@@ -65,6 +65,8 @@ static void disp_event_cb(lv_event_t * e);
 
 lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 {
+    LV_CHECK_ARG(hor_res > 0, return NULL);
+    LV_CHECK_ARG(ver_res > 0, return NULL);
     lv_display_t * disp = lv_ll_ins_head(disp_ll_p);
     LV_ASSERT_MALLOC(disp);
     if(!disp) return NULL;
@@ -186,10 +188,11 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 
 void lv_display_delete(lv_display_t * disp)
 {
-    bool was_default = false;
-    bool was_refr = false;
-    if(disp == lv_display_get_default()) was_default = true;
-    if(disp == lv_refr_get_disp_refreshing()) was_refr = true;
+    if(!disp) {
+        return;
+    }
+    const bool was_default = disp == lv_display_get_default();
+    const bool was_refr = disp == lv_refr_get_disp_refreshing();
 
     lv_display_send_event(disp, LV_EVENT_DELETE, NULL);
     lv_event_mark_deleted(disp);
@@ -276,7 +279,9 @@ void lv_display_set_resolution(lv_display_t * disp, int32_t hor_res, int32_t ver
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(hor_res > 0, return);
+    LV_CHECK_ARG(ver_res > 0, return);
 
     if(disp->hor_res == hor_res && disp->ver_res == ver_res) return;
 
@@ -292,13 +297,14 @@ void lv_display_set_physical_resolution(lv_display_t * disp, int32_t hor_res, in
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(hor_res > 0, return);
+    LV_CHECK_ARG(ver_res > 0, return);
 
     disp->physical_hor_res = hor_res;
     disp->physical_ver_res = ver_res;
 
     lv_obj_invalidate(disp->sys_layer);
-
 }
 
 void lv_display_set_offset(lv_display_t * disp, int32_t x, int32_t y)
@@ -307,7 +313,7 @@ void lv_display_set_offset(lv_display_t * disp, int32_t x, int32_t y)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->offset_x = x;
     disp->offset_y = y;
@@ -323,7 +329,7 @@ void lv_display_set_dpi(lv_display_t * disp, int32_t dpi)
         disp = lv_display_get_default();
     }
 
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->dpi = dpi;
 }
@@ -335,17 +341,14 @@ int32_t lv_display_get_horizontal_resolution(const lv_display_t * disp)
         disp = lv_display_get_default();
     }
 
-    if(disp == NULL) {
-        return 0;
-    }
-    else {
-        switch(disp->rotation) {
-            case LV_DISPLAY_ROTATION_90:
-            case LV_DISPLAY_ROTATION_270:
-                return disp->ver_res;
-            default:
-                return disp->hor_res;
-        }
+    LV_CHECK_ARG(disp != NULL, return 0);
+
+    switch(disp->rotation) {
+        case LV_DISPLAY_ROTATION_90:
+        case LV_DISPLAY_ROTATION_270:
+            return disp->ver_res;
+        default:
+            return disp->hor_res;
     }
 }
 
@@ -356,17 +359,13 @@ int32_t lv_display_get_vertical_resolution(const lv_display_t * disp)
         disp = lv_display_get_default();
     }
 
-    if(disp == NULL) {
-        return 0;
-    }
-    else {
-        switch(disp->rotation) {
-            case LV_DISPLAY_ROTATION_90:
-            case LV_DISPLAY_ROTATION_270:
-                return disp->hor_res;
-            default:
-                return disp->ver_res;
-        }
+    LV_CHECK_ARG(disp != NULL, return 0);
+    switch(disp->rotation) {
+        case LV_DISPLAY_ROTATION_90:
+        case LV_DISPLAY_ROTATION_270:
+            return disp->hor_res;
+        default:
+            return disp->ver_res;
     }
 }
 
@@ -376,9 +375,8 @@ int32_t lv_display_get_original_horizontal_resolution(const lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        return 0;
-    }
+
+    LV_CHECK_ARG(disp != NULL, return 0);
 
     return disp->hor_res;
 }
@@ -389,9 +387,7 @@ int32_t lv_display_get_original_vertical_resolution(const lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        return 0;
-    }
+    LV_CHECK_ARG(disp != NULL, return 0);
 
     return disp->ver_res;
 }
@@ -402,18 +398,14 @@ int32_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
+    LV_CHECK_ARG(disp != NULL, return 0);
 
-    if(disp == NULL) {
-        return 0;
-    }
-    else {
-        switch(disp->rotation) {
-            case LV_DISPLAY_ROTATION_90:
-            case LV_DISPLAY_ROTATION_270:
-                return disp->physical_ver_res > 0 ? disp->physical_ver_res : disp->ver_res;
-            default:
-                return disp->physical_hor_res > 0 ? disp->physical_hor_res : disp->hor_res;
-        }
+    switch(disp->rotation) {
+        case LV_DISPLAY_ROTATION_90:
+        case LV_DISPLAY_ROTATION_270:
+            return disp->physical_ver_res > 0 ? disp->physical_ver_res : disp->ver_res;
+        default:
+            return disp->physical_hor_res > 0 ? disp->physical_hor_res : disp->hor_res;
     }
 }
 
@@ -424,17 +416,13 @@ int32_t lv_display_get_physical_vertical_resolution(const lv_display_t * disp)
         disp = lv_display_get_default();
     }
 
-    if(disp == NULL) {
-        return 0;
-    }
-    else {
-        switch(disp->rotation) {
-            case LV_DISPLAY_ROTATION_90:
-            case LV_DISPLAY_ROTATION_270:
-                return disp->physical_hor_res > 0 ? disp->physical_hor_res : disp->hor_res;
-            default:
-                return disp->physical_ver_res > 0 ? disp->physical_ver_res : disp->ver_res;
-        }
+    LV_CHECK_ARG(disp != NULL, return 0);
+    switch(disp->rotation) {
+        case LV_DISPLAY_ROTATION_90:
+        case LV_DISPLAY_ROTATION_270:
+            return disp->physical_hor_res > 0 ? disp->physical_hor_res : disp->hor_res;
+        default:
+            return disp->physical_ver_res > 0 ? disp->physical_ver_res : disp->ver_res;
     }
 }
 
@@ -445,20 +433,16 @@ int32_t lv_display_get_offset_x(const lv_display_t * disp)
         disp = lv_display_get_default();
     }
 
-    if(disp == NULL) {
-        return 0;
-    }
-    else {
-        switch(disp->rotation) {
-            case LV_DISPLAY_ROTATION_90:
-                return disp->offset_y;
-            case LV_DISPLAY_ROTATION_180:
-                return lv_display_get_physical_horizontal_resolution(disp) - disp->offset_x;
-            case LV_DISPLAY_ROTATION_270:
-                return lv_display_get_physical_horizontal_resolution(disp) - disp->offset_y;
-            default:
-                return disp->offset_x;
-        }
+    LV_CHECK_ARG(disp != NULL, return 0);
+    switch(disp->rotation) {
+        case LV_DISPLAY_ROTATION_90:
+            return disp->offset_y;
+        case LV_DISPLAY_ROTATION_180:
+            return lv_display_get_physical_horizontal_resolution(disp) - disp->offset_x;
+        case LV_DISPLAY_ROTATION_270:
+            return lv_display_get_physical_horizontal_resolution(disp) - disp->offset_y;
+        default:
+            return disp->offset_x;
     }
 }
 
@@ -469,20 +453,16 @@ int32_t lv_display_get_offset_y(const lv_display_t * disp)
         disp = lv_display_get_default();
     }
 
-    if(disp == NULL) {
-        return 0;
-    }
-    else {
-        switch(disp->rotation) {
-            case LV_DISPLAY_ROTATION_90:
-                return disp->offset_x;
-            case LV_DISPLAY_ROTATION_180:
-                return lv_display_get_physical_vertical_resolution(disp) - disp->offset_y;
-            case LV_DISPLAY_ROTATION_270:
-                return lv_display_get_physical_vertical_resolution(disp) - disp->offset_x;
-            default:
-                return disp->offset_y;
-        }
+    LV_CHECK_ARG(disp != NULL, return 0);
+    switch(disp->rotation) {
+        case LV_DISPLAY_ROTATION_90:
+            return disp->offset_x;
+        case LV_DISPLAY_ROTATION_180:
+            return lv_display_get_physical_vertical_resolution(disp) - disp->offset_y;
+        case LV_DISPLAY_ROTATION_270:
+            return lv_display_get_physical_vertical_resolution(disp) - disp->offset_x;
+        default:
+            return disp->offset_y;
     }
 }
 
@@ -492,7 +472,8 @@ int32_t lv_display_get_dpi(const lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return LV_DPI_DEF;  /*Do not return 0 because it might be a divider*/
+    LV_CHECK_ARG(disp != NULL, return LV_DPI_DEF);
+
     return disp->dpi;
 }
 
@@ -506,7 +487,9 @@ void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_d
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(buf1 != NULL, return);
 
     disp->buf_1 = buf1;
     disp->buf_2 = buf2;
@@ -522,9 +505,9 @@ void lv_display_set_3rd_draw_buffer(lv_display_t * disp, lv_draw_buf_t * buf3)
         disp = lv_display_get_default();
     }
     if(disp == NULL) return;
-
-    LV_ASSERT_MSG(disp->buf_1 != NULL, "buf1 is null");
-    LV_ASSERT_MSG(disp->buf_2 != NULL, "buf2 is null");
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(disp->buf_1 != NULL, return, "buf1 should already exist in order to provide a third buffer");
+    LV_CHECK_ARG(disp->buf_2 != NULL, return, "buf2 should already exist in order to provide a third buffer");
 
     disp->buf_3 = buf3;
 }
@@ -532,21 +515,26 @@ void lv_display_set_3rd_draw_buffer(lv_display_t * disp, lv_draw_buf_t * buf3)
 void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
                             lv_display_render_mode_t render_mode)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(buf1 != NULL, return);
     lv_display_set_buffers_with_stride(disp, buf1, buf2, buf_size, LV_STRIDE_AUTO, render_mode);
 }
 
 void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
                                         uint32_t stride, lv_display_render_mode_t render_mode)
 {
-    LV_ASSERT_MSG(buf1 != NULL, "Null buffer");
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(buf1 != NULL, return);
+
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t w = lv_display_get_original_horizontal_resolution(disp);
     uint32_t h = lv_display_get_original_vertical_resolution(disp);
-    LV_ASSERT_MSG(w != 0 && h != 0, "display resolution is 0");
+
+    LV_CHECK_ARG(w != 0 && h != 0, return, "display resolution is 0");
 
     /* buf1 or buf2 is not aligned according to LV_DRAW_BUF_ALIGN */
-    LV_ASSERT_FORMAT_MSG(buf1 == lv_draw_buf_align(buf1, cf), "buf1 is not properly aligned: %p", buf1);
-    LV_ASSERT_FORMAT_MSG(buf2 == NULL || buf2 == lv_draw_buf_align(buf2, cf), "buf2 is not properly aligned: %p", buf2);
+    LV_CHECK_ARG(buf1 == lv_draw_buf_align(buf1, cf), return, "buf1 is not properly aligned: %p", buf1);
+    LV_CHECK_ARG(buf2 == NULL || buf2 == lv_draw_buf_align(buf2, cf), return, "buf2 is not properly aligned: %p", buf2);
 
     bool is_auto_stride = stride == LV_STRIDE_AUTO;
     if(is_auto_stride) {
@@ -554,14 +542,14 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
     }
 
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        LV_ASSERT_FORMAT_MSG(stride != 0, "stride is 0, check your color format %d and width: %" LV_PRIu32, cf, w);
+        LV_CHECK_ARG(stride != 0, return, "stride is 0, check your color format %d and width: %" LV_PRIu32, cf, w);
         /* for partial mode, we calculate the height based on the buf_size and stride */
         h = buf_size / stride;
-        LV_ASSERT_MSG(h != 0, "the buffer is too small");
+        LV_CHECK_ARG(h, return, "the buffer is too small");
     }
     else {
-        LV_ASSERT_FORMAT_MSG(stride * h <= buf_size, "%s mode requires screen sized buffer(s)",
-                             render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
+        LV_CHECK_ARG(stride * h <= buf_size, return, "%s mode requires screen sized buffer(s)",
+                     render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
     }
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
@@ -577,7 +565,7 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
     disp->render_mode = render_mode;
 }
 
@@ -588,7 +576,7 @@ lv_display_flush_cb_t lv_display_get_flush_cb(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return NULL;
+    LV_CHECK_ARG(disp != NULL, return NULL);
     return disp->flush_cb;
 }
 
@@ -598,7 +586,7 @@ void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->flush_cb = flush_cb;
 }
@@ -609,7 +597,7 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->flush_wait_cb = wait_cb;
 }
@@ -620,7 +608,7 @@ void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->sync_cb = sync_cb;
 }
@@ -631,7 +619,7 @@ void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t 
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->sync_wait_cb = wait_cb;
 }
@@ -642,10 +630,11 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->color_format = color_format;
     disp->layer_head->color_format = color_format;
+
     if(disp->buf_1) disp->buf_1->header.cf = color_format;
     if(disp->buf_2) disp->buf_2->header.cf = color_format;
     if(disp->buf_3) disp->buf_3->header.cf = color_format;
@@ -666,20 +655,20 @@ lv_color_format_t lv_display_get_color_format(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return LV_COLOR_FORMAT_UNKNOWN;
+    LV_CHECK_ARG(disp != NULL, return LV_COLOR_FORMAT_UNKNOWN);
 
     return disp->color_format;
 }
 
 void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
 {
-    LV_ASSERT_FORMAT_MSG(tile_cnt < 256, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)", tile_cnt);
 
     if(disp == NULL) {
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(tile_cnt < 256, return, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)", tile_cnt);
 
     disp->tile_cnt = tile_cnt;
 }
@@ -690,7 +679,7 @@ uint32_t lv_display_get_tile_cnt(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return 0;
+    LV_CHECK_ARG(disp != NULL, return 0);
 
     return disp->tile_cnt;
 }
@@ -703,7 +692,7 @@ void lv_display_set_antialiasing(lv_display_t * disp, bool en)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->antialiasing = en;
 }
@@ -714,7 +703,7 @@ bool lv_display_get_antialiasing(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return false;
+    LV_CHECK_ARG(disp != NULL, return false);
 
     return disp->antialiasing;
 }
@@ -725,33 +714,38 @@ lv_display_render_mode_t lv_display_get_render_mode(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return LV_DISPLAY_RENDER_MODE_PARTIAL;
+    LV_CHECK_ARG(disp != NULL, return LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     return disp->render_mode;
 }
 
 LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     disp->flushing = 0;
 }
 
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return false);
     return disp->flushing_last;
 }
 
 LV_ATTRIBUTE_SYNC_READY void lv_display_sync_ready(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     disp->syncing = 0;
 }
 
 LV_ATTRIBUTE_SYNC_READY bool lv_display_sync_is_last(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return false);
     return disp->syncing_last;
 }
 
 bool lv_display_is_double_buffered(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return false);
     return disp->buf_2 != NULL;
 }
 
@@ -765,10 +759,7 @@ lv_obj_t * lv_display_get_screen_active(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("no display registered to get its active screen");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     return disp->act_scr;
 }
@@ -779,10 +770,7 @@ lv_obj_t * lv_display_get_screen_loading(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("no display registered to get the current screen being loaded");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     return disp->scr_to_load;
 }
@@ -793,10 +781,7 @@ lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("no display registered to get its previous screen");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     return disp->prev_scr;
 }
@@ -807,10 +792,7 @@ lv_obj_t * lv_display_get_layer_top(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("lv_layer_top: no display registered to get its top layer");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     return disp->top_layer;
 }
@@ -821,10 +803,7 @@ lv_obj_t * lv_display_get_layer_sys(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("lv_layer_sys: no display registered to get its sys. layer");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     return disp->sys_layer;
 }
@@ -835,10 +814,7 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("lv_layer_bottom: no display registered to get its bottom layer");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     return disp->bottom_layer;
 }
@@ -851,10 +827,8 @@ lv_obj_t * lv_display_get_screen_by_name(const lv_display_t * disp, const char *
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("no display registered to get a screen by name");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
+    LV_CHECK_ARG(screen_name != NULL, return NULL);
 
     uint32_t i;
     for(i = 0; i < disp->screen_cnt; i++) {
@@ -868,14 +842,16 @@ lv_obj_t * lv_display_get_screen_by_name(const lv_display_t * disp, const char *
 
 #endif /*LV_USE_OBJ_NAME*/
 
-void lv_screen_load(struct _lv_obj_t * scr)
+void lv_screen_load(lv_obj_t * scr)
 {
+    LV_CHECK_ARG(scr != NULL, return);
     lv_screen_load_anim(scr, LV_SCREEN_LOAD_ANIM_NONE, 0, 0, false);
 }
 
 void lv_screen_load_anim(lv_obj_t * scr, lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay,
                          bool auto_del)
 {
+    LV_CHECK_ARG(scr != NULL, return);
     lv_display_t * d = lv_obj_get_display(scr);
     lv_obj_t * act_scr = d->act_scr;
 
@@ -1042,34 +1018,34 @@ void lv_screen_load_anim(lv_obj_t * scr, lv_screen_load_anim_t anim_type, uint32
 lv_event_dsc_t * lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter,
                                          void * user_data)
 {
-    LV_ASSERT_NULL(disp);
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     return lv_event_add(&disp->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_display_get_event_count(lv_display_t * disp)
 {
-    LV_ASSERT_NULL(disp);
+    LV_CHECK_ARG(disp != NULL, return 0);
     return lv_event_get_count(&disp->event_list);
 }
 
 lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 {
-    LV_ASSERT_NULL(disp);
+    LV_CHECK_ARG(disp != NULL, return NULL);
     return lv_event_get_dsc(&disp->event_list, index);
 
 }
 
 bool lv_display_remove_event(lv_display_t * disp, uint32_t index)
 {
-    LV_ASSERT_NULL(disp);
+    LV_CHECK_ARG(disp != NULL, return false);
 
     return lv_event_remove(&disp->event_list, index);
 }
 
 uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data)
 {
-    LV_ASSERT_NULL(disp);
+    LV_CHECK_ARG(disp != NULL, return 0);
 
     uint32_t event_cnt = lv_display_get_event_count(disp);
     uint32_t removed_count = 0;
@@ -1088,18 +1064,15 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
 
 lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param)
 {
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
     return lv_event_push_and_send(&disp->event_list, code, disp, param);
 }
 
 lv_area_t * lv_event_get_invalidated_area(lv_event_t * e)
 {
-    if(e->code == LV_EVENT_INVALIDATE_AREA) {
-        return lv_event_get_param(e);
-    }
-    else {
-        LV_LOG_WARN("Not interpreted with this event code");
-        return NULL;
-    }
+    LV_CHECK_ARG(e != NULL, return NULL);
+    LV_CHECK_ARG(e->code == LV_EVENT_INVALIDATE_AREA, return NULL);
+    return lv_event_get_param(e);
 }
 
 void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation)
@@ -1108,7 +1081,7 @@ void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->rotation = rotation;
     update_resolution(disp);
@@ -1120,30 +1093,23 @@ lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return LV_DISPLAY_ROTATION_0;
+    LV_CHECK_ARG(disp != NULL, return LV_DISPLAY_ROTATION_0);
     return disp->rotation;
 }
 
 void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
 {
-#if LV_DRAW_TRANSFORM_USE_MATRIX
+    LV_CHECK_ARG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
+
     if(disp == NULL) {
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return;
-
-    if(!(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT || disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL)) {
-        LV_LOG_WARN("Unsupported rendering mode: %d", disp->render_mode);
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
+                 disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL, return, "Unsupported rendering mode: %d", disp->render_mode);
 
     disp->matrix_rotation = enable;
-#else
-    (void)disp;
-    (void)enable;
-    LV_LOG_WARN("LV_DRAW_TRANSFORM_USE_MATRIX was not enabled");
-#endif
 }
 
 bool lv_display_get_matrix_rotation(lv_display_t * disp)
@@ -1152,7 +1118,8 @@ bool lv_display_get_matrix_rotation(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) return false;
+    LV_CHECK_ARG(disp != NULL, return false);
+    LV_CHECK_ARG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return false, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
     return disp->matrix_rotation;
 }
 
@@ -1162,10 +1129,7 @@ void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("no display registered");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->theme = th;
 
@@ -1190,15 +1154,15 @@ lv_theme_t * lv_display_get_theme(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
     return disp->theme;
 }
 
 uint32_t lv_display_get_inactive_time(const lv_display_t * disp)
 {
-    if(disp) return lv_tick_elaps(disp->last_activity_time);
+    if(disp) {
+        return lv_tick_elaps(disp->last_activity_time);
+    }
 
     lv_display_t * d;
     uint32_t t = UINT32_MAX;
@@ -1218,10 +1182,7 @@ void lv_display_trigger_activity(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("lv_display_trigger_activity: no display registered");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->last_activity_time = lv_tick_get();
 }
@@ -1232,11 +1193,7 @@ void lv_display_enable_invalidation(lv_display_t * disp, bool en)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("no display registered");
-        return;
-    }
-
+    LV_CHECK_ARG(disp != NULL, return);
     disp->inv_en_cnt += en ? 1 : -1;
 }
 
@@ -1246,12 +1203,9 @@ bool lv_display_is_invalidation_enabled(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) {
-        LV_LOG_WARN("no display registered");
-        return false;
-    }
 
-    return (disp->inv_en_cnt > 0);
+    LV_CHECK_ARG(disp != NULL, return false);
+    return disp->inv_en_cnt > 0;
 }
 
 lv_timer_t * lv_display_get_refr_timer(lv_display_t * disp)
@@ -1260,8 +1214,7 @@ lv_timer_t * lv_display_get_refr_timer(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return NULL;
-
+    LV_CHECK_ARG(disp != NULL, return NULL);
     return disp->refr_timer;
 }
 
@@ -1271,7 +1224,7 @@ void lv_display_delete_refr_timer(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp || !disp->refr_timer) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     lv_timer_delete(disp->refr_timer);
     disp->refr_timer = NULL;
@@ -1283,7 +1236,7 @@ lv_result_t lv_display_send_vsync_event(lv_display_t * disp, void * param)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return LV_RESULT_INVALID;
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
 
     if(disp->vsync_count > 0)
         return lv_display_send_event(disp, LV_EVENT_VSYNC, param);
@@ -1297,7 +1250,7 @@ bool lv_display_register_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return false;
+    LV_CHECK_ARG(disp != NULL, return false);
 
     lv_display_add_event_cb(disp, event_cb, LV_EVENT_VSYNC, user_data);
 
@@ -1315,7 +1268,7 @@ bool lv_display_unregister_vsync_event(lv_display_t * disp, lv_event_cb_t event_
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return false;
+    LV_CHECK_ARG(disp != NULL, return false);
 
     uint32_t removed_count = lv_display_remove_event_cb_with_user_data(disp, event_cb, user_data);
     if(removed_count == 0)
@@ -1335,7 +1288,7 @@ void lv_display_set_user_data(lv_display_t * disp, void * user_data)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return;
+    LV_CHECK_ARG(disp != NULL, return);
     disp->user_data = user_data;
 }
 
@@ -1345,7 +1298,7 @@ void lv_display_set_driver_data(lv_display_t * disp, void * driver_data)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return;
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->driver_data = driver_data;
 }
@@ -1356,7 +1309,8 @@ void * lv_display_get_user_data(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return NULL;
+    LV_CHECK_ARG(disp != NULL, return NULL);
+
     return disp->user_data;
 }
 
@@ -1366,7 +1320,7 @@ void * lv_display_get_driver_data(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return NULL;
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     return disp->driver_data;
 }
@@ -1377,12 +1331,14 @@ lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return NULL;
+    LV_CHECK_ARG(disp != NULL, return NULL);
     return disp->buf_act;
 }
 
 void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(area != NULL, return);
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
     if(rotation == LV_DISPLAY_ROTATION_0) return;
@@ -1416,6 +1372,8 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
 
 void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(point != NULL, return);
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
     if(rotation == LV_DISPLAY_ROTATION_0) return;
@@ -1477,12 +1435,9 @@ uint32_t lv_display_get_draw_buf_size(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(!disp) return 0;
-
-    if(disp->buf_1) {
-        return disp->buf_1->data_size;
-    }
-    return 0;
+    LV_CHECK_ARG(disp != NULL, return 0);
+    LV_CHECK_ARG(disp->buf_1 != NULL, return 0);
+    return disp->buf_1->data_size;
 }
 
 uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t width, uint32_t height)
@@ -1491,6 +1446,7 @@ uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t 
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
+    LV_CHECK_ARG(disp != NULL, return 0);
     if(!disp) return 0;
 
     if(disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
@@ -1501,8 +1457,7 @@ uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t 
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
     uint32_t buf_size = stride * height;
-
-    LV_ASSERT(disp->buf_1 && disp->buf_1->data_size >= buf_size);
+    if(disp->buf_1) LV_ASSERT(disp->buf_1->data_size >= buf_size);
     if(disp->buf_2) LV_ASSERT(disp->buf_2->data_size >= buf_size);
     if(disp->buf_3) LV_ASSERT(disp->buf_3->data_size >= buf_size);
 
@@ -1536,16 +1491,18 @@ int32_t lv_dpx(int32_t n)
 
 int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
 {
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return LV_DPI_DEF);
     return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
 
 #if LV_USE_EXT_DATA
 void lv_display_set_external_data(lv_display_t * disp, void * data, void (* free_cb)(void * data))
 {
-    if(!disp) {
-        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL display");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
 
     disp->ext_data.data = data;
     disp->ext_data.free_cb = free_cb;
@@ -1567,8 +1524,11 @@ static bool new_screen_deleted(lv_load_screen_result_t res)
 
 static void update_resolution(lv_display_t * disp)
 {
+    LV_ASSERT(disp != NULL);
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
+    LV_ASSERT(hor_res > 0);
+    LV_ASSERT(ver_res > 0);
 
     lv_area_t prev_coords;
     lv_obj_get_coords(disp->sys_layer, &prev_coords);
@@ -1603,13 +1563,16 @@ static void update_resolution(lv_display_t * disp)
 
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(user_data);
+    LV_ASSERT(obj != NULL);
     lv_obj_mark_layout_as_dirty(obj);
     return LV_OBJ_TREE_WALK_NEXT;
 }
 
 static void screen_event_delete_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t ** screen_var = lv_event_get_user_data(e);
     *screen_var = NULL;
 }
@@ -1634,10 +1597,9 @@ static lv_load_screen_result_t load_new_screen(lv_obj_t * scr)
 {
     /*scr must not be NULL, but d->act_scr might be*/
     LV_ASSERT_NULL(scr);
-    if(scr == NULL) return false;
 
     lv_display_t * d = lv_obj_get_display(scr);
-    LV_ASSERT_NULL(d);
+    LV_ASSERT(d != NULL);
 
     lv_obj_t * old_scr = d->act_scr;
     /* Attach an event delete cb to the screen so we know if the screen is deleted during an event*/
@@ -1698,7 +1660,9 @@ static lv_load_screen_result_t load_new_screen(lv_obj_t * scr)
 
 static void scr_load_anim_start(lv_anim_t * a)
 {
+    LV_ASSERT(a != NULL);
     lv_display_t * d = lv_obj_get_display(a->var);
+    LV_ASSERT(d != NULL);
 
     d->prev_scr = d->act_scr;
     d->act_scr = a->var;
@@ -1708,22 +1672,27 @@ static void scr_load_anim_start(lv_anim_t * a)
 
 static void opa_scale_anim(void * obj, int32_t v)
 {
+    LV_ASSERT(obj != NULL);
     lv_obj_set_style_opa(obj, v, 0);
 }
 
 static void set_x_anim(void * obj, int32_t v)
 {
+    LV_ASSERT(obj != NULL);
     lv_obj_set_x(obj, v);
 }
 
 static void set_y_anim(void * obj, int32_t v)
 {
+    LV_ASSERT(obj != NULL);
     lv_obj_set_y(obj, v);
 }
 
 static void scr_anim_completed(lv_anim_t * a)
 {
+    LV_ASSERT(a != NULL);
     lv_display_t * d = lv_obj_get_display(a->var);
+    LV_ASSERT(d != NULL);
 
     if(lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL) == LV_RESULT_INVALID) {
         d->act_scr = NULL;
@@ -1754,14 +1723,13 @@ static bool is_out_anim(lv_screen_load_anim_t anim_type)
 
 static void disp_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_event_code_t code = lv_event_get_code(e);
     lv_display_t * disp = lv_event_get_target(e);
-    switch(code) {
-        case LV_EVENT_REFR_REQUEST:
-            if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
-            break;
+    LV_ASSERT(disp != NULL);
+    LV_ASSERT(code == LV_EVENT_REFR_REQUEST);
 
-        default:
-            break;
+    if(disp->refr_timer) {
+        lv_timer_resume(disp->refr_timer);
     }
 }
