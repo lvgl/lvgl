@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "../lvgl_public.h"
+#include "../misc/lv_array.h"
 
 /*********************
  *      DEFINES

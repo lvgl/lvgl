@@ -11,6 +11,7 @@
 
 #include "lv_svg_token.h"
 #include "lv_svg_parser.h"
+#include "../../misc/lv_array.h"
 
 /*********************
 *      DEFINES

@@ -148,7 +148,6 @@
 #include "layouts/lv_layout.h"
 #include "logging/lv_log.h"
 #include "lv_types.h"
-#include "misc/lv_array.h"
 #include "misc/lv_async.h"
 #include "misc/lv_math.h"
 #include "misc/lv_ll.h"

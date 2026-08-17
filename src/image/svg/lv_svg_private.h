@@ -18,6 +18,7 @@ extern "C" {
 #if LV_USE_SVG
 
 #include "../../misc/lv_tree.h"
+#include "../../misc/lv_array.h"
 
 /*********************
  *      DEFINES
