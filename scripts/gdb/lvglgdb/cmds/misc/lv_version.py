@@ -34,8 +34,10 @@ def version_from_sources():
             found = gdb.lookup_global_symbol(symbol)
             if found is None or found.symtab is None:
                 continue
-            path = found.symtab.fullname()
-            marker = f"{os.sep}src{os.sep}"
+            # DWARF records whatever separator the compiler used, which is not
+            # always the host's: a MinGW build writes forward slashes.
+            path = found.symtab.fullname().replace("\\", "/")
+            marker = "/src/"
             if marker not in path:
                 continue
             header = os.path.join(path[:path.rindex(marker)], "lv_version.h")
@@ -73,7 +75,9 @@ def lvgl_version():
     except gdb.error:
         info = None
 
-    if any(p is None for p in parts):
+    # `info` counts as missing too: a build that hides it loses the "-dev" that
+    # tells a development version from a release.
+    if any(p is None for p in parts) or info is None:
         from_sources = version_from_sources()
         if from_sources is not None:
             return from_sources

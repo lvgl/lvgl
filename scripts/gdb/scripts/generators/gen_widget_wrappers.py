@@ -44,7 +44,9 @@ SIMPLE_INT_TYPES = {
 def _scan_enum_types() -> set[str]:
     """Scan LVGL headers to find all typedef enum and int-like alias type names."""
     result = set()
-    headers = list(LVGL_SRC.rglob("*.h")) + list(LVGL_INC.rglob("*.h"))
+    # In a checkout LVGL_INC *is* LVGL_SRC, so the two trees have to be merged
+    # rather than concatenated or every header is read twice.
+    headers = sorted({*LVGL_SRC.rglob("*.h"), *LVGL_INC.rglob("*.h")})
     for h in headers:
         text = h.read_text(errors="ignore")
         # typedef enum { ... } lv_xxx_t;
