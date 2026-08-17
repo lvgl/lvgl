@@ -7,13 +7,13 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl.h"
-#include "lv_svg_render.h"
+#include "../../lvgl_public.h"
 #if LV_USE_SVG
 
 #include "../../misc/lv_text_private.h"
 #include <math.h>
 #include <string.h>
+#include "lv_svg_render.h"
 
 #if LV_USE_FREETYPE
     #include "../../font/freetype/lv_freetype_private.h"

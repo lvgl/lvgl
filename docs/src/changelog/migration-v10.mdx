@@ -498,6 +498,21 @@ if you need finer control.
 
 ---
 
+## Image
+
+### SVG
+
+The SVG module internal structures were previously leaked to the public API.
+v9.6 moves these structures to the private API. If you have code that relies on this module, you
+can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
+
+<Callout type="info">
+No public API usage required the user to access these private structures so 
+if you were simply using the public API, this doesn't change anything for you.
+</Callout>
+
+---
+
 ## Others
 
 ### lv_file_explorer
