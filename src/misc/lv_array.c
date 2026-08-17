@@ -8,6 +8,7 @@
  *      INCLUDES
  *********************/
 #include "../lvgl_public.h"
+#include "lv_array.h"
 
 /*********************
  *      DEFINES

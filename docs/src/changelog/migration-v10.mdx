@@ -526,6 +526,12 @@ No public API usage required the user to access this private structure so
 if you were simply using the public API, this doesn't change anything for you.
 </Callout>
 
+### Array
+
+The `lv_array` module was previously leaked to the public LVGL API through the SVG and Event
+modules. v9.6 moves it to the private API. If you have code that relies on this module, you
+can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
+
 ### Tree
 
 The `lv_tree` module was previously leaked to the public LVGL API through the SVG module.

@@ -10,7 +10,6 @@
 #include "lv_svg_token.h"
 #if LV_USE_SVG
 
-#include "../../../lvgl.h"
 #include <ctype.h>
 #include <string.h>
 

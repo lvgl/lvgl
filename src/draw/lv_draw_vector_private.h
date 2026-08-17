@@ -18,6 +18,8 @@ extern "C" {
 
 #if LV_USE_VECTOR_GRAPHIC
 
+#include "../misc/lv_array.h"
+
 /*********************
  *      DEFINES
  *********************/

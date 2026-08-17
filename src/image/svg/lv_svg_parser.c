@@ -7,13 +7,14 @@
  *      INCLUDES
  *********************/
 #include "lv_svg_parser.h"
+
 #if LV_USE_SVG
 
-#include "../../../lvgl.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "../../misc/lv_array.h"
 
 /*********************
 *      DEFINES

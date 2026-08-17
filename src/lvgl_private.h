@@ -159,6 +159,7 @@
 #include "misc/lv_anim_private.h"
 #include "misc/lv_anim_timeline_private.h"
 #include "misc/lv_area_private.h"
+#include "misc/lv_array.h"
 #include "misc/lv_bidi_private.h"
 #include "misc/lv_circle_buf_private.h"
 #include "misc/lv_event_private.h"

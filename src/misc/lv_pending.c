@@ -7,8 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_pending.h"
 #include "../lvgl_public.h"
+#include "lv_pending.h"
+#include "lv_array.h"
 
 /*********************
  *      DEFINES

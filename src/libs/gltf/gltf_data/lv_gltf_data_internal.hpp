@@ -8,6 +8,7 @@
 #include "lv_gltf_data_internal.h"
 
 #include "../../../drivers/opengles/lv_opengles_private.h"
+#include "../../../misc/lv_array.h"
 #include "../../../misc/lv_event_private.h"
 
 #ifdef __cplusplus
