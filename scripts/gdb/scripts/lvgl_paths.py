@@ -12,7 +12,10 @@ from pathlib import Path
 
 
 def _is_lvgl(path):
-    return (path / "lv_version.h").is_file() and (path / "src").is_dir()
+    """A checkout, or an installed tree that only has the public headers."""
+    if not (path / "lv_version.h").is_file():
+        return False
+    return (path / "src").is_dir() or (path / "include" / "lvgl").is_dir()
 
 
 def lvgl_root(start=None):
@@ -22,7 +25,8 @@ def lvgl_root(start=None):
         root = Path(from_env).expanduser().resolve()
         if not _is_lvgl(root):
             raise SystemExit(
-                f"LVGL_ROOT is {root}, which has no lv_version.h and src/"
+                f"LVGL_ROOT is {root}, which has no lv_version.h beside a src/ "
+                f"or include/lvgl/"
             )
         return root
 
