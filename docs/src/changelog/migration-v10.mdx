@@ -515,6 +515,17 @@ if you were simply using the public API, this doesn't change anything for you.
 
 ## Misc
 
+### Event
+
+The `lv_event_list_t` structure was previously leaked to the public API.
+v9.6 moves it to the private API. If you have code that relies on the internals of this structure,
+you can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
+
+<Callout type="info">
+No public API usage required the user to access this private structure so 
+if you were simply using the public API, this doesn't change anything for you.
+</Callout>
+
 ### Tree
 
 The `lv_tree` module was previously leaked to the public LVGL API through the SVG module.

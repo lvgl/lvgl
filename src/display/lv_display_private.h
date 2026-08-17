@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lvgl_public.h"
+#include "../misc/lv_event_private.h"
 
 #if LV_USE_SYSMON
 #include "../debugging/sysmon/lv_sysmon_private.h"
