@@ -358,6 +358,10 @@ typedef uint32_t lv_prop_id_t;
 
 typedef struct _lv_draw_buf_t lv_draw_buf_t;
 
+#if LV_USE_SVG
+typedef struct _lv_svg_node_t lv_svg_node_t;
+#endif
+
 #if LV_USE_OBJ_PROPERTY
 typedef struct _lv_property_name_t lv_property_name_t;
 #endif
