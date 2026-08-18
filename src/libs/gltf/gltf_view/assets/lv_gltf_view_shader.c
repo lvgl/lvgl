@@ -784,13 +784,15 @@ static const lv_opengl_shader_t src_includes[] = {
 
         float lambdaSheenNumericHelper(float x, float alphaG)
         {
+            // The first four coefficients are packed into a vec4 so a single
+            // vectorized mix() replaces four scalar ones, instead of relying on
+            // the shader compiler to vectorize them.
+            vec4 mixA = vec4(21.5473, 3.82987, 0.19823, -1.97760);
+            vec4 mixB = vec4(25.3245, 3.32435, 0.16801, -1.27393);
             float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);
-            float a = mix(21.5473, 25.3245, oneMinusAlphaSq);
-            float b = mix(3.82987, 3.32435, oneMinusAlphaSq);
-            float c = mix(0.19823, 0.16801, oneMinusAlphaSq);
-            float d = mix(-1.97760, -1.27393, oneMinusAlphaSq);
+            vec4 abcd = mix(mixA, mixB, vec4(oneMinusAlphaSq));
             float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);
-            return a / (1.0 + b * pow(x, c)) + d * x + e;
+            return abcd.x / (1.0 + abcd.y * pow(x, abcd.z)) + abcd.w * x + e;
         }
 
 
@@ -3247,13 +3249,15 @@ static const lv_opengl_shader_t env_src_includes[] = {
         // that the table is later used to scale.
         float lambdaSheenNumericHelper(float x, float alphaG)
         {
+            // The first four coefficients are packed into a vec4 so a single
+            // vectorized mix() replaces four scalar ones, instead of relying on
+            // the shader compiler to vectorize them.
+            vec4 mixA = vec4(21.5473, 3.82987, 0.19823, -1.97760);
+            vec4 mixB = vec4(25.3245, 3.32435, 0.16801, -1.27393);
             float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);
-            float a = mix(21.5473, 25.3245, oneMinusAlphaSq);
-            float b = mix(3.82987, 3.32435, oneMinusAlphaSq);
-            float c = mix(0.19823, 0.16801, oneMinusAlphaSq);
-            float d = mix(-1.97760, -1.27393, oneMinusAlphaSq);
+            vec4 abcd = mix(mixA, mixB, vec4(oneMinusAlphaSq));
             float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);
-            return a / (1.0 + b * pow(x, c)) + d * x + e;
+            return abcd.x / (1.0 + abcd.y * pow(x, abcd.z)) + abcd.w * x + e;
         }
 
         float lambdaSheen(float cosTheta, float alphaG)
