@@ -126,6 +126,10 @@ static int32_t do_cubic_bezier(int32_t t, int32_t a, int32_t b, int32_t c)
 
 int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
+    /*x is not checked as the range is clamped below*/
+    LV_CHECK_ARG(x1 >= 0 && x1 <= LV_BEZIER_VAL_MAX, return 0);
+    LV_CHECK_ARG(x2 >= 0 && x2 <= LV_BEZIER_VAL_MAX, return 0);
+
     int32_t ax, bx, cx, ay, by, cy;
     int32_t tl, tr, t;  /*t in cubic-bezier function, used for bisection */
     int32_t xs;  /*x sampled on curve */
@@ -208,6 +212,8 @@ found:
 
 void LV_ATTRIBUTE_FAST_MEM lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 {
+    LV_CHECK_ARG(q != NULL, return);
+
     x = x << 8; /*To get 4 bit precision. (sqrt(256) = 16 = 4 bit)*/
 
     uint32_t root = 0;
@@ -442,6 +448,8 @@ void lv_rand_set_seed(uint32_t seed)
 
 uint32_t lv_rand(uint32_t min, uint32_t max)
 {
+    LV_CHECK_ARG(min <= max, return min);
+
     /*Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs"*/
     uint32_t x = rand_seed;
     x ^= x << 13;
