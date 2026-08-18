@@ -103,19 +103,25 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 
 void lv_sdl_window_set_resizeable(lv_display_t * disp, bool value)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
     SDL_SetWindowResizable(dsc->window, value);
 }
 
 void lv_sdl_window_set_size(lv_display_t * disp, int32_t hor_res, int32_t ver_res)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
     SDL_SetWindowSize(dsc->window, hor_res, ver_res);
 }
 
 void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
     dsc->zoom = zoom;
     lv_display_send_event(disp, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_refr_now(disp);
@@ -123,7 +129,9 @@ void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom)
 
 float lv_sdl_window_get_zoom(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return 0.f);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return 0.f, "Invalid display");
     return dsc->zoom;
 }
 
@@ -144,13 +152,19 @@ lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id)
 
 void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
 {
+    LV_CHECK_ARG(title != NULL, return);
+
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
     SDL_SetWindowTitle(dsc->window, title);
 }
 
 void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int32_t height)
 {
+    LV_CHECK_ARG(icon != NULL, return);
+
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
     SDL_Surface * iconSurface = SDL_CreateRGBSurfaceWithFormatFrom(icon, width, height, 32, width * 4,
                                                                    SDL_PIXELFORMAT_ARGB8888);
     SDL_SetWindowIcon(dsc->window, iconSurface);
@@ -159,23 +173,15 @@ void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int
 
 void * lv_sdl_window_get_renderer(lv_display_t * display)
 {
-    if(!display) {
-        return NULL;
-    }
+    LV_CHECK_ARG(display != NULL, return NULL);
     return lv_sdl_backend_ops.get_renderer(display);
 }
 
 struct SDL_Window * lv_sdl_window_get_window(lv_display_t * disp)
 {
-    if(!disp) {
-        LV_LOG_ERROR("invalid display pointer");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    if(!dsc) {
-        LV_LOG_ERROR("invalid driver data");
-        return NULL;
-    }
+    LV_CHECK_ARG(dsc != NULL, return NULL, "Invalid display");
     return dsc->window;
 }
 
@@ -191,31 +197,29 @@ void lv_sdl_quit(void)
 
 void lv_sdl_backend_set_display_data(lv_display_t * display, void * backend_display_data)
 {
-    LV_ASSERT_NULL(display);
+    LV_ASSERT(display != NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(display);
     dsc->backend_data = backend_display_data;
 }
 void * lv_sdl_backend_get_display_data(lv_display_t * display)
 {
-    LV_ASSERT_NULL(display);
+    LV_ASSERT(display != NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(display);
     return dsc->backend_data;
 }
 
 int32_t lv_sdl_window_get_horizontal_resolution(lv_display_t * display)
 {
-    /* Private function, fine to assert here*/
-    LV_ASSERT_NULL(display);
+    LV_ASSERT(display != NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(display);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
     return (int32_t)((float)(display->hor_res) * dsc->zoom);
 }
 int32_t lv_sdl_window_get_vertical_resolution(lv_display_t * display)
 {
-    /* Private function, fine to assert here*/
-    LV_ASSERT_NULL(display);
+    LV_ASSERT(display != NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(display);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
     return (int32_t)((float)(display->ver_res) * dsc->zoom);
 }
 
@@ -284,7 +288,9 @@ static void sdl_event_handler(lv_timer_t * t)
 
 static lv_result_t window_create(lv_display_t * disp)
 {
+    LV_ASSERT(disp != NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_ASSERT(dsc != NULL);
     dsc->zoom = 1.0;
 
     int flag = 0;
@@ -318,7 +324,9 @@ static lv_result_t window_create(lv_display_t * disp)
 
 static void res_chg_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_display_t * disp = lv_event_get_current_target(e);
+    LV_ASSERT(disp != NULL);
     if(lv_sdl_backend_ops.resize_display(disp) != LV_RESULT_OK) {
         LV_LOG_WARN("Failed to resize display");
         return;
@@ -338,8 +346,11 @@ static void release_disp_cb(lv_event_t * e)
     if(lv_deinit_in_progress) {
         lv_sdl_quit();
     }
+    LV_ASSERT(e != NULL);
     lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
+    LV_ASSERT(disp != NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_ASSERT(dsc != NULL);
 
     lv_sdl_backend_ops.deinit_display(disp);
     SDL_DestroyWindow(dsc->window);
