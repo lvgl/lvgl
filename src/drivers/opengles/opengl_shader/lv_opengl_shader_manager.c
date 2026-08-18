@@ -174,7 +174,7 @@ lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * 
     char define[512];
     uint32_t hash = lv_opengl_shader_hash(shader_identifier);
     for(size_t i = 0; i < permutations_len; ++i) {
-        LV_ASSERT_NULL(permutations[i].name);
+        LV_ASSERT(permutations[i].name != NULL);
         if(permutations[i].value) {
             lv_snprintf(define, sizeof(define), "%s%s", permutations[i].name, permutations[i].value);
         }
