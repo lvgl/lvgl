@@ -114,6 +114,8 @@ static const lv_calendar_festival_t festivals_base_gregorian[] = {
 
 void lv_calendar_set_chinese_mode(lv_obj_t * obj, bool en)
 {
+    LV_CHECK_OBJ(obj, &lv_calendar_class, return);
+
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     calendar->use_chinese_calendar = en;
     lv_calendar_set_month_shown(obj, calendar->today.year, calendar->today.month);
@@ -121,6 +123,8 @@ void lv_calendar_set_chinese_mode(lv_obj_t * obj, bool en)
 
 const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)
 {
+    LV_CHECK_ARG(gregorian != NULL, return NULL);
+
     uint16_t i, len;
     lv_calendar_chinese_t chinese_calendar;
     lv_calendar_gregorian_to_chinese(gregorian, &chinese_calendar);
@@ -171,6 +175,9 @@ const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)
 
 void lv_calendar_gregorian_to_chinese(lv_calendar_date_t * gregorian_time, lv_calendar_chinese_t * chinese_time)
 {
+    LV_CHECK_ARG(gregorian_time != NULL, return);
+    LV_CHECK_ARG(chinese_time != NULL, return);
+
     uint16_t year = gregorian_time->year;
     uint8_t month = gregorian_time->month;
     uint8_t day = gregorian_time->day;
