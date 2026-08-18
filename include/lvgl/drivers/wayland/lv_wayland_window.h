@@ -27,7 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * disp);
+typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * display);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -46,50 +46,50 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 /**
  * Closes the window programmatically
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window @nullable
  */
-void lv_wayland_window_close(lv_display_t * disp);
+void lv_wayland_window_close(lv_display_t * display);
 
 /**
  * Check if the window is open
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  * @return true: The window is open
  */
-bool lv_wayland_window_is_open(lv_display_t * disp);
+bool lv_wayland_window_is_open(lv_display_t * display);
 
 /**
  * Assigns the window to a specific physical display
- * @param disp Reference to the LVGL display associated to the window
- * @param display Physical display number
+ * @param display Reference to the LVGL display associated to the window
+ * @param phys_display Physical display number
  */
-void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display);
+void lv_wayland_assign_physical_display(lv_display_t * display, uint8_t phys_display);
 
 /**
  * Unassigns the current physical display attached to the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  */
-void lv_wayland_unassign_physical_display(lv_display_t * disp);
+void lv_wayland_unassign_physical_display(lv_display_t * display);
 
 /**
  * Sets the fullscreen state of the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  * @param fullscreen If true the window enters fullscreen
  */
 
-void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen);
+void lv_wayland_window_set_fullscreen(lv_display_t * display, bool fullscreen);
 
 /**
  * Sets the maximized state of the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  * @param maximize   If true the window is maximized
  */
-void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximize);
+void lv_wayland_window_set_maximized(lv_display_t * display, bool maximize);
 
 /**
  * Minimizes the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  */
-void lv_wayland_window_set_minimized(lv_display_t * disp);
+void lv_wayland_window_set_minimized(lv_display_t * display);
 
 /**********************
  *      MACROS

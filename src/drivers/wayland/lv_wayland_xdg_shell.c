@@ -86,8 +86,8 @@ const struct xdg_wm_base_listener * lv_wayland_xdg_get_wm_base_listener(void)
 void lv_wayland_xdg_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscreen,
                                    struct wl_output * output)
 {
-    LV_ASSERT_NULL(xdg);
-    LV_ASSERT_NULL(xdg->xdg_toplevel);
+    LV_CHECK_ARG(xdg != NULL, return);
+    LV_CHECK_ARG(xdg->xdg_toplevel != NULL, return);
     if(fullscreen) {
         xdg_toplevel_set_fullscreen(xdg->xdg_toplevel, output);
     }
@@ -98,8 +98,8 @@ void lv_wayland_xdg_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscreen,
 
 void lv_wayland_xdg_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized)
 {
-    LV_ASSERT_NULL(xdg);
-    LV_ASSERT_NULL(xdg->xdg_toplevel);
+    LV_CHECK_ARG(xdg != NULL, return);
+    LV_CHECK_ARG(xdg->xdg_toplevel != NULL, return);
     if(maximized) {
         xdg_toplevel_set_maximized(xdg->xdg_toplevel);
     }
@@ -110,14 +110,14 @@ void lv_wayland_xdg_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized)
 
 void lv_wayland_xdg_set_minimized(lv_wl_window_xdg_t * xdg)
 {
-    LV_ASSERT_NULL(xdg);
-    LV_ASSERT_NULL(xdg->xdg_toplevel);
+    LV_CHECK_ARG(xdg != NULL, return);
+    LV_CHECK_ARG(xdg->xdg_toplevel != NULL, return);
     xdg_toplevel_set_minimized(xdg->xdg_toplevel);
 }
 
 lv_result_t lv_wl_xdg_create_window(struct xdg_wm_base * xdg_wm, lv_wl_window_t * window, const char * title)
 {
-    LV_ASSERT_NULL(xdg_wm);
+    LV_CHECK_ARG(xdg_wm != NULL, return LV_RESULT_INVALID);
 
     window->xdg.xdg_surface = xdg_wm_base_get_xdg_surface(xdg_wm, window->body);
     if(!window->xdg.xdg_surface) {
