@@ -687,6 +687,12 @@
 /** Color filter style */
 #define LV_USE_COLOR_FILTER 0
 
+/** The maximum amount of layout update tries LVGL will run for any given object.
+ *  Past this amount of passes, LVGL assumes that the layout can't be computed and
+ *  gives up.
+ */
+#define LV_OBJ_LAYOUT_UPDATE_MAX_PASSES 100
+
 
 
 /*============================================================================

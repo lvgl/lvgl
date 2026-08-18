@@ -1325,6 +1325,14 @@
     #endif
 #endif
 
+#ifndef LV_OBJ_LAYOUT_UPDATE_MAX_PASSES
+    #ifdef CONFIG_LV_OBJ_LAYOUT_UPDATE_MAX_PASSES
+        #define LV_OBJ_LAYOUT_UPDATE_MAX_PASSES CONFIG_LV_OBJ_LAYOUT_UPDATE_MAX_PASSES
+    #else
+        #define LV_OBJ_LAYOUT_UPDATE_MAX_PASSES 100
+    #endif
+#endif
+
 
 
 /*============================================================================

@@ -16,6 +16,7 @@
 #include "../display/lv_display_private.h"
 #include "lv_refr_private.h"
 #include "../core/lv_global.h"
+#include "lv_obj_class_private.h"
 
 /*********************
  *      DEFINES
@@ -336,7 +337,16 @@ void lv_obj_update_layout(const lv_obj_t * obj)
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
     /*Repeat until there are no more layout invalidations*/
+    uint32_t pass_cnt = 0;
     while(scr->scr_layout_inv) {
+        if(pass_cnt >= LV_OBJ_LAYOUT_UPDATE_MAX_PASSES) {
+            LV_LOG_WARN("Layout of screen %p (class: '%s') didn't settle in %d passes, giving up. Some sizes "
+                        "probably depend on each other circularly",
+                        (void *)scr, scr->class_p->name, LV_OBJ_LAYOUT_UPDATE_MAX_PASSES);
+            scr->scr_layout_inv = 0;
+            break;
+        }
+        pass_cnt++;
         LV_LOG_TRACE("Layout update begin");
         scr->scr_layout_inv = 0;
         layout_update_core(scr);
