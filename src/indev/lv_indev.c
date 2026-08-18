@@ -22,31 +22,6 @@
 /*********************
  *      DEFINES
  *********************/
-/*Drag threshold in pixels*/
-#define LV_INDEV_DEF_SCROLL_LIMIT         10
-
-/*Drag throw slow-down in [%]. Greater value -> faster slow-down*/
-#define LV_INDEV_DEF_SCROLL_THROW         10
-
-/*Long press time in milliseconds.
- *Time to send `LV_EVENT_LONG_PRESSED`)*/
-#define LV_INDEV_DEF_LONG_PRESS_TIME      400
-
-/*Repeated trigger period in long press [ms]
- *Time between `LV_EVENT_LONG_PRESSED_REPEAT*/
-#define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
-
-/*Max time between consecutive clicks for a multi-click (double/triple) gesture [ms].*/
-#define LV_INDEV_DEF_DOUBLE_CLICK_TIME      400
-
-/*Gesture threshold in pixels*/
-#define LV_INDEV_DEF_GESTURE_LIMIT        50
-
-/*Gesture min velocity at release before swipe (pixels)*/
-#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
-
-/**< Rotary diff count will be multiplied by this and divided by 256 */
-#define LV_INDEV_DEF_ROTARY_SENSITIVITY         256
 
 #if LV_INDEV_DEF_SCROLL_THROW <= 0
     #warning "LV_INDEV_DEF_SCROLL_THROW must be greater than 0"
