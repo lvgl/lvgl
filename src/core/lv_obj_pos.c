@@ -24,6 +24,10 @@
 #define MY_CLASS (&lv_obj_class)
 #define update_layout_mutex LV_GLOBAL_DEFAULT()->layout_update_mutex
 
+#if LV_OBJ_LAYOUT_UPDATE_MAX_PASSES <= 0
+    #error "LV_OBJ_LAYOUT_UPDATE_MAX_PASSES needs to be at least 1, otherwise no object layout is calculated"
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -133,10 +137,11 @@ bool lv_obj_refr_size(lv_obj_t * obj)
          * parent's content width calculation. Min/max width define the width in effect only where the clamp
          * actually overrode the width style, hence the comparisons against the unclamped width: crediting a
          * width that merely happens to equal `minw` or `maxw` to min/max makes the flag alternate between
-         * layout passes and the layout never settles.
+         * layout passes and the layout never settles. With inverted bounds (`minw > maxw`) the clamp always
+         * resolves to `minw`, so min width is in effect regardless of the unclamped width.
          */
         int32_t w_style;
-        if(unclamped_w < minw) {
+        if(minw > maxw || unclamped_w < minw) {
             w_style = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
         }
         else if(unclamped_w > maxw) {
@@ -164,10 +169,10 @@ bool lv_obj_refr_size(lv_obj_t * obj)
          * If the height in effect is a percentage of a parent that is itself LV_SIZE_CONTENT and not managed by
          * a layout, the two sizes would depend on each other, so `h_ignore_size` excludes this object from the
          * parent's content height calculation. See the width branch above for why the unclamped height is what
-         * is compared against the bounds.
+         * is compared against the bounds, and why inverted bounds count as the min height case.
          */
         int32_t h_style;
-        if(unclamped_h < minh) {
+        if(minh > maxh || unclamped_h < minh) {
             h_style = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
         }
         else if(unclamped_h > maxh) {
