@@ -121,6 +121,8 @@ lv_font_t * lv_binfont_create(const char * path)
 #if LV_USE_FS_MEMFS
 lv_font_t * lv_binfont_create_from_buffer(void * buffer, uint32_t size)
 {
+    LV_CHECK_ARG(buffer != NULL, return NULL);
+
     lv_fs_path_ex_t mempath;
 
     lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, buffer, size, "bin");
