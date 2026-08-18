@@ -104,18 +104,21 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 void lv_sdl_window_set_resizeable(lv_display_t * disp, bool value)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return);
     SDL_SetWindowResizable(dsc->window, value);
 }
 
 void lv_sdl_window_set_size(lv_display_t * disp, int32_t hor_res, int32_t ver_res)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return);
     SDL_SetWindowSize(dsc->window, hor_res, ver_res);
 }
 
 void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->zoom = zoom;
     lv_display_send_event(disp, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_refr_now(disp);
@@ -124,6 +127,7 @@ void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom)
 float lv_sdl_window_get_zoom(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return 0);
     return dsc->zoom;
 }
 
@@ -144,13 +148,19 @@ lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id)
 
 void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
 {
+    LV_CHECK_ARG(title != NULL, return);
+
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return);
     SDL_SetWindowTitle(dsc->window, title);
 }
 
 void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int32_t height)
 {
+    LV_CHECK_ARG(icon != NULL, return);
+
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(dsc != NULL, return);
     SDL_Surface * iconSurface = SDL_CreateRGBSurfaceWithFormatFrom(icon, width, height, 32, width * 4,
                                                                    SDL_PIXELFORMAT_ARGB8888);
     SDL_SetWindowIcon(dsc->window, iconSurface);
