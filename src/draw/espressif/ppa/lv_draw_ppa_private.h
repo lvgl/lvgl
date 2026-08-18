@@ -39,7 +39,7 @@ extern "C" {
 #error "Cannot determine the data cache line size for the PPA draw unit"
 #endif
 
-#if (CONFIG_LV_DRAW_BUF_ALIGN != LV_DRAW_PPA_CACHE_LINE_SIZE)
+#if (LV_DRAW_BUF_ALIGN != LV_DRAW_PPA_CACHE_LINE_SIZE)
 #error "CONFIG_LV_DRAW_BUF_ALIGN must be equal to the data cache line size!"
 #endif
 
