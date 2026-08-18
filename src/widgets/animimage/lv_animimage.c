@@ -95,11 +95,17 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent)
 
 void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+
     lv_animimg_set_src_inner(obj, dsc, num, false);
 }
 
 void lv_animimg_set_src_reverse(lv_obj_t * obj, const void * dsc[], size_t num)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+
     lv_animimg_set_src_inner(obj, dsc, num, true);
 }
 
@@ -112,7 +118,7 @@ void lv_animimg_start(lv_obj_t * obj)
 
 bool lv_animimg_delete(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+    if(obj == NULL) return false;
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     return lv_anim_delete(animimg, NULL);
 }
@@ -212,6 +218,7 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_TRACE_OBJ_CREATE("begin");
 
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
     animimg->dsc = NULL;
@@ -228,6 +235,7 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
 static void index_change(lv_obj_t * obj, int32_t idx)
 {
+    LV_ASSERT(obj != NULL);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
     if(animimg->dsc == NULL) {
@@ -242,7 +250,8 @@ static void index_change(lv_obj_t * obj, int32_t idx)
 
 static void lv_animimg_set_src_inner(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_ASSERT(obj != NULL);
+    LV_ASSERT(dsc != NULL);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     animimg->dsc = dsc;
     animimg->pic_count = num;
