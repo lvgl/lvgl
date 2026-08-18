@@ -76,6 +76,7 @@ static void create_folders_if_needed(const char * path) ;
 
 lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
 {
+    LV_CHECK_ARG(fn_ref != NULL, return LV_TEST_SCREENSHOT_RESULT_FAILED);
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_invalidate(scr);
@@ -88,6 +89,8 @@ lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
 
 lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 {
+    LV_CHECK_ARG(fn_ref != NULL, return LV_TEST_SCREENSHOT_RESULT_FAILED);
+
     char fn_ref_full[256];
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
 
@@ -185,6 +188,10 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width, unsigned * height,
                                const char * file_name)
 {
+    LV_ASSERT(refr_draw_buf != NULL);
+    LV_ASSERT(width != NULL);
+    LV_ASSERT(height != NULL);
+    LV_ASSERT(file_name != NULL);
     unsigned  error = lodepng_decode32_file((void *)refr_draw_buf, width, height, file_name);
     if(error) LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
     return error;
@@ -192,6 +199,8 @@ static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width,
 
 static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name)
 {
+    LV_ASSERT(raw_img != NULL);
+    LV_ASSERT(file_name != NULL);
     unsigned  error = lodepng_encode32_file(file_name, raw_img, width, height);
     if(error) LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
     return error;
@@ -199,6 +208,8 @@ static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height,
 
 static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
 {
+    LV_ASSERT(draw_buf != NULL);
+    LV_ASSERT(buf_out != NULL);
     uint32_t stride = draw_buf->header.stride;
     lv_color_format_t cf_in = draw_buf->header.cf;
     const uint8_t * buf_in = draw_buf->data;
@@ -309,6 +320,7 @@ static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
 
 static void create_folders_if_needed(const char * path)
 {
+    LV_ASSERT(path != NULL);
     char * ptr;
     char * path_copy = lv_strdup(path);
     if(path_copy == NULL) {
