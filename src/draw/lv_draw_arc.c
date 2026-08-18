@@ -35,6 +35,8 @@
 
 void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
+
     lv_memzero(dsc, sizeof(lv_draw_arc_dsc_t));
     dsc->width = 1;
     dsc->opa = LV_OPA_COVER;
@@ -44,11 +46,16 @@ void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc)
 
 lv_draw_arc_dsc_t * lv_draw_task_get_arc_dsc(lv_draw_task_t * task)
 {
+    LV_CHECK_ARG(task != NULL, return NULL);
+
     return task->type == LV_DRAW_TASK_TYPE_ARC ? (lv_draw_arc_dsc_t *)task->draw_dsc : NULL;
 }
 
 void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
     if(dsc->start_angle == dsc->end_angle) return;
@@ -82,6 +89,8 @@ void lv_draw_arc_get_area(int32_t x, int32_t y, uint16_t radius,  lv_value_preci
                           lv_value_precise_t end_angle,
                           int32_t w, bool rounded, lv_area_t * area)
 {
+    LV_CHECK_ARG(area != NULL, return);
+
     int32_t rout = radius;
     int32_t start_angle_int = (int32_t) start_angle;
     int32_t end_angle_int = (int32_t) end_angle;

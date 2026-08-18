@@ -58,6 +58,8 @@ void lv_draw_buf_init_handlers(void)
 
 void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers)
 {
+    LV_CHECK_ARG(handlers != NULL, return);
+
     lv_draw_buf_handlers_init(handlers, buf_malloc, buf_free, buf_copy, buf_align, NULL, NULL, width_to_stride);
 }
 
@@ -70,6 +72,8 @@ void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
                                lv_draw_buf_cache_operation_cb_t flush_cache_cb,
                                lv_draw_buf_width_to_stride_cb_t width_to_stride_cb)
 {
+    LV_CHECK_ARG(handlers != NULL, return);
+
     lv_memzero(handlers, sizeof(lv_draw_buf_handlers_t));
     handlers->buf_malloc_cb = buf_malloc_cb;
     handlers->buf_free_cb = buf_free_cb;
@@ -103,17 +107,24 @@ uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
 uint32_t lv_draw_buf_width_to_stride_ex(const lv_draw_buf_handlers_t * handlers, uint32_t w,
                                         lv_color_format_t color_format)
 {
+    LV_CHECK_ARG(handlers != NULL, return 0);
+
     if(handlers->width_to_stride_cb) return handlers->width_to_stride_cb(w, color_format);
     else return 0;
 }
 
 void * lv_draw_buf_align(void * buf, lv_color_format_t color_format)
 {
+    LV_CHECK_ARG(buf != NULL, return NULL);
+
     return lv_draw_buf_align_ex(&default_handlers, buf, color_format);
 }
 
 void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * buf, lv_color_format_t color_format)
 {
+    LV_CHECK_ARG(handlers != NULL, return NULL);
+    LV_CHECK_ARG(buf != NULL, return NULL);
+
     if(handlers->align_pointer_cb) return handlers->align_pointer_cb(buf, color_format);
     else return NULL;
 }
@@ -252,6 +263,8 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
 lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, uint32_t w, uint32_t h,
                                       lv_color_format_t cf, uint32_t stride)
 {
+    LV_CHECK_ARG(handlers != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     LV_ASSERT_MALLOC(draw_buf);
@@ -289,11 +302,16 @@ lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, u
 
 lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
 {
+    LV_CHECK_ARG(draw_buf != NULL, return NULL);
+
     return lv_draw_buf_dup_ex(&default_handlers, draw_buf);
 }
 
 lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf)
 {
+    LV_CHECK_ARG(handlers != NULL, return NULL);
+    LV_CHECK_ARG(draw_buf != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
     const lv_image_header_t * header = &draw_buf->header;
     lv_draw_buf_t * new_buf = lv_draw_buf_create_ex(handlers, header->w, header->h, header->cf, header->stride);
@@ -523,6 +541,9 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
 
 lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)
 {
+    LV_CHECK_ARG(buf != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(img != NULL, return LV_RESULT_INVALID);
+
     const lv_result_t res = lv_draw_buf_init(buf, img->header.w, img->header.h, img->header.cf, img->header.stride,
                                              (void *)img->data, img->data_size);
     if(res != LV_RESULT_OK) {
@@ -535,11 +556,16 @@ lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * i
 
 void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
 {
+    LV_CHECK_ARG(buf != NULL, return);
+    LV_CHECK_ARG(img != NULL, return);
+
     lv_memcpy((void *)img, buf, sizeof(lv_image_dsc_t));
 }
 
 void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
+
     LV_LOG_DEPRECATED("Use lv_draw_buf_set_palette instead.");
     lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
 }
@@ -547,6 +573,8 @@ void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
 void lv_image_buf_free(lv_image_dsc_t * dsc)
 {
     LV_LOG_DEPRECATED("Use lv_draw_buf_destroy instead.");
+    if(dsc == NULL) return;
+
     if(dsc != NULL) {
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);
