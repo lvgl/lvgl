@@ -355,6 +355,8 @@ static void x11_window_create(lv_display_t * disp, char const * title)
 
 lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t ver_res)
 {
+    LV_CHECK_ARG(title != NULL, return NULL);
+
     x11_disp_data_t * xd = lv_malloc_zeroed(sizeof(x11_disp_data_t));
     LV_ASSERT_MALLOC(xd);
     if(NULL == xd) return NULL;
