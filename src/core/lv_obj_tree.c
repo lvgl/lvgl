@@ -53,7 +53,7 @@ static lv_obj_t * lv_obj_get_first_not_deleting_child(lv_obj_t * obj);
 
 void lv_obj_delete(lv_obj_t * obj)
 {
-    if(!obj) return;
+    if(obj == NULL) return;
     if(obj->is_deleting) return;
 
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);
@@ -120,7 +120,7 @@ void lv_obj_clean(lv_obj_t * obj)
 
 void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    if(obj == NULL) return;
 
     lv_anim_t a;
     lv_anim_init(&a);
@@ -141,6 +141,8 @@ void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
 
 void lv_obj_delete_async(lv_obj_t * obj)
 {
+    if(obj == NULL) return;
+
     lv_async_call(lv_obj_delete_async_cb, obj);
 }
 
@@ -621,6 +623,8 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * use
 
 void lv_obj_dump_tree(lv_obj_t * start_obj)
 {
+    LV_CHECK_OBJ(start_obj, MY_CLASS, return);
+
     if(start_obj == NULL) {
         lv_display_t * disp = lv_display_get_next(NULL);
         while(disp) {
@@ -661,6 +665,7 @@ static void obj_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 
 static void obj_delete_core(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     if(obj->is_deleting)
         return;
 
@@ -773,6 +778,7 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 
 static void dump_tree_core(lv_obj_t * obj, int32_t depth)
 {
+    LV_ASSERT(obj != NULL);
 #if LV_USE_LOG
     const char * id;
 
@@ -788,7 +794,7 @@ static void dump_tree_core(lv_obj_t * obj, int32_t depth)
     LV_LOG_USER("%*sobj:%p, id:%s;", (int)(2 * depth), "", (void *)obj, id);
 #endif /*LV_USE_LOG*/
 
-    if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {
+    if(obj->spec_attr && obj->spec_attr->child_cnt) {
         for(uint32_t i = 0; i < obj->spec_attr->child_cnt; i++) {
             dump_tree_core(lv_obj_get_child(obj, i), depth + 1);
         }

@@ -59,7 +59,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj);
 
 /**
  * Called periodically to handle the refreshing
- * @param timer pointer to the timer itself, or `NULL`
+ * @param timer pointer to the timer itself. @nullable When NULL the default display is refreshed
  */
 void lv_display_refr_timer(lv_timer_t * timer);
 
