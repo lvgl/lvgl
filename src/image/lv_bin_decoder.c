@@ -411,7 +411,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         return LV_RESULT_INVALID, "Unsupported color format 0x%02x", cf);
     LV_CHECK_ARG(full_area->x1 >= 0 && full_area->x2 < (int32_t)dsc->header.w && full_area->y1 >= 0 &&
                  full_area->y2 < (int32_t)dsc->header.h, return LV_RESULT_INVALID, "Area outside image bounds");
-    LV_CHECK_ARG(dsc->user_data, return LV_RESULT_INVALID, "decoder data unavailable")
+    LV_CHECK_ARG(dsc->user_data, return LV_RESULT_INVALID, "decoder data unavailable");
 
     lv_fs_res_t res = LV_FS_RES_UNKNOWN;
     decoder_data_t * decoder_data = dsc->user_data;
