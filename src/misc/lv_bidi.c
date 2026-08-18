@@ -281,6 +281,10 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
 
 void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt)
 {
+    LV_CHECK_ARG(align != NULL, return);
+    LV_CHECK_ARG(base_dir != NULL, return);
+    LV_CHECK_ARG(txt != NULL, return);
+
     if(*base_dir == LV_BASE_DIR_AUTO) *base_dir = lv_bidi_detect_base_dir(txt);
 
     if(*align == LV_TEXT_ALIGN_AUTO) {
