@@ -97,6 +97,8 @@ void lv_test_mouse_move_to(int32_t x, int32_t y)
 
 void lv_test_mouse_move_to_obj(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     int32_t x = obj->coords.x1 + lv_obj_get_width(obj) / 2;
     int32_t y = obj->coords.y1 + lv_obj_get_height(obj) / 2;
     lv_test_mouse_move_to(x, y);
