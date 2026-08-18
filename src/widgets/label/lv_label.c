@@ -941,7 +941,7 @@ static void draw_main(lv_event_t * e)
     label_draw_dsc.flag = flag;
     label_draw_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
-    lv_bidi_calculate_align(&label_draw_dsc.align, &label_draw_dsc.bidi_dir, label->text);
+    lv_bidi_calculate_align_internal(&label_draw_dsc.align, &label_draw_dsc.bidi_dir, label->text);
 
     label_draw_dsc.sel_start = lv_label_get_text_selection_start(obj);
     label_draw_dsc.sel_end = lv_label_get_text_selection_end(obj);

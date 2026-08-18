@@ -40,7 +40,6 @@ typedef enum {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-#if LV_USE_BIDI
 
 /**
  * Get the real text alignment from the a text alignment, base direction and a text.
@@ -49,6 +48,8 @@ typedef enum {
  * @param txt       a text, used with LV_BASE_DIR_AUTO to determine the base direction
  */
 void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt);
+
+#if LV_USE_BIDI
 
 /**
  * Set custom neutrals string
@@ -60,20 +61,6 @@ void lv_bidi_set_custom_neutrals_static(const char * neutrals);
  *      MACROS
  **********************/
 
-#else /*LV_USE_BIDI*/
-/**
- * For compatibility if LV_USE_BIDI = 0
- * Get the real text alignment from the a text alignment, base direction and a text.
- * @param align     For LV_TEXT_ALIGN_AUTO give LV_TEXT_ALIGN_LEFT else leave unchanged, write back the calculated align here
- * @param base_dir  Unused
- * @param txt       Unused
- */
-static inline void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt)
-{
-    LV_UNUSED(txt);
-    LV_UNUSED(base_dir);
-    if(*align == LV_TEXT_ALIGN_AUTO) * align = LV_TEXT_ALIGN_LEFT;
-}
 #endif /*LV_USE_BIDI*/
 
 #ifdef __cplusplus

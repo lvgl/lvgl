@@ -9,6 +9,7 @@
 #include "lv_obj_private.h"
 #include "../lvgl_public.h"
 #include "../misc/lv_anim_private.h"
+#include "../misc/lv_bidi_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_class_private.h"
 #include "../display/lv_display_private.h"
@@ -635,7 +636,7 @@ lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_
 
     lv_text_align_t align = lv_obj_get_style_text_align(obj, part);
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, part);
-    lv_bidi_calculate_align(&align, &base_dir, txt);
+    lv_bidi_calculate_align_internal(&align, &base_dir, txt);
     return align;
 }
 
