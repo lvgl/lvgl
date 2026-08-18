@@ -574,6 +574,8 @@ err_malloc:
 
 lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
 {
+    LV_CHECK_ARG(dev_path != NULL, return NULL);
+
     int fd = open(dev_path, O_RDONLY | O_NOCTTY | O_CLOEXEC);
     if(fd < 0) {
         LV_LOG_WARN("open failed: %s", strerror(errno));
@@ -686,6 +688,8 @@ uint16_t lv_evdev_get_raw_key(lv_event_t * e)
 
 void lv_evdev_delete(lv_indev_t * indev)
 {
+    if(indev == NULL) return;
+
     lv_indev_delete(indev);
 }
 
