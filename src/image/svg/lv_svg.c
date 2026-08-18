@@ -112,6 +112,8 @@ lv_svg_node_t * lv_svg_node_create(lv_svg_node_t * parent)
 
 void lv_svg_node_delete(lv_svg_node_t * node)
 {
+    if(node == NULL) return;
+
     lv_tree_node_delete((lv_tree_node_t *)node);
 }
 
