@@ -268,6 +268,8 @@ void lv_keyboard_set_mode(lv_obj_t * obj, lv_keyboard_mode_t mode)
 
 void lv_keyboard_set_popovers(lv_obj_t * obj, bool en)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
 
     if(keyboard->popovers == en) {
@@ -282,6 +284,8 @@ void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * c
                          const lv_buttonmatrix_ctrl_t ctrl_map[])
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(map != NULL, return);
+    LV_CHECK_ARG(ctrl_map != NULL, return);
     kb_map[mode] = map;
     kb_ctrl[mode] = ctrl_map;
     lv_keyboard_update_map(obj);
@@ -307,6 +311,8 @@ lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
 
 bool lv_keyboard_get_popovers(const lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     return keyboard->popovers;
 }
@@ -317,6 +323,8 @@ bool lv_keyboard_get_popovers(const lv_obj_t * obj)
 
 void lv_keyboard_def_event_cb(lv_event_t * e)
 {
+    LV_CHECK_ARG(e != NULL, return);
+
     lv_obj_t * obj = lv_event_get_current_target(e);
 
     LV_CHECK_OBJ(obj, MY_CLASS, return);
@@ -421,16 +429,22 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
 
 const char * const * lv_keyboard_get_map_array(const lv_obj_t * kb)
 {
+    LV_CHECK_OBJ(kb, MY_CLASS, return NULL);
+
     return lv_buttonmatrix_get_map(kb);
 }
 
 uint32_t lv_keyboard_get_selected_button(const lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+
     return lv_buttonmatrix_get_selected_button(obj);
 }
 
 const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     return lv_buttonmatrix_get_button_text(obj, btn_id);
 }
 
@@ -440,6 +454,7 @@ const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
 
 static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
     lv_obj_set_click_focusable(obj, false);
 
@@ -461,6 +476,7 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
  */
 static void lv_keyboard_update_map(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     lv_buttonmatrix_set_map(obj, kb_map[keyboard->mode]);
     lv_keyboard_update_ctrl_map(obj);
@@ -472,6 +488,7 @@ static void lv_keyboard_update_map(lv_obj_t * obj)
  */
 static void lv_keyboard_update_ctrl_map(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
 
     if(keyboard->popovers) {
