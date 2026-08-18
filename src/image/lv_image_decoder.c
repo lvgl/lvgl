@@ -93,6 +93,9 @@ void lv_image_decoder_deinit(void)
 
 lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
 {
+    LV_CHECK_ARG(src != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(header != NULL, return LV_RESULT_INVALID);
+
     LV_PROFILER_DECODER_BEGIN;
     lv_image_decoder_dsc_t dsc;
     lv_memzero(&dsc, sizeof(lv_image_decoder_dsc_t));
@@ -109,6 +112,8 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
 
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args)
 {
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
+
     LV_PROFILER_DECODER_BEGIN;
     lv_memzero(dsc, sizeof(lv_image_decoder_dsc_t));
 
@@ -186,6 +191,10 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area,
                                       lv_area_t * decoded_area)
 {
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(full_area != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(decoded_area != NULL, return LV_RESULT_INVALID);
+
     LV_PROFILER_DECODER_BEGIN;
     lv_result_t res = LV_RESULT_INVALID;
     if(dsc->decoder->get_area_cb) {
@@ -200,6 +209,8 @@ lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_are
 
 void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
+    if(dsc == NULL) return;
+
     LV_PROFILER_DECODER_BEGIN;
     if(!dsc->decoder) {
         LV_PROFILER_DECODER_END;
@@ -241,6 +252,8 @@ lv_image_decoder_t * lv_image_decoder_create(void)
 
 void lv_image_decoder_delete(lv_image_decoder_t * decoder)
 {
+    if(decoder == NULL) return;
+
     lv_ll_remove(img_decoder_ll_p, decoder);
     lv_free(decoder);
 }
@@ -255,21 +268,29 @@ lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder)
 
 void lv_image_decoder_set_info_cb(lv_image_decoder_t * decoder, lv_image_decoder_info_f_t info_cb)
 {
+    LV_CHECK_ARG(decoder != NULL, return);
+
     decoder->info_cb = info_cb;
 }
 
 void lv_image_decoder_set_open_cb(lv_image_decoder_t * decoder, lv_image_decoder_open_f_t open_cb)
 {
+    LV_CHECK_ARG(decoder != NULL, return);
+
     decoder->open_cb = open_cb;
 }
 
 void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_decoder_get_area_cb_t get_area_cb)
 {
+    LV_CHECK_ARG(decoder != NULL, return);
+
     decoder->get_area_cb = get_area_cb;
 }
 
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb)
 {
+    LV_CHECK_ARG(decoder != NULL, return);
+
     decoder->close_cb = close_cb;
 }
 
@@ -301,6 +322,8 @@ lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
 
 lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
 {
+    LV_CHECK_ARG(dsc != NULL, return decoded);
+
     LV_PROFILER_DECODER_BEGIN;
     if(decoded == NULL) {
         LV_PROFILER_DECODER_END;
