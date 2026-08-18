@@ -1574,9 +1574,9 @@ static void calc_placeholder_text_size(lv_obj_t * obj)
     ph_dsc.font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
-    lv_text_get_size(&ta->placeholder_txt_size, ph_dsc.text, ph_dsc.font, ph_dsc.letter_space, ph_dsc.line_space,
-                     LV_COORD_MAX,
-                     ph_dsc.flag);
+    lv_text_get_size_internal(&ta->placeholder_txt_size, ph_dsc.text, ph_dsc.font, ph_dsc.letter_space, ph_dsc.line_space,
+                              LV_COORD_MAX,
+                              ph_dsc.flag);
 }
 
 #endif
