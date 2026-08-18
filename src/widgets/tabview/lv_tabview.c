@@ -134,6 +134,7 @@ void lv_tabview_set_tab_text(lv_obj_t * obj, uint32_t idx, const char * new_name
 lv_obj_t * lv_tabview_set_tab_translation_tag(lv_obj_t * obj, const char * tag)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(tag != NULL && tag[0] != '\0', return NULL);
 
     lv_obj_t * page = lv_tabview_add_tab(obj, NULL);
     lv_obj_t * button = lv_tabview_get_tab_button(obj, -1);
@@ -299,11 +300,14 @@ uint32_t lv_tabview_get_tab_count(lv_obj_t * obj)
 
 lv_obj_t * lv_tabview_get_content(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     return lv_obj_get_child(obj, 1);
 }
 
 lv_obj_t * lv_tabview_get_tab_bar(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     return lv_obj_get_child(obj, 0);
 }
 
