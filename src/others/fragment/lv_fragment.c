@@ -78,6 +78,9 @@ lv_fragment_t * lv_fragment_get_parent(lv_fragment_t * fragment)
 
 lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container)
 {
+    LV_CHECK_ARG(fragment != NULL, return NULL);
+    LV_CHECK_ARG(container != NULL, return NULL);
+
     lv_fragment_managed_states_t * states = fragment->managed;
     if(states) {
         states->destroying_obj = false;
