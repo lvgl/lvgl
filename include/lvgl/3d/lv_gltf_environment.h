@@ -50,14 +50,14 @@ void lv_gltf_ibl_sampler_set_cube_map_pixel_resolution(lv_gltf_ibl_sampler_t * s
 
 /**
  * Delete an IBL sampler
- * @param   sampler pointer to the sampler to delete
+ * @param   sampler pointer to the sampler to delete @nullable
  */
 void lv_gltf_ibl_sampler_delete(lv_gltf_ibl_sampler_t * sampler);
 
 /**
  * Create an environment from an HDR or JPEG panoramic image for IBL rendering
  * @param   sampler IBL sampler defining output resolution (can be deleted after this call)
- * @param   file_path path to equirectangular environment image, or NULL to use default embedded image
+ * @param   file_path path to equirectangular environment image. @nullable. Pass NULL to use default embedded image
  * @return  pointer to the created environment, or NULL if the sampler is NULL
  *
  * @note The image is read through the LVGL file system, so `file_path` takes a drive
@@ -78,7 +78,7 @@ void lv_gltf_environment_set_angle(lv_gltf_environment_t * env, float angle);
 
 /**
  * Delete an environment
- * @param environment pointer to the environment to delete
+ * @param environment pointer to the environment to delete @nullable
  */
 void lv_gltf_environment_delete(lv_gltf_environment_t * environment);
 

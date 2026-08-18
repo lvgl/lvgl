@@ -79,6 +79,7 @@ void lv_gltf_model_loader_delete(lv_gltf_model_loader_t * loader)
 
 void lv_gltf_model_loader_store_texture(lv_gltf_model_loader_t * loader, uint32_t texture_hash, uint32_t texture_id)
 {
+    LV_CHECK_ARG(loader != NULL, return);
     lv_opengl_texture_t key = { .id = texture_id, .hash = texture_hash };
     lv_rb_node_t * node = lv_rb_insert(&loader->textures_map, &key);
     if(!node) {
@@ -92,6 +93,7 @@ void lv_gltf_model_loader_store_texture(lv_gltf_model_loader_t * loader, uint32_
 
 uint32_t lv_gltf_model_loader_get_texture(lv_gltf_model_loader_t * loader, uint32_t texture_hash)
 {
+    LV_CHECK_ARG(loader != NULL, return 0);
     lv_opengl_texture_t key = { .hash = texture_hash };
     lv_rb_node_t * node = lv_rb_find(&loader->textures_map, &key);
     if(!node) {

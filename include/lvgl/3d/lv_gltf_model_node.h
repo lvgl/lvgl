@@ -92,7 +92,7 @@ const char * lv_gltf_model_node_get_ip(lv_gltf_model_node_t * node);
  * @param node Pointer to the glTF model node structure
  * @param cb The event callback function to add. Use lv_event_get_param() to retrieve lv_gltf_node_data_t with the node's data.
  * @param filter_list Event code filter for the callback
- * @param user_data User data to pass to the callback
+ * @param user_data User data to pass to the callback @nullable
  * @return Pointer to the event descriptor, or NULL if allocation failed
  */
 lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv_event_cb_t cb,
@@ -105,7 +105,7 @@ lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv
  * @param node Pointer to the glTF model node structure
  * @param cb The event callback function to add. Use lv_event_get_param() to retrieve lv_gltf_node_data_t with the node's data.
  * @param filter_list Event code filter for the callback
- * @param user_data User data to pass to the callback
+ * @param user_data User data to pass to the callback @nullable
  * @return Pointer to the event descriptor, or NULL if allocation failed
  */
 lv_event_dsc_t * lv_gltf_model_node_add_event_cb_with_world_position(lv_gltf_model_node_t * node, lv_event_cb_t cb,

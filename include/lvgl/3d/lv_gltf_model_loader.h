@@ -58,7 +58,7 @@ uint32_t lv_gltf_model_loader_get_texture(lv_gltf_model_loader_t * loader, uint3
 
 /**
  * Delete a glTF model loader instance and free its resources
- * @param loader pointer to the glTF model loader instance to delete
+ * @param loader pointer to the glTF model loader instance to delete @nullable
  */
 void lv_gltf_model_loader_delete(lv_gltf_model_loader_t * loader);
 
