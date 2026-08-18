@@ -619,6 +619,33 @@
  * INPUT DEVICES
  *============================================================================*/
 
+/** Distance the pointer needs to travel before scrolling starts. */
+#define LV_INDEV_DEF_SCROLL_LIMIT 10
+
+/** Slow-down applied after releasing a scroll. Greater value means faster slow-down. */
+#define LV_INDEV_DEF_SCROLL_THROW 10
+
+/** Scrolling past the edge of a scrollable widget is slower by this factor. */
+#define LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR 4
+
+/** Press time after which `LV_EVENT_LONG_PRESSED` is sent. */
+#define LV_INDEV_DEF_LONG_PRESS_TIME 400
+
+/** Time between `LV_EVENT_LONG_PRESSED_REPEAT` events. */
+#define LV_INDEV_DEF_LONG_PRESS_REP_TIME 100
+
+/** Max time between consecutive clicks to count as a double or triple click. */
+#define LV_INDEV_DEF_DOUBLE_CLICK_TIME 400
+
+/** Distance the pointer needs to travel before a gesture is detected. */
+#define LV_INDEV_DEF_GESTURE_LIMIT 50
+
+/** Minimum pointer velocity at release to report a swipe. */
+#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
+
+/** The encoder diff is multiplied by this value and divided by 256. */
+#define LV_INDEV_DEF_ROTARY_SENSITIVITY 256
+
 /** Move focus between a container's children with arrow keys, based on their position. */
 #define LV_USE_GRIDNAV 0
 
@@ -628,6 +655,22 @@
  */
 #define LV_USE_GESTURE_RECOGNITION 0
 
+#if LV_USE_GESTURE_RECOGNITION
+/** Scale the fingers need to pinch down to before pinch events are sent. */
+#define LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD 75
+
+/** Scale the fingers need to pinch up to before pinch events are sent. */
+#define LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD 150
+
+/** A pinch starting above this scale is discarded.
+ *  Must be greater than the pinch out threshold.
+ */
+#define LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE 250
+
+/** Angle the fingers need to rotate by before rotation events are sent. */
+#define LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD 200
+
+#endif /*LV_USE_GESTURE_RECOGNITION*/
 
 
 /*============================================================================

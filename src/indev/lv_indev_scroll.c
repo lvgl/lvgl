@@ -15,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define ELASTIC_SLOWNESS_FACTOR 4   /*Scrolling on elastic parts are slower by this factor*/
+#define ELASTIC_SLOWNESS_FACTOR LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
 
 /**********************
  *      TYPEDEFS

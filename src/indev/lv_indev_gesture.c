@@ -18,11 +18,17 @@
  *      DEFINES
  ********************/
 
-#define LV_GESTURE_PINCH_DOWN_THRESHOLD 0.75f /* Default value - start sending events when reached */
-#define LV_GESTURE_PINCH_UP_THRESHOLD 1.5f /* Default value - start sending events when reached */
-#define LV_GESTURE_PINCH_MAX_INITIAL_SCALE 2.5f /* Default value */
-#define LV_GESTURE_ROTATION_ANGLE_RAD_THRESHOLD 0.2f /* Default value - start sending events when reached */
+/*The configurable defaults are integers (percent and milliradians), scaled to the
+ *floats the recognizer works with*/
+#define GESTURE_PINCH_DOWN_THRESHOLD (LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD / 100.0f)
+#define GESTURE_PINCH_UP_THRESHOLD (LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD / 100.0f)
+#define GESTURE_PINCH_MAX_INITIAL_SCALE (LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE / 100.0f)
+#define GESTURE_ROTATION_ANGLE_RAD_THRESHOLD (LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD / 1000.0f)
 
+
+#if LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE <= LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+    #error LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE needs to be bigger than LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+#endif
 
 /********************
  *     TYPEDEFS
@@ -82,7 +88,7 @@ void lv_indev_set_pinch_up_threshold(lv_indev_t * indev, float threshold)
     if(recognizer->config == NULL) {
         recognizer->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
         LV_ASSERT_MALLOC(recognizer->config);
-        recognizer->config->pinch_down_threshold = LV_GESTURE_PINCH_DOWN_THRESHOLD;
+        recognizer->config->pinch_down_threshold = GESTURE_PINCH_DOWN_THRESHOLD;
     }
 
     recognizer->config->pinch_up_threshold = threshold;
@@ -98,7 +104,7 @@ void lv_indev_set_pinch_down_threshold(lv_indev_t * indev, float threshold)
     if(recognizer->config == NULL) {
         recognizer->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
         LV_ASSERT_MALLOC(recognizer->config);
-        recognizer->config->pinch_up_threshold = LV_GESTURE_PINCH_UP_THRESHOLD;
+        recognizer->config->pinch_up_threshold = GESTURE_PINCH_UP_THRESHOLD;
     }
 
     recognizer->config->pinch_down_threshold = threshold;
@@ -115,7 +121,7 @@ void lv_indev_set_rotation_rad_threshold(lv_indev_t * indev, float threshold)
 
         recognizer->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
         LV_ASSERT(recognizer->config != NULL);
-        recognizer->config->rotation_angle_rad_threshold = LV_GESTURE_ROTATION_ANGLE_RAD_THRESHOLD;
+        recognizer->config->rotation_angle_rad_threshold = GESTURE_ROTATION_ANGLE_RAD_THRESHOLD;
     }
 
     recognizer->config->rotation_angle_rad_threshold = threshold;
@@ -278,8 +284,8 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
         r->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
         LV_ASSERT_MALLOC(r->config);
 
-        r->config->pinch_up_threshold = LV_GESTURE_PINCH_UP_THRESHOLD;
-        r->config->pinch_down_threshold = LV_GESTURE_PINCH_DOWN_THRESHOLD;
+        r->config->pinch_up_threshold = GESTURE_PINCH_UP_THRESHOLD;
+        r->config->pinch_down_threshold = GESTURE_PINCH_DOWN_THRESHOLD;
     }
 
     /* Process collected touch events */
@@ -305,7 +311,7 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
                 break;
             case LV_INDEV_GESTURE_STATE_ONGOING:
                 gesture_calculate_factors(r->info, 2);
-                if(r->info->scale > LV_GESTURE_PINCH_MAX_INITIAL_SCALE) {
+                if(r->info->scale > GESTURE_PINCH_MAX_INITIAL_SCALE) {
                     r->state = LV_INDEV_GESTURE_STATE_CANCELED;
                     break;
                 }
