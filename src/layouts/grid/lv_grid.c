@@ -150,6 +150,8 @@ void lv_grid_init(void)
 
 void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const int32_t col_dsc[], const int32_t row_dsc[])
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     lv_obj_set_style_grid_column_dsc_array(obj, col_dsc, 0);
     lv_obj_set_style_grid_row_dsc_array(obj, row_dsc, 0);
     lv_obj_set_style_layout(obj, LV_LAYOUT_GRID, 0);
@@ -157,6 +159,8 @@ void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const int32_t col_dsc[], const in
 
 void lv_obj_set_grid_align(lv_obj_t * obj, lv_grid_align_t column_align, lv_grid_align_t row_align)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     lv_obj_set_style_grid_column_align(obj, column_align, 0);
     lv_obj_set_style_grid_row_align(obj, row_align, 0);
 
@@ -166,6 +170,8 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t column_align, int32_t 
                           lv_grid_align_t row_align, int32_t row_pos, int32_t row_span)
 
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     lv_obj_set_style_grid_cell_column_pos(obj, col_pos, 0);
     lv_obj_set_style_grid_cell_row_pos(obj, row_pos, 0);
     lv_obj_set_style_grid_cell_x_align(obj, column_align, 0);
