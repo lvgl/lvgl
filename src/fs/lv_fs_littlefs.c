@@ -35,6 +35,8 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 
 void lv_littlefs_set_handler(lfs_t * lfs)
 {
+    LV_CHECK_ARG(lfs != NULL, return);
+
     lv_fs_drv_t * drv = lv_fs_get_drv(LV_FS_LITTLEFS_LETTER);
     drv->user_data = lfs;
 }
