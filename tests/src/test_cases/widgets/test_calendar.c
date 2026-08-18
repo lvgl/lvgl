@@ -261,7 +261,10 @@ void test_calendar_get_pressed_date_parses_single_and_double_digit_days(void)
     lv_calendar_set_month_shown(g_calendar, 2022, 9);
 
     lv_obj_t * btnm = lv_calendar_get_btnmatrix(g_calendar);
+    TEST_ASSERT_NOT_NULL(btnm);
+
     const char * const * map = lv_buttonmatrix_get_map(btnm);
+    TEST_ASSERT_NOT_NULL(map);
 
     uint32_t btn_id = 0;
     int32_t single_digit_id = -1;
