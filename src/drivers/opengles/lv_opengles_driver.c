@@ -153,6 +153,9 @@ void lv_opengles_render_params_init(lv_opengles_render_params_t * params)
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
+    LV_CHECK_ARG(texture_area != NULL, return);
+    LV_CHECK_ARG(texture_clip_area != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_params_t params;
     lv_opengles_render_params_init(&params);
@@ -190,6 +193,8 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
 
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
+    LV_CHECK_ARG(area != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_params_t params;
     lv_opengles_render_params_init(&params);
