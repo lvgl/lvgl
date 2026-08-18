@@ -82,6 +82,8 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * parent)
 
 void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     if(NULL != txt) {
@@ -114,6 +116,9 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 
 void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(txt != NULL, return);
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     if(!cb->static_txt) lv_free(cb->txt);
@@ -131,6 +136,8 @@ void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 
 const char * lv_checkbox_get_text(const lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
     return cb->txt;
 }
@@ -143,6 +150,7 @@ static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
+    LV_ASSERT(obj != NULL);
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
@@ -166,6 +174,7 @@ static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
+    LV_ASSERT(obj != NULL);
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
     if(!cb->static_txt) {
@@ -178,6 +187,7 @@ static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(e != NULL);
 
     lv_result_t res;
     /*Call the ancestor's event handler*/
@@ -228,7 +238,9 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void lv_checkbox_draw(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_current_target(e);
+    LV_ASSERT(obj != NULL);
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     lv_layer_t * layer = lv_event_get_layer(e);
