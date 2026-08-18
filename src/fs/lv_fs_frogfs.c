@@ -101,6 +101,9 @@ void lv_fs_frogfs_deinit(void)
 
 lv_result_t lv_fs_frogfs_register_blob(const void * blob, const char * path_prefix)
 {
+    LV_CHECK_ARG(blob != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(path_prefix != NULL, return LV_RESULT_INVALID);
+
     if(path_prefix[0] == '\0') {
         LV_LOG_WARN("path prefix should not be zero-length");
         return LV_RESULT_INVALID;
@@ -132,6 +135,8 @@ lv_result_t lv_fs_frogfs_register_blob(const void * blob, const char * path_pref
 
 void lv_fs_frogfs_unregister_blob(const char * path_prefix)
 {
+    LV_CHECK_ARG(path_prefix != NULL, return);
+
     lv_fs_drv_t * fs_drv_p = frogfs_fs_drv;
     fs_drv_data_t * data = fs_drv_p->user_data;
 
