@@ -1,21 +1,22 @@
 config LV_USE_DRAW_DMA2D
-	bool "Use DMA2D on the supporting STM32 platforms"
+	bool "DMA2D renderer"
 	default n
 	help
-		Accelerate blends, fills, image decoding, etc. with STM32 DMA2D.
+		Accelerate blends, fills and image decoding with the STM32 DMA2D peripheral.
 
 if LV_USE_DRAW_DMA2D
 
 config LV_DRAW_DMA2D_HAL_INCLUDE
-	string "the header file for LVGL to include for DMA2D"
+	string "STM32 HAL header"
 	default "stm32h7xx_hal.h"
+	help
+		Header that declares the DMA2D HAL API of the target STM32 family.
 
 config LV_USE_DRAW_DMA2D_INTERRUPT
-	bool "use the DMA2D transfer complete interrupt"
+	bool "Transfer complete interrupt"
 	default n
 	help
-		if enabled, the user is required to call
-		`lv_draw_dma2d_transfer_complete_interrupt_handler`
-		upon receiving the DMA2D global interrupt
+		Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
+		Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
 
 endif

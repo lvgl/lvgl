@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*This example shows the deprecated `lv_file_explorer` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 {
     const char * tmp;
@@ -64,6 +67,8 @@ static void file_explorer_event_handler(lv_event_t * e)
 /**
  * @title Custom file explorer sort
  * @brief Apply a 3-way quicksort over the file table after each directory load.
+ *
+ * @deprecated The `lv_file_explorer` widget is deprecated. See `lv_example_table_file_browser`.
  *
  * The file explorer is created with `LV_EXPLORER_SORT_NONE` so that default sorting
  * stays out of the way. On `LV_EVENT_READY`, `lv_file_explorer_get_file_table`
@@ -134,5 +139,7 @@ void lv_example_file_explorer_3(void)
 
     lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

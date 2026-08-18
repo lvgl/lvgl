@@ -400,7 +400,10 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     if(!lv_draw_dave2d_is_dest_cf_supported(layer->color_format)) return LV_DRAW_UNIT_IDLE;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL) return LV_DRAW_UNIT_IDLE;
+    if(buf == NULL) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
+        return LV_DRAW_UNIT_IDLE;
+    }
 
     /*Disable the command buffer as a temporary fix to rendering issues. */
 #if 0

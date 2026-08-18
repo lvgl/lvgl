@@ -1,0 +1,3 @@
+# On 32-bit hosts, cover the other side of this VG-Lite configuration switch.
+
+CONFIG_LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET=y

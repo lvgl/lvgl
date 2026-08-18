@@ -1,0 +1,4 @@
+# Tooling for the SBOM compliance gate (see .github/workflows/code_generation.yml).
+# The validator version is pinned so the gate does not change or break from an
+# unreviewed upstream release; bump it here deliberately when updating.
+check-jsonschema==0.37.4

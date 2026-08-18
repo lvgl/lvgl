@@ -1,42 +1,50 @@
 config LV_USE_NUTTX
-	bool "Use Nuttx to open window and handle touchscreen"
+	bool "NuttX"
 	default n
 	help
-		Use Nuttx to open window and handle touchscreen
+		Display and input drivers for NuttX, including the /dev/fb framebuffer device.
 
 if LV_USE_NUTTX
 
 config LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
-	bool "Use independent image heap"
+	bool "Independent image heap"
 	default n
+	help
+		Allocate cached image buffers from a separate NuttX heap to keep the main heap from fragmenting.
 
 config LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
-	bool "Use independent image heap for default draw buffer"
+	bool "Independent image heap for the default draw buffer"
 	depends on LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
 	default n
 
 config LV_USE_NUTTX_LIBUV
-	bool "Use uv loop to replace default timer loop and other fb/indev timers"
+	bool "libuv event loop"
 	default n
+	help
+		Drive the LVGL timer handler and the display/input timers from a libuv loop instead of the default timer loop.
 
 config LV_USE_NUTTX_CUSTOM_INIT
-	bool "Use Custom Nuttx init API to open window and handle touchscreen"
+	bool "Custom init API"
 	default n
+	help
+		Skip the display and input device creation in lv_nuttx_init() so the application can set them up itself.
 
 config LV_USE_NUTTX_LCD
-	bool "Use NuttX LCD device"
+	bool "LCD device"
 	default n
+	help
+		Create the display on a NuttX LCD character device instead of the framebuffer device.
 
 choice
-	prompt "NuttX LCD buffer size"
+	prompt "LCD buffer size"
 	depends on LV_USE_NUTTX_LCD
-	default LV_NUTTX_LCD_SINGLE_BUFFER
+	default LV_NUTTX_LCD_CUSTOM_BUFFER
 
 	config LV_NUTTX_LCD_SINGLE_BUFFER
 		bool "One screen-sized buffer"
 
 	config LV_NUTTX_LCD_DOUBLE_BUFFER
-		bool "Two screen-sized buffer"
+		bool "Two screen-sized buffers"
 
 	config LV_NUTTX_LCD_CUSTOM_BUFFER
 		bool "Custom-sized buffer"
@@ -50,25 +58,25 @@ config LV_NUTTX_LCD_BUFFER_COUNT
 	default 2 if LV_NUTTX_LCD_DOUBLE_BUFFER
 
 config LV_NUTTX_LCD_BUFFER_SIZE
-	int "Custom partial buffer size (in number of rows)"
+	int "Custom partial buffer size (rows)"
 	depends on LV_NUTTX_LCD_CUSTOM_BUFFER
 	depends on LV_USE_NUTTX_LCD
 	default 60
 	
 
 config LV_USE_NUTTX_TOUCHSCREEN
-	bool "Use NuttX touchscreen driver"
+	bool "Touchscreen"
 	default n
 
 config LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
-	int "Touchscreen cursor size in pixels"
+	int "Touchscreen cursor size (px)"
 	depends on LV_USE_NUTTX_TOUCHSCREEN
 	default 0
 	help
-		Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels.
+		0 disables the cursor.
 
 config LV_USE_NUTTX_MOUSE
-	bool "Use NuttX mouse driver"
+	bool "Mouse"
 	default n
 
 config LV_USE_NUTTX_MOUSE_MOVE_STEP
@@ -76,17 +84,17 @@ config LV_USE_NUTTX_MOUSE_MOVE_STEP
 	depends on LV_USE_NUTTX_MOUSE
 	range 1 10
 	default 1
-	help
-		Set the step size of the mouse movement in pixels.
 
 config LV_USE_NUTTX_TRACE_FILE
-	bool "Use NuttX trace file"
+	bool "Profiler trace file"
 	depends on LV_USE_PROFILER_BUILTIN
 	default n
+	help
+		Write the built-in profiler output to a file instead of the console.
 
 config LV_NUTTX_TRACE_FILE_PATH
 	depends on LV_USE_NUTTX_TRACE_FILE
-	string "NuttX trace file path"
+	string "Profiler trace file path"
 	default "/data/lvgl-trace.log"
 
 

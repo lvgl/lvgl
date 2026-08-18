@@ -1,5 +1,5 @@
 config LV_USE_EVDEV
-	bool "Use evdev input driver"
+	bool "evdev"
 	default n
 	help
-		Driver for evdev input devices
+		Read touchscreen, mouse and keyboard input from Linux /dev/input event devices.

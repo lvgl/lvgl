@@ -90,6 +90,9 @@ typedef enum {
     /** The draw task is rendered. It will be removed from the draw task list of the layer
      * and freed automatically. */
     LV_DRAW_TASK_STATE_FINISHED,
+
+    /*Task cannot be completed. E.g. OOM during layer buf alloc*/
+    LV_DRAW_TASK_STATE_FAILED,
 } lv_draw_task_state_t;
 
 struct _lv_layer_t  {

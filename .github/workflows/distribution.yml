@@ -34,8 +34,6 @@ jobs:
                                   python3 \
                                   pkg-config \
                                   python3-kconfiglib \
-                                  python3-venv \
-                                  python3-pcpp \
                                   libwebp-dev \
                                   libevdev-dev \
                                   libdrm-dev \

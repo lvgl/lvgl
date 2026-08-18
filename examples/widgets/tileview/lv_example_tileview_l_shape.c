@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_TILEVIEW && LV_BUILD_EXAMPLES
 
+/*The tile content is built from the deprecated `lv_list` widget.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 /**
  * @title L-shaped tile view with scroll chaining
  * @brief Three tiles in an L layout where a ten-item list chains its scroll to the tile view.
@@ -51,5 +54,7 @@ void lv_example_tileview_l_shape(void)
     lv_list_add_button(list, NULL, "Ten");
 
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

@@ -34,12 +34,12 @@ struct _lv_obj_style_t {
 };
 
 struct _lv_obj_style_transition_dsc_t {
-    uint16_t time;
-    uint16_t delay;
-    lv_style_selector_t selector;
-    lv_style_prop_t prop;
     lv_anim_path_cb_t path_cb;
     void * user_data;
+    lv_style_selector_t selector;
+    uint16_t time;
+    uint16_t delay;
+    lv_style_prop_t prop;
 };
 
 

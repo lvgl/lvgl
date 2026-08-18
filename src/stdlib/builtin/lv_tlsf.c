@@ -1,5 +1,5 @@
 #include "../../lvgl_public.h"
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_USE_TLSF
 
 #include "lv_tlsf_private.h"
 #include "../../lvgl_public.h"
@@ -511,7 +511,9 @@ static void * align_ptr(const void * ptr, size_t align)
 static size_t adjust_request_size(size_t size, size_t align)
 {
     size_t adjust = 0;
-    if(size) {
+
+    /* align_up would wrap around and turn an impossible request into a small one */
+    if(size && size <= tlsf_cast(size_t, -1) - (align - 1)) {
         const size_t aligned = align_up(size, align);
 
         /* aligned sized must not exceed block_size_max or we'll go out of bounds on sl_bitmap */
@@ -981,16 +983,10 @@ lv_pool_t lv_tlsf_add_pool(lv_tlsf_t tlsf, void * mem, size_t bytes)
         return 0;
     }
 
-    if(pool_bytes < block_size_min || pool_bytes > block_size_max) {
-#if defined (TLSF_64BIT)
-        printf("lv_tlsf_add_pool: Memory size must be between 0x%x and 0x%x00 bytes.\n",
-               (unsigned int)(pool_overhead + block_size_min),
-               (unsigned int)((pool_overhead + block_size_max) / 256));
-#else
-        printf("lv_tlsf_add_pool: Memory size must be between %u and %u bytes.\n",
-               (unsigned int)(pool_overhead + block_size_min),
-               (unsigned int)(pool_overhead + block_size_max));
-#endif
+    if(pool_bytes < block_size_min || pool_bytes >= block_size_max) {
+        printf("lv_tlsf_add_pool: Memory size must be between %zu and %zu bytes.\n",
+               pool_overhead + block_size_min,
+               pool_overhead + block_size_max - ALIGN_SIZE);
         return 0;
     }
 
@@ -1210,8 +1206,8 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
         const size_t cursize = block_size(block);
         const size_t combined = cursize + block_size(next) + block_header_overhead;
         const size_t adjust = adjust_request_size(size, ALIGN_SIZE);
-        if(size > cursize && adjust == 0) {
-            /* The request is probably too large, fail */
+        /* size is non-zero here, so a zero adjust means the request cannot be satisfied */
+        if(adjust == 0) {
             return NULL;
         }
 
@@ -1245,4 +1241,4 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
     return p;
 }
 
-#endif /*LV_STDLIB_BUILTIN*/
+#endif /*LV_USE_TLSF*/

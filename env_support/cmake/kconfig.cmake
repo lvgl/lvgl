@@ -1,5 +1,5 @@
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-set(KCONFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
+
 set(AUTOCONF_H ${CMAKE_CURRENT_BINARY_DIR}/autoconf.h)
 set(OUTPUT_DOTCONFIG ${CMAKE_CURRENT_BINARY_DIR}/.config)
 set(KCONFIG_LIST_OUT ${CMAKE_CURRENT_BINARY_DIR}/kconfig_list)
@@ -18,7 +18,26 @@ endmacro()
 
 # Check if the user wants to use a defconfig, using the -DLV_BUILD_DEFCONFIG_PATH option
 if(LV_BUILD_DEFCONFIG_PATH)
-    lv_normalize_config_path(LV_BUILD_DEFCONFIG_PATH "defconfig" DOTCONFIG)
+    # Several defconfigs can be given as a ";"-separated list. They are merged in
+    # order, so a later fragment overrides the value set by an earlier one. This
+    # lets related configurations share a common base instead of duplicating it.
+    set(DOTCONFIG)
+    foreach(defconfig IN LISTS LV_BUILD_DEFCONFIG_PATH)
+        lv_normalize_config_path(defconfig "defconfig" defconfig_abs)
+        list(APPEND DOTCONFIG ${defconfig_abs})
+    endforeach()
+
+    list(LENGTH DOTCONFIG defconfig_count)
+    if(LV_BUILD_DEFCONFIG_STRICT)
+        # Apply the stricter checks: assignments to unknown or promptless
+        # symbols, and values that end up not taking effect, become errors.
+        # Overriding a symbol set by an earlier fragment is allowed.
+        set(KCONFIG_INPUT_FLAGS --handwritten-input-configs)
+    elseif(defconfig_count GREATER 1)
+        # Merging without the strict checks needs this, otherwise overriding a
+        # symbol set by an earlier fragment is reported as an error.
+        set(KCONFIG_INPUT_FLAGS --forced-input-configs)
+    endif()
 elseif(LV_BUILD_DOTCONFIG_PATH)
     lv_normalize_config_path(LV_BUILD_DOTCONFIG_PATH ".config" DOTCONFIG)
 else()
@@ -36,15 +55,18 @@ else()
     endif()
 endif()
 
-if (NOT EXISTS ${DOTCONFIG})
-    message(FATAL_ERROR "defconfig: ${DOTCONFIG} - does not exist")
-endif()
+foreach(config IN LISTS DOTCONFIG)
+    if (NOT EXISTS ${config})
+        message(FATAL_ERROR "defconfig: ${config} - does not exist")
+    endif()
+endforeach()
 
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E env LVGL_DIR=${LVGL_ROOT_DIR}
-    ${Python_EXECUTABLE} 
-    ${LVGL_ROOT_DIR}/scripts/kconfig.py
-    ${LVGL_ROOT_DIR}/Kconfig
+    ${Python_EXECUTABLE}
+    ${LVGL_ROOT_DIR}/scripts/build-tools/kconfig.py
+    ${KCONFIG_INPUT_FLAGS}
+    ${LV_BUILD_KCONFIG_ROOT}
     ${OUTPUT_DOTCONFIG}
     ${AUTOCONF_H}
     ${KCONFIG_LIST_OUT}

@@ -9,8 +9,6 @@ Build-Depends:
  python3,
  pkg-config,
  python3-kconfiglib,
- python3-venv,
- python3-pcpp,
  libwebp-dev,
  libjpeg-dev,
  libpng-dev,

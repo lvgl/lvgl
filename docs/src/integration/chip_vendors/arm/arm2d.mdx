@@ -1,6 +1,13 @@
 ---
 title: "Arm-2D GPU"
 description: "Arm-2D is not a GPU but an abstraction layer for 2D GPUs dedicated to Microcontrollers. It supports all Cortex-M processors ranging from Cortex-M0 to the latest Cortex-M85."
+faqs:
+  - question: "Should I use Arm-2D's synchronous or asynchronous mode?"
+    answer: "Use synchronous mode when Helium or an Arm Custom Instruction set is available, and asynchronous mode when an Arm-2D backed 2D GPU such as a DMAC-350 based one is present."
+  - question: "Is Arm-2D worth enabling on a plain Cortex-M?"
+    answer: "No. Arm-2D is an abstraction layer, so without an accelerator or a dedicated instruction set such as Helium or ACPI it gives a negligible performance boost, sometimes even a loss."
+  - question: "Do I need to set LV_USE_DRAW_ARM2D_SYNC manually with CMSIS-Pack?"
+    answer: "No. When LVGL is deployed via CMSIS-Pack, lv_conf_cmsis.h checks the environment and sets LV_USE_DRAW_ARM2D_SYNC accordingly."
 ---
 
 Arm-2D is not a GPU but **an abstraction layer for 2D GPUs dedicated to
@@ -10,10 +17,10 @@ Cortex-M0 to the latest Cortex-M85.
 Arm-2D accelerates LVGL's [drawing](/main-modules/draw) with two modes: **Synchronous Mode** and
 **Asynchronous Mode**.
 
-- When **Helium** and **ACI (Arm Custom Instruction)** are available, it is recommend
+- When **Helium** and **ACI (Arm Custom Instruction)** are available, it is recommended
   to use **Synchronous Mode** to accelerate LVGL.
 - When Arm-2D backed 2D-GPUs are available, for example, **DMAC-350 based 2D
-  GPUs**, it is recommend to use **Asynchronous Mode** to accelerate LVGL.
+  GPUs**, it is recommended to use **Asynchronous Mode** to accelerate LVGL.
 
 Arm-2D is an open-source project on GitHub. For more, please refer to
 [ARM-software/Arm-2D](https://github.com/ARM-software/Arm-2D).
@@ -22,7 +29,7 @@ Arm-2D is an open-source project on GitHub. For more, please refer to
 
 In general:
 
-- you can set the macro <ApiLink name="LV_USE_DRAW_ARM2D_SYNC" /> to `1` and
+- You can set the macro <ApiLink name="LV_USE_DRAW_ARM2D_SYNC" /> to `1` and
   <ApiLink name="LV_USE_DRAW_SW_ASM" /> to <ApiLink name="LV_DRAW_SW_ASM_HELIUM" /> in `lv_conf.h` to
   enable Arm-2D synchronous acceleration for LVGL.
 - You can set
@@ -31,13 +38,13 @@ In general:
 
 If you are using
 [CMSIS-Pack](https://github.com/lvgl/lvgl/tree/master/env_support/cmsis-pack)
-to deploy the LVGL. You don't have to define the macro
+to deploy LVGL, you don't have to define the macro
 <ApiLink name="LV_USE_DRAW_ARM2D_SYNC" /> manually, instead the lv_conf_cmsis.h will
 check the environment and set the <ApiLink name="LV_USE_DRAW_ARM2D_SYNC" /> accordingly.
 
 ## Design Considerations
 
-As mentioned before, Arm-2D is an abstraction layer for 2D GPU; hence if
+As mentioned before, Arm-2D is an abstraction layer for 2D GPU; hence, if
 there is no accelerator or dedicated instruction set (such as Helium or
 ACI) available for Arm-2D, it provides negligible performance boost for
 LVGL (sometimes worse) for regular Cortex-M processors.

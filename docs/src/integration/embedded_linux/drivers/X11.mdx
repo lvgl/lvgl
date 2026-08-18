@@ -1,129 +1,121 @@
 ---
 title: X11
-description: The X11 display/input driver offers support for simulating the LVGL display and keyboard/mouse inputs in an X11 desktop window.
+description: The X11 driver opens a window on an X11 desktop and reads mouse, mousewheel and keyboard input, mainly for simulating an LVGL application on a Linux development machine.
 ---
 
 ## Overview
 
-The **X11** display/input [driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/x11)
-offers support for simulating the LVGL display and keyboard/mouse inputs in an X11
-desktop window.
+The [**X11** display/input driver](https://en.wikipedia.org/wiki/X_Window_System) opens a window
+on an X11 desktop through Xlib and reads mouse, mousewheel and keyboard input.
 
-It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
+X11 is a CPU-blit driver with no GPU path. For production embedded targets prefer
+[DRM](/integration/embedded_linux/drivers/drm) or [Wayland](/integration/embedded_linux/drivers/wayland).
 
-The main purpose for this driver is for testing/debugging the LVGL application in a
-**Linux** simulation window.
+## Configuration
 
-## Prerequisites
+Enable <ApiLink name="LV_USE_X11" />.
 
-The X11 driver uses XLib to access the linux window manager.
+<ApiLink name="LV_COLOR_DEPTH" /> must be `16`, `24` or `32`.
 
-1. Install XLib: `sudo apt-get install libx11-6` (should be installed already)
-2. Install XLib development package: `sudo apt-get install libx11-dev`
+### Options
 
-## Configure X11 driver
+| Symbol | Default | Effect |
+|---|---|---|
+| `LV_X11_RENDER_MODE` | `LV_DISPLAY_RENDER_MODE_PARTIAL` | Render mode |
+| `LV_X11_DOUBLE_BUFFER` | on | Use two buffers |
+| `LV_X11_DIRECT_EXIT` | on | Exit the application once all windows are closed |
 
-1. Enable the X11 driver support in lv_conf.h, by cmake compiler define or by KConfig
+## Building
 
-    ```c
-    #define LV_USE_X11  1
-    ```
+The driver always requires `xlib`.
 
-2. Optional configuration options:
-    -  Direct Exit
+<Callout type="tip">
+LVGL's CMake integration resolves it for you.
+Make sure the required libraries  are present on your system or in your sysroot.
 
-        ```c
-        #define LV_X11_DIRECT_EXIT  1 /* preferred default - ends the application automatically if last window has been closed */
-        // or
-        #define LV_X11_DIRECT_EXIT  0 /* application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler) */
-        ```
-
-    -  Double buffering
-
-        ```c
-        #define LV_X11_DOUBLE_BUFFER  1 /* preferred default */
-        // or
-        #define LV_X11_DOUBLE_BUFFER  0 /* not recommended */
-        ```
-
-    - Render mode
-
-        ```c
-        #define LV_X11_RENDER_MODE_PARTIAL 1  /* LV_DISPLAY_RENDER_MODE_PARTIAL, preferred default */
-        // or
-        #define LV_X11_RENDER_MODE_DIRECT  1  /* LV_DISPLAY_RENDER_MODE_DIRECT, not recommended for X11 driver */
-        // or
-        #define LV_X11_RENDER_MODE_FULL    1  /* LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver */
-        ```
+See [Dependency Management](/integration/building/cmake).
+</Callout>
 
 ## Usage
 
-The minimal initialisation opening a window and enabling keyboard/mouse support
-(e.g. in main.c, LV_X11_DIRECT_EXIT must be 1):
+Create the window with <ApiLink name="lv_x11_window_create" />, then attach input with
+<ApiLink name="lv_x11_inputs_create" />. The second argument is an optional cursor image; pass `NULL` for
+none.
 
 ```c
 int main(int argc, char ** argv)
 {
-    ...
+    lv_init();
 
-    /* initialize X11 display driver */
-    lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+    lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", 800, 480);
 
-    /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
+    /* Keyboard, mouse and mousewheel */
     lv_x11_inputs_create(disp, NULL);
 
-    ...
+    lv_demo_widgets();
 
-    while(true)
-    {
-        ...
-
-        /* Periodically call the lv_timer handler */
-        lv_timer_handler();
+    while(1) {
+        uint32_t time_until_next = lv_timer_handler();
+        if(time_until_next == LV_NO_TIMER_READY) time_until_next = LV_DEF_REFR_PERIOD;
+        lv_delay_ms(time_until_next);
     }
 }
 ```
 
-Full initialisation with mouse pointer symbol and own application exit handling
-(dependent on LV_X11_DIRECT_EXIT (can be 1 or 0))
+Call <ApiLink name="lv_x11_window_create" /> again to open more windows; each returns its own display.
+
+### Handling window closure yourself
+
+With `LV_X11_DIRECT_EXIT` off, the application decides what happens when a window closes. Register an
+<ApiLink name="LV_EVENT_DELETE" /> handler on the display and run your own loop condition:
 
 ```c
-bool terminated = false;
+static bool terminated = false;
 
-#if !LV_X11_DIRECT_EXIT
 static void on_close_cb(lv_event_t * e)
 {
-    ...
-
+    LV_UNUSED(e);
     terminated = true;
 }
-#endif
 
 int main(int argc, char ** argv)
 {
-    ...
+    lv_init();
 
-    /* initialize X11 display driver */
-    lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+    lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", 800, 480);
     lv_display_add_event_cb(disp, on_close_cb, LV_EVENT_DELETE, disp);
 
-    /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
-    LV_IMAGE_DECLARE(my_mouse_cursor_icon);
-    lv_x11_inputs_create(disp, &my_mouse_cursor_icon);
+    /* Attach inputs, optionally with a cursor image */
+    LV_IMAGE_DECLARE(mouse_cursor_icon);
+    lv_x11_inputs_create(disp, &mouse_cursor_icon);
 
-    #if !LV_X11_DIRECT_EXIT
-    /* set optional window close callback to enable application cleanup and exit */
-    lv_x11_window_set_close_cb(disp, on_close_cb, disp);
-    #endif
-
-    ...
-
-    while(!terminated)
-    {
-        ...
-
-        /* Periodically call the lv_timer handler */
-        lv_timer_handler();
+    while(!terminated) {
+        uint32_t time_until_next = lv_timer_handler();
+        if(time_until_next == LV_NO_TIMER_READY) time_until_next = LV_DEF_REFR_PERIOD;
+        lv_delay_ms(time_until_next);
     }
+
+    /* Clean up here */
 }
 ```
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Rotation | None |
+| Runtime resolution change | Yes |
+| Runtime color format change | No |
+| Color formats | Derived from <ApiLink name="LV_COLOR_DEPTH" /> (`16`, `24` or `32`) |
+| Multiple displays / windows | Yes, one display per window |
+| Hardware acceleration | None |
+| Render mode | Configurable via `LV_X11_RENDER_MODE` |
+| Input | Built in. Mouse, mousewheel and keyboard via <ApiLink name="lv_x11_inputs_create" /> |
+
+## See Also
+
+- [Dependency Management](/integration/building/cmake) - how LVGL resolves Xlib
+- [Wayland](/integration/embedded_linux/drivers/wayland) - the modern alternative on Linux desktops
+- [SDL Driver](/integration/pc/sdl) - cross-platform alternative for development
+- [GLFW](/integration/embedded_linux/drivers/glfw) - development driver with an OpenGL context
+- [DRM](/integration/embedded_linux/drivers/drm) - production alternative with no display server

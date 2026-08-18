@@ -1,0 +1,11 @@
+# Route failed asserts to lv_test_assert_fail() so they fail the test case
+# instead of halting. The path is relative to the LVGL root directory.
+CONFIG_LV_ASSERT_USE_CUSTOM_INCLUDE=y
+CONFIG_LV_ASSERT_CUSTOM_INCLUDE="tests/src/lv_test_assert.h"
+
+# Test helpers: emulated input devices, time emulation and screenshot compare.
+CONFIG_LV_USE_TEST=y
+CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE=y
+CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE=y
+
+CONFIG_LV_USE_LOG=y

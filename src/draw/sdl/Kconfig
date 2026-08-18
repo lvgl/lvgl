@@ -1,5 +1,5 @@
 config LV_USE_DRAW_SDL
-	bool "Draw using cached SDL textures"
+	bool "SDL renderer"
 	default n
 	help
-	Uses SDL renderer API
+		Render with the SDL renderer API, caching widgets and images as SDL textures.

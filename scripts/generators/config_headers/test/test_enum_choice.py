@@ -90,6 +90,16 @@ def test_color_depth_defines_no_tokens(entries):
     assert depth.emit_internal_options() == []
 
 
+def test_gated_value_alias_keeps_group_default(entries):
+    # The group sits under a disabled `if`, so evaluating the int's `default N if
+    # <member>` conditions would find no match and collapse to 0.  The value has
+    # to come from the group's own default instead.
+    burst = entries["LV_GATED_BURST_LENGTH"]
+    assert isinstance(burst, EnumChoice)
+    assert burst.selected_token == "128"
+    assert burst.emit_template()[-1] == "#define LV_GATED_BURST_LENGTH 128"
+
+
 # -- bridge: derived ints come straight from autoconf ------------------------
 
 

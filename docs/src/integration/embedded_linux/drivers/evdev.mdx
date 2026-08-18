@@ -1,63 +1,89 @@
 ---
 title: evdev
-description: "The Linux event device (evdev) is a hardware-independent API that gives access to input events from, for example, a mouse or touchscreen. It is exposed via the Linux device file system interface."
+description: "The evdev driver reads touchscreen, mouse and keyboard input straight from Linux /dev/input event devices, with no user-space input library required."
 ---
 
 ## Overview
 
-The Linux event device (evdev) is a hardware-independent API that gives access to input events from,
-for example, a mouse or touchscreen. It is exposed via the Linux device file system interface.
+The [Linux event device](https://en.wikipedia.org/wiki/Evdev) (evdev) interface exposes input events from a touchscreen,
+mouse, keyboard or anything else the kernel recognizes, through device files under `/dev/input/`. 
 
-## Prerequisites
+It's the lightest input option on Linux and the natural pairing for the [framebuffer](/integration/embedded_linux/drivers/fbdev)
+and [DRM](/integration/embedded_linux/drivers/drm) display drivers, neither of which brings its own input.
 
-Your system has an input device configured (usually under `/dev/input/` such as `/dev/input/event0`).
+### Prerequisites
 
-## Configuring the driver
+An input device under `/dev/input/`, typically `/dev/input/event0`, and permission to read it.
 
-Enable the Linux LVGL evdev driver support in `lv_conf.h`.
+## Configuration
 
-```c
-#define LV_USE_EVDEV 1
-```
+Enable <ApiLink name="LV_USE_EVDEV" />.
+
+## Building
+
+The driver always requires `libevdev`.
+
+<Callout type="tip">
+LVGL's CMake integration resolves both.
+Make sure the required libraries  are present on your system or in your sysroot.
+
+See [Dependency Management](/integration/building/cmake).
+</Callout>
 
 ## Usage
 
-To set up an event input, first create an input device with <ApiLink name="lv_evdev_create" />, setting it to the correct Linux event device.
-Then link this to the LVGL display with <ApiLink name="lv_indev_set_display" />.
-
-```c
-lv_indev_t *touch = lv_evdev_create(LV_INDEV_TYPE_POINTER, "/dev/input/event0");
-lv_indev_set_display(touch, disp);
-```
-
-Ensure that an <ApiLink name="lv_display_t" /> object is already created for `disp`. An example for this is shown below, using the [Linux framebuffer](/integration/embedded_linux/drivers/fbdev) driver.
+Create an input device with <ApiLink name="lv_evdev_create" />, giving it the device type and node path, then
+attach it to a display with <ApiLink name="lv_indev_set_display" />.
 
 ```c
 lv_display_t * disp = lv_linux_fbdev_create();
 lv_linux_fbdev_set_file(disp, "/dev/fb0");
+
+lv_indev_t * touch = lv_evdev_create(LV_INDEV_TYPE_POINTER, "/dev/input/event0");
+lv_indev_set_display(touch, disp);
 ```
 
-## Locating your input device
+The type is <ApiLink name="LV_INDEV_TYPE_POINTER" /> for mice and touchscreens, or
+<ApiLink name="LV_INDEV_TYPE_KEYPAD" /> for keyboards. <ApiLink name="lv_evdev_create_fd" /> takes an already
+open file descriptor instead of a path, and <ApiLink name="lv_evdev_delete" /> removes a device.
 
-If you can't determine your input device, first run
+### Finding your input device
 
-```$cat /proc/bus/input/devices```
+List what the kernel sees:
 
-This should show input devices and there will be entries with the word `event` which give a clue as to the device to use eg. `event1` would be `/dev/input/event1`.
+```sh
+cat /proc/bus/input/devices
+```
 
-You can use `evtest` to show data from that event source to see if it is actually the one you want.
+Entries mention an `event` handler. `event1` corresponds to `/dev/input/event1`. Confirm you picked the
+right one by watching its events:
 
-Try:
+```sh
+evtest /dev/input/event1
+```
 
-`$evtest /dev/input/event1` replacing `eventX` with your event device from above.
+### Calibrating a touchscreen
 
-## Automatic input device discovery
+Raw touchscreens report device coordinates, not screen coordinates. Map them with
+<ApiLink name="lv_evdev_set_calibration" />, and correct a transposed panel with
+<ApiLink name="lv_evdev_set_swap_axes" />.
 
-There is support for automatically finding and adding input devices in `/dev/input/`. New devices will automatically be added
-when they are connected. To enable this feature, you can simply call <ApiLink name="lv_evdev_discovery_start" display="lv_evdev_discovery_start(NULL, NULL)" />.
+```c
+lv_evdev_set_swap_axes(touch, true);
+lv_evdev_set_calibration(touch, min_x, min_y, max_x, max_y);
+```
 
-You may want to react to a new device being added so that a cursor image can be applied, for example. You can provide a callback
-function which will be called when a new device is added.
+### Automatic device discovery
+
+Rather than naming device nodes, let the driver find them. <ApiLink name="lv_evdev_discovery_start" /> scans
+`/dev/input/` and keeps watching it, so devices plugged in later are added automatically.
+Passing `NULL` for both arguments is enough to enable it:
+
+```c
+lv_evdev_discovery_start(NULL, NULL);
+```
+
+Supply a callback when you need to react to a new device — to attach a cursor image to a mouse, for example:
 
 ```c
 #include "lvgl/src/core/lv_global.h"
@@ -72,9 +98,9 @@ static void indev_deleted_cb(lv_event_t * e)
 static void discovery_cb(lv_indev_t * indev, lv_evdev_type_t type, void * user_data)
 {
     LV_LOG_USER("new '%s' device discovered", type == LV_EVDEV_TYPE_REL ? "REL" :
-                                              type == LV_EVDEV_TYPE_ABS ? "ABS" :
-                                              type == LV_EVDEV_TYPE_KEY ? "KEY" :
-                                              "unknown");
+                                             type == LV_EVDEV_TYPE_ABS ? "ABS" :
+                                             type == LV_EVDEV_TYPE_KEY ? "KEY" :
+                                             "unknown");
 
     if(type == LV_EVDEV_TYPE_REL) {
         LV_IMAGE_DECLARE(mouse_cursor_icon);
@@ -85,7 +111,7 @@ static void discovery_cb(lv_indev_t * indev, lv_evdev_type_t type, void * user_d
     }
 }
 
-int main()
+int main(void)
 {
     /* ... */
     lv_evdev_discovery_start(discovery_cb, NULL);
@@ -93,4 +119,34 @@ int main()
 }
 ```
 
-At the time of writing, this feature is not supported in BSD.
+<ApiLink name="lv_evdev_discovery_stop" /> turns it off again.
+
+<Callout type="info">
+Discovery relies on `inotify` and is not available on BSD. Create devices explicitly there.
+</Callout>
+
+### Raw key codes
+
+For keys LVGL does not map to one of its own, <ApiLink name="lv_evdev_is_raw_key" /> tells you an event
+carries a raw code and <ApiLink name="lv_evdev_get_raw_key" /> returns it. Use these when you need keys
+outside LVGL's navigation set.
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Device types | Pointer (mouse, touchscreen) and keypad |
+| Automatic discovery | Yes — <ApiLink name="lv_evdev_discovery_start" /> |
+| Hotplug | Yes — devices connected later are added automatically |
+| Full keyboard (layouts, modifiers) | No — use [libinput](/integration/embedded_linux/drivers/libinput) with XKB |
+| Touch calibration | Yes — <ApiLink name="lv_evdev_set_calibration" /> |
+| Axis swap | Yes — <ApiLink name="lv_evdev_set_swap_axes" /> |
+| Find device by capability | No — pass a node path, or use discovery |
+| BSD | Yes, except discovery and hotplug |
+
+## See Also
+
+- [libinput](/integration/embedded_linux/drivers/libinput) - richer input stack, with XKB keyboard support
+- [Linux Framebuffer](/integration/embedded_linux/drivers/fbdev) - display driver commonly paired with evdev
+- [DRM](/integration/embedded_linux/drivers/drm) - display driver commonly paired with evdev
+- [Dependency Management](/integration/building/cmake) - how LVGL resolves the evdev library

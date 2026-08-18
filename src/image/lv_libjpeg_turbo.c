@@ -14,7 +14,6 @@
 #include "lv_image_decoder_private.h"
 #include <stdio.h>
 #include <jpeglib.h>
-#include <jpegint.h>
 #include <setjmp.h>
 #include "../core/lv_global.h"
 
@@ -495,6 +494,14 @@ static image_orientation_t get_jpeg_direction(uint8_t * data, uint32_t data_size
     }
     /* jpeg_create_decompress */
     jpeg_decompress_prepare(&cinfo, data, data_size);
+
+    int ret = jpeg_read_header(&cinfo, TRUE);
+    if(ret != JPEG_HEADER_OK) {
+        LV_LOG_WARN("read jpeg header failed: %d", ret);
+        jpeg_destroy_decompress(&cinfo);
+        return res;
+    }
+
     /* read file exif orientation */
     res = jpeg_markers_reader(&cinfo);
 
@@ -564,11 +571,9 @@ static image_orientation_t jpeg_markers_reader(struct jpeg_decompress_struct * c
 {
     image_orientation_t res = IMAGE_CLOCKWISE_NONE;
 
-    if(cinfo == NULL || cinfo->marker == NULL) {
+    if(cinfo == NULL || cinfo->marker_list == NULL) {
         return res;
     }
-
-    cinfo->marker->read_markers(cinfo);
 
     jpeg_saved_marker_ptr marker = cinfo->marker_list;
     while(marker != NULL) {

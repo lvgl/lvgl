@@ -12,10 +12,6 @@
  *********************/
 #include "../../lvgl_public.h"
 
-#ifndef LV_USE_NANOVG_TEST_HEADLESS
-    #define LV_USE_NANOVG_TEST_HEADLESS 0
-#endif
-
 #if LV_USE_TEST && LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
 
 #include "../../draw/nanovg/lv_draw_nanovg.h"

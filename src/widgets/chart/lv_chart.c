@@ -1250,7 +1250,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
         int32_t max_dx = w / (chart->point_cnt - 1) + 1;
 
         lv_fpoint_t scaled_points[3];
-        int32_t raw_points[3];
+        int32_t raw_points[3] = { LV_CHART_POINT_NONE };
         int32_t s_prev = 0; /*Previous steepness around N-1 (y_diff of N-2 and N) */
         int32_t s_act = 0; /*Steepness around N (y_diff of N-1 and N+1)*/
         int32_t min_v = chart->ymin[ser->y_axis_sec];

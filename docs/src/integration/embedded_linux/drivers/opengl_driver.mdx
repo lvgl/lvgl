@@ -1,109 +1,163 @@
 ---
 title: OpenGL Driver
-description: The OpenGL display driver is a generic driver that creates textures for embedding LVGL content in other applications. The goal is to create textures that people can embed in other applications.
+description: "The OpenGL driver renders an LVGL display into an OpenGL texture, for embedding LVGL inside an application that already owns the OpenGL context."
 ---
 
 ## Overview
 
-The **OpenGL** display driver is a generic driver that creates textures for embedding
-LVGL content in other applications. The goal is to create textures that people can
-embed in other applications. The OpenGL context must be created by the user or they
-can use GLFW or EGL as backends.
+The **OpenGL** display driver renders an LVGL display into an OpenGL texture and hands you the texture id.
+It creates no window and no context: it is the driver to use when something else, a game, a visualization
+tool or your own engine already owns the OpenGL context and you want LVGL content inside it.
 
-## Getting Started with OpenGL
+If you do not already have a context, use a driver that creates one for you instead:
 
-### Prerequisites
+- [GLFW](/integration/embedded_linux/drivers/glfw) on PC-like platforms
+- [EGL](/integration/embedded_linux/drivers/egl), or [DRM](/integration/embedded_linux/drivers/drm) and
+  [Wayland](/integration/embedded_linux/drivers/wayland) with their EGL backends, on embedded targets
+- [SDL](/integration/pc/sdl) with its EGL backend
 
-An OpenGL context must be created before using the OpenGL driver. You can create this using:
+<Callout type="info" title="Experimental API">
+The OpenGL Driver API is experimental. Expect breaking changes.
+</Callout>
 
-- GLFW (see [GLFW driver](/integration/embedded_linux/drivers/glfw))
-- EGL (see [EGL driver](/integration/embedded_linux/drivers/egl))
-- Your own OpenGL context management
+## Configuration
 
-### Configure OpenGL Driver
+Enable <ApiLink name="LV_USE_OPENGLES" />.
 
-Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig:
+There are no libraries for LVGL to resolve, the GL entry points come from the context you already created.
 
-```c
-#define LV_USE_OPENGLES  1
-```
+To render on the GPU rather than uploading software-rendered pixels into the texture, also enable a draw
+unit: <ApiLink name="LV_USE_DRAW_NANOVG" /> (recommended) or <ApiLink name="LV_USE_DRAW_OPENGLES" />. See
+[OpenGL Overview](/integration/embedded_linux/opengl).
 
-### Basic Usage
+## Usage
+
+The OpenGL context must already be current when you call <ApiLink name="lv_opengles_texture_create" />. It
+allocates the texture for you; <ApiLink name="lv_opengles_texture_get_texture_id" /> returns the id to use in
+your own rendering.
 
 ```c
 #include "lvgl/lvgl.h"
 
-#define WIDTH 640
+#define WIDTH  640
 #define HEIGHT 480
 
-/* This flush callback works with both FULL and DIRECT render modes*/
-static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
+int main(void)
 {
-    if (lv_display_flush_is_last(disp)) {
-        const int32_t disp_width = lv_display_get_horizontal_resolution(disp);
-        const int32_t disp_height = lv_display_get_vertical_resolution(disp);
-        /* The texture occupies the full screen even if `area` is not the full screen which happens with RENDER_MODE_DIRECT */
-        lv_area_t full_area;
-        lv_area_set(&full_area, 0, 0, disp_width, disp_height);
-
-        /* Get the texture id containing LVGL generated UI */
-        unsigned int texture_id = lv_opengles_texture_get_texture_id(disp);
-        /* This function will render to the current context */
-        lv_opengles_render_texture(texture_id, &full_area, LV_OPA_COVER, disp_width, disp_height, &full_area, false, true);
-    }
-    lv_display_flush_ready(disp);
-}
-
-int main()
-{
-    /* initialize lvgl */
     lv_init();
     /* Don't forget the tick callback */
 
-    /* NOTE: OpenGL context must be created before this point */
+    /* NOTE: the OpenGL context must be created and current before this point */
 
-    /* Create a display that flushes to a texture. The OpenGL texture will be created for you */
-    lv_display_t * texture = lv_opengles_texture_create(WIDTH, HEIGHT);
-    /* If you already have an OpenGL texture ready, you can use it instead:
-     * lv_display_t * texture = lv_opengles_texture_create_from_texture_id(WIDTH, HEIGHT, my_texture_id); */
+    lv_display_t * disp = lv_opengles_texture_create(WIDTH, HEIGHT);
 
-    /* Set the display render mode and flush callback
-     * lv_display_set_render_mode(texture, LV_DISPLAY_RENDER_MODE_FULL);
-     * lv_display_set_flush_cb(texture, flush_cb); */
+    /* The texture id, for use in your application's rendering */
+    unsigned int texture_id = lv_opengles_texture_get_texture_id(disp);
 
-    /* get the texture ID for use in your application */
-    unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
-
-    /* create Widgets on the screen */
     lv_demo_widgets();
 
-    while (1)
-    {
+    while(1) {
         uint32_t time_until_next = lv_timer_handler();
         if(time_until_next == LV_NO_TIMER_READY) time_until_next = LV_DEF_REFR_PERIOD;
         lv_delay_ms(time_until_next);
+        /* Draw texture_id in your own scene, then swap buffers */
     }
 
     return 0;
 }
 ```
 
-## OpenGL Texture Caching Renderer
+If you have already allocated a texture yourself, wrap it instead of letting LVGL create one with
+<ApiLink name="lv_opengles_texture_create_from_texture_id" />.
+<ApiLink name="lv_opengles_texture_get_from_texture_id" /> looks up the display belonging to a texture id,
+and <ApiLink name="lv_opengles_texture_reshape" /> resizes a texture and its display together.
 
-There is a renderer in LVGL which caches software-rendered areas as OpenGL textures.
-The textures are retrieved from the cache and reused when there is a match.
-The performance will be drastically improved in most cases.
+<Callout type="info" title="Private API">
+Resizing a texture requires using LVGL's Private API.
+</Callout>
+
+Create as many displays as you need, each gets its own texture.
+
+### Drawing the texture yourself
+
+The driver flushes into the texture and stops there; putting it on screen is your job.
+<ApiLink name="lv_opengles_render_texture" /> draws a texture into the current framebuffer if you want LVGL
+to do it, and <ApiLink name="lv_opengles_render_display_texture" /> does the same for a display's own
+texture.
+
+To take over presentation entirely, set your own flush callback. This one works in both the full and direct
+render modes:
 
 ```c
-#define LV_USE_DRAW_OPENGLES 1
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+{
+    LV_UNUSED(area);
+    LV_UNUSED(px_map);
+
+    if(lv_display_flush_is_last(disp)) {
+        const int32_t w = lv_display_get_horizontal_resolution(disp);
+        const int32_t h = lv_display_get_vertical_resolution(disp);
+
+        /* The texture always covers the full screen, even when `area` does not,
+         * which is the case in the direct render mode */
+        lv_area_t full_area;
+        lv_area_set(&full_area, 0, 0, w, h);
+
+        unsigned int texture_id = lv_opengles_texture_get_texture_id(disp);
+        /* Renders into the current context */
+        lv_opengles_render_texture(texture_id, &full_area, LV_OPA_COVER, w, h, &full_area, false, true);
+    }
+
+    lv_display_flush_ready(disp);
+}
 ```
+
+Register it after creating the display, together with the render mode you want:
+
+```c
+lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
+lv_display_set_flush_cb(disp, flush_cb);
+```
+
+<ApiLink name="lv_opengles_viewport" /> sets the viewport LVGL renders through, if your application needs
+LVGL confined to part of the framebuffer.
+
+## OpenGL Texture Caching Renderer
+
+<ApiLink name="LV_USE_DRAW_OPENGLES" /> enables a renderer that caches software-rendered areas as OpenGL
+textures and reuses them whenever a later frame asks for the same thing. In most UIs this is a large
+improvement, because most of the screen does not change between frames.
 
 ### Known Limitations
 
-- Performance will be the same or slightly worse if the drawn areas are never found in the cache
-  due to Widgets with continuously varying colors or shapes. One example is a label whose color
-  is set to a random value every frame, as in the "Multiple labels" scene of the benchmark demo.
-- Layers with transparent pixels and an overall layer transparency will not blend correctly.
-  The effect can be observed in the "Containers with opa_layer" scene of the benchmark demo
-  in the border corners.
-- Layers with rotation are not currently supported. Images with rotation are fine.
+- Performance is the same or slightly worse when drawn areas never hit the cache — widgets whose color or
+  shape changes every frame, such as a label recolored randomly each frame (the "Multiple labels" scene of
+  the benchmark demo).
+- Layers that have both transparent pixels and an overall layer opacity do not blend correctly. Visible in
+  the border corners of the benchmark demo's "Containers with opa_layer" scene.
+- Layers with rotation are not supported. Rotated *images* are fine.
+
+<ApiLink name="LV_USE_DRAW_NANOVG" /> avoids these limitations and performs better; prefer it unless you
+specifically need the texture cache. See
+[NanoVG Draw Unit](/integration/embedded_linux/draw_units/draw_nanovg).
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Rotation | Hardware (GPU) |
+| Runtime resolution change | With <ApiLink name="lv_opengles_texture_reshape" />  (Private API) |
+| Runtime color format change | No |
+| Color formats | Derived from <ApiLink name="LV_COLOR_DEPTH" /> |
+| Multiple displays / windows | Yes. One display per texture. Windows are not this driver's concern |
+| Hardware acceleration | OpenGL ES, via <ApiLink name="LV_USE_DRAW_NANOVG" /> or <ApiLink name="LV_USE_DRAW_OPENGLES" /> |
+| Render mode | Direct by default |
+| Input | None built in. The window belongs to your application, so feed LVGL input yourself |
+
+## See Also
+
+- [GLFW](/integration/embedded_linux/drivers/glfw) - creates the window and context for you, and can composite these textures
+- [EGL](/integration/embedded_linux/drivers/egl) - context creation on embedded targets, including off-screen rendering
+- [OpenGL Overview](/integration/embedded_linux/opengl) - how the drivers and draw units fit together
+- [NanoVG Draw Unit](/integration/embedded_linux/draw_units/draw_nanovg) - the recommended GPU renderer
+- [OpenGL ES Draw Unit](/integration/embedded_linux/draw_units/draw_opengl) - the texture-caching renderer

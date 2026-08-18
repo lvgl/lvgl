@@ -11,28 +11,28 @@ menu "Test Utilities"
 	rsource "test/Kconfig"
 
 	config LV_USE_MONKEY
-		bool "Enable Monkey test"
+		bool "Monkey test"
 		default n
 		help
-			Enable Monkey test
+			Feed random input events to the UI for stress testing.
 endmenu
 
 menu "Debug Rendering"
 
 config LV_USE_REFR_DEBUG
-	bool "Draw random colored rectangles over the redrawn areas"
+	bool "Redraw area overlay"
 	help
 		Draw random colored rectangles over the redrawn areas.
 
 config LV_USE_LAYER_DEBUG
-	bool "Draw a red overlay for ARGB layers and a green overlay for RGB layers"
+	bool "Layer type overlay"
 	help
-		Draw a red overlay for ARGB layers and a green overlay for RGB layers
+		Draw a red overlay over ARGB layers and a green overlay over RGB layers.
 
 config LV_USE_PARALLEL_DRAW_DEBUG
-	bool "Draw overlays with different colors for each draw_unit's tasks"
+	bool "Draw unit overlay"
 	help
-		Also add the index number of the draw unit on white background.
-		For layers add the index number of the draw unit on black background.
+		Draw an overlay in a different color for each draw unit's tasks, with the
+		draw unit's index number on a white background (black for layers).
 endmenu
 endmenu

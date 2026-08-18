@@ -4,7 +4,7 @@ config LV_USE_CALENDAR
 
 if LV_USE_CALENDAR
 config LV_CALENDAR_WEEK_STARTS_MONDAY
-	bool "Calendar week starts monday"
+	bool "Week starts on Monday"
 
 menu "Days name configuration"
 	depends on LV_USE_CALENDAR
@@ -74,15 +74,15 @@ config LV_DECEMBER_STR
 endmenu
 
 config LV_USE_CALENDAR_HEADER_ARROW
-	bool "Use calendar header arrow"
+	bool "Header with arrow buttons"
 	default y
 
 config LV_USE_CALENDAR_HEADER_DROPDOWN
-	bool "Use calendar header dropdown"
+	bool "Header with dropdowns"
 	default y
 
 config LV_USE_CALENDAR_CHINESE
-	bool "Use chinese calendar"
+	bool "Chinese calendar"
 	default n
 
 endif #LV_USE_CALENDAR

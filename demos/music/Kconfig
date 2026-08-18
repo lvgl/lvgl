@@ -4,23 +4,23 @@ config LV_USE_DEMO_MUSIC
 if LV_USE_DEMO_MUSIC
 
 config LV_DEMO_MUSIC_SQUARE
-	bool "Enable Square"
+	bool "Square layout"
 	default n
 
 config LV_DEMO_MUSIC_LANDSCAPE
-	bool "Enable Landscape"
+	bool "Landscape layout"
 	default n
 
 config LV_DEMO_MUSIC_ROUND
-	bool "Enable Round"
+	bool "Round layout"
 	default n
 
 config LV_DEMO_MUSIC_LARGE
-	bool "Enable Large"
+	bool "Large layout"
 	default n
 
 config LV_DEMO_MUSIC_AUTO_PLAY
-	bool "Enable Auto play"
+	bool "Auto play"
 	default n
 
 endif #LV_USE_DEMO_MUSIC

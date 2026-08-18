@@ -5,6 +5,8 @@
 
 
 static uint32_t buf[LV_TEST_WIDTH_TO_STRIDE(100, 4) * 100 + LV_DRAW_BUF_ALIGN];
+static const char lottie_30_fps[] =
+    "{\"v\":\"5.7.4\",\"fr\":30,\"ip\":0,\"op\":60,\"w\":1,\"h\":1,\"layers\":[]}";
 extern const uint8_t test_lottie_approve[];
 extern const size_t test_lottie_approve_size;
 
@@ -73,6 +75,14 @@ void test_lottie_load_from_file(void)
     /*Should reset automatically*/
     lv_test_fast_forward(200);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_2.png");
+}
+
+void test_lottie_uses_source_duration(void)
+{
+    lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
+    lv_lottie_set_src_data(lottie, lottie_30_fps, sizeof(lottie_30_fps) - 1);
+
+    TEST_ASSERT_EQUAL_UINT32(2000, lv_lottie_get_anim(lottie)->duration);
 }
 
 void test_lottie_missing_settings(void)

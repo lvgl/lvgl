@@ -11,7 +11,6 @@
 
 #if LV_USE_WAYLAND
 
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -84,7 +83,16 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_driver_data(window->lv_disp, window);
 
     /* Initialize display driver */
-    window->backend_display_data = wl_backend_ops.init_display(lv_wl_ctx.backend_data, window->lv_disp, hor_res, ver_res);
+    lv_result_t res = lv_wayland_backend_init_display(&window->backend_ddata,
+                                                      window->lv_disp, hor_res,
+                                                      ver_res);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to create display");
+        goto init_display_err;
+    }
+
+    /*Assert here so that we can freely use these operations afterwards*/
+    LV_ASSERT_NULL(window->backend_ddata.ops);
 
     lv_wayland_xdg_configure_surface(window);
 
@@ -123,7 +131,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         LV_LOG_ERROR("failed to register keyboard indev");
     }
     return window->lv_disp;
-
+init_display_err:
+    lv_wayland_xdg_delete_window(&window->xdg);
 create_window_err:
     wl_surface_destroy(window->body);
 create_surface_err:
@@ -140,7 +149,7 @@ void * lv_wayland_get_backend_display_data(lv_display_t * display)
     LV_ASSERT_NULL(display);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
     LV_ASSERT_NULL(window);
-    return window->backend_display_data;
+    return window->backend_ddata.display_data;
 }
 
 void lv_wayland_set_backend_display_data(lv_display_t * display, void * data)
@@ -148,7 +157,7 @@ void lv_wayland_set_backend_display_data(lv_display_t * display, void * data)
     LV_ASSERT_NULL(display);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
     LV_ASSERT_NULL(window);
-    window->backend_display_data = data;
+    window->backend_ddata.display_data = data;
 }
 
 struct wl_surface * lv_wayland_get_window_surface(lv_display_t * display)
@@ -298,9 +307,7 @@ static void delete_event(lv_event_t * e)
 
     /* Make sure buffer is correctly released*/
     wl_display_roundtrip(lv_wl_ctx.wl_display);
-
-    wl_backend_ops.deinit_display(window->backend_display_data, window->lv_disp);
-    window->backend_display_data = NULL;
+    lv_wayland_backend_deinit_display(&window->backend_ddata, window->lv_disp);
 
     if(LV_WAYLAND_DIRECT_EXIT) {
         lv_display_set_driver_data(window->lv_disp, NULL);
@@ -337,7 +344,15 @@ static void res_changed_event(lv_event_t * e)
 {
     lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
-    window->backend_display_data = wl_backend_ops.resize_display(lv_wl_ctx.backend_data, display);
+
+    void * display_data = window->backend_ddata.ops->resize_display(window->backend_ddata.backend_data, display);
+    if(!display_data) {
+        /* The backend kept the display data of the previous resolution alive */
+        LV_LOG_ERROR("Failed to resize the display, keeping the previous configuration");
+        return;
+    }
+
+    window->backend_ddata.display_data = display_data;
 }
 
 #endif /* LV_USE_WAYLAND */

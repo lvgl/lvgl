@@ -4,12 +4,12 @@
 #   LV_FS_DRV_STR  - human-readable name (e.g. "stdio")
 
 config LV_USE_FS_$(LV_FS_DRV)
-	bool "File system on top of $(LV_FS_DRV_STR)"
+	bool "$(LV_FS_DRV_STR)"
 
 if LV_USE_FS_$(LV_FS_DRV)
 
 config LV_FS_$(LV_FS_DRV)_LETTER
-	int "Driver-identifier letter for $(LV_FS_DRV_STR) (e.g. 65 for 'A', 0 = disabled)"
+	int "Drive letter for $(LV_FS_DRV_STR) (65 = 'A', 0 = disabled)"
 	range 0 90
 	default 0
 

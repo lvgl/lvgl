@@ -25,9 +25,10 @@
  *      TYPEDEFS
  **********************/
 
-
 typedef struct {
+    /* GPU render target, or software upload target. */
     lv_opengles_texture_t texture;
+
     struct wl_egl_window * egl_window;
     lv_opengles_egl_t * egl_ctx;
 } lv_wl_egl_display_data_t;
@@ -36,7 +37,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void * wl_egl_init(void);
+static lv_result_t wl_egl_init(void ** backend_data);
 static void wl_egl_deinit(void * backend_ctx);
 static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height);
 static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display);
@@ -63,14 +64,21 @@ static void wl_egl_flip_cb(void * driver_data, bool vsync);
  **********************/
 
 
+/* TODO: the opengl driver doesn't support multiple instances
+ * so we can only handle one display per EGL instance
+ * WIP: https://github.com/lvgl/lvgl/pull/9854 */
+static bool has_display;
 static const struct wl_callback_listener frame_listener = {
     .done = frame_done,
 };
 
-const lv_wayland_backend_ops_t wl_backend_ops = {
+const lv_wayland_backend_ops_t wl_egl_ops = {
     .init = wl_egl_init,
     .deinit = wl_egl_deinit,
     .global_handler = wl_egl_global_handler,
+};
+
+const lv_wayland_backend_display_ops_t wl_egl_display_ops = {
     .init_display = wl_egl_init_display,
     .deinit_display = wl_egl_deinit_display,
     .resize_display = wl_egl_resize_display,
@@ -96,14 +104,18 @@ static void frame_done(void * data, struct wl_callback * callback, uint32_t time
     lv_display_flush_ready(display);
 }
 
-static void * wl_egl_init(void)
+static lv_result_t wl_egl_init(void ** backend_data)
 {
-    return NULL;
+    LV_UNUSED(backend_data);
+    *backend_data = NULL;
+    has_display = false;
+    return LV_RESULT_OK;
 }
 
 static void wl_egl_deinit(void * backend_ctx)
 {
     LV_UNUSED(backend_ctx);
+    has_display = false;
 }
 
 static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display,
@@ -111,7 +123,7 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
 {
     lv_wl_egl_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
     if(!ddata) {
-        LV_LOG_ERROR("Failed to allocate data for display");
+        LV_LOG_WARN("Failed to allocate data for display");
         return NULL;
     }
 
@@ -119,12 +131,11 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
      * in the EGL window creation callback */
     lv_wayland_set_backend_display_data(display, ddata);
 
-
     /* Create EGL context */
     lv_egl_interface_t egl_interface = wl_egl_get_interface(display);
     ddata->egl_ctx = lv_opengles_egl_context_create(&egl_interface);
     if(!ddata->egl_ctx) {
-        LV_LOG_ERROR("Failed to create EGL context");
+        LV_LOG_WARN("Failed to create EGL context");
         goto egl_ctx_err;
     }
 
@@ -134,9 +145,11 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
     /*Initialize the draw buffers and texture*/
     lv_result_t res = lv_opengles_texture_reshape(&ddata->texture, display, width, height);
     if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to create draw buffers");
+        LV_LOG_WARN("Failed to create draw buffers");
         goto texture_err;
     }
+
+    has_display = true;
     return ddata;
 
 texture_err:
@@ -162,6 +175,7 @@ static void egl_destroy_display_data(lv_wl_egl_display_data_t * ddata)
 
     LV_LOG_INFO("Deleted EGL display data");
     lv_free(ddata);
+    has_display = false;
 }
 
 static void flush_wait_cb(lv_display_t * disp)
@@ -209,12 +223,12 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     wl_surface_commit(surface);
 }
 
-#else
+#else /*Software rendering*/
 
 static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    LV_UNUSED(px_map);
     LV_UNUSED(area);
+    LV_UNUSED(px_map);
 
     if(!lv_display_flush_is_last(disp)) {
         lv_display_flush_ready(disp);
@@ -271,9 +285,13 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
 static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height)
 {
     LV_UNUSED(backend_ctx);
+    if(has_display) {
+        LV_LOG_INFO("The EGL backend can only handle one display at a time");
+        return NULL;
+    }
     lv_wl_egl_display_data_t * ddata = egl_create_display_data(display, width, height);
     if(!ddata) {
-        LV_LOG_ERROR("Failed to create display data");
+        LV_LOG_WARN("Failed to create display data");
         return NULL;
     }
 
@@ -281,6 +299,7 @@ static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, in
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
     lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
 
+    has_display = true;
     return ddata;
 }
 
@@ -305,7 +324,9 @@ static void wl_egl_deinit_display(void * backend_ctx, lv_display_t * display)
 {
     LV_UNUSED(backend_ctx);
     lv_wl_egl_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
+
     egl_destroy_display_data(ddata);
+    has_display = false;
 }
 
 static void wl_egl_global_handler(void * backend_ctx, struct wl_registry * registry, uint32_t name,
@@ -383,7 +404,7 @@ static void * wl_egl_create_window(void * driver_data, const lv_egl_native_windo
     lv_wl_egl_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
 
     if(!wl_surface) {
-        LV_LOG_ERROR("Failed to get Wayland surface");
+        LV_LOG_WARN("Failed to get Wayland surface");
         return NULL;
     }
 
@@ -391,7 +412,7 @@ static void * wl_egl_create_window(void * driver_data, const lv_egl_native_windo
                                              lv_display_get_horizontal_resolution(display),
                                              lv_display_get_vertical_resolution(display));
     if(!ddata->egl_window) {
-        LV_LOG_ERROR("Failed to create wl_egl_window");
+        LV_LOG_WARN("Failed to create wl_egl_window");
         return NULL;
     }
 

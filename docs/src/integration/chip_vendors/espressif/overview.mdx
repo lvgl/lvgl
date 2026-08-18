@@ -1,29 +1,33 @@
 ---
 title: Overview
-description: "Espressif Systems is a fabless chip manufacturer that produces the ESP32 series of system on chips, these chips can be based on Xtensa or Risc-V architectures, and they feature the common set of an..."
+description: "Developing LVGL applications for the ESP32 series with ESP-IDF, the ready-to-use board projects, and the graphical peripherals LVGL supports."
+faqs:
+  - question: "Which SDK should I use for LVGL on an ESP32?"
+    answer: "ESP-IDF, Espressif's own SDK. Arduino, Zephyr, NuttX, and MicroPython support is built on top of ESP-IDF or some of its components, and each has its own getting-started page."
+  - question: "Is there a ready-to-use ESP32 project?"
+    answer: "Yes, LV Port for ESP32 (lvgl/lv_esp_idf) is a demo project compatible with several ESP32 boards. Additional board support packages and examples are in the espressif/esp-bsp repository."
+  - question: "Which ESP32 chips have graphics acceleration LVGL can use?"
+    answer: "The ESP32-P4 family has a PPA (Pixel Processing Accelerator) and a DMA2D peripheral. Both have their own pages in this section."
 ---
 
 ## About
 
 Espressif Systems is a fabless chip manufacturer that produces the ESP32 series of
-system on chips, these chips can be based on Xtensa or Risc-V architectures, and they
+systems on chip. These chips can be based on Xtensa or RISC-V architectures, and they
 feature the common set of analog and digital peripherals of a general purpose microcontroller
-combined to a radio subsystem capable to run a Bluetooth and/or a WiFi stack.
+combined with a radio subsystem capable of running a Bluetooth and/or a Wi-Fi stack.
 
-Espressif System also provides its comprehensive software development kit (SDK) for
-users to focus only in their applications, which is the IDF, all other 3rd party
-support such as Arduino, Zephyr, NuttX and Micropython are built on top of the IDF or
-some of its components.
+Espressif also provides a comprehensive software development kit (SDK), the IDF, so that
+users can focus only on their applications. All other 3rd party support, such as Arduino,
+Zephyr, NuttX and MicroPython, is built on top of the IDF or some of its components.
 
 ## Application Development
 
-The LVGL is supported by Espressif SDK, that is it, the IDF as mentioned before,
-therefore ESP32 series of chips are supported on a different sets of frameworks
-called by Espressif as 3rd party projects.
+LVGL is supported by Espressif's SDK, the IDF. Beyond that, the ESP32 series of chips is
+supported in several other frameworks, which Espressif calls 3rd party projects.
 
-This guide will cover the usage of the LVGL using the Espressif-IDF software development
-kit. Although ESP32 are supported on other frameworks also supported by LVGL, it
-is recommended the user to check the following pages:
+This section covers using LVGL with the ESP-IDF software development kit. If you use one of
+the other frameworks that LVGL supports, start from its own page instead:
 
 - [Arduino Framework](/integration/frameworks/arduino)
 - [Platformio](/integration/frameworks/platformio)
@@ -31,10 +35,10 @@ is recommended the user to check the following pages:
 - [NuttX RTOS](/integration/rtos/nuttx)
 - [Zephyr RTOS](/integration/rtos/zephyr)
 
-On the pages above users would be able to check the respective getting started on
-these platforms where ESP32, and other chips are abstracted by the framework.
+On the pages above you can find the getting-started instructions for those platforms, where
+the ESP32 and other chips are abstracted by the framework.
 
-## Ready to use projects
+## Ready-to-Use Projects
 
 For a quick start with LVGL and ESP32, LVGL maintains a demo project compatible with
 several ESP32 boards under its [LV Port for ESP32](https://github.com/lvgl/lv_esp_idf).
@@ -47,20 +51,18 @@ Additional BSPs and examples are available in the [esp-bsp](https://github.com/e
 
 ## LVGL Support for ESP32 Graphical Peripherals
 
-Some of the ESP32 chips like the ESP32P4 family have built-in support
-for driving display through standard interfaces like RGB and MIPI,
-the Espressif IDF (esp-idf), provides the necessary drivers, leaving
-to the user the responsibility to integrate them into the LVGL display
-subsystem.
+Some ESP32 chips, like the ESP32-P4 family, have built-in support for driving
+displays through standard interfaces like RGB and MIPI. ESP-IDF provides the
+necessary drivers, leaving it to the user to integrate them into the LVGL
+[display](/main-modules/display) subsystem.
 
-Espressif, via its component manager system, provides a ready to use
-LVGL porting component, which is the recommended and preferred way of
-integrating input and output devices from the ESP32 chip to the LVGL
-Display subsystem, this component is covered in
-[Add LVGL to an ESP32 IDF project](/integration/chip_vendors/espressif/add_lvgl_to_esp32_idf_project)
+Via its component manager, Espressif provides a ready-to-use LVGL porting component,
+which is the recommended way of connecting the input and output devices of an ESP32
+chip to LVGL. That component is covered in
+[Add LVGL to an ESP32 IDF project](/integration/chip_vendors/espressif/add_lvgl_to_esp32_idf_project).
 
 Besides the display controller, some ESP32 chips offer graphical hardware
-acceleration peripherals like:
+acceleration peripherals:
 
-- [Support 2D Direct Memory Access (DMA2D)](/integration/chip_vendors/espressif/hardware_accelerator_dma2d)
-- [Support for Pixel Processing Accelerator](/integration/chip_vendors/espressif/hardware_accelerator_ppa)
+- [2D Direct Memory Access (DMA2D)](/integration/chip_vendors/espressif/hardware_accelerator_dma2d)
+- [PPA (Pixel Processing Accelerator)](/integration/chip_vendors/espressif/hardware_accelerator_ppa)

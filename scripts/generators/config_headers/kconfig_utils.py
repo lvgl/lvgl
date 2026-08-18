@@ -61,25 +61,51 @@ def bool_default(sym) -> str:
     return "0"
 
 
+def default_value_text(sym, value) -> str:
+    """One ``default`` clause's value, as the C text *sym* would take from it.
+
+    A default pointing at another int/hex option is followed through to that
+    option's value; a bare number is kept as-is, gaining an ``0x`` prefix when
+    *sym* is hex."""
+    if isinstance(value, Symbol) and value.nodes and value.type in (INT, HEX):
+        return resolve_int_value(value)
+    s = expr_str(value)
+    if sym.type == HEX and not s.startswith("0x"):
+        s = "0x" + s
+    return s
+
+
 def resolve_int_value(sym) -> str:
     """An int/hex option's value as C text (e.g. ``"32"`` or ``"0x40"``).
 
     Checks each ``default N if <cond>`` in order (ignoring the option's own
-    ``depends on``) and returns the first that applies.  A default pointing at
-    another int/hex option is followed through to its value.  When nothing
-    applies - e.g. a count gated off because its driver is disabled - returns
-    ``0`` (``0x0`` for hex)."""
+    ``depends on``) and returns the first that applies.  When nothing applies -
+    e.g. a count gated off because its driver is disabled - returns ``0``
+    (``0x0`` for hex).
+
+    Not usable for an int derived from a "pick one" group (``default 128 if
+    LV_PPA_BURST_LENGTH_128``): every member of a gated-off group evaluates to
+    n, so no default applies and the value collapses to a meaningless ``0``.
+    Use :func:`choice_int_value` for those."""
     dd_keys = {term_key(x) for x in dep_terms(sym.direct_dep)}
     for value, cond in sym.defaults:
         rest = [x for x in dep_terms(cond) if term_key(x) not in dd_keys]
         if all(expr_value(x) > 0 for x in rest):
-            if isinstance(value, Symbol) and value.nodes and value.type in (INT, HEX):
-                return resolve_int_value(value)
-            s = expr_str(value)
-            if sym.type == HEX and not s.startswith("0x"):
-                s = "0x" + s
-            return s
+            return default_value_text(sym, value)
     return "0x0" if sym.type == HEX else "0"
+
+
+def choice_int_value(sym, choice, pairs) -> str:
+    """The value of an int derived from a "pick one" group, as C text.
+
+    *pairs* is ``[(member, value_expr), ...]``, one per ``default`` of *sym*.
+    The value is taken from whichever member the group selects - via
+    :func:`choice_default`, which reports the member the group *would* pick even
+    when it is gated off - instead of evaluating each default's condition
+    against the current config the way :func:`resolve_int_value` does."""
+    sel = choice_default(choice)
+    value = next((v for member, v in pairs if member is sel), pairs[0][1])
+    return default_value_text(sym, value)
 
 
 def scalar_default(sym) -> str:

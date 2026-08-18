@@ -192,6 +192,19 @@ cmake -B build -DLV_BUILD_USE_KCONFIG=ON -DLV_BUILD_DEFCONFIG_PATH=configs/defco
 cmake --build build
 ```
 
+### Combining presets
+
+`LV_BUILD_DEFCONFIG_PATH` accepts a `;`-separated list of defconfigs. They are
+merged in the given order, so a later one overrides a value set by an earlier
+one. This way a set of related configurations can share a common base instead of
+each repeating it:
+
+```bash
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON \
+      "-DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/sdl2.defconfig;my_overrides.defconfig"
+cmake --build build
+```
+
 ### Empty configuration
 
 `configs/defconfigs/empty.defconfig` strips LVGL to its smallest sensible

@@ -1,6 +1,17 @@
 ---
 title: STM32 DMA2D
-description: "STM32 DMA2D is also called Chrom-ART. It will be referred to as DMA2D on this page."
+description: "The STM32 DMA2D (Chrom-ART) peripheral accelerates pixel data manipulation asynchronously. LVGL integrates it as a draw unit for fills and images."
+faqs:
+  - question: "How do I enable the DMA2D draw unit?"
+    answer: "Set LV_USE_DRAW_DMA2D to 1 in lv_conf.h and set LV_DRAW_DMA2D_HAL_INCLUDE to the HAL header of your STM32 family, e.g. \"stm32u5xx_hal.h\". Nothing else is required."
+  - question: "Which draw tasks does DMA2D accelerate?"
+    answer: "Fills and images that use standard color formats with no gradient, no transform, and no radius. Everything else is rendered in parallel by the software draw unit."
+  - question: "Can the CPU sleep while a DMA2D transfer is running?"
+    answer: "Yes, with an OS. Set LV_USE_OS to the matching value, set LV_USE_DRAW_DMA2D_INTERRUPT to 1, and call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global interrupt. Otherwise LVGL spins while waiting."
+  - question: "Does LVGL use the STM32 HAL for DMA2D?"
+    answer: "No, it manipulates the DMA2D peripheral through direct register access. Make sure no framework contends with LVGL over the peripheral."
+  - question: "Can DMA2D be used together with LTDC and NeoChrom?"
+    answer: "DMA2D and LTDC can be mixed freely as long as LV_ST_LTDC_USE_DMA2D_FLUSH is not enabled, because LTDC would then use the DMA2D peripheral for flushing. NeoChrom and DMA2D can both be enabled; they are separate draw units."
 ---
 
 STM32 DMA2D is also called Chrom-ART. It will be referred to as DMA2D
@@ -44,13 +55,23 @@ completion of before continuing, LVGL will spin waiting for
 DMA2D to complete. If you would like the CPU to sleep or be scheduled to
 other RTOS tasks while a DMA2D transfer is ongoing, do the following:
 
-1. An RTOS/OS must be present. Set <ApiLink name="LV_USE_OS" /> to one of the supported values
-   in `lv_conf_template.h` corresponding to the RTOS you're using.
-2. Set <ApiLink name="LV_USE_DRAW_DMA2D_INTERRUPT" /> to `1` in `lv_conf.h`.
-3. You must call
-   <ApiLink name="lv_draw_dma2d_transfer_complete_interrupt_handler" />
-   when you receive the global interrupt that signals
-   a DMA2D transfer has completed.
+<Steps>
+
+<Step>
+**Enable an OS**: An RTOS/OS must be present. Set <ApiLink name="LV_USE_OS" /> to one of the
+supported values in `lv_conf_template.h` corresponding to the RTOS you're using.
+</Step>
+
+<Step>
+**Enable the interrupt**: Set <ApiLink name="LV_USE_DRAW_DMA2D_INTERRUPT" /> to `1` in `lv_conf.h`.
+</Step>
+
+<Step>
+**Call the handler**: Call <ApiLink name="lv_draw_dma2d_transfer_complete_interrupt_handler" />
+when you receive the global interrupt that signals that a DMA2D transfer has completed.
+</Step>
+
+</Steps>
 
 ## Interop with LTDC and NeoChrom
 

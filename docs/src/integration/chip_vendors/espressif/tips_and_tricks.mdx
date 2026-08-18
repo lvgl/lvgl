@@ -1,67 +1,79 @@
 ---
 title: Tips and tricks
-description: The IDF project in general are configured to optimize the final application image in respect of its size. For some LVGL applications this may not be desired or will result on poor speed of execution.
+description: "IDF projects are optimized for image size by default. These options tune an ESP-IDF project for LVGL speed, PSRAM usage, logging, and file system access."
+faqs:
+  - question: "How do I make LVGL run faster on an ESP32?"
+    answer: "Set CONFIG_COMPILER_OPTIMIZATION_PERF=y to build for performance, CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM=y to place LVGL's critical code in IRAM, and CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_ to the maximum frequency of your chip."
+  - question: "The application crashes after I enable CONFIG_LV_USE_PPA. Why?"
+    answer: "The typical symptom is an error from esp_msync on the monitor console. The PPA only accepts data aligned to the 64-byte L1 cache line, so set CONFIG_LV_DRAW_BUF_ALIGN to 64 instead of the default 4."
+  - question: "The ESP32-P4 log reports a display buffer underrun and the frame rate drops. What should I do?"
+    answer: "Depending on the IDF version, PSRAM may not be running at its maximum speed. Add CONFIG_SPIRAM_SPEED_200M=y to sdkconfig.defaults. Increasing CONFIG_LV_PPA_BURST_LENGTH can help too."
+  - question: "Which PPA burst lengths are valid?"
+    answer: "128, 64, 32, 16, and 8 bytes. Any other value results in a build error. A longer burst can slow down another ESP-IDF consumer of the shared DMA2D channel."
+  - question: "How do I enable LVGL logs in an IDF project?"
+    answer: "Add CONFIG_LV_USE_LOG=y, CONFIG_LV_LOG_LEVEL_INFO=y, and CONFIG_LV_LOG_PRINTF=y to sdkconfig.defaults."
+  - question: "How do I load images from a file system on an ESP32?"
+    answer: "ESP-IDF storage APIs use the standard C file functions, so enabling LV_USE_FS_STDIO is enough. Set the drive letter to 65 (A) and reference files as A:/spiffs/logo.bin."
 ---
 
 ## Improving LVGL speed of execution
 
-The IDF project in general are configured to optimize the final application image
-in respect of its size. For some LVGL applications this may not be desired or will
-result on poor speed of execution.
+IDF projects are generally configured to optimize the final application image for size. For some
+LVGL applications this is not desirable and results in poor execution speed.
 
-In this case, it is interesting to set some of the IDF project wide options on the
-`sdkconfig.defaults` such as:
+In this case it is worth setting some of the IDF project-wide options in
+`sdkconfig.defaults`, such as:
 
-```c
+```ini
 CONFIG_COMPILER_OPTIMIZATION_PERF=y
 ```
 
-This one will compile the application with performance as priority, using SIMD
-instructions where is possible. It is possible to perceive an increase up to 30%
-of overall speed execution increment.
+This compiles the application with performance as the priority, using SIMD
+instructions where possible. An increase of up to 30% in overall execution speed can be observed.
 
-it is also possible to speed-up the execution of the critical code of the LVGL, by
-telling the compiler to put these sections on the IRAM area of ESP32 chips setting
+It is also possible to speed up the execution of LVGL's critical code by
+telling the compiler to put those sections in the IRAM area of ESP32 chips with
 the following option:
 
-```c
+```ini
 CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM=y
 ```
 
-It is also possible to set the CPU to always run on its maximum speed by
-setting the `CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_` option, the value of the
-frequency varies from chip to chip, for example P4 families support 360MHz:
+The CPU can also be set to always run at its maximum speed with the
+`CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_` option. The frequency varies from chip to
+chip; for example, the P4 family supports 360 MHz:
 
-```c
+```ini
 CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_360
 ```
 
-And ESP32/ESP32-S3 support 240MHz:
+and the ESP32/ESP32-S3 support 240 MHz:
 
-```c
+```ini
 CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240
 ```
 
-Please notice, some of these options needs to be enabled by setting the IDF
-experimental options to true:
+<Callout type="info">
+Some of these options need the IDF experimental options to be enabled:
 
-```c
+```ini
 CONFIG_IDF_EXPERIMENTAL_FEATURES=y
 ```
+</Callout>
 
 ## Configuring the PSRAM on ESP32 supported devices
 
-Some of the high-end chips of ESP32 features an external memory on its module, it is
-Pseudo-Static Random Access Memory, the PSRAM. In general values from 4 to 16MB are
-present on the chip and LVGL can take a portion of this memory to:
+Some of the high-end ESP32 chips have external memory in their module: Pseudo-Static Random
+Access Memory, or PSRAM. Values from 4 to 16 MB are typical, and LVGL can use a portion of this
+memory to:
 
-- Copy read-only objects from Flash to PSRAM to increase speed.
-- Use direct-mode plus dual buffer even on ESP32 that does not have built-in display controller.
+- Copy read-only objects from flash to PSRAM to increase speed.
+- Use direct mode plus dual buffers even on an ESP32 that does not have a built-in display controller.
 
-In both scenarios the result will be reflected on less time to flush data to the
-display, resulting in higher frame-rates. To enable the PSRAM usage the user should:
+In both scenarios the result is less time spent flushing data to the display, resulting in higher
+frame rates. To enable PSRAM usage, set:
 
-```c
+```ini
 CONFIG_SPIRAM=y
 CONFIG_SPIRAM_MODE_HEX=y
 CONFIG_SPIRAM_USE=y
@@ -69,172 +81,179 @@ CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY=y
 CONFIG_SPIRAM_RODATA=y
 ```
 
-These options can reside on the IDF project `sdkconfig.defaults`.
+These options can reside in the IDF project's `sdkconfig.defaults`.
 
 ## Application crashes when enabling PPA
 
-Is it possible to happen of an application to start crashing because the user
-enabled `CONFIG_LV_USE_PPA` option. The typical symptom is the appearance of
-a message on the monitor console that indicates error when esp32 calls the
+An application can start crashing after the `CONFIG_LV_USE_PPA` option is enabled. The typical
+symptom is a message on the monitor console indicating an error when the ESP32 calls the
 `esp_msync` function.
 
-This happens because PPA only accepts chunks of data that are aligned to the
-cache L1 line size, that is it 64-bytes, even though the PPA draw unit handles
-the alignment of the source buffer, the target draw buffer area should be also
-aligned otherwise the transfer from PPA to it may fail. To prevent this
-behavior is interesting to make `CONFIG_LV_DRAW_BUF_ALIGN` to be a multiple of the
-cache L1 line size, that is it, set its value to `64` instead of the default of `4`.
+This happens because the PPA only accepts chunks of data that are aligned to the L1 cache line
+size, that is, 64 bytes. Even though the PPA draw unit handles the alignment of the source buffer,
+the target draw buffer area has to be aligned as well, otherwise the transfer from the PPA to it
+may fail. To prevent this, make `CONFIG_LV_DRAW_BUF_ALIGN` a multiple of the L1 cache line size,
+i.e. set it to `64` instead of the default `4`.
 
-```c
+```ini
 CONFIG_LV_DRAW_BUF_ALIGN=64
 ```
 
 ## ESP32-P4 monitor log reports buffer underrun and frame-rate decreases
 
-In cases when the PSRAM is enabled and the PPA is used, it is common to see
-frame-rate degradation followed by a message on the log that reports the display
-buffer will underrun. This behavior happens because depending the IDF version the
-PSRAM was not enabled with maximum supported speed.
+When PSRAM is enabled and the PPA is used, it is common to see frame rate degradation followed by
+a log message reporting that the display buffer will underrun. This happens because, depending on
+the IDF version, PSRAM was not enabled with the maximum supported speed.
 
-To fix that behavior just add to the `sdkconfig.defaults` the following option:
+To fix it, add the following option to `sdkconfig.defaults`:
 
-```c
+```ini
 CONFIG_SPIRAM_SPEED_200M=y
 ```
 
-Additionally it is possible to set the PPA burst length in order to increase
-the memory bandwidth of a particular channel to get speed improvement of the
-drawing operations, using the option:
+Additionally, the PPA burst length can be increased to raise the memory bandwidth of a particular
+channel and gain speed in the drawing operations:
 
-```c
+```ini
 CONFIG_LV_PPA_BURST_LENGTH=128
 ```
 
-There is a downside of increasing the burst length, if another piece of code from
-ESP-IDF is using a DMA2D channel which is shared to PPA, this increase may cause
-slow-down on that channel consumer. Also mind the burst length value supported
-are the following: 128, 64, 32, 16, and 8 bytes, other values set will result
+There is a downside to increasing the burst length: if another piece of ESP-IDF code uses a DMA2D
+channel that is shared with the PPA, the increase may slow down that channel's consumer. Also mind
+that the supported burst length values are 128, 64, 32, 16, and 8 bytes; any other value results
 in a build error.
 
 ## Enabling LVGL logs on IDF project
 
-The LVGL logs are not enabled by default, for enable it, add the following
-options on the `sdkconfig.defaults`:
+LVGL logs are not enabled by default. To enable them, add the following options to
+`sdkconfig.defaults`:
 
-```c
+```ini
 CONFIG_LV_USE_LOG=y
 CONFIG_LV_LOG_LEVEL_INFO=y
 CONFIG_LV_LOG_PRINTF=y
 ```
 
-The logging subsystem of LVGL relies on the ESP-IDF presence of the
-printf.
+The logging subsystem of LVGL relies on `printf` being present in ESP-IDF.
 
 ## Using the File System under ESP-IDF
 
 ESP-IDF uses the standard C file operation functions (`fopen`, `fread`) in all its storage related APIs.
 This allows seamless interoperability with LVGL when enabling the <ApiLink name="LV_USE_FS_STDIO" /> configuration.
-The process is described in details below, using `SPIFFS` as demonstration.
+The process is described in detail below, using `SPIFFS` as a demonstration.
 
-- **Decide what storage system you want to use**
+<Steps>
 
-  ESP-IDF has many, ready-to-use examples like
-  [SPIFFS](https://github.com/espressif/esp-idf/tree/master/examples/storage/spiffsgen)
-  ,
-  [SD Card](https://github.com/espressif/esp-idf/tree/master/examples/storage/sd_card/sdspi)
-  and
-  [LittleFS](https://github.com/espressif/esp-idf/tree/master/examples/storage/littlefs)
-  .
-- **Re-configure your own project**
+<Step>
+**Decide what storage system you want to use**
 
-  The example project should be examined for details, but in general the changes involve:
+ESP-IDF has many ready-to-use examples, like
+[SPIFFS](https://github.com/espressif/esp-idf/tree/master/examples/storage/spiffsgen),
+[SD Card](https://github.com/espressif/esp-idf/tree/master/examples/storage/sd_card/sdspi) and
+[LittleFS](https://github.com/espressif/esp-idf/tree/master/examples/storage/littlefs).
+</Step>
 
-  - Enabling LVGL's STDIO file system in the configuration
+<Step>
+**Enable LVGL's STDIO file system**
 
-    You can use `menuconfig`:
+You can use `menuconfig`:
 
-    - `Component config → LVGL configuration → 3rd Party Libraries`: enable `File system on top of stdio API`
-    - Then select `Set an upper cased letter on which the drive will accessible` and set it to `65` (ASCII **A**)
-    - You can also set `Default driver letter` to 65 to skip the prefix in file paths.
+- `Component config → LVGL configuration → 3rd Party Libraries`: enable `File system on top of stdio API`
+- Then select `Set an upper cased letter on which the drive will accessible` and set it to `65` (ASCII **A**)
+- You can also set `Default driver letter` to 65 to skip the prefix in file paths.
+</Step>
 
-  - Modifying the partition table
+<Step>
+**Modify the partition table**
 
-    The exact configuration depends on your flash size and existing partitions,
-    but the new final result should look something like this:
+The exact configuration depends on your flash size and existing partitions,
+but the new final result should look something like this:
 
-    **Partition Table**
-
-    | Name     | Type | SubType | Offset  | Size   |
-    | -------- | ---- | ------- | ------- | ------ |
-    | nvs      | data | nvs     | 0x9000  | 0x6000 |
-    | phy_init | data | phy     | 0xf000  | 0x1000 |
-    | factory  | app  | factory | 0x10000 | 1400k  |
-    | storage  | data | spiffs  |         | 400k   |
+| Name     | Type | SubType | Offset  | Size   |
+| -------- | ---- | ------- | ------- | ------ |
+| nvs      | data | nvs     | 0x9000  | 0x6000 |
+| phy_init | data | phy     | 0xf000  | 0x1000 |
+| factory  | app  | factory | 0x10000 | 1400k  |
+| storage  | data | spiffs  |         | 400k   |
 
 <Callout type="info">
 If you are not using a custom `partition.csv` yet, it can be added
 via `menuconfig` (`Partition Table → Partition Table → Custom partition table CSV`).
 </Callout>
+</Step>
 
-- Apply changes to the build system
+<Step>
+**Apply changes to the build system**
 
-Some ESP file systems provide automatic generation from a host folder using CMake. The proper line(s) must be copied to `main/CMakeLists.txt`
+Some ESP file systems provide automatic generation from a host folder using CMake. The proper
+line(s) must be copied to `main/CMakeLists.txt`.
 
 <Callout type="info">
-`LittleFS` has extra dependencies that should be added to `main/idf_component.yml`
+`LittleFS` has extra dependencies that should be added to `main/idf_component.yml`.
 </Callout>
+</Step>
 
-- **Prepare the image files**
+<Step>
+**Prepare the image files**
 
-  LVGL's `LVGLImage.py` Python tool can be used to convert images to binary pixel map files.
-  It supports various formats and compression.
+LVGL's `LVGLImage.py` Python tool can be used to convert images to binary pixel map files.
+It supports various formats and compression.
 
-  Meanwhile 3rd party libraries
-  (like [LodePNG](/libs/image_support/lodepng) and [Tiny JPEG](/libs/image_support/tjpgd))
-  allow using image files without conversion.
+Meanwhile 3rd party libraries
+(like [LodePNG](/libs/image_support/lodepng) and [Tiny JPEG](/libs/image_support/tjpgd))
+allow using image files without conversion.
 
-  After preparing the files, they should be moved to the target device:
+After preparing the files, they should be moved to the target device:
 
-  - If properly activated a **SPIFFS** file system based on the `spiffs_image` folder should be automatically generated and later flashed to the target
-  - Similar mechanism for **LittleFS** uses the `flash_data` folder, but it's only available for Linux hosts
-  - For the **SD Card**, a traditional file browser can be used
-- **Invoke proper API calls in the application code**
+- If properly activated, a **SPIFFS** file system based on the `spiffs_image` folder should be automatically generated and later flashed to the target
+- A similar mechanism for **LittleFS** uses the `flash_data` folder, but it's only available for Linux hosts
+- For the **SD Card**, a traditional file browser can be used
+</Step>
 
-  The core functionality requires only a few lines. The following example draws the image as well.
+<Step>
+**Invoke proper API calls in the application code**
 
-  ```c
-  #include "esp_spiffs.h"
+The core functionality requires only a few lines. The following example draws the image as well.
 
-  void lv_example_image_from_esp_fs(void) {
+```c
+#include "esp_spiffs.h"
 
-     esp_vfs_spiffs_conf_t conf = {
+void lv_example_image_from_esp_fs(void)
+{
+    esp_vfs_spiffs_conf_t conf = {
         .base_path = "/spiffs",
         .partition_label = NULL,
         .max_files = 5,
         .format_if_mount_failed = false
-     };
+    };
 
-     esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
 
-     if (ret != ESP_OK) {
+    if(ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to register SPIFF filesystem");
         return;
-     }
+    }
 
-     lv_obj_t * obj = lv_image_create(lv_screen_active());
-     lv_image_set_src(obj, "A:/spiffs/logo.bin");
-     lv_obj_center(obj);
-  }
-  ```
-- **Build and flash**
+    lv_obj_t * obj = lv_image_create(lv_screen_active());
+    lv_image_set_src(obj, "A:/spiffs/logo.bin");
+    lv_obj_center(obj);
+}
+```
+</Step>
 
-  After calling `idf.py build flash` the picture should be displayed on the screen.
+<Step>
+**Build and flash**
+
+After calling `idf.py build flash` the picture should be displayed on the screen.
+</Step>
+
+</Steps>
 
 <Callout type="info">
 Changes made by `menuconfig` are not being tracked in the repository if the `sdkconfig` file is added to `.gitignore`, which is the default for many ESP-IDF projects.
 To make your configuration permanent, add the following lines to `sdkconfig.defaults`:
 
-```c
+```ini
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_LV_USE_FS_STDIO=y
 CONFIG_LV_FS_STDIO_LETTER=65
