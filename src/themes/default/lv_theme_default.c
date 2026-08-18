@@ -11,6 +11,7 @@
 #if LV_USE_THEME_DEFAULT
 
 #include "../lv_theme_private.h"
+#include "../../display/lv_display_private.h"
 #include "../../core/lv_global.h"
 
 /*********************
@@ -196,6 +197,7 @@ static void resolution_change_event_cb(lv_event_t * e);
 
 static void style_init(my_theme_t * theme)
 {
+    LV_ASSERT(theme != NULL);
 #if TRANSITION_TIME
     static const lv_style_prop_t trans_props[] = {
         LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
@@ -624,6 +626,14 @@ static void style_init(my_theme_t * theme)
 lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary, lv_color_t color_secondary, bool dark,
                                    const lv_font_t * font)
 {
+    LV_CHECK_ARG(font != NULL, return NULL);
+
+    if(!disp) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
+
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. MicroPython)
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
@@ -635,7 +645,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
     my_theme_t * theme = theme_def;
 
-    lv_display_t * new_disp = disp == NULL ? lv_display_get_default() : disp;
+    lv_display_t * new_disp = disp;
     int32_t new_dpi = lv_display_get_dpi(new_disp);
     int32_t hor_res = lv_display_get_horizontal_resolution(new_disp);
     int32_t ver_res = lv_display_get_vertical_resolution(new_disp);
@@ -680,7 +690,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
     theme->inited = true;
 
-    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
+    if(lv_display_get_theme(disp) == (lv_theme_t *)theme) {
         lv_obj_report_style_change(NULL);
     }
 
@@ -734,6 +744,7 @@ void lv_theme_default_deinit(void)
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
+    LV_ASSERT(obj != NULL);
 
     my_theme_t * theme = theme_def;
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -1227,6 +1238,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 static void style_init_reset(lv_style_t * style)
 {
+    LV_ASSERT(style != NULL);
     if(lv_theme_default_is_inited()) {
         lv_style_reset(style);
     }
@@ -1238,8 +1250,11 @@ static void style_init_reset(lv_style_t * style)
 
 static void resolution_change_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_display_t * disp = lv_event_get_target(e);
     my_theme_t * theme = lv_event_get_user_data(e);
+    LV_ASSERT(disp != NULL);
+    LV_ASSERT(theme != NULL);
 
     lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary,
                           theme->base.flags & MODE_DARK, theme->base.font_normal);
