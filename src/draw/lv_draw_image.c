@@ -44,6 +44,8 @@ static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
 
 void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
+
     lv_memzero(dsc, sizeof(lv_draw_image_dsc_t));
     dsc->recolor = lv_color_black();
     dsc->opa = LV_OPA_COVER;
@@ -56,11 +58,17 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
 
 lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task)
 {
+    LV_CHECK_ARG(task != NULL, return NULL);
+
     return task->type == LV_DRAW_TASK_TYPE_IMAGE ? (lv_draw_image_dsc_t *)task->draw_dsc : NULL;
 }
 
 void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_CHECK_ARG(coords != NULL, return);
+
     if(dsc->scale_x <= 0 || dsc->scale_y <= 0) {
         /* NOT draw if scale is negative or zero */
         return;
@@ -92,6 +100,10 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
 void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_CHECK_ARG(coords != NULL, return);
+
     if(dsc->src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
         return;

@@ -94,6 +94,9 @@ void * lv_draw_create_unit(size_t size)
 
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+    LV_CHECK_ARG(coords != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
     size_t dsc_size = get_draw_dsc_size(type);
     LV_ASSERT_FORMAT_MSG(dsc_size > 0, "Draw task size is 0 for type %d", type);
@@ -128,6 +131,9 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
 
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(t != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
@@ -228,6 +234,9 @@ void lv_draw_dispatch(void)
 
 bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
 {
+    LV_CHECK_ARG(disp != NULL, return false);
+    LV_CHECK_ARG(layer != NULL, return false);
+
     LV_PROFILER_DRAW_BEGIN;
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
@@ -322,6 +331,8 @@ uint32_t lv_draw_get_unit_count(void)
 
 lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+
     if(_draw_info.unit_cnt == 1) {
         return get_first_available_task(layer);
     }
@@ -332,6 +343,8 @@ lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t *
 
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
 
     /*If the first task is screen sized, there cannot be independent areas*/
@@ -428,6 +441,8 @@ void lv_layer_reset(lv_layer_t * layer)
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
+    LV_CHECK_ARG(area != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_layer_t * new_layer = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
@@ -451,6 +466,9 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
                         const lv_area_t * area)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(area != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_layer_init(layer);
     lv_display_t * disp = lv_refr_get_disp_refreshing();
@@ -478,6 +496,8 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
     /*If the buffer of the layer is already allocated return it*/
     if(layer->draw_buf != NULL) {
@@ -520,27 +540,40 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+
     return lv_draw_buf_goto_xy(layer->draw_buf, x, y);
 }
 
 lv_draw_task_type_t lv_draw_task_get_type(const lv_draw_task_t * t)
 {
+    LV_CHECK_ARG(t != NULL, return LV_DRAW_TASK_TYPE_NONE);
+
     return t->type;
 }
 
 void * lv_draw_task_get_draw_dsc(const lv_draw_task_t * t)
 {
+    LV_CHECK_ARG(t != NULL, return NULL);
+
     return t->draw_dsc;
 }
 
 void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
 {
+    LV_CHECK_ARG(t != NULL, return);
+    LV_CHECK_ARG(area != NULL, return);
+
     *area = t->area;
 }
 
 lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_base_t * base,
                                               const lv_area_t * area)
 {
+    LV_CHECK_ARG(parent_layer != NULL, return NULL);
+    LV_CHECK_ARG(base != NULL, return NULL);
+    LV_CHECK_ARG(area != NULL, return NULL);
+
     lv_area_t drop_shadow_area = *area;
     int32_t blur_radius = base->drop_shadow_blur_radius;
 
@@ -556,6 +589,9 @@ lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const l
 
 void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_base_t * base)
 {
+    LV_CHECK_ARG(drop_shadow_layer != NULL, return);
+    LV_CHECK_ARG(base != NULL, return);
+
     lv_area_t drop_shadow_area = drop_shadow_layer->buf_area;
     lv_draw_blur_dsc_t blur_dsc;
     lv_draw_blur_dsc_init(&blur_dsc);
