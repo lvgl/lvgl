@@ -102,7 +102,7 @@ void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program)
 
 GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program)
 {
-    LV_ASSERT_NULL(program);
+    LV_ASSERT(program != NULL);
     return program->id;
 }
 

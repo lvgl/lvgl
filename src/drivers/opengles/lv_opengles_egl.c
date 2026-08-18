@@ -434,8 +434,9 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
 
 static EGLSurface create_egl_surface(lv_opengles_egl_t * ctx)
 {
-    LV_ASSERT_NULL(ctx->egl_display);
-    LV_ASSERT_NULL(ctx->egl_config);
+    LV_ASSERT(ctx != NULL);
+    LV_ASSERT(ctx->egl_display != NULL);
+    LV_ASSERT(ctx->egl_config != NULL);
     LV_ASSERT(ctx->native_window != 0);
     return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->native_window, NULL);
 }

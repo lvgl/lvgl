@@ -210,7 +210,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         set_viewport(disp);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
 #if LV_USE_DRAW_OPENGLES
-        lv_opengles_render_display_texture(disp, false, true);
+        lv_opengles_render_display_texture_internal(disp, false, true);
 #endif /*LV_USE_DRAW_OPENGLES*/
         lv_opengles_egl_update(ctx->egl_ctx);
     }
