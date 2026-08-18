@@ -234,7 +234,7 @@ float lv_gltf_get_focal_z(const lv_obj_t * obj);
 /**
  * Set the focal coordinates to the center point of the model object
  * @param obj pointer to a glTF viewer object
- * @param model a model attached to this viewer or NULL for the first model
+ * @param model a model attached to this viewer. @nullable Pass NULL to use the primary model
  */
 void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model);
 

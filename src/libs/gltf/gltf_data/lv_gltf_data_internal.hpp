@@ -127,7 +127,7 @@ struct _lv_gltf_model_t {
     size_t current_animation;
     size_t last_material_index;
 
-    int32_t animation_speed_ratio;
+    uint32_t animation_speed_ratio;
     int32_t last_anim_num;
 
     float bound_radius;
@@ -195,7 +195,6 @@ const char * lv_gltf_get_filename(const lv_gltf_model_t * data);
  * @param element The specific parameter to check within the cache.
  * @return True if the cache contains the entry, false otherwise.
  */
-bool lv_gltf_data_centerpoint_cache_contains(lv_gltf_model_t * data, size_t index, int32_t element);
 
 /**
  * @brief Retrieve a specific primitive from a mesh.
@@ -308,12 +307,12 @@ void lv_gltf_data_injest_discover_defines(lv_gltf_model_t * data, fastgltf::Node
  */
 fastgltf::math::fvec3 lv_gltf_data_get_centerpoint(lv_gltf_model_t * gltf_data, fastgltf::math::fmat4x4 matrix,
                                                    size_t mesh_index,
-                                                   int32_t elem);
+                                                   size_t elem);
 
 
 lv_gltf_mesh_data_t * lv_gltf_get_new_meshdata(lv_gltf_model_t * _data);
 
-lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path, fastgltf::Asset);
+lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path, fastgltf::Asset && asset);
 
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
                                              lv_gltf_model_loader_t * loader);
