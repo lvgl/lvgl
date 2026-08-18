@@ -192,7 +192,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_ASSERT_NULL(txt);
+    LV_CHECK_ARG(txt != NULL, return);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
@@ -295,7 +295,7 @@ void lv_textarea_delete_char_forward(lv_obj_t * obj)
 void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_ASSERT_NULL(txt);
+    LV_CHECK_ARG(txt != NULL, return);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
@@ -335,16 +335,18 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
 void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_ASSERT_NULL(txt);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
+    const bool has_text = txt && txt[0] != '\0';
 
-    size_t txt_len = lv_strlen(txt);
-    if((txt_len == 0) && (ta->placeholder_txt)) {
-        lv_free(ta->placeholder_txt);
-        ta->placeholder_txt = NULL;
+    if(!has_text) {
+        if(ta->placeholder_txt) {
+            lv_free(ta->placeholder_txt);
+            ta->placeholder_txt = NULL;
+        }
     }
     else {
+        size_t txt_len = lv_strlen(txt);
         /*Allocate memory for the placeholder_txt text*/
         /*NOTE: Using special realloc behavior, malloc-like when data_p is NULL*/
         ta->placeholder_txt = lv_realloc(ta->placeholder_txt, txt_len + 1);
@@ -423,7 +425,8 @@ void lv_textarea_set_password_bullet(lv_obj_t * obj, const char * bullet)
         lv_free(ta->pwd_bullet);
         ta->pwd_bullet = NULL;
     }
-    else {
+
+    if(bullet) {
         size_t txt_len = lv_strlen(bullet);
 
         /*Allocate memory for the pwd_bullet text*/
@@ -542,6 +545,8 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time)
 
 void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     LV_LOG_DEPRECATED("Use text_align style property instead");
     lv_obj_set_style_text_align(obj, align, 0);
 

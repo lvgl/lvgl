@@ -114,7 +114,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt);
 /**
  * Set the placeholder text of a text area
  * @param obj       pointer to a text area object
- * @param txt       pointer to the text
+ * @param txt       pointer to the text @nullable. When NULL, the placeholder is removed
  */
 void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt);
 
@@ -144,7 +144,8 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en);
 /**
  * Set the replacement characters to show in password mode
  * @param obj       pointer to a text area object
- * @param bullet    pointer to the replacement text
+ * @param bullet    pointer to the replacement text @nullable. When NULL the default
+ *                  bullet icon is used
  */
 void lv_textarea_set_password_bullet(lv_obj_t * obj, const char * bullet);
 
@@ -158,14 +159,18 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en);
 /**
  * Set a list of characters. Only these characters will be accepted by the text area
  * @param obj       pointer to a text area object
- * @param list      list of characters. A copy is saved. Example: "+-.,0123456789"
+ * @param list      list of characters. A copy is saved. @nullable.
+ *                  When NULL the list is removed and every character is accepted by default.
+ *                  Example: "+-.,0123456789"
  */
 void lv_textarea_set_accepted_chars(lv_obj_t * obj, const char * list);
 
 /**
  * Set a list of characters. Only these characters will be accepted by the text area
  * @param obj       pointer to a text area object
- * @param list      list of characters. Only the pointer is saved. Example: "+-.,0123456789"
+ * @param list      list of characters. It must outlive the widget. @nullable.
+ *                  When NULL the list is removed and every character is accepted by default.
+ *                  Example: "+-.,0123456789"
  */
 void lv_textarea_set_accepted_chars_static(lv_obj_t * obj, const char * list);
 
@@ -180,7 +185,7 @@ void lv_textarea_set_max_length(lv_obj_t * obj, uint32_t num);
  * In `LV_EVENT_INSERT` the text which planned to be inserted can be replaced by another text.
  * It can be used to add automatic formatting to the text area.
  * @param obj       pointer to a text area object
- * @param txt       pointer to a new string to insert. If `""` no text will be added.
+ * @param txt       pointer to a new string to insert. @nullable If `""` or NULL no text will be added.
  *                  The variable must be live after the `event_cb` exists. (Should be `global` or `static`)
  */
 void lv_textarea_set_insert_replace(lv_obj_t * obj, const char * txt);
