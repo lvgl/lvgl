@@ -45,6 +45,8 @@
 
 const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
+    LV_CHECK_ARG(g_dsc != NULL, return NULL);
+
     const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
 
@@ -58,6 +60,8 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 
 const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
 {
+    LV_CHECK_ARG(g_dsc != NULL, return NULL);
+
     const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
 
@@ -150,6 +154,8 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out
 
 uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
 {
+    LV_CHECK_ARG(font != NULL, return 0);
+
     lv_font_glyph_dsc_t g;
 
     /*Return zero if letter is marker*/
@@ -168,6 +174,8 @@ void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning)
 
 int32_t lv_font_get_line_height(const lv_font_t * font)
 {
+    LV_CHECK_ARG(font != NULL, return 0);
+
     return font->line_height;
 }
 
@@ -194,6 +202,8 @@ bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_
 
 bool lv_font_has_static_bitmap(const lv_font_t * font)
 {
+    LV_CHECK_ARG(font != NULL, return false);
+
     return font->static_bitmap;
 }
 
