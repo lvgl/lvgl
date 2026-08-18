@@ -74,11 +74,37 @@ void lv_array_copy(lv_array_t * target, const lv_array_t * source)
     if(target == source) return;
 
     lv_array_deinit(target);
-    lv_array_init(target, source->capacity, source->element_size);
 
-    if(target->data == NULL && source->capacity > 0 && source->element_size > 0) {
-        lv_memzero(target, sizeof(lv_array_t));
-        return;
+    /* Guard against multiplication overflow during allocation */
+    if(source->capacity > 0 && source->element_size > 0) {
+        if(source->capacity > UINT32_MAX / source->element_size) {
+            lv_memzero(target, sizeof(lv_array_t));
+            return;
+        }
+
+        void * data = lv_malloc(source->capacity * source->element_size);
+        if(data == NULL) {
+            lv_memzero(target, sizeof(lv_array_t));
+            return;
+        }
+
+        target->data = data;
+        target->capacity = source->capacity;
+        target->element_size = source->element_size;
+        target->inner_alloc = true;
+        target->size = 0;
+    }
+    else {
+        void * data = lv_malloc(0);
+        if(data == NULL) {
+            lv_memzero(target, sizeof(lv_array_t));
+            return;
+        }
+        target->data = data;
+        target->capacity = source->capacity;
+        target->element_size = source->element_size;
+        target->inner_alloc = true;
+        target->size = 0;
     }
 
     if(lv_array_is_empty(source)) {

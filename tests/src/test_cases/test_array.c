@@ -394,6 +394,31 @@ void test_array_copy_allocation_failure(void)
 #endif
 }
 
+void test_array_copy_overflow(void)
+{
+    uint32_t mem_before = lv_test_get_free_mem();
+
+    lv_array_t target;
+    lv_array_init(&target, 2, sizeof(int32_t));
+    int32_t val = 42;
+    lv_array_push_back(&target, &val);
+
+    lv_array_t source;
+    uint8_t dummy_buf[4];
+    /* Initialize source with capacity and element_size that overflows 32-bit multiplication */
+    lv_array_init_from_buf(&source, dummy_buf, UINT32_MAX / 2 + 2, 2);
+
+    /* Copying should overflow and be handled gracefully (zeroed out) */
+    lv_array_copy(&target, &source);
+
+    TEST_ASSERT_NULL(target.data);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_size(&target));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_capacity(&target));
+
+    lv_array_deinit(&target);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+}
+
 void test_array_copy_self(void)
 {
     uint32_t mem_before = lv_test_get_free_mem();
