@@ -56,6 +56,8 @@ static void lv_monkey_timer_cb(lv_timer_t * timer);
 
 void lv_monkey_config_init(lv_monkey_config_t * config)
 {
+    LV_CHECK_ARG(config != NULL, return);
+
     lv_memzero(config, sizeof(lv_monkey_config_t));
     config->type = LV_INDEV_TYPE_POINTER;
     config->period_range.min = MONKEY_PERIOD_RANGE_MIN_DEF;
@@ -64,6 +66,8 @@ void lv_monkey_config_init(lv_monkey_config_t * config)
 
 lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 {
+    LV_CHECK_ARG(config != NULL, return NULL);
+
     lv_monkey_t * monkey = lv_malloc_zeroed(sizeof(lv_monkey_t));
     LV_ASSERT_MALLOC(monkey);
 
@@ -80,37 +84,39 @@ lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 
 lv_indev_t * lv_monkey_get_indev(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return NULL);
     return monkey->indev;
 }
 
 void lv_monkey_set_enable(lv_monkey_t * monkey, bool en)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return);
     en ? lv_timer_resume(monkey->timer) : lv_timer_pause(monkey->timer);
 }
 
 bool lv_monkey_get_enable(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return false);
     return !lv_timer_get_paused(monkey->timer);
 }
 
 void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return);
     monkey->user_data = user_data;
 }
 
 void * lv_monkey_get_user_data(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return NULL);
     return monkey->user_data;
 }
 
 void lv_monkey_delete(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    if(!monkey) {
+        return;
+    }
 
     lv_timer_delete(monkey->timer);
     lv_indev_delete(monkey->indev);
