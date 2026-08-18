@@ -129,6 +129,9 @@ static void rotate270_l8(const uint8_t * src, uint8_t * dst, int32_t src_width, 
 void lv_draw_sw_i1_to_argb8888(const void * buf_i1, void * buf_argb8888, uint32_t width, uint32_t height,
                                uint32_t buf_i1_stride, uint32_t buf_argb8888_stride, uint32_t index0_color, uint32_t index1_color)
 {
+    LV_CHECK_ARG(buf_i1 != NULL, return);
+    LV_CHECK_ARG(buf_argb8888 != NULL, return);
+
     /*Extract the bits of I1 px_map and convert them to ARGB8888*/
     const uint8_t * src = buf_i1;
     uint32_t * dst = buf_argb8888;
@@ -148,6 +151,8 @@ void lv_draw_sw_i1_to_argb8888(const void * buf_i1, void * buf_argb8888, uint32_
 
 void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 {
+    LV_CHECK_ARG(buf != NULL, return);
+
     if(LV_DRAW_SW_RGB565_SWAP(buf, buf_size_px) == LV_RESULT_OK) return;
 
     uint16_t * buf16 = buf;
@@ -252,6 +257,9 @@ void lv_draw_sw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32
 void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
                        int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format)
 {
+    LV_CHECK_ARG(src != NULL, return);
+    LV_CHECK_ARG(dest != NULL, return);
+
     if(rotation == LV_DISPLAY_ROTATION_90) {
         switch(color_format) {
 #if LV_DRAW_SW_SUPPORT_L8
