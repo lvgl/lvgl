@@ -124,9 +124,10 @@ static int _evdev_calibrate(int v, int in_min, int in_max, int out_min, int out_
 
 static lv_point_t _evdev_process_pointer(lv_indev_t * indev, int x, int y)
 {
+    LV_ASSERT(indev != NULL);
     lv_display_t * disp = lv_indev_get_display(indev);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
 
     int swapped_x = dsc->swap_axes ? y : x;
     int swapped_y = dsc->swap_axes ? x : y;
@@ -150,8 +151,10 @@ static void _evdev_async_delete_cb(void * user_data)
 
 static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
+    LV_ASSERT(indev != NULL);
+    LV_ASSERT(data != NULL);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
 
     /*Update dsc with buffered events*/
     struct input_event in = { 0 };
@@ -338,9 +341,10 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
 static void _evdev_indev_delete_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_indev_t * indev = lv_event_get_target(e);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
     lv_async_call_cancel(_evdev_async_delete_cb, indev);
     close(dsc->fd);
     lv_free(dsc);
@@ -349,6 +353,7 @@ static void _evdev_indev_delete_cb(lv_event_t * e)
 #ifndef BSD
 static void _evdev_discovery_indev_try_create(const char * file_name)
 {
+    LV_ASSERT(file_name != NULL);
     if(0 != lv_strncmp(file_name, "event", 5)) {
         return;
     }
@@ -381,9 +386,8 @@ static void _evdev_discovery_indev_try_create(const char * file_name)
     }
 
     lv_evdev_discovery_t * ed = evdev_discovery;
-    if(ed->cb) {
-        ed->cb(indev, dsc->type, ed->cb_user_data);
-    }
+    LV_ASSERT(ed->cb != NULL);
+    ed->cb(indev, dsc->type, ed->cb_user_data);
 }
 
 static bool _evdev_discovery_inotify_try_init_watcher(int inotify_fd)
@@ -423,7 +427,7 @@ static void _evdev_discovery_timer_cb(lv_timer_t * tim)
 {
     LV_UNUSED(tim);
     lv_evdev_discovery_t * ed = evdev_discovery;
-    LV_ASSERT_NULL(ed);
+    LV_ASSERT(ed != NULL);
 
     if(!ed->inotify_watch_active) {
         ed->inotify_watch_active = _evdev_discovery_inotify_try_init_watcher(ed->inotify_fd);
@@ -574,6 +578,8 @@ err_malloc:
 
 lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
 {
+    LV_CHECK_ARG(dev_path != NULL, return NULL);
+
     int fd = open(dev_path, O_RDONLY | O_NOCTTY | O_CLOEXEC);
     if(fd < 0) {
         LV_LOG_WARN("open failed: %s", strerror(errno));
@@ -586,6 +592,7 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
 lv_result_t lv_evdev_discovery_start(lv_evdev_discovery_cb_t cb, void * user_data)
 {
 #ifndef BSD
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
     lv_evdev_discovery_t * ed = NULL;
     int inotify_fd = -1;
     lv_timer_t * timer = NULL;
@@ -645,15 +652,17 @@ lv_result_t lv_evdev_discovery_stop(void)
 
 void lv_evdev_set_swap_axes(lv_indev_t * indev, bool swap_axes)
 {
+    LV_CHECK_ARG(indev != NULL, return);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->swap_axes = swap_axes;
 }
 
 void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_x, int max_y)
 {
+    LV_CHECK_ARG(indev != NULL, return);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->min_x = min_x;
     dsc->min_y = min_y;
     dsc->max_x = max_x;
