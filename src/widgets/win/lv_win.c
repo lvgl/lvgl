@@ -57,6 +57,9 @@ lv_obj_t * lv_win_create(lv_obj_t * parent)
 
 lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)
 {
+    LV_CHECK_OBJ(win, &lv_win_class, return NULL);
+    LV_CHECK_ARG(txt != NULL, return NULL);
+
     LV_LOG_DEPRECATED(LV_WIN_DEPRECATED_MSG);
     lv_obj_t * header = lv_win_get_header(win);
     lv_obj_t * title = lv_label_create(header);
@@ -68,6 +71,9 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)
 
 lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
 {
+    LV_CHECK_OBJ(win, &lv_win_class, return NULL);
+    LV_CHECK_ARG(icon != NULL, return NULL);
+
     LV_LOG_DEPRECATED(LV_WIN_DEPRECATED_MSG);
     lv_obj_t * header = lv_win_get_header(win);
     lv_obj_t * btn = lv_button_create(header);
@@ -84,12 +90,16 @@ lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
 
 lv_obj_t * lv_win_get_header(lv_obj_t * win)
 {
+    LV_CHECK_OBJ(win, &lv_win_class, return NULL);
+
     LV_LOG_DEPRECATED(LV_WIN_DEPRECATED_MSG);
     return lv_obj_get_child(win, 0);
 }
 
 lv_obj_t * lv_win_get_content(lv_obj_t * win)
 {
+    LV_CHECK_OBJ(win, &lv_win_class, return NULL);
+
     LV_LOG_DEPRECATED(LV_WIN_DEPRECATED_MSG);
     return lv_obj_get_child(win, 1);
 }
