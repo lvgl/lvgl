@@ -134,6 +134,10 @@ static void event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target_obj(e);
+#if !LV_USE_LOG
+    LV_UNUSED(obj);
+    LV_UNUSED(flex_list_get_button_text);
+#endif
     if(code == LV_EVENT_CLICKED) {
         LV_LOG_USER("Clicked: %s", flex_list_get_button_text(obj));
     }

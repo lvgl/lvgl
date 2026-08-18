@@ -891,6 +891,12 @@ int lv_tlsf_check(lv_tlsf_t tlsf)
 
 static void default_walker(void * ptr, size_t size, int used, void * user)
 {
+#if !LV_USE_LOG
+    LV_UNUSED(ptr);
+    LV_UNUSED(size);
+    LV_UNUSED(used);
+#endif
+
     LV_UNUSED(user);
     printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, (void *)block_from_ptr(ptr));
 }
