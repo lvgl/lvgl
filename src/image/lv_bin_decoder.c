@@ -93,9 +93,8 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_t * decoder;
 
     decoder = lv_image_decoder_create();
-    LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) {
-        LV_LOG_WARN("Out of memory");
+        LV_LOG_WARN("Failed to create decoder");
         return;
     }
 
@@ -109,7 +108,12 @@ void lv_bin_decoder_init(void)
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
-    LV_UNUSED(decoder); /*Unused*/
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(header != NULL, return LV_RESULT_INVALID);
+
+    /*check it even if unused as it might be required in the future*/
+    LV_CHECK_ARG(decoder != NULL, return LV_RESULT_INVALID);
+    LV_UNUSED(decoder);
 
     const void * src = dsc->src;
     lv_image_src_t src_type = dsc->src_type;
@@ -181,6 +185,7 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
 
     lv_result_t res = LV_RESULT_INVALID;
     lv_fs_res_t fs_res = LV_FS_RES_UNKNOWN;
@@ -383,7 +388,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
 void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    LV_UNUSED(decoder); /*Unused*/
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_UNUSED(decoder);
 
     decoder_data_t * decoder_data = dsc->user_data;
     if(decoder_data && decoder_data->decoded_partial) {
@@ -397,6 +403,10 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area)
 {
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(full_area != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(decoded_area != NULL, return LV_RESULT_INVALID);
+
     LV_UNUSED(decoder);
     lv_color_format_t cf = dsc->header.cf;
     LV_CHECK_ARG(
@@ -411,7 +421,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         return LV_RESULT_INVALID, "Unsupported color format 0x%02x", cf);
     LV_CHECK_ARG(full_area->x1 >= 0 && full_area->x2 < (int32_t)dsc->header.w && full_area->y1 >= 0 &&
                  full_area->y2 < (int32_t)dsc->header.h, return LV_RESULT_INVALID, "Area outside image bounds");
-    LV_CHECK_ARG(dsc->user_data, return LV_RESULT_INVALID, "decoder data unavailable")
+    LV_CHECK_ARG(dsc->user_data, return LV_RESULT_INVALID, "decoder data unavailable");
 
     lv_fs_res_t res = LV_FS_RES_UNKNOWN;
     decoder_data_t * decoder_data = dsc->user_data;
@@ -532,6 +542,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
 static decoder_data_t * get_decoder_data(lv_image_decoder_dsc_t * dsc)
 {
+    LV_ASSERT(dsc != NULL);
     decoder_data_t * data = dsc->user_data;
     if(data == NULL) {
         data = lv_malloc_zeroed(sizeof(decoder_data_t));
@@ -549,6 +560,7 @@ static decoder_data_t * get_decoder_data(lv_image_decoder_dsc_t * dsc)
 
 static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
 {
+    LV_ASSERT(dsc != NULL);
     decoder_data_t * decoder_data = dsc->user_data;
     if(decoder_data == NULL) return;
 
@@ -567,6 +579,7 @@ static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
 static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
+    LV_ASSERT(dsc != NULL);
     lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
@@ -696,6 +709,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 #else
 
     LV_UNUSED(decoder); /*Unused*/
+    LV_ASSERT(dsc != NULL);
 
     lv_fs_res_t res;
     uint32_t rn;
@@ -786,6 +800,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
+    LV_ASSERT(dsc != NULL);
     lv_fs_res_t res;
     decoder_data_t * decoder_data = dsc->user_data;
     lv_fs_file_t * f = decoder_data->f;
@@ -839,6 +854,7 @@ static inline uint8_t bit_extend(uint8_t value, uint8_t bpp)
 static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
+    LV_ASSERT(dsc != NULL);
     lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
@@ -919,6 +935,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t rn;
     uint32_t len;
     uint32_t compressed_len;
+    LV_ASSERT(dsc != NULL);
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     lv_result_t res;
     lv_fs_res_t fs_res;
@@ -1035,6 +1052,9 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 static lv_result_t decode_indexed_line_i8(const lv_color32_t * palette, int32_t x,
                                           int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
+    LV_ASSERT(palette != NULL);
+    LV_ASSERT(in != NULL);
+    LV_ASSERT(out != NULL);
     in += x;
 
     for(int32_t i = 0; i < w_px; i++) {
@@ -1047,6 +1067,9 @@ static lv_result_t decode_indexed_line_i8(const lv_color32_t * palette, int32_t 
 static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
                                        int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
+    LV_ASSERT(palette != NULL);
+    LV_ASSERT(in != NULL);
+    LV_ASSERT(out != NULL);
     uint8_t px_size;
     uint16_t mask;
 
@@ -1091,6 +1114,8 @@ static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_
 
 static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, uint32_t btr, uint32_t * br)
 {
+    LV_ASSERT(f != NULL);
+    LV_ASSERT(buff != NULL);
     lv_fs_res_t res;
     if(br) *br = 0;
 
@@ -1109,6 +1134,8 @@ static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, 
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed)
 {
+    LV_ASSERT(dsc != NULL);
+    LV_ASSERT(compressed != NULL);
     /* At least one compression method must be enabled */
 #if (LV_USE_LZ4 || LV_USE_RLE)
     /* Check if the decompression method is enabled and valid */
