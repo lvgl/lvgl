@@ -60,9 +60,9 @@ void lv_anim_timeline_delete(lv_anim_timeline_t * at);
 void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv_anim_t * a);
 
 /**
- * Start the animation timeline.
+ * Start the animation timeline from the beginning. Reset it if needed.
  * @param at    pointer to the animation timeline.
- * @return      total time spent in animation timeline.
+ * @return      total playtime of the animation.
  */
 uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at);
 
@@ -71,6 +71,12 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at);
  * @param at    pointer to the animation timeline.
  */
 void lv_anim_timeline_pause(lv_anim_timeline_t * at);
+
+/**
+ * Resume a paused timeline.
+ * @param at    pointer to the animation timeline.
+ */
+void lv_anim_timeline_resume(lv_anim_timeline_t * at);
 
 /**
  * Set the playback direction of the animation timeline.

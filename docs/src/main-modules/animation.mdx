@@ -288,6 +288,9 @@ To create and use an Animation Timeline:
   `start_time` will override any value given to
   <ApiLink name="lv_anim_set_delay" display="lv_anim_set_delay(&anim_template, delay)" />.
 - Call <ApiLink name="lv_anim_timeline_start" display="lv_anim_timeline_start(timeline)" /> to start the Animation Timeline.
+  It always plays from the beginning:  the progress is reset and every Animation on
+  the Timeline is armed again.  Calling it on a Timeline that is already playing
+  therefore restarts it.
 
 <Callout type="info">
 own copy of the contents of the Animation template, so if you do not need it
@@ -295,16 +298,15 @@ later, its contents do not need to be preserved after this call.
 </Callout>
 
 It supports forward and reverse play of the entire Animation group, using
-<ApiLink name="lv_anim_timeline_set_reverse" display="lv_anim_timeline_set_reverse(timeline, reverse)" />. Note that if you want to
-play in reverse from the end of the Timeline, you need to call
-<ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX)" />
-after adding all Animations and before telling it to start playing.
+<ApiLink name="lv_anim_timeline_set_reverse" display="lv_anim_timeline_set_reverse(timeline, reverse)" />.  A reversed Timeline
+starts from its end on its own, so no other call is needed to set that up.
 
 Call <ApiLink name="lv_anim_timeline_pause" display="lv_anim_timeline_pause(timeline)" /> to pause the Animation Timeline.
-Note:  this does not preserve its state.  The only way to start it again is to call
-<ApiLink name="lv_anim_timeline_start" display="lv_anim_timeline_start(timeline)" />, which starts the Timeline from the
-beginning or at the point set by
-<ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, progress)" />.
+It keeps its position, and
+<ApiLink name="lv_anim_timeline_resume" display="lv_anim_timeline_resume(timeline)" /> continues from where it was paused.
+Use <ApiLink name="lv_anim_timeline_start" display="lv_anim_timeline_start(timeline)" /> instead to play it again from the
+beginning.  Both pause and resume have no effect on a Timeline that is not
+playing.
 
 Call <ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, progress)" /> function to set the
 state of the Animation Timeline according to the `progress` value.  `progress` is
