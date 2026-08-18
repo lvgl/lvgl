@@ -46,6 +46,8 @@ static void delete_event(lv_event_t * e);
 lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
                                         lv_wayland_display_close_cb_t close_cb)
 {
+    LV_CHECK_ARG(title != NULL, return NULL);
+
     lv_wayland_init();
     if(close_cb) {
         LV_LOG_DEPRECATED("'lv_wayland_display_close_cb_t' is deprecated and will be removed in the next release. "
@@ -92,7 +94,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     }
 
     /*Assert here so that we can freely use these operations afterwards*/
-    LV_ASSERT_NULL(window->backend_ddata.ops);
+    LV_ASSERT(window->backend_ddata.ops != NULL);
 
     lv_wayland_xdg_configure_surface(window);
 
@@ -146,31 +148,33 @@ alloc_window_err:
 
 void * lv_wayland_get_backend_display_data(lv_display_t * display)
 {
-    LV_ASSERT_NULL(display);
+    LV_ASSERT(display != NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
-    LV_ASSERT_NULL(window);
+    LV_ASSERT(window != NULL);
     return window->backend_ddata.display_data;
 }
 
 void lv_wayland_set_backend_display_data(lv_display_t * display, void * data)
 {
-    LV_ASSERT_NULL(display);
+    LV_ASSERT(display != NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
-    LV_ASSERT_NULL(window);
+    LV_ASSERT(window != NULL);
     window->backend_ddata.display_data = data;
 }
 
 struct wl_surface * lv_wayland_get_window_surface(lv_display_t * display)
 {
-    LV_ASSERT_NULL(display);
+    LV_ASSERT(display != NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
-    LV_ASSERT_NULL(window);
+    LV_ASSERT(window != NULL);
     return window->body;
 }
 
 void lv_wayland_window_close(lv_display_t * display)
 {
-    LV_ASSERT_NULL(display);
+    if(!display) {
+        return;
+    }
     lv_wl_window_t * window = lv_display_get_driver_data(display);
     if(!window) {
         return;
@@ -179,76 +183,57 @@ void lv_wayland_window_close(lv_display_t * display)
     lv_display_delete(window->lv_disp);
 }
 
-bool lv_wayland_window_is_open(lv_display_t * disp)
+bool lv_wayland_window_is_open(lv_display_t * display)
 {
-    LV_UNUSED(disp);
-    return true;
+    LV_CHECK_ARG(display != NULL, return false);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_CHECK_ARG(window != NULL, return false, "Invalid display");
+    return window->xdg.configured;
 }
 
-void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
+void lv_wayland_window_set_maximized(lv_display_t * display, bool maximized)
 {
-    lv_wl_window_t * window = lv_display_get_driver_data(disp);
-    if(!window) {
+    LV_CHECK_ARG(display != NULL, return);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_CHECK_ARG(window != NULL, return, "Invalid display");
+    if(window->maximized == maximized) {
         return;
     }
-    if(window->maximized != maximized) {
-        lv_wayland_xdg_set_maximized(&window->xdg, maximized);
-    }
-
+    lv_wayland_xdg_set_maximized(&window->xdg, maximized);
     window->maximized = maximized;
 }
-void lv_wayland_window_set_minimized(lv_display_t * disp)
+void lv_wayland_window_set_minimized(lv_display_t * display)
 {
-    lv_wl_window_t * window = lv_display_get_driver_data(disp);
-    if(!window) {
-        return;
-    }
+    LV_CHECK_ARG(display != NULL, return);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_CHECK_ARG(window != NULL, return, "Invalid display");
     lv_wayland_xdg_set_minimized(&window->xdg);
 }
 
-void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display)
+void lv_wayland_assign_physical_display(lv_display_t * display, uint8_t phys_display)
 {
-    if(!disp) {
-        LV_LOG_ERROR("Invalid display");
-        return;
-    }
+    LV_CHECK_ARG(display != NULL, return);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_CHECK_ARG(window != NULL, return, "Invalid display");
+    LV_CHECK_ARG(phys_display < lv_wl_ctx.wl_output_count, return, "Invalid display number '%d'. Expected '0'..'%d'",
+                 phys_display, lv_wl_ctx.wl_output_count - 1);
 
-    lv_wl_window_t * window = lv_display_get_driver_data(disp);
-
-    if(!window) {
-        LV_LOG_ERROR("Invalid window");
-        return;
-    }
-
-    if(display >= lv_wl_ctx.wl_output_count) {
-        LV_LOG_WARN("Invalid display number '%d'. Expected '0'..'%d'", display, lv_wl_ctx.wl_output_count - 1);
-        return;
-    }
-    window->physical_output = lv_wl_ctx.physical_outputs[display].wl_output;
+    window->physical_output = lv_wl_ctx.physical_outputs[phys_display].wl_output;
 }
 
-void lv_wayland_unassign_physical_display(lv_display_t * disp)
+void lv_wayland_unassign_physical_display(lv_display_t * display)
 {
-
-    if(!disp) {
-        LV_LOG_ERROR("Invalid display");
-        return;
-    }
-
-    lv_wl_window_t * window = lv_display_get_user_data(disp);
-    if(!window) {
-        LV_LOG_ERROR("Invalid window");
-        return;
-    }
+    LV_CHECK_ARG(display != NULL, return);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_CHECK_ARG(window != NULL, return, "Invalid display");
     window->physical_output = NULL;
 }
 
-void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
+void lv_wayland_window_set_fullscreen(lv_display_t * display, bool fullscreen)
 {
-    lv_wl_window_t * window = lv_display_get_driver_data(disp);
-    if(!window) {
-        return;
-    }
+    LV_CHECK_ARG(display != NULL, return);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_CHECK_ARG(window != NULL, return, "Invalid display");
 
     if(window->fullscreen == fullscreen) {
         return;
@@ -263,10 +248,12 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
 
 int32_t lv_wayland_window_get_width(lv_wl_window_t * window)
 {
+    LV_ASSERT(window != NULL);
     return lv_display_get_horizontal_resolution(window->lv_disp);
 }
 int32_t lv_wayland_window_get_height(lv_wl_window_t * window)
 {
+    LV_ASSERT(window != NULL);
     return lv_display_get_vertical_resolution(window->lv_disp);
 }
 
@@ -285,7 +272,9 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
 
 static void delete_event(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_display_t * display = lv_event_get_target(e);
+    LV_ASSERT(display != NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
 
     if(window == NULL) {
@@ -326,8 +315,11 @@ static void delete_event(lv_event_t * e)
 
 static void refr_start_event(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_display_t * display = lv_event_get_target(e);
+    LV_ASSERT(display != NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_ASSERT(window != NULL);
 
     if(lv_wayland_xdg_is_resize_pending(window)) {
         lv_wayland_xdg_resize(window);
@@ -342,8 +334,11 @@ static void refr_end_event(lv_event_t * e)
 
 static void res_changed_event(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
+    LV_ASSERT(display != NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_ASSERT(window != NULL);
 
     void * display_data = window->backend_ddata.ops->resize_display(window->backend_ddata.backend_data, display);
     if(!display_data) {

@@ -88,10 +88,9 @@ lv_indev_t * lv_wayland_keyboard_create(void)
 
 lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display)
 {
+    LV_CHECK_ARG(display != NULL, return NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
-    if(!window) {
-        return NULL;
-    }
+    LV_CHECK_ARG(window != NULL, return NULL, "Invalid display");
     return window->lv_indev_keyboard;
 }
 
@@ -101,6 +100,7 @@ lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display)
 
 lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat)
 {
+    LV_ASSERT(wl_seat != NULL);
 
     struct wl_keyboard * keyboard = wl_seat_get_keyboard(wl_seat);
     if(!keyboard) {
@@ -145,6 +145,8 @@ void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard)
 
 static void keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
+    LV_ASSERT(indev != NULL);
+    LV_ASSERT(data != NULL);
     lv_wl_seat_keyboard_t * kbdata = lv_indev_get_driver_data(indev);
     if(!kbdata) {
         return;

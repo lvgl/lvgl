@@ -62,7 +62,6 @@ static const struct wl_touch_listener touch_listener = {
 
 lv_indev_t * lv_wayland_touch_create(void)
 {
-
     lv_indev_t * indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, touch_read);
@@ -73,10 +72,9 @@ lv_indev_t * lv_wayland_touch_create(void)
 
 lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * display)
 {
+    LV_CHECK_ARG(display != NULL, return NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
-    if(!window) {
-        return NULL;
-    }
+    LV_CHECK_ARG(window != NULL, return NULL, "Invalid display");
     return window->lv_indev_touch;
 }
 
@@ -86,7 +84,7 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * display)
 
 lv_wl_seat_touch_t * lv_wayland_seat_touch_create(struct wl_seat * seat)
 {
-
+    LV_ASSERT(seat != NULL);
     struct wl_touch * touch = wl_seat_get_touch(seat);
     if(!touch) {
         LV_LOG_WARN("Failed to get seat touch");
@@ -107,6 +105,7 @@ lv_wl_seat_touch_t * lv_wayland_seat_touch_create(struct wl_seat * seat)
 
     return wl_seat_touch;
 }
+
 void lv_wayland_seat_touch_delete(lv_wl_seat_touch_t * seat_touch)
 {
     lv_wayland_update_indevs(touch_read, NULL);
@@ -121,6 +120,8 @@ void lv_wayland_seat_touch_delete(lv_wl_seat_touch_t * seat_touch)
 static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
 
+    LV_ASSERT(indev != NULL);
+    LV_ASSERT(data != NULL);
     lv_wl_seat_touch_t * tdata = lv_indev_get_driver_data(indev);
 
     if(!tdata) {
