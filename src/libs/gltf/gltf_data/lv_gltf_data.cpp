@@ -253,26 +253,6 @@ fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_model_t * data)
     return data->vertex_max;
 }
 
-void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
-{
-    {
-        to->vertex_min[0] = from->vertex_min[0];
-        to->vertex_min[1] = from->vertex_min[1];
-        to->vertex_min[2] = from->vertex_min[2];
-    }
-    {
-        to->vertex_max[0] = from->vertex_max[0];
-        to->vertex_max[1] = from->vertex_max[1];
-        to->vertex_max[2] = from->vertex_max[2];
-    }
-    {
-        to->vertex_cen[0] = from->vertex_cen[0];
-        to->vertex_cen[1] = from->vertex_cen[1];
-        to->vertex_cen[2] = from->vertex_cen[2];
-    }
-    to->bound_radius = from->bound_radius;
-}
-
 void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value)
 {
     if(!model) {

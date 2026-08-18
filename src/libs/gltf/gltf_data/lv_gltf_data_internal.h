@@ -198,26 +198,6 @@ lv_gltf_compiled_shader_t * lv_gltf_get_compiled_shader(lv_gltf_model_t * data, 
  */
 double lv_gltf_data_get_radius(const lv_gltf_model_t * model);
 
-
-/**
- * @brief Copy the bounds information from one GLTF data object to another.
- *
- * @param to Pointer to the destination lv_gltf_data_t object.
- * @param from Pointer to the source lv_gltf_data_t object.
- */
-void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from);
-
-/**
- * @brief Swap the red and blue channels in a pixel buffer.
- *
- * @param pixel_buffer Pointer to the pixel buffer containing the image data.
- * @param byte_total_count The total number of bytes in the pixel buffer.
- * @param has_alpha Flag indicating whether the pixel buffer includes an alpha channel.
- */
-void lv_gltf_data_rgb_to_bgr(uint8_t * pixel_buffer,
-                             size_t byte_total_count,
-                             bool has_alpha);
-
 lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer);
 void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer);
 void lv_gltf_model_invalidate(lv_gltf_model_t * model);
