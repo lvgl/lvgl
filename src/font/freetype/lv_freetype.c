@@ -249,6 +249,8 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
 lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
                                     lv_freetype_font_style_t style)
 {
+    LV_CHECK_ARG(pathname != NULL, return NULL);
+
     lv_font_info_t font_info;
     lv_freetype_init_font_info(&font_info);
     font_info.name = pathname;
