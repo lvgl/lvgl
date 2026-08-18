@@ -118,7 +118,7 @@ void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc)
 
 void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
 {
-    LV_ASSERT_NULL(node);
+    LV_ASSERT(node != NULL);
     size_t sz = sizeof(glyph_l1_set_t) * GLYPH_L1_SETS;
     node->glyph_l1 = lv_malloc_zeroed(sz);
     LV_ASSERT_MALLOC(node->glyph_l1);
@@ -129,7 +129,7 @@ void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
 
 void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node)
 {
-    LV_ASSERT_NULL(node);
+    LV_ASSERT(node != NULL);
     if(node->glyph_l1) {
         lv_free(node->glyph_l1);
         node->glyph_l1 = NULL;
@@ -201,8 +201,8 @@ static void glyph_l1_fill(lv_freetype_cache_node_t * node,
 static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
                                       uint32_t unicode_letter_next)
 {
-    LV_ASSERT_NULL(font);
-    LV_ASSERT_NULL(g_dsc);
+    LV_ASSERT(font != NULL);
+    LV_ASSERT(g_dsc != NULL);
     LV_PROFILER_FONT_BEGIN;
 
     if(unicode_letter < 0x20) {
@@ -220,7 +220,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
     lv_freetype_cache_node_t * cache_node = dsc->cache_node;
-    LV_ASSERT_NULL(cache_node);
+    LV_ASSERT(cache_node != NULL);
     LV_LOG_TRACE("Getting glyph for unicode = 0x%" LV_PRIx32 ", size = %" LV_PRIu32, unicode_letter, dsc->size);
 
 #if LV_FREETYPE_CACHE_FT_GLYPH_L1
@@ -293,6 +293,8 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 
 static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void * user_data)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(user_data != NULL);
     LV_PROFILER_FONT_BEGIN;
 
     FT_Error error;
@@ -378,6 +380,8 @@ static void freetype_glyph_free_cb(lv_freetype_glyph_cache_data_t * data, void *
 static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_cache_data_t * lhs,
                                                         const lv_freetype_glyph_cache_data_t * rhs)
 {
+    LV_ASSERT(lhs != NULL);
+    LV_ASSERT(rhs != NULL);
     if(lhs->unicode != rhs->unicode) {
         return lhs->unicode > rhs->unicode ? 1 : -1;
     }
