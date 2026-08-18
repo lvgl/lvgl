@@ -106,6 +106,9 @@ void lv_mem_deinit(void)
 
 lv_mem_pool_t lv_mem_add_pool(void * mem, size_t bytes)
 {
+    LV_CHECK_ARG(mem != NULL, return NULL);
+    LV_CHECK_ARG(bytes > 0, return NULL);
+
     lv_mem_pool_t new_pool = lv_tlsf_add_pool(state.tlsf, mem, bytes);
     if(!new_pool) {
         LV_LOG_WARN("failed to add memory pool, address: %p, size: %zu", mem, bytes);
@@ -193,6 +196,8 @@ void lv_free_core(void * p)
 
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 {
+    LV_ASSERT_NULL(mon_p);
+
     /*Init the data*/
     lv_memzero(mon_p, sizeof(lv_mem_monitor_t));
     LV_TRACE_MEM("begin");

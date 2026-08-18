@@ -38,36 +38,54 @@
 
 void * LV_ATTRIBUTE_FAST_MEM lv_memcpy(void * dst, const void * src, size_t len)
 {
+    LV_ASSERT_NULL(dst);
+    LV_ASSERT_NULL(src);
+
     return memcpy(dst, src, len);
 }
 
 void LV_ATTRIBUTE_FAST_MEM lv_memset(void * dst, uint8_t v, size_t len)
 {
+    LV_ASSERT_NULL(dst);
+
     memset(dst, v, len);
 }
 
 void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len)
 {
+    LV_ASSERT_NULL(dst);
+    LV_ASSERT_NULL(src);
+
     return memmove(dst, src, len);
 }
 
 int lv_memcmp(const void * p1, const void * p2, size_t len)
 {
+    LV_ASSERT_NULL(p1);
+    LV_ASSERT_NULL(p2);
+
     return memcmp(p1, p2, len);
 }
 
 size_t lv_strlen(const char * str)
 {
+    LV_ASSERT_NULL(str);
+
     return strlen(str);
 }
 
 size_t lv_strnlen(const char * str, size_t max_len)
 {
+    LV_ASSERT_NULL(str);
+
     return strnlen(str, max_len);
 }
 
 size_t lv_strlcpy(char * dst, const char * src, size_t dst_size)
 {
+    LV_ASSERT_NULL(dst);
+    LV_ASSERT_NULL(src);
+
     size_t src_len = strlen(src);
     if(dst_size > 0) {
         size_t copy_size = src_len < dst_size ? src_len : dst_size - 1;
@@ -79,26 +97,40 @@ size_t lv_strlcpy(char * dst, const char * src, size_t dst_size)
 
 char * lv_strncpy(char * dst, const char * src, size_t dest_size)
 {
+    LV_ASSERT_NULL(dst);
+    LV_ASSERT_NULL(src);
+
     return strncpy(dst, src, dest_size);
 }
 
 char * lv_strcpy(char * dst, const char * src)
 {
+    LV_ASSERT_NULL(dst);
+    LV_ASSERT_NULL(src);
+
     return strcpy(dst, src);
 }
 
 int lv_strcmp(const char * s1, const char * s2)
 {
+    LV_ASSERT_NULL(s1);
+    LV_ASSERT_NULL(s2);
+
     return strcmp(s1, s2);
 }
 
 int lv_strncmp(const char * s1, const char * s2, size_t len)
 {
+    LV_ASSERT_NULL(s1);
+    LV_ASSERT_NULL(s2);
+
     return strncmp(s1, s2, len);
 }
 
 char * lv_strdup(const char * src)
 {
+    LV_ASSERT_NULL(src);
+
     /*strdup uses malloc, so use the lv_malloc when LV_USE_STDLIB_MALLOC is not LV_STDLIB_CLIB */
     size_t len = lv_strlen(src) + 1;
     char * dst = lv_malloc(len);
@@ -110,6 +142,8 @@ char * lv_strdup(const char * src)
 
 char * lv_strndup(const char * src, size_t max_len)
 {
+    LV_ASSERT_NULL(src);
+
     size_t len = lv_strnlen(src, max_len);
     char * dst = lv_malloc(len + 1);
     if(dst == NULL) return NULL;
@@ -121,16 +155,24 @@ char * lv_strndup(const char * src, size_t max_len)
 
 char * lv_strcat(char * dst, const char * src)
 {
+    LV_ASSERT_NULL(dst);
+    LV_ASSERT_NULL(src);
+
     return strcat(dst, src);
 }
 
 char * lv_strncat(char * dst, const char * src, size_t src_len)
 {
+    LV_ASSERT_NULL(dst);
+    LV_ASSERT_NULL(src);
+
     return strncat(dst, src, src_len);
 }
 
 char * lv_strchr(const char * str, int c)
 {
+    LV_ASSERT_NULL(str);
+
     return strchr(str, c);
 }
 

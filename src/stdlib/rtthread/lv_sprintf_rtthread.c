@@ -44,6 +44,9 @@
 
 int lv_snprintf(char * buffer, size_t count, const char * format, ...)
 {
+    LV_ASSERT_NULL(format);
+    LV_ASSERT_MSG(count == 0 || buffer != NULL, "NULL buffer with non-zero count");
+
     va_list va;
     va_start(va, format);
     const int ret = rt_vsnprintf(buffer, count, format, va);
@@ -53,6 +56,9 @@ int lv_snprintf(char * buffer, size_t count, const char * format, ...)
 
 int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va)
 {
+    LV_ASSERT_NULL(format);
+    LV_ASSERT_MSG(count == 0 || buffer != NULL, "NULL buffer with non-zero count");
+
     return rt_vsnprintf(buffer, count, format, va);
 }
 
