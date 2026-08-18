@@ -143,6 +143,9 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 
 void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size, const char * ext)
 {
+    LV_CHECK_ARG(path != NULL, return);
+    LV_CHECK_ARG(buf != NULL, return);
+
     /*Make a path the contains both the address and the size. */
 
     /*Don't add the '.' and the extension if the extension is NULL*/
@@ -189,6 +192,8 @@ lv_result_t lv_fs_get_buffer_from_path(lv_fs_path_ex_t * path, void ** buffer, u
 
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 {
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+
     if(file_p->drv == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
@@ -221,6 +226,9 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 
 lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(btr == 0 || buf != NULL, return LV_FS_RES_INV_PARAM);
+
     if(br != NULL) *br = 0;
     if(file_p->drv == NULL) return LV_FS_RES_INV_PARAM;
 
@@ -252,6 +260,9 @@ lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t
 
 lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(btw == 0 || buf != NULL, return LV_FS_RES_INV_PARAM);
+
     if(bw != NULL) *bw = 0;
 
     if(file_p->drv == NULL) {
@@ -283,6 +294,8 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
 
 lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+
     if(file_p->drv == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
@@ -311,6 +324,9 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
 
 lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
 {
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(pos != NULL, return LV_FS_RES_INV_PARAM);
+
     if(file_p->drv == NULL) {
         *pos = 0;
         return LV_FS_RES_INV_PARAM;
@@ -339,6 +355,9 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
 
 lv_fs_res_t lv_fs_get_size(lv_fs_file_t * file_p, uint32_t * size_res)
 {
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(size_res != NULL, return LV_FS_RES_INV_PARAM);
+
     uint32_t original_pos;
     lv_fs_res_t ret = lv_fs_tell(file_p, &original_pos);
     if(ret != LV_FS_RES_OK) {
@@ -364,6 +383,9 @@ lv_fs_res_t lv_fs_get_size(lv_fs_file_t * file_p, uint32_t * size_res)
 
 lv_fs_res_t lv_fs_path_get_size(const char * path, uint32_t * size_res)
 {
+    LV_CHECK_ARG(path != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(size_res != NULL, return LV_FS_RES_INV_PARAM);
+
     lv_fs_file_t file;
     lv_fs_res_t ret = lv_fs_open(&file, path, LV_FS_MODE_RD);
     if(ret != LV_FS_RES_OK) {
@@ -386,6 +408,10 @@ lv_fs_res_t lv_fs_path_get_size(const char * path, uint32_t * size_res)
 
 lv_fs_res_t lv_fs_load_to_buf(void * buf, uint32_t buf_size, const char * path)
 {
+    LV_CHECK_ARG(buf != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(path != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(buf_size > 0, return LV_FS_RES_INV_PARAM);
+
     lv_fs_file_t file;
     lv_fs_res_t ret = lv_fs_open(&file, path, LV_FS_MODE_RD);
     if(ret != LV_FS_RES_OK) {
@@ -411,6 +437,9 @@ lv_fs_res_t lv_fs_load_to_buf(void * buf, uint32_t buf_size, const char * path)
 
 void * lv_fs_load_with_alloc(const char * path, uint32_t * size)
 {
+    LV_CHECK_ARG(path != NULL, return NULL);
+    LV_CHECK_ARG(size != NULL, return NULL);
+
     lv_fs_file_t file;
     uint8_t * data = NULL;
 
@@ -447,6 +476,8 @@ fail:
 
 lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 {
+    LV_CHECK_ARG(rddir_p != NULL, return LV_FS_RES_INV_PARAM);
+
     if(path == NULL) return LV_FS_RES_INV_PARAM;
 
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
@@ -486,6 +517,9 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 
 lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn, uint32_t fn_len)
 {
+    LV_CHECK_ARG(rddir_p != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(fn != NULL, return LV_FS_RES_INV_PARAM);
+
     if(fn_len == 0) {
         return LV_FS_RES_INV_PARAM;
     }
@@ -511,6 +545,8 @@ lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn, uint32_t fn_len)
 
 lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
 {
+    LV_CHECK_ARG(rddir_p != NULL, return LV_FS_RES_INV_PARAM);
+
     if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
@@ -533,11 +569,15 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
 
 void lv_fs_drv_init(lv_fs_drv_t * drv)
 {
+    LV_CHECK_ARG(drv != NULL, return);
+
     lv_memzero(drv, sizeof(lv_fs_drv_t));
 }
 
 void lv_fs_drv_register(lv_fs_drv_t * drv)
 {
+    LV_CHECK_ARG(drv != NULL, return);
+
     /*Save the new driver*/
     lv_fs_drv_t ** new_drv;
     new_drv = lv_ll_ins_head(fsdrv_ll_p);
@@ -576,6 +616,8 @@ lv_fs_drv_t * lv_fs_get_drv(char letter)
 
 char * lv_fs_get_letters(char * buf)
 {
+    LV_CHECK_ARG(buf != NULL, return NULL);
+
     lv_fs_drv_t ** drv;
     uint8_t i = 0;
 
@@ -591,6 +633,8 @@ char * lv_fs_get_letters(char * buf)
 
 const char * lv_fs_get_ext(const char * fn)
 {
+    LV_CHECK_ARG(fn != NULL, return "");
+
     size_t i;
     for(i = lv_strlen(fn); i > 0; i--) {
         if(fn[i] == '.') {
@@ -606,6 +650,8 @@ const char * lv_fs_get_ext(const char * fn)
 
 char * lv_fs_up(char * path)
 {
+    LV_CHECK_ARG(path != NULL, return NULL);
+
     size_t len = lv_strlen(path);
     if(len == 0) return path;
 
@@ -632,6 +678,8 @@ char * lv_fs_up(char * path)
 
 const char * lv_fs_get_last(const char * path)
 {
+    LV_CHECK_ARG(path != NULL, return NULL);
+
     size_t len = lv_strlen(path);
     if(len == 0) return path;
 
@@ -658,6 +706,11 @@ const char * lv_fs_get_last(const char * path)
 
 int lv_fs_path_join(char * buf, size_t buf_sz, const char * base, const char * end)
 {
+    LV_CHECK_ARG(buf != NULL, return -1);
+    LV_CHECK_ARG(base != NULL, return -1);
+    LV_CHECK_ARG(end != NULL, return -1);
+    LV_CHECK_ARG(buf_sz > 0, return -1);
+
     if(base[0] == '\0') return lv_strlcpy(buf, end, buf_sz);
     if(end[0] == '\0') return lv_strlcpy(buf, base, buf_sz);
 
