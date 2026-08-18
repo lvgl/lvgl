@@ -91,7 +91,7 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en);
 /**
  * Set the video decoder
  * @param obj pointer to a ffmpeg_player object
- * @param decoder_name decoder name
+ * @param decoder_name decoder name. @nullable When NULL the decoder is auto-selected.
  */
 void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * decoder_name);
 /*=====================
