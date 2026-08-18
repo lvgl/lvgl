@@ -1,0 +1,12 @@
+# Applied on top of "full": build the widest feature set with every runtime
+# diagnostic switched off.
+
+# CONFIG_LV_USE_CHECK_ARG is not set
+
+# CONFIG_LV_USE_ASSERT_NULL is not set
+# CONFIG_LV_USE_ASSERT_MALLOC is not set
+# CONFIG_LV_USE_ASSERT_STYLE is not set
+# CONFIG_LV_USE_ASSERT_MEM_INTEGRITY is not set
+# CONFIG_LV_USE_ASSERT_OBJ is not set
+
+# CONFIG_LV_USE_LOG is not set
