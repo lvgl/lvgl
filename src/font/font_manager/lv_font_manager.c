@@ -142,6 +142,11 @@ bool lv_font_manager_add_src(lv_font_manager_t * manager,
                              const void * src,
                              const lv_font_class_t * class_p)
 {
+    LV_CHECK_ARG(manager != NULL, return false);
+    LV_CHECK_ARG(name != NULL, return false);
+    LV_CHECK_ARG(src != NULL, return false);
+    LV_CHECK_ARG(class_p != NULL, return false);
+
     return lv_font_manager_add_src_core(manager, name, src, class_p, false);
 }
 
@@ -150,6 +155,11 @@ bool lv_font_manager_add_src_static(lv_font_manager_t * manager,
                                     const void * src,
                                     const lv_font_class_t * class_p)
 {
+    LV_CHECK_ARG(manager != NULL, return false);
+    LV_CHECK_ARG(name != NULL, return false);
+    LV_CHECK_ARG(src != NULL, return false);
+    LV_CHECK_ARG(class_p != NULL, return false);
+
     return lv_font_manager_add_src_core(manager, name, src, class_p, true);
 }
 
