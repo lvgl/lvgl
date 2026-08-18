@@ -43,10 +43,7 @@ lv_color_t lv_palette_main(lv_palette_t p)
         LV_COLOR_MAKE(0x79, 0x55, 0x48), LV_COLOR_MAKE(0x60, 0x7D, 0x8B), LV_COLOR_MAKE(0x9E, 0x9E, 0x9E)
     };
 
-    if(p >= LV_PALETTE_LAST) {
-        LV_LOG_WARN("Invalid palette: %d", p);
-        return lv_color_black();
-    }
+    LV_CHECK_ARG(p < LV_PALETTE_LAST, return lv_color_black(), "invalid palette: %d", p);
 
     return colors[p];
 
@@ -76,15 +73,9 @@ lv_color_t lv_palette_lighten(lv_palette_t p, uint8_t lvl)
         {LV_COLOR_MAKE(0xBD, 0xBD, 0xBD), LV_COLOR_MAKE(0xE0, 0xE0, 0xE0), LV_COLOR_MAKE(0xEE, 0xEE, 0xEE), LV_COLOR_MAKE(0xF5, 0xF5, 0xF5), LV_COLOR_MAKE(0xFA, 0xFA, 0xFA)},
     };
 
-    if(p >= LV_PALETTE_LAST) {
-        LV_LOG_WARN("Invalid palette: %d", p);
-        return lv_color_black();
-    }
+    LV_CHECK_ARG(p < LV_PALETTE_LAST, return lv_color_black(), "invalid palette: %d", p);
 
-    if(lvl == 0 || lvl > 5) {
-        LV_LOG_WARN("Invalid level: %d. Must be 1..5", lvl);
-        return lv_color_black();
-    }
+    LV_CHECK_ARG(lvl >= 1 && lvl <= 5, return lv_color_black(), "invalid level: %d, must be 1..5", lvl);
 
     lvl--;
 
@@ -115,15 +106,9 @@ lv_color_t lv_palette_darken(lv_palette_t p, uint8_t lvl)
         {LV_COLOR_MAKE(0x75, 0x75, 0x75), LV_COLOR_MAKE(0x61, 0x61, 0x61), LV_COLOR_MAKE(0x42, 0x42, 0x42), LV_COLOR_MAKE(0x21, 0x21, 0x21)},
     };
 
-    if(p >= LV_PALETTE_LAST) {
-        LV_LOG_WARN("Invalid palette: %d", p);
-        return lv_color_black();
-    }
+    LV_CHECK_ARG(p < LV_PALETTE_LAST, return lv_color_black(), "invalid palette: %d", p);
 
-    if(lvl == 0 || lvl > 4) {
-        LV_LOG_WARN("Invalid level: %d. Must be 1..4", lvl);
-        return lv_color_black();
-    }
+    LV_CHECK_ARG(lvl >= 1 && lvl <= 4, return lv_color_black(), "invalid level: %d, must be 1..4", lvl);
 
     lvl--;
 
