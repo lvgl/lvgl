@@ -88,7 +88,7 @@ lv_span_t * lv_spangroup_add_span(lv_obj_t * obj);
 /**
  * Remove the span from the spangroup and free memory.
  * @param obj   pointer to a spangroup object.
- * @param span  pointer to a span.
+ * @param span  pointer to a span. @nullable. When NULL nothing will be deleted
  * @note        Note that before calling `lv_spangroup_delete_span`
  *              `lv_observer_delete` needs to be called manually as LVGL can't remove the
  *              binding automatically.
@@ -351,7 +351,7 @@ void lv_spangroup_refresh(lv_obj_t * obj);
  * @param span      pointer to Span
  * @param subject   pointer to Subject
  * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
- *                  or NULL to bind to the value directly.
+ *                  @nullable. See note below
  * @return          pointer to newly-created Observer
  * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
  *                  as text as they are, integers as %d, floats as %0.1f
