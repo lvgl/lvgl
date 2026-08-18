@@ -106,6 +106,8 @@ void lv_flex_init(void)
 
 void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     lv_obj_set_style_flex_flow(obj, flow, 0);
     lv_obj_set_style_layout(obj, LV_LAYOUT_FLEX, 0);
 }
@@ -113,6 +115,8 @@ void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow)
 void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
                            lv_flex_align_t track_cross_place)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     lv_obj_set_style_flex_main_place(obj, main_place, 0);
     lv_obj_set_style_flex_cross_place(obj, cross_place, 0);
     lv_obj_set_style_flex_track_place(obj, track_cross_place, 0);
@@ -121,6 +125,8 @@ void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_a
 
 void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     lv_obj_set_style_flex_grow(obj, grow, 0);
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) lv_obj_mark_layout_as_dirty(parent);
