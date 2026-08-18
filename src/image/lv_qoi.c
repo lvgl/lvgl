@@ -1,54 +1,8 @@
-/**
- * @file lv_qoi.c
- * @brief LVGL image decoder for the Quite OK Image (QOI) format.
- *
- * This decoder provides support for the QOI image format within LVGL.
- * It handles both file and variable sources, integrates with LVGL's image
- * cache system, and supports stride-aligned rendering for hardware display
- * pipelines. The implementation is endian-independent and compatible with
- * LVGL v9's image decoder framework.
- *
- * ## Key Features
- *
- * - **Dual Source Support**: Decodes QOI images from both file paths
- *   (via lv_fs) and in-memory variable sources (lv_image_dsc_t).
- * - **Cache Integration**: Fully integrates with LVGL's image cache
- *   subsystem to avoid redundant decoding of frequently used images.
- * - **Stride-Aligned Rendering**: Performs a row-by-row copy from the
- *   raw QOI pixel buffer into an LVGL draw buffer with configurable
- *   stride, ensuring compatibility with hardware display pipelines that
- *   require aligned row pitches.
- * - **Endian-Independent Parsing**: The QOI header signature and
- *   dimension fields are parsed byte-by-byte, making the decoder safe
- *   on both little-endian and big-endian architectures.
- * - **Bounds Checking**: All memory accesses are guarded by size
- *   validation against QOI_HEADER_SIZE, QOI_MIN_FILE_SIZE, and
- *   LV_QOI_MAX_FILE_SIZE to prevent buffer overruns.
- * - **Post-Processing Support**: Passes decoded buffers through
- *   lv_image_decoder_post_process() for color format conversion,
- *   premultiplied alpha handling, or other LVGL pipeline transforms.
- * - **Memory Safety**: Overrides QOI library memory hooks (QOI_MALLOC,
- *   QOI_FREE, QOI_ZEROARR) to use LVGL's allocator, ensuring all
- *   allocations are tracked within the LVGL memory pool.
- *
- * ## Usage
- *
- * Call lv_qoi_init() during LVGL initialization to register the decoder.
- * Once registered, LVGL will automatically use this decoder when loading
- * QOI images via lv_image_create() or lv_image_set_src().
- *
- * ## Dependencies
- *
- * - Requires the QOI reference library (qoi.h / qoi.c) bundled in the
- *   LVGL qoi integration.
- * - Requires LV_USE_QOI to be enabled in lv_conf.h.
- */
-
 /*********************
  *      INCLUDES
  *********************/
 #include "lv_image_decoder_private.h"
-#include "../../lvgl.h"
+#include "../lvgl_public.h"
 #if LV_USE_QOI
 
 #include "../core/lv_global.h"

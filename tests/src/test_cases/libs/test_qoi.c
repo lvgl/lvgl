@@ -132,7 +132,7 @@ void test_qoi_small_image(void)
 
     lv_image_decoder_close(&decoder_dsc);
 
-    /* Also test rendering */
+    /* Also test rendering by checking the pixel color directly */
     lv_obj_clean(lv_screen_active());
 
     lv_obj_t * img = lv_image_create(lv_screen_active());
@@ -141,7 +141,45 @@ void test_qoi_small_image(void)
     lv_image_set_src(img, image_path);
     lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/qoi_1x1.png");
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
+    TEST_ASSERT_NOT_NULL(draw_buf);
+
+    /* The 1x1 image is centered on the 800x480 test display */
+    int32_t cx = lv_display_get_horizontal_resolution(NULL) / 2;
+    int32_t cy = lv_display_get_vertical_resolution(NULL) / 2;
+
+    uint32_t stride = draw_buf->header.stride;
+    lv_color32_t * px_center = (lv_color32_t *)((uint8_t *)draw_buf->data + cy * stride + cx * sizeof(lv_color32_t));
+    lv_color32_t * px_left   = (lv_color32_t *)((uint8_t *)draw_buf->data + cy * stride + (cx - 1) * sizeof(lv_color32_t));
+    lv_color32_t * px_right  = (lv_color32_t *)((uint8_t *)draw_buf->data + cy * stride + (cx + 1) * sizeof(lv_color32_t));
+    lv_color32_t * px_up     = (lv_color32_t *)((uint8_t *)draw_buf->data + (cy - 1) * stride + cx * sizeof(lv_color32_t));
+    lv_color32_t * px_down   = (lv_color32_t *)((uint8_t *)draw_buf->data + (cy + 1) * stride + cx * sizeof(lv_color32_t));
+
+    /* The 1x1 QOI test image is red (R=255, G=0, B=0).
+     * Allow a tolerance for renderer-specific color conversion (e.g. NanoVG
+     * applies color space transforms that can shift channel values). */
+    TEST_ASSERT_UINT8_WITHIN(32, 0xFF, px_center->red);
+    TEST_ASSERT_UINT8_WITHIN(32, 0x00, px_center->green);
+    TEST_ASSERT_UINT8_WITHIN(32, 0x00, px_center->blue);
+
+    /* Neighbors are the background (not the image). The red image pixel has
+     * green and blue near 0, while the background is white/gray with all
+     * channels near each other. Check that neighbor green/blue are not near 0,
+     * which distinguishes background pixels from the red image pixel. */
+    TEST_ASSERT_TRUE(px_left->green > 100);
+    TEST_ASSERT_TRUE(px_left->blue > 100);
+
+    TEST_ASSERT_TRUE(px_right->green > 100);
+    TEST_ASSERT_TRUE(px_right->blue > 100);
+
+    TEST_ASSERT_TRUE(px_up->green > 100);
+    TEST_ASSERT_TRUE(px_up->blue > 100);
+
+    TEST_ASSERT_TRUE(px_down->green > 100);
+    TEST_ASSERT_TRUE(px_down->blue > 100);
 }
 
 void test_qoi_large_image(void)
