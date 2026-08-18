@@ -35,7 +35,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_msgbox_backdrop_class;
 
 /**
  * Create an empty message box
- * @param parent        the parent or NULL to create a modal msgbox
+ * @param parent        pointer to a parent widget @nullable. When NULL, the widget
+ *                      is created on the top layer of the default screen.
  * @return              the created message box
  */
 lv_obj_t * lv_msgbox_create(lv_obj_t * parent);
@@ -43,7 +44,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent);
 /**
  * Add title to the message box. It also creates a header for the title.
  * @param obj           pointer to a message box
- * @param title         the text of the tile
+ * @param title         the text of the tile. @nullable. See the default behaviour
+ *                      of @ref lv_label_set_text
  * @return              the created title label
  */
 lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title);
@@ -51,7 +53,7 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title);
 /**
  * Add a button to the header of to the message box. It also creates a header.
  * @param obj           pointer to a message box
- * @param icon          the icon of the button
+ * @param icon          the icon of the button. @nullable. When NULL an empty button is created
  * @return              the created button
  */
 lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon);
@@ -75,7 +77,7 @@ lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORM
 /**
  * Add a button to the footer of to the message box. It also creates a footer.
  * @param obj           pointer to a message box
- * @param text          the text of the button
+ * @param text          the text of the button @nullable. When NULL an empty button is created
  * @return              the created button
  */
 lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text);
