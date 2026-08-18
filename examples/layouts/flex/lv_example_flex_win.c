@@ -121,8 +121,12 @@ static lv_obj_t * win_add_button(lv_obj_t * win, const void * icon, int32_t btn_
 
 static void event_handler(lv_event_t * e)
 {
+#if LV_USE_LOG
     lv_obj_t * obj = lv_event_get_target_obj(e);
     LV_LOG_USER("Button %d clicked", (int)lv_obj_get_index(obj));
+#else
+    LV_UNUSED(e);
+#endif
 }
 
 /**
