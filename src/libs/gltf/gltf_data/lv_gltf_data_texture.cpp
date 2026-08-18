@@ -38,12 +38,14 @@
 
 void lv_gltf_data_delete_textures(lv_gltf_model_t * data)
 {
+    LV_ASSERT(data != NULL);
     glDeleteTextures(data->skin_tex.size(), data->skin_tex.data());
     data->skin_tex.clear();
 }
 
 GLuint lv_gltf_data_create_texture(lv_gltf_model_t * data)
 {
+    LV_ASSERT(data != NULL);
     GLuint texture;
     GL_CALL(glGenTextures(1, &texture));
     data->skin_tex.push_back(texture);

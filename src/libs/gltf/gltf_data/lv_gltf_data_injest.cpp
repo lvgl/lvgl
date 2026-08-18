@@ -168,6 +168,7 @@ static void load_mesh_texture(lv_gltf_model_t * data,
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
                                              lv_gltf_model_loader_t * loader)
 {
+    LV_ASSERT(data_source != NULL);
     lv_gltf_model_t * model = NULL;
     if(data_size > 0) {
         model = create_data_from_bytes((const uint8_t *)data_source, data_size);
@@ -266,6 +267,7 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
 
 static lv_gltf_model_t * create_data_from_file(const char * path)
 {
+    LV_ASSERT(path != NULL);
     lv_fs_file_t file;
     lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) {
@@ -326,6 +328,8 @@ static lv_gltf_model_t * create_data_from_file(const char * path)
 
 static lv_gltf_model_t * create_data_from_bytes(const uint8_t * bytes, size_t data_size)
 {
+    LV_ASSERT(bytes != NULL);
+    LV_ASSERT(data_size > 0);
     fastgltf::Parser parser(SUPPORTED_EXTENSIONS);
     auto gltf_buffer = fastgltf::GltfDataBuffer::FromBytes(reinterpret_cast<const std::byte *>(bytes), data_size);
     if(!gltf_buffer) {
@@ -360,6 +364,10 @@ static void load_mesh_texture_impl(lv_gltf_model_t * data, const fastgltf::Textu
                                    GLuint * primitive_tex_prop,
                                    GLint * primitive_tex_uv_id)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(primitive_tex_prop != NULL);
+    LV_ASSERT(primitive_tex_uv_id != NULL);
+
     const auto & texture = data->asset.textures[material_prop.textureIndex];
     if(!injest_check_any_image_index_valid(texture)) {
         return;
@@ -381,6 +389,10 @@ static void load_mesh_texture(lv_gltf_model_t * data,
     if(!material_prop) {
         return;
     }
+
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(primitive_tex_prop != NULL);
+    LV_ASSERT(primitive_tex_uv_id != NULL);
     load_mesh_texture_impl(data, material_prop.value(), primitive_tex_prop, primitive_tex_uv_id);
 }
 
@@ -390,6 +402,9 @@ static void load_mesh_texture(lv_gltf_model_t * data, const fastgltf::Optional<f
     if(!material_prop) {
         return;
     }
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(primitive_tex_prop != NULL);
+    LV_ASSERT(primitive_tex_uv_id != NULL);
     load_mesh_texture_impl(data, material_prop.value(), primitive_tex_prop, primitive_tex_uv_id);
 }
 
@@ -400,6 +415,9 @@ static void load_mesh_texture(lv_gltf_model_t * data,
     if(!material_prop) {
         return;
     }
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(primitive_tex_prop != NULL);
+    LV_ASSERT(primitive_tex_uv_id != NULL);
     load_mesh_texture_impl(data, material_prop.value(), primitive_tex_prop, primitive_tex_uv_id);
 }
 
@@ -426,6 +444,7 @@ static bool injest_check_any_image_index_valid(fastgltf::Optional<fastgltf::Text
 static void injest_grow_bounds_to_include(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                           const fastgltf::Mesh & mesh)
 {
+    LV_ASSERT(data != NULL);
     /* Grow the bounds to include the specified mesh. */
     fastgltf::math::fvec3 v_min{ data->vertex_min[0], data->vertex_min[1], data->vertex_min[2] };
 
@@ -476,6 +495,7 @@ static void injest_grow_bounds_to_include(lv_gltf_model_t * data, const fastgltf
 static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                       const fastgltf::Mesh & mesh)
 {
+    LV_ASSERT(data != NULL);
     fastgltf::math::fvec3 v_min, v_max, v_cen;
     float radius = 0.f;
     if(mesh.primitives.size() == 0) {
@@ -520,7 +540,8 @@ static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::ma
 static bool injest_image(lv_gltf_model_loader_t * loader, lv_gltf_model_t * data, fastgltf::Image & image,
                          uint32_t index)
 {
-    LV_ASSERT_NULL(loader);
+    LV_ASSERT(loader != NULL);
+    LV_ASSERT(data != NULL);
     std::string _tex_id = std::string(lv_gltf_get_filename(data)) + "_IMG" + std::to_string(index);
 
     char tmp[512];
@@ -597,6 +618,7 @@ static bool injest_image(lv_gltf_model_loader_t * loader, lv_gltf_model_t * data
 static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sources::BufferView & view,
                                           GLuint texture_id)
 {
+    LV_ASSERT(data != NULL);
     /* Yes, we've already loaded every buffer into some GL buffer. However, with GL it's simpler
        to just copy the buffer data again for the texture. Besides, this is just an example. */
     auto & buffer_view = data->asset.bufferViews[view.bufferViewIndex];
@@ -668,6 +690,7 @@ static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sour
 }
 static void injest_light(lv_gltf_model_t * data, size_t light_index, fastgltf::Light & light, size_t scene_index)
 {
+    LV_ASSERT(data != NULL);
     fastgltf::math::fmat4x4 tmat;
     // It would seem like we'd need this info but not really, just the index will do at the loading phase, the rest is pulled during frame updates.
     LV_UNUSED(light);
@@ -688,6 +711,8 @@ static void injest_light(lv_gltf_model_t * data, size_t light_index, fastgltf::L
 
 static bool check_if_unlit(lv_gltf_model_t * data, fastgltf::Primitive * prim)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(prim != NULL);
     const auto & asset = data->asset;
     if(prim->materialIndex.has_value()) {
         const auto & material = asset.materials[prim->materialIndex.value()];
@@ -710,6 +735,7 @@ static bool check_if_unlit(lv_gltf_model_t * data, fastgltf::Primitive * prim)
 
 static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
 {
+    LV_ASSERT(data != NULL);
     /*const auto &asset = GET_ASSET(data);*/
     const auto & outMesh = lv_gltf_get_new_meshdata(data);
     outMesh->primitives.resize(mesh.primitives.size());
@@ -936,6 +962,9 @@ static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_inde
 
                                   )
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(prim != NULL);
+    LV_ASSERT(attrib_id != NULL);
     const auto & asset = data->asset;
     if(const auto * _attrib = prim->findAttribute(std::string(attrib_id)); _attrib != prim->attributes.end()) {
         auto & accessor = asset.accessors[_attrib->accessorIndex];
@@ -962,6 +991,7 @@ static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_inde
 static void set_bounds_info(lv_gltf_model_t * data, fastgltf::math::fvec3 v_min, fastgltf::math::fvec3 v_max,
                             fastgltf::math::fvec3 v_cen, float radius)
 {
+    LV_ASSERT(data != NULL);
     {
         auto _d = v_min.data();
         data->vertex_min[0] = _d[0];

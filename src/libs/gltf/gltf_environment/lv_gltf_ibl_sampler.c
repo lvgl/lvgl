@@ -106,23 +106,14 @@ lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(void)
 
 void lv_gltf_ibl_sampler_set_cube_map_pixel_resolution(lv_gltf_ibl_sampler_t * sampler, uint32_t resolution)
 {
-    if(!sampler) {
-        LV_LOG_WARN("Can't set cube map resolution on a NULL sampler");
-        return;
-    }
-    if(resolution == 0) {
-        LV_LOG_WARN("Cube map resolution should be > 0");
-        return;
-    }
+    LV_CHECK_ARG(sampler != NULL, return);
+    LV_CHECK_ARG(resolution > 0, return);
     sampler->cube_map_resolution = resolution;
 }
 
 void lv_gltf_ibl_sampler_delete(lv_gltf_ibl_sampler_t * sampler)
 {
-    if(!sampler) {
-        LV_LOG_WARN("Can't delete a NULL sampler");
-        return;
-    }
+    LV_CHECK_ARG(sampler != NULL, return);
 
     ibl_sampler_destroy(sampler);
     lv_free(sampler);
@@ -130,19 +121,13 @@ void lv_gltf_ibl_sampler_delete(lv_gltf_ibl_sampler_t * sampler)
 
 void lv_gltf_environment_set_angle(lv_gltf_environment_t * env, float angle)
 {
-    if(!env) {
-        LV_LOG_WARN("Can't set angle on a NULL environment");
-        return;
-    }
+    LV_CHECK_ARG(env != NULL, return);
     env->angle = angle;
 }
 
 lv_gltf_environment_t * lv_gltf_environment_create(lv_gltf_ibl_sampler_t * sampler, const char * file_path)
 {
-    if(!sampler) {
-        LV_LOG_WARN("Can't create an environment with a NULL sampler");
-        return NULL;
-    }
+    LV_CHECK_ARG(sampler != NULL, return NULL);
 
     lv_gltf_environment_t * env = lv_zalloc(sizeof(*env));
     LV_ASSERT_MALLOC(env);
