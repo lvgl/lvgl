@@ -58,6 +58,8 @@ void lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
 
 void * lv_ll_ins_head(lv_ll_t * ll_p)
 {
+    LV_CHECK_ARG(ll_p != NULL, return NULL);
+
     lv_ll_node_t * n_new;
 
     n_new = lv_malloc(ll_p->n_size + LL_NODE_META_SIZE);
@@ -83,7 +85,8 @@ void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
 {
     lv_ll_node_t * n_new;
 
-    if(NULL == ll_p || NULL == n_act) return NULL;
+    LV_CHECK_ARG(ll_p != NULL, return NULL);
+    LV_CHECK_ARG(n_act != NULL, return NULL);
 
     if(lv_ll_get_head(ll_p) == n_act) {
         n_new = lv_ll_ins_head(ll_p);
@@ -106,6 +109,8 @@ void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
 
 void * lv_ll_ins_tail(lv_ll_t * ll_p)
 {
+    LV_CHECK_ARG(ll_p != NULL, return NULL);
+
     lv_ll_node_t * n_new;
 
     n_new = lv_malloc(ll_p->n_size + LL_NODE_META_SIZE);
@@ -161,6 +166,8 @@ void lv_ll_remove(lv_ll_t * ll_p, void * node_p)
 
 void lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *))
 {
+    if(ll_p == NULL) return;
+
     void * i;
     void * i_next;
 
@@ -182,6 +189,10 @@ void lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *))
 
 void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool head)
 {
+    LV_CHECK_ARG(ll_ori_p != NULL, return);
+    LV_CHECK_ARG(ll_new_p != NULL, return);
+    LV_CHECK_ARG(node != NULL, return);
+
     lv_ll_remove(ll_ori_p, node);
 
     if(head) {
@@ -216,18 +227,21 @@ void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool he
 
 void * lv_ll_get_head(const lv_ll_t * ll_p)
 {
-    if(ll_p == NULL) return NULL;
+    LV_CHECK_ARG(ll_p != NULL, return NULL);
     return ll_p->head;
 }
 
 void * lv_ll_get_tail(const lv_ll_t * ll_p)
 {
-    if(ll_p == NULL) return NULL;
+    LV_CHECK_ARG(ll_p != NULL, return NULL);
     return ll_p->tail;
 }
 
 void * lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
 {
+    LV_CHECK_ARG(ll_p != NULL, return NULL);
+    LV_CHECK_ARG(n_act != NULL, return NULL);
+
     /*Pointer to the next node is stored in the end of this node.
      *Go there and return the address found there*/
     const lv_ll_node_t * n_act_d = n_act;
@@ -237,6 +251,9 @@ void * lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
 
 void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
 {
+    LV_CHECK_ARG(ll_p != NULL, return NULL);
+    LV_CHECK_ARG(n_act != NULL, return NULL);
+
     /*Pointer to the prev. node is stored in the end of this node.
      *Go there and return the address found there*/
     const lv_ll_node_t * n_act_d = n_act;
@@ -246,6 +263,8 @@ void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
 
 uint32_t lv_ll_get_len(const lv_ll_t * ll_p)
 {
+    LV_CHECK_ARG(ll_p != NULL, return 0);
+
     uint32_t len = 0;
     void * node;
 
@@ -258,6 +277,9 @@ uint32_t lv_ll_get_len(const lv_ll_t * ll_p)
 
 void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
 {
+    LV_CHECK_ARG(ll_p != NULL, return);
+    LV_CHECK_ARG(n_act != NULL, return);
+
     if(n_act == n_after) return; /*Can't move before itself*/
 
     void * n_before;
@@ -286,7 +308,7 @@ void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
 
 bool lv_ll_is_empty(lv_ll_t * ll_p)
 {
-    if(ll_p == NULL) return true;
+    LV_CHECK_ARG(ll_p != NULL, return true);
 
     if(ll_p->head == NULL && ll_p->tail == NULL) return true;
 
@@ -295,6 +317,8 @@ bool lv_ll_is_empty(lv_ll_t * ll_p)
 
 void lv_ll_clear(lv_ll_t * ll_p)
 {
+    if(ll_p == NULL) return;
+
     lv_ll_clear_custom(ll_p, NULL);
 }
 
