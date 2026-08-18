@@ -70,7 +70,7 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent)
 
 void lv_fragment_manager_delete(lv_fragment_manager_t * manager)
 {
-    LV_ASSERT_NULL(manager);
+    if(manager == NULL) return;
     lv_fragment_managed_states_t * states;
     LV_LL_READ_BACK(&manager->attached, states) {
         item_delete_obj(states);
@@ -83,7 +83,7 @@ void lv_fragment_manager_delete(lv_fragment_manager_t * manager)
 
 void lv_fragment_manager_create_obj(lv_fragment_manager_t * manager)
 {
-    LV_ASSERT_NULL(manager);
+    LV_CHECK_ARG(manager != NULL, return);
     lv_fragment_stack_item_t * top = lv_ll_get_tail(&manager->stack);
     lv_fragment_managed_states_t * states = NULL;
     LV_LL_READ(&manager->attached, states) {
@@ -97,7 +97,7 @@ void lv_fragment_manager_create_obj(lv_fragment_manager_t * manager)
 
 void lv_fragment_manager_delete_obj(lv_fragment_manager_t * manager)
 {
-    LV_ASSERT_NULL(manager);
+    LV_CHECK_ARG(manager != NULL, return);
     lv_fragment_managed_states_t * states = NULL;
     LV_LL_READ_BACK(&manager->attached, states) {
         item_delete_obj(states);
@@ -106,6 +106,9 @@ void lv_fragment_manager_delete_obj(lv_fragment_manager_t * manager)
 
 void lv_fragment_manager_add(lv_fragment_manager_t * manager, lv_fragment_t * fragment, lv_obj_t * const * container)
 {
+    LV_CHECK_ARG(manager != NULL, return);
+    LV_CHECK_ARG(fragment != NULL, return);
+
     lv_fragment_managed_states_t * states = fragment_attach(manager, fragment, container);
     if(!manager->parent || manager->parent->managed->obj_created) {
         item_create_obj(states);
@@ -114,9 +117,9 @@ void lv_fragment_manager_add(lv_fragment_manager_t * manager, lv_fragment_t * fr
 
 void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t * fragment)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(fragment);
-    LV_ASSERT_NULL(fragment->managed);
+    LV_CHECK_ARG(manager != NULL, return);
+    LV_CHECK_ARG(fragment != NULL, return);
+    LV_CHECK_ARG(fragment->managed != NULL, return);
     LV_ASSERT(fragment->managed->manager == manager);
     lv_fragment_managed_states_t * states = fragment->managed;
     lv_fragment_managed_states_t * prev = NULL;
@@ -149,6 +152,9 @@ void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t *
 
 void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * fragment, lv_obj_t * const * container)
 {
+    LV_CHECK_ARG(manager != NULL, return);
+    LV_CHECK_ARG(fragment != NULL, return);
+
     lv_fragment_stack_item_t * top = lv_ll_get_tail(&manager->stack);
     if(top != NULL) {
         item_delete_obj(top->states);
@@ -164,6 +170,8 @@ void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * f
 
 bool lv_fragment_manager_pop(lv_fragment_manager_t * manager)
 {
+    LV_CHECK_ARG(manager != NULL, return false);
+
     lv_fragment_t * top = lv_fragment_manager_get_top(manager);
     if(top == NULL) return false;
     lv_fragment_manager_remove(manager, top);
@@ -173,6 +181,10 @@ bool lv_fragment_manager_pop(lv_fragment_manager_t * manager)
 void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
                                  lv_obj_t * const * container)
 {
+    LV_CHECK_ARG(manager != NULL, return);
+    LV_CHECK_ARG(fragment != NULL, return);
+    LV_CHECK_ARG(container != NULL, return);   /*dereferenced below, unlike add()/push()*/
+
     lv_fragment_t * top = lv_fragment_manager_find_by_container(manager, *container);
     if(top != NULL) {
         lv_fragment_manager_remove(manager, top);
@@ -182,7 +194,7 @@ void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t 
 
 bool lv_fragment_manager_send_event(lv_fragment_manager_t * manager, int code, void * userdata)
 {
-    LV_ASSERT_NULL(manager);
+    LV_CHECK_ARG(manager != NULL, return false);
     lv_fragment_managed_states_t * p = NULL;
     LV_LL_READ_BACK(&manager->attached, p) {
         if(!p->obj_created || p->destroying_obj) continue;
@@ -196,13 +208,13 @@ bool lv_fragment_manager_send_event(lv_fragment_manager_t * manager, int code, v
 
 size_t lv_fragment_manager_get_stack_size(lv_fragment_manager_t * manager)
 {
-    LV_ASSERT_NULL(manager);
+    LV_CHECK_ARG(manager != NULL, return 0);
     return lv_ll_get_len(&manager->stack);
 }
 
 lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager)
 {
-    LV_ASSERT(manager);
+    LV_CHECK_ARG(manager != NULL, return NULL);
     lv_fragment_stack_item_t * top = lv_ll_get_tail(&manager->stack);
     if(!top)return NULL;
     return top->states->instance;
@@ -210,7 +222,8 @@ lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager)
 
 lv_fragment_t * lv_fragment_manager_find_by_container(lv_fragment_manager_t * manager, const lv_obj_t * container)
 {
-    LV_ASSERT(manager);
+    LV_CHECK_ARG(manager != NULL, return NULL);
+    LV_CHECK_ARG(container != NULL, return NULL);
     lv_fragment_managed_states_t * states;
     LV_LL_READ(&manager->attached, states) {
         if(*states->container == container) return states->instance;
@@ -220,7 +233,7 @@ lv_fragment_t * lv_fragment_manager_find_by_container(lv_fragment_manager_t * ma
 
 lv_fragment_t * lv_fragment_manager_get_parent_fragment(lv_fragment_manager_t * manager)
 {
-    LV_ASSERT_NULL(manager);
+    LV_CHECK_ARG(manager != NULL, return NULL);
     return manager->parent;
 }
 
@@ -257,8 +270,8 @@ static void item_delete_fragment(lv_fragment_managed_states_t * item)
 static lv_fragment_managed_states_t * fragment_attach(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
                                                       lv_obj_t * const * container)
 {
-    LV_ASSERT(manager);
-    LV_ASSERT(fragment);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(fragment != NULL);
     LV_ASSERT(fragment->managed == NULL);
     lv_fragment_managed_states_t * states = lv_ll_ins_tail(&manager->attached);
     lv_memzero(states, sizeof(lv_fragment_managed_states_t));
