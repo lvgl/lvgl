@@ -291,7 +291,7 @@ To create and use an Animation Timeline:
   It plays from wherever the Timeline currently is:  from the beginning, or from the
   point set by <ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, progress)" />.
   Use <ApiLink name="lv_anim_timeline_restart" display="lv_anim_timeline_restart(timeline)" /> to always play from the
-  beginning, whatever state the Timeline was left in.
+  beginning (or end if reversed), regardless of the previous state of the Timeline.
 
 <Callout type="info">
 own copy of the contents of the Animation template, so if you do not need it
@@ -307,8 +307,8 @@ after adding all Animations and before telling it to start playing.
 
 Call <ApiLink name="lv_anim_timeline_pause" display="lv_anim_timeline_pause(timeline)" /> to pause the Animation Timeline.
 The position it reached is kept, so <ApiLink name="lv_anim_timeline_start" display="lv_anim_timeline_start(timeline)" />
-continues from there, and <ApiLink name="lv_anim_timeline_restart" display="lv_anim_timeline_restart(timeline)" /> plays it
-again from the beginning.
+continues from there <ApiLink name="lv_anim_timeline_restart" display="lv_anim_timeline_restart(timeline)" /> plays it
+again from the beginning (or end if reversed).
 
 Call <ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, progress)" /> function to set the
 state of the Animation Timeline according to the `progress` value.  `progress` is
