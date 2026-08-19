@@ -2015,13 +2015,13 @@ static void play_timeline_on_trigger_event_cb(lv_event_t * e)
     uint16_t progress = lv_anim_timeline_get_progress(dsc->at);
     if(dsc->reverse) {
         if(progress == 0) {
+            lv_anim_timeline_set_delay(dsc->at, dsc->delay);
             lv_anim_timeline_set_progress(dsc->at, LV_ANIM_TIMELINE_PROGRESS_MAX);
         }
-
-        lv_anim_timeline_set_reverse(dsc->at, true);
     }
     else {
         if(progress == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_delay(dsc->at, dsc->delay);
             lv_anim_timeline_set_progress(dsc->at, 0);
         }
 
