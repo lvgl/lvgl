@@ -298,6 +298,11 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
 void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y);
 
 /**
+ * Return true if x and y exist in the draw buffer
+ */
+bool lv_draw_buf_is_position_valid(const lv_draw_buf_t * buf, uint32_t x, uint32_t y);
+
+/**
  * Adjust the stride of a draw buf in place.
  * @param src       pointer to a draw buffer
  * @param stride    the new stride in bytes for image. Use LV_STRIDE_AUTO for automatic calculation.
