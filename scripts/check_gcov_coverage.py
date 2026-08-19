@@ -34,6 +34,12 @@ def create_argument_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "--report",
+        type=str,
+        default=None,
+        help="Write the `Coverage` section of the PR report to this path",
+    )
+    parser.add_argument(
         "--fail-under",
         type=float,
         metavar="PERCENT",
@@ -364,6 +370,44 @@ def report_coverage(
     return retval
 
 
+def write_pr_report(covered: int, total: int, fail_under: float,
+                    min_lines: int, output_path: str) -> None:
+    """Emit the `Coverage` row of the single PR comment.
+
+    This reports coverage *of the lines this pull request changed*, which is
+    what CI already gates on. It needs no baseline, so nothing has to be
+    rebuilt for a comparison.
+    """
+    import sys as _sys, os as _os
+    _sys.path.insert(
+        0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "pr_report")
+    )
+    from pr_report import write_report
+
+    if total == 0:
+        write_report(output_path, section="Coverage", icon="skip",
+                     summary="no coverable lines changed")
+        return
+
+    percent = covered / total * 100.0
+    too_small = 0 < total < min_lines
+    if too_small:
+        icon, summary = "info", (
+            f"{percent:.1f}% of {total} changed line(s) "
+            f"(too few to enforce {fail_under:g}%)"
+        )
+    elif percent < fail_under:
+        icon, summary = "fail", (
+            f"{percent:.1f}% of {total} changed line(s), below {fail_under:g}%"
+        )
+    else:
+        icon, summary = "ok", f"{percent:.1f}% of {total} changed line(s)"
+
+    write_report(output_path, section="Coverage", icon=icon, summary=summary,
+                 details=f"{covered} of {total} newly coverable line(s) are "
+                         f"covered by the test suite.")
+
+
 def main() -> int:
     """Main entry point"""
     parser = create_argument_parser()
@@ -393,6 +437,10 @@ def main() -> int:
             covered, total, uncovered, skipped_noncoverable = check_commit_coverage(
                 args.commit, root
             )
+
+            if args.report:
+                write_pr_report(covered, total, args.fail_under,
+                                args.min_lines, args.report)
 
             return report_coverage(
                 header=f"commit {args.commit}",
