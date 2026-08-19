@@ -31,7 +31,7 @@ class LVQrcode(LVCanvas):
 
     @property
     def data_len(self):
-        """Stored payload length in bytes"""
+        """Stored payload length in bytes (text includes its NUL terminator)"""
         return int(self._wv.safe_field("data_len", 0))
 
     @property

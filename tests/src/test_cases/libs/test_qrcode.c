@@ -49,7 +49,7 @@ void test_qrcode_normal(void)
 
     /*Set data*/
     const char * data = "https://lvgl.io";
-    lv_qrcode_set_data(qr, data);
+    lv_qrcode_set_text(qr, data);
     lv_obj_center(qr);
 
     /*Add a border with bg_color*/
@@ -69,7 +69,7 @@ void test_qrcode_color_after_data(void)
 
     /*Set the data first, then the colors. The colors must still be applied
      *(regression test for the setters being ignored after rendering)*/
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
 
     lv_qrcode_set_dark_color(qr, fg_color);
     lv_qrcode_set_light_color(qr, bg_color);
@@ -92,7 +92,7 @@ void test_qrcode_size_after_data(void)
     /*Set the data before the size, so the bitmap is first encoded into the default
      *sized buffer. Changing the size afterwards must re-encode it, not leave the
      *fresh (empty) buffer as it is.*/
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
     lv_qrcode_set_size(qr, 150);
     lv_qrcode_set_dark_color(qr, fg_color);
     lv_qrcode_set_light_color(qr, bg_color);
@@ -116,7 +116,7 @@ void test_qrcode_quiet_zone(void)
     lv_qrcode_set_quiet_zone(qr, true);
 
     /*Set data*/
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
     lv_obj_center(qr);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/qrcode_2.png");
@@ -136,13 +136,78 @@ void test_qrcode_quiet_zone_after_data(void)
     /*Set the data first (renders without quiet zone), then enable the quiet zone.
      *This is the case the old code silently dropped: a geometry change after the
      *data must re-encode the bitmap. The result must match the quiet-zone reference.*/
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
 
     lv_qrcode_set_quiet_zone(qr, true);
     lv_obj_center(qr);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/qrcode_2.png");
 }
+
+void test_qrcode_text_and_binary_round_trip(void)
+{
+    lv_obj_t * qr = lv_qrcode_create(active_screen);
+    TEST_ASSERT_NOT_NULL(qr);
+    lv_qrcode_set_size(qr, 150);
+
+    /*Nothing set yet*/
+    TEST_ASSERT_NULL(lv_qrcode_get_text(qr));
+    TEST_ASSERT_EQUAL(0, lv_qrcode_get_data(qr, NULL, 0));
+
+    /*Text: readable back as a string, and its NUL is not part of the payload*/
+    const char * text = "https://lvgl.io";
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_text(qr, text));
+    TEST_ASSERT_EQUAL_STRING(text, lv_qrcode_get_text(qr));
+    TEST_ASSERT_EQUAL(strlen(text), lv_qrcode_get_data(qr, NULL, 0));
+
+    uint8_t out[32];
+    lv_memset(out, 0xEE, sizeof(out));
+    TEST_ASSERT_EQUAL(strlen(text), lv_qrcode_get_data(qr, out, sizeof(out)));
+    TEST_ASSERT_EQUAL_MEMORY(text, out, strlen(text));
+
+    /*Binary with an embedded NUL: length based, and not a string*/
+    const uint8_t bin[] = {'a', 'b', 0x00, 'c', 'd'};
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, bin, sizeof(bin)));
+    TEST_ASSERT_NULL(lv_qrcode_get_text(qr));
+    TEST_ASSERT_EQUAL(sizeof(bin), lv_qrcode_get_data(qr, NULL, 0));
+    lv_memset(out, 0xEE, sizeof(out));
+    TEST_ASSERT_EQUAL(sizeof(bin), lv_qrcode_get_data(qr, out, sizeof(out)));
+    TEST_ASSERT_EQUAL_MEMORY(bin, out, sizeof(bin));
+
+    /*A too-small buffer truncates but still reports the full length*/
+    uint8_t small[2];
+    TEST_ASSERT_EQUAL(sizeof(bin), lv_qrcode_get_data(qr, small, sizeof(small)));
+    TEST_ASSERT_EQUAL_MEMORY(bin, small, sizeof(small));
+}
+
+void test_qrcode_binary_ending_in_nul_is_treated_as_text(void)
+{
+    lv_obj_t * qr = lv_qrcode_create(active_screen);
+    TEST_ASSERT_NOT_NULL(qr);
+    lv_qrcode_set_size(qr, 150);
+
+    /*Documented limitation of telling the payload kinds apart by content instead of by a
+     *stored flag: a binary payload whose only NUL byte is its last one looks exactly like
+     *what set_text() stores, so it is treated as text and that byte is not encoded.*/
+    const uint8_t bin[] = {'h', 'i', 0x00};
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, bin, sizeof(bin)));
+
+    TEST_ASSERT_EQUAL_STRING("hi", lv_qrcode_get_text(qr));
+    TEST_ASSERT_EQUAL(sizeof(bin) - 1, lv_qrcode_get_data(qr, NULL, 0));
+
+    /*A NUL anywhere but the very end keeps the payload binary and intact*/
+    const uint8_t embedded[] = {'h', 0x00, 'i'};
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, embedded, sizeof(embedded)));
+    TEST_ASSERT_NULL(lv_qrcode_get_text(qr));
+    TEST_ASSERT_EQUAL(sizeof(embedded), lv_qrcode_get_data(qr, NULL, 0));
+
+    /*So does a payload with no NUL at all*/
+    const uint8_t no_nul[] = {'h', 'i'};
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, no_nul, sizeof(no_nul)));
+    TEST_ASSERT_NULL(lv_qrcode_get_text(qr));
+    TEST_ASSERT_EQUAL(sizeof(no_nul), lv_qrcode_get_data(qr, NULL, 0));
+}
+
 
 void test_qrcode_update_mode_default_is_immediate(void)
 {
@@ -170,12 +235,12 @@ void test_qrcode_update_mode_deferred_renders_on_redraw(void)
     lv_qrcode_set_dark_color(qr, fg_color);
     lv_qrcode_set_light_color(qr, bg_color);
 
-    /*Deferred mode expects an explicit lv_qrcode_update(). This test deliberately omits
+    /*Deferred mode expects an explicit lv_qrcode_render(). This test deliberately omits
      *it to cover the fallback: the redraw notices the bitmap is out of date, warns, and
      *encodes it anyway, so the result must still be correct.*/
     lv_log_register_print_cb(count_qrcode_logs_cb);
     lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_DEFERRED);
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
     lv_qrcode_set_quiet_zone(qr, true);
     lv_obj_center(qr);
 
@@ -198,7 +263,7 @@ void test_qrcode_render_applies_deferred_changes(void)
     lv_qrcode_set_size(qr, 150);
     lv_qrcode_set_dark_color(qr, fg_color);
     lv_qrcode_set_light_color(qr, bg_color);
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
 
     lv_log_register_print_cb(count_qrcode_logs_cb);
 
@@ -230,7 +295,7 @@ void test_qrcode_update_before_switching_mode_reports_result(void)
     lv_qrcode_set_light_color(qr, bg_color);
 
     lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_DEFERRED);
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
     lv_qrcode_set_quiet_zone(qr, true);
 
     /*The order that can report a failure: render() encodes the deferred change and
@@ -255,7 +320,7 @@ void test_qrcode_update_mode_immediate_applies_pending_change(void)
     lv_qrcode_set_light_color(qr, bg_color);
 
     lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_DEFERRED);
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
     lv_qrcode_set_quiet_zone(qr, true);
 
     /*Switching back to immediate while out of date must still encode the deferred
@@ -277,7 +342,7 @@ void test_qrcode_deferred_render_failure_is_detectable(void)
     TEST_ASSERT_TRUE(lv_qrcode_get_render_failed(qr));
 
     lv_qrcode_set_size(qr, 150);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
     TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
 
     /*In deferred mode the re-encode happens in the draw pass, so nothing returns its
@@ -300,7 +365,7 @@ void test_qrcode_failed_render_is_not_retried_every_frame(void)
     lv_obj_t * qr = lv_qrcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(qr);
     lv_qrcode_set_size(qr, 150);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
     lv_obj_center(qr);
     lv_refr_now(NULL);
 
@@ -341,7 +406,7 @@ void test_qrcode_failures_are_silent_when_the_caller_sees_the_result(void)
     lv_obj_t * qr = lv_qrcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(qr);
     lv_qrcode_set_size(qr, 150);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
 
     lv_log_register_print_cb(count_qrcode_logs_cb);
 
@@ -381,12 +446,12 @@ void test_qrcode_update_reports_unencodable_payload(void)
     static char too_long[3000];
     lv_memset(too_long, 'a', sizeof(too_long) - 1);
     too_long[sizeof(too_long) - 1] = '\0';
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_update(qr, too_long, sizeof(too_long) - 1));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_set_data(qr, too_long, sizeof(too_long) - 1));
 
     TEST_ASSERT_TRUE(lv_qrcode_get_render_failed(qr));
 
     /*A payload that does fit is reported as success*/
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
     TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
 }
 
@@ -399,33 +464,33 @@ void test_qrcode_canvas_too_small_is_reported(void)
      *hold even one pixel per module, so the bitmap would stay blank. That must be
      *reported as a failure rather than as a successfully rendered QR code.*/
     lv_qrcode_set_size(qr, 10);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_update(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
 
     /*The same holds with a quiet zone, which needs even more room*/
     lv_qrcode_set_quiet_zone(qr, true);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_update(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
 
     /*A canvas large enough for both renders and reports success*/
     lv_qrcode_set_size(qr, 150);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
     lv_qrcode_set_quiet_zone(qr, false);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
 }
 
-void test_qrcode_set_data_ignores_null(void)
+void test_qrcode_set_text_ignores_null(void)
 {
     lv_obj_t * qr = lv_qrcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(qr);
     lv_qrcode_set_size(qr, 150);
-    lv_qrcode_set_data(qr, "https://lvgl.io");
+    lv_qrcode_set_text(qr, "https://lvgl.io");
     TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
 
-    /*A NULL string is a no-op, not a crash, and leaves the stored payload alone.
-     *The guard is unconditional because lv_strlen() would dereference it even when
-     *argument checks are compiled out.*/
-    lv_qrcode_set_data(qr, NULL);
+    /*A NULL string is rejected, not a crash, and leaves the stored payload alone. The
+     *guard is unconditional because lv_strlen() would dereference it even when argument
+     *checks are compiled out.*/
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_set_text(qr, NULL));
     TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
-    TEST_ASSERT_EQUAL(15, ((lv_qrcode_t *)qr)->data_len);
+    TEST_ASSERT_EQUAL_STRING("https://lvgl.io", lv_qrcode_get_text(qr));
 }
 
 void test_qrcode_update_rejects_invalid_arguments(void)
@@ -437,16 +502,16 @@ void test_qrcode_update_rejects_invalid_arguments(void)
     lv_obj_t * qr = lv_qrcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(qr);
 
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_update(qr, NULL, 4));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_set_data(qr, NULL, 4));
 
     /*More bytes than any QR code can hold is rejected before anything is stored*/
     static char over_len[qrcodegen_BUFFER_LEN_MAX + 1];
     lv_memset(over_len, 'a', sizeof(over_len));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_update(qr, over_len, qrcodegen_BUFFER_LEN_MAX + 1));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_set_data(qr, over_len, qrcodegen_BUFFER_LEN_MAX + 1));
 
     /*A previously set payload survives a rejected call*/
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_update(qr, over_len, qrcodegen_BUFFER_LEN_MAX + 1));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io", 15));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_set_data(qr, over_len, qrcodegen_BUFFER_LEN_MAX + 1));
 #endif /*LV_USE_CHECK_ARG*/
 }
 
