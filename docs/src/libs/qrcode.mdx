@@ -17,8 +17,8 @@ Widget that generates and displays QR Codes using the library.
 Enable <ApiLink name="LV_USE_QRCODE" /> in `lv_conf.h` by setting its value to `1`.
 
 Use <ApiLink name="lv_qrcode_create" /> to create the QR-Code Widget. Then set the
-data to encode with <ApiLink name="lv_qrcode_update" /> for arbitrary binary data, or
-with <ApiLink name="lv_qrcode_set_data" /> for a NUL terminated string.
+payload with <ApiLink name="lv_qrcode_set_text" /> for a NUL terminated string, or
+<ApiLink name="lv_qrcode_set_data" /> for arbitrary binary data.
 
 The appearance can be configured with <ApiLink name="lv_qrcode_set_size" />,
 <ApiLink name="lv_qrcode_set_dark_color" />, <ApiLink name="lv_qrcode_set_light_color" />
@@ -46,7 +46,7 @@ lv_qrcode_render(qr);   /* encode once, here, and get the result */
 ```
 
 <ApiLink name="lv_qrcode_render" /> re-encodes the payload the Widget already stores, so
-unlike <ApiLink name="lv_qrcode_update" /> it does not need the data passed in again.
+unlike the payload setters it does not need the payload passed in again.
 
 If that call is forgotten the bitmap is still correct - the redraw notices it is out of
 date and encodes it - but that is a fallback, not the intended flow, and it logs a
@@ -64,14 +64,14 @@ lv_qrcode_render(qr);                                            /* result avail
 lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_IMMEDIATE);  /* nothing left to encode */
 ```
 
-The mode does not affect setting the data: <ApiLink name="lv_qrcode_update" /> and
+The mode does not affect setting the payload: <ApiLink name="lv_qrcode_set_text" /> and
 <ApiLink name="lv_qrcode_set_data" /> always encode right away and return the result,
 so an unencodable payload is reported to the caller. The colors are never affected
 either - they are a palette write in both modes.
 
 ### Detecting a failed re-encode
 
-`lv_qrcode_update()` and `lv_qrcode_render()` return the encode result, but the
+The payload setters and `lv_qrcode_render()` return the encode result, but the
 re-encodes triggered by a property change cannot: `lv_qrcode_set_size()` and `lv_qrcode_set_quiet_zone()` return
 `void`, and in deferred mode the work happens in the draw pass. A payload that no longer
 fits - typically after shrinking the object - therefore fails without anything returning
@@ -91,19 +91,42 @@ A failed encode leaves the bitmap marked as out of date, so it is never mistaken
 current one, and it is not retried on every redraw - only a property change makes the
 Widget try again.
 
-Encode failures are not logged when the caller can see the result: `lv_qrcode_update()`
+Encode failures are not logged when the caller can see the result: the payload setters
 and `lv_qrcode_render()` return it, and the property setters are silent because the state
 is available from `lv_qrcode_get_render_failed()`. Animating a size through values that
 are all too small therefore produces no log output at all. The one exception is the
 re-encode done by the redraw - there is no caller to return anything to, so that failure
 is logged, along with the warning that the explicit render call was missed.
 
+### Reading the payload back
+
+<ApiLink name="lv_qrcode_get_text" /> returns a payload that was set with
+`lv_qrcode_set_text()` as a NUL terminated string, and `NULL` for a binary one.
+<ApiLink name="lv_qrcode_get_data" /> copies either kind into a caller-provided buffer and
+returns the full length, so truncation is detectable; passing a `NULL` buffer just queries
+the length. A text payload's terminator is stored but is neither encoded nor reported, so
+the length matches the string.
+
+The two kinds share one buffer and are told apart by its last two bytes instead of a
+stored flag, which keeps the Widget one `uint16_t` of flags. Text is stored with its
+terminator, and a binary payload that ends with a `NUL` gets a second one appended, so a
+single trailing `NUL` means text and two mean binary:
+
+```c
+const uint8_t bin[] = {0x8A, 0x42, 0x00};
+lv_qrcode_set_data(qr, bin, sizeof(bin));   /* stored as 8A 42 00 00, all 3 bytes encoded */
+
+lv_qrcode_set_text(qr, "hi");               /* stored as 68 69 00, 2 bytes encoded */
+```
+
+Every payload is therefore encoded verbatim, whatever bytes it holds.
+
 ## Notes
 
 - QR Codes with less data are smaller, but they are scaled by an integer
    value to best fit to the given size. If the size is too small to fit even one
    pixel per QR Code module, the bitmap cannot be generated and
-   <ApiLink name="lv_qrcode_update" /> reports `LV_RESULT_INVALID`. Enabling the
+   <ApiLink name="lv_qrcode_render" /> reports `LV_RESULT_INVALID`. Enabling the
    quiet zone needs more room, so a size that works without it may be too small
    with it.
 - Changing the color (dark or light) only updates the palette, so it is cheap
