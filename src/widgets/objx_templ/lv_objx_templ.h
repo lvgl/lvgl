@@ -47,7 +47,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_templ_class;
 
 /**
  * Create a templ object
- * @param parent    pointer to an object, it will be the parent of the new templ
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created bar
  */
 lv_obj_t * lv_templ_create(lv_obj_t * parent);

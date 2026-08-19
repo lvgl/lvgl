@@ -34,7 +34,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
 
 /**
  * Create a canvas object
- * @param parent     pointer to an object, it will be the parent of the new canvas
+ * @param parent     pointer to a parent widget @nullable. When NULL, the widget
+ *                   is created as a screen on the active display.
  * @return           pointer to the created canvas
  */
 lv_obj_t * lv_canvas_create(lv_obj_t * parent);

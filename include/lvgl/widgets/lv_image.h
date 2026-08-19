@@ -77,7 +77,8 @@ enum _lv_property_image_id_t {
 
 /**
  * Create an image object
- * @param parent pointer to an object, it will be the parent of the new image
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the active display.
  * @return pointer to the created image
  */
 lv_obj_t * lv_image_create(lv_obj_t * parent);

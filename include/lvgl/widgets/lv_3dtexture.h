@@ -35,7 +35,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_3dtexture_class;
 
 /**
  * Create a 3dtexture object
- * @param parent    pointer to an object, it will be the parent of the new 3dtexture
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created 3dtexture
  */
 lv_obj_t * lv_3dtexture_create(lv_obj_t * parent);

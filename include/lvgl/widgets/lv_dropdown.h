@@ -56,7 +56,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdownlist_class;
 
 /**
  * Create a drop-down list object
- * @param parent pointer to an object, it will be the parent of the new drop-down list
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the active display.
  * @return pointer to the created drop-down list
  */
 lv_obj_t * lv_dropdown_create(lv_obj_t * parent);

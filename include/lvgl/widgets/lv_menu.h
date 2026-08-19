@@ -74,7 +74,8 @@ enum __lv_property_menu_id_t {
 
 /**
  * Create a menu object
- * @param parent    pointer to an object, it will be the parent of the new menu
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created menu
  * @deprecated The `lv_menu` widget is deprecated. Build menu navigation from base
  *             widgets instead. See `lv_example_menu_navigation`.
