@@ -39,7 +39,8 @@ enum _lv_property_tabview_id_t {
 
 /**
  * Create a tabview widget
- * @param parent    pointer to a parent widget
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          the created tabview
  */
 lv_obj_t * lv_tabview_create(lv_obj_t * parent);

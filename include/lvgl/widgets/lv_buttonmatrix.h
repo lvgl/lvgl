@@ -82,7 +82,8 @@ enum _lv_property_buttonmatrix_id_t {
 
 /**
  * Create a button matrix object
- * @param parent    pointer to an object, it will be the parent of the new button matrix
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created button matrix
  */
 lv_obj_t * lv_buttonmatrix_create(lv_obj_t * parent);

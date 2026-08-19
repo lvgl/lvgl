@@ -72,7 +72,8 @@ void lv_span_stack_deinit(void);
 
 /**
  * Create a spangroup object
- * @param parent    pointer to an object, it will be the parent of the new spangroup
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created spangroup
  */
 lv_obj_t * lv_spangroup_create(lv_obj_t * parent);

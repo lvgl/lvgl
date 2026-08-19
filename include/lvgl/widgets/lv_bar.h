@@ -60,7 +60,8 @@ enum _lv_property_bar_id_t {
 
 /**
  * Create a bar object
- * @param parent        pointer to an object, it will be the parent of the new bar
+ * @param parent        pointer to a parent widget @nullable. When NULL, the widget
+ *                      is created as a screen on the default display.
  * @return              pointer to the created bar
  */
 lv_obj_t * lv_bar_create(lv_obj_t * parent);

@@ -60,7 +60,8 @@ int lv_ffmpeg_get_frame_num(const char * path);
 
 /**
  * Create ffmpeg_player object
- * @param parent pointer to an object, it will be the parent of the new player
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the default display.
  * @return pointer to the created ffmpeg_player
  */
 lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent);

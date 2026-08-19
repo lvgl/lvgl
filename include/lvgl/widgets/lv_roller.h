@@ -55,7 +55,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_roller_class;
 
 /**
  * Create a roller object
- * @param parent    pointer to an object, it will be the parent of the new roller.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created roller
  */
 lv_obj_t * lv_roller_create(lv_obj_t * parent);

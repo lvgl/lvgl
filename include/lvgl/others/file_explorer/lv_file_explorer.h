@@ -64,7 +64,8 @@ extern const lv_obj_class_t lv_file_explorer_class;
 
 /**
  * Create a file explorer object
- * @param parent    pointer to an object, it will be the parent of the new explorer
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created file explorer
  * @deprecated The `lv_file_explorer` widget is deprecated. Build a file browser from
  *             a table and the `lv_fs` API instead. See `lv_example_table_file_browser`.

@@ -50,7 +50,8 @@ typedef void (*lv_obj_class_event_cb_t)(lv_obj_class_t * class_p, lv_event_t * e
 /**
  * Create an object form a class descriptor
  * @param class_p   pointer to a class
- * @param parent    pointer to an object where the new object should be created
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created object
  */
 lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent);

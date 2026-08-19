@@ -86,7 +86,8 @@ enum _lv_property_scale_id_t {
 
 /**
  * Create an scale object
- * @param parent    pointer to an object, it will be the parent of the new scale
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to created Scale Widget
  */
 lv_obj_t * lv_scale_create(lv_obj_t * parent);
