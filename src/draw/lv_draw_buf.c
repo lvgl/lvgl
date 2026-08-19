@@ -394,6 +394,11 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     dest->handlers->buf_copy_cb(dest, dest_area, src, src_area);
 }
 
+bool lv_draw_buf_is_position_valid(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
+{
+    LV_CHECK_ARG(buf != NULL, return false);
+    return x < buf->header.w && y < buf->header.h;
+}
 void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 {
     LV_ASSERT_NULL(buf);
