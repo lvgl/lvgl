@@ -135,6 +135,19 @@ jobs:
         run: python scripts/static_checks/check_file_template.py
 
       # ------------------------------------------------------------------
+      # All public API functions have their argument checks
+      # ------------------------------------------------------------------
+      - name: Install doxygen
+        continue-on-error: true
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq doxygen
+
+      - name: "Check: public API argument checks did not regress"
+        id: arg-checks
+        continue-on-error: true
+        run: |
+          python scripts/static_checks/check_arg_checks.py
+
+      # ------------------------------------------------------------------
       # Final gate – fail the job if any step above failed.
       # This gives us full output from every check before failing.
       # ------------------------------------------------------------------
@@ -151,7 +164,8 @@ jobs:
           steps.labeler-globs.outcome         == 'failure' ||
           steps.labeler-labels.outcome        == 'failure' ||
           steps.comments.outcome              == 'failure' ||
-          steps.file-template.outcome         == 'failure'
+          steps.file-template.outcome         == 'failure' ||
+          steps.arg-checks.outcome            == 'failure'
 
         run: |
           echo "Policy check results:"
@@ -178,6 +192,7 @@ jobs:
           print_result "labeler-labels"        "${{ steps.labeler-labels.outcome }}"
           print_result "comments"              "${{ steps.comments.outcome }}"
           print_result "file-template"         "${{ steps.file-template.outcome }}"
+          print_result "arg-checks"            "${{ steps.arg-checks.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."
