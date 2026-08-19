@@ -672,4 +672,78 @@ void test_slider_large_range_key_up_increments(void)
     TEST_ASSERT_TRUE(val > 10000000);
 }
 
+static uint32_t value_changed_cnt;
+
+static void value_changed_event_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    value_changed_cnt++;
+}
+
+void test_slider_knob_follows_drag_while_parent_is_scrolled(void)
+{
+    /* A slider dragged to its end doesn't change value, so it keeps its vertical scroll
+     * chain and a vertical move can make the parent the indev's scroll object.
+     * The knob must keep following the pointer anyway because the drag is already ongoing. */
+    lv_obj_t * cont = lv_obj_create(active_screen);
+    lv_obj_set_size(cont, 300, 160);
+    lv_obj_center(cont);
+    lv_obj_set_scroll_dir(cont, LV_DIR_VER);
+    lv_obj_set_style_pad_all(cont, 0, 0);
+    /* No momentum so the scroll ends with the release */
+    lv_obj_set_scroll_momentum(cont, false);
+
+    lv_obj_t * slider_in_cont = lv_slider_create(cont);
+    lv_obj_set_size(slider_in_cont, 200, 20);
+    lv_obj_set_pos(slider_in_cont, 0, 60);
+    lv_slider_set_value(slider_in_cont, 100, LV_ANIM_OFF);
+
+    value_changed_cnt = 0;
+    lv_obj_add_event_cb(slider_in_cont, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    /* Make the container really scrollable downwards */
+    lv_obj_t * spacer = lv_obj_create(cont);
+    lv_obj_set_size(spacer, 10, 100);
+    lv_obj_set_pos(spacer, 0, 200);
+
+    lv_obj_update_layout(cont);
+    lv_refr_now(NULL);
+    TEST_ASSERT_GREATER_THAN_INT32(0, lv_obj_get_scroll_bottom(cont));
+
+    lv_area_t coords;
+    lv_obj_get_coords(slider_in_cont, &coords);
+    const int32_t press_y = (coords.y1 + coords.y2) / 2;
+    const int32_t target_x = (coords.x1 + coords.x2) / 2;
+
+    /* Press at the right end and drag further right: dragging starts but the value
+     * stays clamped at the maximum */
+    lv_test_mouse_move_to(coords.x2 - 2, press_y);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_move_by(20, 0);
+    lv_test_wait(50);
+
+    TEST_ASSERT_TRUE(lv_slider_is_dragged(slider_in_cont));
+    TEST_ASSERT_EQUAL_INT32(100, lv_slider_get_value(slider_in_cont));
+    TEST_ASSERT_EQUAL_UINT32(0, value_changed_cnt);
+
+    /* Move up so the indev starts scrolling the container */
+    lv_test_mouse_move_by(0, -40);
+    lv_test_wait(50);
+
+    lv_indev_t * mouse = lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
+    TEST_ASSERT_EQUAL_PTR(cont, lv_indev_get_scroll_obj(mouse));
+    TEST_ASSERT_TRUE(lv_slider_is_dragged(slider_in_cont));
+
+    /* Drag back to the middle. The knob must follow even though a scroll object is active */
+    lv_test_mouse_move_by(target_x - (coords.x2 - 2 + 20), 0);
+    lv_test_wait(50);
+
+    TEST_ASSERT_INT_WITHIN(5, 50, lv_slider_get_value(slider_in_cont));
+    TEST_ASSERT_GREATER_THAN_UINT32(0, value_changed_cnt);
+
+    lv_test_mouse_release();
+    lv_test_wait(200);
+}
+
 #endif
