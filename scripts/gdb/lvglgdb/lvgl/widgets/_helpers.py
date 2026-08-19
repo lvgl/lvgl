@@ -75,6 +75,10 @@ def safe_wrapper(obj, field_name, module_path, class_name):
         cls = getattr(mod, class_name)
         wrapper = cls(val)
         if getattr(type(wrapper), "snapshot", None) is None:
+            # An embedded struct - lv_scale_t.needles - is not convertible to an
+            # int, so the address has to come from the field itself.
+            if val.type.strip_typedefs().code != gdb.TYPE_CODE_PTR:
+                val = val.address
             return {"addr": hex(int(val)), "type": class_name}
         return wrapper.snapshot().as_dict()
     except (gdb.error, gdb.MemoryError, ImportError, AttributeError, TypeError):

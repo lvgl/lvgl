@@ -101,6 +101,16 @@ class TestDecodeCoord(unittest.TestCase):
         """536871012 is what a widgets-demo screen actually reports for HEIGHT."""
         self.assertEqual(decode_coord(536871012), "100%")
 
+    def test_a_negative_value_whose_type_bits_read_as_spec(self):
+        """LV_COORD_PLAIN() keeps bit 31, so `plain` can exceed the pct range.
+
+        LVGL guards the same way - LV_COORD_IS_PCT() also requires
+        LV_COORD_PLAIN(x) <= LV_PCT_STORED_MAX - and without the guard this
+        comes out as a nonsense percentage rather than the number it is.
+        """
+        raw = ((1 << 31) | SPEC | 100) - (1 << 32)
+        self.assertEqual(decode_coord(raw), str(raw))
+
 
 class TestDecodeEnum(unittest.TestCase):
     def test_plain_enum(self):

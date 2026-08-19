@@ -37,7 +37,7 @@ def safe_collect(
         def collect_xxx(): ...
 
     In decorator mode, exceptions cause a gdb warning and return [].
-    In iteration mode, per-item exceptions are skipped silently.
+    In iteration mode, a failing item is warned about and left out.
     """
     if isinstance(items_or_label, str):
         label = items_or_label
