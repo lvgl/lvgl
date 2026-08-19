@@ -40,15 +40,21 @@ def version_from_sources():
             marker = "/src/"
             if marker not in path:
                 continue
-            header = os.path.join(path[:path.rindex(marker)], "lv_version.h")
-            if not os.path.exists(header):
-                continue
-            with open(header) as f:
-                macros = dict(_VERSION_MACRO.findall(f.read()))
-            if not {"MAJOR", "MINOR", "PATCH"} <= set(macros):
-                continue
-            return (int(macros["MAJOR"]), int(macros["MINOR"]),
-                    int(macros["PATCH"]), macros.get("INFO", '""').strip('"'))
+            root = path[:path.rindex(marker)]
+            # Since 9.6 the public headers live in include/lvgl/ and the
+            # top-level lv_version.h is a deprecated wrapper that only includes
+            # the real one, so the defines are not in it. Read that one first
+            # and keep the top-level file for the releases that still have it.
+            for header in (os.path.join(root, "include", "lvgl", "lv_version.h"),
+                           os.path.join(root, "lv_version.h")):
+                if not os.path.exists(header):
+                    continue
+                with open(header) as f:
+                    macros = dict(_VERSION_MACRO.findall(f.read()))
+                if not {"MAJOR", "MINOR", "PATCH"} <= set(macros):
+                    continue
+                return (int(macros["MAJOR"]), int(macros["MINOR"]),
+                        int(macros["PATCH"]), macros.get("INFO", '""').strip('"'))
         except (gdb.error, OSError, ValueError):
             continue
     return None

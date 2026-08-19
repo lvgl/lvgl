@@ -239,6 +239,37 @@ Subject: type=INT subscribers=2
   Observer: cb=<my_cb> target=0x... for_obj=True
 ```
 
+## Inspect LVGL Version
+
+`info lvgl_version`: Print the LVGL version the target was built from, and the
+version of the plugin itself.
+
+Example:
+
+```text
+(gdb) info lvgl_version
+LVGL:    9.6.0-dev
+lvglgdb: 0.5.0
+```
+
+The version is read from the target rather than from the plugin's own copy of
+LVGL, so it is right even when a newer plugin inspects an older application.
+Three sources are tried in turn, because none of them is available in every
+build:
+
+1. `lv_version_major()` and friends. These are `static inline`, so they only
+   reach the binary if something calls them, which usually nothing does.
+2. The `LVGL_VERSION_*` macros. These need a `-g3` build *and* a stop inside a
+   translation unit that included `lv_version.h`. A breakpoint on
+   `lv_timer_handler` does not qualify, so `-g3` alone is not enough.
+3. `lv_version.h` on disk, located through the DWARF source path of any LVGL
+   symbol. This is the one that usually answers, and it works whenever the
+   sources are still where the compiler found them.
+
+If a field cannot be read it prints as `?`, and if none of the three works the
+command says so instead of guessing. Building with `-g3` and keeping the LVGL
+sources in place is enough to get a full answer.
+
 ## Set LVGL Instance (NuttX)
 
 `lvglobal`: Set which LVGL instance to inspect by finding the `lv_global`

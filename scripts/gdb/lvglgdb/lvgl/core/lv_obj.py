@@ -110,6 +110,29 @@ class LVObject(Value):
             field = self.safe_field(name.lower())
             if field is not None and int(field):
                 value |= bit
+        return value | self._user_flags_mask()
+
+    def _user_flags_mask(self) -> int:
+        """The eight flags 9.6 keeps in spec_attr->user_flags, as a flag mask.
+
+        These have no bitfield of their own, so the rebuild above misses all of
+        them - and LAYOUT_1 is LV_OBJ_FLAG_FLEX_IN_NEW_TRACK, so losing it costs
+        a flex layout its wrapping.
+        """
+        from .lv_obj_flag_consts import OBJ_FLAG_NAMES
+
+        raw = self._get_spec_int("user_flags")
+        if not raw:
+            return 0
+
+        # The order lv_obj_add_flag() writes them in, from bit 0 up.
+        names = ("LAYOUT_1", "LAYOUT_2", "WIDGET_1", "WIDGET_2",
+                 "USER_1", "USER_2", "USER_3", "USER_4")
+        bit_of = {name: bit for bit, name in OBJ_FLAG_NAMES.items()}
+        value = 0
+        for index, name in enumerate(names):
+            if raw & (1 << index) and name in bit_of:
+                value |= bit_of[name]
         return value
 
     @property

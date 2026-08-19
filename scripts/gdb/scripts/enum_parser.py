@@ -53,8 +53,11 @@ def parse_enum(path: Path, enum_type: str, prefix: str,
             name = match.group(1)
             # A comment can start on the same line as the value, and a Doxygen
             # one often runs on to the next; only the expression before it is
-            # the value. LV_EVENT_PREPROCESS = 0x8000 is written that way.
-            expression = re.split(r"//|/\*", match.group(2), maxsplit=1)[0]
+            # the value. LV_EVENT_PREPROCESS = 0x8000 is written that way. A
+            # comment that closes again can also sit between two operands, so
+            # drop those first rather than truncating the expression at one.
+            expression = re.sub(r"/\*.*?\*/", " ", match.group(2))
+            expression = re.split(r"//|/\*", expression, maxsplit=1)[0]
             value = eval_c_expr(expression.rstrip().rstrip(","), known)
             if value is None:
                 # Falling back to the running counter would give this member a
@@ -72,13 +75,17 @@ def parse_enum(path: Path, enum_type: str, prefix: str,
                 continue
             name = match.group(1)
 
+        # A skipped member is still a member: a later one may be written in
+        # terms of it, so it has to be resolvable even though it is left out
+        # of the table.
+        known[name] = current_val
+
         if name in skip:
             current_val += 1
             continue
 
         short = name.removeprefix(prefix)
         entries[current_val] = short
-        known[name] = current_val
         current_val += 1
 
     return entries
