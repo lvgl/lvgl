@@ -791,13 +791,13 @@ void lv_screen_load(struct _lv_obj_t * scr)
     lv_screen_load_anim(scr, LV_SCREEN_LOAD_ANIM_NONE, 0, 0, false);
 }
 
-void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay,
+void lv_screen_load_anim(lv_obj_t * scr, lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay,
                          bool auto_del)
 {
-    lv_display_t * d = lv_obj_get_display(new_scr);
+    lv_display_t * d = lv_obj_get_display(scr);
     lv_obj_t * act_scr = d->act_scr;
 
-    if(act_scr == new_scr || d->scr_to_load == new_scr) {
+    if(act_scr == scr || d->scr_to_load == scr) {
         return;
     }
 
@@ -822,7 +822,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
         }
     }
 
-    d->scr_to_load = new_scr;
+    d->scr_to_load = scr;
 
     if(d->prev_scr && d->del_prev) {
         lv_obj_delete(d->prev_scr);
@@ -833,18 +833,18 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
     d->del_prev = auto_del;
 
     /*Be sure there is no other animation on the screens*/
-    lv_anim_delete(new_scr, NULL);
+    lv_anim_delete(scr, NULL);
     if(act_scr) lv_anim_delete(act_scr, NULL);
 
     /*Be sure both screens are in a normal position*/
-    lv_obj_set_pos(new_scr, 0, 0);
+    lv_obj_set_pos(scr, 0, 0);
     if(act_scr) lv_obj_set_pos(act_scr, 0, 0);
-    lv_obj_remove_local_style_prop(new_scr, LV_STYLE_OPA, 0);
+    lv_obj_remove_local_style_prop(scr, LV_STYLE_OPA, 0);
     if(act_scr) lv_obj_remove_local_style_prop(act_scr, LV_STYLE_OPA, 0);
 
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
-        lv_load_screen_result_t res = load_new_screen(new_scr);
+        lv_load_screen_result_t res = load_new_screen(scr);
         if(res == LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED) {
             return;
         }
@@ -859,7 +859,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     lv_anim_t a_new;
     lv_anim_init(&a_new);
-    lv_anim_set_var(&a_new, new_scr);
+    lv_anim_set_var(&a_new, scr);
     lv_anim_set_start_cb(&a_new, scr_load_anim_start);
     lv_anim_set_completed_cb(&a_new, scr_anim_completed);
     lv_anim_set_duration(&a_new, time);

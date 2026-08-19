@@ -423,11 +423,11 @@ void lv_indev_set_gesture_min_distance(lv_indev_t * indev, uint8_t min_distance)
     indev->gesture_min_distance = min_distance;
 }
 
-void lv_indev_set_gesture_min_velocity(lv_indev_t * indev, uint8_t gesture_min_velocity)
+void lv_indev_set_gesture_min_velocity(lv_indev_t * indev, uint8_t min_velocity)
 {
     if(indev == NULL) return;
 
-    indev->gesture_min_velocity = gesture_min_velocity;
+    indev->gesture_min_velocity = min_velocity;
 }
 
 void * lv_indev_get_user_data(const lv_indev_t * indev)
@@ -1214,9 +1214,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
 /**
  * Process new points from an input device. indev->state.pressed has to be set
- * @param indev pointer to an input device state
- * @param x x coordinate of the next point
- * @param y y coordinate of the next point
+ * @param i pointer to an input device
+ * @param data pointer to the data read from the input device
  */
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
@@ -1487,7 +1486,7 @@ static void indev_proc_press(lv_indev_t * indev)
 
 /**
  * Process the released state of LV_INDEV_TYPE_POINTER input devices
- * @param proc pointer to an input device 'proc'
+ * @param indev pointer to an input device 'proc'
  */
 static void indev_proc_release(lv_indev_t * indev)
 {
@@ -1710,9 +1709,6 @@ static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p)
 }
 
 /**
- * Process a new point from LV_INDEV_TYPE_BUTTON input device
- * @param i pointer to an input device
- * @param data pointer to the data read from the input device
  * Reset input device if a reset query has been sent to it
  * @param indev pointer to an input device
  */
@@ -1752,7 +1748,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 
 /**
  * Handle focus/defocus on click for POINTER input devices
- * @param proc pointer to the state of the indev
+ * @param indev pointer to the state of the indev
  */
 static void indev_click_focus(lv_indev_t * indev)
 {
@@ -1876,7 +1872,7 @@ static void indev_gesture(lv_indev_t * indev)
 
 /**
  * Checks if the reset_query flag has been set. If so, perform necessary global indev cleanup actions
- * @param proc pointer to an input device 'proc'
+ * @param indev pointer to an input device 'proc'
  * @return true if indev query should be immediately truncated.
  */
 static bool indev_reset_check(lv_indev_t * indev)

@@ -949,8 +949,8 @@ static void label_event_cb(lv_event_t * e)
 
 /**
  * Called to blink the cursor
- * @param ta pointer to a text area
- * @param hide 1: hide the cursor, 0: show it
+ * @param obj pointer to a text area
+ * @param show 1: show the cursor, 0: hide it
  */
 static void cursor_blink_anim_cb(void * obj, int32_t show)
 {
@@ -971,7 +971,7 @@ static void cursor_blink_anim_cb(void * obj, int32_t show)
  * Dummy function to animate char hiding in pwd mode.
  * Does nothing, but a function is required in car hiding anim.
  * (pwd_char_hider callback do the real job)
- * @param ta unused
+ * @param obj unused
  * @param x unused
  */
 static void pwd_char_hider_anim(void * obj, int32_t x)
@@ -992,7 +992,7 @@ static void pwd_char_hider_anim_completed(lv_anim_t * a)
 
 /**
  * Hide all characters (convert them to '*')
- * @param ta pointer to text area object
+ * @param obj pointer to text area object
  */
 static void pwd_char_hider(lv_obj_t * obj)
 {
@@ -1026,7 +1026,7 @@ static void pwd_char_hider(lv_obj_t * obj)
 
 /**
  * Test a unicode character if it is accepted or not. Checks max length and accepted char list.
- * @param ta pointer to a test area object
+ * @param obj pointer to a test area object
  * @param c a unicode character
  * @return true: accepted; false: rejected
  */

@@ -359,18 +359,18 @@ void lv_refr_set_disp_refreshing(lv_display_t * disp)
     disp_refr = disp;
 }
 
-void lv_display_refr_timer(lv_timer_t * tmr)
+void lv_display_refr_timer(lv_timer_t * timer)
 {
     LV_PROFILER_REFR_BEGIN;
     LV_TRACE_REFR("begin");
 
-    if(tmr) {
-        disp_refr = tmr->user_data;
+    if(timer) {
+        disp_refr = timer->user_data;
         /* Ensure the timer does not run again automatically.
          * This is done before refreshing in case refreshing invalidates something else.
          * However if the performance monitor is enabled keep the timer running to count the FPS.*/
 #if !LV_USE_PERF_MONITOR
-        lv_timer_pause(tmr);
+        lv_timer_pause(timer);
 #endif
     }
     else {
@@ -1129,8 +1129,8 @@ static void refr_configured_layer(lv_layer_t * layer)
 
 /**
  * Make the refreshing from an object. Draw all its children and the youngers too.
- * @param top_p pointer to an objects. Start the drawing from it.
- * @param mask_p pointer to an area, the objects will be drawn only here
+ * @param layer pointer to the layer to draw into
+ * @param top_obj pointer to an object. Start the drawing from it.
  */
 static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
 {

@@ -536,7 +536,7 @@ void lv_fs_drv_init(lv_fs_drv_t * drv)
     lv_memzero(drv, sizeof(lv_fs_drv_t));
 }
 
-void lv_fs_drv_register(lv_fs_drv_t * drv_p)
+void lv_fs_drv_register(lv_fs_drv_t * drv)
 {
     /*Save the new driver*/
     lv_fs_drv_t ** new_drv;
@@ -544,7 +544,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
     LV_ASSERT_MALLOC(new_drv);
     if(new_drv == NULL) return;
 
-    *new_drv = drv_p;
+    *new_drv = drv;
 }
 
 void lv_fs_remove_drive(char letter)

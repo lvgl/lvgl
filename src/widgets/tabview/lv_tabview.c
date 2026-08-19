@@ -297,14 +297,14 @@ uint32_t lv_tabview_get_tab_count(lv_obj_t * obj)
     return lv_obj_get_child_count_by_type(tab_bar, &lv_button_class);
 }
 
-lv_obj_t * lv_tabview_get_content(lv_obj_t * tv)
+lv_obj_t * lv_tabview_get_content(lv_obj_t * obj)
 {
-    return lv_obj_get_child(tv, 1);
+    return lv_obj_get_child(obj, 1);
 }
 
-lv_obj_t * lv_tabview_get_tab_bar(lv_obj_t * tv)
+lv_obj_t * lv_tabview_get_tab_bar(lv_obj_t * obj)
 {
-    return lv_obj_get_child(tv, 0);
+    return lv_obj_get_child(obj, 0);
 }
 
 lv_dir_t lv_tabview_get_tab_bar_position(lv_obj_t * obj)

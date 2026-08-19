@@ -411,7 +411,8 @@ static int kern_pair_16_compare(const void * ref, const void * element)
  * The compress a glyph's bitmap
  * @param in the compressed bitmap
  * @param out buffer to store the result
- * @param px_num number of pixels in the glyph (width * height)
+ * @param w width of the glyph in pixels
+ * @param h height of the glyph in pixels
  * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
  * @param prefilter true: the lines are XORed
  */
@@ -606,8 +607,8 @@ static inline uint8_t rle_next(void)
  *
  *  Compares the value of both input arguments.
  *
- *  @param[in]  pRef        Pointer to the reference.
- *  @param[in]  pElement    Pointer to the element to compare.
+ *  @param[in]  ref         Pointer to the reference.
+ *  @param[in]  element     Pointer to the element to compare.
  *
  *  @return Result of comparison.
  *  @retval < 0   Reference is less than element.

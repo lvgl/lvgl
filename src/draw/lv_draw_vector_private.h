@@ -128,7 +128,7 @@ typedef struct {
  * @param cb            the callback used to iterate through the task
  * @param user_data     a custom pointer that will be passed to the callback
  */
-void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * used_data);
+void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * user_data);
 
 /**********************
  *      MACROS

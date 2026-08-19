@@ -109,7 +109,6 @@ bool lv_circle_buf_is_full(const lv_circle_buf_t * circle_buf);
 /**
  * Reset the buffer
  * @param circle_buf pointer to buffer
- * @return LV_RESULT_OK: the buffer is reset; LV_RESULT_INVALID: the buffer is not reset
  */
 void lv_circle_buf_reset(lv_circle_buf_t * circle_buf);
 

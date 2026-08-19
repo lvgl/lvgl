@@ -31,19 +31,19 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_grad_init_stops(lv_grad_dsc_t * dsc, const lv_color_t colors[], const lv_opa_t opa[],
+void lv_grad_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const lv_opa_t opa[],
                         const uint8_t fracs[], int num_stops)
 {
     LV_ASSERT(num_stops <= LV_GRADIENT_MAX_STOPS);
     LV_ASSERT(num_stops > 1);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NULL(grad);
     LV_ASSERT_NULL(colors);
 
-    dsc->stops_count = num_stops;
+    grad->stops_count = num_stops;
     for(int i = 0; i < num_stops; i++) {
-        dsc->stops[i].color = colors[i];
-        dsc->stops[i].opa = opa != NULL ? opa[i] : LV_OPA_COVER;
-        dsc->stops[i].frac = fracs != NULL ? fracs[i] : 255 * i / (num_stops - 1);
+        grad->stops[i].color = colors[i];
+        grad->stops[i].opa = opa != NULL ? opa[i] : LV_OPA_COVER;
+        grad->stops[i].frac = fracs != NULL ? fracs[i] : 255 * i / (num_stops - 1);
     }
 }
 

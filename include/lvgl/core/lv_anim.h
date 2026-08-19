@@ -472,12 +472,12 @@ uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_t
 /**
  * Resolve the speed (created with `lv_anim_speed` or `lv_anim_speed_clamped`) to time
  * based on start and end values.
- * @param speed     return values of `lv_anim_speed` or `lv_anim_speed_clamped`
+ * @param speed_or_time return values of `lv_anim_speed` or `lv_anim_speed_clamped`
  * @param start     the start value of the animation
  * @param end       the end value of the animation
  * @return          the time required to get from `start` to `end` with the given `speed` setting
  */
-uint32_t lv_anim_resolve_speed(uint32_t speed, int32_t start, int32_t end);
+uint32_t lv_anim_resolve_speed(uint32_t speed_or_time, int32_t start, int32_t end);
 
 /**
  * Calculate the time of an animation based on its speed, start and end values.

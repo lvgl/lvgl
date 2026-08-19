@@ -824,7 +824,7 @@ static void process_touch_event(lv_indev_touch_data_t * touch, lv_indev_gesture_
 /**
  * Calculate the center point of a gesture, called when there
  * is a probability for the gesture to occur
- * @param touch             a pointer to a touch data structure
+ * @param gesture           a pointer to a touch data structure
  * @param touch_points_nb   The number of contact point to take into account
  */
 static void gesture_update_center_point(lv_indev_gesture_t * gesture, int touch_points_nb)

@@ -1750,8 +1750,8 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
 
 /**
  * Get the nearest index to an X coordinate
- * @param chart pointer to a chart object
- * @param coord the coordination of the point relative to the series area.
+ * @param obj   pointer to a chart object
+ * @param x     the coordination of the point relative to the series area.
  * @return the found index
  */
 static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x)

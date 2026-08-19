@@ -70,35 +70,35 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * parent);
 
 /**
  * Assign a text area to the keyboard. Pressed characters will be inserted there.
- * @param kb        pointer to a keyboard object
+ * @param obj       pointer to a keyboard object
  * @param ta        pointer to a text area object to write into
  */
-void lv_keyboard_set_textarea(lv_obj_t * kb, lv_obj_t * ta);
+void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta);
 
 /**
  * Set a new mode (e.g., text, number, special characters).
- * @param kb        pointer to a keyboard object
+ * @param obj       pointer to a keyboard object
  * @param mode      the desired mode (see 'lv_keyboard_mode_t')
  */
-void lv_keyboard_set_mode(lv_obj_t * kb, lv_keyboard_mode_t mode);
+void lv_keyboard_set_mode(lv_obj_t * obj, lv_keyboard_mode_t mode);
 
 /**
  * Enable or disable popovers showing button titles on press.
- * @param kb        pointer to a keyboard object
+ * @param obj       pointer to a keyboard object
  * @param en        true to enable popovers; false to disable
  */
-void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
+void lv_keyboard_set_popovers(lv_obj_t * obj, bool en);
 
 /**
  * Set a custom button map for the keyboard.
- * @param kb        pointer to a keyboard object
+ * @param obj       pointer to a keyboard object
  * @param mode      the mode to assign the new map to (see 'lv_keyboard_mode_t')
  * @param map       pointer to a string array describing the button map
  *                  see 'lv_buttonmatrix_set_map()' for more details
  * @param ctrl_map  pointer to the control map. See 'lv_buttonmatrix_set_ctrl_map()'
 
  */
-void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * const map[],
+void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * const map[],
                          const lv_buttonmatrix_ctrl_t ctrl_map[]);
 
 /*=====================
@@ -107,17 +107,17 @@ void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * co
 
 /**
  * Get the text area currently assigned to the keyboard.
- * @param kb        pointer to a keyboard object
+ * @param obj       pointer to a keyboard object
  * @return          pointer to the assigned text area object
  */
-lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * kb);
+lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * obj);
 
 /**
  * Get the current mode of the keyboard.
- * @param kb        pointer to a keyboard object
+ * @param obj       pointer to a keyboard object
  * @return          the current mode (see 'lv_keyboard_mode_t')
  */
-lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * kb);
+lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj);
 
 /**
  * Check whether popovers are enabled on the keyboard.

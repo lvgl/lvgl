@@ -273,7 +273,7 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
  * Set the frame buffers for a display, similarly to `lv_display_set_buffers`, but allow
  * for a custom stride as required by a display controller.
  * This allows the frame buffers to have a stride alignment different from the rest of
- * the buffers`
+ * the buffers.
  * @param disp              pointer to a display
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)

@@ -2501,11 +2501,11 @@ lv_svg_render_obj_t * lv_svg_render_create(const lv_svg_node_t * svg_doc)
     return state.list;
 }
 
-void lv_svg_render_delete(lv_svg_render_obj_t * list)
+void lv_svg_render_delete(lv_svg_render_obj_t * render)
 {
-    while(list) {
-        lv_svg_render_obj_t * obj = list;
-        list = list->next;
+    while(render) {
+        lv_svg_render_obj_t * obj = render;
+        render = render->next;
 
         _deinit_draw_dsc(&(obj->dsc));
 

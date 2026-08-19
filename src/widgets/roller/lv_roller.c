@@ -41,9 +41,9 @@ static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e
 static void draw_main(lv_event_t * e);
 static void draw_label(lv_event_t * e);
 static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area);
-static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
+static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en);
 static lv_result_t release_handler(lv_obj_t * obj);
-static void inf_normalize(lv_obj_t * obj_scrl);
+static void inf_normalize(lv_obj_t * obj);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 static int32_t get_selected_label_width(const lv_obj_t * obj);
 static void scroll_anim_completed_cb(lv_anim_t * a);
@@ -279,7 +279,7 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
 
 /**
  * Get the options of a roller
- * @param roller pointer to roller object
+ * @param obj    pointer to roller object
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
 const char * lv_roller_get_options(const lv_obj_t * obj)
@@ -698,7 +698,7 @@ static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area)
 
 /**
  * Refresh the position of the roller. It uses the id stored in: roller->ddlist.selected_option_id
- * @param roller pointer to a roller object
+ * @param obj    pointer to a roller object
  * @param anim_en LV_ANIM_ON: refresh with animation; LV_ANIM_OFF: without animation
  */
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
@@ -849,7 +849,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
 
 /**
  * Set the middle page for the roller if infinite is enabled
- * @param roller pointer to a roller object
+ * @param obj    pointer to a roller object
  */
 static void inf_normalize(lv_obj_t * obj)
 {

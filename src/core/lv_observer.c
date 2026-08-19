@@ -414,23 +414,23 @@ void lv_subject_deinit(lv_subject_t * subject)
     lv_ll_clear(&subject->subs_ll);
 }
 
-lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data)
+lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t observer_cb, void * user_data)
 {
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(cb != NULL, return NULL);
+    LV_CHECK_ARG(observer_cb != NULL, return NULL);
 
-    lv_observer_t * observer = lv_subject_add_observer_obj(subject, cb, NULL, user_data);
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, observer_cb, NULL, user_data);
     if(observer == NULL) return NULL;
 
     observer->for_obj = 0;
     return observer;
 }
 
-lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t cb, lv_obj_t * obj,
+lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t observer_cb, lv_obj_t * obj,
                                             void * user_data)
 {
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(cb != NULL, return NULL);
+    LV_CHECK_ARG(observer_cb != NULL, return NULL);
     LV_CHECK_ARG(subject->type != LV_SUBJECT_TYPE_INVALID, return NULL);
 
     lv_observer_t * observer = lv_ll_ins_tail(&(subject->subs_ll));
@@ -440,7 +440,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     lv_memzero(observer, sizeof(*observer));
 
     observer->subject = subject;
-    observer->cb = cb;
+    observer->cb = observer_cb;
     observer->user_data = user_data;
     observer->target = obj;
     observer->for_obj = 1;
@@ -455,11 +455,11 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     return observer;
 }
 
-lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t cb, void * target,
+lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t observer_cb, void * target,
                                                     void * user_data)
 {
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(cb != NULL, return NULL);
+    LV_CHECK_ARG(observer_cb != NULL, return NULL);
     LV_CHECK_ARG(subject->type != LV_SUBJECT_TYPE_INVALID, return NULL);
 
     lv_observer_t * observer = lv_ll_ins_tail(&(subject->subs_ll));
@@ -469,7 +469,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     lv_memzero(observer, sizeof(*observer));
 
     observer->subject = subject;
-    observer->cb = cb;
+    observer->cb = observer_cb;
     observer->user_data = user_data;
     observer->target = target;
 

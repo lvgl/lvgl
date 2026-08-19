@@ -117,15 +117,15 @@ lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj);
 
 /**
  * Close a message box
- * @param mbox           pointer to a message box
+ * @param obj            pointer to a message box
  */
-void lv_msgbox_close(lv_obj_t * mbox);
+void lv_msgbox_close(lv_obj_t * obj);
 
 /**
  * Close a message box in the next call of the message box
- * @param mbox           pointer to a message box
+ * @param obj            pointer to a message box
  */
-void lv_msgbox_close_async(lv_obj_t * mbox);
+void lv_msgbox_close_async(lv_obj_t * obj);
 
 /**********************
  *      MACROS

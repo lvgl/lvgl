@@ -1271,7 +1271,7 @@ static lv_result_t btn_release_handler(lv_obj_t * obj)
 
 /**
  * Called when a drop down list is released to open it or set new option
- * @param list pointer to the drop down list's list
+ * @param list_obj pointer to the drop down list's list
  * @return LV_RESULT_INVALID if the list is not being deleted in the user callback. Else LV_RESULT_OK
  */
 static lv_result_t list_release_handler(lv_obj_t * list_obj)
@@ -1347,7 +1347,8 @@ static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y)
 
 /**
  * Set the position of list when it is closed to show the selected item
- * @param ddlist pointer to a drop down list
+ * @param dropdown_obj pointer to a drop down list
+ * @param anim_en whether to animate the position change
  */
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en)
 {

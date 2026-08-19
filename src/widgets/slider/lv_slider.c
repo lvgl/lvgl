@@ -155,9 +155,9 @@ void lv_slider_set_min_value(lv_obj_t * obj, int32_t min)
     lv_bar_set_min_value(obj, min);
 }
 
-void lv_slider_set_max_value(lv_obj_t * obj, int32_t min)
+void lv_slider_set_max_value(lv_obj_t * obj, int32_t max)
 {
-    lv_bar_set_max_value(obj, min);
+    lv_bar_set_max_value(obj, max);
 }
 
 void lv_slider_set_mode(lv_obj_t * obj, lv_slider_mode_t mode)
@@ -198,9 +198,9 @@ lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider)
     else return LV_SLIDER_MODE_NORMAL;
 }
 
-lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * slider)
+lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * obj)
 {
-    lv_bar_orientation_t ori = lv_bar_get_orientation(slider);
+    lv_bar_orientation_t ori = lv_bar_get_orientation(obj);
     if(ori == LV_BAR_ORIENTATION_HORIZONTAL) return LV_SLIDER_ORIENTATION_HORIZONTAL;
     else if(ori == LV_BAR_ORIENTATION_VERTICAL) return LV_SLIDER_ORIENTATION_VERTICAL;
     else return LV_SLIDER_ORIENTATION_AUTO;
