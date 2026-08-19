@@ -60,23 +60,29 @@ void lv_anim_timeline_delete(lv_anim_timeline_t * at);
 void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv_anim_t * a);
 
 /**
- * Start the animation timeline from the beginning. Reset it if needed.
+ * Start the animation timeline. It plays from where the timeline currently is:
+ * from the beginning, or from the point set by `lv_anim_timeline_set_progress()`.
  * @param at    pointer to the animation timeline.
- * @return      total playtime of the animation.
+ * @return      total time spent in animation timeline.
+ * @note 		`delay` is applied only if the animation is at very beginning or very end (not midway)
+ * @note 		if `reverse` was set it plays backwards.
  */
 uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at);
+
+/**
+ * Play the animation timeline from the beginning, whatever state it was left in.
+ * Same as rewinding with `lv_anim_timeline_set_progress()` and starting it.
+ *
+ * @param at    pointer to the animation timeline.
+ * @return      total time spent in animation timeline.
+ */
+uint32_t lv_anim_timeline_restart(lv_anim_timeline_t * at);
 
 /**
  * Pause the animation timeline.
  * @param at    pointer to the animation timeline.
  */
 void lv_anim_timeline_pause(lv_anim_timeline_t * at);
-
-/**
- * Resume a paused timeline.
- * @param at    pointer to the animation timeline.
- */
-void lv_anim_timeline_resume(lv_anim_timeline_t * at);
 
 /**
  * Set the playback direction of the animation timeline.

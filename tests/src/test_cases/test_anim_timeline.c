@@ -637,8 +637,8 @@ void test_anim_timeline_restart_while_running(void)
     lv_test_wait(400);
     TEST_ASSERT_EQUAL(399, lv_obj_get_x(obj));
 
-    /*Starting again plays from the beginning, not from where it was*/
-    lv_anim_timeline_start(anim_timeline);
+    /*Restarting plays from the beginning, not from where it was*/
+    lv_anim_timeline_restart(anim_timeline);
     lv_refr_now(NULL);
     TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
 
@@ -671,7 +671,7 @@ void test_anim_timeline_restart_keeps_the_whole_range_on_repeat(void)
     /*Restart in the middle. Every later repeat still has to sweep 0..1000;
      *capturing the range from the current time truncated it forever.*/
     lv_test_wait(400);
-    lv_anim_timeline_start(anim_timeline);
+    lv_anim_timeline_restart(anim_timeline);
     lv_refr_now(NULL);
 
     lv_test_wait(1000);   /*end of the first cycle, the second begins*/
@@ -683,7 +683,7 @@ void test_anim_timeline_restart_keeps_the_whole_range_on_repeat(void)
     TEST_ASSERT_EQUAL(399, lv_obj_get_x(obj));
 }
 
-void test_anim_timeline_pause_and_resume(void)
+void test_anim_timeline_pause_and_continue(void)
 {
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 100);
@@ -708,9 +708,41 @@ void test_anim_timeline_pause_and_resume(void)
     lv_test_wait(500);
     TEST_ASSERT_EQUAL(299, lv_obj_get_x(obj));
 
-    lv_anim_timeline_resume(anim_timeline);
+    /*The position is kept, so starting it continues from there*/
+    lv_anim_timeline_start(anim_timeline);
     lv_test_wait(300);
     TEST_ASSERT_EQUAL(599, lv_obj_get_x(obj));
+}
+
+void test_anim_timeline_start_plays_from_the_set_progress(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(obj, 100, 100);
+    lv_obj_set_pos(obj, 30, 40);
+
+    lv_anim_t a1;
+    lv_anim_init(&a1);
+    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_var(&a1, obj);
+    lv_anim_set_values(&a1, 0, 1000);
+    lv_anim_set_duration(&a1, 1000);
+
+    anim_timeline = lv_anim_timeline_create();
+    lv_anim_timeline_add(anim_timeline, 0, &a1);
+
+    /*Seek, then play on from there. `restart` would rewind to the beginning.*/
+    lv_anim_timeline_set_progress(anim_timeline, 32768);
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL(500, lv_obj_get_x(obj));
+
+    lv_anim_timeline_start(anim_timeline);
+    lv_refr_now(NULL);
+
+    lv_test_wait(300);
+    TEST_ASSERT_EQUAL(799, lv_obj_get_x(obj));
+
+    lv_test_wait(200);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
 }
 
 #endif

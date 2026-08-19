@@ -2013,9 +2013,9 @@ static void play_timeline_on_trigger_event_cb(lv_event_t * e)
 
     lv_anim_timeline_set_delay(dsc->at, dsc->delay);
     lv_anim_timeline_set_reverse(dsc->at, dsc->reverse);
-    lv_anim_timeline_start(dsc->at);
-
+    lv_anim_timeline_restart(dsc->at);
 }
+
 
 
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e)

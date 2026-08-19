@@ -74,64 +74,61 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
 {
     LV_CHECK_ARG(at != NULL, return 0);
 
-    for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
-        at->anim_dsc[i].is_started   = 0;
-        at->anim_dsc[i].is_completed = 0;
+    uint32_t playtime = lv_anim_timeline_get_playtime(at);
+
+    if((!at->reverse && at->act_time == 0) || (at->reverse && at->act_time == playtime)) {
+        for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
+            at->anim_dsc[i].is_started   = 0;
+            at->anim_dsc[i].is_completed = 0;
+        }
     }
 
-    uint32_t playtime = lv_anim_timeline_get_playtime(at);
-    at->act_time = 0;
-
-    /*Start an animation going from 0 to `playtime` in `playtime` ms.
-     *That it just sweep through the playtime*/
+    /*Always animate the whole 0..playtime range in `playtime` ms and seek into it if
+     *the timeline is not at its beginning. Starting the animation at `act_time`
+     *instead would shorten it, and as a repeat replays the same values, every later
+     *repeat would keep playing only that remaining part.*/
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, at);
     lv_anim_set_exec_cb(&a, anim_timeline_exec_cb);
-    if(at->reverse) {
-        lv_anim_set_values(&a, playtime, 0);
-        at->act_time = playtime;
-    }
-    else {
-        lv_anim_set_values(&a, 0, playtime);
-        at->act_time = 0;
-    }
+    if(at->reverse) lv_anim_set_values(&a, playtime, 0);
+    else lv_anim_set_values(&a, 0, playtime);
 
     lv_anim_set_duration(&a, playtime);
-    lv_anim_set_delay(&a, at->delay);
     lv_anim_set_path_cb(&a, anim_timeline_path_cb);
     lv_anim_set_repeat_count(&a, at->repeat_count);
-    lv_anim_set_repeat_delay(&a,  at->repeat_delay);
+    lv_anim_set_repeat_delay(&a, at->repeat_delay);
+
+    /*How much of the timeline has already played. A reversed one counts from its end.*/
+    uint32_t elapsed = at->reverse ? playtime - at->act_time : at->act_time;
+    if(elapsed == 0) {
+        /*Apply the delay only if playing from any ends*/
+        lv_anim_set_delay(&a, at->delay);
+    }
+    else {
+        /*`lv_anim_set_delay()` writes act_time as well, so seek after it*/
+        a.act_time = (int32_t)elapsed;
+    }
+
     lv_anim_start(&a);
 
     return playtime;
+}
+
+uint32_t lv_anim_timeline_restart(lv_anim_timeline_t * at)
+{
+    LV_CHECK_ARG(at != NULL, return 0);
+
+    lv_anim_timeline_set_progress(at, at->reverse ? LV_ANIM_TIMELINE_PROGRESS_MAX : 0);
+    return lv_anim_timeline_start(at);
 }
 
 void lv_anim_timeline_pause(lv_anim_timeline_t * at)
 {
     LV_CHECK_ARG(at != NULL, return);
 
-    lv_anim_t * a = lv_anim_get(at, anim_timeline_exec_cb);
-    if(a == NULL) {
-        LV_LOG_WARN("The timeline is not running so it can't be paused");
-    }
-    else {
-        lv_anim_pause(a);
-    }
+    lv_anim_delete(at, anim_timeline_exec_cb);
 }
-
-void lv_anim_timeline_resume(lv_anim_timeline_t * at)
-{
-    LV_CHECK_ARG(at != NULL, return);
-    lv_anim_t * a = lv_anim_get(at, anim_timeline_exec_cb);
-    if(a == NULL) {
-        LV_LOG_WARN("The timeline is not running so it can't be resumed");
-    }
-    else {
-        lv_anim_resume(a);
-    }
-}
-
 
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)
 {
