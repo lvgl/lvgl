@@ -26,12 +26,12 @@ class LVQrcode(LVCanvas):
 
     @property
     def data(self):
-        """Copy of the payload; strings are stored with their trailing NUL, binary as-is"""
+        """Copy of the payload, kept so the bitmap can be re-encoded on a property change"""
         return ptr_or_none(self._wv.safe_field("data"))
 
     @property
     def data_len(self):
-        """Stored length in bytes (a string includes its NUL terminator)"""
+        """Stored payload length in bytes"""
         return int(self._wv.safe_field("data_len", 0))
 
     @property
@@ -40,18 +40,18 @@ class LVQrcode(LVCanvas):
         return int(self._wv.safe_field("quiet_zone", 0))
 
     @property
-    def auto_update(self):
-        """Regenerate the bitmap right away on every change (default: true)"""
-        return int(self._wv.safe_field("auto_update", 0))
+    def update_mode(self):
+        """lv_qrcode_update_mode_t: when a property change is re-encoded"""
+        return int(self._wv.safe_field("update_mode", 0))
 
     @property
     def needs_update(self):
-        """The bitmap is out of date and must be regenerated (manual mode only)"""
+        """The bitmap is out of date; re-encoded on the next redraw (deferred mode)"""
         return int(self._wv.safe_field("needs_update", 0))
 
     @property
     def render_failed(self):
-        """The last bitmap generation failed (or none has run yet)"""
+        """The last encode attempt failed (or none has run yet)"""
         return int(self._wv.safe_field("render_failed", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
@@ -63,7 +63,7 @@ class LVQrcode(LVCanvas):
         d["data"] = self.data
         d["data_len"] = self.data_len
         d["quiet_zone"] = self.quiet_zone
-        d["auto_update"] = self.auto_update
+        d["update_mode"] = self.update_mode
         d["needs_update"] = self.needs_update
         d["render_failed"] = self.render_failed
         s['widget_data'] = d

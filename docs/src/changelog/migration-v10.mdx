@@ -388,34 +388,26 @@ if you need finer control.
 
 ### lv_qrcode
 
-- Data setting and bitmap generation are now separate steps, and the data setters
-  changed signature. `lv_qrcode_set_data()` keeps taking a string (source
-  compatible), and a new `lv_qrcode_set_data_binary()` takes a buffer and length.
-  `lv_qrcode_update()` no longer takes the data; it regenerates the bitmap from the
-  stored data (and is a no-op when nothing changed and the last generation
-  succeeded).
+- No API change, but a behavioral one: `lv_qrcode_set_size()` and
+  `lv_qrcode_set_quiet_zone()` now re-encode the QR code, and the colors are
+  re-applied, when they are called *after* the data. Previously such a change was
+  silently dropped and the widget kept showing the bitmap produced by
+  `lv_qrcode_update()` / `lv_qrcode_set_data()`. The properties may now be set in
+  any order.
 
-  ```c
-  /* Before */
-  lv_qrcode_update(qr, data, data_len);
+  To make this possible the widget keeps a copy of the payload, which costs
+  `data_len` bytes per QR code object.
 
-  /* After */
-  lv_qrcode_set_data_binary(qr, data, data_len);
-  /* set_data_binary auto-regenerates by default. If you disabled auto updating
-   * with lv_qrcode_set_auto_update(qr, false), also call: */
-  lv_qrcode_update(qr);
-  ```
+- New: `lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_DEFERRED)` collapses
+  several property changes into a single re-encode on the next redraw. The default,
+  `LV_QRCODE_UPDATE_MODE_IMMEDIATE`, re-encodes inside the setter.
 
-- Setting the data, size, or quiet zone now regenerates the bitmap regardless of
-  order (previously changing size/quiet zone after the data had no effect). Use
-  `lv_qrcode_set_auto_update(qr, false)` + `lv_qrcode_update()` to batch changes
-  into a single regeneration.
+- New: `lv_qrcode_render()` re-encodes the stored payload without taking it as an
+  argument, which is how property changes made in the deferred update mode are applied.
 
-- Caveat for binary payloads: strings and binary data share one buffer and are
-  told apart by a heuristic (a string ends with a NUL and contains no other NUL).
-  A binary payload whose only NUL is its final byte is treated as a string, so
-  that trailing NUL is not encoded. If you encode binary data that can end in a
-  single NUL, append your own sentinel or otherwise avoid a lone trailing NUL.
+- New: `lv_qrcode_get_render_failed()` reports whether the last encode failed, for the
+  re-encodes whose result cannot be returned (the void property setters, and the
+  deferred re-encode done by the draw pass).
 
 ### lv_span
 
