@@ -132,7 +132,10 @@ void test_qoi_small_image(void)
 
     lv_image_decoder_close(&decoder_dsc);
 
-    /* Also test rendering by checking the pixel color directly */
+    /* Also test rendering by checking the pixel color directly. */
+    /* Single-buffered display: active buffer holds the fresh frame. */
+    /* Pixel readback needs 32-bit XRGB8888/ARGB8888 layout. */
+#if LV_COLOR_DEPTH == 32
     lv_obj_clean(lv_screen_active());
 
     lv_obj_t * img = lv_image_create(lv_screen_active());
@@ -147,28 +150,33 @@ void test_qoi_small_image(void)
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
     TEST_ASSERT_NOT_NULL(draw_buf);
 
+    /* Verify buffer format is 32-bit so pixel reads are valid. */
+    lv_color_format_t cf = draw_buf->header.cf;
+    TEST_ASSERT_TRUE(cf == LV_COLOR_FORMAT_XRGB8888 || cf == LV_COLOR_FORMAT_ARGB8888);
+
     /* The 1x1 image is centered on the 800x480 test display */
     int32_t cx = lv_display_get_horizontal_resolution(NULL) / 2;
     int32_t cy = lv_display_get_vertical_resolution(NULL) / 2;
 
-    uint32_t stride = draw_buf->header.stride;
-    lv_color32_t * px_center = (lv_color32_t *)((uint8_t *)draw_buf->data + cy * stride + cx * sizeof(lv_color32_t));
-    lv_color32_t * px_left   = (lv_color32_t *)((uint8_t *)draw_buf->data + cy * stride + (cx - 1) * sizeof(lv_color32_t));
-    lv_color32_t * px_right  = (lv_color32_t *)((uint8_t *)draw_buf->data + cy * stride + (cx + 1) * sizeof(lv_color32_t));
-    lv_color32_t * px_up     = (lv_color32_t *)((uint8_t *)draw_buf->data + (cy - 1) * stride + cx * sizeof(lv_color32_t));
-    lv_color32_t * px_down   = (lv_color32_t *)((uint8_t *)draw_buf->data + (cy + 1) * stride + cx * sizeof(lv_color32_t));
+    /* Use bounds-checked lv_draw_buf_goto_xy() instead of raw pointer math. */
+    lv_color32_t * px_center = (lv_color32_t *)lv_draw_buf_goto_xy(draw_buf, (uint32_t)cx, (uint32_t)cy);
+    lv_color32_t * px_left   = (lv_color32_t *)lv_draw_buf_goto_xy(draw_buf, (uint32_t)(cx - 1), (uint32_t)cy);
+    lv_color32_t * px_right  = (lv_color32_t *)lv_draw_buf_goto_xy(draw_buf, (uint32_t)(cx + 1), (uint32_t)cy);
+    lv_color32_t * px_up     = (lv_color32_t *)lv_draw_buf_goto_xy(draw_buf, (uint32_t)cx, (uint32_t)(cy - 1));
+    lv_color32_t * px_down   = (lv_color32_t *)lv_draw_buf_goto_xy(draw_buf, (uint32_t)cx, (uint32_t)(cy + 1));
 
-    /* The 1x1 QOI test image is red (R=255, G=0, B=0).
-     * Allow a tolerance for renderer-specific color conversion (e.g. NanoVG
-     * applies color space transforms that can shift channel values). */
+    TEST_ASSERT_NOT_NULL(px_center);
+    TEST_ASSERT_NOT_NULL(px_left);
+    TEST_ASSERT_NOT_NULL(px_right);
+    TEST_ASSERT_NOT_NULL(px_up);
+    TEST_ASSERT_NOT_NULL(px_down);
+
+    /* 1x1 QOI image is red; allow renderer color-conversion tolerance. */
     TEST_ASSERT_UINT8_WITHIN(32, 0xFF, px_center->red);
     TEST_ASSERT_UINT8_WITHIN(32, 0x00, px_center->green);
     TEST_ASSERT_UINT8_WITHIN(32, 0x00, px_center->blue);
 
-    /* Neighbors are the background (not the image). The red image pixel has
-     * green and blue near 0, while the background is white/gray with all
-     * channels near each other. Check that neighbor green/blue are not near 0,
-     * which distinguishes background pixels from the red image pixel. */
+    /* Neighbors are background: green/blue > 100 distinguishes from red image. */
     TEST_ASSERT_TRUE(px_left->green > 100);
     TEST_ASSERT_TRUE(px_left->blue > 100);
 
@@ -180,6 +188,9 @@ void test_qoi_small_image(void)
 
     TEST_ASSERT_TRUE(px_down->green > 100);
     TEST_ASSERT_TRUE(px_down->blue > 100);
+#else
+    TEST_IGNORE_MESSAGE("Pixel readback requires LV_COLOR_DEPTH 32");
+#endif /* LV_COLOR_DEPTH == 32 */
 }
 
 void test_qoi_large_image(void)
