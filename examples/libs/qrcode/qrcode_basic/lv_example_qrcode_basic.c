@@ -32,7 +32,7 @@ void lv_example_qrcode_basic(void)
     lv_qrcode_set_size(qrcode, 150);
     lv_qrcode_set_dark_color(qrcode, QR_DARK);
     lv_qrcode_set_light_color(qrcode, QR_LIGHT);
-    lv_qrcode_set_data(qrcode, "https://lvgl.io");
+    lv_qrcode_set_text(qrcode, "https://lvgl.io");
     lv_qrcode_set_quiet_zone(qrcode, true);
     lv_obj_set_style_border_color(qrcode, QR_DARK, 0);
     lv_obj_set_style_border_width(qrcode, 4, 0);
