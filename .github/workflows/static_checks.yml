@@ -147,6 +147,37 @@ jobs:
         run: python scripts/static_checks/check_lv_types.py
 
       # ------------------------------------------------------------------
+      # Nothing in the public API may change unnoticed.
+      #
+      # Compares the declared signatures, enum members, struct fields and
+      # typedefs against the merge base and fails on a source-breaking change.
+      # Additions pass.
+      # ------------------------------------------------------------------
+      - name: "Check: public API has no breaking change"
+        id: api-diff
+        continue-on-error: true
+        run: |
+          set -eu
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_REF="${{ github.base_ref }}"
+          else
+            BASE_REF="master"
+          fi
+
+          git fetch --no-tags --quiet origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          if ! git rev-parse --verify --quiet "origin/$BASE_REF" >/dev/null; then
+            echo "origin/$BASE_REF not available, nothing to compare against"
+            exit 0
+          fi
+
+          rm -rf /tmp/lvgl-base
+          git worktree add --detach --force /tmp/lvgl-base "origin/$BASE_REF" >/dev/null
+          echo "base: $BASE_REF @ $(git rev-parse --short origin/$BASE_REF)"
+          mkdir -p reports
+          python scripts/static_checks/check_api_diff.py compare \
+            --root . --base /tmp/lvgl-base --report reports/api.json
+
+      # ------------------------------------------------------------------
       # Final gate – fail the job if any step above failed.
       # This gives us full output from every check before failing.
       # ------------------------------------------------------------------
@@ -160,6 +191,7 @@ jobs:
           steps.deprecated.outcome            == 'failure' ||
           steps.lv_types.outcome              == 'failure' ||
           steps.arg-checks.outcome            == 'failure' ||
+          steps.api-diff.outcome              == 'failure'
         run: |
           echo "Policy check results:"
           echo "---------------------"
@@ -181,6 +213,7 @@ jobs:
           print_result "deprecated"            "${{ steps.deprecated.outcome }}"
           print_result "lv_types"              "${{ steps.lv_types.outcome }}"
           print_result "arg-checks"            "${{ steps.arg-checks.outcome }}"
+          print_result "api-diff"              "${{ steps.api-diff.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."
@@ -204,6 +237,7 @@ jobs:
           add deprecated            "${{ steps.deprecated.outcome }}"
           add lv_types              "${{ steps.lv_types.outcome }}"
           add arg-checks            "${{ steps.arg-checks.outcome }}"
+          add api-diff              "${{ steps.api-diff.outcome }}"
 
           if [ -z "$failed" ]; then
             python3 scripts/pr_report/pr_report.py emit \
