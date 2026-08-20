@@ -80,9 +80,9 @@ void lv_translation_deinit(void)
 lv_translation_pack_t * lv_translation_add_static(const char * const languages[], const char * const tags[],
                                                   const char * const translations[])
 {
-    LV_ASSERT_NULL(languages);
-    LV_ASSERT_NULL(tags);
-    LV_ASSERT_NULL(translations);
+    LV_CHECK_ARG(languages != NULL, return NULL);
+    LV_CHECK_ARG(tags != NULL, return NULL);
+    LV_CHECK_ARG(translations != NULL, return NULL);
 
     lv_translation_pack_t * pack = lv_ll_ins_head(&packs_ll);
     LV_ASSERT_MALLOC(pack);
