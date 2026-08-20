@@ -201,13 +201,13 @@ void lv_sdl_quit(void)
 
 void lv_sdl_backend_set_display_data(lv_display_t * display, void * backend_display_data)
 {
-    LV_ASSERT_NULL(display);
+    LV_CHECK_ARG(display != NULL, return);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(display);
     dsc->backend_data = backend_display_data;
 }
 void * lv_sdl_backend_get_display_data(lv_display_t * display)
 {
-    LV_ASSERT_NULL(display);
+    LV_CHECK_ARG(display != NULL, return NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(display);
     return dsc->backend_data;
 }
@@ -215,17 +215,17 @@ void * lv_sdl_backend_get_display_data(lv_display_t * display)
 int32_t lv_sdl_window_get_horizontal_resolution(lv_display_t * display)
 {
     /* Private function, fine to assert here*/
-    LV_ASSERT_NULL(display);
+    LV_CHECK_ARG(display != NULL, return 0);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(display);
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return 0);
     return (int32_t)((float)(display->hor_res) * dsc->zoom);
 }
 int32_t lv_sdl_window_get_vertical_resolution(lv_display_t * display)
 {
     /* Private function, fine to assert here*/
-    LV_ASSERT_NULL(display);
+    LV_CHECK_ARG(display != NULL, return 0);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(display);
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return 0);
     return (int32_t)((float)(display->ver_res) * dsc->zoom);
 }
 
