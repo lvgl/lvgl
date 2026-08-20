@@ -774,7 +774,7 @@ void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 /**
  * Set an id for an object.
  * @param obj   pointer to an object
- * @param id    the id of the object
+ * @param id    the id of the object @nullable. When NULL any previous id is dropped.
  */
 void lv_obj_set_id(lv_obj_t * obj, void * id);
 
@@ -793,7 +793,8 @@ void * lv_obj_get_id(const lv_obj_t * obj);
  *
  * @deprecated IDs are used only to print the widget trees. To find a widget use `lv_obj_find_by_name`
  *
- * @param obj       pointer to an object
+ * @param obj       pointer to an object @nullable. When NULL the active screen is
+ *                  searched.
  * @param id        the id of the child object
  * @return          pointer to the child object or NULL if not found
  */
@@ -826,8 +827,8 @@ void lv_obj_free_id(lv_obj_t * obj);
  * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method for compare.
  * Otherwise, it must be implemented externally.
  *
- * @param id1: the first id
- * @param id2: the second id
+ * @param id1: the first id @nullable
+ * @param id2: the second id @nullable
  * @return     0 if they are equal, non-zero otherwise.
  */
 int lv_obj_id_compare(const void * id1, const void * id2);
