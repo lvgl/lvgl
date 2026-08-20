@@ -124,6 +124,8 @@ lv_display_t * lv_linux_fbdev_create(void)
 
 lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 {
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(file != NULL, return LV_RESULT_INVALID);
     char * devname = lv_strdup(file);
     LV_ASSERT_MALLOC(devname);
     if(devname == NULL) {
@@ -258,6 +260,7 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
 void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->force_refresh = enabled;
 }

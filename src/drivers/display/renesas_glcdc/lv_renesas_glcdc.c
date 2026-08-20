@@ -97,6 +97,7 @@ lv_display_t * lv_renesas_glcdc_direct_create(void)
 
 lv_display_t * lv_renesas_glcdc_partial_create(void * buf1, void * buf2, size_t buf_size)
 {
+    LV_CHECK_ARG(buf1 != NULL, return NULL);
     partial_buffer_size = buf_size;
     return glcdc_create(buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 }
