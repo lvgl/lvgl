@@ -7,7 +7,7 @@
  * Unlike `shadow_*` (always a rectangle), `drop_shadow_*` blurs the actual
  * shape of the part. Added to `LV_PART_INDICATOR`, the active arc gets a
  * red shadow with `drop_shadow_radius = 16` and an offset of (5, 10) that
- * follows the curve. `drop_shadow_*` has no XML attribute yet, so this is C.
+ * follows the curve.
  */
 void lv_example_style_drop_shadow(void)
 {
