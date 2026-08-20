@@ -162,10 +162,7 @@ void lv_opengles_texture_deinit(lv_opengles_texture_t * texture)
 
 unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)
 {
-    if(!disp) {
-        LV_LOG_ERROR("Invalid display");
-        return 0;
-    }
+    LV_CHECK_ARG(disp != NULL, return 0);
     return (unsigned int)(lv_uintptr_t)disp->layer_head->user_data;
 }
 lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id)

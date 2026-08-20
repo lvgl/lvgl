@@ -100,7 +100,8 @@ static lv_ll_t glfw_window_ll;
 lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev,
                                                          bool h_flip, bool v_flip,  const char * title)
 {
-    LV_ASSERT_NULL(title);
+    LV_CHECK_ARG(title != NULL, return NULL);
+
     if(lv_glfw_init() != 0) {
         LV_LOG_ERROR("Failed to init glfw");
         return NULL;
@@ -342,6 +343,7 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
 
 lv_opengles_window_texture_t * lv_opengles_window_display_get_window_texture(lv_display_t * window_display)
 {
+    LV_CHECK_ARG(window_display != NULL, return NULL);
     return lv_display_get_driver_data(window_display);
 }
 
