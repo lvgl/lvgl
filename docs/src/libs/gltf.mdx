@@ -114,9 +114,6 @@ FetchContent_Declare(
   fastgltf
   GIT_REPOSITORY https://github.com/spnda/fastgltf
   GIT_TAG f04052ebd8d157c7b6e8fc3dd9f1ed83df99f3e5)
-set(FASTGLTF_ENABLE_DEPRECATED_EXT
-    ON
-    CACHE BOOL "" FORCE)
 set(FASTGLTF_DIFFUSE_TRANSMISSION_SUPPORT
     ON
     CACHE BOOL "" FORCE)
@@ -264,7 +261,7 @@ lv_gltf_set_background_mode(gltf, LV_GLTF_BG_ENVIRONMENT);
 lv_gltf_set_background_blur(gltf, 50);
 
 /* Lighting and exposure */
-lv_gltf_set_env_brightness(gltf, 150);
+lv_gltf_set_environment_brightness(gltf, 1.5f);
 lv_gltf_set_image_exposure(gltf, 1.2f);
 
 /* Anti-aliasing */
