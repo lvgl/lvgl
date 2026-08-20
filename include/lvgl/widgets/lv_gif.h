@@ -56,6 +56,7 @@ void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format);
  * @param obj       pointer to a gif object
  * @param src       1) pointer to an ::lv_image_dsc_t descriptor (which contains gif raw data) or
  *                  2) path to a gif file (e.g. "S:/dir/anim.gif")
+ *                  @nullable When NULL the current source is closed.
  */
 void lv_gif_set_src(lv_obj_t * obj, const void * src);
 
