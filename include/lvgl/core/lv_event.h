@@ -138,6 +138,15 @@ typedef enum {
  * For details, see ::lv_event_t.
  */
 
+/**
+ * Send an event to the callbacks of an event list.
+ * @param list          pointer to an event list. @nullable When NULL there is nothing
+ *                      to notify and LV_RESULT_OK is returned. Widgets without
+ *                      `spec_attr` legitimately have no list.
+ * @param e             pointer to the event to send
+ * @param preprocess    true: send only to the preprocess callbacks
+ * @return              LV_RESULT_OK: the target wasn't deleted in the event
+ */
 lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
 
 lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
@@ -250,8 +259,10 @@ const char * lv_event_code_get_name(lv_event_code_t code);
  * when the event descriptor is removed or destroyed.
  * @param dsc         pointer to an event descriptor (from lv_obj_add_event_cb)
  * @param data        pointer to the external data to associate with the event descriptor
+ *                    @nullable
  * @param free_cb     function pointer to a destructor that will be called to clean up the external data.
  *                    The destructor will receive the data pointer as its parameter.
+ *                    @nullable When NULL no cleanup is performed.
  */
 void lv_event_desc_set_external_data(lv_event_dsc_t * dsc, void * data, void (* free_cb)(void * data));
 #endif
