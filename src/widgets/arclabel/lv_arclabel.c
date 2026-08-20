@@ -106,6 +106,10 @@ void lv_arclabel_set_text(lv_obj_t * obj, const char * text)
 
     /*If text is NULL then just refresh with the current text*/
     if(text == NULL) text = arclabel->text;
+    if(text == NULL) {
+        lv_obj_invalidate(obj);
+        return;
+    }
 
     const size_t text_len = lv_strlen(text) + 1;
 
@@ -138,7 +142,6 @@ void lv_arclabel_set_text(lv_obj_t * obj, const char * text)
 void lv_arclabel_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_ASSERT_NULL(fmt);
 
     lv_arclabel_t * arclabel = (lv_arclabel_t *)obj;
 
@@ -377,6 +380,7 @@ static void lv_arclabel_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
+    LV_ASSERT(obj != NULL);
 
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
@@ -399,6 +403,7 @@ static void lv_arclabel_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void lv_arclabel_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(e != NULL);
 
     /*Call the ancestor's event handler*/
     const lv_result_t res = lv_obj_event_base(MY_CLASS, e);
@@ -413,7 +418,9 @@ static void lv_arclabel_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void arclabel_draw_main(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_current_target(e);
+    LV_ASSERT(obj != NULL);
     lv_arclabel_t * arclabel = (lv_arclabel_t *)obj;
 
     const char * text = arclabel->text;
