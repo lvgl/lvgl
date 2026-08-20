@@ -88,7 +88,8 @@ void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * mul);
 /**
  * Invert the matrix
  * @param matrix           pointer to a matrix
- * @param m                pointer to another matrix (optional)
+ * @param m                pointer to another matrix. @nullable When NULL `matrix` is
+ *                         set to the identity matrix.
  * @return true: the matrix is invertible, false: the matrix is singular and cannot be inverted
  */
 bool lv_matrix_inverse(lv_matrix_t * matrix, const lv_matrix_t * m);
