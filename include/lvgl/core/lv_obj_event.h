@@ -41,14 +41,16 @@ typedef enum {
  * Send an event to the object
  * @param obj           pointer to an object
  * @param event_code    the type of the event from `lv_event_t`
- * @param param         arbitrary data depending on the widget type and the event. (Usually `NULL`)
+ * @param param         arbitrary data depending on the widget type and the event. @nullable
+ *                      (Usually NULL)
  * @return LV_RESULT_OK: `obj` was not deleted in the event; LV_RESULT_INVALID: `obj` was deleted in the event_code
  */
 lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param);
 
 /**
  * Used by the widgets internally to call the ancestor widget types's event handler
- * @param class_p   pointer to the class of the widget (NOT the ancestor class)
+ * @param class_p   pointer to the class of the widget (NOT the ancestor class). @nullable
+ *                  When NULL the current target's own class is used.
  * @param e         pointer to the event descriptor
  * @return          LV_RESULT_OK: the target object was not deleted in the event; LV_RESULT_INVALID: it was deleted in the event_code
  */
