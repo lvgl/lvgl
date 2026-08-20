@@ -61,7 +61,7 @@ static const struct wl_seat_listener seat_listener = {
 
 void lv_wayland_seat_init(lv_wl_seat_t * seat, struct wl_registry * registry, uint32_t name, uint32_t version)
 {
-    LV_ASSERT_NULL(seat);
+    LV_CHECK_ARG(seat != NULL, return);
     LV_UNUSED(version);
     seat->wl_seat = wl_registry_bind(registry, name, &wl_seat_interface, (version < SEAT_VERSION) ? version : SEAT_VERSION);
     wl_seat_add_listener(seat->wl_seat, &seat_listener, seat);

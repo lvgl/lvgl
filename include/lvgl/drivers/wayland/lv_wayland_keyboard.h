@@ -34,7 +34,7 @@ lv_indev_t * lv_wayland_keyboard_create(void);
 
 /**
  * Get keyboard input device for given LVGL display
- * @param display LVGL display
+ * @param display LVGL display @nullable When NULL the default display is used.
  * @return input device connected to keyboard, or NULL on error
  */
 lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display);
