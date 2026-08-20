@@ -209,7 +209,7 @@ lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_are
 
 void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
-    if(dsc == NULL) return;
+    LV_CHECK_ARG(dsc != NULL, return);
 
     LV_PROFILER_DECODER_BEGIN;
     if(!dsc->decoder) {

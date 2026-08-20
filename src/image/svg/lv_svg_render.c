@@ -2581,9 +2581,8 @@ void lv_draw_svg_render(lv_draw_vector_dsc_t * dsc, const lv_svg_render_obj_t * 
 
 void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc)
 {
-    if(!svg_doc) {
-        return;
-    }
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(svg_doc != NULL, return);
 
     lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(layer);
     lv_svg_render_obj_t * list = lv_svg_render_create(svg_doc);

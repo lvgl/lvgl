@@ -177,7 +177,7 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 
 /**
  * Decode an image from a binary file
- * @param decoder pointer to the decoder
+ * @param decoder pointer to the decoder. @nullable It is ignored.
  * @param dsc     pointer to the decoder descriptor
  * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
  */

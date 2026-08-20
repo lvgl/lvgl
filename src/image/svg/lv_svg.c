@@ -75,8 +75,8 @@ const lv_tree_class_t lv_svg_node_class = {
  **********************/
 lv_svg_node_t * lv_svg_load_data(const char * svg_data, uint32_t data_len)
 {
-    LV_ASSERT_NULL(svg_data);
-    LV_ASSERT(data_len > 0);
+    LV_CHECK_ARG(svg_data != NULL, return NULL);
+    LV_CHECK_ARG(data_len > 0, return NULL);
 
     _lv_svg_parser_t parser;
     _lv_svg_parser_init(&parser);
