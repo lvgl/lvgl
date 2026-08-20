@@ -98,9 +98,9 @@ void lv_indev_delete(lv_indev_t * indev);
 
 /**
  * Get the next input device.
- * @param indev pointer to the current input device. NULL to initialize.
- * @return the next input device or NULL if there are no more. Provide the first input device when
- * the parameter is NULL
+ * @param indev pointer to the current input device. @nullable When NULL the first
+ * input device is returned.
+ * @return the next input device or NULL if there are no more.
  */
 lv_indev_t * lv_indev_get_next(lv_indev_t * indev);
 
@@ -118,7 +118,8 @@ void lv_indev_read_timer_cb(lv_timer_t * timer);
 
 /**
  * Enable or disable one or all input devices (default enabled)
- * @param indev pointer to an input device or NULL to enable/disable all of them
+ * @param indev pointer to an input device. @nullable When NULL every input device is
+ * enabled/disabled.
  * @param enable true to enable, false to disable
  */
 void lv_indev_enable(lv_indev_t * indev, bool enable);
@@ -154,14 +155,14 @@ void lv_indev_set_user_data(lv_indev_t * indev, void * user_data);
 /**
  * Set driver data to the indev
  * @param indev pointer to an input device
- * @param driver_data pointer to driver data
+ * @param driver_data pointer to driver data @nullable
  */
 void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);
 
 /**
  * Assign a display to the indev
  * @param indev pointer to an input device
- * @param disp pointer to an display
+ * @param disp pointer to an display @nullable
  */
 void lv_indev_set_display(lv_indev_t * indev, struct _lv_display_t * disp);
 
@@ -279,8 +280,10 @@ bool lv_indev_get_press_moved(const lv_indev_t * indev);
 
 /**
  * Reset one or all input devices
- * @param indev pointer to an input device to reset or NULL to reset all of them
- * @param obj pointer to an object which triggers the reset.
+ * @param indev pointer to an input device to reset. @nullable When NULL every input
+ * device is reset.
+ * @param obj pointer to an object which triggers the reset. @nullable When NULL the
+ * reset is not attributed to any object.
  */
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj);
 
@@ -305,9 +308,9 @@ void lv_indev_reset_long_press(lv_indev_t * indev);
 void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj);
 
 /**
- * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
+ * Set a destination group for a keypad or encoder input device
  * @param indev pointer to an input device
- * @param group pointer to a group
+ * @param group pointer to a group @nullable. Use NULL to detatch group from the indev
  */
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group);
 
@@ -321,7 +324,7 @@ void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t points[]);
 
 /**
  * Get the last point of an input device (for LV_INDEV_TYPE_POINTER and LV_INDEV_TYPE_BUTTON)
- * @param indev pointer to an input device
+ * @param indev pointer to an input device.
  * @param point pointer to a point to store the result
  */
 void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point);
@@ -470,7 +473,7 @@ uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb
  * Send an event to an indev
  * @param indev         pointer to an indev
  * @param code          an event code. LV_EVENT_...
- * @param param         optional param
+ * @param param         optional param @nullable
  * @return              LV_RESULT_OK: indev wasn't deleted in the event.
  */
 lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void * param);
@@ -510,9 +513,10 @@ bool lv_indev_get_ccw(const lv_indev_t * indev);
  * the associated resources.
  *
  * @param indev      Pointer to an indev
- * @param data       User-defined data pointer to associate with the indev
+ * @param data       User-defined data pointer to associate with the indev @nullable
  * @param free_cb    Callback function for cleaning up ext_data when indev is deleted.
- *                   Receives ext_data as parameter. NULL means no cleanup required.
+ *                   Receives ext_data as parameter. @nullable When NULL no cleanup
+ *                   is performed.
  */
 void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data));
 #endif
