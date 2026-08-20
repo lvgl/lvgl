@@ -47,6 +47,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_rlottie_class;
 
 /**
  * Create an rlottie animation from a JSON file.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @deprecated rlottie is deprecated. Use the `lv_lottie` widget instead.
  */
 LV_DEPRECATED(LV_RLOTTIE_DEPRECATED_MSG)
@@ -54,6 +56,8 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t
 
 /**
  * Create an rlottie animation from a raw JSON description.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @deprecated rlottie is deprecated. Use the `lv_lottie` widget instead.
  */
 LV_DEPRECATED(LV_RLOTTIE_DEPRECATED_MSG)
