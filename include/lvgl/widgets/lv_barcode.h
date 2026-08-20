@@ -47,7 +47,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_barcode_class;
 
 /**
  * Create an empty barcode (an `lv_canvas`) object.
- * @param parent point to an object where to create the barcode
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return pointer to the created barcode object
  */
 lv_obj_t * lv_barcode_create(lv_obj_t * parent);

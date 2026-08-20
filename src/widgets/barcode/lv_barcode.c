@@ -117,9 +117,9 @@ void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding)
 lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_ASSERT_NULL(data);
+    LV_CHECK_ARG(data != NULL, return LV_RESULT_INVALID);
 
-    if(data == NULL || lv_strlen(data) == 0) {
+    if(lv_strlen(data) == 0) {
         LV_LOG_WARN("data is empty");
         lv_barcode_clear(obj);
         return LV_RESULT_INVALID;
@@ -272,6 +272,7 @@ lv_barcode_encoding_t lv_barcode_get_encoding(const lv_obj_t * obj)
 static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     barcode->dark_color = lv_color_black();
@@ -285,6 +286,7 @@ static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     if(draw_buf == NULL) return;
@@ -296,7 +298,7 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
 static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT(obj != NULL);
     if(w <= 0 || h <= 0) {
         LV_LOG_WARN("invalid size: %" LV_PRId32 " x %" LV_PRId32, w, h);
         return false;
@@ -318,6 +320,7 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
 
 static void lv_barcode_clear(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     if(!draw_buf) {
         return;
