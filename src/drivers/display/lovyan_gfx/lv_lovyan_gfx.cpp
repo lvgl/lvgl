@@ -43,6 +43,7 @@ static void read_touch(lv_indev_t * indev_driver, lv_indev_data_t * data);
 
 lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes, bool touch)
 {
+    LV_CHECK_ARG(buf != NULL, return NULL);
     lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_malloc_zeroed(sizeof(lv_lovyan_gfx_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;

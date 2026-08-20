@@ -90,12 +90,14 @@ static struct {
 
 lv_display_t * lv_st_ltdc_create_direct(void * fb_adr_1, void * fb_adr_2, uint32_t layer_idx)
 {
+    LV_CHECK_ARG(fb_adr_1 != NULL, return NULL);
     return create(fb_adr_1, fb_adr_2, 0, layer_idx, LV_DISPLAY_RENDER_MODE_DIRECT);
 }
 
 lv_display_t * lv_st_ltdc_create_partial(void * render_buf_1, void * render_buf_2, uint32_t buf_size,
                                          uint32_t layer_idx)
 {
+    LV_CHECK_ARG(render_buf_1 != NULL, return NULL);
     return create(render_buf_1, render_buf_2, buf_size, layer_idx, LV_DISPLAY_RENDER_MODE_PARTIAL);
 }
 

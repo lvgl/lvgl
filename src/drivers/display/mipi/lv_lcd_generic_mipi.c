@@ -346,7 +346,7 @@ static void delete_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_current_target(e);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
-    LV_ASSERT_NULL(drv);
+    LV_ASSERT(drv != NULL);
     lv_free(drv);
     lv_display_set_driver_data(disp, NULL);
 }
