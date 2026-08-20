@@ -244,8 +244,8 @@ static lv_fpoint_t _point_on_ellipse(float rx, float ry, float cos_r, float sin_
 void lv_vector_path_arc_to(lv_vector_path_t * path, float radius_x, float radius_y, float rotate_angle, bool large_arc,
                            bool clockwise, const lv_fpoint_t * p)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(p);
+    LV_CHECK_ARG(path != NULL, return);
+    LV_CHECK_ARG(p != NULL, return);
 
     if(lv_array_is_empty(&path->ops)) {
         /*first op must be move_to*/
@@ -387,8 +387,8 @@ void lv_vector_path_close(lv_vector_path_t * path)
 
 void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(area);
+    LV_CHECK_ARG(path != NULL, return);
+    LV_CHECK_ARG(area != NULL, return);
 
     uint32_t len = lv_array_size(&path->points);
     if(len == 0) {

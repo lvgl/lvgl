@@ -414,7 +414,8 @@ void lv_draw_vector_dsc_set_stroke_width(lv_draw_vector_dsc_t * dsc, float width
  * Set stroke line dash pattern for descriptor
  * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this dash.
  * @param dsc              pointer to a vector graphic descriptor
- * @param dash_pattern     an array of values that specify the segments of dash line
+ * @param dash_pattern     an array of values that specify the segments of dash line.
+ *                         @nullable When NULL the dash pattern is cleared.
  * @param dash_count       the length of dash pattern array
  */
 void lv_draw_vector_dsc_set_stroke_dash(lv_draw_vector_dsc_t * dsc, float * dash_pattern, uint16_t dash_count);

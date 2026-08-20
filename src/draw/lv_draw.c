@@ -379,7 +379,7 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 
 uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
 {
-    if(t_check == NULL) return 0;
+    LV_CHECK_ARG(t_check != NULL, return 0);
     if(t_check->next == NULL) return 0;
 
     LV_PROFILER_DRAW_BEGIN;
@@ -423,14 +423,14 @@ void lv_draw_unit_send_event(const char * name, lv_event_code_t code, void * par
 
 void lv_layer_init(lv_layer_t * layer)
 {
-    LV_ASSERT_NULL(layer);
+    LV_CHECK_ARG(layer != NULL, return);
     lv_memzero(layer, sizeof(lv_layer_t));
     lv_layer_reset(layer);
 }
 
 void lv_layer_reset(lv_layer_t * layer)
 {
-    LV_ASSERT_NULL(layer);
+    LV_CHECK_ARG(layer != NULL, return);
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
 #endif

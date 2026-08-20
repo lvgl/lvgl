@@ -271,7 +271,8 @@ uint32_t lv_draw_get_unit_count(void);
  * If there is only one draw unit check the first draw task if it's available.
  * If there are multiple draw units call `lv_draw_get_next_available_task` to find a task.
  * @param layer             the draw layer to search in
- * @param t_prev            continue searching from this task
+ * @param t_prev            continue searching from this task. @nullable When NULL the
+ *                          search starts from the first task.
  * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
  * @return                  an available draw task or NULL if there is not any
  */
@@ -280,7 +281,8 @@ lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t *
 /**
  * Find and available draw task
  * @param layer             the draw layer to search in
- * @param t_prev            continue searching from this task
+ * @param t_prev            continue searching from this task. @nullable When NULL the
+ *                          search starts from the first task.
  * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
  * @return                  an available draw task or NULL if there is not any
  */
@@ -299,9 +301,10 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check);
 
 /**
  * Send an event to the draw units
- * @param name              the name of the draw unit to send the event to
+ * @param name              the name of the draw unit to send the event to. @nullable
+ *                          When NULL every draw unit receives the event.
  * @param code              the event code
- * @param param             the event parameter
+ * @param param             the event parameter @nullable
  */
 void lv_draw_unit_send_event(const char * name, lv_event_code_t code, void * param);
 
@@ -319,7 +322,8 @@ void lv_layer_reset(lv_layer_t * layer);
 
 /**
  * Create (allocate) a new layer on a parent layer
- * @param parent_layer      the parent layer to which the layer will be merged when it's rendered
+ * @param parent_layer      the parent layer to which the layer will be merged when it's
+ *                          rendered. @nullable When NULL the layer has no parent.
  * @param color_format      the color format of the layer
  * @param area              the areas of the layer (absolute coordinates)
  * @return                  the new target_layer or NULL on error
@@ -329,7 +333,8 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 /**
  * Initialize a layer which is allocated by the user
  * @param layer             pointer the layer to initialize (its lifetime needs to be managed by the user)
- * @param parent_layer      the parent layer to which the layer will be merged when it's rendered
+ * @param parent_layer      the parent layer to which the layer will be merged when it's
+ *                          rendered. @nullable When NULL the layer has no parent.
  * @param color_format      the color format of the layer
  * @param area              the areas of the layer (absolute coordinates)
  */
