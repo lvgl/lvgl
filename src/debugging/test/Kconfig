@@ -22,6 +22,7 @@ config LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
 config LV_USE_NANOVG_TEST_HEADLESS
 	bool "Headless EGL display for NanoVG"
 	depends on LV_USE_DRAW_NANOVG
+	select LV_USE_EGL
 	help
 		Render into an off-screen EGL pbuffer instead of a window and read the
 		pixels back into the LVGL draw buffer, so screenshot compares work the

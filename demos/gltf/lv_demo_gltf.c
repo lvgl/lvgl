@@ -83,6 +83,7 @@ static void viewer_observer_float_cb(lv_observer_t * observer, lv_subject_t * su
 static void viewer_observer_int_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void animation_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void animation_speed_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void env_brightness_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void style_dropdown(lv_obj_t * dropdown);
 static void style_slider(lv_obj_t * slider, lv_color_t accent_color);
 static void style_control_panel(lv_obj_t * panel);
@@ -94,11 +95,12 @@ static void style_control_panel(lv_obj_t * panel);
 static lv_gltf_set_float_fn_union_t pitch_fn = { .cb = lv_gltf_set_pitch };
 static lv_gltf_set_float_fn_union_t yaw_fn = { .cb = lv_gltf_set_yaw };
 static lv_gltf_set_float_fn_union_t distance_fn = { .cb = lv_gltf_set_distance };
+static lv_gltf_set_float_fn_union_t env_brightness_fn = { .cb = lv_gltf_set_environment_brightness };
+
 static lv_gltf_set_int_fn_union_t camera_fn = { .cb = lv_gltf_set_camera };
 static lv_gltf_set_int_fn_union_t background_mode_fn = { .cb = lv_gltf_set_background_mode };
 static lv_gltf_set_int_fn_union_t antialiasing_mode_fn = { .cb = lv_gltf_set_antialiasing_mode };
 
-static lv_gltf_set_int_fn_union_t env_brightness_fn = { .cb = lv_gltf_set_env_brightness };
 static lv_gltf_set_int_fn_union_t bg_blur_fn = { .cb = lv_gltf_set_background_blur };
 
 static lv_subject_t yaw_subject;
@@ -161,8 +163,8 @@ static void init_subjects(lv_obj_t * viewer)
     lv_subject_init_int(&animation_subject, lv_gltf_model_get_animation(lv_gltf_get_primary_model(viewer)));
     lv_subject_init_int(&antialiasing_subject, lv_gltf_get_antialiasing_mode(viewer));
     lv_subject_init_int(&background_subject, lv_gltf_get_background_mode(viewer));
-    lv_subject_init_int(&env_brightness_subject, lv_gltf_get_env_brightness(viewer));
     lv_subject_init_int(&background_blur_subject, lv_gltf_get_background_blur(viewer));
+    lv_subject_init_int(&env_brightness_subject, lv_gltf_get_environment_brightness(viewer) * 100);
 
     lv_subject_add_observer_obj(&camera_subject, viewer_observer_int_cb, viewer, camera_fn.ptr);
     lv_subject_add_observer_obj(&pitch_subject, viewer_observer_float_cb, viewer, pitch_fn.ptr);
@@ -173,8 +175,8 @@ static void init_subjects(lv_obj_t * viewer)
     lv_subject_add_observer(&animation_speed_subject, animation_speed_observer_cb, viewer);
 
     lv_subject_add_observer_obj(&background_subject, viewer_observer_int_cb, viewer, background_mode_fn.ptr);
-    lv_subject_add_observer_obj(&env_brightness_subject, viewer_observer_int_cb, viewer, env_brightness_fn.ptr);
     lv_subject_add_observer_obj(&background_blur_subject, viewer_observer_int_cb, viewer, bg_blur_fn.ptr);
+    lv_subject_add_observer_obj(&env_brightness_subject, env_brightness_observer_cb, viewer, env_brightness_fn.ptr);
 
     lv_subject_add_observer_obj(&antialiasing_subject, viewer_observer_int_cb, viewer, antialiasing_mode_fn.ptr);
 }
@@ -495,6 +497,16 @@ static lv_obj_t * add_dropdown_to_row(lv_obj_t * row)
     lv_obj_set_width(dropdown, LV_PCT(100));
     return dropdown;
 }
+
+static void env_brightness_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * viewer = lv_observer_get_target_obj(observer);
+    float value = lv_subject_get_int(subject);
+    lv_gltf_set_float_fn_union_t fn_union = { .ptr = lv_observer_get_user_data(observer) };
+
+    fn_union.cb(viewer, value / 100.f);
+}
+
 
 static void viewer_observer_float_cb(lv_observer_t * observer, lv_subject_t * subject)
 {

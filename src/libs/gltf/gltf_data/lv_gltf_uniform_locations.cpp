@@ -22,6 +22,7 @@ lv_gltf_uniform_locations_t lv_gltf_uniform_locations_create(GLuint program)
     uniforms.env_sheen_sampler = glGetUniformLocation(program, "u_CharlieEnvSampler");
     uniforms.env_ggx_lut_sampler = glGetUniformLocation(program, "u_GGXLUT");
     uniforms.env_charlie_lut_sampler = glGetUniformLocation(program, "u_CharlieLUT");
+    uniforms.env_sheen_e_lut_sampler = glGetUniformLocation(program, "u_SheenELUT");
     uniforms.env_mip_count = glGetUniformLocation(program, "u_MipCount");
     // *** BASE COLOR / TEXTURE UNIFORMS ****************************************************************
     uniforms.base_color_factor = glGetUniformLocation(program, "u_BaseColorFactor");

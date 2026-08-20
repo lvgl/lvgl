@@ -45,13 +45,15 @@ void lv_gltf_model_node_init(lv_gltf_model_t * model, lv_gltf_model_node_t * nod
                              const char * path,
                              const char * numeric_path)
 {
-    LV_ASSERT_NULL(node);
+    LV_ASSERT(model != NULL);
+    LV_ASSERT(node != NULL);
     lv_memset(node, 0, sizeof(*node));
     node->model = model;
     node->fastgltf_node = fastgltf_node;
+
     node->path = lv_strdup(path);
-    node->numeric_path = lv_strdup(numeric_path);
     LV_ASSERT_MALLOC(node->path);
+    node->numeric_path = lv_strdup(numeric_path);
     LV_ASSERT_MALLOC(node->numeric_path);
 
     lv_array_init(&node->write_ops, 0, sizeof(lv_gltf_write_op_t));
@@ -59,7 +61,9 @@ void lv_gltf_model_node_init(lv_gltf_model_t * model, lv_gltf_model_node_t * nod
 
 void lv_gltf_model_node_deinit(lv_gltf_model_node_t * node)
 {
-    LV_ASSERT_NULL(node);
+    if(!node) {
+        return;
+    }
     lv_free((void *)node->path);
     lv_free((void *)node->numeric_path);
     lv_array_deinit(&node->write_ops);
@@ -72,21 +76,16 @@ void lv_gltf_model_node_deinit(lv_gltf_model_node_t * node)
 
 lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * model, size_t index)
 {
-    if(!model) {
-        LV_LOG_WARN("Failed to get node from NULL model");
-        return nullptr;
-    }
-
+    LV_CHECK_ARG(model != NULL, return nullptr);
     const uint32_t count = lv_array_size(&model->nodes);
-    if(index >= count) {
-        LV_LOG_WARN("Invalid index %zu. Max should be %" LV_PRIu32, index, count - 1);
-        return nullptr;
-    }
+    LV_CHECK_ARG(index < count, return nullptr, "Invalid index %zu. Max should be %" LV_PRIu32, index, count - 1);
+
     return (lv_gltf_model_node_t *)lv_array_at(&model->nodes, index);
 }
 
 lv_gltf_model_node_t * lv_gltf_model_node_get_by_numeric_path(lv_gltf_model_t * model, const char * num_path)
 {
+    LV_CHECK_ARG(model != NULL, return nullptr);
 
     const uint32_t node_count = lv_array_size(&model->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
@@ -100,12 +99,7 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_numeric_path(lv_gltf_model_t * 
 
 lv_gltf_model_node_t * lv_gltf_model_node_get_by_path(lv_gltf_model_t * model, const char * path)
 {
-
-    if(!model) {
-        LV_LOG_WARN("Can't get node from NULL model");
-        return nullptr;
-    }
-
+    LV_CHECK_ARG(model != NULL, return nullptr);
     const uint32_t node_count = lv_array_size(&model->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
         lv_gltf_model_node_t * entry = (lv_gltf_model_node_t *) lv_array_at(&model->nodes, i);
@@ -120,6 +114,7 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_internal_node(lv_gltf_model_t *
                                                                const fastgltf::Node * fastgltf_node)
 {
     LV_ASSERT_NULL(model);
+    LV_ASSERT_NULL(fastgltf_node);
     const uint32_t node_count = lv_array_size(&model->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
         lv_gltf_model_node_t * entry = (lv_gltf_model_node_t *) lv_array_at(&model->nodes, i);
@@ -132,44 +127,25 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_internal_node(lv_gltf_model_t *
 
 const char * lv_gltf_model_node_get_path(lv_gltf_model_node_t * node)
 {
-    if(!node) {
-        LV_LOG_WARN("Can't get the path of a null node");
-        return nullptr;
-    }
+    LV_CHECK_ARG(node != NULL, return nullptr);
     return node->path;
 }
 
 const char * lv_gltf_model_node_get_ip(lv_gltf_model_node_t * node)
 {
-    if(!node) {
-        LV_LOG_WARN("Can't get the ip of a null node");
-        return nullptr;
-    }
+    LV_CHECK_ARG(node != NULL, return nullptr);
     return node->numeric_path;
-}
-void lv_gltf_model_send_new_values(lv_gltf_model_t * model)
-{
-    LV_ASSERT_NULL(model);
-    if(!model->write_ops_flushed) {
-        return;
-    }
-    const uint32_t node_count = lv_array_size(&model->nodes);
-    for(uint32_t i = 0; i < node_count; ++i) {
-        lv_gltf_model_node_t * node = (lv_gltf_model_node_t *) lv_array_at(&model->nodes, i);
-        if(!node->read_attrs || !node->read_attrs->value_changed) {
-            continue;
-        }
-        lv_event_push_and_send(&node->read_attrs->event_list, LV_EVENT_VALUE_CHANGED, node, &node->read_attrs->node_data);
-        node->read_attrs->value_changed = false;
-    }
-    model->write_ops_flushed = false;
-    model->transforms_changed = false;
 }
 
 lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv_event_cb_t cb,
                                                  lv_event_code_t filter_list,
                                                  void * user_data)
 {
+    LV_CHECK_ARG(node != NULL, return nullptr);
+    LV_CHECK_ARG(cb != NULL, return nullptr);
+    LV_CHECK_ARG((filter_list & LV_EVENT_VALUE_CHANGED) != 0, return nullptr,
+                 "Only LV_EVENT_VALUE_CHANGED events will ever be sent");
+
     if(!node->read_attrs) {
         node->read_attrs = (lv_gltf_model_node_attr_t *) lv_zalloc(sizeof(*node->read_attrs));
         LV_ASSERT_MALLOC(node->read_attrs);
@@ -177,7 +153,7 @@ lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv
             LV_LOG_WARN("Failed to allocate memory for read attributes");
             return nullptr;
         }
-        lv_array_init(&node->read_attrs->event_list.array, 1, sizeof(lv_event_dsc_t *));
+        /* The event list array is allocated by lv_event_add() on the first callback */
     }
     return lv_event_add(&node->read_attrs->event_list, cb, filter_list, user_data);
 }
@@ -186,6 +162,10 @@ lv_event_dsc_t * lv_gltf_model_node_add_event_cb_with_world_position(lv_gltf_mod
                                                                      lv_event_code_t filter_list,
                                                                      void * user_data)
 {
+    LV_CHECK_ARG(node != NULL, return nullptr);
+    LV_CHECK_ARG(cb != NULL, return nullptr);
+    LV_CHECK_ARG((filter_list & LV_EVENT_VALUE_CHANGED) != 0, return nullptr,
+                 "Only LV_EVENT_VALUE_CHANGED events will ever be sent");
     lv_event_dsc_t * dsc = lv_gltf_model_node_add_event_cb(node, cb, filter_list, user_data);
     if(!dsc) {
         return nullptr;
@@ -242,10 +222,9 @@ lv_result_t lv_gltf_model_node_set_scale_z(lv_gltf_model_node_t * node, float z)
 
 lv_result_t lv_gltf_model_node_get_local_position(lv_event_t * e, lv_3dpoint_t * result)
 {
-    if(!e || e->code != LV_EVENT_VALUE_CHANGED) {
-        LV_LOG_WARN("Invalid event");
-        return LV_RESULT_INVALID;
-    }
+    LV_CHECK_ARG(e != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(e->code == LV_EVENT_VALUE_CHANGED, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(result != NULL, return LV_RESULT_INVALID);
     lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
 
     if(!node) {
@@ -262,10 +241,9 @@ lv_result_t lv_gltf_model_node_get_local_position(lv_event_t * e, lv_3dpoint_t *
 
 lv_result_t lv_gltf_model_node_get_world_position(lv_event_t * e, lv_3dpoint_t * result)
 {
-    if(!e || e->code != LV_EVENT_VALUE_CHANGED) {
-        LV_LOG_WARN("Invalid event");
-        return LV_RESULT_INVALID;
-    }
+    LV_CHECK_ARG(e != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(e->code == LV_EVENT_VALUE_CHANGED, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(result != NULL, return LV_RESULT_INVALID);
 
     lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
 
@@ -287,10 +265,10 @@ lv_result_t lv_gltf_model_node_get_world_position(lv_event_t * e, lv_3dpoint_t *
 
 lv_result_t lv_gltf_model_node_get_scale(lv_event_t * e, lv_3dpoint_t * result)
 {
-    if(!e || e->code != LV_EVENT_VALUE_CHANGED) {
-        LV_LOG_WARN("Invalid event");
-        return LV_RESULT_INVALID;
-    }
+    LV_CHECK_ARG(e != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(e->code == LV_EVENT_VALUE_CHANGED, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(result != NULL, return LV_RESULT_INVALID);
+
     lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
     if(!node) {
         LV_LOG_WARN("Cannot get property from a NULL node");
@@ -306,10 +284,10 @@ lv_result_t lv_gltf_model_node_get_scale(lv_event_t * e, lv_3dpoint_t * result)
 
 lv_result_t lv_gltf_model_node_get_euler_rotation(lv_event_t * e, lv_3dpoint_t * result)
 {
-    if(!e || e->code != LV_EVENT_VALUE_CHANGED) {
-        LV_LOG_WARN("Invalid event");
-        return LV_RESULT_INVALID;
-    }
+    LV_CHECK_ARG(e != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(e->code == LV_EVENT_VALUE_CHANGED, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(result != NULL, return LV_RESULT_INVALID);
+
     lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
     if(!node) {
         LV_LOG_WARN("Cannot get property from a NULL node");
@@ -323,22 +301,39 @@ lv_result_t lv_gltf_model_node_get_euler_rotation(lv_event_t * e, lv_3dpoint_t *
     return LV_RESULT_OK;
 }
 
+void lv_gltf_model_send_new_values(lv_gltf_model_t * model)
+{
+    LV_ASSERT_NULL(model);
+    if(!model->write_ops_flushed) {
+        return;
+    }
+    const uint32_t node_count = lv_array_size(&model->nodes);
+    for(uint32_t i = 0; i < node_count; ++i) {
+        lv_gltf_model_node_t * node = (lv_gltf_model_node_t *) lv_array_at(&model->nodes, i);
+        if(!node->read_attrs || !node->read_attrs->value_changed) {
+            continue;
+        }
+        lv_event_push_and_send(&node->read_attrs->event_list, LV_EVENT_VALUE_CHANGED, node, &node->read_attrs->node_data);
+        node->read_attrs->value_changed = false;
+    }
+    model->write_ops_flushed = false;
+    model->transforms_changed = false;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 static void invalidate_model(lv_gltf_model_t * model)
 {
+    LV_ASSERT(model != NULL);
     lv_gltf_model_invalidate(model);
     model->write_ops_pending = true;
 }
 
 static lv_result_t add_write_op(lv_gltf_model_node_t * node, lv_gltf_node_prop_t prop, uint8_t channel, float value)
 {
-    if(!node) {
-        LV_LOG_WARN("Can't queue queue write operation for NULL node");
-        return LV_RESULT_INVALID;
-    }
+    LV_CHECK_ARG(node != NULL, return LV_RESULT_INVALID);
 
     /* Try to find if a write operation for this property + channel combination exists*/
     /* Doing this is ok for now because the array will be of max size 9 (3 properties x 3 channels)

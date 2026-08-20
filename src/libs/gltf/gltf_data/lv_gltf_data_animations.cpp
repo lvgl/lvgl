@@ -50,6 +50,7 @@ static fastgltf::math::fquat animation_get_quat_at_timestamp(lv_gltf_model_t * d
 
 uint32_t lv_gltf_data_get_animation_total_time(lv_gltf_model_t * data, uint32_t index)
 {
+    LV_ASSERT(data != NULL);
     LV_ASSERT(data->asset.animations.size() > index);
     auto & animation = data->asset.animations[index];
     float max_time = -1.0f;
@@ -63,6 +64,8 @@ uint32_t lv_gltf_data_get_animation_total_time(lv_gltf_model_t * data, uint32_t 
 std::vector<uint32_t> * lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_model_t * data,
                                                                fastgltf::Node * node)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(node != NULL);
     const auto & asset = lv_gltf_data_get_asset(data);
     size_t animation_count = lv_gltf_model_get_animation_count(data);
     if(data->channel_set_cache.find(node) == data->channel_set_cache.end()) {
@@ -87,6 +90,8 @@ void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, 
                                          fastgltf::Node * node,
                                          fastgltf::math::fmat4x4 & matrix)
 {
+    LV_ASSERT(gltf_data != NULL);
+    LV_ASSERT(node != NULL);
     const auto & asset = lv_gltf_data_get_asset(gltf_data);
 
     size_t animation_count = lv_gltf_model_get_animation_count(gltf_data);
@@ -177,6 +182,8 @@ static fastgltf::math::fquat animation_get_quat_at_timestamp(lv_gltf_model_t * d
                                                              fastgltf::AnimationSampler * sampler,
                                                              float _seconds)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(sampler != NULL);
     const auto & asset = lv_gltf_data_get_asset(data);
     auto & _inAcc = asset->accessors[sampler->inputAccessor];
     auto & _outAcc = asset->accessors[sampler->outputAccessor];
@@ -227,6 +234,8 @@ static fastgltf::math::fquat animation_get_quat_at_timestamp(lv_gltf_model_t * d
 fastgltf::math::fvec3 animation_get_vec3_at_timestamp(lv_gltf_model_t * data, fastgltf::AnimationSampler * sampler,
                                                       float _seconds)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(sampler != NULL);
     const auto & asset = lv_gltf_data_get_asset(data);
     auto & _inAcc = asset->accessors[sampler->inputAccessor];
     auto & _outAcc = asset->accessors[sampler->outputAccessor];
