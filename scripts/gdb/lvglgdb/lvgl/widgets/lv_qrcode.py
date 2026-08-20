@@ -6,7 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from .lv_canvas import LVCanvas
-from ._helpers import safe_color
+from ._helpers import ptr_or_none, safe_color
 
 
 class LVQrcode(LVCanvas):
@@ -25,8 +25,34 @@ class LVQrcode(LVCanvas):
         return safe_color(self._wv, "light_color")
 
     @property
+    def data(self):
+        """Copy of the payload, kept so the bitmap can be re-encoded on a property change"""
+        return ptr_or_none(self._wv.safe_field("data"))
+
+    @property
+    def data_len(self):
+        """Stored payload length in bytes"""
+        return int(self._wv.safe_field("data_len", 0))
+
+    @property
     def quiet_zone(self):
+        """Add the QR spec's blank margin around the code (boolean toggle)"""
         return int(self._wv.safe_field("quiet_zone", 0))
+
+    @property
+    def update_mode(self):
+        """lv_qrcode_update_mode_t: when a property change is re-encoded"""
+        return int(self._wv.safe_field("update_mode", 0))
+
+    @property
+    def needs_update(self):
+        """The bitmap is out of date; re-encoded on the next redraw (deferred mode)"""
+        return int(self._wv.safe_field("needs_update", 0))
+
+    @property
+    def render_failed(self):
+        """The last encode attempt failed (or none has run yet)"""
+        return int(self._wv.safe_field("render_failed", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""
@@ -34,6 +60,11 @@ class LVQrcode(LVCanvas):
         d = s.get('widget_data') or {}
         d["dark_color"] = self.dark_color
         d["light_color"] = self.light_color
+        d["data"] = self.data
+        d["data_len"] = self.data_len
         d["quiet_zone"] = self.quiet_zone
+        d["update_mode"] = self.update_mode
+        d["needs_update"] = self.needs_update
+        d["render_failed"] = self.render_failed
         s['widget_data'] = d
         return s

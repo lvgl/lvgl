@@ -405,6 +405,29 @@ if you need finer control.
 
 ## Widgets
 
+### lv_qrcode
+
+- No API change, but a behavioral one: `lv_qrcode_set_size()` and
+  `lv_qrcode_set_quiet_zone()` now re-encode the QR code, and the colors are
+  re-applied, when they are called *after* the data. Previously such a change was
+  silently dropped and the widget kept showing the bitmap produced by
+  `lv_qrcode_update()` / `lv_qrcode_set_data()`. The properties may now be set in
+  any order.
+
+  To make this possible the widget keeps a copy of the payload, which costs
+  `data_len` bytes per QR code object.
+
+- New: `lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_DEFERRED)` collapses
+  several property changes into a single re-encode on the next redraw. The default,
+  `LV_QRCODE_UPDATE_MODE_IMMEDIATE`, re-encodes inside the setter.
+
+- New: `lv_qrcode_render()` re-encodes the stored payload without taking it as an
+  argument, which is how property changes made in the deferred update mode are applied.
+
+- New: `lv_qrcode_get_render_failed()` reports whether the last encode failed, for the
+  re-encodes whose result cannot be returned (the void property setters, and the
+  deferred re-encode done by the draw pass).
+
 ### lv_span
 
 - `lv_spangroup_set_align()` is deprecated, use the `text_align` style property instead:
