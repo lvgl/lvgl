@@ -160,16 +160,16 @@ void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * buf,
 /**
  * Invalidate the cache of the buffer
  * @param draw_buf     the draw buffer needs to be invalidated
- * @param area         the area to invalidate in the buffer,
- *                     use NULL to invalidate the whole draw buffer address range
+ * @param area         the area to invalidate in the buffer. @nullable
+ *                     When NULL the whol draw buffer address range is invalidated
  */
 void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 /**
  * Flush the cache of the buffer
  * @param draw_buf     the draw buffer needs to be flushed
- * @param area         the area to flush in the buffer,
- *                     use NULL to flush the whole draw buffer address range
+ * @param area         the area to flush in the buffer. @nullable
+ *                     When NULL the whole draw buffer address range is flushed
  */
 void lv_draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
@@ -194,7 +194,7 @@ uint32_t lv_draw_buf_width_to_stride_ex(const lv_draw_buf_handlers_t * handlers,
 /**
  * Clear an area on the buffer
  * @param draw_buf          pointer to draw buffer
- * @param a                 the area to clear, or NULL to clear the whole buffer
+ * @param a                 the area to clear @nullable. When NULL the whole buffer is cleared
  */
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a);
 
@@ -254,6 +254,7 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
  * @param cf        the color format
  * @param stride    the stride in bytes. Use 0 for automatic calculation
  * @param data      the buffer used for drawing. Unaligned `data` will be aligned internally
+ *                  Might be NULL as long as width and height are 0
  * @param data_size the size of the buffer in bytes
  * @return          return LV_RESULT_OK on success, LV_RESULT_INVALID otherwise
  */
@@ -283,9 +284,11 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf);
 /**
  * Copy an area from a buffer to another
  * @param dest      pointer to the destination draw buffer
- * @param dest_area the area to copy from the destination buffer, if NULL, use the whole buffer
+ * @param dest_area the area to copy from the destination buffer. @nullable
+ *                  When NULL, the whole buffer is copied
  * @param src       pointer to the source draw buffer
- * @param src_area  the area to copy from the destination buffer, if NULL, use the whole buffer
+ * @param src_area  the area to copy from the destination buffer. @nullable
+ *                  When NULL, the whole buffer is copied
  * @note `dest_area` and `src_area` should have the same width and height
  * @note  The default copy function required `dest` and `src` to have the same color format.
  * Overwriting dest->handlers->buf_copy_cb can resolve this limitation.
