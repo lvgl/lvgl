@@ -14,63 +14,64 @@ class LVImePinyin(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_ime_pinyin_t", ptr=True) or self
+        self._wv_lv_ime_pinyin_t = self.cast("lv_ime_pinyin_t", ptr=True) or self
+        self._wv = self._wv_lv_ime_pinyin_t
 
     @property
     def kb(self):
-        return ptr_or_none(self._wv.safe_field("kb"))
+        return ptr_or_none(self._wv_lv_ime_pinyin_t.safe_field("kb"))
 
     @property
     def cand_panel(self):
-        return ptr_or_none(self._wv.safe_field("cand_panel"))
+        return ptr_or_none(self._wv_lv_ime_pinyin_t.safe_field("cand_panel"))
 
     @property
     def dict(self):
-        return ptr_or_none(self._wv.safe_field("dict"))
+        return ptr_or_none(self._wv_lv_ime_pinyin_t.safe_field("dict"))
 
     @property
     def k9_legal_py_ll(self):
-        return safe_wrapper(self._wv, "k9_legal_py_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
+        return safe_wrapper(self._wv_lv_ime_pinyin_t, "k9_legal_py_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
 
     @property
     def cand_str(self):
         """Candidate string"""
-        return safe_string(self._wv, "cand_str")
+        return safe_string(self._wv_lv_ime_pinyin_t, "cand_str")
 
     @property
     def k9_py_ll_pos(self):
         """Current pinyin map pages(k9)"""
-        return int(self._wv.safe_field("k9_py_ll_pos", 0))
+        return int(self._wv_lv_ime_pinyin_t.safe_field("k9_py_ll_pos", 0))
 
     @property
     def k9_legal_py_count(self):
         """Count of legal Pinyin numbers(k9)"""
-        return int(self._wv.safe_field("k9_legal_py_count", 0))
+        return int(self._wv_lv_ime_pinyin_t.safe_field("k9_legal_py_count", 0))
 
     @property
     def k9_input_str_len(self):
         """9-key input(k9) mode input string max len"""
-        return int(self._wv.safe_field("k9_input_str_len", 0))
+        return int(self._wv_lv_ime_pinyin_t.safe_field("k9_input_str_len", 0))
 
     @property
     def ta_count(self):
         """The number of characters entered in the text box this time"""
-        return int(self._wv.safe_field("ta_count", 0))
+        return int(self._wv_lv_ime_pinyin_t.safe_field("ta_count", 0))
 
     @property
     def cand_num(self):
         """Number of candidates"""
-        return int(self._wv.safe_field("cand_num", 0))
+        return int(self._wv_lv_ime_pinyin_t.safe_field("cand_num", 0))
 
     @property
     def py_page(self):
         """Current pinyin map pages(k26)"""
-        return int(self._wv.safe_field("py_page", 0))
+        return int(self._wv_lv_ime_pinyin_t.safe_field("py_page", 0))
 
     @property
     def mode(self):
         """Set mode, 1: 26-key input(k26), 0: 9-key input(k9). Default: 1."""
-        return int(self._wv.safe_field("mode", 0))
+        return int(self._wv_lv_ime_pinyin_t.safe_field("mode", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

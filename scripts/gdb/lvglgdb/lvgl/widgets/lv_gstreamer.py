@@ -14,43 +14,44 @@ class LVGstreamer(LVImage):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_gstreamer_t", ptr=True) or self
+        self._wv_lv_gstreamer_t = self.cast("lv_gstreamer_t", ptr=True) or self
+        self._wv = self._wv_lv_gstreamer_t
 
     @property
     def last_buffer(self):
-        return ptr_or_none(self._wv.safe_field("last_buffer"))
+        return ptr_or_none(self._wv_lv_gstreamer_t.safe_field("last_buffer"))
 
     @property
     def last_sample(self):
-        return ptr_or_none(self._wv.safe_field("last_sample"))
+        return ptr_or_none(self._wv_lv_gstreamer_t.safe_field("last_sample"))
 
     @property
     def pipeline(self):
-        return ptr_or_none(self._wv.safe_field("pipeline"))
+        return ptr_or_none(self._wv_lv_gstreamer_t.safe_field("pipeline"))
 
     @property
     def audio_convert(self):
-        return ptr_or_none(self._wv.safe_field("audio_convert"))
+        return ptr_or_none(self._wv_lv_gstreamer_t.safe_field("audio_convert"))
 
     @property
     def video_convert(self):
-        return ptr_or_none(self._wv.safe_field("video_convert"))
+        return ptr_or_none(self._wv_lv_gstreamer_t.safe_field("video_convert"))
 
     @property
     def audio_volume(self):
-        return ptr_or_none(self._wv.safe_field("audio_volume"))
+        return ptr_or_none(self._wv_lv_gstreamer_t.safe_field("audio_volume"))
 
     @property
     def gstreamer_timer(self):
-        return ptr_or_none(self._wv.safe_field("gstreamer_timer"))
+        return ptr_or_none(self._wv_lv_gstreamer_t.safe_field("gstreamer_timer"))
 
     @property
     def frame_queue(self):
-        return ptr_or_none(self._wv.safe_field("frame_queue"))
+        return ptr_or_none(self._wv_lv_gstreamer_t.safe_field("frame_queue"))
 
     @property
     def is_video_info_valid(self):
-        return int(self._wv.safe_field("is_video_info_valid", 0))
+        return int(self._wv_lv_gstreamer_t.safe_field("is_video_info_valid", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

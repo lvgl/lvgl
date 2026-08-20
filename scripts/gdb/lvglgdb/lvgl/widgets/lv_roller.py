@@ -13,35 +13,36 @@ class LVRoller(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_roller_t", ptr=True) or self
+        self._wv_lv_roller_t = self.cast("lv_roller_t", ptr=True) or self
+        self._wv = self._wv_lv_roller_t
 
     @property
     def option_cnt(self):
         """Number of options"""
-        return int(self._wv.safe_field("option_cnt", 0))
+        return int(self._wv_lv_roller_t.safe_field("option_cnt", 0))
 
     @property
     def sel_opt_id(self):
         """Index of the current option"""
-        return int(self._wv.safe_field("sel_opt_id", 0))
+        return int(self._wv_lv_roller_t.safe_field("sel_opt_id", 0))
 
     @property
     def sel_opt_id_ori(self):
         """Store the original index on focus"""
-        return int(self._wv.safe_field("sel_opt_id_ori", 0))
+        return int(self._wv_lv_roller_t.safe_field("sel_opt_id_ori", 0))
 
     @property
     def inf_page_cnt(self):
         """Number of extra pages added to make the roller look infinite"""
-        return int(self._wv.safe_field("inf_page_cnt", 0))
+        return int(self._wv_lv_roller_t.safe_field("inf_page_cnt", 0))
 
     @property
     def mode(self):
-        return int(self._wv.safe_field("mode", 0))
+        return int(self._wv_lv_roller_t.safe_field("mode", 0))
 
     @property
     def moved(self):
-        return int(self._wv.safe_field("moved", 0))
+        return int(self._wv_lv_roller_t.safe_field("moved", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

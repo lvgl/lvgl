@@ -51,6 +51,7 @@ The plugin provides the following commands.
 - `info draw_unit`: Print raw struct details for each drawing unit.
 - `info obj_class <expr>`: Show object class hierarchy.
 - `info subject <expr>`: Show subject and its observers.
+- `info lvgl_version`: Print the LVGL version of the target and the plugin's own.
 - `lvglobal`: (NuttX only) Set which LVGL instance to inspect.
 
 <Callout type="info">
@@ -70,7 +71,14 @@ be supported.
 ## Inspect Style
 
 `info style <style_var>`: Inspect a single `lv_style_t` variable. Properties are
-displayed with resolved names and formatted values (colors shown as hex).
+displayed with resolved names and formatted values:
+
+- colors as hex,
+- sizes as written in the source, so `LV_PCT(100)` shows as `100%` and
+  `LV_SIZE_CONTENT` as `content`,
+- enums by name, with bitmasks such as `BORDER_SIDE` combined as `BOTTOM|TOP`,
+- pointers as their C symbol, e.g. `TEXT_FONT` as `lv_font_montserrat_16`, or as
+  the string an image source points at.
 
 `info style --obj <obj_var>`: Inspect all styles of an `lv_obj_t`, grouped by
 style slot with selector and flags.
@@ -79,12 +87,15 @@ Example:
 
 ```bash
 (gdb) info style my_style
-+-----------+---------+
-| prop      | value   |
-+-----------+---------+
-| BG_COLOR  | #ff0000 |
-| BG_OPA    | 255     |
-+-----------+---------+
++-----------+-----------------------+
+| prop      | value                 |
++-----------+-----------------------+
+| BG_COLOR  | #ff0000               |
+| BG_OPA    | 255                   |
+| WIDTH     | 100%                  |
+| FLEX_FLOW | COLUMN                |
+| TEXT_FONT | lv_font_montserrat_16 |
++-----------+-----------------------+
 
 (gdb) info style --obj lv_global->disp_default->act_scr
 [0] MAIN|DEFAULT  local
@@ -213,7 +224,7 @@ ObjClass: lv_button -> lv_obj -> lv_obj
   editable       = 0
   group_def      = 2
   default_size   = (CONTENT, CONTENT) theme_inheritable=True
-  theme_inh      = True
+  theme_in      = True
 ```
 
 ## Inspect Subject
@@ -227,6 +238,37 @@ Example:
 Subject: type=INT subscribers=2
   Observer: cb=<my_cb> target=0x... for_obj=True
 ```
+
+## Inspect LVGL Version
+
+`info lvgl_version`: Print the LVGL version the target was built from, and the
+version of the plugin itself.
+
+Example:
+
+```text
+(gdb) info lvgl_version
+LVGL:    9.6.0-dev
+lvglgdb: 0.5.0
+```
+
+The version is read from the target rather than from the plugin's own copy of
+LVGL, so it is right even when a newer plugin inspects an older application.
+Three sources are tried in turn, because none of them is available in every
+build:
+
+1. `lv_version_major()` and friends. These are `static inline`, so they only
+   reach the binary if something calls them, which usually nothing does.
+2. The `LVGL_VERSION_*` macros. These need a `-g3` build *and* a stop inside a
+   translation unit that included `lv_version.h`. A breakpoint on
+   `lv_timer_handler` does not qualify, so `-g3` alone is not enough.
+3. `lv_version.h` on disk, located through the DWARF source path of any LVGL
+   symbol. This is the one that usually answers, and it works whenever the
+   sources are still where the compiler found them.
+
+If a field cannot be read it prints as `?`, and if none of the three works the
+command says so instead of guessing. Building with `-g3` and keeping the LVGL
+sources in place is enough to get a full answer.
 
 ## Set LVGL Instance (NuttX)
 

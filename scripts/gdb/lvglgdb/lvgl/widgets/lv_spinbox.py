@@ -13,42 +13,43 @@ class LVSpinbox(LVTextarea):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_spinbox_t", ptr=True) or self
+        self._wv_lv_spinbox_t = self.cast("lv_spinbox_t", ptr=True) or self
+        self._wv = self._wv_lv_spinbox_t
 
     @property
     def value(self):
-        return int(self._wv.safe_field("value", 0))
+        return int(self._wv_lv_spinbox_t.safe_field("value", 0))
 
     @property
     def range_max(self):
-        return int(self._wv.safe_field("range_max", 0))
+        return int(self._wv_lv_spinbox_t.safe_field("range_max", 0))
 
     @property
     def range_min(self):
-        return int(self._wv.safe_field("range_min", 0))
+        return int(self._wv_lv_spinbox_t.safe_field("range_min", 0))
 
     @property
     def step(self):
-        return int(self._wv.safe_field("step", 0))
+        return int(self._wv_lv_spinbox_t.safe_field("step", 0))
 
     @property
     def digit_count(self):
-        return int(self._wv.safe_field("digit_count", 0))
+        return int(self._wv_lv_spinbox_t.safe_field("digit_count", 0))
 
     @property
     def dec_point_pos(self):
         """if 0, there is no separator and the number is an integer"""
-        return int(self._wv.safe_field("dec_point_pos", 0))
+        return int(self._wv_lv_spinbox_t.safe_field("dec_point_pos", 0))
 
     @property
     def rollover(self):
         """Set to true for rollover functionality"""
-        return int(self._wv.safe_field("rollover", 0))
+        return int(self._wv_lv_spinbox_t.safe_field("rollover", 0))
 
     @property
     def digit_step_dir(self):
         """the direction the digit will step on encoder button press when editing"""
-        return int(self._wv.safe_field("digit_step_dir", 0))
+        return int(self._wv_lv_spinbox_t.safe_field("digit_step_dir", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

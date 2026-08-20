@@ -12,6 +12,7 @@ from .misc import (
     DumpTimer,
     DumpImageDecoder,
     DumpFsDrv,
+    InfoVersion,
 )
 from .dashboard import DumpDashboard
 from .debugger import Debugger
@@ -48,6 +49,7 @@ InfoStyle()
 InfoDrawUnit()
 InfoObjClass()
 InfoSubject()
+InfoVersion()
 
 # Drivers
 Lvglobal()

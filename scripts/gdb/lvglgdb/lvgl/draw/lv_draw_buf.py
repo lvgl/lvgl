@@ -1,11 +1,39 @@
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Optional
 import gdb
 
-import numpy as np
-from PIL import Image
-
 from lvglgdb.value import Value, ValueInput
+
+# numpy and Pillow are needed to turn pixels into an image, and nothing else in
+# the plugin needs them. Importing them here would make every command - and
+# `import lvglgdb` itself - fail on a GDB whose Python does not have them, so
+# they are imported where they are used. `from __future__ import annotations`
+# above keeps the type hints from needing them at definition time.
+np = None
+Image = None
+
+
+def _require_imaging():
+    """Import numpy and Pillow, with a message that says where they must go."""
+    global np, Image
+    if np is not None and Image is not None:
+        return
+    try:
+        import numpy
+        from PIL import Image as pil_image
+    except ImportError as e:
+        import sys
+
+        raise gdb.GdbError(
+            f"{e.name} is needed to read images, and has to be installed for "
+            f"the Python that GDB embeds "
+            f"({sys.version_info.major}.{sys.version_info.minor}), not for the "
+            f"one on your PATH. On Debian and Ubuntu: sudo apt install "
+            f"python3-{'numpy' if e.name == 'numpy' else 'pil'}"
+        ) from e
+    np, Image = numpy, pil_image
 
 
 class LVDrawBuf(Value):
@@ -84,13 +112,20 @@ class LVDrawBuf(Value):
         Returns:
             PIL.Image or None on failure.
         """
+        _require_imaging()
         header = self.super_value("header")
         stride = int(header["stride"])
         height = int(header["h"])
         cf_info = self.color_format_info()
         data_ptr = self.super_value("data")
         data_size = int(self.super_value("data_size"))
-        width = (stride * 8) // cf_info["bpp"] if cf_info["bpp"] else 0
+        # The width is in the header. Deriving it from the stride instead turns
+        # any row padding into extra pixels, which shears the whole image.
+        width = int(header["w"])
+        bpp = cf_info["bpp"]
+        row_bytes = (width * bpp + 7) // 8 if bpp else 0
+        if not stride:
+            stride = row_bytes
         expected_data_size = stride * height
 
         if not data_ptr or width <= 0 or height <= 0:
@@ -115,6 +150,13 @@ class LVDrawBuf(Value):
             .read_memory(int(data_ptr), expected_data_size)
             .tobytes()
         )
+        if stride > row_bytes:
+            # _convert_to_image expects rows packed back to back, so drop the
+            # padding at the end of each row.
+            pixel_data = b"".join(
+                pixel_data[y * stride:y * stride + row_bytes]
+                for y in range(height)
+            )
         return self._convert_to_image(pixel_data, width, height, cf_info["value"])
 
     def data_dump(self, filename: str, format: str = None) -> bool:
@@ -185,6 +227,7 @@ class LVDrawBuf(Value):
         Returns:
             PIL.Image or None if conversion fails
         """
+        _require_imaging()
         try:
             if color_format == self._color_formats["RGB565"]:
                 # Convert RGB565 to RGB888
