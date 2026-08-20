@@ -173,18 +173,26 @@ You can use it as a reference for adding LVGL to your own NuttX app.
 Start by copying the contents of `lvgldemo.c`. It handles fb and lcd based
 display drivers, the touchscreen input driver, and libuv.
 
-## NuttX Driver Support
+## Drivers and Renderers
 
-- **fbdev** - LVGL can create a display for `/dev/fb*` devices.
-- **lcd** - LVGL can create a display for `/dev/lcd*` devices.
-- **input/uinput touchscreen** - LVGL can create an indev(s) for
-   touch devices that use the NuttX input/uinput system.
-- **libuv** - LVGL has support for using libuv as its event loop manager.
-   libuv apps can integrate seamlessly.
+LVGL ships a NuttX driver that covers both display interfaces and the input devices:
 
-There is no support for input/uinput keyboards yet. The NuttX X11 sim
-keyboard driver emits keycodes that are not standard so the LVGL integration
-with it would not be generic, if it were added.
+| What you need | Use |
+|---|---|
+| Display from `/dev/fb*` or `/dev/lcd*` | **[NuttX driver](/main-modules/display_drivers/nuttx)** |
+| Touchscreen and mouse input | **[NuttX driver](/main-modules/display_drivers/nuttx)** — same driver, `LV_USE_NUTTX_TOUCHSCREEN` / `LV_USE_NUTTX_MOUSE` |
+| Keyboard input | **Not supported yet** — see the note below |
+| libuv as the event loop manager | `LV_USE_NUTTX_LIBUV`; libuv apps integrate seamlessly |
+| Rendering | **[Software renderer](/main-modules/renderers/sw)** — NuttX targets rarely have a GPU LVGL can use |
+
+The [NuttX driver page](/main-modules/display_drivers/nuttx) has the full config option list, the
+`lv_nuttx_init()` API and the per-device create functions.
+
+<Callout type="warn">
+There is no support for input/uinput keyboards yet. The NuttX X11 sim keyboard driver emits
+keycodes that are not standard, so the LVGL integration with it would not be generic if it were
+added.
+</Callout>
 
 ## Other Integrations
 
@@ -224,7 +232,7 @@ to allocate from the NuttX global heap or use its own.
 NuttX tries to be POSIX compliant where possible, meaning it supports
 pthreads (POSIX threads). To enable OS features in LVGL on NuttX,
 set <ApiLink name="LV_USE_OS" /> to <ApiLink name="LV_OS_PTHREAD" />.
-The main reason for enabling OS features is for [multi-core rendering](/main-modules/draw/draw_units).
+The main reason for enabling OS features is for [multi-core rendering](/main-modules/renderers/overview).
 See <ApiLink name="LV_DRAW_SW_DRAW_UNIT_CNT" />. Otherwise there is no case
 for setting it.
 

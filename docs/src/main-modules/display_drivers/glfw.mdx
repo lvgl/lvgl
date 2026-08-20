@@ -1,0 +1,162 @@
+---
+title: GLFW
+description: "The GLFW driver opens a window with an OpenGL context and reads mouse and keyboard input. It is the quickest way to get LVGL running with GPU rendering on a PC-like platform."
+---
+
+## Overview
+
+The **GLFW** display/input driver opens a window with an OpenGL context and reads mouse and keyboard input.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_GLFW" />.
+
+<Callout type="warning" title="GLFW and EGL are mutually exclusive">
+<ApiLink name="LV_USE_GLFW" /> cannot be combined with `EGL`.
+GLFW manages the context itself, so the two window-system layers would collide.
+</Callout>
+
+
+## Building
+
+The driver always requires `GLFW`.
+
+<Callout type="tip">
+LVGL's CMake integration resolves it for you.
+It can be fetched at compile time by LVGL so it doesn't have to be present on your system.
+
+See [Dependency Management](/integration/building/cmake).
+</Callout>
+
+## GPU Rendering
+
+To render on the GPU rather than blitting software-rendered pixels, also enable one of the draw units:
+
+| Symbol | Effect |
+|---|---|
+| <ApiLink name="LV_USE_DRAW_NANOVG" /> | Vector rendering on the GPU. Recommended — best performance and feature coverage. |
+| <ApiLink name="LV_USE_DRAW_OPENGLES" /> | Caches software-rendered areas as GPU textures. |
+
+Neither is required: with no draw unit enabled the driver still works, rendering in software and uploading
+the result to the window.
+
+## Usage
+
+<Callout type="tip">
+[LVGL's linux port](https://github.com/lvgl/lv_port_linux) can be used to quickly get started with LVGL's GLFW backend.
+</Callout>
+
+<ApiLink name="lv_opengles_glfw_window_create" /> opens the window and initializes OpenGL. The third
+argument enables the mouse input device. <ApiLink name="lv_opengles_window_display_create" /> then gives you
+a display that renders into that window.
+
+```c
+#include "lvgl/lvgl.h"
+#include "lvgl/demos/lv_demos.h"
+
+#define WIDTH  640
+#define HEIGHT 480
+
+int main(void)
+{
+    lv_init();
+
+    /* Create a window and initialize OpenGL */
+    lv_opengles_window_t * window = lv_opengles_glfw_window_create(WIDTH, HEIGHT, true);
+
+    /* Create a display that renders into the window */
+    lv_display_t * disp = lv_opengles_window_display_create(window, WIDTH, HEIGHT);
+    lv_display_set_default(disp);
+
+    /* Add a cursor to the window's mouse indev */
+    lv_opengles_window_texture_t * wt = lv_opengles_window_display_get_window_texture(disp);
+    lv_indev_t * mouse = lv_opengles_window_texture_get_mouse_indev(wt);
+    LV_IMAGE_DECLARE(mouse_cursor_icon);
+    lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());
+    lv_image_set_src(cursor_obj, &mouse_cursor_icon);
+    lv_indev_set_cursor(mouse, cursor_obj);
+
+    lv_demo_widgets();
+
+    while(1) {
+        uint32_t time_until_next = lv_timer_handler();
+        if(time_until_next == LV_NO_TIMER_READY) time_until_next = LV_DEF_REFR_PERIOD;
+        lv_delay_ms(time_until_next);
+    }
+
+    return 0;
+}
+```
+
+Multiple windows can be created, each with its own displays.
+
+## Compositing Textures in a Window
+
+A GLFW window can draw any number of OpenGL textures, positioned and blended independently. That covers two
+cases: several LVGL displays in one window, and LVGL displaying textures produced by another library.
+
+Use <ApiLink name="lv_opengles_texture_create" /> for an LVGL display that renders into its own texture, and
+<ApiLink name="lv_opengles_window_add_texture" /> to place any texture id in the window.
+
+```c
+#include "lvgl/lvgl.h"
+
+#define WIDTH  640
+#define HEIGHT 480
+
+void composite_example(lv_opengles_window_t * window)
+{
+    /* A second LVGL display, rendering into its own texture */
+    const int32_t sub_w = 300, sub_h = 300;
+    lv_display_t * sub = lv_opengles_texture_create(sub_w, sub_h);
+    unsigned int sub_id = lv_opengles_texture_get_texture_id(sub);
+    lv_opengles_window_texture_t * sub_wt =
+        lv_opengles_window_add_texture(window, sub_id, sub_w, sub_h);
+
+    /* Build its UI */
+    lv_display_t * saved = lv_display_get_default();
+    lv_display_set_default(sub);
+    lv_example_keyboard_2();
+    lv_display_set_default(saved);
+
+    /* Position it in the window and make it translucent */
+    lv_opengles_window_texture_set_x(sub_wt, 250);
+    lv_opengles_window_texture_set_y(sub_wt, 150);
+    lv_opengles_window_texture_set_opa(sub_wt, LV_OPA_80);
+
+    /* A texture owned by some other library can be added the same way */
+    lv_opengles_window_add_texture(window, external_texture_id, ext_w, ext_h);
+
+    /* Going the other way: render the LVGL texture, then hand it to another library */
+    lv_refr_now(sub);
+    third_party_lib_use_texture(sub_id);
+}
+```
+
+<ApiLink name="lv_opengles_window_texture_remove" /> takes a texture back out of the window.
+
+To wrap a texture your own code allocated in an LVGL display instead, use
+<ApiLink name="lv_opengles_texture_create_from_texture_id" />. See
+[OpenGL Driver](/main-modules/display_drivers/opengl_texture) for the texture-only driver, which
+assumes you manage the context and the window yourself.
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Rotation | Hardware (GPU) |
+| Runtime resolution change | No |
+| Runtime color format change | No |
+| Color formats | Derived from <ApiLink name="LV_COLOR_DEPTH" /> |
+| Multiple displays / windows | Yes |
+| Hardware acceleration | OpenGL ES, via <ApiLink name="LV_USE_DRAW_NANOVG" /> or <ApiLink name="LV_USE_DRAW_OPENGLES" /> |
+| Render mode | Full with <ApiLink name="LV_USE_DRAW_OPENGLES" />, otherwise Direct |
+| Input | Built in, mouse per window, keyboard |
+
+## See Also
+
+- [Dependency Management](/integration/building/cmake) - how LVGL resolves or fetches GLFW
+- [OpenGL Driver](/main-modules/display_drivers/opengl_texture) - texture-only driver for an existing context
+- [OpenGL Overview](/integration/embedded_linux/opengl) - how the drivers and draw units fit together
+- [NanoVG Draw Unit](/main-modules/renderers/nanovg) - the recommended GPU renderer
+- [EGL](/main-modules/display_drivers/egl) - use instead of GLFW when you need EGL

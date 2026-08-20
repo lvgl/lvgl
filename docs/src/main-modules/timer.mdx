@@ -10,19 +10,18 @@ See [Timer Handler](/integration/overview) for more information.
 
 By default, LVGL itself uses Timers to:
 
-- refresh each display --- during the creation of each Display, a Timer is
+- Refresh each display. During the creation of each Display, a Timer is
   created for that Display.  That Timer refreshes the display based on the configured
   value of <ApiLink name="LV_DEF_REFR_PERIOD" />, and also sends all display-related events,
   like <ApiLink name="LV_EVENT_REFR_START" />, <ApiLink name="LV_EVENT_REFR_READY" />,
   etc.
-- read input devices --- during the creation of each [Input devices (lv_indev)](/main-modules/indev), a Timer is
+- Read input devices. During the creation of each [Input devices (lv_indev)](/main-modules/indev), a Timer is
   created for that Input Device based on the configured value of
   <ApiLink name="LV_DEF_REFR_PERIOD" />.  That Timer causes that input device to be read and
   also sends all input-device-related events, like <ApiLink name="LV_EVENT_CLICKED" />,
   <ApiLink name="LV_EVENT_PRESSED" />, etc.
-- update system-monitor values --- if <ApiLink name="LV_USE_SYSMON" /> is set to `1` in
-  `lv_conf.h`, one or more timers are created to periodically compute and
-  monitor system performance statistics and LVGL's memory usage.
+- Update system-monitor values. If <ApiLink name="LV_USE_SYSMON" /> is enabled, one or more timers are created
+  to periodically compute and monitor system performance statistics and LVGL's memory usage.
 
 Timers are non-preemptive, which means a Timer cannot interrupt another
 Timer. Therefore, you can call any LVGL-related function in a Timer.
