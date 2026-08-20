@@ -133,7 +133,8 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p)
 
 void lv_ll_remove(lv_ll_t * ll_p, void * node_p)
 {
-    if(ll_p == NULL) return;
+    LV_CHECK_ARG(ll_p != NULL, return);
+    LV_CHECK_ARG(node_p != NULL, return);
 
     if(lv_ll_get_head(ll_p) == node_p) {
         /*The new head will be the node after 'node_p'*/
@@ -166,7 +167,7 @@ void lv_ll_remove(lv_ll_t * ll_p, void * node_p)
 
 void lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *))
 {
-    if(ll_p == NULL) return;
+    LV_CHECK_ARG(ll_p != NULL, return);
 
     void * i;
     void * i_next;
@@ -317,7 +318,7 @@ bool lv_ll_is_empty(lv_ll_t * ll_p)
 
 void lv_ll_clear(lv_ll_t * ll_p)
 {
-    if(ll_p == NULL) return;
+    LV_CHECK_ARG(ll_p != NULL, return);
 
     lv_ll_clear_custom(ll_p, NULL);
 }
