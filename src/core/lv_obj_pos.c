@@ -16,12 +16,17 @@
 #include "../display/lv_display_private.h"
 #include "lv_refr_private.h"
 #include "../core/lv_global.h"
+#include "lv_obj_class_private.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS (&lv_obj_class)
 #define update_layout_mutex LV_GLOBAL_DEFAULT()->layout_update_mutex
+
+#if LV_OBJ_LAYOUT_UPDATE_MAX_PASSES <= 0
+    #error "LV_OBJ_LAYOUT_UPDATE_MAX_PASSES needs to be at least 1, otherwise no object layout is calculated"
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -121,21 +126,25 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     else {
         int32_t content_width = -1;
-        w = calc_dynamic_width(obj, LV_STYLE_WIDTH, &content_width);
+        int32_t unclamped_w = calc_dynamic_width(obj, LV_STYLE_WIDTH, &content_width);
         int32_t minw = calc_dynamic_width(obj, LV_STYLE_MIN_WIDTH, &content_width);
         int32_t maxw = calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH, &content_width);
-        w = LV_CLAMP(minw, w, maxw);
+        w = LV_CLAMP(minw, unclamped_w, maxw);
 
         /**
-         * If the object style (after clamping) results in a width that is defined as a percentage of the parent,
-         * and if the parent's width is set to LV_SIZE_CONTENT and not managed by a layout, this object should not
-         * influence the parent's content width calculation. Thus, the `w_ignore_size` flag is set accordingly.
+         * If the width in effect is a percentage of a parent that is itself LV_SIZE_CONTENT and not managed by
+         * a layout, the two sizes would depend on each other, so `w_ignore_size` excludes this object from the
+         * parent's content width calculation. Min/max width define the width in effect only where the clamp
+         * actually overrode the width style, hence the comparisons against the unclamped width: crediting a
+         * width that merely happens to equal `minw` or `maxw` to min/max makes the flag alternate between
+         * layout passes and the layout never settles. With inverted bounds (`minw > maxw`) the clamp always
+         * resolves to `minw`, so min width is in effect regardless of the unclamped width.
          */
         int32_t w_style;
-        if(w == minw) {
+        if(minw > maxw || unclamped_w < minw) {
             w_style = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
         }
-        else if(w == maxw) {
+        else if(unclamped_w > maxw) {
             w_style = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
         }
         else {
@@ -151,21 +160,22 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     else {
         int32_t content_height = -1;
-        h = calc_dynamic_height(obj, LV_STYLE_HEIGHT, &content_height);
+        int32_t unclamped_h = calc_dynamic_height(obj, LV_STYLE_HEIGHT, &content_height);
         int32_t minh = calc_dynamic_height(obj, LV_STYLE_MIN_HEIGHT, &content_height);
         int32_t maxh = calc_dynamic_height(obj, LV_STYLE_MAX_HEIGHT, &content_height);
-        h = LV_CLAMP(minh, h, maxh);
+        h = LV_CLAMP(minh, unclamped_h, maxh);
 
         /**
-         * If the object style (after clamping) results in a height that is defined as a percentage of the parent,
-         * and if the parent's height is set to LV_SIZE_CONTENT and not managed by a layout, this object should not
-         * influence the parent's content height calculation. Thus, the `h_ignore_size` flag is set accordingly.
+         * If the height in effect is a percentage of a parent that is itself LV_SIZE_CONTENT and not managed by
+         * a layout, the two sizes would depend on each other, so `h_ignore_size` excludes this object from the
+         * parent's content height calculation. See the width branch above for why the unclamped height is what
+         * is compared against the bounds, and why inverted bounds count as the min height case.
          */
         int32_t h_style;
-        if(h == minh) {
+        if(minh > maxh || unclamped_h < minh) {
             h_style = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
         }
-        else if(h == maxh) {
+        else if(unclamped_h > maxh) {
             h_style = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
         }
         else {
@@ -332,7 +342,16 @@ void lv_obj_update_layout(const lv_obj_t * obj)
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
     /*Repeat until there are no more layout invalidations*/
+    uint32_t pass_cnt = 0;
     while(scr->scr_layout_inv) {
+        if(pass_cnt >= LV_OBJ_LAYOUT_UPDATE_MAX_PASSES) {
+            LV_LOG_WARN("Layout of screen %p (class: '%s') didn't settle in %d passes, giving up. Some sizes "
+                        "probably depend on each other circularly",
+                        (void *)scr, scr->class_p->name, LV_OBJ_LAYOUT_UPDATE_MAX_PASSES);
+            scr->scr_layout_inv = 0;
+            break;
+        }
+        pass_cnt++;
         LV_LOG_TRACE("Layout update begin");
         scr->scr_layout_inv = 0;
         layout_update_core(scr);
