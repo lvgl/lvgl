@@ -1413,7 +1413,10 @@
 /** Menu */
 #define LV_USE_MENU 1
 
-/** Message box */
+/** Message box
+ *
+ *  Enable: LV_USE_LABEL
+ */
 #define LV_USE_MSGBOX 1
 
 /** QR code

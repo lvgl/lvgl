@@ -16,10 +16,6 @@
 #include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
 
-#if LV_USE_LABEL == 0
-    #error "lv_mbox: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
-#endif
-
 /*********************
  *      DEFINES
  *********************/
