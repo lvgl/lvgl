@@ -9,7 +9,7 @@
  * `lv_barcode_set_dark_color` and `lv_barcode_set_light_color` use darkened and
  * lightened entries from `LV_PALETTE_BLUE` and `LV_PALETTE_LIGHT_BLUE` for the
  * bars and background, a matching border color is applied, and
- * `lv_barcode_update` encodes `https://lvgl.io`.
+ * `lv_barcode_set_data` encodes `https://lvgl.io`.
  */
 void lv_example_barcode_1(void)
 {
@@ -28,7 +28,7 @@ void lv_example_barcode_1(void)
     lv_obj_set_style_border_color(barcode, bg_color, 0);
 
     /*Set data*/
-    lv_barcode_update(barcode, "https://lvgl.io");
+    lv_barcode_set_data(barcode, "https://lvgl.io");
 }
 
 #endif

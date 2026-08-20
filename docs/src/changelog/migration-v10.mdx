@@ -405,6 +405,26 @@ if you need finer control.
 
 ## Widgets
 
+### lv_barcode
+
+- Data setting and bitmap generation are now separate steps. Set the data with the
+  new `lv_barcode_set_data()`; `lv_barcode_update()` no longer takes the data - it
+  regenerates the bitmap from the stored data (and is a no-op when nothing changed).
+  Use `lv_barcode_force_update()` to regenerate unconditionally.
+
+  ```c
+  /* Before */
+  lv_barcode_update(barcode, "https://lvgl.io");
+
+  /* After */
+  lv_barcode_set_data(barcode, "https://lvgl.io");
+  ```
+
+- Changing the scale, direction, tiled mode, encoding, or the object's size now
+  regenerates the bitmap regardless of order (previously changes made after the data
+  had no effect). Use `lv_barcode_set_auto_update(barcode, false)` +
+  `lv_barcode_update()` to batch changes into a single regeneration.
+
 ### lv_span
 
 - `lv_spangroup_set_align()` is deprecated, use the `text_align` style property instead:
