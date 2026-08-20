@@ -190,7 +190,7 @@ void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
 
 void lv_tiny_ttf_destroy(lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    if(font == NULL) return;
 
     if(font->dsc != NULL) {
         ttf_font_desc_t * ttf = (ttf_font_desc_t *)font->dsc;

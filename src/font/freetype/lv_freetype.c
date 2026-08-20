@@ -145,7 +145,7 @@ void lv_freetype_uninit(void)
 
 void lv_freetype_init_font_info(lv_font_info_t * font_info)
 {
-    LV_ASSERT_NULL(font_info);
+    LV_CHECK_ARG(font_info != NULL, return);
     lv_memzero(font_info, sizeof(lv_font_info_t));
     font_info->class_p = &lv_freetype_font_class;
     font_info->render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
@@ -156,7 +156,7 @@ void lv_freetype_init_font_info(lv_font_info_t * font_info)
 
 lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
 {
-    LV_ASSERT_NULL(font_info);
+    LV_CHECK_ARG(font_info != NULL, return NULL);
     if(font_info->size == 0) {
         LV_LOG_ERROR("font size can't be zero");
         return NULL;
@@ -262,7 +262,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
 
 void lv_freetype_font_delete(lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    if(font == NULL) return;
     lv_freetype_context_t * ctx = lv_freetype_get_context();
     if(!ctx) {
         /* Freetype already torn down (e.g. static destruction order). Nothing to release. */

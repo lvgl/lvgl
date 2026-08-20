@@ -93,7 +93,7 @@ const lv_font_class_t lv_binfont_font_class = {
 
 lv_font_t * lv_binfont_create(const char * path)
 {
-    LV_ASSERT_NULL(path);
+    LV_CHECK_ARG(path != NULL, return NULL);
 
     lv_fs_file_t file;
     lv_fs_res_t fs_res = lv_fs_open(&file, path, LV_FS_MODE_RD);
