@@ -89,7 +89,7 @@ static void flush_no_lock(void);
 
 void lv_profiler_builtin_config_init(lv_profiler_builtin_config_t * config)
 {
-    LV_ASSERT_NULL(config);
+    LV_CHECK_ARG(config != NULL, return);
     lv_memzero(config, sizeof(lv_profiler_builtin_config_t));
     config->buf_size = LV_PROFILER_BUILTIN_BUF_SIZE;
     config->tick_per_sec = 1000;
@@ -101,8 +101,8 @@ void lv_profiler_builtin_config_init(lv_profiler_builtin_config_t * config)
 
 void lv_profiler_builtin_init(const lv_profiler_builtin_config_t * config)
 {
-    LV_ASSERT_NULL(config);
-    LV_ASSERT_NULL(config->tick_get_cb);
+    LV_CHECK_ARG(config != NULL, return);
+    LV_CHECK_ARG(config->tick_get_cb != NULL, return);
 
     uint32_t num = config->buf_size / sizeof(lv_profiler_builtin_item_t);
     if(num == 0) {
@@ -179,7 +179,7 @@ void lv_profiler_builtin_flush(void)
 
 void lv_profiler_builtin_write(const char * func, char tag)
 {
-    LV_ASSERT_NULL(func);
+    LV_CHECK_ARG(func != NULL, return);
 
     if(!(profiler_ctx && profiler_ctx->enable)) {
         return;
