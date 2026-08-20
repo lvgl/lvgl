@@ -125,9 +125,6 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
 
 /**
  * Remove a style from an object.
- * @param obj       pointer to an object
- * @param style     pointer to a style to remove. Can be NULL to check only the selector
- * @param selector  OR-ed values of states and a part to remove only styles with matching selectors. LV_STATE_ANY and LV_PART_ANY can be used
  *
  * Examples:
  * @code
@@ -137,6 +134,11 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
  *
  * lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY); //Remove all styles
  * @endcode
+ *
+ * @param obj       pointer to a widget
+ * @param style     pointer to a style to remove. @nullable When NULL every style
+ *                  matching `selector` is removed.
+ * @param selector  OR-ed value of parts and states to remove the style from
  */
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
@@ -157,8 +159,8 @@ void lv_obj_remove_style_all(lv_obj_t * obj);
 
 /**
  * Notify all object if a style is modified
- * @param style     pointer to a style. Only the objects with this style will be notified
- *                  (NULL to notify all objects)
+ * @param style     pointer to a style. Only the objects with this style will be notified.
+ *                  @nullable When NULL every object is notified.
  */
 void lv_obj_report_style_change(lv_style_t * style);
 
