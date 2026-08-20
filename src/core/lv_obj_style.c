@@ -106,6 +106,7 @@ void lv_obj_style_deinit(void)
 void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
     LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_ARG(style != NULL, return);
     LV_CHECK_ARG(obj->style_cnt < 63, return,
                  "obj->style_cnt is restricted to 6 bits, so we can't store more than 63 styles");
 
@@ -630,6 +631,7 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
 lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_t part, const char * txt)
 {
     LV_CHECK_ARG(obj != NULL, return LV_TEXT_ALIGN_AUTO);
+    LV_CHECK_ARG(txt != NULL, return LV_TEXT_ALIGN_AUTO);
 
     lv_text_align_t align = lv_obj_get_style_text_align(obj, part);
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, part);
