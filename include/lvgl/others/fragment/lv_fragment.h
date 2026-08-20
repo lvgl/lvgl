@@ -126,7 +126,8 @@ struct _lv_fragment_class_t {
 
 /**
  * Create fragment manager instance
- * @param parent Parent fragment if this manager is placed inside another fragment, can be null.
+ * @param parent Parent fragment if this manager is placed inside another fragment.
+ *               @nullable When NULL this manager has no parent fragment.
  * @return Fragment manager instance
  */
 lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent);
@@ -153,7 +154,8 @@ void lv_fragment_manager_delete_obj(lv_fragment_manager_t * manager);
  * Attach fragment to manager, and add to container.
  * @param manager Fragment manager instance
  * @param fragment Fragment instance
- * @param container Pointer to container object for manager to add objects to
+ * @param container Pointer to container object for manager to add objects to.
+ *                  @nullable When NULL the fragment is attached without a container.
  */
 void lv_fragment_manager_add(lv_fragment_manager_t * manager, lv_fragment_t * fragment, lv_obj_t * const * container);
 
@@ -168,7 +170,8 @@ void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t *
  * Attach fragment to manager and add to navigation stack.
  * @param manager Fragment manager instance
  * @param fragment Fragment instance
- * @param container Pointer to container object for manager to add objects to
+ * @param container Pointer to container object for manager to add objects to.
+ *                  @nullable When NULL the fragment is attached without a container.
  */
 void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * fragment, lv_obj_t * const * container);
 
@@ -192,7 +195,7 @@ void lv_fragment_manager_replace(lv_fragment_manager_t * manager, lv_fragment_t 
  * Send event to top-most fragment
  * @param manager Fragment manager instance
  * @param code User-defined ID of event
- * @param userdata User-defined data
+ * @param userdata User-defined data @nullable
  * @return true if fragment returned true
  */
 bool lv_fragment_manager_send_event(lv_fragment_manager_t * manager, int code, void * userdata);
@@ -214,7 +217,8 @@ lv_fragment_t * lv_fragment_manager_get_top(lv_fragment_manager_t * manager);
 /**
  * Find first fragment instance in the container
  * @param manager Fragment manager instance
- * @param container Container which target fragment added to
+ * @param container Container which target fragment added to. @nullable Matches
+ *                  fragments attached without a container.
  * @return First fragment instance in the container
  */
 lv_fragment_t * lv_fragment_manager_find_by_container(lv_fragment_manager_t * manager, const lv_obj_t * container);
@@ -230,7 +234,7 @@ lv_fragment_t * lv_fragment_manager_get_parent_fragment(lv_fragment_manager_t * 
  * Create a fragment instance.
  *
  * @param cls Fragment class. This fragment must return non null object.
- * @param args Arguments assigned by fragment manager
+ * @param args Arguments assigned by fragment manager @nullable
  * @return Fragment instance
  */
 lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args);
