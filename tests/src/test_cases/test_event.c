@@ -177,4 +177,77 @@ void test_event_remove_event_cb(void)
     lv_obj_delete(obj);
 }
 
+/* A single descriptor can be removed while the others are left in place */
+void test_event_remove_event_dsc(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+
+    lv_event_dsc_t * dsc_1 = lv_obj_add_event_cb(obj, test_event_cb_1, LV_EVENT_CLICKED, NULL);
+    lv_event_dsc_t * dsc_2 = lv_obj_add_event_cb(obj, test_event_cb_1, LV_EVENT_PRESSED, NULL);
+    TEST_ASSERT_EQUAL_UINT32(2, lv_obj_get_event_count(obj));
+
+    TEST_ASSERT_TRUE(lv_obj_remove_event_dsc(obj, dsc_1));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_obj_get_event_count(obj));
+    TEST_ASSERT_EQUAL_PTR(dsc_2, lv_obj_get_event_dsc(obj, 0));
+
+    /* Removing the same descriptor twice must fail */
+    TEST_ASSERT_FALSE(lv_obj_remove_event_dsc(obj, dsc_1));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_obj_get_event_count(obj));
+
+    TEST_ASSERT_TRUE(lv_obj_remove_event_dsc(obj, dsc_2));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_obj_get_event_count(obj));
+
+    /* A descriptor of another widget doesn't belong to this list */
+    lv_obj_t * other = lv_obj_create(lv_screen_active());
+    lv_event_dsc_t * dsc_other = lv_obj_add_event_cb(other, test_event_cb_1, LV_EVENT_CLICKED, NULL);
+    TEST_ASSERT_FALSE(lv_obj_remove_event_dsc(obj, dsc_other));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_obj_get_event_count(other));
+
+    lv_obj_delete(other);
+    lv_obj_delete(obj);
+}
+
+static uint32_t bubble_child_cnt;
+static uint32_t bubble_parent_cnt;
+static bool bubble_stop;
+
+static void event_bubble_child_cb(lv_event_t * e)
+{
+    bubble_child_cnt++;
+    if(bubble_stop) lv_event_stop_bubbling(e);
+}
+
+static void event_bubble_parent_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    bubble_parent_cnt++;
+}
+
+/* lv_event_stop_bubbling() keeps the event from reaching the parent */
+void test_event_stop_bubbling(void)
+{
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
+    lv_obj_t * child = lv_obj_create(parent);
+    lv_obj_set_event_bubble(child, true);
+
+    lv_obj_add_event_cb(child, event_bubble_child_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(parent, event_bubble_parent_cb, LV_EVENT_CLICKED, NULL);
+
+    bubble_child_cnt = 0;
+    bubble_parent_cnt = 0;
+    bubble_stop = false;
+    lv_obj_send_event(child, LV_EVENT_CLICKED, NULL);
+    TEST_ASSERT_EQUAL_UINT32(1, bubble_child_cnt);
+    TEST_ASSERT_EQUAL_UINT32(1, bubble_parent_cnt);
+
+    bubble_child_cnt = 0;
+    bubble_parent_cnt = 0;
+    bubble_stop = true;
+    lv_obj_send_event(child, LV_EVENT_CLICKED, NULL);
+    TEST_ASSERT_EQUAL_UINT32(1, bubble_child_cnt);
+    TEST_ASSERT_EQUAL_UINT32(0, bubble_parent_cnt);
+
+    lv_obj_delete(parent);
+}
+
 #endif

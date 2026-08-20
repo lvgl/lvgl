@@ -89,7 +89,7 @@ lv_result_t lv_event_push_and_send(lv_event_list_t * event_list, lv_event_code_t
 
     lv_event_push(&e);
     lv_result_t res = lv_event_send(event_list, &e, true);
-    if(res != LV_RESULT_OK) goto ret;
+    if(res != LV_RESULT_OK || e.stop_processing) goto ret;
 
     res = lv_event_send(event_list, &e, false);
     if(res != LV_RESULT_OK) goto ret;
