@@ -2178,6 +2178,7 @@ config LV_USE_MENU
 config LV_USE_MSGBOX
 	bool "Message box"
 	default y
+	select LV_USE_LABEL
 
 config LV_USE_QRCODE
 	bool "QR code"
