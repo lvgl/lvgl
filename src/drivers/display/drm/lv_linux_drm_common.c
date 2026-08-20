@@ -93,6 +93,7 @@ static char * find_by_class(void)
 
 int32_t lv_linux_drm_mode_get_horizontal_resolution(const lv_linux_drm_mode_t * mode)
 {
+    LV_CHECK_ARG(mode != NULL, return 0);
     if(!mode) {
         return 0;
     }
@@ -101,6 +102,7 @@ int32_t lv_linux_drm_mode_get_horizontal_resolution(const lv_linux_drm_mode_t * 
 
 int32_t lv_linux_drm_mode_get_vertical_resolution(const lv_linux_drm_mode_t * mode)
 {
+    LV_CHECK_ARG(mode != NULL, return 0);
     if(!mode) {
         return 0;
     }
@@ -109,6 +111,7 @@ int32_t lv_linux_drm_mode_get_vertical_resolution(const lv_linux_drm_mode_t * mo
 
 int32_t lv_linux_drm_mode_get_refresh_rate(const lv_linux_drm_mode_t * mode)
 {
+    LV_CHECK_ARG(mode != NULL, return 0);
     if(!mode) {
         return 0;
     }
@@ -117,6 +120,7 @@ int32_t lv_linux_drm_mode_get_refresh_rate(const lv_linux_drm_mode_t * mode)
 
 bool lv_linux_drm_mode_is_preferred(const lv_linux_drm_mode_t * mode)
 {
+    LV_CHECK_ARG(mode != NULL, return false);
     if(!mode) {
         return false;
     }
@@ -125,6 +129,7 @@ bool lv_linux_drm_mode_is_preferred(const lv_linux_drm_mode_t * mode)
 
 void * lv_linux_drm_mode_get_raw(const lv_linux_drm_mode_t * mode)
 {
+    LV_CHECK_ARG(mode != NULL, return NULL);
     if(!mode) {
         return NULL;
     }

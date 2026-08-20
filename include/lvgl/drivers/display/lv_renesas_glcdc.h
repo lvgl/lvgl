@@ -38,7 +38,7 @@ lv_display_t * lv_renesas_glcdc_direct_create(void);
 /**
  * Create a display using Renesas' GLCDC peripheral in PARTIAL render mode
  * @param buf1      first buffer
- * @param buf2      second buffer (can be `NULL`)
+ * @param buf2      second buffer. @nullable When NULL a single buffer is used.
  * @param buf_size  buffer size in byte
  * @return          pointer to the created display
  */
