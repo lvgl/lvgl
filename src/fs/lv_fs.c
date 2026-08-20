@@ -71,10 +71,8 @@ bool lv_fs_is_ready(char letter)
 
 lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode)
 {
-    if(path == NULL) {
-        LV_LOG_WARN("Can't open file: path is NULL");
-        return LV_FS_RES_INV_PARAM;
-    }
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(path != NULL, return LV_FS_RES_INV_PARAM);
 
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
 
@@ -160,9 +158,9 @@ void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void
 
 lv_result_t lv_fs_get_buffer_from_path(lv_fs_path_ex_t * path, void ** buffer, uint32_t * size)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(buffer);
-    LV_ASSERT_NULL(size);
+    LV_CHECK_ARG(path != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(buffer != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(size != NULL, return LV_RESULT_INVALID);
 
     *size = 0;
     *buffer = NULL;
@@ -477,8 +475,7 @@ fail:
 lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 {
     LV_CHECK_ARG(rddir_p != NULL, return LV_FS_RES_INV_PARAM);
-
-    if(path == NULL) return LV_FS_RES_INV_PARAM;
+    LV_CHECK_ARG(path != NULL, return LV_FS_RES_INV_PARAM);
 
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
 

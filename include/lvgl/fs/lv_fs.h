@@ -173,7 +173,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
  * @param letter    the identifier letter of the driver. E.g. `LV_FS_MEMFS_LETTER`
  * @param buf       address of the memory buffer
  * @param size      size of the memory buffer in bytes
- * @param ext       the extension, e.g. "png", if NULL no extension will be added.
+ * @param ext       the extension, e.g. "png". @nullable When NULL no extension is added.
  */
 void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size,
                                  const char * ext);
@@ -199,7 +199,7 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p);
  * @param file_p    pointer to a lv_fs_file_t variable
  * @param buf       pointer to a buffer where the read bytes are stored
  * @param btr       Bytes To Read
- * @param br        the number of real read bytes (Bytes Read). NULL if unused.
+ * @param br        the number of real read bytes (Bytes Read). @nullable
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br);
@@ -209,7 +209,7 @@ lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t
  * @param file_p    pointer to a lv_fs_file_t variable
  * @param buf       pointer to a buffer with the bytes to write
  * @param btw       Bytes To Write
- * @param bw        the number of real written bytes (Bytes Written). NULL if unused.
+ * @param bw        the number of real written bytes (Bytes Written). @nullable
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, uint32_t * bw);

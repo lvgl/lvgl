@@ -64,9 +64,7 @@ void lv_fs_littlefs_init(void)
 lv_fs_res_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
 {
 
-    if(lfs == NULL) {
-        return LV_FS_RES_INV_PARAM; /*Invalid LittleFS handle*/
-    }
+    LV_CHECK_ARG(lfs != NULL, return LV_FS_RES_INV_PARAM);
 
     if(LV_FS_IS_VALID_LETTER(letter) == false) {
         return LV_FS_RES_INV_PARAM; /*Invalid letter*/
