@@ -47,10 +47,10 @@ void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, size_t index
         std::make_pair(node, primitive_index));
 }
 
-void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, size_t index,
+void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, size_t material_index,
                                              fastgltf::Node * node, size_t primitive_index)
 {
-    data->blended_nodes_by_material_index[index].push_back(
+    data->blended_nodes_by_material_index[material_index].push_back(
         std::make_pair(node, primitive_index));
 }
 

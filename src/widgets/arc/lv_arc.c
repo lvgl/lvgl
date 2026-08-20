@@ -1018,7 +1018,7 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, int32_t r, 
 
 /**
  * Used internally to update arc angles after a value change
- * @param arc pointer to an arc object
+ * @param obj pointer to an arc object
  */
 static void value_update(lv_obj_t * obj)
 {

@@ -51,7 +51,7 @@ void lv_matrix_identity(lv_matrix_t * matrix);
  * Translate the matrix to new position
  * @param matrix           pointer to a matrix
  * @param tx               the amount of translate in x direction
- * @param tx               the amount of translate in y direction
+ * @param ty               the amount of translate in y direction
  */
 void lv_matrix_translate(lv_matrix_t * matrix, float tx, float ty);
 
@@ -81,7 +81,7 @@ void lv_matrix_skew(lv_matrix_t * matrix, float skew_x, float skew_y);
 /**
  * Multiply two matrix and store the result to the first one
  * @param matrix           pointer to a matrix
- * @param matrix2          pointer to another matrix
+ * @param mul              pointer to another matrix
  */
 void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * mul);
 

@@ -95,10 +95,10 @@ lv_display_t * lv_linux_drm_create(void)
     return ctx->display;
 }
 
-lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t connector_id)
+lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
 {
     LV_UNUSED(connector_id);
-    lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
+    lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
 
     lv_result_t err = drm_device_init(ctx, file);
     if(err != LV_RESULT_OK) {
@@ -106,7 +106,7 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int
         return LV_RESULT_INVALID;
     }
 
-    lv_display_set_resolution(display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
+    lv_display_set_resolution(disp, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
 
     ctx->egl_interface = drm_get_egl_interface(ctx);
     ctx->egl_ctx = lv_opengles_egl_context_create(&ctx->egl_interface);
@@ -118,7 +118,7 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int
     /* Let the opengles texture driver handle the texture lifetime */
     ctx->texture.is_texture_owner = true;
     /*Initialize the draw buffers and texture*/
-    lv_result_t res = lv_opengles_texture_reshape(&ctx->texture, display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
+    lv_result_t res = lv_opengles_texture_reshape(&ctx->texture, disp, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create draw buffers");
         lv_opengles_egl_context_destroy(ctx->egl_ctx);
@@ -126,8 +126,8 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int
         return LV_RESULT_INVALID;
     }
 
-    lv_display_set_flush_cb(display, flush_cb);
-    lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_flush_cb(disp, flush_cb);
+    lv_display_set_render_mode(disp, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
 
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);

@@ -47,11 +47,11 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
 
 /**
  * Set the active tile in the tileview.
- * @param parent      pointer to the tileview object
+ * @param obj         pointer to the tileview object
  * @param tile_obj    pointer to the tile object to be set as active
  * @param anim_en     animation enable flag (LV_ANIM_ON or LV_ANIM_OFF)
  */
-void lv_tileview_set_tile(lv_obj_t * tv, lv_obj_t * tile_obj, lv_anim_enable_t anim_en);
+void lv_tileview_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t anim_en);
 
 /**
  * Set the active tile by index in the tileview

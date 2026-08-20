@@ -212,7 +212,7 @@ bool lv_timer_get_paused(lv_timer_t * timer);
  *
  * @param timer      Pointer to the timer object
  * @param data       User-defined data pointer to associate with the timer
- * @param destructor Callback function for cleaning up ext_data when timer is deleted.
+ * @param free_cb    Callback function for cleaning up ext_data when timer is deleted.
  *                   Receives ext_data as parameter. NULL means no cleanup required.
  */
 void lv_timer_set_external_data(lv_timer_t * timer, void * data, void (* free_cb)(void * data));

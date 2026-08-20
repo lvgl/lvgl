@@ -1813,7 +1813,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
  * Set the state (fully overwrite) of an object.
  * If specified in the styles, transition animations will be started from the previous state to the current.
  * @param obj       pointer to an object
- * @param state     the new state
+ * @param new_state the new state
  */
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 {

@@ -235,13 +235,8 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
  * Supports normal fill, fill with opacity, fill with mask, and fill with mask and opacity.
  * dest_buf and color have native color depth. (RGB565, RGB888, XRGB8888)
  * The background (dest_buf) cannot have alpha channel
- * @param dest_buf
- * @param dest_area
- * @param dest_stride
- * @param color
- * @param opa
- * @param mask
- * @param mask_stride
+ * @param dsc            the fill descriptor holding the destination buffer, area and
+ *                       stride, the fill color, the opacity and the optional mask
  */
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_blend_fill_dsc_t * dsc)
 {

@@ -43,14 +43,17 @@
 extern "C" {
 #endif
 
-
+/** NemaVG handle object (void pointer)*/
 #ifndef NEMA_VG_HANDLE
-#define NEMA_VG_HANDLE void* /**< NemaVG handle object (void pointer)*/
+#define NEMA_VG_HANDLE void*
 #endif
 
-#define NEMA_VG_PATH_HANDLE NEMA_VG_HANDLE  /**< NemaVG path handle (pointer to path object)*/
-#define NEMA_VG_PAINT_HANDLE NEMA_VG_HANDLE /**< NemaVG paint handle (pointer to paint object)*/
-#define NEMA_VG_GRAD_HANDLE NEMA_VG_HANDLE  /**< NemaVG gradient handle (pointer to gradient object)*/
+/** NemaVG path handle (pointer to path object)*/
+#define NEMA_VG_PATH_HANDLE NEMA_VG_HANDLE
+/** NemaVG paint handle (pointer to paint object)*/
+#define NEMA_VG_PAINT_HANDLE NEMA_VG_HANDLE
+/** NemaVG gradient handle (pointer to gradient object)*/
+#define NEMA_VG_GRAD_HANDLE NEMA_VG_HANDLE
 
 typedef float nema_vg_float_t; /**< Floating point data type (default is 'float') */
 
@@ -134,27 +137,28 @@ void nema_vg_set_fill_rule(uint8_t fill_rule);
  */
 void nema_vg_stroke_set_width(float width);
 
- /** \brief Set stroke cap style
- *
- * \param cap_style Cap style (NEMA_VG_CAP_BUTT | NEMA_VG_CAP_SQUARE | NEMA_VG_CAP_ROUND)
- *
- */
+/** \brief Set stroke cap style
+*
+* \param start_cap_style Cap style for the start of the stroke (NEMA_VG_CAP_BUTT | NEMA_VG_CAP_SQUARE | NEMA_VG_CAP_ROUND)
+* \param end_cap_style Cap style for the end of the stroke (NEMA_VG_CAP_BUTT | NEMA_VG_CAP_SQUARE | NEMA_VG_CAP_ROUND)
+*
+*/
 void nema_vg_stroke_set_cap_style(uint8_t start_cap_style, uint8_t end_cap_style);
 
- /** \brief Set stroke join style
- *
- * \param join_style Join style (NEMA_VG_JOIN_BEVEL | NEMA_VG_JOIN_MITER | NEMA_VG_JOIN_ROUND)
- *
- */
+/** \brief Set stroke join style
+*
+* \param join_style Join style (NEMA_VG_JOIN_BEVEL | NEMA_VG_JOIN_MITER | NEMA_VG_JOIN_ROUND)
+*
+*/
 void nema_vg_stroke_set_join_style(uint8_t join_style);
 
- /** \brief Set stroke miter limit
- * If miter join is chosen and miter length is bigger than the product
- * of miter limit and stroke width a bevel join will be added instead
- *
- * \param miter_limit miter join limit to be set
- *
- */
+/** \brief Set stroke miter limit
+* If miter join is chosen and miter length is bigger than the product
+* of miter limit and stroke width a bevel join will be added instead
+*
+* \param miter_limit miter join limit to be set
+*
+*/
 void nema_vg_stroke_set_miter_limit(float miter_limit);
 
 /** \brief Enable/Disable Masking.
@@ -170,7 +174,7 @@ void nema_vg_masking(uint8_t masking);
  * \return Error code. If no error occurs, NEMA_VG_ERR_NO_ERROR otherwise NEMA_VG_ERR_INVALID_MASKING_FORMAT.
  *
  */
-uint32_t nema_vg_set_mask(nema_img_obj_t *mask_obj);
+uint32_t nema_vg_set_mask(nema_img_obj_t * mask_obj);
 
 /** \brief Translate the mask object (texture) with respect to origin point (0, 0). Sets the position of the mask object.
  *
@@ -218,7 +222,7 @@ void nema_vg_handle_large_coords(uint8_t enable, uint8_t allow_internal_alloc);
  * \param data_size_bytes Data buffer size in bytes
  *
  */
-uint32_t nema_vg_bind_clip_coords_buf(void *segs, uint32_t segs_size_bytes, void *data, uint32_t data_size_bytes);
+uint32_t nema_vg_bind_clip_coords_buf(void * segs, uint32_t segs_size_bytes, void * data, uint32_t data_size_bytes);
 
 /** \brief Unbind segment and data buffers to be used for handling large coordinates
  *

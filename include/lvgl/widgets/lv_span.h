@@ -154,13 +154,6 @@ void lv_spangroup_set_span_text_static(lv_obj_t * obj, lv_span_t * span, const c
  */
 void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(3, 4);
 
-/**
- * Set a static text. It will not be saved by the span so the 'text' variable
- * has to be 'alive' while the span exist.
- * @param span  pointer to a span.
- * @param text  pointer to a text.
- */
-void lv_span_set_text_static(lv_span_t * span, const char * text);
 
 /**
  * Copy all style properties of style to the bbuilt-in static style of the span.
@@ -334,10 +327,10 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * 
 /**
  * Get the span object by point.
  * @param obj       pointer to a spangroup object.
- * @param point     pointer to point containing absolute coordinates
+ * @param p         pointer to point containing absolute coordinates
  * @return          pointer to the span under the point or `NULL` if not found.
  */
-lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * point);
+lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p);
 
 /*=====================
  * Other functions

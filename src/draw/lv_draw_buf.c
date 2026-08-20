@@ -107,14 +107,14 @@ uint32_t lv_draw_buf_width_to_stride_ex(const lv_draw_buf_handlers_t * handlers,
     else return 0;
 }
 
-void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
+void * lv_draw_buf_align(void * buf, lv_color_format_t color_format)
 {
-    return lv_draw_buf_align_ex(&default_handlers, data, color_format);
+    return lv_draw_buf_align_ex(&default_handlers, buf, color_format);
 }
 
-void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * data, lv_color_format_t color_format)
+void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * buf, lv_color_format_t color_format)
 {
-    if(handlers->align_pointer_cb) return handlers->align_pointer_cb(data, color_format);
+    if(handlers->align_pointer_cb) return handlers->align_pointer_cb(buf, color_format);
     else return NULL;
 }
 

@@ -111,11 +111,11 @@ void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow)
 }
 
 void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
-                           lv_flex_align_t track_place)
+                           lv_flex_align_t track_cross_place)
 {
     lv_obj_set_style_flex_main_place(obj, main_place, 0);
     lv_obj_set_style_flex_cross_place(obj, cross_place, 0);
-    lv_obj_set_style_flex_track_place(obj, track_place, 0);
+    lv_obj_set_style_flex_track_place(obj, track_cross_place, 0);
     lv_obj_set_style_layout(obj, LV_LAYOUT_FLEX, 0);
 }
 

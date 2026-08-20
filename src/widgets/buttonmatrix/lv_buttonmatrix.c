@@ -795,7 +795,7 @@ static void draw_main(lv_event_t * e)
 /**
  * Create the required number of buttons and control bytes according to a map
  * @param obj pointer to button matrix object
- * @param map_p pointer to a string array
+ * @param map   pointer to a string array
  */
 static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char * const * map)
 {

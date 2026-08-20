@@ -1511,7 +1511,7 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
  *
  * @param obj       pointer to a scale object
  * @param line_dsc  pointer to line descriptor
- * @param items_section_style  pointer to indicator section style
+ * @param section_style        pointer to indicator section style
  * @param part      line part, example: LV_PART_INDICATOR, LV_PART_ITEMS, LV_PART_MAIN
  */
 static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const lv_style_t * section_style,
@@ -1562,7 +1562,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
  *
  * @param obj       pointer to a scale object
  * @param arc_dsc  pointer to arc descriptor
- * @param items_section_style  pointer to indicator section style
+ * @param section_style        pointer to indicator section style
  */
 static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, const lv_style_t * section_style)
 {
@@ -1631,7 +1631,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
  *
  * @param obj       pointer to a scale object
  * @param label_dsc  pointer to label descriptor
- * @param items_section_style  pointer to indicator section style
+ * @param indicator_section_style pointer to indicator section style
  */
 static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
                                                  const lv_style_t * indicator_section_style)

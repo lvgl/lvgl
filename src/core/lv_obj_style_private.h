@@ -65,10 +65,10 @@ void lv_obj_style_deinit(void);
  * @param part
  * @param prev_state
  * @param new_state
- * @param tr
+ * @param tr_dsc
  */
 void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t prev_state,
-                                    lv_state_t new_state, const lv_obj_style_transition_dsc_t * tr);
+                                    lv_state_t new_state, const lv_obj_style_transition_dsc_t * tr_dsc);
 
 /**
  * Used internally to compare the appearance of an object in 2 states

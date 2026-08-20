@@ -55,19 +55,19 @@ void lv_matrix_identity(lv_matrix_t * matrix)
     matrix->m[2][2] = 1.0f;
 }
 
-void lv_matrix_translate(lv_matrix_t * matrix, float dx, float dy)
+void lv_matrix_translate(lv_matrix_t * matrix, float tx, float ty)
 {
     LV_CHECK_ARG(matrix != NULL, return);
     if(lv_matrix_is_identity_or_translation(matrix)) {
         /*optimization for matrix translation.*/
-        matrix->m[0][2] += dx;
-        matrix->m[1][2] += dy;
+        matrix->m[0][2] += tx;
+        matrix->m[1][2] += ty;
         return;
     }
 
     lv_matrix_t tlm = {{
-            {1.0f, 0.0f, dx},
-            {0.0f, 1.0f, dy},
+            {1.0f, 0.0f, tx},
+            {0.0f, 1.0f, ty},
             {0.0f, 0.0f, 1.0f},
         }
     };
