@@ -155,6 +155,7 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
                               void * user_data)
 {
     LV_CHECK_ARG(list != NULL, return NULL);
+    LV_CHECK_ARG(cb != NULL, return NULL);
     lv_event_dsc_t * dsc = lv_malloc(sizeof(lv_event_dsc_t));
     LV_ASSERT_NULL(dsc);
 
