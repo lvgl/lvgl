@@ -146,6 +146,10 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
                 uint32_t act_px = (ptr_act[2] << 16) + (ptr_act[1] << 8) + (ptr_act[0] << 0);
                 uint32_t ref_px = 0;
                 memcpy(&ref_px, ptr_ref, 3);
+#if !LV_USE_LOG
+                LV_UNUSED(act_px);
+                LV_UNUSED(ref_px);
+#endif
                 LV_LOG("\nScreenshot compare error\n"
                        "  - File: %s\n"
                        "  - At x:%d, y:%d.\n"

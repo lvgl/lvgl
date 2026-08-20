@@ -22,6 +22,7 @@ jobs:
         # A valid option parameter to the cmake file.
         # See build_only_options and test_options in tests/main.py.
         build_option: ['OPTIONS_MINIMAL',
+                       'OPTIONS_NO_CHECKS',
                        'OPTIONS_LINUX_SW',
                        'OPTIONS_LINUX_OPENGLES',
                        'OPTIONS_NUTTX']

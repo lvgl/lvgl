@@ -17,6 +17,10 @@ static void file_explorer_event_handler(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
+#if !LV_USE_LOG
+        LV_UNUSED(cur_path);
+        LV_UNUSED(sel_fn);
+#endif
         LV_LOG_USER("%s%s", cur_path, sel_fn);
     }
 }

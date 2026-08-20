@@ -549,6 +549,7 @@ static int ffmpeg_decode_packet(AVCodecContext * dec, const AVPacket * pkt,
 static int ffmpeg_init_codec_context(AVCodecContext ** dec_ctx, const AVCodec * dec,
                                      enum AVMediaType type, AVStream * st)
 {
+    LV_UNUSED(type);
     int ret = 0;
 
     /* Allocate a codec context for the decoder */
