@@ -93,6 +93,7 @@ lv_obj_t * lv_image_create(lv_obj_t * parent);
  * @param src       1) pointer to an ::lv_image_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
  *                  2) path to an image file (e.g. "S:/dir/img.bin")or
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
+ *                  @nullable When NULL the image is cleared.
  */
 void lv_image_set_src(lv_obj_t * obj, const void * src);
 
@@ -213,7 +214,8 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align);
 /**
  * Set an A8 bitmap mask for the image.
  * @param obj       pointer to an image object
- * @param src       an lv_image_dsc_t bitmap mask source.
+ * @param src       an lv_image_dsc_t bitmap mask source. @nullable When NULL the
+ *                  bitmap mask is removed.
  */
 void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src);
 
