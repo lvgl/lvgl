@@ -49,8 +49,9 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_qrcode_class;
 
 /**
  * Create an empty QR code (an `lv_canvas`) object.
- * @param parent point to an object where to create the QR code
- * @return pointer to the created QR code object
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
+ * @return          pointer to the created QR code object
  */
 lv_obj_t * lv_qrcode_create(lv_obj_t * parent);
 
