@@ -62,6 +62,7 @@
 #define LV_DRAW_SW_ASM_NEON      1
 #define LV_DRAW_SW_ASM_HELIUM    2
 #define LV_DRAW_SW_ASM_RISCV_V   3
+#define LV_DRAW_SW_ASM_SVE2      4
 #define LV_DRAW_SW_ASM_CUSTOM    255
 
 /* VG-Lite GPU (series and revision) */
