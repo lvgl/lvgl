@@ -408,13 +408,11 @@ void lv_spinbox_decrement(lv_obj_t * obj)
 #if LV_USE_OBSERVER
 lv_observer_t * lv_spinbox_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
-    LV_ASSERT_NULL(subject);
-    LV_ASSERT_NULL(obj);
-
-    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
-        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
-        return NULL;
-    }
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(subject != NULL, return NULL);
+    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT,
+                 return NULL,
+                 "Incompatible subject type: %d", subject->type);
 
     lv_obj_add_event_cb(obj, spinbox_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
@@ -431,6 +429,7 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 {
     LV_UNUSED(class_p);
     LV_LOG_TRACE("begin");
+    LV_ASSERT(obj != NULL);
 
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
@@ -455,7 +454,7 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
-
+    LV_ASSERT(e != NULL);
     /*Call the ancestor's event handler*/
     lv_result_t res = LV_RESULT_OK;
     res = lv_obj_event_base(MY_CLASS, e);
@@ -463,6 +462,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_current_target(e);
+    LV_ASSERT(obj != NULL);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     if(code == LV_EVENT_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
@@ -557,6 +557,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void lv_spinbox_updatevalue(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     /* LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES (18): Max possible digit_count value (15) + sign + decimal point + NULL terminator */
@@ -634,8 +635,12 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
 
 static void spinbox_value_changed_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * arc = lv_event_get_current_target(e);
     lv_subject_t * subject = lv_event_get_user_data(e);
+    LV_ASSERT(arc != NULL);
+    LV_ASSERT(subject != NULL);
+    LV_ASSERT(subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT);
 
     if(subject->type == LV_SUBJECT_TYPE_INT) {
         lv_subject_set_int(subject, lv_spinbox_get_value(arc));
@@ -649,6 +654,10 @@ static void spinbox_value_changed_event_cb(lv_event_t * e)
 
 static void spinbox_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_ASSERT(observer != NULL);
+    LV_ASSERT(observer->target != NULL);
+    LV_ASSERT(subject != NULL);
+    LV_ASSERT(subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT);
     if(subject->type == LV_SUBJECT_TYPE_INT) {
         lv_spinbox_set_value(observer->target, subject->value.num);
     }
