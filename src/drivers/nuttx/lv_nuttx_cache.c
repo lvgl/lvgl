@@ -88,10 +88,10 @@ static void draw_buf_to_region(
     const lv_draw_buf_t * draw_buf, const lv_area_t * area,
     lv_uintptr_t * start, lv_uintptr_t * end)
 {
-    LV_ASSERT_NULL(draw_buf);
-    LV_ASSERT_NULL(area);
-    LV_ASSERT_NULL(start);
-    LV_ASSERT_NULL(end);
+    LV_ASSERT(draw_buf != NULL);
+    LV_ASSERT(area != NULL);
+    LV_ASSERT(start != NULL);
+    LV_ASSERT(end != NULL);
 
     void * buf = draw_buf->data;
     uint32_t stride = draw_buf->header.stride;

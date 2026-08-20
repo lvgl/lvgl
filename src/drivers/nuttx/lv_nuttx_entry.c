@@ -105,6 +105,7 @@ lv_global_t * lv_global_default(void)
 
 void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
     if(dsc == NULL)
         return;
 
@@ -127,6 +128,7 @@ void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 
 void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
     nuttx_ctx_p = lv_malloc_zeroed(sizeof(lv_nuttx_ctx_t));
     LV_ASSERT_MALLOC(nuttx_ctx_p);
 
@@ -206,6 +208,7 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 
 void lv_nuttx_run(lv_nuttx_result_t * result)
 {
+    LV_CHECK_ARG(result != NULL, return);
 #if LV_USE_NUTTX_LIBUV
     lv_nuttx_uv_loop(result);
 #else
@@ -245,6 +248,7 @@ uint32_t lv_nuttx_get_idle(void)
 
 void lv_nuttx_deinit(lv_nuttx_result_t * result)
 {
+    if(result == NULL) return;
 #if !LV_USE_NUTTX_CUSTOM_INIT
     if(result) {
         if(result->disp) {
