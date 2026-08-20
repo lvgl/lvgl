@@ -22,6 +22,9 @@ static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_are
                        lv_opa_t * mask_buf,  int32_t width);
 static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, lv_area_t * res_area);
 
+static inline lv_opa_t * allocate_circle_mask(const lv_draw_arc_dsc_t * dsc, int32_t start_angle, int32_t  end_angle,
+                                              uint32_t width, lv_area_t * out_round_area_1, lv_area_t * out_round_area_2);
+
 /*********************
  *      DEFINES
  *********************/
@@ -100,14 +103,22 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
 
     /*Create an outer mask*/
     lv_draw_sw_mask_radius_param_t mask_out_param;
-    lv_draw_sw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
+    lv_result_t res = lv_draw_sw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
     mask_list[1] = &mask_out_param;
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("Couldn't create outer arc mask");
+        goto outer_arc_mask_fail;
+    }
 
     /*Create inner the mask*/
     lv_draw_sw_mask_radius_param_t mask_in_param;
     bool mask_in_param_valid = false;
     if(lv_area_get_width(&area_in) > 0 && lv_area_get_height(&area_in) > 0) {
-        lv_draw_sw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+        res = lv_draw_sw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+        if(res != LV_RESULT_OK) {
+            LV_LOG_WARN("Couldn't create inner arc mask");
+            goto inner_arc_mask_fail;
+        }
         mask_list[2] = &mask_in_param;
         mask_in_param_valid = true;
     }
@@ -116,6 +127,10 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
     int32_t blend_w = lv_area_get_width(&clipped_area);
     int32_t h;
     lv_opa_t * mask_buf = lv_malloc(blend_w);
+    if(!mask_buf) {
+        LV_LOG_WARN("Couldn't allocate arc mask buffer");
+        goto mask_buf_alloc_fail;
+    }
 
     lv_area_t blend_area = clipped_area;
     lv_area_t img_area;
@@ -131,7 +146,7 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
         blend_dsc.color = dsc->color;
     }
     else {
-        lv_result_t res = lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
+        res = lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
         if(res == LV_RESULT_INVALID || decoder_dsc.decoded == NULL) {
             LV_LOG_WARN("Can't decode the background image");
             blend_dsc.color = dsc->color;
@@ -154,34 +169,14 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
         }
     }
 
-    lv_opa_t * circle_mask = NULL;
     lv_area_t round_area_1;
     lv_area_t round_area_2;
+    lv_opa_t * circle_mask = NULL;
     if(dsc->rounded) {
-        circle_mask = lv_malloc(width * width);
-        LV_ASSERT_MALLOC(circle_mask);
-        lv_memset(circle_mask, 0xff, width * width);
-        lv_area_t circle_area = {0, 0, width - 1, width - 1};
-        lv_draw_sw_mask_radius_param_t circle_mask_param;
-        lv_draw_sw_mask_radius_init(&circle_mask_param, &circle_area, width / 2, false);
-        void * circle_mask_list[2] = {&circle_mask_param, NULL};
-
-        lv_opa_t * circle_mask_tmp = circle_mask;
-        for(h = 0; h < width; h++) {
-            lv_draw_sw_mask_res_t res = lv_draw_sw_mask_apply(circle_mask_list, circle_mask_tmp, 0, h, width);
-            if(res == LV_DRAW_SW_MASK_RES_TRANSP) {
-                lv_memzero(circle_mask_tmp, width);
-            }
-
-            circle_mask_tmp += width;
+        circle_mask = allocate_circle_mask(dsc, start_angle, end_angle, width, &round_area_1, &round_area_2);
+        if(!circle_mask) {
+            LV_LOG_WARN("Failed to allocate circle mask. Arc will look degraded");
         }
-        lv_draw_sw_mask_free_param(&circle_mask_param);
-
-        get_rounded_area(start_angle, dsc->radius, width, &round_area_1);
-        lv_area_move(&round_area_1, dsc->center.x, dsc->center.y);
-        get_rounded_area(end_angle, dsc->radius, width, &round_area_2);
-        lv_area_move(&round_area_2, dsc->center.x, dsc->center.y);
-
     }
 
     blend_area.y2 = blend_area.y1;
@@ -189,7 +184,7 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
         lv_memset(mask_buf, 0xff, blend_w);
         blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, blend_area.y1, blend_w);
 
-        if(dsc->rounded) {
+        if(circle_mask) {
             if(blend_area.y1 >= round_area_1.y1 && blend_area.y1 <= round_area_1.y2) {
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
                     lv_memzero(mask_buf, blend_w);
@@ -236,6 +231,17 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
     lv_free(mask_buf);
     if(dsc->img_src) lv_image_decoder_close(&decoder_dsc);
     if(circle_mask) lv_free(circle_mask);
+    return;
+
+mask_buf_alloc_fail:
+    if(mask_in_param_valid) {
+        lv_draw_sw_mask_free_param(&mask_in_param);
+    }
+inner_arc_mask_fail:
+    lv_draw_sw_mask_free_param(&mask_out_param);
+outer_arc_mask_fail:
+    lv_draw_sw_mask_free_param(&mask_angle_param);
+
 #else
     LV_LOG_WARN("Can't draw arc with LV_DRAW_SW_COMPLEX == 0");
     LV_UNUSED(center);
@@ -304,6 +310,42 @@ static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, l
         res_area->y1 = cir_y - thick_half;
         res_area->y2 = cir_y + thick_half - thick_corr;
     }
+}
+
+static inline lv_opa_t * allocate_circle_mask(const lv_draw_arc_dsc_t * dsc, int32_t start_angle, int32_t  end_angle,
+                                              uint32_t width, lv_area_t * out_round_area_1, lv_area_t * out_round_area_2)
+{
+
+    lv_opa_t * circle_mask = lv_malloc(width * width);
+    if(!circle_mask) {
+        return NULL;
+    }
+    lv_memset(circle_mask, 0xff, width * width);
+    lv_area_t circle_area = {0, 0, width - 1, width - 1};
+    lv_draw_sw_mask_radius_param_t circle_mask_param;
+    lv_result_t result = lv_draw_sw_mask_radius_init(&circle_mask_param, &circle_area, width / 2, false);
+    if(result != LV_RESULT_OK) {
+        lv_free(circle_mask);
+        return NULL;
+    }
+    void * circle_mask_list[2] = {&circle_mask_param, NULL};
+
+    lv_opa_t * circle_mask_tmp = circle_mask;
+    for(uint32_t h = 0; h < width; h++) {
+        lv_draw_sw_mask_res_t res = lv_draw_sw_mask_apply(circle_mask_list, circle_mask_tmp, 0, h, width);
+        if(res == LV_DRAW_SW_MASK_RES_TRANSP) {
+            lv_memzero(circle_mask_tmp, width);
+        }
+
+        circle_mask_tmp += width;
+    }
+    lv_draw_sw_mask_free_param(&circle_mask_param);
+
+    get_rounded_area(start_angle, dsc->radius, width, out_round_area_1);
+    lv_area_move(out_round_area_1, dsc->center.x, dsc->center.y);
+    get_rounded_area(end_angle, dsc->radius, width, out_round_area_2);
+    lv_area_move(out_round_area_2, dsc->center.x, dsc->center.y);
+    return circle_mask;
 }
 
 #else /*LV_DRAW_SW_COMPLEX*/

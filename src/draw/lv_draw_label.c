@@ -596,6 +596,8 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
 
     LV_PROFILER_DRAW_BEGIN;
     if(dsc->g == NULL) {
+        /* cppcheck-suppress autoVariables ; `g` outlives every use of `dsc->g`;
+           reset to NULL at `exit:` before returning */
         dsc->g = &g;
         /*If the glyph dsc is not set then get it from the font*/
         bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, 0);
@@ -634,11 +636,18 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
             /*Only check draw buf for bitmap glyph*/
             draw_buf = lv_draw_buf_reshape(dsc->_draw_buf, 0, g.box_w, g.box_h, LV_STRIDE_AUTO);
             if(draw_buf == NULL) {
-                if(dsc->_draw_buf) lv_draw_buf_destroy(dsc->_draw_buf);
+                if(dsc->_draw_buf) {
+                    lv_draw_buf_destroy(dsc->_draw_buf);
+                    dsc->_draw_buf = NULL;
+                }
 
                 uint32_t h = LV_ROUND_UP(g.box_h, 32); /*Assume a larger size to avoid many reallocations*/
                 draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
                 LV_ASSERT_MALLOC(draw_buf);
+                if(!draw_buf) {
+                    LV_LOG_WARN("Failed to allocate memory for glyph draw buffer");
+                    goto exit;
+                }
                 draw_buf->header.h = g.box_h;
                 dsc->_draw_buf = draw_buf;
             }
@@ -659,6 +668,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
 
     dsc->letter_coords = &letter_coords;
     cb(t, dsc, NULL, NULL);
+    dsc->letter_coords = NULL;
 
     lv_font_glyph_release_draw_data(dsc->g);
 
