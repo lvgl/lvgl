@@ -113,7 +113,7 @@ lv_obj_t * lv_buttonmatrix_create(lv_obj_t * parent)
 void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[])
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    if(map == NULL) return;
+    LV_CHECK_ARG(map != NULL, return);
 
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
 
@@ -154,6 +154,7 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[])
 void lv_buttonmatrix_set_ctrl_map(lv_obj_t * obj, const lv_buttonmatrix_ctrl_t ctrl_map[])
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(ctrl_map != NULL, return);
 
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     lv_memcpy(btnm->ctrl_bits, ctrl_map, sizeof(lv_buttonmatrix_ctrl_t) * btnm->btn_cnt);
@@ -327,6 +328,7 @@ static void lv_buttonmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
+    LV_ASSERT(obj != NULL);
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     btnm->btn_cnt        = 0;
     btnm->row_cnt        = 0;
@@ -348,6 +350,7 @@ static void lv_buttonmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t 
 {
     LV_TRACE_OBJ_CREATE("begin");
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     lv_free(btnm->button_areas);
     lv_free(btnm->ctrl_bits);
@@ -359,6 +362,7 @@ static void lv_buttonmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t 
 static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(e != NULL);
 
     lv_result_t res;
 
@@ -635,7 +639,9 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
 
 static void draw_main(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_current_target(e);
+    LV_ASSERT(obj != NULL);
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     if(btnm->btn_cnt == 0) return;
 
@@ -799,6 +805,8 @@ static void draw_main(lv_event_t * e)
  */
 static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char * const * map)
 {
+    LV_ASSERT(obj != NULL);
+    LV_ASSERT(map != NULL);
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     btnm->row_cnt = 1;
     /*Count the buttons in the map*/
@@ -896,6 +904,8 @@ static bool button_get_checked(lv_buttonmatrix_ctrl_t ctrl_bits)
  */
 static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p)
 {
+    LV_ASSERT(obj != NULL);
+    LV_ASSERT(p != NULL);
     lv_area_t obj_cords;
     lv_area_t btn_area;
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
@@ -949,6 +959,7 @@ static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p)
 
 static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx)
 {
+    LV_ASSERT(obj != NULL);
     if(btn_idx == LV_BUTTONMATRIX_BUTTON_NONE) return;
 
     lv_area_t btn_area;
@@ -992,6 +1003,7 @@ static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx)
  */
 static void make_one_button_checked(lv_obj_t * obj, uint32_t btn_idx)
 {
+    LV_ASSERT(obj != NULL);
     /*Save whether the button was toggled*/
     bool was_toggled = lv_buttonmatrix_has_button_ctrl(obj, btn_idx, LV_BUTTONMATRIX_CTRL_CHECKED);
 
@@ -1007,6 +1019,7 @@ static void make_one_button_checked(lv_obj_t * obj, uint32_t btn_idx)
  */
 static bool has_popovers_in_top_row(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
 
     if(btnm->row_cnt <= 0) {
@@ -1033,6 +1046,7 @@ static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits)
 
 static void update_map(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
 
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
@@ -1117,6 +1131,7 @@ static void update_map(lv_obj_t * obj)
 
 static void free_map(lv_buttonmatrix_t * btnm)
 {
+    LV_ASSERT(btnm != NULL);
     uint32_t i;
     for(i = 0; btnm->map_p[i]; i++) {
         lv_free((void *)btnm->map_p[i]);
