@@ -640,6 +640,11 @@ static void spinbox_value_changed_event_cb(lv_event_t * e)
     if(subject->type == LV_SUBJECT_TYPE_INT) {
         lv_subject_set_int(subject, lv_spinbox_get_value(arc));
     }
+#if LV_USE_FLOAT
+    else {
+        lv_subject_set_float(subject, (float)lv_spinbox_get_value(arc));
+    }
+#endif
 }
 
 static void spinbox_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -647,6 +652,11 @@ static void spinbox_value_observer_cb(lv_observer_t * observer, lv_subject_t * s
     if(subject->type == LV_SUBJECT_TYPE_INT) {
         lv_spinbox_set_value(observer->target, subject->value.num);
     }
+#if LV_USE_FLOAT
+    else {
+        lv_spinbox_set_value(observer->target, (int32_t)subject->value.float_v);
+    }
+#endif
 }
 
 #endif /*LV_USE_OBSERVER*/
