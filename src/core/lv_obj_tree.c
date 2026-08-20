@@ -623,8 +623,6 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * use
 
 void lv_obj_dump_tree(lv_obj_t * start_obj)
 {
-    LV_CHECK_OBJ(start_obj, MY_CLASS, return);
-
     if(start_obj == NULL) {
         lv_display_t * disp = lv_display_get_next(NULL);
         while(disp) {
