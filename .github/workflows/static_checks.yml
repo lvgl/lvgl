@@ -76,6 +76,48 @@ jobs:
         run: python scripts/static_checks/check_headers.py no-direct-public-include
 
       # ------------------------------------------------------------------
+      # No public API function may lose an argument check.
+      # ------------------------------------------------------------------
+      - name: Install doxygen
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq doxygen
+
+      - name: "Check: public API argument checks did not regress"
+        id: arg-checks
+        continue-on-error: true
+        run: |
+          set -eu
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_REF="${{ github.base_ref }}"
+          else
+            BASE_REF="master"
+          fi
+
+          HEAD_COUNT=$(python scripts/static_checks/check_arg_checks.py count)
+          echo "this branch          : $HEAD_COUNT unvalidated pointer parameter(s)"
+
+          # Always the tip of the base branch, explicitly fetched, so the
+          # baseline is what this change will actually merge into.
+          git fetch --no-tags --quiet origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          if ! git rev-parse --verify --quiet "origin/$BASE_REF" >/dev/null; then
+            echo "origin/$BASE_REF not available, nothing to compare against"
+            exit 0
+          fi
+
+          rm -rf /tmp/lvgl-base
+          git worktree add --detach --force /tmp/lvgl-base "origin/$BASE_REF" >/dev/null
+          echo "base: $BASE_REF @ $(git rev-parse --short origin/$BASE_REF)"
+          BASE_COUNT=$(python scripts/static_checks/check_arg_checks.py count --root /tmp/lvgl-base)
+          echo "origin/$BASE_REF: $BASE_COUNT"
+
+          if [ "$HEAD_COUNT" -le "$BASE_COUNT" ]; then
+            echo "OK: $((BASE_COUNT - HEAD_COUNT)) check(s) gained"
+            exit 0
+          fi
+
+          echo "::error::$((HEAD_COUNT - BASE_COUNT)) public API pointer argument(s) lost their check"
+          exit 1
+
+      # ------------------------------------------------------------------
       # Every typedef struct/enum in include/lvgl/lv_types.h must have
       #    a real definition (with a body) somewhere
       # ------------------------------------------------------------------
@@ -96,7 +138,8 @@ jobs:
           steps.allowed-list.outcome          == 'failure' ||
           steps.direct-public-include.outcome == 'failure' ||
           steps.deprecated.outcome            == 'failure' ||
-          steps.lv_types.outcome              == 'failure'
+          steps.lv_types.outcome              == 'failure' ||
+          steps.arg-checks.outcome            == 'failure' ||
         run: |
           echo "Policy check results:"
           echo "---------------------"
@@ -117,6 +160,7 @@ jobs:
           print_result "direct-public-include" "${{ steps.direct-public-include.outcome }}"
           print_result "deprecated"            "${{ steps.deprecated.outcome }}"
           print_result "lv_types"              "${{ steps.lv_types.outcome }}"
+          print_result "arg-checks"            "${{ steps.arg-checks.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."
