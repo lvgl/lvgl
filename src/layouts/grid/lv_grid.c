@@ -160,6 +160,10 @@ void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const int32_t col_dsc[], const in
 void lv_obj_set_grid_align(lv_obj_t * obj, lv_grid_align_t column_align, lv_grid_align_t row_align)
 {
     LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    LV_CHECK_ARG(column_align != LV_GRID_ALIGN_STRETCH, return,
+                 "LV_GRID_ALIGN_STRETCH is not supported for column tracks");
+    LV_CHECK_ARG(row_align != LV_GRID_ALIGN_STRETCH, return,
+                 "LV_GRID_ALIGN_STRETCH is not supported for row tracks");
 
     lv_obj_set_style_grid_column_align(obj, column_align, 0);
     lv_obj_set_style_grid_row_align(obj, row_align, 0);
@@ -693,6 +697,7 @@ static int32_t grid_align(int32_t cont_size,  bool auto_size, lv_grid_align_t al
 
         /*Calculate the position of the first item and set gap is necessary*/
         switch(align) {
+            case LV_GRID_ALIGN_STRETCH: /*Not supported for tracks, fall back to START*/
             case LV_GRID_ALIGN_START:
                 pos_array[0] = 0;
                 break;
@@ -713,8 +718,6 @@ static int32_t grid_align(int32_t cont_size,  bool auto_size, lv_grid_align_t al
             case LV_GRID_ALIGN_SPACE_EVENLY:
                 gap = (int32_t)(cont_size - grid_size) / (int32_t)(track_num + 1);
                 pos_array[0] = gap;
-                break;
-            default:
                 break;
         }
     }
