@@ -96,8 +96,9 @@ void lv_free(void * data);
 
 /**
  * Reallocate a memory with a new size. The old content will be kept.
- * @param data_p pointer to an allocated memory.
- *               Its content will be copied to the new memory block and freed
+ * @param data_p pointer to an allocated memory. Its content will be copied to the
+ *               new memory block and freed. @nullable When NULL a new block is
+ *               allocated, like realloc().
  * @param new_size the desired new size in byte
  * @return pointer to the new memory, NULL on failure
  */
@@ -106,8 +107,9 @@ void * lv_realloc(void * data_p, size_t new_size);
 /**
  * Reallocate a memory with a new size. The old content will be kept.
  * In case of failure, the old pointer is free'd.
- * @param data_p pointer to an allocated memory.
- *               Its content will be copied to the new memory block and freed
+ * @param data_p pointer to an allocated memory. Its content will be copied to the
+ *               new memory block and freed. @nullable When NULL a new block is
+ *               allocated, like realloc().
  * @param new_size the desired new size in byte
  * @return pointer to the new memory, NULL on failure
  */
@@ -121,13 +123,13 @@ void * lv_malloc_core(size_t size);
 
 /**
  * Used internally to execute a plain `free` operation
- * @param p      memory address to free
+ * @param p      memory address to free @nullable
  */
 void lv_free_core(void * p);
 
 /**
  * Used internally to execute a plain realloc operation
- * @param p         memory address to realloc
+ * @param p         memory address to realloc. @nullable When NULL a new block is allocated.
  * @param new_size  size in bytes to realloc
  */
 void * lv_realloc_core(void * p, size_t new_size);
