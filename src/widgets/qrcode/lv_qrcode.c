@@ -144,11 +144,8 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 
 void lv_qrcode_set_data(lv_obj_t * obj, const char * data)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(data != NULL, return, "data must not be NULL");
-
-    /*LV_CHECK_ARG compiles to nothing when argument checks are disabled, and the
-     *lv_strlen() below dereferences `data`, so this has to be guarded unconditionally*/
-    if(data == NULL) return;
 
     lv_qrcode_update(obj, data, lv_strlen(data));
 }
@@ -218,6 +215,7 @@ bool lv_qrcode_get_render_failed(lv_obj_t * obj)
 static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
     qrcode->data = NULL;
@@ -238,6 +236,7 @@ static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
     if(qrcode->data) {
@@ -256,6 +255,7 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_qrcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(e != NULL);
 
     lv_event_code_t code = lv_event_get_code(e);
 
@@ -292,11 +292,12 @@ static void lv_qrcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static int32_t get_satisfied_size(int32_t min_version, int32_t size, int32_t * scale)
 {
-    if(min_version <= 0) return -1;
+    LV_ASSERT(scale != NULL);
+    LV_ASSERT(min_version >= 0);
 
     int32_t offset = size;
     int32_t satisfied_version = min_version;
-    if(scale) *scale = 0;
+    *scale = 0;
 
     for(int32_t version = min_version; version <= min_version + 2 && version <= qrcodegen_VERSION_MAX - 3; version++) {
         int32_t version_size = qrcodegen_version2size(version + 1);
@@ -306,7 +307,7 @@ static int32_t get_satisfied_size(int32_t min_version, int32_t size, int32_t * s
         if(tmp_offset < offset) {
             offset = tmp_offset;
             satisfied_version = version;
-            if(scale) *scale = tmp_scale;
+            *scale = tmp_scale;
         }
     }
     return satisfied_version;
@@ -314,9 +315,9 @@ static int32_t get_satisfied_size(int32_t min_version, int32_t size, int32_t * s
 
 static bool qrcode_store_data(lv_qrcode_t * qrcode, const void * data, uint32_t data_len)
 {
-    /*Resize the existing buffer rather than allocating a second one, and assign only on
-     *success: a failed reallocation leaves the previous payload owned by `qrcode`.
-     *`lv_realloc(NULL, len)` allocates, so the first call needs no special case.*/
+    LV_ASSERT(qrcode != NULL);
+    LV_ASSERT(data != NULL);
+
     uint8_t * new_data = lv_realloc(qrcode->data, data_len);
     LV_ASSERT_MALLOC(new_data);
     if(new_data == NULL) return false;
@@ -349,6 +350,7 @@ static void qrcode_mark_dirty(lv_obj_t * obj)
 
 static lv_result_t qrcode_encode(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
     /*Assume failure and clear both flags only on the single success path, so no early
@@ -378,12 +380,15 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
 
     int32_t qr_version = qrcodegen_getMinFitVersion(qrcodegen_Ecc_MEDIUM, data_len);
+    if(qr_version <= 0) {
+        return LV_RESULT_INVALID;
+    }
     int32_t quiet_zone_scale = 0;
     if(qrcode->quiet_zone) qr_version = get_satisfied_size(qr_version, draw_buf->header.w, &quiet_zone_scale);
-    if(qr_version <= 0) return LV_RESULT_INVALID;
+    LV_ASSERT(qr_version > 0);
 
     const int32_t qr_size = qrcodegen_version2size(qr_version);
-    if(qr_size <= 0) return LV_RESULT_INVALID;
+    LV_ASSERT(qr_size > 0);
 
     /*Canvas pixels per QR module. Zero means the canvas cannot hold even a 1:1 copy of
      *the code, which would leave the bitmap blank, so report that instead of succeeding.*/
