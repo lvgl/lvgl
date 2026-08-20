@@ -34,10 +34,10 @@
 void lv_grad_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const lv_opa_t opa[],
                         const uint8_t fracs[], int num_stops)
 {
-    LV_ASSERT(num_stops <= LV_GRADIENT_MAX_STOPS);
-    LV_ASSERT(num_stops > 1);
-    LV_ASSERT_NULL(grad);
-    LV_ASSERT_NULL(colors);
+    LV_CHECK_ARG(num_stops <= LV_GRADIENT_MAX_STOPS, return);
+    LV_CHECK_ARG(num_stops > 1, return);
+    LV_CHECK_ARG(grad != NULL, return);
+    LV_CHECK_ARG(colors != NULL, return);
 
     grad->stops_count = num_stops;
     for(int i = 0; i < num_stops; i++) {
@@ -49,14 +49,14 @@ void lv_grad_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const l
 
 void lv_grad_horizontal_init(lv_grad_dsc_t * dsc)
 {
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
 
     dsc->dir = LV_GRAD_DIR_HOR;
 }
 
 void lv_grad_vertical_init(lv_grad_dsc_t * dsc)
 {
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
 
     dsc->dir = LV_GRAD_DIR_VER;
 }
@@ -64,7 +64,7 @@ void lv_grad_vertical_init(lv_grad_dsc_t * dsc)
 void lv_grad_linear_init(lv_grad_dsc_t * dsc, int32_t from_x, int32_t from_y, int32_t to_x, int32_t to_y,
                          lv_grad_extend_t extend)
 {
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->dir = LV_GRAD_DIR_LINEAR;
     dsc->params.linear.start.x = from_x;
     dsc->params.linear.start.y = from_y;
@@ -76,7 +76,7 @@ void lv_grad_linear_init(lv_grad_dsc_t * dsc, int32_t from_x, int32_t from_y, in
 void lv_grad_radial_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t to_x, int32_t to_y,
                          lv_grad_extend_t extend)
 {
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->dir = LV_GRAD_DIR_RADIAL;
     dsc->params.radial.focal.x = center_x;
     dsc->params.radial.focal.y = center_y;
@@ -92,7 +92,7 @@ void lv_grad_radial_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y
 void lv_grad_conical_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t start_angle,
                           int32_t end_angle, lv_grad_extend_t extend)
 {
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->dir = LV_GRAD_DIR_CONICAL;
     dsc->params.conical.center.x = center_x;
     dsc->params.conical.center.y = center_y;
@@ -103,7 +103,7 @@ void lv_grad_conical_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_
 
 void lv_grad_radial_set_focal(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t radius)
 {
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->params.radial.focal.x = center_x;
     dsc->params.radial.focal.y = center_y;
     dsc->params.radial.focal_extent.x = center_x + radius;
