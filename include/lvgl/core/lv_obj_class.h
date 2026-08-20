@@ -71,10 +71,10 @@ bool lv_obj_is_group_def(const lv_obj_t * obj);
  * the associated resources.
  *
  * @param obj          Target LVGL object
- * @param data         User-defined data pointer to associate with a object
+ * @param data         User-defined data pointer to associate with a object @nullable
  * @param free_cb      Cleanup function called for each non-NULL data pointer during
  *                     object deletion. Receives single data pointer as parameter.
- *                     NULL means no automatic cleanup.
+ *                     @nullable When NULL no automatic cleanup is performed.
  */
 void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void * data));
 #endif
