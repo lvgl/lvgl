@@ -406,7 +406,7 @@ lv_libinput_event_t * _create_event(lv_libinput_t * dsc)
 static void _read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_libinput_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
 
     pthread_mutex_lock(&dsc->event_lock);
 

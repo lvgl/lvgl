@@ -126,7 +126,7 @@ static lv_point_t _evdev_process_pointer(lv_indev_t * indev, int x, int y)
 {
     lv_display_t * disp = lv_indev_get_display(indev);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
 
     int swapped_x = dsc->swap_axes ? y : x;
     int swapped_y = dsc->swap_axes ? x : y;
@@ -151,7 +151,7 @@ static void _evdev_async_delete_cb(void * user_data)
 static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
 
     /*Update dsc with buffered events*/
     struct input_event in = { 0 };
@@ -340,7 +340,7 @@ static void _evdev_indev_delete_cb(lv_event_t * e)
 {
     lv_indev_t * indev = lv_event_get_target(e);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
     lv_async_call_cancel(_evdev_async_delete_cb, indev);
     close(dsc->fd);
     lv_free(dsc);
@@ -423,7 +423,7 @@ static void _evdev_discovery_timer_cb(lv_timer_t * tim)
 {
     LV_UNUSED(tim);
     lv_evdev_discovery_t * ed = evdev_discovery;
-    LV_ASSERT_NULL(ed);
+    LV_ASSERT(ed != NULL);
 
     if(!ed->inotify_watch_active) {
         ed->inotify_watch_active = _evdev_discovery_inotify_try_init_watcher(ed->inotify_fd);
@@ -647,15 +647,17 @@ lv_result_t lv_evdev_discovery_stop(void)
 
 void lv_evdev_set_swap_axes(lv_indev_t * indev, bool swap_axes)
 {
+    LV_CHECK_ARG(indev != NULL, return);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->swap_axes = swap_axes;
 }
 
 void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_x, int max_y)
 {
+    LV_CHECK_ARG(indev != NULL, return);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(dsc != NULL, return);
     dsc->min_x = min_x;
     dsc->min_y = min_y;
     dsc->max_x = max_x;

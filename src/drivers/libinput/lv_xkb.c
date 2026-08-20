@@ -47,6 +47,7 @@ static struct xkb_context * context = NULL;
 
 bool lv_xkb_init(lv_xkb_t * dsc, struct xkb_rule_names names)
 {
+    LV_CHECK_ARG(dsc != NULL, return false);
     if(!context) {
         context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
         if(!context) {

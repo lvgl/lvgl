@@ -84,8 +84,8 @@ lv_display_t * lv_opengles_texture_create_from_texture_id(int32_t w, int32_t h, 
 lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_display_t * display, int32_t width,
                                         int32_t height)
 {
-    LV_ASSERT_NULL(display);
-    LV_ASSERT_NULL(texture);
+    LV_CHECK_ARG(display != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(texture != NULL, return LV_RESULT_INVALID);
     unsigned int new_texture = create_texture(width, height);
     if(new_texture == GL_NONE) {
         LV_LOG_ERROR("Failed to reshape texture. Couldn't acquire new texture from GPU");
@@ -120,7 +120,7 @@ lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_disp
 
 static void lv_opengles_texture_attach_to_display(lv_opengles_texture_t * texture, lv_display_t * display)
 {
-    LV_ASSERT_NULL(display);
+    LV_ASSERT(display != NULL);
     LV_UNUSED(texture);
 #if !LV_USE_DRAW_NANOVG
     display->layer_head->user_data = (void *)(lv_uintptr_t)texture->texture_id;

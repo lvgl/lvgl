@@ -146,7 +146,7 @@ void lv_opengles_deinit(void)
 
 void lv_opengles_render_params_init(lv_opengles_render_params_t * params)
 {
-    LV_ASSERT_NULL(params);
+    LV_CHECK_ARG(params != NULL, return);
     lv_memzero(params, sizeof(lv_opengles_render_params_t));
 }
 
@@ -298,7 +298,7 @@ void lv_opengles_reinit_state(void)
 
 void lv_opengles_render(const lv_opengles_render_params_t * params)
 {
-    LV_ASSERT_NULL(params);
+    LV_CHECK_ARG(params != NULL, return);
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
     if(!lv_area_intersect(&intersection, params->texture_area, params->texture_clip_area)) {
