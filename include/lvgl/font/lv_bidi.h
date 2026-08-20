@@ -52,7 +52,8 @@ void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, 
 
 /**
  * Set custom neutrals string
- * @param neutrals  default " \t\n\r.,:;'\"\`!?%/\\-=()[]{}<>@#&$|"
+ * @param neutrals  default " \t\n\r.,:;'\"\`!?%/\\-=()[]{}<>@#&$|". @nullable When NULL
+ *                  the built-in set is used.
  */
 void lv_bidi_set_custom_neutrals_static(const char * neutrals);
 
