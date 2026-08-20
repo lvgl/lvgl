@@ -47,8 +47,8 @@
 */
 void lv_uefi_init(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE * system_table)
 {
-    LV_ASSERT_NULL(image_handle);
-    LV_ASSERT_NULL(system_table);
+    LV_CHECK_ARG(image_handle != NULL, return);
+    LV_CHECK_ARG(system_table != NULL, return);
 
     gLvEfiImageHandle = image_handle;
     gLvEfiST = system_table;
@@ -64,10 +64,10 @@ void lv_uefi_init(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE * system_table)
  */
 void lv_uefi_platform_init(void)
 {
-    LV_ASSERT_NULL(gLvEfiImageHandle);
-    LV_ASSERT_NULL(gLvEfiST);
-    LV_ASSERT_NULL(gLvEfiBS);
-    LV_ASSERT_NULL(gLvEfiRT);
+    LV_CHECK_ARG(gLvEfiImageHandle != NULL, return);
+    LV_CHECK_ARG(gLvEfiST != NULL, return);
+    LV_CHECK_ARG(gLvEfiBS != NULL, return);
+    LV_CHECK_ARG(gLvEfiRT != NULL, return);
 }
 
 /**
