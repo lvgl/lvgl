@@ -3,6 +3,7 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
+#include <string.h>
 
 /* This function runs before each test */
 void setUp(void);
@@ -253,6 +254,54 @@ void test_calendar_chinese_calendar(void)
     lv_calendar_set_chinese_mode(g_calendar, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_09.png");
+}
+
+void test_calendar_get_pressed_date_parses_single_and_double_digit_days(void)
+{
+    lv_calendar_set_month_shown(g_calendar, 2022, 9);
+
+    lv_obj_t * btnm = lv_calendar_get_btnmatrix(g_calendar);
+    TEST_ASSERT_NOT_NULL(btnm);
+
+    const char * const * map = lv_buttonmatrix_get_map(btnm);
+    TEST_ASSERT_NOT_NULL(map);
+
+    uint32_t btn_id = 0;
+    int32_t single_digit_id = -1;
+    int32_t double_digit_id = -1;
+
+    for(uint32_t i = 0; map[i] != NULL; i++) {
+        /* Skip separators (newline entries) */
+        if(map[i][0] == '\0' || map[i][0] == '\n') {
+            continue;
+        }
+
+        size_t len = strlen(map[i]);
+
+        if(single_digit_id < 0 && len == 1 && map[i][0] == '5') {
+            single_digit_id = (int32_t)btn_id;
+        }
+        if(double_digit_id < 0 && len >= 2 && map[i][0] == '1' && map[i][1] == '5') {
+            double_digit_id = (int32_t)btn_id;
+        }
+
+        btn_id++;
+    }
+
+    TEST_ASSERT_TRUE(single_digit_id >= 0);
+    TEST_ASSERT_TRUE(double_digit_id >= 0);
+
+    lv_calendar_date_t pressed_date;
+
+    lv_buttonmatrix_set_selected_button(btnm, (uint32_t)single_digit_id);
+    lv_result_t res = lv_calendar_get_pressed_date(g_calendar, &pressed_date);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+    TEST_ASSERT_EQUAL_UINT8(5, pressed_date.day);
+
+    lv_buttonmatrix_set_selected_button(btnm, (uint32_t)double_digit_id);
+    res = lv_calendar_get_pressed_date(g_calendar, &pressed_date);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+    TEST_ASSERT_EQUAL_UINT8(15, pressed_date.day);
 }
 
 #endif  /* LV_BUILD_TEST */
