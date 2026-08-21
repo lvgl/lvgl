@@ -20,7 +20,7 @@
 #include "../../indev/lv_indev_scroll.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../core/lv_observer_private.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -717,7 +717,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return;
 
-    const lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, lv_label_get_text(label));
+    const lv_text_align_t align = lv_obj_calculate_style_text_align_internal(label, LV_PART_MAIN, lv_label_get_text(label));
 
     int32_t x = 0;
     switch(align) {
@@ -939,8 +939,8 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     lv_obj_t * parent = roller;
     while(parent) {
         angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
-        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
-        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
+        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
         scale_x = (scale_x * zoom_act_x) >> 8;
         scale_y = (scale_y * zoom_act_y) >> 8;
         parent = lv_obj_get_parent(parent);

@@ -9,10 +9,11 @@
 #include "lv_ime_pinyin_private.h"
 #if LV_USE_IME_PINYIN != 0
 
-#include "../../lvgl_public.h"
-#include "../../core/lv_obj_class_private.h"
 #include "../../lvgl.h"
+#include "../../lvgl_public.h"
 #include "../../core/lv_global.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_style_internal.h"
 #include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************

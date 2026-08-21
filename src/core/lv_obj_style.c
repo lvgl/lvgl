@@ -14,7 +14,7 @@
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "lv_observer_private.h"
-#include "lv_obj_style_internal_gen.h"
+#include "lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -633,11 +633,7 @@ lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_
 {
     LV_CHECK_ARG(obj != NULL, return LV_TEXT_ALIGN_AUTO);
     LV_CHECK_ARG(txt != NULL, return LV_TEXT_ALIGN_AUTO);
-
-    lv_text_align_t align = lv_obj_get_style_text_align_internal(obj, part);
-    lv_base_dir_t base_dir = lv_obj_get_style_base_dir_internal(obj, part);
-    lv_bidi_calculate_align(&align, &base_dir, txt);
-    return align;
+    return lv_obj_calculate_style_text_align_internal(obj, part, txt);
 }
 
 lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
@@ -746,6 +742,110 @@ lv_color32_t lv_obj_get_style_recolor_recursive(const lv_obj_t * obj, lv_part_t 
 
     return result;
 }
+
+void lv_obj_set_style_pad_all(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_pad_left(obj, value, selector);
+    lv_obj_set_style_pad_right(obj, value, selector);
+    lv_obj_set_style_pad_top(obj, value, selector);
+    lv_obj_set_style_pad_bottom(obj, value, selector);
+}
+
+void lv_obj_set_style_pad_hor(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_pad_left(obj, value, selector);
+    lv_obj_set_style_pad_right(obj, value, selector);
+}
+
+void lv_obj_set_style_pad_ver(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_pad_top(obj, value, selector);
+    lv_obj_set_style_pad_bottom(obj, value, selector);
+}
+
+void lv_obj_set_style_margin_all(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_margin_left(obj, value, selector);
+    lv_obj_set_style_margin_right(obj, value, selector);
+    lv_obj_set_style_margin_top(obj, value, selector);
+    lv_obj_set_style_margin_bottom(obj, value, selector);
+}
+
+void lv_obj_set_style_margin_hor(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_margin_left(obj, value, selector);
+    lv_obj_set_style_margin_right(obj, value, selector);
+}
+
+void lv_obj_set_style_margin_ver(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_margin_top(obj, value, selector);
+    lv_obj_set_style_margin_bottom(obj, value, selector);
+}
+
+void lv_obj_set_style_pad_gap(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_pad_row(obj, value, selector);
+    lv_obj_set_style_pad_column(obj, value, selector);
+}
+
+void lv_obj_set_style_size(lv_obj_t * obj, int32_t width, int32_t height, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_width(obj, width, selector);
+    lv_obj_set_style_height(obj, height, selector);
+}
+
+void lv_obj_set_style_transform_scale(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+    lv_obj_set_style_transform_scale_x(obj, value, selector);
+    lv_obj_set_style_transform_scale_y(obj, value, selector);
+}
+
+int32_t lv_obj_get_style_space_left(const lv_obj_t * obj, lv_part_t part)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return 0)
+    return lv_obj_get_style_space_left_internal(obj, part);
+}
+
+int32_t lv_obj_get_style_space_right(const lv_obj_t * obj, lv_part_t part)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return 0)
+    return lv_obj_get_style_space_right_internal(obj, part);
+}
+
+int32_t lv_obj_get_style_space_top(const lv_obj_t * obj, lv_part_t part)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return 0)
+    return lv_obj_get_style_space_top_internal(obj, part);
+}
+
+int32_t lv_obj_get_style_space_bottom(const lv_obj_t * obj, lv_part_t part)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return 0)
+    return lv_obj_get_style_space_bottom_internal(obj, part);
+}
+
+int32_t lv_obj_get_style_transform_scale_x_safe(const lv_obj_t * obj, lv_part_t part)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return 0)
+    return lv_obj_get_style_transform_scale_x_safe_internal(obj, part);
+}
+
+int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * obj, lv_part_t part)
+{
+    LV_CHECK_OBJ(obj, &lv_obj_class, return 0)
+    return lv_obj_get_style_transform_scale_y_safe_internal(obj, part);
+}
+
 
 #if LV_USE_OBSERVER
 

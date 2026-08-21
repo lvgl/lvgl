@@ -11,7 +11,8 @@
 #if LV_USE_FLEX
 
 #include "../../core/lv_global.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -172,9 +173,11 @@ static bool calc_min_size(lv_obj_t * cont, int32_t * req_size, bool width, void 
                                                                                                              LV_PART_MAIN);
 
     int32_t cont_space_start =
-        (f.row ? lv_obj_get_style_space_left(cont, LV_PART_MAIN) : lv_obj_get_style_space_top(cont, LV_PART_MAIN));
+        (f.row ? lv_obj_get_style_space_left_internal(cont, LV_PART_MAIN) : lv_obj_get_style_space_top_internal(cont,
+                                                                                                                LV_PART_MAIN));
     int32_t cont_space_end =
-        (f.row ? lv_obj_get_style_space_right(cont, LV_PART_MAIN) : lv_obj_get_style_space_bottom(cont, LV_PART_MAIN));
+        (f.row ? lv_obj_get_style_space_right_internal(cont, LV_PART_MAIN) : lv_obj_get_style_space_bottom_internal(cont,
+                                                                                                                    LV_PART_MAIN));
 
     int32_t track_first_item = f.rev ? cont->spec_attr->child_cnt - 1 : 0;
     int32_t next_track_first_item;
@@ -214,8 +217,8 @@ static void flex_update(lv_obj_t * cont, void * user_data)
         f.row ? lv_obj_get_style_pad_column_internal(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row_internal(cont,
                                                                                                              LV_PART_MAIN);
     int32_t max_main_size = (f.row ? lv_obj_get_content_width(cont) : lv_obj_get_content_height(cont));
-    int32_t abs_y = cont->coords.y1 + lv_obj_get_style_space_top(cont, LV_PART_MAIN) - lv_obj_get_scroll_y(cont);
-    int32_t abs_x = cont->coords.x1 + lv_obj_get_style_space_left(cont, LV_PART_MAIN) - lv_obj_get_scroll_x(cont);
+    int32_t abs_y = cont->coords.y1 + lv_obj_get_style_space_top_internal(cont, LV_PART_MAIN) - lv_obj_get_scroll_y(cont);
+    int32_t abs_x = cont->coords.x1 + lv_obj_get_style_space_left_internal(cont, LV_PART_MAIN) - lv_obj_get_scroll_x(cont);
 
     lv_flex_align_t track_cross_place = f.track_place;
     int32_t * cross_pos = (f.row ? &abs_y : &abs_x);

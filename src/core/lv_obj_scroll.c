@@ -11,7 +11,7 @@
 #include "../misc/lv_anim_private.h"
 #include "lv_obj_private.h"
 #include "../indev/lv_indev_scroll.h"
-#include "lv_obj_style_internal_gen.h"
+#include "lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -180,8 +180,8 @@ int32_t lv_obj_get_scroll_bottom(const lv_obj_t * obj)
         child_res = LV_MAX(child_res, tmp_y);
     }
 
-    int32_t space_top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    int32_t space_bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    int32_t space_top = lv_obj_get_style_space_top_internal(obj, LV_PART_MAIN);
+    int32_t space_bottom = lv_obj_get_style_space_bottom_internal(obj, LV_PART_MAIN);
 
     if(child_res != LV_COORD_MIN) {
         child_res -= (obj->coords.y2 - space_bottom);
@@ -205,8 +205,8 @@ int32_t lv_obj_get_scroll_left(const lv_obj_t * obj)
     }
 
     /*With RTL base direction scrolling the left is normal so find the left most coordinate*/
-    int32_t space_right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
-    int32_t space_left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    int32_t space_right = lv_obj_get_style_space_right_internal(obj, LV_PART_MAIN);
+    int32_t space_left = lv_obj_get_style_space_left_internal(obj, LV_PART_MAIN);
 
     int32_t child_res = 0;
 
@@ -259,8 +259,8 @@ int32_t lv_obj_get_scroll_right(const lv_obj_t * obj)
         child_res = LV_MAX(child_res, tmp_x);
     }
 
-    int32_t space_right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
-    int32_t space_left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    int32_t space_right = lv_obj_get_style_space_right_internal(obj, LV_PART_MAIN);
+    int32_t space_left = lv_obj_get_style_space_left_internal(obj, LV_PART_MAIN);
 
     if(child_res != LV_COORD_MIN) {
         child_res -= (obj->coords.x2 - space_right);
@@ -787,8 +787,8 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     if(snap_y != LV_SCROLL_SNAP_NONE) area_tmp = &child->coords;
     else area_tmp = area;
 
-    int32_t stop = lv_obj_get_style_space_top(parent, LV_PART_MAIN);
-    int32_t sbottom = lv_obj_get_style_space_bottom(parent, LV_PART_MAIN);
+    int32_t stop = lv_obj_get_style_space_top_internal(parent, LV_PART_MAIN);
+    int32_t sbottom = lv_obj_get_style_space_bottom_internal(parent, LV_PART_MAIN);
     int32_t top_diff = parent->coords.y1 + stop - area_tmp->y1 - scroll_value->y;
     int32_t bottom_diff = -(parent->coords.y2 - sbottom - area_tmp->y2 - scroll_value->y);
     int32_t parent_h = lv_obj_get_height(parent) - stop - sbottom;
@@ -831,8 +831,8 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     if(snap_x != LV_SCROLL_SNAP_NONE) area_tmp = &child->coords;
     else area_tmp = area;
 
-    int32_t sleft = lv_obj_get_style_space_left(parent, LV_PART_MAIN);
-    int32_t sright = lv_obj_get_style_space_right(parent, LV_PART_MAIN);
+    int32_t sleft = lv_obj_get_style_space_left_internal(parent, LV_PART_MAIN);
+    int32_t sright = lv_obj_get_style_space_right_internal(parent, LV_PART_MAIN);
     int32_t left_diff = parent->coords.x1 + sleft - area_tmp->x1 - scroll_value->x;
     int32_t right_diff = -(parent->coords.x2 - sright - area_tmp->x2 - scroll_value->x);
     if((left_diff >= 0 && right_diff >= 0)) x_scroll = 0;
