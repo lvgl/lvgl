@@ -12,6 +12,7 @@
 #if LV_USE_GLTF
 
 #include "../gltf_data/lv_gltf_data_internal.hpp"
+#include "../../../core/lv_obj_style_internal_gen.h"
 
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../drivers/opengles/lv_opengles_private.h"
@@ -957,8 +958,8 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
         /* cast is safe because viewer is a lv_obj_t*/
-        setup_draw_solid_background(viewer, lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN),
-                                    lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN));
+        setup_draw_solid_background(viewer, lv_obj_get_style_bg_color_internal((lv_obj_t *)viewer, LV_PART_MAIN),
+                                    lv_obj_get_style_bg_opa_internal((lv_obj_t *)viewer, LV_PART_MAIN));
     }
 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
@@ -1307,8 +1308,8 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
         /* cast is safe because viewer is a lv_obj_t*/
-        setup_draw_solid_background(viewer, lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN),
-                                    lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN));
+        setup_draw_solid_background(viewer, lv_obj_get_style_bg_color_internal((lv_obj_t *)viewer, LV_PART_MAIN),
+                                    lv_obj_get_style_bg_opa_internal((lv_obj_t *)viewer, LV_PART_MAIN));
     }
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
