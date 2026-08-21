@@ -43,8 +43,8 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 static void draw_buf_flush(lv_display_t * disp);
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void wait_for_flushing(lv_display_t * disp);
-static void call_sync_cb(lv_display_t * disp, const lv_area_t * area);
-static void wait_for_syncing(lv_display_t * disp);
+static void call_partial_sync_cb(lv_display_t * disp, const lv_area_t * area);
+static void wait_for_partial_syncing(lv_display_t * disp);
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
                                   lv_area_t * layer_area_out, lv_area_t * obj_draw_size_out);
 static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area);
@@ -419,10 +419,10 @@ void lv_display_refr_timer(lv_timer_t * timer)
     refr_invalid_areas();
 
     if(disp_refr->inv_p == 0) goto refr_finish;
-    /*In double buffered direct mode or if sync callback is set, save the updated areas.
+    /*In double buffered direct mode or if partial sync callback is set, save the updated areas.
      *They will be used on the next call to synchronize the buffers.*/
-    if((lv_display_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) ||
-       disp_refr->sync_cb) {
+    if((disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT && lv_display_is_double_buffered(disp_refr)) ||
+       (disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL && disp_refr->partial_sync_cb)) {
         uint32_t i;
         for(i = 0; i < disp_refr->inv_p; i++) {
             if(disp_refr->inv_area_joined[i])
@@ -661,19 +661,17 @@ static void lv_refr_join_area(void)
  */
 static void refr_sync_areas(void)
 {
-    /*Do not sync if not direct double buffered and no sync callback set*/
+    /*Do not sync if not direct double buffered and no partial sync callback set*/
     const bool auto_sync = disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT &&
                            lv_display_is_double_buffered(disp_refr);
-    const bool user_sync = disp_refr->sync_cb != NULL;
-    if(!auto_sync && !user_sync) return;
+    const bool partial_sync = disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL &&
+                              disp_refr->partial_sync_cb;
+    if(!auto_sync && !partial_sync) return;
 
     /*Do not sync if no sync areas*/
     if(lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
     LV_PROFILER_REFR_BEGIN;
-    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
-    /*We need to wait for ready here to not mess up the active screen*/
-    wait_for_flushing(disp_refr);
 
     /*Iterate through invalidated areas to see if sync area should be copied*/
     uint16_t i;
@@ -710,34 +708,15 @@ static void refr_sync_areas(void)
         }
     }
 
-    /*The buffers are already swapped.
-     *So the active buffer is the off screen buffer where LVGL will render*/
-    lv_draw_buf_t * off_screen = disp_refr->buf_act;
-    /*Triple buffer sync buffer for off-screen2 updates.*/
-    lv_draw_buf_t * off_screen2 = NULL;
-    lv_draw_buf_t * on_screen = NULL;
-
-    /* Only compute buffer relationships when auto_sync (direct double-buffered) is used.
-     * When only user_sync is active, these pointers are not needed. */
-    if(auto_sync) {
-        if(disp_refr->buf_act == disp_refr->buf_1) {
-            off_screen2 = disp_refr->buf_2;
-            on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
-        }
-        else if(disp_refr->buf_act == disp_refr->buf_2) {
-            off_screen2 = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_1;
-            on_screen = disp_refr->buf_1;
-        }
-        else {
-            off_screen2 = disp_refr->buf_1;
-            on_screen = disp_refr->buf_2;
-        }
-    }
-
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
 
     lv_area_t disp_area = {0, 0, (int32_t)hor_res - 1, (int32_t)ver_res - 1};
+
+    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
+    /*We need to wait for ready here to not mess up the active screen*/
+    wait_for_flushing(disp_refr);
+
     /*Copy sync areas (if any remaining)*/
     for(sync_area = lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
         sync_area = lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
@@ -747,28 +726,59 @@ static void refr_sync_areas(void)
         if(!lv_area_intersect(sync_area, sync_area, &disp_area)) {
             continue;
         }
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-        if(lv_display_get_matrix_rotation(disp_refr)) {
+
+        /*In case the synchronization happens between physically rotated frame buffers,
+         *the area shall be rotated first to convert from the internal logical pixel space
+         *to the physical frame buffer space*/
+        if(partial_sync || lv_display_get_matrix_rotation(disp_refr)) {
             lv_display_rotate_area(disp_refr, sync_area);
         }
-#endif
-        /*Call sync callback (if set)*/
-        if(disp_refr->sync_cb) {
-            /*Set syncing flags*/
-            disp_refr->syncing = true;
-            disp_refr->syncing_last = lv_ll_get_tail(&disp_refr->sync_areas) == sync_area;
 
-            /*Call sync callback and wait for sync to complete*/
-            call_sync_cb(disp_refr, sync_area);
-            wait_for_syncing(disp_refr);
+        /*Do the partial syncing if configured*/
+        if(partial_sync) {
+            /*Set syncing flags*/
+            disp_refr->partial_syncing = true;
+            disp_refr->partial_syncing_last = lv_ll_get_tail(&disp_refr->sync_areas) == sync_area;
+
+            /*Call partial sync callback and wait for sync to complete*/
+            call_partial_sync_cb(disp_refr, sync_area);
+            wait_for_partial_syncing(disp_refr);
         }
-        /*Fallback to internal double buffered direct mode sync*/
+        /*Or do the internal double buffered direct mode sync*/
         else {
-            lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
-            if(off_screen2 != on_screen)
-                lv_draw_buf_copy(off_screen2, sync_area, on_screen, sync_area);
+            /*The buffers are already swapped.
+             *So the active buffer is the off screen buffer where LVGL will render*/
+            lv_draw_buf_t * off_screen = disp_refr->buf_act;
+            /*The previous buffer that flushed recently, might be on-screen only
+             *after the next VSYNC, shall not be modified*/
+            lv_draw_buf_t * queued_screen = NULL;
+            /*The next buffer that still might be on-screen, modifying this before
+              the queued screen is activated might cause tearing.
+              The variable is not needed in the actual process and would cause
+              'set but unused' warnings, so it's been kept only for reference*/
+            /*lv_draw_buf_t * on_screen = NULL;*/
+
+            if(off_screen == disp_refr->buf_3) {
+                queued_screen = disp_refr->buf_2;
+                /*on_screen = disp_refr->buf_1;*/
+            }
+            else if(off_screen == disp_refr->buf_2) {
+                queued_screen = disp_refr->buf_1;
+                /*on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : off_screen;*/
+            }
+            else {
+                queued_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
+                /*on_screen = disp_refr->buf_3 ? disp_refr->buf_2 : off_screen;*/
+            }
+
+            lv_draw_buf_copy(off_screen, sync_area, queued_screen, sync_area);
         }
     }
+
+    /*Now the buffers in sync and the off screen buffer is ready to be updated.
+     *If it is flushed just in time before the queued screen is swapped to at a
+     *VSYNC, it shall override it and be the latest frame. If it is too late to
+     *override, it shall be the next frame (unless overridden by the next flush.*/
 
     /*Clear sync areas*/
     lv_ll_clear(&disp_refr->sync_areas);
@@ -1522,7 +1532,7 @@ static void wait_for_flushing(lv_display_t * disp)
     LV_PROFILER_REFR_END;
 }
 
-static void call_sync_cb(lv_display_t * disp, const lv_area_t * area)
+static void call_partial_sync_cb(lv_display_t * disp, const lv_area_t * area)
 {
     LV_PROFILER_REFR_BEGIN;
 
@@ -1533,38 +1543,38 @@ static void call_sync_cb(lv_display_t * disp, const lv_area_t * area)
     offset_area.y1 += disp->offset_y;
     offset_area.y2 += disp->offset_y;
 
-    LV_TRACE_REFR("Calling sync_cb on (%d;%d)(%d;%d) area",
+    LV_TRACE_REFR("Calling partial_sync_cb on (%d;%d)(%d;%d) area",
                   (int)offset_area.x1, (int)offset_area.y1,
                   (int)offset_area.x2, (int)offset_area.y2);
 
-    lv_display_send_event(disp, LV_EVENT_SYNC_START, (void *)&offset_area);
+    lv_display_send_event(disp, LV_EVENT_PARTIAL_SYNC_START, (void *)&offset_area);
 
-    disp->sync_cb(disp, &offset_area);
+    disp->partial_sync_cb(disp, &offset_area);
 
-    lv_display_send_event(disp, LV_EVENT_SYNC_FINISH, (void *)&offset_area);
+    lv_display_send_event(disp, LV_EVENT_PARTIAL_SYNC_FINISH, (void *)&offset_area);
 
     LV_PROFILER_REFR_END;
 }
 
-static void wait_for_syncing(lv_display_t * disp)
+static void wait_for_partial_syncing(lv_display_t * disp)
 {
     LV_PROFILER_REFR_BEGIN;
     LV_LOG_TRACE("begin");
 
-    lv_display_send_event(disp, LV_EVENT_SYNC_WAIT_START, NULL);
+    lv_display_send_event(disp, LV_EVENT_PARTIAL_SYNC_WAIT_START, NULL);
 
-    if(disp->sync_wait_cb) {
-        if(disp->syncing) {
-            disp->sync_wait_cb(disp);
-            disp->syncing = 0;
+    if(disp->partial_sync_wait_cb) {
+        if(disp->partial_syncing) {
+            disp->partial_sync_wait_cb(disp);
+            disp->partial_syncing = 0;
         }
     }
     else {
-        while(disp->syncing);
+        while(disp->partial_syncing);
     }
-    disp->syncing_last = 0;
+    disp->partial_syncing_last = 0;
 
-    lv_display_send_event(disp, LV_EVENT_SYNC_WAIT_FINISH, NULL);
+    lv_display_send_event(disp, LV_EVENT_PARTIAL_SYNC_WAIT_FINISH, NULL);
 
     LV_LOG_TRACE("end");
     LV_PROFILER_REFR_END;

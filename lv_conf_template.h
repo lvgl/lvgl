@@ -2421,8 +2421,8 @@
  *    display ISR.
  *    e.g. __attribute__((section(".itcm")))
  *
- *  LV_ATTRIBUTE_SYNC_READY
- *    Applied to lv_display_sync_ready(). Similar to FLUSH_READY, useful
+ *  LV_ATTRIBUTE_PARTIAL_SYNC_READY
+ *    Applied to lv_display_partial_sync_ready(). Similar to FLUSH_READY, useful
  *    when called from an ISR context.
  *    e.g. __attribute__((section(".itcm")))
  *
