@@ -8,6 +8,7 @@ REPO_ROOT = Path(BASE_DIR).parents[1]
 
 EXAMPLES_ROOT = REPO_ROOT / "examples"
 STYLE_PROPERTIES_MDX = REPO_ROOT.joinpath("docs/src/common-widget-features/styles/style-properties.mdx")
+OBJ_STYLE_INTERNAL_GEN_H = REPO_ROOT.joinpath("src/core/lv_obj_style_internal_gen.h")
 OBJ_STYLE_GEN_H = REPO_ROOT.joinpath("include/lvgl/core/lv_obj_style_gen.h")
 OBJ_STYLE_GEN_C = REPO_ROOT.joinpath("src/core/lv_obj_style_gen.c")
 STYLE_GEN_H = REPO_ROOT.joinpath("include/lvgl/core/lv_style_gen.h")
@@ -731,6 +732,9 @@ def optionally_append_extra_info(p, dsc):
 
     return dsc
 
+def check_null_value(prop):
+    return prop["style_type"] == "ptr" and "NULL" not in prop["default"]
+
 
 def print_value_param(p, indent='', is_for_const=False):
     # Compute correct wording for description of `value` argument.
@@ -771,7 +775,11 @@ def print_value_param(p, indent='', is_for_const=False):
         elif name == 'GRID_ROW_DSC_ARRAY':
             spelled_out_type = 'grid-row descriptor array'
 
-        print(f' * @param  {arg_name}   {indent}{type_prefix} {spelled_out_type}')
+        # either we need to check for it or we need to mark it as @nullable
+        nullable = ' @nullable' if not check_null_value(p) else ''
+        
+
+        print(f' * @param  {arg_name}   {indent}{type_prefix} {spelled_out_type}{nullable}')
 
 
 def style_set_doxygen_comment(p):
@@ -799,21 +807,34 @@ def style_get_cast(style_type, var_type):
         cast = "(" + var_type + ")"
     return cast
 
-
 def style_set_cast(style_type):
     cast = ""
     if style_type == 'num':
         cast = "(int32_t)"
     return cast
 
+def invalid_return(prop):
+    t = prop['var_type'].strip()
+    if t.endswith('*'):
+        return 'NULL'
+    if t == 'bool':
+        return 'false'
+    if t == 'lv_color_t':
+        return 'lv_color_black()'
+    return '0'
+
 
 def style_set_c(p):
     if 'section' in p: return
 
+    check_null = check_null_value(p)
     cast = style_set_cast(p['style_type'])
     print()
     print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + p['var_type'] + " value)")
     print("{")
+    print("    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);")
+    if check_null:
+        print("    LV_CHECK_ARG(value != NULL, return);")
     print("    lv_style_value_t v = {")
     print("        ." + p['style_type'] + " = " + cast + "value")
     print("    };")
@@ -873,25 +894,26 @@ def local_style_get_doxygen_comment(p):
     print(f' * @param  part   One of the `LV_PART_...` enum values')
     print(' */')
 
-
-def local_style_get_h(p):
+def local_style_get_h_internal(p):
     if 'section' in p: return
 
-    local_style_get_doxygen_comment(p)
     cast = style_get_cast(p['style_type'], p['var_type'])
-    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p[
-        'name'].lower() + "(const lv_obj_t * obj, lv_part_t part)")
+    fn_name = f"lv_obj_get_style_{p['name'].lower()}_internal"
+    local_style_get_doxygen_comment(p)
+    print(f"static inline {p['var_type']} {fn_name}(const lv_obj_t * obj, lv_part_t part)")
     print("{")
+    print("    LV_ASSERT(obj != NULL);")
     print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
     print("    return " + cast + "v." + p['style_type'] + ";")
     print("}")
     print()
 
     if 'filtered' in p and p['filtered']:
+        fn_name = f"lv_obj_get_style_{p['name'].lower()}_filtered_internal"
         local_style_get_doxygen_comment(p)
-        print("static inline " + p['var_type'] + " lv_obj_get_style_" + p[
-            'name'].lower() + "_filtered(const lv_obj_t * obj, lv_part_t part)")
+        print(f"static inline {p['var_type']} {fn_name}(const lv_obj_t * obj, lv_part_t part)")
         print("{")
+        print("    LV_ASSERT(obj != NULL);")
         print(
             "    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" +
             p['name'] + "));")
@@ -899,15 +921,55 @@ def local_style_get_h(p):
         print("}")
         print()
 
+def local_style_get_h(p):
+    if 'section' in p: return
+
+    local_style_get_doxygen_comment(p)
+    print(f"{p['var_type']} lv_obj_get_style_{p['name'].lower()}(const lv_obj_t * obj, lv_part_t part);",
+          end="\n\n")
+
+    if 'filtered' in p and p['filtered']:
+        local_style_get_doxygen_comment(p)
+        print(f"{p['var_type']} lv_obj_get_style_{p['name'].lower()}_filtered(const lv_obj_t * obj, lv_part_t part);",
+          end="\n\n")
+
+
+def local_style_get_c(p):
+    if 'section' in p: return
+
+    fn_name =  f"lv_obj_get_style_{p['name'].lower()}"
+    invalid = invalid_return(p)
+    internal_fn_name =  fn_name + "_internal"
+    print(f"{p['var_type']} {fn_name}(const lv_obj_t * obj, lv_part_t part)")
+    print("{")
+    print(f"    LV_CHECK_OBJ(obj, &lv_obj_class, return {invalid});")
+    print(f"    return {internal_fn_name}(obj, part);")
+    print("}")
+    print()
+
+    if 'filtered' in p and p['filtered']:
+        fn_name += "_filtered"
+        internal_fn_name =  fn_name + "_internal"
+        print(f"{p['var_type']} {fn_name}(const lv_obj_t * obj, lv_part_t part)")
+        print("{")
+        print(f"    LV_CHECK_OBJ(obj, &lv_obj_class, return {invalid});")
+        print(f"    return {internal_fn_name}(obj, part);")
+        print("}")
+        print()
+
 
 def local_style_set_c(p):
     if 'section' in p: return
 
+    check_null = check_null_value(p)
     cast = style_set_cast(p['style_type'])
     print()
     print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p[
         'var_type'] + " value, lv_style_selector_t selector)")
     print("{")
+    print("    LV_CHECK_OBJ(obj, &lv_obj_class, return);")
+    if check_null:
+        print("    LV_CHECK_ARG(value != NULL, return);")
     print("    lv_style_value_t v = {")
     print("        ." + p['style_type'] + " = " + cast + "value")
     print("    };")
@@ -1027,13 +1089,52 @@ print('''\
 print('#endif /* LV_OBJ_STYLE_GEN_H */')
 
 # -------------------------------------------------------------------------
+# lv_obj_style_internal_gen.h
+# -------------------------------------------------------------------------
+sys.stdout = open(OBJ_STYLE_INTERNAL_GEN_H, 'w')
+
+print(HEADING)
+print('#ifndef LV_OBJ_STYLE_INTERNAL_GEN_H')
+print('#define LV_OBJ_STYLE_INTERNAL_GEN_H')
+print()
+print('''\
+#ifdef __cplusplus
+extern "C" {
+#endif
+''')
+print('#include "../lvgl_public.h"')
+print()
+
+guard = ""
+for prop in props:
+    guard_proc(prop)
+    local_style_get_h_internal(prop)
+    _total_func_count += 1
+guard_close()
+
+print()
+print('''\
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+''')
+
+print('#endif /* LV_OBJ_STYLE_INTERNAL_GEN_H */')
+
+# -------------------------------------------------------------------------
 # lv_obj_style_gen.c
 # -------------------------------------------------------------------------
 sys.stdout = open(OBJ_STYLE_GEN_C, 'w')
 
 print(HEADING)
 print('#include "../lvgl_public.h"')
+print('#include "lv_obj_style_internal_gen.h"')
 print()
+
+for prop in props:
+    guard_proc(prop)
+    local_style_get_c(prop)
+guard_close()
 
 for prop in props:
     guard_proc(prop)
@@ -1105,3 +1206,7 @@ for prop in props:
 # -------------------------------------------------------------------------
 sys.stdout = orig_stdout
 print(f'Total functions commented:  {_total_func_count}.')
+
+import subprocess
+code_format = REPO_ROOT / "scripts" / "code-format.py"
+subprocess.call([code_format])
