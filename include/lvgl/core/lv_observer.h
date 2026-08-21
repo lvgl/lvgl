@@ -336,7 +336,7 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  * @param obj           pointer to Widget
  * @param user_data     optional user data
  * @return              pointer to newly-created Observer
- * @note                Do not call `lv_observer_remove()` on Observers created this way.
+ * @note                Do not call `lv_observer_delete()` on Observers created this way.
  *                      Only clean up such Observers by either:
  *                      - deleting the Widget, or
  *                      - calling `lv_subject_deinit()` to gracefully de-couple and
@@ -360,7 +360,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
  * Remove Observer from its Subject.
  * @param observer      pointer to Observer
  */
-void lv_observer_remove(lv_observer_t * observer);
+void lv_observer_delete(lv_observer_t * observer);
 
 /**
  * Remove Observers associated with Widget `obj` from specified `subject` or all Subjects.
