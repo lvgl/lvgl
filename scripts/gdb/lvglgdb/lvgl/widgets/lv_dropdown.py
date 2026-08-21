@@ -37,6 +37,16 @@ class LVDropdown(LVObject):
         return safe_string(self._wv, "options")
 
     @property
+    def text_translation_tag(self):
+        """Translation tag for the button's text"""
+        return safe_string(self._wv, "text_translation_tag")
+
+    @property
+    def options_translation_tag(self):
+        """Translation tag for the options"""
+        return safe_string(self._wv, "options_translation_tag")
+
+    @property
     def option_cnt(self):
         """Number of options"""
         return int(self._wv.safe_field("option_cnt", 0))
@@ -84,6 +94,8 @@ class LVDropdown(LVObject):
         d["text"] = self.text
         d["symbol"] = self.symbol
         d["options"] = self.options
+        d["text_translation_tag"] = self.text_translation_tag
+        d["options_translation_tag"] = self.options_translation_tag
         d["option_cnt"] = self.option_cnt
         d["sel_opt_id"] = self.sel_opt_id
         d["sel_opt_id_orig"] = self.sel_opt_id_orig

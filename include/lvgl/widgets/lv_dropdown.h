@@ -83,6 +83,18 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text);
  */
 void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text);
 
+#if LV_USE_TRANSLATION
+
+/**
+ * Assign a translation tag for the drop-down list's button text. Memory will be allocated to store the tag.
+ * The button text will automatically update when the language is changed via `lv_translation_set_language`.
+ * @param obj       pointer to a drop-down list object
+ * @param tag       '\0' terminated character string.
+ */
+void lv_dropdown_set_text_translation_tag(lv_obj_t * obj, const char * tag);
+
+#endif /*LV_USE_TRANSLATION*/
+
 /**
  * Set the options in a drop-down list from a string.
  * The options will be copied and saved in the object so the `options` can be destroyed after calling this function
@@ -98,6 +110,19 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options);
  * @param options   a static string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options);
+
+#if LV_USE_TRANSLATION
+
+/**
+ * Assign a translation tag for the options of the drop-down list. Memory will be allocated to store the tag.
+ * The options will automatically update when the language is changed via `lv_translation_set_language`.
+ * The translation should contain the options in a '\n' separated list. E.g. "One\nTwo\nThree"
+ * @param obj       pointer to a drop-down list object
+ * @param tag       '\0' terminated character string.
+ */
+void lv_dropdown_set_options_translation_tag(lv_obj_t * obj, const char * tag);
+
+#endif /*LV_USE_TRANSLATION*/
 
 /**
  * Add an options to a drop-down list from a string.  Only works for non-static options.
