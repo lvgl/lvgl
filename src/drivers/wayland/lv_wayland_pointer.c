@@ -195,8 +195,16 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
                                  wl_fixed_t sx, wl_fixed_t sy)
 {
     LV_UNUSED(data);
-    LV_UNUSED(surface);
     lv_wl_seat_pointer_t * seat_pointer = wl_pointer_get_user_data(pointer);
+    LV_ASSERT_NULL(seat_pointer);
+    seat_pointer->active_window = NULL;
+    lv_wl_window_t * window;
+    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
+        if(window->body == surface) {
+            seat_pointer->active_window = window;
+            break;
+        }
+    }
     int pos_x = wl_fixed_to_int(sx);
     int pos_y = wl_fixed_to_int(sy);
 
@@ -220,6 +228,9 @@ static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint3
     LV_UNUSED(serial);
     LV_UNUSED(surface);
     LV_UNUSED(pointer);
+    lv_wl_seat_pointer_t * seat_pointer = wl_pointer_get_user_data(pointer);
+    LV_ASSERT_NULL(seat_pointer);
+    seat_pointer->active_window = NULL;
 }
 
 static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
@@ -248,6 +259,12 @@ static void pointer_handle_button(void * data, struct wl_pointer * pointer, uint
 
     if(button == BTN_LEFT) {
         seat_pointer->left_btn_state = lv_state;
+        if(state == WL_POINTER_BUTTON_STATE_PRESSED && seat_pointer->active_window) {
+            xdg_toplevel_move(
+                seat_pointer->active_window->xdg.xdg_toplevel,
+                lv_wl_ctx.seat.wl_seat,
+                serial);
+        }
     }
     else if(button == BTN_RIGHT) {
         seat_pointer->right_btn_state = lv_state;
