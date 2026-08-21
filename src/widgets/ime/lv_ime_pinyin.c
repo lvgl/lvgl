@@ -7,12 +7,13 @@
  *      INCLUDES
  *********************/
 #include "lv_ime_pinyin_private.h"
-#include "../../lvgl_public.h"
-#include "../../core/lv_obj_class_private.h"
 #if LV_USE_IME_PINYIN != 0
 
+#include "../../lvgl_public.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../lvgl.h"
 #include "../../core/lv_global.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -862,7 +863,7 @@ static void lv_ime_pinyin_style_change_event(lv_event_t * e)
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
     if(code == LV_EVENT_STYLE_CHANGED) {
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+        const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
         lv_obj_set_style_text_font(pinyin_ime->cand_panel, font, 0);
     }
 }

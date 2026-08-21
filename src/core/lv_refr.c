@@ -18,6 +18,7 @@
 #include "../draw/opengles/lv_draw_opengles.h"
 #include "lv_global.h"
 #include "../lvgl_public.h"
+#include "lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -164,11 +165,11 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
         }
         else {
             layer->_clip_area = clip_coords_for_children;
-            bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
+            bool clip_corner = lv_obj_get_style_clip_corner_internal(obj, LV_PART_MAIN);
 
             int32_t radius = 0;
             if(clip_corner) {
-                radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+                radius = lv_obj_get_style_radius_internal(obj, LV_PART_MAIN);
                 if(radius == 0) clip_corner = false;
             }
 
@@ -468,7 +469,7 @@ lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
     if(lv_obj_is_hidden(obj)) return NULL;
     if(lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
-    if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return NULL;
+    if(lv_obj_get_style_opa_internal(obj, LV_PART_MAIN) < LV_OPA_MAX) return NULL;
 
     /*If this object is fully cover the draw area then check the children too*/
     lv_cover_check_info_t info;
@@ -506,7 +507,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
     if(lv_obj_is_hidden(obj)) return;
 
     /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/
-    const lv_opa_t opa_layered = lv_obj_get_style_opa_layered(obj, LV_PART_MAIN);
+    const lv_opa_t opa_layered = lv_obj_get_style_opa_layered_internal(obj, LV_PART_MAIN);
     if(opa_layered <= LV_OPA_MIN) return;
 
     if(lv_obj_get_style_transform_scale_x(obj, LV_PART_MAIN) <= 0) return;
@@ -516,7 +517,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
     const lv_color32_t layer_recolor = layer->recolor;
 
     /*Normal `opa` (not layered) will just scale down `bg_opa`, `text_opa`, etc, in the upcoming drawings.*/
-    const lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+    const lv_opa_t opa_main = lv_obj_get_style_opa_internal(obj, LV_PART_MAIN);
     if(opa_main < LV_OPA_MAX) {
         layer->opa = LV_OPA_MIX2(layer_opa_ori, opa_main);
     }
@@ -565,7 +566,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
             layer_area_act.y2 = layer_area_act.y1 + max_rgb_row_height - 1;
             if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
 
-            const void * bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, LV_PART_MAIN);
+            const void * bitmap_mask_src = lv_obj_get_style_bitmap_mask_src_internal(obj, LV_PART_MAIN);
             bool area_need_alpha = bitmap_mask_src || alpha_test_area_on_obj(obj, &layer_area_act);
 
             if(area_need_alpha) {
@@ -578,8 +579,8 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
             lv_obj_redraw(new_layer, obj);
 
             lv_point_t pivot = {
-                .x = lv_obj_get_style_transform_pivot_x(obj, LV_PART_MAIN),
-                .y = lv_obj_get_style_transform_pivot_y(obj, LV_PART_MAIN)
+                .x = lv_obj_get_style_transform_pivot_x_internal(obj, LV_PART_MAIN),
+                .y = lv_obj_get_style_transform_pivot_y_internal(obj, LV_PART_MAIN)
             };
 
             if(LV_COORD_IS_PCT(pivot.x)) {
@@ -595,14 +596,14 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.pivot.y = obj->coords.y1 + pivot.y - new_layer->buf_area.y1;
 
             layer_draw_dsc.opa = opa_layered;
-            layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, LV_PART_MAIN);
+            layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation_internal(obj, LV_PART_MAIN);
             while(layer_draw_dsc.rotation > 3600) layer_draw_dsc.rotation -= 3600;
             while(layer_draw_dsc.rotation < 0) layer_draw_dsc.rotation += 3600;
-            layer_draw_dsc.scale_x = lv_obj_get_style_transform_scale_x(obj, LV_PART_MAIN);
-            layer_draw_dsc.scale_y = lv_obj_get_style_transform_scale_y(obj, LV_PART_MAIN);
-            layer_draw_dsc.skew_x = lv_obj_get_style_transform_skew_x(obj, LV_PART_MAIN);
-            layer_draw_dsc.skew_y = lv_obj_get_style_transform_skew_y(obj, LV_PART_MAIN);
-            layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, LV_PART_MAIN);
+            layer_draw_dsc.scale_x = lv_obj_get_style_transform_scale_x_internal(obj, LV_PART_MAIN);
+            layer_draw_dsc.scale_y = lv_obj_get_style_transform_scale_y_internal(obj, LV_PART_MAIN);
+            layer_draw_dsc.skew_x = lv_obj_get_style_transform_skew_x_internal(obj, LV_PART_MAIN);
+            layer_draw_dsc.skew_y = lv_obj_get_style_transform_skew_y_internal(obj, LV_PART_MAIN);
+            layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode_internal(obj, LV_PART_MAIN);
             layer_draw_dsc.antialias = disp_refr->antialiasing;
             layer_draw_dsc.bitmap_mask_src = bitmap_mask_src;
             layer_draw_dsc.image_area = obj_draw_size;
@@ -1254,18 +1255,18 @@ static bool obj_get_matrix(lv_obj_t * obj, lv_matrix_t * matrix)
     }
 
     lv_point_t pivot = {
-        .x = lv_obj_get_style_transform_pivot_x(obj, LV_PART_MAIN),
-        .y = lv_obj_get_style_transform_pivot_y(obj, LV_PART_MAIN)
+        .x = lv_obj_get_style_transform_pivot_x_internal(obj, LV_PART_MAIN),
+        .y = lv_obj_get_style_transform_pivot_y_internal(obj, LV_PART_MAIN)
     };
 
     pivot.x = obj->coords.x1 + lv_pct_to_px(pivot.x, lv_area_get_width(&obj->coords));
     pivot.y = obj->coords.y1 + lv_pct_to_px(pivot.y, lv_area_get_height(&obj->coords));
 
-    int32_t rotation = lv_obj_get_style_transform_rotation(obj, LV_PART_MAIN);
-    int32_t scale_x = lv_obj_get_style_transform_scale_x(obj, LV_PART_MAIN);
-    int32_t scale_y = lv_obj_get_style_transform_scale_y(obj, LV_PART_MAIN);
-    int32_t skew_x = lv_obj_get_style_transform_skew_x(obj, LV_PART_MAIN);
-    int32_t skew_y = lv_obj_get_style_transform_skew_y(obj, LV_PART_MAIN);
+    int32_t rotation = lv_obj_get_style_transform_rotation_internal(obj, LV_PART_MAIN);
+    int32_t scale_x = lv_obj_get_style_transform_scale_x_internal(obj, LV_PART_MAIN);
+    int32_t scale_y = lv_obj_get_style_transform_scale_y_internal(obj, LV_PART_MAIN);
+    int32_t skew_x = lv_obj_get_style_transform_skew_x_internal(obj, LV_PART_MAIN);
+    int32_t skew_y = lv_obj_get_style_transform_skew_y_internal(obj, LV_PART_MAIN);
 
     /* Checked by caller */
     LV_ASSERT(scale_x > 0 && scale_y > 0);
@@ -1339,7 +1340,7 @@ static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
 
 static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
 {
-    if(lv_obj_get_style_transform_rotation(obj, LV_PART_MAIN) == 0) {
+    if(lv_obj_get_style_transform_rotation_internal(obj, LV_PART_MAIN) == 0) {
         return false;
     }
 

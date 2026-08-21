@@ -15,6 +15,7 @@
  *********************/
 #define layout_cnt LV_GLOBAL_DEFAULT()->layout_count
 #define layout_list_def LV_GLOBAL_DEFAULT()->layout_list
+#include "../core/lv_obj_style_internal_gen.h"
 
 /**********************
  *      TYPEDEFS
@@ -79,7 +80,7 @@ bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
 {
     LV_ASSERT(obj != NULL);
     LV_ASSERT(size != NULL);
-    lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
+    lv_layout_t layout_id = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id < layout_cnt) {
         void * user_data = layout_list_def[layout_id].user_data;
         if(layout_list_def[layout_id].callbacks.get_min_size_cb) {
@@ -92,7 +93,7 @@ bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
 void lv_layout_apply(lv_obj_t * obj)
 {
     LV_ASSERT(obj != NULL);
-    lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
+    lv_layout_t layout_id = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id < layout_cnt) {
         void  * user_data = layout_list_def[layout_id].user_data;
         layout_list_def[layout_id].callbacks.layout_update_cb(obj, user_data);

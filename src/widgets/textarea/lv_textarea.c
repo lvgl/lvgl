@@ -16,6 +16,7 @@
 #include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../font/lv_font_private.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -638,7 +639,7 @@ const char * lv_textarea_get_password_bullet(lv_obj_t * obj)
     lv_font_glyph_dsc_t g;
 
     /*If the textarea's font has the bullet character use it else fallback to "*"*/
-    const lv_font_t * bullet_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    const lv_font_t * bullet_font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
     if(lv_font_get_glyph_dsc_internal(bullet_font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, '\0'))
         return LV_SYMBOL_BULLET;
 
@@ -778,8 +779,8 @@ void lv_textarea_cursor_down(lv_obj_t * obj)
 
     /*Increment the y with one line and keep the valid x*/
 
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
     int32_t font_h              = lv_font_get_line_height_internal(font);
     pos.y += font_h + line_space + 1;
     pos.x = ta->cursor.valid_x;
@@ -806,9 +807,9 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
     lv_label_get_letter_pos(ta->label, lv_textarea_get_cursor_pos(obj), &pos);
 
     /*Decrement the y with one line and keep the valid x*/
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    int32_t font_h              = lv_font_get_line_height_internal(font);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+    int32_t font_h = lv_font_get_line_height_internal(font);
     pos.y -= font_h + line_space - 1;
     pos.x = ta->cursor.valid_x;
 
@@ -1060,7 +1061,7 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
 static void start_cursor_blink(lv_obj_t * obj)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    uint32_t blink_time = lv_obj_get_style_anim_duration(obj, LV_PART_CURSOR);
+    uint32_t blink_time = lv_obj_get_style_anim_duration_internal(obj, LV_PART_CURSOR);
     if(blink_time == 0) {
         lv_anim_delete(obj, cursor_blink_anim_cb);
         ta->cursor.show = 1;
@@ -1083,8 +1084,8 @@ static void refr_cursor_area(lv_obj_t * obj)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
 
     uint32_t cur_pos = lv_textarea_get_cursor_pos(obj);
     const char * txt = lv_label_get_text(ta->label);
@@ -1130,12 +1131,12 @@ static void refr_cursor_area(lv_obj_t * obj)
     ta->cursor.txt_byte_pos = byte_pos;
 
     /*Calculate the cursor according to its type*/
-    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
-    int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR) + border_width;
-    int32_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_CURSOR) + border_width;
-    int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
-    int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_CURSOR) + border_width;
-    int32_t letter_space_w = lv_obj_get_style_text_letter_space(ta->label, LV_PART_MAIN);
+    int32_t border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_CURSOR);
+    int32_t top = lv_obj_get_style_pad_top_internal(obj, LV_PART_CURSOR) + border_width;
+    int32_t bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_CURSOR) + border_width;
+    int32_t left = lv_obj_get_style_pad_left_internal(obj, LV_PART_CURSOR) + border_width;
+    int32_t right = lv_obj_get_style_pad_right_internal(obj, LV_PART_CURSOR) + border_width;
+    int32_t letter_space_w = lv_obj_get_style_text_letter_space_internal(ta->label, LV_PART_MAIN);
 
     lv_area_t cur_area;
     cur_area.x1 = letter_pos.x - left - letter_space_w / 2;
@@ -1317,8 +1318,8 @@ static void draw_placeholder(lv_event_t * e)
         if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
         lv_obj_t * label = ta->label;
-        int32_t left = lv_obj_get_style_pad_left(label, LV_PART_TEXTAREA_PLACEHOLDER);
-        int32_t top = lv_obj_get_style_pad_top(label, LV_PART_TEXTAREA_PLACEHOLDER);
+        int32_t left = lv_obj_get_style_pad_left_internal(label, LV_PART_TEXTAREA_PLACEHOLDER);
+        int32_t top = lv_obj_get_style_pad_top_internal(label, LV_PART_TEXTAREA_PLACEHOLDER);
         lv_area_t ph_coords;
 
         lv_area_copy(&ph_coords, &label->coords);
@@ -1354,9 +1355,9 @@ static void draw_cursor(lv_event_t * e)
 
     lv_draw_rect(layer, &cur_dsc, &cur_area);
 
-    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
-    int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
-    int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR) + border_width;
+    int32_t border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_CURSOR);
+    int32_t left = lv_obj_get_style_pad_left_internal(obj, LV_PART_CURSOR) + border_width;
+    int32_t top = lv_obj_get_style_pad_top_internal(obj, LV_PART_CURSOR) + border_width;
     char letter_buf[8] = {0};
     lv_memcpy(letter_buf, &txt[ta->cursor.txt_byte_pos], lv_text_encoded_size(&txt[ta->cursor.txt_byte_pos]));
 
@@ -1366,7 +1367,7 @@ static void draw_cursor(lv_event_t * e)
     /*Draw the letter over the cursor only if
      *the cursor has background or the letter has different color than the original.
      *Else the original letter is drawn twice which makes it look bolder*/
-    lv_color_t label_color = lv_obj_get_style_text_color(ta->label, LV_PART_MAIN);
+    lv_color_t label_color = lv_obj_get_style_text_color_internal(ta->label, LV_PART_MAIN);
     lv_draw_label_dsc_t cur_label_dsc;
     lv_draw_label_dsc_init(&cur_label_dsc);
     cur_label_dsc.base.layer = layer;
@@ -1418,7 +1419,7 @@ static void lv_textarea_scroll_to_cursor_pos(lv_obj_t * obj, int32_t pos)
 
     lv_point_t cur_pos;
     lv_obj_update_layout(ta->label);
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
     lv_label_get_letter_pos(ta->label, pos, &cur_pos);
 
     /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
@@ -1576,7 +1577,7 @@ static void calc_placeholder_text_size(lv_obj_t * obj)
     lv_draw_label_dsc_init(&ph_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_TEXTAREA_PLACEHOLDER, &ph_dsc);
     ph_dsc.text = ta->placeholder_txt;
-    ph_dsc.font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    ph_dsc.font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
     if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
     lv_text_get_size_internal(&ta->placeholder_txt_size, ph_dsc.text, ph_dsc.font, ph_dsc.letter_space, ph_dsc.line_space,

@@ -19,6 +19,7 @@
 #include "../../misc/lv_text_ap.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../font/lv_font_private.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -691,11 +692,11 @@ static void draw_main(lv_event_t * e)
     lv_point_t txt_size;
     lv_area_t cell_area;
 
-    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    int32_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    int32_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-    int32_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    int32_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    int32_t border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN);
+    int32_t bg_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
+    int32_t bg_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
+    int32_t bg_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
+    int32_t bg_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
 
     lv_state_t state_ori = obj->state;
     obj->state = LV_STATE_DEFAULT;
@@ -722,7 +723,7 @@ static void draw_main(lv_event_t * e)
     cell_area.x1 = 0;
     cell_area.x2 = 0;
     int32_t scroll_x = lv_obj_get_scroll_x(obj) ;
-    bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
+    bool rtl = lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     /*Handle custom drawer*/
     for(row = 0; row < table->row_cnt; row++) {
@@ -825,10 +826,10 @@ static void draw_main(lv_event_t * e)
             lv_draw_rect(layer, &rect_dsc_act, &cell_area_border);
 
             if(table->cell_data[cell]) {
-                const int32_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-                const int32_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-                const int32_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-                const int32_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+                const int32_t cell_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_ITEMS);
+                const int32_t cell_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_ITEMS);
+                const int32_t cell_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_ITEMS);
+                const int32_t cell_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_ITEMS);
 
                 lv_text_attributes_t attributes = {0};
                 attributes.text_flags = LV_TEXT_FLAG_NONE;
@@ -881,19 +882,19 @@ static void draw_main(lv_event_t * e)
 static void refr_size_form_row(lv_obj_t * obj, uint32_t start_row)
 {
     LV_ASSERT(obj != NULL);
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_ITEMS);
     LV_ASSERT(font != NULL);
 
-    const int32_t cell_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-    const int32_t cell_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-    const int32_t cell_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-    const int32_t cell_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_ITEMS);
 
-    int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
+    int32_t letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_ITEMS);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_ITEMS);
 
-    const int32_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
-    const int32_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
+    const int32_t minh = lv_obj_get_style_min_height_internal(obj, LV_PART_ITEMS);
+    const int32_t maxh = lv_obj_get_style_max_height_internal(obj, LV_PART_ITEMS);
 
     lv_table_t * table = (lv_table_t *)obj;
     uint32_t i;
@@ -910,18 +911,17 @@ static void refr_size_form_row(lv_obj_t * obj, uint32_t start_row)
 static void refr_cell_size(lv_obj_t * obj, uint32_t row, uint32_t col)
 {
     LV_ASSERT(obj != NULL);
-    const int32_t cell_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-    const int32_t cell_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-    const int32_t cell_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-    const int32_t cell_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_ITEMS);
 
-    int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
-    LV_ASSERT(font != NULL);
+    int32_t letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_ITEMS);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_ITEMS);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_ITEMS);
 
-    const int32_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
-    const int32_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
+    const int32_t minh = lv_obj_get_style_min_height_internal(obj, LV_PART_ITEMS);
+    const int32_t maxh = lv_obj_get_style_max_height_internal(obj, LV_PART_ITEMS);
 
     lv_table_t * table = (lv_table_t *)obj;
     int32_t calculated_height = get_row_height(obj, row, font, letter_space, line_space,
@@ -1038,12 +1038,12 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     if(col) {
         int32_t x = p.x + lv_obj_get_scroll_x(obj);
 
-        if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
-            x = obj->coords.x2 - lv_obj_get_style_pad_right(obj, LV_PART_MAIN) - x;
+        if(lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
+            x = obj->coords.x2 - lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN) - x;
         }
         else {
             x -= obj->coords.x1;
-            x -= lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+            x -= lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
         }
 
         *col = 0;
@@ -1060,7 +1060,7 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     if(row) {
         int32_t y = p.y + lv_obj_get_scroll_y(obj);
         y -= obj->coords.y1;
-        y -= lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        y -= lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
 
         *row = 0;
         tmp = 0;
@@ -1141,16 +1141,16 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
             break;
         }
     }
-    bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
+    bool rtl = lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
     if(rtl) {
         area->x1 += lv_obj_get_scroll_x(obj);
         int32_t w = lv_obj_get_width(obj);
-        area->x2 = w - area->x1 - lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+        area->x2 = w - area->x1 - lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
         area->x1 = area->x2 - (table->col_w[col] + offset);
     }
     else {
         area->x1 -= lv_obj_get_scroll_x(obj);
-        area->x1 += lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        area->x1 += lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
         area->x2 = area->x1 + (table->col_w[col] + offset) - 1;
     }
 
@@ -1160,7 +1160,7 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
         area->y1 += table->row_h[r];
     }
 
-    area->y1 += lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    area->y1 += lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
     area->y1 -= lv_obj_get_scroll_y(obj);
     area->y2 = area->y1 + table->row_h[row] - 1;
 

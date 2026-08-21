@@ -19,6 +19,8 @@
 #include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../misc/cache/lv_cache.h"
+#include "../../core/lv_obj_style_internal_gen.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -239,7 +241,7 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
                 break;
             }
         case LV_COLOR_FORMAT_A8: {
-                lv_color_t alpha_color = lv_obj_get_style_image_recolor(obj, LV_PART_MAIN);
+                lv_color_t alpha_color = lv_obj_get_style_image_recolor_internal(obj, LV_PART_MAIN);
                 ret.red = alpha_color.red;
                 ret.green = alpha_color.green;
                 ret.blue = alpha_color.blue;
