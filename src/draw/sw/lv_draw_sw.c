@@ -53,6 +53,9 @@ static void execute_drawing(lv_draw_task_t * t);
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
+#if LV_USE_OS
+    static int32_t lv_draw_sw_wait_for_finish(lv_draw_unit_t * draw_unit);
+#endif
 #if LV_USE_PARALLEL_DRAW_DEBUG
     static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx);
 #endif
@@ -81,6 +84,9 @@ void lv_draw_sw_init(void)
     draw_sw_unit->base_unit.dispatch_cb = dispatch;
     draw_sw_unit->base_unit.evaluate_cb = evaluate;
     draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
+#if LV_USE_OS
+    draw_sw_unit->base_unit.wait_for_finish_cb = lv_draw_sw_wait_for_finish;
+#endif
 #if LV_USE_DRAW_ARM2D_SYNC
     draw_sw_unit->base_unit.name = "SW_ARM2D";
 #else
@@ -120,6 +126,41 @@ void lv_draw_sw_deinit(void)
     lv_draw_sw_mask_deinit();
 #endif
 }
+
+#if LV_USE_OS
+/**
+ * Block until every SW render thread has finished its in-flight task.
+ *
+ * With LV_USE_OS the SW renderer runs draw tasks on separate render threads
+ * while the LVGL thread keeps going. lv_draw_dispatch() calls
+ * lv_draw_wait_for_finish() (via each unit's wait_for_finish_cb) when there is
+ * nothing left to dispatch, providing the ordering guarantee that no draw task
+ * is still being processed on a render thread once dispatching completes.
+ *
+ * Without this callback the SW unit reports "finished" while a render thread may
+ * still be inside execute_drawing(), dereferencing data owned by a widget
+ * subtree (e.g. label/font glyph descriptors). If the LVGL thread then frees
+ * that subtree (a deferred lv_obj_delete_async firing on the next timer tick),
+ * the render thread reads freed memory — a cross-thread use-after-free that
+ * segfaults in release builds where asserts are compiled out.
+ */
+static int32_t lv_draw_sw_wait_for_finish(lv_draw_unit_t * draw_unit)
+{
+    lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
+
+    uint32_t i;
+    for(i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
+        /* task_act is cleared by the render thread once execute_drawing() returns.
+         * The volatile read forces the compiler to re-fetch it each iteration;
+         * lv_sleep_ms() yields and acts as a memory barrier between threads. */
+        while(*(lv_draw_task_t * volatile *) &draw_sw_unit->thread_dscs[i].task_act) {
+            lv_sleep_ms(1);
+        }
+    }
+
+    return 1;
+}
+#endif
 
 static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
 {
