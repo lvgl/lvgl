@@ -11,6 +11,7 @@
 #include "../core/lv_obj_private.h"
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
+#include "../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -69,9 +70,9 @@ void lv_indev_scroll_handler(lv_indev_t * indev)
     int16_t scale_y = 256;
     lv_obj_t * parent = scroll_obj;
     while(parent) {
-        angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
-        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
-        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
+        angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
         scale_x = (scale_x * zoom_act_x) >> 8;
         scale_y = (scale_y * zoom_act_y) >> 8;
         parent = lv_obj_get_parent(parent);
@@ -293,9 +294,9 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
         lv_point_t pivot = { 0, 0 };
         lv_obj_t * parent = obj_act;
         while(parent) {
-            angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
-            int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
-            int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
+            angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+            int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+            int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
             scale_x = (scale_x * zoom_act_x) >> 8;
             scale_y = (scale_y * zoom_act_y) >> 8;
             parent = lv_obj_get_parent(parent);
@@ -525,8 +526,8 @@ static int32_t find_snap_point_x(const lv_obj_t * obj, int32_t min, int32_t max,
 
     int32_t dist = LV_COORD_MAX;
 
-    int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    int32_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    int32_t pad_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
+    int32_t pad_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
 
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
@@ -581,8 +582,8 @@ static int32_t find_snap_point_y(const lv_obj_t * obj, int32_t min, int32_t max,
 
     int32_t dist = LV_COORD_MAX;
 
-    int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    int32_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    int32_t pad_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
+    int32_t pad_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
 
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
@@ -722,18 +723,18 @@ static void has_more_snap_points(lv_obj_t * scroll_obj, lv_dir_t dir, bool * has
         int32_t x = 0;
         switch(snap) {
             case LV_SCROLL_SNAP_CENTER: {
-                    int32_t pad_left = lv_obj_get_style_pad_left(scroll_obj, LV_PART_MAIN);
-                    int32_t pad_right = lv_obj_get_style_pad_right(scroll_obj, LV_PART_MAIN);
+                    int32_t pad_left = lv_obj_get_style_pad_left_internal(scroll_obj, LV_PART_MAIN);
+                    int32_t pad_right = lv_obj_get_style_pad_right_internal(scroll_obj, LV_PART_MAIN);
                     x = scroll_obj->coords.x1;
                     x += (lv_area_get_width(&scroll_obj->coords) - pad_left - pad_right) / 2;
                     x += pad_left;
                 }
                 break;
             case LV_SCROLL_SNAP_START:
-                x = scroll_obj->coords.x1 + lv_obj_get_style_pad_left(scroll_obj, LV_PART_MAIN);
+                x = scroll_obj->coords.x1 + lv_obj_get_style_pad_left_internal(scroll_obj, LV_PART_MAIN);
                 break;
             case LV_SCROLL_SNAP_END:
-                x = scroll_obj->coords.x2 - lv_obj_get_style_pad_right(scroll_obj, LV_PART_MAIN);
+                x = scroll_obj->coords.x2 - lv_obj_get_style_pad_right_internal(scroll_obj, LV_PART_MAIN);
                 break;
             default:
                 break;
@@ -748,18 +749,18 @@ static void has_more_snap_points(lv_obj_t * scroll_obj, lv_dir_t dir, bool * has
         int32_t y = 0;
         switch(snap) {
             case LV_SCROLL_SNAP_CENTER: {
-                    int32_t pad_top = lv_obj_get_style_pad_top(scroll_obj, LV_PART_MAIN);
-                    int32_t pad_bottom = lv_obj_get_style_pad_bottom(scroll_obj, LV_PART_MAIN);
+                    int32_t pad_top = lv_obj_get_style_pad_top_internal(scroll_obj, LV_PART_MAIN);
+                    int32_t pad_bottom = lv_obj_get_style_pad_bottom_internal(scroll_obj, LV_PART_MAIN);
                     y = scroll_obj->coords.y1;
                     y += (lv_area_get_height(&scroll_obj->coords) - pad_top - pad_bottom) / 2;
                     y += pad_top;
                 }
                 break;
             case LV_SCROLL_SNAP_START:
-                y = scroll_obj->coords.y1 + lv_obj_get_style_pad_top(scroll_obj, LV_PART_MAIN);
+                y = scroll_obj->coords.y1 + lv_obj_get_style_pad_top_internal(scroll_obj, LV_PART_MAIN);
                 break;
             case LV_SCROLL_SNAP_END:
-                y = scroll_obj->coords.y2 - lv_obj_get_style_pad_bottom(scroll_obj, LV_PART_MAIN);
+                y = scroll_obj->coords.y2 - lv_obj_get_style_pad_bottom_internal(scroll_obj, LV_PART_MAIN);
                 break;
             default:
                 break;

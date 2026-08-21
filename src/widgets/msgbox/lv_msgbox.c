@@ -15,10 +15,7 @@
 #include "../../core/lv_obj_class_private.h"
 #include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
-
-#if LV_USE_LABEL == 0
-    #error "lv_mbox: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
-#endif
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -142,6 +139,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent)
 
 lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->header == NULL) {
         mbox->header = lv_obj_class_create_obj(&lv_msgbox_header_class, obj);
@@ -168,6 +167,8 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
 
 lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->header == NULL) {
         lv_msgbox_add_title(obj, ""); /*Just to push the buttons to the right*/
@@ -190,6 +191,9 @@ lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
 
 lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(text != NULL, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
 
     lv_obj_t * label = lv_label_create(mbox->content);
@@ -201,6 +205,9 @@ lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text)
 
 lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(fmt != NULL, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
 
     va_list args;
@@ -215,6 +222,8 @@ lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 
 lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->footer == NULL) {
         mbox->footer = lv_obj_class_create_obj(&lv_msgbox_footer_class, obj);
@@ -244,6 +253,8 @@ lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
 
 lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_obj_t * btn = lv_msgbox_add_header_button(obj, LV_SYMBOL_CLOSE);
     lv_obj_add_event_cb(btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
     return btn;
@@ -299,16 +310,27 @@ void lv_msgbox_close_async(lv_obj_t * obj)
 
 static void msgbox_close_click_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e);
     lv_obj_t * btn = lv_event_get_current_target(e);
-    lv_obj_t * mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
+    LV_ASSERT(btn);
+    lv_obj_t * btn_parent = lv_obj_get_parent(btn);
+    LV_ASSERT(btn_parent);
+    lv_obj_t * mbox = lv_obj_get_parent(btn_parent);
+
+    LV_ASSERT(mbox);
     lv_msgbox_close(mbox);
 }
 
 static void msgbox_size_changed_event_cb(lv_event_t * e)
 {
+
+    LV_ASSERT(e);
     lv_obj_t * mbox = lv_event_get_target(e);
+    LV_ASSERT(mbox);
     lv_obj_t * content = lv_msgbox_get_content(mbox);
-    bool is_msgbox_height_size_content = (lv_obj_get_style_height(mbox, LV_PART_MAIN) == LV_SIZE_CONTENT);
+    LV_ASSERT(content);
+
+    bool is_msgbox_height_size_content = (lv_obj_get_style_height_internal(mbox, LV_PART_MAIN) == LV_SIZE_CONTENT);
     lv_obj_set_flex_grow(content, !is_msgbox_height_size_content);
 }
 

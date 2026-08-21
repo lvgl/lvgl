@@ -94,7 +94,7 @@ void lv_freetype_outline_add_event(lv_event_cb_t event_cb, lv_event_code_t filte
 
 uint32_t lv_freetype_outline_get_scale(const lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    LV_CHECK_ARG(font != NULL, return 0);
     const lv_freetype_font_dsc_t * dsc = font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
@@ -103,7 +103,7 @@ uint32_t lv_freetype_outline_get_scale(const lv_font_t * font)
 
 bool lv_freetype_is_outline_font(const lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    LV_CHECK_ARG(font != NULL, return false);
     const lv_freetype_font_dsc_t * dsc = font->dsc;
     if(!dsc || !LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc)) {
         return false;

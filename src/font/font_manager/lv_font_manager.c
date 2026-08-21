@@ -106,7 +106,7 @@ lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size)
 
 bool lv_font_manager_delete(lv_font_manager_t * manager)
 {
-    LV_ASSERT_NULL(manager);
+    if(manager == NULL) return false;
 
     /* Resource leak check */
     if(lv_font_manager_check_resource(manager)) {
@@ -142,6 +142,11 @@ bool lv_font_manager_add_src(lv_font_manager_t * manager,
                              const void * src,
                              const lv_font_class_t * class_p)
 {
+    LV_CHECK_ARG(manager != NULL, return false);
+    LV_CHECK_ARG(name != NULL, return false);
+    LV_CHECK_ARG(src != NULL, return false);
+    LV_CHECK_ARG(class_p != NULL, return false);
+
     return lv_font_manager_add_src_core(manager, name, src, class_p, false);
 }
 
@@ -150,13 +155,18 @@ bool lv_font_manager_add_src_static(lv_font_manager_t * manager,
                                     const void * src,
                                     const lv_font_class_t * class_p)
 {
+    LV_CHECK_ARG(manager != NULL, return false);
+    LV_CHECK_ARG(name != NULL, return false);
+    LV_CHECK_ARG(src != NULL, return false);
+    LV_CHECK_ARG(class_p != NULL, return false);
+
     return lv_font_manager_add_src_core(manager, name, src, class_p, true);
 }
 
 bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(name);
+    LV_CHECK_ARG(manager != NULL, return false);
+    LV_CHECK_ARG(name != NULL, return false);
 
     lv_font_src_t * font_src = lv_font_manager_get_src(manager, name);
     if(!font_src) {
@@ -195,8 +205,8 @@ lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
                                         lv_font_kerning_t kerning)
 {
 
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(font_family);
+    LV_CHECK_ARG(manager != NULL, return NULL);
+    LV_CHECK_ARG(font_family != NULL, return NULL);
 
     lv_font_info_t ft_info;
     lv_memzero(&ft_info, sizeof(ft_info));
@@ -230,8 +240,8 @@ lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
 
 void lv_font_manager_delete_font(lv_font_manager_t * manager, lv_font_t * font)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(font);
+    LV_CHECK_ARG(manager != NULL, return);
+    LV_CHECK_ARG(font != NULL, return);
 
     if(IS_FONT_HAS_FALLBACK(font)) {
         lv_font_manager_delete_font_family(manager, font);

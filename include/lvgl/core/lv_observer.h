@@ -95,8 +95,8 @@ typedef void (*lv_observer_cb_t)(lv_observer_t * observer, lv_subject_t * subjec
  * - Proper memory management for observer-related resources
  *
  * @param subject    pointer to Subject
- * @param data       User-defined data pointer to associate
- * @param free_cb    Cleanup function called when:
+ * @param data       User-defined data pointer to associate @nullable
+ * @param free_cb    Cleanup function called when: @nullable
  *                   - Observer is explicitly deleted
  *                   - Observed object is deleted
  *                   - New data replaces current association
@@ -198,7 +198,8 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value);
  * Initialize a string-type Subject.
  * @param subject   pointer to Subject
  * @param buf       pointer to buffer to store string
- * @param prev_buf  pointer to buffer to store previous string; can be NULL if not used
+ * @param prev_buf  pointer to buffer to store previous string. @nullable When NULL the
+ *                  previous string is not tracked.
  * @param size      size of buffer(s)
  * @param value     initial value of string, e.g. "hello"
  * @note            A string Subject stores its own copy of the string, not just the pointer.
@@ -238,14 +239,14 @@ const char * lv_subject_get_previous_string(lv_subject_t * subject);
 /**
  * Initialize a pointer-type Subject.
  * @param subject   pointer to Subject
- * @param value     initial value
+ * @param value     initial value @nullable
  */
 void lv_subject_init_pointer(lv_subject_t * subject, void * value);
 
 /**
  * Set value of a pointer Subject and notify Observers (regardless of whether it changed).
  * @param subject   pointer to Subject
- * @param ptr       new value
+ * @param ptr       new value @nullable
  */
 void lv_subject_set_pointer(lv_subject_t * subject, void * ptr);
 
@@ -304,7 +305,7 @@ void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], 
  * Remove all Observers from a Subject and free allocated memory, and delete
  * any associated Widget-Binding events.  This leaves `subject` "disconnected" from
  * all Observers and all associated Widget events established through Widget Binding.
- * @param subject   pointer to Subject
+ * @param subject   pointer to Subject @nullable
  * @note            This can safely be called regardless of whether any Observers
  *                  added with `lv_subject_add_observer_obj()` or bound to a Widget Property
  *                  with one of the `..._bind_...()` functions.
@@ -333,10 +334,11 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  * When the Widget is deleted, Observer will be unsubscribed from Subject automatically.
  * @param subject       pointer to Subject
  * @param observer_cb   notification callback
- * @param obj           pointer to Widget
+ * @param obj           pointer to Widget. @nullable When NULL the Observer is not
+ *                      bound to a Widget.
  * @param user_data     optional user data
  * @return              pointer to newly-created Observer
- * @note                Do not call `lv_observer_remove()` on Observers created this way.
+ * @note                Do not call `lv_observer_delete()` on Observers created this way.
  *                      Only clean up such Observers by either:
  *                      - deleting the Widget, or
  *                      - calling `lv_subject_deinit()` to gracefully de-couple and
@@ -349,7 +351,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
  * Add an Observer to a Subject and also save a target pointer.
  * @param subject       pointer to Subject
  * @param observer_cb   notification callback
- * @param target        any pointer (NULL is okay)
+ * @param target        any pointer @nullable
  * @param user_data     optional user data
  * @return              pointer to newly-created Observer
  */
@@ -358,14 +360,15 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 
 /**
  * Remove Observer from its Subject.
- * @param observer      pointer to Observer
+ * @param observer      pointer to Observer @nullable
  */
-void lv_observer_remove(lv_observer_t * observer);
+void lv_observer_delete(lv_observer_t * observer);
 
 /**
  * Remove Observers associated with Widget `obj` from specified `subject` or all Subjects.
  * @param obj       pointer to Widget whose Observers should be removed
- * @param subject   Subject to remove Widget from, or NULL to remove from all Subjects
+ * @param subject   Subject to remove Widget from. @nullable When NULL the Widget is
+ *                  removed from all Subjects.
  * @note            This function can be used e.g. when a Widget's Subject(s) needs to
  *                  be replaced by other Subject(s)
  */

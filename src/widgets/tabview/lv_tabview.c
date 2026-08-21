@@ -12,6 +12,7 @@
 
 #include "../../core/lv_obj_class_private.h"
 #include "../../indev/lv_indev_private.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -134,6 +135,7 @@ void lv_tabview_set_tab_text(lv_obj_t * obj, uint32_t idx, const char * new_name
 lv_obj_t * lv_tabview_set_tab_translation_tag(lv_obj_t * obj, const char * tag)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(tag != NULL && tag[0] != '\0', return NULL);
 
     lv_obj_t * page = lv_tabview_add_tab(obj, NULL);
     lv_obj_t * button = lv_tabview_get_tab_button(obj, -1);
@@ -164,9 +166,9 @@ void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_e
     lv_obj_update_layout(obj);
 
     if((tabview->tab_pos & LV_DIR_VER) != 0) {
-        int32_t gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
+        int32_t gap = lv_obj_get_style_pad_column_internal(cont, LV_PART_MAIN);
         int32_t w = lv_obj_get_content_width(cont);
-        if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
+        if(lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
             lv_obj_scroll_to_x(cont, idx * (gap + w), anim_en);
         }
         else {
@@ -175,7 +177,7 @@ void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_e
         }
     }
     else {
-        int32_t gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
+        int32_t gap = lv_obj_get_style_pad_row_internal(cont, LV_PART_MAIN);
         int32_t h = lv_obj_get_content_height(cont);
         lv_obj_scroll_to_y(cont, idx * (gap + h), anim_en);
     }
@@ -299,11 +301,14 @@ uint32_t lv_tabview_get_tab_count(lv_obj_t * obj)
 
 lv_obj_t * lv_tabview_get_content(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     return lv_obj_get_child(obj, 1);
 }
 
 lv_obj_t * lv_tabview_get_tab_bar(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     return lv_obj_get_child(obj, 0);
 }
 
@@ -410,7 +415,7 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
         int32_t t;
         if((tv_obj->tab_pos & LV_DIR_VER) != 0) {
             int32_t w = lv_obj_get_content_width(cont);
-            if(lv_obj_get_style_base_dir(tv, LV_PART_MAIN) == LV_BASE_DIR_RTL)  t = -(p.x - w / 2) / w;
+            if(lv_obj_get_style_base_dir_internal(tv, LV_PART_MAIN) == LV_BASE_DIR_RTL)  t = -(p.x - w / 2) / w;
             else t = (p.x + w / 2) / w;
         }
         else {

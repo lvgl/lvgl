@@ -56,7 +56,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdownlist_class;
 
 /**
  * Create a drop-down list object
- * @param parent pointer to an object, it will be the parent of the new drop-down list
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the active display.
  * @return pointer to the created drop-down list
  */
 lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
@@ -70,7 +71,8 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
  * If set to `NULL` the selected option's text will be displayed on the button.
  * If set to a specific text then that text will be shown regardless of the selected option.
  * @param obj       pointer to a drop-down list object
- * @param text      the text as a string (Copy is saved)
+ * @param text      the text as a string (Copy is saved). @nullable When NULL the
+ *                  selected option's text is displayed.
  */
 void lv_dropdown_set_text(lv_obj_t * obj, const char * text);
 
@@ -79,7 +81,8 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text);
  * If set to `NULL` the selected option's text will be displayed on the button.
  * If set to a specific text then that text will be shown regardless of the selected option.
  * @param obj       pointer to a drop-down list object
- * @param text      the text as a string (Only its pointer is saved)
+ * @param text      the text as a string (Only its pointer is saved). @nullable When
+ *                  NULL the selected option's text is displayed.
  */
 void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text);
 
@@ -130,7 +133,8 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir);
 /**
  * Set an arrow or other symbol to display when on drop-down list's button. Typically a down caret or arrow.
  * @param obj       pointer to drop-down list object
- * @param symbol    a text like `LV_SYMBOL_DOWN`, an image (pointer or path) or NULL to not draw symbol icon
+ * @param symbol    a text like `LV_SYMBOL_DOWN` or an image (pointer or path).
+ *                  @nullable When NULL no symbol icon is drawn.
  * @note angle and zoom transformation can be applied if the symbol is an image.
  * E.g. when drop down is checked (opened) rotate the symbol by 180 degree
  */

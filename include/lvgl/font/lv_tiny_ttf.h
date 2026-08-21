@@ -93,7 +93,7 @@ void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size);
 
 /**
  * Destroy a font previously created with lv_tiny_ttf_create_xxxx()
- * @param font        the font object
+ * @param font        the font object @nullable
  */
 void lv_tiny_ttf_destroy(lv_font_t * font);
 

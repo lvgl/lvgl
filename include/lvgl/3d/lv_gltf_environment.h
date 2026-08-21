@@ -50,7 +50,7 @@ void lv_gltf_ibl_sampler_set_cube_map_pixel_resolution(lv_gltf_ibl_sampler_t * s
 
 /**
  * Delete an IBL sampler
- * @param   sampler pointer to the sampler to delete
+ * @param   sampler pointer to the sampler to delete @nullable
  */
 void lv_gltf_ibl_sampler_delete(lv_gltf_ibl_sampler_t * sampler);
 
@@ -74,7 +74,7 @@ void lv_gltf_environment_set_angle(lv_gltf_environment_t * env, float angle);
 
 /**
  * Delete an environment
- * @param environment pointer to the environment to delete
+ * @param environment pointer to the environment to delete @nullable
  */
 void lv_gltf_environment_delete(lv_gltf_environment_t * environment);
 

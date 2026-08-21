@@ -50,7 +50,8 @@ typedef void (*lv_obj_class_event_cb_t)(lv_obj_class_t * class_p, lv_event_t * e
 /**
  * Create an object form a class descriptor
  * @param class_p   pointer to a class
- * @param parent    pointer to an object where the new object should be created
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created object
  */
 lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent);
@@ -70,10 +71,10 @@ bool lv_obj_is_group_def(const lv_obj_t * obj);
  * the associated resources.
  *
  * @param obj          Target LVGL object
- * @param data         User-defined data pointer to associate with a object
+ * @param data         User-defined data pointer to associate with a object @nullable
  * @param free_cb      Cleanup function called for each non-NULL data pointer during
  *                     object deletion. Receives single data pointer as parameter.
- *                     NULL means no automatic cleanup.
+ *                     @nullable When NULL no automatic cleanup is performed.
  */
 void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void * data));
 #endif

@@ -91,6 +91,10 @@ void lv_text_attributes_init(lv_text_attributes_t * attributes)
 void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, int32_t letter_space,
                       int32_t line_space, int32_t max_width, lv_text_flag_t flag)
 {
+    LV_CHECK_ARG(size_res != NULL, return);
+    LV_CHECK_ARG(text != NULL, return);
+    LV_CHECK_ARG(font != NULL, return);
+
     lv_text_attributes_t attrs;
     lv_text_attributes_init(&attrs);
     attrs.line_space = line_space;

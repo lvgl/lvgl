@@ -15,6 +15,7 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -170,6 +171,7 @@ const void * lv_imagebutton_get_src_right(lv_obj_t * obj, lv_imagebutton_state_t
 
 static void lv_imagebutton_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     /*Initialize the allocated 'ext'*/
@@ -181,6 +183,7 @@ static void lv_imagebutton_constructor(const lv_obj_class_t * class_p, lv_obj_t 
 
 static void lv_imagebutton_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     LV_UNUSED(class_p);
 
     lv_result_t res = lv_obj_event_base(&lv_imagebutton_class, e);
@@ -212,6 +215,7 @@ static void lv_imagebutton_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_current_target(e);
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
@@ -222,8 +226,8 @@ static void draw_main(lv_event_t * e)
     /*Simply draw the middle src if no tiled*/
     lv_imagebutton_src_info_t * src_info = &imagebutton->src_left[state];
 
-    int32_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-    int32_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    int32_t tw = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
+    int32_t th = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
     lv_area_t coords;
     lv_area_copy(&coords, &obj->coords);
     lv_area_increase(&coords, tw, th);
@@ -280,6 +284,7 @@ static void draw_main(lv_event_t * e)
 
 static void refr_image(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     lv_imagebutton_state_t state  = suggest_state(obj, get_state(obj));
 
@@ -301,6 +306,7 @@ static void refr_image(lv_obj_t * obj)
  */
 static lv_imagebutton_state_t suggest_state(lv_obj_t * obj, lv_imagebutton_state_t state)
 {
+    LV_ASSERT(obj != NULL);
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     if(imagebutton->src_mid[state].img_src == NULL) {
         switch(state) {
@@ -332,7 +338,7 @@ static lv_imagebutton_state_t suggest_state(lv_obj_t * obj, lv_imagebutton_state
 
 static lv_imagebutton_state_t get_state(const lv_obj_t * imagebutton)
 {
-    LV_CHECK_OBJ(imagebutton, MY_CLASS, return 0);
+    LV_ASSERT(imagebutton != NULL);
 
     lv_state_t obj_state = lv_obj_get_state(imagebutton);
 
@@ -353,6 +359,7 @@ static lv_imagebutton_state_t get_state(const lv_obj_t * imagebutton)
 
 static void update_src_info(lv_imagebutton_src_info_t * info, const void * src)
 {
+    LV_ASSERT(info != NULL);
     if(!src) {
         lv_memzero(info, sizeof(lv_imagebutton_src_info_t));
         return;

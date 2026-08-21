@@ -43,7 +43,8 @@ enum _lv_property_spinner_id_t {
 
 /**
  * Create a spinner widget
- * @param parent    pointer to an object, it will be the parent of the new spinner.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          the created spinner
  */
 lv_obj_t * lv_spinner_create(lv_obj_t * parent);

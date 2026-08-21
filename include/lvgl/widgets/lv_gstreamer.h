@@ -90,7 +90,8 @@ typedef enum {
 
 /**
  * Create a gstreamer object
- * @param parent    pointer to an object, it will be the parent of the new gstreamer
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created gstreamer
  */
 lv_obj_t * lv_gstreamer_create(lv_obj_t * parent);
@@ -102,9 +103,9 @@ lv_obj_t * lv_gstreamer_create(lv_obj_t * parent);
  *                      for common factory names, check `LV_GSTREAMER_FACTORY_XXX` defines
  * @param property      the property name for the gstreamer source object
  *                      for common properties, see `LV_GSTREAMER_PROPERTY_XXX` defines
- *                      Passing NULL will create the source object but not set its source
+ *                      @nullable When NULL the source object is created but its source is not set.
  * @param source        the property value for the gstreamer source object
- *                      Passing NULL will create the source object but not set its source
+ *                      @nullable When NULL the source object is created but its source is not set.
  * @return LV_RESULT_OK if the source was correctly set else LV_RESULT_INVALID
  */
 lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, const char * property,

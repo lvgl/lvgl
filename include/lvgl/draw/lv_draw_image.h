@@ -156,6 +156,7 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
  *  - pointer to an 'lv_image_t' variable (image stored internally and compiled into the code)
  *  - a path to a file (e.g. "S:/folder/image.bin")
  *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
+ *  @nullable When NULL LV_IMAGE_SRC_UNKNOWN is returned.
  * @return type of the image source LV_IMAGE_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
  */
 lv_image_src_t lv_image_src_get_type(const void * src);

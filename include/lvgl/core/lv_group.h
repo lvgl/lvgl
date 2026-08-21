@@ -59,14 +59,14 @@ lv_group_t * lv_group_create(void);
 
 /**
  * Delete group object.
- * @param group     pointer to a group
+ * @param group     pointer to a group @nullable
  */
 void lv_group_delete(lv_group_t * group);
 
 /**
  * Set default group. New Widgets will be added to this group if it's enabled in
  * their class with `add_to_def_group = true`.
- * @param group     pointer to a group (can be `NULL`)
+ * @param group     pointer to a group @nullable. When NULL no default group is set.
  */
 void lv_group_set_default(lv_group_t * group);
 
@@ -244,9 +244,10 @@ lv_group_t  * lv_group_by_index(uint32_t index);
  * the associated resources.
  *
  * @param group      Pointer to a group
- * @param data       User-defined data pointer to associate with a group
+ * @param data       User-defined data pointer to associate with a group @nullable
  * @param free_cb    Callback function for cleaning up ext_data when group is deleted.
- *                   Receives ext_data as parameter. NULL means no cleanup required.
+ *                   Receives ext_data as parameter. @nullable When NULL no cleanup
+ *                   is performed.
  */
 void lv_group_set_external_data(lv_group_t * group, void * data, void (* free_cb)(void * data));
 #endif

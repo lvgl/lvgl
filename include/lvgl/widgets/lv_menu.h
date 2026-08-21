@@ -74,7 +74,8 @@ enum __lv_property_menu_id_t {
 
 /**
  * Create a menu object
- * @param parent    pointer to an object, it will be the parent of the new menu
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created menu
  * @deprecated The `lv_menu` widget is deprecated. Build menu navigation from base
  *             widgets instead. See `lv_example_menu_navigation`.
@@ -89,7 +90,8 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent);
  * child of the menu, so the resulting object hierarchy is: menu => storage => new_page
  * where `storage` is a Base Widget.
  * @param menu      pointer to menu object.
- * @param title     pointer to text for title in header (NULL to not display title)
+ * @param title     pointer to text for title in header. @nullable When NULL no title
+ *                  is displayed.
  * @return          pointer to the created menu page
  * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
@@ -128,7 +130,8 @@ lv_obj_t * lv_menu_separator_create(lv_obj_t * parent);
 /**
  * Set menu page to display in main
  * @param obj       pointer to the menu
- * @param page      pointer to the menu page to set (NULL to clear main and clear menu history)
+ * @param page      pointer to the menu page to set. @nullable When NULL main is cleared
+ *                  along with the menu history.
  * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
 LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
@@ -136,27 +139,30 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page);
 
 /**
  * Set menu page title
- * @param page      pointer to the menu page
- * @param title     pointer to text for title in header (NULL to not display title)
+ * @param page_obj  pointer to the menu page
+ * @param title     pointer to text for title in header. @nullable When NULL no title
+ *                  is displayed.
  * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
 LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
-void lv_menu_set_page_title(lv_obj_t * page, char const * const title);
+void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title);
 
 /**
  * Set menu page title with a static text. It will not be saved by the label so the 'text' variable
  * has to be 'alive' while the page exists.
- * @param page      pointer to the menu page
- * @param title     pointer to text for title in header (NULL to not display title)
+ * @param page_obj  pointer to the menu page
+ * @param title     pointer to text for title in header. @nullable When NULL no title
+ *                  is displayed.
  * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
 LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
-void lv_menu_set_page_title_static(lv_obj_t * page, char const * const title);
+void lv_menu_set_page_title_static(lv_obj_t * page_obj, char const * const title);
 
 /**
  * Set menu page to display in sidebar
  * @param obj       pointer to the menu
- * @param page      pointer to the menu page to set (NULL to clear sidebar)
+ * @param page      pointer to the menu page to set. @nullable When NULL the sidebar
+ *                  is cleared.
  * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
 LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)

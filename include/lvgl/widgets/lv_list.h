@@ -47,7 +47,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_list_button_class;
 
 /**
  * Create a list object
- * @param parent    pointer to an object, it will be the parent of the new list
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created list
  * @deprecated Use a flex container with `LV_FLEX_FLOW_COLUMN` instead. See `lv_example_flex_list`.
  */
@@ -57,7 +58,7 @@ lv_obj_t * lv_list_create(lv_obj_t * parent);
 /**
  * Add text to a list
  * @param list      pointer to a list, it will be the parent of the new label
- * @param txt       text of the new label
+ * @param txt       text of the new label. @nullable When NULL the label is left empty.
  * @return          pointer to the created label
  * @deprecated Add a full-width `lv_label` to a flex container instead. See `lv_example_flex_list`.
  */
@@ -67,8 +68,8 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt);
 /**
  * Add button to a list
  * @param list      pointer to a list, it will be the parent of the new button
- * @param icon      icon for the button, when NULL it will have no icon
- * @param txt       text of the new button, when NULL no text will be added
+ * @param icon      icon for the button. @nullable When NULL it will have no icon.
+ * @param txt       text of the new button. @nullable When NULL no text will be added.
  * @return          pointer to the created button
  * @deprecated Add a full-width `lv_button` to a flex container instead. See `lv_example_flex_list`.
  */
@@ -110,8 +111,9 @@ lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag);
 /**
  * Add translation tag button to a list
  * @param list      pointer to a list, it will be the parent of the new button
- * @param icon      icon for the button, when NULL it will have no icon
- * @param tag       translation tag of the new button, when NULL no translation tag will be added
+ * @param icon      icon for the button. @nullable When NULL it will have no icon.
+ * @param tag       translation tag of the new button. @nullable When NULL no translation
+ *                  tag will be added.
  * @return          pointer to the created button
  * @deprecated The `lv_list` widget is deprecated. See `lv_example_flex_list`.
  */

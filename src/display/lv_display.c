@@ -1419,6 +1419,7 @@ static bool new_screen_deleted(lv_load_screen_result_t res)
 
 static void update_resolution(lv_display_t * disp)
 {
+    LV_ASSERT(disp != NULL);
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
 
@@ -1455,6 +1456,7 @@ static void update_resolution(lv_display_t * disp)
 
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(user_data);
     lv_obj_mark_layout_as_dirty(obj);
     return LV_OBJ_TREE_WALK_NEXT;
@@ -1462,6 +1464,7 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
 
 static void screen_event_delete_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t ** screen_var = lv_event_get_user_data(e);
     *screen_var = NULL;
 }
@@ -1485,11 +1488,11 @@ static void screen_event_delete_cb(lv_event_t * e)
 static lv_load_screen_result_t load_new_screen(lv_obj_t * scr)
 {
     /*scr must not be NULL, but d->act_scr might be*/
-    LV_ASSERT_NULL(scr);
+    LV_ASSERT(scr != NULL);
     if(scr == NULL) return false;
 
     lv_display_t * d = lv_obj_get_display(scr);
-    LV_ASSERT_NULL(d);
+    LV_ASSERT(d != NULL);
 
     lv_obj_t * old_scr = d->act_scr;
     /* Attach an event delete cb to the screen so we know if the screen is deleted during an event*/
@@ -1550,6 +1553,7 @@ static lv_load_screen_result_t load_new_screen(lv_obj_t * scr)
 
 static void scr_load_anim_start(lv_anim_t * a)
 {
+    LV_ASSERT(a != NULL);
     lv_display_t * d = lv_obj_get_display(a->var);
 
     d->prev_scr = d->act_scr;
@@ -1560,21 +1564,25 @@ static void scr_load_anim_start(lv_anim_t * a)
 
 static void opa_scale_anim(void * obj, int32_t v)
 {
+    LV_ASSERT(obj != NULL);
     lv_obj_set_style_opa(obj, v, 0);
 }
 
 static void set_x_anim(void * obj, int32_t v)
 {
+    LV_ASSERT(obj != NULL);
     lv_obj_set_x(obj, v);
 }
 
 static void set_y_anim(void * obj, int32_t v)
 {
+    LV_ASSERT(obj != NULL);
     lv_obj_set_y(obj, v);
 }
 
 static void scr_anim_completed(lv_anim_t * a)
 {
+    LV_ASSERT(a != NULL);
     lv_display_t * d = lv_obj_get_display(a->var);
 
     if(lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL) == LV_RESULT_INVALID) {
@@ -1606,6 +1614,7 @@ static bool is_out_anim(lv_screen_load_anim_t anim_type)
 
 static void disp_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_event_code_t code = lv_event_get_code(e);
     lv_display_t * disp = lv_event_get_target(e);
     switch(code) {

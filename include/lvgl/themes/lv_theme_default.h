@@ -31,7 +31,7 @@ extern "C" {
 
 /**
  * Initialize the theme
- * @param disp pointer to display
+ * @param disp pointer to display. @nullable When NULL the default display is used.
  * @param color_primary the primary color of the theme
  * @param color_secondary the secondary color for the theme
  * @param dark

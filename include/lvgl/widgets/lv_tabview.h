@@ -39,7 +39,8 @@ enum _lv_property_tabview_id_t {
 
 /**
  * Create a tabview widget
- * @param parent    pointer to a parent widget
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          the created tabview
  */
 lv_obj_t * lv_tabview_create(lv_obj_t * parent);
@@ -47,7 +48,10 @@ lv_obj_t * lv_tabview_create(lv_obj_t * parent);
 /**
  * Add a tab to the tabview
  * @param obj       pointer to a tabview widget
- * @param name      the name of the tab, it will be displayed on the tab bar
+ * @param name      the name of the tab, it will be displayed on the tab bar @nullable
+ *                  When NULL the tab button's label keeps the default label text
+ *                  (`LV_LABEL_DEFAULT_TEXT`). Useful when the text is set later,
+ *                  e.g. via a translation tag.
  * @return          the widget where the content of the tab can be created
  */
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name);
@@ -56,16 +60,24 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name);
  * Change the name of the tab
  * @param obj       pointer to a tabview widget
  * @param idx       the index of the tab to rename
- * @param new_name  the new name as a string
+ * @param new_name  the new name as a string @nullable
+ *                  When NULL the current name is kept and only refreshed,
+ *                  see @ref lv_label_set_text.
  */
 void lv_tabview_set_tab_text(lv_obj_t * obj, uint32_t idx, const char * new_name);
 
 #if LV_USE_TRANSLATION
 
 /**
- * Add a tab with a translation tag to the tabview.
+ * Add a tab to the tabview whose label is bound to a translation tag.
+ * The tab bar shows the translation of @p tag for the currently selected language,
+ * and updates automatically on `lv_translation_set_language()`.
+ * If no language is selected or the tag is not found in any translation pack,
+ * the tag itself is displayed.
  * @param obj       pointer to a tabview widget
- * @param tag       translation key used for the tab label; will be displayed on the tab bar
+ * @param tag       '\0' terminated translation key, must be non-NULL and not empty.
+ *                  Otherwise no tag is assigned and the tab keeps the default
+ *                  label text, see @ref lv_label_set_translation_tag.
  * @return          the widget where the content of the tab can be created
  */
 lv_obj_t * lv_tabview_set_tab_translation_tag(lv_obj_t * obj, const char * tag);

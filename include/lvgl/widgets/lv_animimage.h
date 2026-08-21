@@ -54,7 +54,8 @@ typedef enum {
 
 /**
  * Create an animation image objects
- * @param parent pointer to an object, it will be the parent of the new button
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the active display.
  * @return pointer to the created animation image object
  */
 lv_obj_t * lv_animimg_create(lv_obj_t * parent);
@@ -87,7 +88,7 @@ void lv_animimg_start(lv_obj_t * obj);
 
 /**
  * Delete the image animation.
- * @param obj   pointer to an animation image object
+ * @param obj   pointer to an animation image object @nullable
  */
 bool lv_animimg_delete(lv_obj_t * obj);
 

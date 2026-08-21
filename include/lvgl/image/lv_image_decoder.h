@@ -105,11 +105,12 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  * Open an image.
  * Try the created image decoders one by one. Once one is able to open the image that decoder is saved in `dsc`
  * @param dsc    describes a decoding session. Simply a pointer to an `lv_image_decoder_dsc_t` variable.
- * @param src    the image source. Can be
+ * @param src    the image source. @nullable Can be
  *                 1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register())`)
  *                 2) Variable: Pointer to an `lv_image_dsc_t` variable
  *                 3) Symbol: E.g. `LV_SYMBOL_OK`
- * @param args   args about how the image should be opened.
+ * @param args   args about how the image should be opened. @nullable When NULL the
+ *               defaults are used.
  * @return LV_RESULT_OK: opened the image. `dsc->decoded` and `dsc->header` are set.
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
@@ -140,13 +141,14 @@ lv_image_decoder_t * lv_image_decoder_create(void);
 
 /**
  * Delete an image decoder
- * @param decoder pointer to an image decoder
+ * @param decoder pointer to an image decoder @nullable
  */
 void lv_image_decoder_delete(lv_image_decoder_t * decoder);
 
 /**
  * Get the next image decoder in the linked list of image decoders
- * @param decoder pointer to an image decoder or NULL to get the first one
+ * @param decoder pointer to an image decoder. @nullable When NULL the first decoder
+ *                is returned.
  * @return the next image decoder or NULL if no more image decoder exists
  */
 lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder);
@@ -184,6 +186,7 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
  * @note A new draw buf will be allocated if provided `decoded` is not modifiable or stride mismatch etc.
  * @param dsc       pointer to a decoder descriptor
  * @param decoded   pointer to a decoded image to post process to meet dsc->args requirement.
+ *                  @nullable When NULL there is nothing to adjust.
  * @return          post processed draw buffer, when it differs with `decoded`, it's newly allocated.
  */
 lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded);

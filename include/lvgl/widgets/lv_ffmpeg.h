@@ -60,7 +60,8 @@ int lv_ffmpeg_get_frame_num(const char * path);
 
 /**
  * Create ffmpeg_player object
- * @param parent pointer to an object, it will be the parent of the new player
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the active display.
  * @return pointer to the created ffmpeg_player
  */
 lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent);
@@ -90,7 +91,7 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en);
 /**
  * Set the video decoder
  * @param obj pointer to a ffmpeg_player object
- * @param decoder_name decoder name
+ * @param decoder_name decoder name. @nullable When NULL the decoder is auto-selected.
  */
 void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * decoder_name);
 /*=====================

@@ -16,6 +16,7 @@
 #include "../indev/lv_indev_private.h"
 #include "../display/lv_display_private.h"
 #include "lv_obj_draw_private.h"
+#include "lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -1313,9 +1314,9 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         int32_t sl = lv_obj_get_scroll_left(parent);
         int32_t st = lv_obj_get_scroll_top(parent);
 
-        obj->coords.y1 = parent->coords.y1 + lv_obj_get_style_pad_top(parent, LV_PART_MAIN) - st;
+        obj->coords.y1 = parent->coords.y1 + lv_obj_get_style_pad_top_internal(parent, LV_PART_MAIN) - st;
         obj->coords.y2 = obj->coords.y1 - 1;
-        obj->coords.x1  = parent->coords.x1 + lv_obj_get_style_pad_left(parent, LV_PART_MAIN) - sl;
+        obj->coords.x1  = parent->coords.x1 + lv_obj_get_style_pad_left_internal(parent, LV_PART_MAIN) - sl;
         obj->coords.x2  = obj->coords.x1 - 1;
     }
 
@@ -1397,15 +1398,15 @@ static void lv_obj_draw(lv_event_t * e)
     if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res == LV_COVER_RES_MASKED) return;
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
+        if(lv_obj_get_style_clip_corner_internal(obj, LV_PART_MAIN)) {
             info->res = LV_COVER_RES_MASKED;
             return;
         }
 
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
-        int32_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-        int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        int32_t r = lv_obj_get_style_radius_internal(obj, LV_PART_MAIN);
+        int32_t w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
+        int32_t h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         lv_area_increase(&coords, w, h);
@@ -1415,24 +1416,24 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 
-        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+        if(lv_obj_get_style_bg_opa_internal(obj, LV_PART_MAIN) < LV_OPA_MAX) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
 
-        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+        if(lv_obj_get_style_opa_internal(obj, LV_PART_MAIN) < LV_OPA_MAX) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
 
-        if(lv_obj_get_style_bg_grad_dir(obj, LV_PART_MAIN) != LV_GRAD_DIR_NONE) {
-            if(lv_obj_get_style_bg_grad_opa(obj, LV_PART_MAIN) < LV_OPA_MAX ||
-               lv_obj_get_style_bg_main_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+        if(lv_obj_get_style_bg_grad_dir_internal(obj, LV_PART_MAIN) != LV_GRAD_DIR_NONE) {
+            if(lv_obj_get_style_bg_grad_opa_internal(obj, LV_PART_MAIN) < LV_OPA_MAX ||
+               lv_obj_get_style_bg_main_opa_internal(obj, LV_PART_MAIN) < LV_OPA_MAX) {
                 info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }
         }
-        const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, LV_PART_MAIN);
+        const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad_internal(obj, LV_PART_MAIN);
         if(grad_dsc) {
             uint32_t i;
             for(i = 0; i < grad_dsc->stops_count; i++) {
@@ -1451,13 +1452,13 @@ static void lv_obj_draw(lv_event_t * e)
         lv_draw_rect_dsc_init(&draw_dsc);
         draw_dsc.base.layer = layer;
 
-        int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        int32_t w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
+        int32_t h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         lv_area_increase(&coords, w, h);
 
-        bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_MAIN);
+        bool backdrop_blur = lv_obj_get_style_blur_backdrop_internal(obj, LV_PART_MAIN);
         if(backdrop_blur) {
             lv_draw_blur_dsc_t blur_dsc;
             lv_draw_blur_dsc_init(&blur_dsc);
@@ -1469,7 +1470,7 @@ static void lv_obj_draw(lv_event_t * e)
 
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
         /*If the border is drawn later disable loading its properties*/
-        if(lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
+        if(lv_obj_get_style_border_post_internal(obj, LV_PART_MAIN)) {
             draw_dsc.border_post = 1;
         }
 
@@ -1479,10 +1480,10 @@ static void lv_obj_draw(lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN_END) {
         /*Draw the non backdrop blur when the main content is rendered the the children are not yet */
         lv_layer_t * layer = lv_event_get_layer(e);
-        bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_MAIN);
+        bool backdrop_blur = lv_obj_get_style_blur_backdrop_internal(obj, LV_PART_MAIN);
         if(!backdrop_blur) {
-            int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-            int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+            int32_t w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
+            int32_t h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
             lv_area_t coords;
             lv_area_copy(&coords, &obj->coords);
             lv_area_increase(&coords, w, h);
@@ -1490,7 +1491,7 @@ static void lv_obj_draw(lv_event_t * e)
             lv_draw_blur_dsc_t blur_dsc;
             lv_draw_blur_dsc_init(&blur_dsc);
             lv_obj_init_draw_blur_dsc(obj, LV_PART_MAIN, &blur_dsc);
-            blur_dsc.corner_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+            blur_dsc.corner_radius = lv_obj_get_style_radius_internal(obj, LV_PART_MAIN);
             blur_dsc.base.layer = layer;
             lv_draw_blur(layer, &blur_dsc, &coords);
         }
@@ -1500,8 +1501,8 @@ static void lv_obj_draw(lv_event_t * e)
         draw_scrollbar(obj, layer);
 
         /*If the border is drawn later disable loading other properties*/
-        if(lv_obj_get_style_border_width(obj, LV_PART_MAIN) &&
-           lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
+        if(lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN) &&
+           lv_obj_get_style_border_post_internal(obj, LV_PART_MAIN)) {
             lv_draw_rect_dsc_t draw_dsc;
             lv_draw_rect_dsc_init(&draw_dsc);
             draw_dsc.bg_opa = LV_OPA_TRANSP;
@@ -1511,8 +1512,8 @@ static void lv_obj_draw(lv_event_t * e)
             draw_dsc.base.layer = layer;
             lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
-            int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-            int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+            int32_t w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
+            int32_t h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
             lv_area_t coords;
             lv_area_copy(&coords, &obj->coords);
             lv_area_increase(&coords, w, h);
@@ -1535,11 +1536,11 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
     lv_result_t sb_res = scrollbar_init_draw_dsc(obj, &rect_dsc);
     if(sb_res != LV_RESULT_OK) return;
 
-    bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_SCROLLBAR);
+    bool backdrop_blur = lv_obj_get_style_blur_backdrop_internal(obj, LV_PART_SCROLLBAR);
     lv_draw_blur_dsc_t blur_dsc;
     lv_draw_blur_dsc_init(&blur_dsc);
     blur_dsc.corner_radius = rect_dsc.radius;
-    blur_dsc.blur_radius = lv_obj_get_style_blur_radius(obj, LV_PART_SCROLLBAR);
+    blur_dsc.blur_radius = lv_obj_get_style_blur_radius_internal(obj, LV_PART_SCROLLBAR);
 
     if(lv_area_get_size(&hor_area) > 0) {
         if(backdrop_blur) lv_obj_init_draw_blur_dsc(obj, LV_PART_SCROLLBAR, &blur_dsc);
@@ -1571,28 +1572,28 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc)
 {
     lv_draw_rect_dsc_init(dsc);
-    dsc->bg_opa = lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR);
+    dsc->bg_opa = lv_obj_get_style_bg_opa_internal(obj, LV_PART_SCROLLBAR);
     if(dsc->bg_opa > LV_OPA_MIN) {
-        dsc->bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR);
+        dsc->bg_color = lv_obj_get_style_bg_color_internal(obj, LV_PART_SCROLLBAR);
     }
 
-    dsc->border_opa = lv_obj_get_style_border_opa(obj, LV_PART_SCROLLBAR);
+    dsc->border_opa = lv_obj_get_style_border_opa_internal(obj, LV_PART_SCROLLBAR);
     if(dsc->border_opa > LV_OPA_MIN) {
-        dsc->border_width = lv_obj_get_style_border_width(obj, LV_PART_SCROLLBAR);
+        dsc->border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_SCROLLBAR);
         if(dsc->border_width > 0) {
-            dsc->border_color = lv_obj_get_style_border_color(obj, LV_PART_SCROLLBAR);
+            dsc->border_color = lv_obj_get_style_border_color_internal(obj, LV_PART_SCROLLBAR);
         }
         else {
             dsc->border_opa = LV_OPA_TRANSP;
         }
     }
 
-    dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, LV_PART_SCROLLBAR);
+    dsc->shadow_opa = lv_obj_get_style_shadow_opa_internal(obj, LV_PART_SCROLLBAR);
     if(dsc->shadow_opa > LV_OPA_MIN) {
-        dsc->shadow_width = lv_obj_get_style_shadow_width(obj, LV_PART_SCROLLBAR);
+        dsc->shadow_width = lv_obj_get_style_shadow_width_internal(obj, LV_PART_SCROLLBAR);
         if(dsc->shadow_width > 0) {
-            dsc->shadow_spread = lv_obj_get_style_shadow_spread(obj, LV_PART_SCROLLBAR);
-            dsc->shadow_color = lv_obj_get_style_shadow_color(obj, LV_PART_SCROLLBAR);
+            dsc->shadow_spread = lv_obj_get_style_shadow_spread_internal(obj, LV_PART_SCROLLBAR);
+            dsc->shadow_color = lv_obj_get_style_shadow_color_internal(obj, LV_PART_SCROLLBAR);
         }
         else {
             dsc->shadow_opa = LV_OPA_TRANSP;
@@ -1608,7 +1609,7 @@ static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * 
     }
 
     if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP || dsc->shadow_opa != LV_OPA_TRANSP) {
-        dsc->radius = lv_obj_get_style_radius(obj, LV_PART_SCROLLBAR);
+        dsc->radius = lv_obj_get_style_radius_internal(obj, LV_PART_SCROLLBAR);
         return LV_RESULT_OK;
     }
     else {
@@ -1765,8 +1766,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        int32_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
-        uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
+        int32_t align = lv_obj_get_style_align_internal(obj, LV_PART_MAIN);
+        uint16_t layout = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
         if(layout || align) {
             lv_obj_mark_layout_as_dirty(obj);
         }
@@ -1779,8 +1780,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_CHILD_CHANGED) {
-        int32_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
-        uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
+        int32_t align = lv_obj_get_style_align_internal(obj, LV_PART_MAIN);
+        uint16_t layout = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
         if(layout || align || lv_obj_is_style_any_width_content(obj) || lv_obj_is_style_any_height_content(obj)) {
             lv_obj_mark_layout_as_dirty(obj);
         }

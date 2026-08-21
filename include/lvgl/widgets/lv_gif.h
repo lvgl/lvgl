@@ -36,7 +36,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gif_class;
 
 /**
  * Create a gif object
- * @param parent    pointer to an object, it will be the parent of the new gif.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the gif obj
  */
 lv_obj_t * lv_gif_create(lv_obj_t * parent);
@@ -55,6 +56,7 @@ void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format);
  * @param obj       pointer to a gif object
  * @param src       1) pointer to an ::lv_image_dsc_t descriptor (which contains gif raw data) or
  *                  2) path to a gif file (e.g. "S:/dir/anim.gif")
+ *                  @nullable When NULL the current source is closed.
  */
 void lv_gif_set_src(lv_obj_t * obj, const void * src);
 

@@ -76,6 +76,7 @@ static void create_folders_if_needed(const char * path) ;
 
 lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
 {
+    LV_CHECK_ARG(fn_ref != NULL, return LV_TEST_SCREENSHOT_RESULT_FAILED);
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_invalidate(scr);
@@ -88,6 +89,8 @@ lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
 
 lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 {
+    LV_CHECK_ARG(fn_ref != NULL, return LV_TEST_SCREENSHOT_RESULT_FAILED);
+
     char fn_ref_full[256];
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
 

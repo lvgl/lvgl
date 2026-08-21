@@ -85,6 +85,8 @@ const lv_font_class_t lv_builtin_font_class = {
 
 const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
+    LV_CHECK_ARG(g_dsc != NULL, return NULL);
+
     const lv_font_t * font = g_dsc->resolved_font;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
@@ -218,6 +220,9 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
+    LV_CHECK_ARG(font != NULL, return false);
+    LV_CHECK_ARG(dsc_out != NULL, return false);
+
     /*It fixes a strange compiler optimization issue: https://github.com/lvgl/lvgl/issues/4370*/
     bool is_tab = unicode_letter == '\t';
     if(is_tab) {

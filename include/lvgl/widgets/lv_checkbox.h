@@ -37,7 +37,8 @@ enum _lv_property_checkbox_id_t {
 
 /**
  * Create a check box object
- * @param parent    pointer to an object, it will be the parent of the new button
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created check box
  */
 lv_obj_t * lv_checkbox_create(lv_obj_t * parent);
@@ -50,7 +51,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * parent);
  * Set the text of a check box. `txt` will be copied and may be deallocated
  * after this function returns.
  * @param obj   pointer to a check box
- * @param txt   the text of the check box. NULL to refresh with the current text.
+ * @param txt   the text of the check box. @nullable When NULL the widget is only refreshed.
  */
 void lv_checkbox_set_text(lv_obj_t * obj, const char * txt);
 

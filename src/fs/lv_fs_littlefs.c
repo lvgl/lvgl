@@ -35,6 +35,8 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 
 void lv_littlefs_set_handler(lfs_t * lfs)
 {
+    LV_CHECK_ARG(lfs != NULL, return);
+
     lv_fs_drv_t * drv = lv_fs_get_drv(LV_FS_LITTLEFS_LETTER);
     drv->user_data = lfs;
 }
@@ -62,9 +64,7 @@ void lv_fs_littlefs_init(void)
 lv_fs_res_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
 {
 
-    if(lfs == NULL) {
-        return LV_FS_RES_INV_PARAM; /*Invalid LittleFS handle*/
-    }
+    LV_CHECK_ARG(lfs != NULL, return LV_FS_RES_INV_PARAM);
 
     if(LV_FS_IS_VALID_LETTER(letter) == false) {
         return LV_FS_RES_INV_PARAM; /*Invalid letter*/

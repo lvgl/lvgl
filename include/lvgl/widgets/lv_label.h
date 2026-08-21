@@ -73,7 +73,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_label_class;
 
 /**
  * Create a label object
- * @param parent    pointer to an object, it will be the parent of the new label.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the created button
  */
 lv_obj_t * lv_label_create(lv_obj_t * parent);
@@ -85,7 +86,8 @@ lv_obj_t * lv_label_create(lv_obj_t * parent);
 /**
  * Set a new text for a label. Memory will be allocated to store the text by the label.
  * @param obj           pointer to a label object
- * @param text          '\0' terminated character string. NULL to refresh with the current text.
+ * @param text          '\0' terminated character string. @nullable When NULL the label is
+ *                      refreshed with its current text.
  * @note If `LV_USE_ARABIC_PERSIAN_CHARS` is enabled the text will be modified to have the correct Arabic
  * characters in it.
  */
@@ -117,6 +119,8 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTR
  * va_end(args);
  * @endcode
  * @note It ignores `LV_USE_ARABIC_PERSIAN_CHARS`
+ * @param fmt           printf-like format string. @nullable When NULL the label is only
+ *                      refreshed.
  */
 void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args);
 
@@ -124,7 +128,7 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args);
  * Set a static text. It will not be saved by the label so the 'text' variable
  * has to be 'alive' while the label exists.
  * @param obj           pointer to a label object
- * @param text          pointer to a text. NULL to refresh with the current text.
+ * @param text          pointer to a text. @nullable When NULL the current text is dropped.
  * @note It ignores `LV_USE_ARABIC_PERSIAN_CHARS`
  */
 void lv_label_set_text_static(lv_obj_t * obj, const char * text);
@@ -262,8 +266,8 @@ bool lv_label_get_recolor(const lv_obj_t * obj);
  * Bind an integer, string, or pointer Subject to a Label.
  * @param obj       pointer to Label
  * @param subject   pointer to Subject
- * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
- *                  or NULL to bind to the value directly.
+ * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C").
+ *                  @nullable When NULL the value is bound directly.
  * @return          pointer to newly-created Observer
  * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
  *                  as text as they are, integers as %d, floats as %0.1f

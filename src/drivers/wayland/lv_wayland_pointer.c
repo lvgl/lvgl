@@ -120,8 +120,8 @@ lv_indev_t * lv_wayland_get_pointeraxis(lv_display_t * display)
 
 lv_wl_seat_pointer_t * lv_wayland_seat_pointer_create(struct wl_seat * seat, struct wl_surface * surface)
 {
-    LV_ASSERT_NULL(seat);
-    LV_ASSERT_NULL(surface);
+    LV_CHECK_ARG(seat != NULL, return NULL);
+    LV_CHECK_ARG(surface != NULL, return NULL);
 
     struct wl_cursor_theme * cursor_theme = wl_cursor_theme_load(NULL, 32, lv_wl_ctx.wl_shm);
     if(!cursor_theme) {
@@ -228,7 +228,7 @@ static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint
     LV_UNUSED(time);
 
     lv_wl_seat_pointer_t * seat_pointer = wl_pointer_get_user_data(pointer);
-    LV_ASSERT_NULL(seat_pointer);
+    LV_ASSERT(seat_pointer != NULL);
 
     seat_pointer->point.x = wl_fixed_to_int(sx);
     seat_pointer->point.y = wl_fixed_to_int(sy);
@@ -241,7 +241,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * pointer, uint
     LV_UNUSED(serial);
     LV_UNUSED(time);
     lv_wl_seat_pointer_t * seat_pointer = wl_pointer_get_user_data(pointer);
-    LV_ASSERT_NULL(seat_pointer);
+    LV_ASSERT(seat_pointer != NULL);
     const lv_indev_state_t lv_state = (state == WL_POINTER_BUTTON_STATE_PRESSED) ?
                                       LV_INDEV_STATE_PRESSED :
                                       LV_INDEV_STATE_RELEASED;

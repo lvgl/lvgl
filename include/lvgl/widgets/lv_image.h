@@ -77,7 +77,8 @@ enum _lv_property_image_id_t {
 
 /**
  * Create an image object
- * @param parent pointer to an object, it will be the parent of the new image
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the active display.
  * @return pointer to the created image
  */
 lv_obj_t * lv_image_create(lv_obj_t * parent);
@@ -92,6 +93,7 @@ lv_obj_t * lv_image_create(lv_obj_t * parent);
  * @param src       1) pointer to an ::lv_image_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
  *                  2) path to an image file (e.g. "S:/dir/img.bin")or
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
+ *                  @nullable When NULL the image is cleared.
  */
 void lv_image_set_src(lv_obj_t * obj, const void * src);
 
@@ -212,7 +214,8 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align);
 /**
  * Set an A8 bitmap mask for the image.
  * @param obj       pointer to an image object
- * @param src       an lv_image_dsc_t bitmap mask source.
+ * @param src       an lv_image_dsc_t bitmap mask source. @nullable When NULL the
+ *                  bitmap mask is removed.
  */
 void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src);
 

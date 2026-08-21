@@ -7,9 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_line_private.h"
-#include "../../core/lv_obj_class_private.h"
 
 #if LV_USE_LINE
+#include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -74,11 +75,17 @@ lv_obj_t * lv_line_create(lv_obj_t * parent)
 
 void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(points != NULL, return);
+
     line_set_points(obj, points, point_num, false);
 }
 
 void lv_line_set_points_mutable(lv_obj_t * obj, lv_point_precise_t points[], uint32_t point_num)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(points != NULL, return);
+
     line_set_points(obj, points, point_num, true);
 }
 
@@ -203,7 +210,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /*The corner of the skew lines is out of the intended area*/
-        int32_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        int32_t line_width = lv_obj_get_style_line_width_internal(obj, LV_PART_MAIN);
         int32_t * s = lv_event_get_param(e);
         if(*s < line_width) *s = line_width;
     }

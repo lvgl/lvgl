@@ -34,19 +34,27 @@ void lv_bin_decoder_init(void);
 
 /**
  * Get info about a lvgl binary image
- * @param decoder the decoder where this function belongs
+ * @param decoder the decoder where this function belongs. @nullable It is ignored.
  * @param dsc image descriptor containing the source and type of the image and other info.
  * @param header store the image data here
  * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
  */
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header);
 
+/**
+ * Decode a part of a lvgl binary image
+ * @param decoder       pointer to the decoder. @nullable It is ignored.
+ * @param dsc           pointer to the decoder descriptor
+ * @param full_area     the whole area to decode
+ * @param decoded_area  input+output parameter, the area that was decoded
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: couldn't decode the area
+ */
 lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area);
 
 /**
  * Open a lvgl binary image
- * @param decoder the decoder where this function belongs
+ * @param decoder the decoder where this function belongs. @nullable It is ignored.
  * @param dsc pointer to decoder descriptor. `src`, `style` are already initialized in it.
  * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
  */
@@ -54,7 +62,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
 /**
  * Close the pending decoding. Free resources etc.
- * @param decoder pointer to the decoder the function associated with
+ * @param decoder pointer to the decoder the function associated with. @nullable It is
+ *                ignored.
  * @param dsc pointer to decoder descriptor
  */
 void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);

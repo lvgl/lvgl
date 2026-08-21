@@ -46,33 +46,33 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 /**
  * Closes the window programmatically
- * @param disp Reference to the LVGL display associated to the window
+ * @param disp Reference to the LVGL display associated to the window @nullable When NULL the default display is used.
  */
 void lv_wayland_window_close(lv_display_t * disp);
 
 /**
  * Check if the window is open
- * @param disp Reference to the LVGL display associated to the window
+ * @param disp Reference to the LVGL display associated to the window @nullable When NULL the default display is used.
  * @return true: The window is open
  */
 bool lv_wayland_window_is_open(lv_display_t * disp);
 
 /**
  * Assigns the window to a specific physical display
- * @param disp Reference to the LVGL display associated to the window
- * @param display Physical display number
+ * @param disp Reference to the LVGL display associated to the window @nullable When NULL the default display is used.
+ * @param display Physical display number @nullable When NULL the default display is used.
  */
 void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display);
 
 /**
  * Unassigns the current physical display attached to the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param disp Reference to the LVGL display associated to the window @nullable When NULL the default display is used.
  */
 void lv_wayland_unassign_physical_display(lv_display_t * disp);
 
 /**
  * Sets the fullscreen state of the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param disp Reference to the LVGL display associated to the window @nullable When NULL the default display is used.
  * @param fullscreen If true the window enters fullscreen
  */
 
@@ -80,14 +80,14 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen);
 
 /**
  * Sets the maximized state of the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param disp Reference to the LVGL display associated to the window @nullable When NULL the default display is used.
  * @param maximize   If true the window is maximized
  */
 void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximize);
 
 /**
  * Minimizes the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param disp Reference to the LVGL display associated to the window @nullable When NULL the default display is used.
  */
 void lv_wayland_window_set_minimized(lv_display_t * disp);
 

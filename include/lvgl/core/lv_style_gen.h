@@ -382,7 +382,7 @@ void lv_style_set_bg_grad_opa(lv_style_t * style, lv_opa_t value);
  * as well. If it's set other gradient related properties will be ignored.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to gradient descriptor
+ * @param  value   Pointer to gradient descriptor @nullable
  */
 void lv_style_set_bg_grad(lv_style_t * style, const lv_grad_dsc_t * value);
 
@@ -391,7 +391,7 @@ void lv_style_set_bg_grad(lv_style_t * style, const lv_grad_dsc_t * value);
  * an `LV_SYMBOL_...`.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: Yes.
  * @param  style   Pointer to style
- * @param  value   Pointer to image source
+ * @param  value   Pointer to image source @nullable
  */
 void lv_style_set_bg_image_src(lv_style_t * style, const void * value);
 
@@ -596,7 +596,7 @@ void lv_style_set_image_recolor_opa(lv_style_t * style, lv_opa_t value);
  * `high_color` will be transparent.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to image color key
+ * @param  value   Pointer to image color key @nullable
  */
 void lv_style_set_image_colorkey(lv_style_t * style, const lv_image_colorkey_t * value);
 
@@ -686,7 +686,7 @@ void lv_style_set_arc_opa(lv_style_t * style, lv_opa_t value);
  * effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to image source
+ * @param  value   Pointer to image source @nullable
  */
 void lv_style_set_arc_image_src(lv_style_t * style, const void * value);
 
@@ -919,7 +919,7 @@ void lv_style_set_opa_layered(lv_style_t * style, lv_opa_t value);
  * Mix a color with all colors of the Widget.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to color-filter descriptor
+ * @param  value   Pointer to color-filter descriptor @nullable
  */
 void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value);
 
@@ -957,7 +957,7 @@ void lv_style_set_recolor_opa(lv_style_t * style, lv_opa_t value);
  * documentation to learn more.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to animation descriptor
+ * @param  value   Pointer to animation descriptor @nullable
  */
 void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value);
 
@@ -975,7 +975,7 @@ void lv_style_set_anim_duration(lv_style_t * style, uint32_t value);
  * An initialized ``lv_style_transition_dsc_t`` to describe a transition.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to transition descriptor
+ * @param  value   Pointer to transition descriptor @nullable
  */
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value);
 
@@ -1010,7 +1010,7 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
  * this A8 bitmap mask.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to A8 bitmap mask
+ * @param  value   Pointer to A8 bitmap mask @nullable
  */
 void lv_style_set_bitmap_mask_src(lv_style_t * style, const void * value);
 
@@ -1071,7 +1071,7 @@ void lv_style_set_flex_grow(lv_style_t * style, uint8_t value);
  * An array to describe the columns of the grid. Should be LV_GRID_TEMPLATE_LAST terminated.
  * Default: `NULL`, inherited: No, layout: Yes, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to grid-column descriptor array
+ * @param  value   Pointer to grid-column descriptor array @nullable
  */
 void lv_style_set_grid_column_dsc_array(lv_style_t * style, const int32_t * value);
 
@@ -1087,7 +1087,7 @@ void lv_style_set_grid_column_align(lv_style_t * style, lv_grid_align_t value);
  * An array to describe the rows of the grid. Should be LV_GRID_TEMPLATE_LAST terminated.
  * Default: `NULL`, inherited: No, layout: Yes, ext. draw: No.
  * @param  style   Pointer to style
- * @param  value   Pointer to grid-row descriptor array
+ * @param  value   Pointer to grid-row descriptor array @nullable
  */
 void lv_style_set_grid_row_dsc_array(lv_style_t * style, const int32_t * value);
 
@@ -1597,7 +1597,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
  * `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors
  * as well. If it's set other gradient related properties will be ignored.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
- * @param  val   Pointer to gradient descriptor
+ * @param  val   Pointer to gradient descriptor @nullable
  */
 #define LV_STYLE_CONST_BG_GRAD(val) \
     { \
@@ -1608,7 +1608,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
  * Set a background image. Can be a pointer to `lv_image_dsc_t`, a path to a file or
  * an `LV_SYMBOL_...`.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: Yes.
- * @param  val   Pointer to image source
+ * @param  val   Pointer to image source @nullable
  */
 #define LV_STYLE_CONST_BG_IMAGE_SRC(val) \
     { \
@@ -1859,7 +1859,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
  * `high_color` and `low_color`. the color of pixels ranging from `low_color` to
  * `high_color` will be transparent.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
- * @param  val   Pointer to image color key
+ * @param  val   Pointer to image color key @nullable
  */
 #define LV_STYLE_CONST_IMAGE_COLORKEY(val) \
     { \
@@ -1971,7 +1971,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
  * Set an image from which arc will be masked out. It's useful to display complex
  * effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
- * @param  val   Pointer to image source
+ * @param  val   Pointer to image source @nullable
  */
 #define LV_STYLE_CONST_ARC_IMAGE_SRC(val) \
     { \
@@ -2256,7 +2256,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 /**
  * Mix a color with all colors of the Widget.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
- * @param  val   Pointer to color-filter descriptor
+ * @param  val   Pointer to color-filter descriptor @nullable
  */
 #define LV_STYLE_CONST_COLOR_FILTER_DSC(val) \
     { \
@@ -2302,7 +2302,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
  * blink time of the cursor on the Text Area or scroll time of a roller. See Widgets'
  * documentation to learn more.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
- * @param  val   Pointer to animation descriptor
+ * @param  val   Pointer to animation descriptor @nullable
  */
 #define LV_STYLE_CONST_ANIM(val) \
     { \
@@ -2324,7 +2324,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 /**
  * An initialized ``lv_style_transition_dsc_t`` to describe a transition.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
- * @param  val   Pointer to transition descriptor
+ * @param  val   Pointer to transition descriptor @nullable
  */
 #define LV_STYLE_CONST_TRANSITION(val) \
     { \
@@ -2367,7 +2367,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
  * If set, a layer will be created for the widget and the layer will be masked with
  * this A8 bitmap mask.
  * Default: `NULL`, inherited: No, layout: No, ext. draw: No.
- * @param  val   Pointer to A8 bitmap mask
+ * @param  val   Pointer to A8 bitmap mask @nullable
  */
 #define LV_STYLE_CONST_BITMAP_MASK_SRC(val) \
     { \
@@ -2442,7 +2442,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 /**
  * An array to describe the columns of the grid. Should be LV_GRID_TEMPLATE_LAST terminated.
  * Default: `NULL`, inherited: No, layout: Yes, ext. draw: No.
- * @param  val   Pointer to grid-column descriptor array
+ * @param  val   Pointer to grid-column descriptor array @nullable
  */
 #define LV_STYLE_CONST_GRID_COLUMN_DSC_ARRAY(val) \
     { \
@@ -2462,7 +2462,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 /**
  * An array to describe the rows of the grid. Should be LV_GRID_TEMPLATE_LAST terminated.
  * Default: `NULL`, inherited: No, layout: Yes, ext. draw: No.
- * @param  val   Pointer to grid-row descriptor array
+ * @param  val   Pointer to grid-row descriptor array @nullable
  */
 #define LV_STYLE_CONST_GRID_ROW_DSC_ARRAY(val) \
     { \

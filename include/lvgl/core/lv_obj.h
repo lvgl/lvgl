@@ -215,7 +215,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
 
 /**
  * Create a base object (a rectangle)
- * @param parent    pointer to a parent object. If NULL then a screen will be created.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          pointer to the new object
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent);
@@ -729,7 +730,7 @@ lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void *
  *
  * Removes a delete descriptor previously created via @ref lv_obj_add_delete_cb
  *
- * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op
+ * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op @nullable
  */
 void lv_obj_remove_delete_cb(lv_delete_dsc_t * dsc);
 
@@ -774,7 +775,7 @@ void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 /**
  * Set an id for an object.
  * @param obj   pointer to an object
- * @param id    the id of the object
+ * @param id    the id of the object @nullable. When NULL any previous id is dropped.
  */
 void lv_obj_set_id(lv_obj_t * obj, void * id);
 
@@ -793,7 +794,8 @@ void * lv_obj_get_id(const lv_obj_t * obj);
  *
  * @deprecated IDs are used only to print the widget trees. To find a widget use `lv_obj_find_by_name`
  *
- * @param obj       pointer to an object
+ * @param obj       pointer to an object @nullable. When NULL the active screen is
+ *                  searched.
  * @param id        the id of the child object
  * @return          pointer to the child object or NULL if not found
  */
@@ -826,8 +828,8 @@ void lv_obj_free_id(lv_obj_t * obj);
  * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method for compare.
  * Otherwise, it must be implemented externally.
  *
- * @param id1: the first id
- * @param id2: the second id
+ * @param id1: the first id @nullable
+ * @param id2: the second id @nullable
  * @return     0 if they are equal, non-zero otherwise.
  */
 int lv_obj_id_compare(const void * id1, const void * id2);

@@ -81,6 +81,9 @@ lv_obj_t * lv_lottie_create(lv_obj_t * parent)
 
 void lv_lottie_set_buffer(lv_obj_t * obj, int32_t w, int32_t h, void * buf)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(buf != NULL, return);
+
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     int32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     buf = lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
@@ -102,6 +105,9 @@ void lv_lottie_set_buffer(lv_obj_t * obj, int32_t w, int32_t h, void * buf)
 
 void lv_lottie_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(draw_buf != NULL, return);
+
     if(draw_buf->header.cf != LV_COLOR_FORMAT_ARGB8888 && draw_buf->header.cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
         LV_LOG_WARN("The draw buf needs to have ARGB8888 or ARGB8888_PREMULTIPLIED color format");
         return;
@@ -125,6 +131,9 @@ void lv_lottie_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 
 void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(src != NULL, return);
+
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     tvg_picture_load_data(lottie->tvg_paint, src, src_size, "lottie", true);
     lv_draw_buf_t * canvas_draw_buf = lv_canvas_get_draw_buf(obj);
@@ -145,6 +154,9 @@ void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
 
 void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(src != NULL, return);
+
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     tvg_picture_load(lottie->tvg_paint, src);
     lv_draw_buf_t * canvas_draw_buf = lv_canvas_get_draw_buf(obj);

@@ -137,6 +137,10 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
  *
  * lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY); //Remove all styles
  * @endcode
+ * @param obj       pointer to a widget
+ * @param style     pointer to a style to remove. @nullable When NULL every style
+ *                  matching `selector` is removed.
+ * @param selector  OR-ed value of parts and states to remove the style from
  */
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
@@ -157,8 +161,8 @@ void lv_obj_remove_style_all(lv_obj_t * obj);
 
 /**
  * Notify all object if a style is modified
- * @param style     pointer to a style. Only the objects with this style will be notified
- *                  (NULL to notify all objects)
+ * @param style     pointer to a style. Only the objects with this style will be notified.
+ *                  @nullable When NULL every object is notified.
  */
 void lv_obj_report_style_change(lv_style_t * style);
 
@@ -273,111 +277,203 @@ static inline lv_part_t lv_obj_style_get_selector_part(lv_style_selector_t selec
 
 #include "lv_obj_style_gen.h"
 
-static inline void lv_obj_set_style_pad_all(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
-{
-    lv_obj_set_style_pad_left(obj, value, selector);
-    lv_obj_set_style_pad_right(obj, value, selector);
-    lv_obj_set_style_pad_top(obj, value, selector);
-    lv_obj_set_style_pad_bottom(obj, value, selector);
-}
+/**
+ * Sets padding on all four sides at once by calling `lv_obj_set_style_pad_top()`,
+ * `lv_obj_set_style_pad_bottom()`, `lv_obj_set_style_pad_left()` and
+ * `lv_obj_set_style_pad_right()` with the same value.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_pad_all(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
-static inline void lv_obj_set_style_pad_hor(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
-{
-    lv_obj_set_style_pad_left(obj, value, selector);
-    lv_obj_set_style_pad_right(obj, value, selector);
-}
+/**
+ * Sets horizontal padding by calling `lv_obj_set_style_pad_left()` and
+ * `lv_obj_set_style_pad_right()` with the same value.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_pad_hor(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
-static inline void lv_obj_set_style_pad_ver(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
-{
-    lv_obj_set_style_pad_top(obj, value, selector);
-    lv_obj_set_style_pad_bottom(obj, value, selector);
-}
+/**
+ * Sets vertical padding by calling `lv_obj_set_style_pad_top()` and
+ * `lv_obj_set_style_pad_bottom()` with the same value.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_pad_ver(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
-static inline void lv_obj_set_style_margin_all(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
-{
-    lv_obj_set_style_margin_left(obj, value, selector);
-    lv_obj_set_style_margin_right(obj, value, selector);
-    lv_obj_set_style_margin_top(obj, value, selector);
-    lv_obj_set_style_margin_bottom(obj, value, selector);
-}
+/**
+ * Sets margin on all four sides at once by calling `lv_obj_set_style_margin_top()`,
+ * `lv_obj_set_style_margin_bottom()`, `lv_obj_set_style_margin_left()` and
+ * `lv_obj_set_style_margin_right()` with the same value.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_margin_all(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
-static inline void lv_obj_set_style_margin_hor(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
-{
-    lv_obj_set_style_margin_left(obj, value, selector);
-    lv_obj_set_style_margin_right(obj, value, selector);
-}
+/**
+ * Sets horizontal margin by calling `lv_obj_set_style_margin_left()` and
+ * `lv_obj_set_style_margin_right()` with the same value.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_margin_hor(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
-static inline void lv_obj_set_style_margin_ver(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
-{
-    lv_obj_set_style_margin_top(obj, value, selector);
-    lv_obj_set_style_margin_bottom(obj, value, selector);
-}
+/**
+ * Sets vertical margin by calling `lv_obj_set_style_margin_top()` and
+ * `lv_obj_set_style_margin_bottom()` with the same value.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_margin_ver(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
-static inline void lv_obj_set_style_pad_gap(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
-{
-    lv_obj_set_style_pad_row(obj, value, selector);
-    lv_obj_set_style_pad_column(obj, value, selector);
-}
+/**
+ * Sets the gap between the children in both directions by calling
+ * `lv_obj_set_style_pad_row()` and `lv_obj_set_style_pad_column()` with the same
+ * value.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_pad_gap(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
-static inline void lv_obj_set_style_size(lv_obj_t * obj, int32_t width, int32_t height,
-                                         lv_style_selector_t selector)
-{
-    lv_obj_set_style_width(obj, width, selector);
-    lv_obj_set_style_height(obj, height, selector);
-}
+/**
+ * Sets size of Widget by calling `lv_obj_set_style_width()` and
+ * `lv_obj_set_style_height()`.
+ * @param  obj        Pointer to Widget
+ * @param  width      Width value to submit
+ * @param  height     Height value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_size(lv_obj_t * obj, int32_t width, int32_t height, lv_style_selector_t selector);
 
-static inline void lv_obj_set_style_transform_scale(lv_obj_t * obj, int32_t value,
-                                                    lv_style_selector_t selector)
-{
-    lv_obj_set_style_transform_scale_x(obj, value, selector);
-    lv_obj_set_style_transform_scale_y(obj, value, selector);
-}
+/**
+ * Sets the zoom factor of Widget in both directions by calling
+ * `lv_obj_set_style_transform_scale_x()` and `lv_obj_set_style_transform_scale_y()`
+ * with the same value.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_transform_scale(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
-static inline int32_t lv_obj_get_style_space_left(const lv_obj_t * obj, lv_part_t part)
-{
-    int32_t padding = lv_obj_get_style_pad_left(obj, part);
-    int32_t border_width = lv_obj_get_style_border_width(obj, part);
-    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
-    return (border_side & LV_BORDER_SIDE_LEFT) ? padding + border_width : padding;
-}
+/**
+ * Gets the space taken on the left side, i.e. the sum of `pad_left` and the border
+ * width. It tells how far the content area starts from the left edge of Widget's
+ * bounding box.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ * @return        Space on the left in pixels
+ */
+int32_t lv_obj_get_style_space_left(const lv_obj_t * obj, lv_part_t part);
 
-static inline int32_t lv_obj_get_style_space_right(const lv_obj_t * obj, lv_part_t part)
-{
-    int32_t padding = lv_obj_get_style_pad_right(obj, part);
-    int32_t border_width = lv_obj_get_style_border_width(obj, part);
-    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
-    return (border_side & LV_BORDER_SIDE_RIGHT) ? padding + border_width : padding;
-}
+/**
+ * Gets the space taken on the right side, i.e. the sum of `pad_right` and the border
+ * width. It tells how far the content area ends from the right edge of Widget's
+ * bounding box.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ * @return        Space on the right in pixels
+ */
+int32_t lv_obj_get_style_space_right(const lv_obj_t * obj, lv_part_t part);
 
-static inline int32_t lv_obj_get_style_space_top(const lv_obj_t * obj, lv_part_t part)
-{
-    int32_t padding = lv_obj_get_style_pad_top(obj, part);
-    int32_t border_width = lv_obj_get_style_border_width(obj, part);
-    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
-    return (border_side & LV_BORDER_SIDE_TOP) ? padding + border_width : padding;
-}
+/**
+ * Gets the space taken on the top side, i.e. the sum of `pad_top` and the border
+ * width. It tells how far the content area starts from the top edge of Widget's
+ * bounding box.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ * @return        Space on the top in pixels
+ */
+int32_t lv_obj_get_style_space_top(const lv_obj_t * obj, lv_part_t part);
 
-static inline int32_t lv_obj_get_style_space_bottom(const lv_obj_t * obj, lv_part_t part)
-{
-    int32_t padding = lv_obj_get_style_pad_bottom(obj, part);
-    int32_t border_width = lv_obj_get_style_border_width(obj, part);
-    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
-    return (border_side & LV_BORDER_SIDE_BOTTOM) ? padding + border_width : padding;
-}
+/**
+ * Gets the space taken on the bottom side, i.e. the sum of `pad_bottom` and the border
+ * width. It tells how far the content area ends from the bottom edge of Widget's
+ * bounding box.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ * @return        Space on the bottom in pixels
+ */
+int32_t lv_obj_get_style_space_bottom(const lv_obj_t * obj, lv_part_t part);
 
+/**
+ * Gets the text alignment which should be really used. Compared to
+ * `lv_obj_get_style_text_align()` it resolves `LV_TEXT_ALIGN_AUTO` by considering the
+ * base direction of Widget and the text itself.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ * @param  txt    The text to align. Its first strong character determines the
+ *                direction if the base direction is `LV_BASE_DIR_AUTO`.
+ * @return        The resolved alignment: `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT`
+ *                (never `LV_TEXT_ALIGN_AUTO`)
+ */
 lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_t part, const char * txt);
 
-static inline int32_t lv_obj_get_style_transform_scale_x_safe(const lv_obj_t * obj, lv_part_t part)
-{
-    int32_t scale = lv_obj_get_style_transform_scale_x(obj, part);
-    return scale > 0 ? scale : 1;
-}
+/**
+ * Gets the horizontal zoom factor of Widget in a way which is safe to divide or
+ * multiply by. Same as `lv_obj_get_style_transform_scale_x()` except that `0` is
+ * replaced by `1` to avoid division by zero.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ * @return        The horizontal scale factor, never `0`. `256` (`LV_SCALE_NONE`)
+ *                means normal size.
+ */
+int32_t lv_obj_get_style_transform_scale_x_safe(const lv_obj_t * obj, lv_part_t part);
 
-static inline int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * obj, lv_part_t part)
-{
-    int32_t scale = lv_obj_get_style_transform_scale_y(obj, part);
-    return scale > 0 ? scale : 1;
-}
+/**
+ * Gets the vertical zoom factor of Widget in a way which is safe to divide or multiply
+ * by. Same as `lv_obj_get_style_transform_scale_y()` except that `0` is replaced by
+ * `1` to avoid division by zero.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ * @return        The vertical scale factor, never `0`. `256` (`LV_SCALE_NONE`) means
+ *                normal size.
+ */
+int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * obj, lv_part_t part);
+
 
 /**
  * Get the `opa` style property from all parents and multiply and `>> 8` them.

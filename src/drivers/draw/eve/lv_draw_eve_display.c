@@ -53,6 +53,8 @@ lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * param
 {
     static uint32_t dummy_buf; /* It won't be used as it will send commands instead of draw pixels. */
 
+    LV_CHECK_ARG(params != NULL, return NULL);
+
     lv_display_t * disp = lv_display_create(params->hor_res, params->ver_res);
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_buffers(disp, &dummy_buf, NULL,
@@ -73,11 +75,14 @@ lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * param
 
 void * lv_draw_eve_display_get_user_data(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return NULL);
     return lv_display_get_driver_data(disp);
 }
 
 lv_indev_t * lv_draw_eve_touch_create(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return NULL);
+
     lv_indev_t * indev = lv_indev_create();
 
     lv_indev_set_display(indev, disp);
@@ -89,6 +94,8 @@ lv_indev_t * lv_draw_eve_touch_create(lv_display_t * disp)
 
 void lv_draw_eve_pre_upload_image(lv_display_t * disp, const void * src)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(src != NULL, return);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to do an LVGL EVE pre-upload without a draw_eve display");
 
     if(!lv_draw_eve_image_src_check(src)) {
@@ -104,6 +111,8 @@ void lv_draw_eve_pre_upload_image(lv_display_t * disp, const void * src)
 void lv_draw_eve_pre_upload_font_range(lv_display_t * disp, const lv_font_t * font, uint32_t unicode_range_start,
                                        uint32_t unicode_range_end)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(font != NULL, return);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to do an LVGL EVE pre-upload without a draw_eve display");
 
     if(!lv_draw_eve_label_font_check(font)) {
@@ -128,6 +137,9 @@ void lv_draw_eve_pre_upload_font_range(lv_display_t * disp, const lv_font_t * fo
 
 void lv_draw_eve_pre_upload_font_text(lv_display_t * disp, const lv_font_t * font, const char * text)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(font != NULL, return);
+    LV_CHECK_ARG(text != NULL, return);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to do an LVGL EVE pre-upload without a draw_eve display");
 
     if(!lv_draw_eve_label_font_check(font)) {
@@ -155,36 +167,42 @@ void lv_draw_eve_pre_upload_font_text(lv_display_t * disp, const lv_font_t * fon
 
 uint8_t lv_draw_eve_memread8(lv_display_t * disp, uint32_t address)
 {
+    LV_CHECK_ARG(disp != NULL, return 0);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command without a draw_eve display");
     return EVE_memRead8(address);
 }
 
 uint16_t lv_draw_eve_memread16(lv_display_t * disp, uint32_t address)
 {
+    LV_CHECK_ARG(disp != NULL, return 0);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
     return EVE_memRead16(address);
 }
 
 uint32_t lv_draw_eve_memread32(lv_display_t * disp, uint32_t address)
 {
+    LV_CHECK_ARG(disp != NULL, return 0);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
     return EVE_memRead32(address);
 }
 
 void lv_draw_eve_memwrite8(lv_display_t * disp, uint32_t address, uint8_t data)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
     EVE_memWrite8(address, data);
 }
 
 void lv_draw_eve_memwrite16(lv_display_t * disp, uint32_t address, uint16_t data)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
     EVE_memWrite16(address, data);
 }
 
 void lv_draw_eve_memwrite32(lv_display_t * disp, uint32_t address, uint32_t data)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
     EVE_memWrite32(address, data);
 }

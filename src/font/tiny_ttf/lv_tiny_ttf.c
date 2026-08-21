@@ -156,6 +156,8 @@ const lv_font_class_t lv_tiny_ttf_font_class = {
 
 void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
 {
+    LV_CHECK_ARG(font != NULL, return);
+
     if(font_size <= 0) {
         LV_LOG_ERROR("invalid font size: %"LV_PRIx32, font_size);
         return;
@@ -188,7 +190,7 @@ void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
 
 void lv_tiny_ttf_destroy(lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    if(font == NULL) return;
 
     if(font->dsc != NULL) {
         ttf_font_desc_t * ttf = (ttf_font_desc_t *)font->dsc;
@@ -526,10 +528,14 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
 lv_font_t * lv_tiny_ttf_create_file_ex(const char * path, int32_t font_size, lv_font_kerning_t kerning,
                                        size_t cache_size)
 {
+    LV_CHECK_ARG(path != NULL, return NULL);
+
     return lv_tiny_ttf_create(path, NULL, 0, font_size, kerning, cache_size);
 }
 lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size)
 {
+    LV_CHECK_ARG(path != NULL, return NULL);
+
     return lv_tiny_ttf_create(path, NULL, 0, font_size, LV_FONT_KERNING_NORMAL, LV_TINY_TTF_CACHE_GLYPH_CNT);
 }
 #endif
@@ -537,10 +543,14 @@ lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size)
 lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size,
                                        lv_font_kerning_t kerning, size_t cache_size)
 {
+    LV_CHECK_ARG(data != NULL, return NULL);
+
     return lv_tiny_ttf_create(NULL, data, data_size, font_size, kerning, cache_size);
 }
 lv_font_t * lv_tiny_ttf_create_data(const void * data, size_t data_size, int32_t font_size)
 {
+    LV_CHECK_ARG(data != NULL, return NULL);
+
     return lv_tiny_ttf_create(NULL, data, data_size, font_size, LV_FONT_KERNING_NORMAL, LV_TINY_TTF_CACHE_GLYPH_CNT);
 }
 

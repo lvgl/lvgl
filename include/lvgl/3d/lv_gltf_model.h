@@ -38,7 +38,7 @@ lv_gltf_model_t * lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data
 
 /**
  * Delete a glTF model
- * @param model the gltf model to delete
+ * @param model the gltf model to delete @nullable
  */
 void lv_gltf_model_delete(lv_gltf_model_t * model);
 

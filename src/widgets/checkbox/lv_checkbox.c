@@ -15,6 +15,7 @@
 #include "../../core/lv_obj_class_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -82,6 +83,8 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * parent)
 
 void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     if(NULL != txt) {
@@ -114,6 +117,9 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 
 void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(txt != NULL, return);
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     if(!cb->static_txt) lv_free(cb->txt);
@@ -131,6 +137,8 @@ void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 
 const char * lv_checkbox_get_text(const lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
     return cb->txt;
 }
@@ -143,6 +151,7 @@ static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
+    LV_ASSERT(obj != NULL);
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
@@ -166,6 +175,7 @@ static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
+    LV_ASSERT(obj != NULL);
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
     if(!cb->static_txt) {
@@ -178,6 +188,7 @@ static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(e != NULL);
 
     lv_result_t res;
     /*Call the ancestor's event handler*/
@@ -191,12 +202,12 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_point_t * p = lv_event_get_param(e);
         lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+        const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
         int32_t font_h = lv_font_get_line_height(font);
         lv_text_attributes_t attributes = {0};
 
-        attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+        attributes.line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
+        attributes.letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_MAIN);
         attributes.max_width = LV_COORD_MAX;
         attributes.text_flags = LV_TEXT_FLAG_NONE;
 
@@ -204,11 +215,11 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_text_get_size_attributes(&txt_size, cb->txt, font, &attributes);
 
-        int32_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
-        int32_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-        int32_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-        int32_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-        int32_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+        int32_t bg_colp = lv_obj_get_style_pad_column_internal(obj, LV_PART_MAIN);
+        int32_t marker_leftp = lv_obj_get_style_pad_left_internal(obj, LV_PART_INDICATOR);
+        int32_t marker_rightp = lv_obj_get_style_pad_right_internal(obj, LV_PART_INDICATOR);
+        int32_t marker_topp = lv_obj_get_style_pad_top_internal(obj, LV_PART_INDICATOR);
+        int32_t marker_bottomp = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_INDICATOR);
         lv_point_t marker_size;
         marker_size.x = font_h + marker_leftp + marker_rightp;
         marker_size.y = font_h + marker_topp + marker_bottomp;
@@ -228,28 +239,30 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void lv_checkbox_draw(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_current_target(e);
+    LV_ASSERT(obj != NULL);
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
     lv_layer_t * layer = lv_event_get_layer(e);
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
     int32_t font_h = lv_font_get_line_height(font);
 
-    const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN);
 
-    int32_t bg_border = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    int32_t bg_topp = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + bg_border;
-    int32_t bg_p = is_rtl ? lv_obj_get_style_pad_right(obj, LV_PART_MAIN) : lv_obj_get_style_pad_left(obj,
-                                                                                                      LV_PART_MAIN) + bg_border;
-    int32_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+    int32_t bg_border = lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN);
+    int32_t bg_topp = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN) + bg_border;
+    int32_t bg_p = is_rtl ? lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN) : lv_obj_get_style_pad_left_internal(obj,
+                                                                                                                        LV_PART_MAIN) + bg_border;
+    int32_t bg_colp = lv_obj_get_style_pad_column_internal(obj, LV_PART_MAIN);
 
-    int32_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-    int32_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-    int32_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-    int32_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+    int32_t marker_leftp = lv_obj_get_style_pad_left_internal(obj, LV_PART_INDICATOR);
+    int32_t marker_rightp = lv_obj_get_style_pad_right_internal(obj, LV_PART_INDICATOR);
+    int32_t marker_topp = lv_obj_get_style_pad_top_internal(obj, LV_PART_INDICATOR);
+    int32_t marker_bottomp = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_INDICATOR);
 
-    int32_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_INDICATOR);
-    int32_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_INDICATOR);
+    int32_t transf_w = lv_obj_get_style_transform_width_internal(obj, LV_PART_INDICATOR);
+    int32_t transf_h = lv_obj_get_style_transform_height_internal(obj, LV_PART_INDICATOR);
 
     lv_draw_rect_dsc_t indic_dsc;
     lv_draw_rect_dsc_init(&indic_dsc);
@@ -274,8 +287,8 @@ static void lv_checkbox_draw(lv_event_t * e)
     lv_draw_rect(layer, &indic_dsc, &marker_area_transf);
 
     lv_text_attributes_t attributes = {0};
-    attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+    attributes.line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
+    attributes.letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_MAIN);
     attributes.text_flags = LV_TEXT_FLAG_NONE;
     attributes.max_width = LV_COORD_MAX;
 

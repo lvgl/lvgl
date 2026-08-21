@@ -94,16 +94,19 @@ lv_display_t * lv_st7796_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_
 
 void lv_st7796_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_set_gap(disp, x, y);
 }
 
 void lv_st7796_set_invert(lv_display_t * disp, bool invert)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_set_invert(disp, invert);
 }
 
 void lv_st7796_set_gamma_curve(lv_display_t * disp, uint8_t gamma)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     /* NOTE: the generic method is not supported on ST7796, TODO: implement gamma tables */
     LV_UNUSED(disp);
     LV_UNUSED(gamma);
@@ -111,6 +114,8 @@ void lv_st7796_set_gamma_curve(lv_display_t * disp, uint8_t gamma)
 
 void lv_st7796_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(cmd_list != NULL, return);
     lv_lcd_generic_mipi_send_cmd_list(disp, cmd_list);
 }
 

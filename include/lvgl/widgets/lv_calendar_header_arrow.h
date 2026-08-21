@@ -31,7 +31,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_header_arrow_cl
 
 /**
  * Create a calendar header with drop-drowns to select the year and month
- * @param parent    pointer to a calendar object.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
  * @return          the created header
  */
 lv_obj_t * lv_calendar_add_header_arrow(lv_obj_t * parent);

@@ -41,7 +41,7 @@ typedef lv_obj_tree_walk_res_t (*lv_obj_tree_walk_cb_t)(lv_obj_t *, void *);
  * Delete an object and all of its children.
  * Also remove the objects from their group and remove all animations (if any).
  * Send `LV_EVENT_DELETE` to deleted objects.
- * @param obj       pointer to an object
+ * @param obj       pointer to an object @nullable
  */
 void lv_obj_delete(lv_obj_t * obj);
 
@@ -55,7 +55,7 @@ void lv_obj_clean(lv_obj_t * obj);
 
 /**
  * Delete an object after some delay
- * @param obj       pointer to an object
+ * @param obj       pointer to an object @nullable
  * @param delay_ms  time to wait before delete in milliseconds
  */
 void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms);
@@ -69,7 +69,7 @@ void lv_obj_delete_anim_completed_cb(lv_anim_t * a);
 /**
  * Helper function for asynchronously deleting objects.
  * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).
- * @param obj       object to delete
+ * @param obj       object to delete @nullable
  * @see lv_async_call
  */
 void lv_obj_delete_async(lv_obj_t * obj);
@@ -199,8 +199,8 @@ uint32_t lv_obj_get_child_count_by_type(const lv_obj_t * obj, const lv_obj_class
  * Set a name for a widget. The name will be allocated and freed when the
  * widget is deleted or a new name is set.
  * @param obj       pointer to an object
- * @param name      the name to set. If set to `NULL` the default "<widget_type>_#"
- *                  name will be used.
+ * @param name      the name to set. @nullable When NULL the default "<widget_type>_#"
+ *                  name is used.
  * @note If the name ends with a `#`, older siblings with the same name
  * will be counted, and the `#` will be replaced by the index of the
  * given widget. For example, creating multiple widgets with the name
@@ -256,7 +256,8 @@ void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size)
  * If the name of a widget was not set a name like "lv_button_1" will
  * be created for it using `lv_obj_get_name_resolved`.
  *
- * @param parent        the widget where the search should start
+ * @param parent        the widget where the search should start. @nullable When NULL the
+ *                      active screen is used.
  * @param name          the name of the widget
  * @return              the found widget or NULL if not found.
  */
@@ -300,7 +301,8 @@ int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * cl
 
 /**
  * Iterate through all children of any object.
- * @param start_obj     start integrating from this object
+ * @param start_obj     start integrating from this object. @nullable When NULL every
+ *                      screen of every display is walked.
  * @param cb            call this callback on the objects
  * @param user_data     pointer to any user related data (will be passed to `cb`)
  */
@@ -308,7 +310,8 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * use
 
 /**
  * Iterate through all children of any object and print their ID.
- * @param start_obj     start integrating from this object
+ * @param start_obj     start integrating from this object. @nullable When NULL every
+ *                      screen of every display is dumped.
  */
 void lv_obj_dump_tree(lv_obj_t * start_obj);
 

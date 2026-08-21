@@ -107,6 +107,8 @@ static const struct libinput_interface interface = {
 
 lv_libinput_capability lv_libinput_query_capability(struct libinput_device * device)
 {
+    LV_CHECK_ARG(device != NULL, return LV_LIBINPUT_CAPABILITY_NONE);
+
     lv_libinput_capability capability = LV_LIBINPUT_CAPABILITY_NONE;
     if(libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_KEYBOARD)
        && (libinput_device_keyboard_has_key(device, KEY_ENTER) || libinput_device_keyboard_has_key(device, KEY_KPENTER))) {
@@ -130,6 +132,8 @@ char * lv_libinput_find_dev(lv_libinput_capability capabilities, bool force_resc
 
 size_t lv_libinput_find_devs(lv_libinput_capability capabilities, char ** found, size_t count, bool force_rescan)
 {
+    LV_CHECK_ARG(found != NULL, return 0);
+
     if((!devices || force_rescan) && !_rescan_devices()) {
         return 0;
     }
@@ -148,6 +152,8 @@ size_t lv_libinput_find_devs(lv_libinput_capability capabilities, char ** found,
 
 lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_path)
 {
+    LV_CHECK_ARG(dev_path != NULL, return NULL);
+
     lv_libinput_t * dsc = lv_malloc_zeroed(sizeof(lv_libinput_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
@@ -202,6 +208,8 @@ lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_pat
 
 void lv_libinput_delete(lv_indev_t * indev)
 {
+    if(indev == NULL) return;
+
     _delete(lv_indev_get_driver_data(indev));
     lv_indev_delete(indev);
 }
@@ -398,7 +406,7 @@ lv_libinput_event_t * _create_event(lv_libinput_t * dsc)
 static void _read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_libinput_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT(dsc != NULL);
 
     pthread_mutex_lock(&dsc->event_lock);
 

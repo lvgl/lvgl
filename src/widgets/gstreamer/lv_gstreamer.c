@@ -104,12 +104,7 @@ lv_obj_t * lv_gstreamer_create(lv_obj_t * parent)
 lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, const char * property, const char * source)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_ASSERT_NULL(factory_name);
-
-    if(!obj || !factory_name) {
-        LV_LOG_WARN("Refusing to set source with invalid params. Obj: %p Factory Name: %s", (void *)obj, factory_name);
-        return LV_RESULT_INVALID;
-    }
+    LV_CHECK_ARG(factory_name != NULL, return LV_RESULT_INVALID);
 
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
@@ -397,10 +392,8 @@ void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
 
 lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e)
 {
-    if(!e || e->code != LV_EVENT_STATE_CHANGED) {
-        LV_LOG_WARN("Invalid event");
-        return -1;
-    }
+    LV_CHECK_ARG(e != NULL, return -1);
+    LV_CHECK_ARG(e->code == LV_EVENT_STATE_CHANGED, return -1);
     return *(lv_gstreamer_stream_state_t *)lv_event_get_param(e);
 }
 
@@ -410,16 +403,17 @@ lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e)
 
 static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
     lv_memzero(&streamer->frame, sizeof(streamer->frame));
 
     streamer->gstreamer_timer = lv_timer_create(gstreamer_timer_cb, LV_DEF_REFR_PERIOD / 5, streamer);
-    LV_ASSERT_NULL(streamer->gstreamer_timer);
+    LV_ASSERT(streamer->gstreamer_timer != NULL);
 
     streamer->frame_queue = g_async_queue_new();
-    LV_ASSERT_NULL(streamer->frame_queue);
+    LV_ASSERT(streamer->frame_queue != NULL);
     streamer->last_sample = NULL;
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -427,6 +421,7 @@ static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
 static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
 {
+    LV_ASSERT(streamer != NULL);
     GstBus * bus = gst_element_get_bus(streamer->pipeline);
     GstMessage * msg;
 
@@ -480,6 +475,7 @@ static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
 
 static void gstreamer_update_frame(lv_gstreamer_t * streamer)
 {
+    LV_ASSERT(streamer != NULL);
     GstSample * sample = g_async_queue_try_pop(streamer->frame_queue);
 
     if(!sample) {
@@ -540,6 +536,7 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
 }
 static void gstreamer_timer_cb(lv_timer_t * timer)
 {
+    LV_ASSERT(timer != NULL);
     lv_gstreamer_t * streamer = lv_timer_get_user_data(timer);
 
     if(!streamer->pipeline) {
@@ -554,6 +551,7 @@ static void gstreamer_timer_cb(lv_timer_t * timer)
 
 static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
@@ -601,8 +599,8 @@ static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
 
 static bool gstreamer_element_has_property(GstElement * element, const char * property_name)
 {
-    LV_ASSERT_NULL(element);
-    LV_ASSERT_NULL(property_name);
+    LV_ASSERT(element != NULL);
+    LV_ASSERT(property_name != NULL);
 
     GObjectClass * klass = G_OBJECT_GET_CLASS(element);
     return g_object_class_find_property(klass, property_name) != NULL;
@@ -610,9 +608,9 @@ static bool gstreamer_element_has_property(GstElement * element, const char * pr
 
 static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value)
 {
-    LV_ASSERT_NULL(element);
-    LV_ASSERT_NULL(property_name);
-    LV_ASSERT_NULL(value);
+    LV_ASSERT(element != NULL);
+    LV_ASSERT(property_name != NULL);
+    LV_ASSERT(value != NULL);
 
     if(!GST_IS_CHILD_PROXY(element)) {
         LV_LOG_WARN("Element does not support child proxy for property '%s'", property_name);
@@ -640,6 +638,8 @@ static bool gstreamer_set_child_proxy_string(GstElement * element, const char * 
 
 static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer user_data)
 {
+    LV_ASSERT(element != NULL);
+    LV_ASSERT(pad != NULL);
     LV_UNUSED(element);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
     GstCaps * caps = gst_pad_query_caps(pad, NULL);
@@ -737,6 +737,7 @@ exit:
 
 static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
 {
+    LV_ASSERT(sink != NULL);
     /* This function is called from a thread other than the main one so we can't call anything related to LVGL here
      * Instead, we acquire the new sample (the new frame) and push it to the queue so that we can retrieve it from an LVGL timer
      * Note that the pipeline spits out a new frame every LV_DEF_REFR_PERIOD as per the way it's set up so we shouldn't ever lose any
@@ -755,6 +756,7 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
 
 static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state)
 {
+    LV_ASSERT(streamer != NULL);
     return lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_STATE_CHANGED, &state);
 }
 #endif

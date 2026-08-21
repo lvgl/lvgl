@@ -44,7 +44,8 @@ void lv_theme_copy(lv_theme_t * dst, const lv_theme_t * src);
 
 /**
  * Get the theme assigned to the display of the object
- * @param obj       pointer to a theme object
+ * @param obj       pointer to a widget @nullable. When NULL the default display's
+ *                  theme is returned.
  * @return          the theme of the object's display (can be NULL)
  */
 lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj);
@@ -60,7 +61,8 @@ void lv_theme_apply(lv_obj_t * obj);
  * The styles from the base them will be added before the styles of the current theme.
  * Arbitrary long chain of themes can be created by setting base themes.
  * @param theme pointer to theme which base should be set
- * @param parent pointer to the base theme
+ * @param parent pointer to the base theme @nullable.
+ *        When NULL the theme doesn't inherit any properties
  */
 void lv_theme_set_parent(lv_theme_t * theme, lv_theme_t * parent);
 
@@ -74,34 +76,34 @@ void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb);
 
 /**
  * Get the small font of the theme
- * @param obj pointer to an object
+ * @param obj pointer to a widget @nullable. When NULL the default display's theme is used.
  * @return pointer to the font
  */
 const lv_font_t * lv_theme_get_font_small(lv_obj_t * obj);
 /**
  * Get the normal font of the theme
- * @param obj pointer to an object
+ * @param obj pointer to a widget @nullable. When NULL the default display's theme is used.
  * @return pointer to the font
  */
 const lv_font_t * lv_theme_get_font_normal(lv_obj_t * obj);
 
 /**
  * Get the subtitle font of the theme
- * @param obj pointer to an object
+ * @param obj pointer to a widget @nullable. When NULL the default display's theme is used.
  * @return pointer to the font
  */
 const lv_font_t * lv_theme_get_font_large(lv_obj_t * obj);
 
 /**
  * Get the primary color of the theme
- * @param obj pointer to an object
+ * @param obj pointer to a widget @nullable. When NULL the default display's theme is used.
  * @return the color
  */
 lv_color_t lv_theme_get_color_primary(lv_obj_t * obj);
 
 /**
  * Get the secondary color of the theme
- * @param obj pointer to an object
+ * @param obj pointer to a widget @nullable. When NULL the default display's theme is used.
  * @return the color
  */
 lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
@@ -109,7 +111,7 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
 
 /**
  * Delete a theme
- * @param   theme the theme to destroy
+ * @param   theme the theme to destroy @nullable
  */
 void lv_theme_delete(lv_theme_t * theme);
 
@@ -122,11 +124,11 @@ void lv_theme_delete(lv_theme_t * theme);
  * the associated resources.
  *
  * @param theme      Pointer to theme which callback should be set
- * @param data       User-defined data pointer to associate with the theme
+ * @param user_data  User-defined data pointer to associate with the theme
  * @param free_cb    Callback function for cleaning up ext_data when theme is deleted.
- *                   Receives ext_data as parameter. NULL means no cleanup required.
+ *                   Receives user_data as parameter. @nullable. NULL means no cleanup required.
  */
-void lv_theme_set_external_data(lv_theme_t * theme, void * data, void (* free_cb)(void * data));
+void lv_theme_set_external_data(lv_theme_t * theme, void * user_data, void (* free_cb)(void * data));
 #endif
 
 /**********************
