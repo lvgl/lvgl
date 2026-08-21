@@ -730,7 +730,7 @@ lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void *
  *
  * Removes a delete descriptor previously created via @ref lv_obj_add_delete_cb
  *
- * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op
+ * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op @nullable
  */
 void lv_obj_remove_delete_cb(lv_delete_dsc_t * dsc);
 

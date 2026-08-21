@@ -98,7 +98,7 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
 
 /**
  * Delete a lv_timer
- * @param timer pointer to an lv_timer
+ * @param timer pointer to an lv_timer @nullable
  */
 void lv_timer_delete(lv_timer_t * timer);
 

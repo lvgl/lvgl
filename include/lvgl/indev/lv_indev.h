@@ -92,7 +92,7 @@ lv_indev_t * lv_indev_create(void);
 
 /**
  * Remove the provided input device. Make sure not to use the provided input device afterwards anymore.
- * @param indev pointer to delete
+ * @param indev pointer to delete @nullable
  */
 void lv_indev_delete(lv_indev_t * indev);
 

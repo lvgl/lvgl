@@ -49,7 +49,7 @@ void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc);
 
 /**
  * @brief Delete an SVG DOM subtree
- * @param node pointer to an SVG DOM subtree
+ * @param node pointer to an SVG DOM subtree @nullable
  */
 void lv_svg_node_delete(lv_svg_node_t * node);
 

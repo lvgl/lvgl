@@ -140,7 +140,7 @@ lv_image_decoder_t * lv_image_decoder_create(void);
 
 /**
  * Delete an image decoder
- * @param decoder pointer to an image decoder
+ * @param decoder pointer to an image decoder @nullable
  */
 void lv_image_decoder_delete(lv_image_decoder_t * decoder);
 

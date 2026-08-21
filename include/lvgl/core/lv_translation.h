@@ -19,6 +19,7 @@ extern "C" {
 
 #include LV_STDINT_INCLUDE
 #include "../lv_types.h"
+#include "../debugging/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -94,6 +95,7 @@ const char * lv_translation_get(const char * tag);
  */
 static inline const char * lv_tr(const char * tag)
 {
+    LV_CHECK_ARG(tag != NULL, return NULL);
     return lv_translation_get(tag);
 }
 

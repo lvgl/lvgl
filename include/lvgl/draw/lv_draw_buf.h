@@ -17,6 +17,7 @@ extern "C" {
 #include "../core/lv_area.h"
 #include "lv_color.h"
 #include "../stdlib/lv_string.h"
+#include "../debugging/lv_check_arg.h"
 #include "lv_image_dsc.h"
 
 /*********************
@@ -275,7 +276,7 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
  * Destroy a draw buf by freeing the actual buffer if it's marked as LV_IMAGE_FLAGS_ALLOCATED in header.
  * Then free the lv_draw_buf_t struct.
  *
- * @param draw_buf  the draw buffer to destroy
+ * @param draw_buf  the draw buffer to destroy @nullable
  */
 void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf);
 
@@ -323,6 +324,7 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
  */
 static inline bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
 {
+    LV_CHECK_ARG(draw_buf != NULL, return false);
     return draw_buf->header.flags & flag;
 }
 
@@ -333,6 +335,7 @@ static inline bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image
  */
 static inline void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
 {
+    LV_CHECK_ARG(draw_buf != NULL, return);
     draw_buf->header.flags |= flag;
 }
 
@@ -343,6 +346,7 @@ static inline void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags
  */
 static inline void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
 {
+    LV_CHECK_ARG(draw_buf != NULL, return);
     draw_buf->header.flags &= ~flag;
 }
 
