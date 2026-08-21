@@ -14,7 +14,7 @@
 #include "../../core/lv_obj_class_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -1052,8 +1052,8 @@ static void update_map(lv_obj_t * obj)
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN);
 
     /*Set size and positions of the buttons*/
-    int32_t sleft = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
-    int32_t stop = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
+    int32_t sleft = lv_obj_get_style_space_left_internal(obj, LV_PART_MAIN);
+    int32_t stop = lv_obj_get_style_space_top_internal(obj, LV_PART_MAIN);
     int32_t prow = lv_obj_get_style_pad_row_internal(obj, LV_PART_MAIN);
     int32_t pcol = lv_obj_get_style_pad_column_internal(obj, LV_PART_MAIN);
 

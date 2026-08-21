@@ -16,7 +16,7 @@
 #include "../display/lv_display_private.h"
 #include "lv_refr_private.h"
 #include "../core/lv_global.h"
-#include "lv_obj_style_internal_gen.h"
+#include "lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -268,8 +268,8 @@ void lv_obj_set_content_width(lv_obj_t * obj, int32_t w)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    int32_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
-    int32_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
+    int32_t left = lv_obj_get_style_space_left_internal(obj, LV_PART_MAIN);
+    int32_t right = lv_obj_get_style_space_right_internal(obj, LV_PART_MAIN);
     lv_obj_set_width(obj, w + left + right);
 }
 
@@ -277,8 +277,8 @@ void lv_obj_set_content_height(lv_obj_t * obj, int32_t h)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    int32_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    int32_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    int32_t top = lv_obj_get_style_space_top_internal(obj, LV_PART_MAIN);
+    int32_t bottom = lv_obj_get_style_space_bottom_internal(obj, LV_PART_MAIN);
     lv_obj_set_height(obj, h + top + bottom);
 }
 
@@ -381,11 +381,11 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, in
         return;
     }
 
-    int32_t pleft = lv_obj_get_style_space_left(parent, LV_PART_MAIN);
-    int32_t ptop = lv_obj_get_style_space_top(parent, LV_PART_MAIN);
+    int32_t pleft = lv_obj_get_style_space_left_internal(parent, LV_PART_MAIN);
+    int32_t ptop = lv_obj_get_style_space_top_internal(parent, LV_PART_MAIN);
 
-    int32_t bleft = lv_obj_get_style_space_left(base, LV_PART_MAIN);
-    int32_t btop = lv_obj_get_style_space_top(base, LV_PART_MAIN);
+    int32_t bleft = lv_obj_get_style_space_left_internal(base, LV_PART_MAIN);
+    int32_t btop = lv_obj_get_style_space_top_internal(base, LV_PART_MAIN);
 
     if(align == LV_ALIGN_DEFAULT) {
         if(lv_obj_get_style_base_dir_internal(base, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_ALIGN_TOP_RIGHT;
@@ -532,7 +532,7 @@ int32_t lv_obj_get_x(const lv_obj_t * obj)
     if(parent) {
         rel_x  = obj->coords.x1 - parent->coords.x1;
         rel_x += lv_obj_get_scroll_x(parent);
-        rel_x -= lv_obj_get_style_space_left(parent, LV_PART_MAIN);
+        rel_x -= lv_obj_get_style_space_left_internal(parent, LV_PART_MAIN);
     }
     else {
         rel_x = obj->coords.x1;
@@ -556,7 +556,7 @@ int32_t lv_obj_get_y(const lv_obj_t * obj)
     if(parent) {
         rel_y = obj->coords.y1 - parent->coords.y1;
         rel_y += lv_obj_get_scroll_y(parent);
-        rel_y -= lv_obj_get_style_space_top(parent, LV_PART_MAIN);
+        rel_y -= lv_obj_get_style_space_top_internal(parent, LV_PART_MAIN);
     }
     else {
         rel_y = obj->coords.y1;
@@ -603,8 +603,8 @@ int32_t lv_obj_get_content_width(const lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
-    int32_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
-    int32_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
+    int32_t left = lv_obj_get_style_space_left_internal(obj, LV_PART_MAIN);
+    int32_t right = lv_obj_get_style_space_right_internal(obj, LV_PART_MAIN);
 
     return lv_obj_get_width(obj) - left - right;
 }
@@ -613,8 +613,8 @@ int32_t lv_obj_get_content_height(const lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
-    int32_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    int32_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    int32_t top = lv_obj_get_style_space_top_internal(obj, LV_PART_MAIN);
+    int32_t bottom = lv_obj_get_style_space_bottom_internal(obj, LV_PART_MAIN);
 
     return lv_obj_get_height(obj) - top - bottom;
 }
@@ -625,10 +625,10 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_obj_get_coords(obj, area);
-    area->x1 += lv_obj_get_style_space_left(obj, LV_PART_MAIN);
-    area->x2 -= lv_obj_get_style_space_right(obj, LV_PART_MAIN);
-    area->y1 += lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    area->y2 -= lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    area->x1 += lv_obj_get_style_space_left_internal(obj, LV_PART_MAIN);
+    area->x2 -= lv_obj_get_style_space_right_internal(obj, LV_PART_MAIN);
+    area->y1 += lv_obj_get_style_space_top_internal(obj, LV_PART_MAIN);
+    area->y2 -= lv_obj_get_style_space_bottom_internal(obj, LV_PART_MAIN);
 
 }
 
@@ -895,8 +895,8 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
             y += parent->coords.y1 - lv_obj_get_scroll_y(parent);
         }
 
-        x += lv_obj_get_style_space_left(parent, LV_PART_MAIN);
-        y += lv_obj_get_style_space_top(parent, LV_PART_MAIN);
+        x += lv_obj_get_style_space_left_internal(parent, LV_PART_MAIN);
+        y += lv_obj_get_style_space_top_internal(parent, LV_PART_MAIN);
     }
 
     /*Calculate and set the movement*/
@@ -1362,8 +1362,8 @@ static int32_t calc_content_width(lv_obj_t * obj)
     int32_t scroll_x_tmp = lv_obj_get_scroll_x(obj);
     if(obj->spec_attr) obj->spec_attr->scroll.x = 0;
 
-    int32_t space_right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
-    int32_t space_left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    int32_t space_right = lv_obj_get_style_space_right_internal(obj, LV_PART_MAIN);
+    int32_t space_left = lv_obj_get_style_space_left_internal(obj, LV_PART_MAIN);
 
     int32_t self_w;
     self_w = lv_obj_get_self_width(obj) + space_left + space_right;
@@ -1472,8 +1472,8 @@ static int32_t calc_content_height(lv_obj_t * obj)
     int32_t scroll_y_tmp = lv_obj_get_scroll_y(obj);
     if(obj->spec_attr) obj->spec_attr->scroll.y = 0;
 
-    int32_t space_top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    int32_t space_bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    int32_t space_top = lv_obj_get_style_space_top_internal(obj, LV_PART_MAIN);
+    int32_t space_bottom = lv_obj_get_style_space_bottom_internal(obj, LV_PART_MAIN);
 
     int32_t self_h;
     self_h = lv_obj_get_self_height(obj) + space_top + space_bottom;
@@ -1587,8 +1587,8 @@ static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
 
     int32_t angle = lv_obj_get_style_transform_rotation_internal(obj, LV_PART_MAIN);
-    int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, LV_PART_MAIN);
-    int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, LV_PART_MAIN);
+    int32_t scale_x = lv_obj_get_style_transform_scale_x_safe_internal(obj, LV_PART_MAIN);
+    int32_t scale_y = lv_obj_get_style_transform_scale_y_safe_internal(obj, LV_PART_MAIN);
     if(scale_x == 0) scale_x = 1;
     if(scale_y == 0) scale_y = 1;
 

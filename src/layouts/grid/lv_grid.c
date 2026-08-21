@@ -13,7 +13,7 @@
 
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_global.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -203,8 +203,8 @@ static void grid_update(lv_obj_t * cont, void * user_data)
 
     /*Calculate the grids absolute x and y coordinates.
      *It will be used as helper during item repositioning to avoid calculating this value for every children*/
-    int32_t pad_left = lv_obj_get_style_space_left(cont, LV_PART_MAIN);
-    int32_t pad_top = lv_obj_get_style_space_top(cont, LV_PART_MAIN);
+    int32_t pad_left = lv_obj_get_style_space_left_internal(cont, LV_PART_MAIN);
+    int32_t pad_top = lv_obj_get_style_space_top_internal(cont, LV_PART_MAIN);
     hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_x(cont);
     hint.grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_y(cont);
 

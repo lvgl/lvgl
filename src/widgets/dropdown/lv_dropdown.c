@@ -626,7 +626,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         }
     }
 
-    lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, dropdown->options);
+    lv_text_align_t align = lv_obj_calculate_style_text_align_internal(label, LV_PART_MAIN, dropdown->options);
 
     switch(align) {
         default:
