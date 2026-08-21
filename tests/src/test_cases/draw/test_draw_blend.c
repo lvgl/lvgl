@@ -5,6 +5,26 @@
 
 #include "unity/unity.h"
 
+static uint16_t make_rgb565(uint8_t red, uint8_t green, uint8_t blue)
+{
+    return (uint16_t)(((red & 0xf8U) << 8) | ((green & 0xfcU) << 3) | (blue >> 3));
+}
+
+static uint16_t add_argb8888_to_rgb565(uint16_t dst, lv_color32_t src)
+{
+    if(src.alpha == 0) return dst;
+
+    uint16_t red = (uint16_t)((dst >> 11) + (src.red >> 3));
+    uint16_t green = (uint16_t)(((dst >> 5) & 0x3fU) + (src.green >> 2));
+    uint16_t blue = (uint16_t)((dst & 0x1fU) + (src.blue >> 3));
+    if(red > 31) red = 31;
+    if(green > 63) green = 63;
+    if(blue > 31) blue = 31;
+
+    uint16_t res = (uint16_t)((red << 11) | (green << 5) | blue);
+    return lv_color_16_16_mix(res, dst, src.alpha);
+}
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -165,6 +185,98 @@ void test_rgb888(void)
 void test_rgb565(void)
 {
     canvas_draw("rgb565", LV_COLOR_FORMAT_RGB565);
+}
+
+void test_argb8888_additive_blend_to_rgb565(void)
+{
+    enum {
+        TEST_W = 4,
+        TEST_H = 2,
+        TEST_STRIDE_PX = 6,
+    };
+
+    uint16_t dest[TEST_H][TEST_STRIDE_PX] = {
+        {
+            make_rgb565(0x10, 0x20, 0x30),
+            make_rgb565(0x21, 0x32, 0x43),
+            make_rgb565(0x40, 0x50, 0x60),
+            make_rgb565(0xf0, 0xe0, 0xd0),
+            0xa55a,
+            0x5aa5,
+        },
+        {
+            make_rgb565(0x01, 0x23, 0x45),
+            make_rgb565(0x67, 0x89, 0xab),
+            make_rgb565(0xcd, 0xef, 0x12),
+            make_rgb565(0x34, 0x56, 0x78),
+            0x33cc,
+            0xcc33,
+        },
+    };
+    const uint16_t original[TEST_H][TEST_STRIDE_PX] = {
+        {
+            dest[0][0],
+            dest[0][1],
+            dest[0][2],
+            dest[0][3],
+            dest[0][4],
+            dest[0][5],
+        },
+        {
+            dest[1][0],
+            dest[1][1],
+            dest[1][2],
+            dest[1][3],
+            dest[1][4],
+            dest[1][5],
+        },
+    };
+    lv_color32_t src[TEST_H][TEST_STRIDE_PX] = {
+        {
+            { .blue = 0x40, .green = 0x20, .red = 0x10, .alpha = 0x00 },
+            { .blue = 0x00, .green = 0x00, .red = 0x00, .alpha = 0xff },
+            { .blue = 0x30, .green = 0x60, .red = 0x90, .alpha = 0x80 },
+            { .blue = 0xff, .green = 0xff, .red = 0xff, .alpha = 0xff },
+            { .blue = 0x7e, .green = 0x7e, .red = 0x7e, .alpha = 0x7e },
+            { .blue = 0x7e, .green = 0x7e, .red = 0x7e, .alpha = 0x7e },
+        },
+        {
+            { .blue = 0x18, .green = 0x28, .red = 0x38, .alpha = 0xff },
+            { .blue = 0x48, .green = 0x58, .red = 0x68, .alpha = 0x40 },
+            { .blue = 0x00, .green = 0x10, .red = 0x20, .alpha = 0x00 },
+            { .blue = 0x90, .green = 0xa0, .red = 0xb0, .alpha = 0xff },
+            { .blue = 0x7e, .green = 0x7e, .red = 0x7e, .alpha = 0x7e },
+            { .blue = 0x7e, .green = 0x7e, .red = 0x7e, .alpha = 0x7e },
+        },
+    };
+
+    lv_draw_sw_blend_image_dsc_t dsc;
+    lv_memzero(&dsc, sizeof(dsc));
+    dsc.dest_buf = dest;
+    dsc.dest_w = TEST_W;
+    dsc.dest_h = TEST_H;
+    dsc.dest_stride = sizeof(dest[0]);
+    dsc.src_buf = src;
+    dsc.src_stride = sizeof(src[0]);
+    dsc.src_color_format = LV_COLOR_FORMAT_ARGB8888;
+    dsc.opa = LV_OPA_COVER;
+    dsc.blend_mode = LV_BLEND_MODE_ADDITIVE;
+
+    lv_draw_sw_blend_image_to_rgb565(&dsc);
+
+    TEST_ASSERT_EQUAL_HEX16(add_argb8888_to_rgb565(original[0][0], src[0][0]), dest[0][0]);
+    TEST_ASSERT_EQUAL_HEX16(add_argb8888_to_rgb565(original[0][1], src[0][1]), dest[0][1]);
+    TEST_ASSERT_EQUAL_HEX16(add_argb8888_to_rgb565(original[0][2], src[0][2]), dest[0][2]);
+    TEST_ASSERT_EQUAL_HEX16(add_argb8888_to_rgb565(original[0][3], src[0][3]), dest[0][3]);
+    TEST_ASSERT_EQUAL_HEX16(add_argb8888_to_rgb565(original[1][0], src[1][0]), dest[1][0]);
+    TEST_ASSERT_EQUAL_HEX16(add_argb8888_to_rgb565(original[1][1], src[1][1]), dest[1][1]);
+    TEST_ASSERT_EQUAL_HEX16(add_argb8888_to_rgb565(original[1][2], src[1][2]), dest[1][2]);
+    TEST_ASSERT_EQUAL_HEX16(add_argb8888_to_rgb565(original[1][3], src[1][3]), dest[1][3]);
+
+    TEST_ASSERT_EQUAL_HEX16(original[0][4], dest[0][4]);
+    TEST_ASSERT_EQUAL_HEX16(original[0][5], dest[0][5]);
+    TEST_ASSERT_EQUAL_HEX16(original[1][4], dest[1][4]);
+    TEST_ASSERT_EQUAL_HEX16(original[1][5], dest[1][5]);
 }
 
 #endif
