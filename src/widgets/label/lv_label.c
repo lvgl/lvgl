@@ -315,7 +315,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
     lv_label_t * label = (lv_label_t *)obj;
     const char * txt = lv_label_get_text(obj);
-    const lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, txt);
+    const lv_text_align_t align = lv_obj_calculate_style_text_align_internal(obj, LV_PART_MAIN, txt);
 
     if(txt[0] == '\0') {
         pos->y = 0;
@@ -501,7 +501,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
 
     /*Calculate the x coordinate*/
     int32_t x = 0;
-    const lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, label->text);
+    const lv_text_align_t align = lv_obj_calculate_style_text_align_internal(obj, LV_PART_MAIN, label->text);
     uint32_t length = new_line_start - line_start;
     calculate_x_coordinate(&x, align, bidi_txt, length, font, &txt_coords, &attributes);
 
@@ -598,7 +598,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     }
 
     /*Calculate the x coordinate*/
-    const lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, label->text);
+    const lv_text_align_t align = lv_obj_calculate_style_text_align_internal(obj, LV_PART_MAIN, label->text);
 
     int32_t x = 0;
     if(align == LV_TEXT_ALIGN_CENTER) {

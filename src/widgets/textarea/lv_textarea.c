@@ -1105,7 +1105,8 @@ static void refr_cursor_area(lv_obj_t * obj)
     lv_point_t letter_pos;
     lv_label_get_letter_pos(ta->label, cur_pos, &letter_pos);
 
-    lv_text_align_t align = lv_obj_calculate_style_text_align(ta->label, LV_PART_MAIN, lv_label_get_text(ta->label));
+    lv_text_align_t align = lv_obj_calculate_style_text_align_internal(ta->label, LV_PART_MAIN,
+                                                                       lv_label_get_text(ta->label));
 
     /*If the cursor is out of the text (most right) draw it to the next line*/
     if(((letter_pos.x + ta->label->coords.x1) + letter_w > ta->label->coords.x2) &&
