@@ -17,6 +17,7 @@
 #include "../../misc/lv_area_private.h"
 #include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 #if LV_USE_FLOAT
     #include <math.h>
@@ -431,10 +432,10 @@ static void arclabel_draw_main(lv_event_t * e)
 
     lv_layer_t * layer = lv_event_get_layer(e);
 
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    const lv_color_t color = lv_obj_get_style_text_color(obj, LV_PART_MAIN);
-    const lv_opa_t opa = LV_OPA_MIX2(layer->opa, lv_obj_get_style_text_opa(obj, LV_PART_MAIN));
-    const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+    const lv_color_t color = lv_obj_get_style_text_color_internal(obj, LV_PART_MAIN);
+    const lv_opa_t opa = LV_OPA_MIX2(layer->opa, lv_obj_get_style_text_opa_internal(obj, LV_PART_MAIN));
+    const int32_t letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_MAIN);
 
     int32_t arc_r = 0;
     bool need_ellipsis = false;
@@ -569,8 +570,8 @@ static lv_value_precise_t arclabel_calc_arc_text_total_angle(lv_obj_t * obj, int
     lv_area_t coords;
     lv_obj_get_content_coords(obj, &coords);
 
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+    const int32_t letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_MAIN);
 
     const int32_t line_height = font->line_height;
     const int32_t base_line = font->base_line;

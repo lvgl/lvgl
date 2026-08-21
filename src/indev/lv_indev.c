@@ -18,6 +18,7 @@
 #include "../core/lv_obj_private.h"
 
 #include "../misc/lv_timer_private.h"
+#include "../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -1587,7 +1588,7 @@ static void indev_proc_release(lv_indev_t * indev)
             lv_point_t pivot = { 0, 0 };
             lv_obj_t * parent = scroll_obj;
             while(parent) {
-                angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
+                angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
                 int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
                 int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
                 scale_x = (scale_x * zoom_act_x) >> 8;
@@ -1670,7 +1671,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
 
     if(editable) {
         uint32_t indev_sensitivity = indev->rotary_sensitivity;
-        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(indev_obj_act, LV_PART_MAIN);
+        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity_internal(indev_obj_act, LV_PART_MAIN);
         int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
         send_event(LV_EVENT_ROTARY, &diff);
     }
@@ -1682,7 +1683,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
         lv_obj_t * scroll_obj = lv_indev_find_scroll_obj(indev);
         if(scroll_obj == NULL) return;
         uint32_t indev_sensitivity = indev->rotary_sensitivity;
-        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(scroll_obj, LV_PART_MAIN);
+        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity_internal(scroll_obj, LV_PART_MAIN);
         int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
 
         indev->pointer.scroll_throw_vect.y = diff;

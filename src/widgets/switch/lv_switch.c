@@ -13,6 +13,7 @@
 #if LV_USE_SWITCH
 
 #include "../../misc/lv_anim_private.h"
+#include "../../core/lv_obj_style_internal_gen.h"
 
 /*********************
  *      DEFINES
@@ -157,10 +158,10 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        int32_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
-        int32_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
-        int32_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
-        int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+        int32_t knob_left = lv_obj_get_style_pad_left_internal(obj,   LV_PART_KNOB);
+        int32_t knob_right = lv_obj_get_style_pad_right_internal(obj,  LV_PART_KNOB);
+        int32_t knob_top = lv_obj_get_style_pad_top_internal(obj,    LV_PART_KNOB);
+        int32_t knob_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
         int32_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
@@ -238,7 +239,7 @@ static void draw_main(lv_event_t * e)
             anim_value_x = chk ? anim_length : 0;
         }
 
-        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
+        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN)) {
             anim_value_x = anim_length - anim_value_x;
         }
         knob_area.x1 += anim_value_x;
@@ -258,7 +259,7 @@ static void draw_main(lv_event_t * e)
             anim_value_y = chk ? anim_length : 0;
         }
 
-        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
+        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN)) {
             anim_value_y = anim_length - anim_value_y;
         }
 
@@ -266,10 +267,10 @@ static void draw_main(lv_event_t * e)
         knob_area.y1 = knob_area.y2 - (knob_size > 0 ? knob_size - 1 : 0);
     }
 
-    int32_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
-    int32_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
-    int32_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
-    int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+    int32_t knob_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_KNOB);
+    int32_t knob_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_KNOB);
+    int32_t knob_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_KNOB);
+    int32_t knob_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_KNOB);
 
     /*Apply the paddings on the knob area*/
     knob_area.x1 -= knob_left;
@@ -314,7 +315,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
 
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    uint32_t anim_dur_full = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
+    uint32_t anim_dur_full = lv_obj_get_style_anim_duration_internal(obj, LV_PART_MAIN);
 
     if(anim_dur_full > 0) {
         bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
