@@ -1010,9 +1010,9 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_
     lv_obj_transform_point_array(obj, p, 4, flags);
 
     area->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
-    area->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
+    area->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x) - 1;
     area->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
-    area->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
+    area->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y) - 1;
 }
 
 typedef struct {
