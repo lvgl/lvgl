@@ -407,7 +407,7 @@ void lv_subject_deinit(lv_subject_t * subject)
     while(observer) {
         lv_observer_t * observer_next = lv_ll_get_next(&subject->subs_ll, observer);
 
-        lv_observer_remove(observer);
+        lv_observer_delete(observer);
         observer = observer_next;
     }
 
@@ -480,7 +480,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 }
 
 
-void lv_observer_remove(lv_observer_t * observer)
+void lv_observer_delete(lv_observer_t * observer)
 {
     if(observer == NULL) return;
 
@@ -525,8 +525,8 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
         if(event_dsc->cb == unsubscribe_on_delete_cb) {
             lv_observer_t * observer = event_dsc->user_data;
             if(subject == NULL || subject == observer->subject) {
-                /* lv_observer_remove handles the deletion of all possible event callbacks */
-                lv_observer_remove(observer);
+                /* lv_observer_delete handles the deletion of all possible event callbacks */
+                lv_observer_delete(observer);
             }
         }
     }
@@ -988,7 +988,7 @@ static void unsubscribe_on_delete_cb(lv_event_t * e)
 {
     LV_ASSERT(e != NULL);
     lv_observer_t * observer = lv_event_get_user_data(e);
-    lv_observer_remove(observer);
+    lv_observer_delete(observer);
 }
 
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,

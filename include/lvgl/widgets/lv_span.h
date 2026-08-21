@@ -90,7 +90,7 @@ lv_span_t * lv_spangroup_add_span(lv_obj_t * obj);
  * @param obj   pointer to a spangroup object.
  * @param span  pointer to a span. @nullable. When NULL nothing will be deleted
  * @note        Note that before calling `lv_spangroup_delete_span`
- *              `lv_observer_remove` needs to be called manually as LVGL can't remove the
+ *              `lv_observer_delete` needs to be called manually as LVGL can't remove the
  *              binding automatically.
  */
 void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span);

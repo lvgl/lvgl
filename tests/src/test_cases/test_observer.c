@@ -48,7 +48,7 @@ void test_observer_add_remove(void)
     TEST_ASSERT_EQUAL(10, lv_subject_get_int(&subject));
     TEST_ASSERT_EQUAL(10, current_v);
 
-    lv_observer_remove(observer);
+    lv_observer_delete(observer);
     lv_subject_set_int(&subject, 15);
     TEST_ASSERT_EQUAL(15, lv_subject_get_int(&subject));
     TEST_ASSERT_EQUAL(10, current_v); /*The observer cb is not called*/
@@ -71,7 +71,7 @@ void test_object_observer_add_remove(void)
     TEST_ASSERT_EQUAL(false, lv_obj_is_hidden(obj));
     lv_subject_set_int(&subject, 5);
     TEST_ASSERT_EQUAL(true, lv_obj_is_hidden(obj));
-    lv_observer_remove(observer);
+    lv_observer_delete(observer);
     lv_subject_set_int(&subject, 1);
 
     /* This shouldn't get updated */
@@ -140,7 +140,7 @@ void test_observer_remove_removes_obj_callback(void)
     }
     {
         /* Removing the observer associated with the object should remove the delete event entry */
-        lv_observer_remove(observer);
+        lv_observer_delete(observer);
         lv_event_dsc_t * delete_event  = get_event_delete_from_obj(obj);
         TEST_ASSERT_NULL(delete_event);
     }
@@ -189,7 +189,7 @@ void test_observer_int(void)
     TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(&subject));
     TEST_ASSERT_EQUAL(3, observer_called);
 
-    lv_observer_remove(basic_observer);
+    lv_observer_delete(basic_observer);
 }
 
 void test_observer_float(void)
@@ -235,7 +235,7 @@ void test_observer_float(void)
     TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(&subject));
     TEST_ASSERT_EQUAL(3, observer_called);
 
-    lv_observer_remove(basic_observer);
+    lv_observer_delete(basic_observer);
 }
 
 void test_observer_string(void)
@@ -333,7 +333,7 @@ void test_observer_string(void)
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.",
                              lv_subject_get_previous_string(&subject));
     TEST_ASSERT_EQUAL(7, observer_called);
-    lv_observer_remove(basic_observer);
+    lv_observer_delete(basic_observer);
 }
 
 void test_observer_pointer(void)
@@ -384,7 +384,7 @@ void test_observer_pointer(void)
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(&subject));
     TEST_ASSERT_EQUAL(4, observer_called);
-    lv_observer_remove(basic_observer);
+    lv_observer_delete(basic_observer);
 }
 
 void test_observer_color(void)
@@ -440,7 +440,7 @@ void test_observer_color(void)
                             lv_subject_get_color(&subject));
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_previous_color(&subject));
-    lv_observer_remove(basic_observer);
+    lv_observer_delete(basic_observer);
 }
 
 static int32_t group_observer_called;
@@ -1055,7 +1055,7 @@ void test_observer_set_user_data(void)
     lv_observer_set_user_data(observer, &b);
     TEST_ASSERT_EQUAL_PTR(&b, lv_observer_get_user_data(observer));
 
-    lv_observer_remove(observer);
+    lv_observer_delete(observer);
 }
 
 void test_observer_set_user_data_user_owned(void)
@@ -1076,7 +1076,7 @@ void test_observer_set_user_data_user_owned(void)
     lv_observer_set_user_data(observer, data);
     TEST_ASSERT_EQUAL_PTR(data, lv_observer_get_user_data(observer));
 
-    lv_observer_remove(observer);
+    lv_observer_delete(observer);
     lv_free(data);
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
 }
@@ -1108,7 +1108,7 @@ void test_observer_set_user_data_replaces_internal_data(void)
     LV_UNUSED(mem_with_both_data);
     LV_HEAP_CHECK(TEST_ASSERT_GREATER_THAN_UINT32(mem_with_both_data, lv_test_get_free_mem()));
 
-    lv_observer_remove(observer);
+    lv_observer_delete(observer);
     lv_free(new_data);
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
 }
@@ -1135,7 +1135,7 @@ void test_observer_set_user_data_same_internal_data(void)
     TEST_ASSERT_FALSE(observer->auto_free_user_data);
     TEST_ASSERT_EQUAL_UINT32(mem_with_data, lv_test_get_free_mem());
 
-    lv_observer_remove(observer);
+    lv_observer_delete(observer);
     lv_free(data);
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
 }
