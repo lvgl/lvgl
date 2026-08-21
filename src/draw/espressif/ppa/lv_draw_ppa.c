@@ -108,6 +108,9 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 #if LV_USE_PPA_IMG
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                /* dsc->opa is not required to be opaque and the source may carry
+                 * an alpha channel: both are handled by the blend engine, see
+                 * lv_draw_ppa_img(). */
                 if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
                      && dsc->clip_radius == 0
                      && dsc->bitmap_mask_src == NULL
@@ -115,7 +118,6 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      && dsc->tile == 0
                      && dsc->blend_mode == LV_BLEND_MODE_NORMAL
                      && dsc->recolor_opa <= LV_OPA_MIN
-                     && dsc->opa >= (lv_opa_t)LV_OPA_MAX
                      && dsc->skew_y == 0
                      && dsc->skew_x == 0
                      && dsc->scale_x == 256
@@ -123,10 +125,27 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      && dsc->rotation == 0
                      && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
                      && (dsc->header.cf == LV_COLOR_FORMAT_RGB888
-                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565)
+                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565
+                         || dsc->header.cf == LV_COLOR_FORMAT_ARGB8888
+                         || dsc->header.cf == LV_COLOR_FORMAT_XRGB8888)
                      && (dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
+                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565
+                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888))) {
                     return 0;
+                }
+
+                /* A source alpha channel or a global opacity means the engine has
+                 * to composite against the destination instead of copying over it.
+                 * Only an RGB565 destination is taken: it has no alpha of its own,
+                 * so treating the backdrop as opaque is exact. An ARGB8888
+                 * destination is an intermediate layer that LVGL clears to
+                 * transparent (see lv_draw_layer_create callers in lv_refr.c), and
+                 * the blend below forces the background alpha to 0xFF, which would
+                 * make every touched pixel opaque and break the later composition
+                 * of that layer onto its parent. Those draws stay in software
+                 * until the configuration preserves the destination alpha. */
+                if(lv_ppa_cf_has_alpha(dsc->header.cf) || dsc->opa < (lv_opa_t)LV_OPA_MAX) {
+                    if(dsc->base.layer->color_format != LV_COLOR_FORMAT_RGB565) return 0;
                 }
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
