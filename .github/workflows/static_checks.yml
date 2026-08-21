@@ -76,6 +76,68 @@ jobs:
         run: python scripts/static_checks/check_headers.py no-direct-public-include
 
       # ------------------------------------------------------------------
+      # No public API function may lose an argument check.
+      # ------------------------------------------------------------------
+      - name: Install doxygen
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq doxygen
+
+      - name: "Check: public API argument checks did not regress"
+        id: arg-checks
+        continue-on-error: true
+        run: |
+          set -eu
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_REF="${{ github.base_ref }}"
+          else
+            BASE_REF="master"
+          fi
+
+          HEAD_COUNT=$(python scripts/static_checks/check_arg_checks.py count)
+          echo "this branch          : $HEAD_COUNT unvalidated pointer parameter(s)"
+
+          # Always the tip of the base branch, explicitly fetched, so the
+          # baseline is what this change will actually merge into.
+          git fetch --no-tags --quiet origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          if ! git rev-parse --verify --quiet "origin/$BASE_REF" >/dev/null; then
+            echo "origin/$BASE_REF not available, nothing to compare against"
+            exit 0
+          fi
+
+          rm -rf /tmp/lvgl-base
+          git worktree add --detach --force /tmp/lvgl-base "origin/$BASE_REF" >/dev/null
+          echo "base: $BASE_REF @ $(git rev-parse --short origin/$BASE_REF)"
+          BASE_COUNT=$(python scripts/static_checks/check_arg_checks.py count --root /tmp/lvgl-base)
+          echo "origin/$BASE_REF: $BASE_COUNT"
+
+          if [ "$HEAD_COUNT" -le "$BASE_COUNT" ]; then
+            echo "OK: $((BASE_COUNT - HEAD_COUNT)) check(s) gained"
+            exit 0
+          fi
+
+          echo "::error::$((HEAD_COUNT - BASE_COUNT)) public API pointer argument(s) lost their check"
+          python - <<'PY'
+          import json, subprocess, sys
+
+          def report(root):
+              out = subprocess.run(
+                  [sys.executable, "scripts/static_checks/check_arg_checks.py",
+                   "json", "--root", root],
+                  capture_output=True, text=True, check=True).stdout
+              return {(m["function"], m["param"]): m for m in json.loads(out)["missing"]}
+
+          new = report(".")
+          old = report("/tmp/lvgl-base")
+          added = sorted(set(new) - set(old))
+          print(f"\nNewly unvalidated ({len(added)}):")
+          for fn, param in added:
+              m = new[(fn, param)]
+              print(f"  {m['impl']}: {fn}({param})")
+          print("\nAdd LV_CHECK_ARG/LV_CHECK_OBJ for these, or document the argument")
+          print("with @nullable in its @param block if NULL is a valid input.")
+          PY
+          exit 1
+
+      # ------------------------------------------------------------------
       # Every typedef struct/enum in include/lvgl/lv_types.h must have
       #    a real definition (with a body) somewhere
       # ------------------------------------------------------------------
@@ -96,7 +158,8 @@ jobs:
           steps.allowed-list.outcome          == 'failure' ||
           steps.direct-public-include.outcome == 'failure' ||
           steps.deprecated.outcome            == 'failure' ||
-          steps.lv_types.outcome              == 'failure'
+          steps.lv_types.outcome              == 'failure' ||
+          steps.arg-checks.outcome            == 'failure' ||
         run: |
           echo "Policy check results:"
           echo "---------------------"
@@ -117,7 +180,54 @@ jobs:
           print_result "direct-public-include" "${{ steps.direct-public-include.outcome }}"
           print_result "deprecated"            "${{ steps.deprecated.outcome }}"
           print_result "lv_types"              "${{ steps.lv_types.outcome }}"
+          print_result "arg-checks"            "${{ steps.arg-checks.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."
           exit 1
+
+      # ------------------------------------------------------------------
+      # PR comment section. Runs whatever the outcome above, so that a
+      # failure is reported rather than leaving the row pending.
+      # ------------------------------------------------------------------
+      - name: Build the PR report section
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          mkdir -p reports
+          failed=""
+          add() { [ "$2" = "success" ] || failed="$failed $1"; }
+          add public-api            "${{ steps.public-api.outcome }}"
+          add private-api           "${{ steps.private-api.outcome }}"
+          add include-paths         "${{ steps.include-paths.outcome }}"
+          add allowed-list          "${{ steps.allowed-list.outcome }}"
+          add direct-public-include "${{ steps.direct-public-include.outcome }}"
+          add deprecated            "${{ steps.deprecated.outcome }}"
+          add lv_types              "${{ steps.lv_types.outcome }}"
+          add arg-checks            "${{ steps.arg-checks.outcome }}"
+
+          if [ -z "$failed" ]; then
+            python3 scripts/pr_report/pr_report.py emit \
+              --output reports/static_checks.json \
+              --section "Static Checks" --icon ok --summary "all checks passed"
+          else
+            n=$(echo $failed | wc -w)
+            {
+              echo "Failing checks:"
+              echo
+              for f in $failed; do echo "- \`$f\`"; done
+              echo
+              echo "See the *Static Checks* job log for the details of each."
+            } > details.md
+            python3 scripts/pr_report/pr_report.py emit \
+              --output reports/static_checks.json \
+              --section "Static Checks" --icon fail \
+              --summary "$n check(s) failing" --details-file details.md
+          fi
+
+      - name: Upload the PR report
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-report-static-checks
+          path: reports/
+          if-no-files-found: ignore
