@@ -49,4 +49,30 @@ void test_set_language_sends_language_changed_event(void)
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
 }
 
+void test_null_arguments_are_rejected(void)
+{
+    lv_translation_pack_t * pack = lv_translation_add_dynamic();
+    TEST_ASSERT_NOT_NULL(pack);
+
+    /* lv_translation_add_language */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_translation_add_language(NULL, "en"));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_translation_add_language(pack, NULL));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_translation_add_language(pack, "en"));
+
+    /* lv_translation_get_language_index */
+    TEST_ASSERT_EQUAL(-1, lv_translation_get_language_index(NULL, "en"));
+    TEST_ASSERT_EQUAL(-1, lv_translation_get_language_index(pack, NULL));
+
+    /* lv_translation_add_tag */
+    TEST_ASSERT_NULL(lv_translation_add_tag(NULL, "tiger"));
+    TEST_ASSERT_NULL(lv_translation_add_tag(pack, NULL));
+    lv_translation_tag_dsc_t * tag = lv_translation_add_tag(pack, "tiger");
+    TEST_ASSERT_NOT_NULL(tag);
+
+    /* lv_translation_set_tag_translation */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_translation_set_tag_translation(NULL, tag, 0, "The Tiger"));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_translation_set_tag_translation(pack, NULL, 0, "The Tiger"));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_translation_set_tag_translation(pack, tag, 0, NULL));
+}
+
 #endif
