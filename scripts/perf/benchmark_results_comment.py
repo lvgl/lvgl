@@ -99,7 +99,12 @@ physical hardware. The measurements are intended for comparative analysis only.
 import argparse
 import json
 import os
+import sys
 import msgpack
+
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pr_report")
+)
 
 
 DISCLAIMER = """
@@ -132,6 +137,62 @@ def format_table(results: list[dict], prev_results: list[dict]):
     return table
 
 
+# Headline metric for the one-line PR-report summary. Lower is better, and it is
+# the number that actually reflects LVGL's own work rather than the harness.
+REPORT_METRIC = "render_time"
+# QEMU instruction counting is deterministic, so a small band is enough to
+# separate a real change from rounding.
+REPORT_THRESHOLD_PERCENT = 1.0
+
+
+def write_pr_report(deltas: list[tuple[str, float, float]], output_path: str) -> None:
+    """Emit the `Performance` row of the single PR comment.
+
+    `deltas` is (config, new_value, previous_value) of REPORT_METRIC, one entry
+    per benchmarked configuration.
+    """
+    from pr_report import write_report
+
+    comparable = [(c, n, p) for c, n, p in deltas if p]
+    if not comparable:
+        write_report(
+            output_path,
+            section="Performance",
+            icon="info",
+            summary="no baseline to compare against",
+        )
+        return
+
+    changes = [(c, (n - p) / p * 100.0) for c, n, p in comparable]
+    worst = max(changes, key=lambda x: x[1])
+    best = min(changes, key=lambda x: x[1])
+
+    if worst[1] > REPORT_THRESHOLD_PERCENT:
+        icon = "down"          # slower
+        summary = f"{REPORT_METRIC} up to {worst[1]:+.1f}% on {worst[0]}"
+    elif best[1] < -REPORT_THRESHOLD_PERCENT:
+        icon = "up"            # faster
+        summary = f"{REPORT_METRIC} {best[1]:+.1f}% on {best[0]}"
+    else:
+        icon = "stable"
+        summary = f"no change beyond {REPORT_THRESHOLD_PERCENT:g}%"
+
+    rows = ["| Configuration | " + REPORT_METRIC + " | vs master |",
+            "|---|---|---|"]
+    for (config, new, prev), (_, pct) in zip(comparable, changes):
+        rows.append(f"| {config} | {new} | {pct:+.1f}% (was {prev}) |")
+    rows.append("")
+    rows.append("Full tables are in the workflow log.")
+
+    write_report(
+        output_path,
+        section="Performance",
+        icon=icon,
+        summary=summary,
+        details="\n".join(rows),
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Process previous and new results, and output a comment file."
@@ -158,6 +219,12 @@ def main():
         required=True,
         help="Output file path (e.g., comment.md)",
     )
+    parser.add_argument(
+        "--report",
+        type=str,
+        default=None,
+        help="Also write the `Performance` section of the PR report to this path",
+    )
 
     args = parser.parse_args()
     previous_results_paths = args.previous
@@ -181,6 +248,8 @@ def main():
             r: list[dict] = json.load(f)
             # We store the filename so it's easier to match with the related results
             new_results[os.path.basename(results_path)] = r
+
+    report_deltas: list[tuple[str, float, float]] = []
 
     comment = "Hi :wave:, thank you for your PR!\n\n"
     comment += "We've run benchmarks in an emulated environment."
@@ -214,6 +283,18 @@ def main():
             prev_all_scene_avg = new_all_scene_avg
 
         _, image_type, config = result_path.replace(".json", "").split("-")
+
+        if new_all_scene_avg and prev_all_scene_avg:
+            report_deltas.append(
+                (
+                    f"{image_type} {config}",
+                    new_all_scene_avg[0].get(REPORT_METRIC, 0),
+                    prev_all_scene_avg[0].get(REPORT_METRIC, 0)
+                    if prev_all_scene_avg is not new_all_scene_avg
+                    else 0,
+                )
+            )
+
         comment += f"#### ARM Emulated {image_type} - {config}\n\n"
         comment += format_table(new_all_scene_avg, prev_all_scene_avg)
         comment += "\n<details>"
@@ -231,6 +312,9 @@ def main():
 
     with open(output_path, "w") as f:
         f.write(comment)
+
+    if args.report:
+        write_pr_report(report_deltas, args.report)
 
 
 if __name__ == "__main__":
