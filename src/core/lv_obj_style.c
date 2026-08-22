@@ -9,6 +9,7 @@
 #include "lv_obj_private.h"
 #include "../lvgl_public.h"
 #include "../misc/lv_anim_private.h"
+#include "../misc/lv_style_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_class_private.h"
 #include "../display/lv_display_private.h"
@@ -149,7 +150,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 
 #if LV_OBJ_STYLE_CACHE
     uint32_t * prop_is_set = part == LV_PART_MAIN ? &obj->style_main_prop_is_set : &obj->style_other_prop_is_set;
-    if(lv_style_is_const(style)) {
+    if(lv_style_is_const_internal(style)) {
         lv_style_const_prop_t * props = style->values_and_props;
         for(i = 0; props[i].prop != LV_STYLE_PROP_INV; i++) {
             (*prop_is_set) |= STYLE_PROP_SHIFTED(props[i].prop);
@@ -1306,7 +1307,7 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
             if(obj->styles[i].is_disabled) continue;
             lv_style_t * style = (lv_style_t *)obj->styles[i].style;
             uint32_t j;
-            if(lv_style_is_const(style)) {
+            if(lv_style_is_const_internal(style)) {
                 lv_style_const_prop_t * props = style->values_and_props;
                 for(j = 0; props[j].prop != LV_STYLE_PROP_INV; j++) {
                     obj->style_main_prop_is_set |= STYLE_PROP_SHIFTED(props[j].prop);
@@ -1328,7 +1329,7 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
 
             lv_style_t * style = (lv_style_t *)obj->styles[i].style;
             uint32_t j;
-            if(lv_style_is_const(style)) {
+            if(lv_style_is_const_internal(style)) {
                 lv_style_const_prop_t * props = style->values_and_props;
                 for(j = 0; props[j].prop != LV_STYLE_PROP_INV; j++) {
                     obj->style_other_prop_is_set |= STYLE_PROP_SHIFTED(props[j].prop);
@@ -1360,7 +1361,7 @@ static void fade_in_anim_completed(lv_anim_t * a)
 
 static bool style_has_flag(const lv_style_t * style, uint32_t flag)
 {
-    if(lv_style_is_const(style)) {
+    if(lv_style_is_const_internal(style)) {
         lv_style_const_prop_t * props = style->values_and_props;
         uint32_t i;
         for(i = 0; props[i].prop != LV_STYLE_PROP_INV; i++) {
