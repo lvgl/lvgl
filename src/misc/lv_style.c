@@ -510,6 +510,12 @@ bool lv_style_is_empty(const lv_style_t * style)
     return style->prop_cnt == 0;
 }
 
+bool lv_style_is_const(const lv_style_t * style)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
+    return lv_style_is_const_internal(style);
+}
+
 uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
     if(prop == LV_STYLE_PROP_ANY) return LV_STYLE_PROP_FLAG_ALL; /*Any prop can have any flags*/
@@ -521,6 +527,73 @@ uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop)
     if(lv_style_custom_prop_flag_lookup_table != NULL && prop < lv_style_custom_prop_flag_lookup_table_size)
         return lv_style_custom_prop_flag_lookup_table[prop];
     return 0;
+}
+
+void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_width(style, width);
+    lv_style_set_height(style, height);
+}
+
+void lv_style_set_pad_all(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+void lv_style_set_pad_hor(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+}
+
+void lv_style_set_pad_ver(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+void lv_style_set_pad_gap(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_pad_row(style, value);
+    lv_style_set_pad_column(style, value);
+}
+
+void lv_style_set_margin_hor(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_margin_left(style, value);
+    lv_style_set_margin_right(style, value);
+}
+
+void lv_style_set_margin_ver(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_margin_top(style, value);
+    lv_style_set_margin_bottom(style, value);
+}
+
+void lv_style_set_margin_all(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_margin_left(style, value);
+    lv_style_set_margin_right(style, value);
+    lv_style_set_margin_top(style, value);
+    lv_style_set_margin_bottom(style, value);
+}
+
+void lv_style_set_transform_scale(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_transform_scale_x(style, value);
+    lv_style_set_transform_scale_y(style, value);
 }
 
 /**********************

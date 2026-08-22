@@ -433,12 +433,7 @@ void lv_style_merge(lv_style_t * dst, const lv_style_t * src);
  * @param style     pointer to a style
  * @return          true: the style is constant
  */
-static inline bool lv_style_is_const(const lv_style_t * style)
-{
-    if(style->prop_cnt == 255) return true;
-    return false;
-}
-
+bool lv_style_is_const(const lv_style_t * style);
 
 /**
  * Register a new style property for custom usage
@@ -592,92 +587,56 @@ uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop);
  * @param  width   width in pixels
  * @param  height  height in pixels
  */
-static inline void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height)
-{
-    lv_style_set_width(style, width);
-    lv_style_set_height(style, height);
-}
+void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height);
 
 /**
  * Set all 4 of `style`s padding values.
  * @param  style   pointer to style to be modified
  * @param  value   padding dimension in pixels
  */
-static inline void lv_style_set_pad_all(lv_style_t * style, int32_t value)
-{
-    lv_style_set_pad_left(style, value);
-    lv_style_set_pad_right(style, value);
-    lv_style_set_pad_top(style, value);
-    lv_style_set_pad_bottom(style, value);
-}
+void lv_style_set_pad_all(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s left and right padding values.
  * @param  style   pointer to style to be modified
  * @param  value   padding dimension in pixels
  */
-static inline void lv_style_set_pad_hor(lv_style_t * style, int32_t value)
-{
-    lv_style_set_pad_left(style, value);
-    lv_style_set_pad_right(style, value);
-}
+void lv_style_set_pad_hor(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s top and bottom padding values.
  * @param  style   pointer to style to be modified
  * @param  value   padding dimension in pixels
  */
-static inline void lv_style_set_pad_ver(lv_style_t * style, int32_t value)
-{
-    lv_style_set_pad_top(style, value);
-    lv_style_set_pad_bottom(style, value);
-}
+void lv_style_set_pad_ver(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s row and column padding gaps (applies only to Grid and Flex layouts).
  * @param  style   pointer to style to be modified
  * @param  value   gap dimension in pixels
  */
-static inline void lv_style_set_pad_gap(lv_style_t * style, int32_t value)
-{
-    lv_style_set_pad_row(style, value);
-    lv_style_set_pad_column(style, value);
-}
+void lv_style_set_pad_gap(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s left and right margin values.
  * @param  style   pointer to style to be modified
  * @param  value   margin dimension in pixels
  */
-static inline void lv_style_set_margin_hor(lv_style_t * style, int32_t value)
-{
-    lv_style_set_margin_left(style, value);
-    lv_style_set_margin_right(style, value);
-}
+void lv_style_set_margin_hor(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s top and bottom margin values.
  * @param  style   pointer to style to be modified
  * @param  value   margin dimension in pixels
  */
-static inline void lv_style_set_margin_ver(lv_style_t * style, int32_t value)
-{
-    lv_style_set_margin_top(style, value);
-    lv_style_set_margin_bottom(style, value);
-}
+void lv_style_set_margin_ver(lv_style_t * style, int32_t value);
 
 /**
  * Set all 4 of `style`s margin values.
  * @param  style   pointer to style to be modified
  * @param  value   margin dimension in pixels
  */
-static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
-{
-    lv_style_set_margin_left(style, value);
-    lv_style_set_margin_right(style, value);
-    lv_style_set_margin_top(style, value);
-    lv_style_set_margin_bottom(style, value);
-}
+void lv_style_set_margin_all(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s X and Y transform scale values.
@@ -689,11 +648,7 @@ static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
  *                     - 128:  half size
  *                     - 512:  double size
  */
-static inline void lv_style_set_transform_scale(lv_style_t * style, int32_t value)
-{
-    lv_style_set_transform_scale_x(style, value);
-    lv_style_set_transform_scale_y(style, value);
-}
+void lv_style_set_transform_scale(lv_style_t * style, int32_t value);
 
 /**
  * @brief Check if the style property has a specified behavioral flag.
