@@ -9,6 +9,7 @@
 
 #include "../lvgl_public.h"
 #include "../core/lv_global.h"
+#include "lv_style_private.h"
 
 /*********************
  *      DEFINES
@@ -30,6 +31,7 @@
  **********************/
 
 const lv_style_prop_t lv_style_const_prop_id_inv = LV_STYLE_PROP_INV;
+
 
 const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROPS] = {
     [LV_STYLE_WIDTH] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
@@ -210,7 +212,7 @@ void lv_style_copy(lv_style_t * dst, const lv_style_t * src)
 {
     LV_CHECK_ARG(dst != NULL, return);
     LV_CHECK_ARG(src != NULL, return);
-    if(lv_style_is_const(dst)) {
+    if(lv_style_is_const_internal(dst)) {
         LV_LOG_WARN("The destination can not be a constant style");
         return;
     }
@@ -224,7 +226,7 @@ void lv_style_merge(lv_style_t * dst, const lv_style_t * src)
 {
     LV_CHECK_ARG(dst != NULL, return);
     LV_CHECK_ARG(src != NULL, return);
-    if(lv_style_is_const(dst)) {
+    if(lv_style_is_const_internal(dst)) {
         LV_LOG_WARN("The destination can not be a constant style");
         return;
     }
@@ -241,7 +243,7 @@ void lv_style_merge(lv_style_t * dst, const lv_style_t * src)
 
     /* Merge the styles */
     int32_t i;
-    if(lv_style_is_const(src)) {
+    if(lv_style_is_const_internal(src)) {
         lv_style_const_prop_t * props_and_values = (lv_style_const_prop_t *)src->values_and_props;
         for(i = 0; props_and_values[i].prop != LV_STYLE_PROP_INV; i++) {
             lv_style_set_prop(dst, props_and_values[i].prop, props_and_values[i].value);
@@ -296,7 +298,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
     LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
 
-    if(lv_style_is_const(style)) {
+    if(lv_style_is_const_internal(style)) {
         LV_LOG_ERROR("Cannot remove prop from const style");
         return false;
     }
@@ -349,7 +351,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 {
     LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 
-    if(lv_style_is_const(style)) {
+    if(lv_style_is_const_internal(style)) {
         LV_LOG_ERROR("Cannot set property of constant style");
         return;
     }
@@ -402,7 +404,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
-    LV_CHECK_ARG(style != NULL, return LV_STYLE_RES_NOT_FOUND);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return LV_STYLE_RES_NOT_FOUND);
     LV_CHECK_ARG(value != NULL, return LV_STYLE_RES_NOT_FOUND);
     return lv_style_get_prop_inlined(style, prop, value);
 }
