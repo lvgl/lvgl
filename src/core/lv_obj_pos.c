@@ -18,6 +18,7 @@
 #include "../core/lv_global.h"
 #include "lv_obj_class_private.h"
 #include "lv_obj_style_internal.h"
+#include "../misc/lv_style_private.h"
 
 /*********************
  *      DEFINES
@@ -1666,11 +1667,11 @@ static bool has_blur(const lv_obj_t * obj)
         if((state_style & state_inv)) continue;
 
         if((obj_style->style->has_group & group_blur) &&
-           lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
+           lv_style_get_prop_internal(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
             if(v.num > 0) return true;
         }
         if((obj_style->style->has_group & group_dropshadow) &&
-           lv_style_get_prop(obj_style->style, LV_STYLE_DROP_SHADOW_OPA, &v)) {
+           lv_style_get_prop_internal(obj_style->style, LV_STYLE_DROP_SHADOW_OPA, &v)) {
             if(v.num > 0) return true;
         }
     }

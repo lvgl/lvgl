@@ -9,6 +9,7 @@
 #include "lv_obj_private.h"
 #include "../lvgl_public.h"
 #include "../misc/lv_event_private.h"
+#include "../misc/lv_style_private.h"
 #include "../misc/lv_area_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_event_private.h"
@@ -2033,7 +2034,7 @@ static void obj_transition_states(lv_obj_t * obj, lv_state_t prev_state, lv_stat
         if(obj_style->is_trans) continue;
 
         lv_style_value_t v;
-        if(lv_style_get_prop_inlined(obj_style->style, LV_STYLE_TRANSITION, &v) != LV_STYLE_RES_FOUND) continue;
+        if(lv_style_get_prop_internal(obj_style->style, LV_STYLE_TRANSITION, &v) != LV_STYLE_RES_FOUND) continue;
         const lv_style_transition_dsc_t * tr = v.ptr;
 
         /*Add the props to the set if not added yet or added but with smaller weight*/

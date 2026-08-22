@@ -11,6 +11,7 @@
 #if LV_USE_SPAN
 
 #include "../../misc/lv_area_private.h"
+#include "../../misc/lv_style_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../lvgl_public.h"
@@ -1011,7 +1012,7 @@ static const lv_font_t * lv_span_get_style_text_font(lv_obj_t * par, lv_span_t *
     LV_ASSERT(span != NULL);
     const lv_font_t * font;
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_FONT, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_FONT, &value);
     if(res != LV_STYLE_RES_FOUND) {
         font = lv_obj_get_style_text_font_internal(par, LV_PART_MAIN);
     }
@@ -1027,7 +1028,7 @@ static int32_t lv_span_get_style_text_letter_space(lv_obj_t * par, lv_span_t * s
     LV_ASSERT(span != NULL);
     int32_t letter_space;
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_LETTER_SPACE, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_LETTER_SPACE, &value);
     if(res != LV_STYLE_RES_FOUND) {
         letter_space = lv_obj_get_style_text_letter_space_internal(par, LV_PART_MAIN);
     }
@@ -1042,7 +1043,7 @@ static lv_color_t lv_span_get_style_text_color(lv_obj_t * par, lv_span_t * span)
     LV_ASSERT(par != NULL);
     LV_ASSERT(span != NULL);
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_COLOR, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_COLOR, &value);
     if(res != LV_STYLE_RES_FOUND) {
         value.color = lv_obj_get_style_text_color_internal(par, LV_PART_MAIN);
     }
@@ -1055,7 +1056,7 @@ static lv_opa_t lv_span_get_style_text_opa(lv_obj_t * par, lv_span_t * span)
     LV_ASSERT(span != NULL);
     lv_opa_t opa;
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_OPA, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_OPA, &value);
     if(res != LV_STYLE_RES_FOUND) {
         opa = (lv_opa_t)lv_obj_get_style_text_opa_internal(par, LV_PART_MAIN);
     }
@@ -1071,7 +1072,7 @@ static int32_t lv_span_get_style_text_decor(lv_obj_t * par, lv_span_t * span)
     LV_ASSERT(span != NULL);
     int32_t decor;
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_DECOR, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_DECOR, &value);
     if(res != LV_STYLE_RES_FOUND) {
         decor = (lv_text_decor_t)lv_obj_get_style_text_decor_internal(par, LV_PART_MAIN);
     }
