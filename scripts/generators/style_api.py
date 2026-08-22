@@ -903,7 +903,7 @@ def local_style_get_h_internal(p):
     print(f"static inline {p['var_type']} {fn_name}(const lv_obj_t * obj, lv_part_t part)")
     print("{")
     print("    LV_ASSERT(obj != NULL);")
-    print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
+    print("    lv_style_value_t v = lv_obj_get_style_prop_internal(obj, part, LV_STYLE_" + p['name'] + ");")
     print("    return " + cast + "v." + p['style_type'] + ";")
     print("}")
     print()
@@ -915,7 +915,7 @@ def local_style_get_h_internal(p):
         print("{")
         print("    LV_ASSERT(obj != NULL);")
         print(
-            "    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" +
+            "    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" +
             p['name'] + "));")
         print("    return " + cast + "v." + p['style_type'] + ";")
         print("}")
@@ -1103,6 +1103,7 @@ extern "C" {
 #endif
 ''')
 print('#include "../lvgl_public.h"')
+print('#include "lv_obj_style_private.h"')
 print()
 
 guard = ""
