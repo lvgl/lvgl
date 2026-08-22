@@ -50,7 +50,8 @@ void lv_example_menu_floating_button(void)
 {
     /*Create a menu object*/
     menu = lv_menu_create(lv_screen_active());
-    lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));
+    lv_display_t * display = lv_display_get_default();
+    lv_obj_set_size(menu, lv_display_get_horizontal_resolution(display), lv_display_get_vertical_resolution(display));
     lv_obj_center(menu);
 
     lv_obj_t * cont;

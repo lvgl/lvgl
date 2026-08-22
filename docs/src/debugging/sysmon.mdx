@@ -40,13 +40,14 @@ Enable in `lv_conf.h`:
 
 ```c
 /* Create generic monitor */
-lv_obj_t * sysmon = lv_sysmon_create(lv_display_get_default());
+lv_display_t* display = lv_display_get_default();
+lv_obj_t * sysmon = lv_sysmon_create(display);
 
 /* Create performance monitor */
-lv_sysmon_show_performance(NULL);  /* NULL = default display */
+lv_sysmon_show_performance(display);
 
 /* Create memory monitor */
-lv_sysmon_show_memory(NULL);
+lv_sysmon_show_memory(display);
 ```
 
 ### Performance Monitor

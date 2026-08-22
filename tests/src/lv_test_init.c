@@ -35,10 +35,10 @@ void lv_test_init(void)
 
 #if LV_USE_SYSMON
 #if LV_USE_MEM_MONITOR
-    lv_sysmon_hide_memory(NULL);
+    lv_sysmon_hide_memory(lv_display_get_default());
 #endif
 #if LV_USE_PERF_MONITOR
-    lv_sysmon_hide_performance(NULL);
+    lv_sysmon_hide_performance(lv_display_get_default());
 #endif
 #endif
 }

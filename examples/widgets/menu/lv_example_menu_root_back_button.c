@@ -37,7 +37,8 @@ void lv_example_menu_root_back_button(void)
     lv_obj_t * menu = lv_menu_create(lv_screen_active());
     lv_menu_set_mode_root_back_button(menu, LV_MENU_ROOT_BACK_BUTTON_ENABLED);
     lv_obj_add_event_cb(menu, back_event_handler, LV_EVENT_CLICKED, menu);
-    lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));
+    lv_display_t * display = lv_display_get_default();
+    lv_obj_set_size(menu, lv_display_get_horizontal_resolution(display), lv_display_get_vertical_resolution(display));
     lv_obj_center(menu);
 
     lv_obj_t * cont;

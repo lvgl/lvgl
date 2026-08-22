@@ -403,6 +403,81 @@ if you need finer control.
 
 ---
 
+## Display
+
+Calling the following functions with `NULL` as the display parameter is deprecated and will be considered an error in future versions. You can use <ApiLink name="lv_display_get_default"/> to query the default display.
+
+- <ApiLink name="lv_display_set_resolution"/>
+- <ApiLink name="lv_display_set_physical_resolution"/>
+- <ApiLink name="lv_display_set_offset"/>
+- <ApiLink name="lv_display_set_dpi"/>
+- <ApiLink name="lv_display_get_horizontal_resolution"/>
+- <ApiLink name="lv_display_get_vertical_resolution"/>
+- <ApiLink name="lv_display_get_original_horizontal_resolution"/>
+- <ApiLink name="lv_display_get_original_vertical_resolution"/>
+- <ApiLink name="lv_display_get_physical_horizontal_resolution"/>
+- <ApiLink name="lv_display_get_physical_vertical_resolution"/>
+- <ApiLink name="lv_display_get_offset_x"/>
+- <ApiLink name="lv_display_get_offset_y"/>
+- <ApiLink name="lv_display_get_dpi"/>
+- <ApiLink name="lv_display_set_draw_buffers"/>
+- <ApiLink name="lv_display_set_3rd_draw_buffer"/>
+- <ApiLink name="lv_display_set_render_mode"/>
+- <ApiLink name="lv_display_get_flush_cb"/>
+- <ApiLink name="lv_display_set_flush_cb"/>
+- <ApiLink name="lv_display_set_flush_wait_cb"/>
+- <ApiLink name="lv_display_set_sync_cb"/>
+- <ApiLink name="lv_display_set_sync_wait_cb"/>
+- <ApiLink name="lv_display_set_color_format"/>
+- <ApiLink name="lv_display_get_color_format"/>
+- <ApiLink name="lv_display_get_tile_cnt"/>
+- <ApiLink name="lv_display_get_antialiasing"/>
+- <ApiLink name="lv_display_get_render_mode"/>
+- <ApiLink name="lv_display_get_screen_active"/>
+- <ApiLink name="lv_display_get_screen_loading"/>
+- <ApiLink name="lv_display_get_screen_prev"/>
+- <ApiLink name="lv_display_get_layer_top"/>
+- <ApiLink name="lv_display_get_layer_sys"/>
+- <ApiLink name="lv_display_get_layer_bottom"/>
+- <ApiLink name="lv_display_get_screen_by_name"/>
+- <ApiLink name="lv_display_set_rotation"/>
+- <ApiLink name="lv_display_get_rotation"/>
+- <ApiLink name="lv_display_get_matrix_rotation"/>
+- <ApiLink name="lv_display_set_theme"/>
+- <ApiLink name="lv_display_get_theme"/>
+- <ApiLink name="lv_display_trigger_activity"/>
+- <ApiLink name="lv_display_enable_invalidation"/>
+- <ApiLink name="lv_display_is_invalidation_enabled"/>
+- <ApiLink name="lv_display_get_refr_timer"/>
+- <ApiLink name="lv_display_delete_refr_timer"/>
+- <ApiLink name="lv_display_send_vsync_event"/>
+- <ApiLink name="lv_display_register_vsync_event"/>
+- <ApiLink name="lv_display_unregister_vsync_event"/>
+- <ApiLink name="lv_display_set_user_data"/>
+- <ApiLink name="lv_display_set_driver_data"/>
+- <ApiLink name="lv_display_get_user_data"/>
+- <ApiLink name="lv_display_get_driver_data"/>
+- <ApiLink name="lv_display_get_buf_active"/>
+- <ApiLink name="lv_display_get_draw_buf_size"/>
+- <ApiLink name="lv_display_get_invalidated_draw_buf_size"/>
+
+---
+
+## Sysmon
+
+Calling the following functions with `NULL` as the display parameter is deprecated and will be considered an error in future versions. You can use <ApiLink name="lv_display_get_default"/> to query the default display.
+
+- <ApiLink name="lv_sysmon_create"/>
+- <ApiLink name="lv_sysmon_show_performance"/>
+- <ApiLink name="lv_sysmon_hide_performance"/>
+- <ApiLink name="lv_sysmon_performance_dump"/>
+- <ApiLink name="lv_sysmon_performance_resume"/>
+- <ApiLink name="lv_sysmon_performance_pause"/>
+- <ApiLink name="lv_sysmon_show_memory"/>
+- <ApiLink name="lv_sysmon_hide_memory"/>
+
+---
+
 ## Widgets
 
 ### lv_qrcode
