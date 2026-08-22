@@ -86,3 +86,8 @@ Each entry lists its SPDX license expression below. The full license text is, fo
 - Path: src/libs/frogfs
 - Source: https://github.com/jkent/frogfs
 - License: MPL-2.0
+
+**QOI (Quite OK Image decoder)**
+- Path: src/libs/qoi
+- Source: https://github.com/phoboslab/qoi
+- License: MIT

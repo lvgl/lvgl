@@ -1789,6 +1789,30 @@
     #endif
 #endif
 
+#ifndef LV_USE_QOI
+    #ifdef CONFIG_LV_USE_QOI
+        #define LV_USE_QOI CONFIG_LV_USE_QOI
+    #else
+        #define LV_USE_QOI 0
+    #endif
+#endif
+
+#ifndef LV_QOI_MAX_FILE_SIZE
+    #ifdef CONFIG_LV_QOI_MAX_FILE_SIZE
+        #define LV_QOI_MAX_FILE_SIZE CONFIG_LV_QOI_MAX_FILE_SIZE
+    #else
+        #define LV_QOI_MAX_FILE_SIZE 67108864
+    #endif
+#endif
+
+#ifndef LV_QOI_MAX_PIXELS
+    #ifdef CONFIG_LV_QOI_MAX_PIXELS
+        #define LV_QOI_MAX_PIXELS CONFIG_LV_QOI_MAX_PIXELS
+    #else
+        #define LV_QOI_MAX_PIXELS 400000000
+    #endif
+#endif
+
 #ifndef LV_USE_LIBWEBP
     #ifdef CONFIG_LV_USE_LIBWEBP
         #define LV_USE_LIBWEBP CONFIG_LV_USE_LIBWEBP
