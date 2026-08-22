@@ -91,6 +91,19 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
  */
 void lv_obj_update_layer_type(lv_obj_t * obj);
 
+/**
+ * Internal implementation of @ref lv_obj_get_style_prop
+ * Does not do any argument checking
+ */
+lv_style_value_t lv_obj_get_style_prop_internal(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
+
+
+/**
+ * Internal implementation of @ref lv_obj_style_apply_color_filter
+ * Does not do any argument checking
+ */
+lv_style_value_t lv_obj_style_apply_color_filter_internal(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v);
+
 /**********************
  *      MACROS
  **********************/
