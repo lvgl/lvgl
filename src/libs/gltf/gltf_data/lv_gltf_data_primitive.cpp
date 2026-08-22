@@ -40,14 +40,14 @@ lv_gltf_primitive_t * lv_gltf_data_get_primitive_from_mesh(lv_gltf_mesh_data_t *
     return &(mesh->primitives[index]);
 }
 
-void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, size_t index,
+void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, uint32_t material_index,
                                             fastgltf::Node * node, size_t primitive_index)
 {
-    data->opaque_nodes_by_material_index[index].emplace_back(
+    data->opaque_nodes_by_material_index[material_index].emplace_back(
         std::make_pair(node, primitive_index));
 }
 
-void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, size_t material_index,
+void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, uint32_t material_index,
                                              fastgltf::Node * node, size_t primitive_index)
 {
     data->blended_nodes_by_material_index[material_index].push_back(

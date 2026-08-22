@@ -253,11 +253,11 @@ void lv_gltf_data_validate_skin(lv_gltf_model_t * data, size_t index);
  * @brief Add an opaque node primitive to the GLTF model data.
  *
  * @param data Pointer to the lv_gltf_data_t object containing the model data.
- * @param index The index of the primitive to add.
+ * @param material_index The index of the primitive to add.
  * @param node Pointer to the NodePtr representing the node to add.
  * @param primitive_index The specific parameter associated with the primitive.
  */
-void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, size_t index, fastgltf::Node * node,
+void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, uint32_t material_index, fastgltf::Node * node,
                                             size_t primitive_index);
 
 /**
@@ -268,7 +268,7 @@ void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, size_t index
  * @param node Pointer to the NodePtr representing the node to add.
  * @param primitive_index The specific parameter associated with the primitive.
  */
-void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, size_t material_index, fastgltf::Node * node,
+void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, uint32_t material_index, fastgltf::Node * node,
                                              size_t primitive_index);
 
 /**
