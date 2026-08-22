@@ -15,6 +15,7 @@
 #include "../../core/lv_observer_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_style_internal_gen.h"
+#include "../../misc/lv_style_private.h"
 
 /*********************
  *      DEFINES
@@ -1555,7 +1556,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
         lv_style_res_t res;
 
         /* Line width */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_WIDTH, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_LINE_WIDTH, &value);
         if(res == LV_STYLE_RES_FOUND) {
             line_dsc->width = (int32_t)value.num;
         }
@@ -1564,7 +1565,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
         }
 
         /* Line color */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_COLOR, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_LINE_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             line_dsc->color = value.color;
         }
@@ -1573,7 +1574,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
         }
 
         /* Line opa */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_OPA, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_LINE_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             line_dsc->opa = (lv_opa_t)value.num;
         }
@@ -1606,7 +1607,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         lv_style_res_t res;
 
         /* arc width */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_WIDTH, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_WIDTH, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->width = (int32_t)value.num;
         }
@@ -1615,7 +1616,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         }
 
         /* arc color */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_COLOR, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->color = value.color;
         }
@@ -1624,7 +1625,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         }
 
         /* arc opa */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_OPA, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->opa = (lv_opa_t)value.num;
         }
@@ -1633,7 +1634,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         }
 
         /* arc rounded */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_ROUNDED, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_ROUNDED, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->rounded = (uint8_t)value.num;
         }
@@ -1642,7 +1643,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         }
 
         /* arc image src */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_IMAGE_SRC, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_IMAGE_SRC, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->img_src = (const void *)value.ptr;
         }
@@ -1678,7 +1679,7 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
         lv_style_res_t res;
 
         /* Text color */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_COLOR, &value);
+        res = lv_style_get_prop_internal(indicator_section_style, LV_STYLE_TEXT_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             label_dsc->color = value.color;
         }
@@ -1687,7 +1688,7 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
         }
 
         /* Text opa */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_OPA, &value);
+        res = lv_style_get_prop_internal(indicator_section_style, LV_STYLE_TEXT_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             label_dsc->opa = (lv_opa_t)value.num;
         }
@@ -1696,7 +1697,7 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
         }
 
         /* Text letter space */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_LETTER_SPACE, &value);
+        res = lv_style_get_prop_internal(indicator_section_style, LV_STYLE_TEXT_LETTER_SPACE, &value);
         if(res == LV_STYLE_RES_FOUND) {
             label_dsc->letter_space = (int32_t)value.num;
         }
@@ -1705,7 +1706,7 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
         }
 
         /* Text font */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_FONT, &value);
+        res = lv_style_get_prop_internal(indicator_section_style, LV_STYLE_TEXT_FONT, &value);
         if(res == LV_STYLE_RES_FOUND) {
             label_dsc->font = (const lv_font_t *)value.ptr;
         }

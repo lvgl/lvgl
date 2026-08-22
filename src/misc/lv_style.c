@@ -406,7 +406,7 @@ lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop,
 {
     LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return LV_STYLE_RES_NOT_FOUND);
     LV_CHECK_ARG(value != NULL, return LV_STYLE_RES_NOT_FOUND);
-    return lv_style_get_prop_inlined(style, prop, value);
+    return lv_style_get_prop_internal(style, prop, value);
 }
 
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
