@@ -342,7 +342,12 @@ void lv_obj_enable_style_refresh(bool en)
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     LV_CHECK_ARG(obj != NULL, return lv_style_prop_get_default(prop));
+    return lv_obj_get_style_prop_internal(obj, part, prop);
+}
 
+lv_style_value_t lv_obj_get_style_prop_internal(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
+{
+    LV_ASSERT(obj != NULL);
     lv_style_selector_t selector = part | obj->state;
     lv_style_value_t value_act = { .ptr = NULL };
     lv_style_res_t found;
@@ -351,6 +356,23 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     if(found == LV_STYLE_RES_FOUND) return value_act;
 
     return lv_style_prop_get_default(prop);
+}
+lv_style_value_t lv_obj_style_apply_color_filter_internal(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v)
+{
+#if LV_USE_COLOR_FILTER
+    LV_ASSERT(obj != NULL);
+
+    const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc_internal(obj, part);
+    if(f && f->filter_cb) {
+        lv_opa_t f_opa = lv_obj_get_style_color_filter_opa_internal(obj, part);
+        if(f_opa != 0) v.color = f->filter_cb(f, v.color, f_opa);
+    }
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(part);
+    LV_UNUSED(v);
+#endif
+    return v;
 }
 
 bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
@@ -499,20 +521,8 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t p
 
 lv_style_value_t lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v)
 {
-#if LV_USE_COLOR_FILTER
     LV_CHECK_ARG(obj != NULL, return v);
-
-    const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc_internal(obj, part);
-    if(f && f->filter_cb) {
-        lv_opa_t f_opa = lv_obj_get_style_color_filter_opa_internal(obj, part);
-        if(f_opa != 0) v.color = f->filter_cb(f, v.color, f_opa);
-    }
-#else
-    LV_UNUSED(obj);
-    LV_UNUSED(part);
-    LV_UNUSED(v);
-#endif
-    return v;
+    return lv_obj_style_apply_color_filter_internal(obj, part, v);
 }
 
 lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2,
