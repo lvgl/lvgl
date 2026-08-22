@@ -806,23 +806,22 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
         for(size_t mp = 0; mp < model->asset.meshes[mesh_index].primitives.size(); mp++) {
             auto & model_primitive = model->asset.meshes[mesh_index].primitives[mp];
             const auto & mappings = model_primitive.mappings;
-            ssize_t material_index =
+            size_t material_index =
                 (!mappings.empty() && mappings[viewer->state.material_variant]) ?
                 mappings[viewer->state.material_variant].value() + 1 :
                 ((model_primitive.materialIndex) ? (model_primitive.materialIndex.value() + 1) : 0);
-            if(material_index < 0) {
+            if(material_index == 0) {
                 lv_gltf_data_add_opaque_node_primitive(model, 0, &node, mp);
                 continue;
             }
             const fastgltf::Material & material = model->asset.materials[material_index - 1];
-
             viewer->state.render_opaque_buffer |= material.transmission != NULL;
 
             if(material.alphaMode == fastgltf::AlphaMode::Blend || material.transmission != NULL) {
-                lv_gltf_data_add_blended_node_primitive(model, material_index + 1, &node, mp);
+                lv_gltf_data_add_blended_node_primitive(model, material_index, &node, mp);
             }
             else {
-                lv_gltf_data_add_opaque_node_primitive(model, material_index + 1, &node, mp);
+                lv_gltf_data_add_opaque_node_primitive(model, material_index, &node, mp);
             }
 
             lv_array_t defines;
