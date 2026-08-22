@@ -548,6 +548,18 @@ void lv_text_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t
     *letter_next = *letter != '\0' ? lv_text_encoded_next(&txt[*ofs], NULL) : 0;
 }
 
+int32_t lv_font_get_bottom_trim(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_CHECK_ARG(font != NULL, return 0);
+    return lv_font_get_bottom_trim_internal(font, trim);
+}
+
+int32_t lv_font_get_top_trim(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_CHECK_ARG(font != NULL, return 0);
+    return lv_font_get_top_trim_internal(font, trim);
+}
+
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
 /*******************************
  *   UTF-8 ENCODER/DECODER

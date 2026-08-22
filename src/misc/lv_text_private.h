@@ -247,6 +247,37 @@ static inline bool lv_text_is_marker(uint32_t letter)
     return false;
 }
 
+static inline int32_t lv_font_get_bottom_trim_internal(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_ASSERT(font != NULL);
+    switch(trim) {
+        case LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE:
+        case LV_TEXT_LEADING_TRIM_LOWER_BASELINE:
+            return font->base_line;
+        case LV_TEXT_LEADING_TRIM_NONE:
+        case LV_TEXT_LEADING_TRIM_CAPITAL:
+        case LV_TEXT_LEADING_TRIM_LOWER:
+            return 0;
+    }
+    LV_UNREACHABLE();
+}
+
+static inline int32_t lv_font_get_top_trim_internal(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_ASSERT(font != NULL);
+    switch(trim) {
+        case LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE:
+        case LV_TEXT_LEADING_TRIM_CAPITAL:
+            return (font->line_height - font->base_line) - font->cap_height;
+        case LV_TEXT_LEADING_TRIM_LOWER_BASELINE:
+        case LV_TEXT_LEADING_TRIM_LOWER:
+            return (font->line_height - font->base_line) - font->x_height;
+        case LV_TEXT_LEADING_TRIM_NONE:
+            return 0;
+    }
+    LV_UNREACHABLE();
+}
+
 /***************************************************************
  *  GLOBAL FUNCTION POINTERS FOR CHARACTER ENCODING INTERFACE
  ***************************************************************/
