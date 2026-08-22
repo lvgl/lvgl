@@ -815,9 +815,9 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
                 continue;
             }
             const fastgltf::Material & material = model->asset.materials[material_index - 1];
-            viewer->state.render_opaque_buffer |= material.transmission != NULL;
+            viewer->state.render_opaque_buffer |= material.transmission != nullptr;
 
-            if(material.alphaMode == fastgltf::AlphaMode::Blend || material.transmission != NULL) {
+            if(material.alphaMode == fastgltf::AlphaMode::Blend || material.transmission != nullptr) {
                 lv_gltf_data_add_blended_node_primitive(model, material_index, &node, mp);
             }
             else {
