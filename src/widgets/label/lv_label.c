@@ -414,7 +414,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     lv_text_leading_trim_t leading_trim_mode =
         lv_obj_get_style_text_leading_trim(obj, LV_PART_MAIN);
     if(leading_trim_mode != LV_TEXT_LEADING_TRIM_NONE) {
-        pos->y -= lv_font_get_top_trim(font, leading_trim_mode);
+        pos->y -= lv_font_get_top_trim_internal(font, leading_trim_mode);
     }
 
 #if LV_USE_BIDI
@@ -444,7 +444,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     lv_text_leading_trim_t leading_trim_mode =
         lv_obj_get_style_text_leading_trim(obj, LV_PART_MAIN);
     if(leading_trim_mode != LV_TEXT_LEADING_TRIM_NONE) {
-        pos.y += lv_font_get_top_trim(font, leading_trim_mode);
+        pos.y += lv_font_get_top_trim_internal(font, leading_trim_mode);
     }
 
     const int32_t letter_height = lv_font_get_line_height(font);
@@ -869,8 +869,8 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_text_leading_trim_t leading_trim =
                 lv_obj_get_style_text_leading_trim(obj, LV_PART_MAIN);
             if(leading_trim != LV_TEXT_LEADING_TRIM_NONE) {
-                int32_t top_trim = lv_font_get_top_trim(font, leading_trim);
-                int32_t bottom_trim = lv_font_get_bottom_trim(font, leading_trim);
+                int32_t top_trim = lv_font_get_top_trim_internal(font, leading_trim);
+                int32_t bottom_trim = lv_font_get_bottom_trim_internal(font, leading_trim);
                 label->size_cache.y -= (top_trim + bottom_trim);
             }
 
@@ -915,8 +915,8 @@ static void draw_main(lv_event_t * e)
     if(leading_trim != LV_TEXT_LEADING_TRIM_NONE) {
         const lv_font_t * trim_font =
             lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t top_trim = lv_font_get_top_trim(trim_font, leading_trim);
-        int32_t bottom_trim = lv_font_get_bottom_trim(trim_font, leading_trim);
+        int32_t top_trim = lv_font_get_top_trim_internal(trim_font, leading_trim);
+        int32_t bottom_trim = lv_font_get_bottom_trim_internal(trim_font, leading_trim);
         txt_coords.y1 -= top_trim;
         txt_coords.y2 += bottom_trim;
     }
