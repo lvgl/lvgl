@@ -37,6 +37,7 @@ typedef lv_display_rotation_t lv_disp_rotation_t;
 
 #define lv_display_delete_event lv_display_remove_event
 #define lv_observer_remove lv_observer_delete
+#define lv_style_get_prop_inlined lv_style_get_prop
 
 #ifdef __cplusplus
 } /*extern "C"*/
