@@ -513,6 +513,13 @@
 
 #define LV_PPA_BURST_LENGTH 128
 
+/** Images with an alpha channel or a partial opacity are composited by
+ *  the PPA only from this many pixels up; smaller blocks go to software,
+ *  which is faster for them because each PPA operation has a fixed cost.
+ *  Set 0 to always use the PPA.
+ */
+#define LV_PPA_ALPHA_MIN_AREA 32768
+
 #endif /*LV_USE_PPA*/
 
 /** Accelerate blends, fills and image decoding with the STM32 DMA2D peripheral. */

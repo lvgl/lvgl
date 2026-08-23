@@ -1045,6 +1045,14 @@
     #endif
 #endif
 
+#ifndef LV_PPA_ALPHA_MIN_AREA
+    #ifdef CONFIG_LV_PPA_ALPHA_MIN_AREA
+        #define LV_PPA_ALPHA_MIN_AREA CONFIG_LV_PPA_ALPHA_MIN_AREA
+    #else
+        #define LV_PPA_ALPHA_MIN_AREA 32768
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_DMA2D
     #ifdef CONFIG_LV_USE_DRAW_DMA2D
         #define LV_USE_DRAW_DMA2D CONFIG_LV_USE_DRAW_DMA2D

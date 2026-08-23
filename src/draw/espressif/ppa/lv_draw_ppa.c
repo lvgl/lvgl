@@ -146,6 +146,18 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                  * until the configuration preserves the destination alpha. */
                 if(lv_ppa_cf_has_alpha(dsc->header.cf) || dsc->opa < (lv_opa_t)LV_OPA_MAX) {
                     if(dsc->base.layer->color_format != LV_COLOR_FORMAT_RGB565) return 0;
+#if LV_PPA_ALPHA_MIN_AREA > 0
+                    /* Every PPA operation costs a fixed amount regardless of the
+                     * pixel count - config, cache maintenance and a blocking wait
+                     * on the transaction - so a small block is faster in software,
+                     * which is where it went before this path existed. Measured on
+                     * an ESP32-P4 rev 1.0 (720x1280) and a rev 1.3 (1024x600): the
+                     * PPA only comes out ahead from 256x256 up, on both. */
+                    lv_area_t blend_area;
+                    if(!lv_area_intersect(&blend_area, &t->area, &t->clip_area)) return 0;
+                    if((uint32_t)(lv_area_get_width(&blend_area) *
+                                  lv_area_get_height(&blend_area)) < LV_PPA_ALPHA_MIN_AREA) return 0;
+#endif
                 }
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
