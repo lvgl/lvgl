@@ -85,6 +85,16 @@ jobs:
         run: python scripts/static_checks/check_lv_types.py
 
       # ------------------------------------------------------------------
+      # Defconfigs are up to date and produce no warnings
+      # ------------------------------------------------------------------
+      - name: "Check: Defconfings are up to date"
+        id: defconfigs
+        continue-on-error: true
+        run: |
+          pip install kconfiglib
+          python scripts/static_checks/check_defconfigs.py
+
+      # ------------------------------------------------------------------
       # Final gate – fail the job if any step above failed.
       # This gives us full output from every check before failing.
       # ------------------------------------------------------------------
@@ -96,7 +106,8 @@ jobs:
           steps.allowed-list.outcome          == 'failure' ||
           steps.direct-public-include.outcome == 'failure' ||
           steps.deprecated.outcome            == 'failure' ||
-          steps.lv_types.outcome              == 'failure'
+          steps.lv_types.outcome              == 'failure' ||
+          steps.defconfigs.outcome            == 'failure'
         run: |
           echo "Policy check results:"
           echo "---------------------"
@@ -117,6 +128,7 @@ jobs:
           print_result "direct-public-include" "${{ steps.direct-public-include.outcome }}"
           print_result "deprecated"            "${{ steps.deprecated.outcome }}"
           print_result "lv_types"              "${{ steps.lv_types.outcome }}"
+          print_result "defconfigs"            "${{ steps.defconfigs.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."
