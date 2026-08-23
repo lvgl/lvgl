@@ -6,6 +6,7 @@
 #include "lv_draw_ppa_private.h"
 #include "lv_draw_ppa.h"
 #include "lv_draw_ppa_srm.h"
+#include "lv_draw_ppa_rot.h"
 
 #if LV_USE_PPA
 
