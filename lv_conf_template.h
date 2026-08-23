@@ -518,7 +518,7 @@
  *  which is faster for them because each PPA operation has a fixed cost.
  *  Set 0 to always use the PPA.
  */
-#define LV_PPA_ALPHA_MIN_AREA 32768
+#define LV_PPA_ALPHA_MIN_AREA 65536
 
 #endif /*LV_USE_PPA*/
 

@@ -42,7 +42,7 @@ config LV_PPA_BURST_LENGTH
 
 config LV_PPA_ALPHA_MIN_AREA
 	int "Minimum area (px) for PPA alpha compositing"
-	default 32768
+	default 65536
 	help
 		Images with an alpha channel or a partial opacity are composited by
 		the PPA only from this many pixels up; smaller blocks go to software,

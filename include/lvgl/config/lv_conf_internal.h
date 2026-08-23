@@ -1049,7 +1049,7 @@
     #ifdef CONFIG_LV_PPA_ALPHA_MIN_AREA
         #define LV_PPA_ALPHA_MIN_AREA CONFIG_LV_PPA_ALPHA_MIN_AREA
     #else
-        #define LV_PPA_ALPHA_MIN_AREA 32768
+        #define LV_PPA_ALPHA_MIN_AREA 65536
     #endif
 #endif
 

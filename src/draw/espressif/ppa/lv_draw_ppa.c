@@ -152,7 +152,9 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      * on the transaction - so a small block is faster in software,
                      * which is where it went before this path existed. Measured on
                      * an ESP32-P4 rev 1.0 (720x1280) and a rev 1.3 (1024x600): the
-                     * PPA only comes out ahead from 256x256 up, on both. */
+                     * PPA only comes out ahead from 256x256 up, on both, so the
+                     * default threshold is that size rather than an interpolated
+                     * value between it and the 128x128 that still loses. */
                     lv_area_t blend_area;
                     if(!lv_area_intersect(&blend_area, &t->area, &t->clip_area)) return 0;
                     if((uint32_t)(lv_area_get_width(&blend_area) *
