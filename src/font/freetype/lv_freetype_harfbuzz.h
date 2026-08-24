@@ -71,17 +71,6 @@ void lv_hb_shaped_text_destroy(lv_hb_shaped_text_t * shaped);
  */
 bool lv_freetype_is_harfbuzz_font(const lv_font_t * font);
 
-/**
- * Get the width of a shaped text string in pixels.
- * Shapes the text using HarfBuzz and sums up the x_advance values.
- * @param font pointer to an LVGL font (must be a FreeType font)
- * @param text UTF-8 encoded text
- * @param byte_len length of text in bytes
- * @param letter_space extra spacing between glyphs
- * @return width of the shaped text in pixels, or -1 on failure
- */
-int32_t lv_hb_get_text_width(const lv_font_t * font, const char * text, uint32_t byte_len, int32_t letter_space);
-
 /**********************
  *      MACROS
  **********************/

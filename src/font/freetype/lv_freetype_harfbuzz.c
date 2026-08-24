@@ -198,40 +198,6 @@ void lv_hb_shaped_text_destroy(lv_hb_shaped_text_t * shaped)
     lv_free(shaped);
 }
 
-int32_t lv_hb_get_text_width(const lv_font_t * font, const char * text, uint32_t byte_len, int32_t letter_space)
-{
-    if(font == NULL || text == NULL || byte_len == 0) return 0;
-
-    lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, text, byte_len, LV_BASE_DIR_AUTO);
-    if(shaped == NULL) return -1;
-
-    int32_t width = 0;
-    for(uint32_t i = 0; i < shaped->count; i++) {
-        int32_t glyph_w = shaped->glyphs[i].x_advance;
-
-        /* For .notdef glyphs (glyph_id == 0), try the fallback font chain */
-        if(shaped->glyphs[i].glyph_id == 0 && font->fallback != NULL) {
-            uint32_t tmp_ofs = shaped->glyphs[i].cluster;
-            uint32_t letter = lv_text_encoded_next(text, &tmp_ofs);
-            if(letter) {
-                glyph_w = lv_font_get_glyph_width(font->fallback, letter, 0);
-            }
-        }
-
-        if(glyph_w > 0) {
-            width += glyph_w + letter_space;
-        }
-    }
-
-    /* Trim the last letter space */
-    if(width > 0) {
-        width -= letter_space;
-    }
-
-    lv_hb_shaped_text_destroy(shaped);
-    return width;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
