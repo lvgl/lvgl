@@ -134,6 +134,14 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                     return 0;
                 }
 
+                /* The PPA describes a picture by its width in pixels and derives
+                 * the row pitch from it, so a source whose stride is padded has to
+                 * be describable as a whole number of pixels. LVGL's image
+                 * converter does pad it - the benchmark logo is 100 px wide with a
+                 * 448 byte stride - and RGB888 padded to 320 bytes is not a whole
+                 * number of pixels at all. Leave those to software. */
+                if(lv_ppa_pic_w(dsc->header.stride, dsc->header.w, dsc->header.cf) == 0) return 0;
+
                 /* A source alpha channel or a global opacity means the engine has
                  * to composite against the destination instead of copying over it.
                  * Only an RGB565 destination is taken: it has no alpha of its own,

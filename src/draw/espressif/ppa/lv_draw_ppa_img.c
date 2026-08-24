@@ -78,6 +78,17 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     const int32_t block_w = lv_area_get_width(clipped_img_area);
     const int32_t block_h = lv_area_get_height(clipped_img_area);
 
+    /* Both buffers are described to the PPA by their row pitch, not their width:
+     * see lv_ppa_pic_w(). ppa_evaluate() rejects a source it cannot describe, so
+     * the source pitch is known good here; the destination is a draw buf whose
+     * stride only exceeds its width when LV_DRAW_BUF_STRIDE_ALIGN is raised. */
+    const int32_t src_pic_w  = lv_ppa_pic_w(decoded->header.stride, draw_dsc->header.w, src_cf);
+    const int32_t dest_pic_w = lv_ppa_pic_w(draw_buf->header.stride, draw_buf->header.w, dest_cf);
+    if(src_pic_w == 0 || dest_pic_w == 0) {
+        LV_LOG_WARN("PPA draw_img: stride is not a whole number of pixels");
+        return;
+    }
+
     /* Does this draw need real compositing, or is a plain copy enough?
      * - a source alpha channel has to be honoured against what the destination
      *   already holds;
@@ -101,10 +112,10 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
          * the foreground is the image drawn over it. The copy path below uses
          * the opposite assignment, which is why it cannot honour a source alpha
          * channel - it overwrites that alpha with 0xFF. */
-        ppa_set_in_blk(&cfg.in_bg, dest_buf, draw_buf->header.w, draw_buf->header.h,
+        ppa_set_in_blk(&cfg.in_bg, dest_buf, dest_pic_w, draw_buf->header.h,
                        dest_area.x1, dest_area.y1, block_w, block_h,
                        lv_color_format_to_ppa_blend(dest_cf));
-        ppa_set_in_blk(&cfg.in_fg, src_buf, draw_dsc->header.w, draw_dsc->header.h,
+        ppa_set_in_blk(&cfg.in_fg, src_buf, src_pic_w, draw_dsc->header.h,
                        src_area.x1, src_area.y1, block_w, block_h,
                        lv_color_format_to_ppa_blend(src_cf));
 
@@ -137,10 +148,10 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
          * fully transparent dummy, so the output is the converted source. The
          * dummy still has to describe a region that exists in the destination
          * buffer - the PPA fetches it even though it contributes nothing. */
-        ppa_set_in_blk(&cfg.in_bg, src_buf, draw_dsc->header.w, draw_dsc->header.h,
+        ppa_set_in_blk(&cfg.in_bg, src_buf, src_pic_w, draw_dsc->header.h,
                        src_area.x1, src_area.y1, block_w, block_h,
                        lv_color_format_to_ppa_blend(src_cf));
-        ppa_set_in_blk(&cfg.in_fg, dest_buf, draw_buf->header.w, draw_buf->header.h,
+        ppa_set_in_blk(&cfg.in_fg, dest_buf, dest_pic_w, draw_buf->header.h,
                        dest_area.x1, dest_area.y1, block_w, block_h,
                        PPA_BLEND_COLOR_MODE_A8);
 
@@ -152,7 +163,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
 
     cfg.out.buffer          = dest_buf;
     cfg.out.buffer_size     = draw_buf->data_size;
-    cfg.out.pic_w           = draw_buf->header.w;
+    cfg.out.pic_w           = dest_pic_w;
     cfg.out.pic_h           = draw_buf->header.h;
     cfg.out.block_offset_x  = dest_area.x1;
     cfg.out.block_offset_y  = dest_area.y1;
