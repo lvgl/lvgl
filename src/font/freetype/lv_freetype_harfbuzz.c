@@ -97,6 +97,10 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
             lv_mutex_unlock(&cache_node->face_lock);
             return NULL;
         }
+        /*hb-ft defaults to FT_LOAD_NO_HINTING; LVGL loads glyphs with native
+         *hinting (only the autohinter disabled), so advances would disagree
+         *with rendering and measurement by up to a pixel per glyph*/
+        hb_ft_font_set_load_flags(hb_font, FT_LOAD_DEFAULT | FT_LOAD_NO_AUTOHINT);
         cache_node->hb_font = hb_font;
         cache_node->hb_font_size = dsc->size;
     }
