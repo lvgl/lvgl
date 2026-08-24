@@ -50,7 +50,7 @@ typedef struct _lv_array_t {
  * @param capacity the initial capacity of the array
  * @param element_size the size of an element in bytes
  */
-void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size);
+lv_result_t lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size);
 
 /**
  * Init an array from a buffer.
