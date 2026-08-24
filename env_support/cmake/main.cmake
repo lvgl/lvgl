@@ -159,8 +159,6 @@ if (NOT LV_BUILD_USE_KCONFIG)
 
         set(CONF_INC_DIR ${LV_BUILD_CONF_DIR})
 
-        list(APPEND LVGL_PUBLIC_HEADERS ${CONF_INC_DIR}/lv_conf.h)
-
         # Avoid compilation errors due to the relative path of the include directory
         if (NOT IS_ABSOLUTE ${CONF_INC_DIR})
             file(REAL_PATH ${CONF_INC_DIR} CONF_INC_DIR BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
@@ -174,8 +172,6 @@ if (NOT LV_BUILD_USE_KCONFIG)
     else()
 
         message(STATUS "Using lv_conf.h from the top-level project directory")
-
-        list(APPEND LVGL_PUBLIC_HEADERS ${CMAKE_SOURCE_DIR}/lv_conf.h)
 
         set(CONF_INC_DIR ${CMAKE_SOURCE_DIR})
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
@@ -475,8 +471,7 @@ if(CONFIG_LV_USE_THORVG_INTERNAL)
         VERSION ${LVGL_VERSION}
         SOVERSION ${LVGL_SOVERSION}
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-        PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
     install(TARGETS lvgl_thorvg
         EXPORT lvglTargets
