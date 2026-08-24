@@ -1,0 +1,263 @@
+name: Zephyr
+
+# Builds and runs Zephyr's own LVGL samples against the LVGL code in this
+# commit, so a change that breaks the Zephyr integration is caught here rather
+# than by Zephyr's next LVGL uprev.
+#
+# The Zephyr version is pinned in tests/zephyr/west.yml; see
+# tests/zephyr/README.md for the details and for how to reproduce a failure.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      zephyr_repo:
+        description: "Zephyr repository URL (default: the manifest pin)"
+        required: false
+        type: string
+      zephyr_revision:
+        description: "Zephyr branch, tag or SHA (default: the manifest pin)"
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  zephyr:
+    name: Build and run Zephyr's LVGL samples
+    runs-on: ubuntu-24.04
+    env:
+      # native_sim builds with the host compiler, so no Zephyr SDK is needed.
+      ZEPHYR_TOOLCHAIN_VARIANT: host
+      BOARD: native_sim/native/64
+      # This is what puts the LVGL code under test into the build: LVGL is
+      # blocklisted from Zephyr's manifest, so this checkout is the only lvgl
+      # module Zephyr sees. Both cmake and twister honour it.
+      ZEPHYR_EXTRA_MODULES: ${{ github.workspace }}/lvgl
+      # How long each sample is left running before it is stopped. Long enough
+      # for a demo to get past start-up and render several frames.
+      RUN_SECONDS: 20
+      # Reconciles Zephyr's stale LVGL source list and the config values its
+      # glue expects, so those differences need no Zephyr patch. Must be
+      # absolute: CMake includes it from each sample's own build directory.
+      CUSTOM_LVGL_CMAKE: ${{ github.workspace }}/lvgl/tests/zephyr/zephyr-with-custom-lvgl.cmake
+
+    steps:
+      # For pull_request this checks out the merge commit, so the samples are
+      # built against the merged code rather than the branch tip.
+      - name: Check out LVGL
+        uses: actions/checkout@v7
+        with:
+          path: lvgl
+          persist-credentials: false
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build gperf device-tree-compiler libsdl2-dev \
+            ccache xz-utils file
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install west
+        run: pip install west
+
+      # The manifest is copied into the workspace rather than used in place:
+      # `west init -l` makes the manifest directory's *parent* the workspace
+      # top directory, which for lvgl/tests/zephyr would be lvgl/tests.
+      # Copying also lets workflow_dispatch override the pin without touching
+      # the committed file.
+      - name: Materialize the west manifest
+        id: pin
+        run: |
+          # Actions runs `bash -e`, not `-o pipefail`: without this a failing
+          # materialize would be hidden by tee's exit status and leave the
+          # step outputs silently empty.
+          set -o pipefail
+          python3 lvgl/scripts/zephyr/manifest.py materialize \
+            --manifest lvgl/tests/zephyr/west.yml \
+            --output manifest/west.yml \
+            --repo "${{ inputs.zephyr_repo }}" \
+            --revision "${{ inputs.zephyr_revision }}" | tee -a "$GITHUB_OUTPUT"
+          echo "--- manifest used ---"
+          cat manifest/west.yml
+
+      - name: Set up the Zephyr workspace
+        run: |
+          west init -l manifest
+          # Neither optional projects nor vendor HALs are needed to build the
+          # LVGL samples for native_sim, and the HALs are by far the largest
+          # part of the workspace.
+          west config manifest.group-filter -- -optional,-hal
+          west update --narrow -o=--depth=1
+          west zephyr-export
+
+      - name: Install Zephyr Python dependencies
+        run: |
+          pip install -r zephyr/scripts/requirements-base.txt \
+                      -r zephyr/scripts/requirements-build-test.txt \
+                      -r zephyr/scripts/requirements-run-test.txt
+
+      # Zephyr picks ccache up automatically. Most of what the samples compile
+      # is the kernel, which is identical from run to run, so this is where the
+      # build time goes.
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: zephyr-${{ runner.os }}
+          # Room for all the sample configurations; too small and it thrashes.
+          max-size: 1G
+
+      # Fixes that are not upstream in Zephyr yet. A patch that no longer
+      # applies is a hard error: silently skipping it would make this check
+      # report a result for a tree that is not the one we think we are testing.
+      - name: Apply the pending Zephyr patches
+        id: patches
+        env:
+          REVISION: ${{ steps.pin.outputs.revision }}
+        run: |
+          shopt -s nullglob
+          patches=(../lvgl/tests/zephyr/patches/*.patch)
+          if [ ${#patches[@]} -eq 0 ]; then
+            echo "no patches to apply"
+            echo "applied=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          names=()
+          for p in "${patches[@]}"; do
+            name=$(basename "$p")
+            if ! git apply --check "$p"; then
+              echo "::error::$name no longer applies to this Zephyr tree." \
+                   "Either it landed upstream and should be deleted, or it" \
+                   "needs rebasing. See tests/zephyr/README.md."
+              python3 ../lvgl/scripts/zephyr/samples.py report \
+                --output ../pr-report-zephyr/zephyr.json \
+                --verdict ../zephyr-verdict.json \
+                --setup-error "\`$name\` no longer applies to Zephyr \`$REVISION\`. Either the fix landed upstream and the patch should be deleted, or it needs rebasing. See \`tests/zephyr/README.md\`."
+              exit 1
+            fi
+            git apply "$p"
+            echo "applied $name"
+            names+=("$name")
+          done
+          printf 'applied=%s\n' "$(IFS=,; echo "${names[*]}")" >> "$GITHUB_OUTPUT"
+        working-directory: zephyr
+
+      # Informational: being behind upstream is reported, never fatal.
+      - name: Check for a newer Zephyr release
+        id: version
+        env:
+          # Lifts the GitHub API rate limit off the shared runner IP.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          note=$(python3 lvgl/scripts/zephyr/manifest.py check-version \
+                   --manifest lvgl/tests/zephyr/west.yml)
+          echo "$note"
+          echo "note=$note" >> "$GITHUB_OUTPUT"
+          case "$note" in
+            outdated*) echo "::warning::$note" ;;
+          esac
+
+      # Twister discovers the LVGL samples from their sample.yaml files, so new
+      # samples added upstream are picked up without changing this workflow. It
+      # applies each sample's own extra_configs, which is how the individual
+      # demos get built. --fixture keeps the fixture-gated demos in the set.
+      # Build only: these are GUI applications with no test harness, so they are
+      # run separately below.
+      - name: Build the samples
+        id: build
+        continue-on-error: true
+        run: |
+          west twister \
+            --platform "$BOARD" \
+            --testsuite-root zephyr/samples/subsys/display/lvgl \
+            --testsuite-root zephyr/samples/modules/lvgl \
+            --fixture fixture_display \
+            --build-only \
+            --jobs "$(nproc)" \
+            --extra-args "CMAKE_PROJECT_INCLUDE=$CUSTOM_LVGL_CMAKE" \
+            --outdir twister-out
+
+      - name: Run the samples
+        id: run
+        continue-on-error: true
+        run: |
+          python3 lvgl/scripts/zephyr/samples.py run \
+            --outdir twister-out \
+            --results run-results.json \
+            --seconds "$RUN_SECONDS"
+
+      # Skipped when the patch step already wrote a setup-error report, so that
+      # report is not overwritten by an "empty run" one.
+      - name: Build the PR report
+        if: always() && steps.patches.outcome == 'success'
+        env:
+          REVISION: ${{ steps.pin.outputs.revision }}
+          VERSION_NOTE: ${{ steps.version.outputs.note }}
+          APPLIED_PATCHES: ${{ steps.patches.outputs.applied }}
+        run: |
+          python3 lvgl/scripts/zephyr/samples.py report \
+            --outdir twister-out \
+            --results run-results.json \
+            --output pr-report-zephyr/zephyr.json \
+            --details zephyr-details.md \
+            --verdict zephyr-verdict.json \
+            --board "$BOARD" \
+            --pin "$REVISION" \
+            --version-note "$VERSION_NOTE" \
+            --patches "$APPLIED_PATCHES"
+          cat zephyr-details.md >> "$GITHUB_STEP_SUMMARY"
+
+      # Collected by .github/workflows/pr_comment.yml, which renders every
+      # `pr-report*` artifact into the single PR report comment.
+      - name: Upload the report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-report-zephyr
+          path: pr-report-zephyr/
+          # There is nothing to upload when scripts/pr_report is absent; the
+          # check still reports its verdict through the job status.
+          if-no-files-found: ignore
+
+      - name: Upload the build and run logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zephyr-logs
+          path: |
+            twister-out/twister.json
+            twister-out/twister.log
+            run-results.json
+            zephyr-verdict.json
+          if-no-files-found: warn
+
+      # Gates on the verdict rather than on the PR report, so whether this check
+      # passes never depends on the comment machinery being present.
+      - name: Fail if any sample did not build or run
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          path = Path("zephyr-verdict.json")
+          if not path.is_file():
+              # An earlier step failed before a verdict could be recorded; that
+              # step already failed the job, so just say so and stop.
+              sys.exit("no verdict was recorded - see the failing step above")
+          verdict = json.loads(path.read_text())
+          print(f"[{verdict['icon']}] {verdict['summary']}")
+          if verdict["icon"] == "fail":
+              sys.exit(1)
+          PY
