@@ -149,7 +149,19 @@ typedef enum {
  */
 lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
 
+/**
+ * Add an event callback to an event list.
+ *
+ * @param list      pointer to an event list
+ * @param cb        the callback to invoke when a matching event is sent
+ * @param filter    event code to react to
+ * @param user_data custom pointer stored with the callback and retrievable
+ *                  inside it via `lv_event_get_user_data()`. @nullable.
+ * @return          pointer to the newly created event descriptor, or `NULL` on failure.
+ *                  Can be passed to `lv_event_remove_dsc()` later.
+ */
 lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
+
 bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc);
 
 uint32_t lv_event_get_count(lv_event_list_t * list);
