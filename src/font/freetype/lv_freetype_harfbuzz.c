@@ -59,7 +59,7 @@ void lv_freetype_font_set_harfbuzz(lv_font_t * font, bool enabled)
 lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text, uint32_t byte_len,
                                        lv_base_dir_t dir_hint)
 {
-    if(font == NULL || text == NULL || byte_len == 0) return NULL;
+    if(font == NULL || font->dsc == NULL || text == NULL || byte_len == 0) return NULL;
 
     const lv_freetype_font_dsc_t * dsc = (const lv_freetype_font_dsc_t *)font->dsc;
     if(!LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc)) {
