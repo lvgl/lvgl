@@ -462,10 +462,6 @@ static lv_fs_res_t lv_fs_uefi_dir_read_cb(lv_fs_drv_t * drv, void * rddir_p, cha
     }
 
     if((info->Attribute & EFI_FILE_DIRECTORY) != 0) {
-        if(fn_len == 0) {
-            return_code = LV_FS_RES_UNKNOWN;
-            goto error;
-        }
         fn[0] = '/';
         fn++;
         fn_len--;

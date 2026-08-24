@@ -516,10 +516,7 @@ lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn, uint32_t fn_len)
 {
     LV_CHECK_ARG(rddir_p != NULL, return LV_FS_RES_INV_PARAM);
     LV_CHECK_ARG(fn != NULL, return LV_FS_RES_INV_PARAM);
-
-    if(fn_len == 0) {
-        return LV_FS_RES_INV_PARAM;
-    }
+    LV_CHECK_ARG(fn_len > 0, return LV_FS_RES_INV_PARAM);
 
     if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
         fn[0] = '\0';

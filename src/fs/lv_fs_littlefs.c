@@ -323,7 +323,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
     LV_ASSERT(drv != NULL);
     LV_ASSERT(dir_p != NULL);
     LV_ASSERT(fn != NULL);
-    if(fn_len == 0) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(fn_len > 0);
 
     LittleDirectory * lf = dir_p;
 

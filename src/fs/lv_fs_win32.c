@@ -340,10 +340,6 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     LV_ASSERT(pos_p != NULL);
     LV_UNUSED(drv);
 
-    if(!pos_p) {
-        return LV_FS_RES_INV_PARAM;
-    }
-
     LARGE_INTEGER file_pointer;
     file_pointer.QuadPart = 0;
 
@@ -431,7 +427,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
     LV_ASSERT(dir_p != NULL);
     LV_ASSERT(fn != NULL);
     LV_UNUSED(drv);
-    if(fn_len == 0) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(fn_len > 0);
 
     dir_handle_t * handle = (dir_handle_t *)dir_p;
     lv_strlcpy(fn, handle->next_fn, fn_len);
