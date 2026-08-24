@@ -35,6 +35,8 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 
 void lv_littlefs_set_handler(lfs_t * lfs)
 {
+    LV_CHECK_ARG(lfs != NULL, return);
+
     lv_fs_drv_t * drv = lv_fs_get_drv(LV_FS_LITTLEFS_LETTER);
     drv->user_data = lfs;
 }
@@ -62,9 +64,7 @@ void lv_fs_littlefs_init(void)
 lv_fs_res_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
 {
 
-    if(lfs == NULL) {
-        return LV_FS_RES_INV_PARAM; /*Invalid LittleFS handle*/
-    }
+    LV_CHECK_ARG(lfs != NULL, return LV_FS_RES_INV_PARAM);
 
     if(LV_FS_IS_VALID_LETTER(letter) == false) {
         return LV_FS_RES_INV_PARAM; /*Invalid letter*/
@@ -151,9 +151,12 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
  */
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(file_p != NULL);
     LittleFile * lf = file_p;
 
     lfs_t * lfs = drv->user_data;
+    LV_ASSERT(lfs != NULL);
     lfs_file_close(lfs, &lf->file);
     lv_free(lf);
 
@@ -171,9 +174,14 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(buf != NULL || btr == 0);
+    LV_ASSERT(br != NULL);
     LittleFile * lf = file_p;
 
     lfs_t * lfs = drv->user_data;
+    LV_ASSERT(lfs != NULL);
     *br = lfs_file_read(lfs, &lf->file, (uint8_t *)buf, btr);
 
     return (int32_t)(*br) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -190,9 +198,14 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(buf != NULL || btw == 0);
+    LV_ASSERT(bw != NULL);
     LittleFile * lf = file_p;
 
     lfs_t * lfs = drv->user_data;
+    LV_ASSERT(lfs != NULL);
     *bw = lfs_file_write(lfs, &lf->file, (uint8_t *)buf, btw);
 
     return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -208,6 +221,8 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  */
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(file_p != NULL);
     int mode = 0;
     if(whence == LV_FS_SEEK_SET)
         mode = LFS_SEEK_SET;
@@ -219,6 +234,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
     LittleFile * lf = file_p;
 
     lfs_t * lfs = drv->user_data;
+    LV_ASSERT(lfs != NULL);
     int rc = lfs_file_seek(lfs, &lf->file, pos, mode);
 
     return rc < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -233,9 +249,13 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(pos_p != NULL);
     LittleFile * lf = file_p;
 
     lfs_t * lfs = drv->user_data;
+    LV_ASSERT(lfs != NULL);
     *pos_p = lfs_file_tell(lfs, &lf->file);
 
     return (int32_t)(*pos_p) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -249,6 +269,8 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
  */
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(path != NULL);
     LittleDirectory * ld = lv_malloc(sizeof(LittleDirectory));
     LV_ASSERT_MALLOC(ld);
 
@@ -256,6 +278,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     lv_snprintf(buf, sizeof(buf), LV_FS_LITTLEFS_PATH "%s", path);
 
     lfs_t * lfs = drv->user_data;
+    LV_ASSERT(lfs != NULL);
     int err = lfs_dir_open(lfs, &ld->dir, buf);
     if(err != LFS_ERR_OK) {
         lv_free(ld);
@@ -273,9 +296,12 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
  */
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(dir_p != NULL);
     LittleDirectory * ld = dir_p;
 
     lfs_t * lfs = drv->user_data;
+    LV_ASSERT(lfs != NULL);
     int rc = lfs_dir_close(lfs, &ld->dir);
 
     if(rc < 0) return LV_FS_RES_UNKNOWN;
@@ -294,7 +320,10 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
  */
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
 {
-    if(fn_len == 0) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(dir_p != NULL);
+    LV_ASSERT(fn != NULL);
+    LV_ASSERT(fn_len > 0);
 
     LittleDirectory * lf = dir_p;
 

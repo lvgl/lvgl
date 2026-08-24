@@ -114,6 +114,7 @@ void lv_fs_uefi_init(void)
 
 static bool lv_fs_uefi_ready_cb(lv_fs_drv_t * drv)
 {
+    LV_ASSERT(drv != NULL);
     EFI_HANDLE fs_handle = (EFI_HANDLE)drv->user_data;
 
     return fs_handle != NULL;
@@ -121,6 +122,8 @@ static bool lv_fs_uefi_ready_cb(lv_fs_drv_t * drv)
 
 static void * lv_fs_uefi_open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
+    LV_ASSERT(drv != NULL);
+    LV_ASSERT(path != NULL);
     EFI_STATUS status;
     EFI_FILE_PROTOCOL * fs_root = NULL;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL * fs_interface = NULL;
@@ -195,7 +198,8 @@ static lv_fs_res_t lv_fs_uefi_close_cb(lv_fs_drv_t * drv, void * file_p)
     EFI_STATUS status;
     lv_uefi_fs_file_context_t * file_ctx = (lv_uefi_fs_file_context_t *)file_p;
 
-    if(file_ctx == NULL || file_ctx->interface == NULL) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(file_ctx != NULL);
+    LV_ASSERT(file_ctx->interface != NULL);
 
     status = file_ctx->interface->Close(file_ctx->interface);
     if(status != EFI_SUCCESS) return LV_FS_RES_HW_ERR;
@@ -211,7 +215,10 @@ static lv_fs_res_t lv_fs_uefi_read_cb(lv_fs_drv_t * drv, void * file_p, void * b
     lv_uefi_fs_file_context_t * file_ctx = (lv_uefi_fs_file_context_t *)file_p;
     UINTN buf_size = btr;
 
-    if(file_ctx == NULL || file_ctx->interface == NULL) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(buf != NULL || btr == 0);
+    LV_ASSERT(br != NULL);
+    LV_ASSERT(file_ctx != NULL);
+    LV_ASSERT(file_ctx->interface != NULL);
 
     status = file_ctx->interface->Read(
                      file_ctx->interface,
@@ -230,7 +237,10 @@ static lv_fs_res_t lv_fs_uefi_write_cb(lv_fs_drv_t * drv, void * file_p, const v
     lv_uefi_fs_file_context_t * file_ctx = (lv_uefi_fs_file_context_t *)file_p;
     UINTN buf_size = btw;
 
-    if(file_ctx == NULL || file_ctx->interface == NULL) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(buf != NULL || btw == 0);
+    LV_ASSERT(bw != NULL);
+    LV_ASSERT(file_ctx != NULL);
+    LV_ASSERT(file_ctx->interface != NULL);
 
     status = file_ctx->interface->Write(
                      file_ctx->interface,
@@ -251,7 +261,8 @@ static lv_fs_res_t lv_fs_uefi_seek_cb(lv_fs_drv_t * drv, void * file_p, uint32_t
     lv_uefi_fs_file_context_t * file_ctx = (lv_uefi_fs_file_context_t *)file_p;
     UINT64 new_pos;
 
-    if(file_ctx == NULL || file_ctx->interface == NULL) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(file_ctx != NULL);
+    LV_ASSERT(file_ctx->interface != NULL);
 
     if(whence == LV_FS_SEEK_END) {
         status = file_ctx->interface->SetPosition(
@@ -300,7 +311,9 @@ static lv_fs_res_t lv_fs_uefi_tell_cb(lv_fs_drv_t * drv, void * file_p, uint32_t
     lv_uefi_fs_file_context_t * file_ctx = (lv_uefi_fs_file_context_t *)file_p;
     UINT64 pos;
 
-    if(file_ctx == NULL || file_ctx->interface == NULL) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(pos_p != NULL);
+    LV_ASSERT(file_ctx != NULL);
+    LV_ASSERT(file_ctx->interface != NULL);
 
     status = file_ctx->interface->GetPosition(
                      file_ctx->interface,
@@ -316,6 +329,7 @@ static lv_fs_res_t lv_fs_uefi_tell_cb(lv_fs_drv_t * drv, void * file_p, uint32_t
 
 static void * lv_fs_uefi_dir_open_cb(lv_fs_drv_t * drv, const char * path)
 {
+    LV_ASSERT(drv != NULL);
     EFI_STATUS status;
     EFI_FILE_PROTOCOL * fs_root = NULL;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL * fs_interface = NULL;
@@ -401,8 +415,10 @@ static lv_fs_res_t lv_fs_uefi_dir_read_cb(lv_fs_drv_t * drv, void * rddir_p, cha
 
     CONST CHAR16 * fn_ucs2;
 
-    if(fn == NULL || fn_len == 0) return LV_FS_RES_INV_PARAM;
-    if(file_ctx == NULL || file_ctx->interface == NULL) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(fn != NULL);
+    LV_ASSERT(fn_len > 0);
+    LV_ASSERT(file_ctx != NULL);
+    LV_ASSERT(file_ctx->interface != NULL);
 
     // skip . and ..
     do {
@@ -446,10 +462,6 @@ static lv_fs_res_t lv_fs_uefi_dir_read_cb(lv_fs_drv_t * drv, void * rddir_p, cha
     }
 
     if((info->Attribute & EFI_FILE_DIRECTORY) != 0) {
-        if(fn_len == 0) {
-            return_code = LV_FS_RES_UNKNOWN;
-            goto error;
-        }
         fn[0] = '/';
         fn++;
         fn_len--;
@@ -477,7 +489,8 @@ static lv_fs_res_t lv_fs_uefi_dir_close_cb(lv_fs_drv_t * drv, void * rddir_p)
     EFI_STATUS status;
     lv_uefi_fs_file_context_t * file_ctx = (lv_uefi_fs_file_context_t *)rddir_p;
 
-    if(file_ctx == NULL || file_ctx->interface == NULL) return LV_FS_RES_INV_PARAM;
+    LV_ASSERT(file_ctx != NULL);
+    LV_ASSERT(file_ctx->interface != NULL);
 
     status = file_ctx->interface->Close(file_ctx->interface);
     if(status != EFI_SUCCESS) return LV_FS_RES_HW_ERR;
@@ -520,7 +533,7 @@ static void lv_fs_drv_uefi_deinit(lv_fs_drv_t * drv)
 
 static void lv_fs_uefi_lvgl_path_to_uefi_path(CHAR16 * path)
 {
-    if(path == NULL) return;
+    LV_ASSERT(path != NULL);
 
     for(; *path != '\0'; path++) {
         if(*path == L'/') *path = L'\\';
@@ -529,7 +542,7 @@ static void lv_fs_uefi_lvgl_path_to_uefi_path(CHAR16 * path)
 
 static void lv_fs_uefi_uefi_path_to_lvgl_path(CHAR16 * path)
 {
-    if(path == NULL) return;
+    LV_ASSERT(path != NULL);
 
     for(; *path != '\0'; path++) {
         if(*path == L'\\') *path = L'/';
@@ -538,7 +551,7 @@ static void lv_fs_uefi_uefi_path_to_lvgl_path(CHAR16 * path)
 
 static bool lv_fs_uefi_is_dot_path(CONST CHAR16 * path)
 {
-    if(path == NULL) return FALSE;
+    LV_ASSERT(path != NULL);
 
     if(path[0] == L'.' && path[1] == L'\0') return TRUE;
     if(path[0] == L'.' && path[1] == L'.' && path[2] == L'\0') return TRUE;
@@ -550,7 +563,7 @@ static bool lv_fs_uefi_is_dir(EFI_FILE_PROTOCOL * dir)
 {
     UINT64 attributes;
 
-    if(dir == NULL) return FALSE;
+    LV_ASSERT(dir != NULL);
 
     EFI_FILE_INFO * info = lv_fs_uefi_get_info(dir);
     if(info == NULL) return FALSE;
@@ -565,7 +578,7 @@ static bool lv_fs_uefi_is_file(EFI_FILE_PROTOCOL * file)
 {
     UINT64 attributes;
 
-    if(file == NULL) return FALSE;
+    LV_ASSERT(file != NULL);
 
     EFI_FILE_INFO * info = lv_fs_uefi_get_info(file);
     if(info == NULL) return FALSE;
@@ -578,6 +591,7 @@ static bool lv_fs_uefi_is_file(EFI_FILE_PROTOCOL * file)
 
 static EFI_FILE_INFO * lv_fs_uefi_get_info(EFI_FILE_PROTOCOL * file)
 {
+    LV_ASSERT(file != NULL);
     EFI_STATUS status;
     EFI_FILE_INFO * info = NULL;
     UINTN size = 0;
