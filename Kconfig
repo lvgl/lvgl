@@ -261,7 +261,10 @@ endmenu
 menu "Rendering Configuration"
 
 menu "Color Settings"
-	choice
+	# Named so downstream Kconfig trees (e.g. Zephyr's lvgl module, which
+	# declares "choice LV_COLOR_DEPTH" of its own) merge into this choice
+	# instead of creating a second, conflicting one.
+	choice LV_COLOR_DEPTH
 		prompt "Color depth"
 		default LV_COLOR_DEPTH_16
 
