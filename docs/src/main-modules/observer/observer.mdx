@@ -195,7 +195,7 @@ static void some_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 This function returns a pointer to the newly-created Observer.
 
 When using this method of subscribing, it is the responsibility of the user to call
-<ApiLink name="lv_observer_remove" display="lv_observer_remove(observer)" /> when the Observer is no longer needed, which
+<ApiLink name="lv_observer_delete" display="lv_observer_delete(observer)" /> when the Observer is no longer needed, which
 both unsubscribes it from the Subject and deletes it from the LVGL heap.
 
 #### Subscribing While Associating Observer with a Non-Widget Object
@@ -210,7 +210,7 @@ A copy of the passed pointer can be retrieved by calling
 <ApiLink name="lv_observer_get_target" display="lv_observer_get_target(observer)" />, e.g. inside the callback function.
 
 When using this method of subscribing, it is the responsibility of the user to call
-<ApiLink name="lv_observer_remove" display="lv_observer_remove(observer)" /> when the Observer is no longer needed, which
+<ApiLink name="lv_observer_delete" display="lv_observer_delete(observer)" /> when the Observer is no longer needed, which
 both unsubscribes it from the Subject and deletes it from the LVGL heap.
 
 #### Subscribing While Associating Observer with a Widget
@@ -250,7 +250,7 @@ from memory using any of the methods below, depending on the effect you want to 
     - <ApiLink name="lv_subject_deinit" display="lv_subject_deinit(subject)" /> gracefully disconnects `subject` from
       all associated Observers and Widget events.  This includes subscriptions made
       using any of the [Widget Binding](/main-modules/observer/observer) functions covered below.
-    - <ApiLink name="lv_observer_remove" display="lv_observer_remove(observer)" /> deletes that specific Observer and
+    - <ApiLink name="lv_observer_delete" display="lv_observer_delete(observer)" /> deletes that specific Observer and
       gracefully disconnects it from its `subject` and any associated Widgets,
       where `observer` is the return value any of the above
       `lv_subject_add_observer_...()` functions.
