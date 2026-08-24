@@ -169,13 +169,22 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
     dsc->ext_data.free_cb = NULL;
     dsc->ext_data.data = NULL;
 #endif
-
+    lv_result_t res;
     if(event_array_size(list) == 0) {
         /*event list hasn't been initialized.*/
-        lv_array_init(&list->array, 1, sizeof(lv_event_dsc_t *));
+        res = lv_array_init(&list->array, 1, sizeof(lv_event_dsc_t *));
+        if(res != LV_RESULT_OK) {
+            lv_free(dsc);
+            return NULL;
+        }
     }
 
-    lv_array_push_back(&list->array, &dsc);
+    res = lv_array_push_back(&list->array, &dsc);
+    if(res != LV_RESULT_OK) {
+        lv_free(dsc);
+        return NULL;
+    }
+
     return dsc;
 }
 
