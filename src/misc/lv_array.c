@@ -33,20 +33,26 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size)
+lv_result_t lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size)
 {
-    array->size = 0;
-    array->capacity = capacity;
-    array->element_size = element_size;
+    LV_ASSERT(array != NULL);
+    lv_memset(array, 0,  sizeof(*array));
 
-    array->data = lv_malloc(capacity * element_size);
+    void * data = lv_malloc(capacity * element_size);
+    LV_ASSERT_MALLOC(data);
+    if(!data) {
+        return LV_RESULT_INVALID;
+    }
+    lv_array_init_from_buf(array, data, capacity, element_size);
     array->inner_alloc = true;
-    LV_ASSERT_MALLOC(array->data);
+    return LV_RESULT_OK;
 }
 
 void lv_array_init_from_buf(lv_array_t * array, void * buf, uint32_t capacity, uint32_t element_size)
 {
-    LV_ASSERT_NULL(buf);
+    LV_ASSERT(array != NULL);
+    LV_ASSERT(buf != NULL);
+    lv_memset(array, 0,  sizeof(*array));
     array->size = 0;
     array->capacity = capacity;
     array->element_size = element_size;

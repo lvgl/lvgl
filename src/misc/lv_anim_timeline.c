@@ -47,7 +47,7 @@ lv_anim_timeline_t * lv_anim_timeline_create(void)
 
 void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 {
-    LV_CHECK_ARG(at != NULL, return);
+    if(at == NULL) return;
 
     lv_anim_timeline_pause(at);
 

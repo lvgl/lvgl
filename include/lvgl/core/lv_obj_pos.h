@@ -181,7 +181,8 @@ void lv_obj_align(lv_obj_t * obj, lv_align_t align, int32_t x_ofs, int32_t y_ofs
 /**
  * Align an object to another object.
  * @param obj       pointer to an object to align
- * @param base      pointer to another object (if NULL `obj`s parent is used). 'obj' will be aligned to it.
+ * @param base      pointer to another object that `obj` will be aligned to. @nullable
+ *                  When NULL `obj`s parent is used.
  * @param align     type of alignment (see 'lv_align_t' enum)
  * @param x_ofs     x coordinate offset after alignment
  * @param y_ofs     y coordinate offset after alignment
@@ -200,7 +201,7 @@ void lv_obj_center(lv_obj_t * obj);
 /**
  * Set the transform matrix of an object
  * @param obj       pointer to an object
- * @param matrix    pointer to a matrix to set
+ * @param matrix    pointer to a matrix to set. @nullable When NULL the transform is reset.
  * @note `LV_DRAW_TRANSFORM_USE_MATRIX` needs to be enabled.
  */
 void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix);
