@@ -106,6 +106,10 @@ if(CONFIG_LV_USE_FREETYPE)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/freetype.cmake)
 endif()
 
+if(CONFIG_LV_USE_HARFBUZZ)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/harfbuzz.cmake)
+endif()
+
 # ====== Libraries ====== #
 if(CONFIG_LV_USE_GLTF)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/fastgltf.cmake)

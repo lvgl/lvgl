@@ -8,6 +8,7 @@ libpng-dev
 libjpeg-turbo8-dev
 libwebp-dev
 libfreetype-dev
+libharfbuzz-dev
 libglfw3-dev
 libsdl2-dev
 libsdl2-image-dev
@@ -15,6 +16,7 @@ libpng-dev:i386
 libjpeg-dev:i386
 libwebp-dev:i386
 libfreetype-dev:i386
+libharfbuzz-dev:i386
 libsdl2-dev:i386
 libsdl2-image-dev:i386
 ruby-full
