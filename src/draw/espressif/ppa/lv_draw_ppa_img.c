@@ -153,7 +153,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
 /* Round a byte count up to the cache line, as required by PPA DMA and esp_cache_msync(). */
 static inline uint32_t lv_draw_ppa_align_size(uint32_t size)
 {
-    return (uint32_t)PPA_ALIGN_UP(size, CONFIG_CACHE_L2_CACHE_LINE_SIZE);
+    return (uint32_t)PPA_ALIGN_UP(size, LV_DRAW_PPA_CACHE_LINE_SIZE);
 }
 
 void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
