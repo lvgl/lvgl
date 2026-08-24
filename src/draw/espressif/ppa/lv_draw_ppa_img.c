@@ -10,6 +10,9 @@
 
 #include "../../lv_draw_image_private.h"
 #include "../../../image/lv_image_decoder_private.h"
+#if LV_USE_DRAW_SW
+    #include "../../sw/lv_draw_sw.h"
+#endif
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
@@ -79,13 +82,22 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     const int32_t block_h = lv_area_get_height(clipped_img_area);
 
     /* Both buffers are described to the PPA by their row pitch, not their width:
-     * see lv_ppa_pic_w(). ppa_evaluate() rejects a source it cannot describe, so
-     * the source pitch is known good here; the destination is a draw buf whose
-     * stride only exceeds its width when LV_DRAW_BUF_STRIDE_ALIGN is raised. */
+     * see lv_ppa_pic_w(). These are the real strides, which is why the decision
+     * is taken here and not in ppa_evaluate() - that runs before the image is
+     * decoded and can only predict the source stride.
+     *
+     * The task has already been assigned to this unit by the time we get here,
+     * so returning would finish it having drawn nothing and leave a hole on the
+     * screen. Hand the draw to the software unit instead. */
     const int32_t src_pic_w  = lv_ppa_pic_w(decoded->header.stride, draw_dsc->header.w, src_cf);
     const int32_t dest_pic_w = lv_ppa_pic_w(draw_buf->header.stride, draw_buf->header.w, dest_cf);
     if(src_pic_w == 0 || dest_pic_w == 0) {
-        LV_LOG_WARN("PPA draw_img: stride is not a whole number of pixels");
+        LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, drawing in software");
+#if LV_USE_DRAW_SW
+        lv_draw_sw_image(t, draw_dsc, img_coords);
+#else
+        LV_LOG_WARN("PPA draw_img: no software draw unit to fall back on, image skipped");
+#endif
         return;
     }
 
