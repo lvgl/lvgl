@@ -94,7 +94,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     if(src_pic_w == 0 || dest_pic_w == 0) {
         LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, drawing in software");
 #if LV_USE_DRAW_SW
-        lv_draw_sw_image(t, draw_dsc, img_coords);
+        lv_draw_sw_image(t, draw_dsc, &t->area);
 #else
         LV_LOG_WARN("PPA draw_img: no software draw unit to fall back on, image skipped");
 #endif
