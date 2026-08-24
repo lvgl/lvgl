@@ -272,9 +272,8 @@ void test_calendar_get_pressed_date_parses_single_and_double_digit_days(void)
 
     for(uint32_t i = 0; map[i] != NULL; i++) {
         /* Skip separators (newline entries) */
-        if(map[i][0] == '\0' || map[i][0] == '\n') {
-            continue;
-        }
+        if(map[i][0] == '\0') break;   /* empty string terminates the map */
+        if(map[i][0] == '\n') continue; /* row separator */
 
         size_t len = strlen(map[i]);
 
