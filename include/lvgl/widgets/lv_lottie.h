@@ -32,7 +32,8 @@ extern "C" {
 
 /**
  * Create a lottie animation
- * @param parent    pointer to the parent widget
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created Lottie animation widget
  */
 lv_obj_t  * lv_lottie_create(lv_obj_t * parent);

@@ -47,7 +47,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_list_button_class;
 
 /**
  * Create a list object
- * @param parent    pointer to an object, it will be the parent of the new list
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created list
  * @deprecated Use a flex container with `LV_FLEX_FLOW_COLUMN` instead. See `lv_example_flex_list`.
  */

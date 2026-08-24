@@ -37,7 +37,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_win_class;
 
 /**
  * Create a window widget
- * @param parent    pointer to a parent widget
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          the created window
  * @deprecated Use a flex column with a header and content area instead. See `lv_example_flex_win`.
  */

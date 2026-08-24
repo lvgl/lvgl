@@ -42,7 +42,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_class;
 
 /**
  * Create a calendar widget
- * @param parent    pointer to an object, it will be the parent of the new calendar
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer the created calendar
  */
 lv_obj_t * lv_calendar_create(lv_obj_t * parent);

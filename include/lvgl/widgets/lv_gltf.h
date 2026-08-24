@@ -49,7 +49,8 @@ typedef enum {
 
 /**
  * Create a glTF object
- * @param parent pointer to the parent object
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the default display.
  * @return pointer to the created glTF object
  */
 lv_obj_t * lv_gltf_create(lv_obj_t * parent);
