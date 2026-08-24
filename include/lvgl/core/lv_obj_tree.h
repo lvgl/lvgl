@@ -304,7 +304,7 @@ int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * cl
  * @param start_obj     start integrating from this object. @nullable When NULL every
  *                      screen of every display is walked.
  * @param cb            call this callback on the objects
- * @param user_data     pointer to any user related data (will be passed to `cb`)
+ * @param user_data     pointer to any user related data (will be passed to `cb`) @nullable
  */
 void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data);
 

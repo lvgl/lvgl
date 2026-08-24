@@ -324,7 +324,7 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
  * Add Observer to Subject. When Subject's value changes `observer_cb` will be called.
  * @param subject       pointer to Subject
  * @param observer_cb   notification callback
- * @param user_data     optional user data
+ * @param user_data     optional user data @nullable
  * @return              pointer to newly-created Observer
  */
 lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t observer_cb, void * user_data);
@@ -336,7 +336,7 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  * @param observer_cb   notification callback
  * @param obj           pointer to Widget. @nullable When NULL the Observer is not
  *                      bound to a Widget.
- * @param user_data     optional user data
+ * @param user_data     optional user data @nullable
  * @return              pointer to newly-created Observer
  * @note                Do not call `lv_observer_delete()` on Observers created this way.
  *                      Only clean up such Observers by either:
@@ -352,7 +352,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
  * @param subject       pointer to Subject
  * @param observer_cb   notification callback
  * @param target        any pointer @nullable
- * @param user_data     optional user data
+ * @param user_data     optional user data @nullable
  * @return              pointer to newly-created Observer
  */
 lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t observer_cb,
@@ -400,7 +400,7 @@ void * lv_observer_get_user_data(const lv_observer_t * observer);
 /**
  * Set Observer's user data.
  * @param observer      pointer to Observer
- * @param user_data     pointer to user-owned data (may be NULL)
+ * @param user_data     pointer to user-owned data (may be NULL) @nullable
  */
 void lv_observer_set_user_data(lv_observer_t * observer, void * user_data);
 

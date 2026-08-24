@@ -91,7 +91,7 @@ lv_timer_t * lv_timer_create_basic(void);
  *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
  *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
- * @param user_data custom parameter
+ * @param user_data custom parameter @nullable
  * @return pointer to the new timer
  */
 lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data);
@@ -152,7 +152,7 @@ void lv_timer_set_auto_delete(lv_timer_t * timer, bool auto_delete);
 /**
  * Set custom parameter to the lv_timer.
  * @param timer pointer to a lv_timer.
- * @param user_data custom parameter
+ * @param user_data custom parameter @nullable
  */
 void lv_timer_set_user_data(lv_timer_t * timer, void * user_data);
 
