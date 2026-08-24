@@ -78,22 +78,23 @@ config LV_GLOBAL_CUSTOM_INCLUDE
 endif #LV_ENABLE_GLOBAL_CUSTOM
 
 menu "Asserts"
-	config LV_USE_ASSERT_NULL
-		bool "NULL checks (very fast, recommended)"
-		default y
+	config LV_USE_ASSERT
+		bool "LV_ASSERT / LV_ASSERT_MSG / LV_ASSERT_FORMAT_MSG"
 
 	config LV_USE_ASSERT_MALLOC
-		bool "Allocation success checks (very fast, recommended)"
-		default y
+		bool "LV_ASSERT_MALLOC"
+
+	config LV_USE_ASSERT_NULL
+		bool "LV_ASSERT_NULL"
 
 	config LV_USE_ASSERT_STYLE
-		bool "Style init checks (very fast, recommended)"
+		bool "LV_ASSERT_STYLE"
 
 	config LV_USE_ASSERT_MEM_INTEGRITY
-		bool "lv_mem integrity checks (slow)"
+		bool "LV_ASSERT_MEM_INTEGRITY"
 
 	config LV_USE_ASSERT_OBJ
-		bool "Widget validity checks (slow)"
+		bool "LV_ASSERT_OBJ"
 
 	config LV_ASSERT_HANDLER_INCLUDE
 		string "Assert handler header [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"

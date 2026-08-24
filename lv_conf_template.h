@@ -2303,19 +2303,22 @@
 #endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE*/
 #endif /*LV_ENABLE_GLOBAL_CUSTOM*/
 
-/** NULL checks (very fast, recommended) */
-#define LV_USE_ASSERT_NULL 1
+/** LV_ASSERT / LV_ASSERT_MSG / LV_ASSERT_FORMAT_MSG */
+#define LV_USE_ASSERT 0
 
-/** Allocation success checks (very fast, recommended) */
-#define LV_USE_ASSERT_MALLOC 1
+/** LV_ASSERT_MALLOC */
+#define LV_USE_ASSERT_MALLOC 0
 
-/** Style init checks (very fast, recommended) */
+/** LV_ASSERT_NULL */
+#define LV_USE_ASSERT_NULL 0
+
+/** LV_ASSERT_STYLE */
 #define LV_USE_ASSERT_STYLE 0
 
-/** lv_mem integrity checks (slow) */
+/** LV_ASSERT_MEM_INTEGRITY */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0
 
-/** Widget validity checks (slow) */
+/** LV_ASSERT_OBJ */
 #define LV_USE_ASSERT_OBJ 0
 
 /** Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
