@@ -21,9 +21,9 @@
 #define CACHE_NAME  "FREETYPE_GLYPH"
 
 #if LV_USE_HARFBUZZ
-/* Tag bit to distinguish glyph-ID cache entries from unicode entries.
- * Unicode codepoints max at 0x10FFFF, so bit 31 is always free. */
-#define GID_TAG  0x80000000u
+    /* Tag bit to distinguish glyph-ID cache entries from unicode entries.
+    * Unicode codepoints max at 0x10FFFF, so bit 31 is always free. */
+    #define GID_TAG  0x80000000u
 #endif
 
 #if LV_FREETYPE_CACHE_FT_GLYPH_L1
@@ -353,7 +353,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
          * The bitmap is cached in prerender for the image callback to reuse,
          * avoiding a second FT_Load_Glyph call. */
         error = FT_Load_Glyph(face, glyph_index,
-                               FT_LOAD_RENDER | FT_LOAD_COLOR | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT);
+                              FT_LOAD_RENDER | FT_LOAD_COLOR | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT);
     }
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
