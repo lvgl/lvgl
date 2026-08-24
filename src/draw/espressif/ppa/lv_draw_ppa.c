@@ -141,12 +141,13 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                  * RGB888 padded to 320 bytes is not a whole number of pixels at
                  * all. Keep those away from this unit.
                  *
-                 * The source stride is a prediction: the image is not decoded yet.
-                 * The destination is exact when the layer buffer already exists,
-                 * and skipped when it does not - it is allocated in ppa_dispatch().
-                 * lv_draw_ppa_img() re-checks both against the real buffers. */
-                if(lv_ppa_pic_w(lv_ppa_decoded_stride(dsc->header.stride, dsc->header.w, dsc->header.cf),
-                                dsc->header.w, dsc->header.cf) == 0) return 0;
+                 * The header stride is what the decode returns: lv_draw_ppa_img()
+                 * passes stride_align = false, so nothing re-strides the buffer
+                 * behind this check. The destination is exact when the layer
+                 * buffer already exists, and skipped when it does not - it is
+                 * allocated in ppa_dispatch(), and the draw re-checks both
+                 * against the real buffers either way. */
+                if(lv_ppa_pic_w(dsc->header.stride, dsc->header.w, dsc->header.cf) == 0) return 0;
 
                 const lv_draw_buf_t * dest = dsc->base.layer->draw_buf;
                 if(dest != NULL &&

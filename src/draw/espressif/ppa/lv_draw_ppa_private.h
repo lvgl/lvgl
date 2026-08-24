@@ -168,6 +168,10 @@ static inline bool lv_ppa_cf_has_alpha(lv_color_format_t lv_fmt)
  * 100 px wide benchmark logo is stored with a 448 byte stride, 112 px, and
  * describing it as 100 px makes every row start 12 px early.
  *
+ * lv_draw_ppa_img() decodes with stride_align = false, so nothing re-strides the
+ * buffer and a source header stride is exactly what the decode returns. That is
+ * what lets ppa_evaluate() check this before the image is decoded.
+ *
  * Returns 0 when the stride is not a whole number of pixels - RGB888 padded to
  * 320 bytes is 106.67 px - which the PPA cannot describe at all. Callers must
  * treat that as "not for this draw unit".
@@ -182,31 +186,6 @@ static inline int32_t lv_ppa_pic_w(uint32_t stride, int32_t w, lv_color_format_t
     if(px_size == 0 || (stride % px_size) != 0) return 0;
 
     return (int32_t)(stride / px_size);
-}
-
-/**
- * The stride the draw will actually see, predicted from a source image header.
- *
- * ppa_evaluate() runs before the image is decoded, so the header is all it has,
- * and the header stride is not always what comes back. When
- * LV_DRAW_BUF_STRIDE_ALIGN is not 1, lv_image_decoder_open() passes
- * stride_align = true and lv_image_decoder_post_process() re-strides the decoded
- * buffer to lv_draw_buf_width_to_stride() - which can turn a describable stride
- * into one that is not, and the other way round.
- *
- * Predicting the same value keeps the gate honest in both directions. It stays a
- * prediction, so lv_draw_ppa_img() checks the real strides and falls back to
- * software rather than trusting it.
- */
-static inline uint32_t lv_ppa_decoded_stride(uint32_t stride, int32_t w, lv_color_format_t cf)
-{
-#if LV_DRAW_BUF_STRIDE_ALIGN != 1
-    /* RGB565A8 is the one format post-processing leaves alone. */
-    if(cf != LV_COLOR_FORMAT_RGB565A8) return lv_draw_buf_width_to_stride((uint32_t)w, cf);
-#endif
-    LV_UNUSED(w);
-    LV_UNUSED(cf);
-    return stride;
 }
 
 static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t lv_fmt)

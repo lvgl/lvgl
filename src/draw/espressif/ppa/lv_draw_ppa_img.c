@@ -43,7 +43,20 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
-    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, NULL);
+
+    /* Decode without stride normalisation. This unit describes a picture by its
+     * own row pitch (see lv_ppa_pic_w()), so there is nothing to gain from
+     * letting LVGL reallocate and copy a padded image just to change that
+     * stride - for an accelerator whose point is to avoid copies, normalising is
+     * the wrong default. It also means a source header stride is exactly what
+     * the decode returns, so ppa_evaluate() can check it without decoding first.
+     *
+     * Only stride_align differs from the defaults lv_image_decoder_open() would
+     * have applied, and only when LV_DRAW_BUF_STRIDE_ALIGN is not 1. */
+    lv_image_decoder_args_t dec_args;
+    lv_memzero(&dec_args, sizeof(dec_args));
+
+    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, &dec_args);
 }
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
