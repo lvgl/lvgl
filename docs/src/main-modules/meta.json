@@ -2,7 +2,11 @@
   "title": "Main Modules",
   "pages": [
     "display",
+    "display_drivers",
     "indev",
+    "input_drivers",
+    "draw",
+    "renderers",
     "fonts",
     "images",
     "color",
@@ -10,7 +14,6 @@
     "animation",
     "fs",
     "observer",
-    "draw",
     "translation"
   ]
 }

@@ -1,7 +1,4 @@
 {
   "title": "Arm",
-  "pages": [
-    "overview",
-    "arm2d"
-  ]
+  "pages": ["overview"]
 }

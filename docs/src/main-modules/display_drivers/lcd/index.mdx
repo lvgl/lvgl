@@ -1,0 +1,68 @@
+---
+title: LCD Controllers
+description: "Drivers for external LCD controller ICs — the chip on the panel that LVGL talks to over SPI, I8080 or MIPI DSI."
+faqs:
+  - question: "My controller is not in the list. Am I stuck?"
+    answer: "Probably not. Most small panels speak MIPI DCS, so the generic MIPI driver works with them once you supply the init commands from the panel datasheet. Try that before writing a driver."
+  - question: "What is the difference between these drivers and the SoC display controllers?"
+    answer: "These drive a controller IC that lives on the panel, over a serial or parallel bus. The SoC controllers — LTDC, eLCDIF, GLCDC — are peripherals inside the MCU that drive a raw RGB panel directly."
+  - question: "Do these drivers handle touch input?"
+    answer: "No. They are display-only. Pair them with an input driver, or with the touch driver of your panel's touch controller."
+---
+
+## Overview
+
+These drivers talk to a **display controller IC on the panel** (an ST7789, ILI9341 and so on)
+over SPI, I8080 parallel, or MIPI DSI. The controller holds its own framebuffer, so LVGL
+renders into a small partial buffer and the driver pushes each flushed area out over the bus.
+
+This is the usual arrangement on MCUs with a small display. Contrast it with the
+[SoC display controllers](/main-modules/display_drivers/overview#soc-display-controllers), which
+are peripherals inside the chip driving a raw RGB panel.
+
+## Which Driver?
+
+| Your panel | Use |
+|---|---|
+| Speaks MIPI DCS, or is not listed here | **[Generic MIPI](/main-modules/display_drivers/lcd/gen_mipi)** — supply the init commands from the datasheet |
+| ST7735 / ST7735S | **[ST7735](/main-modules/display_drivers/lcd/st7735)** |
+| ST7789 | **[ST7789](/main-modules/display_drivers/lcd/st7789)** |
+| ST7796 / ST7796S | **[ST7796](/main-modules/display_drivers/lcd/st7796)** |
+| ILI9341 | **[ILI9341](/main-modules/display_drivers/lcd/ili9341)** |
+| NV3007 | **[NV3007](/main-modules/display_drivers/lcd/nv3007)** |
+| An EVE (FT81x / BT81x) smart controller | **[EVE FT81x](/main-modules/display_drivers/lcd/ft81x)** |
+| Already configured for LovyanGFX | **[LovyanGFX](/main-modules/display_drivers/lcd/lovyan_gfx)** |
+| Already configured for TFT_eSPI | **[TFT_eSPI](/main-modules/display_drivers/lcd/tft_espi)** |
+
+<Callout type="tip" title="Start with Generic MIPI">
+The ST77xx, ILI9341 and NV3007 drivers are all thin specializations of the
+[generic MIPI DCS driver](/main-modules/display_drivers/lcd/gen_mipi). If your controller is not
+listed but its datasheet shows standard DCS commands, the generic driver will very likely drive it
+with the right init sequence — no new driver needed.
+</Callout>
+
+<Callout type="info" title="EVE is a special case">
+An [EVE](/main-modules/display_drivers/lcd/ft81x) controller is not just a framebuffer — it
+accepts high-level drawing commands and rasterizes them itself. It can therefore be used as a
+[renderer](/main-modules/renderers/eve) instead of a plain display driver, which offloads drawing
+entirely. The framebuffer-mode driver here is the simpler of the two options.
+</Callout>
+
+## Common Ground
+
+All of these drivers:
+
+- render in <ApiLink name="LV_DISPLAY_RENDER_MODE_PARTIAL" /> mode, so the draw buffer can be much
+  smaller than the screen
+- need you to supply the bus transfer functions (SPI/I8080 send-command and send-color), because
+  LVGL does not own your platform's peripheral drivers
+- are display-only — pair them with an [input driver](/main-modules/input_drivers) or your touch
+  controller's own driver
+
+## See Also
+
+- [Display Drivers](/main-modules/display_drivers/overview) - the other driver families
+- [Setting Up Your Display](/main-modules/display/setup) - draw buffers and flush callbacks
+- [Constraints on Redrawn Area](/main-modules/display/redraw_area) - for controllers with alignment requirements
+
+<DirectoryIndex />

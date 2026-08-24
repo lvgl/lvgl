@@ -1,7 +1,4 @@
 {
   "title": "Alif",
-  "pages": [
-    "overview",
-    "dave2d_gpu"
-  ]
+  "pages": ["overview"]
 }

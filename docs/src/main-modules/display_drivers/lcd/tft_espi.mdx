@@ -1,0 +1,90 @@
+---
+title: TFT_eSPI
+description: "A thin display driver on top of the TFT_eSPI Arduino library, which already supports a wide range of SPI display controllers on ESP32 and other Arduino targets."
+faqs:
+  - question: "When should I use the TFT_eSPI driver instead of LVGL's own LCD drivers?"
+    answer: "Use it when your panel is already configured for TFT_eSPI, typically in an existing Arduino or PlatformIO project. If you are starting fresh and your controller has a native LVGL driver such as ST7789 or ILI9341, prefer that one — it needs no third-party library."
+  - question: "Where do I configure the pins and the panel type?"
+    answer: "In TFT_eSPI, not in LVGL. The driver calls TFT_eSPI's own begin(), so the panel type, pins and SPI frequency come from TFT_eSPI's User_Setup.h or your build flags."
+  - question: "Does rotation work?"
+    answer: "Yes. The driver forwards LVGL's rotation to TFT_eSPI's setRotation(), so the panel handles it in hardware."
+---
+
+## Overview
+
+[TFT_eSPI](https://github.com/Bodmer/TFT_eSPI) is a widely used Arduino display library that
+supports a long list of SPI display controllers. This LVGL driver is a thin adapter over it: LVGL
+renders into a buffer, and the driver pushes it out with TFT_eSPI's `pushColors()`.
+
+Its value is compatibility. If you already have a working TFT_eSPI setup, a board definition,
+pin mapping and panel type, this driver reuses all of it, and you do not have to reproduce that
+configuration for one of LVGL's [native LCD drivers](/main-modules/display_drivers/lcd).
+
+<Callout type="tip">
+If you are starting a new project and your controller has a native LVGL driver
+([ST7789](/main-modules/display_drivers/lcd/st7789),
+[ILI9341](/main-modules/display_drivers/lcd/ili9341),
+[ST7796](/main-modules/display_drivers/lcd/st7796) and so on), prefer it. It needs no third-party
+library and is configured entirely from LVGL.
+</Callout>
+
+### Prerequisites
+
+The TFT_eSPI library must be available in the build, and configured for your panel, normally
+through its `User_Setup.h` or the equivalent build flags. This is a C++ driver, so the project
+must compile C++.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_TFT_ESPI" />.
+
+```c
+#define LV_USE_TFT_ESPI 1
+```
+
+The panel type, pins, SPI frequency and color order are **not** LVGL settings. The driver calls
+TFT_eSPI's `begin()`, which reads them from TFT_eSPI's own configuration.
+
+## Usage
+
+Create the display with <ApiLink name="lv_tft_espi_create" />, passing the resolution and a draw
+buffer.
+
+```c
+#define HOR_RES 240
+#define VER_RES 320
+
+/* Partial buffer, 1/10th of the screen */
+static uint8_t buf[HOR_RES * VER_RES / 10 * 2];
+
+lv_display_t * disp = lv_tft_espi_create(HOR_RES, VER_RES, buf, sizeof(buf));
+```
+
+The driver initializes TFT_eSPI itself, so no `tft.begin()` call of your own is needed.
+
+The buffer is used in <ApiLink name="LV_DISPLAY_RENDER_MODE_PARTIAL" /> mode, so it can be much
+smaller than the screen. See [Setting Up Your Display](/main-modules/display/setup#draw-buffers)
+for how to size it.
+
+Rotation is forwarded to the panel: calling <ApiLink name="lv_display_set_rotation" /> translates
+into a TFT_eSPI `setRotation()` call.
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Rotation | Hardware, via TFT_eSPI `setRotation()` |
+| Runtime resolution change | No |
+| Runtime color format change | No |
+| Color formats | RGB565 |
+| Multiple displays / windows | One per TFT_eSPI instance |
+| Hardware acceleration | None |
+| Render mode | Partial |
+| Input | None. Pair with a touch driver of your own |
+
+## See Also
+
+- [LCD Controllers](/main-modules/display_drivers/lcd) - LVGL's native drivers, no third-party library needed
+- [LovyanGFX](/main-modules/display_drivers/lcd/lovyan_gfx) - the other third-party Arduino display library LVGL adapts
+- [Arduino](/integration/frameworks/arduino) - using LVGL in the Arduino IDE
+- [PlatformIO](/integration/frameworks/platformio) - using LVGL with PlatformIO

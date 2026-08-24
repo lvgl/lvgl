@@ -1,12 +1,30 @@
 ---
 title: Running on PC
-description: "You can try out LVGL using only your PC (i.e."
+description: "Try LVGL using only your PC — ready-to-use projects for Windows, Linux, macOS, the browser and UEFI, and which display driver each of them uses."
 ---
 
-You can try out LVGL **using only your PC** (i.e. without any
-development boards).
+You can try out LVGL **using only your PC** (i.e. without any development boards).
 
-Many ready-to-use projects are available to get started easily on
-Windows, Linux, macOS, and in a web browser. Even developing a UEFI BIOS is
-an option.
+Many ready-to-use projects are available to get started easily on Windows, Linux, macOS, and in a
+web browser. Even developing a UEFI BIOS is an option.
+
+## Which Driver on a PC?
+
+Every PC target is a display driver plus, optionally, a GPU renderer. The platform pages here cover
+the ready-to-use projects and toolchain setup; the driver pages cover the driver itself.
+
+| Your platform | Display driver | Notes |
+|---|---|---|
+| Any — the quickest window | **[SDL](/main-modules/display_drivers/sdl)** | Cross-platform, brings its own input. Used by most `lv_port_pc_*` projects. |
+| Windows, native | **[Windows](/main-modules/display_drivers/windows)** | Win32 window, touch, IME and per-monitor DPI |
+| Linux desktop | **[X11](/main-modules/display_drivers/x11)** or **[Wayland](/main-modules/display_drivers/wayland)** | Matches whatever your desktop runs |
+| Linux, want a GL context immediately | **[GLFW](/main-modules/display_drivers/glfw)** | Enables the GPU renderers |
+| macOS | **[SDL](/main-modules/display_drivers/sdl)** | The only supported path |
+| Browser | **[SDL](/main-modules/display_drivers/sdl)** | Compiled to WebAssembly with Emscripten |
+| UEFI firmware | **[UEFI](/main-modules/display_drivers/uefi)** | Graphics Output Protocol, pre-boot |
+
+Add a GPU renderer on top only if you want one, **[SDL](/main-modules/renderers/sdl)** with the
+SDL driver, or **[NanoVG](/main-modules/renderers/nanovg)** / **[OpenGL ES](/main-modules/renderers/opengles)**
+with a driver that provides an OpenGL context. Note that the [software renderer](/main-modules/renderers/sw) is more than fast enough on a PC.
+
 <DirectoryIndex />
