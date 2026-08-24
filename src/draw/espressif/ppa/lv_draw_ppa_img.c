@@ -26,7 +26,20 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
-    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, NULL);
+
+    /* Decode without stride normalisation, like the SRM paths below. This unit
+     * describes a picture by its own row pitch (see lv_ppa_pic_w()), so there is
+     * nothing to gain from letting LVGL reallocate and copy a padded image just
+     * to change that stride - and having every path in the unit decode the same
+     * way is what lets ppa_evaluate() read the header stride and be exact rather
+     * than guess which path a task will take.
+     *
+     * Only stride_align differs from the defaults lv_image_decoder_open() would
+     * have applied, and only when LV_DRAW_BUF_STRIDE_ALIGN is not 1. */
+    lv_image_decoder_args_t dec_args;
+    lv_memzero(&dec_args, sizeof(dec_args));
+
+    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, &dec_args);
 }
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
@@ -163,8 +176,8 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     /* The block geometry below is in image pixels, so it uses the visible width.
      * What the PPA is given as pic_w is the row pitch instead: see lv_ppa_pic_w().
-     * These paths decode with stride_align = false, so a padded source keeps its
-     * padding and describing it by its width would shear it. */
+     * Every path in this unit decodes with stride_align = false, so a padded
+     * source keeps its padding and describing it by its width would shear it. */
     int32_t src_pitch  = lv_ppa_pic_w(decoded->header.stride, (int32_t)src_w, src_cf);
     int32_t dest_pitch = lv_ppa_pic_w(dest_buf->header.stride, dest_buf->header.w, dest_cf);
     if(src_pitch == 0 || dest_pitch == 0) {
@@ -353,8 +366,8 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     /* The block geometry below is in image pixels, so it uses the visible width.
      * What the PPA is given as pic_w is the row pitch instead: see lv_ppa_pic_w().
-     * These paths decode with stride_align = false, so a padded source keeps its
-     * padding and describing it by its width would shear it. */
+     * Every path in this unit decodes with stride_align = false, so a padded
+     * source keeps its padding and describing it by its width would shear it. */
     int32_t src_pitch  = lv_ppa_pic_w(decoded->header.stride, (int32_t)src_w, src_cf);
     int32_t dest_pitch = lv_ppa_pic_w(dest_buf->header.stride, dest_buf->header.w, dest_cf);
     if(src_pitch == 0 || dest_pitch == 0) {
