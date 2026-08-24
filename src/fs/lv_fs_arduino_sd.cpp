@@ -59,6 +59,7 @@ extern "C" void lv_fs_arduino_sd_init(void)
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
+    LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
 
     const char * flags;
@@ -90,6 +91,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
  */
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
     SdFile * lf = (SdFile *)file_p;
     lf->file.close();
@@ -109,6 +111,9 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(br != NULL);
+    LV_ASSERT(buf != NULL || btr == 0);
     LV_UNUSED(drv);
     SdFile * lf = (SdFile *)file_p;
     *br = lf->file.read((uint8_t *)buf, btr);
@@ -128,6 +133,9 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     LV_UNUSED(drv);
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(buf != NULL || btw == 0);
+    LV_ASSERT(bw != NULL);
     SdFile * lf = (SdFile *)file_p;
     *bw = lf->file.write((uint8_t *)buf, btw);
 
@@ -144,6 +152,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  */
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
     SeekMode mode;
     if(whence == LV_FS_SEEK_SET)
@@ -169,6 +178,8 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(pos_p != NULL);
     LV_UNUSED(drv);
     SdFile * lf = (SdFile *)file_p;
 
