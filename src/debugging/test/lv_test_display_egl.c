@@ -211,6 +211,8 @@ static void egl_color_format_changed_cb(lv_event_t * e)
 
 void lv_test_display_egl_cleanup(void * egl_ctx)
 {
+    if(egl_ctx == NULL) return;
+
     /* Called after lv_deinit() when NanoVG draw unit is already destroyed */
     egl_test_ctx_t * ctx = egl_ctx;
     if(ctx == NULL) {
