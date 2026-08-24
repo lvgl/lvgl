@@ -72,6 +72,17 @@ jobs:
           git restore .
 
       # ------------------------------------------------------------------
+      # Defconfig
+      # ------------------------------------------------------------------
+      - name: "Generate: automated defconfigs"
+        id: defconfig
+        continue-on-error: true
+        run: |
+          python3 scripts/generators/defconfigs.py
+          git diff --exit-code || (echo "::error::Defconfigs are out of date. Run scripts/generators/defconfigs.py and commit the result."; exit 1)
+          git restore .
+
+      # ------------------------------------------------------------------
       # COPYRIGHTS.md and the SPDX SBOM (sbom/) are generated from
       # sbom/third_party.json. These fail if a committed output is stale.
       # ------------------------------------------------------------------
@@ -103,6 +114,7 @@ jobs:
           steps.config-headers-tests.outcome == 'failure' ||
           steps.config-headers.outcome       == 'failure' ||
           steps.style-api.outcome            == 'failure' ||
+          steps.defconfig.outcome            == 'failure' ||
           steps.copyrights.outcome           == 'failure' ||
           steps.sbom.outcome                 == 'failure' ||
           steps.sbom_schema.outcome          == 'failure'
@@ -122,6 +134,7 @@ jobs:
           print_result "config-headers-tests" "${{ steps.config-headers-tests.outcome }}"
           print_result "config-headers"       "${{ steps.config-headers.outcome }}"
           print_result "style-api"            "${{ steps.style-api.outcome }}"
+          print_result "defconfig"            "${{ steps.defconfig.outcome }}"
           print_result "copyrights"           "${{ steps.copyrights.outcome }}"
           print_result "sbom"                 "${{ steps.sbom.outcome }}"
           print_result "sbom_schema"          "${{ steps.sbom_schema.outcome }}"
