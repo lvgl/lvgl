@@ -696,6 +696,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
 
 #if LV_USE_FREETYPE && LV_USE_HARFBUZZ
 harfbuzz_next_line:
+        ;
 #endif
 
 #if LV_USE_BIDI
