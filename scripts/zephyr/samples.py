@@ -201,6 +201,14 @@ def build_failures(suites: list[dict]) -> list[dict]:
     return bad
 
 
+def expected_to_run(suites: list[dict]) -> list[str]:
+    """Names of suites that produced a binary and therefore must have a run
+    result. A suite that failed to build, or that twister filtered out for this
+    board, is not expected to run."""
+    return [s["name"] for s in suites
+            if (s.get("status") or "").lower() not in ("error", "failed", "filtered")]
+
+
 def repro_block(name: str, path: str, board: str) -> str:
     return (
         f"Reproduce `{name}` locally (see `tests/zephyr/README.md` for the "
@@ -270,7 +278,7 @@ def render_details(suites: list[dict], runs: list[dict], board: str, pin: str,
             build_cell = "ok"
             r = run_by_name.get(name)
             if r is None:
-                icon, run_cell = "⚠️", "not run"
+                icon, run_cell = "❌", "never ran"
             elif r["status"] == "pass":
                 icon, run_cell = "✅", "ok"
             else:
@@ -284,6 +292,17 @@ def render_details(suites: list[dict], runs: list[dict], board: str, pin: str,
             "display shield or a sensor) and were skipped by twister.",
             "",
         ]
+
+    never_ran = [n for n in expected_to_run(suites) if n not in {r["name"] for r in runs}]
+    if never_ran:
+        lines += [
+            f"{len(never_ran)} sample(s) built but produced no run result, so "
+            "they were never executed. The run step reports one line per "
+            "sample, so its log shows where it stopped:",
+            "",
+        ]
+        lines += [f"- `{n}`" for n in never_ran]
+        lines += [""]
 
     for s in failures:
         lines += [
@@ -340,6 +359,11 @@ def cmd_report(args) -> int:
     failures = build_failures(suites)
     run_failures = [r for r in runs if r["status"] != "pass"]
     filtered = [s for s in suites if (s.get("status") or "").lower() == "filtered"]
+    # A sample that built but has no run result was never executed -- the run
+    # step died, or died partway through. Not counting that as a failure would
+    # let "built and ran clean" through for samples that never ran at all.
+    ran = {r["name"] for r in runs}
+    not_run = [name for name in expected_to_run(suites) if name not in ran]
     built_ok = len(suites) - len(failures) - len(filtered)
 
     remaps = source_remaps(outdir)
@@ -347,13 +371,15 @@ def cmd_report(args) -> int:
     version_note = args.version_note.strip()
     outdated = version_note.lower().startswith("outdated")
 
-    if failures or run_failures:
+    if failures or run_failures or not_run:
         icon = ICON_FAIL
         parts = []
         if failures:
             parts.append(f"{len(failures)} build failure(s)")
         if run_failures:
             parts.append(f"{len(run_failures)} run failure(s)")
+        if not_run:
+            parts.append(f"{len(not_run)} sample(s) never ran")
         summary = ", ".join(parts) + f" out of {len(suites) - len(filtered)} sample(s)"
     elif not suites:
         # Either twister never ran, or it found nothing. Both mean this check
