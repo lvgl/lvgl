@@ -4,8 +4,6 @@ menu "Color Settings"
 	choice
 		prompt "Color depth"
 		default LV_COLOR_DEPTH_16
-		help
-			Color depth to be used.
 
 		config LV_COLOR_DEPTH_32
 			bool "32: XRGB8888"
@@ -17,10 +15,10 @@ menu "Color Settings"
 			bool "16: RGB565"
 			imply LV_FONT_MONTSERRAT_14
 		config LV_COLOR_DEPTH_8
-			bool "8: RGB232"
+			bool "8: L8 (grayscale)"
 			imply LV_FONT_UNSCII_8
 		config LV_COLOR_DEPTH_1
-			bool "1: 1 byte per pixel"
+			bool "1: I1 (1 bit per pixel)"
 			imply LV_FONT_MONTSERRAT_14
 	endchoice
 
@@ -35,7 +33,7 @@ menu "Color Settings"
 			Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)
 
 	config LV_COLOR_MIX_ROUND_OFS
-		int "Adjust color mix functions rounding"
+		int "Color mix rounding offset"
 		default 0
 		range 0 254
 		help
@@ -46,8 +44,6 @@ menu "Color Settings"
 			254: round up
 endmenu
 
-# Capability configs, these are set internally by draw units. Can be used by eg: widgets that depend
-# on a specific draw feature
 config LV_DRAW_HAS_VECTOR_SUPPORT
 	bool
 	default n
@@ -63,64 +59,62 @@ config LV_DEF_REFR_PERIOD
 		Default display refresh, input device read and animation step period.
 
 config LV_DPI_DEF
-	int "Default Dots Per Inch (in px/inch)"
+	int "Default DPI (px/inch)"
 	default 130
 	help
-		Used to initialize default sizes such as widgets sizes and style paddings.
-		(Not so important, you can adjust it to modify default sizes and spaces)
+		Used to initialize default sizes such as widget sizes and style paddings.
 
 config LV_DRAW_BUF_STRIDE_ALIGN
-	int "Buffer stride alignment"
+	int "Draw buffer stride alignment (bytes)"
 	default 1
 	help
 		Align the stride of all layers and images to this many bytes.
 
 config LV_DRAW_BUF_ALIGN
-	int "Buffer address alignment"
+	int "Draw buffer address alignment (bytes)"
 	default 4
 	help
 		Align the start address of draw_buf addresses to this many bytes.
 
 config LV_USE_MATRIX
-	bool "Enable matrix support"
+	bool "Matrix"
 	default n
 	select LV_USE_FLOAT
 	help
-		Enable matrix support
+		3x3 matrix API (lv_matrix_t) for transformations. Requires floating point support.
 
 config LV_DRAW_TRANSFORM_USE_MATRIX
-	bool "Using matrix for transformations"
+	bool "Matrix based transformations"
 	default n
 	depends on LV_USE_MATRIX
 	help
-		Requirements: The rendering engine needs to support 3x3 matrix transformations.
+		The rendering engine must support 3x3 matrix transformations.
 
 config LV_DRAW_LAYER_SIMPLE_BUF_SIZE
-	int "Optimal size to buffer the widget with opacity"
+	int "Simple layer buffer size (bytes)"
 	default 24576
 	help
-		If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
-		it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
-		"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be drawn in chunks.
+		Widgets with `style_opa < 255` (not `bg_opa`, `text_opa` etc) or a non-NORMAL blend mode are
+		buffered into a "simple" layer in chunks of this size.
+		"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be chunked.
 
 config LV_DRAW_LAYER_MAX_MEMORY
-	int "The maximum amount of memory that can be used for layers"
+	int "Maximum layer memory (bytes)"
 	default 0
 	help
-		Limit the max allocated memory for simple and transformed layers.
-		It should be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` sized but if transformed layers are also used
-		it should be enough to store the largest widget too (width x height x 4 area).
-		Set it to 0 to have no limit.
+		Limit for simple and transformed layers together; 0 means no limit.
+		Must be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE`, and with transformed layers large enough
+		for the largest widget too (width x height x 4).
 
 config LV_DRAW_THREAD_STACK_SIZE
-	int "Stack size of draw thread in bytes"
+	int "Draw thread stack size (bytes)"
 	default 8192
 	depends on !LV_OS_NONE
 	help
 		If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
 
 config LV_DRAW_THREAD_PRIO
-	int "Thread priority for the drawing thread"
+	int "Draw thread priority"
 	range 0 4
 	default 3
 	depends on !LV_OS_NONE
@@ -137,48 +131,52 @@ config LV_DRAW_THREAD_PRIO
 		starvation of lower priority tasks.
 
 config LV_USE_VECTOR_GRAPHIC
-	bool "Use Vector Graphic APIs"
+	bool "Vector graphics"
 	default n
 	select LV_USE_MATRIX
 	help
-		Enable drawing support vector graphic APIs.
+		Vector drawing API (lv_vector_dsc_*) for paths, strokes and fills.
+		Needs a renderer with vector support, e.g. the SW renderer with ThorVG, or VG-Lite.
 
 
 rsource "snapshot/Kconfig"
 
 config LV_USE_THORVG
-	bool "ThorVG library for vector graphics support"
+	bool "Vector graphics engine (ThorVG)"
 	default n
 	select LV_DRAW_HAS_VECTOR_SUPPORT if LV_USE_DRAW_SW
+	help
+		Backend that gives the SW renderer vector graphics support.
 
 config LV_USE_THORVG_INTERNAL
-	bool "Internal ThorVG library bundled with LVGL"
+	bool "Bundled ThorVG"
 	default y
 	depends on LV_USE_THORVG
+	help
+		Build the ThorVG copy shipped with LVGL instead of linking an external one.
 
 
-# These are menus because they contain a lot of configuration options
-menu "Software Rendering (SW)"
+menu "SW"
 rsource "sw/Kconfig"
 endmenu
 
-menu "VGLite"
+menu "VG-Lite"
 rsource "vg_lite/Kconfig"
 endmenu
 
-menu "DAVE/2D"
+menu "Dave2D"
 rsource "renesas/dave2d/Kconfig"
 endmenu
 
-menu "Nema GFX"
+menu "NemaGFX"
 rsource "nema_gfx/Kconfig"
 endmenu
 
-menu "NXP PXP"
+menu "PXP"
 rsource "nxp/pxp/Kconfig"
 endmenu
 
-menu "ESP32 PPA"
+menu "PPA"
 rsource "espressif/ppa/Kconfig"
 endmenu
 
@@ -190,19 +188,19 @@ menu "EVE"
 rsource "eve/Kconfig"
 endmenu
 
-menu "NXP G2D"
+menu "G2D"
 rsource "nxp/g2d/Kconfig"
 endmenu
 
-menu "NanoVG (OpenGL Shaders)"
+menu "NanoVG"
 rsource "nanovg/Kconfig"
 endmenu
 
-menu "OpenGL Textures"
+menu "OpenGL ES"
 rsource "opengles/Kconfig"
 endmenu
 
-menu "SDL Textures"
+menu "SDL"
 rsource "sdl/Kconfig"
 endmenu 
 endmenu

@@ -1,8 +1,6 @@
 menu "Examples"
 config LV_BUILD_EXAMPLES
-	bool "Enable the examples to be built"
+	bool "Build examples"
 	default y
-	help
-		Enable examples to be built with the library.
 
 endmenu #"Examples"

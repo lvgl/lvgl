@@ -100,6 +100,32 @@ config LV_COLOR_DEPTH
 	default 16 if LV_COLOR_DEPTH_16
 	default 8  if LV_COLOR_DEPTH_8
 
+# --- EnumChoice: value-alias behind a disabled gate (LV_PPA_BURST_LENGTH) ------
+# The gate is off, so every member of the group evaluates to n.  The emitted
+# number must still come from the group's own `default` - a burst length of 0
+# would be invalid.
+config LV_USE_GATED_UNIT
+	bool "Gated draw unit"
+	default n
+
+if LV_USE_GATED_UNIT
+
+choice
+	prompt "Gated burst length (bytes)"
+	default LV_GATED_BURST_LENGTH_128
+	config LV_GATED_BURST_LENGTH_8
+		bool "8"
+	config LV_GATED_BURST_LENGTH_128
+		bool "128"
+endchoice
+
+config LV_GATED_BURST_LENGTH
+	int
+	default 8   if LV_GATED_BURST_LENGTH_8
+	default 128 if LV_GATED_BURST_LENGTH_128
+
+endif
+
 # --- EnumChoice: member == token, tokens owned by a C header (LV_LOG_LEVEL) ----
 # Like LV_USE_OS (member name is the token) but the LV_LOG_LEVEL_* tokens are
 # defined in lv_log.h, so they must NOT be re-emitted in the options block.

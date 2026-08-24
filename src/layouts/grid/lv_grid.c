@@ -54,7 +54,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void grid_update(lv_obj_t * cont, void * user_data);
-static lv_result_t calc(lv_obj_t * obj, lv_grid_calc_t * calc);
+static lv_result_t calc(lv_obj_t * cont, lv_grid_calc_t * calc_out);
 static void calc_free(lv_grid_calc_t * calc);
 static lv_result_t calc_cols(lv_obj_t * cont, lv_grid_calc_t * c);
 static lv_result_t calc_rows(lv_obj_t * cont, lv_grid_calc_t * c);
@@ -162,16 +162,16 @@ void lv_obj_set_grid_align(lv_obj_t * obj, lv_grid_align_t column_align, lv_grid
 
 }
 
-void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t x_align, int32_t col_pos, int32_t col_span,
-                          lv_grid_align_t y_align, int32_t row_pos, int32_t row_span)
+void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t column_align, int32_t col_pos, int32_t col_span,
+                          lv_grid_align_t row_align, int32_t row_pos, int32_t row_span)
 
 {
     lv_obj_set_style_grid_cell_column_pos(obj, col_pos, 0);
     lv_obj_set_style_grid_cell_row_pos(obj, row_pos, 0);
-    lv_obj_set_style_grid_cell_x_align(obj, x_align, 0);
+    lv_obj_set_style_grid_cell_x_align(obj, column_align, 0);
     lv_obj_set_style_grid_cell_column_span(obj, col_span, 0);
     lv_obj_set_style_grid_cell_row_span(obj, row_span, 0);
-    lv_obj_set_style_grid_cell_y_align(obj, y_align, 0);
+    lv_obj_set_style_grid_cell_y_align(obj, row_align, 0);
 
     lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
 }
@@ -228,7 +228,7 @@ static void grid_update(lv_obj_t * cont, void * user_data)
 /**
  * Calculate the grid cells coordinates
  * @param cont an object that has a grid
- * @param calc store the calculated cells sizes here
+ * @param calc_out store the calculated cells sizes here
  * @note `lv_grid_calc_free(calc_out)` needs to be called when `calc_out` is not needed anymore
  */
 static lv_result_t calc(lv_obj_t * cont, lv_grid_calc_t * calc_out)
@@ -481,9 +481,8 @@ static lv_result_t calc_rows(lv_obj_t * cont, lv_grid_calc_t * c)
 /**
  * Reposition a grid item in its cell
  * @param item a grid item to reposition
- * @param calc the calculated grid of `cont`
- * @param child_id_ext helper value if the ID of the child is know (order from the oldest) else -1
- * @param grid_abs helper value, the absolute position of the grid, NULL if unknown
+ * @param c the calculated grid of the container
+ * @param hint helper values cached across the items of the same container
  */
 static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * hint)
 {

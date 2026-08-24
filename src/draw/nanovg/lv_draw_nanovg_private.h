@@ -65,6 +65,8 @@ typedef struct _lv_draw_nanovg_unit_t {
 
     lv_cache_t * image_cache;
     struct _lv_pending_t * image_pending;
+    struct _lv_pending_t *
+        image_uncached_pending; /* GL handles of non-cached (modifiable) images, deleted at end of frame */
     lv_ll_t image_drop_ll;
     const void * image_drop_src;
 

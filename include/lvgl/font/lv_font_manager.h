@@ -98,7 +98,6 @@ lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
  * Delete font.
  * @param manager pointer to main font manager.
  * @param font point to the font.
- * @return return true if the deletion was successful.
  */
 void lv_font_manager_delete_font(lv_font_manager_t * manager, lv_font_t * font);
 

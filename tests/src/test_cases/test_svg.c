@@ -642,7 +642,7 @@ void testStrokeFillAttrs(void)
     svg_node_root = lv_svg_load_data(svg_sf2, lv_strlen(svg_sf2));
     svg_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
     uint32_t r1 = (LV_ARRAY_GET(&svg_node->attrs, 0, lv_svg_attr_t))->value.ival;
-    TEST_ASSERT_EQUAL(r1, LV_SVG_FILL_EVENODD);
+    TEST_ASSERT_EQUAL(r1, LV_SVG_FILL_RULE_EVENODD);
     float w1 = (LV_ARRAY_GET(&svg_node->attrs, 1, lv_svg_attr_t))->value.fval;
     TEST_ASSERT_EQUAL_FLOAT(w1, 0.0f);
     uint32_t l1 = (LV_ARRAY_GET(&svg_node->attrs, 2, lv_svg_attr_t))->value.uval;
@@ -658,7 +658,7 @@ void testStrokeFillAttrs(void)
     uint32_t c2 = (LV_ARRAY_GET(&svg_node->attrs, 1, lv_svg_attr_t))->value.ival;
     TEST_ASSERT_EQUAL(c2, LV_SVG_LINE_JOIN_BEVEL);
     uint32_t r2 = (LV_ARRAY_GET(&svg_node->attrs, 2, lv_svg_attr_t))->value.ival;
-    TEST_ASSERT_EQUAL(r2, LV_SVG_FILL_NONZERO);
+    TEST_ASSERT_EQUAL(r2, LV_SVG_FILL_RULE_NONZERO);
     lv_svg_node_delete(svg_node_root);
 
     const char * svg_sf4 = \

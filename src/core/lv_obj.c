@@ -61,6 +61,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
+static void obj_transition_states(lv_obj_t * obj, lv_state_t prev_state, lv_state_t new_state);
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
 static void lv_obj_children_add_state(lv_obj_t * obj, lv_state_t state);
 static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state);
@@ -1069,12 +1070,14 @@ void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
         parent->spec_attr->child_cnt = 0;
         return;
     }
-
     parent->spec_attr->child_cnt--;
-    parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
-                                             parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    /* Reallocating a smaller size should never fail, so assert it here*/
-    LV_ASSERT_MALLOC(parent->spec_attr->children);
+    lv_obj_t ** new_children = lv_realloc(parent->spec_attr->children, parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    /* Reallocating a smaller size should never fail but just in case it's implemented as malloc + memcpy + free*/
+    if(!new_children) {
+        LV_LOG_INFO("Failed to shrink children array");
+        return;
+    }
+    parent->spec_attr->children = new_children;
 }
 
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
@@ -1810,7 +1813,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
  * Set the state (fully overwrite) of an object.
  * If specified in the styles, transition animations will be started from the previous state to the current.
  * @param obj       pointer to an object
- * @param state     the new state
+ * @param new_state the new state
  */
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 {
@@ -1847,7 +1850,39 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
         return;
     }
 
-    lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    obj_transition_states(obj, prev_state, new_state);
+
+    if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW && changed_part == LV_PART_SCROLLBAR) {
+        /*A redraw-only change confined to the scrollbar: refresh just that part.
+         *lv_obj_refresh_style() skips the child-subtree refresh for
+         *LV_PART_SCROLLBAR, avoiding a full-subtree style cascade. This is safe
+         *because the scrollbar is drawn by lv_obj and has no styled children.*/
+        lv_obj_refresh_style(obj, LV_PART_SCROLLBAR, LV_STYLE_PROP_ANY);
+    }
+    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW) {
+        /*Invalidation is not enough, e.g. layer type needs to be updated too*/
+        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+    }
+    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
+        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+    }
+    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+        lv_obj_invalidate(obj);
+        lv_obj_refresh_ext_draw_size(obj);
+    }
+
+    lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
+}
+
+static void obj_transition_states(lv_obj_t * obj, lv_state_t prev_state, lv_state_t new_state)
+{
+
+    lv_obj_style_transition_dsc_t * ts = lv_malloc(sizeof(lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    LV_ASSERT_MALLOC(ts);
+    if(!ts) {
+        LV_LOG_WARN("No memory to compute state transitions");
+        return;
+    }
     uint32_t tsi = 0;
     uint32_t i;
     for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
@@ -1891,27 +1926,6 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     }
 
     lv_free(ts);
-
-    if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW && changed_part == LV_PART_SCROLLBAR) {
-        /*A redraw-only change confined to the scrollbar: refresh just that part.
-         *lv_obj_refresh_style() skips the child-subtree refresh for
-         *LV_PART_SCROLLBAR, avoiding a full-subtree style cascade. This is safe
-         *because the scrollbar is drawn by lv_obj and has no styled children.*/
-        lv_obj_refresh_style(obj, LV_PART_SCROLLBAR, LV_STYLE_PROP_ANY);
-    }
-    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW) {
-        /*Invalidation is not enough, e.g. layer type needs to be updated too*/
-        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
-    }
-    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
-        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
-    }
-    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
-        lv_obj_invalidate(obj);
-        lv_obj_refresh_ext_draw_size(obj);
-    }
-
-    lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
 }
 
 /**

@@ -1,8 +1,6 @@
 #if LV_BUILD_TEST
 /* Variant: LV_USE_CHECK_ARG=0 */
-#include "lv_test_conf.h"
 #define LV_USE_CHECK_ARG 0
-#define LV_CONF_SKIP
 #include "../lvgl.h"
 #include "test_cases/test_check_obj_impl.h"
 

@@ -1,51 +1,52 @@
 ---
 title: OpenGL ES Draw Unit
-description: "The OpenGL ES Draw Unit provides a hardware-accelerated rendering backend for LVGL that leverages OpenGL ES capabilities."
+description: "The OpenGL ES draw unit caches software-rendered areas as GPU textures and composites them with OpenGL ES, avoiding redraws of content that has not changed."
 ---
 
 ## Overview
 
-The OpenGL ES Draw Unit provides a hardware-accelerated rendering backend for LVGL that leverages OpenGL ES capabilities.
+The OpenGL ES draw unit renders widgets in software, caches the result as an OpenGL texture, and composites
+those textures on the GPU. Whenever a later frame asks for something already in the cache, the texture is
+reused instead of redrawn, which is most of the screen, most of the time, in a typical UI.
 
-OpenGL ES (OpenGL for Embedded Systems) is a subset of OpenGL designed for embedded devices, mobile phones, and other resource-constrained platforms.
-The OpenGL ES Draw Unit brings GPU-accelerated rendering to LVGL applications on these platforms.
+That makes it fast for static and slowly-changing content, and slower than software rendering for content
+that changes every frame.
 
-### Key Features
+<Callout type="info" title="Prefer NanoVG">
+[NanoVG](/integration/embedded_linux/draw_units/draw_nanovg) is the recommended GPU renderer on Linux: it
+performs better and supports more LVGL features. Reach for this draw unit when you specifically want the
+texture cache, or when NanoVG's limitations do not suit you.
+</Callout>
 
-- **Hardware Acceleration**: Direct GPU acceleration via OpenGL ES 2.0+
-- **Texture Caching**: Rendered elements are cached as OpenGL textures for efficient reuse
-- **GPU Blending**: Hardware-accelerated texture composition and blending
-- **Embedded-Friendly**: Optimized for resource-constrained embedded systems
-- **Wide Platform Support**: Works on mobile, embedded Linux, and other OpenGL ES-compatible platforms
+### Requirements
 
-### Performance Characteristics
-
-The OpenGL ES Draw Unit provides excellent performance for:
-
-- **Best Performance**: Static UI elements that benefit from texture caching
-- **Good Performance**: UIs with moderate animation and dynamic content
-- **Embedded Optimization**: Efficient memory usage suitable for embedded systems
-
-## Prerequisites
-
-- OpenGL ES 2.0 or higher support on your platform
-- A driver which supports OpenGL configured (see [OpenGL Overview](/integration/embedded_linux/opengl))
+- OpenGL ES 2.0 or newer
+- An OpenGL context, created by one of the display drivers listed in
+  [OpenGL Overview](/integration/embedded_linux/opengl) or by your own code
 
 ## Configuration
 
-Enable the OpenGL ES draw unit in `lv_conf.h`:
+Enable <ApiLink name="LV_USE_DRAW_OPENGLES" />
 
-```c
-#define LV_USE_OPENGLES 1
+### Options
 
-#define LV_USE_DRAW_OPENGLES 1
+| Symbol | Default | Meaning |
+|---|---|---|
+| `LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT` | `64` | Number of textures kept in the cache. More entries mean fewer redraws but more GPU memory. |
 
-/* Configurable cache count. Bigger cache will improve performance */
-#define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
-```
+## Limitations
+
+- **No gain without cache hits.** Performance is worse when drawn areas are never found
+  in the cache, e.g. widgets whose color or shape changes every frame
+- **Layer transparency.** Layers that have both transparent pixels and an overall layer opacity do not blend
+  correctly
+- **No layer rotation.** Rotated layers are unsupported. Rotated *images* are fine.
+
+[NanoVG](/integration/embedded_linux/draw_units/draw_nanovg) has none of these limitations.
 
 ## See Also
 
-- [OpenGL Overview](/integration/embedded_linux/opengl) - Complete OpenGL integration overview
-- [EGL](/integration/embedded_linux/drivers/egl) - EGL Display Driver documentation
-- [NanoVG Draw Unit](/integration/embedded_linux/draw_units/draw_nanovg) - Vector graphics rendering option
+- [NanoVG Draw Unit](/integration/embedded_linux/draw_units/draw_nanovg) - the recommended GPU renderer
+- [OpenGL Overview](/integration/embedded_linux/opengl) - how drivers and draw units fit together
+- [OpenGL Driver](/integration/embedded_linux/drivers/opengl_driver) - texture-only driver for an existing context
+- [EGL](/integration/embedded_linux/drivers/egl) - context creation on embedded targets

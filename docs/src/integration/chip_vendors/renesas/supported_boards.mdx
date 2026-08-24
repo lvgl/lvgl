@@ -1,16 +1,41 @@
 ---
 title: Supported Boards
+description: "The Renesas boards for which LVGL maintains a ready-to-use project, with their CPU, memory, display, and demo repository."
 ---
 
-|  |  |  |  |  |  |
+LVGL maintains a ready-to-use project for each board listed below. Pick the board you have
+and follow the guide of its family: [RA](/integration/chip_vendors/renesas/ra_family),
+[RX](/integration/chip_vendors/renesas/rx_family),
+[RZ/A](/integration/chip_vendors/renesas/rza_family), or
+[RZ/G](/integration/chip_vendors/renesas/rzg_family).
+
+The videos of all the boards LVGL supports are also collected on the [Boards](https://lvgl.io/boards) page.
+
+## RA Family
+
+| Board Name | CPU | Memory | Display | Video | Project |
 | --- | --- | --- | --- | --- | --- |
-| Board Name | CPU | Memory | Display | [Board](https://lvgl.io/boards) video | Links |
-| **EK-RA8D1** - \| 480 MHz \| Arm Cortex-M85 - \| 1MB internal SDRAM \| 64MB external SDRAM \| 2MB internal flash \| 64MB external octo-SPI flash - \| 4.5” \| 480x854 \| 2-lane MIPI | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/WkJPB8wto_U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> | [Demo repository](https://github.com/lvgl/lv_port_renesas_ek-ra8d1_gcc) |  |  |  |
-| **EK-RA8P1** - \| 1 GHz \| Arm Cortex-M85 - \| 1872KB internal \| 128MB external \| 1MB internal flash - \| 7” \| 1024x600 \| Parallel RGB888 | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/PoxDoQp51G8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> | [Demo repository](https://github.com/lvgl/lv_port_renesas_ek_ra8p1) |  |  |  |
-| **EK-RA6M3G** - \| 120 MHz \| Arm Cortex-M4 - \| 640kB internal SRAM \| 2MB internal SRAM \| 32MB external QSPI flash - \| 4.3” \| 480x272 \| Parallel RGB565 | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/0kar4Ee3Qic" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> - \| [Demo repository](https://github.com/lvgl/lv_port_renesas_ek-ra6m3g) |  |  |  |  |
-| **RX72N Envision Kit** - \| 240 MHz \| Renesas RXv3 - \| 1MB internal SRAM \| 4MB internal SRAM \| 32MB external QSPI flash - \| 4.3” \| 480x272 \| Parallel RGB565 | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/__56v8DsfH0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> | [Demo repository](https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit) |  |  |  |
-| **RZ/G2L-EVKIT** - \| 1.2 GHz \| Arm Cortex-A55 - \| 2GB DDR4 SDRAM - \| 1920x1080 \| Micro-HDMI | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/oeuVvB7y-QA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> | [Demo repository](https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit) |  |  |  |
-| **RZ/G2UL-EVKIT** - \| 1.0 GHz \| Arm Cortex-A55 - \| 1GB DDR4 SDRAM - \| 1280x800 \| Parallel RGB888 \| with Micro-HDMI bridge | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/VnynDLR36Xc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> | [Demo repository](https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit) |  |  |  |
-| **RZ/A3M** - \| 1.0 GHz \| Arm Cortex-A55 - \| 128MB internal DDR3L-SDRAM \| 128KB internal SRAM \| 128MB external QSPI NAND flash \| 32MB external QSPI NOR flash - \| 4.3” \| 1280x720 \| MIPI | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/IEjBGgrR_mk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> | [Demo repository](https://github.com/lvgl/lv_port_renesas-ek-rz_a3m) |  |  |  |
-| **EK-RA8D2** - \| 1 GHz \| Arm Cortex-M85 - \| 1872KB internal \| 128MB external \| 1MB internal flash - \| 7” \| 1024x600 \| Parallel RGB888 | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/a8eLdqC7rZk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> | [Demo repository](https://github.com/lvgl/lv_port_renesas_ek-ra8d2) |  |  |  |
-| **RZ/G3E-EVKIT** - \| 1.8 GHz \| Arm Cortex-A55 - \| 4GB LPDDR4X SDRAM - \| 1920x1080 \| Micro-HDMI | .. raw:: html &lt;iframe width="160" height="90" src="https://www.youtube.com/embed/0vzvV9nKW4Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>&lt;iframe> | [Demo repository](https://github.com/lvgl/lv_port_renesas_rz-g3e-evkit) |  |  |  |
+| **EK-RA8D1** | 480 MHz<br />Arm Cortex-M85 | 1MB internal SDRAM<br />64MB external SDRAM<br />2MB internal flash<br />64MB external octo-SPI flash | 4.5”<br />480x854<br />2-lane MIPI | [Watch](https://www.youtube.com/watch?v=WkJPB8wto_U) | [lv_port_renesas_ek-ra8d1_gcc](https://github.com/lvgl/lv_port_renesas_ek-ra8d1_gcc) |
+| **EK-RA8P1** | 1 GHz<br />Arm Cortex-M85 | 1872KB internal<br />128MB external<br />1MB internal flash | 7”<br />1024x600<br />Parallel RGB888 | [Watch](https://www.youtube.com/watch?v=PoxDoQp51G8) | [lv_port_renesas_ek_ra8p1](https://github.com/lvgl/lv_port_renesas_ek_ra8p1) |
+| **EK-RA8D2** | 1 GHz<br />Arm Cortex-M85 | 1872KB internal<br />128MB external<br />1MB internal flash | 7”<br />1024x600<br />Parallel RGB888 | [Watch](https://www.youtube.com/watch?v=a8eLdqC7rZk) | [lv_port_renesas_ek-ra8d2](https://github.com/lvgl/lv_port_renesas_ek-ra8d2) |
+| **EK-RA6M3G** | 120 MHz<br />Arm Cortex-M4 | 640kB internal SRAM<br />2MB internal SRAM<br />32MB external QSPI flash | 4.3”<br />480x272<br />Parallel RGB565 | [Watch](https://www.youtube.com/watch?v=0kar4Ee3Qic) | [lv_port_renesas_ek-ra6m3g](https://github.com/lvgl/lv_port_renesas_ek-ra6m3g) |
+
+## RX Family
+
+| Board Name | CPU | Memory | Display | Video | Project |
+| --- | --- | --- | --- | --- | --- |
+| **RX72N Envision Kit** | 240 MHz<br />Renesas RXv3 | 1MB internal SRAM<br />4MB internal SRAM<br />32MB external QSPI flash | 4.3”<br />480x272<br />Parallel RGB565 | [Watch](https://www.youtube.com/watch?v=__56v8DsfH0) | [lv_port_renesas_rx72n-envision-kit](https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit) |
+
+## RZ/A Family
+
+| Board Name | CPU | Memory | Display | Video | Project |
+| --- | --- | --- | --- | --- | --- |
+| **RZ/A3M** | 1.0 GHz<br />Arm Cortex-A55 | 128MB internal DDR3L-SDRAM<br />128KB internal SRAM<br />128MB external QSPI NAND flash<br />32MB external QSPI NOR flash | 4.3”<br />1280x720<br />MIPI | [Watch](https://www.youtube.com/watch?v=IEjBGgrR_mk) | [lv_port_renesas-ek-rz_a3m](https://github.com/lvgl/lv_port_renesas-ek-rz_a3m) |
+
+## RZ/G Family
+
+| Board Name | CPU | Memory | Display | Video | Project |
+| --- | --- | --- | --- | --- | --- |
+| **RZ/G2L-EVKIT** | 1.2 GHz<br />Arm Cortex-A55 | 2GB DDR4 SDRAM | 1920x1080<br />Micro-HDMI | [Watch](https://www.youtube.com/watch?v=oeuVvB7y-QA) | [lv_port_renesas_rz-g2l-evkit](https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit) |
+| **RZ/G2UL-EVKIT** | 1.0 GHz<br />Arm Cortex-A55 | 1GB DDR4 SDRAM | 1280x800<br />Parallel RGB888<br />with Micro-HDMI bridge | [Watch](https://www.youtube.com/watch?v=VnynDLR36Xc) | [lv_port_renesas_rz-g2ul-evkit](https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit) |
+| **RZ/G3E-EVKIT** | 1.8 GHz<br />Arm Cortex-A55 | 4GB LPDDR4X SDRAM | 1920x1080<br />Micro-HDMI | [Watch](https://www.youtube.com/watch?v=0vzvV9nKW4Q) | [lv_port_renesas_rz-g3e-evkit](https://github.com/lvgl/lv_port_renesas_rz-g3e-evkit) |

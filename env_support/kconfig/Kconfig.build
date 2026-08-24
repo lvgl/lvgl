@@ -11,11 +11,14 @@ config LVGL_VERSION_PATCH
 	default 0
 
 config LV_CONF_SKIP
-	bool "Check this to skip using lv_conf.h"
+	bool "Skip lv_conf.h"
 	default y
+	help
+	  Do not include lv_conf.h; take the configuration from this Kconfig
+	  tree and the built-in defaults instead.
 
 config LV_CONF_MINIMAL
-	bool "LVGL minimal configuration [DEPRECATED: use the minimal defconfig]"
+	bool "Minimal configuration [DEPRECATED: use the minimal defconfig]"
 	default n
 	help
 	  Deprecated and no longer functional. The minimal preset is now a
@@ -23,11 +26,14 @@ config LV_CONF_MINIMAL
 	  effect on the generated configuration and triggers a build warning.
 
 config LV_USE_PRIVATE_API
-	bool "Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default"
+	bool "Private API (lvgl_private.h)"
 	default n
+	help
+	  Include `lvgl_private.h` from `lvgl.h` so that LVGL internal data
+	  structures and functions are accessible by default.
 
 config LV_ENABLE_GLOBAL_CUSTOM
-	bool "Enable 'lv_global' customization"
+	bool "'lv_global' customization"
 	default n
 	help
 	  By default, LVGL stores all runtime state in a single static
@@ -52,13 +58,13 @@ config LV_ENABLE_GLOBAL_CUSTOM
 if LV_ENABLE_GLOBAL_CUSTOM
 
 config LV_GLOBAL_USE_CUSTOM_INCLUDE
-	bool "Provide 'lv_global_default()' from a custom header"
+	bool "Custom 'lv_global_default()' header"
 	help
 	  Use a custom header for the declaration of:
 	  	lv_global_t *lv_global_default(void);
 
 config LV_GLOBAL_CUSTOM_INCLUDE
-	string "Header to include for the custom 'lv_global' function"
+	string "Path to custom 'lv_global' header"
 	depends on LV_GLOBAL_USE_CUSTOM_INCLUDE
 	default "lv_global.h"
 	help
@@ -73,24 +79,24 @@ endif #LV_ENABLE_GLOBAL_CUSTOM
 
 menu "Asserts"
 	config LV_USE_ASSERT_NULL
-		bool "Check if the parameter is NULL. (Very fast, recommended)"
+		bool "NULL checks (very fast, recommended)"
 		default y
 
 	config LV_USE_ASSERT_MALLOC
-		bool "Checks if the memory is successfully allocated or no. (Very fast, recommended)"
+		bool "Allocation success checks (very fast, recommended)"
 		default y
 
 	config LV_USE_ASSERT_STYLE
-		bool "Check if the styles are properly initialized. (Very fast, recommended)"
+		bool "Style init checks (very fast, recommended)"
 
 	config LV_USE_ASSERT_MEM_INTEGRITY
-		bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
+		bool "lv_mem integrity checks (slow)"
 
 	config LV_USE_ASSERT_OBJ
-		bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
+		bool "Widget validity checks (slow)"
 
 	config LV_ASSERT_HANDLER_INCLUDE
-		string "Assert handler include [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"
+		string "Assert handler header [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"
 		default ""
 		help
 		  [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]
@@ -119,11 +125,11 @@ menu "Asserts"
 		  directly.
 
 	config LV_ASSERT_USE_CUSTOM_INCLUDE
-		bool "Use a custom path to define an assertion handler"
+		bool "Custom assert handler header"
 		default n
 		help
-		  Use LV_ASSERT_CUSTOM_INCLUDE to define the path to a file defining a
-		  custom LV_ASSERT_HANDLER
+		  Include the header given by LV_ASSERT_CUSTOM_INCLUDE, which must define
+		  a custom LV_ASSERT_HANDLER.
 
 	config LV_ASSERT_CUSTOM_INCLUDE
 		string "Path to custom assert handler header"
@@ -140,24 +146,22 @@ endmenu
 
 menu "Argument Checks"
 	config LV_USE_CHECK_ARG
-		bool "Enable LV_CHECK_ARG macro for runtime argument validation"
+		bool "Runtime argument validation"
 		default y
 		help
-			When enabled, LV_CHECK_ARG checks validate function arguments
-			at runtime. Failed checks log a warning and execute the specified
-			action. When disabled, all LV_CHECK_ARG checks compile to nothing.
-			Disabling this is not recommended unless extreme care is taken and only
-			in very resource constrained environments where it can be absolutely
-			ensured that invariants are never violated.
+			LV_CHECK_ARG validates function arguments at runtime: a failed check
+			logs a warning and executes the specified action. When disabled all
+			these checks compile to nothing, which is only safe in very resource
+			constrained environments where invariants are guaranteed to hold.
 
 	if LV_USE_CHECK_ARG
 
 	config LV_CHECK_ARG_ASSERT_ON_FAIL
-		bool "Call assert handler on LV_CHECK_ARG failure"
+		bool "Assert on failure"
 		default n
 		help
-			When enabled, LV_ASSERT_HANDLER is also invoked when an
-			LV_CHECK_ARG check fails, before the action is executed.
+			Also invoke LV_ASSERT_HANDLER when an LV_CHECK_ARG check fails,
+			before the action is executed.
 
 	choice
 		prompt "Log behavior on LV_CHECK_ARG failure"
@@ -165,9 +169,8 @@ menu "Argument Checks"
 		default LV_CHECK_ARG_LOG_MODE_NONE if !LV_USE_LOG
 		help
 			Controls what is logged when an LV_CHECK_ARG check fails.
-			MINIMAL and VERBOSE modes require LV_USE_LOG to be enabled;
-			selecting either when LV_USE_LOG is disabled will cause a
-			compile-time error.
+			Minimal and Verbose require LV_USE_LOG; selecting either without it
+			causes a compile-time error.
 
 		config LV_CHECK_ARG_LOG_MODE_NONE
 			bool "None: no log output on failure"
@@ -189,21 +192,20 @@ menu "Argument Checks"
 		default 2 if LV_CHECK_ARG_LOG_MODE_VERBOSE
 
 	config LV_USE_CHECK_OBJ_CLASSTYPE
-		bool "Enable class check in LV_CHECK_OBJ"
+		bool "Class check in LV_CHECK_OBJ"
 		default n
 		help
-			When enabled, LV_CHECK_OBJ verifies that the object has the
-			expected class (lv_obj_has_class). When disabled, the class
-			check is skipped even if a class argument is supplied.
+			LV_CHECK_OBJ verifies with lv_obj_has_class() that the object has the
+			expected class. When disabled the check is skipped even if a class
+			argument is supplied.
 
 	config LV_USE_CHECK_OBJ_VALIDITY
-		bool "Enable widget-tree validity check in LV_CHECK_OBJ"
+		bool "Widget-tree validity check in LV_CHECK_OBJ"
 		default n
 		help
-			When enabled, LV_CHECK_OBJ also verifies that the object is
-			still part of the widget tree (lv_obj_is_valid). When disabled,
-			the validity check is skipped even if the associated argument
-			is supplied.
+			LV_CHECK_OBJ verifies with lv_obj_is_valid() that the object is still
+			part of the widget tree. When disabled the check is skipped even if the
+			associated argument is supplied.
 	endif
 endmenu
 endmenu #"Build"

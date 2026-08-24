@@ -246,7 +246,6 @@ static void set_swap_xy(lv_lcd_generic_mipi_driver_t * drv, bool swap)
 /**
  * Flush display buffer to the LCD
  * @param disp          display object
- * @param hor_res       horizontal resolution
  * @param area          area stored in the buffer
  * @param px_map        buffer containing pixel data
  * @note                transfers pixel data to the LCD controller using the callbacks 'send_cmd' and 'send_color', which were

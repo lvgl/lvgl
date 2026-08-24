@@ -1,8 +1,8 @@
 config LV_USE_LOVYAN_GFX
-	bool "Use LovyanGFX driver"
+	bool "LovyanGFX"
 	default n
 	help
-		Interface for Lovyan_GFX
+		Display and touch driver built on the LovyanGFX C++ library, which must be available in the build.
 
 if LV_USE_LOVYAN_GFX
 

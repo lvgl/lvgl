@@ -905,6 +905,12 @@ static void inv_arc_area(lv_obj_t * obj, lv_value_precise_t start_angle, lv_valu
     int32_t w = lv_obj_get_style_arc_width(obj, part);
     bool rounded = lv_obj_get_style_arc_rounded(obj, part);
 
+    /*Guard: if radius is zero or negative after padding, invalidate full object (incl. ext-draw area)*/
+    if(r <= 0) {
+        lv_obj_invalidate(obj);
+        return;
+    }
+
     lv_area_t inv_area;
     lv_draw_arc_get_area(c.x, c.y, r, start_angle, end_angle, w, rounded, &inv_area);
 
@@ -1012,7 +1018,7 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, int32_t r, 
 
 /**
  * Used internally to update arc angles after a value change
- * @param arc pointer to an arc object
+ * @param obj pointer to an arc object
  */
 static void value_update(lv_obj_t * obj)
 {

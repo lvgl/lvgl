@@ -28,37 +28,39 @@
 
 /** Malloc functions source
  *  Possible values:
- *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
- *  - LV_STDLIB_CLIB: Standard C functions malloc/realloc/free
- *  - LV_STDLIB_MICROPYTHON: MicroPython functions malloc/realloc/free
- *  - LV_STDLIB_RTTHREAD: RT-Thread functions malloc/realloc/free
- *  - LV_STDLIB_CUSTOM: Implement the functions externally
+ *  - LV_STDLIB_BUILTIN: LVGL built-in
+ *  - LV_STDLIB_CLIB: C standard library (malloc/realloc/free)
+ *  - LV_STDLIB_MICROPYTHON
+ *  - LV_STDLIB_RTTHREAD
+ *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
 #define LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN
 
 /** String functions source
  *  Possible values:
- *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
- *  - LV_STDLIB_CLIB: Standard C functions memcpy/memset/strlen/strcpy
- *  - LV_STDLIB_RTTHREAD: RT-Thread functions rt_memcpy/rt_memset/rt_strlen/rt_strcpy
- *  - LV_STDLIB_CUSTOM: Implement the functions externally
+ *  - LV_STDLIB_BUILTIN: LVGL built-in
+ *  - LV_STDLIB_CLIB: C standard library (memcpy/memset/strlen/strcpy)
+ *  - LV_STDLIB_RTTHREAD: RT-Thread (rt_memcpy/rt_memset/rt_strlen/rt_strcpy)
+ *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
 #define LV_USE_STDLIB_STRING LV_STDLIB_BUILTIN
 
 /** Sprintf functions source
  *  Possible values:
- *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
- *  - LV_STDLIB_CLIB: Standard C function vsnprintf
- *  - LV_STDLIB_RTTHREAD: RT-Thread function rt_vsnprintf
- *  - LV_STDLIB_CUSTOM: Implement the functions externally
+ *  - LV_STDLIB_BUILTIN: LVGL built-in
+ *  - LV_STDLIB_CLIB: C standard library (vsnprintf)
+ *  - LV_STDLIB_RTTHREAD: RT-Thread (rt_vsnprintf)
+ *  - LV_STDLIB_CUSTOM: Custom (implemented externally)
  */
 #define LV_USE_STDLIB_SPRINTF LV_STDLIB_BUILTIN
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-/** Memory size in bytes (Needs to be at least 2kB (2048)) */
+/** Size of the pool `lv_malloc()` allocates from. Needs to be at least 2kB (2048). */
 #define LV_MEM_SIZE 65536
 
-/** Address for the memory pool instead of allocating it as a normal array. 0: unused */
+/** Place the pool at a fixed address instead of allocating it as a normal array.
+ *  0: unused.
+ */
 #define LV_MEM_ADR 0x0
 
 #endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
@@ -87,10 +89,10 @@
  * OPERATING SYSTEM (OS)
  *============================================================================*/
 
-/** Default operating system to use
+/** Operating system
  *  Possible values:
  *  - LV_OS_NONE
- *  - LV_OS_PTHREAD
+ *  - LV_OS_PTHREAD: POSIX threads (pthread)
  *  - LV_OS_FREERTOS
  *  - LV_OS_CMSIS_RTOS2
  *  - LV_OS_RTTHREAD
@@ -108,15 +110,14 @@
 #endif /*LV_USE_OS == LV_OS_CUSTOM*/
 
 #if LV_USE_OS == LV_OS_FREERTOS
-/** Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
- *  than unblocking a task using an intermediary object such as a binary semaphore.
- *  RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+/** Synchronize with direct task notifications instead of an intermediary object such as a
+ *  binary semaphore: 45% faster and less RAM, but only usable when a single task can be
+ *  the recipient of the event.
  */
 #define LV_USE_FREERTOS_TASK_NOTIFY 1
 
-/** Enable this to provide a custom implementation of lv_os_get_idle_percent.
- *  This is useful for multi-core systems where the default
- *  FreeRTOS implementation might not sufficiently track idle time across all cores.
+/** Provide your own lv_os_get_idle_percent(). Useful on multi-core systems, where the
+ *  default FreeRTOS implementation may not track idle time across all cores.
  */
 #define LV_OS_IDLE_PERCENT_CUSTOM 0
 
@@ -141,9 +142,7 @@
 /** Default display refresh, input device read and animation step period. */
 #define LV_DEF_REFR_PERIOD 33
 
-/** Used to initialize default sizes such as widgets sizes and style paddings.
- *  (Not so important, you can adjust it to modify default sizes and spaces)
- */
+/** Used to initialize default sizes such as widget sizes and style paddings. */
 #define LV_DPI_DEF 130
 
 /** Align the stride of all layers and images to this many bytes. */
@@ -152,28 +151,27 @@
 /** Align the start address of draw_buf addresses to this many bytes. */
 #define LV_DRAW_BUF_ALIGN 4
 
-/** Enable matrix support
+/** 3x3 matrix API (lv_matrix_t) for transformations. Requires floating point support.
  *
  *  Enable: LV_USE_FLOAT
  */
 #define LV_USE_MATRIX 0
 
 #if LV_USE_MATRIX
-/** Requirements: The rendering engine needs to support 3x3 matrix transformations. */
+/** The rendering engine must support 3x3 matrix transformations. */
 #define LV_DRAW_TRANSFORM_USE_MATRIX 0
 
 #endif /*LV_USE_MATRIX*/
 
-/** If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
- *  it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
- *  "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be drawn in chunks.
+/** Widgets with `style_opa < 255` (not `bg_opa`, `text_opa` etc) or a non-NORMAL blend mode are
+ *  buffered into a "simple" layer in chunks of this size.
+ *  "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be chunked.
  */
 #define LV_DRAW_LAYER_SIMPLE_BUF_SIZE 24576
 
-/** Limit the max allocated memory for simple and transformed layers.
- *  It should be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` sized but if transformed layers are also used
- *  it should be enough to store the largest widget too (width x height x 4 area).
- *  Set it to 0 to have no limit.
+/** Limit for simple and transformed layers together; 0 means no limit.
+ *  Must be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE`, and with transformed layers large enough
+ *  for the largest widget too (width x height x 4).
  */
 #define LV_DRAW_LAYER_MAX_MEMORY 0
 
@@ -196,20 +194,21 @@
 
 #endif /*LV_USE_OS != LV_OS_NONE*/
 
-/** Enable drawing support vector graphic APIs.
+/** Vector drawing API (lv_vector_dsc_*) for paths, strokes and fills.
+ *  Needs a renderer with vector support, e.g. the SW renderer with ThorVG, or VG-Lite.
  *
  *  Enable: LV_USE_MATRIX
  */
 #define LV_USE_VECTOR_GRAPHIC 0
 
-/** Enable API to take snapshot for object */
+/** Render a widget and its children into an image buffer with lv_snapshot_take(). */
 #define LV_USE_SNAPSHOT 0
 
-/** ThorVG library for vector graphics support */
+/** Backend that gives the SW renderer vector graphics support. */
 #define LV_USE_THORVG 0
 
 #if LV_USE_THORVG
-/** Internal ThorVG library bundled with LVGL */
+/** Build the ThorVG copy shipped with LVGL instead of linking an external one. */
 #define LV_USE_THORVG_INTERNAL 1
 
 #endif /*LV_USE_THORVG*/
@@ -218,41 +217,41 @@
 #define LV_USE_DRAW_SW 1
 
 #if LV_USE_DRAW_SW
-/** Enable support for RGB565 color format */
+/** RGB565 */
 #define LV_DRAW_SW_SUPPORT_RGB565 1
 
-/** Enable support for RGB565 swapped color format */
+/** RGB565 swapped */
 #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 1
 
-/** Enable support for RGB565A8 color format */
+/** RGB565A8 */
 #define LV_DRAW_SW_SUPPORT_RGB565A8 1
 
-/** Enable support for RGB888 color format */
+/** RGB888 */
 #define LV_DRAW_SW_SUPPORT_RGB888 1
 
-/** Enable support for XRGB8888 color format */
+/** XRGB8888 */
 #define LV_DRAW_SW_SUPPORT_XRGB8888 1
 
-/** Enable support for ARGB8888 color format */
+/** ARGB8888 */
 #define LV_DRAW_SW_SUPPORT_ARGB8888 1
 
-/** Enable support for ARGB8888 premultiplied color format */
+/** ARGB8888 premultiplied */
 #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
 
-/** Enable support for L8 color format */
+/** L8 */
 #define LV_DRAW_SW_SUPPORT_L8 1
 
-/** Enable support for AL88 color format */
+/** AL88 */
 #define LV_DRAW_SW_SUPPORT_AL88 1
 
-/** Enable support for A8 color format */
+/** A8 */
 #define LV_DRAW_SW_SUPPORT_A8 1
 
-/** Enable support for I1 color format */
+/** I1 */
 #define LV_DRAW_SW_SUPPORT_I1 1
 
 #if LV_DRAW_SW_SUPPORT_I1
-/** Luminance threshold for a pixel to be active */
+/** Pixels brighter than this luminance become active (set) when rendering to I1. */
 #define LV_DRAW_SW_I1_LUM_THRESHOLD 127
 
 #endif /*LV_DRAW_SW_SUPPORT_I1*/
@@ -263,44 +262,37 @@
 
 #endif /*LV_USE_OS != LV_OS_NONE*/
 
-/** Must deploy arm-2d library to your project and add include PATH for "arm_2d.h". */
+/** Requires the Arm-2D library in your project and an include path for "arm_2d.h". */
 #define LV_USE_DRAW_ARM2D_SYNC 0
 
-/** Disabling this allows arm2d to work on its own (for testing only) */
+/** Disable to let Arm-2D work on its own (for testing only). */
 #define LV_USE_NATIVE_HELIUM_ASM 0
 
-/** 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only,
- *  1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too.
+/** Adds rounded corners, shadows, skewed lines and arcs.
+ *  Without it only rectangles with gradients, images, texts and straight lines can be drawn.
  */
 #define LV_DRAW_SW_COMPLEX 1
 
-/** Increase this to allow more stops.
- *  This adds (sizeof(lv_color_t) + 1) bytes per additional stop
- */
+/** Each additional stop costs (sizeof(lv_color_t) + 1) bytes. */
 #define LV_GRADIENT_MAX_STOPS 2
 
-/** 0: do not enable complex gradients
- *  1: enable complex gradients (linear at an angle, radial or conical)
- */
+/** Adds linear gradients at an angle, plus radial and conical gradients. */
 #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS 0
 
 #if LV_DRAW_SW_COMPLEX
-/** LV_DRAW_SW_SHADOW_CACHE_SIZE is the max shadow size to buffer, where
- *  shadow size is `shadow_width + radius`.
- *  Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost.
+/** Maximum shadow size to buffer, where shadow size is `shadow_width + radius`.
+ *  Costs this value squared in RAM; 0 disables caching.
  */
 #define LV_DRAW_SW_SHADOW_CACHE_SIZE 0
 
-/** The circumference of 1/4 circle are saved for anti-aliasing
- *  radius * 4 bytes are used per circle (the most often used
- *  radiuses are saved).
- *  Set to 0 to disable caching.
+/** The circumference of a 1/4 circle is cached for anti-aliasing, costing
+ *  radius * 4 bytes per circle. Set to 0 to disable caching.
  */
 #define LV_DRAW_SW_CIRCLE_CACHE_SIZE 4
 
 #endif /*LV_DRAW_SW_COMPLEX*/
 
-/** ASM mode to be used
+/** SW assembly optimization
  *  Possible values:
  *  - LV_DRAW_SW_ASM_NONE
  *  - LV_DRAW_SW_ASM_NEON
@@ -312,31 +304,29 @@
 #define LV_USE_DRAW_SW_ASM LV_DRAW_SW_ASM_NONE
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
-/** Set the custom asm include file */
+/** Custom assembly include file */
 #define LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
 
 #endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM*/
 #endif /*LV_USE_DRAW_SW*/
 
-/** Use VG-Lite GPU.
+/** Renders with a VG-Lite GPU. Requires a VG-Lite driver, or the VG-Lite simulator below.
  *
  *  Enable: LV_USE_MATRIX
  */
 #define LV_USE_DRAW_VG_LITE 0
 
 #if LV_USE_DRAW_VG_LITE
-/** Enable VG-Lite custom external 'gpu_init()' function */
+/** Call an application-provided gpu_init() before the first use of the GPU. */
 #define LV_VG_LITE_USE_GPU_INIT 0
 
-/** Enable VG-Lite assert */
+/** Check internal VG-Lite state with LV_ASSERT(). Useful while debugging. */
 #define LV_VG_LITE_USE_ASSERT 0
 
-/** GPU will try to batch these many draw tasks */
+/** The GPU tries to batch this many draw tasks before flushing. */
 #define LV_VG_LITE_FLUSH_MAX_COUNT 8
 
-/** which usually improves performance,
- *  but does not guarantee the same rendering quality as the software.
- */
+/** Usually faster, but does not match the rendering quality of the SW renderer. */
 #define LV_VG_LITE_USE_BOX_SHADOW 1
 
 /** The memory usage of a single gradient:
@@ -345,25 +335,25 @@
  */
 #define LV_VG_LITE_GRAD_CACHE_CNT 32
 
-/** VG-Lite stroke maximum cache number */
+/** Stroke cache size (entries) */
 #define LV_VG_LITE_STROKE_CACHE_CNT 32
 
-/** VG-Lite unaligned bitmap font maximum cache number */
+/** Unaligned bitmap font cache size (entries) */
 #define LV_VG_LITE_BITMAP_FONT_CACHE_CNT 256
 
 /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) */
 #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
 
-/** Disable linear gradient extension for some older versions of drivers */
+/** Needed with older VG-Lite drivers that do not implement the extension. */
 #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 
-/** Disable blit rectangular offset to resolve certain hardware errors */
+/** Works around HW errors on some GPUs at the cost of extra blits. */
 #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET 0
 
-/** Maximum path dump print length (in points) */
+/** Maximum path dump length (points) */
 #define LV_VG_LITE_PATH_DUMP_MAX_LEN 1000
 
-/** Use LVGL's built-in vg_lite driver */
+/** Build the VG-Lite driver bundled with LVGL instead of linking a vendor-provided one. */
 #define LV_USE_VG_LITE_DRIVER 0
 
 #if LV_USE_VG_LITE_DRIVER
@@ -378,68 +368,71 @@
  */
 #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC255_0X40A
 
-/** VG-Lite GPU base address */
+/** GPU base address */
 #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
 
 #endif /*LV_USE_VG_LITE_DRIVER*/
 
-/** Use thorvg to simulate VG-Lite hardware behavior, it's useful
- *  for debugging and testing on PC simulator. Enable LV_USE_THORVG,
- *  Either internal ThorVG or external ThorVG library is required.
+/** Simulate VG-Lite hardware with ThorVG for debugging and testing on a PC simulator.
+ *  Requires the internal or an external ThorVG library.
  *
  *  Enable: LV_USE_THORVG
  */
 #define LV_USE_VG_LITE_THORVG 0
 
 #if LV_USE_VG_LITE_THORVG
-/** Enable LVGL blend mode support */
+/** LVGL blend modes */
 #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
 
-/** Enable YUV color format support */
+/** YUV color formats */
 #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
 
-/** Enable linear gradient extension support */
+/** Linear gradient extension */
 #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
 
-/** Enable 16 pixels alignment */
+/** 16 pixel alignment */
 #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
 
-/** Buffer address alignment */
+/** Buffer address alignment (bytes) */
 #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
 
-/** Enable multi-thread render */
+/** Multi-threaded rendering */
 #define LV_VG_LITE_THORVG_THREAD_RENDER 0
 
 #endif /*LV_USE_VG_LITE_THORVG*/
 #endif /*LV_USE_DRAW_VG_LITE*/
 
-/** Use Renesas Dave2D on RA  platforms. */
+/** Accelerate drawing with the Dave2D GPU found on Renesas RA platforms. */
 #define LV_USE_DRAW_DAVE2D 0
 
-/** Use TSi's aka (Think Silicon) NemaGFX */
+/** Accelerate drawing with the Think Silicon (TSi) NemaGFX GPU library. */
 #define LV_USE_NEMA_GFX 0
 
 #if LV_USE_NEMA_GFX
-/** Cache handling of NemaGFX */
+/** Clean and invalidate the CPU cache around draw buffers so the GPU sees
+ *  coherent data. Needed on cores with a data cache.
+ */
 #define LV_NEMA_USE_CACHE 0
 
 #if LV_NEMA_USE_CACHE
-/** NemaGFX Cache HAL include */
+/** Cache HAL header */
 #define LV_NEMA_CACHE_HAL_INCLUDE "stm32u5xx_hal.h"
 
 #endif /*LV_NEMA_USE_CACHE*/
 
-/** NemaGFX static library
+/** Bundled NemaGFX library and headers to use, per target CPU core.
+ *  None warns at build time and falls back to Cortex-M33 (Rev C).
  *  Possible values:
  *  - LV_NEMA_LIB_NONE
- *  - LV_NEMA_LIB_M33_REVC
- *  - LV_NEMA_LIB_M33_NEMAPVG
- *  - LV_NEMA_LIB_M55
- *  - LV_NEMA_LIB_M7
+ *  - LV_NEMA_LIB_M33_REVC: Cortex-M33 (Rev C)
+ *  - LV_NEMA_LIB_M33_NEMAPVG: Cortex-M33 (NemaPVG)
+ *  - LV_NEMA_LIB_M55: Cortex-M55
+ *  - LV_NEMA_LIB_M7: Cortex-M7
  */
 #define LV_USE_NEMA_LIB LV_NEMA_LIB_NONE
 
-/** NemaGFX HAL
+/** STM32 uses the HAL bundled with LVGL. Custom means the application
+ *  provides the NemaGFX HAL (nema_hal.c) itself.
  *  Possible values:
  *  - LV_NEMA_HAL_CUSTOM
  *  - LV_NEMA_HAL_STM32
@@ -447,7 +440,7 @@
 #define LV_USE_NEMA_HAL LV_NEMA_HAL_CUSTOM
 
 #if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
-/** NemaGFX STM32 HAL include */
+/** STM32 HAL header */
 #define LV_NEMA_STM32_HAL_INCLUDE "stm32u5xx_hal.h"
 
 /** Include the header given by LV_NEMA_CUSTOM_INCLUDE to override
@@ -471,100 +464,123 @@
 
 #endif /*LV_NEMA_USE_CUSTOM_INCLUDE*/
 
-/** Enable NemaVG operations */
+/** Draw vector graphics (lv_vector_dsc) with NemaVG on top of NemaGFX. */
 #define LV_USE_NEMA_VG 0
 
-/** NemaVG max horizontal resolution */
+/** Canvas width NemaVG is initialized for. With the vertical resolution it also
+ *  sizes the NemaGFX memory pool on STM32 (RESX * RESY + 10KB).
+ */
 #define LV_NEMA_GFX_MAX_RESX 800
 
-/** NemaVG max vertical resolution */
+/** Canvas height NemaVG is initialized for. */
 #define LV_NEMA_GFX_MAX_RESY 600
 
 #endif /*LV_USE_NEMA_GFX*/
 
-/** Use PXP for drawing */
+/** Accelerate blends, fills and transforms with the PXP (Pixel Pipeline)
+ *  engine of NXP i.MX RT SoCs.
+ */
 #define LV_USE_DRAW_PXP 0
 
 #if LV_USE_DRAW_PXP
-/** Use PXP to rotate the display */
+/** Rotate the rendered display buffer with the PXP instead of the CPU. */
 #define LV_USE_ROTATE_PXP 0
 
 #if LV_USE_OS != LV_OS_NONE
-/** Use additional draw thread for PXP processing */
+/** Dispatch PXP operations from their own thread so the CPU can keep
+ *  rendering in parallel. Needs an OS.
+ */
 #define LV_USE_PXP_DRAW_THREAD 1
 
 #endif /*LV_USE_OS != LV_OS_NONE*/
 
-/** Enable PXP asserts */
+/** Check the status of every PXP call and assert on failure. Useful while
+ *  bringing up a board.
+ */
 #define LV_USE_PXP_ASSERT 0
 
 #endif /*LV_USE_DRAW_PXP*/
 
-/** Draw using Espressif PPA accelerator */
+/** Accelerate blends, fills and transforms with the PPA (Pixel Processing
+ *  Accelerator) peripheral of Espressif SoCs.
+ */
 #define LV_USE_PPA 0
 
 #if LV_USE_PPA
-/** Use Espressif's PPA accelerator for Image draw */
+/** Let the PPA also draw images. Only simple cases qualify: unscaled,
+ *  unrotated, fully opaque and without masks.
+ */
 #define LV_USE_PPA_IMG 0
 
-/** PPA burst length size in bytes. */
 #define LV_PPA_BURST_LENGTH 128
 
 #endif /*LV_USE_PPA*/
 
-/** Accelerate blends, fills, image decoding, etc. with STM32 DMA2D. */
+/** Accelerate blends, fills and image decoding with the STM32 DMA2D peripheral. */
 #define LV_USE_DRAW_DMA2D 0
 
 #if LV_USE_DRAW_DMA2D
-/** the header file for LVGL to include for DMA2D */
+/** Header that declares the DMA2D HAL API of the target STM32 family. */
 #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
-/** if enabled, the user is required to call
- *  `lv_draw_dma2d_transfer_complete_interrupt_handler`
- *  upon receiving the DMA2D global interrupt
+/** Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
+ *  Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
  */
 #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 
 #endif /*LV_USE_DRAW_DMA2D*/
 
-/** Use EVE FT81X GPU. */
+/** Offload drawing to an external EVE (FT81X/BT81X) graphics controller over SPI. */
 #define LV_USE_DRAW_EVE 0
 
 #if LV_USE_DRAW_EVE
-/** EVE_GEN value */
+/** Generation of the connected controller: 2 = FT81x, 3 = BT815/BT816,
+ *  4 = BT817/BT818. Higher generations expose more commands and registers.
+ */
 #define LV_DRAW_EVE_EVE_GENERATION 4
 
-/** Max bytes to buffer for each SPI transmission or 0 to disable buffering */
+/** Bytes buffered before each SPI transmission. 0 disables buffering;
+ *  values below 4 are treated as 0.
+ */
 #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
 
 #endif /*LV_USE_DRAW_EVE*/
 
-/** Use G2D for drawing */
+/** Accelerate blends, fills and image blits with the NXP G2D API (i.MX 2D GPU).
+ *  Requires the g2d library and its headers.
+ */
 #define LV_USE_DRAW_G2D 0
 
 #if LV_USE_DRAW_G2D
-/** Includes the frame buffers and assets. */
+/** Maximum number of buffers mapped for the G2D draw unit, including frame
+ *  buffers and assets. Drawing asserts once the table is full.
+ */
 #define LV_G2D_HASH_TABLE_SIZE 50
 
 #if LV_USE_OS != LV_OS_NONE
-/** Use additional draw thread for G2D processing */
+/** Dispatch G2D operations from their own thread so the CPU can keep
+ *  rendering in parallel. Needs an OS.
+ */
 #define LV_USE_G2D_DRAW_THREAD 1
 
 #endif /*LV_USE_OS != LV_OS_NONE*/
 
-/** Enable G2D asserts */
+/** Check the status of every G2D call and assert on failure. Useful while
+ *  bringing up a board.
+ */
 #define LV_USE_G2D_ASSERT 0
 
 #endif /*LV_USE_DRAW_G2D*/
 
-/** Use NanoVG Renderer
+/** Draw with the NanoVG vector library on top of OpenGL / OpenGL ES shaders.
  *
  *  Enable: LV_USE_NANOVG, LV_USE_OPENGLES, LV_USE_MATRIX
  */
 #define LV_USE_DRAW_NANOVG 0
 
 #if LV_USE_DRAW_NANOVG
-/** Select which OpenGL implementation to use for NanoVG rendering.
+/** NanoVG shader flavor to compile. Must match the OpenGL context the
+ *  display driver creates.
  *  Possible values:
  *  - LV_NANOVG_BACKEND_GL2: OpenGL 2.0
  *  - LV_NANOVG_BACKEND_GL3: OpenGL 3.0+
@@ -573,27 +589,29 @@
  */
 #define LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GLES2
 
-/** Draw image texture cache count */
+/** Number of decoded images kept as GPU textures. */
 #define LV_NANOVG_IMAGE_CACHE_CNT 128
 
-/** Draw letter cache count */
+/** Number of rendered glyphs kept for text drawing. */
 #define LV_NANOVG_LETTER_CACHE_CNT 512
 
 #endif /*LV_USE_DRAW_NANOVG*/
 
-/** Draw using cached OpenGLES textures.
+/** Draw with OpenGL ES, keeping rendered widgets and images as GPU textures.
  *
  *  Enable: LV_USE_OPENGLES
  */
 #define LV_USE_DRAW_OPENGLES 0
 
 #if LV_USE_DRAW_OPENGLES
-/** OpenGLES texture cache count */
+/** Number of textures kept in the cache. More entries mean fewer redraws
+ *  but more GPU memory.
+ */
 #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
 
 #endif /*LV_USE_DRAW_OPENGLES*/
 
-/** Uses SDL renderer API */
+/** Render with the SDL renderer API, caching widgets and images as SDL textures. */
 #define LV_USE_DRAW_SDL 0
 
 
@@ -602,33 +620,75 @@
  * INPUT DEVICES
  *============================================================================*/
 
-/** Enable grid navigation */
+/** Distance the pointer needs to travel before scrolling starts. */
+#define LV_INDEV_DEF_SCROLL_LIMIT 10
+
+/** Slow-down applied after releasing a scroll. Greater value means faster slow-down. */
+#define LV_INDEV_DEF_SCROLL_THROW 10
+
+/** Scrolling past the edge of a scrollable widget is slower by this factor. */
+#define LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR 4
+
+/** Press time after which `LV_EVENT_LONG_PRESSED` is sent. */
+#define LV_INDEV_DEF_LONG_PRESS_TIME 400
+
+/** Time between `LV_EVENT_LONG_PRESSED_REPEAT` events. */
+#define LV_INDEV_DEF_LONG_PRESS_REP_TIME 100
+
+/** Max time between consecutive clicks to count as a double or triple click. */
+#define LV_INDEV_DEF_DOUBLE_CLICK_TIME 400
+
+/** Distance the pointer needs to travel before a gesture is detected. */
+#define LV_INDEV_DEF_GESTURE_LIMIT 50
+
+/** Minimum pointer velocity at release to report a swipe. */
+#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
+
+/** The encoder diff is multiplied by this value and divided by 256. */
+#define LV_INDEV_DEF_ROTARY_SENSITIVITY 256
+
+/** Move focus between a container's children with arrow keys, based on their position. */
 #define LV_USE_GRIDNAV 0
 
-/** Enable the multi-touch gesture recognition feature
- *  Gesture recognition requires the use of floats
+/** Detect pinch and rotate gestures from multi-touch input. Requires float support.
  *
  *  Enable: LV_USE_FLOAT
  */
 #define LV_USE_GESTURE_RECOGNITION 0
 
+#if LV_USE_GESTURE_RECOGNITION
+/** Scale the fingers need to pinch down to before pinch events are sent. */
+#define LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD 75
+
+/** Scale the fingers need to pinch up to before pinch events are sent. */
+#define LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD 150
+
+/** A pinch starting above this scale is discarded.
+ *  Must be greater than the pinch out threshold.
+ */
+#define LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE 250
+
+/** Angle the fingers need to rotate by before rotation events are sent. */
+#define LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD 200
+
+#endif /*LV_USE_GESTURE_RECOGNITION*/
 
 
 /*============================================================================
  * CORE
  *============================================================================*/
 
-/** Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
+/** Speed up style property lookups by adding 2 x 32 bit variables to each lv_obj_t. */
 #define LV_OBJ_STYLE_CACHE 0
 
-/** Enable support for widget names */
+/** Widget names (lv_obj_set_name) */
 #define LV_USE_OBJ_NAME 0
 
-/** Add `id` field to `lv_obj_t` */
+/** Widget id (lv_obj_set_id) */
 #define LV_USE_OBJ_ID 0
 
 #if LV_USE_OBJ_ID
-/** Automatically assign an ID when obj is created */
+/** Automatic ID assignment on widget creation */
 #define LV_OBJ_ID_AUTO_ASSIGN 1
 
 /** Use builtin obj ID handler functions:
@@ -642,7 +702,7 @@
 
 #endif /*LV_USE_OBJ_ID*/
 
-/** Use obj property set/get API. */
+/** Get and set any widget style or attribute through a single generic property ID based API. */
 #define LV_USE_OBJ_PROPERTY 0
 
 #if LV_USE_OBJ_PROPERTY
@@ -653,31 +713,22 @@
 
 #endif /*LV_USE_OBJ_PROPERTY*/
 
-/** Enable this option to activate external data and destructor functionality,
- *  which assists in resource cleanup when objects are freed by either LVGL core
- *  or applications. Currently supported features include:
- *          - event
- *          - object
- *          - observer
- *          - anim
- *          - timer
- *          - group
- *          - display
- *          - indev (input device)
- *          - theme
+/** Attach your own data plus a destructor callback to events, widgets, observers,
+ *  animations, timers, groups, displays, input devices and themes, so your resources
+ *  are cleaned up when LVGL frees them.
  */
 #define LV_USE_EXT_DATA 0
 
-/** Use `float` as `lv_value_precise_t` */
+/** Use `float` instead of `int32_t` for coordinates and values that need sub-pixel precision. */
 #define LV_USE_FLOAT 0
 
-/** Enable an observer pattern implementation */
+/** Bind widgets to subject variables so they update automatically when the value changes. */
 #define LV_USE_OBSERVER 1
 
-/** Enable text translation support */
+/** Look up strings by ID for the selected language with lv_translation_get(). */
 #define LV_USE_TRANSLATION 0
 
-/** Enable color filter style */
+/** Color filter style */
 #define LV_USE_COLOR_FILTER 0
 
 
@@ -686,57 +737,55 @@
  * LOGGING
  *============================================================================*/
 
-/** Enable log module */
+/** Logging */
 #define LV_USE_LOG 0
 
 #if LV_USE_LOG
-/** Specify how important log should be added.
+/** Default log verbosity
  *  Possible values:
- *  - LV_LOG_LEVEL_TRACE: A lot of logs to give detailed information
- *  - LV_LOG_LEVEL_INFO: Log important events
- *  - LV_LOG_LEVEL_WARN: Log if something unwanted happened but didn't cause a problem
- *  - LV_LOG_LEVEL_ERROR: Only critical issues, when the system may fail
- *  - LV_LOG_LEVEL_USER: Only logs added by the user
- *  - LV_LOG_LEVEL_NONE: Do not log anything
+ *  - LV_LOG_LEVEL_TRACE: detailed information about everything
+ *  - LV_LOG_LEVEL_INFO: important events
+ *  - LV_LOG_LEVEL_WARN: something unwanted happened but caused no problem
+ *  - LV_LOG_LEVEL_ERROR: critical issues where the system may fail
+ *  - LV_LOG_LEVEL_USER: only logs added by the user
+ *  - LV_LOG_LEVEL_NONE: nothing is logged
  */
 #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
 
-/** Use printf for log output.
- *  If not set the user needs to register a callback with `lv_log_register_print_cb`.
- */
+/** If not set, the user needs to register a callback with lv_log_register_print_cb(). */
 #define LV_LOG_PRINTF 0
 
-/** Enable print timestamp */
+/** Add a timestamp to each log */
 #define LV_LOG_USE_TIMESTAMP 1
 
-/** Enable print file and line number */
+/** Add the file name and line number to each log */
 #define LV_LOG_USE_FILE_LINE 1
 
-/** Enable/Disable LV_LOG_TRACE in mem module */
+/** Memory */
 #define LV_LOG_TRACE_MEM 1
 
-/** Enable/Disable LV_LOG_TRACE in timer module */
+/** Timer */
 #define LV_LOG_TRACE_TIMER 1
 
-/** Enable/Disable LV_LOG_TRACE in indev module */
+/** Input devices */
 #define LV_LOG_TRACE_INDEV 1
 
-/** Enable/Disable LV_LOG_TRACE in disp refr module */
+/** Display refresh */
 #define LV_LOG_TRACE_DISP_REFR 1
 
-/** Enable/Disable LV_LOG_TRACE in event module */
+/** Events */
 #define LV_LOG_TRACE_EVENT 1
 
-/** Enable/Disable LV_LOG_TRACE in obj create module */
+/** Widget creation */
 #define LV_LOG_TRACE_OBJ_CREATE 1
 
-/** Enable/Disable LV_LOG_TRACE in layout module */
+/** Layout */
 #define LV_LOG_TRACE_LAYOUT 1
 
-/** Enable/Disable LV_LOG_TRACE in anim module */
+/** Animations */
 #define LV_LOG_TRACE_ANIM 1
 
-/** Enable/Disable LV_LOG_TRACE in cache module */
+/** Cache */
 #define LV_LOG_TRACE_CACHE 1
 
 #endif /*LV_USE_LOG*/
@@ -746,25 +795,25 @@
  * THEMES
  *============================================================================*/
 
-/** A simple, impressive and very complete theme */
+/** Full-featured theme used by LVGL's demos and examples. */
 #define LV_USE_THEME_DEFAULT 1
 
 #if LV_USE_THEME_DEFAULT
-/** Yes to set dark mode, No to set light mode */
+/** Dark mode */
 #define LV_THEME_DEFAULT_DARK 0
 
-/** Enable grow on press */
+/** Grow on press */
 #define LV_THEME_DEFAULT_GROW 1
 
-/** Default transition time in [ms] */
+/** Transition time (ms) */
 #define LV_THEME_DEFAULT_TRANSITION_TIME 80
 
 #endif /*LV_USE_THEME_DEFAULT*/
 
-/** A very simple theme that is a good starting point for a custom theme */
+/** Minimal styling, a good starting point for a custom theme. */
 #define LV_USE_THEME_SIMPLE 1
 
-/** A theme designed for monochrome displays */
+/** Styling for 1-bit displays such as e-paper and dot-matrix panels. */
 #define LV_USE_THEME_MONO 1
 
 
@@ -773,10 +822,10 @@
  * LAYOUTS
  *============================================================================*/
 
-/** A layout similar to Flexbox in CSS. */
+/** Arrange children in a row or column that wraps and grows, similar to Flexbox in CSS. */
 #define LV_USE_FLEX 1
 
-/** A layout similar to Grid in CSS. */
+/** Arrange children in rows and columns, similar to Grid in CSS. */
 #define LV_USE_GRID 1
 
 
@@ -785,69 +834,60 @@
  * IMAGE SETTINGS
  *============================================================================*/
 
-/** When using only built-in image formats, caching provides little benefit.
- *  For complex image decoders (e.g. PNG or JPG), caching avoids repeatedly
- *  opening and decoding the same images, at the cost of additional RAM usage.
+/** Avoids repeatedly opening and decoding the same images, at the cost of RAM.
+ *  Of little benefit with only the built-in image formats.
  */
 #define LV_CACHE_DEF_SIZE 0
 
-/** When using only built-in image formats, caching provides little benefit.
- *  For complex image decoders (e.g. PNG or JPG), caching avoids repeatedly
- *  reading image headers, at the cost of additional RAM usage.
+/** Avoids repeatedly reading image headers, at the cost of RAM.
+ *  Of little benefit with only the built-in image formats.
  */
 #define LV_IMAGE_HEADER_CACHE_DEF_CNT 0
 
-/** RLE decompress library */
+/** Decoder for LVGL's run-length encoded binary image format. */
 #define LV_USE_RLE 0
 
-/** Enable LZ4 compress/decompress lib */
+/** LZ4 compress/decompress functions, used by LVGL's compressed binary images. */
 #define LV_USE_LZ4 0
 
 #if LV_USE_LZ4
-/** Use lvgl built-in LZ4 lib */
+/** Bundled LZ4 */
 #define LV_USE_LZ4_INTERNAL 1
 
 #endif /*LV_USE_LZ4*/
 
-/** Decode bin images to RAM */
+/** Decode binary images to RAM */
 #define LV_BIN_DECODER_RAM_LOAD 0
 
-/** LODEPNG decoder library */
+/** PNG decoder (LodePNG) */
 #define LV_USE_LODEPNG 0
 
-/** PNG decoder(libpng) library */
+/** PNG decoder (libpng) */
 #define LV_USE_LIBPNG 0
 
-/** BMP decoder library */
+/** BMP decoder */
 #define LV_USE_BMP 0
 
-/** JPG + split JPG decoder library.
- *  Split JPG is a custom format optimized for embedded systems.
- */
+/** Also decodes split JPEG, a custom format optimized for embedded systems. */
 #define LV_USE_TJPGD 0
 
-/** libjpeg-turbo decoder library.
- *  - Supports complete JPEG specifications and high-performance JPEG decoding.
- */
+/** High-performance decoder supporting the complete JPEG specifications. */
 #define LV_USE_LIBJPEG_TURBO 0
 
-/** WebP decoder library */
+/** WebP decoder */
 #define LV_USE_LIBWEBP 0
 
-#if LV_DRAW_HAS_VECTOR_SUPPORT
-/** SVG library
+/** SVG
  *
  *  Enable: LV_USE_VECTOR_GRAPHIC
  */
 #define LV_USE_SVG 0
 
-#endif /*LV_DRAW_HAS_VECTOR_SUPPORT*/
-
 #if LV_USE_SVG
 /** SVG animation */
 #define LV_USE_SVG_ANIMATION 0
 
-/** Enable SVG debug logs */
+/** SVG debug logs */
 #define LV_USE_SVG_DEBUG 0
 
 #endif /*LV_USE_SVG*/
@@ -857,14 +897,14 @@
  * TEXT & FONT SETTINGS
  *============================================================================*/
 
-/** Select a character encoding for strings. Your IDE or editor should have the same character encoding.
+/** Your IDE or editor should be set to the same character encoding.
  *  Possible values:
  *  - LV_TXT_ENC_UTF8
  *  - LV_TXT_ENC_ASCII
  */
 #define LV_TXT_ENC LV_TXT_ENC_UTF8
 
-/** While rendering text strings, break (wrap) text on these chars. */
+/** Characters to break (wrap) text on */
 #define LV_TXT_BREAK_CHARS " ,.;:-_)]}"
 
 /** If a word is at least this long, will break wherever 'prettiest'.
@@ -881,7 +921,7 @@
 
 #endif /*LV_TXT_LINE_BREAK_LONG_LEN > 0*/
 
-/** The control character to use for signaling text recoloring */
+/** Text recoloring control character */
 #define LV_TXT_COLOR_CMD "#"
 
 /** Allows mixing Left-to-Right and Right-to-Left texts.
@@ -891,7 +931,7 @@
 #define LV_USE_BIDI 0
 
 #if LV_USE_BIDI
-/** Set the default BIDI base direction
+/** Default base direction
  *  Possible values:
  *  - LV_BASE_DIR_LTR: Left-to-Right
  *  - LV_BASE_DIR_RTL: Right-to-Left
@@ -911,82 +951,82 @@
  */
 #define LV_FONT_MONTSERRAT_8 0
 
-/** Enable Montserrat 10 */
+/** Montserrat 10 */
 #define LV_FONT_MONTSERRAT_10 0
 
-/** Enable Montserrat 12 */
+/** Montserrat 12 */
 #define LV_FONT_MONTSERRAT_12 0
 
-/** Enable Montserrat 14 */
+/** Montserrat 14 */
 #define LV_FONT_MONTSERRAT_14 1
 
-/** Enable Montserrat 16 */
+/** Montserrat 16 */
 #define LV_FONT_MONTSERRAT_16 0
 
-/** Enable Montserrat 18 */
+/** Montserrat 18 */
 #define LV_FONT_MONTSERRAT_18 0
 
-/** Enable Montserrat 20 */
+/** Montserrat 20 */
 #define LV_FONT_MONTSERRAT_20 0
 
-/** Enable Montserrat 22 */
+/** Montserrat 22 */
 #define LV_FONT_MONTSERRAT_22 0
 
-/** Enable Montserrat 24 */
+/** Montserrat 24 */
 #define LV_FONT_MONTSERRAT_24 0
 
-/** Enable Montserrat 26 */
+/** Montserrat 26 */
 #define LV_FONT_MONTSERRAT_26 0
 
-/** Enable Montserrat 28 */
+/** Montserrat 28 */
 #define LV_FONT_MONTSERRAT_28 0
 
-/** Enable Montserrat 30 */
+/** Montserrat 30 */
 #define LV_FONT_MONTSERRAT_30 0
 
-/** Enable Montserrat 32 */
+/** Montserrat 32 */
 #define LV_FONT_MONTSERRAT_32 0
 
-/** Enable Montserrat 34 */
+/** Montserrat 34 */
 #define LV_FONT_MONTSERRAT_34 0
 
-/** Enable Montserrat 36 */
+/** Montserrat 36 */
 #define LV_FONT_MONTSERRAT_36 0
 
-/** Enable Montserrat 38 */
+/** Montserrat 38 */
 #define LV_FONT_MONTSERRAT_38 0
 
-/** Enable Montserrat 40 */
+/** Montserrat 40 */
 #define LV_FONT_MONTSERRAT_40 0
 
-/** Enable Montserrat 42 */
+/** Montserrat 42 */
 #define LV_FONT_MONTSERRAT_42 0
 
-/** Enable Montserrat 44 */
+/** Montserrat 44 */
 #define LV_FONT_MONTSERRAT_44 0
 
-/** Enable Montserrat 46 */
+/** Montserrat 46 */
 #define LV_FONT_MONTSERRAT_46 0
 
-/** Enable Montserrat 48 */
+/** Montserrat 48 */
 #define LV_FONT_MONTSERRAT_48 0
 
-/** Enable Montserrat 28 compressed */
+/** Montserrat 28 (compressed) */
 #define LV_FONT_MONTSERRAT_28_COMPRESSED 0
 
-/** Enable Dejavu 16 Persian, Hebrew, Arabic letters */
+/** Dejavu 16 (Persian, Hebrew, Arabic) */
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0
 
-/** Enable SourceHanSansSC 14 CJK */
+/** SourceHanSansSC 14 (CJK) */
 #define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK 0
 
-/** Enable SourceHanSansSC 16 CJK */
+/** SourceHanSansSC 16 (CJK) */
 #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK 0
 
 /** Pixel perfect monospaced fonts */
 #define LV_FONT_UNSCII_8 0
 
-/** Enable UNSCII 16 (Perfect monospace font) */
+/** UNSCII 16 */
 #define LV_FONT_UNSCII_16 0
 
 /** Include the header given by LV_FONT_CUSTOM_INCLUDE to declare custom
@@ -1022,7 +1062,7 @@
 #define LV_USE_CUSTOM_FONT_DEFAULT 0
 
 #if !LV_USE_CUSTOM_FONT_DEFAULT
-/** Select theme default text font
+/** Font used by the themes and by widgets that do not set one explicitly.
  *  Possible values:
  *  - LV_FONT_DEFAULT_MONTSERRAT_8 (enable: LV_FONT_MONTSERRAT_8)
  *  - LV_FONT_DEFAULT_MONTSERRAT_10 (enable: LV_FONT_MONTSERRAT_10)
@@ -1046,41 +1086,45 @@
  *  - LV_FONT_DEFAULT_MONTSERRAT_46 (enable: LV_FONT_MONTSERRAT_46)
  *  - LV_FONT_DEFAULT_MONTSERRAT_48 (enable: LV_FONT_MONTSERRAT_48)
  *  - LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED (enable: LV_FONT_MONTSERRAT_28_COMPRESSED)
- *  - LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW: Dejavu 16 Persian, Hebrew, Arabic letters (enable: LV_FONT_DEJAVU_16_PERSIAN_HEBREW)
+ *  - LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW: Dejavu 16 (Persian, Hebrew, Arabic) (enable: LV_FONT_DEJAVU_16_PERSIAN_HEBREW)
  *  - LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK (enable: LV_FONT_SOURCE_HAN_SANS_SC_14_CJK)
  *  - LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK (enable: LV_FONT_SOURCE_HAN_SANS_SC_16_CJK)
- *  - LV_FONT_DEFAULT_UNSCII_8: UNSCII 8 (Perfect monospace font) (enable: LV_FONT_UNSCII_8)
- *  - LV_FONT_DEFAULT_UNSCII_16: UNSCII 16 (Perfect monospace font) (enable: LV_FONT_UNSCII_16)
+ *  - LV_FONT_DEFAULT_UNSCII_8 (enable: LV_FONT_UNSCII_8)
+ *  - LV_FONT_DEFAULT_UNSCII_16 (enable: LV_FONT_UNSCII_16)
  */
 #define LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_14
 
 #endif /*!LV_USE_CUSTOM_FONT_DEFAULT*/
 
-/** The limit depends on the font size, font face and format
- *  but with > 10,000 characters if you see issues probably you
- *  need to enable it.
+/** Use larger internal offsets so fonts with many glyphs stay addressable.
+ *  The exact limit depends on font size, face and format, but enable it if
+ *  you see issues with fonts above roughly 10,000 characters.
  */
 #define LV_FONT_FMT_TXT_LARGE 0
 
-/** Enables/disables support for compressed fonts. */
+/** Compressed fonts */
 #define LV_USE_FONT_COMPRESSED 0
 
-/** Enable drawing placeholders when glyph dsc is not found. */
+/** Draw a placeholder rectangle instead of nothing when a glyph is missing
+ *  from the font.
+ */
 #define LV_USE_FONT_PLACEHOLDER 1
 
-/** Enable Font manager */
+/** Load fonts by name, share them between widgets and free them by reference
+ *  counting.
+ */
 #define LV_USE_FONT_MANAGER 0
 
 #if LV_USE_FONT_MANAGER
-/** Font manager name max length */
+/** Font name max length (characters) */
 #define LV_FONT_MANAGER_NAME_MAX_LEN 32
 
 #endif /*LV_USE_FONT_MANAGER*/
 
-/** Support using images as font in label or span widgets */
+/** Use images as glyphs in label and span widgets, e.g. to render emojis. */
 #define LV_USE_IMGFONT 0
 
-/** FreeType library */
+/** FreeType */
 #define LV_USE_FREETYPE 0
 
 #if LV_USE_FREETYPE
@@ -1089,11 +1133,11 @@
  */
 #define LV_FREETYPE_USE_LVGL_PORT 0
 
-/** The maximum number of Glyph in count */
+/** Glyph cache size (glyphs) */
 #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
 
 #if LV_USE_OS == LV_OS_NONE
-/** Enable L1 glyph metrics cache (lock-free, single-thread only) */
+/** L1 glyph metrics cache (lock-free, single-thread only) */
 #define LV_FREETYPE_CACHE_FT_GLYPH_L1 1
 
 #endif /*LV_USE_OS == LV_OS_NONE*/
@@ -1103,13 +1147,13 @@
 #define LV_USE_TINY_TTF 0
 
 #if LV_USE_TINY_TTF
-/** Enable loading Tiny TTF data from files */
+/** Load TTF data from files */
 #define LV_TINY_TTF_FILE_SUPPORT 0
 
-/** Tiny ttf cache entries count */
+/** Glyph cache size (glyphs) */
 #define LV_TINY_TTF_CACHE_GLYPH_CNT 128
 
-/** Tiny ttf kerning cache entries count */
+/** Kerning cache size (entries) */
 #define LV_TINY_TTF_CACHE_KERNING_CNT 256
 
 #endif /*LV_USE_TINY_TTF*/
@@ -1129,25 +1173,22 @@
  */
 #define LV_WIDGETS_HAS_DEFAULT_VALUE 1
 
-#if LV_DRAW_HAS_3D_SUPPORT
-/** 3D Texture */
+/** 3D texture */
 #define LV_USE_3DTEXTURE 0
 
-#endif /*LV_DRAW_HAS_3D_SUPPORT*/
-
-/** Anim image */
+/** Animated image */
 #define LV_USE_ANIMIMG 1
 
 /** Arc */
 #define LV_USE_ARC 1
 
-/** Arc Label */
+/** Arc label */
 #define LV_USE_ARCLABEL 1
 
 /** Bar */
 #define LV_USE_BAR 1
 
-/** Barcode code library
+/** Generates Code 128 barcodes.
  *
  *  Enable: LV_USE_CANVAS
  */
@@ -1163,7 +1204,7 @@
 #define LV_USE_CALENDAR 1
 
 #if LV_USE_CALENDAR
-/** Calendar week starts monday */
+/** Week starts on Monday */
 #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
 
 /** Shortened string for Monday */
@@ -1223,13 +1264,13 @@
 /** String for December */
 #define LV_DECEMBER_STR "December"
 
-/** Use calendar header arrow */
+/** Header with arrow buttons */
 #define LV_USE_CALENDAR_HEADER_ARROW 1
 
-/** Use calendar header dropdown */
+/** Header with dropdowns */
 #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
 
-/** Use chinese calendar */
+/** Chinese calendar */
 #define LV_USE_CALENDAR_CHINESE 0
 
 #endif /*LV_USE_CALENDAR*/
@@ -1243,82 +1284,76 @@
 /** Chart */
 #define LV_USE_CHART 1
 
-/** Check Box */
+/** Checkbox */
 #define LV_USE_CHECKBOX 1
 
-/** Drop down list
+/** Dropdown
  *
  *  Enable: LV_USE_LABEL
  */
 #define LV_USE_DROPDOWN 1
 
-/** FFmpeg library for image decoding and playing videos.
- *  Supports all major image formats so do not enable other image decoder with it.
+/** Decodes images and plays videos with FFmpeg. It supports all major image
+ *  formats, so do not enable other image decoders together with it.
  */
 #define LV_USE_FFMPEG 0
 
 #if LV_USE_FFMPEG
-/** Dump format */
+/** Print the input stream information to stderr and keep FFmpeg logging
+ *  enabled (it is silenced otherwise).
+ */
 #define LV_FFMPEG_DUMP_FORMAT 0
 
-/** You won't be able to open URLs after enabling this feature.
- *  Note that FFmpeg image decoder will always use lvgl file system.
+/** URLs can no longer be opened once this is enabled. The FFmpeg image
+ *  decoder always uses the LVGL file system regardless of this option.
  */
 #define LV_FFMPEG_PLAYER_USE_LV_FS 0
 
 #endif /*LV_USE_FFMPEG*/
 
-/** GIF decoder library */
+/** GIF decoder */
 #define LV_USE_GIF 0
 
 #if LV_USE_GIF
-/** Use extra 16KB RAM to cache decoded data to accelerate */
+/** Speeds up playback at the cost of an extra 16KB of RAM. */
 #define LV_GIF_CACHE_DECODE_DATA 0
 
-/** Increasing this value will consume more memory.
- *  GIFs wider than this are rejected
- */
+/** Wider GIFs are rejected; raising this value increases memory usage. */
 #define LV_GIF_MAX_WIDTH 480
 
-/** This value has no impact on memory usage
- *  GIFs taller than this are rejected
- */
+/** Taller GIFs are rejected; this value has no impact on memory usage. */
 #define LV_GIF_MAX_HEIGHT 32768
 
 #endif /*LV_USE_GIF*/
 
-#if LV_DRAW_HAS_3D_SUPPORT
-/** Enables parsing and rendering of 3D models (.gltf/.glb).
+/** Parses and renders 3D models (.gltf/.glb).
  *
  *  Enable: LV_USE_3DTEXTURE
  */
 #define LV_USE_GLTF 0
 
-#endif /*LV_DRAW_HAS_3D_SUPPORT*/
-
-/** GStreamer library
+/** Requires the gstreamer-1.0, gstreamer-video-1.0 and gstreamer-app-1.0
+ *  development libraries.
  *
  *  Enable: LV_USE_IMAGE
  */
 #define LV_USE_GSTREAMER 0
 
-/** Image
- *
- *  Enable: LV_USE_LABEL
- */
+/** Image */
 #define LV_USE_IMAGE 1
 
-/** ImageButton */
+/** Image button */
 #define LV_USE_IMAGEBUTTON 1
 
-/** Enable Pinyin input method
+/** Chinese input method that converts Pinyin typed on a keyboard widget
+ *  into Chinese characters.
  *
  *  Enable: LV_USE_KEYBOARD
  */
 #define LV_USE_IME_PINYIN 0
 
 #if LV_USE_IME_PINYIN
-/** Enable Pinyin input method 9 key input mode */
+/** 9-key input mode */
 #define LV_IME_PINYIN_USE_K9_MODE 1
 
 #if LV_IME_PINYIN_USE_K9_MODE
@@ -1327,12 +1362,12 @@
 
 #endif /*LV_IME_PINYIN_USE_K9_MODE*/
 
-/** If you do not use the default thesaurus, be sure to use lv_ime_pinyin after setting the thesaurus */
+/** Without it, a dictionary must be set with lv_ime_pinyin_set_dict()
+ *  before the IME is used.
+ */
 #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
 
-/** Set the maximum number of candidate panels that can be displayed.
- *  This needs to be adjusted according to the size of the screen.
- */
+/** Adjust this to the screen size, as all candidate panels must fit on it. */
 #define LV_IME_PINYIN_CAND_TEXT_NUM 6
 
 #endif /*LV_USE_IME_PINYIN*/
@@ -1344,13 +1379,15 @@
 #define LV_USE_LABEL 1
 
 #if LV_USE_LABEL
-/** Enable selecting text of the label */
+/** Text selection */
 #define LV_LABEL_TEXT_SELECTION 1
 
-/** Store extra some info in labels (12 bytes) to speed up drawing of very long texts */
+/** Stores 12 extra bytes per label to speed up drawing of very long texts. */
 #define LV_LABEL_LONG_TXT_HINT 1
 
-/** The count of wait chart */
+/** Gap between the end and the restart of circularly scrolled text,
+ *  measured in space-character widths.
+ */
 #define LV_LABEL_WAIT_CHAR_COUNT 3
 
 #endif /*LV_USE_LABEL*/
@@ -1364,30 +1401,28 @@
 /** List */
 #define LV_USE_LIST 1
 
-#if LV_DRAW_HAS_VECTOR_SUPPORT
 #if LV_USE_THORVG
-/** Enable Lottie animations
+/** Plays Lottie JSON animations using the ThorVG Lottie parser.
  *
  *  Enable: LV_USE_VECTOR_GRAPHIC
  */
 #define LV_USE_LOTTIE 0
 
 #endif /*LV_USE_THORVG*/
-#endif /*LV_DRAW_HAS_VECTOR_SUPPORT*/
 
 /** Menu */
 #define LV_USE_MENU 1
 
-/** Msgbox */
+/** Message box */
 #define LV_USE_MSGBOX 1
 
-/** QR code library
+/** QR code
  *
  *  Enable: LV_USE_CANVAS
  */
 #define LV_USE_QRCODE 0
 
-/** Rlottie library (Deprecated: use LV_USE_LOTTIE instead) */
+/** Legacy rlottie binding, kept for compatibility. Use LV_USE_LOTTIE instead. */
 #define LV_USE_RLOTTIE 0
 
 /** Roller
@@ -1409,7 +1444,7 @@
 #define LV_USE_SPAN 1
 
 #if LV_USE_SPAN
-/** Maximum number of span descriptor */
+/** Maximum number of span descriptors */
 #define LV_SPAN_SNIPPET_STACK_SIZE 64
 
 #endif /*LV_USE_SPAN*/
@@ -1430,7 +1465,7 @@
 #define LV_USE_TEXTAREA 1
 
 #if LV_USE_TEXTAREA
-/** Text area def. pwd show time [ms] */
+/** Default password show time (ms) */
 #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500
 
 #endif /*LV_USE_TEXTAREA*/
@@ -1444,7 +1479,7 @@
 /** Tileview */
 #define LV_USE_TILEVIEW 1
 
-/** Win */
+/** Window */
 #define LV_USE_WIN 1
 
 
@@ -1457,10 +1492,9 @@
 #define LV_USE_LINUX_DRM 0
 
 #if LV_USE_LINUX_DRM
-/** Legacy behavior, kept for backwards compatibility and slated for removal.
- *  While set, the backend is inferred from LV_USE_OPENGLES (EGL when OpenGLES
- *  is enabled).  Disable this and pick a backend explicitly via the Linux DRM
- *  "Rendering backend" choice.
+/** Legacy behavior, slated for removal: the backend is inferred from
+ *  LV_USE_OPENGLES (EGL when it is enabled). Disable this and pick a backend
+ *  explicitly in the "Rendering backend" choice.
  */
 #define LV_LINUX_DRM_AUTO_BACKEND 1
 
@@ -1478,10 +1512,10 @@
 #define LV_USE_LINUX_FBDEV 0
 
 #if LV_USE_LINUX_FBDEV
-/** Use BSD flavored framebuffer device */
+/** BSD-flavored framebuffer device */
 #define LV_LINUX_FBDEV_BSD 0
 
-/** Framebuffer device render mode
+/** Render mode
  *  Possible values:
  *  - LV_DISPLAY_RENDER_MODE_PARTIAL: Partial mode
  *  - LV_DISPLAY_RENDER_MODE_DIRECT: Direct mode
@@ -1489,23 +1523,23 @@
  */
 #define LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
 
-#define LV_LINUX_FBDEV_BUFFER_COUNT 0
+#define LV_LINUX_FBDEV_BUFFER_COUNT 1
 
 #if LV_LINUX_FBDEV_BUFFER_COUNT == 0
-/** Custom partial buffer size (in number of rows) */
+/** Custom partial buffer size (rows) */
 #define LV_LINUX_FBDEV_BUFFER_SIZE 60
 
 #endif /*LV_LINUX_FBDEV_BUFFER_COUNT == 0*/
 
-/** Framebuffer device supports mmap */
+/** Access the framebuffer through mmap() instead of write() calls. */
 #define LV_LINUX_FBDEV_MMAP 1
 
 #endif /*LV_USE_LINUX_FBDEV*/
 
-/** Use ft81x EVE driver */
+/** Driver for FT81X EVE graphics controllers connected over SPI. */
 #define LV_USE_FT81X 0
 
-/** Interface for Lovyan_GFX */
+/** Display and touch driver built on the LovyanGFX C++ library, which must be available in the build. */
 #define LV_USE_LOVYAN_GFX 0
 
 #if LV_USE_LOVYAN_GFX
@@ -1514,77 +1548,80 @@
 
 #endif /*LV_USE_LOVYAN_GFX*/
 
-/** Generic MIPI driver for LCD devices connected via SPI or parallel
- *  port. Use this if your specific LCD controller is not listed among
- *  the dedicated drivers below.
+/** Driver for LCD devices connected via SPI or parallel port.
+ *  Use it if your LCD controller is not listed among the dedicated drivers below.
  */
 #define LV_USE_GENERIC_MIPI 0
 
-/** Drivers for LCD devices connected via SPI/parallel port
+/** ST7735
  *
  *  Enable: LV_USE_GENERIC_MIPI
  */
 #define LV_USE_ST7735 0
 
-/** Use ST7789 LCD driver
+/** ST7789
  *
  *  Enable: LV_USE_GENERIC_MIPI
  */
 #define LV_USE_ST7789 0
 
-/** Use ST7796 LCD driver
+/** ST7796
  *
  *  Enable: LV_USE_GENERIC_MIPI
  */
 #define LV_USE_ST7796 0
 
-/** Use ILI9341 LCD driver
+/** ILI9341
  *
  *  Enable: LV_USE_GENERIC_MIPI
  */
 #define LV_USE_ILI9341 0
 
-/** Use NV3007 LCD driver
+/** NV3007
  *
  *  Enable: LV_USE_GENERIC_MIPI
  */
 #define LV_USE_NV3007 0
 
-/** Driver for NXP ELCDIF */
+/** Create a display on an already initialized NXP ELCDIF LCD controller. */
 #define LV_USE_NXP_ELCDIF 0
 
-/** Driver for Renesas GLCD */
+/** Create a display driven by the Renesas GLCDC peripheral. */
 #define LV_USE_RENESAS_GLCDC 0
 
-/** Driver for ST LTDC */
+/** Create a display bound to a layer of the ST LTDC peripheral. */
 #define LV_USE_ST_LTDC 0
 
 #if !LV_USE_DRAW_DMA2D
 #if LV_USE_ST_LTDC
-/** Only used for created partial mode LTDC displays */
+/** Flush partial mode LTDC displays with DMA2D, in parallel with rendering.
+ *  Only available when the DMA2D renderer is disabled.
+ */
 #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
 
 #endif /*LV_USE_ST_LTDC*/
 #endif /*!LV_USE_DRAW_DMA2D*/
 
-/** Interface for TFT_eSPI */
+/** Display driver built on the TFT_eSPI Arduino library, which must be available in the build. */
 #define LV_USE_TFT_ESPI 0
 
-/** Driver for evdev input devices */
+/** Read touchscreen, mouse and keyboard input from Linux /dev/input event devices. */
 #define LV_USE_EVDEV 0
 
-/** Driver for libinput input devices */
+/** Read pointer, touch and keyboard input through libinput, which must be available in the build. */
 #define LV_USE_LIBINPUT 0
 
 #if LV_USE_LIBINPUT
-/** Use the BSD variant of the libinput input driver */
+/** BSD variant of libinput */
 #define LV_LIBINPUT_BSD 0
 
-/** Enable full keyboard support via XKB */
+/** Map key events to characters with XKB layouts, so modifiers and non-US layouts work.
+ *  Requires linking with -lxkbcommon.
+ */
 #define LV_LIBINPUT_XKB 0
 
 #if LV_LIBINPUT_XKB
-/** XKB rules */
+/** Run `setxkbmap -query` to find the right values for your keyboard. */
 #define LV_LIBINPUT_XKB_RULES ""
 
 /** XKB model */
@@ -1596,9 +1633,8 @@
 /** XKB variant */
 #define LV_LIBINPUT_XKB_VARIANT ""
 
-/** If enabled, NULL is passed for XKB options, letting the system
- *  default apply (e.g. from XKB_DEFAULT_OPTIONS env var).
- *  If disabled, the string from LV_LIBINPUT_XKB_OPTIONS is used instead.
+/** Pass NULL for the XKB options so the system default applies (e.g. from the
+ *  XKB_DEFAULT_OPTIONS env var). Otherwise LV_LIBINPUT_XKB_OPTIONS is used.
  */
 #define LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT 1
 
@@ -1610,83 +1646,83 @@
 #endif /*LV_LIBINPUT_XKB*/
 #endif /*LV_USE_LIBINPUT*/
 
-/** Use Nuttx to open window and handle touchscreen */
+/** Display and input drivers for NuttX, including the /dev/fb framebuffer device. */
 #define LV_USE_NUTTX 0
 
 #if LV_USE_NUTTX
-/** Use independent image heap */
+/** Allocate cached image buffers from a separate NuttX heap to keep the main heap from fragmenting. */
 #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 0
 
 #if LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
-/** Use independent image heap for default draw buffer */
+/** Independent image heap for the default draw buffer */
 #define LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP 0
 
 #endif /*LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP*/
 
-/** Use uv loop to replace default timer loop and other fb/indev timers */
+/** Drive the LVGL timer handler and the display/input timers from a libuv loop instead of the default timer loop. */
 #define LV_USE_NUTTX_LIBUV 0
 
-/** Use Custom Nuttx init API to open window and handle touchscreen */
+/** Skip the display and input device creation in lv_nuttx_init() so the application can set them up itself. */
 #define LV_USE_NUTTX_CUSTOM_INIT 0
 
-/** Use NuttX LCD device */
+/** Create the display on a NuttX LCD character device instead of the framebuffer device. */
 #define LV_USE_NUTTX_LCD 0
 
 #define LV_NUTTX_LCD_BUFFER_COUNT 0
 
 #if LV_NUTTX_LCD_BUFFER_COUNT == 0
 #if LV_USE_NUTTX_LCD
-/** Custom partial buffer size (in number of rows) */
+/** Custom partial buffer size (rows) */
 #define LV_NUTTX_LCD_BUFFER_SIZE 60
 
 #endif /*LV_USE_NUTTX_LCD*/
 #endif /*LV_NUTTX_LCD_BUFFER_COUNT == 0*/
 
-/** Use NuttX touchscreen driver */
+/** Touchscreen */
 #define LV_USE_NUTTX_TOUCHSCREEN 0
 
 #if LV_USE_NUTTX_TOUCHSCREEN
-/** Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels. */
+/** 0 disables the cursor. */
 #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE 0
 
 #endif /*LV_USE_NUTTX_TOUCHSCREEN*/
 
-/** Use NuttX mouse driver */
+/** Mouse */
 #define LV_USE_NUTTX_MOUSE 0
 
 #if LV_USE_NUTTX_MOUSE
-/** Set the step size of the mouse movement in pixels. */
+/** Mouse movement step (pixels) */
 #define LV_USE_NUTTX_MOUSE_MOVE_STEP 1
 
 #endif /*LV_USE_NUTTX_MOUSE*/
 
 #if LV_USE_PROFILER_BUILTIN
-/** Use NuttX trace file */
+/** Write the built-in profiler output to a file instead of the console. */
 #define LV_USE_NUTTX_TRACE_FILE 0
 
 #endif /*LV_USE_PROFILER_BUILTIN*/
 
 #if LV_USE_NUTTX_TRACE_FILE
-/** NuttX trace file path */
+/** Profiler trace file path */
 #define LV_NUTTX_TRACE_FILE_PATH "/data/lvgl-trace.log"
 
 #endif /*LV_USE_NUTTX_TRACE_FILE*/
 #endif /*LV_USE_NUTTX*/
 
-/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
+/** Generic OpenGL ES display driver, for embedding LVGL in another application or driving it through GLFW/EGL.
  *
  *  Enable: LV_USE_MATRIX
  */
 #define LV_USE_OPENGLES 0
 
 #if LV_USE_OPENGLES
-/** Enable debug mode for OpenGL */
+/** Check for an OpenGL error after every GL call and log it with the call site. */
 #define LV_USE_OPENGLES_DEBUG 0
 
 #endif /*LV_USE_OPENGLES*/
 
 #if !LV_USE_EGL
-/** Use GLFW to open window on PC and handle mouse and keyboard.
+/** Open a window on a PC desktop with GLFW and read mouse and keyboard input.
  *
  *  Enable: LV_USE_OPENGLES
  */
@@ -1694,26 +1730,25 @@
 
 #endif /*!LV_USE_EGL*/
 
-/** QNX Screen display and input drivers */
+/** Create a display on a QNX Screen window and read pointer and keyboard input. */
 #define LV_USE_QNX 0
 
 #if LV_USE_QNX
-/** QNX Buffer count */
+/** Number of screen-sized buffers */
 #define LV_QNX_BUF_COUNT 1
 
 #endif /*LV_USE_QNX*/
 
-/** Use SDL to open window on PC and handle mouse and keyboard. */
+/** Open a window on a PC desktop with SDL2 and read mouse and keyboard input. */
 #define LV_USE_SDL 0
 
 #if LV_USE_SDL
 /** SDL include path */
 #define LV_SDL_INCLUDE_PATH "SDL2/SDL.h"
 
-/** Legacy behavior, kept for backwards compatibility and slated for removal.
- *  While set, EGL is inferred the legacy way (OpenGLES enabled with an OpenGL
- *  draw unit).  Disable this and pick a backend explicitly via the SDL
- *  "Rendering backend" choice.
+/** Legacy behavior, slated for removal: EGL is inferred the legacy way
+ *  (LV_USE_OPENGLES with an OpenGL draw unit). Disable this and pick a backend
+ *  explicitly in the "Rendering backend" choice.
  */
 #define LV_SDL_AUTO_BACKEND 1
 
@@ -1725,98 +1760,128 @@
  */
 #define LV_SDL_BACKEND LV_SDL_BACKEND_SW
 
-/** LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance
+/** Direct mode is recommended for best performance.
  *  Possible values:
- *  - LV_DISPLAY_RENDER_MODE_PARTIAL: Use the buffer(s) to render the screen is smaller parts
- *  - LV_DISPLAY_RENDER_MODE_DIRECT: Only the changed areas will be updated with 2 screen sized buffers
- *  - LV_DISPLAY_RENDER_MODE_FULL: Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers
+ *  - LV_DISPLAY_RENDER_MODE_PARTIAL: Partial mode
+ *  - LV_DISPLAY_RENDER_MODE_DIRECT: Direct mode
+ *  - LV_DISPLAY_RENDER_MODE_FULL: Full mode
  */
 #define LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
 
-/** Number of screen-sized buffers (1 or 2) */
+/** Number of screen-sized buffers */
 #define LV_SDL_BUF_COUNT 1
 
-/** Use hardware acceleration */
+/** Ask SDL for a GPU-backed renderer instead of a software one. */
 #define LV_SDL_ACCELERATED 1
 
-/** SDL fullscreen */
+/** Fullscreen */
 #define LV_SDL_FULLSCREEN 0
 
-/** Exit the application when all SDL windows are closed */
+/** Exit when all windows are closed */
 #define LV_SDL_DIRECT_EXIT 1
 
 /** SDL mousewheel mode
  *  Possible values:
- *  - LV_SDL_MOUSEWHEEL_MODE_ENCODER: The mousewheel emulates an encoder input device
- *  - LV_SDL_MOUSEWHEEL_MODE_CROWN: The mousewheel emulates a smart watch crown
+ *  - LV_SDL_MOUSEWHEEL_MODE_ENCODER: Encoder input device
+ *  - LV_SDL_MOUSEWHEEL_MODE_CROWN: Smart watch crown
  */
 #define LV_SDL_MOUSEWHEEL_MODE LV_SDL_MOUSEWHEEL_MODE_ENCODER
 
 #endif /*LV_USE_SDL*/
 
-/** LVGL UEFI backend */
+/** Display and input drivers for UEFI firmware, based on the Graphics Output, keyboard and pointer protocols. */
 #define LV_USE_UEFI 0
 
 #if LV_USE_UEFI
-/** Header that hides the actual framework (EDK2, gnu-efi, ...) */
+/** Header wrapping the UEFI framework (EDK2, gnu-efi, ...) */
 #define LV_USE_UEFI_INCLUDE "myefi.h"
 
-/** Use the memory services from the boot services table */
+/** Allocate memory with the UEFI boot services instead of the C library.
+ *  Only takes effect with the custom stdlib malloc implementation.
+ */
 #define LV_UEFI_USE_MEMORY_SERVICES 0
 
 #endif /*LV_USE_UEFI*/
 
-/** Use Wayland to open a window and handle input on Linux or BSD desktops */
+/** Open a window on a Wayland compositor on Linux or BSD and read mouse, keyboard and touch input. */
 #define LV_USE_WAYLAND 0
 
 #if LV_USE_WAYLAND
-/** Deinitialize LVGL and quit the application when the last wayland window closes */
+/** LVGL is deinitialized before the application exits. */
 #define LV_WAYLAND_DIRECT_EXIT 1
 
-/** Legacy behavior, kept for backwards compatibility and slated for removal.
- *  While set, the backend defaults to SHM and any LV_WAYLAND_USE_* set directly
- *  in lv_conf.h is honored.  Disable this and pick a backend explicitly via the
- *  Wayland "Rendering backend" choice.
+#if !LV_USE_DRAW_OPENGLES
+#if !LV_USE_DRAW_NANOVG
+/** Default backend, using wl_shm for double-buffered direct rendering.
+ *  Compatible with all Wayland compositors; no special hardware required.
+ *  Unavailable with the OpenGL ES and NanoVG renderers, which can only
+ *  render into a GPU surface.
  */
-#define LV_WAYLAND_AUTO_BACKEND 1
+#define LV_WAYLAND_USE_SHM 1
 
-/** Select the rendering backend used by the Wayland driver.
- *  Possible values:
- *  - LV_WAYLAND_BACKEND_SHM: SHM (Shared Memory)
- *  - LV_WAYLAND_BACKEND_EGL: EGL (OpenGL ES, hardware-accelerated) (enable: LV_USE_OPENGLES)
- *  - LV_WAYLAND_BACKEND_G2D: G2D (NXP i.MX hardware accelerator) (enable: LV_USE_DRAW_G2D)
+/** Presents software-rendered frames through linear DMA-BUFs that the
+ *  compositor can scan out directly, saving its copy out of shared memory.
+ *  Requires a compositor with zwp_linux_dmabuf_v1 and a gbm implementation
+ *  able to allocate CPU-mappable buffers, plus libdrm and gbm (-ldrm -lgbm).
+ *  Needs no GPU API: unavailable with the OpenGL ES and NanoVG renderers,
+ *  which can only render into a GPU surface.
  */
-#define LV_WAYLAND_BACKEND LV_WAYLAND_BACKEND_SHM
+#define LV_WAYLAND_USE_DMABUF 0
 
+#endif /*!LV_USE_DRAW_NANOVG*/
+#endif /*!LV_USE_DRAW_OPENGLES*/
+
+/** Hardware-accelerated rendering via OpenGL ES 2.0 and EGL, compatible
+ *  with LVGL 3D/glTF rendering. Requires OpenGL ES 2.0 on the target
+ *  hardware and linking with wayland-egl (-lwayland-egl).
+ *  The only backend available with the OpenGL ES and NanoVG renderers.
+ *
+ *  Enable: LV_USE_OPENGLES
+ */
+#define LV_WAYLAND_USE_EGL 0
+
+#if !LV_USE_DRAW_OPENGLES
+#if !LV_USE_DRAW_NANOVG
+/** Hardware-accelerated 2D rendering via NXP's G2D engine.
+ *  Supports NXP i.MX6/i.MX8 platforms with G2D library installed.
+ *  Unavailable with the OpenGL ES and NanoVG renderers, which can only
+ *  render into a GPU surface.
+ *
+ *  Enable: LV_USE_DRAW_G2D
+ */
+#define LV_WAYLAND_USE_G2D 0
+
+#endif /*!LV_USE_DRAW_NANOVG*/
+#endif /*!LV_USE_DRAW_OPENGLES*/
 #endif /*LV_USE_WAYLAND*/
 
 #if LV_USE_OS == LV_OS_WINDOWS
-/** LVGL Windows backend */
+/** Open a window with the Win32 API and read mouse, touch, keyboard and mousewheel input. */
 #define LV_USE_WINDOWS 0
 
 #endif /*LV_USE_OS == LV_OS_WINDOWS*/
 
-/** Use X11 to open window on Linux desktop and handle mouse and keyboard */
+/** Open a window on an X11 desktop and read mouse and keyboard input. */
 #define LV_USE_X11 0
 
 #if LV_USE_X11
-/** Use double buffers for lvgl rendering */
+/** Double buffering */
 #define LV_X11_DOUBLE_BUFFER 1
 
-/** Exit the application when all X11 windows have been closed */
+/** Exit when all windows are closed */
 #define LV_X11_DIRECT_EXIT 1
 
-/** X11 device render mode
+/** Render mode
  *  Possible values:
- *  - LV_DISPLAY_RENDER_MODE_PARTIAL: Partial render mode
- *  - LV_DISPLAY_RENDER_MODE_DIRECT: Direct render mode
- *  - LV_DISPLAY_RENDER_MODE_FULL: Full render mode
+ *  - LV_DISPLAY_RENDER_MODE_PARTIAL: Partial mode
+ *  - LV_DISPLAY_RENDER_MODE_DIRECT: Direct mode
+ *  - LV_DISPLAY_RENDER_MODE_FULL: Full mode
  */
 #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
 
 #endif /*LV_USE_X11*/
 
-/** Enable NanoVG (vector graphics library) */
+/** Build the bundled NanoVG vector graphics library. Required by the NanoVG renderer. */
 #define LV_USE_NANOVG 0
 
 
@@ -1830,11 +1895,11 @@
  */
 #define LV_FS_DEFAULT_DRIVER_LETTER 0
 
-/** File system on top of stdio */
+/** stdio */
 #define LV_USE_FS_STDIO 0
 
 #if LV_USE_FS_STDIO
-/** Driver-identifier letter for stdio (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for stdio (65 = 'A', 0 = disabled) */
 #define LV_FS_STDIO_LETTER 0
 
 /** Working directory for stdio */
@@ -1845,11 +1910,11 @@
 
 #endif /*LV_USE_FS_STDIO*/
 
-/** File system on top of POSIX */
+/** POSIX */
 #define LV_USE_FS_POSIX 0
 
 #if LV_USE_FS_POSIX
-/** Driver-identifier letter for POSIX (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for POSIX (65 = 'A', 0 = disabled) */
 #define LV_FS_POSIX_LETTER 0
 
 /** Working directory for POSIX */
@@ -1860,11 +1925,11 @@
 
 #endif /*LV_USE_FS_POSIX*/
 
-/** File system on top of Win32 */
+/** Win32 */
 #define LV_USE_FS_WIN32 0
 
 #if LV_USE_FS_WIN32
-/** Driver-identifier letter for Win32 (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for Win32 (65 = 'A', 0 = disabled) */
 #define LV_FS_WIN32_LETTER 0
 
 /** Working directory for Win32 */
@@ -1875,11 +1940,11 @@
 
 #endif /*LV_USE_FS_WIN32*/
 
-/** File system on top of FatFS */
+/** FatFS */
 #define LV_USE_FS_FATFS 0
 
 #if LV_USE_FS_FATFS
-/** Driver-identifier letter for FatFS (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for FatFS (65 = 'A', 0 = disabled) */
 #define LV_FS_FATFS_LETTER 0
 
 /** Working directory for FatFS */
@@ -1890,11 +1955,11 @@
 
 #endif /*LV_USE_FS_FATFS*/
 
-/** File system on top of littlefs */
+/** littlefs */
 #define LV_USE_FS_LITTLEFS 0
 
 #if LV_USE_FS_LITTLEFS
-/** Driver-identifier letter for littlefs (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for littlefs (65 = 'A', 0 = disabled) */
 #define LV_FS_LITTLEFS_LETTER 0
 
 /** Working directory for littlefs */
@@ -1902,11 +1967,11 @@
 
 #endif /*LV_USE_FS_LITTLEFS*/
 
-/** File system on top of Arduino ESP littlefs */
+/** Arduino ESP littlefs */
 #define LV_USE_FS_ARDUINO_ESP_LITTLEFS 0
 
 #if LV_USE_FS_ARDUINO_ESP_LITTLEFS
-/** Driver-identifier letter for Arduino ESP littlefs (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for Arduino ESP littlefs (65 = 'A', 0 = disabled) */
 #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER 0
 
 /** Working directory for Arduino ESP littlefs */
@@ -1914,11 +1979,11 @@
 
 #endif /*LV_USE_FS_ARDUINO_ESP_LITTLEFS*/
 
-/** File system on top of Arduino SD */
+/** Arduino SD */
 #define LV_USE_FS_ARDUINO_SD 0
 
 #if LV_USE_FS_ARDUINO_SD
-/** Driver-identifier letter for Arduino SD (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for Arduino SD (65 = 'A', 0 = disabled) */
 #define LV_FS_ARDUINO_SD_LETTER 0
 
 /** Working directory for Arduino SD */
@@ -1926,29 +1991,29 @@
 
 #endif /*LV_USE_FS_ARDUINO_SD*/
 
-/** File system on top of UEFI */
+/** UEFI */
 #define LV_USE_FS_UEFI 0
 
 #if LV_USE_FS_UEFI
-/** Driver-identifier letter for UEFI (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for UEFI (65 = 'A', 0 = disabled) */
 #define LV_FS_UEFI_LETTER 0
 
 #endif /*LV_USE_FS_UEFI*/
 
-/** File system on top of FrogFS */
+/** FrogFS */
 #define LV_USE_FS_FROGFS 0
 
 #if LV_USE_FS_FROGFS
-/** Driver-identifier letter for FrogFS (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for FrogFS (65 = 'A', 0 = disabled) */
 #define LV_FS_FROGFS_LETTER 0
 
 #endif /*LV_USE_FS_FROGFS*/
 
-/** API for memory-mapped file access. */
+/** Reach data already in memory through the lv_fs API, without a real file system. */
 #define LV_USE_FS_MEMFS 0
 
 #if LV_USE_FS_MEMFS
-/** Driver-identifier letter for memfs (e.g. 65 for 'A', 0 = disabled) */
+/** Drive letter for memfs (65 = 'A', 0 = disabled) */
 #define LV_FS_MEMFS_LETTER 0
 
 #endif /*LV_USE_FS_MEMFS*/
@@ -1958,14 +2023,18 @@
  * DEBUGGING
  *============================================================================*/
 
-/** Enable system monitor component */
+/** Periodically collect CPU, FPS and memory statistics and optionally show them in an
+ *  on-screen overlay.
+ */
 #define LV_USE_SYSMON 0
 
 #if LV_USE_SYSMON
-/** Enable process idle measurement */
+/** The port provides `lv_os_get_proc_idle_percent` a per-process idle percentage
+ *  in addition to the system-wide one. LVGL provides a default one for linux systems.
+ */
 #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
 
-/** Show CPU usage and FPS count */
+/** Show the CPU usage and FPS count in a label on the screen. */
 #define LV_USE_PERF_MONITOR 0
 
 #if LV_USE_PERF_MONITOR
@@ -1983,13 +2052,13 @@
  */
 #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 
-/** Prints performance data using log */
+/** Print the performance data to the log instead of showing the on-screen label. */
 #define LV_USE_PERF_MONITOR_LOG_MODE 0
 
 #endif /*LV_USE_PERF_MONITOR*/
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-/** Show the used memory and the memory fragmentation */
+/** Show the used memory and the memory fragmentation in a label on the screen. */
 #define LV_USE_MEM_MONITOR 0
 
 #endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
@@ -2033,23 +2102,23 @@
 #endif /*LV_SYSMON_USE_CUSTOM_INCLUDE*/
 #endif /*LV_USE_SYSMON*/
 
-/** Enable runtime performance profiler */
+/** Instrument LVGL internals with trace hooks to measure runtime performance. */
 #define LV_USE_PROFILER 0
 
-/** Enable the built-in profiler
+/** Built-in profiler
  *
  *  Enable: LV_USE_PROFILER
  */
 #define LV_USE_PROFILER_BUILTIN 0
 
 #if LV_USE_PROFILER_BUILTIN
-/** Default profiler trace buffer size in bytes */
+/** Trace buffer size (bytes) */
 #define LV_PROFILER_BUILTIN_BUF_SIZE 16384
 
-/** Enable built-in profiler by default */
+/** Start profiling at init */
 #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 1
 
-/** Enable POSIX profiler port */
+/** POSIX port */
 #define LV_USE_PROFILER_BUILTIN_POSIX 0
 
 #endif /*LV_USE_PROFILER_BUILTIN*/
@@ -2078,70 +2147,80 @@
  */
 #define LV_PROFILER_INCLUDE "lvgl/debugging/profiler/lv_profiler_builtin.h"
 
-/** Enable layout profiler */
+/** Layout */
 #define LV_PROFILER_LAYOUT 1
 
-/** Enable disp refr profiler */
+/** Display refresh */
 #define LV_PROFILER_REFR 1
 
-/** Enable draw profiler */
+/** Draw */
 #define LV_PROFILER_DRAW 1
 
-/** Enable indev profiler */
+/** Input devices */
 #define LV_PROFILER_INDEV 1
 
-/** Enable decoder profiler */
+/** Image decoder */
 #define LV_PROFILER_DECODER 1
 
-/** Enable font profiler */
+/** Font */
 #define LV_PROFILER_FONT 1
 
-/** Enable fs profiler */
+/** File system */
 #define LV_PROFILER_FS 1
 
-/** Enable style profiler */
+/** Style */
 #define LV_PROFILER_STYLE 0
 
-/** Enable timer profiler */
+/** Timer */
 #define LV_PROFILER_TIMER 1
 
-/** Enable cache profiler */
+/** Cache */
 #define LV_PROFILER_CACHE 1
 
-/** Enable event profiler */
+/** Events */
 #define LV_PROFILER_EVENT 1
 
 #endif /*LV_USE_PROFILER*/
 
-/** Enable emulated input devices, time emulation, and screenshot compares */
+/** Emulated input devices, time emulation, and screenshot compares. */
 #define LV_USE_TEST 0
 
 #if LV_USE_TEST
-/** Enable `lv_test_screenshot_compare`.
- *  Requires a few MB of extra RAM.
+/** Enable `lv_test_screenshot_compare()`. Requires a few MB of extra RAM.
  *
  *  Enable: LV_USE_LODEPNG
  */
 #define LV_USE_TEST_SCREENSHOT_COMPARE 0
 
 #if LV_USE_TEST_SCREENSHOT_COMPARE
-/** Create a reference image by default if it does not exist */
+/** When a reference image does not exist yet, create it from the rendered
+ *  screen instead of failing the compare.
+ */
 #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 1
 
 #endif /*LV_USE_TEST_SCREENSHOT_COMPARE*/
+
+#if LV_USE_DRAW_NANOVG
+/** Render into an off-screen EGL pbuffer instead of a window and read the
+ *  pixels back into the LVGL draw buffer, so screenshot compares work the
+ *  same way as with the software renderer. Requires EGL and GLESv2.
+ */
+#define LV_USE_NANOVG_TEST_HEADLESS 0
+
+#endif /*LV_USE_DRAW_NANOVG*/
 #endif /*LV_USE_TEST*/
 
-/** Enable Monkey test */
+/** Feed random input events to the UI for stress testing. */
 #define LV_USE_MONKEY 0
 
 /** Draw random colored rectangles over the redrawn areas. */
 #define LV_USE_REFR_DEBUG 0
 
-/** Draw a red overlay for ARGB layers and a green overlay for RGB layers */
+/** Draw a red overlay over ARGB layers and a green overlay over RGB layers. */
 #define LV_USE_LAYER_DEBUG 0
 
-/** Also add the index number of the draw unit on white background.
- *  For layers add the index number of the draw unit on black background.
+/** Draw an overlay in a different color for each draw unit's tasks, with the
+ *  draw unit's index number on a white background (black for layers).
  */
 #define LV_USE_PARALLEL_DRAW_DEBUG 0
 
@@ -2151,23 +2230,21 @@
  * OTHERS
  *============================================================================*/
 
-/** Enable `lv_obj` fragment logic */
+/** Manage a widget subtree with its own lifecycle and back stack, similar to Android fragments. */
 #define LV_USE_FRAGMENT 0
 
-/** Enable file explorer.
+/** File explorer
  *
  *  Enable: LV_USE_TABLE
  */
 #define LV_USE_FILE_EXPLORER 0
 
 #if LV_USE_FILE_EXPLORER
-/** Maximum length of path */
+/** Maximum path length (bytes) */
 #define LV_FILE_EXPLORER_PATH_MAX_LEN 128
 
-/** This can save some memory, but not much.
- *  After the quick access bar is created, it can be hidden
- *  by clicking the button at the top left corner of
- *  the browsing area, which is very useful for small screen devices.
+/** Add a sidebar with shortcuts to common places. It can be hidden by clicking the
+ *  button at the top left corner of the browsing area, which is useful on small screens.
  */
 #define LV_FILE_EXPLORER_QUICK_ACCESS 1
 
@@ -2178,7 +2255,9 @@
  * BUILD
  *============================================================================*/
 
-/** Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default */
+/** Include `lvgl_private.h` from `lvgl.h` so that LVGL internal data
+ *  structures and functions are accessible by default.
+ */
 #define LV_USE_PRIVATE_API 0
 
 /** By default, LVGL stores all runtime state in a single static
@@ -2221,19 +2300,19 @@
 #endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE*/
 #endif /*LV_ENABLE_GLOBAL_CUSTOM*/
 
-/** Check if the parameter is NULL. (Very fast, recommended) */
+/** NULL checks (very fast, recommended) */
 #define LV_USE_ASSERT_NULL 1
 
-/** Checks if the memory is successfully allocated or no. (Very fast, recommended) */
+/** Allocation success checks (very fast, recommended) */
 #define LV_USE_ASSERT_MALLOC 1
 
-/** Check if the styles are properly initialized. (Very fast, recommended) */
+/** Style init checks (very fast, recommended) */
 #define LV_USE_ASSERT_STYLE 0
 
-/** Check the integrity of `lv_mem` after critical operations. (Slow) */
+/** lv_mem integrity checks (slow) */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0
 
-/** Check NULL, the object's type and existence (e.g. not deleted). (Slow) */
+/** Widget validity checks (slow) */
 #define LV_USE_ASSERT_OBJ 0
 
 /** Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
@@ -2251,8 +2330,8 @@
  */
 #define LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING 0
 
-/** Use LV_ASSERT_CUSTOM_INCLUDE to define the path to a file defining a
- *  custom LV_ASSERT_HANDLER
+/** Include the header given by LV_ASSERT_CUSTOM_INCLUDE, which must define
+ *  a custom LV_ASSERT_HANDLER.
  */
 #define LV_ASSERT_USE_CUSTOM_INCLUDE 0
 
@@ -2267,25 +2346,22 @@
 
 #endif /*LV_ASSERT_USE_CUSTOM_INCLUDE*/
 
-/** When enabled, LV_CHECK_ARG checks validate function arguments
- *  at runtime. Failed checks log a warning and execute the specified
- *  action. When disabled, all LV_CHECK_ARG checks compile to nothing.
- *  Disabling this is not recommended unless extreme care is taken and only
- *  in very resource constrained environments where it can be absolutely
- *  ensured that invariants are never violated.
+/** LV_CHECK_ARG validates function arguments at runtime: a failed check
+ *  logs a warning and executes the specified action. When disabled all
+ *  these checks compile to nothing, which is only safe in very resource
+ *  constrained environments where invariants are guaranteed to hold.
  */
 #define LV_USE_CHECK_ARG 1
 
 #if LV_USE_CHECK_ARG
-/** When enabled, LV_ASSERT_HANDLER is also invoked when an
- *  LV_CHECK_ARG check fails, before the action is executed.
+/** Also invoke LV_ASSERT_HANDLER when an LV_CHECK_ARG check fails,
+ *  before the action is executed.
  */
 #define LV_CHECK_ARG_ASSERT_ON_FAIL 0
 
 /** Controls what is logged when an LV_CHECK_ARG check fails.
- *  MINIMAL and VERBOSE modes require LV_USE_LOG to be enabled;
- *  selecting either when LV_USE_LOG is disabled will cause a
- *  compile-time error.
+ *  Minimal and Verbose require LV_USE_LOG; selecting either without it
+ *  causes a compile-time error.
  *  Possible values:
  *  - LV_CHECK_ARG_LOG_MODE_NONE: no log output on failure
  *  - LV_CHECK_ARG_LOG_MODE_MINIMAL: log 'Check failed' only (file/line from LV_LOG_WARN) (requires LV_USE_LOG)
@@ -2293,16 +2369,15 @@
  */
 #define LV_CHECK_ARG_LOG_MODE LV_CHECK_ARG_LOG_MODE_NONE
 
-/** When enabled, LV_CHECK_OBJ verifies that the object has the
- *  expected class (lv_obj_has_class). When disabled, the class
- *  check is skipped even if a class argument is supplied.
+/** LV_CHECK_OBJ verifies with lv_obj_has_class() that the object has the
+ *  expected class. When disabled the check is skipped even if a class
+ *  argument is supplied.
  */
 #define LV_USE_CHECK_OBJ_CLASSTYPE 0
 
-/** When enabled, LV_CHECK_OBJ also verifies that the object is
- *  still part of the widget tree (lv_obj_is_valid). When disabled,
- *  the validity check is skipped even if the associated argument
- *  is supplied.
+/** LV_CHECK_OBJ verifies with lv_obj_is_valid() that the object is still
+ *  part of the widget tree. When disabled the check is skipped even if the
+ *  associated argument is supplied.
  */
 #define LV_USE_CHECK_OBJ_VALIDITY 0
 
@@ -2313,7 +2388,7 @@
  * COMPILER SETTINGS
  *============================================================================*/
 
-/** For big endian systems set to 1 */
+/** Big endian system */
 #define LV_BIG_ENDIAN_SYSTEM 0
 
 /** Include the header given by LV_ATTRIBUTE_CUSTOM_INCLUDE to override the
@@ -2386,7 +2461,7 @@
  * EXAMPLES
  *============================================================================*/
 
-/** Enable examples to be built with the library. */
+/** Build examples */
 #define LV_BUILD_EXAMPLES 1
 
 
@@ -2395,18 +2470,20 @@
  * DEMOS
  *============================================================================*/
 
-/** Build the demos */
+/** Build demos */
 #define LV_BUILD_DEMOS 1
 
 #if LV_BUILD_DEMOS
-/** Benchmark your system
+/** Benchmark demo
  *
  *  Enable: LV_FONT_MONTSERRAT_14, LV_FONT_MONTSERRAT_20, LV_FONT_MONTSERRAT_24, LV_FONT_MONTSERRAT_26, LV_USE_DEMO_WIDGETS
  */
 #define LV_USE_DEMO_BENCHMARK 0
 
 #if LV_USE_DEMO_BENCHMARK
-/** Use static aligned fonts */
+/** Use the demo's own Montserrat fonts with aligned glyph bitmaps instead
+ *  of the LV_FONT_MONTSERRAT_* fonts.
+ */
 #define LV_DEMO_BENCHMARK_ALIGNED_FONTS 0
 
 #endif /*LV_USE_DEMO_BENCHMARK*/
@@ -2417,65 +2494,63 @@
 
 #endif /*LV_USE_GLTF*/
 
-/** Demonstrate the usage of encoder and keyboard */
+/** Keypad and encoder demo */
 #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
 
 /** Music player demo */
 #define LV_USE_DEMO_MUSIC 0
 
 #if LV_USE_DEMO_MUSIC
-/** Enable Square */
+/** Square layout */
 #define LV_DEMO_MUSIC_SQUARE 0
 
-/** Enable Landscape */
+/** Landscape layout */
 #define LV_DEMO_MUSIC_LANDSCAPE 0
 
-/** Enable Round */
+/** Round layout */
 #define LV_DEMO_MUSIC_ROUND 0
 
-/** Enable Large */
+/** Large layout */
 #define LV_DEMO_MUSIC_LARGE 0
 
-/** Enable Auto play */
+/** Auto play */
 #define LV_DEMO_MUSIC_AUTO_PLAY 0
 
 #endif /*LV_USE_DEMO_MUSIC*/
 
-/** Render test for each primitives. Requires at least 480x272 display
+/** Renders each drawing primitive for visual comparison.
+ *  Requires a display of at least 480x272.
  *
  *  Enable: LV_USE_GRID
  */
 #define LV_USE_DEMO_RENDER 0
 
-/** Stress test for LVGL */
+/** Stress demo */
 #define LV_USE_DEMO_STRESS 0
 
-#if LV_DRAW_HAS_VECTOR_SUPPORT
-/** vector graphic demo
+/** Vector graphic demo
  *
  *  Enable: LV_USE_VECTOR_GRAPHIC
  */
 #define LV_USE_DEMO_VECTOR_GRAPHIC 0
 
-#endif /*LV_DRAW_HAS_VECTOR_SUPPORT*/
-
-/** Show-case LVGL widgets */
+/** Widgets demo */
 #define LV_USE_DEMO_WIDGETS 0
 
-/** Flex layout previewer */
+/** Flex layout demo */
 #define LV_USE_DEMO_FLEX_LAYOUT 0
 
-/** multi-language demo */
+/** Multi-language demo */
 #define LV_USE_DEMO_MULTILANG 0
 
 /** Smartwatch demo */
 #define LV_USE_DEMO_SMARTWATCH 0
 
-/** Ebike demo */
+/** E-bike demo */
 #define LV_USE_DEMO_EBIKE 0
 
 #if LV_USE_DEMO_EBIKE
-/** Ebike portrait layout */
+/** Portrait layout */
 #define LV_DEMO_EBIKE_PORTRAIT 0
 
 #endif /*LV_USE_DEMO_EBIKE*/

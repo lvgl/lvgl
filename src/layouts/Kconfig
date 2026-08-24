@@ -1,14 +1,14 @@
 menu "Layouts"
 
 config LV_USE_FLEX
-	bool "A layout similar to Flexbox in CSS"
+	bool "Flex"
 	default y
 	help
-		A layout similar to Flexbox in CSS.
+		Arrange children in a row or column that wraps and grows, similar to Flexbox in CSS.
 
 config LV_USE_GRID
-	bool "A layout similar to Grid in CSS"
+	bool "Grid"
 	default y
 	help
-		A layout similar to Grid in CSS.
+		Arrange children in rows and columns, similar to Grid in CSS.
 endmenu

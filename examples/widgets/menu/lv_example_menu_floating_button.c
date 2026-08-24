@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_MENU && LV_BUILD_EXAMPLES
 
+/*This example shows the deprecated `lv_menu` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static uint32_t btn_cnt = 1;
 static lv_obj_t * main_page;
 static lv_obj_t * menu;
@@ -31,6 +34,8 @@ static void float_button_event_cb(lv_event_t * e)
 /**
  * @title Menu with floating add button
  * @brief A circular floating button appends new items and matching sub pages.
+ *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  *
  * The menu starts with a single main-page item wired to a greeting
  * sub page. A circular `lv_button` flagged with
@@ -78,5 +83,7 @@ void lv_example_menu_floating_button(void)
     lv_obj_set_style_bg_image_src(float_btn, LV_SYMBOL_PLUS, 0);
     lv_obj_set_style_text_font(float_btn, lv_theme_get_font_large(float_btn), 0);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

@@ -279,14 +279,14 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
     player->auto_restart = en;
 }
 
-void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * name)
+void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * decoder_name)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
     if(player->decoder_name) {
         lv_free((void *)player->decoder_name);
     }
-    player->decoder_name = name ? lv_strdup(name) : NULL;
+    player->decoder_name = decoder_name ? lv_strdup(decoder_name) : NULL;
 }
 
 /**********************

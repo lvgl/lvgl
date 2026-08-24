@@ -30,6 +30,7 @@ DRAW_TASK_STATE_NAMES = {
     2: "QUEUED",
     3: "IN_PROGRESS",
     4: "FINISHED",
+    5: "FAILED",
 }
 
 DRAW_UNIT_TYPE_NAMES = {

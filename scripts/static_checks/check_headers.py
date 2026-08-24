@@ -104,11 +104,16 @@ FORBIDDEN_SYSTEM_HEADERS: set[str] = {
 # This is the exhaustive allow-list; anything not here (and not forbidden)
 # is still an error so the list stays intentional and auditable.
 ALLOWED_EXTERNAL_HEADERS: set[str] = {
+    "EGL/egl.h",
+    "EGL/eglext.h",
     "FreeRTOS.h",
     "GL/glew.h",
     "GLES2/gl2.h",
+    "GLES2/gl2ext.h",
     "GLES3/gl3.h",
     "GLFW/glfw3.h",
+    "LGFX_AUTODETECT.hpp",
+    "LovyanGFX.hpp",
     "LVGL_thread.h",
     "LittleFS.h",
     "Pre_Include_Global.h",
@@ -174,7 +179,6 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "hal_data.h",
     "include/lv_mp_mem_custom_include.h",
     "intrin.h",
-    "jpegint.h",
     "jpeglib.h",
     "lfs.h",
     "libavcodec/avcodec.h",

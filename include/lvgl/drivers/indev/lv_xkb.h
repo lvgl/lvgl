@@ -44,7 +44,7 @@ void lv_xkb_deinit(lv_xkb_t * dsc);
 
 /**
  * Process an evdev scancode using a specific XKB descriptor.
- * @param state XKB descriptor to use
+ * @param dsc   XKB descriptor to use
  * @param scancode evdev scancode to process
  * @param down true if the key was pressed, false if it was releases
  * @return the (first) UTF-8 character produced by the event or 0 if no output was produced

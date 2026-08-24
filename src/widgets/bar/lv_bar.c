@@ -153,7 +153,7 @@ void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
     lv_bar_set_value_with_anim(obj, value, &bar->cur_value, &bar->cur_value_anim, anim);
 }
 
-void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
+void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_t anim)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
@@ -163,12 +163,12 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim
         return;
     }
 
-    value = LV_CLAMP(bar->min_value, value, bar->max_value);
-    value = value > bar->cur_value ? bar->cur_value : value; /*Can't be greater than the right value*/
+    start_value = LV_CLAMP(bar->min_value, start_value, bar->max_value);
+    start_value = start_value > bar->cur_value ? bar->cur_value : start_value; /*Can't be greater than the right value*/
 
-    if(bar->start_value == value) return;
+    if(bar->start_value == start_value) return;
 
-    lv_bar_set_value_with_anim(obj, value, &bar->start_value, &bar->start_value_anim, anim);
+    lv_bar_set_value_with_anim(obj, start_value, &bar->start_value, &bar->start_value_anim, anim);
 }
 
 void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)

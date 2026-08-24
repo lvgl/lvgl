@@ -1,0 +1,11 @@
+# Added to the configurations whose test suites are actually executed, on top of
+# the ones that are only compiled.
+
+# Reference images were rendered at this DPI
+CONFIG_LV_DPI_DEF=130
+
+# The test runner installs its own log callback
+# CONFIG_LV_LOG_PRINTF is not set
+
+# The test cases do not use the examples
+# CONFIG_LV_BUILD_EXAMPLES is not set

@@ -148,11 +148,9 @@
 #include "layouts/lv_layout.h"
 #include "logging/lv_log.h"
 #include "lv_types.h"
-#include "misc/lv_array.h"
 #include "misc/lv_async.h"
 #include "misc/lv_math.h"
 #include "misc/lv_ll.h"
-#include "misc/lv_tree.h"
 #include "osal/lv_os.h"
 #include "others/file_explorer/lv_file_explorer.h"
 #include "others/fragment/lv_fragment.h"
@@ -222,28 +220,37 @@
     #include "api_map/lv_api_map_v9_5.h"
 #endif /*LV_DISABLE_API_MAPPING*/
 
-/** Gives 1 if the x.y.z version is supported in the current version
+/**
+ * Gives 1 if the x.y.z version is supported in the current version
+ *
  * Usage:
  *
- * - Require v6
- * #if LV_VERSION_CHECK(6,0,0)
- *   new_func_in_v6();
+ * Require v6:
+ * @code{.c}
+ * #if LV_VERSION_CHECK(6, 0, 0)
+ *     new_func_in_v6();
  * #endif
+ * @endcode
  *
- *
- * - Require at least v5.3
- * #if LV_VERSION_CHECK(5,3,0)
- *   new_feature_from_v5_3();
+ * Require at least v5.3:
+ * @code{.c}
+ * #if LV_VERSION_CHECK(5, 3, 0)
+ *     new_feature_from_v5_3();
  * #endif
+ * @endcode
  *
- *
- * - Require v5.3.2 bugfixes
- * #if LV_VERSION_CHECK(5,3,2)
- *   bugfix_in_v5_3_2();
+ * Require v5.3.2 bugfixes:
+ * @code{.c}
+ * #if LV_VERSION_CHECK(5, 3, 2)
+ *     bugfix_in_v5_3_2();
  * #endif
+ * @endcode
  *
+ * @param x  major version to check against
+ * @param y  minor version to check against
+ * @param z  patch version to check against
  */
-#define LV_VERSION_CHECK(x,y,z) (x == LVGL_VERSION_MAJOR && (y < LVGL_VERSION_MINOR || (y == LVGL_VERSION_MINOR && z <= LVGL_VERSION_PATCH)))
+#define LV_VERSION_CHECK(x, y, z) (x == LVGL_VERSION_MAJOR && (y < LVGL_VERSION_MINOR || (y == LVGL_VERSION_MINOR && z <= LVGL_VERSION_PATCH)))
 
 /**
  * Wrapper functions for VERSION macros

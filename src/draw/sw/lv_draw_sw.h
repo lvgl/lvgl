@@ -124,7 +124,6 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
  * Mask out a rectangle with radius from a current layer
  * @param t             pointer to a draw task
  * @param dsc           the draw descriptor
- * @param coords        the coordinates of the mask
  */
 void lv_draw_sw_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc);
 
@@ -137,12 +136,12 @@ void lv_draw_sw_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * ds
  * @param src_stride    source buffer stride in bytes
  * @param draw_dsc      draw descriptor
  * @param sup           supplementary data
- * @param cf            color format of the source buffer
+ * @param src_cf        color format of the source buffer
  * @param dest_buf      the destination buffer
  */
 void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
                           int32_t src_w, int32_t src_h, int32_t src_stride,
-                          const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t cf, void * dest_buf);
+                          const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t src_cf, void * dest_buf);
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 /**

@@ -194,7 +194,7 @@ uint32_t lv_buttonmatrix_get_selected_button(const lv_obj_t * obj);
  * Get the button's text
  * @param obj       pointer to button matrix object
  * @param btn_id    the index a button not counting new line characters.
- * @return          text of btn_index` button
+ * @return          text of `btn_index` button
  */
 const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_id);
 

@@ -69,12 +69,19 @@ class Emitter:
         return term_key(term)
 
     def _sync_conditions(self, wanted: list, base_keys: set[str]):
-        # Drop terms that aren't valid/sensible C guards: a Choice (a member's
-        # implicit dep, renders as `<choice>`) and the derived-combo symbols
-        # that would gate their own selector members circularly.
-        wanted = [t for t in wanted if not isinstance(t, Choice)]
+        def is_visible(sym):
+            return any(node.prompt for node in sym.nodes)
+
+        # Drop terms that shouldn't appear as conditions in the generated guard:
+        #   - Choice objects (a member's implicit dep renders as `<choice>`, not valid C)
+        #   - derived-combo symbols, which would gate their own selector members circularly
+        #   - symbols with no prompt on any of their nodes
         deduped, seen = [], set(base_keys)
         for t in wanted:
+            if isinstance(t, Choice):
+                continue
+            if isinstance(t, Symbol) and not is_visible(t):
+                continue
             k = term_key(t)
             if k not in seen:
                 seen.add(k)

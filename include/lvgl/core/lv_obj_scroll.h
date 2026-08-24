@@ -272,10 +272,10 @@ void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en);
 /**
  * Get the area of the scrollbars
  * @param obj   pointer to Widget
- * @param hor   pointer to store the area of the horizontal scrollbar
- * @param ver   pointer to store the area of the vertical  scrollbar
+ * @param hor_area pointer to store the area of the horizontal scrollbar
+ * @param ver_area pointer to store the area of the vertical  scrollbar
  */
-void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor, lv_area_t * ver);
+void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t * ver_area);
 
 /**
  * Invalidate the area of the scrollbars

@@ -153,7 +153,10 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     SDL_Texture * texture = layer_get_texture(layer);
     if(layer != disp->layer_head && texture == NULL) {
         void * buf = lv_draw_layer_alloc_buf(layer);
-        if(buf == NULL) return -1;
+        if(buf == NULL) {
+            t->state = LV_DRAW_TASK_STATE_FAILED;
+            return -1;
+        }
 
         SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
         int32_t w = lv_area_get_width(&layer->buf_area);

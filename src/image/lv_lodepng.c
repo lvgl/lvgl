@@ -32,9 +32,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
+static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
 static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size);
 /**********************
@@ -268,7 +268,7 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
 
 /**
  * Convert subpixel order from LodePNG to LVGL
- * @param img the LodePNG RGBA8888 image to be converted in-place to LVGL BGRA8888
+ * @param img_p the LodePNG RGBA8888 image to be converted in-place to LVGL BGRA8888
  * @param px_cnt number of pixels in `img`
  */
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)

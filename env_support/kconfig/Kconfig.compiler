@@ -1,11 +1,9 @@
 menu "Compiler Settings"
 config LV_BIG_ENDIAN_SYSTEM
-	bool "For big endian systems set to 1"
-	help
-		For big endian systems set to 1
+	bool "Big endian system"
 
 config LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
-	bool "Include a custom attributes header"
+	bool "Custom attributes header"
 	default n
 	help
 	  Include the header given by LV_ATTRIBUTE_CUSTOM_INCLUDE to override the

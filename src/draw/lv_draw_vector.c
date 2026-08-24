@@ -9,6 +9,7 @@
 #include "lv_draw_vector_private.h"
 #include "../misc/lv_area_private.h"
 #include "lv_draw_private.h"
+#include "../misc/lv_array.h"
 
 #if LV_USE_VECTOR_GRAPHIC
 
@@ -212,7 +213,7 @@ static lv_fpoint_t _point_on_ellipse(float rx, float ry, float cos_r, float sin_
     };
 }
 
-void lv_vector_path_arc_to(lv_vector_path_t * path, float rx, float ry, float rotate_angle, bool large_arc,
+void lv_vector_path_arc_to(lv_vector_path_t * path, float radius_x, float radius_y, float rotate_angle, bool large_arc,
                            bool clockwise, const lv_fpoint_t * p)
 {
     LV_ASSERT_NULL(path);
@@ -223,7 +224,7 @@ void lv_vector_path_arc_to(lv_vector_path_t * path, float rx, float ry, float ro
         return;
     }
 
-    if(rx <= 0 || ry <= 0) {
+    if(radius_x <= 0 || radius_y <= 0) {
         /*no needed to draw*/
         return;
     }
@@ -253,15 +254,15 @@ void lv_vector_path_arc_to(lv_vector_path_t * path, float rx, float ry, float ro
     float y1 = -sin_r * dx + cos_r * dy;
 
     /*3. adjust radius*/
-    float lambda_val = (x1 * x1) / (rx * rx) + (y1 * y1) / (ry * ry);
+    float lambda_val = (x1 * x1) / (radius_x * radius_x) + (y1 * y1) / (radius_y * radius_y);
     if(lambda_val > 1.0f) {
-        rx *= sqrtf(lambda_val);
-        ry *= sqrtf(lambda_val);
+        radius_x *= sqrtf(lambda_val);
+        radius_y *= sqrtf(lambda_val);
     }
 
     /*4. calc center point*/
-    float rx_sq = rx * rx;
-    float ry_sq = ry * ry;
+    float rx_sq = radius_x * radius_x;
+    float ry_sq = radius_y * radius_y;
     float x1_sq = x1 * x1;
     float y1_sq = y1 * y1;
 
@@ -274,14 +275,14 @@ void lv_vector_path_arc_to(lv_vector_path_t * path, float rx, float ry, float ro
     float sign = (large_arc == clockwise) ? -1.0f : 1.0f;
     float coef = sign * sqrtf(radicand);
 
-    float cx_prime = (coef * rx * y1) / ry;
-    float cy_prime = -(coef * ry * x1) / rx;
+    float cx_prime = (coef * radius_x * y1) / radius_y;
+    float cy_prime = -(coef * radius_y * x1) / radius_x;
 
     float cx = cos_r * cx_prime - sin_r * cy_prime + (x0 + p->x) * 0.5f;
     float cy = sin_r * cx_prime + cos_r * cy_prime + (y0 + p->y) * 0.5f;
 
-    float ux = (x1 - cx_prime) / rx;
-    float uy = (y1 - cy_prime) / ry;
+    float ux = (x1 - cx_prime) / radius_x;
+    float uy = (y1 - cy_prime) / radius_y;
 
     /*5. calculate the starting angle and ending angle*/
     float n_sq = ux * ux + uy * uy;
@@ -290,8 +291,8 @@ void lv_vector_path_arc_to(lv_vector_path_t * path, float rx, float ry, float ro
         theta1 = atan2f(uy, ux);
     }
 
-    float vx = (-x1 - cx_prime) / rx;
-    float vy = (-y1 - cy_prime) / ry;
+    float vx = (-x1 - cx_prime) / radius_x;
+    float vy = (-y1 - cy_prime) / radius_y;
 
     float n = sqrtf(n_sq * (vx * vx + vy * vy));
     float delta = 0.0f;
@@ -331,9 +332,9 @@ void lv_vector_path_arc_to(lv_vector_path_t * path, float rx, float ry, float ro
             alpha_val = sinf(segment_angle) * (sqrtf(4.0f + 3.0f * tan_half * tan_half) - 1.0f) / 3.0f;
         }
 
-        lv_fpoint_t p1 = _point_on_ellipse(rx, ry, cos_r, sin_r, cx, cy, current_angle, alpha_val);
-        lv_fpoint_t p2 = _point_on_ellipse(rx, ry, cos_r, sin_r, cx, cy, next_angle, -alpha_val);
-        lv_fpoint_t p3 = _point_on_ellipse(rx, ry, cos_r, sin_r, cx, cy, next_angle, 0.0f);
+        lv_fpoint_t p1 = _point_on_ellipse(radius_x, radius_y, cos_r, sin_r, cx, cy, current_angle, alpha_val);
+        lv_fpoint_t p2 = _point_on_ellipse(radius_x, radius_y, cos_r, sin_r, cx, cy, next_angle, -alpha_val);
+        lv_fpoint_t p3 = _point_on_ellipse(radius_x, radius_y, cos_r, sin_r, cx, cy, next_angle, 0.0f);
 
         lv_vector_path_cubic_to(path, &p1, &p2, &p3);
 
@@ -951,7 +952,7 @@ void lv_draw_vector_dsc_skew(lv_draw_vector_dsc_t * dsc, float skew_x, float ske
     lv_matrix_skew(&(dsc->ctx->matrix), skew_x, skew_y);
 }
 
-void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data)
+void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * user_data)
 {
     if(task_list == NULL) return;
 
@@ -963,7 +964,7 @@ void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb c
         lv_ll_remove(task_list, task);
 
         if(cb) {
-            cb(data, task->path, &task->ctx);
+            cb(user_data, task->path, &task->ctx);
         }
 
         if(task->path) {

@@ -153,9 +153,9 @@ void lv_span_stack_deinit(void)
     lv_free(snippet_stack);
 }
 
-lv_obj_t * lv_spangroup_create(lv_obj_t * par)
+lv_obj_t * lv_spangroup_create(lv_obj_t * parent)
 {
-    lv_obj_t * obj = lv_obj_class_create_obj(&lv_spangroup_class, par);
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_spangroup_class, parent);
     lv_obj_class_init_obj(obj);
     return obj;
 }
@@ -1078,9 +1078,8 @@ static int32_t convert_indent_pct(lv_obj_t * obj, int32_t width)
 
 /**
  * draw span group
- * @param spans obj handle
- * @param coords coordinates of the label
- * @param mask the label will be drawn only in this area
+ * @param obj pointer to a spangroup object
+ * @param layer pointer to the layer to draw into
  */
 static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 {

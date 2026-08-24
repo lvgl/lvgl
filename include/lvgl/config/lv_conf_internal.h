@@ -46,7 +46,7 @@
 #define LV_STDLIB_CUSTOM        255
 #define LV_LOG_LEVEL_NUM        5
 
-/* Default operating system to use */
+/* Operating system */
 #define LV_OS_NONE          0
 #define LV_OS_PTHREAD       1
 #define LV_OS_FREERTOS      2
@@ -57,7 +57,7 @@
 #define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
 
-/* Asm mode in sw draw */
+/* SW assembly optimization */
 #define LV_DRAW_SW_ASM_NONE      0
 #define LV_DRAW_SW_ASM_NEON      1
 #define LV_DRAW_SW_ASM_HELIUM    2
@@ -111,11 +111,6 @@
 /* SDL mousewheel mode */
 #define LV_SDL_MOUSEWHEEL_MODE_ENCODER   0
 #define LV_SDL_MOUSEWHEEL_MODE_CROWN     1
-
-/* Rendering backend */
-#define LV_WAYLAND_BACKEND_SHM   0
-#define LV_WAYLAND_BACKEND_EGL   1
-#define LV_WAYLAND_BACKEND_G2D   2
 
 /* Log behavior on LV_CHECK_ARG failure */
 #define LV_CHECK_ARG_LOG_MODE_NONE      0
@@ -1197,6 +1192,78 @@
  * INPUT DEVICES
  *============================================================================*/
 
+#ifndef LV_INDEV_DEF_SCROLL_LIMIT
+    #ifdef CONFIG_LV_INDEV_DEF_SCROLL_LIMIT
+        #define LV_INDEV_DEF_SCROLL_LIMIT CONFIG_LV_INDEV_DEF_SCROLL_LIMIT
+    #else
+        #define LV_INDEV_DEF_SCROLL_LIMIT 10
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_SCROLL_THROW
+    #ifdef CONFIG_LV_INDEV_DEF_SCROLL_THROW
+        #define LV_INDEV_DEF_SCROLL_THROW CONFIG_LV_INDEV_DEF_SCROLL_THROW
+    #else
+        #define LV_INDEV_DEF_SCROLL_THROW 10
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
+    #ifdef CONFIG_LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
+        #define LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR CONFIG_LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
+    #else
+        #define LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR 4
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_LONG_PRESS_TIME
+    #ifdef CONFIG_LV_INDEV_DEF_LONG_PRESS_TIME
+        #define LV_INDEV_DEF_LONG_PRESS_TIME CONFIG_LV_INDEV_DEF_LONG_PRESS_TIME
+    #else
+        #define LV_INDEV_DEF_LONG_PRESS_TIME 400
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_LONG_PRESS_REP_TIME
+    #ifdef CONFIG_LV_INDEV_DEF_LONG_PRESS_REP_TIME
+        #define LV_INDEV_DEF_LONG_PRESS_REP_TIME CONFIG_LV_INDEV_DEF_LONG_PRESS_REP_TIME
+    #else
+        #define LV_INDEV_DEF_LONG_PRESS_REP_TIME 100
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_DOUBLE_CLICK_TIME
+    #ifdef CONFIG_LV_INDEV_DEF_DOUBLE_CLICK_TIME
+        #define LV_INDEV_DEF_DOUBLE_CLICK_TIME CONFIG_LV_INDEV_DEF_DOUBLE_CLICK_TIME
+    #else
+        #define LV_INDEV_DEF_DOUBLE_CLICK_TIME 400
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_LIMIT
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_LIMIT
+        #define LV_INDEV_DEF_GESTURE_LIMIT CONFIG_LV_INDEV_DEF_GESTURE_LIMIT
+    #else
+        #define LV_INDEV_DEF_GESTURE_LIMIT 50
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+        #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY CONFIG_LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+    #else
+        #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_ROTARY_SENSITIVITY
+    #ifdef CONFIG_LV_INDEV_DEF_ROTARY_SENSITIVITY
+        #define LV_INDEV_DEF_ROTARY_SENSITIVITY CONFIG_LV_INDEV_DEF_ROTARY_SENSITIVITY
+    #else
+        #define LV_INDEV_DEF_ROTARY_SENSITIVITY 256
+    #endif
+#endif
+
 #ifndef LV_USE_GRIDNAV
     #ifdef CONFIG_LV_USE_GRIDNAV
         #define LV_USE_GRIDNAV CONFIG_LV_USE_GRIDNAV
@@ -1210,6 +1277,38 @@
         #define LV_USE_GESTURE_RECOGNITION CONFIG_LV_USE_GESTURE_RECOGNITION
     #else
         #define LV_USE_GESTURE_RECOGNITION 0
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD
+        #define LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD CONFIG_LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD
+    #else
+        #define LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD 75
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+        #define LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD CONFIG_LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+    #else
+        #define LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD 150
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE
+        #define LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE CONFIG_LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE
+    #else
+        #define LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE 250
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD
+        #define LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD CONFIG_LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD
+    #else
+        #define LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD 200
     #endif
 #endif
 
@@ -3037,7 +3136,7 @@
     #ifdef CONFIG_LV_LINUX_FBDEV_BUFFER_COUNT
         #define LV_LINUX_FBDEV_BUFFER_COUNT CONFIG_LV_LINUX_FBDEV_BUFFER_COUNT
     #else
-        #define LV_LINUX_FBDEV_BUFFER_COUNT 0
+        #define LV_LINUX_FBDEV_BUFFER_COUNT 1
     #endif
 #endif
 
@@ -3545,23 +3644,39 @@
     #endif
 #endif
 
-#ifndef LV_WAYLAND_AUTO_BACKEND
+#ifndef LV_WAYLAND_USE_SHM
     #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_WAYLAND_AUTO_BACKEND
-            #define LV_WAYLAND_AUTO_BACKEND CONFIG_LV_WAYLAND_AUTO_BACKEND
+        #ifdef CONFIG_LV_WAYLAND_USE_SHM
+            #define LV_WAYLAND_USE_SHM CONFIG_LV_WAYLAND_USE_SHM
         #else
-            #define LV_WAYLAND_AUTO_BACKEND 0
+            #define LV_WAYLAND_USE_SHM 0
         #endif
     #else
-          #define LV_WAYLAND_AUTO_BACKEND LV_USE_WAYLAND
+          #define LV_WAYLAND_USE_SHM !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND
     #endif
 #endif
 
-#ifndef LV_WAYLAND_BACKEND
-    #ifdef CONFIG_LV_WAYLAND_BACKEND
-        #define LV_WAYLAND_BACKEND CONFIG_LV_WAYLAND_BACKEND
+#ifndef LV_WAYLAND_USE_DMABUF
+    #ifdef CONFIG_LV_WAYLAND_USE_DMABUF
+        #define LV_WAYLAND_USE_DMABUF CONFIG_LV_WAYLAND_USE_DMABUF
     #else
-        #define LV_WAYLAND_BACKEND LV_WAYLAND_BACKEND_SHM
+        #define LV_WAYLAND_USE_DMABUF 0
+    #endif
+#endif
+
+#ifndef LV_WAYLAND_USE_EGL
+    #ifdef CONFIG_LV_WAYLAND_USE_EGL
+        #define LV_WAYLAND_USE_EGL CONFIG_LV_WAYLAND_USE_EGL
+    #else
+        #define LV_WAYLAND_USE_EGL 0
+    #endif
+#endif
+
+#ifndef LV_WAYLAND_USE_G2D
+    #ifdef CONFIG_LV_WAYLAND_USE_G2D
+        #define LV_WAYLAND_USE_G2D CONFIG_LV_WAYLAND_USE_G2D
+    #else
+        #define LV_WAYLAND_USE_G2D 0
     #endif
 #endif
 
@@ -4169,6 +4284,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_NANOVG_TEST_HEADLESS
+    #ifdef CONFIG_LV_USE_NANOVG_TEST_HEADLESS
+        #define LV_USE_NANOVG_TEST_HEADLESS CONFIG_LV_USE_NANOVG_TEST_HEADLESS
+    #else
+        #define LV_USE_NANOVG_TEST_HEADLESS 0
+    #endif
+#endif
+
 #ifndef LV_USE_MONKEY
     #ifdef CONFIG_LV_USE_MONKEY
         #define LV_USE_MONKEY CONFIG_LV_USE_MONKEY
@@ -4749,29 +4872,6 @@
     #endif
 #endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
 
-/* Wayland never inferred its backend from LV_USE_OPENGLES; the legacy interface
- * was setting LV_WAYLAND_USE_* directly.  While LV_WAYLAND_AUTO_BACKEND is set we
- * honor any such define, default to SHM, and keep the three mutually exclusive.
- * The #warning fires only if a legacy LV_WAYLAND_USE_* was set by hand. */
-#if LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND
-    #if defined(LV_WAYLAND_USE_EGL) || defined(LV_WAYLAND_USE_G2D) || defined(LV_WAYLAND_USE_SHM)
-        #warning Setting LV_WAYLAND_USE_* directly is deprecated and will be removed in a future release. Set LV_WAYLAND_AUTO_BACKEND to 0 and select a backend with LV_WAYLAND_BACKEND.
-    #endif
-    #ifndef LV_WAYLAND_USE_EGL
-        #define LV_WAYLAND_USE_EGL 0
-    #endif
-    #ifndef LV_WAYLAND_USE_G2D
-        #define LV_WAYLAND_USE_G2D 0
-    #endif
-    #ifndef LV_WAYLAND_USE_SHM
-        #if LV_WAYLAND_USE_EGL || LV_WAYLAND_USE_G2D
-            #define LV_WAYLAND_USE_SHM 0
-        #else
-            #define LV_WAYLAND_USE_SHM 1
-        #endif
-    #endif
-#endif /*LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND*/
-
 #if defined(LV_ASSERT_HANDLER_INCLUDE) && !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
 #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
 #include LV_ASSERT_HANDLER_INCLUDE
@@ -4783,6 +4883,14 @@
  -----------------------------------*/
 
 /* Derived capability flags (set via Kconfig `select`). */
+#ifndef LV_USE_TLSF
+    #if (LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN)
+        #define LV_USE_TLSF 1
+    #else
+        #define LV_USE_TLSF 0
+    #endif
+#endif
+
 #ifndef LV_OS_USE_PTHREAD
     #if (LV_USE_OS == LV_OS_PTHREAD)
         #define LV_OS_USE_PTHREAD 1
@@ -4895,27 +5003,11 @@
     #endif
 #endif
 
-#ifndef LV_WAYLAND_USE_SHM
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_SHM) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_SHM 1
+#ifndef LV_WAYLAND_USE_DMABUF_PROTOCOL
+    #if (((LV_WAYLAND_USE_DMABUF && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) || (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)) && (LV_USE_WAYLAND))
+        #define LV_WAYLAND_USE_DMABUF_PROTOCOL 1
     #else
-        #define LV_WAYLAND_USE_SHM 0
-    #endif
-#endif
-
-#ifndef LV_WAYLAND_USE_EGL
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_EGL 1
-    #else
-        #define LV_WAYLAND_USE_EGL 0
-    #endif
-#endif
-
-#ifndef LV_WAYLAND_USE_G2D
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_G2D 1
-    #else
-        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_DMABUF_PROTOCOL 0
     #endif
 #endif
 
@@ -5139,8 +5231,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
 #endif
 
-#if (LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && !LV_USE_DRAW_G2D
-    #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D"
+#if (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) && !LV_USE_DRAW_G2D
+    #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND"
 #endif
 
 #if LV_USE_G2D_ASSERT && !(LV_USE_DRAW_G2D && LV_USE_DRAW_G2D)
@@ -5239,8 +5331,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_KEYBOARD must be enabled: Kconfig selects it from LV_USE_IME_PINYIN"
 #endif
 
-#if (LV_USE_DROPDOWN || LV_USE_IMAGE || LV_USE_ROLLER || LV_USE_TEXTAREA) && !LV_USE_LABEL
-    #error "LV_USE_LABEL must be enabled: Kconfig selects it from LV_USE_DROPDOWN || LV_USE_IMAGE || LV_USE_ROLLER || LV_USE_TEXTAREA"
+#if (LV_USE_DROPDOWN || LV_USE_ROLLER || LV_USE_TEXTAREA) && !LV_USE_LABEL
+    #error "LV_USE_LABEL must be enabled: Kconfig selects it from LV_USE_DROPDOWN || LV_USE_ROLLER || LV_USE_TEXTAREA"
 #endif
 
 #if LV_USE_LOTTIE && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG)
@@ -5303,8 +5395,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_NUTTX_TRACE_FILE requires LV_USE_PROFILER_BUILTIN && LV_USE_NUTTX (Kconfig depends on)"
 #endif
 
-#if (LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL) && !LV_USE_OPENGLES
-    #error "LV_USE_OPENGLES must be enabled: Kconfig selects it from LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL"
+#if (LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || (LV_WAYLAND_USE_EGL && LV_USE_WAYLAND)) && !LV_USE_OPENGLES
+    #error "LV_USE_OPENGLES must be enabled: Kconfig selects it from LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || (LV_WAYLAND_USE_EGL && LV_USE_WAYLAND)"
 #endif
 
 #if LV_USE_OPENGLES_DEBUG && !(LV_USE_OPENGLES)
@@ -5321,6 +5413,18 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_UEFI_USE_MEMORY_SERVICES && !(LV_USE_UEFI)
     #error "LV_UEFI_USE_MEMORY_SERVICES requires LV_USE_UEFI (Kconfig depends on)"
+#endif
+
+#if LV_WAYLAND_USE_DMABUF && !(!LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)
+    #error "LV_WAYLAND_USE_DMABUF requires !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND (Kconfig depends on)"
+#endif
+
+#if LV_WAYLAND_USE_EGL && !(LV_USE_WAYLAND)
+    #error "LV_WAYLAND_USE_EGL requires LV_USE_WAYLAND (Kconfig depends on)"
+#endif
+
+#if LV_WAYLAND_USE_G2D && !(!LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)
+    #error "LV_WAYLAND_USE_G2D requires !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND (Kconfig depends on)"
 #endif
 
 #if LV_USE_WINDOWS && !(LV_USE_OS == LV_OS_WINDOWS)
@@ -5365,6 +5469,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_TEST_SCREENSHOT_COMPARE && !(LV_USE_TEST)
     #error "LV_USE_TEST_SCREENSHOT_COMPARE requires LV_USE_TEST (Kconfig depends on)"
+#endif
+
+#if LV_USE_NANOVG_TEST_HEADLESS && !(LV_USE_DRAW_NANOVG && LV_USE_TEST)
+    #error "LV_USE_NANOVG_TEST_HEADLESS requires LV_USE_DRAW_NANOVG && LV_USE_TEST (Kconfig depends on)"
 #endif
 
 #if LV_GLOBAL_USE_CUSTOM_INCLUDE && !(LV_ENABLE_GLOBAL_CUSTOM)

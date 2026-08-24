@@ -1,11 +1,20 @@
 ---
 title: SPI Display Driver Creation for STM32
-description: Here is how you can drive a RGB565 240x320 SPI display using STM32 HAL SPI. You can use direct or partial mode.
+description: "Driving an RGB565 240x320 SPI display and an I2C touch panel from an STM32 HAL project, with example flush and read callbacks."
+faqs:
+  - question: "Which render mode does the example use?"
+    answer: "Single-buffered direct mode, but partial mode works too. Performance can be improved by using DMA with double buffering."
+  - question: "When should the display initialization commands be sent?"
+    answer: "Before entering the timer loop. The generated STM32 HAL code initializes the SPI peripheral itself, based on the STM32CubeIDE or STM32CubeMX configuration."
+  - question: "Why does the flush callback check lv_display_flush_is_last()?"
+    answer: "In direct mode LVGL renders into the full-size buffer and flushes it once per refresh, so the whole buffer only needs to be transmitted on the last flush call."
+  - question: "How does the touch driver know when data is available?"
+    answer: "Through an interrupt pin. The STM32 HAL calls HAL_GPIO_EXTI_Falling_Callback(), which sets a flag that the read callback checks with the interrupt temporarily disabled."
 ---
 
 ## Display Driver
 
-Here is how you can drive a RGB565 240x320 SPI display using STM32 HAL SPI.
+Here is how you can drive an RGB565 240x320 SPI display using STM32 HAL SPI.
 You can use direct or partial mode. Single-buffered direct is shown in this example.
 See the [Display](/main-modules/display) module for general background on LVGL displays.
 
@@ -45,7 +54,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
 Performance can be improved by using DMA with double buffering.
 
-## Touch indev
+## Touch Input Device
 
 In your initialization code, create the touch screen [input device](/main-modules/indev).
 
@@ -58,7 +67,7 @@ lv_indev_set_read_cb(indev, touch_read);
 The generated STM32 HAL code should initialize the I2C peripheral for you based
 on the configuration values in STM32CubeIDE or STM32CubeMX.
 
-Here is an example implementation of a touch driver that uses i2c
+Here is an example implementation of a touch driver that uses I2C
 communication and an interrupt pin to signal available data.
 
 ```c

@@ -169,7 +169,7 @@ lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider);
  * @param obj       pointer to a slider object
  * @return          slider orientation from `lv_slider_orientation_t`
  */
-lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * slider);
+lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * obj);
 
 /**
  * Give the slider is in symmetrical mode or not

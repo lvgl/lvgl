@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_OBSERVER && LV_USE_ARC && LV_USE_LABEL && LV_USE_BUTTON && LV_USE_SPINNER && LV_BUILD_EXAMPLES
 
+/*The UI is built from the deprecated `lv_win` widget.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 typedef enum {
     FW_UPDATE_STATE_IDLE,
     FW_UPDATE_STATE_CONNECTING,
@@ -170,5 +173,7 @@ static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t
         lv_timer_create(download_timer_cb, 50, NULL);
     }
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

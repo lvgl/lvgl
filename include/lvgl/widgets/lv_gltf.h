@@ -382,7 +382,7 @@ lv_gltf_aa_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj);
 /**
  * Get the point that a given ray intersects with a specified plane at, if any
  * @param ray the intersection test ray
- * @param screen_y the plane to test ray intersection with
+ * @param plane    the plane to test ray intersection with
  * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
  * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
  */
@@ -410,7 +410,7 @@ lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t *
  * Get the screen position of a 3d point
  * @param obj pointer to a GLTF viewer object
  * @param world_pos world position to convert
- * @param lv_point_t the resulting point, in pixels. only valid if return value is true
+ * @param screen_pos the resulting point, in pixels. only valid if return value is true
  * @return LV_RESULT_OK if conversion valid, LV_RESULT_INVALID if no valid conversion
  */
 lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, lv_point_t * screen_pos);

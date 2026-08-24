@@ -161,7 +161,7 @@ typedef struct {
 
     /**
      * Store kerning values.
-     * Can be `lv_font_fmt_txt_kern_pair_t *  or `lv_font_kern_classes_fmt_txt_t *`
+     * Can be @ref lv_font_fmt_txt_kern_pair_t * or @ref lv_font_fmt_txt_kern_classes_t *
      * depending on `kern_classes`
      */
     const void * kern_dsc;
@@ -219,7 +219,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
  * @param unicode_letter a UNICODE letter code
  * @param unicode_letter_next the unicode letter succeeding the letter under test
  * @return true: descriptor is successfully loaded into `dsc_out`.
- *         false: the letter was not found, no data is loaded to `dsc_out`
+ *         false: the letter was not found, no data is loaded to `dsc_out`.
  */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next);

@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*This example shows the deprecated `lv_file_explorer` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static void file_explorer_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -56,6 +59,8 @@ static void dd_event_handler(lv_event_t * e)
 /**
  * @title Quick access toggle and sort control
  * @brief File explorer with a header button to hide quick access and a dropdown to change sort mode.
+ *
+ * @deprecated The `lv_file_explorer` widget is deprecated. See `lv_example_table_file_browser`.
  *
  * Adds a checkable button and a dropdown into the file explorer's header
  * (`lv_file_explorer_get_header`). Toggling the button adds or removes
@@ -156,5 +161,7 @@ void lv_example_file_explorer_2(void)
     lv_obj_add_event_cb(dd, dd_event_handler, LV_EVENT_VALUE_CHANGED, file_explorer);
 #endif
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

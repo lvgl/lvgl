@@ -225,25 +225,34 @@ void test_table_rendering(void)
     g_inv_count = 0;
     lv_display_add_event_cb(lv_display_get_default(), invalidate_area_event_cb, LV_EVENT_INVALIDATE_AREA, NULL);
     lv_table_set_cell_value(table, 1, 0, "changed");
-    TEST_ASSERT_EQUAL_INT32(1, g_inv_count);
-    int32_t merged_col_width = lv_table_get_column_width(table, 0) + lv_table_get_column_width(table, 1)
-                               + lv_table_get_column_width(table, 2) + lv_table_get_column_width(table, 3)
-                               + lv_table_get_column_width(table, 4);
+
+    /* In FULL render mode lv_inv_area() requests a whole-screen redraw and never emits
+     * LV_EVENT_INVALIDATE_AREA, so the precise per-cell invalidated-area check below only
+     * applies to partial/direct rendering. In FULL mode just verify the change is accepted. */
+    if(lv_display_get_render_mode(lv_display_get_default()) == LV_DISPLAY_RENDER_MODE_FULL) {
+        TEST_ASSERT_EQUAL_INT32(0, g_inv_count);
+    }
+    else {
+        TEST_ASSERT_EQUAL_INT32(1, g_inv_count);
+        int32_t merged_col_width = lv_table_get_column_width(table, 0) + lv_table_get_column_width(table, 1)
+                                   + lv_table_get_column_width(table, 2) + lv_table_get_column_width(table, 3)
+                                   + lv_table_get_column_width(table, 4);
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
-    /**
-     * From `lv_obj_pos`:
-     *
-     * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
-     * which can be solved by expanding the redrawing area.
-     * lv_area_increase(&area_tmp, 5, 5);
-     *
-     * This accommodates for this specific calculation.
-     */
-    TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width + 10);
+        /**
+         * From `lv_obj_pos`:
+         *
+         * When using the global matrix, the vertex coordinates of clip_area lose precision after
+         * transformation, which can be solved by expanding the redrawing area.
+         * lv_area_increase(&area_tmp, 5, 5);
+         *
+         * This accommodates for this specific calculation.
+         */
+        TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width + 10);
 #else
-    TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width);
+        TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width);
 #endif
+    }
 }
 
 /* See #3120 for context */

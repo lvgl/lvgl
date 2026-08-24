@@ -1149,7 +1149,7 @@ static void update_layout_completed_cb(lv_event_t * e)
 
 /**
  * Refresh the label with its text stored in its extended data
- * @param label pointer to a label object
+ * @param obj   pointer to a label object
  */
 static void lv_label_refr_text(lv_obj_t * obj)
 {

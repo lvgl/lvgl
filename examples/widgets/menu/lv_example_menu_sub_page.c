@@ -1,9 +1,14 @@
 #include "../../lv_examples.h"
 #if LV_USE_MENU && LV_BUILD_EXAMPLES
 
+/*This example shows the deprecated `lv_menu` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 /**
  * @title Basic menu with sub page
  * @brief A three-item main page whose third entry opens a hidden sub page.
+ *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  *
  * A display-sized `lv_menu` holds a main page with three
  * `lv_menu_cont` items labeled `Item 1`, `Item 2`, and
@@ -47,5 +52,7 @@ void lv_example_menu_sub_page(void)
 
     lv_menu_set_page(menu, main_page);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif
