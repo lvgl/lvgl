@@ -180,12 +180,39 @@ static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t 
  */
 static inline int32_t lv_ppa_pic_w(uint32_t stride, int32_t w, lv_color_format_t cf)
 {
-    if(stride == 0) return w;   /* Not filled in yet; the pitch is the width. */
+    /* LV_STRIDE_AUTO. lv_image_decoder_open() resolves it to width * pixel size
+     * (img_width_to_stride(), no alignment applied), so the pitch is the width. */
+    if(stride == LV_STRIDE_AUTO) return w;
 
     uint8_t px_size = lv_color_format_get_size(cf);
     if(px_size == 0 || (stride % px_size) != 0) return 0;
 
     return (int32_t)(stride / px_size);
+}
+
+/**
+ * The stride the draw will actually see, predicted from a source image header.
+ *
+ * ppa_evaluate() runs before the image is decoded, so the header is all it has,
+ * and the header stride is not always what comes back. When
+ * LV_DRAW_BUF_STRIDE_ALIGN is not 1, lv_image_decoder_open() passes
+ * stride_align = true and lv_image_decoder_post_process() re-strides the decoded
+ * buffer to lv_draw_buf_width_to_stride() - which can turn a describable stride
+ * into one that is not, and the other way round.
+ *
+ * Predicting the same value keeps the gate honest in both directions. It stays a
+ * prediction, so the draw paths check the real strides and fall back to software
+ * rather than trusting it.
+ */
+static inline uint32_t lv_ppa_decoded_stride(uint32_t stride, int32_t w, lv_color_format_t cf)
+{
+#if LV_DRAW_BUF_STRIDE_ALIGN != 1
+    /* RGB565A8 is the one format post-processing leaves alone. */
+    if(cf != LV_COLOR_FORMAT_RGB565A8) return lv_draw_buf_width_to_stride((uint32_t)w, cf);
+#endif
+    LV_UNUSED(w);
+    LV_UNUSED(cf);
+    return stride;
 }
 
 #define PPA_ALIGN_UP(x, align)  ((((x) + (align) - 1) / (align)) * (align))

@@ -12,6 +12,9 @@
 
 #include "../../lv_draw_image_private.h"
 #include "../../../image/lv_image_decoder_private.h"
+#if LV_USE_DRAW_SW
+    #include "../../sw/lv_draw_sw.h"
+#endif
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
@@ -165,8 +168,18 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     int32_t src_pitch  = lv_ppa_pic_w(decoded->header.stride, (int32_t)src_w, src_cf);
     int32_t dest_pitch = lv_ppa_pic_w(dest_buf->header.stride, dest_buf->header.w, dest_cf);
     if(src_pitch == 0 || dest_pitch == 0) {
-        LV_LOG_WARN("PPA SRM: stride is not a whole number of pixels");
+        /* The task has already been assigned to this unit, so returning would
+         * finish it having drawn nothing and leave a hole on the screen. Hand
+         * the draw to the software unit instead, as lv_draw_pxp.c does for
+         * fills. ppa_evaluate() predicts this case, but it only sees the source
+         * header before decoding, so the real check belongs here. */
+        LV_LOG_INFO("PPA SRM: stride is not a whole number of pixels, drawing in software");
         lv_image_decoder_close(&decoder_dsc);
+#if LV_USE_DRAW_SW
+        lv_draw_sw_image(t, dsc, &t->area);
+#else
+        LV_LOG_WARN("PPA SRM: no software draw unit to fall back on, image skipped");
+#endif
         return;
     }
 
@@ -345,8 +358,18 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     int32_t src_pitch  = lv_ppa_pic_w(decoded->header.stride, (int32_t)src_w, src_cf);
     int32_t dest_pitch = lv_ppa_pic_w(dest_buf->header.stride, dest_buf->header.w, dest_cf);
     if(src_pitch == 0 || dest_pitch == 0) {
-        LV_LOG_WARN("PPA SRM: stride is not a whole number of pixels");
+        /* The task has already been assigned to this unit, so returning would
+         * finish it having drawn nothing and leave a hole on the screen. Hand
+         * the draw to the software unit instead, as lv_draw_pxp.c does for
+         * fills. ppa_evaluate() predicts this case, but it only sees the source
+         * header before decoding, so the real check belongs here. */
+        LV_LOG_INFO("PPA SRM: stride is not a whole number of pixels, drawing in software");
         lv_image_decoder_close(&decoder_dsc);
+#if LV_USE_DRAW_SW
+        lv_draw_sw_image(t, dsc, &t->area);
+#else
+        LV_LOG_WARN("PPA SRM: no software draw unit to fall back on, image skipped");
+#endif
         return;
     }
 

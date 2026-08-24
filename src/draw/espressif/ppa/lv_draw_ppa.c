@@ -132,12 +132,22 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 }
 
                 /* The PPA describes a picture by its width in pixels and derives
-                 * the row pitch from it, so a source whose stride is padded has to
-                 * be describable as a whole number of pixels. LVGL's image
-                 * converter does pad it - the benchmark logo is 100 px wide with a
-                 * 448 byte stride - and RGB888 padded to 320 bytes is not a whole
-                 * number of pixels at all. Leave those to software. */
-                if(lv_ppa_pic_w(dsc->header.stride, dsc->header.w, dsc->header.cf) == 0) return 0;
+                 * the row pitch from it, so every buffer it is given has to be a
+                 * whole number of pixels wide. LVGL's image converter pads strides
+                 * - the benchmark logo is 100 px wide with a 448 byte stride - and
+                 * RGB888 padded to 320 bytes is not a whole number of pixels at
+                 * all. Keep those away from this unit.
+                 *
+                 * The source stride is a prediction: the image is not decoded yet.
+                 * The destination is exact when the layer buffer already exists,
+                 * and skipped when it does not - it is allocated in ppa_dispatch().
+                 * The draw paths re-check both against the real buffers. */
+                if(lv_ppa_pic_w(lv_ppa_decoded_stride(dsc->header.stride, dsc->header.w, dsc->header.cf),
+                                dsc->header.w, dsc->header.cf) == 0) return 0;
+
+                const lv_draw_buf_t * dest = dsc->base.layer->draw_buf;
+                if(dest != NULL &&
+                   lv_ppa_pic_w(dest->header.stride, dest->header.w, dest->header.cf) == 0) return 0;
 
                 /* PPA SRM can only rotate in exact 90-degree steps. */
                 if(dsc->rotation != 0) {
