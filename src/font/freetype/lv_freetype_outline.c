@@ -131,6 +131,11 @@ static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, 
                              node->glyph_index,
                              dsc->cache_node->ref_size,
                              (dsc->style & LV_FREETYPE_FONT_STYLE_BOLD) && !FT_HAS_MULTIPLE_MASTERS(dsc->cache_node->face) ? 1 : 0);
+    /*outline_create() sets the face to ref_size; keep the skip cache accurate
+     *so the next consumer re-applies its own size. On failure the face size
+     *is unknown (the set may have succeeded before the load failed), so
+     *invalidate instead.*/
+    dsc->cache_node->last_pixel_size = outline ? dsc->cache_node->ref_size : 0;
     lv_mutex_unlock(&dsc->cache_node->face_lock);
 
     if(!outline) {
