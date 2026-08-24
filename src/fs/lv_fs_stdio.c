@@ -106,6 +106,7 @@ void lv_fs_stdio_init(void)
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
+    LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
 
     const char * flags = "";
@@ -131,6 +132,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
  */
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
     fclose(file_p);
     return LV_FS_RES_OK;
@@ -148,6 +150,9 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(buf != NULL || btr == 0);
+    LV_ASSERT(br != NULL);
     LV_UNUSED(drv);
     *br = fread(buf, 1, btr, file_p);
     return (int32_t)(*br) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -164,6 +169,9 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(buf != NULL || btw == 0);
+    LV_ASSERT(bw != NULL);
     LV_UNUSED(drv);
     *bw = fwrite(buf, 1, btw, file_p);
     return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -179,6 +187,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  */
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
     int w;
     switch(whence) {
@@ -209,6 +218,8 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(pos_p != NULL);
     LV_UNUSED(drv);
     *pos_p = ftell(file_p);
     return LV_FS_RES_OK;
@@ -222,6 +233,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
  */
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
+    LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
     dir_handle_t * handle = (dir_handle_t *)lv_malloc(sizeof(dir_handle_t));
 #ifndef WIN32
@@ -278,6 +290,8 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
  */
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
 {
+    LV_ASSERT(dir_p != NULL);
+    LV_ASSERT(fn != NULL);
     LV_UNUSED(drv);
     if(fn_len == 0) return LV_FS_RES_INV_PARAM;
 
@@ -329,6 +343,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
  */
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
+    LV_ASSERT(dir_p != NULL);
     LV_UNUSED(drv);
     dir_handle_t * handle = (dir_handle_t *)dir_p;
 #ifndef WIN32
