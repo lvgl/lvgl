@@ -16,16 +16,96 @@ Widget that generates and displays QR Codes using the library.
 
 Enable <ApiLink name="LV_USE_QRCODE" /> in `lv_conf.h` by setting its value to `1`.
 
-Use <ApiLink name="lv_qrcode_create" /> to create the QR-Code Widget.  Then use
-<ApiLink name="lv_qrcode_update" /> to generate the QR Code on it.
+Use <ApiLink name="lv_qrcode_create" /> to create the QR-Code Widget. Then set the
+data to encode with <ApiLink name="lv_qrcode_update" /> for arbitrary binary data, or
+with <ApiLink name="lv_qrcode_set_data" /> for a NUL terminated string.
 
-If you need to re-modify the size and color, use
-<ApiLink name="lv_qrcode_set_size" /> and <ApiLink name="lv_qrcode_set_dark_color" /> or
-<ApiLink name="lv_qrcode_set_light_color" /> respectively, and then
-call <ApiLink name="lv_qrcode_update" /> again to update the QR Code.
+The appearance can be configured with <ApiLink name="lv_qrcode_set_size" />,
+<ApiLink name="lv_qrcode_set_dark_color" />, <ApiLink name="lv_qrcode_set_light_color" />
+and <ApiLink name="lv_qrcode_set_quiet_zone" />. These can be called in any order,
+before or after setting the data - a copy of the payload is kept, so a change that
+needs a different bitmap re-encodes it automatically.
+
+### Update mode
+
+Setting the size or the quiet zone re-encodes the stored payload. By default that
+happens inside the setter, so several such changes in a row encode the bitmap several
+times. <ApiLink name="lv_qrcode_set_update_mode" /> collapses them into one:
+
+- `LV_QRCODE_UPDATE_MODE_IMMEDIATE` (the default) re-encodes as soon as a property
+  changes.
+- `LV_QRCODE_UPDATE_MODE_DEFERRED` only marks the bitmap as out of date. You are then
+  expected to encode it once, explicitly, when the changes are done.
+
+```c
+lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_DEFERRED);
+lv_qrcode_set_size(qr, 200);
+lv_qrcode_set_quiet_zone(qr, true);
+
+lv_qrcode_render(qr);   /* encode once, here, and get the result */
+```
+
+<ApiLink name="lv_qrcode_render" /> re-encodes the payload the Widget already stores, so
+unlike <ApiLink name="lv_qrcode_update" /> it does not need the data passed in again.
+
+If that call is forgotten the bitmap is still correct - the redraw notices it is out of
+date and encodes it - but that is a fallback, not the intended flow, and it logs a
+warning. Two things are worse about it: the encode is charged to that refresh instead of
+to your own code, and nothing is left to return the result to, so an unencodable payload
+fails silently. Prefer the explicit call.
+
+Switching back to `LV_QRCODE_UPDATE_MODE_IMMEDIATE` while the bitmap is still out of
+date also encodes it, but <ApiLink name="lv_qrcode_set_update_mode" /> returns `void`, so
+a failure there can only be logged - and it warns to say the result was not reported.
+Render first and switch the mode afterwards if you want the result:
+
+```c
+lv_qrcode_render(qr);                                            /* result available here */
+lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_IMMEDIATE);  /* nothing left to encode */
+```
+
+The mode does not affect setting the data: <ApiLink name="lv_qrcode_update" /> and
+<ApiLink name="lv_qrcode_set_data" /> always encode right away and return the result,
+so an unencodable payload is reported to the caller. The colors are never affected
+either - they are a palette write in both modes.
+
+### Detecting a failed re-encode
+
+`lv_qrcode_update()` and `lv_qrcode_render()` return the encode result, but the
+re-encodes triggered by a property change cannot: `lv_qrcode_set_size()` and `lv_qrcode_set_quiet_zone()` return
+`void`, and in deferred mode the work happens in the draw pass. A payload that no longer
+fits - typically after shrinking the object - therefore fails without anything returning
+an error. <ApiLink name="lv_qrcode_get_render_failed" /> reports that state:
+
+```c
+lv_qrcode_set_size(qr, 10);   /* too small for this payload */
+if(lv_qrcode_get_render_failed(qr)) {
+    /* the bitmap is blank; pick a larger size */
+}
+```
+
+It is also `true` on a fresh QR code that has no data yet, and becomes `false` again as
+soon as an encode succeeds.
+
+A failed encode leaves the bitmap marked as out of date, so it is never mistaken for a
+current one, and it is not retried on every redraw - only a property change makes the
+Widget try again.
+
+Encode failures are not logged when the caller can see the result: `lv_qrcode_update()`
+and `lv_qrcode_render()` return it, and the property setters are silent because the state
+is available from `lv_qrcode_get_render_failed()`. Animating a size through values that
+are all too small therefore produces no log output at all. The one exception is the
+re-encode done by the redraw - there is no caller to return anything to, so that failure
+is logged, along with the warning that the explicit render call was missed.
 
 ## Notes
 
 - QR Codes with less data are smaller, but they are scaled by an integer
-   value to best fit to the given size.
+   value to best fit to the given size. If the size is too small to fit even one
+   pixel per QR Code module, the bitmap cannot be generated and
+   <ApiLink name="lv_qrcode_update" /> reports `LV_RESULT_INVALID`. Enabling the
+   quiet zone needs more room, so a size that works without it may be too small
+   with it.
+- Changing the color (dark or light) only updates the palette, so it is cheap
+   and never triggers a re-encode of the QR Code.
 

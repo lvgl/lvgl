@@ -116,19 +116,19 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y);
 
 /**
  * Get the image of the canvas as a pointer to an `lv_image_dsc_t` variable.
- * @param canvas    pointer to a canvas object
+ * @param obj       pointer to a canvas object
  * @return          pointer to the image descriptor.
  */
-lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * canvas);
+lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * obj);
 
 /**
  * Return the pointer for the buffer.
  * It's recommended to use this function instead of the buffer form the
  * return value of lv_canvas_get_image() as is can be aligned
- * @param canvas    pointer to a canvas object
+ * @param obj       pointer to a canvas object
  * @return          pointer to the buffer
  */
-const void * lv_canvas_get_buf(lv_obj_t * canvas);
+const void * lv_canvas_get_buf(lv_obj_t * obj);
 
 /*=====================
  * Other functions
@@ -157,10 +157,10 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa);
 /**
  * Initialize a layer to use LVGL's generic draw functions (lv_draw_rect/label/...) on the canvas.
  * Needs to be usd in pair with `lv_canvas_finish_layer`.
- * @param canvas    pointer to a canvas
+ * @param obj       pointer to a canvas
  * @param layer     pointer to a layer variable to initialize
  */
-void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer);
+void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer);
 
 /**
  * Wait until all the drawings are finished on layer.

@@ -1,0 +1,36 @@
+config LV_USE_PXP
+	bool "PXP (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_PXP]"
+	default n
+	help
+	  Deprecated and non-functional. Use LV_USE_DRAW_PXP instead.
+
+config LV_USE_DRAW_PXP
+	bool "PXP renderer"
+	default n
+	help
+		Accelerate blends, fills and transforms with the PXP (Pixel Pipeline)
+		engine of NXP i.MX RT SoCs.
+
+if LV_USE_DRAW_PXP
+
+config LV_USE_ROTATE_PXP
+	bool "Display rotation"
+	default n
+	help
+		Rotate the rendered display buffer with the PXP instead of the CPU.
+
+config LV_USE_PXP_DRAW_THREAD
+	bool "Dedicated draw thread"
+	depends on !LV_OS_NONE
+	default y
+	help
+		Dispatch PXP operations from their own thread so the CPU can keep
+		rendering in parallel. Needs an OS.
+
+config LV_USE_PXP_ASSERT
+	bool "Asserts"
+	help
+		Check the status of every PXP call and assert on failure. Useful while
+		bringing up a board.
+
+endif

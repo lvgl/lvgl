@@ -10,13 +10,13 @@ driver for 262,144-color, a-Si TFT liquid crystal display
 with maximum resolution of 168RGBx428 dots. It contains 252-channel source driver,
 a 24-channel GIP driver which used for dual-gate control, 161,784-byte GRAM for
 graphic display data, internal precise power supply circuit which supports full color,
-8-color display mode and sleep mode
-NV3007 supports 3-/4-line serial peripheral interface (SPI) ， quad serial
+8-color display mode and sleep mode.
+NV3007 supports 3-/4-line serial peripheral interface (SPI) and quad serial
 peripheral interface (QSPI). The display area can be specified in internal GRAM by
 window address function.
 
 The NV3007 LCD controller [driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/display/nv3007)
-is a platform-agnostic driver, based on the generic MIPI driver.
+is a platform-agnostic driver, based on the [generic MIPI driver](/integration/external_display_controllers/gen_mipi).
 It implements display initialization, supports display rotation and implements the
 display flush callback. The user needs to implement only two platform-specific
 functions to send a command or pixel data to the controller via SPI or parallel bus.
@@ -92,6 +92,12 @@ Here is a simple example of using the NV3007 display with Arduino framework and 
 #define BUFFER_SIZE 142 * 50
 uint8_t buf[BUFFER_SIZE];
 
+/*  Tell LVGL how much time has elapsed */
+static uint32_t my_tick(void)
+{
+    return millis();
+}
+
 /*  Define your platform-specific functions to send commands and data */
 void my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
 {
@@ -165,7 +171,7 @@ void setup()
     lv_nv3007_set_gap(disp, 0, 14);
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
-    lv_display_set_buffers(disp, buf, NULL, BUFFER_SIZE, LV_DISP_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(disp, buf, NULL, BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /*  Create a simple label on the display */
     lv_obj_t *label = lv_label_create(lv_screen_active());
@@ -180,5 +186,5 @@ void loop()
 }
 ```
 
-For additional details and a working example see the generic MIPI driver
-documentation.
+For additional details and a working example see the
+[generic MIPI driver](/integration/external_display_controllers/gen_mipi) documentation.

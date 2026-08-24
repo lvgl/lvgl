@@ -108,7 +108,7 @@ void test_ime_pinyin_get_cand_panel(void)
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
     TEST_ASSERT_NOT_NULL(cand_panel);
-    TEST_ASSERT_TRUE(lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN));
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(cand_panel));
 }
 
 /* Test mode switching */
@@ -177,7 +177,7 @@ void test_ime_pinyin_kb_event(void)
     TEST_ASSERT_NOT_NULL(cand_panel);
 
     /* Verify cand_panel is initially hidden */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN));
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(cand_panel));
 
     /* Simulate keyboard button click for 'n' */
     lv_buttonmatrix_set_selected_button(g_kb, 26); /* 'n' key position */
@@ -374,7 +374,7 @@ void test_ime_pinyin_cand_panel_visibility(void)
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
 
     /* Initially hidden */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN));
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(cand_panel));
 
     /* After entering some text, it should be visible (if valid pinyin) */
     /* This is tested indirectly by verifying the structure */
@@ -773,7 +773,7 @@ void test_ime_pinyin_cand_selection(void)
     lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
 
     /* If candidates exist, simulate selection */
-    if(ime->cand_num > 0 && !lv_obj_has_flag(ime->cand_panel, LV_OBJ_FLAG_HIDDEN)) {
+    if(ime->cand_num > 0 && !lv_obj_is_hidden(ime->cand_panel)) {
         /* Select first candidate (button id 1, 0 is left arrow) */
         lv_buttonmatrix_set_selected_button(ime->cand_panel, 1);
         lv_obj_send_event(ime->cand_panel, LV_EVENT_VALUE_CHANGED, NULL);
@@ -957,7 +957,7 @@ void test_ime_pinyin_cand_page_buttons(void)
     press_button_by_text(g_kb, "n");
 
     /* If candidate panel is visible, test navigation */
-    if(!lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN) && ime->cand_num > 0) {
+    if(!lv_obj_is_hidden(cand_panel) && ime->cand_num > 0) {
         /* Try to click left/right buttons on candidate panel */
         lv_buttonmatrix_set_selected_button(cand_panel, 0); /* Left button */
         lv_obj_send_event(cand_panel, LV_EVENT_VALUE_CHANGED, NULL);

@@ -15,7 +15,6 @@
 
 #include "lv_draw_pxp.h"
 
-#if LV_USE_PXP
 #if LV_USE_DRAW_PXP
 #include "../../lv_draw_buf_private.h"
 #include "lv_pxp_cfg.h"
@@ -114,4 +113,3 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 }
 
 #endif /*LV_USE_DRAW_PXP*/
-#endif /*LV_USE_PXP*/

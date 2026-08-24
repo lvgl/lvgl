@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_WIN && LV_BUILD_EXAMPLES
 
+/*This example shows the deprecated `lv_win` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static void event_handler(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target_obj(e);
@@ -11,6 +14,9 @@ static void event_handler(lv_event_t * e)
 /**
  * @title Window with title and toolbar buttons
  * @brief A window whose header carries three symbol buttons over a scrollable label body.
+ *
+ * @deprecated The `lv_win` widget is deprecated. See `lv_example_flex_win` for the
+ * recommended way to build a window from a flex container.
  *
  * `lv_win_create` fills the active screen and `lv_win_add_button`
  * places a 40 px `LV_SYMBOL_LEFT`, a 40 px `LV_SYMBOL_RIGHT`, and a
@@ -51,5 +57,7 @@ void lv_example_win_toolbar(void)
                       "sure it\n"
                       "overflows. :)");
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

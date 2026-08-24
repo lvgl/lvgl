@@ -1,0 +1,39 @@
+config LV_USE_G2D
+	bool "G2D (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_G2D]"
+	default n
+	help
+	  Deprecated and non-functional. Use LV_USE_DRAW_G2D instead.
+
+config LV_USE_DRAW_G2D
+	bool "G2D renderer"
+	default n
+	help
+		Accelerate blends, fills and image blits with the NXP G2D API (i.MX 2D GPU).
+		Requires the g2d library and its headers.
+
+if LV_USE_DRAW_G2D
+
+config LV_G2D_HASH_TABLE_SIZE
+	int "Buffer hash table size (entries)"
+	default 50
+	help
+		Maximum number of buffers mapped for the G2D draw unit, including frame
+		buffers and assets. Drawing asserts once the table is full.
+
+config LV_USE_G2D_DRAW_THREAD
+	bool "Dedicated draw thread"
+	depends on !LV_OS_NONE
+	default y
+	help
+		Dispatch G2D operations from their own thread so the CPU can keep
+		rendering in parallel. Needs an OS.
+
+config LV_USE_G2D_ASSERT
+	bool "Asserts"
+	depends on LV_USE_DRAW_G2D
+	default n
+	help
+		Check the status of every G2D call and assert on failure. Useful while
+		bringing up a board.
+
+endif

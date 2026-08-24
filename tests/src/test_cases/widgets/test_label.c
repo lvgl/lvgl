@@ -890,7 +890,14 @@ void test_label_invalidate_area(void)
 {
     int i = 0;
     label = lv_label_create(lv_screen_active());
-    lv_display_add_event_cb(lv_display_get_default(), display_invalidate_area_cb, LV_EVENT_INVALIDATE_AREA, &i);
+
+    /* In FULL render mode lv_inv_area() requests a whole-screen redraw via
+     * LV_EVENT_REFR_REQUEST and never emits LV_EVENT_INVALIDATE_AREA, so listen
+     * for whichever event signals "something got invalidated" for this display. */
+    lv_display_t * disp = lv_display_get_default();
+    lv_event_code_t inv_event = (lv_display_get_render_mode(disp) == LV_DISPLAY_RENDER_MODE_FULL)
+                                ? LV_EVENT_REFR_REQUEST : LV_EVENT_INVALIDATE_AREA;
+    lv_display_add_event_cb(disp, display_invalidate_area_cb, inv_event, &i);
     i = 0;
     lv_label_set_text_static(label, "Hello world");
     TEST_ASSERT(i > 0);

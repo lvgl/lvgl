@@ -1,0 +1,101 @@
+config LV_USE_NUTTX
+	bool "NuttX"
+	default n
+	help
+		Display and input drivers for NuttX, including the /dev/fb framebuffer device.
+
+if LV_USE_NUTTX
+
+config LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+	bool "Independent image heap"
+	default n
+	help
+		Allocate cached image buffers from a separate NuttX heap to keep the main heap from fragmenting.
+
+config LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+	bool "Independent image heap for the default draw buffer"
+	depends on LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+	default n
+
+config LV_USE_NUTTX_LIBUV
+	bool "libuv event loop"
+	default n
+	help
+		Drive the LVGL timer handler and the display/input timers from a libuv loop instead of the default timer loop.
+
+config LV_USE_NUTTX_CUSTOM_INIT
+	bool "Custom init API"
+	default n
+	help
+		Skip the display and input device creation in lv_nuttx_init() so the application can set them up itself.
+
+config LV_USE_NUTTX_LCD
+	bool "LCD device"
+	default n
+	help
+		Create the display on a NuttX LCD character device instead of the framebuffer device.
+
+choice
+	prompt "LCD buffer size"
+	depends on LV_USE_NUTTX_LCD
+	default LV_NUTTX_LCD_CUSTOM_BUFFER
+
+	config LV_NUTTX_LCD_SINGLE_BUFFER
+		bool "One screen-sized buffer"
+
+	config LV_NUTTX_LCD_DOUBLE_BUFFER
+		bool "Two screen-sized buffers"
+
+	config LV_NUTTX_LCD_CUSTOM_BUFFER
+		bool "Custom-sized buffer"
+
+endchoice
+
+config LV_NUTTX_LCD_BUFFER_COUNT
+	int
+	default 0 if LV_NUTTX_LCD_CUSTOM_BUFFER
+	default 1 if LV_NUTTX_LCD_SINGLE_BUFFER
+	default 2 if LV_NUTTX_LCD_DOUBLE_BUFFER
+
+config LV_NUTTX_LCD_BUFFER_SIZE
+	int "Custom partial buffer size (rows)"
+	depends on LV_NUTTX_LCD_CUSTOM_BUFFER
+	depends on LV_USE_NUTTX_LCD
+	default 60
+	
+
+config LV_USE_NUTTX_TOUCHSCREEN
+	bool "Touchscreen"
+	default n
+
+config LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+	int "Touchscreen cursor size (px)"
+	depends on LV_USE_NUTTX_TOUCHSCREEN
+	default 0
+	help
+		0 disables the cursor.
+
+config LV_USE_NUTTX_MOUSE
+	bool "Mouse"
+	default n
+
+config LV_USE_NUTTX_MOUSE_MOVE_STEP
+	int "Mouse movement step (pixels)"
+	depends on LV_USE_NUTTX_MOUSE
+	range 1 10
+	default 1
+
+config LV_USE_NUTTX_TRACE_FILE
+	bool "Profiler trace file"
+	depends on LV_USE_PROFILER_BUILTIN
+	default n
+	help
+		Write the built-in profiler output to a file instead of the console.
+
+config LV_NUTTX_TRACE_FILE_PATH
+	depends on LV_USE_NUTTX_TRACE_FILE
+	string "Profiler trace file path"
+	default "/data/lvgl-trace.log"
+
+
+endif #LV_USE_NUTTX

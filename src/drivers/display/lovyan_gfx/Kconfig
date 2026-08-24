@@ -1,0 +1,13 @@
+config LV_USE_LOVYAN_GFX
+	bool "LovyanGFX"
+	default n
+	help
+		Display and touch driver built on the LovyanGFX C++ library, which must be available in the build.
+
+if LV_USE_LOVYAN_GFX
+
+config LV_LGFX_USER_INCLUDE
+	string "Header for LovyanGFX user configuration"
+	default "lv_lgfx_user.hpp"
+
+endif #LV_USE_LOVYAN_GFX

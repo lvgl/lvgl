@@ -116,9 +116,9 @@ void lv_draw_sw_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * ds
 
 #else /*LV_DRAW_SW_COMPLEX*/
 
-void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_dsc_t * dsc)
+void lv_draw_sw_mask_rect(lv_draw_unit_t * t, const lv_draw_mask_rect_dsc_t * dsc)
 {
-    LV_UNUSED(draw_unit);
+    LV_UNUSED(t);
     LV_UNUSED(dsc);
 
     LV_LOG_WARN("LV_DRAW_SW_COMPLEX needs to be enabled");

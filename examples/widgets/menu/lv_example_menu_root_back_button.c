@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_MENU && LV_USE_MSGBOX && LV_BUILD_EXAMPLES
 
+/*This example shows the deprecated `lv_menu` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static void back_event_handler(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target_obj(e);
@@ -17,6 +20,8 @@ static void back_event_handler(lv_event_t * e)
 /**
  * @title Menu with root back button
  * @brief A menu whose always-visible root back button pops a message box when tapped.
+ *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  *
  * `lv_menu_set_mode_root_back_button` turns on
  * `LV_MENU_ROOT_BACK_BUTTON_ENABLED` so the back button remains on
@@ -63,5 +68,7 @@ void lv_example_menu_root_back_button(void)
 
     lv_menu_set_page(menu, main_page);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

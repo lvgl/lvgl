@@ -542,7 +542,7 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time)
 
 void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
-    LV_LOG_WARN("Deprecated: use the normal text_align style property instead");
+    LV_LOG_DEPRECATED("Use text_align style property instead");
     lv_obj_set_style_text_align(obj, align, 0);
 
     switch(align) {
@@ -848,8 +848,8 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_label_set_text(ta->label, "");
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_STYLE_CHANGED, NULL);
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_SIZE_CHANGED, NULL);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+    lv_obj_set_scroll_on_focus(obj, true);
+    lv_obj_set_scroll_with_arrow(obj, false);
 
     lv_textarea_set_cursor_pos(obj, 0);
 
@@ -949,8 +949,8 @@ static void label_event_cb(lv_event_t * e)
 
 /**
  * Called to blink the cursor
- * @param ta pointer to a text area
- * @param hide 1: hide the cursor, 0: show it
+ * @param obj pointer to a text area
+ * @param show 1: show the cursor, 0: hide it
  */
 static void cursor_blink_anim_cb(void * obj, int32_t show)
 {
@@ -971,7 +971,7 @@ static void cursor_blink_anim_cb(void * obj, int32_t show)
  * Dummy function to animate char hiding in pwd mode.
  * Does nothing, but a function is required in car hiding anim.
  * (pwd_char_hider callback do the real job)
- * @param ta unused
+ * @param obj unused
  * @param x unused
  */
 static void pwd_char_hider_anim(void * obj, int32_t x)
@@ -992,7 +992,7 @@ static void pwd_char_hider_anim_completed(lv_anim_t * a)
 
 /**
  * Hide all characters (convert them to '*')
- * @param ta pointer to text area object
+ * @param obj pointer to text area object
  */
 static void pwd_char_hider(lv_obj_t * obj)
 {
@@ -1026,7 +1026,7 @@ static void pwd_char_hider(lv_obj_t * obj)
 
 /**
  * Test a unicode character if it is accepted or not. Checks max length and accepted char list.
- * @param ta pointer to a test area object
+ * @param obj pointer to a test area object
  * @param c a unicode character
  * @return true: accepted; false: rejected
  */
@@ -1211,7 +1211,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
             ta->sel_start    = char_id_at_click;
             ta->sel_end      = LV_LABEL_TEXT_SELECTION_OFF;
             ta->text_sel_in_prog = 1;
-            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+            lv_obj_set_scroll_chain(obj, false);
         }
         else if(ta->text_sel_in_prog && code == LV_EVENT_PRESSING) {
             /*Input device may be moving. Store the end position*/
@@ -1219,7 +1219,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
         }
         else if(ta->text_sel_in_prog && (code == LV_EVENT_PRESS_LOST || code == LV_EVENT_RELEASED)) {
             /*Input device is released. Check if anything was selected.*/
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+            lv_obj_set_scroll_chain(obj, true);
         }
     }
 

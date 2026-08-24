@@ -4,6 +4,19 @@
 
 #include "unity/unity.h"
 
+/* NanoVG's GPU rasterization produces glyph metrics that differ between architectures
+ * beyond a usable tolerance, so it keeps a per-architecture reference set. The SW
+ * renderer is architecture-stable and shares a single reference image. */
+#if LV_USE_DRAW_NANOVG
+    #ifndef NON_AMD64_BUILD
+        #define REF_IMG_EXT ".nvg.lp64.png"
+    #else
+        #define REF_IMG_EXT ".nvg.lp32.png"
+    #endif
+#else
+    #define REF_IMG_EXT ".png"
+#endif
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -72,7 +85,7 @@ void test_tiny_ttf_kerning(void)
     lv_label_set_text(label_none, "ıTuTuTı");
     lv_obj_set_style_text_font(label_none, font_none, LV_PART_MAIN);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_2.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_2" REF_IMG_EXT);
 
     lv_obj_delete(cont);
     lv_tiny_ttf_destroy(font_normal);
@@ -105,7 +118,7 @@ void test_tiny_ttf_gpos(void)
     lv_obj_set_style_text_align(label_none, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_align(label_none, LV_ALIGN_CENTER, 0, 100);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_3.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_3" REF_IMG_EXT);
 
     lv_tiny_ttf_destroy(font_normal);
     lv_tiny_ttf_destroy(font_none);

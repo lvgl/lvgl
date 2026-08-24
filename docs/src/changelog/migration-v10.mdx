@@ -1,0 +1,583 @@
+---
+title: Migrating from v9 to v10
+description: How to update your LVGL v9 project to v10, covering all breaking changes and deprecations introduced across the v9.x series.
+---
+
+{/*
+  CONTRIBUTOR GUIDE
+  -----------------
+  Add an entry here in the same PR where you introduce a breaking change
+  or deprecation.
+
+  Structure:
+  - Top-level sections: ## Widgets, ## Core, ## Drawing, etc.
+  - Second level: ### lv_foo  (the widget or module)
+  - Entries: a short bullet per changed symbol, with before/after code if helpful.
+*/}
+
+<Callout type="info" title="v9.6 will be the last v9 release">
+  LVGL v9.6 is the final release in the v9 series. All symbols marked
+  `LV_DEPRECATED` are removed in v10.0.
+</Callout>
+
+---
+
+## Configuration
+
+Starting with v9.6, LVGL's configuration was overhauled. [Kconfig](https://github.com/lvgl/lvgl/blob/master/Kconfig)
+is now the **single source of truth** for every configuration option. The files
+you actually use, `lv_conf_template.h` (the file you copy to `lv_conf.h`), the
+internal headers that apply defaults, and the `CONFIG_*` bridge, are all
+*generated* from the Kconfig tree, so the three ways of configuring LVGL
+(`lv_conf.h`, Kconfig, and compiler `-D` defines) can no longer drift apart.
+
+<Callout type="info" title="lv_conf.h is not going away">
+  Configuring LVGL with a hand-written `lv_conf.h` is still **fully supported**
+  and remains the default for most projects. Kconfig being the source of truth
+  is an internal change: `lv_conf_template.h` is now generated from it, but you
+  copy and edit it exactly as before.
+</Callout>
+
+### `lv_conf_template.h` overhaul
+
+`lv_conf_template.h` is now generated from Kconfig rather than hand-maintained.
+The practical effects when you upgrade:
+
+- Options now appear in a consistent order with consistent comments, and every
+  option's default matches the `Kconfig` default exactly.
+- A few options were renamed or restructured (see below). Old names still work
+  for now, they produce warnings or errors at compile time but they will be
+  **removed in v10.0**, so update them.
+
+The simplest way to migrate an existing `lv_conf.h` is to copy the new
+`lv_conf_template.h` over a fresh `lv_conf.h` and re-apply your changes, or to
+re-run `scripts/generate_lv_conf.py` if you're using `lv_conf.defaults`. Either way,
+watch the compiler output for the deprecation `#warning`s listed below.
+
+### Minimal configuration
+
+The `LV_CONF_MINIMAL` switch, which disabled all widgets, themes, layouts and
+fonts in one go, has been **removed**. A one-off switch like this doesn't fit a
+Kconfig-driven model, where presets are expressed as *defconfigs*. The minimal
+preset now lives at `configs/defconfigs/empty.defconfig`:
+
+```bash
+# Build LVGL from the empty preset
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/empty.defconfig
+```
+
+If you set `LV_CONF_MINIMAL` (in `lv_conf.h` or Kconfig) you'll get a build
+warning. Start from the "empty" defconfig and re-enable only what you need.
+
+### Renamed and restructured options
+
+Every old name below **still compiles** for now: it emits a `#warning` at build
+time and continues to work (it is mapped to its replacement, or still honored in
+place), and is **removed in v10.0**.
+
+Watch your build log after upgrading and update each one the warning/error points at.
+
+#### Memory
+
+| Removed | Replacement |
+|---|---|
+| `LV_MEM_SIZE_KILOBYTES` | `LV_MEM_SIZE` (value in **bytes**) |
+| `LV_MEM_POOL_EXPAND_SIZE_KILOBYTES` | `LV_MEM_SIZE` (set the full size in **bytes**) |
+| `LV_MEM_POOL_EXPAND_SIZE` | `LV_MEM_SIZE` (set the full pool size) |
+
+```c
+/* Before */
+#define LV_MEM_SIZE_KILOBYTES 64
+/* After */
+#define LV_MEM_SIZE (64 * 1024)
+```
+
+#### Threading
+
+| Removed | Replacement |
+|---|---|
+| `LV_DRAW_THREAD_STACKSIZE` | `LV_DRAW_THREAD_STACK_SIZE` |
+
+#### LZ4 / ThorVG
+
+`LZ4` and `ThorVG` no longer have separate `_INTERNAL`/`_EXTERNAL` enables.
+Instead, enable the library itself with `LV_USE_LZ4` / `LV_USE_THORVG`,
+and use the `_INTERNAL` flag to choose between the bundled source and an externally provided one:
+
+| Removed | Replacement |
+|---|---|
+| `LV_USE_LZ4_EXTERNAL` | `LV_USE_LZ4` = 1 and `LV_USE_LZ4_INTERNAL` = 0 |
+| `LV_USE_THORVG_EXTERNAL` | `LV_USE_THORVG` = 1 and `LV_USE_THORVG_INTERNAL` = 0 |
+
+<Callout type="warning">
+    If your project previously had `LV_USE_THORVG_INTERNAL` enabled (with no `LV_USE_THORVG_EXTERNAL`), you must now also enable `LV_USE_THORVG`.
+    Leaving `LV_USE_THORVG` disabled while `LV_USE_THORVG_INTERNAL` is enabled will result in a build error.
+    The same applies to `LV_USE_LZ4` and `LV_USE_LZ4_INTERNAL`.
+</Callout>
+
+#### GPU (VG-Lite)
+
+The VG-Lite GPU is now chosen with a single `LV_VG_LITE_GPU` option instead of a free-form series/revision pair.
+Set it to one of the predefined GPU/revision combinations:
+
+| Removed | Replacement |
+|---|---|
+| `LV_VG_LITE_HAL_GPU_SERIES` | `LV_VG_LITE_GPU` |
+| `LV_VG_LITE_HAL_GPU_REVISION` | `LV_VG_LITE_GPU` |
+
+`LV_VG_LITE_GPU` accepts one of the following values:
+
+| Value | GPU | Revision |
+|---|---|---|
+| `LV_VG_LITE_GPU_GC255_0X40A` | GC255 | 0x40A |
+| `LV_VG_LITE_GPU_GC355_0X0_1215` | GC355 | 0x0_1215 |
+| `LV_VG_LITE_GPU_GC355_0X0_1216` | GC355 | 0x0_1216 |
+| `LV_VG_LITE_GPU_GC555_0X423` | GC555 | 0x423 |
+| `LV_VG_LITE_GPU_GC555_0X423_ECO` | GC555 | 0x423 ECO |
+| `LV_VG_LITE_GPU_GCNANOULTRAV_0X1003` | GCNanoUltraV | 0x1003 |
+
+#### Drivers
+
+No driver infers its rendering backend from the enabled draw units any more. SDL and DRM now expose an explicit `LV_<DRIVER>_BACKEND` choice; Wayland instead lets you
+enable each of its backends individually and resolves between them at runtime. See below.
+
+Their `LV_<DRIVER>_AUTO_BACKEND` flags (enabled by default) exist purely to ease migration: they let LVGL reproduce the old auto-detected backend so existing projects
+don't silently switch to a different backend on update simply because they never set one explicitly. Leaving an `_AUTO_BACKEND` flag enabled triggers a build-time warning.
+These flags are not meant to be relied on going forward and will be removed for v10, every project should set its backend explicitly with `LV_<DRIVER>_BACKEND` and then
+disable the corresponding `_AUTO_BACKEND` flag to silence the warning.
+
+- **SDL** — while `LV_SDL_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` and (`LV_USE_DRAW_NANOVG` or `LV_USE_DRAW_OPENGLES`) are enabled,
+otherwise Textures when `LV_USE_DRAW_SDL` is enabled, otherwise Software. Set `LV_SDL_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_SDL_BACKEND`:
+
+  | Value | Backend |
+  |---|---|
+  | `LV_SDL_BACKEND_SW` | Software (SDL surface) |
+  | `LV_SDL_BACKEND_TEXTURE` | Cached SDL textures (enable: `LV_USE_DRAW_SDL`) |
+  | `LV_SDL_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; requires `LV_USE_DRAW_OPENGLES` or `LV_USE_DRAW_NANOVG`) |
+
+  On Kconfig's side, buffer count is now a single integer instead of two separate flags:
+
+  | Removed | Replacement |
+  |---|---|
+  | `LV_SDL_SINGLE_BUFFER` | `LV_SDL_BUF_COUNT` = 1 |
+  | `LV_SDL_DOUBLE_BUFFER` | `LV_SDL_BUF_COUNT` = 2 |
+
+- **Linux DRM** — while `LV_LINUX_DRM_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` is enabled, otherwise FBDEV.
+Set `LV_LINUX_DRM_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_LINUX_DRM_BACKEND`:
+
+  | Value | Backend |
+  |---|---|
+  | `LV_LINUX_DRM_BACKEND_FBDEV` | Dumb buffers (no GPU) |
+  | `LV_LINUX_DRM_BACKEND_GBM` | GBM DMA buffers |
+  | `LV_LINUX_DRM_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) |
+
+  `LV_USE_LINUX_DRM_GBM_BUFFERS` is no longer a user-facing setting. It is now set internally and automatically enabled whenever the `EGL` or `GBM` backend is selected; it should no longer be set directly in `lv_conf.h`.
+
+- **Wayland** — the backend is no longer inferred, and no longer has to be a single one.
+
+  Previously `LV_WAYLAND_USE_SHM`, `LV_WAYLAND_USE_EGL` and `LV_WAYLAND_USE_G2D` were derived internally and mutually exclusive: enabling `LV_USE_OPENGLES` gave you EGL,
+  otherwise enabling `LV_USE_G2D` gave you G2D, otherwise you got SHM. Setting them in `lv_conf.h` had no effect.
+
+  They are now ordinary options that you set yourself, and **more than one may be enabled at a time**:
+
+  | Symbol | Backend | Default |
+  |---|---|---|
+  | `LV_WAYLAND_USE_SHM` | SHM (Shared Memory) | on, except with a GPU draw unit |
+  | `LV_WAYLAND_USE_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) | off; under Kconfig, on with a GPU draw unit |
+  | `LV_WAYLAND_USE_G2D` | G2D (NXP i.MX hardware accelerator; enable: `LV_USE_DRAW_G2D`) | off |
+
+  There is also a new fourth backend, `LV_WAYLAND_USE_DMABUF`, which presents software-rendered frames as linear DMA-BUFs.
+  See the [Wayland driver docs](/integration/embedded_linux/drivers/wayland#dma-buf).
+
+  To reproduce exactly what you had before, enable the one backend the old rules would have picked for your config. `LV_USE_G2D` no longer plays a part in the choice:
+  it is a deprecated no-op (see [No-op options kept for compatibility](#no-op-options-kept-for-compatibility)) and the G2D backend is now tied to `LV_USE_DRAW_G2D`.
+
+  | You had | Backend you got | Add |
+  |---|---|---|
+  | `LV_USE_OPENGLES` = 1 | EGL | `LV_WAYLAND_USE_EGL` = 1 (keep `LV_USE_OPENGLES`) |
+  | `LV_USE_G2D` = 1 | G2D | `LV_WAYLAND_USE_G2D` = 1 and `LV_USE_DRAW_G2D` = 1 |
+  | neither | SHM | nothing — `LV_WAYLAND_USE_SHM` is on by default |
+
+  See the [Wayland driver docs](/integration/embedded_linux/drivers/wayland#runtime-backend-selection) for more information.
+
+- **X11** — render mode (unrelated to backend selection) is now a single value mapped onto the standard `LV_DISPLAY_RENDER_MODE_*` constants:
+
+  | Removed | Replacement |
+  |---|---|
+  | `LV_X11_RENDER_MODE_PARTIAL` | `LV_X11_RENDER_MODE` = `LV_DISPLAY_RENDER_MODE_PARTIAL` |
+  | `LV_X11_RENDER_MODE_DIRECT` | `LV_X11_RENDER_MODE` = `LV_DISPLAY_RENDER_MODE_DIRECT` |
+  | `LV_X11_RENDER_MODE_FULL` | `LV_X11_RENDER_MODE` = `LV_DISPLAY_RENDER_MODE_FULL` |
+
+#### Calendar day/month names
+
+The two array macros became individual short strings, so each name is now a plain
+Kconfig-settable string and you can localize one without redefining the whole
+array. `LV_CALENDAR_WEEK_STARTS_MONDAY` is unchanged, ordering is handled
+internally. The old array macros still work (with a `#warning`).
+
+| Removed | Replacement |
+|---|---|
+| `LV_CALENDAR_DEFAULT_DAY_NAMES` | `LV_MONDAY_STR` ... `LV_SUNDAY_STR` |
+| `LV_CALENDAR_DEFAULT_MONTH_NAMES` | `LV_JANUARY_STR` ... `LV_DECEMBER_STR` |
+
+#### libinput XKB keymap
+
+The single keymap struct became individual string options (again, so Kconfig can
+set each one). The old struct macro still works (with a `#warning`):
+
+| Removed | Replacement |
+|---|---|
+| `LV_LIBINPUT_XKB_KEY_MAP` | `LV_LIBINPUT_XKB_RULES`, `LV_LIBINPUT_XKB_MODEL`, `LV_LIBINPUT_XKB_LAYOUT`, `LV_LIBINPUT_XKB_VARIANT`, `LV_LIBINPUT_XKB_OPTIONS` |
+
+```c
+/* Before */
+#define LV_LIBINPUT_XKB_KEY_MAP { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
+
+/* After */
+#define LV_LIBINPUT_XKB_MODEL  "pc101"
+#define LV_LIBINPUT_XKB_LAYOUT "us"
+/* rules / variant / options default to "" */
+```
+
+### Macros that can't be set from Kconfig
+
+Some configuration values are function-like or expression macros — for example
+`LV_FONT_CUSTOM_DECLARE`, the custom `LV_ASSERT_HANDLER`, the `LV_ATTRIBUTE_*`
+hooks, and NemaGFX pool attributes. Kconfig only stores booleans, integers and
+strings, so it cannot hold these.
+
+**If you configure with `lv_conf.h`, nothing changes** — keep defining these
+macros inline exactly as before. `LV_FONT_CUSTOM_DECLARE`, `LV_ASSERT_HANDLER`,
+the attribute hooks, etc. are all still honored when defined in `lv_conf.h`.
+
+**If you configure with Kconfig**, you can't write such a macro as a Kconfig
+value, so each module now offers a `LV_<MODULE>_USE_CUSTOM_INCLUDE` switch plus a
+`LV_<MODULE>_CUSTOM_INCLUDE` path. Point it at a small header that defines the
+macros, e.g.:
+
+```c
+/* my_lvgl_extra.h, referenced by LV_FONT_CUSTOM_INCLUDE */
+#define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(my_font_24)
+#define LV_FONT_DEFAULT         &my_font_24
+```
+
+This pair exists for `FONT`, `ASSERT`, `ATTRIBUTE`, `SYSMON`, `NEMA` and the
+global custom include. As part of unifying this convention, a couple of old
+include/enable names were renamed (each still works with a `#warning`):
+
+| Removed | Replacement |
+|---|---|
+| `LV_ASSERT_HANDLER_INCLUDE` | `LV_ASSERT_CUSTOM_INCLUDE` (enable with `LV_ASSERT_USE_CUSTOM_INCLUDE`) |
+
+If you still rely on the old `LV_ASSERT_HANDLER_INCLUDE` and can't migrate
+immediately, you can silence the deprecation warning with
+`LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING`. This only suppresses the
+compiler warning, `LV_ASSERT_HANDLER_INCLUDE` itself still works the same
+way. New projects should use `LV_ASSERT_CUSTOM_INCLUDE` and define their
+custom assertion handler directly instead.
+
+A related effect: `lv_conf_template.h` no longer prints an empty stub for every
+overridable macro (`LV_ATTRIBUTE_*`, `LV_PROFILER_*`, `LV_EXPORT_CONST_INT`,
+`LV_ASSERT_HANDLER`, ...). They are **not removed** — define them in `lv_conf.h`
+or via a `*_CUSTOM_INCLUDE` and LVGL still picks them up; they just default to
+empty/no-op otherwise.
+
+### No-op options kept for compatibility
+
+`LV_USE_PXP` and `LV_USE_G2D` never enabled drawing on their own, you always
+also needed `LV_USE_DRAW_PXP` / `LV_USE_DRAW_G2D`. They are kept as **deprecated
+no-ops** (and excluded from the generated headers) purely so existing
+`defconfig`s that set `CONFIG_LV_USE_PXP` / `CONFIG_LV_USE_G2D` keep loading.
+They have no effect and emit no warning. Use the real switches:
+
+| No-op | Real switch |
+|---|---|
+| `LV_USE_PXP` | `LV_USE_DRAW_PXP` |
+| `LV_USE_G2D` | `LV_USE_DRAW_G2D` |
+
+See [Configuring LVGL](/integration/configuration) for the full picture of how
+configuration works now.
+
+---
+
+## Core
+
+### Argument checking
+
+LVGL v9.6 standardizes public-API argument validation. `LV_ASSERT_OBJ` is
+replaced by <ApiLink name="LV_CHECK_OBJ" />, which logs a warning and lets the
+caller recover gracefully instead of halting the program.
+
+```c
+/* Before */
+LV_ASSERT_OBJ(obj, &lv_label_class);
+/* After */
+LV_CHECK_OBJ(obj, &lv_label_class, return);
+```
+
+#### What `LV_CHECK_OBJ` actually checks
+
+The macro is layered — each layer is independently configurable in `lv_conf.h`:
+
+| Layer | Guard | What it checks |
+|---|---|---|
+| Base | `LV_USE_CHECK_ARG` | Enables the whole system; when 0 all three macros expand to nothing. Also enables NULL checks on all arguments regardless of whether Class or Validity guards are set. |
+| Class | `LV_USE_CHECK_OBJ_CLASSTYPE` | `lv_obj_has_class(obj, cls)` — verifies the object is the expected widget type. |
+| Validity | `LV_USE_CHECK_OBJ_VALIDITY` | `lv_obj_is_valid(obj)` — verifies the object is still part of the live widget tree. |
+
+All three layers default to `0` (disabled). Enable them selectively:
+
+```c
+/* lv_conf.h */
+#define LV_USE_CHECK_ARG           1   /* master switch */
+#define LV_USE_CHECK_OBJ_CLASSTYPE 1   /* also check class type */
+#define LV_USE_CHECK_OBJ_VALIDITY  1   /* also check widget-tree membership */
+```
+
+When `LV_USE_CHECK_OBJ_CLASSTYPE` is `0`, `LV_CHECK_OBJ` still performs a
+NULL check; when `LV_USE_CHECK_OBJ_VALIDITY` is `0`, it still performs the
+class check (if enabled). The checks are cumulative.
+
+<Callout type="warning" title="Enable only during development">
+  `lv_obj_is_valid()` walks the widget tree and `lv_obj_has_class()` traverses
+  the class hierarchy — both add non-trivial overhead on every call site.
+  Leave `LV_USE_CHECK_OBJ_CLASSTYPE` and `LV_USE_CHECK_OBJ_VALIDITY` at `0`
+  in production builds.
+</Callout>
+
+#### Failure behavior
+
+Two further options control what happens when a check fails:
+
+```c
+/* lv_conf.h */
+
+/* Also call LV_ASSERT_HANDLER (halts / breakpoints like the old assert). */
+#define LV_CHECK_ARG_ASSERT_ON_FAIL  0
+
+/* How much to log when a check fails (requires LV_USE_LOG = 1). */
+/* LV_CHECK_ARG_LOG_MODE_NONE    (0) – no output                               */
+/* LV_CHECK_ARG_LOG_MODE_MINIMAL (1) – "Check failed" + file/line              */
+/* LV_CHECK_ARG_LOG_MODE_VERBOSE (2) – "Check failed: <cond>" + caller message */
+#define LV_CHECK_ARG_LOG_MODE  LV_CHECK_ARG_LOG_MODE_VERBOSE
+```
+
+Setting `LV_CHECK_ARG_ASSERT_ON_FAIL 1` restores the hard-abort behavior of
+`LV_ASSERT_OBJ`, which can be useful during a debugging session.
+`LV_CHECK_ARG_LOG_MODE` has no effect when `LV_USE_LOG` is `0`.
+
+See the [Argument Checking](contributing/assertions/#argument-checking) docs for
+the full <ApiLink name="LV_CHECK_ARG" /> and <ApiLink name="LV_CHECK_OBJ" /> API
+if you need finer control.
+
+### lv_obj
+
+- `lv_obj_find_by_id()` is deprecated, use `lv_obj_find_by_name()` instead:
+  ```c
+  /* Before */
+  lv_obj_t * obj = lv_obj_find_by_id(parent, my_id);
+
+  /* After */
+  lv_obj_t * obj = lv_obj_find_by_name(parent, "my_widget");
+  ```
+
+- The generic flag API — `lv_obj_add_flag()`, `lv_obj_remove_flag()`,
+  `lv_obj_set_flag()`, `lv_obj_has_flag()` and `lv_obj_has_flag_any()` — is
+  deprecated. Each flag now has a dedicated setter (`lv_obj_set_<flag>(obj, en)`)
+  and getter (`lv_obj_is_<flag>(obj)`):
+  ```c
+  /* Before */
+  lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+  lv_obj_set_flag(obj, LV_OBJ_FLAG_SCROLLABLE, en);
+  bool h = lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN);
+
+  /* After */
+  lv_obj_set_hidden(obj, true);
+  lv_obj_set_clickable(obj, false);
+  lv_obj_set_scrollable(obj, en);
+  bool h = lv_obj_is_hidden(obj);
+  ```
+  The custom-bit flags (`LV_OBJ_FLAG_USER_1`–`4`) can be accessed via
+  `lv_obj_set/get_user_flag()`
+
+---
+
+## Widgets
+
+### lv_qrcode
+
+- No API change, but a behavioral one: `lv_qrcode_set_size()` and
+  `lv_qrcode_set_quiet_zone()` now re-encode the QR code, and the colors are
+  re-applied, when they are called *after* the data. Previously such a change was
+  silently dropped and the widget kept showing the bitmap produced by
+  `lv_qrcode_update()` / `lv_qrcode_set_data()`. The properties may now be set in
+  any order.
+
+  To make this possible the widget keeps a copy of the payload, which costs
+  `data_len` bytes per QR code object.
+
+- New: `lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_DEFERRED)` collapses
+  several property changes into a single re-encode on the next redraw. The default,
+  `LV_QRCODE_UPDATE_MODE_IMMEDIATE`, re-encodes inside the setter.
+
+- New: `lv_qrcode_render()` re-encodes the stored payload without taking it as an
+  argument, which is how property changes made in the deferred update mode are applied.
+
+- New: `lv_qrcode_get_render_failed()` reports whether the last encode failed, for the
+  re-encodes whose result cannot be returned (the void property setters, and the
+  deferred re-encode done by the draw pass).
+
+### lv_span
+
+- `lv_spangroup_set_align()` is deprecated, use the `text_align` style property instead:
+  ```c
+  /* Before */
+  lv_spangroup_set_align(obj, LV_TEXT_ALIGN_CENTER);
+
+  /* After */
+  lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+  ```
+
+- `lv_spangroup_set_mode()` is deprecated, control expanding/wrapping by setting the widget width instead:
+  ```c
+  /* Before */
+  lv_spangroup_set_mode(obj, LV_SPAN_MODE_EXPAND);
+
+  /* After — LV_SIZE_CONTENT expands to fit, a fixed value wraps */
+  lv_obj_set_width(obj, LV_SIZE_CONTENT);
+  ```
+
+### lv_textarea
+
+- `lv_textarea_set_align()` is deprecated, use the `text_align` style property instead:
+  ```c
+  /* Before */
+  lv_textarea_set_align(obj, LV_TEXT_ALIGN_CENTER);
+
+  /* After */
+  lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+  ```
+
+### lv_scale
+
+- `lv_scale_section_set_style()` is deprecated, use the per-part setters instead:
+  ```c
+  /* Before */
+  lv_scale_section_set_style(section, LV_PART_MAIN,      &my_style);
+  lv_scale_section_set_style(section, LV_PART_INDICATOR, &my_style);
+  lv_scale_section_set_style(section, LV_PART_ITEMS,     &my_style);
+
+  /* After */
+  lv_scale_set_section_style_main(scale,      section, &my_style);
+  lv_scale_set_section_style_indicator(scale, section, &my_style);
+  lv_scale_set_section_style_items(scale,     section, &my_style);
+  ```
+
+### lv_menu
+
+- The `lv_menu` widget is deprecated. A menu is page navigation over base widgets
+  — pages built from `lv_obj` and a back button that swaps the visible page — so
+  build it directly instead. See the
+  [`lv_example_menu_navigation`](widgets/menu#building-a-menu-without-lv_menu)
+  example for a starting point.
+
+### lv_list
+
+- The `lv_list` widget is deprecated. A list is just a flex container with a
+  column flow, so build one directly from `lv_obj` with a `LV_FLEX_FLOW_COLUMN`
+  layout instead. See the
+  [`lv_example_flex_list`](common-widget-features/layouts/flex#building-a-list)
+  example for a starting point.
+
+### lv_win
+
+- The `lv_win` widget is deprecated. A window is just a flex column with a header
+  bar and a content area, so build one directly from `lv_obj` instead. See the
+  [`lv_example_flex_win`](common-widget-features/layouts/flex#building-a-window)
+  example for a starting point.
+
+---
+
+## Drawing
+
+### lv_draw_buf
+
+- `lv_image_buf_set_palette()` is deprecated, use `lv_draw_buf_set_palette()` instead.
+- `lv_image_buf_free()` is deprecated, use `lv_draw_buf_destroy()` instead.
+
+### lv_snapshot
+
+- `lv_snapshot_free()` is deprecated, use `lv_draw_buf_destroy()` directly instead.
+- `lv_snapshot_take_to_buf()` is deprecated, use `lv_snapshot_take_to_draw_buf()` instead:
+
+```c
+  /* Before */
+  lv_snapshot_take_to_buf(obj, cf, dsc, buf, buf_size);
+  /* After */
+  lv_snapshot_take_to_draw_buf(obj, cf, draw_buf);
+  lv_draw_buf_destroy(draw_buf);
+```
+
+---
+
+## Image
+
+### SVG
+
+The SVG module internal structures were previously leaked to the public API.
+v9.6 moves these structures to the private API. If you have code that relies on this module, you
+can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
+
+<Callout type="info">
+No public API usage required the user to access these private structures so 
+if you were simply using the public API, this doesn't change anything for you.
+</Callout>
+
+---
+
+## Misc
+
+### Event
+
+The `lv_event_list_t` structure was previously leaked to the public API.
+v9.6 moves it to the private API. If you have code that relies on the internals of this structure,
+you can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
+
+<Callout type="info">
+No public API usage required the user to access this private structure so 
+if you were simply using the public API, this doesn't change anything for you.
+</Callout>
+
+### Array
+
+The `lv_array` module was previously leaked to the public LVGL API through the SVG and Event
+modules. v9.6 moves it to the private API. If you have code that relies on this module, you
+can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
+
+### Tree
+
+The `lv_tree` module was previously leaked to the public LVGL API through the SVG module.
+v9.6 moves it to the private API. If you have code that relies on this module, you
+can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
+
+---
+
+## Others
+
+### lv_file_explorer
+
+- The `lv_file_explorer` widget is deprecated. A file explorer is a path header
+  plus a table of directory entries read with the [`lv_fs`](main-modules/fs) API,
+  so build it directly instead. See the
+  [`lv_example_table_file_browser`](widgets/table#building-a-file-explorer) example
+  for a starting point.
+
+---
+
+## Libraries
+
+### rlottie
+
+- The rlottie player is deprecated. Use the [`lv_lottie`](widgets/lottie) widget
+  instead.

@@ -1,0 +1,93 @@
+menu "Logging"
+config LV_USE_LOG
+	bool "Logging"
+
+if LV_USE_LOG
+
+choice
+	bool "Default log verbosity"
+	default LV_LOG_LEVEL_WARN
+
+	config LV_LOG_LEVEL_TRACE
+		bool "Trace: detailed information about everything"
+	config LV_LOG_LEVEL_INFO
+		bool "Info: important events"
+	config LV_LOG_LEVEL_WARN
+		bool "Warn: something unwanted happened but caused no problem"
+	config LV_LOG_LEVEL_ERROR
+		bool "Error: critical issues where the system may fail"
+	config LV_LOG_LEVEL_USER
+		bool "User: only logs added by the user"
+	config LV_LOG_LEVEL_NONE
+		bool "None: nothing is logged"
+endchoice
+
+config LV_LOG_LEVEL
+	int
+	default 0 if LV_LOG_LEVEL_TRACE
+	default 1 if LV_LOG_LEVEL_INFO
+	default 2 if LV_LOG_LEVEL_WARN
+	default 3 if LV_LOG_LEVEL_ERROR
+	default 4 if LV_LOG_LEVEL_USER
+	default 5 if LV_LOG_LEVEL_NONE
+
+config LV_LOG_LEVEL_NUM
+	int 
+	default 5
+
+config LV_LOG_PRINTF
+	bool "Print the log with 'printf'"
+	default n
+	help
+		If not set, the user needs to register a callback with lv_log_register_print_cb().
+
+config LV_LOG_USE_TIMESTAMP
+	bool "Add a timestamp to each log"
+	default y
+
+config LV_LOG_USE_FILE_LINE
+	bool "Add the file name and line number to each log"
+	default y
+
+menu "Trace logs per module"
+
+config LV_LOG_TRACE_MEM
+	bool "Memory"
+	default y
+
+config LV_LOG_TRACE_TIMER
+	bool "Timer"
+	default y
+
+config LV_LOG_TRACE_INDEV
+	bool "Input devices"
+	default y
+
+config LV_LOG_TRACE_DISP_REFR
+	bool "Display refresh"
+	default y
+
+config LV_LOG_TRACE_EVENT
+	bool "Events"
+	default y
+
+config LV_LOG_TRACE_OBJ_CREATE
+	bool "Widget creation"
+	default y
+
+config LV_LOG_TRACE_LAYOUT
+	bool "Layout"
+	default y
+
+config LV_LOG_TRACE_ANIM
+	bool "Animations"
+	default y
+
+config LV_LOG_TRACE_CACHE
+	bool "Cache"
+	default y
+
+endmenu
+
+endif
+endmenu

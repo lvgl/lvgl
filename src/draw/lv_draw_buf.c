@@ -107,14 +107,14 @@ uint32_t lv_draw_buf_width_to_stride_ex(const lv_draw_buf_handlers_t * handlers,
     else return 0;
 }
 
-void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
+void * lv_draw_buf_align(void * buf, lv_color_format_t color_format)
 {
-    return lv_draw_buf_align_ex(&default_handlers, data, color_format);
+    return lv_draw_buf_align_ex(&default_handlers, buf, color_format);
 }
 
-void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * data, lv_color_format_t color_format)
+void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * buf, lv_color_format_t color_format)
 {
-    if(handlers->align_pointer_cb) return handlers->align_pointer_cb(data, color_format);
+    if(handlers->align_pointer_cb) return handlers->align_pointer_cb(buf, color_format);
     else return NULL;
 }
 
@@ -535,13 +535,13 @@ void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
 
 void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
 {
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
+    LV_LOG_DEPRECATED("Use lv_draw_buf_set_palette instead.");
     lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
 }
 
 void lv_image_buf_free(lv_image_dsc_t * dsc)
 {
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
+    LV_LOG_DEPRECATED("Use lv_draw_buf_destroy instead.");
     if(dsc != NULL) {
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);

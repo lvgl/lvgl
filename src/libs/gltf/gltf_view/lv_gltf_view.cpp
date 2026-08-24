@@ -158,11 +158,11 @@ lv_result_t lv_gltf_add_model(lv_obj_t * obj, lv_gltf_model_t * model)
     return add_model(viewer, model, false) != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * env)
+void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * environment)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gltf_t * gltf = (lv_gltf_t *)obj;
-    if(env == NULL) {
+    if(environment == NULL) {
         LV_LOG_WARN("Refusing to assign a NULL environment to the glTF object");
         return;
     }
@@ -171,7 +171,7 @@ void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * env)
         lv_gltf_environment_delete(gltf->environment);
         gltf->environment = NULL;
     }
-    gltf->environment = env;
+    gltf->environment = environment;
     gltf->owns_environment = false;
 }
 

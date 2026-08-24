@@ -22,7 +22,7 @@
 #include "../../core/lv_observer_private.h"
 
 #if LV_USE_FREETYPE && LV_USE_HARFBUZZ
-    #include "../../libs/freetype/lv_freetype_harfbuzz.h"
+    #include "../../font/freetype/lv_freetype_harfbuzz.h"
 #endif
 
 /*********************
@@ -845,7 +845,7 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     label->sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
 #endif
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(obj, false);
     lv_label_set_long_mode(obj, LV_LABEL_LONG_MODE_WRAP);
     lv_label_set_text(obj, LV_LABEL_DEFAULT_TEXT);
 
@@ -1208,7 +1208,7 @@ static void update_layout_completed_cb(lv_event_t * e)
 
 /**
  * Refresh the label with its text stored in its extended data
- * @param label pointer to a label object
+ * @param obj   pointer to a label object
  */
 static void lv_label_refr_text(lv_obj_t * obj)
 {

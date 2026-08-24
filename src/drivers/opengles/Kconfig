@@ -1,0 +1,30 @@
+config LV_USE_OPENGLES
+	bool "OpenGL ES"
+	select LV_USE_MATRIX
+	default n
+	help
+		Generic OpenGL ES display driver, for embedding LVGL in another application or driving it through GLFW/EGL.
+
+if LV_USE_OPENGLES
+
+config LV_USE_OPENGLES_DEBUG
+	bool "Debug mode"
+	default n
+	help
+		Check for an OpenGL error after every GL call and log it with the call site.
+
+
+endif # LV_USE_OPENGLES
+
+config LV_USE_EGL
+	bool
+	default n
+
+config LV_USE_GLFW
+	bool "GLFW"
+	default n
+	select LV_USE_OPENGLES
+	depends on !LV_USE_EGL
+	help
+		Open a window on a PC desktop with GLFW and read mouse and keyboard input.
+

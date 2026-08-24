@@ -179,7 +179,7 @@ void test_draw_task_hooking(void)
 
     lv_obj_set_parent(chart, chart_wrapper);
     lv_obj_set_size(chart, lv_pct(200), lv_pct(100));
-    lv_obj_add_flag(chart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(chart, true);
     lv_chart_set_div_line_count(chart, 0, 21);
     lv_chart_set_point_count(chart, 21);
     lv_obj_add_event_cb(chart, chart_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);

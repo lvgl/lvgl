@@ -192,7 +192,7 @@ lv_gltf_compiled_shader_t * lv_gltf_get_compiled_shader(lv_gltf_model_t * data, 
 /**
  * @brief Retrieve the radius of the GLTF data object.
  *
- * @param D Pointer to the lv_gltf_data_t object from which to get the radius.
+ * @param model Pointer to the lv_gltf_data_t object from which to get the radius.
  * @return The radius of the GLTF data object.
  */
 double lv_gltf_data_get_radius(const lv_gltf_model_t * model);

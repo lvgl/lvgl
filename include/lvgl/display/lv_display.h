@@ -273,7 +273,7 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
  * Set the frame buffers for a display, similarly to `lv_display_set_buffers`, but allow
  * for a custom stride as required by a display controller.
  * This allows the frame buffers to have a stride alignment different from the rest of
- * the buffers`
+ * the buffers.
  * @param disp              pointer to a display
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)
@@ -710,6 +710,13 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
  * @param point     pointer to a point to rotate
  */
 void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point);
+
+/**
+ * Rotate a point in-place opposite to the display's rotation
+ * @param disp      pointer to a display
+ * @param point     pointer to a point to rotate
+ */
+void lv_display_rotate_point_ccw(lv_display_t * disp, lv_point_t * point);
 
 /**
  * Get the size of the draw buffers

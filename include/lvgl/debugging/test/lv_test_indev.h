@@ -104,7 +104,6 @@ void lv_test_key_press(uint32_t k);
 /**
  * Release the previously press key.
  * This function doesn't wait, but just changes the state and returns immediately.
- * @param k     the key to press
  */
 void lv_test_key_release(void);
 

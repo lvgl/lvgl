@@ -145,7 +145,7 @@ void lv_scale_set_min_value(lv_obj_t * obj, int32_t min);
 /**
  * Set maximum values on Scale.
  * @param obj       pointer to Scale Widget
- * @param min       minimum value of Scale
+ * @param max       maximum value of Scale
  */
 void lv_scale_set_max_value(lv_obj_t * obj, int32_t max);
 
@@ -153,7 +153,7 @@ void lv_scale_set_max_value(lv_obj_t * obj, int32_t max);
  * Set angle between the low end and the high end of the Scale.
  * (Applies only to round Scales.)
  * @param obj         pointer to Scale Widget
- * @param max_angle   angle in degrees from Scale minimum where top end of Scale will be drawn
+ * @param angle_range angle in degrees from Scale minimum where top end of Scale will be drawn
  */
 void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range);
 
@@ -236,8 +236,8 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
  * DEPRECATED, use lv_scale_set_section_range instead.
  * Set range for specified Scale Section
  * @param section       pointer to Section
- * @param range_min     Section new minimum value
- * @param range_max     Section new maximum value
+ * @param min           Section new minimum value
+ * @param max           Section new maximum value
  */
 void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max);
 
@@ -245,8 +245,8 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32
  * Set the range of a scale section
  * @param scale         pointer to scale
  * @param section       pointer to section
- * @param range_min     the section's new minimum value
- * @param range_max     the section's new maximum value
+ * @param min           the section's new minimum value
+ * @param max           the section's new maximum value
  */
 void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, int32_t min, int32_t max);
 
@@ -273,6 +273,7 @@ void lv_scale_set_section_max_value(lv_obj_t * scale, lv_scale_section_t * secti
  * @param part                the part of the Scale the style will apply to, e.g. LV_PART_INDICATOR
  * @param section_part_style  pointer to style to apply
  */
+LV_DEPRECATED("use lv_scale_set_section_style_main/indicator/items instead")
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style);
 
 /**

@@ -46,29 +46,29 @@ extern "C" {
 /**
  * @brief Get a glTF model node by its index
  *
- * @param data Pointer to the glTF model structure
+ * @param model Pointer to the glTF model structure
  * @param index The index of the node to retrieve
  * @return Pointer to the glTF model node, or NULL if not found
  */
-lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * data, size_t index);
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * model, size_t index);
 
 /**
  * @brief Get a glTF model node by its numeric path
  *
- * @param data Pointer to the glTF model structure
+ * @param model Pointer to the glTF model structure
  * @param num_path The numeric path string of the node to retrieve (eg. ".0")
  * @return Pointer to the glTF model node, or NULL if not found
  */
-lv_gltf_model_node_t * lv_gltf_model_node_get_by_numeric_path(lv_gltf_model_t * data, const char * num_path);
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_numeric_path(lv_gltf_model_t * model, const char * num_path);
 
 /**
  * @brief Get a glTF model node by its path
  *
- * @param data Pointer to the glTF model structure
+ * @param model Pointer to the glTF model structure
  * @param path The path string of the node to retrieve
  * @return Pointer to the glTF model node, or NULL if not found
  */
-lv_gltf_model_node_t * lv_gltf_model_node_get_by_path(lv_gltf_model_t * data, const char * path);
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_path(lv_gltf_model_t * model, const char * path);
 
 /**
  * @brief Get the path of a glTF model node

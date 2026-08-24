@@ -1,5 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_LIST && LV_BUILD_EXAMPLES
+
+/*This example shows the deprecated `lv_list` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static lv_obj_t * list1;
 
 static void event_handler(lv_event_t * e)
@@ -59,5 +63,7 @@ void lv_example_list_sections(void)
     btn = lv_list_add_button(list1, LV_SYMBOL_CLOSE, "Close");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

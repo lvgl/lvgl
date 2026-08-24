@@ -1,0 +1,5 @@
+config LV_USE_NXP_ELCDIF
+	bool "NXP ELCDIF"
+	default n
+	help
+		Create a display on an already initialized NXP ELCDIF LCD controller.

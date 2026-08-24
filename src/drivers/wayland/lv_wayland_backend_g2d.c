@@ -64,7 +64,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void * wl_g2d_init(void);
+static lv_result_t wl_g2d_init(void ** backend_data);
 static void wl_g2d_deinit(void * backend_ctx);
 static void wl_g2d_global_handler(void * backend_ctx, struct wl_registry * registry, uint32_t name,
                                   const char * interface, uint32_t version);
@@ -121,10 +121,13 @@ static lv_wl_buffer_t * get_next_buffer(lv_wl_g2d_display_data_t * ddata);
 
 static lv_wl_g2d_ctx_t ctx;
 
-const lv_wayland_backend_ops_t wl_backend_ops = {
+const lv_wayland_backend_ops_t wl_g2d_ops = {
     .init = wl_g2d_init,
     .deinit = wl_g2d_deinit,
     .global_handler = wl_g2d_global_handler,
+};
+
+const lv_wayland_backend_display_ops_t wl_g2d_display_ops = {
     .init_display =   wl_g2d_init_display,
     .deinit_display = wl_g2d_deinit_display,
     .resize_display = wl_g2d_resize_display,
@@ -175,10 +178,11 @@ static const struct wl_callback_listener frame_listener = {
  **********************/
 
 
-static void * wl_g2d_init(void)
+static lv_result_t wl_g2d_init(void ** backend_data)
 {
     lv_memset(&ctx, 0, sizeof(ctx));
-    return &ctx;
+    *backend_data = &ctx;
+    return LV_RESULT_OK;
 }
 
 static void wl_g2d_deinit(void * backend_ctx)
@@ -260,7 +264,8 @@ static void delete_buffer(lv_wl_buffer_t * buffer)
 static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * ctx, lv_display_t * display,
                                                              int32_t width, int32_t height)
 {
-    lv_wl_g2d_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
+    if(!ctx->handler)
+        lv_wl_g2d_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
     LV_ASSERT_MALLOC(ddata);
     if(!ddata) {
         return NULL;
@@ -325,11 +330,14 @@ static void wl_g2d_delete_display_data(lv_wl_g2d_display_data_t * ddata)
 
 static void * wl_g2d_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height)
 {
-
     lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_ctx;
+    if(!ctx->handler) {
+        LV_LOG_WARN("dmabuf registry not bound. Can't initialize a display with the g2d backend");
+        return NULL;
+    }
     lv_wl_g2d_display_data_t * ddata = wl_g2d_create_display_data(ctx, display, width, height);
     if(!ddata) {
-        LV_LOG_ERROR("Failed to create display data");
+        LV_LOG_WARN("Failed to create display data");
         return NULL;
     }
 

@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_MENU && LV_USE_MSGBOX && LV_BUILD_EXAMPLES
 
+/*This example shows the deprecated `lv_menu` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 typedef enum {
     LV_MENU_ITEM_BUILDER_VARIANT_1,
     LV_MENU_ITEM_BUILDER_VARIANT_2
@@ -19,6 +22,8 @@ static lv_obj_t * create_switch(lv_obj_t * parent,
 /**
  * @title Settings menu with sidebar mode
  * @brief A full Settings screen with sidebar navigation and a switch that toggles between sidebar and stacked modes.
+ *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  *
  * A root page named `Settings` lists Mechanics, Sound, Display, and
  * About entries inside `lv_menu_section` groups, with a Menu mode row
@@ -181,7 +186,7 @@ static lv_obj_t * create_text(lv_obj_t * parent, const char * icon, const char *
     }
 
     if(builder_variant == LV_MENU_ITEM_BUILDER_VARIANT_2 && icon && txt) {
-        lv_obj_add_flag(img, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+        lv_obj_set_flex_in_new_track(img, true);
         lv_obj_swap(img, label);
     }
 
@@ -199,7 +204,7 @@ static lv_obj_t * create_slider(lv_obj_t * parent, const char * icon, const char
     lv_slider_set_value(slider, val, LV_ANIM_OFF);
 
     if(icon == NULL) {
-        lv_obj_add_flag(slider, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+        lv_obj_set_flex_in_new_track(slider, true);
     }
 
     return obj;
@@ -214,5 +219,7 @@ static lv_obj_t * create_switch(lv_obj_t * parent, const char * icon, const char
 
     return obj;
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

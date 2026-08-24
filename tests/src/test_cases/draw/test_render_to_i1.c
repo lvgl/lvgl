@@ -17,7 +17,8 @@ void tearDown(void)
 
 void test_render_to_i1(void)
 {
-#if LV_BIN_DECODER_RAM_LOAD && LV_USE_DRAW_VG_LITE == 0
+    /*NanoVG reads back the FBO as 32bpp BGRA, so non-XRGB8888 targets don't apply*/
+#if LV_BIN_DECODER_RAM_LOAD && LV_USE_DRAW_VG_LITE == 0 && LV_USE_DRAW_NANOVG == 0
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_I1);
 
     lv_opa_t opa_values[2] = {0xff, 0xc0};

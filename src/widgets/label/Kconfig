@@ -1,0 +1,24 @@
+config LV_USE_LABEL
+	bool "Label"
+	default y
+
+if LV_USE_LABEL
+
+config LV_LABEL_TEXT_SELECTION
+	bool "Text selection"
+	default y
+
+config LV_LABEL_LONG_TXT_HINT
+	bool "Long text draw hint"
+	default y
+	help
+		Stores 12 extra bytes per label to speed up drawing of very long texts.
+
+config LV_LABEL_WAIT_CHAR_COUNT
+	int "Circular scroll gap (characters)"
+	default 3
+	help
+		Gap between the end and the restart of circularly scrolled text,
+		measured in space-character widths.
+
+endif #LV_USE_LABEL

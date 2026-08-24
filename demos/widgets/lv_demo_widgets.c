@@ -81,19 +81,19 @@ void lv_demo_widgets_with_args(const lv_demo_args_t * args)
         lv_obj_t * tab_bar = lv_tabview_get_tab_bar(tv);
         lv_obj_set_style_pad_left(tab_bar, LV_HOR_RES / 2, 0);
         lv_obj_t * logo = lv_image_create(tab_bar);
-        lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
+        lv_obj_set_ignore_layout(logo, true);
         LV_IMAGE_DECLARE(img_lvgl_logo);
         lv_image_set_src(logo, &img_lvgl_logo);
         lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
         lv_obj_t * label = lv_demo_widgets_title_create(tab_bar, "");
-        lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
+        lv_obj_set_ignore_layout(label, true);
         lv_label_set_text_fmt(label, "LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
         label = lv_label_create(tab_bar);
         lv_label_set_text_static(label, "Widgets demo");
-        lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
+        lv_obj_set_ignore_layout(label, true);
         lv_obj_add_style(label, &style_text_muted, 0);
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
     }
@@ -142,7 +142,7 @@ static void color_changer_create(lv_obj_t * parent)
     lv_obj_remove_style_all(color_cont);
     lv_obj_set_flex_flow(color_cont, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(color_cont, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(color_cont, LV_OBJ_FLAG_FLOATING);
+    lv_obj_set_floating(color_cont, true);
 
     lv_obj_set_style_bg_color(color_cont, lv_color_white(), 0);
     lv_obj_set_style_pad_right(color_cont, disp_size == DISP_SMALL ? LV_DPX(47) : LV_DPX(55), 0);
@@ -162,11 +162,12 @@ static void color_changer_create(lv_obj_t * parent)
         lv_obj_set_style_opa(c, LV_OPA_TRANSP, 0);
         lv_obj_set_size(c, 20, 20);
         lv_obj_add_event_cb(c, color_event_cb, LV_EVENT_ALL, &palette[i]);
-        lv_obj_remove_flag(c, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+        lv_obj_set_scroll_on_focus(c, false);
     }
 
     lv_obj_t * btn = lv_button_create(parent);
-    lv_obj_add_flag(btn, LV_OBJ_FLAG_FLOATING | LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_floating(btn, true);
+    lv_obj_set_clickable(btn, true);
     lv_obj_set_style_bg_color(btn, lv_color_white(), LV_STATE_CHECKED);
     lv_obj_set_style_pad_all(btn, 10, 0);
     lv_obj_set_style_radius(btn, LV_RADIUS_CIRCLE, 0);

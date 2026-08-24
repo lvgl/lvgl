@@ -1,0 +1,36 @@
+config LV_USE_X11
+	bool "X11"
+	default n
+	help
+		Open a window on an X11 desktop and read mouse and keyboard input.
+
+if LV_USE_X11
+
+config LV_X11_DOUBLE_BUFFER
+	bool "Double buffering"
+	default y
+config LV_X11_DIRECT_EXIT
+	bool "Exit when all windows are closed"
+	default y
+choice
+	prompt "Render mode"
+	default LV_X11_RENDER_MODE_PARTIAL
+
+	config LV_X11_RENDER_MODE_PARTIAL
+		bool "Partial mode"
+		help
+			Render the screen in smaller parts so the buffer(s) can be smaller than the display and save RAM.
+			The driver uses buffer(s) of about 1/10 of the screen size.
+	config LV_X11_RENDER_MODE_DIRECT
+		bool "Direct mode"
+		help
+			Render into the correct location of screen-sized buffer(s) so they always hold the whole image, and flush only the changed areas.
+			With 2 buffers their content is kept in sync automatically and flush_cb only has to change the address.
+	config LV_X11_RENDER_MODE_FULL
+		bool "Full mode"
+		help
+			Always redraw the whole screen even if only one pixel has changed.
+			With 2 buffers flush_cb only has to change the address.
+endchoice
+
+endif #LV_USE_X11

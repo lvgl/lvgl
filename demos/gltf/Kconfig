@@ -1,0 +1,4 @@
+config LV_USE_DEMO_GLTF
+	bool "glTF demo"
+	default n
+	depends on LV_USE_GLTF

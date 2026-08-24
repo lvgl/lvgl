@@ -56,7 +56,7 @@ void test_hover_basic(void)
     lv_obj_set_size(label, 200, 20);
     lv_label_set_text(label, "Clickable text can be hovered!");
     lv_obj_set_pos(label, 100, 20);
-    lv_obj_add_flag(label, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(label, true);
     lv_obj_set_style_text_color(label, lv_color_hex(0x5be1b6), LV_PART_MAIN | LV_STATE_HOVERED);
 
     /*Set hover callback*/

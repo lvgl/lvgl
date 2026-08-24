@@ -1,0 +1,17 @@
+config LV_USE_ST_LTDC
+	bool "ST LTDC"
+	default n
+	help
+		Create a display bound to a layer of the ST LTDC peripheral.
+
+if LV_USE_ST_LTDC
+
+config LV_ST_LTDC_USE_DMA2D_FLUSH
+	bool "DMA2D flush for partial mode displays"
+	default n
+	depends on !LV_USE_DRAW_DMA2D
+	help
+		Flush partial mode LTDC displays with DMA2D, in parallel with rendering.
+		Only available when the DMA2D renderer is disabled.
+
+endif #LV_USE_ST_LTDC

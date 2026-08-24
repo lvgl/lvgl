@@ -11,15 +11,6 @@
 
 #if LV_USE_LOTTIE
 
-#if LV_USE_THORVG_EXTERNAL
-    #include <thorvg_capi.h>
-#else
-    #include "../../libs/thorvg/thorvg_capi.h"
-#endif
-
-#include "../../core/lv_obj_class_private.h"
-#include "../../misc/cache/lv_cache.h"
-
 /*Check dependencies*/
 #if LV_USE_CANVAS == 0
     #error "lv_lottie: lv_canvas is required. Enable it in lv_conf.h (LV_USE_CANVAS 1)"
@@ -28,6 +19,15 @@
 #if LV_USE_THORVG == 0
     #error "lv_lottie: ThorVG is required. Enable it in lv_conf.h (LV_USE_THORVG_INTERNAL/EXTERNAL 1)"
 #endif
+
+#if LV_USE_THORVG_INTERNAL
+    #include "../../libs/thorvg/thorvg_capi.h"
+#else
+    #include <thorvg_capi.h>
+#endif
+
+#include "../../core/lv_obj_class_private.h"
+#include "../../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES
@@ -133,8 +133,10 @@ void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
     }
 
     float f_total;
+    float duration;
     tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
-    lv_anim_set_duration(lottie->anim, (int32_t)f_total * 1000 / 60); /*60 FPS*/
+    tvg_animation_get_duration(lottie->tvg_anim, &duration);
+    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
     lottie->anim->act_time = 0;
     lottie->anim->end_value = (int32_t)f_total;
     lottie->anim->reverse_play_in_progress = false;
@@ -151,8 +153,10 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
     }
 
     float f_total;
+    float duration;
     tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
-    lv_anim_set_duration(lottie->anim, (int32_t)f_total * 1000 / 60); /*60 FPS*/
+    tvg_animation_get_duration(lottie->tvg_anim, &duration);
+    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
     lottie->anim->act_time = 0;
     lottie->anim->end_value = (int32_t)f_total;
     lottie->anim->reverse_play_in_progress = false;
@@ -199,6 +203,13 @@ static void lv_lottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
+
+    /*Drop the cached image so a later widget reusing the same draw_buf address
+     *doesn't hit a stale entry (e.g. NanoVG's GPU texture keyed by the buffer).*/
+    const void * src = lv_image_get_src(obj);
+    if(src) {
+        lv_image_cache_drop(src);
+    }
 
     tvg_animation_del(lottie->tvg_anim);
     tvg_canvas_destroy(lottie->tvg_canvas);

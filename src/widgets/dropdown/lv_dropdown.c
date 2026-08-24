@@ -548,7 +548,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_obj_add_state(dropdown_obj, LV_STATE_CHECKED);
     lv_obj_set_parent(dropdown->list, lv_obj_get_screen(dropdown_obj));
     lv_obj_move_to_index(dropdown->list, -1);
-    lv_obj_remove_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(dropdown->list, false);
 
     /*To allow styling the list*/
     lv_obj_send_event(dropdown_obj, LV_EVENT_READY, NULL);
@@ -645,7 +645,7 @@ void lv_dropdown_close(lv_obj_t * obj)
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
-    lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(dropdown->list, true);
 
     lv_obj_send_event(obj, LV_EVENT_CANCEL, NULL);
 }
@@ -655,7 +655,7 @@ bool lv_dropdown_is_open(lv_obj_t * obj)
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    return lv_obj_has_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN) ? false : true;
+    return lv_obj_is_hidden(dropdown->list) ? false : true;
 }
 
 #if LV_USE_OBSERVER
@@ -712,7 +712,7 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     dropdown->option_cnt      = 0;
     dropdown->dir = LV_DIR_BOTTOM;
 
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 #if LV_WIDGETS_HAS_DEFAULT_VALUE
     lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
 #endif
@@ -746,10 +746,10 @@ static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_scroll_on_focus(obj, false);
+    lv_obj_set_click_focusable(obj, false);
+    lv_obj_set_ignore_layout(obj, true);
+    lv_obj_set_hidden(obj, true);
 
     lv_label_create(obj);
 
@@ -1271,7 +1271,7 @@ static lv_result_t btn_release_handler(lv_obj_t * obj)
 
 /**
  * Called when a drop down list is released to open it or set new option
- * @param list pointer to the drop down list's list
+ * @param list_obj pointer to the drop down list's list
  * @return LV_RESULT_INVALID if the list is not being deleted in the user callback. Else LV_RESULT_OK
  */
 static lv_result_t list_release_handler(lv_obj_t * list_obj)
@@ -1347,7 +1347,8 @@ static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y)
 
 /**
  * Set the position of list when it is closed to show the selected item
- * @param ddlist pointer to a drop down list
+ * @param dropdown_obj pointer to a drop down list
+ * @param anim_en whether to animate the position change
  */
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en)
 {

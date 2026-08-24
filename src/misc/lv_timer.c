@@ -111,17 +111,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         }
     } while(timer_active);
 
-    uint32_t time_until_next = LV_NO_TIMER_READY;
-    next = lv_ll_get_head(timer_head);
-    while(next) {
-        if(!next->paused) {
-            uint32_t delay = lv_timer_time_remaining(next);
-            if(delay < time_until_next)
-                time_until_next = delay;
-        }
-
-        next = lv_ll_get_next(timer_head, next); /*Find the next timer*/
-    }
+    uint32_t time_until_next = lv_timer_get_time_to_next();
 
     state_p->busy_time += lv_tick_elaps(handler_start);
     uint32_t idle_period_time = lv_tick_elaps(state_p->idle_period_start);
@@ -139,6 +129,24 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     lv_unlock();
 
     LV_PROFILER_TIMER_END;
+    return time_until_next;
+}
+
+LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_get_time_to_next(void)
+{
+    uint32_t time_until_next = LV_NO_TIMER_READY;
+    lv_ll_t * timer_head = timer_ll_p;
+    lv_timer_t * next = lv_ll_get_head(timer_head);
+
+    while(next && time_until_next) {
+        if(!next->paused) {
+            uint32_t timer_remaining = lv_timer_time_remaining(next);
+            time_until_next = LV_MIN(time_until_next, timer_remaining);
+        }
+
+        next = lv_ll_get_next(timer_head, next); /*Find the next timer*/
+    }
+
     return time_until_next;
 }
 

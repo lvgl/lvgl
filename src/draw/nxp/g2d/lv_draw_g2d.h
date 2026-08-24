@@ -22,7 +22,6 @@ extern "C" {
 
 #include "../../../lvgl_public.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include "../../sw/lv_draw_sw_private.h"
 
@@ -62,7 +61,6 @@ void lv_draw_g2d_img(lv_draw_task_t * t);
  **********************/
 
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -1,13 +1,24 @@
 ---
 title: STM32 LTDC Display Driver
+description: "LVGL's LTDC driver creates a display bound to a layer of an already-configured LTDC peripheral, in direct or partial render mode, single or double buffered."
+faqs:
+  - question: "Does the driver configure the LTDC peripheral?"
+    answer: "No. It works with an already-configured peripheral and relies on the STM32 HAL to detect the configuration. Generate the LTDC initialization code with STM32CubeIDE or STM32CubeMX. The driver includes main.h from within LVGL to reach the HAL definitions."
+  - question: "Can I drive two LTDC layers?"
+    answer: "Yes. The driver creates a display for one specific layer, so two LVGL LTDC displays can be created and operate independently on separate layers."
+  - question: "Should I use direct or partial render mode?"
+    answer: "Double-buffered direct mode gives the best visual results if enough memory is available. Use single-buffered direct mode only when memory is very scarce; on chips with a CPU data cache it has unavoidable visual artifacts. If there is almost, but not quite, enough memory for double-buffered direct mode, use partial mode."
+  - question: "What exactly is the framebuffer address the driver needs?"
+    answer: "The value of pLayerCfg.FBStartAdress when the LTDC layer is configured with the STM32 HAL, which is written to the CFBAR register of the LTDC layer peripheral. It can also be set at runtime with HAL_LTDC_SetAddress() before creating the display."
+  - question: "Can the display be rotated?"
+    answer: "Yes, with lv_display_set_rotation(), but only for displays created with lv_st_ltdc_create_partial(). The rotation is done in software, and LV_ST_LTDC_USE_DMA2D_FLUSH has no effect while it is used."
+  - question: "Can LTDC be combined with the DMA2D and NeoChrom draw units?"
+    answer: "LV_ST_LTDC_USE_DMA2D_FLUSH must not be enabled at the same time as LV_USE_DRAW_DMA2D. NeoChrom can be enabled together with LTDC without any interference."
 ---
-
-<br />
-
-<hr />
 
 Some STM32s have a specialized peripheral called
 LTDC (LCD-TFT Display Controller) for driving displays.
+See the [Display](/main-modules/display) module for general background on LVGL displays.
 
 ## Usage Modes With LVGL
 
@@ -31,7 +42,7 @@ All permutations of the below options are well supported.
 
 If OS is enabled, a synchronization primitive will be used to
 give the thread a chance to yield to other threads while blocked,
-improving CPU utilization. See <ApiLink name="LV_USE_OS" /> in your lv_conf.h
+improving CPU utilization. See <ApiLink name="LV_USE_OS" /> in your `lv_conf.h`.
 
 ## LTDC Layers
 
@@ -58,7 +69,7 @@ size as the default framebuffer for double-buffered
 mode, or `NULL` otherwise. `my_ltdc_layer_index` is the layer index of the
 LTDC layer to create the display for.
 
-For the best visial results, `optional_other_full_size_buffer` should be used
+For the best visual results, `optional_other_full_size_buffer` should be used
 if enough memory is available. Single-buffered mode is what you should use
 if memory is very scarce. Chips with a CPU data cache have unavoidable visual
 artifacts when using single-buffered direct mode. If there is almost enough
@@ -68,7 +79,11 @@ To clarify what `my_ltdc_framebuffer_address` exactly is, it's the value of
 `pLayerCfg.FBStartAdress` when the LTDC layer is configured using the STM32 HAL,
 which is written to the `CFBAR` register of the LTDC layer peripheral.
 
-![Stm32cubemx Ltdc Fbaddr](/_static/images/stm32cubemx-ltdc-fbaddr.png)
+<Figure
+  src="/_static/images/stm32cubemx-ltdc-fbaddr.png"
+  alt="The LTDC framebuffer start address in STM32CubeMX"
+  caption="The LTDC framebuffer start address in STM32CubeMX"
+/>
 
 ## Partial Render Mode
 
@@ -134,13 +149,13 @@ disp = lv_st_ltdc_create_partial(partial_buf1,
 
 The driver supports display rotation with
 <ApiLink name="lv_display_set_rotation" display="lv_display_set_rotation(disp, rotation)" /> where rotation is one of
-<ApiLink name="LV_DISP_ROTATION_90" />, <ApiLink name="LV_DISP_ROTATION_180" />,
-or <ApiLink name="LV_DISP_ROTATION_270" />. The rotation is initially
-<ApiLink name="LV_DISP_ROTATION_0" />.
+<ApiLink name="LV_DISPLAY_ROTATION_90" />, <ApiLink name="LV_DISPLAY_ROTATION_180" />,
+or <ApiLink name="LV_DISPLAY_ROTATION_270" />. The rotation is initially
+<ApiLink name="LV_DISPLAY_ROTATION_0" />.
 
 The rotation is done in software and only works if the display was
 created using <ApiLink name="lv_st_ltdc_create_partial" />.
-<ApiLink name="LV_ST_LTDC_USE_DMA2D_FLUSH" /> will be have no effect if rotation
+<ApiLink name="LV_ST_LTDC_USE_DMA2D_FLUSH" /> will have no effect if rotation
 is used.
 
 ## Interop with the DMA2D and NeoChrom Draw Units

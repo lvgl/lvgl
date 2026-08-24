@@ -32,7 +32,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t draw_unit_id);
-static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
 static inline size_t get_draw_dsc_size(lv_draw_task_type_t type);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
 
@@ -141,7 +140,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
      *dispatching might remove the "main" draw task while it's still being used in the event*/
 
     if(info->task_running == false) {
-        if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
+        if(base_dsc->obj && lv_obj_is_send_draw_task_events(base_dsc->obj)) {
             info->task_running = true;
             lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
             info->task_running = false;
@@ -237,8 +236,12 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
     bool remove_task = false;
     while(t) {
         t_next = t->next;
-        if(t->state == LV_DRAW_TASK_STATE_FINISHED) {
-            cleanup_task(t, disp);
+        if(t->state == LV_DRAW_TASK_STATE_FINISHED || t->state == LV_DRAW_TASK_STATE_FAILED) {
+            if(t->state == LV_DRAW_TASK_STATE_FAILED) {
+                LV_LOG_ERROR("draw task failed, type: %d", (int)t->type);
+            }
+
+            lv_draw_cleanup_task(t, disp);
             remove_task = true;
             if(t_prev != NULL)
                 t_prev->next = t_next;
@@ -672,7 +675,7 @@ static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
  * @param t         pointer to a draw task
  * @param disp      pointer to a display on which the task was drawn
  */
-static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
+void lv_draw_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
 {
     LV_PROFILER_DRAW_BEGIN;
     if(t->type == LV_DRAW_TASK_TYPE_LINE) {

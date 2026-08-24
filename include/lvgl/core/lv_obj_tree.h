@@ -257,6 +257,7 @@ void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size)
  * be created for it using `lv_obj_get_name_resolved`.
  *
  * @param parent        the widget where the search should start
+ * @param name          the name of the widget
  * @return              the found widget or NULL if not found.
  */
 lv_obj_t * lv_obj_find_by_name(const lv_obj_t * parent, const char * name);
@@ -271,6 +272,7 @@ lv_obj_t * lv_obj_find_by_name(const lv_obj_t * parent, const char * name);
  * be created for it using `lv_obj_get_name_resolved`.
  *
  * @param parent        the widget where the search should start
+ * @param name_path     the widget name path
  * @return              the found widget or NULL if not found.
  */
 lv_obj_t * lv_obj_get_child_by_name(const lv_obj_t * parent, const char * name_path);

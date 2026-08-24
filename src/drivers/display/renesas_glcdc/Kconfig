@@ -1,0 +1,5 @@
+config LV_USE_RENESAS_GLCDC
+	bool "Renesas GLCDC"
+	default n
+	help
+		Create a display driven by the Renesas GLCDC peripheral.

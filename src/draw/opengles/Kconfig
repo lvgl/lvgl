@@ -1,0 +1,18 @@
+config LV_USE_DRAW_OPENGLES
+	bool "OpenGL ES renderer"
+	default n
+	select LV_USE_OPENGLES
+	select LV_DRAW_HAS_3D_SUPPORT
+	help
+		Draw with OpenGL ES, keeping rendered widgets and images as GPU textures.
+
+if LV_USE_DRAW_OPENGLES
+
+config LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+	int "Texture cache size (entries)"
+	default 64
+	help
+		Number of textures kept in the cache. More entries mean fewer redraws
+		but more GPU memory.
+
+endif

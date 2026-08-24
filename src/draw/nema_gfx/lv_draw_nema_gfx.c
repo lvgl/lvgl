@@ -294,8 +294,10 @@ static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL)
+    if(buf == NULL) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
         return LV_DRAW_UNIT_IDLE;
+    }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_nema_gfx_unit->task_act = t;

@@ -414,8 +414,8 @@
         * Others
         *-----------*/
 
-        #define LV_ENABLE_GLOBAL_CUSTOM 0
-        #if LV_ENABLE_GLOBAL_CUSTOM
+        #define LV_GLOBAL_USE_CUSTOM_INCLUDE 0
+        #if LV_GLOBAL_USE_CUSTOM_INCLUDE
             /** Header to include for custom 'lv_global' function" */
             #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
         #endif

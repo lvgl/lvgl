@@ -1,0 +1,82 @@
+menu "Core"
+
+config LV_OBJ_STYLE_CACHE
+	bool "Style cache"
+	default n
+	help
+		Speed up style property lookups by adding 2 x 32 bit variables to each lv_obj_t.
+
+config LV_USE_OBJ_NAME
+	bool "Widget names (lv_obj_set_name)"
+	default n
+
+config LV_USE_OBJ_ID
+	bool "Widget id (lv_obj_set_id)"
+	default n
+
+if LV_USE_OBJ_ID
+
+config LV_OBJ_ID_AUTO_ASSIGN
+	bool "Automatic ID assignment on widget creation"
+	default y
+
+config LV_USE_OBJ_ID_BUILTIN
+	bool "Built-in ID handler"
+	default y
+	help
+		Use builtin obj ID handler functions:
+		- lv_obj_assign_id:       Called when a widget is created. Use a separate counter for each widget class as an ID.
+		- lv_obj_id_compare:      Compare the ID to decide if it matches with a requested value.
+		- lv_obj_stringify_id:    Return string-ified identifier, e.g. "button3".
+		- lv_obj_free_id:         Does nothing, as there is no memory allocation for the ID.
+		When disabled these functions needs to be implemented by the user.
+
+endif #LV_USE_OBJ_ID
+
+config LV_USE_OBJ_PROPERTY
+	bool "Generic widget property set/get API"
+	default n
+	help
+		Get and set any widget style or attribute through a single generic property ID based API.
+
+if LV_USE_OBJ_PROPERTY
+
+config LV_USE_OBJ_PROPERTY_NAME
+	bool "Access properties by name"
+	default y
+	help
+		Add a name table to every widget class, so the property can be accessed by name.
+		Note, the const table will increase flash usage.
+
+endif #LV_USE_OBJ_PROPERTY
+
+config LV_USE_EXT_DATA
+	bool "External data and destructor"
+	default n
+	help
+		Attach your own data plus a destructor callback to events, widgets, observers,
+		animations, timers, groups, displays, input devices and themes, so your resources
+		are cleaned up when LVGL frees them.
+
+config LV_USE_FLOAT
+	bool "Float as lv_value_precise_t"
+	default n
+	help
+		Use `float` instead of `int32_t` for coordinates and values that need sub-pixel precision.
+
+config LV_USE_OBSERVER
+	bool "Observer"
+	default y
+	help
+		Bind widgets to subject variables so they update automatically when the value changes.
+
+config LV_USE_TRANSLATION
+	bool "Text translation"
+	help
+		Look up strings by ID for the selected language with lv_translation_get().
+
+config LV_USE_COLOR_FILTER
+	bool "Color filter style"
+	default n
+
+endmenu #"Core"

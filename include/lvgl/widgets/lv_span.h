@@ -154,13 +154,6 @@ void lv_spangroup_set_span_text_static(lv_obj_t * obj, lv_span_t * span, const c
  */
 void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(3, 4);
 
-/**
- * Set a static text. It will not be saved by the span so the 'text' variable
- * has to be 'alive' while the span exist.
- * @param span  pointer to a span.
- * @param text  pointer to a text.
- */
-void lv_span_set_text_static(lv_span_t * span, const char * text);
 
 /**
  * Copy all style properties of style to the bbuilt-in static style of the span.
@@ -176,6 +169,7 @@ void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_styl
  * @param obj   pointer to a spangroup object.
  * @param align see lv_text_align_t for details.
  */
+LV_DEPRECATED("Use text_align style property instead")
 void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align);
 
 /**
@@ -198,6 +192,7 @@ void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent);
  * @param obj       pointer to a spangroup object.
  * @param mode      see lv_span_mode_t for details.
  */
+LV_DEPRECATED("set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping")
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
 
 /**
@@ -332,10 +327,10 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * 
 /**
  * Get the span object by point.
  * @param obj       pointer to a spangroup object.
- * @param point     pointer to point containing absolute coordinates
+ * @param p         pointer to point containing absolute coordinates
  * @return          pointer to the span under the point or `NULL` if not found.
  */
-lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * point);
+lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p);
 
 /*=====================
  * Other functions

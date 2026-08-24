@@ -165,7 +165,7 @@ void test_arc_click_area_with_adv_hittest(void)
     arc = lv_arc_create(lv_screen_active());
     lv_obj_set_size(arc, 100, 100);
     lv_obj_set_style_arc_width(arc, 10, 0);
-    lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_set_adv_hittest(arc, true);
     lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
     lv_obj_set_ext_click_area(arc, 5);
 
@@ -249,8 +249,8 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
     lv_obj_set_size(arc2, 100, 100);
     lv_arc_set_bg_angles(arc, 20, 160);
     lv_arc_set_bg_angles(arc2, 200, 340);
-    lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_add_flag(arc2, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_set_adv_hittest(arc, true);
+    lv_obj_set_adv_hittest(arc2, true);
     lv_arc_set_value(arc, 10);
     lv_arc_set_value(arc2, 10);
     lv_arc_set_rotation(arc, 355);
@@ -791,6 +791,62 @@ void test_arc_angle_within_bg_bounds_edge_cases(void)
 
     /* Edge test 5: wrapped arc after-end tolerance */
     run_arc_drag_test(300, 60, 80, 60, 75);
+}
+
+/* Regression: negative inner radius in inv_arc_area() when padding
+ * exceeds the arc radius. Previously passed a negative value to
+ * lv_draw_arc_get_area(), causing undefined trig results. */
+void test_arc_negative_radius_no_crash(void)
+{
+    arc = lv_arc_create(active_screen);
+    lv_obj_set_size(arc, 10, 10);
+    lv_obj_set_style_arc_width(arc, 50, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(arc, 50, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(arc, 30, LV_PART_MAIN);
+
+    lv_arc_set_value(arc, 50);
+    lv_obj_invalidate(arc);
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_NOT_NULL(arc);
+}
+
+/* Regression: stroke width wider than radius in lv_draw_arc_get_area()
+ * produced a negative inner radius, leading to bad trig calculations. */
+void test_arc_stroke_wider_than_radius_no_crash(void)
+{
+    arc = lv_arc_create(active_screen);
+    lv_obj_set_size(arc, 30, 30);
+    lv_obj_set_style_arc_width(arc, 40, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(arc, 40, LV_PART_MAIN);
+
+    lv_arc_set_value(arc, 70);
+    lv_obj_invalidate(arc);
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_NOT_NULL(arc);
+}
+
+/* Edge case: zero-size arc should not crash during invalidation
+ * or redraw. */
+void test_arc_zero_size_no_crash(void)
+{
+    arc = lv_arc_create(active_screen);
+    lv_obj_set_size(arc, 1, 1);
+
+    lv_arc_set_value(arc, 50);
+    lv_obj_invalidate(arc);
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_NOT_NULL(arc);
+
+    /* Also try true zero size */
+    lv_obj_set_size(arc, 0, 0);
+    lv_arc_set_value(arc, 80);
+    lv_obj_invalidate(arc);
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_NOT_NULL(arc);
 }
 
 #endif

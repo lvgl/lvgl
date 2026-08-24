@@ -14,7 +14,7 @@
 #include "lv_nanovg_utils.h"
 #include "lv_nanovg_math.h"
 #include "lv_nanovg_image_cache.h"
-#include "../lv_image_decoder_private.h"
+#include "../../image/lv_image_decoder_private.h"
 #include "../lv_draw_image_private.h"
 
 /*********************
@@ -89,8 +89,7 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
             }
         }
 
-        image_handle = lv_nanovg_image_cache_get_handle(u, dsc->src,
-                                                        image_flags, NULL);
+        image_handle = lv_nanovg_image_cache_get_handle(u, dsc->src, image_flags, NULL);
     }
 
     if(image_handle < 0) {

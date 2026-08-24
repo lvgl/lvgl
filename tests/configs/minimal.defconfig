@@ -1,0 +1,8 @@
+# Applied on top of the empty preset in configs/defconfigs, which is what
+# actually switches the widgets, themes and layouts off.
+# Disable assertions to catch unused variables errors
+
+CONFIG_LV_MEM_SIZE=65535
+
+# CONFIG_LV_USE_ASSERT_NULL is not set
+# CONFIG_LV_USE_ASSERT_MALLOC is not set

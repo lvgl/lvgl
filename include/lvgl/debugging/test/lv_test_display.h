@@ -42,6 +42,25 @@ extern "C" {
  */
 lv_display_t * lv_test_display_create(int32_t hor_res, int32_t ver_res);
 
+#if LV_USE_TEST && defined(LV_USE_DRAW_NANOVG) && LV_USE_DRAW_NANOVG && defined(LV_USE_NANOVG_TEST_HEADLESS) && LV_USE_NANOVG_TEST_HEADLESS
+/**
+ * Create a headless EGL display for EGL headless rendering tests.
+ * Uses EGL + pbuffer + FBO for off-screen rendering with glReadPixels readback.
+ * @param hor_res   the horizontal resolution
+ * @param ver_res   the vertical resolution
+ * @return          the created display, or NULL on failure
+ */
+lv_display_t * lv_test_display_egl_create(int32_t hor_res, int32_t ver_res);
+
+/**
+ * Clean up EGL/GL resources after lv_deinit() has destroyed the NanoVG draw unit.
+ * Must be called from lv_test_deinit() after lv_deinit(), passing the context that
+ * was captured from the display's driver data before lv_deinit() deleted the display.
+ * @param egl_ctx   the context returned via lv_display_get_driver_data(), may be NULL
+ */
+void lv_test_display_egl_cleanup(void * egl_ctx);
+#endif
+
 /**********************
  *      MACROS
  **********************/

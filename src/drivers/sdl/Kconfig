@@ -1,0 +1,127 @@
+config LV_USE_SDL
+	bool "SDL"
+	default n
+	help
+		Open a window on a PC desktop with SDL2 and read mouse and keyboard input.
+
+if LV_USE_SDL
+
+config LV_SDL_INCLUDE_PATH
+	string "SDL include path"
+	default "SDL2/SDL.h"
+
+config LV_SDL_AUTO_BACKEND
+	bool "Auto-select the SDL backend (legacy)"
+	default y
+	help
+	  Legacy behavior, slated for removal: EGL is inferred the legacy way
+	  (LV_USE_OPENGLES with an OpenGL draw unit). Disable this and pick a backend
+	  explicitly in the "Rendering backend" choice.
+
+choice
+	prompt "Rendering backend"
+	default LV_SDL_BACKEND_SW
+	depends on !LV_SDL_AUTO_BACKEND
+	help
+	  Select how the SDL driver presents rendered frames.
+
+	config LV_SDL_BACKEND_SW
+		bool "Software (SDL surface)"
+		help
+		  Render in software and upload via an SDL surface.
+
+	config LV_SDL_BACKEND_TEXTURE
+		bool "Cached SDL textures"
+		select LV_USE_DRAW_SDL
+		help
+		  Render into cached SDL textures. Enables the SDL renderer.
+
+	config LV_SDL_BACKEND_EGL
+		bool "EGL (OpenGL ES, hardware-accelerated)"
+		depends on LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
+		select LV_SDL_USE_EGL
+		help
+		  Present frames through an EGL/OpenGL ES context.
+		  Requires the OpenGL ES or NanoVG renderer.
+endchoice
+
+config LV_SDL_BACKEND
+	int
+	default 0 if LV_SDL_BACKEND_SW
+	default 1 if LV_SDL_BACKEND_TEXTURE
+	default 2 if LV_SDL_BACKEND_EGL
+
+config LV_SDL_USE_EGL
+	bool
+	select LV_USE_EGL
+
+choice
+	prompt "Render mode"
+	default LV_SDL_RENDER_MODE_DIRECT
+	help
+		Direct mode is recommended for best performance.
+
+	config LV_SDL_RENDER_MODE_PARTIAL
+		bool "Partial mode"
+		help
+			Render the screen in smaller parts so the buffer(s) can be smaller than the display and save RAM.
+
+	config LV_SDL_RENDER_MODE_DIRECT
+		bool "Direct mode"
+		help
+			Render into the correct location of screen-sized buffer(s) so they always hold the whole image, and flush only the changed areas.
+
+	config LV_SDL_RENDER_MODE_FULL
+		bool "Full mode"
+		help
+			Always redraw the whole screen even if only one pixel has changed.
+endchoice
+
+config LV_SDL_BUF_COUNT
+	int "Number of screen-sized buffers"
+	range 1 2
+	default 1
+
+choice
+	prompt "SDL buffer count [DEPRECATED: use LV_SDL_BUF_COUNT]"
+	optional
+
+	config LV_SDL_SINGLE_BUFFER
+		bool "One screen-sized buffer [DEPRECATED: set LV_SDL_BUF_COUNT to 1]"
+
+	config LV_SDL_DOUBLE_BUFFER
+		bool "Two screen-sized buffers [DEPRECATED: set LV_SDL_BUF_COUNT to 2]"
+endchoice
+
+config LV_SDL_ACCELERATED
+	bool "Hardware acceleration"
+	default y
+	help
+		Ask SDL for a GPU-backed renderer instead of a software one.
+
+config LV_SDL_FULLSCREEN
+	bool "Fullscreen"
+	default n
+
+config LV_SDL_DIRECT_EXIT
+	bool "Exit when all windows are closed"
+	default y
+
+choice
+	prompt "SDL mousewheel mode"
+	default LV_SDL_MOUSEWHEEL_MODE_ENCODER
+
+	config LV_SDL_MOUSEWHEEL_MODE_ENCODER
+		bool "Encoder input device"
+
+	config LV_SDL_MOUSEWHEEL_MODE_CROWN
+		bool "Smart watch crown"
+endchoice
+
+config LV_SDL_MOUSEWHEEL_MODE
+	int
+	default 0 if LV_SDL_MOUSEWHEEL_MODE_ENCODER
+	default 1 if LV_SDL_MOUSEWHEEL_MODE_CROWN
+
+
+endif #LV_USE_SDL

@@ -17,11 +17,17 @@ each within LVGL's codebase.
 | Recovery possible | No | Yes / Maybe |
 | Typical use | Internal invariants | API input validation |
 
-**Use assertions** for conditions that indicate bugs in the code—situations
-that should never happen if the code is correct.
+**Use assertions** for conditions that indicate bugs in the code, situations
+that should never happen if the code is correct. If an internal function expects
+a parameter to satisfy a certain condition, add an assertion: it acts as
+executable documentation for future contributors and catches misuse early.
 
-**Use argument checking** for conditions that might legitimately fail at runtime
-(e.g., user-provided input, resource availability) and require graceful handling.
+**Use argument checking** for validating inputs at public API boundaries.
+`LV_CHECK_ARG` (and `LV_CHECK_OBJ*`) are **mandatory** at the start
+of every public API function, they allow callers to recover gracefully and
+produce actionable log output when something goes wrong.
+
+---
 
 ## Assertions
 
@@ -86,6 +92,8 @@ LV_ASSERT_MALLOC(buf);
 LV_ASSERT_MEM_INTEGRITY();
 ```
 
+---
+
 ## Argument Checking
 
 The <ApiLink name="LV_CHECK_ARG" /> macro provides a flexible approach for validating
@@ -101,21 +109,30 @@ This macro is useful for:
 
 ### Configuration
 
-In `lv_conf.h`:
+- <ApiLink name="LV_USE_CHECK_ARG" /> — Set to `1` to enable, `0` to disable.
+  When disabled, all `LV_CHECK_ARG` and `LV_CHECK_OBJ` calls compile to nothing.
 
-- <ApiLink name="LV_USE_CHECK_ARG" /> - Set to `1` to enable, `0` to disable.
-  When disabled, all `LV_CHECK_ARG` calls compile to nothing.
-- <ApiLink name="LV_CHECK_ARG_ASSERT_ON_FAIL" /> - Set to `1` to also call
-  `LV_ASSERT_HANDLER` on failure (before the action is executed).
+  <Callout type="warning" title="Disabling argument checks is dangerous">
+    With `LV_USE_CHECK_ARG = 0`, passing invalid arguments to any public API
+    function is undefined behavior — there is no NULL guard, no type check, and
+    no early return. Only disable this if you can guarantee that every call site
+    in your application passes valid arguments. When in doubt, leave it enabled.
+  </Callout>
 
-The macro uses the [Logging](/debugging/log) system to output warnings.
-Make sure logging is enabled by setting <ApiLink name="LV_USE_LOG" /> to `1`.
+- <ApiLink name="LV_CHECK_ARG_ASSERT_ON_FAIL" /> — Set to `1` to also call
+  `LV_ASSERT_HANDLER` on failure (before the action is executed). Useful during
+  debugging to restore hard-abort behavior.
+- <ApiLink name="LV_CHECK_ARG_LOG_MODE" /> — Controls how much is logged when a
+  check fails. Requires `LV_USE_LOG = 1`; if logging is disabled no output is
+  produced regardless of this setting.
+  - `LV_CHECK_ARG_LOG_MODE_NONE (0)` — No log output.
+  - `LV_CHECK_ARG_LOG_MODE_MINIMAL (1)` — Logs `"Check failed"` plus file and line number.
+  - `LV_CHECK_ARG_LOG_MODE_VERBOSE (2)` — Logs `"Check failed: <cond>"` plus any caller-supplied message.
 
 ### Usage
 
-<ApiLink name="LV_CHECK_ARG" />
-   Takes a condition, an action to execute on failure, and optional printf-style
-   arguments for the log message:
+<ApiLink name="LV_CHECK_ARG" /> takes a condition, an action to execute on failure,
+and optional printf-style arguments for the log message:
 
 ```c
 void draw_to_display(lv_obj_t * display, int len)
@@ -123,7 +140,7 @@ void draw_to_display(lv_obj_t * display, int len)
     /* Return early if display is NULL */
     LV_CHECK_ARG(display != NULL, return, ": display must be provided");
 
-    /* Return -1 if len is invalid, logging the actual value */
+    /* Return if len is invalid, logging the actual value */
     LV_CHECK_ARG(len % 2 == 0, return, ": need even data points, but got %d", (int)len);
 }
 
@@ -136,17 +153,53 @@ int get_width(lv_obj_t * obj)
 ```
 
 The condition is stringified and included in the log message, so you can see
-   exactly what check failed. Only supply a format string and arguments if you
-   want to include additional context beyond the condition itself.
+exactly what check failed. Only supply a format string and arguments if you want
+to include additional context beyond the condition itself.
 
-Using `break` as the action in a loop:
+---
+
+## Object Checking
+
+<ApiLink name="LV_CHECK_OBJ" /> is the standard replacement for `LV_ASSERT_OBJ` and
+the only object-checking macro you should use directly. It performs all checks
+enabled by the configuration (see below) and requires
+<ApiLink name="LV_USE_CHECK_ARG" /> `= 1`:
 
 ```c
-for(int i = 0; i < count; i++) {
-    LV_CHECK_ARG(data[i] != NULL, break, ": NULL at index %d", i);
-    /* ... */
-}
+LV_CHECK_OBJ(obj, &lv_label_class, return);
 ```
+
+<ApiLink name="LV_CHECK_OBJ_CLASS" /> and <ApiLink name="LV_CHECK_OBJ_VALID" /> are
+lower-level building blocks exposed for completeness. Do not use them directly.
+
+### Configuration
+
+The checks performed by <ApiLink name="LV_CHECK_OBJ" /> macros are layered and independently configurable:
+
+| Layer | Config option | What it checks |
+| --- | --- | --- |
+| Base | `LV_USE_CHECK_ARG = 1` | Master switch. When `0`, all three macros expand to nothing. |
+| NULL | always on | `obj != NULL` (always checked when the system is enabled). |
+| Class type | `LV_USE_CHECK_OBJ_CLASSTYPE = 1` | `lv_obj_has_class(obj, cls)` — verifies the object is the expected widget type. |
+| Validity | `LV_USE_CHECK_OBJ_VALIDITY = 1` | `lv_obj_is_valid(obj)` — verifies the object is still part of the live widget tree. |
+
+All options default to `0`. Enable them selectively:
+
+```c
+/* lv_conf.h */
+#define LV_USE_CHECK_ARG            1   /* master switch — enables LV_CHECK_ARG and LV_CHECK_OBJ* */
+#define LV_USE_CHECK_OBJ_CLASSTYPE  1   /* also verify the object's class type */
+#define LV_USE_CHECK_OBJ_VALIDITY   1   /* also verify the object is alive in the widget tree */
+```
+
+<Callout type="warning" title="Enable only during development">
+  `lv_obj_is_valid()` walks the widget tree and `lv_obj_has_class()` traverses
+  the class hierarchy on every call site. These checks add non-trivial overhead,
+  especially in rendering-critical code paths. Keep `LV_USE_CHECK_OBJ_CLASSTYPE`
+  and `LV_USE_CHECK_OBJ_VALIDITY` at `0` in production builds.
+</Callout>
+
+---
 
 ## Macros Reference
 
@@ -166,3 +219,11 @@ for(int i = 0; i < count; i++) {
 | Macro | Description |
 | --- | --- |
 | <ApiLink name="LV_CHECK_ARG" /> | Check condition; on failure log and execute action |
+
+### Object Checking
+
+| Macro | Description |
+| --- | --- |
+| <ApiLink name="LV_CHECK_OBJ" /> | NULL + optional class type + optional validity check (preferred) |
+| <ApiLink name="LV_CHECK_OBJ_CLASS" /> | NULL + optional class type check |
+| <ApiLink name="LV_CHECK_OBJ_VALID" /> | NULL + optional class type + optional validity check (alias for `LV_CHECK_OBJ`) |

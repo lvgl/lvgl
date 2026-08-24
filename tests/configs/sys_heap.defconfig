@@ -1,0 +1,17 @@
+# Use the C library allocator and string functions, so that ASan/LSan/UBSan can
+# see every allocation.
+
+CONFIG_LV_USE_CLIB_MALLOC=y
+CONFIG_LV_USE_CLIB_STRING=y
+CONFIG_LV_USE_CLIB_SPRINTF=y
+
+# CONFIG_LV_OBJ_STYLE_CACHE is not set
+
+# Run the tests with bin images loaded to RAM
+CONFIG_LV_BIN_DECODER_RAM_LOAD=y
+
+# Use a large stride so that any indexing issue causes a visible failure, and a
+# non power of 2 buffer alignment so that we do not accidentally rely on the
+# alignment malloc() happens to return.
+CONFIG_LV_DRAW_BUF_STRIDE_ALIGN=64
+CONFIG_LV_DRAW_BUF_ALIGN=852

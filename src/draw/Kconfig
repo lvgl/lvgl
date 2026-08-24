@@ -1,0 +1,206 @@
+menu "Rendering Configuration"
+
+menu "Color Settings"
+	choice
+		prompt "Color depth"
+		default LV_COLOR_DEPTH_16
+
+		config LV_COLOR_DEPTH_32
+			bool "32: XRGB8888"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_DEPTH_24
+			bool "24: RGB888"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_DEPTH_16
+			bool "16: RGB565"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_DEPTH_8
+			bool "8: L8 (grayscale)"
+			imply LV_FONT_UNSCII_8
+		config LV_COLOR_DEPTH_1
+			bool "1: I1 (1 bit per pixel)"
+			imply LV_FONT_MONTSERRAT_14
+	endchoice
+
+	config LV_COLOR_DEPTH
+		int
+		default 1 if LV_COLOR_DEPTH_1
+		default 8 if LV_COLOR_DEPTH_8
+		default 16 if LV_COLOR_DEPTH_16
+		default 24 if LV_COLOR_DEPTH_24
+		default 32 if LV_COLOR_DEPTH_32
+		help
+			Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)
+
+	config LV_COLOR_MIX_ROUND_OFS
+		int "Color mix rounding offset"
+		default 0
+		range 0 254
+		help
+			0: no adjustment, get the integer part of the result (round down)
+			64: round up from x.75
+			128: round up from half
+			192: round up from x.25
+			254: round up
+endmenu
+
+config LV_DRAW_HAS_VECTOR_SUPPORT
+	bool
+	default n
+
+config LV_DRAW_HAS_3D_SUPPORT
+	bool
+	default n
+
+config LV_DEF_REFR_PERIOD
+	int "Default refresh period (ms)"
+	default 33
+	help
+		Default display refresh, input device read and animation step period.
+
+config LV_DPI_DEF
+	int "Default DPI (px/inch)"
+	default 130
+	help
+		Used to initialize default sizes such as widget sizes and style paddings.
+
+config LV_DRAW_BUF_STRIDE_ALIGN
+	int "Draw buffer stride alignment (bytes)"
+	default 1
+	help
+		Align the stride of all layers and images to this many bytes.
+
+config LV_DRAW_BUF_ALIGN
+	int "Draw buffer address alignment (bytes)"
+	default 4
+	help
+		Align the start address of draw_buf addresses to this many bytes.
+
+config LV_USE_MATRIX
+	bool "Matrix"
+	default n
+	select LV_USE_FLOAT
+	help
+		3x3 matrix API (lv_matrix_t) for transformations. Requires floating point support.
+
+config LV_DRAW_TRANSFORM_USE_MATRIX
+	bool "Matrix based transformations"
+	default n
+	depends on LV_USE_MATRIX
+	help
+		The rendering engine must support 3x3 matrix transformations.
+
+config LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+	int "Simple layer buffer size (bytes)"
+	default 24576
+	help
+		Widgets with `style_opa < 255` (not `bg_opa`, `text_opa` etc) or a non-NORMAL blend mode are
+		buffered into a "simple" layer in chunks of this size.
+		"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be chunked.
+
+config LV_DRAW_LAYER_MAX_MEMORY
+	int "Maximum layer memory (bytes)"
+	default 0
+	help
+		Limit for simple and transformed layers together; 0 means no limit.
+		Must be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE`, and with transformed layers large enough
+		for the largest widget too (width x height x 4).
+
+config LV_DRAW_THREAD_STACK_SIZE
+	int "Draw thread stack size (bytes)"
+	default 8192
+	depends on !LV_OS_NONE
+	help
+		If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
+
+config LV_DRAW_THREAD_PRIO
+	int "Draw thread priority"
+	range 0 4
+	default 3
+	depends on !LV_OS_NONE
+	help
+		Thread priority controls the relative importance of the drawing threads.
+		Values correspond to lv_thread_prio_t enum in lv_os.h:
+		0: LV_THREAD_PRIO_LOWEST
+		1: LV_THREAD_PRIO_LOW
+		2: LV_THREAD_PRIO_MID (default)
+		3: LV_THREAD_PRIO_HIGH
+		4: LV_THREAD_PRIO_HIGHEST
+
+		Higher priority can improve rendering performance but might cause
+		starvation of lower priority tasks.
+
+config LV_USE_VECTOR_GRAPHIC
+	bool "Vector graphics"
+	default n
+	select LV_USE_MATRIX
+	help
+		Vector drawing API (lv_vector_dsc_*) for paths, strokes and fills.
+		Needs a renderer with vector support, e.g. the SW renderer with ThorVG, or VG-Lite.
+
+
+rsource "snapshot/Kconfig"
+
+config LV_USE_THORVG
+	bool "Vector graphics engine (ThorVG)"
+	default n
+	select LV_DRAW_HAS_VECTOR_SUPPORT if LV_USE_DRAW_SW
+	help
+		Backend that gives the SW renderer vector graphics support.
+
+config LV_USE_THORVG_INTERNAL
+	bool "Bundled ThorVG"
+	default y
+	depends on LV_USE_THORVG
+	help
+		Build the ThorVG copy shipped with LVGL instead of linking an external one.
+
+
+menu "SW"
+rsource "sw/Kconfig"
+endmenu
+
+menu "VG-Lite"
+rsource "vg_lite/Kconfig"
+endmenu
+
+menu "Dave2D"
+rsource "renesas/dave2d/Kconfig"
+endmenu
+
+menu "NemaGFX"
+rsource "nema_gfx/Kconfig"
+endmenu
+
+menu "PXP"
+rsource "nxp/pxp/Kconfig"
+endmenu
+
+menu "PPA"
+rsource "espressif/ppa/Kconfig"
+endmenu
+
+menu "DMA2D"
+rsource "dma2d/Kconfig"
+endmenu
+
+menu "EVE"
+rsource "eve/Kconfig"
+endmenu
+
+menu "G2D"
+rsource "nxp/g2d/Kconfig"
+endmenu
+
+menu "NanoVG"
+rsource "nanovg/Kconfig"
+endmenu
+
+menu "OpenGL ES"
+rsource "opengles/Kconfig"
+endmenu
+
+menu "SDL"
+rsource "sdl/Kconfig"
+endmenu 
+endmenu

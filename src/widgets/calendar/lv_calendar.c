@@ -59,7 +59,16 @@ const lv_obj_class_t lv_calendar_class = {
     .name = "lv_calendar",
 };
 
+#if defined(LV_CALENDAR_DEFAULT_DAY_NAMES) && !LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES
+#warning "LV_CALENDAR_DEFAULT_DAY_NAMES is deprecated and will be removed in the next release. Use LV_MONDAY_STR, LV_TUESDAY_STR,... to set each week day name"
 static const char * day_names_def[7] = LV_CALENDAR_DEFAULT_DAY_NAMES;
+#else
+#if LV_CALENDAR_WEEK_STARTS_MONDAY
+static const char * day_names_def[7] = { LV_MONDAY_STR, LV_TUESDAY_STR, LV_WEDNESDAY_STR, LV_THURSDAY_STR, LV_FRIDAY_STR, LV_SATURDAY_STR, LV_SUNDAY_STR };
+#else
+static const char * day_names_def[7] = { LV_SUNDAY_STR, LV_MONDAY_STR, LV_TUESDAY_STR, LV_WEDNESDAY_STR, LV_THURSDAY_STR, LV_FRIDAY_STR, LV_SATURDAY_STR };
+#endif /*CONFIG_LV_CALENDAR_WEEK_STARTS_MONDAY*/
+#endif
 
 /**********************
  *      MACROS
@@ -356,7 +365,9 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_buttonmatrix_set_button_ctrl_all(calendar->btnm, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT);
     lv_obj_add_event_cb(calendar->btnm, draw_task_added_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_set_width(calendar->btnm, lv_pct(100));
-    lv_obj_add_flag(calendar->btnm, LV_OBJ_FLAG_EVENT_BUBBLE | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+
+    lv_obj_set_event_bubble(calendar->btnm, true);
+    lv_obj_set_send_draw_task_events(calendar->btnm, true);
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);

@@ -215,6 +215,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(!buf) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
         return LV_DRAW_UNIT_IDLE;
     }
 

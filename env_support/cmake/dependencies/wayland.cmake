@@ -150,8 +150,8 @@ endif()
 
 set(WAYLAND_PROTOCOL_SOURCES ${XDG_SHELL_SOURCE})
 
-# dmabuf (optional)
-if(CONFIG_LV_WAYLAND_USE_G2D)
+# dmabuf (optional) - used by the DMA-BUF and G2D backends
+if(CONFIG_LV_WAYLAND_USE_DMABUF_PROTOCOL)
   set(DMABUF_XML "${PROTOCOL_ROOT}/stable/linux-dmabuf/linux-dmabuf-v1.xml")
   set(DMABUF_HEADER "${PROTOCOLS_DIR}/wayland_linux_dmabuf.h")
   set(DMABUF_SOURCE "${PROTOCOLS_DIR}/wayland_linux_dmabuf.c")
@@ -193,3 +193,7 @@ target_sources(lvgl PRIVATE $<TARGET_OBJECTS:lv_wayland_protocols>)
 target_include_directories(
   lvgl
   PRIVATE $<TARGET_PROPERTY:lv_wayland_protocols,INTERFACE_INCLUDE_DIRECTORIES>)
+
+if(CONFIG_LV_USE_PRIVATE_API)
+  target_include_directories(lvgl PUBLIC $<BUILD_INTERFACE:${PROTOCOLS_DIR}>)
+endif()

@@ -286,6 +286,76 @@ void test_bin_decoder_decoder_dsc_error_handling(void)
     lv_bin_decoder_close(decoder_dsc->decoder, decoder_dsc);
 }
 
+void test_bin_decoder_get_area_outside_image(void)
+{
+    const char * src = "A:src/test_files/binimages/cogwheel.RGB565.bin";
+    lv_image_cache_drop(src);
+
+    const lv_image_decoder_args_t args = { .no_cache = true };
+    lv_image_decoder_dsc_t dsc;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&dsc, src, &args));
+
+    int32_t w = dsc.header.w;
+    int32_t h = dsc.header.h;
+
+    /*A transformed image is drawn on a larger area than the image itself. Such an area
+     *cannot be decoded line by line, so it must be rejected instead of reading out of bounds.*/
+    const lv_area_t outside[] = {
+        {-1, 0, w - 1, 0},
+        {0, -1, w - 1, 0},
+        {0, 0, w, 0},
+        {0, 0, w - 1, h},
+        {-4, -4, w + 3, h + 3},
+    };
+
+    for(uint32_t i = 0; i < sizeof(outside) / sizeof(outside[0]); i++) {
+        lv_area_t decoded_area = {LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN};
+        TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_image_decoder_get_area(&dsc, &outside[i], &decoded_area));
+    }
+
+    /*The full image is a valid area*/
+    const lv_area_t inside = {0, 0, w - 1, h - 1};
+    lv_area_t decoded_area = {LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN};
+    lv_result_t res = lv_image_decoder_get_area(&dsc, &inside, &decoded_area);
+#if LV_BIN_DECODER_RAM_LOAD == 0
+    /*Read line by line*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+    TEST_ASSERT_EQUAL(0, decoded_area.y1);
+    TEST_ASSERT_EQUAL(0, decoded_area.y2);
+    TEST_ASSERT_EQUAL(0, decoded_area.x1);
+    TEST_ASSERT_EQUAL(w - 1, decoded_area.x2);
+#else
+    LV_UNUSED(res); /*The whole image was decoded on open, no need to read it here*/
+#endif
+
+    lv_image_decoder_close(&dsc);
+}
+
+static void render_transformed_image(const void * src)
+{
+    lv_image_cache_drop(src);
+
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, src);
+    lv_obj_center(img);
+    lv_image_set_pivot(img, 0, 0);
+    lv_image_set_rotation(img, 300);
+    lv_image_set_scale(img, 400);
+    lv_refr_now(NULL);
+
+    lv_obj_clean(lv_screen_active());
+    lv_image_cache_drop(src);
+}
+
+void test_bin_decoder_transformed_partial_decode(void)
+{
+    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
+    render_transformed_image(&test_image_cogwheel_i4);
+    render_transformed_image("A:src/test_files/binimages/cogwheel.I4.bin");
+    render_transformed_image("A:src/test_files/binimages/cogwheel.RGB565.bin");
+    render_transformed_image("A:src/test_files/binimages/cogwheel.RGB565A8.bin");
+}
+
 void test_bin_decoder_open_stride_zero_handling(void)
 {
     /* Test open image with stride zero */

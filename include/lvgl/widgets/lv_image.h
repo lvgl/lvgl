@@ -17,11 +17,6 @@ extern "C" {
 
 #if LV_USE_IMAGE != 0
 
-/*Testing of dependencies*/
-#if LV_USE_LABEL == 0
-#error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
-#endif
-
 #include "../core/lv_obj.h"
 #include "../fs/lv_fs.h"
 #include "../draw/lv_draw.h"
@@ -228,7 +223,7 @@ void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src);
 /**
  * Get the source of the image
  * @param obj       pointer to an image object
- * @return          the image source (symbol, file name or ::lv-img_dsc_t for C arrays)
+ * @return          the image source (symbol, file name or @ref lv_image_dsc_t for C arrays)
  */
 const void * lv_image_get_src(lv_obj_t * obj);
 
