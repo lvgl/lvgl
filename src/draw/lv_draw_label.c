@@ -777,6 +777,8 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
 
     LV_PROFILER_DRAW_BEGIN;
     if(dsc->g == NULL) {
+        /*The local glyph dsc never outlives this call: dsc->g is reset to NULL at exit*/
+        /*cppcheck-suppress autoVariables*/
         dsc->g = &g;
         /*If the glyph dsc is not set then get it from the font*/
         bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, 0);
@@ -838,6 +840,8 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
         dsc->format = LV_FONT_GLYPH_FORMAT_NONE;
     }
 
+    /*Points to a local, but cb() consumes it synchronously before this call returns*/
+    /*cppcheck-suppress autoVariables*/
     dsc->letter_coords = &letter_coords;
     cb(t, dsc, NULL, NULL);
 
