@@ -144,7 +144,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                         if(lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font) &&
                            glyph_draw_dsc->g->format == LV_FONT_GLYPH_FORMAT_A8) {
                             glyph_draw_dsc->g->req_raw_bitmap = 1;
-                            const void * bitmap = lv_font_get_glyph_static_bitmap(glyph_draw_dsc->g);
+                            const void * bitmap = lv_font_get_glyph_static_bitmap_internal(glyph_draw_dsc->g);
                             lv_draw_sw_blend_dsc_t blend_dsc;
                             lv_memzero(&blend_dsc, sizeof(blend_dsc));
                             blend_dsc.color = glyph_draw_dsc->color;

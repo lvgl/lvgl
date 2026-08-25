@@ -69,9 +69,15 @@ const void * lv_font_get_glyph_bitmap_internal(lv_font_glyph_dsc_t * g_dsc, lv_d
 const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
 {
     LV_CHECK_ARG(g_dsc != NULL, return NULL);
+    return lv_font_get_glyph_static_bitmap_internal(g_dsc);
+
+}
+const void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_dsc)
+{
+    LV_ASSERT(g_dsc != NULL);
+    LV_ASSERT(g_dsc->resolved_font != NULL);
 
     const lv_font_t * font_p = g_dsc->resolved_font;
-    LV_ASSERT_NULL(font_p);
 
     if(font_p->static_bitmap == 0) {
         LV_LOG_WARN("Requesting static bitmap of a non-static bitmap of %p font", (void *)font_p);

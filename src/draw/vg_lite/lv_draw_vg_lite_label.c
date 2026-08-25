@@ -233,7 +233,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 
 static inline bool init_buffer_from_glyph_dsc(vg_lite_buffer_t * buffer, lv_font_glyph_dsc_t * g_dsc)
 {
-    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap(g_dsc);
+    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap_internal(g_dsc);
     if(!glyph_bitmap) {
         return false;
     }
