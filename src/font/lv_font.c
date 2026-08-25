@@ -95,6 +95,12 @@ const void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_ds
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 {
     LV_CHECK_ARG(g_dsc != NULL, return);
+    lv_font_glyph_release_draw_data_internal(g_dsc);
+}
+
+void lv_font_glyph_release_draw_data_internal(lv_font_glyph_dsc_t * g_dsc)
+{
+    LV_ASSERT(g_dsc != NULL);
     if(!g_dsc->entry) {
         return;
     }

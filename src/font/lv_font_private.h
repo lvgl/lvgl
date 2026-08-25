@@ -39,6 +39,11 @@ const void * lv_font_get_glyph_bitmap_internal(lv_font_glyph_dsc_t * g_dsc, lv_d
  */
 const void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_dsc);
 
+/*
+ * Internal implementation of @ref lv_font_glyph_release_draw_data
+ */
+void lv_font_glyph_release_draw_data_internal(lv_font_glyph_dsc_t * g_dsc);
+
 /**********************
  *      MACROS
  **********************/

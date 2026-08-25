@@ -393,7 +393,7 @@ static void bitmap_cache_release_cb(void * entry, void * user_data)
 {
     LV_UNUSED(user_data);
     lv_font_glyph_dsc_t * g_dsc = entry;
-    lv_font_glyph_release_draw_data(g_dsc);
+    lv_font_glyph_release_draw_data_internal(g_dsc);
 }
 
 

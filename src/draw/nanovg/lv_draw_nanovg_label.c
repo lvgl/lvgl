@@ -266,7 +266,7 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
                                                                                                      0));
     LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
 
-    lv_font_glyph_release_draw_data(g_dsc);
+    lv_font_glyph_release_draw_data_internal(g_dsc);
 
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
     LV_PROFILER_DRAW_END;

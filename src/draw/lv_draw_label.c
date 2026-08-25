@@ -672,7 +672,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
     cb(t, dsc, NULL, NULL);
     dsc->letter_coords = NULL;
 
-    lv_font_glyph_release_draw_data(dsc->g);
+    lv_font_glyph_release_draw_data_internal(dsc->g);
 
 exit:
     if(dsc->g == &g) {
