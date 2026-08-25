@@ -237,8 +237,7 @@ bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_
 bool lv_font_has_static_bitmap(const lv_font_t * font)
 {
     LV_CHECK_ARG(font != NULL, return false);
-
-    return font->static_bitmap;
+    return lv_font_has_static_bitmap_internal(font);
 }
 
 int32_t lv_font_glyph_dsc_compare(const lv_font_glyph_dsc_t * lhs, const lv_font_glyph_dsc_t * rhs)

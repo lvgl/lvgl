@@ -157,7 +157,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A8: {
                     const lv_font_t * resolved_font = glyph_draw_dsc->g->resolved_font;
                     vg_lite_buffer_t src_buf;
-                    if(lv_font_has_static_bitmap(resolved_font) && init_buffer_from_glyph_dsc(&src_buf, glyph_draw_dsc->g)) {
+                    if(lv_font_has_static_bitmap_internal(resolved_font) && init_buffer_from_glyph_dsc(&src_buf, glyph_draw_dsc->g)) {
                     }
                     else {
                         if(resolved_font->release_glyph) {

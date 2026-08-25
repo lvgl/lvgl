@@ -141,7 +141,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                     if(glyph_draw_dsc->rotation % 3600 == 0 && glyph_draw_dsc->format != LV_FONT_GLYPH_FORMAT_IMAGE) {
                         lv_area_t mask_area = *glyph_draw_dsc->letter_coords;
 
-                        if(lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font) &&
+                        if(lv_font_has_static_bitmap_internal(glyph_draw_dsc->g->resolved_font) &&
                            glyph_draw_dsc->g->format == LV_FONT_GLYPH_FORMAT_A8) {
                             glyph_draw_dsc->g->req_raw_bitmap = 1;
                             const void * bitmap = lv_font_get_glyph_static_bitmap_internal(glyph_draw_dsc->g);
