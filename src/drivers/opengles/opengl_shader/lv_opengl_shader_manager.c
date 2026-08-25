@@ -111,6 +111,7 @@ void lv_opengl_shader_manager_init(lv_opengl_shader_manager_t * manager, const l
 
     manager->bg_index_buf = 0;
     manager->bg_vertex_buf = 0;
+    manager->bg_vao = 0;
     manager->bg_program = 0;
 }
 

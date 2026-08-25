@@ -15,6 +15,7 @@ lvgl_script_path = os.path.join(lvgl_test_dir, "../scripts")
 sys.path.append(lvgl_script_path)
 
 from LVGLImage import ColorFormat, CompressMethod, LVGLImage
+
 from perf import perf_test_options
 
 lvgl_configs_dir = os.path.join(lvgl_test_dir, "configs")
@@ -26,6 +27,9 @@ HOST = "@host"
 
 # Prefix for a fragment that is one of the presets in configs/defconfigs
 PRESET = "preset:"
+
+# Directory CMake's FetchContent puts the dependencies it downloads in
+FETCHED_DEPS_DIR = "_deps"
 
 # Every build configuration is a list of defconfig fragments from tests/configs,
 # merged in the given order so that a later fragment overrides an earlier one.
@@ -90,7 +94,7 @@ test_options = {
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "riscv_v"],
     },
     "OPTIONS_TEST_NANOVG": {
-        "description": "NanoVG headless rendering with EGL, 32 bit color depth",
+        "description": "NanoVG headless rendering with EGL and glTF, 32 bit color depth",
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "nanovg"],
     },
 }
@@ -331,6 +335,8 @@ def generate_code_coverage_report():
         str(os.cpu_count()),
         "--print-summary",
         "--merge-mode-functions=merge-use-line-min",
+        "--exclude",
+        ".*/%s/.*" % FETCHED_DEPS_DIR,
         "--html-title",
         "LVGL Test Coverage",
     ]
@@ -373,6 +379,13 @@ def generate_test_images():
                     )
 
 
+def generate_gltf_assets():
+    """Write the glTF models the tests in src/test_cases/3d load."""
+
+    script = os.path.join(lvgl_test_dir, "gen_gltf_assets.py")
+    subprocess.check_call([sys.executable, script])
+
+
 def clean_dir_with_filter(directory, clean_filters):
     for entry in os.listdir(directory):
         entry_path = os.path.join(directory, entry)
@@ -386,6 +399,19 @@ def clean_dir_with_filter(directory, clean_filters):
             shutil.rmtree(entry_path)
 
 
+def clean_fetched_deps(build_dir):
+    """Strip a fetched dependency tree down to its sources.
+
+    gcov resolves every file that contributed code to an object, including the
+    headers of fetched dependencies, and errors out when one of them is gone.
+    The sources are small; the dependency build trees, which hold no coverage
+    data of interest, are what takes up the space.
+    """
+    deps_dir = os.path.join(build_dir, FETCHED_DEPS_DIR)
+    if os.path.isdir(deps_dir):
+        clean_dir_with_filter(deps_dir, ["-src"])
+
+
 def clean_build_dirs_with_filter(build_dir, clean_filters):
     # The test executables are built in a "tests" subdirectory of the LVGL build
     # directory, so the coverage data is spread over both. Clean the nested one
@@ -394,7 +420,8 @@ def clean_build_dirs_with_filter(build_dir, clean_filters):
     if os.path.isdir(tests_dir):
         clean_dir_with_filter(tests_dir, clean_filters)
 
-    clean_dir_with_filter(build_dir, clean_filters + ["tests"])
+    clean_fetched_deps(build_dir)
+    clean_dir_with_filter(build_dir, clean_filters + ["tests", FETCHED_DEPS_DIR])
 
 
 if __name__ == "__main__":
@@ -454,6 +481,8 @@ if __name__ == "__main__":
 
     if args.update_image:
         generate_test_images()
+
+    generate_gltf_assets()
 
     if args.build_options:
         options_to_build = args.build_options

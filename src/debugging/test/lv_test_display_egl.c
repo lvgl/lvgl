@@ -14,14 +14,19 @@
 
 #if LV_USE_TEST && LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
 
+#if !LV_USE_EGL
+    #error "LV_USE_NANOVG_TEST_HEADLESS requires LV_USE_EGL so that the GL entry points are taken from glad"
+#endif
+
 #include "../../draw/nanovg/lv_draw_nanovg.h"
 
-/* Include EGL and GLES2 directly - do NOT include lvgl_private.h here
- * because it pulls in glad headers that conflict with system EGL/GLES2. */
+/* EGL comes from the system headers, but the GL entry points come from LVGL's glad
+ * loader, which this file initializes for the whole library (NanoVG, the OpenGL ES
+ * driver and glTF all call through it when LV_USE_EGL is enabled).
+ * Do NOT include lvgl_private.h or glad/egl.h here: those clash with system EGL. */
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+#include "../../drivers/opengles/glad/include/glad/gles2.h"
 
 /*********************
  *      DEFINES
@@ -112,8 +117,10 @@ lv_display_t * lv_test_display_egl_create(int32_t hor_res, int32_t ver_res)
     lv_display_add_event_cb(disp, egl_resolution_changed_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(disp, egl_color_format_changed_cb, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
 
-    /* Initialize NanoVG draw unit - this requires an active GL context */
-    lv_draw_nanovg_init();
+    /* Initialize the OpenGL ES driver (shaders, buffers) and, through it, the NanoVG
+     * draw unit. Both need an active GL context. The driver state is what the NanoVG
+     * 3D task uses to blend an lv_3dtexture (e.g. a glTF view) into the layer. */
+    lv_opengles_init();
 
     LV_LOG_INFO("EGL headless test display created (%dx%d)", (int)hor_res, (int)ver_res);
     return disp;
@@ -219,6 +226,10 @@ void lv_test_display_egl_cleanup(void * egl_ctx)
         return;
     }
 
+    /* Release the shaders and buffers created by lv_opengles_init() while the
+     * context is still current. lv_deinit() does not do it. */
+    lv_opengles_deinit();
+
     if(ctx->fbo) {
         glDeleteFramebuffers(1, &ctx->fbo);
         ctx->fbo = 0;
@@ -283,10 +294,16 @@ static bool init_egl(egl_test_ctx_t * ctx)
 
     eglBindAPI(EGL_OPENGL_ES_API);
 
+    /* An ES3 context is requested because the glTF renderer needs "#version 300 es"
+     * shaders. NanoVG's GLES2 backend runs unchanged on such a context. Drivers
+     * without ES3 fall back to ES2, where only the glTF tests are unavailable. */
+    EGLint renderable_type = EGL_OPENGL_ES3_BIT;
+    EGLint client_version = 3;
+
     /* Choose config with pbuffer support, stencil for NanoVG clipping,
      * and 4x MSAA for GPU antialiasing (matching lv_sdl_egl.c config) */
     EGLint config_attribs[] = {
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_RENDERABLE_TYPE, renderable_type,
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
         EGL_RED_SIZE, 8,
         EGL_GREEN_SIZE, 8,
@@ -301,9 +318,9 @@ static bool init_egl(egl_test_ctx_t * ctx)
     EGLConfig config;
     EGLint num_configs;
     if(!eglChooseConfig(ctx->egl_display, config_attribs, &config, 1, &num_configs) || num_configs == 0) {
-        /* Fallback: try without surface type constraint */
+        /* Fallback: drop the surface type constraint, then the ES3 requirement */
         EGLint config_attribs_fallback[] = {
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+            EGL_RENDERABLE_TYPE, renderable_type,
             EGL_RED_SIZE, 8,
             EGL_GREEN_SIZE, 8,
             EGL_BLUE_SIZE, 8,
@@ -311,9 +328,15 @@ static bool init_egl(egl_test_ctx_t * ctx)
             EGL_NONE
         };
         if(!eglChooseConfig(ctx->egl_display, config_attribs_fallback, &config, 1, &num_configs) || num_configs == 0) {
-            LV_LOG_ERROR("No suitable EGL config found");
-            eglTerminate(ctx->egl_display);
-            return false;
+            LV_LOG_WARN("No ES3 capable EGL config found, falling back to ES2");
+            renderable_type = EGL_OPENGL_ES2_BIT;
+            client_version = 2;
+            config_attribs_fallback[1] = renderable_type;
+            if(!eglChooseConfig(ctx->egl_display, config_attribs_fallback, &config, 1, &num_configs) || num_configs == 0) {
+                LV_LOG_ERROR("No suitable EGL config found");
+                eglTerminate(ctx->egl_display);
+                return false;
+            }
         }
     }
 
@@ -328,9 +351,14 @@ static bool init_egl(egl_test_ctx_t * ctx)
         LV_LOG_WARN("Pbuffer surface creation failed, using surfaceless");
     }
 
-    /* Create GLES2 context */
-    EGLint ctx_attribs[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
+    /* Create the GLES context */
+    EGLint ctx_attribs[] = { EGL_CONTEXT_CLIENT_VERSION, client_version, EGL_NONE };
     ctx->egl_context = eglCreateContext(ctx->egl_display, config, EGL_NO_CONTEXT, ctx_attribs);
+    if(ctx->egl_context == EGL_NO_CONTEXT && client_version == 3) {
+        LV_LOG_WARN("ES3 context creation failed (0x%x), falling back to ES2", eglGetError());
+        ctx_attribs[1] = 2;
+        ctx->egl_context = eglCreateContext(ctx->egl_display, config, EGL_NO_CONTEXT, ctx_attribs);
+    }
     if(ctx->egl_context == EGL_NO_CONTEXT) {
         LV_LOG_ERROR("eglCreateContext failed: 0x%x", eglGetError());
         eglTerminate(ctx->egl_display);
@@ -346,6 +374,16 @@ static bool init_egl(egl_test_ctx_t * ctx)
             eglTerminate(ctx->egl_display);
             return false;
         }
+    }
+
+    /* Load the GL entry points into glad. Everything in LVGL calls GL through these
+     * pointers, so this has to happen before the first GL call below. */
+    if(!gladLoadGLES2((GLADloadfunc)eglGetProcAddress)) {
+        LV_LOG_ERROR("Failed to load the GLES entry points");
+        eglMakeCurrent(ctx->egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        eglDestroyContext(ctx->egl_display, ctx->egl_context);
+        eglTerminate(ctx->egl_display);
+        return false;
     }
 
     LV_LOG_INFO("GL Version: %s", glGetString(GL_VERSION));

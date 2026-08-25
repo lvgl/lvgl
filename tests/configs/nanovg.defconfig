@@ -7,3 +7,7 @@ CONFIG_LV_USE_NANOVG_TEST_HEADLESS=y
 
 # NanoVG expects a compact stride (no padding)
 CONFIG_LV_DRAW_BUF_STRIDE_ALIGN=1
+
+# NanoVG is the renderer that provides LV_DRAW_HAS_3D_SUPPORT, so this is where
+# the glTF widget gets tested. LV_USE_3DTEXTURE comes with it via select.
+CONFIG_LV_USE_GLTF=y
