@@ -15,6 +15,7 @@
 #include "../../lvgl_public.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_text_private.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -633,7 +634,7 @@ const char * lv_textarea_get_password_bullet(lv_obj_t * obj)
 
     /*If the textarea's font has the bullet character use it else fallback to "*"*/
     const lv_font_t * bullet_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    if(lv_font_get_glyph_dsc(bullet_font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, '\0'))
+    if(lv_font_get_glyph_dsc_internal(bullet_font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, '\0'))
         return LV_SYMBOL_BULLET;
 
     return "*";

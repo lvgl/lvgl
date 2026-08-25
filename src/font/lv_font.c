@@ -118,6 +118,15 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out
 
     LV_CHECK_ARG(dsc_out != NULL, return false);
     LV_CHECK_ARG(font != NULL, return false);
+    return lv_font_get_glyph_dsc_internal(font, dsc_out, letter, letter_next);
+}
+
+bool lv_font_get_glyph_dsc_internal(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
+                                    uint32_t letter_next)
+{
+
+    LV_ASSERT(dsc_out != NULL);
+    LV_ASSERT(font != NULL);
 
 #if LV_USE_FONT_PLACEHOLDER
     const lv_font_t * placeholder_font = NULL;

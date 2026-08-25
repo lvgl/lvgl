@@ -44,6 +44,12 @@ const void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_ds
  */
 void lv_font_glyph_release_draw_data_internal(lv_font_glyph_dsc_t * g_dsc);
 
+/*
+ * Internal implementation of @ref lv_font_get_glyph_dsc
+ */
+bool lv_font_get_glyph_dsc_internal(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
+                                    uint32_t letter_next);
+
 /**********************
  *      MACROS
  **********************/

@@ -147,7 +147,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
 
     lv_font_glyph_dsc_t g;
 
-    lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0);
+    lv_font_get_glyph_dsc_internal(dsc->font, &g, unicode_letter, 0);
 
     lv_area_t a;
     a.x1 = point->x;
@@ -186,7 +186,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
     LV_PROFILER_DRAW_BEGIN;
     lv_font_glyph_dsc_t g;
 
-    lv_font_get_glyph_dsc(font, &g, dsc->unicode, 0);
+    lv_font_get_glyph_dsc_internal(font, &g, dsc->unicode, 0);
 
     font = g.resolved_font ? g.resolved_font : dsc->font;
 
@@ -475,7 +475,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                 logical_char_pos -= (LABEL_RECOLOR_PAR_LENGTH + 1);
             }
 
-            lv_font_get_glyph_dsc(font, &glyph_dsc, letter, letter_next);
+            lv_font_get_glyph_dsc_internal(font, &glyph_dsc, letter, letter_next);
             letter_w = lv_text_is_marker(letter) ? 0 : glyph_dsc.adv_w;
 
             /*Always set the bg_coordinates for placeholder drawing*/
@@ -602,7 +602,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
          * we correctly reset it to NULL at `exit:` but cpp-check chokes on it and warns us*/
         dsc->g = &g;
         /*If the glyph dsc is not set then get it from the font*/
-        bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, 0);
+        bool g_ret = lv_font_get_glyph_dsc_internal(font, &g, letter, 0);
         if(g_ret == false) {
             /*Add warning if the dsc is not found*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);

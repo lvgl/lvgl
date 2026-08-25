@@ -1647,7 +1647,7 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
                         continue;
                     }
                     lv_font_glyph_dsc_t g;
-                    lv_font_get_glyph_dsc(text->font, &g, content->letters[j], '\0');
+                    lv_font_get_glyph_dsc_internal(text->font, &g, content->letters[j], '\0');
                     lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap_internal(&g, NULL);
                     lv_vector_path_clear(glyph_path);
                     lv_vector_path_copy(glyph_path, p);
@@ -1716,7 +1716,7 @@ static void _render_span(const lv_svg_render_content_t * content, lv_draw_vector
                 continue;
             }
             lv_font_glyph_dsc_t g;
-            lv_font_get_glyph_dsc(span->font, &g, content->letters[j], '\0');
+            lv_font_get_glyph_dsc_internal(span->font, &g, content->letters[j], '\0');
             lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap_internal(&g, NULL);
             lv_vector_path_clear(glyph_path);
             lv_vector_path_copy(glyph_path, p);
