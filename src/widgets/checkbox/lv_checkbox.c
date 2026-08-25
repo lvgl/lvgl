@@ -15,6 +15,7 @@
 #include "../../core/lv_obj_class_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -192,7 +193,7 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t font_h = lv_font_get_line_height(font);
+        int32_t font_h = lv_font_get_line_height_internal(font);
         lv_text_attributes_t attributes = {0};
 
         attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -233,7 +234,7 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_layer_t * layer = lv_event_get_layer(e);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    int32_t font_h = lv_font_get_line_height(font);
+    int32_t font_h = lv_font_get_line_height_internal(font);
 
     const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 

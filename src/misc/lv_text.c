@@ -9,6 +9,7 @@
 
 #include "lv_text_private.h"
 #include "lv_text_ap.h"
+#include "../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -113,7 +114,7 @@ void lv_text_get_size_attributes(lv_point_t * size_res, const char * text, const
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(text);
 
-    letter_height = lv_font_get_line_height(font);
+    letter_height = lv_font_get_line_height_internal(font);
 
     if(attributes->text_flags & LV_TEXT_FLAG_EXPAND) {
         attributes->max_width = LV_COORD_MAX;

@@ -153,7 +153,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
     a.x1 = point->x;
     a.y1 = point->y;
     a.x2 = a.x1 + g.adv_w;
-    a.y2 = a.y1 + lv_font_get_line_height(g.resolved_font ? g.resolved_font : dsc->font);
+    a.y2 = a.y1 + lv_font_get_line_height_internal(g.resolved_font ? g.resolved_font : dsc->font);
 
     /*lv_draw_label needs UTF8 text so convert the Unicode character to an UTF8 string */
     uint32_t letter_buf[2];
@@ -194,7 +194,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
     a.x1 = point->x;
     a.y1 = point->y;
     a.x2 = a.x1 + g.adv_w;
-    a.y2 = a.y1 + lv_font_get_line_height(font);
+    a.y2 = a.y1 + lv_font_get_line_height_internal(font);
 
     dsc->pivot.x = g.adv_w / 2 ;
     dsc->pivot.y = font->line_height - font->base_line;
@@ -247,7 +247,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         }
     }
 
-    int32_t line_height_font = lv_font_get_line_height(font);
+    int32_t line_height_font = lv_font_get_line_height_internal(font);
     int32_t line_height = line_height_font + dsc->line_space;
 
     /*Init variables for the first line*/

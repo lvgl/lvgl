@@ -19,6 +19,7 @@
 #include "../../core/lv_observer_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../core/lv_global.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -528,7 +529,7 @@ int32_t lv_spangroup_get_max_line_height(lv_obj_t * obj)
     lv_span_t * cur_span;
     LV_LL_READ(&spans->child_ll, cur_span) {
         const lv_font_t * font = lv_span_get_style_text_font(obj, cur_span);
-        int32_t line_h = lv_font_get_line_height(font);
+        int32_t line_h = lv_font_get_line_height_internal(font);
         if(line_h > max_line_h) {
             max_line_h = line_h;
         }
@@ -626,7 +627,7 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
                 snippet.span = cur_span;
                 snippet.font = lv_span_get_style_text_font(obj, cur_span);
                 snippet.letter_space = lv_span_get_style_text_letter_space(obj, cur_span);
-                snippet.line_h = lv_font_get_line_height(snippet.font) + line_space;
+                snippet.line_h = lv_font_get_line_height_internal(snippet.font) + line_space;
             }
 
             /* get current span text line info */
@@ -1172,7 +1173,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                 snippet.span = cur_span;
                 snippet.font = lv_span_get_style_text_font(obj, cur_span);
                 snippet.letter_space = lv_span_get_style_text_letter_space(obj, cur_span);
-                snippet.line_h = lv_font_get_line_height(snippet.font) + line_space;
+                snippet.line_h = lv_font_get_line_height_internal(snippet.font) + line_space;
             }
 
             /* get current span text line info */
@@ -1239,7 +1240,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                     next_span = lv_ll_get_next(&spans->child_ll, next_span);
                 }
                 if(next_span && next_span->txt && next_span->txt[0]) { /* have the next line */
-                    next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
+                    next_line_h = lv_font_get_line_height_internal(lv_span_get_style_text_font(obj, next_span)) + line_space;
                     has_more_content = true;
                 }
             }

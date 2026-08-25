@@ -210,7 +210,7 @@ int32_t lv_font_get_line_height(const lv_font_t * font)
 {
     LV_CHECK_ARG(font != NULL, return 0);
 
-    return font->line_height;
+    return lv_font_get_line_height_internal(font);
 }
 
 
