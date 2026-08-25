@@ -3598,7 +3598,7 @@ menu "Argument Checks"
 
 	config LV_USE_CHECK_OBJ_CLASSTYPE
 		bool "Class check in LV_CHECK_OBJ"
-		default n
+		default y
 		help
 			LV_CHECK_OBJ verifies with lv_obj_has_class() that the object has the
 			expected class. When disabled the check is skipped even if a class

@@ -2372,7 +2372,7 @@
  *  expected class. When disabled the check is skipped even if a class
  *  argument is supplied.
  */
-#define LV_USE_CHECK_OBJ_CLASSTYPE 0
+#define LV_USE_CHECK_OBJ_CLASSTYPE 1
 
 /** LV_CHECK_OBJ verifies with lv_obj_is_valid() that the object is still
  *  part of the widget tree. When disabled the check is skipped even if the
