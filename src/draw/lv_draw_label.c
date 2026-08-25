@@ -545,7 +545,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                 draw_letter_dsc.color = dsc->color;
             }
 
-            lv_draw_unit_draw_letter(t, &draw_letter_dsc, &pos, font, letter, cb);
+            lv_draw_unit_draw_letter_internal(t, &draw_letter_dsc, &pos, font, letter, cb);
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
@@ -618,7 +618,19 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
     LV_CHECK_ARG(dsc != NULL, return);
     LV_CHECK_ARG(pos != NULL, return);
     LV_CHECK_ARG(font != NULL, return);
+    LV_CHECK_ARG(cb != NULL, return);
+    lv_draw_unit_draw_letter_internal(t, dsc, pos, font, letter, cb);
 
+}
+
+void lv_draw_unit_draw_letter_internal(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
+                                       const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
+{
+    LV_ASSERT(t != NULL);
+    LV_ASSERT(dsc != NULL);
+    LV_ASSERT(pos != NULL);
+    LV_ASSERT(font != NULL);
+    LV_ASSERT(cb != NULL);
     lv_font_glyph_dsc_t g;
 
     if(lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/
