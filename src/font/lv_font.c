@@ -184,13 +184,18 @@ bool lv_font_get_glyph_dsc_internal(const lv_font_t * font, lv_font_glyph_dsc_t 
 uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
 {
     LV_CHECK_ARG(font != NULL, return 0);
+    return lv_font_get_glyph_width_internal(font, letter, letter_next);
+}
 
+uint16_t lv_font_get_glyph_width_internal(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
+{
+    LV_ASSERT(font != NULL);
     lv_font_glyph_dsc_t g;
 
     /*Return zero if letter is marker*/
     if(lv_text_is_marker(letter)) return 0;
 
-    lv_font_get_glyph_dsc(font, &g, letter, letter_next);
+    lv_font_get_glyph_dsc_internal(font, &g, letter, letter_next);
 
     return g.adv_w;
 }
