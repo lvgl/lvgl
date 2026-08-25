@@ -79,12 +79,4 @@ config LV_USE_COLOR_FILTER
 	bool "Color filter style"
 	default n
 
-config LV_OBJ_LAYOUT_UPDATE_MAX_PASSES
-	int "Max layout update passes"
-	default 100
-	help
-		The maximum amount of layout update tries LVGL will run for any given object.
-		Past this amount of passes, LVGL assumes that the layout can't be computed and
-		gives up.
-
 endmenu #"Core"

@@ -24,6 +24,10 @@
 #define MY_CLASS (&lv_obj_class)
 #define update_layout_mutex LV_GLOBAL_DEFAULT()->layout_update_mutex
 
+#ifndef LV_OBJ_LAYOUT_UPDATE_MAX_PASSES
+    #define LV_OBJ_LAYOUT_UPDATE_MAX_PASSES 100
+#endif
+
 #if LV_OBJ_LAYOUT_UPDATE_MAX_PASSES <= 0
     #error "LV_OBJ_LAYOUT_UPDATE_MAX_PASSES needs to be at least 1, otherwise no object layout is calculated"
 #endif
@@ -345,9 +349,11 @@ void lv_obj_update_layout(const lv_obj_t * obj)
     uint32_t pass_cnt = 0;
     while(scr->scr_layout_inv) {
         if(pass_cnt >= LV_OBJ_LAYOUT_UPDATE_MAX_PASSES) {
-            LV_LOG_WARN("Layout of screen %p (class: '%s') didn't settle in %d passes, giving up. Some sizes "
-                        "probably depend on each other circularly",
-                        (void *)scr, scr->class_p->name, LV_OBJ_LAYOUT_UPDATE_MAX_PASSES);
+            LV_ASSERT_FORMAT_MSG(false,
+                                 "Layout of screen %p (class: '%s') didn't settle in %d passes, giving up. Some "
+                                 "sizes probably depend on each other circularly",
+                                 (void *)scr, scr->class_p->name, LV_OBJ_LAYOUT_UPDATE_MAX_PASSES);
+            /*Reached only if the assert handler returns*/
             scr->scr_layout_inv = 0;
             break;
         }
