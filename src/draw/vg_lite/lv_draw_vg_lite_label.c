@@ -18,6 +18,7 @@
 #include "lv_vg_lite_bitmap_font_cache.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_area_private.h"
+#include "../../font/lv_font_private.h"
 #include "../../font/freetype/lv_freetype_private.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_image_private.h"
@@ -161,7 +162,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     else {
                         if(resolved_font->release_glyph) {
                             /* For dynamic fonts, its internal implementation already supports cache management. */
-                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                         }
                         else {
                             /* For non-cached unaligned fonts, we need to manage the cache manually. */
@@ -185,7 +186,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                 break;
 
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
-                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     if(!glyph_draw_dsc->glyph_data) {
                         return;
                     }

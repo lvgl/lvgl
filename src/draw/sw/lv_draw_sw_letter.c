@@ -9,6 +9,7 @@
 #include "blend/lv_draw_sw_blend_private.h"
 #include "../lv_draw_label_private.h"
 #include "../../draw/lv_draw_private.h"
+#include "../../font/lv_font_private.h"
 #include "lv_draw_sw.h"
 
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
@@ -156,7 +157,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             lv_draw_sw_blend(t, &blend_dsc);
                         }
                         else {
-                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                             if(glyph_draw_dsc->glyph_data == NULL) {
                                 LV_LOG_WARN("Couldn't get the bitmap of a glyph");
                                 break;
@@ -177,7 +178,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                         }
                     }
                     else {
-                        glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                         lv_draw_image_dsc_t img_dsc;
                         lv_draw_image_dsc_init(&img_dsc);
                         img_dsc.rotation = glyph_draw_dsc->rotation;

@@ -14,6 +14,7 @@
 #include "../misc/lv_bidi_private.h"
 #include "../misc/lv_text_private.h"
 #include "../core/lv_global.h"
+#include "../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -659,7 +660,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
         if(g.format == LV_FONT_GLYPH_FORMAT_VECTOR) {
 
             /*Load the outline of the glyph, even if the function says bitmap*/
-            dsc->glyph_data = (void *) lv_font_get_glyph_bitmap(dsc->g, draw_buf);
+            dsc->glyph_data = (void *) lv_font_get_glyph_bitmap_internal(dsc->g, draw_buf);
             dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
         }
     }
