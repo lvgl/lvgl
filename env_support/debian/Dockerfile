@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get install -y software-properties-common && \
     rm -rf /var/lib/apt/lists/*
 
-RUN add-apt-repository ppa:andrecosta/fastgltf && \
+RUN add-apt-repository ppa:lvgl/lvgl && \
     apt-get update && \
     apt-get install -y dpkg-dev debhelper && \
     apt-get install -y $(./tmp/extract-build-deps.py) && \
