@@ -399,7 +399,14 @@ if you need finer control.
   bool h = lv_obj_is_hidden(obj);
   ```
   The custom-bit flags (`LV_OBJ_FLAG_USER_1`–`4`) can be accessed via
-  `lv_obj_set/get_user_flag()`
+  `lv_obj_set/get_user_flag()`, which take a bit from 0 to 3 e.g `lv_obj_set_user_flag(obj, 0, true)`
+  instead of lv_obj_get/set-flag(obj, LV_OBJ_FLAG_USER_1).
+
+  A migration script is available at `scripts/migration/migrate_obj_flags.py`:
+  ```bash
+  	python3 scripts/migration/migrate_obj_flags.py path/to/your/project
+  ```
+  _Note: Only raw flag constants can be converted automatically. Expressions using variables will be skipped for safety._
 
 ---
 
