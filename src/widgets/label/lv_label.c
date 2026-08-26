@@ -174,6 +174,10 @@ void lv_label_set_text_static(lv_obj_t * obj, const char * text)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_label_t * label = (lv_label_t *)obj;
+    if(!text) {
+        lv_label_mark_need_refr_text(obj);
+        return;
+    }
 
     remove_translation_tag(obj);
     if(label->static_txt == 0 && label->text != NULL) {
