@@ -57,13 +57,15 @@ typedef enum {
 uint32_t lv_layout_create(lv_layout_callbacks_t callbacks, void * user_data);
 
 /**
- * DEPRECATED: `lv_layout_register` is deprecated. `lv_layout_create` should be used instead.
- *
  * Register a new layout
+ *
+ * @deprecated use `lv_layout_create` instead.
+ *
  * @param cb        the layout update callback
  * @param user_data custom data that will be passed to `cb`
  * @return          the ID of the new layout
  */
+LV_DEPRECATED("Use lv_layout_create instead")
 uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data);
 
 /**********************
