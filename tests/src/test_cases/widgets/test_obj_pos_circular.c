@@ -56,6 +56,39 @@ void test_content_size_chain_with_pct_min_width_settles(void)
 }
 
 /**
+ * A percentage size that happens to be exactly the fixed min size could be credited to either
+ * style. Crediting it to the percentage drops the object from its `LV_SIZE_CONTENT` parent's content
+ * size, so in the next pass the percentage resolves to 0, the min size brings the object back, and
+ * the layout keeps flipping between the two.
+ */
+void test_pct_size_equal_to_fixed_min_size_settles(void)
+{
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(parent, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_style_pad_all(parent, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(parent, 0, LV_PART_MAIN);
+
+    lv_obj_t * child = lv_obj_create(parent);
+    lv_obj_set_size(child, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_min_width(child, 50, LV_PART_MAIN);
+    lv_obj_set_style_min_height(child, 30, LV_PART_MAIN);
+
+    /*Has no min size of its own, so it only ever follows the parent's content size*/
+    lv_obj_t * follower = lv_obj_create(parent);
+    lv_obj_set_size(follower, LV_PCT(100), LV_PCT(100));
+
+    lv_obj_update_layout(lv_screen_active());
+
+    /*The min size is what the parent wraps, and the percentages resolve to that same size*/
+    TEST_ASSERT_EQUAL_INT32(50, lv_obj_get_content_width(parent));
+    TEST_ASSERT_EQUAL_INT32(30, lv_obj_get_content_height(parent));
+    TEST_ASSERT_EQUAL_INT32(50, lv_obj_get_width(child));
+    TEST_ASSERT_EQUAL_INT32(30, lv_obj_get_height(child));
+    TEST_ASSERT_EQUAL_INT32(50, lv_obj_get_width(follower));
+    TEST_ASSERT_EQUAL_INT32(30, lv_obj_get_height(follower));
+}
+
+/**
  * Contradictory bounds (`min_width > max_width`) resolve to the min width, like CSS does. The
  * percentage min width must therefore still count as the width in effect, even when the width style
  * is above both bounds. Otherwise the object is credited to its `LV_SIZE_CONTENT` parent's content

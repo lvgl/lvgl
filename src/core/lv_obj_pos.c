@@ -50,6 +50,8 @@ static lv_result_t obj_invalidate_area_internal(const lv_display_t * disp, const
 static bool has_blur(const lv_obj_t * obj);
 static int32_t calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t * content_width);
 static int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t * content_height);
+static bool size_in_effect_is_pct(int32_t unclamped, int32_t min, int32_t max, int32_t size_style,
+                                  int32_t min_style, int32_t max_style);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -138,24 +140,14 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         /**
          * If the width in effect is a percentage of a parent that is itself LV_SIZE_CONTENT and not managed by
          * a layout, the two sizes would depend on each other, so `w_ignore_size` excludes this object from the
-         * parent's content width calculation. Min/max width define the width in effect only where the clamp
-         * actually overrode the width style, hence the comparisons against the unclamped width: crediting a
-         * width that merely happens to equal `minw` or `maxw` to min/max makes the flag alternate between
-         * layout passes and the layout never settles. With inverted bounds (`minw > maxw`) the clamp always
-         * resolves to `minw`, so min width is in effect regardless of the unclamped width.
+         * parent's content width calculation.
          */
-        int32_t w_style;
-        if(minw > maxw || unclamped_w < minw) {
-            w_style = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
-        }
-        else if(unclamped_w > maxw) {
-            w_style = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
-        }
-        else {
-            w_style = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        }
+        bool w_pct = size_in_effect_is_pct(unclamped_w, minw, maxw,
+                                           lv_obj_get_style_width(obj, LV_PART_MAIN),
+                                           lv_obj_get_style_min_width(obj, LV_PART_MAIN),
+                                           lv_obj_get_style_max_width(obj, LV_PART_MAIN));
         obj->w_ignore_size =
-            (LV_COORD_IS_PCT(w_style) && parent->w_layout == 0 && lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT);
+            (w_pct && parent->w_layout == 0 && lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT);
     }
 
     int32_t h;
@@ -172,20 +164,13 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         /**
          * If the height in effect is a percentage of a parent that is itself LV_SIZE_CONTENT and not managed by
          * a layout, the two sizes would depend on each other, so `h_ignore_size` excludes this object from the
-         * parent's content height calculation. See the width branch above for why the unclamped height is what
-         * is compared against the bounds, and why inverted bounds count as the min height case.
+         * parent's content height calculation. See the width branch above.
          */
-        int32_t h_style;
-        if(minh > maxh || unclamped_h < minh) {
-            h_style = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
-        }
-        else if(unclamped_h > maxh) {
-            h_style = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
-        }
-        else {
-            h_style = lv_obj_get_style_height(obj, LV_PART_MAIN);
-        }
-        obj->h_ignore_size = (LV_COORD_IS_PCT(h_style) && parent->h_layout == 0 &&
+        bool h_pct = size_in_effect_is_pct(unclamped_h, minh, maxh,
+                                           lv_obj_get_style_height(obj, LV_PART_MAIN),
+                                           lv_obj_get_style_min_height(obj, LV_PART_MAIN),
+                                           lv_obj_get_style_max_height(obj, LV_PART_MAIN));
+        obj->h_ignore_size = (h_pct && parent->h_layout == 0 &&
                               lv_obj_get_style_height(parent, 0) == LV_SIZE_CONTENT);
     }
 
@@ -351,7 +336,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
         if(pass_cnt >= LV_OBJ_LAYOUT_UPDATE_MAX_PASSES) {
             LV_ASSERT_FORMAT_MSG(false,
                                  "Layout of screen %p (class: '%s') didn't settle in %d passes, giving up. Some "
-                                 "sizes probably depend on each other circularly",
+                                 "sizes probably depend on each other circularly. Please report it on github",
                                  (void *)scr, scr->class_p->name, LV_OBJ_LAYOUT_UPDATE_MAX_PASSES);
             /*Reached only if the assert handler returns*/
             scr->scr_layout_inv = 0;
@@ -1767,3 +1752,32 @@ static int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t
     return height;
 }
 
+/**
+ * Tell whether the style which sets the final size is a percentage.
+ * @param unclamped     the size from the size style, before clamping
+ * @param min           the min size after resolving its style
+ * @param max           the max size after resolving its style
+ * @param size_style    the size style value, e.g. LV_PCT(100) or LV_SIZE_CONTENT
+ * @param min_style     the min size style value
+ * @param max_style     the max size style value
+ * @return              true: a percentage style sets the size
+ */
+static bool size_in_effect_is_pct(int32_t unclamped, int32_t min, int32_t max, int32_t size_style,
+                                  int32_t min_style, int32_t max_style)
+{
+    /*If the bounds are inverted the clamp always returns the min size*/
+    if(min > max) return LV_COORD_IS_PCT(min_style);
+
+    /*The size is set by the bound which clamped it*/
+    if(unclamped < min) return LV_COORD_IS_PCT(min_style);
+    if(unclamped > max) return LV_COORD_IS_PCT(max_style);
+
+    /*Else the size is set by the size style. If it's equal to a bound, that bound sets the same
+     *size, so use the style which is not a percentage. Percentages are left out of the parent's
+     *content size, so choosing a different style in each pass would make the layout never settle.*/
+    bool is_pct = LV_COORD_IS_PCT(size_style);
+    if(is_pct && unclamped == min) is_pct = LV_COORD_IS_PCT(min_style);
+    if(is_pct && unclamped == max) is_pct = LV_COORD_IS_PCT(max_style);
+
+    return is_pct;
+}
