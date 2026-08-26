@@ -51,10 +51,12 @@ static void file_explorer_event_handler(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
+#if LV_USE_LOG
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
 
         LV_LOG_USER("%s%s", cur_path, sel_fn);
+#endif
     }
     else if(code == LV_EVENT_READY) {
         lv_obj_t * tb = lv_file_explorer_get_file_table(obj);

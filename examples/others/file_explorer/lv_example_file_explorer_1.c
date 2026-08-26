@@ -11,14 +11,19 @@ LV_DEPRECATIONS_IGNORE_BEGIN
 
 static void file_explorer_event_handler(lv_event_t * e)
 {
+#if LV_USE_LOG
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
+
         LV_LOG_USER("%s%s", cur_path, sel_fn);
     }
+#else
+    LV_UNUSED(e);
+#endif
 }
 
 /**

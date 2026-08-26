@@ -146,6 +146,8 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
             if(LV_ABS((int32_t) ptr_act[0] - (int32_t) ptr_ref[0]) > REF_IMG_TOLERANCE ||
                LV_ABS((int32_t) ptr_act[1] - (int32_t) ptr_ref[1]) > REF_IMG_TOLERANCE ||
                LV_ABS((int32_t) ptr_act[2] - (int32_t) ptr_ref[2]) > REF_IMG_TOLERANCE) {
+                err = true;
+#if LV_USE_LOG
                 uint32_t act_px = (ptr_act[2] << 16) + (ptr_act[1] << 8) + (ptr_act[0] << 0);
                 uint32_t ref_px = 0;
                 memcpy(&ref_px, ptr_ref, 3);
@@ -156,7 +158,7 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
                        "  - Actual:   %X\n"
                        "  - Tolerance: %d\n",
                        fn_ref_full,  x, y, ref_px, act_px, REF_IMG_TOLERANCE);
-                err = true;
+#endif
                 break;
             }
         }

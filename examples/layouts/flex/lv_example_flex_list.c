@@ -115,6 +115,7 @@ static lv_obj_t * flex_list_add_button(lv_obj_t * list, const void * icon, const
     return btn;
 }
 
+#if LV_USE_LOG
 /**
  * Find the text of a list button by looking for its child label.
  */
@@ -129,14 +130,20 @@ static const char * flex_list_get_button_text(lv_obj_t * btn)
     }
     return "";
 }
+#endif /*LV_USE_LOG*/
 
 static void event_handler(lv_event_t * e)
 {
+#if LV_USE_LOG
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target_obj(e);
+
     if(code == LV_EVENT_CLICKED) {
         LV_LOG_USER("Clicked: %s", flex_list_get_button_text(obj));
     }
+#else
+    LV_UNUSED(e);
+#endif
 }
 
 /**
