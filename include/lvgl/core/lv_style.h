@@ -499,7 +499,7 @@ lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop,
  * @param path_cb   an animation path (ease) callback. If `NULL` liner path will be used.
  * @param time      duration of the transition in [ms]
  * @param delay     delay before the transition in [ms]
- * @param user_data any custom data that will be saved in the transition animation and will be available when `path_cb` is called
+ * @param user_data any custom data that will be saved in the transition animation and will be available when `path_cb` is called @nullable
  *
  * Example:
  * @code

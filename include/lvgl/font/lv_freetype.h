@@ -117,7 +117,7 @@ void lv_freetype_font_delete(lv_font_t * font);
  *
  * @param event_cb The callback function to be registered.
  * @param filter The event code to filter for, or LV_EVENT_ALL to receive every event.
- * @param user_data User data to be passed to the callback function.
+ * @param user_data User data to be passed to the callback function. @nullable
  */
 void lv_freetype_outline_add_event(lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 

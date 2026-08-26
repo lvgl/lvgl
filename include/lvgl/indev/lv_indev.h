@@ -148,7 +148,7 @@ void lv_indev_set_read_cb(lv_indev_t * indev,  lv_indev_read_cb_t read_cb);
 /**
  * Set user data to the indev
  * @param indev pointer to an input device
- * @param user_data pointer to user data
+ * @param user_data pointer to user data @nullable
  */
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data);
 
@@ -431,7 +431,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point);
  * @param indev          pointer to an indev
  * @param event_cb      an event callback
  * @param filter        event code to react or `LV_EVENT_ALL`
- * @param user_data     optional user_data
+ * @param user_data     optional user_data @nullable
  * @return the event descriptor or NULL if the event couldn't be created
  */
 lv_event_dsc_t * lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter,
@@ -464,7 +464,7 @@ bool lv_indev_remove_event(lv_indev_t * indev, uint32_t index);
  * Remove an event_cb with user_data
  * @param indev         pointer to a indev
  * @param event_cb      the event_cb of the event to remove
- * @param user_data     user_data
+ * @param user_data     user_data @nullable
  * @return              the count of the event removed
  */
 uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb_t event_cb, void * user_data);

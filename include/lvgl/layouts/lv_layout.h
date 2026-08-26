@@ -51,7 +51,7 @@ typedef enum {
 /**
  * Create a new layout
  * @param callbacks the layout callbacks
- * @param user_data custom data that will be passed when a callback is invoked
+ * @param user_data custom data that will be passed when a callback is invoked @nullable
  * @return          the ID of the new layout
  */
 uint32_t lv_layout_create(lv_layout_callbacks_t callbacks, void * user_data);
@@ -62,7 +62,7 @@ uint32_t lv_layout_create(lv_layout_callbacks_t callbacks, void * user_data);
  * @deprecated use `lv_layout_create` instead.
  *
  * @param cb        the layout update callback
- * @param user_data custom data that will be passed to `cb`
+ * @param user_data custom data that will be passed to `cb` @nullable
  * @return          the ID of the new layout
  */
 LV_DEPRECATED("Use lv_layout_create instead")

@@ -328,7 +328,7 @@ void lv_anim_set_early_apply(lv_anim_t * a, bool en);
 /**
  * Set the custom user data field of the animation.
  * @param a           pointer to an initialized `lv_anim_t` variable
- * @param user_data   pointer to the new user_data.
+ * @param user_data   pointer to the new user_data. @nullable
  */
 void lv_anim_set_user_data(lv_anim_t * a, void * user_data);
 

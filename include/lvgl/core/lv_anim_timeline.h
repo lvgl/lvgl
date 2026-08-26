@@ -111,7 +111,7 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress);
 /**
  * Set the user_data of a an animation timeline
  * @param at        pointer to the animation timeline.
- * @param user_data pointer to any data. Only the pointer will be saved.
+ * @param user_data pointer to any data. Only the pointer will be saved. @nullable
  */
 void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data);
 

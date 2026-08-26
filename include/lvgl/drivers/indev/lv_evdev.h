@@ -31,7 +31,7 @@ typedef enum {
 /**
  * @param indev      the indev created for the newly discovered evdev
  * @param type       the type of the evdev
- * @param user_data  a custom parameter
+ * @param user_data  a custom parameter @nullable
  */
 typedef void (*lv_evdev_discovery_cb_t)(lv_indev_t * indev, lv_evdev_type_t type, void * user_data);
 
@@ -59,7 +59,7 @@ lv_indev_t * lv_evdev_create_fd(lv_indev_type_t indev_type, int fd);
  * Begin automatically creating evdev indevs for all new and existing
  * evdev devices found in /dev/input/
  * @param cb         function to call when a new evdev indev is discovered, or `NULL`
- * @param user_data  parameter to pass to the callback
+ * @param user_data  parameter to pass to the callback @nullable
  * @return           the success or failure status. It will fail if it's
  *                   already running or resources could not be initialized.
  */
