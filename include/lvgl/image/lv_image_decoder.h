@@ -109,7 +109,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  *                 1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register())`)
  *                 2) Variable: Pointer to an `lv_image_dsc_t` variable
  *                 3) Symbol: E.g. `LV_SYMBOL_OK`
- * @param args   args about how the image should be opened.
+ * @param args   args about how the image should be opened. @nullable. Use NULL to use default parameters
  * @return LV_RESULT_OK: opened the image. `dsc->decoded` and `dsc->header` are set.
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
@@ -128,7 +128,7 @@ lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_are
 
 /**
  * Close a decoding session
- * @param dsc pointer to `lv_image_decoder_dsc_t` used in `lv_image_decoder_open`
+ * @param dsc pointer to `lv_image_decoder_dsc_t` used in `lv_image_decoder_open` @nullable
  */
 void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc);
 
@@ -140,13 +140,13 @@ lv_image_decoder_t * lv_image_decoder_create(void);
 
 /**
  * Delete an image decoder
- * @param decoder pointer to an image decoder
+ * @param decoder pointer to an image decoder @nullable
  */
 void lv_image_decoder_delete(lv_image_decoder_t * decoder);
 
 /**
  * Get the next image decoder in the linked list of image decoders
- * @param decoder pointer to an image decoder or NULL to get the first one
+ * @param decoder pointer to an image decoder. @nullable. Use NULL to get the first one
  * @return the next image decoder or NULL if no more image decoder exists
  */
 lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder);
@@ -154,28 +154,29 @@ lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder);
 /**
  * Set a callback to get information about the image
  * @param decoder pointer to an image decoder
- * @param info_cb a function to collect info about an image (fill an `lv_image_header_t` struct)
+ * @param info_cb a function to collect info about an image (fill an `lv_image_header_t` struct).
+ *                @nullable. Use NULL to detach a previously assigned callback
  */
 void lv_image_decoder_set_info_cb(lv_image_decoder_t * decoder, lv_image_decoder_info_f_t info_cb);
 
 /**
  * Set a callback to open an image
  * @param decoder pointer to an image decoder
- * @param open_cb a function to open an image
+ * @param open_cb a function to open an image @nullable. Use NULL to detach a previously assigned callback
  */
 void lv_image_decoder_set_open_cb(lv_image_decoder_t * decoder, lv_image_decoder_open_f_t open_cb);
 
 /**
  * Set a callback to a decoded line of an image
  * @param decoder pointer to an image decoder
- * @param get_area_cb a function to read a line of an image
+ * @param get_area_cb a function to read a line of an image @nullable. Use NULL to detach a previously assigned callback
  */
 void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_decoder_get_area_cb_t get_area_cb);
 
 /**
  * Set a callback to close a decoding session. E.g. close files and free other resources.
  * @param decoder pointer to an image decoder
- * @param close_cb a function to close a decoding session
+ * @param close_cb a function to close a decoding session @nullable. Use NULL to detach a previously assigned callback
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
 
@@ -183,7 +184,8 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
  * Check the decoded image, make any modification if decoder `args` requires.
  * @note A new draw buf will be allocated if provided `decoded` is not modifiable or stride mismatch etc.
  * @param dsc       pointer to a decoder descriptor
- * @param decoded   pointer to a decoded image to post process to meet dsc->args requirement.
+ * @param decoded   pointer to a decoded image to post process to meet dsc->args requirement. @nullable.
+ *                  When NULL no post processing is done
  * @return          post processed draw buffer, when it differs with `decoded`, it's newly allocated.
  */
 lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded);
