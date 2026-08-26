@@ -86,7 +86,7 @@ static bool lv_font_manager_add_src_core(lv_font_manager_t * manager, const char
 
 lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size)
 {
-    LV_ASSERT_MSG(recycle_cache_size > 0, "recycle_cache_size should be greater than 0");
+    LV_CHECK_ARG(recycle_cache_size > 0, return NULL, "recycle_cache_size must be greater than 0");
     lv_font_manager_t * manager = lv_malloc_zeroed(sizeof(lv_font_manager_t));
     LV_ASSERT_MALLOC(manager);
     if(!manager) {
@@ -106,7 +106,7 @@ lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size)
 
 bool lv_font_manager_delete(lv_font_manager_t * manager)
 {
-    LV_ASSERT_NULL(manager);
+    if(manager == NULL) return false;
 
     /* Resource leak check */
     if(lv_font_manager_check_resource(manager)) {
@@ -142,6 +142,11 @@ bool lv_font_manager_add_src(lv_font_manager_t * manager,
                              const void * src,
                              const lv_font_class_t * class_p)
 {
+    LV_CHECK_ARG(manager != NULL, return false);
+    LV_CHECK_ARG(name != NULL, return false);
+    LV_CHECK_ARG(src != NULL, return false);
+    LV_CHECK_ARG(class_p != NULL, return false);
+
     return lv_font_manager_add_src_core(manager, name, src, class_p, false);
 }
 
@@ -150,13 +155,18 @@ bool lv_font_manager_add_src_static(lv_font_manager_t * manager,
                                     const void * src,
                                     const lv_font_class_t * class_p)
 {
+    LV_CHECK_ARG(manager != NULL, return false);
+    LV_CHECK_ARG(name != NULL, return false);
+    LV_CHECK_ARG(src != NULL, return false);
+    LV_CHECK_ARG(class_p != NULL, return false);
+
     return lv_font_manager_add_src_core(manager, name, src, class_p, true);
 }
 
 bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(name);
+    LV_CHECK_ARG(manager != NULL, return false);
+    LV_CHECK_ARG(name != NULL, return false);
 
     lv_font_src_t * font_src = lv_font_manager_get_src(manager, name);
     if(!font_src) {
@@ -195,8 +205,8 @@ lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
                                         lv_font_kerning_t kerning)
 {
 
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(font_family);
+    LV_CHECK_ARG(manager != NULL, return NULL);
+    LV_CHECK_ARG(font_family != NULL, return NULL);
 
     lv_font_info_t ft_info;
     lv_memzero(&ft_info, sizeof(ft_info));
@@ -230,8 +240,8 @@ lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
 
 void lv_font_manager_delete_font(lv_font_manager_t * manager, lv_font_t * font)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(font);
+    LV_CHECK_ARG(manager != NULL, return);
+    LV_CHECK_ARG(font != NULL, return);
 
     if(IS_FONT_HAS_FALLBACK(font)) {
         lv_font_manager_delete_font_family(manager, font);
@@ -247,8 +257,8 @@ void lv_font_manager_delete_font(lv_font_manager_t * manager, lv_font_t * font)
 
 static lv_font_t * lv_font_manager_create_font_single(lv_font_manager_t * manager, const lv_font_info_t * ft_info)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(ft_info);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(ft_info != NULL);
 
     const lv_font_refer_node_t * refer_node = lv_font_manager_get_font(manager, ft_info);
     if(!refer_node) {
@@ -272,8 +282,8 @@ static lv_font_t * lv_font_manager_create_font_single(lv_font_manager_t * manage
 
 static bool lv_font_manager_delete_font_single(lv_font_manager_t * manager, lv_font_t * font)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(font);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(font != NULL);
 
     if(font == LV_FONT_DEFAULT) {
         LV_LOG_INFO("LV_FONT_DEFAULT can not be deleted");
@@ -302,8 +312,8 @@ static bool lv_font_manager_delete_font_single(lv_font_manager_t * manager, lv_f
 
 static const char * strncpy_until(char * dest, const char * src, size_t n, char c)
 {
-    LV_ASSERT_NULL(dest);
-    LV_ASSERT_NULL(src);
+    LV_ASSERT(dest != NULL);
+    LV_ASSERT(src != NULL);
 
     size_t i = 0;
     while(i < n && *src != '\0' && *src != c) {
@@ -320,8 +330,8 @@ static const char * strncpy_until(char * dest, const char * src, size_t n, char 
 
 static lv_font_t * lv_font_manager_create_font_family(lv_font_manager_t * manager, const lv_font_info_t * ft_info)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(ft_info);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(ft_info != NULL);
 
     lv_font_t * first_font = NULL;
     lv_font_t * pre_font = NULL;
@@ -371,8 +381,8 @@ static lv_font_t * lv_font_manager_create_font_family(lv_font_manager_t * manage
 
 static void lv_font_manager_delete_font_family(lv_font_manager_t * manager, lv_font_t * font)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(font);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(font != NULL);
 
     lv_font_t * f = font;
     while(f) {
@@ -388,10 +398,10 @@ static bool lv_font_manager_add_src_core(lv_font_manager_t * manager,
                                          const lv_font_class_t * class_p,
                                          bool is_static)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(name);
-    LV_ASSERT_NULL(src);
-    LV_ASSERT_NULL(class_p);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(name != NULL);
+    LV_ASSERT(src != NULL);
+    LV_ASSERT(class_p != NULL);
 
     if(lv_font_manager_get_src(manager, name)) {
         LV_LOG_WARN("name: %s already exists", name);
@@ -413,7 +423,7 @@ static bool lv_font_manager_add_src_core(lv_font_manager_t * manager,
         LV_ASSERT_MALLOC(font_src->name);
 
         font_src->src = font_src->class_p->dup_src_cb(src);
-        LV_ASSERT_NULL(font_src->src);
+        LV_ASSERT(font_src->src != NULL);
     }
 
     LV_LOG_INFO("name: %s, src: %p add success", name, (void *)src);
@@ -434,7 +444,7 @@ static lv_font_src_t * lv_font_manager_get_src(lv_font_manager_t * manager, cons
 
 static bool lv_font_manager_check_resource(lv_font_manager_t * manager)
 {
-    LV_ASSERT_NULL(manager);
+    LV_ASSERT(manager != NULL);
 
     /* Check the recorded font */
     lv_ll_t * rec_ll = &manager->rec_ll;
@@ -475,8 +485,8 @@ static bool lv_font_manager_check_resource(lv_font_manager_t * manager)
 
 static bool lv_font_manager_check_src_resource(lv_font_manager_t * manager, const char * name)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(name);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(name != NULL);
 
     bool has_resource = false;
     lv_ll_t * refer_ll = &manager->refer_ll;
@@ -499,8 +509,8 @@ static bool lv_font_manager_check_src_resource(lv_font_manager_t * manager, cons
 
 static lv_font_rec_node_t * lv_font_manager_search_rec_node(lv_font_manager_t * manager, lv_font_t * font)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(font);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(font != NULL);
 
     lv_font_rec_node_t * rec_node;
     LV_LL_READ(&manager->rec_ll, rec_node) {
@@ -516,8 +526,8 @@ static lv_font_rec_node_t * lv_font_manager_search_rec_node(lv_font_manager_t * 
 static lv_font_refer_node_t * lv_font_manager_search_refer_node(lv_font_manager_t * manager,
                                                                 const lv_font_info_t * ft_info)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(ft_info);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(ft_info != NULL);
 
     lv_font_refer_node_t * refer_node;
     LV_LL_READ(&manager->refer_ll, refer_node) {
@@ -532,8 +542,8 @@ static lv_font_refer_node_t * lv_font_manager_search_refer_node(lv_font_manager_
 
 static lv_font_t * lv_font_manager_create_font_wrapper(lv_font_manager_t * manager, const lv_font_info_t * ft_info)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(ft_info);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(ft_info != NULL);
 
     lv_font_t * font;
 
@@ -565,16 +575,16 @@ static lv_font_t * lv_font_manager_create_font_wrapper(lv_font_manager_t * manag
 
 static void lv_font_manager_delete_font_wrapper(lv_font_manager_t * manager, lv_font_refer_node_t * refer_node)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(refer_node);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(refer_node != NULL);
     lv_font_manager_recycle_set_reuse(manager->recycle_manager, refer_node->font_p, &refer_node->ft_info);
 }
 
 static const lv_font_refer_node_t * lv_font_manager_get_font(lv_font_manager_t * manager,
                                                              const lv_font_info_t * ft_info)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(ft_info);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(ft_info != NULL);
 
     /* check refer_node is existed */
     lv_font_refer_node_t * refer_node = lv_font_manager_search_refer_node(manager, ft_info);
@@ -600,7 +610,7 @@ static const lv_font_refer_node_t * lv_font_manager_get_font(lv_font_manager_t *
     lv_strncpy(refer_node->name, ft_info->name, sizeof(refer_node->name) - 1);
 
     const lv_font_src_t * font_src = lv_font_manager_get_src(manager, ft_info->name);
-    LV_ASSERT_NULL(font_src);
+    LV_ASSERT(font_src != NULL);
 
     /* copy font data */
     refer_node->font_p = font;
@@ -615,8 +625,8 @@ static const lv_font_refer_node_t * lv_font_manager_get_font(lv_font_manager_t *
 
 static bool lv_font_manager_drop_font(lv_font_manager_t * manager, const lv_font_refer_node_t * node)
 {
-    LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(node);
+    LV_ASSERT(manager != NULL);
+    LV_ASSERT(node != NULL);
 
     /* Check refer_node is existed */
     lv_font_refer_node_t * refer_node = lv_font_manager_search_refer_node(manager, &node->ft_info);

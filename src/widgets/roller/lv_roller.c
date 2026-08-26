@@ -20,6 +20,7 @@
 #include "../../indev/lv_indev_scroll.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../core/lv_observer_private.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -145,8 +146,9 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         roller->mode = LV_ROLLER_MODE_INFINITE;
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t normal_h = roller->option_cnt * (lv_font_get_line_height(font) + lv_obj_get_style_text_letter_space(obj,
-                                                                                                                    LV_PART_MAIN));
+        int32_t normal_h = roller->option_cnt * (lv_font_get_line_height_internal(font) + lv_obj_get_style_text_letter_space(
+                                                     obj,
+                                                     LV_PART_MAIN));
         roller->inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
         if(!(roller->inf_page_cnt & 1)) roller->inf_page_cnt++;   /*Make it odd*/
         LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", roller->inf_page_cnt);
@@ -248,7 +250,7 @@ void lv_roller_set_visible_row_count(lv_obj_t * obj, uint32_t row_cnt)
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_obj_set_height(obj, (lv_font_get_line_height(font) + line_space) * row_cnt + 2 * border_width);
+    lv_obj_set_height(obj, (lv_font_get_line_height_internal(font) + line_space) * row_cnt + 2 * border_width);
 }
 
 /*=====================
@@ -682,8 +684,8 @@ static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area)
 
     const lv_font_t * font_main = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     const lv_font_t * font_sel = lv_obj_get_style_text_font(obj, LV_PART_SELECTED);
-    int32_t font_main_h        = lv_font_get_line_height(font_main);
-    int32_t font_sel_h        = lv_font_get_line_height(font_sel);
+    int32_t font_main_h        = lv_font_get_line_height_internal(font_main);
+    int32_t font_sel_h        = lv_font_get_line_height_internal(font_sel);
     int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     int32_t d = (font_sel_h + font_main_h) / 2 + line_space;
     sel_area->y1 = obj->coords.y1 + lv_obj_get_height(obj) / 2 - d / 2;
@@ -727,7 +729,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
 
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     const int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    const int32_t font_h = lv_font_get_line_height(font);
+    const int32_t font_h = lv_font_get_line_height_internal(font);
     const int32_t h = lv_obj_get_content_height(obj);
     uint32_t anim_time = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
 
@@ -812,7 +814,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
             /*If dragged then align the list to have an element in the middle*/
             const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
             int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-            int32_t font_h              = lv_font_get_line_height(font);
+            int32_t font_h              = lv_font_get_line_height_internal(font);
 
             int32_t label_unit = font_h + line_space;
             int32_t mid        = obj->coords.y1 + (obj->coords.y2 - obj->coords.y1) / 2;
@@ -866,7 +868,7 @@ static void inf_normalize(lv_obj_t * obj)
         /*Move to the new id*/
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        int32_t font_h              = lv_font_get_line_height(font);
+        int32_t font_h              = lv_font_get_line_height_internal(font);
         int32_t h                   = lv_obj_get_content_height(obj);
 
         lv_obj_t * label = get_label(obj);

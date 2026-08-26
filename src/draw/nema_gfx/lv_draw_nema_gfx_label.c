@@ -39,6 +39,7 @@
 #include "../../misc/lv_bidi_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../lvgl.h"
+#include "../../font/lv_font_private.h"
 #include "../../font/freetype/lv_freetype_private.h"
 #include "../../core/lv_global.h"
 
@@ -447,7 +448,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
         attributes.max_width = p.x;
     }
 
-    int32_t line_height_font = lv_font_get_line_height(font);
+    int32_t line_height_font = lv_font_get_line_height_internal(font);
     int32_t line_height = line_height_font + dsc->line_space;
 
     /*Init variables for the first line*/
@@ -776,7 +777,7 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
         return;
 
     LV_PROFILER_DRAW_BEGIN;
-    bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, '\0');
+    bool g_ret = lv_font_get_glyph_dsc_internal(font, &g, letter, '\0');
     if(g_ret == false) {
         /*Add warning if the dsc is not found*/
         LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);

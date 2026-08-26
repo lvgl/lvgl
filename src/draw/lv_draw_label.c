@@ -14,6 +14,7 @@
 #include "../misc/lv_bidi_private.h"
 #include "../misc/lv_text_private.h"
 #include "../core/lv_global.h"
+#include "../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -146,13 +147,13 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
 
     lv_font_glyph_dsc_t g;
 
-    lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0);
+    lv_font_get_glyph_dsc_internal(dsc->font, &g, unicode_letter, 0);
 
     lv_area_t a;
     a.x1 = point->x;
     a.y1 = point->y;
     a.x2 = a.x1 + g.adv_w;
-    a.y2 = a.y1 + lv_font_get_line_height(g.resolved_font ? g.resolved_font : dsc->font);
+    a.y2 = a.y1 + lv_font_get_line_height_internal(g.resolved_font ? g.resolved_font : dsc->font);
 
     /*lv_draw_label needs UTF8 text so convert the Unicode character to an UTF8 string */
     uint32_t letter_buf[2];
@@ -185,7 +186,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
     LV_PROFILER_DRAW_BEGIN;
     lv_font_glyph_dsc_t g;
 
-    lv_font_get_glyph_dsc(font, &g, dsc->unicode, 0);
+    lv_font_get_glyph_dsc_internal(font, &g, dsc->unicode, 0);
 
     font = g.resolved_font ? g.resolved_font : dsc->font;
 
@@ -193,7 +194,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
     a.x1 = point->x;
     a.y1 = point->y;
     a.x2 = a.x1 + g.adv_w;
-    a.y2 = a.y1 + lv_font_get_line_height(font);
+    a.y2 = a.y1 + lv_font_get_line_height_internal(font);
 
     dsc->pivot.x = g.adv_w / 2 ;
     dsc->pivot.y = font->line_height - font->base_line;
@@ -246,7 +247,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         }
     }
 
-    int32_t line_height_font = lv_font_get_line_height(font);
+    int32_t line_height_font = lv_font_get_line_height_internal(font);
     int32_t line_height = line_height_font + dsc->line_space;
 
     /*Init variables for the first line*/
@@ -474,7 +475,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                 logical_char_pos -= (LABEL_RECOLOR_PAR_LENGTH + 1);
             }
 
-            lv_font_get_glyph_dsc(font, &glyph_dsc, letter, letter_next);
+            lv_font_get_glyph_dsc_internal(font, &glyph_dsc, letter, letter_next);
             letter_w = lv_text_is_marker(letter) ? 0 : glyph_dsc.adv_w;
 
             /*Always set the bg_coordinates for placeholder drawing*/
@@ -601,7 +602,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
          * we correctly reset it to NULL at `exit:` but cpp-check chokes on it and warns us*/
         dsc->g = &g;
         /*If the glyph dsc is not set then get it from the font*/
-        bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, 0);
+        bool g_ret = lv_font_get_glyph_dsc_internal(font, &g, letter, 0);
         if(g_ret == false) {
             /*Add warning if the dsc is not found*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
@@ -659,7 +660,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
         if(g.format == LV_FONT_GLYPH_FORMAT_VECTOR) {
 
             /*Load the outline of the glyph, even if the function says bitmap*/
-            dsc->glyph_data = (void *) lv_font_get_glyph_bitmap(dsc->g, draw_buf);
+            dsc->glyph_data = (void *) lv_font_get_glyph_bitmap_internal(dsc->g, draw_buf);
             dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
         }
     }
@@ -671,7 +672,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
     cb(t, dsc, NULL, NULL);
     dsc->letter_coords = NULL;
 
-    lv_font_glyph_release_draw_data(dsc->g);
+    lv_font_glyph_release_draw_data_internal(dsc->g);
 
 exit:
     if(dsc->g == &g) {

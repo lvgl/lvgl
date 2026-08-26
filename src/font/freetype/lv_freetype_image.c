@@ -86,9 +86,11 @@ void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc)
 
 static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
+    LV_ASSERT(g_dsc != NULL);
     LV_UNUSED(draw_buf);
     LV_PROFILER_FONT_BEGIN;
     const lv_font_t * font = g_dsc->resolved_font;
+    LV_ASSERT(font != NULL);
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
@@ -117,7 +119,8 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv
 
 static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
 {
-    LV_ASSERT_NULL(font);
+    LV_ASSERT(font != NULL);
+    LV_ASSERT(g_dsc != NULL);
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     lv_cache_release(dsc->cache_node->draw_data_cache, g_dsc->entry, NULL);
     g_dsc->entry = NULL;
@@ -129,6 +132,8 @@ static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_
 
 static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void * user_data)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(user_data != NULL);
     LV_PROFILER_FONT_BEGIN;
 
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)user_data;
@@ -211,12 +216,15 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
 }
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * data, void * user_data)
 {
+    LV_ASSERT(data != NULL);
     LV_UNUSED(user_data);
     lv_draw_buf_destroy(data->draw_buf);
 }
 static lv_cache_compare_res_t freetype_image_compare_cb(const lv_freetype_image_cache_data_t * lhs,
                                                         const lv_freetype_image_cache_data_t * rhs)
 {
+    LV_ASSERT(lhs != NULL);
+    LV_ASSERT(rhs != NULL);
     if(lhs->glyph_index != rhs->glyph_index) {
         return lhs->glyph_index > rhs->glyph_index ? 1 : -1;
     }

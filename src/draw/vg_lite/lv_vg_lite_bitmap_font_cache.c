@@ -161,7 +161,7 @@ static bool cache_create_cb(cache_item_t * item, void * user_data)
         return false;
     }
 
-    if(!lv_font_get_glyph_bitmap(&item->g_dsc, draw_buf)) {
+    if(!lv_font_get_glyph_bitmap_internal(&item->g_dsc, draw_buf)) {
         LV_LOG_WARN("Failed to get glyph bitmap for bitmap font cache");
         lv_draw_buf_destroy(draw_buf);
         LV_PROFILER_FONT_END;

@@ -93,7 +93,7 @@ const lv_font_class_t lv_binfont_font_class = {
 
 lv_font_t * lv_binfont_create(const char * path)
 {
-    LV_ASSERT_NULL(path);
+    LV_CHECK_ARG(path != NULL, return NULL);
 
     lv_fs_file_t file;
     lv_fs_res_t fs_res = lv_fs_open(&file, path, LV_FS_MODE_RD);
@@ -121,6 +121,8 @@ lv_font_t * lv_binfont_create(const char * path)
 #if LV_USE_FS_MEMFS
 lv_font_t * lv_binfont_create_from_buffer(void * buffer, uint32_t size)
 {
+    LV_CHECK_ARG(buffer != NULL, return NULL);
+
     lv_fs_path_ex_t mempath;
 
     lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, buffer, size, "bin");
@@ -174,6 +176,7 @@ void lv_binfont_destroy(lv_font_t * font)
 
 static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp)
 {
+    LV_ASSERT(fp != NULL);
     bit_iterator_t it;
     it.fp = fp;
     it.bit_pos = -1;
@@ -183,6 +186,8 @@ static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp)
 
 static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 {
+    LV_ASSERT(it != NULL);
+    LV_ASSERT(res != NULL);
     unsigned int value = 0;
     while(n_bits--) {
         it->byte_value = it->byte_value << 1;
@@ -205,6 +210,8 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
 
 static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 {
+    LV_ASSERT(it != NULL);
+    LV_ASSERT(res != NULL);
     unsigned int value = read_bits(it, n_bits, res);
     if(value & (1 << (n_bits - 1))) {
         value |= ~0u << n_bits;
@@ -214,6 +221,8 @@ static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 
 static int read_label(lv_fs_file_t * fp, int start, const char * label)
 {
+    LV_ASSERT(fp != NULL);
+    LV_ASSERT(label != NULL);
     lv_fs_seek(fp, start, LV_FS_SEEK_SET);
 
     uint32_t length;
@@ -232,6 +241,9 @@ static int read_label(lv_fs_file_t * fp, int start, const char * label)
 static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
                               uint32_t cmaps_start, cmap_table_bin_t * cmap_table)
 {
+    LV_ASSERT(fp != NULL);
+    LV_ASSERT(font_dsc != NULL);
+    LV_ASSERT(cmap_table != NULL);
     if(lv_fs_read(fp, cmap_table, font_dsc->cmap_num * sizeof(cmap_table_bin_t), NULL) != LV_FS_RES_OK) {
         return false;
     }
@@ -298,6 +310,8 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
 static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint32_t cmaps_start)
 {
+    LV_ASSERT(fp != NULL);
+    LV_ASSERT(font_dsc != NULL);
     int32_t cmaps_length = read_label(fp, cmaps_start, "cmap");
     if(cmaps_length < 0) {
         return -1;
@@ -328,6 +342,10 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
 static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
                           uint32_t start, uint32_t * glyph_offset, uint32_t loca_count, font_header_bin_t * header)
 {
+    LV_ASSERT(fp != NULL);
+    LV_ASSERT(font_dsc != NULL);
+    LV_ASSERT(glyph_offset != NULL);
+    LV_ASSERT(header != NULL);
     int32_t glyph_length = read_label(fp, start, "glyf");
     if(glyph_length < 0) {
         return -1;
@@ -480,6 +498,8 @@ static void release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * glyph
  */
 static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 {
+    LV_ASSERT(fp != NULL);
+    LV_ASSERT(font != NULL);
     lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *)
                                        lv_malloc(sizeof(lv_font_fmt_txt_dsc_t));
 
@@ -586,6 +606,8 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 
 int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start)
 {
+    LV_ASSERT(fp != NULL);
+    LV_ASSERT(font_dsc != NULL);
     int32_t kern_length = read_label(fp, start, "kern");
     if(kern_length < 0) {
         return -1;
@@ -682,6 +704,8 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
 
 static lv_font_t * binfont_font_create_cb(const lv_font_info_t * info, const void * src)
 {
+    LV_ASSERT(info != NULL);
+    LV_ASSERT(src != NULL);
     const lv_binfont_font_src_t * font_src = src;
 
     if(info->size == font_src->font_size) {
@@ -706,6 +730,7 @@ static void binfont_font_delete_cb(lv_font_t * font)
 
 static void * binfont_font_dup_src_cb(const void * src)
 {
+    LV_ASSERT(src != NULL);
     const lv_binfont_font_src_t * font_src = src;
 
     lv_binfont_font_src_t * new_src = lv_malloc_zeroed(sizeof(lv_binfont_font_src_t));
@@ -721,11 +746,10 @@ static void * binfont_font_dup_src_cb(const void * src)
 
 static void binfont_font_free_src_cb(void * src)
 {
+    LV_ASSERT(src != NULL);
     lv_binfont_font_src_t * font_src = src;
-    if(font_src->path) {
-        lv_free((char *)font_src->path);
-        font_src->path = NULL;
-    }
 
+    lv_free((char *)font_src->path);
+    font_src->path = NULL;
     lv_free(font_src);
 }

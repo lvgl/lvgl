@@ -93,20 +93,7 @@ typedef enum {
  * @param trim  leading-trim mode
  * @return      pixels to trim from the top (0 if no trimming)
  */
-static inline int32_t lv_font_get_top_trim(const lv_font_t * font,
-                                           lv_text_leading_trim_t trim)
-{
-    switch(trim) {
-        case LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE:
-        case LV_TEXT_LEADING_TRIM_CAPITAL:
-            return (font->line_height - font->base_line) - font->cap_height;
-        case LV_TEXT_LEADING_TRIM_LOWER_BASELINE:
-        case LV_TEXT_LEADING_TRIM_LOWER:
-            return (font->line_height - font->base_line) - font->x_height;
-        default:
-            return 0;
-    }
-}
+int32_t lv_font_get_top_trim(const lv_font_t * font, lv_text_leading_trim_t trim);
 
 /**
  * Get the number of pixels to trim from the bottom of text for a given
@@ -115,17 +102,7 @@ static inline int32_t lv_font_get_top_trim(const lv_font_t * font,
  * @param trim  leading-trim mode
  * @return      pixels to trim from the bottom (0 if no trimming)
  */
-static inline int32_t lv_font_get_bottom_trim(const lv_font_t * font,
-                                              lv_text_leading_trim_t trim)
-{
-    switch(trim) {
-        case LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE:
-        case LV_TEXT_LEADING_TRIM_LOWER_BASELINE:
-            return font->base_line;
-        default:
-            return 0;
-    }
-}
+int32_t lv_font_get_bottom_trim(const lv_font_t * font, lv_text_leading_trim_t trim);
 
 /**
  * Get size of a text

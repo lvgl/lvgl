@@ -15,6 +15,7 @@
 #include "../../lvgl_public.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_text_private.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -633,7 +634,7 @@ const char * lv_textarea_get_password_bullet(lv_obj_t * obj)
 
     /*If the textarea's font has the bullet character use it else fallback to "*"*/
     const lv_font_t * bullet_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    if(lv_font_get_glyph_dsc(bullet_font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, '\0'))
+    if(lv_font_get_glyph_dsc_internal(bullet_font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, '\0'))
         return LV_SYMBOL_BULLET;
 
     return "*";
@@ -774,7 +775,7 @@ void lv_textarea_cursor_down(lv_obj_t * obj)
 
     int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    int32_t font_h              = lv_font_get_line_height(font);
+    int32_t font_h              = lv_font_get_line_height_internal(font);
     pos.y += font_h + line_space + 1;
     pos.x = ta->cursor.valid_x;
 
@@ -802,7 +803,7 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
     /*Decrement the y with one line and keep the valid x*/
     int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    int32_t font_h              = lv_font_get_line_height(font);
+    int32_t font_h              = lv_font_get_line_height_internal(font);
     pos.y -= font_h + line_space - 1;
     pos.x = ta->cursor.valid_x;
 
@@ -1087,7 +1088,7 @@ static void refr_cursor_area(lv_obj_t * obj)
     uint32_t letter = lv_text_encoded_next(&txt[byte_pos], NULL);
 
     /* Letter height and width */
-    const int32_t letter_h = lv_font_get_line_height(font);
+    const int32_t letter_h = lv_font_get_line_height_internal(font);
     /*Set letter_w (set not 0 on non printable but valid chars)*/
     uint32_t letter_space = letter;
     if(is_valid_but_non_printable_char(letter)) {
@@ -1418,7 +1419,7 @@ static void lv_textarea_scroll_to_cursor_pos(lv_obj_t * obj, int32_t pos)
     /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
 
     /*Check the top*/
-    int32_t font_h = lv_font_get_line_height(font);
+    int32_t font_h = lv_font_get_line_height_internal(font);
     if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
         lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
     }

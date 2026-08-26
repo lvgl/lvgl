@@ -20,6 +20,7 @@
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -342,7 +343,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    const int32_t letter_height = lv_font_get_line_height(font);
+    const int32_t letter_height = lv_font_get_line_height_internal(font);
 
     lv_area_t txt_coords;
     lv_obj_get_content_coords(obj, &txt_coords);
@@ -414,7 +415,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     lv_text_leading_trim_t leading_trim_mode =
         lv_obj_get_style_text_leading_trim(obj, LV_PART_MAIN);
     if(leading_trim_mode != LV_TEXT_LEADING_TRIM_NONE) {
-        pos->y -= lv_font_get_top_trim(font, leading_trim_mode);
+        pos->y -= lv_font_get_top_trim_internal(font, leading_trim_mode);
     }
 
 #if LV_USE_BIDI
@@ -444,10 +445,10 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     lv_text_leading_trim_t leading_trim_mode =
         lv_obj_get_style_text_leading_trim(obj, LV_PART_MAIN);
     if(leading_trim_mode != LV_TEXT_LEADING_TRIM_NONE) {
-        pos.y += lv_font_get_top_trim(font, leading_trim_mode);
+        pos.y += lv_font_get_top_trim_internal(font, leading_trim_mode);
     }
 
-    const int32_t letter_height = lv_font_get_line_height(font);
+    const int32_t letter_height = lv_font_get_line_height_internal(font);
     int32_t y = 0;
 
     lv_text_attributes_t attributes = {0};
@@ -571,7 +572,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
     const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    const int32_t letter_height    = lv_font_get_line_height(font);
+    const int32_t letter_height    = lv_font_get_line_height_internal(font);
     const int32_t max_h = lv_area_get_height(&txt_coords);
 
     attributes.max_width = lv_area_get_width(&txt_coords);
@@ -829,7 +830,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
          * To avoid this add some extra draw area.
          * font_h / 4 is an empirical value. */
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        const int32_t font_h = lv_font_get_line_height(font);
+        const int32_t font_h = lv_font_get_line_height_internal(font);
         lv_event_set_ext_draw_size(e, font_h / 4);
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
@@ -863,14 +864,14 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
             if(label->max_lines > 0) {
                 label->size_cache.y = LV_MIN(label->size_cache.y,
-                                             lv_font_get_line_height(font) * label->max_lines + line_space * (label->max_lines - 1));
+                                             lv_font_get_line_height_internal(font) * label->max_lines + line_space * (label->max_lines - 1));
             }
 
             lv_text_leading_trim_t leading_trim =
                 lv_obj_get_style_text_leading_trim(obj, LV_PART_MAIN);
             if(leading_trim != LV_TEXT_LEADING_TRIM_NONE) {
-                int32_t top_trim = lv_font_get_top_trim(font, leading_trim);
-                int32_t bottom_trim = lv_font_get_bottom_trim(font, leading_trim);
+                int32_t top_trim = lv_font_get_top_trim_internal(font, leading_trim);
+                int32_t bottom_trim = lv_font_get_bottom_trim_internal(font, leading_trim);
                 label->size_cache.y -= (top_trim + bottom_trim);
             }
 
@@ -915,8 +916,8 @@ static void draw_main(lv_event_t * e)
     if(leading_trim != LV_TEXT_LEADING_TRIM_NONE) {
         const lv_font_t * trim_font =
             lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t top_trim = lv_font_get_top_trim(trim_font, leading_trim);
-        int32_t bottom_trim = lv_font_get_bottom_trim(trim_font, leading_trim);
+        int32_t top_trim = lv_font_get_top_trim_internal(trim_font, leading_trim);
+        int32_t bottom_trim = lv_font_get_bottom_trim_internal(trim_font, leading_trim);
         txt_coords.y1 -= top_trim;
         txt_coords.y2 += bottom_trim;
     }
@@ -1023,7 +1024,7 @@ static void draw_main(lv_event_t * e)
         /*Draw the text again below the original to make a circular effect */
         if(size.y > lv_area_get_height(&txt_coords)) {
             label_draw_dsc.ofs_x = label->offset.x;
-            label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
+            label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height_internal(label_draw_dsc.font);
 
             lv_draw_label(layer, &label_draw_dsc, &txt_coords);
         }
@@ -1254,7 +1255,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
 
         if(size.y > lv_area_get_height(&txt_coords) && hor_anim == false) {
-            lv_anim_set_values(&a, 0, lv_area_get_height(&txt_coords) - size.y - (lv_font_get_line_height(font)));
+            lv_anim_set_values(&a, 0, lv_area_get_height(&txt_coords) - size.y - (lv_font_get_line_height_internal(font)));
             lv_anim_set_exec_cb(&a, set_ofs_y_anim);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
@@ -1350,7 +1351,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
 
         if(size.y > lv_area_get_height(&txt_coords) && hor_anim == false) {
-            lv_anim_set_values(&a, 0, -size.y - (lv_font_get_line_height(font)));
+            lv_anim_set_values(&a, 0, -size.y - (lv_font_get_line_height_internal(font)));
             lv_anim_set_exec_cb(&a, set_ofs_y_anim);
             lv_anim_set_duration(&a, anim_time);
 
@@ -1377,7 +1378,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
     else if(label->long_mode == LV_LABEL_LONG_MODE_DOTS) {
 
         if(size.y > lv_area_get_height(&txt_coords) && /*Text overflows available area*/
-           size.y > lv_font_get_line_height(font) && /*No break requested, so no dots required*/
+           size.y > lv_font_get_line_height_internal(font) && /*No break requested, so no dots required*/
            lv_text_get_encoded_length(label->text) > LV_LABEL_DOT_NUM) { /*Do not turn all characters into dots*/
             lv_point_t p;
             int32_t y_overed;
@@ -1386,10 +1387,10 @@ static void lv_label_refr_text(lv_obj_t * obj)
                   LV_LABEL_DOT_NUM; /*Shrink with dots*/
             p.y = lv_area_get_height(&txt_coords);
             y_overed = p.y %
-                       (lv_font_get_line_height(font) + attributes.line_space); /*Round down to the last line*/
-            if(y_overed >= lv_font_get_line_height(font)) {
+                       (lv_font_get_line_height_internal(font) + attributes.line_space); /*Round down to the last line*/
+            if(y_overed >= lv_font_get_line_height_internal(font)) {
                 p.y -= y_overed;
-                p.y += lv_font_get_line_height(font);
+                p.y += lv_font_get_line_height_internal(font);
             }
             else {
                 p.y -= y_overed;

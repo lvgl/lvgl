@@ -18,6 +18,7 @@
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -865,7 +866,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         if(opt_txt == NULL) {
-            size.y = LV_MAX(size.y, lv_font_get_line_height(font));
+            size.y = LV_MAX(size.y, lv_font_get_line_height_internal(font));
         }
         else {
             lv_draw_label_dsc_t dsc;
@@ -1166,7 +1167,7 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, l
     /*Draw a rectangle under the selected item*/
     const lv_font_t * font    = lv_obj_get_style_text_font(list_obj, LV_PART_SELECTED);
     int32_t line_space = lv_obj_get_style_text_line_space(list_obj,  LV_PART_SELECTED);
-    int32_t font_h         = lv_font_get_line_height(font);
+    int32_t font_h         = lv_font_get_line_height_internal(font);
 
     /*Draw the selected*/
     lv_obj_t * label = get_label(dropdown_obj);
@@ -1214,7 +1215,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;
 
-    int32_t font_h        = lv_font_get_line_height(label_dsc.font);
+    int32_t font_h        = lv_font_get_line_height_internal(label_dsc.font);
 
     lv_area_t area_sel;
     area_sel.y1 = label->coords.y1;
@@ -1333,7 +1334,7 @@ static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y)
     y -= label->coords.y1;
 
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
-    int32_t font_h              = lv_font_get_line_height(font);
+    int32_t font_h              = lv_font_get_line_height_internal(font);
     int32_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
 
     y += line_space / 2;
@@ -1360,7 +1361,7 @@ static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_
     if(lv_obj_get_height(label) <= lv_obj_get_content_height(dropdown_obj)) return;
 
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
-    int32_t font_h              = lv_font_get_line_height(font);
+    int32_t font_h              = lv_font_get_line_height_internal(font);
     int32_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
     int32_t unit_h = font_h + line_space;
     int32_t line_y1 = dropdown->sel_opt_id * unit_h;

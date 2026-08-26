@@ -145,7 +145,7 @@ void lv_freetype_uninit(void)
 
 void lv_freetype_init_font_info(lv_font_info_t * font_info)
 {
-    LV_ASSERT_NULL(font_info);
+    LV_CHECK_ARG(font_info != NULL, return);
     lv_memzero(font_info, sizeof(lv_font_info_t));
     font_info->class_p = &lv_freetype_font_class;
     font_info->render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
@@ -156,7 +156,7 @@ void lv_freetype_init_font_info(lv_font_info_t * font_info)
 
 lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
 {
-    LV_ASSERT_NULL(font_info);
+    LV_CHECK_ARG(font_info != NULL, return NULL);
     if(font_info->size == 0) {
         LV_LOG_ERROR("font size can't be zero");
         return NULL;
@@ -249,6 +249,8 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
 lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
                                     lv_freetype_font_style_t style)
 {
+    LV_CHECK_ARG(pathname != NULL, return NULL);
+
     lv_font_info_t font_info;
     lv_freetype_init_font_info(&font_info);
     font_info.name = pathname;
@@ -260,7 +262,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
 
 void lv_freetype_font_delete(lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    if(font == NULL) return;
     lv_freetype_context_t * ctx = lv_freetype_get_context();
     if(!ctx) {
         /* Freetype already torn down (e.g. static destruction order). Nothing to release. */
@@ -288,7 +290,7 @@ lv_freetype_context_t * lv_freetype_get_context(void)
 
 void lv_freetype_italic_transform(FT_Face face)
 {
-    LV_ASSERT_NULL(face);
+    LV_ASSERT(face != NULL);
     FT_Matrix matrix;
     matrix.xx = FT_INT_TO_F16DOT16(1);
     matrix.xy = LV_FREETYPE_OBLIQUE_SLANT_DEF;
@@ -308,6 +310,7 @@ int32_t lv_freetype_italic_transform_on_pos(lv_point_t point)
 
 static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc, uint32_t max_glyph_cnt)
 {
+    LV_ASSERT(dsc != NULL);
     /*
      * Glyph info uses a small amount of memory, and uses glyph info more frequently,
      * so it plans to use twice the maximum number of caches here to
@@ -343,6 +346,7 @@ static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc, uint32_t max_g
 
 static void freetype_on_font_set_cbs(lv_freetype_font_dsc_t * dsc)
 {
+    LV_ASSERT(dsc != NULL);
     lv_freetype_set_cbs_glyph(dsc);
     if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
         lv_freetype_set_cbs_image_font(dsc);
@@ -354,7 +358,7 @@ static void freetype_on_font_set_cbs(lv_freetype_font_dsc_t * dsc)
 
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx)
 {
-    LV_ASSERT_NULL(ctx);
+    LV_ASSERT(ctx != NULL);
     if(ctx->cache_node_cache) {
         lv_cache_destroy(ctx->cache_node_cache, NULL);
         ctx->cache_node_cache = NULL;
@@ -400,7 +404,7 @@ static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const cha
 #endif
     {
         node->pathname = lv_strdup(pathname);
-        LV_ASSERT_NULL(node->pathname);
+        LV_ASSERT(node->pathname != NULL);
     }
 
     LV_LOG_INFO("add face_id: %s", node->pathname);
@@ -476,8 +480,8 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 static void lv_freetype_done_mm_var(FT_MM_Var * mm_var)
 {
     lv_freetype_context_t * ctx = lv_freetype_get_context();
-    LV_ASSERT_NULL(ctx);
-    LV_ASSERT_NULL(ctx->library);
+    LV_ASSERT(ctx != NULL);
+    LV_ASSERT(ctx->library != NULL);
     FT_Error err = FT_Done_MM_Var(ctx->library, mm_var);
     if(err != 0) {
         FT_ERROR_MSG("FT_Done_MM_Var", err);
@@ -609,7 +613,7 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
 
 static lv_font_t * freetype_font_create_cb(const lv_font_info_t * info, const void * src)
 {
-    LV_ASSERT_NULL(info);
+    LV_ASSERT(info != NULL);
     lv_font_info_t font_info = *info;
     font_info.name = src;
     return lv_freetype_font_create_with_info(&font_info);
@@ -622,6 +626,7 @@ static void freetype_font_delete_cb(lv_font_t * font)
 
 static void * freetype_font_dup_src_cb(const void * src)
 {
+    LV_ASSERT(src);
     return lv_strdup(src);
 }
 

@@ -18,6 +18,7 @@
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../draw/lv_draw_private.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -938,7 +939,7 @@ static int32_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t *
 {
     lv_table_t * table = (lv_table_t *)obj;
 
-    int32_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
+    int32_t h_max = lv_font_get_line_height_internal(font) + cell_top + cell_bottom;
     /* Calculate the cell_data index where to start */
     uint32_t row_start = row_id * table->col_cnt;
 
@@ -981,7 +982,7 @@ static int32_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t *
 
         /*When cropping the text we can assume the row height is equal to the line height*/
         if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
-            h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
+            h_max = LV_MAX(lv_font_get_line_height_internal(font) + cell_top + cell_bottom,
                            h_max);
         }
         /*Else we have to calculate the height of the cell text*/

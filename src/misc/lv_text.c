@@ -9,6 +9,7 @@
 
 #include "lv_text_private.h"
 #include "lv_text_ap.h"
+#include "../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -113,7 +114,7 @@ void lv_text_get_size_attributes(lv_point_t * size_res, const char * text, const
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(text);
 
-    letter_height = lv_font_get_line_height(font);
+    letter_height = lv_font_get_line_height_internal(font);
 
     if(attributes->text_flags & LV_TEXT_FLAG_EXPAND) {
         attributes->max_width = LV_COORD_MAX;
@@ -546,6 +547,18 @@ void lv_text_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t
 {
     *letter = lv_text_encoded_next(txt, ofs);
     *letter_next = *letter != '\0' ? lv_text_encoded_next(&txt[*ofs], NULL) : 0;
+}
+
+int32_t lv_font_get_bottom_trim(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_CHECK_ARG(font != NULL, return 0);
+    return lv_font_get_bottom_trim_internal(font, trim);
+}
+
+int32_t lv_font_get_top_trim(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_CHECK_ARG(font != NULL, return 0);
+    return lv_font_get_top_trim_internal(font, trim);
 }
 
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
