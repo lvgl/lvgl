@@ -138,8 +138,6 @@ struct _lv_display_t {
      * Layer
      *--------------------*/
     lv_layer_t * layer_head;
-    void (*layer_init)(lv_display_t * disp, lv_layer_t * layer);
-    void (*layer_deinit)(lv_display_t * disp, lv_layer_t * layer);
 
     /*---------------------
      * Screens
