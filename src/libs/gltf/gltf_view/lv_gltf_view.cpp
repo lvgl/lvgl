@@ -108,8 +108,8 @@ lv_obj_t * lv_gltf_create(lv_obj_t * parent)
 
 lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path)
 {
-    LV_ASSERT_NULL(obj);
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(path != NULL, return NULL);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(!viewer->environment) {
@@ -125,8 +125,9 @@ lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path
 
 lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * bytes, size_t len)
 {
-    LV_ASSERT_NULL(obj);
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(bytes != NULL, return NULL);
+    LV_CHECK_ARG(len > 0, return NULL);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(!viewer->environment) {
@@ -143,10 +144,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
 lv_result_t lv_gltf_add_model(lv_obj_t * obj, lv_gltf_model_t * model)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    if(!model) {
-        return LV_RESULT_INVALID;
-    }
-
+    LV_CHECK_ARG(model != NULL, return LV_RESULT_INVALID);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(!viewer->environment) {
@@ -161,11 +159,8 @@ lv_result_t lv_gltf_add_model(lv_obj_t * obj, lv_gltf_model_t * model)
 void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * environment)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(environment != NULL, return);
     lv_gltf_t * gltf = (lv_gltf_t *)obj;
-    if(environment == NULL) {
-        LV_LOG_WARN("Refusing to assign a NULL environment to the glTF object");
-        return;
-    }
 
     if(gltf->environment && gltf->owns_environment) {
         lv_gltf_environment_delete(gltf->environment);
@@ -198,6 +193,7 @@ lv_gltf_model_t * lv_gltf_get_model_by_index(const lv_obj_t * obj, size_t id)
 }
 lv_gltf_model_t * lv_gltf_get_primary_model(const lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     return lv_gltf_get_model_by_index(obj, 0);
 }
 
@@ -442,12 +438,14 @@ uint32_t lv_gltf_get_background_blur(const lv_obj_t * obj)
 
 void lv_gltf_set_env_brightness(lv_obj_t * obj, uint32_t value)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_LOG_DEPRECATED("use lv_gltf_set_environment_brightness() instead");
     lv_gltf_set_environment_brightness(obj, (float)value / 100.0f);
 }
 
 uint32_t lv_gltf_get_env_brightness(const lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     LV_LOG_DEPRECATED("use lv_gltf_get_environment_brightness() instead");
     float v = lv_gltf_get_environment_brightness(obj) * 100.0f;
     if(v <= 0.0f) return 0;
@@ -487,10 +485,13 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
+    LV_CHECK_ARG(lv_array_size(&viewer->models) > 0, return);
+
     if(model == NULL) {
         LV_ASSERT(lv_array_size(&viewer->models) > 0);
         model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
     }
+    LV_CHECK_ARG(model != NULL, return);
 
     const auto & center_position = lv_gltf_data_get_center(model);
     viewer->desc.focal_x = center_position[0];
@@ -501,6 +502,7 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
 lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return make_empty_ray());
+    LV_CHECK_ARG(screen_pos, return make_empty_ray());
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     float norm_mouse_x = (float)screen_pos->x / (float)(lv_obj_get_width(obj));
@@ -533,6 +535,9 @@ lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t *
 lv_result_t lv_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
                                         lv_3dpoint_t * collision_point)
 {
+    LV_CHECK_ARG(ray != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(plane != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(collision_point != NULL, return LV_RESULT_INVALID);
     fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane->origin.x, plane->origin.y, plane->origin.z);
     fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane->direction.x, plane->direction.y, plane->direction.z);
     fastgltf::math::fvec3 ray_start = fastgltf::math::fvec3(ray->origin.x, ray->origin.y, ray->origin.z);
@@ -575,6 +580,7 @@ lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
 lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, lv_point_t * screen_pos)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(screen_pos != NULL, return LV_RESULT_INVALID);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     fastgltf::math::fvec4 world_position_h = fastgltf::math::fvec4(world_pos.x, world_pos.y, world_pos.z, 1.0f);
