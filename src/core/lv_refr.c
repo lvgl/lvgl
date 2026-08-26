@@ -757,7 +757,7 @@ static void refr_sync_areas(void)
         if(lv_display_get_matrix_rotation(disp_refr)) {
             lv_display_rotate_area(disp_refr, sync_area);
         }
-#endif
+#endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
         /*Call sync callback (if set)*/
         if(disp_refr->sync_cb) {
             /*Set syncing flags*/
@@ -903,7 +903,8 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
         /*In direct mode and full mode the buffer area is always the whole screen, not considering rotation*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
-        if(lv_display_get_matrix_rotation(disp_refr)) {
+
+        if(LV_DRAW_TRANSFORM_USE_MATRIX && lv_display_get_matrix_rotation(disp_refr)) {
             layer->buf_area.x2 = lv_display_get_original_horizontal_resolution(disp_refr) - 1;
             layer->buf_area.y2 = lv_display_get_original_vertical_resolution(disp_refr) - 1;
         }
