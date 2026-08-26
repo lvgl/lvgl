@@ -400,7 +400,7 @@ if you need finer control.
   ```
   The custom-bit flags (`LV_OBJ_FLAG_USER_1`–`4`) can be accessed via
   `lv_obj_set/get_user_flag()`, which take a bit from 0 to 3 e.g `lv_obj_set_user_flag(obj, 0, true)`
-  instead of LV_OBJ_FLAG_USER_1.
+  instead of lv_obj_get/set-flag(obj, LV_OBJ_FLAG_USER_1).
 
   A migration script is available at `scripts/migration/migrate_obj_flags.py`:
   ```bash
