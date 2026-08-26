@@ -374,9 +374,6 @@ if you need finer control.
 
 Assertions in LVGL are now disabled by default and can be enabled with <ApiLink name="LV_USE_ASSERT"/>.
 
-People migrating might encounter a compilation error if one of the old `LV_USE_ASSERT_*` macros is enabled in `lv_conf.h` as 
-they are now gated by the new symbol. Simply enable it if you wish to continue using assertions.
-
 Note that these assertions are not required and should be disabled to improve performance when deploying your LVGL application.
 
 ### lv_obj
