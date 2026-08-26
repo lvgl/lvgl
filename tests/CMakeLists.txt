@@ -238,13 +238,13 @@ target_compile_definitions(test_common PRIVATE
 )
 
 file(GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c)
-file(GLOB_RECURSE TEST_LIBS_FILES src/test_libs/*.c)
+file(GLOB_RECURSE TEST_HELPERS_FILES src/test_helpers/*.c)
 
-if(TEST_LIBS_FILES)
-    add_library(test_libs STATIC ${TEST_LIBS_FILES})
-    target_include_directories(test_libs PUBLIC ${TEST_INCLUDE_DIRS} src/test_libs)
-    target_compile_options(test_libs PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
-    target_link_libraries(test_libs PUBLIC lvgl)
+if(TEST_HELPERS_FILES)
+    add_library(test_helpers STATIC ${TEST_HELPERS_FILES})
+    target_include_directories(test_helpers PUBLIC ${TEST_INCLUDE_DIRS} src/test_helpers)
+    target_compile_options(test_helpers PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
+    target_link_libraries(test_helpers PUBLIC lvgl)
 endif()
 
 # Generate one test executable per test case source file. The runner source is
@@ -284,7 +284,7 @@ foreach(test_case_fname ${TEST_CASE_FILES})
         lvgl
         $<TARGET_NAME_IF_EXISTS:lvgl_demos>
         $<TARGET_NAME_IF_EXISTS:lvgl_thorvg>
-        $<TARGET_NAME_IF_EXISTS:test_libs>
+        $<TARGET_NAME_IF_EXISTS:test_helpers>
     )
 
     add_test(
