@@ -34,7 +34,7 @@ typedef struct _lv_linux_drm_mode_t lv_linux_drm_mode_t;
 
 /**
  * Callback function type for selecting a DRM display mode
- * @param disp pointer to the display object @nullable When NULL the default display is used.
+ * @param disp pointer to the display object
  * @param modes array of available DRM modes
  * @param mode_count number of modes in the array
  * @return index of the selected mode from the modes array
@@ -64,7 +64,7 @@ lv_display_t * lv_linux_drm_create(void);
  * The DRM device file is typically located at /dev/dri/cardN where N is the card number.
  * The connector ID specifies which physical output (HDMI, VGA, etc.) to use.
  *
- * @param disp         Pointer to the display object created with lv_linux_drm_create() @nullable When NULL the default display is used.
+ * @param disp         Pointer to the display object created with lv_linux_drm_create()
  * @param file         Path to the DRM device file (e.g., "/dev/dri/card0")
  * @param connector_id ID of the DRM connector to use, or -1 to auto-select the first available
  * @return LV_RESULT_OK if the initialization succeeded or LV_RESULT_INVALID if it failed
@@ -87,7 +87,7 @@ char * lv_linux_drm_find_device_path(void);
  *
  * The default mode selection behavior is selecting the native mode
  *
- * @param disp pointer to the display object @nullable When NULL the default display is used.
+ * @param disp pointer to the display object
  * @param callback function to be called when a display mode needs to be selected,
  *                 or NULL to use the default mode selection behavior
  */

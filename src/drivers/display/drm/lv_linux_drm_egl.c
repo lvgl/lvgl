@@ -97,9 +97,12 @@ lv_display_t * lv_linux_drm_create(void)
 
 lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
 {
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
     LV_CHECK_ARG(file != NULL, return LV_RESULT_INVALID);
     LV_UNUSED(connector_id);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+
+    LV_CHECK_ARG(ctx != NULL, return LV_RESULT_INVALID, "Invalid display");
 
     lv_result_t err = drm_device_init(ctx, file);
     if(err != LV_RESULT_OK) {
@@ -138,11 +141,9 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_
 
 void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t callback)
 {
-    if(!disp) {
-        LV_LOG_ERROR("Cannot set a mode select callback on a NULL display");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(ctx != NULL, return, "Invalid display");
     ctx->mode_select_cb = callback;
 }
 
