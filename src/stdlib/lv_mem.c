@@ -180,6 +180,8 @@ lv_result_t lv_mem_test(void)
 
 void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 {
+    LV_CHECK_ARG(mon_p != NULL, return);
+
     lv_memzero(mon_p, sizeof(lv_mem_monitor_t));
     lv_mem_monitor_core(mon_p);
 }
