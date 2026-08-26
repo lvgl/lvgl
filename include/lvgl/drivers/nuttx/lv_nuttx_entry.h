@@ -70,7 +70,7 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result);
 
 /**
  * Deinitialize the LVGL display driver for NuttX.
- * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler.
+ * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler. @nullable
  */
 void lv_nuttx_deinit(lv_nuttx_result_t * result);
 

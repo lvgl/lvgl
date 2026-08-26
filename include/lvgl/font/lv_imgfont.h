@@ -46,7 +46,7 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb,
 
 /**
  * Destroy a image font that has been created.
- * @param font pointer to image font handle.
+ * @param font pointer to image font handle. @nullable
  */
 void lv_imgfont_destroy(lv_font_t * font);
 

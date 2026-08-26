@@ -275,7 +275,7 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
  * Destroy a draw buf by freeing the actual buffer if it's marked as LV_IMAGE_FLAGS_ALLOCATED in header.
  * Then free the lv_draw_buf_t struct.
  *
- * @param draw_buf  the draw buffer to destroy
+ * @param draw_buf  the draw buffer to destroy @nullable
  */
 void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf);
 

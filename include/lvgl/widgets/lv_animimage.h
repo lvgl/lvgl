@@ -88,7 +88,7 @@ void lv_animimg_start(lv_obj_t * obj);
 
 /**
  * Delete the image animation.
- * @param obj   pointer to an animation image object
+ * @param obj   pointer to an animation image object @nullable
  */
 bool lv_animimg_delete(lv_obj_t * obj);
 

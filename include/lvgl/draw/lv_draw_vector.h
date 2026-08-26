@@ -135,7 +135,7 @@ void lv_vector_path_clear(lv_vector_path_t * path);
 
 /**
  * Delete the graphic path object
- * @param path              pointer to a path
+ * @param path              pointer to a path @nullable
  */
 void lv_vector_path_delete(lv_vector_path_t * path);
 
@@ -263,7 +263,7 @@ lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer);
 
 /**
  * Delete the vector graphic descriptor
- * @param dsc              pointer to a vector graphic descriptor
+ * @param dsc              pointer to a vector graphic descriptor @nullable
  */
 void lv_draw_vector_dsc_delete(lv_draw_vector_dsc_t * dsc);
 

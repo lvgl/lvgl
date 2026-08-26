@@ -57,7 +57,7 @@ lv_font_t * lv_binfont_create_from_buffer(void * buffer, uint32_t size);
 
 /**
  * Frees the memory allocated by the `lv_binfont_create()` function
- * @param font          lv_font_t object created by the lv_binfont_create function
+ * @param font          lv_font_t object created by the lv_binfont_create function @nullable
  */
 void lv_binfont_destroy(lv_font_t * font);
 
