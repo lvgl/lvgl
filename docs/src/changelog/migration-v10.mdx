@@ -596,6 +596,23 @@ Calling the following functions with `NULL` as the display parameter is deprecat
 
 ---
 
+## Layouts
+
+<ApiLink name="lv_layout_register"/> is deprecated and is replaced with <ApiLink name="lv_layout_create"/>.
+
+```c
+uint32_t layout = lv_layout_register(my_layout_update, &user_data);
+```
+
+Becomes: 
+
+```c
+lv_layout_callbacks_t callbacks = { .layout_update_cb = my_layout_update };
+uint32_t layout = lv_layout_create(callbacks, &user_data);
+```
+
+---
+
 ## Image
 
 ### SVG
