@@ -59,7 +59,7 @@ lv_group_t * lv_group_create(void);
 
 /**
  * Delete group object.
- * @param group     pointer to a group
+ * @param group     pointer to a group @nullable
  */
 void lv_group_delete(lv_group_t * group);
 

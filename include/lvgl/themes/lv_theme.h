@@ -109,7 +109,7 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
 
 /**
  * Delete a theme
- * @param   theme the theme to destroy
+ * @param   theme the theme to destroy @nullable
  */
 void lv_theme_delete(lv_theme_t * theme);
 

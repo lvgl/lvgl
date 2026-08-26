@@ -93,7 +93,7 @@ lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_pat
 
 /**
  * Delete a libinput input device
- * @param indev pointer to input device
+ * @param indev pointer to input device @nullable
  */
 void lv_libinput_delete(lv_indev_t * indev);
 

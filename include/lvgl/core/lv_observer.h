@@ -305,7 +305,7 @@ void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], 
  * Remove all Observers from a Subject and free allocated memory, and delete
  * any associated Widget-Binding events.  This leaves `subject` "disconnected" from
  * all Observers and all associated Widget events established through Widget Binding.
- * @param subject   pointer to Subject
+ * @param subject   pointer to Subject @nullable
  * @note            This can safely be called regardless of whether any Observers
  *                  added with `lv_subject_add_observer_obj()` or bound to a Widget Property
  *                  with one of the `..._bind_...()` functions.
@@ -360,7 +360,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 
 /**
  * Remove Observer from its Subject.
- * @param observer      pointer to Observer
+ * @param observer      pointer to Observer @nullable
  */
 void lv_observer_delete(lv_observer_t * observer);
 

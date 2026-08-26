@@ -97,7 +97,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res);
 
 /**
  * Remove a display
- * @param disp      pointer to display
+ * @param disp      pointer to display @nullable
  */
 void lv_display_delete(lv_display_t * disp);
 

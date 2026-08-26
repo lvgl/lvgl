@@ -108,7 +108,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname,
 
 /**
  * Delete a freetype font.
- * @param font freetype font to be deleted.
+ * @param font freetype font to be deleted. @nullable
  */
 void lv_freetype_font_delete(lv_font_t * font);
 

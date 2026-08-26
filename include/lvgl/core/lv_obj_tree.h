@@ -41,7 +41,7 @@ typedef lv_obj_tree_walk_res_t (*lv_obj_tree_walk_cb_t)(lv_obj_t *, void *);
  * Delete an object and all of its children.
  * Also remove the objects from their group and remove all animations (if any).
  * Send `LV_EVENT_DELETE` to deleted objects.
- * @param obj       pointer to an object
+ * @param obj       pointer to an object @nullable
  */
 void lv_obj_delete(lv_obj_t * obj);
 
@@ -55,7 +55,7 @@ void lv_obj_clean(lv_obj_t * obj);
 
 /**
  * Delete an object after some delay
- * @param obj       pointer to an object
+ * @param obj       pointer to an object @nullable
  * @param delay_ms  time to wait before delete in milliseconds
  */
 void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms);
@@ -69,7 +69,7 @@ void lv_obj_delete_anim_completed_cb(lv_anim_t * a);
 /**
  * Helper function for asynchronously deleting objects.
  * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).
- * @param obj       object to delete
+ * @param obj       object to delete @nullable
  * @see lv_async_call
  */
 void lv_obj_delete_async(lv_obj_t * obj);

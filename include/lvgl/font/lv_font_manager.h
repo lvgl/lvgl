@@ -38,7 +38,7 @@ lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size);
 
 /**
  * Delete main font manager.
- * @param manager pointer to main font manager.
+ * @param manager pointer to main font manager. @nullable
  * @return return true if the deletion was successful.
  */
 bool lv_font_manager_delete(lv_font_manager_t * manager);

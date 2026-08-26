@@ -108,7 +108,7 @@ uint16_t lv_evdev_get_raw_key(lv_event_t * e);
 
 /**
  * Remove evdev input device.
- * @param indev evdev input device to close and free
+ * @param indev evdev input device to close and free @nullable
  */
 void lv_evdev_delete(lv_indev_t * indev);
 

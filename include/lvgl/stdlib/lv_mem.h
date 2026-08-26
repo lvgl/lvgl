@@ -90,7 +90,7 @@ void * lv_malloc_zeroed(size_t size);
 
 /**
  * Free an allocated data
- * @param data pointer to an allocated memory
+ * @param data pointer to an allocated memory @nullable
  */
 void lv_free(void * data);
 

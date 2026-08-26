@@ -386,7 +386,7 @@ void * lv_anim_get_user_data(const lv_anim_t * a);
 
 /**
  * Delete animation(s) of a variable with a given animator function
- * @param var       pointer to variable
+ * @param var       pointer to variable @nullable
  * @param exec_cb   a function pointer which is animating 'var',
  *                  or NULL to ignore it and delete all the animations of 'var
  * @return          true: at least 1 animation is deleted, false: no animation is deleted
