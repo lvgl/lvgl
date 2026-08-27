@@ -8,6 +8,9 @@
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
+#define LV_CONF_PASTE_(a, b) a##b
+#define LV_CONF_PASTE(a, b)  LV_CONF_PASTE_(a, b)
+
 /* Config options */
 /* Built-in font selectors for LV_FONT_DEFAULT */
 #define LV_FONT_DEFAULT_MONTSERRAT_8                &lv_font_montserrat_8
@@ -150,8 +153,30 @@
     #endif
 #endif
 
-#ifdef CONFIG_LV_COLOR_DEPTH
+#ifdef CONFIG_LV_STDLIB_BUILTIN
     #define LV_KCONFIG_PRESENT
+#endif
+
+/*
+ * LV_COLOR_DEPTH was replaced by LV_COLOR_FORMAT_DEFAULT.
+ * Derive LV_COLOR_FORMAT_DEFAULT from it here
+ * TODO: Remove this for v10.
+ */
+#if !defined(LV_COLOR_FORMAT_DEFAULT) && defined(LV_COLOR_DEPTH)
+    #warning LV_COLOR_DEPTH is deprecated and will be removed in a future release. Define LV_COLOR_FORMAT_DEFAULT instead
+    #if LV_COLOR_DEPTH == 1
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_I1
+    #elif LV_COLOR_DEPTH == 8
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_L8
+    #elif LV_COLOR_DEPTH == 16
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
+    #elif LV_COLOR_DEPTH == 24
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB888
+    #elif LV_COLOR_DEPTH == 32
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_XRGB8888
+    #else
+        #error "LV_COLOR_DEPTH should be 1, 8, 16, 24 or 32"
+    #endif
 #endif
 
 /*
@@ -338,11 +363,11 @@
  * RENDERING CONFIGURATION
  *============================================================================*/
 
-#ifndef LV_COLOR_DEPTH
-    #ifdef CONFIG_LV_COLOR_DEPTH
-        #define LV_COLOR_DEPTH CONFIG_LV_COLOR_DEPTH
+#ifndef LV_COLOR_FORMAT_DEFAULT
+    #ifdef CONFIG_LV_COLOR_FORMAT_DEFAULT
+        #define LV_COLOR_FORMAT_DEFAULT CONFIG_LV_COLOR_FORMAT_DEFAULT
     #else
-        #define LV_COLOR_DEPTH 16
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
     #endif
 #endif
 
@@ -4892,6 +4917,27 @@
 /*----------------------------------
  * End of compatibility block
  -----------------------------------*/
+
+
+/* Values fixed by another option's selected token (see LV_CONF_PASTE). */
+
+/** LV_COLOR_DEPTH - derived from LV_COLOR_FORMAT_DEFAULT. */
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_I1                       1
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_L8                       8
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_RGB565                   16
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_RGB565_SWAPPED           16
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_RGB888                   24
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_XRGB8888                 32
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_ARGB8888                 32
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED   32
+
+#ifndef LV_COLOR_DEPTH
+    #ifdef CONFIG_LV_COLOR_DEPTH
+        #define LV_COLOR_DEPTH CONFIG_LV_COLOR_DEPTH
+    #else
+        #define LV_COLOR_DEPTH LV_CONF_PASTE(LV_COLOR_DEPTH_OF_, LV_COLOR_FORMAT_DEFAULT)
+    #endif
+#endif
 
 /* Derived capability flags (set via Kconfig `select`). */
 #ifndef LV_USE_TLSF

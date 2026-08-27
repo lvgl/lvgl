@@ -191,7 +191,7 @@ static HDC lv_windows_create_frame_buffer(
         bitmap_info.bmiHeader.biHeight = -height;
         bitmap_info.bmiHeader.biPlanes = 1;
         bitmap_info.bmiHeader.biBitCount = lv_color_format_get_bpp(
-                                               LV_COLOR_FORMAT_NATIVE);
+                                               LV_COLOR_FORMAT_DEFAULT);
 #if (LV_COLOR_DEPTH == 32) || (LV_COLOR_DEPTH == 24)
         bitmap_info.bmiHeader.biCompression = BI_RGB;
 #elif (LV_COLOR_DEPTH == 16)
@@ -213,7 +213,7 @@ static HDC lv_windows_create_frame_buffer(
         if(hBitmap) {
             *pixel_buffer_size = width * height;
             *pixel_buffer_size *= lv_color_format_get_size(
-                                      LV_COLOR_FORMAT_NATIVE);
+                                      LV_COLOR_FORMAT_DEFAULT);
 
             DeleteObject(SelectObject(frame_buffer_dc_handle, hBitmap));
             DeleteObject(hBitmap);

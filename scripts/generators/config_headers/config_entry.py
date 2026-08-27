@@ -241,18 +241,23 @@ class DerivedConstToken(ConfigEntry):
         doc = f"{self.name} - derived from {self.selector}."
         if self.doc:
             doc += "\n" + self.doc
-        return [
-            f"#define {(prefix + tok).ljust(width)}   {val}" for tok, val in self.table
-        ] + [
-            "",
-            f"#ifndef {self.name}",
-            f"    #ifdef CONFIG_{upper}",
-            f"        #define {self.name} CONFIG_{upper}",
-            f"    #else",
-            f"        #define {self.name} LV_CONF_PASTE({prefix}, {self.selector})",
-            f"    #endif",
-            f"#endif",
-        ]
+        return (
+            c_comment(doc)
+            + [
+                f"#define {(prefix + tok).ljust(width)}   {val}"
+                for tok, val in self.table
+            ]
+            + [
+                "",
+                f"#ifndef {self.name}",
+                f"    #ifdef CONFIG_{upper}",
+                f"        #define {self.name} CONFIG_{upper}",
+                f"    #else",
+                f"        #define {self.name} LV_CONF_PASTE({prefix}, {self.selector})",
+                f"    #endif",
+                f"#endif",
+            ]
+        )
 
 
 class DerivedFlag(ConfigEntry):

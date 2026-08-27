@@ -25,10 +25,10 @@ files.  Follow the instructions in [File System (lv_fs_drv)](/main-modules/fs).
    (<ApiLink name="lv_image_dsc_t" />) are not supported.  This is because there is no
    practical difference between how uncompressed BMP files and LVGL's image format
    store the image data.
-- The BMP file's color format needs to match the configured <ApiLink name="LV_COLOR_DEPTH" />
-   of the display on which it will be rendered.  You can use GIMP to save the image
-   in the required format.  Both RGB888 and ARGB888 work with
-   <ApiLink name="LV_COLOR_DEPTH" /> `32`
+- The BMP file's color format needs to match the color format of the display on which
+   it will be rendered (<ApiLink name="LV_COLOR_FORMAT_DEFAULT" />, or whatever the
+   display was later set to).  You can use GIMP to save the image in the required
+   format.  Both RGB888 and ARGB888 work with <ApiLink name="LV_COLOR_FORMAT_XRGB8888" />
 - Color palettes are not supported.
 - Because the whole image is not loaded, it cannot be zoomed or rotated.
 

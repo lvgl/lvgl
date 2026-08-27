@@ -46,7 +46,7 @@ void test_canvas_functions_invalidate(void)
     lv_refr_now(NULL);
     TEST_ASSERT(draw_counter == 0);
 
-    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 100, 100, LV_COLOR_FORMAT_NATIVE);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 100, 100, LV_COLOR_FORMAT_DEFAULT);
 
     /* test uninitialized draw buffer, it should fail.*/
     lv_canvas_set_draw_buf(canvas, &draw_buf);
@@ -762,7 +762,7 @@ void test_line_bigger_than_display_resolution(void)
 {
     int32_t hor_res = lv_display_get_horizontal_resolution(lv_display_get_default());
     int32_t ver_res = lv_display_get_vertical_resolution(lv_display_get_default());
-    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, LV_TEST_DISPLAY_HOR_RES + 1, LV_TEST_DISPLAY_VER_RES + 1, LV_COLOR_FORMAT_NATIVE);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, LV_TEST_DISPLAY_HOR_RES + 1, LV_TEST_DISPLAY_VER_RES + 1, LV_COLOR_FORMAT_DEFAULT);
     LV_DRAW_BUF_INIT_STATIC(draw_buf);
     draw_buf.header.stride = LV_STRIDE_AUTO;
 

@@ -436,10 +436,7 @@ def generate_internal(kconf: Kconfig, entries) -> str:
     if em.derived_consts:
         derived_consts += [
             "",
-            "/* Values fixed by another option's selected token.  The token is not a",
-            " * number the preprocessor can compare, so paste it onto a table. */",
-            "#define LV_CONF_PASTE_(a, b) a##b",
-            "#define LV_CONF_PASTE(a, b)  LV_CONF_PASTE_(a, b)",
+            "/* Values fixed by another option's selected token (see LV_CONF_PASTE). */",
             "",
         ]
         for const in em.derived_consts:

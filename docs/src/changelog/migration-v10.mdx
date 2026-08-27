@@ -77,6 +77,73 @@ place), and is **removed in v10.0**.
 
 Watch your build log after upgrading and update each one the warning/error points at.
 
+#### Color format
+
+`LV_COLOR_DEPTH` is replaced by `LV_COLOR_FORMAT_DEFAULT`, which names the format
+you want directly instead of describing how many bits it takes.
+
+The reasoning is that a bit count is ambiguous: `LV_COLOR_DEPTH 16` means either 
+`RGB565` or `RGB565_SWAPPED`, and `32` means either `XRGB8888` or `ARGB8888`
+
+This new configuration makes the choice explicit:
+
+| Before | After |
+|---|---|
+| `LV_COLOR_DEPTH 1` | `LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_I1` |
+| `LV_COLOR_DEPTH 8` | `LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_L8` |
+| `LV_COLOR_DEPTH 16` | `LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565` |
+| `LV_COLOR_DEPTH 24` | `LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB888` |
+| `LV_COLOR_DEPTH 32` | `LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_XRGB8888` |
+
+Beyond those five, `LV_COLOR_FORMAT_DEFAULT` also accepts formats that no
+`LV_COLOR_DEPTH` value could reach:
+
+- `LV_COLOR_FORMAT_RGB565_SWAPPED`: big-endian RGB565 panels, previously handled
+  by swapping bytes in the flush callback
+- `LV_COLOR_FORMAT_ARGB8888` — a screen with a real alpha channel
+- `LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED` — premultiplied alpha, what compositors
+  such as Wayland expect
+
+`LV_COLOR_DEPTH` is still defined and still readable from your own code
+(`#if LV_COLOR_DEPTH == 32` keeps working), but it is now **derived** from
+`LV_COLOR_FORMAT_DEFAULT` rather than something you set, and it no longer appears
+in `lv_conf_template.h`. Being a bit count it is lossy: both RGB565 formats report
+`16`, and all three 8888 formats report `32`.
+
+`LV_COLOR_FORMAT_NATIVE` and `LV_COLOR_FORMAT_NATIVE_WITH_ALPHA` were
+`lv_color_format_t` enumerators picked by `LV_COLOR_DEPTH`. They are no longer part of
+the enum and live on as compatibility macros in `lv_api_map_v9_5.h`, so they keep
+working unless you build with `LV_DISABLE_API_MAPPING`. `NATIVE` is a plain alias of
+`LV_COLOR_FORMAT_DEFAULT`; `NATIVE_WITH_ALPHA` maps each format to its alpha-capable
+companion, unchanged from v9.5 for the five formats a color depth could select:
+
+| `LV_COLOR_FORMAT_DEFAULT` | `LV_COLOR_FORMAT_NATIVE_WITH_ALPHA` |
+|---|---|
+| `I1` | `I1` (there is no alpha-capable 1-bit format) |
+| `L8` | `AL88` |
+| `RGB565`, `RGB565_SWAPPED` | `RGB565A8` |
+| `RGB888`, `XRGB8888`, `ARGB8888` | `ARGB8888` |
+| `ARGB8888_PREMULTIPLIED` | `ARGB8888_PREMULTIPLIED` |
+
+In new code name the format you want explicitly (`LV_COLOR_FORMAT_ARGB8888` in most
+cases), or read a display's actual format with `lv_display_get_color_format()`.
+
+<Callout type="info" title="Kconfig configs migrate themselves">
+  The deprecated color depth choice is still there, and the default color format is
+  seeded from it: an existing `.config` or `defconfig` holding
+  `CONFIG_LV_COLOR_DEPTH_32=y` selects `XRGB8888` with no change on your side.
+  Replace it with `CONFIG_LV_COLOR_FORMAT_XRGB8888=y`
+ </Callout>
+
+<Callout type="tip">
+`LV_COLOR_FORMAT_DEFAULT` sets the format each display *starts* with, not a global
+constant. Any display's format can be changed at runtime with
+<ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_...)" />,
+and two displays can run different formats. This needs support from the driver:
+its flush callback has to handle the pixel layout it is handed, and the draw
+buffer(s) must be large enough for the new format.
+</Callout>
+
 #### Memory
 
 | Removed | Replacement |
