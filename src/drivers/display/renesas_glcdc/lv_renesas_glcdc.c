@@ -303,9 +303,9 @@ static void flush_partial(lv_display_t * display, const lv_area_t * area, uint8_
         }
 
         if(rotation == LV_DISPLAY_ROTATION_180)
-            lv_draw_sw_rotate(img, rotation_buffer, w, h, w_stride, w_stride, rotation, cf);
+            lv_draw_rotate(img, rotation_buffer, w, h, w_stride, w_stride, rotation, cf);
         else /* 90 or 270 */
-            lv_draw_sw_rotate(img, rotation_buffer, w, h, w_stride, h_stride, rotation, cf);
+            lv_draw_rotate(img, rotation_buffer, w, h, w_stride, h_stride, rotation, cf);
 
         img = rotation_buffer;
 

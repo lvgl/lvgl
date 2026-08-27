@@ -410,6 +410,20 @@ if you need finer control.
 
 ---
 
+## Drawing/Rendering
+
+The `lv_draw_sw_xxx` functions are renamed to `lv_draw_xxx`.
+
+- `lv_draw_sw_i1_to_argb8888` -> <ApiLink name="lv_draw_i1_to_argb8888"/>
+- `lv_draw_sw_rgb565_swap` -> <ApiLink name="lv_draw_rgb565_swap"/>
+- `lv_draw_sw_rotate` -> <ApiLink name="lv_draw_rotate"/>
+- `lv_draw_sw_i1_invert` -> <ApiLink name="lv_draw_i1_invert"/>
+- `lv_draw_sw_i1_convert_to_vtiled` -> <ApiLink name="lv_draw_i1_convert_to_vtiled"/>
+
+The old names can still be used via LVGL's v9.5 API map which is automatically included via `lvgl.h`.
+
+---
+
 ## Display
 
 Calling the following functions with `NULL` as the display parameter is deprecated and will be considered an error in future versions. You can use <ApiLink name="lv_display_get_default"/> to query the default display.
