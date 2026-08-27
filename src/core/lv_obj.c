@@ -1662,6 +1662,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
                         lv_obj_remove_state(sibling, LV_STATE_CHECKED);
                         lv_result_t res = lv_obj_send_event(sibling, LV_EVENT_VALUE_CHANGED, NULL);
                         if(res != LV_RESULT_OK) return;
+
+                        res = lv_obj_send_event(sibling, LV_EVENT_UNCHECKED, NULL);
+                        if(res != LV_RESULT_OK) return;
                     }
                 }
             }
