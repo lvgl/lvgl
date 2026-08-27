@@ -218,7 +218,7 @@ static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
 
     if(cf_in == LV_COLOR_FORMAT_RGB565 || cf_in == LV_COLOR_FORMAT_RGB565_SWAPPED) {
         if(cf_in == LV_COLOR_FORMAT_RGB565_SWAPPED) {
-            lv_draw_sw_rgb565_swap(draw_buf->data, draw_buf->header.w * draw_buf->header.h);
+            lv_draw_rgb565_swap(draw_buf->data, draw_buf->header.w * draw_buf->header.h);
         }
         uint32_t y;
         for(y = 0; y < draw_buf->header.h; y++) {

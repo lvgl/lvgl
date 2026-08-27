@@ -354,11 +354,10 @@ void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t 
  * @param disp              pointer to a display
  * @param color_format      Possible values are
  *                          - LV_COLOR_FORMAT_RGB565
+ *                          - LV_COLOR_FORMAT_RGB565_SWAPPED
  *                          - LV_COLOR_FORMAT_RGB888
  *                          - LV_COLOR_FORMAT_XRGB888
  *                          - LV_COLOR_FORMAT_ARGB888
- *@note To change the endianness of the rendered image in case of RGB565 format
- *      (i.e. swap the 2 bytes) call `lv_draw_sw_rgb565_swap` in the flush_cb
  */
 void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
 

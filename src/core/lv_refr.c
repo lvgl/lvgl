@@ -1481,11 +1481,11 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
         int32_t w = lv_area_get_width(area);
         int32_t h = lv_area_get_height(area);
         for(int32_t y = 0; y < h; y++) {
-            lv_draw_sw_rgb565_swap(fb + (uint32_t)(area->y1 + y) * stride_px + area->x1, w);
+            lv_draw_rgb565_swap(fb + (uint32_t)(area->y1 + y) * stride_px + area->x1, w);
         }
     }
     else {
-        lv_draw_sw_rgb565_swap(px_map, lv_area_get_size(&offset_area));
+        lv_draw_rgb565_swap(px_map, lv_area_get_size(&offset_area));
     }
 #endif
 

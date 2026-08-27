@@ -214,7 +214,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         else {
 #if LV_USE_DRAW_SW
             uint32_t area_stride = px_size * area_width;
-            lv_draw_sw_rotate(px_map, first_pixel, area_width, area_height, area_stride, fb_stride, rotation, cf);
+            lv_draw_rotate(px_map, first_pixel, area_width, area_height, area_stride, fb_stride, rotation, cf);
             clean_dcache();
             g_data.disp_flushed_in_flush_cb[layer_idx] = true;
 #else

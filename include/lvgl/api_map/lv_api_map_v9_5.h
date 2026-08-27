@@ -38,6 +38,12 @@ typedef lv_display_rotation_t lv_disp_rotation_t;
 #define lv_display_delete_event lv_display_remove_event
 #define lv_observer_remove lv_observer_delete
 
+#define lv_draw_sw_i1_to_argb8888 lv_draw_i1_to_argb8888
+#define lv_draw_sw_rgb565_swap lv_draw_rgb565_swap
+#define lv_draw_sw_rotate lv_draw_rotate
+#define lv_draw_sw_i1_invert lv_draw_i1_invert
+#define lv_draw_sw_i1_convert_to_vtiled lv_draw_i1_convert_to_vtiled
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

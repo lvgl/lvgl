@@ -634,7 +634,7 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *)dest_buf_u16;
-            lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
+            lv_draw_rgb565_swap((uint8_t *) dest_buf_u16, w);
             for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
                 uint8_t rb = src_buf_al88[src_x].lumi >> 3;
                 uint8_t g = src_buf_al88[src_x].lumi >> 2;
@@ -761,7 +761,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *)dest_buf_u16;
-            lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
+            lv_draw_rgb565_swap((uint8_t *) dest_buf_u16, w);
             for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
                 uint8_t rb = src_buf_l8[src_x] >> 3;
                 uint8_t g = src_buf_l8[src_x] >> 2;
@@ -836,7 +836,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
                 uint32_t line_in_bytes = w * 2;
                 for(y = 0; y < h; y++) {
                     lv_memcpy(dest_buf_u16, src_buf_u16, line_in_bytes);
-                    lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
+                    lv_draw_rgb565_swap((uint8_t *) dest_buf_u16, w);
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
                 }
@@ -1136,7 +1136,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *) dest_buf_u16;
-            lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
+            lv_draw_rgb565_swap((uint8_t *) dest_buf_u16, w);
             for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += src_px_size) {
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
@@ -1259,7 +1259,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *) dest_buf_u16;
-            lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
+            lv_draw_rgb565_swap((uint8_t *) dest_buf_u16, w);
             for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
@@ -1429,7 +1429,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *) dest_buf_u16;
-            lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
+            lv_draw_rgb565_swap((uint8_t *) dest_buf_u16, w);
             for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:

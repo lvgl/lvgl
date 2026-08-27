@@ -935,7 +935,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
                 uint32_t line_in_bytes = w * 2;
                 for(y = 0; y < h; y++) {
                     lv_memcpy(dest_buf_u16, src_buf_u16, line_in_bytes);
-                    lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
+                    lv_draw_rgb565_swap((uint8_t *) dest_buf_u16, w);
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
                 }

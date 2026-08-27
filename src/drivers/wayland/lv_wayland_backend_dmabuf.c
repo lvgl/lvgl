@@ -563,7 +563,7 @@ static bool copy_frame_to_buffer(lv_wl_buffer_t * buffer, const uint8_t * px_map
     }
 
     if(rotation != LV_DISPLAY_ROTATION_0) {
-        lv_draw_sw_rotate(px_map, dst, src_width, src_height, src_stride, dst_stride, rotation, cf);
+        lv_draw_rotate(px_map, dst, src_width, src_height, src_stride, dst_stride, rotation, cf);
     }
     else if(dst_stride == src_stride) {
         /* The whole frame is copied rather than just the flushed area: in DIRECT

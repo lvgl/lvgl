@@ -21,13 +21,6 @@ selected color format.
 
 ## Swapping Endian-ness
 
-In case of RGB565 color format it might be required to swap the 2 bytes
-because the SPI, I2C or 8 bit parallel port periphery sends them in the wrong order.
-
-This usually requires calling <ApiLink name="lv_draw_sw_rgb565_swap" display="lv_draw_sw_rgb565_swap(buf, buf_size_in_px)" />
-inside the [Flush Callback](/main-modules/display/setup), implementing a custom function to swap the bytes or
-using the correct color format.
-
 LVGL supports the <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED" /> color format natively.
 By using this color format, no manual byte swapping is needed at all,
 simplifying display drivers and eliminating software overhead.
@@ -79,15 +72,14 @@ meaning `(horizontal_resolution x vertical_resolution / 8) + 8` bytes.
 As LVGL can not handle fractional width make sure to round the horizontal resolution
 to 8 bits (for example 90 to 96).
 
-The <ApiLink name="lv_draw_sw_i1_convert_to_vtiled" /> function is used to convert a draw
+The <ApiLink name="lv_draw_i1_convert_to_vtiled" /> function is used to convert a draw
 buffer in I1 color format from a row-wise (htiled) to a column-wise (vtiled) buffer
 layout.  This conversion is necessary for certain display controllers that require a
 different draw buffer mapping.  The function assumes that the buffer width and height
 are rounded to a multiple of 8.  The bit order of the resulting vtiled buffer can be
 specified using the `bit_order_lsb` parameter.
 
-For more details, refer to the implementation in
-<ApiLink name="lv_draw_sw_i1_convert_to_vtiled" /> in :file:`src/draw/sw/lv_draw_sw.c`.
+For more details, refer to the implementation in <ApiLink name="lv_draw_i1_convert_to_vtiled" />.
 
 To ensure that the redrawn areas start and end on byte boundaries, you can add a
 rounder callback to your display driver.  This callback will round the width and

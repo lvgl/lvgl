@@ -270,7 +270,7 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
         if(cf == LV_COLOR_FORMAT_RGB565_SWAPPED) {
             uint32_t width = lv_area_get_width(area);
             uint32_t height = lv_area_get_height(area);
-            lv_draw_sw_rgb565_swap(px_map, width * height);
+            lv_draw_rgb565_swap(px_map, width * height);
         }
         /*Update values in a special OLED I1 --> ARGB8888 case
           We render everything in I1, but display it in ARGB8888*/
@@ -290,7 +290,7 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
             px_map += LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
             const uint32_t i1_stride = lv_draw_buf_width_to_stride(width, LV_COLOR_FORMAT_I1);
             const uint32_t argb8888_stride = lv_draw_buf_width_to_stride(width, LV_COLOR_FORMAT_ARGB8888);
-            lv_draw_sw_i1_to_argb8888(px_map, argb_px_map, width, height, i1_stride, argb8888_stride, 0xFF000000u, 0xFFFFFFFFu);
+            lv_draw_i1_to_argb8888(px_map, argb_px_map, width, height, i1_stride, argb8888_stride, 0xFF000000u, 0xFFFFFFFFu);
             px_map = (uint8_t *)argb_px_map;
         }
 
@@ -318,7 +318,7 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
             }
         }
         else {
-            lv_draw_sw_rotate(px_map, fb_start, px_map_w, px_map_h, px_map_stride, fb_stride, rotation, cf);
+            lv_draw_rotate(px_map, fb_start, px_map_w, px_map_h, px_map_stride, fb_stride, rotation, cf);
         }
     }
 

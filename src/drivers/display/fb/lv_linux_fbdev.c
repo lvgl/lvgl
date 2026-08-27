@@ -377,7 +377,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             LV_ASSERT_MALLOC(dsc->rotated_buf);
             dsc->rotated_buf_size = buf_size;
         }
-        lv_draw_sw_rotate(color_p, dsc->rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
+        lv_draw_rotate(color_p, dsc->rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
         area = &rotated_area;
         color_p = dsc->rotated_buf;
     }
