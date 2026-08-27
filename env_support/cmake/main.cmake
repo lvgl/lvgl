@@ -10,6 +10,11 @@ set(LV_BUILD_CONF_DIR "" CACHE PATH
     "Can be used to specify the include dir containing lv_conf.h, to be used in conjunction with LV_CONF_INCLUDE_SIMPLE")
 
 option(LV_BUILD_USE_KCONFIG "Use Kconfig" OFF)
+
+option(LV_CONF_SKIP 
+       "Build without lv_conf.h, using lv_conf_internal.h defaults. Options can still be set via compiler definitions"
+       OFF)
+
 set(LV_BUILD_DEFCONFIG_PATH "" CACHE STRING
     "Supply the default Kconfig configuration - used with Kconfig. Accepts a \
 \";\"-separated list of defconfigs, merged in order so later ones override earlier ones")
@@ -58,6 +63,10 @@ option(CONFIG_LV_USE_PRIVATE_API "If set - install the private headers" OFF)
 
 if (LV_BUILD_CONF_PATH AND LV_BUILD_CONF_DIR)
     message(FATAL_ERROR "can not use LV_BUILD_CONF_DIR and LV_BUILD_CONF_PATH at the same time")
+endif()
+
+if (LV_CONF_SKIP AND (LV_BUILD_USE_KCONFIG OR LV_BUILD_SET_CONFIG_OPTS OR LV_BUILD_TESTS))
+    message(FATAL_ERROR "can not use kconfig (LV_BUILD_USE_KCONFIG) nor enable LV_BUILD_SET_CONFIG_OPTS with LV_CONF_SKIP enabled")
 endif()
 
 if (LV_BUILD_TESTS)
@@ -131,9 +140,22 @@ add_library(lvgl::lvgl ALIAS lvgl)
 
 set(CONF_PATH)
 include(${CMAKE_CURRENT_LIST_DIR}/lvgl_target_definitions.cmake)
-if (NOT LV_BUILD_USE_KCONFIG)
 
-    # Default - use the lv_conf.h configuration file
+if(LV_CONF_SKIP)
+    # no config file
+    lvgl_build_definitions(LV_CONF_SKIP)
+    lvgl_install_definitions(LV_CONF_SKIP)
+elseif(LV_BUILD_USE_KCONFIG)
+    # Use a .config, a defconfig or multiple .config fragments
+    # files by generating a header file from them
+
+    include(${CMAKE_CURRENT_LIST_DIR}/kconfig.cmake)
+    # If using Kconfig, we need to define additional build definitions
+    lvgl_build_definitions(
+      LV_CONF_SKIP
+      "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${KCONFIG_EXTERNAL_INCLUDE}\"")
+else()
+    # lv_conf.h
     lvgl_build_definitions(LV_KCONFIG_IGNORE)
     lvgl_install_definitions(LV_KCONFIG_IGNORE)
 
@@ -184,28 +206,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
     if (NOT EXISTS ${CONF_PATH})
         message(FATAL_ERROR "Configuration file: ${CONF_PATH} - not found")
     endif()
-
-    # The lv_conf.h used during the build is installed to <includedir>/lvgl/lv_conf.h
-    # (see the installation section), so the installed library is self-contained and
-    # consumers resolve it the same way as in the Kconfig case, via LV_CONF_PATH.
-
-else()
-
-    # Use kconfig
-    # kconfig.cmake will generate the .config
-    # and autoconf.h, which will be used by lv_conf_kconfig.h
-    include(${CMAKE_CURRENT_LIST_DIR}/kconfig.cmake)
-
-    # Set the flag to specify we are using kconfig, needed for the
-    # generate_cmake_variables.py script.
-    set(GEN_VARS_KCONFIG_MODE_FLAG --kconfig)
-
-    # If using Kconfig, we need to define additional build definitions
-    lvgl_build_definitions(
-      LV_CONF_SKIP
-      "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${KCONFIG_EXTERNAL_INCLUDE}\"")
 endif()
-
 
 
 if (LV_BUILD_LVGL_H_SYSTEM_INCLUDE)
@@ -247,6 +248,12 @@ if (LV_BUILD_SET_CONFIG_OPTS)
         set(PARENT_SCOPE_ARG "")
     endif()
 
+    set(GEN_VARS_ARGS "")
+    if(LV_BUILD_USE_KCONFIG)
+        # Tell generate_cmake_variables.py to expect a Kconfig based config
+        list(APPEND GEN_VARS_ARGS --kconfig)
+    endif()
+
     # Convert the expanded lv_conf_expanded.h to cmake variables
     execute_process(
         COMMAND ${Python_EXECUTABLE}
@@ -254,7 +261,7 @@ if (LV_BUILD_SET_CONFIG_OPTS)
         --input ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
         --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake
         ${PARENT_SCOPE_ARG}
-        ${GEN_VARS_KCONFIG_MODE_FLAG}
+        ${GEN_VARS_ARGS}
         RESULT_VARIABLE ret
     )
 
@@ -387,7 +394,7 @@ if(LV_BUILD_USE_KCONFIG)
         FILES "${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/config"
         RENAME lv_conf.h)
-else()
+elseif(NOT LV_CONF_SKIP)
     # Non-kconfig: install the actual lv_conf.h used during the build
     install(
         FILES "${CONF_PATH}"
