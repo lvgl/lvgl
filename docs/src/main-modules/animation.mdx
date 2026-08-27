@@ -288,6 +288,10 @@ To create and use an Animation Timeline:
   `start_time` will override any value given to
   <ApiLink name="lv_anim_set_delay" display="lv_anim_set_delay(&anim_template, delay)" />.
 - Call <ApiLink name="lv_anim_timeline_start" display="lv_anim_timeline_start(timeline)" /> to start the Animation Timeline.
+  It plays from wherever the Timeline currently is:  from the beginning, or from the
+  point set by <ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, progress)" />.
+  Use <ApiLink name="lv_anim_timeline_restart" display="lv_anim_timeline_restart(timeline)" /> to always play from the
+  beginning (or end if reversed), regardless of the previous state of the Timeline.
 
 <Callout type="info">
 own copy of the contents of the Animation template, so if you do not need it
@@ -299,12 +303,12 @@ It supports forward and reverse play of the entire Animation group, using
 play in reverse from the end of the Timeline, you need to call
 <ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX)" />
 after adding all Animations and before telling it to start playing.
+<ApiLink name="lv_anim_timeline_restart" display="lv_anim_timeline_restart(timeline)" /> does that for you.
 
 Call <ApiLink name="lv_anim_timeline_pause" display="lv_anim_timeline_pause(timeline)" /> to pause the Animation Timeline.
-Note:  this does not preserve its state.  The only way to start it again is to call
-<ApiLink name="lv_anim_timeline_start" display="lv_anim_timeline_start(timeline)" />, which starts the Timeline from the
-beginning or at the point set by
-<ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, progress)" />.
+The position it reached is kept, so <ApiLink name="lv_anim_timeline_start" display="lv_anim_timeline_start(timeline)" />
+continues from there, and <ApiLink name="lv_anim_timeline_restart" display="lv_anim_timeline_restart(timeline)" /> plays it
+again from the beginning (or end if reversed).
 
 Call <ApiLink name="lv_anim_timeline_set_progress" display="lv_anim_timeline_set_progress(timeline, progress)" /> function to set the
 state of the Animation Timeline according to the `progress` value.  `progress` is
