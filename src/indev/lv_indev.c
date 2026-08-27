@@ -1869,10 +1869,34 @@ static void indev_gesture(lv_indev_t * indev)
                 indev->pointer.gesture_dir = LV_DIR_TOP;
         }
 
+        lv_event_code_t dir_code;
+        switch(indev->pointer.gesture_dir) {
+            case LV_DIR_TOP:
+                dir_code = LV_EVENT_GESTURE_UP;
+                break;
+            case LV_DIR_BOTTOM:
+                dir_code = LV_EVENT_GESTURE_DOWN;
+                break;
+            case LV_DIR_LEFT:
+                dir_code = LV_EVENT_GESTURE_LEFT;
+                break;
+            case LV_DIR_RIGHT:
+                dir_code = LV_EVENT_GESTURE_RIGHT;
+                break;
+            default:
+                LV_UNREACHABLE();
+        }
+
         lv_obj_send_event(gesture_obj, LV_EVENT_GESTURE, indev_act);
         if(indev_reset_check(indev)) return;
 
+        lv_obj_send_event(gesture_obj, dir_code, indev_act);
+        if(indev_reset_check(indev)) return;
+
         lv_indev_send_event(indev_act, LV_EVENT_GESTURE, gesture_obj);
+        if(indev_reset_check(indev_act)) return;
+
+        lv_indev_send_event(indev_act, dir_code, gesture_obj);
         if(indev_reset_check(indev_act)) return;
     }
 }

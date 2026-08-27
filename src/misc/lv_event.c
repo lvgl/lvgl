@@ -370,6 +370,10 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_SCROLL_END);
             ENUM_CASE(EVENT_SCROLL);
             ENUM_CASE(EVENT_GESTURE);
+            ENUM_CASE(EVENT_GESTURE_UP);
+            ENUM_CASE(EVENT_GESTURE_DOWN);
+            ENUM_CASE(EVENT_GESTURE_LEFT);
+            ENUM_CASE(EVENT_GESTURE_RIGHT);
             ENUM_CASE(EVENT_KEY);
             ENUM_CASE(EVENT_ROTARY);
             ENUM_CASE(EVENT_FOCUSED);
@@ -398,6 +402,8 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_READY);
             ENUM_CASE(EVENT_CANCEL);
             ENUM_CASE(EVENT_STATE_CHANGED);
+            ENUM_CASE(EVENT_CHECKED);
+            ENUM_CASE(EVENT_UNCHECKED);
 
             /** Other events*/
             ENUM_CASE(EVENT_CREATE);

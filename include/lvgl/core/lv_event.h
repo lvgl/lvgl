@@ -51,6 +51,10 @@ typedef enum {
     LV_EVENT_SCROLL_END,          /**< Scrolling ends */
     LV_EVENT_SCROLL,              /**< Scrolling */
     LV_EVENT_GESTURE,             /**< A gesture is detected. Get gesture with `lv_indev_get_gesture_dir(lv_indev_active());` */
+    LV_EVENT_GESTURE_UP,          /**< An upwards gesture is detected. Sent right after `LV_EVENT_GESTURE`. */
+    LV_EVENT_GESTURE_DOWN,        /**< A downwards gesture is detected. Sent right after `LV_EVENT_GESTURE`. */
+    LV_EVENT_GESTURE_LEFT,        /**< A leftwards gesture is detected. Sent right after `LV_EVENT_GESTURE`. */
+    LV_EVENT_GESTURE_RIGHT,       /**< A rightwards gesture is detected. Sent right after `LV_EVENT_GESTURE`. */
     LV_EVENT_KEY,                 /**< A key is sent to Widget. Get key with `lv_indev_get_key(lv_indev_active());`*/
     LV_EVENT_ROTARY,              /**< An encoder or wheel was rotated. Get rotation count with `lv_event_get_rotary_diff(e);`*/
     LV_EVENT_FOCUSED,             /**< Widget received focus */
@@ -79,6 +83,8 @@ typedef enum {
     LV_EVENT_READY,               /**< A process has finished */
     LV_EVENT_CANCEL,              /**< A process has been cancelled */
     LV_EVENT_STATE_CHANGED,       /**< The state of the widget changed*/
+    LV_EVENT_CHECKED,             /**< A checkable Widget became checked. Sent right after `LV_EVENT_VALUE_CHANGED`. */
+    LV_EVENT_UNCHECKED,           /**< A checkable Widget became unchecked. Sent right after `LV_EVENT_VALUE_CHANGED`. */
 
     /** Other events */
     LV_EVENT_CREATE,              /**< Object is being created */
