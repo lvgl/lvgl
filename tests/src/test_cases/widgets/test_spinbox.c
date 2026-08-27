@@ -185,6 +185,31 @@ void test_spinbox_event_key(void)
     TEST_ASSERT_EQUAL(step / 10, lv_spinbox_get_step(spinbox_events));
 }
 
+/* See issue #10135. */
+void test_spinbox_ignores_non_digit_control_keys(void)
+{
+    /* Set a known starting state. */
+    lv_spinbox_set_value(spinbox_events, 5);
+    const int32_t baseline_value = lv_spinbox_get_value(spinbox_events);
+    const char * baseline_text = lv_textarea_get_text(spinbox_events);
+    char baseline_copy[64];
+    lv_strlcpy(baseline_copy, baseline_text, sizeof(baseline_copy));
+
+    /* Send each non-navigation control key. Pre-fix these fell through the
+     * else branch into lv_textarea_add_char and polluted the spinbox text
+     * with the corresponding control symbol (ESC, ENTER, BACKSPACE, etc.). */
+    uint32_t control_keys[] = {
+        LV_KEY_ESC, LV_KEY_ENTER, LV_KEY_DEL, LV_KEY_BACKSPACE,
+        LV_KEY_NEXT, LV_KEY_PREV, LV_KEY_HOME, LV_KEY_END
+    };
+    for(uint32_t i = 0; i < sizeof(control_keys) / sizeof(control_keys[0]); i++) {
+        uint32_t key = control_keys[i];
+        lv_obj_send_event(spinbox_events, LV_EVENT_KEY, (void *) &key);
+        TEST_ASSERT_EQUAL_INT32(baseline_value, lv_spinbox_get_value(spinbox_events));
+        TEST_ASSERT_EQUAL_STRING(baseline_copy, lv_textarea_get_text(spinbox_events));
+    }
+}
+
 void test_spinbox_event_key_encoder_indev_turn_right(void)
 {
     /* Setup group and encoder indev */
