@@ -52,6 +52,13 @@ typedef enum {
     LV_EVENT_SCROLL,              /**< Scrolling */
     LV_EVENT_GESTURE,             /**< A gesture is detected. Get gesture with `lv_indev_get_gesture_dir(lv_indev_active());` */
     LV_EVENT_KEY,                 /**< A key is sent to Widget. Get key with `lv_indev_get_key(lv_indev_active());`*/
+    LV_EVENT_KEY_PRESSED,         /**< A key has been pressed. */
+    LV_EVENT_KEY_SHORT_CLICKED,   /**< A key was pressed for less than `long_press_time`, then released. */
+    LV_EVENT_KEY_LONG_CLICKED,    /**< A key was pressed for at least `long_press_time`, then released. */
+    LV_EVENT_KEY_LONG_PRESSED,    /**< A key has been pressed for at least `long_press_time`. */
+    LV_EVENT_KEY_LONG_PRESSED_REPEAT, /**< Sent after `long_press_time` in every `long_press_repeat_time` ms while a key is pressed. */
+    LV_EVENT_KEY_CLICKED,         /**< A key was pressed, then released, after either a short or a long press. */
+    LV_EVENT_KEY_RELEASED,        /**< A key has been released. */
     LV_EVENT_ROTARY,              /**< An encoder or wheel was rotated. Get rotation count with `lv_event_get_rotary_diff(e);`*/
     LV_EVENT_FOCUSED,             /**< Widget received focus */
     LV_EVENT_DEFOCUSED,           /**< Widget's focus has been lost */
