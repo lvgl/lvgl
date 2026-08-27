@@ -325,6 +325,9 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     if(entry == NULL) {
         if(!dsc->cache_size) {  /* no cache, do everything directly */
             int g1 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter);
+            if(g1 == 0) {
+                return false;
+            }
             tiny_ttf_glyph_cache_create_cb(&search_key, dsc);
             *dsc_out = search_key.glyph_dsc;
             adv_w = search_key.adv_w;
@@ -349,6 +352,10 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     *dsc_out = data->glyph_dsc;
     adv_w = data->adv_w;
     lv_cache_release(dsc->glyph_cache, entry, NULL);
+
+    if(dsc_out->gid.index == 0) {
+        return false;
+    }
 
     /*Kerning correction*/
     if(font->kerning == LV_FONT_KERNING_NORMAL &&
@@ -576,7 +583,10 @@ static bool tiny_ttf_glyph_cache_create_cb(tiny_ttf_glyph_cache_data_t * node, v
     int g1 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter);
     if(g1 == 0) {
         /* Glyph not found */
-        return false;
+        lv_memzero(dsc_out, sizeof(*dsc_out));
+        node->adv_w = 0;
+        dsc_out->gid.index = 0;
+        return true;
     }
     int x1, y1, x2, y2;
 
