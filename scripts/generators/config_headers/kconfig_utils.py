@@ -148,6 +148,7 @@ def is_int_const(sym) -> bool:
         return False
     if len(sym.defaults) != 1:
         return False
+
     value, _cond = sym.defaults[0]
     # A numeric literal default is modelled as an undefined symbol whose name is
     # the literal text, not as an ``is_constant`` symbol.
@@ -163,6 +164,102 @@ def is_int_const(sym) -> bool:
 def int_const_value(sym) -> str:
     """The number an :func:`is_int_const` token stands for, as text."""
     return sym.defaults[0][0].name
+
+
+def _literal_value(value) -> str | None:
+    """The text of a numeric-literal default value, or None if it isn't one.
+
+    A literal is modelled as an undefined symbol whose name is the literal text
+    (the same shape :func:`is_int_const` checks for)."""
+    if not (isinstance(value, Symbol) and not value.nodes):
+        return None
+    try:
+        int(value.name, 0)
+    except (ValueError, TypeError):
+        return None
+    return value.name
+
+
+def or_terms(expr) -> list:
+    """Flat list of the operands of an ``A || B || C`` expression (``[A, B, C]``)."""
+    if expr is None:
+        return []
+    return [t for t in split_expr(expr, OR) if t is not None]
+
+
+def derived_int_const_table(sym):
+    """Similar to :func:`is_int_const` but this one supports multiple default values"""
+
+    if sym.type not in (INT, HEX):
+        return None
+    if any(node.prompt for node in sym.nodes):
+        return None
+    if len(sym.defaults) < 2:
+        return None
+
+    dd_keys = {term_key(x) for x in dep_terms(sym.direct_dep)}
+    choice = None
+    table: dict[str, str] = {}
+    fallback = None
+
+    for value, cond in sym.defaults:
+        literal = _literal_value(value)
+        if literal is None:
+            return None
+        rest = [x for x in dep_terms(cond) if term_key(x) not in dd_keys]
+        if not rest:  # an unconditional default covers every remaining member
+            if fallback is None:
+                fallback = literal
+            continue
+        if len(rest) != 1:
+            return None
+        members = or_terms(rest[0])
+        for m in members:
+            # An undefined symbol in a condition is always a typo: Kconfig reads
+            # it as permanently false, so the clause would just never fire.
+            if (
+                isinstance(m, Symbol)
+                and not m.nodes
+                and not m.is_constant
+                and _literal_value(m) is None
+            ):
+                raise ValueError(
+                    f"{sym.name}: `default {literal} if {m.name}` references "
+                    f"{m.name}, which no Kconfig file defines."
+                )
+        if not all(isinstance(m, Symbol) and m.choice is not None for m in members):
+            return None
+        for m in members:
+            if choice is None:
+                choice = m.choice
+            elif m.choice is not choice:
+                return None
+            table.setdefault(m.name, literal)
+
+    if choice is None or int_owns_choice(sym, choice):
+        return None
+
+    pairs, missing = [], []
+    for member in choice.syms:
+        literal = table.get(member.name, fallback)
+        if literal is None:
+            missing.append(member.name)
+        else:
+            pairs.append((member, literal))
+    if missing:
+        raise ValueError(
+            f"{sym.name} is derived from choice {choice.name} but no default "
+            f"covers: {', '.join(missing)}.\n"
+            f"Add a `default <n> if <member>` clause for each, or an "
+            f"unconditional final default."
+        )
+    return choice, pairs
+
+
+def int_owns_choice(sym, choice) -> bool:
+    """True if the int *sym* is the macro the user sets in lv_conf.h
+    for *choice*, rather than a value computed from it."""
+    return not choice.name or choice.name == sym.name
 
 
 def choice_default(choice):

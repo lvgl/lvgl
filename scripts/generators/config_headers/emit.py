@@ -19,6 +19,7 @@ from .config_entry import (
     BoolConfig,
     ConstraintCheck,
     ConstToken,
+    DerivedConstToken,
     DerivedFlag,
     EnumChoice,
 )
@@ -44,6 +45,9 @@ class Emitter:
         self.cond_stack: list[str] = []
         self.emitted: set[str] = set()
         self.deferred: list[DerivedFlag] = []  # internal: emitted after the body
+        # internal: emitted after the compatibility block, once their selector
+        # macro is defined
+        self.derived_consts: list[DerivedConstToken] = []
         # member symbol -> (macro, token): rewrites a `#if <member>` guard (only
         # valid on the Kconfig path) into `<macro> == <token>` (valid on both).
         self.guard: dict[str, tuple[str, str]] = enum_guard_map(entries)
@@ -112,6 +116,10 @@ class Emitter:
         if isinstance(entry, DerivedFlag):
             if self.target == "internal":
                 self.deferred.append(entry)
+            return
+        if isinstance(entry, DerivedConstToken):
+            if self.target == "internal":
+                self.derived_consts.append(entry)
             return
         lines = (
             entry.emit_template()
@@ -421,6 +429,23 @@ def generate_internal(kconf: Kconfig, entries) -> str:
     options = render_config_options(entries)
     preamble = templates.INTERNAL_PREAMBLE.replace("__CONFIG_OPTIONS__", options)
 
+    # Values derived from a selected option, emitted straight after the
+    # compatibility block: the selector macro is defined by the body above, and
+    # the derived capability flags below may read the result.
+    derived_consts: list[str] = []
+    if em.derived_consts:
+        derived_consts += [
+            "",
+            "/* Values fixed by another option's selected token.  The token is not a",
+            " * number the preprocessor can compare, so paste it onto a table. */",
+            "#define LV_CONF_PASTE_(a, b) a##b",
+            "#define LV_CONF_PASTE(a, b)  LV_CONF_PASTE_(a, b)",
+            "",
+        ]
+        for const in em.derived_consts:
+            derived_consts += const.emit_internal()
+            derived_consts += ["", ""]
+
     deferred: list[str] = []
     if em.deferred:
         for flag in em.deferred:
@@ -458,6 +483,7 @@ def generate_internal(kconf: Kconfig, entries) -> str:
         + "\n"
         + templates.INTERNAL_COMPATIBILITY_BLOCK
         + "\n"
+        + "\n".join(derived_consts)
         + "\n".join(deferred)
         + "\n".join(custom_inc)
         + templates.INTERNAL_FOOTER
