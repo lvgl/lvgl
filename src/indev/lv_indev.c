@@ -1883,8 +1883,8 @@ static void indev_gesture(lv_indev_t * indev)
             case LV_DIR_RIGHT:
                 dir_code = LV_EVENT_GESTURE_RIGHT;
                 break;
-             default: 
-                 LV_UNREACHABLE();
+            default:
+                LV_UNREACHABLE();
         }
 
         lv_obj_send_event(gesture_obj, LV_EVENT_GESTURE, indev_act);
