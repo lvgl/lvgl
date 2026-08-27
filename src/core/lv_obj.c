@@ -1642,6 +1642,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(was_checked != lv_obj_has_state(obj, LV_STATE_CHECKED)) {
                 lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RESULT_OK) return;
+
+                res = lv_obj_send_event(obj, was_checked ? LV_EVENT_UNCHECKED : LV_EVENT_CHECKED, NULL);
+                if(res != LV_RESULT_OK) return;
             }
         }
     }
@@ -1691,6 +1694,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             /*With Enter LV_EVENT_RELEASED will send VALUE_CHANGE event*/
             if(c != LV_KEY_ENTER && was_checked != lv_obj_has_state(obj, LV_STATE_CHECKED)) {
                 lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RESULT_OK) return;
+
+                res = lv_obj_send_event(obj, was_checked ? LV_EVENT_UNCHECKED : LV_EVENT_CHECKED, NULL);
                 if(res != LV_RESULT_OK) return;
             }
         }
