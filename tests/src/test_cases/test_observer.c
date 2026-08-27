@@ -820,7 +820,7 @@ void test_observer_obj_bind_bool_flag(void)
     TEST_ASSERT_EQUAL(false, lv_obj_is_hidden(obj));
 
     /*After removing the observer the widget is no longer updated*/
-    lv_observer_remove(observer);
+    lv_observer_delete(observer);
     lv_subject_set_int(&subject, 1);
     TEST_ASSERT_EQUAL(false, lv_obj_is_hidden(obj));
 

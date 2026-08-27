@@ -452,7 +452,7 @@ void lv_subject_set_group_list(lv_subject_t * group_subject, lv_subject_t * list
         lv_observer_t * observer;
         LV_LL_READ(&sub->subs_ll, observer) {
             if(observer->cb == group_notify_cb && observer->user_data == group_subject) {
-                lv_observer_remove(observer);
+                lv_observer_delete(observer);
                 break;
             }
         }

@@ -49,7 +49,7 @@ target can be read back with <ApiLink name="lv_observer_get_target" display="lv_
 
 An Observer bound to a Widget using <ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj()" /> is removed automatically when that Widget is deleted, so in this case you don't need to do anything. Otherwise:
 
-- <ApiLink name="lv_observer_remove" display="lv_observer_remove(observer)" /> removes a
+- <ApiLink name="lv_observer_delete" display="lv_observer_delete(observer)" /> removes a
   single Observer (use the pointer returned when subscribing).
 - <ApiLink name="lv_obj_remove_from_subject" display="lv_obj_remove_from_subject(widget, subject)" />
   removes a Widget's Observers (`subject` may be `NULL` to detach from all).
