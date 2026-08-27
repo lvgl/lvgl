@@ -761,6 +761,71 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v)
     else lv_obj_remove_state(obj, state);
 }
 
+void lv_obj_set_alt(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_ALT, en);
+}
+
+void lv_obj_set_checked(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_CHECKED, en);
+}
+
+void lv_obj_set_focused(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_FOCUSED, en);
+}
+
+void lv_obj_set_focus_key(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_FOCUS_KEY, en);
+}
+
+void lv_obj_set_edited(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_EDITED, en);
+}
+
+void lv_obj_set_hovered(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_HOVERED, en);
+}
+
+void lv_obj_set_pressed(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_PRESSED, en);
+}
+
+void lv_obj_set_scrolled(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_SCROLLED, en);
+}
+
+void lv_obj_set_disabled(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_DISABLED, en);
+}
+
+void lv_obj_set_state_user_1(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_USER_1, en);
+}
+
+void lv_obj_set_state_user_2(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_USER_2, en);
+}
+
+void lv_obj_set_state_user_3(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_USER_3, en);
+}
+
+void lv_obj_set_state_user_4(lv_obj_t * obj, bool en)
+{
+    lv_obj_set_state(obj, LV_STATE_USER_4, en);
+}
+
 /*=======================
  * Getter functions
  *======================*/
@@ -1021,6 +1086,71 @@ bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     return !!(obj->state & state);
+}
+
+bool lv_obj_is_alt(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_ALT);
+}
+
+bool lv_obj_is_checked(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_CHECKED);
+}
+
+bool lv_obj_is_focused(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_FOCUSED);
+}
+
+bool lv_obj_is_focus_key(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_FOCUS_KEY);
+}
+
+bool lv_obj_is_edited(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_EDITED);
+}
+
+bool lv_obj_is_hovered(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_HOVERED);
+}
+
+bool lv_obj_is_pressed(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_PRESSED);
+}
+
+bool lv_obj_is_scrolled(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_SCROLLED);
+}
+
+bool lv_obj_is_disabled(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_DISABLED);
+}
+
+bool lv_obj_is_state_user_1(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_USER_1);
+}
+
+bool lv_obj_is_state_user_2(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_USER_2);
+}
+
+bool lv_obj_is_state_user_3(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_USER_3);
+}
+
+bool lv_obj_is_state_user_4(const lv_obj_t * obj)
+{
+    return lv_obj_has_state(obj, LV_STATE_USER_4);
 }
 
 lv_group_t * lv_obj_get_group(const lv_obj_t * obj)

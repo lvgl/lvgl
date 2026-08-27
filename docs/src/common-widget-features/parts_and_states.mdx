@@ -60,4 +60,19 @@ manually. To set or clear a given state (while leaving other states untouched), 
 In both cases, you can bit-wise OR multiple state values. For example:
 <ApiLink name="lv_obj_add_state" display="lv_obj_add_state(widget, LV_STATE_PRESSED | LV_STATE_CHECKED)" />
 
+Every state also has a dedicated setter and getter for a single state, which is usually
+more convenient:
+
+```c
+lv_obj_set_checked(widget, true);
+if(lv_obj_is_disabled(widget)) { ... }
+```
+
+`lv_obj_set_<state>()` and `lv_obj_is_<state>()` exist for all states, e.g.
+<ApiLink name="lv_obj_set_alt" />, <ApiLink name="lv_obj_set_focused" />,
+<ApiLink name="lv_obj_set_pressed" />, <ApiLink name="lv_obj_is_edited" />.
+The custom states are named
+<ApiLink name="lv_obj_set_state_user_1" />...`lv_obj_set_state_user_4()` and
+<ApiLink name="lv_obj_is_state_user_1" />...`lv_obj_is_state_user_4()`.
+
 To learn more about states, see the related section in [Styles Overview](/common-widget-features/styles/overview).
