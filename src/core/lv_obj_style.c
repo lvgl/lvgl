@@ -720,7 +720,7 @@ void lv_obj_update_layer_type(lv_obj_t * obj)
 
 void lv_obj_update_blur_status(lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_ASSERT_NULL(obj);
 
     /*Deletion releases the count itself (see obj_delete_core())*/
     if(obj->is_deleting) return;
