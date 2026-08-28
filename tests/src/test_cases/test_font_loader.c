@@ -29,6 +29,7 @@ void test_font_loader_with_cache(void);
 void test_font_loader_no_cache(void);
 void test_font_loader_from_buffer(void);
 void test_font_loader_dynamic(void);
+void test_font_loader_corrupt_kern(void);
 void test_font_loader_dynamic_from_buffer(void);
 
 /**********************
@@ -195,6 +196,19 @@ void test_font_loader_dynamic_from_buffer(void)
     TEST_ASSERT_NOT_NULL(font_3_bin);
 
     common();
+}
+
+void test_font_loader_corrupt_kern(void)
+{
+    const char * path = "A:src/test_assets/test_font_corrupt_kern.fnt";
+
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
 }
 
 void test_font_loader_reload(void)
