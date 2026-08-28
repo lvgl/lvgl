@@ -139,7 +139,8 @@ static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_mix32_inlined(lv_color
  * with the remaining alpha.
  * @param fg        the premultiplied foreground color, fg.alpha is the mix ratio
  * @param bg        the background color
- * @return          the mixed color, the alpha of `bg` is kept
+ * @return          the mixed color with the alpha of `bg`, except for an (almost) opaque
+ *                  foreground where `fg` is returned as it is, so its alpha is kept
  */
 static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_mix32_premultiplied_inlined(lv_color32_t fg,
                                                                                       lv_color32_t bg)
@@ -151,7 +152,7 @@ static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_mix32_premultiplied_in
         return bg;
     }
 
-    uint32_t mix_inv = 255 - fg.alpha;
+    uint32_t mix_inv = LV_OPA_MAX - fg.alpha;
     bg.red = (uint8_t)(fg.red + (((uint32_t)bg.red * mix_inv) >> 8));
     bg.green = (uint8_t)(fg.green + (((uint32_t)bg.green * mix_inv) >> 8));
     bg.blue = (uint8_t)(fg.blue + (((uint32_t)bg.blue * mix_inv) >> 8));

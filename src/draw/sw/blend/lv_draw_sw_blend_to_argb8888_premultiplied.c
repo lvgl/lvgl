@@ -647,7 +647,8 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                         color_argb.red = LV_OPA_MIX2(color_argb.red, scale);
                         color_argb.green = LV_OPA_MIX2(color_argb.green, scale);
                         color_argb.blue = LV_OPA_MIX2(color_argb.blue, scale);
-                        color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, scale);
+                        /*Combine the three factors in one step to keep the precision*/
+                        color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, mask_buf[x], opa);
 
                         dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
                     }
@@ -714,7 +715,7 @@ static inline lv_color32_t lv_color_32_32_mix_premul(lv_color32_t fg, lv_color32
         return bg;
     }
     /* Opaque background: use simple mix */
-    else if(bg.alpha == 255) {
+    else if(bg.alpha >= LV_OPA_MAX) {
         return lv_color_mix32_premultiplied_inlined(fg, bg);
     }
     else {

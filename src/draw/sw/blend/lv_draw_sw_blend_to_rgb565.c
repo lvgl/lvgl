@@ -1361,8 +1361,9 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                             src_scaled[0] = LV_OPA_MIX2(src_buf_u8[src_x + 0], scale);
                             src_scaled[1] = LV_OPA_MIX2(src_buf_u8[src_x + 1], scale);
                             src_scaled[2] = LV_OPA_MIX2(src_buf_u8[src_x + 2], scale);
+                            /*Combine the three factors in one step to keep the precision*/
                             dest_buf_u16[dest_x] = lv_color_24_16_mix_premult(src_scaled, dest_buf_u16[dest_x],
-                                                                              LV_OPA_MIX2(src_buf_u8[src_x + 3], scale));
+                                                                              LV_OPA_MIX3(src_buf_u8[src_x + 3], mask_buf[dest_x], opa));
                         }
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);

@@ -199,10 +199,12 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
         sinma = 0;
         cosma = 1024;
     }
-    int32_t sxx = (int32_t)(((int64_t)cosma << 14) / tr_dsc.scale_x);
-    int32_t sxy = (int32_t)((-(int64_t)sinma << 14) / tr_dsc.scale_x);
-    int32_t syx = (int32_t)(((int64_t)sinma << 14) / tr_dsc.scale_y);
-    int32_t syy = (int32_t)(((int64_t)cosma << 14) / tr_dsc.scale_y);
+    /*Multiply instead of shifting: `sinma` and `cosma` can be negative and
+     *left shifting a negative value is undefined behavior*/
+    int32_t sxx = (int32_t)(((int64_t)cosma * 16384) / tr_dsc.scale_x);
+    int32_t sxy = (int32_t)((-(int64_t)sinma * 16384) / tr_dsc.scale_x);
+    int32_t syx = (int32_t)(((int64_t)sinma * 16384) / tr_dsc.scale_y);
+    int32_t syy = (int32_t)(((int64_t)cosma * 16384) / tr_dsc.scale_y);
 
     int64_t xin0 = -(int64_t)tr_dsc.pivot.x;
     int64_t yin0 = -(int64_t)tr_dsc.pivot.y;
@@ -318,13 +320,14 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
 
 static void rgb888_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                               int32_t x_from, int32_t x_to, int32_t xs_clamp_ups,
+                               int32_t x_from, int32_t x_to, int32_t x_offs, int32_t xs_clamp_ups,
                                lv_color32_t * dest_c32, bool aa, uint32_t px_size)
 {
     int32_t x;
     for(x = x_from; x < x_to; x++) {
-        int32_t xs_ups = xs_base + ((xs_step * x) >> 8);
-        int32_t ys_ups = ys_base + ((ys_step * x) >> 8);
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups = xs_base + ((xs_step * x_abs) >> 8);
+        int32_t ys_ups = ys_base + ((ys_step * x_abs) >> 8);
         if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
 
         int32_t xs_int = xs_ups >> 8;
@@ -412,12 +415,14 @@ static void rgb888_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h
 
 static void rgb888_row_bilinear(const uint8_t * src, int32_t src_stride,
                                 int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                                int32_t x_from, int32_t x_to, lv_color32_t * dest_c32, uint32_t px_size)
+                                int32_t x_from, int32_t x_to, int32_t x_offs,
+                                lv_color32_t * dest_c32, uint32_t px_size)
 {
     int32_t x;
     for(x = x_from; x < x_to; x++) {
-        int32_t xs_ups = xs_base + ((xs_step * x) >> 8) - 0x80;
-        int32_t ys_ups = ys_base + ((ys_step * x) >> 8) - 0x80;
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups = xs_base + ((xs_step * x_abs) >> 8) - 0x80;
+        int32_t ys_ups = ys_base + ((ys_step * x_abs) >> 8) - 0x80;
         int32_t xs_int = xs_ups >> 8;
         int32_t ys_int = ys_ups >> 8;
 
@@ -459,24 +464,32 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
                              int32_t x_start, int32_t x_end, int32_t xs_clamp_ups,
                              uint8_t * dest_buf, bool aa, uint32_t px_size)
 {
-    lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf - x_start;
+    lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf;
+
+    /*The destination is indexed from zero while the source coordinates are calculated from the
+     *absolute (image local) x coordinate to keep the partial rendering deterministic*/
+    int32_t w = x_end - x_start;
 
     /*In the middle of the row the pixel and all its neighbors are inside the source image,
      *so neither bounds checking nor edge handling is needed there*/
     int32_t fast_from, fast_to;
     transform_safe_range(xs_ups, ys_ups, xs_step, ys_step, src_w, src_h, x_start, x_end, aa, &fast_from, &fast_to);
+    fast_from -= x_start;
+    fast_to -= x_start;
 
     rgb888_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
-                       x_start, fast_from, xs_clamp_ups, dest_c32, aa, px_size);
+                       0, fast_from, x_start, xs_clamp_ups, dest_c32, aa, px_size);
 
     if(aa) {
-        rgb888_row_bilinear(src, src_stride, xs_ups, ys_ups, xs_step, ys_step, fast_from, fast_to, dest_c32, px_size);
+        rgb888_row_bilinear(src, src_stride, xs_ups, ys_ups, xs_step, ys_step, fast_from, fast_to, x_start,
+                            dest_c32, px_size);
     }
     else {
         int32_t x;
         for(x = fast_from; x < fast_to; x++) {
-            int32_t xs_int = (xs_ups + ((xs_step * x) >> 8)) >> 8;
-            int32_t ys_int = (ys_ups + ((ys_step * x) >> 8)) >> 8;
+            int32_t x_abs = x + x_start;
+            int32_t xs_int = (xs_ups + ((xs_step * x_abs) >> 8)) >> 8;
+            int32_t ys_int = (ys_ups + ((ys_step * x_abs) >> 8)) >> 8;
             const uint8_t * src_u8 = &src[ys_int * src_stride + xs_int * px_size];
             dest_c32[x].red = src_u8[2];
             dest_c32[x].green = src_u8[1];
@@ -486,7 +499,7 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
     }
 
     rgb888_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
-                       fast_to, x_end, xs_clamp_ups, dest_c32, aa, px_size);
+                       fast_to, w, x_start, xs_clamp_ups, dest_c32, aa, px_size);
 }
 
 #endif
@@ -548,13 +561,14 @@ static inline lv_color32_t argb8888_px_aa_inside(const lv_color32_t * src_px, in
 
 static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                  int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                                 int32_t x_from, int32_t x_to, int32_t xs_clamp_ups,
+                                 int32_t x_from, int32_t x_to, int32_t x_offs, int32_t xs_clamp_ups,
                                  lv_color32_t * dest_c32, bool aa)
 {
     int32_t x;
     for(x = x_from; x < x_to; x++) {
-        int32_t xs_ups = xs_base + ((xs_step * x) >> 8);
-        int32_t ys_ups = ys_base + ((ys_step * x) >> 8);
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups = xs_base + ((xs_step * x_abs) >> 8);
+        int32_t ys_ups = ys_base + ((ys_step * x_abs) >> 8);
         if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
 
         int32_t xs_int = xs_ups >> 8;
@@ -635,12 +649,13 @@ static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src
 
 static void argb8888_row_fast(const uint8_t * src, int32_t src_stride,
                               int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                              int32_t x_from, int32_t x_to, lv_color32_t * dest_c32)
+                              int32_t x_from, int32_t x_to, int32_t x_offs, lv_color32_t * dest_c32)
 {
     int32_t x;
     for(x = x_from; x < x_to; x++) {
-        int32_t xs_ups = xs_base + ((xs_step * x) >> 8);
-        int32_t ys_ups = ys_base + ((ys_step * x) >> 8);
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups = xs_base + ((xs_step * x_abs) >> 8);
+        int32_t ys_ups = ys_base + ((ys_step * x_abs) >> 8);
         int32_t xs_ups_ofs = xs_ups - 0x80;
         int32_t ys_ups_ofs = ys_ups - 0x80;
         int32_t xs_int = xs_ups_ofs >> 8;
@@ -683,30 +698,37 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
                                int32_t x_start, int32_t x_end, int32_t xs_clamp_ups,
                                uint8_t * dest_buf, bool aa)
 {
-    lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf - x_start;
+    lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf;
+
+    /*The destination is indexed from zero while the source coordinates are calculated from the
+     *absolute (image local) x coordinate to keep the partial rendering deterministic*/
+    int32_t w = x_end - x_start;
 
     /*In the middle of the row the pixel and all its neighbors are inside the source image,
      *so neither bounds checking nor edge handling is needed there*/
     int32_t fast_from, fast_to;
     transform_safe_range(xs_ups, ys_ups, xs_step, ys_step, src_w, src_h, x_start, x_end, aa, &fast_from, &fast_to);
+    fast_from -= x_start;
+    fast_to -= x_start;
 
     argb8888_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
-                         x_start, fast_from, xs_clamp_ups, dest_c32, aa);
+                         0, fast_from, x_start, xs_clamp_ups, dest_c32, aa);
 
     if(aa) {
-        argb8888_row_fast(src, src_stride, xs_ups, ys_ups, xs_step, ys_step, fast_from, fast_to, dest_c32);
+        argb8888_row_fast(src, src_stride, xs_ups, ys_ups, xs_step, ys_step, fast_from, fast_to, x_start, dest_c32);
     }
     else {
         int32_t x;
         for(x = fast_from; x < fast_to; x++) {
-            int32_t xs_int = (xs_ups + ((xs_step * x) >> 8)) >> 8;
-            int32_t ys_int = (ys_ups + ((ys_step * x) >> 8)) >> 8;
+            int32_t x_abs = x + x_start;
+            int32_t xs_int = (xs_ups + ((xs_step * x_abs) >> 8)) >> 8;
+            int32_t ys_int = (ys_ups + ((ys_step * x_abs) >> 8)) >> 8;
             *(uint32_t *)&dest_c32[x] = *(const uint32_t *)(src + ys_int * src_stride + xs_int * 4);
         }
     }
 
     argb8888_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
-                         fast_to, x_end, xs_clamp_ups, dest_c32, aa);
+                         fast_to, w, x_start, xs_clamp_ups, dest_c32, aa);
 }
 
 
@@ -738,12 +760,14 @@ static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w,
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
-    lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf - x_start;
+    lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf;
+    int32_t w = x_end - x_start;
 
     int32_t x;
-    for(x = x_start; x < x_end; x++) {
-        xs_ups = xs_ups_start + ((xs_step * x) >> 8);
-        ys_ups = ys_ups_start + ((ys_step * x) >> 8);
+    for(x = 0; x < w; x++) {
+        int32_t x_abs = x + x_start;
+        xs_ups = xs_ups_start + ((xs_step * x_abs) >> 8);
+        ys_ups = ys_ups_start + ((ys_step * x_abs) >> 8);
         if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
 
         int32_t xs_int = xs_ups >> 8;
@@ -903,12 +927,14 @@ static inline void rgb565a8_px_aa_inside(const uint16_t * src_px, int32_t src_st
 static void rgb565a8_row_fast(const uint8_t * src, int32_t src_stride,
                               const lv_opa_t * src_alpha, int32_t alpha_stride,
                               int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                              int32_t x_from, int32_t x_to, uint16_t * cbuf, uint8_t * abuf, bool src_has_a8)
+                              int32_t x_from, int32_t x_to, int32_t x_offs,
+                              uint16_t * cbuf, uint8_t * abuf, bool src_has_a8)
 {
     int32_t x;
     for(x = x_from; x < x_to; x++) {
-        int32_t xs_ups = xs_base + ((xs_step * x) >> 8);
-        int32_t ys_ups = ys_base + ((ys_step * x) >> 8);
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups = xs_base + ((xs_step * x_abs) >> 8);
+        int32_t ys_ups = ys_base + ((ys_step * x_abs) >> 8);
         int32_t xs_ups_ofs = xs_ups - 0x80;
         int32_t ys_ups_ofs = ys_ups - 0x80;
         int32_t xs_int = xs_ups_ofs >> 8;
@@ -955,13 +981,14 @@ static void rgb565a8_row_fast(const uint8_t * src, int32_t src_stride,
 static void rgb565a8_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                  const lv_opa_t * src_alpha, int32_t alpha_stride,
                                  int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                                 int32_t x_from, int32_t x_to, int32_t xs_clamp_ups,
+                                 int32_t x_from, int32_t x_to, int32_t x_offs, int32_t xs_clamp_ups,
                                  uint16_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa)
 {
     int32_t x;
     for(x = x_from; x < x_to; x++) {
-        int32_t xs_ups = xs_base + ((xs_step * x) >> 8);
-        int32_t ys_ups = ys_base + ((ys_step * x) >> 8);
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups = xs_base + ((xs_step * x_abs) >> 8);
+        int32_t ys_ups = ys_base + ((ys_step * x_abs) >> 8);
         if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
 
         int32_t xs_int = xs_ups >> 8;
@@ -1068,33 +1095,37 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
     /*Must be signed type, because we would use negative array index calculated from stride*/
     int32_t alpha_stride = src_stride / 2; /*alpha map stride is always half of RGB map stride*/
 
-    cbuf -= x_start;
-    abuf -= x_start;
+    /*The destination is indexed from zero while the source coordinates are calculated from the
+     *absolute (image local) x coordinate to keep the partial rendering deterministic*/
+    int32_t w = x_end - x_start;
 
     /*In the middle of the row the pixel and all its neighbors are inside the source image,
      *so neither bounds checking nor edge handling is needed there*/
     int32_t fast_from, fast_to;
     transform_safe_range(xs_ups, ys_ups, xs_step, ys_step, src_w, src_h, x_start, x_end, aa, &fast_from, &fast_to);
+    fast_from -= x_start;
+    fast_to -= x_start;
 
     rgb565a8_row_checked(src, src_w, src_h, src_stride, src_alpha, alpha_stride, xs_ups, ys_ups, xs_step, ys_step,
-                         x_start, fast_from, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
+                         0, fast_from, x_start, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
 
     if(aa) {
         rgb565a8_row_fast(src, src_stride, src_alpha, alpha_stride, xs_ups, ys_ups, xs_step, ys_step,
-                          fast_from, fast_to, cbuf, abuf, src_has_a8);
+                          fast_from, fast_to, x_start, cbuf, abuf, src_has_a8);
     }
     else {
         int32_t x;
         for(x = fast_from; x < fast_to; x++) {
-            int32_t xs_int = (xs_ups + ((xs_step * x) >> 8)) >> 8;
-            int32_t ys_int = (ys_ups + ((ys_step * x) >> 8)) >> 8;
+            int32_t x_abs = x + x_start;
+            int32_t xs_int = (xs_ups + ((xs_step * x_abs) >> 8)) >> 8;
+            int32_t ys_int = (ys_ups + ((ys_step * x_abs) >> 8)) >> 8;
             cbuf[x] = *((const uint16_t *)(src + ys_int * src_stride) + xs_int);
             abuf[x] = src_has_a8 ? src_alpha[ys_int * alpha_stride + xs_int] : 0xFF;
         }
     }
 
     rgb565a8_row_checked(src, src_w, src_h, src_stride, src_alpha, alpha_stride, xs_ups, ys_ups, xs_step, ys_step,
-                         fast_to, x_end, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
+                         fast_to, w, x_start, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
 }
 
 
@@ -1157,12 +1188,14 @@ static inline void rgb565a8_swapped_px_aa_inside(const uint16_t * src_px, int32_
 static void rgb565a8_swapped_row_fast(const uint8_t * src, int32_t src_stride,
                                       const lv_opa_t * src_alpha, int32_t alpha_stride,
                                       int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                                      int32_t x_from, int32_t x_to, uint16_t * cbuf, uint8_t * abuf, bool src_has_a8)
+                                      int32_t x_from, int32_t x_to, int32_t x_offs,
+                                      uint16_t * cbuf, uint8_t * abuf, bool src_has_a8)
 {
     int32_t x;
     for(x = x_from; x < x_to; x++) {
-        int32_t xs_ups = xs_base + ((xs_step * x) >> 8);
-        int32_t ys_ups = ys_base + ((ys_step * x) >> 8);
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups = xs_base + ((xs_step * x_abs) >> 8);
+        int32_t ys_ups = ys_base + ((ys_step * x_abs) >> 8);
         int32_t xs_ups_ofs = xs_ups - 0x80;
         int32_t ys_ups_ofs = ys_ups - 0x80;
         int32_t xs_int = xs_ups_ofs >> 8;
@@ -1213,13 +1246,14 @@ static void rgb565a8_swapped_row_fast(const uint8_t * src, int32_t src_stride,
 static void rgb565a8_swapped_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                          const lv_opa_t * src_alpha, int32_t alpha_stride,
                                          int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                                         int32_t x_from, int32_t x_to, int32_t xs_clamp_ups,
+                                         int32_t x_from, int32_t x_to, int32_t x_offs, int32_t xs_clamp_ups,
                                          uint16_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa)
 {
     int32_t x;
     for(x = x_from; x < x_to; x++) {
-        int32_t xs_ups = xs_base + ((xs_step * x) >> 8);
-        int32_t ys_ups = ys_base + ((ys_step * x) >> 8);
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups = xs_base + ((xs_step * x_abs) >> 8);
+        int32_t ys_ups = ys_base + ((ys_step * x_abs) >> 8);
         if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
 
         int32_t xs_int = xs_ups >> 8;
@@ -1327,33 +1361,37 @@ static void transform_rgb565a8_swapped(const uint8_t * src, int32_t src_w, int32
     /*Must be signed type, because we would use negative array index calculated from stride*/
     int32_t alpha_stride = src_stride / 2; /*alpha map stride is always half of RGB map stride*/
 
-    cbuf -= x_start;
-    abuf -= x_start;
+    /*The destination is indexed from zero while the source coordinates are calculated from the
+     *absolute (image local) x coordinate to keep the partial rendering deterministic*/
+    int32_t w = x_end - x_start;
 
     /*In the middle of the row the pixel and all its neighbors are inside the source image,
      *so neither bounds checking nor edge handling is needed there*/
     int32_t fast_from, fast_to;
     transform_safe_range(xs_ups, ys_ups, xs_step, ys_step, src_w, src_h, x_start, x_end, aa, &fast_from, &fast_to);
+    fast_from -= x_start;
+    fast_to -= x_start;
 
     rgb565a8_swapped_row_checked(src, src_w, src_h, src_stride, src_alpha, alpha_stride, xs_ups, ys_ups, xs_step, ys_step,
-                                 x_start, fast_from, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
+                                 0, fast_from, x_start, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
 
     if(aa) {
         rgb565a8_swapped_row_fast(src, src_stride, src_alpha, alpha_stride, xs_ups, ys_ups, xs_step, ys_step,
-                                  fast_from, fast_to, cbuf, abuf, src_has_a8);
+                                  fast_from, fast_to, x_start, cbuf, abuf, src_has_a8);
     }
     else {
         int32_t x;
         for(x = fast_from; x < fast_to; x++) {
-            int32_t xs_int = (xs_ups + ((xs_step * x) >> 8)) >> 8;
-            int32_t ys_int = (ys_ups + ((ys_step * x) >> 8)) >> 8;
+            int32_t x_abs = x + x_start;
+            int32_t xs_int = (xs_ups + ((xs_step * x_abs) >> 8)) >> 8;
+            int32_t ys_int = (ys_ups + ((ys_step * x_abs) >> 8)) >> 8;
             cbuf[x] = lv_color_swap_16(*((const uint16_t *)(src + ys_int * src_stride) + xs_int));
             abuf[x] = src_has_a8 ? src_alpha[ys_int * alpha_stride + xs_int] : 0xFF;
         }
     }
 
     rgb565a8_swapped_row_checked(src, src_w, src_h, src_stride, src_alpha, alpha_stride, xs_ups, ys_ups, xs_step, ys_step,
-                                 fast_to, x_end, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
+                                 fast_to, w, x_start, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
 }
 
 #endif
@@ -1367,12 +1405,13 @@ static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int3
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
-    abuf -= x_start;
+    int32_t w = x_end - x_start;
 
     int32_t x;
-    for(x = x_start; x < x_end; x++) {
-        xs_ups = xs_ups_start + ((xs_step * x) >> 8);
-        ys_ups = ys_ups_start + ((ys_step * x) >> 8);
+    for(x = 0; x < w; x++) {
+        int32_t x_abs = x + x_start;
+        xs_ups = xs_ups_start + ((xs_step * x_abs) >> 8);
+        ys_ups = ys_ups_start + ((ys_step * x_abs) >> 8);
         if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
 
         int32_t xs_int = xs_ups >> 8;
@@ -1448,13 +1487,13 @@ static void transform_al88(const uint8_t * src, int32_t src_w, int32_t src_h, in
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
-    cbuf -= x_start;
-    abuf -= x_start;
+    int32_t w = x_end - x_start;
 
     int32_t x;
-    for(x = x_start; x < x_end; x++) {
-        xs_ups = xs_ups_start + ((xs_step * x) >> 8);
-        ys_ups = ys_ups_start + ((ys_step * x) >> 8);
+    for(x = 0; x < w; x++) {
+        int32_t x_abs = x + x_start;
+        xs_ups = xs_ups_start + ((xs_step * x_abs) >> 8);
+        ys_ups = ys_ups_start + ((ys_step * x_abs) >> 8);
         if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
 
         int32_t xs_int = xs_ups >> 8;
@@ -1573,8 +1612,10 @@ static void transform_safe_interval(int32_t base, int32_t step, int32_t lo, int3
      * As `>> 8` is a floor operation:
      *    floor(t / 256) >= k  <=>  t >= 256 * k
      *    floor(t / 256) <= k  <=>  t <= 256 * k + 255  */
-    int64_t lo_n = ((int64_t)(lo - base)) << 8;
-    int64_t hi_n = (((int64_t)(hi - base)) << 8) + 255;
+    /*Multiply instead of shifting: the difference can be negative and
+     *left shifting a negative value is undefined behavior*/
+    int64_t lo_n = (int64_t)(lo - base) * 256;
+    int64_t hi_n = (int64_t)(hi - base) * 256 + 255;
 
     if(step == 0) {
         if(lo_n > 0 || hi_n < 0) xb = xa;

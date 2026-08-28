@@ -68,8 +68,18 @@ static void invalidate_middle_and_compare(lv_obj_t * img)
     lv_inv_area(disp, &area);
     lv_refr_now(NULL);
 
-    TEST_ASSERT_EQUAL_MEMORY(full_render, front->data, size);
+    /*Compare and release the buffer before asserting, else a failing assert
+     *aborts the test and leaks `full_render`*/
+    uint32_t diff_at = 0;
+    while(diff_at < size && full_render[diff_at] == ((const uint8_t *)front->data)[diff_at]) diff_at++;
     lv_free(full_render);
+
+    if(diff_at < size) {
+        char msg[128];
+        lv_snprintf(msg, sizeof(msg), "The partial and the full render differ at byte %" LV_PRIu32 " of %" LV_PRIu32,
+                    diff_at, size);
+        TEST_FAIL_MESSAGE(msg);
+    }
 }
 
 void test_transform_partial_render_deterministic(void)
