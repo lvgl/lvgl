@@ -77,6 +77,7 @@ typedef enum {
 } lv_gstreamer_state_t;
 
 typedef enum {
+    LV_GSTREAMER_STREAM_STATE_INVALID = -1,
     LV_GSTREAMER_STREAM_STATE_START,
     LV_GSTREAMER_STREAM_STATE_PLAY,
     LV_GSTREAMER_STREAM_STATE_PAUSE,
@@ -185,7 +186,7 @@ void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate);
 /**
  * Retrieve the stream state from a STATE_CHANGED event callback
  * @param e     pointer to the event
- * @return the stream state or -1 if `e` is invalid (i.e. NULL or does not match expected event)
+ * @return the stream state or `LV_GSTREAMER_STREAM_STATE_INVALID` if `e` is invalid
  */
 lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e);
 
