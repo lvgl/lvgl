@@ -100,51 +100,6 @@ static void set_pointer_observer(lv_observer_t * observer, lv_subject_t * subjec
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_subject_t * lv_subject_create(lv_subject_type_t type)
-{
-    lv_subject_t * subject = lv_malloc(sizeof(lv_subject_t));
-    LV_ASSERT_MALLOC(subject);
-    if(subject == NULL) return NULL;
-
-    switch(type) {
-        case LV_SUBJECT_TYPE_INT:
-            lv_subject_init_int(subject, 0);
-            break;
-#if LV_USE_FLOAT
-        case LV_SUBJECT_TYPE_FLOAT:
-            lv_subject_init_float(subject, 0.0f);
-            break;
-#endif
-        case LV_SUBJECT_TYPE_STRING:
-            lv_subject_init_string(subject, NULL, NULL, 0, "");
-            break;
-        case LV_SUBJECT_TYPE_POINTER:
-            lv_subject_init_pointer(subject, NULL);
-            break;
-        case LV_SUBJECT_TYPE_COLOR:
-            lv_subject_init_color(subject, lv_color_black());
-            break;
-        case LV_SUBJECT_TYPE_GROUP:
-            lv_subject_init_group(subject, NULL, 0);
-            break;
-        default:
-            LV_LOG_WARN("Invalid subject type: %d", type);
-            lv_free(subject);
-            return NULL;
-    }
-
-    return subject;
-}
-
-void lv_subject_delete(lv_subject_t * subject)
-{
-    if(!subject) {
-        return;
-    }
-    lv_subject_deinit(subject);
-    lv_free(subject);
-}
-
 void lv_subject_init_int(lv_subject_t * subject, int32_t value)
 {
     LV_CHECK_ARG(subject != NULL, return);

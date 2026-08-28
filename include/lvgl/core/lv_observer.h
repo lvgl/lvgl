@@ -130,22 +130,6 @@ typedef void (*lv_obj_set_pointer_t)(lv_obj_t * obj, const void * value);
  **********************/
 
 /**
- * Create a new Subject of the specified type.
- * @param type      type of the Subject
- * @return          pointer to the created Subject
- * @note            The Subject is allocated on the heap and must be freed with `lv_subject_delete()`.
- * @note            The Subject is initialized with a default value (0 for int, 0.0 for float, NULL for pointer, black for color, empty string for string).
- *                  For string `lv_subject_set_buf()`, for groups `lv_subject_set_group_list()` should be called to set the buffer(s) or list.
- */
-lv_subject_t * lv_subject_create(lv_subject_type_t type);
-
-/**
- * Delete a Subject that we created with `lv_subject_create()`.
- * @param subject   pointer to Subject
- */
-void lv_subject_delete(lv_subject_t * subject);
-
-/**
  * Initialize an integer-type Subject.
  * @param subject   pointer to Subject
  * @param value     initial value
@@ -281,8 +265,6 @@ const char * lv_subject_get_string(lv_subject_t * subject);
  * Get previous value of a string Subject.
  * @param subject   pointer to Subject
  * @return          pointer to buffer containing previous value
- * @note            NULL will be returned if NULL was passed in `lv_subject_init_string()`
- *                  as `prev_buf` or if `subject` is NULL or not of string type.
  */
 const char * lv_subject_get_previous_string(lv_subject_t * subject);
 
@@ -346,7 +328,7 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject);
  * Initialize a Group-type Subject.
  * @param group_subject  pointer to Group-type Subject
  * @param list           list of other Subject addresses; when any of these have values
-                             updated, Observers of `group_subject` will be notified.
+ *                       updated, Observers of `group_subject` will be notified.
  * @param list_len       number of elements in `list[]`
  */
 void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len);
@@ -640,6 +622,7 @@ lv_observer_t * lv_obj_bind_pointer(lv_obj_t * obj, lv_subject_t * subject, lv_o
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
 
 /**
@@ -651,6 +634,7 @@ lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, l
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag,
                                            int32_t ref_value);
 
@@ -663,6 +647,7 @@ lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subjec
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
 
 /**
@@ -674,6 +659,7 @@ lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, l
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
 
 /**
@@ -685,6 +671,7 @@ lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, l
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
 
 /**
@@ -696,6 +683,7 @@ lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, l
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
 
 
@@ -708,6 +696,7 @@ lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, l
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
 
 /**
@@ -719,6 +708,7 @@ lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, 
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state,
                                             int32_t ref_value);
 
@@ -731,6 +721,7 @@ lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subje
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
 
 /**
@@ -742,6 +733,7 @@ lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, 
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
 
 /**
@@ -753,6 +745,7 @@ lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, 
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
 
 /**
@@ -764,6 +757,7 @@ lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, 
  * @return              pointer to newly-created Observer
  * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
  */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
 lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
 
 /**

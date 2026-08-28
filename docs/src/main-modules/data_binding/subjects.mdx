@@ -35,14 +35,6 @@ The remaining types work the same way with <ApiLink name="lv_subject_init_float"
 <ApiLink name="lv_subject_init_pointer" display="lv_subject_init_pointer()" /> and
 <ApiLink name="lv_subject_init_color" display="lv_subject_init_color()" />.
 
-If you'd rather keep a Subject on the heap instead of in a static variable,
-<ApiLink name="lv_subject_create" display="lv_subject_create(type)" /> allocates and
-initializes one of the given type, and
-<ApiLink name="lv_subject_delete" display="lv_subject_delete(subject)" /> frees it
-again.
-The Subject is initialized with a zero default value (0 for int, 0.0 for float, `NULL` for pointer, black for color, no buffer for string, no list for groups)
-For string <ApiLink name="lv_subject_set_buf"/>, for groups <ApiLink name="lv_subject_set_group_list"/> should be called to set the buffer(s) or list.
-
 ## Reading and Writing the Value
 
 Write a value with `lv_subject_set_...()` (e.g. <ApiLink name="lv_subject_set_int"/>).

@@ -36,17 +36,11 @@ The following Subject types are supported:
 - pointer
 - group
 
-You can create a Subject in two ways:
+You can create a Subject by using a static/global variable:
 
 ```c
-/*Create dynamically*/
-lv_subject_t * subject_1 = lv_subject_create(LV_SUBJECT_TYPE_INT);
-
-
-/*Or initialize a static/global variable*/
 static lv_subject_t subject_2;
 lv_subject_init_int(&subject_2, 10);   /*10 is the initial value*/
-
 ```
 
 Set a Subject's value like below. This also notifies all subscribed Observers when the value changes.
@@ -87,12 +81,9 @@ lv_label_bind_text(label_1, subject_1, "%d °C");
 lv_dropdown_bind_value(dropdown_1, &subject_2);
 ```
 
-When the subjects are no longer needed they can be deleted or deinitialized:
-```c
-/*If it was created with lv_subject_create()*/
-lv_subject_delete(subject_1);
+When the subjects are no longer needed they can be deinitialized:
 
-/*If it was initialized with lv_subject_init_...()*/
+```c
 lv_subject_deinit(&subject_2);
 ```
 
