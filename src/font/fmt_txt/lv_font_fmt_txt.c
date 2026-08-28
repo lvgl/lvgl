@@ -34,6 +34,9 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 static int unicode_list_compare(const void * ref, const void * element);
 static int kern_pair_8_compare(const void * ref, const void * element);
 static int kern_pair_16_compare(const void * ref, const void * element);
+static const uint8_t * glyph_bitmap_acquire(lv_font_fmt_txt_dsc_t * fdsc,
+                                            const lv_font_fmt_txt_glyph_dsc_t * gdsc, uint32_t gid);
+static void glyph_bitmap_release(lv_font_fmt_txt_dsc_t * fdsc);
 
 #if LV_USE_FONT_COMPRESSED
     static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter);
@@ -98,7 +101,16 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    if(g_dsc->req_raw_bitmap) {
+        /*With a loader the bitmap is read into a scratch buffer which is overwritten by the next
+         *glyph, so the returned pointer is only valid until then. Such fonts have
+         *`static_bitmap == 0` which tells the draw units not to hold on to the pointer.*/
+        const uint8_t * raw = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        if(raw == NULL) return NULL;
+
+        glyph_bitmap_release(fdsc);
+        return raw;
+    }
 
     LV_ASSERT(draw_buf != NULL);
     uint8_t * bitmap_out = draw_buf->data;
@@ -109,7 +121,9 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-        const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        if(bitmap_in == NULL) return NULL;
+
         uint8_t * bitmap_out_tmp = bitmap_out;
         int32_t i = 0;
         int32_t x, y;
@@ -200,6 +214,8 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
             }
         }
 
+        glyph_bitmap_release(fdsc);
+
         lv_draw_buf_flush_cache(draw_buf, NULL);
         return draw_buf;
     }
@@ -207,8 +223,13 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     else {
 #if LV_USE_FONT_COMPRESSED
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
+        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        if(bitmap_in == NULL) return NULL;
+
+        decompress(bitmap_in, bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
+        glyph_bitmap_release(fdsc);
+
         lv_draw_buf_flush_cache(draw_buf, NULL);
         return draw_buf;
 #else /*!LV_USE_FONT_COMPRESSED*/
@@ -286,6 +307,49 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ * Get the raw bitmap of a glyph.
+ * If the font has a loader the bitmap is read into the font's scratch buffer and the loader stays
+ * locked until `glyph_bitmap_release()` is called.
+ * @param fdsc      the font descriptor
+ * @param gdsc      the descriptor of the glyph, i.e. `fdsc->glyph_dsc[gid]`
+ * @param gid       glyph index
+ * @return          pointer to the raw bitmap or `NULL` on error
+ */
+static const uint8_t * glyph_bitmap_acquire(lv_font_fmt_txt_dsc_t * fdsc,
+                                            const lv_font_fmt_txt_glyph_dsc_t * gdsc, uint32_t gid)
+{
+    if(!fdsc->are_glyphs_dynamic_loaded) {
+        const uint8_t * bitmap = fdsc->glyph_bitmap;
+        return &bitmap[gdsc->bitmap_index];
+    }
+
+    lv_font_fmt_txt_glyph_loader_t * loader = (lv_font_fmt_txt_glyph_loader_t *) fdsc->glyph_bitmap;
+    lv_mutex_lock(&loader->lock);
+
+    const uint8_t * bitmap = loader->get_glyph_bitmap_cb(loader, gid);
+    if(bitmap == NULL) {
+        LV_LOG_WARN("Couldn't load the bitmap of glyph %" LV_PRIu32, gid);
+        lv_mutex_unlock(&loader->lock);
+    }
+
+    return bitmap;
+}
+
+/**
+ * Release the bitmap returned by a successful `glyph_bitmap_acquire()` call.
+ * @param fdsc      the font descriptor
+ */
+static void glyph_bitmap_release(lv_font_fmt_txt_dsc_t * fdsc)
+{
+    if(!fdsc->are_glyphs_dynamic_loaded) {
+        return;
+    }
+
+    lv_font_fmt_txt_glyph_loader_t * loader = (lv_font_fmt_txt_glyph_loader_t *) fdsc->glyph_bitmap;
+    lv_mutex_unlock(&loader->lock);
+}
 
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 {
