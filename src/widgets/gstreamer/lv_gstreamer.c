@@ -45,6 +45,10 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data);
 static void gstreamer_timer_cb(lv_timer_t * timer);
 static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer);
 static void gstreamer_update_frame(lv_gstreamer_t * streamer);
+static void gstreamer_release_frame(lv_gstreamer_t * streamer);
+static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample, GstBuffer * buffer, GstMapInfo * map);
+static bool gstreamer_copy_to_aligned_frame(lv_gstreamer_t * streamer, const GstMapInfo * map, uint32_t w, uint32_t h,
+                                            uint32_t src_stride);
 static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
                                                       const lv_gstreamer_pipeline_element_t * elements, size_t element_count);
 static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state);
@@ -496,32 +500,16 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
 
     GstBuffer * buffer = gst_sample_get_buffer(sample);
     GstMapInfo map;
-    if(buffer && gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        if(streamer->last_buffer) {
-            gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
-        }
-        if(streamer->last_sample) {
-            gst_sample_unref(streamer->last_sample);
-        }
-        streamer->last_buffer = buffer;
-        streamer->last_map_info = map;
-
-        streamer->last_sample = sample;
-
-        streamer->frame = (lv_image_dsc_t) {
-            .data = map.data,
-            .data_size = map.size,
-            .header = {
-                .magic = LV_IMAGE_HEADER_MAGIC,
-                .cf = IMAGE_FORMAT,
-                .flags = LV_IMAGE_FLAGS_MODIFIABLE,
-                .h = GST_VIDEO_INFO_HEIGHT(&streamer->video_info),
-                .w = GST_VIDEO_INFO_WIDTH(&streamer->video_info),
-                .stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0),
-            }
-        };
-        lv_image_set_src((lv_obj_t *)streamer, &streamer->frame);
+    if(!buffer || !gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+        gst_sample_unref(sample);
     }
+    bool stored = gstreamer_store_frame(streamer, sample, buffer, &map);
+    if(first_frame && !stored) {
+        streamer->is_video_info_valid = false;
+        return;
+    }
+    lv_image_set_src((lv_obj_t *)streamer, &streamer->frame);
+
     /* We send the event AFTER setting the image source so that users can query the
      * resolution on this specific event callback */
     if(first_frame) {
@@ -534,6 +522,89 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     }
 
 }
+
+static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample, GstBuffer * buffer, GstMapInfo * map)
+{
+    const uint32_t w = GST_VIDEO_INFO_WIDTH(&streamer->video_info);
+    const uint32_t h = GST_VIDEO_INFO_HEIGHT(&streamer->video_info);
+    const uint32_t src_stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0);
+
+    const bool aligned = (lv_uintptr_t)map->data % LV_DRAW_BUF_ALIGN == 0
+                         && src_stride == lv_draw_buf_width_to_stride(w, IMAGE_FORMAT);
+
+    gstreamer_release_frame(streamer);
+
+    if(aligned) {
+        streamer->last_buffer = buffer;
+        streamer->last_map_info = *map;
+        streamer->last_sample = sample;
+    }
+    else {
+        const bool copied = gstreamer_copy_to_aligned_frame(streamer, map, w, h, src_stride);
+        gst_buffer_unmap(buffer, map);
+        gst_sample_unref(sample);
+        if(!copied) {
+            return false;
+        }
+    }
+
+    const lv_draw_buf_t * copy = streamer->aligned_frame;
+    streamer->frame = (lv_image_dsc_t) {
+        .data = aligned ? map->data : copy->data,
+        .data_size = aligned ? map->size : copy->data_size,
+        .header = {
+            .magic = LV_IMAGE_HEADER_MAGIC,
+            .cf = IMAGE_FORMAT,
+            .flags = LV_IMAGE_FLAGS_MODIFIABLE,
+            .h = h,
+            .w = w,
+            .stride = aligned ? src_stride : copy->header.stride,
+        }
+    };
+    return true;
+}
+
+static bool gstreamer_copy_to_aligned_frame(lv_gstreamer_t * streamer, const GstMapInfo * map, uint32_t w, uint32_t h,
+                                            uint32_t src_stride)
+{
+    lv_draw_buf_t * dest = streamer->aligned_frame;
+    if(dest && (dest->header.w != w || dest->header.h != h)) {
+        lv_draw_buf_destroy(dest);
+        dest = NULL;
+        streamer->aligned_frame = NULL;
+    }
+
+    if(!dest) {
+        dest = lv_draw_buf_create(w, h, IMAGE_FORMAT, LV_STRIDE_AUTO);
+        if(!dest) {
+            LV_LOG_ERROR("Failed to allocate an aligned %" LV_PRIu32 "x%" LV_PRIu32 " frame", w, h);
+            return false;
+        }
+        streamer->aligned_frame = dest;
+    }
+
+    const uint32_t dest_stride = dest->header.stride;
+    const uint32_t row_size = LV_MIN(src_stride, dest_stride);
+    for(uint32_t y = 0; y < h; y++) {
+        lv_memcpy(dest->data + y * dest_stride, map->data + y * src_stride, row_size);
+    }
+
+    lv_draw_buf_flush_cache(dest, NULL);
+    return true;
+}
+
+static void gstreamer_release_frame(lv_gstreamer_t * streamer)
+{
+    if(streamer->last_buffer) {
+        gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
+        streamer->last_buffer = NULL;
+    }
+    if(streamer->last_sample) {
+        gst_sample_unref(streamer->last_sample);
+        streamer->last_sample = NULL;
+    }
+}
+
 static void gstreamer_timer_cb(lv_timer_t * timer)
 {
     LV_ASSERT(timer != NULL);
@@ -559,11 +630,9 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         gst_element_set_state(streamer->pipeline, GST_STATE_NULL);
         gst_object_unref(streamer->pipeline);
     }
-    if(streamer->last_buffer) {
-        gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
-    }
-    if(streamer->last_sample) {
-        gst_sample_unref(streamer->last_sample);
+    gstreamer_release_frame(streamer);
+    if(streamer->aligned_frame) {
+        lv_draw_buf_destroy(streamer->aligned_frame);
     }
     if(streamer->frame_queue) {
         GstSample * sample;
