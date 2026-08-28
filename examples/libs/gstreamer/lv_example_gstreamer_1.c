@@ -233,6 +233,8 @@ static void stream_state_changed(lv_event_t * e)
         case LV_GSTREAMER_STREAM_STATE_STOP:
             lv_label_set_text_static(event_data->button_label, LV_SYMBOL_PLAY);
             break;
+        case LV_GSTREAMER_STREAM_STATE_INVALID:
+            break;
     }
 }
 

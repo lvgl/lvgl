@@ -392,8 +392,8 @@ void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
 
 lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e)
 {
-    LV_CHECK_ARG(e != NULL, return -1);
-    LV_CHECK_ARG(e->code == LV_EVENT_STATE_CHANGED, return -1);
+    LV_CHECK_ARG(e != NULL, return LV_GSTREAMER_STREAM_STATE_INVALID);
+    LV_CHECK_ARG(e->code == LV_EVENT_STATE_CHANGED, return LV_GSTREAMER_STREAM_STATE_INVALID);
     return *(lv_gstreamer_stream_state_t *)lv_event_get_param(e);
 }
 
