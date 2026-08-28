@@ -11,6 +11,7 @@ static uint32_t cache_error_count;
 static void count_cache_errors_cb(lv_log_level_t level, const char * buf)
 {
     if(level == LV_LOG_LEVEL_ERROR && strstr(buf, "cache not allocated") != NULL) cache_error_count++;
+    if(level >= LV_LOG_LEVEL_WARN) TEST_PRINTF(buf);
 }
 
 /* NanoVG's GPU rasterization produces glyph metrics that differ between architectures
@@ -28,12 +29,13 @@ static void count_cache_errors_cb(lv_log_level_t level, const char * buf)
 
 void setUp(void)
 {
-    /* Function run before every test */
+    cache_error_count = 0;
+    lv_log_register_print_cb(count_cache_errors_cb);
 }
 
 void tearDown(void)
 {
-    /* Function run after every test */
+    lv_log_register_print_cb(NULL);
 }
 
 void test_tiny_ttf_rendering_test(void)
@@ -111,9 +113,6 @@ void test_tiny_ttf_missing_glyph_uses_fallback(void)
     extern size_t test_ubuntu_font_size;
     const size_t cache_sizes[] = {0, 1};
 
-    cache_error_count = 0;
-    lv_log_register_print_cb(count_cache_errors_cb);
-
     for(size_t i = 0; i < sizeof(cache_sizes) / sizeof(cache_sizes[0]); i++) {
         lv_font_t * font = lv_tiny_ttf_create_data_ex(test_ubuntu_font, test_ubuntu_font_size, 30,
                                                       LV_FONT_KERNING_NORMAL, cache_sizes[i]);
@@ -127,7 +126,6 @@ void test_tiny_ttf_missing_glyph_uses_fallback(void)
         lv_tiny_ttf_destroy(font);
     }
 
-    lv_log_register_print_cb(NULL);
     TEST_ASSERT_EQUAL_UINT32(0, cache_error_count);
 #else
     TEST_PASS();
