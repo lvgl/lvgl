@@ -27,6 +27,13 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * How many decoded frames may wait to be displayed.
+ * Only the newest one is ever shown, so this only has to absorb the jitter between the
+ * thread that decodes and the LVGL timer that displays.
+ */
+#define LV_GSTREAMER_MAX_QUEUED_FRAMES 2
+
 /**********************
  *      TYPEDEFS
  **********************/

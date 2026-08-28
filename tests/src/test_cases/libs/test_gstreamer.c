@@ -238,6 +238,28 @@ void test_gstreamer_follows_display_color_format(void)
 #endif
 }
 
+void test_gstreamer_queue_stays_bounded(void)
+{
+    lv_obj_t * player = create_player();
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gstreamer_set_src(player, LV_GSTREAMER_FACTORY_TEST_VIDEO, NULL, NULL));
+
+    lv_gstreamer_play(player);
+    TEST_ASSERT_TRUE(pump_until(&event_cnt[LV_GSTREAMER_STREAM_STATE_START], 1, 3000));
+
+    /* Stall the UI thread. The pipeline keeps decoding on its own thread, and nothing
+     * takes the frames it produces out of the queue */
+    usleep(1000000);
+
+    const lv_gstreamer_t * streamer = (const lv_gstreamer_t *)player;
+    TEST_ASSERT_LESS_OR_EQUAL(LV_GSTREAMER_MAX_QUEUED_FRAMES, g_async_queue_length(streamer->frame_queue));
+
+    /* The widget still displays what the pipeline produced after the stall */
+    event_cnt[LV_GSTREAMER_STREAM_STATE_START] = 0;
+    pump(100);
+    TEST_ASSERT_EQUAL(LV_GSTREAMER_STATE_PLAYING, lv_gstreamer_get_state(player));
+    TEST_ASSERT_NOT_NULL(lv_image_get_src(player));
+}
+
 void test_gstreamer_delete_while_playing(void)
 {
     size_t mem_before = lv_test_get_free_mem();
@@ -265,6 +287,7 @@ void test_gstreamer_missing_file(void) { }
 void test_gstreamer_videotestsrc(void) { }
 void test_gstreamer_file_playback(void) { }
 void test_gstreamer_follows_display_color_format(void) { }
+void test_gstreamer_queue_stays_bounded(void) { }
 void test_gstreamer_delete_while_playing(void) { }
 
 #endif /* LV_USE_GSTREAMER */
