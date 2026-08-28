@@ -61,7 +61,7 @@ void test_observer_add_remove(void)
 
 void test_object_observer_add_remove(void)
 {
-
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -78,6 +78,7 @@ void test_object_observer_add_remove(void)
     TEST_ASSERT_EQUAL(true, lv_obj_is_hidden(obj));
     lv_obj_delete(obj);
     /* We shouldn't crash here */
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 static lv_event_dsc_t * get_event_delete_from_obj(lv_obj_t * obj)
@@ -523,6 +524,7 @@ void test_observer_group(void)
 
 void test_observer_obj_flag_invalid_subject(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     typedef lv_observer_t * (*lv_obj_bind_flag_fn)(
         lv_obj_t *, lv_subject_t *, lv_obj_flag_t, int32_t);
     static const lv_obj_bind_flag_fn fns[] = {
@@ -530,6 +532,7 @@ void test_observer_obj_flag_invalid_subject(void)
         lv_obj_bind_flag_if_ge, lv_obj_bind_flag_if_gt,
         lv_obj_bind_flag_if_lt, lv_obj_bind_flag_if_le,
     };
+    LV_DEPRECATIONS_IGNORE_END
     static lv_subject_t invalid_subjects[4];
 
     static char buf1[30];
@@ -558,6 +561,7 @@ void test_observer_obj_flag_invalid_subject(void)
 }
 void test_observer_obj_flag_eq(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -578,10 +582,12 @@ void test_observer_obj_flag_eq(void)
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL(false, lv_obj_is_hidden(obj));
     TEST_ASSERT_EQUAL(false, lv_obj_is_checkable(obj));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_flag_ge(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -598,10 +604,12 @@ void test_observer_obj_flag_ge(void)
 
     lv_subject_set_int(&subject, 6);
     TEST_ASSERT_EQUAL(true, lv_obj_is_hidden(obj));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_flag_gt(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -618,10 +626,12 @@ void test_observer_obj_flag_gt(void)
 
     lv_subject_set_int(&subject, 4);
     TEST_ASSERT_EQUAL(false, lv_obj_is_hidden(obj));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_flag_le(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 7);
@@ -638,10 +648,12 @@ void test_observer_obj_flag_le(void)
 
     lv_subject_set_int(&subject, 4);
     TEST_ASSERT_EQUAL(true, lv_obj_is_hidden(obj));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_flag_lt(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 7);
@@ -658,10 +670,12 @@ void test_observer_obj_flag_lt(void)
 
     lv_subject_set_int(&subject, 3);
     TEST_ASSERT_EQUAL(true, lv_obj_is_hidden(obj));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_state_invalid_subject(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     typedef lv_observer_t * (*lv_obj_bind_state_fn)(
         lv_obj_t *, lv_subject_t *, lv_state_t, int32_t);
 
@@ -695,10 +709,12 @@ void test_observer_obj_state_invalid_subject(void)
                 NULL, fns[i](obj, &invalid_subjects[j], 0, 5));
         }
     }
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_state_eq(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -719,10 +735,12 @@ void test_observer_obj_state_eq(void)
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
     TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_DISABLED));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_state_gt(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -739,10 +757,12 @@ void test_observer_obj_state_gt(void)
 
     lv_subject_set_int(&subject, 7);
     TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_state_ge(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -759,10 +779,12 @@ void test_observer_obj_state_ge(void)
 
     lv_subject_set_int(&subject, 5);
     TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_state_le(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -776,10 +798,12 @@ void test_observer_obj_state_le(void)
 
     lv_subject_set_int(&subject, 4);
     TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_observer_obj_state_lt(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
@@ -793,6 +817,7 @@ void test_observer_obj_state_lt(void)
 
     lv_subject_set_int(&subject, 4);
     TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 /* Recommended replacement for lv_obj_bind_flag_if_*: bind a flag from a boolean
