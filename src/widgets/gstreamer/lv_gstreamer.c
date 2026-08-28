@@ -854,7 +854,17 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
         return GST_FLOW_OK;
     }
 
-    g_async_queue_push(streamer->frame_queue, sample);
+    g_async_queue_lock(streamer->frame_queue);
+    g_async_queue_push_unlocked(streamer->frame_queue, sample);
+    while(g_async_queue_length_unlocked(streamer->frame_queue) > LV_GSTREAMER_MAX_QUEUED_FRAMES) {
+        GstSample * dropped = g_async_queue_try_pop_unlocked(streamer->frame_queue);
+        if(!dropped) {
+            break;
+        }
+        gst_sample_unref(dropped);
+    }
+    g_async_queue_unlock(streamer->frame_queue);
+
     return GST_FLOW_OK;
 }
 
