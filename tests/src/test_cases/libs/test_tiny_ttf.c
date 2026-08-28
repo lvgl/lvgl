@@ -114,7 +114,7 @@ void test_tiny_ttf_missing_glyph_uses_fallback(void)
     cache_error_count = 0;
     lv_log_register_print_cb(count_cache_errors_cb);
 
-    for(size_t i = 0; i < LV_ARRAY_SIZE(cache_sizes); i++) {
+    for(size_t i = 0; i < sizeof(cache_sizes) / sizeof(cache_sizes[0]); i++) {
         lv_font_t * font = lv_tiny_ttf_create_data_ex(test_ubuntu_font, test_ubuntu_font_size, 30,
                                                       LV_FONT_KERNING_NORMAL, cache_sizes[i]);
         TEST_ASSERT_NOT_NULL(font);
