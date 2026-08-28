@@ -12,14 +12,14 @@ to have a special binary format. (Not TTF or WOFF). Use
 
 ## Loading from File
 
-| Field | Description |
-|-------|-------------|
-| `note` | To load a font [LVGL's filesystem](/main-modules/fs) needs to be enabled and a driver must be added. |
+<Callout type="tip">
+To load a font [LVGL's filesystem](/main-modules/fs) needs to be enabled and a driver must be added. 
+</Callout>
 
-Example
+This is how you can use it in practice:
 
 ```c
-lv_font_t *my_font = lv_binfont_create("X:/path/to/my_font.bin");
+lv_font_t *my_font = lv_binfont_create("A:/path/to/my_font.bin");
 if(my_font == NULL) return;
 
 /* Use the font */
@@ -34,11 +34,11 @@ lv_binfont_destroy(my_font);
 This function may be useful to load a font from an external file system, which is not
 supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
 
-| Field | Description |
-|-------|-------------|
-| `note` | To load a font from a buffer [LVGL's filesystem](/main-modules/fs) needs to be enabled and the MEMFS driver must be added. |
+<Callout type="tip">
+To load a font from a buffer [LVGL's filesystem](/main-modules/fs) needs to be enabled and the MEMFS driver must be added. 
+</Callout>
 
-Example
+This is how you can use it in practice:
 
 ```c
 lv_font_t *my_font;
@@ -56,3 +56,48 @@ if(my_font == NULL) return;
 /* Free the font if not required anymore */
 lv_binfont_destroy(my_font);
 ```
+
+## Dynamic Glyph Loading
+
+### Overview
+
+By default `lv_binfont_create()` reads the whole font into RAM, glyph bitmaps included. For a
+large font the bitmaps are by far the biggest part of it.
+
+<ApiLink name="lv_binfont_create_ex" /> can load the same font with `dynamic_glyph_load` set,
+in which case only the glyph descriptors, the character maps and the kerning data are kept in
+RAM. The glyph bitmaps stay in the font file and are read when a glyph is actually drawn, into
+a scratch buffer that is only as large as the biggest glyph of the font. Depending on the font
+this typically cuts the RAM usage by an order of magnitude.
+
+This is decided per font, so a font that is drawn constantly can be loaded normally while a
+rarely used one is loaded dynamically. It works with both plain and compressed fonts.
+
+<Callout type="tip">
+The font file is kept open for as long as the font is alive. `lv_binfont_destroy()` closes it. 
+</Callout>
+
+<Callout type="warn">
+Every drawn glyph costs a seek and a read in the font file, so the file system should be reasonably fast. 
+</Callout>
+
+This is how you can use it in practice:
+
+```c
+const lv_binfont_dsc_t dsc = {
+    .path = "A:/path/to/my_font.bin",
+    .dynamic_glyph_load = true,
+};
+
+lv_font_t * my_font = lv_binfont_create_ex(&dsc);
+if(my_font == NULL) return;
+
+/* Use the font */
+
+/* Free the font and close the font file */
+lv_binfont_destroy(my_font);
+```
+
+The same works when loading from memory, by setting `buffer` and `buffer_size` instead of
+`path`, and when a font is registered in the [font manager](/main-modules/fonts/font_manager),
+by setting `dynamic_glyph_load` in `lv_binfont_font_src_t`.

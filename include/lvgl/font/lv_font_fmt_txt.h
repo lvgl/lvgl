@@ -24,6 +24,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct _lv_font_fmt_txt_glyph_loader_t lv_font_fmt_txt_glyph_loader_t;
+
 /** This describes a glyph.*/
 typedef struct {
 #if LV_FONT_FMT_TXT_LARGE == 0
@@ -149,7 +151,10 @@ typedef enum {
 
 /** Describe store for additional data for fonts */
 typedef struct {
-    /** The bitmaps of all glyphs */
+
+    /** The bitmaps of all glyphs or a lv_font_fmt_txt_glyph_loader_t *
+     * depending on the state of `are_glyphs_dynamic_loaded`
+     * a uint8_t to preserve backwards compatibility */
     const uint8_t * glyph_bitmap;
 
     /** Describe the glyphs */
@@ -191,6 +196,14 @@ typedef struct {
      * 4, 8, 16, 32, 64: each line is padded to the given byte boundaries
      */
     uint8_t stride;
+
+    /**
+     * `false`: the glyph bitmaps are stored in `glyph_bitmap`
+     *
+     * `true`: the glyph bitmaps are loaded on demand and `glyph_bitmap` holds a
+     * `lv_font_fmt_txt_glyph_loader_t *` instead
+     */
+    bool are_glyphs_dynamic_loaded;
 } lv_font_fmt_txt_dsc_t;
 
 typedef struct {

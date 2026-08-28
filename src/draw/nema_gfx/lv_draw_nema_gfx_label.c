@@ -827,7 +827,10 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
             g.req_raw_bitmap = 1;
             if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
                 lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-                if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+                if(fdsc->are_glyphs_dynamic_loaded) {
+                    g.req_raw_bitmap = 0;
+                }
+                else if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
                     is_raw_bitmap = true;
                 }
             }
