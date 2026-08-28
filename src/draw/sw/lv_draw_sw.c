@@ -104,6 +104,7 @@ void lv_draw_sw_init(void)
         lv_draw_sw_thread_dsc_t * thread_dsc = &draw_sw_unit->thread_dscs[i];
         thread_dsc->idx = i;
         thread_dsc->draw_unit = (void *) draw_sw_unit;
+        lv_thread_sync_init(&thread_dsc->sync);
         lv_thread_init(&thread_dsc->thread, "swdraw", LV_DRAW_THREAD_PRIO, render_thread_cb,
                        LV_DRAW_THREAD_STACK_SIZE, thread_dsc);
     }
@@ -144,10 +145,9 @@ static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
         LV_LOG_INFO("cancel software rendering thread");
         thread_dsc->exit_status = true;
 
-        if(thread_dsc->inited) {
-            lv_thread_sync_signal(&thread_dsc->sync);
-        }
+        lv_thread_sync_signal(&thread_dsc->sync);
         lv_thread_delete(&thread_dsc->thread);
+        lv_thread_sync_delete(&thread_dsc->sync);
     }
 
     return 0;
@@ -311,7 +311,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         thread_dsc->task_act = t;
 
         /*Let the render thread work*/
-        if(thread_dsc->inited) lv_thread_sync_signal(&thread_dsc->sync);
+        lv_thread_sync_signal(&thread_dsc->sync);
     }
 
     LV_PROFILER_DRAW_END;
@@ -360,8 +360,6 @@ static void render_thread_cb(void * ptr)
 {
     lv_draw_sw_thread_dsc_t * thread_dsc = ptr;
 
-    lv_thread_sync_init(&thread_dsc->sync);
-    thread_dsc->inited = true;
 
     while(1) {
         while(thread_dsc->task_act == NULL) {
@@ -388,8 +386,6 @@ static void render_thread_cb(void * ptr)
 
     }
 
-    thread_dsc->inited = false;
-    lv_thread_sync_delete(&thread_dsc->sync);
     LV_LOG_INFO("exit software rendering thread");
 }
 #endif

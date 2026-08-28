@@ -37,7 +37,6 @@ typedef struct {
     lv_thread_sync_t sync;
     lv_draw_unit_t * draw_unit;
     uint32_t idx;
-    volatile bool inited;
     volatile bool exit_status;
 } lv_draw_sw_thread_dsc_t;
 
