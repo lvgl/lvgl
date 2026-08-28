@@ -32,9 +32,10 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_task_t * task_act;
+    lv_draw_task_t * volatile task_act;
     lv_thread_t thread;
-    lv_thread_sync_t sync;
+    lv_thread_sync_t new_task_sync;
+    lv_thread_sync_t task_done_sync;
     lv_draw_unit_t * draw_unit;
     uint32_t idx;
     volatile bool exit_status;
