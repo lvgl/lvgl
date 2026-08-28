@@ -23,15 +23,18 @@
 #define TEST_VIDEO_COLOR_TOLERANCE 8
 
 static uint32_t event_cnt[LV_GSTREAMER_STREAM_STATE_END + 1];
+static lv_color_format_t original_color_format;
 
 void setUp(void)
 {
     lv_memzero(event_cnt, sizeof(event_cnt));
+    original_color_format = lv_display_get_color_format(lv_display_get_default());
 }
 
 void tearDown(void)
 {
     lv_obj_clean(lv_screen_active());
+    lv_display_set_color_format(lv_display_get_default(), original_color_format);
 }
 
 static void stream_event_cb(lv_event_t * e)
@@ -64,6 +67,32 @@ static bool pump_until(const uint32_t * counter, uint32_t target, uint32_t timeo
     }
     lv_refr_now(NULL);
     return *counter >= target;
+}
+
+static void assert_frame_is_video_color(const lv_image_dsc_t * frame)
+{
+    const uint8_t * px = frame->data + frame->header.stride * (TEST_VIDEO_SIZE / 2);
+
+    switch(frame->header.cf) {
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            px += (TEST_VIDEO_SIZE / 2) * 4;
+            TEST_ASSERT_INT_WITHIN(TEST_VIDEO_COLOR_TOLERANCE, TEST_VIDEO_B, px[0]);
+            TEST_ASSERT_INT_WITHIN(TEST_VIDEO_COLOR_TOLERANCE, TEST_VIDEO_G, px[1]);
+            TEST_ASSERT_INT_WITHIN(TEST_VIDEO_COLOR_TOLERANCE, TEST_VIDEO_R, px[2]);
+            break;
+        case LV_COLOR_FORMAT_RGB565: {
+                px += (TEST_VIDEO_SIZE / 2) * 2;
+                uint16_t color;
+                lv_memcpy(&color, px, sizeof(color));
+                TEST_ASSERT_INT_WITHIN(1, TEST_VIDEO_R >> 3, (color >> 11) & 0x1f);
+                TEST_ASSERT_INT_WITHIN(1, TEST_VIDEO_G >> 2, (color >> 5) & 0x3f);
+                TEST_ASSERT_INT_WITHIN(1, TEST_VIDEO_B >> 3, color & 0x1f);
+                break;
+            }
+        default:
+            TEST_FAIL_MESSAGE("frame decoded into an unexpected color format");
+    }
 }
 
 static lv_obj_t * create_player(void)
@@ -164,17 +193,10 @@ void test_gstreamer_file_playback(void)
     TEST_ASSERT_EQUAL(TEST_VIDEO_SIZE, lv_obj_get_height(player));
     TEST_ASSERT_EQUAL(TEST_VIDEO_DURATION, lv_gstreamer_get_duration(player));
 
-    /* The decoded frame is handed to the image widget in the display's color
-     * format, checking it directly keeps the test renderer independent */
     const lv_image_dsc_t * frame = lv_image_get_src(player);
     TEST_ASSERT_NOT_NULL(frame);
-    const uint8_t * px = frame->data + frame->header.stride * (TEST_VIDEO_SIZE / 2);
-#if LV_COLOR_DEPTH == 32
-    px += (TEST_VIDEO_SIZE / 2) * 4;
-    TEST_ASSERT_INT_WITHIN(TEST_VIDEO_COLOR_TOLERANCE, TEST_VIDEO_B, px[0]);
-    TEST_ASSERT_INT_WITHIN(TEST_VIDEO_COLOR_TOLERANCE, TEST_VIDEO_G, px[1]);
-    TEST_ASSERT_INT_WITHIN(TEST_VIDEO_COLOR_TOLERANCE, TEST_VIDEO_R, px[2]);
-#endif
+    TEST_ASSERT_EQUAL(lv_display_get_color_format(lv_display_get_default()), frame->header.cf);
+    assert_frame_is_video_color(frame);
 
     lv_gstreamer_pause(player);
     uint32_t paused_at = lv_gstreamer_get_position(player);
@@ -190,6 +212,30 @@ void test_gstreamer_file_playback(void)
 
     lv_gstreamer_play(player);
     TEST_ASSERT_TRUE(pump_until(&event_cnt[LV_GSTREAMER_STREAM_STATE_END], 1, 3000));
+}
+
+void test_gstreamer_follows_display_color_format(void)
+{
+#if LV_USE_DRAW_NANOVG
+    TEST_IGNORE_MESSAGE("The NanoVG headless test display only supports XRGB8888/ARGB8888");
+#else
+    /* Restored by tearDown() */
+    lv_display_set_color_format(lv_display_get_default(), LV_COLOR_FORMAT_RGB565);
+
+    lv_obj_t * player = create_player();
+    TEST_ASSERT_EQUAL(LV_RESULT_OK,
+                      lv_gstreamer_set_src(player, LV_GSTREAMER_FACTORY_FILE, LV_GSTREAMER_PROPERTY_FILE, TEST_VIDEO_PATH));
+
+    lv_gstreamer_play(player);
+    TEST_ASSERT_TRUE(pump_until(&event_cnt[LV_GSTREAMER_STREAM_STATE_START], 1, 3000));
+
+    const lv_image_dsc_t * frame = lv_image_get_src(player);
+    TEST_ASSERT_NOT_NULL(frame);
+    TEST_ASSERT_EQUAL(LV_COLOR_FORMAT_RGB565, frame->header.cf);
+    TEST_ASSERT_EQUAL(lv_draw_buf_width_to_stride(TEST_VIDEO_SIZE, LV_COLOR_FORMAT_RGB565), frame->header.stride);
+    /* The pipeline really produced RGB16, the frame is not just labelled as such */
+    assert_frame_is_video_color(frame);
+#endif
 }
 
 void test_gstreamer_delete_while_playing(void)
@@ -218,6 +264,7 @@ void test_gstreamer_stream_state_of_invalid_event(void) { }
 void test_gstreamer_missing_file(void) { }
 void test_gstreamer_videotestsrc(void) { }
 void test_gstreamer_file_playback(void) { }
+void test_gstreamer_follows_display_color_format(void) { }
 void test_gstreamer_delete_while_playing(void) { }
 
 #endif /* LV_USE_GSTREAMER */

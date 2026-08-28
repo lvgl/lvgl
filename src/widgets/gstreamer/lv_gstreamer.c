@@ -34,6 +34,11 @@ typedef struct {
     GstElement ** store;
 } lv_gstreamer_pipeline_element_t;
 
+typedef struct {
+    lv_color_format_t color_format;
+    const char * gst_format;
+} lv_gstreamer_format_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -53,11 +58,22 @@ static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
                                                       const lv_gstreamer_pipeline_element_t * elements, size_t element_count);
 static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state);
 static bool gstreamer_element_has_property(GstElement * element, const char * property_name);
+static const char * gstreamer_get_gst_format(lv_color_format_t color_format);
+static lv_color_format_t gstreamer_resolve_color_format(lv_obj_t * obj);
 static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static const lv_gstreamer_format_t gstreamer_formats[] = {
+    {LV_COLOR_FORMAT_RGB565,   "RGB16"},
+    {LV_COLOR_FORMAT_RGB888,   "BGR"},
+    {LV_COLOR_FORMAT_XRGB8888, "BGRx"},
+    {LV_COLOR_FORMAT_ARGB8888, "BGRA"},
+};
+
+#define GSTREAMER_FALLBACK_COLOR_FORMAT LV_COLOR_FORMAT_ARGB8888
 
 const lv_obj_class_t lv_gstreamer_class = {
     .constructor_cb = lv_gstreamer_constructor,
@@ -72,19 +88,6 @@ const lv_obj_class_t lv_gstreamer_class = {
 /**********************
  *      MACROS
  **********************/
-
-#if LV_COLOR_DEPTH == 16
-    #define GST_FORMAT   "RGB16"
-    #define IMAGE_FORMAT LV_COLOR_FORMAT_RGB565
-#elif LV_COLOR_DEPTH == 24
-    #define GST_FORMAT   "BGR"
-    #define IMAGE_FORMAT LV_COLOR_FORMAT_RGB888
-#elif LV_COLOR_DEPTH == 32
-    #define GST_FORMAT   "BGRA"
-    #define IMAGE_FORMAT LV_COLOR_FORMAT_ARGB8888
-#else
-    #error Unsupported LV_COLOR_DEPTH
-#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -191,6 +194,8 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
      * i.e one pad for audio and one for video
      * We add a callback so that we automatically connect to the data once it's figured out*/
     g_signal_connect(head, "pad-added", G_CALLBACK(on_decode_pad_added), streamer);
+
+    streamer->color_format = gstreamer_resolve_color_format(obj);
 
     streamer->pipeline = pipeline;
     return LV_RESULT_OK;
@@ -412,6 +417,7 @@ static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     LV_TRACE_OBJ_CREATE("begin");
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
     lv_memzero(&streamer->frame, sizeof(streamer->frame));
+    streamer->color_format = GSTREAMER_FALLBACK_COLOR_FORMAT;
 
     streamer->gstreamer_timer = lv_timer_create(gstreamer_timer_cb, LV_DEF_REFR_PERIOD / 5, streamer);
     LV_ASSERT(streamer->gstreamer_timer != NULL);
@@ -530,7 +536,7 @@ static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample,
     const uint32_t src_stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0);
 
     const bool aligned = (lv_uintptr_t)map->data % LV_DRAW_BUF_ALIGN == 0
-                         && src_stride == lv_draw_buf_width_to_stride(w, IMAGE_FORMAT);
+                         && src_stride == lv_draw_buf_width_to_stride(w, streamer->color_format);
 
     gstreamer_release_frame(streamer);
 
@@ -554,7 +560,7 @@ static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample,
         .data_size = aligned ? map->size : copy->data_size,
         .header = {
             .magic = LV_IMAGE_HEADER_MAGIC,
-            .cf = IMAGE_FORMAT,
+            .cf = streamer->color_format,
             .flags = LV_IMAGE_FLAGS_MODIFIABLE,
             .h = h,
             .w = w,
@@ -575,7 +581,7 @@ static bool gstreamer_copy_to_aligned_frame(lv_gstreamer_t * streamer, const Gst
     }
 
     if(!dest) {
-        dest = lv_draw_buf_create(w, h, IMAGE_FORMAT, LV_STRIDE_AUTO);
+        dest = lv_draw_buf_create(w, h, streamer->color_format, LV_STRIDE_AUTO);
         if(!dest) {
             LV_LOG_ERROR("Failed to allocate an aligned %" LV_PRIu32 "x%" LV_PRIu32 " frame", w, h);
             return false;
@@ -666,6 +672,34 @@ static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
     return LV_RESULT_OK;
 }
 
+static const char * gstreamer_get_gst_format(lv_color_format_t color_format)
+{
+    for(size_t i = 0; i < sizeof(gstreamer_formats) / sizeof(gstreamer_formats[0]); ++i) {
+        if(gstreamer_formats[i].color_format == color_format) {
+            return gstreamer_formats[i].gst_format;
+        }
+    }
+    return NULL;
+}
+
+static lv_color_format_t gstreamer_resolve_color_format(lv_obj_t * obj)
+{
+    LV_ASSERT(obj != NULL);
+    lv_display_t * display = lv_obj_get_display(obj);
+    if(!display) {
+        LV_LOG_WARN("Widget is on no display, decoding to the fallback color format");
+        return GSTREAMER_FALLBACK_COLOR_FORMAT;
+    }
+
+    const lv_color_format_t color_format = lv_display_get_color_format(display);
+    if(!gstreamer_get_gst_format(color_format)) {
+        LV_LOG_INFO("No GStreamer equivalent for color format %d, decoding to the fallback one", (int)color_format);
+        return GSTREAMER_FALLBACK_COLOR_FORMAT;
+    }
+
+    return color_format;
+}
+
 static bool gstreamer_element_has_property(GstElement * element, const char * property_name)
 {
     LV_ASSERT(element != NULL);
@@ -739,7 +773,8 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
              * convert the image to the format we desire*/
             uint32_t target_fps = 1000 / LV_DEF_REFR_PERIOD;
             char caps_str[128];
-            lv_snprintf(caps_str, sizeof(caps_str), "video/x-raw,format=%s,framerate=%" LV_PRIu32 "/1", GST_FORMAT, target_fps);
+            lv_snprintf(caps_str, sizeof(caps_str), "video/x-raw,format=%s,framerate=%" LV_PRIu32 "/1",
+                        gstreamer_get_gst_format(streamer->color_format), target_fps);
 
             GstCaps * appsink_caps = gst_caps_from_string(caps_str);
             g_object_set(G_OBJECT(video_app_sink), "emit-signals", TRUE, "sync", TRUE, "max-buffers", 1, "drop", TRUE, "caps",
