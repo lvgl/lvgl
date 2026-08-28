@@ -36,12 +36,6 @@ typedef struct {
     int32_t w;
     int32_t h;
     SDL_Texture * texture;
-    /*A freshly added cache node is a byte copy of the search key (see
-     *alloc_new_node() in lv_cache_lru_rb.c), so on entry `draw_dsc` still points
-     *at the *draw task's* dsc, which is an interior pointer into the task
-     *allocation (lv_draw.c: t->draw_dsc = (uint8_t *)t + sizeof(...)) and must
-     *never be freed. Only draw_to_texture() replacing it with its own lv_malloc
-     *copy makes it ours to free.*/
     bool dsc_owned;
 } cache_data_t;
 
@@ -190,16 +184,6 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
-    /*Claim only what execute_drawing()/draw_to_texture() can render. Claiming
-     *anything else makes the texture cache's create_cb fail, and
-     *lv_cache_acquire_or_create() then calls free_cb on a node whose draw_dsc is
-     *still the task's own (never heap-allocated) dsc -- a wild free that trips
-     *the TLSF integrity assert and, with LV_ASSERT_HANDLER as a spin, hangs the
-     *UI thread. LV_DRAW_TASK_TYPE_MASK_RECTANGLE reaches this from lv_refr.c's
-     *clip_corner path, i.e. from every widget the default theme gives
-     *`clip_corner` to (dropdown list, msgbox, list, win, menu) and from lv_bar;
-     *LV_DRAW_TASK_TYPE_LETTER from lv_draw_character(). Both are left to the SW
-     *unit, which handles them.*/
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL:
         case LV_DRAW_TASK_TYPE_BORDER:
@@ -350,13 +334,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
                 break;
             }
         default:
-            /*Unreachable as long as evaluate() only claims the types above, but
-             *keep the exit clean: the SEND_DRAW_TASK_EVENTS flag cleared above
-             *would otherwise stay off on this object forever.*/
-            if(obj) {
-                lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
-            }
-            return false;
+            LV_UNREACHABLE();
     }
 
     while(dest_layer.draw_task_head) {

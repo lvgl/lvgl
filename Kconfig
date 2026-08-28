@@ -1109,6 +1109,7 @@ endmenu
 menu "SDL"
 config LV_USE_DRAW_SDL
 	bool "SDL renderer"
+	select LV_USE_DRAW_SW
 	default n
 	help
 		Render with the SDL renderer API, caching widgets and images as SDL textures.

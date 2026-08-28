@@ -611,7 +611,10 @@
 
 #endif /*LV_USE_DRAW_OPENGLES*/
 
-/** Render with the SDL renderer API, caching widgets and images as SDL textures. */
+/** Render with the SDL renderer API, caching widgets and images as SDL textures.
+ *
+ *  Enable: LV_USE_DRAW_SW
+ */
 #define LV_USE_DRAW_SDL 0
 
 
