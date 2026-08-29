@@ -304,15 +304,40 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
              *expanded foreground once and blend each pixel with a single multiplication:
              *result = (fg * mix + bg * (32 - mix)) >> 5
              *It's branch-free, so the compiler can also vectorize it.*/
-            uint32_t mix = ((uint32_t)opa + 4) >> 3;
-            uint32_t mix_inv = 32 - mix;
-            uint32_t fg_premult = (((uint32_t)color16 | ((uint32_t)color16 << 16)) & 0x7E0F81F) * mix;
+            /*v9.5's structure: the result of the last background pair is cached, because real
+             *UIs are full of flat areas where neighboring pixels are identical, so two pixels are
+             *often written with a single 32 bit store. Only the mix itself is now inlined.*/
+            uint32_t last_dest32_color = dest_buf_u16[0] + 1; /*Anything but the first pixel*/
+            uint32_t last_res32_color = 0;
 
             for(y = 0; y < h; y++) {
-                for(x = 0; x < w; x++) {
-                    uint32_t bg = ((uint32_t)dest_buf_u16[x] | ((uint32_t)dest_buf_u16[x] << 16)) & 0x7E0F81F;
-                    uint32_t res = ((fg_premult + bg * mix_inv) >> 5) & 0x7E0F81F;
-                    dest_buf_u16[x] = (uint16_t)(res | (res >> 16));
+                x = 0;
+                if((lv_uintptr_t)&dest_buf_u16[0] & 0x3) {
+                    dest_buf_u16[0] = lv_color_16_16_mix(color16, dest_buf_u16[0], opa);
+                    x = 1;
+                }
+
+                for(; x < w - 2; x += 2) {
+                    if(dest_buf_u16[x] != dest_buf_u16[x + 1]) {
+                        dest_buf_u16[x + 0] = lv_color_16_16_mix(color16, dest_buf_u16[x + 0], opa);
+                        dest_buf_u16[x + 1] = lv_color_16_16_mix(color16, dest_buf_u16[x + 1], opa);
+                    }
+                    else {
+                        volatile uint32_t * dest32 = (uint32_t *)&dest_buf_u16[x];
+                        if(last_dest32_color == *dest32) {
+                            *dest32 = last_res32_color;
+                        }
+                        else {
+                            last_dest32_color = *dest32;
+                            dest_buf_u16[x] = lv_color_16_16_mix(color16, dest_buf_u16[x + 0], opa);
+                            dest_buf_u16[x + 1] = dest_buf_u16[x];
+                            last_res32_color = *dest32;
+                        }
+                    }
+                }
+
+                for(; x < w ; x++) {
+                    dest_buf_u16[x] = lv_color_16_16_mix(color16, dest_buf_u16[x], opa);
                 }
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
             }

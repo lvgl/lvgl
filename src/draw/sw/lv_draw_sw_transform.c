@@ -316,6 +316,115 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
  *   STATIC FUNCTIONS
  **********************/
 
+/**
+ * `(32 << 8) / alpha_sum` for every possible alpha sum, so the alpha weighted color
+ * interpolation can normalize without a division. Most MCU cores, Xtensa included, have no
+ * integer divide instruction, so a 514 byte table is far cheaper than the division it replaces.
+ */
+static const uint16_t transform_norm_inv[257] = {
+    0, 8192, 4096, 2730, 2048, 1638, 1365, 1170, 1024, 910, 819, 744, 682, 630, 585, 546, 512, 481, 455,
+    431, 409, 390, 372, 356, 341, 327, 315, 303, 292, 282, 273, 264, 256, 248, 240, 234, 227, 221, 215,
+    210, 204, 199, 195, 190, 186, 182, 178, 174, 170, 167, 163, 160, 157, 154, 151, 148, 146, 143, 141,
+    138, 136, 134, 132, 130, 128, 126, 124, 122, 120, 118, 117, 115, 113, 112, 110, 109, 107, 106, 105,
+    103, 102, 101, 99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 81, 80,
+    79, 78, 78, 77, 76, 75, 75, 74, 73, 73, 72, 71, 71, 70, 70, 69, 68, 68, 67, 67, 66, 66, 65, 65, 64,
+    64, 63, 63, 62, 62, 61, 61, 60, 60, 59, 59, 58, 58, 58, 57, 57, 56, 56, 56, 55, 55, 54, 54, 54, 53,
+    53, 53, 52, 52, 52, 51, 51, 51, 50, 50, 50, 49, 49, 49, 49, 48, 48, 48, 47, 47, 47, 47, 46, 46, 46,
+    46, 45, 45, 45, 45, 44, 44, 44, 44, 43, 43, 43, 43, 42, 42, 42, 42, 42, 41, 41, 41, 41, 40, 40, 40,
+    40, 40, 39, 39, 39, 39, 39, 39, 38, 38, 38, 38, 38, 37, 37, 37, 37, 37, 37, 36, 36, 36, 36, 36, 36,
+    35, 35, 35, 35, 35, 35, 35, 34, 34, 34, 34, 34, 34, 33, 33, 33, 33, 33, 33, 33, 33, 32, 32, 32, 32,
+    32, 32, 32, 32
+};
+
+/**
+ * Fold the bilinear weights of a 2x2 neighborhood together with its alphas.
+ * Used where color and alpha live in separate planes (RGB565A8, AL88): the color has to be
+ * weighted with alpha so a transparent neighbor cannot bleed its color in, then normalized
+ * back, because the consumer expects a straight and not a premultiplied color.
+ * @param a00..a11  the four alphas, 0..255
+ * @param fx        weight of the right column, 0..255
+ * @param fy        weight of the bottom row, 0..255
+ * @param t         out: the four normalized 5 bit color weights, adding up to at most 32
+ * @return          the interpolated alpha, 0..255
+ */
+static inline uint32_t LV_ATTRIBUTE_FAST_MEM transform_alpha_weights(uint32_t a00, uint32_t a01,
+                                                                     uint32_t a10, uint32_t a11,
+                                                                     uint32_t fx, uint32_t fy, uint32_t * t)
+{
+    uint32_t ifx = 256 - fx;
+    uint32_t ify = 256 - fy;
+
+    /*Scale each alpha to 0..256 so an opaque neighbor keeps its full weight*/
+    uint32_t u00 = (((ifx * ify) >> 8) * (a00 + (a00 >> 7))) >> 8;
+    uint32_t u01 = (((fx * ify) >> 8) * (a01 + (a01 >> 7))) >> 8;
+    uint32_t u10 = (((ifx * fy) >> 8) * (a10 + (a10 >> 7))) >> 8;
+    uint32_t u11 = (((fx * fy) >> 8) * (a11 + (a11 >> 7))) >> 8;
+
+    uint32_t sum = u00 + u01 + u10 + u11;
+    if(sum == 0) {
+        t[0] = t[1] = t[2] = t[3] = 0;
+        return 0;
+    }
+
+    uint32_t inv = transform_norm_inv[sum];
+    t[0] = (u00 * inv) >> 8;
+    t[1] = (u01 * inv) >> 8;
+    t[2] = (u10 * inv) >> 8;
+    t[3] = (u11 * inv) >> 8;
+
+    return sum > 255 ? 255 : sum;
+}
+
+/**
+ * Premultiply an ARGB8888 pixel. The red/blue lanes and the green lane are scaled with one
+ * multiplication each. Alpha is scaled to 0..256 first so an opaque pixel comes back unchanged.
+ */
+static inline uint32_t LV_ATTRIBUTE_FAST_MEM argb8888_premul(uint32_t p)
+{
+    uint32_t a = p >> 24;
+    uint32_t a256 = a + (a >> 7);
+    uint32_t rb = (((p & 0x00FF00FF) * a256) >> 8) & 0x00FF00FF;
+    uint32_t g = (((p & 0x0000FF00) * a256) >> 8) & 0x0000FF00;
+    return rb | g | (a << 24);
+}
+
+/**
+ * Bilinear filtering of a 2x2 ARGB8888 neighborhood, computed in premultiplied alpha space.
+ * That is the only space where bilinear filtering of an image with an alpha channel is correct:
+ * a transparent neighbor carries no color weight, so it cannot bleed into the result and no
+ * special case is needed for it. The kernel is therefore fully branchless.
+ *
+ * Each neighbor's bilinear weight is folded into its alpha up front, which spares a separate
+ * interpolation of the alpha channel and keeps the packed sums in range: the four weights add
+ * up to 256 and every alpha is at most 255, so no 16 bit lane can overflow.
+ * @return          the filtered pixel, premultiplied
+ */
+static inline uint32_t LV_ATTRIBUTE_FAST_MEM argb8888_bilinear_premul(uint32_t p00, uint32_t p01,
+                                                                      uint32_t p10, uint32_t p11,
+                                                                      uint32_t fx, uint32_t fy)
+{
+    uint32_t ifx = 256 - fx;
+    uint32_t ify = 256 - fy;
+
+    uint32_t a00 = p00 >> 24, a01 = p01 >> 24, a10 = p10 >> 24, a11 = p11 >> 24;
+    uint32_t u00 = (((ifx * ify) >> 8) * (a00 + (a00 >> 7))) >> 8;
+    uint32_t u01 = (((fx * ify) >> 8) * (a01 + (a01 >> 7))) >> 8;
+    uint32_t u10 = (((ifx * fy) >> 8) * (a10 + (a10 >> 7))) >> 8;
+    uint32_t u11 = (((fx * fy) >> 8) * (a11 + (a11 >> 7))) >> 8;
+
+    uint32_t rb = (p00 & 0x00FF00FF) * u00 + (p01 & 0x00FF00FF) * u01
+                  + (p10 & 0x00FF00FF) * u10 + (p11 & 0x00FF00FF) * u11;
+    uint32_t g = (p00 & 0x0000FF00) * u00 + (p01 & 0x0000FF00) * u01
+                 + (p10 & 0x0000FF00) * u10 + (p11 & 0x0000FF00) * u11;
+
+    /*In premultiplied space the resulting alpha is just the sum of the folded weights*/
+    uint32_t a = u00 + u01 + u10 + u11;
+    if(a > 255) a = 255;
+
+    return ((rb >> 8) & 0x00FF00FF) | ((g >> 8) & 0x0000FF00) | (a << 24);
+}
+
+
 #if LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888
 
 static void rgb888_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
@@ -506,58 +615,6 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
 
-/**
- * The direction based anti-aliasing of one ARGB8888 pixel whose neighbors are surely valid.
- * It's used instead of bilinear interpolation when some involved pixels are not opaque
- * to avoid bleeding in the color of transparent pixels.
- */
-static inline lv_color32_t argb8888_px_aa_inside(const lv_color32_t * src_px, int32_t src_stride,
-                                                 int32_t xs_fract_raw, int32_t ys_fract_raw)
-{
-    int32_t x_next;
-    int32_t y_next;
-    int32_t xs_fract;
-    int32_t ys_fract;
-    if(xs_fract_raw < 0x80) {
-        x_next = -1;
-        xs_fract = 0x7F - xs_fract_raw;
-    }
-    else {
-        x_next = 1;
-        xs_fract = xs_fract_raw - 0x80;
-    }
-    if(ys_fract_raw < 0x80) {
-        y_next = -1;
-        ys_fract = 0x7F - ys_fract_raw;
-    }
-    else {
-        y_next = 1;
-        ys_fract = ys_fract_raw - 0x80;
-    }
-
-    lv_color32_t d = src_px[0];
-    lv_color32_t px_hor = src_px[x_next];
-    lv_color32_t px_ver = *(const lv_color32_t *)((const uint8_t *)src_px + y_next * src_stride);
-
-    if(px_ver.alpha == 0) {
-        d.alpha = (d.alpha * (0xFF - ys_fract)) >> 8;
-    }
-    else if(!lv_color32_eq(d, px_ver)) {
-        if(d.alpha) d.alpha = ((px_ver.alpha * ys_fract) + (d.alpha * (0xFF - ys_fract))) >> 8;
-        px_ver.alpha = ys_fract;
-        d = lv_color_mix32_inlined(px_ver, d);
-    }
-
-    if(px_hor.alpha == 0) {
-        d.alpha = (d.alpha * (0xFF - xs_fract)) >> 8;
-    }
-    else if(!lv_color32_eq(d, px_hor)) {
-        if(d.alpha) d.alpha = ((px_hor.alpha * xs_fract) + (d.alpha * (0xFF - xs_fract))) >> 8;
-        px_hor.alpha = xs_fract;
-        d = lv_color_mix32_inlined(px_hor, d);
-    }
-    return d;
-}
 
 static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                  int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
@@ -580,70 +637,29 @@ static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src
             continue;
         }
 
-        /*Get the direction the hor and ver neighbor
-         *`fract` will be in range of 0x00..0xFF and `next` (+/-1) indicates the direction*/
-        int32_t xs_fract = xs_ups & 0xFF;
-        int32_t ys_fract = ys_ups & 0xFF;
-
-        int32_t x_next;
-        int32_t y_next;
-        if(xs_fract < 0x80) {
-            x_next = -1;
-            xs_fract = 0x7F - xs_fract;
-        }
-        else {
-            x_next = 1;
-            xs_fract = xs_fract - 0x80;
-        }
-        if(ys_fract < 0x80) {
-            y_next = -1;
-            ys_fract = 0x7F - ys_fract;
-        }
-        else {
-            y_next = 1;
-            ys_fract = ys_fract - 0x80;
+        if(!aa) {
+            *(uint32_t *)&dest_c32[x] = *(const uint32_t *)(src + ys_int * src_stride + xs_int * 4);
+            continue;
         }
 
-        const lv_color32_t * src_c32 = (const lv_color32_t *)(src + ys_int * src_stride + xs_int * 4);
-
-        dest_c32[x] = src_c32[0];
-
-        if(aa &&
-           xs_int + x_next >= 0 &&
-           xs_int + x_next <= src_w - 1 &&
-           ys_int + y_next >= 0 &&
-           ys_int + y_next <= src_h - 1) {
-
-            lv_color32_t px_hor = src_c32[x_next];
-            lv_color32_t px_ver = *(const lv_color32_t *)((uint8_t *)src_c32 + y_next * src_stride);
-
-            if(px_ver.alpha == 0) {
-                dest_c32[x].alpha = (dest_c32[x].alpha * (0xFF - ys_fract)) >> 8;
-            }
-            else if(!lv_color32_eq(dest_c32[x], px_ver)) {
-                if(dest_c32[x].alpha) dest_c32[x].alpha = ((px_ver.alpha * ys_fract) + (dest_c32[x].alpha * (0xFF - ys_fract))) >> 8;
-                px_ver.alpha = ys_fract;
-                dest_c32[x] = lv_color_mix32_inlined(px_ver, dest_c32[x]);
-            }
-
-            if(px_hor.alpha == 0) {
-                dest_c32[x].alpha = (dest_c32[x].alpha * (0xFF - xs_fract)) >> 8;
-            }
-            else if(!lv_color32_eq(dest_c32[x], px_hor)) {
-                if(dest_c32[x].alpha) dest_c32[x].alpha = ((px_hor.alpha * xs_fract) + (dest_c32[x].alpha * (0xFF - xs_fract))) >> 8;
-                px_hor.alpha = xs_fract;
-                dest_c32[x] = lv_color_mix32_inlined(px_hor, dest_c32[x]);
+        /*Sample the 2x2 neighborhood. Taps outside the image count as fully transparent,
+         *so the edge fades out on its own and needs no dedicated handling.*/
+        int32_t xs_ofs = xs_ups - 0x80;
+        int32_t ys_ofs = ys_ups - 0x80;
+        int32_t x0 = xs_ofs >> 8;
+        int32_t y0 = ys_ofs >> 8;
+        uint32_t p[4] = {0, 0, 0, 0};
+        int32_t i;
+        for(i = 0; i < 4; i++) {
+            int32_t sx = x0 + (i & 1);
+            int32_t sy = y0 + (i >> 1);
+            if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
+                p[i] = *(const uint32_t *)(src + sy * src_stride + sx * 4);
             }
         }
-        /*Partially out of the image*/
-        else {
-            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))  {
-                dest_c32[x].alpha = (dest_c32[x].alpha * (0x7F - xs_fract)) >> 7;
-            }
-            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
-                dest_c32[x].alpha = (dest_c32[x].alpha * (0x7F - ys_fract)) >> 7;
-            }
-        }
+
+        *(uint32_t *)&dest_c32[x] = argb8888_bilinear_premul(p[0], p[1], p[2], p[3],
+                                                             xs_ofs & 0xFF, ys_ofs & 0xFF);
     }
 }
 
@@ -667,7 +683,12 @@ static void argb8888_row_fast(const uint8_t * src, int32_t src_stride,
         uint32_t p10 = *(const uint32_t *)(p + src_stride);
         uint32_t p11 = *(const uint32_t *)(p + src_stride + 4);
 
-        if(((p00 & p01 & p10 & p11) >> 24) == 0xFF) {
+        if(p00 == p01 && p00 == p10 && p00 == p11) {
+            /*Flat neighborhood: the filter is the identity. Real UI images are mostly flat,
+             *so this fires often and predicts well.*/
+            *(uint32_t *)&dest_c32[x] = argb8888_premul(p00);
+        }
+        else if(((p00 & p01 & p10 & p11) >> 24) == 0xFF) {
             /*All the 4 neighbors are opaque: use true bilinear interpolation.
              *The red and blue channels are interpolated together in one 32 bit value
              *with a single multiplication each. The 16 bit lanes can't overflow
@@ -685,10 +706,10 @@ static void argb8888_row_fast(const uint8_t * src, int32_t src_stride,
             *(uint32_t *)&dest_c32[x] = rb | g | 0xFF000000;
         }
         else {
-            /*There are non opaque pixels involved: use the direction based mixing
-             *to avoid bleeding in the color of transparent pixels*/
-            const lv_color32_t * src_px = (const lv_color32_t *)(src + (ys_ups >> 8) * src_stride + (xs_ups >> 8) * 4);
-            dest_c32[x] = argb8888_px_aa_inside(src_px, src_stride, xs_ups & 0xFF, ys_ups & 0xFF);
+            /*Non opaque pixels are involved: filter in premultiplied space, where a
+             *transparent neighbor simply carries no weight*/
+            *(uint32_t *)&dest_c32[x] = argb8888_bilinear_premul(p00, p01, p10, p11,
+                                                                 xs_ups_ofs & 0xFF, ys_ups_ofs & 0xFF);
         }
     }
 }
@@ -872,57 +893,6 @@ static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w,
 
 #if LV_DRAW_SW_SUPPORT_RGB565A8
 
-/**
- * The direction based anti-aliasing of one RGB565(A8) pixel whose neighbors are surely valid.
- * It's used instead of bilinear interpolation when some involved pixels are not opaque
- * to avoid bleeding in the color of transparent pixels.
- */
-static inline void rgb565a8_px_aa_inside(const uint16_t * src_px, int32_t src_stride,
-                                         const lv_opa_t * alpha_px, int32_t alpha_stride,
-                                         int32_t xs_fract_raw, int32_t ys_fract_raw,
-                                         uint16_t * c_out, uint8_t * a_out)
-{
-    int32_t x_next;
-    int32_t y_next;
-    int32_t xs_fract;
-    int32_t ys_fract;
-    if(xs_fract_raw < 0x80) {
-        x_next = -1;
-        xs_fract = (0x7F - xs_fract_raw) * 2;
-    }
-    else {
-        x_next = 1;
-        xs_fract = (xs_fract_raw - 0x80) * 2;
-    }
-    if(ys_fract_raw < 0x80) {
-        y_next = -1;
-        ys_fract = (0x7F - ys_fract_raw) * 2;
-    }
-    else {
-        y_next = 1;
-        ys_fract = (ys_fract_raw - 0x80) * 2;
-    }
-
-    uint16_t c = src_px[0];
-
-    uint8_t a = alpha_px[0];
-    lv_opa_t a_hor = alpha_px[x_next];
-    lv_opa_t a_ver = alpha_px[y_next * alpha_stride];
-    if(a_ver != a) a_ver = ((a_ver * ys_fract) + (a * (0x100 - ys_fract))) >> 8;
-    if(a_hor != a) a_hor = ((a_hor * xs_fract) + (a * (0x100 - xs_fract))) >> 8;
-    a = (a_ver + a_hor) >> 1;
-    *a_out = a;
-    if(a == 0x00) return;
-
-    uint16_t px_hor = src_px[x_next];
-    uint16_t px_ver = *(const uint16_t *)((const uint8_t *)src_px + y_next * src_stride);
-    if(c != px_ver || c != px_hor) {
-        uint16_t v = lv_color_16_16_mix_inlined(px_ver, c, ys_fract);
-        uint16_t h = lv_color_16_16_mix_inlined(px_hor, c, xs_fract);
-        c = lv_color_16_16_mix_inlined(h, v, LV_OPA_50);
-    }
-    *c_out = c;
-}
 
 static void rgb565a8_row_fast(const uint8_t * src, int32_t src_stride,
                               const lv_opa_t * src_alpha, int32_t alpha_stride,
@@ -942,22 +912,49 @@ static void rgb565a8_row_fast(const uint8_t * src, int32_t src_stride,
         uint32_t fx = xs_ups_ofs & 0xFF;
         uint32_t fy = ys_ups_ofs & 0xFF;
 
+        uint32_t alpha_out = 0xFF;
         if(src_has_a8) {
             const lv_opa_t * pa = src_alpha + ys_int * alpha_stride + xs_int;
             uint32_t a00 = pa[0];
             uint32_t a01 = pa[1];
             uint32_t a10 = pa[alpha_stride];
             uint32_t a11 = pa[alpha_stride + 1];
-            if((a00 & a01 & a10 & a11) != 0xFF) {
-                /*There are non opaque pixels involved: use the direction based mixing
-                 *to avoid bleeding in the color of transparent pixels*/
-                rgb565a8_px_aa_inside((const uint16_t *)(src + (ys_ups >> 8) * src_stride) + (xs_ups >> 8),
-                                      src_stride, src_alpha + (ys_ups >> 8) * alpha_stride + (xs_ups >> 8), alpha_stride,
-                                      xs_ups & 0xFF, ys_ups & 0xFF, &cbuf[x], &abuf[x]);
+            if(a00 == a01 && a00 == a10 && a00 == a11) {
+                /*Uniform alpha: the weighting cancels out, so the plain interpolation below is
+                 *already exact. Covers opaque interiors and fully transparent areas alike.*/
+                alpha_out = a00;
+                if(a00 == 0) {
+                    abuf[x] = 0;
+                    cbuf[x] = 0;
+                    continue;
+                }
+            }
+            else {
+                /*Mixed alpha: weight the colors with their alpha so a transparent neighbor
+                 *cannot bleed its color in, then normalize back to a straight color*/
+                uint32_t t[4];
+                uint32_t a = transform_alpha_weights(a00, a01, a10, a11, fx, fy, t);
+                abuf[x] = (uint8_t)a;
+                if(a == 0) {
+                    cbuf[x] = 0;
+                    continue;
+                }
+                const uint16_t * pc = (const uint16_t *)(src + ys_int * src_stride) + xs_int;
+                const uint16_t * pc2 = (const uint16_t *)((const uint8_t *)pc + src_stride);
+                uint16_t s00 = pc[0];
+                uint16_t s01 = pc[1];
+                uint16_t s10 = pc2[0];
+                uint16_t s11 = pc2[1];
+                uint32_t w00 = (s00 | ((uint32_t)s00 << 16)) & 0x7E0F81F;
+                uint32_t w01 = (s01 | ((uint32_t)s01 << 16)) & 0x7E0F81F;
+                uint32_t w10 = (s10 | ((uint32_t)s10 << 16)) & 0x7E0F81F;
+                uint32_t w11 = (s11 | ((uint32_t)s11 << 16)) & 0x7E0F81F;
+                uint32_t acc = ((w00 * t[0] + w01 * t[1] + w10 * t[2] + w11 * t[3]) >> 5) & 0x7E0F81F;
+                cbuf[x] = (uint16_t)(acc | (acc >> 16));
                 continue;
             }
         }
-        abuf[x] = 0xFF;
+        abuf[x] = (uint8_t)alpha_out;
 
         /*All the 4 neighbors are opaque: use true bilinear interpolation.
          *The RGB565 colors are expanded to 32 bits (0x07E0F81F mask) so all channels
@@ -996,92 +993,49 @@ static void rgb565a8_row_checked(const uint8_t * src, int32_t src_w, int32_t src
 
         /*Fully out of the image*/
         if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+            cbuf[x] = 0;
             abuf[x] = 0x00;
             continue;
         }
 
-        /*Get the direction the hor and ver neighbor
-         *`fract` will be in range of 0x00..0xFF and `next` (+/-1) indicates the direction*/
-        int32_t xs_fract = xs_ups & 0xFF;
-        int32_t ys_fract = ys_ups & 0xFF;
-
-        int32_t x_next;
-        int32_t y_next;
-        if(xs_fract < 0x80) {
-            x_next = -1;
-            xs_fract = (0x7F - xs_fract) * 2;
-        }
-        else {
-            x_next = 1;
-            xs_fract = (xs_fract - 0x80) * 2;
-        }
-        if(ys_fract < 0x80) {
-            y_next = -1;
-            ys_fract = (0x7F - ys_fract) * 2;
-        }
-        else {
-            y_next = 1;
-            ys_fract = (ys_fract - 0x80) * 2;
+        if(!aa) {
+            uint16_t c = *(const uint16_t *)(src + ys_int * src_stride + xs_int * 2);
+            cbuf[x] = c;
+            abuf[x] = src_has_a8 ? src_alpha[ys_int * alpha_stride + xs_int] : 0xFF;
+            continue;
         }
 
-        const uint16_t * src_tmp_u16 = (const uint16_t *)(src + (ys_int * src_stride) + xs_int * 2);
-        cbuf[x] = src_tmp_u16[0];
+        /*Sample the 2x2 neighborhood. Taps outside the image count as fully transparent,
+         *so the edge fades out on its own and needs no dedicated handling.*/
+        int32_t xs_ofs = xs_ups - 0x80;
+        int32_t ys_ofs = ys_ups - 0x80;
+        int32_t x0 = xs_ofs >> 8;
+        int32_t y0 = ys_ofs >> 8;
 
-        if(aa &&
-           xs_int + x_next >= 0 &&
-           xs_int + x_next <= src_w - 1 &&
-           ys_int + y_next >= 0 &&
-           ys_int + y_next <= src_h - 1) {
-
-            uint16_t px_hor = src_tmp_u16[x_next];
-            uint16_t px_ver = *(const uint16_t *)((uint8_t *)src_tmp_u16 + (y_next * src_stride));
-
-            if(src_has_a8) {
-                const lv_opa_t * src_alpha_tmp = src_alpha;
-                src_alpha_tmp += (ys_int * alpha_stride) + xs_int;
-                abuf[x] = src_alpha_tmp[0];
-
-                lv_opa_t a_hor = src_alpha_tmp[x_next];
-                lv_opa_t a_ver = src_alpha_tmp[y_next * alpha_stride];
-
-                if(a_ver != abuf[x]) a_ver = ((a_ver * ys_fract) + (abuf[x] * (0x100 - ys_fract))) >> 8;
-                if(a_hor != abuf[x]) a_hor = ((a_hor * xs_fract) + (abuf[x] * (0x100 - xs_fract))) >> 8;
-                abuf[x] = (a_ver + a_hor) >> 1;
-
-                if(abuf[x] == 0x00) continue;
-            }
-            else {
-                abuf[x] = 0xff;
-            }
-
-            if(cbuf[x] != px_ver || cbuf[x] != px_hor) {
-                uint16_t v = lv_color_16_16_mix_inlined(px_ver, cbuf[x], ys_fract);
-                uint16_t h = lv_color_16_16_mix_inlined(px_hor, cbuf[x], xs_fract);
-                cbuf[x] = lv_color_16_16_mix_inlined(h, v, LV_OPA_50);
+        uint32_t e[4] = {0, 0, 0, 0};
+        uint32_t a[4] = {0, 0, 0, 0};
+        int32_t i;
+        for(i = 0; i < 4; i++) {
+            int32_t sx = x0 + (i & 1);
+            int32_t sy = y0 + (i >> 1);
+            if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
+                uint16_t c = *(const uint16_t *)(src + sy * src_stride + sx * 2);
+                uint16_t cc = c;
+                e[i] = (cc | ((uint32_t)cc << 16)) & 0x7E0F81F;
+                a[i] = src_has_a8 ? src_alpha[sy * alpha_stride + sx] : 0xFF;
             }
         }
-        /*Partially out of the image*/
-        else {
-            lv_opa_t a;
-            if(src_has_a8) {
-                const lv_opa_t * src_alpha_tmp = src_alpha;
-                src_alpha_tmp += (ys_int * alpha_stride) + xs_int;
-                a = src_alpha_tmp[0];
-            }
-            else {
-                a = 0xff;
-            }
 
-            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))  {
-                abuf[x] = (a * (0xFF - xs_fract)) >> 8;
-            }
-            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
-                abuf[x] = (a * (0xFF - ys_fract)) >> 8;
-            }
-            else {
-                abuf[x] = a;
-            }
+        uint32_t t[4];
+        uint32_t av = transform_alpha_weights(a[0], a[1], a[2], a[3], xs_ofs & 0xFF, ys_ofs & 0xFF, t);
+        abuf[x] = (uint8_t)av;
+        if(av == 0) {
+            cbuf[x] = 0;
+            continue;
         }
+
+        uint32_t acc = ((e[0] * t[0] + e[1] * t[1] + e[2] * t[2] + e[3] * t[3]) >> 5) & 0x7E0F81F;
+        cbuf[x] = (uint16_t)(acc | (acc >> 16));
     }
 }
 
@@ -1133,57 +1087,6 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
 
 #if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
 
-/**
- * The direction based anti-aliasing of one byte-swapped RGB565(A8) pixel whose neighbors
- * are surely valid. It's used instead of bilinear interpolation when some involved pixels
- * are not opaque to avoid bleeding in the color of transparent pixels.
- */
-static inline void rgb565a8_swapped_px_aa_inside(const uint16_t * src_px, int32_t src_stride,
-                                                 const lv_opa_t * alpha_px, int32_t alpha_stride,
-                                                 int32_t xs_fract_raw, int32_t ys_fract_raw,
-                                                 uint16_t * c_out, uint8_t * a_out)
-{
-    int32_t x_next;
-    int32_t y_next;
-    int32_t xs_fract;
-    int32_t ys_fract;
-    if(xs_fract_raw < 0x80) {
-        x_next = -1;
-        xs_fract = (0x7F - xs_fract_raw) * 2;
-    }
-    else {
-        x_next = 1;
-        xs_fract = (xs_fract_raw - 0x80) * 2;
-    }
-    if(ys_fract_raw < 0x80) {
-        y_next = -1;
-        ys_fract = (0x7F - ys_fract_raw) * 2;
-    }
-    else {
-        y_next = 1;
-        ys_fract = (ys_fract_raw - 0x80) * 2;
-    }
-
-    uint16_t c = lv_color_swap_16(src_px[0]);
-
-    uint8_t a = alpha_px[0];
-    lv_opa_t a_hor = alpha_px[x_next];
-    lv_opa_t a_ver = alpha_px[y_next * alpha_stride];
-    if(a_ver != a) a_ver = ((a_ver * ys_fract) + (a * (0x100 - ys_fract))) >> 8;
-    if(a_hor != a) a_hor = ((a_hor * xs_fract) + (a * (0x100 - xs_fract))) >> 8;
-    a = (a_ver + a_hor) >> 1;
-    *a_out = a;
-    if(a == 0x00) return;
-
-    uint16_t px_hor = lv_color_swap_16(src_px[x_next]);
-    uint16_t px_ver = lv_color_swap_16(*(const uint16_t *)((const uint8_t *)src_px + y_next * src_stride));
-    if(c != px_ver || c != px_hor) {
-        uint16_t v = lv_color_16_16_mix_inlined(px_ver, c, ys_fract);
-        uint16_t h = lv_color_16_16_mix_inlined(px_hor, c, xs_fract);
-        c = lv_color_16_16_mix_inlined(h, v, LV_OPA_50);
-    }
-    *c_out = c;
-}
 
 static void rgb565a8_swapped_row_fast(const uint8_t * src, int32_t src_stride,
                                       const lv_opa_t * src_alpha, int32_t alpha_stride,
@@ -1203,22 +1106,49 @@ static void rgb565a8_swapped_row_fast(const uint8_t * src, int32_t src_stride,
         uint32_t fx = xs_ups_ofs & 0xFF;
         uint32_t fy = ys_ups_ofs & 0xFF;
 
+        uint32_t alpha_out = 0xFF;
         if(src_has_a8) {
             const lv_opa_t * pa = src_alpha + ys_int * alpha_stride + xs_int;
             uint32_t a00 = pa[0];
             uint32_t a01 = pa[1];
             uint32_t a10 = pa[alpha_stride];
             uint32_t a11 = pa[alpha_stride + 1];
-            if((a00 & a01 & a10 & a11) != 0xFF) {
-                /*There are non opaque pixels involved: use the direction based mixing
-                 *to avoid bleeding in the color of transparent pixels*/
-                rgb565a8_swapped_px_aa_inside((const uint16_t *)(src + (ys_ups >> 8) * src_stride) + (xs_ups >> 8),
-                                              src_stride, src_alpha + (ys_ups >> 8) * alpha_stride + (xs_ups >> 8), alpha_stride,
-                                              xs_ups & 0xFF, ys_ups & 0xFF, &cbuf[x], &abuf[x]);
+            if(a00 == a01 && a00 == a10 && a00 == a11) {
+                /*Uniform alpha: the weighting cancels out, so the plain interpolation below is
+                 *already exact. Covers opaque interiors and fully transparent areas alike.*/
+                alpha_out = a00;
+                if(a00 == 0) {
+                    abuf[x] = 0;
+                    cbuf[x] = 0;
+                    continue;
+                }
+            }
+            else {
+                /*Mixed alpha: weight the colors with their alpha so a transparent neighbor
+                 *cannot bleed its color in, then normalize back to a straight color*/
+                uint32_t t[4];
+                uint32_t a = transform_alpha_weights(a00, a01, a10, a11, fx, fy, t);
+                abuf[x] = (uint8_t)a;
+                if(a == 0) {
+                    cbuf[x] = 0;
+                    continue;
+                }
+                const uint16_t * pc = (const uint16_t *)(src + ys_int * src_stride) + xs_int;
+                const uint16_t * pc2 = (const uint16_t *)((const uint8_t *)pc + src_stride);
+                uint16_t s00 = lv_color_swap_16(pc[0]);
+                uint16_t s01 = lv_color_swap_16(pc[1]);
+                uint16_t s10 = lv_color_swap_16(pc2[0]);
+                uint16_t s11 = lv_color_swap_16(pc2[1]);
+                uint32_t w00 = (s00 | ((uint32_t)s00 << 16)) & 0x7E0F81F;
+                uint32_t w01 = (s01 | ((uint32_t)s01 << 16)) & 0x7E0F81F;
+                uint32_t w10 = (s10 | ((uint32_t)s10 << 16)) & 0x7E0F81F;
+                uint32_t w11 = (s11 | ((uint32_t)s11 << 16)) & 0x7E0F81F;
+                uint32_t acc = ((w00 * t[0] + w01 * t[1] + w10 * t[2] + w11 * t[3]) >> 5) & 0x7E0F81F;
+                cbuf[x] = (uint16_t)(acc | (acc >> 16));
                 continue;
             }
         }
-        abuf[x] = 0xFF;
+        abuf[x] = (uint8_t)alpha_out;
 
         /*All the 4 neighbors are opaque: use true bilinear interpolation.
          *The RGB565 colors are expanded to 32 bits (0x07E0F81F mask) so all channels
@@ -1261,93 +1191,49 @@ static void rgb565a8_swapped_row_checked(const uint8_t * src, int32_t src_w, int
 
         /*Fully out of the image*/
         if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+            cbuf[x] = 0;
             abuf[x] = 0x00;
             continue;
         }
 
-        /*Get the direction the hor and ver neighbor
-         *`fract` will be in range of 0x00..0xFF and `next` (+/-1) indicates the direction*/
-        int32_t xs_fract = xs_ups & 0xFF;
-        int32_t ys_fract = ys_ups & 0xFF;
-
-        int32_t x_next;
-        int32_t y_next;
-        if(xs_fract < 0x80) {
-            x_next = -1;
-            xs_fract = (0x7F - xs_fract) * 2;
-        }
-        else {
-            x_next = 1;
-            xs_fract = (xs_fract - 0x80) * 2;
-        }
-        if(ys_fract < 0x80) {
-            y_next = -1;
-            ys_fract = (0x7F - ys_fract) * 2;
-        }
-        else {
-            y_next = 1;
-            ys_fract = (ys_fract - 0x80) * 2;
+        if(!aa) {
+            uint16_t c = *(const uint16_t *)(src + ys_int * src_stride + xs_int * 2);
+            cbuf[x] = lv_color_swap_16(c);
+            abuf[x] = src_has_a8 ? src_alpha[ys_int * alpha_stride + xs_int] : 0xFF;
+            continue;
         }
 
-        const uint16_t * src_tmp_u16 = (const uint16_t *)(src + (ys_int * src_stride) + xs_int * 2);
-        cbuf[x] = lv_color_swap_16(src_tmp_u16[0]); /* swap the src pixels */
+        /*Sample the 2x2 neighborhood. Taps outside the image count as fully transparent,
+         *so the edge fades out on its own and needs no dedicated handling.*/
+        int32_t xs_ofs = xs_ups - 0x80;
+        int32_t ys_ofs = ys_ups - 0x80;
+        int32_t x0 = xs_ofs >> 8;
+        int32_t y0 = ys_ofs >> 8;
 
-        if(aa &&
-           xs_int + x_next >= 0 &&
-           xs_int + x_next <= src_w - 1 &&
-           ys_int + y_next >= 0 &&
-           ys_int + y_next <= src_h - 1) {
-
-            /* swap the src pixels */
-            uint16_t px_hor = lv_color_swap_16(src_tmp_u16[x_next]);
-            uint16_t px_ver = lv_color_swap_16(*(const uint16_t *)((uint8_t *)src_tmp_u16 + (y_next * src_stride)));
-
-            if(src_has_a8) {
-                const lv_opa_t * src_alpha_tmp = src_alpha;
-                src_alpha_tmp += (ys_int * alpha_stride) + xs_int;
-                abuf[x] = src_alpha_tmp[0];
-
-                lv_opa_t a_hor = src_alpha_tmp[x_next];
-                lv_opa_t a_ver = src_alpha_tmp[y_next * alpha_stride];
-
-                if(a_ver != abuf[x]) a_ver = ((a_ver * ys_fract) + (abuf[x] * (0x100 - ys_fract))) >> 8;
-                if(a_hor != abuf[x]) a_hor = ((a_hor * xs_fract) + (abuf[x] * (0x100 - xs_fract))) >> 8;
-                abuf[x] = (a_ver + a_hor) >> 1;
-
-                if(abuf[x] == 0x00) continue;
-            }
-            else {
-                abuf[x] = 0xff;
-            }
-
-            if(cbuf[x] != px_ver || cbuf[x] != px_hor) {
-                uint16_t v = lv_color_16_16_mix_inlined(px_ver, cbuf[x], ys_fract);
-                uint16_t h = lv_color_16_16_mix_inlined(px_hor, cbuf[x], xs_fract);
-                cbuf[x] =  lv_color_16_16_mix_inlined(h, v, LV_OPA_50);
+        uint32_t e[4] = {0, 0, 0, 0};
+        uint32_t a[4] = {0, 0, 0, 0};
+        int32_t i;
+        for(i = 0; i < 4; i++) {
+            int32_t sx = x0 + (i & 1);
+            int32_t sy = y0 + (i >> 1);
+            if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
+                uint16_t c = *(const uint16_t *)(src + sy * src_stride + sx * 2);
+                uint16_t cc = lv_color_swap_16(c);
+                e[i] = (cc | ((uint32_t)cc << 16)) & 0x7E0F81F;
+                a[i] = src_has_a8 ? src_alpha[sy * alpha_stride + sx] : 0xFF;
             }
         }
-        /*Partially out of the image*/
-        else {
-            lv_opa_t a;
-            if(src_has_a8) {
-                const lv_opa_t * src_alpha_tmp = src_alpha;
-                src_alpha_tmp += (ys_int * alpha_stride) + xs_int;
-                a = src_alpha_tmp[0];
-            }
-            else {
-                a = 0xff;
-            }
 
-            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))  {
-                abuf[x] = (a * (0xFF - xs_fract)) >> 8;
-            }
-            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
-                abuf[x] = (a * (0xFF - ys_fract)) >> 8;
-            }
-            else {
-                abuf[x] = a;
-            }
+        uint32_t t[4];
+        uint32_t av = transform_alpha_weights(a[0], a[1], a[2], a[3], xs_ofs & 0xFF, ys_ofs & 0xFF, t);
+        abuf[x] = (uint8_t)av;
+        if(av == 0) {
+            cbuf[x] = 0;
+            continue;
         }
+
+        uint32_t acc = ((e[0] * t[0] + e[1] * t[1] + e[2] * t[2] + e[3] * t[3]) >> 5) & 0x7E0F81F;
+        cbuf[x] = (uint16_t)(acc | (acc >> 16));
     }
 }
 
@@ -1410,69 +1296,41 @@ static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int3
     int32_t x;
     for(x = 0; x < w; x++) {
         int32_t x_abs = x + x_start;
-        xs_ups = xs_ups_start + ((xs_step * x_abs) >> 8);
-        ys_ups = ys_ups_start + ((ys_step * x_abs) >> 8);
-        if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
+        int32_t xu = xs_ups_start + ((xs_step * x_abs) >> 8);
+        int32_t yu = ys_ups_start + ((ys_step * x_abs) >> 8);
+        if(xu > xs_clamp_ups) xu = xs_clamp_ups;
 
-        int32_t xs_int = xs_ups >> 8;
-        int32_t ys_int = ys_ups >> 8;
-
-        /*Fully out of the image*/
-        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+        int32_t xi = xu >> 8;
+        int32_t yi = yu >> 8;
+        if(xi < 0 || xi >= src_w || yi < 0 || yi >= src_h) {
             abuf[x] = 0x00;
             continue;
         }
 
-        /*Get the direction the hor and ver neighbor
-         *`fract` will be in range of 0x00..0xFF and `next` (+/-1) indicates the direction*/
-        int32_t xs_fract = xs_ups & 0xFF;
-        int32_t ys_fract = ys_ups & 0xFF;
-
-        int32_t x_next;
-        int32_t y_next;
-        if(xs_fract < 0x80) {
-            x_next = -1;
-            xs_fract = (0x7F - xs_fract) * 2;
-        }
-        else {
-            x_next = 1;
-            xs_fract = (xs_fract - 0x80) * 2;
-        }
-        if(ys_fract < 0x80) {
-            y_next = -1;
-            ys_fract = (0x7F - ys_fract) * 2;
-        }
-        else {
-            y_next = 1;
-            ys_fract = (ys_fract - 0x80) * 2;
+        if(!aa) {
+            abuf[x] = src[yi * src_stride + xi];
+            continue;
         }
 
-        const uint8_t * src_tmp = src;
-        src_tmp += ys_int * src_stride + xs_int;
-        abuf[x] = src_tmp[0];
-
-        if(aa &&
-           xs_int + x_next >= 0 &&
-           xs_int + x_next <= src_w - 1 &&
-           ys_int + y_next >= 0 &&
-           ys_int + y_next <= src_h - 1) {
-
-            lv_opa_t a_ver = src_tmp[x_next];
-            lv_opa_t a_hor = src_tmp[y_next * src_stride];
-
-            if(a_ver != abuf[x]) a_ver = ((a_ver * ys_fract) + (abuf[x] * (0x100 - ys_fract))) >> 8;
-            if(a_hor != abuf[x]) a_hor = ((a_hor * xs_fract) + (abuf[x] * (0x100 - xs_fract))) >> 8;
-            abuf[x] = (a_ver + a_hor) >> 1;
+        int32_t xo = xu - 0x80;
+        int32_t yo = yu - 0x80;
+        int32_t x0 = xo >> 8;
+        int32_t y0 = yo >> 8;
+        uint32_t a[4] = {0, 0, 0, 0};
+        int32_t i;
+        for(i = 0; i < 4; i++) {
+            int32_t sx = x0 + (i & 1);
+            int32_t sy = y0 + (i >> 1);
+            if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) a[i] = src[sy * src_stride + sx];
         }
-        else {
-            /*Partially out of the image*/
-            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))  {
-                abuf[x] = (src_tmp[0] * (0xFF - xs_fract)) >> 8;
-            }
-            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
-                abuf[x] = (src_tmp[0] * (0xFF - ys_fract)) >> 8;
-            }
-        }
+
+        /*An alpha only image carries no color, so nothing can bleed and plain bilinear
+         *interpolation is already the correct filter*/
+        uint32_t fx = xo & 0xFF;
+        uint32_t fy = yo & 0xFF;
+        uint32_t top = a[0] * (256 - fx) + a[1] * fx;
+        uint32_t bot = a[2] * (256 - fx) + a[3] * fx;
+        abuf[x] = (uint8_t)((top * (256 - fy) + bot * fy) >> 16);
     }
 }
 
@@ -1488,114 +1346,72 @@ static void transform_al88(const uint8_t * src, int32_t src_w, int32_t src_h, in
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
     int32_t w = x_end - x_start;
+    int32_t px_size = src_has_a8 ? 2 : 1;
 
     int32_t x;
     for(x = 0; x < w; x++) {
         int32_t x_abs = x + x_start;
-        xs_ups = xs_ups_start + ((xs_step * x_abs) >> 8);
-        ys_ups = ys_ups_start + ((ys_step * x_abs) >> 8);
-        if(xs_ups > xs_clamp_ups) xs_ups = xs_clamp_ups;
+        int32_t xu = xs_ups_start + ((xs_step * x_abs) >> 8);
+        int32_t yu = ys_ups_start + ((ys_step * x_abs) >> 8);
+        if(xu > xs_clamp_ups) xu = xs_clamp_ups;
 
-        int32_t xs_int = xs_ups >> 8;
-        int32_t ys_int = ys_ups >> 8;
-
-        /*Fully out of the image*/
-        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+        int32_t xi = xu >> 8;
+        int32_t yi = yu >> 8;
+        if(xi < 0 || xi >= src_w || yi < 0 || yi >= src_h) {
             cbuf[x] = 0x00;
             abuf[x] = 0x00;
             continue;
         }
 
-        /*Get the direction the hor and ver neighbor
-         *`fract` will be in range of 0x00..0xFF and `next` (+/-1) indicates the direction*/
-        int32_t xs_fract = xs_ups & 0xFF;
-        int32_t ys_fract = ys_ups & 0xFF;
+        if(!aa) {
+            const uint8_t * pn = src + yi * src_stride + xi * px_size;
+            cbuf[x] = pn[0];
+            abuf[x] = src_has_a8 ? pn[1] : 0xFF;
+            continue;
+        }
 
-        int32_t x_next;
-        int32_t y_next;
-        if(xs_fract < 0x80) {
-            x_next = -1;
-            xs_fract = (0x7F - xs_fract) * 2;
+        int32_t xo = xu - 0x80;
+        int32_t yo = yu - 0x80;
+        int32_t x0 = xo >> 8;
+        int32_t y0 = yo >> 8;
+        uint32_t fx = xo & 0xFF;
+        uint32_t fy = yo & 0xFF;
+
+        uint32_t l[4] = {0, 0, 0, 0};
+        uint32_t a[4] = {0, 0, 0, 0};
+        int32_t i;
+        for(i = 0; i < 4; i++) {
+            int32_t sx = x0 + (i & 1);
+            int32_t sy = y0 + (i >> 1);
+            if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
+                const uint8_t * pn = src + sy * src_stride + sx * px_size;
+                l[i] = pn[0];
+                a[i] = src_has_a8 ? pn[1] : 0xFF;
+            }
+        }
+
+        if(a[0] == a[1] && a[0] == a[2] && a[0] == a[3]) {
+            /*Uniform alpha: the weighting cancels, plain bilinear on the luminance is exact*/
+            abuf[x] = (uint8_t)a[0];
+            if(a[0] == 0) {
+                cbuf[x] = 0;
+                continue;
+            }
+            uint32_t top = l[0] * (256 - fx) + l[1] * fx;
+            uint32_t bot = l[2] * (256 - fx) + l[3] * fx;
+            cbuf[x] = (uint8_t)((top * (256 - fy) + bot * fy) >> 16);
         }
         else {
-            x_next = 1;
-            xs_fract = (xs_fract - 0x80) * 2;
-        }
-        if(ys_fract < 0x80) {
-            y_next = -1;
-            ys_fract = (0x7F - ys_fract) * 2;
-        }
-        else {
-            y_next = 1;
-            ys_fract = (ys_fract - 0x80) * 2;
-        }
-
-        if(src_has_a8) {
-            const lv_color16a_t * src_tmp = (const lv_color16a_t *)(src + ys_int * src_stride + xs_int * 2);
-            cbuf[x] = src_tmp[0].lumi;
-            abuf[x] = src_tmp[0].alpha;
-
-            if(aa &&
-               xs_int + x_next >= 0 &&
-               xs_int + x_next <= src_w - 1 &&
-               ys_int + y_next >= 0 &&
-               ys_int + y_next <= src_h - 1) {
-
-                lv_color16a_t px_hor = src_tmp[x_next];
-                lv_color16a_t px_ver = *(const lv_color16a_t *)((uint8_t *)src_tmp + (y_next * src_stride));
-
-                /* Interpolate luminance */
-                uint8_t l_ver = px_ver.lumi;
-                uint8_t l_hor = px_hor.lumi;
-                if(l_ver != cbuf[x]) l_ver = ((l_ver * ys_fract) + (cbuf[x] * (0x100 - ys_fract))) >> 8;
-                if(l_hor != cbuf[x]) l_hor = ((l_hor * xs_fract) + (cbuf[x] * (0x100 - xs_fract))) >> 8;
-                cbuf[x] = (l_ver + l_hor) >> 1;
-
-                /* Interpolate alpha */
-                uint8_t a_ver = px_ver.alpha;
-                uint8_t a_hor = px_hor.alpha;
-                if(a_ver != abuf[x]) a_ver = ((a_ver * ys_fract) + (abuf[x] * (0x100 - ys_fract))) >> 8;
-                if(a_hor != abuf[x]) a_hor = ((a_hor * xs_fract) + (abuf[x] * (0x100 - xs_fract))) >> 8;
-                abuf[x] = (a_ver + a_hor) >> 1;
+            /*Mixed alpha: weight the luminance with alpha so a transparent neighbor cannot
+             *bleed in, then normalize back*/
+            uint32_t t[4];
+            uint32_t av = transform_alpha_weights(a[0], a[1], a[2], a[3], fx, fy, t);
+            abuf[x] = (uint8_t)av;
+            if(av == 0) {
+                cbuf[x] = 0;
+                continue;
             }
-            else {
-                /*Partially out of the image*/
-                if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
-                    abuf[x] = (abuf[x] * (0xFF - xs_fract)) >> 8;
-                }
-                else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
-                    abuf[x] = (abuf[x] * (0xFF - ys_fract)) >> 8;
-                }
-            }
-        }
-        else {
-            /* L8 format: 1 byte per pixel, no separate alpha channel */
-            const uint8_t * src_tmp = src + ys_int * src_stride + xs_int;
-            cbuf[x] = src_tmp[0];
-            abuf[x] = 0xff;
-
-            if(aa &&
-               xs_int + x_next >= 0 &&
-               xs_int + x_next <= src_w - 1 &&
-               ys_int + y_next >= 0 &&
-               ys_int + y_next <= src_h - 1) {
-
-                uint8_t l_ver = src_tmp[y_next * src_stride];
-                uint8_t l_hor = src_tmp[x_next];
-
-                if(l_ver != cbuf[x]) l_ver = ((l_ver * ys_fract) + (cbuf[x] * (0x100 - ys_fract))) >> 8;
-                if(l_hor != cbuf[x]) l_hor = ((l_hor * xs_fract) + (cbuf[x] * (0x100 - xs_fract))) >> 8;
-                cbuf[x] = (l_ver + l_hor) >> 1;
-            }
-            else {
-                /*Partially out of the image - reduce alpha for edge pixels*/
-                if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
-                    abuf[x] = (0xff * (0xFF - xs_fract)) >> 8;
-                }
-                else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
-                    abuf[x] = (0xff * (0xFF - ys_fract)) >> 8;
-                }
-            }
+            cbuf[x] = (uint8_t)((l[0] * t[0] + l[1] * t[1] + l[2] * t[2] + l[3] * t[3]) >> 5);
         }
     }
 }

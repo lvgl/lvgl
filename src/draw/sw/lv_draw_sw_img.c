@@ -486,7 +486,15 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
     bool has_colorkey = draw_dsc->colorkey != NULL;
 
     lv_color_format_t cf_final = cf;
-    if(cf_final == LV_COLOR_FORMAT_RGB888 || cf_final == LV_COLOR_FORMAT_XRGB8888) cf_final = LV_COLOR_FORMAT_ARGB8888;
+    /*The SW transform filters in premultiplied alpha space and emits premultiplied pixels,
+     *so the blender and the recolor step have to be told that. RGB888/XRGB8888 become opaque
+     *ARGB8888, for which premultiplied and straight are the same bytes.*/
+    if(cf_final == LV_COLOR_FORMAT_RGB888 || cf_final == LV_COLOR_FORMAT_XRGB8888) {
+        cf_final = LV_COLOR_FORMAT_ARGB8888;
+    }
+    if(cf_final == LV_COLOR_FORMAT_ARGB8888 && draw_dsc->antialias) {
+        cf_final = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+    }
     else if(cf_final == LV_COLOR_FORMAT_RGB565 ||
             cf_final == LV_COLOR_FORMAT_RGB565_SWAPPED) cf_final = LV_COLOR_FORMAT_RGB565A8;
     else if(cf_final == LV_COLOR_FORMAT_L8) cf_final = LV_COLOR_FORMAT_AL88;
