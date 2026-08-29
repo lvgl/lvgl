@@ -1509,8 +1509,17 @@ static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_8_16_mix(const uint8_t c1,
         return c2;
     }
 
-    /*Convert to RGB565 first, then mix the two channel pairs with a single multiplication each*/
-    return lv_color_16_16_mix_inlined(l8_to_rgb565(c1), c2, mix);
+    uint16_t c1_16 = ((c1 & 0xF8) << 8) + ((c1 & 0xFC) << 3) + ((c1 & 0xF8) >> 3);
+    if(mix == 255 || c1_16 == c2) return c1_16;
+
+    /*Spelled out instead of calling lv_color_16_16_mix_inlined(): size-optimized builds inline
+     *neither helper, so delegating would cost a second call on every pixel.*/
+    uint32_t mix5 = ((uint32_t)mix + 4) >> 3;
+    /*0x7E0F81F = 0b00000111111000001111100000011111*/
+    uint32_t bg = (uint32_t)(c2 | ((uint32_t)c2 << 16)) & 0x7E0F81F;
+    uint32_t fg = (uint32_t)(c1_16 | ((uint32_t)c1_16 << 16)) & 0x7E0F81F;
+    uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x7E0F81F;
+    return (uint16_t)((result >> 16) | result);
 }
 
 static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_24_16_mix(const uint8_t * c1, uint16_t c2, uint8_t mix)
@@ -1519,9 +1528,17 @@ static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_24_16_mix(const uint8_t * 
         return c2;
     }
 
-    /*Convert to RGB565 first, then mix the two channel pairs with a single multiplication each*/
     uint16_t c1_16 = ((c1[2] & 0xF8) << 8) + ((c1[1] & 0xFC) << 3) + ((c1[0] & 0xF8) >> 3);
-    return lv_color_16_16_mix_inlined(c1_16, c2, mix);
+    if(mix == 255 || c1_16 == c2) return c1_16;
+
+    /*Spelled out instead of calling lv_color_16_16_mix_inlined(): size-optimized builds inline
+     *neither helper, so delegating would cost a second call on every pixel.*/
+    uint32_t mix5 = ((uint32_t)mix + 4) >> 3;
+    /*0x7E0F81F = 0b00000111111000001111100000011111*/
+    uint32_t bg = (uint32_t)(c2 | ((uint32_t)c2 << 16)) & 0x7E0F81F;
+    uint32_t fg = (uint32_t)(c1_16 | ((uint32_t)c1_16 << 16)) & 0x7E0F81F;
+    uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x7E0F81F;
+    return (uint16_t)((result >> 16) | result);
 }
 
 #if LV_DRAW_SW_SUPPORT_I1
