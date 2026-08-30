@@ -334,6 +334,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
                 break;
             }
         default:
+            /*Keep in sync with evaluate(): every type it claims must have a case above*/
             LV_UNREACHABLE();
     }
 
