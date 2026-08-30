@@ -1338,21 +1338,80 @@ static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int3
 
 #if LV_DRAW_SW_SUPPORT_L8 || LV_DRAW_SW_SUPPORT_AL88
 
-static void transform_al88(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
-                           int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                           int32_t x_start, int32_t x_end, int32_t xs_clamp_ups,
-                           uint8_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa)
+/*The interior of a row: every one of the four neighbors is inside the image, so no bounds
+ *checking and no edge handling is needed*/
+static void al88_row_fast(const uint8_t * src, int32_t src_stride,
+                          int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
+                          int32_t x_from, int32_t x_to, int32_t x_offs,
+                          uint8_t * cbuf, uint8_t * abuf, bool src_has_a8)
 {
-    int32_t xs_ups_start = xs_ups;
-    int32_t ys_ups_start = ys_ups;
-    int32_t w = x_end - x_start;
     int32_t px_size = src_has_a8 ? 2 : 1;
-
     int32_t x;
-    for(x = 0; x < w; x++) {
-        int32_t x_abs = x + x_start;
-        int32_t xu = xs_ups_start + ((xs_step * x_abs) >> 8);
-        int32_t yu = ys_ups_start + ((ys_step * x_abs) >> 8);
+    for(x = x_from; x < x_to; x++) {
+        int32_t x_abs = x + x_offs;
+        int32_t xs_ups_ofs = xs_base + ((xs_step * x_abs) >> 8) - 0x80;
+        int32_t ys_ups_ofs = ys_base + ((ys_step * x_abs) >> 8) - 0x80;
+        int32_t xs_int = xs_ups_ofs >> 8;
+        int32_t ys_int = ys_ups_ofs >> 8;
+        uint32_t fx = xs_ups_ofs & 0xFF;
+        uint32_t fy = ys_ups_ofs & 0xFF;
+
+        const uint8_t * p = src + ys_int * src_stride + xs_int * px_size;
+        const uint8_t * p2 = p + src_stride;
+        uint32_t l00 = p[0];
+        uint32_t l01 = p[px_size];
+        uint32_t l10 = p2[0];
+        uint32_t l11 = p2[px_size];
+        uint32_t a00, a01, a10, a11;
+        if(src_has_a8) {
+            a00 = p[1];
+            a01 = p[px_size + 1];
+            a10 = p2[1];
+            a11 = p2[px_size + 1];
+        }
+        else {
+            a00 = a01 = a10 = a11 = 0xFF;
+        }
+
+        if(a00 == a01 && a00 == a10 && a00 == a11) {
+            /*Uniform alpha: the weighting cancels, plain bilinear on the luminance is exact*/
+            abuf[x] = (uint8_t)a00;
+            if(a00 == 0) {
+                cbuf[x] = 0;
+                continue;
+            }
+            uint32_t top = l00 * (256 - fx) + l01 * fx;
+            uint32_t bot = l10 * (256 - fx) + l11 * fx;
+            cbuf[x] = (uint8_t)((top * (256 - fy) + bot * fy) >> 16);
+        }
+        else {
+            /*Mixed alpha: weight the luminance with alpha so a transparent neighbor cannot
+             *bleed in, then normalize back*/
+            uint32_t t[4];
+            uint32_t av = transform_alpha_weights(a00, a01, a10, a11, fx, fy, t);
+            abuf[x] = (uint8_t)av;
+            if(av == 0) {
+                cbuf[x] = 0;
+                continue;
+            }
+            cbuf[x] = (uint8_t)((l00 * t[0] + l01 * t[1] + l10 * t[2] + l11 * t[3]) >> 5);
+        }
+    }
+}
+
+/*The edges of a row, where a neighbor can fall outside the image. An outside tap counts as
+ *fully transparent, which is what makes the edge fade out.*/
+static void al88_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                             int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
+                             int32_t x_from, int32_t x_to, int32_t x_offs, int32_t xs_clamp_ups,
+                             uint8_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa)
+{
+    int32_t px_size = src_has_a8 ? 2 : 1;
+    int32_t x;
+    for(x = x_from; x < x_to; x++) {
+        int32_t x_abs = x + x_offs;
+        int32_t xu = xs_base + ((xs_step * x_abs) >> 8);
+        int32_t yu = ys_base + ((ys_step * x_abs) >> 8);
         if(xu > xs_clamp_ups) xu = xs_clamp_ups;
 
         int32_t xi = xu >> 8;
@@ -1377,43 +1436,94 @@ static void transform_al88(const uint8_t * src, int32_t src_w, int32_t src_h, in
         uint32_t fx = xo & 0xFF;
         uint32_t fy = yo & 0xFF;
 
-        uint32_t l[4] = {0, 0, 0, 0};
-        uint32_t a[4] = {0, 0, 0, 0};
-        int32_t i;
-        for(i = 0; i < 4; i++) {
-            int32_t sx = x0 + (i & 1);
-            int32_t sy = y0 + (i >> 1);
-            if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
-                const uint8_t * pn = src + sy * src_stride + sx * px_size;
-                l[i] = pn[0];
-                a[i] = src_has_a8 ? pn[1] : 0xFF;
+        uint32_t l00 = 0, l01 = 0, l10 = 0, l11 = 0;
+        uint32_t a00 = 0, a01 = 0, a10 = 0, a11 = 0;
+        bool y0_in = y0 >= 0 && y0 < src_h;
+        bool y1_in = y0 + 1 >= 0 && y0 + 1 < src_h;
+        bool x0_in = x0 >= 0 && x0 < src_w;
+        bool x1_in = x0 + 1 >= 0 && x0 + 1 < src_w;
+        if(y0_in) {
+            const uint8_t * pr = src + y0 * src_stride;
+            if(x0_in) {
+                l00 = pr[x0 * px_size];
+                a00 = src_has_a8 ? pr[x0 * px_size + 1] : 0xFF;
+            }
+            if(x1_in) {
+                l01 = pr[(x0 + 1) * px_size];
+                a01 = src_has_a8 ? pr[(x0 + 1) * px_size + 1] : 0xFF;
+            }
+        }
+        if(y1_in) {
+            const uint8_t * pr = src + (y0 + 1) * src_stride;
+            if(x0_in) {
+                l10 = pr[x0 * px_size];
+                a10 = src_has_a8 ? pr[x0 * px_size + 1] : 0xFF;
+            }
+            if(x1_in) {
+                l11 = pr[(x0 + 1) * px_size];
+                a11 = src_has_a8 ? pr[(x0 + 1) * px_size + 1] : 0xFF;
             }
         }
 
-        if(a[0] == a[1] && a[0] == a[2] && a[0] == a[3]) {
-            /*Uniform alpha: the weighting cancels, plain bilinear on the luminance is exact*/
-            abuf[x] = (uint8_t)a[0];
-            if(a[0] == 0) {
+        if(a00 == a01 && a00 == a10 && a00 == a11) {
+            abuf[x] = (uint8_t)a00;
+            if(a00 == 0) {
                 cbuf[x] = 0;
                 continue;
             }
-            uint32_t top = l[0] * (256 - fx) + l[1] * fx;
-            uint32_t bot = l[2] * (256 - fx) + l[3] * fx;
+            uint32_t top = l00 * (256 - fx) + l01 * fx;
+            uint32_t bot = l10 * (256 - fx) + l11 * fx;
             cbuf[x] = (uint8_t)((top * (256 - fy) + bot * fy) >> 16);
         }
         else {
-            /*Mixed alpha: weight the luminance with alpha so a transparent neighbor cannot
-             *bleed in, then normalize back*/
             uint32_t t[4];
-            uint32_t av = transform_alpha_weights(a[0], a[1], a[2], a[3], fx, fy, t);
+            uint32_t av = transform_alpha_weights(a00, a01, a10, a11, fx, fy, t);
             abuf[x] = (uint8_t)av;
             if(av == 0) {
                 cbuf[x] = 0;
                 continue;
             }
-            cbuf[x] = (uint8_t)((l[0] * t[0] + l[1] * t[1] + l[2] * t[2] + l[3] * t[3]) >> 5);
+            cbuf[x] = (uint8_t)((l00 * t[0] + l01 * t[1] + l10 * t[2] + l11 * t[3]) >> 5);
         }
     }
+}
+
+static void transform_al88(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                           int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                           int32_t x_start, int32_t x_end, int32_t xs_clamp_ups,
+                           uint8_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa)
+{
+    int32_t w = x_end - x_start;
+    int32_t px_size = src_has_a8 ? 2 : 1;
+
+    /*In the middle of the row the pixel and all its neighbors are inside the source image,
+     *so neither bounds checking nor edge handling is needed there*/
+    int32_t fast_from, fast_to;
+    transform_safe_range(xs_ups, ys_ups, xs_step, ys_step, src_w, src_h, x_start, x_end, aa, &fast_from, &fast_to);
+    fast_from -= x_start;
+    fast_to -= x_start;
+
+    al88_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
+                     0, fast_from, x_start, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
+
+    if(aa) {
+        al88_row_fast(src, src_stride, xs_ups, ys_ups, xs_step, ys_step,
+                      fast_from, fast_to, x_start, cbuf, abuf, src_has_a8);
+    }
+    else {
+        int32_t x;
+        for(x = fast_from; x < fast_to; x++) {
+            int32_t x_abs = x + x_start;
+            int32_t xs_int = (xs_ups + ((xs_step * x_abs) >> 8)) >> 8;
+            int32_t ys_int = (ys_ups + ((ys_step * x_abs) >> 8)) >> 8;
+            const uint8_t * pn = src + ys_int * src_stride + xs_int * px_size;
+            cbuf[x] = pn[0];
+            abuf[x] = src_has_a8 ? pn[1] : 0xFF;
+        }
+    }
+
+    al88_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
+                     fast_to, w, x_start, xs_clamp_ups, cbuf, abuf, src_has_a8, aa);
 }
 
 #endif

@@ -235,7 +235,7 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
         uint32_t a_ = (mask_val);                                               \
         if(a_) {                                                                \
             if(a_ == 255) (dest_px) = color16;                                  \
-            else LV_COLOR_16_16_MIX_EXPANDED(dest_px, fg_exp, dest_px, a_);     \
+            else LV_COLOR_MIX_16_TO_16_PREPARED(dest_px, fg_prep, dest_px, a_);     \
         }                                                                       \
     } while(0)
 
@@ -273,8 +273,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
     LV_UNUSED(dest_buf_u16);
 
     /*The fill color is the same for the whole area, so expand it once*/
-    uint32_t fg_exp = LV_COLOR_16_EXPAND(color16);
-    LV_UNUSED(fg_exp);
+    uint32_t fg_prep = LV_COLOR_MIX_16_PREPARE(color16);
+    LV_UNUSED(fg_prep);
 
     /*Simple fill*/
     if(mask == NULL && opa >= LV_OPA_MAX) {
@@ -366,7 +366,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
             /*Every glyph, rounded corner, border, arc and shadow ends up here. About half
              *of such a mask is fully transparent and a third fully opaque, and both are
              *handled above the mix, so the mix only ever sees 1..254.*/
-            /*fg_exp is declared before the branch chain*/
+            /*fg_prep is declared before the branch chain*/
 
             /*Glyphs are a few pixels wide, where the alignment and tail handling of the
              *word based loop would cost more than it saves. Rounded corners and borders are
@@ -430,7 +430,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
                     /*The product can't reach 255, so there is no opaque shortcut here*/
                     uint32_t a = LV_OPA_MIX2(mask[x], opa);
                     if(a == 0) continue;
-                    LV_COLOR_16_16_MIX_EXPANDED(dest_buf_u16[x], fg_exp, dest_buf_u16[x], a);
+                    LV_COLOR_MIX_16_TO_16_PREPARED(dest_buf_u16[x], fg_prep, dest_buf_u16[x], a);
                 }
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                 mask += mask_stride;
@@ -579,15 +579,15 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
                 uint8_t chan_val = get_bit(src_buf_i1, src_x) * 255;
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
-                        // Additive blending mode
+                        /*Additive blending mode*/
                         res = (LV_MIN(dest_buf_u16[dest_x] + l8_to_rgb565(chan_val), 0xFFFF));
                         break;
                     case LV_BLEND_MODE_SUBTRACTIVE:
-                        // Subtractive blending mode
+                        /*Subtractive blending mode*/
                         res = (LV_MAX(dest_buf_u16[dest_x] - l8_to_rgb565(chan_val), 0));
                         break;
                     case LV_BLEND_MODE_MULTIPLY:
-                        // Multiply blending mode
+                        /*Multiply blending mode*/
                         res = ((((dest_buf_u16[dest_x] >> 11) * (l8_to_rgb565(chan_val) >> 3)) & 0x1F) << 11) |
                               ((((dest_buf_u16[dest_x] >> 5) & 0x3F) * ((l8_to_rgb565(chan_val) >> 2) & 0x3F) >> 6) << 5) |
                               (((dest_buf_u16[dest_x] & 0x1F) * (l8_to_rgb565(chan_val) & 0x1F)) >> 5);
@@ -1598,8 +1598,8 @@ static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_8_16_mix(const uint8_t c1,
     /*Spelled out instead of calling lv_color_16_16_mix_inlined(): size-optimized builds inline
      *neither helper, so delegating would cost a second call on every pixel.*/
     uint32_t mix5 = ((uint32_t)mix + 4) >> 3;
-    uint32_t bg = LV_COLOR_16_EXPAND(c2);
-    uint32_t fg = LV_COLOR_16_EXPAND(c1_16);
+    uint32_t bg = LV_COLOR_MIX_16_PREPARE(c2);
+    uint32_t fg = LV_COLOR_MIX_16_PREPARE(c1_16);
     uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x07E0F81Fu;
     return (uint16_t)((result >> 16) | result);
 }
@@ -1615,8 +1615,8 @@ static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_24_16_mix(const uint8_t * 
     /*Spelled out instead of calling lv_color_16_16_mix_inlined(): size-optimized builds inline
      *neither helper, so delegating would cost a second call on every pixel.*/
     uint32_t mix5 = ((uint32_t)mix + 4) >> 3;
-    uint32_t bg = LV_COLOR_16_EXPAND(c2);
-    uint32_t fg = LV_COLOR_16_EXPAND(c1_16);
+    uint32_t bg = LV_COLOR_MIX_16_PREPARE(c2);
+    uint32_t fg = LV_COLOR_MIX_16_PREPARE(c1_16);
     uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x07E0F81Fu;
     return (uint16_t)((result >> 16) | result);
 }

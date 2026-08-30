@@ -81,10 +81,10 @@ struct _lv_draw_sw_blend_image_dsc_t {
  **********************/
 
 /**
- * Spread an RGB565 color over 32 bits, giving each channel room to grow, so a whole
- * pixel can be mixed with one multiplication.
+ * Prepare an RGB565 color for mixing: spread it over 32 bits so each channel gets room to
+ * grow and a whole pixel can be mixed with one multiplication.
  */
-#define LV_COLOR_16_EXPAND(c) ((((uint32_t)(c)) | (((uint32_t)(c)) << 16)) & 0x07E0F81Fu)
+#define LV_COLOR_MIX_16_PREPARE(c) ((((uint32_t)(c)) | (((uint32_t)(c)) << 16)) & 0x07E0F81Fu)
 
 /**
  * Convert a blue, green, red byte triplet to RGB565.
@@ -93,16 +93,16 @@ struct _lv_draw_sw_blend_image_dsc_t {
     ((uint16_t)((((c1)[2] & 0xF8) << 8) + (((c1)[1] & 0xFC) << 3) + (((c1)[0] & 0xF8) >> 3)))
 
 /**
- * Mix an expanded foreground into an RGB565 background. `mix` must be 1..254, the
+ * Mix a prepared foreground into an RGB565 background. `mix` must be 1..254, the
  * callers handle 0 and 255 themselves. `res` may be the same variable as `bg`.
  * A macro and not a function because -Os inlines neither, and this runs on every pixel.
  */
-#define LV_COLOR_16_16_MIX_EXPANDED(res, fg_exp, bg, mix)                                 \
-    do {                                                                                  \
-        uint32_t bg_exp_ = LV_COLOR_16_EXPAND(bg);                                        \
-        uint32_t mix5_ = ((uint32_t)(mix) + 4) >> 3;                                       \
-        uint32_t res_ = (((((fg_exp) - bg_exp_) * mix5_) >> 5) + bg_exp_) & 0x07E0F81Fu;  \
-        (res) = (uint16_t)((res_ >> 16) | res_);                                          \
+#define LV_COLOR_MIX_16_TO_16_PREPARED(res, fg_prep, bg, mix)                               \
+    do {                                                                                    \
+        uint32_t bg_prep_ = LV_COLOR_MIX_16_PREPARE(bg);                                    \
+        uint32_t mix5_ = ((uint32_t)(mix) + 4) >> 3;                                        \
+        uint32_t res_ = (((((fg_prep) - bg_prep_) * mix5_) >> 5) + bg_prep_) & 0x07E0F81Fu; \
+        (res) = (uint16_t)((res_ >> 16) | res_);                                            \
     } while(0)
 
 /**********************

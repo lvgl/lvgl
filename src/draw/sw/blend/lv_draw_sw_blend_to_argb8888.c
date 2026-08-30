@@ -745,6 +745,50 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
         }                                                                           \
     } while(0)
 
+/**
+ * The masked rows of an RGB565 source. Kept out of rgb565_image_blend() on purpose: inlined
+ * there it pushes that function over the compiler's inline budget, and the unmasked loops
+ * beside it lose their own inlining, which costs far more than this path saves.
+ */
+static void LV_ATTRIBUTE_FAST_MEM rgb565_masked_rows(lv_color32_t * dest_buf_c32, int32_t dest_stride,
+                                                     const lv_color16_t * src_buf_c16, int32_t src_stride,
+                                                     const lv_opa_t * mask_buf, int32_t mask_stride,
+                                                     int32_t w, int32_t h,
+                                                     lv_color_mix_alpha_cache_t * cache_p)
+{
+    lv_color32_t color_argb;
+    lv_color_mix_alpha_cache_t cache = *cache_p;
+    int32_t x;
+    int32_t y;
+
+    color_argb.alpha = 0xff;
+    for(y = 0; y < h; y++) {
+        /*The mask is the image's alpha plane, mostly 0 or 255. Wide rows test four mask bytes
+         *with one word read; the four are spelled out because a `for(i = 0; i < 4; i++)` here
+         *costs more than it saves.*/
+        x = 0;
+        if(w >= 32) {
+            for(; x < w && ((lv_uintptr_t)(mask_buf + x) & 0x3); x++) {
+                RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x], src_buf_c16[x], mask_buf[x]);
+            }
+            for(; x <= w - 4; x += 4) {
+                if(*((const uint32_t *)(mask_buf + x)) == 0) continue;
+                RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 0], src_buf_c16[x + 0], mask_buf[x + 0]);
+                RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 1], src_buf_c16[x + 1], mask_buf[x + 1]);
+                RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 2], src_buf_c16[x + 2], mask_buf[x + 2]);
+                RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 3], src_buf_c16[x + 3], mask_buf[x + 3]);
+            }
+        }
+        for(; x < w; x++) {
+            RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x], src_buf_c16[x], mask_buf[x]);
+        }
+        dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+        src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
+        mask_buf += mask_stride;
+    }
+    *cache_p = cache;
+}
+
 static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     int32_t w = dsc->dest_w;
@@ -778,44 +822,39 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
             }
             if(LV_RESULT_INVALID == accelerated) {
                 color_argb.alpha = opa;
-                for(y = 0; y < h; y++) {
-                    for(x = 0; x < w; x++) {
-                        color_argb.red = (src_buf_c16[x].red * 2106) >> 8;  /*To make it rounded*/
-                        color_argb.green = (src_buf_c16[x].green * 1037) >> 8;
-                        color_argb.blue = (src_buf_c16[x].blue * 2106) >> 8;
-                        dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                if(opa >= LV_OPA_MAX) {
+                    /*An opaque foreground always wins, whatever the background is, so this is
+                     *a plain convert and store. Keeping the mix out of the loop also keeps the
+                     *loop free of calls, which is what lets the compiler vectorize it.*/
+                    for(y = 0; y < h; y++) {
+                        for(x = 0; x < w; x++) {
+                            color_argb.red = (src_buf_c16[x].red * 2106) >> 8;  /*To make it rounded*/
+                            color_argb.green = (src_buf_c16[x].green * 1037) >> 8;
+                            color_argb.blue = (src_buf_c16[x].blue * 2106) >> 8;
+                            dest_buf_c32[x] = color_argb;
+                        }
+                        dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                        src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
                     }
-                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
-                    src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
+                }
+                else {
+                    for(y = 0; y < h; y++) {
+                        for(x = 0; x < w; x++) {
+                            color_argb.red = (src_buf_c16[x].red * 2106) >> 8;  /*To make it rounded*/
+                            color_argb.green = (src_buf_c16[x].green * 1037) >> 8;
+                            color_argb.blue = (src_buf_c16[x].blue * 2106) >> 8;
+                            dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                        }
+                        dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                        src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
+                    }
                 }
             }
         }
         else if(mask_buf && opa >= LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc)) {
-                for(y = 0; y < h; y++) {
-                    /*The mask is the image's alpha plane, mostly 0 or 255. Wide rows test four
-                     *mask bytes with one word read; the four are spelled out because a
-                     *`for(i = 0; i < 4; i++)` here costs more than it saves at -O2.*/
-                    x = 0;
-                    if(w >= 32) {
-                        for(; x < w && ((lv_uintptr_t)(mask_buf + x) & 0x3); x++) {
-                            RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x], src_buf_c16[x], mask_buf[x]);
-                        }
-                        for(; x <= w - 4; x += 4) {
-                            if(*((const uint32_t *)(mask_buf + x)) == 0) continue;
-                            RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 0], src_buf_c16[x + 0], mask_buf[x + 0]);
-                            RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 1], src_buf_c16[x + 1], mask_buf[x + 1]);
-                            RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 2], src_buf_c16[x + 2], mask_buf[x + 2]);
-                            RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 3], src_buf_c16[x + 3], mask_buf[x + 3]);
-                        }
-                    }
-                    for(; x < w; x++) {
-                        RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x], src_buf_c16[x], mask_buf[x]);
-                    }
-                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
-                    src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
-                    mask_buf += mask_stride;
-                }
+                rgb565_masked_rows(dest_buf_c32, dest_stride, src_buf_c16, src_stride,
+                                   mask_buf, mask_stride, w, h, &cache);
             }
         }
         else {
@@ -892,17 +931,36 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
             }
             if(LV_RESULT_INVALID == accelerated) {
                 color_argb.alpha = opa;
-                for(y = 0; y < h; y++) {
-                    for(x = 0; x < w; x++) {
-                        raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
-                        px = lv_color16_from_u16(raw);
-                        color_argb.red = (px.red * 2106) >> 8;  /*To make it rounded*/
-                        color_argb.green = (px.green * 1037) >> 8;
-                        color_argb.blue = (px.blue * 2106) >> 8;
-                        dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                if(opa >= LV_OPA_MAX) {
+                    /*An opaque foreground always wins, whatever the background is, so this is
+                     *a plain convert and store. Keeping the mix out of the loop also keeps the
+                     *loop free of calls, which is what lets the compiler vectorize it.*/
+                    for(y = 0; y < h; y++) {
+                        for(x = 0; x < w; x++) {
+                            raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
+                            px = lv_color16_from_u16(raw);
+                            color_argb.red = (px.red * 2106) >> 8;  /*To make it rounded*/
+                            color_argb.green = (px.green * 1037) >> 8;
+                            color_argb.blue = (px.blue * 2106) >> 8;
+                            dest_buf_c32[x] = color_argb;
+                        }
+                        dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                        src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
                     }
-                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
-                    src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
+                }
+                else {
+                    for(y = 0; y < h; y++) {
+                        for(x = 0; x < w; x++) {
+                            raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
+                            px = lv_color16_from_u16(raw);
+                            color_argb.red = (px.red * 2106) >> 8;  /*To make it rounded*/
+                            color_argb.green = (px.green * 1037) >> 8;
+                            color_argb.blue = (px.blue * 2106) >> 8;
+                            dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                        }
+                        dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                        src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
+                    }
                 }
             }
         }
