@@ -77,6 +77,47 @@ struct _lv_draw_sw_blend_image_dsc_t {
 
 
 /**********************
+ *      MACROS
+ **********************/
+
+/**
+ * Spread an RGB565 color over 32 bits so that the red, green and blue channels each get
+ * their own gap to grow into. Blending a constant color is loop invariant, so the fill
+ * loops expand the foreground once instead of on every pixel.
+ * @param c         an RGB565 color
+ * @return          the color with the channels spread out
+ */
+#define LV_COLOR_16_EXPAND(c) ((((uint32_t)(c)) | (((uint32_t)(c)) << 16)) & 0x07E0F81Fu)
+
+/**
+ * Convert a BGR ordered 24 bit color to RGB565.
+ * @param c1        pointer to the blue, green and red bytes in this order
+ * @return          the RGB565 color
+ */
+#define LV_COLOR_24_TO_16(c1) \
+    ((uint16_t)((((c1)[2] & 0xF8) << 8) + (((c1)[1] & 0xFC) << 3) + (((c1)[0] & 0xF8) >> 3)))
+
+/**
+ * Mix an already expanded foreground into an RGB565 background.
+ * `mix` has to be 1..254: the 0 and 255 cases are left to the caller, which can skip the
+ * pixel or store the color instead of mixing it, and that also spares the read and the
+ * write that lv_color_16_16_mix() would still do.
+ * Written as a macro on purpose: size-optimized builds inline neither `static inline`
+ * helper, and this runs on every pixel of every glyph and every rounded corner.
+ * @param res       lvalue receiving the mixed RGB565 color, may alias `bg`
+ * @param fg_exp    the foreground expanded with LV_COLOR_16_EXPAND()
+ * @param bg        the background RGB565 color
+ * @param mix       1..254, the opacity of the foreground
+ */
+#define LV_COLOR_16_16_MIX_EXPANDED(res, fg_exp, bg, mix)                                 \
+    do {                                                                                  \
+        uint32_t bg_exp_ = LV_COLOR_16_EXPAND(bg);                                        \
+        uint32_t mix5_ = ((uint32_t)(mix) + 4) >> 3;                                       \
+        uint32_t res_ = (((((fg_exp) - bg_exp_) * mix5_) >> 5) + bg_exp_) & 0x07E0F81Fu;  \
+        (res) = (uint16_t)((res_ >> 16) | res_);                                          \
+    } while(0)
+
+/**********************
  * GLOBAL PROTOTYPES
  **********************/
 
@@ -158,10 +199,6 @@ static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_mix32_premultiplied_in
     bg.blue = (uint8_t)(fg.blue + (((uint32_t)bg.blue * mix_inv) >> 8));
     return bg;
 }
-
-/**********************
- *      MACROS
- **********************/
 
 #endif /* LV_USE_DRAW_SW */
 

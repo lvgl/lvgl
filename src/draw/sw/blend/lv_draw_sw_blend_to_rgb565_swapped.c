@@ -224,6 +224,29 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
  **********************/
 
 /**
+ * One masked pixel of lv_draw_sw_blend_color_to_rgb565_swapped(): skip it if the mask is
+ * fully transparent, store the swapped color if it is fully opaque, mix otherwise. Both
+ * extremes also spare the two byte swaps the mix needs, which is why deciding them here is
+ * worth even more than for the plain RGB565 destination. A macro because size-optimized
+ * builds inline neither `static inline` helper, and this runs on every pixel of every
+ * glyph and every rounded corner.
+ */
+#define RGB565_SWAPPED_MASK_FILL_PX(dest_px, mask_val)                          \
+    do {                                                                        \
+        uint32_t a_ = (mask_val);                                               \
+        if(a_) {                                                                \
+            if(a_ == 255) {                                                     \
+                (dest_px) = color16_swapped;                                    \
+            }                                                                   \
+            else {                                                              \
+                uint16_t px_ = lv_color_swap_16(dest_px); /* Swap destination */\
+                LV_COLOR_16_16_MIX_EXPANDED(px_, fg_exp, px_, a_); /* Mix */    \
+                (dest_px) = lv_color_swap_16(px_); /* Write back swapped */     \
+            }                                                                   \
+        }                                                                       \
+    } while(0)
+
+/**
  * Fill an area with a color.
  * Supports normal fill, fill with opacity, fill with mask, and fill with mask and opacity.
  * dest_buf and color have native color depth. (RGB565, RGB888, XRGB8888)
@@ -257,6 +280,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
     LV_UNUSED(mask_stride);
     LV_UNUSED(dest_stride);
     LV_UNUSED(dest_buf_u16);
+
+    /*The fill color is constant, so expand it once instead of on every pixel*/
+    uint32_t fg_exp = LV_COLOR_16_EXPAND(color16);
+    LV_UNUSED(fg_exp);
 
     /*Simple fill*/
     if(mask == NULL && opa >= LV_OPA_MAX) {
@@ -321,44 +348,67 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
     /*Masked with full opacity*/
     else if(mask && opa >= LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_SWAPPED_WITH_MASK(dsc)) {
-            for(y = 0; y < h; y++) {
-                x = 0;
-                if((lv_uintptr_t)(mask) & 0x1) {
-                    uint16_t px = dest_buf_u16[x];
-                    px = lv_color_swap_16(px); /* Swap destination */
-                    px = lv_color_16_16_mix_inlined(color16, px, mask[x]); /* Color mix */
-                    dest_buf_u16[x] = lv_color_swap_16(px); /* Write back swapped */
-                    x++;
-                }
+            /*This is where every glyph, rounded corner, border, arc and line ends up.
+             *In such a mask about half of the pixels are fully transparent and a third are
+             *fully opaque, so both are decided here: a transparent pixel is skipped without
+             *touching the frame buffer at all and an opaque one is a plain store of the
+             *already swapped color. Both also spare the two byte swaps a mix would need.
+             *The mix is therefore only reached with 1..254 and needs no shortcuts of its own.*/
+            /*fg_exp is declared before the branch chain*/
 
-                for(; x <= w - 2; x += 2) {
-                    uint16_t mask16 = *((uint16_t *)&mask[x]);
-                    if(mask16 == 0xFFFF) {
-                        dest_buf_u16[x + 0] = color16_swapped;
-                        dest_buf_u16[x + 1] = color16_swapped;
+            /*Glyphs are only a few pixels wide, so aligning the mask pointer and handling a
+             *tail costs more than reading four mask bytes at once would save. Rounded corners,
+             *borders and arcs on the other hand are as wide as the widget and consist of long
+             *runs of 0 and 255, where a single word test replaces four byte tests.*/
+            if(w < 32) {
+                for(y = 0; y < h; y++) {
+                    /*Walking the row backwards from its end lets the loop test the index
+                     *itself instead of comparing it to the width on every pixel.*/
+                    const lv_opa_t * mask_row = mask + w;
+                    uint16_t * dest_row = dest_buf_u16 + w;
+                    int32_t i = -w;
+                    if(w & 0x1) {
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_row[i], mask_row[i]);
+                        i++;
                     }
-                    else if(mask16 != 0) {
-                        uint16_t px0 = lv_color_swap_16(dest_buf_u16[x + 0]); /* Swap destination */
-                        uint16_t px1 = lv_color_swap_16(dest_buf_u16[x + 1]); /* Swap destination */
-
-                        px0 = lv_color_16_16_mix_inlined(color16, px0, mask[x + 0]); /* Color mix */
-                        px1 = lv_color_16_16_mix_inlined(color16, px1, mask[x + 1]); /* Color mix */
-
-                        dest_buf_u16[x + 0] = lv_color_swap_16(px0); /* Write back swapped */
-                        dest_buf_u16[x + 1] = lv_color_swap_16(px1); /* Write back swapped */
-
+                    while(i) {
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_row[i], mask_row[i]);
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_row[i + 1], mask_row[i + 1]);
+                        i += 2;
                     }
+                    dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+                    mask += mask_stride;
                 }
-
-                for(; x < w ; x++) {
-                    uint16_t px = dest_buf_u16[x];
-                    px = lv_color_swap_16(px); /* Swap destination */
-                    px = lv_color_16_16_mix_inlined(color16, px, mask[x]); /* Color mix */
-                    dest_buf_u16[x] = lv_color_swap_16(px); /* Write back swapped */
-
+            }
+            else {
+                for(y = 0; y < h; y++) {
+                    /*Align the mask so that the word reads below are aligned too*/
+                    for(x = 0; x < w && ((lv_uintptr_t)(mask + x) & 0x3); x++) {
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_buf_u16[x], mask[x]);
+                    }
+                    for(; x <= w - 4; x += 4) {
+                        uint32_t mask32 = *((const uint32_t *)(mask + x));
+                        if(mask32 == 0) continue;   /*Four transparent pixels*/
+                        if(mask32 == 0xFFFFFFFF) {  /*Four opaque pixels*/
+                            dest_buf_u16[x + 0] = color16_swapped;
+                            dest_buf_u16[x + 1] = color16_swapped;
+                            dest_buf_u16[x + 2] = color16_swapped;
+                            dest_buf_u16[x + 3] = color16_swapped;
+                            continue;
+                        }
+                        /*Read the bytes again instead of taking them apart from `mask32`
+                         *to keep this independent of the byte order*/
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_buf_u16[x + 0], mask[x + 0]);
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_buf_u16[x + 1], mask[x + 1]);
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_buf_u16[x + 2], mask[x + 2]);
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_buf_u16[x + 3], mask[x + 3]);
+                    }
+                    for(; x < w; x++) {
+                        RGB565_SWAPPED_MASK_FILL_PX(dest_buf_u16[x], mask[x]);
+                    }
+                    dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+                    mask += mask_stride;
                 }
-                dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
-                mask += mask_stride;
             }
         }
     }
@@ -367,12 +417,14 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_SWAPPED_MIX_MASK_OPA(dsc)) {
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
-                    uint16_t px = dest_buf_u16[x];
-                    px = lv_color_swap_16(px); /* Swap destination */
-
-                    uint8_t mix_opa = LV_OPA_MIX2(mask[x], opa);
-                    px = lv_color_16_16_mix_inlined(color16, px, mix_opa); /* Color mix */
-
+                    /*Skipping the transparent pixels here spares the two swaps, the read and
+                     *the write that the mix would do to leave them unchanged. The product
+                     *can't reach 255, LV_OPA_MIX2(255, 252) is 251, so there is no fully
+                     *opaque shortcut.*/
+                    uint32_t a = LV_OPA_MIX2(mask[x], opa);
+                    if(a == 0) continue;
+                    uint16_t px = lv_color_swap_16(dest_buf_u16[x]); /* Swap destination */
+                    LV_COLOR_16_16_MIX_EXPANDED(px, fg_exp, px, a); /* Color mix */
                     dest_buf_u16[x] = lv_color_swap_16(px); /* Write back swapped */
                 }
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
@@ -381,6 +433,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
         }
     }
 }
+
+#undef RGB565_SWAPPED_MASK_FILL_PX
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_rgb565_swapped(lv_draw_sw_blend_image_dsc_t * dsc)
 {
@@ -484,9 +538,14 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
             if(LV_RESULT_INVALID == LV_DRAW_SW_I1_BLEND_NORMAL_TO_RGB565_SWAPPED_WITH_MASK(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
+                        /*Images and masks are mostly fully transparent or fully opaque, so both
+                         *are decided here instead of inside the mix, which also spares the swaps*/
+                        uint32_t a = mask_buf[dest_x];
+                        if(a == 0) continue;
                         uint8_t chan_val = get_bit(src_buf_i1, src_x) * 255;
-                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(chan_val, lv_color_swap_16(dest_buf_u16[dest_x]),
-                                                                                  mask_buf[dest_x]));
+                        if(a == 255) dest_buf_u16[dest_x] = lv_color_swap_16(l8_to_rgb565(chan_val));
+                        else dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(chan_val,
+                                                                                           lv_color_swap_16(dest_buf_u16[dest_x]), a));
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_i1 = drawbuf_next_row(src_buf_i1, src_stride);
@@ -498,9 +557,12 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
             if(LV_RESULT_INVALID == LV_DRAW_SW_I1_BLEND_NORMAL_TO_RGB565_SWAPPED_MIX_MASK_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
+                        /*Fully transparent pixels are skipped without touching the frame buffer*/
+                        uint32_t a = LV_OPA_MIX2(mask_buf[dest_x], opa);
+                        if(a == 0) continue;
                         uint8_t chan_val = get_bit(src_buf_i1, src_x) * 255;
-                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(chan_val, lv_color_swap_16(dest_buf_u16[dest_x]),
-                                                                                  LV_OPA_MIX2(mask_buf[dest_x], opa)));
+                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(chan_val,
+                                                                                  lv_color_swap_16(dest_buf_u16[dest_x]), a));
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_i1 = drawbuf_next_row(src_buf_i1, src_stride);
@@ -580,8 +642,13 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
             if(LV_RESULT_INVALID == LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_SWAPPED(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
-                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_al88[src_x].lumi,
-                                                                                  lv_color_swap_16(dest_buf_u16[dest_x]), src_buf_al88[src_x].alpha));
+                        /*Images and masks are mostly fully transparent or fully opaque, so both
+                         *are decided here instead of inside the mix, which also spares the swaps*/
+                        uint32_t a = src_buf_al88[src_x].alpha;
+                        if(a == 0) continue;
+                        if(a == 255) dest_buf_u16[dest_x] = lv_color_swap_16(l8_to_rgb565(src_buf_al88[src_x].lumi));
+                        else dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_al88[src_x].lumi,
+                                                                                           lv_color_swap_16(dest_buf_u16[dest_x]), a));
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_al88 = drawbuf_next_row(src_buf_al88, src_stride);
@@ -592,6 +659,8 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
             if(LV_RESULT_INVALID == LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_SWAPPED_WITH_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
+                        /*Fully transparent pixels are skipped without touching the frame buffer*/
+                        if(src_buf_al88[src_x].alpha == 0) continue;
                         dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_al88[src_x].lumi,
                                                                                   lv_color_swap_16(dest_buf_u16[dest_x]),
                                                                                   LV_OPA_MIX2(src_buf_al88[src_x].alpha, opa)));
@@ -605,6 +674,8 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
             if(LV_RESULT_INVALID == LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_SWAPPED_WITH_MASK(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
+                        /*Fully transparent pixels are skipped without touching the frame buffer*/
+                        if(src_buf_al88[src_x].alpha == 0 || mask_buf[dest_x] == 0) continue;
                         dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_al88[src_x].lumi,
                                                                                   lv_color_swap_16(dest_buf_u16[dest_x]),
                                                                                   LV_OPA_MIX2(src_buf_al88[src_x].alpha, mask_buf[dest_x])));
@@ -619,6 +690,8 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
             if(LV_RESULT_INVALID == LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_SWAPPED_MIX_MASK_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
+                        /*Fully transparent pixels are skipped without touching the frame buffer*/
+                        if(src_buf_al88[src_x].alpha == 0 || mask_buf[dest_x] == 0) continue;
                         dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_al88[src_x].lumi,
                                                                                   lv_color_swap_16(dest_buf_u16[dest_x]),
                                                                                   LV_OPA_MIX3(src_buf_al88[src_x].alpha, mask_buf[dest_x], opa)));
@@ -736,8 +809,13 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_RGB565_SWAPPED_WITH_MASK(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
-                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_l8[src_x], lv_color_swap_16(dest_buf_u16[dest_x]),
-                                                                                  mask_buf[dest_x]));
+                        /*Images and masks are mostly fully transparent or fully opaque, so both
+                         *are decided here instead of inside the mix, which also spares the swaps*/
+                        uint32_t a = mask_buf[dest_x];
+                        if(a == 0) continue;
+                        if(a == 255) dest_buf_u16[dest_x] = lv_color_swap_16(l8_to_rgb565(src_buf_l8[src_x]));
+                        else dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_l8[src_x],
+                                                                                           lv_color_swap_16(dest_buf_u16[dest_x]), a));
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_l8 += src_stride;
@@ -749,8 +827,11 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_RGB565_SWAPPED_MIX_MASK_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
-                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_l8[src_x], lv_color_swap_16(dest_buf_u16[dest_x]),
-                                                                                  LV_OPA_MIX2(mask_buf[dest_x], opa)));
+                        /*Fully transparent pixels are skipped without touching the frame buffer*/
+                        uint32_t a = LV_OPA_MIX2(mask_buf[dest_x], opa);
+                        if(a == 0) continue;
+                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_8_16_mix(src_buf_l8[src_x],
+                                                                                  lv_color_swap_16(dest_buf_u16[dest_x]), a));
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_l8 += src_stride;
@@ -1115,8 +1196,13 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_SWAPPED_WITH_MASK(dsc, src_px_size)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += src_px_size) {
-                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x], lv_color_swap_16(dest_buf_u16[dest_x]),
-                                                                                   mask_buf[dest_x]));
+                        /*Images and masks are mostly fully transparent or fully opaque, so both
+                         *are decided here instead of inside the mix, which also spares the swaps*/
+                        uint32_t a = mask_buf[dest_x];
+                        if(a == 0) continue;
+                        if(a == 255) dest_buf_u16[dest_x] = lv_color_swap_16(LV_COLOR_24_TO_16(&src_buf_u8[src_x]));
+                        else dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x],
+                                                                                            lv_color_swap_16(dest_buf_u16[dest_x]), a));
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_u8 += src_stride;
@@ -1128,8 +1214,11 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_SWAPPED_MIX_MASK_OPA(dsc, src_px_size)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += src_px_size) {
-                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x], lv_color_swap_16(dest_buf_u16[dest_x]),
-                                                                                   LV_OPA_MIX2(mask_buf[dest_x], opa)));
+                        /*Fully transparent pixels are skipped without touching the frame buffer*/
+                        uint32_t a = LV_OPA_MIX2(mask_buf[dest_x], opa);
+                        if(a == 0) continue;
+                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x],
+                                                                                   lv_color_swap_16(dest_buf_u16[dest_x]), a));
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_u8 += src_stride;
@@ -1214,8 +1303,19 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_SWAPPED(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
-                        dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x], lv_color_swap_16(dest_buf_u16[dest_x]),
-                                                                                   src_buf_u8[src_x + 3]));
+                        /*Images are mostly fully transparent or fully opaque, so both are
+                         *decided here: a transparent pixel is skipped without touching the
+                         *frame buffer and an opaque one is a plain store. Both also spare
+                         *the two byte swaps the mix needs.*/
+                        uint32_t a = src_buf_u8[src_x + 3];
+                        if(a == 0) continue;
+                        if(a == 255) {
+                            dest_buf_u16[dest_x] = lv_color_swap_16(LV_COLOR_24_TO_16(&src_buf_u8[src_x]));
+                        }
+                        else {
+                            dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x],
+                                                                                       lv_color_swap_16(dest_buf_u16[dest_x]), a));
+                        }
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_u8 += src_stride;
@@ -1226,6 +1326,10 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_SWAPPED_WITH_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
+                        /*A transparent source pixel stays transparent whatever `opa` is, so
+                         *skip it before the multiplication. It can't become fully opaque
+                         *though, LV_OPA_MIX2(255, 255) is 254, so there's no store shortcut.*/
+                        if(src_buf_u8[src_x + 3] == 0) continue;
                         dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x], lv_color_swap_16(dest_buf_u16[dest_x]),
                                                                                    LV_OPA_MIX2(src_buf_u8[src_x + 3],
                                                                                                opa)));
@@ -1239,6 +1343,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_SWAPPED_WITH_MASK(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
+                        if(src_buf_u8[src_x + 3] == 0 || mask_buf[dest_x] == 0) continue;
                         dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x], lv_color_swap_16(dest_buf_u16[dest_x]),
                                                                                    LV_OPA_MIX2(src_buf_u8[src_x + 3], mask_buf[dest_x])));
                     }
@@ -1252,6 +1357,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_SWAPPED_MIX_MASK_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
+                        if(src_buf_u8[src_x + 3] == 0 || mask_buf[dest_x] == 0) continue;
                         dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix(&src_buf_u8[src_x], lv_color_swap_16(dest_buf_u16[dest_x]),
                                                                                    LV_OPA_MIX3(src_buf_u8[src_x + 3], mask_buf[dest_x], opa)));
                     }
@@ -1505,39 +1611,35 @@ static inline uint16_t LV_ATTRIBUTE_FAST_MEM l8_to_rgb565(const uint8_t c1)
 
 static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_8_16_mix(const uint8_t c1, uint16_t c2, uint8_t mix)
 {
-    if(mix == 0) {
-        return c2;
-    }
-
-    uint16_t c1_16 = ((c1 & 0xF8) << 8) + ((c1 & 0xFC) << 3) + ((c1 & 0xF8) >> 3);
-    if(mix == 255 || c1_16 == c2) return c1_16;
+    /*No shortcuts for a fully transparent, fully opaque or equal foreground: the callers pick
+     *those pixels off before calling, where a skip is a real skip instead of a mix that reads
+     *and writes the pixel back unchanged. The maths below is correct for 0 and 255 anyway,
+     *`mix5` becomes 0 or 32, so a caller that doesn't is only slower, never wrong.*/
+    uint16_t c1_16 = l8_to_rgb565(c1);
 
     /*Spelled out instead of calling lv_color_16_16_mix_inlined(): size-optimized builds inline
      *neither helper, so delegating would cost a second call on every pixel.*/
     uint32_t mix5 = ((uint32_t)mix + 4) >> 3;
-    /*0x7E0F81F = 0b00000111111000001111100000011111*/
-    uint32_t bg = (uint32_t)(c2 | ((uint32_t)c2 << 16)) & 0x7E0F81F;
-    uint32_t fg = (uint32_t)(c1_16 | ((uint32_t)c1_16 << 16)) & 0x7E0F81F;
-    uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x7E0F81F;
+    uint32_t bg = LV_COLOR_16_EXPAND(c2);
+    uint32_t fg = LV_COLOR_16_EXPAND(c1_16);
+    uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x07E0F81Fu;
     return (uint16_t)((result >> 16) | result);
 }
 
 static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_24_16_mix(const uint8_t * c1, uint16_t c2, uint8_t mix)
 {
-    if(mix == 0) {
-        return c2;
-    }
-
-    uint16_t c1_16 = ((c1[2] & 0xF8) << 8) + ((c1[1] & 0xFC) << 3) + ((c1[0] & 0xF8) >> 3);
-    if(mix == 255 || c1_16 == c2) return c1_16;
+    /*No shortcuts for a fully transparent, fully opaque or equal foreground: the callers pick
+     *those pixels off before calling, where a skip is a real skip instead of a mix that reads
+     *and writes the pixel back unchanged. The maths below is correct for 0 and 255 anyway,
+     *`mix5` becomes 0 or 32, so a caller that doesn't is only slower, never wrong.*/
+    uint16_t c1_16 = LV_COLOR_24_TO_16(c1);
 
     /*Spelled out instead of calling lv_color_16_16_mix_inlined(): size-optimized builds inline
      *neither helper, so delegating would cost a second call on every pixel.*/
     uint32_t mix5 = ((uint32_t)mix + 4) >> 3;
-    /*0x7E0F81F = 0b00000111111000001111100000011111*/
-    uint32_t bg = (uint32_t)(c2 | ((uint32_t)c2 << 16)) & 0x7E0F81F;
-    uint32_t fg = (uint32_t)(c1_16 | ((uint32_t)c1_16 << 16)) & 0x7E0F81F;
-    uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x7E0F81F;
+    uint32_t bg = LV_COLOR_16_EXPAND(c2);
+    uint32_t fg = LV_COLOR_16_EXPAND(c1_16);
+    uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x07E0F81Fu;
     return (uint16_t)((result >> 16) | result);
 }
 

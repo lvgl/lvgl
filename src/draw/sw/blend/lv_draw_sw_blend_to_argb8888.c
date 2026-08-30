@@ -72,6 +72,9 @@ static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_color_8_32_mix(const uint8_t s
 static inline lv_color32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color_32_32_mix(lv_color32_t fg, lv_color32_t bg,
                                                                           lv_color_mix_alpha_cache_t * cache);
 
+static inline lv_color32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color_32_32_mix_mid(lv_color32_t fg, lv_color32_t bg,
+                                                                              lv_color_mix_alpha_cache_t * cache);
+
 static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
 
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ blend_non_normal_pixel(lv_color32_t * dest, lv_color32_t src,
@@ -219,6 +222,28 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
     #define LV_DRAW_SW_I1_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)  LV_RESULT_INVALID
 #endif
 
+/**
+ * One masked pixel of lv_draw_sw_blend_color_to_argb8888(): skip it if the mask is fully
+ * transparent, store the color if it is fully opaque, mix otherwise. Deciding the two
+ * extremes here rather than inside the mix spares the read and the write that a mix with
+ * 0 would still do. A macro because size-optimized builds inline neither `static inline`
+ * helper, and this runs on every pixel of every glyph and every rounded corner.
+ */
+#define ARGB8888_MASK_FILL_PX(dest_px, mask_val)                                \
+    do {                                                                        \
+        uint32_t a_ = (mask_val);                                               \
+        if(a_ > LV_OPA_MIN) {                                                   \
+            color_argb.alpha = (uint8_t)a_;                                     \
+            /*An opaque foreground or a transparent background is a plain store*/\
+            if(a_ >= LV_OPA_MAX || (dest_px).alpha <= LV_OPA_MIN) {             \
+                (dest_px) = color_argb;                                         \
+            }                                                                   \
+            else {                                                              \
+                (dest_px) = lv_color_32_32_mix_mid(color_argb, dest_px, &cache);\
+            }                                                                   \
+        }                                                                       \
+    } while(0)
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -302,14 +327,50 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_MASK(dsc)) {
             lv_color32_t color_argb = lv_color_to_32(dsc->color, 0xff);
             lv_color32_t * dest_buf = dsc->dest_buf;
-            for(y = 0; y < h; y++) {
-                for(x = 0; x < w; x++) {
-                    color_argb.alpha = mask[x];
-                    dest_buf[x] = lv_color_32_32_mix(color_argb, dest_buf[x], &cache);
+            /*Glyphs are only a few pixels wide, so aligning the mask pointer and handling a
+             *tail costs more than reading four mask bytes at once would save. Rounded corners,
+             *borders and arcs on the other hand are as wide as the widget and consist of long
+             *runs of 0 and 255, where a single word test replaces four byte tests.*/
+            if(w < 32) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        ARGB8888_MASK_FILL_PX(dest_buf[x], mask[x]);
+                    }
+                    dest_buf = drawbuf_next_row(dest_buf, dest_stride);
+                    mask += mask_stride;
                 }
-
-                dest_buf = drawbuf_next_row(dest_buf, dest_stride);
-                mask += mask_stride;
+            }
+            else {
+                lv_color32_t color_opaque = color_argb;
+                color_opaque.alpha = 0xff;
+                for(y = 0; y < h; y++) {
+                    /*Align the mask so that the word reads below are aligned too*/
+                    for(x = 0; x < w && ((lv_uintptr_t)(mask + x) & 0x3); x++) {
+                        ARGB8888_MASK_FILL_PX(dest_buf[x], mask[x]);
+                    }
+                    for(; x <= w - 4; x += 4) {
+                        uint32_t mask32 = *((const uint32_t *)(mask + x));
+                        if(mask32 == 0) continue;   /*Four transparent pixels*/
+                        if(mask32 == 0xFFFFFFFF) {  /*Four opaque pixels*/
+                            dest_buf[x + 0] = color_opaque;
+                            dest_buf[x + 1] = color_opaque;
+                            dest_buf[x + 2] = color_opaque;
+                            dest_buf[x + 3] = color_opaque;
+                            continue;
+                        }
+                        /*Read the bytes again instead of taking them apart from `mask32`
+                         *to keep this independent of the byte order*/
+                        ARGB8888_MASK_FILL_PX(dest_buf[x + 0], mask[x + 0]);
+                        ARGB8888_MASK_FILL_PX(dest_buf[x + 1], mask[x + 1]);
+                        ARGB8888_MASK_FILL_PX(dest_buf[x + 2], mask[x + 2]);
+                        ARGB8888_MASK_FILL_PX(dest_buf[x + 3], mask[x + 3]);
+                    }
+                    for(; x < w; x++) {
+                        ARGB8888_MASK_FILL_PX(dest_buf[x], mask[x]);
+                    }
+                    dest_buf = drawbuf_next_row(dest_buf, dest_stride);
+                    mask += mask_stride;
+                }
             }
         }
     }
@@ -320,8 +381,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
             lv_color32_t * dest_buf = dsc->dest_buf;
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
-                    color_argb.alpha = LV_OPA_MIX2(mask[x], opa);
-                    dest_buf[x] = lv_color_32_32_mix(color_argb, dest_buf[x], &cache);
+                    /*Fully transparent pixels are skipped without touching the frame buffer*/
+                    ARGB8888_MASK_FILL_PX(dest_buf[x], LV_OPA_MIX2(mask[x], opa));
                 }
                 dest_buf = drawbuf_next_row(dest_buf, dest_stride);
                 mask += mask_stride;
@@ -329,6 +390,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
         }
     }
 }
+
+#undef ARGB8888_MASK_FILL_PX
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_argb8888(lv_draw_sw_blend_image_dsc_t * dsc)
 {
@@ -1018,7 +1081,18 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        dest_buf_c32[x] = lv_color_32_32_mix(src_buf_c32[x], dest_buf_c32[x], &cache);
+                        /*The two cheap cases of lv_color_32_32_mix() decided here: an opaque
+                         *foreground or a transparent background is a plain store and a
+                         *transparent foreground leaves the pixel alone. Images are mostly one
+                         *of these, and a fresh layer starts out fully transparent, so this
+                         *spares the call on nearly every pixel.*/
+                        color_argb = src_buf_c32[x];
+                        if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
+                            dest_buf_c32[x] = color_argb;
+                        }
+                        else if(color_argb.alpha > LV_OPA_MIN) {
+                            dest_buf_c32[x] = lv_color_32_32_mix_mid(color_argb, dest_buf_c32[x], &cache);
+                        }
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -1029,9 +1103,19 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
+                        /*The two cheap cases of lv_color_32_32_mix() decided here: an opaque
+                         *foreground or a transparent background is a plain store and a
+                         *transparent foreground leaves the pixel alone. Images are mostly one
+                         *of these, and a fresh layer starts out fully transparent, so this
+                         *spares the call on nearly every pixel.*/
                         color_argb = src_buf_c32[x];
                         color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
-                        dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                        if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
+                            dest_buf_c32[x] = color_argb;
+                        }
+                        else if(color_argb.alpha > LV_OPA_MIN) {
+                            dest_buf_c32[x] = lv_color_32_32_mix_mid(color_argb, dest_buf_c32[x], &cache);
+                        }
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -1042,9 +1126,19 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
+                        /*The two cheap cases of lv_color_32_32_mix() decided here: an opaque
+                         *foreground or a transparent background is a plain store and a
+                         *transparent foreground leaves the pixel alone. Images are mostly one
+                         *of these, and a fresh layer starts out fully transparent, so this
+                         *spares the call on nearly every pixel.*/
                         color_argb = src_buf_c32[x];
                         color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, mask_buf[x]);
-                        dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                        if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
+                            dest_buf_c32[x] = color_argb;
+                        }
+                        else if(color_argb.alpha > LV_OPA_MIN) {
+                            dest_buf_c32[x] = lv_color_32_32_mix_mid(color_argb, dest_buf_c32[x], &cache);
+                        }
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -1056,9 +1150,19 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
+                        /*The two cheap cases of lv_color_32_32_mix() decided here: an opaque
+                         *foreground or a transparent background is a plain store and a
+                         *transparent foreground leaves the pixel alone. Images are mostly one
+                         *of these, and a fresh layer starts out fully transparent, so this
+                         *spares the call on nearly every pixel.*/
                         color_argb = src_buf_c32[x];
                         color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, opa, mask_buf[x]);
-                        dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                        if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
+                            dest_buf_c32[x] = color_argb;
+                        }
+                        else if(color_argb.alpha > LV_OPA_MIN) {
+                            dest_buf_c32[x] = lv_color_32_32_mix_mid(color_argb, dest_buf_c32[x], &cache);
+                        }
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -1253,6 +1357,64 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_8_32_mix(const uint8_t src, lv
     }
 }
 
+/**
+ * The alpha compositing branch of lv_color_32_32_mix(), for a background that is neither
+ * fully opaque nor fully transparent. It is rare and large, so it is deliberately not
+ * inlined: keeping it out of the mix helpers is what lets those be inlined into the
+ * per-pixel blend loops.
+ * @param fg        the foreground, alpha above LV_OPA_MIN and below LV_OPA_MAX
+ * @param bg        the background, alpha above LV_OPA_MIN and below LV_OPA_MAX
+ * @param cache     the mix cache of the caller
+ * @return          the mixed color
+ */
+static LV_ATTRIBUTE_FAST_MEM lv_color32_t lv_color_32_32_mix_semi_transparent_bg(lv_color32_t fg, lv_color32_t bg,
+                                                                                 lv_color_mix_alpha_cache_t * cache)
+{
+    /*Save the parameters and the result. If they will be asked again don't compute again*/
+
+    /*Update the ratio and the result alpha value if the input alpha values change*/
+    if(bg.alpha != cache->bg_saved.alpha || fg.alpha != cache->fg_saved.alpha) {
+        /*Info:
+         * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
+        cache->res_alpha_saved = 255 - LV_OPA_MIX2(255 - fg.alpha, 255 - bg.alpha);
+        LV_ASSERT(cache->res_alpha_saved != 0);
+        cache->ratio_saved = (uint32_t)((uint32_t)fg.alpha * 255) / cache->res_alpha_saved;
+    }
+
+    if(!lv_color32_eq(bg, cache->bg_saved) || !lv_color32_eq(fg, cache->fg_saved)) {
+        cache->fg_saved = fg;
+        cache->bg_saved = bg;
+        fg.alpha = cache->ratio_saved;
+        cache->res_saved = lv_color_mix32_inlined(fg, bg);
+        cache->res_saved.alpha = cache->res_alpha_saved;
+    }
+
+    return cache->res_saved;
+}
+
+/**
+ * lv_color_32_32_mix() without the two cheap cases at its front. The callers that can
+ * decide them per pixel do so themselves, where an opaque foreground or a transparent
+ * background is a plain store, so repeating the tests here would only cost instructions
+ * once the compiler inlines this.
+ * @param fg        the foreground, its alpha must be above LV_OPA_MIN and below LV_OPA_MAX
+ * @param bg        the background, its alpha must be above LV_OPA_MIN
+ * @param cache     the mix cache of the caller
+ * @return          the mixed color
+ */
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_32_32_mix_mid(lv_color32_t fg, lv_color32_t bg,
+                                                                        lv_color_mix_alpha_cache_t * cache)
+{
+    /*Opaque background: use simple mix*/
+    if(bg.alpha >= LV_OPA_MAX) {
+        return lv_color_mix32_inlined(fg, bg);
+    }
+
+    /*Both colors have alpha: the expensive case, kept out of line so that the callers of
+     *lv_color_32_32_mix() stay small enough for the compiler to inline them*/
+    return lv_color_32_32_mix_semi_transparent_bg(fg, bg, cache);
+}
+
 static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_32_32_mix(lv_color32_t fg, lv_color32_t bg,
                                                                     lv_color_mix_alpha_cache_t * cache)
 {
@@ -1268,28 +1430,10 @@ static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_32_32_mix(lv_color32_t
     else if(bg.alpha >= LV_OPA_MAX) {
         return lv_color_mix32_inlined(fg, bg);
     }
-    /*Both colors have alpha. Expensive calculation need to be applied*/
+    /*Both colors have alpha: the expensive case, kept out of line so that this function
+     *stays small enough for the compiler to inline it into the blend loops*/
     else {
-        /*Save the parameters and the result. If they will be asked again don't compute again*/
-
-        /*Update the ratio and the result alpha value if the input alpha values change*/
-        if(bg.alpha != cache->bg_saved.alpha || fg.alpha != cache->fg_saved.alpha) {
-            /*Info:
-             * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
-            cache->res_alpha_saved = 255 - LV_OPA_MIX2(255 - fg.alpha, 255 - bg.alpha);
-            LV_ASSERT(cache->res_alpha_saved != 0);
-            cache->ratio_saved = (uint32_t)((uint32_t)fg.alpha * 255) / cache->res_alpha_saved;
-        }
-
-        if(!lv_color32_eq(bg, cache->bg_saved) || !lv_color32_eq(fg, cache->fg_saved)) {
-            cache->fg_saved = fg;
-            cache->bg_saved = bg;
-            fg.alpha = cache->ratio_saved;
-            cache->res_saved = lv_color_mix32_inlined(fg, bg);
-            cache->res_saved.alpha = cache->res_alpha_saved;
-        }
-
-        return cache->res_saved;
+        return lv_color_32_32_mix_semi_transparent_bg(fg, bg, cache);
     }
 }
 
