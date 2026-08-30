@@ -52,7 +52,8 @@ static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(lv_draw_sw_blend_imag
 #endif
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
-    static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc,
+                                                             bool premultiplied);
 #endif
 
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_color_8_8_mix(const uint8_t src, uint8_t * dest, uint8_t mix);
@@ -301,7 +302,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_l8(lv_draw_sw_blend_image_d
 #endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888
         case LV_COLOR_FORMAT_ARGB8888:
-            argb8888_image_blend(dsc);
+            argb8888_image_blend(dsc, false);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            argb8888_image_blend(dsc, true);
             break;
 #endif
         case LV_COLOR_FORMAT_L8:
@@ -862,7 +868,20 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
 
-static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
+/**
+ * Luminance of an image pixel. A premultiplied source has its channels already scaled by
+ * its alpha, so undo that to get the same value a straight source would give.
+ */
+static inline uint8_t LV_ATTRIBUTE_FAST_MEM argb8888_lumi(lv_color32_t c, bool premultiplied)
+{
+    if(!premultiplied || c.alpha == 0 || c.alpha >= LV_OPA_MAX) return lv_color32_luminance(c);
+
+    uint32_t lumi = (lv_color32_luminance(c) * ((255u * 256u) / c.alpha)) >> 8;
+    return (uint8_t)(lumi > 255 ? 255 : lumi);
+}
+
+static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc,
+                                                       bool premultiplied)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -882,7 +901,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_L8(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        lv_color_8_8_mix(lv_color32_luminance(src_buf_c32[x]), &dest_buf_l8[x], src_buf_c32[x].alpha);
+                        lv_color_8_8_mix(argb8888_lumi(src_buf_c32[x], premultiplied), &dest_buf_l8[x], src_buf_c32[x].alpha);
                     }
                     dest_buf_l8 = drawbuf_next_row(dest_buf_l8, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -893,7 +912,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_L8_WITH_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        lv_color_8_8_mix(lv_color32_luminance(src_buf_c32[x]), &dest_buf_l8[x], LV_OPA_MIX2(src_buf_c32[x].alpha, opa));
+                        lv_color_8_8_mix(argb8888_lumi(src_buf_c32[x], premultiplied), &dest_buf_l8[x], LV_OPA_MIX2(src_buf_c32[x].alpha, opa));
                     }
                     dest_buf_l8 = drawbuf_next_row(dest_buf_l8, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -904,7 +923,8 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_L8_WITH_MASK(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        lv_color_8_8_mix(lv_color32_luminance(src_buf_c32[x]), &dest_buf_l8[x], LV_OPA_MIX2(src_buf_c32[x].alpha, mask_buf[x]));
+                        lv_color_8_8_mix(argb8888_lumi(src_buf_c32[x], premultiplied), &dest_buf_l8[x], LV_OPA_MIX2(src_buf_c32[x].alpha,
+                                                                                                                    mask_buf[x]));
                     }
                     dest_buf_l8 = drawbuf_next_row(dest_buf_l8, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -916,8 +936,8 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_L8_MIX_MASK_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        lv_color_8_8_mix(lv_color32_luminance(src_buf_c32[x]), &dest_buf_l8[x], LV_OPA_MIX3(src_buf_c32[x].alpha, opa,
-                                                                                                            mask_buf[x]));
+                        lv_color_8_8_mix(argb8888_lumi(src_buf_c32[x], premultiplied), &dest_buf_l8[x], LV_OPA_MIX3(src_buf_c32[x].alpha, opa,
+                                                                                                                    mask_buf[x]));
                     }
                     dest_buf_l8 = drawbuf_next_row(dest_buf_l8, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);

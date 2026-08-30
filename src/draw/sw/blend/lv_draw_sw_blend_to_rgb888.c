@@ -298,13 +298,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
             uint8_t * dest_buf = dsc->dest_buf;
             w *= dest_px_size;
 
-            /*As the color and the opacity are constant for the whole fill premultiply them once.
-             *Every channel is then `(fg * opa + bg * (255 - opa)) >> 8`, which is at most
-             *255 * 255, so two channels fit side by side in the 16 bit halves of a 32 bit
-             *word and can be blended with a single multiplication.
-             *3 and 4 are coprime, so 4 pixels of a 24 bit buffer are exactly 3 aligned words
-             *and the channel roles inside a word simply rotate with a period of 3. That turns
-             *12 byte reads and 12 byte writes per 4 pixels into 3 word reads and 3 word writes.*/
+            /*Every channel is `(fg * opa + bg * (255 - opa)) >> 8`, which stays below
+             *255 * 255, so two of them fit in the 16 bit halves of a word and blend with one
+             *multiplication. 4 pixels of a 24 bit buffer are exactly 3 aligned words, and the
+             *channel order inside a word repeats every 3 words. So 4 pixels cost 3 word
+             *accesses instead of 24 byte accesses.*/
             uint32_t mix_inv = 255 - opa;
             uint32_t fg_premult[3];
             fg_premult[0] = (uint32_t)dsc->color.blue * opa;
@@ -312,8 +310,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
             fg_premult[2] = (uint32_t)dsc->color.red * opa;
 
             if(dest_px_size == 3) {
-                /*`k_lo[r]` holds the constants of the bytes 0 and 2 of a word that starts on
-                 *channel `r`, `k_hi[r]` the ones of the bytes 1 and 3*/
+                /*Constants for a word starting on channel `r`: k_lo for bytes 0 and 2,
+                 *k_hi for bytes 1 and 3*/
                 uint32_t k_lo[3];
                 uint32_t k_hi[3];
                 for(x = 0; x < 3; x++) {
@@ -324,8 +322,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                 for(y = 0; y < h; y++) {
                     uint32_t role = 0;
                     x = 0;
-                    /*Lead in until the buffer is word aligned. Unaligned word accesses are
-                     *unsupported on some targets and slow on the rest.*/
+                    /*Lead in until word aligned. Some targets can't do unaligned word
+                     *accesses at all, the rest are slow at it.*/
                     while(x < w && ((lv_uintptr_t)(dest_buf + x) & 0x3)) {
                         dest_buf[x] = (uint8_t)((fg_premult[role] + dest_buf[x] * mix_inv) >> 8);
                         x++;
@@ -336,7 +334,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                         uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo[role]) >> 8) & 0x00FF00FFu;
                         uint32_t hi = (((((d >> 8) & 0x00FF00FFu) * mix_inv) + k_hi[role]) >> 8) & 0x00FF00FFu;
                         *((uint32_t *)(dest_buf + x)) = lo | (hi << 8);
-                        /*4 bytes advance the channel role by 4 % 3 == 1*/
+                        /*4 bytes move the channel order on by one*/
                         if(++role == 3) role = 0;
                     }
                     for(; x < w; x++) {
@@ -347,7 +345,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                 }
             }
             else {
-                /*32 bit pixels: one word each, and the 4th byte has to be kept as it is*/
+                /*32 bit pixels: one word each, and the 4th byte must be left alone*/
                 uint32_t k_lo = fg_premult[0] | (fg_premult[2] << 16);
                 uint32_t k_g = fg_premult[1];
                 for(y = 0; y < h; y++) {
@@ -372,9 +370,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
             for(y = 0; y < h; y++) {
                 uint32_t mask_x;
                 for(x = 0, mask_x = 0; x < w; x += dest_px_size, mask_x++) {
-                    /*About half of the pixels of a glyph or a rounded corner are fully
-                     *transparent, and deciding that here spares a call per pixel in
-                     *size-optimized builds, where the mix isn't inlined*/
+                    /*About half of a glyph or a rounded corner is fully transparent, and
+                     *at -Os the mix isn't inlined, so this saves a call per pixel*/
                     if(mask[mask_x] == 0) continue;
                     lv_color_24_24_mix((const uint8_t *)&color32, &dest_buf[x], mask[mask_x]);
                 }

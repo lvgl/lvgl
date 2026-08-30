@@ -81,33 +81,21 @@ struct _lv_draw_sw_blend_image_dsc_t {
  **********************/
 
 /**
- * Spread an RGB565 color over 32 bits so that the red, green and blue channels each get
- * their own gap to grow into. Blending a constant color is loop invariant, so the fill
- * loops expand the foreground once instead of on every pixel.
- * @param c         an RGB565 color
- * @return          the color with the channels spread out
+ * Spread an RGB565 color over 32 bits, giving each channel room to grow, so a whole
+ * pixel can be mixed with one multiplication.
  */
 #define LV_COLOR_16_EXPAND(c) ((((uint32_t)(c)) | (((uint32_t)(c)) << 16)) & 0x07E0F81Fu)
 
 /**
- * Convert a BGR ordered 24 bit color to RGB565.
- * @param c1        pointer to the blue, green and red bytes in this order
- * @return          the RGB565 color
+ * Convert a blue, green, red byte triplet to RGB565.
  */
 #define LV_COLOR_24_TO_16(c1) \
     ((uint16_t)((((c1)[2] & 0xF8) << 8) + (((c1)[1] & 0xFC) << 3) + (((c1)[0] & 0xF8) >> 3)))
 
 /**
- * Mix an already expanded foreground into an RGB565 background.
- * `mix` has to be 1..254: the 0 and 255 cases are left to the caller, which can skip the
- * pixel or store the color instead of mixing it, and that also spares the read and the
- * write that lv_color_16_16_mix() would still do.
- * Written as a macro on purpose: size-optimized builds inline neither `static inline`
- * helper, and this runs on every pixel of every glyph and every rounded corner.
- * @param res       lvalue receiving the mixed RGB565 color, may alias `bg`
- * @param fg_exp    the foreground expanded with LV_COLOR_16_EXPAND()
- * @param bg        the background RGB565 color
- * @param mix       1..254, the opacity of the foreground
+ * Mix an expanded foreground into an RGB565 background. `mix` must be 1..254, the
+ * callers handle 0 and 255 themselves. `res` may be the same variable as `bg`.
+ * A macro and not a function because -Os inlines neither, and this runs on every pixel.
  */
 #define LV_COLOR_16_16_MIX_EXPANDED(res, fg_exp, bg, mix)                                 \
     do {                                                                                  \
