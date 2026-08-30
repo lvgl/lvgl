@@ -225,6 +225,10 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
 /**
  * One masked pixel: leave it alone, store the color, or mix.
  * A macro because -Os doesn't inline helpers, and this runs on every pixel.
+ *
+ * A transparent mask leaves the destination alone. lv_color_32_32_mix() would store the
+ * color if the destination is transparent too, but such a pixel is invisible wherever it
+ * ends up, so the extra test is not worth a branch here.
  */
 #define ARGB8888_MASK_FILL_PX(dest_px, mask_val)                                \
     do {                                                                        \
@@ -344,7 +348,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
                         ARGB8888_MASK_FILL_PX(dest_buf[x], mask[x]);
                     }
                     for(; x <= w - 4; x += 4) {
-                        uint32_t mask32 = *((const uint32_t *)(mask + x));
+                        uint32_t mask32;
+                        LV_LOAD_U32(mask32, mask + x);
                         if(mask32 == 0) continue;   /*Four transparent pixels*/
                         if(mask32 == 0xFFFFFFFF) {  /*Four opaque pixels*/
                             dest_buf[x + 0] = color_opaque;
@@ -772,7 +777,9 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_masked_rows(lv_color32_t * dest_buf_c32
                 RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x], src_buf_c16[x], mask_buf[x]);
             }
             for(; x <= w - 4; x += 4) {
-                if(*((const uint32_t *)(mask_buf + x)) == 0) continue;
+                uint32_t m32;
+                LV_LOAD_U32(m32, mask_buf + x);
+                if(m32 == 0) continue;
                 RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 0], src_buf_c16[x + 0], mask_buf[x + 0]);
                 RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 1], src_buf_c16[x + 1], mask_buf[x + 1]);
                 RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 2], src_buf_c16[x + 2], mask_buf[x + 2]);
@@ -1268,13 +1275,10 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 
 /**
- * Blend a premultiplied foreground pixel to a straight-alpha background.
- * `scale` is the extra opacity to apply on the channels (opa, mask or both combined) and
- * `ae` is the matching effective alpha. `ae` is passed in instead of being derived from
- * `scale` so that the caller can combine `opa` and `mask` with a single rounding step
- * (LV_OPA_MIX3), keeping the precision of the non optimized version.
- * When the background is opaque (the most common case) no unpremultiplication
- * (so no division) is needed.
+ * Blend a premultiplied foreground pixel to a straight alpha background.
+ * `scale` is the extra opacity for the channels, `ae` the matching effective alpha. Passing
+ * `ae` in lets the caller combine opa and mask with a single rounding step.
+ * An opaque background, the common case, needs no unpremultiplication and so no division.
  */
 static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_32_32_mix_premult_scaled(lv_color32_t fg_premult,
                                                                                    lv_color32_t bg, uint8_t scale,

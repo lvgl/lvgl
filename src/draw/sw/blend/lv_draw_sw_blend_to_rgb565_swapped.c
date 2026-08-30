@@ -329,9 +329,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
                 uint16_t last_res_color = 0;
                 for(x = 0; x < w; x++) {
                     if(last_dest_color != dest_buf_u16[x]) {
-                        uint16_t px = lv_color_swap_16(dest_buf_u16[x]); /* Swap destination so it becomes unswapped now */
-                        last_res_color = lv_color_16_16_mix_inlined(color16, px, opa); /* Color mix of unswapped colors */
-                        last_res_color = lv_color_swap_16(last_res_color);
+                        uint16_t px = lv_color_swap_16(dest_buf_u16[x]);
+                        last_res_color = lv_color_swap_16(lv_color_16_16_mix_inlined(color16, px, opa));
                         last_dest_color = dest_buf_u16[x];
                     }
 
@@ -378,7 +377,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
                         RGB565_SWAPPED_MASK_FILL_PX(dest_buf_u16[x], mask[x]);
                     }
                     for(; x <= w - 4; x += 4) {
-                        uint32_t mask32 = *((const uint32_t *)(mask + x));
+                        uint32_t mask32;
+                        LV_LOAD_U32(mask32, mask + x);
                         if(mask32 == 0) continue;   /*Four transparent pixels*/
                         if(mask32 == 0xFFFFFFFF) {  /*Four opaque pixels*/
                             dest_buf_u16[x + 0] = color16_swapped;
@@ -931,7 +931,9 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
                                                                                                    lv_color_swap_16(dest_buf_u16[x]), a));
                         }
                         for(; x <= w - 4; x += 4) {
-                            if(*((const uint32_t *)(mask_buf + x)) == 0) continue;
+                            uint32_t m32;
+                            LV_LOAD_U32(m32, mask_buf + x);
+                            if(m32 == 0) continue;
                             {
                                 uint32_t a = mask_buf[x + 0];
                                 if(a == 255) dest_buf_u16[x + 0] = lv_color_swap_16(src_buf_u16[x + 0]);

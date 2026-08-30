@@ -55,6 +55,8 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memcpy(void * dst, const void * src, size_t len)
     LV_ASSERT(dst != NULL);
     LV_ASSERT(src != NULL);
 
+    /*The destination is volatile on purpose: it stops the compiler recognizing the byte
+     *loops below as memcpy and calling into it. See #7573.*/
     volatile uint8_t * d8 = dst;
     const uint8_t * s8 = src;
 
@@ -74,7 +76,7 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memcpy(void * dst, const void * src, size_t len)
 
     /*Byte copy for unaligned memories*/
     if(s_align != d_align) {
-        while(len > 32) {
+        while(len >= 32) {
             _REPEAT8(_COPY(d8, s8));
             _REPEAT8(_COPY(d8, s8));
             _REPEAT8(_COPY(d8, s8));
@@ -98,15 +100,24 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memcpy(void * dst, const void * src, size_t len)
         }
     }
 
-    uint32_t * d32 = (uint32_t *)d8;
-    const uint32_t * s32 = (uint32_t *)s8;
-    while(len > 32) {
-        _REPEAT8(_COPY(d32, s32))
-        len -= 32;
+    /*The bulk of the work, in whole words. MEM_UNIT is as wide as the machine, so this is
+     *8 bytes at a time on a 64 bit target instead of 4*/
+    MEM_UNIT * du = (MEM_UNIT *)(uint8_t *)d8;
+    const MEM_UNIT * su = (const MEM_UNIT *)s8;
+    while(len >= 8 * sizeof(MEM_UNIT)) {
+        _REPEAT8(_COPY(du, su))
+        len -= 8 * sizeof(MEM_UNIT);
     }
 
-    d8 = (uint8_t *)d32;
-    s8 = (const uint8_t *)s32;
+    /*Whatever is left of a whole word. Without this every length that is a multiple of the
+     *block size finished byte by byte*/
+    while(len >= sizeof(MEM_UNIT)) {
+        _COPY(du, su)
+        len -= sizeof(MEM_UNIT);
+    }
+
+    d8 = (volatile uint8_t *)du;
+    s8 = (const uint8_t *)su;
     while(len) {
         _COPY(d8, s8)
         len--;
@@ -120,7 +131,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_memset(void * dst, uint8_t v, size_t len)
     LV_ASSERT(dst != NULL);
 
     uint8_t * d8 = (uint8_t *)dst;
-    uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
+    lv_uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
     /*Make the address aligned*/
     if(d_align) {
@@ -132,15 +143,24 @@ void LV_ATTRIBUTE_FAST_MEM lv_memset(void * dst, uint8_t v, size_t len)
         }
     }
 
-    uint32_t v32 = (uint32_t)v + ((uint32_t)v << 8) + ((uint32_t)v << 16) + ((uint32_t)v << 24);
-    uint32_t * d32 = (uint32_t *)d8;
+    MEM_UNIT vu = (MEM_UNIT)v;
+    vu |= vu << 8;
+    vu |= vu << 16;
+#ifdef LV_ARCH_64
+    vu |= vu << 32;
+#endif
 
-    while(len > 32) {
-        _REPEAT8(_SET(d32, v32));
-        len -= 32;
+    MEM_UNIT * du = (MEM_UNIT *)d8;
+    while(len >= 8 * sizeof(MEM_UNIT)) {
+        _REPEAT8(_SET(du, vu));
+        len -= 8 * sizeof(MEM_UNIT);
+    }
+    while(len >= sizeof(MEM_UNIT)) {
+        _SET(du, vu);
+        len -= sizeof(MEM_UNIT);
     }
 
-    d8 = (uint8_t *)d32;
+    d8 = (uint8_t *)du;
     while(len) {
         _SET(d8, v);
         len--;

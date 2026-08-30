@@ -317,13 +317,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
     /*Opacity only*/
     else if(mask == NULL && opa < LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(dsc)) {
-            /*As the color and the opacity are constant for the whole fill, premultiply the
-             *expanded foreground once and blend each pixel with a single multiplication:
-             *result = (fg * mix + bg * (32 - mix)) >> 5
-             *It's branch-free, so the compiler can also vectorize it.*/
-            /*v9.5's structure: the result of the last background pair is cached, because real
-             *UIs are full of flat areas where neighboring pixels are identical, so two pixels are
-             *often written with a single 32 bit store. Only the mix itself is now inlined.*/
+            /*Flat areas are common, so cache the last background and its result: repeated
+             *pixels then cost a compare instead of a mix.*/
             uint32_t last_dest32_color = dest_buf_u16[0] + 1; /*Anything but the first pixel*/
             uint32_t last_res32_color = 0;
 
@@ -340,6 +335,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
                         dest_buf_u16[x + 1] = lv_color_16_16_mix(color16, dest_buf_u16[x + 1], opa);
                     }
                     else {
+                        /*volatile: without it -O3 miscompiles this pair access*/
                         volatile uint32_t * dest32 = (uint32_t *)&dest_buf_u16[x];
                         if(last_dest32_color == *dest32) {
                             *dest32 = last_res32_color;
@@ -363,14 +359,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
     /*Masked with full opacity*/
     else if(mask && opa >= LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK(dsc)) {
-            /*Every glyph, rounded corner, border, arc and shadow ends up here. About half
-             *of such a mask is fully transparent and a third fully opaque, and both are
-             *handled above the mix, so the mix only ever sees 1..254.*/
-            /*fg_prep is declared before the branch chain*/
-
-            /*Glyphs are a few pixels wide, where the alignment and tail handling of the
-             *word based loop would cost more than it saves. Rounded corners and borders are
-             *as wide as the widget and hold long runs of 0 and 255, where it pays off.*/
+            /*Masks are mostly 0 or 255, so both are decided before the mix. Narrow rows go
+             *per pixel; wide ones have long runs, worth testing four mask bytes at once.*/
             if(w < 32) {
                 for(y = 0; y < h; y++) {
                     /*Counting up to zero from -w saves a compare per pixel*/
@@ -397,7 +387,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
                         RGB565_MASK_FILL_PX(dest_buf_u16[x], mask[x]);
                     }
                     for(; x <= w - 4; x += 4) {
-                        uint32_t mask32 = *((const uint32_t *)(mask + x));
+                        uint32_t mask32;
+                        LV_LOAD_U32(mask32, mask + x);
                         if(mask32 == 0) continue;   /*Four transparent pixels*/
                         if(mask32 == 0xFFFFFFFF) {  /*Four opaque pixels*/
                             dest_buf_u16[x + 0] = color16;
@@ -931,7 +922,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
                             else dest_buf_u16[x] = lv_color_16_16_mix_inlined(src_buf_u16[x], dest_buf_u16[x], a);
                         }
                         for(; x <= w - 4; x += 4) {
-                            uint32_t m32 = *((const uint32_t *)(mask_buf + x));
+                            uint32_t m32;
+                            LV_LOAD_U32(m32, mask_buf + x);
                             if(m32 == 0) continue;
                             {
                                 uint32_t a = mask_buf[x + 0];

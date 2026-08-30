@@ -58,6 +58,29 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
                              uint8_t * dest_buf, bool aa, uint32_t px_size);
 #endif
 
+#if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+/**
+ * Undo the alpha scaling of a premultiplied pixel, giving back a straight color.
+ */
+static lv_color32_t unpremultiply(lv_color32_t c)
+{
+    if(c.alpha == 0) {
+        c.red = 0;
+        c.green = 0;
+        c.blue = 0;
+    }
+    else {
+        uint16_t reciprocal_alpha = (255 * 256) / c.alpha;
+        c.red = (c.red * reciprocal_alpha) >> 8;
+        c.green = (c.green * reciprocal_alpha) >> 8;
+        c.blue = (c.blue  * reciprocal_alpha) >> 8;
+    }
+
+    return c;
+}
+
+#endif
+
 #if LV_DRAW_SW_SUPPORT_ARGB8888
 static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -366,11 +389,19 @@ static inline uint32_t LV_ATTRIBUTE_FAST_MEM transform_alpha_weights(uint32_t a0
         return 0;
     }
 
+    /*Normalize on the running total instead of each weight on its own. Scaling the four
+     *weights separately rounds each one down, which left the four adding up to 30 of 32 in
+     *most cases and darkened the pixel by a few percent even where all four colors were the
+     *same. Taking the differences of the scaled partial sums spreads that rounding out and
+     *the last weight takes whatever is left, so the four always add up to exactly 32.*/
     uint32_t inv = transform_norm_inv[sum];
-    t[0] = (u00 * inv) >> 8;
-    t[1] = (u01 * inv) >> 8;
-    t[2] = (u10 * inv) >> 8;
-    t[3] = (u11 * inv) >> 8;
+    uint32_t c1 = (u00 * inv) >> 8;
+    uint32_t c2 = ((u00 + u01) * inv) >> 8;
+    uint32_t c3 = ((u00 + u01 + u10) * inv) >> 8;
+    t[0] = c1;
+    t[1] = c2 - c1;
+    t[2] = c3 - c2;
+    t[3] = 32 - c3;
 
     return sum > 255 ? 255 : sum;
 }
@@ -750,29 +781,21 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
 
     argb8888_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
                          fast_to, w, x_start, xs_clamp_ups, dest_c32, aa);
+
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED == 0
+    /*The antialiasing filter works in premultiplied space. Without the premultiplied blenders
+     *the result is consumed as straight ARGB8888, so convert it back.*/
+    if(aa) {
+        int32_t i;
+        for(i = 0; i < w; i++) dest_c32[i] = unpremultiply(dest_c32[i]);
+    }
+#endif
 }
 
 
 #endif
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
-
-static lv_color32_t unpremultiply(lv_color32_t c)
-{
-    if(c.alpha == 0) {
-        c.red = 0;
-        c.green = 0;
-        c.blue = 0;
-    }
-    else {
-        uint16_t reciprocal_alpha = (255 * 256) / c.alpha;
-        c.red = (c.red * reciprocal_alpha) >> 8;
-        c.green = (c.green * reciprocal_alpha) >> 8;
-        c.blue = (c.blue  * reciprocal_alpha) >> 8;
-    }
-
-    return c;
-}
 
 static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,

@@ -310,6 +310,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
             fg_premult[2] = (uint32_t)dsc->color.red * opa;
 
             if(dest_px_size == 3) {
+#if LV_BIG_ENDIAN_SYSTEM == 0
                 /*Constants for a word starting on channel `r`: k_lo for bytes 0 and 2,
                  *k_hi for bytes 1 and 3*/
                 uint32_t k_lo[3];
@@ -318,10 +319,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                     k_lo[x] = fg_premult[x] | (fg_premult[(x + 2) % 3] << 16);
                     k_hi[x] = fg_premult[(x + 1) % 3] | (fg_premult[x] << 16);
                 }
-
+#endif
                 for(y = 0; y < h; y++) {
                     uint32_t role = 0;
                     x = 0;
+#if LV_BIG_ENDIAN_SYSTEM == 0
                     /*Lead in until word aligned. Some targets can't do unaligned word
                      *accesses at all, the rest are slow at it.*/
                     while(x < w && ((lv_uintptr_t)(dest_buf + x) & 0x3)) {
@@ -330,13 +332,16 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                         if(++role == 3) role = 0;
                     }
                     for(; x <= w - 4; x += 4) {
-                        uint32_t d = *((uint32_t *)(dest_buf + x));
+                        uint32_t d;
+                        LV_LOAD_U32(d, dest_buf + x);
                         uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo[role]) >> 8) & 0x00FF00FFu;
                         uint32_t hi = (((((d >> 8) & 0x00FF00FFu) * mix_inv) + k_hi[role]) >> 8) & 0x00FF00FFu;
-                        *((uint32_t *)(dest_buf + x)) = lo | (hi << 8);
+                        uint32_t res = lo | (hi << 8);
+                        LV_STORE_U32(dest_buf + x, res);
                         /*4 bytes move the channel order on by one*/
                         if(++role == 3) role = 0;
                     }
+#endif
                     for(; x < w; x++) {
                         dest_buf[x] = (uint8_t)((fg_premult[role] + dest_buf[x] * mix_inv) >> 8);
                         if(++role == 3) role = 0;
@@ -345,18 +350,31 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                 }
             }
             else {
+#if LV_BIG_ENDIAN_SYSTEM == 0
                 /*32 bit pixels: one word each, and the 4th byte must be left alone*/
                 uint32_t k_lo = fg_premult[0] | (fg_premult[2] << 16);
                 uint32_t k_g = fg_premult[1];
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x += 4) {
-                        uint32_t d = *((uint32_t *)(dest_buf + x));
+                        uint32_t d;
+                        LV_LOAD_U32(d, dest_buf + x);
                         uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo) >> 8) & 0x00FF00FFu;
                         uint32_t g = (((((d >> 8) & 0xFFu) * mix_inv) + k_g) >> 8) & 0xFFu;
-                        *((uint32_t *)(dest_buf + x)) = lo | (g << 8) | (d & 0xFF000000u);
+                        uint32_t res = lo | (g << 8) | (d & 0xFF000000u);
+                        LV_STORE_U32(dest_buf + x, res);
                     }
                     dest_buf = drawbuf_next_row(dest_buf, dest_stride);
                 }
+#else
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x += 4) {
+                        dest_buf[x + 0] = (uint8_t)((fg_premult[0] + dest_buf[x + 0] * mix_inv) >> 8);
+                        dest_buf[x + 1] = (uint8_t)((fg_premult[1] + dest_buf[x + 1] * mix_inv) >> 8);
+                        dest_buf[x + 2] = (uint8_t)((fg_premult[2] + dest_buf[x + 2] * mix_inv) >> 8);
+                    }
+                    dest_buf = drawbuf_next_row(dest_buf, dest_stride);
+                }
+#endif
             }
         }
     }

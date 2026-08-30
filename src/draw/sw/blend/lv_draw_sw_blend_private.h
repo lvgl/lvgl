@@ -81,6 +81,22 @@ struct _lv_draw_sw_blend_image_dsc_t {
  **********************/
 
 /**
+ * Read or write four bytes of a mask or pixel buffer as one word. A plain `uint32_t *` cast
+ * breaks the aliasing rules and optimizers do act on that, so where the compiler offers
+ * `may_alias` the access goes through it: same single instruction, without the assumption.
+ * `__builtin_memcpy` would also be correct but RISC-V expands it to four byte loads, which
+ * costs more than the batching saves.
+ */
+#if defined(__GNUC__) || defined(__clang__)
+typedef uint32_t lv_u32_alias_t __attribute__((__may_alias__));
+#define LV_LOAD_U32(res, src)  do { (res) = *((const lv_u32_alias_t *)(src)); } while(0)
+#define LV_STORE_U32(dst, val) do { *((lv_u32_alias_t *)(dst)) = (val); } while(0)
+#else
+#define LV_LOAD_U32(res, src)  do { (res) = *((const uint32_t *)(src)); } while(0)
+#define LV_STORE_U32(dst, val) do { *((uint32_t *)(dst)) = (val); } while(0)
+#endif
+
+/**
  * Prepare an RGB565 color for mixing: spread it over 32 bits so each channel gets room to
  * grow and a whole pixel can be mixed with one multiplication.
  */
@@ -108,6 +124,48 @@ struct _lv_draw_sw_blend_image_dsc_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Undo the alpha scaling of a premultiplied pixel, giving back a straight color.
+ * Shared so the output formats that need it can't drift apart.
+ * @param c     a premultiplied pixel
+ * @return      the same pixel with straight channels
+ */
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color32_unpremultiply(lv_color32_t c)
+{
+    if(c.alpha == 0) {
+        c.red = 0;
+        c.green = 0;
+        c.blue = 0;
+    }
+    else if(c.alpha != LV_OPA_COVER) {
+        uint32_t reciprocal = (255u * 256u) / c.alpha;
+        uint32_t r = (c.red * reciprocal) >> 8;
+        uint32_t g = (c.green * reciprocal) >> 8;
+        uint32_t b = (c.blue * reciprocal) >> 8;
+        c.red = (uint8_t)(r > 255 ? 255 : r);
+        c.green = (uint8_t)(g > 255 ? 255 : g);
+        c.blue = (uint8_t)(b > 255 ? 255 : b);
+    }
+
+    return c;
+}
+
+/**
+ * Luminance of an image pixel for the grayscale and indexed outputs. A premultiplied source
+ * has its channels already scaled by its alpha, so undo that first to get the same value a
+ * straight source would give.
+ * @param c                 the pixel
+ * @param premultiplied     true: `c` is premultiplied
+ * @return                  the luminance, 0..255
+ */
+static inline uint8_t LV_ATTRIBUTE_FAST_MEM lv_color32_lumi_of(lv_color32_t c, bool premultiplied)
+{
+    if(!premultiplied || c.alpha == 0 || c.alpha == LV_OPA_COVER) return lv_color32_luminance(c);
+
+    uint32_t lumi = (lv_color32_luminance(c) * ((255u * 256u) / c.alpha)) >> 8;
+    return (uint8_t)(lumi > 255 ? 255 : lumi);
+}
 
 /**
  * Inlined version of lv_color_16_16_mix() for the per-pixel blend loops.
