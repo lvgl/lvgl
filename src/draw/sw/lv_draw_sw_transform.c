@@ -390,18 +390,39 @@ static inline uint32_t LV_ATTRIBUTE_FAST_MEM transform_alpha_weights(uint32_t a0
     }
 
     /*Normalize on the running total instead of each weight on its own. Scaling the four
-     *weights separately rounds each one down, which left the four adding up to 30 of 32 in
-     *most cases and darkened the pixel by a few percent even where all four colors were the
-     *same. Taking the differences of the scaled partial sums spreads that rounding out and
-     *the last weight takes whatever is left, so the four always add up to exactly 32.*/
+     *weights separately rounds each one down, which left them adding up to 30 of 32 in most
+     *cases and darkened the pixel even where all four colors were the same. Differences of
+     *the scaled partial sums spread that rounding out instead.*/
     uint32_t inv = transform_norm_inv[sum];
     uint32_t c1 = (u00 * inv) >> 8;
     uint32_t c2 = ((u00 + u01) * inv) >> 8;
     uint32_t c3 = ((u00 + u01 + u10) * inv) >> 8;
+    uint32_t c4 = (sum * inv) >> 8;
     t[0] = c1;
     t[1] = c2 - c1;
     t[2] = c3 - c2;
-    t[3] = 32 - c3;
+    t[3] = c4 - c3;
+
+    /*Whatever the rounding left over goes to the neighbor that already weighs the most.
+     *It must not go to a fixed one: if that neighbor is transparent it would bleed its
+     *color in, which is exactly what weighting by alpha is meant to prevent.*/
+    uint32_t rem = 32 - c4;
+    if(rem) {
+        uint32_t m = 0;
+        uint32_t best = u00;
+        if(u01 > best) {
+            best = u01;
+            m = 1;
+        }
+        if(u10 > best) {
+            best = u10;
+            m = 2;
+        }
+        if(u11 > best) {
+            m = 3;
+        }
+        t[m] += rem;
+    }
 
     return sum > 255 ? 255 : sum;
 }

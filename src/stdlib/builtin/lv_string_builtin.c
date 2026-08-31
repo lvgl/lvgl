@@ -14,11 +14,19 @@
  *      DEFINES
  *********************/
 #ifdef LV_ARCH_64
-    #define MEM_UNIT         uint64_t
+    #define MEM_UNIT_BASE    uint64_t
     #define ALIGN_MASK       0x7
 #else
-    #define MEM_UNIT         uint32_t
+    #define MEM_UNIT_BASE    uint32_t
     #define ALIGN_MASK       0x3
+#endif
+
+/*This copies arbitrary objects, so the word sized accesses below must not claim to know the
+ *effective type of what they touch.*/
+#if defined(__GNUC__) || defined(__clang__)
+    typedef MEM_UNIT_BASE __attribute__((__may_alias__)) MEM_UNIT;
+#else
+    typedef MEM_UNIT_BASE MEM_UNIT;
 #endif
 
 /**********************

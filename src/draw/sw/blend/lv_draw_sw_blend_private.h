@@ -81,14 +81,11 @@ struct _lv_draw_sw_blend_image_dsc_t {
  **********************/
 
 /**
- * Read or write four bytes of a mask or pixel buffer as one word. A plain `uint32_t *` cast
- * breaks the aliasing rules and optimizers do act on that, so where the compiler offers
- * `may_alias` the access goes through it: same single instruction, without the assumption.
- * `__builtin_memcpy` would also be correct but RISC-V expands it to four byte loads, which
- * costs more than the batching saves.
- * The attribute is written inside the macro rather than as a typedef so that the header
- * stays parseable by tools that don't understand `__attribute__`, such as the pycparser
- * the MicroPython bindings are generated with.
+ * Read or write four bytes of a byte buffer as one word. Every caller aligns the pointer to
+ * a word first, so this is always an aligned access. `may_alias` tells the compilers that
+ * have it not to assume the buffer's type, without costing an instruction; the others get
+ * the plain access. The attribute sits inside the macro so the header stays parseable by
+ * tools that don't know `__attribute__`, such as the pycparser the MicroPython bindings use.
  */
 #if defined(__GNUC__) || defined(__clang__)
 #define LV_LOAD_U32(res, src)  \
