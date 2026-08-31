@@ -15,6 +15,7 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -225,8 +226,8 @@ static void draw_main(lv_event_t * e)
     /*Simply draw the middle src if no tiled*/
     lv_imagebutton_src_info_t * src_info = &imagebutton->src_left[state];
 
-    int32_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-    int32_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    int32_t tw = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
+    int32_t th = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
     lv_area_t coords;
     lv_area_copy(&coords, &obj->coords);
     lv_area_increase(&coords, tw, th);

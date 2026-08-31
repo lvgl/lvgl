@@ -17,6 +17,7 @@
 #include "../../lvgl_public.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../core/lv_observer_private.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*Check dependencies*/
 #if LV_USE_BAR == 0
@@ -367,14 +368,14 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_refresh_ext_draw_size(obj);
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        int32_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
-        int32_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
-        int32_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
-        int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+        int32_t knob_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_KNOB);
+        int32_t knob_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_KNOB);
+        int32_t knob_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_KNOB);
+        int32_t knob_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
-        int32_t trans_w = lv_obj_get_style_transform_width(obj, LV_PART_KNOB);
-        int32_t trans_h = lv_obj_get_style_transform_height(obj, LV_PART_KNOB);
+        int32_t trans_w = lv_obj_get_style_transform_width_internal(obj, LV_PART_KNOB);
+        int32_t trans_h = lv_obj_get_style_transform_height_internal(obj, LV_PART_KNOB);
         int32_t knob_size = LV_MIN(lv_obj_get_width(obj) + 2 * trans_w, lv_obj_get_height(obj) + 2 * trans_h) >> 1;
         knob_size += LV_MAX(LV_MAX(knob_left, knob_right), LV_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
@@ -426,7 +427,7 @@ static void draw_knob(lv_event_t * e)
     LV_ASSERT(layer != NULL);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
-    const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN);
     const bool is_horizontal = is_slider_horizontal(obj);
     const bool is_reversed = slider->bar.val_reversed ^ (is_rtl && is_horizontal);
 
@@ -499,13 +500,13 @@ static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, const int32_t k
         knob_area->x2 = obj->coords.x2;
     }
 
-    int32_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
-    int32_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
-    int32_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
-    int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+    int32_t knob_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_KNOB);
+    int32_t knob_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_KNOB);
+    int32_t knob_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_KNOB);
+    int32_t knob_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_KNOB);
 
-    int32_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_KNOB);
-    int32_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_KNOB);
+    int32_t transf_w = lv_obj_get_style_transform_width_internal(obj, LV_PART_KNOB);
+    int32_t transf_h = lv_obj_get_style_transform_height_internal(obj, LV_PART_KNOB);
 
     /*Apply the paddings on the knob area*/
     knob_area->x1 -= knob_left + transf_w;
@@ -537,7 +538,7 @@ static void drag_start(lv_obj_t * obj)
     else if(mode == LV_SLIDER_MODE_RANGE) {
         lv_indev_get_point(lv_indev_active(), &p);
         lv_obj_transform_point(obj, &p, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE_RECURSIVE);
-        const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+        const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN);
         const bool is_horizontal = is_slider_horizontal(obj);
         const bool is_reversed = slider->bar.val_reversed ^ (is_rtl && is_horizontal);
         int32_t dist_left, dist_right;
@@ -621,13 +622,13 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
 
     int32_t new_value = 0;
     const int32_t range = slider->bar.max_value - slider->bar.min_value;
-    const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN);
     const bool is_horizontal = is_slider_horizontal(obj);
     const bool is_reversed = slider->bar.val_reversed ^ (is_rtl && is_horizontal);
 
     if(is_hor) {
-        const int32_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        const int32_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+        const int32_t bg_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
+        const int32_t bg_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
         const int32_t w = lv_obj_get_width(obj);
         const int32_t indic_w = w - bg_left - bg_right;
 
@@ -645,8 +646,8 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
         }
     }
     else {
-        const int32_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        const int32_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+        const int32_t bg_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
+        const int32_t bg_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
         const int32_t h = lv_obj_get_height(obj);
         const int32_t indic_h = h - bg_bottom - bg_top;
 

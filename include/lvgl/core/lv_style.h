@@ -433,12 +433,7 @@ void lv_style_merge(lv_style_t * dst, const lv_style_t * src);
  * @param style     pointer to a style
  * @return          true: the style is constant
  */
-static inline bool lv_style_is_const(const lv_style_t * style)
-{
-    if(style->prop_cnt == 255) return true;
-    return false;
-}
-
+bool lv_style_is_const(const lv_style_t * style);
 
 /**
  * Register a new style property for custom usage
@@ -519,43 +514,6 @@ void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style
 lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
 
 /**
- * Get the value of a property
- * @param style pointer to a style
- * @param prop  the ID of a property
- * @param value pointer to a `lv_style_value_t` variable to store the value
- * @return LV_RESULT_INVALID: the property wasn't found in the style (`value` is unchanged)
- *         LV_RESULT_OK: the property was fond, and `value` is set accordingly
- * @note For performance reasons there are no sanity check on `style`
- * @note This function is the same as ::lv_style_get_prop but inlined. Use it only on performance critical places
- */
-static inline lv_style_res_t lv_style_get_prop_inlined(const lv_style_t * style, lv_style_prop_t prop,
-                                                       lv_style_value_t * value)
-{
-    if(lv_style_is_const(style)) {
-        lv_style_const_prop_t * props = (lv_style_const_prop_t *)style->values_and_props;
-        uint32_t i;
-        for(i = 0; props[i].prop != LV_STYLE_PROP_INV; i++) {
-            if(props[i].prop == prop) {
-                *value = props[i].value;
-                return LV_STYLE_RES_FOUND;
-            }
-        }
-    }
-    else {
-        lv_style_prop_t * props = (lv_style_prop_t *)style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
-        uint32_t i;
-        for(i = 0; i < style->prop_cnt; i++) {
-            if(props[i] == prop) {
-                lv_style_value_t * values = (lv_style_value_t *)style->values_and_props;
-                *value = values[i];
-                return LV_STYLE_RES_FOUND;
-            }
-        }
-    }
-    return LV_STYLE_RES_NOT_FOUND;
-}
-
-/**
  * Checks if a style is empty (has no properties)
  * @param style pointer to a style
  * @return true if the style is empty
@@ -592,92 +550,56 @@ uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop);
  * @param  width   width in pixels
  * @param  height  height in pixels
  */
-static inline void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height)
-{
-    lv_style_set_width(style, width);
-    lv_style_set_height(style, height);
-}
+void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height);
 
 /**
  * Set all 4 of `style`s padding values.
  * @param  style   pointer to style to be modified
  * @param  value   padding dimension in pixels
  */
-static inline void lv_style_set_pad_all(lv_style_t * style, int32_t value)
-{
-    lv_style_set_pad_left(style, value);
-    lv_style_set_pad_right(style, value);
-    lv_style_set_pad_top(style, value);
-    lv_style_set_pad_bottom(style, value);
-}
+void lv_style_set_pad_all(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s left and right padding values.
  * @param  style   pointer to style to be modified
  * @param  value   padding dimension in pixels
  */
-static inline void lv_style_set_pad_hor(lv_style_t * style, int32_t value)
-{
-    lv_style_set_pad_left(style, value);
-    lv_style_set_pad_right(style, value);
-}
+void lv_style_set_pad_hor(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s top and bottom padding values.
  * @param  style   pointer to style to be modified
  * @param  value   padding dimension in pixels
  */
-static inline void lv_style_set_pad_ver(lv_style_t * style, int32_t value)
-{
-    lv_style_set_pad_top(style, value);
-    lv_style_set_pad_bottom(style, value);
-}
+void lv_style_set_pad_ver(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s row and column padding gaps (applies only to Grid and Flex layouts).
  * @param  style   pointer to style to be modified
  * @param  value   gap dimension in pixels
  */
-static inline void lv_style_set_pad_gap(lv_style_t * style, int32_t value)
-{
-    lv_style_set_pad_row(style, value);
-    lv_style_set_pad_column(style, value);
-}
+void lv_style_set_pad_gap(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s left and right margin values.
  * @param  style   pointer to style to be modified
  * @param  value   margin dimension in pixels
  */
-static inline void lv_style_set_margin_hor(lv_style_t * style, int32_t value)
-{
-    lv_style_set_margin_left(style, value);
-    lv_style_set_margin_right(style, value);
-}
+void lv_style_set_margin_hor(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s top and bottom margin values.
  * @param  style   pointer to style to be modified
  * @param  value   margin dimension in pixels
  */
-static inline void lv_style_set_margin_ver(lv_style_t * style, int32_t value)
-{
-    lv_style_set_margin_top(style, value);
-    lv_style_set_margin_bottom(style, value);
-}
+void lv_style_set_margin_ver(lv_style_t * style, int32_t value);
 
 /**
  * Set all 4 of `style`s margin values.
  * @param  style   pointer to style to be modified
  * @param  value   margin dimension in pixels
  */
-static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
-{
-    lv_style_set_margin_left(style, value);
-    lv_style_set_margin_right(style, value);
-    lv_style_set_margin_top(style, value);
-    lv_style_set_margin_bottom(style, value);
-}
+void lv_style_set_margin_all(lv_style_t * style, int32_t value);
 
 /**
  * Set `style`s X and Y transform scale values.
@@ -689,11 +611,7 @@ static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
  *                     - 128:  half size
  *                     - 512:  double size
  */
-static inline void lv_style_set_transform_scale(lv_style_t * style, int32_t value)
-{
-    lv_style_set_transform_scale_x(style, value);
-    lv_style_set_transform_scale_y(style, value);
-}
+void lv_style_set_transform_scale(lv_style_t * style, int32_t value);
 
 /**
  * @brief Check if the style property has a specified behavioral flag.

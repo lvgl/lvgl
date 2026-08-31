@@ -19,6 +19,7 @@
 #include "../../core/lv_obj_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_observer_private.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -227,11 +228,11 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
 
     if(src_type == LV_IMAGE_SRC_SYMBOL) {
         /*`lv_image_dsc_get_info` couldn't set the width and height of a font so set it here*/
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+        const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
         lv_text_attributes_t attributes = {0};
 
-        attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-        attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        attributes.letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_MAIN);
+        attributes.line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
         attributes.max_width = LV_COORD_MAX;
         attributes.text_flags = LV_TEXT_FLAG_NONE;
 
@@ -814,7 +815,7 @@ static void draw_image(lv_event_t * e)
         }
 
         /*With not LV_OPA_COVER images can't cover an area */
-        if(lv_obj_get_style_image_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) {
+        if(lv_obj_get_style_image_opa_internal(obj, LV_PART_MAIN) != LV_OPA_COVER) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
@@ -885,7 +886,7 @@ static void draw_image(lv_event_t * e)
                         obj->coords.x1 + img->w - 1,
                         obj->coords.y1 + img->h - 1);
 
-            draw_dsc.clip_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+            draw_dsc.clip_radius = lv_obj_get_style_radius_internal(obj, LV_PART_MAIN);
 
             lv_area_t coords;
             if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {

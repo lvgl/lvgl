@@ -14,6 +14,8 @@
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_style_internal.h"
+#include "../../misc/lv_style_private.h"
 
 /*********************
  *      DEFINES
@@ -287,8 +289,8 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
 
     lv_obj_align(needle_line, LV_ALIGN_TOP_LEFT, 0, 0);
 
-    const int32_t scale_width = lv_obj_get_style_width(obj, LV_PART_MAIN);
-    const int32_t scale_height = lv_obj_get_style_height(obj, LV_PART_MAIN);
+    const int32_t scale_width = lv_obj_get_style_width_internal(obj, LV_PART_MAIN);
+    const int32_t scale_height = lv_obj_get_style_height_internal(obj, LV_PART_MAIN);
 
     if(scale_width != scale_height) {
         return;
@@ -925,9 +927,9 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         label_dsc->text_local = 1;
     }
 
-    int32_t translate_x = lv_obj_get_style_translate_x(obj, LV_PART_INDICATOR);
-    int32_t translate_y = lv_obj_get_style_translate_y(obj, LV_PART_INDICATOR);
-    int32_t label_rotation = lv_obj_get_style_transform_rotation(obj, LV_PART_INDICATOR);
+    int32_t translate_x = lv_obj_get_style_translate_x_internal(obj, LV_PART_INDICATOR);
+    int32_t translate_y = lv_obj_get_style_translate_y_internal(obj, LV_PART_INDICATOR);
+    int32_t label_rotation = lv_obj_get_style_transform_rotation_internal(obj, LV_PART_INDICATOR);
     int32_t translate_rotation = 0;
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
@@ -939,8 +941,8 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         label_rotation = (label_rotation & LV_SCALE_ROTATION_ANGLE_MASK);
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-        translate_rotation = lv_obj_get_style_translate_radial(obj, LV_PART_INDICATOR);
-        uint32_t label_gap = lv_obj_get_style_pad_radial(obj, LV_PART_INDICATOR) + LV_SCALE_DEFAULT_LABEL_GAP;
+        translate_rotation = lv_obj_get_style_translate_radial_internal(obj, LV_PART_INDICATOR);
+        uint32_t label_gap = lv_obj_get_style_pad_radial_internal(obj, LV_PART_INDICATOR) + LV_SCALE_DEFAULT_LABEL_GAP;
 
         lv_area_t scale_area;
         lv_obj_get_content_coords(obj, &scale_area);
@@ -951,7 +953,7 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         center_point.x = scale_area.x1 + radius_edge;
         center_point.y = scale_area.y1 + radius_edge;
 
-        const int32_t major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
+        const int32_t major_len = lv_obj_get_style_length_internal(obj, LV_PART_INDICATOR);
 
         /* Also take into consideration the letter space of the style */
         int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U) +
@@ -1112,11 +1114,11 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         /* Get style properties so they can be used in the main line drawing */
-        const int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        const int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
-        const int32_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) + border_width;
-        const int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
-        const int32_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
+        const int32_t border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN);
+        const int32_t pad_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN) + border_width;
+        const int32_t pad_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN) + border_width;
+        const int32_t pad_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN) + border_width;
+        const int32_t pad_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN) + border_width;
 
         int32_t x_ofs = 0;
         int32_t y_ofs = 0;
@@ -1277,10 +1279,10 @@ static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, int32_t 
     LV_ASSERT(obj != NULL);
     LV_ASSERT(center != NULL);
     LV_ASSERT(arc_r != NULL);
-    int32_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    int32_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-    int32_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    int32_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    int32_t left_bg = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
+    int32_t right_bg = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
+    int32_t top_bg = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
+    int32_t bottom_bg = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
 
     int32_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg, lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2;
 
@@ -1319,27 +1321,27 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
     int32_t radial_offset = 0;
 
     if(is_major_tick) {
-        major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
-        radial_offset = lv_obj_get_style_radial_offset(obj, LV_PART_INDICATOR);
+        major_len = lv_obj_get_style_length_internal(obj, LV_PART_INDICATOR);
+        radial_offset = lv_obj_get_style_radial_offset_internal(obj, LV_PART_INDICATOR);
     }
     else {
-        minor_len = lv_obj_get_style_length(obj, LV_PART_ITEMS);
-        radial_offset = lv_obj_get_style_radial_offset(obj, LV_PART_ITEMS);
+        minor_len = lv_obj_get_style_length_internal(obj, LV_PART_ITEMS);
+        radial_offset = lv_obj_get_style_radial_offset_internal(obj, LV_PART_ITEMS);
     }
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
 
         /* Get style properties so they can be used in the tick and label drawing */
-        const int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        const int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
-        const int32_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) + border_width;
-        const int32_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
-        const int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
-        const int32_t tick_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-        const int32_t tick_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-        const int32_t tick_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-        const int32_t tick_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+        const int32_t border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN);
+        const int32_t pad_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN) + border_width;
+        const int32_t pad_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN) + border_width;
+        const int32_t pad_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN) + border_width;
+        const int32_t pad_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN) + border_width;
+        const int32_t tick_pad_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_ITEMS);
+        const int32_t tick_pad_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_ITEMS);
+        const int32_t tick_pad_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_ITEMS);
+        const int32_t tick_pad_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_ITEMS);
 
         int32_t x_ofs = 0;
         int32_t y_ofs = 0;
@@ -1503,11 +1505,11 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
         label_coords->x2 = tick_point->x + (label_size.x / 2);
 
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-            label_coords->y1 = tick_point->y + lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+            label_coords->y1 = tick_point->y + lv_obj_get_style_pad_bottom_internal(obj, LV_PART_INDICATOR);
             label_coords->y2 = label_coords->y1 + label_size.y;
         }
         else {
-            label_coords->y2 = tick_point->y - lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+            label_coords->y2 = tick_point->y - lv_obj_get_style_pad_top_internal(obj, LV_PART_INDICATOR);
             label_coords->y1 = label_coords->y2 - label_size.y;
         }
     }
@@ -1516,12 +1518,12 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
         label_coords->y2 = tick_point->y + (label_size.y / 2);
 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-            label_coords->x1 = tick_point->x - label_size.x - lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-            label_coords->x2 = tick_point->x - lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+            label_coords->x1 = tick_point->x - label_size.x - lv_obj_get_style_pad_left_internal(obj, LV_PART_INDICATOR);
+            label_coords->x2 = tick_point->x - lv_obj_get_style_pad_left_internal(obj, LV_PART_INDICATOR);
         }
         else {
-            label_coords->x1 = tick_point->x + lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-            label_coords->x2 = tick_point->x + label_size.x + lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+            label_coords->x1 = tick_point->x + lv_obj_get_style_pad_right_internal(obj, LV_PART_INDICATOR);
+            label_coords->x2 = tick_point->x + label_size.x + lv_obj_get_style_pad_right_internal(obj, LV_PART_INDICATOR);
         }
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
@@ -1553,36 +1555,36 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
         lv_style_res_t res;
 
         /* Line width */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_WIDTH, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_LINE_WIDTH, &value);
         if(res == LV_STYLE_RES_FOUND) {
             line_dsc->width = (int32_t)value.num;
         }
         else {
-            line_dsc->width = lv_obj_get_style_line_width(obj, part);
+            line_dsc->width = lv_obj_get_style_line_width_internal(obj, part);
         }
 
         /* Line color */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_COLOR, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_LINE_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             line_dsc->color = value.color;
         }
         else {
-            line_dsc->color = lv_obj_get_style_line_color(obj, part);
+            line_dsc->color = lv_obj_get_style_line_color_internal(obj, part);
         }
 
         /* Line opa */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_OPA, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_LINE_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             line_dsc->opa = (lv_opa_t)value.num;
         }
         else {
-            line_dsc->opa = lv_obj_get_style_line_opa(obj, part);
+            line_dsc->opa = lv_obj_get_style_line_opa_internal(obj, part);
         }
     }
     else {
-        line_dsc->color = lv_obj_get_style_line_color(obj, part);
-        line_dsc->opa = lv_obj_get_style_line_opa(obj, part);
-        line_dsc->width = lv_obj_get_style_line_width(obj, part);
+        line_dsc->color = lv_obj_get_style_line_color_internal(obj, part);
+        line_dsc->opa = lv_obj_get_style_line_opa_internal(obj, part);
+        line_dsc->width = lv_obj_get_style_line_width_internal(obj, part);
     }
 }
 
@@ -1604,56 +1606,56 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         lv_style_res_t res;
 
         /* arc width */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_WIDTH, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_WIDTH, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->width = (int32_t)value.num;
         }
         else {
-            arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
+            arc_dsc->width = lv_obj_get_style_arc_width_internal(obj, LV_PART_MAIN);
         }
 
         /* arc color */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_COLOR, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->color = value.color;
         }
         else {
-            arc_dsc->color = lv_obj_get_style_arc_color(obj, LV_PART_MAIN);
+            arc_dsc->color = lv_obj_get_style_arc_color_internal(obj, LV_PART_MAIN);
         }
 
         /* arc opa */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_OPA, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->opa = (lv_opa_t)value.num;
         }
         else {
-            arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
+            arc_dsc->opa = lv_obj_get_style_arc_opa_internal(obj, LV_PART_MAIN);
         }
 
         /* arc rounded */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_ROUNDED, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_ROUNDED, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->rounded = (uint8_t)value.num;
         }
         else {
-            arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
+            arc_dsc->rounded = lv_obj_get_style_arc_rounded_internal(obj, LV_PART_MAIN);
         }
 
         /* arc image src */
-        res = lv_style_get_prop(section_style, LV_STYLE_ARC_IMAGE_SRC, &value);
+        res = lv_style_get_prop_internal(section_style, LV_STYLE_ARC_IMAGE_SRC, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->img_src = (const void *)value.ptr;
         }
         else {
-            arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
+            arc_dsc->img_src = lv_obj_get_style_arc_image_src_internal(obj, LV_PART_MAIN);
         }
     }
     else {
-        arc_dsc->color = lv_obj_get_style_arc_color(obj, LV_PART_MAIN);
-        arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
-        arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
-        arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
-        arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
+        arc_dsc->color = lv_obj_get_style_arc_color_internal(obj, LV_PART_MAIN);
+        arc_dsc->opa = lv_obj_get_style_arc_opa_internal(obj, LV_PART_MAIN);
+        arc_dsc->width = lv_obj_get_style_arc_width_internal(obj, LV_PART_MAIN);
+        arc_dsc->rounded = lv_obj_get_style_arc_rounded_internal(obj, LV_PART_MAIN);
+        arc_dsc->img_src = lv_obj_get_style_arc_image_src_internal(obj, LV_PART_MAIN);
     }
 }
 
@@ -1676,47 +1678,47 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
         lv_style_res_t res;
 
         /* Text color */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_COLOR, &value);
+        res = lv_style_get_prop_internal(indicator_section_style, LV_STYLE_TEXT_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             label_dsc->color = value.color;
         }
         else {
-            label_dsc->color = lv_obj_get_style_text_color(obj, LV_PART_INDICATOR);
+            label_dsc->color = lv_obj_get_style_text_color_internal(obj, LV_PART_INDICATOR);
         }
 
         /* Text opa */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_OPA, &value);
+        res = lv_style_get_prop_internal(indicator_section_style, LV_STYLE_TEXT_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             label_dsc->opa = (lv_opa_t)value.num;
         }
         else {
-            label_dsc->opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
+            label_dsc->opa = lv_obj_get_style_text_opa_internal(obj, LV_PART_INDICATOR);
         }
 
         /* Text letter space */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_LETTER_SPACE, &value);
+        res = lv_style_get_prop_internal(indicator_section_style, LV_STYLE_TEXT_LETTER_SPACE, &value);
         if(res == LV_STYLE_RES_FOUND) {
             label_dsc->letter_space = (int32_t)value.num;
         }
         else {
-            label_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
+            label_dsc->letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_INDICATOR);
         }
 
         /* Text font */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_FONT, &value);
+        res = lv_style_get_prop_internal(indicator_section_style, LV_STYLE_TEXT_FONT, &value);
         if(res == LV_STYLE_RES_FOUND) {
             label_dsc->font = (const lv_font_t *)value.ptr;
         }
         else {
-            label_dsc->font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
+            label_dsc->font = lv_obj_get_style_text_font_internal(obj, LV_PART_INDICATOR);
         }
     }
     else {
         /* If label is not within a range then get the indicator style */
-        label_dsc->color = lv_obj_get_style_text_color(obj, LV_PART_INDICATOR);
-        label_dsc->opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
-        label_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
-        label_dsc->font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
+        label_dsc->color = lv_obj_get_style_text_color_internal(obj, LV_PART_INDICATOR);
+        label_dsc->opa = lv_obj_get_style_text_opa_internal(obj, LV_PART_INDICATOR);
+        label_dsc->letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_INDICATOR);
+        label_dsc->font = lv_obj_get_style_text_font_internal(obj, LV_PART_INDICATOR);
     }
 }
 

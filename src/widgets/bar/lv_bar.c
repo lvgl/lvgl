@@ -17,6 +17,7 @@
 #include "../../lvgl_public.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_observer_private.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -368,8 +369,8 @@ static void draw_indic(lv_event_t * e)
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);
 
-    int32_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-    int32_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    int32_t transf_w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
+    int32_t transf_h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
     lv_area_increase(&bar_coords, transf_w, transf_h);
     int32_t barw = lv_area_get_width(&bar_coords);
     int32_t barh = lv_area_get_height(&bar_coords);
@@ -397,10 +398,10 @@ static void draw_indic(lv_event_t * e)
     bool sym = lv_bar_is_symmetrical(obj);
 
     /*Calculate the indicator area*/
-    int32_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
-    int32_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
-    int32_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
-    int32_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    int32_t bg_left = lv_obj_get_style_pad_left_internal(obj,     LV_PART_MAIN);
+    int32_t bg_right = lv_obj_get_style_pad_right_internal(obj,   LV_PART_MAIN);
+    int32_t bg_top = lv_obj_get_style_pad_top_internal(obj,       LV_PART_MAIN);
+    int32_t bg_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
 
     /*Respect padding and minimum width/height too*/
     lv_area_copy(&bar->indic_area, &bar_coords);
@@ -472,7 +473,7 @@ static void draw_indic(lv_event_t * e)
      * The drawing direction of the bar can be reversed only when one of the two conditions(value inversion
      * or horizontal direction base dir is LV_BASE_DIR_RTL) is met.
     */
-    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    lv_base_dir_t base_dir = lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN);
     bool hor_need_reversed = hor && base_dir == LV_BASE_DIR_RTL;
     bool reversed = bar->val_reversed ^ hor_need_reversed;
 
@@ -557,11 +558,11 @@ static void draw_indic(lv_event_t * e)
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
 
 
-    int32_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+    int32_t bg_radius = lv_obj_get_style_radius_internal(obj, LV_PART_MAIN);
     int32_t short_side = LV_MIN(barw, barh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
-    bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_INDICATOR);
+    bool backdrop_blur = lv_obj_get_style_blur_backdrop_internal(obj, LV_PART_INDICATOR);
     lv_draw_blur_dsc_t draw_blur_dsc;
     lv_draw_blur_dsc_init(&draw_blur_dsc);
     draw_blur_dsc.corner_radius = draw_rect_dsc.radius;
@@ -705,10 +706,10 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
         *s = LV_MAX(*s, indic_size);
 
         /*Calculate the indicator area*/
-        int32_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        int32_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-        int32_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        int32_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+        int32_t bg_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
+        int32_t bg_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
+        int32_t bg_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
+        int32_t bg_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
 
         int32_t pad = LV_MIN4(bg_left, bg_right, bg_top, bg_bottom);
         if(pad < 0) {
@@ -789,7 +790,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
         lv_anim_set_exec_cb(&a, lv_bar_anim);
         lv_anim_set_values(&a, LV_BAR_ANIM_STATE_START, LV_BAR_ANIM_STATE_END);
         lv_anim_set_completed_cb(&a, lv_bar_anim_completed);
-        lv_anim_set_duration(&a, lv_obj_get_style_anim_duration(obj, LV_PART_MAIN));
+        lv_anim_set_duration(&a, lv_obj_get_style_anim_duration_internal(obj, LV_PART_MAIN));
         lv_anim_start(&a);
     }
 }

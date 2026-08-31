@@ -21,6 +21,7 @@
 #include "../../indev/lv_indev_private.h"
 #include "../../core/lv_observer_private.h"
 #include "../../font/lv_font_private.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -145,8 +146,9 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
     else {
         roller->mode = LV_ROLLER_MODE_INFINITE;
 
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t normal_h = roller->option_cnt * (lv_font_get_line_height_internal(font) + lv_obj_get_style_text_letter_space(
+        const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+        int32_t normal_h = roller->option_cnt * (lv_font_get_line_height_internal(font) +
+                                                 lv_obj_get_style_text_letter_space_internal(
                                                      obj,
                                                      LV_PART_MAIN));
         roller->inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
@@ -250,9 +252,9 @@ void lv_roller_set_visible_row_count(lv_obj_t * obj, uint32_t row_cnt)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
+    int32_t border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN);
     lv_obj_set_height(obj, (lv_font_get_line_height_internal(font) + line_space) * row_cnt + 2 * border_width);
 }
 
@@ -592,7 +594,7 @@ static void draw_main(lv_event_t * e)
 
             /*Move the selected label proportionally with the background label*/
             int32_t roller_h = lv_obj_get_height(obj);
-            const lv_font_t * normal_label_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+            const lv_font_t * normal_label_font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
             /*label offset from the middle line of the roller*/
             int32_t label_y_prop = (label->coords.y1 + normal_label_font->line_height / 2) - (roller_h / 2 + obj->coords.y1);
 
@@ -612,9 +614,9 @@ static void draw_main(lv_event_t * e)
             label_sel_y += ((label_sel_size.y - corr) * label_y_prop) >> 14;
             label_sel_y -= corr / 2;
 
-            int32_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-            int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-            int32_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+            int32_t bwidth = lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN);
+            int32_t pleft = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
+            int32_t pright = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
 
             /*Draw the selected text*/
             lv_area_t label_sel_area;
@@ -690,11 +692,11 @@ static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area)
 {
     LV_ASSERT(obj != NULL);
     LV_ASSERT(sel_area != NULL);
-    const lv_font_t * font_main = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    const lv_font_t * font_sel = lv_obj_get_style_text_font(obj, LV_PART_SELECTED);
+    const lv_font_t * font_main = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+    const lv_font_t * font_sel = lv_obj_get_style_text_font_internal(obj, LV_PART_SELECTED);
     int32_t font_main_h        = lv_font_get_line_height_internal(font_main);
     int32_t font_sel_h        = lv_font_get_line_height_internal(font_sel);
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
     int32_t d = (font_sel_h + font_main_h) / 2 + line_space;
     sel_area->y1 = obj->coords.y1 + lv_obj_get_height(obj) / 2 - d / 2;
     sel_area->y2 = sel_area->y1 + d;
@@ -717,7 +719,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return;
 
-    const lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, lv_label_get_text(label));
+    const lv_text_align_t align = lv_obj_calculate_style_text_align_internal(label, LV_PART_MAIN, lv_label_get_text(label));
 
     int32_t x = 0;
     switch(align) {
@@ -736,11 +738,11 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     }
     lv_obj_set_x(label, x);
 
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    const int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+    const int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
     const int32_t font_h = lv_font_get_line_height_internal(font);
     const int32_t h = lv_obj_get_content_height(obj);
-    uint32_t anim_time = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
+    uint32_t anim_time = lv_obj_get_style_anim_duration_internal(obj, LV_PART_MAIN);
 
     /*Normally the animation's `end_cb` sets correct position of the roller if infinite.
      *But without animations we have to do it manually*/
@@ -822,8 +824,8 @@ static lv_result_t release_handler(lv_obj_t * obj)
         }
         else {
             /*If dragged then align the list to have an element in the middle*/
-            const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-            int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+            const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+            int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
             int32_t font_h              = lv_font_get_line_height_internal(font);
 
             int32_t label_unit = font_h + line_space;
@@ -877,8 +879,8 @@ static void inf_normalize(lv_obj_t * obj)
         roller->sel_opt_id_ori += (roller->inf_page_cnt / 2) * real_id_cnt; /*Select the middle page*/
 
         /*Move to the new id*/
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
+        int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
         int32_t font_h              = lv_font_get_line_height_internal(font);
         int32_t h                   = lv_obj_get_content_height(obj);
 
@@ -904,8 +906,8 @@ static int32_t get_selected_label_width(const lv_obj_t * obj)
     if(label == NULL) return 0;
 
     lv_text_attributes_t attributes = {0};
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_SELECTED);
-    attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_SELECTED);
+    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_SELECTED);
+    attributes.letter_space = lv_obj_get_style_text_letter_space_internal(obj, LV_PART_SELECTED);
     attributes.max_width = LV_COORD_MAX;
     attributes.text_flags = LV_TEXT_FLAG_NONE;
 
@@ -938,9 +940,9 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     int32_t scale_y = 256;
     lv_obj_t * parent = roller;
     while(parent) {
-        angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
-        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
-        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
+        angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
         scale_x = (scale_x * zoom_act_x) >> 8;
         scale_y = (scale_y * zoom_act_y) >> 8;
         parent = lv_obj_get_parent(parent);

@@ -69,7 +69,7 @@ jobs:
         run: |
           python3 scripts/generators/style_api.py
           git diff --exit-code || (echo "::error::Generated styles are out of date. Run scripts/generators/style_api.py and commit the result."; exit 1)
-          git restore .
+          git reset --hard
 
       # ------------------------------------------------------------------
       # Defconfig
@@ -80,7 +80,7 @@ jobs:
         run: |
           python3 scripts/generators/defconfigs.py
           git diff --exit-code || (echo "::error::Defconfigs are out of date. Run scripts/generators/defconfigs.py and commit the result."; exit 1)
-          git restore .
+          git reset --hard
 
       # ------------------------------------------------------------------
       # COPYRIGHTS.md and the SPDX SBOM (sbom/) are generated from

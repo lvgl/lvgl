@@ -11,6 +11,7 @@
 #if LV_USE_SPAN
 
 #include "../../misc/lv_area_private.h"
+#include "../../misc/lv_style_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../lvgl_public.h"
@@ -20,6 +21,7 @@
 #include "../../misc/lv_text_ap.h"
 #include "../../core/lv_global.h"
 #include "../../font/lv_font_private.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -386,7 +388,7 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
         lv_obj_set_height(obj, LV_SIZE_CONTENT);
     }
     else if(mode == LV_SPAN_MODE_BREAK) {
-        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+        if(lv_obj_get_style_width_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
             lv_obj_set_width(obj, 100);
         }
         lv_obj_set_height(obj, LV_SIZE_CONTENT);
@@ -394,10 +396,10 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
     else if(mode == LV_SPAN_MODE_FIXED) {
         /* use this mode, The user needs to set the size. */
         /* This is just to prevent an infinite loop. */
-        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+        if(lv_obj_get_style_width_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
             lv_obj_set_width(obj, 100);
         }
-        if(lv_obj_get_style_height(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+        if(lv_obj_get_style_height_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
             lv_obj_set_content_height(obj, 100);
         }
     }
@@ -482,7 +484,7 @@ lv_text_align_t lv_spangroup_get_align(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_TEXT_ALIGN_AUTO);
 
-    return lv_obj_get_style_text_align(obj, LV_PART_MAIN);
+    return lv_obj_get_style_text_align_internal(obj, LV_PART_MAIN);
 }
 
 lv_span_overflow_t lv_spangroup_get_overflow(lv_obj_t * obj)
@@ -503,12 +505,12 @@ lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
-    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+    if(lv_obj_get_style_width_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
         return LV_SPAN_MODE_EXPAND;
     }
 
     /*Width is fixed for the following cases*/
-    else if(lv_obj_get_style_height(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+    else if(lv_obj_get_style_height_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
         return LV_SPAN_MODE_BREAK;
     }
     /*Both fixed*/
@@ -588,7 +590,7 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 
     /* init draw variable */
     lv_text_flag_t txt_flag = LV_TEXT_FLAG_NONE;
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
     int32_t max_width = width;
     int32_t indent = convert_indent_pct(obj, max_width);
     int32_t max_w  = max_width - indent; /* first line need minus indent */
@@ -726,11 +728,11 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * 
         prev_span = curr_span;
     }
 
-    const uint32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    const uint32_t border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN);
     return make_span_coords(prev_span, curr_span, width, (lv_area_t) {
-        .x1 = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width,
-        .y1 = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width,
-        .x2 = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width, .y2 = 0
+        .x1 = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN) + border_width,
+        .y1 = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN) + border_width,
+        .x2 = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN) + border_width, .y2 = 0
     },
     indent);
 }
@@ -757,9 +759,9 @@ lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p)
     lv_span_t * curr_span;
     LV_LL_READ(spans, curr_span) {
         lv_span_coords_t coords = make_span_coords(prev_span, curr_span, width, (lv_area_t) {
-            .x1 = lv_obj_get_style_pad_left(obj, LV_PART_MAIN),
-            .y1 = lv_obj_get_style_pad_top(obj, LV_PART_MAIN),
-            .x2 = lv_obj_get_style_pad_right(obj, LV_PART_MAIN),
+            .x1 = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN),
+            .y1 = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN),
+            .x2 = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN),
             .y2 = 0
         },
         indent);
@@ -1010,9 +1012,9 @@ static const lv_font_t * lv_span_get_style_text_font(lv_obj_t * par, lv_span_t *
     LV_ASSERT(span != NULL);
     const lv_font_t * font;
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_FONT, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_FONT, &value);
     if(res != LV_STYLE_RES_FOUND) {
-        font = lv_obj_get_style_text_font(par, LV_PART_MAIN);
+        font = lv_obj_get_style_text_font_internal(par, LV_PART_MAIN);
     }
     else {
         font = (const lv_font_t *)value.ptr;
@@ -1026,9 +1028,9 @@ static int32_t lv_span_get_style_text_letter_space(lv_obj_t * par, lv_span_t * s
     LV_ASSERT(span != NULL);
     int32_t letter_space;
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_LETTER_SPACE, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_LETTER_SPACE, &value);
     if(res != LV_STYLE_RES_FOUND) {
-        letter_space = lv_obj_get_style_text_letter_space(par, LV_PART_MAIN);
+        letter_space = lv_obj_get_style_text_letter_space_internal(par, LV_PART_MAIN);
     }
     else {
         letter_space = (int32_t)value.num;
@@ -1041,9 +1043,9 @@ static lv_color_t lv_span_get_style_text_color(lv_obj_t * par, lv_span_t * span)
     LV_ASSERT(par != NULL);
     LV_ASSERT(span != NULL);
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_COLOR, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_COLOR, &value);
     if(res != LV_STYLE_RES_FOUND) {
-        value.color = lv_obj_get_style_text_color(par, LV_PART_MAIN);
+        value.color = lv_obj_get_style_text_color_internal(par, LV_PART_MAIN);
     }
     return value.color;
 }
@@ -1054,9 +1056,9 @@ static lv_opa_t lv_span_get_style_text_opa(lv_obj_t * par, lv_span_t * span)
     LV_ASSERT(span != NULL);
     lv_opa_t opa;
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_OPA, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_OPA, &value);
     if(res != LV_STYLE_RES_FOUND) {
-        opa = (lv_opa_t)lv_obj_get_style_text_opa(par, LV_PART_MAIN);
+        opa = (lv_opa_t)lv_obj_get_style_text_opa_internal(par, LV_PART_MAIN);
     }
     else {
         opa = (lv_opa_t)value.num;
@@ -1070,9 +1072,9 @@ static int32_t lv_span_get_style_text_decor(lv_obj_t * par, lv_span_t * span)
     LV_ASSERT(span != NULL);
     int32_t decor;
     lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_TEXT_DECOR, &value);
+    lv_style_res_t res = lv_style_get_prop_internal(&span->style, LV_STYLE_TEXT_DECOR, &value);
     if(res != LV_STYLE_RES_FOUND) {
-        decor = (lv_text_decor_t)lv_obj_get_style_text_decor(par, LV_PART_MAIN);
+        decor = (lv_text_decor_t)lv_obj_get_style_text_decor_internal(par, LV_PART_MAIN);
     }
     else {
         decor = (int32_t)value.num;
@@ -1125,7 +1127,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
     /* init draw variable */
     lv_text_flag_t txt_flag = LV_TEXT_FLAG_NONE;
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space_internal(obj, LV_PART_MAIN);
     int32_t max_width = lv_area_get_width(&coords);
     int32_t indent = convert_indent_pct(obj, max_width);
     int32_t max_w  = max_width - indent; /* first line need minus indent */
@@ -1140,9 +1142,9 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
     const char * cur_txt = cur_span->txt;
     SPAN_TEXT_CHECK(&cur_txt);
 
-    lv_text_align_t align = lv_obj_get_style_text_align(obj, LV_PART_MAIN);
+    lv_text_align_t align = lv_obj_get_style_text_align_internal(obj, LV_PART_MAIN);
 #if LV_USE_BIDI
-    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    lv_base_dir_t base_dir = lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN);
     if(base_dir == LV_BASE_DIR_AUTO) {
         base_dir = lv_bidi_detect_base_dir(cur_txt) == LV_BASE_DIR_RTL ? LV_BASE_DIR_RTL : LV_BASE_DIR_AUTO;
     }
