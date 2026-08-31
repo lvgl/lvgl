@@ -679,7 +679,7 @@
  *============================================================================*/
 
 /** Speed up style property lookups by adding 2 x 32 bit variables to each lv_obj_t. */
-#define LV_OBJ_STYLE_CACHE 0
+#define LV_OBJ_STYLE_CACHE 1
 
 /** Widget names (lv_obj_set_name) */
 #define LV_USE_OBJ_NAME 0
