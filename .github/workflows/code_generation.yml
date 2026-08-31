@@ -43,9 +43,9 @@ jobs:
         run: python3 -m pytest config_headers/test/ -q
 
       # ------------------------------------------------------------------
-      # Config headers: lv_conf_template.h, lv_conf_internal.h and
-      # lv_conf_kconfig.h are generated from the Kconfig tree. Regenerate
-      # them and fail if the committed files differ.
+      # Config headers: lv_conf_template.h, lv_conf_internal.h,
+      # lv_conf_kconfig.h and lv_conf_check.c are generated from the Kconfig
+      # tree. Regenerate them and fail if the committed files differ.
       # ------------------------------------------------------------------
       - name: "Generate: config headers (Kconfig)"
         id: config-headers
@@ -57,6 +57,7 @@ jobs:
             lv_conf_template.h \
             include/lvgl/config/lv_conf_internal.h \
             include/lvgl/config/lv_conf_kconfig.h \
+            src/lv_conf_check.c \
           || (echo "::error::Generated config headers are out of date. Run scripts/generators/config_headers.py and commit the result."; exit 1)
           git restore .
 

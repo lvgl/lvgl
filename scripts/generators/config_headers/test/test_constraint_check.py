@@ -1,11 +1,14 @@
-"""Tests for ConstraintCheck: Kconfig depends/select replayed as #error guards."""
+"""Tests for ConstraintCheck: Kconfig depends/select replayed as #error guards.
+
+The guards live in the generated lv_conf_check.c, not in lv_conf_internal.h, so
+a config violation is reported once instead of in every translation unit."""
 
 import os
 
 import pytest
 
 from config_headers.config_entry import BoolConfig, ConstraintCheck, DerivedFlag
-from config_headers.emit import constraint_checks, generate_internal
+from config_headers.emit import constraint_checks, generate_checker, generate_internal
 from config_headers.parse import load, parse_entries
 
 FIXTURE = os.path.join(
@@ -72,11 +75,37 @@ def test_unconstrained_option_has_no_check(entries, checks):
     assert "LV_USE_PLAIN" not in checks
 
 
-def test_checks_land_before_the_closing_endif(kconf, entries):
+def test_checks_land_in_the_checker_translation_unit(kconf, entries):
+    checker = generate_checker(kconf, entries)
+    assert '#error "LV_USE_BBB must be enabled' in checker
+    assert '#error "LV_USE_EEE requires LV_USE_AAA' in checker
+    # The checker is a .c file: it pulls the config in through the public header
+    # and carries no include guard of its own.
+    assert '#include "lvgl_public.h"' in checker
+    assert "LV_CONF_INTERNAL_H" not in checker
+
+
+def test_checks_are_not_in_the_internal_header(kconf, entries):
     internal = generate_internal(kconf, entries)
-    check_pos = internal.index('#error "LV_USE_BBB must be enabled')
-    close_pos = internal.index("#endif  /*LV_CONF_INTERNAL_H*/")
-    assert check_pos < close_pos
+    assert '#error "LV_USE_BBB must be enabled' not in internal
+    assert '#error "LV_USE_EEE requires LV_USE_AAA' not in internal
+
+
+def test_checker_warns_about_deprecated_symbols(kconf, entries):
+    checker = generate_checker(kconf, entries)
+    assert "#warning LV_X11_RENDER_MODE_PARTIAL is deprecated" in checker
+    assert "#warning LV_X11_RENDER_MODE_DIRECT is deprecated" in checker
+    assert "#warning LV_X11_RENDER_MODE_FULL is deprecated" in checker
+
+
+def test_internal_still_maps_deprecated_symbols_without_warning(kconf, entries):
+    # The #undef/#define remapping has to stay in the header so user code keeps
+    # working; only the #warning moves to the checker.
+    internal = generate_internal(kconf, entries)
+    assert "#define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL" in internal
+    assert "#warning LV_X11_RENDER_MODE_PARTIAL" not in internal
+    assert "#warning LV_X11_RENDER_MODE_DIRECT" not in internal
+    assert "#warning LV_X11_RENDER_MODE_FULL" not in internal
 
 
 def test_template_comment_lists_user_facing_selects(kconf, entries):
