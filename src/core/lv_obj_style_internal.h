@@ -95,4 +95,4 @@ static inline int32_t lv_obj_get_style_transform_scale_y_safe_internal(const lv_
 } /*extern "C"*/
 #endif
 
-#endif /*LV_OBJ_STYLE_H*/
+#endif /*LV_OBJ_STYLE_INTERNAL_H*/
