@@ -19,7 +19,7 @@
 #include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../misc/cache/lv_cache.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES

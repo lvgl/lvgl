@@ -13,7 +13,7 @@
 #if LV_USE_SWITCH
 
 #include "../../misc/lv_anim_private.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES

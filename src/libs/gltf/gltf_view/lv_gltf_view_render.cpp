@@ -12,7 +12,7 @@
 #if LV_USE_GLTF
 
 #include "../gltf_data/lv_gltf_data_internal.hpp"
-#include "../../../core/lv_obj_style_internal_gen.h"
+#include "../../../core/lv_obj_style_internal.h"
 
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../drivers/opengles/lv_opengles_private.h"

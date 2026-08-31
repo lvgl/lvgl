@@ -12,7 +12,7 @@
 #if LV_USE_3DTEXTURE
 
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES

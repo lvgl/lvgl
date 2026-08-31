@@ -14,7 +14,7 @@
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 #include "../../misc/lv_style_private.h"
 
 /*********************

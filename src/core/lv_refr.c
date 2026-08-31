@@ -18,7 +18,7 @@
 #include "../draw/opengles/lv_draw_opengles.h"
 #include "lv_global.h"
 #include "../lvgl_public.h"
-#include "lv_obj_style_internal_gen.h"
+#include "lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES

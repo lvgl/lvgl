@@ -16,7 +16,7 @@
 #include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../font/lv_font_private.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES

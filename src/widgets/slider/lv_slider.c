@@ -17,7 +17,7 @@
 #include "../../lvgl_public.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../core/lv_observer_private.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*Check dependencies*/
 #if LV_USE_BAR == 0

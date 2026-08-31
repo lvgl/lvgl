@@ -17,7 +17,7 @@
 #include "../../misc/lv_area_private.h"
 #include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
-#include "../../core/lv_obj_style_internal_gen.h"
+#include "../../core/lv_obj_style_internal.h"
 
 #if LV_USE_FLOAT
     #include <math.h>

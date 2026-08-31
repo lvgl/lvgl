@@ -15,7 +15,7 @@
  *********************/
 #define layout_cnt LV_GLOBAL_DEFAULT()->layout_count
 #define layout_list_def LV_GLOBAL_DEFAULT()->layout_list
-#include "../core/lv_obj_style_internal_gen.h"
+#include "../core/lv_obj_style_internal.h"
 
 /**********************
  *      TYPEDEFS
