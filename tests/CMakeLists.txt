@@ -296,6 +296,8 @@ foreach(test_case_fname ${TEST_CASE_FILES})
         # Force the Mesa driver so that rendering is reproducible
         set(nanovg_test_env
             "LSAN_OPTIONS=fast_unwind_on_malloc=0"
+            "LIBGL_ALWAYS_SOFTWARE=1"
+            "GALLIUM_DRIVER=llvmpipe"
             "__EGL_VENDOR_LIBRARY_FILENAMES=${LVGL_TEST_DIR}/egl_vendor_mesa_only.json")
         set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "${nanovg_test_env}")
     endif()
