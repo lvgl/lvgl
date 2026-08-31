@@ -1,0 +1,1536 @@
+max-files-changed: 40
+changed-files-labels-limit: 15
+
+##############################################################################
+# Meta / infrastructure
+##############################################################################
+
+docs:
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'docs/**'
+              - '**/*.md'
+              - '**/*.mdx'
+      - changed-files:
+          - all-globs-to-all-files:
+              - '!src/**'
+              - '!include/**'
+
+tests:
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'tests/**'
+              - 'gcovr.cfg'
+              - 'docs/src/contributing/running_tests.mdx'
+      - changed-files:
+          - all-globs-to-all-files:
+              - '!src/**'
+              - '!include/**'
+
+ref-images:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/ref_imgs/**'
+          - 'tests/ref_imgs_nanovg/**'
+          - 'tests/ref_imgs_vg_lite/**'
+
+test:
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'src/debugging/test/**'
+              - 'include/lvgl/debugging/test/**'
+              - 'docs/src/debugging/test.mdx'
+              - 'tests/src/test_cases/test_test_helpers.c'
+      - changed-files:
+          - all-globs-to-all-files:
+              - '!src/**'
+              - '!include/**'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+          - '.typos.toml'
+
+scripts:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'scripts/**'
+
+examples:
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'examples/**'
+      - changed-files:
+          - all-globs-to-all-files:
+              - '!src/**'
+              - '!include/**'
+
+demos:
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'demos/**'
+      - changed-files:
+          - all-globs-to-all-files:
+              - '!src/**'
+              - '!include/**'
+
+config:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/Kconfig*'
+          - 'lv_conf_template.h'
+          - 'configs/**'
+          - 'include/lvgl/config/**'
+          - 'env_support/kconfig/**'
+          - 'env_support/cmake/kconfig.cmake'
+          - 'scripts/generate_lv_conf.py'
+          - 'scripts/kconfig_verify.py'
+          - 'docs/src/integration/configuration.mdx'
+          - 'docs/src/contributing/configuration.mdx'
+
+public-api:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/**'
+          - 'lvgl.h'
+          - 'lvgl_private.h'
+          - 'lv_version.h'
+          - 'lv_version.h.in'
+
+cmake:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/CMakeLists.txt'
+          - '**/*.cmake'
+          - 'CMakePresets.json'
+          - 'env_support/cmake/**'
+          - 'docs/src/integration/building/cmake.mdx'
+
+build:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/Makefile'
+          - '**/*.mk'
+          - '**/CMakeLists.txt'
+          - '**/*.cmake'
+          - 'env_support/cmake/**'
+          - 'SConscript'
+          - 'library.json'
+          - 'library.properties'
+          - 'idf_component.yml'
+          - 'tests/makefiles/**'
+          - 'docs/src/integration/building/**'
+
+sbom:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'sbom/**'
+          - 'scripts/generate_sbom.py'
+          - 'scripts/validate_sbom.py'
+          - 'COPYRIGHTS.md'
+          - 'scripts/generate_copyrights.py'
+
+devcontainer:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.devcontainer/**'
+
+dev:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.pre-commit-config.yaml'
+          - '.gitignore'
+
+blobs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'libs/**'
+
+debian:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'env_support/debian/**'
+
+# Core
+
+core:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/**'
+          - 'src/core/**'
+          - 'src/misc/lv_area.*'
+          - 'src/misc/lv_area_private.h'
+          - 'src/misc/lv_matrix.*'
+          - 'src/lv_init.*'
+          - 'docs/src/main-modules/indev/groups.mdx'
+          - 'tests/src/test_cases/test_area.c'
+          - 'tests/src/test_cases/test_group.c'
+
+obj:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_obj*'
+          - 'src/core/lv_obj*'
+          - 'examples/widgets/obj/**'
+          - 'docs/src/widgets/base_widget.mdx'
+          - 'docs/src/common-widget-features/basics.mdx'
+          - 'docs/src/common-widget-features/coordinates.mdx'
+          - 'docs/src/common-widget-features/flags.mdx'
+          - 'docs/src/common-widget-features/layers.mdx'
+          - 'docs/src/common-widget-features/parts_and_states.mdx'
+          - 'docs/src/common-widget-features/tree.mdx'
+          - 'docs/src/debugging/obj_id.mdx'
+          - 'tests/src/test_cases/**/test_obj*'
+
+obj-property:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_obj_property*.h'
+          - 'src/core/lv_obj_property.*'
+          - 'src/widgets/property/**'
+          - 'docs/src/common-widget-features/obj_property.mdx'
+          - 'tests/src/test_cases/widgets/test_obj_property.c'
+
+style:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_style*.h'
+          - 'include/lvgl/core/lv_obj_style*.h'
+          - 'src/misc/lv_style*'
+          - 'src/core/lv_obj_style*'
+          - 'docs/src/common-widget-features/styles/**'
+          - 'examples/styles/**'
+          - 'examples/get_started/get_started_styles/**'
+          - 'tests/src/test_cases/test_style.c'
+          - 'tests/src/test_cases/test_obj_style_state_refresh.c'
+
+theme:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/themes/**'
+          - 'src/themes/**'
+          - 'docs/src/common-widget-features/styles/themes.mdx'
+          - 'tests/src/test_cases/test_theme.c'
+
+event:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_event.h'
+          - 'include/lvgl/core/lv_obj_event.h'
+          - 'src/misc/lv_event*'
+          - 'src/core/lv_obj_event*'
+          - 'examples/event/**'
+          - 'docs/src/common-widget-features/events.mdx'
+          - 'docs/src/main-modules/display/display_events.mdx'
+          - 'tests/src/test_cases/test_event*.c'
+          - 'tests/src/test_cases/widgets/test_obj_event*.c'
+
+animation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_anim.h'
+          - 'include/lvgl/core/lv_anim_timeline.h'
+          - 'src/misc/lv_anim*'
+          - 'examples/anim/**'
+          - 'docs/src/main-modules/animation.mdx'
+          - 'tests/src/test_cases/test_anim*.c'
+
+timer:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_timer.h'
+          - 'include/lvgl/tick/**'
+          - 'src/misc/lv_timer*'
+          - 'src/tick/**'
+          - 'docs/src/main-modules/timer.mdx'
+          - 'tests/src/test_cases/test_tick*.c'
+
+observer:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_observer.h'
+          - 'src/core/lv_observer*'
+          - 'docs/src/main-modules/observer/**'
+          - 'examples/others/observer/**'
+          - 'tests/src/test_cases/test_observer.c'
+
+translation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_translation.h'
+          - 'src/others/translation/**'
+          - 'docs/src/main-modules/translation.mdx'
+          - 'examples/others/translation/**'
+          - 'tests/src/test_cases/test_translation.c'
+
+screen:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/src/common-widget-features/screens.mdx'
+          - 'docs/src/main-modules/display/screen_layers.mdx'
+          - 'tests/src/test_cases/test_screen_load.c'
+
+scroll:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_obj_scroll.h'
+          - 'src/core/lv_obj_scroll*'
+          - 'src/indev/lv_indev_scroll.*'
+          - 'docs/src/common-widget-features/scrolling.mdx'
+          - 'examples/scroll/**'
+          - 'tests/src/test_cases/test_scrollbar.c'
+          - 'tests/src/test_cases/test_indev_scroll_rotation.c'
+
+refresh:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/core/lv_refr.h'
+          - 'src/core/lv_refr*'
+          - 'docs/src/main-modules/display/refreshing.mdx'
+          - 'docs/src/main-modules/display/redraw_area.mdx'
+          - 'docs/src/main-modules/display/tiling.mdx'
+          - 'tests/src/test_cases/refr/**'
+          - 'tests/src/test_helpers/refr/**'
+
+# Display
+display:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/display/**'
+          - 'src/display/**'
+          - 'docs/src/main-modules/display/**'
+          - 'src/debugging/test/lv_test_display*'
+          - 'tests/src/test_cases/test_display.c'
+
+# Indev
+indev:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/indev/**'
+          - 'src/indev/**'
+          - 'include/lvgl/drivers/indev/**'
+          - 'docs/src/main-modules/indev/**'
+          - 'src/debugging/test/lv_test_indev*'
+          - 'tests/src/test_cases/test_indev*.c'
+          - 'tests/src/test_cases/test_click.c'
+          - 'tests/src/test_cases/test_hover.c'
+
+gridnav:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/indev/lv_gridnav.h'
+          - 'src/indev/lv_gridnav.*'
+          - 'docs/src/main-modules/indev/gridnav.mdx'
+          - 'examples/others/gridnav/**'
+          - 'tests/src/test_cases/test_gridnav.c'
+
+gesture:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/indev/lv_indev_gesture.h'
+          - 'src/indev/lv_indev_gesture*'
+          - 'src/debugging/test/lv_test_indev_gesture.*'
+          - 'docs/src/main-modules/indev/gestures.mdx'
+          - 'examples/others/gestures/**'
+          - 'tests/src/test_cases/test_gesture_*.c'
+
+# Draw
+draw:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/draw/**'
+          - 'src/draw/**'
+          - 'docs/src/main-modules/draw/**'
+          - 'docs/src/integration/embedded_linux/draw_units/**'
+          - 'tests/src/test_cases/draw/**'
+
+draw-sw:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/sw/**'
+          - 'tests/src/test_cases/draw/test_draw_sw_*.c'
+
+simd:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/sw/arm2d/**'
+          - 'src/draw/sw/blend/arm2d/**'
+          - 'src/draw/sw/blend/helium/**'
+          - 'src/draw/sw/blend/neon/**'
+          - 'src/draw/sw/blend/riscv_v/**'
+          - 'src/draw/sw/blend/sve2/**'
+          - 'docs/src/integration/chip_vendors/arm/**'
+
+arm2d:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/sw/arm2d/lv_draw_sw_arm2d.h'
+          - 'src/draw/sw/blend/arm2d/**'
+          - 'docs/src/integration/chip_vendors/arm/arm2d.mdx'
+
+helium:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/sw/arm2d/lv_draw_sw_helium.h'
+          - 'src/draw/sw/blend/helium/**'
+
+neon:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/sw/blend/neon/**'
+
+sve2:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/sw/blend/sve2/**'
+
+riscv:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/sw/blend/riscv_v/**'
+
+draw-buf:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/draw/lv_draw_buf.h'
+          - 'src/draw/lv_draw_buf*'
+          - 'tests/src/test_cases/test_draw_buf.c'
+          - 'tests/src/test_cases/refr/test_refr_draw_buf.c'
+
+draw-vector:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/draw/lv_draw_vector.h'
+          - 'src/draw/lv_draw_vector*'
+          - 'src/draw/sw/lv_draw_sw_vector.c'
+          - 'demos/vector_graphic/**'
+          - 'tests/src/test_cases/draw/test_draw_vector*.c'
+          - 'tests/src/test_cases/test_demo_vector_graphic.c'
+
+draw-snapshot:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/draw/lv_snapshot.h'
+          - 'src/draw/snapshot/**'
+          - 'docs/src/main-modules/draw/snapshot.mdx'
+          - 'examples/others/snapshot/**'
+          - 'tests/src/test_cases/test_snapshot.c'
+
+color:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/draw/lv_color.h'
+          - 'include/lvgl/draw/lv_color_op.h'
+          - 'include/lvgl/draw/lv_palette.h'
+          - 'src/misc/lv_color*'
+          - 'src/misc/lv_palette.*'
+          - 'src/draw/convert/**'
+          - 'docs/src/main-modules/color.mdx'
+          - 'docs/src/main-modules/display/color_format.mdx'
+          - 'docs/src/main-modules/images/color_formats.mdx'
+          - 'tests/src/test_cases/test_color.c'
+          - 'tests/src/test_cases/test_palette.c'
+          - 'tests/src/test_cases/test_recolor.c'
+
+gradient:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/draw/lv_grad.h'
+          - 'src/misc/lv_grad.*'
+          - 'src/draw/sw/lv_draw_sw_grad.*'
+          - 'examples/grad/**'
+
+# Font & text
+
+font:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/font/**'
+          - 'src/font/**'
+          - 'src/misc/lv_text*'
+          - 'docs/src/main-modules/fonts/**'
+          - 'docs/src/libs/font_support/**'
+          - 'scripts/built_in_font/**'
+          - 'scripts/font_license_verify.py'
+          - 'tests/src/test_files/fonts/**'
+          - 'tests/src/test_cases/test_txt.c'
+          - 'tests/src/test_cases/test_text_ap.c'
+          - 'tests/src/test_cases/libs/test_font_stress.c'
+
+freetype:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/font/lv_freetype.h'
+          - 'src/font/freetype/**'
+          - 'src/libs/freetype/**'
+          - 'env_support/cmake/dependencies/freetype.cmake'
+          - 'docs/src/libs/font_support/freetype.mdx'
+          - 'examples/libs/freetype/**'
+          - 'tests/src/test_cases/libs/test_freetype*.c'
+
+tinyttf:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/font/lv_tiny_ttf.h'
+          - 'src/libs/tiny_ttf/**'
+          - 'docs/src/libs/font_support/tiny_ttf.mdx'
+          - 'examples/libs/tiny_ttf/**'
+          - 'tests/src/test_cases/libs/test_tiny_ttf.c'
+
+font manager:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/font/lv_font_manager.h'
+          - 'src/font/font_manager/**'
+          - 'docs/src/main-modules/fonts/font_manager.mdx'
+          - 'examples/others/font_manager/**'
+          - 'tests/src/test_cases/test_font_manager.c'
+
+imgfont:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/font/lv_imgfont.h'
+          - 'src/font/imgfont/**'
+          - 'docs/src/main-modules/fonts/imgfont.mdx'
+          - 'examples/others/imgfont/**'
+          - 'tests/src/test_cases/widgets/test_imgfont.c'
+
+binfont:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/font/lv_binfont_loader.h'
+          - 'src/font/binfont_loader/**'
+          - 'docs/src/main-modules/fonts/binfont_loader.mdx'
+          - 'tests/src/test_cases/test_font_loader.c'
+
+bidi:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/font/lv_bidi.h'
+          - 'src/misc/lv_bidi*'
+          - 'docs/src/main-modules/fonts/rtl.mdx'
+
+# Images & decoders
+
+image:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/image/**'
+          - 'include/lvgl/draw/lv_image_dsc.h'
+          - 'include/lvgl/draw/lv_draw_image.h'
+          - 'src/image/**'
+          - 'src/libs/bin_decoder/**'
+          - 'src/draw/lv_draw_image*'
+          - 'src/draw/lv_image_decoder.h'
+          - 'src/draw/lv_image_dsc.h'
+          - 'docs/src/main-modules/images/**'
+          - 'docs/src/libs/image_support/**'
+          - 'scripts/LVGLImage.py'
+          - 'scripts/image_viewer.py'
+          - 'tests/src/test_files/binimages/**'
+          - 'tests/test_images/**'
+          - 'tests/src/test_cases/draw/test_image_*.c'
+          - 'tests/src/test_cases/test_image_src_get_type.c'
+          - 'tests/src/test_cases/libs/test_bin_decoder.c'
+
+widget-image:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_image.h'
+          - 'src/widgets/image/**'
+          - 'docs/src/widgets/image.mdx'
+          - 'examples/widgets/image/**'
+          - 'tests/src/test_cases/widgets/test_image.c'
+
+lodepng:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/image/lv_lodepng.h'
+          - 'src/libs/lodepng/**'
+          - 'src/image/lv_lodepng.c'
+          - 'docs/src/libs/image_support/lodepng.mdx'
+          - 'examples/libs/lodepng/**'
+          - 'tests/src/test_cases/libs/test_lodepng.c'
+
+libpng:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/image/lv_libpng.h'
+          - 'src/libs/libpng/**'
+          - 'src/image/lv_libpng.c'
+          - 'env_support/cmake/dependencies/png.cmake'
+          - 'docs/src/libs/image_support/libpng.mdx'
+          - 'examples/libs/libpng/**'
+          - 'tests/src/test_cases/libs/test_libpng.c'
+
+tjpgd:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/image/lv_tjpgd.h'
+          - 'src/libs/tjpgd/**'
+          - 'src/image/lv_tjpgd.c'
+          - 'docs/src/libs/image_support/tjpgd.mdx'
+          - 'examples/libs/tjpgd/**'
+          - 'scripts/jpg_to_sjpg.py'
+          - 'tests/src/test_cases/libs/test_tjpgd.c'
+
+libjpeg_turbo:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/image/lv_libjpeg_turbo.h'
+          - 'src/libs/libjpeg_turbo/**'
+          - 'src/image/lv_libjpeg_turbo.c'
+          - 'env_support/cmake/dependencies/jpeg.cmake'
+          - 'docs/src/libs/image_support/libjpeg_turbo.mdx'
+          - 'examples/libs/libjpeg_turbo/**'
+          - 'tests/src/test_cases/libs/test_libjpeg_turbo.c'
+
+libwebp:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/image/lv_libwebp.h'
+          - 'src/libs/libwebp/**'
+          - 'src/image/lv_libwebp.c'
+          - 'env_support/cmake/dependencies/webp.cmake'
+          - 'docs/src/libs/image_support/libwebp.mdx'
+          - 'examples/libs/libwebp/**'
+          - 'tests/src/test_cases/libs/test_libwebp.c'
+
+bmp:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/image/lv_bmp.h'
+          - 'src/libs/bmp/**'
+          - 'src/image/lv_bmp.c'
+          - 'docs/src/libs/image_support/bmp.mdx'
+          - 'examples/libs/bmp/**'
+          - 'tests/src/test_cases/libs/test_bmp.c'
+
+rle:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/libs/rle/**'
+          - 'docs/src/libs/image_support/rle.mdx'
+          - 'tests/src/test_files/rle_compressed/**'
+
+lz4:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/libs/lz4/**'
+          - 'env_support/cmake/dependencies/zlib.cmake'
+          - 'docs/src/libs/image_support/lz4.mdx'
+          - 'tests/src/test_files/lz4_compressed/**'
+
+svg:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/image/lv_svg.h'
+          - 'src/image/svg/**'
+          - 'docs/src/libs/image_support/svg.mdx'
+          - 'examples/libs/svg/**'
+          - 'tests/src/test_assets/svg/**'
+          - 'tests/src/test_cases/test_svg*.c'
+          - 'tests/src/test_cases/draw/test_draw_svg.c'
+          - 'tests/src/test_cases/libs/test_svg_decoder.c'
+
+cache:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/misc/cache/**'
+          - 'docs/src/main-modules/images/caching.mdx'
+          - 'tests/src/test_cases/cache/**'
+          - 'tests/src/test_cases/draw/test_image_cache.c'
+
+# File system
+
+fs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/fs/**'
+          - 'src/fs/**'
+          - 'src/libs/fsdrv/**'
+          - 'src/debugging/test/lv_test_fs.*'
+          - 'docs/src/main-modules/fs.mdx'
+          - 'docs/src/libs/fs_support/**'
+          - 'tests/src/test_cases/test_fs.c'
+
+fatfs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/fs/lv_fs_fatfs.c'
+
+littlefs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/fs/lv_fs_littlefs.c'
+          - 'src/fs/lv_fs_arduino_esp_littlefs.cpp'
+          - 'docs/src/libs/fs_support/lfs.mdx'
+          - 'docs/src/libs/fs_support/arduino_esp_littlefs.mdx'
+
+frogfs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/libs/frogfs/**'
+          - 'src/fs/lv_fs_frogfs.c'
+          - 'docs/src/libs/fs_support/frogfs.mdx'
+
+file_explorer:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/others/file_explorer/**'
+          - 'src/others/file_explorer/**'
+          - 'docs/src/auxiliary-modules/file_explorer.mdx'
+          - 'examples/others/file_explorer/**'
+          - 'tests/src/test_cases/test_file_explorer.c'
+
+fragment:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/others/fragment/**'
+          - 'src/others/fragment/**'
+          - 'docs/src/auxiliary-modules/fragment.mdx'
+          - 'examples/others/fragment/**'
+
+# Layouts
+
+layout:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/layouts/**'
+          - 'src/layouts/**'
+          - 'docs/src/common-widget-features/layouts/**'
+          - 'examples/layouts/**'
+          - 'tests/src/test_cases/test_margin_align.c'
+
+flex:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/layouts/lv_flex.h'
+          - 'src/layouts/flex/**'
+          - 'docs/src/common-widget-features/layouts/flex.mdx'
+          - 'examples/layouts/flex/**'
+          - 'tests/src/test_cases/test_align_flex.c'
+          - 'tests/src/test_cases/test_flex_grow.c'
+          - 'tests/src/test_cases/test_margin_flex.c'
+
+grid:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/layouts/lv_grid.h'
+          - 'src/layouts/grid/**'
+          - 'docs/src/common-widget-features/layouts/grid.mdx'
+          - 'examples/layouts/grid/**'
+          - 'tests/src/test_cases/test_grid*.c'
+          - 'tests/src/test_cases/test_margin_grid.c'
+
+# Debugging & diagnostics
+
+debugging:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/debugging/**'
+          - 'src/debugging/**'
+          - 'docs/src/debugging/**'
+
+log:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/logging/**'
+          - 'src/logging/**'
+          - 'src/misc/lv_log.h'
+          - 'docs/src/debugging/log.mdx'
+
+sysmon:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/debugging/lv_sysmon.h'
+          - 'src/debugging/sysmon/**'
+          - 'docs/src/debugging/sysmon.mdx'
+
+profiler:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/debugging/profiler/**'
+          - 'src/debugging/profiler/**'
+          - 'src/misc/lv_profiler*.h'
+          - 'src/drivers/nuttx/lv_nuttx_profiler.*'
+          - 'docs/src/debugging/profiler.mdx'
+          - 'scripts/perf/**'
+          - 'tests/src/test_cases/test_profiler.c'
+          - 'tests/src/test_cases_perf/**'
+
+monkey:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/debugging/lv_monkey.h'
+          - 'src/debugging/monkey/**'
+          - 'docs/src/debugging/monkey.mdx'
+          - 'examples/others/monkey/**'
+
+# OS abstraction, stdlib, bindings
+
+osal:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/osal/**'
+          - 'src/osal/**'
+          - 'docs/src/integration/rtos/**'
+          - 'examples/porting/osal/**'
+
+freertos:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/osal/lv_freertos.*'
+          - 'docs/src/integration/rtos/freertos.mdx'
+
+rt-thread:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/osal/lv_rtthread.*'
+          - 'src/stdlib/rtthread/**'
+          - 'env_support/rt-thread/**'
+          - 'docs/src/integration/rtos/rt-thread.mdx'
+
+cmsis:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/osal/lv_cmsis_rtos2.*'
+          - 'env_support/cmsis-pack/**'
+
+mqx:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/osal/lv_mqx.*'
+          - 'docs/src/integration/rtos/mqx.mdx'
+
+zephyr:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'zephyr/**'
+          - 'docs/src/integration/rtos/zephyr.mdx'
+
+nuttx:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/nuttx/**'
+          - 'src/drivers/nuttx/**'
+          - 'env_support/cmake/dependencies/libuv.cmake'
+          - 'docs/src/integration/rtos/nuttx.mdx'
+
+qnx:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/qnx/**'
+          - 'src/drivers/qnx/**'
+          - 'env_support/qnx/**'
+          - 'docs/src/integration/rtos/qnx.mdx'
+
+stdlib:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/stdlib/**'
+          - 'src/stdlib/**'
+          - 'tests/src/test_cases/test_mem.c'
+          - 'tests/src/test_cases/libs/test_memmove.c'
+
+micropython:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/stdlib/micropython/**'
+          - 'env_support/cmake/micropython.cmake'
+          - 'docs/src/integration/bindings/micropython.mdx'
+          - 'tests/micropy_test/**'
+          - 'tests/src/test_cases/test_bindings.c'
+
+pikascript:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'env_support/pikascript/**'
+          - 'docs/src/integration/bindings/pikascript.mdx'
+
+arduino:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'examples/arduino/**'
+          - 'src/fs/lv_fs_arduino_*'
+          - 'library.properties'
+          - 'library.json'
+          - 'docs/src/integration/frameworks/arduino.mdx'
+          - 'docs/src/libs/fs_support/arduino_*.mdx'
+
+misc:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/misc/**'
+          - 'include/lvgl/lv_types.h'
+          - 'src/misc/**'
+          - 'tests/src/test_cases/test_array.c'
+          - 'tests/src/test_cases/test_async.c'
+          - 'tests/src/test_cases/test_circle_buf.c'
+          - 'tests/src/test_cases/test_ll.c'
+          - 'tests/src/test_cases/test_math.c'
+          - 'tests/src/test_cases/test_rb.c'
+          - 'tests/src/test_cases/test_utils.c'
+
+# Widgets
+
+widget-3dtexture:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_3dtexture.h'
+          - 'src/widgets/3dtexture/**'
+          - 'docs/src/widgets/3dtexture.mdx'
+
+widget-animimage:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_animimage.h'
+          - 'src/widgets/animimage/**'
+          - 'docs/src/widgets/animimg.mdx'
+          - 'examples/widgets/animimg/**'
+          - 'tests/src/test_cases/widgets/test_animimg.c'
+
+widget-arc:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_arc.h'
+          - 'src/widgets/arc/**'
+          - 'docs/src/widgets/arc.mdx'
+          - 'examples/widgets/arc/**'
+          - 'tests/src/test_cases/widgets/test_arc.c'
+
+widget-arclabel:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_arclabel.h'
+          - 'src/widgets/arclabel/**'
+          - 'docs/src/widgets/arclabel.mdx'
+          - 'examples/widgets/arclabel/**'
+          - 'tests/src/test_cases/widgets/test_arclabel.c'
+
+widget-bar:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_bar.h'
+          - 'src/widgets/bar/**'
+          - 'docs/src/widgets/bar.mdx'
+          - 'examples/widgets/bar/**'
+          - 'tests/src/test_cases/widgets/test_bar.c'
+
+barcode:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_barcode.h'
+          - 'src/widgets/barcode/**'
+          - 'src/libs/barcode/**'
+          - 'docs/src/libs/barcode.mdx'
+          - 'examples/libs/barcode/**'
+          - 'tests/src/test_cases/libs/test_barcode.c'
+
+widget-button:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_button.h'
+          - 'src/widgets/button/**'
+          - 'docs/src/widgets/button.mdx'
+          - 'examples/widgets/button/**'
+          - 'tests/src/test_cases/widgets/test_btn.c'
+
+widget-buttonmatrix:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_buttonmatrix.h'
+          - 'src/widgets/buttonmatrix/**'
+          - 'docs/src/widgets/buttonmatrix.mdx'
+          - 'examples/widgets/buttonmatrix/**'
+          - 'tests/src/test_cases/widgets/test_btnmatrix.c'
+
+widget-calendar:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_calendar*.h'
+          - 'src/widgets/calendar/**'
+          - 'docs/src/widgets/calendar.mdx'
+          - 'examples/widgets/calendar/**'
+          - 'tests/src/test_cases/widgets/test_calendar.c'
+
+widget-canvas:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_canvas.h'
+          - 'src/widgets/canvas/**'
+          - 'docs/src/widgets/canvas.mdx'
+          - 'examples/widgets/canvas/**'
+          - 'tests/src/test_cases/widgets/test_canvas.c'
+
+widget-chart:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_chart.h'
+          - 'src/widgets/chart/**'
+          - 'docs/src/widgets/chart.mdx'
+          - 'examples/widgets/chart/**'
+          - 'tests/src/test_cases/widgets/test_chart.c'
+
+widget-checkbox:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_checkbox.h'
+          - 'src/widgets/checkbox/**'
+          - 'docs/src/widgets/checkbox.mdx'
+          - 'examples/widgets/checkbox/**'
+          - 'tests/src/test_cases/widgets/test_checkbox.c'
+
+widget-dropdown:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_dropdown.h'
+          - 'src/widgets/dropdown/**'
+          - 'docs/src/widgets/dropdown.mdx'
+          - 'examples/widgets/dropdown/**'
+          - 'tests/src/test_cases/widgets/test_dropdown.c'
+
+ffmpeg:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_ffmpeg.h'
+          - 'src/widgets/ffmpeg/**'
+          - 'src/libs/ffmpeg/**'
+          - 'env_support/cmake/dependencies/ffmpeg.cmake'
+          - 'docs/src/libs/video_support/ffmpeg.mdx'
+          - 'examples/libs/ffmpeg/**'
+          - 'tests/src/test_cases/libs/test_ffmpeg.c'
+
+gif:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_gif.h'
+          - 'src/widgets/gif/**'
+          - 'src/libs/gif/**'
+          - 'docs/src/widgets/gif.mdx'
+          - 'examples/libs/gif/**'
+          - 'tests/src/test_cases/libs/test_gif.c'
+
+gltf:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/3d/**'
+          - 'include/lvgl/widgets/lv_gltf.h'
+          - 'src/libs/gltf/**'
+          - 'src/draw/lv_draw_3d.*'
+          - 'env_support/cmake/dependencies/fastgltf.cmake'
+          - 'demos/gltf/**'
+          - 'docs/src/libs/gltf.mdx'
+          - 'examples/libs/gltf/**'
+          - 'tests/gen_gltf_assets.py'
+          - 'tests/src/test_cases/3d/**'
+
+gstreamer:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_gstreamer.h'
+          - 'src/widgets/gstreamer/**'
+          - 'src/libs/gstreamer/**'
+          - 'env_support/cmake/dependencies/gstreamer.cmake'
+          - 'docs/src/libs/video_support/gstreamer.mdx'
+          - 'examples/libs/gstreamer/**'
+
+widget-imagebutton:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_imagebutton.h'
+          - 'src/widgets/imagebutton/**'
+          - 'docs/src/widgets/imagebutton.mdx'
+          - 'examples/widgets/imagebutton/**'
+          - 'tests/src/test_cases/widgets/test_imagebutton.c'
+
+widget-keyboard:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_keyboard.h'
+          - 'src/widgets/keyboard/**'
+          - 'docs/src/widgets/keyboard.mdx'
+          - 'examples/widgets/keyboard/**'
+          - 'tests/src/test_cases/widgets/test_keyboard.c'
+
+widget-label:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_label.h'
+          - 'src/widgets/label/**'
+          - 'docs/src/widgets/label.mdx'
+          - 'examples/widgets/label/**'
+          - 'tests/src/test_cases/widgets/test_label.c'
+
+widget-led:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_led.h'
+          - 'src/widgets/led/**'
+          - 'docs/src/widgets/led.mdx'
+          - 'examples/widgets/led/**'
+          - 'tests/src/test_cases/widgets/test_led.c'
+
+widget-line:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_line.h'
+          - 'src/widgets/line/**'
+          - 'docs/src/widgets/line.mdx'
+          - 'examples/widgets/line/**'
+          - 'tests/src/test_cases/widgets/test_line.c'
+
+widget-list:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_list.h'
+          - 'src/widgets/list/**'
+          - 'docs/src/widgets/list.mdx'
+          - 'examples/widgets/list/**'
+          - 'tests/src/test_cases/widgets/test_list.c'
+
+lottie:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_lottie.h'
+          - 'include/lvgl/widgets/lv_rlottie.h'
+          - 'src/widgets/lottie/**'
+          - 'src/libs/rlottie/**'
+          - 'docs/src/widgets/lottie.mdx'
+          - 'docs/src/libs/image_support/rlottie.mdx'
+          - 'examples/widgets/lottie/**'
+          - 'examples/libs/rlottie/**'
+          - 'tests/src/test_cases/widgets/test_lottie.c'
+
+widget-menu:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_menu.h'
+          - 'src/widgets/menu/**'
+          - 'docs/src/widgets/menu.mdx'
+          - 'examples/widgets/menu/**'
+          - 'tests/src/test_cases/widgets/test_menu.c'
+
+widget-msgbox:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_msgbox.h'
+          - 'src/widgets/msgbox/**'
+          - 'docs/src/widgets/msgbox.mdx'
+          - 'examples/widgets/msgbox/**'
+          - 'tests/src/test_cases/widgets/test_msgbox.c'
+
+widget-pinyin:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_ime_pinyin.h'
+          - 'src/widgets/ime/**'
+          - 'docs/src/widgets/ime_pinyin.mdx'
+          - 'examples/others/ime/**'
+          - 'tests/src/test_cases/widgets/test_ime_pinyin.c'
+
+qrcode:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_qrcode.h'
+          - 'src/widgets/qrcode/**'
+          - 'src/libs/qrcode/**'
+          - 'docs/src/libs/qrcode.mdx'
+          - 'examples/libs/qrcode/**'
+          - 'tests/src/test_cases/libs/test_qrcode.c'
+
+widget-roller:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_roller.h'
+          - 'src/widgets/roller/**'
+          - 'docs/src/widgets/roller.mdx'
+          - 'examples/widgets/roller/**'
+          - 'tests/src/test_cases/widgets/test_roller.c'
+
+widget-scale:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_scale.h'
+          - 'src/widgets/scale/**'
+          - 'docs/src/widgets/scale.mdx'
+          - 'examples/widgets/scale/**'
+          - 'tests/src/test_cases/widgets/test_scale.c'
+
+widget-slider:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_slider.h'
+          - 'src/widgets/slider/**'
+          - 'docs/src/widgets/slider.mdx'
+          - 'examples/widgets/slider/**'
+          - 'examples/get_started/get_started_slider/**'
+          - 'tests/src/test_cases/widgets/test_slider.c'
+
+widget-span:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_span.h'
+          - 'src/widgets/span/**'
+          - 'docs/src/widgets/spangroup.mdx'
+          - 'examples/widgets/span/**'
+          - 'tests/src/test_cases/widgets/test_span.c'
+
+widget-spinbox:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_spinbox.h'
+          - 'src/widgets/spinbox/**'
+          - 'docs/src/widgets/spinbox.mdx'
+          - 'examples/widgets/spinbox/**'
+          - 'tests/src/test_cases/widgets/test_spinbox.c'
+
+widget-spinner:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_spinner.h'
+          - 'src/widgets/spinner/**'
+          - 'docs/src/widgets/spinner.mdx'
+          - 'examples/widgets/spinner/**'
+          - 'tests/src/test_cases/widgets/test_spinner.c'
+
+widget-switch:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_switch.h'
+          - 'src/widgets/switch/**'
+          - 'docs/src/widgets/switch.mdx'
+          - 'examples/widgets/switch/**'
+          - 'tests/src/test_cases/widgets/test_switch.c'
+
+widget-table:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_table.h'
+          - 'src/widgets/table/**'
+          - 'docs/src/widgets/table.mdx'
+          - 'examples/widgets/table/**'
+          - 'tests/src/test_cases/widgets/test_table.c'
+
+widget-tabview:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_tabview.h'
+          - 'src/widgets/tabview/**'
+          - 'docs/src/widgets/tabview.mdx'
+          - 'examples/widgets/tabview/**'
+          - 'tests/src/test_cases/widgets/test_tabview.c'
+
+widget-textarea:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_textarea.h'
+          - 'src/widgets/textarea/**'
+          - 'docs/src/widgets/textarea.mdx'
+          - 'examples/widgets/textarea/**'
+          - 'tests/src/test_cases/widgets/test_textarea.c'
+
+widget-tileview:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_tileview.h'
+          - 'src/widgets/tileview/**'
+          - 'docs/src/widgets/tileview.mdx'
+          - 'examples/widgets/tileview/**'
+
+widget-win:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/widgets/lv_win.h'
+          - 'src/widgets/win/**'
+          - 'docs/src/widgets/win.mdx'
+          - 'examples/widgets/win/**'
+          - 'tests/src/test_cases/widgets/test_win.c'
+
+# Drivers
+
+drivers:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/**'
+          - 'src/drivers/**'
+          - 'docs/src/integration/embedded_linux/drivers/**'
+          - 'docs/src/integration/external_display_controllers/**'
+
+wayland:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/wayland/**'
+          - 'src/drivers/wayland/**'
+          - 'env_support/cmake/dependencies/wayland.cmake'
+          - 'docs/src/integration/embedded_linux/drivers/wayland.mdx'
+
+drm:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_linux_drm.h'
+          - 'src/drivers/display/drm/**'
+          - 'env_support/cmake/dependencies/drm.cmake'
+          - 'env_support/cmake/dependencies/gbm.cmake'
+          - 'tests/FindLibDRM.cmake'
+          - 'docs/src/integration/embedded_linux/drivers/drm.mdx'
+
+fbdev:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_linux_fbdev.h'
+          - 'include/lvgl/drivers/nuttx/lv_nuttx_fbdev.h'
+          - 'src/drivers/display/fb/**'
+          - 'src/drivers/nuttx/lv_nuttx_fbdev.*'
+          - 'docs/src/integration/embedded_linux/drivers/fbdev.mdx'
+
+evdev:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/indev/lv_evdev.h'
+          - 'src/drivers/evdev/**'
+          - 'env_support/cmake/dependencies/evdev.cmake'
+          - 'docs/src/integration/embedded_linux/drivers/evdev.mdx'
+
+libinput:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/indev/lv_libinput.h'
+          - 'include/lvgl/drivers/indev/lv_xkb.h'
+          - 'src/drivers/libinput/**'
+          - 'env_support/cmake/dependencies/libinput.cmake'
+          - 'env_support/cmake/dependencies/xkbcommon.cmake'
+          - 'docs/src/integration/embedded_linux/drivers/libinput.mdx'
+
+x11:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/x11/**'
+          - 'src/drivers/x11/**'
+          - 'env_support/cmake/dependencies/x11.cmake'
+          - 'docs/src/integration/embedded_linux/drivers/X11.mdx'
+
+windows:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/windows/**'
+          - 'src/drivers/windows/**'
+          - 'src/osal/lv_windows.*'
+          - 'src/fs/lv_fs_win32.c'
+          - 'docs/src/integration/pc/windows.mdx'
+
+uefi:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/uefi/**'
+          - 'src/drivers/uefi/**'
+          - 'src/stdlib/uefi/**'
+          - 'src/fs/lv_fs_uefi.c'
+          - 'tests/makefiles_uefi/**'
+          - 'docs/src/integration/pc/uefi.mdx'
+
+sdl:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/sdl/**'
+          - 'src/drivers/sdl/**'
+          - 'src/osal/lv_sdl2.*'
+          - 'env_support/cmake/dependencies/sdl2*.cmake'
+          - 'docs/src/integration/pc/sdl.mdx'
+
+draw-sdl:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/sdl/**'
+          - 'docs/src/integration/embedded_linux/draw_units/draw_sdl.mdx'
+
+opengl:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/opengles/**'
+          - 'src/drivers/opengles/**'
+          - 'env_support/cmake/dependencies/glesv2.cmake'
+          - 'docs/src/integration/embedded_linux/opengl.mdx'
+          - 'docs/src/integration/embedded_linux/drivers/opengl_driver.mdx'
+
+draw-opengl:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/opengles/**'
+          - 'docs/src/integration/embedded_linux/draw_units/draw_opengl.mdx'
+
+glfw:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/opengles/lv_opengles_glfw.h'
+          - 'src/drivers/opengles/*glfw*'
+          - 'env_support/cmake/dependencies/glfw.cmake'
+          - 'docs/src/integration/embedded_linux/drivers/glfw.mdx'
+
+egl:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*_egl.*'
+          - '**/*_egl_private.h'
+          - 'env_support/cmake/dependencies/egl.cmake'
+          - 'docs/src/integration/embedded_linux/drivers/egl.mdx'
+          - 'tests/egl_vendor_mesa_only.json'
+
+mipi:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_lcd_generic_mipi.h'
+          - 'include/lvgl/drivers/display/lv_ili9341.h'
+          - 'include/lvgl/drivers/display/lv_nv3007.h'
+          - 'include/lvgl/drivers/display/lv_st77*.h'
+          - 'src/drivers/display/mipi/**'
+          - 'src/drivers/display/lcd/**'
+          - 'src/drivers/display/ili9341/**'
+          - 'src/drivers/display/nv3007/**'
+          - 'src/drivers/display/st7735/**'
+          - 'src/drivers/display/st7789/**'
+          - 'src/drivers/display/st7796/**'
+          - 'docs/src/integration/external_display_controllers/gen_mipi.mdx'
+          - 'docs/src/integration/external_display_controllers/ili9341.mdx'
+          - 'docs/src/integration/external_display_controllers/nv3007.mdx'
+          - 'docs/src/integration/external_display_controllers/st77*.mdx'
+          - 'tests/src/test_cases/test_lcd.c'
+
+lovyangfx:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_lovyan_gfx.h'
+          - 'src/drivers/display/lovyan_gfx/**'
+          - 'docs/src/integration/external_display_controllers/lovyan.mdx'
+
+tft_espi:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_tft_espi.h'
+          - 'src/drivers/display/tft_espi/**'
+
+
+# GPU / vendor accelerators
+
+esp32:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'env_support/esp/**'
+          - 'env_support/cmake/esp.cmake'
+          - 'idf_component.yml'
+          - 'component.mk'
+          - 'src/draw/espressif/**'
+          - 'docs/src/integration/chip_vendors/espressif/**'
+
+draw-ppa:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/espressif/ppa/**'
+          - 'docs/src/integration/chip_vendors/espressif/hardware_accelerator_ppa.mdx'
+
+draw-dma2d:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/dma2d/**'
+          - 'docs/src/integration/chip_vendors/stm32/dma2d_gpu.mdx'
+          - 'docs/src/integration/chip_vendors/espressif/hardware_accelerator_dma2d.mdx'
+
+stm32:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_st_ltdc.h'
+          - 'src/drivers/display/st_ltdc/**'
+          - 'docs/src/integration/chip_vendors/stm32/**'
+
+draw-nema:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/nema_gfx/**'
+          - 'libs/nema_gfx/**'
+          - 'docs/src/integration/chip_vendors/stm32/neochrom.mdx'
+
+nxp:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_nxp_elcdif.h'
+          - 'src/draw/nxp/**'
+          - 'src/drivers/display/nxp_elcdif/**'
+          - 'docs/src/integration/chip_vendors/nxp/**'
+
+draw-g2d:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/nxp/g2d/**'
+          - 'env_support/cmake/dependencies/g2d.cmake'
+          - 'docs/src/integration/chip_vendors/nxp/g2d_gpu.mdx'
+
+draw-pxp:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/nxp/pxp/**'
+          - 'docs/src/integration/chip_vendors/nxp/pxp_gpu.mdx'
+
+elcdif:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_nxp_elcdif.h'
+          - 'src/drivers/display/nxp_elcdif/**'
+          - 'docs/src/integration/chip_vendors/nxp/elcdif.mdx'
+
+draw-vglite:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/vg_lite/**'
+          - 'src/libs/vg_lite_driver/**'
+          - 'src/debugging/vg_lite_tvg/**'
+          - 'docs/src/integration/chip_vendors/nxp/vg_lite_gpu.mdx'
+          - 'docs/src/debugging/vg_lite_tvg.mdx'
+          - 'tests/ref_imgs_vg_lite/**'
+
+draw-dave2d:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/renesas/dave2d/**'
+          - 'docs/src/integration/chip_vendors/renesas/dave2d_gpu.mdx'
+          - 'docs/src/integration/chip_vendors/alif/dave2d_gpu.mdx'
+
+renesas:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_renesas_glcdc.h'
+          - 'src/drivers/display/renesas_glcdc/**'
+          - 'src/draw/renesas/**'
+          - 'docs/src/integration/chip_vendors/renesas/**'
+
+draw-nanovg:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/draw/nanovg/**'
+          - 'src/libs/nanovg/**'
+          - 'docs/src/integration/embedded_linux/draw_units/draw_nanovg.mdx'
+          - 'tests/ref_imgs_nanovg/**'
+
+thorvg:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/libs/thorvg/**'
+
+eve:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_ft81x.h'
+          - 'src/drivers/display/ft81x/**'
+          - 'src/libs/FT800-FT813/**'
+          - 'docs/src/integration/external_display_controllers/eve/**'
+
+draw-eve:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'include/lvgl/drivers/display/lv_draw_eve*'
+          - 'src/draw/eve/**'
