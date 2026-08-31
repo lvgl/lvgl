@@ -435,7 +435,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
     lv_text_align_t align = dsc->align;
     lv_base_dir_t base_dir = dsc->bidi_dir;
 
-    lv_bidi_calculate_align(&align, &base_dir, dsc->text);
+    lv_bidi_calculate_align_internal(&align, &base_dir, dsc->text);
 
     if((dsc->flag & LV_TEXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/

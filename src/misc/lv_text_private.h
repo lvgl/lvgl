@@ -139,6 +139,12 @@ char * lv_text_set_text_vfmt(const char * fmt, va_list ap) LV_FORMAT_ATTRIBUTE(1
 void lv_text_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t * ofs);
 
 /**
+ * Internal implementation of @ref lv_text_get_size
+ */
+void lv_text_get_size_internal(lv_point_t * size_res, const char * text, const lv_font_t * font, int32_t letter_space,
+                               int32_t line_space, int32_t max_width, lv_text_flag_t flag);
+
+/**
  * Test if char is break char or not (a text can broken here or not)
  * @param letter a letter
  * @return false: 'letter' is not break char

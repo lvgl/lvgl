@@ -838,13 +838,13 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
                 lv_point_t text_size;
 
-                lv_text_get_size(&text_size,
-                                 dropdown->symbol,
-                                 symbol_dsc.font,
-                                 symbol_dsc.letter_space,
-                                 symbol_dsc.line_space,
-                                 LV_COORD_MAX,
-                                 symbol_dsc.flag);
+                lv_text_get_size_internal(&text_size,
+                                          dropdown->symbol,
+                                          symbol_dsc.font,
+                                          symbol_dsc.letter_space,
+                                          symbol_dsc.line_space,
+                                          LV_COORD_MAX,
+                                          symbol_dsc.flag);
                 symbol_w = text_size.x;
             }
             else {
@@ -880,7 +880,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
             lv_point_t text_size;
             int32_t max_width = lv_obj_calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH) - size.x;
-            lv_text_get_size(&text_size, opt_txt, font, dsc.letter_space, dsc.line_space, max_width, dsc.flag);
+            lv_text_get_size_internal(&text_size, opt_txt, font, dsc.letter_space, dsc.line_space, max_width, dsc.flag);
 
             size.x += text_size.x;
             size.y = LV_MAX(size.y, text_size.y);
