@@ -79,7 +79,7 @@ void lv_draw_sw_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, con
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    lv_draw_unit_draw_letter(t, &glyph_dsc, &(lv_point_t) {
+    lv_draw_unit_draw_letter_internal(t, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
     dsc->font, dsc->unicode, draw_letter_cb);

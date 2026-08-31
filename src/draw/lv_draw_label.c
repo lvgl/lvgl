@@ -57,6 +57,8 @@ static uint8_t hex_char_to_num(char hex);
 
 void lv_draw_letter_dsc_init(lv_draw_letter_dsc_t * dsc)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
+
     lv_memzero(dsc, sizeof(lv_draw_letter_dsc_t));
     dsc->opa = LV_OPA_COVER;
     dsc->color = lv_color_black();
@@ -69,6 +71,8 @@ void lv_draw_letter_dsc_init(lv_draw_letter_dsc_t * dsc)
 
 void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
+
     lv_memzero(dsc, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
     dsc->color = lv_color_black();
@@ -84,17 +88,25 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 
 lv_draw_label_dsc_t * lv_draw_task_get_label_dsc(lv_draw_task_t * task)
 {
+    LV_CHECK_ARG(task != NULL, return NULL);
+
     return task->type == LV_DRAW_TASK_TYPE_LABEL ? (lv_draw_label_dsc_t *)task->draw_dsc : NULL;
 }
 
 void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
+
     lv_memzero(dsc, sizeof(lv_draw_glyph_dsc_t));
 }
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
                                          const lv_area_t * coords)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_CHECK_ARG(coords != NULL, return);
+
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
     if(dsc->font == NULL) {
@@ -135,6 +147,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
 void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
                                              const lv_point_t * point, uint32_t unicode_letter)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_CHECK_ARG(point != NULL, return);
+
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->font == NULL) {
         LV_LOG_WARN("dsc->font == NULL");
@@ -175,6 +191,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc_t * dsc, const lv_point_t * point)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_CHECK_ARG(point != NULL, return);
+
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->font == NULL) {
         LV_LOG_WARN("dsc->font == NULL");
@@ -211,6 +231,10 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                                       const lv_area_t * coords,
                                       lv_draw_glyph_cb_t cb)
 {
+    LV_CHECK_ARG(t != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_CHECK_ARG(coords != NULL, return);
+
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     const lv_font_t * font = dsc->font;
     int32_t w;
@@ -521,7 +545,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                 draw_letter_dsc.color = dsc->color;
             }
 
-            lv_draw_unit_draw_letter(t, &draw_letter_dsc, &pos, font, letter, cb);
+            lv_draw_unit_draw_letter_internal(t, &draw_letter_dsc, &pos, font, letter, cb);
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
@@ -590,6 +614,23 @@ static uint8_t hex_char_to_num(char hex)
 void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
                               const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
 {
+    LV_CHECK_ARG(t != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_CHECK_ARG(pos != NULL, return);
+    LV_CHECK_ARG(font != NULL, return);
+    LV_CHECK_ARG(cb != NULL, return);
+    lv_draw_unit_draw_letter_internal(t, dsc, pos, font, letter, cb);
+
+}
+
+void lv_draw_unit_draw_letter_internal(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
+                                       const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
+{
+    LV_ASSERT(t != NULL);
+    LV_ASSERT(dsc != NULL);
+    LV_ASSERT(pos != NULL);
+    LV_ASSERT(font != NULL);
+    LV_ASSERT(cb != NULL);
     lv_font_glyph_dsc_t g;
 
     if(lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/

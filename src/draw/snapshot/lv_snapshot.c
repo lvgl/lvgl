@@ -56,6 +56,8 @@ static void snapshot_discard_layer_tasks(lv_layer_t * layer);
  */
 lv_draw_buf_t * lv_snapshot_create_draw_buf(lv_obj_t * obj, lv_color_format_t cf)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return NULL);
+
     lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
@@ -69,6 +71,9 @@ lv_draw_buf_t * lv_snapshot_create_draw_buf(lv_obj_t * obj, lv_color_format_t cf
 
 lv_result_t lv_snapshot_reshape_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(draw_buf != NULL, return LV_RESULT_INVALID);
+
     lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
@@ -238,6 +243,8 @@ lv_draw_buf_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
 
 void lv_snapshot_free(lv_image_dsc_t * dsc)
 {
+    if(dsc == NULL) return;
+
     LV_LOG_DEPRECATED("use lv_draw_buf_destroy directly");
     lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
 }
@@ -246,6 +253,10 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
                                     void * buf,
                                     uint32_t buf_size)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(buf != NULL, return LV_RESULT_INVALID);
+
     lv_draw_buf_t draw_buf;
     LV_LOG_DEPRECATED("use lv_snapshot_take_to_draw_buf instead.");
     lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);

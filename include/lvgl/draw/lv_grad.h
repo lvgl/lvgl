@@ -97,8 +97,9 @@ typedef struct {
  * Initialize gradient color map from a table
  * @param grad      pointer to a gradient descriptor
  * @param colors    color array
- * @param fracs     position array (0..255): if NULL, then colors are distributed evenly
- * @param opa       opacity array: if NULL, then LV_OPA_COVER is assumed
+ * @param fracs     position array (0..255). @nullable When NULL the colors are
+ *                  distributed evenly.
+ * @param opa       opacity array. @nullable When NULL LV_OPA_COVER is assumed.
  * @param num_stops number of gradient stops (1..LV_GRADIENT_MAX_STOPS)
  */
 void lv_grad_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const lv_opa_t opa[],
