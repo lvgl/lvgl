@@ -277,6 +277,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888(dsc)) {
             uint32_t color32 = lv_color_to_u32(dsc->color);
             uint32_t * dest_buf = dsc->dest_buf;
+            /*Back to back rows are one long run, so the row setup and the tail are paid once*/
+            if(dest_stride == w * 4) {
+                w *= h;
+                h = 1;
+            }
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w - 15; x += 16) {
                     dest_buf[x + 0] = color32;

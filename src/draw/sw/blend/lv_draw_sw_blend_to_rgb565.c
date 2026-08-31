@@ -279,17 +279,22 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
     /*Simple fill*/
     if(mask == NULL && opa >= LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc)) {
-            for(y = 0; y < h; y++) {
-                uint16_t * dest_end_final = dest_buf_u16 + w;
-                uint32_t * dest_end_mid = (uint32_t *)((uint16_t *) dest_buf_u16 + ((w - 1) & ~(0xF)));
-                if((lv_uintptr_t)&dest_buf_u16[0] & 0x3) {
-                    dest_buf_u16[0] = color16;
-                    dest_buf_u16++;
-                }
+            uint32_t c32 = (uint32_t)color16 + ((uint32_t)color16 << 16);
+            /*Back to back rows are one long run, so the setup and the odd pixel are paid
+             *once instead of once per row*/
+            if(dest_stride == w * 2) {
+                w *= h;
+                h = 1;
+            }
 
-                uint32_t c32 = (uint32_t)color16 + ((uint32_t)color16 << 16);
-                uint32_t * dest32 = (uint32_t *)dest_buf_u16;
-                while(dest32 < dest_end_mid) {
+            for(y = 0; y < h; y++) {
+                uint16_t * dest_end = dest_buf_u16 + w;
+                uint16_t * dest = dest_buf_u16;
+                if((lv_uintptr_t)dest & 0x3) *dest++ = color16;   /*align to a word*/
+
+                uint32_t * dest32 = (uint32_t *)dest;
+                uint32_t * dest32_end = (uint32_t *)((lv_uintptr_t)dest_end & ~(lv_uintptr_t)0x3);
+                while(dest32 + 8 <= dest32_end) {
                     dest32[0] = c32;
                     dest32[1] = c32;
                     dest32[2] = c32;
@@ -300,16 +305,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
                     dest32[7] = c32;
                     dest32 += 8;
                 }
-
-                dest_buf_u16 = (uint16_t *)dest32;
-
-                while(dest_buf_u16 < dest_end_final) {
-                    *dest_buf_u16 = color16;
-                    dest_buf_u16++;
-                }
+                /*Two pixels at a time, so at most one is left over*/
+                while(dest32 < dest32_end) *dest32++ = c32;
+                if((uint16_t *)dest32 < dest_end) *(uint16_t *)dest32 = color16;
 
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
-                dest_buf_u16 -= w;
             }
         }
 
