@@ -124,8 +124,15 @@ void lv_translation_set_language(const char * lang)
 {
     LV_CHECK_ARG(lang != NULL, return);
 
-    if(selected_lang) lv_free((void *)selected_lang);
-    selected_lang = lv_strdup(lang);
+    size_t new_len = lv_strlen(lang) + 1;
+    char * new_lang = lv_realloc((void *)selected_lang, new_len);
+    LV_ASSERT_MALLOC(new_lang);
+    if(!new_lang) {
+        LV_LOG_WARN("Not enough memory to modify the language");
+        return;
+    }
+    lv_strcpy(new_lang, lang);
+    selected_lang = new_lang;
     lv_obj_tree_walk(NULL, send_language_change_event, (void *)lang);
 }
 
