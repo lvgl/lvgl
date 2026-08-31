@@ -1319,10 +1319,14 @@
  *============================================================================*/
 
 #ifndef LV_OBJ_STYLE_CACHE
-    #ifdef CONFIG_LV_OBJ_STYLE_CACHE
-        #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_OBJ_STYLE_CACHE
+            #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
+        #else
+            #define LV_OBJ_STYLE_CACHE 0
+        #endif
     #else
-        #define LV_OBJ_STYLE_CACHE 0
+        #define LV_OBJ_STYLE_CACHE 1
     #endif
 #endif
 
