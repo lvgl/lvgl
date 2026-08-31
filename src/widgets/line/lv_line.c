@@ -74,11 +74,15 @@ lv_obj_t * lv_line_create(lv_obj_t * parent)
 
 void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     line_set_points(obj, points, point_num, false);
 }
 
 void lv_line_set_points_mutable(lv_obj_t * obj, lv_point_precise_t points[], uint32_t point_num)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     line_set_points(obj, points, point_num, true);
 }
 

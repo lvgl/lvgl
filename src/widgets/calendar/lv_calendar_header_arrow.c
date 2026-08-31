@@ -55,6 +55,8 @@ static const char * month_names_def[12] = { LV_JANUARY_STR, LV_FEBRUARY_STR, LV_
 
 lv_obj_t * lv_calendar_add_header_arrow(lv_obj_t * parent)
 {
+    LV_CHECK_OBJ(parent, &lv_calendar_class, return NULL);
+
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_arrow_class, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -69,6 +71,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("begin");
 
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_obj_move_to_index(obj, 0);
 
@@ -104,10 +107,13 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void month_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * btn = lv_event_get_current_target(e);
 
     lv_obj_t * header = lv_obj_get_parent(btn);
+    LV_ASSERT(header != NULL);
     lv_obj_t * calendar = lv_obj_get_parent(header);
+    LV_ASSERT(calendar != NULL);
 
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);
@@ -144,8 +150,11 @@ static void month_event_cb(lv_event_t * e)
 
 static void value_changed_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * header = lv_event_get_current_target(e);
+    LV_ASSERT(header != NULL);
     lv_obj_t * calendar = lv_obj_get_parent(header);
+    LV_ASSERT(calendar != NULL);
 
     const lv_calendar_date_t * date = lv_calendar_get_showed_date(calendar);
     LV_ASSERT_FORMAT_MSG(date->month >= 1 && date->month <= 12,
