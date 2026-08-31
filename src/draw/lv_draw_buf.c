@@ -233,10 +233,10 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
 
     if(stride == LV_STRIDE_AUTO) stride = lv_draw_buf_width_to_stride(w, cf);
 
-    LV_CHECK_ARG(data_size >= stride * h,
-                 return LV_RESULT_INVALID,
-                 "Data size too small, required: %" LV_PRId32 ", provided: %" LV_PRId32,
-                 stride * h, data_size);
+    LV_CHECK_ARG_FORMAT_MSG(data_size >= stride * h,
+                            return LV_RESULT_INVALID,
+                            "Data size too small, required: %" LV_PRId32 ", provided: %" LV_PRId32,
+                            stride * h, data_size);
 
     lv_image_header_t * header = &draw_buf->header;
     header->w = w;
@@ -409,10 +409,10 @@ bool lv_draw_buf_is_position_valid(const lv_draw_buf_t * buf, uint32_t x, uint32
 void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 {
     LV_CHECK_ARG(buf != NULL, return NULL);
-    LV_CHECK_ARG(lv_draw_buf_is_position_valid(buf, x, y),
-                 return NULL,
-                 "coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32,
-                 x, y, (uint32_t)buf->header.w, (uint32_t)buf->header.h);
+    LV_CHECK_ARG_FORMAT_MSG(lv_draw_buf_is_position_valid(buf, x, y),
+                            return NULL,
+                            "coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32,
+                            x, y, (uint32_t)buf->header.w, (uint32_t)buf->header.h);
     LV_CHECK_ARG(buf->data != NULL, return NULL);
 
     uint8_t * data = buf->data;
@@ -526,7 +526,7 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
 {
     LV_CHECK_ARG(draw_buf != NULL, return);
     LV_CHECK_ARG(draw_buf->data != NULL, return);
-    LV_CHECK_ARG(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf), return, "Color format is not indexed");
+    LV_CHECK_ARG_MSG(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf), return, "Color format is not indexed");
 
     lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
     palette[index] = color;

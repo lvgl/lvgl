@@ -131,30 +131,33 @@ This macro is useful for:
 
 ### Usage
 
-<ApiLink name="LV_CHECK_ARG" /> takes a condition, an action to execute on failure,
-and optional printf-style arguments for the log message:
+<ApiLink name="LV_CHECK_ARG" /> takes a condition and an action to execute on
+failure. <ApiLink name="LV_CHECK_ARG_MSG" /> also takes a message and
+<ApiLink name="LV_CHECK_ARG_FORMAT_MSG" /> a printf-style format string with its
+arguments:
 
 ```c
 void draw_to_display(lv_obj_t * display, int len)
 {
     /* Return early if display is NULL */
-    LV_CHECK_ARG(display != NULL, return, ": display must be provided");
+    LV_CHECK_ARG_MSG(display != NULL, return, "display must be provided");
 
     /* Return if len is invalid, logging the actual value */
-    LV_CHECK_ARG(len % 2 == 0, return, ": need even data points, but got %d", (int)len);
+    LV_CHECK_ARG_FORMAT_MSG(len % 2 == 0, return, "need even data points, but got %d", (int)len);
 }
 
 int get_width(lv_obj_t * obj)
 {
     /* Return -1 if obj is NULL */
-    LV_CHECK_ARG(obj != NULL, return -1, "tried to get width of NULL object");
+    LV_CHECK_ARG(obj != NULL, return -1);
     /* ... */
 }
 ```
 
 The condition is stringified and included in the log message, so you can see
-exactly what check failed. Only supply a format string and arguments if you want
-to include additional context beyond the condition itself.
+exactly what check failed. Only supply a message, or a format string and
+arguments, if you want to include additional context beyond the condition
+itself.
 
 ---
 

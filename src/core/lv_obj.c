@@ -1308,7 +1308,7 @@ void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_ob
                                   lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_CHECK_ARG(screen != NULL, return, "can't load a non-existing screen");
+    LV_CHECK_ARG_MSG(screen != NULL, return, "can't load a non-existing screen");
     LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
 
     screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));

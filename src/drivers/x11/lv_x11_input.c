@@ -307,7 +307,7 @@ void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img)
 {
     LV_CHECK_ARG(disp != NULL, return);
     x11_inp_data_t * xd = x11_input_get_user_data(disp);
-    LV_CHECK_ARG(xd != NULL, return, "Invalid display");
+    LV_CHECK_ARG_MSG(xd != NULL, return, "Invalid display");
     xd->inp_group = lv_group_create();
     lv_group_set_default(xd->inp_group);
 

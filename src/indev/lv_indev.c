@@ -703,8 +703,8 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
 
 void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb)
 {
-    LV_CHECK_ARG(indev != NULL, return,
-                 "Can't remap key on a NULL indev");
+    LV_CHECK_ARG_MSG(indev != NULL, return,
+                     "Can't remap key on a NULL indev");
 
     indev->key_remap_cb = remap_cb;
 }
@@ -735,8 +735,8 @@ bool lv_indev_get_ccw(const lv_indev_t * indev)
 #if LV_USE_EXT_DATA
 void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data))
 {
-    LV_CHECK_ARG(indev != NULL, return,
-                 "Can't attach external user data and free_cb callback to a NULL indev");
+    LV_CHECK_ARG_MSG(indev != NULL, return,
+                     "Can't attach external user data and free_cb callback to a NULL indev");
 
     indev->ext_data.data = data;
     indev->ext_data.free_cb = free_cb;

@@ -86,7 +86,7 @@ static bool lv_font_manager_add_src_core(lv_font_manager_t * manager, const char
 
 lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size)
 {
-    LV_CHECK_ARG(recycle_cache_size > 0, return NULL, "recycle_cache_size must be greater than 0");
+    LV_CHECK_ARG_MSG(recycle_cache_size > 0, return NULL, "recycle_cache_size must be greater than 0");
     lv_font_manager_t * manager = lv_malloc_zeroed(sizeof(lv_font_manager_t));
     LV_ASSERT_MALLOC(manager);
     if(!manager) {

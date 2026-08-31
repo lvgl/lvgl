@@ -190,7 +190,7 @@ bool lv_obj_is_group_def(const lv_obj_t * obj)
 #if LV_USE_EXT_DATA
 void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void * data))
 {
-    LV_CHECK_ARG(obj != NULL, return, "Can't attach external user data and destructor callback to a NULL object");
+    LV_CHECK_ARG_MSG(obj != NULL, return, "Can't attach external user data and destructor callback to a NULL object");
 
     obj->ext_data.data = data;
     obj->ext_data.free_cb = free_cb;

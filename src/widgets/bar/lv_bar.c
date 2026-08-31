@@ -305,9 +305,10 @@ lv_observer_t * lv_bar_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT,
-                 return NULL,
-                 "Incompatible subject type: %d", subject->type);
+    LV_CHECK_ARG_FORMAT_MSG(
+        subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT,
+        return NULL,
+        "Incompatible subject type: %d", subject->type);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, bar_value_observer_cb, obj, NULL);
     return observer;

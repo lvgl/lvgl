@@ -162,10 +162,10 @@ void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const int32_t col_dsc[], const in
 void lv_obj_set_grid_align(lv_obj_t * obj, lv_grid_align_t column_align, lv_grid_align_t row_align)
 {
     LV_CHECK_OBJ(obj, &lv_obj_class, return);
-    LV_CHECK_ARG(column_align != LV_GRID_ALIGN_STRETCH, return,
-                 "LV_GRID_ALIGN_STRETCH is not supported for column tracks");
-    LV_CHECK_ARG(row_align != LV_GRID_ALIGN_STRETCH, return,
-                 "LV_GRID_ALIGN_STRETCH is not supported for row tracks");
+    LV_CHECK_ARG_MSG(column_align != LV_GRID_ALIGN_STRETCH, return,
+                     "LV_GRID_ALIGN_STRETCH is not supported for column tracks");
+    LV_CHECK_ARG_MSG(row_align != LV_GRID_ALIGN_STRETCH, return,
+                     "LV_GRID_ALIGN_STRETCH is not supported for row tracks");
 
     lv_obj_set_style_grid_column_align(obj, column_align, 0);
     lv_obj_set_style_grid_row_align(obj, row_align, 0);

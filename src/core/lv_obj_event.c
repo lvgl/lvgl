@@ -215,8 +215,10 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
         LV_EVENT_HOVER_OVER,        LV_EVENT_HOVER_LEAVE,
     };
 #endif
-    LV_CHECK_ARG(event_code_in_array(e->code, indev_codes, sizeof(indev_codes) / sizeof(indev_codes[0])),
-                 return NULL, "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(
+        event_code_in_array(e->code, indev_codes, sizeof(indev_codes) / sizeof(indev_codes[0])),
+        return NULL,
+        "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
@@ -229,24 +231,28 @@ lv_layer_t * lv_event_get_layer(lv_event_t * e)
         LV_EVENT_DRAW_POST,     LV_EVENT_DRAW_POST_BEGIN,   LV_EVENT_DRAW_POST_END,
     };
 #endif
-    LV_CHECK_ARG(event_code_in_array(e->code, draw_codes, sizeof(draw_codes) / sizeof(draw_codes[0])),
-                 return NULL, "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(
+        event_code_in_array(e->code, draw_codes, sizeof(draw_codes) / sizeof(draw_codes[0])),
+        return NULL,
+        "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 const lv_area_t * lv_event_get_old_size(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
-    LV_CHECK_ARG(e->code == LV_EVENT_SIZE_CHANGED, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_SIZE_CHANGED,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 uint32_t lv_event_get_key(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return 0);
-    LV_CHECK_ARG(e->code == LV_EVENT_KEY, return 0,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_KEY,
+                            return 0,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     uint32_t * k = lv_event_get_param(e);
     return k ? *k : 0;
 }
@@ -254,8 +260,9 @@ uint32_t lv_event_get_key(lv_event_t * e)
 int32_t lv_event_get_rotary_diff(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return 0);
-    LV_CHECK_ARG(e->code == LV_EVENT_ROTARY, return 0,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_ROTARY,
+                            return 0,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     int32_t * r = lv_event_get_param(e);
     return r ? *r : 0;
 }
@@ -263,16 +270,18 @@ int32_t lv_event_get_rotary_diff(lv_event_t * e)
 lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
-    LV_CHECK_ARG(e->code == LV_EVENT_SCROLL_BEGIN, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_SCROLL_BEGIN,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size)
 {
     LV_CHECK_ARG(e != NULL, return);
-    LV_CHECK_ARG(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE, return,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE,
+                            return,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     int32_t * cur_size = lv_event_get_param(e);
     *cur_size = LV_MAX(*cur_size, size);
 }
@@ -280,24 +289,27 @@ void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size)
 lv_point_t * lv_event_get_self_size_info(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
-    LV_CHECK_ARG(e->code == LV_EVENT_GET_SELF_SIZE, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_GET_SELF_SIZE,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 lv_hit_test_info_t * lv_event_get_hit_test_info(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
-    LV_CHECK_ARG(e->code == LV_EVENT_HIT_TEST, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_HIT_TEST,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 const lv_area_t * lv_event_get_cover_area(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
-    LV_CHECK_ARG(e->code == LV_EVENT_COVER_CHECK, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_COVER_CHECK,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     lv_cover_check_info_t * p = lv_event_get_param(e);
     return p->area;
 }
@@ -305,8 +317,9 @@ const lv_area_t * lv_event_get_cover_area(lv_event_t * e)
 void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
 {
     LV_CHECK_ARG(e != NULL, return);
-    LV_CHECK_ARG(e->code == LV_EVENT_COVER_CHECK, return,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_COVER_CHECK,
+                            return,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     lv_cover_check_info_t * p = lv_event_get_param(e);
     if(res > p->res) p->res = res;  /*Save only "stronger" results*/
 }
@@ -314,16 +327,18 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
 lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
-    LV_CHECK_ARG(e->code == LV_EVENT_DRAW_TASK_ADDED, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_DRAW_TASK_ADDED,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 lv_state_t lv_event_get_prev_state(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return 0);
-    LV_CHECK_ARG(e->code == LV_EVENT_STATE_CHANGED, return 0,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_STATE_CHANGED,
+                            return 0,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     lv_state_t * state = lv_event_get_param(e);
     return state ? *state : 0;
 }

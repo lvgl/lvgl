@@ -94,7 +94,7 @@ void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_buf != NULL, return);
-    LV_CHECK_ARG(draw_buf->handlers != NULL, return, "draw_buf has no handlers, is it initialized?");
+    LV_CHECK_ARG_MSG(draw_buf->handlers != NULL, return, "draw_buf has no handlers, is it initialized?");
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     canvas->draw_buf = draw_buf;
@@ -294,7 +294,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
     LV_CHECK_ARG(src_buf != NULL, return);
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     LV_CHECK_ARG(canvas->draw_buf != NULL, return);
-    LV_CHECK_ARG(canvas->draw_buf->header.cf == src_buf->header.cf, return, "Color formats must be the same");
+    LV_CHECK_ARG_MSG(canvas->draw_buf->header.cf == src_buf->header.cf, return, "Color formats must be the same");
 
     lv_draw_buf_copy(canvas->draw_buf, canvas_area, src_buf, src_area);
 }
