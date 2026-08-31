@@ -466,9 +466,9 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
 #else
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x += 4) {
-                        dest_buf[x + 0] = (uint8_t)((fg_premult[0] + dest_buf[x + 0] * mix_inv) >> 8);
-                        dest_buf[x + 1] = (uint8_t)((fg_premult[1] + dest_buf[x + 1] * mix_inv) >> 8);
-                        dest_buf[x + 2] = (uint8_t)((fg_premult[2] + dest_buf[x + 2] * mix_inv) >> 8);
+                        dest_buf[x + 1] = (uint8_t)((fg_premult[2] + dest_buf[x + 1] * mix_inv) >> 8);
+                        dest_buf[x + 2] = (uint8_t)((fg_premult[1] + dest_buf[x + 2] * mix_inv) >> 8);
+                        dest_buf[x + 3] = (uint8_t)((fg_premult[0] + dest_buf[x + 3] * mix_inv) >> 8);
                     }
                     dest_buf = drawbuf_next_row(dest_buf, dest_stride);
                 }
