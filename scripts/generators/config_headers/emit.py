@@ -451,9 +451,24 @@ def generate_internal(kconf: Kconfig, entries) -> str:
             custom_inc.append("#endif")
             custom_inc.append("")
 
+    return (
+        preamble
+        + "\n"
+        + "\n".join(em.out)
+        + "\n"
+        + templates.INTERNAL_COMPATIBILITY_BLOCK
+        + "\n"
+        + "\n".join(deferred)
+        + "\n".join(custom_inc)
+        + templates.INTERNAL_FOOTER
+        + templates.INTERNAL_CLOSE
+    )
+
+
+def generate_checker(kconf: Kconfig, entries) -> str:
+    preamble = templates.CHECK_PREAMBLE
     # Replay Kconfig `select` / `depends on` as #error guards on the lv_conf.h
-    # path.  Emitted after the footer derivations so checks may reference symbols
-    # computed there (e.g. the Wayland/EGL backend flags).
+    # path.
     guards: list[str] = []
     checks = constraint_checks(entries)
     if checks:
@@ -469,13 +484,7 @@ def generate_internal(kconf: Kconfig, entries) -> str:
     return (
         preamble
         + "\n"
-        + "\n".join(em.out)
-        + "\n"
-        + templates.INTERNAL_COMPATIBILITY_BLOCK
-        + "\n"
-        + "\n".join(deferred)
-        + "\n".join(custom_inc)
-        + templates.INTERNAL_FOOTER
+        + templates.CHECK_DEPRECATED_SYMBOLS_SECTION
         + "\n".join(guards)
-        + templates.INTERNAL_CLOSE
+        + "\n"
     )
