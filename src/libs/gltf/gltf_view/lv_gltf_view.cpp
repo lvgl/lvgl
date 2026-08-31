@@ -933,7 +933,7 @@ static void display_refr_end_event_cb(lv_event_t * e)
         LV_ASSERT_NULL(modeld);
         lv_gltf_model_t * model = modeld->model;
         LV_ASSERT_NULL(model);
-        lv_gltf_model_send_new_values(modeld->model);
+        lv_gltf_model_send_new_values(model);
     }
 }
 
