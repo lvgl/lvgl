@@ -92,7 +92,7 @@ def decode_enum(prop_id: int, raw: int) -> str:
     return "|".join(parts) if parts and covered == raw else str(raw)
 
 
-def _read_symbol(addr: int) -> "str | None":
+def read_symbol(addr: int) -> "str | None":
     """Resolve an address to its C symbol name, or None."""
     if addr not in _symbol_cache:
         try:
@@ -131,7 +131,7 @@ def _format_pointer(prop_id: int, addr: int) -> str:
     """Name a pointer property: its symbol, the string it points at, or its address."""
     if not addr:
         return "NULL"
-    symbol = _read_symbol(addr)
+    symbol = read_symbol(addr)
     if symbol:
         return symbol
     if prop_id in SRC_PROPS:

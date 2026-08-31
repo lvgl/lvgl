@@ -1,6 +1,15 @@
 import gdb
 
-from .core import DumpObj, DumpIndev, DumpGroup, InfoObjClass, InfoSubject
+from .core import (
+    DumpObj,
+    DumpIndev,
+    DumpGroup,
+    InfoObjClass,
+    InfoSubject,
+    InfoWidget,
+    DumpWidget,
+    DumpWidgetProps,
+)
 from .display import DumpDisplayBuf
 from .draw import InfoDrawUnit, DumpDrawTask
 from .misc import (
@@ -43,6 +52,8 @@ DumpFsDrv()
 DumpIndev()
 DumpGroup()
 DumpDrawTask()
+DumpWidget()  # prefix for 'dump widget props'
+DumpWidgetProps()
 
 # Infos
 InfoStyle()
@@ -50,6 +61,7 @@ InfoDrawUnit()
 InfoObjClass()
 InfoSubject()
 InfoVersion()
+InfoWidget()
 
 # Drivers
 Lvglobal()

@@ -1,9 +1,9 @@
 import argparse
+
 import gdb
 
-from lvglgdb.lvgl import curr_inst
-from lvglgdb.lvgl import LVObject, dump_obj_info
-from lvglgdb.value import CorruptedError
+from lvglgdb.lvgl import LVObject
+from .lv_widget import print_all_widgets, print_tree
 
 
 class DumpObj(gdb.Command):
@@ -13,24 +13,6 @@ class DumpObj(gdb.Command):
         super(DumpObj, self).__init__(
             "dump obj", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION
         )
-
-    def dump_obj(self, obj: LVObject, depth=0, limit=None):
-        if not obj:
-            return
-
-        # dump self
-        print("  " * depth, end="")
-        dump_obj_info(obj)
-
-        if limit is not None and depth >= limit:
-            return
-
-        # dump children
-        try:
-            for child in obj.children:
-                self.dump_obj(child, depth + 1, limit=limit)
-        except CorruptedError:
-            print("  " * (depth + 1) + "(corrupted children)")
 
     def invoke(self, args, from_tty):
         parser = argparse.ArgumentParser(description="Dump lvgl obj tree.")
@@ -53,18 +35,14 @@ class DumpObj(gdb.Command):
         except SystemExit:
             return
 
+        # The listing is `info widget`'s, so both commands print the same tree
+        # and there is only one renderer to keep current with the widget data.
         if args.root:
-            root = gdb.parse_and_eval(args.root)
-            root = LVObject(root)
-            self.dump_obj(root, limit=args.level)
+            try:
+                root = LVObject(gdb.parse_and_eval(args.root))
+            except gdb.error as e:
+                print(f"Error: {e}")
+                return
+            print_tree(root, limit=args.level)
         else:
-            # dump all displays
-            depth = 0
-            for disp in curr_inst().displays():
-                print(f"Display {hex(disp)}")
-                try:
-                    for screen in disp.screens:
-                        print(f"{'  ' * (depth + 1)}Screen@{hex(screen)}")
-                        self.dump_obj(screen, depth=depth + 1, limit=args.level)
-                except CorruptedError:
-                    print(f"{'  ' * (depth + 1)}(corrupted screens)")
+            print_all_widgets(limit=args.level)

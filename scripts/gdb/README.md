@@ -20,8 +20,11 @@ py import lvglgdb
 
 ### Dump Commands
 
+Where a command takes a widget, style, class or layer, any C expression GDB can
+evaluate will do: a variable, a member chain, or a plain address.
+
 ```bash
-dump obj                        # Dump widget tree
+dump obj                        # Dump widget tree (same listing as `info widget`)
 dump display -f png             # Dump display framebuffer as PNG
 dump cache image                # Dump image cache entries
 dump cache image_header         # Dump image header cache entries
@@ -32,20 +35,25 @@ dump indev                      # Dump input devices
 dump group                      # Dump focus groups
 dump image_decoder              # Dump registered image decoders
 dump fs_drv                     # Dump filesystem drivers
-dump draw_task <layer_expr>     # Dump draw tasks for a layer
+dump draw_task lv_global->disp_default->layer_head   # Draw tasks of a layer
 dump dashboard                  # Generate interactive HTML dashboard
 dump dashboard -o out.html      # Save dashboard to file
+dump widget props lv_keyboard   # Which fields a widget class has
 ```
 
 ### Info Commands
 
 ```bash
 info lvgl_version               # LVGL version of the target, and this plugin's version
+info widget                     # List every widget, indented by tree depth
+info widget my_obj              # All fields of one widget, incl. its own struct
+info widget 0x50e000000820      # ...an address works as well as a variable
+info widget my_obj text         # Only the named field(s)
 info style my_style             # Inspect a single lv_style_t
 info style --obj my_obj         # Inspect all styles of an lv_obj_t
                                 # sizes as 100%/content, enums and fonts by name
 info draw_unit                  # Show draw unit information
-info obj_class obj->class_p     # Show object class hierarchy
+info obj_class &lv_button_class # Show object class hierarchy
 info subject &my_subject        # Show subject and its observers
 ```
 
