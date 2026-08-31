@@ -88,7 +88,7 @@ const char * lv_translation_get_language(void);
 const char * lv_translation_get(const char * tag);
 
 /**
- * Shorthand of lv_translation_set_language
+ * Shorthand of lv_translation_get
  * @param tag       the tag to translate
  * @return          the translation
  */
