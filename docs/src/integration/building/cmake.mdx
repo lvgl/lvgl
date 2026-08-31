@@ -227,6 +227,7 @@ Below is a list of the available options/variables
 | LV_USE_FIND_PACKAGE_&lt;DEP> | BOOLEAN | Allow resolving a specific dependency via `find_package`. Defaults to `LV_USE_FIND_PACKAGE`. Example: `LV_USE_FIND_PACKAGE_FREETYPE`. |
 | LV_USE_PKG_CONFIG_&lt;DEP> | BOOLEAN | Allow resolving a specific dependency via `pkg-config`. Defaults to `LV_USE_PKG_CONFIG`. Example: `LV_USE_PKG_CONFIG_FREETYPE`. |
 | LV_FETCH_&lt;DEP> | BOOLEAN | Fetch a specific dependency from source. Defaults to `LV_FETCH_DEPENDENCIES`. Example: `LV_FETCH_FREETYPE`. |
+| LV_CONF_SKIP | BOOLEAN | Build with `lv_conf_internal.h` defaults instead of an `lv_conf.h`. Individual options can still be set via compiler definitions. Also skips the CMake search for the file. |
 | CONFIG_LV_BUILD_DEMOS | BOOLEAN | When enabled builds the demos |
 | CONFIG_LV_BUILD_EXAMPLES | BOOLEAN | When enabled builds the examples |
 | CONFIG_LV_USE_THORVG_INTERNAL | BOOLEAN | When enabled the in-tree LVGL version of ThorVG is compiled |
