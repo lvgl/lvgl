@@ -59,10 +59,6 @@ void lv_draw_init(void)
 
 void lv_draw_deinit(void)
 {
-#if LV_USE_OS
-    lv_thread_sync_delete(&_draw_info.sync);
-#endif
-
     lv_draw_unit_t * u = _draw_info.unit_head;
     while(u) {
         lv_draw_unit_t * cur_unit = u;
@@ -72,6 +68,9 @@ void lv_draw_deinit(void)
         lv_free(cur_unit);
     }
     _draw_info.unit_head = NULL;
+#if LV_USE_OS
+    lv_thread_sync_delete(&_draw_info.sync);
+#endif
 }
 
 void * lv_draw_create_unit(size_t size)
