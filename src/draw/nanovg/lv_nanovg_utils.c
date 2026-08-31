@@ -48,7 +48,7 @@
 
 void lv_nanovg_utils_init(struct _lv_draw_nanovg_unit_t * u)
 {
-    LV_ASSERT_NULL(u);
+    LV_UNUSED(u);
 }
 
 void lv_nanovg_utils_deinit(struct _lv_draw_nanovg_unit_t * u)

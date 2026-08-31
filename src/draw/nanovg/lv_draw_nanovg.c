@@ -248,7 +248,7 @@ static void on_layer_changed(lv_layer_t * new_layer)
 static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
 {
     LV_PROFILER_DRAW_BEGIN;
-    LV_ASSERT_NULL(u);
+    LV_UNUSED(u);
     LV_ASSERT_NULL(layer);
 
     lv_cache_entry_t * entry = layer->user_data;
