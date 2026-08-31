@@ -164,10 +164,10 @@ lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
 {
     LV_LOG_DEPRECATED(LV_MENU_DEPRECATED_MSG);
     LV_CHECK_ARG(parent != NULL, return NULL);
-    LV_CHECK_ARG(lv_obj_has_class(parent, &lv_menu_page_class)
-                 || lv_obj_has_class(parent, &lv_menu_section_class),
-                 return NULL,
-                 "Invalid parent object type for menu container object");
+    LV_CHECK_ARG_MSG(lv_obj_has_class(parent, &lv_menu_page_class)
+                     || lv_obj_has_class(parent, &lv_menu_section_class),
+                     return NULL,
+                     "Invalid parent object type for menu container object");
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_cont_class, parent);

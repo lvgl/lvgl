@@ -78,7 +78,8 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * model, 
 {
     LV_CHECK_ARG(model != NULL, return nullptr);
     const uint32_t count = lv_array_size(&model->nodes);
-    LV_CHECK_ARG(index < count, return nullptr, "Invalid index %zu. Max should be %" LV_PRIu32, index, count - 1);
+    LV_CHECK_ARG_FORMAT_MSG(index < count, return nullptr, "Invalid index %zu. Max should be %" LV_PRIu32, index,
+                            count - 1);
 
     return (lv_gltf_model_node_t *)lv_array_at(&model->nodes, index);
 }
@@ -145,9 +146,9 @@ lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv
 {
     LV_CHECK_ARG(node != NULL, return nullptr);
     LV_CHECK_ARG(cb != NULL, return nullptr);
-    LV_CHECK_ARG(filter_list == LV_EVENT_ALL || (filter_list & LV_EVENT_VALUE_CHANGED) != 0,
-                 return nullptr,
-                 "Only LV_EVENT_VALUE_CHANGED events will ever be sent");
+    LV_CHECK_ARG_MSG(filter_list == LV_EVENT_ALL || (filter_list & LV_EVENT_VALUE_CHANGED) != 0,
+                     return nullptr,
+                     "Only LV_EVENT_VALUE_CHANGED events will ever be sent");
 
     if(!node->read_attrs) {
         node->read_attrs = (lv_gltf_model_node_attr_t *) lv_zalloc(sizeof(*node->read_attrs));
@@ -167,9 +168,9 @@ lv_event_dsc_t * lv_gltf_model_node_add_event_cb_with_world_position(lv_gltf_mod
 {
     LV_CHECK_ARG(node != NULL, return nullptr);
     LV_CHECK_ARG(cb != NULL, return nullptr);
-    LV_CHECK_ARG(filter_list == LV_EVENT_ALL || (filter_list & LV_EVENT_VALUE_CHANGED) != 0,
-                 return nullptr,
-                 "Only LV_EVENT_VALUE_CHANGED events will ever be sent");
+    LV_CHECK_ARG_MSG(filter_list == LV_EVENT_ALL || (filter_list & LV_EVENT_VALUE_CHANGED) != 0,
+                     return nullptr,
+                     "Only LV_EVENT_VALUE_CHANGED events will ever be sent");
     lv_event_dsc_t * dsc = lv_gltf_model_node_add_event_cb(node, cb, filter_list, user_data);
     if(!dsc) {
         return nullptr;

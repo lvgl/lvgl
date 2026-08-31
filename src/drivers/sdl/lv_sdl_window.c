@@ -105,7 +105,7 @@ void lv_sdl_window_set_resizeable(lv_display_t * disp, bool value)
 {
     LV_CHECK_ARG(disp != NULL, return);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
+    LV_CHECK_ARG_MSG(dsc != NULL, return, "Invalid display");
     SDL_SetWindowResizable(dsc->window, value);
 }
 
@@ -113,7 +113,7 @@ void lv_sdl_window_set_size(lv_display_t * disp, int32_t hor_res, int32_t ver_re
 {
     LV_CHECK_ARG(disp != NULL, return);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
+    LV_CHECK_ARG_MSG(dsc != NULL, return, "Invalid display");
     SDL_SetWindowSize(dsc->window, hor_res, ver_res);
 }
 
@@ -121,7 +121,7 @@ void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom)
 {
     LV_CHECK_ARG(disp != NULL, return);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
+    LV_CHECK_ARG_MSG(dsc != NULL, return, "Invalid display");
     dsc->zoom = zoom;
     lv_display_send_event(disp, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_refr_now(disp);
@@ -131,7 +131,7 @@ float lv_sdl_window_get_zoom(lv_display_t * disp)
 {
     LV_CHECK_ARG(disp != NULL, return 0.f);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    LV_CHECK_ARG(dsc != NULL, return 0.f, "Invalid display");
+    LV_CHECK_ARG_MSG(dsc != NULL, return 0.f, "Invalid display");
     return dsc->zoom;
 }
 
@@ -155,7 +155,7 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
     LV_CHECK_ARG(title != NULL, return);
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
+    LV_CHECK_ARG_MSG(dsc != NULL, return, "Invalid display");
     SDL_SetWindowTitle(dsc->window, title);
 }
 
@@ -164,7 +164,7 @@ void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int
     LV_CHECK_ARG(icon != NULL, return);
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    LV_CHECK_ARG(dsc != NULL, return, "Invalid display");
+    LV_CHECK_ARG_MSG(dsc != NULL, return, "Invalid display");
     SDL_Surface * iconSurface = SDL_CreateRGBSurfaceWithFormatFrom(icon, width, height, 32, width * 4,
                                                                    SDL_PIXELFORMAT_ARGB8888);
     SDL_SetWindowIcon(dsc->window, iconSurface);
@@ -181,7 +181,7 @@ struct SDL_Window * lv_sdl_window_get_window(lv_display_t * disp)
 {
     LV_CHECK_ARG(disp != NULL, return NULL);
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    LV_CHECK_ARG(dsc != NULL, return NULL, "Invalid display");
+    LV_CHECK_ARG_MSG(dsc != NULL, return NULL, "Invalid display");
     return dsc->window;
 }
 

@@ -508,8 +508,8 @@ void lv_display_set_3rd_draw_buffer(lv_display_t * disp, lv_draw_buf_t * buf3)
     }
     if(disp == NULL) return;
     LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(disp->buf_1 != NULL, return, "buf1 should already exist in order to provide a third buffer");
-    LV_CHECK_ARG(disp->buf_2 != NULL, return, "buf2 should already exist in order to provide a third buffer");
+    LV_CHECK_ARG_MSG(disp->buf_1 != NULL, return, "buf1 should already exist in order to provide a third buffer");
+    LV_CHECK_ARG_MSG(disp->buf_2 != NULL, return, "buf2 should already exist in order to provide a third buffer");
 
     disp->buf_3 = buf3;
 }
@@ -532,11 +532,12 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
     uint32_t w = lv_display_get_original_horizontal_resolution(disp);
     uint32_t h = lv_display_get_original_vertical_resolution(disp);
 
-    LV_CHECK_ARG(w != 0 && h != 0, return, "display resolution is 0");
+    LV_CHECK_ARG_MSG(w != 0 && h != 0, return, "display resolution is 0");
 
     /* buf1 or buf2 is not aligned according to LV_DRAW_BUF_ALIGN */
-    LV_CHECK_ARG(buf1 == lv_draw_buf_align(buf1, cf), return, "buf1 is not properly aligned: %p", buf1);
-    LV_CHECK_ARG(buf2 == NULL || buf2 == lv_draw_buf_align(buf2, cf), return, "buf2 is not properly aligned: %p", buf2);
+    LV_CHECK_ARG_FORMAT_MSG(buf1 == lv_draw_buf_align(buf1, cf), return, "buf1 is not properly aligned: %p", buf1);
+    LV_CHECK_ARG_FORMAT_MSG(buf2 == NULL ||
+                            buf2 == lv_draw_buf_align(buf2, cf), return, "buf2 is not properly aligned: %p", buf2);
 
     bool is_auto_stride = stride == LV_STRIDE_AUTO;
     if(is_auto_stride) {
@@ -544,14 +545,14 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
     }
 
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        LV_CHECK_ARG(stride != 0, return, "stride is 0, check your color format %d and width: %" LV_PRIu32, cf, w);
+        LV_CHECK_ARG_FORMAT_MSG(stride != 0, return, "stride is 0, check your color format %d and width: %" LV_PRIu32, cf, w);
         /* for partial mode, we calculate the height based on the buf_size and stride */
         h = buf_size / stride;
-        LV_CHECK_ARG(h, return, "the buffer is too small");
+        LV_CHECK_ARG_MSG(h, return, "the buffer is too small");
     }
     else {
-        LV_CHECK_ARG(stride * h <= buf_size, return, "%s mode requires screen sized buffer(s)",
-                     render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
+        LV_CHECK_ARG_FORMAT_MSG(stride * h <= buf_size, return, "%s mode requires screen sized buffer(s)",
+                                render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
     }
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
@@ -670,7 +671,8 @@ void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
         disp = lv_display_get_default();
     }
     LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(tile_cnt < 256, return, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)", tile_cnt);
+    LV_CHECK_ARG_FORMAT_MSG(tile_cnt < 256, return, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)",
+                            tile_cnt);
 
     disp->tile_cnt = tile_cnt;
 }
@@ -1101,15 +1103,15 @@ lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
 
 void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
 {
-    LV_CHECK_ARG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
+    LV_CHECK_ARG_MSG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
 
     if(disp == NULL) {
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
     LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
-                 disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL, return, "Unsupported rendering mode: %d", disp->render_mode);
+    LV_CHECK_ARG_FORMAT_MSG(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
+                            disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL, return, "Unsupported rendering mode: %d", disp->render_mode);
 
     disp->matrix_rotation = enable;
 }
@@ -1121,7 +1123,7 @@ bool lv_display_get_matrix_rotation(lv_display_t * disp)
         disp = lv_display_get_default();
     }
     LV_CHECK_ARG(disp != NULL, return false);
-    LV_CHECK_ARG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return false, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
+    LV_CHECK_ARG_MSG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return false, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
     return disp->matrix_rotation;
 }
 

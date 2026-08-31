@@ -122,7 +122,7 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
 #if LV_USE_EXT_DATA
 void lv_theme_set_external_data(lv_theme_t * theme, void * user_data, void (* free_cb)(void * data))
 {
-    LV_CHECK_ARG(theme != NULL, return, "can't attach external data to a NULL theme");
+    LV_CHECK_ARG_MSG(theme != NULL, return, "can't attach external data to a NULL theme");
 
     theme->ext_data.data = user_data;
     theme->ext_data.free_cb = free_cb;

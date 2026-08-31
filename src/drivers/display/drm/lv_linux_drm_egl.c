@@ -102,7 +102,7 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_
     LV_UNUSED(connector_id);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
 
-    LV_CHECK_ARG(ctx != NULL, return LV_RESULT_INVALID, "Invalid display");
+    LV_CHECK_ARG_MSG(ctx != NULL, return LV_RESULT_INVALID, "Invalid display");
 
     lv_result_t err = drm_device_init(ctx, file);
     if(err != LV_RESULT_OK) {
@@ -143,7 +143,7 @@ void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t
 {
     LV_CHECK_ARG(disp != NULL, return);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-    LV_CHECK_ARG(ctx != NULL, return, "Invalid display");
+    LV_CHECK_ARG_MSG(ctx != NULL, return, "Invalid display");
     ctx->mode_select_cb = callback;
 }
 

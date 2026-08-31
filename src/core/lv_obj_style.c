@@ -110,8 +110,8 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 {
     LV_CHECK_ARG(obj != NULL, return);
     LV_CHECK_ARG(style != NULL, return);
-    LV_CHECK_ARG(obj->style_cnt < 63, return,
-                 "obj->style_cnt is restricted to 6 bits, so we can't store more than 63 styles");
+    LV_CHECK_ARG_MSG(obj->style_cnt < 63, return,
+                     "obj->style_cnt is restricted to 6 bits, so we can't store more than 63 styles");
 
     trans_delete(obj, selector, LV_STYLE_PROP_ANY, NULL);
 

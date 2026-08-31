@@ -605,7 +605,10 @@ lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_CHECK_ARG(section != NULL, return NULL);
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type  == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
+    LV_CHECK_ARG_FORMAT_MSG(
+        subject->type  == LV_SUBJECT_TYPE_INT,
+        return NULL,
+        "Incompatible subject type: %d", subject->type);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_min_value_observer_cb, obj, section);
 
@@ -617,7 +620,10 @@ lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_CHECK_ARG(section != NULL, return NULL);
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type  == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
+    LV_CHECK_ARG_FORMAT_MSG(
+        subject->type  == LV_SUBJECT_TYPE_INT,
+        return NULL,
+        "Incompatible subject type: %d", subject->type);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_max_value_observer_cb, obj, section);
 
@@ -630,7 +636,9 @@ lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needl
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_CHECK_ARG(needle_line != NULL, return NULL);
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type  == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
+    LV_CHECK_ARG_FORMAT_MSG(
+        subject->type  == LV_SUBJECT_TYPE_INT,
+        return NULL, "Incompatible subject type: %d", subject->type);
 
     bind_element_needle_t * user_data = lv_zalloc(sizeof(bind_element_needle_t));
     LV_ASSERT_MALLOC(user_data);
@@ -660,7 +668,10 @@ lv_observer_t * lv_scale_bind_image_needle_value(lv_obj_t * obj, lv_obj_t * need
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_CHECK_ARG(needle_img != NULL, return NULL);
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type  == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d", subject->type);
+    LV_CHECK_ARG_FORMAT_MSG(
+        subject->type  == LV_SUBJECT_TYPE_INT,
+        return NULL,
+        "Incompatible subject type: %d", subject->type);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_image_needle_value_observer_cb, obj, needle_img);
 

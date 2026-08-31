@@ -124,10 +124,10 @@ void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(data != NULL, return LV_RESULT_INVALID, "data must not be NULL");
-    LV_CHECK_ARG(data_len <= qrcodegen_BUFFER_LEN_MAX, return LV_RESULT_INVALID,
-                 "data_len %u exceeds the maximum %u",
-                 (unsigned)data_len, (unsigned)qrcodegen_BUFFER_LEN_MAX);
+    LV_CHECK_ARG_MSG(data != NULL, return LV_RESULT_INVALID, "data must not be NULL");
+    LV_CHECK_ARG_FORMAT_MSG(data_len <= qrcodegen_BUFFER_LEN_MAX, return LV_RESULT_INVALID,
+                            "data_len %u exceeds the maximum %u",
+                            (unsigned)data_len, (unsigned)qrcodegen_BUFFER_LEN_MAX);
 
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
@@ -145,7 +145,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 void lv_qrcode_set_data(lv_obj_t * obj, const char * data)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_CHECK_ARG(data != NULL, return, "data must not be NULL");
+    LV_CHECK_ARG_MSG(data != NULL, return, "data must not be NULL");
 
     lv_qrcode_update(obj, data, lv_strlen(data));
 }

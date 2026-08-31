@@ -90,7 +90,7 @@ lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display)
 {
     LV_CHECK_ARG(display != NULL, return NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
-    LV_CHECK_ARG(window != NULL, return NULL, "Invalid display");
+    LV_CHECK_ARG_MSG(window != NULL, return NULL, "Invalid display");
     return window->lv_indev_keyboard;
 }
 

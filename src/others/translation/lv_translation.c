@@ -242,7 +242,7 @@ lv_translation_tag_dsc_t * lv_translation_add_tag(lv_translation_pack_t * pack, 
 {
     LV_CHECK_ARG(pack != NULL, return NULL);
     LV_CHECK_ARG(tag_name != NULL, return NULL);
-    LV_CHECK_ARG(!pack->is_static, return NULL, "Can't add tag `%s` to static translation pack", tag_name);
+    LV_CHECK_ARG_FORMAT_MSG(!pack->is_static, return NULL, "Can't add tag `%s` to static translation pack", tag_name);
 
     lv_translation_tag_dsc_t tag;
     tag.tag = lv_strdup(tag_name);
@@ -275,11 +275,12 @@ lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_
     LV_CHECK_ARG(pack != NULL, return LV_RESULT_INVALID);
     LV_CHECK_ARG(tag != NULL, return LV_RESULT_INVALID);
     LV_CHECK_ARG(trans != NULL, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(!pack->is_static, return LV_RESULT_INVALID, "Can't set tag translation `%s` in static translation pack",
-                 trans);
-    LV_CHECK_ARG(lang_idx < pack->language_cnt, return LV_RESULT_INVALID,
-                 "Can't set the translation for language %" LV_PRIu32 " as there are only %" LV_PRIu32 " languages defined",
-                 lang_idx, pack->language_cnt);
+    LV_CHECK_ARG_FORMAT_MSG(!pack->is_static, return LV_RESULT_INVALID,
+                            "Can't set tag translation `%s` in static translation pack",
+                            trans);
+    LV_CHECK_ARG_FORMAT_MSG(lang_idx < pack->language_cnt, return LV_RESULT_INVALID,
+                            "Can't set the translation for language %" LV_PRIu32 " as there are only %" LV_PRIu32 " languages defined",
+                            lang_idx, pack->language_cnt);
     LV_UNUSED(pack);
 
     size_t new_len = lv_strlen(trans) + 1;

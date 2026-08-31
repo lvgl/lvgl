@@ -670,8 +670,10 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT, return NULL,
-                 "Incompatible subject type: %d", subject->type);
+    LV_CHECK_ARG_FORMAT_MSG(
+        subject->type == LV_SUBJECT_TYPE_INT,
+        return NULL,
+        "Incompatible subject type: %d", subject->type);
 
     lv_obj_add_event_cb(obj, dropdown_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
