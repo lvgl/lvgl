@@ -496,8 +496,7 @@ static inline lv_color_t lv_obj_get_style_bg_color_internal(const lv_obj_t * obj
 static inline lv_color_t lv_obj_get_style_bg_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_BG_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_COLOR));
     return v.color;
 }
 
@@ -538,8 +537,7 @@ static inline lv_color_t lv_obj_get_style_bg_grad_color_internal(const lv_obj_t 
 static inline lv_color_t lv_obj_get_style_bg_grad_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_BG_GRAD_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_GRAD_COLOR));
     return v.color;
 }
 
@@ -678,8 +676,7 @@ static inline lv_color_t lv_obj_get_style_bg_image_recolor_internal(const lv_obj
 static inline lv_color_t lv_obj_get_style_bg_image_recolor_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_BG_IMAGE_RECOLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_IMAGE_RECOLOR));
     return v.color;
 }
 
@@ -734,8 +731,7 @@ static inline lv_color_t lv_obj_get_style_border_color_internal(const lv_obj_t *
 static inline lv_color_t lv_obj_get_style_border_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_BORDER_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BORDER_COLOR));
     return v.color;
 }
 
@@ -831,8 +827,7 @@ static inline lv_color_t lv_obj_get_style_outline_color_internal(const lv_obj_t 
 static inline lv_color_t lv_obj_get_style_outline_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_OUTLINE_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_OUTLINE_COLOR));
     return v.color;
 }
 
@@ -939,8 +934,7 @@ static inline lv_color_t lv_obj_get_style_shadow_color_internal(const lv_obj_t *
 static inline lv_color_t lv_obj_get_style_shadow_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_SHADOW_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_SHADOW_COLOR));
     return v.color;
 }
 
@@ -996,8 +990,7 @@ static inline lv_color_t lv_obj_get_style_image_recolor_internal(const lv_obj_t 
 static inline lv_color_t lv_obj_get_style_image_recolor_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_IMAGE_RECOLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_IMAGE_RECOLOR));
     return v.color;
 }
 
@@ -1106,8 +1099,7 @@ static inline lv_color_t lv_obj_get_style_line_color_internal(const lv_obj_t * o
 static inline lv_color_t lv_obj_get_style_line_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_LINE_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_LINE_COLOR));
     return v.color;
 }
 
@@ -1172,8 +1164,7 @@ static inline lv_color_t lv_obj_get_style_arc_color_internal(const lv_obj_t * ob
 static inline lv_color_t lv_obj_get_style_arc_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_ARC_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_ARC_COLOR));
     return v.color;
 }
 
@@ -1226,8 +1217,7 @@ static inline lv_color_t lv_obj_get_style_text_color_internal(const lv_obj_t * o
 static inline lv_color_t lv_obj_get_style_text_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_TEXT_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_COLOR));
     return v.color;
 }
 
@@ -1334,12 +1324,10 @@ static inline lv_color_t lv_obj_get_style_text_outline_stroke_color_internal(con
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-static inline lv_color_t lv_obj_get_style_text_outline_stroke_color_filtered_internal(const lv_obj_t * obj,
-                                                                                      lv_part_t part)
+static inline lv_color_t lv_obj_get_style_text_outline_stroke_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_TEXT_OUTLINE_STROKE_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_OUTLINE_STROKE_COLOR));
     return v.color;
 }
 
@@ -1492,8 +1480,7 @@ static inline lv_color_t lv_obj_get_style_drop_shadow_color_internal(const lv_ob
 static inline lv_color_t lv_obj_get_style_drop_shadow_color_filtered_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
-    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                                   LV_STYLE_DROP_SHADOW_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter_internal(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_DROP_SHADOW_COLOR));
     return v.color;
 }
 
@@ -1603,8 +1590,7 @@ static inline lv_opa_t lv_obj_get_style_opa_layered_internal(const lv_obj_t * ob
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc_internal(const lv_obj_t * obj,
-                                                                                       lv_part_t part)
+static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
     lv_style_value_t v = lv_obj_get_style_prop_internal(obj, part, LV_STYLE_COLOR_FILTER_DSC);
@@ -1690,8 +1676,7 @@ static inline uint32_t lv_obj_get_style_anim_duration_internal(const lv_obj_t * 
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-static inline const lv_style_transition_dsc_t * lv_obj_get_style_transition_internal(const lv_obj_t * obj,
-                                                                                     lv_part_t part)
+static inline const lv_style_transition_dsc_t * lv_obj_get_style_transition_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
     lv_style_value_t v = lv_obj_get_style_prop_internal(obj, part, LV_STYLE_TRANSITION);

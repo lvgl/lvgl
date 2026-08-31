@@ -1208,6 +1208,3 @@ for prop in props:
 sys.stdout = orig_stdout
 print(f'Total functions commented:  {_total_func_count}.')
 
-import subprocess
-code_format = REPO_ROOT / "scripts" / "code-format.py"
-subprocess.call([code_format])
