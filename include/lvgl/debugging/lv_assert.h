@@ -40,10 +40,18 @@ extern "C" {
  **********************/
 
 
-#define LV_ASSERT_INTERNAL(expr, format, ...)                                           \
+#define LV_ASSERT_INTERNAL(expr, msg)                                                   \
     do {                                                                                \
         if(!(expr)) {                                                                   \
-            LV_LOG_ERROR("Assertion `%s` failed." format , #expr, __VA_ARGS__);         \
+            LV_LOG_ERROR("Assertion `%s` failed." msg, #expr);                         \
+            LV_ASSERT_HANDLER                                                           \
+        }                                                                               \
+    } while(0)
+
+#define LV_ASSERT_FORMAT_INTERNAL(expr, format, ...)                                    \
+    do {                                                                                \
+        if(!(expr)) {                                                                   \
+            LV_LOG_ERROR("Assertion `%s` failed." format, #expr, __VA_ARGS__);          \
             LV_ASSERT_HANDLER                                                           \
         }                                                                               \
     } while(0)
@@ -51,8 +59,8 @@ extern "C" {
 #if LV_USE_ASSERT
 
 #define LV_ASSERT(expr) LV_ASSERT_INTERNAL(expr, "")
-#define LV_ASSERT_MSG(expr, msg) LV_ASSERT_INTERNAL(expr, " %s", msg)
-#define LV_ASSERT_FORMAT_MSG(expr, format, ...) LV_ASSERT_INTERNAL(expr, " " format, __VA_ARGS__)
+#define LV_ASSERT_MSG(expr, msg) LV_ASSERT_INTERNAL(expr, " " msg)
+#define LV_ASSERT_FORMAT_MSG(expr, format, ...) LV_ASSERT_FORMAT_INTERNAL(expr, format, __VA_ARGS__)
 
 #else
 
@@ -67,19 +75,19 @@ extern "C" {
  *-----------------*/
 
 #if LV_USE_ASSERT_NULL
-#   define LV_ASSERT_NULL(p) LV_ASSERT_MSG_INTERNAL(p != NULL, "NULL pointer");
+#   define LV_ASSERT_NULL(p) LV_ASSERT_INTERNAL(p != NULL, " NULL pointer");
 #else
 #   define LV_ASSERT_NULL(p)
 #endif
 
 #if LV_USE_ASSERT_MALLOC
-#   define LV_ASSERT_MALLOC(p) LV_ASSERT_MSG_INTERNAL(p != NULL, "Out of memory");
+#   define LV_ASSERT_MALLOC(p) LV_ASSERT_INTERNAL(p != NULL, " Out of memory");
 #else
 #   define LV_ASSERT_MALLOC(p)
 #endif
 
 #if LV_USE_ASSERT_MEM_INTEGRITY
-#   define LV_ASSERT_MEM_INTEGRITY() LV_ASSERT_MSG_INTERNAL(lv_mem_test() == LV_RESULT_OK, "Memory integrity error");
+#   define LV_ASSERT_MEM_INTEGRITY() LV_ASSERT_INTERNAL(lv_mem_test() == LV_RESULT_OK, " Memory integrity error");
 #else
 #   define LV_ASSERT_MEM_INTEGRITY()
 #endif
