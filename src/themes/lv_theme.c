@@ -37,10 +37,12 @@ static void apply_theme_recursion(lv_theme_t * th, lv_obj_t * obj);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj)
+lv_theme_t * lv_theme_get_from_obj(lv_obj_t * obj)
 {
-    lv_display_t * disp = obj ? lv_obj_get_display(obj) : lv_display_get_default();
-    return lv_display_get_theme(disp);
+    if(obj == NULL) return lv_display_get_theme(lv_display_get_default());
+
+    LV_CHECK_OBJ(obj, &lv_obj_class, return NULL);
+    return lv_display_get_theme(lv_obj_get_display(obj));
 }
 
 lv_theme_t * lv_theme_create(void)
@@ -56,15 +58,15 @@ void lv_theme_delete(lv_theme_t * theme)
 
 void lv_theme_copy(lv_theme_t * dst, const lv_theme_t * src)
 {
-    if(!dst || !src) {
-        LV_LOG_WARN("Refusing to copy null themes");
-        return;
-    }
+    LV_CHECK_ARG(dst != NULL, return);
+    LV_CHECK_ARG(src != NULL, return);
     lv_memcpy(dst, src, sizeof(*src));
 }
 
 void lv_theme_apply(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     lv_theme_t * th = lv_theme_get_from_obj(obj);
     lv_obj_remove_style_all(obj);
 
@@ -75,11 +77,15 @@ void lv_theme_apply(lv_obj_t * obj)
 
 void lv_theme_set_parent(lv_theme_t * theme, lv_theme_t * parent)
 {
+    LV_CHECK_ARG(theme != NULL, return);
+
     theme->parent = parent;
 }
 
 void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb)
 {
+    LV_CHECK_ARG(theme != NULL, return);
+
     theme->apply_cb = apply_cb;
 }
 
@@ -116,10 +122,7 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
 #if LV_USE_EXT_DATA
 void lv_theme_set_external_data(lv_theme_t * theme, void * user_data, void (* free_cb)(void * data))
 {
-    if(!theme) {
-        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL theme");
-        return;
-    }
+    LV_CHECK_ARG(theme != NULL, return, "can't attach external data to a NULL theme");
 
     theme->ext_data.data = user_data;
     theme->ext_data.free_cb = free_cb;
