@@ -233,34 +233,102 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB888(dsc, dest_px_size)) {
             if(dest_px_size == 3) {
                 uint8_t * dest_buf_u8 = dsc->dest_buf;
-                uint8_t * dest_buf_ori = dsc->dest_buf;
                 w *= dest_px_size;
+#if LV_BIG_ENDIAN_SYSTEM == 0
+                /*4 pixels are exactly 3 words and the channel order inside a word repeats
+                 *every 3 words, so the whole area is written with word stores and never read
+                 *back. `role` is the byte offset of the word within that 3 byte cycle.*/
+                uint32_t k[3];
+                uint32_t b_ = dsc->color.blue, g_ = dsc->color.green, r_ = dsc->color.red;
+                k[0] = b_ | (g_ << 8) | (r_ << 16) | (b_ << 24);
+                k[1] = g_ | (r_ << 8) | (b_ << 16) | (g_ << 24);
+                k[2] = r_ | (b_ << 8) | (g_ << 16) | (r_ << 24);
 
-                /*Render the first row by writing the first few pixels byte-by-byte
-                 *and doubling them with memcpy (it copies words instead of bytes)*/
-                int32_t filled = w < 12 ? w : 12;
-                for(x = 0; x < filled; x += 3) {
-                    dest_buf_u8[x + 0] = dsc->color.blue;
-                    dest_buf_u8[x + 1] = dsc->color.green;
-                    dest_buf_u8[x + 2] = dsc->color.red;
+                /*Back to back rows are one long run*/
+                if((int32_t)dest_stride == w) {
+                    w *= h;
+                    h = 1;
                 }
-                while(filled * 2 <= w) {
-                    lv_memcpy(dest_buf_u8 + filled, dest_buf_u8, filled);
-                    filled *= 2;
-                }
-                if(filled < w) lv_memcpy(dest_buf_u8 + filled, dest_buf_u8, w - filled);
 
-                dest_buf_u8 += dest_stride;
+                for(y = 0; y < h; y++) {
+                    uint8_t * dest = dest_buf_u8;
+                    uint8_t * dest_end = dest + w;
 
-                /*Copy the first row to all other rows*/
-                for(y = 1; y < h; y++) {
-                    lv_memcpy(dest_buf_u8, dest_buf_ori, w);
+                    /*Lead in until word aligned. Some targets can't do unaligned word
+                     *accesses at all, the rest are slow at it.*/
+                    uint32_t ofs = 0;
+                    while(dest < dest_end && ((lv_uintptr_t)dest & 0x3)) {
+                        *dest++ = (uint8_t)(k[ofs] & 0xFF);
+                        if(++ofs == 3) ofs = 0;
+                    }
+
+                    /*3 words are 4 whole pixels, so a block of 3 repeats forever and the
+                     *channel order never has to be advanced inside the loop*/
+                    uint32_t a0 = k[ofs];
+                    uint32_t a1 = k[ofs == 2 ? 0 : ofs + 1];
+                    uint32_t a2 = k[ofs == 0 ? 2 : ofs - 1];
+                    uint32_t * dest32 = (uint32_t *)dest;
+                    uint32_t * dest32_end = dest32 + (uint32_t)(dest_end - dest) / 4;
+
+                    while(dest32 + 12 <= dest32_end) {
+                        dest32[0] = a0;
+                        dest32[1] = a1;
+                        dest32[2] = a2;
+                        dest32[3] = a0;
+                        dest32[4] = a1;
+                        dest32[5] = a2;
+                        dest32[6] = a0;
+                        dest32[7] = a1;
+                        dest32[8] = a2;
+                        dest32[9] = a0;
+                        dest32[10] = a1;
+                        dest32[11] = a2;
+                        dest32 += 12;
+                    }
+                    while(dest32 + 3 <= dest32_end) {
+                        dest32[0] = a0;
+                        dest32[1] = a1;
+                        dest32[2] = a2;
+                        dest32 += 3;
+                    }
+                    if(dest32 < dest32_end) {
+                        *dest32++ = a0;
+                        a0 = a1;
+                        a1 = a2;
+                    }
+                    if(dest32 < dest32_end) {
+                        *dest32++ = a0;
+                        a0 = a1;
+                    }
+
+                    /*At most 3 bytes left, and `a0` already starts on the right channel*/
+                    dest = (uint8_t *)dest32;
+                    while(dest < dest_end) {
+                        *dest++ = (uint8_t)(a0 & 0xFF);
+                        a0 >>= 8;
+                    }
+
                     dest_buf_u8 += dest_stride;
                 }
+#else
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x += 3) {
+                        dest_buf_u8[x + 0] = dsc->color.blue;
+                        dest_buf_u8[x + 1] = dsc->color.green;
+                        dest_buf_u8[x + 2] = dsc->color.red;
+                    }
+                    dest_buf_u8 += dest_stride;
+                }
+#endif
             }
             if(dest_px_size == 4) {
                 uint32_t color32 = lv_color_to_u32(dsc->color);
                 uint32_t * dest_buf_u32 = dsc->dest_buf;
+                /*Back to back rows are one long run*/
+                if((int32_t)dest_stride == w * 4) {
+                    w *= h;
+                    h = 1;
+                }
                 for(y = 0; y < h; y++) {
                     for(x = 0; x <= w - 16; x += 16) {
                         dest_buf_u32[x + 0] = color32;
@@ -320,6 +388,16 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                     k_hi[x] = fg_premult[(x + 1) % 3] | (fg_premult[x] << 16);
                 }
 #endif
+#if LV_BIG_ENDIAN_SYSTEM == 0
+                /*Flat areas are common, so remember the last destination word and its result.
+                 *One per channel role, because the same bytes blend differently depending on
+                 *where the word starts. Seeded with 0 so the entry is always valid.*/
+                uint32_t last_d[3] = {0, 0, 0};
+                uint32_t last_res[3];
+                for(x = 0; x < 3; x++) {
+                    last_res[x] = ((k_lo[x] >> 8) & 0x00FF00FFu) | (((k_hi[x] >> 8) & 0x00FF00FFu) << 8);
+                }
+#endif
                 for(y = 0; y < h; y++) {
                     uint32_t role = 0;
                     x = 0;
@@ -334,9 +412,17 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                     for(; x <= w - 4; x += 4) {
                         uint32_t d;
                         LV_LOAD_U32(d, dest_buf + x);
-                        uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo[role]) >> 8) & 0x00FF00FFu;
-                        uint32_t hi = (((((d >> 8) & 0x00FF00FFu) * mix_inv) + k_hi[role]) >> 8) & 0x00FF00FFu;
-                        uint32_t res = lo | (hi << 8);
+                        uint32_t res;
+                        if(d == last_d[role]) {
+                            res = last_res[role];
+                        }
+                        else {
+                            uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo[role]) >> 8) & 0x00FF00FFu;
+                            uint32_t hi = (((((d >> 8) & 0x00FF00FFu) * mix_inv) + k_hi[role]) >> 8) & 0x00FF00FFu;
+                            res = lo | (hi << 8);
+                            last_d[role] = d;
+                            last_res[role] = res;
+                        }
                         LV_STORE_U32(dest_buf + x, res);
                         /*4 bytes move the channel order on by one*/
                         if(++role == 3) role = 0;
@@ -354,13 +440,25 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                 /*32 bit pixels: one word each, and the 4th byte must be left alone*/
                 uint32_t k_lo = fg_premult[0] | (fg_premult[2] << 16);
                 uint32_t k_g = fg_premult[1];
+                /*Flat areas are common, so remember the last destination pixel and its
+                 *result. Seeded with 0 so the entry is always valid.*/
+                uint32_t last_d = 0;
+                uint32_t last_res = ((k_lo >> 8) & 0x00FF00FFu) | ((((k_g >> 8) & 0xFFu)) << 8);
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x += 4) {
                         uint32_t d;
                         LV_LOAD_U32(d, dest_buf + x);
-                        uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo) >> 8) & 0x00FF00FFu;
-                        uint32_t g = (((((d >> 8) & 0xFFu) * mix_inv) + k_g) >> 8) & 0xFFu;
-                        uint32_t res = lo | (g << 8) | (d & 0xFF000000u);
+                        uint32_t res;
+                        if(d == last_d) {
+                            res = last_res;
+                        }
+                        else {
+                            uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo) >> 8) & 0x00FF00FFu;
+                            uint32_t g = (((((d >> 8) & 0xFFu) * mix_inv) + k_g) >> 8) & 0xFFu;
+                            res = lo | (g << 8) | (d & 0xFF000000u);
+                            last_d = d;
+                            last_res = res;
+                        }
                         LV_STORE_U32(dest_buf + x, res);
                     }
                     dest_buf = drawbuf_next_row(dest_buf, dest_stride);

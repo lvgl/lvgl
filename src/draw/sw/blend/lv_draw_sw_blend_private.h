@@ -86,11 +86,15 @@ struct _lv_draw_sw_blend_image_dsc_t {
  * `may_alias` the access goes through it: same single instruction, without the assumption.
  * `__builtin_memcpy` would also be correct but RISC-V expands it to four byte loads, which
  * costs more than the batching saves.
+ * The attribute is written inside the macro rather than as a typedef so that the header
+ * stays parseable by tools that don't understand `__attribute__`, such as the pycparser
+ * the MicroPython bindings are generated with.
  */
 #if defined(__GNUC__) || defined(__clang__)
-typedef uint32_t lv_u32_alias_t __attribute__((__may_alias__));
-#define LV_LOAD_U32(res, src)  do { (res) = *((const lv_u32_alias_t *)(src)); } while(0)
-#define LV_STORE_U32(dst, val) do { *((lv_u32_alias_t *)(dst)) = (val); } while(0)
+#define LV_LOAD_U32(res, src)  \
+    do { (res) = *((const uint32_t __attribute__((__may_alias__)) *)(src)); } while(0)
+#define LV_STORE_U32(dst, val) \
+    do { *((uint32_t __attribute__((__may_alias__)) *)(dst)) = (val); } while(0)
 #else
 #define LV_LOAD_U32(res, src)  do { (res) = *((const uint32_t *)(src)); } while(0)
 #define LV_STORE_U32(dst, val) do { *((uint32_t *)(dst)) = (val); } while(0)
