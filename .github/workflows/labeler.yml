@@ -1,0 +1,26 @@
+name: Labeler
+
+# pull_request_target is safe here because the job never checks out or executes PR code
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  label:
+    name: Label
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Apply labels from .github/labeler.yml
+        uses: actions/labeler@v7
+        with:
+          sync-labels: true
+          dot: true

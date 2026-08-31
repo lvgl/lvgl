@@ -95,6 +95,27 @@ jobs:
           python scripts/static_checks/check_defconfigs.py
 
       # ------------------------------------------------------------------
+      # Every glob in .github/labeler.yml still matches a tracked file
+      # ------------------------------------------------------------------
+      - name: "Check: labeler globs match tracked files"
+        id: labeler-globs
+        continue-on-error: true
+        run: |
+          pip install pyyaml
+          python scripts/static_checks/check_labeler.py globs
+
+      # ------------------------------------------------------------------
+      # Every label used by .github/labeler.yml exists on the repo
+      # ------------------------------------------------------------------
+      - name: "Check: labeler labels exist"
+        id: labeler-labels
+        if: github.repository == 'lvgl/lvgl'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/static_checks/check_labeler.py labels-exist
+
+      # ------------------------------------------------------------------
       # Final gate – fail the job if any step above failed.
       # This gives us full output from every check before failing.
       # ------------------------------------------------------------------
@@ -107,7 +128,10 @@ jobs:
           steps.direct-public-include.outcome == 'failure' ||
           steps.deprecated.outcome            == 'failure' ||
           steps.lv_types.outcome              == 'failure' ||
-          steps.defconfigs.outcome            == 'failure'
+          steps.defconfigs.outcome            == 'failure' ||
+          steps.labeler-globs.outcome         == 'failure' ||
+          steps.labeler-labels.outcome        == 'failure'
+
         run: |
           echo "Policy check results:"
           echo "---------------------"
@@ -129,6 +153,8 @@ jobs:
           print_result "deprecated"            "${{ steps.deprecated.outcome }}"
           print_result "lv_types"              "${{ steps.lv_types.outcome }}"
           print_result "defconfigs"            "${{ steps.defconfigs.outcome }}"
+          print_result "labeler-globs"         "${{ steps.labeler-globs.outcome }}"
+          print_result "labeler-labels"        "${{ steps.labeler-labels.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."
