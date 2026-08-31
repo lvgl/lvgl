@@ -4408,27 +4408,27 @@
     #endif
 #endif
 
-#ifndef LV_USE_ASSERT_NULL
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ASSERT_NULL
-            #define LV_USE_ASSERT_NULL CONFIG_LV_USE_ASSERT_NULL
-        #else
-            #define LV_USE_ASSERT_NULL 0
-        #endif
+#ifndef LV_USE_ASSERT
+    #ifdef CONFIG_LV_USE_ASSERT
+        #define LV_USE_ASSERT CONFIG_LV_USE_ASSERT
     #else
-        #define LV_USE_ASSERT_NULL 1
+        #define LV_USE_ASSERT 0
     #endif
 #endif
 
 #ifndef LV_USE_ASSERT_MALLOC
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ASSERT_MALLOC
-            #define LV_USE_ASSERT_MALLOC CONFIG_LV_USE_ASSERT_MALLOC
-        #else
-            #define LV_USE_ASSERT_MALLOC 0
-        #endif
+    #ifdef CONFIG_LV_USE_ASSERT_MALLOC
+        #define LV_USE_ASSERT_MALLOC CONFIG_LV_USE_ASSERT_MALLOC
     #else
-        #define LV_USE_ASSERT_MALLOC 1
+        #define LV_USE_ASSERT_MALLOC 0
+    #endif
+#endif
+
+#ifndef LV_USE_ASSERT_NULL
+    #ifdef CONFIG_LV_USE_ASSERT_NULL
+        #define LV_USE_ASSERT_NULL CONFIG_LV_USE_ASSERT_NULL
+    #else
+        #define LV_USE_ASSERT_NULL 0
     #endif
 #endif
 

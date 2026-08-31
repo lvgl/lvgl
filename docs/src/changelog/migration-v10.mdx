@@ -370,6 +370,12 @@ See the [Argument Checking](contributing/assertions/#argument-checking) docs for
 the full <ApiLink name="LV_CHECK_ARG" /> and <ApiLink name="LV_CHECK_OBJ" /> API
 if you need finer control.
 
+### Assertions
+
+Assertions in LVGL are now disabled by default and can be enabled with <ApiLink name="LV_USE_ASSERT"/>.
+
+Note that these assertions are not required and should be disabled to improve performance when deploying your LVGL application.
+
 ### lv_obj
 
 - `lv_obj_find_by_id()` is deprecated, use `lv_obj_find_by_name()` instead:

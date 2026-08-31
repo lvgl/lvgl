@@ -2182,6 +2182,9 @@ static void call_delete_cb(lv_event_t * e)
     LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_delete_dsc_t * dsc = lv_event_get_user_data(e);
+#if !LV_USE_ASSERT
+    LV_UNUSED(obj);
+#endif
     LV_ASSERT(dsc != NULL);
     LV_ASSERT(dsc->cb != NULL);
     LV_ASSERT(dsc->obj == obj);
