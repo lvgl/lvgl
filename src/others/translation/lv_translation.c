@@ -273,6 +273,7 @@ lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_
     LV_CHECK_ARG(lang_idx < pack->language_cnt, return LV_RESULT_INVALID,
                  "Can't set the translation for language %" LV_PRIu32 " as there are only %" LV_PRIu32 " languages defined",
                  lang_idx, pack->language_cnt);
+    LV_UNUSED(pack);
 
     size_t new_len = lv_strlen(trans) + 1;
     char * new_trans = lv_realloc((void *)tag->translations[lang_idx], new_len);
