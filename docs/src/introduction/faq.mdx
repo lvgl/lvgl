@@ -91,7 +91,7 @@ for(i = 0; i < BUF_WIDTH; i++) {
 ## Why do I see nonsense colors on the screen?
 
 The configured LVGL color format is probably not compatible with your display's color
-format.  Check <ApiLink name="LV_COLOR_DEPTH" /> in *lv_conf.h*.
+format.  Check <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> in *lv_conf.h*.
 
 If you're using a 16 bit (RGB565) display connected via SPI the bytes might be swapped. Try
 setting <ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565_SWAPPED)" />

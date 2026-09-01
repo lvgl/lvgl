@@ -1,10 +1,46 @@
 menu "Rendering Configuration"
 
 menu "Color Settings"
-	choice
-		prompt "Color depth"
-		default LV_COLOR_DEPTH_16
 
+	choice LV_COLOR_FORMAT_DEFAULT
+		prompt "Default color format"
+		default LV_COLOR_FORMAT_I1       if LV_COLOR_DEPTH_1
+		default LV_COLOR_FORMAT_L8       if LV_COLOR_DEPTH_8
+		default LV_COLOR_FORMAT_RGB888   if LV_COLOR_DEPTH_24
+		default LV_COLOR_FORMAT_XRGB8888 if LV_COLOR_DEPTH_32
+		default LV_COLOR_FORMAT_RGB565
+
+		config LV_COLOR_FORMAT_I1
+			bool "I1"
+			imply LV_FONT_UNSCII_8
+		config LV_COLOR_FORMAT_L8
+			bool "L8"
+			imply LV_FONT_UNSCII_8
+		config LV_COLOR_FORMAT_RGB565
+			bool "RGB565"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_RGB565_SWAPPED
+			bool "RGB565 (Big-endian)"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_RGB888
+			bool "RGB888"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_XRGB8888
+			bool "XRGB8888"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_ARGB8888
+			bool "ARGB8888"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
+			bool "ARGB8888 (premultiplied)"
+			imply LV_FONT_MONTSERRAT_14
+	endchoice
+
+	choice LV_COLOR_DEPTH_CHOICE
+		prompt "Color depth [DEPRECATED: Use LV_COLOR_FORMAT_DEFAULT]"
+		default LV_COLOR_DEPTH_UNSET
+		config LV_COLOR_DEPTH_UNSET
+			bool "Use LV_COLOR_FORMAT_DEFAULT"
 		config LV_COLOR_DEPTH_32
 			bool "32: XRGB8888"
 			imply LV_FONT_MONTSERRAT_14
@@ -24,13 +60,11 @@ menu "Color Settings"
 
 	config LV_COLOR_DEPTH
 		int
-		default 1 if LV_COLOR_DEPTH_1
-		default 8 if LV_COLOR_DEPTH_8
-		default 16 if LV_COLOR_DEPTH_16
-		default 24 if LV_COLOR_DEPTH_24
-		default 32 if LV_COLOR_DEPTH_32
-		help
-			Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)
+		default 1 if LV_COLOR_FORMAT_I1
+		default 8 if LV_COLOR_FORMAT_L8
+		default 16 if LV_COLOR_FORMAT_RGB565 || LV_COLOR_FORMAT_RGB565_SWAPPED
+		default 24 if LV_COLOR_FORMAT_RGB888
+		default 32
 
 	config LV_COLOR_MIX_ROUND_OFS
 		int "Color mix rounding offset"

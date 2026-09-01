@@ -51,7 +51,7 @@ void test_snapshot_should_not_leak_memory(void)
     initial_available_memory = monitor.free_size;
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
-        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
+        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_DEFAULT);
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
     }
 
@@ -84,7 +84,7 @@ void test_snapshot_with_transform_should_not_leak_memory(void)
     initial_available_memory = monitor.free_size;
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
-        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
+        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_DEFAULT);
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
     }
 

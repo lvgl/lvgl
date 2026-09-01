@@ -58,7 +58,7 @@ lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * param
     lv_display_t * disp = lv_display_create(params->hor_res, params->ver_res);
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_buffers(disp, &dummy_buf, NULL,
-                           params->hor_res * params->ver_res * LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_NATIVE),
+                           params->hor_res * params->ver_res * LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_DEFAULT),
                            LV_DISPLAY_RENDER_MODE_FULL); /* recreate the full display list each refresh */
     lv_display_add_event_cb(disp, resolution_changed_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(disp, render_start_cb, LV_EVENT_RENDER_START, NULL);

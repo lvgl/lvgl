@@ -575,7 +575,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
             }
 
             lv_layer_t * new_layer = lv_draw_layer_create(layer,
-                                                          area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE, &layer_area_act);
+                                                          area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_DEFAULT, &layer_area_act);
             lv_obj_redraw(new_layer, obj);
 
             lv_point_t pivot = {

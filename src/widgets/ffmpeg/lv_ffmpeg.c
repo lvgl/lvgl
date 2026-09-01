@@ -204,7 +204,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     int height = player->ffmpeg_ctx->video_dec_ctx->height;
 
     uint8_t * data = ffmpeg_get_image_data(player->ffmpeg_ctx);
-    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_DEFAULT;
     uint32_t stride = width * lv_color_format_get_size(cf);
     uint32_t data_size = stride * height;
     lv_memzero(data, data_size);
@@ -487,7 +487,7 @@ static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx)
     }
 
     if(!ffmpeg_ctx->has_alpha) {
-        int lv_linesize = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE) * width;
+        int lv_linesize = lv_color_format_get_size(LV_COLOR_FORMAT_DEFAULT) * width;
         int dst_linesize = ffmpeg_ctx->video_dst_linesize[0];
         if(dst_linesize != lv_linesize) {
             LV_LOG_WARN("ffmpeg linesize = %d, but lvgl image require %d",
@@ -685,7 +685,7 @@ static int ffmpeg_get_image_header(lv_image_decoder_dsc_t * dsc,
         /* allocate image where the decoded image will be put */
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
-        header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+        header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_DEFAULT;
         header->stride = header->w * lv_color_format_get_size(header->cf);
         header->flags = LV_IMAGE_FLAGS_MODIFIABLE;
 

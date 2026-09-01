@@ -26,7 +26,7 @@ static uint8_t fb[240 * 320 * 2];
 lv_display_t * disp = lv_display_create(240, 320);
 lv_display_set_buffers(disp, fb, NULL, sizeof(fb), LV_DISPLAY_RENDER_MODE_DIRECT);
 lv_display_set_flush_cb(disp, flush_cb);
-lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565); /* not needed if LV_COLOR_DEPTH is 16 */
+lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565); /* not needed if LV_COLOR_FORMAT_DEFAULT is LV_COLOR_FORMAT_RGB565 */
 ```
 
 The generated STM32 HAL code should initialize the SPI peripheral for you based

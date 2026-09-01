@@ -81,7 +81,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->offset_y         = 0;
     disp->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
     disp->dpi              = LV_DPI_DEF;
-    disp->color_format = LV_COLOR_FORMAT_NATIVE;
+    disp->color_format = LV_COLOR_FORMAT_DEFAULT;
 #if LV_USE_EXT_DATA
     disp->ext_data.free_cb = NULL;
     disp->ext_data.data = NULL;

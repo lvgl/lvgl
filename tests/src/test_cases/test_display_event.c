@@ -41,7 +41,7 @@ void setUp(void)
     stop_in_preprocess = false;
     stop_in_normal = false;
 
-    test_draw_buf = lv_draw_buf_create(TEST_DISP_HOR_RES, TEST_DISP_VER_RES, LV_COLOR_FORMAT_NATIVE, 0);
+    test_draw_buf = lv_draw_buf_create(TEST_DISP_HOR_RES, TEST_DISP_VER_RES, LV_COLOR_FORMAT_DEFAULT, 0);
     test_disp = lv_display_create(TEST_DISP_HOR_RES, TEST_DISP_VER_RES);
     lv_display_set_flush_cb(test_disp, dummy_flush_cb);
     lv_display_set_draw_buffers(test_disp, test_draw_buf, NULL);
