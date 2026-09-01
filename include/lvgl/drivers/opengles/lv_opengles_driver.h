@@ -36,7 +36,7 @@ extern "C" {
  * Initialize OpenGL
  * @note    it is not necessary to call this if you use `lv_opengles_glfw_window_create`
  */
-void lv_opengles_init(void);
+lv_result_t lv_opengles_init(void);
 
 /**
  * Deinitialize OpenGL
