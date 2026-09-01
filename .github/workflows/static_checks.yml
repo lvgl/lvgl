@@ -126,6 +126,15 @@ jobs:
         run: python scripts/static_checks/check_comments.py src/core
 
       # ------------------------------------------------------------------
+      # The file name dependent parts of every lv_*.c/lv_*.h file
+      # (@file comment, include guards) must match the file name
+      # ------------------------------------------------------------------
+      - name: "Check: file templates match file names"
+        id: file-template
+        continue-on-error: true
+        run: python scripts/static_checks/check_file_template.py
+
+      # ------------------------------------------------------------------
       # Final gate – fail the job if any step above failed.
       # This gives us full output from every check before failing.
       # ------------------------------------------------------------------
@@ -141,7 +150,8 @@ jobs:
           steps.defconfigs.outcome            == 'failure' ||
           steps.labeler-globs.outcome         == 'failure' ||
           steps.labeler-labels.outcome        == 'failure' ||
-          steps.comments.outcome              == 'failure'
+          steps.comments.outcome              == 'failure' ||
+          steps.file-template.outcome         == 'failure'
 
         run: |
           echo "Policy check results:"
@@ -167,6 +177,7 @@ jobs:
           print_result "labeler-globs"         "${{ steps.labeler-globs.outcome }}"
           print_result "labeler-labels"        "${{ steps.labeler-labels.outcome }}"
           print_result "comments"              "${{ steps.comments.outcome }}"
+          print_result "file-template"         "${{ steps.file-template.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."
