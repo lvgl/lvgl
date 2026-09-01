@@ -56,6 +56,8 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
+static void remove_observers_from_group_subject(lv_subject_t * subject);
+static void subject_remove_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data);
 static void subject_toggle_cb(lv_event_t * e);
 static void subject_set_int_cb(lv_event_t * e);
 #if LV_USE_FLOAT
@@ -381,7 +383,11 @@ void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], 
     LV_CHECK_ARG(group_subject != NULL, return);
     LV_CHECK_ARG(list != NULL, return);
 
-    lv_memzero(group_subject, sizeof(lv_subject_t));
+    lv_memzero(group_subject, sizeof(*group_subject));
+    for(uint32_t i = 0; i < list_len; i++) {
+        LV_CHECK_ARG_FORMAT_MSG(list[i] != NULL, return, "Subject %" LV_PRIu32 " is NULL", i);
+    }
+
     lv_ll_init(&(group_subject->subs_ll), sizeof(lv_observer_t));
     group_subject->type = LV_SUBJECT_TYPE_GROUP;
     group_subject->size = list_len;
@@ -405,6 +411,10 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 void lv_subject_deinit(lv_subject_t * subject)
 {
     if(subject == NULL) return;
+
+    if(subject->type == LV_SUBJECT_TYPE_GROUP) {
+        remove_observers_from_group_subject(subject);
+    }
 
     lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {
@@ -1326,6 +1336,32 @@ static void set_pointer_observer(lv_observer_t * observer, lv_subject_t * subjec
     lv_obj_t * obj = (lv_obj_t *)observer->target;
     lv_obj_set_pointer_t set_pointer_cb = (lv_obj_set_pointer_t)observer->user_cb;
     if(set_pointer_cb) set_pointer_cb(obj, subject->value.pointer);
+}
+
+static void remove_observers_from_group_subject(lv_subject_t * subject)
+{
+    LV_ASSERT(subject != NULL);
+    LV_ASSERT(subject->type == LV_SUBJECT_TYPE_GROUP);
+
+    for(uint32_t i = 0; i < subject->size; ++i) {
+        lv_subject_t * sub = ((lv_subject_t **)(subject->value.pointer))[i];
+        subject_remove_observer(sub, group_notify_cb, subject);
+    }
+}
+
+static void subject_remove_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data)
+{
+    LV_ASSERT(subject != NULL);
+    LV_ASSERT(cb != NULL);
+
+    lv_observer_t * obs = lv_ll_get_head(&subject->subs_ll);
+    while(obs) {
+        lv_observer_t * obs_next = lv_ll_get_next(&subject->subs_ll, obs);
+        if(obs->cb == cb && obs->user_data == user_data) {
+            lv_observer_delete(obs);
+        }
+        obs = obs_next;
+    }
 }
 
 #endif /*LV_USE_OBSERVER*/
