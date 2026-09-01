@@ -53,7 +53,7 @@ void lv_test_deinit(void)
 #if LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
     /* Capture the EGL context before lv_deinit() deletes the display, then release
      * the EGL/GL resources after lv_deinit() has destroyed the NanoVG draw unit. */
-    void * egl_ctx = lv_display_get_driver_data(lv_display_get_default());
+    void * egl_ctx = lv_test_display_egl_get_context(lv_display_get_default());
     lv_deinit();
     lv_test_display_egl_cleanup(egl_ctx);
 #else

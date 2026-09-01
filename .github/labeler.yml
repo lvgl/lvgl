@@ -1355,7 +1355,6 @@ opengl:
       - any-glob-to-any-file:
           - 'include/lvgl/drivers/opengles/**'
           - 'src/drivers/opengles/**'
-          - 'env_support/cmake/dependencies/glesv2.cmake'
           - 'docs/src/integration/embedded_linux/opengl.mdx'
           - 'docs/src/integration/embedded_linux/drivers/opengl_driver.mdx'
 
@@ -1378,7 +1377,6 @@ egl:
       - any-glob-to-any-file:
           - '**/*_egl.*'
           - '**/*_egl_private.h'
-          - 'env_support/cmake/dependencies/egl.cmake'
           - 'docs/src/integration/embedded_linux/drivers/egl.mdx'
           - 'tests/egl_vendor_mesa_only.json'
 
