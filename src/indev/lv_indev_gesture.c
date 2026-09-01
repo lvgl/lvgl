@@ -192,7 +192,8 @@ lv_dir_t lv_event_get_two_fingers_swipe_dir(lv_event_t * gesture_event)
 bool lv_event_get_gesture_center_point(lv_event_t * gesture_event, lv_indev_gesture_type_t type,
                                        lv_point_t * point)
 {
-    LV_ASSERT_NULL(point);
+    LV_CHECK_ARG(gesture_event != NULL, return false);
+    LV_CHECK_ARG(point != NULL, return false);
 
     lv_indev_gesture_recognizer_t * recognizer;
     if((recognizer = get_gesture_recognizer(gesture_event, type)) == NULL) {
