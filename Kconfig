@@ -3637,12 +3637,10 @@ menu "Argument Checks"
 		depends on LV_USE_CHECK_OBJ_VALIDITY
 		depends on LV_USE_ASSERT
 		help
-			lv_obj_is_in_widget_tree verifies, while walking up the parent chain,
-			that each parent's children array actually contains the child. This
-			catches corruption where a child's parent pointer disagrees with the
-			parent's children list. Slower than the basic reachability check
-			(O(siblings) per level instead of O(1)). The mismatch is reported
-			through LV_ASSERT, so LV_USE_ASSERT must be enabled too.
+			While walking up the parent chain, lv_obj_is_in_widget_tree also checks that
+			each parent's children array contains the child. This finds corruption where
+			a child's parent pointer and the parent's children list disagree. The cost is
+			O(siblings) per level instead of O(1), and LV_ASSERT reports the mismatch.
 	endif
 endmenu
 endmenu #"Build"
