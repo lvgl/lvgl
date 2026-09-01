@@ -38,6 +38,7 @@ typedef lv_display_rotation_t lv_disp_rotation_t;
 #define lv_display_delete_event lv_display_remove_event
 #define lv_observer_remove lv_observer_delete
 #define lv_style_get_prop_inlined lv_style_get_prop
+#define lv_obj_is_valid lv_obj_is_in_widget_tree
 
 #define lv_draw_sw_i1_to_argb8888 lv_draw_i1_to_argb8888
 #define lv_draw_sw_rgb565_swap lv_draw_rgb565_swap

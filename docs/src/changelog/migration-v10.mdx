@@ -323,7 +323,7 @@ The macro is layered — each layer is independently configurable in `lv_conf.h`
 |---|---|---|
 | Base | `LV_USE_CHECK_ARG` | Enables the whole system; when 0 all three macros expand to nothing. Also enables NULL checks on all arguments regardless of whether Class or Validity guards are set. |
 | Class | `LV_USE_CHECK_OBJ_CLASSTYPE` | `lv_obj_has_class(obj, cls)` — verifies the object is the expected widget type. |
-| Validity | `LV_USE_CHECK_OBJ_VALIDITY` | `lv_obj_is_valid(obj)` — verifies the object is still part of the live widget tree. |
+| Validity | `LV_USE_CHECK_OBJ_VALIDITY` | `lv_obj_is_in_widget_tree(obj)` — verifies the object is still part of the live widget tree. |
 
 All three layers default to `0` (disabled). Enable them selectively:
 
@@ -339,7 +339,7 @@ NULL check; when `LV_USE_CHECK_OBJ_VALIDITY` is `0`, it still performs the
 class check (if enabled). The checks are cumulative.
 
 <Callout type="warning" title="Enable only during development">
-  `lv_obj_is_valid()` walks the widget tree and `lv_obj_has_class()` traverses
+  `lv_obj_is_in_widget_tree()` walks the widget tree and `lv_obj_has_class()` traverses
   the class hierarchy — both add non-trivial overhead on every call site.
   Leave `LV_USE_CHECK_OBJ_CLASSTYPE` and `LV_USE_CHECK_OBJ_VALIDITY` at `0`
   in production builds.

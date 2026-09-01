@@ -845,11 +845,21 @@ bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p);
 const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
 
 /**
- * Check if any object is still "alive".
- * @param obj       pointer to an object
- * @return          true: valid
+ * Walk up `obj`'s parent chain to its root and check whether that root is
+ * present in some `lv_display_t`'s screen list.
+ *
+ * For any properly-created live object this returns true: the public API
+ * does not allow creating a screen without registering it on a display, nor
+ * detaching a subtree from its display. The function is therefore primarily
+ * a defensive check — it returns false for NULL, and (best-effort) for
+ * stale/corrupted pointers whose memory no longer reads back as a chain
+ * terminating at a registered screen. It is not a reliable use-after-free
+ * detector: freed memory may still satisfy the check by coincidence.
+ *
+ * @param obj   pointer to an object
+ * @return      true if the root of `obj`'s parent chain is a registered screen
  */
-bool lv_obj_is_valid(const lv_obj_t * obj);
+bool lv_obj_is_in_widget_tree(const lv_obj_t * obj);
 
 /**
  * Utility to set an object reference to NULL when it gets deleted.
@@ -1022,7 +1032,7 @@ void lv_objid_builtin_destroy(void);
         LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");                  \
         LV_ASSERT_INTERNAL(obj_p != NULL, "");                                                               \
         LV_ASSERT_INTERNAL(lv_obj_has_class(obj_p, obj_class) == true, "");                                  \
-        LV_ASSERT_INTERNAL(lv_obj_is_valid(obj_p) == true, "");                                              \
+        LV_ASSERT_INTERNAL(lv_obj_is_in_widget_tree(obj_p) == true, "");                                     \
     } while(0)
 # else
 /**

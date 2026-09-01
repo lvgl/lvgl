@@ -20,7 +20,7 @@ config LV_STDLIB_RTTHREAD
 	default 3
 
 config LV_STDLIB_CUSTOM
-	int 
+	int
 	default 255
 
 choice
@@ -520,7 +520,7 @@ config LV_GRADIENT_MAX_STOPS
 config LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 	bool "Complex gradients"
 	default n
-	
+
 	help
 		Adds linear gradients at an angle, plus radial and conical gradients.
 
@@ -543,7 +543,7 @@ config LV_DRAW_SW_CIRCLE_CACHE_SIZE
 choice LV_USE_DRAW_SW_ASM
 	prompt "SW assembly optimization"
 	default LV_DRAW_SW_ASM_NONE
-	
+
 	config LV_DRAW_SW_ASM_NONE
 		bool "0: None"
 	config LV_DRAW_SW_ASM_NEON
@@ -1113,7 +1113,7 @@ config LV_USE_DRAW_SDL
 	default n
 	help
 		Render with the SDL renderer API, caching widgets and images as SDL textures.
-endmenu 
+endmenu
 endmenu
 menu "Input Devices"
 
@@ -1343,7 +1343,7 @@ config LV_LOG_LEVEL
 	default 5 if LV_LOG_LEVEL_NONE
 
 config LV_LOG_LEVEL_NUM
-	int 
+	int
 	default 5
 
 config LV_LOG_PRINTF
@@ -1688,7 +1688,7 @@ config LV_USE_CUSTOM_FONT_DEFAULT
 		  - in the header given by LV_FONT_CUSTOM_INCLUDE, e.g.
 		        #define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(my_font_24)
 		        #define LV_FONT_DEFAULT         &my_font_24
-			
+
 		If you do not, LV_FONT_DEFAULT falls back to a builtin font,
 		which is no longer compiled in, causing a link error.
 
@@ -1996,7 +1996,7 @@ config LV_USE_CALENDAR_CHINESE
 	default n
 
 endif #LV_USE_CALENDAR
-	
+
 
 
 config LV_USE_CANVAS
@@ -2588,7 +2588,7 @@ config LV_NUTTX_LCD_BUFFER_SIZE
 	depends on LV_NUTTX_LCD_CUSTOM_BUFFER
 	depends on LV_USE_NUTTX_LCD
 	default 60
-	
+
 
 config LV_USE_NUTTX_TOUCHSCREEN
 	bool "Touchscreen"
@@ -3620,16 +3620,29 @@ menu "Argument Checks"
 		default n
 		help
 			LV_CHECK_OBJ verifies with lv_obj_has_class() that the object has the
-			expected class. When disabled the check is skipped even if a class
-			argument is supplied.
+			expected class. When disabled the class check is skipped
+			(LV_CHECK_OBJ collapses to a NULL check).
 
 	config LV_USE_CHECK_OBJ_VALIDITY
 		bool "Widget-tree validity check in LV_CHECK_OBJ"
 		default n
 		help
-			LV_CHECK_OBJ verifies with lv_obj_is_valid() that the object is still
-			part of the widget tree. When disabled the check is skipped even if the
-			associated argument is supplied.
+			LV_CHECK_OBJ verifies with lv_obj_is_in_widget_tree() that the object is
+			still part of the widget tree. When disabled the validity check is
+			skipped (only the class/NULL check remains).
+
+	config LV_USE_CHECK_OBJ_PARENT_LINK
+		bool "Parent-link consistency check in lv_obj_is_in_widget_tree"
+		default n
+		depends on LV_USE_CHECK_OBJ_VALIDITY
+		depends on LV_USE_ASSERT
+		help
+			lv_obj_is_in_widget_tree verifies, while walking up the parent chain,
+			that each parent's children array actually contains the child. This
+			catches corruption where a child's parent pointer disagrees with the
+			parent's children list. Slower than the basic reachability check
+			(O(siblings) per level instead of O(1)). The mismatch is reported
+			through LV_ASSERT, so LV_USE_ASSERT must be enabled too.
 	endif
 endmenu
 endmenu #"Build"

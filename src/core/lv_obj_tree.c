@@ -740,6 +740,8 @@ static void obj_delete_core(lv_obj_t * obj)
         lv_obj_remove_child(obj->parent, obj);
     }
 
+    obj->parent = NULL;
+
     /*Free the object itself*/
     lv_free(obj);
 }

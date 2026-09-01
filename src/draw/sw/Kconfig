@@ -97,7 +97,7 @@ config LV_GRADIENT_MAX_STOPS
 config LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 	bool "Complex gradients"
 	default n
-	
+
 	help
 		Adds linear gradients at an angle, plus radial and conical gradients.
 
@@ -120,7 +120,7 @@ config LV_DRAW_SW_CIRCLE_CACHE_SIZE
 choice LV_USE_DRAW_SW_ASM
 	prompt "SW assembly optimization"
 	default LV_DRAW_SW_ASM_NONE
-	
+
 	config LV_DRAW_SW_ASM_NONE
 		bool "0: None"
 	config LV_DRAW_SW_ASM_NEON
