@@ -184,7 +184,7 @@ The checks performed by <ApiLink name="LV_CHECK_OBJ" /> macros are layered and i
 | Base | `LV_USE_CHECK_ARG = 1` | Master switch. When `0`, all three macros expand to nothing. |
 | NULL | always on | `obj != NULL` (always checked when the system is enabled). |
 | Class type | `LV_USE_CHECK_OBJ_CLASSTYPE = 1` | `lv_obj_has_class(obj, cls)` — verifies the object is the expected widget type. |
-| Validity | `LV_USE_CHECK_OBJ_VALIDITY = 1` | `lv_obj_is_valid(obj)` — verifies the object is still part of the live widget tree. |
+| Validity | `LV_USE_CHECK_OBJ_VALIDITY = 1` | `lv_obj_is_in_widget_tree(obj)` — verifies the object is still part of the live widget tree. |
 
 All options default to `0`. Enable them selectively:
 
@@ -196,7 +196,7 @@ All options default to `0`. Enable them selectively:
 ```
 
 <Callout type="warning" title="Enable only during development">
-  `lv_obj_is_valid()` walks the widget tree and `lv_obj_has_class()` traverses
+  `lv_obj_is_in_widget_tree()` walks the widget tree and `lv_obj_has_class()` traverses
   the class hierarchy on every call site. These checks add non-trivial overhead,
   especially in rendering-critical code paths. Keep `LV_USE_CHECK_OBJ_CLASSTYPE`
   and `LV_USE_CHECK_OBJ_VALIDITY` at `0` in production builds.

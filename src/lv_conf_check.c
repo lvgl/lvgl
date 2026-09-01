@@ -394,6 +394,10 @@
     #error "LV_USE_CHECK_OBJ_VALIDITY requires LV_USE_CHECK_ARG (Kconfig depends on)"
 #endif
 
+#if LV_USE_CHECK_OBJ_PARENT_LINK && !(LV_USE_CHECK_OBJ_VALIDITY && LV_USE_ASSERT && LV_USE_CHECK_ARG)
+    #error "LV_USE_CHECK_OBJ_PARENT_LINK requires LV_USE_CHECK_OBJ_VALIDITY && LV_USE_ASSERT && LV_USE_CHECK_ARG (Kconfig depends on)"
+#endif
+
 #if LV_USE_DEMO_BENCHMARK && !(LV_BUILD_DEMOS)
     #error "LV_USE_DEMO_BENCHMARK requires LV_BUILD_DEMOS (Kconfig depends on)"
 #endif

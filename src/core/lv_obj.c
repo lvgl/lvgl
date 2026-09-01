@@ -72,7 +72,9 @@ static void screen_create_on_trigger_event_cb(lv_event_t * e);
 static void play_timeline_on_trigger_event_cb(lv_event_t * e);
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
 static void call_delete_cb(lv_event_t * e);
-static bool parent_contains_child(const lv_obj_t * parent, const lv_obj_t * child);
+#if LV_USE_CHECK_OBJ_PARENT_LINK && LV_USE_ASSERT
+    static bool parent_contains_child(const lv_obj_t * parent, const lv_obj_t * child);
+#endif
 
 #if LV_USE_OBJ_PROPERTY
     static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
@@ -1267,7 +1269,9 @@ bool lv_obj_is_in_widget_tree(const lv_obj_t * obj)
     const lv_obj_t * current = obj;
 
     while(current->parent != NULL) {
+#if LV_USE_CHECK_OBJ_PARENT_LINK && LV_USE_ASSERT
         LV_ASSERT(parent_contains_child(current->parent, current));
+#endif
         current = current->parent;
     }
 
@@ -2177,21 +2181,17 @@ static void call_delete_cb(lv_event_t * e)
     lv_obj_remove_delete_cb(dsc);
 }
 
+#if LV_USE_CHECK_OBJ_PARENT_LINK && LV_USE_ASSERT
 static bool parent_contains_child(const lv_obj_t * parent, const lv_obj_t * child)
 {
-#if LV_USE_CHECK_OBJ_PARENT_LINK
     uint32_t child_cnt = parent->spec_attr ? parent->spec_attr->child_cnt : 0;
     uint32_t i;
     for(i = 0; i < child_cnt; i++) {
         if(parent->spec_attr->children[i] == child) return true;
     }
     return false;
-#else
-    LV_UNUSED(parent);
-    LV_UNUSED(child);
-    return true;
-#endif
 }
+#endif
 
 
 #if LV_USE_OBJ_PROPERTY
