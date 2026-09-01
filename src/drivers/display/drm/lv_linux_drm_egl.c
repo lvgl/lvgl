@@ -110,6 +110,8 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_
 
     lv_display_set_resolution(disp, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
 
+    lv_opengles_egl_set_display_color_format(disp);
+
     ctx->egl_interface = drm_get_egl_interface(ctx);
     ctx->egl_ctx = lv_opengles_egl_context_create(&ctx->egl_interface);
     if(!ctx->egl_ctx) {

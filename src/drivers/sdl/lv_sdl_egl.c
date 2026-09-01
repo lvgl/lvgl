@@ -69,6 +69,8 @@ const lv_sdl_backend_ops_t lv_sdl_backend_ops = {
 
 static lv_result_t init_display(lv_display_t * display)
 {
+    lv_opengles_egl_set_display_color_format(display);
+
     lv_egl_interface_t ifc = lv_sdl_get_egl_interface(display);
     lv_sdl_egl_display_data_t * ddata = lv_malloc_zeroed(sizeof(*ddata));
     if(!ddata) {
