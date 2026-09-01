@@ -96,7 +96,69 @@ def format_coord(val):
         if plain <= _PCT_POS_MAX:
             return f"{plain}%"
         return f"{_PCT_POS_MAX - plain}%"
-    if coord_type == _COORD_TYPE_PX_NEG:
-        plain = val & ~_COORD_TYPE_MASK
-        return str(-plain) if plain else "0"
+    # LV_COORD_TYPE_PX_NEG needs no branch of its own. There is no
+    # LV_COORD_SET_PX_NEG: the tag exists so LV_COORD_IS_PX() accepts negatives,
+    # and in two's complement every negative int32 already has those top bits,
+    # so such a value is an ordinary negative pixel count. Taking
+    # LV_COORD_PLAIN() of it and negating turned -5 into -536870907.
     return str(val)
+
+
+_enum_cache = {}
+
+
+def _enum_members(type_name):
+    """Members of a C enum as {value: name}, or None if the target has no such type."""
+    if type_name not in _enum_cache:
+        try:
+            members = {
+                int(f.enumval): f.name for f in gdb.lookup_type(type_name).fields()
+            }
+        except (gdb.error, AttributeError, TypeError):
+            members = None
+        _enum_cache[type_name] = members
+    return _enum_cache[type_name]
+
+
+def format_enum(type_name, value, prefix="", bitmask=False):
+    """Name a value of a C enum, reading the names from the target's debug info.
+
+    The fields holding these values are plain unsigned bitfields, so GDB prints
+    them as bare numbers and the enum has to be looked up by name. Reading it
+    from the target rather than from a generated table means the names always
+    match the binary in front of you - and when the enum was optimised out,
+    the raw number is still printed.
+    """
+    if value is None:
+        return None
+    value = int(value)
+    members = _enum_members(type_name)
+    if not members:
+        return str(value)
+
+    def _short(name):
+        return name[len(prefix):] if prefix and name.startswith(prefix) else name
+
+    if value in members:
+        return _short(members[value])
+    if not bitmask:
+        return str(value)
+
+    parts, covered = [], 0
+    for bit in sorted(b for b in members if b and not b & (b - 1)):
+        if value & bit:
+            parts.append(_short(members[bit]))
+            covered |= bit
+    return "|".join(parts) if parts and covered == value else str(value)
+
+
+def _forget_enums(_event=None):
+    """Enum layouts belong to the objfile they were read from."""
+    _enum_cache.clear()
+
+
+try:
+    gdb.events.exited.connect(_forget_enums)
+    gdb.events.new_objfile.connect(_forget_enums)
+except AttributeError:
+    pass  # older GDB, or imported outside a debug session

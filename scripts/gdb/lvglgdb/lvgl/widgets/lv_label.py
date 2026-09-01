@@ -14,76 +14,77 @@ class LVLabel(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_label_t", ptr=True) or self
+        self._wv_lv_label_t = self.cast("lv_label_t", ptr=True) or self
+        self._wv = self._wv_lv_label_t
 
     @property
     def text(self):
-        return safe_string(self._wv, "text")
+        return safe_string(self._wv_lv_label_t, "text")
 
     @property
     def translation_tag(self):
-        return safe_string(self._wv, "translation_tag")
+        return safe_string(self._wv_lv_label_t, "translation_tag")
 
     @property
     def dot_begin(self):
         """Offset where bytes have been replaced with dots"""
-        return int(self._wv.safe_field("dot_begin", 0))
+        return int(self._wv_lv_label_t.safe_field("dot_begin", 0))
 
     @property
     def max_lines(self):
-        return int(self._wv.safe_field("max_lines", 0))
+        return int(self._wv_lv_label_t.safe_field("max_lines", 0))
 
     @property
     def sel_start(self):
-        return int(self._wv.safe_field("sel_start", 0))
+        return int(self._wv_lv_label_t.safe_field("sel_start", 0))
 
     @property
     def sel_end(self):
-        return int(self._wv.safe_field("sel_end", 0))
+        return int(self._wv_lv_label_t.safe_field("sel_end", 0))
 
     @property
     def size_cache(self):
         """Text size cache"""
-        return safe_point(self._wv, "size_cache")
+        return safe_point(self._wv_lv_label_t, "size_cache")
 
     @property
     def offset(self):
         """Text draw position offset"""
-        return safe_point(self._wv, "offset")
+        return safe_point(self._wv_lv_label_t, "offset")
 
     @property
     def long_mode(self):
         """Determine what to do with the long texts"""
-        return int(self._wv.safe_field("long_mode", 0))
+        return int(self._wv_lv_label_t.safe_field("long_mode", 0))
 
     @property
     def static_txt(self):
         """Flag to indicate the text is static"""
-        return int(self._wv.safe_field("static_txt", 0))
+        return int(self._wv_lv_label_t.safe_field("static_txt", 0))
 
     @property
     def recolor(self):
         """Enable in-line letter re-coloring"""
-        return int(self._wv.safe_field("recolor", 0))
+        return int(self._wv_lv_label_t.safe_field("recolor", 0))
 
     @property
     def expand(self):
         """Ignore real width (used by the library with LV_LABEL_LONG_MODE_SCROLL)"""
-        return int(self._wv.safe_field("expand", 0))
+        return int(self._wv_lv_label_t.safe_field("expand", 0))
 
     @property
     def invalid_size_cache(self):
         """1: Recalculate size and update cache"""
-        return int(self._wv.safe_field("invalid_size_cache", 0))
+        return int(self._wv_lv_label_t.safe_field("invalid_size_cache", 0))
 
     @property
     def need_refr_text(self):
         """1: Refresh text after layout update completion"""
-        return int(self._wv.safe_field("need_refr_text", 0))
+        return int(self._wv_lv_label_t.safe_field("need_refr_text", 0))
 
     @property
     def text_size(self):
-        return safe_point(self._wv, "text_size")
+        return safe_point(self._wv_lv_label_t, "text_size")
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

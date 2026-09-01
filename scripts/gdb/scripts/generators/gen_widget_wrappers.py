@@ -24,9 +24,11 @@ from pathlib import Path
 from dataclasses import dataclass, field as dc_field
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from lvgl_paths import include_dir, lvgl_root  # noqa: E402
 
-LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
-LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
+LVGL_ROOT = lvgl_root(__file__)
+LVGL_SRC = LVGL_ROOT / "src"
+LVGL_INC = include_dir(LVGL_ROOT)
 WIDGETS_DIR = LVGL_SRC / "widgets"
 OUTPUT_DIR = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "widgets"
 SPECS_JSON = Path(__file__).parent / "widget_specs.json"
@@ -42,7 +44,9 @@ SIMPLE_INT_TYPES = {
 def _scan_enum_types() -> set[str]:
     """Scan LVGL headers to find all typedef enum and int-like alias type names."""
     result = set()
-    headers = list(LVGL_SRC.rglob("*.h")) + list(LVGL_INC.rglob("*.h"))
+    # In a checkout LVGL_INC *is* LVGL_SRC, so the two trees have to be merged
+    # rather than concatenated or every header is read twice.
+    headers = sorted({*LVGL_SRC.rglob("*.h"), *LVGL_INC.rglob("*.h")})
     for h in headers:
         text = h.read_text(errors="ignore")
         # typedef enum { ... } lv_xxx_t;
@@ -235,22 +239,28 @@ def parse_widgets() -> dict[str, WidgetDef]:
     return widgets
 
 
-def _field_expr(f: StructField) -> str | None:
-    """Return snapshot expression for a field, or None to skip."""
+def _field_expr(f: StructField, attr: str = "_wv") -> str | None:
+    """Return snapshot expression for a field, or None to skip.
+
+    `attr` is the class's own cast of the object. Each class needs its own,
+    because a widget struct embeds its ancestor as the first member: casting
+    an lv_slider_t to lv_bar_t is valid, but reading lv_bar_t's fields off an
+    lv_slider_t cast is not, and safe_field() would quietly return the default.
+    """
     if f.is_array:
         return None
     if f.is_obj_pointer:
-        return f'ptr_or_none(self._wv.safe_field("{f.name}"))'
+        return f'ptr_or_none(self.{attr}.safe_field("{f.name}"))'
     if f.is_string:
-        return f'safe_string(self._wv, "{f.name}")'
+        return f'safe_string(self.{attr}, "{f.name}")'
     if f.is_pointer:
-        return f'ptr_or_none(self._wv.safe_field("{f.name}"))'
+        return f'ptr_or_none(self.{attr}.safe_field("{f.name}"))'
     if f.c_type == "lv_color_t":
-        return f'safe_color(self._wv, "{f.name}")'
+        return f'safe_color(self.{attr}, "{f.name}")'
     if f.c_type == "lv_area_t":
-        return f'safe_area(self._wv, "{f.name}")'
+        return f'safe_area(self.{attr}, "{f.name}")'
     if f.c_type == "lv_point_t":
-        return f'safe_point(self._wv, "{f.name}")'
+        return f'safe_point(self.{attr}, "{f.name}")'
     # Known wrapper types — use snapshot() for rich output
     _WRAPPER_TYPES = {
         "lv_draw_buf_t": ("lvglgdb.lvgl.draw.lv_draw_buf", "LVDrawBuf"),
@@ -260,13 +270,13 @@ def _field_expr(f: StructField) -> str | None:
     }
     if f.c_type in _WRAPPER_TYPES:
         mod, cls = _WRAPPER_TYPES[f.c_type]
-        return f'safe_wrapper(self._wv, "{f.name}", "{mod}", "{cls}")'
+        return f'safe_wrapper(self.{attr}, "{f.name}", "{mod}", "{cls}")'
     if f.is_bitfield or f.c_type in SIMPLE_INT_TYPES or f.c_type.startswith(("uint", "int")):
-        return f'int(self._wv.safe_field("{f.name}", 0))'
+        return f'int(self.{attr}.safe_field("{f.name}", 0))'
     # TODO: implement generic struct expansion (Value.to_dict) for
     # non-enum lv_*_t types like lv_calendar_date_t.
     if f.c_type in _INT_SAFE_TYPES:
-        return f'int(self._wv.safe_field("{f.name}", 0))'
+        return f'int(self.{attr}.safe_field("{f.name}", 0))'
     return None
 
 
@@ -372,20 +382,38 @@ def safe_point(obj, field_name):
 
 
 def safe_wrapper(obj, field_name, module_path, class_name):
-    """Read a struct field using its known Value wrapper, return snapshot dict."""
+    """Read a struct field using its known Value wrapper, return snapshot dict.
+
+    Not every wrapper has a snapshot(); LVArray does not. Value forwards an
+    unknown attribute to gdb.Value.__getitem__, so asking for one raises
+    gdb.error rather than AttributeError, and the caller would otherwise lose
+    the whole widget - and its subtree - over a single field.
+    """
+    import gdb
+
     val = obj.safe_field(field_name)
     if val is None or not getattr(val, 'is_ok', True):
         return None
     import importlib
-    mod = importlib.import_module(module_path)
-    cls = getattr(mod, class_name)
-    wrapper = cls(val)
-    return wrapper.snapshot().as_dict()
+    try:
+        mod = importlib.import_module(module_path)
+        cls = getattr(mod, class_name)
+        wrapper = cls(val)
+        if getattr(type(wrapper), "snapshot", None) is None:
+            # An embedded struct - lv_scale_t.needles - is not convertible to an
+            # int, so the address has to come from the field itself.
+            if val.type.strip_typedefs().code != gdb.TYPE_CODE_PTR:
+                val = val.address
+            return {"addr": hex(int(val)), "type": class_name}
+        return wrapper.snapshot().as_dict()
+    except (gdb.error, gdb.MemoryError, ImportError, AttributeError, TypeError):
+        return None
 '''
 
 
 def gen_widget_file(wdef: WidgetDef, widgets: dict[str, WidgetDef]) -> str:
     """Generate a single widget module file."""
+    attr = f"_wv_{wdef.c_type}"
     lines = [
         '"""',
         f"Auto-generated wrapper for {wdef.c_type}.",
@@ -406,7 +434,7 @@ def gen_widget_file(wdef: WidgetDef, widgets: dict[str, WidgetDef]) -> str:
     # Import helpers only if needed
     needs = set()
     for f in wdef.fields:
-        expr = _field_expr(f)
+        expr = _field_expr(f, attr)
         if expr is None:
             continue
         if "ptr_or_none" in expr:
@@ -435,13 +463,14 @@ def gen_widget_file(wdef: WidgetDef, widgets: dict[str, WidgetDef]) -> str:
     lines.append("")
     lines.append(f"    def __init__(self, obj):")
     lines.append(f"        super().__init__(obj)")
-    lines.append(f'        self._wv = self.cast("{wdef.c_type}", ptr=True) or self')
+    lines.append(f'        self.{attr} = self.cast("{wdef.c_type}", ptr=True) or self')
+    lines.append(f"        self._wv = self.{attr}")
     lines.append("")
 
     # Properties
     snapshot_fields = []
     for f in wdef.fields:
-        expr = _field_expr(f)
+        expr = _field_expr(f, attr)
         if expr is None:
             continue
         lines.append(f"    @property")

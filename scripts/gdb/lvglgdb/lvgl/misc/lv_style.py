@@ -9,7 +9,24 @@ from .lv_style_consts import (
     STATE_FLAGS,
     COLOR_PROPS,
     POINTER_PROPS,
+    SRC_PROPS,
+    COORD_PROPS,
+    BOOL_PROPS,
+    ENUM_PROP_VALUES,
+    COORD_TYPE_SHIFT,
 )
+
+_COORD_TYPE_MASK = 3 << COORD_TYPE_SHIFT
+_COORD_TYPE_SPEC = 1 << COORD_TYPE_SHIFT
+_COORD_MAX = (1 << COORD_TYPE_SHIFT) - 1
+_PCT_STORED_MAX = _COORD_MAX - 1
+_PCT_POS_MAX = _PCT_STORED_MAX // 2
+
+# lv_image_src_get_type(): the first byte of an image source says what it is.
+_IMAGE_HEADER_MAGIC = 0x19
+_IMAGE_HEADER_LEGACY = 0x00
+
+_symbol_cache: dict[int, "str | None"] = {}
 
 
 def style_prop_name(prop_id: int) -> str:
@@ -35,29 +52,104 @@ def decode_selector(selector: int) -> str:
     return f"{part_str}|{state_str}"
 
 
-def format_style_value(prop_id: int, value: Value) -> str:
-    """Format a style value based on property type (with ANSI color block)."""
+def decode_coord(raw: int) -> str:
+    """Render an int32 coordinate the way the source wrote it.
+
+    LV_PCT() and LV_SIZE_CONTENT survive in the stored value as a type tag in
+    the top bits, so a percentage never has to be inferred from geometry.
+    """
+    bits = raw & 0xFFFFFFFF
+    # Only LV_COORD_TYPE_SPEC carries an encoding. LV_COORD_TYPE_PX_NEG is not a
+    # second one: there is no LV_COORD_SET_PX_NEG, and in two's complement every
+    # negative int32 already has those top bits, so a "PX_NEG" value is just a
+    # negative number and prints as itself.
+    if bits & _COORD_TYPE_MASK != _COORD_TYPE_SPEC:
+        return str(raw)
+    plain = bits & ~_COORD_TYPE_MASK
+    if plain == _COORD_MAX:
+        return "content"
+    # Not unreachable: _COORD_TYPE_MASK covers bits 29-30 only, so a negative
+    # raw keeps bit 31 in `plain`. LVGL's LV_COORD_IS_PCT() guards the same way.
+    if plain > _PCT_STORED_MAX:
+        return str(raw)
+    pct = plain if plain <= _PCT_POS_MAX else _PCT_POS_MAX - plain
+    return f"{pct}%"
+
+
+def decode_enum(prop_id: int, raw: int) -> str:
+    """Name an enum value, decomposing bitmasks such as BORDER_SIDE.
+
+    Only single-bit members are combined, and only when they account for every
+    set bit. Otherwise a sequential enum like FLEX_FLOW would render an
+    out-of-range value as a meaningless list of its low members.
+    """
+    names = ENUM_PROP_VALUES[prop_id]
+    if raw in names:
+        return names[raw]
+    parts, covered = [], 0
+    for bit in sorted(b for b in names if b and not b & (b - 1)):
+        if raw & bit:
+            parts.append(names[bit])
+            covered |= bit
+    return "|".join(parts) if parts and covered == raw else str(raw)
+
+
+def read_symbol(addr: int) -> "str | None":
+    """Resolve an address to its C symbol name, or None."""
+    if addr not in _symbol_cache:
+        try:
+            out = gdb.execute(f"info symbol {addr:#x}", to_string=True).strip()
+        except gdb.error:
+            out = ""
+        name = out.split(" in section ")[0] if " in section " in out else None
+        _symbol_cache[addr] = name
+    return _symbol_cache[addr]
+
+
+def _forget_symbols(_event=None):
+    """Addresses move when the program is re-run, so the cache must not outlive it."""
+    _symbol_cache.clear()
+
+
+try:
+    gdb.events.exited.connect(_forget_symbols)
+    gdb.events.new_objfile.connect(_forget_symbols)
+except AttributeError:
+    pass  # older GDB, or imported outside a debug session
+
+
+def _read_image_src(addr: int) -> "str | None":
+    """Read an image source pointer the way lv_image_src_get_type() does."""
     try:
-        if prop_id in COLOR_PROPS:
-            color = value.color
-            r = int(color.red) & 0xFF
-            g = int(color.green) & 0xFF
-            b = int(color.blue) & 0xFF
-            block = f"\033[48;2;{r};{g};{b}m  \033[0m"
-            return f"#{r:02x}{g:02x}{b:02x} {block}"
-        elif prop_id in POINTER_PROPS:
-            ptr = int(value.ptr)
-            return f"{ptr:#x}" if ptr else "NULL"
-        else:
-            return str(int(value.num))
-    except CorruptedError:
-        return str(value)
+        # bytes(): GDB returns a memoryview whose element type differs
+        # between versions - b'\xf3' on some, 243 on others.
+        first = bytes(gdb.selected_inferior().read_memory(addr, 1))[0]
+        if first == _IMAGE_HEADER_MAGIC or first == _IMAGE_HEADER_LEGACY:
+            return None  # an lv_image_dsc_t, so the symbol name is the useful part
+        return gdb.Value(addr).cast(gdb.lookup_type("char").pointer()).string()
+    except (gdb.error, gdb.MemoryError, UnicodeDecodeError):
+        return None
+
+
+def _format_pointer(prop_id: int, addr: int) -> str:
+    """Name a pointer property: its symbol, the string it points at, or its address."""
+    if not addr:
+        return "NULL"
+    symbol = read_symbol(addr)
+    if symbol:
+        return symbol
+    if prop_id in SRC_PROPS:
+        text = _read_image_src(addr)
+        if text:
+            return text
+    return f"{addr:#x}"
 
 
 def _style_value_data(prop_id: int, value: Value) -> dict:
     """Extract style value as pure data dict (no ANSI codes).
 
-    Returns dict with 'value_str' and optional 'color_rgb'.
+    Returns dict with 'value_str', optional 'color_rgb' and, for pointers,
+    'ptr' so the raw address is never lost behind a resolved name.
     """
     try:
         if prop_id in COLOR_PROPS:
@@ -71,11 +163,30 @@ def _style_value_data(prop_id: int, value: Value) -> dict:
             }
         elif prop_id in POINTER_PROPS:
             ptr = int(value.ptr)
-            return {"value_str": f"{ptr:#x}" if ptr else "NULL"}
+            data = {"value_str": _format_pointer(prop_id, ptr)}
+            if ptr:
+                data["ptr"] = f"{ptr:#x}"
+            return data
+        elif prop_id in ENUM_PROP_VALUES:
+            return {"value_str": decode_enum(prop_id, int(value.num))}
+        elif prop_id in BOOL_PROPS:
+            return {"value_str": "true" if int(value.num) else "false"}
+        elif prop_id in COORD_PROPS:
+            return {"value_str": decode_coord(int(value.num))}
         else:
             return {"value_str": str(int(value.num))}
     except CorruptedError:
         return {"value_str": str(value)}
+
+
+def format_style_value(prop_id: int, value: Value) -> str:
+    """Format a style value based on property type (with ANSI color block)."""
+    data = _style_value_data(prop_id, value)
+    rgb = data.get("color_rgb")
+    if rgb:
+        block = f"\033[48;2;{rgb['r']};{rgb['g']};{rgb['b']}m  \033[0m"
+        return f"{data['value_str']} {block}"
+    return data["value_str"]
 
 
 @dataclass
