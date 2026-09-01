@@ -128,9 +128,15 @@ def eval_c_expr(expr: str, known: dict) -> "int | None":
     if not re.fullmatch(r"[\d\sxXa-fA-F|&^~<>+\-*/()]+", expr):
         return None
     try:
-        return int(eval(expr, {"__builtins__": {}}, {}))
+        value = int(eval(expr, {"__builtins__": {}}, {}))
     except Exception:
         return None
+    # Python's ints are unbounded, so ~0x0F is -16 where C's 32-bit unsigned
+    # gives 0xFFFFFFF0. Only complement can produce that difference here: the
+    # other operators agree for the values LVGL's headers hold.
+    if "~" in expr and value < 0:
+        value &= 0xFFFFFFFF
+    return value
 
 
 def parse_bitmask_enum(path: Path, enum_type: str, prefix: str,

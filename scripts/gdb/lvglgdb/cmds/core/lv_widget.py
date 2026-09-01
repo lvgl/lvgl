@@ -73,6 +73,8 @@ def resolved_name(obj) -> str:
 
 def _sibling_screens(obj):
     """The screen list holding this screen, or None if it is not a screen."""
+    if not curr_inst().ensure_init():
+        return None
     for disp in curr_inst().displays():
         try:
             found = list(disp.screens)
@@ -90,8 +92,12 @@ def name_path(obj) -> str:
     seen = set()
     while node is not None and int(node) not in seen:
         seen.add(int(node))
-        parts.append(resolved_name(node))
-        parent = node.super_value("parent")
+        try:
+            parts.append(resolved_name(node))
+            parent = node.super_value("parent")
+        except CorruptedError:
+            parts.append("?")
+            break
         node = LVObject(parent) if parent.is_ok and int(parent) else None
     return "/".join(reversed(parts))
 
@@ -116,20 +122,24 @@ def find_by_name(name, parent=None):
     screen, every match is collected: in the debugger an ambiguous name is
     worth seeing rather than silently resolving to one of several widgets.
     """
-    roots = [parent] if parent is not None else screens()
     found = []
 
-    def walk(obj):
+    def walk(obj, matchable=True):
         try:
-            if _name_is(obj, name):
+            if matchable and _name_is(obj, name):
                 found.append(obj)
             for child in obj.children:
                 walk(child)
         except CorruptedError:
             pass
 
-    for root in roots:
-        walk(root)
+    if parent is not None:
+        # Like lv_obj_find_by_name(), the search starts below the parent: with
+        # `info widget dialog -p dialog` the parent itself is not the answer.
+        walk(parent, matchable=False)
+    else:
+        for root in screens():
+            walk(root)
     return found
 
 

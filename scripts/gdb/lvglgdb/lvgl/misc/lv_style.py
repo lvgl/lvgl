@@ -68,6 +68,8 @@ def decode_coord(raw: int) -> str:
     plain = bits & ~_COORD_TYPE_MASK
     if plain == _COORD_MAX:
         return "content"
+    # Not unreachable: _COORD_TYPE_MASK covers bits 29-30 only, so a negative
+    # raw keeps bit 31 in `plain`. LVGL's LV_COORD_IS_PCT() guards the same way.
     if plain > _PCT_STORED_MAX:
         return str(raw)
     pct = plain if plain <= _PCT_POS_MAX else _PCT_POS_MAX - plain
@@ -119,7 +121,9 @@ except AttributeError:
 def _read_image_src(addr: int) -> "str | None":
     """Read an image source pointer the way lv_image_src_get_type() does."""
     try:
-        first = int(gdb.selected_inferior().read_memory(addr, 1)[0][0])
+        # bytes(): GDB returns a memoryview whose element type differs
+        # between versions - b'\xf3' on some, 243 on others.
+        first = bytes(gdb.selected_inferior().read_memory(addr, 1))[0]
         if first == _IMAGE_HEADER_MAGIC or first == _IMAGE_HEADER_LEGACY:
             return None  # an lv_image_dsc_t, so the symbol name is the useful part
         return gdb.Value(addr).cast(gdb.lookup_type("char").pointer()).string()
