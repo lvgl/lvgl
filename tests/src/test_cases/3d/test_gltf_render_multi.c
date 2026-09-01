@@ -60,6 +60,48 @@ void test_gltf_render_two_views_side_by_side(void)
     TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_two_views"));
 }
 
+void test_gltf_render_after_removing_a_model(void)
+{
+    lv_obj_t * gltf = create_view();
+    TEST_ASSERT_NOT_NULL(lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf")));
+
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_one_model"));
+
+    lv_gltf_model_t * second = lv_gltf_load_model_from_file(gltf, ASSET("cameras.gltf"));
+    TEST_ASSERT_NOT_NULL(second);
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_two_models"));
+
+    lv_gltf_remove_model(gltf, second);
+    TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(gltf));
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_one_model"));
+}
+
+void test_gltf_render_after_removing_a_transmissive_model(void)
+{
+    lv_obj_t * gltf = create_view();
+    TEST_ASSERT_NOT_NULL(lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf")));
+
+    lv_gltf_model_t * transmissive = lv_gltf_load_model_from_file(gltf, ASSET("materials.gltf"));
+    TEST_ASSERT_NOT_NULL(transmissive);
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    lv_gltf_remove_model(gltf, transmissive);
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_one_model"));
+}
+
+void test_gltf_render_after_removing_all_models(void)
+{
+    lv_obj_t * gltf = create_view();
+    TEST_ASSERT_NOT_NULL(lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf")));
+
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_one_model"));
+
+    lv_gltf_remove_all_models(gltf);
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_without_model"));
+}
+
 /* Deleting a view while another one keeps rendering must not disturb the survivor */
 void test_gltf_render_after_deleting_another_view(void)
 {
@@ -96,6 +138,18 @@ void test_gltf_render_two_views_side_by_side(void)
 }
 
 void test_gltf_render_after_deleting_another_view(void)
+{
+}
+
+void test_gltf_render_after_removing_a_model(void)
+{
+}
+
+void test_gltf_render_after_removing_a_transmissive_model(void)
+{
+}
+
+void test_gltf_render_after_removing_all_models(void)
 {
 }
 
