@@ -280,6 +280,7 @@ static uint16_t ttf_get_glyph_pair_kerning_width(const ttf_font_desc_t * dsc, ui
         /* No cache, call the create function directly */
         bool ret = tiny_ttf_kerning_cache_create_cb(&kerning_cache_search_key, (void *)&kerning_cache_create_data);
         LV_ASSERT(ret);
+        LV_UNUSED(ret);
         return kerning_cache_search_key.adv_w16;
     }
 
