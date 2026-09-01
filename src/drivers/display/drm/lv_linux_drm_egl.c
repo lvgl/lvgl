@@ -568,40 +568,7 @@ open_err:
 static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
-    int32_t target_w = lv_display_get_horizontal_resolution(ctx->display);
-    int32_t target_h = lv_display_get_vertical_resolution(ctx->display);
-
-#if LV_COLOR_DEPTH == 16
-    lv_color_format_t target_cf = LV_COLOR_FORMAT_RGB565;
-#elif LV_COLOR_DEPTH == 32
-    lv_color_format_t target_cf = LV_COLOR_FORMAT_ARGB8888;
-#else
-#error("Unsupported color format")
-#endif
-
-
-    for(size_t i = 0; i < config_count; ++i) {
-        LV_LOG_TRACE("Got config %zu %#x %dx%d %d %d %d %d buffer size %d depth %d  samples %d stencil %d surface type %d",
-                     i, configs[i].id,
-                     configs[i].max_width, configs[i].max_height, configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
-                     configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].stencil, configs[i].surface_type);
-    }
-
-    for(size_t i = 0; i < config_count; ++i) {
-        lv_color_format_t config_cf = lv_opengles_egl_color_format_from_egl_config(&configs[i]);
-        const bool resolution_matches = configs[i].max_width >= target_w &&
-                                        configs[i].max_height >= target_h;
-        const bool is_nanovg_compatible = (configs[i].renderable_type & EGL_OPENGL_ES2_BIT) != 0 &&
-                                          configs[i].stencil == 8 && configs[i].samples == 4;
-        const bool is_window = (configs[i].surface_type & EGL_WINDOW_BIT) != 0;
-        const bool is_compatible_with_draw_unit = is_nanovg_compatible || !LV_USE_DRAW_NANOVG;
-
-        if(is_window && resolution_matches && config_cf == target_cf && is_compatible_with_draw_unit) {
-            LV_LOG_TRACE("Choosing config %zu", i);
-            return i;
-        }
-    }
-    return config_count;
+    return lv_opengles_egl_display_select_config(ctx->display, configs, config_count);
 }
 
 
