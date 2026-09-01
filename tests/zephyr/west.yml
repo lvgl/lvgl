@@ -1,0 +1,30 @@
+# West manifest for building Zephyr's LVGL samples against this LVGL checkout.
+#
+# This file is the single source of truth for which Zephyr the CI checks LVGL
+# against (see .github/workflows/zephyr.yml). To move to another Zephyr -- a
+# newer release, or an lvgl/zephyr fork carrying fixes that are not upstream yet
+# -- change `url-base` and/or `revision` below and nothing else.
+#
+# See README.md in this directory for how to reproduce the CI locally.
+#
+# LVGL itself is deliberately *not* a project here: it is blocklisted from
+# Zephyr's own manifest and injected through ZEPHYR_EXTRA_MODULES, so the code
+# under test is used instead of the LVGL revision Zephyr pins.
+manifest:
+  remotes:
+    - name: zephyr-upstream
+      url-base: https://github.com/zephyrproject-rtos
+
+  defaults:
+    remote: zephyr-upstream
+
+  projects:
+    - name: zephyr
+      repo-path: zephyr
+      revision: v4.4.2
+      import:
+        name-blocklist:
+          - lvgl
+          # Only needed for the nRF babblesim boards, and it depends on
+          # hal_nordic, which the -hal group filter excludes. See README.md.
+          - nrf_hw_models

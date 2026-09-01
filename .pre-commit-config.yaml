@@ -5,6 +5,13 @@ repos:
     rev: v3.2.0
     hooks:
     -   id: trailing-whitespace
+        # Patch files must stay byte-exact: in a unified diff a blank context
+        # line is a single space, and a patched line may legitimately end in
+        # whitespace. Rewriting either can stop the patch from applying.
+        exclude: |
+            (?x)^(
+                tests/zephyr/patches/
+             )
 
 -   repo: local
     hooks:
