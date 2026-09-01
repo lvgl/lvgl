@@ -87,6 +87,16 @@ extern "C" {
 #define GL_RGB565 GL_RGB
 #endif
 
+/* Desktop GL uploads single channel textures as GL_R8/GL_RED.
+ * GLES2 has no such format, GL_LUMINANCE is the equivalent there. */
+#ifndef GL_R8
+#define GL_R8 GL_LUMINANCE
+#endif /*GL_R8*/
+
+#ifndef GL_RED
+#define GL_RED GL_LUMINANCE
+#endif /*GL_RED*/
+
 #if !defined(glClearDepthf) && defined(glClearDepth)
 #define glClearDepthf glClearDepth
 #endif
@@ -180,6 +190,26 @@ void lv_opengles_render_texture_internal(unsigned int texture, const lv_area_t *
  * Internal implementation of @ref lv_opengles_render_display_texture
  */
 void lv_opengles_render_display_texture_internal(lv_display_t * display, bool h_flip, bool v_flip);
+
+/**
+ * Upload a pixel buffer into an OpenGL texture
+ * @param texture_id    the OpenGL texture ID to upload into
+ * @param buf           the pixel buffer. @nullable. Can be `NULL` to only define the size and the format
+ * @param w             width of the buffer in pixels
+ * @param h             height of the buffer in pixels
+ * @param stride        stride of the buffer in bytes. Ignored when `buf` is `NULL`
+ */
+void lv_opengles_texture_upload_buf(unsigned int texture_id, const void * buf, int32_t w, int32_t h,
+                                    uint32_t stride);
+
+/**
+ * Upload the rendered buffer of a display into an OpenGL texture.
+ * @param texture_id    the OpenGL texture ID to upload into
+ * @param display       the display the buffer belongs to
+ * @param buf           the pixel buffer. @nullable. Can be `NULL` to only define the size and the format
+ */
+void lv_opengles_texture_upload_display_buf(unsigned int texture_id, lv_display_t * display, const void * buf);
+
 /**********************
  *      MACROS
  **********************/

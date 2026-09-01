@@ -159,6 +159,42 @@ void lv_opengles_render_params_init(lv_opengles_render_params_t * params)
     lv_memzero(params, sizeof(lv_opengles_render_params_t));
 }
 
+void lv_opengles_texture_upload_buf(unsigned int texture_id, const void * buf, int32_t w, int32_t h,
+                                    uint32_t stride)
+{
+    const uint8_t px_size = lv_color_format_get_size(LV_COLOR_FORMAT_DEFAULT);
+
+    LV_PROFILER_DRAW_BEGIN;
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture_id));
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+    GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, (GLint)(stride / px_size)));
+
+    /*Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
+#if LV_COLOR_DEPTH == 8
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, buf));
+#elif LV_COLOR_DEPTH == 16
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, w, h, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buf));
+#elif LV_COLOR_DEPTH == 24
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, buf));
+#elif LV_COLOR_DEPTH == 32
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf));
+#else
+#error("Unsupported color format")
+#endif
+
+    GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_texture_upload_display_buf(unsigned int texture_id, lv_display_t * display, const void * buf)
+{
+    LV_ASSERT(display != NULL);
+    const lv_color_format_t cf = lv_display_get_color_format(display);
+    const int32_t w = lv_display_get_horizontal_resolution(display);
+    const int32_t h = lv_display_get_vertical_resolution(display);
+    lv_opengles_texture_upload_buf(texture_id, buf, w, h, lv_draw_buf_width_to_stride(w, cf));
+}
+
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {

@@ -532,26 +532,11 @@ static void window_update_handler(lv_timer_t * t)
 #if !LV_USE_DRAW_OPENGLES
                 ensure_init_window_display_texture();
 
-                GL_CALL(glBindTexture(GL_TEXTURE_2D, window_display_texture));
-
                 /* set the dimensions and format to complete the texture */
-                /* Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
-#if LV_COLOR_DEPTH == 8
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_RED, GL_UNSIGNED_BYTE, texture->fb));
-#elif LV_COLOR_DEPTH == 16
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                                     texture->fb));
-#elif LV_COLOR_DEPTH == 24
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_RGB, GL_UNSIGNED_BYTE, texture->fb));
-#elif LV_COLOR_DEPTH == 32
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_RGBA, GL_UNSIGNED_BYTE, texture->fb));
-#else
-#error("Unsupported color format")
-#endif
+                const int32_t tex_w = lv_area_get_width(&texture->area);
+                const int32_t tex_h = lv_area_get_height(&texture->area);
+                const uint32_t tex_stride = lv_draw_buf_width_to_stride(tex_w, lv_display_get_color_format(texture->disp));
+                lv_opengles_texture_upload_buf(window_display_texture, texture->fb, tex_w, tex_h, tex_stride);
 
                 GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 

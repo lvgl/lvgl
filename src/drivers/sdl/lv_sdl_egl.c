@@ -193,12 +193,7 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
     LV_ASSERT(ddata != NULL);
 
     if(lv_display_flush_is_last(display)) {
-#if LV_USE_DRAW_OPENGLES
-        lv_opengles_viewport(0, 0,
-                             lv_display_get_original_horizontal_resolution(display),
-                             lv_display_get_original_vertical_resolution(display));
-        lv_opengles_render_display_texture_internal(display, false, true);
-#endif /*LV_USE_DRAW_OPENGLES*/
+        lv_opengles_texture_render_display(&ddata->opengles_texture, display);
         lv_opengles_egl_update(ddata->egl_ctx);
     }
     lv_display_flush_ready(display);
