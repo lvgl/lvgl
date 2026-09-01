@@ -115,6 +115,12 @@ lv_color_t lv_theme_get_color_primary(lv_obj_t * obj);
  */
 lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
 
+/**
+ * Get the user_data field of the theme
+ * @param theme pointer to a theme
+ * @return the pointer to the user_data of the theme (can be NULL if not set)
+ */
+void * lv_theme_get_user_data(const lv_theme_t * theme);
 
 /**
  * Delete a theme
