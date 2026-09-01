@@ -39,7 +39,7 @@ variable (`my_label`), a member chain (`obj->parent`), the address of a global
 and a pointer to it are both accepted, so `info style my_style` and
 `info style &my_style` do the same thing.
 
-- `dump obj [-L <depth>] [<lv_obj_t *>]`: Dump the widget tree, from the given
+- `dump obj [-L <depth>] [<widget>]`: Dump the widget tree, from the given
   widget or from every display's screens.
 - `dump display [-p <prefix>] [-f bmp|png]`: Export the default display's draw
   buffers to image files.
@@ -55,11 +55,12 @@ and a pointer to it are both accepted, so `info style my_style` and
   `dump draw_task lv_global->disp_default->layer_head`.
 - `dump dashboard [-o <file>] [--json|--viewer]`: Generate an HTML dashboard of
   all LVGL runtime state.
-- `dump widget props [<class>|<lv_obj_t *>]`: List the fields a widget has, by
+- `dump widget props [<class>|<widget>]`: List the fields a widget has, by
   class name (`lv_keyboard`) or from a live widget. With no argument, lists the
   widget classes.
-- `info widget [<lv_obj_t *>] [<field>...]`: Inspect one widget, or list every
-  widget. Field names limit the output to those fields.
+- `info widget [<widget>] [<field>...] [-p <path>]`: Inspect one widget, or
+  list every widget. The widget can be named instead of addressed. Field names
+  limit the output to those fields.
 - `info style <lv_style_t>`: Inspect a single style.
 - `info style --obj <lv_obj_t *>`: Inspect all styles of a widget.
 - `info draw_unit`: Print raw struct details for each drawing unit.
@@ -84,15 +85,16 @@ be supported.
 
 `dump obj -L 2`: Dump the object tree with a depth of 2.
 
-`dump obj <lv_obj_t *>`: Dump the tree starting from that widget, e.g.
-`dump obj my_screen`, `dump obj lv_global->disp_default->act_scr`, or
-`dump obj 0x507000025da0`.
+`dump obj <widget>`: Dump the tree starting from that widget, named or
+addressed - `dump obj main_screen_0`, `dump obj my_screen`,
+`dump obj lv_global->disp_default->act_scr`, or `dump obj 0x507000025da0`. See
+[Naming a widget](#naming-a-widget).
 
 Each line carries the widget's name, its position and size, any non-default
 state, and a summary of what the widget holds - a label's text, an arc's value.
 `info widget` prints the very same listing, so it does not matter which of the
 two you reach for; to see everything about one of the widgets listed, pass its
-address to `info widget`.
+name or address to `info widget`.
 
 ## Inspect Widget
 
@@ -113,9 +115,33 @@ the ones the full listing prints, so `text`, `long_mode`, `coords`, `flags`.
 `info widget <widget> --tree`: List the subtree below one widget instead of
 detailing it.
 
-Wherever these commands take a widget, any C expression GDB can evaluate to an
-`lv_obj_t *` will do: a variable (`my_label`), a member chain
-(`lv_global->disp_default->act_scr`), or a plain address (`0x50e000000820`).
+### Naming a widget
+
+Wherever these commands take a widget, it can be given four ways:
+
+- a **name**: `info widget ball_1`. Names are resolved as
+  `lv_obj_get_name_resolved()` resolves them, so a trailing `#` becomes the
+  index among the siblings sharing that name, and a widget that was never named
+  answers to `<class>_<n>` - `lv_label_0`. The name it was given works too, so
+  `main_screen_#` and `main_screen_0` both find the same screen.
+- a **name path** from the screen down: `info widget main_screen_0/lv_button_0/label3`.
+- a name plus **`-p` / `--parent`**, which is where the search starts:
+  `info widget label3 -p screen_1/button_2` looks for `label3` anywhere below
+  `screen_1/button_2`.
+- a **C expression** GDB can evaluate to an `lv_obj_t *`: a variable
+  (`my_label`), a member chain (`lv_global->disp_default->act_scr`), or a plain
+  address (`0x50e000000820`).
+
+A bare name is searched across every screen of every display, and every match
+is reported rather than the first one:
+
+```text
+(gdb) info widget lv_label_0
+Error: 'lv_label_0' matches 2 widgets:
+  lv_obj_3/lv_label_0  (lv_label @0x50e000000820)
+  main_screen_0/lv_button_0/lv_label_0  (lv_label @0x50e000037160)
+Narrow it down with --parent, or pass a name path.
+```
 
 Example:
 

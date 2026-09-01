@@ -26,6 +26,196 @@ from lvglgdb.value import CorruptedError
 _LABEL_W = 14
 
 
+# --- finding a widget by name ------------------------------------------------
+#
+# The names are resolved the way lv_obj_get_name_resolved() resolves them, and
+# the search follows lv_obj_find_by_name() / lv_obj_get_child_by_name(): a
+# trailing '#' is an auto-index over the siblings sharing that name, and a
+# widget that was never named answers to `<class>_<n>`. Reimplementing this
+# rather than calling into the target keeps it working on a core dump, where
+# nothing can be called.
+
+
+def resolved_name(obj) -> str:
+    """The name `lv_obj_get_name_resolved()` would produce for this widget."""
+    raw = obj._get_name()
+    auto = raw is None
+    name = f"{obj.class_name}_#" if auto else raw
+
+    if not name.endswith("#"):
+        return name
+
+    parent = obj.super_value("parent")
+    parent = LVObject(parent) if parent.is_ok and int(parent) else None
+    # A screen has no parent, so its siblings are the other screens of its
+    # display. LVGL leaves the '#' unresolved there; indexing it as well is what
+    # makes a screen the typable first segment of a name path.
+    siblings = parent.children if parent is not None else _sibling_screens(obj)
+    if siblings is None:
+        return name
+
+    index = 0
+    for sibling in siblings:
+        if int(sibling) == int(obj):
+            return name[:-1] + str(index)
+        sibling_name = sibling._get_name()
+        if sibling_name is None:
+            # An unnamed sibling counts when the name we resolve is its own
+            # auto name, i.e. `<its class>_#`.
+            class_name = sibling.class_name
+            if len(name) > 3 and len(class_name) == len(name) - 2 \
+                    and name.startswith(class_name):
+                index += 1
+        elif sibling_name == name:
+            index += 1
+    return name
+
+
+def _sibling_screens(obj):
+    """The screen list holding this screen, or None if it is not a screen."""
+    for disp in curr_inst().displays():
+        try:
+            found = list(disp.screens)
+        except CorruptedError:
+            continue
+        if any(int(s) == int(obj) for s in found):
+            return found
+    return None
+
+
+def name_path(obj) -> str:
+    """The resolved names from the screen down to this widget, slash separated."""
+    parts = []
+    node = obj
+    seen = set()
+    while node is not None and int(node) not in seen:
+        seen.add(int(node))
+        parts.append(resolved_name(node))
+        parent = node.super_value("parent")
+        node = LVObject(parent) if parent.is_ok and int(parent) else None
+    return "/".join(reversed(parts))
+
+
+def screens():
+    """Every screen of every display, the roots a name path starts from."""
+    if not curr_inst().ensure_init():
+        return []
+    result = []
+    for disp in curr_inst().displays():
+        try:
+            result.extend(disp.screens)
+        except CorruptedError:
+            continue
+    return result
+
+
+def find_by_name(name, parent=None):
+    """Widgets called *name* below *parent*, or below every screen.
+
+    Unlike `lv_obj_find_by_name()`, which stops at the first hit on the active
+    screen, every match is collected: in the debugger an ambiguous name is
+    worth seeing rather than silently resolving to one of several widgets.
+    """
+    roots = [parent] if parent is not None else screens()
+    found = []
+
+    def walk(obj):
+        try:
+            if _name_is(obj, name):
+                found.append(obj)
+            for child in obj.children:
+                walk(child)
+        except CorruptedError:
+            pass
+
+    for root in roots:
+        walk(root)
+    return found
+
+
+def find_by_path(path, parent=None):
+    """The widget at a slash separated name path, or None.
+
+    With no *parent* the first segment names a screen, so
+    `screen_1/button_2/label3` is a whole path from the top.
+    """
+    segments = [seg for seg in path.split("/") if seg]
+    if not segments:
+        return None
+
+    if parent is None:
+        candidates = [s for s in screens() if _name_is(s, segments[0])]
+        segments = segments[1:]
+    else:
+        candidates = [parent]
+
+    for segment in segments:
+        nxt = None
+        for candidate in candidates:
+            try:
+                for child in candidate.children:
+                    if _name_is(child, segment):
+                        nxt = child
+                        break
+            except CorruptedError:
+                continue
+            if nxt is not None:
+                break
+        if nxt is None:
+            return None
+        candidates = [nxt]
+
+    return candidates[0] if candidates else None
+
+
+def _name_is(obj, name) -> bool:
+    """A widget answers to its resolved name and to the raw one it was given."""
+    try:
+        return name in (resolved_name(obj), obj._get_name())
+    except CorruptedError:
+        return False
+
+
+def resolve_widget(token, parent_path=None):
+    """Turn what the user typed into one widget, or explain why it is not one.
+
+    Returns (widget, error). The token is a C expression when GDB can evaluate
+    it - a variable, a member chain, an address - and a name or a name path
+    otherwise.
+    """
+    parent = None
+    if parent_path:
+        parent, error = resolve_widget(parent_path)
+        if parent is None:
+            return None, f"--parent: {error}"
+
+    if "/" in token:
+        found = find_by_path(token, parent)
+        if found is None:
+            where = f" under {parent_path}" if parent_path else ""
+            return None, f"no widget at path '{token}'{where}"
+        return found, None
+
+    if parent is None:
+        try:
+            return LVObject(gdb.parse_and_eval(token)), None
+        except gdb.error:
+            pass  # not an expression, so it is a name
+
+    matches = find_by_name(token, parent)
+    if not matches:
+        where = f" under {parent_path}" if parent_path else ""
+        return None, f"no widget named '{token}'{where}"
+    if len(matches) > 1:
+        lines = [f"'{token}' matches {len(matches)} widgets:"]
+        lines += [
+            f"  {name_path(m)}  ({m.class_name} @{hex(int(m))})" for m in matches
+        ]
+        lines.append("Narrow it down with --parent, or pass a name path.")
+        return None, "\n".join(lines)
+    return matches[0], None
+
+
 def _snapshot(obj) -> dict:
     """Snapshot of a single widget, widget_data included, children excluded."""
     return LVObject._wrap_as_widget(obj).snapshot().as_dict()
@@ -53,20 +243,22 @@ def _size_str(d) -> str:
     return f"({x1},{y1})-({x2},{y2})  {x2 - x1 + 1}x{y2 - y1 + 1}"
 
 
-def _headline(d) -> str:
-    name = d.get("name")
+def _headline(obj, d) -> str:
     gist = specs.summary(d.get("class_name", ""), d.get("widget_data"))
     parts = [f"{d.get('class_name', '?')} @{d.get('addr', '?')}"]
-    if name:
-        parts.append(f"name={name}")
+    try:
+        parts.append(f"name={resolved_name(obj)}")
+    except CorruptedError:
+        pass
     if gist:
         parts.append(f'"{gist}"' if not gist.startswith('"') else gist)
     return "  ".join(parts)
 
 
-def _compact(d) -> str:
+def _compact(obj) -> str:
     """One line for the tree listing."""
-    line = _headline(d)
+    d = _snapshot(obj)
+    line = _headline(obj, d)
     c = d.get("coords") or {}
     x1, y1 = c.get("x1", 0), c.get("y1", 0)
     line += f"  ({x1},{y1}) {c.get('x2', 0) - x1 + 1}x{c.get('y2', 0) - y1 + 1}"
@@ -194,7 +386,7 @@ def print_widget(obj, expr=None):
     """Print everything known about one widget."""
     d = _snapshot(obj)
 
-    print(_headline(d))
+    print(_headline(obj, d))
     chain = []
     cls = obj.obj_class
     if cls:
@@ -247,7 +439,7 @@ def print_widget(obj, expr=None):
         print("  children")
         for i, child in enumerate(children):
             try:
-                print(f"    [{i}] {_compact(_snapshot(child))}")
+                print(f"    [{i}] {_compact(child)}")
             except CorruptedError as e:
                 print(f"    [{i}] (corrupted: {e})")
 
@@ -255,7 +447,7 @@ def print_widget(obj, expr=None):
 def print_tree(obj, depth=0, limit=None):
     """Print one compact line per widget, indented by tree depth."""
     try:
-        print("  " * depth + _compact(_snapshot(obj)))
+        print("  " * depth + _compact(obj))
     except CorruptedError as e:
         print("  " * depth + f"(corrupted: {e})")
         return
@@ -302,7 +494,7 @@ class InfoWidget(gdb.Command):
             "-t",
             "--tree",
             action="store_true",
-            help="List the subtree of <expr> instead of its details.",
+            help="List the subtree of the widget instead of its details.",
         )
         parser.add_argument(
             "-L",
@@ -312,35 +504,53 @@ class InfoWidget(gdb.Command):
             help="Limit the depth of a listing.",
         )
         parser.add_argument(
-            "expr",
+            "-p",
+            "--parent",
             type=str,
-            nargs="?",
             default=None,
-            help="A widget: a variable, a member chain, or its address.",
+            help="Search for the name below this widget, e.g. screen_1/button_2.",
         )
         parser.add_argument(
-            "fields",
+            "widget_and_fields",
+            metavar="widget [field...]",
             type=str,
             nargs="*",
-            help="Field names to print instead of the whole widget.",
+            help="The widget - a name, a name path, an expression or an address"
+                 " - then the field names to print instead of the whole widget.",
         )
         try:
-            opts = parser.parse_args(gdb.string_to_argv(args))
+            # parse_known_args, because argparse fills a positional list in one
+            # go: in `info widget label3 -p screen_1 text` everything after the
+            # option would be dropped as unrecognised. The leftovers are the
+            # rest of the positionals, in the order they were typed.
+            opts, rest = parser.parse_known_args(gdb.string_to_argv(args))
         except SystemExit:
             return
 
-        if opts.expr:
-            try:
-                obj = LVObject(gdb.parse_and_eval(opts.expr))
-            except gdb.error as e:
-                print(f"Error: {e}")
+        flags = [word for word in rest if word.startswith("-")]
+        if flags:
+            print(f"Error: unknown option {flags[0]}")
+            return
+
+        positional = opts.widget_and_fields + rest
+        widget = positional[0] if positional else None
+        opts.fields = positional[1:]
+
+        if opts.parent and not widget:
+            print("Error: --parent needs a name to look for.")
+            return
+
+        if widget:
+            obj, error = resolve_widget(widget, opts.parent)
+            if obj is None:
+                print(f"Error: {error}")
                 return
             if opts.tree:
                 print_tree(obj, limit=opts.level)
             elif opts.fields:
                 print_widget_fields(obj, opts.fields)
             else:
-                print_widget(obj, expr=opts.expr)
+                print_widget(obj, expr=widget)
             return
 
         print_all_widgets(limit=opts.level)
@@ -473,12 +683,15 @@ class DumpWidgetProps(gdb.Command):
             print_widget_props(opts.target)
             return
 
-        try:
-            obj = LVObject(gdb.parse_and_eval(opts.target))
-            d = _snapshot(obj)
-        except (gdb.error, CorruptedError):
+        obj, error = resolve_widget(opts.target)
+        if obj is None:
             print(f"'{opts.target}' is neither a widget class nor a widget.")
-            print_widget_classes()
+            print(f"({error})")
+            return
+        try:
+            d = _snapshot(obj)
+        except CorruptedError as e:
+            print(f"Error: {e}")
             return
         live = _friendly_names(
             k for k in d if k not in ("widget_data", "children", "styles")

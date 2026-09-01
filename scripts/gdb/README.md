@@ -49,6 +49,9 @@ info widget                     # List every widget, indented by tree depth
 info widget my_obj              # All fields of one widget, incl. its own struct
 info widget 0x50e000000820      # ...an address works as well as a variable
 info widget my_obj text         # Only the named field(s)
+info widget ball_1              # Find it by name, anywhere on any screen
+info widget label3 -p screen_1/button_2   # ...or by name below a parent path
+info widget screen_1/button_2/label3      # ...or by a full name path
 info style my_style             # Inspect a single lv_style_t
 info style --obj my_obj         # Inspect all styles of an lv_obj_t
                                 # sizes as 100%/content, enums and fonts by name

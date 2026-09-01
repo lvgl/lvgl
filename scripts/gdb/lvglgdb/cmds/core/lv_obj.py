@@ -2,8 +2,7 @@ import argparse
 
 import gdb
 
-from lvglgdb.lvgl import LVObject
-from .lv_widget import print_all_widgets, print_tree
+from .lv_widget import print_all_widgets, print_tree, resolve_widget
 
 
 class DumpObj(gdb.Command):
@@ -28,7 +27,7 @@ class DumpObj(gdb.Command):
             type=str,
             nargs="?",
             default=None,
-            help="Optional root obj to dump.",
+            help="Optional root widget: a name, a name path, or an expression.",
         )
         try:
             args = parser.parse_args(gdb.string_to_argv(args))
@@ -38,10 +37,9 @@ class DumpObj(gdb.Command):
         # The listing is `info widget`'s, so both commands print the same tree
         # and there is only one renderer to keep current with the widget data.
         if args.root:
-            try:
-                root = LVObject(gdb.parse_and_eval(args.root))
-            except gdb.error as e:
-                print(f"Error: {e}")
+            root, error = resolve_widget(args.root)
+            if root is None:
+                print(f"Error: {error}")
                 return
             print_tree(root, limit=args.level)
         else:
