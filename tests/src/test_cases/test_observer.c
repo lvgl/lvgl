@@ -499,27 +499,6 @@ void test_observer_group(void)
     lv_subject_set_int(&subject_sub2, 20);
     TEST_ASSERT_EQUAL(3, group_observer_called);
     TEST_ASSERT_EQUAL(10 + 20, group_value_sum);
-
-
-    static lv_subject_t * subject_list_new[3] = { &subject_sub3, &subject_sub4, &subject_sub5 };
-    lv_subject_set_group_list(&subject_main, subject_list_new, 3);
-    TEST_ASSERT_EQUAL_PTR(&subject_sub3,
-                          lv_subject_get_group_element(&subject_main, 0));
-    TEST_ASSERT_EQUAL_PTR(&subject_sub4,
-                          lv_subject_get_group_element(&subject_main, 1));
-    TEST_ASSERT_EQUAL_PTR(&subject_sub5,
-                          lv_subject_get_group_element(&subject_main, 2));
-    TEST_ASSERT_EQUAL_PTR(NULL,
-                          lv_subject_get_group_element(&subject_main, 3));
-
-    group_observer_called = 0;
-    lv_subject_set_int(&subject_sub2, 10000); /* This should not trigger the group observer callback */
-    TEST_ASSERT_EQUAL(0, group_observer_called);
-    TEST_ASSERT_EQUAL(3 + 4 + 5, group_value_sum);
-
-    lv_subject_set_int(&subject_sub5, 50);
-    TEST_ASSERT_EQUAL(1, group_observer_called);
-    TEST_ASSERT_EQUAL(3 + 4 + 50, group_value_sum);
 }
 
 void test_observer_obj_flag_invalid_subject(void)

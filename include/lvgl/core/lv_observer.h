@@ -231,16 +231,6 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value);
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value);
 
 /**
- * Assign user-supplied buffers for the `value` and `previous value` of a string subject.
- * Copies existing data into the new buffers before switching.
- * @param subject   pointer to Subject
- * @param buf       pointer to buffer to store string
- * @param prev_buf  pointer to buffer to store previous string; can be NULL if not used
- * @param size      size of buffer(s)
- */
-void lv_subject_set_buf(lv_subject_t * subject, char * buf, char * prev_buf, size_t size);
-
-/**
  * Copy a string to a Subject and notify Observers if it changed.
  * @param subject   pointer to Subject
  * @param buf       new string
@@ -332,16 +322,6 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject);
  * @param list_len       number of elements in `list[]`
  */
 void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len);
-
-/**
- * Set the list of Subjects for a Group-type Subject.
- * The previous subjects of the list will be removed from the group and the new list will be added instead.
- * @param group_subject  pointer to a group-type Subject
- * @param list           list of other Subject addresses; when any of these have values updated,
- *                       the Observers of `group_subject` will be notified.
- * @param list_len       number of elements in `list[]`
- */
-void lv_subject_set_group_list(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len);
 
 /**
  * Remove all Observers from a Subject and free allocated memory, and delete

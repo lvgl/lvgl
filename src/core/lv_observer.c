@@ -100,6 +100,16 @@ static void set_pointer_observer(lv_observer_t * observer, lv_subject_t * subjec
  *   GLOBAL FUNCTIONS
  **********************/
 
+#if LV_USE_EXT_DATA
+void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
+{
+    LV_CHECK_ARG(subject != NULL, return);
+
+    subject->ext_data.data = data;
+    subject->ext_data.free_cb = free_cb;
+}
+#endif
+
 void lv_subject_init_int(lv_subject_t * subject, int32_t value)
 {
     LV_CHECK_ARG(subject != NULL, return);
@@ -222,6 +232,8 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value)
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
     LV_CHECK_ARG(subject != NULL, return);
+    LV_CHECK_ARG(buf != NULL, return);
+    LV_CHECK_ARG(size > 0, return);
     LV_CHECK_ARG(value != NULL, return);
 
     lv_memzero(subject, sizeof(lv_subject_t));
@@ -234,25 +246,6 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
     subject->prev_value.pointer = prev_buf;
 
     lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
-}
-
-void lv_subject_set_buf(lv_subject_t * subject, char * buf, char * prev_buf, size_t size)
-{
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
-
-    if(buf) {
-        if(subject->value.pointer) lv_strlcpy(buf, subject->value.pointer, size);
-        else buf[0] = '\0';
-    }
-    if(prev_buf) {
-        if(subject->prev_value.pointer) lv_strlcpy(prev_buf, subject->prev_value.pointer, size);
-        else prev_buf[0] = '\0';
-    }
-
-    subject->size = (uint32_t)size;
-    subject->value.pointer = buf;
-    subject->prev_value.pointer = prev_buf;
 }
 
 void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
@@ -386,41 +379,18 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)
 void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len)
 {
     LV_CHECK_ARG(group_subject != NULL, return);
+    LV_CHECK_ARG(list != NULL, return);
 
     lv_memzero(group_subject, sizeof(lv_subject_t));
-    group_subject->type = LV_SUBJECT_TYPE_GROUP;
     lv_ll_init(&(group_subject->subs_ll), sizeof(lv_observer_t));
-
-    /* Bind all list[] subjects to `group_subject`. */
-    lv_subject_set_group_list(group_subject, list, list_len);
-}
-
-void lv_subject_set_group_list(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len)
-{
-    LV_CHECK_ARG(group_subject != NULL, return);
-    LV_CHECK_ARG(group_subject->type == LV_SUBJECT_TYPE_GROUP, return);
-
-    /* Unbind all previous subjects from `group_subject`. */
-    uint32_t i;
-    for(i = 0; i < group_subject->size; i++) {
-        lv_subject_t * sub = ((lv_subject_t **)(group_subject->value.pointer))[i];
-        lv_observer_t * observer;
-        LV_LL_READ(&sub->subs_ll, observer) {
-            if(observer->cb == group_notify_cb && observer->user_data == group_subject) {
-                lv_observer_delete(observer);
-                break;
-            }
-        }
-    }
-
+    group_subject->type = LV_SUBJECT_TYPE_GROUP;
     group_subject->size = list_len;
     group_subject->value.pointer = list;
+
     /* Bind all new subjects in `list[]` to `group_subject`. */
-    for(i = 0; i < list_len; i++) {
+    for(uint32_t i = 0; i < list_len; i++) {
         lv_subject_add_observer(list[i], group_notify_cb, group_subject);
     }
-
-    lv_subject_notify(group_subject);
 }
 
 lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)
@@ -435,11 +405,6 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 void lv_subject_deinit(lv_subject_t * subject)
 {
     if(subject == NULL) return;
-
-    /*Unsubscribe all subjects from the group */
-    if(subject->type == LV_SUBJECT_TYPE_GROUP) {
-        lv_subject_set_group_list(subject, NULL, 0);
-    }
 
     lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {
@@ -531,8 +496,8 @@ void lv_observer_delete(lv_observer_t * observer)
 
 #if LV_USE_EXT_DATA
     if(observer->subject->ext_data.free_cb) {
-        observer->subject->ext_data.free_cb(observer->subject->ext_data);
-        observer->subject->ext_data = NULL;
+        observer->subject->ext_data.free_cb(observer->subject->ext_data.data);
+        observer->subject->ext_data.data = NULL;
     }
 #endif
 
@@ -602,16 +567,6 @@ void lv_subject_notify(lv_subject_t * subject)
         }
     } while(subject->notify_restart_query);
 }
-
-#if LV_USE_EXT_DATA
-void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
-{
-    LV_CHECK_ARG(subject != NULL, return);
-
-    subject->ext_data = data;
-    subject->ext_data.free_cb = free_cb;
-}
-#endif
 
 lv_subject_increment_dsc_t * lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject,
                                                                 lv_event_code_t trigger, int32_t step)
