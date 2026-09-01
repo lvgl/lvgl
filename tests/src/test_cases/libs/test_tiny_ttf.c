@@ -108,7 +108,6 @@ void test_tiny_ttf_kerning(void)
 
 void test_tiny_ttf_missing_glyph_uses_fallback(void)
 {
-#if LV_USE_TINY_TTF && LV_FONT_MONTSERRAT_14
     extern const uint8_t test_ubuntu_font[];
     extern size_t test_ubuntu_font_size;
     const size_t cache_sizes[] = {0, 1};
@@ -127,9 +126,6 @@ void test_tiny_ttf_missing_glyph_uses_fallback(void)
     }
 
     TEST_ASSERT_EQUAL_UINT32(0, cache_error_count);
-#else
-    TEST_PASS();
-#endif
 }
 
 void test_tiny_ttf_gpos(void)
