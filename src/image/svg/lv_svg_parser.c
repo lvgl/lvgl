@@ -2113,6 +2113,7 @@ static void create_tokens_from_style_attr(lv_array_t * result, _lv_svg_token_att
 {
     lv_svg_attr_type_t type = _get_svg_attr_type(tok_attr->name_start, tok_attr->name_end);
     LV_ASSERT(type == LV_SVG_ATTR_STYLE);
+    LV_UNUSED(type);
     tok_attr->value_start = _skip_space(tok_attr->value_start, tok_attr->value_end);
 
     /*Generate extra tokens from a style attribute (eg: style="fill:none;stroke-width:6;")*/
