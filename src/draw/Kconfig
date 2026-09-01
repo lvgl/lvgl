@@ -202,5 +202,5 @@ endmenu
 
 menu "SDL"
 rsource "sdl/Kconfig"
-endmenu 
+endmenu
 endmenu
