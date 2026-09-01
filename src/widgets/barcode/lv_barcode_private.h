@@ -33,10 +33,20 @@ struct _lv_barcode_t {
     lv_canvas_t canvas;
     lv_color_t dark_color;
     lv_color_t light_color;
-    uint16_t scale;
+    char * data;                    /*Copy of the payload, kept so the bitmap can be regenerated on a property change*/
+    /*The encoded bars, one byte each - 0 for a light bar, 0xFF for a dark one - handed
+     *from the sizing pass to the fill so that one regeneration never encodes the payload
+     *twice. NULL when the fill has to encode it itself.*/
+    uint8_t * pattern;
+    int32_t bar_count;              /*Bars `data` encodes to; 0 when it is not known and has to be encoded*/
+    uint16_t scale;                 /*Pixel width of a single bar*/
     lv_dir_t direction;
-    bool tiled;
     lv_barcode_encoding_t encoding;
+    uint8_t tiled : 1;              /*Draw a one bar wide bitmap and let the image tiling repeat it*/
+    uint8_t update_mode : 1;        /*lv_barcode_update_mode_t: when a property change is regenerated*/
+    uint8_t needs_update : 1;       /*The bitmap is out of date; filled in on the next redraw (deferred mode)*/
+    uint8_t render_failed : 1;      /*The last generation attempt failed (or none has run yet)*/
+    uint8_t fitting : 1;            /*Guard against the re-entrant resize our own reallocation triggers*/
 };
 
 

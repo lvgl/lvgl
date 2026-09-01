@@ -136,10 +136,17 @@
       "fields": {
         "dark_color": "color",
         "light_color": "color",
+        "data": "string",
+        "pattern": "pointer",
+        "bar_count": "int",
         "scale": "int",
         "direction": "int",
+        "encoding": "int",
         "tiled": "bool",
-        "encoding": "int"
+        "update_mode": "bool",
+        "needs_update": "bool",
+        "render_failed": "bool",
+        "fitting": "bool"
       }
     }
   },
