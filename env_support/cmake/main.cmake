@@ -304,10 +304,13 @@ get_target_property(COMP_DEF lvgl COMPILE_DEFINITIONS)
 
 # The ThorVG sources are all guarded by LV_USE_THORVG_INTERNAL, so building them
 # with ThorVG disabled in the config yields an empty library that lvgl still links.
-if(DEFINED CONFIG_LV_USE_THORVG AND NOT CONFIG_LV_USE_THORVG
+if(LV_BUILD_SET_CONFIG_OPTS AND NOT CONFIG_LV_USE_THORVG
    AND CONFIG_LV_USE_THORVG_INTERNAL)
     message(STATUS "LV_USE_THORVG is disabled - not building ThorVG internal")
     set(CONFIG_LV_USE_THORVG_INTERNAL OFF)
+    if(HAS_PARENT_SCOPE)
+        set(CONFIG_LV_USE_THORVG_INTERNAL OFF PARENT_SCOPE)
+    endif()
 endif()
 
 if(CONFIG_LV_USE_THORVG_INTERNAL)
