@@ -425,6 +425,8 @@ static void wl_egl_destroy_window(void * driver_data, void * native_window)
     lv_wl_egl_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
 
     LV_ASSERT(ddata->egl_window == native_window);
+    LV_UNUSED(native_window);
+
     if(ddata->egl_window) {
         wl_egl_window_destroy(ddata->egl_window);
         ddata->egl_window = NULL;
