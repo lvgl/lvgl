@@ -105,6 +105,9 @@ struct _lv_opengles_egl {
  * GLOBAL PROTOTYPES
  **********************/
 
+size_t lv_opengles_egl_display_select_config(lv_display_t * display, const lv_egl_config_t * configs,
+                                             size_t config_count);
+
 /**********************
  *      MACROS
  **********************/
