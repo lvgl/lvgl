@@ -36,6 +36,7 @@ typedef struct {
     int32_t w;
     int32_t h;
     SDL_Texture * texture;
+    bool dsc_owned;
 } cache_data_t;
 
 /**********************
@@ -73,8 +74,9 @@ static void sdl_texture_cache_free_cb(cache_data_t * cached_data, void * user_da
 {
     LV_UNUSED(user_data);
 
-    lv_free(cached_data->draw_dsc);
+    if(cached_data->dsc_owned) lv_free(cached_data->draw_dsc);
     SDL_DestroyTexture(cached_data->texture);
+    cached_data->dsc_owned = false;
     cached_data->draw_dsc = NULL;
     cached_data->texture = NULL;
 }
@@ -181,6 +183,21 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
+
+    switch(task->type) {
+        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_TASK_TYPE_BORDER:
+        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+        case LV_DRAW_TASK_TYPE_LABEL:
+        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_TASK_TYPE_LINE:
+        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
+            break;
+        default:
+            return 0;
+    }
 
     if(task->type == LV_DRAW_TASK_TYPE_IMAGE &&
        ((lv_draw_image_dsc_t *)task->draw_dsc)->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
@@ -317,7 +334,8 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
                 break;
             }
         default:
-            return false;
+            /*Keep in sync with evaluate(): every type it claims must have a case above*/
+            LV_UNREACHABLE();
     }
 
     while(dest_layer.draw_task_head) {
@@ -336,6 +354,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
 
     cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
     lv_memcpy((void *)cache_data->draw_dsc, base_dsc, base_dsc->dsc_size);
+    cache_data->dsc_owned = true;
     cache_data->w = texture_w;
     cache_data->h = texture_h;
     cache_data->texture = texture;
@@ -395,6 +414,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
     data_to_find.w = lv_area_get_width(&t->_real_area);
     data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = NULL;
+    data_to_find.dsc_owned = false;
 
     /*user_data stores the renderer to differentiate it from SW rendered tasks.
      *However the cached texture is independent from the renderer so use NULL user_data*/
