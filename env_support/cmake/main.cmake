@@ -56,6 +56,7 @@ option(LV_BUILD_TESTS "Build the unit tests in the tests directory" OFF)
 
 option(CONFIG_LV_BUILD_DEMOS "Build demos" ON)
 option(CONFIG_LV_BUILD_EXAMPLES "Build examples" ON)
+option(CONFIG_LV_USE_THORVG "Enable ThorVG" ON)
 option(CONFIG_LV_USE_THORVG_INTERNAL "Use the internal version of ThorVG" ON)
 option(CONFIG_LV_USE_PRIVATE_API "If set - install the private headers" OFF)
 
@@ -303,15 +304,10 @@ target_include_directories(lvgl SYSTEM PUBLIC
 get_target_property(COMP_DEF lvgl COMPILE_DEFINITIONS)
 
 # The ThorVG sources are all guarded by LV_USE_THORVG_INTERNAL, so building them
-# with ThorVG disabled in the config yields an empty library that lvgl still links.
-# CONFIG_LV_USE_THORVG is only trustworthy when it was derived from the active
-# configuration, hence the LV_BUILD_SET_CONFIG_OPTS check.
-set(LV_BUILD_THORVG_INTERNAL ${CONFIG_LV_USE_THORVG_INTERNAL})
-
-if(LV_BUILD_SET_CONFIG_OPTS AND NOT CONFIG_LV_USE_THORVG
-   AND LV_BUILD_THORVG_INTERNAL)
-    message(STATUS "LV_USE_THORVG is disabled - not building ThorVG internal")
-    set(LV_BUILD_THORVG_INTERNAL OFF)
+# with ThorVG disabled yields an empty library that lvgl still links.
+set(LV_BUILD_THORVG_INTERNAL OFF)
+if(CONFIG_LV_USE_THORVG AND CONFIG_LV_USE_THORVG_INTERNAL)
+    set(LV_BUILD_THORVG_INTERNAL ON)
 endif()
 
 if(LV_BUILD_THORVG_INTERNAL)
