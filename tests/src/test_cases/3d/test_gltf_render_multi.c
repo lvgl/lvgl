@@ -14,7 +14,7 @@
 #endif
 
 #define VIEW_SIZE 160
-
+static lv_gltf_model_t * model;
 void setUp(void)
 {
     /* A known screen color makes it possible to tell rendered pixels from the background */
@@ -24,6 +24,8 @@ void setUp(void)
 
 void tearDown(void)
 {
+    lv_gltf_model_delete(model);
+    model = NULL;
     lv_obj_clean(lv_screen_active());
 }
 
@@ -102,7 +104,31 @@ void test_gltf_render_after_removing_all_models(void)
     TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_without_model"));
 }
 
-/* Deleting a view while another one keeps rendering must not disturb the survivor */
+void test_gltf_render_shared_model_after_deleting_a_view(void)
+{
+    lv_obj_t * left = create_view();
+    lv_obj_t * right = create_view();
+    lv_obj_set_pos(right, VIEW_SIZE, 0);
+
+    model = lv_gltf_data_load_from_file(ASSET("minimal_triangle.gltf"), NULL);
+    TEST_ASSERT_NOT_NULL(model);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(left, model));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(right, model));
+
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_both_views"));
+
+    lv_obj_delete(right);
+
+    /* Move the camera and put it back, so the survivor really redraws the model instead of
+     * handing out the frame it already had */
+    lv_gltf_set_yaw(left, 15.0f);
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+    lv_gltf_set_yaw(left, 0.0f);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_one_model"));
+}
+
 void test_gltf_render_after_deleting_another_view(void)
 {
     lv_obj_t * first = create_view();
@@ -150,6 +176,10 @@ void test_gltf_render_after_removing_a_transmissive_model(void)
 }
 
 void test_gltf_render_after_removing_all_models(void)
+{
+}
+
+void test_gltf_render_shared_model_after_deleting_a_view(void)
 {
 }
 

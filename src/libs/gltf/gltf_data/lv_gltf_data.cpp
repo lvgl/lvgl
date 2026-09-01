@@ -59,6 +59,12 @@ void lv_gltf_model_delete(lv_gltf_model_t * model)
     if(!model) {
         return;
     }
+
+    /* Each call drops one entry, and with it one viewer from the array being walked */
+    while(!lv_array_is_empty(&model->viewers)) {
+        lv_gltf_detach_model(*(lv_obj_t **)lv_array_at(&model->viewers, 0), model);
+    }
+
     lv_timer_delete(model->animation_update_timer);
     model->animation_update_timer = NULL;
 
@@ -81,7 +87,6 @@ void lv_gltf_model_delete(lv_gltf_model_t * model)
     }
     lv_array_deinit(&model->viewers);
     lv_array_deinit(&model->nodes);
-    lv_array_deinit(&model->compiled_shaders);
 
     /* Explicitly call destructors for C++ objects initialized with placement new */
     model->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
@@ -214,7 +219,6 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     data->last_anim_num = -5;
     data->current_animation_max_time = 0;
     data->local_timestamp = 0.0f;
-    data->last_material_index = 99999;
 
     data->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     data->animation_update_timer = lv_timer_create(update_animation_cb, LV_DEF_REFR_PERIOD, data);
@@ -234,7 +238,6 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(&data->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
     lv_array_init(&data->viewers, 1, sizeof(lv_gltf_t *));
-    lv_array_init(&data->compiled_shaders, 1, sizeof(lv_gltf_compiled_shader_t));
     return data;
 }
 

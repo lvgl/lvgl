@@ -84,8 +84,6 @@ void test_gltf_viewer_multiple_models(void)
     TEST_ASSERT_EQUAL_PTR(first, lv_gltf_get_primary_model(gltf));
 }
 
-/* A model added with lv_gltf_add_model belongs to the caller, who deletes it after
- * the viewer is gone */
 void test_gltf_viewer_add_model_keeps_ownership_with_the_caller(void)
 {
     lv_obj_t * gltf = create_view();
@@ -210,6 +208,86 @@ void test_gltf_viewer_remove_all_models(void)
     /* An emptied viewer takes models again */
     TEST_ASSERT_NOT_NULL(lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf")));
     TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(gltf));
+}
+
+void test_gltf_viewer_remove_all_models_holding_one_model_twice(void)
+{
+    lv_obj_t * gltf = create_view();
+
+    lv_gltf_model_t * model = lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf"));
+    TEST_ASSERT_NOT_NULL(model);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(gltf, model));
+    TEST_ASSERT_EQUAL(2, lv_gltf_get_model_count(gltf));
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    lv_gltf_remove_all_models(gltf);
+
+    TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(gltf));
+
+    /* The viewer renders on without the models it lost */
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+}
+
+/* The same duplicated entry, this time released by the viewer going away */
+void test_gltf_viewer_delete_view_holding_one_model_twice(void)
+{
+    lv_obj_t * gltf = create_view();
+
+    lv_gltf_model_t * model = lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf"));
+    TEST_ASSERT_NOT_NULL(model);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(gltf, model));
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    lv_obj_delete(gltf);
+}
+
+void test_gltf_viewer_delete_a_model_in_use(void)
+{
+    lv_obj_t * gltf = create_view();
+
+    lv_gltf_model_t * model = lv_gltf_data_load_from_file(ASSET("minimal_triangle.gltf"), NULL);
+    TEST_ASSERT_NOT_NULL(model);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(gltf, model));
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    lv_gltf_model_delete(model);
+
+    TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(gltf));
+    TEST_ASSERT_NULL(lv_gltf_get_primary_model(gltf));
+
+    /* The viewer renders on without the model it lost */
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+}
+
+void test_gltf_viewer_delete_a_shared_model(void)
+{
+    lv_obj_t * first = create_view();
+    lv_obj_t * second = create_view();
+    lv_obj_set_pos(second, 130, 0);
+
+    lv_gltf_model_t * model = lv_gltf_data_load_from_file(ASSET("cameras.gltf"), NULL);
+    TEST_ASSERT_NOT_NULL(model);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(first, model));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(second, model));
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    lv_gltf_model_delete(model);
+
+    TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(first));
+    TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(second));
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
 }
 
 void test_gltf_viewer_remove_model_tolerates_unknown_models(void)
@@ -532,6 +610,22 @@ void test_gltf_viewer_remove_all_models(void)
 }
 
 void test_gltf_viewer_remove_model_tolerates_unknown_models(void)
+{
+}
+
+void test_gltf_viewer_remove_all_models_holding_one_model_twice(void)
+{
+}
+
+void test_gltf_viewer_delete_view_holding_one_model_twice(void)
+{
+}
+
+void test_gltf_viewer_delete_a_model_in_use(void)
+{
+}
+
+void test_gltf_viewer_delete_a_shared_model(void)
 {
 }
 

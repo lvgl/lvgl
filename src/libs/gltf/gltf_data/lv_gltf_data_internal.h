@@ -10,6 +10,7 @@ extern "C" {
 #if LV_USE_GLTF
 
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
+#include "../../../misc/lv_array.h"
 
 
 typedef struct {
@@ -187,8 +188,9 @@ typedef struct {
     GLuint program;
 } lv_gltf_compiled_shader_t;
 
-void lv_gltf_store_compiled_shader(lv_gltf_model_t * data, size_t identifier, lv_gltf_compiled_shader_t * shader);
-lv_gltf_compiled_shader_t * lv_gltf_get_compiled_shader(lv_gltf_model_t * data, size_t identifier);
+void lv_gltf_store_compiled_shader(lv_array_t * compiled_shaders, size_t identifier,
+                                   lv_gltf_compiled_shader_t * shader);
+lv_gltf_compiled_shader_t * lv_gltf_get_compiled_shader(lv_array_t * compiled_shaders, size_t identifier);
 
 /**
  * @brief Retrieve the radius of the GLTF data object.
@@ -201,6 +203,14 @@ double lv_gltf_data_get_radius(const lv_gltf_model_t * model);
 lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer);
 void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer);
 void lv_gltf_model_invalidate(lv_gltf_model_t * model);
+
+/**
+ * @brief Make a viewer let go of a model it holds, without deleting the model.
+ *
+ * @param viewer Pointer to the glTF viewer holding the model.
+ * @param model Pointer to the model to let go of.
+ */
+void lv_gltf_detach_model(lv_obj_t * viewer, lv_gltf_model_t * model);
 
 #endif /*LV_USE_GLTF*/
 

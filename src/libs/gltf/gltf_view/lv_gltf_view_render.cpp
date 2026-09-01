@@ -387,7 +387,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_data_t
     });
 
     /* Reset the last material index to an unused value once per frame at the start*/
-    modeld->model->last_material_index = 99999;
+    modeld->last_material_index = 99999;
 
     if(vstate->render_opaque_buffer) {
         std::optional<lv_gltf_matrices_saver_t> saver;
@@ -581,17 +581,17 @@ static bool setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
 
     GL_CALL(glBindVertexArray(_prim_data->vertexArray));
 
-    lv_gltf_compiled_shader_t * compiled_shader = lv_gltf_get_compiled_shader(model, materialIndex);
+    lv_gltf_compiled_shader_t * compiled_shader = lv_gltf_get_compiled_shader(&modeld->compiled_shaders, materialIndex);
     const lv_gltf_uniform_locations_t * uniforms = &compiled_shader->uniforms;
 
     /* Fast path, primitive setup in the primitive draw render */
-    if((model->last_material_index == materialIndex) && (model->last_pass_was_transmission == is_transmission_pass)) {
+    if((modeld->last_material_index == materialIndex) && (modeld->last_pass_was_transmission == is_transmission_pass)) {
         GL_CALL(glUniformMatrix4fv(uniforms->model_matrix, 1, GL_FALSE, &matrix[0][0]));
         return true;
     }
 
-    model->last_material_index = materialIndex;
-    model->last_pass_was_transmission = is_transmission_pass;
+    modeld->last_material_index = materialIndex;
+    modeld->last_pass_was_transmission = is_transmission_pass;
 
     const GLuint program = compiled_shader->program;
 
