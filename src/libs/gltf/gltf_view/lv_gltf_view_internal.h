@@ -157,9 +157,13 @@ typedef struct {
 typedef struct {
     lv_gltf_model_t * model;
     lv_array_t skin_textures;
+    /* Programs of this viewer's shader manager, indexed by material */
+    lv_array_t compiled_shaders;
+    size_t last_material_index;
     uint32_t last_camera_index;
     bool owned;
     bool requires_opaque_pass;
+    bool last_pass_was_transmission;
     bool last_frame_was_antialiased;
     bool last_frame_no_motion;
     bool _last_frame_no_motion;

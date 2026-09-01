@@ -43,6 +43,23 @@ void test_gltf_render_all_material_features(void)
     TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_materials"));
 }
 
+void test_gltf_render_model_added_again(void)
+{
+    lv_obj_t * gltf = create_view();
+
+    lv_gltf_model_t * model = lv_gltf_data_load_from_file(ASSET("materials.gltf"), NULL);
+    TEST_ASSERT_NOT_NULL(model);
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(gltf, model));
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_materials"));
+
+    lv_gltf_remove_model(gltf, model);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(gltf, model));
+    TEST_ASSERT_EQUAL_SCREENSHOT(REF("render_materials"));
+
+    lv_gltf_model_delete(model);
+}
+
 /* The sheen material of this asset has a black base color and no dielectric specular,
  * so everything that shows up comes from the sheen lobe. It stays black when the sheen
  * lighting tables are not generated. */
@@ -84,6 +101,10 @@ void tearDown(void)
 }
 
 void test_gltf_render_all_material_features(void)
+{
+}
+
+void test_gltf_render_model_added_again(void)
 {
 }
 

@@ -114,7 +114,6 @@ struct _lv_gltf_model_t {
 
     std::vector<lv_gltf_mesh_data_t> meshes;
     std::vector<GLuint> textures;
-    lv_array_t compiled_shaders;
     std::map<fastgltf::Node *, std::vector<uint32_t> > channel_set_cache;
     fastgltf::math::fmat4x4 view_mat;
     fastgltf::math::fvec3 view_pos;
@@ -125,7 +124,6 @@ struct _lv_gltf_model_t {
     lv_timer_t * animation_update_timer;
 
     size_t current_animation;
-    size_t last_material_index;
 
     uint32_t animation_speed_ratio;
     int32_t last_anim_num;
@@ -139,7 +137,6 @@ struct _lv_gltf_model_t {
 
     bool transforms_changed;
     bool is_animation_enabled;
-    bool last_pass_was_transmission;
     bool write_ops_pending;
     bool write_ops_flushed;
     struct _lv_gltf_model_t * linked_view_source;
@@ -239,6 +236,16 @@ bool lv_gltf_data_validated_skins_contains(lv_gltf_model_t * data, size_t index)
  * @param index The index of the skin to validate.
  */
 void lv_gltf_data_validate_skin(lv_gltf_model_t * data, size_t index);
+
+/**
+ * @brief Drop the draw lists built by a previous parse of this model.
+ *
+ * The lists are rebuilt from the model every time it is parsed for a viewer, so they have
+ * to be emptied first or a model parsed twice would draw every primitive twice.
+ *
+ * @param data Pointer to the lv_gltf_data_t object containing the model data.
+ */
+void lv_gltf_data_clear_node_primitives(lv_gltf_model_t * data);
 
 /**
  * @brief Add an opaque node primitive to the GLTF model data.
