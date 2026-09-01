@@ -152,15 +152,15 @@ void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding)
     barcode_mark_dirty(obj);
 }
 
-lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
+lv_result_t lv_barcode_set_text(lv_obj_t * obj, const char * text)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(data != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(text != NULL, return LV_RESULT_INVALID);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
-    if(data[0] == '\0') {
-        LV_LOG_WARN("data is empty");
+    if(text[0] == '\0') {
+        LV_LOG_WARN("text is empty");
         barcode_forget_data(barcode);
         barcode->needs_update = false;
         barcode->render_failed = true;
@@ -168,9 +168,17 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
         return LV_RESULT_INVALID;
     }
 
-    if(!barcode_store_data(barcode, data)) return LV_RESULT_INVALID;
+    if(!barcode_store_data(barcode, text)) return LV_RESULT_INVALID;
 
     return barcode_mark_dirty(obj);
+}
+
+const char * lv_barcode_get_text(lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    return barcode->data;
 }
 
 lv_result_t lv_barcode_render(lv_obj_t * obj)

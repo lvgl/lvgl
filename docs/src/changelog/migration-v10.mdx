@@ -507,6 +507,21 @@ Calling the following functions with `NULL` as the display parameter is deprecat
 
 ## Widgets
 
+### lv_barcode
+
+- `lv_barcode_update()` is renamed to `lv_barcode_set_text()`. Same argument, same return
+  value.
+
+  ```c
+  /* Before */
+  lv_barcode_update(barcode, "https://lvgl.io");
+
+  /* After */
+  lv_barcode_set_text(barcode, "https://lvgl.io");
+  ```
+
+- New: `lv_barcode_get_text()` reads the stored text back.
+
 ### lv_qrcode
 
 - No API change, but a behavioral one: `lv_qrcode_set_size()` and

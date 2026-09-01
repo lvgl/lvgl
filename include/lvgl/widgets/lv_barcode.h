@@ -113,22 +113,30 @@ void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled);
 void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding);
 
 /**
- * Set the data of a barcode object and generate the bitmap.
+ * Set the text a barcode object encodes, and generate the bitmap.
  * A copy is stored, so a later property change or resize can regenerate it; the properties
- * may be set before or after the data, in any order.
+ * may be set before or after the text, in any order.
  * @note Obeys the update mode. In DEFERRED the canvas is only resized here, so the return
  *       value reports that resize, not the bars.
  * @param obj  pointer to barcode object
- * @param data data to display as a NUL terminated string
+ * @param text text to encode, as a non-empty NUL terminated string
  * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error
  */
-lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data);
+lv_result_t lv_barcode_set_text(lv_obj_t * obj, const char * text);
+
+/**
+ * Get the text a barcode object encodes.
+ * @param obj pointer to barcode object
+ * @return the stored text, or NULL if none is set. Owned by the barcode object and
+ *         invalidated by the next `lv_barcode_set_text()`.
+ */
+const char * lv_barcode_get_text(lv_obj_t * obj);
 
 /**
  * (Re)generate the barcode bitmap from the stored data, whether or not anything changed.
  * Needs no data argument, which is how deferred changes are applied.
  * @param obj pointer to barcode object
- * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error (e.g. no data set, or
+ * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error (e.g. no text set, or
  *         the bars do not fit the current object size)
  */
 lv_result_t lv_barcode_render(lv_obj_t * obj);
@@ -157,12 +165,12 @@ lv_barcode_update_mode_t lv_barcode_get_update_mode(lv_obj_t * obj);
 
 /**
  * Get whether the last attempt to generate the bitmap failed. `lv_barcode_render()`, and
- * `lv_barcode_update()` in IMMEDIATE mode, return their result directly; the rest cannot -
+ * `lv_barcode_set_text()` in IMMEDIATE mode, return their result directly; the rest cannot -
  * they run in a void setter, the resize handler, or a deferred fill in the draw pass. Use
  * this for those, e.g. after shrinking the object below the size its data needs.
  * @note A failure is not retried every redraw; only a change makes the Widget try again.
  * @param obj pointer to barcode object
- * @return true: the last generation attempt failed, or no data has been set yet;
+ * @return true: the last generation attempt failed, or no text has been set yet;
  *         false: the bitmap holds a valid barcode
  */
 bool lv_barcode_get_render_failed(lv_obj_t * obj);
