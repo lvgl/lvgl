@@ -96,9 +96,11 @@ static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_opengles_init(void)
+lv_result_t lv_opengles_init(void)
 {
-    if(is_init) return;
+    if(is_init) {
+        return LV_RESULT_OK;
+    }
 
     lv_opengles_enable_blending(false);
 
@@ -115,7 +117,13 @@ void lv_opengles_init(void)
     lv_opengles_index_buffer_init(indices, 6);
 
     lv_result_t res = lv_opengles_shader_init();
-    LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to initialize shaders");
+    if(res != LV_RESULT_OK) {
+        lv_opengles_index_buffer_deinit();
+        lv_opengles_vertex_array_deinit();
+        lv_opengles_vertex_buffer_deinit();
+        LV_LOG_ERROR("failed to initialize shaders");
+        return LV_RESULT_INVALID;
+    }
 
     lv_opengles_shader_bind();
 
@@ -130,6 +138,7 @@ void lv_opengles_init(void)
 #endif /*LV_USE_DRAW_NANOVG*/
 
     is_init = true;
+    return LV_RESULT_OK;
 }
 
 void lv_opengles_deinit(void)
