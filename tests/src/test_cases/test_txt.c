@@ -56,6 +56,24 @@ void test_txt_cut_should_handle_len_longer_than_string_length(void)
     TEST_ASSERT_EQUAL_UINT8(msg[0], 0x00);
 }
 
+void test_txt_cut_should_handle_len_longer_than_remaining_string(void)
+{
+    char msg[] = "Hello World";
+
+    lv_text_cut(msg, 6, 30);
+
+    TEST_ASSERT_EQUAL_STRING("Hello ", msg);
+}
+
+void test_txt_cut_should_handle_pos_beyond_string_length(void)
+{
+    char msg[] = "Hello World";
+
+    lv_text_cut(msg, 30, 1);
+
+    TEST_ASSERT_EQUAL_STRING("Hello World", msg);
+}
+
 void test_txt_get_encoded_next_should_decode_valid_ascii(void)
 {
     char msg[] = "Hello World!";
