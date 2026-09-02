@@ -1,0 +1,33 @@
+config LV_USE_IME_PINYIN
+	bool "Pinyin input method"
+	default n
+	select LV_USE_KEYBOARD
+	help
+		Chinese input method that converts Pinyin typed on a keyboard widget
+		into Chinese characters.
+
+if LV_USE_IME_PINYIN
+
+config LV_IME_PINYIN_USE_K9_MODE
+	bool "9-key input mode"
+	default y
+
+config LV_IME_PINYIN_K9_CAND_TEXT_NUM
+	int "Maximum number of candidate panels for 9-key input mode"
+	depends on LV_IME_PINYIN_USE_K9_MODE
+	default 3
+
+config LV_IME_PINYIN_USE_DEFAULT_DICT
+	bool "Built-in dictionary"
+	default y
+	help
+		Without it, a dictionary must be set with lv_ime_pinyin_set_dict()
+		before the IME is used.
+
+config LV_IME_PINYIN_CAND_TEXT_NUM
+	int "Maximum number of candidate panels"
+	default 6
+	help
+		Adjust this to the screen size, as all candidate panels must fit on it.
+
+endif #LV_USE_IME_PINYIN

@@ -1,0 +1,35 @@
+menu "Themes"
+
+config LV_USE_THEME_DEFAULT
+	bool "Default theme"
+	default y
+	help
+		Full-featured theme used by LVGL's demos and examples.
+
+if LV_USE_THEME_DEFAULT
+config LV_THEME_DEFAULT_DARK
+	bool "Dark mode"
+	default n
+
+config LV_THEME_DEFAULT_GROW
+	bool "Grow on press"
+	default y
+
+config LV_THEME_DEFAULT_TRANSITION_TIME
+	int "Transition time (ms)"
+	default 80
+
+endif #LV_USE_THEME_DEFAULT
+
+config LV_USE_THEME_SIMPLE
+	bool "Simple theme"
+	default y
+	help
+		Minimal styling, a good starting point for a custom theme.
+
+config LV_USE_THEME_MONO
+	bool "Monochrome theme"
+	default y
+	help
+		Styling for 1-bit displays such as e-paper and dot-matrix panels.
+endmenu

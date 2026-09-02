@@ -1,0 +1,148 @@
+config LV_USE_DRAW_VG_LITE
+	bool "VG-Lite renderer"
+	default n
+	select LV_USE_MATRIX
+	select LV_DRAW_HAS_VECTOR_SUPPORT
+	help
+		Renders with a VG-Lite GPU. Requires a VG-Lite driver, or the VG-Lite simulator below.
+
+if LV_USE_DRAW_VG_LITE
+
+config LV_VG_LITE_USE_GPU_INIT
+	bool "Custom external gpu_init() function"
+	default n
+	help
+		Call an application-provided gpu_init() before the first use of the GPU.
+
+config LV_VG_LITE_USE_ASSERT
+	bool "Assertions"
+	default n
+	help
+		Check internal VG-Lite state with LV_ASSERT(). Useful while debugging.
+
+config LV_VG_LITE_FLUSH_MAX_COUNT
+	int "Flush trigger threshold (draw tasks)"
+	default 8
+	help
+		The GPU tries to batch this many draw tasks before flushing.
+
+config LV_VG_LITE_USE_BOX_SHADOW
+	bool "Simulate box shadow with a border"
+	default y
+	help
+		Usually faster, but does not match the rendering quality of the SW renderer.
+
+config LV_VG_LITE_GRAD_CACHE_CNT
+	int "Gradient cache size (entries)"
+	default 32
+	help
+		The memory usage of a single gradient:
+			linear: 4K bytes.
+			radial: radius * 4K bytes.
+
+config LV_VG_LITE_STROKE_CACHE_CNT
+	int "Stroke cache size (entries)"
+	default 32
+
+config LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+	int "Unaligned bitmap font cache size (entries)"
+	default 256
+
+config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
+	bool "Remove VLC_OP_CLOSE path instruction (Workaround for NXP)"
+	default n
+
+config LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
+	bool "Disable linear gradient extension"
+	default n
+	help
+		Needed with older VG-Lite drivers that do not implement the extension.
+
+config LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+	bool "Disable blit rectangle offset"
+	default n
+	help
+		Works around HW errors on some GPUs at the cost of extra blits.
+
+config LV_VG_LITE_PATH_DUMP_MAX_LEN
+	int "Maximum path dump length (points)"
+	default 1000
+
+config LV_USE_VG_LITE_DRIVER
+	bool "Built-in VG-Lite driver"
+	default n
+	help
+		Build the VG-Lite driver bundled with LVGL instead of linking a vendor-provided one.
+
+	if LV_USE_VG_LITE_DRIVER
+	# A choice because the include path needs unquoted tokens, which Kconfig
+	# strings cannot emit.
+	choice
+		prompt "VG-Lite GPU (series and revision)"
+		default LV_VG_LITE_GPU_GC255_0X40A
+
+		config LV_VG_LITE_GPU_GC255_0X40A
+			bool "GC255 (revision 0x40A)"
+		config LV_VG_LITE_GPU_GC355_0X0_1215
+			bool "GC355 (revision 0x0_1215)"
+		config LV_VG_LITE_GPU_GC355_0X0_1216
+			bool "GC355 (revision 0x0_1216)"
+		config LV_VG_LITE_GPU_GC555_0X423
+			bool "GC555 (revision 0x423)"
+		config LV_VG_LITE_GPU_GC555_0X423_ECO
+			bool "GC555 (revision 0x423 ECO)"
+		config LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
+			bool "GCNanoUltraV (revision 0x1003)"
+	endchoice
+
+	config LV_VG_LITE_GPU
+		int
+		default 0 if LV_VG_LITE_GPU_GC255_0X40A
+		default 1 if LV_VG_LITE_GPU_GC355_0X0_1215
+		default 2 if LV_VG_LITE_GPU_GC355_0X0_1216
+		default 3 if LV_VG_LITE_GPU_GC555_0X423
+		default 4 if LV_VG_LITE_GPU_GC555_0X423_ECO
+		default 5 if LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
+
+	config LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+		hex "GPU base address"
+		default 0x40240000
+	endif #LV_USE_VG_LITE_DRIVER
+
+config LV_USE_VG_LITE_THORVG
+	bool "VG-Lite simulator (ThorVG)"
+	default n
+	select LV_USE_THORVG
+	help
+		Simulate VG-Lite hardware with ThorVG for debugging and testing on a PC simulator.
+		Requires the internal or an external ThorVG library.
+
+if LV_USE_VG_LITE_THORVG
+
+config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+	bool "LVGL blend modes"
+	default n
+	depends on LV_USE_VG_LITE_THORVG
+
+config LV_VG_LITE_THORVG_YUV_SUPPORT
+	bool "YUV color formats"
+	default n
+
+config LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+	bool "Linear gradient extension"
+	default n
+
+config LV_VG_LITE_THORVG_16PIXELS_ALIGN
+	bool "16 pixel alignment"
+	default y
+
+config LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+	int "Buffer address alignment (bytes)"
+	default 64
+
+config LV_VG_LITE_THORVG_THREAD_RENDER
+	bool "Multi-threaded rendering"
+	default n
+
+endif #LV_USE_VG_LITE_THORVG
+endif #LV_USE_DRAW_VG_LITE

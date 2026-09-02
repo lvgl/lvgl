@@ -96,7 +96,7 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info);
 /**
  * Create a freetype font.
  * @param pathname font file path.
- * @param render_mode font render mode(see @lv_freetype_font_render_mode_t for details).
+ * @param render_mode font render mode(see @ref lv_freetype_font_render_mode_t for details).
  * @param size font size.
  * @param style font style(see lv_freetype_font_style_t for details).
  * @return Created font, or NULL on failure.
@@ -115,9 +115,9 @@ void lv_freetype_font_delete(lv_font_t * font);
 /**
  * Register a callback function to generate outlines for FreeType fonts.
  *
- * @param cb The callback function to be registered.
+ * @param event_cb The callback function to be registered.
+ * @param filter The event code to filter for, or LV_EVENT_ALL to receive every event.
  * @param user_data User data to be passed to the callback function.
- * @return The ID of the registered callback function, or a negative value on failure.
  */
 void lv_freetype_outline_add_event(lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
@@ -136,6 +136,17 @@ uint32_t lv_freetype_outline_get_scale(const lv_font_t * font);
  * @return Is outline font on success, otherwise false.
  */
 bool lv_freetype_is_outline_font(const lv_font_t * font);
+
+#if LV_USE_HARFBUZZ
+/**
+ * Enable or disable HarfBuzz shaping for a FreeType font instance.
+ * When disabled, the font uses LVGL's standard character-by-character rendering
+ * (compatible with LV_USE_ARABIC_PERSIAN_CHARS and LV_USE_BIDI).
+ * @param font pointer to an LVGL font (must be a FreeType font)
+ * @param enabled true to enable HarfBuzz (default), false to disable
+ */
+void lv_freetype_font_set_harfbuzz(lv_font_t * font, bool enabled);
+#endif
 
 /**********************
  *      MACROS

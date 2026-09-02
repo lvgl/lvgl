@@ -180,6 +180,13 @@ void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time);
 void lv_indev_set_long_press_repeat_time(lv_indev_t * indev, uint16_t long_press_repeat_time);
 
 /**
+ * Set double click time to indev
+ * @param  indev              pointer to input device
+ * @param  double_click_time  double/triple click time in ms
+ */
+void lv_indev_set_double_click_time(lv_indev_t * indev, uint16_t double_click_time);
+
+/**
  * Set scroll limit to the input device
  * @param indev pointer to an input device
  * @param scroll_limit the number of pixels to slide before actually drag the object
@@ -474,6 +481,25 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
  * @param remap_cb      remapping function callback. Use NULL to disable callback.
  */
 void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb);
+
+/**
+ * Set Counter-Clock-Wise (CCW) rotation processing for an indev
+ * @param indev         indev to set CCW rotation processing on
+ */
+void lv_indev_set_ccw(lv_indev_t * indev);
+
+/**
+ * Clear Counter-Clock-Wise (CCW) rotation processing for an indev
+ * @param indev         indev to clear CCW rotation processing on
+ */
+void lv_indev_clear_ccw(lv_indev_t * indev);
+
+/**
+ * Get Counter-Clock-Wise (CCW) rotation processing for an indev
+ * @param indev         indev to get CCW rotation from
+ * @return              True if CCW processing is set for an indev, false if indev is NULL or CCW processing is not set.
+ */
+bool lv_indev_get_ccw(const lv_indev_t * indev);
 
 #if LV_USE_EXT_DATA
 /**

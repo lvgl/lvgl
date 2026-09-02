@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_MENU && LV_BUILD_EXAMPLES
 
+/*This example shows the deprecated `lv_menu` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static uint32_t btn_cnt = 1;
 static lv_obj_t * main_page;
 static lv_obj_t * menu;
@@ -31,6 +34,8 @@ static void float_button_event_cb(lv_event_t * e)
 /**
  * @title Menu with floating add button
  * @brief A circular floating button appends new items and matching sub pages.
+ *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  *
  * The menu starts with a single main-page item wired to a greeting
  * sub page. A circular `lv_button` flagged with
@@ -71,12 +76,14 @@ void lv_example_menu_floating_button(void)
     /*Create floating btn*/
     lv_obj_t * float_btn = lv_button_create(lv_screen_active());
     lv_obj_set_size(float_btn, 50, 50);
-    lv_obj_add_flag(float_btn, LV_OBJ_FLAG_FLOATING);
+    lv_obj_set_floating(float_btn, true);
     lv_obj_align(float_btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(float_btn, float_button_event_cb, LV_EVENT_CLICKED, menu);
     lv_obj_set_style_radius(float_btn, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_image_src(float_btn, LV_SYMBOL_PLUS, 0);
     lv_obj_set_style_text_font(float_btn, lv_theme_get_font_large(float_btn), 0);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

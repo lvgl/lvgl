@@ -1,0 +1,3 @@
+# RISC-V Vector software rendering assembly, exercised under emulation.
+
+CONFIG_LV_DRAW_SW_ASM_RISCV_V=y

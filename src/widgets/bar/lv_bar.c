@@ -153,7 +153,7 @@ void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
     lv_bar_set_value_with_anim(obj, value, &bar->cur_value, &bar->cur_value_anim, anim);
 }
 
-void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
+void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_t anim)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
@@ -163,12 +163,12 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim
         return;
     }
 
-    value = LV_CLAMP(bar->min_value, value, bar->max_value);
-    value = value > bar->cur_value ? bar->cur_value : value; /*Can't be greater than the right value*/
+    start_value = LV_CLAMP(bar->min_value, start_value, bar->max_value);
+    start_value = start_value > bar->cur_value ? bar->cur_value : start_value; /*Can't be greater than the right value*/
 
-    if(bar->start_value == value) return;
+    if(bar->start_value == start_value) return;
 
-    lv_bar_set_value_with_anim(obj, value, &bar->start_value, &bar->start_value_anim, anim);
+    lv_bar_set_value_with_anim(obj, start_value, &bar->start_value, &bar->start_value_anim, anim);
 }
 
 void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
@@ -336,8 +336,8 @@ static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_bar_init_anim(obj, &bar->cur_value_anim);
     lv_bar_init_anim(obj, &bar->start_value_anim);
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_checkable(obj, false);
+    lv_obj_set_scrollable(obj, false);
     lv_bar_set_value(obj, 0, LV_ANIM_OFF);
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -435,9 +435,9 @@ static void draw_indic(lv_event_t * e)
 
     if(LV_BAR_IS_ANIMATING(bar->start_value_anim)) {
         int32_t anim_start_value_start_x =
-            (int32_t)((int32_t)anim_length * (bar->start_value_anim.anim_start - bar->min_value)) / range;
+            (int32_t)(((int64_t)anim_length * (bar->start_value_anim.anim_start - bar->min_value)) / range);
         int32_t anim_start_value_end_x =
-            (int32_t)((int32_t)anim_length * (bar->start_value_anim.anim_end - bar->min_value)) / range;
+            (int32_t)(((int64_t)anim_length * (bar->start_value_anim.anim_end - bar->min_value)) / range);
 
         anim_start_value_x = (((anim_start_value_end_x - anim_start_value_start_x) * bar->start_value_anim.anim_state) /
                               LV_BAR_ANIM_STATE_END);
@@ -445,21 +445,21 @@ static void draw_indic(lv_event_t * e)
         anim_start_value_x += anim_start_value_start_x;
     }
     else {
-        anim_start_value_x = (int32_t)((int32_t)anim_length * (bar->start_value - bar->min_value)) / range;
+        anim_start_value_x = (int32_t)(((int64_t)anim_length * (bar->start_value - bar->min_value)) / range);
     }
 
     if(LV_BAR_IS_ANIMATING(bar->cur_value_anim)) {
         int32_t anim_cur_value_start_x =
-            (int32_t)((int32_t)anim_length * (bar->cur_value_anim.anim_start - bar->min_value)) / range;
+            (int32_t)(((int64_t)anim_length * (bar->cur_value_anim.anim_start - bar->min_value)) / range);
         int32_t anim_cur_value_end_x =
-            (int32_t)((int32_t)anim_length * (bar->cur_value_anim.anim_end - bar->min_value)) / range;
+            (int32_t)(((int64_t)anim_length * (bar->cur_value_anim.anim_end - bar->min_value)) / range);
 
         anim_cur_value_x = anim_cur_value_start_x + (((anim_cur_value_end_x - anim_cur_value_start_x) *
                                                       bar->cur_value_anim.anim_state) /
                                                      LV_BAR_ANIM_STATE_END);
     }
     else {
-        anim_cur_value_x = (int32_t)((int32_t)anim_length * (bar->cur_value - bar->min_value)) / range;
+        anim_cur_value_x = (int32_t)(((int64_t)anim_length * (bar->cur_value - bar->min_value)) / range);
     }
 
     /**

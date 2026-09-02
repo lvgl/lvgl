@@ -31,6 +31,21 @@
     #include <linux/input.h>
 #endif
 
+#if defined(LV_LIBINPUT_XKB_KEY_MAP) && !LV_LIBINPUT_XKB_DISABLE_KEY_MAP
+#warning "LV_LIBINPUT_XKB_KEY_MAP is deprecated and will be removed in the next release. Use LV_LIBINPUT_XKB_RULES, LV_LIBINPUT_XKB_MODEL, LV_LIBINPUT_XKB_LAYOUT, LV_LIBINPUT_XKB_VARIANT, LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT, and LV_LIBINPUT_XKB_OPTIONS instead."
+#define XKB_RULE_NAMES LV_LIBINPUT_XKB_KEY_MAP
+#else
+
+#if LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
+    #define RULE_NAMES_OPTIONS NULL
+#else
+    #define RULE_NAMES_OPTIONS LV_LIBINPUT_XKB_OPTIONS
+#endif
+
+#define XKB_RULE_NAMES  (struct xkb_rule_names) { \
+        .rules = LV_LIBINPUT_XKB_RULES, .model = LV_LIBINPUT_XKB_MODEL, .layout = LV_LIBINPUT_XKB_LAYOUT, .variant = LV_LIBINPUT_XKB_VARIANT, .options = RULE_NAMES_OPTIONS}
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -164,7 +179,7 @@ lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_pat
     dsc->fds[0].revents = 0;
 
 #if LV_LIBINPUT_XKB
-    struct xkb_rule_names names = LV_LIBINPUT_XKB_KEY_MAP;
+    struct xkb_rule_names names = XKB_RULE_NAMES;
     lv_xkb_init(&(dsc->xkb), names);
 #endif /* LV_LIBINPUT_XKB */
 

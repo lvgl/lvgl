@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_LIST && LV_BUILD_EXAMPLES
 
+/*This example shows the deprecated `lv_list` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static lv_obj_t * list1;
 static lv_obj_t * list2;
 
@@ -173,5 +176,7 @@ void lv_example_list_reorder(void)
     lv_obj_add_event_cb(btn, event_handler_swap, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

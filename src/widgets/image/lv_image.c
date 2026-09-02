@@ -528,8 +528,8 @@ void lv_image_get_pivot(lv_obj_t * obj, lv_point_t * pivot)
 
     lv_image_t * img = (lv_image_t *)obj;
 
-    pivot->x = lv_pct_to_px(img->pivot.x, img->w);
-    pivot->y = lv_pct_to_px(img->pivot.y, img->h);
+    pivot->x = lv_pct_to_px(img->pivot.x, img->w > 0 ? img->w - 1 : 0);
+    pivot->y = lv_pct_to_px(img->pivot.y, img->h > 0 ? img->h - 1 : 0);
 }
 
 int32_t lv_image_get_scale(lv_obj_t * obj)
@@ -689,8 +689,8 @@ static void lv_image_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_point_set(&img->pivot, LV_PCT(50), LV_PCT(50)); /*Default pivot to image center*/
     img->align     = LV_IMAGE_ALIGN_CENTER;
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_set_clickable(obj, false);
+    lv_obj_set_adv_hittest(obj, true);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

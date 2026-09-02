@@ -17,7 +17,8 @@
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_grad.h"
 #include "lv_vg_lite_stroke.h"
-#include "../lv_image_decoder_private.h"
+#include "../../image/lv_image_decoder_private.h"
+#include "../../misc/lv_array.h"
 #include "../lv_draw_vector_private.h"
 #include <float.h>
 #include <math.h>

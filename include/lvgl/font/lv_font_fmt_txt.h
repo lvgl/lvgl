@@ -161,7 +161,7 @@ typedef struct {
 
     /**
      * Store kerning values.
-     * Can be `lv_font_fmt_txt_kern_pair_t *  or `lv_font_kern_classes_fmt_txt_t *`
+     * Can be @ref lv_font_fmt_txt_kern_pair_t * or @ref lv_font_fmt_txt_kern_classes_t *
      * depending on `kern_classes`
      */
     const void * kern_dsc;
@@ -170,19 +170,19 @@ typedef struct {
     uint16_t kern_scale;
 
     /** Number of cmap tables */
-    uint16_t cmap_num       : 9;
+    uint16_t cmap_num;
 
     /** Bit per pixel: 1, 2, 3, 4, 8 */
-    uint16_t bpp            : 4;
+    uint8_t bpp            : 4;
 
     /** Type of `kern_dsc` */
-    uint16_t kern_classes   : 1;
+    uint8_t kern_classes   : 1;
 
     /**
      * storage format of the bitmap
      * from `lv_font_fmt_txt_bitmap_format_t`
      */
-    uint16_t bitmap_format  : 2;
+    uint8_t bitmap_format  : 2;
 
     /**
      * Bytes to which each line is padded.
@@ -219,7 +219,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
  * @param unicode_letter a UNICODE letter code
  * @param unicode_letter_next the unicode letter succeeding the letter under test
  * @return true: descriptor is successfully loaded into `dsc_out`.
- *         false: the letter was not found, no data is loaded to `dsc_out`
+ *         false: the letter was not found, no data is loaded to `dsc_out`.
  */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next);

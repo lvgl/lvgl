@@ -500,13 +500,13 @@ static void gif_initialize(lv_gif_t * gifobj)
  * Only disposal method 2 ("restore to background") is handled in this function.
  *
  * @param gif      Pointer to the GIFIMAGE structure representing the current GIF frame.
- * @param drawbuf  Pointer to the draw buffer where the frame is rendered.
+ * @param draw_buf Pointer to the draw buffer where the frame is rendered.
  *
  * Assumptions:
  *   - The coordinates and dimensions (iX, iY, iWidth, iHeight) are within the bounds of the draw buffer.
  *   - The palette type and background color are valid for the current GIF frame.
  */
-static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
+static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * draw_buf)
 {
     LV_PROFILER_DECODER_BEGIN;
 
@@ -519,7 +519,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
 
     /* Bounds validation to prevent out-of-bounds access */
     if(x < 0 || y < 0 || w <= 0 || h <= 0 ||
-       x + w > drawbuf->header.w || y + h > drawbuf->header.h) {
+       x + w > draw_buf->header.w || y + h > draw_buf->header.h) {
         LV_PROFILER_DECODER_END;
         return;
     }
@@ -539,7 +539,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                     if(gif->ucGIFBits & 1) color = 0;
 
                     for(i = y; i < y + h; i++) {
-                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
                         for(j = x; j < x + w; j++) {
                             *(uint16_t *)(dst + 2 * j) = color;
                         }
@@ -559,7 +559,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                     }
 
                     for(i = y; i < y + h; i++) {
-                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
                         for(j = x; j < x + w; j++) {
                             dst[3 * j] = r;
                             dst[3 * j + 1] = g;
@@ -577,7 +577,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                     }
 
                     for(i = y; i < y + h; i++) {
-                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
                         for(j = x; j < x + w; j++) {
                             *(lv_color32_t *)(dst + 4 * j) = bg_color;
                         }

@@ -214,7 +214,7 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int3
     if(param->steep < 0) param->spx = -param->spx;
 }
 
-void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t py, int16_t angle,
+void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t px, int32_t py, int16_t angle,
                                      lv_draw_sw_mask_line_side_t side)
 {
     /*Find an optimal degree.
@@ -226,10 +226,10 @@ void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32
     int32_t p2x;
     int32_t p2y;
 
-    p2x = (lv_trigo_sin(angle + 90) >> 5) + p1x;
+    p2x = (lv_trigo_sin(angle + 90) >> 5) + px;
     p2y = (lv_trigo_sin(angle) >> 5) + py;
 
-    lv_draw_sw_mask_line_points_init(param, p1x, py, p2x, p2y, side);
+    lv_draw_sw_mask_line_points_init(param, px, py, p2x, p2y, side);
 }
 
 void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, int32_t vertex_x, int32_t vertex_y,

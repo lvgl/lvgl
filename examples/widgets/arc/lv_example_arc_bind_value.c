@@ -38,7 +38,7 @@ void lv_example_arc_bind_value(void)
     lv_obj_t * arc = lv_arc_create(screen);
     lv_obj_set_size(arc, 160, 160);
     lv_arc_bind_value(arc, &subject_value);
-    lv_obj_set_flag(arc, LV_OBJ_FLAG_CLICKABLE, false);
+    lv_obj_set_clickable(arc, false);
     lv_obj_set_style_bg_opa(arc, (255 * 0 / 100), LV_PART_KNOB);
     lv_obj_t * lv_label_0 = lv_label_create(arc);
     lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);

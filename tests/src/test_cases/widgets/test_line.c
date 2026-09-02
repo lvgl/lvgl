@@ -27,7 +27,7 @@ void test_line_should_have_valid_documented_default_values(void)
     TEST_ASSERT_EQUAL_UINT16(default_point_num, lv_line_get_point_count(line));
     TEST_ASSERT_NULL(lv_line_get_points(line));
     TEST_ASSERT_FALSE(lv_line_get_y_invert(line));
-    TEST_ASSERT_FALSE(lv_obj_has_flag(line, LV_OBJ_FLAG_CLICKABLE));
+    TEST_ASSERT_FALSE(lv_obj_is_clickable(line));
     /* line doesn't have any points, so it's 0,0 in size */
     TEST_ASSERT_EQUAL_UINT16(0U, lv_obj_get_self_width(line));
     TEST_ASSERT_EQUAL_UINT16(0U, lv_obj_get_self_height(line));

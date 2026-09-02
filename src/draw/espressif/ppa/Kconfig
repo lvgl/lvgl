@@ -1,0 +1,42 @@
+config LV_USE_PPA
+	bool "PPA renderer"
+	default n
+	help
+		Accelerate blends, fills and transforms with the PPA (Pixel Processing
+		Accelerator) peripheral of Espressif SoCs.
+
+if LV_USE_PPA
+
+config LV_USE_PPA_IMG
+	bool "Image drawing"
+	default n
+	help
+		Let the PPA also draw images. Only simple cases qualify: unscaled,
+		unrotated, fully opaque and without masks.
+
+choice
+	prompt "PPA burst length (bytes)"
+	default LV_PPA_BURST_LENGTH_128
+	help
+		DMA burst length used by the PPA clients.
+
+	config LV_PPA_BURST_LENGTH_8
+		bool "8"
+	config LV_PPA_BURST_LENGTH_16
+		bool "16"
+	config LV_PPA_BURST_LENGTH_32
+		bool "32"
+	config LV_PPA_BURST_LENGTH_64
+		bool "64"
+	config LV_PPA_BURST_LENGTH_128
+		bool "128"
+endchoice
+
+config LV_PPA_BURST_LENGTH
+	int
+	default 8 if LV_PPA_BURST_LENGTH_8
+	default 16 if LV_PPA_BURST_LENGTH_16
+	default 32 if LV_PPA_BURST_LENGTH_32
+	default 64 if LV_PPA_BURST_LENGTH_64
+	default 128 if LV_PPA_BURST_LENGTH_128
+endif

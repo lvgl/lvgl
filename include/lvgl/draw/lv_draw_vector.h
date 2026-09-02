@@ -13,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_array.h"
 #include "../core/lv_matrix.h"
 #include "lv_draw_image.h"
 

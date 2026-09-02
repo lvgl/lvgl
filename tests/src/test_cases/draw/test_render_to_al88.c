@@ -18,7 +18,8 @@ void tearDown(void)
 
 void test_render_to_al88(void)
 {
-#if LV_USE_DRAW_VG_LITE
+    /*NanoVG reads back the FBO as 32bpp BGRA, so non-XRGB8888 targets don't apply*/
+#if LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG
     TEST_PASS();
 #else
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_AL88);

@@ -1,0 +1,30 @@
+config LV_USE_TEST
+	bool "Test utilities"
+	help
+		Emulated input devices, time emulation, and screenshot compares.
+
+if LV_USE_TEST
+
+config LV_USE_TEST_SCREENSHOT_COMPARE
+	bool "Screenshot compare"
+	select LV_USE_LODEPNG
+	help
+		Enable `lv_test_screenshot_compare()`. Requires a few MB of extra RAM.
+
+config LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+	bool "Create missing reference images"
+	default y
+	depends on LV_USE_TEST_SCREENSHOT_COMPARE
+	help
+		When a reference image does not exist yet, create it from the rendered
+		screen instead of failing the compare.
+
+config LV_USE_NANOVG_TEST_HEADLESS
+	bool "Headless EGL display for NanoVG"
+	depends on LV_USE_DRAW_NANOVG
+	help
+		Render into an off-screen EGL pbuffer instead of a window and read the
+		pixels back into the LVGL draw buffer, so screenshot compares work the
+		same way as with the software renderer. Requires EGL and GLESv2.
+
+endif #LV_USE_TEST

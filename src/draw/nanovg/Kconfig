@@ -1,0 +1,50 @@
+config LV_USE_DRAW_NANOVG
+	bool "NanoVG renderer"
+	default n
+	select LV_USE_NANOVG
+	select LV_USE_OPENGLES
+	select LV_USE_MATRIX
+	select LV_DRAW_HAS_VECTOR_SUPPORT
+	select LV_DRAW_HAS_3D_SUPPORT
+	help
+		Draw with the NanoVG vector library on top of OpenGL / OpenGL ES shaders.
+
+if LV_USE_DRAW_NANOVG
+
+choice LV_NANOVG_BACKEND
+	prompt "NanoVG OpenGL backend"
+	default LV_NANOVG_BACKEND_GLES2
+	help
+		NanoVG shader flavor to compile. Must match the OpenGL context the
+		display driver creates.
+
+	config LV_NANOVG_BACKEND_GL2
+		bool "OpenGL 2.0"
+	config LV_NANOVG_BACKEND_GL3
+		bool "OpenGL 3.0+"
+	config LV_NANOVG_BACKEND_GLES2
+		bool "OpenGL ES 2.0"
+	config LV_NANOVG_BACKEND_GLES3
+		bool "OpenGL ES 3.0+"
+endchoice
+
+config LV_NANOVG_BACKEND
+	int
+	default 1 if LV_NANOVG_BACKEND_GL2
+	default 2 if LV_NANOVG_BACKEND_GL3
+	default 3 if LV_NANOVG_BACKEND_GLES2
+	default 4 if LV_NANOVG_BACKEND_GLES3
+
+config LV_NANOVG_IMAGE_CACHE_CNT
+	int "Image texture cache size (entries)"
+	default 128
+	help
+		Number of decoded images kept as GPU textures.
+
+config LV_NANOVG_LETTER_CACHE_CNT
+	int "Letter cache size (entries)"
+	default 512
+	help
+		Number of rendered glyphs kept for text drawing.
+
+endif

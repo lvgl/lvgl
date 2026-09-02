@@ -307,8 +307,8 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     lv_obj_t * obj = ((lv_draw_dsc_base_t *)task->draw_dsc)->obj;
     bool original_send_draw_task_event = false;
     if(obj) {
-        original_send_draw_task_event = lv_obj_has_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-        lv_obj_remove_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+        original_send_draw_task_event = lv_obj_is_send_draw_task_events(obj);
+        lv_obj_set_send_draw_task_events(obj, false);
     }
 
     if(cache_data != NULL) {
@@ -317,7 +317,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
         LV_ASSERT_MALLOC(cache_data->draw_dsc);
         if(cache_data->draw_dsc == NULL) {
             if(obj) {
-                lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+                lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
             }
             LV_PROFILER_DRAW_END;
             return 0;
@@ -408,7 +408,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
             *in opengles_texture_cache_free_cb*/
             LV_LOG_ERROR("OpenGLES draw unit does not support tasks of type %d", task->type);
             if(obj) {
-                lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+                lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
             }
             LV_PROFILER_DRAW_END;
             return 0;
@@ -430,7 +430,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     }
 
     if(obj) {
-        lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+        lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
     }
 
     LV_PROFILER_DRAW_END;
@@ -542,15 +542,6 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *)t->draw_unit;
     cache_data_t data_to_find;
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
-    bool h_flip = false;
-    bool v_flip = false;
-#if LV_USE_3DTEXTURE
-    if(t->type == LV_DRAW_TASK_TYPE_3D) {
-        lv_draw_3d_dsc_t * _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
-        h_flip = _3d_dsc->h_flip;
-        v_flip = _3d_dsc->v_flip;
-    }
-#endif
     data_to_find.w = lv_area_get_width(&t->_real_area);
     data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = 0;
@@ -639,8 +630,8 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                     }
 
                     if(fill_dsc->opa >= LV_OPA_MAX) {
-                        float tex_w = (float)lv_area_get_width(&fill_area);
-                        float tex_h = (float)lv_area_get_height(&fill_area);
+                        int32_t tex_w = lv_area_get_width(&fill_area);
+                        int32_t tex_h = lv_area_get_height(&fill_area);
                         GL_CALL(glEnable(GL_SCISSOR_TEST));
                         GL_CALL(glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h));
                         /* swap red and blue channels here as they will be swapped back during flushing*/

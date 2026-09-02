@@ -21,6 +21,14 @@
  *      DEFINES
  *********************/
 
+/*Consecutive `lv_draw_dispatch()` calls tolerated without the pending task
+ *count changing. A layer allocation that fails leaves its draw task queued
+ *("Try later" in `lv_draw_layer_alloc_buf()`), and without an OS the loop below
+ *would retry it forever: a fragmented heap turns a snapshot into a livelock
+ *that hangs the whole application. 512 is roughly 100 ms of failing retries on
+ *a low-end target, far above any legitimate stall.*/
+#define LV_SNAPSHOT_MAX_STALLED_DISPATCHES 512U
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -28,6 +36,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static uint32_t snapshot_pending_task_count(const lv_layer_t * layer);
+static void snapshot_discard_layer_tasks(lv_layer_t * layer, lv_display_t * disp);
 
 /**********************
  *  STATIC VARIABLES
@@ -173,9 +183,33 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
 
     layer.all_tasks_added = true;
 
+    uint32_t stalled_dispatches = 0;
+    uint32_t last_task_count = snapshot_pending_task_count(&layer);
+
     while(layer.draw_task_head) {
+#if LV_USE_OS
+        /*Without an OS this busy-spins on `_draw_info.dispatch_req`, so the
+         *stall counter below would never be reached.*/
         lv_draw_dispatch_wait_for_request();
+#endif
         lv_draw_dispatch();
+
+        uint32_t task_count = snapshot_pending_task_count(&layer);
+        if(task_count != last_task_count) {
+            last_task_count = task_count;
+            stalled_dispatches = 0;
+        }
+        else if(++stalled_dispatches > LV_SNAPSHOT_MAX_STALLED_DISPATCHES) {
+            LV_LOG_WARN("Snapshot draw queue stalled, aborting");
+            snapshot_discard_layer_tasks(&layer, disp_new);
+            disp_new->layer_head = layer_old;
+            lv_refr_set_disp_refreshing(disp_old);
+
+            /*Balance the CHILD_CREATED sent for the top layer above; sub-layers
+             *were already balanced by lv_draw_cleanup_task().*/
+            lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, &layer);
+            return LV_RESULT_INVALID;
+        }
     }
 
     disp_new->layer_head = layer_old;
@@ -203,7 +237,7 @@ lv_draw_buf_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
 
 void lv_snapshot_free(lv_image_dsc_t * dsc)
 {
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy directly.");
+    LV_LOG_DEPRECATED("use lv_draw_buf_destroy directly");
     lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
 }
 
@@ -212,7 +246,7 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
                                     uint32_t buf_size)
 {
     lv_draw_buf_t draw_buf;
-    LV_LOG_WARN("Deprecated API, use lv_snapshot_take_to_draw_buf instead.");
+    LV_LOG_DEPRECATED("use lv_snapshot_take_to_draw_buf instead.");
     lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);
     lv_result_t res = lv_snapshot_take_to_draw_buf(obj, cf, &draw_buf);
     if(res == LV_RESULT_OK) {
@@ -224,5 +258,69 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ * Count the draw tasks still pending for a snapshot, across every layer the
+ * redraw created.
+ *
+ * Counting only the top layer would miss all progress made inside a sub-layer:
+ * a task leaves the top layer's list only once it is `READY`, so rendering a
+ * sub-layer keeps the top count constant and would look like a stall.
+ * @param  layer   the snapshot's top layer, which is the head of the chain
+ * @return         number of pending draw tasks
+ */
+static uint32_t snapshot_pending_task_count(const lv_layer_t * layer)
+{
+    uint32_t count = 0;
+
+    while(layer) {
+        const lv_draw_task_t * task = layer->draw_task_head;
+        while(task) {
+            count++;
+            task = task->next;
+        }
+        layer = layer->next;
+    }
+
+    return count;
+}
+
+/**
+ * Release every draw task a stalled snapshot left queued, freeing the sub-layers
+ * they created along the way.
+ *
+ * `lv_draw_dispatch_layer()` only cleans up tasks that reached
+ * `LV_DRAW_TASK_STATE_READY`, and a sub-layer is freed only when its parent's
+ * LAYER task is cleaned up, so abandoning the redraw would otherwise leak both
+ * the queued tasks and every sub-layer allocated for them - on the one path that
+ * runs when memory is already short.  `lv_draw_cleanup_task()` frees a LAYER
+ * task's sub-layer but not the tasks still queued inside it, so those are
+ * released first by recursing into the sub-layer.
+ * @param  layer   layer whose queued tasks are released.  Its own draw buffer
+ *                 is left untouched: for the snapshot's top layer it belongs to
+ *                 the caller, and a sub-layer's buffer is freed by the parent
+ *                 LAYER task that owns it.
+ * @param  disp    display being refreshed, needed to release the sub-layers
+ */
+static void snapshot_discard_layer_tasks(lv_layer_t * layer, lv_display_t * disp)
+{
+    lv_draw_task_t * task = layer->draw_task_head;
+
+    while(task) {
+        lv_draw_task_t * task_next = task->next;
+
+        if(task->type == LV_DRAW_TASK_TYPE_LAYER) {
+            lv_draw_image_dsc_t * image_dsc = task->draw_dsc;
+            lv_layer_t * sub_layer = (lv_layer_t *)image_dsc->src;
+            if(sub_layer) snapshot_discard_layer_tasks(sub_layer, disp);
+        }
+
+        lv_draw_cleanup_task(task, disp);
+
+        task = task_next;
+    }
+
+    layer->draw_task_head = NULL;
+}
 
 #endif /*LV_USE_SNAPSHOT*/

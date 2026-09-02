@@ -15,8 +15,7 @@
 
 #include "lv_draw_pxp.h"
 
-#if LV_USE_PXP
-#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
+#if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 #include "../../../core/lv_global.h"
@@ -167,7 +166,6 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if LV_USE_DRAW_PXP
 static inline bool _pxp_src_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
@@ -329,8 +327,10 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
         return LV_DRAW_UNIT_IDLE;
 
-    if(lv_draw_layer_alloc_buf(layer) == NULL)
+    if(lv_draw_layer_alloc_buf(layer) == NULL) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
         return LV_DRAW_UNIT_IDLE;
+    }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_pxp_unit->task_act = t;
@@ -487,7 +487,5 @@ static void _pxp_render_thread_cb(void * ptr)
     lv_thread_sync_delete(&u->sync);
     LV_LOG_INFO("Exit PXP draw thread.");
 }
-#endif
+#endif /*LV_USE_PXP_DRAW_THREAD*/
 #endif /*LV_USE_DRAW_PXP*/
-#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
-#endif /*LV_USE_PXP*/

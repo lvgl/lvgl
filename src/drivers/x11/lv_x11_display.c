@@ -23,14 +23,6 @@
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
 
-#if LV_X11_RENDER_MODE_PARTIAL
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
-#elif defined LV_X11_RENDER_MODE_DIRECT
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
-#elif defined LV_X11_RENDER_MODE_FULL
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -74,7 +66,7 @@ typedef struct {
 typedef lv_color32_t color_t;
 static inline lv_color32_t get_px(color_t p)
 {
-    return (lv_color32_t)p;
+    return p;
 }
 #elif LV_COLOR_DEPTH == 24
 typedef lv_color_t color_t;

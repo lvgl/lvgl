@@ -16,8 +16,8 @@
 #include "../core/lv_global.h"
 
 #if LV_USE_FREETYPE && LV_USE_HARFBUZZ
-    #include "../libs/freetype/lv_freetype_harfbuzz.h"
-    #include "../libs/freetype/lv_freetype_private.h"
+    #include "../font/freetype/lv_freetype_harfbuzz.h"
+    #include "../font/freetype/lv_freetype_private.h"
 #endif
 
 /*********************
@@ -234,7 +234,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     }
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
-        if(base_dsc->obj && !lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
+        if(base_dsc->obj && !lv_obj_is_send_draw_task_events(base_dsc->obj)) {
             w = dsc->text_size.x;
         }
         else {
@@ -696,6 +696,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
 
 #if LV_USE_FREETYPE && LV_USE_HARFBUZZ
 harfbuzz_next_line:
+        ;
 #endif
 
 #if LV_USE_BIDI
@@ -777,6 +778,8 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
 
     LV_PROFILER_DRAW_BEGIN;
     if(dsc->g == NULL) {
+        /*The local glyph dsc never outlives this call: dsc->g is reset to NULL at exit*/
+        /*cppcheck-suppress autoVariables*/
         dsc->g = &g;
         /*If the glyph dsc is not set then get it from the font*/
         bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, 0);
@@ -838,6 +841,8 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
         dsc->format = LV_FONT_GLYPH_FORMAT_NONE;
     }
 
+    /*Points to a local, but cb() consumes it synchronously before this call returns*/
+    /*cppcheck-suppress autoVariables*/
     dsc->letter_coords = &letter_coords;
     cb(t, dsc, NULL, NULL);
 

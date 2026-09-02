@@ -14,11 +14,11 @@
 #include "../../core/lv_global.h"
 #include "../../misc/lv_area_private.h"
 
-#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-    #if LV_USE_THORVG_EXTERNAL
-        #include <thorvg_capi.h>
-    #else
+#if LV_USE_THORVG
+    #if LV_USE_THORVG_INTERNAL
         #include "../../libs/thorvg/thorvg_capi.h"
+    #else
+        #include <thorvg_capi.h>
     #endif
 #endif
 
@@ -288,7 +288,10 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         /*Allocate a buffer if not done yet.*/
         void * buf = lv_draw_layer_alloc_buf(layer);
         /*Do not return is failed. The other thread might already have a buffer can do something. */
-        if(buf == NULL) continue;
+        if(buf == NULL) {
+            t->state = LV_DRAW_TASK_STATE_FAILED;
+            continue;
+        }
 
         /*Take the task*/
         all_idle = false;
@@ -320,6 +323,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
         LV_PROFILER_DRAW_END;
         return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }

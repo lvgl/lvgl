@@ -16,6 +16,7 @@ extern "C" {
  *********************/
 
 #include "../lvgl_public.h"
+#include "lv_array.h"
 
 /*********************
  *      DEFINES
@@ -108,12 +109,12 @@ bool lv_circle_buf_is_full(const lv_circle_buf_t * circle_buf);
 /**
  * Reset the buffer
  * @param circle_buf pointer to buffer
- * @return LV_RESULT_OK: the buffer is reset; LV_RESULT_INVALID: the buffer is not reset
  */
 void lv_circle_buf_reset(lv_circle_buf_t * circle_buf);
 
 /**
  * Get the head of the buffer
+ * @note The capacity of the buffer must be greater than 0.
  * @param circle_buf pointer to buffer
  * @return pointer to the head of the buffer
  */
@@ -121,6 +122,7 @@ void * lv_circle_buf_head(const lv_circle_buf_t * circle_buf);
 
 /**
  * Get the tail of the buffer
+ * @note The capacity of the buffer must be greater than 0.
  * @param circle_buf pointer to buffer
  * @return pointer to the tail of the buffer
  */
@@ -170,6 +172,7 @@ lv_result_t lv_circle_buf_peek(const lv_circle_buf_t * circle_buf, void * data);
 
 /**
  * Peek a value at an index
+ * @note The size of the buffer must be greater than 0.
  * @param circle_buf pointer to buffer
  * @param index the index of the value to peek, if the index is greater than the size of the buffer, it will return looply.
  * @param data pointer to a variable to store the peeked value

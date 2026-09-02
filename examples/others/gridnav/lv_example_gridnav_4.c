@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_GRIDNAV && LV_USE_FLEX && LV_BUILD_EXAMPLES
 
+/*The navigated content is built from the deprecated `lv_list` widget.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static void event_handler(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target_obj(e);
@@ -51,5 +54,7 @@ void lv_example_gridnav_4(void)
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, "Button");
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

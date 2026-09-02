@@ -15,6 +15,19 @@
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 
+#ifndef LV_SYSMON_GET_IDLE
+    #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
+#endif
+
+extern uint32_t LV_SYSMON_GET_IDLE(void);
+
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
+    #ifndef LV_SYSMON_GET_PROC_IDLE
+        #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
+    #endif
+    extern uint32_t LV_SYSMON_GET_PROC_IDLE(void);
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -118,11 +131,7 @@ void lv_sysmon_show_performance(lv_display_t * disp)
         lv_display_add_event_cb(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
     }
 
-#if LV_USE_PERF_MONITOR_LOG_MODE
-    lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
-#else
-    lv_obj_remove_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
-#endif
+    lv_obj_set_hidden(disp->perf_label, LV_USE_PERF_MONITOR_LOG_MODE);
 }
 
 void lv_sysmon_hide_performance(lv_display_t * disp)
@@ -133,7 +142,7 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
         return;
     }
 
-    lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(disp->perf_label, true);
 }
 
 void lv_sysmon_performance_dump(lv_display_t * disp)
@@ -179,7 +188,7 @@ void lv_sysmon_show_memory(lv_display_t * disp)
         lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
     }
 
-    lv_obj_remove_flag(disp->mem_label, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(disp->mem_label, false);
 }
 
 void lv_sysmon_hide_memory(lv_display_t * disp)
@@ -190,7 +199,7 @@ void lv_sysmon_hide_memory(lv_display_t * disp)
         return;
     }
 
-    lv_obj_add_flag(disp->mem_label, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(disp->mem_label, true);
 }
 
 #endif
@@ -254,7 +263,6 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
 
 static void perf_dump_info(lv_display_t * disp)
 {
-    uint32_t LV_SYSMON_GET_IDLE(void);
 
     lv_sysmon_perf_info_t * info = &disp->perf_sysmon_info;
     info->calculated.run_cnt++;
@@ -269,7 +277,6 @@ static void perf_dump_info(lv_display_t * disp)
 
     info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
-    uint32_t LV_SYSMON_GET_PROC_IDLE(void);
     info->calculated.cpu_proc = 100 - LV_SYSMON_GET_PROC_IDLE();
 #endif /*LV_SYSMON_PROC_IDLE_AVAILABLE*/
     info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :

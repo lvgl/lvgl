@@ -22,7 +22,7 @@
  * containing only the glyphs this example renders.  Regenerate it with:
  *   fonttools subset NotoSansDevanagari-Regular.ttf --layout-features='*' \
  *       --no-glyph-names --no-hinting --desubroutinize \
- *       --text="<the strings drawn below>"
+ *       --text="<the strings drawn below and in tests/src/test_cases/libs/test_freetype_harfbuzz.c>"
  */
 void lv_example_harfbuzz_1(void)
 {

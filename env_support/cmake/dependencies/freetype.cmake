@@ -80,4 +80,4 @@ set(FT_WITH_ZLIB
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(freetype)
-lvgl_link_raw(TARGETS freetype PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
+lvgl_link_fetched(TARGETS freetype PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

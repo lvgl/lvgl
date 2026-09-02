@@ -16,7 +16,6 @@ extern "C" {
 
 #include "../lv_types.h"
 #include "../config/lv_conf_internal.h"
-#include "../misc/lv_array.h"
 
 
 /*********************
@@ -132,12 +131,6 @@ typedef enum {
     LV_EVENT_MARKED_DELETING = 0x10000,
 } lv_event_code_t;
 
-typedef struct {
-    lv_array_t array;
-    uint8_t is_traversing: 1;          /**< True: the list is being nested traversed */
-    uint8_t has_marked_deleting: 1;    /**< True: the list has marked deleting objects
-                                         when some of events are marked as deleting */
-} lv_event_list_t;
 
 /**
  * @brief Event callback.

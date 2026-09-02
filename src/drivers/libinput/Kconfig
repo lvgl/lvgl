@@ -1,0 +1,54 @@
+config LV_USE_LIBINPUT
+	bool "libinput"
+	default n
+	help
+		Read pointer, touch and keyboard input through libinput, which must be available in the build.
+
+if LV_USE_LIBINPUT
+
+config LV_LIBINPUT_BSD
+	bool "BSD variant of libinput"
+	default n
+
+config LV_LIBINPUT_XKB
+	bool "Full keyboard support via XKB"
+	default n
+	help
+		Map key events to characters with XKB layouts, so modifiers and non-US layouts work.
+		Requires linking with -lxkbcommon.
+
+if LV_LIBINPUT_XKB
+
+config LV_LIBINPUT_XKB_RULES
+	string "XKB rules"
+	default ""
+	help
+		Run `setxkbmap -query` to find the right values for your keyboard.
+
+config LV_LIBINPUT_XKB_MODEL
+	string "XKB model"
+	default "pc101"
+
+config LV_LIBINPUT_XKB_LAYOUT
+	string "XKB layout"
+	default "us"
+
+config LV_LIBINPUT_XKB_VARIANT
+	string "XKB variant"
+	default ""
+
+config LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
+	bool "System default XKB options"
+	default y
+	help
+	  Pass NULL for the XKB options so the system default applies (e.g. from the
+	  XKB_DEFAULT_OPTIONS env var). Otherwise LV_LIBINPUT_XKB_OPTIONS is used.
+
+config LV_LIBINPUT_XKB_OPTIONS
+	string "XKB options"
+	default ""
+	depends on !LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
+
+endif # LV_LIBINPUT_XKB
+
+endif #LV_USE_LIBINPUT

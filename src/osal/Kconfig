@@ -1,0 +1,94 @@
+menu "Operating System (OS)"
+choice LV_USE_OS
+	prompt "Operating system"
+	default LV_OS_NONE
+
+	config LV_OS_NONE
+		bool "None"
+	config LV_OS_PTHREAD
+		bool "POSIX threads (pthread)"
+		select LV_OS_USE_PTHREAD
+	config LV_OS_FREERTOS
+		bool "FreeRTOS"
+		select LV_OS_USE_FREERTOS
+	config LV_OS_CMSIS_RTOS2
+		bool "CMSIS-RTOS2"
+		select LV_OS_USE_CMSIS_RTOS2
+	config LV_OS_RTTHREAD
+		bool "RT-Thread"
+		select LV_OS_USE_RTTHREAD
+	config LV_OS_WINDOWS
+		bool "Windows"
+		select LV_OS_USE_WINDOWS
+	config LV_OS_MQX
+		bool "MQX"
+		select LV_OS_USE_MQX
+	config LV_OS_SDL2
+		bool "SDL2"
+		select LV_OS_USE_SDL2
+	config LV_OS_CUSTOM
+		bool "Custom"
+		select LV_OS_USE_CUSTOM_INCLUDE
+endchoice
+
+config LV_USE_OS
+	int
+	default 0 if LV_OS_NONE
+	default 1 if LV_OS_PTHREAD
+	default 2 if LV_OS_FREERTOS
+	default 3 if LV_OS_CMSIS_RTOS2
+	default 4 if LV_OS_RTTHREAD
+	default 5 if LV_OS_WINDOWS
+	default 6 if LV_OS_MQX
+	default 7 if LV_OS_SDL2
+	default 255 if LV_OS_CUSTOM
+
+config LV_OS_USE_PTHREAD
+	bool
+
+config LV_OS_USE_FREERTOS
+	bool
+
+config LV_OS_USE_CMSIS_RTOS2
+	bool
+
+config LV_OS_USE_RTTHREAD
+	bool
+
+config LV_OS_USE_WINDOWS
+	bool
+
+config LV_OS_USE_MQX
+	bool
+
+config LV_OS_USE_SDL2
+	bool
+
+config LV_OS_USE_CUSTOM_INCLUDE
+	bool
+
+config LV_OS_CUSTOM_INCLUDE
+	string "Custom OS include header"
+	default ""
+	depends on LV_OS_CUSTOM
+
+if LV_OS_FREERTOS
+menu "FreeRTOS Configuration"
+
+config LV_USE_FREERTOS_TASK_NOTIFY
+	bool "Direct task notifications"
+	default y
+	help
+		Synchronize with direct task notifications instead of an intermediary object such as a
+		binary semaphore: 45% faster and less RAM, but only usable when a single task can be
+		the recipient of the event.
+
+config LV_OS_IDLE_PERCENT_CUSTOM
+	bool "Custom idle percentage calculation"
+	default n
+	help
+		Provide your own lv_os_get_idle_percent(). Useful on multi-core systems, where the
+		default FreeRTOS implementation may not track idle time across all cores.
+endmenu
+endif #LV_OS_FREERTOS
+endmenu

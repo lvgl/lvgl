@@ -1,0 +1,112 @@
+menu "Input Devices"
+
+config LV_INDEV_DEF_SCROLL_LIMIT
+	int "Scroll threshold (px)"
+	range 0 255
+	default 10
+	help
+		Distance the pointer needs to travel before scrolling starts.
+
+config LV_INDEV_DEF_SCROLL_THROW
+	int "Scroll throw slow-down (%)"
+	range 1 100
+	default 10
+	help
+		Slow-down applied after releasing a scroll. Greater value means faster slow-down.
+
+config LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
+	int "Elastic scroll slow-down factor"
+	range 1 255
+	default 4
+	help
+		Scrolling past the edge of a scrollable widget is slower by this factor.
+
+config LV_INDEV_DEF_LONG_PRESS_TIME
+	int "Long press time (ms)"
+	range 0 65535
+	default 400
+	help
+		Press time after which `LV_EVENT_LONG_PRESSED` is sent.
+
+config LV_INDEV_DEF_LONG_PRESS_REP_TIME
+	int "Long press repeat period (ms)"
+	range 0 65535
+	default 100
+	help
+		Time between `LV_EVENT_LONG_PRESSED_REPEAT` events.
+
+config LV_INDEV_DEF_DOUBLE_CLICK_TIME
+	int "Multi-click time (ms)"
+	range 0 65535
+	default 400
+	help
+		Max time between consecutive clicks to count as a double or triple click.
+
+config LV_INDEV_DEF_GESTURE_LIMIT
+	int "Gesture threshold (px)"
+	range 0 255
+	default 50
+	help
+		Distance the pointer needs to travel before a gesture is detected.
+
+config LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+	int "Gesture minimum velocity (px)"
+	range 0 255
+	default 3
+	help
+		Minimum pointer velocity at release to report a swipe.
+
+config LV_INDEV_DEF_ROTARY_SENSITIVITY
+	int "Rotary sensitivity"
+	range 1 65535
+	default 256
+	help
+		The encoder diff is multiplied by this value and divided by 256.
+
+config LV_USE_GRIDNAV
+	bool "Grid navigation"
+	default n
+	help
+		Move focus between a container's children with arrow keys, based on their position.
+
+config LV_USE_GESTURE_RECOGNITION
+	bool "Multi-touch gesture recognition"
+	select LV_USE_FLOAT
+	default n
+	help
+		Detect pinch and rotate gestures from multi-touch input. Requires float support.
+
+if LV_USE_GESTURE_RECOGNITION
+
+config LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD
+	int "Pinch in threshold (%)"
+	range 1 99
+	default 75
+	help
+		Scale the fingers need to pinch down to before pinch events are sent.
+
+config LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+	int "Pinch out threshold (%)"
+	range 101 1000
+	default 150
+	help
+		Scale the fingers need to pinch up to before pinch events are sent.
+
+config LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE
+	int "Pinch maximum initial scale (%)"
+	range 101 1000
+	default 250
+	help
+		A pinch starting above this scale is discarded.
+		Must be greater than the pinch out threshold.
+
+config LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD
+	int "Rotation threshold (mrad)"
+	range 1 3141
+	default 200
+	help
+		Angle the fingers need to rotate by before rotation events are sent.
+
+endif #LV_USE_GESTURE_RECOGNITION
+
+endmenu

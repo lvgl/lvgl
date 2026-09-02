@@ -10,8 +10,19 @@ set(LV_BUILD_CONF_DIR "" CACHE PATH
     "Can be used to specify the include dir containing lv_conf.h, to be used in conjunction with LV_CONF_INCLUDE_SIMPLE")
 
 option(LV_BUILD_USE_KCONFIG "Use Kconfig" OFF)
-set(LV_BUILD_DEFCONFIG_PATH "" CACHE PATH
-    "Supply the default Kconfig configuration - used with Kconfig")
+set(LV_BUILD_DEFCONFIG_PATH "" CACHE STRING
+    "Supply the default Kconfig configuration - used with Kconfig. Accepts a \
+\";\"-separated list of defconfigs, merged in order so later ones override earlier ones")
+
+option(LV_BUILD_DEFCONFIG_STRICT
+    "Fail if a defconfig assigns an unknown or promptless symbol, or a value \
+that ends up having no effect. Off by default so that existing configurations \
+keep working" OFF)
+
+set(LV_BUILD_DOTCONFIG_PATH "" CACHE PATH
+    "Path to .config path - used with Kconfig")
+
+set(LV_BUILD_KCONFIG_ROOT ${LVGL_ROOT_DIR}/Kconfig CACHE PATH "Path to root Kconfig file")
 
 option(LV_BUILD_SET_CONFIG_OPTS
     "Create variables from the definitions in lv_conf_internal.h"  OFF)
@@ -36,6 +47,8 @@ option(LV_USE_FIND_PACKAGE "Resolve dependencies via find_package" ON)
 option(LV_USE_PKG_CONFIG "Resolve dependencies via pkg-config (requires pkg-config to be installed)" ON)
 option(LV_FETCH_DEPENDENCIES "Fetch dependencies from source if not found on the system" ON)
 
+option(LV_BUILD_TESTS "Build the unit tests in the tests directory" OFF)
+
 option(CONFIG_LV_BUILD_DEMOS "Build demos" ON)
 option(CONFIG_LV_BUILD_EXAMPLES "Build examples" ON)
 option(CONFIG_LV_USE_THORVG_INTERNAL "Use the internal version of ThorVG" ON)
@@ -47,15 +60,40 @@ if (LV_BUILD_CONF_PATH AND LV_BUILD_CONF_DIR)
     message(FATAL_ERROR "can not use LV_BUILD_CONF_DIR and LV_BUILD_CONF_PATH at the same time")
 endif()
 
+if (LV_BUILD_TESTS)
+    if (NOT EXISTS ${LVGL_ROOT_DIR}/tests/CMakeLists.txt)
+        message(FATAL_ERROR "LV_BUILD_TESTS is set but the tests directory is missing")
+    endif()
+
+    # Every test configuration is a set of Kconfig defconfigs, see
+    # tests/configs and the recipes in tests/main.py
+    set(LV_BUILD_USE_KCONFIG ON)
+    set(LV_BUILD_DEFCONFIG_STRICT ON)
+
+    set(CMAKE_C_STANDARD 99)
+    set(CMAKE_CXX_STANDARD 14)
+
+    # Lets `ctest -T memcheck` work. include(CTest) reads this, so it has to be
+    # found here rather than in tests/CMakeLists.txt.
+    find_program(VALGRIND_EXECUTABLE valgrind)
+    if (VALGRIND_EXECUTABLE)
+        set(MEMORYCHECK_COMMAND ${VALGRIND_EXECUTABLE})
+        set(MEMORYCHECK_COMMAND_OPTIONS --error-exitcode=1)
+    endif()
+
+    enable_testing()
+    include(CTest)
+endif()
+
 if (LV_BUILD_USE_KCONFIG)
-    # If Kconfig is used then enable PCPP
+    # If Kconfig is used then the configuration has to be expanded
     set(LV_BUILD_SET_CONFIG_OPTS ON)
 endif()
 
 if (LV_BUILD_SET_CONFIG_OPTS)
     # Python is required when LV_BUILD_SET_CONFIG_OPTS is enabled
-    # PCPP is used to pre-process lv_conf_internal.h and it avoids setting
-    # CONFIG_LV_USE or CONFIG_LV_BUILD options manually
+    # lv_conf_internal.h is pre-processed to avoid setting CONFIG_LV_USE
+    # or CONFIG_LV_BUILD options manually
     find_package(Python REQUIRED)
 endif()
 
@@ -91,10 +129,13 @@ endif()
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
+set(CONF_PATH)
+include(${CMAKE_CURRENT_LIST_DIR}/lvgl_target_definitions.cmake)
 if (NOT LV_BUILD_USE_KCONFIG)
 
     # Default - use the lv_conf.h configuration file
-    target_compile_definitions(lvgl PUBLIC LV_KCONFIG_IGNORE)
+    lvgl_build_definitions(LV_KCONFIG_IGNORE)
+    lvgl_install_definitions(LV_KCONFIG_IGNORE)
 
     message(STATUS ${LV_BUILD_CONF_PATH})
 
@@ -110,7 +151,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
 
         get_filename_component(CONF_INC_DIR ${CONF_PATH} DIRECTORY)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_PATH="${CONF_PATH}")
+        lvgl_build_definitions("LV_CONF_PATH=\"${CONF_PATH}\"")
 
     elseif(LV_BUILD_CONF_DIR)
 
@@ -128,7 +169,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
 
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE)
+        lvgl_build_definitions(LV_CONF_INCLUDE_SIMPLE)
 
     else()
 
@@ -139,7 +180,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
         set(CONF_INC_DIR ${CMAKE_SOURCE_DIR})
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE)
+        lvgl_build_definitions(LV_CONF_INCLUDE_SIMPLE)
 
     endif()
 
@@ -147,6 +188,10 @@ if (NOT LV_BUILD_USE_KCONFIG)
     if (NOT EXISTS ${CONF_PATH})
         message(FATAL_ERROR "Configuration file: ${CONF_PATH} - not found")
     endif()
+
+    # The lv_conf.h used during the build is installed to <includedir>/lvgl/lv_conf.h
+    # (see the installation section), so the installed library is self-contained and
+    # consumers resolve it the same way as in the Kconfig case, via LV_CONF_PATH.
 
 else()
 
@@ -159,31 +204,37 @@ else()
     # generate_cmake_variables.py script.
     set(GEN_VARS_KCONFIG_MODE_FLAG --kconfig)
 
-    # If using Kconfig, we need to define additional definitions
-    target_compile_definitions(lvgl PUBLIC
-        "LV_CONF_SKIP"
-        "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${KCONFIG_EXTERNAL_INCLUDE}\"")
-
+    # If using Kconfig, we need to define additional build definitions
+    lvgl_build_definitions(
+      LV_CONF_SKIP
+      "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${KCONFIG_EXTERNAL_INCLUDE}\"")
 endif()
 
+
+
 if (LV_BUILD_LVGL_H_SYSTEM_INCLUDE)
-    target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SYSTEM)
+    lvgl_build_definitions(LV_LVGL_H_INCLUDE_SYSTEM)
 elseif(LV_BUILD_LVGL_H_SIMPLE_INCLUDE)
-    target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SIMPLE)
+    lvgl_build_definitions(LV_LVGL_H_INCLUDE_SIMPLE)
 endif()
 
 
 if (LV_BUILD_SET_CONFIG_OPTS)
-    # Use the portable pcpp to preprocess lv_conf_internal.h
+    # Use the C compiler of the build to preprocess lv_conf_internal.h
 
-    get_target_property(CONF_DEFINES lvgl COMPILE_DEFINITIONS)
+    # Use the definitions active during the build (recorded by
+    # lvgl_build_definitions). We can't use get_target_property(...
+    # COMPILE_DEFINITIONS) here because it returns raw generator-expression
+    # syntax (e.g. "$<BUILD_INTERFACE:LV_CONF_SKIP>") that the preprocessor
+    # can't parse.
+    get_property(CONF_DEFINES GLOBAL PROPERTY LVGL_BUILD_DEFINES)
 
     execute_process(
-        COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
+        COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/build-tools/preprocess_lv_conf_internal.py
         --input ${LVGL_INCLUDE_DIR}/lvgl/config/lv_conf_internal.h
         --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
         --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
-        --workfolder ${CMAKE_CURRENT_BINARY_DIR}
+        --cc ${CMAKE_C_COMPILER}
         --defs ${CONF_DEFINES}
         --include ${LVGL_ROOT_DIR} ${CMAKE_SOURCE_DIR} ${LVGL_ROOT_DIR}/src ${CONF_INC_DIR}
         RESULT_VARIABLE ret
@@ -217,6 +268,16 @@ if (LV_BUILD_SET_CONFIG_OPTS)
 
     # This will set all CONFIG_LV_USE_* or CONFIG_LV_BUILD_* variables in cmake
     include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
+
+    # Regen lv_conf.cmake when lv_conf.h changes
+    if(CONF_PATH)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CONF_PATH})
+    endif()
+
+    if(NOT CONFIG_LV_USE_PRIVATE_API AND (CONFIG_LV_BUILD_DEMOS OR CONFIG_LV_BUILD_EXAMPLES))
+        message(STATUS "CONFIG_LV_USE_PRIVATE_API forcefully enabled because demos or examples are being built")
+        set(CONFIG_LV_USE_PRIVATE_API ON CACHE BOOL "" FORCE)
+    endif()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/lvgl_link_libraries.cmake)
@@ -321,11 +382,20 @@ if(CONFIG_LV_USE_PRIVATE_API)
     ")
 endif()
 
-# When KConfig is used, copy the expanded conf header and rename it to lv_conf.h
+# Install lv_conf.h inside lvgl/config so its next to lv_conf_internal.h
+# and define LV_CONF_INCLUDE_SIMPLE so that it can be found
+lvgl_install_definitions(LV_CONF_INCLUDE_SIMPLE)
 if(LV_BUILD_USE_KCONFIG)
+    # Kconfig: install the expanded configuration header
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/config"
+        RENAME lv_conf.h)
+else()
+    # Non-kconfig: install the actual lv_conf.h used during the build
+    install(
+        FILES "${CONF_PATH}"
+	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/config"
         RENAME lv_conf.h)
 endif()
 
@@ -336,7 +406,9 @@ get_property(PKG_LIBS_PRIVATE GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
 get_property(CMAKE_PUBLIC_DEPS GLOBAL PROPERTY LVGL_CMAKE_PUBLIC_DEPS)
 get_property(CMAKE_PRIVATE_DEPS GLOBAL PROPERTY LVGL_CMAKE_PRIVATE_DEPS)
 get_property(CMAKE_RAW_LIBS GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS)
+get_property(PKG_CFLAGS GLOBAL PROPERTY LVGL_INSTALL_DEFINES)
 
+list(JOIN PKG_CFLAGS " " LVGL_PKG_CFLAGS)
 list(JOIN PKG_LIBS_PRIVATE " " LVGL_PKG_LIBS_PRIVATE)
 list(JOIN PKG_REQUIRES " " LVGL_PKG_REQUIRES)
 list(JOIN PKG_REQUIRES_PRIVATE " " LVGL_PKG_REQUIRES_PRIVATE)
@@ -471,10 +543,17 @@ if (HAS_PARENT_SCOPE)
     set(LVGL_COMPILER_DEFINES ${COMP_DEF} PARENT_SCOPE)
 
 else()
-    # The file has been included by tests/CMakeLists.txt -
-    # or somewhere else, set variable containing the normalized path of the include dir
-    # containing the configuration file
+    # Building LVGL as the top-level project, set variable containing the
+    # normalized path of the include dir containing the configuration file
     set(LVGL_CONF_INC_DIR ${CONF_INC_DIR})
     set(LVGL_CONF_PATH ${CONF_PATH})
     set(LVGL_COMPILER_DEFINES ${COMP_DEF})
+endif()
+
+############################## TESTS ######################################
+
+# Added last so that the tests can adjust the targets created above, e.g. to
+# compile LVGL itself with the sanitizers and the strict warning set.
+if (LV_BUILD_TESTS)
+    add_subdirectory(${LVGL_ROOT_DIR}/tests tests)
 endif()

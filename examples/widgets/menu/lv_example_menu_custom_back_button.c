@@ -1,9 +1,14 @@
 #include "../../lv_examples.h"
 #if LV_USE_MENU && LV_BUILD_EXAMPLES
 
+/*This example shows the deprecated `lv_menu` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 /**
  * @title Customized back button header
  * @brief A menu with a labeled "Back" button in the header and three titled sub pages.
+ *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  *
  * `lv_menu_get_main_header_back_button` returns the default back
  * button, and a child `lv_label` adds the text `Back` next to its
@@ -65,5 +70,7 @@ void lv_example_menu_custom_back_button(void)
 
     lv_menu_set_page(menu, main_page);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

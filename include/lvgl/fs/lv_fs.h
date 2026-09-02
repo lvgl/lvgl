@@ -261,7 +261,7 @@ lv_fs_res_t lv_fs_load_to_buf(void * buf, uint32_t buf_size, const char * path);
 
 /**
  * Load a file into a memory buffer.
- * @param filename  the path of the file
+ * @param path      the path of the file
  * @param size      pointer to store the size of the loaded file
  * @return          a pointer to the loaded file buffer, or NULL if an error occurred
  */

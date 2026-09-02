@@ -86,4 +86,4 @@ FetchContent_Declare(
   GIT_TAG 4fa21912338357f89e4fd51cf2368325b59e9bd9)
 
 FetchContent_MakeAvailable(webp)
-lvgl_link_raw(TARGETS webp PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
+lvgl_link_fetched(TARGETS webp PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

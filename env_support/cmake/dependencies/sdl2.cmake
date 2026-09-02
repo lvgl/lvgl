@@ -82,6 +82,9 @@ set(SDL_TEST
 set(SDL_ALSA
     OFF
     CACHE BOOL "" FORCE)
+set(SDL_PIPEWIRE
+    OFF
+    CACHE BOOL "" FORCE)
 set(SDL_PULSEAUDIO
     OFF
     CACHE BOOL "" FORCE)
@@ -102,4 +105,4 @@ set(SDL_DBUS
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(SDL2)
-lvgl_link_raw(TARGETS SDL2::SDL2-static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
+lvgl_link_fetched(TARGETS SDL2::SDL2-static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

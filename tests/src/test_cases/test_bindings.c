@@ -142,7 +142,7 @@ static void create_ui(void)
         }
         if(i == 1) {
             /*Use flags*/
-            lv_obj_add_flag(btn, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_hidden(btn, true);
         }
         if(i == 2) {
             lv_obj_t * btn_label = lv_obj_get_child(btn, 0);
@@ -182,12 +182,12 @@ static void create_ui(void)
     img = lv_image_create(scr);
     lv_image_set_src(img, &test_img_lvgl_logo_jpg);
     lv_obj_align(img, LV_ALIGN_BOTTOM_RIGHT, -20, -20);
-    lv_obj_add_flag(img, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_set_ignore_layout(img, true);
 
     img = lv_image_create(scr);
     lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo.png");
     lv_obj_set_pos(img, 500, 420);
-    lv_obj_add_flag(img, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_set_ignore_layout(img, true);
     lv_image_set_rotation(img, 200);
     lv_image_set_scale_x(img, 400);
 }

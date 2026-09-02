@@ -878,7 +878,7 @@ static void blend_mode_cb(lv_obj_t * parent)
     lv_obj_set_style_image_recolor(img_recolored, lv_color_hex(0x00ff00), 0);
     lv_obj_set_style_image_recolor_opa(img_recolored, LV_OPA_50, 0);
     lv_obj_set_y(img_recolored, 30);
-    lv_obj_add_flag(img_recolored, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_set_ignore_layout(img_recolored, true);
 
 }
 

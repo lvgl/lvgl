@@ -93,6 +93,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 
     lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
+    lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
 
     /*Process the initial events*/
     sdl_event_handler(NULL);
@@ -301,7 +302,7 @@ static lv_result_t window_create(lv_display_t * disp)
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
     if(!dsc->window) {
-        LV_LOG_ERROR("Failed to create SDL window");
+        LV_LOG_ERROR("Failed to create SDL window: '%s'", SDL_GetError());
         return LV_RESULT_INVALID;
     }
     if(lv_sdl_backend_ops.init_display(disp) != LV_RESULT_OK) {
@@ -330,6 +331,7 @@ static void res_chg_event_cb(lv_event_t * e)
                           lv_sdl_window_get_vertical_resolution(disp));
     }
 }
+
 
 static void release_disp_cb(lv_event_t * e)
 {

@@ -71,7 +71,7 @@ void lv_example_button_styling(void)
     /* Checkable button: swaps to the checked style on toggle */
     lv_obj_t * button_2 = lv_button_create(screen);
     lv_obj_set_size(button_2, 180, 48);
-    lv_obj_set_flag(button_2, LV_OBJ_FLAG_CHECKABLE, true);
+    lv_obj_set_checkable(button_2, true);
     lv_obj_add_style(button_2, &style_button, 0);
     lv_obj_add_style(button_2, &style_button_pressed, LV_STATE_PRESSED);
     lv_obj_add_style(button_2, &style_button_checked, LV_STATE_CHECKED);

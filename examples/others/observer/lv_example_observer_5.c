@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_OBSERVER && LV_USE_ARC && LV_USE_LABEL && LV_USE_BUTTON && LV_USE_SPINNER && LV_BUILD_EXAMPLES
 
+/*The UI is built from the deprecated `lv_win` widget.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 typedef enum {
     FW_UPDATE_STATE_IDLE,
     FW_UPDATE_STATE_CONNECTING,
@@ -103,7 +106,7 @@ static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * s
         lv_arc_bind_value(arc, &fw_download_percent_subject);
         lv_obj_center(arc);
         lv_obj_set_size(arc, 130, 130);
-        lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_set_clickable(arc, false);
 
         lv_obj_t * label = lv_label_create(cont);
         lv_label_bind_text(label, &fw_download_percent_subject, "%d %%");
@@ -170,5 +173,7 @@ static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t
         lv_timer_create(download_timer_cb, 50, NULL);
     }
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

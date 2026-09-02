@@ -370,12 +370,14 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
 /**
  * @deprecated Use lv_draw_buf_set_palette instead.
  */
+LV_DEPRECATED("Use lv_draw_buf_set_palette instead.")
 void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c);
 
 /**
  * @deprecated Use lv_draw_buffer_create/destroy instead.
  * Free the data pointer and dsc struct of an image.
  */
+LV_DEPRECATED("Use lv_draw_buf_destroy instead.")
 void lv_image_buf_free(lv_image_dsc_t * dsc);
 
 /**********************

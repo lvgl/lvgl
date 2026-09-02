@@ -153,7 +153,10 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     SDL_Texture * texture = layer_get_texture(layer);
     if(layer != disp->layer_head && texture == NULL) {
         void * buf = lv_draw_layer_alloc_buf(layer);
-        if(buf == NULL) return -1;
+        if(buf == NULL) {
+            t->state = LV_DRAW_TASK_STATE_FAILED;
+            return -1;
+        }
 
         SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
         int32_t w = lv_area_get_width(&layer->buf_area);
@@ -230,8 +233,8 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     lv_obj_t * obj = ((lv_draw_dsc_base_t *)task->draw_dsc)->obj;
     bool original_send_draw_task_event = false;
     if(obj) {
-        original_send_draw_task_event = lv_obj_has_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-        lv_obj_remove_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+        original_send_draw_task_event = lv_obj_is_send_draw_task_events(obj);
+        lv_obj_set_send_draw_task_events(obj, false);
     }
 
     switch(task->type) {
@@ -338,7 +341,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     cache_data->texture = texture;
 
     if(obj) {
-        lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+        lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
     }
 
     return true;

@@ -1,0 +1,14 @@
+menu "Layouts"
+
+config LV_USE_FLEX
+	bool "Flex"
+	default y
+	help
+		Arrange children in a row or column that wraps and grows, similar to Flexbox in CSS.
+
+config LV_USE_GRID
+	bool "Grid"
+	default y
+	help
+		Arrange children in rows and columns, similar to Grid in CSS.
+endmenu

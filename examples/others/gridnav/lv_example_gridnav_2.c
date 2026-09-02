@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_GRIDNAV && LV_USE_LIST && LV_BUILD_EXAMPLES
 
+/*The navigated content is built from the deprecated `lv_list` widget.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 /**
  * @title Keypad navigation across two lists
  * @brief Side-by-side list widgets with distinct `lv_gridnav_ctrl_t` modes.
@@ -46,5 +49,7 @@ void lv_example_gridnav_2(void)
         lv_group_remove_obj(item);
     }
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

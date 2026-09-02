@@ -66,7 +66,7 @@ void lv_example_scroll_scrollable(void)
     lv_obj_set_size(container_3, 130, lv_pct(100));
     lv_obj_set_flex_flow(container_3, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(container_3, 8, 0);
-    lv_obj_set_flag(container_3, LV_OBJ_FLAG_SCROLLABLE, false);
+    lv_obj_set_scrollable(container_3, false);
     lv_obj_set_style_border_color(container_3, lv_color_hex(0x9429ff), 0);
     lv_obj_set_style_border_width(container_3, 2, 0);
     lv_obj_t * label_6 = lv_label_create(container_3);

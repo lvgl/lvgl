@@ -73,7 +73,7 @@ void lv_example_grid_ignore_layout(void)
     lv_obj_add_style(label_4, &style_cell, 0);
 
     lv_obj_t * label_5 = lv_label_create(container);
-    lv_obj_set_flag(label_5, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
+    lv_obj_set_ignore_layout(label_5, true);
     lv_obj_set_align(label_5, LV_ALIGN_CENTER);
     lv_obj_set_style_bg_color(label_5, lv_color_hex(0xe74c3c), 0);
     lv_label_set_text(label_5, "FREE");

@@ -1,0 +1,71 @@
+config LV_USE_LINUX_FBDEV
+	bool "Linux framebuffer (fbdev)"
+	default n
+	help
+		Driver for /dev/fb
+
+if LV_USE_LINUX_FBDEV
+
+config LV_LINUX_FBDEV_BSD
+	bool "BSD-flavored framebuffer device"
+	default n
+
+choice
+	prompt "Render mode"
+	default LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+	config LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+		bool "Partial mode"
+		help
+			Render the screen in smaller parts so the buffer(s) can be smaller than the display and save RAM.
+			At least 1/10 of the screen size is recommended.
+
+	config LV_LINUX_FBDEV_RENDER_MODE_DIRECT
+		bool "Direct mode"
+		help
+			Render into the correct location of screen-sized buffer(s) so they always hold the whole image, and flush only the changed areas.
+			With 2 buffers their content is kept in sync automatically and flush_cb only has to change the address.
+
+	config LV_LINUX_FBDEV_RENDER_MODE_FULL
+		bool "Full mode"
+		help
+			Always redraw the whole screen even if only one pixel has changed.
+			With 2 buffers flush_cb only has to change the address.
+
+endchoice
+
+choice
+	prompt "Framebuffer size"
+	default LV_LINUX_FBDEV_SINGLE_BUFFER
+
+	config LV_LINUX_FBDEV_SINGLE_BUFFER
+		bool "One screen-sized buffer"
+
+	config LV_LINUX_FBDEV_DOUBLE_BUFFER
+		bool "Two screen-sized buffers"
+		depends on !LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+	config LV_LINUX_FBDEV_CUSTOM_BUFFER
+		bool "Custom-sized buffer"
+		depends on LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+endchoice
+
+config LV_LINUX_FBDEV_BUFFER_COUNT
+	int
+	default 0 if LV_LINUX_FBDEV_CUSTOM_BUFFER
+	default 1 if LV_LINUX_FBDEV_SINGLE_BUFFER
+	default 2 if LV_LINUX_FBDEV_DOUBLE_BUFFER
+
+config LV_LINUX_FBDEV_BUFFER_SIZE
+	int "Custom partial buffer size (rows)"
+	depends on LV_LINUX_FBDEV_CUSTOM_BUFFER
+	default 60
+
+config LV_LINUX_FBDEV_MMAP
+	bool "Framebuffer device supports mmap"
+	default y
+	help
+		Access the framebuffer through mmap() instead of write() calls.
+
+endif #LV_USE_LINUX_FBDEV

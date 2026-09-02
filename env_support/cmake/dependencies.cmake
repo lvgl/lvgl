@@ -16,7 +16,7 @@ if(UNIX AND NOT PkgConfig_FOUND)
 endif()
 
 if(UNIX)
-  lvgl_link_raw(TARGETS m PKG_LIB_PRIVATE -lm)
+  lvgl_link_system_lib(TARGETS m PKG_LIB_PRIVATE -lm)
 endif()
 
 # ====== Draw Units ====== #
@@ -33,11 +33,12 @@ if(CONFIG_LV_USE_SDL)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/sdl2.cmake)
 endif()
 
-if(CONFIG_LV_USE_LINUX_DRM)
+if(CONFIG_LV_USE_LINUX_DRM OR CONFIG_LV_WAYLAND_USE_DMABUF_PROTOCOL)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/drm.cmake)
 endif()
 
-if(CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS OR CONFIG_LV_LINUX_DRM_USE_EGL)
+if(CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS OR CONFIG_LV_LINUX_DRM_USE_EGL OR
+   CONFIG_LV_WAYLAND_USE_DMABUF)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/gbm.cmake)
 endif()
 
@@ -51,6 +52,17 @@ endif()
 
 if(CONFIG_LV_USE_GLFW)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw.cmake)
+endif()
+
+# LV_USE_EGL dynamically loads egl so it doesn't appear here
+if(CONFIG_LV_USE_NANOVG_TEST_HEADLESS)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/egl.cmake)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/glesv2.cmake)
+endif()
+
+# ====== OS ====== #
+if(CONFIG_LV_USE_NUTTX_LIBUV)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/libuv.cmake)
 endif()
 
 # ====== Indev ====== #
@@ -92,6 +104,10 @@ endif()
 # ====== Font ====== #
 if(CONFIG_LV_USE_FREETYPE)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/freetype.cmake)
+endif()
+
+if(CONFIG_LV_USE_HARFBUZZ)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/harfbuzz.cmake)
 endif()
 
 # ====== Libraries ====== #

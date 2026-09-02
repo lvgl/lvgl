@@ -29,10 +29,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-#if LV_USE_THORVG_EXTERNAL
-#include <thorvg_capi.h>
-#else
+#if LV_USE_THORVG_INTERNAL
 #include "../../libs/thorvg/thorvg_capi.h"
+#else
+#include <thorvg_capi.h>
 #endif
 
 typedef struct {

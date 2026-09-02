@@ -19,6 +19,7 @@ extern "C" {
 #if LV_USE_WAYLAND
 
 
+#include "lv_wayland_backend_private.h"
 #include <sys/poll.h>
 #include <wayland-client-protocol.h>
 #include <wayland_xdg_shell.h>
@@ -127,12 +128,12 @@ typedef struct {
 
 
 typedef struct _lv_wl_window_t {
-    void * backend_display_data;
     lv_display_t * lv_disp;
     lv_indev_t * lv_indev_pointer;
     lv_indev_t * lv_indev_pointeraxis;
     lv_indev_t * lv_indev_touch;
     lv_indev_t * lv_indev_keyboard;
+    lv_wayland_backend_display_data_t backend_ddata;
     lv_wayland_display_close_cb_t close_cb;
     lv_wl_window_xdg_t xdg;
 

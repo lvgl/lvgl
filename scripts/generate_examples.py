@@ -52,8 +52,10 @@ ROOT_METADATA = {"project.xml", "globals.xml"}
 # widget in, so these examples get gated on `LV_BUILD_EXAMPLES` alone —
 # emitting `LV_USE_STYLES` / `LV_USE_SCROLL` / `LV_USE_OBJ` (undefined)
 # would make the `#if` false and silently drop every example in those
-# folders.
-TOPICS_WITHOUT_LV_USE = {"scroll", "styles", "obj"}
+# folders. `get_started` is a mixed-widget intro topic with no single
+# `LV_USE_GET_STARTED` macro, so it gets the same `LV_BUILD_EXAMPLES`-only
+# treatment.
+TOPICS_WITHOUT_LV_USE = {"scroll", "styles", "obj", "get_started"}
 
 # Categories that group several independent topics, each with its own
 # `LV_USE_<TOPIC>` macro and `lv_example_<topic>.h` header. For these the

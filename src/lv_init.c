@@ -9,9 +9,9 @@
 
 #include "lvgl_public.h"
 #include "misc/lv_timer_private.h"
-#include "misc/lv_profiler_builtin_private.h"
+#include "debugging/profiler/lv_profiler_builtin_private.h"
 #include "misc/lv_anim_private.h"
-#include "draw/lv_image_decoder_private.h"
+#include "image/lv_image_decoder_private.h"
 #include "draw/lv_draw_buf_private.h"
 #include "core/lv_refr_private.h"
 #include "core/lv_obj_style_private.h"
@@ -20,27 +20,23 @@
 #include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout_private.h"
-#include "misc/lv_fs_private.h"
+#include "fs/lv_fs_private.h"
 #include "osal/lv_os_private.h"
 #include "debugging/sysmon/lv_sysmon_private.h"
 #include "drivers/wayland/lv_wayland_private.h"
 
 #if LV_USE_SVG
-    #include "libs/svg/lv_svg_decoder.h"
+    #include "image/svg/lv_svg_decoder.h"
 #endif
 
 #if LV_USE_NEMA_GFX
     #include "draw/nema_gfx/lv_draw_nema_gfx.h"
 #endif
-#if LV_USE_PXP
-    #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
-        #include "draw/nxp/pxp/lv_draw_pxp.h"
-    #endif
+#if LV_USE_DRAW_PXP
+    #include "draw/nxp/pxp/lv_draw_pxp.h"
 #endif
-#if LV_USE_G2D
-    #if LV_USE_DRAW_G2D
-        #include "draw/nxp/g2d/lv_draw_g2d.h"
-    #endif
+#if LV_USE_DRAW_G2D
+    #include "draw/nxp/g2d/lv_draw_g2d.h"
 #endif
 #if LV_USE_DRAW_DAVE2D
     #include "draw/renesas/dave2d/lv_draw_dave2d.h"
@@ -87,7 +83,7 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_ENABLE_GLOBAL_CUSTOM == 0
+#if !LV_ENABLE_GLOBAL_CUSTOM
     lv_global_t lv_global;
 #endif
 
@@ -220,16 +216,12 @@ void lv_init(void)
     lv_draw_nema_gfx_init();
 #endif
 
-#if LV_USE_PXP
-#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
+#if LV_USE_DRAW_PXP
     lv_draw_pxp_init();
 #endif
-#endif
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
     lv_draw_g2d_init();
-#endif
 #endif
 
 #if LV_USE_DRAW_DAVE2D
@@ -453,19 +445,15 @@ void lv_deinit(void)
     lv_uefi_platform_deinit();
 #endif
 
-#if LV_USE_PXP
-#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
+#if LV_USE_DRAW_PXP
     lv_draw_pxp_deinit();
-#endif
 #endif
 
 #if LV_USE_WAYLAND
     lv_wayland_deinit();
 #endif
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
     lv_draw_g2d_deinit();
-#endif
 #endif
 
 #if LV_USE_DRAW_VG_LITE

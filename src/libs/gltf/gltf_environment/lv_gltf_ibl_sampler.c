@@ -167,11 +167,11 @@ lv_gltf_environment_t * lv_gltf_environment_create(lv_gltf_ibl_sampler_t * sampl
     return env;
 }
 
-void lv_gltf_environment_delete(lv_gltf_environment_t * env)
+void lv_gltf_environment_delete(lv_gltf_environment_t * environment)
 {
-    const unsigned int d[3] = { env->diffuse, env->specular, env->sheen };
+    const unsigned int d[3] = { environment->diffuse, environment->specular, environment->sheen };
     GL_CALL(glDeleteTextures(3, d));
-    lv_free(env);
+    lv_free(environment);
 }
 
 

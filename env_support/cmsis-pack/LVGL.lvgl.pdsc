@@ -2029,13 +2029,13 @@
             <component Cgroup="Libraries and Others" Csub="Libs freetype"  condition="LVGL-Essential">
               <description>Add FreeType library, an extra librbary is required.</description>
               <files>
-                <!-- src/libs/freetype -->
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype_glyph.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype_harfbuzz.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype_image.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype_outline.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_ftsystem.c" />
+                <!-- src/font/freetype -->
+                <file category="sourceC"    name="src/font/freetype/lv_freetype.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_freetype_glyph.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_freetype_harfbuzz.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_freetype_image.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_freetype_outline.c" />
+                <file category="sourceC"    name="src/font/freetype/lv_ftsystem.c" />
               </files>
 
               <RTE_Components_h>

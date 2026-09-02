@@ -81,7 +81,7 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen);
 /**
  * Sets the maximized state of the window
  * @param disp Reference to the LVGL display associated to the window
- * @param fullscreen If true the window is maximized
+ * @param maximize   If true the window is maximized
  */
 void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximize);
 

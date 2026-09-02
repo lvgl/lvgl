@@ -511,6 +511,7 @@ void test_textarea_set_password_show_time(void)
 
 void test_textarea_set_align(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_textarea_set_align(textarea, LV_TEXT_ALIGN_CENTER);
     lv_textarea_set_text(textarea, "1234567890");
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_center.png");
@@ -520,6 +521,22 @@ void test_textarea_set_align(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_left.png");
 
     lv_textarea_set_align(textarea, LV_TEXT_ALIGN_RIGHT);
+    lv_textarea_set_text(textarea, "1234567890");
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_right.png");
+    LV_DEPRECATIONS_IGNORE_END
+}
+
+void test_textarea_text_align(void)
+{
+    lv_obj_set_style_text_align(textarea, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_textarea_set_text(textarea, "1234567890");
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_center.png");
+
+    lv_obj_set_style_text_align(textarea, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN);
+    lv_textarea_set_text(textarea, "1234567890");
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_left.png");
+
+    lv_obj_set_style_text_align(textarea, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
     lv_textarea_set_text(textarea, "1234567890");
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_right.png");
 }

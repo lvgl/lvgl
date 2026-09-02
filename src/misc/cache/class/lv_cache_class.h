@@ -1,5 +1,5 @@
 /**
- * @file lv_cache_clazz.h
+ * @file lv_cache_class.h
  *
  */
 
