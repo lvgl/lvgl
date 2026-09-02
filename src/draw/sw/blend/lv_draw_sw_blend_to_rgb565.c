@@ -319,8 +319,9 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(dsc)) {
             /*Flat areas are common, so cache the last background and its result: repeated
              *pixels then cost a compare instead of a mix.*/
-            uint32_t last_dest32_color = dest_buf_u16[0] + 1; /*Anything but the first pixel*/
-            uint32_t last_res32_color = 0;
+            uint16_t last_dest_color = dest_buf_u16[0];
+            uint32_t last_res32_color = lv_color_16_16_mix(color16, last_dest_color, opa);
+            last_res32_color |= last_res32_color << 16; /*Kept as the pair, to store in one go*/
 
             for(y = 0; y < h; y++) {
                 x = 0;
@@ -335,17 +336,13 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
                         dest_buf_u16[x + 1] = lv_color_16_16_mix(color16, dest_buf_u16[x + 1], opa);
                     }
                     else {
-                        /*volatile: without it -O3 miscompiles this pair access*/
-                        volatile uint32_t * dest32 = (uint32_t *)&dest_buf_u16[x];
-                        if(last_dest32_color == *dest32) {
-                            *dest32 = last_res32_color;
+                        /*Both pixels are equal here, so one mix and one compare cover the pair*/
+                        if(last_dest_color != dest_buf_u16[x]) {
+                            uint16_t res = lv_color_16_16_mix(color16, dest_buf_u16[x], opa);
+                            last_dest_color = dest_buf_u16[x];
+                            last_res32_color = (uint32_t)res | ((uint32_t)res << 16);
                         }
-                        else {
-                            last_dest32_color = *dest32;
-                            dest_buf_u16[x] = lv_color_16_16_mix(color16, dest_buf_u16[x + 0], opa);
-                            dest_buf_u16[x + 1] = dest_buf_u16[x];
-                            last_res32_color = *dest32;
-                        }
+                        LV_STORE_U32(&dest_buf_u16[x], last_res32_color);
                     }
                 }
 
