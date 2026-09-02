@@ -716,7 +716,7 @@ static void draw_main(lv_event_t * e)
         }
 
         /*Get the button's area*/
-        lv_area_copy(&btn_area, &btnm->button_areas[btn_i]);
+        btn_area = btnm->button_areas[btn_i];
         btn_area.x1 += area_obj.x1;
         btn_area.y1 += area_obj.y1;
         btn_area.x2 += area_obj.x1;
@@ -955,7 +955,7 @@ static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p)
     pbottom = LV_MIN(pbottom, BTN_EXTRA_CLICK_AREA_MAX);
 
     for(i = 0; i < btnm->btn_cnt; i++) {
-        lv_area_copy(&btn_area, &btnm->button_areas[i]);
+        btn_area = btnm->button_areas[i];
         if(btn_area.x1 <= pleft) btn_area.x1 += obj_cords.x1 - LV_MIN(pleft, BTN_EXTRA_CLICK_AREA_MAX);
         else btn_area.x1 += obj_cords.x1 - pcol;
 
@@ -991,7 +991,7 @@ static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx)
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     if(btn_idx >= btnm->btn_cnt) return;
 
-    lv_area_copy(&btn_area, &btnm->button_areas[btn_idx]);
+    btn_area = btnm->button_areas[btn_idx];
     lv_obj_get_coords(obj, &obj_area);
 
     /*The buttons might have outline and shadow so make the invalidation larger with the gaps between the buttons.

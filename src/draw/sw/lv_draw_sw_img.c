@@ -119,7 +119,7 @@ void lv_draw_sw_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, 
 
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
     lv_area_t area_rot;
-    lv_area_copy(&area_rot, coords);
+    area_rot = *coords;
     if(draw_dsc->rotation || draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE) {
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
@@ -436,7 +436,7 @@ static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
     blend_area.y2 = blend_area.y1 + buf_h - 1;
     while(blend_area.y1 <= y_last) {
         lv_area_t relative_area;
-        lv_area_copy(&relative_area, &blend_area);
+        relative_area = blend_area;
         lv_area_move(&relative_area, -img_coords->x1, -img_coords->y1);
 
         recolor(relative_area, decoded->data, tmp_buf, img_stride, blend_dsc.src_color_format, draw_dsc);
@@ -553,14 +553,14 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
     while(blend_area.y1 <= y_last) {
         /*Apply transformations if any or separate the channels*/
         lv_area_t relative_area;
-        lv_area_copy(&relative_area, &blend_area);
+        relative_area = blend_area;
         lv_area_move(&relative_area, -img_coords->x1, -img_coords->y1);
         lv_draw_sw_transform(&relative_area, src_buf, src_w, src_h, img_stride,
                              draw_dsc, sup, cf, transformed_buf);
 
         if(do_recolor || has_colorkey) {
             lv_area_t relative_area2;
-            lv_area_copy(&relative_area2, &blend_area);
+            relative_area2 = blend_area;
             lv_area_move(&relative_area2, -blend_area.x1, -blend_area.y1);
             if(has_colorkey && cf_final != LV_COLOR_FORMAT_RGB565_SWAPPED) {
                 colorkey_and_recolor(relative_area2, transformed_buf, transformed_buf, blend_dsc.src_stride, cf_final, draw_dsc,

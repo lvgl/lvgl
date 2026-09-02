@@ -405,7 +405,7 @@ static void draw_indic(lv_event_t * e)
     int32_t bg_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
 
     /*Respect padding and minimum width/height too*/
-    lv_area_copy(&bar->indic_area, &bar_coords);
+    bar->indic_area = bar_coords;
     bar->indic_area.x1 += bg_left;
     bar->indic_area.x2 -= bg_right;
     bar->indic_area.y1 += bg_top;
@@ -551,7 +551,7 @@ static void draw_indic(lv_event_t * e)
     }
 
     lv_area_t indic_area;
-    lv_area_copy(&indic_area, &bar->indic_area);
+    indic_area = bar->indic_area;
 
     lv_draw_rect_dsc_t draw_rect_dsc;
     lv_draw_rect_dsc_init(&draw_rect_dsc);

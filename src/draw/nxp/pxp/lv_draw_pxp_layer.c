@@ -77,7 +77,7 @@ void lv_draw_pxp_layer(lv_draw_task_t * t)
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
     const lv_area_t * coords = &t->area;
     lv_area_t area_rot;
-    lv_area_copy(&area_rot, coords);
+    area_rot = *coords;
     if(draw_dsc->rotation || draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE) {
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);

@@ -229,7 +229,7 @@ static void draw_main(lv_event_t * e)
     int32_t tw = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
     int32_t th = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
     lv_area_t coords;
-    lv_area_copy(&coords, &obj->coords);
+    coords = obj->coords;
     lv_area_increase(&coords, tw, th);
 
     lv_draw_image_dsc_t img_dsc;

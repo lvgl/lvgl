@@ -76,7 +76,7 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
 
     /*Consider 1 px smaller bg to be sure the edge will be covered by the shadow*/
     lv_area_t bg_area;
-    lv_area_copy(&bg_area, coords);
+    bg_area = *coords;
     lv_area_increase(&bg_area, -1, -1);
 
     /*Get the clamped radius*/
@@ -591,7 +591,7 @@ static void LV_ATTRIBUTE_FAST_MEM shadow_draw_corner_buf(const lv_area_t * coord
     int32_t size = sw_ori  + r;
 
     lv_area_t sh_area;
-    lv_area_copy(&sh_area, coords);
+    sh_area = *coords;
     sh_area.x2 = sw / 2 + r - 1  - ((sw & 1) ? 0 : 1);
     sh_area.y1 = sw / 2 + 1;
 

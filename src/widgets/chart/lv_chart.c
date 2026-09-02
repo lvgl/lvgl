@@ -1852,7 +1852,7 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
         int32_t point_w = lv_obj_get_style_width_internal(obj, LV_PART_INDICATOR);
 
         lv_area_t coords;
-        lv_area_copy(&coords, &obj->coords);
+        coords = obj->coords;
         coords.y1 -= line_width + point_w;
         coords.y2 += line_width + point_w;
 

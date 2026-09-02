@@ -776,7 +776,7 @@ static void draw_main(lv_event_t * e)
 
             /*Expand the cell area with a half border to avoid drawing 2 borders next to each other*/
             lv_area_t cell_area_border;
-            lv_area_copy(&cell_area_border, &cell_area);
+            cell_area_border = cell_area;
             if((rect_dsc_def.border_side & LV_BORDER_SIDE_LEFT) && cell_area_border.x1 > obj->coords.x1 + bg_left) {
                 cell_area_border.x1 -= rect_dsc_def.border_width / 2;
             }

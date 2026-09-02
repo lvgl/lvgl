@@ -532,7 +532,7 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
     LV_CHECK_ARG(coords != NULL, return);
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    lv_area_copy(coords, &obj->coords);
+    *coords = obj->coords;
 }
 
 int32_t lv_obj_get_x(const lv_obj_t * obj)
@@ -1042,7 +1042,7 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords = obj->coords;
     lv_area_increase(&obj_coords, ext_size, ext_size);
 
     if(is_transformed(obj)) {
@@ -1053,7 +1053,7 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
     if(lv_area_is_on(blur_data->inv_area, &obj_coords)) {
         if(has_blur(obj)) {
             ext_size = lv_obj_get_ext_draw_size(obj);
-            lv_area_copy(&obj_coords, &obj->coords);
+            obj_coords = obj->coords;
             obj_coords.x1 -= ext_size;
             obj_coords.y1 -= ext_size;
             obj_coords.x2 += ext_size;
@@ -1102,7 +1102,7 @@ lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords = obj->coords;
     obj_coords.x1 -= ext_size;
     obj_coords.y1 -= ext_size;
     obj_coords.x2 += ext_size;
@@ -1134,7 +1134,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords = obj->coords;
     lv_area_increase(&obj_coords, ext_size, ext_size);
 
     /*The area is not on the object*/
@@ -1174,7 +1174,7 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
 
     lv_area_t obj_coords;
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords = obj->coords;
     obj_coords.x1 -= ext_size;
     obj_coords.y1 -= ext_size;
     obj_coords.x2 += ext_size;
@@ -1198,7 +1198,7 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
     LV_CHECK_ARG(area != NULL, return);
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    lv_area_copy(area, &obj->coords);
+    *area = obj->coords;
     if(obj->spec_attr) {
         lv_area_increase(area, obj->spec_attr->ext_click_pad, obj->spec_attr->ext_click_pad);
     }
@@ -1342,7 +1342,7 @@ static lv_result_t obj_invalidate_area_internal(const lv_display_t * disp, const
     LV_ASSERT_NULL(area);
 
     lv_area_t area_tmp;
-    lv_area_copy(&area_tmp, area);
+    area_tmp = *area;
 
     lv_result_t res = invalidate_area_core(obj, &area_tmp);
     if(res == LV_RESULT_INVALID) return res;

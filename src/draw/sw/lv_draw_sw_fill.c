@@ -45,7 +45,7 @@ void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area
     if(dsc->opa <= LV_OPA_MIN) return;
 
     lv_area_t bg_coords;
-    lv_area_copy(&bg_coords, coords);
+    bg_coords = *coords;
 
     lv_area_t clipped_coords;
     if(!lv_area_intersect(&clipped_coords, &bg_coords, &t->clip_area)) return;
