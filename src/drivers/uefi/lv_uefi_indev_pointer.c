@@ -62,12 +62,6 @@ static EFI_GUID _uefi_guid_simple_pointer = EFI_SIMPLE_POINTER_PROTOCOL_GUID;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * @brief Create an indev object.
- * @param display_res The resolution of the display in pixels, needed to scale the input.
- * If NULL the resolution of the current default display will be used.
- * @return The created LVGL indev object.
-*/
 lv_indev_t * lv_uefi_simple_pointer_indev_create(lv_point_t * display_res)
 {
     lv_indev_t * indev = NULL;
