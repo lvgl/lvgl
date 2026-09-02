@@ -26,7 +26,7 @@ void test_ppa_rot_180_full(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
 
     lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
-                                    &coords, &buf, 200, 200, 100, 100, 1800);
+                                    &coords, &buf, &buf, 200, 200, 100, 100, 1800);
 
     TEST_ASSERT_TRUE(b.draw);
     TEST_ASSERT_EQUAL_INT32(0, b.dest_area.x1);
@@ -45,7 +45,7 @@ void test_ppa_rot_90_full(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
 
     lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
-                                    &coords, &buf, 200, 200, 100, 60, 900);
+                                    &coords, &buf, &buf, 200, 200, 100, 60, 900);
 
     TEST_ASSERT_TRUE(b.draw);
     TEST_ASSERT_EQUAL_INT32(0, b.block_x);
@@ -61,7 +61,7 @@ void test_ppa_rot_270_full(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
 
     lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
-                                    &coords, &buf, 200, 200, 100, 60, 2700);
+                                    &coords, &buf, &buf, 200, 200, 100, 60, 2700);
 
     TEST_ASSERT_TRUE(b.draw);
     TEST_ASSERT_EQUAL_INT32(0, b.block_x);
@@ -79,7 +79,7 @@ void test_ppa_rot_90_partial_tile(void)
     lv_area_t buf = {.x1 = 30, .y1 = 0, .x2 = 59, .y2 = 99}; /* right half, 30x100 tile */
 
     lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
-                                    &coords, &buf, 30, 100, 100, 60, 900);
+                                    &coords, &buf, &buf, 30, 100, 100, 60, 900);
 
     TEST_ASSERT_TRUE(b.draw);
     /* destination is buffer-local, so it starts at the tile origin */
@@ -99,7 +99,7 @@ void test_ppa_rot_180_partial_tile(void)
     lv_area_t buf = {.x1 = 50, .y1 = 50, .x2 = 99, .y2 = 99}; /* bottom-right, 50x50 tile */
 
     lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
-                                    &coords, &buf, 50, 50, 100, 100, 1800);
+                                    &coords, &buf, &buf, 50, 50, 100, 100, 1800);
 
     TEST_ASSERT_TRUE(b.draw);
     TEST_ASSERT_EQUAL_INT32(0, b.dest_area.x1);
@@ -118,7 +118,7 @@ void test_ppa_rot_offscreen(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
 
     lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
-                                    &coords, &buf, 200, 200, 100, 60, 900);
+                                    &coords, &buf, &buf, 200, 200, 100, 60, 900);
 
     TEST_ASSERT_FALSE(b.draw);
 }
@@ -132,7 +132,7 @@ void test_ppa_rot_dest_clamped_to_buffer(void)
 
     /* buffer is only 80x80 even though the visible window is 100x100 */
     lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
-                                    &coords, &buf, 80, 80, 100, 100, 1800);
+                                    &coords, &buf, &buf, 80, 80, 100, 100, 1800);
 
     TEST_ASSERT_TRUE(b.draw);
     /* source block (and therefore the PPA output) is clamped to 80x80 */
@@ -140,6 +140,36 @@ void test_ppa_rot_dest_clamped_to_buffer(void)
     TEST_ASSERT_EQUAL_INT32(80, b.block_h);
     TEST_ASSERT_TRUE(b.dest_area.x1 + b.block_w <= 80);
     TEST_ASSERT_TRUE(b.dest_area.y1 + b.block_h <= 80);
+}
+
+/* A clip area narrower than the render tile must be honoured for rotation too. */
+void test_ppa_rot_clip_narrower_than_tile(void)
+{
+    lv_area_t coords = {.x1 = 0, .y1 = 0, .x2 = 99, .y2 = 99};
+    lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
+    lv_area_t clip = {.x1 = 50, .y1 = 50, .x2 = 199, .y2 = 199};
+
+    lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
+                                    &coords, &buf, &clip, 200, 200, 100, 100, 1800);
+
+    TEST_ASSERT_TRUE(b.draw);
+    TEST_ASSERT_EQUAL_INT32(50, b.dest_area.x1);
+    TEST_ASSERT_EQUAL_INT32(50, b.dest_area.y1);
+    TEST_ASSERT_EQUAL_INT32(50, b.block_w);
+    TEST_ASSERT_EQUAL_INT32(50, b.block_h);
+}
+
+/* Clip entirely outside the rotated image: nothing to draw. */
+void test_ppa_rot_clip_disjoint(void)
+{
+    lv_area_t coords = {.x1 = 0, .y1 = 0, .x2 = 99, .y2 = 99};
+    lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
+    lv_area_t clip = {.x1 = 150, .y1 = 150, .x2 = 199, .y2 = 199};
+
+    lv_draw_ppa_rot_block_t b = lv_draw_ppa_rot_calc_block(
+                                    &coords, &buf, &clip, 200, 200, 100, 100, 1800);
+
+    TEST_ASSERT_FALSE(b.draw);
 }
 
 #endif

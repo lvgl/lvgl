@@ -66,6 +66,10 @@ typedef struct {
  *
  * @param real_area  transformed on-screen bounding box of the rotated image
  * @param buf_area   the layer buffer (render tile) area, in screen coordinates
+ * @param clip_area  the task's clip area, in screen coordinates. The render
+ *                   tile is not the whole story: a widget inside a clipping
+ *                   parent gets a narrower clip, and drawing the full tile
+ *                   would bleed outside it.
  * @param buf_w      destination buffer width  in pixels
  * @param buf_h      destination buffer height in pixels
  * @param img_w      decoded source image width  in pixels
@@ -74,16 +78,18 @@ typedef struct {
  * @return           the computed block; check `.draw` before using the rest
  */
 static inline lv_draw_ppa_rot_block_t lv_draw_ppa_rot_calc_block(
-    const lv_area_t * real_area, const lv_area_t * buf_area,
+    const lv_area_t * real_area, const lv_area_t * buf_area, const lv_area_t * clip_area,
     int32_t buf_w, int32_t buf_h, int32_t img_w, int32_t img_h,
     int32_t angle)
 {
     lv_draw_ppa_rot_block_t r;
     lv_memzero(&r, sizeof(r));
 
-    /* Clip the rotated image to the render tile. */
+    /* Clip the rotated image to the render tile, then to the task's clip area. */
+    lv_area_t tile;
+    if(!lv_area_intersect(&tile, real_area, buf_area)) return r;
     lv_area_t vis;
-    if(!lv_area_intersect(&vis, real_area, buf_area)) return r;
+    if(!lv_area_intersect(&vis, &tile, clip_area)) return r;
 
     /* Offset of the visible window inside the full rotated output. */
     int32_t out_dx = vis.x1 - real_area->x1;

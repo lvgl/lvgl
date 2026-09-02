@@ -166,9 +166,11 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     lv_draw_buf_t * dest_buf  = layer->draw_buf;
 
     /* real_area = on-screen bounding box of the scaled image (t->_real_area).
-     * Skip the decode entirely if nothing intersects the render tile. */
+     * Skip the decode entirely if nothing survives the render tile and the clip
+     * area; calc_block below applies the same two intersections. */
     lv_area_t visible_area;
     if(!lv_area_intersect(&visible_area, real_area, &layer->buf_area)) return;
+    if(!lv_area_intersect(&visible_area, &visible_area, &t->clip_area)) return;
     LV_UNUSED(visible_area);
 
     lv_image_decoder_dsc_t decoder_dsc;
@@ -220,7 +222,7 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     /* Map the visible render tile back onto a PPA source block.
      * Pure geometry, shared with the host unit test (lv_draw_ppa_srm.h). */
     lv_draw_ppa_srm_block_t blk = lv_draw_ppa_srm_calc_block(
-                                      real_area, &layer->buf_area,
+                                      real_area, &layer->buf_area, &t->clip_area,
                                       (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
                                       (int32_t)src_w, (int32_t)src_h,
                                       dsc->scale_x, dsc->scale_y);
@@ -237,8 +239,7 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     uint32_t out_bpp = (dest_cf == LV_COLOR_FORMAT_RGB565) ? 2u :
                        (dest_cf == LV_COLOR_FORMAT_RGB888)  ? 3u : 4u;
-    uint32_t raw_bytes    = (uint32_t)dest_pitch * dest_buf->header.h * out_bpp;
-    uint32_t aligned_size = lv_draw_ppa_align_size(raw_bytes);
+    uint32_t aligned_size = lv_draw_ppa_align_size(dest_buf->data_size);
 
     ppa_srm_oper_config_t cfg;
     lv_memzero(&cfg, sizeof(cfg));
@@ -275,7 +276,7 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     esp_err_t ret = ppa_do_scale_rotate_mirror(u->srm_client, &cfg);
     if(ret != ESP_OK) {
-        LV_LOG_WARN("PPA SRM scale failed: %d (src %ux%u scale %.2f/%.2f)",
+        LV_LOG_WARN("PPA SRM scale failed: %d (src %" LV_PRIu32 "x%" LV_PRIu32 " scale %.2f/%.2f)",
                     (int)ret, src_w, src_h, (double)blk.scale_x, (double)blk.scale_y);
     }
 
@@ -412,7 +413,7 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
      * (lv_draw_ppa_rot.h); also guarantees the destination stays inside the
      * buffer so the PPA cannot write out of bounds. */
     lv_draw_ppa_rot_block_t blk = lv_draw_ppa_rot_calc_block(
-                                      real_area, &layer->buf_area,
+                                      real_area, &layer->buf_area, &t->clip_area,
                                       (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
                                       (int32_t)src_w, (int32_t)src_h, angle);
     if(!blk.draw) {
@@ -442,10 +443,7 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     cfg.in.block_offset_y = (uint32_t)blk.block_y;
     cfg.in.srm_cm         = lv_color_format_to_ppa_srm(src_cf);
 
-    uint32_t out_bpp_r    = (dest_cf == LV_COLOR_FORMAT_RGB565) ? 2u :
-                            (dest_cf == LV_COLOR_FORMAT_RGB888)  ? 3u : 4u;
-    uint32_t aligned_size_r = lv_draw_ppa_align_size(
-                                  (uint32_t)dest_pitch * dest_buf->header.h * out_bpp_r);
+    uint32_t aligned_size_r = lv_draw_ppa_align_size(dest_buf->data_size);
 
     /* Draw buffers are cache-aligned (lv_draw_buf_ppa_init_handlers). */
     cfg.out.buffer         = dest_buf->data;
@@ -473,7 +471,8 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     esp_err_t ret = ppa_do_scale_rotate_mirror(u->srm_client, &cfg);
     if(ret != ESP_OK) {
-        LV_LOG_WARN("PPA SRM rotation failed: %d  (src %ux%u, angle %d)", (int)ret, src_w, src_h, angle);
+        LV_LOG_WARN("PPA SRM rotation failed: %d  (src %" LV_PRIu32 "x%" LV_PRIu32 ", angle %d)",
+                    (int)ret, src_w, src_h, (int)angle);
     }
 
     lv_image_decoder_close(&decoder_dsc);

@@ -28,7 +28,7 @@ void test_ppa_srm_identity(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
 
     lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
-                                    &real_area, &buf, 200, 200, 100, 100,
+                                    &real_area, &buf, &buf, 200, 200, 100, 100,
                                     LV_SCALE_NONE, LV_SCALE_NONE);
 
     TEST_ASSERT_TRUE(b.draw);
@@ -54,7 +54,7 @@ void test_ppa_srm_upscale_2x(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 399, .y2 = 399};
 
     lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
-                                    &real_area, &buf, 400, 400, 100, 100,
+                                    &real_area, &buf, &buf, 400, 400, 100, 100,
                                     512, 512);
 
     TEST_ASSERT_TRUE(b.draw);
@@ -75,7 +75,7 @@ void test_ppa_srm_downscale_half(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
 
     lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
-                                    &real_area, &buf, 200, 200, 100, 100,
+                                    &real_area, &buf, &buf, 200, 200, 100, 100,
                                     128, 128);
 
     TEST_ASSERT_TRUE(b.draw);
@@ -98,7 +98,7 @@ void test_ppa_srm_downscale_centered(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
 
     lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
-                                    &real_area, &buf, 200, 200, 100, 100,
+                                    &real_area, &buf, &buf, 200, 200, 100, 100,
                                     128, 128);
 
     TEST_ASSERT_TRUE(b.draw);
@@ -120,7 +120,7 @@ void test_ppa_srm_offscreen(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
 
     lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
-                                    &real_area, &buf, 200, 200, 100, 100,
+                                    &real_area, &buf, &buf, 200, 200, 100, 100,
                                     LV_SCALE_NONE, LV_SCALE_NONE);
 
     TEST_ASSERT_FALSE(b.draw);
@@ -135,7 +135,7 @@ void test_ppa_srm_right_gap(void)
     lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 99, .y2 = 99};
 
     lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
-                                    &real_area, &buf, 100, 100, 100, 100,
+                                    &real_area, &buf, &buf, 100, 100, 100, 100,
                                     384, LV_SCALE_NONE);
 
     TEST_ASSERT_TRUE(b.draw);
@@ -144,6 +144,42 @@ void test_ppa_srm_right_gap(void)
     TEST_ASSERT_EQUAL_INT32(66, b.block_w);   /* clamped from ceil(100/1.5)=67 */
     TEST_ASSERT_EQUAL_INT32(100, b.block_h);
     TEST_ASSERT_FLOAT_WITHIN(0.001f, 1.5f, b.scale_x);
+}
+
+/* A clip area narrower than the render tile must be honoured: a widget inside a
+ * clipping parent gets one, and drawing the whole tile would bleed outside it. */
+void test_ppa_srm_clip_narrower_than_tile(void)
+{
+    lv_area_t real_area = {.x1 = 0, .y1 = 0, .x2 = 99, .y2 = 99};
+    lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
+    lv_area_t clip = {.x1 = 50, .y1 = 50, .x2 = 199, .y2 = 199};
+
+    lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
+                                    &real_area, &buf, &clip, 200, 200, 100, 100,
+                                    LV_SCALE_NONE, LV_SCALE_NONE);
+
+    TEST_ASSERT_TRUE(b.draw);
+    /* Only the bottom-right quarter of the image survives the clip. */
+    TEST_ASSERT_EQUAL_INT32(50, b.dest_area.x1);
+    TEST_ASSERT_EQUAL_INT32(50, b.dest_area.y1);
+    TEST_ASSERT_EQUAL_INT32(50, b.clip_w);
+    TEST_ASSERT_EQUAL_INT32(50, b.clip_h);
+    TEST_ASSERT_EQUAL_INT32(50, b.block_x);
+    TEST_ASSERT_EQUAL_INT32(50, b.block_y);
+}
+
+/* Clip entirely outside the image: nothing to draw. */
+void test_ppa_srm_clip_disjoint(void)
+{
+    lv_area_t real_area = {.x1 = 0, .y1 = 0, .x2 = 99, .y2 = 99};
+    lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
+    lv_area_t clip = {.x1 = 150, .y1 = 150, .x2 = 199, .y2 = 199};
+
+    lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
+                                    &real_area, &buf, &clip, 200, 200, 100, 100,
+                                    LV_SCALE_NONE, LV_SCALE_NONE);
+
+    TEST_ASSERT_FALSE(b.draw);
 }
 
 #endif

@@ -64,6 +64,10 @@ typedef struct {
  *                   virtual image origin and its size is img * scale, so the
  *                   transform pivot is already baked in.
  * @param buf_area   the layer buffer (render tile) area, in screen coordinates
+ * @param clip_area  the task's clip area, in screen coordinates. The render
+ *                   tile is not the whole story: a widget inside a clipping
+ *                   parent gets a narrower clip, and drawing the full tile
+ *                   would bleed outside it.
  * @param buf_w      destination buffer width  in pixels
  * @param buf_h      destination buffer height in pixels
  * @param img_w      decoded source image width  in pixels
@@ -73,7 +77,7 @@ typedef struct {
  * @return           the computed block; check `.draw` before using the rest
  */
 static inline lv_draw_ppa_srm_block_t lv_draw_ppa_srm_calc_block(
-    const lv_area_t * real_area, const lv_area_t * buf_area,
+    const lv_area_t * real_area, const lv_area_t * buf_area, const lv_area_t * clip_area,
     int32_t buf_w, int32_t buf_h, int32_t img_w, int32_t img_h,
     int32_t scale_x, int32_t scale_y)
 {
@@ -84,7 +88,9 @@ static inline lv_draw_ppa_srm_block_t lv_draw_ppa_srm_calc_block(
      * screen). Intersect with the render tile to get the actual visible clip.
      * Using the transformed box (not the 1:1 rect) is what keeps a downscaled,
      * centered image from mapping to a negative source offset. */
-    if(!lv_area_intersect(&r.visible_area, real_area, buf_area)) return r;
+    lv_area_t tile;
+    if(!lv_area_intersect(&tile, real_area, buf_area)) return r;
+    if(!lv_area_intersect(&r.visible_area, &tile, clip_area)) return r;
 
     float sx = (scale_x != LV_SCALE_NONE) ? ((float)scale_x / 256.0f) : 1.0f;
     float sy = (scale_y != LV_SCALE_NONE) ? ((float)scale_y / 256.0f) : 1.0f;
