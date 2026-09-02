@@ -302,13 +302,13 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         /*Ordinary slider: was the knob area hit?*/
         lv_area_t a;
-        lv_area_copy(&a, &slider->right_knob_area);
+        a = slider->right_knob_area;
         lv_area_increase(&a, ext_click_area, ext_click_area);
         info->res = lv_area_is_point_on(&a, info->point, 0);
 
         /*There's still a chance that there is a hit if there is another knob*/
         if((info->res == false) && (type == LV_SLIDER_MODE_RANGE)) {
-            lv_area_copy(&a, &slider->left_knob_area);
+            a = slider->left_knob_area;
             lv_area_increase(&a, ext_click_area, ext_click_area);
             info->res = lv_area_is_point_on(&a, info->point, 0);
         }
@@ -455,7 +455,7 @@ static void draw_knob(lv_event_t * e)
     /* Update knob area with knob style */
     position_knob(obj, &knob_area, knob_size, is_horizontal);
     /* Update right knob area with calculated knob area */
-    lv_area_copy(&slider->right_knob_area, &knob_area);
+    slider->right_knob_area = knob_area;
 
     if(lv_slider_get_mode(obj) != LV_SLIDER_MODE_RANGE) {
         lv_draw_rect(layer, &knob_rect_dsc, &slider->right_knob_area);
@@ -476,7 +476,7 @@ static void draw_knob(lv_event_t * e)
             knob_area.y1 = LV_SLIDER_KNOB_COORD_VERTICAL(!is_reversed, slider->bar.indic_area);
         }
         position_knob(obj, &knob_area, knob_size, is_horizontal);
-        lv_area_copy(&slider->left_knob_area, &knob_area);
+        slider->left_knob_area = knob_area;
 
         lv_memcpy(&knob_rect_dsc, &knob_rect_dsc_tmp, sizeof(lv_draw_rect_dsc_t));
 

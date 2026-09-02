@@ -78,7 +78,7 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
     }
 
     lv_area_t area_in;
-    lv_area_copy(&area_in, &area_out);
+    area_in = area_out;
     area_in.x1 += dsc->width;
     area_in.y1 += dsc->width;
     area_in.x2 -= dsc->width;

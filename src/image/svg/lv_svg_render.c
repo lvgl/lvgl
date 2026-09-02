@@ -1791,7 +1791,7 @@ static void _get_line_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 static void _get_poly_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
-    lv_area_copy(area, &poly->bounds);
+    *area = poly->bounds;
 }
 
 static void _get_group_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
@@ -1843,13 +1843,13 @@ static void _get_use_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 static void _get_text_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_text_t * text = (lv_svg_render_text_t *)obj;
-    lv_area_copy(area, &text->bounds);
+    *area = text->bounds;
 }
 
 static void _get_tspan_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_tspan_t * tspan = (lv_svg_render_tspan_t *)obj;
-    lv_area_copy(area, &tspan->bounds);
+    *area = tspan->bounds;
 }
 #endif
 

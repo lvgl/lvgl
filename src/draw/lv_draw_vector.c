@@ -73,7 +73,7 @@ static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_
 
     dst->blend_mode = src->blend_mode;
     lv_memcpy(&(dst->matrix), &(src->matrix), sizeof(lv_matrix_t));
-    lv_area_copy(&(dst->scissor_area), &(src->scissor_area));
+    dst->scissor_area = src->scissor_area;
 }
 
 
@@ -1031,7 +1031,7 @@ void lv_draw_vector_dsc_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t *
 
     new_task->ctx.fill_dsc.color = dsc->ctx->fill_dsc.color;
     new_task->ctx.fill_dsc.opa = dsc->ctx->fill_dsc.opa;
-    lv_area_copy(&(new_task->ctx.scissor_area), &final_rect);
+    new_task->ctx.scissor_area = final_rect;
 }
 
 void lv_draw_vector(lv_draw_vector_dsc_t * dsc)

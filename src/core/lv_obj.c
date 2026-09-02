@@ -1575,7 +1575,7 @@ static void lv_obj_draw(lv_event_t * e)
         int32_t w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
         int32_t h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
         lv_area_t coords;
-        lv_area_copy(&coords, &obj->coords);
+        coords = obj->coords;
         lv_area_increase(&coords, w, h);
 
         if(lv_area_is_in(info->area, &coords, r) == false) {
@@ -1622,7 +1622,7 @@ static void lv_obj_draw(lv_event_t * e)
         int32_t w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
         int32_t h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
         lv_area_t coords;
-        lv_area_copy(&coords, &obj->coords);
+        coords = obj->coords;
         lv_area_increase(&coords, w, h);
 
         bool backdrop_blur = lv_obj_get_style_blur_backdrop_internal(obj, LV_PART_MAIN);
@@ -1652,7 +1652,7 @@ static void lv_obj_draw(lv_event_t * e)
             int32_t w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
             int32_t h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
             lv_area_t coords;
-            lv_area_copy(&coords, &obj->coords);
+            coords = obj->coords;
             lv_area_increase(&coords, w, h);
 
             lv_draw_blur_dsc_t blur_dsc;
@@ -1682,7 +1682,7 @@ static void lv_obj_draw(lv_event_t * e)
             int32_t w = lv_obj_get_style_transform_width_internal(obj, LV_PART_MAIN);
             int32_t h = lv_obj_get_style_transform_height_internal(obj, LV_PART_MAIN);
             lv_area_t coords;
-            lv_area_copy(&coords, &obj->coords);
+            coords = obj->coords;
             lv_area_increase(&coords, w, h);
 
             lv_draw_rect(layer, &draw_dsc, &coords);

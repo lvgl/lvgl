@@ -71,7 +71,7 @@ void lv_draw_eve_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, co
 
     /*Get the inner area*/
     lv_area_t area_inner;
-    lv_area_copy(&area_inner, coords);
+    area_inner = *coords;
     area_inner.x1 += ((dsc->side & LV_BORDER_SIDE_LEFT) ? dsc->width : - (dsc->width));
     area_inner.x2 -= ((dsc->side & LV_BORDER_SIDE_RIGHT) ? dsc->width : - (dsc->width));
     area_inner.y1 += ((dsc->side & LV_BORDER_SIDE_TOP) ? dsc->width : - (dsc->width));

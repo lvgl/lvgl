@@ -337,7 +337,7 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
         disp->inv_p = 0;
         tmp_area_p = &scr_area;
     }
-    lv_area_copy(&disp->inv_areas[disp->inv_p], tmp_area_p);
+    disp->inv_areas[disp->inv_p] = *tmp_area_p;
     disp->inv_p++;
 
     lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
@@ -653,7 +653,7 @@ static void lv_refr_join_area(void)
             /*Join two area only if the joined area size is smaller*/
             if(lv_area_get_size(&joined_area) < (lv_area_get_size(&disp_refr->inv_areas[join_in]) +
                                                  lv_area_get_size(&disp_refr->inv_areas[join_from]))) {
-                lv_area_copy(&disp_refr->inv_areas[join_in], &joined_area);
+                disp_refr->inv_areas[join_in] = joined_area;
 
                 /*Mark 'join_form' is joined into 'join_in'*/
                 disp_refr->inv_area_joined[join_from] = 1;
@@ -1347,7 +1347,7 @@ static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords = obj->coords;
     lv_area_increase(&obj_coords, ext_size, ext_size);
 
     lv_obj_get_transformed_area(obj, &obj_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);

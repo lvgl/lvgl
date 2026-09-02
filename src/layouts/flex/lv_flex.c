@@ -527,7 +527,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                 lv_obj_invalidate(item);
 
                 lv_area_t old_coords;
-                lv_area_copy(&old_coords, &item->coords);
+                old_coords = item->coords;
                 area_set_main_size(&item->coords, s);
                 lv_obj_send_event(item, LV_EVENT_SIZE_CHANGED, &old_coords);
                 lv_obj_send_event(lv_obj_get_parent(item), LV_EVENT_CHILD_CHANGED, item);
