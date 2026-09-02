@@ -442,6 +442,9 @@ static uint8_t * barcode_encode(const lv_barcode_t * barcode, int32_t * bar_coun
         case LV_BARCODE_ENCODING_CODE128_RAW:
             w = (int32_t) code128_encode_raw(data, (char *)pattern, len);
             break;
+        default:
+            LV_ASSERT(false);
+            break;
     }
     LV_LOG_INFO("barcode width = %" LV_PRId32, w);
 
