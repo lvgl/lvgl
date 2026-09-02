@@ -163,7 +163,7 @@ lv_barcode_update_mode_t lv_barcode_get_update_mode(lv_obj_t * obj);
  * @note A failure is not retried every redraw; only a change makes the Widget try again.
  * @param obj pointer to barcode object
  * @return true: the last generation attempt failed, or no data has been set yet;
- *         false: the bitmap holds a valid barcode
+ *         false: no generation attempt has failed; deferred changes may still be pending
  */
 bool lv_barcode_get_render_failed(lv_obj_t * obj);
 
