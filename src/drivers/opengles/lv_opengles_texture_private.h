@@ -42,6 +42,14 @@ lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_disp
                                         int32_t width, int32_t height);
 void lv_opengles_texture_deinit(lv_opengles_texture_t * texture);
 
+/**
+ * Render the display content to the current OpenGL framebuffer
+ * Handles NanoVG, OpenGL and SW rendering
+ * @param texture   the texture of the display
+ * @param display   the display to render
+ */
+void lv_opengles_texture_render_display(lv_opengles_texture_t * texture, lv_display_t * display);
+
 /**********************
  *      MACROS
  **********************/

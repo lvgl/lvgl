@@ -161,6 +161,36 @@ void lv_opengles_texture_deinit(lv_opengles_texture_t * texture)
     }
 }
 
+void lv_opengles_texture_render_display(lv_opengles_texture_t * texture, lv_display_t * display)
+{
+    LV_ASSERT(texture != NULL);
+    LV_ASSERT(display != NULL);
+
+    /*The rotation is applied while rendering, so the viewport is never rotated*/
+    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(display),
+                         lv_display_get_original_vertical_resolution(display));
+
+#if LV_USE_DRAW_OPENGLES
+    /*The draw unit has rendered into the texture of the display already*/
+    LV_UNUSED(texture);
+    lv_opengles_render_display_texture_internal(display, false, true);
+#elif LV_USE_DRAW_NANOVG
+    /*NanoVG has rendered into the framebuffer directly*/
+    LV_UNUSED(texture);
+#else
+    /*Upload the software rendered buffer of the display, then render it*/
+    lv_opengles_texture_upload_display_buf(texture->texture_id, display, texture->fb1);
+
+    lv_opengles_render_params_t params = {
+        .h_flip = false,
+        .v_flip = false,
+        /*LVGL stores RGB888 as B, G, R and XRGB8888 as B, G, R, X in memory*/
+        .rb_swap = LV_COLOR_DEPTH == 24 || LV_COLOR_DEPTH == 32,
+    };
+    lv_opengles_render_display(display, &params);
+#endif /*LV_USE_DRAW_OPENGLES*/
+}
+
 unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)
 {
     LV_CHECK_ARG(disp != NULL, return 0);
@@ -222,18 +252,9 @@ static unsigned int create_texture(int32_t w, int32_t h)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 
     /* set the dimensions and format to complete the texture */
-    /* Color depth: 16 (RGB565), 32 (XRGB8888) */
-#if LV_COLOR_DEPTH == 16
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                         NULL));
-#elif LV_COLOR_DEPTH == 32
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
-#else
-#error("Unsupported color format")
-#endif
+    lv_opengles_texture_upload_buf(texture, NULL, w, h, 0);
 
 #if 0
     GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
@@ -261,23 +282,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     if(lv_display_flush_is_last(disp)) {
 
         lv_opengles_texture_t * texture = lv_display_get_driver_data(disp);
-        lv_color_format_t cf = lv_display_get_color_format(disp);
-        uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp), cf);
-
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, texture->texture_id));
-
-        GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-        GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / lv_color_format_get_size(cf)));
-        /*Color depth: 16 (RGB565), 32 (XRGB8888)*/
-#if LV_COLOR_DEPTH == 16
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                             texture->fb1));
-#elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE,
-                             texture->fb1));
-#else
-#error("Unsupported color format")
-#endif
+        lv_opengles_texture_upload_display_buf(texture->texture_id, disp, texture->fb1);
     }
 #endif /* !LV_USE_DRAW_OPENGLES */
 

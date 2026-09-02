@@ -13,7 +13,6 @@
 #include "../../display/lv_display_private.h"
 #include "../opengles/lv_opengles_texture_private.h"
 #include "../opengles/lv_opengles_egl_private.h"
-#include "../opengles/lv_opengles_debug.h"
 
 #include <wayland-egl.h>
 
@@ -185,15 +184,11 @@ static void flush_wait_cb(lv_display_t * disp)
     }
 }
 
-#if LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
-
 static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     LV_UNUSED(area);
     LV_UNUSED(px_map);
 
-    int32_t disp_width = lv_display_get_horizontal_resolution(disp);
-    int32_t disp_height = lv_display_get_vertical_resolution(disp);
     if(!lv_display_flush_is_last(disp)) {
         lv_display_flush_ready(disp);
         return;
@@ -207,11 +202,7 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         return;
     }
 
-#if LV_USE_DRAW_OPENGLES
-    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(disp),
-                         lv_display_get_original_vertical_resolution(disp));
-    lv_opengles_render_display_texture_internal(disp, false, true);
-#endif /*LV_USE_DRAW_OPENGLES*/
+    lv_opengles_texture_render_display(&ddata->texture, disp);
 
     /* Swap buffers through EGL */
     lv_opengles_egl_update(ddata->egl_ctx);
@@ -219,68 +210,10 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     /* Request frame callback for vsync */
     struct wl_callback * callback = wl_surface_frame(surface);
     wl_callback_add_listener(callback, &frame_listener, disp);
-    wl_surface_damage(surface, 0, 0, disp_width, disp_height);
+    wl_surface_damage(surface, 0, 0, lv_display_get_horizontal_resolution(disp),
+                      lv_display_get_vertical_resolution(disp));
     wl_surface_commit(surface);
 }
-
-#else /*Software rendering*/
-
-static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
-{
-    LV_UNUSED(area);
-    LV_UNUSED(px_map);
-
-    if(!lv_display_flush_is_last(disp)) {
-        lv_display_flush_ready(disp);
-        return;
-    }
-
-    lv_wl_egl_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
-    struct wl_surface * surface = lv_wayland_get_window_surface(disp);
-
-    if(!surface) {
-        lv_display_flush_ready(disp);
-        return;
-    }
-
-    int32_t disp_width = lv_display_get_horizontal_resolution(disp);
-    int32_t disp_height = lv_display_get_vertical_resolution(disp);
-
-    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(disp),
-                         lv_display_get_original_vertical_resolution(disp));
-
-    lv_color_format_t cf = lv_display_get_color_format(disp);
-    uint32_t stride = lv_draw_buf_width_to_stride(disp_width, cf);
-
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, ddata->texture.texture_id));
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-    GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / lv_color_format_get_size(cf)));
-
-#if LV_COLOR_DEPTH == 16
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp_width, disp_height, 0, GL_RGB,
-                         GL_UNSIGNED_SHORT_5_6_5, ddata->texture.fb1));
-#elif LV_COLOR_DEPTH == 32
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_RGBA,
-                         GL_UNSIGNED_BYTE, ddata->texture.fb1));
-#else
-#error("Unsupported color format")
-#endif
-    lv_opengles_render_params_t params = {
-        .h_flip = false,
-        .v_flip = false,
-        .rb_swap = LV_COLOR_DEPTH == 32,
-    };
-    lv_opengles_render_display(disp, &params);
-    lv_opengles_egl_update(ddata->egl_ctx);
-
-    struct wl_callback * callback = wl_surface_frame(surface);
-    wl_callback_add_listener(callback, &frame_listener, disp);
-
-    wl_surface_damage(surface, 0, 0, disp_width, disp_height);
-    wl_surface_commit(surface);
-}
-
-#endif
 
 static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height)
 {
