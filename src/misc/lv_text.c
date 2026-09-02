@@ -504,7 +504,10 @@ void lv_text_cut(char * txt, uint32_t pos, uint32_t len)
     size_t old_len = lv_strlen(txt);
 
     pos = lv_text_encoded_get_byte_id(txt, pos); /*Convert to byte index instead of letter index*/
+    if(pos >= old_len) return;
+
     len = lv_text_encoded_get_byte_id(&txt[pos], len);
+    if(len > old_len - pos) len = old_len - pos; /*Don't cut more than what's left*/
 
     /*Copy the second part into the end to make place to text to insert*/
     uint32_t i;
