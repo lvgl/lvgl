@@ -414,6 +414,13 @@ void lv_subject_deinit(lv_subject_t * subject)
         observer = observer_next;
     }
 
+#if LV_USE_EXT_DATA
+    if(subject->ext_data.free_cb) {
+        subject->ext_data.free_cb(subject->ext_data.data);
+        subject->ext_data.data = NULL;
+    }
+#endif
+
     lv_ll_clear(&subject->subs_ll);
 }
 
@@ -493,13 +500,6 @@ void lv_observer_delete(lv_observer_t * observer)
     }
 
     observer->subject->notify_restart_query = 1;
-
-#if LV_USE_EXT_DATA
-    if(observer->subject->ext_data.free_cb) {
-        observer->subject->ext_data.free_cb(observer->subject->ext_data.data);
-        observer->subject->ext_data.data = NULL;
-    }
-#endif
 
     lv_ll_remove(&(observer->subject->subs_ll), observer);
 
