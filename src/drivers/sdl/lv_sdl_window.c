@@ -152,6 +152,7 @@ lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id)
 
 void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     LV_CHECK_ARG(title != NULL, return);
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
@@ -161,6 +162,7 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
 
 void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int32_t height)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     LV_CHECK_ARG(icon != NULL, return);
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
