@@ -10,9 +10,15 @@
  * @brief A checkbox drives an int subject; a sibling label hides when the subject is zero.
  *
  * `bind_checked` connects the checkbox's checked state to `subject_flag` (0 or 1).
- * The note label uses `bind_flag_if_eq` to enable the `hidden` flag while
- * `subject_flag` equals 0 — so the label only shows once the box is ticked.
+ * The note label uses a subject to enable the `hidden` flag when `subject_flag`
+ * equals 0 — so the label only shows once the box is ticked.
  */
+
+static void show_label(lv_obj_t * obj, bool value)
+{
+    lv_obj_set_hidden(obj, !value);
+}
+
 void lv_example_checkbox_bind_checked(void)
 {
     static lv_subject_t subject_flag;
@@ -36,6 +42,6 @@ void lv_example_checkbox_bind_checked(void)
     lv_label_set_text(label, "Extra details only visible while the box is ticked.");
     lv_obj_set_align(label, LV_ALIGN_CENTER);
     lv_obj_set_y(label, 30);
-    lv_obj_bind_flag_if_eq(label, &subject_flag, LV_OBJ_FLAG_HIDDEN, 0);
+    lv_obj_bind_bool(label, &subject_flag, show_label);
 }
 #endif

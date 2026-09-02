@@ -1531,7 +1531,7 @@ static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     LV_ASSERT(subject != NULL);
     LV_ASSERT(subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT ||
               subject->type == LV_SUBJECT_TYPE_STRING || subject->type == LV_SUBJECT_TYPE_POINTER);
-    bind_element_string_t * user_data = observer->user_data;
+    bind_element_string_t * user_data = lv_observer_get_user_data(observer);
     LV_ASSERT(user_data != NULL);
 
     if(user_data->fmt == NULL) {

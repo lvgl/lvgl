@@ -570,6 +570,33 @@ Calling the following functions with `NULL` as the display parameter is deprecat
 - <ApiLink name="lv_sysmon_show_memory"/>
 - <ApiLink name="lv_sysmon_hide_memory"/>
 
+### lv_observer
+
+- The `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` families
+  (`_eq`/`_not_eq`/`_gt`/`_ge`/`_lt`/`_le`) are deprecated. For a boolean subject,
+  bind a widget flag with `lv_obj_bind_bool()` — the dedicated per-flag setters
+  (`lv_obj_set_hidden()`, `lv_obj_set_clickable()`, …) can be passed directly as
+  the callback. For a state, or for any comparison against a reference value, add
+  a custom observer with `lv_subject_add_observer_obj()`:
+  ```c
+  /* Before: hide a widget while a 0/1 subject is non-zero */
+  lv_obj_bind_flag_if_not_eq(obj, &subject, LV_OBJ_FLAG_HIDDEN, 0);
+
+  /* After */
+  lv_obj_bind_bool(obj, &subject, lv_obj_set_hidden);
+
+  /* Before: disable a widget while a subject is greater than 80 */
+  lv_obj_bind_state_if_gt(obj, &subject, LV_STATE_DISABLED, 80);
+
+  /* After */
+  static void disabled_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+  {
+      lv_obj_t * obj = lv_observer_get_target_obj(observer);
+      lv_obj_set_state(obj, LV_STATE_DISABLED, lv_subject_get_int(subject) > 80);
+  }
+  lv_subject_add_observer_obj(&subject, disabled_observer_cb, obj, NULL);
+  ```
+
 ---
 
 ## Widgets

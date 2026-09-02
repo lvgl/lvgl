@@ -68,7 +68,7 @@
   - 30種類以上の組み込み [ウィジェット](https://lvgl.io/docs/open/widgets): Button、Label、Slider、Chart、Keyboard、Meter、Arc、Tableなど多数。
   - 100以上のスタイルプロパティを備えた柔軟な [スタイルシステム](https://lvgl.io/docs/open/common-widget-features/styles) で、あらゆる状態のウィジェットのあらゆる部分をカスタマイズできます。
   - [Flexbox](https://lvgl.io/docs/open/common-widget-features/layouts/flex) と [Grid](https://lvgl.io/docs/open/common-widget-features/layouts/grid) 風のレイアウトエンジンで、ウィジェットのサイズと位置をレスポンシブに自動調整します。
-  - UIとアプリケーションを簡単に接続する [データバインディング](https://lvgl.io/docs/open/main-modules/observer)。
+  - UIとアプリケーションを簡単に接続する [データバインディング](https://lvgl.io/docs/open/main-modules/data_binding/index.html)。
   - Mouse、Touchpad、Keypad、Keyboard、外部ボタン、Encoderの [入力デバイス](https://lvgl.io/docs/open/main-modules/indev) に対応。
   - [マルチディスプレイ](https://lvgl.io/docs/open/main-modules/display/overview#how-many-displays-can-lvgl-use) 対応。
 
