@@ -479,6 +479,29 @@ lv_gltf_model_t * primary = lv_gltf_get_primary_model(gltf);
 lv_gltf_model_t * specific = lv_gltf_get_model_by_index(gltf, 1);
 ```
 
+### Removing Models
+
+Models can be taken out of a viewer at any time:
+
+```c
+/* Remove a single model */
+lv_gltf_remove_model(gltf, model1);
+
+/* Remove every model. The viewer stays usable and renders empty */
+lv_gltf_remove_all_models(gltf);
+```
+
+What happens to the model itself depends on who owns it:
+
+- A model the viewer loaded with <ApiLink name="lv_gltf_load_model_from_file" /> or
+  <ApiLink name="lv_gltf_load_model_from_bytes" /> belongs to the viewer, so removing it
+  deletes it. The pointer must not be used afterwards.
+- A model handed over with <ApiLink name="lv_gltf_add_model" /> belongs to the caller, so
+  removing it only detaches it from the viewer. It stays valid and can be added to another
+  viewer or deleted with <ApiLink name="lv_gltf_model_delete" />.
+
+Removing the primary model recenters the view on the model that takes its place.
+
 ### Model Inspection
 
 Query model properties to understand its structure:

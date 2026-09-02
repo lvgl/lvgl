@@ -87,7 +87,8 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
  *
  * Contrary to `lv_gltf_load_model_from_file` and `lv_gltf_load_model_from_bytes`, the model
  * is owned by the caller of this function meaning that it's the caller's responsibility
- * to delete the model when it is no longer needed, that is, the model must outlive the viewer's lifetime.
+ * to delete the model when it is no longer needed, that is, the model must outlive the viewer's
+ * lifetime unless it is taken out of the viewer with `lv_gltf_remove_model` first.
  *
  * @param obj pointer to a glTF viewer object
  * @param model glTF model to add to the viewer
@@ -118,6 +119,21 @@ lv_gltf_model_t * lv_gltf_get_model_by_index(const lv_obj_t * obj, size_t id);
  * @return pointer to the primary model, or NULL if no models are loaded
  */
 lv_gltf_model_t * lv_gltf_get_primary_model(const lv_obj_t * obj);
+
+/**
+ * Remove a model from the glTF viewer
+ *
+ * @param obj pointer to a glTF viewer object
+ * @param model model to remove. Nothing happens if the viewer doesn't hold it
+ */
+void lv_gltf_remove_model(lv_obj_t * obj, lv_gltf_model_t * model);
+
+/**
+ * Remove all models from the glTF viewer
+ *
+ * @param obj pointer to a glTF viewer object
+ */
+void lv_gltf_remove_all_models(lv_obj_t * obj);
 
 /**
  * Set the yaw (horizontal rotation) of the camera

@@ -128,6 +128,113 @@ void test_gltf_viewer_share_a_model(void)
     lv_gltf_model_delete(model);
 }
 
+void test_gltf_viewer_remove_model(void)
+{
+    lv_obj_t * gltf = create_view();
+
+    lv_gltf_model_t * first = lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf"));
+    lv_gltf_model_t * second = lv_gltf_load_model_from_file(gltf, ASSET("cameras.gltf"));
+    lv_gltf_model_t * third = lv_gltf_load_model_from_file(gltf, ASSET("materials.gltf"));
+    TEST_ASSERT_NOT_NULL(first);
+    TEST_ASSERT_NOT_NULL(second);
+    TEST_ASSERT_NOT_NULL(third);
+
+    lv_gltf_remove_model(gltf, second);
+
+    TEST_ASSERT_EQUAL(2, lv_gltf_get_model_count(gltf));
+    TEST_ASSERT_EQUAL_PTR(first, lv_gltf_get_model_by_index(gltf, 0));
+    TEST_ASSERT_EQUAL_PTR(third, lv_gltf_get_model_by_index(gltf, 1));
+    TEST_ASSERT_NULL(lv_gltf_get_model_by_index(gltf, 2));
+    TEST_ASSERT_EQUAL_PTR(first, lv_gltf_get_primary_model(gltf));
+}
+
+void test_gltf_viewer_remove_the_primary_model(void)
+{
+    lv_obj_t * gltf = create_view();
+
+    lv_gltf_model_t * first = lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf"));
+    lv_gltf_model_t * second = lv_gltf_load_model_from_file(gltf, ASSET("cameras.gltf"));
+    TEST_ASSERT_NOT_NULL(first);
+    TEST_ASSERT_NOT_NULL(second);
+
+    /* Read the center of the second model through the focal point, then move away from it */
+    lv_gltf_recenter(gltf, second);
+    const float center_x = lv_gltf_get_focal_x(gltf);
+    const float center_y = lv_gltf_get_focal_y(gltf);
+    lv_gltf_set_focal_x(gltf, 10.0f);
+    lv_gltf_set_focal_y(gltf, 10.0f);
+
+    lv_gltf_remove_model(gltf, first);
+
+    TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(gltf));
+    TEST_ASSERT_EQUAL_PTR(second, lv_gltf_get_primary_model(gltf));
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, center_x, lv_gltf_get_focal_x(gltf));
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, center_y, lv_gltf_get_focal_y(gltf));
+}
+
+void test_gltf_viewer_remove_model_keeps_a_borrowed_model_alive(void)
+{
+    lv_obj_t * gltf = create_view();
+
+    lv_gltf_model_t * model = lv_gltf_data_load_from_file(ASSET("minimal_triangle.gltf"), NULL);
+    TEST_ASSERT_NOT_NULL(model);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_gltf_add_model(gltf, model));
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    lv_gltf_remove_model(gltf, model);
+    TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(gltf));
+
+    /* The model outlived its stay in the viewer, so it is still valid here */
+    TEST_ASSERT_EQUAL(1, lv_gltf_model_get_mesh_count(model));
+    lv_gltf_model_delete(model);
+}
+
+void test_gltf_viewer_remove_all_models(void)
+{
+    lv_obj_t * gltf = create_view();
+
+    TEST_ASSERT_NOT_NULL(lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf")));
+    TEST_ASSERT_NOT_NULL(lv_gltf_load_model_from_file(gltf, ASSET("materials.gltf")));
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    lv_gltf_remove_all_models(gltf);
+
+    TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(gltf));
+    TEST_ASSERT_NULL(lv_gltf_get_primary_model(gltf));
+    TEST_ASSERT_EQUAL(0, lv_gltf_get_camera_count(gltf));
+
+    /* An emptied viewer takes models again */
+    TEST_ASSERT_NOT_NULL(lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf")));
+    TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(gltf));
+}
+
+void test_gltf_viewer_remove_model_tolerates_unknown_models(void)
+{
+    lv_obj_t * first = create_view();
+    lv_obj_t * second = create_view();
+
+    lv_gltf_model_t * mine = lv_gltf_load_model_from_file(first, ASSET("minimal_triangle.gltf"));
+    lv_gltf_model_t * other = lv_gltf_load_model_from_file(second, ASSET("cameras.gltf"));
+    TEST_ASSERT_NOT_NULL(mine);
+    TEST_ASSERT_NOT_NULL(other);
+
+    lv_gltf_remove_model(first, other);
+    lv_gltf_remove_model(first, NULL);
+
+    TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(first));
+    TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(second));
+
+    lv_gltf_remove_all_models(first);
+    /* Removing all models twice in a row is harmless */
+    lv_gltf_remove_all_models(first);
+    TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(first));
+    TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(second));
+}
+
 void test_gltf_viewer_add_model_rejects_null(void)
 {
     lv_obj_t * gltf = create_view();
@@ -405,6 +512,26 @@ void test_gltf_viewer_add_model_keeps_ownership_with_the_caller(void)
 }
 
 void test_gltf_viewer_share_a_model(void)
+{
+}
+
+void test_gltf_viewer_remove_model(void)
+{
+}
+
+void test_gltf_viewer_remove_the_primary_model(void)
+{
+}
+
+void test_gltf_viewer_remove_model_keeps_a_borrowed_model_alive(void)
+{
+}
+
+void test_gltf_viewer_remove_all_models(void)
+{
+}
+
+void test_gltf_viewer_remove_model_tolerates_unknown_models(void)
 {
 }
 
