@@ -26,6 +26,7 @@
  **********************/
 
 static lv_obj_tree_walk_res_t send_language_change_event(lv_obj_t * obj, void * lang);
+static const char * get_translation(const char * tag);
 
 /**********************
  *  STATIC VARIABLES
@@ -139,61 +140,13 @@ void lv_translation_set_language(const char * lang)
 const char * lv_translation_get(const char * tag)
 {
     LV_CHECK_ARG(tag != NULL, return NULL);
+    return get_translation(tag);
+}
 
-    if(selected_lang == NULL) {
-        LV_LOG_WARN("No language is selected to get the translation of `%s`", tag);
-        return tag;
-    }
-
-    lv_translation_pack_t * pack;
-    bool lang_found = false;
-    LV_LL_READ(&packs_ll, pack) {
-        uint32_t lang;
-        for(lang = 0; lang < pack->language_cnt; lang++) {
-            /*Does this pack contains the language?*/
-            if(lv_streq(pack->languages[lang], selected_lang)) {
-                lang_found = true;
-                /*Find the tag*/
-                if(pack->is_static) {
-                    uint32_t t;
-                    for(t = 0; pack->tag_p[t]; t++) {
-                        if(lv_streq(pack->tag_p[t], tag)) {
-                            /*Find the "row" of the tag */
-                            const char ** tr_row = pack->translation_p + pack->language_cnt * t;
-                            const char * tr = tr_row[lang];
-                            if(tr) return tr; /*Found directly*/
-
-                            LV_LOG_WARN("`%s` tag is not found. Using the tag as translation.", tag);
-                            return tag; /*Return the tag as a fall back*/
-                        }
-                    }
-                }
-                else {
-                    size_t trans_cnt = lv_array_size(&pack->translation_array);
-                    size_t i;
-                    for(i = 0; i < trans_cnt; i++) {
-                        lv_translation_tag_dsc_t * tag_dsc = lv_array_at(&pack->translation_array, i);
-                        if(lv_streq(tag_dsc->tag, tag)) {
-                            const char * tr = tag_dsc->translations[lang];
-                            if(tr) return tr; /*Found directly*/
-
-                            LV_LOG_WARN("`%s` tag is not found. Using the tag as translation.", tag);
-                            return tag; /*Return the tag as a worst case option*/
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if(lang_found) {
-        LV_LOG_WARN("`%s` tag is not found, using the tag as translation.", tag);
-    }
-    else {
-        LV_LOG_WARN("`%s` language is not found, using the `%s` as translation.", selected_lang, tag);
-    }
-
-    return tag;
+const char * lv_tr(const char * tag)
+{
+    LV_CHECK_ARG(tag != NULL, return NULL);
+    return get_translation(tag);
 }
 
 lv_result_t lv_translation_add_language(lv_translation_pack_t * pack, const char * lang)
@@ -302,6 +255,66 @@ static lv_obj_tree_walk_res_t send_language_change_event(lv_obj_t * obj, void * 
 {
     lv_obj_send_event(obj, LV_EVENT_TRANSLATION_LANGUAGE_CHANGED, lang);
     return LV_OBJ_TREE_WALK_NEXT;
+}
+
+static const char * get_translation(const char * tag)
+{
+    LV_ASSERT(tag != NULL);
+
+    if(selected_lang == NULL) {
+        LV_LOG_WARN("No language is selected to get the translation of `%s`", tag);
+        return tag;
+    }
+
+    lv_translation_pack_t * pack;
+    bool lang_found = false;
+    LV_LL_READ(&packs_ll, pack) {
+        uint32_t lang;
+        for(lang = 0; lang < pack->language_cnt; lang++) {
+            /*Does this pack contains the language?*/
+            if(lv_streq(pack->languages[lang], selected_lang)) {
+                lang_found = true;
+                /*Find the tag*/
+                if(pack->is_static) {
+                    uint32_t t;
+                    for(t = 0; pack->tag_p[t]; t++) {
+                        if(lv_streq(pack->tag_p[t], tag)) {
+                            /*Find the "row" of the tag */
+                            const char ** tr_row = pack->translation_p + pack->language_cnt * t;
+                            const char * tr = tr_row[lang];
+                            if(tr) return tr; /*Found directly*/
+
+                            LV_LOG_WARN("`%s` tag is not found. Using the tag as translation.", tag);
+                            return tag; /*Return the tag as a fall back*/
+                        }
+                    }
+                }
+                else {
+                    size_t trans_cnt = lv_array_size(&pack->translation_array);
+                    size_t i;
+                    for(i = 0; i < trans_cnt; i++) {
+                        lv_translation_tag_dsc_t * tag_dsc = lv_array_at(&pack->translation_array, i);
+                        if(lv_streq(tag_dsc->tag, tag)) {
+                            const char * tr = tag_dsc->translations[lang];
+                            if(tr) return tr; /*Found directly*/
+
+                            LV_LOG_WARN("`%s` tag is not found. Using the tag as translation.", tag);
+                            return tag; /*Return the tag as a worst case option*/
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(lang_found) {
+        LV_LOG_WARN("`%s` tag is not found, using the tag as translation.", tag);
+    }
+    else {
+        LV_LOG_WARN("`%s` language is not found, using the `%s` as translation.", selected_lang, tag);
+    }
+
+    return tag;
 }
 
 #endif /*LV_USE_TRANSLATION*/

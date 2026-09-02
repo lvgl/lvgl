@@ -92,10 +92,7 @@ const char * lv_translation_get(const char * tag);
  * @param tag       the tag to translate
  * @return          the translation
  */
-static inline const char * lv_tr(const char * tag)
-{
-    return lv_translation_get(tag);
-}
+const char * lv_tr(const char * tag);
 
 /**
  * Add a new language to a dynamic language pack.
