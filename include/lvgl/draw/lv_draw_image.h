@@ -152,7 +152,7 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
 /**
  * Get the type of an image source
- * @param src pointer to an image source:
+ * @param src pointer to an image source @nullable
  *  - pointer to an 'lv_image_t' variable (image stored internally and compiled into the code)
  *  - a path to a file (e.g. "S:/folder/image.bin")
  *  - or a symbol (e.g. LV_SYMBOL_CLOSE)

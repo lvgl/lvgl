@@ -244,8 +244,8 @@ static lv_fpoint_t _point_on_ellipse(float rx, float ry, float cos_r, float sin_
 void lv_vector_path_arc_to(lv_vector_path_t * path, float radius_x, float radius_y, float rotate_angle, bool large_arc,
                            bool clockwise, const lv_fpoint_t * p)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(p);
+    LV_CHECK_ARG(path != NULL, return);
+    LV_CHECK_ARG(p != NULL, return);
 
     if(lv_array_is_empty(&path->ops)) {
         /*first op must be move_to*/
@@ -387,8 +387,8 @@ void lv_vector_path_close(lv_vector_path_t * path)
 
 void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(area);
+    LV_CHECK_ARG(path != NULL, return);
+    LV_CHECK_ARG(area != NULL, return);
 
     uint32_t len = lv_array_size(&path->points);
     if(len == 0) {
@@ -501,6 +501,15 @@ void lv_vector_path_append_rectangle(lv_vector_path_t * path, float x, float y, 
     lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
 
     lv_vector_path_close(path);
+}
+
+void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)
+{
+    LV_CHECK_ARG(path != NULL, return);
+    LV_CHECK_ARG(rect != NULL, return);
+
+    lv_vector_path_append_rectangle(path, rect->x1, rect->y1, (float)lv_area_get_width(rect),
+                                    (float)lv_area_get_height(rect), rx, ry);
 }
 
 void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, float rx, float ry)

@@ -429,14 +429,14 @@ void lv_draw_unit_send_event(const char * name, lv_event_code_t code, void * par
 
 void lv_layer_init(lv_layer_t * layer)
 {
-    LV_ASSERT_NULL(layer);
+    LV_CHECK_ARG(layer != NULL, return);
     lv_memzero(layer, sizeof(lv_layer_t));
     lv_layer_reset(layer);
 }
 
 void lv_layer_reset(lv_layer_t * layer)
 {
-    LV_ASSERT_NULL(layer);
+    LV_CHECK_ARG(layer != NULL, return);
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
 #endif
@@ -781,11 +781,6 @@ static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
     return 0;
 }
 
-/**
- * Clean-up resources allocated by a finished task
- * @param t         pointer to a draw task
- * @param disp      pointer to a display on which the task was drawn
- */
 void lv_draw_cleanup_task(lv_draw_task_t * t)
 {
     LV_PROFILER_DRAW_BEGIN;

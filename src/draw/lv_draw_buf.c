@@ -576,6 +576,24 @@ void lv_image_buf_free(lv_image_dsc_t * dsc)
     }
 }
 
+bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    LV_CHECK_ARG(draw_buf != NULL, return false);
+    return draw_buf->header.flags & flag;
+}
+
+void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    LV_CHECK_ARG(draw_buf != NULL, return);
+    draw_buf->header.flags |= flag;
+}
+
+void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    LV_CHECK_ARG(draw_buf != NULL, return);
+    draw_buf->header.flags &= ~flag;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

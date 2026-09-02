@@ -217,14 +217,7 @@ void lv_vector_path_append_rectangle(lv_vector_path_t * path, float x, float y, 
  * @param rx                the horizontal radius for rounded rectangle
  * @param ry                the vertical radius for rounded rectangle
  */
-static inline void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)
-{
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(rect);
-
-    lv_vector_path_append_rectangle(path, rect->x1, rect->y1, (float)lv_area_get_width(rect),
-                                    (float)lv_area_get_height(rect), rx, ry);
-}
+void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry);
 
 /**
  * Add a circle to the path
@@ -414,7 +407,7 @@ void lv_draw_vector_dsc_set_stroke_width(lv_draw_vector_dsc_t * dsc, float width
  * Set stroke line dash pattern for descriptor
  * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this dash.
  * @param dsc              pointer to a vector graphic descriptor
- * @param dash_pattern     an array of values that specify the segments of dash line
+ * @param dash_pattern     an array of values that specify the segments of dash line @nullable
  * @param dash_count       the length of dash pattern array
  */
 void lv_draw_vector_dsc_set_stroke_dash(lv_draw_vector_dsc_t * dsc, float * dash_pattern, uint16_t dash_count);
