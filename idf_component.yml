@@ -8,19 +8,19 @@ dependencies:
     require: private
     version: "^2.14.3"
     rules:
-      - if: "idf_version >=6.0 && $CONFIG{LV_USE_FREETYPE} == True"
+      - if: "idf_version >=5.5 && $CONFIG{LV_USE_FREETYPE} == True"
   espressif/libjpeg-turbo:
     require: private
     version: "^3.1.1"
     rules:
-      - if: "idf_version >=6.0 && $CONFIG{LV_USE_LIBJPEG_TURBO} == True"
+      - if: "idf_version >=5.5 && $CONFIG{LV_USE_LIBJPEG_TURBO} == True"
   espressif/libpng:
     require: private
     version: "^1.6.58"
     rules:
-      - if: "idf_version >=6.0 && $CONFIG{LV_USE_LIBPNG} == True"
+      - if: "idf_version >=5.5 && $CONFIG{LV_USE_LIBPNG} == True"
   espressif/lz4:
     require: private
     version: "^1.10.0"
     rules:
-      - if: "idf_version >=6.0 && $CONFIG{LV_USE_LZ4} == True && $CONFIG{LV_USE_LZ4_INTERNAL} == False"
+      - if: "idf_version >=5.5 && $CONFIG{LV_USE_LZ4} == True && $CONFIG{LV_USE_LZ4_INTERNAL} == False"
