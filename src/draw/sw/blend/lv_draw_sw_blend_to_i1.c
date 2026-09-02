@@ -224,19 +224,28 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_i1(lv_draw_sw_blend_fill_ds
     uint8_t src_color = lv_color_luminance(dsc->color) / (I1_LUM_THRESHOLD + 1);
     uint8_t * dest_buf = dsc->dest_buf;
 
-    int32_t bit_ofs = dsc->relative_area.x1 % 8;
+    const int32_t bit_ofs = dsc->relative_area.x1 % 8;
 
     /* Simple fill */
     if(mask == NULL && opa >= LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_I1(dsc)) {
+            const uint8_t fill_byte = src_color ? 0xFF : 0x00;
             for(int32_t y = 0; y < h; y++) {
-                for(int32_t x = 0; x < w; x++) {
-                    if(src_color) {
-                        set_bit(dest_buf, x + bit_ofs);
-                    }
-                    else {
-                        clear_bit(dest_buf, x + bit_ofs);
-                    }
+                int32_t x = 0;
+                while(x < w && ((x + bit_ofs) % 8) != 0) {
+                    if(src_color) set_bit(dest_buf, x + bit_ofs);
+                    else clear_bit(dest_buf, x + bit_ofs);
+                    x++;
+                }
+                const int32_t full_bytes = (w - x) / 8;
+                if(full_bytes > 0) {
+                    lv_memset(&dest_buf[(x + bit_ofs) / 8], fill_byte, full_bytes);
+                    x += full_bytes * 8;
+                }
+                while(x < w) {
+                    if(src_color) set_bit(dest_buf, x + bit_ofs);
+                    else clear_bit(dest_buf, x + bit_ofs);
+                    x++;
                 }
                 dest_buf = drawbuf_next_row(dest_buf, dest_stride);
             }
