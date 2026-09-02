@@ -48,7 +48,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * parent);
 /**
  * Add a tab to the tabview
  * @param obj       pointer to a tabview widget
- * @param name      the name of the tab, it will be displayed on the tab bar @nullable
+ * @param name      the name of the tab to be displayed on the tab bar @nullable
  *                  When NULL the tab button's label keeps the default label text
  *                  (`LV_LABEL_DEFAULT_TEXT`). Useful when the text is set later,
  *                  e.g. via a translation tag.

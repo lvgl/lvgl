@@ -105,7 +105,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  * Open an image.
  * Try the created image decoders one by one. Once one is able to open the image that decoder is saved in `dsc`
  * @param dsc    describes a decoding session. Simply a pointer to an `lv_image_decoder_dsc_t` variable.
- * @param src    the image source. Can be
+ * @param src    the image source. @nullable Can be
  *                 1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register())`)
  *                 2) Variable: Pointer to an `lv_image_dsc_t` variable
  *                 3) Symbol: E.g. `LV_SYMBOL_OK`

@@ -129,7 +129,7 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p);
  * Remove the node 'node_p' from 'll_p' linked list.
  * It does not free the memory of node.
  * @param ll_p pointer to the linked list of 'node_p'
- * @param node_p pointer to node in 'll_p' linked list
+ * @param node_p pointer to node in 'll_p' linked list @nullable
  */
 void lv_ll_remove(lv_ll_t * ll_p, void * node_p);
 
