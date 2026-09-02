@@ -7,12 +7,16 @@
 void setUp(void)
 {
     /* Function run before every test */
+    lv_translation_init();
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
     lv_obj_clean(lv_screen_active());
+
+    /*Workaround the reset the translations across tests*/
+    lv_translation_deinit();
 }
 
 void test_dropdown_create_delete(void)
@@ -643,7 +647,6 @@ void test_dropdown_text_translation_tag(void)
     /* Unknown language returns the tag*/
     lv_translation_set_language("fr");
     TEST_ASSERT_EQUAL_STRING("tiger", lv_dropdown_get_text(dd));
-
 }
 
 void test_dropdown_options_translation_tag(void)

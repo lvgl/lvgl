@@ -1460,7 +1460,6 @@ static void dropdown_list_align_bidi(lv_dropdown_t * dropdown, lv_dir_t dir)
 static void set_text_internal(lv_obj_t * obj, const char * text)
 {
     LV_ASSERT(obj);
-    LV_ASSERT(text);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(!dropdown->static_text && dropdown->text && text && lv_streq(dropdown->text, text)) {
