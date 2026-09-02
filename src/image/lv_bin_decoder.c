@@ -176,12 +176,6 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
     return LV_RESULT_OK;
 }
 
-/**
- * Decode an image from a binary file
- * @param decoder pointer to the decoder
- * @param dsc     pointer to the decoder descriptor
- * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
- */
 lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
