@@ -124,8 +124,16 @@ static inline lv_draw_ppa_srm_block_t lv_draw_ppa_srm_calc_block(
     if((float)src_bw < bw_f) src_bw++;
     if((float)src_bh < bh_f) src_bh++;
 
+    /* The PPA writes block * scale output pixels, and the block was just rounded
+     * up, so it can overshoot. Bound it by the VISIBLE width, not merely by the
+     * rest of the buffer: clip_w is what survived the clip area, and a pixel past
+     * it is a pixel painted outside the task's clip. clip_w <= the remaining
+     * buffer by construction, so this subsumes the buffer bound. Undershooting is
+     * what gap_right/gap_bottom exist to patch. */
     uint32_t avail_w = (uint32_t)(buf_w - r.dest_area.x1);
     uint32_t avail_h = (uint32_t)(buf_h - r.dest_area.y1);
+    if((uint32_t)r.clip_w < avail_w) avail_w = (uint32_t)r.clip_w;
+    if((uint32_t)r.clip_h < avail_h) avail_h = (uint32_t)r.clip_h;
     uint32_t max_src_bw = (uint32_t)((float)avail_w / sx);
     uint32_t max_src_bh = (uint32_t)((float)avail_h / sy);
     r.gap_right  = (src_bw > max_src_bw);

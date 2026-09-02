@@ -156,6 +156,26 @@ static inline uint32_t lv_draw_ppa_align_size(uint32_t size)
     return (uint32_t)PPA_ALIGN_UP(size, LV_DRAW_PPA_CACHE_LINE_SIZE);
 }
 
+/**
+ * Byte span of a draw buffer to hand to the PPA and to cache maintenance.
+ *
+ * The peripheral wants a cache-line-aligned size, but rounding up must never run
+ * past the allocation. This unit does not own it: lv_draw_buf_ppa_init_handlers()
+ * only replaces invalidate_cache_cb, so a display buffer handed in through
+ * lv_display_set_buffers() is exactly as large as the caller declared and need
+ * not be a whole number of cache lines. Take the aligned pixel span, then cap it
+ * at what was actually allocated - which is what lv_draw_ppa_buf.c already does
+ * when it syncs draw_buf->data_size unrounded.
+ */
+static inline uint32_t lv_draw_ppa_buf_span(const lv_draw_buf_t * buf)
+{
+    uint32_t span = (uint32_t)buf->header.stride * buf->header.h;
+    if(span > buf->data_size) span = buf->data_size;
+
+    uint32_t aligned = lv_draw_ppa_align_size(span);
+    return (aligned > buf->data_size) ? buf->data_size : aligned;
+}
+
 void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                          const lv_area_t * real_area)
 {
@@ -233,13 +253,13 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     if(decoded->data_size > 0) {
         esp_cache_msync((void *)decoded->data,
-                        lv_draw_ppa_align_size(decoded->data_size),
+                        lv_draw_ppa_buf_span(decoded),
                         ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_UNALIGNED);
     }
 
     uint32_t out_bpp = (dest_cf == LV_COLOR_FORMAT_RGB565) ? 2u :
                        (dest_cf == LV_COLOR_FORMAT_RGB888)  ? 3u : 4u;
-    uint32_t aligned_size = lv_draw_ppa_align_size(dest_buf->data_size);
+    uint32_t aligned_size = lv_draw_ppa_buf_span(dest_buf);
 
     ppa_srm_oper_config_t cfg;
     lv_memzero(&cfg, sizeof(cfg));
@@ -425,7 +445,7 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
      * line; _UNALIGNED flag is only a safety net for the address. */
     if(decoded->data_size > 0) {
         esp_cache_msync((void *)decoded->data,
-                        lv_draw_ppa_align_size(decoded->data_size),
+                        lv_draw_ppa_buf_span(decoded),
                         ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_UNALIGNED);
     }
 
@@ -443,7 +463,7 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     cfg.in.block_offset_y = (uint32_t)blk.block_y;
     cfg.in.srm_cm         = lv_color_format_to_ppa_srm(src_cf);
 
-    uint32_t aligned_size_r = lv_draw_ppa_align_size(dest_buf->data_size);
+    uint32_t aligned_size_r = lv_draw_ppa_buf_span(dest_buf);
 
     /* Draw buffers are cache-aligned (lv_draw_buf_ppa_init_handlers). */
     cfg.out.buffer         = dest_buf->data;

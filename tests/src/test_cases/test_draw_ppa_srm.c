@@ -182,4 +182,30 @@ void test_ppa_srm_clip_disjoint(void)
     TEST_ASSERT_FALSE(b.draw);
 }
 
+/* Fractional upscale into a narrow clip. The source block is rounded up, so
+ * block * scale can exceed the clipped width and paint a pixel outside the clip
+ * area. 100x100 at 1.5x, clipped to 40 px: ceil(40 / 1.5) is 27 and 27 * 1.5 is
+ * 40.5, one pixel too wide, so the block must be bounded to 26 and the shortfall
+ * flagged for the caller to patch. */
+void test_ppa_srm_upscale_clamped_to_clip(void)
+{
+    lv_area_t real_area = {.x1 = 0, .y1 = 0, .x2 = 149, .y2 = 149};  /* 100 * 1.5 */
+    lv_area_t buf = {.x1 = 0, .y1 = 0, .x2 = 199, .y2 = 199};
+    lv_area_t clip = {.x1 = 0, .y1 = 0, .x2 = 39, .y2 = 39};
+
+    lv_draw_ppa_srm_block_t b = lv_draw_ppa_srm_calc_block(
+                                    &real_area, &buf, &clip, 200, 200, 100, 100,
+                                    384, 384);  /* 1.5x */
+
+    TEST_ASSERT_TRUE(b.draw);
+    TEST_ASSERT_EQUAL_INT32(40, b.clip_w);
+    TEST_ASSERT_EQUAL_INT32(40, b.clip_h);
+    /* Bounded so the scaled output cannot exceed the clip. */
+    TEST_ASSERT_EQUAL_INT32(26, b.block_w);
+    TEST_ASSERT_EQUAL_INT32(26, b.block_h);
+    TEST_ASSERT_TRUE(b.block_w * b.scale_x <= (float)b.clip_w);
+    TEST_ASSERT_TRUE(b.gap_right);
+    TEST_ASSERT_TRUE(b.gap_bottom);
+}
+
 #endif
