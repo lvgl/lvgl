@@ -202,7 +202,7 @@ void lv_draw_rgb565_swap(void * buf, uint32_t buf_size_px)
 
 void lv_draw_i1_invert(void * buf, uint32_t buf_size)
 {
-    if(buf == NULL) return;
+    LV_CHECK_ARG(buf != NULL, return);
 
     uint8_t * byte_buf = (uint8_t *)buf;
     uint32_t i;
@@ -235,10 +235,11 @@ void lv_draw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32_t 
                                   void * out_buf,
                                   uint32_t out_buf_size, bool bit_order_lsb)
 {
-    LV_ASSERT(buf && out_buf);
-    LV_ASSERT(width % 8 == 0 && height % 8 == 0);
-    LV_ASSERT(buf_size >= (width / 8) * height);
-    LV_ASSERT(out_buf_size >= buf_size);
+    LV_CHECK_ARG(buf != NULL, return);
+    LV_CHECK_ARG(out_buf != NULL, return);
+    LV_CHECK_ARG(width % 8 == 0 && height % 8 == 0, return);
+    LV_CHECK_ARG(buf_size >= (width / 8) * height, return);
+    LV_CHECK_ARG(out_buf_size >= buf_size, return);
     LV_UNUSED(buf_size);
 
     lv_memset(out_buf, 0, out_buf_size);
