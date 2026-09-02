@@ -76,6 +76,7 @@ void lv_translation_deinit(void)
     lv_ll_clear(&packs_ll);
 
     lv_free((void *)selected_lang);
+    selected_lang = NULL;
 }
 
 lv_translation_pack_t * lv_translation_add_static(const char * const languages[], const char * const tags[],
