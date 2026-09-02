@@ -501,6 +501,46 @@ void test_observer_group(void)
     TEST_ASSERT_EQUAL(10 + 20, group_value_sum);
 }
 
+void test_observer_group_deinit_unsubscribes_from_elements(void)
+{
+    static lv_subject_t subject_sub1;
+    static lv_subject_t subject_sub2;
+    static lv_subject_t * subject_list[2] = { &subject_sub1, &subject_sub2 };
+
+    lv_subject_init_int(&subject_sub1, 1);
+    lv_subject_init_int(&subject_sub2, 2);
+
+    /* Allocate the group subject so that ASAN can catch it being notified
+     * after it was freed. */
+    lv_subject_t * subject_main = lv_zalloc(sizeof(lv_subject_t));
+    TEST_ASSERT_NOT_NULL(subject_main);
+    lv_subject_init_group(subject_main, subject_list, 2);
+
+    /* The group subscribed to both of its elements. */
+    TEST_ASSERT_EQUAL(1, lv_ll_get_len(&subject_sub1.subs_ll));
+    TEST_ASSERT_EQUAL(1, lv_ll_get_len(&subject_sub2.subs_ll));
+
+    group_observer_called = 0;
+    lv_subject_add_observer(subject_main, group_observer_cb, NULL);
+    TEST_ASSERT_EQUAL(1, group_observer_called);
+
+    /* Deinitializing the group must unsubscribe it from all its elements,
+     * otherwise they keep a dangling observer pointing to the group. */
+    lv_subject_deinit(subject_main);
+    lv_free(subject_main);
+
+    TEST_ASSERT_EQUAL(0, lv_ll_get_len(&subject_sub1.subs_ll));
+    TEST_ASSERT_EQUAL(0, lv_ll_get_len(&subject_sub2.subs_ll));
+
+    /* Would notify the freed group subject if the observers were left behind. */
+    lv_subject_set_int(&subject_sub1, 10);
+    lv_subject_set_int(&subject_sub2, 20);
+    TEST_ASSERT_EQUAL(1, group_observer_called);
+
+    lv_subject_deinit(&subject_sub1);
+    lv_subject_deinit(&subject_sub2);
+}
+
 void test_observer_obj_flag_invalid_subject(void)
 {
     LV_DEPRECATIONS_IGNORE_BEGIN
