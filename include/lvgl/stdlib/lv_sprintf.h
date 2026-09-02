@@ -47,6 +47,16 @@
 
 #include "../lv_types.h"
 
+#ifndef LV_PRIuPTR
+    #ifdef PRIuPTR
+        #define LV_PRIuPTR PRIuPTR
+    #elif defined(LV_ARCH_64)
+        #define LV_PRIuPTR LV_PRIu64
+    #else
+        #define LV_PRIuPTR LV_PRIu32
+    #endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
