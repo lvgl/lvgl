@@ -163,7 +163,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
         LV_LOG_WARN("data is empty");
         barcode_forget_data(barcode);
         barcode->needs_update = false;
-        barcode->render_failed = true;
+        barcode->render_valid = false;
         lv_barcode_clear(obj);
         return LV_RESULT_INVALID;
     }
@@ -213,12 +213,12 @@ lv_barcode_update_mode_t lv_barcode_get_update_mode(lv_obj_t * obj)
     return (lv_barcode_update_mode_t)barcode->update_mode;
 }
 
-bool lv_barcode_get_render_failed(lv_obj_t * obj)
+bool lv_barcode_is_render_valid(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return true);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
-    return barcode->render_failed;
+    return barcode->render_valid;
 }
 
 lv_color_t lv_barcode_get_dark_color(lv_obj_t * obj)
@@ -278,7 +278,7 @@ static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     barcode->tiled = false;
     barcode->update_mode = LV_BARCODE_UPDATE_MODE_IMMEDIATE;
     barcode->needs_update = false;
-    barcode->render_failed = true;   /*Nothing generated yet*/
+    barcode->render_valid = false;   /*Nothing generated yet*/
     barcode->fitting = false;
     lv_image_set_inner_align(obj, LV_IMAGE_ALIGN_DEFAULT);
 }
@@ -322,8 +322,8 @@ static void lv_barcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_DRAW_MAIN_BEGIN) {
-        /*A failed state is not retried here; only a change clears `render_failed`*/
-        if(barcode->needs_update && !barcode->render_failed) {
+        /*A failed state is not retried here; only a change makes the Widget try again*/
+        if(barcode->needs_update && barcode->render_valid) {
             LV_ASSERT(barcode->update_mode == LV_BARCODE_UPDATE_MODE_DEFERRED);
 
             /*Safe: the setter already resized the canvas, so nothing is reallocated here*/
@@ -332,7 +332,7 @@ static void lv_barcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
                         "refresh and its result cannot be reported");
 
             if(barcode_fill(obj) != LV_RESULT_OK) {
-                barcode->render_failed = true;
+                barcode->render_valid = false;
                 LV_LOG_ERROR("the barcode could not be filled in during the redraw "
                              "(scale %d, %s); the bitmap is left blank",
                              (int)barcode->scale, barcode->direction == LV_DIR_VER ? "vertical" : "horizontal");
@@ -519,13 +519,13 @@ static bool barcode_fit_only(lv_obj_t * obj)
 {
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
-    barcode->render_failed = true;
+    barcode->render_valid = false;
     barcode->needs_update = true;
 
     if(barcode->data == NULL) return false;
     if(!barcode_fit(obj)) return false;
 
-    barcode->render_failed = false;
+    barcode->render_valid = true;
     return true;
 }
 
@@ -610,7 +610,7 @@ static lv_result_t barcode_fill(lv_obj_t * obj)
     lv_free(pattern);
 
     barcode->needs_update = false;
-    barcode->render_failed = false;
+    barcode->render_valid = true;
     return LV_RESULT_OK;
 }
 
@@ -618,12 +618,12 @@ static lv_result_t barcode_render(lv_obj_t * obj)
 {
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
-    /*Assume failure so no early return can forget to record it; only barcode_fill()'s
-     *success path clears these. `needs_update` survives a failure on purpose - the bitmap
-     *still does not match the properties - and `render_failed` keeps the draw hook from
-     *retrying a known-bad state every frame. Nothing is logged here: the result is
-     *returned, and the caller reports it if nothing else will.*/
-    barcode->render_failed = true;
+    /*Start invalid so no early return can forget to record a failure; only barcode_fill()'s
+     *success path sets `render_valid`. `needs_update` survives a failure on purpose - the
+     *bitmap still does not match the properties - and a cleared `render_valid` keeps the
+     *draw hook from retrying a known-bad state every frame. Nothing is logged here: the
+     *result is returned, and the caller reports it if nothing else will.*/
+    barcode->render_valid = false;
     barcode->needs_update = true;
 
     if(barcode->data == NULL) return LV_RESULT_INVALID;
@@ -638,7 +638,8 @@ static lv_result_t barcode_mark_dirty(lv_obj_t * obj)
 
     if(barcode->data == NULL) return LV_RESULT_INVALID;
 
-    barcode->render_failed = false;
+    /*The change may well make the data encodable again, so allow a new attempt*/
+    barcode->render_valid = true;
 
     /*The canvas is resized in both modes, because the draw pass cannot do it*/
     const bool ok = (barcode->update_mode == LV_BARCODE_UPDATE_MODE_IMMEDIATE)
