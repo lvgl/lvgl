@@ -146,8 +146,8 @@ void lv_qrcode_set_update_mode(lv_obj_t * obj, lv_qrcode_update_mode_t mode);
 lv_qrcode_update_mode_t lv_qrcode_get_update_mode(lv_obj_t * obj);
 
 /**
- * Get whether the QR code bitmap is missing because the last attempt to generate it
- * failed. Most encodes report their result directly: `lv_qrcode_update()` returns it.
+ * Check whether the QR code bitmap is free of a known encode failure. Most encodes report
+ * their result directly: `lv_qrcode_update()` returns it.
  * The ones that cannot are the re-encodes triggered by a property change - they happen
  * in a void setter or, in LV_QRCODE_UPDATE_MODE_DEFERRED, in the draw pass. Use this to
  * detect those, e.g. after shrinking the object below the size its payload needs.
@@ -157,10 +157,11 @@ lv_qrcode_update_mode_t lv_qrcode_get_update_mode(lv_obj_t * obj);
  *       result; the one exception is the re-encode done by the redraw, which has no
  *       caller, so that one is logged.
  * @param obj pointer to a QR code object
- * @return true: the last generation attempt failed, or no data has been set yet;
- *         false: the bitmap holds a valid QR code
+ * @return true: no encode attempt is known to have failed. A property change re-arms the
+ *               Widget, so this is also true while a deferred re-encode is still pending;
+ *         false: the last encode attempt failed, or no data has been set yet
  */
-bool lv_qrcode_get_render_failed(lv_obj_t * obj);
+bool lv_qrcode_is_render_valid(lv_obj_t * obj);
 
 /**********************
  *      MACROS

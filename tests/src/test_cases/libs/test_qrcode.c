@@ -274,11 +274,11 @@ void test_qrcode_deferred_render_failure_is_detectable(void)
     TEST_ASSERT_NOT_NULL(qr);
 
     /*Nothing encoded yet*/
-    TEST_ASSERT_TRUE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_FALSE(lv_qrcode_is_render_valid(qr));
 
     lv_qrcode_set_size(qr, 150);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
-    TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_TRUE(lv_qrcode_is_render_valid(qr));
 
     /*In deferred mode the re-encode happens in the draw pass, so nothing returns its
      *result to the caller. Shrinking the canvas below one pixel per QR module makes it
@@ -287,12 +287,12 @@ void test_qrcode_deferred_render_failure_is_detectable(void)
     lv_qrcode_set_size(qr, 10);
     lv_obj_center(qr);
     lv_refr_now(NULL);
-    TEST_ASSERT_TRUE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_FALSE(lv_qrcode_is_render_valid(qr));
 
     /*Growing it back re-encodes successfully*/
     lv_qrcode_set_size(qr, 150);
     lv_refr_now(NULL);
-    TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_TRUE(lv_qrcode_is_render_valid(qr));
 }
 
 void test_qrcode_failed_render_is_not_retried_every_frame(void)
@@ -321,7 +321,7 @@ void test_qrcode_failed_render_is_not_retried_every_frame(void)
 
     lv_log_register_print_cb(NULL);
 
-    TEST_ASSERT_TRUE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_FALSE(lv_qrcode_is_render_valid(qr));
     TEST_ASSERT_TRUE(((lv_qrcode_t *)qr)->needs_update);
 #if LV_USE_LOG
     TEST_ASSERT_EQUAL(1, encode_error_cnt);
@@ -331,7 +331,7 @@ void test_qrcode_failed_render_is_not_retried_every_frame(void)
     /*A property change is what allows another attempt - proven by one that can succeed*/
     lv_qrcode_set_size(qr, 150);
     lv_refr_now(NULL);
-    TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_TRUE(lv_qrcode_is_render_valid(qr));
     TEST_ASSERT_FALSE(((lv_qrcode_t *)qr)->needs_update);
 }
 
@@ -358,14 +358,14 @@ void test_qrcode_failures_are_silent_when_the_caller_sees_the_result(void)
 #if LV_USE_LOG
     TEST_ASSERT_EQUAL(0, encode_error_cnt);
 #endif
-    TEST_ASSERT_TRUE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_FALSE(lv_qrcode_is_render_valid(qr));
 
     /*A failed encode must not claim the bitmap is up to date*/
     TEST_ASSERT_TRUE(((lv_qrcode_t *)qr)->needs_update);
 
     /*A size that fits clears both*/
     lv_qrcode_set_size(qr, 150);
-    TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_TRUE(lv_qrcode_is_render_valid(qr));
     TEST_ASSERT_FALSE(((lv_qrcode_t *)qr)->needs_update);
 }
 
@@ -383,11 +383,11 @@ void test_qrcode_update_reports_unencodable_payload(void)
     too_long[sizeof(too_long) - 1] = '\0';
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_qrcode_update(qr, too_long, sizeof(too_long) - 1));
 
-    TEST_ASSERT_TRUE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_FALSE(lv_qrcode_is_render_valid(qr));
 
     /*A payload that does fit is reported as success*/
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "https://lvgl.io", 15));
-    TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_TRUE(lv_qrcode_is_render_valid(qr));
 }
 
 void test_qrcode_canvas_too_small_is_reported(void)
@@ -418,13 +418,13 @@ void test_qrcode_set_data_ignores_null(void)
     TEST_ASSERT_NOT_NULL(qr);
     lv_qrcode_set_size(qr, 150);
     lv_qrcode_set_data(qr, "https://lvgl.io");
-    TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_TRUE(lv_qrcode_is_render_valid(qr));
 
     /*A NULL string is a no-op, not a crash, and leaves the stored payload alone.
      *The guard is unconditional because lv_strlen() would dereference it even when
      *argument checks are compiled out.*/
     lv_qrcode_set_data(qr, NULL);
-    TEST_ASSERT_FALSE(lv_qrcode_get_render_failed(qr));
+    TEST_ASSERT_TRUE(lv_qrcode_is_render_valid(qr));
     TEST_ASSERT_EQUAL(15, ((lv_qrcode_t *)qr)->data_len);
 }
 

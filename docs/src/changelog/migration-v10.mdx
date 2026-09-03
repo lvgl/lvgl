@@ -703,7 +703,7 @@ used afterwards.
 - New: `lv_qrcode_render()` re-encodes the stored payload without taking it as an
   argument, which is how property changes made in the deferred update mode are applied.
 
-- New: `lv_qrcode_get_render_failed()` reports whether the last encode failed, for the
+- New: `lv_qrcode_is_render_valid()` reports whether the last encode succeeded, for the
   re-encodes whose result cannot be returned (the void property setters, and the
   deferred re-encode done by the draw pass).
 
