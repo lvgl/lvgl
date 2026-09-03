@@ -6,7 +6,7 @@
 **/*.gcno
 tags
 scripts/cppcheck_res.txt
-scripts/built_in_font/lv_font_*
+scripts/generators/built_in_font/lv_font_*
 __pycache__
 /emscripten_builder
 test_screenshot_error.h
