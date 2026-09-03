@@ -56,7 +56,7 @@ static void list_press_handler(lv_obj_t * page);
 static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y);
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en);
 static lv_obj_t * get_label(const lv_obj_t * obj);
-static void dropdown_list_align(lv_dropdown_t *dropdown, lv_area_t coord);
+static void dropdown_list_align(lv_dropdown_t * dropdown, lv_area_t coord);
 
 #if LV_USE_OBSERVER
     static void dropdown_value_changed_event_cb(lv_event_t * e);
@@ -1403,7 +1403,7 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
     return lv_obj_get_child(dropdown->list, 0);
 }
 
-static void dropdown_list_align(lv_dropdown_t *dropdown, lv_area_t coord)
+static void dropdown_list_align(lv_dropdown_t * dropdown, lv_area_t coord)
 {
     int32_t offset, pos_x;
 
@@ -1413,11 +1413,16 @@ static void dropdown_list_align(lv_dropdown_t *dropdown, lv_area_t coord)
     int32_t scroll_x = lv_obj_get_scroll_x(list_parent);
     int32_t space_left = lv_obj_get_style_space_left(list_parent, LV_PART_MAIN);
 
-    offset = (rtl)  ? (coord.x2 - lv_obj_get_width(dropdown->list) + 1) : coord.x1;
+    if(rtl) {
+        offset = coord.x2 - lv_obj_get_width(dropdown->list) + 1;
+        pos_x = (list_parent->coords.x1 + space_left - scroll_x) +
+                (lv_obj_get_content_width(list_parent) - lv_obj_get_width(dropdown->list) - offset);
+    }
+    else {
+        offset = coord.x1;
+        pos_x = offset - list_parent->coords.x1 - space_left + scroll_x;
+    }
 
-    pos_x = (rtl)   ? ((list_parent->coords.x1 + space_left - scroll_x) +
-                        (lv_obj_get_content_width(list_parent) - lv_obj_get_width(dropdown->list) - offset))
-                    :   (offset - list_parent->coords.x1 - space_left + scroll_x);
 
     lv_obj_set_x(dropdown->list, pos_x);
     lv_obj_set_y(dropdown->list, coord.y2 + 1);
