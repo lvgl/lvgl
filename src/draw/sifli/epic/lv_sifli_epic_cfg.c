@@ -59,7 +59,6 @@ static HAL_StatusTypeDef epic_wait_async_result(HAL_StatusTypeDef start_status);
 static HAL_StatusTypeDef epic_prepare_start(EPIC_HandleTypeDef * epic,
                                             lv_epic_cplt_cbk cb);
 static void epic_start_failed_cleanup(void);
-static void lv_epic_flush_cache(void);
 
 /**********************
  *      MACROS
@@ -118,15 +117,6 @@ void lv_epic_deinit(void)
 #endif
     epic_async_cb = NULL;
     epic_initialized = false;
-}
-
-void lv_epic_reset(void)
-{
-    if(!epic_initialized) {
-        return;
-    }
-
-    (void)HAL_EPIC_Init(&epic_handle);
 }
 
 bool lv_epic_is_initialized(void)
@@ -188,18 +178,6 @@ EZIP_HandleTypeDef * lv_ezip_get_handle(void)
     return &ezip_handle;
 }
 #endif
-
-static void lv_epic_flush_cache(void)
-{
-#if defined(__ZEPHYR__)
-    (void)arch_dcache_flush_all();
-#else
-#if defined(__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-    /* Flush D-Cache if present */
-    SCB_CleanDCache();
-#endif
-#endif
-}
 
 void lv_epic_flush_cache_range(const void * data, uint32_t size)
 {
@@ -324,7 +302,6 @@ static HAL_StatusTypeDef epic_prepare_start(EPIC_HandleTypeDef * epic,
         lv_epic_wait();
     }
 
-    lv_epic_flush_cache();
     epic_async_cb = cb;
     epic->XferCpltCallback = epic_xfer_cplt_callback;
     lv_epic_run();

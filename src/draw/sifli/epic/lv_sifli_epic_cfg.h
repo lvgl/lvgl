@@ -107,11 +107,6 @@ void lv_epic_init(void);
 void lv_epic_deinit(void);
 
 /**
- * Reset EPIC device.
- */
-void lv_epic_reset(void);
-
-/**
  * Check whether the external EPIC adapter has completed initialization.
  * @return true if initialized, false otherwise
  */
