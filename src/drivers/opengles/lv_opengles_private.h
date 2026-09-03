@@ -145,6 +145,7 @@ typedef struct {
     uint32_t format;            /**< the `format` argument of `glTexImage2D` */
     uint32_t type;              /**< the `type` argument of `glTexImage2D` */
     bool rb_swap;               /**< the red and blue channels have to be swapped while rendering */
+    bool premultiplied;         /**< the color channels are multiplied with the alpha channel already */
 } lv_opengles_gl_format_t;
 
 /**********************
@@ -213,6 +214,8 @@ void lv_opengles_render_display_texture_internal(lv_display_t * display, bool h_
 lv_result_t lv_opengles_gl_format_from_color_format(lv_color_format_t cf, lv_opengles_gl_format_t * gl_format);
 
 bool lv_opengles_color_format_is_rb_swap(lv_color_format_t cf);
+
+bool lv_opengles_color_format_is_premultiplied(lv_color_format_t cf);
 
 /**
  * Upload a pixel buffer into an OpenGL texture
