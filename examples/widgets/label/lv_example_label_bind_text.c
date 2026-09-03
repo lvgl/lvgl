@@ -16,18 +16,19 @@
  */
 void lv_example_label_bind_text(void)
 {
-    static lv_subject_t subject_text;
+    static lv_subject_t * subject_text;
     static char subject_text_buf[256];
     static char subject_text_prev_buf[256];
 
     static bool inited = false;
 
     if(!inited) {
-        lv_subject_init_string(&subject_text,
-                               subject_text_buf,
-                               subject_text_prev_buf,
-                               256,
-                               "Hello");
+        subject_text = lv_subject_create(LV_SUBJECT_TYPE_STRING);
+        lv_subject_set_string_buffer_static(subject_text,
+                                            subject_text_buf,
+                                            subject_text_prev_buf,
+                                            256);
+        lv_subject_copy_string(subject_text, "Hello");
         inited = true;
     }
 
@@ -35,7 +36,7 @@ void lv_example_label_bind_text(void)
 
     /* 💡 Click either button; the label updates because it reads `subject_text` live. */
     lv_obj_t * label_1 = lv_label_create(screen);
-    lv_label_bind_text(label_1, &subject_text, NULL);
+    lv_label_bind_text(label_1, subject_text, NULL);
     lv_obj_set_align(label_1, LV_ALIGN_CENTER);
     lv_obj_set_y(label_1, -50);
 
@@ -45,7 +46,7 @@ void lv_example_label_bind_text(void)
     lv_obj_set_align(label_2, LV_ALIGN_CENTER);
     lv_label_set_text(label_2, "Idle");
 
-    lv_obj_add_subject_set_string_event(button_1, &subject_text, LV_EVENT_CLICKED, "Idle");
+    lv_obj_add_subject_set_string_event(button_1, subject_text, LV_EVENT_CLICKED, "Idle");
 
     lv_obj_t * button_2 = lv_button_create(screen);
     lv_obj_set_align(button_2, LV_ALIGN_CENTER);
@@ -54,6 +55,6 @@ void lv_example_label_bind_text(void)
     lv_obj_set_align(label_3, LV_ALIGN_CENTER);
     lv_label_set_text(label_3, "Running");
 
-    lv_obj_add_subject_set_string_event(button_2, &subject_text, LV_EVENT_CLICKED, "Running");
+    lv_obj_add_subject_set_string_event(button_2, subject_text, LV_EVENT_CLICKED, "Running");
 }
 #endif

@@ -68,7 +68,7 @@ and a pointer to it are both accepted, so `info style my_style` and
   `info obj_class &lv_button_class` or `info obj_class obj->class_p`. With no
   argument, lists all registered classes.
 - `info subject <lv_subject_t *>`: Show a subject and its observers, e.g.
-  `info subject &my_subject`.
+  `info subject my_subject`.
 - `info lvgl_version`: Print the LVGL version of the target and the plugin's
   own.
 - `lvglobal [-p <pid>]`: (NuttX only) Set which LVGL instance to inspect.
@@ -372,12 +372,12 @@ ObjClass: lv_button -> lv_obj -> lv_obj
 ## Inspect Subject
 
 `info subject <lv_subject_t *>`: Show a subject's type and all its observers,
-e.g. `info subject &my_subject`.
+e.g. `info subject my_subject`.
 
 Example:
 
 ```text
-(gdb) info subject &my_subject
+(gdb) info subject my_subject
 Subject: type=INT subscribers=2
   Observer: cb=<my_cb> target=0x... for_obj=True
 ```

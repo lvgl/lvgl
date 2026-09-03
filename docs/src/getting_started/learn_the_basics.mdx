@@ -211,7 +211,8 @@ See [Styles](/common-widget-features/styles) for full details.
 
 To realize data bindings, LVGL uses the Subject/Observer pattern.
 
-Subjects are global <ApiLink name="lv_subject_t" /> variables that store integer, color, string, etc. values.
+Subjects are <ApiLink name="lv_subject_t" /> objects that store integer, color, string, etc. values.
+They are created with <ApiLink name="lv_subject_create" /> and freed with <ApiLink name="lv_subject_delete" />.
 
 Either the UI or the application can subscribe to these subjects by creating *observer callbacks* that
 are notified when the subject changes.
@@ -233,18 +234,19 @@ static void label_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 ...
 
-static lv_subject_t subject1;
-lv_subject_init_int(&subject1, 10);
+static lv_subject_t * subject1;
+subject1 = lv_subject_create(LV_SUBJECT_TYPE_INT);
+lv_subject_set_int(subject1, 10);
 
 lv_obj_t * label1 = lv_label_create(lv_screen_active());
 /*lv_label_bind_text could have been used too*/
-lv_subject_add_observer_obj(&subject1, label_observer_cb, label1, NULL);
+lv_subject_add_observer_obj(subject1, label_observer_cb, label1, NULL);
 
 lv_obj_t * slider1 = lv_slider_create(lv_screen_active());
-lv_slider_bind_value(slider1, &subject1);
+lv_slider_bind_value(slider1, subject1);
 lv_obj_set_y(slider1, 30);
 
-lv_subject_set_int(&subject1, 30);
+lv_subject_set_int(subject1, 30);
 ```
 
 Learn more on the documentation page of [Observers](/main-modules/data_binding/observers).

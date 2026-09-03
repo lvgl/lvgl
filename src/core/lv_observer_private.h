@@ -55,6 +55,10 @@ struct _lv_subject_increment_dsc_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+/*TODO: v10 rename to plain init/deinit after removing old init/deinit functions*/
+void lv_subject_global_init(void);
+void lv_subject_global_deinit(void);
+
 /**********************
  *      MACROS
  **********************/

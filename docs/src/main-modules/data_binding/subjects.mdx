@@ -8,32 +8,55 @@ A **Subject** is a value you can observe. When you change it, every
 automatically. A Subject can hold an integer, a float, a string, a pointer, a
 color, or a group of other Subjects.
 
-Keep a Subject in a static or global variable; it has to stay alive as long as
-anything observes it.
-
 ## Creating a Subject
 
-Initialize a Subject with the function for its type. The last argument is the
-starting value:
+<ApiLink name="lv_subject_create" display="lv_subject_create()" /> allocates a Subject
+of the requested type and returns a pointer to it. Keep that pointer in a static or
+global variable; it has to stay alive as long as anything observes the Subject.
 
 ```c
-static lv_subject_t temperature;
-lv_subject_init_int(&temperature, 20);          /* integer, starts at 20 */
+static lv_subject_t * temperature;
+temperature = lv_subject_create(LV_SUBJECT_TYPE_INT);
+lv_subject_set_int(temperature, 20);            /* integer, starts at 20 */
 ```
+
+A newly created Subject starts from a neutral value: `0` for int and float, `NULL`
+for pointer, black for color, an empty string for string, and an empty list for
+group. Set the initial value with the matching `lv_subject_set_...()` function, as
+above.
+
+The available types are `LV_SUBJECT_TYPE_INT`, `LV_SUBJECT_TYPE_FLOAT` (requires
+<ApiLink name="LV_USE_FLOAT"/>), `LV_SUBJECT_TYPE_STRING`, `LV_SUBJECT_TYPE_POINTER`,
+`LV_SUBJECT_TYPE_COLOR` and `LV_SUBJECT_TYPE_GROUP`.
 
 Strings need a buffer to live in (and an optional second buffer to remember the
-previous value):
+previous value). The buffers are supplied with
+<ApiLink name="lv_subject_set_string_buffer_static" display="lv_subject_set_string_buffer_static()" />
+and must out-live the Subject:
 
 ```c
-static lv_subject_t title;
+static lv_subject_t * title;
 static char buf[32];
 static char prev_buf[32];
-lv_subject_init_string(&title, buf, prev_buf, sizeof(buf), "Hello");
+title = lv_subject_create(LV_SUBJECT_TYPE_STRING);
+lv_subject_set_string_buffer_static(title, buf, prev_buf, sizeof(buf));
+lv_subject_copy_string(title, "Hello");
 ```
 
-The remaining types work the same way with <ApiLink name="lv_subject_init_float" display="lv_subject_init_float()" /> (requires <ApiLink name="LV_USE_FLOAT"/>),
-<ApiLink name="lv_subject_init_pointer" display="lv_subject_init_pointer()" /> and
-<ApiLink name="lv_subject_init_color" display="lv_subject_init_color()" />.
+## Deleting a Subject
+
+<ApiLink name="lv_subject_delete" display="lv_subject_delete()" /> removes every
+Observer from a Subject, deletes the Widget bindings attached to it, and frees it.
+It accepts `NULL`, so it is safe to call on a pointer that was never created.
+
+```c
+lv_subject_delete(temperature);
+temperature = NULL;
+```
+
+Any Subject still alive at <ApiLink name="lv_deinit" display="lv_deinit()" /> is
+deleted automatically, so a Subject that lives for the whole run of the application
+doesn't have to be deleted by hand.
 
 ## Reading and Writing the Value
 
@@ -46,15 +69,15 @@ when the previous buffer is also set.
 Read the current value back with `lv_subject_get_...()` (e.g. <ApiLink name="lv_subject_get_int"/>):
 
 ```c
-lv_subject_set_int(&temperature, 25);           /* notifies observers */
-int32_t t = lv_subject_get_int(&temperature);   /* -> 25 */
+lv_subject_set_int(temperature, 25);            /* notifies observers */
+int32_t t = lv_subject_get_int(temperature);    /* -> 25 */
 ```
 
 Strings are copied into the Subject's own buffer, so update them with
 <ApiLink name="lv_subject_copy_string" display="lv_subject_copy_string()" />:
 
 ```c
-lv_subject_copy_string(&title, "Settings");
+lv_subject_copy_string(title, "Settings");
 ```
 
 Every type (except groups) also has a `lv_subject_get_previous_...()` function (e.g.
@@ -67,19 +90,31 @@ Integer and float Subjects can be clamped. Out-of-range values are pulled back i
 before the Observers are notified:
 
 ```c
-lv_subject_set_min_value_int(&temperature, 0);
-lv_subject_set_max_value_int(&temperature, 100);
+lv_subject_set_min_value_int(temperature, 0);
+lv_subject_set_max_value_int(temperature, 100);
 ```
+
+Set the limits before the first value: `lv_subject_set_int()` clamps to them.
 
 ## Grouping Several Subjects
 
 Sometimes one thing depends on several values at once. A **group** Subject ties them
 together, so an Observer fires whenever *any* member changes.
 
+The list of members is passed with
+<ApiLink name="lv_subject_set_group_list_static" display="lv_subject_set_group_list_static()" />.
+The array is not copied, so it must out-live the group Subject:
+
 ```c
-static lv_subject_t * list[3] = {&mode, &value, &unit};
-static lv_subject_t measurement;
-lv_subject_init_group(&measurement, list, 3);
+static lv_subject_t * list[3];
+static lv_subject_t * measurement;
+
+list[0] = mode;
+list[1] = value;
+list[2] = unit;
+
+measurement = lv_subject_create(LV_SUBJECT_TYPE_GROUP);
+lv_subject_set_group_list_static(measurement, list, 3);
 ```
 
 In the callback, reach the members with
@@ -106,12 +141,12 @@ Instead of writing an event handler, you can let a Widget update a Subject direc
 For example, toggle an integer between `0` and `1` when a button is clicked:
 
 ```c
-lv_obj_add_subject_toggle_event(button, &enabled, LV_EVENT_CLICKED);
+lv_obj_add_subject_toggle_event(button, enabled, LV_EVENT_CLICKED);
 ```
 
 Other ready-made actions:
 
-- <ApiLink name="lv_obj_add_subject_increment_event" display="lv_obj_add_subject_increment_event(obj, &subject, trigger, step)" />
+- <ApiLink name="lv_obj_add_subject_increment_event" display="lv_obj_add_subject_increment_event(obj, subject, trigger, step)" />
   adds `step` to the value (use a negative `step` to subtract). It returns a
   descriptor you can adjust further with
   <ApiLink name="lv_obj_set_subject_increment_event_min_value" display="lv_obj_set_subject_increment_event_min_value()" />,
@@ -123,6 +158,6 @@ Other ready-made actions:
   write a fixed value on the trigger.
 
 <Callout type="warning">
-Do not de-initialize or delete a Subject while these events remain attached as their callbacks saved a pointer to the Subject.
+Do not delete a Subject while these events remain attached as their callbacks saved a pointer to the Subject.
 </Callout>
 

@@ -16,12 +16,13 @@
  */
 void lv_example_roller_bind_value(void)
 {
-    static lv_subject_t subject_index;
+    static lv_subject_t * subject_index;
 
     static bool inited = false;
 
     if(!inited) {
-        lv_subject_init_int(&subject_index, 0);
+        subject_index = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_int(subject_index, 0);
         inited = true;
     }
 
@@ -37,13 +38,13 @@ void lv_example_roller_bind_value(void)
     lv_obj_set_width(roller, 160);
     lv_roller_set_visible_row_count(roller, 3);
     lv_roller_set_options(roller, "Mon\nTue\nWed\nThu\nFri\nSat\nSun", LV_ROLLER_MODE_NORMAL);
-    lv_roller_bind_value(roller, &subject_index);
+    lv_roller_bind_value(roller, subject_index);
 
     lv_obj_t * button = lv_button_create(screen);
     lv_obj_t * label = lv_label_create(button);
     lv_obj_set_align(label, LV_ALIGN_CENTER);
     lv_label_set_text(label, "Jump to Wed");
 
-    lv_obj_add_subject_set_int_event(button, &subject_index, LV_EVENT_CLICKED, 2);
+    lv_obj_add_subject_set_int_event(button, subject_index, LV_EVENT_CLICKED, 2);
 }
 #endif

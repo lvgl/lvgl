@@ -103,16 +103,16 @@ static lv_gltf_set_int_fn_union_t antialiasing_mode_fn = { .cb = lv_gltf_set_ant
 
 static lv_gltf_set_int_fn_union_t bg_blur_fn = { .cb = lv_gltf_set_background_blur };
 
-static lv_subject_t yaw_subject;
-static lv_subject_t pitch_subject;
-static lv_subject_t distance_subject;
-static lv_subject_t camera_subject;
-static lv_subject_t animation_subject;
-static lv_subject_t antialiasing_subject;
-static lv_subject_t background_subject;
-static lv_subject_t env_brightness_subject;
-static lv_subject_t background_blur_subject;
-static lv_subject_t animation_speed_subject;
+static lv_subject_t * yaw_subject;
+static lv_subject_t * pitch_subject;
+static lv_subject_t * distance_subject;
+static lv_subject_t * camera_subject;
+static lv_subject_t * animation_subject;
+static lv_subject_t * antialiasing_subject;
+static lv_subject_t * background_subject;
+static lv_subject_t * env_brightness_subject;
+static lv_subject_t * background_blur_subject;
+static lv_subject_t * animation_speed_subject;
 
 /**********************
  *      MACROS
@@ -154,31 +154,41 @@ lv_obj_t * lv_demo_gltf(const char * path)
 
 static void init_subjects(lv_obj_t * viewer)
 {
-    lv_subject_init_float(&yaw_subject, lv_gltf_get_yaw(viewer));
-    lv_subject_init_float(&pitch_subject, lv_gltf_get_pitch(viewer));
-    lv_subject_init_float(&distance_subject, lv_gltf_get_distance(viewer));
+    yaw_subject = lv_subject_create(LV_SUBJECT_TYPE_FLOAT);
+    lv_subject_set_float(yaw_subject, lv_gltf_get_yaw(viewer));
+    pitch_subject = lv_subject_create(LV_SUBJECT_TYPE_FLOAT);
+    lv_subject_set_float(pitch_subject, lv_gltf_get_pitch(viewer));
+    distance_subject = lv_subject_create(LV_SUBJECT_TYPE_FLOAT);
+    lv_subject_set_float(distance_subject, lv_gltf_get_distance(viewer));
 
-    lv_subject_init_int(&camera_subject, lv_gltf_get_camera(viewer));
-    lv_subject_init_int(&animation_speed_subject, LV_GLTF_ANIM_SPEED_NORMAL);
-    lv_subject_init_int(&animation_subject, lv_gltf_model_get_animation(lv_gltf_get_primary_model(viewer)));
-    lv_subject_init_int(&antialiasing_subject, lv_gltf_get_antialiasing_mode(viewer));
-    lv_subject_init_int(&background_subject, lv_gltf_get_background_mode(viewer));
-    lv_subject_init_int(&background_blur_subject, lv_gltf_get_background_blur(viewer));
-    lv_subject_init_int(&env_brightness_subject, lv_gltf_get_environment_brightness(viewer) * 100);
+    camera_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(camera_subject, lv_gltf_get_camera(viewer));
+    animation_speed_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(animation_speed_subject, LV_GLTF_ANIM_SPEED_NORMAL);
+    animation_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(animation_subject, lv_gltf_model_get_animation(lv_gltf_get_primary_model(viewer)));
+    antialiasing_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(antialiasing_subject, lv_gltf_get_antialiasing_mode(viewer));
+    background_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(background_subject, lv_gltf_get_background_mode(viewer));
+    background_blur_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(background_blur_subject, lv_gltf_get_background_blur(viewer));
+    env_brightness_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(env_brightness_subject, lv_gltf_get_environment_brightness(viewer) * 100);
 
-    lv_subject_add_observer_obj(&camera_subject, viewer_observer_int_cb, viewer, camera_fn.ptr);
-    lv_subject_add_observer_obj(&pitch_subject, viewer_observer_float_cb, viewer, pitch_fn.ptr);
-    lv_subject_add_observer_obj(&yaw_subject, viewer_observer_float_cb, viewer, yaw_fn.ptr);
-    lv_subject_add_observer_obj(&distance_subject, viewer_observer_float_cb, viewer, distance_fn.ptr);
+    lv_subject_add_observer_obj(camera_subject, viewer_observer_int_cb, viewer, camera_fn.ptr);
+    lv_subject_add_observer_obj(pitch_subject, viewer_observer_float_cb, viewer, pitch_fn.ptr);
+    lv_subject_add_observer_obj(yaw_subject, viewer_observer_float_cb, viewer, yaw_fn.ptr);
+    lv_subject_add_observer_obj(distance_subject, viewer_observer_float_cb, viewer, distance_fn.ptr);
 
-    lv_subject_add_observer(&animation_subject, animation_observer_cb, viewer);
-    lv_subject_add_observer(&animation_speed_subject, animation_speed_observer_cb, viewer);
+    lv_subject_add_observer(animation_subject, animation_observer_cb, viewer);
+    lv_subject_add_observer(animation_speed_subject, animation_speed_observer_cb, viewer);
 
-    lv_subject_add_observer_obj(&background_subject, viewer_observer_int_cb, viewer, background_mode_fn.ptr);
-    lv_subject_add_observer_obj(&background_blur_subject, viewer_observer_int_cb, viewer, bg_blur_fn.ptr);
-    lv_subject_add_observer_obj(&env_brightness_subject, env_brightness_observer_cb, viewer, env_brightness_fn.ptr);
+    lv_subject_add_observer_obj(background_subject, viewer_observer_int_cb, viewer, background_mode_fn.ptr);
+    lv_subject_add_observer_obj(background_blur_subject, viewer_observer_int_cb, viewer, bg_blur_fn.ptr);
+    lv_subject_add_observer_obj(env_brightness_subject, env_brightness_observer_cb, viewer, env_brightness_fn.ptr);
 
-    lv_subject_add_observer_obj(&antialiasing_subject, viewer_observer_int_cb, viewer, antialiasing_mode_fn.ptr);
+    lv_subject_add_observer_obj(antialiasing_subject, viewer_observer_int_cb, viewer, antialiasing_mode_fn.ptr);
 }
 static void create_control_panel(lv_obj_t * viewer)
 {
@@ -208,11 +218,11 @@ static void create_camera_panel(lv_obj_t * panel, lv_obj_t * viewer)
 
     lv_obj_t * camera_dropdown = add_dropdown_to_row(camera_row);
     style_dropdown(camera_dropdown);
-    populate_dropdown(camera_dropdown, "Camera", lv_gltf_get_camera_count(viewer), &camera_subject);
+    populate_dropdown(camera_dropdown, "Camera", lv_gltf_get_camera_count(viewer), camera_subject);
     lv_dropdown_add_option(camera_dropdown, "No Camera", 0);
 
     lv_obj_t * camera_reset_btn = add_button_to_row(camera_row, lv_color_hex(0xFF6B35));
-    lv_obj_add_event_cb(camera_reset_btn, reset_subject_event_handler, LV_EVENT_CLICKED, &camera_subject);
+    lv_obj_add_event_cb(camera_reset_btn, reset_subject_event_handler, LV_EVENT_CLICKED, camera_subject);
 
     lv_obj_t * camera_reset_btn_label = lv_label_create(camera_reset_btn);
     lv_label_set_text_static(camera_reset_btn_label, LV_SYMBOL_REFRESH);
@@ -220,20 +230,20 @@ static void create_camera_panel(lv_obj_t * panel, lv_obj_t * viewer)
     lv_obj_center(camera_reset_btn_label);
 
     lv_obj_t * yaw_title = add_title_to_row(camera_row, "");
-    lv_label_bind_text(yaw_title, &yaw_subject, "Yaw %.2f");
+    lv_label_bind_text(yaw_title, yaw_subject, "Yaw %.2f");
 
     lv_obj_t * yaw_slider = lv_slider_create(camera_row);
-    lv_slider_bind_value(yaw_slider, &yaw_subject);
+    lv_slider_bind_value(yaw_slider, yaw_subject);
     lv_obj_set_width(yaw_slider, LV_PCT(100));
     lv_slider_set_max_value(yaw_slider, 360);
     lv_slider_set_min_value(yaw_slider, -360);
     style_slider(yaw_slider, SLIDER_COLOR);
 
     lv_obj_t * pitch_title = add_title_to_row(camera_row, "");
-    lv_label_bind_text(pitch_title, &pitch_subject, "Pitch %.2f");
+    lv_label_bind_text(pitch_title, pitch_subject, "Pitch %.2f");
 
     lv_obj_t * pitch_slider = lv_slider_create(camera_row);
-    lv_slider_bind_value(pitch_slider, &pitch_subject);
+    lv_slider_bind_value(pitch_slider, pitch_subject);
     lv_obj_set_width(pitch_slider, LV_PCT(100));
     lv_slider_set_min_value(pitch_slider, -90);
     lv_slider_set_max_value(pitch_slider, 90);
@@ -241,18 +251,18 @@ static void create_camera_panel(lv_obj_t * panel, lv_obj_t * viewer)
     style_slider(pitch_slider, SLIDER_COLOR);
 
     lv_obj_t * distance_title = add_title_to_row(camera_row, "");
-    lv_label_bind_text(distance_title, &distance_subject, "Distance %.2f");
+    lv_label_bind_text(distance_title, distance_subject, "Distance %.2f");
 
     lv_obj_t * distance_slider = lv_slider_create(camera_row);
     lv_obj_set_width(distance_slider, LV_PCT(100));
-    lv_slider_bind_value(distance_slider, &distance_subject);
+    lv_slider_bind_value(distance_slider, distance_subject);
     lv_slider_set_min_value(distance_slider, 1);
     lv_slider_set_max_value(distance_slider, 25);
     style_slider(distance_slider, SLIDER_COLOR);
 
-    lv_subject_add_observer_obj(&camera_subject, disable_while_camera_selected_observer_cb, yaw_slider, NULL);
-    lv_subject_add_observer_obj(&camera_subject, disable_while_camera_selected_observer_cb, pitch_slider, NULL);
-    lv_subject_add_observer_obj(&camera_subject, disable_while_camera_selected_observer_cb, distance_slider, NULL);
+    lv_subject_add_observer_obj(camera_subject, disable_while_camera_selected_observer_cb, yaw_slider, NULL);
+    lv_subject_add_observer_obj(camera_subject, disable_while_camera_selected_observer_cb, pitch_slider, NULL);
+    lv_subject_add_observer_obj(camera_subject, disable_while_camera_selected_observer_cb, distance_slider, NULL);
 }
 
 static void create_animation_panel(lv_obj_t * panel, lv_obj_t * viewer)
@@ -264,7 +274,7 @@ static void create_animation_panel(lv_obj_t * panel, lv_obj_t * viewer)
 
     lv_obj_t * animation_dropdown = add_dropdown_to_row(animation_row);
     style_dropdown(animation_dropdown);
-    populate_dropdown(animation_dropdown, "Animation", lv_gltf_model_get_animation_count(model), &animation_subject);
+    populate_dropdown(animation_dropdown, "Animation", lv_gltf_model_get_animation_count(model), animation_subject);
 
     const bool has_animations = lv_gltf_model_get_animation_count(model) > 0;
     const lv_color_t btn_color = has_animations ? PAUSE_BTN_COLOR : PLAY_BTN_COLOR;
@@ -297,17 +307,17 @@ static void create_animation_panel(lv_obj_t * panel, lv_obj_t * viewer)
     lv_obj_set_style_text_color(animation_reset_btn_label, lv_color_white(), 0);
     lv_obj_center(animation_reset_btn_label);
 
-    lv_obj_add_event_cb(animation_reset_btn, reset_subject_event_handler, LV_EVENT_CLICKED, &animation_subject);
+    lv_obj_add_event_cb(animation_reset_btn, reset_subject_event_handler, LV_EVENT_CLICKED, animation_subject);
 
     add_title_to_row(animation_row, "Animation Speed");
     lv_obj_t * animation_ratio_value = add_title_to_row(animation_row, "");
-    lv_label_bind_text(animation_ratio_value, &animation_speed_subject, "%d (x1000)");
+    lv_label_bind_text(animation_ratio_value, animation_speed_subject, "%d (x1000)");
 
     lv_obj_t * animation_ratio_slider = lv_slider_create(animation_row);
     lv_obj_set_width(animation_ratio_slider, LV_PCT(100));
     lv_slider_set_min_value(animation_ratio_slider, 0);
     lv_slider_set_max_value(animation_ratio_slider, LV_GLTF_ANIM_SPEED_4X);
-    lv_slider_bind_value(animation_ratio_slider, &animation_speed_subject);
+    lv_slider_bind_value(animation_ratio_slider, animation_speed_subject);
 
     style_slider(animation_ratio_slider, SLIDER_COLOR);
 
@@ -320,7 +330,7 @@ static void create_antialiasing_panel(lv_obj_t * panel)
     lv_obj_t * antialiasing_dropdown = add_dropdown_to_row(antialiasing_row);
     style_dropdown(antialiasing_dropdown);
     lv_dropdown_set_options(antialiasing_dropdown, "Off\nOn\nDynamic");
-    lv_dropdown_bind_value(antialiasing_dropdown, &antialiasing_subject);
+    lv_dropdown_bind_value(antialiasing_dropdown, antialiasing_subject);
 }
 
 static void create_background_panel(lv_obj_t * panel)
@@ -333,13 +343,13 @@ static void create_background_panel(lv_obj_t * panel)
     style_dropdown(background_dropdown);
 
     lv_dropdown_set_options(background_dropdown, "Solid Color\nEnvironment");
-    lv_dropdown_bind_value(background_dropdown, &background_subject);
+    lv_dropdown_bind_value(background_dropdown, background_subject);
 
     lv_obj_t * env_brightness_title = add_title_to_row(bg_row, "");
-    lv_label_bind_text(env_brightness_title, &env_brightness_subject, "Env Brightness %d");
+    lv_label_bind_text(env_brightness_title, env_brightness_subject, "Env Brightness %d");
 
     lv_obj_t * env_brightness_slider = lv_slider_create(bg_row);
-    lv_slider_bind_value(env_brightness_slider, &env_brightness_subject);
+    lv_slider_bind_value(env_brightness_slider, env_brightness_subject);
     lv_obj_set_width(env_brightness_slider, LV_PCT(100));
 
     lv_slider_set_min_value(env_brightness_slider, 0);
@@ -347,10 +357,10 @@ static void create_background_panel(lv_obj_t * panel)
     style_slider(env_brightness_slider, SLIDER_COLOR);
 
     lv_obj_t * background_blur_title = add_title_to_row(bg_row, "");
-    lv_label_bind_text(background_blur_title, &background_blur_subject, "Background Blur %d");
+    lv_label_bind_text(background_blur_title, background_blur_subject, "Background Blur %d");
 
     lv_obj_t * background_blur_slider = lv_slider_create(bg_row);
-    lv_slider_bind_value(background_blur_slider, &background_blur_subject);
+    lv_slider_bind_value(background_blur_slider, background_blur_subject);
     lv_obj_set_width(background_blur_slider, LV_PCT(100));
     lv_slider_set_min_value(background_blur_slider, 0);
     lv_slider_set_max_value(background_blur_slider, 100);
@@ -394,8 +404,8 @@ static void on_mouse_event(lv_event_t * e)
                 if(new_pitch < -89.0f)
                     new_pitch = -89.0f;
 
-                lv_subject_set_float(&yaw_subject, new_yaw);
-                lv_subject_set_float(&pitch_subject, new_pitch);
+                lv_subject_set_float(yaw_subject, new_yaw);
+                lv_subject_set_float(pitch_subject, new_pitch);
             }
             mouse_state->last_pos = current_pos;
             break;

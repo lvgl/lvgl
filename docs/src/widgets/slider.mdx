@@ -108,9 +108,9 @@ A Slider binds its integer value to a Subject. The link is two-way: the
 end user's drag updates the subject, and any application-side write into
 the subject moves the knob. Integer and float subjects are both supported.
 
-- <ApiLink name="lv_slider_bind_value" display="lv_slider_bind_value(slider, &subject)" />
+- <ApiLink name="lv_slider_bind_value" display="lv_slider_bind_value(slider, subject)" />
 
-To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
 
 
 <LvglExample name="lv_example_slider_bind_value" path="widgets/slider/lv_example_slider_bind_value" />

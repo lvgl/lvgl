@@ -9,7 +9,7 @@ typedef struct {
     lv_obj_t * button_label;
     lv_obj_t * position_label;
     lv_obj_t * duration_label;
-    lv_subject_t position_subject;
+    lv_subject_t * position_subject;
 } event_data_t;
 
 static void volume_setter_create(event_data_t * event_data);
@@ -106,18 +106,18 @@ static void volume_setter_create(event_data_t * event_data)
 
     /* We use `lv_subject` to simplify binding the data between multiple objects.
      * Here the data is shared between the slider, the label and the gstreamer widgets */
-    static lv_subject_t volume_subject;
-    lv_subject_init_int(&volume_subject, 50);
-    lv_subject_add_observer_obj(&volume_subject, volume_observer_cb, event_data->streamer, NULL);
-    lv_slider_bind_value(volume_slider, &volume_subject);
-    lv_label_bind_text(volume_label, &volume_subject, LV_SYMBOL_VOLUME_MID "\n%3" LV_PRId32 "%%");
+    lv_subject_t * volume_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(volume_subject, 50);
+    lv_subject_add_observer_obj(volume_subject, volume_observer_cb, event_data->streamer, NULL);
+    lv_slider_bind_value(volume_slider, volume_subject);
+    lv_label_bind_text(volume_label, volume_subject, LV_SYMBOL_VOLUME_MID "\n%3" LV_PRId32 "%%");
 
 }
 
 
 static void control_bar_create(event_data_t * event_data)
 {
-    lv_subject_init_int(&event_data->position_subject, 0);
+    event_data->position_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
 
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_remove_style_all(cont);
@@ -147,7 +147,7 @@ static void control_bar_create(event_data_t * event_data)
     lv_obj_t * position_slider = lv_bar_create(cont);
     lv_bar_set_range(position_slider, 0, 1000);
     lv_obj_set_flex_grow(position_slider, 1);
-    lv_slider_bind_value(position_slider, &event_data->position_subject);
+    lv_slider_bind_value(position_slider, event_data->position_subject);
 
     event_data->duration_label = lv_label_create(cont);
     lv_obj_set_width(event_data->duration_label, 80);
@@ -180,7 +180,7 @@ static void update_position_slider(lv_timer_t * timer)
     uint32_t duration = lv_gstreamer_get_duration(event_data->streamer);
     uint32_t position = lv_gstreamer_get_position(event_data->streamer);
     int32_t position_perc = lv_map(position, 0, duration, 0, 1000);
-    lv_subject_set_int(&event_data->position_subject, position_perc);
+    lv_subject_set_int(event_data->position_subject, position_perc);
     update_duration_label(event_data->position_label, position);
 }
 

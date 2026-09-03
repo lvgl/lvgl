@@ -21,12 +21,13 @@ static void show_label(lv_obj_t * obj, bool value)
 
 void lv_example_checkbox_bind_checked(void)
 {
-    static lv_subject_t subject_flag;
+    static lv_subject_t * subject_flag;
 
     static bool inited = false;
 
     if(!inited) {
-        lv_subject_init_int(&subject_flag, 0);
+        subject_flag = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_int(subject_flag, 0);
         inited = true;
     }
 
@@ -36,12 +37,12 @@ void lv_example_checkbox_bind_checked(void)
     lv_obj_t * checkbox = lv_checkbox_create(screen);
     lv_checkbox_set_text(checkbox, "Show extra details");
     lv_obj_set_align(checkbox, LV_ALIGN_CENTER);
-    lv_obj_bind_checked(checkbox, &subject_flag);
+    lv_obj_bind_checked(checkbox, subject_flag);
 
     lv_obj_t * label = lv_label_create(screen);
     lv_label_set_text(label, "Extra details only visible while the box is ticked.");
     lv_obj_set_align(label, LV_ALIGN_CENTER);
     lv_obj_set_y(label, 30);
-    lv_obj_bind_bool(label, &subject_flag, show_label);
+    lv_obj_bind_bool(label, subject_flag, show_label);
 }
 #endif

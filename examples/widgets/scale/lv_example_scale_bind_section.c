@@ -20,8 +20,8 @@ void lv_example_scale_bind_section(void)
     static lv_style_t style_section_items;
     static lv_style_t style_section_indicator;
 
-    static lv_subject_t subject_value;
-    static lv_subject_t subject_value2;
+    static lv_subject_t * subject_value;
+    static lv_subject_t * subject_value2;
 
     static bool inited = false;
 
@@ -41,12 +41,15 @@ void lv_example_scale_bind_section(void)
         lv_style_set_line_width(&style_section_indicator, 4);
         lv_style_set_text_color(&style_section_indicator, lv_color_hex(0xef4444));
 
-        lv_subject_init_int(&subject_value, 50);
-        lv_subject_set_min_value_int(&subject_value, 0);
-        lv_subject_set_max_value_int(&subject_value, 100);
-        lv_subject_init_int(&subject_value2, 20);
-        lv_subject_set_min_value_int(&subject_value2, 0);
-        lv_subject_set_max_value_int(&subject_value2, 100);
+        subject_value = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_min_value_int(subject_value, 0);
+        lv_subject_set_max_value_int(subject_value, 100);
+        lv_subject_set_int(subject_value, 50);
+
+        subject_value2 = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_min_value_int(subject_value2, 0);
+        lv_subject_set_max_value_int(subject_value2, 100);
+        lv_subject_set_int(subject_value2, 20);
         inited = true;
     }
 
@@ -70,21 +73,21 @@ void lv_example_scale_bind_section(void)
     lv_scale_set_section_style_main(scale, lv_scale_section_0, &style_section_main);
     lv_scale_set_section_style_items(scale, lv_scale_section_0, &style_section_items);
     lv_scale_set_section_style_indicator(scale, lv_scale_section_0, &style_section_indicator);
-    lv_scale_bind_section_min_value(scale, lv_scale_section_0, &subject_value2);
-    lv_scale_bind_section_max_value(scale, lv_scale_section_0, &subject_value);
+    lv_scale_bind_section_min_value(scale, lv_scale_section_0, subject_value2);
+    lv_scale_bind_section_max_value(scale, lv_scale_section_0, subject_value);
 
     lv_obj_t * label_1 = lv_label_create(screen);
     lv_label_set_text(label_1, "Section start (subject_value2)");
 
     lv_obj_t * slider_1 = lv_slider_create(screen);
     lv_obj_set_width(slider_1, 240);
-    lv_slider_bind_value(slider_1, &subject_value2);
+    lv_slider_bind_value(slider_1, subject_value2);
 
     lv_obj_t * label_2 = lv_label_create(screen);
     lv_label_set_text(label_2, "Section end (subject_value)");
 
     lv_obj_t * slider_2 = lv_slider_create(screen);
     lv_obj_set_width(slider_2, 240);
-    lv_slider_bind_value(slider_2, &subject_value);
+    lv_slider_bind_value(slider_2, subject_value);
 }
 #endif

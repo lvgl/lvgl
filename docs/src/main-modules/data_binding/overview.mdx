@@ -36,11 +36,10 @@ The following Subject types are supported:
 - pointer
 - group
 
-You can create a Subject by using a static/global variable:
+You can create a subject with <ApiLink name="lv_subject_create"/>:
 
 ```c
-static lv_subject_t subject_2;
-lv_subject_init_int(&subject_2, 10);   /*10 is the initial value*/
+lv_subject_t * subject_2 = lv_subject_create(LV_SUBJECT_TYPE_INT);
 ```
 
 Set a Subject's value like below. This also notifies all subscribed Observers when the value changes.
@@ -78,14 +77,16 @@ Some Widgets also offer an API to easily create one- or two-way bindings. For ex
 lv_label_bind_text(label_1, subject_1, "%d °C");
 
 /*Keep the Subject and the selected drop-down option in sync (two-way)*/
-lv_dropdown_bind_value(dropdown_1, &subject_2);
+lv_dropdown_bind_value(dropdown_1, subject_2);
 ```
 
-When the subjects are no longer needed they can be deinitialized:
+When a Subject is no longer needed it can be deleted:
 
 ```c
-lv_subject_deinit(&subject_2);
+lv_subject_delete(subject_2);
 ```
+
+Subjects that are still alive when `lv_deinit()` is called are deleted automatically.
 
 That's it in short. Continue reading to learn more about
 [Subjects](/main-modules/data_binding/subjects) and

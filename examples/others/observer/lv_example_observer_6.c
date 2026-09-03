@@ -10,7 +10,7 @@ static lv_obj_t * my_panel_create(lv_obj_t * parent);
 static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_event_cb_t event_cb);
 static void switch_theme_event_cb(lv_event_t * e);
 
-static lv_subject_t theme_subject;
+static lv_subject_t * theme_subject;
 
 /**
  * @title Theme styles with `lv_subject_add_observer_with_target`
@@ -26,7 +26,8 @@ static lv_subject_t theme_subject;
  */
 void lv_example_observer_6(void)
 {
-    lv_subject_init_int(&theme_subject, THEME_MODE_DARK);
+    theme_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(theme_subject, THEME_MODE_DARK);
 
     lv_obj_t * panel1 = my_panel_create(lv_screen_active());
     lv_obj_set_flex_flow(panel1, LV_FLEX_FLOW_COLUMN);
@@ -49,8 +50,8 @@ void lv_example_observer_6(void)
 static void switch_theme_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
-    if(lv_subject_get_int(&theme_subject) == THEME_MODE_LIGHT) lv_subject_set_int(&theme_subject, THEME_MODE_DARK);
-    else lv_subject_set_int(&theme_subject, THEME_MODE_LIGHT);
+    if(lv_subject_get_int(theme_subject) == THEME_MODE_LIGHT) lv_subject_set_int(theme_subject, THEME_MODE_DARK);
+    else lv_subject_set_int(theme_subject, THEME_MODE_LIGHT);
 }
 
 /*-----------------------------------------
@@ -69,7 +70,7 @@ static void my_panel_style_observer_cb(lv_observer_t * observer, lv_subject_t * 
 {
     LV_UNUSED(subject);
 
-    lv_theme_mode_t m = (lv_theme_mode_t) lv_subject_get_int(&theme_subject);
+    lv_theme_mode_t m = (lv_theme_mode_t) lv_subject_get_int(theme_subject);
     lv_panel_styles_t * styles = (lv_panel_styles_t *) lv_observer_get_target(observer);
     if(m == THEME_MODE_LIGHT) {
         lv_style_set_bg_color(&styles->style_main, lv_color_hex3(0xfff));
@@ -111,7 +112,7 @@ static lv_obj_t * my_panel_create(lv_obj_t * parent)
         lv_style_set_pad_ver(&styles.style_scrollbar, 8);
         lv_style_set_bg_opa(&styles.style_scrollbar, LV_OPA_50);
 
-        lv_subject_add_observer_with_target(&theme_subject, my_panel_style_observer_cb, &styles, NULL);
+        lv_subject_add_observer_with_target(theme_subject, my_panel_style_observer_cb, &styles, NULL);
     }
 
     lv_obj_t * panel = lv_obj_create(parent);
@@ -138,7 +139,7 @@ static void my_button_style_observer_cb(lv_observer_t * observer, lv_subject_t *
 {
     LV_UNUSED(subject);
 
-    lv_theme_mode_t m = (lv_theme_mode_t) lv_subject_get_int(&theme_subject);
+    lv_theme_mode_t m = (lv_theme_mode_t) lv_subject_get_int(theme_subject);
     lv_button_styles_t * styles = (lv_button_styles_t *) lv_observer_get_target(observer);
     if(m == THEME_MODE_LIGHT) {
         lv_style_set_bg_color(&styles->style_main, lv_color_hex(0x3379de));
@@ -179,7 +180,7 @@ static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_even
 
         lv_style_init(&styles.style_pressed);
         lv_style_set_color_filter_dsc(&styles.style_pressed, &lv_color_filter_shade);
-        lv_subject_add_observer_with_target(&theme_subject, my_button_style_observer_cb, &styles, NULL);
+        lv_subject_add_observer_with_target(theme_subject, my_button_style_observer_cb, &styles, NULL);
     }
 
     lv_obj_t * btn = lv_button_create(parent);

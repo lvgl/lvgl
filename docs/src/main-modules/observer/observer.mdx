@@ -32,18 +32,19 @@ A typical use case looks like this:
 
 ```c
 // Any typical global variable
-lv_subject_t my_subject;
+lv_subject_t * my_subject;
 
 /*-------
  * main.c
  *-------*/
 
-extern lv_subject_t my_subject;
+extern lv_subject_t * my_subject;
 
 void main(void)
 {
-    // Initialize Subject as integer with the default value of 10.
-    lv_subject_init_int(&my_subject, 10);
+    // Create an integer Subject and set its initial value to 10.
+    my_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(my_subject, 10);
 
     some_module_init();
 }
@@ -52,7 +53,7 @@ void main(void)
  * some_module.c
  *--------------*/
 
-extern lv_subject_t my_subject;
+extern lv_subject_t * my_subject;
 
 // Will be called when Subject's value changes
 static void some_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -64,41 +65,60 @@ static void some_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 void some_module_init(void)
 {
     // Subscribe to Subject as an Observer.
-    lv_subject_add_observer(&my_subject, some_observer_cb, NULL);
+    lv_subject_add_observer(my_subject, some_observer_cb, NULL);
 }
 
 /*--------------
  * some_system.c
  *--------------*/
 
-extern lv_subject_t my_subject;
+extern lv_subject_t * my_subject;
 
 void some_event(void)
 {
     // The below call sets Subject's value to 30 and notifies current Observers.
-    lv_subject_set_int(&my_subject, 30);
+    lv_subject_set_int(my_subject, 30);
 }
 ```
 
 ### Subject
 
-##### Subject Initialization
+##### Subject Creation
 
-Subjects have to be static or global variables, or dynamically-allocated
-<ApiLink name="lv_subject_t" /> objects.  Reason:  their content must remain valid through
-the life of the Subject.
+A Subject is created by LVGL with
+<ApiLink name="lv_subject_create" display="lv_subject_create(type)" />, which returns
+a pointer to it. Keep that pointer in a static or global variable: it has to remain
+valid through the life of the Subject.
 
-To initialize a Subject use `lv_subject_init_<type>(&subject, params, init_value)`.
-The following initialization functions exist, one for each of the Subject types:
+| Type | `lv_subject_type_t` value |
+|------|---------------------------|
+| `Integer` | `LV_SUBJECT_TYPE_INT` |
+| `Float` | `LV_SUBJECT_TYPE_FLOAT` (requires <ApiLink name="LV_USE_FLOAT" />) |
+| `String` | `LV_SUBJECT_TYPE_STRING` |
+| `Pointer` | `LV_SUBJECT_TYPE_POINTER` |
+| `Color` | `LV_SUBJECT_TYPE_COLOR` |
+| `Group` | `LV_SUBJECT_TYPE_GROUP` |
 
-| Field | Description |
-|-------|-------------|
-| `Integer` | void <ApiLink name="lv_subject_init_int" display="lv_subject_init_int(subject, int_value)" /> |
-| `Float` | void <ApiLink name="lv_subject_init_float" display="lv_subject_init_float(subject, float_value)" /> |
-| `String` | void <ApiLink name="lv_subject_init_string" display="lv_subject_init_string(subject, buf, prev_buf, buf_size, initial_string)" /> |
-| `Pointer` | void <ApiLink name="lv_subject_init_pointer" display="lv_subject_init_pointer(subject, ptr)" /> |
-| `Color` | void <ApiLink name="lv_subject_init_color" display="lv_subject_init_color(subject, color)" /> |
-| `Group` | void <ApiLink name="lv_subject_init_group" display="lv_subject_init_group(group_subject, subject_list[], count)" /> |
+A new Subject starts from a neutral value (`0`, `NULL`, black, an empty string, an
+empty group), so set the initial value with the matching `lv_subject_set_...()`
+function afterwards. Two types need one extra call before they can hold a value:
+
+| Type | Extra setup |
+|------|-------------|
+| `String` | void <ApiLink name="lv_subject_set_string_buffer_static" display="lv_subject_set_string_buffer_static(subject, buf, prev_buf, buf_size)" /> |
+| `Group` | void <ApiLink name="lv_subject_set_group_list_static" display="lv_subject_set_group_list_static(subject, subject_list[], count)" /> |
+
+Both the string buffers and the group list are used in place, not copied, so they
+must out-live the Subject.
+
+A Subject is freed with <ApiLink name="lv_subject_delete" display="lv_subject_delete(subject)" />.
+Subjects still alive when <ApiLink name="lv_deinit" display="lv_deinit()" /> is
+called are deleted automatically.
+
+<Callout type="warning">
+The `lv_subject_init_<type>()` and <ApiLink name="lv_subject_deinit" display="lv_subject_deinit()" />
+functions are **deprecated** in favor of `lv_subject_create()`/`lv_subject_delete()`.
+</Callout>
 
 ##### Setting a Subject's Value
 
@@ -245,8 +265,8 @@ from memory using any of the methods below, depending on the effect you want to 
     - <ApiLink name="lv_obj_remove_from_subject" display="lv_obj_remove_from_subject(widget, subject)" /> deletes all Observers
       associated with `widget`.  `subject` can be NULL to unsubscribe the Widget
       from all associated Subjects.
-    - <ApiLink name="lv_subject_deinit" display="lv_subject_deinit(subject)" /> gracefully disconnects `subject` from
-      all associated Observers and Widget events.  This includes subscriptions made
+    - <ApiLink name="lv_subject_delete" display="lv_subject_delete(subject)" /> gracefully disconnects `subject` from
+      all associated Observers and Widget events, and frees it.  This includes subscriptions made
       using any of the [Widget Binding](/main-modules/data_binding) functions covered below.
     - <ApiLink name="lv_observer_delete" display="lv_observer_delete(observer)" /> deletes that specific Observer and
       gracefully disconnects it from its `subject` and any associated Widgets,
@@ -269,13 +289,13 @@ To display the measured value on a label, 3 things are required:
 When any of these 3 input values change, the label needs to be updated, and it needs
 to know all 3 values to compose its text.
 
-To handle this you can create an array from the addresses of all the Subjects that
-are relied upon, and pass that array as a parameter when you initialize a Subject
-with GROUP type.
+To handle this you can create an array from the pointers of all the Subjects that
+are relied upon, and pass that array to a Subject created with GROUP type.
 
 ```c
-static lv_subject_t * subject_list[3] = {&subject_1, &subject_2, &subject_3};
-lv_subject_init_group(&subject_all, subject_list, 3);  /* Last argument is number of elements. */
+static lv_subject_t * subject_list[3] = {subject_1, subject_2, subject_3};
+subject_all = lv_subject_create(LV_SUBJECT_TYPE_GROUP);
+lv_subject_set_group_list_static(subject_all, subject_list, 3);  /* Last argument is number of elements. */
 ```
 
 Observers are then added to Subject Groups (e.g. `subject_all`) in the usual way.
@@ -287,18 +307,27 @@ As an example, the above scenario with Voltage/Current measurement might look li
 ```c
 lv_obj_t * label = lv_label_create(lv_screen_active());
 
-lv_subject_t subject_mode;  // Voltage or Current
-lv_subject_t subject_value; // Measured value
-lv_subject_t subject_unit;  // The unit
-lv_subject_t subject_all;   // Subject group that connects the above 3 Subjects
-lv_subject_t * subject_list[3] = {&subject_mode, &subject_value, &subject_unit};  // The elements of the group
+lv_subject_t * subject_mode;  // Voltage or Current
+lv_subject_t * subject_value; // Measured value
+lv_subject_t * subject_unit;  // The unit
+lv_subject_t * subject_all;   // Subject group that connects the above 3 Subjects
+static lv_subject_t * subject_list[3];  // The elements of the group
 
-lv_subject_init_int(&subject_mode, 0); // Let's say 0 is Voltage, 1 is Current
-lv_subject_init_int(&subject_value, 0);
-lv_subject_init_pointer(&subject_unit, "V");
-lv_subject_init_group(&subject_all, subject_list, 3);
+subject_mode = lv_subject_create(LV_SUBJECT_TYPE_INT);
+subject_value = lv_subject_create(LV_SUBJECT_TYPE_INT);
+subject_unit = lv_subject_create(LV_SUBJECT_TYPE_POINTER);
+subject_all = lv_subject_create(LV_SUBJECT_TYPE_GROUP);
 
-lv_subject_add_observer_obj(&subject_all, all_observer_cb, label, NULL);
+lv_subject_set_int(subject_mode, 0); // Let's say 0 is Voltage, 1 is Current
+lv_subject_set_int(subject_value, 0);
+lv_subject_set_pointer(subject_unit, "V");
+
+subject_list[0] = subject_mode;
+subject_list[1] = subject_value;
+subject_list[2] = subject_unit;
+lv_subject_set_group_list_static(subject_all, subject_list, 3);
+
+lv_subject_add_observer_obj(subject_all, all_observer_cb, label, NULL);
 
 ...
 
@@ -336,7 +365,7 @@ non-zero), use <ApiLink name="lv_obj_bind_bool" />. The callback receives the va
 as a `bool`, so a dedicated per-flag setter can be passed directly:
 
 ```c
-lv_obj_bind_bool(widget, &subject, lv_obj_set_hidden);   /* hidden while non-zero */
+lv_obj_bind_bool(widget, subject, lv_obj_set_hidden);   /* hidden while non-zero */
 ```
 
 For a state, or when the Subject must be compared to a reference value, add a custom
@@ -350,7 +379,7 @@ static void disabled_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
     lv_obj_set_state(obj, LV_STATE_DISABLED, lv_subject_get_int(subject) > 80);
 }
 
-lv_subject_add_observer_obj(&subject, disabled_observer_cb, widget, NULL);
+lv_subject_add_observer_obj(subject, disabled_observer_cb, widget, NULL);
 ```
 
 <Callout type="warning">
@@ -373,7 +402,7 @@ programmatic) interaction with the Widget that causes its
 <ApiLink name="LV_STATE_CHECKED" /> state to be SET or CLEARED also causes the
 Subject's value to be set to `1` or `0` respectively.
 
-- <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked(widget, &subject)" />
+- <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked(widget, subject)" />
 
 ### Change Subject on Event
 

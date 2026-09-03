@@ -24,7 +24,7 @@ The simplest way to subscribe is <ApiLink name="lv_subject_add_observer" display
 The third argument is free-form user data passed to the callback:
 
 ```c
-lv_subject_add_observer(&temperature, temperature_cb, NULL);
+lv_subject_add_observer(temperature, temperature_cb, NULL);
 ```
 
 Often the Observer needs to update a specific object. Pass a Widget with
@@ -32,7 +32,7 @@ Often the Observer needs to update a specific object. Pass a Widget with
 then read it back in the callback with <ApiLink name="lv_observer_get_target_obj" display="lv_observer_get_target_obj()" />.
 
 ```c
-lv_subject_add_observer_obj(&temperature, label_cb, my_label, NULL);
+lv_subject_add_observer_obj(temperature, label_cb, my_label, NULL);
 
 static void label_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
@@ -53,8 +53,8 @@ An Observer bound to a Widget using <ApiLink name="lv_subject_add_observer_obj" 
   single Observer (use the pointer returned when subscribing).
 - <ApiLink name="lv_obj_remove_from_subject" display="lv_obj_remove_from_subject(widget, subject)" />
   removes a Widget's Observers (`subject` may be `NULL` to detach from all).
-- <ApiLink name="lv_subject_deinit" display="lv_subject_deinit(subject)" /> disconnects a
-  Subject from all of its Observers.
+- <ApiLink name="lv_subject_delete" display="lv_subject_delete(subject)" /> disconnects a
+  Subject from all of its Observers and frees it.
 
 ## Binding a Widget to a Subject
 
@@ -69,7 +69,7 @@ To drive a flag from a `0`/non-zero Subject, use
 takes a `bool`, a dedicated per-flag setter can be passed straight in:
 
 ```c
-lv_obj_bind_bool(widget, &subject, lv_obj_set_hidden);   /* hidden while non-zero */
+lv_obj_bind_bool(widget, subject, lv_obj_set_hidden);   /* hidden while non-zero */
 ```
 
 ### States
@@ -84,7 +84,7 @@ static void disabled_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_set_state(obj, LV_STATE_DISABLED, lv_subject_get_int(subject) > 80);
 }
 
-lv_subject_add_observer_obj(&subject, disabled_cb, widget, NULL);
+lv_subject_add_observer_obj(subject, disabled_cb, widget, NULL);
 ```
 
 <Callout type="warning">
@@ -101,7 +101,7 @@ should have <ApiLink name="lv_obj_set_checkable" display="lv_obj_set_checkable(o
 to make it checkable.
 
 ```c
-lv_obj_bind_checked(checkbox, &subject);
+lv_obj_bind_checked(checkbox, subject);
 ```
 
 <LvglExample name="lv_example_checkbox_bind_checked" path="widgets/checkbox/lv_example_checkbox_bind_checked" />
