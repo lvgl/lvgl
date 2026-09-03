@@ -25,6 +25,8 @@ extern "C" {
 
 #if LV_USE_DRAW_G2D
 
+#include "../../../misc/lv_array.h"
+
 #include <string.h>
 
 /*********************
