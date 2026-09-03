@@ -68,6 +68,12 @@ typedef struct lv_draw_ppa_unit {
     ppa_client_handle_t fill_client;
     ppa_client_handle_t blend_client;
     uint8_t * buf;
+    /* Set once the image path has handed the current task to the software unit.
+     * A partial decoder makes lv_draw_image_normal_helper() call the draw core
+     * back once per decoded chunk, and the fallback draws the whole image, so
+     * without this it would redraw it for every chunk. Cleared per task in
+     * ppa_dispatch(). */
+    bool img_sw_fallback;
 } lv_draw_ppa_unit_t;
 
 /**********************
