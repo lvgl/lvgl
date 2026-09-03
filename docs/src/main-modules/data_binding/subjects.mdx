@@ -96,6 +96,10 @@ static void measurement_cb(lv_observer_t * observer, lv_subject_t * subject)
 }
 ```
 
+<Callout type="warn">
+The group subject needs to be deinitialized before any of the subjects it points to.
+</Callout>
+
 ## Changing a Subject from the UI
 
 Instead of writing an event handler, you can let a Widget update a Subject directly.
