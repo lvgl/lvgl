@@ -317,7 +317,7 @@ fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_model_t * data)
 
 void lv_gltf_model_set_animation_time(lv_gltf_model_t * model, uint32_t raw_millis)
 {
-
+    LV_CHECK_ARG(model != NULL);
     if((raw_millis >= model->current_animation_max_time) || (raw_millis < LV_GLTF_ANIMATION_RESET_TIME)) {
         raw_millis = LV_GLTF_ANIMATION_RESET_TIME;
     }
@@ -327,6 +327,7 @@ void lv_gltf_model_set_animation_time(lv_gltf_model_t * model, uint32_t raw_mill
 
 void lv_gltf_model_set_animation_ratio(lv_gltf_model_t * model, float ratio)
 {
+    LV_CHECK_ARG(model != NULL);
     uint32_t raw_millis = model->current_animation_max_time * f_ratio;
     lv_gltf_model_set_animation_time(model, raw_millis);
 }
