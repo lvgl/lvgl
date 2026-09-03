@@ -325,11 +325,8 @@ void lv_gltf_model_set_animation_time(lv_gltf_model_t * model, uint32_t raw_mill
     lv_gltf_model_invalidate(model);
 }
 
-void lv_gltf_model_set_animation_ratio(lv_gltf_model_t * model, uint32_t ratio_100k)
+void lv_gltf_model_set_animation_ratio(lv_gltf_model_t * model, float ratio)
 {
-
-    float f_ratio = (float)ratio_100k / 100000.f;
-
     uint32_t raw_millis = model->current_animation_max_time * f_ratio;
     lv_gltf_model_set_animation_time(model, raw_millis);
 }
