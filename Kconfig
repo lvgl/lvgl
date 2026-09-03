@@ -1540,6 +1540,21 @@ config LV_USE_LIBJPEG_TURBO
 	help
 		High-performance decoder supporting the complete JPEG specifications.
 
+config LV_USE_QOI
+	bool "QOI decoder library"
+	help
+		QOI (Quite OK Image) decoder library.
+
+config LV_QOI_MAX_FILE_SIZE
+	int "Maximum file size for QOI images (bytes)"
+	depends on LV_USE_QOI
+	default 67108864
+
+config LV_QOI_MAX_PIXELS
+	int "Maximum number of pixels for QOI images"
+	depends on LV_USE_QOI
+	default 400000000
+
 config LV_USE_LIBWEBP
 	bool "WebP decoder"
 

@@ -1,0 +1,40 @@
+---
+title: QOI Decoder
+description: "The QOI (Quite OK Image) format is a fast, lossless image compression format that encodes and decodes images at high speed with a simple, dependency-free implementation."
+---
+
+The **QOI** (Quite OK Image) format is a fast, lossless image compression format
+that encodes and decodes images at high speed with a simple, dependency-free
+implementation.
+
+For a detailed introduction, see: https://github.com/phoboslab/qoi.
+
+When <ApiLink name="LV_USE_QOI" /> is enabled, LVGL will register a new image
+decoder automatically so QOI files can be used directly as an image source.
+
+## Usage
+
+```c
+lv_image_set_src(my_img, "A:path/to/image.qoi");
+```
+
+Note that a [File System (lv_fs_drv)](/main-modules/fs) driver needs to be registered
+to open images from files. Follow the instructions in [File System (lv_fs_drv)](/main-modules/fs).
+
+## Memory Requirements
+
+The whole QOI image is decoded, so `width × height × 4` bytes of RAM is required
+from the LVGL heap. The decoded image is stored in ARGB8888 pixel format (converted from QOI's internal RGBA).
+
+Since it might take significant time to decode QOI images, LVGL's
+[image caching](/main-modules/images/caching) feature can be useful.
+
+The maximum file size that can be decoded is limited by
+<ApiLink name="LV_QOI_MAX_FILE_SIZE" /> (default 64 MB). This can be adjusted in
+`lv_conf.h` to suit the available memory of the target platform.
+
+## Example
+
+### Open a QOI image from file and variable
+
+<LvglExample name="lv_example_qoi_1" path="libs/qoi/lv_example_qoi_1" />

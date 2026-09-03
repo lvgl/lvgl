@@ -209,6 +209,18 @@
       "purl": "pkg:github/jkent/frogfs",
       "purpose": "library",
       "supplier": {"name": "Jeff Kent", "type": "person"}
+    },
+    {
+      "key": "qoi",
+      "name": "QOI (Quite OK Image decoder)",
+      "paths": ["src/libs/qoi"],
+      "sources": [{"url": "https://github.com/phoboslab/qoi"}],
+      "version": "NOASSERTION",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2021, Dominic Szablewski - https://phoboslab.org",
+      "purl": "pkg:github/phoboslab/qoi",
+      "purpose": "library",
+      "supplier": {"name": "Dominic Szablewski", "type": "person"}
     }
   ]
 }
