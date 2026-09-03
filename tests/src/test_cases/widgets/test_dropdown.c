@@ -599,7 +599,7 @@ void test_dropdown_list_position_ltr(void)
 void test_dropdown_list_position_rtl(void)
 {
     dropdown_list_position_test(LV_BASE_DIR_RTL);
-    lv_obj_set_style_base_dir(lv_screen_active(), LV_BASE_DIR_LTR, LV_PART_MAIN);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_list_position_rtl.png")
+    lv_obj_set_style_base_dir(lv_screen_active(), LV_BASE_DIR_LTR, LV_PART_MAIN);
 }
 #endif
