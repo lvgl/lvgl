@@ -700,6 +700,23 @@ used afterwards.
   several property changes into a single re-encode on the next redraw. The default,
   `LV_QRCODE_UPDATE_MODE_IMMEDIATE`, re-encodes inside the setter.
 
+- The payload API is split by kind. `lv_qrcode_update()` is gone: use
+  `lv_qrcode_set_data()` for binary payloads (same arguments as the old
+  `lv_qrcode_update()`) and `lv_qrcode_set_text()` for strings. Both return the encode
+  result. `lv_qrcode_set_data()` previously took a `const char *` and returned `void`.
+
+  ```c
+  /* Before */
+  lv_qrcode_update(qr, data, data_len);
+  lv_qrcode_set_data(qr, "https://lvgl.io");
+
+  /* After */
+  lv_qrcode_set_data(qr, data, data_len);
+  lv_qrcode_set_text(qr, "https://lvgl.io");
+  ```
+
+- New: `lv_qrcode_get_text()` and `lv_qrcode_get_data()` read the stored payload back.
+
 - New: `lv_qrcode_render()` re-encodes the stored payload without taking it as an
   argument, which is how property changes made in the deferred update mode are applied.
 
