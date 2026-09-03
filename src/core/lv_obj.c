@@ -2015,6 +2015,7 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 
     obj->state = new_state;
     lv_obj_update_layer_type(obj);
+    lv_obj_update_blur_status(obj);
 
     /*Skip transitions if the widget is not rendered yet. */
     if(!obj->rendered) {
