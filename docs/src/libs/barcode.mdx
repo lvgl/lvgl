@@ -12,7 +12,7 @@ The LVGL Barcode utility enables you to generate Code-128 bar codes.  It uses th
 Set <ApiLink name="LV_USE_BARCODE" /> to `1` in `lv_conf.h`.
 
 Use <ApiLink name="lv_barcode_create" /> to create a barcode object, and use
-<ApiLink name="lv_barcode_update" /> to generate a barcode.
+<ApiLink name="lv_barcode_update" /> to set the data to encode.
 
 Call <ApiLink name="lv_barcode_set_scale" /> to adjust scaling,
 call <ApiLink name="lv_barcode_set_dark_color" /> and <ApiLink name="lv_barcode_set_light_color" />
@@ -24,21 +24,74 @@ and strips `[FCN1]` and spaces. Optionally use
 <ApiLink name="lv_barcode_set_encoding" /> to set
 <ApiLink name="LV_BARCODE_ENCODING_CODE128_RAW" />.
 
-After any of a bar code's settings have changed, call
-<ApiLink name="lv_barcode_update" /> again to regenerate it.
+These can all be called in any order, before or after the data. The Widget keeps a copy of
+the data - costing its length in bytes - so any change, including a resize, regenerates the
+bars automatically.
+
+### Update mode
+
+Every change except the colors regenerates the bars.
+<ApiLink name="lv_barcode_set_update_mode" /> chooses when:
+
+- `LV_BARCODE_UPDATE_MODE_IMMEDIATE` (default) regenerates inside the setter.
+- `LV_BARCODE_UPDATE_MODE_DEFERRED` marks the bars out of date instead, so several changes
+  collapse into one regeneration. Call <ApiLink name="lv_barcode_render" /> when done - it
+  regenerates from the stored data and returns the result.
+
+```c
+lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
+lv_barcode_set_scale(barcode, 2);
+lv_barcode_set_direction(barcode, LV_DIR_VER);
+
+lv_barcode_render(barcode);   /* generate once, here, and get the result */
+```
+
+Forgetting that call still gives the right bitmap - the redraw fills the bars in and warns -
+but the work lands on that refresh and no caller is left to see a failure.
+
+Two things to know about deferred mode:
+
+- The canvas is resized in the setter in both modes, because the draw pass cannot
+  reallocate it. Only the fill is deferred.
+- <ApiLink name="lv_barcode_update" /> obeys the mode too, so in deferred mode its return
+  value reports only the resize.
+
+Switching back to `LV_BARCODE_UPDATE_MODE_IMMEDIATE` while out of date also regenerates, but
+that setter returns `void`, so a failure is only logged. Render first to get the result.
+
+### Detecting a failed regeneration
+
+<ApiLink name="lv_barcode_render" /> returns its result, and so does
+<ApiLink name="lv_barcode_update" /> in immediate mode. The rest cannot: the property
+setters return `void`, resizes happen in an event handler, and a deferred fill happens in
+the draw pass. <ApiLink name="lv_barcode_get_render_failed" /> covers those:
+
+```c
+lv_obj_set_height(barcode, 0);   /* leaves no room for a horizontal barcode */
+if(lv_barcode_get_render_failed(barcode)) {
+    /* the bitmap is blank; give the object a height */
+}
+```
+
+It is also `true` before any data is set, and `false` again after a success. A failure is
+not retried every redraw - only a change makes the Widget try again.
 
 ## Notes
 
 - It is best not to manually set the width of the barcode, because when
    the width of the Widget is lower than the width of the barcode, the
    display will be incomplete due to truncation.
+- A horizontal barcode is as tall as the Widget and a vertical one as wide, so that
+   dimension must be set. Until it is, nothing can be generated - but the data is
+   remembered, so the barcode appears once the Widget has a size.
 - The scale adjustment can only be an integer multiple, for example,
    <ApiLink name="lv_barcode_set_scale" display="lv_barcode_set_scale(barcode, 2)" /> means 2x scaling.
 - The direction setting can be <ApiLink name="LV_DIR_HOR" /> or <ApiLink name="LV_DIR_VER" />.
+- Changing the color (dark or light) only updates the palette, so it is cheap
+   and never regenerates the bars.
 
 ## Example
 
 ### Create a Barcode
 
 <LvglExample name="lv_example_barcode_1" path="libs/barcode/lv_example_barcode_1" />
-
