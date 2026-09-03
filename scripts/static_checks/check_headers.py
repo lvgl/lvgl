@@ -128,6 +128,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "arm_sve.h",
     "assert.h",
     "atomic.h",
+    "bf0_hal.h",
     "bsp_api.h",
     "cmsis_os2.h",
     "cstdint",
@@ -223,6 +224,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "rtthread.h",
     "screen/screen.h",
     "sdkconfig.h",
+    "system_bf0_ap.h",
     "semaphore.h",
     "semphr.h",
     "setjmp.h",
@@ -263,6 +265,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "xf86drm.h",
     "xf86drmMode.h",
     "xkbcommon/xkbcommon.h",
+    "zephyr/arch/cache.h",
     "zephyr/irq.h",
     "zephyr/kernel.h",
 }

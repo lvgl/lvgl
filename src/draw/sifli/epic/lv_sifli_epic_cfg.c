@@ -17,7 +17,7 @@
 #include "lv_sifli_epic_osa.h"
 
 #if LV_USE_SIFLI_EPIC
-#include "system_bf0_ap.h"
+#include <system_bf0_ap.h>
 #include <string.h>
 
 #if defined(__ZEPHYR__)

@@ -218,6 +218,10 @@ menu "DMA2D"
 rsource "dma2d/Kconfig"
 endmenu
 
+menu "EPIC"
+rsource "sifli/Kconfig"
+endmenu
+
 menu "EVE"
 rsource "eve/Kconfig"
 endmenu

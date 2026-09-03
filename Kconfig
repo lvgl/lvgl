@@ -887,28 +887,6 @@ config LV_NEMA_GFX_MAX_RESY
 
 endif
 endmenu
-menu "EPIC"
-
-		config LV_USE_SIFLI_EPIC
-			bool "Enable SiFli EPIC hardware acceleration"
-			depends on LV_USE_DRAW_SW
-			default n
-			help
-				Enable the SiFli EPIC draw unit. This backend accelerates a subset
-				of LVGL draw tasks in hardware and can fall back to software rendering
-				for unsupported operations.
-
-		config LV_USE_SIFLI_EPIC_DRAW_THREAD
-			bool "Use additional draw thread for SiFli EPIC processing"
-			depends on LV_USE_SIFLI_EPIC && !LV_OS_NONE
-			default y
-
-		config LV_USE_SIFLI_EPIC_ASSERT
-			bool "Enable SiFli EPIC asserts"
-			depends on LV_USE_SIFLI_EPIC
-			default n
-
-endmenu
 
 menu "PXP"
 config LV_USE_PXP
@@ -1015,6 +993,34 @@ config LV_USE_DRAW_DMA2D_INTERRUPT
 	help
 		Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
 		Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
+
+endif
+endmenu
+
+menu "EPIC"
+config LV_USE_SIFLI_EPIC
+	bool "SiFli EPIC renderer"
+	default n
+	help
+		Accelerate blends, fills, images and text with the EPIC (Enhanced
+		Pixel Image Compositor) engine of SiFli BF0 SoCs. Unsupported
+		operations fall back to software rendering.
+
+if LV_USE_SIFLI_EPIC
+
+config LV_USE_SIFLI_EPIC_DRAW_THREAD
+	bool "Dedicated draw thread"
+	depends on !LV_OS_NONE
+	default y
+	help
+		Dispatch EPIC operations from their own thread so the CPU can keep
+		rendering in parallel. Needs an OS.
+
+config LV_USE_SIFLI_EPIC_ASSERT
+	bool "Asserts"
+	help
+		Check the status of every EPIC call and assert on failure. Useful
+		while bringing up a board.
 
 endif
 endmenu

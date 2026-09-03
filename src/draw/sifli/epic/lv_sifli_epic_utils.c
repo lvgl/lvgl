@@ -17,7 +17,7 @@
 
 #if LV_USE_SIFLI_EPIC
 #include "../../../misc/lv_area_private.h"
-#include "string.h"
+#include <string.h>
 
 /*********************
  *      DEFINES

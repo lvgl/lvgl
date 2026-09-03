@@ -18,7 +18,7 @@
 #if LV_USE_SIFLI_EPIC
 #include "lv_sifli_epic_utils.h"
 #include "../../../draw/lv_draw_image_private.h"
-#include "../../../draw/lv_image_decoder_private.h"
+#include "../../../image/lv_image_decoder_private.h"
 #include "../../../misc/lv_area_private.h"
 
 /*********************

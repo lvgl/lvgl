@@ -25,7 +25,7 @@
 #endif
 
 #if LV_USE_OS == LV_OS_RTTHREAD
-    #include "rtthread.h"
+    #include <rtthread.h>
 #endif
 
 /*********************

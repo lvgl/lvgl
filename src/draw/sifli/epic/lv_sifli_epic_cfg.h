@@ -25,7 +25,7 @@ extern "C" {
 #if LV_USE_SIFLI_EPIC
 
 /* Include SiFli HAL headers - these should be provided by the platform */
-#include "bf0_hal.h"
+#include <bf0_hal.h>
 
 /*********************
  *      DEFINES
