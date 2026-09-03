@@ -130,6 +130,8 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
      * in the EGL window creation callback */
     lv_wayland_set_backend_display_data(display, ddata);
 
+    lv_opengles_egl_set_display_color_format(display);
+
     /* Create EGL context */
     lv_egl_interface_t egl_interface = wl_egl_get_interface(display);
     ddata->egl_ctx = lv_opengles_egl_context_create(&egl_interface);

@@ -134,7 +134,18 @@ typedef struct {
     lv_color_t fill_color;
     bool blend_opt;
     const lv_matrix_t * matrix;
+    lv_color_format_t cf;
 } lv_opengles_render_params_t;
+
+/**
+ * The `glTexImage2D` arguments describing an LVGL color format
+ */
+typedef struct {
+    int32_t internal_format;    /**< the `internalformat` argument of `glTexImage2D` */
+    uint32_t format;            /**< the `format` argument of `glTexImage2D` */
+    uint32_t type;              /**< the `type` argument of `glTexImage2D` */
+    bool rb_swap;               /**< the red and blue channels have to be swapped while rendering */
+} lv_opengles_gl_format_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -168,6 +179,23 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
                                        bool h_flip, bool v_flip);
 
 /**
+ * Render a texture holding pixels of an LVGL color format, using alternate blending mode.
+ * The channel order and the grayscale handling are derived from `cf`.
+ * @param texture               OpenGL texture ID
+ * @param texture_area          the area in the window to render the texture in
+ * @param opa                   opacity to blend the texture with existing contents
+ * @param disp_w                width of the window/framebuffer being rendered to
+ * @param disp_h                height of the window/framebuffer being rendered to
+ * @param texture_clip_area     the area of the texture to draw
+ * @param h_flip                horizontal flip
+ * @param v_flip                vertical flip
+ * @param cf                    the LVGL color format the texture was uploaded from
+ */
+void lv_opengles_render_texture_cf(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                   int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
+                                   bool h_flip, bool v_flip, lv_color_format_t cf);
+
+/**
  * Set the OpenGL viewport, with vertical co-ordinate conversion
  * @param x        x position of the viewport
  * @param y        y position of the viewport
@@ -192,23 +220,39 @@ void lv_opengles_render_texture_internal(unsigned int texture, const lv_area_t *
 void lv_opengles_render_display_texture_internal(lv_display_t * display, bool h_flip, bool v_flip);
 
 /**
+ * Get the `glTexImage2D` arguments to upload a buffer of an LVGL color format with
+ * @param cf            the LVGL color format
+ * @param gl_format     pointer to the struct to fill
+ * @return              `LV_RESULT_OK` on success, `LV_RESULT_INVALID` if `cf` has no OpenGL equivalent
+ */
+lv_result_t lv_opengles_gl_format_from_color_format(lv_color_format_t cf, lv_opengles_gl_format_t * gl_format);
+
+bool lv_opengles_color_format_is_rb_swap(lv_color_format_t cf);
+
+/**
  * Upload a pixel buffer into an OpenGL texture
  * @param texture_id    the OpenGL texture ID to upload into
  * @param buf           the pixel buffer. @nullable. Can be `NULL` to only define the size and the format
  * @param w             width of the buffer in pixels
  * @param h             height of the buffer in pixels
  * @param stride        stride of the buffer in bytes. Ignored when `buf` is `NULL`
+ * @param cf            the LVGL color format of the buffer
+ * @return              `LV_RESULT_OK` on success, `LV_RESULT_INVALID` if `cf` has no OpenGL equivalent
  */
-void lv_opengles_texture_upload_buf(unsigned int texture_id, const void * buf, int32_t w, int32_t h,
-                                    uint32_t stride);
+lv_result_t lv_opengles_texture_upload_buf(unsigned int texture_id, const void * buf, int32_t w, int32_t h,
+                                           uint32_t stride, lv_color_format_t cf);
 
 /**
  * Upload the rendered buffer of a display into an OpenGL texture.
+ * The size and the color format are taken from the display.
  * @param texture_id    the OpenGL texture ID to upload into
  * @param display       the display the buffer belongs to
  * @param buf           the pixel buffer. @nullable. Can be `NULL` to only define the size and the format
+ * @return              `LV_RESULT_OK` on success, `LV_RESULT_INVALID` if the color format of the
+ *                      display has no OpenGL equivalent
  */
-void lv_opengles_texture_upload_display_buf(unsigned int texture_id, lv_display_t * display, const void * buf);
+lv_result_t lv_opengles_texture_upload_display_buf(unsigned int texture_id, lv_display_t * display,
+                                                   const void * buf);
 
 /**********************
  *      MACROS

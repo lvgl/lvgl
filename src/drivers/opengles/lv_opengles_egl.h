@@ -45,6 +45,14 @@ lv_color_format_t lv_opengles_egl_color_format_from_egl_config(const lv_egl_conf
  */
 uint8_t lv_opengles_egl_get_gles_version(lv_opengles_egl_t * ctx);
 
+/**
+ * Modifies display color format to ensure the selected color format is opengl
+ * compatible else it falls back to `LV_COLOR_FORMAT_ARGB8888` and logs a warning.
+ * @param display   the display to check
+ * @return          the color format the display uses after the call
+ */
+lv_color_format_t lv_opengles_egl_set_display_color_format(lv_display_t * display);
+
 void lv_opengles_egl_update(lv_opengles_egl_t * ctx);
 void lv_opengles_egl_clear(lv_opengles_egl_t * ctx);
 void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx);
