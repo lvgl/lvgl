@@ -581,6 +581,8 @@
 
 /** Accelerate blends, fills and image blits with the NXP G2D API (i.MX 2D GPU).
  *  Requires the g2d library and its headers.
+ *
+ *  Enable: LV_USE_DRAW_SW
  */
 #define LV_USE_DRAW_G2D 0
 
