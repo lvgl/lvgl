@@ -197,6 +197,14 @@ struct _lv_display_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * TODO(v10): rework the draw buffer abstraction so a buffer describes its own storage, and remove this.
+ *
+ * @param disp      pointer to a display
+ * @param handlers  the handlers to set on every draw buffer of the display
+ */
+void lv_display_set_draw_buf_handlers(lv_display_t * disp, const lv_draw_buf_handlers_t * handlers);
+
 /**********************
  *      MACROS
  **********************/

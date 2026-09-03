@@ -15,6 +15,8 @@
 
 #include "lv_opengles_private.h"
 #include "lv_opengles_texture_private.h"
+#include "../../draw/opengles/lv_draw_opengles.h"
+#include "../../draw/nanovg/lv_draw_nanovg.h"
 #include "../../display/lv_display_private.h"
 
 #include <stdlib.h>
@@ -93,9 +95,16 @@ lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_disp
         return LV_RESULT_INVALID;
     }
 
-#if LV_USE_DRAW_OPENGLES
+#if LV_USE_DRAW_NANOVG
+    static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
+    lv_display_set_buffers(display, &dummy_buf, NULL,
+                           lv_draw_buf_width_to_stride(width, lv_display_get_color_format(display)) * height,
+                           lv_display_get_render_mode(display));
+    lv_display_set_draw_buf_handlers(display, lv_draw_nanovg_get_draw_buf_handlers());
+#elif LV_USE_DRAW_OPENGLES
     static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
     lv_display_set_buffers(display, &dummy_buf, NULL, width * height * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_draw_buf_handlers(display, lv_draw_opengles_get_draw_buf_handlers());
 #else
     uint32_t stride = lv_draw_buf_width_to_stride(width, lv_display_get_color_format(display));
     uint32_t buf_size = stride * height;
@@ -109,7 +118,7 @@ lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_disp
     texture->fb1 = buffer;
 
     lv_display_set_buffers(display, texture->fb1, NULL, buf_size, lv_display_get_render_mode(display));
-#endif /*LV_USE_DRAW_OPENGLES*/
+#endif /*LV_USE_DRAW_NANOVG*/
 
     if(texture->is_texture_owner && texture->texture_id != 0) {
         GL_CALL(glDeleteTextures(1, &texture->texture_id));
@@ -133,10 +142,18 @@ static lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t
     int32_t w = lv_display_get_horizontal_resolution(display);
     int32_t h = lv_display_get_vertical_resolution(display);
 
-#if LV_USE_DRAW_OPENGLES
+#if LV_USE_DRAW_NANOVG
+    LV_UNUSED(texture);
+    static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
+    lv_display_set_buffers(display, &dummy_buf, NULL,
+                           lv_draw_buf_width_to_stride(w, lv_display_get_color_format(display)) * h,
+                           LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_draw_buf_handlers(display, lv_draw_nanovg_get_draw_buf_handlers());
+#elif LV_USE_DRAW_OPENGLES
     LV_UNUSED(texture);
     static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
     lv_display_set_buffers(display, &dummy_buf, NULL, w * h * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_draw_buf_handlers(display, lv_draw_opengles_get_draw_buf_handlers());
 #else
     uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(display));
     uint32_t buf_size = stride * h;
@@ -146,15 +163,15 @@ static lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t
         return LV_RESULT_INVALID;
     }
     lv_display_set_buffers(display, texture->fb1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
-#endif
+#endif /*LV_USE_DRAW_NANOVG*/
     return LV_RESULT_OK;
 }
 
 void lv_opengles_texture_deinit(lv_opengles_texture_t * texture)
 {
-#if !LV_USE_DRAW_OPENGLES
+#if !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
     lv_free(texture->fb1);
-#endif /*!LV_USE_DRAW_OPENGLES*/
+#endif /*!LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG*/
 
     if(texture->is_texture_owner && texture->texture_id != 0) {
         GL_CALL(glDeleteTextures(1, &texture->texture_id));
@@ -278,13 +295,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
     LV_UNUSED(px_map);
 
-#if !LV_USE_DRAW_OPENGLES
+#if !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
     if(lv_display_flush_is_last(disp)) {
 
         lv_opengles_texture_t * texture = lv_display_get_driver_data(disp);
         lv_opengles_texture_upload_display_buf(texture->texture_id, disp, texture->fb1);
     }
-#endif /* !LV_USE_DRAW_OPENGLES */
+#endif /* !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG */
 
     lv_display_flush_ready(disp);
 }

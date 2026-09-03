@@ -45,6 +45,8 @@ void lv_draw_opengles_deinit(void);
  */
 void lv_draw_opengles_clear_layer_area(lv_layer_t * layer, const lv_area_t * area);
 
+const lv_draw_buf_handlers_t * lv_draw_opengles_get_draw_buf_handlers(void);
+
 /**********************
  *      MACROS
  **********************/
