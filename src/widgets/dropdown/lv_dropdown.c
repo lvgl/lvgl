@@ -60,7 +60,11 @@ static void dropdown_list_align_bidi(lv_dropdown_t * dropdown, lv_dir_t dir);
 static void set_text_internal(lv_obj_t * obj, const char * text);
 static void set_options_internal(lv_obj_t * obj, const char * options);
 static void remove_options_translation_tag(lv_obj_t * obj);
+static lv_result_t update_text(lv_obj_t * obj, const char * text);
+static lv_result_t update_options(lv_obj_t * obj, const char * options);
+static uint32_t count_options_in_str(const char * options);
 static void remove_text_translation_tag(lv_obj_t * obj);
+static void remove_options_translation_tag(lv_obj_t * obj);
 
 #if LV_USE_OBSERVER
     static void dropdown_value_changed_event_cb(lv_event_t * e);
@@ -167,8 +171,14 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
+    lv_result_t res = update_text(obj, text);
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't set text");
+        return;
+    }
+
     remove_text_translation_tag(obj);
-    set_text_internal(obj, text);
+    refresh_size(obj);
 }
 
 void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
@@ -178,10 +188,6 @@ void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
     remove_text_translation_tag(obj);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-
-    if(dropdown->static_text && dropdown->text && text && lv_streq(dropdown->text, text)) {
-        return;
-    }
 
     if(!dropdown->static_text) lv_free(dropdown->text);
     dropdown->static_text = 1;
@@ -200,14 +206,21 @@ void lv_dropdown_set_text_translation_tag(lv_obj_t * obj, const char * tag)
 
     char * new_tag = lv_strdup(tag);
     LV_ASSERT_MALLOC(new_tag);
-    if(!new_tag) {
+    if(new_tag == NULL) {
         LV_LOG_WARN("Failed to allocate memory for new tag");
+        return;
+    }
+
+    lv_result_t res = update_text(obj, lv_tr(tag));
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't set the translated text");
+        lv_free(new_tag);
         return;
     }
 
     lv_free(dropdown->text_translation_tag);
     dropdown->text_translation_tag = new_tag;
-    set_text_internal(obj, lv_tr(tag));
+    refresh_size(obj);
 }
 #endif /*LV_USE_TRANSLATION*/
 
@@ -216,8 +229,17 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(options != NULL, return);
 
+    lv_result_t res = update_options(obj, options);
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't set the options");
+        return;
+    }
+
     remove_options_translation_tag(obj);
-    set_options_internal(obj, options);
+    refresh_size(obj);
+
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
@@ -228,13 +250,8 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
     remove_options_translation_tag(obj);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    /*Count the '\n'-s to determine the number of options*/
-    dropdown->option_cnt = 0;
-    uint32_t i;
-    for(i = 0; options[i] != '\0'; i++) {
-        if(options[i] == '\n') dropdown->option_cnt++;
-    }
-    dropdown->option_cnt++;   /*Last option has no `\n`*/
+
+    dropdown->option_cnt = count_options_in_str(options);
     dropdown->sel_opt_id      = 0;
     dropdown->sel_opt_id_orig = 0;
 
@@ -247,8 +264,7 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
     dropdown->options = (char *)options;
 
     refresh_size(obj);
-    if(dropdown->list)
-        lv_obj_invalidate(dropdown->list);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
@@ -256,74 +272,95 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(option != NULL, return);
 
-    remove_options_translation_tag(obj);
-
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-
-    /*Convert static options to dynamic*/
-    if(dropdown->static_options != 0) {
-        char * static_options = dropdown->options;
-        if(dropdown->options) {
-            dropdown->options = lv_strdup(static_options);
-        }
-        else {
-            dropdown->options = lv_calloc(1, 1); /*Allocate at least 1 byte for the NULL terminator*/
-        }
-        LV_ASSERT_MALLOC(dropdown->options);
-        if(dropdown->options == NULL) return;
-        dropdown->static_options = 0;
+    /*Fast path: adding an item to empty list is the same as just setting its options*/
+    if(dropdown->option_cnt == 0) {
+        lv_dropdown_set_options(obj, option);
+        return;
     }
 
-    /*Allocate space for the new option*/
     size_t old_len = lv_strlen(dropdown->options);
+    const char * ins_buf;
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     size_t ins_len = lv_strlen(option) + 1;
+    ins_buf = option;
 #else
     size_t ins_len = lv_text_ap_strlen(option) + 1;
+
+    /*The option to insert needs to be Arabic preprocessed*/
+    char * ap_tmp_buf = lv_malloc(ins_len);
+    LV_ASSERT_MALLOC(ap_tmp_buf);
+    if(ap_tmp_buf == NULL) {
+        LV_LOG_WARN("Couldn't allocate buffer for the Arabic conversion");
+        return;
+    }
+    lv_text_ap_proc(option, ap_tmp_buf);
+    ins_buf = ap_tmp_buf;
+
 #endif
 
+    /*Allocate space for the new option*/
     size_t new_len = ins_len + old_len + 2; /*+2 for terminating NULL and possible \n*/
-    dropdown->options        = lv_realloc(dropdown->options, new_len + 1);
-    LV_ASSERT_MALLOC(dropdown->options);
-    if(dropdown->options == NULL) return;
-
-    dropdown->options[old_len] = '\0';
-
-    /*Find the insert character position*/
-    uint32_t insert_pos = old_len;
-    if(pos != LV_DROPDOWN_POS_LAST) {
-        uint32_t opcnt = 0;
-        for(insert_pos = 0; dropdown->options[insert_pos] != 0; insert_pos++) {
-            if(opcnt == pos)
-                break;
-            if(dropdown->options[insert_pos] == '\n')
-                opcnt++;
-        }
+    char * new_options;
+    if(dropdown->static_options) {
+        LV_LOG_INFO("Converting static options to dynamic");
+        new_options = lv_malloc(new_len);
+        if(new_options) lv_strcpy(new_options, dropdown->options);
+    }
+    else {
+        new_options = lv_realloc(dropdown->options, new_len);
     }
 
-    /*Add delimiter to existing options*/
-    if((insert_pos > 0) && (pos >= dropdown->option_cnt))
-        lv_text_ins(dropdown->options, lv_text_encoded_get_char_id(dropdown->options, insert_pos++), "\n");
-
-    /*Insert the new option, adding \n if necessary*/
-    char * ins_buf = lv_malloc(ins_len + 2); /*+ 2 for terminating NULL and possible \n*/
-    LV_ASSERT_MALLOC(ins_buf);
-    if(ins_buf == NULL) return;
-#if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    lv_strcpy(ins_buf, option);
-#else
-    lv_text_ap_proc(option, ins_buf);
+    LV_ASSERT_MALLOC(new_options);
+    if(new_options == NULL) {
+        LV_LOG_WARN("Couldn't reallocate the buffer for the options");
+#if LV_USE_ARABIC_PERSIAN_CHARS
+        lv_free(ap_tmp_buf);
 #endif
-    if(pos < dropdown->option_cnt) lv_strcat(ins_buf, "\n");
+        return;
+    }
 
-    lv_text_ins(dropdown->options, lv_text_encoded_get_char_id(dropdown->options, insert_pos), ins_buf);
-    lv_free(ins_buf);
+    /*Insert to the beginning*/
+    if(pos == 0) {
+        lv_text_ins(new_options, 0, ins_buf);
+        lv_text_ins(new_options, lv_text_get_encoded_length(ins_buf), "\n");
+    }
+    /*Insert to the end*/
+    else if(pos ==  LV_DROPDOWN_POS_LAST || pos >= dropdown->option_cnt) {
+        new_options[old_len] = '\n';
+        new_options[old_len + 1] = '\0';
+        lv_strcat(new_options, ins_buf);
+    }
+    /*Insert to the middle*/
+    else {
+        /*Find the insert character position after a '\n'*/
+        uint32_t ins_byte_pos;
+        uint32_t option_cnt = 0;
+        for(ins_byte_pos = 0; new_options[ins_byte_pos] != '\0'; ins_byte_pos++) {
+            if(option_cnt == pos) break;
+            if(new_options[ins_byte_pos] == '\n') option_cnt++;
+        }
 
+        uint32_t ins_char_pos = lv_text_encoded_get_char_id(new_options, ins_byte_pos);
+        lv_text_ins(new_options, ins_char_pos, ins_buf);
+        ins_char_pos += lv_text_get_encoded_length(ins_buf);
+        lv_text_ins(new_options, ins_char_pos, "\n");
+    }
+
+    dropdown->options = new_options;
     dropdown->option_cnt++;
+    dropdown->static_options = 0;
+
+    if(dropdown->options_translation_tag) {
+        LV_LOG_WARN("Adding an option to translated options removed the translation tag");
+        remove_options_translation_tag(obj);
+    }
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    lv_free(ap_tmp_buf);
+#endif
 
     refresh_size(obj);
-    if(dropdown->list)
-        lv_obj_invalidate(dropdown->list);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 #if LV_USE_TRANSLATION
@@ -335,15 +372,23 @@ void lv_dropdown_set_options_translation_tag(lv_obj_t * obj, const char * tag)
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     char * new_tag = lv_strdup(tag);
     LV_ASSERT_MALLOC(new_tag);
-    if(!new_tag) {
+    if(new_tag == NULL) {
         LV_LOG_WARN("Failed to allocate memory for new tag");
         return;
     }
-    if(dropdown->options_translation_tag) {
-        lv_free(dropdown->options_translation_tag);
+
+    lv_result_t res = update_options(obj, lv_tr(new_tag));
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't set the translated text");
+        lv_free(new_tag);
+        return;
     }
+
+    lv_free(dropdown->options_translation_tag);
     dropdown->options_translation_tag = new_tag;
-    set_options_internal(obj, lv_tr(tag));
+
+    refresh_size(obj);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 #endif /*LV_USE_TRANSLATION*/
 
@@ -364,8 +409,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     dropdown->option_cnt = 0;
 
     refresh_size(obj);
-    if(dropdown->list)
-        lv_obj_invalidate(dropdown->list);
+    if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
@@ -960,15 +1004,29 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
 #if LV_USE_TRANSLATION
     else if(code == LV_EVENT_TRANSLATION_LANGUAGE_CHANGED) {
         if(dropdown->text_translation_tag) {
-            set_text_internal(obj, lv_tr(dropdown->text_translation_tag));
+            lv_result_t text_res = update_text(obj, lv_tr(dropdown->text_translation_tag));
+            if(text_res == LV_RESULT_INVALID) {
+                LV_LOG_WARN("Couldn't update the translated text");
+            }
+            else {
+                refresh_size(obj);
+            }
         }
         if(dropdown->options_translation_tag) {
             /*Keep the selected option on language change*/
             uint32_t prev_sel = dropdown->sel_opt_id;
-            set_options_internal(obj, lv_tr(dropdown->options_translation_tag));
-            dropdown->sel_opt_id = LV_MIN(prev_sel, dropdown->option_cnt - 1);
-            dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
+            lv_result_t opts_res = update_options(obj, lv_tr(dropdown->options_translation_tag));
+            if(opts_res == LV_RESULT_INVALID) {
+                LV_LOG_WARN("Couldn't update the translated options");
+            }
+            else {
+                refresh_size(obj);
 
+                dropdown->sel_opt_id = LV_MIN(prev_sel, dropdown->option_cnt - 1);
+                dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
+
+                if(dropdown->list) lv_obj_invalidate(dropdown->list);
+            }
         }
     }
 #endif /*LV_USE_TRANSLATION*/
@@ -1150,7 +1208,9 @@ static void draw_main(lv_event_t * e)
 static void refresh_size(lv_obj_t * obj)
 {
     LV_ASSERT(obj != NULL);
+    /*Always invalidate as `lv_obj_refresh_self_size` invalidates only content sized widgets*/
     lv_obj_invalidate(obj);
+
     lv_obj_refresh_self_size(obj);
 }
 
@@ -1457,13 +1517,15 @@ static void dropdown_list_align_bidi(lv_dropdown_t * dropdown, lv_dir_t dir)
     else lv_obj_set_y(dropdown->list, coord->y1 - lv_obj_get_height(dropdown->list));
 }
 
-static void set_text_internal(lv_obj_t * obj, const char * text)
+static lv_result_t update_text(lv_obj_t * obj, const char * text)
 {
     LV_ASSERT(obj);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(!dropdown->static_text && dropdown->text && text && lv_streq(dropdown->text, text)) {
-        return;
+
+    if(!dropdown->static_text && text && dropdown->text && lv_streq(text, dropdown->text)) {
+        LV_LOG_INFO("Same text is set dynamically already");
+        return LV_RESULT_OK;
     }
 
     char * copied_text = NULL;
@@ -1471,30 +1533,37 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
         copied_text = lv_strdup(text);
         LV_ASSERT_MALLOC(copied_text);
         if(copied_text == NULL) {
-            LV_LOG_WARN("Couldn't save text.");
-            return;
+            LV_LOG_WARN("Couldn't set the text.");
+            return LV_RESULT_INVALID;
         }
     }
 
+    /*Free only when successfully allocated*/
     if(!dropdown->static_text) lv_free(dropdown->text);
+
+    /*Now the text is dynamically allocated*/
     dropdown->static_text = 0;
     dropdown->text = copied_text;
-    refresh_size(obj);
+
+    return LV_RESULT_OK;
 }
 
-static void set_options_internal(lv_obj_t * obj, const char * options)
+static lv_result_t update_options(lv_obj_t * obj, const char * options)
 {
     LV_ASSERT(obj);
     LV_ASSERT(options);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    /*Count the '\n'-s to determine the number of options*/
-    dropdown->option_cnt = 0;
-    uint32_t i;
-    for(i = 0; options[i] != '\0'; i++) {
-        if(options[i] == '\n') dropdown->option_cnt++;
+    /*If Arabic processing is enabled dropdown->options is preprocessed already
+     *but options are not, so can't compare them*/
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
+    if(!dropdown->static_options && lv_streq(options, dropdown->options)) {
+        LV_LOG_INFO("Same options are set dynamically already");
+        dropdown->sel_opt_id = 0;
+        dropdown->sel_opt_id_orig = 0;
+        return LV_RESULT_OK;
     }
-    dropdown->option_cnt++;   /*Last option has no `\n`*/
+#endif
 
     /*Allocate space for the new text*/
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
@@ -1503,14 +1572,19 @@ static void set_options_internal(lv_obj_t * obj, const char * options)
     size_t len = lv_text_ap_strlen(options) + 1;
 #endif
 
-    if(dropdown->options != NULL && dropdown->static_options == 0) {
+    char * new_options = lv_malloc(len);
+    LV_ASSERT_MALLOC(new_options);
+    if(new_options == NULL) {
+        LV_LOG_WARN("Couldn't allocate the options");
+        return LV_RESULT_INVALID;
+    }
+
+    /*Free only when successfully allocated*/
+    if(!dropdown->static_options) {
         lv_free(dropdown->options);
         dropdown->options = NULL;
     }
-
-    dropdown->options = lv_malloc(len);
-    LV_ASSERT_MALLOC(dropdown->options);
-    if(dropdown->options == NULL) return;
+    dropdown->options = new_options;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     lv_strcpy(dropdown->options, options);
@@ -1518,14 +1592,25 @@ static void set_options_internal(lv_obj_t * obj, const char * options)
     lv_text_ap_proc(options, dropdown->options);
 #endif
 
-    /*Now the text is dynamically allocated*/
+    dropdown->option_cnt = count_options_in_str(options);
+
+    /*Now the options are dynamically allocated*/
     dropdown->static_options = 0;
     dropdown->sel_opt_id = 0;
     dropdown->sel_opt_id_orig = 0;
 
-    refresh_size(obj);
-    if(dropdown->list)
-        lv_obj_invalidate(dropdown->list);
+    return LV_RESULT_OK;
+}
+
+static uint32_t count_options_in_str(const char * options)
+{
+    /*Count the '\n'-s to determine the number of options*/
+    uint32_t cnt = 0;
+    uint32_t i;
+    for(i = 0; options[i] != '\0'; i++) {
+        if(options[i] == '\n') cnt++;
+    }
+    return cnt + 1;   /*Last option has no `\n`*/
 }
 
 static void remove_options_translation_tag(lv_obj_t * obj)
