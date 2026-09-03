@@ -20,7 +20,7 @@ class LVRoller(LVObject):
     @property
     def options_translation_tag(self):
         """Translation tag for the options"""
-        return safe_string(self._wv, "options_translation_tag")
+        return safe_string(self._wv_lv_roller_t, "options_translation_tag")
 
     @property
     def option_cnt(self):
