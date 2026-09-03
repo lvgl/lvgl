@@ -68,9 +68,9 @@ class LVBarcode(LVCanvas):
         return int(self._wv_lv_barcode_t.safe_field("needs_update", 0))
 
     @property
-    def render_failed(self):
-        """The last generation attempt failed (or none has run yet)"""
-        return int(self._wv_lv_barcode_t.safe_field("render_failed", 0))
+    def render_valid(self):
+        """No generation attempt is known to have failed; a change re-arms it"""
+        return int(self._wv_lv_barcode_t.safe_field("render_valid", 0))
 
     @property
     def fitting(self):
@@ -92,7 +92,7 @@ class LVBarcode(LVCanvas):
         d["tiled"] = self.tiled
         d["update_mode"] = self.update_mode
         d["needs_update"] = self.needs_update
-        d["render_failed"] = self.render_failed
+        d["render_valid"] = self.render_valid
         d["fitting"] = self.fitting
         s['widget_data'] = d
         return s

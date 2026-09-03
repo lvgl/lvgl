@@ -64,17 +64,19 @@ that setter returns `void`, so a failure is only logged. Render first to get the
 <ApiLink name="lv_barcode_render" /> returns its result, and so does
 <ApiLink name="lv_barcode_update" /> in immediate mode. The rest cannot: the property
 setters return `void`, resizes happen in an event handler, and a deferred fill happens in
-the draw pass. <ApiLink name="lv_barcode_get_render_failed" /> covers those:
+the draw pass. <ApiLink name="lv_barcode_is_render_valid" /> covers those:
 
 ```c
 lv_obj_set_height(barcode, 0);   /* leaves no room for a horizontal barcode */
-if(lv_barcode_get_render_failed(barcode)) {
+if(!lv_barcode_is_render_valid(barcode)) {
     /* the bitmap is blank; give the object a height */
 }
 ```
 
-It is also `true` before any data is set, and `false` again after a success. A failure is
-not retried every redraw - only a change makes the Widget try again.
+It is also `false` before any data is set. A failure is not retried every redraw - only a
+change makes the Widget try again, and that change sets the flag back to `true` before the
+new attempt runs. So `true` means "no known failure", not "the bitmap is up to date"; in
+deferred mode a pending regeneration is also `true`.
 
 ## Notes
 

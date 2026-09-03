@@ -45,7 +45,7 @@ struct _lv_barcode_t {
     uint8_t tiled : 1;              /*Draw a one bar wide bitmap and let the image tiling repeat it*/
     uint8_t update_mode : 1;        /*lv_barcode_update_mode_t: when a property change is regenerated*/
     uint8_t needs_update : 1;       /*The bitmap is out of date; filled in on the next redraw (deferred mode)*/
-    uint8_t render_failed : 1;      /*The last generation attempt failed (or none has run yet)*/
+    uint8_t render_valid : 1;       /*No generation attempt is known to have failed; a change re-arms it*/
     uint8_t fitting : 1;            /*Guard against the re-entrant resize our own reallocation triggers*/
 };
 

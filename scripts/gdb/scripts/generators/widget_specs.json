@@ -145,7 +145,7 @@
         "tiled": "bool",
         "update_mode": "bool",
         "needs_update": "bool",
-        "render_failed": "bool",
+        "render_valid": "bool",
         "fitting": "bool"
       }
     }
