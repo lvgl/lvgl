@@ -247,7 +247,21 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
 {
     LV_CHECK_ARG(texture_area != NULL, return);
     LV_CHECK_ARG(texture_clip_area != NULL, return);
-    lv_opengles_render_texture_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip);
+
+    LV_PROFILER_DRAW_BEGIN;
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = texture;
+    params.texture_area = texture_area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = texture_clip_area;
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+    params.rb_swap = true;
+    lv_opengles_render(&params);
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_texture_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
@@ -268,28 +282,6 @@ void lv_opengles_render_texture_internal(unsigned int texture, const lv_area_t *
     params.texture_clip_area = texture_clip_area;
     params.h_flip = h_flip;
     params.v_flip = v_flip;
-    lv_opengles_render(&params);
-    LV_PROFILER_DRAW_END;
-}
-
-void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                                       int32_t disp_w,
-                                       int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
-{
-    LV_ASSERT(texture_area != NULL);
-    LV_ASSERT(texture_clip_area != NULL);
-    LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render_params_t params;
-    lv_opengles_render_params_init(&params);
-    params.texture = texture;
-    params.texture_area = texture_area;
-    params.opa = opa;
-    params.disp_w = disp_w;
-    params.disp_h = disp_h;
-    params.texture_clip_area = texture_clip_area;
-    params.h_flip = h_flip;
-    params.v_flip = v_flip;
-    params.rb_swap = true;
     lv_opengles_render(&params);
     LV_PROFILER_DRAW_END;
 }
