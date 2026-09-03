@@ -14,6 +14,7 @@
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
 #include "../../misc/lv_area_private.h"
+#include "../../draw/opengles/lv_draw_opengles.h"
 
 #include <stdlib.h>
 
@@ -299,6 +300,7 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
     static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
     lv_display_set_buffers(disp, &dummy_buf, NULL, h * lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888),
                            LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_draw_buf_handlers(disp, lv_draw_opengles_get_draw_buf_handlers());
 #else
     uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
     uint32_t buf_size = stride * h;

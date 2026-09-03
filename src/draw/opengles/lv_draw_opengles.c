@@ -15,6 +15,7 @@
 #endif
 
 #include "../lv_draw_private.h"
+#include "../lv_draw_buf_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../drivers/opengles/lv_opengles_debug.h"
 #include "../../drivers/opengles/lv_opengles_private.h"
@@ -68,6 +69,7 @@ static void draw_texture_to_framebuffer(lv_draw_opengles_unit_t * u, unsigned in
 static void draw_to_framebuffer(lv_draw_opengles_unit_t * u);
 
 static unsigned int layer_get_texture(lv_layer_t * layer);
+static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer);
 static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u);
 static unsigned int create_texture(int32_t w, int32_t h, const void * data);
 
@@ -80,6 +82,7 @@ static unsigned int create_texture(int32_t w, int32_t h, const void * data);
  **********************/
 
 static lv_draw_opengles_unit_t * g_unit;
+static lv_draw_buf_handlers_t gpu_draw_buf_handlers;
 
 /**********************
  *      MACROS
@@ -105,6 +108,9 @@ void lv_draw_opengles_init(void)
 
     lv_draw_buf_init(&draw_opengles_unit->render_draw_buf, 0, 0, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO, NULL, 0);
 
+    lv_draw_buf_init_with_default_handlers(&gpu_draw_buf_handlers);
+    gpu_draw_buf_handlers.buf_clear_cb = gpu_buf_clear_cb;
+
     g_unit = draw_opengles_unit;
 }
 
@@ -117,6 +123,38 @@ void lv_draw_opengles_deinit(void)
         GL_CALL(glDeleteFramebuffers(1, &g_unit->framebuffer));
     }
     g_unit = NULL;
+}
+
+const lv_draw_buf_handlers_t * lv_draw_opengles_get_draw_buf_handlers(void)
+{
+    return &gpu_draw_buf_handlers;
+}
+
+static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer)
+{
+    if(layer == NULL) return;
+
+    /*Tiled rendering uses temporary tile layers that have no texture of their own.
+     *They render into the display's backing layer, so clear that one instead.*/
+    if(layer->user_data == NULL) {
+        lv_display_t * disp = lv_refr_get_disp_refreshing();
+        if(disp == NULL || disp->layer_head == NULL) return;
+        layer = disp->layer_head;
+    }
+
+    /*`a` is relative to the draw buffer, `lv_draw_opengles_clear_layer_area()` takes
+     *screen coordinates.*/
+    lv_area_t screen_area;
+    if(a == NULL) {
+        screen_area = layer->buf_area;
+    }
+    else {
+        screen_area = *a;
+        lv_area_move(&screen_area, layer->buf_area.x1, layer->buf_area.y1);
+    }
+
+    LV_UNUSED(draw_buf);
+    lv_draw_opengles_clear_layer_area(layer, &screen_area);
 }
 
 void lv_draw_opengles_clear_layer_area(lv_layer_t * layer, const lv_area_t * area)

@@ -13,6 +13,7 @@
 #include <SDL2/SDL_syswm.h>
 #include "lv_sdl_private.h"
 #include "../opengles/lv_opengles_egl_private.h"
+#include "../../draw/nanovg/lv_draw_nanovg.h"
 
 /*********************
  *      DEFINES
@@ -90,6 +91,9 @@ static lv_result_t init_display(lv_display_t * display)
         static lv_draw_buf_t draw_buf;
         static uint8_t dummy_buf;
         lv_draw_buf_init(&draw_buf, 4096, 4096, LV_COLOR_FORMAT_ARGB8888, 4096 * 4, &dummy_buf, 4096 * 4096 * 4);
+#if LV_USE_DRAW_NANOVG
+        draw_buf.handlers = lv_draw_nanovg_get_draw_buf_handlers();
+#endif
 
         lv_display_set_draw_buffers(display, &draw_buf, NULL);
         lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
