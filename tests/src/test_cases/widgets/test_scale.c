@@ -722,6 +722,7 @@ static lv_obj_t * create_self_size_scale(lv_obj_t * parent, lv_scale_mode_t mode
     lv_scale_set_mode(scale, mode);
     lv_scale_set_label_show(scale, true);
     lv_obj_set_style_outline_width(scale, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_width(scale, 2, LV_PART_MAIN);
 
     return scale;
 }
@@ -746,7 +747,7 @@ void test_scale_self_size(void)
     create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_RIGHT);
 
     lv_obj_t * scale = set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_TOP), 30, 5);
-    lv_obj_set_flag(scale, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK, true);
+    lv_obj_set_flex_in_new_track(scale, true);
     set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_BOTTOM), 30, 5);
     set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_LEFT), 30, 5);
     set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_RIGHT), 30, 5);

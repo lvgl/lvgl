@@ -804,16 +804,16 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
             return;
         }
 
-        const int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        const int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        const int32_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-        const int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        const int32_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+        const int32_t border_width = lv_obj_get_style_border_width_internal(obj, LV_PART_MAIN);
+        const int32_t pad_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
+        const int32_t pad_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
+        const int32_t pad_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
+        const int32_t pad_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
 
-        const int32_t main_line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-        const int32_t major_tick_len = LV_ABS(lv_obj_get_style_length(obj, LV_PART_INDICATOR));
-        const int32_t minor_tick_len = LV_ABS(lv_obj_get_style_length(obj, LV_PART_ITEMS));
-        const int32_t max_tick_len = LV_MAX(major_tick_len, minor_tick_len);
+        const int32_t main_line_width = lv_obj_get_style_line_width_internal(obj, LV_PART_MAIN);
+        const int32_t major_tick_len = LV_ABS(lv_obj_get_style_length_internal(obj, LV_PART_INDICATOR));
+        const int32_t minor_tick_len = LV_ABS(lv_obj_get_style_length_internal(obj, LV_PART_ITEMS));
+        const int32_t max_tick_len = scale->total_tick_count == 0 ? 0 : LV_MAX(major_tick_len, minor_tick_len);
 
         int32_t max_label_w = 0;
         int32_t max_label_h = 0;
@@ -829,9 +829,14 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
 
             if(scale->label_enabled && max_label_h > 0) {
                 int32_t label_pad = (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode)
-                                    ? lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR)
-                                    : lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-                int32_t label_translate = LV_ABS(lv_obj_get_style_translate_y(obj, LV_PART_INDICATOR));
+                                    ? lv_obj_get_style_pad_bottom_internal(obj, LV_PART_INDICATOR)
+                                    : lv_obj_get_style_pad_top_internal(obj, LV_PART_INDICATOR);
+                int32_t label_translate = LV_ABS(lv_obj_get_style_translate_y_internal(obj, LV_PART_INDICATOR));
+
+                /*Don't change the self size if moved inwards*/
+                if(scale->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM && label_translate < 0) label_translate = 0;
+                else if(scale->mode == LV_SCALE_MODE_HORIZONTAL_TOP && label_translate > 0) label_translate = 0;
+
                 self_h += label_pad + max_label_h + label_translate;
             }
 
@@ -842,10 +847,15 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
 
             if(scale->label_enabled && max_label_w > 0) {
                 int32_t label_pad = (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode)
-                                    ? lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR)
-                                    : lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-                int32_t label_translate = LV_ABS(lv_obj_get_style_translate_x(obj, LV_PART_INDICATOR));
+                                    ? lv_obj_get_style_pad_left_internal(obj, LV_PART_INDICATOR)
+                                    : lv_obj_get_style_pad_right_internal(obj, LV_PART_INDICATOR);
+                int32_t label_translate = LV_ABS(lv_obj_get_style_translate_x_internal(obj, LV_PART_INDICATOR));
                 self_w += label_pad + max_label_w + label_translate;
+
+                /*Don't change the self size if moved inwards*/
+                if(scale->mode == LV_SCALE_MODE_VERTICAL_LEFT && label_translate < 0) label_translate = 0;
+                else if(scale->mode == LV_SCALE_MODE_VERTICAL_RIGHT && label_translate > 0) label_translate = 0;
+
             }
 
             p->x = LV_MAX(p->x, self_w);
@@ -1329,7 +1339,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             scale_get_center(obj, &section_arc_center, &section_arc_radius);
             lv_style_value_t v;
             if(section->main_style != NULL
-               && lv_style_get_prop(section->main_style, LV_STYLE_PAD_RADIAL, &v) == LV_STYLE_RES_FOUND) {
+               && lv_style_get_prop_internal(section->main_style, LV_STYLE_PAD_RADIAL, &v) == LV_STYLE_RES_FOUND) {
                 section_arc_radius -= v.num;
             }
 
