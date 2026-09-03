@@ -4,6 +4,16 @@
 
 #include "unity/unity.h"
 
+#include <string.h>
+
+static uint32_t cache_error_count;
+
+static void count_cache_errors_cb(lv_log_level_t level, const char * buf)
+{
+    if(level == LV_LOG_LEVEL_ERROR && strstr(buf, "cache not allocated") != NULL) cache_error_count++;
+    if(level >= LV_LOG_LEVEL_WARN) TEST_PRINTF(buf);
+}
+
 /* NanoVG's GPU rasterization produces glyph metrics that differ between architectures
  * beyond a usable tolerance, so it keeps a per-architecture reference set. The SW
  * renderer is architecture-stable and shares a single reference image. */
@@ -19,12 +29,13 @@
 
 void setUp(void)
 {
-    /* Function run before every test */
+    cache_error_count = 0;
+    lv_log_register_print_cb(count_cache_errors_cb);
 }
 
 void tearDown(void)
 {
-    /* Function run after every test */
+    lv_log_register_print_cb(NULL);
 }
 
 void test_tiny_ttf_rendering_test(void)
@@ -93,6 +104,28 @@ void test_tiny_ttf_kerning(void)
 #else
     TEST_PASS();
 #endif
+}
+
+void test_tiny_ttf_missing_glyph_uses_fallback(void)
+{
+    extern const uint8_t test_ubuntu_font[];
+    extern size_t test_ubuntu_font_size;
+    const size_t cache_sizes[] = {0, 1};
+
+    for(size_t i = 0; i < sizeof(cache_sizes) / sizeof(cache_sizes[0]); i++) {
+        lv_font_t * font = lv_tiny_ttf_create_data_ex(test_ubuntu_font, test_ubuntu_font_size, 30,
+                                                      LV_FONT_KERNING_NORMAL, cache_sizes[i]);
+        TEST_ASSERT_NOT_NULL(font);
+        font->fallback = &lv_font_montserrat_14;
+
+        lv_font_glyph_dsc_t glyph_dsc;
+        TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &glyph_dsc, 0xf55a, 0));
+        TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_14, glyph_dsc.resolved_font);
+
+        lv_tiny_ttf_destroy(font);
+    }
+
+    TEST_ASSERT_EQUAL_UINT32(0, cache_error_count);
 }
 
 void test_tiny_ttf_gpos(void)
