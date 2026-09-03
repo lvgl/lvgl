@@ -558,4 +558,48 @@ void test_dropdown_content_size()
     lv_dropdown_set_selected(dd, 2);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_content_size_3.png");
 }
+/* The open list has to stay under the button, no matter the base direction of the screen.
+ * See https://github.com/lvgl/lvgl/issues/10254 */
+static void dropdown_list_position_test(lv_base_dir_t base_dir)
+{
+    lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_style_base_dir(screen, base_dir, LV_PART_MAIN);
+
+    lv_obj_t * dd = lv_dropdown_create(screen);
+    lv_dropdown_set_options(dd, "Option 1\nA considerably longer option");
+    lv_obj_set_width(dd, 100);
+    lv_obj_set_pos(dd, 30, 20);
+
+    lv_dropdown_open(dd);
+    lv_obj_update_layout(screen);
+
+    lv_area_t dd_coords;
+    lv_area_t list_coords;
+    lv_obj_get_coords(dd, &dd_coords);
+    lv_obj_get_coords(lv_dropdown_get_list(dd), &list_coords);
+
+    /*The list is wider than the button, so the two aligned edges are the only matching ones*/
+    TEST_ASSERT_GREATER_THAN_INT32(lv_area_get_width(&dd_coords), lv_area_get_width(&list_coords));
+
+    if(base_dir == LV_BASE_DIR_RTL) {
+        TEST_ASSERT_EQUAL_INT32(dd_coords.x2, list_coords.x2);
+    }
+    else {
+        TEST_ASSERT_EQUAL_INT32(dd_coords.x1, list_coords.x1);
+    }
+    TEST_ASSERT_EQUAL_INT32(dd_coords.y2 + 1, list_coords.y1);
+}
+
+void test_dropdown_list_position_ltr(void)
+{
+    dropdown_list_position_test(LV_BASE_DIR_LTR);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_list_position_ltr.png")
+}
+
+void test_dropdown_list_position_rtl(void)
+{
+    dropdown_list_position_test(LV_BASE_DIR_RTL);
+    lv_obj_set_style_base_dir(lv_screen_active(), LV_BASE_DIR_LTR, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_list_position_rtl.png")
+}
 #endif
