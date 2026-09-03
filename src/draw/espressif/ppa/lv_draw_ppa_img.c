@@ -65,6 +65,13 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     const int32_t src_pic_w  = lv_ppa_pic_w(decoded->header.stride, draw_dsc->header.w, src_cf);
     const int32_t dest_pic_w = lv_ppa_pic_w(draw_buf->header.stride, draw_buf->header.w, dest_cf);
     if(src_pic_w == 0 || dest_pic_w == 0) {
+        /* lv_draw_sw_image() redraws the whole task, and it runs its own decode
+         * loop, so it must fire exactly once. A partial decoder calls this core
+         * back per decoded chunk (see img_decode_and_draw()), which would
+         * otherwise repeat the full software draw for every chunk. */
+        if(u->img_sw_fallback) return;
+        u->img_sw_fallback = true;
+
         LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, drawing in software");
 #if LV_USE_DRAW_SW
         lv_draw_sw_image(t, draw_dsc, &t->area);

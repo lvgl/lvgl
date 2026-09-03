@@ -158,6 +158,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     u->task_act = t;
     u->task_act->draw_unit = draw_unit;
+    u->img_sw_fallback = false;
 
     ppa_execute_drawing(u);
 
