@@ -1009,6 +1009,11 @@ static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller
         }
 
         char * opt_extra = lv_malloc(opt_extra_len);
+        LV_ASSERT_MALLOC(opt_extra);
+        if(opt_extra == NULL) {
+            LV_LOG_WARN("Couldn't allocate the buffer for the options");
+            return;
+        }
         uint32_t i;
         for(i = 0; i < roller->inf_page_cnt; i++) {
             lv_strcpy(&opt_extra[opt_len * i], options);
