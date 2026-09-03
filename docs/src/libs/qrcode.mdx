@@ -75,17 +75,19 @@ either - they are a palette write in both modes.
 re-encodes triggered by a property change cannot: `lv_qrcode_set_size()` and `lv_qrcode_set_quiet_zone()` return
 `void`, and in deferred mode the work happens in the draw pass. A payload that no longer
 fits - typically after shrinking the object - therefore fails without anything returning
-an error. <ApiLink name="lv_qrcode_get_render_failed" /> reports that state:
+an error. <ApiLink name="lv_qrcode_is_render_valid" /> reports that state:
 
 ```c
 lv_qrcode_set_size(qr, 10);   /* too small for this payload */
-if(lv_qrcode_get_render_failed(qr)) {
+if(!lv_qrcode_is_render_valid(qr)) {
     /* the bitmap is blank; pick a larger size */
 }
 ```
 
-It is also `true` on a fresh QR code that has no data yet, and becomes `false` again as
-soon as an encode succeeds.
+It is also `false` on a fresh QR code that has no data yet. A property change re-arms the
+Widget and sets the flag back to `true` before the new encode runs, so `true` means "no
+known failure", not "the bitmap is up to date" - in deferred mode a pending re-encode is
+also `true`.
 
 A failed encode leaves the bitmap marked as out of date, so it is never mistaken for a
 current one, and it is not retried on every redraw - only a property change makes the
@@ -93,7 +95,7 @@ Widget try again.
 
 Encode failures are not logged when the caller can see the result: `lv_qrcode_update()`
 and `lv_qrcode_render()` return it, and the property setters are silent because the state
-is available from `lv_qrcode_get_render_failed()`. Animating a size through values that
+is available from `lv_qrcode_is_render_valid()`. Animating a size through values that
 are all too small therefore produces no log output at all. The one exception is the
 re-encode done by the redraw - there is no caller to return anything to, so that failure
 is logged, along with the warning that the explicit render call was missed.

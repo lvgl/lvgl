@@ -136,7 +136,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 
     /*A new payload leaves the bitmap out of date, and makes any earlier failure moot*/
     qrcode->needs_update = true;
-    qrcode->render_failed = false;
+    qrcode->render_valid = true;
 
     /*Setting the data always encodes right away, in either update mode*/
     return lv_qrcode_render(obj);
@@ -180,7 +180,7 @@ void lv_qrcode_set_update_mode(lv_obj_t * obj, lv_qrcode_update_mode_t mode)
      *order that can report the failure is lv_qrcode_update() first, then switch mode.*/
     if(mode == LV_QRCODE_UPDATE_MODE_IMMEDIATE && qrcode->needs_update) {
         qrcode_encode(obj);
-        if(qrcode->render_failed) {
+        if(!qrcode->render_valid) {
             LV_LOG_ERROR("re-encoding on the switch to immediate update mode failed; "
                          "call lv_qrcode_render() before switching the mode to get the result");
         }
@@ -201,11 +201,11 @@ lv_qrcode_update_mode_t lv_qrcode_get_update_mode(lv_obj_t * obj)
     return (lv_qrcode_update_mode_t)qrcode->update_mode;
 }
 
-bool lv_qrcode_get_render_failed(lv_obj_t * obj)
+bool lv_qrcode_is_render_valid(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return true);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
-    return qrcode->render_failed;
+    return qrcode->render_valid;
 }
 
 /**********************
@@ -223,7 +223,7 @@ static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     qrcode->update_mode = LV_QRCODE_UPDATE_MODE_IMMEDIATE;
     qrcode->needs_update = false;
     /*No bitmap has been generated yet, so there is nothing valid to report*/
-    qrcode->render_failed = true;
+    qrcode->render_valid = false;
 
     /*Set default size*/
     lv_qrcode_set_size(obj, LV_DPI_DEF);
@@ -267,8 +267,8 @@ static void lv_qrcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_t * obj = lv_event_get_current_target(e);
         lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
         /*A state that already failed to encode is not retried here: it can only start
-         *working again when a property changes, and that clears `render_failed`.*/
-        if(qrcode->needs_update && !qrcode->render_failed) {
+         *working again when a property changes, and that sets `render_valid` again.*/
+        if(qrcode->needs_update && qrcode->render_valid) {
             /*Only deferred mode leaves the bitmap out of date; immediate mode re-encodes in the setter*/
             LV_ASSERT(qrcode->update_mode == LV_QRCODE_UPDATE_MODE_DEFERRED);
 
@@ -340,7 +340,7 @@ static void qrcode_mark_dirty(lv_obj_t * obj)
     qrcode->needs_update = true;
 
     /*The property change may well make the payload encodable again, so allow a new attempt*/
-    qrcode->render_failed = false;
+    qrcode->render_valid = true;
 
     /*Deferred mode collapses several changes into one re-encode on the next redraw*/
     if(qrcode->update_mode == LV_QRCODE_UPDATE_MODE_IMMEDIATE) qrcode_encode(obj);
@@ -353,14 +353,14 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
     LV_ASSERT(obj != NULL);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
-    /*Assume failure and clear both flags only on the single success path, so no early
+    /*Start invalid and settle both flags only on the single success path, so no early
      *return can forget to record the outcome. `needs_update` deliberately survives a
      *failure: the bitmap still does not match the properties, and reporting it as up to
-     *date would be a lie. `render_failed` is what keeps the draw hook from retrying a
-     *known-bad state on every frame; a property change clears it to allow a new attempt.
-     *Failures are never logged here - the result is returned, and it is up to the caller
-     *to report it if nothing else will.*/
-    qrcode->render_failed = true;
+     *date would be a lie. A cleared `render_valid` is what keeps the draw hook from
+     *retrying a known-bad state on every frame; a property change sets it again to allow a
+     *new attempt. Failures are never logged here - the result is returned, and it is up to
+     *the caller to report it if nothing else will.*/
+    qrcode->render_valid = false;
 
     if(qrcode->data == NULL) return LV_RESULT_INVALID;
 
@@ -484,7 +484,7 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
 
     /*Only now does the bitmap match the properties*/
     qrcode->needs_update = false;
-    qrcode->render_failed = false;
+    qrcode->render_valid = true;
     return LV_RESULT_OK;
 }
 

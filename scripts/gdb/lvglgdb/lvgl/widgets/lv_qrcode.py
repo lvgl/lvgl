@@ -51,9 +51,9 @@ class LVQrcode(LVCanvas):
         return int(self._wv_lv_qrcode_t.safe_field("needs_update", 0))
 
     @property
-    def render_failed(self):
-        """The last encode attempt failed (or none has run yet)"""
-        return int(self._wv_lv_qrcode_t.safe_field("render_failed", 0))
+    def render_valid(self):
+        """No encode attempt is known to have failed; a change re-arms it"""
+        return int(self._wv_lv_qrcode_t.safe_field("render_valid", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""
@@ -66,6 +66,6 @@ class LVQrcode(LVCanvas):
         d["quiet_zone"] = self.quiet_zone
         d["update_mode"] = self.update_mode
         d["needs_update"] = self.needs_update
-        d["render_failed"] = self.render_failed
+        d["render_valid"] = self.render_valid
         s['widget_data'] = d
         return s
