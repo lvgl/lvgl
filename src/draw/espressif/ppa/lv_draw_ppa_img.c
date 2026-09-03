@@ -180,7 +180,12 @@ static inline uint32_t lv_draw_ppa_buf_span(const lv_draw_buf_t * buf)
     if(span > buf->data_size) span = buf->data_size;
 
     uint32_t aligned = lv_draw_ppa_align_size(span);
-    return (aligned > buf->data_size) ? buf->data_size : aligned;
+    if(aligned <= buf->data_size) return aligned;
+
+    /* Rounding up would run past the allocation, so round down instead. The
+     * result still has to be a whole number of cache lines: esp_cache_msync()
+     * rejects ESP_CACHE_MSYNC_FLAG_UNALIGNED outright in the M2C direction. */
+    return (buf->data_size / LV_DRAW_PPA_CACHE_LINE_SIZE) * LV_DRAW_PPA_CACHE_LINE_SIZE;
 }
 
 void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
@@ -311,8 +316,15 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
      * Fill it by duplicating the last rendered column/row.
      * Must invalidate CPU cache first: PPA wrote via DMA, CPU cache is stale. */
     if(ret == ESP_OK && (blk.gap_right || blk.gap_bottom)) {
-        esp_cache_msync(dest_buf->data, aligned_size,
-                        ESP_CACHE_MSYNC_FLAG_DIR_M2C | ESP_CACHE_MSYNC_FLAG_UNALIGNED);
+        /* No ESP_CACHE_MSYNC_FLAG_UNALIGNED here: esp_cache_msync() rejects it
+         * for M2C with ESP_ERR_INVALID_ARG, so passing it made the invalidate a
+         * no-op and the gap fill below then read a stale cache. The address is
+         * aligned by the draw buffer contract and lv_draw_ppa_buf_span() keeps
+         * the size a whole number of cache lines. */
+        esp_err_t inv = esp_cache_msync(dest_buf->data, aligned_size, ESP_CACHE_MSYNC_FLAG_DIR_M2C);
+        if(inv != ESP_OK) {
+            LV_LOG_WARN("PPA SRM: cache invalidate failed: %d", (int)inv);
+        }
 
         uint8_t * base = dest_buf->data;
         uint32_t stride = (uint32_t)dest_pitch * out_bpp;

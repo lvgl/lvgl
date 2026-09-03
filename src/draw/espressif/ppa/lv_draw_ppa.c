@@ -261,7 +261,12 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
                 else
 #endif
                 {
-                    lv_draw_ppa_img(t, img_dsc, &area);
+                    /* The image rectangle, not the clipped region:
+                     * lv_draw_image_normal_helper() treats this as the image's
+                     * own area and measures the clip against it, so handing it a
+                     * pre-clipped rect makes the source offsets be taken from the
+                     * wrong origin and the wrong part of the image is drawn. */
+                    lv_draw_ppa_img(t, img_dsc, &t->area);
                 }
                 lv_draw_buf_invalidate_cache(buf, &area);
                 break;
