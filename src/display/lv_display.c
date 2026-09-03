@@ -556,7 +556,9 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
     }
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
-    lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
+    if(buf2) {
+        lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
+    }
     lv_display_set_draw_buffers(disp, &disp->_static_buf1, buf2 ? &disp->_static_buf2 : NULL);
     lv_display_set_render_mode(disp, render_mode);
     disp->stride_is_auto = is_auto_stride;
