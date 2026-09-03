@@ -18,7 +18,6 @@
 #if LV_USE_SIFLI_EPIC
 #include "lv_sifli_epic_utils.h"
 #include "../../../draw/lv_draw_label_private.h"
-#include "../../../draw/lv_draw_rect.h"
 
 /*********************
  *      DEFINES

@@ -17,7 +17,6 @@
 #include "lv_sifli_epic_cfg.h"
 
 #if LV_USE_SIFLI_EPIC
-#include "../../../misc/lv_log.h"
 #include "../../../osal/lv_os_private.h"
 
 #if defined(__ZEPHYR__)

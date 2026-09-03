@@ -20,12 +20,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_SIFLI_EPIC
 #include "../../sw/lv_draw_sw.h"
 #include "../../lv_draw_private.h"
-#include "../../../stdlib/lv_string.h"
 #include "lv_sifli_epic_cfg.h"
 
 /*********************

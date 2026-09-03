@@ -19,9 +19,6 @@
 #include "lv_sifli_epic_utils.h"
 #include "lv_sifli_epic_cfg.h"
 #include "../../../display/lv_display_private.h"
-#include "../../../font/lv_font.h"
-#include "../../../misc/lv_log.h"
-#include "../../../misc/lv_text.h"
 
 /*********************
  *      DEFINES

@@ -20,8 +20,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
-#include "../../../misc/lv_types.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_SIFLI_EPIC
 

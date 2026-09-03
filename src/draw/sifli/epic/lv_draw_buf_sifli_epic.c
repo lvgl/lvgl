@@ -17,7 +17,6 @@
 
 #if LV_USE_SIFLI_EPIC
 #include "../../../draw/lv_draw_buf_private.h"
-#include "../../../misc/lv_log.h"
 #include "lv_sifli_epic_cfg.h"
 
 /*********************

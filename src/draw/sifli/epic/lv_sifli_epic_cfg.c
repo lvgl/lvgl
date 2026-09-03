@@ -17,7 +17,6 @@
 #include "lv_sifli_epic_osa.h"
 
 #if LV_USE_SIFLI_EPIC
-#include "../../../misc/lv_log.h"
 #include "system_bf0_ap.h"
 #include <string.h>
 

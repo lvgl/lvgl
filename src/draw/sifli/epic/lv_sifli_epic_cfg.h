@@ -20,15 +20,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_SIFLI_EPIC
 
 /* Include SiFli HAL headers - these should be provided by the platform */
 #include "bf0_hal.h"
-#include "../../../draw/lv_image_dsc.h"
-
-#include "../../../misc/lv_log.h"
 
 /*********************
  *      DEFINES
