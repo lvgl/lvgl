@@ -24,7 +24,7 @@ void lv_example_slider_img_indicator(void)
     static lv_style_t style_slider_indicator;
     static lv_style_t style_slider_knob;
 
-    static lv_subject_t subject_value2;
+    static lv_subject_t * subject_value2;
 
     static bool inited = false;
 
@@ -48,9 +48,10 @@ void lv_example_slider_img_indicator(void)
         lv_style_set_pad_hor(&style_slider_knob, 0);
         lv_style_set_pad_ver(&style_slider_knob, 6);
 
-        lv_subject_init_int(&subject_value2, 20);
-        lv_subject_set_min_value_int(&subject_value2, 0);
-        lv_subject_set_max_value_int(&subject_value2, 100);
+        subject_value2 = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_min_value_int(subject_value2, 0);
+        lv_subject_set_max_value_int(subject_value2, 100);
+        lv_subject_set_int(subject_value2, 20);
         inited = true;
     }
 
@@ -66,12 +67,12 @@ void lv_example_slider_img_indicator(void)
     lv_obj_set_size(slider, 280, 30);
     lv_slider_set_min_value(slider, 0);
     lv_slider_set_max_value(slider, 20);
-    lv_slider_bind_value(slider, &subject_value2);
+    lv_slider_bind_value(slider, subject_value2);
     lv_obj_add_style(slider, &style_slider_track, LV_PART_MAIN);
     lv_obj_add_style(slider, &style_slider_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(slider, &style_slider_knob, LV_PART_KNOB);
 
     lv_obj_t * label = lv_label_create(screen);
-    lv_label_bind_text(label, &subject_value2, "%d");
+    lv_label_bind_text(label, subject_value2, "%d");
 }
 #endif

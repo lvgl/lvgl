@@ -100,9 +100,9 @@ A Drop-Down binds its selected index to a Subject. The link is two-way:
 picking an option updates the subject, and an application-side write into
 the subject moves the selection. Only integer subjects are supported.
 
-- <ApiLink name="lv_dropdown_bind_value" display="lv_dropdown_bind_value(dropdown, &subject)" />
+- <ApiLink name="lv_dropdown_bind_value" display="lv_dropdown_bind_value(dropdown, subject)" />
 
-To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
 
 
 <LvglExample name="lv_example_dropdown_bind_value" path="widgets/dropdown/lv_example_dropdown_bind_value" />

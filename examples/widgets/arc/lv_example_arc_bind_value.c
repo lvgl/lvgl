@@ -16,14 +16,15 @@
  */
 void lv_example_arc_bind_value(void)
 {
-    static lv_subject_t subject_value;
+    static lv_subject_t * subject_value;
 
     static bool inited = false;
 
     if(!inited) {
-        lv_subject_init_int(&subject_value, 50);
-        lv_subject_set_min_value_int(&subject_value, 0);
-        lv_subject_set_max_value_int(&subject_value, 100);
+        subject_value = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_min_value_int(subject_value, 0);
+        lv_subject_set_max_value_int(subject_value, 100);
+        lv_subject_set_int(subject_value, 50);
         inited = true;
     }
 
@@ -37,15 +38,15 @@ void lv_example_arc_bind_value(void)
     /* 💡 Slide to change `subject_value`; the arc follows because both bind to it. */
     lv_obj_t * arc = lv_arc_create(screen);
     lv_obj_set_size(arc, 160, 160);
-    lv_arc_bind_value(arc, &subject_value);
+    lv_arc_bind_value(arc, subject_value);
     lv_obj_set_clickable(arc, false);
     lv_obj_set_style_bg_opa(arc, (255 * 0 / 100), LV_PART_KNOB);
     lv_obj_t * lv_label_0 = lv_label_create(arc);
     lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_bind_text(lv_label_0, &subject_value, "%d %%");
+    lv_label_bind_text(lv_label_0, subject_value, "%d %%");
 
     lv_obj_t * slider = lv_slider_create(screen);
     lv_obj_set_width(slider, 220);
-    lv_slider_bind_value(slider, &subject_value);
+    lv_slider_bind_value(slider, subject_value);
 }
 #endif

@@ -570,7 +570,90 @@ Calling the following functions with `NULL` as the display parameter is deprecat
 - <ApiLink name="lv_sysmon_show_memory"/>
 - <ApiLink name="lv_sysmon_hide_memory"/>
 
-### lv_observer
+---
+
+## Observer
+
+### Subject create/delete
+
+The `lv_subject_init_<type>()` family and <ApiLink name="lv_subject_deinit"/> are
+deprecated. A Subject is now allocated by LVGL with
+<ApiLink name="lv_subject_create"/>, which takes the type and returns a pointer, and
+freed with <ApiLink name="lv_subject_delete"/>. Every Subject is tracked by LVGL, so
+any Subject still alive at `lv_deinit()` is deleted automatically.
+
+Keep the returned pointer where the `lv_subject_t` value used to live, and drop the
+`&` from every call that took its address:
+
+```c
+/* Before */
+static lv_subject_t temperature;
+lv_subject_init_int(&temperature, 20);
+lv_label_bind_text(label, &temperature, "%d °C");
+lv_subject_deinit(&temperature);
+
+/* After */
+static lv_subject_t * temperature;
+temperature = lv_subject_create(LV_SUBJECT_TYPE_INT);
+lv_subject_set_int(temperature, 20);
+lv_label_bind_text(label, temperature, "%d °C");
+lv_subject_delete(temperature);
+```
+
+The type is one of `LV_SUBJECT_TYPE_INT`, `LV_SUBJECT_TYPE_FLOAT`,
+`LV_SUBJECT_TYPE_STRING`, `LV_SUBJECT_TYPE_POINTER`, `LV_SUBJECT_TYPE_COLOR` or
+`LV_SUBJECT_TYPE_GROUP`.
+
+There is no initial value parameter any more. `lv_subject_create()` starts the Subject
+from a neutral value — `0` for int and float, `NULL` for pointer, black for color, an
+empty string for string, an empty list for group — and the initial value is set with
+the regular `lv_subject_set_...()` function. Two consequences to keep in mind:
+
+- Set `lv_subject_set_min_value_int()`/`lv_subject_set_max_value_int()` (and the float
+  variants) *before* the first value, because `lv_subject_set_int()` clamps to them,
+  while `lv_subject_init_int()` did not.
+- After the first `lv_subject_set_...()` the previous value is the neutral one, not the
+  initial one. `lv_subject_init_...()` set both to the initial value.
+
+The string buffers and the group list moved out of the init call into their own
+setters. Both take the memory as-is, so it still has to out-live the Subject:
+
+```c
+/* Before */
+static lv_subject_t title;
+lv_subject_init_string(&title, buf, prev_buf, sizeof(buf), "Hello");
+
+/* After */
+static lv_subject_t * title;
+title = lv_subject_create(LV_SUBJECT_TYPE_STRING);
+lv_subject_set_string_buffer_static(title, buf, prev_buf, sizeof(buf));
+lv_subject_copy_string(title, "Hello");
+```
+
+```c
+/* Before */
+static lv_subject_t * list[3] = {&mode, &value, &unit};
+static lv_subject_t measurement;
+lv_subject_init_group(&measurement, list, 3);
+
+/* After */
+static lv_subject_t * list[3];
+static lv_subject_t * measurement;
+list[0] = mode;
+list[1] = value;
+list[2] = unit;
+measurement = lv_subject_create(LV_SUBJECT_TYPE_GROUP);
+lv_subject_set_group_list_static(measurement, list, 3);
+```
+
+Because the group list is filled at run time, a static initializer taking the
+addresses of the member Subjects has to become run-time assignments.
+
+<ApiLink name="lv_subject_delete"/> accepts `NULL`, and unlike
+`lv_subject_deinit()` it also frees the Subject itself, so the pointer must not be
+used afterwards.
+
+### lv_obj_bind_flag_if_* / lv_obj_bind_state_if_*
 
 - The `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` families
   (`_eq`/`_not_eq`/`_gt`/`_ge`/`_lt`/`_le`) are deprecated. For a boolean subject,
@@ -583,7 +666,7 @@ Calling the following functions with `NULL` as the display parameter is deprecat
   lv_obj_bind_flag_if_not_eq(obj, &subject, LV_OBJ_FLAG_HIDDEN, 0);
 
   /* After */
-  lv_obj_bind_bool(obj, &subject, lv_obj_set_hidden);
+  lv_obj_bind_bool(obj, subject, lv_obj_set_hidden);
 
   /* Before: disable a widget while a subject is greater than 80 */
   lv_obj_bind_state_if_gt(obj, &subject, LV_STATE_DISABLED, 80);
@@ -594,7 +677,7 @@ Calling the following functions with `NULL` as the display parameter is deprecat
       lv_obj_t * obj = lv_observer_get_target_obj(observer);
       lv_obj_set_state(obj, LV_STATE_DISABLED, lv_subject_get_int(subject) > 80);
   }
-  lv_subject_add_observer_obj(&subject, disabled_observer_cb, obj, NULL);
+  lv_subject_add_observer_obj(subject, disabled_observer_cb, obj, NULL);
   ```
 
 ---

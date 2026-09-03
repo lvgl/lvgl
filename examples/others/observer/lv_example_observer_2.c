@@ -2,7 +2,7 @@
 #if LV_USE_OBSERVER && LV_USE_SLIDER && LV_USE_LABEL && LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
 /*This the only interface between the UI and the application*/
-static lv_subject_t engine_subject;
+static lv_subject_t * engine_subject;
 
 static void app_init(void);
 static void ui_init(void);
@@ -11,7 +11,7 @@ static void ui_init(void);
  * @title PIN login via state observers
  * @brief Decouple a login UI from an engine subject using observers on an auth subject.
  *
- * Two int subjects are initialised: `engine_subject` for the engine state and
+ * Two int subjects are created: `engine_subject` for the engine state and
  * `auth_state_subject` for `LOGGED_OUT`, `LOGGED_IN`, and `AUTH_FAILED`. A
  * password textarea fires `LV_EVENT_READY` to set the auth subject, a log-out
  * button resets it, and an observer on `auth_state_subject` writes status text
@@ -21,7 +21,7 @@ static void ui_init(void);
  */
 void lv_example_observer_2(void)
 {
-    lv_subject_init_int(&engine_subject, 0);
+    engine_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
     app_init();
     ui_init();
 }
@@ -45,7 +45,7 @@ static void engine_state_observer_cb(lv_observer_t * observer, lv_subject_t * su
 
 static void app_init(void)
 {
-    lv_subject_add_observer(&engine_subject, engine_state_observer_cb, NULL);
+    lv_subject_add_observer(engine_subject, engine_state_observer_cb, NULL);
 }
 
 /*--------------------------------------------------
@@ -62,16 +62,16 @@ typedef enum {
     AUTH_FAILED,
 } auth_state_t;
 
-static lv_subject_t auth_state_subject;
+static lv_subject_t * auth_state_subject;
 
 static void textarea_event_cb(lv_event_t * e)
 {
     lv_obj_t * ta = lv_event_get_target_obj(e);
     if(lv_strcmp(lv_textarea_get_text(ta), "hello") == 0) {
-        lv_subject_set_int(&auth_state_subject, LOGGED_IN);
+        lv_subject_set_int(auth_state_subject, LOGGED_IN);
     }
     else {
-        lv_subject_set_int(&auth_state_subject, AUTH_FAILED);
+        lv_subject_set_int(auth_state_subject, AUTH_FAILED);
     }
 }
 
@@ -108,12 +108,13 @@ static void enable_while_logged_in_observer_cb(lv_observer_t * observer, lv_subj
 static void log_out_click_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
-    lv_subject_set_int(&auth_state_subject, LOGGED_OUT);
+    lv_subject_set_int(auth_state_subject, LOGGED_OUT);
 }
 
 static void ui_init(void)
 {
-    lv_subject_init_int(&auth_state_subject, LOGGED_OUT);
+    auth_state_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(auth_state_subject, LOGGED_OUT);
 
     /*Create a slider in the center of the display*/
     lv_obj_t * ta = lv_textarea_create(lv_screen_active());
@@ -123,7 +124,7 @@ static void ui_init(void)
     lv_textarea_set_password_mode(ta, true);
     lv_textarea_set_placeholder_text(ta, "The password is: hello");
     lv_obj_add_event_cb(ta, textarea_event_cb, LV_EVENT_READY, NULL);
-    lv_subject_add_observer_obj(&auth_state_subject, disable_while_logged_in_observer_cb, ta, NULL);
+    lv_subject_add_observer_obj(auth_state_subject, disable_while_logged_in_observer_cb, ta, NULL);
 
     lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
     lv_keyboard_set_textarea(kb, ta);
@@ -135,7 +136,7 @@ static void ui_init(void)
     btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn, 220, 10);
     lv_obj_add_event_cb(btn, log_out_click_event_cb, LV_EVENT_CLICKED, NULL);
-    lv_subject_add_observer_obj(&auth_state_subject, enable_while_logged_in_observer_cb, btn, NULL);
+    lv_subject_add_observer_obj(auth_state_subject, enable_while_logged_in_observer_cb, btn, NULL);
 
     label = lv_label_create(btn);
     lv_label_set_text(label, "LOG OUT");
@@ -143,14 +144,14 @@ static void ui_init(void)
     /*Create a label to show info*/
     label = lv_label_create(lv_screen_active());
     lv_obj_set_pos(label, 10, 60);
-    lv_subject_add_observer_obj(&auth_state_subject, info_label_observer_cb, label, NULL);
+    lv_subject_add_observer_obj(auth_state_subject, info_label_observer_cb, label, NULL);
 
     /*Create button which will be active only when logged in*/
     btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn, 10, 80);
     lv_obj_set_checkable(btn, true);
-    lv_subject_add_observer_obj(&auth_state_subject, enable_while_logged_in_observer_cb, btn, NULL);
-    lv_obj_bind_checked(btn, &engine_subject);
+    lv_subject_add_observer_obj(auth_state_subject, enable_while_logged_in_observer_cb, btn, NULL);
+    lv_obj_bind_checked(btn, engine_subject);
     label = lv_label_create(btn);
     lv_label_set_text(label, "START ENGINE");
 }

@@ -130,10 +130,24 @@ typedef void (*lv_obj_set_pointer_t)(lv_obj_t * obj, const void * value);
  **********************/
 
 /**
+ * Create a subject of type `type`
+ * @param type   the type of the subject. See @ref lv_subject_type_t
+ */
+lv_subject_t * lv_subject_create(lv_subject_type_t type);
+
+/**
+ * Delete a subject
+ * @param subject   the subject to delete @nullable
+ */
+void lv_subject_delete(lv_subject_t * subject);
+
+/**
  * Initialize an integer-type Subject.
  * @param subject   pointer to Subject
  * @param value     initial value
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
  */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
 void lv_subject_init_int(lv_subject_t * subject, int32_t value);
 
 /**
@@ -178,7 +192,9 @@ void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value);
  * Initialize an float-type Subject.
  * @param subject   pointer to Subject
  * @param value     initial value
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
  */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
 void lv_subject_init_float(lv_subject_t * subject, float value);
 
 /**
@@ -227,8 +243,23 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value);
  * @param size      size of buffer(s)
  * @param value     initial value of string, e.g. "hello"
  * @note            A string Subject stores its own copy of the string, not just the pointer.
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
  */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value);
+
+/**
+ * Set the buffers where a string subject will store its value
+ * The buffers must out-live the subject
+ *
+ * @param subject   pointer to Subject
+ * @param buf       pointer to buffer to store string
+ * @param prev_buf  pointer to buffer to store previous string. @nullable When NULL the
+ *                  previous string is not tracked.
+ * @param size      size of buffer(s)
+ * @note            A string Subject stores its own copy of the string, not just the pointer.
+ */
+void lv_subject_set_string_buffer_static(lv_subject_t * subject, char * buf, char * prev_buf, size_t size);
 
 /**
  * Copy a string to a Subject and notify Observers if it changed.
@@ -262,7 +293,9 @@ const char * lv_subject_get_previous_string(lv_subject_t * subject);
  * Initialize a pointer-type Subject.
  * @param subject   pointer to Subject
  * @param value     initial value @nullable
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
  */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
 void lv_subject_init_pointer(lv_subject_t * subject, void * value);
 
 /**
@@ -290,7 +323,9 @@ const void * lv_subject_get_previous_pointer(lv_subject_t * subject);
  * Initialize a color-type Subject.
  * @param subject   pointer to Subject
  * @param color     initial value
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
  */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
 void lv_subject_init_color(lv_subject_t * subject, lv_color_t color);
 
 /**
@@ -320,8 +355,20 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject);
  * @param list           list of other Subject addresses; when any of these have values
  *                       updated, Observers of `group_subject` will be notified.
  * @param list_len       number of elements in `list[]`
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
  */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
 void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len);
+
+/**
+ * Set the subject list of a group subject
+ *
+ * @param subject   pointer to group Subject
+ * @param list      list of other Subject addresses; when any of these have values
+ *                  updated, Observers of `group_subject` will be notified.
+ * @param list_len  number of elements in `list[]`
+ */
+void lv_subject_set_group_list_static(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len);
 
 /**
  * Remove all Observers from a Subject and free allocated memory, and delete
@@ -331,7 +378,9 @@ void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], 
  * @note            This can safely be called regardless of whether any Observers
  *                  added with `lv_subject_add_observer_obj()` or bound to a Widget Property
  *                  with one of the `..._bind_...()` functions.
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create`/`lv_subject_delete` instead
  */
+LV_DEPRECATED("The subject init API is deprecated, use `lv_subject_create`/`lv_subject_delete` instead")
 void lv_subject_deinit(lv_subject_t * subject);
 
 /**

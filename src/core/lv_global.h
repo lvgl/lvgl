@@ -121,6 +121,11 @@ typedef struct _lv_global_t {
 
     lv_draw_global_info_t draw_info;
     lv_ll_t draw_sw_blend_handler_ll;
+
+#if LV_USE_OBSERVER
+    lv_ll_t subject_ll;
+#endif
+
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif

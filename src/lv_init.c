@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "core/lv_observer_private.h"
 #include "lvgl_public.h"
 #include "misc/lv_timer_private.h"
 #include "debugging/profiler/lv_profiler_builtin_private.h"
@@ -172,6 +173,10 @@ void lv_init(void)
     lv_mem_init();
 
     lv_draw_buf_init_handlers();
+
+#if LV_USE_OBSERVER
+    lv_subject_global_init();
+#endif
 
 #if LV_USE_SPAN != 0
     lv_span_stack_init();
@@ -499,6 +504,10 @@ void lv_deinit(void)
 #endif
 
     lv_fs_deinit();
+
+#if LV_USE_OBSERVER
+    lv_subject_global_deinit();
+#endif
 
     lv_mem_deinit();
 

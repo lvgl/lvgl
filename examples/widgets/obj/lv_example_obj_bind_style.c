@@ -19,7 +19,7 @@ void lv_example_obj_bind_style(void)
 {
     static lv_style_t style_dark;
 
-    static lv_subject_t subject_flag;
+    static lv_subject_t * subject_flag;
 
     static bool inited = false;
 
@@ -29,7 +29,8 @@ void lv_example_obj_bind_style(void)
         lv_style_set_text_color(&style_dark, lv_color_hex(0xf9fafb));
         lv_style_set_border_color(&style_dark, lv_color_hex(0x4b5563));
 
-        lv_subject_init_int(&subject_flag, 0);
+        subject_flag = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_int(subject_flag, 0);
         inited = true;
     }
 
@@ -46,7 +47,7 @@ void lv_example_obj_bind_style(void)
     lv_obj_set_style_pad_all(container, 16, 0);
     lv_obj_set_style_radius(container, 8, 0);
     lv_obj_set_style_border_width(container, 1, 0);
-    lv_obj_bind_style(container, &style_dark, 0, &subject_flag, 1);
+    lv_obj_bind_style(container, &style_dark, 0, subject_flag, 1);
     lv_obj_t * label_1 = lv_label_create(container);
     lv_obj_set_align(label_1, LV_ALIGN_CENTER);
     lv_label_set_text(label_1, "Panel content");
@@ -56,6 +57,6 @@ void lv_example_obj_bind_style(void)
     lv_obj_set_align(label_2, LV_ALIGN_CENTER);
     lv_label_set_text(label_2, "Toggle theme");
 
-    lv_obj_add_subject_toggle_event(button, &subject_flag, LV_EVENT_CLICKED);
+    lv_obj_add_subject_toggle_event(button, subject_flag, LV_EVENT_CLICKED);
 }
 #endif
