@@ -98,7 +98,9 @@ void lv_windows_platform_init(void)
     window_class.lpszMenuName = NULL;
     window_class.lpszClassName = L"LVGL.Window";
     window_class.hIconSm = NULL;
-    LV_ASSERT(RegisterClassExW(&window_class));
+    ATOM window_class_atom = RegisterClassExW(&window_class);
+    LV_ASSERT(window_class_atom != 0);
+    LV_UNUSED(window_class_atom);
 }
 
 lv_windows_window_context_t * lv_windows_get_window_context(
@@ -270,6 +272,13 @@ static void lv_windows_display_timer_callback(lv_timer_t * timer)
                 NULL,
                 (uint32_t)context->display_framebuffer_size,
                 LV_DISPLAY_RENDER_MODE_DIRECT);
+
+            /* The new FB is blank. lv_display_set_resolution()
+             * above only invalidates when the resolution changes,
+             * minimize/restore window keeps the same size, so we need an
+             * explicit invalidation */
+            lv_obj_invalidate(lv_display_get_screen_active(
+                                  context->display_device_object));
         }
     }
 
@@ -502,21 +511,27 @@ static bool lv_windows_window_message_callback_nolock(
                                                     lv_windows_display_timer_callback,
                                                     LV_DEF_REFR_PERIOD,
                                                     context);
+                if(!context->display_timer_object) {
+                    return -1;
+                }
 
                 context->display_resolution_changed = false;
                 context->requested_display_resolution.x = 0;
                 context->requested_display_resolution.y = 0;
 
-                context->display_device_object = lv_display_create(0, 0);
+                RECT request_content_size;
+                if(context->simulator_mode) {
+                    GetWindowRect(hWnd, &request_content_size);
+                }
+                else {
+                    GetClientRect(hWnd, &request_content_size);
+                }
+                context->display_device_object = lv_display_create(
+                                                     request_content_size.right - request_content_size.left,
+                                                     request_content_size.bottom - request_content_size.top);
                 if(!context->display_device_object) {
                     return -1;
                 }
-                RECT request_content_size;
-                GetWindowRect(hWnd, &request_content_size);
-                lv_display_set_resolution(
-                    context->display_device_object,
-                    request_content_size.right - request_content_size.left,
-                    request_content_size.bottom - request_content_size.top);
                 lv_display_set_flush_cb(
                     context->display_device_object,
                     lv_windows_display_driver_flush_callback);
@@ -542,6 +557,20 @@ static bool lv_windows_window_message_callback_nolock(
                 lv_windows_register_touch_window(hWnd, 0);
 
                 lv_windows_enable_child_window_dpi_message(hWnd);
+
+                /* Build the frame buffer now so the display is usable when
+                 * lv_windows_create_display() returns. Simulator mode has
+                 * already armed the fields below, hence the guard. */
+                if(!context->display_resolution_changed) {
+                    context->display_resolution_changed = true;
+                    context->requested_display_resolution.x =
+                        lv_display_get_horizontal_resolution(
+                            context->display_device_object);
+                    context->requested_display_resolution.y =
+                        lv_display_get_vertical_resolution(
+                            context->display_device_object);
+                }
+                lv_windows_display_timer_callback(context->display_timer_object);
 
                 break;
             }

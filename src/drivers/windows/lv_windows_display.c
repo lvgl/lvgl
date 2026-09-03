@@ -166,7 +166,9 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
     ShowWindow(window_handle, SW_SHOW);
     UpdateWindow(window_handle);
 
-    LV_ASSERT(SetEvent(data->mutex));
+    BOOL event_set = SetEvent(data->mutex);
+    LV_ASSERT(event_set);
+    LV_UNUSED(event_set);
 
     data = NULL;
 

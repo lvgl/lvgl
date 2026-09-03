@@ -370,12 +370,6 @@ void lv_display_refr_timer(lv_timer_t * timer)
 
     if(timer) {
         disp_refr = timer->user_data;
-        /* Ensure the timer does not run again automatically.
-         * This is done before refreshing in case refreshing invalidates something else.
-         * However if the performance monitor is enabled keep the timer running to count the FPS.*/
-#if !LV_USE_PERF_MONITOR
-        lv_timer_pause(timer);
-#endif
     }
     else {
         disp_refr = lv_display_get_default();
@@ -393,6 +387,15 @@ void lv_display_refr_timer(lv_timer_t * timer)
         LV_PROFILER_REFR_END;
         return;
     }
+
+    /* Ensure the timer does not run again automatically.
+     * This is done before refreshing in case refreshing invalidates something else.
+     * However if the performance monitor is enabled keep the timer running to count the FPS.
+     * Pause here where the draw buffer exists otherwise lv_display_refr_timer() may not be
+     * called again which would yield a blank screen */
+#if !LV_USE_PERF_MONITOR
+    if(timer) lv_timer_pause(timer);
+#endif
 
     lv_result_t res = lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
     if(res == LV_RESULT_INVALID) {
