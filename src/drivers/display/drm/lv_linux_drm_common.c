@@ -51,9 +51,10 @@ static char * find_by_drm_dev(void);
 
 char * lv_linux_drm_find_device_path(void)
 {
-    char * card_path;
-    if((card_path = find_by_class()))
+    char * card_path = find_by_class();
+    if(card_path) {
         return card_path;
+    }
     return find_by_drm_dev();
 }
 
@@ -69,37 +70,49 @@ static char * find_by_drm_dev(void)
     }
     struct dirent * ent;
     while((ent = readdir(d)) != NULL) {
-        if(!lv_strcmp(ent->d_name, ".")
-           || !lv_strcmp(ent->d_name, "..")
-           || lv_strncmp(ent->d_name, "card", 4))
+        if(lv_streq(ent->d_name, ".")
+           || lv_streq(ent->d_name, "..")
+           || lv_strncmp(ent->d_name, "card", 4)) {
             continue;
+        }
 
         const size_t buf_size = lv_strlen(LV_DRM_CARD_DIR "/") + lv_strlen(ent->d_name) + 1;
         char * card_path = lv_zalloc(buf_size);
-        if(!card_path)
+        LV_ASSERT_MALLOC(card_path);
+        if(!card_path) {
             continue;
+        }
         lv_snprintf(card_path, buf_size, LV_DRM_CARD_DIR "/%s", ent->d_name);
+        LV_LOG_TRACE("Card %s", card_path);
         int fd = open(card_path, O_RDWR);
 
-        if(fd < 0)
+        if(fd < 0) {
+            LV_LOG_TRACE("\tOpen failed");
             goto open_fail;
+        }
 
-        if(fcntl(fd, F_SETFD, FD_CLOEXEC) < 0)
+        if(fcntl(fd, F_SETFD, FD_CLOEXEC) < 0) {
+            LV_LOG_TRACE("\tfcntl failed");
             goto get_res_fail;
+        }
 
         drmModeRes * res = drmModeGetResources(fd);
-        if(!res)
+        if(!res) {
+            LV_LOG_TRACE("\tdrmModeGetResources failed");
             goto get_res_fail;
+        }
 
         for(int i = 0; i < res->count_connectors; i++) {
             drmModeConnector * conn = drmModeGetConnector(fd, res->connectors[i]);
-            if(!conn)
+            if(!conn) {
                 continue;
+            }
             if(conn->connection == DRM_MODE_CONNECTED) {
                 drmModeFreeConnector(conn);
                 drmModeFreeResources(res);
                 close(fd);
                 closedir(d);
+                LV_LOG_TRACE("\tOK");
                 return card_path;
             }
             drmModeFreeConnector(conn);
