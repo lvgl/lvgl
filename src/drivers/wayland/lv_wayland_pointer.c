@@ -167,12 +167,33 @@ void lv_wayland_seat_pointer_delete(lv_wl_seat_pointer_t * seat_pointer)
  *   STATIC FUNCTIONS
  **********************/
 
+/* The seat has a single pointer shared by every window, only the window the
+ * pointer currently hovers over may report its position and buttons */
+static bool is_indev_focused(lv_indev_t * indev, const lv_wl_seat_pointer_t * seat_pointer)
+{
+    LV_ASSERT(indev != NULL);
+    lv_display_t * disp = lv_indev_get_display(indev);
+    if(!disp) {
+        return false;
+    }
+    lv_wl_window_t * window = lv_display_get_driver_data(disp);
+    LV_ASSERT(window != NULL);
+    return window->body == seat_pointer->focused_surface;
+}
+
 static void pointeraxis_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_ASSERT(indev != NULL);
     LV_ASSERT(data != NULL);
+
+    data->state = LV_INDEV_STATE_RELEASED;
+    data->enc_diff = 0;
     lv_wl_seat_pointer_t * seat_pointer = lv_indev_get_driver_data(indev);
     if(!seat_pointer) {
+        return;
+    }
+
+    if(!is_indev_focused(indev, seat_pointer)) {
         return;
     }
 
@@ -189,6 +210,12 @@ static void pointer_read(lv_indev_t * indev, lv_indev_data_t * data)
     if(!seat_pointer) {
         return;
     }
+
+    data->state = LV_INDEV_STATE_RELEASED;
+    if(!is_indev_focused(indev, seat_pointer)) {
+        return;
+    }
+
     data->point = seat_pointer->point;
     data->state = seat_pointer->left_btn_state;
 }
@@ -197,11 +224,11 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
                                  wl_fixed_t sx, wl_fixed_t sy)
 {
     LV_UNUSED(data);
-    LV_UNUSED(surface);
     lv_wl_seat_pointer_t * seat_pointer = wl_pointer_get_user_data(pointer);
     int pos_x = wl_fixed_to_int(sx);
     int pos_y = wl_fixed_to_int(sy);
 
+    seat_pointer->focused_surface = surface;
     seat_pointer->point.x = pos_x;
     seat_pointer->point.y = pos_y;
 
@@ -220,8 +247,17 @@ static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint3
 {
     LV_UNUSED(data);
     LV_UNUSED(serial);
-    LV_UNUSED(surface);
-    LV_UNUSED(pointer);
+
+    lv_wl_seat_pointer_t * seat_pointer = wl_pointer_get_user_data(pointer);
+    if(seat_pointer->focused_surface != surface) {
+        return;
+    }
+
+    seat_pointer->left_btn_state = LV_INDEV_STATE_RELEASED;
+    seat_pointer->right_btn_state = LV_INDEV_STATE_RELEASED;
+    seat_pointer->wheel_btn_state = LV_INDEV_STATE_RELEASED;
+    seat_pointer->wheel_diff = 0;
+    seat_pointer->focused_surface = NULL;
 }
 
 static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)

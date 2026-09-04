@@ -46,12 +46,23 @@ typedef struct {
     struct wl_pointer * wl_pointer;
     struct wl_surface * cursor_surface;
     struct wl_cursor_theme * cursor_theme;
+
+    /* The surface the pointer currently hovers over, NULL if none */
+    struct wl_surface * focused_surface;
+
     lv_point_t point;
     lv_indev_state_t left_btn_state;
     lv_indev_state_t right_btn_state;
     lv_indev_state_t wheel_btn_state;
     int16_t wheel_diff;
 } lv_wl_seat_pointer_t;
+
+typedef struct {
+    int32_t id;                  /* Wayland touch point ID */
+    struct wl_surface * surface; /* The surface this touch point belongs to */
+    lv_point_t point;            /* Last known coordinates */
+    lv_indev_state_t state;      /* PRESSED or RELEASED */
+} lv_wl_touch_point_t;
 
 typedef struct {
     struct wl_touch * wl_touch;
@@ -61,8 +72,8 @@ typedef struct {
     uint8_t event_cnt;
     uint8_t primary_id;
 #else
-    lv_point_t point;
-    lv_indev_state_t state;
+    /* Active touch points (lv_wl_touch_point_t), one per finger on screen */
+    lv_ll_t touch_point_ll;
 #endif /*LV_USE_GESTURE_RECOGNITION*/
 } lv_wl_seat_touch_t;
 
@@ -71,6 +82,8 @@ typedef struct {
     struct xkb_context * xkb_context;
     struct xkb_keymap * xkb_keymap;
     struct xkb_state * xkb_state;
+    /* The surface that currently has keyboard focus, NULL if none */
+    struct wl_surface * focused_surface;
 
     struct {
         lv_key_t key;
