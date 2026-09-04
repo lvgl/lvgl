@@ -543,6 +543,8 @@
 /** Accelerate blends, fills, images and text with the EPIC (Enhanced
  *  Pixel Image Compositor) engine of SiFli BF0 SoCs. Unsupported
  *  operations fall back to software rendering.
+ *
+ *  Enable: LV_USE_DRAW_SW
  */
 #define LV_USE_SIFLI_EPIC 0
 

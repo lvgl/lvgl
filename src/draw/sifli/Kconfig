@@ -1,6 +1,7 @@
 config LV_USE_SIFLI_EPIC
 	bool "SiFli EPIC renderer"
 	default n
+	select LV_USE_DRAW_SW
 	help
 		Accelerate blends, fills, images and text with the EPIC (Enhanced
 		Pixel Image Compositor) engine of SiFli BF0 SoCs. Unsupported
