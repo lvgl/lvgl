@@ -558,17 +558,19 @@ void test_dropdown_content_size()
     lv_dropdown_set_selected(dd, 2);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_content_size_3.png");
 }
-/* The open list has to stay under the button, no matter the base direction of the screen.
+/* The open list has to touch the button, no matter the base direction of the screen
+ * or whether it opens downwards or upwards.
  * See https://github.com/lvgl/lvgl/issues/10254 */
-static void dropdown_list_position_test(lv_base_dir_t base_dir)
+static void dropdown_list_position_test(lv_base_dir_t base_dir, int32_t x, int32_t y)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_style_base_dir(screen, base_dir, LV_PART_MAIN);
 
     lv_obj_t * dd = lv_dropdown_create(screen);
     lv_dropdown_set_options(dd, "Option 1\nA considerably longer option");
+    lv_obj_set_ignore_layout(dd, true);
     lv_obj_set_width(dd, 100);
-    lv_obj_set_pos(dd, 30, 20);
+    lv_obj_set_pos(dd, x, y);
 
     lv_dropdown_open(dd);
     lv_obj_update_layout(screen);
@@ -587,18 +589,27 @@ static void dropdown_list_position_test(lv_base_dir_t base_dir)
     else {
         TEST_ASSERT_EQUAL_INT32(dd_coords.x1, list_coords.x1);
     }
-    TEST_ASSERT_EQUAL_INT32(dd_coords.y2 + 1, list_coords.y1);
+
+    /*The list has to touch the button, no matter if it's opened downwards or upwards*/
+    if(list_coords.y1 > dd_coords.y1) {
+        TEST_ASSERT_EQUAL_INT32(dd_coords.y2 + 1, list_coords.y1);
+    }
+    else {
+        TEST_ASSERT_EQUAL_INT32(dd_coords.y1 - 1, list_coords.y2);
+    }
 }
 
 void test_dropdown_list_position_ltr(void)
 {
-    dropdown_list_position_test(LV_BASE_DIR_LTR);
+    dropdown_list_position_test(LV_BASE_DIR_LTR, 300, 10);
+    dropdown_list_position_test(LV_BASE_DIR_LTR, 300, 400);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_list_position_ltr.png")
 }
 
 void test_dropdown_list_position_rtl(void)
 {
-    dropdown_list_position_test(LV_BASE_DIR_RTL);
+    dropdown_list_position_test(LV_BASE_DIR_RTL, 300, 10);
+    dropdown_list_position_test(LV_BASE_DIR_RTL, 300, 400);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_list_position_rtl.png")
     lv_obj_set_style_base_dir(lv_screen_active(), LV_BASE_DIR_LTR, LV_PART_MAIN);
 }

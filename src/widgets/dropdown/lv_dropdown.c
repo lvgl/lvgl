@@ -56,7 +56,7 @@ static void list_press_handler(lv_obj_t * page);
 static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y);
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en);
 static lv_obj_t * get_label(const lv_obj_t * obj);
-static void dropdown_list_align(lv_dropdown_t * dropdown, lv_area_t coord);
+static void dropdown_list_align_bidi(lv_dropdown_t * dropdown, lv_dir_t dir);
 
 #if LV_USE_OBSERVER
     static void dropdown_value_changed_event_cb(lv_event_t * e);
@@ -610,10 +610,14 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     if(list_h > list_fit_h) list_h = list_fit_h;
     lv_obj_set_height(dropdown->list, list_h);
 
+    /*Update the layout to know the real size of the list. It can be smaller than `list_h`
+     *e.g. if a `max_height` style is applied on it.*/
+    lv_obj_update_layout(dropdown->list);
+
     position_to_selected(dropdown_obj, LV_ANIM_OFF);
 
-    if(dir == LV_DIR_BOTTOM)     dropdown_list_align(dropdown, dropdown_obj->coords);
-    else if(dir == LV_DIR_TOP)   lv_obj_align_to(dropdown->list, dropdown_obj, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
+    if(dir == LV_DIR_BOTTOM)     dropdown_list_align_bidi(dropdown, LV_DIR_BOTTOM);
+    else if(dir == LV_DIR_TOP)   dropdown_list_align_bidi(dropdown, LV_DIR_TOP);
     else if(dir == LV_DIR_LEFT)  lv_obj_align_to(dropdown->list, dropdown_obj, LV_ALIGN_OUT_LEFT_TOP, 0, 0);
     else if(dir == LV_DIR_RIGHT) lv_obj_align_to(dropdown->list, dropdown_obj, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
@@ -1403,29 +1407,32 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
     return lv_obj_get_child(dropdown->list, 0);
 }
 
-static void dropdown_list_align(lv_dropdown_t * dropdown, lv_area_t coord)
+static void dropdown_list_align_bidi(lv_dropdown_t * dropdown, lv_dir_t dir)
 {
-    int32_t offset, pos_x;
+    LV_ASSERT(dir == LV_DIR_TOP || dir == LV_DIR_BOTTOM);
+
+    int32_t x_offset, pos_x;
+    lv_area_t * coord = &dropdown->obj.coords;
+
+    bool rtl = lv_obj_get_style_base_dir(dropdown->list, LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     lv_obj_t * list_parent = lv_obj_get_parent(dropdown->list);
-    bool rtl = lv_obj_get_style_base_dir(list_parent, LV_PART_MAIN) == LV_BASE_DIR_RTL;
-
     int32_t scroll_x = lv_obj_get_scroll_x(list_parent);
     int32_t space_left = lv_obj_get_style_space_left(list_parent, LV_PART_MAIN);
 
     if(rtl) {
-        offset = coord.x2 - lv_obj_get_width(dropdown->list) + 1;
+        x_offset = coord->x2 - lv_obj_get_width(dropdown->list) + 1;
         pos_x = (list_parent->coords.x1 + space_left - scroll_x) +
-                (lv_obj_get_content_width(list_parent) - lv_obj_get_width(dropdown->list) - offset);
+                (lv_obj_get_content_width(list_parent) - lv_obj_get_width(dropdown->list) - x_offset);
     }
     else {
-        offset = coord.x1;
-        pos_x = offset - list_parent->coords.x1 - space_left + scroll_x;
+        x_offset = coord->x1;
+        pos_x = x_offset - list_parent->coords.x1 - space_left + scroll_x;
     }
 
-
     lv_obj_set_x(dropdown->list, pos_x);
-    lv_obj_set_y(dropdown->list, coord.y2 + 1);
+    if(dir == LV_DIR_BOTTOM) lv_obj_set_y(dropdown->list, coord->y2 + 1);
+    else lv_obj_set_y(dropdown->list, coord->y1 - lv_obj_get_height(dropdown->list));
 }
 
 #if LV_USE_OBSERVER
