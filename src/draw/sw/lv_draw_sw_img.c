@@ -486,10 +486,22 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
     bool has_colorkey = draw_dsc->colorkey != NULL;
 
     lv_color_format_t cf_final = cf;
-    if(cf_final == LV_COLOR_FORMAT_RGB888 || cf_final == LV_COLOR_FORMAT_XRGB8888) cf_final = LV_COLOR_FORMAT_ARGB8888;
+    /*RGB888/XRGB8888 gain an alpha channel: the transform fades the edge pixels. That alpha
+     *is straight, so these must not be flagged premultiplied.*/
+    if(cf_final == LV_COLOR_FORMAT_RGB888 || cf_final == LV_COLOR_FORMAT_XRGB8888) {
+        cf_final = LV_COLOR_FORMAT_ARGB8888;
+    }
     else if(cf_final == LV_COLOR_FORMAT_RGB565 ||
             cf_final == LV_COLOR_FORMAT_RGB565_SWAPPED) cf_final = LV_COLOR_FORMAT_RGB565A8;
     else if(cf_final == LV_COLOR_FORMAT_L8) cf_final = LV_COLOR_FORMAT_AL88;
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+    /*Antialiasing an image that has an alpha channel is only correct in premultiplied space,
+     *so that is what the filter works in and what it writes out. Without the antialiasing the
+     *pixels are copied as they are and stay straight.*/
+    else if(cf_final == LV_COLOR_FORMAT_ARGB8888 && draw_dsc->antialias) {
+        cf_final = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+    }
+#endif
 
     uint8_t * transformed_buf;
     int32_t buf_h;

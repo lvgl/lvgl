@@ -96,6 +96,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     LV_ASSERT(font != NULL);
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     LV_ASSERT(fdsc != NULL);
+
     uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
@@ -121,97 +122,73 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+        LV_ASSERT_FORMAT_MSG(fdsc->bpp == 1 || fdsc->bpp == 2 || fdsc->bpp == 4 || fdsc->bpp == 8, "bpp was %d", fdsc->bpp);
+
         const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
         if(bitmap_in == NULL) return NULL;
 
         uint8_t * bitmap_out_tmp = bitmap_out;
-        int32_t i = 0;
         int32_t x, y;
         uint32_t stride_out = lv_draw_buf_width_to_stride(gdsc->box_w, LV_COLOR_FORMAT_A8);
-        if(fdsc->bpp == 1) {
-            for(y = 0; y < gdsc->box_h; y ++) {
-                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
-                for(x = 0; x < gdsc->box_w; x++, i++) {
-                    i = i & 0x7;
-                    if(i == 0) bitmap_out_tmp[x] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
-                    else if(i == 1) bitmap_out_tmp[x] = (*bitmap_in) & 0x40 ? 0xff : 0x00;
-                    else if(i == 2) bitmap_out_tmp[x] = (*bitmap_in) & 0x20 ? 0xff : 0x00;
-                    else if(i == 3) bitmap_out_tmp[x] = (*bitmap_in) & 0x10 ? 0xff : 0x00;
-                    else if(i == 4) bitmap_out_tmp[x] = (*bitmap_in) & 0x08 ? 0xff : 0x00;
-                    else if(i == 5) bitmap_out_tmp[x] = (*bitmap_in) & 0x04 ? 0xff : 0x00;
-                    else if(i == 6) bitmap_out_tmp[x] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
-                    else if(i == 7) {
-                        bitmap_out_tmp[x] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
-                        line_rem--;
-                        bitmap_in++;
-                    }
-                }
-                /*Handle stride*/
-                if(stride_in) {
-                    i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
-                }
-                bitmap_out_tmp += stride_out;
-            }
-        }
-        else if(fdsc->bpp == 2) {
-            for(y = 0; y < gdsc->box_h; y ++) {
-                uint32_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
-                for(x = 0; x < gdsc->box_w; x++, i++) {
-                    i = i & 0x3;
-                    if(i == 0) bitmap_out_tmp[x] = opa2_table[(*bitmap_in) >> 6];
-                    else if(i == 1) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 4) & 0x3];
-                    else if(i == 2) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 2) & 0x3];
-                    else if(i == 3) {
-                        bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 0) & 0x3];
-                        line_rem--;
-                        bitmap_in++;
-                    }
-                }
+        /*Whole source bytes are read at a time, so a pixel costs a shift and a table lookup
+         *instead of walking a compare chain. `shift` carries the bit position between rows,
+         *because without a stride the rows are packed continuously.*/
+        int32_t shift = 8;
+        uint8_t cur = 0;
 
-                /*Handle stride*/
-                if(stride_in) {
-                    i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
+        for(y = 0; y < gdsc->box_h; y++) {
+            uint32_t used = 0;
+            if(stride_in) shift = 8;    /*with a stride every row starts on a byte boundary*/
+
+            if(fdsc->bpp == 4) {
+                x = 0;
+                if(shift == 4) {        /*the row starts mid byte, finish the low nibble*/
+                    bitmap_out_tmp[x++] = opa4_table[cur & 0xF];
+                    shift = 8;
                 }
-                bitmap_out_tmp += stride_out;
+                for(; x + 1 < gdsc->box_w; x += 2) {
+                    cur = *bitmap_in++;
+                    used++;
+                    bitmap_out_tmp[x] = opa4_table[cur >> 4];
+                    bitmap_out_tmp[x + 1] = opa4_table[cur & 0xF];
+                }
+                if(x < gdsc->box_w) {   /*odd width, the low nibble belongs to the next row*/
+                    cur = *bitmap_in++;
+                    used++;
+                    bitmap_out_tmp[x] = opa4_table[cur >> 4];
+                    shift = 4;
+                }
+            }
+            else if(fdsc->bpp == 8) {
+                for(x = 0; x < gdsc->box_w; x++) bitmap_out_tmp[x] = *bitmap_in++;
+                used = gdsc->box_w;
+            }
+            else if(fdsc->bpp == 1 || fdsc->bpp == 2) {
+                int32_t per = 8 / fdsc->bpp;
+                uint32_t mask = (1u << fdsc->bpp) - 1u;
+                x = 0;
+                while(x < gdsc->box_w) {
+                    if(shift >= 8) {
+                        cur = *bitmap_in++;
+                        used++;
+                        shift = 0;
+                    }
+                    int32_t n = per - shift / fdsc->bpp;
+                    if(n > gdsc->box_w - x) n = gdsc->box_w - x;
+                    while(n--) {
+                        uint32_t v = (cur >> (8 - fdsc->bpp - shift)) & mask;
+                        bitmap_out_tmp[x++] = fdsc->bpp == 1 ? (v ? 0xff : 0x00) : opa2_table[v];
+                        shift += fdsc->bpp;
+                    }
+                }
+                if(shift >= 8) shift = 8;
             }
 
-        }
-        else if(fdsc->bpp == 4) {
-            for(y = 0; y < gdsc->box_h; y ++) {
-                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
-                for(x = 0; x < gdsc->box_w; x++, i++) {
-                    i = i & 0x1;
-                    if(i == 0) {
-                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) >> 4];
-                    }
-                    else if(i == 1) {
-                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) & 0xF];
-                        line_rem--;
-                        bitmap_in++;
-                    }
-                }
-
-                /*Handle stride*/
-                if(stride_in) {
-                    i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
-                }
-                bitmap_out_tmp += stride_out;
+            if(stride_in) {
+                bitmap_in += stride_in - used;
+                shift = 8;
             }
-        }
-        else if(fdsc->bpp == 8) {
-            for(y = 0; y < gdsc->box_h; y ++) {
-                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
-                for(x = 0; x < gdsc->box_w; x++, i++) {
-                    bitmap_out_tmp[x] = *bitmap_in;
-                    line_rem--;
-                    bitmap_in++;
-                }
-                bitmap_out_tmp += stride_out;
-                bitmap_in += line_rem;
-            }
+            bitmap_out_tmp += stride_out;
         }
 
         glyph_bitmap_release(fdsc);

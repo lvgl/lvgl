@@ -77,12 +77,182 @@ struct _lv_draw_sw_blend_image_dsc_t {
 
 
 /**********************
+ *      MACROS
+ **********************/
+
+/**
+ * Read or write four bytes of a pixel or mask buffer as one word. The caller must align the
+ * pointer to a word first.
+ *
+ * Through a union and not a cast: C99 6.5p7 lets an object be accessed through an aggregate
+ * that has its type among the members, `*(uint32_t *)ptr` on a `uint8_t` or `uint16_t` buffer
+ * is undefined and GCC 13 at -O2 really does keep a stale half word across it.
+ */
+typedef union {
+    uint32_t u32;
+    uint16_t u16[2];
+    uint8_t u8[4];
+    lv_color32_t c32;
+} lv_draw_sw_word_t;
+
+/** The same for two bytes, for the RGB565 buffers. */
+typedef union {
+    uint16_t u16;
+    uint8_t u8[2];
+    lv_color16_t c16;
+} lv_draw_sw_halfword_t;
+
+/**
+ * Prepare an RGB565 color for mixing: spread it over 32 bits so each channel gets room to
+ * grow and a whole pixel can be mixed with one multiplication.
+ * See https://stackoverflow.com/a/50012418/1999969
+ */
+#define LV_COLOR_MIX_16_PREPARE(c) ((((uint32_t)(c)) | (((uint32_t)(c)) << 16)) & 0x07E0F81Fu)
+
+/**
+ * Convert RGB888 to RGB565.
+ */
+#define LV_COLOR_24_TO_16(c1) \
+    ((uint16_t)((((c1)[2] & 0xF8) << 8) + (((c1)[1] & 0xFC) << 3) + (((c1)[0] & 0xF8) >> 3)))
+
+/**
+ * Mix a prepared foreground into an RGB565 background. `mix` must be 1..254, the
+ * callers handle 0 and 255 themselves. `res` may be the same variable as `bg`.
+ * A macro and not a function because -Os inlines neither, and this runs on every pixel.
+ * See https://stackoverflow.com/a/50012418/1999969
+ */
+#define LV_COLOR_MIX_16_TO_16_PREPARED(res, fg_prep, bg, mix)                               \
+    do {                                                                                    \
+        uint32_t bg_prep_ = LV_COLOR_MIX_16_PREPARE(bg);                                    \
+        uint32_t mix5_ = ((uint32_t)(mix) + 4) >> 3;                                        \
+        uint32_t res_ = (((((fg_prep) - bg_prep_) * mix5_) >> 5) + bg_prep_) & 0x07E0F81Fu; \
+        (res) = (uint16_t)((res_ >> 16) | res_);                                            \
+    } while(0)
+
+/**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-/**********************
- *      MACROS
- **********************/
+/**
+ * Undo the alpha scaling of a premultiplied pixel, giving back a straight color.
+ * Shared so the output formats that need it can't drift apart.
+ * @param c     a premultiplied pixel
+ * @return      the same pixel with straight channels
+ */
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color32_unpremultiply(lv_color32_t c)
+{
+    if(c.alpha == 0) {
+        c.red = 0;
+        c.green = 0;
+        c.blue = 0;
+    }
+    else if(c.alpha != LV_OPA_COVER) {
+        uint32_t reciprocal = (255u * 256u) / c.alpha;
+        uint32_t r = (c.red * reciprocal) >> 8;
+        uint32_t g = (c.green * reciprocal) >> 8;
+        uint32_t b = (c.blue * reciprocal) >> 8;
+        c.red = (uint8_t)(r > 255 ? 255 : r);
+        c.green = (uint8_t)(g > 255 ? 255 : g);
+        c.blue = (uint8_t)(b > 255 ? 255 : b);
+    }
+
+    return c;
+}
+
+/**
+ * Luminance of an image pixel for the grayscale and indexed outputs. A premultiplied source
+ * has its channels already scaled by its alpha, so undo that first to get the same value a
+ * straight source would give.
+ * @param c                 the pixel
+ * @param premultiplied     true: `c` is premultiplied
+ * @return                  the luminance, 0..255
+ */
+static inline uint8_t LV_ATTRIBUTE_FAST_MEM lv_color32_lumi_of(lv_color32_t c, bool premultiplied)
+{
+    if(!premultiplied || c.alpha == 0 || c.alpha == LV_OPA_COVER) return lv_color32_luminance(c);
+
+    uint32_t lumi = (lv_color32_luminance(c) * ((255u * 256u) / c.alpha)) >> 8;
+    return (uint8_t)(lumi > 255 ? 255 : lumi);
+}
+
+/**
+ * Inlined version of lv_color_16_16_mix() for the per-pixel blend loops.
+ * Identical to the public function, but being in a header it can be inlined
+ * and loop-invariant parts (e.g. a constant fill color) can be hoisted out of the loops.
+ * @param c1        the first color (typically the foreground color)
+ * @param c2        the second color (typically the background color)
+ * @param mix       0..255, the opacity of `c1`
+ * @return          the mixed color
+ */
+static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_16_16_mix_inlined(uint16_t c1, uint16_t c2, uint8_t mix)
+{
+    if(mix == 255) return c1;
+    if(mix == 0) return c2;
+    if(c1 == c2) return c1;
+
+    /* Source: https://stackoverflow.com/a/50012418/1999969*/
+    uint32_t mix5 = ((uint32_t)mix + 4) >> 3;
+
+    /*0x7E0F81F = 0b00000111111000001111100000011111*/
+    uint32_t bg = (uint32_t)(c2 | ((uint32_t)c2 << 16)) & 0x7E0F81F;
+    uint32_t fg = (uint32_t)(c1 | ((uint32_t)c1 << 16)) & 0x7E0F81F;
+    uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x7E0F81F;
+
+    return (uint16_t)((result >> 16) | result);
+}
+
+/**
+ * Inlined version of lv_color_mix32() for the per-pixel blend loops.
+ * Identical to the public function, but being in a header it can be inlined,
+ * sparing a function call per pixel.
+ * The channels are mixed independently on purpose: superscalar CPUs can compute
+ * them in parallel, which is faster than packing them into one 32 bit value.
+ * @param fg        the foreground color, fg.alpha is the mix ratio
+ * @param bg        the background color
+ * @return          the mixed color, the alpha of `bg` is kept
+ */
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_mix32_inlined(lv_color32_t fg, lv_color32_t bg)
+{
+    if(fg.alpha >= LV_OPA_MAX) {
+        fg.alpha = bg.alpha;
+        return fg;
+    }
+    if(fg.alpha <= LV_OPA_MIN) {
+        return bg;
+    }
+
+    uint32_t mix_inv = 255 - fg.alpha;
+    bg.red = (uint8_t)LV_UDIV255((uint32_t)fg.red * fg.alpha + (uint32_t)bg.red * mix_inv);
+    bg.green = (uint8_t)LV_UDIV255((uint32_t)fg.green * fg.alpha + (uint32_t)bg.green * mix_inv);
+    bg.blue = (uint8_t)LV_UDIV255((uint32_t)fg.blue * fg.alpha + (uint32_t)bg.blue * mix_inv);
+    return bg;
+}
+
+/**
+ * Inlined version of lv_color_mix32_premultiplied() for the per-pixel blend loops.
+ * The premultiplied foreground is added as is and the background is weighted
+ * with the remaining alpha.
+ * @param fg        the premultiplied foreground color, fg.alpha is the mix ratio
+ * @param bg        the background color
+ * @return          the mixed color with the alpha of `bg`, except for an (almost) opaque
+ *                  foreground where `fg` is returned as it is, so its alpha is kept
+ */
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_mix32_premultiplied_inlined(lv_color32_t fg,
+                                                                                      lv_color32_t bg)
+{
+    if(fg.alpha >= LV_OPA_MAX) {
+        return fg;
+    }
+    if(fg.alpha <= LV_OPA_MIN) {
+        return bg;
+    }
+
+    uint32_t mix_inv = LV_OPA_MAX - fg.alpha;
+    bg.red = (uint8_t)(fg.red + (((uint32_t)bg.red * mix_inv) >> 8));
+    bg.green = (uint8_t)(fg.green + (((uint32_t)bg.green * mix_inv) >> 8));
+    bg.blue = (uint8_t)(fg.blue + (((uint32_t)bg.blue * mix_inv) >> 8));
+    return bg;
+}
 
 #endif /* LV_USE_DRAW_SW */
 

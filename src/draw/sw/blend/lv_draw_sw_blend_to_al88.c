@@ -56,7 +56,8 @@ static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(lv_draw_sw_blend_imag
 #endif
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
-    static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc,
+                                                             bool premultiplied);
 #endif
 
 static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
@@ -314,7 +315,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_al88(lv_draw_sw_blend_image
 #endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888
         case LV_COLOR_FORMAT_ARGB8888:
-            argb8888_image_blend(dsc);
+            argb8888_image_blend(dsc, false);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            argb8888_image_blend(dsc, true);
             break;
 #endif
 #if LV_DRAW_SW_SUPPORT_L8
@@ -812,7 +818,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
 
-static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc,
+                                                       bool premultiplied)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -836,7 +843,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
                         lv_color16a_t src_color;
-                        src_color.lumi = lv_color32_luminance(src_buf_c32[x]);
+                        src_color.lumi = lv_color32_lumi_of(src_buf_c32[x], premultiplied);
                         src_color.alpha = src_buf_c32[x].alpha;
                         lv_color_16a_16a_mix(src_color, &dest_buf_al88[x], &cache);
                     }
@@ -850,7 +857,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
                         lv_color16a_t src_color;
-                        src_color.lumi = lv_color32_luminance(src_buf_c32[x]);
+                        src_color.lumi = lv_color32_lumi_of(src_buf_c32[x], premultiplied);
                         src_color.alpha = LV_OPA_MIX2(src_buf_c32[x].alpha, opa);
                         lv_color_16a_16a_mix(src_color, &dest_buf_al88[x], &cache);
                     }
@@ -864,7 +871,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
                         lv_color16a_t src_color;
-                        src_color.lumi = lv_color32_luminance(src_buf_c32[x]);
+                        src_color.lumi = lv_color32_lumi_of(src_buf_c32[x], premultiplied);
                         src_color.alpha = LV_OPA_MIX2(src_buf_c32[x].alpha, mask_buf[x]);
                         lv_color_16a_16a_mix(src_color, &dest_buf_al88[x], &cache);
                     }
@@ -879,7 +886,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
                         lv_color16a_t src_color;
-                        src_color.lumi = lv_color32_luminance(src_buf_c32[x]);
+                        src_color.lumi = lv_color32_lumi_of(src_buf_c32[x], premultiplied);
                         src_color.alpha = LV_OPA_MIX3(src_buf_c32[x].alpha, mask_buf[x], opa);
                         lv_color_16a_16a_mix(src_color, &dest_buf_al88[x], &cache);
                     }
@@ -894,7 +901,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {
                 lv_color16a_t src_color;
-                src_color.lumi = lv_color32_luminance(src_buf_c32[x]);
+                src_color.lumi = lv_color32_lumi_of(src_buf_c32[x], premultiplied);
                 src_color.alpha = src_buf_c32[x].alpha;
                 if(mask_buf == NULL) src_color.alpha = LV_OPA_MIX2(src_color.alpha, opa);
                 else src_color.alpha = LV_OPA_MIX3(src_color.alpha, mask_buf[x], opa);

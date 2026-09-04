@@ -188,7 +188,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                         img_dsc.src = glyph_draw_dsc->glyph_data;
                         img_dsc.recolor = glyph_draw_dsc->color;
                         img_dsc.pivot = (lv_point_t) {
-                            .x = glyph_draw_dsc->pivot.x,
+                            .x = glyph_draw_dsc->pivot.x - glyph_draw_dsc->g->ofs_x,
                             .y = glyph_draw_dsc->g->box_h + glyph_draw_dsc->g->ofs_y
                         };
                         lv_draw_sw_image(t, &img_dsc, glyph_draw_dsc->letter_coords);

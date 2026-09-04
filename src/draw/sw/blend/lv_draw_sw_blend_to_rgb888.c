@@ -233,25 +233,102 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB888(dsc, dest_px_size)) {
             if(dest_px_size == 3) {
                 uint8_t * dest_buf_u8 = dsc->dest_buf;
-                uint8_t * dest_buf_ori = dsc->dest_buf;
                 w *= dest_px_size;
+#if LV_BIG_ENDIAN_SYSTEM == 0
+                /*4 pixels are exactly 3 words and the channel order inside a word repeats
+                 *every 3 words, so the whole area is written with word stores and never read
+                 *back. `role` is the byte offset of the word within that 3 byte cycle.*/
+                uint32_t k[3];
+                uint32_t b_ = dsc->color.blue, g_ = dsc->color.green, r_ = dsc->color.red;
+                k[0] = b_ | (g_ << 8) | (r_ << 16) | (b_ << 24);
+                k[1] = g_ | (r_ << 8) | (b_ << 16) | (g_ << 24);
+                k[2] = r_ | (b_ << 8) | (g_ << 16) | (r_ << 24);
 
-                for(x = 0; x < w; x += 3) {
-                    dest_buf_u8[x + 0] = dsc->color.blue;
-                    dest_buf_u8[x + 1] = dsc->color.green;
-                    dest_buf_u8[x + 2] = dsc->color.red;
+                /*Back to back rows are one long run*/
+                if((int32_t)dest_stride == w) {
+                    w *= h;
+                    h = 1;
                 }
 
-                dest_buf_u8 += dest_stride;
+                for(y = 0; y < h; y++) {
+                    uint8_t * dest = dest_buf_u8;
+                    uint8_t * dest_end = dest + w;
 
-                for(y = 1; y < h; y++) {
-                    lv_memcpy(dest_buf_u8, dest_buf_ori, w);
+                    /*Lead in until word aligned. Some targets can't do unaligned word
+                     *accesses at all, the rest are slow at it.*/
+                    uint32_t ofs = 0;
+                    while(dest < dest_end && ((lv_uintptr_t)dest & 0x3)) {
+                        *dest++ = (uint8_t)(k[ofs] & 0xFF);
+                        if(++ofs == 3) ofs = 0;
+                    }
+
+                    /*3 words are 4 whole pixels, so a block of 3 repeats forever and the
+                     *channel order never has to be advanced inside the loop*/
+                    uint32_t a0 = k[ofs];
+                    uint32_t a1 = k[ofs == 2 ? 0 : ofs + 1];
+                    uint32_t a2 = k[ofs == 0 ? 2 : ofs - 1];
+                    lv_draw_sw_word_t * dest_word = (lv_draw_sw_word_t *)dest;
+                    lv_draw_sw_word_t * dest_word_end = dest_word + (uint32_t)(dest_end - dest) / 4;
+
+                    while(dest_word + 12 <= dest_word_end) {
+                        dest_word[0].u32 = a0;
+                        dest_word[1].u32 = a1;
+                        dest_word[2].u32 = a2;
+                        dest_word[3].u32 = a0;
+                        dest_word[4].u32 = a1;
+                        dest_word[5].u32 = a2;
+                        dest_word[6].u32 = a0;
+                        dest_word[7].u32 = a1;
+                        dest_word[8].u32 = a2;
+                        dest_word[9].u32 = a0;
+                        dest_word[10].u32 = a1;
+                        dest_word[11].u32 = a2;
+                        dest_word += 12;
+                    }
+                    while(dest_word + 3 <= dest_word_end) {
+                        dest_word[0].u32 = a0;
+                        dest_word[1].u32 = a1;
+                        dest_word[2].u32 = a2;
+                        dest_word += 3;
+                    }
+                    if(dest_word < dest_word_end) {
+                        (dest_word++)->u32 = a0;
+                        a0 = a1;
+                        a1 = a2;
+                    }
+                    if(dest_word < dest_word_end) {
+                        (dest_word++)->u32 = a0;
+                        a0 = a1;
+                    }
+
+                    /*At most 3 bytes left, and `a0` already starts on the right channel*/
+                    dest = (uint8_t *)dest_word;
+                    while(dest < dest_end) {
+                        *dest++ = (uint8_t)(a0 & 0xFF);
+                        a0 >>= 8;
+                    }
+
                     dest_buf_u8 += dest_stride;
                 }
+#else
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x += 3) {
+                        dest_buf_u8[x + 0] = dsc->color.blue;
+                        dest_buf_u8[x + 1] = dsc->color.green;
+                        dest_buf_u8[x + 2] = dsc->color.red;
+                    }
+                    dest_buf_u8 += dest_stride;
+                }
+#endif
             }
             if(dest_px_size == 4) {
                 uint32_t color32 = lv_color_to_u32(dsc->color);
                 uint32_t * dest_buf_u32 = dsc->dest_buf;
+                /*Back to back rows are one long run*/
+                if((int32_t)dest_stride == w * 4) {
+                    w *= h;
+                    h = 1;
+                }
                 for(y = 0; y < h; y++) {
                     for(x = 0; x <= w - 16; x += 16) {
                         dest_buf_u32[x + 0] = color32;
@@ -286,15 +363,116 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
     /*Opacity only*/
     else if(mask == NULL && opa < LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA(dsc, dest_px_size)) {
-            uint32_t color32 = lv_color_to_u32(dsc->color);
             uint8_t * dest_buf = dsc->dest_buf;
             w *= dest_px_size;
-            for(y = 0; y < h; y++) {
-                for(x = 0; x < w; x += dest_px_size) {
-                    lv_color_24_24_mix((const uint8_t *)&color32, &dest_buf[x], opa);
-                }
 
-                dest_buf = drawbuf_next_row(dest_buf, dest_stride);
+            /*Every channel is `(fg * opa + bg * (255 - opa)) >> 8`, which stays below
+             *255 * 255, so two of them fit in the 16 bit halves of a word and blend with one
+             *multiplication. 4 pixels of a 24 bit buffer are exactly 3 aligned words, and the
+             *channel order inside a word repeats every 3 words. So 4 pixels cost 3 word
+             *accesses instead of 24 byte accesses.*/
+            uint32_t mix_inv = 255 - opa;
+            uint32_t fg_premult[3];
+            fg_premult[0] = (uint32_t)dsc->color.blue * opa;
+            fg_premult[1] = (uint32_t)dsc->color.green * opa;
+            fg_premult[2] = (uint32_t)dsc->color.red * opa;
+
+            if(dest_px_size == 3) {
+#if LV_BIG_ENDIAN_SYSTEM == 0
+                /*Constants for a word starting on channel `r`: k_lo for bytes 0 and 2,
+                 *k_hi for bytes 1 and 3*/
+                uint32_t k_lo[3];
+                uint32_t k_hi[3];
+                for(x = 0; x < 3; x++) {
+                    k_lo[x] = fg_premult[x] | (fg_premult[(x + 2) % 3] << 16);
+                    k_hi[x] = fg_premult[(x + 1) % 3] | (fg_premult[x] << 16);
+                }
+#endif
+#if LV_BIG_ENDIAN_SYSTEM == 0
+                /*Flat areas are common, so remember the last destination word and its result.
+                 *One per channel role, because the same bytes blend differently depending on
+                 *where the word starts. Seeded with 0 so the entry is always valid.*/
+                uint32_t last_d[3] = {0, 0, 0};
+                uint32_t last_res[3];
+                for(x = 0; x < 3; x++) {
+                    last_res[x] = ((k_lo[x] >> 8) & 0x00FF00FFu) | (((k_hi[x] >> 8) & 0x00FF00FFu) << 8);
+                }
+#endif
+                for(y = 0; y < h; y++) {
+                    uint32_t role = 0;
+                    x = 0;
+#if LV_BIG_ENDIAN_SYSTEM == 0
+                    /*Lead in until word aligned. Some targets can't do unaligned word
+                     *accesses at all, the rest are slow at it.*/
+                    while(x < w && ((lv_uintptr_t)(dest_buf + x) & 0x3)) {
+                        dest_buf[x] = (uint8_t)((fg_premult[role] + dest_buf[x] * mix_inv) >> 8);
+                        x++;
+                        if(++role == 3) role = 0;
+                    }
+                    for(; x <= w - 4; x += 4) {
+                        uint32_t d;
+                        d = ((const lv_draw_sw_word_t *)(dest_buf + x))->u32;
+                        uint32_t res;
+                        if(d == last_d[role]) {
+                            res = last_res[role];
+                        }
+                        else {
+                            uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo[role]) >> 8) & 0x00FF00FFu;
+                            uint32_t hi = (((((d >> 8) & 0x00FF00FFu) * mix_inv) + k_hi[role]) >> 8) & 0x00FF00FFu;
+                            res = lo | (hi << 8);
+                            last_d[role] = d;
+                            last_res[role] = res;
+                        }
+                        ((lv_draw_sw_word_t *)(dest_buf + x))->u32 = res;
+                        /*4 bytes move the channel order on by one*/
+                        if(++role == 3) role = 0;
+                    }
+#endif
+                    for(; x < w; x++) {
+                        dest_buf[x] = (uint8_t)((fg_premult[role] + dest_buf[x] * mix_inv) >> 8);
+                        if(++role == 3) role = 0;
+                    }
+                    dest_buf = drawbuf_next_row(dest_buf, dest_stride);
+                }
+            }
+            else {
+#if LV_BIG_ENDIAN_SYSTEM == 0
+                /*32 bit pixels: one word each, and the 4th byte must be left alone*/
+                uint32_t k_lo = fg_premult[0] | (fg_premult[2] << 16);
+                uint32_t k_g = fg_premult[1];
+                /*Flat areas are common, so remember the last destination pixel and its
+                 *result. Seeded with 0 so the entry is always valid.*/
+                uint32_t last_d = 0;
+                uint32_t last_res = ((k_lo >> 8) & 0x00FF00FFu) | ((((k_g >> 8) & 0xFFu)) << 8);
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x += 4) {
+                        uint32_t d;
+                        d = ((const lv_draw_sw_word_t *)(dest_buf + x))->u32;
+                        uint32_t res;
+                        if(d == last_d) {
+                            res = last_res;
+                        }
+                        else {
+                            uint32_t lo = ((((d & 0x00FF00FFu) * mix_inv) + k_lo) >> 8) & 0x00FF00FFu;
+                            uint32_t g = (((((d >> 8) & 0xFFu) * mix_inv) + k_g) >> 8) & 0xFFu;
+                            res = lo | (g << 8) | (d & 0xFF000000u);
+                            last_d = d;
+                            last_res = res;
+                        }
+                        ((lv_draw_sw_word_t *)(dest_buf + x))->u32 = res;
+                    }
+                    dest_buf = drawbuf_next_row(dest_buf, dest_stride);
+                }
+#else
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x += 4) {
+                        dest_buf[x + 1] = (uint8_t)((fg_premult[2] + dest_buf[x + 1] * mix_inv) >> 8);
+                        dest_buf[x + 2] = (uint8_t)((fg_premult[1] + dest_buf[x + 2] * mix_inv) >> 8);
+                        dest_buf[x + 3] = (uint8_t)((fg_premult[0] + dest_buf[x + 3] * mix_inv) >> 8);
+                    }
+                    dest_buf = drawbuf_next_row(dest_buf, dest_stride);
+                }
+#endif
             }
         }
     }
@@ -308,6 +486,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
             for(y = 0; y < h; y++) {
                 uint32_t mask_x;
                 for(x = 0, mask_x = 0; x < w; x += dest_px_size, mask_x++) {
+                    if(mask[mask_x] == 0) continue;
                     lv_color_24_24_mix((const uint8_t *)&color32, &dest_buf[x], mask[mask_x]);
                 }
 
@@ -946,10 +1125,13 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_24_24_mix_premult(const uint8_
         dest[2] = src[2];
     }
     else {
+        /*Weight the first and third background channels in one 32 bit value with
+         *a single multiplication. The 16 bit lanes can't overflow as their max value is 255 * 255*/
         lv_opa_t mix_inv = 255 - mix;
-        dest[0] = (uint32_t)src[0] + ((uint32_t)(dest[0] * mix_inv) >> 8);
+        uint32_t rb = (((uint32_t)dest[2] << 16) | dest[0]) * mix_inv;
+        dest[0] = (uint8_t)(src[0] + ((rb >> 8) & 0xFF));
         dest[1] = (uint32_t)src[1] + ((uint32_t)(dest[1] * mix_inv) >> 8);
-        dest[2] = (uint32_t)src[2] + ((uint32_t)(dest[2] * mix_inv) >> 8);
+        dest[2] = (uint8_t)(src[2] + (rb >> 24));
     }
 }
 
@@ -990,11 +1172,13 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
                         lv_color32_t src_pixel = src_buf_c32[src_x];
                         if(src_pixel.alpha > 0) {
-                            uint16_t reciprocal = (255 * 256) / src_pixel.alpha;
-                            src_pixel.red   = (src_pixel.red   * reciprocal) >> 8;
-                            src_pixel.green = (src_pixel.green * reciprocal) >> 8;
-                            src_pixel.blue  = (src_pixel.blue  * reciprocal) >> 8;
-                            lv_color_24_24_mix((const uint8_t *)&src_pixel, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, opa));
+                            /*No need to unpremultiply: scale the premultiplied channels by `opa` and
+                             *blend the background with the remaining (255 - alpha * opa) weight*/
+                            uint8_t src_scaled[3];
+                            src_scaled[0] = LV_OPA_MIX2(src_pixel.blue, opa);
+                            src_scaled[1] = LV_OPA_MIX2(src_pixel.green, opa);
+                            src_scaled[2] = LV_OPA_MIX2(src_pixel.red, opa);
+                            lv_color_24_24_mix_premult(src_scaled, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, opa));
                         }
                     }
                     dest_buf += dest_stride;
@@ -1008,11 +1192,13 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
                         lv_color32_t src_pixel = src_buf_c32[src_x];
                         if(src_pixel.alpha > 0) {
-                            uint16_t reciprocal = (255 * 256) / src_pixel.alpha;
-                            src_pixel.red   = (src_pixel.red   * reciprocal) >> 8;
-                            src_pixel.green = (src_pixel.green * reciprocal) >> 8;
-                            src_pixel.blue  = (src_pixel.blue  * reciprocal) >> 8;
-                            lv_color_24_24_mix((const uint8_t *)&src_pixel, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, mask_buf[src_x]));
+                            /*No need to unpremultiply: scale the premultiplied channels by the mask and
+                             *blend the background with the remaining (255 - alpha * mask) weight*/
+                            uint8_t src_scaled[3];
+                            src_scaled[0] = LV_OPA_MIX2(src_pixel.blue, mask_buf[src_x]);
+                            src_scaled[1] = LV_OPA_MIX2(src_pixel.green, mask_buf[src_x]);
+                            src_scaled[2] = LV_OPA_MIX2(src_pixel.red, mask_buf[src_x]);
+                            lv_color_24_24_mix_premult(src_scaled, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, mask_buf[src_x]));
                         }
                     }
                     dest_buf += dest_stride;
@@ -1027,11 +1213,16 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
                         lv_color32_t src_pixel = src_buf_c32[src_x];
                         if(src_pixel.alpha > 0) {
-                            uint16_t reciprocal = (255 * 256) / src_pixel.alpha;
-                            src_pixel.red   = (src_pixel.red   * reciprocal) >> 8;
-                            src_pixel.green = (src_pixel.green * reciprocal) >> 8;
-                            src_pixel.blue  = (src_pixel.blue  * reciprocal) >> 8;
-                            lv_color_24_24_mix((const uint8_t *)&src_pixel, &dest_buf[dest_x], LV_OPA_MIX3(src_pixel.alpha, mask_buf[src_x], opa));
+                            /*No need to unpremultiply: scale the premultiplied channels by mask * opa and
+                             *blend the background with the remaining (255 - alpha * mask * opa) weight*/
+                            uint8_t scale = LV_OPA_MIX2(mask_buf[src_x], opa);
+                            uint8_t src_scaled[3];
+                            src_scaled[0] = LV_OPA_MIX2(src_pixel.blue, scale);
+                            src_scaled[1] = LV_OPA_MIX2(src_pixel.green, scale);
+                            src_scaled[2] = LV_OPA_MIX2(src_pixel.red, scale);
+                            /*Combine the three factors in one step to keep the precision*/
+                            lv_color_24_24_mix_premult(src_scaled, &dest_buf[dest_x],
+                                                       LV_OPA_MIX3(src_pixel.alpha, mask_buf[src_x], opa));
                         }
                     }
                     dest_buf += dest_stride;
@@ -1108,10 +1299,14 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_8_24_mix(const uint8_t src, ui
         dest[2] = src;
     }
     else {
+        /*Mix the first and third channels in one 32 bit value with a single
+         *multiplication each. The 16 bit lanes can't overflow as their max value is 255 * 255*/
         lv_opa_t mix_inv = 255 - mix;
-        dest[0] = (uint32_t)((uint32_t)src * mix + dest[0] * mix_inv) >> 8;
+        uint32_t rb = ((((uint32_t)src << 16) | src) * mix) +
+                      ((((uint32_t)dest[2] << 16) | dest[0]) * mix_inv);
+        dest[0] = (uint8_t)(rb >> 8);
         dest[1] = (uint32_t)((uint32_t)src * mix + dest[1] * mix_inv) >> 8;
-        dest[2] = (uint32_t)((uint32_t)src * mix + dest[2] * mix_inv) >> 8;
+        dest[2] = (uint8_t)(rb >> 24);
     }
 }
 
@@ -1126,10 +1321,14 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_24_24_mix(const uint8_t * src,
         dest[2] = src[2];
     }
     else {
+        /*Mix the first and third channels in one 32 bit value with a single
+         *multiplication each. The 16 bit lanes can't overflow as their max value is 255 * 255*/
         lv_opa_t mix_inv = 255 - mix;
-        dest[0] = (uint32_t)((uint32_t)src[0] * mix + dest[0] * mix_inv) >> 8;
+        uint32_t rb = ((((uint32_t)src[2] << 16) | src[0]) * mix) +
+                      ((((uint32_t)dest[2] << 16) | dest[0]) * mix_inv);
+        dest[0] = (uint8_t)(rb >> 8);
         dest[1] = (uint32_t)((uint32_t)src[1] * mix + dest[1] * mix_inv) >> 8;
-        dest[2] = (uint32_t)((uint32_t)src[2] * mix + dest[2] * mix_inv) >> 8;
+        dest[2] = (uint8_t)(rb >> 24);
     }
 }
 
