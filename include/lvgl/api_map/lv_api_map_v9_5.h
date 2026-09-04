@@ -35,6 +35,9 @@ typedef lv_display_rotation_t lv_disp_rotation_t;
  *      MACROS
  **********************/
 
+#define lv_wayland_assign_physical_display lv_wayland_window_set_physical_display
+#define lv_wayland_unassign_physical_display(display) lv_wayland_window_set_physical_display(display, LV_WAYLAND_PHYSICAL_DISPLAY_ANY)
+
 #define lv_display_delete_event lv_display_remove_event
 #define lv_observer_remove lv_observer_delete
 #define lv_style_get_prop_inlined lv_style_get_prop

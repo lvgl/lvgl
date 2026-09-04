@@ -258,6 +258,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "wayland-cursor.h",
     "wayland-egl.h",
     "wayland_linux_dmabuf.h",
+    "wayland_xdg_output.h",
     "wayland_xdg_shell.h",
     "webp/decode.h",
     "windows.h",

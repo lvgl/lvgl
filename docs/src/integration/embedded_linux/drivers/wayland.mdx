@@ -163,13 +163,45 @@ want it:
 
 ```c
 /* Assign to physical display 0 and go fullscreen there */
-lv_wayland_assign_physical_display(disp, 0);
+lv_wayland_set_physical_display(disp, 0);
 lv_wayland_window_set_fullscreen(disp, true);
 ```
 
-<ApiLink name="lv_wayland_unassign_physical_display" /> restores the default behaviour.
+<ApiLink name="LV_WAYLAND_PHYSICAL_DISPLAY_ANY" /> can be used to restore the default behaviour.
 
-If you integrate LVGL into your own event loop, <ApiLink name="lv_wayland_get_fd" /> gives you the
+```c
+lv_wayland_set_physical_display(disp, LV_WAYLAND_PHYSICAL_DISPLAY_ANY);
+```
+
+### Physical outputs
+
+To target a specific physical output, look it up by its connector name:
+
+| Function | Purpose |
+|---|---|
+| <ApiLink name="lv_wayland_get_output_count" /> | Number of outputs the compositor advertises |
+| <ApiLink name="lv_wayland_get_output_name" /> | Connector name of an output, e.g. `"HDMI-A-1"` |
+| <ApiLink name="lv_wayland_get_output_size" /> | Size of an output in pixels |
+| <ApiLink name="lv_wayland_get_display_size" /> | Look up an output by name and get its size |
+
+```c
+/* Open a fullscreen window on the HDMI connector */
+int32_t width, height;
+int32_t output = lv_wayland_get_display_size("HDMI-A-1", &width, &height);
+
+if(output >= 0) {
+    lv_display_t * disp = lv_wayland_window_create(width, height, "My window", NULL);
+    lv_wayland_set_physical_display(disp, output);
+    lv_wayland_window_set_fullscreen(disp, true);
+}
+```
+
+The names come from the `xdg-output` protocol, or from the `wl_output` v4 `name` event when the compositor doesn't support xdg-output.
+If neither is available the name is empty and the lookup returns -1; the size falls back to the output's current mode.
+
+### Event loop
+
+You can integrate LVGL into your own event loop, <ApiLink name="lv_wayland_get_fd" /> gives you the
 compositor's file descriptor to poll.
 
 ## Rendering Backends

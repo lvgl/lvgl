@@ -210,19 +210,25 @@ void lv_wayland_window_set_minimized(lv_display_t * display)
     lv_wayland_xdg_set_minimized(&window->xdg);
 }
 
-void lv_wayland_assign_physical_display(lv_display_t * display, uint8_t phys_display)
+void lv_wayland_window_set_physical_display(lv_display_t * display, uint8_t phys_display)
 {
     LV_CHECK_ARG(display != NULL, return);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
     LV_CHECK_ARG_MSG(window != NULL, return, "Invalid display");
-    LV_CHECK_ARG_FORMAT_MSG(phys_display < lv_wl_ctx.wl_output_count, return,
-                            "Invalid display number '%d'. Expected '0'..'%d'",
+    LV_CHECK_ARG_FORMAT_MSG(phys_display == LV_WAYLAND_PHYSICAL_DISPLAY_ANY ||
+                            phys_display < lv_wl_ctx.wl_output_count, return,
+                            "Invalid display number '%d'. Expected '0'..'%d' or LV_WAYLAND_PHYSICAL_DISPLAY_ANY",
                             phys_display, lv_wl_ctx.wl_output_count - 1);
 
-    window->physical_output = lv_wl_ctx.physical_outputs[phys_display].wl_output;
+    if(phys_display == LV_WAYLAND_PHYSICAL_DISPLAY_ANY) {
+        window->physical_output = NULL;
+    }
+    else {
+        window->physical_output = lv_wl_ctx.physical_outputs[phys_display]->wl_output;
+    }
 }
 
-void lv_wayland_unassign_physical_display(lv_display_t * display)
+void lv_wayland_window_remove_physical_display(lv_display_t * display)
 {
     LV_CHECK_ARG(display != NULL, return);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
