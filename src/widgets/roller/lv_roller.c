@@ -53,7 +53,7 @@ static int32_t get_selected_label_width(const lv_obj_t * obj);
 static void scroll_anim_completed_cb(lv_anim_t * a);
 static void set_y_anim(void * obj, int32_t v);
 static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
-static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller_mode_t mode);
+static lv_result_t update_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode);
 
 #if LV_USE_OBSERVER
     static void roller_value_changed_event_cb(lv_event_t * e);
@@ -129,8 +129,12 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(options != NULL, return);
 
+    lv_result_t res = update_options(obj, options, mode);
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't set the new options");
+        return;
+    }
     remove_options_translation_tag(obj);
-    set_options_internal(obj, options, mode);
 }
 
 #if LV_USE_TRANSLATION
@@ -147,11 +151,19 @@ void lv_roller_set_options_translation_tag(lv_obj_t * obj, const char * tag, lv_
         LV_LOG_WARN("Failed to allocate memory for new tag");
         return;
     }
+
+    lv_result_t res = update_options(obj, lv_tr(tag), mode);
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't set the new translated options");
+        lv_free(new_tag);
+        return;
+    }
+
     if(roller->options_translation_tag) {
         lv_free(roller->options_translation_tag);
     }
     roller->options_translation_tag = new_tag;
-    set_options_internal(obj, lv_tr(tag), mode);
+
 }
 #endif /*LV_USE_TRANSLATION*/
 
@@ -512,8 +524,15 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(roller->options_translation_tag) {
 
             uint32_t prev_sel = roller->sel_opt_id;
-            set_options_internal(obj, lv_tr(roller->options_translation_tag), roller->mode);
-            lv_roller_set_selected(obj, prev_sel, LV_ANIM_OFF);
+
+            lv_result_t options_res = update_options(obj, lv_tr(roller->options_translation_tag), roller->mode);
+            if(options_res == LV_RESULT_INVALID) {
+                LV_LOG_WARN("Couldn't set the new translated options");
+            }
+            else {
+                update_options(obj, lv_tr(roller->options_translation_tag), roller->mode);
+                lv_roller_set_selected(obj, prev_sel, LV_ANIM_OFF);
+            }
         }
     }
 #endif /*LV_USE_TRANSLATION*/
@@ -967,7 +986,7 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     lv_point_transform(vect, -angle, scale_x, scale_y, &pivot, false);
 }
 
-static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
+static lv_result_t update_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
 {
     LV_ASSERT(obj);
     LV_ASSERT(options);
@@ -991,18 +1010,17 @@ static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller
         lv_label_set_text(label, options);
     }
     else {
-        roller->mode = LV_ROLLER_MODE_INFINITE;
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
 
         int32_t normal_h = roller->option_cnt * (lv_font_get_line_height_internal(font) +
                                                  lv_obj_get_style_text_letter_space_internal(obj, LV_PART_MAIN));
-        roller->inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
-        if(!(roller->inf_page_cnt & 1)) roller->inf_page_cnt++;   /*Make it odd*/
-        LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", roller->inf_page_cnt);
+        uint32_t inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
+        if(!(inf_page_cnt & 1)) inf_page_cnt++;   /*Make it odd*/
+        LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", inf_page_cnt);
 
         size_t opt_len = lv_strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        size_t opt_extra_len = opt_len * roller->inf_page_cnt;
+        size_t opt_extra_len = opt_len * inf_page_cnt;
         if(opt_extra_len == 0) {
             /*Prevent write overflow*/
             opt_extra_len = 1;
@@ -1012,8 +1030,11 @@ static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller
         LV_ASSERT_MALLOC(opt_extra);
         if(opt_extra == NULL) {
             LV_LOG_WARN("Couldn't allocate the buffer for the options");
-            return;
+            return LV_RESULT_INVALID;
         }
+
+        roller->inf_page_cnt = inf_page_cnt;
+        roller->mode = LV_ROLLER_MODE_INFINITE;
         uint32_t i;
         for(i = 0; i < roller->inf_page_cnt; i++) {
             lv_strcpy(&opt_extra[opt_len * i], options);
@@ -1029,10 +1050,13 @@ static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller
         inf_normalize(obj);
     }
 
+
     roller->sel_opt_id_ori = roller->sel_opt_id;
 
     /*If the selected text has larger font the label needs some extra draw padding to draw it.*/
     lv_obj_refresh_ext_draw_size(label);
+
+    return LV_RESULT_OK;
 }
 
 
