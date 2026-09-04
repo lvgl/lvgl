@@ -277,7 +277,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888(dsc)) {
             uint32_t color32 = lv_color_to_u32(dsc->color);
             uint32_t * dest_buf = dsc->dest_buf;
-            /*Back to back rows are one long run, so the row setup and the tail are paid once*/
+            /* Treat the buffer as one long row when stride matches width*/
             if(dest_stride == w * 4) {
                 w *= h;
                 h = 1;
@@ -835,9 +835,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
             if(LV_RESULT_INVALID == accelerated) {
                 color_argb.alpha = opa;
                 if(opa >= LV_OPA_MAX) {
-                    /*An opaque foreground always wins, whatever the background is, so this is
-                     *a plain convert and store. Keeping the mix out of the loop also keeps the
-                     *loop free of calls, which is what lets the compiler vectorize it.*/
+                    /* Fast path, opaque foreground simply needs to be stored*/
                     for(y = 0; y < h; y++) {
                         for(x = 0; x < w; x++) {
                             color_argb.red = (src_buf_c16[x].red * 2106) >> 8;  /*To make it rounded*/
@@ -944,9 +942,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
             if(LV_RESULT_INVALID == accelerated) {
                 color_argb.alpha = opa;
                 if(opa >= LV_OPA_MAX) {
-                    /*An opaque foreground always wins, whatever the background is, so this is
-                     *a plain convert and store. Keeping the mix out of the loop also keeps the
-                     *loop free of calls, which is what lets the compiler vectorize it.*/
+                    /* Fast path, opaque foreground simply needs to be stored*/
                     for(y = 0; y < h; y++) {
                         for(x = 0; x < w; x++) {
                             raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
@@ -1182,7 +1178,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                     for(x = 0; x < w; x++) {
                         /*An opaque source or an empty destination is a plain store and a
                          *transparent source changes nothing. A fresh layer is all empty,
-                         *so this covers nearly every pixel.*/
+                        /*Fast path opaque source or empty destination*/
                         color_argb = src_buf_c32[x];
                         if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
                             dest_buf_c32[x] = color_argb;
@@ -1200,9 +1196,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        /*An opaque source or an empty destination is a plain store and a
-                         *transparent source changes nothing. A fresh layer is all empty,
-                         *so this covers nearly every pixel.*/
+                        /*Fast path opaque source or empty destination*/
                         color_argb = src_buf_c32[x];
                         color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
                         if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
@@ -1221,9 +1215,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        /*An opaque source or an empty destination is a plain store and a
-                         *transparent source changes nothing. A fresh layer is all empty,
-                         *so this covers nearly every pixel.*/
+                       /*Fast path opaque source or empty destination*/
                         color_argb = src_buf_c32[x];
                         color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, mask_buf[x]);
                         if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
@@ -1243,9 +1235,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        /*An opaque source or an empty destination is a plain store and a
-                         *transparent source changes nothing. A fresh layer is all empty,
-                         *so this covers nearly every pixel.*/
+                        /*Fast path opaque source or empty destination*/
                         color_argb = src_buf_c32[x];
                         color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, opa, mask_buf[x]);
                         if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
@@ -1487,8 +1477,7 @@ static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_32_32_mix_mid(lv_color
         return lv_color_mix32_inlined(fg, bg);
     }
 
-    /*Both colors have alpha: the expensive case, kept out of line so that the callers of
-     *lv_color_32_32_mix() stay small enough for the compiler to inline them*/
+    /*Both colors have alpha: slow path*/
     return lv_color_32_32_mix_semi_transparent_bg(fg, bg, cache);
 }
 
@@ -1507,8 +1496,7 @@ static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_32_32_mix(lv_color32_t
     else if(bg.alpha >= LV_OPA_MAX) {
         return lv_color_mix32_inlined(fg, bg);
     }
-    /*Both colors have alpha: the expensive case, kept out of line so that this function
-     *stays small enough for the compiler to inline it into the blend loops*/
+    /*Both colors have alpha: slow path*/
     else {
         return lv_color_32_32_mix_semi_transparent_bg(fg, bg, cache);
     }
