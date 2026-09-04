@@ -456,7 +456,7 @@ font:
           - 'src/misc/lv_text*'
           - 'docs/src/main-modules/fonts/**'
           - 'docs/src/libs/font_support/**'
-          - 'scripts/built_in_font/**'
+          - 'scripts/generators/built_in_font/**'
           - 'scripts/font_license_verify.py'
           - 'tests/src/test_files/fonts/**'
           - 'tests/src/test_cases/test_txt.c'
