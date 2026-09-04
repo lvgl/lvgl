@@ -85,8 +85,8 @@ static unsigned int index_buffer_count = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_SwapRB", "u_Hue", "u_Saturation", "u_Value" };
-static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_SwapRB", "u_PremultipliedSrc", "u_Hue", "u_Saturation", "u_Value" };
+static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**********************
  *      MACROS
@@ -170,12 +170,14 @@ lv_result_t lv_opengles_gl_format_from_color_format(lv_color_format_t cf, lv_ope
             gl_format->format = GL_RED;
             gl_format->type = GL_UNSIGNED_BYTE;
             gl_format->rb_swap = false;
+            gl_format->premultiplied = false;
             return LV_RESULT_OK;
         case LV_COLOR_FORMAT_RGB565:
             gl_format->internal_format = GL_RGB565;
             gl_format->format = GL_RGB;
             gl_format->type = GL_UNSIGNED_SHORT_5_6_5;
             gl_format->rb_swap = false;
+            gl_format->premultiplied = false;
             return LV_RESULT_OK;
         case LV_COLOR_FORMAT_RGB565_SWAPPED:
             gl_format->internal_format = GL_RGB565;
@@ -189,6 +191,7 @@ lv_result_t lv_opengles_gl_format_from_color_format(lv_color_format_t cf, lv_ope
             gl_format->type = GL_UNSIGNED_BYTE;
             /* RGB is actually stored as BGR in memory */
             gl_format->rb_swap = true;
+            gl_format->premultiplied = false;
             return LV_RESULT_OK;
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB8888:
@@ -198,6 +201,7 @@ lv_result_t lv_opengles_gl_format_from_color_format(lv_color_format_t cf, lv_ope
             gl_format->type = GL_UNSIGNED_BYTE;
             /* RGB is actually stored as BGR in memory */
             gl_format->rb_swap = true;
+            gl_format->premultiplied = cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
             return LV_RESULT_OK;
         default:
             LV_LOG_WARN("Color format 0x%02x has no OpenGL equivalent", cf);
@@ -212,6 +216,15 @@ bool lv_opengles_color_format_is_rb_swap(lv_color_format_t cf)
         return false;
     }
     return gl_format.rb_swap;
+}
+
+bool lv_opengles_color_format_is_premultiplied(lv_color_format_t cf)
+{
+    lv_opengles_gl_format_t gl_format;
+    if(lv_opengles_gl_format_from_color_format(cf, &gl_format) != LV_RESULT_OK) {
+        return false;
+    }
+    return gl_format.premultiplied;
 }
 
 lv_result_t lv_opengles_texture_upload_buf(unsigned int texture_id, const void * buf, int32_t w, int32_t h,
@@ -365,6 +378,7 @@ void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
     lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap);
+    lv_opengles_shader_set_uniform1i("u_PremultipliedSrc", lv_opengles_color_format_is_premultiplied(params->cf));
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
@@ -544,6 +558,7 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
                                      (float)params->fill_color.green / 255.0f,
                                      (float)params->fill_color.blue / 255.0f);
     lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap ? 1 : 0);
+    lv_opengles_shader_set_uniform1i("u_PremultipliedSrc", lv_opengles_color_format_is_premultiplied(params->cf));
 
     lv_opengles_render_draw();
     lv_opengles_disable_blending();
