@@ -310,7 +310,7 @@ void lv_obj_style_set_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
 
     obj_style->is_disabled = !en;
     full_cache_refresh(obj, lv_obj_style_get_selector_part(selector));
-    lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
+    lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), LV_STYLE_PROP_ANY);
 }
 
 bool lv_obj_style_get_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
