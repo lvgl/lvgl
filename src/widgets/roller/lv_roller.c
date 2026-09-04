@@ -441,8 +441,6 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
-        if(roller->option_cnt <= 1) return;
-
         release_handler(obj);
     }
     else if(code == LV_EVENT_FOCUSED) {
