@@ -1025,6 +1025,7 @@ static lv_result_t update_options(lv_obj_t * obj, const char * options, lv_rolle
             opt_extra_len = 1;
         }
 
+        /*Have a the options multiple times so that it looks infinite */
         char * opt_extra = lv_malloc(opt_extra_len);
         LV_ASSERT_MALLOC(opt_extra);
         if(opt_extra == NULL) {
