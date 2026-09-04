@@ -17,6 +17,7 @@
  *      DEFINES
  *********************/
 
+#define LV_GLTF_ANIMATION_RESET_TIME 50
 
 /**********************
  *      TYPEDEFS
@@ -314,6 +315,28 @@ fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_model_t * data)
 }
 
 
+void lv_gltf_model_set_animation_time(lv_gltf_model_t * model, uint32_t millis)
+{
+    LV_CHECK_ARG(model != NULL, return);
+    if(millis > model->current_animation_max_time) {
+        millis = model->current_animation_max_time;
+    }
+    model->local_timestamp = millis;
+    lv_gltf_model_invalidate(model);
+}
+
+void lv_gltf_model_set_animation_ratio(lv_gltf_model_t * model, float ratio)
+{
+    LV_CHECK_ARG(model != NULL, return);
+    if(ratio < 0.0f) {
+        ratio = 0.0f;
+    }
+    else if(ratio > 1.0f) {
+        ratio = 1.0f;
+    }
+    lv_gltf_model_set_animation_time(model, (uint32_t)(model->current_animation_max_time * ratio));
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -328,12 +351,12 @@ static void update_animation_cb(lv_timer_t * timer)
     const uint32_t delta = lv_tick_diff(current_tick, model->last_tick);
 
     model->last_tick = current_tick;
-    model->local_timestamp += (delta * model->animation_speed_ratio) / 1000;
 
-    if(model->local_timestamp >= model->current_animation_max_time) {
-        model->local_timestamp = 50;
+    uint64_t next_timestamp = model->local_timestamp + ((delta * model->animation_speed_ratio) / 1000);
+    if(next_timestamp >= model->current_animation_max_time) {
+        next_timestamp = LV_GLTF_ANIMATION_RESET_TIME;
     }
-    lv_gltf_model_invalidate(model);
+    lv_gltf_model_set_animation_time(model, (uint32_t)next_timestamp);
 }
 
 
