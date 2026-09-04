@@ -196,12 +196,17 @@ void lv_wayland_window_set_maximized(lv_display_t * display, bool maximized)
     LV_CHECK_ARG(display != NULL, return);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
     LV_CHECK_ARG_MSG(window != NULL, return, "Invalid display");
-    if(window->maximized == maximized) {
-        return;
-    }
     lv_wayland_xdg_set_maximized(&window->xdg, maximized);
-    window->maximized = maximized;
 }
+
+bool lv_wayland_window_is_maximized(lv_display_t * display)
+{
+    LV_CHECK_ARG(display != NULL, return false);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_CHECK_ARG_MSG(window != NULL, return false, "Invalid display");
+    return window->maximized;
+}
+
 void lv_wayland_window_set_minimized(lv_display_t * display)
 {
     LV_CHECK_ARG(display != NULL, return);
@@ -236,11 +241,18 @@ void lv_wayland_window_set_fullscreen(lv_display_t * display, bool fullscreen)
     lv_wl_window_t * window = lv_display_get_driver_data(display);
     LV_CHECK_ARG_MSG(window != NULL, return, "Invalid display");
 
-    if(window->fullscreen == fullscreen) {
-        return;
-    }
     lv_wayland_xdg_set_fullscreen(&window->xdg, fullscreen, window->physical_output);
-    window->fullscreen = fullscreen;
+}
+
+bool lv_wayland_window_is_fullscreen(lv_display_t * display)
+{
+    LV_CHECK_ARG(display != NULL, return false);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_CHECK_ARG_MSG(window != NULL, return false, "Invalid display");
+    if(!window) {
+        return false;
+    }
+    return window->fullscreen;
 }
 
 /**********************

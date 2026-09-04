@@ -74,16 +74,37 @@ void lv_wayland_unassign_physical_display(lv_display_t * display);
  * Sets the fullscreen state of the window
  * @param display Reference to the LVGL display associated to the window
  * @param fullscreen If true the window enters fullscreen
+ *
+ * @note The fullscreen request is made asynchronously and may not be fulfilled
+ * if the compositor doesn't allow it. lv_wayland_window_is_fullscreen() can be
+ * used to determine the fullscreen state of the window.
  */
-
 void lv_wayland_window_set_fullscreen(lv_display_t * display, bool fullscreen);
 
 /**
- * Sets the maximized state of the window
+ * Check if window is fullscreen
+ * @param disp Reference to the LVGL display associated to the window
+ * @returns the fullscreen state of the window as reported by the compositor
+ */
+bool lv_wayland_window_is_fullscreen(lv_display_t * disp);
+
+/**
+ * Requests the window be maximized/unmaximized
  * @param display Reference to the LVGL display associated to the window
- * @param maximize   If true the window is maximized
+ * @param maximize true: maximize the window false: unmaximize the window
+ *
+ * @note The maximized request is made asynchronously and may not be fulfilled
+ * if the compositor doesn't allow it. lv_wayland_window_is_maximized() can be
+ * used to determine the maximized state of the window.
  */
 void lv_wayland_window_set_maximized(lv_display_t * display, bool maximize);
+
+/**
+ * Check if window is maximized
+ * @param disp Reference to the LVGL display associated to the window
+ * @returns the maximized state of the window as reported by the compositor
+ */
+bool lv_wayland_window_is_maximized(lv_display_t * disp);
 
 /**
  * Minimizes the window
