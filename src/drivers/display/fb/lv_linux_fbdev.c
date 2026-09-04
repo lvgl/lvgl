@@ -209,6 +209,16 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     LV_LOG_INFO("The framebuffer device was mapped to memory successfully");
 
     switch(dsc->vinfo.bits_per_pixel) {
+        case 8:
+#if !LV_LINUX_FBDEV_BSD
+            if(dsc->vinfo.grayscale != 1) {
+                LV_LOG_WARN("8bpp framebuffer does not report a grayscale format (grayscale = %u); "
+                            "LV_COLOR_FORMAT_L8 is not supported", (unsigned)dsc->vinfo.grayscale);
+                return LV_RESULT_INVALID;
+            }
+#endif
+            lv_display_set_color_format(disp, LV_COLOR_FORMAT_L8);
+            break;
         case 16:
             lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
             break;
