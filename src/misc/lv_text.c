@@ -148,7 +148,7 @@ void lv_text_get_size_attributes(lv_point_t * size_res, const char * text, const
         }
 
         /*Calculate the longest line*/
-        int32_t act_line_length = lv_text_get_width(
+        int32_t act_line_length = lv_text_get_line_width(
                                       &text[line_start], new_line_start - line_start, font, attributes);
 
         size_res->x = LV_MAX(act_line_length, size_res->x);
@@ -273,8 +273,11 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
             cur_w += letter_space;
         }
 
+        const bool is_break = (letter == '\n' || letter == '\r' || lv_text_is_break_char(letter));
+
         /*Test if this character fits within max_width*/
-        if(break_index == NO_BREAK_FOUND && (cur_w - letter_space) > max_width) {
+        if(!lv_text_is_hanging_space(letter) && break_index == NO_BREAK_FOUND &&
+           (cur_w - letter_space) > max_width) {
             break_index = i;
             break_letter_count = word_len - 1;
             if(flag & LV_TEXT_FLAG_BREAK_ALL) {
@@ -284,7 +287,7 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
         }
 
         /*Check for new line chars and breakchars*/
-        if(letter == '\n' || letter == '\r' || lv_text_is_break_char(letter)) {
+        if(is_break) {
             /*Update the output width on the first character if it fits.
              *Must do this here in case first letter is a break character.*/
             if(i == 0 && break_index == NO_BREAK_FOUND && word_w_ptr != NULL) *word_w_ptr = cur_w;
@@ -349,6 +352,35 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
 #endif
 }
 
+/**
+ * Tell whether a consumed run of text is nothing but spaces.
+ * (Non-rendered soft break opportunity)
+ */
+static bool is_space_run(const char * txt, uint32_t len)
+{
+    if(len == 0) return false;
+
+    for(uint32_t i = 0; i < len; i++) {
+        if(txt[i] != ' ') return false;
+    }
+
+    return true;
+}
+
+int32_t lv_text_get_line_width(const char * txt, uint32_t length, const lv_font_t * font,
+                               const lv_text_attributes_t * attributes)
+{
+    if(txt == NULL) return 0;
+
+    /*length may reach past the end of the string, so find the real end first*/
+    uint32_t len = 0;
+    while(len < length && txt[len] != '\0') len++;
+
+    while(len > 0 && lv_text_is_hanging_space((uint8_t)txt[len - 1])) len--;
+
+    return lv_text_get_width(txt, len, font, attributes);
+}
+
 uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
                                const lv_font_t * font, int32_t * used_width, lv_text_attributes_t * attributes)
 {
@@ -383,20 +415,28 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
     uint32_t i = 0;                                        /*Iterating index into txt*/
     uint32_t max_width = attributes->max_width;
     bool explicit_new_line = false;
+    uint32_t hanging_w = 0;   /*Width of the white space which may hang out of the line*/
 
-    while(i < len && txt[i] != '\0' && max_width > 0) {
+    while(i < len && txt[i] != '\0' && max_width > hanging_w) {
         lv_text_flag_t word_flag = attributes->text_flags;
 
         if(i == 0) word_flag |= LV_TEXT_FLAG_BREAK_ALL;
 
         uint32_t word_w = 0;
         uint32_t advance = lv_text_get_next_word(&txt[i], font, attributes->letter_space,
-                                                 max_width, word_flag, &word_w, &cmd_state);
-        max_width -= word_w;
-        line_w += word_w;
+                                                 max_width - hanging_w, word_flag, &word_w, &cmd_state);
 
         if(advance == 0) {
             break;
+        }
+
+        if(is_space_run(&txt[i], advance)) {
+            hanging_w += word_w;
+        }
+        else {
+            max_width -= word_w + hanging_w;
+            line_w += word_w + hanging_w;
+            hanging_w = 0;
         }
 
         i += advance;
@@ -411,6 +451,10 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
             explicit_new_line = true;
             break;
         }
+    }
+
+    if(i >= len || txt[i] == '\0') {
+        line_w += hanging_w;
     }
 
     /*Always step at least one to avoid infinite loops*/
