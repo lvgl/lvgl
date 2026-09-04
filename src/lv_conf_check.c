@@ -46,8 +46,8 @@
     #error "LV_USE_THORVG must be enabled: Kconfig selects it from LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE"
 #endif
 
-#if (LV_USE_DRAW_SDL) && !LV_USE_DRAW_SW
-    #error "LV_USE_DRAW_SW must be enabled: Kconfig selects it from LV_USE_DRAW_SDL"
+#if (LV_USE_SIFLI_EPIC || LV_USE_DRAW_SDL) && !LV_USE_DRAW_SW
+    #error "LV_USE_DRAW_SW must be enabled: Kconfig selects it from LV_USE_SIFLI_EPIC || LV_USE_DRAW_SDL"
 #endif
 
 #if LV_USE_DRAW_ARM2D_SYNC && !(LV_USE_DRAW_SW)
@@ -132,6 +132,10 @@
 
 #if LV_USE_DRAW_DMA2D_INTERRUPT && !(LV_USE_DRAW_DMA2D)
     #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
+#endif
+
+#if LV_USE_SIFLI_EPIC_ASSERT && !(LV_USE_SIFLI_EPIC)
+    #error "LV_USE_SIFLI_EPIC_ASSERT requires LV_USE_SIFLI_EPIC (Kconfig depends on)"
 #endif
 
 #if (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) && !LV_USE_DRAW_G2D

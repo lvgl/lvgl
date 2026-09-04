@@ -50,5 +50,6 @@ DRAW_UNIT_TYPE_NAMES = {
     "SW_NEON": "lv_draw_sw_unit_t",
     "SW_RISCV_V": "lv_draw_sw_unit_t",
     "SW_SVE2": "lv_draw_sw_unit_t",
+    "SiFli_EPIC": "lv_draw_sifli_epic_unit_t",
     "VG_LITE": "lv_draw_vg_lite_unit_t",
 }

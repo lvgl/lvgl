@@ -997,6 +997,35 @@ config LV_USE_DRAW_DMA2D_INTERRUPT
 endif
 endmenu
 
+menu "EPIC"
+config LV_USE_SIFLI_EPIC
+	bool "SiFli EPIC renderer"
+	default n
+	select LV_USE_DRAW_SW
+	help
+		Accelerate blends, fills, images and text with the EPIC (Enhanced
+		Pixel Image Compositor) engine of SiFli BF0 SoCs. Unsupported
+		operations fall back to software rendering.
+
+if LV_USE_SIFLI_EPIC
+
+config LV_USE_SIFLI_EPIC_DRAW_THREAD
+	bool "Draw thread"
+	depends on !LV_OS_NONE
+	default y
+	help
+		Dispatch EPIC operations from their own thread so the CPU can keep
+		rendering in parallel.
+
+config LV_USE_SIFLI_EPIC_ASSERT
+	bool "Asserts"
+	help
+		Check the status of every EPIC call and assert on failure. Useful
+		while bringing up a board.
+
+endif
+endmenu
+
 menu "EVE"
 config LV_USE_DRAW_EVE
 	bool "EVE renderer"
