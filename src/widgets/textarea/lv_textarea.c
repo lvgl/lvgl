@@ -926,7 +926,11 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_POST) {
         draw_cursor(e);
     }
-    else if(code == LV_EVENT_SIZE_CHANGED || code == LV_EVENT_STYLE_CHANGED) {
+    else if(code == LV_EVENT_SIZE_CHANGED) {
+        lv_textarea_t * ta = (lv_textarea_t *)obj;
+        lv_textarea_scroll_to_cursor_pos(obj, ta->cursor.pos);
+    }
+    else if(code == LV_EVENT_STYLE_CHANGED) {
         refr_cursor_area(obj);
     }
 }

@@ -842,4 +842,83 @@ void test_textarea_one_line_should_not_scroll_when_cursor_stays_visible(void)
     TEST_ASSERT_EQUAL_INT32(scroll_x, lv_obj_get_scroll_x(textarea));
 }
 
+/* Resizing the textarea must keep the cursor in view. The label has LV_SIZE_CONTENT
+ * width in one_line mode, so no label size change reports the new geometry. */
+void test_textarea_one_line_should_keep_cursor_in_view_when_resized(void)
+{
+    lv_obj_clean(active_screen);
+    textarea = one_line_textarea_create(200);
+
+    /* The cursor is at the end of the text, so the view is scrolled to the end */
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_right(textarea));
+
+    lv_obj_set_width(textarea, 100);
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_right(textarea));
+}
+
+void test_textarea_should_keep_cursor_in_view_when_resized(void)
+{
+    lv_obj_clean(active_screen);
+    textarea = lv_textarea_create(active_screen);
+    lv_obj_set_pos(textarea, 20, 20);
+    lv_obj_set_size(textarea, 200, 60);
+    lv_textarea_set_text(textarea, "aaa\nbbb\nccc\nddd\neee\nfff");
+    lv_test_wait(500);
+
+    /* The cursor is on the last line, so the view is scrolled to the bottom */
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_bottom(textarea));
+
+    lv_obj_set_height(textarea, 40);
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_bottom(textarea));
+}
+
+static lv_obj_t * scroll_screenshot_row(int32_t y, const char * caption)
+{
+    static const char * ruler_text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    lv_obj_t * label = lv_label_create(active_screen);
+    lv_label_set_text(label, caption);
+    lv_obj_set_pos(label, 20, y);
+
+    lv_obj_t * obj = lv_textarea_create(active_screen);
+    lv_textarea_set_one_line(obj, true);
+    lv_obj_set_pos(obj, 20, y + 20);
+    lv_obj_set_size(obj, 200, 40);
+    lv_textarea_add_text(obj, ruler_text);
+
+    /* Draw the cursor, without blinking, so that it is visible where the view ends up */
+    lv_obj_set_style_anim_duration(obj, 0, LV_PART_CURSOR | LV_STATE_FOCUSED);
+    lv_obj_add_state(obj, LV_STATE_FOCUSED);
+    lv_obj_send_event(obj, LV_EVENT_FOCUSED, NULL);
+    lv_test_wait(500);
+
+    return obj;
+}
+
+void test_textarea_one_line_scroll_screenshot(void)
+{
+    lv_obj_clean(active_screen);
+
+    /* Moving the cursor within the visible area must not scroll */
+    lv_obj_t * ta = scroll_screenshot_row(20, "cursor moved back 10 characters");
+    lv_textarea_set_cursor_pos(ta, lv_textarea_get_cursor_pos(ta) - 10);
+    lv_test_wait(500);
+
+    /* Resizing has to bring the cursor back into view */
+    ta = scroll_screenshot_row(100, "resized from 200 px to 120 px");
+    lv_obj_set_width(ta, 120);
+    lv_test_wait(500);
+
+    /* A style change must not move the scroll position */
+    ta = scroll_screenshot_row(180, "scrolled to the start, then disabled");
+    lv_obj_scroll_to_x(ta, 0, LV_ANIM_OFF);
+    lv_test_wait(500);
+    lv_obj_add_state(ta, LV_STATE_DISABLED);
+    lv_test_wait(500);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/textarea_one_line_scroll.png");
+}
+
 #endif
