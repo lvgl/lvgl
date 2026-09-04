@@ -5,14 +5,14 @@
 #include "../../src/misc/lv_bidi_private.h"
 #include <string.h>
 
-#if LV_USE_BIDI
-
 void setUp(void)
 {
 }
 
 void tearDown(void)
 {
+    /*Restore the default neutrals in case a test left custom ones behind*/
+    lv_bidi_set_custom_neutrals_static(NULL);
     lv_obj_clean(lv_screen_active());
 }
 
@@ -337,9 +337,6 @@ void test_bidi_set_custom_neutrals(void)
 
     /* Should not crash, output should be non-empty */
     TEST_ASSERT_NOT_EQUAL(0, out[0]);
-
-    /* Restore default neutrals */
-    lv_bidi_set_custom_neutrals_static(NULL);
 }
 
 /*
@@ -702,7 +699,5 @@ void test_bidi_dir_change_exclude_neutrals(void)
     lv_bidi_process_paragraph(input, out, len, LV_BASE_DIR_LTR, NULL, 0);
     TEST_ASSERT_NOT_EQUAL(0, out[0]);
 }
-
-#endif /*LV_USE_BIDI*/
 
 #endif /*LV_BUILD_TEST*/
