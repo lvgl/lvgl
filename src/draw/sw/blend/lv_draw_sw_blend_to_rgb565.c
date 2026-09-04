@@ -296,8 +296,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
     if(mask == NULL && opa >= LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc)) {
             uint32_t c32 = (uint32_t)color16 + ((uint32_t)color16 << 16);
-            /*Back to back rows are one long run, so the setup and the odd pixel are paid
-             *once instead of once per row*/
+            /* Treat the buffer as one long row when stride matches width*/
             if(dest_stride == w * 2) {
                 w *= h;
                 h = 1;
@@ -350,8 +349,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
 
                 for(; x < w - 2; x += 2) {
                     if(dest_buf_u16[x] == dest_buf_u16[x + 1]) {
-                        /*Both pixels are equal, so one compare covers the pair and the cached
-                         *result goes out as a single word*/
+                        /*Both pixels are equal so use a u32 write*/
                         RGB565_OPA_FILL_PX(dest_buf_u16[x]);
                         ((lv_draw_sw_word_t *)&dest_buf_u16[x])->u32 = last_res32_color;
                     }

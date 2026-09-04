@@ -486,8 +486,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
             for(y = 0; y < h; y++) {
                 uint32_t mask_x;
                 for(x = 0, mask_x = 0; x < w; x += dest_px_size, mask_x++) {
-                    /*About half of a glyph or a rounded corner is fully transparent, and
-                     *at -Os the mix isn't inlined, so this saves a call per pixel*/
                     if(mask[mask_x] == 0) continue;
                     lv_color_24_24_mix((const uint8_t *)&color32, &dest_buf[x], mask[mask_x]);
                 }
