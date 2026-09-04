@@ -38,7 +38,9 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_roller_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static void remove_options_translation_tag(lv_obj_t * obj);
 static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 static void draw_label(lv_event_t * e);
@@ -51,6 +53,7 @@ static int32_t get_selected_label_width(const lv_obj_t * obj);
 static void scroll_anim_completed_cb(lv_anim_t * a);
 static void set_y_anim(void * obj, int32_t v);
 static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
+static lv_result_t update_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode);
 
 #if LV_USE_OBSERVER
     static void roller_value_changed_event_cb(lv_event_t * e);
@@ -82,6 +85,7 @@ static const lv_property_ops_t lv_roller_properties[] = {
 
 const lv_obj_class_t lv_roller_class = {
     .constructor_cb = lv_roller_constructor,
+    .destructor_cb = lv_roller_destructor,
     .event_cb = lv_roller_event,
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_DPI_DEF,
@@ -125,64 +129,43 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(options != NULL, return);
 
-    lv_roller_t * roller = (lv_roller_t *)obj;
-    lv_obj_t * label = get_label(obj);
-
-    roller->sel_opt_id     = 0;
-    roller->sel_opt_id_ori = 0;
-
-    /*Count the '\n'-s to determine the number of options*/
-    roller->option_cnt = 0;
-    uint32_t cnt;
-    for(cnt = 0; options[cnt] != '\0'; cnt++) {
-        if(options[cnt] == '\n') roller->option_cnt++;
+    lv_result_t res = update_options(obj, options, mode);
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't set the new options");
+        return;
     }
-    roller->option_cnt++; /*Last option has no `\n`*/
-
-    if(mode == LV_ROLLER_MODE_NORMAL) {
-        roller->mode = LV_ROLLER_MODE_NORMAL;
-        lv_label_set_text(label, options);
-    }
-    else {
-        roller->mode = LV_ROLLER_MODE_INFINITE;
-
-        const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
-        int32_t normal_h = roller->option_cnt * (lv_font_get_line_height_internal(font) +
-                                                 lv_obj_get_style_text_letter_space_internal(
-                                                     obj,
-                                                     LV_PART_MAIN));
-        roller->inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
-        if(!(roller->inf_page_cnt & 1)) roller->inf_page_cnt++;   /*Make it odd*/
-        LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", roller->inf_page_cnt);
-
-        size_t opt_len = lv_strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        size_t opt_extra_len = opt_len * roller->inf_page_cnt;
-        if(opt_extra_len == 0) {
-            /*Prevent write overflow*/
-            opt_extra_len = 1;
-        }
-
-        char * opt_extra = lv_malloc(opt_extra_len);
-        uint32_t i;
-        for(i = 0; i < roller->inf_page_cnt; i++) {
-            lv_strcpy(&opt_extra[opt_len * i], options);
-            opt_extra[opt_len * (i + 1) - 1] = '\n';
-        }
-        opt_extra[opt_extra_len - 1] = '\0';
-        lv_label_set_text(label, opt_extra);
-        lv_free(opt_extra);
-
-        roller->sel_opt_id = ((roller->inf_page_cnt / 2) + 0) * roller->option_cnt;
-
-        roller->option_cnt = roller->option_cnt * roller->inf_page_cnt;
-        inf_normalize(obj);
-    }
-
-    roller->sel_opt_id_ori = roller->sel_opt_id;
-
-    /*If the selected text has larger font the label needs some extra draw padding to draw it.*/
-    lv_obj_refresh_ext_draw_size(label);
+    remove_options_translation_tag(obj);
 }
+
+#if LV_USE_TRANSLATION
+void lv_roller_set_options_translation_tag(lv_obj_t * obj, const char * tag, lv_roller_mode_t mode)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(tag && tag[0] != '\0', return);
+
+    lv_roller_t * roller = (lv_roller_t *)obj;
+
+    char * new_tag = lv_strdup(tag);
+    LV_ASSERT_MALLOC(new_tag);
+    if(!new_tag) {
+        LV_LOG_WARN("Failed to allocate memory for new tag");
+        return;
+    }
+
+    lv_result_t res = update_options(obj, lv_tr(tag), mode);
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't set the new translated options");
+        lv_free(new_tag);
+        return;
+    }
+
+    if(roller->options_translation_tag) {
+        lv_free(roller->options_translation_tag);
+    }
+    roller->options_translation_tag = new_tag;
+
+}
+#endif /*LV_USE_TRANSLATION*/
 
 void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim)
 {
@@ -387,6 +370,29 @@ static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_LOG_TRACE("finished");
 }
 
+static void lv_roller_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+#if LV_USE_TRANSLATION
+    lv_roller_t * roller = (lv_roller_t *)obj;
+    lv_free(roller->options_translation_tag);
+    roller->options_translation_tag = NULL;
+#else
+    LV_UNUSED(obj);
+#endif /*LV_USE_TRANSLATION*/
+}
+
+static void remove_options_translation_tag(lv_obj_t * obj)
+{
+#if LV_USE_TRANSLATION
+    lv_roller_t * roller = (lv_roller_t *)obj;
+    lv_free(roller->options_translation_tag);
+    roller->options_translation_tag = NULL;
+#else
+    LV_UNUSED(obj);
+#endif /*LV_USE_TRANSLATION*/
+}
+
 static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
@@ -513,6 +519,22 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST) {
         draw_main(e);
     }
+#if LV_USE_TRANSLATION
+    else if(code == LV_EVENT_TRANSLATION_LANGUAGE_CHANGED) {
+        if(roller->options_translation_tag) {
+
+            uint32_t prev_sel = roller->sel_opt_id;
+
+            lv_result_t options_res = update_options(obj, lv_tr(roller->options_translation_tag), roller->mode);
+            if(options_res == LV_RESULT_INVALID) {
+                LV_LOG_WARN("Couldn't set the new translated options");
+            }
+            else {
+                lv_roller_set_selected(obj, prev_sel, LV_ANIM_OFF);
+            }
+        }
+    }
+#endif /*LV_USE_TRANSLATION*/
 }
 
 static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
@@ -962,6 +984,81 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     scale_y = 256 * 256 / scale_y;
     lv_point_transform(vect, -angle, scale_x, scale_y, &pivot, false);
 }
+
+static lv_result_t update_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
+{
+    LV_ASSERT(obj);
+    LV_ASSERT(options);
+
+    lv_roller_t * roller = (lv_roller_t *)obj;
+    lv_obj_t * label = get_label(obj);
+
+    roller->sel_opt_id     = 0;
+    roller->sel_opt_id_ori = 0;
+
+    /*Count the '\n'-s to determine the number of options*/
+    roller->option_cnt = 0;
+    uint32_t cnt;
+    for(cnt = 0; options[cnt] != '\0'; cnt++) {
+        if(options[cnt] == '\n') roller->option_cnt++;
+    }
+    roller->option_cnt++; /*Last option has no `\n`*/
+
+    if(mode == LV_ROLLER_MODE_NORMAL) {
+        roller->mode = LV_ROLLER_MODE_NORMAL;
+        lv_label_set_text(label, options);
+    }
+    else {
+
+        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+
+        int32_t normal_h = roller->option_cnt * (lv_font_get_line_height_internal(font) +
+                                                 lv_obj_get_style_text_letter_space_internal(obj, LV_PART_MAIN));
+        uint32_t inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
+        if(!(inf_page_cnt & 1)) inf_page_cnt++;   /*Make it odd*/
+        LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", inf_page_cnt);
+
+        size_t opt_len = lv_strlen(options) + 1; /*+1 to add '\n' after option lists*/
+        size_t opt_extra_len = opt_len * inf_page_cnt;
+        if(opt_extra_len == 0) {
+            /*Prevent write overflow*/
+            opt_extra_len = 1;
+        }
+
+        /*Have a the options multiple times so that it looks infinite */
+        char * opt_extra = lv_malloc(opt_extra_len);
+        LV_ASSERT_MALLOC(opt_extra);
+        if(opt_extra == NULL) {
+            LV_LOG_WARN("Couldn't allocate the buffer for the options");
+            return LV_RESULT_INVALID;
+        }
+
+        roller->inf_page_cnt = inf_page_cnt;
+        roller->mode = LV_ROLLER_MODE_INFINITE;
+        uint32_t i;
+        for(i = 0; i < roller->inf_page_cnt; i++) {
+            lv_strcpy(&opt_extra[opt_len * i], options);
+            opt_extra[opt_len * (i + 1) - 1] = '\n';
+        }
+        opt_extra[opt_extra_len - 1] = '\0';
+        lv_label_set_text(label, opt_extra);
+        lv_free(opt_extra);
+
+        roller->sel_opt_id = ((roller->inf_page_cnt / 2) + 0) * roller->option_cnt;
+
+        roller->option_cnt = roller->option_cnt * roller->inf_page_cnt;
+        inf_normalize(obj);
+    }
+
+
+    roller->sel_opt_id_ori = roller->sel_opt_id;
+
+    /*If the selected text has larger font the label needs some extra draw padding to draw it.*/
+    lv_obj_refresh_ext_draw_size(label);
+
+    return LV_RESULT_OK;
+}
+
 
 #if LV_USE_OBSERVER
 
