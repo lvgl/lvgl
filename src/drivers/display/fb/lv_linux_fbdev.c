@@ -211,13 +211,9 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     switch(dsc->vinfo.bits_per_pixel) {
         case 8:
 #if !LV_LINUX_FBDEV_BSD
-            /* In 8bpp modes, many Linux framebuffers are pseudocolor (palette indexed).
-             * LV_COLOR_FORMAT_L8 assumes a linear grayscale buffer, so reject
-             * pseudocolor visuals unless the colormap is explicitly managed. */
-            if(dsc->finfo.visual == FB_VISUAL_PSEUDOCOLOR ||
-               dsc->finfo.visual == FB_VISUAL_STATIC_PSEUDOCOLOR) {
-                LV_LOG_WARN("8bpp pseudocolor framebuffer visual (%d) is not supported with "
-                            "LV_COLOR_FORMAT_L8", dsc->finfo.visual);
+            if(dsc->vinfo.grayscale != 1) {
+                LV_LOG_WARN("8bpp framebuffer does not report a grayscale format (grayscale = %u); "
+                            "LV_COLOR_FORMAT_L8 is not supported", (unsigned)dsc->vinfo.grayscale);
                 return LV_RESULT_INVALID;
             }
 #endif
