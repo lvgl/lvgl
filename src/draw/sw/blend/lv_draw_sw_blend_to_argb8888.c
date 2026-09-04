@@ -354,7 +354,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
                     }
                     for(; x <= w - 4; x += 4) {
                         uint32_t mask32;
-                        LV_LOAD_U32(mask32, mask + x);
+                        mask32 = ((const lv_draw_sw_word_t *)(mask + x))->u32;
                         if(mask32 == 0) continue;   /*Four transparent pixels*/
                         if(mask32 == 0xFFFFFFFF) {  /*Four opaque pixels*/
                             dest_buf[x + 0] = color_opaque;
@@ -783,7 +783,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_masked_rows(lv_color32_t * dest_buf_c32
             }
             for(; x <= w - 4; x += 4) {
                 uint32_t m32;
-                LV_LOAD_U32(m32, mask_buf + x);
+                m32 = ((const lv_draw_sw_word_t *)(mask_buf + x))->u32;
                 if(m32 == 0) continue;
                 RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 0], src_buf_c16[x + 0], mask_buf[x + 0]);
                 RGB565_TO_ARGB8888_MASK_PX(dest_buf_c32[x + 1], src_buf_c16[x + 1], mask_buf[x + 1]);

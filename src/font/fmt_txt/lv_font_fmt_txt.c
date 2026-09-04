@@ -160,7 +160,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
                 for(x = 0; x < gdsc->box_w; x++) bitmap_out_tmp[x] = *bitmap_in++;
                 used = gdsc->box_w;
             }
-            else {                      /*1 and 2 bpp*/
+            else if(fdsc->bpp == 1 || fdsc->bpp == 2) {
                 int32_t per = 8 / fdsc->bpp;
                 uint32_t mask = (1u << fdsc->bpp) - 1u;
                 x = 0;
@@ -179,6 +179,13 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
                     }
                 }
                 if(shift >= 8) shift = 8;
+            }
+            else {
+                /*`lv_binfont_loader` takes the bpp from the file header unchecked. On a bpp
+                 *that doesn't divide 8 the loop above advances no pixels and never finishes,
+                 *after reading past `opa2_table` on the way.*/
+                LV_LOG_WARN("%d bpp is not handled", (int)fdsc->bpp);
+                return NULL;
             }
 
             if(stride_in) {

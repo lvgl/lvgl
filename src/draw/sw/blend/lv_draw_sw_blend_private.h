@@ -81,21 +81,26 @@ struct _lv_draw_sw_blend_image_dsc_t {
  **********************/
 
 /**
- * Read or write four bytes of a byte buffer as one word. Every caller aligns the pointer to
- * a word first, so this is always an aligned access. `may_alias` tells the compilers that
- * have it not to assume the buffer's type, without costing an instruction; the others get
- * the plain access. The attribute sits inside the macro so the header stays parseable by
- * tools that don't know `__attribute__`, such as the pycparser the MicroPython bindings use.
+ * Read or write four bytes of a pixel or mask buffer as one word. The caller must align the
+ * pointer to a word first.
+ *
+ * Through a union and not a cast: C99 6.5p7 lets an object be accessed through an aggregate
+ * that has its type among the members, `*(uint32_t *)ptr` on a `uint8_t` or `uint16_t` buffer
+ * is undefined and GCC 13 at -O2 really does keep a stale half word across it.
  */
-#if defined(__GNUC__) || defined(__clang__)
-#define LV_LOAD_U32(res, src)  \
-    do { (res) = *((const uint32_t __attribute__((__may_alias__)) *)(src)); } while(0)
-#define LV_STORE_U32(dst, val) \
-    do { *((uint32_t __attribute__((__may_alias__)) *)(dst)) = (val); } while(0)
-#else
-#define LV_LOAD_U32(res, src)  do { (res) = *((const uint32_t *)(src)); } while(0)
-#define LV_STORE_U32(dst, val) do { *((uint32_t *)(dst)) = (val); } while(0)
-#endif
+typedef union {
+    uint32_t u32;
+    uint16_t u16[2];
+    uint8_t u8[4];
+    lv_color32_t c32;
+} lv_draw_sw_word_t;
+
+/** The same for two bytes, for the RGB565 buffers. */
+typedef union {
+    uint16_t u16;
+    uint8_t u8[2];
+    lv_color16_t c16;
+} lv_draw_sw_halfword_t;
 
 /**
  * Prepare an RGB565 color for mixing: spread it over 32 bits so each channel gets room to

@@ -579,6 +579,7 @@ static void rgb888_row_bilinear(const uint8_t * src, int32_t src_stride,
                                 int32_t x_from, int32_t x_to, int32_t x_offs,
                                 lv_color32_t * dest_c32, uint32_t px_size)
 {
+    lv_draw_sw_word_t * dest_w = (lv_draw_sw_word_t *)dest_c32;
     int32_t x;
     for(x = x_from; x < x_to; x++) {
         int32_t x_abs = x + x_offs;
@@ -590,10 +591,12 @@ static void rgb888_row_bilinear(const uint8_t * src, int32_t src_stride,
         const uint8_t * p = src + ys_int * src_stride + xs_int * px_size;
         uint32_t p00, p01, p10, p11;
         if(px_size == 4) {
-            p00 = *(const uint32_t *)p;
-            p01 = *(const uint32_t *)(p + 4);
-            p10 = *(const uint32_t *)(p + src_stride);
-            p11 = *(const uint32_t *)(p + src_stride + 4);
+            const lv_draw_sw_word_t * w = (const lv_draw_sw_word_t *)p;
+            const lv_draw_sw_word_t * w2 = (const lv_draw_sw_word_t *)(p + src_stride);
+            p00 = w[0].u32;
+            p01 = w[1].u32;
+            p10 = w2[0].u32;
+            p11 = w2[1].u32;
         }
         else {
             const uint8_t * p2 = p + src_stride;
@@ -616,7 +619,7 @@ static void rgb888_row_bilinear(const uint8_t * src, int32_t src_stride,
         uint32_t fy_inv = 256 - fy;
         uint32_t rb = ((t_rb * fy_inv + b_rb * fy) >> 8) & 0xFF00FF;
         uint32_t g = ((t_g * fy_inv + b_g * fy) >> 8) & 0xFF00;
-        *(uint32_t *)&dest_c32[x] = rb | g | 0xFF000000;
+        dest_w[x].u32 = rb | g | 0xFF000000;
     }
 }
 
@@ -673,6 +676,7 @@ static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src
                                  int32_t x_from, int32_t x_to, int32_t x_offs, int32_t xs_clamp_ups,
                                  lv_color32_t * dest_c32, bool aa)
 {
+    lv_draw_sw_word_t * dest_w = (lv_draw_sw_word_t *)dest_c32;
     int32_t x;
     for(x = x_from; x < x_to; x++) {
         int32_t x_abs = x + x_offs;
@@ -685,12 +689,12 @@ static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src
 
         /*Fully out of the image*/
         if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
-            *(uint32_t *)&dest_c32[x] = 0x00000000;
+            dest_w[x].u32 = 0x00000000;
             continue;
         }
 
         if(!aa) {
-            *(uint32_t *)&dest_c32[x] = *(const uint32_t *)(src + ys_int * src_stride + xs_int * 4);
+            dest_w[x].u32 = ((const lv_draw_sw_word_t *)(src + ys_int * src_stride + xs_int * 4))->u32;
             continue;
         }
 
@@ -706,12 +710,12 @@ static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src
             int32_t sx = x0 + (i & 1);
             int32_t sy = y0 + (i >> 1);
             if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
-                p[i] = *(const uint32_t *)(src + sy * src_stride + sx * 4);
+                p[i] = ((const lv_draw_sw_word_t *)(src + sy * src_stride + sx * 4))->u32;
             }
         }
 
-        *(uint32_t *)&dest_c32[x] = argb8888_bilinear_premul(p[0], p[1], p[2], p[3],
-                                                             xs_ofs & 0xFF, ys_ofs & 0xFF);
+        dest_w[x].u32 = argb8888_bilinear_premul(p[0], p[1], p[2], p[3],
+                                                 xs_ofs & 0xFF, ys_ofs & 0xFF);
     }
 }
 
@@ -719,6 +723,7 @@ static void argb8888_row_fast(const uint8_t * src, int32_t src_stride,
                               int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
                               int32_t x_from, int32_t x_to, int32_t x_offs, lv_color32_t * dest_c32)
 {
+    lv_draw_sw_word_t * dest_w = (lv_draw_sw_word_t *)dest_c32;
     int32_t x;
     for(x = x_from; x < x_to; x++) {
         int32_t x_abs = x + x_offs;
@@ -729,16 +734,18 @@ static void argb8888_row_fast(const uint8_t * src, int32_t src_stride,
         int32_t xs_int = xs_ups_ofs >> 8;
         int32_t ys_int = ys_ups_ofs >> 8;
 
-        const uint8_t * p = src + ys_int * src_stride + xs_int * 4;
-        uint32_t p00 = *(const uint32_t *)p;
-        uint32_t p01 = *(const uint32_t *)(p + 4);
-        uint32_t p10 = *(const uint32_t *)(p + src_stride);
-        uint32_t p11 = *(const uint32_t *)(p + src_stride + 4);
+        const uint8_t * pb = src + ys_int * src_stride + xs_int * 4;
+        const lv_draw_sw_word_t * p = (const lv_draw_sw_word_t *)pb;
+        const lv_draw_sw_word_t * p2 = (const lv_draw_sw_word_t *)(pb + src_stride);
+        uint32_t p00 = p[0].u32;
+        uint32_t p01 = p[1].u32;
+        uint32_t p10 = p2[0].u32;
+        uint32_t p11 = p2[1].u32;
 
         if(p00 == p01 && p00 == p10 && p00 == p11) {
             /*Flat neighborhood: the filter is the identity. Real UI images are mostly flat,
              *so this fires often and predicts well.*/
-            *(uint32_t *)&dest_c32[x] = argb8888_premul(p00);
+            dest_w[x].u32 = argb8888_premul(p00);
         }
         else if(((p00 & p01 & p10 & p11) >> 24) == 0xFF) {
             /*All the 4 neighbors are opaque: use true bilinear interpolation.
@@ -755,13 +762,13 @@ static void argb8888_row_fast(const uint8_t * src, int32_t src_stride,
             uint32_t fy_inv = 256 - fy;
             uint32_t rb = ((t_rb * fy_inv + b_rb * fy) >> 8) & 0xFF00FF;
             uint32_t g = ((t_g * fy_inv + b_g * fy) >> 8) & 0xFF00;
-            *(uint32_t *)&dest_c32[x] = rb | g | 0xFF000000;
+            dest_w[x].u32 = rb | g | 0xFF000000;
         }
         else {
             /*Non opaque pixels are involved: filter in premultiplied space, where a
              *transparent neighbor simply carries no weight*/
-            *(uint32_t *)&dest_c32[x] = argb8888_bilinear_premul(p00, p01, p10, p11,
-                                                                 xs_ups_ofs & 0xFF, ys_ups_ofs & 0xFF);
+            dest_w[x].u32 = argb8888_bilinear_premul(p00, p01, p10, p11,
+                                                     xs_ups_ofs & 0xFF, ys_ups_ofs & 0xFF);
         }
     }
 }
@@ -772,6 +779,7 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
                                uint8_t * dest_buf, bool aa)
 {
     lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf;
+    lv_draw_sw_word_t * dest_w = (lv_draw_sw_word_t *)dest_buf;
 
     /*The destination is indexed from zero while the source coordinates are calculated from the
      *absolute (image local) x coordinate to keep the partial rendering deterministic*/
@@ -796,7 +804,7 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
             int32_t x_abs = x + x_start;
             int32_t xs_int = (xs_ups + ((xs_step * x_abs) >> 8)) >> 8;
             int32_t ys_int = (ys_ups + ((ys_step * x_abs) >> 8)) >> 8;
-            *(uint32_t *)&dest_c32[x] = *(const uint32_t *)(src + ys_int * src_stride + xs_int * 4);
+            dest_w[x].u32 = ((const lv_draw_sw_word_t *)(src + ys_int * src_stride + xs_int * 4))->u32;
         }
     }
 
@@ -823,6 +831,7 @@ static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w,
                                              int32_t x_start, int32_t x_end, int32_t xs_clamp_ups,
                                              uint8_t * dest_buf, bool aa)
 {
+    lv_draw_sw_word_t * dest_w = (lv_draw_sw_word_t *)dest_buf;
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
     lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf;
@@ -840,7 +849,7 @@ static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w,
 
         /*Fully out of the image*/
         if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
-            *(uint32_t *)&dest_c32[x] = 0x00000000;
+            dest_w[x].u32 = 0x00000000;
             continue;
         }
 
@@ -983,12 +992,13 @@ static void rgb565a8_row_fast(const uint8_t * src, int32_t src_stride,
                     cbuf[x] = 0;
                     continue;
                 }
-                const uint16_t * pc = (const uint16_t *)(src + ys_int * src_stride) + xs_int;
-                const uint16_t * pc2 = (const uint16_t *)((const uint8_t *)pc + src_stride);
-                uint16_t s00 = pc[0];
-                uint16_t s01 = pc[1];
-                uint16_t s10 = pc2[0];
-                uint16_t s11 = pc2[1];
+                const uint8_t * pcb = src + ys_int * src_stride + xs_int * 2;
+                const lv_draw_sw_halfword_t * pc = (const lv_draw_sw_halfword_t *)pcb;
+                const lv_draw_sw_halfword_t * pc2 = (const lv_draw_sw_halfword_t *)(pcb + src_stride);
+                uint16_t s00 = pc[0].u16;
+                uint16_t s01 = pc[1].u16;
+                uint16_t s10 = pc2[0].u16;
+                uint16_t s11 = pc2[1].u16;
                 uint32_t w00 = (s00 | ((uint32_t)s00 << 16)) & 0x7E0F81F;
                 uint32_t w01 = (s01 | ((uint32_t)s01 << 16)) & 0x7E0F81F;
                 uint32_t w10 = (s10 | ((uint32_t)s10 << 16)) & 0x7E0F81F;
@@ -1004,12 +1014,17 @@ static void rgb565a8_row_fast(const uint8_t * src, int32_t src_stride,
          *The RGB565 colors are expanded to 32 bits (0x07E0F81F mask) so all channels
          *can be interpolated with a single multiplication. 5 bit weights are used
          *so the 11 bit lanes can't overflow (63 * 32 < 2048).*/
-        const uint16_t * p = (const uint16_t *)(src + ys_int * src_stride) + xs_int;
-        const uint16_t * p2 = (const uint16_t *)((const uint8_t *)p + src_stride);
-        uint32_t e00 = (p[0] | ((uint32_t)p[0] << 16)) & 0x7E0F81F;
-        uint32_t e01 = (p[1] | ((uint32_t)p[1] << 16)) & 0x7E0F81F;
-        uint32_t e10 = (p2[0] | ((uint32_t)p2[0] << 16)) & 0x7E0F81F;
-        uint32_t e11 = (p2[1] | ((uint32_t)p2[1] << 16)) & 0x7E0F81F;
+        const uint8_t * pb = src + ys_int * src_stride + xs_int * 2;
+        const lv_draw_sw_halfword_t * p = (const lv_draw_sw_halfword_t *)pb;
+        const lv_draw_sw_halfword_t * p2 = (const lv_draw_sw_halfword_t *)(pb + src_stride);
+        uint16_t q00 = p[0].u16;
+        uint16_t q01 = p[1].u16;
+        uint16_t q10 = p2[0].u16;
+        uint16_t q11 = p2[1].u16;
+        uint32_t e00 = (q00 | ((uint32_t)q00 << 16)) & 0x7E0F81F;
+        uint32_t e01 = (q01 | ((uint32_t)q01 << 16)) & 0x7E0F81F;
+        uint32_t e10 = (q10 | ((uint32_t)q10 << 16)) & 0x7E0F81F;
+        uint32_t e11 = (q11 | ((uint32_t)q11 << 16)) & 0x7E0F81F;
         uint32_t fx5 = (fx + 4) >> 3;
         uint32_t fy5 = (fy + 4) >> 3;
         uint32_t top = ((e00 * (32 - fx5) + e01 * fx5) >> 5) & 0x7E0F81F;
@@ -1043,7 +1058,7 @@ static void rgb565a8_row_checked(const uint8_t * src, int32_t src_w, int32_t src
         }
 
         if(!aa) {
-            uint16_t c = *(const uint16_t *)(src + ys_int * src_stride + xs_int * 2);
+            uint16_t c = ((const lv_draw_sw_halfword_t *)(src + ys_int * src_stride + xs_int * 2))->u16;
             cbuf[x] = c;
             abuf[x] = src_has_a8 ? src_alpha[ys_int * alpha_stride + xs_int] : 0xFF;
             continue;
@@ -1063,7 +1078,7 @@ static void rgb565a8_row_checked(const uint8_t * src, int32_t src_w, int32_t src
             int32_t sx = x0 + (i & 1);
             int32_t sy = y0 + (i >> 1);
             if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
-                uint16_t c = *(const uint16_t *)(src + sy * src_stride + sx * 2);
+                uint16_t c = ((const lv_draw_sw_halfword_t *)(src + sy * src_stride + sx * 2))->u16;
                 uint16_t cc = c;
                 e[i] = (cc | ((uint32_t)cc << 16)) & 0x7E0F81F;
                 a[i] = src_has_a8 ? src_alpha[sy * alpha_stride + sx] : 0xFF;
@@ -1117,7 +1132,7 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
             int32_t x_abs = x + x_start;
             int32_t xs_int = (xs_ups + ((xs_step * x_abs) >> 8)) >> 8;
             int32_t ys_int = (ys_ups + ((ys_step * x_abs) >> 8)) >> 8;
-            cbuf[x] = *((const uint16_t *)(src + ys_int * src_stride) + xs_int);
+            cbuf[x] = ((const lv_draw_sw_halfword_t *)(src + ys_int * src_stride + xs_int * 2))->u16;
             abuf[x] = src_has_a8 ? src_alpha[ys_int * alpha_stride + xs_int] : 0xFF;
         }
     }
@@ -1177,12 +1192,13 @@ static void rgb565a8_swapped_row_fast(const uint8_t * src, int32_t src_stride,
                     cbuf[x] = 0;
                     continue;
                 }
-                const uint16_t * pc = (const uint16_t *)(src + ys_int * src_stride) + xs_int;
-                const uint16_t * pc2 = (const uint16_t *)((const uint8_t *)pc + src_stride);
-                uint16_t s00 = lv_color_swap_16(pc[0]);
-                uint16_t s01 = lv_color_swap_16(pc[1]);
-                uint16_t s10 = lv_color_swap_16(pc2[0]);
-                uint16_t s11 = lv_color_swap_16(pc2[1]);
+                const uint8_t * pcb = src + ys_int * src_stride + xs_int * 2;
+                const lv_draw_sw_halfword_t * pc = (const lv_draw_sw_halfword_t *)pcb;
+                const lv_draw_sw_halfword_t * pc2 = (const lv_draw_sw_halfword_t *)(pcb + src_stride);
+                uint16_t s00 = lv_color_swap_16(pc[0].u16);
+                uint16_t s01 = lv_color_swap_16(pc[1].u16);
+                uint16_t s10 = lv_color_swap_16(pc2[0].u16);
+                uint16_t s11 = lv_color_swap_16(pc2[1].u16);
                 uint32_t w00 = (s00 | ((uint32_t)s00 << 16)) & 0x7E0F81F;
                 uint32_t w01 = (s01 | ((uint32_t)s01 << 16)) & 0x7E0F81F;
                 uint32_t w10 = (s10 | ((uint32_t)s10 << 16)) & 0x7E0F81F;
@@ -1198,12 +1214,13 @@ static void rgb565a8_swapped_row_fast(const uint8_t * src, int32_t src_stride,
          *The RGB565 colors are expanded to 32 bits (0x07E0F81F mask) so all channels
          *can be interpolated with a single multiplication. 5 bit weights are used
          *so the 11 bit lanes can't overflow (63 * 32 < 2048).*/
-        const uint16_t * p = (const uint16_t *)(src + ys_int * src_stride) + xs_int;
-        const uint16_t * p2 = (const uint16_t *)((const uint8_t *)p + src_stride);
-        uint16_t c00 = lv_color_swap_16(p[0]);
-        uint16_t c01 = lv_color_swap_16(p[1]);
-        uint16_t c10 = lv_color_swap_16(p2[0]);
-        uint16_t c11 = lv_color_swap_16(p2[1]);
+        const uint8_t * pb = src + ys_int * src_stride + xs_int * 2;
+        const lv_draw_sw_halfword_t * p = (const lv_draw_sw_halfword_t *)pb;
+        const lv_draw_sw_halfword_t * p2 = (const lv_draw_sw_halfword_t *)(pb + src_stride);
+        uint16_t c00 = lv_color_swap_16(p[0].u16);
+        uint16_t c01 = lv_color_swap_16(p[1].u16);
+        uint16_t c10 = lv_color_swap_16(p2[0].u16);
+        uint16_t c11 = lv_color_swap_16(p2[1].u16);
         uint32_t e00 = (c00 | ((uint32_t)c00 << 16)) & 0x7E0F81F;
         uint32_t e01 = (c01 | ((uint32_t)c01 << 16)) & 0x7E0F81F;
         uint32_t e10 = (c10 | ((uint32_t)c10 << 16)) & 0x7E0F81F;
@@ -1241,7 +1258,7 @@ static void rgb565a8_swapped_row_checked(const uint8_t * src, int32_t src_w, int
         }
 
         if(!aa) {
-            uint16_t c = *(const uint16_t *)(src + ys_int * src_stride + xs_int * 2);
+            uint16_t c = ((const lv_draw_sw_halfword_t *)(src + ys_int * src_stride + xs_int * 2))->u16;
             cbuf[x] = lv_color_swap_16(c);
             abuf[x] = src_has_a8 ? src_alpha[ys_int * alpha_stride + xs_int] : 0xFF;
             continue;
@@ -1261,7 +1278,7 @@ static void rgb565a8_swapped_row_checked(const uint8_t * src, int32_t src_w, int
             int32_t sx = x0 + (i & 1);
             int32_t sy = y0 + (i >> 1);
             if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
-                uint16_t c = *(const uint16_t *)(src + sy * src_stride + sx * 2);
+                uint16_t c = ((const lv_draw_sw_halfword_t *)(src + sy * src_stride + sx * 2))->u16;
                 uint16_t cc = lv_color_swap_16(c);
                 e[i] = (cc | ((uint32_t)cc << 16)) & 0x7E0F81F;
                 a[i] = src_has_a8 ? src_alpha[sy * alpha_stride + sx] : 0xFF;
@@ -1315,7 +1332,7 @@ static void transform_rgb565a8_swapped(const uint8_t * src, int32_t src_w, int32
             int32_t x_abs = x + x_start;
             int32_t xs_int = (xs_ups + ((xs_step * x_abs) >> 8)) >> 8;
             int32_t ys_int = (ys_ups + ((ys_step * x_abs) >> 8)) >> 8;
-            cbuf[x] = lv_color_swap_16(*((const uint16_t *)(src + ys_int * src_stride) + xs_int));
+            cbuf[x] = lv_color_swap_16(((const lv_draw_sw_halfword_t *)(src + ys_int * src_stride + xs_int * 2))->u16);
             abuf[x] = src_has_a8 ? src_alpha[ys_int * alpha_stride + xs_int] : 0xFF;
         }
     }

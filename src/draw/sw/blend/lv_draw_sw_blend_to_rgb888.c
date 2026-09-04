@@ -267,42 +267,42 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                     uint32_t a0 = k[ofs];
                     uint32_t a1 = k[ofs == 2 ? 0 : ofs + 1];
                     uint32_t a2 = k[ofs == 0 ? 2 : ofs - 1];
-                    uint32_t * dest32 = (uint32_t *)dest;
-                    uint32_t * dest32_end = dest32 + (uint32_t)(dest_end - dest) / 4;
+                    lv_draw_sw_word_t * dest_word = (lv_draw_sw_word_t *)dest;
+                    lv_draw_sw_word_t * dest_word_end = dest_word + (uint32_t)(dest_end - dest) / 4;
 
-                    while(dest32 + 12 <= dest32_end) {
-                        dest32[0] = a0;
-                        dest32[1] = a1;
-                        dest32[2] = a2;
-                        dest32[3] = a0;
-                        dest32[4] = a1;
-                        dest32[5] = a2;
-                        dest32[6] = a0;
-                        dest32[7] = a1;
-                        dest32[8] = a2;
-                        dest32[9] = a0;
-                        dest32[10] = a1;
-                        dest32[11] = a2;
-                        dest32 += 12;
+                    while(dest_word + 12 <= dest_word_end) {
+                        dest_word[0].u32 = a0;
+                        dest_word[1].u32 = a1;
+                        dest_word[2].u32 = a2;
+                        dest_word[3].u32 = a0;
+                        dest_word[4].u32 = a1;
+                        dest_word[5].u32 = a2;
+                        dest_word[6].u32 = a0;
+                        dest_word[7].u32 = a1;
+                        dest_word[8].u32 = a2;
+                        dest_word[9].u32 = a0;
+                        dest_word[10].u32 = a1;
+                        dest_word[11].u32 = a2;
+                        dest_word += 12;
                     }
-                    while(dest32 + 3 <= dest32_end) {
-                        dest32[0] = a0;
-                        dest32[1] = a1;
-                        dest32[2] = a2;
-                        dest32 += 3;
+                    while(dest_word + 3 <= dest_word_end) {
+                        dest_word[0].u32 = a0;
+                        dest_word[1].u32 = a1;
+                        dest_word[2].u32 = a2;
+                        dest_word += 3;
                     }
-                    if(dest32 < dest32_end) {
-                        *dest32++ = a0;
+                    if(dest_word < dest_word_end) {
+                        (dest_word++)->u32 = a0;
                         a0 = a1;
                         a1 = a2;
                     }
-                    if(dest32 < dest32_end) {
-                        *dest32++ = a0;
+                    if(dest_word < dest_word_end) {
+                        (dest_word++)->u32 = a0;
                         a0 = a1;
                     }
 
                     /*At most 3 bytes left, and `a0` already starts on the right channel*/
-                    dest = (uint8_t *)dest32;
+                    dest = (uint8_t *)dest_word;
                     while(dest < dest_end) {
                         *dest++ = (uint8_t)(a0 & 0xFF);
                         a0 >>= 8;
@@ -411,7 +411,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                     }
                     for(; x <= w - 4; x += 4) {
                         uint32_t d;
-                        LV_LOAD_U32(d, dest_buf + x);
+                        d = ((const lv_draw_sw_word_t *)(dest_buf + x))->u32;
                         uint32_t res;
                         if(d == last_d[role]) {
                             res = last_res[role];
@@ -423,7 +423,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                             last_d[role] = d;
                             last_res[role] = res;
                         }
-                        LV_STORE_U32(dest_buf + x, res);
+                        ((lv_draw_sw_word_t *)(dest_buf + x))->u32 = res;
                         /*4 bytes move the channel order on by one*/
                         if(++role == 3) role = 0;
                     }
@@ -447,7 +447,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x += 4) {
                         uint32_t d;
-                        LV_LOAD_U32(d, dest_buf + x);
+                        d = ((const lv_draw_sw_word_t *)(dest_buf + x))->u32;
                         uint32_t res;
                         if(d == last_d) {
                             res = last_res;
@@ -459,7 +459,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                             last_d = d;
                             last_res = res;
                         }
-                        LV_STORE_U32(dest_buf + x, res);
+                        ((lv_draw_sw_word_t *)(dest_buf + x))->u32 = res;
                     }
                     dest_buf = drawbuf_next_row(dest_buf, dest_stride);
                 }

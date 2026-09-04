@@ -234,9 +234,25 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
     do {                                                                        \
         uint32_t a_ = (mask_val);                                               \
         if(a_) {                                                                \
-            if(a_ == 255) (dest_px) = color16;                                  \
-            else LV_COLOR_MIX_16_TO_16_PREPARED(dest_px, fg_prep, dest_px, a_);     \
+            if(a_ >= LV_OPA_MAX) (dest_px) = color16;                           \
+            else LV_COLOR_MIX_16_TO_16_PREPARED(dest_px, fg_prep, dest_px, a_); \
         }                                                                       \
+    } while(0)
+
+/**
+ * One pixel of the opacity only fill, through the cache: a repeat costs a compare, and the
+ * result is kept as the pair so the paired loop can store it in one go.
+ * A macro because -Os doesn't inline helpers, and this runs on every pixel.
+ */
+#define RGB565_OPA_FILL_PX(dest_px)                                     \
+    do {                                                                \
+        uint16_t d_ = (dest_px);                                        \
+        if(last_dest_color != d_) {                                     \
+            uint16_t res_ = lv_color_16_16_mix(color16, d_, opa);       \
+            last_dest_color = d_;                                       \
+            last_res32_color = (uint32_t)res_ | ((uint32_t)res_ << 16); \
+        }                                                               \
+        (dest_px) = (uint16_t)last_res32_color;                         \
     } while(0)
 
 /**
@@ -292,22 +308,24 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
                 uint16_t * dest = dest_buf_u16;
                 if((lv_uintptr_t)dest & 0x3) *dest++ = color16;   /*align to a word*/
 
-                uint32_t * dest32 = (uint32_t *)dest;
-                uint32_t * dest32_end = (uint32_t *)((lv_uintptr_t)dest_end & ~(lv_uintptr_t)0x3);
-                while(dest32 + 8 <= dest32_end) {
-                    dest32[0] = c32;
-                    dest32[1] = c32;
-                    dest32[2] = c32;
-                    dest32[3] = c32;
-                    dest32[4] = c32;
-                    dest32[5] = c32;
-                    dest32[6] = c32;
-                    dest32[7] = c32;
-                    dest32 += 8;
+                lv_draw_sw_word_t * dest_word = (lv_draw_sw_word_t *)dest;
+                lv_draw_sw_word_t * dest_word_end = (lv_draw_sw_word_t *)((lv_uintptr_t)dest_end & ~(lv_uintptr_t)0x3);
+                while(dest_word + 8 <= dest_word_end) {
+                    dest_word[0].u32 = c32;
+                    dest_word[1].u32 = c32;
+                    dest_word[2].u32 = c32;
+                    dest_word[3].u32 = c32;
+                    dest_word[4].u32 = c32;
+                    dest_word[5].u32 = c32;
+                    dest_word[6].u32 = c32;
+                    dest_word[7].u32 = c32;
+                    dest_word += 8;
                 }
                 /*Two pixels at a time, so at most one is left over*/
-                while(dest32 < dest32_end) *dest32++ = c32;
-                if((uint16_t *)dest32 < dest_end) *(uint16_t *)dest32 = color16;
+                while(dest_word < dest_word_end) {
+                    (dest_word++)->u32 = c32;
+                }
+                if((uint16_t *)dest_word < dest_end) *(uint16_t *)dest_word = color16;
 
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
             }
@@ -318,36 +336,33 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
     else if(mask == NULL && opa < LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(dsc)) {
             /*Flat areas are common, so cache the last background and its result: repeated
-             *pixels then cost a compare instead of a mix.*/
-            uint16_t last_dest_color = dest_buf_u16[0];
-            uint32_t last_res32_color = lv_color_16_16_mix(color16, last_dest_color, opa);
-            last_res32_color |= last_res32_color << 16; /*Kept as the pair, to store in one go*/
+             *pixels then cost a compare instead of a mix. Seeded one below the first pixel so
+             *the first compare always misses and the entry is valid from then on.*/
+            uint16_t last_dest_color = dest_buf_u16[0] - 1;
+            uint32_t last_res32_color = 0;
 
             for(y = 0; y < h; y++) {
                 x = 0;
                 if((lv_uintptr_t)&dest_buf_u16[0] & 0x3) {
-                    dest_buf_u16[0] = lv_color_16_16_mix(color16, dest_buf_u16[0], opa);
+                    RGB565_OPA_FILL_PX(dest_buf_u16[0]);
                     x = 1;
                 }
 
                 for(; x < w - 2; x += 2) {
-                    if(dest_buf_u16[x] != dest_buf_u16[x + 1]) {
-                        dest_buf_u16[x + 0] = lv_color_16_16_mix(color16, dest_buf_u16[x + 0], opa);
-                        dest_buf_u16[x + 1] = lv_color_16_16_mix(color16, dest_buf_u16[x + 1], opa);
+                    if(dest_buf_u16[x] == dest_buf_u16[x + 1]) {
+                        /*Both pixels are equal, so one compare covers the pair and the cached
+                         *result goes out as a single word*/
+                        RGB565_OPA_FILL_PX(dest_buf_u16[x]);
+                        ((lv_draw_sw_word_t *)&dest_buf_u16[x])->u32 = last_res32_color;
                     }
                     else {
-                        /*Both pixels are equal here, so one mix and one compare cover the pair*/
-                        if(last_dest_color != dest_buf_u16[x]) {
-                            uint16_t res = lv_color_16_16_mix(color16, dest_buf_u16[x], opa);
-                            last_dest_color = dest_buf_u16[x];
-                            last_res32_color = (uint32_t)res | ((uint32_t)res << 16);
-                        }
-                        LV_STORE_U32(&dest_buf_u16[x], last_res32_color);
+                        RGB565_OPA_FILL_PX(dest_buf_u16[x + 0]);
+                        RGB565_OPA_FILL_PX(dest_buf_u16[x + 1]);
                     }
                 }
 
                 for(; x < w ; x++) {
-                    dest_buf_u16[x] = lv_color_16_16_mix(color16, dest_buf_u16[x], opa);
+                    RGB565_OPA_FILL_PX(dest_buf_u16[x]);
                 }
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
             }
@@ -385,7 +400,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
                     }
                     for(; x <= w - 4; x += 4) {
                         uint32_t mask32;
-                        LV_LOAD_U32(mask32, mask + x);
+                        mask32 = ((const lv_draw_sw_word_t *)(mask + x))->u32;
                         if(mask32 == 0) continue;   /*Four transparent pixels*/
                         if(mask32 == 0xFFFFFFFF) {  /*Four opaque pixels*/
                             dest_buf_u16[x + 0] = color16;
@@ -535,7 +550,7 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
                         uint32_t a = mask_buf[dest_x];
                         if(a == 0) continue;
                         uint8_t chan_val = get_bit(src_buf_i1, src_x) * 255;
-                        if(a == 255) dest_buf_u16[dest_x] = l8_to_rgb565(chan_val);
+                        if(a >= LV_OPA_MAX) dest_buf_u16[dest_x] = l8_to_rgb565(chan_val);
                         else dest_buf_u16[dest_x] = lv_color_8_16_mix(chan_val, dest_buf_u16[dest_x], a);
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
@@ -636,7 +651,7 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
                         /*Images and masks are mostly fully transparent or fully opaque*/
                         uint32_t a = src_buf_al88[src_x].alpha;
                         if(a == 0) continue;
-                        if(a == 255) dest_buf_u16[dest_x] = l8_to_rgb565(src_buf_al88[src_x].lumi);
+                        if(a >= LV_OPA_MAX) dest_buf_u16[dest_x] = l8_to_rgb565(src_buf_al88[src_x].lumi);
                         else dest_buf_u16[dest_x] = lv_color_8_16_mix(src_buf_al88[src_x].lumi, dest_buf_u16[dest_x], a);
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
@@ -789,7 +804,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
                         /*Images and masks are mostly fully transparent or fully opaque*/
                         uint32_t a = mask_buf[dest_x];
                         if(a == 0) continue;
-                        if(a == 255) dest_buf_u16[dest_x] = l8_to_rgb565(src_buf_l8[src_x]);
+                        if(a >= LV_OPA_MAX) dest_buf_u16[dest_x] = l8_to_rgb565(src_buf_l8[src_x]);
                         else dest_buf_u16[dest_x] = lv_color_8_16_mix(src_buf_l8[src_x], dest_buf_u16[dest_x], a);
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
@@ -915,31 +930,31 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
                         for(; x < w && ((lv_uintptr_t)(mask_buf + x) & 0x3); x++) {
                             uint32_t a = mask_buf[x];
                             if(a == 0) continue;
-                            if(a == 255) dest_buf_u16[x] = src_buf_u16[x];
+                            if(a >= LV_OPA_MAX) dest_buf_u16[x] = src_buf_u16[x];
                             else dest_buf_u16[x] = lv_color_16_16_mix_inlined(src_buf_u16[x], dest_buf_u16[x], a);
                         }
                         for(; x <= w - 4; x += 4) {
                             uint32_t m32;
-                            LV_LOAD_U32(m32, mask_buf + x);
+                            m32 = ((const lv_draw_sw_word_t *)(mask_buf + x))->u32;
                             if(m32 == 0) continue;
                             {
                                 uint32_t a = mask_buf[x + 0];
-                                if(a == 255) dest_buf_u16[x + 0] = src_buf_u16[x + 0];
+                                if(a >= LV_OPA_MAX) dest_buf_u16[x + 0] = src_buf_u16[x + 0];
                                 else if(a) dest_buf_u16[x + 0] = lv_color_16_16_mix_inlined(src_buf_u16[x + 0], dest_buf_u16[x + 0], a);
                             }
                             {
                                 uint32_t a = mask_buf[x + 1];
-                                if(a == 255) dest_buf_u16[x + 1] = src_buf_u16[x + 1];
+                                if(a >= LV_OPA_MAX) dest_buf_u16[x + 1] = src_buf_u16[x + 1];
                                 else if(a) dest_buf_u16[x + 1] = lv_color_16_16_mix_inlined(src_buf_u16[x + 1], dest_buf_u16[x + 1], a);
                             }
                             {
                                 uint32_t a = mask_buf[x + 2];
-                                if(a == 255) dest_buf_u16[x + 2] = src_buf_u16[x + 2];
+                                if(a >= LV_OPA_MAX) dest_buf_u16[x + 2] = src_buf_u16[x + 2];
                                 else if(a) dest_buf_u16[x + 2] = lv_color_16_16_mix_inlined(src_buf_u16[x + 2], dest_buf_u16[x + 2], a);
                             }
                             {
                                 uint32_t a = mask_buf[x + 3];
-                                if(a == 255) dest_buf_u16[x + 3] = src_buf_u16[x + 3];
+                                if(a >= LV_OPA_MAX) dest_buf_u16[x + 3] = src_buf_u16[x + 3];
                                 else if(a) dest_buf_u16[x + 3] = lv_color_16_16_mix_inlined(src_buf_u16[x + 3], dest_buf_u16[x + 3], a);
                             }
                         }
@@ -947,7 +962,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
                     for(; x < w; x++) {
                         uint32_t a = mask_buf[x];
                         if(a == 0) continue;
-                        if(a == 255) dest_buf_u16[x] = src_buf_u16[x];
+                        if(a >= LV_OPA_MAX) dest_buf_u16[x] = src_buf_u16[x];
                         else dest_buf_u16[x] = lv_color_16_16_mix_inlined(src_buf_u16[x], dest_buf_u16[x], a);
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
@@ -1193,7 +1208,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
                         /*Images and masks are mostly fully transparent or fully opaque*/
                         uint32_t a = mask_buf[dest_x];
                         if(a == 0) continue;
-                        if(a == 255) dest_buf_u16[dest_x] = LV_COLOR_24_TO_16(&src_buf_u8[src_x]);
+                        if(a >= LV_OPA_MAX) dest_buf_u16[dest_x] = LV_COLOR_24_TO_16(&src_buf_u8[src_x]);
                         else dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x], a);
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
@@ -1292,7 +1307,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                         /*Images are mostly fully transparent or fully opaque*/
                         uint32_t a = src_buf_u8[src_x + 3];
                         if(a == 0) continue;
-                        if(a == 255) dest_buf_u16[dest_x] = LV_COLOR_24_TO_16(&src_buf_u8[src_x]);
+                        if(a >= LV_OPA_MAX) dest_buf_u16[dest_x] = LV_COLOR_24_TO_16(&src_buf_u8[src_x]);
                         else dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x], a);
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
