@@ -82,7 +82,7 @@ Watch your build log after upgrading and update each one the warning/error point
 `LV_COLOR_DEPTH` is replaced by `LV_COLOR_FORMAT_DEFAULT`, which names the format
 you want directly instead of describing how many bits it takes.
 
-The reasoning is that a bit count is ambiguous: `LV_COLOR_DEPTH 16` means either 
+The reasoning is that a bit count is ambiguous: `LV_COLOR_DEPTH 16` means either
 `RGB565` or `RGB565_SWAPPED`, and `32` means either `XRGB8888` or `ARGB8888`
 
 This new configuration makes the choice explicit:
@@ -481,6 +481,20 @@ Note that these assertions are not required and should be disabled to improve pe
   ```
   _Note: Only raw flag constants can be converted automatically. Expressions using variables will be skipped for safety._
 
+- `lv_obj_style_set_disabled()` and `lv_obj_style_get_disabled()` are deprecated
+  in favor of the positive-logic <ApiLink name="lv_obj_style_set_enabled"/> and
+  <ApiLink name="lv_obj_style_get_enabled"/>. Note that the meaning of the
+  `bool` is inverted:
+  ```c
+  /* Before */
+  lv_obj_style_set_disabled(obj, &style, LV_PART_MAIN, true);   /*Disable the style*/
+  bool dis = lv_obj_style_get_disabled(obj, &style, LV_PART_MAIN);
+
+  /* After */
+  lv_obj_style_set_enabled(obj, &style, LV_PART_MAIN, false);   /*Disable the style*/
+  bool en = lv_obj_style_get_enabled(obj, &style, LV_PART_MAIN);
+  ```
+
 ---
 
 ## Drawing/Rendering
@@ -808,7 +822,7 @@ used afterwards.
 uint32_t layout = lv_layout_register(my_layout_update, &user_data);
 ```
 
-Becomes: 
+Becomes:
 
 ```c
 lv_layout_callbacks_t callbacks = { .layout_update_cb = my_layout_update };
@@ -826,7 +840,7 @@ v9.6 moves these structures to the private API. If you have code that relies on 
 can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
 
 <Callout type="info">
-No public API usage required the user to access these private structures so 
+No public API usage required the user to access these private structures so
 if you were simply using the public API, this doesn't change anything for you.
 </Callout>
 
@@ -841,7 +855,7 @@ v9.6 moves it to the private API. If you have code that relies on the internals 
 you can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
 
 <Callout type="info">
-No public API usage required the user to access this private structure so 
+No public API usage required the user to access this private structure so
 if you were simply using the public API, this doesn't change anything for you.
 </Callout>
 

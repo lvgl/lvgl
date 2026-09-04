@@ -75,6 +75,7 @@ static bool style_has_flag(const lv_style_t * style, uint32_t flag);
 static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                               lv_style_value_t * value_act);
 static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool theme_only);
+static lv_obj_style_t * find_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 #if LV_USE_OBSERVER
     static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void bind_style_prop_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -297,40 +298,51 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     LV_PROFILER_STYLE_END;
 }
 
-void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis)
+void lv_obj_style_set_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool en)
 {
     LV_CHECK_ARG(obj != NULL, return);
     LV_CHECK_ARG(style != NULL, return);
 
-    uint32_t i;
-    for(i = 0; i < obj->style_cnt; i++) {
-        if(obj->styles[i].style == style && obj->styles[i].selector == selector) {
-            if(dis == obj->styles[i].is_disabled) {
-                return; /*Already in the right state*/
-            }
-            obj->styles[i].is_disabled = dis;
-            full_cache_refresh(obj, lv_obj_style_get_selector_part(selector));
-            lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
-            return;
-        }
-    }
-    LV_LOG_WARN("%p style was not found on %p widget with %6" LV_PRIx32 " selector", (void *)style, (void *)obj, selector);
+    lv_obj_style_t * obj_style = find_style(obj, style, selector);
+    if(obj_style == NULL) return;
+
+    if(en != obj_style->is_disabled) return; /*Already in the right state*/
+
+    obj_style->is_disabled = !en;
+    full_cache_refresh(obj, lv_obj_style_get_selector_part(selector));
+    lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), LV_STYLE_PROP_ANY);
 }
 
-bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+bool lv_obj_style_get_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
     LV_CHECK_ARG(obj != NULL, return false);
     LV_CHECK_ARG(style != NULL, return false);
 
-    uint32_t i;
-    for(i = 0; i < obj->style_cnt; i++) {
-        if(obj->styles[i].style == style && obj->styles[i].selector == selector) {
-            return obj->styles[i].is_disabled;
-        }
-    }
+    lv_obj_style_t * obj_style = find_style(obj, style, selector);
+    if(obj_style == NULL) return false;
 
-    LV_LOG_WARN("%p style was not found on %p widget with %6" LV_PRIx32 " selector", (void *)style, (void *)obj, selector);
-    return false;
+    return !obj_style->is_disabled;
+}
+
+void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis)
+{
+    LV_LOG_DEPRECATED("use lv_obj_style_set_enabled instead (with inverted logic).");
+    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_ARG(style != NULL, return);
+
+    lv_obj_style_set_enabled(obj, style, selector, !dis);
+}
+
+bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+{
+    LV_LOG_DEPRECATED("use lv_obj_style_get_enabled instead (with inverted logic).");
+    LV_CHECK_ARG(obj != NULL, return false);
+    LV_CHECK_ARG(style != NULL, return false);
+
+    lv_obj_style_t * obj_style = find_style(obj, style, selector);
+    if(obj_style == NULL) return false;
+
+    return obj_style->is_disabled;
 }
 
 
@@ -1534,6 +1546,19 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
     }
 }
 
+static lv_obj_style_t * find_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+{
+    uint32_t i;
+    for(i = 0; i < obj->style_cnt; i++) {
+        if(obj->styles[i].style == style && obj->styles[i].selector == selector) {
+            return &obj->styles[i];
+        }
+    }
+
+    LV_LOG_WARN("%p style was not found on %p widget with %6" LV_PRIx32 " selector", (void *)style, (void *)obj, selector);
+    return NULL;
+}
+
 
 
 #if LV_USE_OBSERVER
@@ -1543,8 +1568,8 @@ static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subj
     bind_style_t * p = lv_observer_get_user_data(observer);
 
     int32_t v = lv_subject_get_int(subject);
-    bool dis = (v != p->value);
-    lv_obj_style_set_disabled(observer->target, p->style, p->selector, dis);
+    bool en = (v == p->value);
+    lv_obj_style_set_enabled(observer->target, p->style, p->selector, en);
 }
 
 static void bind_style_prop_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
