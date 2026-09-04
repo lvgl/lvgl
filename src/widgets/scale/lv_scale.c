@@ -1815,8 +1815,9 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
 
 static void scale_get_labels_max_size(lv_obj_t * obj, int32_t * max_w, int32_t * max_h)
 {
-    LV_ASSERT_NULL(max_w);
-    LV_ASSERT_NULL(max_h);
+    LV_ASSERT(obj);
+    LV_ASSERT(max_w);
+    LV_ASSERT(max_h);
 
     *max_w = 0;
     *max_h = 0;
