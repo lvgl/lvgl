@@ -229,14 +229,11 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
 {
-    if(array == NULL || other == NULL) {
-        LV_LOG_ERROR("NULL pointer passed to lv_array_concat");
-        return LV_RESULT_INVALID;
-    }
+    LV_ASSERT(array);
+    LV_ASSERT(other);
 
     if(array->element_size != other->element_size) {
-        LV_LOG_ERROR("Element size mismatch: %u vs %u",
-                     (unsigned int)array->element_size, (unsigned int)other->element_size);
+        LV_LOG_ERROR("Element size mismatch: %"LV_PRIu32" vs %"LV_PRIu32, array->element_size, other->element_size);
         return LV_RESULT_INVALID;
     }
 

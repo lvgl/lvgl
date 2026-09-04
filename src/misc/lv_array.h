@@ -175,8 +175,8 @@ lv_result_t lv_array_remove_unordered(lv_array_t * array, uint32_t index);
  */
 lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end);
 
-
-/** Concatenate two arrays. Adds new elements from `other` to the end of `array`.
+/**
+ * Concatenate two arrays. Adds new elements from `other` to the end of `array`.
  * @note Destination array capacity is automatically expanded as necessary.
  * @note Both arrays must have matching element sizes.
  * @param array pointer to destination `lv_array_t` variable
@@ -184,6 +184,7 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end);
  * @return LV_RESULT_OK: success, LV_RESULT_INVALID: error (NULL pointer, size overflow, element size mismatch)
  */
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other);
+
 /**
  * Push back element. Adds a new element to the end of the array.
  * If the array capacity is not enough for the new element, the array will be resized automatically.

@@ -80,16 +80,10 @@ void test_array_copy(void)
 
 void test_array_concat(void)
 {
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_concat(NULL, NULL));
-
     lv_array_t a, b, c;
     lv_array_init(&a, 4, sizeof(int32_t));
     lv_array_init(&b, 4, sizeof(int32_t));
     lv_array_init(&c, 4, sizeof(int16_t)); /* Mismatched element size */
-
-    /* NULL input validation */
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_concat(&a, NULL));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_concat(NULL, &b));
 
     /* Element size mismatch validation */
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_concat(&a, &c));
