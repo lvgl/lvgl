@@ -530,7 +530,6 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 LV_LOG_WARN("Couldn't set the new translated options");
             }
             else {
-                update_options(obj, lv_tr(roller->options_translation_tag), roller->mode);
                 lv_roller_set_selected(obj, prev_sel, LV_ANIM_OFF);
             }
         }
