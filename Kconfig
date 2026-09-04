@@ -1062,6 +1062,7 @@ config LV_USE_G2D
 
 config LV_USE_DRAW_G2D
 	bool "G2D renderer"
+	select LV_USE_DRAW_SW
 	default n
 	help
 		Accelerate blends, fills and image blits with the NXP G2D API (i.MX 2D GPU).
