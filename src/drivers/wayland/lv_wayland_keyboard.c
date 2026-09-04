@@ -156,6 +156,16 @@ static void keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
         return;
     }
 
+    lv_display_t * display = lv_indev_get_display(indev);
+    if(!display) {
+        return;
+    }
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_ASSERT(window != NULL);
+    if(window->body != kbdata->focused_surface) {
+        return;
+    }
+
     uint8_t index = kbdata->event_read_index;
     data->key = kbdata->events[index].key;
     data->state = kbdata->events[index].state;
@@ -212,19 +222,29 @@ static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard, ui
 {
 
     LV_UNUSED(data);
-    LV_UNUSED(keyboard);
     LV_UNUSED(serial);
     LV_UNUSED(keys);
-    LV_UNUSED(surface);
+
+    lv_wl_seat_keyboard_t * kbdata = wl_keyboard_get_user_data(keyboard);
+    LV_ASSERT(kbdata != NULL);
+    kbdata->focused_surface = surface;
 }
 
 static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard, uint32_t serial,
                                   struct wl_surface * surface)
 {
     LV_UNUSED(serial);
-    LV_UNUSED(keyboard);
     LV_UNUSED(data);
-    LV_UNUSED(surface);
+
+    lv_wl_seat_keyboard_t * kbdata = wl_keyboard_get_user_data(keyboard);
+    LV_ASSERT(kbdata != NULL);
+    if(kbdata->focused_surface != surface) {
+        return;
+    }
+
+    kbdata->key = 0;
+    kbdata->state = LV_INDEV_STATE_RELEASED;
+    kbdata->focused_surface = NULL;
 }
 
 static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint32_t serial, uint32_t time,
