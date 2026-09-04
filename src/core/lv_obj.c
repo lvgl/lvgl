@@ -210,6 +210,13 @@ static const lv_property_ops_t lv_obj_properties[] = {
         .id = LV_PROPERTY_OBJ_INDEX,
         .getter = lv_obj_get_index,
     },
+#if LV_USE_OBJ_NAME
+    {
+        .id = LV_PROPERTY_OBJ_NAME,
+        .getter = lv_obj_get_name,
+        .setter = lv_obj_set_name,
+    },
+#endif
     {
         .id = LV_PROPERTY_OBJ_HIDDEN,
         .setter = lv_obj_set_hidden,
@@ -334,7 +341,7 @@ static const lv_property_ops_t lv_obj_properties[] = {
         .id = LV_PROPERTY_ID_ANY,
         .setter = lv_obj_set_any,
         .getter = lv_obj_get_any,
-    }
+    },
 };
 #endif
 

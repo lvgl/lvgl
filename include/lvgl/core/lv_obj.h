@@ -200,6 +200,10 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, STATE_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      96),
     LV_PROPERTY_ID(OBJ, FLEX_IN_NEW_TRACK,          LV_PROPERTY_TYPE_BOOL,      97),
 
+#if LV_USE_OBJ_NAME
+    LV_PROPERTY_ID(OBJ, NAME,               		LV_PROPERTY_TYPE_TEXT,  	98),
+#endif
+
     LV_PROPERTY_OBJ_END,
 };
 #endif

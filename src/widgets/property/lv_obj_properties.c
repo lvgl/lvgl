@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_obj_property_names[100] = {
+const lv_property_name_t lv_obj_property_names[101] = {
     {"adv_hittest",            LV_PROPERTY_OBJ_ADV_HITTEST,},
     {"align",                  LV_PROPERTY_OBJ_ALIGN,},
     {"checkable",              LV_PROPERTY_OBJ_CHECKABLE,},
@@ -70,6 +70,7 @@ const lv_property_name_t lv_obj_property_names[100] = {
     {"ignore_layout",          LV_PROPERTY_OBJ_IGNORE_LAYOUT,},
     {"index",                  LV_PROPERTY_OBJ_INDEX,},
     {"layout",                 LV_PROPERTY_OBJ_LAYOUT,},
+    {"name",                   LV_PROPERTY_OBJ_NAME,},
     {"overflow_visible",       LV_PROPERTY_OBJ_OVERFLOW_VISIBLE,},
     {"parent",                 LV_PROPERTY_OBJ_PARENT,},
     {"press_lock",             LV_PROPERTY_OBJ_PRESS_LOCK,},
