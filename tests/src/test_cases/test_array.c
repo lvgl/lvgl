@@ -80,9 +80,19 @@ void test_array_copy(void)
 
 void test_array_concat(void)
 {
-    lv_array_t a, b;
+    lv_array_t a, b, c;
     lv_array_init(&a, 4, sizeof(int32_t));
     lv_array_init(&b, 4, sizeof(int32_t));
+    lv_array_init(&c, 4, sizeof(int16_t)); /* Mismatched element size */
+
+    /* Element size mismatch validation */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_concat(&a, &c));
+
+    /* Empty source array concatenation */
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_array_concat(&a, &b));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_size(&a));
+
+    /* Populate and test successful concatenation with capacity expansion */
     for(int32_t i = 0; i < 4; i++) {
         lv_array_push_back(&a, &i);
         lv_array_push_back(&b, &i);
@@ -98,6 +108,7 @@ void test_array_concat(void)
 
     lv_array_deinit(&a);
     lv_array_deinit(&b);
+    lv_array_deinit(&c);
 }
 
 void test_array_init_from_buf(void)
