@@ -78,6 +78,7 @@ typedef struct {
     } events[LV_WAYLAND_KEY_EVENT_MAX_COUNT];
     uint8_t event_read_index;
     uint8_t event_write_index;
+    uint8_t event_count;
 } lv_wl_seat_keyboard_t;
 
 
