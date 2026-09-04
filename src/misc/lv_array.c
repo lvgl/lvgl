@@ -209,7 +209,7 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
 
 bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 {
-    if(array == NULL) return false;
+    LV_ASSERT(array);
 
     if(array->inner_alloc == false) {
         LV_LOG_WARN("Cannot resize array with external buffer");
