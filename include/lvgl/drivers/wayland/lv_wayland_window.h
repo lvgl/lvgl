@@ -28,6 +28,7 @@ extern "C" {
  **********************/
 
 typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * display);
+#define LV_WAYLAND_PHYSICAL_DISPLAY_ANY 0xFF
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -60,15 +61,16 @@ bool lv_wayland_window_is_open(lv_display_t * display);
 /**
  * Assigns the window to a specific physical display
  * @param display Reference to the LVGL display associated to the window
- * @param phys_display Physical display number
+ * @param phys_display Physical display number or LV_WAYLAND_PHYSICAL_DISPLAY_ANY
+ *                     to unassign a previously set physical display
  */
-void lv_wayland_assign_physical_display(lv_display_t * display, uint8_t phys_display);
+void lv_wayland_window_set_physical_display(lv_display_t * display, uint8_t phys_display);
 
 /**
  * Unassigns the current physical display attached to the window
  * @param display Reference to the LVGL display associated to the window
  */
-void lv_wayland_unassign_physical_display(lv_display_t * display);
+void lv_wayland_window_remove_physical_display(lv_display_t * display);
 
 /**
  * Sets the fullscreen state of the window

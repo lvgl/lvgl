@@ -42,6 +42,12 @@
  *      DEFINES
  *********************/
 
+#ifdef WL_OUTPUT_NAME_SINCE_VERSION
+    #define LV_WAYLAND_WL_OUTPUT_VERSION 4
+#else
+    #define LV_WAYLAND_WL_OUTPUT_VERSION 2
+#endif
+
 
 /**********************
  *      TYPEDEFS
@@ -71,6 +77,43 @@ static void output_done(void * data, struct wl_output * output);
 static void output_geometry(void * data, struct wl_output * output, int32_t x, int32_t y, int32_t physical_width,
                             int32_t physical_height, int32_t subpixel, const char * make, const char * model, int32_t transform);
 
+#ifdef WL_OUTPUT_NAME_SINCE_VERSION
+    static void output_name(void * data, struct wl_output * output, const char * name);
+    static void output_description(void * data, struct wl_output * output, const char * description);
+#endif
+
+static void xdg_output_logical_position(void * data, struct zxdg_output_v1 * xdg_output, int32_t x, int32_t y);
+static void xdg_output_logical_size(void * data, struct zxdg_output_v1 * xdg_output, int32_t width, int32_t height);
+static void xdg_output_done(void * data, struct zxdg_output_v1 * xdg_output);
+static void xdg_output_name(void * data, struct zxdg_output_v1 * xdg_output, const char * name);
+static void xdg_output_description(void * data, struct zxdg_output_v1 * xdg_output, const char * description);
+
+/* Attaches an zxdg_output_v1 to 'info' so that the compositor reports its
+ * connector name and logical size. No-op if the compositor doesn't support it. */
+#ifdef WL_OUTPUT_NAME_SINCE_VERSION
+
+static void output_name(void * data, struct wl_output * output, const char * name)
+{
+    LV_UNUSED(output);
+    lv_wl_output_info_t * info = data;
+
+    /* The core protocol is authoritative, xdg-output reports the same name */
+    snprintf(info->name, sizeof(info->name), "%s", name);
+}
+
+static void output_description(void * data, struct wl_output * output, const char * description)
+{
+    /* A human readable description of the output,
+     * Skipped since we identify outputs by their connector name */
+    LV_UNUSED(data);
+    LV_UNUSED(output);
+    LV_UNUSED(description);
+}
+
+#endif /*WL_OUTPUT_NAME_SINCE_VERSION*/
+
+static void output_bind_xdg_output(lv_wl_output_info_t * info);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -87,7 +130,19 @@ static const struct wl_output_listener output_listener = {
     .geometry = output_geometry,
     .mode = output_mode,
     .done = output_done,
-    .scale = output_scale
+    .scale = output_scale,
+#ifdef WL_OUTPUT_NAME_SINCE_VERSION
+    .name = output_name,
+    .description = output_description,
+#endif
+};
+
+static const struct zxdg_output_v1_listener xdg_output_listener = {
+    .logical_position = xdg_output_logical_position,
+    .logical_size = xdg_output_logical_size,
+    .done = xdg_output_done,
+    .name = xdg_output_name,
+    .description = xdg_output_description
 };
 
 /**********************
@@ -105,6 +160,67 @@ int lv_wayland_get_fd(void)
         return -1;
     }
     return wl_display_get_fd(lv_wl_ctx.wl_display);
+}
+
+uint8_t lv_wayland_get_output_count(void)
+{
+    return lv_wl_ctx.wl_output_count;
+}
+
+const char * lv_wayland_get_output_name(uint8_t output)
+{
+    LV_CHECK_ARG_FORMAT_MSG(output < lv_wl_ctx.wl_output_count, return NULL,
+                            "Invalid output '%d'. Expected '0'..'%d'",
+                            output, lv_wl_ctx.wl_output_count - 1);
+
+    const lv_wl_output_info_t * info = lv_wl_ctx.physical_outputs[output];
+
+    return info->name;
+}
+
+bool lv_wayland_get_output_size(uint8_t output, int32_t * width, int32_t * height)
+{
+    LV_CHECK_ARG_FORMAT_MSG(output < lv_wl_ctx.wl_output_count, return false,
+                            "Invalid output '%d'. Expected '0'..'%d'",
+                            output, lv_wl_ctx.wl_output_count - 1);
+
+    const lv_wl_output_info_t * info = lv_wl_ctx.physical_outputs[output];
+
+    int32_t w, h;
+    /* Prefer the logical size over the screen resolution */
+    if(info->logical_width > 0 && info->logical_height > 0) {
+        w = info->logical_width;
+        h = info->logical_height;
+    }
+    else {
+        w = info->width;
+        h = info->height;
+    }
+
+    if(width) {
+        *width = w;
+    }
+    if(height) {
+        *height = h;
+    }
+    return w > 0 && h > 0;
+}
+
+int32_t lv_wayland_get_display_size(const char * name, int32_t * width, int32_t * height)
+{
+    LV_CHECK_ARG(name != NULL, return -1);
+
+    for(uint8_t i = 0; i < lv_wl_ctx.wl_output_count; i++) {
+        const char * output_name = lv_wayland_get_output_name(i);
+        if(output_name == NULL || strcmp(name, output_name) != 0) {
+            continue;
+        }
+        lv_wayland_get_output_size(i, width, height);
+        return i;
+    }
+
+    LV_LOG_WARN("No output named '%s'", name);
+    return -1;
 }
 
 /**********************
@@ -147,6 +263,19 @@ lv_result_t lv_wayland_init(void)
     lv_tick_set_cb(tick_get_cb);
     lv_wl_ctx.read_compositor_events_timer = lv_timer_create(read_compositor_events_timer_cb, LV_DEF_REFR_PERIOD, NULL);
 
+    if(lv_wl_ctx.xdg_output_mgr) {
+        for(uint8_t i = 0; i < lv_wl_ctx.wl_output_count; i++) {
+            output_bind_xdg_output(lv_wl_ctx.physical_outputs[i]);
+        }
+        /* Wait for the name and logical size of every output to arrive, so that
+         * `lv_wayland_get_display_size` can be used right after initialization */
+        wl_display_roundtrip(lv_wl_ctx.wl_display);
+    }
+    else {
+        LV_LOG_WARN("zxdg_output_manager_v1 is not available, "
+                    "outputs can't be identified by their connector name");
+    }
+
     is_wayland_initialized = true;
     return LV_RESULT_OK;
 }
@@ -179,10 +308,22 @@ void lv_wayland_deinit(void)
     }
 
     for(uint8_t i = 0; i < lv_wl_ctx.wl_output_count; ++i) {
-        if(lv_wl_ctx.physical_outputs[i].wl_output) {
-            wl_output_destroy(lv_wl_ctx.physical_outputs[i].wl_output);
-            lv_wl_ctx.physical_outputs[i].wl_output = NULL;
+        lv_wl_output_info_t * info = lv_wl_ctx.physical_outputs[i];
+        if(info->xdg_output) {
+            zxdg_output_v1_destroy(info->xdg_output);
         }
+        if(info->wl_output) {
+            wl_output_destroy(info->wl_output);
+        }
+        lv_free(info);
+    }
+    lv_free(lv_wl_ctx.physical_outputs);
+    lv_wl_ctx.physical_outputs = NULL;
+    lv_wl_ctx.wl_output_count = 0;
+
+    if(lv_wl_ctx.xdg_output_mgr) {
+        zxdg_output_manager_v1_destroy(lv_wl_ctx.xdg_output_mgr);
+        lv_wl_ctx.xdg_output_mgr = NULL;
     }
 
     if(lv_wl_ctx.wl_compositor) {
@@ -259,8 +400,8 @@ static void output_geometry(void * data, struct wl_output * output, int32_t x, i
     LV_UNUSED(make);
     LV_UNUSED(transform);
 
-    lv_wl_output_info_t * info = data;
-    snprintf(info->name, sizeof(info->name), "%s", model);
+    LV_UNUSED(data);
+    LV_UNUSED(model);
 }
 
 static void output_mode(void * data, struct wl_output * wl_output, uint32_t flags, int32_t width, int32_t height,
@@ -292,6 +433,64 @@ static void output_scale(void * data, struct wl_output * output, int32_t factor)
     info->scale = factor;
 }
 
+static void output_bind_xdg_output(lv_wl_output_info_t * info)
+{
+    if(!lv_wl_ctx.xdg_output_mgr || info->xdg_output || !info->wl_output) {
+        return;
+    }
+
+    info->xdg_output = zxdg_output_manager_v1_get_xdg_output(lv_wl_ctx.xdg_output_mgr, info->wl_output);
+    if(!info->xdg_output) {
+        LV_LOG_WARN("Failed to get the xdg_output of an output");
+        return;
+    }
+
+    zxdg_output_v1_add_listener(info->xdg_output, &xdg_output_listener, info);
+}
+
+static void xdg_output_logical_position(void * data, struct zxdg_output_v1 * xdg_output, int32_t x, int32_t y)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(xdg_output);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
+}
+
+static void xdg_output_logical_size(void * data, struct zxdg_output_v1 * xdg_output, int32_t width, int32_t height)
+{
+    LV_UNUSED(xdg_output);
+    lv_wl_output_info_t * info = data;
+    info->logical_width = width;
+    info->logical_height = height;
+}
+
+static void xdg_output_done(void * data, struct zxdg_output_v1 * xdg_output)
+{
+    /* Deprecated since version 3, the events above are applied immediately */
+    LV_UNUSED(data);
+    LV_UNUSED(xdg_output);
+}
+
+static void xdg_output_name(void * data, struct zxdg_output_v1 * xdg_output, const char * name)
+{
+    LV_UNUSED(xdg_output);
+    lv_wl_output_info_t * info = data;
+
+    /* Only useful below wl_output version 4, which reports the same name */
+    if(info->name[0] == '\0') {
+        snprintf(info->name, sizeof(info->name), "%s", name);
+    }
+}
+
+static void xdg_output_description(void * data, struct zxdg_output_v1 * xdg_output, const char * description)
+{
+    /* A human readable description of the output, not stored since the driver
+     * identifies outputs by their connector name */
+    LV_UNUSED(data);
+    LV_UNUSED(xdg_output);
+    LV_UNUSED(description);
+}
+
 static uint32_t tick_get_cb(void)
 {
     struct timespec t;
@@ -321,13 +520,30 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
         xdg_wm_base_add_listener(ctx->xdg_wm, lv_wayland_xdg_get_wm_base_listener(), ctx);
     }
     else if(strcmp(interface, wl_output_interface.name) == 0) {
-        if(ctx->wl_output_count < LV_WAYLAND_MAX_OUTPUTS) {
-            memset(&ctx->physical_outputs[ctx->wl_output_count], 0, sizeof(lv_wl_output_info_t));
-            struct wl_output * out = wl_registry_bind(registry, name, &wl_output_interface, 1);
-            ctx->physical_outputs[ctx->wl_output_count].wl_output = out;
-            wl_output_add_listener(out, &output_listener, &ctx->physical_outputs[ctx->wl_output_count].wl_output);
-            ctx->wl_output_count++;
+        lv_wl_output_info_t ** outputs = lv_realloc(ctx->physical_outputs,
+                                                    (ctx->wl_output_count + 1) * sizeof(lv_wl_output_info_t *));
+        if(!outputs) {
+            LV_LOG_WARN("Failed to allocate memory for output");
+            return;
         }
+        ctx->physical_outputs = outputs;
+
+        lv_wl_output_info_t * info = lv_zalloc(sizeof(lv_wl_output_info_t));
+        if(!info) {
+            LV_LOG_WARN("Failed to allocate memory for output");
+            return;
+        }
+
+        info->wl_output = wl_registry_bind(registry, name, &wl_output_interface,
+                                           LV_MIN(version, LV_WAYLAND_WL_OUTPUT_VERSION));
+        ctx->physical_outputs[ctx->wl_output_count] = info;
+        ctx->wl_output_count++;
+        wl_output_add_listener(info->wl_output, &output_listener, info);
+
+        output_bind_xdg_output(info);
+    }
+    else if(strcmp(interface, zxdg_output_manager_v1_interface.name) == 0) {
+        ctx->xdg_output_mgr = wl_registry_bind(registry, name, &zxdg_output_manager_v1_interface, LV_MIN(version, 3));
     }
 
     lv_wayland_backend_global_handler(registry, name, interface, version);
