@@ -152,14 +152,15 @@ static void keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
         return;
     }
 
-    if(kbdata->event_count == 0) {
+    if(kbdata->event_read_index == kbdata->event_write_index) {
         return;
     }
 
-    data->key = kbdata->events[0].key;
-    data->state = kbdata->events[0].state;
-    kbdata->event_count--;
-    data->continue_reading = kbdata->event_count > 0;
+    uint8_t index = kbdata->event_read_index;
+    data->key = kbdata->events[index].key;
+    data->state = kbdata->events[index].state;
+    kbdata->event_read_index = (index + 1) % LV_WAYLAND_KEY_EVENT_MAX_COUNT;
+    data->continue_reading = kbdata->event_read_index != kbdata->event_write_index;
 }
 
 static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard, uint32_t format, int fd, uint32_t size)
@@ -238,11 +239,6 @@ static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint
     if(!kbdata->xkb_state) {
         return;
     }
-    if(kbdata->event_count == LV_WAYLAND_KEY_EVENT_MAX_COUNT) {
-        LV_LOG_WARN("Dropping event as LV_WAYLAND_KEY_EVENT_MAX_COUNT (%d) was reached. Increase it this causes issues",
-                    LV_WAYLAND_KEY_EVENT_MAX_COUNT);
-        return;
-    }
 
     const xkb_keysym_t * syms = XKB_KEY_NoSymbol;
     if(xkb_state_key_get_syms(kbdata->xkb_state, code, &syms) != 1) {
@@ -254,9 +250,9 @@ static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint
         (state == WL_KEYBOARD_KEY_STATE_PRESSED) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
     if(lv_key != 0) {
-        kbdata->events[kbdata->event_count].key = lv_key;
-        kbdata->events[kbdata->event_count].state = lv_state;
-        kbdata->event_count++;
+        kbdata->events[kbdata->event_write_index].key = lv_key;
+        kbdata->events[kbdata->event_write_index].state = lv_state;
+        kbdata->event_write_index = (kbdata->event_write_index + 1) % LV_WAYLAND_KEY_EVENT_MAX_COUNT;
     }
 }
 
