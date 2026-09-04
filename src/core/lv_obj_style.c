@@ -327,6 +327,9 @@ bool lv_obj_style_get_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
 void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis)
 {
     LV_LOG_DEPRECATED("use lv_obj_style_set_enabled instead (with inverted logic).");
+    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_ARG(style != NULL, return);
+
     lv_obj_style_set_enabled(obj, style, selector, !dis);
 }
 
