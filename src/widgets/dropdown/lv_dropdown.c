@@ -351,10 +351,13 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     dropdown->option_cnt++;
     dropdown->static_options = 0;
 
+#if LV_USE_TRANSLATION
     if(dropdown->options_translation_tag) {
         LV_LOG_WARN("Adding an option to translated options removed the translation tag");
         remove_options_translation_tag(obj);
     }
+#endif
+
 #if LV_USE_ARABIC_PERSIAN_CHARS
     lv_free(ap_tmp_buf);
 #endif
