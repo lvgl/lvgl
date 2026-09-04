@@ -1176,8 +1176,6 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        /*An opaque source or an empty destination is a plain store and a
-                         *transparent source changes nothing. A fresh layer is all empty,
                         /*Fast path opaque source or empty destination*/
                         color_argb = src_buf_c32[x];
                         if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {
@@ -1215,7 +1213,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                       /*Fast path opaque source or empty destination*/
+                        /*Fast path opaque source or empty destination*/
                         color_argb = src_buf_c32[x];
                         color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, mask_buf[x]);
                         if(color_argb.alpha >= LV_OPA_MAX || dest_buf_c32[x].alpha <= LV_OPA_MIN) {

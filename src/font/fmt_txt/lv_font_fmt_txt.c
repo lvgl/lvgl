@@ -96,6 +96,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     LV_ASSERT(font != NULL);
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     LV_ASSERT(fdsc != NULL);
+
     uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
@@ -121,6 +122,8 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+        LV_ASSERT_FORMAT_MSG(fdsc->bpp == 1 || fdsc->bpp == 2 || fdsc->bpp == 4 || fdsc->bpp == 8, "bpp was %d", fdsc->bpp);
+
         const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
         if(bitmap_in == NULL) return NULL;
 
@@ -179,13 +182,6 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
                     }
                 }
                 if(shift >= 8) shift = 8;
-            }
-            else {
-                /*`lv_binfont_loader` takes the bpp from the file header unchecked. On a bpp
-                 *that doesn't divide 8 the loop above advances no pixels and never finishes,
-                 *after reading past `opa2_table` on the way.*/
-                LV_LOG_WARN("%d bpp is not handled", (int)fdsc->bpp);
-                return NULL;
             }
 
             if(stride_in) {
