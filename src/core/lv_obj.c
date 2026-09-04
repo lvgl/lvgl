@@ -210,7 +210,7 @@ static const lv_property_ops_t lv_obj_properties[] = {
         .id = LV_PROPERTY_OBJ_INDEX,
         .getter = lv_obj_get_index,
     },
-#ifdef LV_USE_OBJ_NAME
+#if LV_USE_OBJ_NAME
     {
         .id = LV_PROPERTY_OBJ_NAME,
         .getter = lv_obj_get_name,
