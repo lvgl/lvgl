@@ -549,7 +549,7 @@
 #if LV_USE_OS != LV_OS_NONE
 #if LV_USE_SIFLI_EPIC
 /** Dispatch EPIC operations from their own thread so the CPU can keep
- *  rendering in parallel. Needs an OS.
+ *  rendering in parallel.
  */
 #define LV_USE_SIFLI_EPIC_DRAW_THREAD 1
 
