@@ -5,11 +5,16 @@
 
 #include "lv_draw_ppa_private.h"
 #include "lv_draw_ppa.h"
+#include "lv_draw_ppa_srm.h"
+#include "lv_draw_ppa_rot.h"
 
 #if LV_USE_PPA
 
 #include "../../lv_draw_image_private.h"
 #include "../../../image/lv_image_decoder_private.h"
+#if LV_USE_DRAW_SW
+    #include "../../sw/lv_draw_sw.h"
+#endif
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
@@ -21,7 +26,20 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
-    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, NULL);
+
+    /* Decode without stride normalisation, like the SRM paths below. This unit
+     * describes a picture by its own row pitch (see lv_ppa_pic_w()), so there is
+     * nothing to gain from letting LVGL reallocate and copy a padded image just
+     * to change that stride - and having every path in the unit decode the same
+     * way is what lets ppa_evaluate() read the header stride and be exact rather
+     * than guess which path a task will take.
+     *
+     * Only stride_align differs from the defaults lv_image_decoder_open() would
+     * have applied, and only when LV_DRAW_BUF_STRIDE_ALIGN is not 1. */
+    lv_image_decoder_args_t dec_args;
+    lv_memzero(&dec_args, sizeof(dec_args));
+
+    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, &dec_args);
 }
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
@@ -54,12 +72,34 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     lv_color_format_t dest_cf = draw_buf->header.cf;
     uint8_t * dest_buf = draw_buf->data;
 
-    extern const lv_image_dsc_t img_benchmark_lvgl_logo_rgb;
+    /* Row pitch, not visible width: see lv_ppa_pic_w(). This path decodes with
+     * stride_align = false like the SRM paths, so a padded source keeps its
+     * padding and the width would shear it. The task is already assigned to this
+     * unit here, so a picture that cannot be described goes to the software unit
+     * rather than being dropped, which would leave a hole on the screen. */
+    const int32_t src_pic_w  = lv_ppa_pic_w(decoded->header.stride, draw_dsc->header.w, src_cf);
+    const int32_t dest_pic_w = lv_ppa_pic_w(draw_buf->header.stride, draw_buf->header.w, dest_cf);
+    if(src_pic_w == 0 || dest_pic_w == 0) {
+        /* lv_draw_sw_image() redraws the whole task, and it runs its own decode
+         * loop, so it must fire exactly once. A partial decoder calls this core
+         * back per decoded chunk (see img_decode_and_draw()), which would
+         * otherwise repeat the full software draw for every chunk. */
+        if(u->img_sw_fallback) return;
+        u->img_sw_fallback = true;
+
+        LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, drawing in software");
+#if LV_USE_DRAW_SW
+        lv_draw_sw_image(t, draw_dsc, &t->area);
+#else
+        LV_LOG_WARN("PPA draw_img: no software draw unit to fall back on, image skipped");
+#endif
+        return;
+    }
 
     ppa_blend_oper_config_t cfg = {
         .in_bg = {
             .buffer          = (void *)src_buf,
-            .pic_w           = draw_dsc->header.w,
+            .pic_w           = src_pic_w,
             .pic_h           = draw_dsc->header.h,
             .block_w         = lv_area_get_width(clipped_img_area),
             .block_h         = lv_area_get_height(clipped_img_area),
@@ -72,14 +112,18 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         .bg_alpha_update_mode  = PPA_ALPHA_FIX_VALUE,
         .bg_alpha_fix_val      = 0xFF,
         .bg_ck_en              = false,
+        /* The transparent dummy foreground. Its buffer is the destination, so it
+         * has to be described by the destination's geometry - it was carrying the
+         * source's, which makes the PPA fetch a region that need not exist in
+         * that buffer. It contributes no colour either way. */
         .in_fg = {
             .buffer          = (void *)dest_buf,
-            .pic_w           = draw_dsc->header.w,
-            .pic_h           = draw_dsc->header.h,
+            .pic_w           = dest_pic_w,
+            .pic_h           = draw_buf->header.h,
             .block_w         = lv_area_get_width(clipped_img_area),
             .block_h         = lv_area_get_height(clipped_img_area),
-            .block_offset_x  = src_area.x1,
-            .block_offset_y  = src_area.y1,
+            .block_offset_x  = dest_area.x1,
+            .block_offset_y  = dest_area.y1,
             .blend_cm        = PPA_BLEND_COLOR_MODE_A8,
         },
         .fg_fix_rgb_val = {
@@ -95,7 +139,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         .out = {
             .buffer          = dest_buf,
             .buffer_size     = draw_buf->data_size,
-            .pic_w           = draw_buf->header.w,
+            .pic_w           = dest_pic_w,
             .pic_h           = draw_buf->header.h,
             .block_offset_x  = dest_area.x1,
             .block_offset_y  = dest_area.y1,
@@ -110,5 +154,369 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         LV_LOG_WARN("PPA draw_img blend failed: %d", ret);
     }
 }
+
+#if LV_USE_PPA_IMG
+
+/* Round a byte count up to the cache line, as required by PPA DMA and esp_cache_msync(). */
+static inline uint32_t lv_draw_ppa_align_size(uint32_t size)
+{
+    return (uint32_t)PPA_ALIGN_UP(size, LV_DRAW_PPA_CACHE_LINE_SIZE);
+}
+
+/**
+ * Byte span of a draw buffer to hand to the PPA and to cache maintenance.
+ *
+ * The peripheral wants a cache-line-aligned size, but rounding up must never run
+ * past the allocation. This unit does not own it: lv_draw_buf_ppa_init_handlers()
+ * only replaces invalidate_cache_cb, so a display buffer handed in through
+ * lv_display_set_buffers() is exactly as large as the caller declared and need
+ * not be a whole number of cache lines. Take the aligned pixel span, then cap it
+ * at what was actually allocated - which is what lv_draw_ppa_buf.c already does
+ * when it syncs draw_buf->data_size unrounded.
+ */
+static inline uint32_t lv_draw_ppa_buf_span(const lv_draw_buf_t * buf)
+{
+    uint32_t span = (uint32_t)buf->header.stride * buf->header.h;
+    if(span > buf->data_size) span = buf->data_size;
+
+    uint32_t aligned = lv_draw_ppa_align_size(span);
+    if(aligned <= buf->data_size) return aligned;
+
+    /* Rounding up would run past the allocation, so round down instead. The
+     * result still has to be a whole number of cache lines: esp_cache_msync()
+     * rejects ESP_CACHE_MSYNC_FLAG_UNALIGNED outright in the M2C direction. */
+    return (buf->data_size / LV_DRAW_PPA_CACHE_LINE_SIZE) * LV_DRAW_PPA_CACHE_LINE_SIZE;
+}
+
+void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
+                         const lv_area_t * real_area)
+{
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN) return;
+
+    lv_draw_ppa_unit_t * u   = (lv_draw_ppa_unit_t *)t->draw_unit;
+    lv_layer_t * layer        = t->target_layer;
+    lv_draw_buf_t * dest_buf  = layer->draw_buf;
+
+    /* real_area = on-screen bounding box of the scaled image (t->_real_area).
+     * Skip the decode entirely if nothing survives the render tile and the clip
+     * area; calc_block below applies the same two intersections. */
+    lv_area_t visible_area;
+    if(!lv_area_intersect(&visible_area, real_area, &layer->buf_area)) return;
+    if(!lv_area_intersect(&visible_area, &visible_area, &t->clip_area)) return;
+    LV_UNUSED(visible_area);
+
+    lv_image_decoder_dsc_t decoder_dsc;
+    lv_image_decoder_args_t dec_args;
+    lv_memzero(&dec_args, sizeof(dec_args));
+    dec_args.flush_cache = true;
+
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, dsc->src, &dec_args);
+    if(res != LV_RESULT_OK) return;
+
+    const lv_draw_buf_t * decoded = decoder_dsc.decoded;
+    if(!decoded || !decoded->data) {
+        lv_image_decoder_close(&decoder_dsc);
+        return;
+    }
+
+    lv_color_format_t src_cf  = decoded->header.cf;
+    lv_color_format_t dest_cf = dest_buf->header.cf;
+    if(!ppa_src_cf_supported(src_cf) || !ppa_dest_cf_supported(dest_cf)) {
+        lv_image_decoder_close(&decoder_dsc);
+        return;
+    }
+
+    uint32_t src_w = decoded->header.w;
+    uint32_t src_h = decoded->header.h;
+
+    /* The block geometry below is in image pixels, so it uses the visible width.
+     * What the PPA is given as pic_w is the row pitch instead: see lv_ppa_pic_w().
+     * Every path in this unit decodes with stride_align = false, so a padded
+     * source keeps its padding and describing it by its width would shear it. */
+    int32_t src_pitch  = lv_ppa_pic_w(decoded->header.stride, (int32_t)src_w, src_cf);
+    int32_t dest_pitch = lv_ppa_pic_w(dest_buf->header.stride, dest_buf->header.w, dest_cf);
+    if(src_pitch == 0 || dest_pitch == 0) {
+        /* The task has already been assigned to this unit, so returning would
+         * finish it having drawn nothing and leave a hole on the screen. Hand
+         * the draw to the software unit instead, as lv_draw_pxp.c does for
+         * fills. ppa_evaluate() predicts this case, but it only sees the source
+         * header before decoding, so the real check belongs here. */
+        LV_LOG_INFO("PPA SRM: stride is not a whole number of pixels, drawing in software");
+        lv_image_decoder_close(&decoder_dsc);
+#if LV_USE_DRAW_SW
+        lv_draw_sw_image(t, dsc, &t->area);
+#else
+        LV_LOG_WARN("PPA SRM: no software draw unit to fall back on, image skipped");
+#endif
+        return;
+    }
+
+    /* Map the visible render tile back onto a PPA source block.
+     * Pure geometry, shared with the host unit test (lv_draw_ppa_srm.h). */
+    lv_draw_ppa_srm_block_t blk = lv_draw_ppa_srm_calc_block(
+                                      real_area, &layer->buf_area, &t->clip_area,
+                                      (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
+                                      (int32_t)src_w, (int32_t)src_h,
+                                      dsc->scale_x, dsc->scale_y);
+    if(!blk.draw) {
+        lv_image_decoder_close(&decoder_dsc);
+        return;
+    }
+
+    if(decoded->data_size > 0) {
+        esp_cache_msync((void *)decoded->data,
+                        lv_draw_ppa_buf_span(decoded),
+                        ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_UNALIGNED);
+    }
+
+    uint32_t out_bpp = (dest_cf == LV_COLOR_FORMAT_RGB565) ? 2u :
+                       (dest_cf == LV_COLOR_FORMAT_RGB888)  ? 3u : 4u;
+    uint32_t aligned_size = lv_draw_ppa_buf_span(dest_buf);
+
+    ppa_srm_oper_config_t cfg;
+    lv_memzero(&cfg, sizeof(cfg));
+
+    cfg.in.buffer         = (void *)decoded->data;
+    cfg.in.pic_w          = (uint32_t)src_pitch;
+    cfg.in.pic_h          = src_h;
+    cfg.in.block_w        = (uint32_t)blk.block_w;
+    cfg.in.block_h        = (uint32_t)blk.block_h;
+    cfg.in.block_offset_x = (uint32_t)blk.block_x;
+    cfg.in.block_offset_y = (uint32_t)blk.block_y;
+    cfg.in.srm_cm         = lv_color_format_to_ppa_srm(src_cf);
+
+    cfg.out.buffer         = dest_buf->data;
+    cfg.out.buffer_size    = aligned_size;
+    cfg.out.pic_w          = (uint32_t)dest_pitch;
+    cfg.out.pic_h          = dest_buf->header.h;
+    cfg.out.block_offset_x = (uint32_t)blk.dest_area.x1;
+    cfg.out.block_offset_y = (uint32_t)blk.dest_area.y1;
+    cfg.out.srm_cm         = lv_color_format_to_ppa_srm(dest_cf);
+
+    cfg.rotation_angle    = PPA_SRM_ROTATION_ANGLE_0;
+    cfg.scale_x           = blk.scale_x;
+    cfg.scale_y           = blk.scale_y;
+    /* The PPA SRM engine can mirror, but lv_draw_image_dsc_t has no mirror/flip
+     * field, so LVGL never requests it for an image draw: keep it disabled. */
+    cfg.mirror_x          = false;
+    cfg.mirror_y          = false;
+    cfg.rgb_swap          = false;
+    cfg.byte_swap         = false;
+    cfg.alpha_update_mode = PPA_ALPHA_NO_CHANGE;
+    cfg.mode              = PPA_TRANS_MODE_BLOCKING;
+    cfg.user_data         = u;
+
+    esp_err_t ret = ppa_do_scale_rotate_mirror(u->srm_client, &cfg);
+    if(ret != ESP_OK) {
+        LV_LOG_WARN("PPA SRM scale failed: %d (src %" LV_PRIu32 "x%" LV_PRIu32 " scale %.2f/%.2f)",
+                    (int)ret, src_w, src_h, (double)blk.scale_x, (double)blk.scale_y);
+    }
+
+    /* PPA floorf rounding leaves a 1-pixel gap at right/bottom edges.
+     * Fill it by duplicating the last rendered column/row.
+     * Must invalidate CPU cache first: PPA wrote via DMA, CPU cache is stale. */
+    if(ret == ESP_OK && (blk.gap_right || blk.gap_bottom)) {
+        /* No ESP_CACHE_MSYNC_FLAG_UNALIGNED here: esp_cache_msync() rejects it
+         * for M2C with ESP_ERR_INVALID_ARG, so passing it made the invalidate a
+         * no-op and the gap fill below then read a stale cache. The address is
+         * aligned by the draw buffer contract and lv_draw_ppa_buf_span() keeps
+         * the size a whole number of cache lines. */
+        esp_err_t inv = esp_cache_msync(dest_buf->data, aligned_size, ESP_CACHE_MSYNC_FLAG_DIR_M2C);
+        if(inv != ESP_OK) {
+            LV_LOG_WARN("PPA SRM: cache invalidate failed: %d", (int)inv);
+        }
+
+        uint8_t * base = dest_buf->data;
+        uint32_t stride = (uint32_t)dest_pitch * out_bpp;
+
+        if(blk.gap_right && blk.clip_w >= 2) {
+            uint32_t col = blk.dest_area.x1 + (uint32_t)blk.clip_w - 1;
+            uint32_t col_prev = col - 1;
+            for(int32_t y = 0; y < blk.clip_h; y++) {
+                uint32_t row_off = (blk.dest_area.y1 + (uint32_t)y) * stride;
+                lv_memcpy(base + row_off + col * out_bpp,
+                          base + row_off + col_prev * out_bpp, out_bpp);
+            }
+        }
+        if(blk.gap_bottom && blk.clip_h >= 2) {
+            uint32_t row = blk.dest_area.y1 + (uint32_t)blk.clip_h - 1;
+            uint32_t row_prev = row - 1;
+            lv_memcpy(base + row * stride + blk.dest_area.x1 * out_bpp,
+                      base + row_prev * stride + blk.dest_area.x1 * out_bpp,
+                      (uint32_t)blk.clip_w * out_bpp);
+        }
+
+        esp_cache_msync(dest_buf->data, aligned_size,
+                        ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_UNALIGNED);
+    }
+
+    lv_image_decoder_close(&decoder_dsc);
+}
+
+/**
+ * PPA SRM hardware-accelerated image rotation (0/90/180/270 degrees)
+ * Uses the ESP32-P4 PPA Scale-Rotate-Mirror engine for zero-CPU-cost rotation.
+ */
+void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
+                            const lv_area_t * real_area)
+{
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+        return;
+
+    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)t->draw_unit;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_buf_t * dest_buf = layer->draw_buf;
+
+    /* Decode the source image */
+    lv_image_decoder_dsc_t decoder_dsc;
+    lv_image_decoder_args_t dec_args;
+    lv_memzero(&dec_args, sizeof(dec_args));
+    dec_args.stride_align = false;
+    dec_args.premultiply = false;
+    dec_args.no_cache = false;
+    dec_args.use_indexed = false;
+    dec_args.flush_cache = true;  /* Ensure cache coherency for PPA DMA */
+
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, dsc->src, &dec_args);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("PPA SRM: failed to decode image");
+        return;
+    }
+
+    const lv_draw_buf_t * decoded = decoder_dsc.decoded;
+    if(!decoded || !decoded->data) {
+        lv_image_decoder_close(&decoder_dsc);
+        return;
+    }
+
+    lv_color_format_t src_cf = decoded->header.cf;
+    lv_color_format_t dest_cf = dest_buf->header.cf;
+
+    /* Verify PPA format support for both source and destination */
+    if(!ppa_src_cf_supported(src_cf) || !ppa_dest_cf_supported(dest_cf)) {
+        LV_LOG_WARN("PPA SRM: unsupported color format src=%d dest=%d", src_cf, dest_cf);
+        lv_image_decoder_close(&decoder_dsc);
+        return;
+    }
+
+    /* Map LVGL rotation (clockwise, 0.1 deg units) to PPA rotation (counter-clockwise) */
+    int32_t angle = dsc->rotation % 3600;
+    if(angle < 0) angle += 3600;
+
+    ppa_srm_rotation_angle_t ppa_rot;
+    switch(angle) {
+        case 0:
+            ppa_rot = PPA_SRM_ROTATION_ANGLE_0;
+            break;
+        case 900:
+            ppa_rot = PPA_SRM_ROTATION_ANGLE_270;
+            break;  /* 90° CW = 270° CCW */
+        case 1800:
+            ppa_rot = PPA_SRM_ROTATION_ANGLE_180;
+            break;
+        case 2700:
+            ppa_rot = PPA_SRM_ROTATION_ANGLE_90;
+            break;  /* 270° CW = 90° CCW */
+        default:
+            lv_image_decoder_close(&decoder_dsc);
+            return;
+    }
+
+    uint32_t src_w = decoded->header.w;
+    uint32_t src_h = decoded->header.h;
+
+    /* The block geometry below is in image pixels, so it uses the visible width.
+     * What the PPA is given as pic_w is the row pitch instead: see lv_ppa_pic_w().
+     * Every path in this unit decodes with stride_align = false, so a padded
+     * source keeps its padding and describing it by its width would shear it. */
+    int32_t src_pitch  = lv_ppa_pic_w(decoded->header.stride, (int32_t)src_w, src_cf);
+    int32_t dest_pitch = lv_ppa_pic_w(dest_buf->header.stride, dest_buf->header.w, dest_cf);
+    if(src_pitch == 0 || dest_pitch == 0) {
+        /* The task has already been assigned to this unit, so returning would
+         * finish it having drawn nothing and leave a hole on the screen. Hand
+         * the draw to the software unit instead, as lv_draw_pxp.c does for
+         * fills. ppa_evaluate() predicts this case, but it only sees the source
+         * header before decoding, so the real check belongs here. */
+        LV_LOG_INFO("PPA SRM: stride is not a whole number of pixels, drawing in software");
+        lv_image_decoder_close(&decoder_dsc);
+#if LV_USE_DRAW_SW
+        lv_draw_sw_image(t, dsc, &t->area);
+#else
+        LV_LOG_WARN("PPA SRM: no software draw unit to fall back on, image skipped");
+#endif
+        return;
+    }
+
+    /* Map the visible render tile back onto a PPA source block, clipping to the
+     * layer buffer. Pure geometry, shared with the host unit test
+     * (lv_draw_ppa_rot.h); also guarantees the destination stays inside the
+     * buffer so the PPA cannot write out of bounds. */
+    lv_draw_ppa_rot_block_t blk = lv_draw_ppa_rot_calc_block(
+                                      real_area, &layer->buf_area, &t->clip_area,
+                                      (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
+                                      (int32_t)src_w, (int32_t)src_h, angle);
+    if(!blk.draw) {
+        lv_image_decoder_close(&decoder_dsc);
+        return;
+    }
+
+    /* Flush decoded source buffer for PPA DMA access. Align size to cache
+     * line; _UNALIGNED flag is only a safety net for the address. */
+    if(decoded->data_size > 0) {
+        esp_cache_msync((void *)decoded->data,
+                        lv_draw_ppa_buf_span(decoded),
+                        ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_UNALIGNED);
+    }
+
+    /* Configure PPA SRM operation */
+    ppa_srm_oper_config_t cfg;
+    lv_memzero(&cfg, sizeof(cfg));
+
+    /* Input: the source sub-block that maps onto the visible (clipped) tile. */
+    cfg.in.buffer         = (void *)decoded->data;
+    cfg.in.pic_w          = (uint32_t)src_pitch;
+    cfg.in.pic_h          = src_h;
+    cfg.in.block_w        = (uint32_t)blk.block_w;
+    cfg.in.block_h        = (uint32_t)blk.block_h;
+    cfg.in.block_offset_x = (uint32_t)blk.block_x;
+    cfg.in.block_offset_y = (uint32_t)blk.block_y;
+    cfg.in.srm_cm         = lv_color_format_to_ppa_srm(src_cf);
+
+    uint32_t aligned_size_r = lv_draw_ppa_buf_span(dest_buf);
+
+    /* Draw buffers are cache-aligned (lv_draw_buf_ppa_init_handlers). */
+    cfg.out.buffer         = dest_buf->data;
+    cfg.out.buffer_size    = aligned_size_r;
+    cfg.out.pic_w          = (uint32_t)dest_pitch;
+    cfg.out.pic_h          = dest_buf->header.h;
+    cfg.out.block_offset_x = (uint32_t)blk.dest_area.x1;
+    cfg.out.block_offset_y = (uint32_t)blk.dest_area.y1;
+    cfg.out.srm_cm         = lv_color_format_to_ppa_srm(dest_cf);
+
+    cfg.rotation_angle     = ppa_rot;
+    /* ppa_evaluate() rejects rotation combined with scaling, so this path is
+     * always 1:1 and the source-block geometry above assumes it. */
+    cfg.scale_x            = 1.0f;
+    cfg.scale_y            = 1.0f;
+    /* No mirror: lv_draw_image_dsc_t has no mirror/flip field (see the SRM
+     * path), so LVGL never requests it. */
+    cfg.mirror_x           = false;
+    cfg.mirror_y           = false;
+    cfg.rgb_swap           = false;
+    cfg.byte_swap          = false;
+    cfg.alpha_update_mode  = PPA_ALPHA_NO_CHANGE;
+    cfg.mode               = PPA_TRANS_MODE_BLOCKING;
+    cfg.user_data          = u;
+
+    esp_err_t ret = ppa_do_scale_rotate_mirror(u->srm_client, &cfg);
+    if(ret != ESP_OK) {
+        LV_LOG_WARN("PPA SRM rotation failed: %d  (src %" LV_PRIu32 "x%" LV_PRIu32 ", angle %d)",
+                    (int)ret, src_w, src_h, (int)angle);
+    }
+
+    lv_image_decoder_close(&decoder_dsc);
+}
+
+#endif /* LV_USE_PPA_IMG */
 
 #endif /* LV_USE_PPA */
