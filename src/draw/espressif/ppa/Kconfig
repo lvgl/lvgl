@@ -39,4 +39,13 @@ config LV_PPA_BURST_LENGTH
 	default 32 if LV_PPA_BURST_LENGTH_32
 	default 64 if LV_PPA_BURST_LENGTH_64
 	default 128 if LV_PPA_BURST_LENGTH_128
+
+config LV_PPA_ALPHA_MIN_AREA
+	int "Minimum area (px) for PPA alpha compositing"
+	default 65536
+	help
+		Images with an alpha channel or a partial opacity are composited by
+		the PPA only from this many pixels up; smaller blocks go to software,
+		which is faster for them because each PPA operation has a fixed cost.
+		Set 0 to always use the PPA.
 endif

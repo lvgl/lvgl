@@ -108,6 +108,9 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 #if LV_USE_PPA_IMG
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                /* dsc->opa is not required to be opaque and the source may carry
+                 * an alpha channel: both are handled by the blend engine, see
+                 * lv_draw_ppa_img(). */
                 if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
                      && dsc->clip_radius == 0
                      && dsc->bitmap_mask_src == NULL
@@ -115,7 +118,6 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      && dsc->tile == 0
                      && dsc->blend_mode == LV_BLEND_MODE_NORMAL
                      && dsc->recolor_opa <= LV_OPA_MIN
-                     && dsc->opa >= (lv_opa_t)LV_OPA_MAX
                      && dsc->skew_y == 0
                      && dsc->skew_x == 0
                      && dsc->scale_x == 256
@@ -123,10 +125,60 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      && dsc->rotation == 0
                      && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
                      && (dsc->header.cf == LV_COLOR_FORMAT_RGB888
-                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565)
+                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565
+                         || dsc->header.cf == LV_COLOR_FORMAT_ARGB8888
+                         || dsc->header.cf == LV_COLOR_FORMAT_XRGB8888)
                      && (dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
+                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565
+                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888))) {
                     return 0;
+                }
+
+                /* The PPA describes a picture by its width in pixels and derives
+                 * the row pitch from it, so every buffer it is given has to be a
+                 * whole number of pixels wide. LVGL's image converter pads strides
+                 * - the benchmark logo is 100 px wide with a 448 byte stride - and
+                 * RGB888 padded to 320 bytes is not a whole number of pixels at
+                 * all. Keep those away from this unit.
+                 *
+                 * The header stride is what the decode returns: lv_draw_ppa_img()
+                 * passes stride_align = false, so nothing re-strides the buffer
+                 * behind this check. The destination is exact when the layer
+                 * buffer already exists, and skipped when it does not - it is
+                 * allocated in ppa_dispatch(), and the draw re-checks both
+                 * against the real buffers either way. */
+                if(lv_ppa_pic_w(dsc->header.stride, dsc->header.w, dsc->header.cf) == 0) return 0;
+
+                const lv_draw_buf_t * dest = dsc->base.layer->draw_buf;
+                if(dest != NULL &&
+                   lv_ppa_pic_w(dest->header.stride, dest->header.w, dest->header.cf) == 0) return 0;
+
+                /* A source alpha channel or a global opacity means the engine has
+                 * to composite against the destination instead of copying over it.
+                 * Only an RGB565 destination is taken: it has no alpha of its own,
+                 * so treating the backdrop as opaque is exact. An ARGB8888
+                 * destination is an intermediate layer that LVGL clears to
+                 * transparent (see lv_draw_layer_create callers in lv_refr.c), and
+                 * the blend below forces the background alpha to 0xFF, which would
+                 * make every touched pixel opaque and break the later composition
+                 * of that layer onto its parent. Those draws stay in software
+                 * until the configuration preserves the destination alpha. */
+                if(lv_ppa_cf_has_alpha(dsc->header.cf) || dsc->opa < (lv_opa_t)LV_OPA_MAX) {
+                    if(dsc->base.layer->color_format != LV_COLOR_FORMAT_RGB565) return 0;
+#if LV_PPA_ALPHA_MIN_AREA > 0
+                    /* Every PPA operation costs a fixed amount regardless of the
+                     * pixel count - config, cache maintenance and a blocking wait
+                     * on the transaction - so a small block is faster in software,
+                     * which is where it went before this path existed. Measured on
+                     * an ESP32-P4 rev 1.0 (720x1280) and a rev 1.3 (1024x600): the
+                     * PPA only comes out ahead from 256x256 up, on both, so the
+                     * default threshold is that size rather than an interpolated
+                     * value between it and the 128x128 that still loses. */
+                    lv_area_t blend_area;
+                    if(!lv_area_intersect(&blend_area, &t->area, &t->clip_area)) return 0;
+                    if((uint32_t)(lv_area_get_width(&blend_area) *
+                                  lv_area_get_height(&blend_area)) < LV_PPA_ALPHA_MIN_AREA) return 0;
+#endif
                 }
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
@@ -158,6 +210,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     u->task_act = t;
     u->task_act->draw_unit = draw_unit;
+    u->img_sw_fallback = false;
 
     ppa_execute_drawing(u);
 
@@ -193,7 +246,12 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
             lv_draw_buf_invalidate_cache(buf, &area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &area);
+            /* The image rectangle, not the clipped region:
+             * lv_draw_image_normal_helper() treats this as the image's own area
+             * and measures the clip against it, so handing it a pre-clipped rect
+             * makes the source offsets be taken from the wrong origin and the
+             * wrong part of the image is drawn. */
+            lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
             lv_draw_buf_invalidate_cache(buf, &area);
             break;
         default:
