@@ -1,64 +1,72 @@
 # LVGL Memory Usage Tests
 
-This directory contains bare-metal (Cortex-M4) build configurations used to
-measure LVGL's real flash and RAM footprint via a fully linked executable,
-built with `arm-none-eabi-gcc` and `--gc-sections`.
+Bare-metal build configurations used to measure LVGL's real flash and RAM footprint from a
+fully linked executable.
 
-Two configurations are provided:
+Three configurations are measured on four targets:
 
-- `standard/` — a representative `lv_conf.h` with a typical/common feature set
-  enabled (widgets, fonts, etc.), meant to reflect a "normal" app.
-- `minimal/` — a stripped-down `lv_conf.h` with as many features disabled as
-  possible, used as a baseline to measure LVGL's core cost.
+- `standard/`: a representative configuration with a typical feature set enabled (widgets,
+  fonts, every software renderer colour format), meant to reflect a "normal" app.
+- `rgb565/`: an RGB565 panel with only the renderer colour formats a program like this needs.
+- `minimal/`: as many features disabled as possible, as a baseline for LVGL's core cost.
 
-Both configurations share the same toolchain file, and  differ in 
-their linker scripts, lvgl configuration and the UI they run.
+| Target | Toolchain |
+|---|---|
+| `arm-cortex-m4` | `arm-none-eabi-gcc` |
+| `arm-cortex-m0plus` | `arm-none-eabi-gcc` |
+| `xtensa-esp32` | `xtensa-esp32-elf-gcc` |
+| `riscv32-esp32c3` | `riscv32-esp-elf-gcc` |
 
 ## Prerequisites
 
-Download and extract the toolchain (only needs to be done once):
+The measurement script needs the toolchains on `PATH`, `cmake`, `ninja`, and `kconfiglib`.
 
 ```bash
+# ARM
 wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
-tar xvf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+tar xf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+
+# Xtensa and RISC-V
+ESP_VER=13.2.0_20230928
+for tc in xtensa-esp-elf riscv32-esp-elf; do
+    wget "https://github.com/espressif/crosstool-NG/releases/download/esp-$ESP_VER/$tc-$ESP_VER-x86_64-linux-gnu.tar.xz"
+    tar xf "$tc-$ESP_VER-x86_64-linux-gnu.tar.xz"
+done
+
+export PATH=$PWD/gcc-arm-none-eabi-10.3-2021.10/bin:$PWD/xtensa-esp-elf/bin:$PWD/riscv32-esp-elf/bin:$PATH
 ```
 
-Add the toolchain's `bin/` directory to your `PATH` before running CMake:
+## Measuring
 
 ```bash
-export PATH=/path/to/gcc-arm-none-eabi-10.3-2021.10/bin:$PATH
+./measure.py
+./measure.py --targets arm-cortex-m4 --configs standard
+./measure.py --skip-missing
 ```
 
-## Building
+It writes `size-results.json`, a per-symbol map per target and configuration under
+`symbols/`, and prints a summary:
 
-From either `standard/` or `minimal/`:
+```
+arm-cortex-m4      standard  flash=  370812 ram=  374328 lib=  362804
+arm-cortex-m4      rgb565      flash=  332884 ram=  374328 lib=  328113
+arm-cortex-m4      minimal   flash=  140672 ram=   77560 lib=  250430
+...
+```
+
+- **Flash** = `text + data` (code, rodata, and the flash-resident copy of initialised globals)
+- **RAM** = `data + bss` (writable globals plus zero-initialised globals)
+- **lib** = `liblvgl.a` in full, with nothing dead-stripped
 
 ```bash
-cmake -B build -GNinja -DCMAKE_TOOLCHAIN_FILE=../toolchain/arm-none-eabi.cmake
-cmake --build build
+# largest symbols
+arm-none-eabi-nm --size-sort -S --radix=d build/arm-cortex-m4-standard/main | tail -40
+
+# per translation unit, which is usually the quickest way to spot a jump
+arm-none-eabi-size build/arm-cortex-m4-standard/lvgl/CMakeFiles/lvgl.dir/src/**/*.obj
 ```
 
-## Measuring flash/RAM usage
+## Adding a target
 
-```bash
-arm-none-eabi-size build/main
-```
-
-Example output:
-
-```
-   text	  data	   bss	   dec	   hex	filename
- 283472	   832	307936	592240	 90970	build/main
-```
-
-- **Flash usage** = `text + data` (code, rodata, and initialized globals
-  stored in flash)
-- **RAM usage** = `data + bss` (writable globals + zero-initialized globals)
-
-For a per-symbol breakdown of what's contributing to the size (useful when
-comparing `standard/` vs `minimal/`, or after enabling a new feature), use
-the generated map file or `nm`:
-
-```bash
-arm-none-eabi-nm --size-sort -S build/main | tail -40
-```
+Add a toolchain file under `toolchain/` and an entry in `measure.py`'s `TARGETS`. Any target
+specific requirements live in the toolchain file.

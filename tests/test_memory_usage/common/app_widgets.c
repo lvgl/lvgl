@@ -14,6 +14,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 }
 int main(void)
 {
+    lv_init();
     lv_display_t * display = lv_display_create(WIDTH, HEIGHT);
     lv_display_set_buffers(display, buffer, NULL, sizeof(buffer), LV_DISPLAY_RENDER_MODE_FULL);
     lv_display_set_flush_cb(display, flush_cb);

@@ -12,6 +12,7 @@ permissions:
 env:
   ARM_TOOLCHAIN_URL: https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
   ARM_TOOLCHAIN_DIR: gcc-arm-none-eabi-10.3-2021.10
+  ESP_TOOLCHAIN_VERSION: 13.2.0_20230928
 
 jobs:
   comment:
@@ -19,6 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     steps:
+      # Needed for report.py, and for measure.py if the master baseline has to be rebuilt.
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.12
+
       - name: Download PR results artifact
         uses: actions/download-artifact@v4
         with:
@@ -40,7 +50,7 @@ jobs:
             const { data } = await github.rest.actions.listWorkflowRuns({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: "memory-usage.yml",
+              workflow_id: "memory_usage.yml",
               branch: "master",
               status: "success",
               per_page: 1,
@@ -71,7 +81,7 @@ jobs:
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # --- Fallback: no artifact found (or download failed) -> try building master ourselves ---
+      # --- Fallback: no artifact found (or download failed) -> build master ourselves ---
       - name: Checkout master
         if: steps.check_master.outputs.available == 'false'
         uses: actions/checkout@v6
@@ -79,129 +89,69 @@ jobs:
           ref: master
           path: master-src
 
-      - name: Install Ninja (fallback build)
+      - name: Install dependencies (fallback build)
         if: steps.check_master.outputs.available == 'false'
-        run: sudo apt-get update && sudo apt-get install -y ninja-build
+        run: |
+          python3 -m pip install kconfiglib pcpp
+          sudo apt-get update && sudo apt-get install -y ninja-build
 
-      - name: Cache ARM toolchain (fallback build)
+      - name: Cache toolchains (fallback build)
         if: steps.check_master.outputs.available == 'false'
-        id: cache-toolchain
+        id: cache-toolchains
         uses: actions/cache@v4
         with:
-          path: ${{ env.ARM_TOOLCHAIN_DIR }}
-          key: arm-toolchain-${{ env.ARM_TOOLCHAIN_DIR }}
+          path: |
+            ${{ env.ARM_TOOLCHAIN_DIR }}
+            xtensa-esp-elf
+            riscv32-esp-elf
+          key: memory-usage-toolchains-${{ env.ARM_TOOLCHAIN_DIR }}-esp${{ env.ESP_TOOLCHAIN_VERSION }}
 
-      - name: Download ARM toolchain (fallback build)
-        if: steps.check_master.outputs.available == 'false' && steps.cache-toolchain.outputs.cache-hit != 'true'
+      - name: Download toolchains (fallback build)
+        if: steps.check_master.outputs.available == 'false' && steps.cache-toolchains.outputs.cache-hit != 'true'
         run: |
-          wget -q "${{ env.ARM_TOOLCHAIN_URL }}"
-          tar xjf "$(basename "${{ env.ARM_TOOLCHAIN_URL }}")"
+          set -euo pipefail
+          wget -q "$ARM_TOOLCHAIN_URL"
+          tar xjf "$(basename "$ARM_TOOLCHAIN_URL")"
 
-      - name: Add toolchain to PATH (fallback build)
+          esp_base="https://github.com/espressif/crosstool-NG/releases/download/esp-${ESP_TOOLCHAIN_VERSION}"
+          for tc in xtensa-esp-elf riscv32-esp-elf; do
+            wget -q "${esp_base}/${tc}-${ESP_TOOLCHAIN_VERSION}-x86_64-linux-gnu.tar.xz"
+            tar xf "${tc}-${ESP_TOOLCHAIN_VERSION}-x86_64-linux-gnu.tar.xz"
+          done
+
+      - name: Add toolchains to PATH (fallback build)
         if: steps.check_master.outputs.available == 'false'
-        run: echo "${{ github.workspace }}/${{ env.ARM_TOOLCHAIN_DIR }}/bin" >> "$GITHUB_PATH"
+        run: |
+          {
+            echo "${{ github.workspace }}/${{ env.ARM_TOOLCHAIN_DIR }}/bin"
+            echo "${{ github.workspace }}/xtensa-esp-elf/bin"
+            echo "${{ github.workspace }}/riscv32-esp-elf/bin"
+          } >> "$GITHUB_PATH"
 
       - name: Build master from source
         id: build_master
         if: steps.check_master.outputs.available == 'false'
         continue-on-error: true
         working-directory: master-src/tests/test_memory_usage
-        run: |
-          mkdir -p ../../../results/master
-          echo '{}' > ../../../results/master/size-results.json
-
-          for config in standard minimal; do
-            cmake -S "$config" -B "$config/build" -GNinja \
-              -DCMAKE_TOOLCHAIN_FILE="$PWD/toolchain/arm-none-eabi.cmake"
-            cmake --build "$config/build"
-
-            SIZE_OUTPUT=$(arm-none-eabi-size "$config/build/main" | tail -1)
-            TEXT=$(echo "$SIZE_OUTPUT" | awk '{print $1}')
-            DATA=$(echo "$SIZE_OUTPUT" | awk '{print $2}')
-            BSS=$(echo "$SIZE_OUTPUT" | awk '{print $3}')
-            FLASH=$((TEXT + DATA))
-            RAM=$((DATA + BSS))
-
-            python3 - <<EOF
-            import json
-            with open("../../../results/master/size-results.json") as f:
-                data = json.load(f)
-            data["$config"] = {"text": $TEXT, "data": $DATA, "bss": $BSS, "flash": $FLASH, "ram": $RAM}
-            with open("../../../results/master/size-results.json", "w") as f:
-                json.dump(data, f, indent=2)
-            EOF
-          done
-
-      - name: Re-check master availability after fallback build
-        id: recheck_master
-        run: |
-          if [ -f results/master/size-results.json ] && [ "$(cat results/master/size-results.json)" != "{}" ]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-          fi
+        run: ./measure.py --out "$GITHUB_WORKSPACE/results/master/size-results.json"
 
       - name: Build comment body
         id: body
-        env:
-          MASTER_AVAILABLE: ${{ steps.check_master.outputs.available == 'true' || steps.recheck_master.outputs.available == 'true' }}
         run: |
-          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
-          import json
-          import os
-
-          with open("results/pr/size-results.json") as f:
-              pr_data = json.load(f)
-
-          master_available = os.environ.get("MASTER_AVAILABLE") == "true"
-          master_data = {}
-          if master_available:
-              try:
-                  with open("results/master/size-results.json") as f:
-                      master_data = json.load(f)
-              except (FileNotFoundError, json.JSONDecodeError):
-                  master_available = False
-
-          lines = ["## 📦 Flash / RAM usage", ""]
-
-          if master_available and master_data:
-              lines.append("| Config | Flash (PR) | Flash (master) | Δ Flash | RAM (PR) | RAM (master) | Δ RAM |")
-              lines.append("|---|---|---|---|---|---|---|")
-              for config, sizes in pr_data.items():
-                  base = master_data.get(config)
-                  if base:
-                      d_flash = sizes["flash"] - base["flash"]
-                      d_ram = sizes["ram"] - base["ram"]
-                      d_flash_str = f"{'+' if d_flash >= 0 else ''}{d_flash} B"
-                      d_ram_str = f"{'+' if d_ram >= 0 else ''}{d_ram} B"
-                      lines.append(
-                          f"| {config} | {sizes['flash']} B | {base['flash']} B | {d_flash_str} | "
-                          f"{sizes['ram']} B | {base['ram']} B | {d_ram_str} |"
-                      )
-                  else:
-                      lines.append(f"| {config} | {sizes['flash']} B | n/a | n/a | {sizes['ram']} B | n/a | n/a |")
-          else:
-              lines.append("| Config | Flash (PR) | RAM (PR) |")
-              lines.append("|---|---|---|")
-              for config, sizes in pr_data.items():
-                  lines.append(f"| {config} | {sizes['flash']} B | {sizes['ram']} B |")
-              lines.append("")
-              lines.append("_Could not determine a master baseline for comparison "
-                            "(no artifact from master's last successful run, and a "
-                            "local build of master also failed)._")
-
-          body = "\n".join(lines)
-          print("body<<COMMENT_EOF")
-          print(body)
-          print("COMMENT_EOF")
-          EOF
+          {
+            echo "body<<COMMENT_EOF"
+            tests/test_memory_usage/report.py \
+              --pr results/pr \
+              --master results/master
+            echo "COMMENT_EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Comment on PR
         uses: actions/github-script@v7
         with:
           script: |
             const prNumber = ${{ steps.pr.outputs.number }};
-            const body = `${{ steps.body.outputs.body }}`;
+            const body = process.env.COMMENT_BODY;
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -227,3 +177,5 @@ jobs:
                 body,
               });
             }
+        env:
+          COMMENT_BODY: ${{ steps.body.outputs.body }}
