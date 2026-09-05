@@ -329,6 +329,11 @@ void lv_event_free_user_data_cb(lv_event_t * e)
 
 uint32_t lv_event_register_id(void)
 {
+    if(event_last_id + 1 > (uint32_t)LV_EVENT_LAST_CUSTOM) {
+        LV_LOG_ERROR("No more event ids can be registered");
+        return LV_EVENT_LAST;
+    }
+
     event_last_id ++;
     return event_last_id;
 }
@@ -448,6 +453,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
 
         /* Special event flags */
         case LV_EVENT_LAST:
+        case LV_EVENT_LAST_CUSTOM:
         case LV_EVENT_PREPROCESS:
         case LV_EVENT_MARKED_DELETING:
             break;
