@@ -10,6 +10,9 @@
 
 #include "../../lv_draw_image_private.h"
 #include "../../../image/lv_image_decoder_private.h"
+#if LV_USE_DRAW_SW
+    #include "../../sw/lv_draw_sw.h"
+#endif
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
@@ -54,12 +57,34 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     lv_color_format_t dest_cf = draw_buf->header.cf;
     uint8_t * dest_buf = draw_buf->data;
 
-    extern const lv_image_dsc_t img_benchmark_lvgl_logo_rgb;
+    /* Row pitch, not visible width: see lv_ppa_pic_w(). The task is already
+     * assigned to this unit here, so a picture the PPA cannot describe goes to
+     * the software unit rather than being dropped, which would finish the task
+     * having drawn nothing and leave a hole on the screen. lv_draw_pxp.c falls
+     * back the same way for fills. */
+    const int32_t src_pic_w  = lv_ppa_pic_w(decoded->header.stride, draw_dsc->header.w, src_cf);
+    const int32_t dest_pic_w = lv_ppa_pic_w(draw_buf->header.stride, draw_buf->header.w, dest_cf);
+    if(src_pic_w == 0 || dest_pic_w == 0) {
+        /* lv_draw_sw_image() redraws the whole task, and it runs its own decode
+         * loop, so it must fire exactly once. A partial decoder calls this core
+         * back per decoded chunk (see img_decode_and_draw()), which would
+         * otherwise repeat the full software draw for every chunk. */
+        if(u->img_sw_fallback) return;
+        u->img_sw_fallback = true;
+
+        LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, drawing in software");
+#if LV_USE_DRAW_SW
+        lv_draw_sw_image(t, draw_dsc, &t->area);
+#else
+        LV_LOG_WARN("PPA draw_img: no software draw unit to fall back on, image skipped");
+#endif
+        return;
+    }
 
     ppa_blend_oper_config_t cfg = {
         .in_bg = {
             .buffer          = (void *)src_buf,
-            .pic_w           = draw_dsc->header.w,
+            .pic_w           = src_pic_w,
             .pic_h           = draw_dsc->header.h,
             .block_w         = lv_area_get_width(clipped_img_area),
             .block_h         = lv_area_get_height(clipped_img_area),
@@ -72,14 +97,18 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         .bg_alpha_update_mode  = PPA_ALPHA_FIX_VALUE,
         .bg_alpha_fix_val      = 0xFF,
         .bg_ck_en              = false,
+        /* The transparent dummy foreground. Its buffer is the destination, so it
+         * has to be described by the destination's geometry - it was carrying the
+         * source's, which makes the PPA fetch a region that need not exist in
+         * that buffer. It contributes no colour either way. */
         .in_fg = {
             .buffer          = (void *)dest_buf,
-            .pic_w           = draw_dsc->header.w,
-            .pic_h           = draw_dsc->header.h,
+            .pic_w           = dest_pic_w,
+            .pic_h           = draw_buf->header.h,
             .block_w         = lv_area_get_width(clipped_img_area),
             .block_h         = lv_area_get_height(clipped_img_area),
-            .block_offset_x  = src_area.x1,
-            .block_offset_y  = src_area.y1,
+            .block_offset_x  = dest_area.x1,
+            .block_offset_y  = dest_area.y1,
             .blend_cm        = PPA_BLEND_COLOR_MODE_A8,
         },
         .fg_fix_rgb_val = {
@@ -95,7 +124,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         .out = {
             .buffer          = dest_buf,
             .buffer_size     = draw_buf->data_size,
-            .pic_w           = draw_buf->header.w,
+            .pic_w           = dest_pic_w,
             .pic_h           = draw_buf->header.h,
             .block_offset_x  = dest_area.x1,
             .block_offset_y  = dest_area.y1,
