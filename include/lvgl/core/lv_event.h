@@ -132,6 +132,8 @@ typedef enum {
 
     LV_EVENT_LAST,                 /** Number of default events */
 
+    LV_EVENT_LAST_CUSTOM = 0x7FFF,  /** Sentinel for the last custom event code*/
+
     LV_EVENT_PREPROCESS = 0x8000,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */
     LV_EVENT_MARKED_DELETING = 0x10000,
@@ -250,7 +252,7 @@ void lv_event_free_user_data_cb(lv_event_t * e);
 /**
  * Register a new, custom event ID.
  * It can be used the same way as e.g. `LV_EVENT_CLICKED` to send custom events
- * @return      the new event id
+ * @return      the new event id, or `LV_EVENT_LAST` if `LV_EVENT_LAST_CUSTOM` is reached
  *
  * Example:
  * @code

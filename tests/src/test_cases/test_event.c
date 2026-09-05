@@ -250,4 +250,19 @@ void test_event_stop_bubbling(void)
     lv_obj_delete(parent);
 }
 
+void test_event_register_id_stops_at_last_custom(void)
+{
+    uint32_t saved = LV_GLOBAL_DEFAULT()->event_last_register_id;
+
+    LV_GLOBAL_DEFAULT()->event_last_register_id = (uint32_t)LV_EVENT_LAST_CUSTOM - 1;
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)LV_EVENT_LAST_CUSTOM, lv_event_register_id());
+
+    TEST_ASSERT_EQUAL_UINT32(LV_EVENT_LAST, lv_event_register_id());
+    TEST_ASSERT_EQUAL_UINT32(LV_EVENT_LAST, lv_event_register_id());
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)LV_EVENT_LAST_CUSTOM,
+                             LV_GLOBAL_DEFAULT()->event_last_register_id);
+
+    LV_GLOBAL_DEFAULT()->event_last_register_id = saved;
+}
+
 #endif
