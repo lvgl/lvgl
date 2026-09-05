@@ -182,7 +182,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
  * @param selector  the selector of a style (e.g. LV_STATE_PRESSED | LV_PART_KNOB)
  * @param en        true: enable the style, false: disable the style
  */
-void lv_obj_style_set_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool en);
+void lv_obj_set_style_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool en);
 
 /**
  * Get if a given style is enabled on an object.
@@ -191,7 +191,7 @@ void lv_obj_style_set_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
  * @param selector  the selector of a style (e.g. LV_STATE_PRESSED | LV_PART_KNOB)
  * @return          true: the style is enabled, false: the style is disabled
  */
-bool lv_obj_style_get_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
+bool lv_obj_get_style_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
 /**
  * Temporary disable a style for a selector. It will look like is the style wasn't added
@@ -199,9 +199,9 @@ bool lv_obj_style_get_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
  * @param style     pointer to a style
  * @param selector  the selector of a style (e.g. LV_STATE_PRESSED | LV_PART_KNOB)
  * @param dis       true: disable the style, false: enable the style
- * @deprecated      Use `lv_obj_style_set_enabled()` instead (with inverted logic).
+ * @deprecated      Use `lv_obj_set_style_enabled()` instead (with inverted logic).
  */
-LV_DEPRECATED("Use lv_obj_style_set_enabled() instead (with inverted logic).")
+LV_DEPRECATED("Use lv_obj_set_style_enabled() instead (with inverted logic).")
 void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis);
 
 /**
@@ -210,9 +210,9 @@ void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_styl
  * @param style     pointer to a style
  * @param selector  the selector of a style (e.g. LV_STATE_PRESSED | LV_PART_KNOB)
  * @return          true: disable the style, false: enable the style
- * @deprecated      Use `lv_obj_style_get_enabled()` instead (with inverted logic).
+ * @deprecated      Use `lv_obj_get_style_enabled()` instead (with inverted logic).
  */
-LV_DEPRECATED("Use lv_obj_style_get_enabled() instead (with inverted logic).")
+LV_DEPRECATED("Use lv_obj_get_style_enabled() instead (with inverted logic).")
 bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
 /**
