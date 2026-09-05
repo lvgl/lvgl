@@ -126,17 +126,17 @@ void refr_flush_wait_cb(lv_display_t * disp)
     refr_ctx.flush_wait_cnt++;
 }
 
-void refr_sync_cb(lv_display_t * disp, const lv_area_t * area)
+void refr_partial_sync_cb(lv_display_t * disp, const lv_area_t * area)
 {
-    if(refr_ctx.sync_cnt < REFR_LOG_MAX) refr_ctx.sync_area[refr_ctx.sync_cnt] = *area;
-    refr_ctx.sync_cnt++;
-    if(!refr_ctx.defer_sync_ready) lv_display_sync_ready(disp);
+    if(refr_ctx.partial_sync_cnt < REFR_LOG_MAX) refr_ctx.partial_sync_area[refr_ctx.partial_sync_cnt] = *area;
+    refr_ctx.partial_sync_cnt++;
+    if(!refr_ctx.defer_partial_sync_ready) lv_display_partial_sync_ready(disp);
 }
 
-void refr_sync_wait_cb(lv_display_t * disp)
+void refr_partial_sync_wait_cb(lv_display_t * disp)
 {
     LV_UNUSED(disp);
-    refr_ctx.sync_wait_cnt++;
+    refr_ctx.partial_sync_wait_cnt++;
 }
 
 /*Recording the display events*/
@@ -148,8 +148,8 @@ void refr_log_events(lv_display_t * disp)
         LV_EVENT_RENDER_START, LV_EVENT_RENDER_READY,
         LV_EVENT_FLUSH_START, LV_EVENT_FLUSH_FINISH,
         LV_EVENT_FLUSH_WAIT_START, LV_EVENT_FLUSH_WAIT_FINISH,
-        LV_EVENT_SYNC_START, LV_EVENT_SYNC_FINISH,
-        LV_EVENT_SYNC_WAIT_START, LV_EVENT_SYNC_WAIT_FINISH,
+        LV_EVENT_PARTIAL_SYNC_START, LV_EVENT_PARTIAL_SYNC_FINISH,
+        LV_EVENT_PARTIAL_SYNC_WAIT_START, LV_EVENT_PARTIAL_SYNC_WAIT_FINISH,
     };
     size_t i;
     for(i = 0; i < sizeof(codes) / sizeof(codes[0]); i++) {
@@ -189,8 +189,8 @@ void refr_log_reset(void)
 {
     refr_ctx.flush_cnt = 0;
     refr_ctx.flush_wait_cnt = 0;
-    refr_ctx.sync_cnt = 0;
-    refr_ctx.sync_wait_cnt = 0;
+    refr_ctx.partial_sync_cnt = 0;
+    refr_ctx.partial_sync_wait_cnt = 0;
     refr_ctx.ev_cnt = 0;
 }
 

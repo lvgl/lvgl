@@ -27,6 +27,10 @@ extern "C" {
 #define LV_ATTRIBUTE_FLUSH_READY
 #endif
 
+#ifndef LV_ATTRIBUTE_PARTIAL_SYNC_READY
+#define LV_ATTRIBUTE_PARTIAL_SYNC_READY
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -80,8 +84,8 @@ typedef enum {
 
 typedef void (*lv_display_flush_cb_t)(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 typedef void (*lv_display_flush_wait_cb_t)(lv_display_t * disp);
-typedef void (*lv_display_sync_cb_t)(lv_display_t * disp, const lv_area_t * area);
-typedef void (*lv_display_sync_wait_cb_t)(lv_display_t * disp);
+typedef void (*lv_display_partial_sync_cb_t)(lv_display_t * disp, const lv_area_t * area);
+typedef void (*lv_display_partial_sync_wait_cb_t)(lv_display_t * disp);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -333,21 +337,33 @@ lv_display_flush_cb_t lv_display_get_flush_cb(lv_display_t * disp);
 void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_t wait_cb);
 
 /**
- * Set the sync callback which will be called to synchronize invalidated areas between frame buffers pre-render.
+ * Set the partial sync callback which will be called to synchronize invalidated areas between frame buffers.
+ * In case the underlying hardware does not support frame buffer rotation, the only viable option to implement it
+ * is by reverting to LV_DISPLAY_RENDER_MODE_PARTIAL and rotating the reported dirty areas in the driver's
+ * flush_cb() callback in software by using lv_draw_sw_rotate(). To accelerate the rendering, the driver can
+ * still implement multiple full frame buffers under the hood, keeping track of them and choosing the target of
+ * its flush_cb() callback without the upper layers' knowledge about it. To keep the buffers in sync and use
+ * the previous frame as a base for rendering the next one, normally the driver would have to copy the full
+ * contents of the old physically rotated frame buffer to the new one, taking a severe performance hit.
+ * If this callback is set, the dirty areas are collected during the rendering phase (just as if it were in
+ * direct rendering mode) and before the rendering of the next frame starts, the callback is called to inform
+ * the driver to synchronize them between its frame buffers. It is the driver's responsibility to identify the
+ * source and destination frame buffers based on its internal bookkeeping. The driver is free to do the task in
+ * software or with the help of a DMA 2D engine.
  * @param disp     pointer to a display
- * @param sync_cb  the sync callback (pointer to `area` needing to be synchronized)
+ * @param sync_cb  the sync callback (pointer to `area` needing to be synchronized, already in translated physical frame buffer space)
  */
-void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb);
+void lv_display_set_partial_sync_cb(lv_display_t * disp, lv_display_partial_sync_cb_t sync_cb);
 
 /**
- * Set a callback to be used while LVGL is waiting sync to be finished.
+ * Set a callback to be used while LVGL is waiting partial sync to be finished.
  * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
- * If not set the `disp->syncing` flag is used which can be cleared with `lv_display_sync_ready()`
+ * If not set the `disp->partial_syncing` flag is used which can be cleared with `lv_display_partial_sync_ready()`
  * @param disp      pointer to a display
- * @param wait_cb   a callback to call while LVGL is waiting for sync ready.
- *                  If NULL `lv_display_sync_ready()` can be used to signal that syncing is ready.
+ * @param wait_cb   a callback to call while LVGL is waiting for partial sync ready.
+ *                  If NULL `lv_display_partial_sync_ready()` can be used to signal that syncing is ready.
  */
-void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t wait_cb);
+void lv_display_set_partial_sync_wait_cb(lv_display_t * disp, lv_display_partial_sync_wait_cb_t wait_cb);
 
 /**
  * Set the color format of the display.
@@ -413,19 +429,19 @@ LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp);
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp);
 
 /**
- * Call from the display driver when the syncing is finished
- * @param disp      pointer to display whose `sync_cb` was called
+ * Call from the display driver when the partial syncing is finished
+ * @param disp      pointer to display whose `partial_sync_cb` was called
  */
-LV_ATTRIBUTE_SYNC_READY void lv_display_sync_ready(lv_display_t * disp);
+LV_ATTRIBUTE_PARTIAL_SYNC_READY void lv_display_partial_sync_ready(lv_display_t * disp);
 
 /**
- * Tell if it's the last area of the syncing process.
- * Can be called from `sync_cb` to execute some special display refreshing if needed when all areas are synced.
+ * Tell if it's the last area of the partial syncing process.
+ * Can be called from `partial_sync_cb` to execute some special display refreshing if needed when all areas are synced.
  * @param disp      pointer to display
  * @return          true: it's the last area to sync;
  *                  false: there are other areas too which will be synced soon
  */
-LV_ATTRIBUTE_SYNC_READY bool lv_display_sync_is_last(lv_display_t * disp);
+LV_ATTRIBUTE_PARTIAL_SYNC_READY bool lv_display_partial_sync_is_last(lv_display_t * disp);
 
 /**
  * Get display is double buffered.
