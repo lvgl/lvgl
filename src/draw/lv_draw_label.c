@@ -331,13 +331,13 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
 
     /*Align to middle*/
     if(align == LV_TEXT_ALIGN_CENTER) {
-        line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
+        line_width = lv_text_get_line_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
         pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
+        line_width = lv_text_get_line_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
         pos.x += lv_area_get_width(coords) - line_width;
     }
 
@@ -369,6 +369,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     fill_dsc.opa = dsc->opa;
     int32_t underline_width = font->underline_thickness ? font->underline_thickness : 1;
     int32_t line_start_x;
+    int32_t decor_end_x;
     uint32_t next_char_offset;
     uint32_t recolor_command_start_index = 0;
     int32_t letter_w;
@@ -381,6 +382,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     while(remaining_len && dsc->text[line_start] != '\0') {
         pos.x += x_ofs;
         line_start_x = pos.x;
+        decor_end_x = pos.x - 1;
 
         /*Write all letter of a line*/
         next_char_offset = 0;
@@ -502,17 +504,21 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
             lv_font_get_glyph_dsc_internal(font, &glyph_dsc, letter, letter_next);
             letter_w = lv_text_is_marker(letter) ? 0 : glyph_dsc.adv_w;
 
+            if(!lv_text_is_hanging_space(letter)) {
+                decor_end_x = pos.x + letter_w - 1;
+            }
+
             /*Always set the bg_coordinates for placeholder drawing*/
             bg_coords.x1 = pos.x - dsc->letter_space / 2;
             bg_coords.y1 = pos.y;
             bg_coords.x2 = pos.x + letter_w - 1 + (dsc->letter_space + 1) / 2;
             bg_coords.y2 = pos.y + line_height - 1;
 
-            if(next_char_offset >= line_end - line_start) {
+            if(next_char_offset >= line_end - line_start && decor_end_x >= line_start_x) {
                 if(dsc->decor & LV_TEXT_DECOR_UNDERLINE) {
                     lv_area_t fill_area;
                     fill_area.x1 = line_start_x;
-                    fill_area.x2 = pos.x + letter_w - 1;
+                    fill_area.x2 = decor_end_x;
                     fill_area.y1 = pos.y + font->line_height - font->base_line - font->underline_position;
                     fill_area.y2 = fill_area.y1 + underline_width - 1;
 
@@ -522,7 +528,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                 if(dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH) {
                     lv_area_t fill_area;
                     fill_area.x1 = line_start_x;
-                    fill_area.x2 = pos.x + letter_w - 1;
+                    fill_area.x2 = decor_end_x;
                     fill_area.y1 = pos.y + (font->line_height - font->base_line) * 2 / 3 + font->underline_thickness / 2;
                     fill_area.y2 = fill_area.y1 + underline_width - 1;
 
@@ -573,14 +579,14 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         /*Align to middle*/
         if(align == LV_TEXT_ALIGN_CENTER) {
             line_width =
-                lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
+                lv_text_get_line_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
 
             pos.x += (lv_area_get_width(coords) - line_width) / 2;
         }
         /*Align to the right*/
         else if(align == LV_TEXT_ALIGN_RIGHT) {
             line_width =
-                lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
+                lv_text_get_line_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
             pos.x += lv_area_get_width(coords) - line_width;
         }
 

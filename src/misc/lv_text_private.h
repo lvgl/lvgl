@@ -80,6 +80,17 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
                           const lv_text_attributes_t * attributes);
 
 /**
+ * Same as lv_text_get_width() but without the trailing white space of the line.
+ * @param txt a '\0' terminate string
+ * @param length length of 'txt' in byte count and not characters
+ * @param font pointer to font of the text
+ * @param attributes the text attributes, flags for line break behaviour, spacing etc
+ * @return visible width of the line
+ */
+int32_t lv_text_get_line_width(const char * txt, uint32_t length, const lv_font_t * font,
+                               const lv_text_attributes_t * attributes);
+
+/**
  * Check if c is command state
  * @param state
  * @param c
@@ -163,6 +174,16 @@ static inline bool lv_text_is_break_char(uint32_t letter)
     }
 
     return ret;
+}
+
+/**
+ * Test if char is white space which may hang out of the end of a line
+ * @param letter a letter
+ * @return false: 'letter' is not hangable white space
+ */
+static inline bool lv_text_is_hanging_space(uint32_t letter)
+{
+    return letter == ' ' || letter == '\n' || letter == '\r';
 }
 
 /**
