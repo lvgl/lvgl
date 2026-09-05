@@ -74,6 +74,7 @@ static void _g2d_execute_drawing(lv_draw_task_t * t);
  **********************/
 
 static int32_t is_hw_pxp = 0;
+static bool init_successful = false;
 
 /**********************
  *      MACROS
@@ -107,14 +108,20 @@ void lv_draw_g2d_init(void)
 #endif
     g2d_create_buf_map();
     void * handle;
-    LV_ASSERT_MSG(!g2d_open(&handle), "Cannot open G2D handle\r\n");
+    int ret = g2d_open(&handle);
+    if(ret != 0) {
+        LV_LOG_ERROR("Cannot open G2D handle");
+        return;
+    }
     g2d_query_hardware(handle, G2D_HARDWARE_PXP_V1, &is_hw_pxp);
     g2d_set_handle(handle);
+    init_successful = true;
 }
 
 void lv_draw_g2d_deinit(void)
 {
     g2d_free_buf_map();
+    init_successful = false;
 }
 
 /**********************
@@ -181,6 +188,9 @@ static bool _g2d_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
+    if(!init_successful) {
+        return 0;
+    }
 
     const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
     lv_draw_buf_t * draw_buf = draw_dsc_base->layer->draw_buf;
