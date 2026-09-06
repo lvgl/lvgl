@@ -28,7 +28,7 @@ void lv_example_label_bind_text(void)
                                             subject_text_buf,
                                             subject_text_prev_buf,
                                             256);
-        lv_subject_copy_string(subject_text, "Hello");
+        lv_subject_set_string(subject_text, "Hello");
         inited = true;
     }
 

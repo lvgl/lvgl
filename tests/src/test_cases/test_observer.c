@@ -243,7 +243,7 @@ void test_observer_int(void)
     TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(subject));
     TEST_ASSERT_EQUAL(3, observer_called);
 
-    lv_subject_copy_string(subject, "hello");
+    lv_subject_set_string(subject, "hello");
     TEST_ASSERT_EQUAL(15, lv_subject_get_int(subject));
     TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(subject));
     TEST_ASSERT_EQUAL(3, observer_called);
@@ -290,7 +290,7 @@ void test_observer_float(void)
     TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(subject));
     TEST_ASSERT_EQUAL(3, observer_called);
 
-    lv_subject_copy_string(subject, "hello");
+    lv_subject_set_string(subject, "hello");
     TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(subject));
     TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(subject));
     TEST_ASSERT_EQUAL(3, observer_called);
@@ -304,7 +304,7 @@ void test_observer_string(void)
     char buf_previous[32];
     lv_subject_t * subject = subject_create(LV_SUBJECT_TYPE_STRING);
     lv_subject_set_string_buffer_static(subject, buf_current, buf_previous, sizeof(buf_current));
-    lv_subject_copy_string(subject, "hello");
+    lv_subject_set_string(subject, "hello");
 
     lv_observer_t * basic_observer =
         lv_subject_add_observer(subject, observer_basic, NULL);
@@ -314,14 +314,14 @@ void test_observer_string(void)
     TEST_ASSERT_EQUAL_STRING("", lv_subject_get_previous_string(subject));
     TEST_ASSERT_EQUAL(1, observer_called);
 
-    lv_subject_copy_string(subject, "my name is John");
+    lv_subject_set_string(subject, "my name is John");
     TEST_ASSERT_EQUAL_STRING("my name is John",
                              lv_subject_get_string(subject));
     TEST_ASSERT_EQUAL_STRING("hello",
                              lv_subject_get_previous_string(subject));
     TEST_ASSERT_EQUAL(2, observer_called);
 
-    lv_subject_copy_string(subject, "how are you?");
+    lv_subject_set_string(subject, "how are you?");
     TEST_ASSERT_EQUAL_STRING("how are you?",
                              lv_subject_get_string(subject));
     TEST_ASSERT_EQUAL_STRING("my name is John",
@@ -329,7 +329,7 @@ void test_observer_string(void)
     TEST_ASSERT_EQUAL(3, observer_called);
 
     /* Observer shouldn't be called with same value */
-    lv_subject_copy_string(subject, "how are you?");
+    lv_subject_set_string(subject, "how are you?");
     TEST_ASSERT_EQUAL_STRING("how are you?",
                              lv_subject_get_string(subject));
     TEST_ASSERT_EQUAL_STRING("how are you?",
@@ -359,7 +359,7 @@ void test_observer_string(void)
     TEST_ASSERT_EQUAL(5, observer_called);
 
     /*Clip long text*/
-    lv_subject_copy_string(
+    lv_subject_set_string(
         subject,
         "text to be clipped to 32 chars.this should be clipped");
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.",
@@ -369,7 +369,7 @@ void test_observer_string(void)
     TEST_ASSERT_EQUAL(6, observer_called);
 
     /*Check if the previous string is clipped correctly*/
-    lv_subject_copy_string(subject, "a");
+    lv_subject_set_string(subject, "a");
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(subject));
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.",
                              lv_subject_get_previous_string(subject));
@@ -442,7 +442,7 @@ void test_observer_pointer(void)
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(subject));
     TEST_ASSERT_EQUAL(4, observer_called);
 
-    lv_subject_copy_string(subject, "hello");
+    lv_subject_set_string(subject, "hello");
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(subject));
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(subject));
     TEST_ASSERT_EQUAL(4, observer_called);
@@ -498,7 +498,7 @@ void test_observer_color(void)
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_previous_color(subject));
 
-    lv_subject_copy_string(subject, "hello");
+    lv_subject_set_string(subject, "hello");
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_color(subject));
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
@@ -992,11 +992,11 @@ void test_observer_obj_bind_string(void)
 
     lv_subject_t * subject = subject_create(LV_SUBJECT_TYPE_STRING);
     lv_subject_set_string_buffer_static(subject, buf, prev_buf, sizeof(buf));
-    lv_subject_copy_string(subject, "hello");
+    lv_subject_set_string(subject, "hello");
 
     TEST_ASSERT_NOT_NULL(lv_obj_bind_string(obj, subject, capture_string_cb));
     TEST_ASSERT_EQUAL_STRING("hello", captured_string);
-    lv_subject_copy_string(subject, "world");
+    lv_subject_set_string(subject, "world");
     TEST_ASSERT_EQUAL_STRING("world", captured_string);
 
     lv_obj_delete(obj);
@@ -1140,16 +1140,16 @@ void test_observer_label_text_normal(void)
     static char buf[32];
     lv_subject_t * subject_string = subject_create(LV_SUBJECT_TYPE_STRING);
     lv_subject_set_string_buffer_static(subject_string, buf, NULL, sizeof(buf));
-    lv_subject_copy_string(subject_string, "hello");
+    lv_subject_set_string(subject_string, "hello");
     lv_label_bind_text(obj, subject_string, NULL);
     TEST_ASSERT_EQUAL_STRING("hello", lv_label_get_text(obj));
 
-    lv_subject_copy_string(subject_string, "world");
+    lv_subject_set_string(subject_string, "world");
     TEST_ASSERT_EQUAL_STRING("world", lv_label_get_text(obj));
 
     /*Remove the label from the subject*/
     lv_obj_remove_from_subject(obj, subject_string);
-    lv_subject_copy_string(subject_string, "nothing");
+    lv_subject_set_string(subject_string, "nothing");
     TEST_ASSERT_EQUAL_STRING("world", lv_label_get_text(obj));
 
     /*Bind to pointer*/
@@ -1163,7 +1163,7 @@ void test_observer_label_text_normal(void)
 
     /*Remove the label from the subject*/
     lv_obj_remove_from_subject(obj, subject_pointer);
-    lv_subject_copy_string(subject_pointer, "NOTHING");
+    lv_subject_set_string(subject_pointer, "NOTHING");
     TEST_ASSERT_EQUAL_STRING("WORLD", lv_label_get_text(obj));
 }
 
@@ -1196,16 +1196,16 @@ void test_observer_label_text_formatted(void)
     static char buf[32];
     lv_subject_t * subject_string = subject_create(LV_SUBJECT_TYPE_STRING);
     lv_subject_set_string_buffer_static(subject_string, buf, NULL, sizeof(buf));
-    lv_subject_copy_string(subject_string, "hello");
+    lv_subject_set_string(subject_string, "hello");
     lv_label_bind_text(obj, subject_string, "text: %s");
     TEST_ASSERT_EQUAL_STRING("text: hello", lv_label_get_text(obj));
 
-    lv_subject_copy_string(subject_string, "world");
+    lv_subject_set_string(subject_string, "world");
     TEST_ASSERT_EQUAL_STRING("text: world", lv_label_get_text(obj));
 
     /*Remove the label from the subject*/
     lv_obj_remove_from_subject(obj, subject_string);
-    lv_subject_copy_string(subject_string, "nothing");
+    lv_subject_set_string(subject_string, "nothing");
     TEST_ASSERT_EQUAL_STRING("text: world", lv_label_get_text(obj));
 
     /*Bind to pointer*/
@@ -1219,7 +1219,7 @@ void test_observer_label_text_formatted(void)
 
     /*Remove the label from the subject*/
     lv_obj_remove_from_subject(obj, subject_pointer);
-    lv_subject_copy_string(subject_pointer, "NOTHING");
+    lv_subject_set_string(subject_pointer, "NOTHING");
     TEST_ASSERT_EQUAL_STRING("pointer: WORLD", lv_label_get_text(obj));
 }
 

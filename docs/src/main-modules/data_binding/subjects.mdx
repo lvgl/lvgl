@@ -40,7 +40,7 @@ static char buf[32];
 static char prev_buf[32];
 title = lv_subject_create(LV_SUBJECT_TYPE_STRING);
 lv_subject_set_string_buffer_static(title, buf, prev_buf, sizeof(buf));
-lv_subject_copy_string(title, "Hello");
+lv_subject_set_string(title, "Hello");
 ```
 
 ## Deleting a Subject
@@ -74,10 +74,10 @@ int32_t t = lv_subject_get_int(temperature);    /* -> 25 */
 ```
 
 Strings are copied into the Subject's own buffer, so update them with
-<ApiLink name="lv_subject_copy_string" display="lv_subject_copy_string()" />:
+<ApiLink name="lv_subject_set_string" display="lv_subject_set_string()" />:
 
 ```c
-lv_subject_copy_string(title, "Settings");
+lv_subject_set_string(title, "Settings");
 ```
 
 Every type (except groups) also has a `lv_subject_get_previous_...()` function (e.g.
