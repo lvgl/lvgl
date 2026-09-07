@@ -700,4 +700,65 @@ void test_bidi_dir_change_exclude_neutrals(void)
     TEST_ASSERT_NOT_EQUAL(0, out[0]);
 }
 
+/*
+ * Test 38: A partial character right before the string terminator is dropped.
+ * `lv_text_encoded_next` steps over its bytes but decodes it to 0, so it must not
+ * be counted as a character and must not reach the output.
+ */
+void test_bidi_trailing_partial_char_dropped(void)
+{
+    /*Lone UTF-8 lead byte of a 2 byte character*/
+    const char partial[] = "\xc3";
+    char out[8];
+
+    lv_memset(out, 0x55, sizeof(out));
+    lv_bidi_process_paragraph(partial, out, 1, LV_BASE_DIR_LTR, NULL, 0);
+    TEST_ASSERT_EQUAL_UINT8(0x00, (uint8_t)out[0]);
+
+    lv_memset(out, 0x55, sizeof(out));
+    lv_bidi_process_paragraph(partial, out, 1, LV_BASE_DIR_RTL, NULL, 0);
+    TEST_ASSERT_EQUAL_UINT8(0x00, (uint8_t)out[0]);
+}
+
+/*
+ * Test 39: A partial character at the end must not corrupt the valid text before it.
+ * The trailing lead byte used to be treated as a whole character, so in RTL it was
+ * copied to the output and the Hebrew character was mangled.
+ */
+void test_bidi_trailing_partial_char_keeps_valid_text(void)
+{
+    /*Hebrew alef (U+05D0) followed by a lone lead byte*/
+    const char input[] = "\xd7\x90\xc3";
+    char out[8];
+
+    lv_memset(out, 0x55, sizeof(out));
+    lv_bidi_process_paragraph(input, out, 3, LV_BASE_DIR_RTL, NULL, 0);
+    TEST_ASSERT_EQUAL_UINT8(0xd7, (uint8_t)out[0]);
+    TEST_ASSERT_EQUAL_UINT8(0x90, (uint8_t)out[1]);
+    TEST_ASSERT_EQUAL_UINT8(0x00, (uint8_t)out[2]);
+
+    lv_memset(out, 0x55, sizeof(out));
+    lv_bidi_process_paragraph(input, out, 3, LV_BASE_DIR_LTR, NULL, 0);
+    TEST_ASSERT_EQUAL_UINT8(0xd7, (uint8_t)out[0]);
+    TEST_ASSERT_EQUAL_UINT8(0x90, (uint8_t)out[1]);
+    TEST_ASSERT_EQUAL_UINT8(0x00, (uint8_t)out[2]);
+}
+
+/*
+ * Test 40: The byte and character counts stay consistent when the text ends with a
+ * partial character, so every visual position has a mapped logical position.
+ */
+void test_bidi_trailing_partial_char_pos_conv(void)
+{
+    /*Hebrew alef and bet followed by a lone lead byte*/
+    const char input[] = "\xd7\x90\xd7\x91\xc3";
+    uint16_t len = (uint16_t)strlen(input);
+
+    /*Only the two Hebrew characters are mapped, and RTL reverses them*/
+    TEST_ASSERT_EQUAL_UINT16(1, lv_bidi_get_visual_pos(input, NULL, len, LV_BASE_DIR_RTL, 0, NULL));
+    TEST_ASSERT_EQUAL_UINT16(0, lv_bidi_get_visual_pos(input, NULL, len, LV_BASE_DIR_RTL, 1, NULL));
+    TEST_ASSERT_EQUAL_UINT16(1, lv_bidi_get_logical_pos(input, NULL, len, LV_BASE_DIR_RTL, 0, NULL));
+    TEST_ASSERT_EQUAL_UINT16(0, lv_bidi_get_logical_pos(input, NULL, len, LV_BASE_DIR_RTL, 1, NULL));
+}
+
 #endif /*LV_BUILD_TEST*/
