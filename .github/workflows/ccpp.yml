@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Build and Test
 
 on:
   push:
@@ -22,6 +22,7 @@ jobs:
         # A valid option parameter to the cmake file.
         # See build_only_options and test_options in tests/main.py.
         build_option: ['OPTIONS_MINIMAL',
+                       'OPTIONS_NO_CHECKS',
                        'OPTIONS_LINUX_SW',
                        'OPTIONS_LINUX_OPENGLES',
                        'OPTIONS_NUTTX']
@@ -103,6 +104,9 @@ jobs:
 
   test-native:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -134,19 +138,62 @@ jobs:
       run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
       run: python tests/main.py --report --update-image test --auto-clean --keep-report
+    - name: Download the overall coverage baseline
+      if: ${{ github.event_name == 'pull_request' && matrix.build_config == '64bit build' }}
+      continue-on-error: true
+      uses: dawidd6/action-download-artifact@v24
+      with:
+        workflow: ccpp.yml
+        branch: master
+        event: push
+        name: coverage-baseline
+        path: baseline
+        allow_forks: false
+        if_no_artifact_found: warn
     - name: Code coverage analysis
+      if: ${{ github.event_name == 'pull_request' }}
       run: |
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
-          git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
-          MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
-          echo "Merge-base: $MB"
-          python scripts/check_gcov_coverage.py \
-            --commit="${MB}...${{ github.event.pull_request.head.sha }}" \
-            --fail-under=50 \
-            --min-lines=5
-        else
-          echo "Not a pull request, skipping code coverage analysis."
-        fi
+        git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
+        MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+        echo "Merge-base: $MB"
+        BASELINE=baseline/coverage-baseline.json
+        [ -f "$BASELINE" ] && BASELINE_ARG="--baseline=$BASELINE" || BASELINE_ARG=""
+        python scripts/check_gcov_coverage.py \
+          --commit="${MB}...${{ github.event.pull_request.head.sha }}" \
+          --fail-under=50 \
+          --min-lines=5 \
+          $BASELINE_ARG \
+          --report reports/coverage.json
+    - name: Export the overall coverage baseline
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.build_config == '64bit build' }}
+      run: |
+        python scripts/check_gcov_coverage.py \
+          --overall-only \
+          --overall-out baseline/coverage-baseline.json
+    - name: Upload the overall coverage baseline
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.build_config == '64bit build' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage-baseline
+        path: baseline/coverage-baseline.json
+    - name: Note a missing coverage report
+      # A step above can fail before the report is written
+      if: ${{ !cancelled() && github.event_name == 'pull_request' && matrix.build_config == '64bit build' }}
+      run: |
+        [ -f reports/coverage.json ] || \
+          python3 scripts/pr_report/pr_report.py emit \
+            --output reports/coverage.json \
+            --section "Coverage" --icon warn \
+            --summary "not available, the tests did not finish"
+
+    - name: Upload the PR report
+      if: ${{ !cancelled() && github.event_name == 'pull_request' && matrix.build_config == '64bit build' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: pr-report-coverage
+        path: reports/
+        if-no-files-found: ignore
+
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v7

@@ -147,7 +147,7 @@ static const lv_opengl_shader_t src_includes[] = {
             return linearTosRGB(color);
         }
 
-    )"
+        )"
     },
     {
         "textures1.glsl", R"(
@@ -784,13 +784,15 @@ static const lv_opengl_shader_t src_includes[] = {
 
         float lambdaSheenNumericHelper(float x, float alphaG)
         {
+            // The first four coefficients are packed into a vec4 so a single
+            // vectorized mix() replaces four scalar ones, instead of relying on
+            // the shader compiler to vectorize them.
+            vec4 mixA = vec4(21.5473, 3.82987, 0.19823, -1.97760);
+            vec4 mixB = vec4(25.3245, 3.32435, 0.16801, -1.27393);
             float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);
-            float a = mix(21.5473, 25.3245, oneMinusAlphaSq);
-            float b = mix(3.82987, 3.32435, oneMinusAlphaSq);
-            float c = mix(0.19823, 0.16801, oneMinusAlphaSq);
-            float d = mix(-1.97760, -1.27393, oneMinusAlphaSq);
+            vec4 abcd = mix(mixA, mixB, vec4(oneMinusAlphaSq));
             float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);
-            return a / (1.0 + b * pow(x, c)) + d * x + e;
+            return abcd.x / (1.0 + abcd.y * pow(x, abcd.z)) + abcd.w * x + e;
         }
 
 
@@ -1994,7 +1996,11 @@ static const lv_opengl_shader_t src_includes[] = {
         uniform mat3 u_vertNormalUVTransform;
         #endif
 
+        #ifdef USE_SKINNING
+        vec4 getPosition(mat4 skinningMatrix)
+        #else
         vec4 getPosition()
+        #endif /*USE_SKINNING*/
         {
             vec4 pos = vec4(a_position, 1.0);
 
@@ -2003,7 +2009,7 @@ static const lv_opengl_shader_t src_includes[] = {
         #endif
 
         #ifdef USE_SKINNING
-            pos = getSkinningMatrix() * pos;
+            pos = skinningMatrix * pos;
         #endif
 
             return pos;
@@ -2011,7 +2017,11 @@ static const lv_opengl_shader_t src_includes[] = {
 
 
         #ifdef HAS_NORMAL_VEC3
-        vec3 getNormal()
+        #ifdef USE_SKINNING
+            vec3 getNormal(mat4 skinningNormalMatrix)
+        #else
+            vec3 getNormal()
+        #endif /*USE_SKINNING*/
         {
             vec3 normal = a_normal;
 
@@ -2020,35 +2030,36 @@ static const lv_opengl_shader_t src_includes[] = {
         #endif
 
         #ifdef USE_SKINNING
-            normal = mat3(getSkinningNormalMatrix()) * normal;
+            normal = mat3(skinningNormalMatrix) * normal;
         #endif
 
             return normalize(normal);
         }
         #endif
-
+    )"
+    },
+    {
+        "vert_v1_chunk_01.glsl", R"(
         #ifdef HAS_NORMAL_VEC3
         #ifdef HAS_TANGENT_VEC4
+        #ifdef USE_SKINNING
+        vec3 getTangent(mat4 skinningMatrix)
+        #else
         vec3 getTangent()
+        #endif /*USE_SKINNING*/
         {
             vec3 tangent = a_tangent.xyz;
 
         #ifdef USE_MORPHING
             tangent += getTargetTangent(gl_VertexID);
         #endif
-        
-    )"
-    },
-    {
-        "vert_v1_chunk_01.glsl", R"(
         #ifdef USE_SKINNING
-            tangent = mat3(getSkinningMatrix()) * tangent;
+            tangent = mat3(skinningMatrix) * tangent;
         #endif
-
             return normalize(tangent);
         }
-        #endif
-        #endif
+        #endif /*HAS_TANGENT_VEC4*/
+        #endif /*HAS_NORMAL_VEC3*/
 
         mat4 temp_makeNormalMatrixFromViewProj(mat4 _viewProjModelMatrix) {
             mat4 normMat = _viewProjModelMatrix ;
@@ -2079,36 +2090,53 @@ static const lv_opengl_shader_t src_includes[] = {
             mat4 normalMatrix =  transpose(inverse(modelMatrix));
 
         #endif
+        #ifdef USE_SKINNING
+            mat4 skinMatrix = getSkinningMatrix();
+            vec4 pos = modelMatrix * getPosition(skinMatrix);
+        #else
             vec4 pos = modelMatrix * getPosition();
+        #endif /*USE_SKINNING*/
             v_Position = vec3(pos.xyz) / pos.w;
 
         #ifdef HAS_NORMAL_VEC3
         #ifdef HAS_TANGENT_VEC4
+        #ifdef USE_SKINNING
+            mat4 skinNormalMatrix = getSkinningNormalMatrix();
+            vec3 tangent = getTangent(skinMatrix);
+            vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(skinNormalMatrix), 0.0)));
+        #else
             vec3 tangent = getTangent();
             vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));
+        #endif /* USE_SKINNING */
+
             vec3 tangentW = vec3(modelMatrix * vec4(tangent, 0.0));
             vec3 bitangentW = cross(normalW, tangentW) * a_tangent.w;
 
         #ifdef HAS_VERT_NORMAL_UV_TRANSFORM
             tangentW = u_vertNormalUVTransform * tangentW;
             bitangentW = u_vertNormalUVTransform * bitangentW;
-        #endif
+        #endif /* HAS_VERT_NORMAL_UV_TRANSFORM*/
 
             bitangentW = normalize(bitangentW);
             tangentW = normalize(tangentW);
 
             v_TBN = mat3(tangentW, bitangentW, normalW);
         #else
+        #ifdef USE_SKINNING
+            mat4 skinNormalMatrix = getSkinningNormalMatrix();
+            v_Normal = normalize(vec3(normalMatrix * vec4(getNormal(skinNormalMatrix), 0.0)));
+        #else
             v_Normal = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));
-        #endif
-        #endif
+        #endif /*USE_SKINNING*/
+        #endif /*HAS_TANGENT_VEC4*/
+        #endif /*HAS_NORMAL_VEC3*/
 
             v_texcoord_0 = vec2(0.0, 0.0);
             v_texcoord_1 = vec2(0.0, 0.0);
 
         #ifdef HAS_TEXCOORD_0_VEC2
             v_texcoord_0 = a_texcoord_0;
-        #endif
+        #endif /*HAS_TEXCOORD_0_VEC2*/
 
         #ifdef HAS_TEXCOORD_1_VEC2
             v_texcoord_1 = a_texcoord_1;
@@ -2861,6 +2889,10 @@ static const lv_opengl_shader_t env_src_includes[] = {
         //#extension GL_ARB_separate_shader_objects : enable
 
         precision highp float;
+        /* The Hammersley sequence below reverses the bits of a 32 bit value. Integers
+         * default to mediump in an ES fragment shader, which only has to hold 16 bits,
+         * and the sequence then collapses to a single direction. */
+        precision highp int;
         #define MATH_PI 3.1415926535897932384626433832795
         //#define MATH_INV_PI (1.0 / MATH_PI)
 
@@ -3238,6 +3270,40 @@ static const lv_opengl_shader_t env_src_includes[] = {
             return clamp(1.0 / (4.0 * (NdotL + NdotV - NdotL * NdotV)), 0.0, 1.0);
         }
 
+        // The visibility of the sheen lobe as the material shader evaluates it. It is
+        // repeated here so that the sheen albedo table below integrates the very lobe
+        // that the table is later used to scale.
+        float lambdaSheenNumericHelper(float x, float alphaG)
+        {
+            // The first four coefficients are packed into a vec4 so a single
+            // vectorized mix() replaces four scalar ones, instead of relying on
+            // the shader compiler to vectorize them.
+            vec4 mixA = vec4(21.5473, 3.82987, 0.19823, -1.97760);
+            vec4 mixB = vec4(25.3245, 3.32435, 0.16801, -1.27393);
+            float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);
+            vec4 abcd = mix(mixA, mixB, vec4(oneMinusAlphaSq));
+            float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);
+            return abcd.x / (1.0 + abcd.y * pow(x, abcd.z)) + abcd.w * x + e;
+        }
+
+        float lambdaSheen(float cosTheta, float alphaG)
+        {
+            if (abs(cosTheta) < 0.5)
+            {
+                return exp(lambdaSheenNumericHelper(cosTheta, alphaG));
+            }
+            else
+            {
+                return exp(2.0 * lambdaSheenNumericHelper(0.5, alphaG) - lambdaSheenNumericHelper(1.0 - cosTheta, alphaG));
+            }
+        }
+
+        float V_Sheen(float NdotL, float NdotV, float alphaG)
+        {
+            return clamp(1.0 / ((1.0 + lambdaSheen(NdotV, alphaG) + lambdaSheen(NdotL, alphaG)) *
+                (4.0 * NdotV * NdotL)), 0.0, 1.0);
+        }
+
         // Compute LUT for GGX distribution.
         // See https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
         vec3 LUT(float NdotV, float roughness)
@@ -3293,6 +3359,37 @@ static const lv_opengl_shader_t env_src_includes[] = {
                         A += 0.0;
                         B += 0.0;
                         C += sheenVisibility * sheenDistribution * NdotL * VdotH;
+                    }
+                }
+            }
+
+            if (u_distribution == cCharlie)
+            {
+                // Directional albedo of the sheen BRDF, which the material shader reads
+                // from the red channel through u_SheenELUT to scale the base layer that
+                // sits under the sheen lobe.
+                //
+                // The light directions are sampled cosine weighted, so with a probability
+                // density of NdotL / pi the estimator collapses to pi times the average of
+                // the BRDF. The 0.25 cancels the factor of 4 applied to A below.
+                for(int i = 0; i < u_sampleCount; ++i)
+                {
+                    vec2 xi = hammersley2d(i, u_sampleCount);
+
+                    float cosThetaL = sqrt(1.0 - xi.y);
+                    float sinThetaL = sqrt(xi.y);
+                    float phiL = 2.0 * MATH_PI * xi.x;
+                    vec3 L = vec3(sinThetaL * cos(phiL), sinThetaL * sin(phiL), cosThetaL);
+                    vec3 Hl = normalize(V + L);
+
+                    float NdotLl = saturate(L.z);
+                    float NdotHl = saturate(Hl.z);
+                    if (NdotLl > 0.0)
+                    {
+                        // D_Charlie takes the squared roughness here, while the copy of
+                        // it in the material shader squares the roughness itself
+                        float alphaG = roughness * roughness;
+                        A += 0.25 * MATH_PI * D_Charlie(alphaG, NdotHl) * V_Sheen(NdotLl, NdotV, alphaG);
                     }
                 }
             }

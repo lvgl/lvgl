@@ -89,7 +89,7 @@ lv_result_t lv_event_push_and_send(lv_event_list_t * event_list, lv_event_code_t
 
     lv_event_push(&e);
     lv_result_t res = lv_event_send(event_list, &e, true);
-    if(res != LV_RESULT_OK) goto ret;
+    if(res != LV_RESULT_OK || e.stop_processing) goto ret;
 
     res = lv_event_send(event_list, &e, false);
     if(res != LV_RESULT_OK) goto ret;
@@ -155,8 +155,12 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
                               void * user_data)
 {
     LV_CHECK_ARG(list != NULL, return NULL);
+    LV_CHECK_ARG(cb != NULL, return NULL);
     lv_event_dsc_t * dsc = lv_malloc(sizeof(lv_event_dsc_t));
     LV_ASSERT_NULL(dsc);
+    if(!dsc) {
+        return NULL;
+    }
 
     dsc->cb = cb;
     dsc->filter = filter;
@@ -165,13 +169,22 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
     dsc->ext_data.free_cb = NULL;
     dsc->ext_data.data = NULL;
 #endif
-
+    lv_result_t res;
     if(event_array_size(list) == 0) {
         /*event list hasn't been initialized.*/
-        lv_array_init(&list->array, 1, sizeof(lv_event_dsc_t *));
+        res = lv_array_init(&list->array, 1, sizeof(lv_event_dsc_t *));
+        if(res != LV_RESULT_OK) {
+            lv_free(dsc);
+            return NULL;
+        }
     }
 
-    lv_array_push_back(&list->array, &dsc);
+    res = lv_array_push_back(&list->array, &dsc);
+    if(res != LV_RESULT_OK) {
+        lv_free(dsc);
+        return NULL;
+    }
+
     return dsc;
 }
 
@@ -316,6 +329,11 @@ void lv_event_free_user_data_cb(lv_event_t * e)
 
 uint32_t lv_event_register_id(void)
 {
+    if(event_last_id + 1 > (uint32_t)LV_EVENT_LAST_CUSTOM) {
+        LV_LOG_ERROR("No more event ids can be registered");
+        return LV_EVENT_LAST;
+    }
+
     event_last_id ++;
     return event_last_id;
 }
@@ -357,6 +375,10 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_SCROLL_END);
             ENUM_CASE(EVENT_SCROLL);
             ENUM_CASE(EVENT_GESTURE);
+            ENUM_CASE(EVENT_GESTURE_UP);
+            ENUM_CASE(EVENT_GESTURE_DOWN);
+            ENUM_CASE(EVENT_GESTURE_LEFT);
+            ENUM_CASE(EVENT_GESTURE_RIGHT);
             ENUM_CASE(EVENT_KEY);
             ENUM_CASE(EVENT_ROTARY);
             ENUM_CASE(EVENT_FOCUSED);
@@ -385,6 +407,8 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_READY);
             ENUM_CASE(EVENT_CANCEL);
             ENUM_CASE(EVENT_STATE_CHANGED);
+            ENUM_CASE(EVENT_CHECKED);
+            ENUM_CASE(EVENT_UNCHECKED);
 
             /** Other events*/
             ENUM_CASE(EVENT_CREATE);
@@ -429,6 +453,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
 
         /* Special event flags */
         case LV_EVENT_LAST:
+        case LV_EVENT_LAST_CUSTOM:
         case LV_EVENT_PREPROCESS:
         case LV_EVENT_MARKED_DELETING:
             break;

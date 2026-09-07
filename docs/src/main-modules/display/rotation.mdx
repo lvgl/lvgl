@@ -11,7 +11,7 @@ The orientation of the display can be changed with
 according to the set degree; however, it will not perform the actual rotation.
 When changing the rotation, the <ApiLink name="LV_EVENT_RESOLUTION_CHANGED" /> event is
 emitted to allow for hardware reconfiguration. If your display panel and/or its
-driver chip(s) do not support rotation, <ApiLink name="lv_draw_sw_rotate" /> can be used to
+driver chip(s) do not support rotation, <ApiLink name="lv_draw_rotate" /> can be used to
 rotate the buffer in the [Flush Callback](/main-modules/display/setup) function.
 
 <ApiLink name="lv_display_rotate_area" display="lv_display_rotate_area(display, &area)" /> rotates the rendered area
@@ -51,7 +51,7 @@ void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
         static uint8_t rotated_buf[500*1014];
         int32_t src_w = lv_area_get_width(area);
         int32_t src_h = lv_area_get_height(area);
-        lv_draw_sw_rotate(px_map, rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
+        lv_draw_rotate(px_map, rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
         /*Use the rotated area and rotated buffer from now on*/
         area = &rotated_area;
         px_map = rotated_buf;
@@ -92,7 +92,7 @@ void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
         }
     }
     else {
-        lv_draw_sw_rotate(px_map, fb_start, src_w, src_h, src_stride, fb_stride, rotation, cf);
+        lv_draw_rotate(px_map, fb_start, src_w, src_h, src_stride, fb_stride, rotation, cf);
     }
 }
 ```

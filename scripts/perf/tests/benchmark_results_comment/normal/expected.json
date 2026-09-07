@@ -1,0 +1,7 @@
+{
+ "section": "Performance",
+ "order": 30,
+ "icon": "\u2796",
+ "summary": "no change in render_time",
+ "details": "| Configuration | render_time (ms) | vs master |\n|---|---|---|\n| 32b lv_conf_perf32b | 7 | no change |\n| 64b lv_conf_perf64b | 6 | no change |\n\nThe full per-scene tables are in the job summary."
+}

@@ -97,13 +97,13 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res);
 
 /**
  * Remove a display
- * @param disp      pointer to display
+ * @param disp      pointer to display @nullable
  */
 void lv_display_delete(lv_display_t * disp);
 
 /**
  * Set a default display. The new screens will be created on it by default.
- * @param disp      pointer to a display
+ * @param disp      pointer to a display @nullable
  */
 void lv_display_set_default(lv_display_t * disp);
 
@@ -115,7 +115,7 @@ lv_display_t * lv_display_get_default(void);
 
 /**
  * Get the next display.
- * @param disp      pointer to the current display. NULL to initialize.
+ * @param disp      pointer to the current display. @nullable. When NULL it returns the first display.
  * @return          the next display or NULL if no more. Gives the first display when the parameter is NULL.
  */
 lv_display_t * lv_display_get_next(lv_display_t * disp);
@@ -262,7 +262,7 @@ int32_t lv_display_get_dpi(const lv_display_t * disp);
  * `hor_res * ver_res * lv_color_format_get_size(lv_display_get_color_format(disp))`
  * @param disp              pointer to a display
  * @param buf1              first buffer
- * @param buf2              second buffer (can be `NULL`)
+ * @param buf2              second buffer @nullable
  * @param buf_size          buffer size in byte
  * @param render_mode       LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL
  */
@@ -290,14 +290,14 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
  * Use this function when an existing lv_draw_buf_t is available.
  * @param disp              pointer to a display
  * @param buf1              first buffer
- * @param buf2              second buffer (can be `NULL`)
+ * @param buf2              second buffer @nullable
  */
 void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2);
 
 /**
  * Set the third draw buffer for a display.
  * @param disp              pointer to a display
- * @param buf3              third buffer
+ * @param buf3              third buffer @nullable. Use NULL to stop using triple buffering
  */
 void lv_display_set_3rd_draw_buffer(lv_display_t * disp, lv_draw_buf_t * buf3);
 
@@ -354,11 +354,10 @@ void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t 
  * @param disp              pointer to a display
  * @param color_format      Possible values are
  *                          - LV_COLOR_FORMAT_RGB565
+ *                          - LV_COLOR_FORMAT_RGB565_SWAPPED
  *                          - LV_COLOR_FORMAT_RGB888
  *                          - LV_COLOR_FORMAT_XRGB888
  *                          - LV_COLOR_FORMAT_ARGB888
- *@note To change the endianness of the rendered image in case of RGB565 format
- *      (i.e. swap the 2 bytes) call `lv_draw_sw_rgb565_swap` in the flush_cb
  */
 void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
 
@@ -509,7 +508,7 @@ lv_obj_t * lv_display_get_screen_by_name(const lv_display_t * disp, const char *
  * Load a screen on the default display
  * @param scr       pointer to a screen
  */
-void lv_screen_load(struct _lv_obj_t * scr);
+void lv_screen_load(lv_obj_t * scr);
 
 /**
  * Switch screen with animation
@@ -555,7 +554,7 @@ lv_obj_t * lv_layer_bottom(void);
  * @param disp          pointer to a display
  * @param event_cb      an event callback
  * @param filter        event code to react or `LV_EVENT_ALL`
- * @param user_data     optional user_data
+ * @param user_data     optional user_data @nullable
  * @return the event descriptor or NULL if the event couldn't be created
  */
 lv_event_dsc_t * lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter,
@@ -588,7 +587,7 @@ bool lv_display_remove_event(lv_display_t * disp, uint32_t index);
  * Remove an event_cb with user_data
  * @param disp          pointer to a display
  * @param event_cb      the event_cb of the event to remove
- * @param user_data     user_data
+ * @param user_data     user_data @nullable
  * @return              the count of the event removed
  */
 uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data);
@@ -597,7 +596,7 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
  * Send an event to a display
  * @param disp          pointer to a display
  * @param code          an event code. LV_EVENT_...
- * @param param         optional param
+ * @param param         optional param @nullable
  * @return              LV_RESULT_OK: disp wasn't deleted in the event.
  */
 lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param);
@@ -610,9 +609,21 @@ lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, voi
 lv_area_t * lv_event_get_invalidated_area(lv_event_t * e);
 
 /**
- * Set the theme of a display. If there are no user created widgets yet the screens' theme will be updated
+ * Set the theme of a display.
+ *
+ * The theme is applied to each widget when it is created, so this affects the widgets
+ * created afterwards on this display. Widgets that already exist keep their current
+ * styles.
+ *
  * @param disp      pointer to a display
- * @param th        pointer to a theme
+ * @param th        pointer to a theme @nullable. With NULL no theme is applied, so
+ *                  widgets created later get no styles at all and it's up to the
+ *                  application to style them.
+ *
+ * @note If the display is still untouched (no user created screens
+ *       and all screens and layers are empty) the screen created together with the
+ *       display is themed as well. With NULL the layers are cleared of their styles
+ *       too, leaving the whole display unstyled.
  */
 void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th);
 
@@ -625,7 +636,7 @@ lv_theme_t * lv_display_get_theme(lv_display_t * disp);
 
 /**
  * Get elapsed time since last user activity on a display (e.g. click)
- * @param disp      pointer to a display (NULL to get the overall smallest inactivity)
+ * @param disp      pointer to a display @nullable. Use NULL to get the overall smallest inactivity
  * @return          elapsed ticks (milliseconds) since the last activity
  */
 uint32_t lv_display_get_inactive_time(const lv_display_t * disp);
@@ -670,7 +681,7 @@ void lv_display_delete_refr_timer(lv_display_t * disp);
  *
  * @param disp      pointer to a display
  * @param event_cb      an event callback
- * @param user_data     optional user_data
+ * @param user_data     optional user_data @nullable
  */
 bool lv_display_register_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data);
 
@@ -679,22 +690,55 @@ bool lv_display_register_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb
  * Please don't use it in display event listeners, as it may cause memory leaks and illegal access issues.
  * @param disp      pointer to a display
  * @param event_cb      an event callback
- * @param user_data     optional user_data
+ * @param user_data     optional user_data @nullable
  */
 bool lv_display_unregister_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data);
 
 /**
  * Send an vsync event to a display
  * @param disp          pointer to a display
- * @param param         optional param
+ * @param param         optional param @nullable
  * @return              LV_RESULT_OK: disp wasn't deleted in the event.
  */
 lv_result_t lv_display_send_vsync_event(lv_display_t * disp, void * param);
 
+/**
+ * Store a custom pointer on the display. LVGL never uses this value, it's free
+ * for the application to use for any purpose.
+ * @param disp          pointer to a display
+ * @param user_data     @nullable custom pointer to store, can be `NULL` to clear it
+ */
 void lv_display_set_user_data(lv_display_t * disp, void * user_data);
+
+/**
+ * Store a pointer to display driver specific data on the display. Intended for
+ * the display driver implementation, the application should use
+ * `lv_display_set_user_data()` instead.
+ * @param disp          pointer to a display
+ * @param driver_data   @nullable custom pointer to store, can be `NULL` to clear it
+ */
 void lv_display_set_driver_data(lv_display_t * disp, void * driver_data);
+
+/**
+ * Get the custom pointer set by `lv_display_set_user_data()`.
+ * @param disp          pointer to a display
+ * @return              the stored user data
+ */
 void * lv_display_get_user_data(lv_display_t * disp);
+
+/**
+ * Get the driver specific pointer set by `lv_display_set_driver_data()`.
+ * @param disp          pointer to a display
+ * @return              the stored driver data
+ */
 void * lv_display_get_driver_data(lv_display_t * disp);
+
+/**
+ * Get the draw buffer LVGL is currently rendering into. With double buffering
+ * this alternates between the two buffers after each flush.
+ * @param disp          pointer to a display
+ * @return              pointer to the active draw buffer
+ */
 lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp);
 
 /**
@@ -769,7 +813,7 @@ uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t 
  * @sa https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
  */
 #define LV_DPX_CALC(dpi, n)   ((n) == 0 ? 0 :LV_MAX((( (dpi) * (n) + 80) / 160), 1)) /*+80 for rounding*/
-#define LV_DPX(n)   LV_DPX_CALC(lv_display_get_dpi(NULL), n)
+#define LV_DPX(n)   LV_DPX_CALC(lv_display_get_dpi(lv_display_get_default()), n)
 
 /**
  * For default display, computes the number of pixels (a distance or size) as if the
@@ -803,9 +847,10 @@ int32_t lv_display_dpx(const lv_display_t * disp, int32_t n);
  * the associated resources.
  *
  * @param disp       Pointer to a display
- * @param data       User-defined data pointer to associate with the display
+ * @param data       User-defined data pointer to associate with the display @nullable
  * @param free_cb    Callback function for cleaning up data when display is deleted.
- *                   Receives data as parameter. NULL means no cleanup required.
+ *                   Receives data as parameter. @nullable.
+ *                   Use NULL to dettach a previously attached callback
  */
 void lv_display_set_external_data(lv_display_t * disp, void * data, void (* free_cb)(void * data));
 #endif

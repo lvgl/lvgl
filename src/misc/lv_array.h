@@ -50,7 +50,7 @@ typedef struct _lv_array_t {
  * @param capacity the initial capacity of the array
  * @param element_size the size of an element in bytes
  */
-void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size);
+lv_result_t lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size);
 
 /**
  * Init an array from a buffer.
@@ -176,11 +176,12 @@ lv_result_t lv_array_remove_unordered(lv_array_t * array, uint32_t index);
 lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end);
 
 /**
- * Concatenate two arrays. Adds new elements to the end of the array.
- * @note The destination array is automatically expanded as necessary.
- * @param array pointer to an `lv_array_t` variable
- * @param other pointer to the array to concatenate
- * @return LV_RESULT_OK: success, otherwise: error
+ * Concatenate two arrays. Adds new elements from `other` to the end of `array`.
+ * @note Destination array capacity is automatically expanded as necessary.
+ * @note Both arrays must have matching element sizes.
+ * @param array pointer to destination `lv_array_t` variable
+ * @param other pointer to source `lv_array_t` variable to concatenate
+ * @return LV_RESULT_OK: success, LV_RESULT_INVALID: error (NULL pointer, size overflow, element size mismatch)
  */
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other);
 

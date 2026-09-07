@@ -9,6 +9,7 @@
 #include "blend/lv_draw_sw_blend_private.h"
 #include "../lv_draw_label_private.h"
 #include "../../draw/lv_draw_private.h"
+#include "../../font/lv_font_private.h"
 #include "lv_draw_sw.h"
 
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
@@ -78,7 +79,7 @@ void lv_draw_sw_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, con
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    lv_draw_unit_draw_letter(t, &glyph_dsc, &(lv_point_t) {
+    lv_draw_unit_draw_letter_internal(t, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
     dsc->font, dsc->unicode, draw_letter_cb);
@@ -140,10 +141,10 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                     if(glyph_draw_dsc->rotation % 3600 == 0 && glyph_draw_dsc->format != LV_FONT_GLYPH_FORMAT_IMAGE) {
                         lv_area_t mask_area = *glyph_draw_dsc->letter_coords;
 
-                        if(lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font) &&
+                        if(lv_font_has_static_bitmap_internal(glyph_draw_dsc->g->resolved_font) &&
                            glyph_draw_dsc->g->format == LV_FONT_GLYPH_FORMAT_A8) {
                             glyph_draw_dsc->g->req_raw_bitmap = 1;
-                            const void * bitmap = lv_font_get_glyph_static_bitmap(glyph_draw_dsc->g);
+                            const void * bitmap = lv_font_get_glyph_static_bitmap_internal(glyph_draw_dsc->g);
                             lv_draw_sw_blend_dsc_t blend_dsc;
                             lv_memzero(&blend_dsc, sizeof(blend_dsc));
                             blend_dsc.color = glyph_draw_dsc->color;
@@ -156,7 +157,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             lv_draw_sw_blend(t, &blend_dsc);
                         }
                         else {
-                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                             if(glyph_draw_dsc->glyph_data == NULL) {
                                 LV_LOG_WARN("Couldn't get the bitmap of a glyph");
                                 break;
@@ -177,7 +178,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                         }
                     }
                     else {
-                        glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                         lv_draw_image_dsc_t img_dsc;
                         lv_draw_image_dsc_init(&img_dsc);
                         img_dsc.rotation = glyph_draw_dsc->rotation;
@@ -187,7 +188,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                         img_dsc.src = glyph_draw_dsc->glyph_data;
                         img_dsc.recolor = glyph_draw_dsc->color;
                         img_dsc.pivot = (lv_point_t) {
-                            .x = glyph_draw_dsc->pivot.x,
+                            .x = glyph_draw_dsc->pivot.x - glyph_draw_dsc->g->ofs_x,
                             .y = glyph_draw_dsc->g->box_h + glyph_draw_dsc->g->ofs_y
                         };
                         lv_draw_sw_image(t, &img_dsc, glyph_draw_dsc->letter_coords);

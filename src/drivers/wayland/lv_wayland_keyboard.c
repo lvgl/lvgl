@@ -48,6 +48,7 @@ static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint
 #endif
 
 static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key);
+static void push_event(lv_wl_seat_keyboard_t * kbdata, lv_key_t key, lv_indev_state_t state);
 
 /**********************
  *  STATIC VARIABLES
@@ -88,10 +89,9 @@ lv_indev_t * lv_wayland_keyboard_create(void)
 
 lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display)
 {
+    LV_CHECK_ARG(display != NULL, return NULL);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
-    if(!window) {
-        return NULL;
-    }
+    LV_CHECK_ARG_MSG(window != NULL, return NULL, "Invalid display");
     return window->lv_indev_keyboard;
 }
 
@@ -101,6 +101,7 @@ lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display)
 
 lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat)
 {
+    LV_ASSERT(wl_seat != NULL);
 
     struct wl_keyboard * keyboard = wl_seat_get_keyboard(wl_seat);
     if(!keyboard) {
@@ -145,12 +146,33 @@ void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard)
 
 static void keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
+    LV_ASSERT(indev != NULL);
+    LV_ASSERT(data != NULL);
     lv_wl_seat_keyboard_t * kbdata = lv_indev_get_driver_data(indev);
     if(!kbdata) {
         return;
     }
-    data->key = kbdata->key;
-    data->state = kbdata->state;
+
+    if(kbdata->event_count == 0) {
+        return;
+    }
+
+    lv_display_t * display = lv_indev_get_display(indev);
+    if(!display) {
+        return;
+    }
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_ASSERT(window != NULL);
+    if(window->body != kbdata->focused_surface) {
+        return;
+    }
+
+    uint8_t index = kbdata->event_read_index;
+    data->key = kbdata->events[index].key;
+    data->state = kbdata->events[index].state;
+    kbdata->event_read_index = (index + 1) % LV_WAYLAND_KEY_EVENT_MAX_COUNT;
+    kbdata->event_count--;
+    data->continue_reading = kbdata->event_count > 0;
 }
 
 static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard, uint32_t format, int fd, uint32_t size)
@@ -201,19 +223,34 @@ static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard, ui
 {
 
     LV_UNUSED(data);
-    LV_UNUSED(keyboard);
     LV_UNUSED(serial);
     LV_UNUSED(keys);
-    LV_UNUSED(surface);
+
+    lv_wl_seat_keyboard_t * kbdata = wl_keyboard_get_user_data(keyboard);
+    LV_ASSERT(kbdata != NULL);
+    kbdata->focused_surface = surface;
 }
 
 static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard, uint32_t serial,
                                   struct wl_surface * surface)
 {
     LV_UNUSED(serial);
-    LV_UNUSED(keyboard);
     LV_UNUSED(data);
-    LV_UNUSED(surface);
+
+    lv_wl_seat_keyboard_t * kbdata = wl_keyboard_get_user_data(keyboard);
+    LV_ASSERT(kbdata != NULL);
+    if(kbdata->focused_surface != surface) {
+        return;
+    }
+
+    const uint8_t last_event_index = kbdata->event_write_index == 0 ?
+                                     LV_WAYLAND_KEY_EVENT_MAX_COUNT - 1 :
+                                     kbdata->event_write_index - 1;
+
+    /* release last pushed event in case it wasn't a release event*/
+    if(kbdata->events[last_event_index].state != LV_INDEV_STATE_RELEASED) {
+        push_event(kbdata, kbdata->events[last_event_index].key, LV_INDEV_STATE_RELEASED);
+    }
 }
 
 static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint32_t serial, uint32_t time,
@@ -240,8 +277,7 @@ static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint
         (state == WL_KEYBOARD_KEY_STATE_PRESSED) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
     if(lv_key != 0) {
-        kbdata->key = lv_key;
-        kbdata->state = lv_state;
+        push_event(kbdata, lv_key, lv_state);
     }
 }
 
@@ -332,6 +368,19 @@ static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key)
         default:
             return 0;
     }
+}
+static void push_event(lv_wl_seat_keyboard_t * kbdata, lv_key_t key, lv_indev_state_t state)
+{
+    LV_ASSERT(kbdata != NULL);
+
+    if(kbdata->event_count == LV_WAYLAND_KEY_EVENT_MAX_COUNT) {
+        LV_LOG_WARN("Dropping event as LV_WAYLAND_KEY_EVENT_MAX_COUNT was reached.");
+        return;
+    }
+    kbdata->events[kbdata->event_write_index].key = key;
+    kbdata->events[kbdata->event_write_index].state = state;
+    kbdata->event_write_index = (kbdata->event_write_index + 1) % LV_WAYLAND_KEY_EVENT_MAX_COUNT;
+    kbdata->event_count++;
 }
 
 #endif /* LV_WAYLAND */

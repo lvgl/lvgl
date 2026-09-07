@@ -18,6 +18,7 @@
 #include "lv_vg_lite_bitmap_font_cache.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_area_private.h"
+#include "../../font/lv_font_private.h"
 #include "../../font/freetype/lv_freetype_private.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_image_private.h"
@@ -118,7 +119,7 @@ void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    lv_draw_unit_draw_letter(t, &glyph_dsc, &(lv_point_t) {
+    lv_draw_unit_draw_letter_internal(t, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
     dsc->font, dsc->unicode, draw_letter_cb);
@@ -156,12 +157,12 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A8: {
                     const lv_font_t * resolved_font = glyph_draw_dsc->g->resolved_font;
                     vg_lite_buffer_t src_buf;
-                    if(lv_font_has_static_bitmap(resolved_font) && init_buffer_from_glyph_dsc(&src_buf, glyph_draw_dsc->g)) {
+                    if(lv_font_has_static_bitmap_internal(resolved_font) && init_buffer_from_glyph_dsc(&src_buf, glyph_draw_dsc->g)) {
                     }
                     else {
                         if(resolved_font->release_glyph) {
                             /* For dynamic fonts, its internal implementation already supports cache management. */
-                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                         }
                         else {
                             /* For non-cached unaligned fonts, we need to manage the cache manually. */
@@ -185,7 +186,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                 break;
 
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
-                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     if(!glyph_draw_dsc->glyph_data) {
                         return;
                     }
@@ -232,7 +233,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 
 static inline bool init_buffer_from_glyph_dsc(vg_lite_buffer_t * buffer, lv_font_glyph_dsc_t * g_dsc)
 {
-    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap(g_dsc);
+    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap_internal(g_dsc);
     if(!glyph_bitmap) {
         return false;
     }
@@ -392,7 +393,7 @@ static void bitmap_cache_release_cb(void * entry, void * user_data)
 {
     LV_UNUSED(user_data);
     lv_font_glyph_dsc_t * g_dsc = entry;
-    lv_font_glyph_release_draw_data(g_dsc);
+    lv_font_glyph_release_draw_data_internal(g_dsc);
 }
 
 

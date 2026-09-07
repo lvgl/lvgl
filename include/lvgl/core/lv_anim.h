@@ -177,7 +177,7 @@ void lv_anim_init(lv_anim_t * a);
 /**
  * Set a variable to animate
  * @param a     pointer to an initialized `lv_anim_t` variable
- * @param var   pointer to a variable to animate
+ * @param var   pointer to a variable to animate @nullable
  */
 void lv_anim_set_var(lv_anim_t * a, void * var);
 
@@ -328,7 +328,7 @@ void lv_anim_set_early_apply(lv_anim_t * a, bool en);
 /**
  * Set the custom user data field of the animation.
  * @param a           pointer to an initialized `lv_anim_t` variable
- * @param user_data   pointer to the new user_data.
+ * @param user_data   pointer to the new user_data. @nullable
  */
 void lv_anim_set_user_data(lv_anim_t * a, void * user_data);
 
@@ -386,7 +386,7 @@ void * lv_anim_get_user_data(const lv_anim_t * a);
 
 /**
  * Delete animation(s) of a variable with a given animator function
- * @param var       pointer to variable
+ * @param var       pointer to variable @nullable
  * @param exec_cb   a function pointer which is animating 'var',
  *                  or NULL to ignore it and delete all the animations of 'var
  * @return          true: at least 1 animation is deleted, false: no animation is deleted
@@ -418,7 +418,8 @@ lv_timer_t * lv_anim_get_timer(void);
  * This function exists because it's logical that all anim. functions receives an
  * `lv_anim_t` as their first parameter. It's not practical in C but might make
  * the API more consequent and makes easier to generate bindings.
- * @param a         pointer to an animation.
+ * @param a         pointer to an animation. @nullable When NULL the animations whose
+ *                  variable is NULL are matched.
  * @param exec_cb   a function pointer which is animating 'var',
  *                  or NULL to ignore it and delete all the animations of 'var
  * @return          true: at least 1 animation is deleted, false: no animation is deleted
@@ -430,7 +431,8 @@ bool lv_anim_custom_delete(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb);
  * This function exists because it's logical that all anim. functions receives an
  * `lv_anim_t` as their first parameter. It's not practical in C but might make
  * the API more consequent and makes easier to generate bindings.
- * @param a         pointer to an animation.
+ * @param a         pointer to an animation. @nullable When NULL the animations whose
+ *                  variable is NULL are matched.
  * @param exec_cb   a function pointer which is animating 'var', or NULL to return first matching 'var'
  * @return          pointer to the animation.
  */
@@ -566,8 +568,8 @@ int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a);
  * or is deleted, enabling proper resource cleanup.
  *
  * @param anim       Pointer to the animation object to configure
- * @param data       User-defined data pointer to associate
- * @param free_cb    Cleanup callback that receives ext_data when:
+ * @param data       User-defined data pointer to associate @nullable
+ * @param free_cb    Cleanup callback that receives ext_data when: @nullable
  *                   - Animation completes naturally
  *                   - Animation is deleted prematurely
  *                   - New data replaces current association

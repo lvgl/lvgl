@@ -35,6 +35,8 @@
 
 void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_memzero(draw_dsc, sizeof(lv_draw_triangle_dsc_t));
     draw_dsc->color = lv_color_white();
@@ -49,11 +51,16 @@ void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc)
 
 lv_draw_triangle_dsc_t * lv_draw_task_get_triangle_dsc(lv_draw_task_t * task)
 {
+    LV_CHECK_ARG(task != NULL, return NULL);
+
     return task->type == LV_DRAW_TASK_TYPE_TRIANGLE ? (lv_draw_triangle_dsc_t *)task->draw_dsc : NULL;
 }
 
 void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
     LV_PROFILER_DRAW_BEGIN;

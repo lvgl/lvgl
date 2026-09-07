@@ -27,7 +27,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * disp);
+typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * display);
+#define LV_WAYLAND_PHYSICAL_DISPLAY_ANY 0xFF
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -46,50 +47,72 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 /**
  * Closes the window programmatically
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window @nullable
  */
-void lv_wayland_window_close(lv_display_t * disp);
+void lv_wayland_window_close(lv_display_t * display);
 
 /**
  * Check if the window is open
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  * @return true: The window is open
  */
-bool lv_wayland_window_is_open(lv_display_t * disp);
+bool lv_wayland_window_is_open(lv_display_t * display);
 
 /**
  * Assigns the window to a specific physical display
- * @param disp Reference to the LVGL display associated to the window
- * @param display Physical display number
+ * @param display Reference to the LVGL display associated to the window
+ * @param phys_display Physical display number or LV_WAYLAND_PHYSICAL_DISPLAY_ANY
+ *                     to unassign a previously set physical display
  */
-void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display);
+void lv_wayland_window_set_physical_display(lv_display_t * display, uint8_t phys_display);
 
 /**
  * Unassigns the current physical display attached to the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  */
-void lv_wayland_unassign_physical_display(lv_display_t * disp);
+void lv_wayland_window_remove_physical_display(lv_display_t * display);
 
 /**
  * Sets the fullscreen state of the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  * @param fullscreen If true the window enters fullscreen
+ *
+ * @note The fullscreen request is made asynchronously and may not be fulfilled
+ * if the compositor doesn't allow it. lv_wayland_window_is_fullscreen() can be
+ * used to determine the fullscreen state of the window.
  */
-
-void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen);
+void lv_wayland_window_set_fullscreen(lv_display_t * display, bool fullscreen);
 
 /**
- * Sets the maximized state of the window
+ * Check if window is fullscreen
  * @param disp Reference to the LVGL display associated to the window
- * @param maximize   If true the window is maximized
+ * @returns the fullscreen state of the window as reported by the compositor
  */
-void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximize);
+bool lv_wayland_window_is_fullscreen(lv_display_t * disp);
+
+/**
+ * Requests the window be maximized/unmaximized
+ * @param display Reference to the LVGL display associated to the window
+ * @param maximize true: maximize the window false: unmaximize the window
+ *
+ * @note The maximized request is made asynchronously and may not be fulfilled
+ * if the compositor doesn't allow it. lv_wayland_window_is_maximized() can be
+ * used to determine the maximized state of the window.
+ */
+void lv_wayland_window_set_maximized(lv_display_t * display, bool maximize);
+
+/**
+ * Check if window is maximized
+ * @param disp Reference to the LVGL display associated to the window
+ * @returns the maximized state of the window as reported by the compositor
+ */
+bool lv_wayland_window_is_maximized(lv_display_t * disp);
 
 /**
  * Minimizes the window
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  */
-void lv_wayland_window_set_minimized(lv_display_t * disp);
+void lv_wayland_window_set_minimized(lv_display_t * display);
 
 /**********************
  *      MACROS

@@ -83,6 +83,7 @@ lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv
 
 void lv_lcd_generic_mipi_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
     drv->x_gap = x;
     drv->y_gap = y;
@@ -90,12 +91,14 @@ void lv_lcd_generic_mipi_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
 
 void lv_lcd_generic_mipi_set_invert(lv_display_t * disp, bool invert)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
     send_cmd(drv, invert ? LV_LCD_CMD_ENTER_INVERT_MODE : LV_LCD_CMD_EXIT_INVERT_MODE, NULL, 0);
 }
 
 void lv_lcd_generic_mipi_set_address_mode(lv_display_t * disp, bool mirror_x, bool mirror_y, bool swap_xy, bool bgr)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
     uint8_t mad = drv->madctl_reg & ~(LV_LCD_MASK_RGB_ORDER);
     if(bgr) {
@@ -110,6 +113,7 @@ void lv_lcd_generic_mipi_set_address_mode(lv_display_t * disp, bool mirror_x, bo
 
 void lv_lcd_generic_mipi_set_gamma_curve(lv_display_t * disp, uint8_t gamma)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
     send_cmd(drv, LV_LCD_CMD_SET_GAMMA_CURVE, (uint8_t[]) {
         gamma,
@@ -118,6 +122,8 @@ void lv_lcd_generic_mipi_set_gamma_curve(lv_display_t * disp, uint8_t gamma)
 
 void lv_lcd_generic_mipi_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(cmd_list != NULL, return);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
     while(1) {
         uint8_t cmd = *cmd_list++;
@@ -340,7 +346,7 @@ static void delete_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_current_target(e);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
-    LV_ASSERT_NULL(drv);
+    LV_ASSERT(drv != NULL);
     lv_free(drv);
     lv_display_set_driver_data(disp, NULL);
 }

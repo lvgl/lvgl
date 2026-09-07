@@ -435,8 +435,8 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         size_t buf_size = dest_stride * phy_height;
         uint8_t * wl_buf = (uint8_t *)ddata->mmap_ptr + (ddata->curr_wl_buffer_idx * buf_size);
 
-        lv_draw_sw_rotate(ddata->rotated_buf, wl_buf, hor_res, ver_res,
-                          src_stride, dest_stride, rotation, cf);
+        lv_draw_rotate(ddata->rotated_buf, wl_buf, hor_res, ver_res,
+                       src_stride, dest_stride, rotation, cf);
 
         wl_surface_damage(surface, 0, 0, phy_width, phy_height);
     }

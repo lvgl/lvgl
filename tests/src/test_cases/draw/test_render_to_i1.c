@@ -12,14 +12,14 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
-    lv_display_set_color_format(NULL, LV_COLOR_FORMAT_XRGB8888);
+    lv_display_set_color_format(lv_display_get_default(), LV_COLOR_FORMAT_XRGB8888);
 }
 
 void test_render_to_i1(void)
 {
     /*NanoVG reads back the FBO as 32bpp BGRA, so non-XRGB8888 targets don't apply*/
 #if LV_BIN_DECODER_RAM_LOAD && LV_USE_DRAW_VG_LITE == 0 && LV_USE_DRAW_NANOVG == 0
-    lv_display_set_color_format(NULL, LV_COLOR_FORMAT_I1);
+    lv_display_set_color_format(lv_display_get_default(), LV_COLOR_FORMAT_I1);
 
     lv_opa_t opa_values[2] = {0xff, 0xc0};
     uint32_t opa;

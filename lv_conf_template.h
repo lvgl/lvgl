@@ -128,8 +128,18 @@
  * RENDERING CONFIGURATION
  *============================================================================*/
 
-/** Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
-#define LV_COLOR_DEPTH 16
+/** Default color format
+ *  Possible values:
+ *  - LV_COLOR_FORMAT_I1
+ *  - LV_COLOR_FORMAT_L8
+ *  - LV_COLOR_FORMAT_RGB565
+ *  - LV_COLOR_FORMAT_RGB565_SWAPPED: RGB565 (Big-endian)
+ *  - LV_COLOR_FORMAT_RGB888
+ *  - LV_COLOR_FORMAT_XRGB8888
+ *  - LV_COLOR_FORMAT_ARGB8888
+ *  - LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
+ */
+#define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
 
 /** 0: no adjustment, get the integer part of the result (round down)
  *  64: round up from x.75
@@ -298,6 +308,7 @@
  *  - LV_DRAW_SW_ASM_NEON
  *  - LV_DRAW_SW_ASM_HELIUM
  *  - LV_DRAW_SW_ASM_RISCV_V: RISC-V Vector
+ *  - LV_DRAW_SW_ASM_SVE2
  *  - LV_DRAW_SW_ASM_CUSTOM
  */
 #define LV_USE_DRAW_SW_ASM LV_DRAW_SW_ASM_NONE
@@ -502,6 +513,8 @@
 
 /** Accelerate blends, fills and transforms with the PPA (Pixel Processing
  *  Accelerator) peripheral of Espressif SoCs.
+ *
+ *  Enable: LV_USE_DRAW_SW
  */
 #define LV_USE_PPA 0
 
@@ -536,6 +549,29 @@
 
 #endif /*LV_USE_DRAW_DMA2D*/
 
+/** Accelerate blends, fills, images and text with the EPIC (Enhanced
+ *  Pixel Image Compositor) engine of SiFli BF0 SoCs. Unsupported
+ *  operations fall back to software rendering.
+ *
+ *  Enable: LV_USE_DRAW_SW
+ */
+#define LV_USE_SIFLI_EPIC 0
+
+#if LV_USE_OS != LV_OS_NONE
+#if LV_USE_SIFLI_EPIC
+/** Dispatch EPIC operations from their own thread so the CPU can keep
+ *  rendering in parallel.
+ */
+#define LV_USE_SIFLI_EPIC_DRAW_THREAD 1
+
+/** Check the status of every EPIC call and assert on failure. Useful
+ *  while bringing up a board.
+ */
+#define LV_USE_SIFLI_EPIC_ASSERT 0
+
+#endif /*LV_USE_SIFLI_EPIC*/
+#endif /*LV_USE_OS != LV_OS_NONE*/
+
 /** Offload drawing to an external EVE (FT81X/BT81X) graphics controller over SPI. */
 #define LV_USE_DRAW_EVE 0
 
@@ -554,6 +590,8 @@
 
 /** Accelerate blends, fills and image blits with the NXP G2D API (i.MX 2D GPU).
  *  Requires the g2d library and its headers.
+ *
+ *  Enable: LV_USE_DRAW_SW
  */
 #define LV_USE_DRAW_G2D 0
 
@@ -617,7 +655,10 @@
 
 #endif /*LV_USE_DRAW_OPENGLES*/
 
-/** Render with the SDL renderer API, caching widgets and images as SDL textures. */
+/** Render with the SDL renderer API, caching widgets and images as SDL textures.
+ *
+ *  Enable: LV_USE_DRAW_SW
+ */
 #define LV_USE_DRAW_SDL 0
 
 
@@ -685,7 +726,7 @@
  *============================================================================*/
 
 /** Speed up style property lookups by adding 2 x 32 bit variables to each lv_obj_t. */
-#define LV_OBJ_STYLE_CACHE 0
+#define LV_OBJ_STYLE_CACHE 1
 
 /** Widget names (lv_obj_set_name) */
 #define LV_USE_OBJ_NAME 0
@@ -1419,7 +1460,10 @@
 /** Menu */
 #define LV_USE_MENU 1
 
-/** Message box */
+/** Message box
+ *
+ *  Enable: LV_USE_LABEL
+ */
 #define LV_USE_MSGBOX 1
 
 /** QR code
@@ -2306,19 +2350,22 @@
 #endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE*/
 #endif /*LV_ENABLE_GLOBAL_CUSTOM*/
 
-/** NULL checks (very fast, recommended) */
-#define LV_USE_ASSERT_NULL 1
+/** LV_ASSERT / LV_ASSERT_MSG / LV_ASSERT_FORMAT_MSG */
+#define LV_USE_ASSERT 0
 
-/** Allocation success checks (very fast, recommended) */
-#define LV_USE_ASSERT_MALLOC 1
+/** LV_ASSERT_MALLOC */
+#define LV_USE_ASSERT_MALLOC 0
 
-/** Style init checks (very fast, recommended) */
+/** LV_ASSERT_NULL */
+#define LV_USE_ASSERT_NULL 0
+
+/** LV_ASSERT_STYLE */
 #define LV_USE_ASSERT_STYLE 0
 
-/** lv_mem integrity checks (slow) */
+/** LV_ASSERT_MEM_INTEGRITY */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0
 
-/** Widget validity checks (slow) */
+/** LV_ASSERT_OBJ */
 #define LV_USE_ASSERT_OBJ 0
 
 /** Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
@@ -2376,17 +2423,28 @@
 #define LV_CHECK_ARG_LOG_MODE LV_CHECK_ARG_LOG_MODE_NONE
 
 /** LV_CHECK_OBJ verifies with lv_obj_has_class() that the object has the
- *  expected class. When disabled the check is skipped even if a class
- *  argument is supplied.
+ *  expected class. When disabled the class check is skipped
+ *  (LV_CHECK_OBJ collapses to a NULL check).
  */
 #define LV_USE_CHECK_OBJ_CLASSTYPE 0
 
-/** LV_CHECK_OBJ verifies with lv_obj_is_valid() that the object is still
- *  part of the widget tree. When disabled the check is skipped even if the
- *  associated argument is supplied.
+/** LV_CHECK_OBJ verifies with lv_obj_is_in_widget_tree() that the object is
+ *  still part of the widget tree. When disabled the validity check is
+ *  skipped (only the class/NULL check remains).
  */
 #define LV_USE_CHECK_OBJ_VALIDITY 0
 
+#if LV_USE_CHECK_OBJ_VALIDITY
+#if LV_USE_ASSERT
+/** While walking up the parent chain, lv_obj_is_in_widget_tree also checks that
+ *  each parent's children array contains the child. This finds corruption where
+ *  a child's parent pointer and the parent's children list disagree. The cost is
+ *  O(siblings) per level instead of O(1), and LV_ASSERT reports the mismatch.
+ */
+#define LV_USE_CHECK_OBJ_PARENT_LINK 0
+
+#endif /*LV_USE_ASSERT*/
+#endif /*LV_USE_CHECK_OBJ_VALIDITY*/
 #endif /*LV_USE_CHECK_ARG*/
 
 

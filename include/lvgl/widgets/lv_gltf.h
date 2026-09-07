@@ -49,7 +49,8 @@ typedef enum {
 
 /**
  * Create a glTF object
- * @param parent pointer to the parent object
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the default display.
  * @return pointer to the created glTF object
  */
 lv_obj_t * lv_gltf_create(lv_obj_t * parent);
@@ -86,7 +87,8 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
  *
  * Contrary to `lv_gltf_load_model_from_file` and `lv_gltf_load_model_from_bytes`, the model
  * is owned by the caller of this function meaning that it's the caller's responsibility
- * to delete the model when it is no longer needed, that is, the model must outlive the viewer's lifetime.
+ * to delete the model when it is no longer needed, with `lv_gltf_model_delete`. Deleting it
+ * while the viewer still shows it is allowed, the viewer lets go of it.
  *
  * @param obj pointer to a glTF viewer object
  * @param model glTF model to add to the viewer
@@ -117,6 +119,21 @@ lv_gltf_model_t * lv_gltf_get_model_by_index(const lv_obj_t * obj, size_t id);
  * @return pointer to the primary model, or NULL if no models are loaded
  */
 lv_gltf_model_t * lv_gltf_get_primary_model(const lv_obj_t * obj);
+
+/**
+ * Remove a model from the glTF viewer
+ *
+ * @param obj pointer to a glTF viewer object
+ * @param model model to remove. Nothing happens if the viewer doesn't hold it
+ */
+void lv_gltf_remove_model(lv_obj_t * obj, lv_gltf_model_t * model);
+
+/**
+ * Remove all models from the glTF viewer
+ *
+ * @param obj pointer to a glTF viewer object
+ */
+void lv_gltf_remove_all_models(lv_obj_t * obj);
 
 /**
  * Set the yaw (horizontal rotation) of the camera
@@ -234,7 +251,7 @@ float lv_gltf_get_focal_z(const lv_obj_t * obj);
 /**
  * Set the focal coordinates to the center point of the model object
  * @param obj pointer to a glTF viewer object
- * @param model a model attached to this viewer or NULL for the first model
+ * @param model a model attached to this viewer. @nullable Pass NULL to use the primary model
  */
 void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model);
 
@@ -330,17 +347,37 @@ void lv_gltf_set_background_blur(lv_obj_t * obj, uint32_t value);
 uint32_t lv_gltf_get_background_blur(const lv_obj_t * obj);
 
 /**
- * Set the environmental brightness/power
- * @param obj pointer to a glTF viewer object
- * @param value brightness multiplier
+ * Set the environment brightness of a glTF viewer.
+ * @param obj       pointer to a glTF viewer object
+ * @param value     brightness multiplier, 1.0 = neutral. Default: 1.8
  */
+void lv_gltf_set_environment_brightness(lv_obj_t * obj, float value);
+
+/**
+ * Get the environment brightness of a glTF viewer.
+ * @param obj       pointer to a glTF viewer object
+ * @return          brightness multiplier, 1.0 = neutral
+ */
+float lv_gltf_get_environment_brightness(const lv_obj_t * obj);
+
+/**
+ * Set the environment brightness.
+ * @param obj       pointer to a glTF viewer object
+ * @param value     brightness percentage, 100 = neutral
+ * @deprecated      Use lv_gltf_set_environment_brightness() instead,
+ *                  which takes a multiplier (1.0 = neutral).
+ */
+LV_DEPRECATED("Use lv_gltf_set_environment_brightness() instead")
 void lv_gltf_set_env_brightness(lv_obj_t * obj, uint32_t value);
 
 /**
- * Get the environmental brightness/power
- * @param obj pointer to a glTF viewer object
- * @return brightness multiplier
+ * Get the environment brightness.
+ * @param obj       pointer to a glTF viewer object
+ * @return          brightness percentage, 100 = neutral
+ * @deprecated      Use lv_gltf_get_environment_brightness() instead,
+ *                  which returns a multiplier (1.0 = neutral).
  */
+LV_DEPRECATED("Use lv_gltf_get_environment_brightness() instead")
 uint32_t lv_gltf_get_env_brightness(const lv_obj_t * obj);
 
 /**

@@ -34,6 +34,11 @@ typedef struct {
     GstElement ** store;
 } lv_gstreamer_pipeline_element_t;
 
+typedef struct {
+    lv_color_format_t color_format;
+    const char * gst_format;
+} lv_gstreamer_format_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -45,15 +50,30 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data);
 static void gstreamer_timer_cb(lv_timer_t * timer);
 static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer);
 static void gstreamer_update_frame(lv_gstreamer_t * streamer);
+static void gstreamer_release_frame(lv_gstreamer_t * streamer);
+static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample, GstBuffer * buffer, GstMapInfo * map);
+static bool gstreamer_copy_to_aligned_frame(lv_gstreamer_t * streamer, const GstMapInfo * map, uint32_t w, uint32_t h,
+                                            uint32_t src_stride);
 static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
                                                       const lv_gstreamer_pipeline_element_t * elements, size_t element_count);
 static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state);
 static bool gstreamer_element_has_property(GstElement * element, const char * property_name);
+static const char * gstreamer_get_gst_format(lv_color_format_t color_format);
+static lv_color_format_t gstreamer_resolve_color_format(lv_obj_t * obj);
 static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static const lv_gstreamer_format_t gstreamer_formats[] = {
+    {LV_COLOR_FORMAT_RGB565,   "RGB16"},
+    {LV_COLOR_FORMAT_RGB888,   "BGR"},
+    {LV_COLOR_FORMAT_XRGB8888, "BGRx"},
+    {LV_COLOR_FORMAT_ARGB8888, "BGRA"},
+};
+
+#define GSTREAMER_FALLBACK_COLOR_FORMAT LV_COLOR_FORMAT_ARGB8888
 
 const lv_obj_class_t lv_gstreamer_class = {
     .constructor_cb = lv_gstreamer_constructor,
@@ -68,19 +88,6 @@ const lv_obj_class_t lv_gstreamer_class = {
 /**********************
  *      MACROS
  **********************/
-
-#if LV_COLOR_DEPTH == 16
-    #define GST_FORMAT   "RGB16"
-    #define IMAGE_FORMAT LV_COLOR_FORMAT_RGB565
-#elif LV_COLOR_DEPTH == 24
-    #define GST_FORMAT   "BGR"
-    #define IMAGE_FORMAT LV_COLOR_FORMAT_RGB888
-#elif LV_COLOR_DEPTH == 32
-    #define GST_FORMAT   "BGRA"
-    #define IMAGE_FORMAT LV_COLOR_FORMAT_ARGB8888
-#else
-    #error Unsupported LV_COLOR_DEPTH
-#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -104,12 +111,7 @@ lv_obj_t * lv_gstreamer_create(lv_obj_t * parent)
 lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, const char * property, const char * source)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_ASSERT_NULL(factory_name);
-
-    if(!obj || !factory_name) {
-        LV_LOG_WARN("Refusing to set source with invalid params. Obj: %p Factory Name: %s", (void *)obj, factory_name);
-        return LV_RESULT_INVALID;
-    }
+    LV_CHECK_ARG(factory_name != NULL, return LV_RESULT_INVALID);
 
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
@@ -192,6 +194,8 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
      * i.e one pad for audio and one for video
      * We add a callback so that we automatically connect to the data once it's figured out*/
     g_signal_connect(head, "pad-added", G_CALLBACK(on_decode_pad_added), streamer);
+
+    streamer->color_format = gstreamer_resolve_color_format(obj);
 
     streamer->pipeline = pipeline;
     return LV_RESULT_OK;
@@ -397,10 +401,8 @@ void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
 
 lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e)
 {
-    if(!e || e->code != LV_EVENT_STATE_CHANGED) {
-        LV_LOG_WARN("Invalid event");
-        return -1;
-    }
+    LV_CHECK_ARG(e != NULL, return LV_GSTREAMER_STREAM_STATE_INVALID);
+    LV_CHECK_ARG(e->code == LV_EVENT_STATE_CHANGED, return LV_GSTREAMER_STREAM_STATE_INVALID);
     return *(lv_gstreamer_stream_state_t *)lv_event_get_param(e);
 }
 
@@ -410,16 +412,18 @@ lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e)
 
 static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
     lv_memzero(&streamer->frame, sizeof(streamer->frame));
+    streamer->color_format = GSTREAMER_FALLBACK_COLOR_FORMAT;
 
     streamer->gstreamer_timer = lv_timer_create(gstreamer_timer_cb, LV_DEF_REFR_PERIOD / 5, streamer);
-    LV_ASSERT_NULL(streamer->gstreamer_timer);
+    LV_ASSERT(streamer->gstreamer_timer != NULL);
 
     streamer->frame_queue = g_async_queue_new();
-    LV_ASSERT_NULL(streamer->frame_queue);
+    LV_ASSERT(streamer->frame_queue != NULL);
     streamer->last_sample = NULL;
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -427,6 +431,7 @@ static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
 static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
 {
+    LV_ASSERT(streamer != NULL);
     GstBus * bus = gst_element_get_bus(streamer->pipeline);
     GstMessage * msg;
 
@@ -480,6 +485,7 @@ static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
 
 static void gstreamer_update_frame(lv_gstreamer_t * streamer)
 {
+    LV_ASSERT(streamer != NULL);
     GstSample * sample = g_async_queue_try_pop(streamer->frame_queue);
 
     if(!sample) {
@@ -500,32 +506,16 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
 
     GstBuffer * buffer = gst_sample_get_buffer(sample);
     GstMapInfo map;
-    if(buffer && gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        if(streamer->last_buffer) {
-            gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
-        }
-        if(streamer->last_sample) {
-            gst_sample_unref(streamer->last_sample);
-        }
-        streamer->last_buffer = buffer;
-        streamer->last_map_info = map;
-
-        streamer->last_sample = sample;
-
-        streamer->frame = (lv_image_dsc_t) {
-            .data = map.data,
-            .data_size = map.size,
-            .header = {
-                .magic = LV_IMAGE_HEADER_MAGIC,
-                .cf = IMAGE_FORMAT,
-                .flags = LV_IMAGE_FLAGS_MODIFIABLE,
-                .h = GST_VIDEO_INFO_HEIGHT(&streamer->video_info),
-                .w = GST_VIDEO_INFO_WIDTH(&streamer->video_info),
-                .stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0),
-            }
-        };
-        lv_image_set_src((lv_obj_t *)streamer, &streamer->frame);
+    if(!buffer || !gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+        gst_sample_unref(sample);
     }
+    bool stored = gstreamer_store_frame(streamer, sample, buffer, &map);
+    if(first_frame && !stored) {
+        streamer->is_video_info_valid = false;
+        return;
+    }
+    lv_image_set_src((lv_obj_t *)streamer, &streamer->frame);
+
     /* We send the event AFTER setting the image source so that users can query the
      * resolution on this specific event callback */
     if(first_frame) {
@@ -538,8 +528,92 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     }
 
 }
+
+static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample, GstBuffer * buffer, GstMapInfo * map)
+{
+    const uint32_t w = GST_VIDEO_INFO_WIDTH(&streamer->video_info);
+    const uint32_t h = GST_VIDEO_INFO_HEIGHT(&streamer->video_info);
+    const uint32_t src_stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0);
+
+    const bool aligned = (lv_uintptr_t)map->data % LV_DRAW_BUF_ALIGN == 0
+                         && src_stride == lv_draw_buf_width_to_stride(w, streamer->color_format);
+
+    gstreamer_release_frame(streamer);
+
+    if(aligned) {
+        streamer->last_buffer = buffer;
+        streamer->last_map_info = *map;
+        streamer->last_sample = sample;
+    }
+    else {
+        const bool copied = gstreamer_copy_to_aligned_frame(streamer, map, w, h, src_stride);
+        gst_buffer_unmap(buffer, map);
+        gst_sample_unref(sample);
+        if(!copied) {
+            return false;
+        }
+    }
+
+    const lv_draw_buf_t * copy = streamer->aligned_frame;
+    streamer->frame = (lv_image_dsc_t) {
+        .data = aligned ? map->data : copy->data,
+        .data_size = aligned ? map->size : copy->data_size,
+        .header = {
+            .magic = LV_IMAGE_HEADER_MAGIC,
+            .cf = streamer->color_format,
+            .flags = LV_IMAGE_FLAGS_MODIFIABLE,
+            .h = h,
+            .w = w,
+            .stride = aligned ? src_stride : copy->header.stride,
+        }
+    };
+    return true;
+}
+
+static bool gstreamer_copy_to_aligned_frame(lv_gstreamer_t * streamer, const GstMapInfo * map, uint32_t w, uint32_t h,
+                                            uint32_t src_stride)
+{
+    lv_draw_buf_t * dest = streamer->aligned_frame;
+    if(dest && (dest->header.w != w || dest->header.h != h)) {
+        lv_draw_buf_destroy(dest);
+        dest = NULL;
+        streamer->aligned_frame = NULL;
+    }
+
+    if(!dest) {
+        dest = lv_draw_buf_create(w, h, streamer->color_format, LV_STRIDE_AUTO);
+        if(!dest) {
+            LV_LOG_ERROR("Failed to allocate an aligned %" LV_PRIu32 "x%" LV_PRIu32 " frame", w, h);
+            return false;
+        }
+        streamer->aligned_frame = dest;
+    }
+
+    const uint32_t dest_stride = dest->header.stride;
+    const uint32_t row_size = LV_MIN(src_stride, dest_stride);
+    for(uint32_t y = 0; y < h; y++) {
+        lv_memcpy(dest->data + y * dest_stride, map->data + y * src_stride, row_size);
+    }
+
+    lv_draw_buf_flush_cache(dest, NULL);
+    return true;
+}
+
+static void gstreamer_release_frame(lv_gstreamer_t * streamer)
+{
+    if(streamer->last_buffer) {
+        gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
+        streamer->last_buffer = NULL;
+    }
+    if(streamer->last_sample) {
+        gst_sample_unref(streamer->last_sample);
+        streamer->last_sample = NULL;
+    }
+}
+
 static void gstreamer_timer_cb(lv_timer_t * timer)
 {
+    LV_ASSERT(timer != NULL);
     lv_gstreamer_t * streamer = lv_timer_get_user_data(timer);
 
     if(!streamer->pipeline) {
@@ -554,6 +628,7 @@ static void gstreamer_timer_cb(lv_timer_t * timer)
 
 static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
@@ -561,11 +636,9 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         gst_element_set_state(streamer->pipeline, GST_STATE_NULL);
         gst_object_unref(streamer->pipeline);
     }
-    if(streamer->last_buffer) {
-        gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
-    }
-    if(streamer->last_sample) {
-        gst_sample_unref(streamer->last_sample);
+    gstreamer_release_frame(streamer);
+    if(streamer->aligned_frame) {
+        lv_draw_buf_destroy(streamer->aligned_frame);
     }
     if(streamer->frame_queue) {
         GstSample * sample;
@@ -599,10 +672,38 @@ static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
     return LV_RESULT_OK;
 }
 
+static const char * gstreamer_get_gst_format(lv_color_format_t color_format)
+{
+    for(size_t i = 0; i < sizeof(gstreamer_formats) / sizeof(gstreamer_formats[0]); ++i) {
+        if(gstreamer_formats[i].color_format == color_format) {
+            return gstreamer_formats[i].gst_format;
+        }
+    }
+    return NULL;
+}
+
+static lv_color_format_t gstreamer_resolve_color_format(lv_obj_t * obj)
+{
+    LV_ASSERT(obj != NULL);
+    lv_display_t * display = lv_obj_get_display(obj);
+    if(!display) {
+        LV_LOG_WARN("Widget is on no display, decoding to the fallback color format");
+        return GSTREAMER_FALLBACK_COLOR_FORMAT;
+    }
+
+    const lv_color_format_t color_format = lv_display_get_color_format(display);
+    if(!gstreamer_get_gst_format(color_format)) {
+        LV_LOG_INFO("No GStreamer equivalent for color format %d, decoding to the fallback one", (int)color_format);
+        return GSTREAMER_FALLBACK_COLOR_FORMAT;
+    }
+
+    return color_format;
+}
+
 static bool gstreamer_element_has_property(GstElement * element, const char * property_name)
 {
-    LV_ASSERT_NULL(element);
-    LV_ASSERT_NULL(property_name);
+    LV_ASSERT(element != NULL);
+    LV_ASSERT(property_name != NULL);
 
     GObjectClass * klass = G_OBJECT_GET_CLASS(element);
     return g_object_class_find_property(klass, property_name) != NULL;
@@ -610,9 +711,9 @@ static bool gstreamer_element_has_property(GstElement * element, const char * pr
 
 static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value)
 {
-    LV_ASSERT_NULL(element);
-    LV_ASSERT_NULL(property_name);
-    LV_ASSERT_NULL(value);
+    LV_ASSERT(element != NULL);
+    LV_ASSERT(property_name != NULL);
+    LV_ASSERT(value != NULL);
 
     if(!GST_IS_CHILD_PROXY(element)) {
         LV_LOG_WARN("Element does not support child proxy for property '%s'", property_name);
@@ -640,6 +741,8 @@ static bool gstreamer_set_child_proxy_string(GstElement * element, const char * 
 
 static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer user_data)
 {
+    LV_ASSERT(element != NULL);
+    LV_ASSERT(pad != NULL);
     LV_UNUSED(element);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
     GstCaps * caps = gst_pad_query_caps(pad, NULL);
@@ -670,7 +773,8 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
              * convert the image to the format we desire*/
             uint32_t target_fps = 1000 / LV_DEF_REFR_PERIOD;
             char caps_str[128];
-            lv_snprintf(caps_str, sizeof(caps_str), "video/x-raw,format=%s,framerate=%" LV_PRIu32 "/1", GST_FORMAT, target_fps);
+            lv_snprintf(caps_str, sizeof(caps_str), "video/x-raw,format=%s,framerate=%" LV_PRIu32 "/1",
+                        gstreamer_get_gst_format(streamer->color_format), target_fps);
 
             GstCaps * appsink_caps = gst_caps_from_string(caps_str);
             g_object_set(G_OBJECT(video_app_sink), "emit-signals", TRUE, "sync", TRUE, "max-buffers", 1, "drop", TRUE, "caps",
@@ -737,6 +841,7 @@ exit:
 
 static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
 {
+    LV_ASSERT(sink != NULL);
     /* This function is called from a thread other than the main one so we can't call anything related to LVGL here
      * Instead, we acquire the new sample (the new frame) and push it to the queue so that we can retrieve it from an LVGL timer
      * Note that the pipeline spits out a new frame every LV_DEF_REFR_PERIOD as per the way it's set up so we shouldn't ever lose any
@@ -749,12 +854,23 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
         return GST_FLOW_OK;
     }
 
-    g_async_queue_push(streamer->frame_queue, sample);
+    g_async_queue_lock(streamer->frame_queue);
+    g_async_queue_push_unlocked(streamer->frame_queue, sample);
+    while(g_async_queue_length_unlocked(streamer->frame_queue) > LV_GSTREAMER_MAX_QUEUED_FRAMES) {
+        GstSample * dropped = g_async_queue_try_pop_unlocked(streamer->frame_queue);
+        if(!dropped) {
+            break;
+        }
+        gst_sample_unref(dropped);
+    }
+    g_async_queue_unlock(streamer->frame_queue);
+
     return GST_FLOW_OK;
 }
 
 static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state)
 {
+    LV_ASSERT(streamer != NULL);
     return lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_STATE_CHANGED, &state);
 }
 #endif

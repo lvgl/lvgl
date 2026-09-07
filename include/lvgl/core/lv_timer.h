@@ -74,7 +74,7 @@ LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void);
 /**
  * Set the resume callback to the timer handler
  * @param cb the function to call when timer handler is resumed
- * @param data pointer to a resume data
+ * @param data pointer to a resume data @nullable
  */
 void lv_timer_handler_set_resume_cb(lv_timer_handler_resume_cb_t cb, void * data);
 
@@ -91,14 +91,14 @@ lv_timer_t * lv_timer_create_basic(void);
  *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
  *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
- * @param user_data custom parameter
+ * @param user_data custom parameter @nullable
  * @return pointer to the new timer
  */
 lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data);
 
 /**
  * Delete a lv_timer
- * @param timer pointer to an lv_timer
+ * @param timer pointer to an lv_timer @nullable
  */
 void lv_timer_delete(lv_timer_t * timer);
 
@@ -152,7 +152,7 @@ void lv_timer_set_auto_delete(lv_timer_t * timer, bool auto_delete);
 /**
  * Set custom parameter to the lv_timer.
  * @param timer pointer to a lv_timer.
- * @param user_data custom parameter
+ * @param user_data custom parameter @nullable
  */
 void lv_timer_set_user_data(lv_timer_t * timer, void * user_data);
 
@@ -183,7 +183,8 @@ uint32_t lv_timer_get_time_until_next(void);
 
 /**
  * Iterate through the timers
- * @param timer NULL to start iteration or the previous return value to get the next timer
+ * @param timer the previous return value. @nullable When NULL the iteration starts
+ *              from the first timer.
  * @return the next timer or NULL if there is no more timer
  */
 lv_timer_t * lv_timer_get_next(lv_timer_t * timer);
@@ -211,9 +212,10 @@ bool lv_timer_get_paused(lv_timer_t * timer);
  * the associated resources.
  *
  * @param timer      Pointer to the timer object
- * @param data       User-defined data pointer to associate with the timer
+ * @param data       User-defined data pointer to associate with the timer @nullable
  * @param free_cb    Callback function for cleaning up ext_data when timer is deleted.
- *                   Receives ext_data as parameter. NULL means no cleanup required.
+ *                   Receives ext_data as parameter. @nullable When NULL no cleanup
+ *                   is performed.
  */
 void lv_timer_set_external_data(lv_timer_t * timer, void * data, void (* free_cb)(void * data));
 #endif

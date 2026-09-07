@@ -485,4 +485,109 @@ void test_buttonmatrix_properties(void)
 #endif
 }
 
+void test_button_matrix_partial_clip_render(void)
+{
+    /*Create a small container that clips its content*/
+    lv_obj_t * cont = lv_obj_create(active_screen);
+    lv_obj_set_size(cont, 300, 120);
+    lv_obj_center(cont);
+    lv_obj_set_style_pad_all(cont, 0, 0);
+
+    /*Create a buttonmatrix taller than the container*/
+    static const char * map[] = {"A", "B", "C", "\n",
+                                 "D", "E", "F", "\n",
+                                 "G", "H", "I", "\n",
+                                 "J", "K", "L", ""
+                                };
+    lv_obj_t * btnm_clip = lv_buttonmatrix_create(cont);
+    lv_buttonmatrix_set_map(btnm_clip, map);
+    lv_obj_set_size(btnm_clip, 280, 300);
+
+    /*Scroll so the middle rows are visible, top and bottom rows clipped*/
+    lv_obj_scroll_to_y(cont, 80, LV_ANIM_OFF);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/btnm_partial_clip.png");
+}
+
+static uint32_t drawn_buttons_mask;
+
+static void partial_clip_draw_task_cb(lv_event_t * e)
+{
+    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
+    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    if(base_dsc->part != LV_PART_ITEMS) return;
+    if(lv_draw_task_get_fill_dsc(draw_task) == NULL) return;
+    drawn_buttons_mask |= 1UL << base_dsc->id1;
+}
+
+void test_button_matrix_draw_task_culling(void)
+{
+    /*Buttons farther outside the clip area than this margin must not create
+     *draw tasks.  The margin must be larger than the widget's internal clip
+     *margin (row/column gap with a dpi/10 floor) so buttons whose shadow or
+     *outline could reach the clip area are exempt from the check.*/
+    const int32_t margin = 40;
+
+    /*Create a small container that clips its content*/
+    lv_obj_t * cont = lv_obj_create(active_screen);
+    lv_obj_set_size(cont, 300, 150);
+    lv_obj_center(cont);
+    lv_obj_set_style_pad_all(cont, 0, 0);
+
+    /*Create a buttonmatrix much taller than the container so entire rows
+     *fall far outside the clip area on both sides*/
+    static const char * map[] = {"A", "B", "C", "\n",
+                                 "D", "E", "F", "\n",
+                                 "G", "H", "I", "\n",
+                                 "J", "K", "L", ""
+                                };
+    lv_obj_t * btnm_clip = lv_buttonmatrix_create(cont);
+    lv_buttonmatrix_set_map(btnm_clip, map);
+    lv_obj_set_size(btnm_clip, 280, 600);
+    lv_obj_set_send_draw_task_events(btnm_clip, true);
+    lv_obj_add_event_cb(btnm_clip, partial_clip_draw_task_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+
+    /*Scroll so the middle rows are visible, top and bottom rows clipped*/
+    lv_obj_update_layout(active_screen);
+    lv_obj_scroll_to_y(cont, 225, LV_ANIM_OFF);
+
+    drawn_buttons_mask = 0;
+    lv_obj_invalidate(active_screen);
+    lv_refr_now(NULL);
+
+    lv_area_t clip_area;
+    lv_obj_get_coords(cont, &clip_area);
+
+    lv_area_t obj_coords;
+    lv_obj_get_coords(btnm_clip, &obj_coords);
+
+    lv_buttonmatrix_t * btnm_priv = (lv_buttonmatrix_t *)btnm_clip;
+    bool culled_above = false;
+    bool culled_below = false;
+    uint32_t i;
+    for(i = 0; i < btnm_priv->btn_cnt; i++) {
+        lv_area_t btn_area = btnm_priv->button_areas[i];
+        lv_area_move(&btn_area, obj_coords.x1, obj_coords.y1);
+        bool drawn = (drawn_buttons_mask >> i) & 1;
+
+        if(lv_area_is_on(&btn_area, &clip_area)) {
+            TEST_ASSERT_TRUE_MESSAGE(drawn, "Button intersecting the clip area was not drawn");
+        }
+        else {
+            lv_area_t enlarged = btn_area;
+            lv_area_increase(&enlarged, margin, margin);
+            if(!lv_area_is_on(&enlarged, &clip_area)) {
+                TEST_ASSERT_FALSE_MESSAGE(drawn, "Button far outside the clip area created draw tasks");
+                if(btn_area.y2 < clip_area.y1) culled_above = true;
+                if(btn_area.y1 > clip_area.y2) culled_below = true;
+            }
+        }
+    }
+
+    /*Self-check: the geometry must exercise culling on both sides of the
+     *clip area, otherwise the assertions above are vacuous*/
+    TEST_ASSERT_TRUE_MESSAGE(culled_above, "No button far above the clip area, adjust the test geometry");
+    TEST_ASSERT_TRUE_MESSAGE(culled_below, "No button far below the clip area, adjust the test geometry");
+}
+
 #endif

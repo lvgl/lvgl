@@ -14,34 +14,35 @@ class LVSlider(LVBar):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_slider_t", ptr=True) or self
+        self._wv_lv_slider_t = self.cast("lv_slider_t", ptr=True) or self
+        self._wv = self._wv_lv_slider_t
 
     @property
     def left_knob_area(self):
-        return safe_area(self._wv, "left_knob_area")
+        return safe_area(self._wv_lv_slider_t, "left_knob_area")
 
     @property
     def right_knob_area(self):
-        return safe_area(self._wv, "right_knob_area")
+        return safe_area(self._wv_lv_slider_t, "right_knob_area")
 
     @property
     def pressed_point(self):
-        return safe_point(self._wv, "pressed_point")
+        return safe_point(self._wv_lv_slider_t, "pressed_point")
 
     @property
     def value_to_set(self):
         """Which bar value to set"""
-        return ptr_or_none(self._wv.safe_field("value_to_set"))
+        return ptr_or_none(self._wv_lv_slider_t.safe_field("value_to_set"))
 
     @property
     def dragging(self):
         """1: the slider is being dragged"""
-        return int(self._wv.safe_field("dragging", 0))
+        return int(self._wv_lv_slider_t.safe_field("dragging", 0))
 
     @property
     def left_knob_focus(self):
         """1: with encoder now the right knob can be adjusted"""
-        return int(self._wv.safe_field("left_knob_focus", 0))
+        return int(self._wv_lv_slider_t.safe_field("left_knob_focus", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -151,6 +151,8 @@ void lv_ffmpeg_deinit(void)
 
 int lv_ffmpeg_get_frame_num(const char * path)
 {
+    LV_CHECK_ARG(path != NULL, return -1);
+
     int ret = -1;
     struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, LV_FFMPEG_PLAYER_USE_LV_FS, NULL);
 
@@ -172,6 +174,7 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent)
 lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(path != NULL, return LV_RESULT_INVALID);
     lv_result_t res = LV_RESULT_INVALID;
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
@@ -201,7 +204,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     int height = player->ffmpeg_ctx->video_dec_ctx->height;
 
     uint8_t * data = ffmpeg_get_image_data(player->ffmpeg_ctx);
-    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_DEFAULT;
     uint32_t stride = width * lv_color_format_get_size(cf);
     uint32_t data_size = stride * height;
     lv_memzero(data, data_size);
@@ -295,6 +298,8 @@ void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * decoder_name)
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
+    LV_ASSERT(dsc != NULL);
+    LV_ASSERT(header != NULL);
     LV_UNUSED(decoder);
 
     /* Get the source type */
@@ -321,6 +326,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
  */
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
+    LV_ASSERT(dsc != NULL);
     LV_UNUSED(decoder);
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -379,6 +385,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
+    LV_ASSERT(dsc != NULL);
     LV_UNUSED(decoder);
     struct ffmpeg_context_s * ffmpeg_ctx = dsc->user_data;
     ffmpeg_close(ffmpeg_ctx);
@@ -386,6 +393,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
 static uint8_t * ffmpeg_get_image_data(struct ffmpeg_context_s * ffmpeg_ctx)
 {
+    LV_ASSERT(ffmpeg_ctx != NULL);
     uint8_t * img_data = ffmpeg_ctx->video_dst_data[0];
 
     if(img_data == NULL) {
@@ -423,6 +431,7 @@ static bool ffmpeg_pix_fmt_is_yuv(enum AVPixelFormat pix_fmt)
 
 static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx)
 {
+    LV_ASSERT(ffmpeg_ctx != NULL);
     int ret = -1;
 
     int width = ffmpeg_ctx->video_dec_ctx->width;
@@ -478,7 +487,7 @@ static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx)
     }
 
     if(!ffmpeg_ctx->has_alpha) {
-        int lv_linesize = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE) * width;
+        int lv_linesize = lv_color_format_get_size(LV_COLOR_FORMAT_DEFAULT) * width;
         int dst_linesize = ffmpeg_ctx->video_dst_linesize[0];
         if(dst_linesize != lv_linesize) {
             LV_LOG_WARN("ffmpeg linesize = %d, but lvgl image require %d",
@@ -549,6 +558,7 @@ static int ffmpeg_decode_packet(AVCodecContext * dec, const AVPacket * pkt,
 static int ffmpeg_init_codec_context(AVCodecContext ** dec_ctx, const AVCodec * dec,
                                      enum AVMediaType type, AVStream * st)
 {
+    LV_UNUSED(type);
     int ret = 0;
 
     /* Allocate a codec context for the decoder */
@@ -675,7 +685,7 @@ static int ffmpeg_get_image_header(lv_image_decoder_dsc_t * dsc,
         /* allocate image where the decoded image will be put */
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
-        header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+        header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_DEFAULT;
         header->stride = header->w * lv_color_format_get_size(header->cf);
         header->flags = LV_IMAGE_FLAGS_MODIFIABLE;
 
@@ -694,6 +704,7 @@ failed:
 
 static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx)
 {
+    LV_ASSERT(ffmpeg_ctx != NULL);
     int avg_frame_rate_num = ffmpeg_ctx->video_stream->avg_frame_rate.num;
     if(avg_frame_rate_num > 0) {
         int period = 1000 * (int64_t)ffmpeg_ctx->video_stream->avg_frame_rate.den
@@ -706,6 +717,7 @@ static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx)
 
 static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
 {
+    LV_ASSERT(ffmpeg_ctx != NULL);
     int ret = 0;
 
     while(1) {
@@ -746,6 +758,8 @@ static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
 
 static int ffmpeg_lvfs_read(void * ptr, uint8_t * buf, int buf_size)
 {
+    LV_ASSERT(ptr != NULL);
+    LV_ASSERT(buf != NULL);
     lv_fs_file_t * file = ptr;
     uint32_t bytesRead = 0;
     lv_fs_res_t res = lv_fs_read(file, buf, buf_size, &bytesRead);
@@ -758,6 +772,7 @@ static int ffmpeg_lvfs_read(void * ptr, uint8_t * buf, int buf_size)
 
 static int64_t ffmpeg_lvfs_seek(void * ptr, int64_t pos, int whence)
 {
+    LV_ASSERT(ptr != NULL);
     lv_fs_file_t * file = ptr;
     if(whence == SEEK_SET && lv_fs_seek(file, pos, SEEK_SET) == LV_FS_RES_OK) {
         return pos;
@@ -767,6 +782,7 @@ static int64_t ffmpeg_lvfs_seek(void * ptr, int64_t pos, int whence)
 
 static AVIOContext * ffmpeg_open_io_context(lv_fs_file_t * file)
 {
+    LV_ASSERT(file != NULL);
     uint8_t * iBuffer = av_malloc(DECODER_BUFFER_SIZE);
     if(iBuffer == NULL) {
         LV_LOG_ERROR("iBuffer malloc failed");
@@ -868,6 +884,7 @@ failed:
 
 static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx, int align)
 {
+    LV_ASSERT(ffmpeg_ctx != NULL);
     int ret;
 
     /* Allocate video_dst_data as a separate buffer for the destination image.
@@ -912,6 +929,7 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx, int align
 
 static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx)
 {
+    LV_ASSERT(ffmpeg_ctx != NULL);
     avcodec_free_context(&(ffmpeg_ctx->video_dec_ctx));
     avformat_close_input(&(ffmpeg_ctx->fmt_ctx));
     av_packet_free(&ffmpeg_ctx->pkt);
@@ -920,6 +938,7 @@ static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx)
 
 static void ffmpeg_close_dst_ctx(struct ffmpeg_context_s * ffmpeg_ctx)
 {
+    LV_ASSERT(ffmpeg_ctx != NULL);
     if(ffmpeg_ctx->video_dst_data[0] != NULL) {
         av_free(ffmpeg_ctx->video_dst_data[0]);
         ffmpeg_ctx->video_dst_data[0] = NULL;
@@ -948,6 +967,7 @@ static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx)
 
 static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
 {
+    LV_ASSERT(timer != NULL);
     lv_obj_t * obj = (lv_obj_t *)lv_timer_get_user_data(timer);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
@@ -973,6 +993,7 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
 static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
                                          lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
 
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
@@ -993,6 +1014,7 @@ static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
 static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
                                         lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
 
     LV_TRACE_OBJ_CREATE("begin");

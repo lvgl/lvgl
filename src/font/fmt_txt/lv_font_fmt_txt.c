@@ -34,6 +34,9 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 static int unicode_list_compare(const void * ref, const void * element);
 static int kern_pair_8_compare(const void * ref, const void * element);
 static int kern_pair_16_compare(const void * ref, const void * element);
+static const uint8_t * glyph_bitmap_acquire(lv_font_fmt_txt_dsc_t * fdsc,
+                                            const lv_font_fmt_txt_glyph_dsc_t * gdsc, uint32_t gid);
+static void glyph_bitmap_release(lv_font_fmt_txt_dsc_t * fdsc);
 
 #if LV_USE_FONT_COMPRESSED
     static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter);
@@ -85,16 +88,32 @@ const lv_font_class_t lv_builtin_font_class = {
 
 const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
-    const lv_font_t * font = g_dsc->resolved_font;
+    /* TODO: We can't add an arg check here because this is used in a hot path for all fonts stored as a C array
+     * changing this will mean also changing the font converter so for now these assertions are an exception */
+    LV_ASSERT(g_dsc != NULL);
 
+    const lv_font_t * font = g_dsc->resolved_font;
+    LV_ASSERT(font != NULL);
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    LV_ASSERT(fdsc != NULL);
+
     uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    if(g_dsc->req_raw_bitmap) {
+        /*With a loader the bitmap is read into a scratch buffer which is overwritten by the next
+         *glyph, so the returned pointer is only valid until then. Such fonts have
+         *`static_bitmap == 0` which tells the draw units not to hold on to the pointer.*/
+        const uint8_t * raw = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        if(raw == NULL) return NULL;
 
+        glyph_bitmap_release(fdsc);
+        return raw;
+    }
+
+    LV_ASSERT(draw_buf != NULL);
     uint8_t * bitmap_out = draw_buf->data;
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
@@ -103,96 +122,76 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-        const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        LV_ASSERT_FORMAT_MSG(fdsc->bpp == 1 || fdsc->bpp == 2 || fdsc->bpp == 4 || fdsc->bpp == 8, "bpp was %d", fdsc->bpp);
+
+        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        if(bitmap_in == NULL) return NULL;
+
         uint8_t * bitmap_out_tmp = bitmap_out;
-        int32_t i = 0;
         int32_t x, y;
         uint32_t stride_out = lv_draw_buf_width_to_stride(gdsc->box_w, LV_COLOR_FORMAT_A8);
-        if(fdsc->bpp == 1) {
-            for(y = 0; y < gdsc->box_h; y ++) {
-                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
-                for(x = 0; x < gdsc->box_w; x++, i++) {
-                    i = i & 0x7;
-                    if(i == 0) bitmap_out_tmp[x] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
-                    else if(i == 1) bitmap_out_tmp[x] = (*bitmap_in) & 0x40 ? 0xff : 0x00;
-                    else if(i == 2) bitmap_out_tmp[x] = (*bitmap_in) & 0x20 ? 0xff : 0x00;
-                    else if(i == 3) bitmap_out_tmp[x] = (*bitmap_in) & 0x10 ? 0xff : 0x00;
-                    else if(i == 4) bitmap_out_tmp[x] = (*bitmap_in) & 0x08 ? 0xff : 0x00;
-                    else if(i == 5) bitmap_out_tmp[x] = (*bitmap_in) & 0x04 ? 0xff : 0x00;
-                    else if(i == 6) bitmap_out_tmp[x] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
-                    else if(i == 7) {
-                        bitmap_out_tmp[x] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
-                        line_rem--;
-                        bitmap_in++;
-                    }
-                }
-                /*Handle stride*/
-                if(stride_in) {
-                    i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
-                }
-                bitmap_out_tmp += stride_out;
-            }
-        }
-        else if(fdsc->bpp == 2) {
-            for(y = 0; y < gdsc->box_h; y ++) {
-                uint32_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
-                for(x = 0; x < gdsc->box_w; x++, i++) {
-                    i = i & 0x3;
-                    if(i == 0) bitmap_out_tmp[x] = opa2_table[(*bitmap_in) >> 6];
-                    else if(i == 1) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 4) & 0x3];
-                    else if(i == 2) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 2) & 0x3];
-                    else if(i == 3) {
-                        bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 0) & 0x3];
-                        line_rem--;
-                        bitmap_in++;
-                    }
-                }
+        /*Whole source bytes are read at a time, so a pixel costs a shift and a table lookup
+         *instead of walking a compare chain. `shift` carries the bit position between rows,
+         *because without a stride the rows are packed continuously.*/
+        int32_t shift = 8;
+        uint8_t cur = 0;
 
-                /*Handle stride*/
-                if(stride_in) {
-                    i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
+        for(y = 0; y < gdsc->box_h; y++) {
+            uint32_t used = 0;
+            if(stride_in) shift = 8;    /*with a stride every row starts on a byte boundary*/
+
+            if(fdsc->bpp == 4) {
+                x = 0;
+                if(shift == 4) {        /*the row starts mid byte, finish the low nibble*/
+                    bitmap_out_tmp[x++] = opa4_table[cur & 0xF];
+                    shift = 8;
                 }
-                bitmap_out_tmp += stride_out;
+                for(; x + 1 < gdsc->box_w; x += 2) {
+                    cur = *bitmap_in++;
+                    used++;
+                    bitmap_out_tmp[x] = opa4_table[cur >> 4];
+                    bitmap_out_tmp[x + 1] = opa4_table[cur & 0xF];
+                }
+                if(x < gdsc->box_w) {   /*odd width, the low nibble belongs to the next row*/
+                    cur = *bitmap_in++;
+                    used++;
+                    bitmap_out_tmp[x] = opa4_table[cur >> 4];
+                    shift = 4;
+                }
+            }
+            else if(fdsc->bpp == 8) {
+                for(x = 0; x < gdsc->box_w; x++) bitmap_out_tmp[x] = *bitmap_in++;
+                used = gdsc->box_w;
+            }
+            else if(fdsc->bpp == 1 || fdsc->bpp == 2) {
+                int32_t per = 8 / fdsc->bpp;
+                uint32_t mask = (1u << fdsc->bpp) - 1u;
+                x = 0;
+                while(x < gdsc->box_w) {
+                    if(shift >= 8) {
+                        cur = *bitmap_in++;
+                        used++;
+                        shift = 0;
+                    }
+                    int32_t n = per - shift / fdsc->bpp;
+                    if(n > gdsc->box_w - x) n = gdsc->box_w - x;
+                    while(n--) {
+                        uint32_t v = (cur >> (8 - fdsc->bpp - shift)) & mask;
+                        bitmap_out_tmp[x++] = fdsc->bpp == 1 ? (v ? 0xff : 0x00) : opa2_table[v];
+                        shift += fdsc->bpp;
+                    }
+                }
+                if(shift >= 8) shift = 8;
             }
 
+            if(stride_in) {
+                bitmap_in += stride_in - used;
+                shift = 8;
+            }
+            bitmap_out_tmp += stride_out;
         }
-        else if(fdsc->bpp == 4) {
-            for(y = 0; y < gdsc->box_h; y ++) {
-                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
-                for(x = 0; x < gdsc->box_w; x++, i++) {
-                    i = i & 0x1;
-                    if(i == 0) {
-                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) >> 4];
-                    }
-                    else if(i == 1) {
-                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) & 0xF];
-                        line_rem--;
-                        bitmap_in++;
-                    }
-                }
 
-                /*Handle stride*/
-                if(stride_in) {
-                    i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
-                }
-                bitmap_out_tmp += stride_out;
-            }
-        }
-        else if(fdsc->bpp == 8) {
-            for(y = 0; y < gdsc->box_h; y ++) {
-                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
-                for(x = 0; x < gdsc->box_w; x++, i++) {
-                    bitmap_out_tmp[x] = *bitmap_in;
-                    line_rem--;
-                    bitmap_in++;
-                }
-                bitmap_out_tmp += stride_out;
-                bitmap_in += line_rem;
-            }
-        }
+        glyph_bitmap_release(fdsc);
 
         lv_draw_buf_flush_cache(draw_buf, NULL);
         return draw_buf;
@@ -201,8 +200,13 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     else {
 #if LV_USE_FONT_COMPRESSED
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
+        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        if(bitmap_in == NULL) return NULL;
+
+        decompress(bitmap_in, bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
+        glyph_bitmap_release(fdsc);
+
         lv_draw_buf_flush_cache(draw_buf, NULL);
         return draw_buf;
 #else /*!LV_USE_FONT_COMPRESSED*/
@@ -218,12 +222,17 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
+    /* TODO: We can't add an arg check here because this is used in a hot path for all fonts stored as a C array
+     * changing this will mean also changing the font converter so for now these assertions are an exception */
+    LV_ASSERT(font != NULL);
+    LV_ASSERT(dsc_out != NULL);
     /*It fixes a strange compiler optimization issue: https://github.com/lvgl/lvgl/issues/4370*/
     bool is_tab = unicode_letter == '\t';
     if(is_tab) {
         unicode_letter = ' ';
     }
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    LV_ASSERT(fdsc != NULL);
     uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
     if(!gid) return false;
 
@@ -276,8 +285,52 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
  *   STATIC FUNCTIONS
  **********************/
 
+/**
+ * Get the raw bitmap of a glyph.
+ * If the font has a loader the bitmap is read into the font's scratch buffer and the loader stays
+ * locked until `glyph_bitmap_release()` is called.
+ * @param fdsc      the font descriptor
+ * @param gdsc      the descriptor of the glyph, i.e. `fdsc->glyph_dsc[gid]`
+ * @param gid       glyph index
+ * @return          pointer to the raw bitmap or `NULL` on error
+ */
+static const uint8_t * glyph_bitmap_acquire(lv_font_fmt_txt_dsc_t * fdsc,
+                                            const lv_font_fmt_txt_glyph_dsc_t * gdsc, uint32_t gid)
+{
+    if(!fdsc->are_glyphs_dynamic_loaded) {
+        const uint8_t * bitmap = fdsc->glyph_bitmap;
+        return &bitmap[gdsc->bitmap_index];
+    }
+
+    lv_font_fmt_txt_glyph_loader_t * loader = (lv_font_fmt_txt_glyph_loader_t *) fdsc->glyph_bitmap;
+    lv_mutex_lock(&loader->lock);
+
+    const uint8_t * bitmap = loader->get_glyph_bitmap_cb(loader, gid);
+    if(bitmap == NULL) {
+        LV_LOG_WARN("Couldn't load the bitmap of glyph %" LV_PRIu32, gid);
+        lv_mutex_unlock(&loader->lock);
+    }
+
+    return bitmap;
+}
+
+/**
+ * Release the bitmap returned by a successful `glyph_bitmap_acquire()` call.
+ * @param fdsc      the font descriptor
+ */
+static void glyph_bitmap_release(lv_font_fmt_txt_dsc_t * fdsc)
+{
+    if(!fdsc->are_glyphs_dynamic_loaded) {
+        return;
+    }
+
+    lv_font_fmt_txt_glyph_loader_t * loader = (lv_font_fmt_txt_glyph_loader_t *) fdsc->glyph_bitmap;
+    lv_mutex_unlock(&loader->lock);
+}
+
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 {
+    LV_ASSERT(font != NULL);
     if(letter == '\0') return 0;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
@@ -331,7 +384,9 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
 static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right)
 {
+    LV_ASSERT(font != NULL);
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    LV_ASSERT(fdsc != NULL);
 
     int8_t value = 0;
 
@@ -387,6 +442,8 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 
 static int kern_pair_8_compare(const void * ref, const void * element)
 {
+    LV_ASSERT(ref != NULL);
+    LV_ASSERT(element != NULL);
     const kern_pair_ref_t * ref8_p = ref;
     const uint8_t * element8_p = element;
 
@@ -397,6 +454,8 @@ static int kern_pair_8_compare(const void * ref, const void * element)
 
 static int kern_pair_16_compare(const void * ref, const void * element)
 {
+    LV_ASSERT(ref != NULL);
+    LV_ASSERT(element != NULL);
     const kern_pair_ref_t * ref16_p = ref;
     const uint16_t * element16_p = element;
 
@@ -418,6 +477,8 @@ static int kern_pair_16_compare(const void * ref, const void * element)
  */
 static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter)
 {
+    LV_ASSERT(in != NULL);
+    LV_ASSERT(out != NULL);
     const lv_opa_t * opa_table;
     switch(bpp) {
         case 2:
@@ -485,6 +546,7 @@ static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, 
  */
 static inline void decompress_line(uint8_t * out, int32_t w)
 {
+    LV_ASSERT(out != NULL);
     int32_t i;
     for(i = 0; i < w; i++) {
         out[i] = rle_next();
@@ -500,6 +562,7 @@ static inline void decompress_line(uint8_t * out, int32_t w)
  */
 static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len)
 {
+    LV_ASSERT(in != NULL);
     uint8_t bit_mask;
     switch(len) {
         case 1:
@@ -535,6 +598,7 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
 
 static inline void rle_init(const uint8_t * in,  uint8_t bpp)
 {
+    LV_ASSERT(in != NULL);
     lv_font_fmt_rle_t * rle = &font_rle;
     rle->in = in;
     rle->bpp = bpp;
@@ -618,11 +682,15 @@ static inline uint8_t rle_next(void)
  */
 static int unicode_list_compare(const void * ref, const void * element)
 {
+    LV_ASSERT(ref != NULL);
+    LV_ASSERT(element != NULL);
     return (*(uint16_t *)ref) - (*(uint16_t *)element);
 }
 
 static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const void * src)
 {
+    LV_ASSERT(info != NULL);
+    LV_ASSERT(src != NULL);
     const lv_builtin_font_src_t * font_src = src;
 
     /**
@@ -648,6 +716,7 @@ static void builtin_font_delete_cb(lv_font_t * font)
 
 static void * builtin_font_dup_src_cb(const void * src)
 {
+    LV_ASSERT(src != NULL);
     const lv_builtin_font_src_t * font_src = src;
     uint32_t len = 0;
 

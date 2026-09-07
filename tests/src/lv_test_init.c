@@ -35,10 +35,10 @@ void lv_test_init(void)
 
 #if LV_USE_SYSMON
 #if LV_USE_MEM_MONITOR
-    lv_sysmon_hide_memory(NULL);
+    lv_sysmon_hide_memory(lv_display_get_default());
 #endif
 #if LV_USE_PERF_MONITOR
-    lv_sysmon_hide_performance(NULL);
+    lv_sysmon_hide_performance(lv_display_get_default());
 #endif
 #endif
 }
@@ -53,7 +53,7 @@ void lv_test_deinit(void)
 #if LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
     /* Capture the EGL context before lv_deinit() deletes the display, then release
      * the EGL/GL resources after lv_deinit() has destroyed the NanoVG draw unit. */
-    void * egl_ctx = lv_display_get_driver_data(lv_display_get_default());
+    void * egl_ctx = lv_test_display_egl_get_context(lv_display_get_default());
     lv_deinit();
     lv_test_display_egl_cleanup(egl_ctx);
 #else

@@ -76,6 +76,8 @@ lv_obj_t * lv_list_create(lv_obj_t * parent)
 
 lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 {
+    LV_CHECK_OBJ(list, MY_CLASS, return NULL);
+
     LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
 
@@ -87,6 +89,8 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 
 lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
 {
+    LV_CHECK_OBJ(list, MY_CLASS, return NULL);
+
     LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS_BUTTON, list);
@@ -112,6 +116,9 @@ lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * t
 
 const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
 {
+    LV_CHECK_OBJ(list, MY_CLASS, return NULL);
+    LV_CHECK_ARG(btn != NULL, return NULL);
+
     LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_UNUSED(list);
     uint32_t i;
@@ -128,6 +135,10 @@ const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
 
 void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
 {
+    LV_CHECK_OBJ(list, MY_CLASS, return);
+    LV_CHECK_ARG(btn != NULL, return);
+    LV_CHECK_ARG(txt != NULL, return);
+
     LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_UNUSED(list);
     uint32_t i;
@@ -144,6 +155,9 @@ void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
 
 lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag)
 {
+    LV_CHECK_OBJ(list, MY_CLASS, return NULL);
+    LV_CHECK_ARG(tag != NULL, return NULL);
+
     LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
 
@@ -154,17 +168,23 @@ lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag)
 
 lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon, const char * tag)
 {
+    LV_CHECK_OBJ(list, MY_CLASS, return NULL);
+
     LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
 
     lv_obj_t * obj = lv_list_add_button(list, icon, "");
-    lv_list_set_button_translation_tag(list, obj, tag);
+    if(tag != NULL) lv_list_set_button_translation_tag(list, obj, tag);
 
     return obj;
 }
 
 void lv_list_set_button_translation_tag(lv_obj_t * list, lv_obj_t * btn, const char * tag)
 {
+    LV_CHECK_OBJ(list, MY_CLASS, return);
+    LV_CHECK_ARG(btn != NULL, return);
+    LV_CHECK_ARG(tag != NULL, return);
+
     LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_UNUSED(list);
     uint32_t i;

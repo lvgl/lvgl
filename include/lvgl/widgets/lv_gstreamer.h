@@ -77,6 +77,7 @@ typedef enum {
 } lv_gstreamer_state_t;
 
 typedef enum {
+    LV_GSTREAMER_STREAM_STATE_INVALID = -1,
     LV_GSTREAMER_STREAM_STATE_START,
     LV_GSTREAMER_STREAM_STATE_PLAY,
     LV_GSTREAMER_STREAM_STATE_PAUSE,
@@ -90,7 +91,8 @@ typedef enum {
 
 /**
  * Create a gstreamer object
- * @param parent    pointer to an object, it will be the parent of the new gstreamer
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created gstreamer
  */
 lv_obj_t * lv_gstreamer_create(lv_obj_t * parent);
@@ -102,9 +104,9 @@ lv_obj_t * lv_gstreamer_create(lv_obj_t * parent);
  *                      for common factory names, check `LV_GSTREAMER_FACTORY_XXX` defines
  * @param property      the property name for the gstreamer source object
  *                      for common properties, see `LV_GSTREAMER_PROPERTY_XXX` defines
- *                      Passing NULL will create the source object but not set its source
+ *                      @nullable When NULL the source object is created but its source is not set.
  * @param source        the property value for the gstreamer source object
- *                      Passing NULL will create the source object but not set its source
+ *                      @nullable When NULL the source object is created but its source is not set.
  * @return LV_RESULT_OK if the source was correctly set else LV_RESULT_INVALID
  */
 lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, const char * property,
@@ -184,7 +186,7 @@ void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate);
 /**
  * Retrieve the stream state from a STATE_CHANGED event callback
  * @param e     pointer to the event
- * @return the stream state or -1 if `e` is invalid (i.e. NULL or does not match expected event)
+ * @return the stream state or `LV_GSTREAMER_STREAM_STATE_INVALID` if `e` is invalid
  */
 lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e);
 

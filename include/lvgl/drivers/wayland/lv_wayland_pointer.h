@@ -36,10 +36,10 @@ lv_indev_t * lv_wayland_pointer_create(void);
 /**
  * Obtains the input device of the mouse pointer
  * @note It is used to create an input group on application start
- * @param disp Reference to the LVGL display associated to the window
+ * @param display Reference to the LVGL display associated to the window
  * @return The input device
  */
-lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp);
+lv_indev_t * lv_wayland_get_pointer(lv_display_t * display);
 
 /**********************
  *      MACROS

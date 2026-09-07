@@ -1023,4 +1023,66 @@ void test_label_text_trim(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_text_trim.png");
 }
 
+/**
+ * Two labels which show the same text, side by side under identical styles.
+ * Built on their own container so that styles left on the screen by other
+ * tests cannot change the result.
+ */
+static void create_wrap_pair(const char * text_a, const char * text_b,
+                             lv_obj_t ** label_a, lv_obj_t ** label_b)
+{
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(cont);
+    lv_obj_set_size(cont, 400, 200);
+    lv_obj_set_style_text_font(cont, LV_FONT_DEFAULT, LV_PART_MAIN);
+
+    const char * texts[2] = {text_a, text_b};
+    lv_obj_t ** out[2] = {label_a, label_b};
+
+    for(uint32_t i = 0; i < 2; i++) {
+        lv_obj_t * wrap_label = lv_label_create(cont);
+        lv_label_set_long_mode(wrap_label, LV_LABEL_LONG_MODE_WRAP);
+        /*Wide enough for "hello world" but not for another word after it*/
+        lv_obj_set_style_max_width(wrap_label, 100, LV_PART_MAIN);
+        lv_obj_set_width(wrap_label, LV_SIZE_CONTENT);
+        lv_label_set_text(wrap_label, texts[i]);
+        *out[i] = wrap_label;
+    }
+
+    lv_obj_update_layout(cont);
+}
+
+/**
+ * Issue #10493: a space which ends an automatically wrapped line is never
+ * drawn, so it must not be charged to the line. Otherwise the same visible
+ * text lays out differently depending on whether the break was automatic or
+ * written as a '\n'.
+ */
+void test_label_wrap_at_space_measures_like_explicit_newline(void)
+{
+    lv_obj_t * wrapped;
+    lv_obj_t * hard_break;
+    create_wrap_pair("hello world hello world", "hello world\nhello world", &wrapped, &hard_break);
+
+    /*Both show the same two lines, so both must measure the same*/
+    TEST_ASSERT_EQUAL(lv_obj_get_width(hard_break), lv_obj_get_width(wrapped));
+    TEST_ASSERT_EQUAL(lv_obj_get_height(hard_break), lv_obj_get_height(wrapped));
+}
+
+/**
+ * Issue #10493: trailing spaces must not widen a line either. With enough of
+ * them the centring offset used to go negative and the text was drawn outside
+ * the label, which WRAP mode does not clip horizontally.
+ */
+void test_label_trailing_spaces_do_not_widen_the_label(void)
+{
+    lv_obj_t * plain;
+    lv_obj_t * padded;
+    create_wrap_pair("hello world", "hello world              ", &plain, &padded);
+
+    TEST_ASSERT_EQUAL(lv_obj_get_width(plain), lv_obj_get_width(padded));
+}
+
 #endif

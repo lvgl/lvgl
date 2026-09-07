@@ -69,7 +69,7 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb,
 
 void lv_imgfont_destroy(lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    if(font == NULL) return;
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
     lv_free(dsc);

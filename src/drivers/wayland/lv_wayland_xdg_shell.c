@@ -86,8 +86,8 @@ const struct xdg_wm_base_listener * lv_wayland_xdg_get_wm_base_listener(void)
 void lv_wayland_xdg_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscreen,
                                    struct wl_output * output)
 {
-    LV_ASSERT_NULL(xdg);
-    LV_ASSERT_NULL(xdg->xdg_toplevel);
+    LV_CHECK_ARG(xdg != NULL, return);
+    LV_CHECK_ARG(xdg->xdg_toplevel != NULL, return);
     if(fullscreen) {
         xdg_toplevel_set_fullscreen(xdg->xdg_toplevel, output);
     }
@@ -98,8 +98,8 @@ void lv_wayland_xdg_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscreen,
 
 void lv_wayland_xdg_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized)
 {
-    LV_ASSERT_NULL(xdg);
-    LV_ASSERT_NULL(xdg->xdg_toplevel);
+    LV_CHECK_ARG(xdg != NULL, return);
+    LV_CHECK_ARG(xdg->xdg_toplevel != NULL, return);
     if(maximized) {
         xdg_toplevel_set_maximized(xdg->xdg_toplevel);
     }
@@ -110,14 +110,14 @@ void lv_wayland_xdg_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized)
 
 void lv_wayland_xdg_set_minimized(lv_wl_window_xdg_t * xdg)
 {
-    LV_ASSERT_NULL(xdg);
-    LV_ASSERT_NULL(xdg->xdg_toplevel);
+    LV_CHECK_ARG(xdg != NULL, return);
+    LV_CHECK_ARG(xdg->xdg_toplevel != NULL, return);
     xdg_toplevel_set_minimized(xdg->xdg_toplevel);
 }
 
 lv_result_t lv_wl_xdg_create_window(struct xdg_wm_base * xdg_wm, lv_wl_window_t * window, const char * title)
 {
-    LV_ASSERT_NULL(xdg_wm);
+    LV_CHECK_ARG(xdg_wm != NULL, return LV_RESULT_INVALID);
 
     window->xdg.xdg_surface = xdg_wm_base_get_xdg_surface(xdg_wm, window->body);
     if(!window->xdg.xdg_surface) {
@@ -146,7 +146,8 @@ void lv_wayland_xdg_configure_surface(lv_wl_window_t * window)
      * configure event */
     wl_surface_commit(window->body);
     wl_display_roundtrip(lv_wl_ctx.wl_display);
-    LV_ASSERT_MSG(window->resize_event.pending, "Failed to receive the xdg_surface configuration event");
+    LV_ASSERT_MSG(window->xdg.configured ||
+                  window->resize_event.pending, "Failed to receive the xdg_surface configuration event");
 }
 bool lv_wayland_xdg_is_resize_pending(lv_wl_window_t * window)
 {
@@ -209,9 +210,23 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
     lv_wl_window_t * window = (lv_wl_window_t *)data;
 
     LV_UNUSED(xdg_toplevel);
-    LV_UNUSED(states);
     LV_LOG_TRACE("XDG toplevel configure: w=%d h=%d (current: %dx%d)",
                  width, height, lv_wayland_window_get_width(window), lv_wayland_window_get_height(window));
+
+    window->maximized = false;
+    window->fullscreen = false;
+    uint32_t * s;
+    wl_array_for_each(s, states) {
+        switch(*s) {
+            case XDG_TOPLEVEL_STATE_MAXIMIZED:
+                window->maximized = true;
+                break;
+
+            case XDG_TOPLEVEL_STATE_FULLSCREEN:
+                window->fullscreen = true;
+                break;
+        }
+    }
 
     if((width < 0) || (height < 0)) {
         LV_LOG_TRACE("will not resize to w:%d h:%d", width, height);

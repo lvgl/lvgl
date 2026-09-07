@@ -124,10 +124,10 @@ void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(data != NULL, return LV_RESULT_INVALID, "data must not be NULL");
-    LV_CHECK_ARG(data_len <= qrcodegen_BUFFER_LEN_MAX, return LV_RESULT_INVALID,
-                 "data_len %u exceeds the maximum %u",
-                 (unsigned)data_len, (unsigned)qrcodegen_BUFFER_LEN_MAX);
+    LV_CHECK_ARG_MSG(data != NULL, return LV_RESULT_INVALID, "data must not be NULL");
+    LV_CHECK_ARG_FORMAT_MSG(data_len <= qrcodegen_BUFFER_LEN_MAX, return LV_RESULT_INVALID,
+                            "data_len %u exceeds the maximum %u",
+                            (unsigned)data_len, (unsigned)qrcodegen_BUFFER_LEN_MAX);
 
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
@@ -136,7 +136,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 
     /*A new payload leaves the bitmap out of date, and makes any earlier failure moot*/
     qrcode->needs_update = true;
-    qrcode->render_failed = false;
+    qrcode->render_valid = true;
 
     /*Setting the data always encodes right away, in either update mode*/
     return lv_qrcode_render(obj);
@@ -144,11 +144,8 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 
 void lv_qrcode_set_data(lv_obj_t * obj, const char * data)
 {
-    LV_CHECK_ARG(data != NULL, return, "data must not be NULL");
-
-    /*LV_CHECK_ARG compiles to nothing when argument checks are disabled, and the
-     *lv_strlen() below dereferences `data`, so this has to be guarded unconditionally*/
-    if(data == NULL) return;
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG_MSG(data != NULL, return, "data must not be NULL");
 
     lv_qrcode_update(obj, data, lv_strlen(data));
 }
@@ -183,7 +180,7 @@ void lv_qrcode_set_update_mode(lv_obj_t * obj, lv_qrcode_update_mode_t mode)
      *order that can report the failure is lv_qrcode_update() first, then switch mode.*/
     if(mode == LV_QRCODE_UPDATE_MODE_IMMEDIATE && qrcode->needs_update) {
         qrcode_encode(obj);
-        if(qrcode->render_failed) {
+        if(!qrcode->render_valid) {
             LV_LOG_ERROR("re-encoding on the switch to immediate update mode failed; "
                          "call lv_qrcode_render() before switching the mode to get the result");
         }
@@ -204,11 +201,11 @@ lv_qrcode_update_mode_t lv_qrcode_get_update_mode(lv_obj_t * obj)
     return (lv_qrcode_update_mode_t)qrcode->update_mode;
 }
 
-bool lv_qrcode_get_render_failed(lv_obj_t * obj)
+bool lv_qrcode_is_render_valid(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return true);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
-    return qrcode->render_failed;
+    return qrcode->render_valid;
 }
 
 /**********************
@@ -218,6 +215,7 @@ bool lv_qrcode_get_render_failed(lv_obj_t * obj)
 static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
     qrcode->data = NULL;
@@ -225,7 +223,7 @@ static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     qrcode->update_mode = LV_QRCODE_UPDATE_MODE_IMMEDIATE;
     qrcode->needs_update = false;
     /*No bitmap has been generated yet, so there is nothing valid to report*/
-    qrcode->render_failed = true;
+    qrcode->render_valid = false;
 
     /*Set default size*/
     lv_qrcode_set_size(obj, LV_DPI_DEF);
@@ -238,6 +236,7 @@ static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
     if(qrcode->data) {
@@ -256,6 +255,7 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_qrcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(e != NULL);
 
     lv_event_code_t code = lv_event_get_code(e);
 
@@ -267,8 +267,8 @@ static void lv_qrcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_t * obj = lv_event_get_current_target(e);
         lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
         /*A state that already failed to encode is not retried here: it can only start
-         *working again when a property changes, and that clears `render_failed`.*/
-        if(qrcode->needs_update && !qrcode->render_failed) {
+         *working again when a property changes, and that sets `render_valid` again.*/
+        if(qrcode->needs_update && qrcode->render_valid) {
             /*Only deferred mode leaves the bitmap out of date; immediate mode re-encodes in the setter*/
             LV_ASSERT(qrcode->update_mode == LV_QRCODE_UPDATE_MODE_DEFERRED);
 
@@ -292,11 +292,12 @@ static void lv_qrcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static int32_t get_satisfied_size(int32_t min_version, int32_t size, int32_t * scale)
 {
-    if(min_version <= 0) return -1;
+    LV_ASSERT(scale != NULL);
+    LV_ASSERT(min_version >= 0);
 
     int32_t offset = size;
     int32_t satisfied_version = min_version;
-    if(scale) *scale = 0;
+    *scale = 0;
 
     for(int32_t version = min_version; version <= min_version + 2 && version <= qrcodegen_VERSION_MAX - 3; version++) {
         int32_t version_size = qrcodegen_version2size(version + 1);
@@ -306,7 +307,7 @@ static int32_t get_satisfied_size(int32_t min_version, int32_t size, int32_t * s
         if(tmp_offset < offset) {
             offset = tmp_offset;
             satisfied_version = version;
-            if(scale) *scale = tmp_scale;
+            *scale = tmp_scale;
         }
     }
     return satisfied_version;
@@ -314,9 +315,9 @@ static int32_t get_satisfied_size(int32_t min_version, int32_t size, int32_t * s
 
 static bool qrcode_store_data(lv_qrcode_t * qrcode, const void * data, uint32_t data_len)
 {
-    /*Resize the existing buffer rather than allocating a second one, and assign only on
-     *success: a failed reallocation leaves the previous payload owned by `qrcode`.
-     *`lv_realloc(NULL, len)` allocates, so the first call needs no special case.*/
+    LV_ASSERT(qrcode != NULL);
+    LV_ASSERT(data != NULL);
+
     uint8_t * new_data = lv_realloc(qrcode->data, data_len);
     LV_ASSERT_MALLOC(new_data);
     if(new_data == NULL) return false;
@@ -339,7 +340,7 @@ static void qrcode_mark_dirty(lv_obj_t * obj)
     qrcode->needs_update = true;
 
     /*The property change may well make the payload encodable again, so allow a new attempt*/
-    qrcode->render_failed = false;
+    qrcode->render_valid = true;
 
     /*Deferred mode collapses several changes into one re-encode on the next redraw*/
     if(qrcode->update_mode == LV_QRCODE_UPDATE_MODE_IMMEDIATE) qrcode_encode(obj);
@@ -349,16 +350,17 @@ static void qrcode_mark_dirty(lv_obj_t * obj)
 
 static lv_result_t qrcode_encode(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
-    /*Assume failure and clear both flags only on the single success path, so no early
+    /*Start invalid and settle both flags only on the single success path, so no early
      *return can forget to record the outcome. `needs_update` deliberately survives a
      *failure: the bitmap still does not match the properties, and reporting it as up to
-     *date would be a lie. `render_failed` is what keeps the draw hook from retrying a
-     *known-bad state on every frame; a property change clears it to allow a new attempt.
-     *Failures are never logged here - the result is returned, and it is up to the caller
-     *to report it if nothing else will.*/
-    qrcode->render_failed = true;
+     *date would be a lie. A cleared `render_valid` is what keeps the draw hook from
+     *retrying a known-bad state on every frame; a property change sets it again to allow a
+     *new attempt. Failures are never logged here - the result is returned, and it is up to
+     *the caller to report it if nothing else will.*/
+    qrcode->render_valid = false;
 
     if(qrcode->data == NULL) return LV_RESULT_INVALID;
 
@@ -378,12 +380,15 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
 
     int32_t qr_version = qrcodegen_getMinFitVersion(qrcodegen_Ecc_MEDIUM, data_len);
+    if(qr_version <= 0) {
+        return LV_RESULT_INVALID;
+    }
     int32_t quiet_zone_scale = 0;
     if(qrcode->quiet_zone) qr_version = get_satisfied_size(qr_version, draw_buf->header.w, &quiet_zone_scale);
-    if(qr_version <= 0) return LV_RESULT_INVALID;
+    LV_ASSERT(qr_version > 0);
 
     const int32_t qr_size = qrcodegen_version2size(qr_version);
-    if(qr_size <= 0) return LV_RESULT_INVALID;
+    LV_ASSERT(qr_size > 0);
 
     /*Canvas pixels per QR module. Zero means the canvas cannot hold even a 1:1 copy of
      *the code, which would leave the bitmap blank, so report that instead of succeeding.*/
@@ -479,7 +484,7 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
 
     /*Only now does the bitmap match the properties*/
     qrcode->needs_update = false;
-    qrcode->render_failed = false;
+    qrcode->render_valid = true;
     return LV_RESULT_OK;
 }
 

@@ -24,6 +24,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct _lv_font_fmt_txt_glyph_loader_t lv_font_fmt_txt_glyph_loader_t;
+
 /** This describes a glyph.*/
 typedef struct {
 #if LV_FONT_FMT_TXT_LARGE == 0
@@ -149,7 +151,10 @@ typedef enum {
 
 /** Describe store for additional data for fonts */
 typedef struct {
-    /** The bitmaps of all glyphs */
+
+    /** The bitmaps of all glyphs or a lv_font_fmt_txt_glyph_loader_t *
+     * depending on the state of `are_glyphs_dynamic_loaded`
+     * a uint8_t to preserve backwards compatibility */
     const uint8_t * glyph_bitmap;
 
     /** Describe the glyphs */
@@ -191,6 +196,14 @@ typedef struct {
      * 4, 8, 16, 32, 64: each line is padded to the given byte boundaries
      */
     uint8_t stride;
+
+    /**
+     * `false`: the glyph bitmaps are stored in `glyph_bitmap`
+     *
+     * `true`: the glyph bitmaps are loaded on demand and `glyph_bitmap` holds a
+     * `lv_font_fmt_txt_glyph_loader_t *` instead
+     */
+    bool are_glyphs_dynamic_loaded;
 } lv_font_fmt_txt_dsc_t;
 
 typedef struct {
@@ -207,7 +220,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_builtin_font_class;
 /**
  * Used as `get_glyph_bitmap` callback in lvgl's native font format if the font is uncompressed.
  * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and format.
- * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
+ * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph.
+ *                      @nullable It's OK not to use it.
  * @return pointer to an A8 bitmap (not necessarily bitmap_out) or NULL if `unicode_letter` not found
  */
 const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);

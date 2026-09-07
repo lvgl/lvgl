@@ -31,7 +31,10 @@ void lv_example_gridnav_4(void)
     lv_obj_t * list = lv_list_create(lv_screen_active());
     lv_gridnav_add(list, LV_GRIDNAV_CTRL_ROLLOVER);
     lv_obj_align(list, LV_ALIGN_LEFT_MID, 10, 0);
-    lv_group_add_obj(lv_group_get_default(), list);
+    lv_group_t * g = lv_group_get_default();
+    if(g) {
+        lv_group_add_obj(g, list);
+    }
 
     uint32_t i;
     for(i = 0; i < 20; i++) {

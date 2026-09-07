@@ -14,19 +14,20 @@ class LVFfmpegPlayer(LVImage):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_ffmpeg_player_t", ptr=True) or self
+        self._wv_lv_ffmpeg_player_t = self.cast("lv_ffmpeg_player_t", ptr=True) or self
+        self._wv = self._wv_lv_ffmpeg_player_t
 
     @property
     def timer(self):
-        return ptr_or_none(self._wv.safe_field("timer"))
+        return ptr_or_none(self._wv_lv_ffmpeg_player_t.safe_field("timer"))
 
     @property
     def auto_restart(self):
-        return int(self._wv.safe_field("auto_restart", 0))
+        return int(self._wv_lv_ffmpeg_player_t.safe_field("auto_restart", 0))
 
     @property
     def decoder_name(self):
-        return safe_string(self._wv, "decoder_name")
+        return safe_string(self._wv_lv_ffmpeg_player_t, "decoder_name")
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -111,7 +111,7 @@ Place it in your `include/` or `src/` folder, and enable/disable LVGL features b
 editing the macros. For example:
 
 ```c
-#define LV_COLOR_DEPTH 16
+#define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
 #define LV_USE_LOG 1
 ```
 
@@ -122,7 +122,7 @@ Alternatively, you can define LVGL configuration macros directly in `platformio.
 ```ini
 build_flags =
     -D LV_CONF_SKIP
-    -D LV_COLOR_DEPTH=16
+    -D LV_COLOR_FORMAT_DEFAULT=LV_COLOR_FORMAT_RGB565
     -D LV_USE_LOG=1
     -D LV_FONT_MONTSERRAT_24=1
 ```

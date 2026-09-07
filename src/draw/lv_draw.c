@@ -3,10 +3,6 @@
  *
  */
 
-/**
- * Modified by NXP in 2024
- */
-
 /*********************
  *      INCLUDES
  *********************/
@@ -63,10 +59,6 @@ void lv_draw_init(void)
 
 void lv_draw_deinit(void)
 {
-#if LV_USE_OS
-    lv_thread_sync_delete(&_draw_info.sync);
-#endif
-
     lv_draw_unit_t * u = _draw_info.unit_head;
     while(u) {
         lv_draw_unit_t * cur_unit = u;
@@ -76,6 +68,9 @@ void lv_draw_deinit(void)
         lv_free(cur_unit);
     }
     _draw_info.unit_head = NULL;
+#if LV_USE_OS
+    lv_thread_sync_delete(&_draw_info.sync);
+#endif
 }
 
 void * lv_draw_create_unit(size_t size)
@@ -94,6 +89,9 @@ void * lv_draw_create_unit(size_t size)
 
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+    LV_CHECK_ARG(coords != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
     size_t dsc_size = get_draw_dsc_size(type);
     LV_ASSERT_FORMAT_MSG(dsc_size > 0, "Draw task size is 0 for type %d", type);
@@ -121,6 +119,8 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
 
         tail->next = new_task;
     }
+    LV_LOG_TRACE("Added task %p (type %d), layer (%p) layer head (%p)", (void *)new_task, new_task->type,
+                 (void *) layer, (void *)layer->draw_task_head);
 
     LV_PROFILER_DRAW_END;
     return new_task;
@@ -128,6 +128,10 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
 
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
+    LV_LOG_TRACE("Finalize task %p (type %d)", (void *)t, t->type);
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(t != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
@@ -161,12 +165,18 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             u = u->next;
         }
         if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
-            LV_LOG_WARN("the draw task was not taken by any units");
-            t->state = LV_DRAW_TASK_STATE_FINISHED;
+            LV_LOG_WARN("Draw task failed (%p, type %d): not taken by any unit", (void *)t, t->type);
+            /* mark a non-taken layer task as BLOCKED so we don't try to release it
+            * as one of its draw tasks might be in progress already */
+            if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
+                t->state = LV_DRAW_TASK_STATE_BLOCKED;
+            }
+            else {
+                /* Other tasks won't have anything depending on them so we can just mark them as FAILED*/
+                t->state = LV_DRAW_TASK_STATE_FAILED;
+            }
         }
-        else {
-            lv_draw_dispatch();
-        }
+        lv_draw_dispatch();
     }
     else {
         /*Let the draw units set their preference score*/
@@ -228,6 +238,9 @@ void lv_draw_dispatch(void)
 
 bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
 {
+    LV_UNUSED(disp);
+    LV_CHECK_ARG(layer != NULL, return false);
+
     LV_PROFILER_DRAW_BEGIN;
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
@@ -241,7 +254,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
                 LV_LOG_ERROR("draw task failed, type: %d", (int)t->type);
             }
 
-            lv_draw_cleanup_task(t, disp);
+            lv_draw_cleanup_task(t);
             remove_task = true;
             if(t_prev != NULL)
                 t_prev->next = t_next;
@@ -264,7 +277,9 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
             if(t_src->type == LV_DRAW_TASK_TYPE_LAYER && t_src->state == LV_DRAW_TASK_STATE_BLOCKED) {
                 lv_draw_image_dsc_t * draw_dsc = t_src->draw_dsc;
                 if(draw_dsc->src == layer) {
-                    t_src->state = LV_DRAW_TASK_STATE_WAITING;
+                    t_src->state = t_src->preferred_draw_unit_id == LV_DRAW_UNIT_NONE
+                                   ? LV_DRAW_TASK_STATE_FAILED
+                                   : LV_DRAW_TASK_STATE_WAITING;
                     lv_draw_dispatch_request();
                     break;
                 }
@@ -322,6 +337,8 @@ uint32_t lv_draw_get_unit_count(void)
 
 lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+
     if(_draw_info.unit_cnt == 1) {
         return get_first_available_task(layer);
     }
@@ -332,16 +349,16 @@ lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t *
 
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
 
-    /*If the first task is screen sized, there cannot be independent areas*/
+    /*If the first task covers the whole layer, there cannot be independent areas.*/
     if(layer->draw_task_head) {
-        int32_t hor_res = lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing());
-        int32_t ver_res = lv_display_get_vertical_resolution(lv_refr_get_disp_refreshing());
         lv_draw_task_t * t = layer->draw_task_head;
         if(t->state != LV_DRAW_TASK_STATE_WAITING &&
-           t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
-           t->area.y1 <= 0 && t->area.y2 >= ver_res - 1) {
+           t->area.x1 <= layer->buf_area.x1 && t->area.x2 >= layer->buf_area.x2 &&
+           t->area.y1 <= layer->buf_area.y1 && t->area.y2 >= layer->buf_area.y2) {
             LV_PROFILER_DRAW_END;
             return NULL;
         }
@@ -410,14 +427,14 @@ void lv_draw_unit_send_event(const char * name, lv_event_code_t code, void * par
 
 void lv_layer_init(lv_layer_t * layer)
 {
-    LV_ASSERT_NULL(layer);
+    LV_CHECK_ARG(layer != NULL, return);
     lv_memzero(layer, sizeof(lv_layer_t));
     lv_layer_reset(layer);
 }
 
 void lv_layer_reset(lv_layer_t * layer)
 {
-    LV_ASSERT_NULL(layer);
+    LV_CHECK_ARG(layer != NULL, return);
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
 #endif
@@ -428,6 +445,8 @@ void lv_layer_reset(lv_layer_t * layer)
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
+    LV_CHECK_ARG(area != NULL, return NULL);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_layer_t * new_layer = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
@@ -451,6 +470,9 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
                         const lv_area_t * area)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(area != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_layer_init(layer);
     lv_display_t * disp = lv_refr_get_disp_refreshing();
@@ -460,8 +482,8 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     layer->buf_area = *area;
     layer->phy_clip_area = *area;
     layer->color_format = color_format;
+    layer->display = disp;
 
-    if(disp->layer_init) disp->layer_init(disp, layer);
     lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
 
     if(disp->layer_head) {
@@ -478,6 +500,7 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
     LV_PROFILER_DRAW_BEGIN;
     /*If the buffer of the layer is already allocated return it*/
     if(layer->draw_buf != NULL) {
@@ -506,6 +529,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         LV_PROFILER_DRAW_END;
         return NULL;
     }
+    layer->buffer_owned = true;
 
     _draw_info.used_memory_for_layers += layer_size_byte;
     LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
@@ -520,27 +544,40 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
 {
+    LV_CHECK_ARG(layer != NULL, return NULL);
+
     return lv_draw_buf_goto_xy(layer->draw_buf, x, y);
 }
 
 lv_draw_task_type_t lv_draw_task_get_type(const lv_draw_task_t * t)
 {
+    LV_CHECK_ARG(t != NULL, return LV_DRAW_TASK_TYPE_NONE);
+
     return t->type;
 }
 
 void * lv_draw_task_get_draw_dsc(const lv_draw_task_t * t)
 {
+    LV_CHECK_ARG(t != NULL, return NULL);
+
     return t->draw_dsc;
 }
 
 void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
 {
+    LV_CHECK_ARG(t != NULL, return);
+    LV_CHECK_ARG(area != NULL, return);
+
     *area = t->area;
 }
 
 lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_base_t * base,
                                               const lv_area_t * area)
 {
+    LV_CHECK_ARG(parent_layer != NULL, return NULL);
+    LV_CHECK_ARG(base != NULL, return NULL);
+    LV_CHECK_ARG(area != NULL, return NULL);
+
     lv_area_t drop_shadow_area = *area;
     int32_t blur_radius = base->drop_shadow_blur_radius;
 
@@ -556,6 +593,9 @@ lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const l
 
 void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_base_t * base)
 {
+    LV_CHECK_ARG(drop_shadow_layer != NULL, return);
+    LV_CHECK_ARG(base != NULL, return);
+
     lv_area_t drop_shadow_area = drop_shadow_layer->buf_area;
     lv_draw_blur_dsc_t blur_dsc;
     lv_draw_blur_dsc_init(&blur_dsc);
@@ -576,6 +616,75 @@ void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_d
     layer_draw_dsc.recolor = base->drop_shadow_color;
     layer_draw_dsc.opa = base->drop_shadow_opa;
     lv_draw_layer(drop_shadow_layer->parent, &layer_draw_dsc, &drop_shadow_area);
+}
+
+void lv_draw_layer_deinit(lv_layer_t * layer)
+{
+    if(!layer) {
+        return;
+    }
+
+    lv_draw_task_t * t = layer->draw_task_head;
+    while(t) {
+        if(t->state == LV_DRAW_TASK_STATE_IN_PROGRESS) {
+            LV_LOG_WARN("Deiniting a layer with a task in progress, waiting for the draw units");
+            lv_draw_wait_for_finish();
+            break;
+        }
+        t = t->next;
+    }
+
+    t = layer->draw_task_head;
+    while(t) {
+        lv_draw_task_t * next = t->next;
+        lv_draw_cleanup_task(t);
+        t = next;
+    }
+    layer->draw_task_head = NULL;
+
+    if(layer->display) {
+        lv_layer_t * l = layer->display->layer_head;
+        while(l) {
+            if(l->next == layer) {
+                l->next = layer->next;
+                break;
+            }
+            l = l->next;
+        }
+    }
+
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer);
+
+    lv_draw_layer_dealloc_buf(layer);
+}
+
+void lv_draw_layer_delete(lv_layer_t * layer)
+{
+    if(!layer) {
+        return;
+    }
+    lv_draw_layer_deinit(layer);
+    lv_free(layer);
+}
+
+void lv_draw_layer_dealloc_buf(lv_layer_t * layer)
+{
+    LV_CHECK_ARG(layer != NULL, return);
+    if(layer->draw_buf == NULL || !layer->buffer_owned) return;
+
+    uint32_t layer_size_byte = lv_area_get_height(&layer->buf_area) * layer->draw_buf->header.stride;
+    if(_draw_info.used_memory_for_layers >= layer_size_byte) {
+        _draw_info.used_memory_for_layers -= layer_size_byte;
+    }
+    else {
+        _draw_info.used_memory_for_layers = 0;
+        LV_LOG_WARN("More layers were freed than allocated");
+    }
+    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
+
+    lv_draw_buf_destroy(layer->draw_buf);
+    layer->draw_buf = NULL;
+    layer->buffer_owned = false;
 }
 
 /**********************
@@ -670,14 +779,13 @@ static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
     return 0;
 }
 
-/**
- * Clean-up resources allocated by a finished task
- * @param t         pointer to a draw task
- * @param disp      pointer to a display on which the task was drawn
- */
-void lv_draw_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
+void lv_draw_cleanup_task(lv_draw_task_t * t)
 {
     LV_PROFILER_DRAW_BEGIN;
+    LV_LOG_TRACE("Cleanup task %p (type %d)", (void *)t, t->type);
+
+    LV_ASSERT_FORMAT_MSG(t->state != LV_DRAW_TASK_STATE_IN_PROGRESS, "task %p (type %d) is still used by a draw unit",
+                         (void *)t, t->type);
     if(t->type == LV_DRAW_TASK_TYPE_LINE) {
         lv_draw_line_dsc_t * draw_line_dsc = t->draw_dsc;
         if(draw_line_dsc->points) {
@@ -689,42 +797,7 @@ void lv_draw_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
     else if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
         lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
-
-        if(layer_drawn->draw_buf) {
-            int32_t h = lv_area_get_height(&layer_drawn->buf_area);
-            uint32_t layer_size_byte = h * layer_drawn->draw_buf->header.stride;
-
-            if(_draw_info.used_memory_for_layers >= layer_size_byte) {
-                _draw_info.used_memory_for_layers -= layer_size_byte;
-            }
-            else {
-                _draw_info.used_memory_for_layers = 0;
-                LV_LOG_WARN("More layers were freed than allocated");
-            }
-            LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
-            lv_draw_buf_destroy(layer_drawn->draw_buf);
-            layer_drawn->draw_buf = NULL;
-        }
-
-        /*Remove the layer from  the display's*/
-        if(disp) {
-            lv_layer_t * l2 = disp->layer_head;
-            while(l2) {
-                if(l2->next == layer_drawn) {
-                    l2->next = layer_drawn->next;
-                    break;
-                }
-                l2 = l2->next;
-            }
-
-            lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer_drawn);
-            if(disp->layer_deinit) {
-                LV_PROFILER_DRAW_BEGIN_TAG("layer_deinit");
-                disp->layer_deinit(disp, layer_drawn);
-                LV_PROFILER_DRAW_END_TAG("layer_deinit");
-            }
-            lv_free(layer_drawn);
-        }
+        lv_draw_layer_delete(layer_drawn);
     }
     lv_draw_label_dsc_t * draw_label_dsc = lv_draw_task_get_label_dsc(t);
     if(draw_label_dsc && draw_label_dsc->text_local) {

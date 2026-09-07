@@ -20,6 +20,7 @@ from .config_entry import (
     BoolConfig,
     ConfigEntry,
     ConstToken,
+    DerivedConstToken,
     DerivedFlag,
     EnumChoice,
     EnumMember,
@@ -30,8 +31,10 @@ from .kconfig_utils import (
     choice_default,
     choice_int_value,
     dep_terms,
+    derived_int_const_table,
     doc_text,
     int_const_value,
+    int_owns_choice,
     is_int_const,
     member_requires,
     rev_dep_c_expr,
@@ -272,6 +275,8 @@ def _build_enum_choice(sym, node) -> EnumChoice | None:
     if derived is None:
         return None
     choice, pairs = derived
+    if not int_owns_choice(sym, choice):
+        return None
     resolved = [_member_token(sym.name, member, value) for member, value in pairs]
     # A value-alias (members map to bare numbers, e.g. LV_COLOR_DEPTH or the
     # buffer counts) emits the selected member's number and documents itself
@@ -327,7 +332,7 @@ def enum_backed_choices(kconf: Kconfig) -> set:
     out = set()
     for sym in kconf.unique_defined_syms:
         derived = _derived_enum(sym)
-        if derived is not None:
+        if derived is not None and int_owns_choice(sym, derived[0]):
             out.add(derived[0])
     return out
 
@@ -380,6 +385,19 @@ def classify(node, enum_choices: frozenset = frozenset()) -> ConfigEntry | None:
         # where the enum choices that reference it by name can see it.
         if is_int_const(item):
             return ConstToken(item.name, int_const_value(item), node=node)
+
+        # If it's not const, maybe it's a derived const, meaning that it will
+        # end up being constant after the rest of the config is parsed
+        derived_const = derived_int_const_table(item)
+        if derived_const is not None:
+            choice, pairs = derived_const
+            return DerivedConstToken(
+                item.name,
+                choice.name,
+                [(m.name, literal) for m, literal in pairs],
+                node=node,
+                doc=doc_text(node),
+            )
         # Any other int/hex is emitted - including no-prompt computed aliases
         # like LV_SDL_BUF_COUNT (the prompt gate below would wrongly drop it).
         return IntConfig.from_symbol(item, node)

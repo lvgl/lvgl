@@ -17,14 +17,15 @@
  */
 void lv_example_slider_bind_value(void)
 {
-    static lv_subject_t subject_value;
+    static lv_subject_t * subject_value;
 
     static bool inited = false;
 
     if(!inited) {
-        lv_subject_init_int(&subject_value, 50);
-        lv_subject_set_min_value_int(&subject_value, 0);
-        lv_subject_set_max_value_int(&subject_value, 100);
+        subject_value = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_min_value_int(subject_value, 0);
+        lv_subject_set_max_value_int(subject_value, 100);
+        lv_subject_set_int(subject_value, 50);
         inited = true;
     }
 
@@ -38,9 +39,9 @@ void lv_example_slider_bind_value(void)
     /* 💡 Drag the slider; the label re-renders because both widgets share `subject_value`. */
     lv_obj_t * slider = lv_slider_create(screen);
     lv_obj_set_width(slider, lv_pct(90));
-    lv_slider_bind_value(slider, &subject_value);
+    lv_slider_bind_value(slider, subject_value);
 
     lv_obj_t * label = lv_label_create(screen);
-    lv_label_bind_text(label, &subject_value, "Value: %d/100");
+    lv_label_bind_text(label, subject_value, "Value: %d/100");
 }
 #endif

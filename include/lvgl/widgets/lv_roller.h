@@ -55,7 +55,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_roller_class;
 
 /**
  * Create a roller object
- * @param parent    pointer to an object, it will be the parent of the new roller.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created roller
  */
 lv_obj_t * lv_roller_create(lv_obj_t * parent);
@@ -71,6 +72,20 @@ lv_obj_t * lv_roller_create(lv_obj_t * parent);
  * @param mode      `LV_ROLLER_MODE_NORMAL` or `LV_ROLLER_MODE_INFINITE`
  */
 void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode);
+
+#if LV_USE_TRANSLATION
+
+/**
+ * Assign a translation tag for the options of the roller. Memory will be allocated to store the tag.
+ * The options will automatically update when the language is changed via `lv_translation_set_language`.
+ * The translation should contain the options in a '\n' separated list. E.g. "One\nTwo\nThree"
+ * @param obj       pointer to a roller object
+ * @param tag       '\0' terminated character string.
+ * @param mode      `LV_ROLLER_MODE_NORMAL` or `LV_ROLLER_MODE_INFINITE`
+ */
+void lv_roller_set_options_translation_tag(lv_obj_t * obj, const char * tag, lv_roller_mode_t mode);
+
+#endif /*LV_USE_TRANSLATION*/
 
 /**
  * Set the selected option

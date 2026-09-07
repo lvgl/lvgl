@@ -36,7 +36,7 @@ repos:
     # that depend on the file name are correct.
     -   id: template-check
         name: Comparing file templates with file names
-        entry: python scripts/lv_templ_check.py --fix --quiet
+        entry: python scripts/static_checks/check_file_template.py --fix --quiet
         stages: [ commit ]
         language: system
         pass_filenames: false

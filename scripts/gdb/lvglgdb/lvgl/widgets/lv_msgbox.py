@@ -14,28 +14,29 @@ class LVMsgbox(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_msgbox_t", ptr=True) or self
+        self._wv_lv_msgbox_t = self.cast("lv_msgbox_t", ptr=True) or self
+        self._wv = self._wv_lv_msgbox_t
 
     @property
     def header(self):
-        return ptr_or_none(self._wv.safe_field("header"))
+        return ptr_or_none(self._wv_lv_msgbox_t.safe_field("header"))
 
     @property
     def content(self):
-        return ptr_or_none(self._wv.safe_field("content"))
+        return ptr_or_none(self._wv_lv_msgbox_t.safe_field("content"))
 
     @property
     def footer(self):
-        return ptr_or_none(self._wv.safe_field("footer"))
+        return ptr_or_none(self._wv_lv_msgbox_t.safe_field("footer"))
 
     @property
     def title(self):
-        return ptr_or_none(self._wv.safe_field("title"))
+        return ptr_or_none(self._wv_lv_msgbox_t.safe_field("title"))
 
     @property
     def auto_parent(self):
         """Mark that the parent was automatically created"""
-        return int(self._wv.safe_field("auto_parent", 0))
+        return int(self._wv_lv_msgbox_t.safe_field("auto_parent", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

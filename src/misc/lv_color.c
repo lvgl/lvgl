@@ -345,6 +345,8 @@ lv_color_t lv_color_black(void)
 
 void lv_color_premultiply(lv_color32_t * c)
 {
+    LV_CHECK_ARG(c != NULL, return);
+
     if(c->alpha == LV_OPA_COVER) {
         return;
     }
@@ -361,6 +363,8 @@ void lv_color_premultiply(lv_color32_t * c)
 
 void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
 {
+    LV_CHECK_ARG(c != NULL, return);
+
     if(a == LV_OPA_COVER) {
         return;
     }
@@ -387,6 +391,8 @@ uint8_t lv_color16_luminance(const lv_color16_t c)
 
 uint8_t lv_color24_luminance(const uint8_t * c)
 {
+    LV_CHECK_ARG(c != NULL, return 0);
+
     return (uint8_t)((uint16_t)(77u * c[2] + 151u * c[1] + 28u * c[0]) >> 8);
 }
 

@@ -4,12 +4,15 @@
 
 #include "unity/unity.h"
 
-static void create_ui(void);
+static void create_ui(lv_subject_t * subject);
 static void chart_type_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void buttonmatrix_event_cb(lv_event_t * e);
 static lv_obj_t * list_button_create(lv_obj_t * parent);
 static void opa_anim_cb(void * var, int32_t v);
 static void draw_to_canvas(lv_obj_t * canvas);
+
+/* Subjects are owned by LVGL now; tearDown() deletes the one the test created. */
+static lv_subject_t * created_subject;
 
 void setUp(void)
 {
@@ -19,11 +22,16 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
+    lv_subject_delete(created_subject);
+    created_subject = NULL;
 }
 
 void test_binding(void)
 {
-    create_ui();
+    created_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    TEST_ASSERT_NOT_NULL(created_subject);
+
+    create_ui(created_subject);
 
     /*Wait for the animation*/
     lv_test_wait(500);
@@ -31,7 +39,7 @@ void test_binding(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("binding.png");
 }
 
-static void create_ui(void)
+static void create_ui(lv_subject_t * subject)
 {
     /*Create a colors*/
     lv_color_t c1 = lv_color_hex(0xff0000);
@@ -53,9 +61,6 @@ static void create_ui(void)
     static int32_t gird_rows[] = {100, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_grid_dsc_array(scr, gird_cols, gird_rows);
 
-    static lv_subject_t chart_type_subject;
-    lv_subject_init_int(&chart_type_subject, 0);
-
     /*Create a widget*/
     lv_obj_t * dropdown = lv_dropdown_create(scr);
 
@@ -66,7 +71,7 @@ static void create_ui(void)
     lv_obj_set_grid_cell(dropdown, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 0, 1);
 
     /*Bind to a subject*/
-    lv_dropdown_bind_value(dropdown, &chart_type_subject);
+    lv_dropdown_bind_value(dropdown, subject);
 
     /*Create a chart with an external array of points*/
     lv_obj_t * chart = lv_chart_create(lv_screen_active());
@@ -78,10 +83,10 @@ static void create_ui(void)
     lv_chart_set_series_ext_y_array(chart, series, chart_y_array);
 
     /*Add custom observer callback*/
-    lv_subject_add_observer_obj(&chart_type_subject, chart_type_observer_cb, chart, NULL);
+    lv_subject_add_observer_obj(subject, chart_type_observer_cb, chart, NULL);
 
     /*Manually set the subject's value*/
-    lv_subject_set_int(&chart_type_subject, 1);
+    lv_subject_set_int(subject, 1);
 
     lv_obj_t * label = lv_label_create(scr);
     lv_obj_set_grid_cell(label, LV_GRID_ALIGN_START, 1, 1, LV_GRID_ALIGN_CENTER, 0, 1);

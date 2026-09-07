@@ -40,7 +40,7 @@ typedef struct _mem_header_t {
 
 void lv_mem_init(void)
 {
-    LV_ASSERT_NULL(gLvEfiBS);
+    LV_ASSERT(gLvEfiBS != NULL);
 
     return; /*Nothing to init*/
 }

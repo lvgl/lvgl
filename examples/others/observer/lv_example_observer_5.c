@@ -18,8 +18,8 @@ static void fw_update_btn_clicked_event_cb(lv_event_t * e);
 static void fw_update_close_event_cb(lv_event_t * e);
 static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
-static lv_subject_t fw_download_percent_subject;
-static lv_subject_t fw_update_status_subject;
+static lv_subject_t * fw_download_percent_subject;
+static lv_subject_t * fw_update_status_subject;
 
 /**
  * @title Firmware update state machine
@@ -37,10 +37,11 @@ static lv_subject_t fw_update_status_subject;
  */
 void lv_example_observer_5(void)
 {
-    lv_subject_init_int(&fw_download_percent_subject, 0);
-    lv_subject_init_int(&fw_update_status_subject, FW_UPDATE_STATE_IDLE);
+    fw_download_percent_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    fw_update_status_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(fw_update_status_subject, FW_UPDATE_STATE_IDLE);
 
-    lv_subject_add_observer(&fw_update_status_subject, fw_upload_manager_observer_cb, NULL);
+    lv_subject_add_observer(fw_update_status_subject, fw_upload_manager_observer_cb, NULL);
 
     /*Create start FW update button*/
     lv_obj_t * btn = lv_button_create(lv_screen_active());
@@ -66,28 +67,28 @@ static void fw_update_btn_clicked_event_cb(lv_event_t * e)
     lv_obj_add_event_cb(btn, fw_update_close_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_center(win);
 
-    lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_IDLE);
-    lv_subject_add_observer_obj(&fw_update_status_subject, fw_update_win_observer_cb, win, NULL);
+    lv_subject_set_int(fw_update_status_subject, FW_UPDATE_STATE_IDLE);
+    lv_subject_add_observer_obj(fw_update_status_subject, fw_update_win_observer_cb, win, NULL);
 }
 
 static void fw_update_close_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
-    lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_CANCEL);
+    lv_subject_set_int(fw_update_status_subject, FW_UPDATE_STATE_CANCEL);
 }
 
 static void restart_btn_click_event_cb(lv_event_t * e)
 {
     lv_obj_t * win = (lv_obj_t *) lv_event_get_user_data(e);
     lv_obj_delete(win);
-    lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_IDLE);
+    lv_subject_set_int(fw_update_status_subject, FW_UPDATE_STATE_IDLE);
 }
 
 static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * win = (lv_obj_t *) lv_observer_get_target(observer);
     lv_obj_t * cont = lv_win_get_content(win);
-    lv_fw_update_state_t status = (lv_fw_update_state_t) lv_subject_get_int(&fw_update_status_subject);
+    lv_fw_update_state_t status = (lv_fw_update_state_t) lv_subject_get_int(fw_update_status_subject);
     if(status == FW_UPDATE_STATE_IDLE) {
         lv_obj_clean(cont);
         lv_obj_t * spinner = lv_spinner_create(cont);
@@ -103,13 +104,13 @@ static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * s
     else if(status == FW_UPDATE_STATE_DOWNLOADING) {
         lv_obj_clean(cont);
         lv_obj_t * arc = lv_arc_create(cont);
-        lv_arc_bind_value(arc, &fw_download_percent_subject);
+        lv_arc_bind_value(arc, fw_download_percent_subject);
         lv_obj_center(arc);
         lv_obj_set_size(arc, 130, 130);
         lv_obj_set_clickable(arc, false);
 
         lv_obj_t * label = lv_label_create(cont);
-        lv_label_bind_text(label, &fw_download_percent_subject, "%d %%");
+        lv_label_bind_text(label, fw_download_percent_subject, "%d %%");
         lv_obj_center(label);
     }
     else if(status == FW_UPDATE_STATE_READY) {
@@ -132,25 +133,25 @@ static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * s
 
 static void connect_timer_cb(lv_timer_t * t)
 {
-    if(lv_subject_get_int(&fw_update_status_subject) != FW_UPDATE_STATE_CANCEL) {
-        lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_CONNECTED);
+    if(lv_subject_get_int(fw_update_status_subject) != FW_UPDATE_STATE_CANCEL) {
+        lv_subject_set_int(fw_update_status_subject, FW_UPDATE_STATE_CONNECTED);
     }
     lv_timer_delete(t);
 }
 
 static void download_timer_cb(lv_timer_t * t)
 {
-    if(lv_subject_get_int(&fw_update_status_subject) == FW_UPDATE_STATE_CANCEL) {
+    if(lv_subject_get_int(fw_update_status_subject) == FW_UPDATE_STATE_CANCEL) {
         lv_timer_delete(t);
         return;
     }
 
-    int32_t v = lv_subject_get_int(&fw_download_percent_subject);
+    int32_t v = lv_subject_get_int(fw_download_percent_subject);
     if(v < 100) {
-        lv_subject_set_int(&fw_download_percent_subject, v + 1);
+        lv_subject_set_int(fw_download_percent_subject, v + 1);
     }
     else {
-        lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_READY);
+        lv_subject_set_int(fw_update_status_subject, FW_UPDATE_STATE_READY);
         lv_timer_delete(t);
     }
 }
@@ -163,13 +164,13 @@ static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t
     LV_UNUSED(subject);
     LV_UNUSED(observer);
 
-    lv_fw_update_state_t state = (lv_fw_update_state_t) lv_subject_get_int(&fw_update_status_subject);
+    lv_fw_update_state_t state = (lv_fw_update_state_t) lv_subject_get_int(fw_update_status_subject);
     if(state == FW_UPDATE_STATE_CONNECTING) {
         lv_timer_create(connect_timer_cb, 2000, NULL);
     }
     else if(state == FW_UPDATE_STATE_CONNECTED) {
-        lv_subject_set_int(&fw_download_percent_subject, 0);
-        lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_DOWNLOADING);
+        lv_subject_set_int(fw_download_percent_subject, 0);
+        lv_subject_set_int(fw_update_status_subject, FW_UPDATE_STATE_DOWNLOADING);
         lv_timer_create(download_timer_cb, 50, NULL);
     }
 }

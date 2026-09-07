@@ -6,12 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../lvgl_public.h"
+
+#if LV_USE_OBJ_PROPERTY
+
+#include "lv_obj_style_internal.h"
 #include "lv_obj_private.h"
 #include "../misc/lv_utils.h"
 #include "lv_obj_class_private.h"
 #include "../lvgl_public.h"
-
-#if LV_USE_OBJ_PROPERTY
 
 /*********************
  *      DEFINES

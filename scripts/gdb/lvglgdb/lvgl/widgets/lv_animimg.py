@@ -14,19 +14,20 @@ class LVAnimimg(LVImage):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_animimg_t", ptr=True) or self
+        self._wv_lv_animimg_t = self.cast("lv_animimg_t", ptr=True) or self
+        self._wv = self._wv_lv_animimg_t
 
     @property
     def anim(self):
-        return safe_wrapper(self._wv, "anim", "lvglgdb.lvgl.misc.lv_anim", "LVAnim")
+        return safe_wrapper(self._wv_lv_animimg_t, "anim", "lvglgdb.lvgl.misc.lv_anim", "LVAnim")
 
     @property
     def dsc(self):
-        return ptr_or_none(self._wv.safe_field("dsc"))
+        return ptr_or_none(self._wv_lv_animimg_t.safe_field("dsc"))
 
     @property
     def pic_count(self):
-        return int(self._wv.safe_field("pic_count", 0))
+        return int(self._wv_lv_animimg_t.safe_field("pic_count", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

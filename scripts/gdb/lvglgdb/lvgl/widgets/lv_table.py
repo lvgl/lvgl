@@ -14,35 +14,36 @@ class LVTable(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_table_t", ptr=True) or self
+        self._wv_lv_table_t = self.cast("lv_table_t", ptr=True) or self
+        self._wv = self._wv_lv_table_t
 
     @property
     def col_cnt(self):
-        return int(self._wv.safe_field("col_cnt", 0))
+        return int(self._wv_lv_table_t.safe_field("col_cnt", 0))
 
     @property
     def row_cnt(self):
-        return int(self._wv.safe_field("row_cnt", 0))
+        return int(self._wv_lv_table_t.safe_field("row_cnt", 0))
 
     @property
     def cell_data(self):
-        return ptr_or_none(self._wv.safe_field("cell_data"))
+        return ptr_or_none(self._wv_lv_table_t.safe_field("cell_data"))
 
     @property
     def row_h(self):
-        return ptr_or_none(self._wv.safe_field("row_h"))
+        return ptr_or_none(self._wv_lv_table_t.safe_field("row_h"))
 
     @property
     def col_w(self):
-        return ptr_or_none(self._wv.safe_field("col_w"))
+        return ptr_or_none(self._wv_lv_table_t.safe_field("col_w"))
 
     @property
     def col_act(self):
-        return int(self._wv.safe_field("col_act", 0))
+        return int(self._wv_lv_table_t.safe_field("col_act", 0))
 
     @property
     def row_act(self):
-        return int(self._wv.safe_field("row_act", 0))
+        return int(self._wv_lv_table_t.safe_field("row_act", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

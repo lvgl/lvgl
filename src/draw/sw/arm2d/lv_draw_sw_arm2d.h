@@ -38,9 +38,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_DRAW_SW_RGB565_SWAP
-    #define LV_DRAW_SW_RGB565_SWAP(__buf_ptr, __buf_size_px)                    \
-        lv_draw_sw_rgb565_swap_helium((__buf_ptr), (__buf_size_px))
+#ifndef LV_DRAW_RGB565_SWAP
+    #define LV_DRAW_RGB565_SWAP(__buf_ptr, __buf_size_px)                    \
+        lv_draw_rgb565_swap_helium((__buf_ptr), (__buf_size_px))
 #endif
 
 #ifndef LV_DRAW_SW_IMAGE
@@ -164,7 +164,7 @@ extern void arm_2d_helper_swap_rgb16(uint16_t * phwBuffer, uint32_t wCount);
         }                                                                       \
     } while(0);
 
-static inline lv_result_t lv_draw_sw_rgb565_swap_helium(void * buf, uint32_t buf_size_px)
+static inline lv_result_t lv_draw_rgb565_swap_helium(void * buf, uint32_t buf_size_px)
 {
     arm_2d_helper_swap_rgb16((uint16_t *)buf, buf_size_px);
     return LV_RESULT_OK;

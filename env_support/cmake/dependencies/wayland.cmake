@@ -148,7 +148,38 @@ if(NOT EXISTS ${XDG_SHELL_HEADER} OR NOT EXISTS ${XDG_SHELL_SOURCE})
   endif()
 endif()
 
-set(WAYLAND_PROTOCOL_SOURCES ${XDG_SHELL_SOURCE})
+# xdg-output (always) - used to identify physical outputs by connector name
+set(XDG_OUTPUT_XML
+    "${PROTOCOL_ROOT}/unstable/xdg-output/xdg-output-unstable-v1.xml")
+set(XDG_OUTPUT_HEADER "${PROTOCOLS_DIR}/wayland_xdg_output.h")
+set(XDG_OUTPUT_SOURCE "${PROTOCOLS_DIR}/wayland_xdg_output.c")
+
+if(NOT EXISTS ${XDG_OUTPUT_HEADER} OR NOT EXISTS ${XDG_OUTPUT_SOURCE})
+  execute_process(
+    COMMAND wayland-scanner client-header ${XDG_OUTPUT_XML} ${XDG_OUTPUT_HEADER}
+    RESULT_VARIABLE XDG_OUTPUT_HEADER_RESULT
+    ERROR_VARIABLE XDG_OUTPUT_HEADER_ERROR)
+  if(NOT XDG_OUTPUT_HEADER_RESULT EQUAL 0)
+    message(
+      FATAL_ERROR
+        "lvgl: wayland-scanner failed to generate xdg-output header: ${XDG_OUTPUT_HEADER_ERROR}"
+    )
+  endif()
+
+  execute_process(
+    COMMAND wayland-scanner ${WAYLAND_SCANNER_CODE_MODE} ${XDG_OUTPUT_XML}
+            ${XDG_OUTPUT_SOURCE}
+    RESULT_VARIABLE XDG_OUTPUT_SOURCE_RESULT
+    ERROR_VARIABLE XDG_OUTPUT_SOURCE_ERROR)
+  if(NOT XDG_OUTPUT_SOURCE_RESULT EQUAL 0)
+    message(
+      FATAL_ERROR
+        "lvgl: wayland-scanner failed to generate xdg-output source: ${XDG_OUTPUT_SOURCE_ERROR}"
+    )
+  endif()
+endif()
+
+set(WAYLAND_PROTOCOL_SOURCES ${XDG_SHELL_SOURCE} ${XDG_OUTPUT_SOURCE})
 
 # dmabuf (optional) - used by the DMA-BUF and G2D backends
 if(CONFIG_LV_WAYLAND_USE_DMABUF_PROTOCOL)

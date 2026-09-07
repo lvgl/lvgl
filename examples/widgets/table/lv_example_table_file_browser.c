@@ -331,7 +331,7 @@ void lv_example_table_file_browser(void)
 
     /*Icon column fits a symbol; name column fills the rest of the browser area*/
     int32_t icon_col = 30;
-    int32_t name_col = lv_display_get_horizontal_resolution(NULL) - 100 - icon_col - 16;
+    int32_t name_col = lv_display_get_horizontal_resolution(lv_display_get_default()) - 100 - icon_col - 16;
     lv_table_set_column_count(browser_table, 2);
     lv_table_set_column_width(browser_table, 0, icon_col);
     lv_table_set_column_width(browser_table, 1, name_col);

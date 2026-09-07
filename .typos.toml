@@ -39,6 +39,7 @@ extend-ignore-identifiers-re = [
 ]
 
 [default.extend-words]
+"rsource" = "rsource"
 # https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6loca.html
 "loca" = "loca"
 "viewe" = "viewe"

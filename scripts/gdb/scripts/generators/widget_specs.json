@@ -136,10 +136,17 @@
       "fields": {
         "dark_color": "color",
         "light_color": "color",
+        "data": "string",
+        "pattern": "pointer",
+        "bar_count": "int",
         "scale": "int",
         "direction": "int",
+        "encoding": "int",
         "tiled": "bool",
-        "encoding": "int"
+        "update_mode": "bool",
+        "needs_update": "bool",
+        "render_valid": "bool",
+        "fitting": "bool"
       }
     }
   },
@@ -247,6 +254,8 @@
         "text": "string",
         "symbol": "pointer",
         "options": "string",
+        "text_translation_tag": "string",
+        "options_translation_tag": "string",
         "option_cnt": "int",
         "sel_opt_id": "int",
         "sel_opt_id_orig": "int",
@@ -298,6 +307,8 @@
         "audio_convert": "pointer",
         "video_convert": "pointer",
         "audio_volume": "pointer",
+        "aligned_frame": "pointer",
+        "color_format": "int",
         "gstreamer_timer": "pointer",
         "frame_queue": "pointer",
         "is_video_info_valid": "bool"
@@ -536,13 +547,14 @@
         "quiet_zone": "bool",
         "update_mode": "bool",
         "needs_update": "bool",
-        "render_failed": "bool"
+        "render_valid": "bool"
       }
     }
   },
   "lv_roller": {
     "_auto": {
       "fields": {
+        "options_translation_tag": "string",
         "option_cnt": "int",
         "sel_opt_id": "int",
         "sel_opt_id_ori": "int",

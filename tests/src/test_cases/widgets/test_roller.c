@@ -415,4 +415,73 @@ void test_roller_properties(void)
 #endif
 }
 
+void test_roller_single_option_should_leave_edit_mode_if_released(void)
+{
+    lv_obj_t * roller_one_opt = lv_roller_create(active_screen);
+    lv_roller_set_options(roller_one_opt, "Single", LV_ROLLER_MODE_NORMAL);
+
+    lv_group_t * temp_g = lv_group_create();
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_ENCODER), temp_g);
+    lv_group_add_obj(temp_g, roller_one_opt);
+
+    lv_group_set_editing(temp_g, true);
+    TEST_ASSERT_TRUE(lv_group_get_editing(temp_g));
+
+    lv_test_encoder_click();
+
+    /* A roller with a single option must still be able to leave edit mode on
+     * release, just like a roller with multiple options. */
+    TEST_ASSERT_FALSE(lv_group_get_editing(temp_g));
+
+    lv_group_delete(temp_g);
+}
+
+#if LV_USE_TRANSLATION
+void test_roller_options_translation_tag(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"animals", NULL};
+    static const char * const languages[]    = {"en", "de", NULL};
+    static const char * const translations[] = { "Dog\nLion", "Hund\nLowe" };
+    lv_translation_add_static(languages, tags, translations);
+    lv_translation_set_language("en");
+
+    lv_obj_t * obj = lv_roller_create(active_screen);
+    lv_roller_set_options_translation_tag(obj, "animals", LV_ROLLER_MODE_NORMAL);
+
+    TEST_ASSERT_EQUAL_STRING("Dog\nLion", lv_roller_get_options(obj));
+    TEST_ASSERT_EQUAL(2, lv_roller_get_option_count(obj));
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Hund\nLowe", lv_roller_get_options(obj));
+
+    /* Unknown language translates to the tag */
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING("animals", lv_roller_get_options(obj));
+}
+
+void test_roller_setting_options_disables_translation(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"animals", NULL};
+    static const char * const languages[]    = {"en", "de", NULL};
+    static const char * const translations[] = { "Dog\nLion", "Hund\nLowe" };
+    lv_translation_add_static(languages, tags, translations);
+    lv_translation_set_language("de");
+
+    lv_obj_t * obj = lv_roller_create(active_screen);
+    lv_roller_set_options_translation_tag(obj, "animals", LV_ROLLER_MODE_NORMAL);
+
+    TEST_ASSERT_EQUAL_STRING("Hund\nLowe", lv_roller_get_options(obj));
+
+    /* Using set options should unbind the translation tag*/
+    lv_roller_set_options(obj, "One\nTwo", LV_ROLLER_MODE_NORMAL);
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("One\nTwo", lv_roller_get_options(obj));
+
+    lv_roller_set_options_translation_tag(obj, "animals", LV_ROLLER_MODE_NORMAL);
+    TEST_ASSERT_EQUAL_STRING("Dog\nLion", lv_roller_get_options(obj));
+}
+#endif /*LV_USE_TRANSLATION*/
+
 #endif

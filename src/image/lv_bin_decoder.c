@@ -93,9 +93,8 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_t * decoder;
 
     decoder = lv_image_decoder_create();
-    LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) {
-        LV_LOG_WARN("Out of memory");
+        LV_LOG_WARN("Failed to create decoder");
         return;
     }
 
@@ -109,7 +108,12 @@ void lv_bin_decoder_init(void)
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
-    LV_UNUSED(decoder); /*Unused*/
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(header != NULL, return LV_RESULT_INVALID);
+
+    /*check it even if unused as it might be required in the future*/
+    LV_CHECK_ARG(decoder != NULL, return LV_RESULT_INVALID);
+    LV_UNUSED(decoder);
 
     const void * src = dsc->src;
     lv_image_src_t src_type = dsc->src_type;
@@ -172,15 +176,10 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
     return LV_RESULT_OK;
 }
 
-/**
- * Decode an image from a binary file
- * @param decoder pointer to the decoder
- * @param dsc     pointer to the decoder descriptor
- * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
- */
 lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
 
     lv_result_t res = LV_RESULT_INVALID;
     lv_fs_res_t fs_res = LV_FS_RES_UNKNOWN;
@@ -383,7 +382,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
 void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    LV_UNUSED(decoder); /*Unused*/
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_UNUSED(decoder);
 
     decoder_data_t * decoder_data = dsc->user_data;
     if(decoder_data && decoder_data->decoded_partial) {
@@ -397,9 +397,13 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area)
 {
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(full_area != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(decoded_area != NULL, return LV_RESULT_INVALID);
+
     LV_UNUSED(decoder);
     lv_color_format_t cf = dsc->header.cf;
-    LV_CHECK_ARG(
+    LV_CHECK_ARG_FORMAT_MSG(
         LV_COLOR_FORMAT_IS_INDEXED(cf)
         || cf == LV_COLOR_FORMAT_ARGB8888
         || cf == LV_COLOR_FORMAT_XRGB8888
@@ -409,9 +413,9 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         || cf == LV_COLOR_FORMAT_ARGB8565
         || cf == LV_COLOR_FORMAT_RGB565A8,
         return LV_RESULT_INVALID, "Unsupported color format 0x%02x", cf);
-    LV_CHECK_ARG(full_area->x1 >= 0 && full_area->x2 < (int32_t)dsc->header.w && full_area->y1 >= 0 &&
-                 full_area->y2 < (int32_t)dsc->header.h, return LV_RESULT_INVALID, "Area outside image bounds");
-    LV_CHECK_ARG(dsc->user_data, return LV_RESULT_INVALID, "decoder data unavailable")
+    LV_CHECK_ARG_MSG(full_area->x1 >= 0 && full_area->x2 < (int32_t)dsc->header.w && full_area->y1 >= 0 &&
+                     full_area->y2 < (int32_t)dsc->header.h, return LV_RESULT_INVALID, "Area outside image bounds");
+    LV_CHECK_ARG_MSG(dsc->user_data, return LV_RESULT_INVALID, "decoder data unavailable");
 
     lv_fs_res_t res = LV_FS_RES_UNKNOWN;
     decoder_data_t * decoder_data = dsc->user_data;
@@ -532,6 +536,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
 static decoder_data_t * get_decoder_data(lv_image_decoder_dsc_t * dsc)
 {
+    LV_ASSERT(dsc != NULL);
     decoder_data_t * data = dsc->user_data;
     if(data == NULL) {
         data = lv_malloc_zeroed(sizeof(decoder_data_t));
@@ -549,6 +554,7 @@ static decoder_data_t * get_decoder_data(lv_image_decoder_dsc_t * dsc)
 
 static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
 {
+    LV_ASSERT(dsc != NULL);
     decoder_data_t * decoder_data = dsc->user_data;
     if(decoder_data == NULL) return;
 
@@ -567,6 +573,7 @@ static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
 static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
+    LV_ASSERT(dsc != NULL);
     lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
@@ -696,6 +703,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 #else
 
     LV_UNUSED(decoder); /*Unused*/
+    LV_ASSERT(dsc != NULL);
 
     lv_fs_res_t res;
     uint32_t rn;
@@ -786,6 +794,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
+    LV_ASSERT(dsc != NULL);
     lv_fs_res_t res;
     decoder_data_t * decoder_data = dsc->user_data;
     lv_fs_file_t * f = decoder_data->f;
@@ -839,6 +848,7 @@ static inline uint8_t bit_extend(uint8_t value, uint8_t bpp)
 static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
+    LV_ASSERT(dsc != NULL);
     lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
@@ -919,6 +929,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t rn;
     uint32_t len;
     uint32_t compressed_len;
+    LV_ASSERT(dsc != NULL);
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     lv_result_t res;
     lv_fs_res_t fs_res;
@@ -1032,9 +1043,128 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 #endif
 }
 
+static lv_result_t decode_indexed_line_i1(const lv_color32_t * palette, int32_t x,
+                                          int32_t w_px, const uint8_t * in, lv_color32_t * out)
+{
+    /*8 pixels per byte, MSB first (bit 7 is the left-most pixel)*/
+    in += x >> 3;
+    int32_t shift = 7 - (x & 0x7);
+
+    int32_t i = 0;
+
+    /*Head: consume the rest of the first byte so the main loop starts byte-aligned.
+     *Skipped entirely when x is already byte-aligned (shift == 7).*/
+    if(shift != 7) {
+        uint8_t byte = *in++;
+        while(shift >= 0 && i < w_px) {
+            out[i++] = palette[(byte >> shift) & 0x1];
+            shift--;
+        }
+    }
+
+    /*Body: one full byte -> 8 pixels per iteration, fully unrolled.
+     *No per-pixel branch or shift bookkeeping, so the compiler can pipeline it.*/
+    for(; i + 8 <= w_px; i += 8) {
+        uint8_t byte = *in++;
+        out[i + 0] = palette[(byte >> 7) & 0x1];
+        out[i + 1] = palette[(byte >> 6) & 0x1];
+        out[i + 2] = palette[(byte >> 5) & 0x1];
+        out[i + 3] = palette[(byte >> 4) & 0x1];
+        out[i + 4] = palette[(byte >> 3) & 0x1];
+        out[i + 5] = palette[(byte >> 2) & 0x1];
+        out[i + 6] = palette[(byte >> 1) & 0x1];
+        out[i + 7] = palette[(byte >> 0) & 0x1];
+    }
+
+    /*Tail: the remaining 1..7 pixels of the last partial byte.*/
+    if(i < w_px) {
+        uint8_t byte = *in;
+        shift = 7;
+        for(; i < w_px; i++) {
+            out[i] = palette[(byte >> shift) & 0x1];
+            shift--;
+        }
+    }
+
+    return LV_RESULT_OK;
+}
+
+
+static lv_result_t decode_indexed_line_i2(const lv_color32_t * palette, int32_t x,
+                                          int32_t w_px, const uint8_t * in, lv_color32_t * out)
+{
+    /*4 pixels per byte, MSB first: bits 6-7, 4-5, 2-3, 0-1.*/
+    in += x >> 2;
+    int32_t shift = 6 - 2 * (x & 0x3);
+
+    int32_t i = 0;
+
+    /*Head: consume the rest of the first byte so the main loop starts byte-aligned.
+     *Skipped entirely when x is already byte-aligned (shift == 6).*/
+    if(shift != 6) {
+        uint8_t byte = *in++;
+        while(shift >= 0 && i < w_px) {
+            out[i++] = palette[(byte >> shift) & 0x3];
+            shift -= 2;
+        }
+    }
+
+    /*Body: one full byte -> 4 pixels per iteration, fully unrolled.*/
+    for(; i + 4 <= w_px; i += 4) {
+        uint8_t byte = *in++;
+        out[i + 0] = palette[(byte >> 6) & 0x3];
+        out[i + 1] = palette[(byte >> 4) & 0x3];
+        out[i + 2] = palette[(byte >> 2) & 0x3];
+        out[i + 3] = palette[(byte >> 0) & 0x3];
+    }
+
+    /*Tail: the remaining 1..3 pixels of the last partial byte.*/
+    if(i < w_px) {
+        uint8_t byte = *in;
+        shift = 6;
+        for(; i < w_px; i++) {
+            out[i] = palette[(byte >> shift) & 0x3];
+            shift -= 2;
+        }
+    }
+
+    return LV_RESULT_OK;
+}
+
+static lv_result_t decode_indexed_line_i4(const lv_color32_t * palette, int32_t x,
+                                          int32_t w_px, const uint8_t * in, lv_color32_t * out)
+{
+    /*2 pixels per byte: high nibble (bits 4-7) is the left pixel, low nibble (bits 0-3) the right.*/
+    in += x >> 1;
+
+    int32_t i = 0;
+
+    /*Head: if x is odd we start mid-byte at the low nibble; consume it to byte-align.*/
+    if((x & 0x1) && i < w_px) {
+        out[i++] = palette[*in++ & 0x0F];
+    }
+
+    /*Body: one full byte -> 2 pixels per iteration, unrolled.*/
+    for(; i + 2 <= w_px; i += 2) {
+        uint8_t byte = *in++;
+        out[i + 0] = palette[byte >> 4];
+        out[i + 1] = palette[byte & 0x0F];
+    }
+
+    /*Tail: one pixel left -> high nibble of the last byte.*/
+    if(i < w_px) {
+        out[i] = palette[*in >> 4];
+    }
+
+    return LV_RESULT_OK;
+}
+
 static lv_result_t decode_indexed_line_i8(const lv_color32_t * palette, int32_t x,
                                           int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
+    LV_ASSERT(palette != NULL);
+    LV_ASSERT(in != NULL);
+    LV_ASSERT(out != NULL);
     in += x;
 
     for(int32_t i = 0; i < w_px; i++) {
@@ -1047,50 +1177,24 @@ static lv_result_t decode_indexed_line_i8(const lv_color32_t * palette, int32_t 
 static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
                                        int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
-    uint8_t px_size;
-    uint16_t mask;
-
-    int8_t shift   = 0;
     switch(color_format) {
         case LV_COLOR_FORMAT_I1:
-            px_size = 1;
-            in += x / 8;                /*8pixel per byte*/
-            shift = 7 - (x & 0x7);
-            break;
+            return decode_indexed_line_i1(palette, x, w_px, in, out);
         case LV_COLOR_FORMAT_I2:
-            px_size = 2;
-            in += x / 4;                /*4pixel per byte*/
-            shift = 6 - 2 * (x & 0x3);
-            break;
+            return decode_indexed_line_i2(palette, x, w_px, in, out);
         case LV_COLOR_FORMAT_I4:
-            px_size = 4;
-            in += x / 2;                /*2pixel per byte*/
-            shift = 4 - 4 * (x & 0x1);
-            break;
+            return decode_indexed_line_i4(palette, x, w_px, in, out);
         case LV_COLOR_FORMAT_I8:
             return decode_indexed_line_i8(palette, x, w_px, in, out);
         default:
             return LV_RESULT_INVALID;
     }
-
-    mask   = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
-
-    int32_t i;
-    for(i = 0; i < w_px; i++) {
-        uint8_t val_act = (*in >> shift) & mask;
-        out[i] = palette[val_act];
-
-        shift -= px_size;
-        if(shift < 0) {
-            shift = 8 - px_size;
-            in++;
-        }
-    }
-    return LV_RESULT_OK;
 }
 
 static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, uint32_t btr, uint32_t * br)
 {
+    LV_ASSERT(f != NULL);
+    LV_ASSERT(buff != NULL);
     lv_fs_res_t res;
     if(br) *br = 0;
 
@@ -1109,6 +1213,8 @@ static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, 
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed)
 {
+    LV_ASSERT(dsc != NULL);
+    LV_ASSERT(compressed != NULL);
     /* At least one compression method must be enabled */
 #if (LV_USE_LZ4 || LV_USE_RLE)
     /* Check if the decompression method is enabled and valid */

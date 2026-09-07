@@ -62,7 +62,7 @@ config LV_NUTTX_LCD_BUFFER_SIZE
 	depends on LV_NUTTX_LCD_CUSTOM_BUFFER
 	depends on LV_USE_NUTTX_LCD
 	default 60
-	
+
 
 config LV_USE_NUTTX_TOUCHSCREEN
 	bool "Touchscreen"

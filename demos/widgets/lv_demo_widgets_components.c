@@ -113,7 +113,8 @@ void lv_demo_widgets_components_init(void)
 #endif
     }
 #if LV_USE_THEME_DEFAULT
-    lv_theme_default_init(NULL, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), LV_THEME_DEFAULT_DARK,
+    lv_theme_default_init(lv_display_get_default(), lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
+                          LV_THEME_DEFAULT_DARK,
                           font_normal);
 #endif
 

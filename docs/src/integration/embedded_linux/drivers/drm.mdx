@@ -27,7 +27,8 @@ modesetting, atomic page flips, and a path to GPU acceleration.
 
 ## Configuration
 
-Enable <ApiLink name="LV_USE_LINUX_DRM" />, and set <ApiLink name="LV_COLOR_DEPTH" /> to `32` or `16`.
+Enable <ApiLink name="LV_USE_LINUX_DRM" />, and set <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> to
+<ApiLink name="LV_COLOR_FORMAT_XRGB8888" /> or <ApiLink name="LV_COLOR_FORMAT_RGB565" />.
 
 ## Building
 
@@ -172,7 +173,7 @@ The callback must always return a valid index in `0 .. mode_count - 1`. Passing 
 | Rotation | None | None | Hardware (GPU) |
 | Runtime resolution change | No | No | Yes |
 | Runtime color format change | No | No | No |
-| Color formats | RGB565 or XRGB8888, from <ApiLink name="LV_COLOR_DEPTH" /> | XRGB8888, from <ApiLink name="LV_COLOR_DEPTH" /> | RGB565 or ARGB8888, from <ApiLink name="LV_COLOR_DEPTH" /> |
+| Color formats | RGB565 or XRGB8888, from <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> | XRGB8888, from <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> | RGB565 or ARGB8888, from <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> |
 | Multiple displays / windows | One display per DRM device | One display per DRM device | One display per DRM device |
 | Hardware acceleration | None | Buffer allocation only | OpenGL ES |
 | Render mode | Direct | Direct | Full with NanoVG, otherwise Direct |

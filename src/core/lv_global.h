@@ -80,6 +80,9 @@ typedef struct _lv_global_t {
 
     lv_ll_t style_trans_ll;
     bool style_refresh;
+    /** Number of widgets that currently have blur or a drop shadow (see
+     * lv_obj_t::has_blur). If it is zero lv_obj_invalidate_expand_blur() is skipped. */
+    uint32_t blur_obj_cnt;
     uint32_t style_custom_table_size;
     uint32_t style_last_custom_prop_id;
     uint8_t * style_custom_prop_flag_lookup_table;
@@ -121,6 +124,11 @@ typedef struct _lv_global_t {
 
     lv_draw_global_info_t draw_info;
     lv_ll_t draw_sw_blend_handler_ll;
+
+#if LV_USE_OBSERVER
+    lv_ll_t subject_ll;
+#endif
+
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif

@@ -8,7 +8,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_svg_data[] = "<svg width=\"12cm\" heigh
 
 const lv_image_dsc_t img_svg_img = {
     .header = {
-        .cf = LV_COLOR_FORMAT_NATIVE,
+        .cf = LV_COLOR_FORMAT_DEFAULT,
         .w = 450,
         .h = 150,
         .stride = 0,
