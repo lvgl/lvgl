@@ -513,6 +513,8 @@
 
 /** Accelerate blends, fills and transforms with the PPA (Pixel Processing
  *  Accelerator) peripheral of Espressif SoCs.
+ *
+ *  Enable: LV_USE_DRAW_SW
  */
 #define LV_USE_PPA 0
 

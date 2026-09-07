@@ -158,6 +158,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     u->task_act = t;
     u->task_act->draw_unit = draw_unit;
+    u->img_sw_fallback = false;
 
     ppa_execute_drawing(u);
 
@@ -193,7 +194,7 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
             lv_draw_buf_invalidate_cache(buf, &area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &area);
+            lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
             lv_draw_buf_invalidate_cache(buf, &area);
             break;
         default:
