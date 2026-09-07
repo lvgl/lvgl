@@ -298,7 +298,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     LV_PROFILER_STYLE_END;
 }
 
-void lv_obj_style_set_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool en)
+void lv_obj_set_style_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool en)
 {
     LV_CHECK_ARG(obj != NULL, return);
     LV_CHECK_ARG(style != NULL, return);
@@ -313,7 +313,7 @@ void lv_obj_style_set_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
     lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), LV_STYLE_PROP_ANY);
 }
 
-bool lv_obj_style_get_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+bool lv_obj_get_style_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
     LV_CHECK_ARG(obj != NULL, return false);
     LV_CHECK_ARG(style != NULL, return false);
@@ -326,16 +326,16 @@ bool lv_obj_style_get_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
 
 void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis)
 {
-    LV_LOG_DEPRECATED("use lv_obj_style_set_enabled instead (with inverted logic).");
+    LV_LOG_DEPRECATED("use lv_obj_set_style_enabled instead (with inverted logic).");
     LV_CHECK_ARG(obj != NULL, return);
     LV_CHECK_ARG(style != NULL, return);
 
-    lv_obj_style_set_enabled(obj, style, selector, !dis);
+    lv_obj_set_style_enabled(obj, style, selector, !dis);
 }
 
 bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
-    LV_LOG_DEPRECATED("use lv_obj_style_get_enabled instead (with inverted logic).");
+    LV_LOG_DEPRECATED("use lv_obj_get_style_enabled instead (with inverted logic).");
     LV_CHECK_ARG(obj != NULL, return false);
     LV_CHECK_ARG(style != NULL, return false);
 
@@ -1569,7 +1569,7 @@ static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subj
 
     int32_t v = lv_subject_get_int(subject);
     bool en = (v == p->value);
-    lv_obj_style_set_enabled(observer->target, p->style, p->selector, en);
+    lv_obj_set_style_enabled(observer->target, p->style, p->selector, en);
 }
 
 static void bind_style_prop_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
