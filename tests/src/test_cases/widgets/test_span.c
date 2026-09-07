@@ -431,10 +431,10 @@ void test_spangroup_get_span_coords(void)
     /* Define expected coordinates for testing */
     const lv_span_coords_t test_coords[] = {
         {.heading = {.x1 = 40, .y1 = 20, .x2 = 280, .y2 = 20}, .middle = {.x1 = 40, .y1 = 20, .x2 = 241, .y2 = 36}, .trailing = {.x1 = 0, .y1 = 0, .x2 = 0, .y2 = 0}},
-        {.heading = {.x1 = 241, .y1 = 20, .x2 = 280, .y2 = 36}, .middle = {.x1 = 20, .y1 = 36, .x2 = 280, .y2 = 63}, .trailing = {.x1 = 20, .y1 = 63, .x2 = 155, .y2 = 90}},
-        {.heading = {.x1 = 155, .y1 = 63, .x2 = 280, .y2 = 90}, .middle = {.x1 = 20, .y1 = 90, .x2 = 280, .y2 = 90}, .trailing = {.x1 = 20, .y1 = 90, .x2 = 188, .y2 = 112}},
-        {.heading = {.x1 = 188, .y1 = 90, .x2 = 280, .y2 = 112}, .middle = {.x1 = 20, .y1 = 112, .x2 = 280, .y2 = 112}, .trailing = {.x1 = 20, .y1 = 112, .x2 = 116, .y2 = 134}},
-        {.heading = {.x1 = 116, .y1 = 112, .x2 = 280, .y2 = 134}, .middle = {.x1 = 20, .y1 = 134, .x2 = 280, .y2 = 134}, .trailing = {.x1 = 20, .y1 = 134, .x2 = 160, .y2 = 150}}
+        {.heading = {.x1 = 241, .y1 = 20, .x2 = 280, .y2 = 36}, .middle = {.x1 = 20, .y1 = 36, .x2 = 280, .y2 = 63}, .trailing = {.x1 = 20, .y1 = 63, .x2 = 106, .y2 = 90}},
+        {.heading = {.x1 = 106, .y1 = 63, .x2 = 280, .y2 = 90}, .middle = {.x1 = 20, .y1 = 90, .x2 = 280, .y2 = 90}, .trailing = {.x1 = 20, .y1 = 90, .x2 = 135, .y2 = 112}},
+        {.heading = {.x1 = 135, .y1 = 90, .x2 = 280, .y2 = 112}, .middle = {.x1 = 20, .y1 = 112, .x2 = 280, .y2 = 112}, .trailing = {.x1 = 20, .y1 = 112, .x2 = 84, .y2 = 134}},
+        {.heading = {.x1 = 84, .y1 = 112, .x2 = 280, .y2 = 134}, .middle = {.x1 = 20, .y1 = 134, .x2 = 280, .y2 = 134}, .trailing = {.x1 = 20, .y1 = 134, .x2 = 118, .y2 = 150}}
     };
 
     /* Define colors for visual testing */
@@ -730,6 +730,47 @@ void test_spangroup_ellipsis_multiline_truncated(void)
     lv_span_set_text(span, "This text is long enough to wrap into three or more lines in a 100px container");
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_17.png");
+}
+
+/**
+ * Issue #10493: white space hangs only where the line actually breaks. A space
+ * which ends a span in the middle of a line is really used, so the next span
+ * has to start after it. lv_text_get_next_line() cannot see the next span, so
+ * it only lets the space hang when the line was broken by wrapping.
+ */
+void test_spangroup_keeps_the_space_which_ends_a_span(void)
+{
+    active_screen = lv_screen_active();
+
+    /*Wide enough that both spans land on the same line*/
+    lv_obj_t * with_space = lv_spangroup_create(active_screen);
+    lv_obj_set_width(with_space, 400);
+    lv_obj_set_height(with_space, LV_SIZE_CONTENT);
+    lv_span_set_text(lv_spangroup_add_span(with_space), "The quick brown fox. ");
+    lv_span_t * tail_after_space = lv_spangroup_add_span(with_space);
+    lv_span_set_text(tail_after_space, "abcdefghijklmn");
+    lv_spangroup_refresh(with_space);
+
+    lv_obj_t * without_space = lv_spangroup_create(active_screen);
+    lv_obj_set_width(without_space, 400);
+    lv_obj_set_height(without_space, LV_SIZE_CONTENT);
+    lv_span_set_text(lv_spangroup_add_span(without_space), "The quick brown fox.");
+    lv_span_t * tail_no_space = lv_spangroup_add_span(without_space);
+    lv_span_set_text(tail_no_space, "abcdefghijklmn");
+    lv_spangroup_refresh(without_space);
+
+    lv_obj_update_layout(active_screen);
+
+    const int32_t after_space = lv_spangroup_get_span_coords(with_space, tail_after_space).heading.x1;
+    const int32_t no_space = lv_spangroup_get_span_coords(without_space, tail_no_space).heading.x1;
+
+    /*The two spans must not run together: the second one starts one space later*/
+    const lv_font_t * font = lv_obj_get_style_text_font(with_space, LV_PART_MAIN);
+    const int32_t space_w = lv_font_get_glyph_width(font, ' ', 'a');
+    TEST_ASSERT_EQUAL(no_space + space_w, after_space);
+
+    lv_obj_delete(with_space);
+    lv_obj_delete(without_space);
 }
 
 #endif

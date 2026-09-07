@@ -602,11 +602,11 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 
     int32_t x = 0;
     if(align == LV_TEXT_ALIGN_CENTER) {
-        const int32_t line_w = lv_text_get_width(&txt[line_start], new_line_start - line_start, font, &attributes);
+        const int32_t line_w = lv_text_get_line_width(&txt[line_start], new_line_start - line_start, font, &attributes);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
     }
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        const int32_t line_w = lv_text_get_width(&txt[line_start], new_line_start - line_start, font, &attributes);
+        const int32_t line_w = lv_text_get_line_width(&txt[line_start], new_line_start - line_start, font, &attributes);
         x += lv_area_get_width(&txt_coords) - line_w;
     }
 
@@ -1540,11 +1540,11 @@ static void calculate_x_coordinate(int32_t * x, const lv_text_align_t align, con
     LV_ASSERT(font != NULL);
     LV_ASSERT(txt_coords != NULL);
     if(align == LV_TEXT_ALIGN_CENTER) {
-        const int32_t line_w = lv_text_get_width(txt, length, font, attributes);
+        const int32_t line_w = lv_text_get_line_width(txt, length, font, attributes);
         *x += lv_area_get_width(txt_coords) / 2 - line_w / 2;
     }
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        const int32_t line_w = lv_text_get_width(txt, length, font, attributes);
+        const int32_t line_w = lv_text_get_line_width(txt, length, font, attributes);
         *x += lv_area_get_width(txt_coords) - line_w;
     }
     else {
