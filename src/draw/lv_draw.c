@@ -475,7 +475,7 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
 
     LV_PROFILER_DRAW_BEGIN;
     lv_layer_init(layer);
-    lv_display_t * disp = lv_refr_get_disp_refreshing();
+    lv_display_t * disp = parent_layer ? parent_layer->display : lv_refr_get_disp_refreshing();
 
     layer->parent = parent_layer;
     layer->_clip_area = *area;
