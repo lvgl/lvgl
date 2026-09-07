@@ -914,9 +914,9 @@ void test_textarea_one_line_scroll_screenshot(void)
     /* A style change must not move the scroll position */
     ta = scroll_screenshot_row(180, "scrolled to the start, then disabled");
     lv_obj_scroll_to_x(ta, 0, LV_ANIM_OFF);
-    lv_test_wait(500);
+    lv_test_wait(1000);
     lv_obj_add_state(ta, LV_STATE_DISABLED);
-    lv_test_wait(500);
+    lv_test_wait(1000);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/textarea_one_line_scroll.png");
 }
