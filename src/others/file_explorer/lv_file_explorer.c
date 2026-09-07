@@ -537,11 +537,15 @@ static void browser_file_event_handler(lv_event_t * e)
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
-    lv_indev_type_t type = lv_indev_get_type(lv_indev_active());
-    lv_event_code_t active_code = type == LV_INDEV_TYPE_POINTER ||
-                                  type == LV_INDEV_TYPE_BUTTON ? LV_EVENT_VALUE_CHANGED : LV_EVENT_CLICKED;
+    lv_indev_t * indev = lv_indev_active();
+    lv_event_code_t active_code;
+    if(indev) {
+        lv_indev_type_t type = lv_indev_get_type(indev);
+        active_code = type == LV_INDEV_TYPE_POINTER ||
+                      type == LV_INDEV_TYPE_BUTTON ? LV_EVENT_VALUE_CHANGED : LV_EVENT_CLICKED;
+    }
 
-    if(code == active_code) {
+    if(indev && code == active_code) {
         char file_name[LV_FILE_EXPLORER_PATH_MAX_LEN];
         const char * selected_text = NULL;
         const lv_file_explorer_file_table_entry_data_t * file_entry_user_data = NULL;
