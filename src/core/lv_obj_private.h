@@ -159,6 +159,11 @@ struct _lv_obj_t {
     /** The widget is rendered at least once already.
      * It's used to skip initial animations and transitions. */
     uint16_t rendered : 1;
+
+    /** The widget has blur or a drop shadow in its current state, so a change
+     * behind it must invalidate its full extent. It's updated by
+     * lv_obj_update_blur_status() and counted in blur_obj_cnt in lv_global_t. */
+    uint16_t has_blur : 1;
 };
 
 /**********************
@@ -174,6 +179,16 @@ lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj);
 
 lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child);
 void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child);
+
+/**
+ * Expand the display's invalidated areas to cover blur objects whose background
+ * changed. It's called once per frame and invalidates the full extent of every
+ * blur object that overlaps an invalidated area, repeating the walk until a
+ * pass adds no new areas to cover transitive blur-over-blur cases.
+ * Does nothing while no widget has blur (blur_obj_cnt in lv_global_t is zero).
+ * @param disp  pointer to a display
+ */
+void lv_obj_invalidate_expand_blur(lv_display_t * disp);
 
 /**********************
  *      MACROS
