@@ -27,12 +27,23 @@ def create_argument_parser() -> argparse.ArgumentParser:
         default="HEAD",
     )
 
-    parser.add_argument(
+    scope = parser.add_mutually_exclusive_group()
+
+    scope.add_argument(
         "--path",
         metavar="PATH",
         help=(
             "Analyze coverage for a single file or a directory (relative or absolute path). "
             "When specified, --commit is ignored."
+        ),
+    )
+
+    scope.add_argument(
+        "--overall-only",
+        action="store_true",
+        help=(
+            "Only compute the overall project coverage and skip the patch "
+            "analysis. Useful to export a baseline on a push build."
         ),
     )
 
@@ -59,6 +70,22 @@ def create_argument_parser() -> argparse.ArgumentParser:
             "Skip --fail-under enforcement when new coverable lines < N. "
             "Small patches produce noisy percentages; this avoids false positives. "
             "Default: 0 (always enforce)"
+        ),
+    )
+
+    parser.add_argument(
+        "--overall-out",
+        metavar="PATH",
+        help="Export the overall project coverage totals to this JSON file",
+    )
+
+    parser.add_argument(
+        "--baseline",
+        metavar="PATH",
+        help=(
+            "A JSON file exported by an earlier --overall-out run, typically the "
+            "latest master build. Its totals turn the overall coverage in the PR "
+            "report into a trend. Missing or unreadable is not an error."
         ),
     )
 
@@ -172,7 +199,7 @@ def get_coverage_data(root: str) -> Dict[str, Dict[int, int]]:
 
 
 def check_commit_coverage(
-    commit: str, root: str
+    commit: str, root: str, coverage_data: Dict[str, Dict[int, int]]
 ) -> Tuple[int, int, List[Tuple[str, int]], int]:
     """
     Check coverage for a commit or range
@@ -201,9 +228,6 @@ def check_commit_coverage(
     print(f"Found changes in {len(changed_lines)} files (before filtering):")
     for filename, lines in sorted(changed_lines.items()):
         print(f"  {filename}: {len(lines)} lines changed")
-
-    print("Getting coverage data...")
-    coverage_data = get_coverage_data(root)
 
     # Normalize changed file paths to POSIX separators for matching.
     normalized_changed: Dict[str, Set[int]] = {
@@ -244,7 +268,9 @@ def check_commit_coverage(
     return covered_lines, total_new_lines, uncovered_lines, skipped_noncoverable
 
 
-def check_path_coverage(path: str, root: str) -> Tuple[int, int, List[Tuple[str, int]]]:
+def check_path_coverage(
+    path: str, root: str, coverage_data: Dict[str, Dict[int, int]]
+) -> Tuple[int, int, List[Tuple[str, int]]]:
     """
     Compute coverage for a specific file or directory.
     Returns: (covered_lines, total_coverable_lines, uncovered_lines)
@@ -255,9 +281,6 @@ def check_path_coverage(path: str, root: str) -> Tuple[int, int, List[Tuple[str,
     """
     # Normalize input path
     abs_path = os.path.abspath(path)
-    if not os.path.exists(abs_path):
-        print(f"Error: The specified path does not exist: {abs_path}", file=sys.stderr)
-        sys.exit(1)
 
     # Ensure we operate from repo root to construct relative POSIX paths
     root = os.path.abspath(root)
@@ -265,9 +288,6 @@ def check_path_coverage(path: str, root: str) -> Tuple[int, int, List[Tuple[str,
     # Build relative POSIX target(s)
     rel = os.path.relpath(abs_path, root)
     rel_posix = rel.replace(os.path.sep, "/")
-
-    print("Getting coverage data...")
-    coverage_data = get_coverage_data(root)
 
     covered = 0
     total = 0
@@ -308,6 +328,88 @@ def check_path_coverage(path: str, root: str) -> Tuple[int, int, List[Tuple[str,
             )
 
     return covered, total, uncovered
+
+
+def overall_coverage(coverage_data: Dict[str, Dict[int, int]]) -> Tuple[int, int]:
+    """
+    Aggregate every coverable line gcovr reported.
+    Returns: (covered_lines, total_coverable_lines)
+    The scope is whatever gcovr.cfg selects, so it matches the patch numbers.
+    """
+    covered = 0
+    total = 0
+    for line_map in coverage_data.values():
+        for count in line_map.values():
+            total += 1
+            if count > 0:
+                covered += 1
+    return covered, total
+
+
+def percent_of(covered: int, total: int) -> Optional[float]:
+    """Coverage percentage, or None when there is nothing to cover"""
+    return covered / total * 100.0 if total else None
+
+
+def export_overall(covered: int, total: int, root: str, output_path: str) -> None:
+    """Export the overall totals so a later run can use them as a baseline"""
+    data = {
+        "commit": run_git_command(["rev-parse", "HEAD"], cwd=root).strip(),
+        "covered": covered,
+        "total": total,
+        "percent": percent_of(covered, total),
+    }
+    directory = os.path.dirname(os.path.abspath(output_path))
+    os.makedirs(directory, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=1)
+        f.write("\n")
+    print(f"Exported the overall coverage totals to {output_path}")
+
+
+def read_baseline(path: str) -> Optional[Dict]:
+    """
+    Load the totals exported by an earlier --overall-out run.
+    A missing or unusable baseline only costs us the trend, so warn and go on.
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"Warning: cannot read the coverage baseline '{path}': {e}")
+        return None
+
+    usable = (
+        isinstance(data, dict)
+        and isinstance(data.get("covered"), int)
+        and isinstance(data.get("total"), int)
+        and data["total"] > 0
+    )
+    if not usable:
+        print(f"Warning: the coverage baseline '{path}' has no usable totals")
+        return None
+
+    commit = data.get("commit")
+    data["commit"] = commit if isinstance(commit, str) and commit else "unknown"
+
+    print(
+        f"Baseline: {data['covered']}/{data['total']} = "
+        f"{percent_of(data['covered'], data['total']):.2f}% ({data['commit']})"
+    )
+    return data
+
+
+def overall_summary(covered: int, total: int, baseline: Optional[Dict]) -> str:
+    """Render the `overall ...` part of the PR report coverage line"""
+    now = percent_of(covered, total)
+    if now is None:
+        return ""
+
+    before = percent_of(baseline["covered"], baseline["total"]) if baseline else None
+    if before is None:
+        return f"overall {now:.2f}%"
+
+    return f"overall {now:.2f}% (vs master {before:.2f}%, {now - before:+.2f}%)"
 
 
 def report_coverage(
@@ -374,33 +476,52 @@ def report_coverage(
 
 
 def write_pr_report(covered: int, total: int, fail_under: float,
-                    min_lines: int, output_path: str) -> None:
+                    min_lines: int, output_path: str,
+                    overall_covered: int = 0, overall_total: int = 0,
+                    baseline: Optional[Dict] = None) -> None:
     """Emit the `Coverage` section of the PR report comment.
-    Reports coverage of the lines the pull request changed
+    Reports coverage of the lines the pull request changed, followed by the
+    overall project coverage and, with a baseline, how it moved.
+    The icon still reflects the changed lines only, since that is what gates.
     """
 
     if total == 0:
-        write_report(output_path, section="Coverage", icon="skip",
-                     summary="no coverable lines changed")
-        return
-
-    percent = covered / total * 100.0
-    too_small = 0 < total < min_lines
-    if too_small:
-        icon, summary = "info", (
-            f"{percent:.1f}% of {total} changed line(s) "
-            f"(too few to enforce {fail_under:g}%)"
-        )
-    elif percent < fail_under:
-        icon, summary = "fail", (
-            f"{percent:.1f}% of {total} changed line(s), below {fail_under:g}%"
-        )
+        icon, summary = "skip", "no coverable lines changed"
+        details = ""
     else:
-        icon, summary = "ok", f"{percent:.1f}% of {total} changed line(s)"
+        percent = covered / total * 100.0
+        too_small = 0 < total < min_lines
+        if too_small:
+            icon, summary = "info", (
+                f"{percent:.1f}% of {total} changed line(s) "
+                f"(too few to enforce {fail_under:g}%)"
+            )
+        elif percent < fail_under:
+            icon, summary = "fail", (
+                f"{percent:.1f}% of {total} changed line(s), below {fail_under:g}%"
+            )
+        else:
+            icon, summary = "ok", f"{percent:.1f}% of {total} changed line(s)"
+        details = (f"{covered} of {total} newly coverable line(s) are "
+                   f"covered by the test suite.")
+
+    overall = overall_summary(overall_covered, overall_total, baseline)
+    if overall:
+        summary = f"{summary} · {overall}"
+        overall_details = (
+            f"Overall: {overall_covered} of {overall_total} coverable line(s) "
+            f"are covered by the test suite."
+        )
+        if baseline:
+            overall_details += (
+                f" The latest master build, `{baseline['commit'][:9]}`, covered "
+                f"{baseline['covered']} of {baseline['total']}. Commits merged to "
+                f"master since this branch was cut also move that comparison."
+            )
+        details = f"{details}\n\n{overall_details}" if details else overall_details
 
     write_report(output_path, section="Coverage", icon=icon, summary=summary,
-                 details=f"{covered} of {total} newly coverable line(s) are "
-                         f"covered by the test suite.")
+                 details=details)
 
 
 def main() -> int:
@@ -414,10 +535,39 @@ def main() -> int:
         os.chdir(root)
         print(f"Current working directory: {root}")
 
+        if args.path and not os.path.exists(os.path.abspath(args.path)):
+            print(
+                "Error: The specified path does not exist: "
+                f"{os.path.abspath(args.path)}",
+                file=sys.stderr,
+            )
+            return 1
+
+        # A single gcovr pass feeds both the overall and the patch numbers.
+        print("Getting coverage data...")
+        coverage_data = get_coverage_data(root)
+
+        overall_covered, overall_total = overall_coverage(coverage_data)
+        overall_percent = percent_of(overall_covered, overall_total)
+        print(
+            f"Overall coverage: {overall_covered}/{overall_total}"
+            + (f" = {overall_percent:.2f}%" if overall_percent is not None else "")
+        )
+
+        if args.overall_out:
+            export_overall(overall_covered, overall_total, root, args.overall_out)
+
+        baseline = read_baseline(args.baseline) if args.baseline else None
+
+        if args.overall_only:
+            return 0
+
         if args.path:
             # Path mode: ignore commit, compute coverage for file/dir
             # --min-lines is not applied here since it targets patch (commit) mode.
-            covered, total, uncovered = check_path_coverage(args.path, root)
+            covered, total, uncovered = check_path_coverage(
+                args.path, root, coverage_data
+            )
 
             return report_coverage(
                 header=f"'{args.path}'",
@@ -430,12 +580,13 @@ def main() -> int:
         else:
             # Commit mode: default behavior
             covered, total, uncovered, skipped_noncoverable = check_commit_coverage(
-                args.commit, root
+                args.commit, root, coverage_data
             )
 
             if args.report:
                 write_pr_report(covered, total, args.fail_under,
-                                args.min_lines, args.report)
+                                args.min_lines, args.report,
+                                overall_covered, overall_total, baseline)
 
             return report_coverage(
                 header=f"commit {args.commit}",
