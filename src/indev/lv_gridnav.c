@@ -228,7 +228,8 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
         else {
-            if(lv_group_get_focused(lv_obj_get_group(obj)) == obj) {
+            lv_group_t * group = lv_obj_get_group(obj);
+            if(group && lv_group_get_focused(group) == obj) {
                 lv_obj_send_event(dsc->focused_obj, LV_EVENT_KEY, &key);
             }
         }
