@@ -12,6 +12,10 @@
 
 #include <include/lv_mp_mem_custom_include.h>
 
+#if !MICROPY_TRACKED_ALLOC
+    #error "LV_STDLIB_MICROPYTHON requires MICROPY_TRACKED_ALLOC=1 in mpconfigport.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -64,32 +68,17 @@ void lv_mem_remove_pool(lv_mem_pool_t pool)
 
 void * lv_malloc_core(size_t size)
 {
-#if MICROPY_MALLOC_USES_ALLOCATED_SIZE
-    return gc_alloc(size, true);
-#else
-    return m_malloc(size);
-#endif
+    return m_tracked_calloc(1, size);
 }
 
 void * lv_realloc_core(void * p, size_t new_size)
 {
-
-#if MICROPY_MALLOC_USES_ALLOCATED_SIZE
-    return gc_realloc(p, new_size, true);
-#else
-    return m_realloc(p, new_size);
-#endif
+    return m_tracked_realloc(p, new_size);
 }
 
 void lv_free_core(void * p)
 {
-
-#if MICROPY_MALLOC_USES_ALLOCATED_SIZE
-    gc_free(p);
-
-#else
-    m_free(p);
-#endif
+    m_tracked_free(p);
 }
 
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
