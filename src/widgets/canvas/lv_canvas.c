@@ -389,6 +389,7 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     lv_area_t canvas_area = {0, 0, header->w - 1,  header->h - 1};
 
     layer->draw_buf = canvas->draw_buf;
+    layer->display = lv_obj_get_display(obj);
     layer->color_format = header->cf;
     layer->buf_area = canvas_area;
     layer->_clip_area = canvas_area;
