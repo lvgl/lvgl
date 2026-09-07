@@ -68,6 +68,7 @@ typedef struct lv_draw_ppa_unit {
     ppa_client_handle_t fill_client;
     ppa_client_handle_t blend_client;
     uint8_t * buf;
+    bool img_sw_fallback;
 } lv_draw_ppa_unit_t;
 
 /**********************
@@ -146,6 +147,16 @@ static inline ppa_blend_color_mode_t lv_color_format_to_ppa_blend(lv_color_forma
         default:
             return PPA_BLEND_COLOR_MODE_RGB565;
     }
+}
+
+static inline int32_t lv_ppa_pic_w(uint32_t stride, int32_t w, lv_color_format_t cf)
+{
+    if(stride == LV_STRIDE_AUTO) return w;
+
+    uint8_t px_size = lv_color_format_get_size(cf);
+    if(px_size == 0 || (stride % px_size) != 0) return 0;
+
+    return (int32_t)(stride / px_size);
 }
 
 static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t lv_fmt)
