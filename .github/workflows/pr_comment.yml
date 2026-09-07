@@ -12,9 +12,9 @@ name: PR Report Comment
 on:
   workflow_run:
     workflows:
+      - "Build and Test"
       - "Static Checks"
       - "Emulated Performance Test"
-      - "C/C++ CI"
     types:
       - completed
 
