@@ -31,10 +31,14 @@ static void roller_key_cb(lv_event_t * e)
  */
 void lv_example_gridnav_5(void)
 {
-    /*It's assumed that the default group is set and
+    /*The example requires that a default group is set and
      *there is a keyboard indev*/
-
     lv_group_t * group = lv_group_get_default();
+    if(!group) {
+        LV_LOG_WARN("Gridnav example requires a default group");
+        return;
+    }
+
     lv_obj_t * cont;
 
     cont = lv_obj_create(lv_screen_active());
@@ -63,6 +67,7 @@ void lv_example_gridnav_5(void)
     /* only left/right keys will be used for grid navigation in this container. */
     /* up/down will be sent to the rollers */
     lv_gridnav_add(cont, LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY);
+
     lv_group_add_obj(group, cont);
     for(uint32_t i = 0; i < 3; i++) {
         lv_obj_t * roller = lv_roller_create(cont);
