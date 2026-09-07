@@ -3217,6 +3217,14 @@
     #endif
 #endif
 
+#ifndef LV_LINUX_FBDEV_VSYNC
+    #ifdef CONFIG_LV_LINUX_FBDEV_VSYNC
+        #define LV_LINUX_FBDEV_VSYNC CONFIG_LV_LINUX_FBDEV_VSYNC
+    #else
+        #define LV_LINUX_FBDEV_VSYNC 0
+    #endif
+#endif
+
 #ifndef LV_USE_FT81X
     #ifdef CONFIG_LV_USE_FT81X
         #define LV_USE_FT81X CONFIG_LV_USE_FT81X
