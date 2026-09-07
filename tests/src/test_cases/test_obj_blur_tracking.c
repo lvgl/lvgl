@@ -189,10 +189,10 @@ void test_count_follows_style_disable(void)
     lv_obj_add_style(obj, &style, 0);
     TEST_ASSERT_EQUAL_UINT32(1, blur_cnt());
 
-    lv_obj_style_set_disabled(obj, &style, 0, true);
+    lv_obj_set_style_enabled(obj, &style, 0, false);
     TEST_ASSERT_EQUAL_UINT32(0, blur_cnt());
 
-    lv_obj_style_set_disabled(obj, &style, 0, false);
+    lv_obj_set_style_enabled(obj, &style, 0, true);
     TEST_ASSERT_EQUAL_UINT32(1, blur_cnt());
 
     lv_obj_delete(obj);
