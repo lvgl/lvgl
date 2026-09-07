@@ -184,6 +184,7 @@ lv_result_t lv_opengles_gl_format_from_color_format(lv_color_format_t cf, lv_ope
             gl_format->format = GL_RGB;
             gl_format->type = GL_UNSIGNED_SHORT_5_6_5;
             gl_format->rb_swap = true;
+            gl_format->premultiplied = false;
             return LV_RESULT_OK;
         case LV_COLOR_FORMAT_RGB888:
             gl_format->internal_format = GL_RGB;
@@ -211,7 +212,7 @@ lv_result_t lv_opengles_gl_format_from_color_format(lv_color_format_t cf, lv_ope
 
 bool lv_opengles_color_format_is_rb_swap(lv_color_format_t cf)
 {
-    lv_opengles_gl_format_t gl_format;
+    lv_opengles_gl_format_t gl_format = {0};
     if(lv_opengles_gl_format_from_color_format(cf, &gl_format) != LV_RESULT_OK) {
         return false;
     }
@@ -220,7 +221,7 @@ bool lv_opengles_color_format_is_rb_swap(lv_color_format_t cf)
 
 bool lv_opengles_color_format_is_premultiplied(lv_color_format_t cf)
 {
-    lv_opengles_gl_format_t gl_format;
+    lv_opengles_gl_format_t gl_format = {0};
     if(lv_opengles_gl_format_from_color_format(cf, &gl_format) != LV_RESULT_OK) {
         return false;
     }
