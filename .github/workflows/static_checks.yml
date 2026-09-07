@@ -148,52 +148,77 @@ jobs:
           python scripts/static_checks/check_arg_checks.py
 
       # ------------------------------------------------------------------
-      # Final gate – fail the job if any step above failed.
-      # This gives us full output from every check before failing.
+      # Final gate
       # ------------------------------------------------------------------
-      - name: "Gate: fail if any check failed"
-        if: |
-          steps.public-api.outcome            == 'failure' ||
-          steps.private-api.outcome           == 'failure' ||
-          steps.include-paths.outcome         == 'failure' ||
-          steps.allowed-list.outcome          == 'failure' ||
-          steps.direct-public-include.outcome == 'failure' ||
-          steps.deprecated.outcome            == 'failure' ||
-          steps.lv_types.outcome              == 'failure' ||
-          steps.defconfigs.outcome            == 'failure' ||
-          steps.labeler-globs.outcome         == 'failure' ||
-          steps.labeler-labels.outcome        == 'failure' ||
-          steps.comments.outcome              == 'failure' ||
-          steps.file-template.outcome         == 'failure' ||
-          steps.arg-checks.outcome            == 'failure'
-
+      - name: "Gate: report the results and fail if any check failed"
+        if: ${{ !cancelled() }}
         run: |
+          results="public-api=${{ steps.public-api.outcome }}
+                   private-api=${{ steps.private-api.outcome }}
+                   include-paths=${{ steps.include-paths.outcome }}
+                   allowed-list=${{ steps.allowed-list.outcome }}
+                   direct-public-include=${{ steps.direct-public-include.outcome }}
+                   deprecated=${{ steps.deprecated.outcome }}
+                   lv_types=${{ steps.lv_types.outcome }}
+                   defconfigs=${{ steps.defconfigs.outcome }}
+                   labeler-globs=${{ steps.labeler-globs.outcome }}
+                   labeler-labels=${{ steps.labeler-labels.outcome }}
+                   comments=${{ steps.comments.outcome }}
+                   file-template=${{ steps.file-template.outcome }}
+                   arg-checks=${{ steps.arg-checks.outcome }}"
+
+          failed=""
+          skipped=""
+
           echo "Policy check results:"
           echo "---------------------"
-          print_result() {
-            local name="$1"
-            local outcome="$2"
-            if [ "$outcome" = "success" ]; then
-              echo "  ✅ $name"
-            else
-              echo "  ❌ $name"
-            fi
-          }
-
-          print_result "public-api"            "${{ steps.public-api.outcome }}"
-          print_result "private-api"           "${{ steps.private-api.outcome }}"
-          print_result "include-paths"         "${{ steps.include-paths.outcome }}"
-          print_result "allowed-list"          "${{ steps.allowed-list.outcome }}"
-          print_result "direct-public-include" "${{ steps.direct-public-include.outcome }}"
-          print_result "deprecated"            "${{ steps.deprecated.outcome }}"
-          print_result "lv_types"              "${{ steps.lv_types.outcome }}"
-          print_result "defconfigs"            "${{ steps.defconfigs.outcome }}"
-          print_result "labeler-globs"         "${{ steps.labeler-globs.outcome }}"
-          print_result "labeler-labels"        "${{ steps.labeler-labels.outcome }}"
-          print_result "comments"              "${{ steps.comments.outcome }}"
-          print_result "file-template"         "${{ steps.file-template.outcome }}"
-          print_result "arg-checks"            "${{ steps.arg-checks.outcome }}"
-
+          for result in $results; do
+            name="${result%%=*}"
+            outcome="${result#*=}"
+            case "$outcome" in
+              success) echo "  ✅ $name" ;;
+              failure) echo "  ❌ $name"; failed="$failed $name" ;;
+              # The check never ran, e.g. an install step before it failed
+              *)       echo "  ⏭️ $name ($outcome)"; skipped="$skipped $name" ;;
+            esac
+          done
           echo "---------------------"
-          echo "One or more policy checks failed. See above for details."
-          exit 1
+
+          if [ -n "$failed" ]; then
+            icon=fail
+            summary="$(echo $failed | wc -w) check(s) failing"
+          elif [ -n "$skipped" ]; then
+            icon=warn
+            summary="$(echo $skipped | wc -w) check(s) did not run"
+          else
+            icon=ok
+            summary="all checks passed"
+          fi
+
+          {
+            for name in $failed;  do echo "- ❌ \`$name\` failed"; done
+            for name in $skipped; do echo "- ⏭️ \`$name\` did not run"; done
+            [ -z "$failed$skipped" ] || echo
+            [ -z "$failed$skipped" ] || \
+              echo "See the *Static Checks* job log for the details of each."
+          } > details.md
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python3 scripts/pr_report/pr_report.py emit \
+              --output reports/static_checks.json \
+              --section "Static Checks" --icon "$icon" --summary "$summary" \
+              --details-file details.md
+          fi
+
+          if [ -n "$failed" ]; then
+            echo "One or more policy checks failed. See above for details."
+            exit 1
+          fi
+
+      - name: Upload the PR report
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-report-static-checks
+          path: reports/
+          if-no-files-found: ignore

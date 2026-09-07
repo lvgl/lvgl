@@ -144,10 +144,29 @@ jobs:
           python scripts/check_gcov_coverage.py \
             --commit="${MB}...${{ github.event.pull_request.head.sha }}" \
             --fail-under=50 \
-            --min-lines=5
+            --min-lines=5 \
+            --report reports/coverage.json
         else
           echo "Not a pull request, skipping code coverage analysis."
         fi
+    - name: Note a missing coverage report
+      # A step above can fail before the report is written
+      if: ${{ !cancelled() && github.event_name == 'pull_request' && matrix.build_config == '64bit build' }}
+      run: |
+        [ -f reports/coverage.json ] || \
+          python3 scripts/pr_report/pr_report.py emit \
+            --output reports/coverage.json \
+            --section "Coverage" --icon warn \
+            --summary "not available, the tests did not finish"
+
+    - name: Upload the PR report
+      if: ${{ !cancelled() && github.event_name == 'pull_request' && matrix.build_config == '64bit build' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: pr-report-coverage
+        path: reports/
+        if-no-files-found: ignore
+
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v7

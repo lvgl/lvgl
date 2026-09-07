@@ -19,11 +19,11 @@ jobs:
       matrix: 
         test_script:
           - scripts/perf/tests/filter_docker_logs/test.sh
-          # These scripts aren't executed in this workflow directly. Instead, they're run
+          - scripts/perf/tests/benchmark_results_comment/test.sh
+          # This script isn't executed in this workflow directly. Instead, it's run
           # by the `Emulated Performance Test Results Handler` workflow.
           # That workflow runs in the context of the `master` branch, so this workflow ensures
-          # the scripts are tested in the PR context before merging. Helping to prevent CI failures in `master`
-          - scripts/perf/tests/benchmark_results_comment/test.sh
+          # the script is tested in the PR context before merging. Helping to prevent CI failures in `master`
           - scripts/perf/tests/serialize_results/test.sh
     steps:
       - name: Checkout
@@ -88,18 +88,67 @@ jobs:
           path: results-${{matrix.image_type}}-${{matrix.config}}.json
           if-no-files-found: error
 
-  save_pr_number:
+  pr_report:
     runs-on: ubuntu-24.04
-    if: ${{ github.event_name == 'pull_request' }}
-    name: ARM Emulated Benchmark - Save PR Number
+    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+    name: ARM Emulated Benchmark - PR Report
     needs: run_benchmark
     steps:
-      - name: Save PR number 
-        run: |
-          echo ${{ github.event.number }} > pr_number
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Download the results of this run
+        if: ${{ needs.run_benchmark.result == 'success' }}
+        uses: actions/download-artifact@v8
+        with:
+          pattern: results-*
+          merge-multiple: true
+          path: input
 
-      - name: Upload PR number as artifact
+      - name: Collect 'master' Results
+        if: ${{ needs.run_benchmark.result == 'success' }}
+        # The baseline is a public pre-release, so this needs no more than the
+        # read-only token a pull request from a fork gets
+        uses: robinraju/release-downloader@v1
+        continue-on-error: true # The release may not exist yet
+        with:
+          preRelease: true
+          tag: emulated-benchmark-latest
+          fileName: results*.mpk
+
+      - name: Build the PR report section
+        if: ${{ needs.run_benchmark.result == 'success' }}
+        run: |
+          pip3 install msgpack==1.1.0
+          if ls results*.mpk 1> /dev/null 2>&1; then
+            python3 scripts/perf/benchmark_results_comment.py \
+              --previous results*.mpk \
+              --new input/results*.json \
+              --output comment.md \
+              --report reports/performance.json
+          else
+            echo "No previous results found, generating comment without comparison."
+            python3 scripts/perf/benchmark_results_comment.py \
+              --new input/results*.json \
+              --output comment.md \
+              --report reports/performance.json
+          fi
+          # The report section points at this summary for the full tables
+          cat comment.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Note a missing report
+        # A step above can fail before the report is written
+        if: ${{ !cancelled() }}
+        run: |
+          [ -f reports/performance.json ] || \
+            python3 scripts/pr_report/pr_report.py emit \
+              --output reports/performance.json \
+              --section "Performance" --icon warn \
+              --summary "not available, the benchmark did not finish"
+
+      - name: Upload the PR report
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: pr_number
-          path: pr_number
+          name: pr-report-performance
+          path: reports/
+          if-no-files-found: ignore
