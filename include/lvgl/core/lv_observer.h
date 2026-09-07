@@ -270,15 +270,6 @@ void lv_subject_set_string_buffer_static(lv_subject_t * subject, char * buf, cha
 void lv_subject_set_string(lv_subject_t * subject, const char * buf);
 
 /**
- * Copy a string to a Subject and notify Observers if it changed.
- * @param subject   pointer to Subject
- * @param buf       new string
- * @deprecated      Use `lv_subject_set_string()` instead.
- */
-LV_DEPRECATED("Use lv_subject_set_string() instead.")
-void lv_subject_copy_string(lv_subject_t * subject, const char * buf);
-
-/**
  * Format a new string, updating Subject, and notify Observers if it changed.
  * @param subject   pointer to Subject
  * @param format    format string

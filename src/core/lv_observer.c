@@ -337,12 +337,6 @@ void lv_subject_set_string_buffer_static(lv_subject_t * subject, char * buf, cha
     subject->prev_value.pointer = prev_buf;
 }
 
-void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
-{
-    LV_LOG_DEPRECATED("use lv_subject_set_string instead.");
-    lv_subject_set_string(subject, buf);
-}
-
 void lv_subject_set_string(lv_subject_t * subject, const char * buf)
 {
     LV_CHECK_ARG(subject != NULL, return);
