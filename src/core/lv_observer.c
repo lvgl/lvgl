@@ -337,7 +337,7 @@ void lv_subject_set_string_buffer_static(lv_subject_t * subject, char * buf, cha
     subject->prev_value.pointer = prev_buf;
 }
 
-void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
+void lv_subject_set_string(lv_subject_t * subject, const char * buf)
 {
     LV_CHECK_ARG(subject != NULL, return);
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
@@ -1249,7 +1249,7 @@ static void subject_set_string_cb(lv_event_t * e)
 {
     LV_ASSERT(e != NULL);
     subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
-    lv_subject_copy_string(user_data->subject, user_data->value);
+    lv_subject_set_string(user_data->subject, user_data->value);
 }
 
 static void subject_increment_cb(lv_event_t * e)

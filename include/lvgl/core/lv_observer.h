@@ -262,11 +262,12 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
 void lv_subject_set_string_buffer_static(lv_subject_t * subject, char * buf, char * prev_buf, size_t size);
 
 /**
- * Copy a string to a Subject and notify Observers if it changed.
+ * Set a Subject's string value and notify Observers if it changed.
  * @param subject   pointer to Subject
  * @param buf       new string
+ * @note            The Subject stores its own copy of the string, not just the pointer.
  */
-void lv_subject_copy_string(lv_subject_t * subject, const char * buf);
+void lv_subject_set_string(lv_subject_t * subject, const char * buf);
 
 /**
  * Format a new string, updating Subject, and notify Observers if it changed.

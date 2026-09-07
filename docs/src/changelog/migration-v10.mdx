@@ -641,7 +641,7 @@ lv_subject_init_string(&title, buf, prev_buf, sizeof(buf), "Hello");
 static lv_subject_t * title;
 title = lv_subject_create(LV_SUBJECT_TYPE_STRING);
 lv_subject_set_string_buffer_static(title, buf, prev_buf, sizeof(buf));
-lv_subject_copy_string(title, "Hello");
+lv_subject_set_string(title, "Hello");
 ```
 
 ```c
@@ -666,6 +666,18 @@ addresses of the member Subjects has to become run-time assignments.
 <ApiLink name="lv_subject_delete"/> accepts `NULL`, and unlike
 `lv_subject_deinit()` it also frees the Subject itself, so the pointer must not be
 used afterwards.
+
+- `lv_subject_copy_string()` is deprecated in favor of
+  <ApiLink name="lv_subject_set_string"/>, so that every Subject type is written
+  with `lv_subject_set_<type>()`. The behavior is unchanged: the string is still
+  copied into the Subject's own buffer.
+  ```c
+  /* Before */
+  lv_subject_copy_string(title, "Hello");
+
+  /* After */
+  lv_subject_set_string(title, "Hello");
+  ```
 
 ### lv_obj_bind_flag_if_* / lv_obj_bind_state_if_*
 
