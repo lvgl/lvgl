@@ -87,11 +87,19 @@ The fix is procedural: make sure the display is connected and powered before the
 | Rotation | Software |
 | Runtime resolution change | No |
 | Runtime color format change | No |
-| Color formats | RGB565, RGB888 or XRGB8888, chosen from the framebuffer's bit depth (16, 24 or 32) |
+| Color formats | L8, RGB565, RGB888 or XRGB8888, chosen from the framebuffer's bit depth (8, 16, 24 or 32) |
 | Multiple displays / windows | Yes |
 | Hardware acceleration | None |
 | Render mode | Partial (default) — configurable via `LV_LINUX_FBDEV_RENDER_MODE` |
 | Input | None built in. Pair with [evdev](/integration/embedded_linux/drivers/evdev) or [libinput](/integration/embedded_linux/drivers/libinput) |
+
+<Callout type="info" title="8bpp needs a grayscale framebuffer">
+An 8bpp framebuffer maps to `LV_COLOR_FORMAT_L8`, which writes one luminance byte per pixel, so the device has to report a grayscale format. 
+Colour 8bpp framebuffers (palette-indexed, packed RGB332, or FOURCC) are rejected and <ApiLink name="lv_linux_fbdev_set_file" />
+returns `LV_RESULT_INVALID`.
+
+Check what yours reports with `fbset -i -fb /dev/fb0`.
+</Callout>
 
 ## See Also
 

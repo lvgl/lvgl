@@ -52,7 +52,8 @@ lv_obj_t * lv_line_create(lv_obj_t * parent);
 /**
  * Set an array of points. The line object will connect these points.
  * @param obj           pointer to a line object
- * @param points        an array of points. Only the address is saved, so the array needs to be alive while the line exists
+ * @param points        an array of points. Only the address is saved, so the array needs to be alive while the line exists.
+ *                      @nullable Use NULL to remove the previously assigned points of the line
  * @param point_num     number of points in 'point_a'
  */
 void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num);
@@ -61,6 +62,7 @@ void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint3
  * Set a non-const array of points. Identical to `lv_line_set_points` except the array may be retrieved by `lv_line_get_points_mutable`.
  * @param obj           pointer to a line object
  * @param points        a non-const array of points. Only the address is saved, so the array needs to be alive while the line exists.
+ *                      @nullable Use NULL to remove the previously assigned points of the line
  * @param point_num     number of points in 'point_a'
  */
 void lv_line_set_points_mutable(lv_obj_t * obj, lv_point_precise_t points[], uint32_t point_num);

@@ -202,6 +202,8 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_
 {
     int ret;
 
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(file != NULL, return LV_RESULT_INVALID);
     drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
 
     ret = drm_setup(drm_dev, file, connector_id, DRM_FOURCC);

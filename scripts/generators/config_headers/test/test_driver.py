@@ -52,6 +52,16 @@ def test_internal_footer_has_static_derivations(generated):
     assert "#undef LV_KCONFIG_PRESENT" in i
 
 
+def test_checker_is_a_plain_translation_unit(generated):
+    c = generated["checker"]
+    # No include guard, no Kconfig ladder, no option defaults: the checker only
+    # includes the public header and asserts on the resulting configuration.
+    assert '#include "lvgl_public.h"' in c
+    assert "#ifndef LV_CONF_INTERNAL_H" not in c
+    assert "#ifdef CONFIG_LV_USE_WAYLAND" not in c
+    assert "#define LV_USE_WAYLAND" not in c
+
+
 def test_internal_has_legacy_autobackend_shim(generated):
     i = generated["internal"]
     assert "#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND" in i

@@ -32,6 +32,9 @@ void test_screen_load_with_delete_no_crash(void)
     lv_obj_t * screen_with_anim_2 = lv_obj_create(NULL);
     lv_obj_t * screen_with_anim_3 = lv_obj_create(NULL);
 
+    lv_obj_null_on_delete(&screen_with_anim_1);
+    lv_obj_null_on_delete(&screen_with_anim_2);
+
     lv_screen_load_anim(screen_with_anim_1, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, false);
     lv_screen_load_anim(screen_with_anim_2, LV_SCREEN_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
 
@@ -46,9 +49,9 @@ void test_screen_load_with_delete_no_crash(void)
     lv_test_wait(400);
 
     /*Check for the screens status after the transition*/
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_1), false);
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_2), false);
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_3), true);
+    TEST_ASSERT_NULL(screen_with_anim_1);
+    TEST_ASSERT_NULL(screen_with_anim_2);
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(screen_with_anim_3));
 }
 
 void test_screen_load_with_delete_no_crash2(void)
@@ -65,6 +68,10 @@ void test_screen_load_with_delete_no_crash2(void)
     lv_obj_t * screen_with_anim_3 = lv_obj_create(NULL);
     lv_obj_t * screen_with_anim_4 = lv_obj_create(NULL);
 
+    lv_obj_null_on_delete(&screen_with_anim_1);
+    lv_obj_null_on_delete(&screen_with_anim_2);
+    lv_obj_null_on_delete(&screen_with_anim_3);
+
     lv_screen_load_anim(screen_with_anim_1, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, false);
     lv_screen_load_anim(screen_with_anim_2, LV_SCREEN_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
     lv_screen_load_anim(screen_with_anim_3, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, true);
@@ -80,10 +87,10 @@ void test_screen_load_with_delete_no_crash2(void)
     lv_test_wait(400);
 
     /*Check for the screens status after the transition*/
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_1), false);
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_2), false);
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_3), false);
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_4), true);
+    TEST_ASSERT_NULL(screen_with_anim_1);
+    TEST_ASSERT_NULL(screen_with_anim_2);
+    TEST_ASSERT_NULL(screen_with_anim_3);
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(screen_with_anim_4));
 }
 
 static bool screen_1_unloaded_called = false;
@@ -108,6 +115,10 @@ void test_screen_load_with_delete_event(void)
     lv_obj_t * screen_with_anim_3 = lv_obj_create(NULL);
     lv_obj_t * screen_with_anim_4 = lv_obj_create(NULL);
 
+    lv_obj_null_on_delete(&screen_with_anim_1);
+    lv_obj_null_on_delete(&screen_with_anim_2);
+    lv_obj_null_on_delete(&screen_with_anim_3);
+
     lv_screen_load_anim(screen_with_anim_1, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, false);
     lv_obj_add_event_cb(screen_with_anim_1, screen_with_anim_1_unloaded_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
     lv_screen_load_anim(screen_with_anim_2, LV_SCREEN_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
@@ -126,10 +137,10 @@ void test_screen_load_with_delete_event(void)
     lv_test_wait(400);
 
     /*Check for the screens status after the transition*/
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_1), false);
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_2), false);
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_3), false);
-    TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_4), true);
+    TEST_ASSERT_NULL(screen_with_anim_1);
+    TEST_ASSERT_NULL(screen_with_anim_2);
+    TEST_ASSERT_NULL(screen_with_anim_3);
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(screen_with_anim_4));
 }
 
 static size_t display_screen_load_start = 0;

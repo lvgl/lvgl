@@ -268,7 +268,7 @@ void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_
 /**
  * Get the next series.
  * @param obj       pointer to a chart
- * @param ser      the previous series or NULL to get the first
+ * @param ser      the previous series. @nullable When NULL the first series is returned.
  * @return          the next series or NULL if there is no more.
  */
 lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * obj, const lv_chart_series_t * ser);
@@ -321,7 +321,7 @@ void lv_chart_set_cursor_pos_y(lv_obj_t * chart, lv_chart_cursor_t * cursor, int
  * Stick the cursor to a point
  * @param chart     pointer to a chart object
  * @param cursor    pointer to the cursor
- * @param ser       pointer to a series
+ * @param ser       pointer to a series. @nullable When NULL the chart's first series is used.
  * @param point_id  the point's index or `LV_CHART_POINT_NONE` to not assign to any points.
  */
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser,

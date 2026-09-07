@@ -95,7 +95,7 @@ static lv_result_t resize(lv_display_t * display)
 static void deinit_display(lv_display_t * display)
 {
     lv_sdl_texture_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
-    LV_ASSERT_NULL(ddata);
+    LV_ASSERT(ddata != NULL);
 
     if(ddata->renderer) {
         SDL_DestroyRenderer(ddata->renderer);
@@ -119,14 +119,14 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
 static SDL_Renderer * get_renderer(lv_display_t * display)
 {
     lv_sdl_texture_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
-    LV_ASSERT_NULL(ddata);
+    LV_ASSERT(ddata != NULL);
     return ddata->renderer;
 }
 static lv_result_t redraw(lv_display_t * display)
 {
 
     lv_sdl_texture_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
-    LV_ASSERT_NULL(ddata);
+    LV_ASSERT(ddata != NULL);
     SDL_RenderPresent(ddata->renderer);
     return LV_RESULT_OK;
 }

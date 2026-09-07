@@ -75,6 +75,11 @@ void lv_draw_sw_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * ds
         lv_draw_buf_clear(draw_buf, &clear_area);
     }
 
+    /*The rows below are addressed relative to the buffer, so clamp the draw area to it*/
+    if(!lv_area_intersect(&draw_area, &draw_area, buf_area)) {
+        return;
+    }
+
     lv_draw_sw_mask_radius_param_t param;
     lv_draw_sw_mask_radius_init(&param, &dsc->area, dsc->radius, false);
 

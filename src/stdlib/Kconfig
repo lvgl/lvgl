@@ -17,7 +17,7 @@ config LV_STDLIB_RTTHREAD
 	default 3
 
 config LV_STDLIB_CUSTOM
-	int 
+	int
 	default 255
 
 choice

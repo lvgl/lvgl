@@ -7,12 +7,16 @@
 void setUp(void)
 {
     /* Function run before every test */
+    lv_translation_init();
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
     lv_obj_clean(lv_screen_active());
+
+    /*Workaround the reset the translations across tests*/
+    lv_translation_deinit();
 }
 
 void test_dropdown_create_delete(void)
@@ -557,5 +561,197 @@ void test_dropdown_content_size()
 
     lv_dropdown_set_selected(dd, 2);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_content_size_3.png");
+}
+/* The open list has to touch the button, no matter the base direction of the screen
+ * or whether it opens downwards or upwards.
+ * See https://github.com/lvgl/lvgl/issues/10254 */
+static void dropdown_list_position_test(lv_base_dir_t base_dir, int32_t x, int32_t y)
+{
+    lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_style_base_dir(screen, base_dir, LV_PART_MAIN);
+
+    lv_obj_t * dd = lv_dropdown_create(screen);
+    lv_dropdown_set_options(dd, "Option 1\nA considerably longer option");
+    lv_obj_set_ignore_layout(dd, true);
+    lv_obj_set_width(dd, 100);
+    lv_obj_set_pos(dd, x, y);
+
+    lv_dropdown_open(dd);
+    lv_obj_update_layout(screen);
+
+    lv_area_t dd_coords;
+    lv_area_t list_coords;
+    lv_obj_get_coords(dd, &dd_coords);
+    lv_obj_get_coords(lv_dropdown_get_list(dd), &list_coords);
+
+    /*The list is wider than the button, so the two aligned edges are the only matching ones*/
+    TEST_ASSERT_GREATER_THAN_INT32(lv_area_get_width(&dd_coords), lv_area_get_width(&list_coords));
+
+    if(base_dir == LV_BASE_DIR_RTL) {
+        TEST_ASSERT_EQUAL_INT32(dd_coords.x2, list_coords.x2);
+    }
+    else {
+        TEST_ASSERT_EQUAL_INT32(dd_coords.x1, list_coords.x1);
+    }
+
+    /*The list has to touch the button, no matter if it's opened downwards or upwards*/
+    if(list_coords.y1 > dd_coords.y1) {
+        TEST_ASSERT_EQUAL_INT32(dd_coords.y2 + 1, list_coords.y1);
+    }
+    else {
+        TEST_ASSERT_EQUAL_INT32(dd_coords.y1 - 1, list_coords.y2);
+    }
+}
+
+void test_dropdown_list_position_ltr(void)
+{
+    dropdown_list_position_test(LV_BASE_DIR_LTR, 300, 10);
+    dropdown_list_position_test(LV_BASE_DIR_LTR, 300, 400);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_list_position_ltr.png")
+}
+
+void test_dropdown_list_position_rtl(void)
+{
+    dropdown_list_position_test(LV_BASE_DIR_RTL, 300, 10);
+    dropdown_list_position_test(LV_BASE_DIR_RTL, 300, 400);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_list_position_rtl.png")
+    lv_obj_set_style_base_dir(lv_screen_active(), LV_BASE_DIR_LTR, LV_PART_MAIN);
+}
+
+void test_dropdown_text_translation_tag(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre (make it longer)" };
+    lv_translation_add_static(languages, tags, translations);
+    lv_translation_set_language("en");
+
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_width(dd, LV_SIZE_CONTENT);
+    lv_dropdown_set_text_translation_tag(dd, "tiger");
+
+    TEST_ASSERT_EQUAL_STRING("The Tiger", lv_dropdown_get_text(dd));
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Der Tiger", lv_dropdown_get_text(dd));
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_text_translation_1.png");
+
+    lv_translation_set_language("es");
+    TEST_ASSERT_EQUAL_STRING("El Tigre (make it longer)", lv_dropdown_get_text(dd));
+
+    /*Also check the layout is updated*/
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_text_translation_2.png");
+
+    /* Unknown language returns the tag*/
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING("tiger", lv_dropdown_get_text(dd));
+}
+
+void test_dropdown_options_translation_tag(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"animals", NULL};
+    static const char * const languages[]    = {"en", "de", NULL};
+    static const char * const translations[] = { "Dog\nLion", "Hund\nLowe" };
+    lv_translation_add_static(languages, tags, translations);
+    lv_translation_set_language("en");
+
+    char buf[256];
+
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+
+    TEST_ASSERT_EQUAL_STRING("Dog\nLion", lv_dropdown_get_options(dd));
+    lv_dropdown_get_selected_str(dd, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_STRING("Dog", buf);
+
+    lv_dropdown_set_selected(dd, 1);
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Hund\nLowe", lv_dropdown_get_options(dd));
+    lv_dropdown_get_selected_str(dd, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_STRING("Lowe", buf);
+
+    lv_dropdown_set_selected(dd, 0);
+    lv_dropdown_get_selected_str(dd, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_STRING("Hund", buf);
+
+    lv_dropdown_open(dd);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_options_translation.png");
+
+    /* Unknown language returns the tag*/
+    lv_translation_set_language("fr");
+    lv_dropdown_get_selected_str(dd, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_STRING("animals", buf);
+    TEST_ASSERT_EQUAL_STRING("animals", lv_dropdown_get_options(dd));
+}
+
+void test_dropdown_setting_text_disables_translation(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+    lv_translation_set_language("de");
+
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_text_translation_tag(dd, "tiger");
+
+    TEST_ASSERT_EQUAL_STRING("Der Tiger", lv_dropdown_get_text(dd));
+
+    /* Using set text should unbind the translation tag*/
+    lv_dropdown_set_text(dd, "Hello world");
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("Hello world", lv_dropdown_get_text(dd));
+
+    lv_dropdown_set_text_translation_tag(dd, "tiger");
+    TEST_ASSERT_EQUAL_STRING("The Tiger", lv_dropdown_get_text(dd));
+
+    /* Using set text static should unbind the translation tag*/
+    lv_dropdown_set_text_static(dd, "Hello world");
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Hello world", lv_dropdown_get_text(dd));
+}
+
+void test_dropdown_setting_options_disables_translation(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"animals", NULL};
+    static const char * const languages[]    = {"en", "de", NULL};
+    static const char * const translations[] = { "Dog\nLion", "Hund\nLowe" };
+    lv_translation_add_static(languages, tags, translations);
+    lv_translation_set_language("de");
+
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+
+    TEST_ASSERT_EQUAL_STRING("Hund\nLowe", lv_dropdown_get_options(dd));
+
+    /* Using set options should unbind the translation tag*/
+    lv_dropdown_set_options(dd, "One\nTwo");
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("One\nTwo", lv_dropdown_get_options(dd));
+
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+    TEST_ASSERT_EQUAL_STRING("Dog\nLion", lv_dropdown_get_options(dd));
+
+    /* Using set options static should unbind the translation tag*/
+    lv_dropdown_set_options_static(dd, "One\nTwo");
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("One\nTwo", lv_dropdown_get_options(dd));
+
+    /* Adding/clearing options should unbind the translation tag*/
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+    lv_dropdown_add_option(dd, "Bear", LV_DROPDOWN_POS_LAST);
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("Hund\nLowe\nBear", lv_dropdown_get_options(dd));
+
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+    lv_dropdown_clear_options(dd);
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("", lv_dropdown_get_options(dd));
 }
 #endif

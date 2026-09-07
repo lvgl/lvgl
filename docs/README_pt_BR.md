@@ -74,7 +74,7 @@ e perguntar qualquer coisa!
   - Mais de 30 [Widgets](https://lvgl.io/docs/open/widgets) integrados: Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table e muitos outros.
   - [Sistema de estilos](https://lvgl.io/docs/open/common-widget-features/styles) flexível com mais de 100 propriedades de estilo para personalizar qualquer parte dos widgets em qualquer estado.
   - Motores de layout semelhantes a [Flexbox](https://lvgl.io/docs/open/common-widget-features/layouts/flex) e [Grid](https://lvgl.io/docs/open/common-widget-features/layouts/grid) para dimensionar e posicionar os widgets de forma responsiva automaticamente.
-  - [Data bindings](https://lvgl.io/docs/open/main-modules/observer) para conectar facilmente a UI à aplicação.
+  - [Data bindings](https://lvgl.io/docs/open/main-modules/data_binding) para conectar facilmente a UI à aplicação.
   - Suporta Mouse, Touchpad, Keypad, Keyboard, botões externos e Encoder [dispositivos de entrada](https://lvgl.io/docs/open/main-modules/indev).
   - Suporte a [múltiplos displays](https://lvgl.io/docs/open/main-modules/display/overview#how-many-displays-can-lvgl-use).
 

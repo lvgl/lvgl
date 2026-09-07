@@ -30,3 +30,8 @@ def create_cache_iterator(cache) -> LVCacheIteratorBase | None:
 
     except Exception:
         raise TypeError(f"Unsupported cache type {cache}")
+
+    # An unknown or null class: None is the documented answer, and callers check
+    # for it. LVCache.__iter__ turns it into an error that names the cache, so
+    # `for entry in cache` cannot fail with a bare TypeError about NoneType.
+    return None

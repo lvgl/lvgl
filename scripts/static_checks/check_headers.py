@@ -104,12 +104,9 @@ FORBIDDEN_SYSTEM_HEADERS: set[str] = {
 # This is the exhaustive allow-list; anything not here (and not forbidden)
 # is still an error so the list stays intentional and auditable.
 ALLOWED_EXTERNAL_HEADERS: set[str] = {
-    "EGL/egl.h",
-    "EGL/eglext.h",
     "FreeRTOS.h",
     "GL/glew.h",
     "GLES2/gl2.h",
-    "GLES2/gl2ext.h",
     "GLES3/gl3.h",
     "GLFW/glfw3.h",
     "LGFX_AUTODETECT.hpp",
@@ -128,8 +125,10 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "algorithm",
     "arm_2d.h",
     "arm_neon.h",
+    "arm_sve.h",
     "assert.h",
     "atomic.h",
+    "bf0_hal.h",
     "bsp_api.h",
     "cmsis_os2.h",
     "cstdint",
@@ -245,6 +244,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "sys/syscall.h",
     "sys/types.h",
     "syslog.h",
+    "system_bf0_ap.h",
     "task.h",
     "thorvg_capi.h",
     "thread",
@@ -258,6 +258,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "wayland-cursor.h",
     "wayland-egl.h",
     "wayland_linux_dmabuf.h",
+    "wayland_xdg_output.h",
     "wayland_xdg_shell.h",
     "webp/decode.h",
     "windows.h",
@@ -265,6 +266,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "xf86drm.h",
     "xf86drmMode.h",
     "xkbcommon/xkbcommon.h",
+    "zephyr/arch/cache.h",
     "zephyr/irq.h",
     "zephyr/kernel.h",
 }

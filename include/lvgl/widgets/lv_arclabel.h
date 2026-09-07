@@ -79,6 +79,7 @@ lv_obj_t * lv_arclabel_create(lv_obj_t * parent);
  *
  * @param obj       Pointer to the arc label object.
  * @param text      Pointer to a null-terminated string containing the new text for the label.
+ *                  @nullable When NULL the label is refreshed with its current text.
  */
 void lv_arclabel_set_text(lv_obj_t * obj, const char * text);
 
@@ -90,6 +91,7 @@ void lv_arclabel_set_text(lv_obj_t * obj, const char * text);
  *
  * @param obj       The arc label object to set the text for.
  * @param fmt       A format string that specifies how subsequent arguments are converted to text.
+ *                  @nullable When NULL the label is only refreshed.
  * @param ...       Arguments following the format string that are used to replace format specifiers in the format string.
  */
 void lv_arclabel_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
@@ -99,7 +101,7 @@ void lv_arclabel_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_A
  * The 'text' must remain valid in memory; the arc label does not manage its lifecycle.
  *
  * @param obj       Pointer to the arc label object.
- * @param text      Pointer to the new text. If NULL, the label is refreshed with its current text.
+ * @param text      Pointer to the new text. @nullable When NULL the current text is dropped.
  */
 void lv_arclabel_set_text_static(lv_obj_t * obj, const char * text);
 

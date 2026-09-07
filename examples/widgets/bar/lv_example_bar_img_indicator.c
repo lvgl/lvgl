@@ -23,7 +23,7 @@ void lv_example_bar_img_indicator(void)
     static lv_style_t style_bar_track;
     static lv_style_t style_bar_indicator;
 
-    static lv_subject_t subject_value2;
+    static lv_subject_t * subject_value2;
 
     static bool inited = false;
 
@@ -38,9 +38,10 @@ void lv_example_bar_img_indicator(void)
         lv_style_set_bg_opa(&style_bar_indicator, 0);
         lv_style_set_radius(&style_bar_indicator, 0);
 
-        lv_subject_init_int(&subject_value2, 20);
-        lv_subject_set_min_value_int(&subject_value2, 0);
-        lv_subject_set_max_value_int(&subject_value2, 100);
+        subject_value2 = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_min_value_int(subject_value2, 0);
+        lv_subject_set_max_value_int(subject_value2, 100);
+        lv_subject_set_int(subject_value2, 20);
         inited = true;
     }
 
@@ -56,7 +57,7 @@ void lv_example_bar_img_indicator(void)
     lv_obj_set_size(bar, 280, 35);
     lv_bar_set_min_value(bar, 0);
     lv_bar_set_max_value(bar, 20);
-    lv_bar_bind_value(bar, &subject_value2);
+    lv_bar_bind_value(bar, subject_value2);
     lv_obj_add_style(bar, &style_bar_track, LV_PART_MAIN);
     lv_obj_add_style(bar, &style_bar_indicator, LV_PART_INDICATOR);
 
@@ -73,18 +74,18 @@ void lv_example_bar_img_indicator(void)
     lv_obj_set_align(label_1, LV_ALIGN_CENTER);
     lv_label_set_text(label_1, "-");
 
-    lv_obj_add_subject_increment_event(button_1, &subject_value2, LV_EVENT_CLICKED, -1);
-    lv_obj_add_subject_increment_event(button_1, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, -1);
+    lv_obj_add_subject_increment_event(button_1, subject_value2, LV_EVENT_CLICKED, -1);
+    lv_obj_add_subject_increment_event(button_1, subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, -1);
 
     lv_obj_t * label_2 = lv_label_create(container);
-    lv_label_bind_text(label_2, &subject_value2, NULL);
+    lv_label_bind_text(label_2, subject_value2, NULL);
 
     lv_obj_t * button_2 = lv_button_create(container);
     lv_obj_t * label_3 = lv_label_create(button_2);
     lv_obj_set_align(label_3, LV_ALIGN_CENTER);
     lv_label_set_text(label_3, "+");
 
-    lv_obj_add_subject_increment_event(button_2, &subject_value2, LV_EVENT_CLICKED, 1);
-    lv_obj_add_subject_increment_event(button_2, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, 1);
+    lv_obj_add_subject_increment_event(button_2, subject_value2, LV_EVENT_CLICKED, 1);
+    lv_obj_add_subject_increment_event(button_2, subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, 1);
 }
 #endif

@@ -31,7 +31,11 @@ class LVGL:
 
     def displays(self) -> "Iterator[LVDisplay]":
         ll = self.lv_global.disp_ll
-        if not ll:
+        # disp_ll is an inline lv_ll_t, not a pointer. Some GDB builds cannot
+        # convert an aggregate to a boolean, and Value.__bool__ answers False
+        # when that conversion fails - which would report no displays at all.
+        # The list is empty exactly when it has no head.
+        if not ll.head:
             return
 
         from ..display.lv_display import LVDisplay

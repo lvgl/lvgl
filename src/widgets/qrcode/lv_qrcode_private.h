@@ -40,7 +40,7 @@ struct _lv_qrcode_t {
     uint16_t quiet_zone : 1;        /*Add the QR spec's blank margin around the code (boolean toggle)*/
     uint16_t update_mode : 1;       /*lv_qrcode_update_mode_t: when a property change is re-encoded*/
     uint16_t needs_update : 1;      /*The bitmap is out of date; re-encoded on the next redraw (deferred mode)*/
-    uint16_t render_failed : 1;     /*The last encode attempt failed (or none has run yet)*/
+    uint16_t render_valid : 1;      /*No encode attempt is known to have failed; a change re-arms it*/
 };
 
 

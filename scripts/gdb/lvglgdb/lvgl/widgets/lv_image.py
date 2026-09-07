@@ -14,76 +14,77 @@ class LVImage(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_image_t", ptr=True) or self
+        self._wv_lv_image_t = self.cast("lv_image_t", ptr=True) or self
+        self._wv = self._wv_lv_image_t
 
     @property
     def src(self):
         """Image source: Pointer to an array or a file or a symbol"""
-        return ptr_or_none(self._wv.safe_field("src"))
+        return ptr_or_none(self._wv_lv_image_t.safe_field("src"))
 
     @property
     def bitmap_mask_src(self):
         """Pointer to an A8 bitmap mask"""
-        return ptr_or_none(self._wv.safe_field("bitmap_mask_src"))
+        return ptr_or_none(self._wv_lv_image_t.safe_field("bitmap_mask_src"))
 
     @property
     def offset(self):
-        return safe_point(self._wv, "offset")
+        return safe_point(self._wv_lv_image_t, "offset")
 
     @property
     def w(self):
         """Width of the image (Handled by the library)"""
-        return int(self._wv.safe_field("w", 0))
+        return int(self._wv_lv_image_t.safe_field("w", 0))
 
     @property
     def h(self):
         """Height of the image (Handled by the library)"""
-        return int(self._wv.safe_field("h", 0))
+        return int(self._wv_lv_image_t.safe_field("h", 0))
 
     @property
     def rotation(self):
         """Rotation angle of the image"""
-        return int(self._wv.safe_field("rotation", 0))
+        return int(self._wv_lv_image_t.safe_field("rotation", 0))
 
     @property
     def scale_x(self):
         """256 means no zoom, 512 double size, 128 half size"""
-        return int(self._wv.safe_field("scale_x", 0))
+        return int(self._wv_lv_image_t.safe_field("scale_x", 0))
 
     @property
     def scale_y(self):
         """256 means no zoom, 512 double size, 128 half size"""
-        return int(self._wv.safe_field("scale_y", 0))
+        return int(self._wv_lv_image_t.safe_field("scale_y", 0))
 
     @property
     def pivot(self):
         """Rotation center of the image"""
-        return safe_point(self._wv, "pivot")
+        return safe_point(self._wv_lv_image_t, "pivot")
 
     @property
     def src_type(self):
         """See: lv_image_src_t"""
-        return int(self._wv.safe_field("src_type", 0))
+        return int(self._wv_lv_image_t.safe_field("src_type", 0))
 
     @property
     def cf(self):
         """Color format from `lv_color_format_t`"""
-        return int(self._wv.safe_field("cf", 0))
+        return int(self._wv_lv_image_t.safe_field("cf", 0))
 
     @property
     def antialias(self):
         """Apply anti-aliasing in transformations (rotate, zoom)"""
-        return int(self._wv.safe_field("antialias", 0))
+        return int(self._wv_lv_image_t.safe_field("antialias", 0))
 
     @property
     def align(self):
         """Image size mode when image size and object size is different. See lv_image_align_t"""
-        return int(self._wv.safe_field("align", 0))
+        return int(self._wv_lv_image_t.safe_field("align", 0))
 
     @property
     def blend_mode(self):
         """Element of `lv_blend_mode_t`"""
-        return int(self._wv.safe_field("blend_mode", 0))
+        return int(self._wv_lv_image_t.safe_field("blend_mode", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

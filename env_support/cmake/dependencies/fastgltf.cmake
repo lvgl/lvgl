@@ -39,17 +39,14 @@ message(STATUS "lvgl: fastgltf: fetching from source")
 
 FetchContent_Declare(
   fastgltf
-  GIT_REPOSITORY https://github.com/spnda/fastgltf
-  GIT_TAG f04052ebd8d157c7b6e8fc3dd9f1ed83df99f3e5)
+  GIT_REPOSITORY https://github.com/lvgl/fastgltf
+  GIT_TAG 75d76998df3352193cee26a209ab679b2759d33d)
 
 set(FASTGLTF_BUILD_TESTS
     OFF
     CACHE BOOL "" FORCE)
 set(FASTGLTF_BUILD_EXAMPLES
     OFF
-    CACHE BOOL "" FORCE)
-set(FASTGLTF_ENABLE_DEPRECATED_EXT
-    ON
     CACHE BOOL "" FORCE)
 set(FASTGLTF_DIFFUSE_TRANSMISSION_SUPPORT
     ON

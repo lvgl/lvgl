@@ -12,9 +12,7 @@
 
 #include "../../lv_draw_image_private.h"
 #include "../../../image/lv_image_decoder_private.h"
-#if LV_USE_DRAW_SW
-    #include "../../sw/lv_draw_sw.h"
-#endif
+#include "../../sw/lv_draw_sw.h"
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
@@ -52,11 +50,11 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)t->draw_unit;
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, clipped_img_area);
+    rel_clip_area = *clipped_img_area;
     lv_area_move(&rel_clip_area, -img_coords->x1, -img_coords->y1);
 
     lv_area_t rel_img_coords;
-    lv_area_copy(&rel_img_coords, img_coords);
+    rel_img_coords = *img_coords;
     lv_area_move(&rel_img_coords, -img_coords->x1, -img_coords->y1);
 
     lv_area_t src_area;
@@ -64,7 +62,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         return;
 
     lv_area_t dest_area;
-    lv_area_copy(&dest_area, clipped_img_area);
+    dest_area = *clipped_img_area;
     lv_area_move(&dest_area, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
 
     const uint8_t * src_buf = decoded->data;
@@ -72,27 +70,14 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     lv_color_format_t dest_cf = draw_buf->header.cf;
     uint8_t * dest_buf = draw_buf->data;
 
-    /* Row pitch, not visible width: see lv_ppa_pic_w(). This path decodes with
-     * stride_align = false like the SRM paths, so a padded source keeps its
-     * padding and the width would shear it. The task is already assigned to this
-     * unit here, so a picture that cannot be described goes to the software unit
-     * rather than being dropped, which would leave a hole on the screen. */
     const int32_t src_pic_w  = lv_ppa_pic_w(decoded->header.stride, draw_dsc->header.w, src_cf);
     const int32_t dest_pic_w = lv_ppa_pic_w(draw_buf->header.stride, draw_buf->header.w, dest_cf);
     if(src_pic_w == 0 || dest_pic_w == 0) {
-        /* lv_draw_sw_image() redraws the whole task, and it runs its own decode
-         * loop, so it must fire exactly once. A partial decoder calls this core
-         * back per decoded chunk (see img_decode_and_draw()), which would
-         * otherwise repeat the full software draw for every chunk. */
         if(u->img_sw_fallback) return;
         u->img_sw_fallback = true;
 
-        LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, drawing in software");
-#if LV_USE_DRAW_SW
+        LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, using software");
         lv_draw_sw_image(t, draw_dsc, &t->area);
-#else
-        LV_LOG_WARN("PPA draw_img: no software draw unit to fall back on, image skipped");
-#endif
         return;
     }
 

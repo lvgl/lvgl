@@ -35,7 +35,7 @@ extern "C" {
  * Create a display for the EVE draw unit.
  * @param params      Pointer to a struct of display parameters. Can be a temporary variable
  * @param op_cb       A callback that will be called to perform pin and SPI IO operations with the EVE chip
- * @param user_data   use `lv_draw_eve_display_get_user_data` to get this pointer inside the `op_cb`
+ * @param user_data   use `lv_draw_eve_display_get_user_data` to get this pointer inside the `op_cb` @nullable
  * @return            the EVE display
  */
 lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * params, lv_draw_eve_operation_cb_t op_cb,

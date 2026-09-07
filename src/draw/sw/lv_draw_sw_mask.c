@@ -288,7 +288,7 @@ lv_result_t lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, 
     if(radius > short_side >> 1) radius = short_side >> 1;
     if(radius < 0) radius = 0;
 
-    lv_area_copy(&param->cfg.rect, rect);
+    param->cfg.rect = *rect;
     param->cfg.radius = radius;
     param->cfg.outer = inv ? 1 : 0;
     param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_radius;
@@ -316,7 +316,7 @@ void lv_draw_sw_mask_fade_init(lv_draw_sw_mask_fade_param_t * param, const lv_ar
                                int32_t y_top,
                                lv_opa_t opa_bottom, int32_t y_bottom)
 {
-    lv_area_copy(&param->cfg.coords, coords);
+    param->cfg.coords = *coords;
     param->cfg.opa_top = opa_top;
     param->cfg.opa_bottom = opa_bottom;
     param->cfg.y_top = y_top;
@@ -327,7 +327,7 @@ void lv_draw_sw_mask_fade_init(lv_draw_sw_mask_fade_param_t * param, const lv_ar
 
 void lv_draw_sw_mask_map_init(lv_draw_sw_mask_map_param_t * param, const lv_area_t * coords, const lv_opa_t * map)
 {
-    lv_area_copy(&param->cfg.coords, coords);
+    param->cfg.coords = *coords;
     param->cfg.map = map;
     param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_map;
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_MAP;
@@ -802,7 +802,7 @@ static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_radius(lv_opa_t 
     bool outer = p->cfg.outer;
     int32_t radius = p->cfg.radius;
     lv_area_t rect;
-    lv_area_copy(&rect, &p->cfg.rect);
+    rect = p->cfg.rect;
 
     if(outer == false) {
         if((abs_y < rect.y1 || abs_y > rect.y2)) {

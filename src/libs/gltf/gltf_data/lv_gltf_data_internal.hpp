@@ -114,7 +114,6 @@ struct _lv_gltf_model_t {
 
     std::vector<lv_gltf_mesh_data_t> meshes;
     std::vector<GLuint> textures;
-    lv_array_t compiled_shaders;
     std::map<fastgltf::Node *, std::vector<uint32_t> > channel_set_cache;
     fastgltf::math::fmat4x4 view_mat;
     fastgltf::math::fvec3 view_pos;
@@ -125,9 +124,8 @@ struct _lv_gltf_model_t {
     lv_timer_t * animation_update_timer;
 
     size_t current_animation;
-    size_t last_material_index;
 
-    int32_t animation_speed_ratio;
+    uint32_t animation_speed_ratio;
     int32_t last_anim_num;
 
     float bound_radius;
@@ -139,7 +137,6 @@ struct _lv_gltf_model_t {
 
     bool transforms_changed;
     bool is_animation_enabled;
-    bool last_pass_was_transmission;
     bool write_ops_pending;
     bool write_ops_flushed;
     struct _lv_gltf_model_t * linked_view_source;
@@ -187,15 +184,6 @@ fastgltf::math::fvec3 lv_gltf_data_get_center(const lv_gltf_model_t * data);
  */
 const char * lv_gltf_get_filename(const lv_gltf_model_t * data);
 
-/**
- * @brief Check if the centerpoint cache contains a specific entry.
- *
- * @param data Pointer to the lv_gltf_data_t object containing the model data.
- * @param index The index of the entry to check.
- * @param element The specific parameter to check within the cache.
- * @return True if the cache contains the entry, false otherwise.
- */
-bool lv_gltf_data_centerpoint_cache_contains(lv_gltf_model_t * data, size_t index, int32_t element);
 
 /**
  * @brief Retrieve a specific primitive from a mesh.
@@ -250,14 +238,24 @@ bool lv_gltf_data_validated_skins_contains(lv_gltf_model_t * data, size_t index)
 void lv_gltf_data_validate_skin(lv_gltf_model_t * data, size_t index);
 
 /**
+ * @brief Drop the draw lists built by a previous parse of this model.
+ *
+ * The lists are rebuilt from the model every time it is parsed for a viewer, so they have
+ * to be emptied first or a model parsed twice would draw every primitive twice.
+ *
+ * @param data Pointer to the lv_gltf_data_t object containing the model data.
+ */
+void lv_gltf_data_clear_node_primitives(lv_gltf_model_t * data);
+
+/**
  * @brief Add an opaque node primitive to the GLTF model data.
  *
  * @param data Pointer to the lv_gltf_data_t object containing the model data.
- * @param index The index of the primitive to add.
+ * @param material_index The index of the primitive to add.
  * @param node Pointer to the NodePtr representing the node to add.
  * @param primitive_index The specific parameter associated with the primitive.
  */
-void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, size_t index, fastgltf::Node * node,
+void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, uint32_t material_index, fastgltf::Node * node,
                                             size_t primitive_index);
 
 /**
@@ -268,7 +266,7 @@ void lv_gltf_data_add_opaque_node_primitive(lv_gltf_model_t * data, size_t index
  * @param node Pointer to the NodePtr representing the node to add.
  * @param primitive_index The specific parameter associated with the primitive.
  */
-void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, size_t material_index, fastgltf::Node * node,
+void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, uint32_t material_index, fastgltf::Node * node,
                                              size_t primitive_index);
 
 /**
@@ -308,12 +306,12 @@ void lv_gltf_data_injest_discover_defines(lv_gltf_model_t * data, fastgltf::Node
  */
 fastgltf::math::fvec3 lv_gltf_data_get_centerpoint(lv_gltf_model_t * gltf_data, fastgltf::math::fmat4x4 matrix,
                                                    size_t mesh_index,
-                                                   int32_t elem);
+                                                   size_t elem);
 
 
 lv_gltf_mesh_data_t * lv_gltf_get_new_meshdata(lv_gltf_model_t * _data);
 
-lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path, fastgltf::Asset);
+lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path, fastgltf::Asset && asset);
 
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
                                              lv_gltf_model_loader_t * loader);

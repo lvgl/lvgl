@@ -81,7 +81,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->offset_y         = 0;
     disp->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
     disp->dpi              = LV_DPI_DEF;
-    disp->color_format = LV_COLOR_FORMAT_NATIVE;
+    disp->color_format = LV_COLOR_FORMAT_DEFAULT;
 #if LV_USE_EXT_DATA
     disp->ext_data.free_cb = NULL;
     disp->ext_data.data = NULL;
@@ -93,17 +93,20 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->tile_cnt = 1;
 #endif
 
-    disp->layer_head = lv_malloc(sizeof(lv_layer_t));
-    LV_ASSERT_MALLOC(disp->layer_head);
-    if(disp->layer_head == NULL) return NULL;
-    lv_layer_init(disp->layer_head);
+    lv_area_t disp_area = {
+        0, 0, hor_res - 1, ver_res - 1
+    };
 
-    if(disp->layer_init) disp->layer_init(disp, disp->layer_head);
-    disp->layer_head->buf_area.x1 = 0;
-    disp->layer_head->buf_area.y1 = 0;
-    disp->layer_head->buf_area.x2 = hor_res - 1;
-    disp->layer_head->buf_area.y2 = ver_res - 1;
-    disp->layer_head->color_format = disp->color_format;
+    /* TODO: (v10) make `lv_draw_layer_init` take in a display pointer
+    * instead of assuming it needs to be bound to the refreshing display*/
+    lv_display_t * original_refr_disp = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(disp);
+    disp->layer_head = lv_draw_layer_create(NULL, disp->color_format, &disp_area);
+    if(!disp->layer_head) {
+        lv_ll_remove(disp_ll_p, disp);
+        return NULL;
+    }
+    lv_refr_set_disp_refreshing(original_refr_disp);
 
     disp->inv_en_cnt = 1;
     disp->last_activity_time = lv_tick_get();
@@ -234,8 +237,7 @@ void lv_display_delete(lv_display_t * disp)
     lv_ll_remove(disp_ll_p, disp);
     if(disp->refr_timer) lv_timer_delete(disp->refr_timer);
 
-    if(disp->layer_deinit) disp->layer_deinit(disp, disp->layer_head);
-    lv_free(disp->layer_head);
+    lv_draw_layer_delete(disp->layer_head);
 
 #if LV_USE_EXT_DATA
     if(disp->ext_data.free_cb) {
@@ -481,6 +483,16 @@ int32_t lv_display_get_dpi(const lv_display_t * disp)
  * BUFFERING
  *--------------------*/
 
+void lv_display_set_draw_buf_handlers(lv_display_t * disp, const lv_draw_buf_handlers_t * handlers)
+{
+    LV_ASSERT(disp != NULL);
+    LV_ASSERT(handlers != NULL);
+
+    if(disp->buf_1) disp->buf_1->handlers = handlers;
+    if(disp->buf_2) disp->buf_2->handlers = handlers;
+    if(disp->buf_3) disp->buf_3->handlers = handlers;
+}
+
 void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2)
 {
     if(disp == NULL) {
@@ -506,8 +518,8 @@ void lv_display_set_3rd_draw_buffer(lv_display_t * disp, lv_draw_buf_t * buf3)
     }
     if(disp == NULL) return;
     LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(disp->buf_1 != NULL, return, "buf1 should already exist in order to provide a third buffer");
-    LV_CHECK_ARG(disp->buf_2 != NULL, return, "buf2 should already exist in order to provide a third buffer");
+    LV_CHECK_ARG_MSG(disp->buf_1 != NULL, return, "buf1 should already exist in order to provide a third buffer");
+    LV_CHECK_ARG_MSG(disp->buf_2 != NULL, return, "buf2 should already exist in order to provide a third buffer");
 
     disp->buf_3 = buf3;
 }
@@ -530,11 +542,12 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
     uint32_t w = lv_display_get_original_horizontal_resolution(disp);
     uint32_t h = lv_display_get_original_vertical_resolution(disp);
 
-    LV_CHECK_ARG(w != 0 && h != 0, return, "display resolution is 0");
+    LV_CHECK_ARG_MSG(w != 0 && h != 0, return, "display resolution is 0");
 
     /* buf1 or buf2 is not aligned according to LV_DRAW_BUF_ALIGN */
-    LV_CHECK_ARG(buf1 == lv_draw_buf_align(buf1, cf), return, "buf1 is not properly aligned: %p", buf1);
-    LV_CHECK_ARG(buf2 == NULL || buf2 == lv_draw_buf_align(buf2, cf), return, "buf2 is not properly aligned: %p", buf2);
+    LV_CHECK_ARG_FORMAT_MSG(buf1 == lv_draw_buf_align(buf1, cf), return, "buf1 is not properly aligned: %p", buf1);
+    LV_CHECK_ARG_FORMAT_MSG(buf2 == NULL ||
+                            buf2 == lv_draw_buf_align(buf2, cf), return, "buf2 is not properly aligned: %p", buf2);
 
     bool is_auto_stride = stride == LV_STRIDE_AUTO;
     if(is_auto_stride) {
@@ -542,18 +555,20 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
     }
 
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        LV_CHECK_ARG(stride != 0, return, "stride is 0, check your color format %d and width: %" LV_PRIu32, cf, w);
+        LV_CHECK_ARG_FORMAT_MSG(stride != 0, return, "stride is 0, check your color format %d and width: %" LV_PRIu32, cf, w);
         /* for partial mode, we calculate the height based on the buf_size and stride */
         h = buf_size / stride;
-        LV_CHECK_ARG(h, return, "the buffer is too small");
+        LV_CHECK_ARG_MSG(h, return, "the buffer is too small");
     }
     else {
-        LV_CHECK_ARG(stride * h <= buf_size, return, "%s mode requires screen sized buffer(s)",
-                     render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
+        LV_CHECK_ARG_FORMAT_MSG(stride * h <= buf_size, return, "%s mode requires screen sized buffer(s)",
+                                render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
     }
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
-    lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
+    if(buf2) {
+        lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
+    }
     lv_display_set_draw_buffers(disp, &disp->_static_buf1, buf2 ? &disp->_static_buf2 : NULL);
     lv_display_set_render_mode(disp, render_mode);
     disp->stride_is_auto = is_auto_stride;
@@ -668,7 +683,8 @@ void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
         disp = lv_display_get_default();
     }
     LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(tile_cnt < 256, return, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)", tile_cnt);
+    LV_CHECK_ARG_FORMAT_MSG(tile_cnt < 256, return, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)",
+                            tile_cnt);
 
     disp->tile_cnt = tile_cnt;
 }
@@ -1099,15 +1115,15 @@ lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
 
 void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
 {
-    LV_CHECK_ARG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
+    LV_CHECK_ARG_MSG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
 
     if(disp == NULL) {
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
     LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
-                 disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL, return, "Unsupported rendering mode: %d", disp->render_mode);
+    LV_CHECK_ARG_FORMAT_MSG(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
+                            disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL, return, "Unsupported rendering mode: %d", disp->render_mode);
 
     disp->matrix_rotation = enable;
 }
@@ -1119,7 +1135,7 @@ bool lv_display_get_matrix_rotation(lv_display_t * disp)
         disp = lv_display_get_default();
     }
     LV_CHECK_ARG(disp != NULL, return false);
-    LV_CHECK_ARG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return false, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
+    LV_CHECK_ARG_MSG(LV_DRAW_TRANSFORM_USE_MATRIX == 1, return false, "LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
     return disp->matrix_rotation;
 }
 
@@ -1457,9 +1473,10 @@ uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t 
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
     uint32_t buf_size = stride * height;
-    if(disp->buf_1) LV_ASSERT(disp->buf_1->data_size >= buf_size);
-    if(disp->buf_2) LV_ASSERT(disp->buf_2->data_size >= buf_size);
-    if(disp->buf_3) LV_ASSERT(disp->buf_3->data_size >= buf_size);
+
+    LV_ASSERT(disp->buf_1 == NULL || disp->buf_1->data_size >= buf_size);
+    LV_ASSERT(disp->buf_2 == NULL || disp->buf_2->data_size >= buf_size);
+    LV_ASSERT(disp->buf_3 == NULL || disp->buf_3->data_size >= buf_size);
 
     return buf_size;
 }
@@ -1725,9 +1742,11 @@ static void disp_event_cb(lv_event_t * e)
 {
     LV_ASSERT(e != NULL);
     lv_event_code_t code = lv_event_get_code(e);
+    LV_ASSERT(code == LV_EVENT_REFR_REQUEST);
+    LV_UNUSED(code);
+
     lv_display_t * disp = lv_event_get_target(e);
     LV_ASSERT(disp != NULL);
-    LV_ASSERT(code == LV_EVENT_REFR_REQUEST);
 
     if(disp->refr_timer) {
         lv_timer_resume(disp->refr_timer);

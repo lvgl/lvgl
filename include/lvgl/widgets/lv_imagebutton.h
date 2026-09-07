@@ -60,11 +60,11 @@ lv_obj_t * lv_imagebutton_create(lv_obj_t * parent);
  * @param obj           pointer to an image button object
  * @param state         for which state set the new image
  * @param src_left      pointer to an image source for the left side of the button (a C array or path to
- * a file)
+ * a file) @nullable When NULL the left side is not drawn.
  * @param src_mid       pointer to an image source for the middle of the button (ideally 1px wide) (a C
- * array or path to a file)
+ * array or path to a file) @nullable When NULL the middle is not drawn.
  * @param src_right     pointer to an image source for the right side of the button (a C array or path
- * to a file)
+ * to a file) @nullable When NULL the right side is not drawn.
  */
 void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left,
                             const void * src_mid,
@@ -75,7 +75,7 @@ void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const 
  * @param obj           pointer to an image button object
  * @param state         for which state set the new image
  * @param src_left      pointer to an image source for the left side of the button
- *                      (a C array or path to a file)
+ *                      (a C array or path to a file) @nullable When NULL the left side is not drawn.
  */
 void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left);
 
@@ -84,7 +84,7 @@ void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, c
  * @param obj           pointer to an image button object
  * @param state         for which state set the new image
  * @param src_right      pointer to an image source for the right side of the button
- *                      (a C array or path to a file)
+ *                      (a C array or path to a file) @nullable When NULL the right side is not drawn.
  */
 void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_right);
 
@@ -93,7 +93,7 @@ void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, 
  * @param obj           pointer to an image button object
  * @param state         for which state set the new image
  * @param src_mid       pointer to an image source for the middle of the button
- *                      (a C array or path to a file)
+ *                      (a C array or path to a file) @nullable When NULL the middle is not drawn.
  */
 void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_mid);
 

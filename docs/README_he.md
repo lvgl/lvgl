@@ -76,7 +76,7 @@
   - יותר מ-30 [רכיבי ממשק](https://lvgl.io/docs/open/widgets) מובנים: Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table ועוד רבים.
   - [מערכת סגנונות](https://lvgl.io/docs/open/common-widget-features/styles) גמישה עם יותר מ-100 מאפייני סגנון להתאמה אישית של כל חלק ברכיבי הממשק בכל מצב.
   - מנועי פריסה בסגנון [Flexbox](https://lvgl.io/docs/open/common-widget-features/layouts/flex) ו-[Grid](https://lvgl.io/docs/open/common-widget-features/layouts/grid) לקביעת גודל ומיקום אוטומטיים ורספונסיביים של רכיבי הממשק.
-  - [קישורי נתונים](https://lvgl.io/docs/open/main-modules/observer) לחיבור קל של ממשק המשתמש עם היישום.
+  - [קישורי נתונים](https://lvgl.io/docs/open/main-modules/data_binding) לחיבור קל של ממשק המשתמש עם היישום.
   - תמיכה בעכבר, במשטח מגע, בלוח מקשים, במקלדת, בלחצנים חיצוניים וב-Encoder [התקני קלט](https://lvgl.io/docs/open/main-modules/indev).
   - תמיכה ב[תצוגות מרובות](https://lvgl.io/docs/open/main-modules/display/overview#how-many-displays-can-lvgl-use).
 

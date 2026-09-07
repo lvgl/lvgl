@@ -140,7 +140,8 @@ const void * lv_canvas_get_buf(lv_obj_t * obj);
  * @param obj           pointer to a canvas object
  * @param canvas_area   the area of the canvas to copy the new data to
  * @param src_buf       pointer to a buffer holding the source data
- * @param src_area      the area of the source buffer to copy from. If NULL, copy the whole buffer.
+ * @param src_area      the area of the source buffer to copy from. @nullable When NULL the
+ *                      whole buffer is copied.
  * @note  canvas_area and src_area should be the same size. If canvas_area and the size of src_buf are the same,
  *        src_area can be left NULL.
  */

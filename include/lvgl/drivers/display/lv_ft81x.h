@@ -68,7 +68,7 @@ typedef void (*lv_ft81x_spi_cb_t)(lv_display_t * disp, lv_ft81x_spi_operation_t 
  * @param partial_buf a single partial buffer
  * @param buf_size    size of the partial buffer
  * @param spi_cb      a callback called by the driver to perform SPI operations
- * @param user_data   use `lv_ft81x_get_user_data` to get this pointer inside the SPI callback
+ * @param user_data   use `lv_ft81x_get_user_data` to get this pointer inside the SPI callback @nullable
  * @return pointer to the display
  */
 lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size,

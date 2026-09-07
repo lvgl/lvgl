@@ -17,7 +17,7 @@ extern "C" {
 /**
  * Load a glTF model from a file
  * @param file_path path to the glTF file to load
- * @param loader pointer to the glTF model loader instance, or NULL to create a new one
+ * @param loader pointer to the glTF model loader instance @nullable
  * @return pointer to the loaded glTF model, or NULL on failure
  * @note If loader is NULL, an internal loader will be created and managed automatically
  */
@@ -28,7 +28,7 @@ lv_gltf_model_t * lv_gltf_data_load_from_file(const char * file_path,
  * Load a glTF model from a byte array
  * @param data pointer to the glTF data buffer
  * @param data_size size of the data buffer in bytes
- * @param loader pointer to the glTF model loader instance, or NULL to create a new one
+ * @param loader pointer to the glTF model loader instance @nullable
  * @return pointer to the loaded glTF model, or NULL on failure
  * @note If loader is NULL, an internal loader will be created and managed automatically
  */
@@ -38,7 +38,7 @@ lv_gltf_model_t * lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data
 
 /**
  * Delete a glTF model
- * @param model the gltf model to delete
+ * @param model the gltf model to delete @nullable
  */
 void lv_gltf_model_delete(lv_gltf_model_t * model);
 
@@ -170,6 +170,26 @@ void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value);
  * @param model pointer to a glTF model
  */
 uint32_t lv_gltf_model_get_animation_speed(const lv_gltf_model_t * model);
+
+/**
+ * Set the animation current time
+ *
+ * The time is in milliseconds with the animation speed ratio applied.
+ * Values greater than the duration of the current animation are clamped to it.
+ *
+ * @param model pointer to a glTF model
+ * @param millis the new playback time in milliseconds
+ */
+void lv_gltf_model_set_animation_time(lv_gltf_model_t * model, uint32_t millis);
+
+/**
+ * Set the animation current playback ratio
+ *
+ * @param model pointer to a glTF model
+ * @param ratio position in the animation, from 0.0 (first keyframe) to 1.0 (last keyframe).
+ *              Values outside of this range are clamped.
+ */
+void lv_gltf_model_set_animation_ratio(lv_gltf_model_t * model, float ratio);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -384,6 +384,7 @@
 
         /* Enable assertion failures if an operation fails or invalid data is found.
         * If LV_USE_LOG is enabled, an error message will be printed on failure. */
+        #define LV_USE_ASSERT               1
         #define LV_USE_ASSERT_NULL          1   /**< Check if the parameter is NULL. (Very fast, recommended) */
         #define LV_USE_ASSERT_MALLOC        1   /**< Checks is the memory is successfully allocated or no. (Very fast, recommended) */
         #define LV_USE_ASSERT_STYLE         0   /**< Check if the styles are properly initialized. (Very fast, recommended) */

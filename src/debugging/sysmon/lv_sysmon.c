@@ -76,7 +76,12 @@ void lv_sysmon_builtin_init(void)
 {
 #if LV_USE_MEM_MONITOR
     static lv_mem_monitor_t mem_info;
-    lv_subject_init_pointer(&sysmon_mem.subject, &mem_info);
+    sysmon_mem.subject = lv_subject_create(LV_SUBJECT_TYPE_POINTER);
+    if(sysmon_mem.subject == NULL) {
+        LV_LOG_WARN("Couldn't create sysmon subject");
+        return;
+    }
+    lv_subject_set_pointer(sysmon_mem.subject, &mem_info);
     sysmon_mem.timer = lv_timer_create(mem_update_timer_cb, LV_SYSMON_REFR_PERIOD_DEF, &mem_info);
 #endif
 }
@@ -85,6 +90,8 @@ void lv_sysmon_builtin_deinit(void)
 {
 #if LV_USE_MEM_MONITOR
     lv_timer_delete(sysmon_mem.timer);
+    lv_subject_delete(sysmon_mem.subject);
+    sysmon_mem.subject = NULL;
 #endif
 }
 
@@ -117,15 +124,24 @@ void lv_sysmon_show_performance(lv_display_t * disp)
     LV_CHECK_ARG(disp != NULL, return);
 
     if(disp->perf_label == NULL) {
+
+        disp->perf_sysmon_backend.subject = lv_subject_create(LV_SUBJECT_TYPE_POINTER);
+        if(!disp->perf_sysmon_backend.subject) {
+            LV_LOG_WARN("Couldn't create sysmon subject");
+            return;
+
+        }
         disp->perf_label = lv_sysmon_create(disp);
         if(disp->perf_label == NULL) {
             LV_LOG_WARN("Couldn't create sysmon");
+            lv_subject_delete(disp->perf_sysmon_backend.subject);
+            disp->perf_sysmon_backend.subject = NULL;
             return;
         }
 
-        lv_subject_init_pointer(&disp->perf_sysmon_backend.subject, &disp->perf_sysmon_info);
+        lv_subject_set_pointer(disp->perf_sysmon_backend.subject, &disp->perf_sysmon_info);
         lv_obj_align(disp->perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
-        lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, perf_observer_cb, disp->perf_label, NULL);
+        lv_subject_add_observer_obj(disp->perf_sysmon_backend.subject, perf_observer_cb, disp->perf_label, NULL);
         disp->perf_sysmon_backend.timer = lv_timer_create(perf_update_timer_cb, LV_SYSMON_REFR_PERIOD_DEF, disp);
         lv_display_add_event_cb(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
     }
@@ -193,7 +209,7 @@ void lv_sysmon_show_memory(lv_display_t * disp)
         }
 
         lv_obj_align(disp->mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
-        lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
+        lv_subject_add_observer_obj(sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
     }
 
     lv_obj_set_hidden(disp->mem_label, false);
@@ -266,7 +282,7 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
             break;
         case LV_EVENT_DELETE:
             lv_timer_delete(disp->perf_sysmon_backend.timer);
-            lv_subject_deinit(&disp->perf_sysmon_backend.subject);
+            lv_subject_delete(disp->perf_sysmon_backend.subject);
             break;
         default:
             break;
@@ -308,7 +324,7 @@ static void perf_dump_info(lv_display_t * disp)
     info->calculated.fps_avg_total = ((info->calculated.fps_avg_total * (info->calculated.run_cnt - 1)) +
                                       info->calculated.fps) / info->calculated.run_cnt;
 
-    lv_subject_set_pointer(&disp->perf_sysmon_backend.subject, info);
+    lv_subject_set_pointer(disp->perf_sysmon_backend.subject, info);
 
     lv_sysmon_perf_info_t prev_info = *info;
     lv_memzero(info, sizeof(lv_sysmon_perf_info_t));
@@ -406,7 +422,7 @@ static void mem_update_timer_cb(lv_timer_t * t)
     lv_mem_monitor_t * mem_mon = lv_timer_get_user_data(t);
     LV_ASSERT(mem_mon != NULL);
     lv_mem_monitor(mem_mon);
-    lv_subject_set_pointer(&sysmon_mem.subject, mem_mon);
+    lv_subject_set_pointer(sysmon_mem.subject, mem_mon);
 }
 
 static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject)

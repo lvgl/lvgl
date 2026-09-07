@@ -58,7 +58,7 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt);
 /**
  * Add a button to the window
  * @param win       pointer to a window widget
- * @param icon      an icon to be displayed on the button
+ * @param icon      an icon to be displayed on the button @nullable
  * @param btn_w     width of the button
  * @return          the widget where the content of the button can be created
  * @deprecated The `lv_win` widget is deprecated. See `lv_example_flex_win`.

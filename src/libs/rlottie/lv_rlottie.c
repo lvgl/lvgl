@@ -64,6 +64,8 @@ static lv_rlottie_create_info_t create_info;
 
 lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t height, const char * path)
 {
+    LV_CHECK_ARG(path != NULL, return NULL);
+
     LV_LOG_DEPRECATED(LV_RLOTTIE_DEPRECATED_MSG);
     create_info.width = width;
     create_info.height = height;
@@ -79,6 +81,8 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t
 
 lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, int32_t width, int32_t height, const char * rlottie_desc)
 {
+    LV_CHECK_ARG(rlottie_desc != NULL, return NULL);
+
     LV_LOG_DEPRECATED(LV_RLOTTIE_DEPRECATED_MSG);
     create_info.width = width;
     create_info.height = height;
@@ -94,6 +98,8 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, int32_t width, int32_t 
 
 void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     LV_LOG_DEPRECATED(LV_RLOTTIE_DEPRECATED_MSG);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     rlottie->play_ctrl = ctrl;
@@ -106,6 +112,8 @@ void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 
 void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     LV_LOG_DEPRECATED(LV_RLOTTIE_DEPRECATED_MSG);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     rlottie->current_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;

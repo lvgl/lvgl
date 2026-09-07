@@ -68,11 +68,6 @@ typedef struct lv_draw_ppa_unit {
     ppa_client_handle_t fill_client;
     ppa_client_handle_t blend_client;
     uint8_t * buf;
-    /* Set once the image path has handed the current task to the software unit.
-     * A partial decoder makes lv_draw_image_normal_helper() call the draw core
-     * back once per decoded chunk, and the fallback draws the whole image, so
-     * without this it would redraw it for every chunk. Cleared per task in
-     * ppa_dispatch(). */
     bool img_sw_fallback;
 } lv_draw_ppa_unit_t;
 
@@ -155,6 +150,16 @@ static inline ppa_blend_color_mode_t lv_color_format_to_ppa_blend(lv_color_forma
     }
 }
 
+static inline int32_t lv_ppa_pic_w(uint32_t stride, int32_t w, lv_color_format_t cf)
+{
+    if(stride == LV_STRIDE_AUTO) return w;
+
+    uint8_t px_size = lv_color_format_get_size(cf);
+    if(px_size == 0 || (stride % px_size) != 0) return 0;
+
+    return (int32_t)(stride / px_size);
+}
+
 static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t lv_fmt)
 {
     switch(lv_fmt) {
@@ -167,36 +172,6 @@ static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t 
         default:
             return PPA_SRM_COLOR_MODE_RGB565;
     }
-}
-
-/**
- * Row pitch of a picture, in pixels - what the PPA calls pic_w.
- *
- * The PPA has no stride field: it derives the pitch from pic_w times the pixel
- * size, so a buffer whose stride is padded beyond its width must be described
- * by that stride and not by its width. LVGL's image converter pads it, and every
- * decode path in this unit passes stride_align = false, which keeps that padding
- * rather than normalising it away: the 100 px wide benchmark logo is stored with
- * a 448 byte stride, 112 px, and describing it as 100 px makes every row start
- * 12 px early.
- *
- * Because no path re-strides, a source header stride is also exactly what the
- * decode returns, so ppa_evaluate() can check this without decoding first.
- *
- * Returns 0 when the stride is not a whole number of pixels - RGB888 padded to
- * 320 bytes is 106.67 px - which the PPA cannot describe at all. Callers must
- * treat that as "not for this draw unit".
- */
-static inline int32_t lv_ppa_pic_w(uint32_t stride, int32_t w, lv_color_format_t cf)
-{
-    /* LV_STRIDE_AUTO. lv_image_decoder_open() resolves it to width * pixel size
-     * (img_width_to_stride(), no alignment applied), so the pitch is the width. */
-    if(stride == LV_STRIDE_AUTO) return w;
-
-    uint8_t px_size = lv_color_format_get_size(cf);
-    if(px_size == 0 || (stride % px_size) != 0) return 0;
-
-    return (int32_t)(stride / px_size);
 }
 
 #define PPA_ALIGN_UP(x, align)  ((((x) + (align) - 1) / (align)) * (align))

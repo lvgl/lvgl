@@ -62,14 +62,14 @@ static void log_cb(lv_log_level_t level, const char * buf)
 
 static int helper_return_val_on_null(void * ptr)
 {
-    LV_CHECK_ARG(ptr != NULL, return -1, "ptr is NULL");
+    LV_CHECK_ARG_MSG(ptr != NULL, return -1, "ptr is NULL");
     LV_UNUSED(ptr);
     return 42;
 }
 
 static void helper_return_void_on_null(void * ptr, bool * was_reached)
 {
-    LV_CHECK_ARG(ptr != NULL, return, "ptr is NULL");
+    LV_CHECK_ARG_MSG(ptr != NULL, return, "ptr is NULL");
     LV_UNUSED(ptr);
     *was_reached = true;
 }
@@ -82,7 +82,7 @@ static void helper_return_void_on_null(void * ptr, bool * was_reached)
 void test_check_arg_condition_true(void)
 {
     int x = 0;
-    LV_CHECK_ARG(1 == 1, x = -1, ": should not fire");
+    LV_CHECK_ARG_MSG(1 == 1, x = -1, ": should not fire");
     TEST_ASSERT_EQUAL_INT(0, x);
     TEST_ASSERT_FALSE(log_warned);
 }
@@ -95,7 +95,7 @@ void test_check_arg_condition_true(void)
 void test_check_arg_condition_false(void)
 {
     int x = 0;
-    LV_CHECK_ARG(1 == 0, x = -1, ": test failure action");
+    LV_CHECK_ARG_MSG(1 == 0, x = -1, ": test failure action");
     TEST_ASSERT_EQUAL_INT(-1, x);
 #if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
@@ -113,7 +113,7 @@ void test_check_arg_printf_args(void)
     int x = 0;
     int val = 7;
     LV_UNUSED(val);
-    LV_CHECK_ARG(val > 10, x = -1, ": val=%d", val);
+    LV_CHECK_ARG_FORMAT_MSG(val > 10, x = -1, ": val=%d", val);
     TEST_ASSERT_EQUAL_INT(-1, x);
 #if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
@@ -130,7 +130,7 @@ void test_check_arg_action_break(void)
 {
     int i;
     for(i = 0; i < 5; i++) {
-        LV_CHECK_ARG(i < 3, break, ": breaking at i=%d", i);
+        LV_CHECK_ARG_FORMAT_MSG(i < 3, break, ": breaking at i=%d", i);
     }
     TEST_ASSERT_EQUAL_INT(3, i);
 #if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
@@ -195,10 +195,10 @@ void test_check_arg_return_val_condition_false(void)
 void test_check_arg_multiple_in_sequence(void)
 {
     int x = 0;
-    LV_CHECK_ARG(1 == 1, x = 1, ": first");
+    LV_CHECK_ARG_MSG(1 == 1, x = 1, ": first");
     TEST_ASSERT_FALSE(log_warned);
 
-    LV_CHECK_ARG(1 == 0, x = 2, ": second");
+    LV_CHECK_ARG_MSG(1 == 0, x = 2, ": second");
     TEST_ASSERT_EQUAL_INT(2, x);
 #if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
@@ -209,7 +209,7 @@ void test_check_arg_multiple_in_sequence(void)
 /* Complex expression as error value in return */
 static int helper_return_val_complex_expr(void * ptr)
 {
-    LV_CHECK_ARG(ptr != NULL, return (1 > 0 ? -100 : -200), "complex expr");
+    LV_CHECK_ARG_MSG(ptr != NULL, return (1 > 0 ? -100 : -200), "complex expr");
     LV_UNUSED(ptr);
     return 42;
 }
@@ -227,7 +227,7 @@ void test_check_arg_return_val_complex_expr(void)
 /* Zero as error return value is not confused with success */
 static int helper_return_val_zero(void * ptr)
 {
-    LV_CHECK_ARG(ptr != NULL, return 0, "returns zero");
+    LV_CHECK_ARG_MSG(ptr != NULL, return 0, "returns zero");
     LV_UNUSED(ptr);
     return 42;
 }

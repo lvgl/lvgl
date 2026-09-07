@@ -42,6 +42,7 @@ int GLAD_EGL_KHR_image = 0;
 int GLAD_EGL_KHR_image_base = 0;
 int GLAD_EGL_KHR_platform_gbm = 0;
 int GLAD_EGL_KHR_reusable_sync = 0;
+int GLAD_EGL_MESA_platform_surfaceless = 0;
 
 
 
@@ -260,6 +261,7 @@ static int glad_egl_find_extensions_egl(EGLDisplay display) {
     GLAD_EGL_KHR_image_base = glad_egl_has_extension(extensions, "EGL_KHR_image_base");
     GLAD_EGL_KHR_platform_gbm = glad_egl_has_extension(extensions, "EGL_KHR_platform_gbm");
     GLAD_EGL_KHR_reusable_sync = glad_egl_has_extension(extensions, "EGL_KHR_reusable_sync");
+    GLAD_EGL_MESA_platform_surfaceless = glad_egl_has_extension(extensions, "EGL_MESA_platform_surfaceless");
 
     return 1;
 }

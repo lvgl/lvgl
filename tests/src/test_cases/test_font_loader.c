@@ -28,6 +28,9 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2);
 void test_font_loader_with_cache(void);
 void test_font_loader_no_cache(void);
 void test_font_loader_from_buffer(void);
+void test_font_loader_dynamic(void);
+void test_font_loader_corrupt_kern(void);
+void test_font_loader_dynamic_from_buffer(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -143,6 +146,69 @@ void test_font_loader_from_buffer(void)
     TEST_ASSERT_NOT_NULL(font_3_bin);
 
     common();
+}
+
+void test_font_loader_dynamic(void)
+{
+    /*Load the glyph bitmaps on demand instead of loading them all into RAM*/
+
+    lv_binfont_dsc_t dsc = {
+        .dynamic_glyph_load = true,
+    };
+
+    dsc.path = "A:src/test_assets/test_font_1.fnt";
+    font_1_bin = lv_binfont_create_ex(&dsc);
+    TEST_ASSERT_NOT_NULL(font_1_bin);
+
+    dsc.path = "A:src/test_assets/test_font_2.fnt";
+    font_2_bin = lv_binfont_create_ex(&dsc);
+    TEST_ASSERT_NOT_NULL(font_2_bin);
+
+    dsc.path = "A:src/test_assets/test_font_3.fnt";
+    font_3_bin = lv_binfont_create_ex(&dsc);
+    TEST_ASSERT_NOT_NULL(font_3_bin);
+
+    /*The rendered result has to be identical to the fully loaded fonts*/
+    common();
+}
+
+void test_font_loader_dynamic_from_buffer(void)
+{
+    /*Dynamic loading from a memory mapped file*/
+
+    lv_binfont_dsc_t dsc = {
+        .dynamic_glyph_load = true,
+    };
+
+    dsc.buffer = test_font_1_buf;
+    dsc.buffer_size = sizeof(test_font_1_buf);
+    font_1_bin = lv_binfont_create_ex(&dsc);
+    TEST_ASSERT_NOT_NULL(font_1_bin);
+
+    dsc.buffer = test_font_2_buf;
+    dsc.buffer_size = sizeof(test_font_2_buf);
+    font_2_bin = lv_binfont_create_ex(&dsc);
+    TEST_ASSERT_NOT_NULL(font_2_bin);
+
+    dsc.buffer = test_font_3_buf;
+    dsc.buffer_size = sizeof(test_font_3_buf);
+    font_3_bin = lv_binfont_create_ex(&dsc);
+    TEST_ASSERT_NOT_NULL(font_3_bin);
+
+    common();
+}
+
+void test_font_loader_corrupt_kern(void)
+{
+    const char * path = "A:src/test_assets/test_font_corrupt_kern.fnt";
+
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
 }
 
 void test_font_loader_reload(void)
@@ -297,7 +363,9 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc2 = (lv_font_fmt_txt_glyph_dsc_t *)dsc2->glyph_dsc;
 
     for(int i = 0; i < total_glyphs; ++i) {
-        if(i < total_glyphs - 1) {
+        /*A dynamically loaded font has no `glyph_bitmap` array, the screenshot comparison of the
+         *caller covers its glyphs instead*/
+        if(i < total_glyphs - 1 && !dsc2->are_glyphs_dynamic_loaded) {
             int size1 = glyph_dsc1[i + 1].bitmap_index - glyph_dsc1[i].bitmap_index;
 
             if(size1 > 0) {

@@ -97,7 +97,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res);
 
 /**
  * Remove a display
- * @param disp      pointer to display
+ * @param disp      pointer to display @nullable
  */
 void lv_display_delete(lv_display_t * disp);
 
@@ -354,11 +354,10 @@ void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t 
  * @param disp              pointer to a display
  * @param color_format      Possible values are
  *                          - LV_COLOR_FORMAT_RGB565
+ *                          - LV_COLOR_FORMAT_RGB565_SWAPPED
  *                          - LV_COLOR_FORMAT_RGB888
  *                          - LV_COLOR_FORMAT_XRGB888
  *                          - LV_COLOR_FORMAT_ARGB888
- *@note To change the endianness of the rendered image in case of RGB565 format
- *      (i.e. swap the 2 bytes) call `lv_draw_sw_rgb565_swap` in the flush_cb
  */
 void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
 
@@ -555,7 +554,7 @@ lv_obj_t * lv_layer_bottom(void);
  * @param disp          pointer to a display
  * @param event_cb      an event callback
  * @param filter        event code to react or `LV_EVENT_ALL`
- * @param user_data     optional user_data
+ * @param user_data     optional user_data @nullable
  * @return the event descriptor or NULL if the event couldn't be created
  */
 lv_event_dsc_t * lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter,
@@ -588,7 +587,7 @@ bool lv_display_remove_event(lv_display_t * disp, uint32_t index);
  * Remove an event_cb with user_data
  * @param disp          pointer to a display
  * @param event_cb      the event_cb of the event to remove
- * @param user_data     user_data
+ * @param user_data     user_data @nullable
  * @return              the count of the event removed
  */
 uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data);
@@ -682,7 +681,7 @@ void lv_display_delete_refr_timer(lv_display_t * disp);
  *
  * @param disp      pointer to a display
  * @param event_cb      an event callback
- * @param user_data     optional user_data
+ * @param user_data     optional user_data @nullable
  */
 bool lv_display_register_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data);
 
@@ -691,7 +690,7 @@ bool lv_display_register_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb
  * Please don't use it in display event listeners, as it may cause memory leaks and illegal access issues.
  * @param disp      pointer to a display
  * @param event_cb      an event callback
- * @param user_data     optional user_data
+ * @param user_data     optional user_data @nullable
  */
 bool lv_display_unregister_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data);
 

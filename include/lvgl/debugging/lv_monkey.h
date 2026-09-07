@@ -89,7 +89,7 @@ bool lv_monkey_get_enable(lv_monkey_t * monkey);
 /**
  * Set the user_data field of the monkey
  * @param monkey   pointer to a monkey
- * @param user_data   pointer to the new user_data.
+ * @param user_data   pointer to the new user_data. @nullable
  */
 void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data);
 
@@ -102,7 +102,7 @@ void * lv_monkey_get_user_data(lv_monkey_t * monkey);
 
 /**
  * Delete monkey
- * @param monkey pointer to monkey
+ * @param monkey pointer to monkey @nullable
  */
 void lv_monkey_delete(lv_monkey_t * monkey);
 

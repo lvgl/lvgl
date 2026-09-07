@@ -28,10 +28,41 @@ jobs:
         with:
           python-version: 3.12
 
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.11.1
+
       - name: Install dependencies
         # sbom/requirements.txt pins the SBOM validator so an unreviewed
         # upstream release cannot silently change or break the compliance gate.
         run: python3 -m pip install kconfiglib pytest -r sbom/requirements.txt
+
+      # The built-in font generator formats its output with astyle, so it has
+      # to be the same build the rest of the tree is formatted with.
+      - name: Checkout astyle
+        uses: actions/checkout@v7
+        with:
+          repository: lvgl/astyle
+          path: astyle
+          ref: v3.4.12
+
+      - name: Install astyle
+        run: |
+          cd astyle/build/gcc/
+          make -j
+          sudo make install
+          astyle --version
+
+      - name: Install lv_font_conv
+        env:
+          LV_FONT_CONV_REF: ed6084a0649046ba4061ef1f9312e13bdcfe6fbd
+        run: |
+          git clone https://github.com/lvgl/lv_font_conv.git "$RUNNER_TEMP/lv_font_conv"
+          git -C "$RUNNER_TEMP/lv_font_conv" checkout "$LV_FONT_CONV_REF"
+          npm ci --prefix "$RUNNER_TEMP/lv_font_conv"
+          sudo ln -s "$RUNNER_TEMP/lv_font_conv/lv_font_conv.js" /usr/local/bin/lv_font_conv
+          lv_font_conv --version
 
       # ------------------------------------------------------------------
       # Unit tests for the config-headers generator itself.
@@ -43,9 +74,9 @@ jobs:
         run: python3 -m pytest config_headers/test/ -q
 
       # ------------------------------------------------------------------
-      # Config headers: lv_conf_template.h, lv_conf_internal.h and
-      # lv_conf_kconfig.h are generated from the Kconfig tree. Regenerate
-      # them and fail if the committed files differ.
+      # Config headers: lv_conf_template.h, lv_conf_internal.h,
+      # lv_conf_kconfig.h and lv_conf_check.c are generated from the Kconfig
+      # tree. Regenerate them and fail if the committed files differ.
       # ------------------------------------------------------------------
       - name: "Generate: config headers (Kconfig)"
         id: config-headers
@@ -57,6 +88,7 @@ jobs:
             lv_conf_template.h \
             include/lvgl/config/lv_conf_internal.h \
             include/lvgl/config/lv_conf_kconfig.h \
+            src/lv_conf_check.c \
           || (echo "::error::Generated config headers are out of date. Run scripts/generators/config_headers.py and commit the result."; exit 1)
           git restore .
 
@@ -69,7 +101,7 @@ jobs:
         run: |
           python3 scripts/generators/style_api.py
           git diff --exit-code || (echo "::error::Generated styles are out of date. Run scripts/generators/style_api.py and commit the result."; exit 1)
-          git restore .
+          git reset --hard
 
       # ------------------------------------------------------------------
       # Defconfig
@@ -80,7 +112,33 @@ jobs:
         run: |
           python3 scripts/generators/defconfigs.py
           git diff --exit-code || (echo "::error::Defconfigs are out of date. Run scripts/generators/defconfigs.py and commit the result."; exit 1)
-          git restore .
+          git reset --hard
+
+      # ------------------------------------------------------------------
+      # GDB constants
+      # ------------------------------------------------------------------
+      - name: "Generate: GDB constants"
+        id: gdb-consts
+        continue-on-error: true
+        run: |
+          python3 scripts/gdb/scripts/generate_all.py
+          git add -A -- scripts/gdb
+          git diff --cached --exit-code -- scripts/gdb \
+          || (echo "::error::GDB constants are out of date. Run scripts/gdb/scripts/generate_all.py and commit the result."; exit 1)
+          git reset --hard
+
+      # ------------------------------------------------------------------
+      # Built-in fonts 
+      # ------------------------------------------------------------------
+      - name: "Generate: built-in fonts"
+        id: built-in-fonts
+        continue-on-error: true
+        run: |
+          python3 scripts/generators/built_in_font/generate_all.py
+          git add src/font
+          git diff --exit-code -- src/font \
+          || (echo "::error::Generated built-in fonts are out of date. Run scripts/generators/built_in_font/generate_all.py and commit the result."; exit 1)
+          git reset --hard
 
       # ------------------------------------------------------------------
       # COPYRIGHTS.md and the SPDX SBOM (sbom/) are generated from
@@ -115,6 +173,8 @@ jobs:
           steps.config-headers.outcome       == 'failure' ||
           steps.style-api.outcome            == 'failure' ||
           steps.defconfig.outcome            == 'failure' ||
+          steps.gdb-consts.outcome           == 'failure' ||
+          steps.built-in-fonts.outcome       == 'failure' ||
           steps.copyrights.outcome           == 'failure' ||
           steps.sbom.outcome                 == 'failure' ||
           steps.sbom_schema.outcome          == 'failure'
@@ -135,6 +195,8 @@ jobs:
           print_result "config-headers"       "${{ steps.config-headers.outcome }}"
           print_result "style-api"            "${{ steps.style-api.outcome }}"
           print_result "defconfig"            "${{ steps.defconfig.outcome }}"
+          print_result "gdb-consts"           "${{ steps.gdb-consts.outcome }}"
+          print_result "built-in-fonts"       "${{ steps.built-in-fonts.outcome }}"
           print_result "copyrights"           "${{ steps.copyrights.outcome }}"
           print_result "sbom"                 "${{ steps.sbom.outcome }}"
           print_result "sbom_schema"          "${{ steps.sbom_schema.outcome }}"

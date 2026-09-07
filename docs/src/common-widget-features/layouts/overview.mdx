@@ -48,13 +48,11 @@ These flags can be added/removed with <ApiLink name="lv_obj_add_flag" display="l
 LVGL can be freely extended by a custom layout like this:
 
 ```c
-uint32_t MY_LAYOUT;
-
-...
-
-MY_LAYOUT = lv_layout_register(my_layout_update, &user_data);
-lv_layout_set_min_size_cb(MY_LAYOUT, my_layout_get_min_size); /* Optional */
-
+lv_layout_callbacks_t callbacks {
+    .layout_update_cb = my_layout_update,
+    .get_min_size_cb = my_get_min_size, // or NULL
+};
+uint32_t layout = lv_layout_create(callbacks, &user_data);
 ...
 
 void my_layout_update(lv_obj_t * widget, void * user_data)

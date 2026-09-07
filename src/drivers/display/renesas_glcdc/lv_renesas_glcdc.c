@@ -97,6 +97,7 @@ lv_display_t * lv_renesas_glcdc_direct_create(void)
 
 lv_display_t * lv_renesas_glcdc_partial_create(void * buf1, void * buf2, size_t buf_size)
 {
+    LV_CHECK_ARG(buf1 != NULL, return NULL);
     partial_buffer_size = buf_size;
     return glcdc_create(buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 }
@@ -302,9 +303,9 @@ static void flush_partial(lv_display_t * display, const lv_area_t * area, uint8_
         }
 
         if(rotation == LV_DISPLAY_ROTATION_180)
-            lv_draw_sw_rotate(img, rotation_buffer, w, h, w_stride, w_stride, rotation, cf);
+            lv_draw_rotate(img, rotation_buffer, w, h, w_stride, w_stride, rotation, cf);
         else /* 90 or 270 */
-            lv_draw_sw_rotate(img, rotation_buffer, w, h, w_stride, h_stride, rotation, cf);
+            lv_draw_rotate(img, rotation_buffer, w, h, w_stride, h_stride, rotation, cf);
 
         img = rotation_buffer;
 

@@ -264,7 +264,7 @@ static void color_event_cb(lv_event_t * e)
         lv_palette_t palette_secondary = (*palette_primary) + 3; /*Use another palette as secondary*/
         if(palette_secondary >= LV_PALETTE_LAST) palette_secondary = 0;
 #if LV_USE_THEME_DEFAULT
-        lv_theme_default_init(NULL, lv_palette_main(*palette_primary), lv_palette_main(palette_secondary),
+        lv_theme_default_init(lv_obj_get_display(obj), lv_palette_main(*palette_primary), lv_palette_main(palette_secondary),
                               LV_THEME_DEFAULT_DARK, font_normal);
 #endif
         lv_color_t color = lv_palette_main(*palette_primary);

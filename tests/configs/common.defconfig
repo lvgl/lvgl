@@ -1,5 +1,6 @@
 # Route failed asserts to lv_test_assert_fail() so they fail the test case
 # instead of halting. The path is relative to the LVGL root directory.
+CONFIG_LV_USE_ASSERT=y
 CONFIG_LV_ASSERT_USE_CUSTOM_INCLUDE=y
 CONFIG_LV_ASSERT_CUSTOM_INCLUDE="tests/src/lv_test_assert.h"
 

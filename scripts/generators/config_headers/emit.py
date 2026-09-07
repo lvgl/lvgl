@@ -19,6 +19,7 @@ from .config_entry import (
     BoolConfig,
     ConstraintCheck,
     ConstToken,
+    DerivedConstToken,
     DerivedFlag,
     EnumChoice,
 )
@@ -44,6 +45,9 @@ class Emitter:
         self.cond_stack: list[str] = []
         self.emitted: set[str] = set()
         self.deferred: list[DerivedFlag] = []  # internal: emitted after the body
+        # internal: emitted after the compatibility block, once their selector
+        # macro is defined
+        self.derived_consts: list[DerivedConstToken] = []
         # member symbol -> (macro, token): rewrites a `#if <member>` guard (only
         # valid on the Kconfig path) into `<macro> == <token>` (valid on both).
         self.guard: dict[str, tuple[str, str]] = enum_guard_map(entries)
@@ -112,6 +116,10 @@ class Emitter:
         if isinstance(entry, DerivedFlag):
             if self.target == "internal":
                 self.deferred.append(entry)
+            return
+        if isinstance(entry, DerivedConstToken):
+            if self.target == "internal":
+                self.derived_consts.append(entry)
             return
         lines = (
             entry.emit_template()
@@ -421,6 +429,20 @@ def generate_internal(kconf: Kconfig, entries) -> str:
     options = render_config_options(entries)
     preamble = templates.INTERNAL_PREAMBLE.replace("__CONFIG_OPTIONS__", options)
 
+    # Values derived from a selected option, emitted straight after the
+    # compatibility block: the selector macro is defined by the body above, and
+    # the derived capability flags below may read the result.
+    derived_consts: list[str] = []
+    if em.derived_consts:
+        derived_consts += [
+            "",
+            "/* Values fixed by another option's selected token (see LV_CONF_PASTE). */",
+            "",
+        ]
+        for const in em.derived_consts:
+            derived_consts += const.emit_internal()
+            derived_consts += ["", ""]
+
     deferred: list[str] = []
     if em.deferred:
         for flag in em.deferred:
@@ -451,9 +473,25 @@ def generate_internal(kconf: Kconfig, entries) -> str:
             custom_inc.append("#endif")
             custom_inc.append("")
 
+    return (
+        preamble
+        + "\n"
+        + "\n".join(em.out)
+        + "\n"
+        + templates.INTERNAL_COMPATIBILITY_BLOCK
+        + "\n"
+        + "\n".join(derived_consts)
+        + "\n".join(deferred)
+        + "\n".join(custom_inc)
+        + templates.INTERNAL_FOOTER
+        + templates.INTERNAL_CLOSE
+    )
+
+
+def generate_checker(kconf: Kconfig, entries) -> str:
+    preamble = templates.CHECK_PREAMBLE
     # Replay Kconfig `select` / `depends on` as #error guards on the lv_conf.h
-    # path.  Emitted after the footer derivations so checks may reference symbols
-    # computed there (e.g. the Wayland/EGL backend flags).
+    # path.
     guards: list[str] = []
     checks = constraint_checks(entries)
     if checks:
@@ -469,13 +507,7 @@ def generate_internal(kconf: Kconfig, entries) -> str:
     return (
         preamble
         + "\n"
-        + "\n".join(em.out)
-        + "\n"
-        + templates.INTERNAL_COMPATIBILITY_BLOCK
-        + "\n"
-        + "\n".join(deferred)
-        + "\n".join(custom_inc)
-        + templates.INTERNAL_FOOTER
+        + templates.CHECK_DEPRECATED_SYMBOLS_SECTION
         + "\n".join(guards)
-        + templates.INTERNAL_CLOSE
+        + "\n"
     )

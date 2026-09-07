@@ -112,7 +112,7 @@ void lv_draw_nanovg_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc,
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    lv_draw_unit_draw_letter(t, &glyph_dsc, &(lv_point_t) {
+    lv_draw_unit_draw_letter_internal(t, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
     dsc->font, dsc->unicode, draw_letter_cb);
@@ -255,7 +255,7 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
         return false;
     }
 
-    const lv_draw_buf_t * bitmap_draw_buf = (const lv_draw_buf_t *)lv_font_get_glyph_bitmap(g_dsc, image_buf);
+    const lv_draw_buf_t * bitmap_draw_buf = (const lv_draw_buf_t *)lv_font_get_glyph_bitmap_internal(g_dsc, image_buf);
     if(!bitmap_draw_buf) {
         LV_PROFILER_DRAW_END;
         return false;
@@ -266,7 +266,7 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
                                                                                                      0));
     LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
 
-    lv_font_glyph_release_draw_data(g_dsc);
+    lv_font_glyph_release_draw_data_internal(g_dsc);
 
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
     LV_PROFILER_DRAW_END;
@@ -324,7 +324,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 #endif /* LV_USE_FREETYPE */
 
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
-                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     if(!glyph_draw_dsc->glyph_data) {
                         return;
                     }

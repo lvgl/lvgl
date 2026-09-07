@@ -328,7 +328,7 @@ void lv_anim_set_early_apply(lv_anim_t * a, bool en);
 /**
  * Set the custom user data field of the animation.
  * @param a           pointer to an initialized `lv_anim_t` variable
- * @param user_data   pointer to the new user_data.
+ * @param user_data   pointer to the new user_data. @nullable
  */
 void lv_anim_set_user_data(lv_anim_t * a, void * user_data);
 
@@ -386,7 +386,7 @@ void * lv_anim_get_user_data(const lv_anim_t * a);
 
 /**
  * Delete animation(s) of a variable with a given animator function
- * @param var       pointer to variable
+ * @param var       pointer to variable @nullable
  * @param exec_cb   a function pointer which is animating 'var',
  *                  or NULL to ignore it and delete all the animations of 'var
  * @return          true: at least 1 animation is deleted, false: no animation is deleted

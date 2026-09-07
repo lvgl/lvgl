@@ -200,6 +200,10 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, STATE_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      96),
     LV_PROPERTY_ID(OBJ, FLEX_IN_NEW_TRACK,          LV_PROPERTY_TYPE_BOOL,      97),
 
+#if LV_USE_OBJ_NAME
+    LV_PROPERTY_ID(OBJ, NAME,               		LV_PROPERTY_TYPE_TEXT,  	98),
+#endif
+
     LV_PROPERTY_OBJ_END,
 };
 #endif
@@ -433,18 +437,96 @@ void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state);
  */
 void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
 
+/** Add or remove `LV_STATE_ALT`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_alt(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_CHECKED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_checked(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_FOCUSED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_focused(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_FOCUS_KEY`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_focus_key(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_EDITED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_edited(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_HOVERED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_hovered(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_PRESSED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_pressed(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_SCROLLED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_scrolled(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_DISABLED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_disabled(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_USER_1`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_state_user_1(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_USER_2`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_state_user_2(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_USER_3`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_state_user_3(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_USER_4`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_state_user_4(lv_obj_t * obj, bool en);
+
 /**
  * Set the user_data field of the object
  * @param obj   pointer to an object
- * @param user_data   pointer to the new user_data.
+ * @param user_data   pointer to the new user_data. @nullable
  */
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
 
 /**
  * Set one of the 4 flags available for the user
  * @param obj   pointer to an object
- * @param bit	the index of the bit (0..3)
- * @param v		the value of the bit, true or false
+ * @param bit   the index of the bit (0..3)
+ * @param v     the value of the bit, true or false
  */
 void lv_obj_set_user_flag(lv_obj_t * obj, uint32_t bit, bool v);
 
@@ -638,6 +720,84 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj);
  */
 bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
 
+/** Get whether the object is in `LV_STATE_ALT`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_alt(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_CHECKED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_checked(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_FOCUSED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_focused(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_FOCUS_KEY`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_focus_key(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_EDITED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_edited(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_HOVERED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_hovered(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_PRESSED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_pressed(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_SCROLLED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_scrolled(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_DISABLED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_disabled(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_USER_1`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_state_user_1(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_USER_2`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_state_user_2(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_USER_3`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_state_user_3(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_USER_4`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_state_user_4(const lv_obj_t * obj);
+
 /**
  * Get the group of the object
  * @param       obj pointer to an object
@@ -655,8 +815,8 @@ void * lv_obj_get_user_data(lv_obj_t * obj);
 /**
  * Get the value of one of the 4 flags available for the user
  * @param obj   pointer to an object
- * @param bit	the index of the bit (0..3)
- * @return		the value of the bit, true or false
+ * @param bit   the index of the bit (0..3)
+ * @return      the value of the bit, true or false
  */
 bool lv_obj_get_user_flag(lv_obj_t * obj, uint32_t bit);
 
@@ -689,11 +849,21 @@ bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p);
 const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
 
 /**
- * Check if any object is still "alive".
- * @param obj       pointer to an object
- * @return          true: valid
+ * Walk up `obj`'s parent chain to its root and check whether that root is
+ * present in some `lv_display_t`'s screen list.
+ *
+ * For any properly-created live object this returns true: the public API
+ * does not allow creating a screen without registering it on a display, nor
+ * detaching a subtree from its display. The function is therefore primarily
+ * a defensive check — it returns false for NULL, and (best-effort) for
+ * stale/corrupted pointers whose memory no longer reads back as a chain
+ * terminating at a registered screen. It is not a reliable use-after-free
+ * detector: freed memory may still satisfy the check by coincidence.
+ *
+ * @param obj   pointer to an object
+ * @return      true if the root of `obj`'s parent chain is a registered screen
  */
-bool lv_obj_is_valid(const lv_obj_t * obj);
+bool lv_obj_is_in_widget_tree(const lv_obj_t * obj);
 
 /**
  * Utility to set an object reference to NULL when it gets deleted.
@@ -719,7 +889,7 @@ void lv_obj_null_on_delete(lv_obj_t ** obj_ptr);
  *
  * @param obj       Pointer to the LVGL object to attach the delete callback to.
  * @param cb        The delete callback function to register.
- * @param user_data     User data pointer passed to `cb` when the object is deleted.
+ * @param user_data     User data pointer passed to `cb` when the object is deleted. @nullable
  *
  * @return      Pointer to the delete descriptor or NULL if the operation failed.
  */
@@ -730,7 +900,7 @@ lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void *
  *
  * Removes a delete descriptor previously created via @ref lv_obj_add_delete_cb
  *
- * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op
+ * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op @nullable
  */
 void lv_obj_remove_delete_cb(lv_delete_dsc_t * dsc);
 
@@ -861,12 +1031,12 @@ void lv_objid_builtin_destroy(void);
  *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
  *             and executes the supplied action, which is safer in production.
  */
-#define LV_ASSERT_OBJ(obj_p, obj_class)                                                             \
-    do {                                                                                              \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");             \
-        LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
-        LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
-        LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
+#define LV_ASSERT_OBJ(obj_p, obj_class)                                                                      \
+    do {                                                                                                     \
+        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");                  \
+        LV_ASSERT_INTERNAL(obj_p != NULL, "");                                                               \
+        LV_ASSERT_INTERNAL(lv_obj_has_class(obj_p, obj_class) == true, "");                                  \
+        LV_ASSERT_INTERNAL(lv_obj_is_in_widget_tree(obj_p) == true, "");                                     \
     } while(0)
 # else
 /**
@@ -875,7 +1045,7 @@ void lv_objid_builtin_destroy(void);
 #define LV_ASSERT_OBJ(obj_p, obj_class) \
     do { \
         LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead."); \
-        LV_ASSERT_NULL(obj_p); \
+        LV_ASSERT_INTERNAL(obj_p, ""); \
     } while(0)
 #endif
 

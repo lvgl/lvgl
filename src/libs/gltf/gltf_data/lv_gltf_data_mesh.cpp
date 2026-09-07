@@ -36,6 +36,7 @@
 
 lv_gltf_mesh_data_t * lv_gltf_get_new_meshdata(lv_gltf_model_t * data)
 {
+    LV_ASSERT(data != NULL);
     data->meshes.emplace_back(lv_gltf_mesh_data_t {});
     return &(data->meshes[data->meshes.size() - 1]);
 }
@@ -43,6 +44,8 @@ lv_gltf_mesh_data_t * lv_gltf_get_new_meshdata(lv_gltf_model_t * data)
 
 lv_gltf_mesh_data_t * lv_gltf_data_get_mesh(lv_gltf_model_t * data, size_t index)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(index < data->meshes.size());
     return &data->meshes[index];
 }
 

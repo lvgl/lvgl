@@ -15,14 +15,15 @@
  */
 void lv_example_arc_value_range(void)
 {
-    static lv_subject_t subject_value;
+    static lv_subject_t * subject_value;
 
     static bool inited = false;
 
     if(!inited) {
-        lv_subject_init_int(&subject_value, 50);
-        lv_subject_set_min_value_int(&subject_value, 0);
-        lv_subject_set_max_value_int(&subject_value, 100);
+        subject_value = lv_subject_create(LV_SUBJECT_TYPE_INT);
+        lv_subject_set_min_value_int(subject_value, 0);
+        lv_subject_set_max_value_int(subject_value, 100);
+        lv_subject_set_int(subject_value, 50);
         inited = true;
     }
 
@@ -39,11 +40,11 @@ void lv_example_arc_value_range(void)
     lv_arc_set_value(arc_2, 140);
     lv_arc_set_bg_start_angle(arc_2, 135);
     lv_arc_set_bg_end_angle(arc_2, 45);
-    lv_arc_bind_value(arc_2, &subject_value);
+    lv_arc_bind_value(arc_2, subject_value);
     lv_obj_t * label_4 = lv_label_create(arc_2);
     lv_obj_set_align(label_4, LV_ALIGN_CENTER);
     lv_obj_set_y(label_4, -10);
-    lv_label_bind_text(label_4, &subject_value, NULL);
+    lv_label_bind_text(label_4, subject_value, NULL);
 
     lv_obj_t * label_3 = lv_label_create(arc_2);
     lv_obj_set_align(label_3, LV_ALIGN_CENTER);

@@ -78,7 +78,7 @@ both the track and the active fill independently.
 ## Data binding
 
 Data bindings connect a widget property to a piece of global data — a
-[Subject](/main-modules/observer/observer). When the subject's value
+[Subject](/main-modules/data_binding/subjects). When the subject's value
 changes, every widget bound to it updates automatically; and an
 interactive widget can write back into the subject so other subscribers
 see the new value.
@@ -88,9 +88,9 @@ Widget) because the bar isn't interactive — application-side writes into
 the subject update the bar's fill. Integer and float subjects are
 supported.
 
-- <ApiLink name="lv_bar_bind_value" display="lv_bar_bind_value(bar, &subject)" />
+- <ApiLink name="lv_bar_bind_value" display="lv_bar_bind_value(bar, subject)" />
 
-To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
 
 
 <LvglExample name="lv_example_bar_bind_value" path="widgets/bar/lv_example_bar_bind_value" />

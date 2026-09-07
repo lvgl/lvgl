@@ -139,7 +139,7 @@ hides the section — a quick way to toggle it off
 ### Data binding
 
 Data bindings connect a widget property to a piece of global data — a
-[Subject](/main-modules/observer/observer). When the subject's value
+[Subject](/main-modules/data_binding/subjects). When the subject's value
 changes, every widget bound to it updates automatically; and an
 interactive widget can write back into the subject so other subscribers
 see the new value.
@@ -148,8 +148,8 @@ A Scale Section binds its minimum and maximum to Subjects. The link is
 one-way (Subject → Widget): application-side writes into either subject
 move that end of the section band. Only integer subjects are supported.
 
-- <ApiLink name="lv_scale_bind_section_min_value" display="lv_scale_bind_section_min_value(scale, section1, &subject)" />
-- <ApiLink name="lv_scale_bind_section_max_value" display="lv_scale_bind_section_max_value(scale, section1, &subject)" />
+- <ApiLink name="lv_scale_bind_section_min_value" display="lv_scale_bind_section_min_value(scale, section1, subject)" />
+- <ApiLink name="lv_scale_bind_section_max_value" display="lv_scale_bind_section_max_value(scale, section1, subject)" />
 
 <LvglExample name="lv_example_scale_bind_section" path="widgets/scale/lv_example_scale_bind_section" />
 
@@ -167,9 +167,12 @@ Relevant style properties per part:
 | Part | Properties |
 |---|---|
 | <ApiLink name="LV_PART_MAIN" /> (line) | `line_width`, `line_color`, `line_opa` |
-| <ApiLink name="LV_PART_MAIN" /> (arc) | `arc_width`, `arc_color`, `arc_opa`, `arc_rounded`, `arc_image_src` |
+| <ApiLink name="LV_PART_MAIN" /> (arc) | `arc_width`, `arc_color`, `arc_opa`, `arc_rounded`, `arc_image_src`, `pad_radial` |
 | <ApiLink name="LV_PART_ITEMS" /> / <ApiLink name="LV_PART_INDICATOR" /> | `line_width`, `line_color`, `line_opa` |
 | <ApiLink name="LV_PART_INDICATOR" /> labels | `text_color`, `text_opa`, `text_letter_space`, `text_font` |
+
+`pad_radial` applies only to sections drawn as an arc. Positive values move
+the section arc toward the center.
 
 ## Needles
 
@@ -194,7 +197,7 @@ Needles aren't yet exposed through XML, so this example is C-only:
 ### Data binding
 
 Data bindings connect a widget property to a piece of global data — a
-[Subject](/main-modules/observer/observer). When the subject's value
+[Subject](/main-modules/data_binding/subjects). When the subject's value
 changes, every widget bound to it updates automatically; and an
 interactive widget can write back into the subject so other subscribers
 see the new value.
@@ -203,8 +206,8 @@ A Scale needle binds its value to a Subject. The link is one-way (Subject
 → Widget): application-side writes into the subject sweep the needle.
 Only integer subjects are supported.
 
-- <ApiLink name="lv_scale_bind_line_needle_value" display="lv_scale_bind_line_needle_value(scale, needle_line, needle_length, &subject)" />
-- <ApiLink name="lv_scale_bind_image_needle_value" display="lv_scale_bind_image_needle_value(scale, needle_img, &subject)" />
+- <ApiLink name="lv_scale_bind_line_needle_value" display="lv_scale_bind_line_needle_value(scale, needle_line, needle_length, subject)" />
+- <ApiLink name="lv_scale_bind_image_needle_value" display="lv_scale_bind_image_needle_value(scale, needle_img, subject)" />
 
 ## Events
 

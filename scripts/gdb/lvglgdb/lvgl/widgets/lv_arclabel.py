@@ -14,70 +14,71 @@ class LVArclabel(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_arclabel_t", ptr=True) or self
+        self._wv_lv_arclabel_t = self.cast("lv_arclabel_t", ptr=True) or self
+        self._wv = self._wv_lv_arclabel_t
 
     @property
     def text(self):
-        return safe_string(self._wv, "text")
+        return safe_string(self._wv_lv_arclabel_t, "text")
 
     @property
     def dot_begin(self):
         """Offset where bytes have been replaced with dots"""
-        return int(self._wv.safe_field("dot_begin", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("dot_begin", 0))
 
     @property
     def angle_start(self):
-        return int(self._wv.safe_field("angle_start", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("angle_start", 0))
 
     @property
     def angle_size(self):
-        return int(self._wv.safe_field("angle_size", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("angle_size", 0))
 
     @property
     def offset(self):
-        return int(self._wv.safe_field("offset", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("offset", 0))
 
     @property
     def radius(self):
-        return int(self._wv.safe_field("radius", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("radius", 0))
 
     @property
     def center_offset(self):
-        return safe_point(self._wv, "center_offset")
+        return safe_point(self._wv_lv_arclabel_t, "center_offset")
 
     @property
     def dir(self):
-        return int(self._wv.safe_field("dir", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("dir", 0))
 
     @property
     def text_align_v(self):
         """Vertical text alignment"""
-        return int(self._wv.safe_field("text_align_v", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("text_align_v", 0))
 
     @property
     def text_align_h(self):
         """Horizontal text alignment"""
-        return int(self._wv.safe_field("text_align_h", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("text_align_h", 0))
 
     @property
     def static_txt(self):
         """Flag to indicate the text is static"""
-        return int(self._wv.safe_field("static_txt", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("static_txt", 0))
 
     @property
     def recolor(self):
         """Enable in-line letter re-coloring"""
-        return int(self._wv.safe_field("recolor", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("recolor", 0))
 
     @property
     def overflow(self):
         """Overflow mode: 0=visible, 1=ellipsis, 2=clip"""
-        return int(self._wv.safe_field("overflow", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("overflow", 0))
 
     @property
     def end_overlap(self):
         """End overlap flag, false if prevent end overlap"""
-        return int(self._wv.safe_field("end_overlap", 0))
+        return int(self._wv_lv_arclabel_t.safe_field("end_overlap", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -68,7 +68,12 @@ class LVCache(Value):
 
     def __iter__(self):
         """Create appropriate iterator based on cache class"""
-        return create_cache_iterator(self)
+        iterator = create_cache_iterator(self)
+        if iterator is None:
+            # Returning None here would make `for entry in cache` fail with
+            # TypeError about NoneType, which says nothing about the cache.
+            raise gdb.GdbError(f"unsupported cache type: {self.name}")
+        return iterator
 
     def items(self):
         """Get all cache entries as a list"""
@@ -81,9 +86,11 @@ class LVCache(Value):
         """Run sanity check and print results as a table"""
         from lvglgdb.lvgl.formatter import print_table
 
-        iterator = iter(self)
-        if iterator is None:
-            errors = [f"unsupported cache type: {self.name}"]
+        try:
+            iterator = iter(self)
+        except gdb.GdbError as unsupported:
+            iterator = ()
+            errors = [str(unsupported)]
         else:
             errors = iterator.sanity_check(entry_checker)
 

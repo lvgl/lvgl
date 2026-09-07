@@ -15,7 +15,8 @@ X11 is a CPU-blit driver with no GPU path. For production embedded targets prefe
 
 Enable <ApiLink name="LV_USE_X11" />.
 
-<ApiLink name="LV_COLOR_DEPTH" /> must be `16`, `24` or `32`.
+<ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> must be <ApiLink name="LV_COLOR_FORMAT_RGB565" />,
+<ApiLink name="LV_COLOR_FORMAT_RGB888" /> or <ApiLink name="LV_COLOR_FORMAT_XRGB8888" />.
 
 ### Options
 
@@ -106,7 +107,7 @@ int main(int argc, char ** argv)
 | Rotation | None |
 | Runtime resolution change | Yes |
 | Runtime color format change | No |
-| Color formats | Derived from <ApiLink name="LV_COLOR_DEPTH" /> (`16`, `24` or `32`) |
+| Color formats | RGB565, RGB888 or XRGB8888, from <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> |
 | Multiple displays / windows | Yes, one display per window |
 | Hardware acceleration | None |
 | Render mode | Configurable via `LV_X11_RENDER_MODE` |

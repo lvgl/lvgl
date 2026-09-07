@@ -103,7 +103,7 @@ if __name__ == "__main__":
     print("Verifying license for fonts:")
     for path, name in fonts:
         if has_intree_license(
-            os.path.join(SCRIPT_DIR, "built_in_font", "font_license"), name
+            os.path.join(SCRIPT_DIR, "generators", "built_in_font", "font_license"), name
         ):
             print(f"  [OK] '{name}'")
         else:

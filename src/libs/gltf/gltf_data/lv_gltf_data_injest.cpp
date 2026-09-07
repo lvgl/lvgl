@@ -23,22 +23,23 @@
  *      DEFINES
  *********************/
 constexpr auto SUPPORTED_EXTENSIONS =
-    //fastgltf::Extensions::KHR_draco_mesh_compression |
-    //fastgltf::Extensions::EXT_meshopt_compression |
-    fastgltf::Extensions::KHR_mesh_quantization | fastgltf::Extensions::KHR_texture_transform |
-    fastgltf::Extensions::KHR_lights_punctual | fastgltf::Extensions::KHR_materials_anisotropy |
-    fastgltf::Extensions::KHR_materials_clearcoat | fastgltf::Extensions::KHR_materials_dispersion |
-    fastgltf::Extensions::KHR_materials_emissive_strength | fastgltf::Extensions::KHR_materials_ior |
-    fastgltf::Extensions::KHR_materials_iridescence | fastgltf::Extensions::KHR_materials_sheen |
-    fastgltf::Extensions::KHR_materials_specular |
-    fastgltf::Extensions::
-    KHR_materials_pbrSpecularGlossiness
-    | // Depreciated, to enable support make sure to define FASTGLTF_ENABLE_DEPRECATED_EXT
-    fastgltf::Extensions::KHR_materials_transmission |
-    fastgltf::Extensions::KHR_materials_volume | fastgltf::Extensions::KHR_materials_unlit |
-    fastgltf::Extensions::EXT_texture_webp |
-    //fastgltf::Extensions::KHR_materials_diffuse_transmission |
-    fastgltf::Extensions::KHR_materials_variants;
+    fastgltf::Extensions::KHR_mesh_quantization
+    | fastgltf::Extensions::KHR_texture_transform
+    | fastgltf::Extensions::KHR_lights_punctual
+    | fastgltf::Extensions::KHR_materials_anisotropy
+    | fastgltf::Extensions::KHR_materials_clearcoat
+    | fastgltf::Extensions::KHR_materials_dispersion
+    | fastgltf::Extensions::KHR_materials_emissive_strength
+    | fastgltf::Extensions::KHR_materials_ior
+    | fastgltf::Extensions::KHR_materials_iridescence
+    | fastgltf::Extensions::KHR_materials_sheen
+    | fastgltf::Extensions::KHR_materials_specular
+    | fastgltf::Extensions::KHR_materials_pbrSpecularGlossiness
+    | fastgltf::Extensions::KHR_materials_transmission
+    | fastgltf::Extensions::KHR_materials_volume
+    | fastgltf::Extensions::KHR_materials_unlit
+    | fastgltf::Extensions::EXT_texture_webp
+    | fastgltf::Extensions::KHR_materials_variants;
 
 constexpr auto GLTF_OPTIONS = fastgltf::Options::DontRequireValidAssetMember | fastgltf::Options::AllowDouble |
                               fastgltf::Options::LoadExternalBuffers | fastgltf::Options::LoadExternalImages |
@@ -167,6 +168,7 @@ static void load_mesh_texture(lv_gltf_model_t * data,
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
                                              lv_gltf_model_loader_t * loader)
 {
+    LV_ASSERT(data_source != NULL);
     lv_gltf_model_t * model = NULL;
     if(data_size > 0) {
         model = create_data_from_bytes((const uint8_t *)data_source, data_size);
@@ -175,8 +177,8 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
         model = create_data_from_file((const char *)data_source);
     }
 
-    LV_ASSERT_MSG(model, "Failed to create gltf data");
     if(!model) {
+        LV_LOG_ERROR("Failed to create glTF data");
         return NULL;
     }
 
@@ -205,6 +207,12 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
     /*Virtually set size so that lv_array_assign will work*/
     model->nodes.size = model->asset.nodes.size();
 
+    for(size_t node_index = 0; node_index < model->asset.nodes.size(); node_index++) {
+        lv_gltf_model_node_t model_node;
+        lv_gltf_model_node_init(model, &model_node, &model->asset.nodes[node_index], "", "");
+        lv_array_assign(&model->nodes, node_index, &model_node);
+    }
+
     fastgltf::namegen_iterate_scene_nodes(model->asset, scene_index,
                                           [&](fastgltf::Node & node, const std::string & node_path, const std::string & node_num_path,
     size_t node_index, std::size_t child_index) {
@@ -214,6 +222,7 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
 
         /* Store the nodes in the same order as fastgltf
          * This is a workaround as we can't assign any type of user data to fastgltf's types*/
+        lv_gltf_model_node_deinit((lv_gltf_model_node_t *)lv_array_at(&model->nodes, node_index));
         lv_array_assign(&model->nodes, node_index, & model_node);
     });
 
@@ -246,7 +255,7 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
     }
 
     if(model->asset.defaultScene.has_value()) {
-        LV_LOG_INFO("Default scene = #%" LV_PRIu64, model->asset.defaultScene.value());
+        LV_LOG_INFO("Default scene = #%zu", model->asset.defaultScene.value());
     }
 
     return model;
@@ -258,6 +267,7 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
 
 static lv_gltf_model_t * create_data_from_file(const char * path)
 {
+    LV_ASSERT(path != NULL);
     lv_fs_file_t file;
     lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) {
@@ -267,37 +277,50 @@ static lv_gltf_model_t * create_data_from_file(const char * path)
     res = lv_fs_seek(&file, 0, LV_FS_SEEK_END);
     if(res != LV_FS_RES_OK) {
         LV_LOG_ERROR("Failed to seek end of file '%s': %d", path, res);
+        lv_fs_close(&file);
         return NULL;
     }
     uint32_t file_size;
     res = lv_fs_tell(&file, &file_size);
     if(res != LV_FS_RES_OK) {
         LV_LOG_ERROR("Failed to get file count size '%s': %d", path, res);
+        lv_fs_close(&file);
         return NULL;
     }
 
     res = lv_fs_seek(&file, 0, LV_FS_SEEK_SET);
     if(res != LV_FS_RES_OK) {
         LV_LOG_ERROR("Failed to seek start of file '%s': %d", path, res);
+        lv_fs_close(&file);
         return NULL;
     }
 
     uint8_t * bytes = (uint8_t *) lv_malloc(file_size);
+    LV_ASSERT_MALLOC(bytes);
+    if(bytes == NULL) {
+        lv_fs_close(&file);
+        return NULL;
+    }
 
     uint32_t bytes_read;
     res = lv_fs_read(&file, bytes, file_size, &bytes_read);
+    lv_fs_close(&file);
     if(res != LV_FS_RES_OK) {
-        LV_LOG_ERROR("Failed to seek start of file '%s': %d", path, res);
+        LV_LOG_ERROR("Failed to read file '%s': %d", path, res);
+        lv_free(bytes);
         return NULL;
     }
     if(bytes_read != file_size) {
         LV_LOG_ERROR("Failed to read the entire gltf file '%s': %d", path, res);
+        lv_free(bytes);
         return NULL;
     }
-    lv_fs_close(&file);
 
     lv_gltf_model_t * model = create_data_from_bytes(bytes, file_size);
     lv_free(bytes);
+    if(model == NULL) {
+        return NULL;
+    }
 
     model->filename = path;
     return model;
@@ -305,6 +328,8 @@ static lv_gltf_model_t * create_data_from_file(const char * path)
 
 static lv_gltf_model_t * create_data_from_bytes(const uint8_t * bytes, size_t data_size)
 {
+    LV_ASSERT(bytes != NULL);
+    LV_ASSERT(data_size > 0);
     fastgltf::Parser parser(SUPPORTED_EXTENSIONS);
     auto gltf_buffer = fastgltf::GltfDataBuffer::FromBytes(reinterpret_cast<const std::byte *>(bytes), data_size);
     if(!gltf_buffer) {
@@ -339,6 +364,10 @@ static void load_mesh_texture_impl(lv_gltf_model_t * data, const fastgltf::Textu
                                    GLuint * primitive_tex_prop,
                                    GLint * primitive_tex_uv_id)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(primitive_tex_prop != NULL);
+    LV_ASSERT(primitive_tex_uv_id != NULL);
+
     const auto & texture = data->asset.textures[material_prop.textureIndex];
     if(!injest_check_any_image_index_valid(texture)) {
         return;
@@ -360,6 +389,10 @@ static void load_mesh_texture(lv_gltf_model_t * data,
     if(!material_prop) {
         return;
     }
+
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(primitive_tex_prop != NULL);
+    LV_ASSERT(primitive_tex_uv_id != NULL);
     load_mesh_texture_impl(data, material_prop.value(), primitive_tex_prop, primitive_tex_uv_id);
 }
 
@@ -369,6 +402,9 @@ static void load_mesh_texture(lv_gltf_model_t * data, const fastgltf::Optional<f
     if(!material_prop) {
         return;
     }
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(primitive_tex_prop != NULL);
+    LV_ASSERT(primitive_tex_uv_id != NULL);
     load_mesh_texture_impl(data, material_prop.value(), primitive_tex_prop, primitive_tex_uv_id);
 }
 
@@ -379,6 +415,9 @@ static void load_mesh_texture(lv_gltf_model_t * data,
     if(!material_prop) {
         return;
     }
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(primitive_tex_prop != NULL);
+    LV_ASSERT(primitive_tex_uv_id != NULL);
     load_mesh_texture_impl(data, material_prop.value(), primitive_tex_prop, primitive_tex_uv_id);
 }
 
@@ -405,6 +444,7 @@ static bool injest_check_any_image_index_valid(fastgltf::Optional<fastgltf::Text
 static void injest_grow_bounds_to_include(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                           const fastgltf::Mesh & mesh)
 {
+    LV_ASSERT(data != NULL);
     /* Grow the bounds to include the specified mesh. */
     fastgltf::math::fvec3 v_min{ data->vertex_min[0], data->vertex_min[1], data->vertex_min[2] };
 
@@ -455,6 +495,7 @@ static void injest_grow_bounds_to_include(lv_gltf_model_t * data, const fastgltf
 static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                       const fastgltf::Mesh & mesh)
 {
+    LV_ASSERT(data != NULL);
     fastgltf::math::fvec3 v_min, v_max, v_cen;
     float radius = 0.f;
     if(mesh.primitives.size() == 0) {
@@ -499,7 +540,8 @@ static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::ma
 static bool injest_image(lv_gltf_model_loader_t * loader, lv_gltf_model_t * data, fastgltf::Image & image,
                          uint32_t index)
 {
-    LV_ASSERT_NULL(loader);
+    LV_ASSERT(loader != NULL);
+    LV_ASSERT(data != NULL);
     std::string _tex_id = std::string(lv_gltf_get_filename(data)) + "_IMG" + std::to_string(index);
 
     char tmp[512];
@@ -576,11 +618,12 @@ static bool injest_image(lv_gltf_model_loader_t * loader, lv_gltf_model_t * data
 static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sources::BufferView & view,
                                           GLuint texture_id)
 {
+    LV_ASSERT(data != NULL);
     /* Yes, we've already loaded every buffer into some GL buffer. However, with GL it's simpler
        to just copy the buffer data again for the texture. Besides, this is just an example. */
     auto & buffer_view = data->asset.bufferViews[view.bufferViewIndex];
     auto & buffer = data->asset.buffers[buffer_view.bufferIndex];
-    LV_LOG_INFO("Unpacking image bufferView: %s from %" LV_PRIu64 " bytes", buffer_view.name.c_str(), buffer.byteLength);
+    LV_LOG_INFO("Unpacking image bufferView: %s from %zu bytes", buffer_view.name.c_str(), buffer.byteLength);
     return std::visit(
     fastgltf::visitor{
         // We only care about VectorWithMime here, because we specify LoadExternalBuffers, meaning
@@ -647,6 +690,7 @@ static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sour
 }
 static void injest_light(lv_gltf_model_t * data, size_t light_index, fastgltf::Light & light, size_t scene_index)
 {
+    LV_ASSERT(data != NULL);
     fastgltf::math::fmat4x4 tmat;
     // It would seem like we'd need this info but not really, just the index will do at the loading phase, the rest is pulled during frame updates.
     LV_UNUSED(light);
@@ -660,13 +704,15 @@ static void injest_light(lv_gltf_model_t * data, size_t light_index, fastgltf::L
            node.lightIndex.value() != light_index) {
             return;
         }
-        LV_LOG_INFO("SCENE LIGHT BEING ADDED #%" LV_PRIu64 "\n", light_index);
+        LV_LOG_INFO("SCENE LIGHT BEING ADDED #%zu\n", light_index);
         data->node_by_light_index.push_back(&node);
     });
 }
 
 static bool check_if_unlit(lv_gltf_model_t * data, fastgltf::Primitive * prim)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(prim != NULL);
     const auto & asset = data->asset;
     if(prim->materialIndex.has_value()) {
         const auto & material = asset.materials[prim->materialIndex.value()];
@@ -689,6 +735,7 @@ static bool check_if_unlit(lv_gltf_model_t * data, fastgltf::Primitive * prim)
 
 static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
 {
+    LV_ASSERT(data != NULL);
     /*const auto &asset = GET_ASSET(data);*/
     const auto & outMesh = lv_gltf_get_new_meshdata(data);
     outMesh->primitives.resize(mesh.primitives.size());
@@ -915,6 +962,9 @@ static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_inde
 
                                   )
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(prim != NULL);
+    LV_ASSERT(attrib_id != NULL);
     const auto & asset = data->asset;
     if(const auto * _attrib = prim->findAttribute(std::string(attrib_id)); _attrib != prim->attributes.end()) {
         auto & accessor = asset.accessors[_attrib->accessorIndex];
@@ -941,6 +991,7 @@ static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_inde
 static void set_bounds_info(lv_gltf_model_t * data, fastgltf::math::fvec3 v_min, fastgltf::math::fvec3 v_max,
                             fastgltf::math::fvec3 v_cen, float radius)
 {
+    LV_ASSERT(data != NULL);
     {
         auto _d = v_min.data();
         data->vertex_min[0] = _d[0];

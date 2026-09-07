@@ -53,7 +53,7 @@ void lv_draw_nema_gfx_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * ds
 
     lv_layer_t * layer = t->target_layer;
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, &t->clip_area);
+    rel_clip_area = t->clip_area;
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     c.rel_translate_x = -layer->buf_area.x1;

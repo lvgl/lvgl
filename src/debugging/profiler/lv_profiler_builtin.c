@@ -218,8 +218,12 @@ static uint64_t default_tick_get_cb(void)
 
 static void default_flush_cb(const char * buf)
 {
+#if LV_USE_LOG
     LV_ASSERT(buf != NULL);
     LV_LOG("%s", buf);
+#else
+    LV_UNUSED(buf);
+#endif
 }
 
 static int default_tid_get_cb(void)

@@ -21,7 +21,6 @@
 #include <time.h>
 #include <unistd.h>
 #include "lv_linux_drm_egl_private.h"
-#include "../../opengles/lv_opengles_debug.h"
 #include "../../opengles/lv_opengles_private.h"
 
 /**********************
@@ -58,7 +57,6 @@ static void drm_flip_cb(void * driver_data, bool vsync);
 static void * drm_create_window(void * driver_data, const lv_egl_native_window_properties_t * properties);
 static void drm_destroy_window(void * driver_data, void * native_window);
 static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
-static inline void set_viewport(lv_display_t * display);
 
 /**********************
  *  STATIC VARIABLES
@@ -97,8 +95,12 @@ lv_display_t * lv_linux_drm_create(void)
 
 lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
 {
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(file != NULL, return LV_RESULT_INVALID);
     LV_UNUSED(connector_id);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+
+    LV_CHECK_ARG_MSG(ctx != NULL, return LV_RESULT_INVALID, "Invalid display");
 
     lv_result_t err = drm_device_init(ctx, file);
     if(err != LV_RESULT_OK) {
@@ -107,6 +109,8 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_
     }
 
     lv_display_set_resolution(disp, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
+
+    lv_opengles_egl_set_display_color_format(disp);
 
     ctx->egl_interface = drm_get_egl_interface(ctx);
     ctx->egl_ctx = lv_opengles_egl_context_create(&ctx->egl_interface);
@@ -137,11 +141,9 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_
 
 void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t callback)
 {
-    if(!disp) {
-        LV_LOG_ERROR("Cannot set a mode select callback on a NULL display");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+    LV_CHECK_ARG_MSG(ctx != NULL, return, "Invalid display");
     ctx->mode_select_cb = callback;
 }
 
@@ -185,79 +187,17 @@ static uint32_t tick_cb(void)
     return ts.tv_sec * 1000 + (ts.tv_nsec / 1000000);;
 }
 
-static inline void set_viewport(lv_display_t * display)
-{
-    const lv_display_rotation_t rotation = lv_display_get_rotation(display);
-    int32_t disp_width, disp_height;
-    if(rotation == LV_DISPLAY_ROTATION_0 || rotation == LV_DISPLAY_ROTATION_180) {
-        disp_width = lv_display_get_horizontal_resolution(display);
-        disp_height = lv_display_get_vertical_resolution(display);
-    }
-    else {
-        disp_width = lv_display_get_vertical_resolution(display) ;
-        disp_height = lv_display_get_horizontal_resolution(display) ;
-    }
-    lv_opengles_viewport(0, 0, disp_width, disp_height);
-}
-
-#if LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
-
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     LV_UNUSED(area);
     LV_UNUSED(px_map);
     if(lv_display_flush_is_last(disp)) {
-        set_viewport(disp);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-#if LV_USE_DRAW_OPENGLES
-        lv_opengles_render_display_texture(disp, false, true);
-#endif /*LV_USE_DRAW_OPENGLES*/
+        lv_opengles_texture_render_display(&ctx->texture, disp);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
 }
-
-#else
-
-static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
-{
-    LV_UNUSED(px_map);
-    LV_UNUSED(area);
-    if(lv_display_flush_is_last(disp)) {
-        lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-        int32_t disp_width = lv_display_get_horizontal_resolution(disp);
-        int32_t disp_height = lv_display_get_vertical_resolution(disp);
-
-        set_viewport(disp);
-
-        lv_color_format_t cf = lv_display_get_color_format(disp);
-        uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp), cf);
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, ctx->texture.texture_id));
-
-        GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-        GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / lv_color_format_get_size(cf)));
-        /*Color depth: 16 (RGB565), 32 (ARGB8888)*/
-#if LV_COLOR_DEPTH == 16
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp_width, disp_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                             ctx->texture.fb1));
-#elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                             ctx->texture.fb1));
-#else
-#error("Unsupported color format")
-#endif
-
-        lv_opengles_render_params_t params = {
-            .h_flip = false,
-            .v_flip = false,
-            .rb_swap = LV_COLOR_DEPTH == 32,
-        };
-        lv_opengles_render_display(disp, &params);
-        lv_opengles_egl_update(ctx->egl_ctx);
-    }
-    lv_display_flush_ready(disp);
-}
-#endif
 
 void drm_device_deinit(lv_drm_ctx_t * ctx)
 {
@@ -354,7 +294,7 @@ static void drm_on_page_flip(int fd, unsigned int frame, unsigned int sec, unsig
 
 static drm_fb_state_t * drm_fb_state_create(lv_drm_ctx_t * ctx, struct gbm_bo * bo)
 {
-    LV_ASSERT_NULL(bo);
+    LV_ASSERT(bo != NULL);
     drm_fb_state_t * fb = (drm_fb_state_t *)gbm_bo_get_user_data(bo);
 
     if(fb) {
@@ -566,40 +506,7 @@ open_err:
 static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
-    int32_t target_w = lv_display_get_horizontal_resolution(ctx->display);
-    int32_t target_h = lv_display_get_vertical_resolution(ctx->display);
-
-#if LV_COLOR_DEPTH == 16
-    lv_color_format_t target_cf = LV_COLOR_FORMAT_RGB565;
-#elif LV_COLOR_DEPTH == 32
-    lv_color_format_t target_cf = LV_COLOR_FORMAT_ARGB8888;
-#else
-#error("Unsupported color format")
-#endif
-
-
-    for(size_t i = 0; i < config_count; ++i) {
-        LV_LOG_TRACE("Got config %zu %#x %dx%d %d %d %d %d buffer size %d depth %d  samples %d stencil %d surface type %d",
-                     i, configs[i].id,
-                     configs[i].max_width, configs[i].max_height, configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
-                     configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].stencil, configs[i].surface_type);
-    }
-
-    for(size_t i = 0; i < config_count; ++i) {
-        lv_color_format_t config_cf = lv_opengles_egl_color_format_from_egl_config(&configs[i]);
-        const bool resolution_matches = configs[i].max_width >= target_w &&
-                                        configs[i].max_height >= target_h;
-        const bool is_nanovg_compatible = (configs[i].renderable_type & EGL_OPENGL_ES2_BIT) != 0 &&
-                                          configs[i].stencil == 8 && configs[i].samples == 4;
-        const bool is_window = (configs[i].surface_type & EGL_WINDOW_BIT) != 0;
-        const bool is_compatible_with_draw_unit = is_nanovg_compatible || !LV_USE_DRAW_NANOVG;
-
-        if(is_window && resolution_matches && config_cf == target_cf && is_compatible_with_draw_unit) {
-            LV_LOG_TRACE("Choosing config %zu", i);
-            return i;
-        }
-    }
-    return config_count;
+    return lv_opengles_egl_display_select_config(ctx->display, configs, config_count);
 }
 
 
@@ -624,7 +531,7 @@ static drmModeConnector * drm_get_connector(lv_drm_ctx_t * ctx)
 {
     drmModeConnector * connector = NULL;
 
-    LV_ASSERT_NULL(ctx->drm_resources);
+    LV_ASSERT(ctx->drm_resources != NULL);
     for(int i = 0; i < ctx->drm_resources->count_connectors; i++) {
         connector = drmModeGetConnector(ctx->fd, ctx->drm_resources->connectors[i]);
         if(connector->connection == DRM_MODE_CONNECTED && connector->count_modes > 0) {
@@ -638,7 +545,7 @@ static drmModeConnector * drm_get_connector(lv_drm_ctx_t * ctx)
 
 static drmModeModeInfo * drm_get_mode(lv_drm_ctx_t * ctx)
 {
-    LV_ASSERT_NULL(ctx->drm_connector);
+    LV_ASSERT(ctx->drm_connector != NULL);
     if(ctx->mode_select_cb) {
         lv_linux_drm_mode_t * modes = lv_malloc(sizeof(lv_linux_drm_mode_t) * ctx->drm_connector->count_modes);
         if(!modes) {
@@ -696,7 +603,7 @@ static drmModeCrtc * drm_get_crtc(lv_drm_ctx_t * ctx)
 
 static drmModeEncoder * drm_get_encoder(lv_drm_ctx_t * ctx)
 {
-    LV_ASSERT_NULL(ctx->drm_connector);
+    LV_ASSERT(ctx->drm_connector != NULL);
     drmModeEncoder * encoder = NULL;
     for(int i = 0; i < ctx->drm_resources->count_encoders; i++) {
         encoder = drmModeGetEncoder(ctx->fd, ctx->drm_resources->encoders[i]);
@@ -717,7 +624,7 @@ static drmModeEncoder * drm_get_encoder(lv_drm_ctx_t * ctx)
 static void * drm_create_window(void * driver_data, const lv_egl_native_window_properties_t * properties)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
-    LV_ASSERT_NULL(ctx->gbm_dev);
+    LV_ASSERT(ctx->gbm_dev != NULL);
 
     uint32_t format = properties->visual_id;
 

@@ -97,11 +97,12 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
 {
     LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(path != NULL, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     /*If path is unavailable */
-    if((path == NULL) || (lv_strlen(path) <= 0)) return;
+    if(lv_strlen(path) <= 0) return;
 
     char ** dir_str = NULL;
     switch(dir) {
@@ -266,6 +267,7 @@ void lv_file_explorer_open_dir(lv_obj_t * obj, const char * dir)
 {
     LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(dir != NULL, return);
 
     show_dir(obj, dir);
 }

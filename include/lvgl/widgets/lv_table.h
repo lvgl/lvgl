@@ -136,7 +136,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_tab
  * @param obj       pointer to a Table object
  * @param row       id of the row [0 .. row_cnt -1]
  * @param col       id of the column [0 .. col_cnt -1]
- * @param user_data pointer to the new user_data.
+ * @param user_data pointer to the new user_data. @nullable
  *                  Should be allocated by `lv_malloc`,
  *                  and it will be freed automatically when the table is deleted or
  *                  when the cell is dropped due to lower row or column count.

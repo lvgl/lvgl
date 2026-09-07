@@ -14,40 +14,41 @@ class LVSpangroup(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_spangroup_t", ptr=True) or self
+        self._wv_lv_spangroup_t = self.cast("lv_spangroup_t", ptr=True) or self
+        self._wv = self._wv_lv_spangroup_t
 
     @property
     def lines(self):
-        return int(self._wv.safe_field("lines", 0))
+        return int(self._wv_lv_spangroup_t.safe_field("lines", 0))
 
     @property
     def indent(self):
         """first line indent"""
-        return int(self._wv.safe_field("indent", 0))
+        return int(self._wv_lv_spangroup_t.safe_field("indent", 0))
 
     @property
     def cache_w(self):
         """the cache automatically calculates the width"""
-        return int(self._wv.safe_field("cache_w", 0))
+        return int(self._wv_lv_spangroup_t.safe_field("cache_w", 0))
 
     @property
     def cache_h(self):
         """similar cache_w"""
-        return int(self._wv.safe_field("cache_h", 0))
+        return int(self._wv_lv_spangroup_t.safe_field("cache_h", 0))
 
     @property
     def child_ll(self):
-        return safe_wrapper(self._wv, "child_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
+        return safe_wrapper(self._wv_lv_spangroup_t, "child_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
 
     @property
     def overflow(self):
         """details see lv_span_overflow_t"""
-        return int(self._wv.safe_field("overflow", 0))
+        return int(self._wv_lv_spangroup_t.safe_field("overflow", 0))
 
     @property
     def refresh(self):
         """the spangroup need refresh cache_w and cache_h"""
-        return int(self._wv.safe_field("refresh", 0))
+        return int(self._wv_lv_spangroup_t.safe_field("refresh", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""
