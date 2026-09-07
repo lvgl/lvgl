@@ -13,11 +13,12 @@ class LVTileviewTile(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_tileview_tile_t", ptr=True) or self
+        self._wv_lv_tileview_tile_t = self.cast("lv_tileview_tile_t", ptr=True) or self
+        self._wv = self._wv_lv_tileview_tile_t
 
     @property
     def dir(self):
-        return int(self._wv.safe_field("dir", 0))
+        return int(self._wv_lv_tileview_tile_t.safe_field("dir", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -226,6 +226,40 @@ class ConstToken(ConfigEntry):
         return [f"#define {self.name} {self.value}"]
 
 
+class DerivedConstToken(ConfigEntry):
+    """A promptless int/hex with its value chosen by another config"""
+
+    def __init__(self, name: str, selector: str, table, *, node=None, doc: str = ""):
+        super().__init__(name, node=node, doc=doc)
+        self.selector = selector
+        self.table = table  # [(member token, literal value)]
+
+    def emit_internal(self) -> list[str]:
+        upper = self.name.upper()
+        prefix = f"{self.name}_OF_"
+        width = max(len(prefix + token) for token, _ in self.table)
+        doc = f"{self.name} - derived from {self.selector}."
+        if self.doc:
+            doc += "\n" + self.doc
+        return (
+            c_comment(doc)
+            + [
+                f"#define {(prefix + tok).ljust(width)}   {val}"
+                for tok, val in self.table
+            ]
+            + [
+                "",
+                f"#ifndef {self.name}",
+                f"    #ifdef CONFIG_{upper}",
+                f"        #define {self.name} CONFIG_{upper}",
+                f"    #else",
+                f"        #define {self.name} LV_CONF_PASTE({prefix}, {self.selector})",
+                f"    #endif",
+                f"#endif",
+            ]
+        )
+
+
 class DerivedFlag(ConfigEntry):
     """An internal capability flag set via Kconfig ``select`` (e.g.
     ``LV_DRAW_HAS_VECTOR_SUPPORT``, selected by the vector-capable draw units).

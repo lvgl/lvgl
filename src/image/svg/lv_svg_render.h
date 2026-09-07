@@ -17,6 +17,7 @@
 #endif
 
 #include "../../draw/lv_draw_vector_private.h"
+#include "lv_svg_private.h"
 
 /*********************
  *      DEFINES
@@ -29,7 +30,7 @@
  **********************/
 struct _lv_svg_render_class;
 
-typedef struct _lv_svg_render_obj {
+typedef struct  _lv_svg_render_obj {
     struct _lv_svg_render_obj * next;
     lv_svg_tag_t tag;
     uint32_t flags;
@@ -45,18 +46,19 @@ typedef struct _lv_svg_render_obj {
 } lv_svg_render_obj_t;
 
 typedef struct _lv_svg_render_class {
-    void (*set_paint_ref)(struct _lv_svg_render_obj * obj, lv_vector_path_ctx_t * dsc,
-                          const struct _lv_svg_render_obj * target_obj, bool fill);
+    void (*set_paint_ref)(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc,
+                          const lv_svg_render_obj_t * target_obj, bool fill);
 
-    void (*init)(struct _lv_svg_render_obj * obj, const lv_svg_node_t * node);
-    void (*render)(const struct _lv_svg_render_obj * obj, lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix);
-    void (*set_attr)(struct _lv_svg_render_obj * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr);
-    void (*get_bounds)(const struct _lv_svg_render_obj * obj, lv_area_t * area);
-    void (*get_size)(const struct _lv_svg_render_obj * obj, uint32_t * size);
-    void (*destroy)(struct _lv_svg_render_obj * obj);
+    void (*init)(lv_svg_render_obj_t * obj, const lv_svg_node_t * node);
+    void (*render)(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix);
+    void (*set_attr)(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr);
+    void (*get_bounds)(const lv_svg_render_obj_t * obj, lv_area_t * area);
+    void (*get_size)(const lv_svg_render_obj_t * obj, uint32_t * size);
+    void (*destroy)(lv_svg_render_obj_t * obj);
 } lv_svg_render_class;
 
-typedef struct _lv_svg_render_hal {
+
+typedef struct {
     void (*load_image)(const char * image_url, lv_draw_image_dsc_t * img_dsc);
     const char * (*get_font_path)(const char * font_family);
 } lv_svg_render_hal_t;

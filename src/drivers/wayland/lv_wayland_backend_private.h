@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_wayland_private.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_WAYLAND
 
@@ -30,33 +30,37 @@ extern "C" {
 
 /**
  * @typedef lv_wayland_backend_init_t
- * @brief Initialize the backend context
+ * @brief Initialize the backend data
  *
  * This function is called once when the Wayland driver is initialized to create
- * the global backend context. The returned pointer will be passed as backend_ctx
- * to all other backend operations.
+ * the global backend data. The context written to backend_data is passed back
+ * to every other operation of the backend. It may be left NULL by a backend that
+ * keeps no global state.
  *
- * @return Pointer to backend-specific context data, or NULL on failure
+ * @param[out] backend_data Receives a pointer to backend-specific context data
+ * @return LV_RESULT_OK if the backend is usable, otherwise LV_RESULT_INVALID.
+ *         A backend that fails here is skipped entirely: no further operation is
+ *         called on it, not even deinit()
  *
  * @note This is called before any displays are created
  * @see lv_wayland_backend_deinit_t
  */
-typedef void * (*lv_wayland_backend_init_t)(void);
+typedef lv_result_t (*lv_wayland_backend_init_t)(void ** backend_data);
 
 /**
  * @typedef lv_wayland_backend_deinit_t
- * @brief Deinitialize the backend context
+ * @brief Deinitialize the backend data
  *
  * This function is called when the Wayland driver is deinitialized. It must
  * clean up all resources allocated in the init function and free the backend
  * context.
  *
- * @param[in] backend_ctx Pointer to the backend context returned by init
+ * @param[in] backend_data Pointer to the backend data returned by init
  *
  * @note This is called after all displays have been destroyed
  * @see lv_wayland_backend_init_t
  */
-typedef void (*lv_wayland_backend_deinit_t)(void * backend_ctx);
+typedef void (*lv_wayland_backend_deinit_t)(void * backend_data);
 
 /**
  * @typedef lv_wayland_backend_init_display_t
@@ -65,7 +69,7 @@ typedef void (*lv_wayland_backend_deinit_t)(void * backend_ctx);
  * This function is called when creating a new LVGL display on Wayland. It should
  * allocate and initialize per-display resources needed for rendering.
  *
- * @param[in] backend_ctx Pointer to the backend context
+ * @param[in] backend_data Pointer to the backend data
  * @param[in] display Pointer to the LVGL display object
  * @param[in] width Initial width of the display in pixels
  * @param[in] height Initial height of the display in pixels
@@ -76,7 +80,7 @@ typedef void (*lv_wayland_backend_deinit_t)(void * backend_ctx);
  * @note It is expected that each display gets its own data structure in order for a backend
  *       to support multiple displays
  */
-typedef void * (*lv_wayland_backend_init_display_t)(void * backend_ctx, lv_display_t * display, int32_t width,
+typedef void * (*lv_wayland_backend_init_display_t)(void * backend_data, lv_display_t * display, int32_t width,
                                                     int32_t height);
 
 /**
@@ -86,7 +90,7 @@ typedef void * (*lv_wayland_backend_init_display_t)(void * backend_ctx, lv_displ
  * This function is called when a display needs to be resized or when its rotation
  * is modified. The backend should update its rendering resources accordingly.
  *
- * @param[in] backend_ctx Pointer to the backend context
+ * @param[in] backend_data Pointer to the backend data
  * @param[in] display Pointer to the LVGL display object being resized
  * @return Pointer to updated display-specific data, or NULL on failure
  *
@@ -95,7 +99,7 @@ typedef void * (*lv_wayland_backend_init_display_t)(void * backend_ctx, lv_displ
  *       retrieved using lv_wayland_get_backend_display_data()
  * @warning The display data is overwritten with the return value of this function
  */
-typedef void * (*lv_wayland_backend_resize_display_t)(void * backend_ctx, lv_display_t * display);
+typedef void * (*lv_wayland_backend_resize_display_t)(void * backend_data, lv_display_t * display);
 
 /**
  * @typedef lv_wayland_backend_destroy_display_t
@@ -105,12 +109,12 @@ typedef void * (*lv_wayland_backend_resize_display_t)(void * backend_ctx, lv_dis
  * all per-display resources and free the display data that was allocated in
  * init_display.
  *
- * @param[in] backend_ctx Pointer to the backend context
+ * @param[in] backend_data Pointer to the backend data
  * @param[in] display Pointer to the LVGL display object being destroyed
  *
  * @note The display data associated with this display must be freed
  */
-typedef void (*lv_wayland_backend_destroy_display_t)(void * backend_ctx, lv_display_t * display);
+typedef void (*lv_wayland_backend_destroy_display_t)(void * backend_data, lv_display_t * display);
 
 /**
  * @typedef lv_wayland_backend_global_handler_t
@@ -120,7 +124,7 @@ typedef void (*lv_wayland_backend_destroy_display_t)(void * backend_ctx, lv_disp
  * compositor. The backend can use this to bind to Wayland protocols it requires
  * (e.g., wl_shm, EGL extensions, DMA-BUF protocols, etc.).
  *
- * @param[in] backend_ctx Pointer to the backend context
+ * @param[in] backend_data Pointer to the backend data
  * @param[in] registry Wayland registry object
  * @param[in] name Numeric name of the global object
  * @param[in] interface String name of the interface (e.g., "wl_shm")
@@ -129,34 +133,94 @@ typedef void (*lv_wayland_backend_destroy_display_t)(void * backend_ctx, lv_disp
  * @note This is called during Wayland connection setup
  * @note The backend should use wl_registry_bind() to bind to needed protocols
  */
-typedef void (*lv_wayland_backend_global_handler_t)(void * backend_ctx, struct wl_registry * registry, uint32_t name,
+typedef void (*lv_wayland_backend_global_handler_t)(void * backend_data, struct wl_registry * registry, uint32_t name,
                                                     const char * interface, uint32_t version);
 
 /**
  * @struct lv_wayland_backend_ops_t
  * @brief Wayland backend operations structure
  *
- * This structure defines the complete set of operations that a Wayland backend
+ * This structure defines the general set of operations that a Wayland backend
  * must implement. All function pointers must be non-NULL.
  *
  * @par Lifecycle Order:
- * 1. init() - Initialize backend context
+ * 1. init() - Initialize backend data
  * 2. global_handler() - Called for each Wayland global (may be called multiple times)
- * 3. init_display() - Create display (may be called multiple times for multiple displays)
- * 4. resize_display() - Resize display (called as needed)
- * 5. deinit_display() - Destroy display (called once per display)
- * 6. deinit() - Clean up backend context
+ * 3. deinit() - Clean up backend data
  */
 typedef struct {
-    lv_wayland_backend_init_t init;                         /**< Initialize backend context */
+    lv_wayland_backend_init_t init;                         /**< Initialize backend data */
     lv_wayland_backend_global_handler_t global_handler;     /**< Handle Wayland global objects */
+    lv_wayland_backend_deinit_t deinit;                     /**< Deinitialize backend data */
+} lv_wayland_backend_ops_t;
+
+/**
+ * @struct lv_wayland_backend_display_ops_t
+ * @brief Wayland backend display operations structure
+ *
+ * This structure defines the display specific set of operations that a Wayland backend
+ * must implement. All function pointers must be non-NULL.
+ *
+ * @par Lifecycle Order:
+ * 1. init_display() - Create display (may be called multiple times for multiple displays)
+ * 2. resize_display() - Resize display (called as needed)
+ * 3. deinit_display() - Destroy display (called once per display)
+ */
+typedef struct {
     lv_wayland_backend_init_display_t init_display;         /**< Initialize a new display */
     lv_wayland_backend_resize_display_t resize_display;     /**< Resize or reconfigure display */
     lv_wayland_backend_destroy_display_t deinit_display;    /**< Destroy a display */
-    lv_wayland_backend_deinit_t deinit;                     /**< Deinitialize backend context */
-} lv_wayland_backend_ops_t;
+} lv_wayland_backend_display_ops_t;
 
-extern const lv_wayland_backend_ops_t wl_backend_ops;
+
+typedef struct {
+    const lv_wayland_backend_display_ops_t * ops;    /**< Backend display specific operations */
+    void * backend_data;                             /**< General backend data */
+    void * display_data;                             /**< Specific display backend data */
+} lv_wayland_backend_display_data_t;
+
+/** @brief Initializes every compiled-in backend
+ *
+ * A backend whose init() fails is marked unavailable and skipped by all the
+ * functions below.
+ */
+void lv_wayland_backend_init_all(void);
+
+/** @brief Deinitializes every available backend
+ */
+void lv_wayland_backend_deinit_all(void);
+
+/** @brief Dispatches a global handler call to all available backends
+ *
+ * @param[in] registry Wayland registry object
+ * @param[in] name Numeric name of the global object
+ * @param[in] interface String name of the interface
+ * @param[in] version Version number of the interface
+ */
+void lv_wayland_backend_global_handler(struct wl_registry * registry, uint32_t name,
+                                       const char * interface, uint32_t version);
+
+/** @brief Loops through all available backends to find one capable of initializing a display
+ *
+ * The function loops through all available backends until one can initialize a display
+ *
+ * @param[out] backend_ddata Backend display data
+ * @param[in] display The display to initialize for
+ * @param[in] width the display width
+ * @param[in] height the display height
+ * @return LV_RESULT_OK if the display was initialized else LV_RESULT_INVALID
+ */
+lv_result_t lv_wayland_backend_init_display(lv_wayland_backend_display_data_t * backend_ddata,
+                                            lv_display_t * display,
+                                            int32_t width,
+                                            int32_t height);
+
+/** @brief Deinitializes a display
+ *
+ * @param[in] backend_ddata Backend display data of the display
+ * @param[in] display The display to deinitialize
+ */
+void lv_wayland_backend_deinit_display(lv_wayland_backend_display_data_t * backend_ddata, lv_display_t * display);
 
 /** @brief Get the backend-specific display data
  *

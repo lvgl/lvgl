@@ -66,7 +66,7 @@ static void _draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * d
     bool masked = dsc->bitmap_mask_src != NULL;
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, clipped_img_area);
+    rel_clip_area = *clipped_img_area;
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);

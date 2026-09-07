@@ -52,6 +52,12 @@ extern const lv_obj_class_t lv_ime_pinyin_class;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+/**
+ * Create a Pinyin input method object
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the active display.
+ * @return          pointer to the created Pinyin input method
+ */
 lv_obj_t * lv_ime_pinyin_create(lv_obj_t * parent);
 
 /*=====================

@@ -72,7 +72,8 @@ void lv_span_stack_deinit(void);
 
 /**
  * Create a spangroup object
- * @param parent    pointer to an object, it will be the parent of the new spangroup
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created spangroup
  */
 lv_obj_t * lv_spangroup_create(lv_obj_t * parent);
@@ -87,9 +88,9 @@ lv_span_t * lv_spangroup_add_span(lv_obj_t * obj);
 /**
  * Remove the span from the spangroup and free memory.
  * @param obj   pointer to a spangroup object.
- * @param span  pointer to a span.
+ * @param span  pointer to a span. @nullable. When NULL nothing will be deleted
  * @note        Note that before calling `lv_spangroup_delete_span`
- *              `lv_observer_remove` needs to be called manually as LVGL can't remove the
+ *              `lv_observer_delete` needs to be called manually as LVGL can't remove the
  *              binding automatically.
  */
 void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span);
@@ -154,13 +155,6 @@ void lv_spangroup_set_span_text_static(lv_obj_t * obj, lv_span_t * span, const c
  */
 void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(3, 4);
 
-/**
- * Set a static text. It will not be saved by the span so the 'text' variable
- * has to be 'alive' while the span exist.
- * @param span  pointer to a span.
- * @param text  pointer to a text.
- */
-void lv_span_set_text_static(lv_span_t * span, const char * text);
 
 /**
  * Copy all style properties of style to the bbuilt-in static style of the span.
@@ -334,10 +328,10 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * 
 /**
  * Get the span object by point.
  * @param obj       pointer to a spangroup object.
- * @param point     pointer to point containing absolute coordinates
+ * @param p         pointer to point containing absolute coordinates
  * @return          pointer to the span under the point or `NULL` if not found.
  */
-lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * point);
+lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p);
 
 /*=====================
  * Other functions
@@ -357,7 +351,7 @@ void lv_spangroup_refresh(lv_obj_t * obj);
  * @param span      pointer to Span
  * @param subject   pointer to Subject
  * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
- *                  or NULL to bind to the value directly.
+ *                  @nullable. See note below
  * @return          pointer to newly-created Observer
  * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
  *                  as text as they are, integers as %d, floats as %0.1f

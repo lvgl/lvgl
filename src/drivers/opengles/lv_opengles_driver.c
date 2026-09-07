@@ -85,8 +85,8 @@ static unsigned int index_buffer_count = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_SwapRB", "u_Hue", "u_Saturation", "u_Value" };
-static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_SwapRB", "u_PremultipliedSrc", "u_Hue", "u_Saturation", "u_Value" };
+static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**********************
  *      MACROS
@@ -96,9 +96,11 @@ static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_opengles_init(void)
+lv_result_t lv_opengles_init(void)
 {
-    if(is_init) return;
+    if(is_init) {
+        return LV_RESULT_OK;
+    }
 
     lv_opengles_enable_blending(false);
 
@@ -115,7 +117,13 @@ void lv_opengles_init(void)
     lv_opengles_index_buffer_init(indices, 6);
 
     lv_result_t res = lv_opengles_shader_init();
-    LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to initialize shaders");
+    if(res != LV_RESULT_OK) {
+        lv_opengles_index_buffer_deinit();
+        lv_opengles_vertex_array_deinit();
+        lv_opengles_vertex_buffer_deinit();
+        LV_LOG_ERROR("failed to initialize shaders");
+        return LV_RESULT_INVALID;
+    }
 
     lv_opengles_shader_bind();
 
@@ -130,6 +138,7 @@ void lv_opengles_init(void)
 #endif /*LV_USE_DRAW_NANOVG*/
 
     is_init = true;
+    return LV_RESULT_OK;
 }
 
 void lv_opengles_deinit(void)
@@ -146,32 +155,112 @@ void lv_opengles_deinit(void)
 
 void lv_opengles_render_params_init(lv_opengles_render_params_t * params)
 {
-    LV_ASSERT_NULL(params);
+    LV_ASSERT(params != NULL);
     lv_memzero(params, sizeof(lv_opengles_render_params_t));
+    params->cf = LV_COLOR_FORMAT_ARGB8888;
+}
+
+lv_result_t lv_opengles_gl_format_from_color_format(lv_color_format_t cf, lv_opengles_gl_format_t * gl_format)
+{
+    LV_ASSERT(gl_format != NULL);
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_L8:
+            gl_format->internal_format = GL_R8;
+            gl_format->format = GL_RED;
+            gl_format->type = GL_UNSIGNED_BYTE;
+            gl_format->rb_swap = false;
+            gl_format->premultiplied = false;
+            return LV_RESULT_OK;
+        case LV_COLOR_FORMAT_RGB565:
+            gl_format->internal_format = GL_RGB565;
+            gl_format->format = GL_RGB;
+            gl_format->type = GL_UNSIGNED_SHORT_5_6_5;
+            gl_format->rb_swap = false;
+            gl_format->premultiplied = false;
+            return LV_RESULT_OK;
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            gl_format->internal_format = GL_RGB565;
+            gl_format->format = GL_RGB;
+            gl_format->type = GL_UNSIGNED_SHORT_5_6_5;
+            gl_format->rb_swap = true;
+            return LV_RESULT_OK;
+        case LV_COLOR_FORMAT_RGB888:
+            gl_format->internal_format = GL_RGB;
+            gl_format->format = GL_RGB;
+            gl_format->type = GL_UNSIGNED_BYTE;
+            /* RGB is actually stored as BGR in memory */
+            gl_format->rb_swap = true;
+            gl_format->premultiplied = false;
+            return LV_RESULT_OK;
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            gl_format->internal_format = GL_RGBA;
+            gl_format->format = GL_RGBA;
+            gl_format->type = GL_UNSIGNED_BYTE;
+            /* RGB is actually stored as BGR in memory */
+            gl_format->rb_swap = true;
+            gl_format->premultiplied = cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+            return LV_RESULT_OK;
+        default:
+            LV_LOG_WARN("Color format 0x%02x has no OpenGL equivalent", cf);
+            return LV_RESULT_INVALID;
+    }
+}
+
+bool lv_opengles_color_format_is_rb_swap(lv_color_format_t cf)
+{
+    lv_opengles_gl_format_t gl_format;
+    if(lv_opengles_gl_format_from_color_format(cf, &gl_format) != LV_RESULT_OK) {
+        return false;
+    }
+    return gl_format.rb_swap;
+}
+
+bool lv_opengles_color_format_is_premultiplied(lv_color_format_t cf)
+{
+    lv_opengles_gl_format_t gl_format;
+    if(lv_opengles_gl_format_from_color_format(cf, &gl_format) != LV_RESULT_OK) {
+        return false;
+    }
+    return gl_format.premultiplied;
+}
+
+lv_result_t lv_opengles_texture_upload_buf(unsigned int texture_id, const void * buf, int32_t w, int32_t h,
+                                           uint32_t stride, lv_color_format_t cf)
+{
+    lv_opengles_gl_format_t gl_format;
+    if(lv_opengles_gl_format_from_color_format(cf, &gl_format) != LV_RESULT_OK) {
+        return LV_RESULT_INVALID;
+    }
+
+    LV_PROFILER_DRAW_BEGIN;
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture_id));
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+    GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, (GLint)(stride / lv_color_format_get_size(cf))));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, gl_format.internal_format, w, h, 0, gl_format.format, gl_format.type, buf));
+
+    GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
+    LV_PROFILER_DRAW_END;
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_opengles_texture_upload_display_buf(unsigned int texture_id, lv_display_t * display, const void * buf)
+{
+    LV_ASSERT(display != NULL);
+    const lv_color_format_t cf = lv_display_get_color_format(display);
+    const int32_t w = lv_display_get_horizontal_resolution(display);
+    const int32_t h = lv_display_get_vertical_resolution(display);
+    return lv_opengles_texture_upload_buf(texture_id, buf, w, h, lv_draw_buf_width_to_stride(w, cf), cf);
 }
 
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
-    LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render_params_t params;
-    lv_opengles_render_params_init(&params);
-    params.texture = texture;
-    params.texture_area = texture_area;
-    params.opa = opa;
-    params.disp_w = disp_w;
-    params.disp_h = disp_h;
-    params.texture_clip_area = texture_clip_area;
-    params.h_flip = h_flip;
-    params.v_flip = v_flip;
-    lv_opengles_render(&params);
-    LV_PROFILER_DRAW_END;
-}
+    LV_CHECK_ARG(texture_area != NULL, return);
+    LV_CHECK_ARG(texture_clip_area != NULL, return);
 
-void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                                       int32_t disp_w,
-                                       int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
-{
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_params_t params;
     lv_opengles_render_params_init(&params);
@@ -188,8 +277,55 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
     LV_PROFILER_DRAW_END;
 }
 
+void lv_opengles_render_texture_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                         int32_t disp_w,
+                                         int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+{
+    LV_ASSERT(texture_area != NULL);
+    LV_ASSERT(texture_clip_area != NULL);
+
+    LV_PROFILER_DRAW_BEGIN;
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = texture;
+    params.texture_area = texture_area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = texture_clip_area;
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+    lv_opengles_render(&params);
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render_texture_cf(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                   int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
+                                   bool h_flip, bool v_flip, lv_color_format_t cf)
+{
+    LV_ASSERT(texture_area != NULL);
+    LV_ASSERT(texture_clip_area != NULL);
+    LV_PROFILER_DRAW_BEGIN;
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = texture;
+    params.texture_area = texture_area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = texture_clip_area;
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+    params.rb_swap = lv_opengles_color_format_is_rb_swap(cf);
+    params.cf = cf;
+    lv_opengles_render(&params);
+    LV_PROFILER_DRAW_END;
+}
+
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
+    LV_CHECK_ARG(area != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_params_t params;
     lv_opengles_render_params_init(&params);
@@ -206,6 +342,8 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
 
 void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render_params_t * params)
 {
+    LV_ASSERT(display != NULL);
+    LV_ASSERT(params != NULL);
     LV_PROFILER_DRAW_BEGIN;
     unsigned int texture = (lv_uintptr_t)display->layer_head->user_data;
     GL_CALL(glActiveTexture(GL_TEXTURE0));
@@ -233,13 +371,14 @@ void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render
     };
 
     lv_opengles_shader_bind();
-    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1f("u_ColorDepth", lv_color_format_get_bpp(params->cf));
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
     lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap);
+    lv_opengles_shader_set_uniform1i("u_PremultipliedSrc", lv_opengles_color_format_is_premultiplied(params->cf));
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
@@ -248,12 +387,24 @@ void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render
 void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
 {
     /*TODO: Deprecate this function and make lv_opengles_render_display public instead*/
+    LV_CHECK_ARG(display != NULL, return);
+    lv_opengles_render_display_texture_internal(display, h_flip, v_flip);
+}
 
-    lv_opengles_render_params_t params = {
-        .v_flip = v_flip,
-        .h_flip = h_flip,
-        .rb_swap = true
-    };
+void lv_opengles_render_display_texture_internal(lv_display_t * display, bool h_flip, bool v_flip)
+{
+    LV_ASSERT(display != NULL);
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+#if LV_USE_DRAW_OPENGLES
+    params.rb_swap = true;
+#else
+    /*The texture was uploaded from the buffer of the display*/
+    params.cf = lv_display_get_color_format(display);
+    params.rb_swap = lv_opengles_color_format_is_rb_swap(params.cf);
+#endif /*LV_USE_DRAW_OPENGLES*/
     lv_opengles_render_display(display, &params);
 }
 
@@ -291,7 +442,7 @@ void lv_opengles_reinit_state(void)
 
 void lv_opengles_render(const lv_opengles_render_params_t * params)
 {
-    LV_ASSERT_NULL(params);
+    LV_ASSERT(params != NULL);
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
     if(!lv_area_intersect(&intersection, params->texture_area, params->texture_clip_area)) {
@@ -398,7 +549,7 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
 
     lv_opengles_shader_bind();
     lv_opengles_enable_blending(params->blend_opt);
-    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1f("u_ColorDepth", lv_color_format_get_bpp(params->cf));
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, (float *)&gl_matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)params->opa / (float)LV_OPA_100);
@@ -407,6 +558,7 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
                                      (float)params->fill_color.green / 255.0f,
                                      (float)params->fill_color.blue / 255.0f);
     lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap ? 1 : 0);
+    lv_opengles_shader_set_uniform1i("u_PremultipliedSrc", lv_opengles_color_format_is_premultiplied(params->cf));
 
     lv_opengles_render_draw();
     lv_opengles_disable_blending();

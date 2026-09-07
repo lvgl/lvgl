@@ -139,6 +139,12 @@ char * lv_text_set_text_vfmt(const char * fmt, va_list ap) LV_FORMAT_ATTRIBUTE(1
 void lv_text_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t * letter_next, uint32_t * ofs);
 
 /**
+ * Internal implementation of @ref lv_text_get_size
+ */
+void lv_text_get_size_internal(lv_point_t * size_res, const char * text, const lv_font_t * font, int32_t letter_space,
+                               int32_t line_space, int32_t max_width, lv_text_flag_t flag);
+
+/**
  * Test if char is break char or not (a text can broken here or not)
  * @param letter a letter
  * @return false: 'letter' is not break char
@@ -245,6 +251,37 @@ static inline bool lv_text_is_marker(uint32_t letter)
     if(letter == 0xF8FF) return true; /*LV_SYMBOL_DUMMY*/
 
     return false;
+}
+
+static inline int32_t lv_font_get_bottom_trim_internal(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_ASSERT(font != NULL);
+    switch(trim) {
+        case LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE:
+        case LV_TEXT_LEADING_TRIM_LOWER_BASELINE:
+            return font->base_line;
+        case LV_TEXT_LEADING_TRIM_NONE:
+        case LV_TEXT_LEADING_TRIM_CAPITAL:
+        case LV_TEXT_LEADING_TRIM_LOWER:
+            return 0;
+    }
+    LV_UNREACHABLE();
+}
+
+static inline int32_t lv_font_get_top_trim_internal(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_ASSERT(font != NULL);
+    switch(trim) {
+        case LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE:
+        case LV_TEXT_LEADING_TRIM_CAPITAL:
+            return (font->line_height - font->base_line) - font->cap_height;
+        case LV_TEXT_LEADING_TRIM_LOWER_BASELINE:
+        case LV_TEXT_LEADING_TRIM_LOWER:
+            return (font->line_height - font->base_line) - font->x_height;
+        case LV_TEXT_LEADING_TRIM_NONE:
+            return 0;
+    }
+    LV_UNREACHABLE();
 }
 
 /***************************************************************

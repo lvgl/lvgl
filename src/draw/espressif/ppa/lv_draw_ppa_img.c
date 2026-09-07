@@ -34,11 +34,11 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)t->draw_unit;
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, clipped_img_area);
+    rel_clip_area = *clipped_img_area;
     lv_area_move(&rel_clip_area, -img_coords->x1, -img_coords->y1);
 
     lv_area_t rel_img_coords;
-    lv_area_copy(&rel_img_coords, img_coords);
+    rel_img_coords = *img_coords;
     lv_area_move(&rel_img_coords, -img_coords->x1, -img_coords->y1);
 
     lv_area_t src_area;
@@ -46,7 +46,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         return;
 
     lv_area_t dest_area;
-    lv_area_copy(&dest_area, clipped_img_area);
+    dest_area = *clipped_img_area;
     lv_area_move(&dest_area, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
 
     const uint8_t * src_buf = decoded->data;

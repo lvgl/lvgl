@@ -9,6 +9,7 @@
 
 #include "lv_text_private.h"
 #include "lv_text_ap.h"
+#include "../font/lv_font_private.h"
 
 /*********************
  *      DEFINES
@@ -91,6 +92,18 @@ void lv_text_attributes_init(lv_text_attributes_t * attributes)
 void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, int32_t letter_space,
                       int32_t line_space, int32_t max_width, lv_text_flag_t flag)
 {
+    LV_CHECK_ARG(size_res != NULL, return);
+    LV_CHECK_ARG(text != NULL, return);
+    LV_CHECK_ARG(font != NULL, return);
+    lv_text_get_size_internal(size_res, text, font, letter_space, line_space, max_width, flag);
+}
+void lv_text_get_size_internal(lv_point_t * size_res, const char * text, const lv_font_t * font, int32_t letter_space,
+                               int32_t line_space, int32_t max_width, lv_text_flag_t flag)
+{
+    LV_ASSERT(size_res != NULL);
+    LV_ASSERT(text != NULL);
+    LV_ASSERT(font != NULL);
+
     lv_text_attributes_t attrs;
     lv_text_attributes_init(&attrs);
     attrs.line_space = line_space;
@@ -113,7 +126,7 @@ void lv_text_get_size_attributes(lv_point_t * size_res, const char * text, const
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(text);
 
-    letter_height = lv_font_get_line_height(font);
+    letter_height = lv_font_get_line_height_internal(font);
 
     if(attributes->text_flags & LV_TEXT_FLAG_EXPAND) {
         attributes->max_width = LV_COORD_MAX;
@@ -211,7 +224,7 @@ bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
  * @param font pointer to a font
  * @param letter_space letter space
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid line breaks
- * @param flags settings for the text from 'txt_flag_type' enum
+ * @param flag  settings for the text from 'txt_flag_type' enum
  * @param[out] word_w_ptr width (in pixels) of the parsed word. May be NULL.
  * @param cmd_state Pointer to a lv_text_cmd_state_t variable which stored the current state of command processing
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
@@ -491,7 +504,10 @@ void lv_text_cut(char * txt, uint32_t pos, uint32_t len)
     size_t old_len = lv_strlen(txt);
 
     pos = lv_text_encoded_get_byte_id(txt, pos); /*Convert to byte index instead of letter index*/
+    if(pos >= old_len) return;
+
     len = lv_text_encoded_get_byte_id(&txt[pos], len);
+    if(len > old_len - pos) len = old_len - pos; /*Don't cut more than what's left*/
 
     /*Copy the second part into the end to make place to text to insert*/
     uint32_t i;
@@ -546,6 +562,18 @@ void lv_text_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t
 {
     *letter = lv_text_encoded_next(txt, ofs);
     *letter_next = *letter != '\0' ? lv_text_encoded_next(&txt[*ofs], NULL) : 0;
+}
+
+int32_t lv_font_get_bottom_trim(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_CHECK_ARG(font != NULL, return 0);
+    return lv_font_get_bottom_trim_internal(font, trim);
+}
+
+int32_t lv_font_get_top_trim(const lv_font_t * font, lv_text_leading_trim_t trim)
+{
+    LV_CHECK_ARG(font != NULL, return 0);
+    return lv_font_get_top_trim_internal(font, trim);
 }
 
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8

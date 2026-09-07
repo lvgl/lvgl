@@ -32,7 +32,7 @@ config LV_LOG_LEVEL
 	default 5 if LV_LOG_LEVEL_NONE
 
 config LV_LOG_LEVEL_NUM
-	int 
+	int
 	default 5
 
 config LV_LOG_PRINTF

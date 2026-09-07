@@ -48,7 +48,8 @@ enum _lv_property_spinbox_id_t {
 
 /**
  * Create a spinbox object
- * @param parent    pointer to an object, it will be the parent of the new spinbox
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created spinbox
  */
 lv_obj_t * lv_spinbox_create(lv_obj_t * parent);

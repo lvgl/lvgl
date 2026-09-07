@@ -33,7 +33,7 @@ extern "C" {
 
 /**
  * Delete an OpenGL window. If it is the last one, the process will exit
- * @param window    OpenGL window to delete
+ * @param window    OpenGL window to delete @nullable
  */
 void lv_opengles_window_delete(lv_opengles_window_t * window);
 

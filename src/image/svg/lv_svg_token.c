@@ -10,7 +10,6 @@
 #include "lv_svg_token.h"
 #if LV_USE_SVG
 
-#include "../../../lvgl.h"
 #include <ctype.h>
 #include <string.h>
 
@@ -60,37 +59,37 @@ typedef struct {
     uint32_t flags;
     const char * cur;
     const char * end;
-} _lv_svg_parser_state_t;
+} _lv_svg_token_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void _set_state(_lv_svg_parser_state_t * state, uint32_t bit)
+static void _set_state(_lv_svg_token_state_t * state, uint32_t bit)
 {
     state->flags |= bit;
 }
 
-static void _clear_state(_lv_svg_parser_state_t * state, uint32_t bit)
+static void _clear_state(_lv_svg_token_state_t * state, uint32_t bit)
 {
     state->flags &= ~bit;
 }
 
-static bool _is_state(_lv_svg_parser_state_t * state, uint32_t bit)
+static bool _is_state(_lv_svg_token_state_t * state, uint32_t bit)
 {
     return state->flags & bit;
 }
 
-static void _set_tag_state(_lv_svg_parser_state_t * state, uint32_t bit)
+static void _set_tag_state(_lv_svg_token_state_t * state, uint32_t bit)
 {
     state->flags = (state->flags & ~SVG_TAG_MASK) | bit;
 }
 
-static void _set_quote_state(_lv_svg_parser_state_t * state, uint32_t bit)
+static void _set_quote_state(_lv_svg_token_state_t * state, uint32_t bit)
 {
     state->flags = (state->flags & ~SVG_QUOTE_MASK) | (bit << 3);
 }
 
-static bool _special_handle(_lv_svg_parser_state_t * state)
+static bool _special_handle(_lv_svg_token_state_t * state)
 {
     return state->flags & (SVG_TAG | SVG_SEARCH | SVG_TAG_MASK | SVG_COMMENT | SVG_DOCTYPE | SVG_XMLINST);
 }
@@ -137,7 +136,7 @@ static _lv_svg_token_attr_t * _new_svg_attr(_lv_svg_token_t * token)
     return attr;
 }
 
-static void _svg_parser_xml_inst(_lv_svg_parser_state_t * state, _lv_svg_token_t * token)
+static void _svg_parser_xml_inst(_lv_svg_token_state_t * state, _lv_svg_token_t * token)
 {
     LV_UNUSED(token);
 
@@ -152,7 +151,7 @@ static void _svg_parser_xml_inst(_lv_svg_parser_state_t * state, _lv_svg_token_t
     }
 }
 
-static void _svg_parser_comment(_lv_svg_parser_state_t * state, _lv_svg_token_t * token)
+static void _svg_parser_comment(_lv_svg_token_state_t * state, _lv_svg_token_t * token)
 {
     LV_UNUSED(token);
 
@@ -167,7 +166,7 @@ static void _svg_parser_comment(_lv_svg_parser_state_t * state, _lv_svg_token_t 
     }
 }
 
-static void _svg_parser_doctype(_lv_svg_parser_state_t * state, _lv_svg_token_t * token)
+static void _svg_parser_doctype(_lv_svg_token_state_t * state, _lv_svg_token_t * token)
 {
     LV_UNUSED(token);
 
@@ -183,7 +182,7 @@ static void _svg_parser_doctype(_lv_svg_parser_state_t * state, _lv_svg_token_t 
     }
 }
 
-static bool _svg_parser_tag(_lv_svg_parser_state_t * state, _lv_svg_token_t * token, svg_token_process cb, void * data)
+static bool _svg_parser_tag(_lv_svg_token_state_t * state, _lv_svg_token_t * token, svg_token_process cb, void * data)
 {
     while(state->cur <= state->end) {
         switch(state->flags & SVG_TAG_MASK) {
@@ -350,19 +349,19 @@ static bool _svg_parser_tag(_lv_svg_parser_state_t * state, _lv_svg_token_t * to
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool _lv_svg_tokenizer(const char * svg_data, uint32_t data_len, svg_token_process cb, void * data)
+bool _lv_svg_tokenizer(const char * svg_data, uint32_t len, svg_token_process cb, void * user_data)
 {
     LV_ASSERT_NULL(svg_data);
-    LV_ASSERT(data_len > 0);
+    LV_ASSERT(len > 0);
     LV_ASSERT_NULL(cb);
-    LV_ASSERT_NULL(data);
+    LV_ASSERT_NULL(user_data);
 
     _lv_svg_token_t token;
     _lv_svg_token_init(&token);
-    _lv_svg_parser_state_t state = {
+    _lv_svg_token_state_t state = {
         .flags = 0,
         .cur = svg_data,
-        .end = svg_data + data_len,
+        .end = svg_data + len,
     };
 
     while(state.cur < state.end) {
@@ -402,7 +401,7 @@ bool _lv_svg_tokenizer(const char * svg_data, uint32_t data_len, svg_token_proce
                         }
                 }
                 // process token
-                if(!_lv_svg_token_process(&token, cb, data)) {
+                if(!_lv_svg_token_process(&token, cb, user_data)) {
                     LV_LOG_ERROR("svg document parser error!");
                     lv_array_deinit(&token.attrs);
                     return false;
@@ -442,7 +441,7 @@ bool _lv_svg_tokenizer(const char * svg_data, uint32_t data_len, svg_token_proce
                 _svg_parser_doctype(&state, &token);
             }
             else if(_is_state(&state, SVG_TAG_MASK)) {
-                if(!_svg_parser_tag(&state, &token, cb, data)) {
+                if(!_svg_parser_tag(&state, &token, cb, user_data)) {
                     LV_LOG_ERROR("svg document parser error!");
                     lv_array_deinit(&token.attrs);
                     return false;

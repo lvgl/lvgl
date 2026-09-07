@@ -14,15 +14,16 @@ class LVMenuPage(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_menu_page_t", ptr=True) or self
+        self._wv_lv_menu_page_t = self.cast("lv_menu_page_t", ptr=True) or self
+        self._wv = self._wv_lv_menu_page_t
 
     @property
     def title(self):
-        return safe_string(self._wv, "title")
+        return safe_string(self._wv_lv_menu_page_t, "title")
 
     @property
     def static_title(self):
-        return int(self._wv.safe_field("static_title", 0))
+        return int(self._wv_lv_menu_page_t.safe_field("static_title", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -20,7 +20,7 @@ config LV_STDLIB_RTTHREAD
 	default 3
 
 config LV_STDLIB_CUSTOM
-	int 
+	int
 	default 255
 
 choice
@@ -28,6 +28,7 @@ choice
 	default LV_USE_BUILTIN_MALLOC
 
 config LV_USE_BUILTIN_MALLOC
+	select LV_USE_TLSF
 	bool "LVGL built-in"
 
 config LV_USE_CLIB_MALLOC
@@ -158,6 +159,10 @@ config LV_LIMITS_INCLUDE
 config LV_STDARG_INCLUDE
 	string "Header for variadic argument handling (stdarg)"
 	default "stdarg.h"
+
+config LV_USE_TLSF
+	bool
+	default n
 endmenu
 menu "Operating System (OS)"
 choice LV_USE_OS
@@ -256,10 +261,46 @@ endmenu
 menu "Rendering Configuration"
 
 menu "Color Settings"
-	choice
-		prompt "Color depth"
-		default LV_COLOR_DEPTH_16
 
+	choice LV_COLOR_FORMAT_DEFAULT
+		prompt "Default color format"
+		default LV_COLOR_FORMAT_I1       if LV_COLOR_DEPTH_1
+		default LV_COLOR_FORMAT_L8       if LV_COLOR_DEPTH_8
+		default LV_COLOR_FORMAT_RGB888   if LV_COLOR_DEPTH_24
+		default LV_COLOR_FORMAT_XRGB8888 if LV_COLOR_DEPTH_32
+		default LV_COLOR_FORMAT_RGB565
+
+		config LV_COLOR_FORMAT_I1
+			bool "I1"
+			imply LV_FONT_UNSCII_8
+		config LV_COLOR_FORMAT_L8
+			bool "L8"
+			imply LV_FONT_UNSCII_8
+		config LV_COLOR_FORMAT_RGB565
+			bool "RGB565"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_RGB565_SWAPPED
+			bool "RGB565 (Big-endian)"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_RGB888
+			bool "RGB888"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_XRGB8888
+			bool "XRGB8888"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_ARGB8888
+			bool "ARGB8888"
+			imply LV_FONT_MONTSERRAT_14
+		config LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
+			bool "ARGB8888 (premultiplied)"
+			imply LV_FONT_MONTSERRAT_14
+	endchoice
+
+	choice LV_COLOR_DEPTH_CHOICE
+		prompt "Color depth [DEPRECATED: Use LV_COLOR_FORMAT_DEFAULT]"
+		default LV_COLOR_DEPTH_UNSET
+		config LV_COLOR_DEPTH_UNSET
+			bool "Use LV_COLOR_FORMAT_DEFAULT"
 		config LV_COLOR_DEPTH_32
 			bool "32: XRGB8888"
 			imply LV_FONT_MONTSERRAT_14
@@ -279,13 +320,11 @@ menu "Color Settings"
 
 	config LV_COLOR_DEPTH
 		int
-		default 1 if LV_COLOR_DEPTH_1
-		default 8 if LV_COLOR_DEPTH_8
-		default 16 if LV_COLOR_DEPTH_16
-		default 24 if LV_COLOR_DEPTH_24
-		default 32 if LV_COLOR_DEPTH_32
-		help
-			Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)
+		default 1 if LV_COLOR_FORMAT_I1
+		default 8 if LV_COLOR_FORMAT_L8
+		default 16 if LV_COLOR_FORMAT_RGB565 || LV_COLOR_FORMAT_RGB565_SWAPPED
+		default 24 if LV_COLOR_FORMAT_RGB888
+		default 32
 
 	config LV_COLOR_MIX_ROUND_OFS
 		int "Color mix rounding offset"
@@ -515,7 +554,7 @@ config LV_GRADIENT_MAX_STOPS
 config LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 	bool "Complex gradients"
 	default n
-	
+
 	help
 		Adds linear gradients at an angle, plus radial and conical gradients.
 
@@ -538,7 +577,7 @@ config LV_DRAW_SW_CIRCLE_CACHE_SIZE
 choice LV_USE_DRAW_SW_ASM
 	prompt "SW assembly optimization"
 	default LV_DRAW_SW_ASM_NONE
-	
+
 	config LV_DRAW_SW_ASM_NONE
 		bool "0: None"
 	config LV_DRAW_SW_ASM_NEON
@@ -547,6 +586,8 @@ choice LV_USE_DRAW_SW_ASM
 		bool "2: Helium"
 	config LV_DRAW_SW_ASM_RISCV_V
 		bool "3: RISC-V Vector"
+	config LV_DRAW_SW_ASM_SVE2
+		bool "4: SVE2"
 	config LV_DRAW_SW_ASM_CUSTOM
 		bool "255: Custom"
 		select LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE
@@ -558,6 +599,7 @@ config LV_USE_DRAW_SW_ASM
 	default 1 if LV_DRAW_SW_ASM_NEON
 	default 2 if LV_DRAW_SW_ASM_HELIUM
 	default 3 if LV_DRAW_SW_ASM_RISCV_V
+	default 4 if LV_DRAW_SW_ASM_SVE2
 	default 255 if LV_DRAW_SW_ASM_CUSTOM
 
 config LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE
@@ -955,6 +997,35 @@ config LV_USE_DRAW_DMA2D_INTERRUPT
 endif
 endmenu
 
+menu "EPIC"
+config LV_USE_SIFLI_EPIC
+	bool "SiFli EPIC renderer"
+	default n
+	select LV_USE_DRAW_SW
+	help
+		Accelerate blends, fills, images and text with the EPIC (Enhanced
+		Pixel Image Compositor) engine of SiFli BF0 SoCs. Unsupported
+		operations fall back to software rendering.
+
+if LV_USE_SIFLI_EPIC
+
+config LV_USE_SIFLI_EPIC_DRAW_THREAD
+	bool "Draw thread"
+	depends on !LV_OS_NONE
+	default y
+	help
+		Dispatch EPIC operations from their own thread so the CPU can keep
+		rendering in parallel.
+
+config LV_USE_SIFLI_EPIC_ASSERT
+	bool "Asserts"
+	help
+		Check the status of every EPIC call and assert on failure. Useful
+		while bringing up a board.
+
+endif
+endmenu
+
 menu "EVE"
 config LV_USE_DRAW_EVE
 	bool "EVE renderer"
@@ -991,6 +1062,7 @@ config LV_USE_G2D
 
 config LV_USE_DRAW_G2D
 	bool "G2D renderer"
+	select LV_USE_DRAW_SW
 	default n
 	help
 		Accelerate blends, fills and image blits with the NXP G2D API (i.MX 2D GPU).
@@ -1101,12 +1173,77 @@ endmenu
 menu "SDL"
 config LV_USE_DRAW_SDL
 	bool "SDL renderer"
+	select LV_USE_DRAW_SW
 	default n
 	help
 		Render with the SDL renderer API, caching widgets and images as SDL textures.
-endmenu 
+endmenu
 endmenu
 menu "Input Devices"
+
+config LV_INDEV_DEF_SCROLL_LIMIT
+	int "Scroll threshold (px)"
+	range 0 255
+	default 10
+	help
+		Distance the pointer needs to travel before scrolling starts.
+
+config LV_INDEV_DEF_SCROLL_THROW
+	int "Scroll throw slow-down (%)"
+	range 1 100
+	default 10
+	help
+		Slow-down applied after releasing a scroll. Greater value means faster slow-down.
+
+config LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
+	int "Elastic scroll slow-down factor"
+	range 1 255
+	default 4
+	help
+		Scrolling past the edge of a scrollable widget is slower by this factor.
+
+config LV_INDEV_DEF_LONG_PRESS_TIME
+	int "Long press time (ms)"
+	range 0 65535
+	default 400
+	help
+		Press time after which `LV_EVENT_LONG_PRESSED` is sent.
+
+config LV_INDEV_DEF_LONG_PRESS_REP_TIME
+	int "Long press repeat period (ms)"
+	range 0 65535
+	default 100
+	help
+		Time between `LV_EVENT_LONG_PRESSED_REPEAT` events.
+
+config LV_INDEV_DEF_DOUBLE_CLICK_TIME
+	int "Multi-click time (ms)"
+	range 0 65535
+	default 400
+	help
+		Max time between consecutive clicks to count as a double or triple click.
+
+config LV_INDEV_DEF_GESTURE_LIMIT
+	int "Gesture threshold (px)"
+	range 0 255
+	default 50
+	help
+		Distance the pointer needs to travel before a gesture is detected.
+
+config LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+	int "Gesture minimum velocity (px)"
+	range 0 255
+	default 3
+	help
+		Minimum pointer velocity at release to report a swipe.
+
+config LV_INDEV_DEF_ROTARY_SENSITIVITY
+	int "Rotary sensitivity"
+	range 1 65535
+	default 256
+	help
+		The encoder diff is multiplied by this value and divided by 256.
+
 config LV_USE_GRIDNAV
 	bool "Grid navigation"
 	default n
@@ -1120,12 +1257,45 @@ config LV_USE_GESTURE_RECOGNITION
 	help
 		Detect pinch and rotate gestures from multi-touch input. Requires float support.
 
+if LV_USE_GESTURE_RECOGNITION
+
+config LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD
+	int "Pinch in threshold (%)"
+	range 1 99
+	default 75
+	help
+		Scale the fingers need to pinch down to before pinch events are sent.
+
+config LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+	int "Pinch out threshold (%)"
+	range 101 1000
+	default 150
+	help
+		Scale the fingers need to pinch up to before pinch events are sent.
+
+config LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE
+	int "Pinch maximum initial scale (%)"
+	range 101 1000
+	default 250
+	help
+		A pinch starting above this scale is discarded.
+		Must be greater than the pinch out threshold.
+
+config LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD
+	int "Rotation threshold (mrad)"
+	range 1 3141
+	default 200
+	help
+		Angle the fingers need to rotate by before rotation events are sent.
+
+endif #LV_USE_GESTURE_RECOGNITION
+
 endmenu
 menu "Core"
 
 config LV_OBJ_STYLE_CACHE
 	bool "Style cache"
-	default n
+	default y
 	help
 		Speed up style property lookups by adding 2 x 32 bit variables to each lv_obj_t.
 
@@ -1237,7 +1407,7 @@ config LV_LOG_LEVEL
 	default 5 if LV_LOG_LEVEL_NONE
 
 config LV_LOG_LEVEL_NUM
-	int 
+	int
 	default 5
 
 config LV_LOG_PRINTF
@@ -1582,7 +1752,7 @@ config LV_USE_CUSTOM_FONT_DEFAULT
 		  - in the header given by LV_FONT_CUSTOM_INCLUDE, e.g.
 		        #define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(my_font_24)
 		        #define LV_FONT_DEFAULT         &my_font_24
-			
+
 		If you do not, LV_FONT_DEFAULT falls back to a builtin font,
 		which is no longer compiled in, causing a link error.
 
@@ -1890,7 +2060,7 @@ config LV_USE_CALENDAR_CHINESE
 	default n
 
 endif #LV_USE_CALENDAR
-	
+
 
 
 config LV_USE_CANVAS
@@ -1976,7 +2146,6 @@ config LV_USE_GSTREAMER
 
 config LV_USE_IMAGE
 	bool "Image"
-	select LV_USE_LABEL
 	default y
 
 config LV_USE_IMAGEBUTTON
@@ -2074,6 +2243,7 @@ config LV_USE_MENU
 config LV_USE_MSGBOX
 	bool "Message box"
 	default y
+	select LV_USE_LABEL
 
 config LV_USE_QRCODE
 	bool "QR code"
@@ -2482,7 +2652,7 @@ config LV_NUTTX_LCD_BUFFER_SIZE
 	depends on LV_NUTTX_LCD_CUSTOM_BUFFER
 	depends on LV_USE_NUTTX_LCD
 	default 60
-	
+
 
 config LV_USE_NUTTX_TOUCHSCREEN
 	bool "Touchscreen"
@@ -2540,6 +2710,18 @@ endif # LV_USE_OPENGLES
 config LV_USE_EGL
 	bool
 	default n
+
+# Promptless as it's not part of the public API
+config LV_USE_OPENGLES_PBUFFER
+	bool
+	default n
+	depends on LV_USE_DRAW_NANOVG
+	select LV_USE_EGL
+	select LV_USE_OPENGLES
+	help
+		Render on the GPU into an off-screen EGL pbuffer with no window system at
+		all, and read the frame back into the display's draw buffer. For headless
+		rendering, screenshot testing and server-side image generation.
 
 config LV_USE_GLFW
 	bool "GLFW"
@@ -2723,65 +2905,51 @@ config LV_WAYLAND_DIRECT_EXIT
 	help
 		LVGL is deinitialized before the application exits.
 
-config LV_WAYLAND_AUTO_BACKEND
-	bool "Auto-select the Wayland backend (legacy)"
-	default y
-	help
-	  Legacy behavior, slated for removal: the backend defaults to SHM and any
-	  LV_WAYLAND_USE_* set directly in lv_conf.h is honored. Disable this and pick
-	  a backend explicitly in the "Rendering backend" choice.
-
-choice
-	prompt "Rendering backend"
-	default LV_WAYLAND_BACKEND_SHM
-	depends on !LV_WAYLAND_AUTO_BACKEND
-	help
-	  Select the rendering backend used by the Wayland driver.
-
-	config LV_WAYLAND_BACKEND_SHM
-		bool "SHM (Shared Memory)"
-		select LV_WAYLAND_USE_SHM
-		help
-		  Default backend, using wl_shm for double-buffered direct rendering.
-		  Compatible with all Wayland compositors; no special hardware required.
-
-	config LV_WAYLAND_BACKEND_EGL
-		bool "EGL (OpenGL ES, hardware-accelerated)"
-		select LV_WAYLAND_USE_EGL
-		select LV_USE_OPENGLES
-		help
-		  Hardware-accelerated rendering via OpenGL ES 2.0 and EGL, compatible
-		  with LVGL 3D/glTF rendering. Requires OpenGL ES 2.0 on the target
-		  hardware and linking with wayland-egl (-lwayland-egl).
-
-	config LV_WAYLAND_BACKEND_G2D
-		bool "G2D (NXP i.MX hardware accelerator)"
-		select LV_WAYLAND_USE_G2D
-		select LV_USE_DRAW_G2D
-		help
-		  Hardware-accelerated 2D rendering via NXP's G2D engine.
-		  Supports NXP i.MX6/i.MX8 platforms with G2D library installed.
-endchoice
-
-config LV_WAYLAND_BACKEND
-	int
-	default 0 if LV_WAYLAND_BACKEND_SHM
-	default 1 if LV_WAYLAND_BACKEND_EGL
-	default 2 if LV_WAYLAND_BACKEND_G2D
-
 config LV_WAYLAND_USE_SHM
-	bool
-
-config LV_WAYLAND_USE_EGL
-	bool
-	select LV_USE_EGL
-	select LV_WAYLAND_USE_DMABUF if !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
-
-config LV_WAYLAND_USE_G2D
-	bool
-	select LV_WAYLAND_USE_DMABUF
+	bool "SHM (Shared Memory) Backend"
+	default y
+	depends on !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
+	help
+		Default backend, using wl_shm for double-buffered direct rendering.
+		Compatible with all Wayland compositors; no special hardware required.
+		Unavailable with the OpenGL ES and NanoVG renderers, which can only
+		render into a GPU surface.
 
 config LV_WAYLAND_USE_DMABUF
+	bool "DMA-BUF Backend"
+	depends on !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
+	select LV_WAYLAND_USE_DMABUF_PROTOCOL
+	help
+		Presents software-rendered frames through linear DMA-BUFs that the
+		compositor can scan out directly, saving its copy out of shared memory.
+		Requires a compositor with zwp_linux_dmabuf_v1 and a gbm implementation
+		able to allocate CPU-mappable buffers, plus libdrm and gbm (-ldrm -lgbm).
+		Needs no GPU API: unavailable with the OpenGL ES and NanoVG renderers,
+		which can only render into a GPU surface.
+
+config LV_WAYLAND_USE_EGL
+	bool "EGL (OpenGL ES, hardware-accelerated) Backend"
+	default y if LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
+	select LV_USE_EGL
+	select LV_USE_OPENGLES
+	help
+		Hardware-accelerated rendering via OpenGL ES 2.0 and EGL, compatible
+		with LVGL 3D/glTF rendering. Requires OpenGL ES 2.0 on the target
+		hardware and linking with wayland-egl (-lwayland-egl).
+		The only backend available with the OpenGL ES and NanoVG renderers.
+
+config LV_WAYLAND_USE_G2D
+	bool "G2D (NXP i.MX hardware accelerator)"
+	depends on !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
+	select LV_USE_DRAW_G2D
+	select LV_WAYLAND_USE_DMABUF_PROTOCOL
+	help
+		Hardware-accelerated 2D rendering via NXP's G2D engine.
+		Supports NXP i.MX6/i.MX8 platforms with G2D library installed.
+		Unavailable with the OpenGL ES and NanoVG renderers, which can only
+		render into a GPU surface.
+
+config LV_WAYLAND_USE_DMABUF_PROTOCOL
 	bool
 
 endif # LV_USE_WAYLAND
@@ -3256,6 +3424,7 @@ config LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
 config LV_USE_NANOVG_TEST_HEADLESS
 	bool "Headless EGL display for NanoVG"
 	depends on LV_USE_DRAW_NANOVG
+	select LV_USE_OPENGLES_PBUFFER
 	help
 		Render into an off-screen EGL pbuffer instead of a window and read the
 		pixels back into the LVGL draw buffer, so screenshot compares work the
@@ -3396,22 +3565,23 @@ config LV_GLOBAL_CUSTOM_INCLUDE
 endif #LV_ENABLE_GLOBAL_CUSTOM
 
 menu "Asserts"
-	config LV_USE_ASSERT_NULL
-		bool "NULL checks (very fast, recommended)"
-		default y
+	config LV_USE_ASSERT
+		bool "LV_ASSERT / LV_ASSERT_MSG / LV_ASSERT_FORMAT_MSG"
 
 	config LV_USE_ASSERT_MALLOC
-		bool "Allocation success checks (very fast, recommended)"
-		default y
+		bool "LV_ASSERT_MALLOC"
+
+	config LV_USE_ASSERT_NULL
+		bool "LV_ASSERT_NULL"
 
 	config LV_USE_ASSERT_STYLE
-		bool "Style init checks (very fast, recommended)"
+		bool "LV_ASSERT_STYLE"
 
 	config LV_USE_ASSERT_MEM_INTEGRITY
-		bool "lv_mem integrity checks (slow)"
+		bool "LV_ASSERT_MEM_INTEGRITY"
 
 	config LV_USE_ASSERT_OBJ
-		bool "Widget validity checks (slow)"
+		bool "LV_ASSERT_OBJ"
 
 	config LV_ASSERT_HANDLER_INCLUDE
 		string "Assert handler header [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"
@@ -3514,16 +3684,27 @@ menu "Argument Checks"
 		default n
 		help
 			LV_CHECK_OBJ verifies with lv_obj_has_class() that the object has the
-			expected class. When disabled the check is skipped even if a class
-			argument is supplied.
+			expected class. When disabled the class check is skipped
+			(LV_CHECK_OBJ collapses to a NULL check).
 
 	config LV_USE_CHECK_OBJ_VALIDITY
 		bool "Widget-tree validity check in LV_CHECK_OBJ"
 		default n
 		help
-			LV_CHECK_OBJ verifies with lv_obj_is_valid() that the object is still
-			part of the widget tree. When disabled the check is skipped even if the
-			associated argument is supplied.
+			LV_CHECK_OBJ verifies with lv_obj_is_in_widget_tree() that the object is
+			still part of the widget tree. When disabled the validity check is
+			skipped (only the class/NULL check remains).
+
+	config LV_USE_CHECK_OBJ_PARENT_LINK
+		bool "Parent-link consistency check in lv_obj_is_in_widget_tree"
+		default n
+		depends on LV_USE_CHECK_OBJ_VALIDITY
+		depends on LV_USE_ASSERT
+		help
+			While walking up the parent chain, lv_obj_is_in_widget_tree also checks that
+			each parent's children array contains the child. This finds corruption where
+			a child's parent pointer and the parent's children list disagree. The cost is
+			O(siblings) per level instead of O(1), and LV_ASSERT reports the mismatch.
 	endif
 endmenu
 endmenu #"Build"
@@ -3620,6 +3801,8 @@ config LV_USE_DEMO_BENCHMARK
 	select LV_FONT_MONTSERRAT_24
 	select LV_FONT_MONTSERRAT_26
 	select LV_USE_DEMO_WIDGETS
+	imply LV_USE_SYSMON
+	imply LV_USE_PERF_MONITOR
 
 config LV_DEMO_BENCHMARK_ALIGNED_FONTS
 	depends on LV_USE_DEMO_BENCHMARK

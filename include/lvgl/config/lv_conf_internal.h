@@ -8,6 +8,9 @@
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
+#define LV_CONF_PASTE_(a, b) a##b
+#define LV_CONF_PASTE(a, b)  LV_CONF_PASTE_(a, b)
+
 /* Config options */
 /* Built-in font selectors for LV_FONT_DEFAULT */
 #define LV_FONT_DEFAULT_MONTSERRAT_8                &lv_font_montserrat_8
@@ -62,6 +65,7 @@
 #define LV_DRAW_SW_ASM_NEON      1
 #define LV_DRAW_SW_ASM_HELIUM    2
 #define LV_DRAW_SW_ASM_RISCV_V   3
+#define LV_DRAW_SW_ASM_SVE2      4
 #define LV_DRAW_SW_ASM_CUSTOM    255
 
 /* VG-Lite GPU (series and revision) */
@@ -111,11 +115,6 @@
 #define LV_SDL_MOUSEWHEEL_MODE_ENCODER   0
 #define LV_SDL_MOUSEWHEEL_MODE_CROWN     1
 
-/* Rendering backend */
-#define LV_WAYLAND_BACKEND_SHM   0
-#define LV_WAYLAND_BACKEND_EGL   1
-#define LV_WAYLAND_BACKEND_G2D   2
-
 /* Log behavior on LV_CHECK_ARG failure */
 #define LV_CHECK_ARG_LOG_MODE_NONE      0
 #define LV_CHECK_ARG_LOG_MODE_MINIMAL   1
@@ -154,11 +153,33 @@
     #endif
 #endif
 
-#ifdef CONFIG_LV_COLOR_DEPTH
+#ifdef CONFIG_LV_STDLIB_BUILTIN
     #define LV_KCONFIG_PRESENT
 #endif
 
-/* 
+/*
+ * LV_COLOR_DEPTH was replaced by LV_COLOR_FORMAT_DEFAULT.
+ * Derive LV_COLOR_FORMAT_DEFAULT from it here
+ * TODO: Remove this for v10.
+ */
+#if !defined(LV_COLOR_FORMAT_DEFAULT) && defined(LV_COLOR_DEPTH)
+    #warning LV_COLOR_DEPTH is deprecated and will be removed in a future release. Define LV_COLOR_FORMAT_DEFAULT instead
+    #if LV_COLOR_DEPTH == 1
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_I1
+    #elif LV_COLOR_DEPTH == 8
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_L8
+    #elif LV_COLOR_DEPTH == 16
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
+    #elif LV_COLOR_DEPTH == 24
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB888
+    #elif LV_COLOR_DEPTH == 32
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_XRGB8888
+    #else
+        #error "LV_COLOR_DEPTH should be 1, 8, 16, 24 or 32"
+    #endif
+#endif
+
+/*
  * Detect if the user is using the new calendar day/month configuration
  * in order to avoid warnings for users that have migrated.
  */
@@ -168,7 +189,7 @@
 #define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 0
 #endif
 
-/* 
+/*
  * Detect if the user is using the new calendar day/month configuration
  * in order to avoid warnings for users that have migrated.
  */
@@ -178,7 +199,7 @@
 #define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 0
 #endif
 
-/* 
+/*
  * Detect if the user is using the xkb keymap configuration
  * in order to avoid warnings for users that have migrated.
  * we only need to check for it if LV_LIBINPUT_XKB is enabled
@@ -342,11 +363,11 @@
  * RENDERING CONFIGURATION
  *============================================================================*/
 
-#ifndef LV_COLOR_DEPTH
-    #ifdef CONFIG_LV_COLOR_DEPTH
-        #define LV_COLOR_DEPTH CONFIG_LV_COLOR_DEPTH
+#ifndef LV_COLOR_FORMAT_DEFAULT
+    #ifdef CONFIG_LV_COLOR_FORMAT_DEFAULT
+        #define LV_COLOR_FORMAT_DEFAULT CONFIG_LV_COLOR_FORMAT_DEFAULT
     #else
-        #define LV_COLOR_DEPTH 16
+        #define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
     #endif
 #endif
 
@@ -1074,6 +1095,34 @@
     #endif
 #endif
 
+#ifndef LV_USE_SIFLI_EPIC
+    #ifdef CONFIG_LV_USE_SIFLI_EPIC
+        #define LV_USE_SIFLI_EPIC CONFIG_LV_USE_SIFLI_EPIC
+    #else
+        #define LV_USE_SIFLI_EPIC 0
+    #endif
+#endif
+
+#ifndef LV_USE_SIFLI_EPIC_DRAW_THREAD
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_SIFLI_EPIC_DRAW_THREAD
+            #define LV_USE_SIFLI_EPIC_DRAW_THREAD CONFIG_LV_USE_SIFLI_EPIC_DRAW_THREAD
+        #else
+            #define LV_USE_SIFLI_EPIC_DRAW_THREAD 0
+        #endif
+    #else
+          #define LV_USE_SIFLI_EPIC_DRAW_THREAD !(LV_USE_OS == LV_OS_NONE) && LV_USE_SIFLI_EPIC
+    #endif
+#endif
+
+#ifndef LV_USE_SIFLI_EPIC_ASSERT
+    #ifdef CONFIG_LV_USE_SIFLI_EPIC_ASSERT
+        #define LV_USE_SIFLI_EPIC_ASSERT CONFIG_LV_USE_SIFLI_EPIC_ASSERT
+    #else
+        #define LV_USE_SIFLI_EPIC_ASSERT 0
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_EVE
     #ifdef CONFIG_LV_USE_DRAW_EVE
         #define LV_USE_DRAW_EVE CONFIG_LV_USE_DRAW_EVE
@@ -1196,6 +1245,78 @@
  * INPUT DEVICES
  *============================================================================*/
 
+#ifndef LV_INDEV_DEF_SCROLL_LIMIT
+    #ifdef CONFIG_LV_INDEV_DEF_SCROLL_LIMIT
+        #define LV_INDEV_DEF_SCROLL_LIMIT CONFIG_LV_INDEV_DEF_SCROLL_LIMIT
+    #else
+        #define LV_INDEV_DEF_SCROLL_LIMIT 10
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_SCROLL_THROW
+    #ifdef CONFIG_LV_INDEV_DEF_SCROLL_THROW
+        #define LV_INDEV_DEF_SCROLL_THROW CONFIG_LV_INDEV_DEF_SCROLL_THROW
+    #else
+        #define LV_INDEV_DEF_SCROLL_THROW 10
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
+    #ifdef CONFIG_LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
+        #define LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR CONFIG_LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
+    #else
+        #define LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR 4
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_LONG_PRESS_TIME
+    #ifdef CONFIG_LV_INDEV_DEF_LONG_PRESS_TIME
+        #define LV_INDEV_DEF_LONG_PRESS_TIME CONFIG_LV_INDEV_DEF_LONG_PRESS_TIME
+    #else
+        #define LV_INDEV_DEF_LONG_PRESS_TIME 400
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_LONG_PRESS_REP_TIME
+    #ifdef CONFIG_LV_INDEV_DEF_LONG_PRESS_REP_TIME
+        #define LV_INDEV_DEF_LONG_PRESS_REP_TIME CONFIG_LV_INDEV_DEF_LONG_PRESS_REP_TIME
+    #else
+        #define LV_INDEV_DEF_LONG_PRESS_REP_TIME 100
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_DOUBLE_CLICK_TIME
+    #ifdef CONFIG_LV_INDEV_DEF_DOUBLE_CLICK_TIME
+        #define LV_INDEV_DEF_DOUBLE_CLICK_TIME CONFIG_LV_INDEV_DEF_DOUBLE_CLICK_TIME
+    #else
+        #define LV_INDEV_DEF_DOUBLE_CLICK_TIME 400
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_LIMIT
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_LIMIT
+        #define LV_INDEV_DEF_GESTURE_LIMIT CONFIG_LV_INDEV_DEF_GESTURE_LIMIT
+    #else
+        #define LV_INDEV_DEF_GESTURE_LIMIT 50
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+        #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY CONFIG_LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+    #else
+        #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_ROTARY_SENSITIVITY
+    #ifdef CONFIG_LV_INDEV_DEF_ROTARY_SENSITIVITY
+        #define LV_INDEV_DEF_ROTARY_SENSITIVITY CONFIG_LV_INDEV_DEF_ROTARY_SENSITIVITY
+    #else
+        #define LV_INDEV_DEF_ROTARY_SENSITIVITY 256
+    #endif
+#endif
+
 #ifndef LV_USE_GRIDNAV
     #ifdef CONFIG_LV_USE_GRIDNAV
         #define LV_USE_GRIDNAV CONFIG_LV_USE_GRIDNAV
@@ -1212,6 +1333,38 @@
     #endif
 #endif
 
+#ifndef LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD
+        #define LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD CONFIG_LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD
+    #else
+        #define LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD 75
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+        #define LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD CONFIG_LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD
+    #else
+        #define LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD 150
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE
+        #define LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE CONFIG_LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE
+    #else
+        #define LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE 250
+    #endif
+#endif
+
+#ifndef LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD
+    #ifdef CONFIG_LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD
+        #define LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD CONFIG_LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD
+    #else
+        #define LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD 200
+    #endif
+#endif
+
 
 
 /*============================================================================
@@ -1219,10 +1372,14 @@
  *============================================================================*/
 
 #ifndef LV_OBJ_STYLE_CACHE
-    #ifdef CONFIG_LV_OBJ_STYLE_CACHE
-        #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_OBJ_STYLE_CACHE
+            #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
+        #else
+            #define LV_OBJ_STYLE_CACHE 0
+        #endif
     #else
-        #define LV_OBJ_STYLE_CACHE 0
+        #define LV_OBJ_STYLE_CACHE 1
     #endif
 #endif
 
@@ -3544,23 +3701,39 @@
     #endif
 #endif
 
-#ifndef LV_WAYLAND_AUTO_BACKEND
+#ifndef LV_WAYLAND_USE_SHM
     #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_WAYLAND_AUTO_BACKEND
-            #define LV_WAYLAND_AUTO_BACKEND CONFIG_LV_WAYLAND_AUTO_BACKEND
+        #ifdef CONFIG_LV_WAYLAND_USE_SHM
+            #define LV_WAYLAND_USE_SHM CONFIG_LV_WAYLAND_USE_SHM
         #else
-            #define LV_WAYLAND_AUTO_BACKEND 0
+            #define LV_WAYLAND_USE_SHM 0
         #endif
     #else
-          #define LV_WAYLAND_AUTO_BACKEND LV_USE_WAYLAND
+          #define LV_WAYLAND_USE_SHM !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND
     #endif
 #endif
 
-#ifndef LV_WAYLAND_BACKEND
-    #ifdef CONFIG_LV_WAYLAND_BACKEND
-        #define LV_WAYLAND_BACKEND CONFIG_LV_WAYLAND_BACKEND
+#ifndef LV_WAYLAND_USE_DMABUF
+    #ifdef CONFIG_LV_WAYLAND_USE_DMABUF
+        #define LV_WAYLAND_USE_DMABUF CONFIG_LV_WAYLAND_USE_DMABUF
     #else
-        #define LV_WAYLAND_BACKEND LV_WAYLAND_BACKEND_SHM
+        #define LV_WAYLAND_USE_DMABUF 0
+    #endif
+#endif
+
+#ifndef LV_WAYLAND_USE_EGL
+    #ifdef CONFIG_LV_WAYLAND_USE_EGL
+        #define LV_WAYLAND_USE_EGL CONFIG_LV_WAYLAND_USE_EGL
+    #else
+        #define LV_WAYLAND_USE_EGL 0
+    #endif
+#endif
+
+#ifndef LV_WAYLAND_USE_G2D
+    #ifdef CONFIG_LV_WAYLAND_USE_G2D
+        #define LV_WAYLAND_USE_G2D CONFIG_LV_WAYLAND_USE_G2D
+    #else
+        #define LV_WAYLAND_USE_G2D 0
     #endif
 #endif
 
@@ -4288,27 +4461,27 @@
     #endif
 #endif
 
-#ifndef LV_USE_ASSERT_NULL
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ASSERT_NULL
-            #define LV_USE_ASSERT_NULL CONFIG_LV_USE_ASSERT_NULL
-        #else
-            #define LV_USE_ASSERT_NULL 0
-        #endif
+#ifndef LV_USE_ASSERT
+    #ifdef CONFIG_LV_USE_ASSERT
+        #define LV_USE_ASSERT CONFIG_LV_USE_ASSERT
     #else
-        #define LV_USE_ASSERT_NULL 1
+        #define LV_USE_ASSERT 0
     #endif
 #endif
 
 #ifndef LV_USE_ASSERT_MALLOC
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ASSERT_MALLOC
-            #define LV_USE_ASSERT_MALLOC CONFIG_LV_USE_ASSERT_MALLOC
-        #else
-            #define LV_USE_ASSERT_MALLOC 0
-        #endif
+    #ifdef CONFIG_LV_USE_ASSERT_MALLOC
+        #define LV_USE_ASSERT_MALLOC CONFIG_LV_USE_ASSERT_MALLOC
     #else
-        #define LV_USE_ASSERT_MALLOC 1
+        #define LV_USE_ASSERT_MALLOC 0
+    #endif
+#endif
+
+#ifndef LV_USE_ASSERT_NULL
+    #ifdef CONFIG_LV_USE_ASSERT_NULL
+        #define LV_USE_ASSERT_NULL CONFIG_LV_USE_ASSERT_NULL
+    #else
+        #define LV_USE_ASSERT_NULL 0
     #endif
 #endif
 
@@ -4401,6 +4574,14 @@
         #define LV_USE_CHECK_OBJ_VALIDITY CONFIG_LV_USE_CHECK_OBJ_VALIDITY
     #else
         #define LV_USE_CHECK_OBJ_VALIDITY 0
+    #endif
+#endif
+
+#ifndef LV_USE_CHECK_OBJ_PARENT_LINK
+    #ifdef CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
+        #define LV_USE_CHECK_OBJ_PARENT_LINK CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
+    #else
+        #define LV_USE_CHECK_OBJ_PARENT_LINK 0
     #endif
 #endif
 
@@ -4641,15 +4822,17 @@
  * Start of compatibility block
  -----------------------------------*/
 
-/*  
- *  TODO: Remove this for v10.
+/*
+ * TODO: Remove this for v10.
+ * These checks can't go to lv_conf_check.c as we export the correct
+ * settings so the user code continues to work
  */
 
 /*
  *  Before the user selected either LV_USE_LZ4_INTERNAL or LV_USE_LZ4_EXTERNAL
- *  For v9.6 LV_USE_LZ4_EXTERNAL doesn't exist anymore, instead the user 
+ *  For v9.6 LV_USE_LZ4_EXTERNAL doesn't exist anymore, instead the user
  *  enables LV_USE_LZ4 and disables LV_USE_LZ4_INTERNAL
- *  To support users using LV_USE_LZ4_EXTERNAL from before v9.6 we 
+ *  To support users using LV_USE_LZ4_EXTERNAL from before v9.6 we
  *  we enable LV_USE_LZ4 for them
  */
 #if defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL
@@ -4660,11 +4843,11 @@
 #endif /*!LV_USE_LZ4*/
 #endif /*defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL*/
 
-/*  
+/*
  *  Before the user selected either LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL
- *  For v9.6 LV_USE_THORVG_EXTERNAL doesn't exist anymore, instead the user 
+ *  For v9.6 LV_USE_THORVG_EXTERNAL doesn't exist anymore, instead the user
  *  enables LV_USE_THORVG and disables LV_USE_THORVG_INTERNAL
- *  To support users using LV_USE_THORVG_EXTERNAL from before v9.6 we 
+ *  To support users using LV_USE_THORVG_EXTERNAL from before v9.6 we
  *  we enable LV_USE_THORVG for them
  */
 #if defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL
@@ -4675,26 +4858,23 @@
 #endif /*!LV_USE_THORVG*/
 #endif /*defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL*/
 
-/*  
- *  Backward compatibility. Before the user selected either 
+/*
+ *  Backward compatibility. Before the user selected either
  *  LV_X11_RENDER_MODE_PARTIAL or LV_X11_RENDER_MODE_DIRECT or
  *  LV_X11_RENDER_MODE_FULL. For v9.6, this becomes a single choice:
  *  LV_X11_RENDER_MODE which maps to a LV_DISPLAY_RENDER_MODE value.
  */
 #if defined(LV_X11_RENDER_MODE_PARTIAL) && LV_X11_RENDER_MODE_PARTIAL
-    #warning LV_X11_RENDER_MODE_PARTIAL is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_PARTIAL instead.
     #undef LV_X11_RENDER_MODE
     #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
 #endif /*defined(LV_X11_RENDER_MODE_PARTIAL) && LV_X11_RENDER_MODE_PARTIAL*/
 
 #if defined(LV_X11_RENDER_MODE_DIRECT) && LV_X11_RENDER_MODE_DIRECT
-    #warning LV_X11_RENDER_MODE_DIRECT is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_DIRECT instead.
     #undef LV_X11_RENDER_MODE
     #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
 #endif /*defined(LV_X11_RENDER_MODE_DIRECT) && LV_X11_RENDER_MODE_DIRECT*/
 
 #if defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL
-    #warning LV_X11_RENDER_MODE_FULL is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_FULL instead.
     #undef LV_X11_RENDER_MODE
     #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
 #endif /*defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL*/
@@ -4756,29 +4936,6 @@
     #endif
 #endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
 
-/* Wayland never inferred its backend from LV_USE_OPENGLES; the legacy interface
- * was setting LV_WAYLAND_USE_* directly.  While LV_WAYLAND_AUTO_BACKEND is set we
- * honor any such define, default to SHM, and keep the three mutually exclusive.
- * The #warning fires only if a legacy LV_WAYLAND_USE_* was set by hand. */
-#if LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND
-    #if defined(LV_WAYLAND_USE_EGL) || defined(LV_WAYLAND_USE_G2D) || defined(LV_WAYLAND_USE_SHM)
-        #warning Setting LV_WAYLAND_USE_* directly is deprecated and will be removed in a future release. Set LV_WAYLAND_AUTO_BACKEND to 0 and select a backend with LV_WAYLAND_BACKEND.
-    #endif
-    #ifndef LV_WAYLAND_USE_EGL
-        #define LV_WAYLAND_USE_EGL 0
-    #endif
-    #ifndef LV_WAYLAND_USE_G2D
-        #define LV_WAYLAND_USE_G2D 0
-    #endif
-    #ifndef LV_WAYLAND_USE_SHM
-        #if LV_WAYLAND_USE_EGL || LV_WAYLAND_USE_G2D
-            #define LV_WAYLAND_USE_SHM 0
-        #else
-            #define LV_WAYLAND_USE_SHM 1
-        #endif
-    #endif
-#endif /*LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND*/
-
 #if defined(LV_ASSERT_HANDLER_INCLUDE) && !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
 #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
 #include LV_ASSERT_HANDLER_INCLUDE
@@ -4789,7 +4946,36 @@
  * End of compatibility block
  -----------------------------------*/
 
+
+/* Values fixed by another option's selected token (see LV_CONF_PASTE). */
+
+/** LV_COLOR_DEPTH - derived from LV_COLOR_FORMAT_DEFAULT. */
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_I1                       1
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_L8                       8
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_RGB565                   16
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_RGB565_SWAPPED           16
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_RGB888                   24
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_XRGB8888                 32
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_ARGB8888                 32
+#define LV_COLOR_DEPTH_OF_LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED   32
+
+#ifndef LV_COLOR_DEPTH
+    #ifdef CONFIG_LV_COLOR_DEPTH
+        #define LV_COLOR_DEPTH CONFIG_LV_COLOR_DEPTH
+    #else
+        #define LV_COLOR_DEPTH LV_CONF_PASTE(LV_COLOR_DEPTH_OF_, LV_COLOR_FORMAT_DEFAULT)
+    #endif
+#endif
+
 /* Derived capability flags (set via Kconfig `select`). */
+#ifndef LV_USE_TLSF
+    #if (LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN)
+        #define LV_USE_TLSF 1
+    #else
+        #define LV_USE_TLSF 0
+    #endif
+#endif
+
 #ifndef LV_OS_USE_PTHREAD
     #if (LV_USE_OS == LV_OS_PTHREAD)
         #define LV_OS_USE_PTHREAD 1
@@ -4894,6 +5080,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_OPENGLES_PBUFFER
+    #if ((LV_USE_NANOVG_TEST_HEADLESS && LV_USE_DRAW_NANOVG && LV_USE_TEST) && (LV_USE_DRAW_NANOVG))
+        #define LV_USE_OPENGLES_PBUFFER 1
+    #else
+        #define LV_USE_OPENGLES_PBUFFER 0
+    #endif
+#endif
+
 #ifndef LV_SDL_USE_EGL
     #if ((LV_SDL_BACKEND == LV_SDL_BACKEND_EGL && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)) && (LV_USE_SDL))
         #define LV_SDL_USE_EGL 1
@@ -4902,43 +5096,19 @@
     #endif
 #endif
 
-#ifndef LV_WAYLAND_USE_SHM
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_SHM) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_SHM 1
+#ifndef LV_WAYLAND_USE_DMABUF_PROTOCOL
+    #if (((LV_WAYLAND_USE_DMABUF && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) || (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)) && (LV_USE_WAYLAND))
+        #define LV_WAYLAND_USE_DMABUF_PROTOCOL 1
     #else
-        #define LV_WAYLAND_USE_SHM 0
-    #endif
-#endif
-
-#ifndef LV_WAYLAND_USE_EGL
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_EGL 1
-    #else
-        #define LV_WAYLAND_USE_EGL 0
-    #endif
-#endif
-
-#ifndef LV_WAYLAND_USE_G2D
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_G2D 1
-    #else
-        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_DMABUF_PROTOCOL 0
     #endif
 #endif
 
 #ifndef LV_USE_EGL
-    #if ((LV_LINUX_DRM_USE_EGL && LV_USE_LINUX_DRM) || (LV_SDL_USE_EGL && LV_USE_SDL) || (LV_WAYLAND_USE_EGL && LV_USE_WAYLAND))
+    #if ((LV_LINUX_DRM_USE_EGL && LV_USE_LINUX_DRM) || (LV_USE_OPENGLES_PBUFFER && LV_USE_DRAW_NANOVG) || (LV_SDL_USE_EGL && LV_USE_SDL) || (LV_WAYLAND_USE_EGL && LV_USE_WAYLAND))
         #define LV_USE_EGL 1
     #else
         #define LV_USE_EGL 0
-    #endif
-#endif
-
-#ifndef LV_WAYLAND_USE_DMABUF
-    #if (((LV_WAYLAND_USE_EGL && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) || (LV_WAYLAND_USE_G2D && LV_USE_WAYLAND)) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_DMABUF 1
-    #else
-        #define LV_WAYLAND_USE_DMABUF 0
     #endif
 #endif
 
@@ -5046,444 +5216,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #ifndef LV_CHECK_ARG_LOG_MODE
     #define LV_CHECK_ARG_LOG_MODE   0
-#endif
-
-/* Kconfig enforces `depends on` / `select`; these checks catch a
- * hand-written lv_conf.h that violates them. */
-#if LV_OS_IDLE_PERCENT_CUSTOM && !(LV_USE_OS == LV_OS_FREERTOS)
-    #error "LV_OS_IDLE_PERCENT_CUSTOM requires LV_USE_OS == LV_OS_FREERTOS (Kconfig depends on)"
-#endif
-
-#if (LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES) && !LV_USE_MATRIX
-    #error "LV_USE_MATRIX must be enabled: Kconfig selects it from LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES"
-#endif
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX && !(LV_USE_MATRIX)
-    #error "LV_DRAW_TRANSFORM_USE_MATRIX requires LV_USE_MATRIX (Kconfig depends on)"
-#endif
-
-#if ((LV_USE_SVG && LV_DRAW_HAS_VECTOR_SUPPORT) || (LV_USE_LOTTIE && LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG) || (LV_USE_DEMO_VECTOR_GRAPHIC && LV_DRAW_HAS_VECTOR_SUPPORT && LV_BUILD_DEMOS)) && !LV_USE_VECTOR_GRAPHIC
-    #error "LV_USE_VECTOR_GRAPHIC must be enabled: Kconfig selects it from (LV_USE_SVG && LV_DRAW_HAS_VECTOR_SUPPORT) || (LV_USE_LOTTIE && LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG) || (LV_USE_DEMO_VECTOR_GRAPHIC && LV_DRAW_HAS_VECTOR_SUPPORT && LV_BUILD_DEMOS)"
-#endif
-
-#if (LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE) && !LV_USE_THORVG
-    #error "LV_USE_THORVG must be enabled: Kconfig selects it from LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE"
-#endif
-
-#if LV_USE_DRAW_ARM2D_SYNC && !(LV_USE_DRAW_SW)
-    #error "LV_USE_DRAW_ARM2D_SYNC requires LV_USE_DRAW_SW (Kconfig depends on)"
-#endif
-
-#if LV_USE_NATIVE_HELIUM_ASM && !(LV_USE_DRAW_SW)
-    #error "LV_USE_NATIVE_HELIUM_ASM requires LV_USE_DRAW_SW (Kconfig depends on)"
-#endif
-
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS && !(LV_USE_DRAW_SW)
-    #error "LV_USE_DRAW_SW_COMPLEX_GRADIENTS requires LV_USE_DRAW_SW (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_USE_GPU_INIT && !(LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_USE_GPU_INIT requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_USE_ASSERT && !(LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_USE_ASSERT requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_DISABLE_VLC_OP_CLOSE && !(LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_DISABLE_VLC_OP_CLOSE requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT && !(LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET && !(LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_USE_VG_LITE_DRIVER && !(LV_USE_DRAW_VG_LITE)
-    #error "LV_USE_VG_LITE_DRIVER requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_USE_VG_LITE_THORVG && !(LV_USE_DRAW_VG_LITE)
-    #error "LV_USE_VG_LITE_THORVG requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT && !(LV_USE_VG_LITE_THORVG && LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT requires LV_USE_VG_LITE_THORVG && LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_THORVG_YUV_SUPPORT && !(LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_THORVG_YUV_SUPPORT requires LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT && !(LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT requires LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_VG_LITE_THORVG_THREAD_RENDER && !(LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE)
-    #error "LV_VG_LITE_THORVG_THREAD_RENDER requires LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE (Kconfig depends on)"
-#endif
-
-#if LV_NEMA_USE_CACHE && !(LV_USE_NEMA_GFX)
-    #error "LV_NEMA_USE_CACHE requires LV_USE_NEMA_GFX (Kconfig depends on)"
-#endif
-
-#if LV_NEMA_USE_CUSTOM_INCLUDE && !(LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32 && LV_USE_NEMA_GFX)
-    #error "LV_NEMA_USE_CUSTOM_INCLUDE requires LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32 && LV_USE_NEMA_GFX (Kconfig depends on)"
-#endif
-
-#if LV_USE_NEMA_VG && !(LV_USE_NEMA_GFX)
-    #error "LV_USE_NEMA_VG requires LV_USE_NEMA_GFX (Kconfig depends on)"
-#endif
-
-#if LV_USE_ROTATE_PXP && !(LV_USE_DRAW_PXP)
-    #error "LV_USE_ROTATE_PXP requires LV_USE_DRAW_PXP (Kconfig depends on)"
-#endif
-
-#if LV_USE_PXP_ASSERT && !(LV_USE_DRAW_PXP)
-    #error "LV_USE_PXP_ASSERT requires LV_USE_DRAW_PXP (Kconfig depends on)"
-#endif
-
-#if LV_USE_PPA_IMG && !(LV_USE_PPA)
-    #error "LV_USE_PPA_IMG requires LV_USE_PPA (Kconfig depends on)"
-#endif
-
-#if LV_USE_DRAW_DMA2D_INTERRUPT && !(LV_USE_DRAW_DMA2D)
-    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
-#endif
-
-#if (LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && !LV_USE_DRAW_G2D
-    #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D"
-#endif
-
-#if LV_USE_G2D_ASSERT && !(LV_USE_DRAW_G2D && LV_USE_DRAW_G2D)
-    #error "LV_USE_G2D_ASSERT requires LV_USE_DRAW_G2D && LV_USE_DRAW_G2D (Kconfig depends on)"
-#endif
-
-#if (LV_SDL_BACKEND == LV_SDL_BACKEND_TEXTURE) && !LV_USE_DRAW_SDL
-    #error "LV_USE_DRAW_SDL must be enabled: Kconfig selects it from LV_SDL_BACKEND == LV_SDL_BACKEND_TEXTURE"
-#endif
-
-#if (LV_USE_MATRIX || LV_USE_GESTURE_RECOGNITION) && !LV_USE_FLOAT
-    #error "LV_USE_FLOAT must be enabled: Kconfig selects it from LV_USE_MATRIX || LV_USE_GESTURE_RECOGNITION"
-#endif
-
-#if LV_LOG_PRINTF && !(LV_USE_LOG)
-    #error "LV_LOG_PRINTF requires LV_USE_LOG (Kconfig depends on)"
-#endif
-
-#if LV_THEME_DEFAULT_DARK && !(LV_USE_THEME_DEFAULT)
-    #error "LV_THEME_DEFAULT_DARK requires LV_USE_THEME_DEFAULT (Kconfig depends on)"
-#endif
-
-#if (LV_USE_DEMO_RENDER && LV_BUILD_DEMOS) && !LV_USE_GRID
-    #error "LV_USE_GRID must be enabled: Kconfig selects it from LV_USE_DEMO_RENDER && LV_BUILD_DEMOS"
-#endif
-
-#if (LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST) && !LV_USE_LODEPNG
-    #error "LV_USE_LODEPNG must be enabled: Kconfig selects it from LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST"
-#endif
-
-#if LV_USE_SVG && !(LV_DRAW_HAS_VECTOR_SUPPORT)
-    #error "LV_USE_SVG requires LV_DRAW_HAS_VECTOR_SUPPORT (Kconfig depends on)"
-#endif
-
-#if LV_USE_SVG_ANIMATION && !(LV_USE_SVG)
-    #error "LV_USE_SVG_ANIMATION requires LV_USE_SVG (Kconfig depends on)"
-#endif
-
-#if LV_USE_SVG_DEBUG && !(LV_USE_SVG)
-    #error "LV_USE_SVG_DEBUG requires LV_USE_SVG (Kconfig depends on)"
-#endif
-
-#if LV_FREETYPE_USE_LVGL_PORT && !(LV_USE_FREETYPE)
-    #error "LV_FREETYPE_USE_LVGL_PORT requires LV_USE_FREETYPE (Kconfig depends on)"
-#endif
-
-#if LV_TINY_TTF_FILE_SUPPORT && !(LV_USE_TINY_TTF)
-    #error "LV_TINY_TTF_FILE_SUPPORT requires LV_USE_TINY_TTF (Kconfig depends on)"
-#endif
-
-#if (LV_USE_GLTF && LV_DRAW_HAS_3D_SUPPORT) && !LV_USE_3DTEXTURE
-    #error "LV_USE_3DTEXTURE must be enabled: Kconfig selects it from LV_USE_GLTF && LV_DRAW_HAS_3D_SUPPORT"
-#endif
-
-#if LV_USE_3DTEXTURE && !(LV_DRAW_HAS_3D_SUPPORT)
-    #error "LV_USE_3DTEXTURE requires LV_DRAW_HAS_3D_SUPPORT (Kconfig depends on)"
-#endif
-
-#if (LV_USE_SLIDER) && !LV_USE_BAR
-    #error "LV_USE_BAR must be enabled: Kconfig selects it from LV_USE_SLIDER"
-#endif
-
-#if LV_CALENDAR_WEEK_STARTS_MONDAY && !(LV_USE_CALENDAR)
-    #error "LV_CALENDAR_WEEK_STARTS_MONDAY requires LV_USE_CALENDAR (Kconfig depends on)"
-#endif
-
-#if LV_USE_CALENDAR_CHINESE && !(LV_USE_CALENDAR)
-    #error "LV_USE_CALENDAR_CHINESE requires LV_USE_CALENDAR (Kconfig depends on)"
-#endif
-
-#if (LV_USE_BARCODE || LV_USE_QRCODE) && !LV_USE_CANVAS
-    #error "LV_USE_CANVAS must be enabled: Kconfig selects it from LV_USE_BARCODE || LV_USE_QRCODE"
-#endif
-
-#if LV_FFMPEG_DUMP_FORMAT && !(LV_USE_FFMPEG)
-    #error "LV_FFMPEG_DUMP_FORMAT requires LV_USE_FFMPEG (Kconfig depends on)"
-#endif
-
-#if LV_FFMPEG_PLAYER_USE_LV_FS && !(LV_USE_FFMPEG)
-    #error "LV_FFMPEG_PLAYER_USE_LV_FS requires LV_USE_FFMPEG (Kconfig depends on)"
-#endif
-
-#if LV_GIF_CACHE_DECODE_DATA && !(LV_USE_GIF)
-    #error "LV_GIF_CACHE_DECODE_DATA requires LV_USE_GIF (Kconfig depends on)"
-#endif
-
-#if LV_USE_GLTF && !(LV_DRAW_HAS_3D_SUPPORT)
-    #error "LV_USE_GLTF requires LV_DRAW_HAS_3D_SUPPORT (Kconfig depends on)"
-#endif
-
-#if (LV_USE_CANVAS || LV_USE_GSTREAMER) && !LV_USE_IMAGE
-    #error "LV_USE_IMAGE must be enabled: Kconfig selects it from LV_USE_CANVAS || LV_USE_GSTREAMER"
-#endif
-
-#if (LV_USE_IME_PINYIN) && !LV_USE_KEYBOARD
-    #error "LV_USE_KEYBOARD must be enabled: Kconfig selects it from LV_USE_IME_PINYIN"
-#endif
-
-#if (LV_USE_DROPDOWN || LV_USE_IMAGE || LV_USE_ROLLER || LV_USE_TEXTAREA) && !LV_USE_LABEL
-    #error "LV_USE_LABEL must be enabled: Kconfig selects it from LV_USE_DROPDOWN || LV_USE_IMAGE || LV_USE_ROLLER || LV_USE_TEXTAREA"
-#endif
-
-#if LV_USE_LOTTIE && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG)
-    #error "LV_USE_LOTTIE requires LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG (Kconfig depends on)"
-#endif
-
-#if (LV_USE_FILE_EXPLORER) && !LV_USE_TABLE
-    #error "LV_USE_TABLE must be enabled: Kconfig selects it from LV_USE_FILE_EXPLORER"
-#endif
-
-#if LV_LINUX_FBDEV_BSD && !(LV_USE_LINUX_FBDEV)
-    #error "LV_LINUX_FBDEV_BSD requires LV_USE_LINUX_FBDEV (Kconfig depends on)"
-#endif
-
-#if (LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341 || LV_USE_NV3007) && !LV_USE_GENERIC_MIPI
-    #error "LV_USE_GENERIC_MIPI must be enabled: Kconfig selects it from LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341 || LV_USE_NV3007"
-#endif
-
-#if LV_ST_LTDC_USE_DMA2D_FLUSH && !(!LV_USE_DRAW_DMA2D && LV_USE_ST_LTDC)
-    #error "LV_ST_LTDC_USE_DMA2D_FLUSH requires !LV_USE_DRAW_DMA2D && LV_USE_ST_LTDC (Kconfig depends on)"
-#endif
-
-#if LV_LIBINPUT_BSD && !(LV_USE_LIBINPUT)
-    #error "LV_LIBINPUT_BSD requires LV_USE_LIBINPUT (Kconfig depends on)"
-#endif
-
-#if LV_LIBINPUT_XKB && !(LV_USE_LIBINPUT)
-    #error "LV_LIBINPUT_XKB requires LV_USE_LIBINPUT (Kconfig depends on)"
-#endif
-
-#if LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP && !(LV_USE_NUTTX)
-    #error "LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP requires LV_USE_NUTTX (Kconfig depends on)"
-#endif
-
-#if LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP && !(LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP && LV_USE_NUTTX)
-    #error "LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP requires LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP && LV_USE_NUTTX (Kconfig depends on)"
-#endif
-
-#if LV_USE_NUTTX_LIBUV && !(LV_USE_NUTTX)
-    #error "LV_USE_NUTTX_LIBUV requires LV_USE_NUTTX (Kconfig depends on)"
-#endif
-
-#if LV_USE_NUTTX_CUSTOM_INIT && !(LV_USE_NUTTX)
-    #error "LV_USE_NUTTX_CUSTOM_INIT requires LV_USE_NUTTX (Kconfig depends on)"
-#endif
-
-#if LV_USE_NUTTX_LCD && !(LV_USE_NUTTX)
-    #error "LV_USE_NUTTX_LCD requires LV_USE_NUTTX (Kconfig depends on)"
-#endif
-
-#if LV_USE_NUTTX_TOUCHSCREEN && !(LV_USE_NUTTX)
-    #error "LV_USE_NUTTX_TOUCHSCREEN requires LV_USE_NUTTX (Kconfig depends on)"
-#endif
-
-#if LV_USE_NUTTX_MOUSE && !(LV_USE_NUTTX)
-    #error "LV_USE_NUTTX_MOUSE requires LV_USE_NUTTX (Kconfig depends on)"
-#endif
-
-#if LV_USE_NUTTX_TRACE_FILE && !(LV_USE_PROFILER_BUILTIN && LV_USE_NUTTX)
-    #error "LV_USE_NUTTX_TRACE_FILE requires LV_USE_PROFILER_BUILTIN && LV_USE_NUTTX (Kconfig depends on)"
-#endif
-
-#if (LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL) && !LV_USE_OPENGLES
-    #error "LV_USE_OPENGLES must be enabled: Kconfig selects it from LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL"
-#endif
-
-#if LV_USE_OPENGLES_DEBUG && !(LV_USE_OPENGLES)
-    #error "LV_USE_OPENGLES_DEBUG requires LV_USE_OPENGLES (Kconfig depends on)"
-#endif
-
-#if LV_USE_GLFW && !(!LV_USE_EGL)
-    #error "LV_USE_GLFW requires !LV_USE_EGL (Kconfig depends on)"
-#endif
-
-#if LV_SDL_FULLSCREEN && !(LV_USE_SDL)
-    #error "LV_SDL_FULLSCREEN requires LV_USE_SDL (Kconfig depends on)"
-#endif
-
-#if LV_UEFI_USE_MEMORY_SERVICES && !(LV_USE_UEFI)
-    #error "LV_UEFI_USE_MEMORY_SERVICES requires LV_USE_UEFI (Kconfig depends on)"
-#endif
-
-#if LV_USE_WINDOWS && !(LV_USE_OS == LV_OS_WINDOWS)
-    #error "LV_USE_WINDOWS requires LV_USE_OS == LV_OS_WINDOWS (Kconfig depends on)"
-#endif
-
-#if (LV_USE_DRAW_NANOVG) && !LV_USE_NANOVG
-    #error "LV_USE_NANOVG must be enabled: Kconfig selects it from LV_USE_DRAW_NANOVG"
-#endif
-
-#if LV_SYSMON_PROC_IDLE_AVAILABLE && !(LV_USE_SYSMON)
-    #error "LV_SYSMON_PROC_IDLE_AVAILABLE requires LV_USE_SYSMON (Kconfig depends on)"
-#endif
-
-#if LV_USE_PERF_MONITOR && !(LV_USE_SYSMON)
-    #error "LV_USE_PERF_MONITOR requires LV_USE_SYSMON (Kconfig depends on)"
-#endif
-
-#if LV_USE_PERF_MONITOR_LOG_MODE && !(LV_USE_PERF_MONITOR && LV_USE_SYSMON)
-    #error "LV_USE_PERF_MONITOR_LOG_MODE requires LV_USE_PERF_MONITOR && LV_USE_SYSMON (Kconfig depends on)"
-#endif
-
-#if LV_USE_MEM_MONITOR && !(LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_USE_SYSMON)
-    #error "LV_USE_MEM_MONITOR requires LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_USE_SYSMON (Kconfig depends on)"
-#endif
-
-#if LV_SYSMON_USE_CUSTOM_INCLUDE && !(LV_USE_SYSMON)
-    #error "LV_SYSMON_USE_CUSTOM_INCLUDE requires LV_USE_SYSMON (Kconfig depends on)"
-#endif
-
-#if (LV_USE_PROFILER_BUILTIN) && !LV_USE_PROFILER
-    #error "LV_USE_PROFILER must be enabled: Kconfig selects it from LV_USE_PROFILER_BUILTIN"
-#endif
-
-#if LV_USE_PROFILER_BUILTIN_POSIX && !(LV_USE_PROFILER_BUILTIN)
-    #error "LV_USE_PROFILER_BUILTIN_POSIX requires LV_USE_PROFILER_BUILTIN (Kconfig depends on)"
-#endif
-
-#if LV_PROFILER_STYLE && !(LV_USE_PROFILER)
-    #error "LV_PROFILER_STYLE requires LV_USE_PROFILER (Kconfig depends on)"
-#endif
-
-#if LV_USE_TEST_SCREENSHOT_COMPARE && !(LV_USE_TEST)
-    #error "LV_USE_TEST_SCREENSHOT_COMPARE requires LV_USE_TEST (Kconfig depends on)"
-#endif
-
-#if LV_USE_NANOVG_TEST_HEADLESS && !(LV_USE_DRAW_NANOVG && LV_USE_TEST)
-    #error "LV_USE_NANOVG_TEST_HEADLESS requires LV_USE_DRAW_NANOVG && LV_USE_TEST (Kconfig depends on)"
-#endif
-
-#if LV_GLOBAL_USE_CUSTOM_INCLUDE && !(LV_ENABLE_GLOBAL_CUSTOM)
-    #error "LV_GLOBAL_USE_CUSTOM_INCLUDE requires LV_ENABLE_GLOBAL_CUSTOM (Kconfig depends on)"
-#endif
-
-#if LV_CHECK_ARG_ASSERT_ON_FAIL && !(LV_USE_CHECK_ARG)
-    #error "LV_CHECK_ARG_ASSERT_ON_FAIL requires LV_USE_CHECK_ARG (Kconfig depends on)"
-#endif
-
-#if LV_USE_CHECK_OBJ_CLASSTYPE && !(LV_USE_CHECK_ARG)
-    #error "LV_USE_CHECK_OBJ_CLASSTYPE requires LV_USE_CHECK_ARG (Kconfig depends on)"
-#endif
-
-#if LV_USE_CHECK_OBJ_VALIDITY && !(LV_USE_CHECK_ARG)
-    #error "LV_USE_CHECK_OBJ_VALIDITY requires LV_USE_CHECK_ARG (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_BENCHMARK && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_BENCHMARK requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS && !(LV_USE_DEMO_BENCHMARK && LV_BUILD_DEMOS)
-    #error "LV_DEMO_BENCHMARK_ALIGNED_FONTS requires LV_USE_DEMO_BENCHMARK && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_GLTF && !(LV_USE_GLTF && LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_GLTF requires LV_USE_GLTF && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_KEYPAD_AND_ENCODER && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_KEYPAD_AND_ENCODER requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_MUSIC && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_MUSIC requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_DEMO_MUSIC_SQUARE && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
-    #error "LV_DEMO_MUSIC_SQUARE requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_DEMO_MUSIC_LANDSCAPE && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
-    #error "LV_DEMO_MUSIC_LANDSCAPE requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_DEMO_MUSIC_ROUND && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
-    #error "LV_DEMO_MUSIC_ROUND requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_DEMO_MUSIC_LARGE && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
-    #error "LV_DEMO_MUSIC_LARGE requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_DEMO_MUSIC_AUTO_PLAY && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
-    #error "LV_DEMO_MUSIC_AUTO_PLAY requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_RENDER && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_RENDER requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_STRESS && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_STRESS requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_VECTOR_GRAPHIC && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_VECTOR_GRAPHIC requires LV_DRAW_HAS_VECTOR_SUPPORT && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if (LV_USE_DEMO_BENCHMARK && LV_BUILD_DEMOS) && !LV_USE_DEMO_WIDGETS
-    #error "LV_USE_DEMO_WIDGETS must be enabled: Kconfig selects it from LV_USE_DEMO_BENCHMARK && LV_BUILD_DEMOS"
-#endif
-
-#if LV_USE_DEMO_WIDGETS && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_WIDGETS requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_FLEX_LAYOUT && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_FLEX_LAYOUT requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_MULTILANG && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_MULTILANG requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_SMARTWATCH && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_SMARTWATCH requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_EBIKE && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_EBIKE requires LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_DEMO_EBIKE_PORTRAIT && !(LV_USE_DEMO_EBIKE && LV_BUILD_DEMOS)
-    #error "LV_DEMO_EBIKE_PORTRAIT requires LV_USE_DEMO_EBIKE && LV_BUILD_DEMOS (Kconfig depends on)"
-#endif
-
-#if LV_USE_DEMO_HIGH_RES && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_HIGH_RES requires LV_BUILD_DEMOS (Kconfig depends on)"
 #endif
 
 #endif  /*LV_CONF_INTERNAL_H*/

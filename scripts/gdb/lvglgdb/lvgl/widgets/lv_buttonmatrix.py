@@ -14,47 +14,48 @@ class LVButtonmatrix(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_buttonmatrix_t", ptr=True) or self
+        self._wv_lv_buttonmatrix_t = self.cast("lv_buttonmatrix_t", ptr=True) or self
+        self._wv = self._wv_lv_buttonmatrix_t
 
     @property
     def map_p(self):
         """Pointer to the current map"""
-        return ptr_or_none(self._wv.safe_field("map_p"))
+        return ptr_or_none(self._wv_lv_buttonmatrix_t.safe_field("map_p"))
 
     @property
     def button_areas(self):
         """Array of areas of buttons"""
-        return ptr_or_none(self._wv.safe_field("button_areas"))
+        return ptr_or_none(self._wv_lv_buttonmatrix_t.safe_field("button_areas"))
 
     @property
     def ctrl_bits(self):
         """Array of control bytes"""
-        return ptr_or_none(self._wv.safe_field("ctrl_bits"))
+        return ptr_or_none(self._wv_lv_buttonmatrix_t.safe_field("ctrl_bits"))
 
     @property
     def btn_cnt(self):
         """Number of button in 'map_p'(Handled by the library)"""
-        return int(self._wv.safe_field("btn_cnt", 0))
+        return int(self._wv_lv_buttonmatrix_t.safe_field("btn_cnt", 0))
 
     @property
     def row_cnt(self):
         """Number of rows in 'map_p'(Handled by the library)"""
-        return int(self._wv.safe_field("row_cnt", 0))
+        return int(self._wv_lv_buttonmatrix_t.safe_field("row_cnt", 0))
 
     @property
     def btn_id_sel(self):
         """Index of the active button (being pressed/released etc) or LV_BUTTONMATRIX_BUTTON_NONE"""
-        return int(self._wv.safe_field("btn_id_sel", 0))
+        return int(self._wv_lv_buttonmatrix_t.safe_field("btn_id_sel", 0))
 
     @property
     def one_check(self):
         """1: Single button toggled at once"""
-        return int(self._wv.safe_field("one_check", 0))
+        return int(self._wv_lv_buttonmatrix_t.safe_field("one_check", 0))
 
     @property
     def auto_free_map(self):
         """1: Automatically free the map when the widget is deleted"""
-        return int(self._wv.safe_field("auto_free_map", 0))
+        return int(self._wv_lv_buttonmatrix_t.safe_field("auto_free_map", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

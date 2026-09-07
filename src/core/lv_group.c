@@ -134,7 +134,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
         return;
     }
 
-    LV_ASSERT_NULL(obj->spec_attr);
+    LV_ASSERT(obj->spec_attr != NULL);
 
     /*Be sure the object is removed from its current group*/
     lv_group_remove_obj(obj);
@@ -253,7 +253,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
     LV_LL_READ(&g->obj_ll, i) {
         if(*i == obj) {
             if(g->obj_focus != NULL) {
-                if(*g->obj_focus == obj) break;  // Refocusing same object
+                if(*g->obj_focus == obj) break;  /*Refocusing same object*/
                 lv_result_t res = lv_obj_send_event(*g->obj_focus, LV_EVENT_DEFOCUSED, get_indev(g));
                 if(res != LV_RESULT_OK) return;
                 lv_obj_invalidate(*g->obj_focus);
@@ -457,6 +457,7 @@ void * lv_group_get_user_data(const lv_group_t * group)
 
 static void lv_group_refocus(lv_group_t * g)
 {
+    LV_ASSERT(g != NULL);
     /*Refocus must temporarily allow wrapping to work correctly*/
     uint8_t temp_wrap = g->wrap;
     g->wrap           = 1;
@@ -472,6 +473,9 @@ static void lv_group_refocus(lv_group_t * g)
 static bool focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *),
                             void * (*move)(const lv_ll_t *, const void *))
 {
+    LV_ASSERT(group != NULL);
+    LV_ASSERT(begin != NULL);
+    LV_ASSERT(move != NULL);
     if(group->frozen) return false;
 
     bool focus_changed = false;
@@ -555,6 +559,7 @@ static bool focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
  */
 static lv_indev_t * get_indev(const lv_group_t * g)
 {
+    LV_ASSERT(g != NULL);
     lv_indev_t * indev_guess = NULL;
     lv_indev_t * indev = lv_indev_get_next(NULL);
 

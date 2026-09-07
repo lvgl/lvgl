@@ -2,7 +2,7 @@ menu "Core"
 
 config LV_OBJ_STYLE_CACHE
 	bool "Style cache"
-	default n
+	default y
 	help
 		Speed up style property lookups by adding 2 x 32 bit variables to each lv_obj_t.
 

@@ -8,6 +8,7 @@
  *      INCLUDES
  *********************/
 #include "../lvgl_public.h"
+#include "lv_array.h"
 
 /*********************
  *      DEFINES
@@ -32,20 +33,26 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size)
+lv_result_t lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size)
 {
-    array->size = 0;
-    array->capacity = capacity;
-    array->element_size = element_size;
+    LV_ASSERT(array != NULL);
+    lv_memset(array, 0,  sizeof(*array));
 
-    array->data = lv_malloc(capacity * element_size);
+    void * data = lv_malloc(capacity * element_size);
+    LV_ASSERT_MALLOC(data);
+    if(!data) {
+        return LV_RESULT_INVALID;
+    }
+    lv_array_init_from_buf(array, data, capacity, element_size);
     array->inner_alloc = true;
-    LV_ASSERT_MALLOC(array->data);
+    return LV_RESULT_OK;
 }
 
 void lv_array_init_from_buf(lv_array_t * array, void * buf, uint32_t capacity, uint32_t element_size)
 {
-    LV_ASSERT_NULL(buf);
+    LV_ASSERT(array != NULL);
+    LV_ASSERT(buf != NULL);
+    lv_memset(array, 0,  sizeof(*array));
     array->size = 0;
     array->capacity = capacity;
     array->element_size = element_size;
@@ -67,11 +74,49 @@ void lv_array_deinit(lv_array_t * array)
 
 void lv_array_copy(lv_array_t * target, const lv_array_t * source)
 {
+    LV_ASSERT_NULL(target);
+    LV_ASSERT_NULL(source);
+
+    if(target == source) return;
+
+    lv_array_deinit(target);
+
+    /* Guard against multiplication overflow during allocation */
+    if(source->capacity > 0 && source->element_size > 0) {
+        if(source->capacity > UINT32_MAX / source->element_size) {
+            lv_memzero(target, sizeof(lv_array_t));
+            return;
+        }
+
+        void * data = lv_malloc(source->capacity * source->element_size);
+        if(data == NULL) {
+            lv_memzero(target, sizeof(lv_array_t));
+            return;
+        }
+
+        target->data = data;
+        target->capacity = source->capacity;
+        target->element_size = source->element_size;
+        target->inner_alloc = true;
+        target->size = 0;
+    }
+    else {
+        void * data = lv_malloc(0);
+        if(data == NULL) {
+            lv_memzero(target, sizeof(lv_array_t));
+            return;
+        }
+        target->data = data;
+        target->capacity = source->capacity;
+        target->element_size = source->element_size;
+        target->inner_alloc = true;
+        target->size = 0;
+    }
+
     if(lv_array_is_empty(source)) {
         return;
     }
-    lv_array_deinit(target);
-    lv_array_init(target, source->capacity, source->element_size);
+
     lv_memcpy(target->data, source->data, source->size * source->element_size);
     target->size = source->size;
 }
@@ -164,14 +209,14 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
 
 bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 {
+    LV_ASSERT(array);
+
     if(array->inner_alloc == false) {
         LV_LOG_WARN("Cannot resize array with external buffer");
         return false;
     }
 
     uint8_t * data = lv_realloc(array->data, new_capacity * array->element_size);
-    LV_ASSERT_NULL(data);
-
     if(data == NULL) return false;
 
     array->data = data;
@@ -184,8 +229,24 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
 {
-    LV_ASSERT_NULL(array->data);
+    LV_ASSERT(array);
+    LV_ASSERT(other);
+
+    if(array->element_size != other->element_size) {
+        LV_LOG_ERROR("Element size mismatch: %"LV_PRIu32" vs %"LV_PRIu32, array->element_size, other->element_size);
+        return LV_RESULT_INVALID;
+    }
+
     uint32_t size = other->size;
+    if(size == 0) {
+        return LV_RESULT_OK;
+    }
+
+    if(UINT32_MAX - array->size < size) {
+        LV_LOG_ERROR("Array size overflow");
+        return LV_RESULT_INVALID;
+    }
+
     if(array->size + size > array->capacity) {
         /*array is full*/
         if(lv_array_resize(array, array->size + size) == false) {

@@ -87,7 +87,8 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
             eve_stride = src_w * 2;
             break;
         default :
-            LV_ASSERT(0);
+            LV_ASSERT_FORMAT_MSG(0, "Invalid color format 0x%02x", src_cf);
+            return;
     }
 
     uint32_t ramg_addr = lv_draw_eve_image_upload_image(true, img_dsc);
@@ -190,7 +191,8 @@ uint32_t lv_draw_eve_image_upload_image(bool burst_is_active, const lv_image_dsc
             eve_alignment = 2;
             break;
         default :
-            LV_ASSERT(0);
+            LV_ASSERT_FORMAT_MSG(0, "Invalid color format 0x%02x", src_cf);
+            return 0;
     }
 
     int32_t eve_size = eve_stride * src_h;
@@ -235,7 +237,8 @@ uint32_t lv_draw_eve_image_upload_image(bool burst_is_active, const lv_image_dsc
                     break;
                 }
             default:
-                LV_ASSERT(0);
+                LV_ASSERT_FORMAT_MSG(0, "Invalid color format 0x%02x", src_cf);
+                return 0;
         }
 
         if(burst_is_active) {

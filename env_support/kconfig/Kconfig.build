@@ -78,22 +78,23 @@ config LV_GLOBAL_CUSTOM_INCLUDE
 endif #LV_ENABLE_GLOBAL_CUSTOM
 
 menu "Asserts"
-	config LV_USE_ASSERT_NULL
-		bool "NULL checks (very fast, recommended)"
-		default y
+	config LV_USE_ASSERT
+		bool "LV_ASSERT / LV_ASSERT_MSG / LV_ASSERT_FORMAT_MSG"
 
 	config LV_USE_ASSERT_MALLOC
-		bool "Allocation success checks (very fast, recommended)"
-		default y
+		bool "LV_ASSERT_MALLOC"
+
+	config LV_USE_ASSERT_NULL
+		bool "LV_ASSERT_NULL"
 
 	config LV_USE_ASSERT_STYLE
-		bool "Style init checks (very fast, recommended)"
+		bool "LV_ASSERT_STYLE"
 
 	config LV_USE_ASSERT_MEM_INTEGRITY
-		bool "lv_mem integrity checks (slow)"
+		bool "LV_ASSERT_MEM_INTEGRITY"
 
 	config LV_USE_ASSERT_OBJ
-		bool "Widget validity checks (slow)"
+		bool "LV_ASSERT_OBJ"
 
 	config LV_ASSERT_HANDLER_INCLUDE
 		string "Assert handler header [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"
@@ -196,16 +197,27 @@ menu "Argument Checks"
 		default n
 		help
 			LV_CHECK_OBJ verifies with lv_obj_has_class() that the object has the
-			expected class. When disabled the check is skipped even if a class
-			argument is supplied.
+			expected class. When disabled the class check is skipped
+			(LV_CHECK_OBJ collapses to a NULL check).
 
 	config LV_USE_CHECK_OBJ_VALIDITY
 		bool "Widget-tree validity check in LV_CHECK_OBJ"
 		default n
 		help
-			LV_CHECK_OBJ verifies with lv_obj_is_valid() that the object is still
-			part of the widget tree. When disabled the check is skipped even if the
-			associated argument is supplied.
+			LV_CHECK_OBJ verifies with lv_obj_is_in_widget_tree() that the object is
+			still part of the widget tree. When disabled the validity check is
+			skipped (only the class/NULL check remains).
+
+	config LV_USE_CHECK_OBJ_PARENT_LINK
+		bool "Parent-link consistency check in lv_obj_is_in_widget_tree"
+		default n
+		depends on LV_USE_CHECK_OBJ_VALIDITY
+		depends on LV_USE_ASSERT
+		help
+			While walking up the parent chain, lv_obj_is_in_widget_tree also checks that
+			each parent's children array contains the child. This finds corruption where
+			a child's parent pointer and the parent's children list disagree. The cost is
+			O(siblings) per level instead of O(1), and LV_ASSERT reports the mismatch.
 	endif
 endmenu
 endmenu #"Build"

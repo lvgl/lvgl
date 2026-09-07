@@ -1,0 +1,130 @@
+---
+title: Ubuntu
+description: Install prebuilt LVGL packages on Ubuntu from the official Launchpad PPA, without building LVGL from source.
+---
+
+## Overview
+
+LVGL publishes prebuilt packages for Ubuntu through a [Launchpad PPA](https://launchpad.net/~lvgl/+archive/ubuntu/lvgl).
+This lets you `apt install` LVGL directly, with all of its dependencies pulled in automatically, instead of
+configuring and compiling LVGL yourself.
+
+Each package is built with most optional features enabled (JPEG and PNG decoders, GStreamer, and more), so it's a
+good way to get started quickly or to try out a demo. If your project needs a leaner build, compile LVGL from
+source and disable the features you don't need in your own configuration.
+
+<Callout type="info">
+  The PPA packages are a convenient way to install and link against LVGL on Ubuntu. They are not a replacement for
+  vendoring LVGL into an embedded project, where you typically still want full control over the configuration and
+  the build.
+</Callout>
+
+## Prerequisites
+
+Install the tools needed to add a PPA and to compile a small test program:
+
+```bash title=" " lineNumbers=1
+sudo apt update
+sudo apt install software-properties-common build-essential pkg-config
+```
+
+* `software-properties-common` provides `add-apt-repository`.
+* `build-essential` provides a compiler.
+
+## Configuration
+
+<Steps>
+
+    <Step>
+    **Add the LVGL PPA:**
+    
+    ```bash title=" " lineNumbers=1
+    sudo add-apt-repository ppa:lvgl/lvgl
+    sudo apt update
+    ```
+    </Step>
+
+    <Step>
+    Install one of the LVGL packages. Packages differ only in which display backend(s) they enable and whether 3D
+       support is included; the rest of the feature set (image decoders, GStreamer, etc.) is the same across all of
+       them.
+    
+    | Backends         | 2D                  | 3D                     |
+    | ---------------- | ------------------- | ---------------------- |
+    | SDL2             | liblvgl-sdl2-dev    | liblvgl-sdl2-3d-dev    |
+    | Wayland          | liblvgl-wayland-dev | liblvgl-wayland-3d-dev |
+    | DRM              | liblvgl-drm-dev     | liblvgl-drm-3d-dev     |
+    | SDL2/Wayland/DRM | liblvgl-full-2d-dev | liblvgl-full-3d-dev    |
+    
+    
+    `apt` resolves and installs every runtime library each package needs (SDL2, DRM, Wayland client libraries, and so on).
+    
+    Every package installs an `lvgl.pc` file and a CMake config into the standard system paths, so `pkg-config` and
+    `find_package(lvgl)` work immediately with no extra setup.
+    </Step>
+</Steps>
+
+## Usage
+
+The application code is the same as for any other LVGL install; only how LVGL got onto the machine differs. This
+example uses the SDL2 backend:
+
+```c title=" " lineNumbers=1
+#include <lvgl/lvgl.h>
+
+int main(void)
+{
+    lv_init();
+
+    lv_display_t * disp = lv_sdl_window_create(800, 600);
+    if(!disp) {
+        return 1;
+    }
+    lv_sdl_mouse_create();
+
+    lv_obj_t * button = lv_button_create(lv_screen_active());
+    lv_obj_t * label  = lv_label_create(button);
+    lv_label_set_text_static(label, "Click Me!");
+    lv_obj_center(button);
+
+    while(1) {
+        uint32_t ms = lv_timer_handler();
+        if(ms == LV_NO_TIMER_READY) {
+            ms = LV_DEF_REFR_PERIOD;
+        }
+        lv_sleep_ms(ms);
+    }
+
+    return 0;
+}
+```
+
+Compile and link against the installed package with `pkg-config` or CMake:
+
+**pkg-config**:
+
+```bash title=" " lineNumbers=1
+g++ main.c -o main $(pkg-config --cflags --static --libs lvgl)
+```
+
+**cmake**:
+
+```cmake title="CMakeLists.txt" lineNumbers=1
+cmake_minimum_required(VERSION 3.14)
+project(lvgl_consumer)
+
+find_package(lvgl REQUIRED)
+
+add_executable(main main.c)
+target_link_libraries(main PRIVATE lvgl::lvgl)
+```
+
+```bash title=" " lineNumbers=1
+cmake -B build
+cmake --build build
+```
+
+## See Also
+
+* [SDL Driver](/integration/pc/sdl) - using the SDL2 backend directly
+* Found a problem with a package, or want another configuration published? Open an issue at [github.com/lvgl/lvgl/issues](https://github.com/lvgl/lvgl/issues).

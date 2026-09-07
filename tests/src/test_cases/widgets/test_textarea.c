@@ -428,6 +428,40 @@ void test_textarea_password_mode(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_normal_mode.png");
 }
 
+/* In password mode, adding text must go through the realloc path of
+ * lv_textarea_add_text() so that pwd_tmp stays valid. */
+void test_textarea_add_text_in_password_mode(void)
+{
+    lv_textarea_set_password_mode(textarea, true);
+    lv_textarea_add_text(textarea, "Hello");
+    TEST_ASSERT_EQUAL_STRING("Hello", lv_textarea_get_text(textarea));
+
+    /*Adding more text should keep pwd_tmp in sync*/
+    lv_textarea_add_text(textarea, " World");
+    TEST_ASSERT_EQUAL_STRING("Hello World", lv_textarea_get_text(textarea));
+
+    lv_textarea_set_password_mode(textarea, false);
+    TEST_ASSERT_EQUAL_STRING("Hello World", lv_textarea_get_text(textarea));
+}
+
+/* In password mode, deleting a char must go through the realloc path of
+ * lv_textarea_delete_char() so that pwd_tmp stays valid. */
+void test_textarea_delete_char_in_password_mode(void)
+{
+    lv_textarea_set_text(textarea, "Hello World");
+    lv_textarea_set_password_mode(textarea, true);
+    lv_textarea_set_cursor_pos(textarea, 11);
+
+    lv_textarea_delete_char(textarea);
+    TEST_ASSERT_EQUAL_STRING("Hello Worl", lv_textarea_get_text(textarea));
+
+    lv_textarea_delete_char(textarea);
+    TEST_ASSERT_EQUAL_STRING("Hello Wor", lv_textarea_get_text(textarea));
+
+    lv_textarea_set_password_mode(textarea, false);
+    TEST_ASSERT_EQUAL_STRING("Hello Wor", lv_textarea_get_text(textarea));
+}
+
 void test_textarea_password_mode_hide_char(void)
 {
     lv_textarea_set_one_line(textarea, false);

@@ -26,7 +26,7 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
-    lv_area_copy(&coordinates, coords);
+    coordinates = *coords;
 
     x = 0 - t->target_layer->buf_area.x1;
     y = 0 - t->target_layer->buf_area.y1;

@@ -104,13 +104,7 @@ void lv_area_set(lv_area_t * area_p, int32_t x1, int32_t y1, int32_t x2, int32_t
  * @param dest pointer to the destination area
  * @param src pointer to the source area
  */
-inline static void lv_area_copy(lv_area_t * dest, const lv_area_t * src)
-{
-    dest->x1 = src->x1;
-    dest->y1 = src->y1;
-    dest->x2 = src->x2;
-    dest->y2 = src->y2;
-}
+void lv_area_copy(lv_area_t * dest, const lv_area_t * src);
 
 /**
  * Get the width of an area

@@ -1,5 +1,5 @@
 #include "../../lvgl_public.h"
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_USE_TLSF
 
 #include "lv_tlsf_private.h"
 #include "../../lvgl_public.h"
@@ -892,7 +892,13 @@ int lv_tlsf_check(lv_tlsf_t tlsf)
 static void default_walker(void * ptr, size_t size, int used, void * user)
 {
     LV_UNUSED(user);
+#if LV_USE_LOG
     printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, (void *)block_from_ptr(ptr));
+#else
+    LV_UNUSED(ptr);
+    LV_UNUSED(size);
+    LV_UNUSED(used);
+#endif
 }
 
 void lv_tlsf_walk_pool(lv_pool_t pool, lv_tlsf_walker walker, void * user)
@@ -1241,4 +1247,4 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
     return p;
 }
 
-#endif /*LV_STDLIB_BUILTIN*/
+#endif /*LV_USE_TLSF*/

@@ -8,7 +8,8 @@ Flags are deprecated in LVGL v9.6 and will be removed in LVGL v10.
 Use a dedicated function instead, such as <ApiLink name="lv_obj_set_hidden"/>.
 
 <ApiLink name="lv_obj_set_user_flag"/> and <ApiLink name="lv_obj_get_user_flag"/>
-can be used to replace `LV_OBJ_FLAG_USER_1-4`.
+can be used to replace `LV_OBJ_FLAG_USER_1-4`, it takes in a bit from 0 to 3 instead 
+of the old flag constant, e.g `lv_obj_set_user_flag(obj, 0, true)`
 </Callout>
 
 Some widget attributes can be enabled or disabled using

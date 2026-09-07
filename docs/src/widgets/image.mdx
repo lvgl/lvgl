@@ -145,7 +145,7 @@ When the widget is larger than its image source, `inner_align`
 ## Data binding
 
 Data bindings connect a widget property to a piece of global data — a
-[Subject](/main-modules/observer/observer). When the subject's value
+[Subject](/main-modules/data_binding/subjects). When the subject's value
 changes, every widget bound to it updates automatically; and an
 interactive widget can write back into the subject so other subscribers
 see the new value.
@@ -154,7 +154,7 @@ An Image binds its `src` to a pointer Subject. The link is one-way
 (Subject → Widget): application-side writes into the subject point the
 widget at a new image descriptor. Only pointer subjects are supported.
 
-- <ApiLink name="lv_image_bind_src" display="lv_image_bind_src(img, &subject)" />
+- <ApiLink name="lv_image_bind_src" display="lv_image_bind_src(img, subject)" />
 
 ## Events
 

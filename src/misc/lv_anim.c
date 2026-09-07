@@ -90,7 +90,7 @@ void lv_anim_enable_vsync_mode(bool enable)
             LV_ASSERT_NULL(state.timer);
 
             if(state.anim_vsync_registered) {
-                lv_display_unregister_vsync_event(NULL, anim_vsync_event, NULL);
+                lv_display_unregister_vsync_event(lv_display_get_default(), anim_vsync_event, NULL);
                 state.anim_vsync_registered = false;
             }
         }
@@ -777,7 +777,7 @@ static void anim_mark_list_change(void)
         }
 
         if(state.anim_vsync_registered) {
-            lv_display_unregister_vsync_event(NULL, anim_vsync_event, NULL);
+            lv_display_unregister_vsync_event(lv_display_get_default(), anim_vsync_event, NULL);
             state.anim_vsync_registered = false;
         }
 
@@ -790,7 +790,7 @@ static void anim_mark_list_change(void)
     }
 
     if(!state.anim_vsync_registered) {
-        lv_display_register_vsync_event(NULL, anim_vsync_event, NULL);
+        lv_display_register_vsync_event(lv_display_get_default(), anim_vsync_event, NULL);
         state.anim_vsync_registered = true;
     }
 }

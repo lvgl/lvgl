@@ -1,45 +1,45 @@
 ---
 title: EGL
-description: "The EGL driver provides support for creating LVGL displays using the EGL (Embedded-System Graphics Library) API. EGL is a lower-level API that is more closely tied to the underlying drivers of the ..."
+description: "EGL is the platform layer that binds OpenGL ES to a native windowing system. In LVGL it underpins the hardware-accelerated backends of the DRM, Wayland and SDL drivers, and can also render off-screen with no display server at all."
 ---
 
 ## Overview
 
-The **EGL** driver provides support for creating LVGL displays using the EGL (Embedded-System Graphics Library) API.
-EGL is a lower-level API that is more closely tied to the underlying drivers of the platform.
-The OpenGL support in LVGL is intended to be portable between different APIs. Currently, there is support for GLFW and EGL.
-Using EGL requires some additional platform integration.
+[**EGL**](https://en.wikipedia.org/wiki/EGL_(API)) (Embedded-System Graphics Library) is the platform layer that binds OpenGL ES to a native windowing
+system. It sits lower than GLFW and is more closely tied to the platform's own drivers, which is why it is
+the path LVGL uses for GPU rendering on embedded Linux.
 
-`lv_opengles_egl_window_create` can be used to create a <ApiLink name="lv_opengles_window_t" />
-which can be used with the same generic LVGL OpenGL APIs as a GLFW window.
+You rarely enable EGL on its own. It underpins the hardware-accelerated backends of the other drivers:
 
-## EGL with DRM
+- [DRM](/integration/embedded_linux/drivers/drm) with `LV_LINUX_DRM_BACKEND_EGL`
+- [Wayland](/integration/embedded_linux/drivers/wayland) with `LV_WAYLAND_USE_EGL`
+- [SDL](/integration/pc/sdl) with `LV_SDL_BACKEND_EGL`
 
-EGL can be used together with the DRM driver for hardware-accelerated rendering.
+Selecting any of those backends turns EGL on for you and sets up the context during normal driver
+initialization. Beyond that, EGL offers two things the other drivers do
+not: a standalone window path for platforms LVGL does not otherwise cover, and off-screen rendering with no
+display server at all.
 
-When <ApiLink name="LV_USE_OPENGLES" /> is enabled, the DRM driver will automatically set up EGL.
-No additional initialization is required beyond the normal DRM setup.
+## Building
 
-See [DRM](/integration/embedded_linux/drivers/drm) for configuration and a basic usage example.
+LVGL loads `libEGL.so` and `libGLESv2.so` at runtime with `dlopen`, so EGL doesn't have any build-time dependencies.
 
-## EGL without DRM (Experimental)
-
-<Callout type="warn">
-This feature is experimental and the API is private. Expect breaking changes.
+<Callout type="warning" title="EGL and GLFW are mutually exclusive">
+<ApiLink name="LV_USE_GLFW" /> cannot be combined with <ApiLink name="LV_USE_EGL" />
+each wants to own context creation.
 </Callout>
 
-If you want to use EGL without being tied to DRM, you can enable <ApiLink name="LV_USE_EGL" /> using a compiler definition.
-This API is currently private and experimental, and people should expect breaking changes.
+## Usage
 
-```bash
-# Enable standalone EGL (experimental)
--DLV_USE_EGL=1
-```
+With a driver backend, EGL is invisible: configure the driver as its own page describes and it initializes
+EGL during setup. See [DRM](/integration/embedded_linux/drivers/drm) or
+[Wayland](/integration/embedded_linux/drivers/wayland) for working examples.
 
-This allows you to use EGL with your own context management or other platforms, but the API may change
-without notice in future versions.
+## See Also
 
-## Improving Performance
-
-There is a renderer in LVGL which caches software-rendered areas as OpenGL textures.
-See [OpenGL Texture Caching Renderer](/integration/embedded_linux/drivers/opengl_driver) to learn more about it.
+- [DRM](/integration/embedded_linux/drivers/drm) - EGL backend for direct-to-display rendering
+- [Wayland](/integration/embedded_linux/drivers/wayland) - EGL backend under a compositor
+- [OpenGL Driver](/integration/embedded_linux/drivers/opengl_driver) - use when you already own the context
+- [OpenGL Overview](/integration/embedded_linux/opengl) - how the drivers and draw units fit together
+- [NanoVG Draw Unit](/integration/embedded_linux/draw_units/draw_nanovg) - the renderer used for off-screen rendering
+- [glTF](/libs/gltf) - 3D content, the strongest case for headless GPU rendering

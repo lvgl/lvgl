@@ -1,0 +1,64 @@
+---
+title: Soldered Electronics
+description: "Soldered Electronics designs and manufactures open-source hardware in Croatia, EU. Their Inkplate family of ESP32-powered e-paper displays has official Arduino & ESP-IDF libraries with built-in LVGL support."
+---
+
+[Soldered](https://soldered.com/) designs and manufactures a wide selection of electronic products to help you
+turn your ideas into acts and bring you one step closer to your final project. Their products are intended for makers
+and crafted in-house by their experienced team in Osijek, Croatia. They believe that sharing is a crucial element for
+improvement and innovation, and work hard to stay connected with all their makers regardless of their skill or
+experience level. Therefore, all their products are open-source. Finally, they always have your back. If you face any
+problem concerning either your shopping experience or your electronics project, their team will help you deal with it,
+offering efficient customer service and cost-free technical support anytime.
+
+Of particular interest to LVGL users is Soldered's flagship [Inkplate](https://docs.soldered.com/inkplate/) lineup.
+Inkplates are ESP32-based e-paper boards ranging from small monochrome panels to large color displays. Their boards
+are also designed with low-power use in mind, allowing them to run for weeks or months on battery. Soldered maintains
+two official LVGL libraries:
+[Arduino Inkplate LVGL Library](https://github.com/SolderedElectronics/Inkplate-LVGL-Library) and
+[ESP-IDF Inkplate LVGL Component](https://github.com/SolderedElectronics/Inkplate-LVGL-ESP-IDF-component).
+
+## Inkplate LVGL Libraries
+
+Both libraries handle LVGL initialization internally and support both RGB565 and grayscale (L8) color formats depending
+on the board's display technology. A single `begin()` call handles all LVGL setup, including built-in dithering for
+smoother grayscale/color rendering and SD-card-backed file access for images and fonts.
+
+Supported boards:
+
+- [Inkplate 2](https://soldered.com/products/inkplate-2)
+- [Inkplate 4TEMPERA](https://soldered.com/products/inkplate-4tempera)
+- [Inkplate 5V2](https://soldered.com/products/inkplate-5-gen2)
+- [Inkplate 6](https://soldered.com/products/inkplate-6)
+- [Inkplate 6FLICK](https://soldered.com/products/inkplate-6flick)
+- [Inkplate 6COLOR](https://soldered.com/products/inkplate-6color)
+- [Inkplate 10](https://soldered.com/products/inkplate-10)
+- [Inkplate 13SPECTRA](https://soldered.com/products/inkplate-13spectra)
+
+To see it in action, check out [docs](https://docs.soldered.com/inkplate/lvgl-library/) or examples under the
+respective libraries, e.g.,
+[Arduino LVGL Library Examples](https://github.com/SolderedElectronics/Inkplate-LVGL-Library/tree/main/examples)
+and
+[ESP-IDF Library Examples](https://github.com/SolderedElectronics/Inkplate-LVGL-ESP-IDF-component/tree/main/components/inkplate_lvgl/examples).
+
+## Getting Started
+
+Follow the [Inkplate LVGL Library setup guide](https://docs.soldered.com/inkplate/lvgl-library/) for step-by-step
+installation instructions, board setup, and a Hello World example to get LVGL running on your Inkplate.
+
+## Inkplate 13SPECTRA
+
+[Inkplate 13SPECTRA](https://docs.soldered.com/inkplate/13spectra/overview/) is Soldered's latest and most advanced
+board. It has a beautiful 13.3-inch 6-color e-paper screen with a resolution of 1600x1200 pixels and features a
+powerful ESP32-S3 microcontroller.
+
+## Inkplate 6FLICK
+
+[Inkplate 6FLICK](https://docs.soldered.com/inkplate/6flick/overview/) features a touchscreen and frontlight,
+enabling users to make their own e-reader device.
+
+## Inkplate 4TEMPERA
+
+[Inkplate 4TEMPERA](https://docs.soldered.com/inkplate/4tempera/overview/) is a compact, all-in-one 3.8-inch
+touchscreen e-paper device for low-power, always-on display applications with a built-in Li-Ion battery, frontlighting,
+and a set of onboard sensors, all inside a 3D-printed case.

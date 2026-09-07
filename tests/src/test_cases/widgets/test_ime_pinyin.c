@@ -313,12 +313,15 @@ void test_ime_pinyin_destructor(void)
     lv_obj_t * kb_ref = lv_ime_pinyin_get_kb(g_pinyin_ime);
     lv_obj_t * cand_ref = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
 
+    lv_obj_null_on_delete(&kb_ref);
+    lv_obj_null_on_delete(&cand_ref);
+
     /* Delete the IME object */
     lv_obj_delete(g_pinyin_ime);
 
     /* The keyboard and cand_panel should also be deleted */
-    TEST_ASSERT_FALSE(lv_obj_is_valid(kb_ref));
-    TEST_ASSERT_FALSE(lv_obj_is_valid(cand_ref));
+    TEST_ASSERT_NULL(kb_ref);
+    TEST_ASSERT_NULL(cand_ref);
 }
 
 /* Test K9 mode with default dictionary */
@@ -388,14 +391,14 @@ void test_ime_pinyin_kb_validity(void)
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
 
     lv_obj_t * retrieved = lv_ime_pinyin_get_kb(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(retrieved));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(retrieved));
 }
 
 /* Test cand_panel object validity */
 void test_ime_pinyin_cand_panel_validity(void)
 {
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 }
 
 /* Test getter functions */
@@ -411,7 +414,7 @@ void test_ime_pinyin_getters(void)
     /* Test get_cand_panel */
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
     TEST_ASSERT_NOT_NULL(cand_panel);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 
     /* Test get_dict (should return default dict) */
     const lv_pinyin_dict_t * dict = lv_ime_pinyin_get_dict(g_pinyin_ime);
@@ -428,7 +431,7 @@ void test_ime_pinyin_edge_cases(void)
 
     /* Verify cand_panel is valid */
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 }
 
 /* Test rendering with default dictionary */
@@ -661,11 +664,13 @@ void test_ime_pinyin_deletion_order(void)
     /* Store references */
     lv_obj_t * kb_ref = lv_ime_pinyin_get_kb(g_pinyin_ime);
 
+    lv_obj_null_on_delete(&kb_ref);
+
     /* Delete keyboard first */
     lv_obj_delete(g_kb);
 
     /* Verify g_kb reference is invalid */
-    TEST_ASSERT_FALSE(lv_obj_is_valid(kb_ref));
+    TEST_ASSERT_NULL(kb_ref);
 }
 
 /* Test with empty input */

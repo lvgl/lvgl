@@ -69,6 +69,8 @@ lv_obj_t * lv_tileview_create(lv_obj_t * parent)
 
 lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, lv_dir_t dir)
 {
+    LV_CHECK_OBJ(tv, &lv_tileview_class, return NULL);
+
     LV_LOG_INFO("begin");
 
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_tileview_tile_class, tv);
@@ -86,6 +88,9 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
 
 void lv_tileview_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t anim_en)
 {
+    LV_CHECK_OBJ(obj, &lv_tileview_class, return);
+    LV_CHECK_ARG(tile_obj != NULL, return);
+
     int32_t tx = lv_obj_get_x(tile_obj);
     int32_t ty = lv_obj_get_y(tile_obj);
 
@@ -99,6 +104,8 @@ void lv_tileview_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t 
 
 void lv_tileview_set_tile_by_index(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim_enable_t anim_en)
 {
+    LV_CHECK_OBJ(tv, &lv_tileview_class, return);
+
     lv_obj_update_layout(tv);
 
     int32_t w = lv_obj_get_content_width(tv);
@@ -123,6 +130,8 @@ void lv_tileview_set_tile_by_index(lv_obj_t * tv, uint32_t col_id, uint32_t row_
 
 lv_obj_t * lv_tileview_get_tile_active(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, &lv_tileview_class, return NULL);
+
     lv_tileview_t * tv = (lv_tileview_t *) obj;
     return tv->tile_act;
 }

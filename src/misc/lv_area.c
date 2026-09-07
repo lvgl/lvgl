@@ -622,6 +622,13 @@ int32_t lv_pct_to_px(int32_t v, int32_t base)
     return v;
 }
 
+void lv_area_copy(lv_area_t * dest, const lv_area_t * src)
+{
+    LV_CHECK_ARG(dest != NULL, return);
+    LV_CHECK_ARG(src != NULL, return);
+    *dest = *src;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

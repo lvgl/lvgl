@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "core/lv_observer_private.h"
 #include "lvgl_public.h"
 #include "misc/lv_timer_private.h"
 #include "debugging/profiler/lv_profiler_builtin_private.h"
@@ -64,6 +65,9 @@
 #endif
 #if LV_USE_DRAW_EVE
     #include "draw/eve/lv_draw_eve.h"
+#endif
+#if LV_USE_SIFLI_EPIC
+    #include "draw/sifli/epic/lv_draw_sifli_epic.h"
 #endif
 
 /*********************
@@ -173,6 +177,10 @@ void lv_init(void)
 
     lv_draw_buf_init_handlers();
 
+#if LV_USE_OBSERVER
+    lv_subject_global_init();
+#endif
+
 #if LV_USE_SPAN != 0
     lv_span_stack_init();
 #endif
@@ -254,6 +262,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_EVE
     lv_draw_eve_init();
+#endif
+
+#if LV_USE_SIFLI_EPIC
+    lv_draw_sifli_epic_init();
 #endif
 
     lv_obj_style_init();
@@ -472,6 +484,10 @@ void lv_deinit(void)
     lv_draw_sw_deinit();
 #endif
 
+#if LV_USE_SIFLI_EPIC
+    lv_draw_sifli_epic_deinit();
+#endif
+
     lv_draw_deinit();
 
     lv_group_deinit();
@@ -499,6 +515,10 @@ void lv_deinit(void)
 #endif
 
     lv_fs_deinit();
+
+#if LV_USE_OBSERVER
+    lv_subject_global_deinit();
+#endif
 
     lv_mem_deinit();
 

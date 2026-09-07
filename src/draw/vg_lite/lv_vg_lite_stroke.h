@@ -38,7 +38,8 @@ struct _lv_draw_vg_lite_unit_t;
 
 /**
  * Initialize the stroke module
- * @param unit pointer to the unit
+ * @param unit          pointer to the unit
+ * @param cache_cnt     maximum amount of entries in the cache at the same time
  */
 void lv_vg_lite_stroke_init(struct _lv_draw_vg_lite_unit_t * unit, uint32_t cache_cnt);
 
@@ -69,7 +70,7 @@ struct _lv_vg_lite_path_t * lv_vg_lite_stroke_get_path(lv_cache_entry_t * cache_
 /**
  * Drop the stroke cache entry
  * @param unit pointer to the unit
- * @param stroke pointer to the stroke
+ * @param cache_entry pointer to the stroke cache entry
  */
 void lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_cache_entry_t * cache_entry);
 

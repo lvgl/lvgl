@@ -42,7 +42,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_class;
 
 /**
  * Create a calendar widget
- * @param parent    pointer to an object, it will be the parent of the new calendar
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer the created calendar
  */
 lv_obj_t * lv_calendar_create(lv_obj_t * parent);
@@ -139,40 +140,40 @@ lv_obj_t * lv_calendar_get_btnmatrix(const lv_obj_t * obj);
 
 /**
  * Get the today's date
- * @param calendar  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @return          return pointer to an `lv_calendar_date_t` variable containing the date of today.
  */
-const lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar);
+const lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * obj);
 
 /**
  * Get the currently showed
- * @param calendar  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @return          pointer to an `lv_calendar_date_t` variable containing the date is being shown.
  */
-const lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
+const lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * obj);
 
 /**
  * Get the highlighted dates
- * @param calendar  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @return          pointer to an `lv_calendar_date_t` array containing the dates.
  */
-lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar);
+lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * obj);
 
 /**
  * Get the number of the highlighted dates
- * @param calendar  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @return          number of highlighted days
  */
-size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar);
+size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * obj);
 
 /**
  * Get the currently pressed day
- * @param calendar  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @param date      store the pressed date here
  * @return          LV_RESULT_OK: there is a valid pressed date
  *                  LV_RESULT_INVALID: there is no pressed data
  */
-lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t * date);
+lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * date);
 
 /*=====================
  * Other functions

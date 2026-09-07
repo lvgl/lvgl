@@ -18,8 +18,8 @@ This page explains the ways to configure LVGL and when to use each.
 
 When setting up a project for the first time, copy `lvgl/lv_conf_template.h` to
 `lv_conf.h` next to the `lvgl` folder, change the first `#if 0` to `1` to enable
-the file's content, and set <ApiLink name="LV_COLOR_DEPTH" /> to match your
-display panel. Adjust the other options as needed. Every option is documented
+the file's content, and set <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> to match
+your display panel. Adjust the other options as needed. Every option is documented
 by a comment in the file.
 
 The layout should look like this:
@@ -41,7 +41,7 @@ LVGL needs to be able to find `lv_conf.h`. There are a few ways to arrange that:
    `-DLV_CONF_PATH="/home/joe/my_project/my_conf.h"`.
 
 You can also remove some settings from `lv_conf.h` and pass them as compiler
-defines instead (e.g. `-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1`); any option not
+defines instead (e.g. `-DLV_COLOR_FORMAT_DEFAULT=LV_COLOR_FORMAT_XRGB8888 -DLV_USE_BUTTON=1`); any option not
 set in `lv_conf.h` keeps its default.
 
 To skip `lv_conf.h` entirely and rely only on defines, define
@@ -64,7 +64,7 @@ settings in a small text file instead. We call this format "LVGL Defaults".
 A `lv_conf.defaults` file lists one option per line, each with its value:
 
 ```txt
-LV_COLOR_DEPTH 32
+LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_XRGB8888
 LV_USE_OBJ_NAME 1
 ...
 ```

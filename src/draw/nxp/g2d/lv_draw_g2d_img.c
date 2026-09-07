@@ -100,11 +100,11 @@ static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, clipped_img_area);
+    rel_clip_area = *clipped_img_area;
     lv_area_move(&rel_clip_area, -img_coords->x1, -img_coords->y1);
 
     lv_area_t rel_img_coords;
-    lv_area_copy(&rel_img_coords, img_coords);
+    rel_img_coords = *img_coords;
     lv_area_move(&rel_img_coords, -img_coords->x1, -img_coords->y1);
 
     lv_area_t src_area;

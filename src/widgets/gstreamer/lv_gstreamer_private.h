@@ -27,6 +27,13 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * How many decoded frames may wait to be displayed.
+ * Only the newest one is ever shown, so this only has to absorb the jitter between the
+ * thread that decodes and the LVGL timer that displays.
+ */
+#define LV_GSTREAMER_MAX_QUEUED_FRAMES 2
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -42,6 +49,8 @@ struct _lv_gstreamer_t {
     GstElement * audio_convert;
     GstElement * video_convert;
     GstElement * audio_volume;
+    lv_draw_buf_t * aligned_frame;
+    lv_color_format_t color_format;
     lv_timer_t * gstreamer_timer;
     GAsyncQueue * frame_queue;
     bool is_video_info_valid;

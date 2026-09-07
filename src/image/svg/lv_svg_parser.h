@@ -14,6 +14,7 @@
 
 #if LV_USE_SVG
 
+#include "lv_svg_private.h"
 #include "lv_svg_token.h"
 
 /*********************

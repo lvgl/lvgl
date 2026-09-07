@@ -101,6 +101,9 @@ void lv_fs_frogfs_deinit(void)
 
 lv_result_t lv_fs_frogfs_register_blob(const void * blob, const char * path_prefix)
 {
+    LV_CHECK_ARG(blob != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(path_prefix != NULL, return LV_RESULT_INVALID);
+
     if(path_prefix[0] == '\0') {
         LV_LOG_WARN("path prefix should not be zero-length");
         return LV_RESULT_INVALID;
@@ -132,6 +135,8 @@ lv_result_t lv_fs_frogfs_register_blob(const void * blob, const char * path_pref
 
 void lv_fs_frogfs_unregister_blob(const char * path_prefix)
 {
+    LV_CHECK_ARG(path_prefix != NULL, return);
+
     lv_fs_drv_t * fs_drv_p = frogfs_fs_drv;
     fs_drv_data_t * data = fs_drv_p->user_data;
 
@@ -155,6 +160,9 @@ void lv_fs_frogfs_unregister_blob(const char * path_prefix)
 
 static bool get_blob_and_entry(const char * path, blob_t ** blob_dst, const frogfs_entry_t ** entry_dst)
 {
+    LV_ASSERT(path != NULL);
+    LV_ASSERT(blob_dst != NULL);
+    LV_ASSERT(entry_dst != NULL);
     lv_fs_drv_t * fs_drv_p = frogfs_fs_drv;
     fs_drv_data_t * data = fs_drv_p->user_data;
 
@@ -192,6 +200,7 @@ static bool get_blob_and_entry(const char * path, blob_t ** blob_dst, const frog
 
 static void destroy_blob(blob_t * blob)
 {
+    LV_ASSERT(blob != NULL);
     lv_fs_drv_t * fs_drv_p = frogfs_fs_drv;
     fs_drv_data_t * data = fs_drv_p->user_data;
 
@@ -204,6 +213,7 @@ static void destroy_blob(blob_t * blob)
 
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
+    LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
 
     if(mode & LV_FS_MODE_WR) {
@@ -233,6 +243,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
     frogfs_close(file_p);
     return LV_FS_RES_OK;
@@ -240,6 +251,8 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(buf != NULL || btr == 0);
     LV_UNUSED(drv);
 
     ssize_t res = frogfs_read(file_p, buf, btr);
@@ -255,6 +268,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
 
     ssize_t res = frogfs_seek(file_p, pos, whence);
@@ -269,6 +283,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
 
     size_t res = frogfs_tell(file_p);
@@ -283,6 +298,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
+    LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
 
     blob_t * blob;
@@ -307,8 +323,10 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
 {
+    LV_ASSERT(dir_p != NULL);
+    LV_ASSERT(fn != NULL);
+    LV_ASSERT(fn_len > 0);
     LV_UNUSED(drv);
-    if(fn_len == 0) return LV_FS_RES_INV_PARAM;
 
     const frogfs_entry_t * entry = frogfs_readdir(dir_p);
     if(entry == NULL) {
@@ -332,6 +350,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
+    LV_ASSERT(dir_p != NULL);
     LV_UNUSED(drv);
     frogfs_closedir(dir_p);
     return LV_FS_RES_OK;

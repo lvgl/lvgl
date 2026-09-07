@@ -142,6 +142,13 @@ static void event_cb(lv_event_t * e)
 
 }
 
+/*Assert the per-checkbox event counters of the 5 radio buttons*/
+#define ASSERT_EVENT_CNT(act, e0, e1, e2, e3, e4)               \
+    do {                                                        \
+        const uint32_t exp[5] = {e0, e1, e2, e3, e4};           \
+        TEST_ASSERT_EQUAL_UINT32_ARRAY(exp, act, 5);            \
+    } while(0)
+
 void test_obj_flag_radio_button(void)
 {
     lv_group_t * g = lv_group_create();
@@ -151,13 +158,19 @@ void test_obj_flag_radio_button(void)
     lv_obj_t * scr = lv_screen_active();
     lv_obj_t * cb[5];
     uint32_t called[5];
+    uint32_t checked[5];
+    uint32_t unchecked[5];
     for(uint32_t i = 0; i < 5; i++) {
         cb[i] = lv_checkbox_create(scr);
         lv_obj_set_y(cb[i], i * 50);
         lv_obj_set_radio_button(cb[i], true);
         lv_group_add_obj(g, cb[i]);
         lv_obj_add_event_cb(cb[i], event_cb, LV_EVENT_VALUE_CHANGED, &called[i]);
+        lv_obj_add_event_cb(cb[i], event_cb, LV_EVENT_CHECKED, &checked[i]);
+        lv_obj_add_event_cb(cb[i], event_cb, LV_EVENT_UNCHECKED, &unchecked[i]);
         called[i] = 0;
+        checked[i] = 0;
+        unchecked[i] = 0;
     }
 
     /*Click the first checkbox*/
@@ -168,6 +181,8 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[2], 0);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+    ASSERT_EVENT_CNT(checked, 1, 0, 0, 0, 0);
+    ASSERT_EVENT_CNT(unchecked, 0, 0, 0, 0, 0);
 
     /*Click the second checkbox*/
     lv_test_mouse_click_at(20, 55);
@@ -178,6 +193,8 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[2], 0);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+    ASSERT_EVENT_CNT(checked, 1, 1, 0, 0, 0);
+    ASSERT_EVENT_CNT(unchecked, 1, 0, 0, 0, 0);
 
     /*Clicking the same checkbox shouldn't change anything*/
     lv_test_mouse_click_at(20, 55);
@@ -188,6 +205,8 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[2], 0);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+    ASSERT_EVENT_CNT(checked, 1, 1, 0, 0, 0);
+    ASSERT_EVENT_CNT(unchecked, 1, 0, 0, 0, 0);
 
     /*Turn on checkbox 2 with a key*/
     lv_group_focus_obj(cb[2]);
@@ -199,6 +218,8 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[2], 1);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+    ASSERT_EVENT_CNT(checked, 1, 1, 1, 0, 0);
+    ASSERT_EVENT_CNT(unchecked, 1, 1, 0, 0, 0);
 
     /*Nothing happen checking checkbox 2 again*/
     lv_test_key_hit(LV_KEY_RIGHT);
@@ -209,6 +230,8 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[2], 1);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+    ASSERT_EVENT_CNT(checked, 1, 1, 1, 0, 0);
+    ASSERT_EVENT_CNT(unchecked, 1, 1, 0, 0, 0);
 
     /*Can't check off*/
     lv_test_key_hit(LV_KEY_DOWN);
@@ -219,6 +242,8 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[2], 1);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+    ASSERT_EVENT_CNT(checked, 1, 1, 1, 0, 0);
+    ASSERT_EVENT_CNT(unchecked, 1, 1, 0, 0, 0);
 
     /*Same with left*/
     lv_test_key_hit(LV_KEY_LEFT);
@@ -229,8 +254,11 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[2], 1);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
-
+    ASSERT_EVENT_CNT(checked, 1, 1, 1, 0, 0);
+    ASSERT_EVENT_CNT(unchecked, 1, 1, 0, 0, 0);
 }
+
+#undef ASSERT_EVENT_CNT
 
 void test_obj_flag_parent_hidden(void)
 {

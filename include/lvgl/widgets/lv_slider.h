@@ -57,7 +57,8 @@ enum _lv_property_slider_id_t {
 
 /**
  * Create a slider object
- * @param parent    pointer to an object, it will be the parent of the new slider.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created slider
  */
 lv_obj_t * lv_slider_create(lv_obj_t * parent);
@@ -169,7 +170,7 @@ lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider);
  * @param obj       pointer to a slider object
  * @return          slider orientation from `lv_slider_orientation_t`
  */
-lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * slider);
+lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * obj);
 
 /**
  * Give the slider is in symmetrical mode or not

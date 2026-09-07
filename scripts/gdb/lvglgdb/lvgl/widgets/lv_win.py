@@ -13,7 +13,8 @@ class LVWin(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_win_t", ptr=True) or self
+        self._wv_lv_win_t = self.cast("lv_win_t", ptr=True) or self
+        self._wv = self._wv_lv_win_t
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

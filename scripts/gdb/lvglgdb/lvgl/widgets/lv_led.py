@@ -14,16 +14,17 @@ class LVLed(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_led_t", ptr=True) or self
+        self._wv_lv_led_t = self.cast("lv_led_t", ptr=True) or self
+        self._wv = self._wv_lv_led_t
 
     @property
     def color(self):
-        return safe_color(self._wv, "color")
+        return safe_color(self._wv_lv_led_t, "color")
 
     @property
     def bright(self):
         """Current brightness of the LED (0..255)"""
-        return int(self._wv.safe_field("bright", 0))
+        return int(self._wv_lv_led_t.safe_field("bright", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

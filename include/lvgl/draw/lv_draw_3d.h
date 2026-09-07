@@ -55,6 +55,7 @@ lv_draw_3d_dsc_t * lv_draw_task_get_3d_dsc(lv_draw_task_t * task);
  * Create a 3D draw task
  * @param layer     pointer to a layer
  * @param dsc       pointer to an initialized `lv_draw_3d_dsc_t` variable
+ * @param coords    the coordinates of where to draw the widget
  */
 void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
 

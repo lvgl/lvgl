@@ -86,7 +86,8 @@ enum _lv_property_scale_id_t {
 
 /**
  * Create an scale object
- * @param parent    pointer to an object, it will be the parent of the new scale
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to created Scale Widget
  */
 lv_obj_t * lv_scale_create(lv_obj_t * parent);
@@ -145,7 +146,7 @@ void lv_scale_set_min_value(lv_obj_t * obj, int32_t min);
 /**
  * Set maximum values on Scale.
  * @param obj       pointer to Scale Widget
- * @param min       minimum value of Scale
+ * @param max       maximum value of Scale
  */
 void lv_scale_set_max_value(lv_obj_t * obj, int32_t max);
 
@@ -153,7 +154,7 @@ void lv_scale_set_max_value(lv_obj_t * obj, int32_t max);
  * Set angle between the low end and the high end of the Scale.
  * (Applies only to round Scales.)
  * @param obj         pointer to Scale Widget
- * @param max_angle   angle in degrees from Scale minimum where top end of Scale will be drawn
+ * @param angle_range angle in degrees from Scale minimum where top end of Scale will be drawn
  */
 void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range);
 
@@ -206,7 +207,8 @@ void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int3
  * Set custom text source for major ticks labels.
  * @param obj       pointer to Scale Widget
  * @param txt_src   pointer to an array of strings which will be display at major ticks;
- *                  last element must be a NULL pointer.
+ *                  last element must be a NULL pointer. @nullable. Use NULL to detach the
+ *                  previous major ticks text
  */
 void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[]);
 
@@ -236,8 +238,8 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
  * DEPRECATED, use lv_scale_set_section_range instead.
  * Set range for specified Scale Section
  * @param section       pointer to Section
- * @param range_min     Section new minimum value
- * @param range_max     Section new maximum value
+ * @param min           Section new minimum value
+ * @param max           Section new maximum value
  */
 void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max);
 
@@ -245,8 +247,8 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32
  * Set the range of a scale section
  * @param scale         pointer to scale
  * @param section       pointer to section
- * @param range_min     the section's new minimum value
- * @param range_max     the section's new maximum value
+ * @param min           the section's new minimum value
+ * @param max           the section's new maximum value
  */
 void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, int32_t min, int32_t max);
 
@@ -271,7 +273,7 @@ void lv_scale_set_section_max_value(lv_obj_t * scale, lv_scale_section_t * secti
  * Set style for specified part of Section.
  * @param section             pointer to Section
  * @param part                the part of the Scale the style will apply to, e.g. LV_PART_INDICATOR
- * @param section_part_style  pointer to style to apply
+ * @param section_part_style  pointer to style to apply @nullable. Use NULL to detach a part style
  */
 LV_DEPRECATED("use lv_scale_set_section_style_main/indicator/items instead")
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style);
@@ -280,7 +282,8 @@ void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv
  * Set the style of the line on a section.
  * @param scale         pointer to scale
  * @param section       pointer to section
- * @param style         point to a style
+ * @param style         pointer to a style. @nullable
+ *                      Use NULL to detach the previous main style
  */
 void lv_scale_set_section_style_main(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style);
 
@@ -288,7 +291,8 @@ void lv_scale_set_section_style_main(lv_obj_t * scale, lv_scale_section_t * sect
  * Set the style of the major ticks and label on a section.
  * @param scale         pointer to scale
  * @param section       pointer to section
- * @param style         point to a style
+ * @param style         pointer to a style. @nullable
+ *                      Use NULL to detach the previous indicatior style
  */
 void lv_scale_set_section_style_indicator(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style);
 
@@ -296,7 +300,8 @@ void lv_scale_set_section_style_indicator(lv_obj_t * scale, lv_scale_section_t *
  * Set the style of the minor ticks on a section.
  * @param scale         pointer to scale
  * @param section       pointer to section
- * @param style         point to a style
+ * @param style         pointer to a style. @nullable
+ *                      Use NULL to detach the previous items style
  */
 void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style);
 

@@ -85,6 +85,69 @@ jobs:
         run: python scripts/static_checks/check_lv_types.py
 
       # ------------------------------------------------------------------
+      # Defconfigs are up to date and produce no warnings
+      # ------------------------------------------------------------------
+      - name: "Check: Defconfings are up to date"
+        id: defconfigs
+        continue-on-error: true
+        run: |
+          pip install kconfiglib
+          python scripts/static_checks/check_defconfigs.py
+
+      # ------------------------------------------------------------------
+      # Every glob in .github/labeler.yml still matches a tracked file
+      # ------------------------------------------------------------------
+      - name: "Check: labeler globs match tracked files"
+        id: labeler-globs
+        continue-on-error: true
+        run: |
+          pip install pyyaml
+          python scripts/static_checks/check_labeler.py globs
+
+      # ------------------------------------------------------------------
+      # Every label used by .github/labeler.yml exists on the repo
+      # ------------------------------------------------------------------
+      - name: "Check: labeler labels exist"
+        id: labeler-labels
+        if: github.repository == 'lvgl/lvgl'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/static_checks/check_labeler.py labels-exist
+
+      # ------------------------------------------------------------------
+      # C sources/headers must use block comments (/* */), not //.
+      # Scoped per-module while the conversion is rolled out; widen the
+      # path list as each module is cleaned.
+      # ------------------------------------------------------------------
+      - name: "Check: no // comments in C sources (src/core)"
+        id: comments
+        continue-on-error: true
+        run: python scripts/static_checks/check_comments.py src/core
+
+      # ------------------------------------------------------------------
+      # The file name dependent parts of every lv_*.c/lv_*.h file
+      # (@file comment, include guards) must match the file name
+      # ------------------------------------------------------------------
+      - name: "Check: file templates match file names"
+        id: file-template
+        continue-on-error: true
+        run: python scripts/static_checks/check_file_template.py
+
+      # ------------------------------------------------------------------
+      # All public API functions have their argument checks
+      # ------------------------------------------------------------------
+      - name: Install doxygen
+        continue-on-error: true
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq doxygen
+
+      - name: "Check: public API argument checks did not regress"
+        id: arg-checks
+        continue-on-error: true
+        run: |
+          python scripts/static_checks/check_arg_checks.py
+
+      # ------------------------------------------------------------------
       # Final gate – fail the job if any step above failed.
       # This gives us full output from every check before failing.
       # ------------------------------------------------------------------
@@ -96,7 +159,14 @@ jobs:
           steps.allowed-list.outcome          == 'failure' ||
           steps.direct-public-include.outcome == 'failure' ||
           steps.deprecated.outcome            == 'failure' ||
-          steps.lv_types.outcome              == 'failure'
+          steps.lv_types.outcome              == 'failure' ||
+          steps.defconfigs.outcome            == 'failure' ||
+          steps.labeler-globs.outcome         == 'failure' ||
+          steps.labeler-labels.outcome        == 'failure' ||
+          steps.comments.outcome              == 'failure' ||
+          steps.file-template.outcome         == 'failure' ||
+          steps.arg-checks.outcome            == 'failure'
+
         run: |
           echo "Policy check results:"
           echo "---------------------"
@@ -117,6 +187,12 @@ jobs:
           print_result "direct-public-include" "${{ steps.direct-public-include.outcome }}"
           print_result "deprecated"            "${{ steps.deprecated.outcome }}"
           print_result "lv_types"              "${{ steps.lv_types.outcome }}"
+          print_result "defconfigs"            "${{ steps.defconfigs.outcome }}"
+          print_result "labeler-globs"         "${{ steps.labeler-globs.outcome }}"
+          print_result "labeler-labels"        "${{ steps.labeler-labels.outcome }}"
+          print_result "comments"              "${{ steps.comments.outcome }}"
+          print_result "file-template"         "${{ steps.file-template.outcome }}"
+          print_result "arg-checks"            "${{ steps.arg-checks.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."

@@ -3,10 +3,6 @@
  *
  */
 
-/**
- * Modified by NXP in 2024
- */
-
 #ifndef LV_DRAW_PRIVATE_H
 #define LV_DRAW_PRIVATE_H
 
@@ -199,6 +195,13 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Free a draw task and everything it owns
+ * Used both by the normal dispatch path and to unwind a redraw that is being abandoned.
+ * @param  t      draw task to free
+ */
+void lv_draw_cleanup_task(lv_draw_task_t * t);
 
 /**********************
  *      MACROS

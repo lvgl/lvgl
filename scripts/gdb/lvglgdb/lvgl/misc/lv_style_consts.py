@@ -191,4 +191,241 @@ POINTER_PROPS = {
     116,  # ANIM
     118,  # TRANSITION
     121,  # BITMAP_MASK_SRC
+    165,  # GRID_COLUMN_DSC_ARRAY
+    166,  # GRID_ROW_DSC_ARRAY
 }
+
+SRC_PROPS = {
+    48,  # BG_IMAGE_SRC
+    96,  # ARC_IMAGE_SRC
+    121,  # BITMAP_MASK_SRC
+}
+
+COORD_PROPS = {
+    1,  # WIDTH
+    2,  # HEIGHT
+    3,  # LENGTH
+    4,  # TRANSFORM_WIDTH
+    5,  # TRANSFORM_HEIGHT
+    8,  # MIN_WIDTH
+    9,  # MAX_WIDTH
+    10,  # MIN_HEIGHT
+    11,  # MAX_HEIGHT
+    12,  # TRANSLATE_X
+    13,  # TRANSLATE_Y
+    14,  # RADIAL_OFFSET
+    16,  # X
+    17,  # Y
+    24,  # PAD_TOP
+    25,  # PAD_BOTTOM
+    26,  # PAD_LEFT
+    27,  # PAD_RIGHT
+    28,  # PAD_RADIAL
+    29,  # PAD_ROW
+    30,  # PAD_COLUMN
+    32,  # MARGIN_TOP
+    33,  # MARGIN_BOTTOM
+    34,  # MARGIN_LEFT
+    35,  # MARGIN_RIGHT
+    45,  # BG_MAIN_STOP
+    46,  # BG_GRAD_STOP
+    56,  # BORDER_WIDTH
+    64,  # OUTLINE_WIDTH
+    67,  # OUTLINE_PAD
+    74,  # SHADOW_WIDTH
+    75,  # LINE_WIDTH
+    76,  # ARC_WIDTH
+    97,  # SHADOW_OFFSET_X
+    98,  # SHADOW_OFFSET_Y
+    99,  # SHADOW_SPREAD
+    100,  # LINE_DASH_WIDTH
+    102,  # TEXT_LETTER_SPACE
+    103,  # TEXT_LINE_SPACE
+    104,  # LINE_DASH_GAP
+    107,  # TEXT_OUTLINE_STROKE_WIDTH
+    120,  # RADIUS
+    124,  # TRANSLATE_RADIAL
+    136,  # BLUR_RADIUS
+    144,  # DROP_SHADOW_RADIUS
+    145,  # DROP_SHADOW_OFFSET_X
+    146,  # DROP_SHADOW_OFFSET_Y
+    152,  # TRANSFORM_SCALE_X
+    153,  # TRANSFORM_SCALE_Y
+    154,  # TRANSFORM_PIVOT_X
+    155,  # TRANSFORM_PIVOT_Y
+    156,  # TRANSFORM_ROTATION
+    157,  # TRANSFORM_SKEW_X
+    158,  # TRANSFORM_SKEW_Y
+    170,  # GRID_CELL_COLUMN_POS
+    171,  # GRID_CELL_COLUMN_SPAN
+    173,  # GRID_CELL_ROW_POS
+    174,  # GRID_CELL_ROW_SPAN
+}
+
+BOOL_PROPS = {
+    51,  # BG_IMAGE_TILED
+    59,  # BORDER_POST
+    105,  # LINE_ROUNDED
+    111,  # ARC_ROUNDED
+    128,  # CLIP_CORNER
+    137,  # BLUR_BACKDROP
+}
+
+ENUM_PROP_VALUES = {
+    18: {  # ALIGN
+        0: "DEFAULT",
+        1: "TOP_LEFT",
+        2: "TOP_MID",
+        3: "TOP_RIGHT",
+        4: "BOTTOM_LEFT",
+        5: "BOTTOM_MID",
+        6: "BOTTOM_RIGHT",
+        7: "LEFT_MID",
+        8: "RIGHT_MID",
+        9: "CENTER",
+        10: "OUT_TOP_LEFT",
+        11: "OUT_TOP_MID",
+        12: "OUT_TOP_RIGHT",
+        13: "OUT_BOTTOM_LEFT",
+        14: "OUT_BOTTOM_MID",
+        15: "OUT_BOTTOM_RIGHT",
+        16: "OUT_LEFT_TOP",
+        17: "OUT_LEFT_MID",
+        18: "OUT_LEFT_BOTTOM",
+        19: "OUT_RIGHT_TOP",
+        20: "OUT_RIGHT_MID",
+        21: "OUT_RIGHT_BOTTOM",
+    },
+    41: {  # BG_GRAD_DIR
+        0: "NONE",
+        1: "VER",
+        2: "HOR",
+        3: "LINEAR",
+        4: "RADIAL",
+        5: "CONICAL",
+    },
+    60: {  # BORDER_SIDE
+        0: "NONE",
+        1: "BOTTOM",
+        2: "TOP",
+        4: "LEFT",
+        8: "RIGHT",
+        15: "FULL",
+        16: "INTERNAL",
+    },
+    101: {  # TEXT_ALIGN
+        0: "AUTO",
+        1: "LEFT",
+        2: "CENTER",
+        3: "RIGHT",
+    },
+    110: {  # TEXT_DECOR
+        0: "NONE",
+        1: "UNDERLINE",
+        2: "STRIKETHROUGH",
+    },
+    122: {  # BLEND_MODE
+        0: "NORMAL",
+        1: "ADDITIVE",
+        2: "SUBTRACTIVE",
+        3: "MULTIPLY",
+        4: "DIFFERENCE",
+    },
+    129: {  # BASE_DIR
+        0: "LTR",
+        1: "RTL",
+        2: "AUTO",
+        32: "NEUTRAL",
+        33: "WEAK",
+    },
+    138: {  # BLUR_QUALITY
+        0: "AUTO",
+        1: "SPEED",
+        2: "PRECISION",
+    },
+    149: {  # DROP_SHADOW_QUALITY
+        0: "AUTO",
+        1: "SPEED",
+        2: "PRECISION",
+    },
+    160: {  # FLEX_FLOW
+        0: "ROW",
+        1: "COLUMN",
+        4: "ROW_WRAP",
+        5: "COLUMN_WRAP",
+        8: "ROW_REVERSE",
+        9: "COLUMN_REVERSE",
+        12: "ROW_WRAP_REVERSE",
+        13: "COLUMN_WRAP_REVERSE",
+    },
+    161: {  # FLEX_MAIN_PLACE
+        0: "START",
+        1: "END",
+        2: "CENTER",
+        3: "SPACE_EVENLY",
+        4: "SPACE_AROUND",
+        5: "SPACE_BETWEEN",
+    },
+    162: {  # FLEX_CROSS_PLACE
+        0: "START",
+        1: "END",
+        2: "CENTER",
+        3: "SPACE_EVENLY",
+        4: "SPACE_AROUND",
+        5: "SPACE_BETWEEN",
+    },
+    163: {  # FLEX_TRACK_PLACE
+        0: "START",
+        1: "END",
+        2: "CENTER",
+        3: "SPACE_EVENLY",
+        4: "SPACE_AROUND",
+        5: "SPACE_BETWEEN",
+    },
+    168: {  # GRID_COLUMN_ALIGN
+        0: "START",
+        1: "CENTER",
+        2: "END",
+        3: "STRETCH",
+        4: "SPACE_EVENLY",
+        5: "SPACE_AROUND",
+        6: "SPACE_BETWEEN",
+    },
+    169: {  # GRID_ROW_ALIGN
+        0: "START",
+        1: "CENTER",
+        2: "END",
+        3: "STRETCH",
+        4: "SPACE_EVENLY",
+        5: "SPACE_AROUND",
+        6: "SPACE_BETWEEN",
+    },
+    172: {  # GRID_CELL_X_ALIGN
+        0: "START",
+        1: "CENTER",
+        2: "END",
+        3: "STRETCH",
+        4: "SPACE_EVENLY",
+        5: "SPACE_AROUND",
+        6: "SPACE_BETWEEN",
+    },
+    175: {  # GRID_CELL_Y_ALIGN
+        0: "START",
+        1: "CENTER",
+        2: "END",
+        3: "STRETCH",
+        4: "SPACE_EVENLY",
+        5: "SPACE_AROUND",
+        6: "SPACE_BETWEEN",
+    },
+    176: {  # TEXT_LEADING_TRIM
+        0: "NONE",
+        1: "CAPITAL_BASELINE",
+        2: "LOWER_BASELINE",
+        3: "CAPITAL",
+        4: "LOWER",
+    },
+}
+
+# From LV_COORD_TYPE_SHIFT in lv_area.h
+COORD_TYPE_SHIFT = 29

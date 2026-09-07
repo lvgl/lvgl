@@ -122,6 +122,10 @@ The following event codes exist:
 - <ApiLink name="LV_EVENT_SCROLL_END" />: Scrolling ends
 - <ApiLink name="LV_EVENT_SCROLL" />: Scrolling
 - <ApiLink name="LV_EVENT_GESTURE" />: A gesture is detected. Get the gesture with <ApiLink name="lv_indev_get_gesture_dir" display="lv_indev_get_gesture_dir(lv_indev_active())" />
+- <ApiLink name="LV_EVENT_GESTURE_UP" />: An upwards gesture is detected. Sent right after <ApiLink name="LV_EVENT_GESTURE" />
+- <ApiLink name="LV_EVENT_GESTURE_DOWN" />: A downwards gesture is detected. Sent right after <ApiLink name="LV_EVENT_GESTURE" />
+- <ApiLink name="LV_EVENT_GESTURE_LEFT" />: A leftwards gesture is detected. Sent right after <ApiLink name="LV_EVENT_GESTURE" />
+- <ApiLink name="LV_EVENT_GESTURE_RIGHT" />: A rightwards gesture is detected. Sent right after <ApiLink name="LV_EVENT_GESTURE" />
 - <ApiLink name="LV_EVENT_KEY" />: A key is sent to Widget. Get the key with <ApiLink name="lv_indev_get_key" display="lv_indev_get_key(lv_indev_active())" />
 - <ApiLink name="LV_EVENT_FOCUSED" />: Widget received focus
 - <ApiLink name="LV_EVENT_DEFOCUSED" />: Widget is defocused
@@ -161,6 +165,8 @@ indicating that invalidating an area is not allowed during rendering.
 - <ApiLink name="LV_EVENT_STATE_CHANGED" />: The state of a widget has been changed.
    E.g. <ApiLink name="LV_STATE_PRESSED" /> was added. In the event <ApiLink name="lv_event_get_prev_state" display="lv_event_get_prev_state(e)" />
    returns the previous state and <ApiLink name="lv_obj_get_state" display="lv_obj_get_state(obj)" /> returns the current state.
+- <ApiLink name="LV_EVENT_CHECKED" />: A checkable Widget became checked. Sent right after <ApiLink name="LV_EVENT_VALUE_CHANGED" />
+- <ApiLink name="LV_EVENT_UNCHECKED" />: A checkable Widget became unchecked. Sent right after <ApiLink name="LV_EVENT_VALUE_CHANGED" />
 
 ### Other Events
 

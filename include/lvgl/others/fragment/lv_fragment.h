@@ -133,7 +133,7 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent);
 
 /**
  * Destroy fragment manager instance
- * @param manager Fragment manager instance
+ * @param manager Fragment manager instance @nullable
  */
 void lv_fragment_manager_delete(lv_fragment_manager_t * manager);
 
@@ -237,7 +237,7 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
 
 /**
  * Destroy a fragment.
- * @param fragment Fragment instance.
+ * @param fragment Fragment instance. @nullable
  */
 void lv_fragment_delete(lv_fragment_t * fragment);
 

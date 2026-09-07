@@ -39,6 +39,7 @@
 #include "../../misc/lv_bidi_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../lvgl.h"
+#include "../../font/lv_font_private.h"
 #include "../../font/freetype/lv_freetype_private.h"
 #include "../../core/lv_global.h"
 
@@ -123,7 +124,7 @@ void lv_draw_nema_gfx_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
     lv_layer_t * layer = t->target_layer;
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, &t->clip_area);
+    clip_area = t->clip_area;
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_color_format_t dst_cf = layer->draw_buf->header.cf;
@@ -343,7 +344,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             lv_area_t mask_area = *glyph_draw_dsc->letter_coords;
 
             lv_area_t rel_coords;
-            lv_area_copy(&rel_coords, &blend_area);
+            rel_coords = blend_area;
             lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
             int32_t x, y, w, h;
@@ -434,7 +435,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
     lv_text_align_t align = dsc->align;
     lv_base_dir_t base_dir = dsc->bidi_dir;
 
-    lv_bidi_calculate_align(&align, &base_dir, dsc->text);
+    lv_bidi_calculate_align_internal(&align, &base_dir, dsc->text);
 
     if((dsc->flag & LV_TEXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
@@ -447,7 +448,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
         attributes.max_width = p.x;
     }
 
-    int32_t line_height_font = lv_font_get_line_height(font);
+    int32_t line_height_font = lv_font_get_line_height_internal(font);
     int32_t line_height = line_height_font + dsc->line_space;
 
     /*Init variables for the first line*/
@@ -776,7 +777,7 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
         return;
 
     LV_PROFILER_DRAW_BEGIN;
-    bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, '\0');
+    bool g_ret = lv_font_get_glyph_dsc_internal(font, &g, letter, '\0');
     if(g_ret == false) {
         /*Add warning if the dsc is not found*/
         LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
@@ -826,7 +827,10 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
             g.req_raw_bitmap = 1;
             if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
                 lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-                if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+                if(fdsc->are_glyphs_dynamic_loaded) {
+                    g.req_raw_bitmap = 0;
+                }
+                else if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
                     is_raw_bitmap = true;
                 }
             }

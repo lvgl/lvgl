@@ -128,8 +128,18 @@
  * RENDERING CONFIGURATION
  *============================================================================*/
 
-/** Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
-#define LV_COLOR_DEPTH 16
+/** Default color format
+ *  Possible values:
+ *  - LV_COLOR_FORMAT_I1
+ *  - LV_COLOR_FORMAT_L8
+ *  - LV_COLOR_FORMAT_RGB565
+ *  - LV_COLOR_FORMAT_RGB565_SWAPPED: RGB565 (Big-endian)
+ *  - LV_COLOR_FORMAT_RGB888
+ *  - LV_COLOR_FORMAT_XRGB8888
+ *  - LV_COLOR_FORMAT_ARGB8888
+ *  - LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
+ */
+#define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
 
 /** 0: no adjustment, get the integer part of the result (round down)
  *  64: round up from x.75
@@ -298,6 +308,7 @@
  *  - LV_DRAW_SW_ASM_NEON
  *  - LV_DRAW_SW_ASM_HELIUM
  *  - LV_DRAW_SW_ASM_RISCV_V: RISC-V Vector
+ *  - LV_DRAW_SW_ASM_SVE2
  *  - LV_DRAW_SW_ASM_CUSTOM
  */
 #define LV_USE_DRAW_SW_ASM LV_DRAW_SW_ASM_NONE
@@ -529,6 +540,29 @@
 
 #endif /*LV_USE_DRAW_DMA2D*/
 
+/** Accelerate blends, fills, images and text with the EPIC (Enhanced
+ *  Pixel Image Compositor) engine of SiFli BF0 SoCs. Unsupported
+ *  operations fall back to software rendering.
+ *
+ *  Enable: LV_USE_DRAW_SW
+ */
+#define LV_USE_SIFLI_EPIC 0
+
+#if LV_USE_OS != LV_OS_NONE
+#if LV_USE_SIFLI_EPIC
+/** Dispatch EPIC operations from their own thread so the CPU can keep
+ *  rendering in parallel.
+ */
+#define LV_USE_SIFLI_EPIC_DRAW_THREAD 1
+
+/** Check the status of every EPIC call and assert on failure. Useful
+ *  while bringing up a board.
+ */
+#define LV_USE_SIFLI_EPIC_ASSERT 0
+
+#endif /*LV_USE_SIFLI_EPIC*/
+#endif /*LV_USE_OS != LV_OS_NONE*/
+
 /** Offload drawing to an external EVE (FT81X/BT81X) graphics controller over SPI. */
 #define LV_USE_DRAW_EVE 0
 
@@ -547,6 +581,8 @@
 
 /** Accelerate blends, fills and image blits with the NXP G2D API (i.MX 2D GPU).
  *  Requires the g2d library and its headers.
+ *
+ *  Enable: LV_USE_DRAW_SW
  */
 #define LV_USE_DRAW_G2D 0
 
@@ -610,7 +646,10 @@
 
 #endif /*LV_USE_DRAW_OPENGLES*/
 
-/** Render with the SDL renderer API, caching widgets and images as SDL textures. */
+/** Render with the SDL renderer API, caching widgets and images as SDL textures.
+ *
+ *  Enable: LV_USE_DRAW_SW
+ */
 #define LV_USE_DRAW_SDL 0
 
 
@@ -618,6 +657,33 @@
 /*============================================================================
  * INPUT DEVICES
  *============================================================================*/
+
+/** Distance the pointer needs to travel before scrolling starts. */
+#define LV_INDEV_DEF_SCROLL_LIMIT 10
+
+/** Slow-down applied after releasing a scroll. Greater value means faster slow-down. */
+#define LV_INDEV_DEF_SCROLL_THROW 10
+
+/** Scrolling past the edge of a scrollable widget is slower by this factor. */
+#define LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR 4
+
+/** Press time after which `LV_EVENT_LONG_PRESSED` is sent. */
+#define LV_INDEV_DEF_LONG_PRESS_TIME 400
+
+/** Time between `LV_EVENT_LONG_PRESSED_REPEAT` events. */
+#define LV_INDEV_DEF_LONG_PRESS_REP_TIME 100
+
+/** Max time between consecutive clicks to count as a double or triple click. */
+#define LV_INDEV_DEF_DOUBLE_CLICK_TIME 400
+
+/** Distance the pointer needs to travel before a gesture is detected. */
+#define LV_INDEV_DEF_GESTURE_LIMIT 50
+
+/** Minimum pointer velocity at release to report a swipe. */
+#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
+
+/** The encoder diff is multiplied by this value and divided by 256. */
+#define LV_INDEV_DEF_ROTARY_SENSITIVITY 256
 
 /** Move focus between a container's children with arrow keys, based on their position. */
 #define LV_USE_GRIDNAV 0
@@ -628,6 +694,22 @@
  */
 #define LV_USE_GESTURE_RECOGNITION 0
 
+#if LV_USE_GESTURE_RECOGNITION
+/** Scale the fingers need to pinch down to before pinch events are sent. */
+#define LV_INDEV_DEF_GESTURE_PINCH_DOWN_THRESHOLD 75
+
+/** Scale the fingers need to pinch up to before pinch events are sent. */
+#define LV_INDEV_DEF_GESTURE_PINCH_UP_THRESHOLD 150
+
+/** A pinch starting above this scale is discarded.
+ *  Must be greater than the pinch out threshold.
+ */
+#define LV_INDEV_DEF_GESTURE_PINCH_MAX_INITIAL_SCALE 250
+
+/** Angle the fingers need to rotate by before rotation events are sent. */
+#define LV_INDEV_DEF_GESTURE_ROTATION_THRESHOLD 200
+
+#endif /*LV_USE_GESTURE_RECOGNITION*/
 
 
 /*============================================================================
@@ -635,7 +717,7 @@
  *============================================================================*/
 
 /** Speed up style property lookups by adding 2 x 32 bit variables to each lv_obj_t. */
-#define LV_OBJ_STYLE_CACHE 0
+#define LV_OBJ_STYLE_CACHE 1
 
 /** Widget names (lv_obj_set_name) */
 #define LV_USE_OBJ_NAME 0
@@ -1295,10 +1377,7 @@
  */
 #define LV_USE_GSTREAMER 0
 
-/** Image
- *
- *  Enable: LV_USE_LABEL
- */
+/** Image */
 #define LV_USE_IMAGE 1
 
 /** Image button */
@@ -1372,7 +1451,10 @@
 /** Menu */
 #define LV_USE_MENU 1
 
-/** Message box */
+/** Message box
+ *
+ *  Enable: LV_USE_LABEL
+ */
 #define LV_USE_MSGBOX 1
 
 /** QR code
@@ -1769,20 +1851,49 @@
 /** LVGL is deinitialized before the application exits. */
 #define LV_WAYLAND_DIRECT_EXIT 1
 
-/** Legacy behavior, slated for removal: the backend defaults to SHM and any
- *  LV_WAYLAND_USE_* set directly in lv_conf.h is honored. Disable this and pick
- *  a backend explicitly in the "Rendering backend" choice.
+#if !LV_USE_DRAW_OPENGLES
+#if !LV_USE_DRAW_NANOVG
+/** Default backend, using wl_shm for double-buffered direct rendering.
+ *  Compatible with all Wayland compositors; no special hardware required.
+ *  Unavailable with the OpenGL ES and NanoVG renderers, which can only
+ *  render into a GPU surface.
  */
-#define LV_WAYLAND_AUTO_BACKEND 1
+#define LV_WAYLAND_USE_SHM 1
 
-/** Select the rendering backend used by the Wayland driver.
- *  Possible values:
- *  - LV_WAYLAND_BACKEND_SHM: SHM (Shared Memory)
- *  - LV_WAYLAND_BACKEND_EGL: EGL (OpenGL ES, hardware-accelerated) (enable: LV_USE_OPENGLES)
- *  - LV_WAYLAND_BACKEND_G2D: G2D (NXP i.MX hardware accelerator) (enable: LV_USE_DRAW_G2D)
+/** Presents software-rendered frames through linear DMA-BUFs that the
+ *  compositor can scan out directly, saving its copy out of shared memory.
+ *  Requires a compositor with zwp_linux_dmabuf_v1 and a gbm implementation
+ *  able to allocate CPU-mappable buffers, plus libdrm and gbm (-ldrm -lgbm).
+ *  Needs no GPU API: unavailable with the OpenGL ES and NanoVG renderers,
+ *  which can only render into a GPU surface.
  */
-#define LV_WAYLAND_BACKEND LV_WAYLAND_BACKEND_SHM
+#define LV_WAYLAND_USE_DMABUF 0
 
+#endif /*!LV_USE_DRAW_NANOVG*/
+#endif /*!LV_USE_DRAW_OPENGLES*/
+
+/** Hardware-accelerated rendering via OpenGL ES 2.0 and EGL, compatible
+ *  with LVGL 3D/glTF rendering. Requires OpenGL ES 2.0 on the target
+ *  hardware and linking with wayland-egl (-lwayland-egl).
+ *  The only backend available with the OpenGL ES and NanoVG renderers.
+ *
+ *  Enable: LV_USE_OPENGLES
+ */
+#define LV_WAYLAND_USE_EGL 0
+
+#if !LV_USE_DRAW_OPENGLES
+#if !LV_USE_DRAW_NANOVG
+/** Hardware-accelerated 2D rendering via NXP's G2D engine.
+ *  Supports NXP i.MX6/i.MX8 platforms with G2D library installed.
+ *  Unavailable with the OpenGL ES and NanoVG renderers, which can only
+ *  render into a GPU surface.
+ *
+ *  Enable: LV_USE_DRAW_G2D
+ */
+#define LV_WAYLAND_USE_G2D 0
+
+#endif /*!LV_USE_DRAW_NANOVG*/
+#endif /*!LV_USE_DRAW_OPENGLES*/
 #endif /*LV_USE_WAYLAND*/
 
 #if LV_USE_OS == LV_OS_WINDOWS
@@ -2230,19 +2341,22 @@
 #endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE*/
 #endif /*LV_ENABLE_GLOBAL_CUSTOM*/
 
-/** NULL checks (very fast, recommended) */
-#define LV_USE_ASSERT_NULL 1
+/** LV_ASSERT / LV_ASSERT_MSG / LV_ASSERT_FORMAT_MSG */
+#define LV_USE_ASSERT 0
 
-/** Allocation success checks (very fast, recommended) */
-#define LV_USE_ASSERT_MALLOC 1
+/** LV_ASSERT_MALLOC */
+#define LV_USE_ASSERT_MALLOC 0
 
-/** Style init checks (very fast, recommended) */
+/** LV_ASSERT_NULL */
+#define LV_USE_ASSERT_NULL 0
+
+/** LV_ASSERT_STYLE */
 #define LV_USE_ASSERT_STYLE 0
 
-/** lv_mem integrity checks (slow) */
+/** LV_ASSERT_MEM_INTEGRITY */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0
 
-/** Widget validity checks (slow) */
+/** LV_ASSERT_OBJ */
 #define LV_USE_ASSERT_OBJ 0
 
 /** Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
@@ -2300,17 +2414,28 @@
 #define LV_CHECK_ARG_LOG_MODE LV_CHECK_ARG_LOG_MODE_NONE
 
 /** LV_CHECK_OBJ verifies with lv_obj_has_class() that the object has the
- *  expected class. When disabled the check is skipped even if a class
- *  argument is supplied.
+ *  expected class. When disabled the class check is skipped
+ *  (LV_CHECK_OBJ collapses to a NULL check).
  */
 #define LV_USE_CHECK_OBJ_CLASSTYPE 0
 
-/** LV_CHECK_OBJ verifies with lv_obj_is_valid() that the object is still
- *  part of the widget tree. When disabled the check is skipped even if the
- *  associated argument is supplied.
+/** LV_CHECK_OBJ verifies with lv_obj_is_in_widget_tree() that the object is
+ *  still part of the widget tree. When disabled the validity check is
+ *  skipped (only the class/NULL check remains).
  */
 #define LV_USE_CHECK_OBJ_VALIDITY 0
 
+#if LV_USE_CHECK_OBJ_VALIDITY
+#if LV_USE_ASSERT
+/** While walking up the parent chain, lv_obj_is_in_widget_tree also checks that
+ *  each parent's children array contains the child. This finds corruption where
+ *  a child's parent pointer and the parent's children list disagree. The cost is
+ *  O(siblings) per level instead of O(1), and LV_ASSERT reports the mismatch.
+ */
+#define LV_USE_CHECK_OBJ_PARENT_LINK 0
+
+#endif /*LV_USE_ASSERT*/
+#endif /*LV_USE_CHECK_OBJ_VALIDITY*/
 #endif /*LV_USE_CHECK_ARG*/
 
 

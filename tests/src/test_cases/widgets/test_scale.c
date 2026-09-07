@@ -656,4 +656,103 @@ void test_scale_with_1_tick(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_9.png");
 }
 
+/* When LV_STYLE_PAD_RADIAL is set on a section's main style, the section arc
+ * should be drawn with a radius reduced by the pad value. Two sections with
+ * adjacent ranges but with different radial paddings must therefore produce
+ * concentric arcs at distinct radii. */
+void test_scale_section_pad_radial(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_obj_set_size(scale, 200, 200);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+    lv_obj_center(scale);
+
+    lv_scale_set_label_show(scale, false);
+    lv_scale_set_total_tick_count(scale, 11);
+    lv_scale_set_major_tick_every(scale, 5);
+    lv_scale_set_range(scale, 0, 100);
+
+    /* Make the main arc visible so the section arcs can be visually distinguished. */
+    static lv_style_t main_arc_style;
+    lv_style_init(&main_arc_style);
+    lv_style_set_arc_color(&main_arc_style, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_arc_width(&main_arc_style, 2U);
+    lv_obj_add_style(scale, &main_arc_style, LV_PART_MAIN);
+
+    /* Section 1: no radial pad - the arc should sit on the default scale radius. */
+    static lv_style_t section_no_pad_style;
+    lv_style_init(&section_no_pad_style);
+    lv_style_set_arc_color(&section_no_pad_style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_arc_width(&section_no_pad_style, 4U);
+
+    lv_scale_section_t * section_no_pad = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section_no_pad, 0, 50);
+    lv_scale_set_section_style_main(scale, section_no_pad, &section_no_pad_style);
+
+    /* Section 2: radial pad of 20 - the section arc must be drawn 20 px inside. */
+    static lv_style_t section_padded_style;
+    lv_style_init(&section_padded_style);
+    lv_style_set_arc_color(&section_padded_style, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_arc_width(&section_padded_style, 4U);
+    lv_style_set_pad_radial(&section_padded_style, 20);
+
+    lv_scale_section_t * section_padded = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section_padded, 50, 100);
+    lv_scale_set_section_style_main(scale, section_padded, &section_padded_style);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_10.png");
+}
+
+static lv_obj_t * create_self_size_scale(lv_obj_t * parent, lv_scale_mode_t mode)
+{
+
+    lv_obj_t * scale = lv_scale_create(parent);
+    switch(mode) {
+        case LV_SCALE_MODE_HORIZONTAL_TOP:
+        case LV_SCALE_MODE_HORIZONTAL_BOTTOM:
+            lv_obj_set_height(scale, LV_SIZE_CONTENT);
+            break;
+        case LV_SCALE_MODE_VERTICAL_LEFT:
+        case LV_SCALE_MODE_VERTICAL_RIGHT:
+            lv_obj_set_width(scale, LV_SIZE_CONTENT);
+            break;
+        default:
+            break;
+    }
+    lv_scale_set_mode(scale, mode);
+    lv_scale_set_label_show(scale, true);
+    lv_obj_set_style_outline_width(scale, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_width(scale, 2, LV_PART_MAIN);
+
+    return scale;
+}
+
+static lv_obj_t * set_tick_length(lv_obj_t * scale, int32_t major_len, int32_t minor_len)
+{
+    lv_obj_set_style_length(scale, minor_len, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, major_len, LV_PART_INDICATOR);
+    return scale;
+}
+
+void test_scale_self_size(void)
+{
+
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+
+    create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_TOP);
+    create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_LEFT);
+    create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_RIGHT);
+
+    lv_obj_t * scale = set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_TOP), 30, 5);
+    lv_obj_set_flex_in_new_track(scale, true);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_BOTTOM), 30, 5);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_LEFT), 30, 5);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_RIGHT), 30, 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_self_size.png");
+}
+
 #endif

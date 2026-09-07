@@ -57,24 +57,36 @@ extern "C" {
 /*----------------------------------------------------------------------
  * Internal helper: log output
  * Controlled by LV_CHECK_ARG_LOG_MODE.
- * In all modes the macro accepts (cond_str, ...) so that
- * LV_CHECK_ARG_INTERNAL_ can call it uniformly.
+ * `cond_str` is logged as an argument of `%s` instead of being pasted into
+ * the format string, because a `%` in the condition would otherwise be read
+ * as a conversion specifier.
  *---------------------------------------------------------------------*/
 #  if LV_CHECK_ARG_LOG_MODE == LV_CHECK_ARG_LOG_MODE_VERBOSE
-#    define LV_CHECK_ARG_LOG_(cond_str, ...) LV_LOG_WARN("Check failed: " cond_str " " __VA_ARGS__)
+#    define LV_CHECK_ARG_LOG_(cond_str, msg) LV_LOG_WARN("Check failed: %s" msg, cond_str)
+#    define LV_CHECK_ARG_LOG_FORMAT_(cond_str, format, ...) \
+    LV_LOG_WARN("Check failed: %s" format, cond_str, __VA_ARGS__)
 #  elif LV_CHECK_ARG_LOG_MODE == LV_CHECK_ARG_LOG_MODE_MINIMAL
-#    define LV_CHECK_ARG_LOG_(cond_str, ...) LV_LOG_WARN("Check failed")
+#    define LV_CHECK_ARG_LOG_(cond_str, msg) LV_LOG_WARN("Check failed")
+#    define LV_CHECK_ARG_LOG_FORMAT_(cond_str, format, ...) LV_LOG_WARN("Check failed")
 #  else /* LV_CHECK_ARG_LOG_MODE_NONE */
-#    define LV_CHECK_ARG_LOG_(cond_str, ...) do {} while(0)
+#    define LV_CHECK_ARG_LOG_(cond_str, msg) do {} while(0)
+#    define LV_CHECK_ARG_LOG_FORMAT_(cond_str, format, ...) do {} while(0)
 #  endif
 
 /*----------------------------------------------------------------------
- * Internal macro: single definition, behaviour driven by the helpers above.
- * Do not use directly; use LV_CHECK_ARG instead.
+ * Internal macros: behaviour driven by the helpers above.
+ * Do not use directly; use LV_CHECK_ARG and friends instead.
  *---------------------------------------------------------------------*/
-#  define LV_CHECK_ARG_INTERNAL_(cond, cond_str, action_on_fail, ...)  \
+#  define LV_CHECK_ARG_INTERNAL_(cond, cond_str, action_on_fail, msg)   \
     if(LV_UNLIKELY(!(cond))) {                                          \
-        LV_CHECK_ARG_LOG_(cond_str, __VA_ARGS__);                       \
+        LV_CHECK_ARG_LOG_(cond_str, msg);                               \
+        LV_CHECK_ARG_ASSERT_HANDLER_;                                   \
+        action_on_fail;                                                 \
+    } else {}
+
+#  define LV_CHECK_ARG_FORMAT_INTERNAL_(cond, cond_str, action_on_fail, format, ...) \
+    if(LV_UNLIKELY(!(cond))) {                                          \
+        LV_CHECK_ARG_LOG_FORMAT_(cond_str, format, __VA_ARGS__);        \
         LV_CHECK_ARG_ASSERT_HANDLER_;                                   \
         action_on_fail;                                                 \
     } else {}
@@ -82,15 +94,14 @@ extern "C" {
 #else
 
 /** LV_CHECK_ARG is disabled; all checks compile to nothing. */
-#  define LV_CHECK_ARG_INTERNAL_(cond, cond_str, action_on_fail, ...) ((void)0)
+#  define LV_CHECK_ARG_INTERNAL_(cond, cond_str, action_on_fail, msg) ((void)0)
+#  define LV_CHECK_ARG_FORMAT_INTERNAL_(cond, cond_str, action_on_fail, format, ...) ((void)0)
 
 #endif /*LV_USE_CHECK_ARG*/
 
 /**
  * Check that a condition is true. If the condition is false, log a warning
  * and execute `action_on_fail` (e.g. `return`, `return val`, `break`).
- * Additional printf-style arguments are appended to the log message when
- * LV_CHECK_ARG_LOG_MODE is set to VERBOSE.
  *
  * Can be disabled entirely by setting LV_USE_CHECK_ARG to 0 in lv_conf.h.
  * If LV_CHECK_ARG_ASSERT_ON_FAIL is 1, LV_ASSERT_HANDLER is also invoked
@@ -100,17 +111,47 @@ extern "C" {
  *
  * Example:
  * @code
- * LV_CHECK_ARG(ptr != NULL, return, "pointer must not be NULL");
- * LV_CHECK_ARG(len > 0, return -1, "len=%d", (int)len);
+ * LV_CHECK_ARG(ptr != NULL, return);
  * @endcode
  *
  * @param cond              condition to check
  * @param action_on_fail    statement to execute on failure (e.g. `return`, `return 0`, `break`)
- * @param ...               optional printf-style format string and arguments appended to the log
- *                          (only used when LV_CHECK_ARG_LOG_MODE == LV_CHECK_ARG_LOG_MODE_VERBOSE)
  */
-#define LV_CHECK_ARG(cond, action_on_fail, ...)                                                \
-    LV_CHECK_ARG_INTERNAL_(cond, #cond, action_on_fail, __VA_ARGS__)
+#define LV_CHECK_ARG(cond, action_on_fail) \
+    LV_CHECK_ARG_INTERNAL_(cond, #cond, action_on_fail, "")
+
+/**
+ * Same as LV_CHECK_ARG but a message is appended to the log. The message is
+ * only used when LV_CHECK_ARG_LOG_MODE is set to VERBOSE.
+ *
+ * Example:
+ * @code
+ * LV_CHECK_ARG_MSG(ptr != NULL, return, "pointer must not be NULL");
+ * @endcode
+ *
+ * @param cond              condition to check
+ * @param action_on_fail    statement to execute on failure (e.g. `return`, `return 0`, `break`)
+ * @param msg               string literal appended to the log message
+ */
+#define LV_CHECK_ARG_MSG(cond, action_on_fail, msg) \
+    LV_CHECK_ARG_INTERNAL_(cond, #cond, action_on_fail, " " msg)
+
+/**
+ * Same as LV_CHECK_ARG but a printf-style message is appended to the log. The
+ * message is only used when LV_CHECK_ARG_LOG_MODE is set to VERBOSE.
+ *
+ * Example:
+ * @code
+ * LV_CHECK_ARG_FORMAT_MSG(len > 0, return -1, "len=%d", (int)len);
+ * @endcode
+ *
+ * @param cond              condition to check
+ * @param action_on_fail    statement to execute on failure (e.g. `return`, `return 0`, `break`)
+ * @param format            format string literal appended to the log message
+ * @param ...               arguments of `format`; at least one is required
+ */
+#define LV_CHECK_ARG_FORMAT_MSG(cond, action_on_fail, format, ...) \
+    LV_CHECK_ARG_FORMAT_INTERNAL_(cond, #cond, action_on_fail, " " format, __VA_ARGS__)
 
 #ifdef __cplusplus
 } /*extern "C"*/

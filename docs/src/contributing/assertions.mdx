@@ -131,30 +131,33 @@ This macro is useful for:
 
 ### Usage
 
-<ApiLink name="LV_CHECK_ARG" /> takes a condition, an action to execute on failure,
-and optional printf-style arguments for the log message:
+<ApiLink name="LV_CHECK_ARG" /> takes a condition and an action to execute on
+failure. <ApiLink name="LV_CHECK_ARG_MSG" /> also takes a message and
+<ApiLink name="LV_CHECK_ARG_FORMAT_MSG" /> a printf-style format string with its
+arguments:
 
 ```c
 void draw_to_display(lv_obj_t * display, int len)
 {
     /* Return early if display is NULL */
-    LV_CHECK_ARG(display != NULL, return, ": display must be provided");
+    LV_CHECK_ARG_MSG(display != NULL, return, "display must be provided");
 
     /* Return if len is invalid, logging the actual value */
-    LV_CHECK_ARG(len % 2 == 0, return, ": need even data points, but got %d", (int)len);
+    LV_CHECK_ARG_FORMAT_MSG(len % 2 == 0, return, "need even data points, but got %d", (int)len);
 }
 
 int get_width(lv_obj_t * obj)
 {
     /* Return -1 if obj is NULL */
-    LV_CHECK_ARG(obj != NULL, return -1, "tried to get width of NULL object");
+    LV_CHECK_ARG(obj != NULL, return -1);
     /* ... */
 }
 ```
 
 The condition is stringified and included in the log message, so you can see
-exactly what check failed. Only supply a format string and arguments if you want
-to include additional context beyond the condition itself.
+exactly what check failed. Only supply a message, or a format string and
+arguments, if you want to include additional context beyond the condition
+itself.
 
 ---
 
@@ -181,7 +184,7 @@ The checks performed by <ApiLink name="LV_CHECK_OBJ" /> macros are layered and i
 | Base | `LV_USE_CHECK_ARG = 1` | Master switch. When `0`, all three macros expand to nothing. |
 | NULL | always on | `obj != NULL` (always checked when the system is enabled). |
 | Class type | `LV_USE_CHECK_OBJ_CLASSTYPE = 1` | `lv_obj_has_class(obj, cls)` — verifies the object is the expected widget type. |
-| Validity | `LV_USE_CHECK_OBJ_VALIDITY = 1` | `lv_obj_is_valid(obj)` — verifies the object is still part of the live widget tree. |
+| Validity | `LV_USE_CHECK_OBJ_VALIDITY = 1` | `lv_obj_is_in_widget_tree(obj)` — verifies the object is still part of the live widget tree. |
 
 All options default to `0`. Enable them selectively:
 
@@ -193,7 +196,7 @@ All options default to `0`. Enable them selectively:
 ```
 
 <Callout type="warning" title="Enable only during development">
-  `lv_obj_is_valid()` walks the widget tree and `lv_obj_has_class()` traverses
+  `lv_obj_is_in_widget_tree()` walks the widget tree and `lv_obj_has_class()` traverses
   the class hierarchy on every call site. These checks add non-trivial overhead,
   especially in rendering-critical code paths. Keep `LV_USE_CHECK_OBJ_CLASSTYPE`
   and `LV_USE_CHECK_OBJ_VALIDITY` at `0` in production builds.

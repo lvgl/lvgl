@@ -6,21 +6,18 @@ import os
 import sys
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-SCRIPT_PATH = os.path.join(
-    BASE_PATH, '..', '..', 'scripts',
-    'gen_json', 'gen_json.py'
-)
+SCRIPT_PATH = os.path.join(BASE_PATH, "..", "..", "scripts", "gen_json", "gen_json.py")
 
-OUTPUT_FILE = os.path.join(BASE_PATH, 'lvgl.json')
+OUTPUT_FILE = os.path.join(BASE_PATH, "lvgl.json")
 
 cmd = f'{sys.executable} "{SCRIPT_PATH}" --output-path "{BASE_PATH}"'
-print('running test')
+print("running test")
 print(cmd)
 
 result = os.system(cmd)
 if result != 0:
     print()
-    sys.stderr.write('TEST FAILED!!\n\n')
+    sys.stderr.write("TEST FAILED!!\n\n")
     sys.stderr.flush()
     sys.exit(result)
 
@@ -28,7 +25,7 @@ if result != 0:
 if not os.path.exists(OUTPUT_FILE):
     print()
     sys.stderr.write(f'"{OUTPUT_FILE}" was not found.\n')
-    sys.stderr.write('TEST FAILED!!\n\n')
+    sys.stderr.write("TEST FAILED!!\n\n")
     sys.stderr.flush()
     sys.exit(-500)
 
@@ -38,4 +35,4 @@ except:  # NOQA
     pass
 
 print()
-print('TEST PASSED!')
+print("TEST PASSED!")

@@ -121,6 +121,7 @@ void lv_fs_memfs_init(void)
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
+    LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
     LV_UNUSED(mode);
     return (void *)path;
@@ -152,6 +153,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
+    LV_ASSERT(br != NULL);
     LV_UNUSED(drv);
     LV_UNUSED(file_p);
     LV_UNUSED(buf);
@@ -171,6 +173,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
     /* NOTE: this function is only called to determine the end of the buffer when LV_FS_SEEK_END was given to lv_fs_seek() */
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
     lv_fs_file_t * fp = (lv_fs_file_t *)file_p;
     switch(whence) {
@@ -204,6 +207,8 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(pos_p != NULL);
     LV_UNUSED(drv);
     *pos_p = ((lv_fs_file_t *)file_p)->cache->file_position;
     return LV_FS_RES_OK;

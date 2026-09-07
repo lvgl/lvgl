@@ -16,11 +16,11 @@ void lv_draw_ppa_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc,
     lv_draw_buf_t * draw_buf = t->target_layer->draw_buf;
 
     lv_area_t rel_coords;
-    lv_area_copy(&rel_coords, coords);
+    rel_coords = *coords;
     lv_area_move(&rel_coords, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, &t->clip_area);
+    rel_clip_area = t->clip_area;
     lv_area_move(&rel_clip_area, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
 
     lv_area_t blend_area;

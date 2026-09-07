@@ -62,6 +62,8 @@ static const char * year_list = {
 
 lv_obj_t * lv_calendar_add_header_dropdown(lv_obj_t * parent)
 {
+    LV_CHECK_OBJ(parent, &lv_calendar_class, return NULL);
+
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_dropdown_class, parent);
     lv_obj_class_init_obj(obj);
 
@@ -70,6 +72,9 @@ lv_obj_t * lv_calendar_add_header_dropdown(lv_obj_t * parent)
 
 void lv_calendar_header_dropdown_set_year_list(lv_obj_t * parent, const char * years_list)
 {
+    LV_CHECK_OBJ(parent, &lv_calendar_class, return);
+    LV_CHECK_ARG(years_list != NULL, return);
+
     /* Search for the header dropdown */
     lv_obj_t * header = lv_obj_get_child_by_type(parent, 0, &lv_calendar_header_dropdown_class);
     if(NULL == header) {
@@ -102,8 +107,10 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("begin");
 
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_obj_t * calendar = lv_obj_get_parent(obj);
+    LV_ASSERT(calendar != NULL);
     lv_obj_move_to_index(obj, 0);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
 
@@ -125,8 +132,11 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void month_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * dropdown = lv_event_get_current_target(e);
     lv_obj_t * calendar = lv_event_get_user_data(e);
+    LV_ASSERT(dropdown != NULL);
+    LV_ASSERT(calendar != NULL);
 
     uint32_t sel = lv_dropdown_get_selected(dropdown);
 
@@ -140,8 +150,11 @@ static void month_event_cb(lv_event_t * e)
 
 static void year_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * dropdown = lv_event_get_current_target(e);
     lv_obj_t * calendar = lv_event_get_user_data(e);
+    LV_ASSERT(dropdown != NULL);
+    LV_ASSERT(calendar != NULL);
 
     uint32_t sel = lv_dropdown_get_selected(dropdown);
 
@@ -165,8 +178,11 @@ static void year_event_cb(lv_event_t * e)
 
 static void value_changed_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * header = lv_event_get_current_target(e);
+    LV_ASSERT(header != NULL);
     lv_obj_t * calendar = lv_obj_get_parent(header);
+    LV_ASSERT(calendar != NULL);
     const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
     lv_obj_t * year_dd = lv_obj_get_child(header, 0);
     lv_obj_t * month_dd = lv_obj_get_child(header, 1);

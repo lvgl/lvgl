@@ -19,6 +19,8 @@ extern "C" {
 
 #if LV_USE_SCALE
 
+#include "../../misc/lv_array.h"
+
 /*********************
  *      DEFINES
  *********************/

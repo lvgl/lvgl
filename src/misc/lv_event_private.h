@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "../lvgl_public.h"
+#include "../misc/lv_array.h"
 
 /*********************
  *      DEFINES
@@ -47,6 +48,13 @@ struct _lv_event_t {
 #if LV_USE_EXT_DATA
     lv_ext_data_t ext_data;
 #endif
+};
+
+struct _lv_event_list_t {
+    lv_array_t array;
+    uint8_t is_traversing: 1;          /**< True: the list is being nested traversed */
+    uint8_t has_marked_deleting: 1;    /**< True: the list has marked deleting objects
+                                         when some of events are marked as deleting */
 };
 
 

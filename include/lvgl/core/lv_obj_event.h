@@ -41,14 +41,16 @@ typedef enum {
  * Send an event to the object
  * @param obj           pointer to an object
  * @param event_code    the type of the event from `lv_event_t`
- * @param param         arbitrary data depending on the widget type and the event. (Usually `NULL`)
+ * @param param         arbitrary data depending on the widget type and the event. @nullable
+ *                      (Usually NULL)
  * @return LV_RESULT_OK: `obj` was not deleted in the event; LV_RESULT_INVALID: `obj` was deleted in the event_code
  */
 lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param);
 
 /**
  * Used by the widgets internally to call the ancestor widget types's event handler
- * @param class_p   pointer to the class of the widget (NOT the ancestor class)
+ * @param class_p   pointer to the class of the widget (NOT the ancestor class). @nullable
+ *                  When NULL the current target's own class is used.
  * @param e         pointer to the event descriptor
  * @return          LV_RESULT_OK: the target object was not deleted in the event; LV_RESULT_INVALID: it was deleted in the event_code
  */
@@ -76,7 +78,7 @@ lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
  * @param obj       pointer to an object
  * @param filter    an event code (e.g. `LV_EVENT_CLICKED`) on which the event should be called. `LV_EVENT_ALL` can be used to receive all the events.
  * @param event_cb  the new event function
- * @param           user_data custom data will be available in `event_cb`
+ * @param           user_data custom data will be available in `event_cb` @nullable
  * @return          handler to the event. It can be used in `lv_obj_remove_event_dsc`.
  */
 lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
@@ -101,7 +103,7 @@ uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
  * Remove an event_cb with user_data
  * @param obj           pointer to a obj
  * @param event_cb      the event_cb of the event to remove
- * @param user_data     user_data
+ * @param user_data     user_data @nullable
  * @return              the count of the event removed
  */
 uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);

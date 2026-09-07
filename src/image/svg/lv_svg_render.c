@@ -7,13 +7,15 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl.h"
-#include "lv_svg_render.h"
+#include "../../lvgl_public.h"
 #if LV_USE_SVG
 
 #include "../../misc/lv_text_private.h"
 #include <math.h>
 #include <string.h>
+#include "lv_svg_render.h"
+#include "../../misc/lv_array.h"
+#include "../../font/lv_font_private.h"
 
 #if LV_USE_FREETYPE
     #include "../../font/freetype/lv_freetype_private.h"
@@ -274,7 +276,7 @@ static void _set_viewport_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t *
             view->height = attr->value.fval;
             break;
         case LV_SVG_ATTR_VIEWBOX: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) {
                     float * vals = attr->value.val;
                     float scale_x = 1.0f;
                     float scale_y = 1.0f;
@@ -296,18 +298,18 @@ static void _set_viewport_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t *
             }
             break;
         case LV_SVG_ATTR_VIEWPORT_FILL: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL
                    && attr->val_type == LV_SVG_ATTR_VALUE_DATA) {
                     dsc->fill_dsc.color = lv_color_to_32(lv_color_hex(attr->value.uval), 0xFF);
                     view->viewport_fill = true;
                 }
-                else if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+                else if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
                     view->viewport_fill = false;
                 }
             }
             break;
         case LV_SVG_ATTR_VIEWPORT_FILL_OPACITY: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) {
                     dsc->fill_dsc.opa = (lv_opa_t)(attr->value.fval * 255.0f);
                 }
             }
@@ -600,7 +602,7 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 } \
                 break; \
             case LV_SVG_ATTR_FONT_SIZE: \
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) { \
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) { \
                     if(attr->val_type == LV_SVG_ATTR_VALUE_DATA) { \
                         if((obj)->font) { \
                             lv_freetype_font_delete((obj)->font); \
@@ -612,7 +614,7 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 } \
                 break; \
             case LV_SVG_ATTR_FONT_STYLE: \
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) { \
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) { \
                     if(attr->val_type == LV_SVG_ATTR_VALUE_PTR) { \
                         if((obj)->font) { \
                             lv_freetype_font_delete((obj)->font); \
@@ -626,7 +628,7 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 } \
                 break; \
             case LV_SVG_ATTR_FONT_WEIGHT: \
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) { \
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) { \
                     if(attr->val_type == LV_SVG_ATTR_VALUE_PTR) { \
                         if((obj)->font) { \
                             lv_freetype_font_delete((obj)->font); \
@@ -640,7 +642,7 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 } \
                 break; \
             case LV_SVG_ATTR_FONT_VARIANT: \
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) { \
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) { \
                     if(attr->val_type == LV_SVG_ATTR_VALUE_PTR) { \
                         if((obj)->font) { \
                             lv_freetype_font_delete((obj)->font); \
@@ -710,7 +712,7 @@ static void _set_image_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * ds
             }
             break;
         case LV_SVG_ATTR_PRESERVE_ASPECT_RATIO: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) {
                     image->ratio = attr->value.uval;
                 }
             }
@@ -723,13 +725,13 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
     LV_UNUSED(obj);
     switch(attr->id) {
         case LV_SVG_ATTR_FILL: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
                     dsc->fill_dsc.opa = LV_OPA_0;
                     obj->flags |= _RENDER_ATTR_FILL_OPACITY;
                     obj->flags |= _RENDER_ATTR_FILL;
                     return;
                 }
-                else if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                else if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_FILL;
                     return;
                 }
@@ -754,13 +756,13 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
                     dsc->stroke_dsc.opa = LV_OPA_0;
                     obj->flags |= _RENDER_ATTR_STROKE_OPACITY;
                     obj->flags |= _RENDER_ATTR_STROKE;
                     return;
                 }
-                else if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                else if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE;
                     return;
                 }
@@ -786,7 +788,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_FILL_OPACITY: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_FILL_OPACITY;
                     return;
                 }
@@ -795,7 +797,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_OPACITY: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_OPACITY;
                     return;
                 }
@@ -804,7 +806,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_FILL_RULE: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_FILL_RULE;
                     return;
                 }
@@ -813,7 +815,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_WIDTH: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_WIDTH;
                     return;
                 }
@@ -822,7 +824,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_LINECAP: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_LINECAP;
                     return;
                 }
@@ -831,7 +833,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_LINEJOIN: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_LINEJOIN;
                     return;
                 }
@@ -840,7 +842,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_MITER_LIMIT: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_MITER_LIMIT;
                     return;
                 }
@@ -849,12 +851,12 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_DASH_ARRAY: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
                     lv_array_clear(&(dsc->stroke_dsc.dash_pattern));
                     obj->flags |= _RENDER_ATTR_STROKE_DASH_ARRAY;
                     return;
                 }
-                else if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                else if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_DASH_ARRAY;
                     return;
                 }
@@ -890,7 +892,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
 static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr)
 {
     if(attr->id == LV_SVG_ATTR_TRANSFORM) {
-        if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+        if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
             return;
         }
         lv_memcpy(&(obj->matrix), attr->value.val, sizeof(lv_matrix_t));
@@ -1645,8 +1647,8 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
                         continue;
                     }
                     lv_font_glyph_dsc_t g;
-                    lv_font_get_glyph_dsc(text->font, &g, content->letters[j], '\0');
-                    lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap(&g, NULL);
+                    lv_font_get_glyph_dsc_internal(text->font, &g, content->letters[j], '\0');
+                    lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap_internal(&g, NULL);
                     lv_vector_path_clear(glyph_path);
                     lv_vector_path_copy(glyph_path, p);
                     uint32_t letter_w = g.box_w > 0 ? g.box_w : g.adv_w;
@@ -1714,8 +1716,8 @@ static void _render_span(const lv_svg_render_content_t * content, lv_draw_vector
                 continue;
             }
             lv_font_glyph_dsc_t g;
-            lv_font_get_glyph_dsc(span->font, &g, content->letters[j], '\0');
-            lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap(&g, NULL);
+            lv_font_get_glyph_dsc_internal(span->font, &g, content->letters[j], '\0');
+            lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap_internal(&g, NULL);
             lv_vector_path_clear(glyph_path);
             lv_vector_path_copy(glyph_path, p);
             uint32_t letter_w = g.box_w > 0 ? g.box_w : g.adv_w;
@@ -1789,7 +1791,7 @@ static void _get_line_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 static void _get_poly_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
-    lv_area_copy(area, &poly->bounds);
+    *area = poly->bounds;
 }
 
 static void _get_group_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
@@ -1841,13 +1843,13 @@ static void _get_use_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 static void _get_text_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_text_t * text = (lv_svg_render_text_t *)obj;
-    lv_area_copy(area, &text->bounds);
+    *area = text->bounds;
 }
 
 static void _get_tspan_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_tspan_t * tspan = (lv_svg_render_tspan_t *)obj;
-    lv_area_copy(area, &tspan->bounds);
+    *area = tspan->bounds;
 }
 #endif
 
@@ -2500,11 +2502,11 @@ lv_svg_render_obj_t * lv_svg_render_create(const lv_svg_node_t * svg_doc)
     return state.list;
 }
 
-void lv_svg_render_delete(lv_svg_render_obj_t * list)
+void lv_svg_render_delete(lv_svg_render_obj_t * render)
 {
-    while(list) {
-        lv_svg_render_obj_t * obj = list;
-        list = list->next;
+    while(render) {
+        lv_svg_render_obj_t * obj = render;
+        render = render->next;
 
         _deinit_draw_dsc(&(obj->dsc));
 
@@ -2580,9 +2582,8 @@ void lv_draw_svg_render(lv_draw_vector_dsc_t * dsc, const lv_svg_render_obj_t * 
 
 void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc)
 {
-    if(!svg_doc) {
-        return;
-    }
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(svg_doc != NULL, return);
 
     lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(layer);
     lv_svg_render_obj_t * list = lv_svg_render_create(svg_doc);

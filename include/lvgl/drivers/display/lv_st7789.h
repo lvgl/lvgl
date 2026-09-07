@@ -40,8 +40,8 @@ typedef lv_lcd_send_color_cb_t lv_st7789_send_color_cb_t;
  * @param hor_res       horizontal resolution
  * @param ver_res       vertical resolution
  * @param flags         default configuration settings (mirror, RGB ordering, etc.)
- * @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
- * @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
+ * @param send_cmd_cb   platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
+ * @param send_color_cb platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
  * @return              pointer to the created display
  */
 lv_display_t * lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,

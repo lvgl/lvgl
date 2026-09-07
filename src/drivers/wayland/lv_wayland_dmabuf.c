@@ -9,7 +9,7 @@
 
 #include "lv_wayland_dmabuf.h"
 
-#if LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF
+#if LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF_PROTOCOL
 
 #include <string.h>
 #include <unistd.h>
@@ -123,12 +123,51 @@ bool lv_wayland_dmabuf_registry_handle_global(lv_wayland_dmabuf_ctx_t * ctx, str
     return true;
 }
 
+bool lv_wayland_dmabuf_commit_creation(lv_wayland_dmabuf_ctx_t * ctx)
+{
+    LV_UNUSED(ctx);
+    int flush_ret = wl_display_flush(lv_wl_ctx.wl_display);
+    if(flush_ret < 0 && errno != EAGAIN) {
+        LV_LOG_ERROR("wl_display_flush failed: %s", strerror(errno));
+        return false;
+    }
+    int roundtrip_ret = wl_display_roundtrip(lv_wl_ctx.wl_display);
+    if(roundtrip_ret < 0) {
+        LV_LOG_ERROR("wl_display_roundtrip failed: %s", strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+bool lv_wayland_dmabuf_buffer_is_valid(const lv_wayland_dmabuf_buffer_t * buf)
+{
+    LV_ASSERT(buf != NULL);
+    return buf->wl_buffer != NULL;
+}
+
+bool lv_wayland_dmabuf_buffer_is_ready(const lv_wayland_dmabuf_buffer_t * buf)
+{
+    LV_ASSERT(buf != NULL);
+    return !buf->busy;
+}
+
+void lv_wayland_dmabuf_buffer_attach(lv_wayland_dmabuf_ctx_t * ctx, struct wl_surface * surface,
+                                     lv_wayland_dmabuf_buffer_t * buf,
+                                     uint32_t width, uint32_t height)
+{
+    LV_ASSERT(buf != NULL);
+    LV_ASSERT(surface != NULL);
+    LV_ASSERT(width > 0);
+    LV_ASSERT(height > 0);
+    LV_UNUSED(ctx);
+    wl_surface_attach(surface, buf->wl_buffer, 0, 0);
+    wl_surface_damage(surface, 0, 0, width, height);
+    wl_surface_commit(surface);
+    buf->busy = true;
+}
+
 uint32_t lv_wayland_dmabuf_cf_to_drm(lv_color_format_t cf)
 {
-    if(cf == LV_COLOR_FORMAT_UNKNOWN) {
-        return DRM_FORMAT_ARGB8888; /* Default to ARGB8888 */
-    }
-
     switch(cf) {
         case LV_COLOR_FORMAT_XRGB8888:
             return DRM_FORMAT_XRGB8888;
@@ -138,20 +177,22 @@ uint32_t lv_wayland_dmabuf_cf_to_drm(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
             return DRM_FORMAT_RGB565;
         default:
-            return DRM_FORMAT_ARGB8888;
+            return 0;
     }
 }
 
 void lv_wayland_dmabuf_create_buffer(lv_wayland_dmabuf_ctx_t * ctx, lv_wayland_dmabuf_buffer_t * buf,
                                      int dmabuf_fd, uint32_t width, uint32_t height,
-                                     uint32_t stride, uint32_t offset, uint32_t drm_cf)
+                                     uint32_t stride, uint32_t offset, uint32_t drm_cf,
+                                     uint64_t modifier)
 {
     /* Will be set on the create callback if the creation is successful */
     buf->wl_buffer = NULL;
 
     struct zwp_linux_buffer_params_v1 * params = zwp_linux_dmabuf_v1_create_params(ctx->handler);
 
-    zwp_linux_buffer_params_v1_add(params, dmabuf_fd, 0, offset, stride, 0, 0);
+    zwp_linux_buffer_params_v1_add(params, dmabuf_fd, 0, offset, stride,
+                                   (uint32_t)(modifier >> 32), (uint32_t)(modifier & 0xFFFFFFFF));
 
     zwp_linux_buffer_params_v1_add_listener(params, &params_listener, buf);
     zwp_linux_buffer_params_v1_create(params, width, height, drm_cf, 0);
@@ -334,4 +375,4 @@ static void dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dm
     }
 }
 
-#endif /*LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF*/
+#endif /*LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF_PROTOCOL*/

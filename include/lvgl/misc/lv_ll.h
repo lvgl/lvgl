@@ -129,7 +129,7 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p);
  * Remove the node 'node_p' from 'll_p' linked list.
  * It does not free the memory of node.
  * @param ll_p pointer to the linked list of 'node_p'
- * @param node_p pointer to node in 'll_p' linked list
+ * @param node_p pointer to node in 'll_p' linked list @nullable
  */
 void lv_ll_remove(lv_ll_t * ll_p, void * node_p);
 
@@ -140,7 +140,8 @@ void lv_ll_remove(lv_ll_t * ll_p, void * node_p);
  * the callback is then responsible for both releasing any owned sub-resources
  * and freeing the node block itself.
  * @param ll_p    pointer to linked list
- * @param cleanup optional per-node cleanup callback, or NULL for a plain free
+ * @param cleanup optional per-node cleanup callback. @nullable When NULL the nodes
+ *                are freed with lv_free().
  */
 void lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *));
 
@@ -210,7 +211,8 @@ void lv_ll_swap(lv_ll_t * ll_p, void * n1_p, void * n2_p);
  *
  * @param ll_p pointer to a linked list
  * @param n_act pointer to node to move
- * @param n_after pointer to a node which should be after `n_act`
+ * @param n_after pointer to a node which should be after `n_act`. @nullable When NULL
+ *                `n_act` is moved to the tail.
  */
 void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after);
 

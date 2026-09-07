@@ -92,21 +92,26 @@ lv_display_t * lv_ili9341_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag
 
 void lv_ili9341_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_set_gap(disp, x, y);
 }
 
 void lv_ili9341_set_invert(lv_display_t * disp, bool invert)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_set_invert(disp, invert);
 }
 
 void lv_ili9341_set_gamma_curve(lv_display_t * disp, uint8_t gamma)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_lcd_generic_mipi_set_gamma_curve(disp, gamma);
 }
 
 void lv_ili9341_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(cmd_list != NULL, return);
     lv_lcd_generic_mipi_send_cmd_list(disp, cmd_list);
 }
 

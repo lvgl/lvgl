@@ -596,7 +596,7 @@ static inline uint32_t LV_EVE_BITMAP_LAYOUT_H(uint16_t linestride, uint16_t heig
 //#define LV_EVE_BITMAP_SIZE_H(width,height) ((LV_EVE_DL_BITMAP_SIZE_H) | (((((width) & 0x600U) >> 9U) & 3UL) << 2U) | ((((height) & 0x600U) >> 9U) & 3UL))
 /**
  * @brief Set the 2 most significant bits of bitmaps dimension for the current handle.
- * @param linestride 11-bit value of bitmap width, the 2 most significant bits are used
+ * @param width      11-bit value of bitmap width, the 2 most significant bits are used
  * @param height 11-bit value of bitmap width, the 2 most significant bits are used
  * @note this is different to FTDIs implementation as this takes the original values as parameters and not only the upper bits
  * @return a 32 bit word for use with EVE_cmd_dl()

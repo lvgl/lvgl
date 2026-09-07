@@ -32,9 +32,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
+static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
 static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size);
 /**********************
@@ -114,18 +114,19 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         else {
             const lv_image_dsc_t * img_dsc = dsc->src;
             const uint32_t data_size = img_dsc->data_size;
-            size = img_dsc->data + 16;
 
-            if(data_size < sizeof(magic)) return LV_RESULT_INVALID;
+            if(data_size < sizeof(buf)) return LV_RESULT_INVALID;
             if(lv_memcmp(img_dsc->data, magic, sizeof(magic)) != 0) return LV_RESULT_INVALID;
+
+            size = img_dsc->data + 16;
         }
 
         /*Save the data in the header*/
         header->cf = LV_COLOR_FORMAT_ARGB8888;
 
         /*The width and height are stored in Big endian format*/
-        uint32_t width = (size[0] << 24) + (size[1] << 16) + (size[2] << 8) + size[3];
-        uint32_t height = (size[4] << 24) + (size[5] << 16) + (size[6] << 8) + size[7];
+        uint32_t width = ((uint32_t)size[0] << 24) + ((uint32_t)size[1] << 16) + ((uint32_t)size[2] << 8) + (uint32_t)size[3];
+        uint32_t height = ((uint32_t)size[4] << 24) + ((uint32_t)size[5] << 16) + ((uint32_t)size[6] << 8) + (uint32_t)size[7];
 
         /*Avoid attempting to load images LVGL cannot use*/
         if(width > UINT16_MAX || height > UINT16_MAX) return LV_RESULT_INVALID;
@@ -268,7 +269,7 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
 
 /**
  * Convert subpixel order from LodePNG to LVGL
- * @param img the LodePNG RGBA8888 image to be converted in-place to LVGL BGRA8888
+ * @param img_p the LodePNG RGBA8888 image to be converted in-place to LVGL BGRA8888
  * @param px_cnt number of pixels in `img`
  */
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)
