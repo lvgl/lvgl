@@ -12,12 +12,24 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
     LV_UNUSED(px_map);
 }
+
+static void indev_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
+{
+    LV_UNUSED(indev);
+    data->state = LV_INDEV_STATE_RELEASED;
+}
+
 int main(void)
 {
     lv_init();
     lv_display_t * display = lv_display_create(WIDTH, HEIGHT);
     lv_display_set_buffers(display, buffer, NULL, sizeof(buffer), LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(display, flush_cb);
+
+    lv_indev_t * indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev, indev_read_cb);
+
     LV_IMAGE_DECLARE(lvgl_logo);
     lv_obj_t * image = lv_image_create(lv_screen_active());
     lv_image_set_src(image, &lvgl_logo);
