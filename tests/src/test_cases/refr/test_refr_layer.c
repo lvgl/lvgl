@@ -274,4 +274,16 @@ void test_refr_children_of_a_transparent_parent_are_skipped(void)
     ASSERT_PX_EQ(REFR_COLOR_BLACK, refr_screen_px(15, 15));
 }
 
+void test_refr_without_active_screen(void)
+{
+    lv_display_t * disp = lv_display_get_default();
+    lv_obj_t * scr = disp->act_scr;
+
+    disp->act_scr = NULL;
+    lv_refr_now(disp);
+    disp->act_scr = scr;
+    /* if no assertion fired we're good*/
+    TEST_PASS();
+}
+
 #endif /*LV_BUILD_TEST*/
