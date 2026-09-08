@@ -68,4 +68,10 @@ config LV_LINUX_FBDEV_MMAP
 	help
 		Access the framebuffer through mmap() instead of write() calls.
 
+config LV_LINUX_FBDEV_VSYNC
+	bool "Synchronize flushes with vsync"
+	default n
+	help
+	  Wait for vsync before writing to the framebuffer to reduce tearing
+
 endif #LV_USE_LINUX_FBDEV

@@ -254,6 +254,10 @@
     #error "LV_LINUX_FBDEV_BSD requires LV_USE_LINUX_FBDEV (Kconfig depends on)"
 #endif
 
+#if LV_LINUX_FBDEV_VSYNC && !(LV_USE_LINUX_FBDEV)
+    #error "LV_LINUX_FBDEV_VSYNC requires LV_USE_LINUX_FBDEV (Kconfig depends on)"
+#endif
+
 #if (LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341 || LV_USE_NV3007) && !LV_USE_GENERIC_MIPI
     #error "LV_USE_GENERIC_MIPI must be enabled: Kconfig selects it from LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341 || LV_USE_NV3007"
 #endif

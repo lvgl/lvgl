@@ -1577,6 +1577,9 @@
 /** Access the framebuffer through mmap() instead of write() calls. */
 #define LV_LINUX_FBDEV_MMAP 1
 
+/** Wait for vsync before writing to the framebuffer to reduce tearing */
+#define LV_LINUX_FBDEV_VSYNC 0
+
 #endif /*LV_USE_LINUX_FBDEV*/
 
 /** Driver for FT81X EVE graphics controllers connected over SPI. */

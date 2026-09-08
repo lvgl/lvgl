@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include LV_STDDEF_INCLUDE
+#include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -53,7 +54,6 @@ struct bsd_fb_fix_info {
 
 typedef struct {
     const char * devname;
-    lv_color_format_t color_format;
 #if LV_LINUX_FBDEV_BSD
     struct bsd_fb_var_info vinfo;
     struct bsd_fb_fix_info finfo;
@@ -65,12 +65,15 @@ typedef struct {
     char * fbp;
 #endif
     uint8_t * rotated_buf;
+    uint8_t * draw_buf_1;
+    uint8_t * draw_buf_2;
     size_t rotated_buf_size;
     long int screensize;
     int fbfd;
+    lv_color_format_t color_format;
     bool force_refresh;
-    uint8_t * draw_buf_1;
-    uint8_t * draw_buf_2;
+    bool wait_vsync_next;
+    bool vsync_supported;
 } lv_linux_fb_t;
 
 /**********************
@@ -115,6 +118,10 @@ lv_display_t * lv_linux_fbdev_create(void)
         return NULL;
     }
     dsc->fbfd = -1;
+    /* assume supported by default*/
+    dsc->vsync_supported = true;
+    /* sync on first flush*/
+    dsc->wait_vsync_next = true;
     lv_display_set_driver_data(disp, dsc);
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_add_event_cb(disp, del_event_cb, LV_EVENT_DELETE, NULL);
@@ -329,9 +336,22 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     }
 #endif
 
+    /* Wait once per frame before drawing the next frame */
+    if(LV_LINUX_FBDEV_VSYNC && dsc->vsync_supported && dsc->wait_vsync_next) {
+        uint32_t dummy = 0;
+        if(ioctl(dsc->fbfd, FBIO_WAITFORVSYNC, &dummy) == -1) {
+            /* Disable the optional wait if the framebuffer does not support FBIO_WAITFORVSYNC*/
+            LV_LOG_WARN("FBIO_WAITFORVSYNC unsupported (%s); disabling vsync wait", strerror(errno));
+            dsc->vsync_supported = false;
+        }
+    }
+
+
     const bool wait_for_last_flush = LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_FULL;
     const bool is_last_flush = lv_display_flush_is_last(disp);
     const bool skip_flush = wait_for_last_flush && !is_last_flush;
+    /* wait for vsync every first frame*/
+    dsc->wait_vsync_next = is_last_flush;
 
     if(skip_flush) {
         lv_display_flush_ready(disp);
