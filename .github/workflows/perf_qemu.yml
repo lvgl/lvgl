@@ -41,7 +41,7 @@ jobs:
     # Published by the "QEMU Benchmark Image" workflow, which prints the digest to pin
     # here. The counts are only comparable across runs while this does not move, so it
     # should change deliberately. `container` takes no expressions, hence the literal.
-    container: ghcr.io/lvgl/lv-perf-qemu:1
+    container: ghcr.io/lvgl/lv-perf-qemu@sha256:66cf814ae11c32e4eba451e95b30b24fa53b181c8f1f8bd47c2edc5ec59d2a77
     strategy:
       fail-fast: false
       matrix:

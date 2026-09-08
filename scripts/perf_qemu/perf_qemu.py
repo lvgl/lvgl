@@ -63,6 +63,7 @@ CI_OPT = "O2"
 SC_RE = re.compile(r"^#SC\t(\S+)\t(\d+)$", re.M)
 TOTAL_RE = re.compile(r"^#TOTAL\t(\d+)\t(\d+)$", re.M)
 MEM_RE = re.compile(r"^#MEM\t(\d+)\t(\d+)$", re.M)
+ERR_RE = re.compile(r"^#ERR\t(.*)$", re.M)
 
 # A heap this full is close enough to thrashing the cache that the counts stop being a
 # property of the code alone
@@ -144,6 +145,12 @@ def parse(label: str, out: str) -> dict:
     total = TOTAL_RE.search(out)
     if not scenes or not total:
         raise RuntimeError(f"{label}: no #SC or #TOTAL in the run output:\n" + out[-2000:])
+
+    # The target reports its own problems this way. A framebuffer it could not write would
+    # otherwise just be missing from the reference comparison, which would pass.
+    errors = ERR_RE.findall(out)
+    if errors:
+        raise RuntimeError(f"{label}: the run reported " + "; ".join(errors))
     data = {"scenes": scenes, "total": int(total.group(1)), "frames": int(total.group(2))}
 
     mem = MEM_RE.search(out)
@@ -274,6 +281,15 @@ def main() -> int:
 
     args.out.mkdir(parents=True, exist_ok=True)
 
+    # A narrowed run in a directory a wider one already used would otherwise leave the
+    # older targets' files behind, and report.py reads every results-*.json it finds.
+    # Compared against what was asked for, not what is left after --reuse filters it.
+    requested = set(targets)
+    for stale in args.out.glob("results-*.json"):
+        if stale.name[len("results-"):-len(".json")] not in requested:
+            print(f"removing {stale.name}, not part of this run")
+            stale.unlink()
+
     if args.reuse:
         fresh = [t for t in targets if not is_current(args.out / f"results-{t}.json", settings)]
         for target in sorted(set(targets) - set(fresh)):
@@ -282,8 +298,11 @@ def main() -> int:
             return 0
         targets = fresh
 
-    runs = [(t, suite, f, scene)
-            for t in targets for suite, scene in selection for f in formats]
+    # Deduplicated: the same (target, suite, format) twice would be two runs writing the
+    # same framebuffer dumps at the same time.
+    runs = list(dict.fromkeys(
+        (t, suite, f, scene)
+        for t in targets for suite, scene in selection for f in formats))
     if args.gdb is not None and len(runs) != 1:
         print(f"--gdb needs exactly one run selected, not {len(runs)}. Narrow it down with "
               f"--targets, --suites and --formats.", file=sys.stderr)
@@ -309,7 +328,17 @@ def main() -> int:
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as pool:
         for job, data in pool.map(do_run, runs):
             target, suite, cf, scene = job
-            results[target]["suites"][f"{suite}_{cf}"] = data
+            key = f"{suite}_{cf}"
+            # Two scenes of the same suite share a key, so merge rather than overwrite
+            have = results[target]["suites"].get(key)
+            if have:
+                have["scenes"].update(data["scenes"])
+                have["total"] += data["total"]
+                have["frames"] += data["frames"]
+                if "heap" in data:
+                    have["heap"] = data["heap"]
+            else:
+                results[target]["suites"][key] = data
             shown = f"{suite}:{scene}" if scene else suite
             print(f"{target} {shown} {cf}: {data['total']} instructions", flush=True)
 

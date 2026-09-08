@@ -523,6 +523,17 @@ static void benchmark_start(uint32_t first, uint32_t last)
     scene_act = first;
     scene_last = last;
 
+    /*The measurements accumulate into the scene table, so a second run would report the
+     *first one's numbers as well as its own*/
+    uint32_t i;
+    for(i = 0; i < scene_cnt(); i++) {
+        scenes[i].cpu_avg_usage = 0;
+        scenes[i].fps_avg = 0;
+        scenes[i].render_avg_time = 0;
+        scenes[i].flush_avg_time = 0;
+        scenes[i].measurement_cnt = 0;
+    }
+
     lv_obj_t * scr = lv_screen_active();
     lv_obj_remove_style_all(scr);
     lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);

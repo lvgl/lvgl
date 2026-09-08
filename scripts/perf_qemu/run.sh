@@ -39,9 +39,10 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
 
-# CI pins this by digest. Locally the tag is enough, and run.sh builds the image if it is
-# neither present nor pullable.
-IMAGE="${PERF_QEMU_IMAGE:-ghcr.io/lvgl/lv-perf-qemu:1}"
+# Pinned by digest, not by tag: republishing :1 would change every count without an LVGL
+# change, and a stale local copy of the tag would disagree with a fresh pull in CI. Update
+# this and perf_qemu.yml's `container:` together whenever the toolchain image changes.
+IMAGE="${PERF_QEMU_IMAGE:-ghcr.io/lvgl/lv-perf-qemu@sha256:66cf814ae11c32e4eba451e95b30b24fa53b181c8f1f8bd47c2edc5ec59d2a77}"
 
 LVGL="$REPO"
 OUT="$REPO/build/perf_qemu"
@@ -192,11 +193,13 @@ if [ -d "$BASE_REF" ]; then
 elif [ -n "$BASE_REF" ]; then
     # A worktree rather than a checkout, so the working tree being measured is untouched.
     # It is kept between runs, and --reuse then skips the measurement itself as well.
+    # From $LVGL, the tree being measured, not from $REPO where this script lives. With
+    # -l pointing somewhere else the two are different repositories.
     BASE_TREE="$OUT/base-tree"
     if [ -d "$BASE_TREE" ]; then
         git -C "$BASE_TREE" checkout --detach "$BASE_REF"
     else
-        git -C "$REPO" worktree add --detach "$BASE_TREE" "$BASE_REF"
+        git -C "$LVGL" worktree add --detach "$BASE_TREE" "$BASE_REF"
     fi
     echo "baseline: $BASE_REF ($(git -C "$BASE_TREE" rev-parse --short HEAD))"
     docker run "${DOCKER_ARGS[@]}" -v "$BASE_TREE:/base:ro" "$IMAGE" \

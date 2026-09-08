@@ -205,8 +205,14 @@ def main() -> int:
     if not base:
         icon = "warn" if refs else "info"
         summary = f"{len(new)} target(s) measured, no baseline to compare against"
+    elif not changes:
+        # A baseline was given but nothing in it lined up with this run, so there is no
+        # comparison to report. Saying "+0.00%" here would be a lie.
+        icon = "warn"
+        summary = ("a baseline was given but none of its targets or suites match this "
+                   "run, so nothing was compared")
     else:
-        worst, best = max(changes, default=0.0), min(changes, default=0.0)
+        worst, best = max(changes), min(changes)
         if best <= -NOTABLE_PCT and worst < NOTABLE_PCT:
             icon = "down"
         elif worst >= NOTABLE_PCT:

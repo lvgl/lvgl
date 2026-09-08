@@ -16,7 +16,13 @@ SECTIONS {
         *(.sdata*)
     } > RAM
 
-    .bss (NOLOAD) : { _sbss = .; *(.bss*) *(.sbss*) *(COMMON) . = ALIGN(8); _ebss = .; } > RAM
+    /* .sbss has to sit next to .sdata, inside the 2 KB window gp can reach. Left at the
+     * end of .bss it lands past the whole LVGL heap, megabytes away, and the linker's
+     * gp relaxation silently stops applying to every small global: the startup file's
+     * `la gp` is then wasted and the counts are higher than a normal RISC-V build's. */
+    .sbss (NOLOAD) : { _sbss = .; *(.sbss*) *(.sbss.*) *(.scommon) } > RAM
+
+    .bss (NOLOAD) : { *(.bss*) *(COMMON) . = ALIGN(8); _ebss = .; } > RAM
 
     . = ALIGN(16);
     /* picolibc's malloc takes its heap from __heap_start/__heap_end */

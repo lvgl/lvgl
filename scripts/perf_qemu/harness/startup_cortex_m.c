@@ -22,7 +22,10 @@ void Reset_Handler(void)
      *instruction raises a NOCP usage fault (CFSR bit 19) that escalates to a hard fault,
      *and the image sits in Default_Handler forever with no output at all.*/
     SCB_CPACR |= (3u << 20) | (3u << 22); /*full access to CP10 and CP11*/
-    __asm__ volatile("dsb\nisb");
+    /*The "memory" clobber is load bearing: a volatile write is not ordered against
+     *ordinary memory accesses, so without it the compiler is free to hoist the clear
+     *below, and its floating point instructions, above this barrier.*/
+    __asm__ volatile("dsb\nisb" ::: "memory");
 
     for(d = &_sbss; d < &_ebss; d++) *d = 0;
     main();

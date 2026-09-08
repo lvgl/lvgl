@@ -21,7 +21,11 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  # contents: write to publish the release. actions: read as well, because naming any
+  # permission sets every unnamed one to none, and dawidd6/action-download-artifact needs
+  # to read the triggering run's artifacts.
   contents: write
+  actions: read
 
 jobs:
   publish:

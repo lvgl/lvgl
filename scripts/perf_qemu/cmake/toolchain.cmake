@@ -2,8 +2,8 @@
 # selected with -DPERF_QEMU_TARGET. The matching QEMU invocation is in perf_qemu.py
 # and the matching linker script and startup file are in harness/targets/<target>.
 #
-# Cortex-M55 uses newlib, the other two picolibc, because that is what Ubuntu ships
-# for each of them.
+# The two Cortex-M targets use newlib and the other two picolibc, because that is what
+# Ubuntu ships for each of them.
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)

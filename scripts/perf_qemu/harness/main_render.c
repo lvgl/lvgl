@@ -78,12 +78,17 @@ int main(void)
             lv_refr_now(disp);
             bench_passes++;
 
+            /*plat_instr() is read every pass, not just around the loop. On Cortex-M it
+             *accumulates a 24 bit SysTick delta, which wraps after a few hundred million
+             *instructions, so the gap between two reads has to stay well inside that. One
+             *frame is; eight of the heaviest scene would be uncomfortably close.*/
             uint64_t t0 = plat_instr();
             uint32_t r;
             for(r = 0; r < RENDER_REPS; r++) {
                 lv_obj_invalidate(lv_screen_active());
                 lv_refr_now(disp);
                 bench_passes++;
+                plat_instr();
             }
             uint64_t instr = (plat_instr() - t0) / RENDER_REPS;
             total += instr;

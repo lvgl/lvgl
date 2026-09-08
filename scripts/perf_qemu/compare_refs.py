@@ -75,12 +75,28 @@ def expand(cf: str, rows: np.ndarray, w: int) -> np.ndarray:
     raise ValueError(f"no expansion for colour format {cf}")
 
 
+# Bits per pixel per colour format, used to check that a dump really is in the format it
+# is being read as. Checked against the stride rather than against the dump header's
+# LV_COLOR_FORMAT_* number, because that number would have to be mirrored here and would
+# then quietly drift out of step with lv_color.h.
+CF_BPP = {
+    "rgb565": 16, "rgb565_swapped": 16, "rgb888": 24, "xrgb8888": 32,
+    "argb8888": 32, "argb8888_premultiplied": 32, "l8": 8, "al88": 16, "i1": 1,
+}
+
+
 def read_dump(path: Path, cf: str) -> np.ndarray:
     """Return the dumped framebuffer as an (h, w, 3) uint8 array of R, G, B."""
     raw = path.read_bytes()
     magic, w, h, _cf, stride = HEADER.unpack_from(raw)
     if magic != DUMP_MAGIC:
         raise ValueError(f"{path}: not a framebuffer dump")
+    bpp = CF_BPP.get(cf)
+    if bpp is None:
+        raise ValueError(f"{path}: no expansion for colour format {cf}")
+    if stride * 8 < w * bpp:
+        raise ValueError(f"{path}: a stride of {stride} bytes cannot hold {w} pixels of "
+                         f"{cf} ({bpp} bpp). A leftover dump from another format?")
 
     body = raw[HEADER.size:]
     expected = stride * h
@@ -146,6 +162,13 @@ def main() -> int:
     ap.add_argument("--tolerance", type=int, default=0,
                     help="per-channel difference that still counts as equal (default 0)")
     args = ap.parse_args()
+
+    # Outside this range the comparison stops meaning anything: below zero every pixel
+    # differs, above 255 none can.
+    if not 0 <= args.tolerance <= 255:
+        print(f"--tolerance must be between 0 and 255, not {args.tolerance}",
+              file=sys.stderr)
+        return 1
 
     dumps = sorted(args.dumps.glob("*.bin"))
     if not dumps:

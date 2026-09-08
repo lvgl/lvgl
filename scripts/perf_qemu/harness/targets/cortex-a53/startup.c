@@ -34,7 +34,11 @@ static uint64_t l1_table[4] __attribute__((aligned(4096)));
 
 void _cstart(void)
 {
-    uint8_t * p;
+    /*volatile so the clear stays byte wise. It runs before the identity map is installed,
+     *where all memory is Device memory, and -O2 would otherwise turn the loop into SIMD
+     *stores that are not valid there. The map cannot be installed first, because its page
+     *table lives in the .bss this clears.*/
+    volatile uint8_t * p;
     uint64_t v;
 
     for(p = _sbss; p < _ebss; p++) *p = 0;
