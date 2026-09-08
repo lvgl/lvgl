@@ -130,25 +130,28 @@ def build_tables(pr, master, pr_symbols, master_symbols):
 
     for target, configs in pr.items():
         for config, sizes in configs.items():
+            flash_kb = sizes["flash"] / 1000
+            ram_kb = sizes["ram"] / 1000
             base = master.get(target, {}).get(config)
             if not master:
                 lines.append(
-                    f"| {target} | {config} | {sizes['flash']} B | {sizes['ram']} B |"
+                    f"| {target} | {config} | {flash_kb:.3f} KB | {ram_kb:.3f} KB |"
                 )
                 continue
             if not base:
                 lines.append(
-                    f"| {target} | {config} | {sizes['flash']} B | n/a | n/a | "
-                    f"{sizes['ram']} B | n/a |"
+                    f"| {target} | {config} | {flash_kb:.3f} KB | n/a | n/a | "
+                    f"{ram_kb:.3f} KB | n/a |"
                 )
                 continue
+            base_flash_kb = base["flash"] / 1000
 
             mark = is_notable(sizes["flash"], base["flash"])
             notable = notable or mark
             lines.append(
-                f"| {target} | {config} | {sizes['flash']} B | {base['flash']} B | "
+                f"| {target} | {config} | {flash_kb} KB | {base_flash_kb} KB | "
                 f"{fmt_delta(sizes['flash'], base['flash'], mark)} | "
-                f"{sizes['ram']} B | {fmt_delta(sizes['ram'], base['ram'])} |"
+                f"{ram_kb} KB | {fmt_delta(sizes['ram'], base['ram'])} |"
             )
 
             if mark:
@@ -180,16 +183,18 @@ def build_tables(pr, master, pr_symbols, master_symbols):
             lib = sizes.get("library", {}).get("size")
             if lib is None:
                 continue
+            lib_kb = lib / 1000
             base = master.get(target, {}).get(config, {}).get("library", {}).get("size")
             if not master:
-                lines.append(f"| {target} | {config} | {lib} B |")
+                lines.append(f"| {target} | {config} | {lib_kb} KB |")
             elif base is None:
-                lines.append(f"| {target} | {config} | {lib} B | n/a | n/a |")
+                lines.append(f"| {target} | {config} | {lib_kb} KB | n/a | n/a |")
             else:
+                base_kb = base / 1000
                 mark = is_notable(lib, base)
                 notable = notable or mark
                 lines.append(
-                    f"| {target} | {config} | {lib} B | {base} B | "
+                    f"| {target} | {config} | {lib_kb} KB | {base_kb} KB | "
                     f"{fmt_delta(lib, base, mark)} |"
                 )
 
