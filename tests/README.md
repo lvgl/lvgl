@@ -104,6 +104,13 @@ lvgl_add_test_folder_if(NOT CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL test_cases/public
 
 See [`lvgl_test_helpers.cmake`](./lvgl_test_helpers.cmake).
 
+### Public API tests
+
+LVGL test run with `LV_CHECK_ARG_ASSERT_ON_FAIL` to ensure LVGL internals respect 
+its public API. The test cases that check that a public function behaves correctly when 
+invalid parameters are passed exist in `src/test_cases/public_api`. These tests are only 
+exercised when `LV_CHECK_ARG_ASSERT_ON_FAIL` is disabled.
+
 ## Add new tests
 
 ### Create new test file
