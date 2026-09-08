@@ -392,7 +392,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
         lv_indev_t * indev = lv_event_get_indev(e);
         invalidate_button_area(obj, btnm->btn_id_sel);
 
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
+        lv_indev_type_t indev_type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
         if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
             uint32_t btn_pr;
             /*Search the pressed area*/
@@ -485,13 +485,10 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
         if(btnm->btn_cnt == 0) return;
 
         lv_indev_t * indev = lv_event_get_indev(e);
-        lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
         /*If not focused by an input device assume the last input device*/
-        if(indev == NULL) {
-            indev = lv_indev_get_next(NULL);
-            indev_type = lv_indev_get_type(indev);
-        }
+        if(indev == NULL) indev = lv_indev_get_next(NULL);
+        lv_indev_type_t indev_type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
 
         bool editing = lv_group_get_editing(lv_obj_get_group(obj));
         /*Focus the first button if there is not selected button*/
