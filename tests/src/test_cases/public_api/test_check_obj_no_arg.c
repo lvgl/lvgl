@@ -2,7 +2,7 @@
 /* Variant: LV_USE_CHECK_ARG=0 */
 #define LV_USE_CHECK_ARG 0
 #include "../lvgl.h"
-#include "test_cases/test_check_obj_impl.h"
+#include "test_cases/public_api/test_check_obj_impl.h"
 
 void setUp(void)
 {
