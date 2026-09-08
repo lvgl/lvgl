@@ -1,4 +1,5 @@
 name: Memory Usage
+
 on:
   push:
     branches: ["**"]
@@ -10,6 +11,10 @@ on:
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
 
 env:
   ARM_TOOLCHAIN_URL: https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
@@ -69,16 +74,83 @@ jobs:
           } >> "$GITHUB_PATH"
 
       - name: Build and measure every target and configuration
+        id: measure
         working-directory: tests/test_memory_usage
         run: ./measure.py --out "$GITHUB_WORKSPACE/results/size-results.json"
 
-      - name: Save PR metadata
-        if: github.event_name == 'pull_request'
+      # --- Baseline: the base branch's last successful run, else build it here ---
+      - name: Find the base branch's latest successful run
+        id: base_run
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRuns({
+              ...context.repo,
+              workflow_id: "memory_usage.yml",
+              branch: context.payload.pull_request.base.ref,
+              status: "success",
+              per_page: 1,
+            });
+            return data.workflow_runs.length ? String(data.workflow_runs[0].id) : "";
+          result-encoding: string
+
+      - name: Download the baseline measurements
+        if: ${{ !cancelled() && steps.base_run.outputs.result != '' }}
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: flash-usage-results
+          path: baseline
+          run-id: ${{ steps.base_run.outputs.result }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check out the base branch
+        id: base_src
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && hashFiles('baseline/size-results.json') == '' }}
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          path: base-src
+
+      - name: Measure the base branch
+        if: ${{ !cancelled() && steps.base_src.outcome == 'success' }}
+        continue-on-error: true
+        working-directory: base-src/tests/test_memory_usage
+        run: ./measure.py --out "$GITHUB_WORKSPACE/baseline/size-results.json"
+
+      # --- Report ---
+      - name: Build the PR report section
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
         run: |
-          echo "${{ github.event.pull_request.number }}" > results/pr_number.txt
-          echo "${{ github.event.pull_request.head.sha }}" > results/pr_sha.txt
+          set -euo pipefail
+          if [ "${{ steps.measure.outcome }}" != "success" ]; then
+            python3 scripts/pr_report/pr_report.py emit \
+              --output reports/memory_usage.json \
+              --section "Memory Usage" --icon warn \
+              --summary "not available, the build did not finish"
+            exit 0
+          fi
+
+          master_arg=()
+          if [ -f baseline/size-results.json ]; then
+            master_arg=(--master baseline)
+          fi
+
+          tests/test_memory_usage/report.py \
+            --pr results "${master_arg[@]}" \
+            --pr-report reports/memory_usage.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the PR report
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-report-memory-usage
+          path: reports/
+          if-no-files-found: ignore
 
       - name: Upload results artifact
+        if: ${{ !cancelled() && steps.measure.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: flash-usage-results

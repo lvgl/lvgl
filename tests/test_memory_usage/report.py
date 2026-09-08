@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
 """
-Render the results of measure.py as a Markdown table for a pull request comment.
+Render the results of measure.py.
+
+Prints the tables as Markdown on stdout, and with --pr-report also emits the
+"Memory Usage" section of the shared PR report comment.
+
+    ./report.py --pr results/pr --master results/master \
+                --pr-report reports/memory_usage.json
+
+Each of --pr and --master is a directory produced by measure.py: a
+`size-results.json` plus a `symbols/` directory. --master is optional; without it
+the PR's own numbers are reported with no comparison.
 """
 
 import argparse
 import json
 import os
+import statistics
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "scripts"))
 
 MARKER = "## 📦 Flash / RAM usage"
 
@@ -16,6 +31,9 @@ NOTABLE_REL = 0.005
 
 # How many symbols to list when a row is worth explaining.
 TOP_SYMBOLS = 15
+
+# The whole matrix would otherwise be able to bury the rest of the PR comment.
+MAX_SYMBOL_SECTIONS = 3
 
 
 def load(directory):
@@ -48,6 +66,10 @@ def fmt_delta(now, before, mark=False):
     return f"⚠️ {text}" if mark else text
 
 
+def pct(now, before):
+    return (now - before) / before * 100.0 if before else 0.0
+
+
 def symbol_table(pr_symbols, master_symbols):
     """The symbols that moved most, so a regression says where and not just how much."""
     names = set(pr_symbols) | set(master_symbols)
@@ -68,29 +90,43 @@ def symbol_table(pr_symbols, master_symbols):
     return lines
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser.add_argument("--pr", required=True, help="directory with the PR's results")
-    parser.add_argument("--master", help="directory with master's results")
-    args = parser.parse_args()
+def collect(pr, master):
+    """One record per target and configuration that can be compared with master."""
+    rows = []
+    for target, configs in pr.items():
+        for config, sizes in configs.items():
+            base = master.get(target, {}).get(config)
+            if not base:
+                continue
+            lib = sizes.get("library", {}).get("size")
+            lib_base = base.get("library", {}).get("size")
+            rows.append(
+                {
+                    "target": target,
+                    "config": config,
+                    "flash": sizes["flash"],
+                    "flash_base": base["flash"],
+                    "ram": sizes["ram"],
+                    "ram_base": base["ram"],
+                    "lib": lib,
+                    "lib_base": lib_base,
+                }
+            )
+    return rows
 
-    pr, pr_symbols = load(args.pr)
-    master, master_symbols = load(args.master)
 
-    lines = [MARKER, ""]
-    details = []
-    notable = False
-
-    lines.append("### Linked image (`--gc-sections`)")
-    lines.append("")
+def build_tables(pr, master, pr_symbols, master_symbols):
+    """The full matrix, shared by the standalone output and the PR report section."""
+    lines = ["### Linked image (`--gc-sections`)", ""]
     if master:
         lines.append("| Target | Config | Flash | master | Δ Flash | RAM | Δ RAM |")
         lines.append("|---|---|---:|---:|---:|---:|---:|")
     else:
         lines.append("| Target | Config | Flash | RAM |")
         lines.append("|---|---|---:|---:|")
+
+    notable = False
+    drilldowns = []
 
     for target, configs in pr.items():
         for config, sizes in configs.items():
@@ -121,18 +157,11 @@ def main():
                     pr_symbols.get(key, {}), master_symbols.get(key, {})
                 )
                 if body:
-                    d = sizes["flash"] - base["flash"]
-                    details.append(
-                        f"<details><summary>What grew in "
-                        f"<code>{target} / {config}</code> ({d:+d} B)</summary>"
+                    drilldowns.append(
+                        (sizes["flash"] - base["flash"], target, config, body)
                     )
-                    details.extend(body)
-                    details.append("</details>")
-                    details.append("")
 
-    lines.append("")
-    lines.append("### LVGL library, nothing dead-stripped")
-    lines.append("")
+    lines += ["", "### LVGL library, nothing dead-stripped", ""]
     lines.append(
         "<sub>`liblvgl.a` in full. The linked image above only contains what the "
         "test application reaches; bindings such as MicroPython's reference every "
@@ -175,13 +204,104 @@ def main():
             "deserves a sentence in the PR description."
         )
 
-    if details:
+    drilldowns.sort(key=lambda r: -r[0])
+    for d, target, config, body in drilldowns[:MAX_SYMBOL_SECTIONS]:
         lines.append("")
-        lines.extend(details)
+        lines.append(
+            f"<details><summary>What grew in "
+            f"<code>{target} / {config}</code> ({d:+d} B)</summary>"
+        )
+        lines.extend(body)
+        lines.append("</details>")
 
-    lines.append("<sub>Flash is `text + data`, RAM is `data + bss`.</sub>")
+    lines += ["", "<sub>Flash is `text + data`, RAM is `data + bss`.</sub>"]
+    return lines
 
-    print("\n".join(lines))
+
+def summarise(rows):
+    """One line for the shared PR report table.
+
+    Reports the worst target and configuration rather than an average: the failure
+    this test exists to catch is a single target running out of flash, and a mean or
+    median hides exactly that. The median comes along to say whether the change is
+    broad or isolated.
+    """
+    if not rows:
+        return "info", "no baseline to compare against"
+
+    flash_deltas = [r["flash"] - r["flash_base"] for r in rows]
+    worst = max(rows, key=lambda r: r["flash"] - r["flash_base"])
+    best = min(rows, key=lambda r: r["flash"] - r["flash_base"])
+    worst_d = worst["flash"] - worst["flash_base"]
+    median = int(statistics.median(flash_deltas))
+
+    lib_rows = [r for r in rows if r["lib"] is not None and r["lib_base"] is not None]
+    lib_worst = (
+        max(lib_rows, key=lambda r: r["lib"] - r["lib_base"]) if lib_rows else None
+    )
+    lib_worst_d = lib_worst["lib"] - lib_worst["lib_base"] if lib_worst else 0
+
+    ram_worst = max(rows, key=lambda r: r["ram"] - r["ram_base"])
+    ram_worst_d = ram_worst["ram"] - ram_worst["ram_base"]
+
+    if worst_d <= 0 and lib_worst_d <= 0:
+        best_d = best["flash"] - best["flash_base"]
+        if best_d == 0 and lib_worst_d == 0:
+            return "stable", "no change"
+        return "down", (
+            f"flash {best_d:+d} B ({pct(best['flash'], best['flash_base']):+.1f}%) "
+            f"on {best['target']}/{best['config']}"
+        )
+
+    notable = is_notable(worst["flash"], worst["flash_base"]) or (
+        lib_worst is not None and is_notable(lib_worst["lib"], lib_worst["lib_base"])
+    )
+
+    parts = [
+        f"flash {worst_d:+d} B ({pct(worst['flash'], worst['flash_base']):+.1f}%) max "
+        f"on {worst['target']}/{worst['config']}, {median:+d} B median"
+    ]
+    # Worth its own mention only when it moved more than the linked image did: that is
+    # the case that costs the bindings flash while every linked demo looks unchanged.
+    if lib_worst is not None and lib_worst_d > max(worst_d, 0):
+        parts.append(f"library {lib_worst_d:+d} B max")
+    # Small RAM movements are left to the table: naming them here costs more of the one
+    # line than they are worth.
+    if is_notable(ram_worst["ram"], ram_worst["ram_base"]):
+        parts.append(f"RAM {ram_worst_d:+d} B max")
+
+    return ("warn" if notable else "up"), " · ".join(parts)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument("--pr", required=True, help="directory with the PR's results")
+    parser.add_argument("--master", help="directory with master's results")
+    parser.add_argument(
+        "--pr-report",
+        help="also write the Memory Usage section of the PR report comment here",
+    )
+    args = parser.parse_args()
+
+    pr, pr_symbols = load(args.pr)
+    master, master_symbols = load(args.master)
+
+    tables = build_tables(pr, master, pr_symbols, master_symbols)
+    print("\n".join([MARKER, ""] + tables))
+
+    if args.pr_report:
+        from pr_report import write_report
+
+        icon, summary = summarise(collect(pr, master))
+        write_report(
+            args.pr_report,
+            section="Memory Usage",
+            icon=icon,
+            summary=summary,
+            details="\n".join(tables),
+        )
 
 
 if __name__ == "__main__":
