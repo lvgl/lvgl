@@ -468,7 +468,9 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
         lv_indev_t * indev = lv_indev_active();
-        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(obj))) {
+        lv_group_t * g = lv_obj_get_group(obj);
+        if(indev != NULL && lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER
+           && g != NULL && lv_group_get_editing(g)) {
             if(spinbox->digit_count > 1) {
                 if(spinbox->digit_step_dir == LV_DIR_RIGHT) {
                     if(spinbox->step > 1) {
@@ -529,7 +531,8 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_KEY) {
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
+        lv_indev_t * indev = lv_indev_active();
+        lv_indev_type_t indev_type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
 
         uint32_t c = *((uint32_t *)lv_event_get_param(e)); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT) {
