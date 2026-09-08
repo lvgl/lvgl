@@ -45,9 +45,7 @@ void lv_example_gridnav_2(void)
     lv_obj_set_size(list2, lv_pct(45), lv_pct(80));
     lv_obj_align(list2, LV_ALIGN_RIGHT_MID, -5, 0);
     lv_obj_set_style_bg_color(list2, lv_palette_lighten(LV_PALETTE_BLUE, 5), LV_STATE_FOCUSED);
-    if(g) {
-        lv_group_add_obj(g, list2);
-    }
+    lv_group_add_obj(group, list2);
 
     for(i = 0; i < 15; i++) {
         lv_snprintf(buf, sizeof(buf), "Folder %d", i + 1);
