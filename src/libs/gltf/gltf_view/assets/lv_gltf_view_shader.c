@@ -2039,7 +2039,7 @@ static const lv_opengl_shader_t src_includes[] = {
     )"
     },
     {
-        "vert_v1_chunk_01.glsl", R"(
+        "vert_v1_chunk_01a.glsl", R"(
         #ifdef HAS_NORMAL_VEC3
         #ifdef HAS_TANGENT_VEC4
         #ifdef USE_SKINNING
@@ -2077,7 +2077,10 @@ static const lv_opengl_shader_t src_includes[] = {
             normMat[3][3] = 1.0;
             return normMat;
         }
-
+    )"
+    },
+    {
+        "vert_v1_chunk_01b.glsl", R"(
         void main()
         {
             gl_PointSize = 1.0f;
@@ -2879,7 +2882,8 @@ static const lv_opengl_shader_t env_src_includes[] = {
 #include <ibl_filtering2.glsl>
 #include <ibl_filtering3.glsl>
 #include <ibl_filtering4.glsl>
-#include <ibl_filtering5.glsl>
+#include <ibl_filtering5a.glsl>
+#include <ibl_filtering5b.glsl>
 #include <ibl_filtering6.glsl>
     )"
     },
@@ -3254,7 +3258,7 @@ static const lv_opengl_shader_t env_src_includes[] = {
     )"
     },
     {
-        "ibl_filtering5.glsl", R"(
+        "ibl_filtering5a.glsl", R"(
         // From the filament docs. Geometric Shadowing function
         // https://google.github.io/filament/Filament.html#toc4.4.2
         float V_SmithGGXCorrelated(float NoV, float NoL, float roughness) {
@@ -3322,7 +3326,10 @@ static const lv_opengl_shader_t env_src_includes[] = {
             float A = 0.0;
             float B = 0.0;
             float C = 0.0;
-
+    )"
+    },
+    {
+        "ibl_filtering5b.glsl", R"(
             for(int i = 0; i < u_sampleCount; ++i)
             {
                 // Importance sampling, depending on the distribution.
@@ -3515,7 +3522,8 @@ static const char * src_vertex_shader = R"(
 #include <animation2.glsl>
 #include <vert_v1_chunk_00.glsl>
 // CHUNK 00 -> 01
-#include <vert_v1_chunk_01.glsl>
+#include <vert_v1_chunk_01a.glsl>
+#include <vert_v1_chunk_01b.glsl>
 )";
 
 static const char *src_fragment_shader = R"(
