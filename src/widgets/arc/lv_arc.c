@@ -740,7 +740,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Leave edit mode if released. (No need to wait for LONG_PRESS)*/
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
+        lv_indev_t * indev         = lv_event_get_indev(e);
+        lv_indev_type_t indev_type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             if(editing) lv_group_set_editing(g, false);
         }
