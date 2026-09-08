@@ -41,6 +41,9 @@ void lv_draw_buf_ppa_init_handlers(void)
 
 static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
+    /* Sync the whole buffer: cheaper than computing the byte span of an
+     * arbitrary sub-area and always coherent before the PPA reads it. */
+    LV_UNUSED(area);
     esp_cache_msync(draw_buf->data, draw_buf->data_size, ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_TYPE_DATA);
 }
 #endif /* LV_USE_PPA */
