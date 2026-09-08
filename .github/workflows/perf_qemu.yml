@@ -1,0 +1,152 @@
+name: QEMU Emulated Render Performance
+
+# Counts retired instructions for the benchmark demo and every render demo scene on four
+# bare metal targets, and diffs a pull request against the last results master published.
+#
+# The baseline is downloaded rather than measured, the same way perf_emulation.yml gets
+# its own, so a pull request pays for one measurement instead of two. That is only sound
+# because the counts are reproducible; see below.
+#
+# QEMU runs with -icount shift=0, where one instruction is one nanosecond of virtual time.
+# That makes the counts deterministic and host independent: the same tree gives the same
+# number on any runner, so a difference between the two sides is a real difference and not
+# noise. It counts instructions and not cycles, so it understates a change that removes
+# memory traffic and overstates one that only folds stores together.
+#
+# The same container runs locally through scripts/perf_qemu/run.sh, which also has a --gdb
+# option for stepping through a run.
+
+on:
+  push:
+    branches: 'master'
+  pull_request:
+    branches: 'master'
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  # Spelled out rather than left to perf_qemu.py's defaults, so that what CI measures is
+  # visible here and a local run can be told to match with the same flags:
+  #   scripts/perf_qemu/run.sh -f rgb565,argb8888 --opt O2
+  # The script knows six more colour formats and -Os/-O3 for trying things locally.
+  PERF_QEMU_FORMATS: rgb565,argb8888
+  PERF_QEMU_OPT: O2
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-24.04
+    name: QEMU Benchmark - ${{ matrix.target }}
+    # Published by the "QEMU Benchmark Image" workflow, which prints the digest to pin
+    # here. The counts are only comparable across runs while this does not move, so it
+    # should change deliberately. `container` takes no expressions, hence the literal.
+    container: ghcr.io/lvgl/lv-perf-qemu:1
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [cortex-m7, cortex-m55, riscv32, cortex-a53]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Mark the checkout safe for git
+        # The container runs as a different user than the one that wrote the checkout, and
+        # perf_qemu.py records the measured revision in its results
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Benchmark this revision
+        run: |
+          python3 scripts/perf_qemu/perf_qemu.py \
+            --lvgl "$GITHUB_WORKSPACE" \
+            --out "$RUNNER_TEMP/out-new" \
+            --targets ${{ matrix.target }} \
+            --formats "$PERF_QEMU_FORMATS" \
+            --opt "$PERF_QEMU_OPT"
+
+      - name: Collect the results
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p results/new
+          cp "$RUNNER_TEMP"/out-new/results-*.json results/new/
+          # Only the scenes that did not match a reference image produce one of these
+          if [ -d "$RUNNER_TEMP/out-new/err_imgs" ]; then
+            cp -r "$RUNNER_TEMP/out-new/err_imgs" results/
+          fi
+
+      - name: Upload the results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: perf-qemu-${{ matrix.target }}
+          path: results/
+          if-no-files-found: error
+
+  pr_report:
+    runs-on: ubuntu-24.04
+    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+    name: QEMU Benchmark - PR Report
+    needs: benchmark
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Download the results
+        if: ${{ needs.benchmark.result == 'success' }}
+        uses: actions/download-artifact@v8
+        with:
+          pattern: perf-qemu-*
+          merge-multiple: true
+          path: results
+
+      - name: Collect the baseline master published
+        id: baseline
+        if: ${{ needs.benchmark.result == 'success' }}
+        # The baseline is a public pre-release, so this needs no more than the read-only
+        # token a pull request from a fork gets
+        uses: robinraju/release-downloader@v1
+        continue-on-error: true # The release may not exist yet
+        with:
+          preRelease: true
+          tag: qemu-benchmark-latest
+          fileName: results-*.json
+          out-file-path: baseline
+
+      - name: Build the PR report section
+        if: ${{ needs.benchmark.result == 'success' }}
+        run: |
+          BASE=()
+          if ls baseline/results-*.json >/dev/null 2>&1; then
+            BASE=(--base baseline)
+          else
+            echo "no published baseline yet, reporting absolute numbers only"
+          fi
+          python3 scripts/perf_qemu/report.py \
+            --new results/new "${BASE[@]}" \
+            --output reports/render_performance.json
+          # The report section points at this summary for the full tables
+          python3 -c "
+          import json, pathlib
+          r = json.loads(pathlib.Path('reports/render_performance.json').read_text())
+          print('## ' + r['section'], r['summary'], sep=': ')
+          print()
+          print(r['details'])
+          " >> $GITHUB_STEP_SUMMARY
+
+      - name: Note a missing report
+        # A step above can fail before the report is written
+        if: ${{ !cancelled() }}
+        run: |
+          [ -f reports/render_performance.json ] || \
+            python3 scripts/pr_report/pr_report.py emit \
+              --output reports/render_performance.json \
+              --section "Render Performance" --order 31 --icon warn \
+              --summary "not available, the QEMU benchmark did not finish"
+
+      - name: Upload the PR report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-report-render-performance
+          path: reports/
+          if-no-files-found: ignore

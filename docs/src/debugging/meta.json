@@ -5,6 +5,7 @@
     "log",
     "monkey",
     "obj_id",
+    "perf_qemu",
     "profiler",
     "sysmon",
     "test",

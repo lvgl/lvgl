@@ -1,0 +1,61 @@
+name: QEMU Render Performance Results Handler
+
+# Publishes master's instruction counts to a pre-release, which perf_qemu.yml then
+# downloads as the baseline for every pull request. Same arrangement as
+# perf_emulation_handle_results.yml, so that a pull request measures one revision instead
+# of two.
+#
+# Unlike the wall-clock benchmark, these counts do not need a history to average over:
+# QEMU under -icount shift=0 is deterministic and host independent, so one published run
+# of master is as good as ten. The assets are therefore the plain results-<target>.json
+# files, replaced each time rather than accumulated.
+
+on:
+  workflow_run:
+    workflows: [QEMU Emulated Render Performance]
+    types:
+      - completed
+
+concurrency:
+  group: ${{ github.event.workflow_run.head_branch }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    # Only a successful push to master, never a pull request: a fork must not be able to
+    # move the baseline everyone else is compared against.
+    if: ${{ github.event.workflow_run.conclusion == 'success'
+            && github.event.workflow_run.event == 'push'
+            && github.event.workflow_run.head_branch == 'master' }}
+    runs-on: ubuntu-24.04
+    name: QEMU Benchmark - Publish the master baseline
+    steps:
+      - name: Download the results of that run
+        uses: dawidd6/action-download-artifact@v24
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          pattern: perf-qemu-*
+          path: artifacts
+          allow_forks: false
+
+      - name: Gather the result files
+        run: |
+          mkdir output
+          # One results-<target>.json per matrix job, each in its own artifact directory
+          find artifacts -name 'results-*.json' -exec mv -t output {} +
+          ls -l output
+
+      - name: Store them in the benchmark pre-release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: QEMU Render Benchmark Latest
+          files: output/results-*.json
+          tag_name: qemu-benchmark-latest
+          prerelease: true
+          body: >
+            Automatically generated. Holds the QEMU instruction counts for the current
+            master, which pull requests are compared against. See
+            .github/workflows/perf_qemu.yml.
