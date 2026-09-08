@@ -330,7 +330,7 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
     int32_t x;
     int32_t y;
 
-    if(!lv_area_intersect(&clipped_area,  &t->area, &t->clip_area)) {
+    if(!lv_area_intersect(&clipped_area, &t->_real_area, &t->clip_area)) {
         /* Nothing to do */
         return;
     }
