@@ -1,15 +1,8 @@
-# Unit tests for LVGL. Not a project of its own: this is pulled in by
-# env_support/cmake/main.cmake when LV_BUILD_TESTS is set, after the lvgl,
-# lvgl_thorvg, lvgl_examples and lvgl_demos targets have been created.
-#
-# tests/main.py drives the build. It picks a configuration by passing the list
-# of defconfig fragments from tests/configs in LV_BUILD_DEFCONFIG_PATH, and
-# everything below is derived from the resulting CONFIG_LV_* variables, so
-# adding a test configuration only takes a new recipe in main.py.
-
 option(LVGL_TEST_ENABLE "Build and register the test executables" OFF)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+include(${LVGL_TEST_DIR}/lvgl_test_helpers.cmake)
 
 if(NOT MSVC)
     set(IS_GNU_LIKE TRUE)
@@ -237,7 +230,16 @@ target_compile_definitions(test_common PRIVATE
     LV_BUILD_EXAMPLES=1
 )
 
-file(GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c)
+lvgl_add_test_folder(test_cases)
+lvgl_add_test_folder(test_cases/3d)
+lvgl_add_test_folder(test_cases/cache)
+lvgl_add_test_folder(test_cases/draw)
+lvgl_add_test_folder(test_cases/libs)
+lvgl_add_test_folder(test_cases/refr)
+lvgl_add_test_folder(test_cases/widgets)
+
+lvgl_get_test_files(TEST_CASE_FILES)
+
 file(GLOB_RECURSE TEST_HELPERS_FILES src/test_helpers/*.c)
 
 if(TEST_HELPERS_FILES)
