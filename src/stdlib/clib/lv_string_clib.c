@@ -173,7 +173,7 @@ char * lv_strchr(const char * str, int c)
 {
     LV_ASSERT(str != NULL);
 
-    return strchr(str, c);
+    return (char *)strchr(str, c);
 }
 
 /**********************
