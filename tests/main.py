@@ -87,6 +87,17 @@ test_options = {
             "run_tests",
         ],
     },
+    "OPTIONS_TEST_PUBLIC_API": {
+        "description": "Public API argument checks, system heap, 32 bit color depth",
+        "defconfigs": [
+            "full",
+            "depth_32",
+            HOST,
+            "sys_heap",
+            "run_tests",
+            "public_api",
+        ],
+    },
     "OPTIONS_TEST_VG_LITE": {
         "description": "VG-Lite simulator with full config, 32 bit color depth",
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "vg_lite"],

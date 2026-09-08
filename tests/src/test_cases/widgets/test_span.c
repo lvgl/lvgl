@@ -31,14 +31,6 @@ void test_spangroup_create_returns_not_null_object(void)
     TEST_ASSERT(NULL != obj);
 }
 
-void test_spangroup_new_span_with_null_parameter_returns_null_object(void)
-{
-    lv_span_t * span = lv_spangroup_add_span(NULL);
-
-    TEST_ASSERT(NULL == span);
-    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_span_count(spangroup));
-}
-
 void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
 {
     lv_span_t * span = lv_spangroup_add_span(spangroup);
@@ -66,17 +58,6 @@ void test_span_set_text(void)
     TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
 }
 
-void test_span_set_text_with_bad_parameter_no_action_performed(void)
-{
-    const char * test_text = "Test Text";
-    lv_span_t * span = lv_spangroup_add_span(spangroup);
-
-    lv_span_set_text(span, test_text);
-    lv_span_set_text(span, NULL);
-
-    TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
-}
-
 void test_span_set_text_with_previous_test_overwrites(void)
 {
     const char * old_test_text = "Old Test Text";
@@ -95,17 +76,6 @@ void test_span_set_text_static(void)
     lv_span_t * span = lv_spangroup_add_span(spangroup);
 
     lv_span_set_text_static(span, test_text);
-
-    TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
-}
-
-void test_span_set_text_static_with_bad_parameter_no_action_performed(void)
-{
-    const char * test_text = "Test Text";
-    lv_span_t * span = lv_spangroup_add_span(spangroup);
-
-    lv_span_set_text_static(span, test_text);
-    lv_span_set_text_static(span, NULL);
 
     TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
 }

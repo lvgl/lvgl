@@ -91,8 +91,6 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
     font_path_error = lv_freetype_font_create("", render_mode, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
     TEST_ASSERT_NULL(font_path_error);
 
-    font_path_error = lv_freetype_font_create(NULL, render_mode, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
-    TEST_ASSERT_NULL(font_path_error);
 
     lv_font_t * font_size_error = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
                                                           render_mode,

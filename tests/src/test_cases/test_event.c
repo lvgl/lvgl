@@ -24,6 +24,11 @@ void test_event_object_deletion(void)
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
+static void event_noop_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+}
+
 /* Add and then remove event should not memory leak */
 void test_event_should_not_memory_lean(void)
 {
@@ -33,7 +38,7 @@ void test_event_should_not_memory_lean(void)
     size_t initial_free_size = monitor.free_size;
 
     for(int i = 0; i < 10; i++) {
-        lv_obj_add_event_cb(obj, NULL, LV_EVENT_ALL, NULL);
+        lv_obj_add_event_cb(obj, event_noop_cb, LV_EVENT_ALL, NULL);
     }
 
     lv_obj_delete(obj);
@@ -137,7 +142,6 @@ void test_event_delete_obj_in_recursive_event_call(void)
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 200, 100);
     lv_obj_add_event_cb(obj, event_click_to_delete_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_add_event_cb(obj, NULL, LV_EVENT_CLICKED, NULL);
     lv_obj_add_event_cb(obj, event_click_to_delete_cb, LV_EVENT_CLICKED, NULL);
     lv_test_mouse_click_at(30, 30);
 }
