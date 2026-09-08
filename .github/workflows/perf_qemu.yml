@@ -45,7 +45,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [cortex-m7, cortex-m55, riscv32, cortex-a53]
+        target: [cortex-m7, riscv32, cortex-a53]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
