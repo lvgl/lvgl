@@ -1,0 +1,159 @@
+name: Memory Usage
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["**"]
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ARM_TOOLCHAIN_URL: https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+  ARM_TOOLCHAIN_DIR: gcc-arm-none-eabi-10.3-2021.10
+  ESP_TOOLCHAIN_VERSION: 13.2.0_20230928
+
+jobs:
+  flash-usage-check:
+    name: Check memory usage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: python3 -m pip install kconfiglib pcpp
+
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Cache toolchains
+        id: cache-toolchains
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ARM_TOOLCHAIN_DIR }}
+            xtensa-esp-elf
+            riscv32-esp-elf
+          key: memory-usage-toolchains-${{ env.ARM_TOOLCHAIN_DIR }}-esp${{ env.ESP_TOOLCHAIN_VERSION }}
+
+      - name: Download toolchains
+        if: steps.cache-toolchains.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          wget -q "$ARM_TOOLCHAIN_URL"
+          tar xjf "$(basename "$ARM_TOOLCHAIN_URL")"
+
+          esp_base="https://github.com/espressif/crosstool-NG/releases/download/esp-${ESP_TOOLCHAIN_VERSION}"
+          for tc in xtensa-esp-elf riscv32-esp-elf; do
+            wget -q "${esp_base}/${tc}-${ESP_TOOLCHAIN_VERSION}-x86_64-linux-gnu.tar.xz"
+            tar xf "${tc}-${ESP_TOOLCHAIN_VERSION}-x86_64-linux-gnu.tar.xz"
+          done
+
+      - name: Add toolchains to PATH
+        run: |
+          {
+            echo "${{ github.workspace }}/${{ env.ARM_TOOLCHAIN_DIR }}/bin"
+            echo "${{ github.workspace }}/xtensa-esp-elf/bin"
+            echo "${{ github.workspace }}/riscv32-esp-elf/bin"
+          } >> "$GITHUB_PATH"
+
+      - name: Build and measure every target and configuration
+        id: measure
+        working-directory: tests/test_memory_usage
+        run: ./measure.py --out "$GITHUB_WORKSPACE/results/size-results.json"
+
+      # --- Baseline: the base branch's last successful run, else build it here ---
+      - name: Find the base branch's latest successful run
+        id: base_run
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRuns({
+              ...context.repo,
+              workflow_id: "memory_usage.yml",
+              branch: context.payload.pull_request.base.ref,
+              event: "push",
+              status: "success",
+              per_page: 1,
+            });
+            return data.workflow_runs.length ? String(data.workflow_runs[0].id) : "";
+          result-encoding: string
+
+      - name: Download the baseline measurements
+        if: ${{ !cancelled() && steps.base_run.outputs.result != '' }}
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: flash-usage-results
+          path: baseline
+          run-id: ${{ steps.base_run.outputs.result }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check out the base branch
+        id: base_src
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && hashFiles('baseline/size-results.json') == '' }}
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          path: base-src
+
+      - name: Measure the base branch
+        if: ${{ !cancelled() && steps.base_src.outcome == 'success' }}
+        continue-on-error: true
+        working-directory: base-src/tests/test_memory_usage
+        run: ./measure.py --out "$GITHUB_WORKSPACE/baseline/size-results.json"
+
+      # --- Report ---
+      - name: Build the PR report section
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.measure.outcome }}" != "success" ]; then
+            python3 scripts/pr_report/pr_report.py emit \
+              --output reports/memory_usage.json \
+              --section "Memory Usage" --icon warn \
+              --summary "not available, the build did not finish"
+            exit 0
+          fi
+
+          master_arg=()
+          if [ -f baseline/size-results.json ]; then
+            master_arg=(--master baseline)
+          fi
+
+          tests/test_memory_usage/report.py \
+            --pr results "${master_arg[@]}" \
+            --pr-report reports/memory_usage.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the PR report
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-report-memory-usage
+          path: reports/
+          if-no-files-found: ignore
+
+      - name: Upload results artifact
+        if: ${{ !cancelled() && steps.measure.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: flash-usage-results
+          path: results/
+          retention-days: 14
