@@ -311,4 +311,30 @@ void test_indev_ccw_pointer(void)
     TEST_ASSERT_FALSE(lv_indev_get_ccw(indev));
 }
 
+static void forget_pressed_obj_cb(lv_event_t * e)
+{
+    if(lv_event_get_code(e) != LV_EVENT_PRESSED) return;
+
+    lv_indev_t * indev = lv_indev_active();
+    lv_indev_wait_release(indev);
+    /*Drop the pressed object while the release is still pending*/
+    lv_indev_reset(indev, lv_event_get_target(e));
+}
+
+void test_release_without_pressed_object(void)
+{
+    lv_obj_t * btn = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(btn, 100, 100);
+    lv_obj_set_pos(btn, 0, 0);
+    lv_obj_add_event_cb(btn, forget_pressed_obj_cb, LV_EVENT_ALL, NULL);
+
+    lv_test_mouse_move_to(50, 50);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    /* if no assertion fired we're good*/
+    TEST_PASS();
+}
+
 #endif

@@ -1516,7 +1516,9 @@ static void indev_proc_release(lv_indev_t * indev)
     }
 
     if(indev->wait_until_release) {
-        lv_obj_send_event(indev->pointer.act_obj, LV_EVENT_PRESS_LOST, indev_act);
+        if(indev->pointer.act_obj) {
+            lv_obj_send_event(indev->pointer.act_obj, LV_EVENT_PRESS_LOST, indev_act);
+        }
         if(indev_reset_check(indev)) {
             indev->wait_until_release = 0;
             return;
