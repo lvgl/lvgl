@@ -93,6 +93,15 @@ cmake -B build -DLV_BUILD_TESTS=ON -DLVGL_TEST_ENABLE=ON \
 
 Prefer `main.py` as it picks the right fragments for the host and architecture but this is useful when debugging the build itself.
 
+The test case folders are listed one by one in `CMakeLists.txt`, so that a folder can be tied to a configuration option:
+
+```cmake
+lvgl_add_test_folder(test_cases/widgets)
+lvgl_add_test_folder_if(NOT CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL test_cases/public_api)
+```
+
+See [`lvgl_test_helpers.cmake`](./lvgl_test_helpers.cmake).
+
 ## Add new tests
 
 ### Create new test file
