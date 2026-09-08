@@ -848,7 +848,8 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_FOCUSED) {
         lv_group_t * g = lv_obj_get_group(obj);
         const bool editing = g && lv_group_get_editing(g);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
+        lv_indev_t * indev = lv_indev_active();
+        lv_indev_type_t indev_type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
@@ -1050,7 +1051,8 @@ static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
     if(code == LV_EVENT_RELEASED) {
-        if(lv_indev_get_scroll_obj(lv_indev_active()) == NULL) {
+        lv_indev_t * indev = lv_event_get_indev(e);
+        if(indev == NULL || lv_indev_get_scroll_obj(indev) == NULL) {
             list_release_handler(list);
         }
     }
@@ -1347,7 +1349,7 @@ static lv_result_t btn_release_handler(lv_obj_t * obj)
     LV_ASSERT(obj != NULL);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     lv_indev_t * indev = lv_indev_active();
-    if(lv_indev_get_scroll_obj(indev) == NULL) {
+    if(indev == NULL || lv_indev_get_scroll_obj(indev) == NULL) {
         if(lv_dropdown_is_open(obj)) {
             lv_dropdown_close(obj);
             if(dropdown->sel_opt_id_orig != dropdown->sel_opt_id) {
