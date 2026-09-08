@@ -5,7 +5,6 @@ import argparse
 import glob
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -101,11 +100,24 @@ def measure(target, config, build_root):
     return sizes, symbol_sizes(build_dir, elf)
 
 
+def measured_commit():
+    """The commit these numbers describe, so a stale baseline is visible in the report."""
+    try:
+        return run(["git", "-C", SCRIPT_DIR, "rev-parse", "HEAD"]).stdout.strip()
+    except (subprocess.CalledProcessError, OSError):
+        return ""
+
+
 def write_results(out, results, all_symbols):
     out_dir = os.path.dirname(os.path.abspath(out))
     os.makedirs(out_dir, exist_ok=True)
     with open(out, "w") as f:
         json.dump(results, f, indent=2)
+
+    commit = measured_commit()
+    if commit:
+        with open(os.path.join(out_dir, "commit.txt"), "w") as f:
+            f.write(commit + "\n")
 
     # Kept beside the totals rather than in them: the totals stay readable, and report.py
     # only needs these for the rows that actually moved.

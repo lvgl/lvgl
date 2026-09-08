@@ -63,7 +63,8 @@ arm-cortex-m4      minimal   flash=  140672 ram=   77560 lib=  250430
 arm-none-eabi-nm --size-sort -S --radix=d build/arm-cortex-m4-standard/main | tail -40
 
 # per translation unit, which is usually the quickest way to spot a jump
-arm-none-eabi-size build/arm-cortex-m4-standard/lvgl/CMakeFiles/lvgl.dir/src/**/*.obj
+find build/arm-cortex-m4-standard/lvgl/CMakeFiles/lvgl.dir/src -name '*.obj' \
+    -exec arm-none-eabi-size {} +
 ```
 
 ## Adding a target

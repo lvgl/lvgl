@@ -89,6 +89,7 @@ jobs:
               ...context.repo,
               workflow_id: "memory_usage.yml",
               branch: context.payload.pull_request.base.ref,
+              event: "push",
               status: "success",
               per_page: 1,
             });

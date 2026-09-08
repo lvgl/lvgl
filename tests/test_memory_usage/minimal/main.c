@@ -8,9 +8,9 @@ static uint16_t buffer[(WIDTH * HEIGHT) / 10];
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    LV_UNUSED(disp);
     LV_UNUSED(area);
     LV_UNUSED(px_map);
+    lv_display_flush_ready(disp);
 }
 
 static void indev_read_cb(lv_indev_t * indev, lv_indev_data_t * data)

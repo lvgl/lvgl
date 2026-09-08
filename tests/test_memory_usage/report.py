@@ -32,18 +32,26 @@ NOTABLE_REL = 0.005
 # How many symbols to list when a row is worth explaining.
 TOP_SYMBOLS = 15
 
+KB = 1024
+
 # The whole matrix would otherwise be able to bury the rest of the PR comment.
 MAX_SYMBOL_SECTIONS = 3
 
 
 def load(directory):
     if not directory:
-        return {}, {}
+        return {}, {}, ""
     try:
         with open(os.path.join(directory, "size-results.json")) as f:
             totals = json.load(f)
     except (OSError, json.JSONDecodeError):
-        return {}, {}
+        return {}, {}, ""
+
+    try:
+        with open(os.path.join(directory, "commit.txt")) as f:
+            commit = f.read().strip()[:9]
+    except OSError:
+        commit = ""
 
     symbols = {}
     symbols_dir = os.path.join(directory, "symbols")
@@ -52,7 +60,11 @@ def load(directory):
             if name.endswith(".json"):
                 with open(os.path.join(symbols_dir, name)) as f:
                     symbols[name[: -len(".json")]] = json.load(f)
-    return totals, symbols
+    return totals, symbols, commit
+
+
+def fmt_kb(value):
+    return f"{value / KB:.3f} KB"
 
 
 def is_notable(now, before):
@@ -115,7 +127,7 @@ def collect(pr, master):
     return rows
 
 
-def build_tables(pr, master, pr_symbols, master_symbols):
+def build_tables(pr, master, pr_symbols, master_symbols, pr_commit="", master_commit=""):
     """The full matrix, shared by the standalone output and the PR report section."""
     lines = ["### Linked image (`--gc-sections`)", ""]
     if master:
@@ -130,28 +142,27 @@ def build_tables(pr, master, pr_symbols, master_symbols):
 
     for target, configs in pr.items():
         for config, sizes in configs.items():
-            flash_kb = sizes["flash"] / 1000
-            ram_kb = sizes["ram"] / 1000
             base = master.get(target, {}).get(config)
             if not master:
                 lines.append(
-                    f"| {target} | {config} | {flash_kb:.3f} KB | {ram_kb:.3f} KB |"
+                    f"| {target} | {config} | {fmt_kb(sizes['flash'])} | "
+                    f"{fmt_kb(sizes['ram'])} |"
                 )
                 continue
             if not base:
                 lines.append(
-                    f"| {target} | {config} | {flash_kb:.3f} KB | n/a | n/a | "
-                    f"{ram_kb:.3f} KB | n/a |"
+                    f"| {target} | {config} | {fmt_kb(sizes['flash'])} | n/a | n/a | "
+                    f"{fmt_kb(sizes['ram'])} | n/a |"
                 )
                 continue
-            base_flash_kb = base["flash"] / 1000
 
             mark = is_notable(sizes["flash"], base["flash"])
             notable = notable or mark
             lines.append(
-                f"| {target} | {config} | {flash_kb} KB | {base_flash_kb} KB | "
+                f"| {target} | {config} | {fmt_kb(sizes['flash'])} | "
+                f"{fmt_kb(base['flash'])} | "
                 f"{fmt_delta(sizes['flash'], base['flash'], mark)} | "
-                f"{ram_kb} KB | {fmt_delta(sizes['ram'], base['ram'])} |"
+                f"{fmt_kb(sizes['ram'])} | {fmt_delta(sizes['ram'], base['ram'])} |"
             )
 
             if mark:
@@ -183,18 +194,16 @@ def build_tables(pr, master, pr_symbols, master_symbols):
             lib = sizes.get("library", {}).get("size")
             if lib is None:
                 continue
-            lib_kb = lib / 1000
             base = master.get(target, {}).get(config, {}).get("library", {}).get("size")
             if not master:
-                lines.append(f"| {target} | {config} | {lib_kb} KB |")
+                lines.append(f"| {target} | {config} | {fmt_kb(lib)} |")
             elif base is None:
-                lines.append(f"| {target} | {config} | {lib_kb} KB | n/a | n/a |")
+                lines.append(f"| {target} | {config} | {fmt_kb(lib)} | n/a | n/a |")
             else:
-                base_kb = base / 1000
                 mark = is_notable(lib, base)
                 notable = notable or mark
                 lines.append(
-                    f"| {target} | {config} | {lib_kb} KB | {base_kb} KB | "
+                    f"| {target} | {config} | {fmt_kb(lib)} | {fmt_kb(base)} | "
                     f"{fmt_delta(lib, base, mark)} |"
                 )
 
@@ -218,63 +227,86 @@ def build_tables(pr, master, pr_symbols, master_symbols):
         lines.extend(body)
         lines.append("</details>")
 
-    lines += ["", "<sub>Flash is `text + data`, RAM is `data + bss`.</sub>"]
+    lines += ["", "<sub>Flash is `text + data`, RAM is `data + bss`."]
+    if pr_commit and master_commit:
+        # The baseline is the base branch's last successful run, which may be behind its
+        # tip. Naming both commits makes a stale comparison visible.
+        lines.append(f"Comparing `{pr_commit}` against `{master_commit}`.</sub>")
+    elif pr_commit:
+        lines.append(f"Measured at `{pr_commit}`.</sub>")
+    else:
+        lines[-1] += "</sub>"
     return lines
+
+
+def metric_summary(rows, key, label):
+    """One clause for one metric: what it did, and the target where it did it worst.
+
+    Returns the clause, the delta it describes and whether that delta is notable.
+    """
+    base_key = f"{key}_base"
+    comparable = [r for r in rows if r[key] is not None and r[base_key] is not None]
+    if not comparable:
+        return "", 0, False
+
+    worst = max(comparable, key=lambda r: r[key] - r[base_key])
+    best = min(comparable, key=lambda r: r[key] - r[base_key])
+    grew = worst[key] - worst[base_key]
+    shrank = best[key] - best[base_key]
+
+    if grew == 0 and shrank == 0:
+        return f"{label} unchanged", 0, False
+
+    row, delta = (worst, grew) if grew > 0 else (best, shrank)
+    return (
+        f"{label} {delta:+d} B ({pct(row[key], row[base_key]):+.1f}%) on "
+        f"{row['target']}/{row['config']}",
+        delta,
+        is_notable(worst[key], worst[base_key]),
+    )
 
 
 def summarise(rows):
     """One line for the shared PR report table.
 
-    Reports the worst target and configuration rather than an average: the failure
-    this test exists to catch is a single target running out of flash, and a mean or
-    median hides exactly that. The median comes along to say whether the change is
-    broad or isolated.
+    Every metric reports itself. Picking one to headline is what used to make this
+    claim things about the metric it had not picked - "flash unchanged" on a change
+    that shrank flash, for one.
+
+    Each clause names the worst target and configuration rather than an average: the
+    failure this test exists to catch is a single target running out of flash, and a
+    mean or a median hides exactly that. The median comes along for flash because it
+    says for free whether a change is broad or isolated.
     """
     if not rows:
         return "info", "no baseline to compare against"
 
-    flash_deltas = [r["flash"] - r["flash_base"] for r in rows]
-    worst = max(rows, key=lambda r: r["flash"] - r["flash_base"])
-    best = min(rows, key=lambda r: r["flash"] - r["flash_base"])
-    worst_d = worst["flash"] - worst["flash_base"]
-    median = int(statistics.median(flash_deltas))
+    flash, flash_delta, flash_notable = metric_summary(rows, "flash", "flash")
+    ram, ram_delta, ram_notable = metric_summary(rows, "ram", "RAM")
+    lib, lib_delta, lib_notable = metric_summary(rows, "lib", "library")
 
-    lib_rows = [r for r in rows if r["lib"] is not None and r["lib_base"] is not None]
-    lib_worst = (
-        max(lib_rows, key=lambda r: r["lib"] - r["lib_base"]) if lib_rows else None
-    )
-    lib_worst_d = lib_worst["lib"] - lib_worst["lib_base"] if lib_worst else 0
+    if not flash_delta and not ram_delta and not lib_delta:
+        return "stable", "no change"
 
-    ram_worst = max(rows, key=lambda r: r["ram"] - r["ram_base"])
-    ram_worst_d = ram_worst["ram"] - ram_worst["ram_base"]
+    parts = [flash, ram]
+    if flash_delta:
+        median = int(statistics.median(r["flash"] - r["flash_base"] for r in rows))
+        parts[0] += f", {median:+d} B median"
 
-    if worst_d <= 0 and lib_worst_d <= 0:
-        best_d = best["flash"] - best["flash_base"]
-        if best_d == 0 and lib_worst_d == 0:
-            return "stable", "no change"
-        return "down", (
-            f"flash {best_d:+d} B ({pct(best['flash'], best['flash_base']):+.1f}%) "
-            f"on {best['target']}/{best['config']}"
-        )
+    # Worth its own clause when it says something flash does not: either it grew more
+    # than the linked image did - the case that costs the bindings flash while every
+    # linked demo looks unchanged - or it is the only thing that moved at all.
+    if lib and (lib_delta > max(flash_delta, 0) or not (flash_delta or ram_delta)):
+        parts.append(lib)
 
-    notable = is_notable(worst["flash"], worst["flash_base"]) or (
-        lib_worst is not None and is_notable(lib_worst["lib"], lib_worst["lib_base"])
-    )
+    if flash_notable or ram_notable or lib_notable:
+        icon = "warn"
+    elif max(flash_delta, ram_delta, lib_delta) > 0:
+        icon = "up"
+    else:
+        icon = "down"
 
-    parts = [
-        f"flash {worst_d:+d} B ({pct(worst['flash'], worst['flash_base']):+.1f}%) max "
-        f"on {worst['target']}/{worst['config']}, {median:+d} B median"
-    ]
-    # Worth its own mention only when it moved more than the linked image did: that is
-    # the case that costs the bindings flash while every linked demo looks unchanged.
-    if lib_worst is not None and lib_worst_d > max(worst_d, 0):
-        parts.append(f"library {lib_worst_d:+d} B max")
-    # Small RAM movements are left to the table: naming them here costs more of the one
-    # line than they are worth.
-    if is_notable(ram_worst["ram"], ram_worst["ram_base"]):
-        parts.append(f"RAM {ram_worst_d:+d} B max")
-
-    return ("warn" if notable else "up"), " · ".join(parts)
+    return icon, " · ".join(p for p in parts if p)
 
 
 def main():
@@ -289,10 +321,12 @@ def main():
     )
     args = parser.parse_args()
 
-    pr, pr_symbols = load(args.pr)
-    master, master_symbols = load(args.master)
+    pr, pr_symbols, pr_commit = load(args.pr)
+    master, master_symbols, master_commit = load(args.master)
 
-    tables = build_tables(pr, master, pr_symbols, master_symbols)
+    tables = build_tables(
+        pr, master, pr_symbols, master_symbols, pr_commit, master_commit
+    )
     print("\n".join([MARKER, ""] + tables))
 
     if args.pr_report:
