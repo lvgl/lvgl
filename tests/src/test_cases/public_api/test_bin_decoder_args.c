@@ -1,0 +1,235 @@
+#if LV_BUILD_TEST
+#include "../lvgl.h"
+#include "../../lvgl_private.h"
+
+#include "unity/unity.h"
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+    lv_obj_clean(lv_screen_active());
+}
+
+static void create_image(const void * src)
+{
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, src);
+    lv_obj_center(img);
+}
+
+/* Render `src` repeatedly and compare against `screenshot`. A descriptor the
+ * decoder rejects has to render as the empty image, without leaking. */
+static void bin_decoder(const void * src, const char * screenshot)
+{
+    lv_image_cache_drop(src);
+    create_image(src);
+    TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
+    lv_obj_clean(lv_screen_active());
+
+    size_t mem_before = lv_test_get_free_mem();
+    for(uint32_t i = 0; i < 20; i++) {
+        lv_obj_clean(lv_screen_active());
+        create_image(src);
+
+        lv_obj_invalidate(lv_screen_active());
+        lv_refr_now(NULL);
+    }
+    TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
+    lv_obj_clean(lv_screen_active());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+}
+
+/* A freshly valid descriptor that every case below corrupts in one way */
+static lv_image_dsc_t * get_image_dsc(void)
+{
+#define IMAGE_WIDTH 32
+#define IMAGE_HEIGHT 2
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t image_map[IMAGE_WIDTH * IMAGE_HEIGHT * sizeof(lv_color32_t)] = { 0 };
+    static lv_image_dsc_t image_dsc = { 0 };
+
+    image_dsc.header.magic = LV_IMAGE_HEADER_MAGIC,
+    image_dsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
+    image_dsc.header.w = IMAGE_WIDTH;
+    image_dsc.header.h = IMAGE_HEIGHT;
+    image_dsc.header.stride = IMAGE_WIDTH * sizeof(lv_color32_t);
+    image_dsc.header.flags = 0;
+    image_dsc.data_size = sizeof(image_map);
+    image_dsc.data = image_map;
+
+    return &image_dsc;
+}
+
+static lv_image_decoder_dsc_t * get_image_decoder_dsc(void)
+{
+    static lv_image_decoder_dsc_t decoder_dsc = { 0 };
+    decoder_dsc.src_type = LV_IMAGE_SRC_FILE;
+    decoder_dsc.src = NULL;
+    decoder_dsc.header.flags = 0;
+    return &decoder_dsc;
+}
+
+void test_bin_decoder_image_dsc_error_handling(void)
+{
+    lv_image_dsc_t * image_dsc = get_image_dsc();
+
+    /* Valid image */
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test invalid magic */
+    image_dsc = get_image_dsc();
+    image_dsc->header.magic = 0;
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test invalid NULL data */
+    image_dsc = get_image_dsc();
+    image_dsc->data = NULL;
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test invalid data_size */
+    image_dsc = get_image_dsc();
+    image_dsc->data_size = 0;
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test invalid stride */
+    image_dsc = get_image_dsc();
+    image_dsc->header.stride = 0;
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test invalid color format */
+    image_dsc = get_image_dsc();
+    image_dsc->header.cf = LV_COLOR_FORMAT_UNKNOWN;
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test invalid image size */
+    image_dsc = get_image_dsc();
+    image_dsc->header.w++;
+    image_dsc->header.h++;
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test invalid unaligned data */
+    image_dsc = get_image_dsc();
+    image_dsc->data = image_dsc->data + 1;
+    image_dsc->header.h = 1;
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test invalid flags */
+    image_dsc = get_image_dsc();
+    image_dsc->header.flags = (LV_IMAGE_FLAGS_ALLOCATED | LV_IMAGE_FLAGS_PREMULTIPLIED);
+    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
+
+    /* Test NULL image */
+    bin_decoder(NULL, "libs/bin_decoder_empty_image.png");
+}
+
+void test_bin_decoder_decoder_dsc_error_handling(void)
+{
+    lv_image_decoder_dsc_t * decoder_dsc = get_image_decoder_dsc();
+
+    /* Test info invalid file extension */
+    decoder_dsc->src = "test_image.png";
+    lv_result_t result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test info file read error */
+    decoder_dsc->src = "non_existing.bin";
+    result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test info unknown src type */
+    decoder_dsc->src = "A:src/test_files/binimages/cogwheel.ARGB8888.bin";
+    decoder_dsc->src_type = LV_IMAGE_SRC_UNKNOWN;
+    result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test open invalid file extension */
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = "test_image.png";
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test open file failure */
+    decoder_dsc->src = "non_existing.bin";
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test open variable image with NULL data */
+    lv_image_dsc_t * image_dsc = get_image_dsc();
+    image_dsc->data = NULL;
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = image_dsc;
+    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test open decompress image with LV_BIN_DECODER_RAM_LOAD == 0 */
+#if LV_BIN_DECODER_RAM_LOAD == 0
+    image_dsc = get_image_dsc();
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = image_dsc;
+    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
+    decoder_dsc->header.flags = LV_IMAGE_FLAGS_COMPRESSED;
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+#endif
+
+    /* Test open with user_flags handling */
+    image_dsc = get_image_dsc();
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = image_dsc;
+    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
+    decoder_dsc->header.flags = LV_IMAGE_FLAGS_USER_MASK;
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, result);
+
+    lv_bin_decoder_close(decoder_dsc->decoder, decoder_dsc);
+}
+
+void test_bin_decoder_get_area_outside_image(void)
+{
+    const char * src = "A:src/test_files/binimages/cogwheel.RGB565.bin";
+    lv_image_cache_drop(src);
+
+    const lv_image_decoder_args_t args = { .no_cache = true };
+    lv_image_decoder_dsc_t dsc;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&dsc, src, &args));
+
+    int32_t w = dsc.header.w;
+    int32_t h = dsc.header.h;
+
+    /*A transformed image is drawn on a larger area than the image itself. Such an area
+     *cannot be decoded line by line, so it must be rejected instead of reading out of bounds.*/
+    const lv_area_t outside[] = {
+        {-1, 0, w - 1, 0},
+        {0, -1, w - 1, 0},
+        {0, 0, w, 0},
+        {0, 0, w - 1, h},
+        {-4, -4, w + 3, h + 3},
+    };
+
+    for(uint32_t i = 0; i < sizeof(outside) / sizeof(outside[0]); i++) {
+        lv_area_t decoded_area = {LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN};
+        TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_image_decoder_get_area(&dsc, &outside[i], &decoded_area));
+    }
+
+    /*The full image is a valid area*/
+    const lv_area_t inside = {0, 0, w - 1, h - 1};
+    lv_area_t decoded_area = {LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN};
+    lv_result_t res = lv_image_decoder_get_area(&dsc, &inside, &decoded_area);
+#if LV_BIN_DECODER_RAM_LOAD == 0
+    /*Read line by line*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+    TEST_ASSERT_EQUAL(0, decoded_area.y1);
+    TEST_ASSERT_EQUAL(0, decoded_area.y2);
+    TEST_ASSERT_EQUAL(0, decoded_area.x1);
+    TEST_ASSERT_EQUAL(w - 1, decoded_area.x2);
+#else
+    LV_UNUSED(res); /*The whole image was decoded on open, no need to read it here*/
+#endif
+
+    lv_image_decoder_close(&dsc);
+}
+
+#endif /*LV_BUILD_TEST*/

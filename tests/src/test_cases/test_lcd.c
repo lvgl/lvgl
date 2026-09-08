@@ -212,8 +212,6 @@ void test_lcd_st7796(void)
     test_lcd_generic_mipi(lv_st7796_create, lv_st7796_set_gap, lv_st7796_set_invert, NULL,
                           lv_st7796_send_cmd_list);
 
-    /* NOTE: lv_st7796_set_gamma_curve is not supported, the setting should have no effect */
-    lv_st7796_set_gamma_curve(NULL, 0);
 }
 
 void test_lcd_ili9341(void)

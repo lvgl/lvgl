@@ -238,6 +238,7 @@ lvgl_add_test_folder(test_cases/libs)
 lvgl_add_test_folder(test_cases/refr)
 lvgl_add_test_folder(test_cases/widgets)
 
+lvgl_add_test_folder_if(NOT CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL test_cases/public_api)
 lvgl_get_test_files(TEST_CASE_FILES)
 
 file(GLOB_RECURSE TEST_HELPERS_FILES src/test_helpers/*.c)

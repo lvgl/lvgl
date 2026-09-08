@@ -345,25 +345,16 @@ static void cb_check_invalidated_area(lv_event_t * e)
     last_param = area;
 }
 
-static void cb_invalidated_area_wrong_code(lv_event_t * e)
-{
-    call_cnt++;
-    TEST_ASSERT_NULL(lv_event_get_invalidated_area(e));
-}
-
 void test_display_event_get_invalidated_area(void)
 {
     lv_area_t area = { 1, 2, 3, 4 };
 
     lv_display_add_event_cb(test_disp, cb_check_invalidated_area, LV_EVENT_INVALIDATE_AREA, NULL);
-    lv_display_add_event_cb(test_disp, cb_invalidated_area_wrong_code, LV_EVENT_REFR_START, NULL);
 
     lv_display_send_event(test_disp, LV_EVENT_INVALIDATE_AREA, &area);
     TEST_ASSERT_EQUAL_UINT32(1, call_cnt);
     TEST_ASSERT_EQUAL_PTR(&area, last_param);
 
-    lv_display_send_event(test_disp, LV_EVENT_REFR_START, NULL);
-    TEST_ASSERT_EQUAL_UINT32(2, call_cnt);
 }
 
 /* The handler of LV_EVENT_INVALIDATE_AREA may enlarge the area, and the

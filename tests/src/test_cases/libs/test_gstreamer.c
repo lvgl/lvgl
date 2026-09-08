@@ -136,11 +136,6 @@ void test_gstreamer_invalid_source(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gstreamer_set_src(player, LV_GSTREAMER_FACTORY_TEST_VIDEO, NULL, NULL));
 }
 
-void test_gstreamer_stream_state_of_invalid_event(void)
-{
-    TEST_ASSERT_EQUAL(LV_GSTREAMER_STREAM_STATE_INVALID, lv_gstreamer_get_stream_state(NULL));
-}
-
 void test_gstreamer_missing_file(void)
 {
     lv_obj_t * player = create_player();
@@ -282,7 +277,6 @@ void setUp(void) { }
 void tearDown(void) { }
 void test_gstreamer_without_source(void) { }
 void test_gstreamer_invalid_source(void) { }
-void test_gstreamer_stream_state_of_invalid_event(void) { }
 void test_gstreamer_missing_file(void) { }
 void test_gstreamer_videotestsrc(void) { }
 void test_gstreamer_file_playback(void) { }

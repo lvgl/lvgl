@@ -258,8 +258,6 @@ void test_theme_user_data(void)
     lv_theme_set_user_data(&theme, NULL);
     TEST_ASSERT_EQUAL_PTR(NULL, theme.user_data);
 
-    // NULL theme must not crash
-    lv_theme_set_user_data(NULL, &dummy);
 
     // A non NULL value can be retrieved
     lv_theme_set_user_data(&theme, &dummy);

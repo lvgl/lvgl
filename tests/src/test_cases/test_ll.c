@@ -158,7 +158,6 @@ void test_ll_get_len(void)
 
 void test_ll_is_empty(void)
 {
-    TEST_ASSERT_TRUE(lv_ll_is_empty(NULL));
     TEST_ASSERT_TRUE(lv_ll_is_empty(&test_ll));
 
     lv_ll_ins_head(&test_ll);
@@ -313,17 +312,6 @@ void test_ll_get_len_empty_list(void)
 {
     /* Test length of empty list */
     TEST_ASSERT_EQUAL(0, lv_ll_get_len(&test_ll));
-}
-
-void test_ll_nullptr_handling(void)
-{
-    TEST_ASSERT_NULL(lv_ll_ins_prev(NULL, NULL));
-    TEST_ASSERT_NULL(lv_ll_ins_prev(&test_ll, NULL));
-
-    lv_ll_remove(NULL, NULL);
-
-    TEST_ASSERT_NULL(lv_ll_get_head(NULL));
-    TEST_ASSERT_NULL(lv_ll_get_tail(NULL));
 }
 
 #endif

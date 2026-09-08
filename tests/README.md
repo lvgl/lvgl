@@ -68,6 +68,8 @@ GitHub's CI automatically runs these tests on pushes and pull requests to `maste
 ## Directory structure
 - `src` Source files of the tests
     - `test_cases` The written tests,
+        - `public_api` Tests that call a public function with an argument it is
+          documented to reject, see below,
     - `test_cases_perf` The performance tests,
     - `test_runners` Generated automatically from the files in `test_cases`.
     - other miscellaneous files and folders
