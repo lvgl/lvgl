@@ -164,9 +164,8 @@ def build_tables(pr, master, pr_symbols, master_symbols):
     lines += ["", "### LVGL library, nothing dead-stripped", ""]
     lines.append(
         "<sub>`liblvgl.a` in full. The linked image above only contains what the "
-        "test application reaches; bindings such as MicroPython's reference every "
-        "public symbol, so for them nothing is ever stripped and this is the number "
-        "that matters.</sub>"
+        "test application reaches. Useful to know how much memory LVGL will require "
+        "when using a binding like MicroPython</sub>"
     )
     lines.append("")
     if master:
