@@ -619,8 +619,8 @@ void lv_style_set_transform_scale(lv_style_t * style, int32_t value);
  * Do not pass multiple flags to this function as backwards-compatibility is not guaranteed
  * for that.
  *
- * @param prop Property ID
- * @param flag Flag
+ * @param prop 		a style property like `LV_STYLE_BG_COOR`
+ * @param flag 		a flag like `LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE`
  * @return true if the flag is set for this property
  */
 static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
