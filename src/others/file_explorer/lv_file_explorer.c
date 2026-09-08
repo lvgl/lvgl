@@ -537,7 +537,8 @@ static void browser_file_event_handler(lv_event_t * e)
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
-    lv_indev_type_t type = lv_indev_get_type(lv_indev_active());
+    lv_indev_t * indev = lv_indev_active();
+    lv_indev_type_t type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
     lv_event_code_t active_code = type == LV_INDEV_TYPE_POINTER ||
                                   type == LV_INDEV_TYPE_BUTTON ? LV_EVENT_VALUE_CHANGED : LV_EVENT_CLICKED;
 
