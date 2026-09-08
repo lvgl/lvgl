@@ -457,7 +457,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            const bool editing = lv_group_get_editing(g);
+            const bool editing = g != NULL && lv_group_get_editing(g);
 
             /*Save the current state when entered to edit mode*/
             if(editing) {
@@ -815,7 +815,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
 
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             lv_group_t * g      = lv_obj_get_group(obj);
-            if(lv_group_get_editing(g)) {
+            if(g != NULL && lv_group_get_editing(g)) {
                 lv_group_set_editing(g, false);
             }
         }
