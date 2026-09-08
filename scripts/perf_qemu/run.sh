@@ -113,12 +113,22 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+# Nothing but Docker is needed here: the toolchains and emulators come from the published
+# image, which is the same one CI runs, so the counts match. Building it is the fallback,
+# not the normal path.
 if [ -n "$BUILD_IMAGE" ]; then
     IMAGE=lv-perf-qemu:local
     docker build -t "$IMAGE" "$HERE"
 elif ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-    if ! docker pull "$IMAGE" >/dev/null 2>&1; then
-        echo "$IMAGE is not available, building it from $HERE/Dockerfile" >&2
+    echo "pulling $IMAGE (about 900 MB, once)"
+    if ! docker pull "$IMAGE"; then
+        # Said out loud rather than swallowed: if the package went private, or the tag was
+        # never published, every run would otherwise quietly build its own 4 GB image and
+        # nobody would know why the first run took ten minutes.
+        echo >&2
+        echo "could not pull $IMAGE, so building it from $HERE/Dockerfile instead." >&2
+        echo "That works, but takes a few minutes and needs to download the toolchains." >&2
+        echo "If it should have been pullable, check that the package is public." >&2
         IMAGE=lv-perf-qemu:local
         docker build -t "$IMAGE" "$HERE"
     fi

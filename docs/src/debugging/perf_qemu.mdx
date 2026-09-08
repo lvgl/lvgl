@@ -30,7 +30,13 @@ several stores into a single instruction. Real hardware is still what settles a 
 ## Requirements
 
 Docker, and nothing else. The toolchains, the emulators and GDB all live in one container
-image, which is what keeps a local run comparable with CI.
+image, which `run.sh` pulls from GHCR the first time it is needed and reuses after that.
+There is no toolchain to install and nothing to build: it is the same image CI runs, which
+is what makes a local count comparable with the one in a pull request.
+
+The pull is about 900 MB and happens once. `--build-image` builds the image from
+`scripts/perf_qemu/Dockerfile` instead, which is only useful when changing the Dockerfile
+itself; `run.sh` also falls back to that on its own if the image cannot be pulled.
 
 ## How to run it
 
