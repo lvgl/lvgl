@@ -2,7 +2,7 @@
 /* Variant: LV_USE_CHECK_ARG=1, LV_USE_CHECK_OBJ_CLASSTYPE=0, LV_USE_CHECK_OBJ_VALIDITY=1 */
 #define LV_USE_CHECK_OBJ_CLASSTYPE 0
 #include "../lvgl.h"
-#include "test_cases/test_check_obj_impl.h"
+#include "test_cases/public_api/test_check_obj_impl.h"
 
 void setUp(void)
 {

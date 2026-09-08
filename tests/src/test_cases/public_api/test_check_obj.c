@@ -1,7 +1,7 @@
 #if LV_BUILD_TEST
 /* Variant: default — LV_USE_CHECK_ARG=1, LV_USE_CHECK_OBJ_CLASSTYPE=1, LV_USE_CHECK_OBJ_VALIDITY=1 */
 #include "../lvgl.h"
-#include "test_cases/test_check_obj_impl.h"
+#include "test_cases/public_api/test_check_obj_impl.h"
 
 void setUp(void)
 {
