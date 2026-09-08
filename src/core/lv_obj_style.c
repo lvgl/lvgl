@@ -27,6 +27,11 @@
 #define _style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
 #define STYLE_PROP_SHIFTED(prop) ((uint32_t)1 << ((prop) >> 3))
 
+/*Property flags that can change the area where the widget is drawn.
+ *Before changing such a property the old area needs to be invalidated,
+ *else the already drawn pixels are left on the screen.*/
+#define DRAW_AREA_FLAGS (LV_STYLE_PROP_FLAG_TRANSFORM | LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -115,15 +120,14 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     LV_CHECK_ARG_MSG(obj->style_cnt < 63, return,
                      "obj->style_cnt is restricted to 6 bits, so we can't store more than 63 styles");
 
-    bool trans_removed = remove_trans_styles(obj, selector, LV_STYLE_PROP_ANY, NULL);
-
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
     /*If the draw size changes invalidate the old area first*/
-    if(style && part == LV_PART_MAIN &&
-       style_has_flag(style, LV_STYLE_PROP_FLAG_TRANSFORM | LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE)) {
+    if(part == LV_PART_MAIN && style_has_flag(style, DRAW_AREA_FLAGS)) {
         lv_obj_invalidate(obj);
     }
+
+    bool trans_removed = remove_trans_styles(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
     /*Try removing the style first to be sure it won't be added twice*/
     lv_obj_remove_style(obj, style, selector);
@@ -153,10 +157,10 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     obj->styles[i].style = style;
     obj->styles[i].selector = selector;
 
-#if LV_OBJ_STYLE_CACHE
     if(trans_removed) {
         full_cache_refresh(obj, LV_PART_ANY);
     }
+#if LV_OBJ_STYLE_CACHE
     else {
         uint32_t * prop_is_set = part == LV_PART_MAIN ? &obj->style_main_prop_is_set : &obj->style_other_prop_is_set;
         if(lv_style_is_const_internal(style)) {
@@ -188,9 +192,14 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
     lv_state_t state = lv_obj_style_get_selector_state(selector);
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
+    /*If the draw size changes invalidate the old area first*/
+    if((part == LV_PART_MAIN || part == LV_PART_ANY) &&
+       (style_has_flag(old_style, DRAW_AREA_FLAGS) || style_has_flag(new_style, DRAW_AREA_FLAGS))) {
+        lv_obj_invalidate(obj);
+    }
+
     /*Similar to lv_obj_add_style, delete transition*/
-    bool trans_removed;
-    trans_removed = remove_trans_styles(obj, selector, LV_STYLE_PROP_ANY, NULL);
+    bool trans_removed = remove_trans_styles(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
     bool replaced = false;
     uint32_t i;
@@ -322,9 +331,16 @@ void lv_obj_set_style_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
 
     if(en != obj_style->is_disabled) return; /*Already in the right state*/
 
+    lv_part_t part = lv_obj_style_get_selector_part(selector);
+
+    /*If the draw size changes invalidate the old area first*/
+    if((part == LV_PART_MAIN || part == LV_PART_ANY) && style_has_flag(style, DRAW_AREA_FLAGS)) {
+        lv_obj_invalidate(obj);
+    }
+
     obj_style->is_disabled = !en;
-    full_cache_refresh(obj, lv_obj_style_get_selector_part(selector));
-    lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), LV_STYLE_PROP_ANY);
+    full_cache_refresh(obj, part);
+    lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
 }
 
 bool lv_obj_get_style_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
@@ -421,22 +437,22 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
 
     LV_PROFILER_STYLE_BEGIN;
 
+    /*If the draw size changes invalidate the old area first*/
+    if(lv_obj_style_get_selector_part(selector) == LV_PART_MAIN && lv_style_prop_has_flag(prop, DRAW_AREA_FLAGS)) {
+        lv_obj_invalidate(obj);
+    }
+
     /*Stop running transitions with this property */
     bool trans_removed = remove_trans_styles(obj, lv_obj_style_get_selector_part(selector), prop, NULL);
 
     lv_style_t * style = get_local_style(obj, selector);
-    /*If the draw size changes invalidate the old area first*/
-    if(selector == LV_PART_MAIN &&
-       lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_TRANSFORM | LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE)) {
-        lv_obj_invalidate(obj);
-    }
 
     lv_style_set_prop(style, prop, value);
 
-#if LV_OBJ_STYLE_CACHE
     if(trans_removed) {
         full_cache_refresh(obj, LV_PART_ANY);
     }
+#if LV_OBJ_STYLE_CACHE
     else {
         uint32_t prop_shifted = STYLE_PROP_SHIFTED(prop);
         if(lv_obj_style_get_selector_part(selector) == LV_PART_MAIN) {
@@ -1186,9 +1202,8 @@ static void refresh_children_style(lv_obj_t * obj)
  * @param part a part of object or 0xFF to remove from all parts
  * @param prop a property or 0xFF to remove all properties
  * @param tr_limit delete transitions only "older" than this. `NULL` if not used
- * @return true: at lest 1 transition style saw removed.
+ * @return true: at least 1 transition style was removed.
  * @note it doesn't update the cache, `full_cache_refresh` needs to be called manually
- * @note it doesn't invalidate the widget
  */
 static bool remove_trans_styles(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit)
 {
@@ -1203,6 +1218,13 @@ static bool remove_trans_styles(lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         tr_prev = lv_ll_get_prev(style_trans_ll_p, tr);
 
         if(tr->obj == obj && (part == tr->selector || part == LV_PART_ANY) && (prop == tr->prop || prop == LV_STYLE_PROP_ANY)) {
+            /*Dropping the transitioned value changes the drawn area right away,
+             *so invalidate the old area first*/
+            if(lv_obj_style_get_selector_part(tr->selector) == LV_PART_MAIN &&
+               lv_style_prop_has_flag(tr->prop, DRAW_AREA_FLAGS)) {
+                lv_obj_invalidate(obj);
+            }
+
             /*Remove any transitioned properties from the trans. style
              *to allow changing it by normal styles*/
             uint32_t i;
@@ -1287,11 +1309,12 @@ static void trans_anim_cb(void * _tr, int32_t v)
 
         /*If the draw size changes invalidate the old area first*/
         lv_part_t part = lv_obj_style_get_selector_part(tr->selector);
-        if(part == LV_PART_MAIN &&
-           lv_style_prop_has_flag(tr->prop, LV_STYLE_PROP_FLAG_TRANSFORM  | LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE)) {
+        if(part == LV_PART_MAIN && lv_style_prop_has_flag(tr->prop, DRAW_AREA_FLAGS)) {
             lv_obj_invalidate(tr->obj);
         }
         lv_style_set_prop((lv_style_t *)obj->styles[i].style, tr->prop, value_final);
+
+#if LV_OBJ_STYLE_CACHE
         uint32_t prop_shifted = STYLE_PROP_SHIFTED(tr->prop);
         if(part == LV_PART_MAIN) {
             obj->style_main_prop_is_set |= prop_shifted;
@@ -1299,6 +1322,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
         else {
             obj->style_other_prop_is_set |= prop_shifted;
         }
+#endif
 
         lv_obj_refresh_style(tr->obj, tr->selector, tr->prop);
         break;
@@ -1325,18 +1349,22 @@ static void trans_anim_start_cb(lv_anim_t * a)
     lv_obj_style_t * style_trans = get_trans_style(tr->obj, tr->selector);
     /*Be sure `trans_style` has a valid value*/
     lv_style_set_prop((lv_style_t *)style_trans->style, tr->prop, tr->start_value);
+#if LV_OBJ_STYLE_CACHE
     if(trans_removed) {
         full_cache_refresh(tr->obj, part);
     }
     else {
         uint32_t prop_shifted = STYLE_PROP_SHIFTED(tr->prop);
-        if(lv_obj_style_get_selector_part(tr->selector) == LV_PART_MAIN) {
+        if(part == LV_PART_MAIN) {
             tr->obj->style_main_prop_is_set |= prop_shifted;
         }
         else {
             tr->obj->style_other_prop_is_set |= prop_shifted;
         }
     }
+#else
+    LV_UNUSED(trans_removed);
+#endif
 
     lv_obj_refresh_style(tr->obj, tr->selector, tr->prop);
 
@@ -1591,9 +1619,10 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
     lv_state_t state = lv_obj_style_get_selector_state(selector);
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
-    /*If the draw size changes invalidate the old area first*/
-    if(style && part == LV_PART_MAIN &&
-       style_has_flag(style, LV_STYLE_PROP_FLAG_TRANSFORM | LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE)) {
+    /*If the draw size changes invalidate the old area first.
+     *`style == NULL` means "any style" (e.g. `lv_obj_remove_style_all()`) so it can't be checked for flags.*/
+    if((part == LV_PART_MAIN || part == LV_PART_ANY) &&
+       (style == NULL || style_has_flag(style, DRAW_AREA_FLAGS))) {
         lv_obj_invalidate(obj);
     }
 
