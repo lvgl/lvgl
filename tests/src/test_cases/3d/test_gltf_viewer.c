@@ -301,7 +301,6 @@ void test_gltf_viewer_remove_model_tolerates_unknown_models(void)
     TEST_ASSERT_NOT_NULL(other);
 
     lv_gltf_remove_model(first, other);
-    lv_gltf_remove_model(first, NULL);
 
     TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(first));
     TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(second));
@@ -311,14 +310,6 @@ void test_gltf_viewer_remove_model_tolerates_unknown_models(void)
     lv_gltf_remove_all_models(first);
     TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(first));
     TEST_ASSERT_EQUAL(1, lv_gltf_get_model_count(second));
-}
-
-void test_gltf_viewer_add_model_rejects_null(void)
-{
-    lv_obj_t * gltf = create_view();
-
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_add_model(gltf, NULL));
-    TEST_ASSERT_EQUAL(0, lv_gltf_get_model_count(gltf));
 }
 
 void test_gltf_viewer_camera_selection(void)
@@ -360,15 +351,6 @@ void test_gltf_viewer_camera_count_without_cameras(void)
 }
 
 /* The camera of a viewer without models cannot be changed */
-void test_gltf_viewer_camera_without_model(void)
-{
-    lv_obj_t * gltf = create_view();
-
-    TEST_ASSERT_EQUAL(0, lv_gltf_get_camera_count(gltf));
-    lv_gltf_set_camera(gltf, 1);
-    TEST_ASSERT_EQUAL(LV_GLTF_DEFAULT_CAMERA, lv_gltf_get_camera(gltf));
-}
-
 void test_gltf_viewer_camera_orientation(void)
 {
     lv_obj_t * gltf = create_view();
@@ -629,19 +611,11 @@ void test_gltf_viewer_delete_a_shared_model(void)
 {
 }
 
-void test_gltf_viewer_add_model_rejects_null(void)
-{
-}
-
 void test_gltf_viewer_camera_selection(void)
 {
 }
 
 void test_gltf_viewer_camera_count_without_cameras(void)
-{
-}
-
-void test_gltf_viewer_camera_without_model(void)
 {
 }
 

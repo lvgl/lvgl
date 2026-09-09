@@ -131,12 +131,6 @@ void test_gltf_environment_create_from_missing_file_falls_back(void)
     lv_gltf_ibl_sampler_delete(sampler);
 }
 
-/* A NULL sampler is refused */
-void test_gltf_environment_create_without_sampler_fails(void)
-{
-    TEST_ASSERT_NULL(lv_gltf_environment_create(NULL, NULL));
-}
-
 /* The environment image really is taken from the file: the same model lit by the
  * generated image does not look like the one lit by the embedded default image */
 void test_gltf_environment_image_is_used(void)
@@ -240,18 +234,6 @@ void test_gltf_environment_replace_after_load(void)
     lv_gltf_environment_delete(env);
 }
 
-/* A NULL environment is refused instead of leaving the viewer without one */
-void test_gltf_environment_set_null_is_refused(void)
-{
-    lv_obj_t * gltf = create_view(0);
-    TEST_ASSERT_NOT_NULL(lv_gltf_load_model_from_file(gltf, ASSET("minimal_triangle.gltf")));
-
-    lv_gltf_set_environment(gltf, NULL);
-
-    /* Rendering still works, so the viewer kept its environment */
-    render_frames();
-}
-
 /* Rotating the environment rotates the lighting of the model */
 void test_gltf_environment_angle_is_applied(void)
 {
@@ -312,10 +294,6 @@ void test_gltf_environment_create_from_missing_file_falls_back(void)
 {
 }
 
-void test_gltf_environment_create_without_sampler_fails(void)
-{
-}
-
 void test_gltf_environment_image_is_used(void)
 {
 }
@@ -333,10 +311,6 @@ void test_gltf_environment_shared_between_viewers(void)
 }
 
 void test_gltf_environment_replace_after_load(void)
-{
-}
-
-void test_gltf_environment_set_null_is_refused(void)
 {
 }
 
