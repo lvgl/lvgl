@@ -51,16 +51,35 @@ def write_set_cmd(fout, expr, is_parent_scope):
     if is_parent_scope == True:
         fout.write(f'set({expr} PARENT_SCOPE)\n')
 
+# Boolean options outside of the LV_USE_*/LV_BUILD_*
+# namespaces to be export to CMake
+EXTRA_SYMBOLS = [
+    "LV_CHECK_ARG_ASSERT_ON_FAIL",
+]
+
+def symbol_pattern(prefix: str):
+    """Match the `#define`s to export, `prefix` being "" or "CONFIG_".
+
+    Only the LV_USE_*/LV_BUILD_* namespaces and the symbols explicitly listed
+    in EXTRA_SYMBOLS are exported."""
+    assert prefix == "" or prefix == "CONFIG_"
+
+    namespaces = ["LV_USE", "LV_BUILD", "LV_[0-9A-Z_]+_USE"]
+    extras = ["%s\\b" % symbol for symbol in EXTRA_SYMBOLS]
+    alternatives = "|".join(prefix + name for name in namespaces + extras)
+
+    return "^#define +(%s)" % alternatives
+
 def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, debug: bool, is_parent_scope: bool):
     fin = open(path_input)
     fout = open(path_output, "w", newline='')
 
-    BARE_PATTERN = "^#define +(LV_USE|LV_BUILD|LV_[0-9A-Z_]+_USE)"
+    BARE_PATTERN = symbol_pattern("")
 
     if kconfig:
         # If we use Kconfig, we must check for CONFIG_LV_USE_* and 
         # CONFIG_LV_BUILD_* defines
-        CONFIG_PATTERN = "^#define +(CONFIG_LV_USE|CONFIG_LV_BUILD|CONFIG_LV_[0-9A-Z_]+_USE)"
+        CONFIG_PATTERN = symbol_pattern("CONFIG_")
         CONFIG_PREFIX = ""
     else:
         # Otherwise check the LV_USE_* and LV_BUILD_* defines
