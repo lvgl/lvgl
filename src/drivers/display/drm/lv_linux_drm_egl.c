@@ -647,7 +647,7 @@ static void drm_destroy_window(void * driver_data, void * native_window)
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
     LV_ASSERT(native_window == ctx->gbm_surface);
 
-    if(!ctx->gbm_surface) {
+    if(!native_window) {
         return;
     }
 
