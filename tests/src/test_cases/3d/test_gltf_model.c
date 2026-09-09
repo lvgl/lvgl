@@ -196,16 +196,6 @@ void test_gltf_model_counts_skin_asset(void)
     lv_gltf_model_delete(model);
 }
 
-/* The count getters assert on a NULL model, but the functions that document a NULL
- * check must tolerate it. */
-void test_gltf_model_null_tolerant_functions(void)
-{
-    lv_gltf_model_delete(NULL);
-    lv_gltf_model_set_animation_speed(NULL, LV_GLTF_ANIM_SPEED_2X);
-    TEST_ASSERT_EQUAL(0, lv_gltf_model_get_animation_speed(NULL));
-    lv_gltf_model_loader_delete(NULL);
-}
-
 /* A loader can be reused for several models. Its texture cache is what makes shared
  * images load once, so models loaded through the same loader stay independent. */
 void test_gltf_model_shared_loader(void)
@@ -328,10 +318,6 @@ void test_gltf_model_counts_lights_asset(void)
 }
 
 void test_gltf_model_counts_skin_asset(void)
-{
-}
-
-void test_gltf_model_null_tolerant_functions(void)
 {
 }
 

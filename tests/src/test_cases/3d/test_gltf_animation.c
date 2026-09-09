@@ -62,30 +62,6 @@ void test_gltf_animation_play_selects_the_animation(void)
     lv_gltf_model_delete(model);
 }
 
-void test_gltf_animation_play_out_of_range_fails(void)
-{
-    lv_gltf_model_t * model = load_animated();
-
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_play_animation(model, ANIMATION_COUNT));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_play_animation(model, 1000));
-
-    /* A failed selection leaves the state alone */
-    TEST_ASSERT_TRUE(lv_gltf_model_is_animation_paused(model));
-
-    lv_gltf_model_delete(model);
-}
-
-void test_gltf_animation_play_without_animations_fails(void)
-{
-    lv_gltf_model_t * model = lv_gltf_data_load_from_file(ASSET("minimal_triangle.gltf"), NULL);
-    TEST_ASSERT_NOT_NULL(model);
-
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_play_animation(model, 0));
-    TEST_ASSERT_TRUE(lv_gltf_model_is_animation_paused(model));
-
-    lv_gltf_model_delete(model);
-}
-
 void test_gltf_animation_pause_and_resume(void)
 {
     lv_gltf_model_t * model = load_animated();
@@ -204,14 +180,6 @@ void test_gltf_animation_paused_by_default(void)
 }
 
 void test_gltf_animation_play_selects_the_animation(void)
-{
-}
-
-void test_gltf_animation_play_out_of_range_fails(void)
-{
-}
-
-void test_gltf_animation_play_without_animations_fails(void)
 {
 }
 

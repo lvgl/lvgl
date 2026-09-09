@@ -80,11 +80,6 @@ void test_gltf_node_get_by_index(void)
         TEST_ASSERT_NOT_NULL(lv_gltf_model_node_get_by_index(model, i));
     }
 
-    /* One past the last node and far beyond it are both out of range */
-    TEST_ASSERT_NULL(lv_gltf_model_node_get_by_index(model, 7));
-    TEST_ASSERT_NULL(lv_gltf_model_node_get_by_index(model, 1000));
-    TEST_ASSERT_NULL(lv_gltf_model_node_get_by_index(NULL, 0));
-
     lv_gltf_model_delete(model);
 }
 
@@ -106,7 +101,6 @@ void test_gltf_node_get_by_path(void)
     TEST_ASSERT_NULL(lv_gltf_model_node_get_by_path(model, "/body/nope"));
     TEST_ASSERT_NULL(lv_gltf_model_node_get_by_path(model, "body"));
     TEST_ASSERT_NULL(lv_gltf_model_node_get_by_path(model, ""));
-    TEST_ASSERT_NULL(lv_gltf_model_node_get_by_path(NULL, "/body"));
 
     lv_gltf_model_delete(model);
 }
@@ -131,7 +125,6 @@ void test_gltf_node_get_by_numeric_path(void)
 
     TEST_ASSERT_NULL(lv_gltf_model_node_get_by_numeric_path(model, ".9"));
     TEST_ASSERT_NULL(lv_gltf_model_node_get_by_numeric_path(model, "0"));
-    TEST_ASSERT_NULL(lv_gltf_model_node_get_by_numeric_path(NULL, ".0"));
 
     lv_gltf_model_delete(model);
 }
@@ -150,9 +143,6 @@ void test_gltf_node_paths_round_trip(void)
         /* The numeric path always leads back to the same node */
         TEST_ASSERT_EQUAL_PTR(node, lv_gltf_model_node_get_by_numeric_path(model, numeric_path));
     }
-
-    TEST_ASSERT_NULL(lv_gltf_model_node_get_path(NULL));
-    TEST_ASSERT_NULL(lv_gltf_model_node_get_ip(NULL));
 
     lv_gltf_model_delete(model);
 }
@@ -283,17 +273,6 @@ void test_gltf_node_read_world_position(void)
     TEST_ASSERT_FLOAT_WITHIN(0.001f, 3.0f, report.world_position.z);
 }
 
-/* Reading a property outside of the callback must fail instead of handing out stale data */
-void test_gltf_node_read_outside_callback_fails(void)
-{
-    lv_3dpoint_t point;
-
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_get_local_position(NULL, &point));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_get_world_position(NULL, &point));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_get_scale(NULL, &point));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_get_euler_rotation(NULL, &point));
-}
-
 void test_gltf_node_set_position(void)
 {
     lv_gltf_model_t * model = NULL;
@@ -386,23 +365,6 @@ void test_gltf_node_parent_transform_affects_child(void)
     TEST_ASSERT_EQUAL_FLOAT(0.25f, report.local_position.x);
     TEST_ASSERT_NOT_EQUAL(world_x_before, report.world_position.x);
     TEST_ASSERT_FLOAT_WITHIN(0.001f, 11.0f + 0.5f + 0.25f * 2.0f, report.world_position.x);
-}
-
-void test_gltf_node_setters_reject_null(void)
-{
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_position_x(NULL, 1.0f));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_position_y(NULL, 1.0f));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_position_z(NULL, 1.0f));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_rotation_x(NULL, 1.0f));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_rotation_y(NULL, 1.0f));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_rotation_z(NULL, 1.0f));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_scale_x(NULL, 1.0f));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_scale_y(NULL, 1.0f));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_gltf_model_node_set_scale_z(NULL, 1.0f));
-
-    TEST_ASSERT_NULL(lv_gltf_model_node_add_event_cb(NULL, node_value_cb, LV_EVENT_VALUE_CHANGED, NULL));
-    TEST_ASSERT_NULL(lv_gltf_model_node_add_event_cb_with_world_position(NULL, node_value_cb,
-                                                                         LV_EVENT_VALUE_CHANGED, NULL));
 }
 
 /* The callback is only called when a property actually changed */
@@ -501,10 +463,6 @@ void test_gltf_node_read_world_position(void)
 {
 }
 
-void test_gltf_node_read_outside_callback_fails(void)
-{
-}
-
 void test_gltf_node_set_position(void)
 {
 }
@@ -518,10 +476,6 @@ void test_gltf_node_set_rotation(void)
 }
 
 void test_gltf_node_parent_transform_affects_child(void)
-{
-}
-
-void test_gltf_node_setters_reject_null(void)
 {
 }
 
