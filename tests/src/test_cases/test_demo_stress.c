@@ -24,12 +24,12 @@ void test_demo_stress(void)
 #endif
     /* loop once to allow objects to be created */
     loop_through_stress_test();
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
     /* loop 5 more times */
     for(uint32_t i = 0; i < 5; i++) {
         loop_through_stress_test();
     }
-    TEST_ASSERT_EQUAL(mem_before, lv_test_get_free_mem());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
 }
 
 #endif

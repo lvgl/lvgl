@@ -218,6 +218,7 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
         mon_p->frag_pct = 0; /*no fragmentation if all the RAM is used*/
     }
 
+    mon_p->cur_used = state.cur_used;
     mon_p->max_used = state.max_used;
 
     LV_TRACE_MEM("finished");

@@ -28,7 +28,7 @@ static void bin_decoder(const void * src, const char * screenshot)
     TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
     lv_obj_clean(lv_screen_active());
 
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
     for(uint32_t i = 0; i < 20; i++) {
         lv_obj_clean(lv_screen_active());
         create_image(src);
@@ -38,7 +38,7 @@ static void bin_decoder(const void * src, const char * screenshot)
     }
     TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
     lv_obj_clean(lv_screen_active());
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, LV_TEST_MEM_LEAK_TOLERANCE);
 }
 
 static void create_image_tile(const void * src)
@@ -84,7 +84,7 @@ void bin_decoder_tile(const void * src, const char * screenshot)
     TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
     lv_obj_clean(lv_screen_active());
 
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
     for(uint32_t i = 0; i < 20; i++) {
         lv_obj_clean(lv_screen_active());
         create_image_tile(src);
@@ -94,7 +94,7 @@ void bin_decoder_tile(const void * src, const char * screenshot)
     }
     TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
     lv_obj_clean(lv_screen_active());
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, LV_TEST_MEM_LEAK_TOLERANCE);
 }
 
 void test_bin_decoder_i4(void)

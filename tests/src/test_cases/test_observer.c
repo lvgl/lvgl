@@ -1396,7 +1396,7 @@ void test_observer_set_user_data_user_owned(void)
     lv_subject_set_int(subject, 5);
 
     /* Record the baseline before any allocation so removal returns to it */
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
 
     lv_observer_t * observer =
         lv_subject_add_observer(subject, observer_basic, NULL);
@@ -1410,7 +1410,7 @@ void test_observer_set_user_data_user_owned(void)
 
     lv_observer_delete(observer);
     lv_free(data);
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
 }
 
 void test_observer_set_user_data_replaces_internal_data(void)
@@ -1420,7 +1420,7 @@ void test_observer_set_user_data_replaces_internal_data(void)
     lv_subject_set_int(subject, 5);
 
     /* Record the baseline before any allocation so removal returns to it */
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
 
     lv_observer_t * observer =
         lv_subject_add_observer(subject, observer_basic, NULL);
@@ -1434,16 +1434,16 @@ void test_observer_set_user_data_replaces_internal_data(void)
 
     void * new_data = lv_malloc(64);
     TEST_ASSERT_NOT_NULL(new_data);
-    uint32_t mem_with_both_data = lv_test_get_free_mem();
+    uint32_t mem_with_both_data = lv_test_get_used_mem();
     lv_observer_set_user_data(observer, new_data);
     TEST_ASSERT_EQUAL_PTR(new_data, lv_observer_get_user_data(observer));
     TEST_ASSERT_FALSE(observer->auto_free_user_data);
     LV_UNUSED(mem_with_both_data);
-    LV_HEAP_CHECK(TEST_ASSERT_GREATER_THAN_UINT32(mem_with_both_data, lv_test_get_free_mem()));
+    LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN_UINT32(mem_with_both_data, lv_test_get_used_mem()));
 
     lv_observer_delete(observer);
     lv_free(new_data);
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
 }
 
 void test_observer_set_user_data_same_internal_data(void)
@@ -1452,7 +1452,7 @@ void test_observer_set_user_data_same_internal_data(void)
     lv_subject_t * subject = subject_create(LV_SUBJECT_TYPE_INT);
     lv_subject_set_int(subject, 5);
 
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
 
     lv_observer_t * observer =
         lv_subject_add_observer(subject, observer_basic, NULL);
@@ -1463,20 +1463,20 @@ void test_observer_set_user_data_same_internal_data(void)
     observer->user_data = data;
     observer->auto_free_user_data = 1;
 
-    uint32_t mem_with_data = lv_test_get_free_mem();
+    uint32_t mem_with_data = lv_test_get_used_mem();
     lv_observer_set_user_data(observer, data);
     TEST_ASSERT_EQUAL_PTR(data, lv_observer_get_user_data(observer));
     TEST_ASSERT_FALSE(observer->auto_free_user_data);
-    TEST_ASSERT_EQUAL_UINT32(mem_with_data, lv_test_get_free_mem());
+    TEST_ASSERT_EQUAL_UINT32(mem_with_data, lv_test_get_used_mem());
 
     lv_observer_delete(observer);
     lv_free(data);
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
 }
 
 void test_observer_delete(void)
 {
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
     uint32_t i;
     for(i = 0; i < 64; i++) {
         lv_obj_t * obj1 = lv_slider_create(lv_screen_active());
@@ -1492,7 +1492,7 @@ void test_observer_delete(void)
         lv_obj_delete(obj2);
     }
 
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
 }
 
 #endif

@@ -44,7 +44,7 @@ void svg_decoder(void)
 void test_svg_decoder(void)
 {
     svg_decoder();
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
     svg_decoder();
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
 }
@@ -66,7 +66,7 @@ static void svg_decoder_file(void)
 void test_svg_decoder_file(void)
 {
     svg_decoder_file();
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
     svg_decoder_file();
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
 }
@@ -95,7 +95,7 @@ void svg_snapshot(void)
 void test_svg_snapshot(void)
 {
     svg_snapshot();
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
     svg_snapshot();
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
 }

@@ -206,7 +206,7 @@ void test_gstreamer_file_playback(void)
 
     lv_gstreamer_set_position(player, 500);
     /* The flushing seek is asynchronous, the position is only up to date once
-     * the pipeline has prerolled the frame it seeked to */
+     * the pipeline has prerolled the frame it sought to */
     pump(200);
     TEST_ASSERT_INT_WITHIN(100, 500, lv_gstreamer_get_position(player));
 
@@ -262,7 +262,7 @@ void test_gstreamer_queue_stays_bounded(void)
 
 void test_gstreamer_delete_while_playing(void)
 {
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
 
     for(uint32_t i = 0; i < 5; i++) {
         lv_obj_t * player = create_player();
@@ -273,7 +273,7 @@ void test_gstreamer_delete_while_playing(void)
         pump(20);
     }
 
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 64);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
 }
 
 #else

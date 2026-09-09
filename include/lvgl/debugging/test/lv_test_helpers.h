@@ -49,11 +49,22 @@ void lv_test_wait(uint32_t ms);
  */
 void lv_test_fast_forward(uint32_t ms);
 
+/**
+ * Heap usage sample to compare against a later one. See `lv_test_get_mem_usage()`.
+ */
+typedef struct {
+    size_t used_size;   /**< Allocated bytes */
+    size_t used_cnt;    /**< Number of allocated blocks */
+} lv_test_mem_usage_t;
+
 #if LV_USE_STDLIB_MALLOC != LV_STDLIB_BUILTIN
 /* Skip checking heap as we don't have the info available */
 #define LV_HEAP_CHECK(x) do {} while(0)
 /* Pick a non-zero value */
 #define lv_test_get_free_mem() (65536)
+/* Constant values, so that comparing two samples never reports a leak */
+#define lv_test_get_used_mem() (0)
+#define lv_test_get_mem_usage() ((lv_test_mem_usage_t) {0})
 #else
 #define LV_HEAP_CHECK(x) x
 
@@ -62,6 +73,32 @@ static inline size_t lv_test_get_free_mem(void)
     lv_mem_monitor_t m1;
     lv_mem_monitor(&m1);
     return m1.free_size;
+}
+
+/**
+ * Get the number of allocated bytes.
+ * Prefer this over `lv_test_get_free_mem()` for leak checks: the free size also
+ * shrinks when the heap gets fragmented, as every new block consumes a header.
+ */
+static inline size_t lv_test_get_used_mem(void)
+{
+    lv_mem_monitor_t m1;
+    lv_mem_monitor(&m1);
+    return m1.cur_used;
+}
+
+/**
+ * Take a heap usage sample for `TEST_ASSERT_MEM_LEAK_LESS_THAN()`.
+ * The block count is exact, while the allocated size can differ by a few bytes
+ * between two identical sequences of allocations: the allocator leaves the
+ * remainder in the block when it is too small to be split off.
+ */
+static inline lv_test_mem_usage_t lv_test_get_mem_usage(void)
+{
+    lv_mem_monitor_t m1;
+    lv_mem_monitor(&m1);
+    lv_test_mem_usage_t usage = { .used_size = m1.cur_used, .used_cnt = m1.used_cnt };
+    return usage;
 }
 #endif /* LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN */
 

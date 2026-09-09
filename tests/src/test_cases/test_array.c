@@ -318,7 +318,7 @@ void test_array_assign(void)
 
 void test_array_copy_empty_to_uninitialized(void)
 {
-    uint32_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
 
     lv_array_t target = {0};
     lv_array_t source;
@@ -337,7 +337,7 @@ void test_array_copy_empty_to_uninitialized(void)
 
 void test_array_copy_empty_to_populated(void)
 {
-    uint32_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
 
     lv_array_t target;
     lv_array_init(&target, 4, sizeof(int32_t));
@@ -361,7 +361,7 @@ void test_array_copy_empty_to_populated(void)
 
 void test_array_copy_zero_capacity(void)
 {
-    uint32_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
 
     lv_array_t target = {0};
     lv_array_t source;
@@ -381,7 +381,7 @@ void test_array_copy_zero_capacity(void)
 void test_array_copy_allocation_failure(void)
 {
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && !LV_USE_ASSERT_MALLOC
-    uint32_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
 
     lv_array_t target;
     lv_array_init(&target, 2, sizeof(int32_t));
@@ -407,7 +407,7 @@ void test_array_copy_allocation_failure(void)
 
 void test_array_copy_overflow(void)
 {
-    uint32_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
 
     lv_array_t target;
     lv_array_init(&target, 2, sizeof(int32_t));
@@ -432,7 +432,7 @@ void test_array_copy_overflow(void)
 
 void test_array_copy_self(void)
 {
-    uint32_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
 
     lv_array_t target;
     lv_array_init(&target, 4, sizeof(int32_t));

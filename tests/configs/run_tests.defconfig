@@ -9,3 +9,9 @@ CONFIG_LV_DPI_DEF=130
 
 # The test cases do not use the examples
 # CONFIG_LV_BUILD_EXAMPLES is not set
+
+# The system monitor labels are updated with values derived from the real elapsed
+# time, so the size of their text buffers varies between runs. That jitter would
+# show up in the memory leak checks, hence the executed suites run without it.
+# The sysmon code is still compiled by the build only configurations.
+# CONFIG_LV_USE_SYSMON is not set

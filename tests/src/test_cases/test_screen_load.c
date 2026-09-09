@@ -508,7 +508,7 @@ static lv_obj_t * screen_create(void)
 
 void test_screen_mix_event_and_manual_creation(void)
 {
-    size_t free_mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = lv_test_get_mem_usage();
 
     lv_obj_t * screen = lv_obj_create(NULL);
     lv_obj_t * screen_create_trigger = lv_obj_create(screen);
@@ -522,7 +522,7 @@ void test_screen_mix_event_and_manual_creation(void)
     lv_screen_load_anim(screen, LV_SCREEN_LOAD_ANIM_NONE, 0, 0, true);
     lv_obj_delete(lv_screen_active());
 
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(free_mem, 32);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
 }
 
 #endif

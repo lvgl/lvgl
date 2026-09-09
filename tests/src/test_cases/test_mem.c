@@ -16,7 +16,7 @@ void tearDown(void)
 
 void test_malloc(void)
 {
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
     void * buf = lv_malloc(32);
     TEST_ASSERT_NOT_NULL(buf);
     lv_free(buf);
@@ -33,7 +33,7 @@ static void check_zero_mem(const void * data, size_t size)
 
 void test_calloc(void)
 {
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
     void * buf = lv_calloc(4, 8);
     TEST_ASSERT_NOT_NULL(buf);
 
@@ -52,7 +52,7 @@ void test_calloc_overflow(void)
 
 void test_zalloc(void)
 {
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
     void * buf = lv_zalloc(32);
     TEST_ASSERT_NOT_NULL(buf);
 
@@ -64,7 +64,7 @@ void test_zalloc(void)
 
 void test_realloc(void)
 {
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
     void * buf = lv_malloc(16);
     TEST_ASSERT_NOT_NULL(buf);
 
@@ -88,7 +88,7 @@ void test_realloc(void)
 void test_realloc_failed(void)
 {
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
 
     void * buf1 = lv_malloc(20);
 
@@ -110,7 +110,7 @@ void test_realloc_failed(void)
 void test_malloc_failed(void)
 {
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
     TEST_ASSERT_NULL(lv_malloc(LV_MEM_SIZE + 1));
     TEST_ASSERT_NULL(lv_malloc_zeroed(LV_MEM_SIZE + 1));
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
@@ -120,7 +120,7 @@ void test_malloc_failed(void)
 void test_malloc_size_overflow(void)
 {
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
 
     /* Aligning these up wraps around, which must not turn them into a tiny request */
     for(size_t i = 0; i < 2 * lv_tlsf_align_size(); i++) {
@@ -137,7 +137,7 @@ void test_realloc_size_overflow(void)
 {
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     const size_t len = 100;
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
 
     uint8_t * buf = lv_malloc(len);
     TEST_ASSERT_NOT_NULL(buf);
@@ -173,7 +173,7 @@ void test_mem_add_pool_size_limits(void)
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     const size_t overhead = lv_tlsf_pool_overhead();
     const size_t block_max = lv_tlsf_block_size_max();
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
 
     void * pool_mem = malloc(overhead + block_max);
     TEST_ASSERT_NOT_NULL(pool_mem);
@@ -200,7 +200,7 @@ void test_mem_add_pool_size_limits(void)
 void test_mem_test(void)
 {
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    uint32_t mem = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem = lv_test_get_mem_usage();
     uint32_t * zero_mem = lv_malloc_zeroed(0);
     TEST_ASSERT_NOT_NULL(zero_mem);
 

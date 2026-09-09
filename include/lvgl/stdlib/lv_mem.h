@@ -36,6 +36,8 @@ typedef struct {
     size_t free_size;   /**< Size of available memory */
     size_t free_biggest_size;
     size_t used_cnt;
+    size_t cur_used;    /**< Size of the currently allocated blocks. Unlike `free_size` it is
+                             not affected by the fragmentation of the heap. */
     size_t max_used;    /**< Max size of Heap memory used */
     uint8_t used_pct;   /**< Percentage used */
     uint8_t frag_pct;   /**< Amount of fragmentation */

@@ -39,7 +39,28 @@ extern "C" {
 #  define TEST_ASSERT_NOT_EQUAL_COLOR32(c1, c2)                   TEST_ASSERT_FALSE(lv_color32_eq(c1, c2))
 #  define TEST_ASSERT_NOT_EQUAL_COLOR32_MESSAGE(c1, c2, msg)      TEST_ASSERT_FALSE(lv_color32_eq(c1, c2), msg)
 
-#  define TEST_ASSERT_MEM_LEAK_LESS_THAN(prev_usage, threshold)  TEST_ASSERT_LESS_OR_EQUAL(threshold, LV_ABS((int64_t)(prev_usage) - (int64_t)lv_test_get_free_mem()));
+/* Allowance for the allocator's rounding slack in the tests that repeat the same
+ * rendering: the very same sequence of allocations can end up a few bytes apart,
+ * depending on which free blocks it lands in. The number of the allocated blocks
+ * is compared exactly, that is what catches an actual leak. */
+#  define LV_TEST_MEM_LEAK_TOLERANCE 128
+
+/* Compare the heap usage with an earlier `lv_test_get_mem_usage()` sample: the number
+ * of allocated blocks must not grow at all, while the allocated bytes may grow by
+ * `threshold`, as the allocator leaves a few bytes in a block that it cannot split.
+ * Only a growth is a leak, freeing more than what was allocated in between is fine. */
+#  define TEST_ASSERT_MEM_LEAK_LESS_THAN(prev_usage, threshold)                                     \
+    do {                                                                                            \
+        lv_test_mem_usage_t usage_now = lv_test_get_mem_usage();                                    \
+        TEST_ASSERT_LESS_OR_EQUAL_MESSAGE(0,                                                        \
+                                          (int)((int64_t)usage_now.used_cnt                         \
+                                                - (int64_t)(prev_usage).used_cnt),                  \
+                                          "more allocated blocks than before");                     \
+        TEST_ASSERT_LESS_OR_EQUAL_MESSAGE((int)(threshold),                                         \
+                                          (int)((int64_t)usage_now.used_size                        \
+                                                - (int64_t)(prev_usage).used_size),                 \
+                                          "more allocated bytes than before");                      \
+    } while(0)
 
 #ifdef LV_BUILD_TEST_PERF
 

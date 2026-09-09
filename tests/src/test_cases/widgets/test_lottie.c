@@ -142,7 +142,7 @@ void test_lottie_non_uniform_shape(void)
 
 void test_lottie_memory_leak(void)
 {
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = {0};
 
     uint32_t i;
     for(i = 0; i < 32; i++) {
@@ -153,8 +153,12 @@ void test_lottie_memory_leak(void)
         lv_test_fast_forward(753 * i); /*Render a random frame*/
         lv_timer_handler();
         lv_obj_delete(lottie);
+
+        /* The first iteration also allocates one-time data, e.g. in the caches,
+         * so take the reference after it */
+        if(i == 0) mem_before = lv_test_get_mem_usage();
     }
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 16);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, LV_TEST_MEM_LEAK_TOLERANCE);
 }
 
 void test_lottie_no_jump_when_visible_again(void)

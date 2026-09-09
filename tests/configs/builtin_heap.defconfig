@@ -2,3 +2,7 @@ CONFIG_LV_USE_BUILTIN_MALLOC=y
 CONFIG_LV_USE_BUILTIN_STRING=y
 CONFIG_LV_USE_BUILTIN_SPRINTF=y
 CONFIG_LV_MEM_SIZE=33554432
+
+# Only the build only configurations compile it: the executed suites run without
+# the system monitor, see run_tests.defconfig
+CONFIG_LV_USE_MEM_MONITOR=y

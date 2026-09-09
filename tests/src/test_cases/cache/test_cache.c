@@ -5,7 +5,7 @@
 
 #include "unity/unity.h"
 
-static uint32_t MEM_SIZE = 0;
+static lv_test_mem_usage_t mem_used_before;
 
 // Cache size in bytes
 #define CACHE_SIZE_BYTES 1000
@@ -14,13 +14,13 @@ static uint32_t MEM_SIZE = 0;
 void setUp(void)
 {
     /* Function run before every test */
-    MEM_SIZE = lv_test_get_free_mem();
+    mem_used_before = lv_test_get_mem_usage();
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(MEM_SIZE, 64);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_used_before, 0);
 }
 
 typedef struct {
@@ -128,23 +128,14 @@ void test_cache_lru_rb_1(void)
      * Now drop the cache {key1 = 32, key2 = 33}. However, this entry is acquired once without release, so `drop`
      * will not release the memory allocated by this entry.
      */
-    size_t mem_curr_free = lv_test_get_free_mem();
+    size_t mem_used_curr = lv_test_get_used_mem();
     lv_cache_drop(cache, &search_key32, NULL);
-    /*
-     * Though it doesn't release the data, the entry and other structure has been freed.
-     * lv_rb_note_t (4 ptr + 1 int32 may align to 8 bit on 64 bit machine) + lv_ll (2 ptr + node_size).
-     * Also, the def heap has some other aligned attributes. It'll also affect the final result.
-     */
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(
-        mem_curr_free,
-        sizeof(lv_rb_node_t) + sizeof(void *) +
-        (sizeof(lv_ll_node_t *) + sizeof(lv_ll_node_t *)) +
-        32); // the last 32 is an error in memory allocating
-    mem_curr_free = lv_test_get_free_mem();
+    /* Though it doesn't release the data, the entry and the other structures are freed */
+    LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(mem_used_curr, lv_test_get_used_mem()));
+    mem_used_curr = lv_test_get_used_mem();
     lv_cache_release(cache, entry_key32, NULL);
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(
-        mem_curr_free, lv_cache_entry_get_size(sizeof(test_data_t)) +
-        sizeof(void *) + 32 + 32);
+    /* Releasing the last reference frees the data too */
+    LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(mem_used_curr, lv_test_get_used_mem()));
 
     // Now the freed cache size should be 8 + 32 = 40
     TEST_ASSERT_EQUAL(40, lv_cache_get_free_size(cache, NULL));

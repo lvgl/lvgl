@@ -47,10 +47,19 @@ void test_switch_should_have_default_state_after_being_created(void)
 void test_switch_should_not_leak_memory_after_deletion(void)
 {
     size_t idx = 0;
-    size_t initial_available_memory = 0;
+    lv_test_mem_usage_t initial_used_memory = {0};
     lv_obj_t * switches[SWITCHES_CNT] = {NULL};
 
-    initial_available_memory = lv_test_get_free_mem();
+    /* Create and delete the switches once: it also allocates one-time data,
+     * e.g. it grows the child array of the screen */
+    for(idx = 0; idx < SWITCHES_CNT; idx++) {
+        switches[idx] = lv_switch_create(scr);
+    }
+    for(idx = 0; idx < SWITCHES_CNT; idx++) {
+        lv_obj_delete(switches[idx]);
+    }
+
+    initial_used_memory = lv_test_get_mem_usage();
 
     for(idx = 0; idx < SWITCHES_CNT; idx++) {
         switches[idx] = lv_switch_create(scr);
@@ -60,8 +69,8 @@ void test_switch_should_not_leak_memory_after_deletion(void)
         lv_obj_delete(switches[idx]);
     }
 
-    LV_UNUSED(initial_available_memory);
-    LV_HEAP_CHECK(TEST_ASSERT_MEM_LEAK_LESS_THAN(initial_available_memory, 24));
+    LV_UNUSED(initial_used_memory);
+    LV_HEAP_CHECK(TEST_ASSERT_MEM_LEAK_LESS_THAN(initial_used_memory, LV_TEST_MEM_LEAK_TOLERANCE));
 }
 
 void test_switch_animation(void)

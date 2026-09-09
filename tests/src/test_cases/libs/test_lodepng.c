@@ -65,17 +65,21 @@ void test_lodepng_1(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_1.png");
 
-    size_t mem_before = lv_test_get_free_mem();
+    lv_test_mem_usage_t mem_before = {0};
     for(uint32_t i = 0; i < 20; i++) {
         create_images();
 
         lv_obj_invalidate(lv_screen_active());
         lv_refr_now(NULL);
+
+        /* The first iteration also allocates one-time data, e.g. in the caches,
+         * so take the reference after it */
+        if(i == 0) mem_before = lv_test_get_mem_usage();
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_1.png");
 
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 112);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, LV_TEST_MEM_LEAK_TOLERANCE);
 
     /* Re-add libpng decoder */
     lv_libpng_init();

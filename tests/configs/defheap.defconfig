@@ -1,6 +1,5 @@
 # Test configuration to be added on top of builtin_heap.defconfig.
 
-CONFIG_LV_USE_MEM_MONITOR=y
 CONFIG_LV_OBJ_STYLE_CACHE=y
 
 # Non power of 2 so that we do not accidentally rely on the alignment
