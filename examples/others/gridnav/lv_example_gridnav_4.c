@@ -25,16 +25,18 @@ static void event_handler(lv_event_t * e)
  */
 void lv_example_gridnav_4(void)
 {
-    /*It's assumed that the default group is set and
+    /*The example requires that a default group is set and
      *there is a keyboard indev*/
+    lv_group_t * group = lv_group_get_default();
+    if(!group) {
+        LV_LOG_WARN("Gridnav example requires a default group");
+        return;
+    }
 
     lv_obj_t * list = lv_list_create(lv_screen_active());
     lv_gridnav_add(list, LV_GRIDNAV_CTRL_ROLLOVER);
     lv_obj_align(list, LV_ALIGN_LEFT_MID, 10, 0);
-    lv_group_t * g = lv_group_get_default();
-    if(g) {
-        lv_group_add_obj(g, list);
-    }
+    lv_group_add_obj(group, list);
 
     uint32_t i;
     for(i = 0; i < 20; i++) {

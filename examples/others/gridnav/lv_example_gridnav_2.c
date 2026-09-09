@@ -16,18 +16,20 @@ LV_DEPRECATIONS_IGNORE_BEGIN
  */
 void lv_example_gridnav_2(void)
 {
-    /*It's assumed that the default group is set and
+    /*The example requires that a default group is set and
      *there is a keyboard indev*/
+    lv_group_t * group = lv_group_get_default();
+    if(!group) {
+        LV_LOG_WARN("Gridnav example requires a default group");
+        return;
+    }
 
     lv_obj_t * list1 = lv_list_create(lv_screen_active());
     lv_gridnav_add(list1, LV_GRIDNAV_CTRL_NONE);
     lv_obj_set_size(list1, lv_pct(45), lv_pct(80));
     lv_obj_align(list1, LV_ALIGN_LEFT_MID, 5, 0);
     lv_obj_set_style_bg_color(list1, lv_palette_lighten(LV_PALETTE_BLUE, 5), LV_STATE_FOCUSED);
-    lv_group_t * g = lv_group_get_default();
-    if(g) {
-        lv_group_add_obj(g, list1);
-    }
+    lv_group_add_obj(group, list1);
 
     char buf[32];
     uint32_t i;
@@ -43,9 +45,7 @@ void lv_example_gridnav_2(void)
     lv_obj_set_size(list2, lv_pct(45), lv_pct(80));
     lv_obj_align(list2, LV_ALIGN_RIGHT_MID, -5, 0);
     lv_obj_set_style_bg_color(list2, lv_palette_lighten(LV_PALETTE_BLUE, 5), LV_STATE_FOCUSED);
-    if(g) {
-        lv_group_add_obj(g, list2);
-    }
+    lv_group_add_obj(group, list2);
 
     for(i = 0; i < 15; i++) {
         lv_snprintf(buf, sizeof(buf), "Folder %d", i + 1);
