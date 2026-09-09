@@ -230,13 +230,15 @@ target_compile_definitions(test_common PRIVATE
     LV_BUILD_EXAMPLES=1
 )
 
-lvgl_add_test_folder(test_cases)
-lvgl_add_test_folder(test_cases/3d)
-lvgl_add_test_folder(test_cases/cache)
-lvgl_add_test_folder(test_cases/draw)
-lvgl_add_test_folder(test_cases/libs)
-lvgl_add_test_folder(test_cases/refr)
-lvgl_add_test_folder(test_cases/widgets)
+if(CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL)
+    lvgl_add_test_folder(test_cases)
+    lvgl_add_test_folder(test_cases/3d)
+    lvgl_add_test_folder(test_cases/cache)
+    lvgl_add_test_folder(test_cases/draw)
+    lvgl_add_test_folder(test_cases/libs)
+    lvgl_add_test_folder(test_cases/refr)
+    lvgl_add_test_folder(test_cases/widgets)
+endif()
 
 lvgl_add_test_folder_if(NOT CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL test_cases/public_api)
 lvgl_get_test_files(TEST_CASE_FILES)
