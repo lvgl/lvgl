@@ -480,7 +480,6 @@ static bool get_jpeg_size(uint8_t * data, uint32_t data_size, uint32_t * width, 
 
 static image_orientation_t get_jpeg_direction(uint8_t * data, uint32_t data_size)
 {
-    image_orientation_t res = IMAGE_CLOCKWISE_NONE;
     struct jpeg_decompress_struct cinfo;
     error_mgr_t jerr;
 
@@ -490,7 +489,7 @@ static image_orientation_t get_jpeg_direction(uint8_t * data, uint32_t data_size
     if(setjmp(jerr.jb)) {
         LV_LOG_WARN("read jpeg orientation failed");
         jpeg_destroy_decompress(&cinfo);
-        return res;
+        return IMAGE_CLOCKWISE_NONE;
     }
     /* jpeg_create_decompress */
     jpeg_decompress_prepare(&cinfo, data, data_size);
@@ -499,11 +498,11 @@ static image_orientation_t get_jpeg_direction(uint8_t * data, uint32_t data_size
     if(ret != JPEG_HEADER_OK) {
         LV_LOG_WARN("read jpeg header failed: %d", ret);
         jpeg_destroy_decompress(&cinfo);
-        return res;
+        return IMAGE_CLOCKWISE_NONE;
     }
 
     /* read file exif orientation */
-    res = jpeg_markers_reader(&cinfo);
+    image_orientation_t res = jpeg_markers_reader(&cinfo);
 
     jpeg_destroy_decompress(&cinfo);
 
