@@ -53,6 +53,27 @@ static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer, uin
     static void pointer_handle_frame(void * data, struct wl_pointer * pointer);
 #endif
 
+#ifdef WL_POINTER_AXIS_SOURCE_SINCE_VERSION
+    static void pointer_handle_axis_source(void * data, struct wl_pointer * pointer, uint32_t axis_source);
+#endif
+
+#ifdef WL_POINTER_AXIS_STOP_SINCE_VERSION
+    static void pointer_handle_axis_stop(void * data, struct wl_pointer * pointer, uint32_t time, uint32_t axis);
+#endif
+
+#ifdef WL_POINTER_AXIS_DISCRETE_SINCE_VERSION
+    static void pointer_handle_axis_discrete(void * data, struct wl_pointer * pointer, uint32_t axis, int32_t discrete);
+#endif
+
+#ifdef WL_POINTER_AXIS_VALUE120_SINCE_VERSION
+    static void pointer_handle_axis_value120(void * data, struct wl_pointer * pointer, uint32_t axis, int32_t value120);
+#endif
+
+#ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
+static void pointer_handle_axis_relative_direction(void * data, struct wl_pointer * pointer, uint32_t axis,
+                                                   uint32_t direction);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -65,6 +86,21 @@ static const struct wl_pointer_listener pointer_listener = {
     .axis   = pointer_handle_axis,
 #ifdef WL_POINTER_FRAME_SINCE_VERSION
     .frame  = pointer_handle_frame,
+#endif
+#ifdef WL_POINTER_AXIS_SOURCE_SINCE_VERSION
+    .axis_source = pointer_handle_axis_source,
+#endif
+#ifdef WL_POINTER_AXIS_STOP_SINCE_VERSION
+    .axis_stop = pointer_handle_axis_stop,
+#endif
+#ifdef WL_POINTER_AXIS_DISCRETE_SINCE_VERSION
+    .axis_discrete = pointer_handle_axis_discrete,
+#endif
+#ifdef WL_POINTER_AXIS_VALUE120_SINCE_VERSION
+    .axis_value120 = pointer_handle_axis_value120,
+#endif
+#ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
+    .axis_relative_direction = pointer_handle_axis_relative_direction,
 #endif
 };
 
@@ -315,6 +351,57 @@ static void pointer_handle_frame(void * data, struct wl_pointer * pointer)
     LV_UNUSED(pointer);
     lv_wayland_indevs_ready(pointer_read);
     lv_wayland_indevs_ready(pointeraxis_read);
+}
+#endif
+
+
+#ifdef WL_POINTER_AXIS_SOURCE_SINCE_VERSION
+static void pointer_handle_axis_source(void * data, struct wl_pointer * pointer, uint32_t axis_source)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(pointer);
+    LV_UNUSED(axis_source);
+}
+#endif
+
+#ifdef WL_POINTER_AXIS_STOP_SINCE_VERSION
+static void pointer_handle_axis_stop(void * data, struct wl_pointer * pointer, uint32_t time, uint32_t axis)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(pointer);
+    LV_UNUSED(time);
+    LV_UNUSED(axis);
+}
+#endif
+
+#ifdef WL_POINTER_AXIS_DISCRETE_SINCE_VERSION
+static void pointer_handle_axis_discrete(void * data, struct wl_pointer * pointer, uint32_t axis, int32_t discrete)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(pointer);
+    LV_UNUSED(axis);
+    LV_UNUSED(discrete);
+}
+#endif
+
+#ifdef WL_POINTER_AXIS_VALUE120_SINCE_VERSION
+static void pointer_handle_axis_value120(void * data, struct wl_pointer * pointer, uint32_t axis, int32_t value120)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(pointer);
+    LV_UNUSED(axis);
+    LV_UNUSED(value120);
+}
+#endif
+
+#ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
+static void pointer_handle_axis_relative_direction(void * data, struct wl_pointer * pointer, uint32_t axis,
+                                                   uint32_t direction)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(pointer);
+    LV_UNUSED(axis);
+    LV_UNUSED(direction);
 }
 #endif
 
