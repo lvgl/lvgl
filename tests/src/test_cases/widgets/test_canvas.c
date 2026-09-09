@@ -791,4 +791,71 @@ void test_line_bigger_than_display_resolution(void)
      * at (hor_res+1, ver_res+1) on a buffer of size (hor_res+1)x(ver_res+1)*/
 }
 
+void test_canvas_draw_sub_layer(void)
+{
+    lv_obj_t * canvas = lv_canvas_create(g_screen_active);
+
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 100, 100, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf);
+    canvas_draw_buf_reshape(&draw_buf);
+    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+    TEST_ASSERT_EQUAL_PTR(lv_obj_get_display(canvas), layer.display);
+
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_draw_rect_dsc_init(&rect_dsc);
+    rect_dsc.bg_color = lv_color_hex(0xFF0000);
+    rect_dsc.bg_opa = LV_OPA_COVER;
+    rect_dsc.base.drop_shadow_opa = LV_OPA_COVER;
+    rect_dsc.base.drop_shadow_blur_radius = 5;
+    lv_area_t rect_area = {30, 30, 70, 70};
+    lv_draw_rect(&layer, &rect_dsc, &rect_area);
+
+    lv_canvas_finish_layer(canvas, &layer);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/canvas_dropshadow.png")
+}
+
+void test_canvas_draw_nested_sub_layer(void)
+{
+    lv_obj_t * canvas = lv_canvas_create(g_screen_active);
+
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 100, 100, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf);
+    canvas_draw_buf_reshape(&draw_buf);
+    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    /* A sub-layer of the canvas layer */
+    lv_area_t sub_area = {10, 10, 90, 90};
+    lv_layer_t * sub_layer = lv_draw_layer_create(&layer, LV_COLOR_FORMAT_ARGB8888, &sub_area);
+    TEST_ASSERT_NOT_NULL(sub_layer);
+
+    /* which gets a sub-layer of its own for the drop shadow */
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_draw_rect_dsc_init(&rect_dsc);
+    rect_dsc.bg_color = lv_color_hex(0x0000FF);
+    rect_dsc.bg_opa = LV_OPA_COVER;
+    rect_dsc.base.drop_shadow_opa = LV_OPA_COVER;
+    rect_dsc.base.drop_shadow_blur_radius = 4;
+    lv_area_t rect_area = {35, 35, 65, 65};
+    lv_draw_rect(sub_layer, &rect_dsc, &rect_area);
+
+    /* Blend the sub-layer back into the canvas layer */
+    lv_draw_image_dsc_t layer_dsc;
+    lv_draw_image_dsc_init(&layer_dsc);
+    layer_dsc.src = sub_layer;
+    lv_draw_layer(&layer, &layer_dsc, &sub_area);
+
+    lv_canvas_finish_layer(canvas, &layer);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/canvas_nested_sub_layer.png")
+}
+
 #endif

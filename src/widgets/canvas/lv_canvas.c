@@ -15,6 +15,7 @@
 
 #if LV_USE_CANVAS
 
+#include "../../display/lv_display_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
@@ -35,6 +36,7 @@
  **********************/
 static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static bool layer_is_descendant(const lv_layer_t * layer, const lv_layer_t * ancestor);
 
 /**********************
  *  STATIC VARIABLES
@@ -389,6 +391,7 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     lv_area_t canvas_area = {0, 0, header->w - 1,  header->h - 1};
 
     layer->draw_buf = canvas->draw_buf;
+    layer->display = lv_obj_get_display(obj);
     layer->color_format = header->cf;
     layer->buf_area = canvas_area;
     layer->_clip_area = canvas_area;
@@ -410,10 +413,26 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
     layer->all_tasks_added = true;
 
     bool task_dispatched;
+    lv_display_t * display = layer->display;
+    LV_ASSERT(display != NULL);
 
     while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
-        task_dispatched = lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
+
+        task_dispatched = lv_draw_dispatch_layer(display, layer);
+
+        /*TODO(v10): dispatching a layer can create new sub layers that the layer depends on.
+         * These sub layers are created in display's layer list because `lv_draw_layer_create`
+         * attaches this layer to the display layer head, so in here we need to iterate over that
+         * list and dispatchs any sub layers that are required by the main layer
+         */
+        lv_layer_t * sub_layer = display->layer_head;
+        while(sub_layer) {
+            if(layer_is_descendant(sub_layer, layer) && lv_draw_dispatch_layer(display, sub_layer)) {
+                task_dispatched = true;
+            }
+            sub_layer = sub_layer->next;
+        }
 
         if(!task_dispatched) {
             lv_draw_wait_for_finish();
@@ -451,6 +470,16 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     if(canvas->draw_buf == NULL) return;
 
     lv_image_cache_drop(&canvas->draw_buf);
+}
+static bool layer_is_descendant(const lv_layer_t * layer, const lv_layer_t * ancestor)
+{
+    layer = layer->parent;
+    while(layer) {
+        if(layer == ancestor) return true;
+        layer = layer->parent;
+    }
+
+    return false;
 }
 
 #endif
