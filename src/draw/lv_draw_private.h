@@ -42,9 +42,6 @@ struct _lv_draw_task_t {
      */
     lv_area_t _real_area;
 
-    /** The original area which is updated*/
-    lv_area_t clip_area_original;
-
     /**
      * The clip area of the layer is saved here when the draw task is created.
      * As the clip area of the layer can be changed as new draw tasks are added its current value needs to be saved.
