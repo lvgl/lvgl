@@ -49,6 +49,13 @@ void lv_test_wait(uint32_t ms);
  */
 void lv_test_fast_forward(uint32_t ms);
 
+/**
+ * Get the number of live allocations on the LVGL heap.
+ *
+ * @return  the number of allocated blocks, or 0 when the heap does not report it
+ */
+size_t lv_test_get_allocation_count(void);
+
 #if LV_USE_STDLIB_MALLOC != LV_STDLIB_BUILTIN
 /* Skip checking heap as we don't have the info available */
 #define LV_HEAP_CHECK(x) do {} while(0)
