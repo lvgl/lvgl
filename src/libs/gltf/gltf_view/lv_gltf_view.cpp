@@ -414,8 +414,12 @@ void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
     lv_gltf_model_t * model = modeld->model;
     LV_ASSERT_NULL(model);
 
-    /* Index 0 is the viewer's own camera, 1 and up are the cameras of the model */
-    LV_CHECK_ARG(value <= model->asset.cameras.size(), return);
+    /* Index 0 is the viewer's own camera, 1 and up are the cameras of the model.
+     * A higher index is clamped to the last camera. */
+    const uint32_t camera_count = (uint32_t)model->asset.cameras.size();
+    if(value > camera_count) {
+        value = camera_count;
+    }
 
     model->camera = value;
     lv_obj_invalidate(obj);
