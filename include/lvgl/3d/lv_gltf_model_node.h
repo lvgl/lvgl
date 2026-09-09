@@ -47,8 +47,8 @@ extern "C" {
  * @brief Get a glTF model node by its index
  *
  * @param model Pointer to the glTF model structure
- * @param index The index of the node to retrieve
- * @return Pointer to the glTF model node, or NULL if not found
+ * @param index The index of the node to retrieve, must be less than the node count
+ * @return Pointer to the glTF model node
  */
 lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * model, size_t index);
 
@@ -74,7 +74,7 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_path(lv_gltf_model_t * model, c
  * @brief Get the path of a glTF model node
  *
  * @param node Pointer to the glTF model node structure
- * @return The path string of the node, or NULL if node is invalid
+ * @return The path string of the node
  */
 const char * lv_gltf_model_node_get_path(lv_gltf_model_node_t * node);
 
@@ -82,7 +82,7 @@ const char * lv_gltf_model_node_get_path(lv_gltf_model_node_t * node);
  * @brief Get the IP (internal pointer/identifier) of a glTF model node
  *
  * @param node Pointer to the glTF model node structure
- * @return The IP string of the node, or NULL if node is invalid
+ * @return The IP string of the node
  */
 const char * lv_gltf_model_node_get_ip(lv_gltf_model_node_t * node);
 
@@ -127,7 +127,7 @@ size_t lv_gltf_model_get_node_count(const lv_gltf_model_t * model);
  *
  * @param node Pointer to the glTF model node structure
  * @param x The X position value
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_position_x(lv_gltf_model_node_t * node, float x);
 
@@ -136,7 +136,7 @@ lv_result_t lv_gltf_model_node_set_position_x(lv_gltf_model_node_t * node, float
  *
  * @param node Pointer to the glTF model node structure
  * @param y The Y position value
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_position_y(lv_gltf_model_node_t * node, float y);
 
@@ -145,7 +145,7 @@ lv_result_t lv_gltf_model_node_set_position_y(lv_gltf_model_node_t * node, float
  *
  * @param node Pointer to the glTF model node structure
  * @param z The Z position value
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_position_z(lv_gltf_model_node_t * node, float z);
 
@@ -154,7 +154,7 @@ lv_result_t lv_gltf_model_node_set_position_z(lv_gltf_model_node_t * node, float
  *
  * @param node Pointer to the glTF model node structure
  * @param x The rotation around the X axis, in radians
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_rotation_x(lv_gltf_model_node_t * node, float x);
 
@@ -163,7 +163,7 @@ lv_result_t lv_gltf_model_node_set_rotation_x(lv_gltf_model_node_t * node, float
  *
  * @param node Pointer to the glTF model node structure
  * @param y The rotation around the Y axis, in radians
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_rotation_y(lv_gltf_model_node_t * node, float y);
 
@@ -172,7 +172,7 @@ lv_result_t lv_gltf_model_node_set_rotation_y(lv_gltf_model_node_t * node, float
  *
  * @param node Pointer to the glTF model node structure
  * @param z The rotation around the Z axis, in radians
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_rotation_z(lv_gltf_model_node_t * node, float z);
 
@@ -181,7 +181,7 @@ lv_result_t lv_gltf_model_node_set_rotation_z(lv_gltf_model_node_t * node, float
  *
  * @param node Pointer to the glTF model node structure
  * @param x The X scale value
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_scale_x(lv_gltf_model_node_t * node, float x);
 
@@ -190,7 +190,7 @@ lv_result_t lv_gltf_model_node_set_scale_x(lv_gltf_model_node_t * node, float x)
  *
  * @param node Pointer to the glTF model node structure
  * @param y The Y scale value
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_scale_y(lv_gltf_model_node_t * node, float y);
 
@@ -199,7 +199,7 @@ lv_result_t lv_gltf_model_node_set_scale_y(lv_gltf_model_node_t * node, float y)
  *
  * @param node Pointer to the glTF model node structure
  * @param z The Z scale value
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
+ * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if there is no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_scale_z(lv_gltf_model_node_t * node, float z);
 
@@ -213,7 +213,7 @@ lv_result_t lv_gltf_model_node_set_scale_z(lv_gltf_model_node_t * node, float z)
  *
  * @param e Pointer to the event structure from the callback
  * @param result Pointer to lv_3dpoint_t structure to store the position (x, y, z)
- * @return LV_RESULT_OK if successful, LV_RESULT_INVALID if called outside event callback or if parameters are null
+ * @return LV_RESULT_OK if successful, LV_RESULT_INVALID on failure
  */
 lv_result_t lv_gltf_model_node_get_local_position(lv_event_t * e, lv_3dpoint_t * result);
 
@@ -228,7 +228,7 @@ lv_result_t lv_gltf_model_node_get_local_position(lv_event_t * e, lv_3dpoint_t *
  *
  * @param e Pointer to the event structure from the callback
  * @param result Pointer to lv_3dpoint_t structure to store the position (x, y, z)
- * @return LV_RESULT_OK if successful, LV_RESULT_INVALID if called outside event callback, world position not enabled, or if parameters are null
+ * @return LV_RESULT_OK if successful, LV_RESULT_INVALID on failure
  */
 lv_result_t lv_gltf_model_node_get_world_position(lv_event_t * e, lv_3dpoint_t * result);
 
@@ -242,7 +242,7 @@ lv_result_t lv_gltf_model_node_get_world_position(lv_event_t * e, lv_3dpoint_t *
  *
  * @param e Pointer to the event structure from the callback
  * @param result Pointer to lv_3dpoint_t structure to store the scale (x, y, z)
- * @return LV_RESULT_OK if successful, LV_RESULT_INVALID if called outside event callback or if parameters are null
+ * @return LV_RESULT_OK if successful, LV_RESULT_INVALID on failure
  */
 lv_result_t lv_gltf_model_node_get_scale(lv_event_t * e, lv_3dpoint_t * result);
 
@@ -256,7 +256,7 @@ lv_result_t lv_gltf_model_node_get_scale(lv_event_t * e, lv_3dpoint_t * result);
  *
  * @param e Pointer to the event structure from the callback
  * @param result Pointer to lv_3dpoint_t structure to store the rotation in radians (x, y, z)
- * @return LV_RESULT_OK if successful, LV_RESULT_INVALID if called outside event callback or if parameters are null
+ * @return LV_RESULT_OK if successful, LV_RESULT_INVALID on failure
  */
 lv_result_t lv_gltf_model_node_get_euler_rotation(lv_event_t * e, lv_3dpoint_t * result);
 
