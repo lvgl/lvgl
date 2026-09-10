@@ -1,0 +1,88 @@
+# Config for the QEMU instruction-count benchmark.
+#
+# Two jobs at once, so it is a compromise:
+#
+#  - It has to render what the reference images in tests/ref_imgs/draw/render were
+#    rendered with, or the screenshot comparison reports differences that are only
+#    config. Everything under "Must match the reference images" is there for that
+#    reason and is copied from tests/configs, not chosen.
+#  - It has to be what an MCU actually builds, so no logging, no assertions, no
+#    profiler, and the built-in allocator rather than the C library's.
+#
+# Bare metal, so nothing that needs an OS, a filesystem or an external library is
+# enabled. The demos' images are C arrays, so no decoder is needed either.
+
+# --- Must match the reference images -----------------------------------------
+# tests/configs/depth_32.defconfig, and the DPI note in run_tests.defconfig
+CONFIG_LV_COLOR_DEPTH_32=y
+CONFIG_LV_DPI_DEF=130
+
+# tests/configs/full.defconfig
+CONFIG_LV_USE_FLOAT=y
+CONFIG_LV_USE_MATRIX=y
+CONFIG_LV_USE_DRAW_SW_COMPLEX_GRADIENTS=y
+CONFIG_LV_DRAW_SW_SHADOW_CACHE_SIZE=8
+CONFIG_LV_LABEL_TEXT_SELECTION=y
+
+# tests/configs/sys_heap.defconfig. The transformed indexed image scenes render
+# differently without it, which is why the test suite skips them when it is off.
+CONFIG_LV_BIN_DECODER_RAM_LOAD=y
+
+# --- The harness -------------------------------------------------------------
+# lv_test_display_create(), the same display the test suite renders through
+CONFIG_LV_USE_TEST=y
+
+# The two suites, and nothing else. The widgets demo is not listed because the benchmark
+# demo's Kconfig entry already selects it, and the strict defconfig check rejects an
+# assignment that changes nothing.
+CONFIG_LV_USE_DEMO_BENCHMARK=y
+CONFIG_LV_USE_DEMO_RENDER=y
+
+# Every other demo, and the examples, are code that would be built and never run
+# CONFIG_LV_USE_DEMO_MUSIC is not set
+# CONFIG_LV_USE_DEMO_STRESS is not set
+# CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER is not set
+# CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC is not set
+# CONFIG_LV_USE_DEMO_GLTF is not set
+# CONFIG_LV_USE_DEMO_FLEX_LAYOUT is not set
+# CONFIG_LV_USE_DEMO_MULTILANG is not set
+# CONFIG_LV_USE_DEMO_SMARTWATCH is not set
+# CONFIG_LV_USE_DEMO_EBIKE is not set
+# CONFIG_LV_USE_DEMO_HIGH_RES is not set
+# CONFIG_LV_BUILD_EXAMPLES is not set
+
+# Fonts the two demos name directly
+CONFIG_LV_FONT_MONTSERRAT_12=y
+CONFIG_LV_FONT_MONTSERRAT_14=y
+CONFIG_LV_FONT_MONTSERRAT_16=y
+CONFIG_LV_FONT_MONTSERRAT_18=y
+CONFIG_LV_FONT_MONTSERRAT_20=y
+CONFIG_LV_FONT_MONTSERRAT_24=y
+CONFIG_LV_FONT_MONTSERRAT_26=y
+CONFIG_LV_FONT_DEFAULT_MONTSERRAT_14=y
+
+# --- Bare metal --------------------------------------------------------------
+CONFIG_LV_USE_BUILTIN_MALLOC=y
+CONFIG_LV_USE_BUILTIN_STRING=y
+CONFIG_LV_USE_BUILTIN_SPRINTF=y
+# Measured: LVGL's own heap peaks at about 60 KB across both suites, because
+# lv_test_display_create() takes the 1.6 MB display buffer from the C library's heap and
+# the demos' images are C arrays that are never copied. 2 MB is therefore ~30x headroom,
+# and it still fits the smallest target here, mps2-an500's 4 MB of data SRAM. perf_qemu.py
+# fails a run whose heap got within 15% of the limit, because a heap that tight makes the
+# cache evict and the counts stop being a property of the code.
+CONFIG_LV_MEM_SIZE=2097152
+CONFIG_LV_CACHE_DEF_SIZE=1048576
+
+CONFIG_LV_OS_NONE=y
+
+# Software rendering only. This is the Kconfig default, but the whole point of these
+# numbers is that no hand written assembly is involved, so it is said out loud.
+CONFIG_LV_DRAW_SW_ASM_NONE=y
+
+# --- Nothing that would show up in the numbers rather than in the drawing ----
+# CONFIG_LV_USE_LOG is not set
+# CONFIG_LV_USE_ASSERT is not set
+# CONFIG_LV_USE_PROFILER is not set
+# CONFIG_LV_USE_SYSMON is not set
+# CONFIG_LV_USE_PERF_MONITOR is not set

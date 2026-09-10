@@ -58,6 +58,10 @@
 
 static void load_scene(lv_obj_t * scr, uint32_t scene);
 static void next_scene_timer_cb(lv_timer_t * timer);
+static void benchmark_start(uint32_t first, uint32_t last);
+
+/*The number of real scenes, so not counting the closing entry that ends a run*/
+static uint32_t scene_cnt(void);
 
 #if LV_USE_PERF_MONITOR
     static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -478,6 +482,9 @@ static lv_demo_benchmark_scene_dsc_t scenes[] = {
 };
 
 static uint32_t scene_act;
+/*The last scene this run will play, inclusive. Everything but lv_demo_benchmark_scene()
+ *leaves it at the end of the table.*/
+static uint32_t scene_last;
 static uint32_t rnd_act;
 static lv_demo_benchmark_on_end_cb_t on_demo_end_cb;
 
@@ -491,7 +498,41 @@ static lv_demo_benchmark_on_end_cb_t on_demo_end_cb;
 
 void lv_demo_benchmark(void)
 {
-    scene_act = 0;
+    benchmark_start(0, scene_cnt() - 1);
+}
+
+void lv_demo_benchmark_scene(uint32_t scene)
+{
+    if(scene >= scene_cnt()) return;
+    benchmark_start(scene, scene);
+}
+
+uint32_t lv_demo_benchmark_get_scene_act(void)
+{
+    return scene_act;
+}
+
+const char * lv_demo_benchmark_get_scene_name(uint32_t scene)
+{
+    if(scene >= scene_cnt()) return NULL;
+    return scenes[scene].name;
+}
+
+static void benchmark_start(uint32_t first, uint32_t last)
+{
+    scene_act = first;
+    scene_last = last;
+
+    /*The measurements accumulate into the scene table, so a second run would report the
+     *first one's numbers as well as its own*/
+    uint32_t i;
+    for(i = 0; i < scene_cnt(); i++) {
+        scenes[i].cpu_avg_usage = 0;
+        scenes[i].fps_avg = 0;
+        scenes[i].render_avg_time = 0;
+        scenes[i].flush_avg_time = 0;
+        scenes[i].measurement_cnt = 0;
+    }
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_remove_style_all(scr);
@@ -511,7 +552,7 @@ void lv_demo_benchmark(void)
     load_scene(scr, scene_act);
 
     /* store the active screen so that we can re-use it for the next scenes*/
-    lv_timer_create(next_scene_timer_cb, scenes[0].scene_time, scr);
+    lv_timer_create(next_scene_timer_cb, scenes[scene_act].scene_time, scr);
 
 #if LV_USE_PERF_MONITOR
     lv_display_t * disp = lv_display_get_default();
@@ -648,10 +689,19 @@ static void load_scene(lv_obj_t * scr, uint32_t scene)
     if(scenes[scene].create_cb) scenes[scene].create_cb(scr);
 }
 
+static uint32_t scene_cnt(void)
+{
+    return (uint32_t)(sizeof(scenes) / sizeof(scenes[0])) - 1;
+}
+
 static void next_scene_timer_cb(lv_timer_t * timer)
 {
     scene_act++;
     lv_obj_t * scr = lv_timer_get_user_data(timer);
+
+    /*Jump to the closing entry so that a run limited to one scene ends the same way a
+     *whole run does: the screen is cleared and the summary is drawn on it*/
+    if(scene_act > scene_last) scene_act = scene_cnt();
 
     load_scene(scr, scene_act);
     if(scenes[scene_act].scene_time == 0) {

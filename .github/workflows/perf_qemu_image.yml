@@ -1,0 +1,51 @@
+name: QEMU Benchmark Image
+
+# The benchmark's numbers only mean something when the compiler and the emulator are
+# identical everywhere, so the toolchain lives in one image that both CI and
+# scripts/perf_qemu/run.sh use. Publishing prints the digest; put that digest in
+# perf_qemu.yml and in run.sh, so a rebuild can never silently change the numbers.
+
+on:
+  push:
+    branches: 'master'
+    paths:
+      - 'scripts/perf_qemu/Dockerfile'
+      - '.github/workflows/perf_qemu_image.yml'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    name: Build and publish the QEMU benchmark image
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: scripts/perf_qemu
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/lv-perf-qemu:1
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Report the digest to pin
+        run: |
+          echo "Pin this in .github/workflows/perf_qemu.yml and scripts/perf_qemu/run.sh:" \
+            >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "ghcr.io/${{ github.repository_owner }}/lv-perf-qemu@${{ steps.push.outputs.digest }}" \
+            >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
