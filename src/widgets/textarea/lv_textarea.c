@@ -62,7 +62,7 @@ static void auto_hide_characters_cancel(lv_obj_t * obj);
 static inline bool is_valid_but_non_printable_char(const uint32_t letter);
 static void lv_textarea_scroll_to_cursor_pos(lv_obj_t * obj, int32_t pos);
 static lv_result_t add_char(lv_obj_t * obj, uint32_t c);
-static void add_text(lv_obj_t * obj, const char * txt);
+static bool add_text(lv_obj_t * obj, const char * txt);
 static void set_cursor_pos_internal(lv_obj_t * obj, int32_t pos);
 static void calc_placeholder_text_size(lv_obj_t * obj);
 
@@ -202,7 +202,9 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
 
     /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
     if(lv_textarea_get_accepted_chars(obj) || lv_textarea_get_max_length(obj)) {
-        add_text(obj, txt);
+        if(add_text(obj, txt)) {
+            lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        }
         return;
     }
 
@@ -307,17 +309,19 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
     lv_textarea_clear_selection(obj);
 
     /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
+    bool text_changed = false;
     if(lv_textarea_get_accepted_chars(obj) || lv_textarea_get_max_length(obj)) {
         lv_label_set_text(ta->label, "");
         lv_textarea_set_cursor_pos(obj, LV_TEXTAREA_CURSOR_LAST);
         if(ta->pwd_mode) {
             ta->pwd_tmp[0] = '\0'; /*Clear the password too*/
         }
-        add_text(obj, txt);
+        text_changed = add_text(obj, txt);
     }
     else {
         lv_label_set_text(ta->label, txt);
         lv_textarea_set_cursor_pos(obj, LV_TEXTAREA_CURSOR_LAST);
+        text_changed = true;
     }
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
@@ -333,6 +337,10 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
         if(ta->pwd_tmp == NULL) return;
 
         pwd_char_hider(obj);
+    }
+
+    if(text_changed) {
+        lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
     }
 }
 
@@ -1461,7 +1469,7 @@ static void set_cursor_pos_internal(lv_obj_t * obj, int32_t pos)
     ta->cursor.pos = pos;
 }
 
-static void add_text(lv_obj_t * obj, const char * txt)
+static bool add_text(lv_obj_t * obj, const char * txt)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     uint32_t i = 0;
@@ -1477,16 +1485,17 @@ static void add_text(lv_obj_t * obj, const char * txt)
     }
 
     if(!text_changed) {
-        return;
+        return false;
     }
 
+    /*Move the cursor after the new character*/
     lv_obj_update_layout(obj);
     lv_textarea_scroll_to_cursor_pos(obj, ta->cursor.pos);
     refr_cursor_area(obj);
-    /*Move the cursor after the new character*/
-    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 
+    return true;
 }
+
 static lv_result_t add_char(lv_obj_t * obj, uint32_t c)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
