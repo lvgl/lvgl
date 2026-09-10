@@ -31,6 +31,8 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -81,19 +83,117 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     vg_lite_matrix_t matrix = u->global_matrix;
     lv_vg_lite_matrix_multiply(&matrix, &image_matrix);
 
-    const bool has_transform = lv_vg_lite_matrix_has_transform(&matrix);
+    const bool has_transform = matrix_has_transform(&matrix);
+    const bool has_perspective = lv_vg_lite_matrix_has_perspective(&matrix);
     const vg_lite_filter_t filter = has_transform ?  VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* Use coords as the fallback image width and height */
     const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);
     const uint32_t img_h = dsc->header.h ? dsc->header.h : lv_area_get_height(coords);
 
+    const bool need_clip = !lv_area_is_in(&t->_real_area, &t->clip_area, false);
+
     if(dsc->colorkey) {
         lv_vg_lite_set_color_key(dsc->colorkey);
     }
 
+    /**
+     * The hardware can only apply an affine transformation to a path (only the first two rows
+     * of the path matrix are sent to the GPU), so a perspective matrix can not be handled by
+     * the path of `vg_lite_draw_pattern()`. Use the image unit instead, which does a
+     * perspective correct texture mapping, and use the scissor to clip the output.
+     * (Tiling is not supported with a perspective matrix.)
+     */
+    if(has_perspective && !dsc->tile) {
+        /* The scissor works in the coordinate system of the frame buffer */
+        lv_area_t phy_clip_area;
+        bool phy_clip_area_ok = lv_vg_lite_matrix_transform_area(&phy_clip_area, &u->global_matrix, &clip_area);
+        const lv_area_t scissor_area_ori = u->current_scissor_area;
+        bool scissor_changed = false;
+
+        if(phy_clip_area_ok && vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
+            lv_area_t scissor_area;
+            if(!lv_area_intersect(&scissor_area, &phy_clip_area, &scissor_area_ori)) {
+                /*Fully clipped, nothing to do*/
+                if(dsc->colorkey) {
+                    lv_vg_lite_set_color_key(NULL);
+                }
+                lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
+                LV_PROFILER_DRAW_END;
+                return;
+            }
+
+            phy_clip_area = scissor_area;
+
+            if(need_clip) {
+                lv_vg_lite_set_scissor_area(u, &phy_clip_area);
+                scissor_changed = true;
+            }
+        }
+
+        if(dsc->clip_radius > 0) {
+            /**
+             * The rounded corners are drawn with a path. The points of the path are transformed
+             * on the CPU (including the perspective division), so an identity matrix is used
+             * as the path matrix.
+             */
+            lv_vg_lite_path_t * radius_path = lv_vg_lite_path_get(u, VG_LITE_FP32);
+            lv_vg_lite_path_set_transform(radius_path, &matrix);
+            lv_vg_lite_path_append_rect(
+                radius_path,
+                dsc->image_area.x1 - coords->x1, dsc->image_area.y1 - coords->y1,
+                lv_area_get_width(&dsc->image_area), lv_area_get_height(&dsc->image_area),
+                dsc->clip_radius);
+
+            if(phy_clip_area_ok) {
+                lv_vg_lite_path_set_bounding_box_area(radius_path, &phy_clip_area);
+            }
+            lv_vg_lite_path_end(radius_path);
+
+            vg_lite_matrix_t identity_matrix;
+            vg_lite_identity(&identity_matrix);
+
+            lv_vg_lite_draw_pattern(
+                &u->target_buffer,
+                lv_vg_lite_path_get_path(radius_path),
+                VG_LITE_FILL_EVEN_ODD,
+                &identity_matrix,
+                &src_buf,
+                &matrix,
+                blend,
+                VG_LITE_PATTERN_COLOR,
+                0,
+                color,
+                filter);
+
+            lv_vg_lite_path_drop(u, radius_path);
+        }
+        else {
+            lv_vg_lite_blit(
+                &u->target_buffer,
+                &src_buf,
+                &matrix,
+                blend,
+                color,
+                filter);
+        }
+
+        if(scissor_changed) {
+            /* Restore the scissor area of the layer */
+            lv_vg_lite_set_scissor_area(u, &scissor_area_ori);
+        }
+
+        if(dsc->colorkey) {
+            lv_vg_lite_set_color_key(NULL);
+        }
+
+        lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     /* If clipping is not required, blit directly */
-    if(lv_area_is_in(&t->_real_area, &t->clip_area, false) && dsc->clip_radius <= 0 && !dsc->tile) {
+    if(!need_clip && dsc->clip_radius <= 0 && !dsc->tile) {
         /* rect is used to crop the pixel-aligned padding area */
         vg_lite_rectangle_t rect = {
             .x = 0,
@@ -111,11 +211,14 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             color,
             filter);
 
+        if(dsc->colorkey) {
+            lv_vg_lite_set_color_key(NULL);
+        }
+
         lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
         LV_PROFILER_DRAW_END;
         return;
     }
-
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
 
@@ -238,5 +341,20 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix)
+{
+    /**
+     * When the rotation angle is 0 or 180 degrees,
+     * it is considered that there is no transformation.
+     */
+    return !((matrix->m[0][0] == 1.0f || matrix->m[0][0] == -1.0f) &&
+             matrix->m[0][1] == 0.0f &&
+             matrix->m[1][0] == 0.0f &&
+             (matrix->m[1][1] == 1.0f || matrix->m[1][1] == -1.0f) &&
+             matrix->m[2][0] == 0.0f &&
+             matrix->m[2][1] == 0.0f &&
+             matrix->m[2][2] == 1.0f);
+}
 
 #endif /*LV_USE_DRAW_VG_LITE*/
