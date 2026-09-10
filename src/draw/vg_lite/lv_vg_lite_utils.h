@@ -172,6 +172,17 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
 
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point);
 
+/**
+ * Transform an area with a matrix and return the bounding box of the result.
+ * Perspective matrices are supported.
+ * @param dest   pointer to the transformed (bounding) area
+ * @param matrix pointer to the matrix
+ * @param src    pointer to the area to transform
+ * @return true: the transformed area is valid; false: the area can not be transformed
+ *         (a corner is on or behind the vanishing line)
+ */
+bool lv_vg_lite_matrix_transform_area(lv_area_t * dest, const vg_lite_matrix_t * matrix, const lv_area_t * src);
+
 static inline bool lv_vg_lite_matrix_has_transform(const vg_lite_matrix_t * matrix)
 {
     /**
@@ -190,6 +201,18 @@ static inline bool lv_vg_lite_matrix_has_transform(const vg_lite_matrix_t * matr
 static inline vg_lite_filter_t lv_vg_lite_matrix_get_filter(const vg_lite_matrix_t * matrix)
 {
     return lv_vg_lite_matrix_has_transform(matrix) ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+}
+
+/**
+ * Check if the matrix has a perspective (non-affine) part.
+ * @param matrix pointer to the matrix
+ * @return true: the matrix is not affine, the transformed points need perspective division
+ */
+static inline bool lv_vg_lite_matrix_has_perspective(const vg_lite_matrix_t * matrix)
+{
+    return !(matrix->m[2][0] == 0.0f
+             && matrix->m[2][1] == 0.0f
+             && matrix->m[2][2] == 1.0f);
 }
 
 void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area);
@@ -317,6 +340,39 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
 }
+
+static inline void lv_vg_lite_blit(vg_lite_buffer_t * target,
+                                   vg_lite_buffer_t * source,
+                                   vg_lite_matrix_t * matrix,
+                                   vg_lite_blend_t blend,
+                                   vg_lite_color_t color,
+                                   vg_lite_filter_t filter)
+{
+    LV_VG_LITE_ASSERT_DEST_BUFFER(target);
+    LV_VG_LITE_ASSERT_SRC_BUFFER(source);
+    LV_VG_LITE_ASSERT_MATRIX(matrix);
+
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit");
+    LV_VG_LITE_CHECK_ERROR(vg_lite_blit(
+                               target,
+                               source,
+                               matrix,
+                               blend,
+                               color,
+                               filter),
+                           /* Dump parameters */
+    {
+        lv_vg_lite_buffer_dump_info(target);
+        lv_vg_lite_buffer_dump_info(source);
+        lv_vg_lite_matrix_dump_info(matrix);
+        LV_LOG_USER("blend: 0x%X", (int)blend);
+        lv_vg_lite_color_dump_info(color);
+        LV_LOG_USER("filter: 0x%X", (int)filter);
+    });
+    LV_PROFILER_DRAW_END_TAG("vg_lite_blit");
+}
+
+
 void lv_vg_lite_set_color_key(const lv_image_colorkey_t * colorkey);
 
 static inline void lv_vg_lite_clear(vg_lite_buffer_t * target, const lv_area_t * area, vg_lite_color_t color)
