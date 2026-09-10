@@ -405,6 +405,9 @@ void test_display_resolution(void)
 
 void test_display_dpi_tile_cnt_antialiasing(void)
 {
+#if LV_DRAW_DISABLE_TILED_RENDERING
+    TEST_IGNORE();
+#endif
     lv_display_t * disp_def = lv_display_get_default();
     TEST_ASSERT_NOT_NULL(disp_def);
 

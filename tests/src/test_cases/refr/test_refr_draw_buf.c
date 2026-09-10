@@ -302,6 +302,9 @@ void test_refr_raw_buffers_use_automatic_stride(void)
 
 void test_refr_tiled_rendering(void)
 {
+#if LV_DRAW_DISABLE_TILED_RENDERING
+    TEST_IGNORE();
+#endif
     refr_disp_create(80, 80, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_DIRECT, 1, 80);
     lv_display_set_tile_cnt(refr_ctx.disp, 4);
     TEST_ASSERT_EQUAL_UINT32(4, lv_display_get_tile_cnt(refr_ctx.disp));

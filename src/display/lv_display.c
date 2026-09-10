@@ -21,6 +21,15 @@
 #define disp_def LV_GLOBAL_DEFAULT()->disp_default
 #define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
+#if LV_DRAW_DISABLE_TILED_RENDERING
+    #define DEFAULT_TILE_CNT 1
+#else
+    #if LV_DRAW_SW_DRAW_UNIT_CNT < 1
+        #error LV_DRAW_SW_DRAW_UNIT_CNT should be at least 1
+    #endif
+    #define DEFAULT_TILE_CNT LV_DRAW_SW_DRAW_UNIT_CNT
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -87,11 +96,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->ext_data.data = NULL;
 #endif
 
-#if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && (LV_DRAW_SW_DRAW_UNIT_CNT != 0)
-    disp->tile_cnt = LV_DRAW_SW_DRAW_UNIT_CNT;
-#else
-    disp->tile_cnt = 1;
-#endif
+    disp->tile_cnt = DEFAULT_TILE_CNT;
 
     lv_area_t disp_area = {
         0, 0, hor_res - 1, ver_res - 1
@@ -685,6 +690,13 @@ void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
     LV_CHECK_ARG(disp != NULL, return);
     LV_CHECK_ARG_FORMAT_MSG(tile_cnt < 256, return, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)",
                             tile_cnt);
+#if LV_DRAW_DISABLE_TILED_RENDERING
+    if(tile_cnt > 1) {
+        LV_LOG_WARN("The enabled draw unit renders on the GPU and cannot render tiles. "
+                    "Using 1 tile instead of %" LV_PRIu32, tile_cnt);
+        tile_cnt = 1;
+    }
+#endif
 
     disp->tile_cnt = tile_cnt;
 }
