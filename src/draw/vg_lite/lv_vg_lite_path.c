@@ -91,10 +91,6 @@ lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format)
     LV_ASSERT_MALLOC(path);
     path->format_len = lv_vg_lite_path_format_len(data_format);
 
-    /**
-     * NOTE: the call must not be inside LV_ASSERT(), it is compiled out
-     * when LV_USE_ASSERT is disabled, leaving the path uninitialized.
-     */
     vg_lite_error_t init_err = vg_lite_init_path(
                                    &path->base,
                                    data_format,
