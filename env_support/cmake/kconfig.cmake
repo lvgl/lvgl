@@ -16,30 +16,75 @@ macro(lv_normalize_config_path INPUT_PATH LABEL OUTPUT_VAR)
     endif()
 endmacro()
 
+# Returns in OUTPUT_VAR a hash of the given defconfig fragments: their
+# paths and their contents.
+function(lv_defconfig_hash FRAGMENTS OUTPUT_VAR)
+    set(defconfig_list "strict=${LV_BUILD_DEFCONFIG_STRICT}")
+    foreach(fragment IN LISTS FRAGMENTS)
+        file(SHA256 ${fragment} fragment_hash)
+        string(APPEND defconfig_list ";${fragment}=${fragment_hash}")
+    endforeach()
+    string(SHA256 defconfig_hash "${defconfig_list}")
+    set(${OUTPUT_VAR} ${defconfig_hash} PARENT_SCOPE)
+endfunction()
+
+set(KCONFIG_INPUT_FLAGS)
+
+if(LV_BUILD_DEFCONFIG_PATH AND LV_BUILD_DOTCONFIG_PATH)
+    message(WARNING "Both LV_BUILD_DEFCONFIG_PATH and LV_BUILD_DOTCONFIG_PATH are set, \
+ignoring the latter. Pass -DLV_BUILD_DEFCONFIG_PATH= to drop the defconfigs.")
+endif()
+
 # Check if the user wants to use a defconfig, using the -DLV_BUILD_DEFCONFIG_PATH option
 if(LV_BUILD_DEFCONFIG_PATH)
     # Several defconfigs can be given as a ";"-separated list. They are merged in
     # order, so a later fragment overrides the value set by an earlier one. This
     # lets related configurations share a common base instead of duplicating it.
-    set(DOTCONFIG)
+    set(DEFCONFIGS)
     foreach(defconfig IN LISTS LV_BUILD_DEFCONFIG_PATH)
         lv_normalize_config_path(defconfig "defconfig" defconfig_abs)
-        list(APPEND DOTCONFIG ${defconfig_abs})
+        if(NOT EXISTS ${defconfig_abs})
+            message(FATAL_ERROR "lvgl: ${defconfig_abs} does not exist")
+        endif()
+        list(APPEND DEFCONFIGS ${defconfig_abs})
     endforeach()
 
-    list(LENGTH DOTCONFIG defconfig_count)
-    if(LV_BUILD_DEFCONFIG_STRICT)
-        # Apply the stricter checks: assignments to unknown or promptless
-        # symbols, and values that end up not taking effect, become errors.
-        # Overriding a symbol set by an earlier fragment is allowed.
-        set(KCONFIG_INPUT_FLAGS --handwritten-input-configs)
-    elseif(defconfig_count GREATER 1)
-        # Merging without the strict checks needs this, otherwise overriding a
-        # symbol set by an earlier fragment is reported as an error.
-        set(KCONFIG_INPUT_FLAGS --forced-input-configs)
+    # The defconfig fragments are merged to create ${OUTPUT_DOTCONFIG}
+    # ${OUTPUT_DOTCONFIG} can be edited by hand or with menuconfig and the next
+    # build picks these updates instead of using the defconfig fragments we started with
+    # Editing a fragment, or changing the list of fragments, creates ${OUTPUT_DOTCONFIG} again.
+    lv_defconfig_hash("${DEFCONFIGS}" DEFCONFIG_HASH)
+
+    if(EXISTS ${OUTPUT_DOTCONFIG} AND "${DEFCONFIG_HASH}" STREQUAL "${LV_BUILD_DEFCONFIG_HASH}")
+        # No changes to defconfig fragments and ${OUTPUT_DOTCONFIG}
+        # already exist, just use it
+        set(DOTCONFIG ${OUTPUT_DOTCONFIG})
+    else()
+        if(EXISTS ${OUTPUT_DOTCONFIG})
+            message(STATUS "lvgl: defconfigs changed, regenerating ${OUTPUT_DOTCONFIG} from them")
+        endif()
+
+        set(DOTCONFIG ${DEFCONFIGS})
+
+        list(LENGTH DEFCONFIGS defconfig_count)
+        if(LV_BUILD_DEFCONFIG_STRICT)
+            # Apply the stricter checks: assignments to unknown or promptless
+            # symbols, and values that end up not taking effect, become errors.
+            # Overriding a symbol set by an earlier fragment is allowed.
+            set(KCONFIG_INPUT_FLAGS --handwritten-input-configs)
+        elseif(defconfig_count GREATER 1)
+            # Merging without the strict checks needs this, otherwise overriding a
+            # symbol set by an earlier fragment is reported as an error.
+            set(KCONFIG_INPUT_FLAGS --forced-input-configs)
+        endif()
     endif()
+
+    # Both defconfig fragment and ${OUTPUT_DOTCONFIG} changes
+    # must trigger a cmake configuration
+    set(CONFIGURE_DEPENDS ${DEFCONFIGS} ${OUTPUT_DOTCONFIG})
 elseif(LV_BUILD_DOTCONFIG_PATH)
     lv_normalize_config_path(LV_BUILD_DOTCONFIG_PATH ".config" DOTCONFIG)
+    set(CONFIGURE_DEPENDS ${DOTCONFIG})
 else()
     # No explicit config file set
     # Search, in order:
@@ -53,6 +98,7 @@ else()
     else()
         set(DOTCONFIG ${OUTPUT_DOTCONFIG})
     endif()
+    set(CONFIGURE_DEPENDS ${DOTCONFIG})
 endif()
 
 foreach(config IN LISTS DOTCONFIG)
@@ -80,13 +126,19 @@ if(NOT "${ret}" STREQUAL "0")
     message(FATAL_ERROR "command failed with return code: ${ret}")
 endif()
 
+if(DEFINED DEFCONFIG_HASH)
+    # store the defconfig hash in cache so we can use it on the next run
+    set(LV_BUILD_DEFCONFIG_HASH ${DEFCONFIG_HASH} CACHE INTERNAL
+    "Hash of the defconfigs ${OUTPUT_DOTCONFIG} was seeded from")
+else()
+    # No defconfig in use any more, so the recorded hash would only make
+    # a later one look already applied.
+    unset(LV_BUILD_DEFCONFIG_HASH CACHE)
+endif()
+
 # Re-run CMake configuration (which regenerates autoconf.h) when the input
 # .config/defconfig changes, so that `cmake --build` picks up config edits.
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${DOTCONFIG})
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CONFIGURE_DEPENDS})
 
 # Set the variable that can be used by the CMakeLists.txt including this file
 set(KCONFIG_EXTERNAL_INCLUDE ${AUTOCONF_H})
-
-# Ensure LV_BUILD_DEFCONFIG_PATH is not set in the path, to be able to call it without
-# the -DLV_BUILD_DEFCONFIG_PATH after the first configuration, and to work with the .config
-unset(LV_BUILD_DEFCONFIG_PATH CACHE)
