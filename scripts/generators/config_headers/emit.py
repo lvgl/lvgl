@@ -458,6 +458,18 @@ def generate_internal(kconf: Kconfig, entries) -> str:
             deferred += flag.emit_internal()
             deferred.append("")
 
+    guards: list[str] = []
+    checks = constraint_checks(entries)
+    if checks:
+        guards.append("")
+        guards.append(
+            "/* Kconfig enforces `depends on` / `select`; these checks catch a"
+        )
+        guards.append(" * hand-written lv_conf.h that violates them. */")
+        for c in checks:
+            guards += c.emit_internal()
+            guards.append("")
+
     # Optional user headers that override config macros: include each one (once
     # both its gate and path are defined) so source files don't have to.
     custom_inc: list[str] = []
@@ -484,30 +496,6 @@ def generate_internal(kconf: Kconfig, entries) -> str:
         + "\n".join(deferred)
         + "\n".join(custom_inc)
         + templates.INTERNAL_FOOTER
-        + templates.INTERNAL_CLOSE
-    )
-
-
-def generate_checker(kconf: Kconfig, entries) -> str:
-    preamble = templates.CHECK_PREAMBLE
-    # Replay Kconfig `select` / `depends on` as #error guards on the lv_conf.h
-    # path.
-    guards: list[str] = []
-    checks = constraint_checks(entries)
-    if checks:
-        guards.append("")
-        guards.append(
-            "/* Kconfig enforces `depends on` / `select`; these checks catch a"
-        )
-        guards.append(" * hand-written lv_conf.h that violates them. */")
-        for c in checks:
-            guards += c.emit_internal()
-            guards.append("")
-
-    return (
-        preamble
-        + "\n"
-        + templates.CHECK_DEPRECATED_SYMBOLS_SECTION
         + "\n".join(guards)
-        + "\n"
+        + templates.INTERNAL_CLOSE
     )
