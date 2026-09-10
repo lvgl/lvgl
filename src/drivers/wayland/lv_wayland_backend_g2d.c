@@ -205,10 +205,10 @@ static void wl_g2d_global_handler(void * backend_ctx, struct wl_registry * regis
                                   const char * interface, uint32_t version)
 {
 
-    LV_UNUSED(version);
     lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_ctx;
 
     if(lv_streq(interface, zwp_linux_dmabuf_v1_interface.name)) {
+        version = LV_MIN(version, (uint32_t)zwp_linux_dmabuf_v1_interface.version);
         ctx->handler = wl_registry_bind(registry, name, &zwp_linux_dmabuf_v1_interface, version);
 
         if(version >= 4) {
