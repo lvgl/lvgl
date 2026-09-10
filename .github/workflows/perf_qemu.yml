@@ -1,7 +1,7 @@
 name: QEMU Emulated Render Performance
 
-# Counts retired instructions for the benchmark demo and every render demo scene on four
-# bare metal targets, and diffs a pull request against the last results master published.
+# Counts retired instructions for the benchmark demo and every render demo scene on
+# several bare metal targets, and diffs a pull request against the last results master published.
 #
 # The baseline is downloaded rather than measured, the same way perf_emulation.yml gets
 # its own, so a pull request pays for one measurement instead of two. That is only sound

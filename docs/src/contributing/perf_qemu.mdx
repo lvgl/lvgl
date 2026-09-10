@@ -1,0 +1,111 @@
+---
+title: "QEMU Render Benchmark"
+description: "Counts the instructions LVGL's software renderer executes, on emulated Cortex-M, RISC-V and Cortex-A targets, so that a change's cost can be measured instead of guessed."
+---
+
+## Overview
+
+`scripts/perf_qemu` builds LVGL for a bare metal target, runs the benchmark demo and every
+`lv_demo_render` scene inside [QEMU](https://www.qemu.org/), and reports how many
+instructions each one took. It also compares every rendered scene against the reference
+images in `tests/ref_imgs/draw/render`, so a change that makes rendering faster and wrong
+does not look like a win.
+
+It runs in CI on every pull request and reports the difference against `master`, and it
+runs the same way on your own machine.
+
+## Counting instructions
+
+QEMU runs with `-icount shift=0`, where one instruction is one nanosecond of virtual time.
+The counts are therefore **deterministic and host independent**: the same revision gives
+the same number on your laptop and on a CI runner, so any difference between two runs is a
+real difference and not measurement noise. Wall clock timing on a loaded machine swings by
+tens of percent and cannot answer "did this commit help".
+
+The trade-off is that this counts **instructions, not cycles**. QEMU charges one cycle per
+instruction and models no cache, wait states or branch predictor. So it *understates* a
+change that removes memory traffic or branches, and *overstates* one that merely folds
+several stores into a single instruction. Real hardware is still what settles a close call.
+
+## Requirements
+
+It requires only [Docker](https://docs.docker.com/get-started/get-docker/). The toolchains,
+the emulators and GDB all live in one container image, which `run.sh` pulls from
+[GHCR](https://github.com/orgs/lvgl/packages/container/package/lv-perf-qemu) (GitHub Container Registry)
+the first time it is needed and reuses after that. It is the same image CI runs, which is
+what makes a local count comparable with the one in a pull request.
+
+## How to run it
+
+```bash
+scripts/perf_qemu/run.sh
+```
+
+That measures the current working tree with the default settings. The first run pulls the
+container image, which takes a few minutes; later runs do not.
+
+Results, error images and the build tree go to `build/perf_qemu` unless `-o` says
+otherwise, and `run.sh` prints that path when it starts and when it finishes.
+
+While working on one drawing kernel it is much quicker to measure only what changed. The
+run can be narrowed to a target, a colour format, an optimisation level, a suite or even a
+single scene:
+
+```bash
+scripts/perf_qemu/run.sh -t riscv32 -s render -f rgb565
+scripts/perf_qemu/run.sh -s render:fill              # a single render scene
+```
+
+`-t`, `-f` and `-s` take comma separated lists, so several of anything is a single run.
+`run.sh --help` lists the available targets, colour formats, suites and scene selectors.
+
+## Comparing against a baseline
+
+A number on its own says little. `--base` adds the comparison:
+
+```bash
+# measure master once, then reuse that measurement on every later run
+scripts/perf_qemu/run.sh --base master
+
+# or point at result files saved from an earlier run, yours or someone else's
+scripts/perf_qemu/run.sh --base ~/master-results
+```
+
+Given a revision, `run.sh` measures it in a git worktree of its own and reuses that result
+as long as the revision and the settings do not change. Given a directory, it reads the
+`results-<target>.json` files there.
+
+The report names the two revisions, lists the totals and the biggest per-scene movers, and
+says whether any scene now renders different bytes than the baseline.
+
+## Debugging a run
+
+Any single run can be stopped and handed to [GDB](https://sourceware.org/gdb/):
+
+```bash
+scripts/perf_qemu/run.sh -t cortex-m7 -s render -f rgb565 --gdb
+```
+
+QEMU then waits before its first instruction, with the port published from the container, so
+GDB runs on your machine. `run.sh` prints the exact command to attach with, along the lines
+of:
+
+```bash
+gdb-multiarch -ex 'target remote :1234' <output>/build/cortex-m7-O2/render_rgb565.elf
+```
+
+LVGL's own [GDB plug-in](/debugging/gdb_plugin) works here as well, and is worth loading
+before inspecting draw tasks, layers or objects.
+
+**To end a `--gdb` run, press Ctrl-A then X.** Ctrl-C and Ctrl-D do nothing: QEMU runs with
+`-nographic`, which gives it the terminal, and Ctrl-A is its escape key.
+
+`--shell` opens a shell in the container instead, which is where the container's own
+`gdb-multiarch` and `objdump` are.
+
+## CI integration
+
+On a pull request the workflow measures that revision and compares it against the counts
+`master` last published, then adds a "Render Performance" row to the pull request report
+comment. On a push to `master` it measures and publishes the new baseline so nothing needs
+to be run by hand.
