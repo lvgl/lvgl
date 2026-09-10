@@ -268,6 +268,96 @@ extern "C" {
 #undef CONFIG_LV_CONF_MINIMAL
 #endif
 
+/*
+ * CONFIG_* options that no longer exist and haven't worked _ever_ in Kconfig
+ *
+ * Up to v9.5 lv_conf_internal.h bridged CONFIG_<OPTION> to <OPTION> for every
+ * option it knew, including ones whose value is a C expression (an attribute,
+ * a function name, a macro body). Which are not part of kconfig and would
+ * get ignored by projects using them
+ *
+ */ 
+
+#ifndef LV_KCONFIG_IGNORE
+
+#ifdef CONFIG_LV_ASSERT_HANDLER
+#error "CONFIG_LV_ASSERT_HANDLER has no effect: LV_ASSERT_HANDLER is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ASSERT_USE_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER in the header named by LV_ASSERT_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+#error "CONFIG_LV_ATTRIBUTE_EXTERN_DATA has no effect: LV_ATTRIBUTE_EXTERN_DATA is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_EXTERN_DATA in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_FAST_MEM
+#error "CONFIG_LV_ATTRIBUTE_FAST_MEM has no effect: LV_ATTRIBUTE_FAST_MEM is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_FAST_MEM in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_FLUSH_READY
+#error "CONFIG_LV_ATTRIBUTE_FLUSH_READY has no effect: LV_ATTRIBUTE_FLUSH_READY is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_FLUSH_READY in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_LARGE_CONST
+#error "CONFIG_LV_ATTRIBUTE_LARGE_CONST has no effect: LV_ATTRIBUTE_LARGE_CONST is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_LARGE_CONST in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
+#error "CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY has no effect: LV_ATTRIBUTE_LARGE_RAM_ARRAY is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_LARGE_RAM_ARRAY in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN
+#error "CONFIG_LV_ATTRIBUTE_MEM_ALIGN has no effect: LV_ATTRIBUTE_MEM_ALIGN is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_MEM_ALIGN in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_SYNC_READY
+#error "CONFIG_LV_ATTRIBUTE_SYNC_READY has no effect: LV_ATTRIBUTE_SYNC_READY is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_SYNC_READY in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_TICK_INC
+#error "CONFIG_LV_ATTRIBUTE_TICK_INC has no effect: LV_ATTRIBUTE_TICK_INC is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_TICK_INC in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_TIMER_HANDLER
+#error "CONFIG_LV_ATTRIBUTE_TIMER_HANDLER has no effect: LV_ATTRIBUTE_TIMER_HANDLER is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_TIMER_HANDLER in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_EXPORT_CONST_INT
+#error "CONFIG_LV_EXPORT_CONST_INT has no effect: LV_EXPORT_CONST_INT is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_EXPORT_CONST_INT in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_FONT_CUSTOM_DECLARE
+#error "CONFIG_LV_FONT_CUSTOM_DECLARE has no effect: LV_FONT_CUSTOM_DECLARE is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_FONT_USE_CUSTOM_INCLUDE and define LV_FONT_CUSTOM_DECLARE in the header named by LV_FONT_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+#error "CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM has no effect: LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_NEMA_USE_CUSTOM_INCLUDE and define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM in the header named by LV_NEMA_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_SYSMON_GET_IDLE
+#error "CONFIG_LV_SYSMON_GET_IDLE has no effect: LV_SYSMON_GET_IDLE is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_SYSMON_USE_CUSTOM_INCLUDE and define LV_SYSMON_GET_IDLE in the header named by LV_SYSMON_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_SYSMON_GET_PROC_IDLE
+#error "CONFIG_LV_SYSMON_GET_PROC_IDLE has no effect: LV_SYSMON_GET_PROC_IDLE is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_SYSMON_USE_CUSTOM_INCLUDE and define LV_SYSMON_GET_PROC_IDLE in the header named by LV_SYSMON_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_PROFILER_BEGIN
+#error "CONFIG_LV_PROFILER_BEGIN has no effect: LV_PROFILER_BEGIN is a C expression, which Kconfig cannot carry. To keep the setting, define LV_PROFILER_BEGIN in the header named by LV_PROFILER_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_PROFILER_BEGIN_TAG
+#error "CONFIG_LV_PROFILER_BEGIN_TAG has no effect: LV_PROFILER_BEGIN_TAG is a C expression, which Kconfig cannot carry. To keep the setting, define LV_PROFILER_BEGIN_TAG in the header named by LV_PROFILER_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_PROFILER_END
+#error "CONFIG_LV_PROFILER_END has no effect: LV_PROFILER_END is a C expression, which Kconfig cannot carry. To keep the setting, define LV_PROFILER_END in the header named by LV_PROFILER_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_PROFILER_END_TAG
+#error "CONFIG_LV_PROFILER_END_TAG has no effect: LV_PROFILER_END_TAG is a C expression, which Kconfig cannot carry. To keep the setting, define LV_PROFILER_END_TAG in the header named by LV_PROFILER_INCLUDE."
+#endif
+
+#endif /*LV_KCONFIG_IGNORE*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

@@ -359,6 +359,7 @@ def generate_bridge(kconf: Kconfig, entries) -> str:
         + "\n\n".join(blocks)
         + "\n"
         + templates.KCONFIG_BRIDGE_DEPRECATIONS
+        + templates.KCONFIG_BRIDGE_UNSUPPORTED
         + templates.KCONFIG_BRIDGE_FOOTER
     )
 
