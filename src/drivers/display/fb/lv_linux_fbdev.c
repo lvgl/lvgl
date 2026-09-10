@@ -159,11 +159,9 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     }
     LV_LOG_INFO("The framebuffer device was opened successfully");
 
-    /* Make sure that the display is on (unless another process already owns the framebuffer). */
     if(!dsc->skip_unblank) {
         if(ioctl(dsc->fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
             perror("ioctl(FBIOBLANK)");
-            /* Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK.*/
         }
     }
 
@@ -316,8 +314,6 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     uint8_t * draw_buf = NULL;
     uint8_t * draw_buf_2 = NULL;
 
-    /* Over-allocate to guarantee LV_DRAW_BUF_ALIGN alignment.
-     * Store raw pointers in dsc for lv_free(), pass aligned pointers to LVGL. */
     dsc->draw_buf_1 = lv_malloc(draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
     LV_ASSERT_MALLOC(dsc->draw_buf_1);
     if(dsc->draw_buf_1 == NULL) {
@@ -531,13 +527,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     uint8_t * swap_buf = NULL;
     if(dsc->swap_rb) {
         if(!dsc->swap_line_buf || dsc->swap_line_buf_size < line_bytes) {
-            /* Use a temp pointer so a NULL return doesn't leak the old buffer
-             * or wrongly update the cached size. */
             uint8_t * tmp = lv_realloc(dsc->swap_line_buf, line_bytes);
+            LV_ASSERT_MALLOC(tmp);
             if(tmp == NULL) {
-                LV_ASSERT_MALLOC(tmp);
-                /* Keep the old buffer; skip the R/B swap this frame rather than
-                 * crash. swap_buf stays NULL, so the unswapped data is written. */
                 LV_LOG_WARN("Failed to (re)allocate swap line buffer; skipping R/B swap this frame");
             }
             else {
