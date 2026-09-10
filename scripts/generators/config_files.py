@@ -11,12 +11,7 @@ import re
 import sys
 from pathlib import Path
 
-from config_headers.emit import (
-    generate_bridge,
-    generate_checker,
-    generate_internal,
-    generate_template,
-)
+from config_headers.emit import generate_bridge, generate_internal, generate_template
 from config_headers.parse import load, parse_entries
 
 SCRIPT_PATH = Path(__file__).resolve()
@@ -83,7 +78,6 @@ def main() -> int:
     lv_conf_internal = os.path.join(
         lvgl_root_dir, "include", "lvgl", "config", "lv_conf_internal.h"
     )
-    lv_conf_check = os.path.join(lvgl_root_dir, "src", "lv_conf_check.c")
     lv_conf_kconfig = os.path.join(
         lvgl_root_dir, "include", "lvgl", "config", "lv_conf_kconfig.h"
     )
@@ -103,8 +97,6 @@ def main() -> int:
         f.write(generate_template(kconf, entries))
     with open(lv_conf_internal, "w") as f:
         f.write(generate_internal(kconf, entries))
-    with open(lv_conf_check, "w") as f:
-        f.write(generate_checker(kconf, entries))
     with open(lv_conf_kconfig, "w") as f:
         f.write(generate_bridge(kconf, entries))
 
