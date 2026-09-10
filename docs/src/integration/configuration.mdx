@@ -205,6 +205,21 @@ cmake -B build -DLV_BUILD_USE_KCONFIG=ON \
 cmake --build build
 ```
 
+### Editing a configuration that came from a defconfig
+
+When using one or multiple defconfigs, LVGL merges them into `build/.config`.
+You can then edit that file by hand or with `menuconfig`. On the next 
+`cmake --build build` the change is picked up
+
+```bash
+KCONFIG_CONFIG=build/.config menuconfig   # or edit the file directly
+cmake --build build                       # re-runs the configuration
+```
+
+Editing one of the defconfigs, or changing the list of them, generates `build/.config`
+again, which discards any edit made to it. If you want to revert any hand-made changes
+to `build/.config`, simply delete it and LVGL will generate it again from the defconfigs.
+
 ### Empty configuration
 
 `configs/defconfigs/empty.defconfig` strips LVGL to its smallest sensible
