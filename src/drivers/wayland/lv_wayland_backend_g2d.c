@@ -267,8 +267,12 @@ static void delete_buffer(lv_wl_buffer_t * buffer)
 static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * ctx, lv_display_t * display,
                                                              int32_t width, int32_t height)
 {
-    if(!ctx->handler)
-        lv_wl_g2d_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
+    LV_ASSERT(ctx != NULL);
+    if(!ctx->handler) {
+        LV_LOG_WARN("dmabuf registry not bound. Can't initialize a display with the g2d backend");
+        return NULL;
+    }
+    lv_wl_g2d_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
     LV_ASSERT_MALLOC(ddata);
     if(!ddata) {
         return NULL;
