@@ -6,6 +6,7 @@ config LV_USE_DRAW_NANOVG
 	select LV_USE_MATRIX
 	select LV_DRAW_HAS_VECTOR_SUPPORT
 	select LV_DRAW_HAS_3D_SUPPORT
+	select LV_DRAW_DISABLE_TILED_RENDERING
 	help
 		Draw with the NanoVG vector library on top of OpenGL / OpenGL ES shaders.
 
