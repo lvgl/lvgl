@@ -73,14 +73,39 @@ void lv_draw_nanovg_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_
     const int32_t shadow_w = lv_area_get_width(&shadow_area);
     const int32_t shadow_h = lv_area_get_height(&shadow_area);
 
+    /*Get the clamped radius. `dsc->radius` can be `LV_RADIUS_CIRCLE` which
+     *would degenerate the box gradient and make the shadow disappear.*/
+    int32_t r_sh = dsc->radius;
+    int32_t short_side = LV_MIN(core_w, core_h);
+    if(r_sh > short_side >> 1) r_sh = short_side >> 1;
+
+    /*Consider 1 px smaller bg to be sure the edge will be covered by the shadow*/
+    lv_area_t bg_area = *coords;
+    lv_area_increase(&bg_area, -1, -1);
+    const int32_t bg_w = lv_area_get_width(&bg_area);
+    const int32_t bg_h = lv_area_get_height(&bg_area);
+
+    /*Get the clamped radius of the bg*/
+    int32_t r_bg = dsc->radius;
+    short_side = LV_MIN(bg_w, bg_h);
+    if(r_bg > short_side >> 1) r_bg = short_side >> 1;
+
     NVGpaint paint = nvgBoxGradient(
                          u->vg,
                          core_area.x1, core_area.y1,
                          core_w, core_h,
-                         dsc->radius, dsc->width, icol, ocol);
+                         r_sh, dsc->width, icol, ocol);
 
     nvgBeginPath(u->vg);
-    lv_nanovg_path_append_rect(u->vg, shadow_area.x1, shadow_area.y1, shadow_w, shadow_h, dsc->radius);
+    lv_nanovg_path_append_rect(u->vg, shadow_area.x1, shadow_area.y1, shadow_w, shadow_h, r_sh);
+
+    /*Remove the shadow from the bg area. Without this the shadow is also painted
+     *behind the object and shows through if the bg is not fully opaque.*/
+    if(bg_w > 0 && bg_h > 0) {
+        lv_nanovg_path_append_rect(u->vg, bg_area.x1, bg_area.y1, bg_w, bg_h, r_bg);
+        nvgPathWinding(u->vg, NVG_HOLE);
+    }
+
     nvgFillPaint(u->vg, paint);
     nvgFill(u->vg);
 

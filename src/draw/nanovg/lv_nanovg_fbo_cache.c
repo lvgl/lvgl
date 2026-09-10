@@ -14,48 +14,34 @@
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
 #include "../../libs/nanovg/nanovg_gl_utils.h"
-#include "../../misc/cache/class/lv_cache_lru_ll.h"
-#include "../../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-#define LV_NANOVG_FBO_CACHE_CNT 4
+#ifndef LV_NANOVG_FBO_POOL_MAX_UNUSED_TEXTURE_MEMORY
+    #define LV_NANOVG_FBO_POOL_MAX_UNUSED_TEXTURE_MEMORY (6 * 1024 * 1024)
+#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    /* context */
-    lv_draw_nanovg_unit_t * u;
-
-    /* key */
+struct _lv_nanovg_fbo_t {
+    struct NVGLUframebuffer * fbo;
     int width;
     int height;
     int flags;
-    enum NVGtexture format;
-
-    /* value */
-    struct NVGLUframebuffer * fbo;
-} fbo_item_t;
+    int format;
+    bool in_use;
+};
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-static bool fbo_create_cb(fbo_item_t * item, void * user_data);
-static void fbo_free_cb(fbo_item_t * item, void * user_data);
-static lv_cache_compare_res_t fbo_compare_cb(const fbo_item_t * lhs, const fbo_item_t * rhs);
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-
-/**********************
- *      MACROS
- **********************/
+static uint32_t fbo_bytes(const lv_nanovg_fbo_t * item);
+static void pool_trim(lv_draw_nanovg_unit_t * u);
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -64,115 +50,138 @@ static lv_cache_compare_res_t fbo_compare_cb(const fbo_item_t * lhs, const fbo_i
 void lv_nanovg_fbo_cache_init(lv_draw_nanovg_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_ASSERT(u->fbo_cache == NULL);
-
-    const lv_cache_ops_t ops = {
-        .compare_cb = (lv_cache_compare_cb_t)fbo_compare_cb,
-        .create_cb = (lv_cache_create_cb_t)fbo_create_cb,
-        .free_cb = (lv_cache_free_cb_t)fbo_free_cb,
-    };
-
-    u->fbo_cache = lv_cache_create(&lv_cache_class_lru_ll_count, sizeof(fbo_item_t), LV_NANOVG_FBO_CACHE_CNT, ops);
-    lv_cache_set_name(u->fbo_cache, "NVG_FBO");
+    lv_ll_init(&u->fbo_pool, sizeof(lv_nanovg_fbo_t));
 }
 
 void lv_nanovg_fbo_cache_deinit(lv_draw_nanovg_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_ASSERT(u->fbo_cache);
 
-    lv_cache_destroy(u->fbo_cache, NULL);
-    u->fbo_cache = NULL;
+    lv_nanovg_fbo_t * item;
+    LV_LL_READ(&u->fbo_pool, item) {
+        if(item->in_use) {
+            LV_LOG_WARN("Framebuffer %p is still in use", (void *)item);
+        }
+        nvgluDeleteFramebuffer(item->fbo);
+    }
+
+    lv_ll_clear(&u->fbo_pool);
 }
 
-struct _lv_cache_entry_t * lv_nanovg_fbo_cache_get(lv_draw_nanovg_unit_t * u, int width, int height, int flags,
-                                                   int format)
+lv_nanovg_fbo_t * lv_nanovg_fbo_cache_get(lv_draw_nanovg_unit_t * u, int width, int height, int flags,
+                                          int format)
 {
     LV_PROFILER_DRAW_BEGIN;
     LV_ASSERT_NULL(u);
 
-    fbo_item_t search_key = { 0 };
-    search_key.u = u;
-    search_key.width = width;
-    search_key.height = height;
-    search_key.flags = flags;
-    search_key.format = format;
-
-    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->fbo_cache, &search_key, NULL);
-    if(cache_node_entry == NULL) {
-        cache_node_entry = lv_cache_acquire_or_create(u->fbo_cache, &search_key, NULL);
-        if(cache_node_entry == NULL) {
-            LV_LOG_ERROR("FBO cache creating failed");
-            LV_PROFILER_DRAW_END;
-            return NULL;
+    /* Try to find an already allocated framebuffer in the pool
+     * by matching size, flags and format */
+    lv_nanovg_fbo_t * item;
+    LV_LL_READ(&u->fbo_pool, item) {
+        if(item->in_use) {
+            continue;
         }
+        if(item->width != width || item->height != height) {
+            continue;
+        }
+        if(item->flags != flags || item->format != format) {
+            continue;
+        }
+
+        item->in_use = true;
+        LV_PROFILER_DRAW_END;
+        return item;
     }
 
+    /* no free buffer matches the requirements, allocate a new entry in the pool */
+    item = lv_ll_ins_head(&u->fbo_pool);
+    if(item == NULL) {
+        LV_LOG_ERROR("Failed to allocate the framebuffer pool entry");
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
+
+    lv_memzero(item, sizeof(*item));
+    item->width = width;
+    item->height = height;
+    item->flags = flags;
+    item->format = format;
+    item->fbo = nvgluCreateFramebuffer(u->vg, width, height, flags, format);
+
+    if(item->fbo == NULL) {
+        LV_LOG_ERROR("Failed to create the framebuffer");
+        lv_ll_remove(&u->fbo_pool, item);
+        lv_free(item);
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
+
+    item->in_use = true;
+
     LV_PROFILER_DRAW_END;
-    return cache_node_entry;
+    return item;
 }
 
-void lv_nanovg_fbo_cache_release(struct _lv_draw_nanovg_unit_t * u, struct _lv_cache_entry_t * entry)
+void lv_nanovg_fbo_cache_release(lv_draw_nanovg_unit_t * u, lv_nanovg_fbo_t * item)
 {
     LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(entry);
-    lv_cache_release(u->fbo_cache, entry, NULL);
+    LV_ASSERT_NULL(item);
+
+    item->in_use = false;
+
+    /* Move it to the head to keep the most recently used framebuffers at the start of the list */
+    const bool head = true;
+    lv_ll_chg_list(&u->fbo_pool, &u->fbo_pool, item, head);
+
+    pool_trim(u);
 }
 
-struct NVGLUframebuffer * lv_nanovg_fbo_cache_entry_to_fb(struct _lv_cache_entry_t * entry)
+struct NVGLUframebuffer * lv_nanovg_fbo_cache_entry_to_fb(lv_nanovg_fbo_t * item)
 {
-    LV_ASSERT_NULL(entry);
-    fbo_item_t * fbo_item = lv_cache_entry_get_data(entry);
-    return fbo_item->fbo;
+    LV_ASSERT_NULL(item);
+    return item->fbo;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static bool fbo_create_cb(fbo_item_t * item, void * user_data)
+static uint32_t fbo_bytes(const lv_nanovg_fbo_t * item)
 {
-    LV_PROFILER_DRAW_BEGIN;
-    LV_UNUSED(user_data);
-
-    item->fbo = nvgluCreateFramebuffer(item->u->vg, item->width, item->height, item->flags, item->format);
-    if(!item->fbo) {
-        LV_LOG_ERROR("Failed to create FBO");
-    }
-
-    LV_PROFILER_DRAW_END;
-    return item->fbo != NULL;
+    /* Every format the unit asks for is 4 bytes per pixel */
+    return (uint32_t)item->width * (uint32_t)item->height * 4;
 }
 
-static void fbo_free_cb(fbo_item_t * item, void * user_data)
+static void pool_trim(lv_draw_nanovg_unit_t * u)
 {
-    LV_PROFILER_DRAW_BEGIN;
-    LV_UNUSED(user_data);
-
-    nvgluDeleteFramebuffer(item->fbo);
-
-    LV_PROFILER_DRAW_END;
-}
-
-static lv_cache_compare_res_t fbo_compare_cb(const fbo_item_t * lhs, const fbo_item_t * rhs)
-{
-    if(lhs->width != rhs->width) {
-        return lhs->width > rhs->width ? 1 : -1;
+    LV_ASSERT(u != NULL);
+    uint32_t free_bytes = 0;
+    lv_nanovg_fbo_t * item;
+    LV_LL_READ(&u->fbo_pool, item) {
+        if(item->in_use) {
+            continue;
+        }
+        free_bytes += fbo_bytes(item);
     }
 
-    if(lhs->height != rhs->height) {
-        return lhs->height > rhs->height ? 1 : -1;
-    }
+    /* Drop the least recently released ones until the free set fits the budget */
+    while(free_bytes > LV_NANOVG_FBO_POOL_MAX_UNUSED_TEXTURE_MEMORY) {
+        lv_nanovg_fbo_t * victim = NULL;
+        LV_LL_READ_BACK(&u->fbo_pool, item) {
+            if(!item->in_use) {
+                victim = item;
+                break;
+            }
+        }
+        if(victim == NULL) {
+            break;
+        }
 
-    if(lhs->flags != rhs->flags) {
-        return lhs->flags > rhs->flags ? 1 : -1;
+        free_bytes -= fbo_bytes(victim);
+        nvgluDeleteFramebuffer(victim->fbo);
+        lv_ll_remove(&u->fbo_pool, victim);
+        lv_free(victim);
     }
-
-    if(lhs->format != rhs->format) {
-        return lhs->format > rhs->format ? 1 : -1;
-    }
-
-    return 0;
 }
 
 #endif /* LV_USE_DRAW_NANOVG */
