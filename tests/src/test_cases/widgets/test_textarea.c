@@ -921,4 +921,33 @@ void test_textarea_one_line_scroll_screenshot(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/textarea_one_line_scroll.png");
 }
 
+void test_textarea_set_text_should_emit_value_changed_event_without_filters(void)
+{
+    event_count = 0;
+    lv_obj_add_event_cb(textarea, event_counter_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_textarea_set_text(textarea, "Hello");
+
+    TEST_ASSERT_EQUAL_STRING("Hello", lv_textarea_get_text(textarea));
+    TEST_ASSERT_EQUAL_UINT32(1U, event_count);
+}
+
+void test_textarea_add_text_should_emit_value_changed_event_only_once(void)
+{
+    event_count = 0;
+    lv_textarea_set_accepted_chars(textarea, "abcdefghijklmnopqrstuvwxyz");
+    lv_obj_add_event_cb(textarea, event_counter_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_textarea_add_text(textarea, "abc");
+
+    TEST_ASSERT_EQUAL_STRING("abc", lv_textarea_get_text(textarea));
+    TEST_ASSERT_EQUAL_UINT32(1U, event_count);
+
+    /*All characters rejected: nothing added, no event*/
+    lv_textarea_add_text(textarea, "123");
+
+    TEST_ASSERT_EQUAL_STRING("abc", lv_textarea_get_text(textarea));
+    TEST_ASSERT_EQUAL_UINT32(1U, event_count);
+}
+
 #endif
