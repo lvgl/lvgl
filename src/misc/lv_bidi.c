@@ -55,7 +55,7 @@ static lv_base_dir_t bracket_process(lv_bidi_ctx_t * ctx, const char * txt, uint
                                      uint32_t letter,
                                      lv_base_dir_t base_dir);
 static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index);
-static uint32_t get_txt_len(const char * txt, uint32_t max_len);
+static uint32_t get_txt_len(const char * txt, uint32_t max_len, uint32_t * byte_len);
 
 /**********************
  *  STATIC VARIABLES
@@ -122,7 +122,7 @@ lv_base_dir_t lv_bidi_detect_base_dir(const char * txt)
 uint16_t lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_t len, lv_base_dir_t base_dir,
                                  uint32_t visual_pos, bool * is_rtl)
 {
-    uint32_t pos_conv_len = get_txt_len(str_in, len);
+    uint32_t pos_conv_len = get_txt_len(str_in, len, NULL);
     char * buf = lv_malloc(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
@@ -147,7 +147,7 @@ uint16_t lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_t
 uint16_t lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t len, lv_base_dir_t base_dir,
                                 uint32_t logical_pos, bool * is_rtl)
 {
-    uint32_t pos_conv_len = get_txt_len(str_in, len);
+    uint32_t pos_conv_len = get_txt_len(str_in, len, NULL);
     char * buf = lv_malloc(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
@@ -187,6 +187,13 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
     uint16_t pos_conv_rd = 0;
     uint16_t pos_conv_wr;
 
+    /*A trailing partial or invalid character can't be processed and would make the byte
+     *and character counts inconsistent, so drop its bytes and zero them in the output*/
+    uint32_t aligned_len;
+    get_txt_len(str_in, len, &aligned_len);
+    if(str_out) lv_memzero(&str_out[aligned_len], len - aligned_len + 1);
+    len = aligned_len;
+
     if(base_dir == LV_BASE_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(str_in);
     if(base_dir == LV_BASE_DIR_RTL) {
         wr = len;
@@ -196,8 +203,6 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
         wr = 0;
         pos_conv_wr = 0;
     }
-
-    if(str_out) str_out[len] = '\0';
 
     lv_base_dir_t dir = base_dir;
 
@@ -370,15 +375,19 @@ static bool lv_bidi_letter_is_neutral(uint32_t letter)
     return false;
 }
 
-static uint32_t get_txt_len(const char * txt, uint32_t max_len)
+static uint32_t get_txt_len(const char * txt, uint32_t max_len, uint32_t * byte_len)
 {
     uint32_t len = 0;
     uint32_t i   = 0;
 
-    while(i < max_len && txt[i] != '\0') {
-        lv_text_encoded_next(txt, &i);
+    while(i < max_len) {
+        uint32_t next = i;
+        if(lv_text_encoded_next(txt, &next) == 0 || next > max_len) break;
+        i = next;
         len++;
     }
+
+    if(byte_len) *byte_len = i;
 
     return len;
 }
@@ -535,6 +544,9 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
         /*Simply store in reversed order*/
         else {
             uint32_t letter_size = lv_text_encoded_size((const char *)&src[i]);
+
+            if(wr + letter_size > len) break;
+
             /*Swap arithmetical symbols*/
             if(letter_size == 1) {
                 uint32_t new_letter = letter = char_change_to_pair(letter);
