@@ -48,7 +48,11 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 {
     LV_CHECK_ARG(title != NULL, return NULL);
 
-    lv_wayland_init();
+    lv_result_t res = lv_wayland_init();
+    if(res != LV_RESULT_OK) {
+        return NULL;
+    }
+
     if(close_cb) {
         LV_LOG_DEPRECATED("'lv_wayland_display_close_cb_t' is deprecated and will be removed in the next release. "
                           "Bind an LV_EVENT_DELETE to the display returned by `lv_wayland_window_create` instead.");
@@ -85,9 +89,9 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_driver_data(window->lv_disp, window);
 
     /* Initialize display driver */
-    lv_result_t res = lv_wayland_backend_init_display(&window->backend_ddata,
-                                                      window->lv_disp, hor_res,
-                                                      ver_res);
+    res = lv_wayland_backend_init_display(&window->backend_ddata,
+                                          window->lv_disp, hor_res,
+                                          ver_res);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create display");
         goto init_display_err;
