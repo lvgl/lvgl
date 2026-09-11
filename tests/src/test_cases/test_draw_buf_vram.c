@@ -1528,6 +1528,48 @@ void test_vram_alpha_format_lazy_zeroed(void)
     lv_draw_buf_destroy(buf);
 }
 
+void test_vram_goto_xy_allocates_lazy_buffer(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(8, 8, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    uint8_t * px = lv_draw_buf_goto_xy(buf, 2, 3);
+    TEST_ASSERT_NOT_NULL(px);
+    TEST_ASSERT_EQUAL_PTR(buf->data + 3 * buf->header.stride + 8, px);
+    lv_draw_buf_destroy(buf);
+}
+
+void test_vram_partial_clear_allocates_lazy_buffer(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(8, 8, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_area_t area = {1, 1, 3, 3};
+    lv_draw_buf_clear(buf, &area);
+    TEST_ASSERT_NOT_NULL(buf->data);
+    TEST_ASSERT_EQUAL_HEX32(0, *(uint32_t *)lv_draw_buf_goto_xy(buf, 2, 2));
+    lv_draw_buf_destroy(buf);
+}
+
+static void * fail_buf_malloc(size_t size, lv_color_format_t cf)
+{
+    LV_UNUSED(size);
+    LV_UNUSED(cf);
+    return NULL;
+}
+
+void test_vram_partial_clear_allocation_failure(void)
+{
+    lv_draw_buf_handlers_t handlers;
+    lv_draw_buf_init_with_default_handlers(&handlers);
+    handlers.buf_malloc_cb = fail_buf_malloc;
+    lv_draw_buf_t * buf = lv_draw_buf_create_ex(&handlers, 8, 8, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    TEST_ASSERT_NULL(lv_draw_buf_goto_xy(buf, 0, 0));
+    lv_area_t area = {0, 0, 3, 3};
+    lv_draw_buf_clear(buf, &area);
+    TEST_ASSERT_NULL(buf->data);
+    lv_draw_buf_destroy(buf);
+}
+
 #endif /* LV_USE_DRAW_VRAM */
 
 typedef int _keep_pedantic_happy; /* avoid empty translation unit when VRAM is disabled */

@@ -206,6 +206,10 @@ void lv_draw_buf_clear_ex(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_laye
         }
 #endif
         uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, 0, 0);
+        if(buf == NULL) {
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         lv_memzero(buf, header->h * stride);
         lv_draw_buf_flush_cache(draw_buf, a);
 #if LV_USE_DRAW_VRAM
@@ -240,6 +244,10 @@ void lv_draw_buf_clear_ex(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_laye
     }
 
     uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
+    if(buf == NULL) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
     uint8_t bpp = lv_color_format_get_bpp(header->cf);
     uint32_t line_length = (lv_area_get_width(&a_clipped) * bpp + 7) >> 3;
     int32_t y;
@@ -516,13 +524,12 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
                             return NULL,
                             "coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32,
                             x, y, (uint32_t)buf->header.w, (uint32_t)buf->header.h);
-    LV_CHECK_ARG(buf->data != NULL, return NULL);
-
 #if LV_USE_DRAW_VRAM
     if(buf->data == NULL) {
         if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)buf, NULL)) return NULL;
     }
 #endif
+    LV_CHECK_ARG(buf->data != NULL, return NULL);
 
     uint8_t * data = buf->data;
 
