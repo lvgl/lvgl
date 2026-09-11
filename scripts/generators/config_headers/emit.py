@@ -32,6 +32,8 @@ from .kconfig_utils import (
 )
 from .parse import classify, enum_backed_choices
 
+KCONFIG_ONLY_CONFIGS = {"LV_ATTRIBUTE_FAST_MEM_USE_IRAM"}
+
 
 class Emitter:
     """Renders one target (``"template"``, ``"internal"``) of the tree."""
@@ -120,6 +122,8 @@ class Emitter:
         if isinstance(entry, DerivedConstToken):
             if self.target == "internal":
                 self.derived_consts.append(entry)
+            return
+        if self.target == "template" and entry.name in KCONFIG_ONLY_CONFIGS:
             return
         lines = (
             entry.emit_template()
