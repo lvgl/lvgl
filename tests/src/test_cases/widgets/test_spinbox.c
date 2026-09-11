@@ -363,5 +363,31 @@ void test_spinbox_properties(void)
 #endif
 }
 
+static size_t event_count;
+
+static void event_counter_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    event_count++;
+}
+
+void test_spinbox_set_value_should_emit_value_changed_event(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(active_screen);
+    lv_spinbox_set_range(spinbox, 0, 100);
+
+    event_count = 0;
+    lv_obj_add_event_cb(spinbox, event_counter_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_spinbox_set_value(spinbox, 42);
+    TEST_ASSERT_EQUAL_UINT32(1U, event_count);
+
+    lv_spinbox_increment(spinbox);
+    TEST_ASSERT_EQUAL_UINT32(2U, event_count);
+
+    lv_obj_delete(spinbox);
+}
+
+
 #endif
 

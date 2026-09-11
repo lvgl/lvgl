@@ -13,10 +13,6 @@ static lv_style_t style_screen_dark;
 static lv_style_t style_yellow;
 static lv_style_t style_bg_dark;
 
-/*Subjects for a temperature and the selected theme*/
-static lv_subject_t subject_room_temperature;
-static lv_subject_t subject_theme;
-
 /**
  * @title Light and dark themes via `lv_obj_bind_style`
  * @brief Apply a second style only when a theme subject equals the selected value.
@@ -36,8 +32,10 @@ void lv_example_observer_7(void)
      * Initialize subjects
      *-------------------*/
 
-    lv_subject_init_int(&subject_theme, 0); /*Light theme by default*/
-    lv_subject_init_int(&subject_room_temperature, 25);
+    /*Subjects for the selected theme and a temperature*/
+    lv_subject_t * subject_theme = lv_subject_create(LV_SUBJECT_TYPE_INT); /*Light theme by default*/
+    lv_subject_t * subject_room_temperature = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(subject_room_temperature, 25);
 
     /*-------------------
      * Initialize styles
@@ -80,29 +78,29 @@ void lv_example_observer_7(void)
     /*Add the light them to the screen and bind the dark style only if the
      *dark theme is selected*/
     lv_obj_add_style(lv_screen_active(), &style_screen, 0);
-    lv_obj_bind_style(lv_screen_active(), &style_screen_dark, 0, &subject_theme, 1);
+    lv_obj_bind_style(lv_screen_active(), &style_screen_dark, 0, subject_theme, 1);
 
     /*Create a container and add the dark style if the dark theme is selected*/
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
-    lv_obj_bind_style(cont, &style_bg_dark, 0, &subject_theme, 1);
+    lv_obj_bind_style(cont, &style_bg_dark, 0, subject_theme, 1);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_size(cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_align(cont, LV_ALIGN_TOP_MID, 0, 20);
 
     lv_obj_t * label = lv_label_create(cont);
-    lv_label_bind_text(label, &subject_room_temperature, "%d °C");
+    lv_label_bind_text(label, subject_room_temperature, "%d °C");
 
     /*Bind the slider to the temperature subject and some of its styles to
      *theme subject*/
     lv_obj_t * slider = lv_slider_create(cont);
-    lv_slider_bind_value(slider, &subject_room_temperature);
+    lv_slider_bind_value(slider, subject_room_temperature);
     lv_obj_add_style(slider, &style_slider_main, 0);
     lv_obj_add_style(slider, &style_slider_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(slider, &style_slider_knob, LV_PART_KNOB);
-    lv_obj_bind_style(slider, &style_yellow, 0, &subject_theme, 1);
-    lv_obj_bind_style(slider, &style_yellow, LV_PART_INDICATOR, &subject_theme, 1);
-    lv_obj_bind_style(slider, &style_yellow, LV_PART_KNOB, &subject_theme, 1);
+    lv_obj_bind_style(slider, &style_yellow, 0, subject_theme, 1);
+    lv_obj_bind_style(slider, &style_yellow, LV_PART_INDICATOR, subject_theme, 1);
+    lv_obj_bind_style(slider, &style_yellow, LV_PART_KNOB, subject_theme, 1);
     lv_slider_set_range(slider, 20, 40);
 
     /*Create a dropdown to select a theme.
@@ -110,9 +108,9 @@ void lv_example_observer_7(void)
     lv_obj_t * dropdown = lv_dropdown_create(lv_screen_active());
     lv_obj_align(dropdown, LV_ALIGN_TOP_MID, 0, 120);
     lv_dropdown_set_options(dropdown, "Light\nDark");
-    lv_dropdown_bind_value(dropdown, &subject_theme);
-    lv_obj_bind_style(dropdown, &style_bg_dark, 0, &subject_theme, 1);
-    lv_obj_bind_style(lv_dropdown_get_list(dropdown), &style_bg_dark, 0, &subject_theme, 1);
+    lv_dropdown_bind_value(dropdown, subject_theme);
+    lv_obj_bind_style(dropdown, &style_bg_dark, 0, subject_theme, 1);
+    lv_obj_bind_style(lv_dropdown_get_list(dropdown), &style_bg_dark, 0, subject_theme, 1);
 }
 
 

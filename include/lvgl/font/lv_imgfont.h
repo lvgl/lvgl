@@ -39,14 +39,14 @@ typedef const void * (*lv_imgfont_get_path_cb_t)(const lv_font_t * font,
  * Creates a image font with info parameter specified.
  * @param height font size
  * @param path_cb a function to get the image path name of character.
- * @param user_data pointer to user data
+ * @param user_data pointer to user data @nullable
  * @return pointer to the new imgfont or NULL if create error.
  */
 lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb, void * user_data);
 
 /**
  * Destroy a image font that has been created.
- * @param font pointer to image font handle.
+ * @param font pointer to image font handle. @nullable
  */
 void lv_imgfont_destroy(lv_font_t * font);
 

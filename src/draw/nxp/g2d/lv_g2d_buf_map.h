@@ -23,8 +23,9 @@ extern "C" {
 
 #include "../../../lvgl_public.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
+
+#include "../../../misc/lv_array.h"
 
 #include <string.h>
 
@@ -73,7 +74,6 @@ void g2d_print_table(void);
  **********************/
 
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

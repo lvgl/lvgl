@@ -15,8 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../lvgl_public.h"
-
-#if LV_USE_FONT_COMPRESSED
+#include "../../osal/lv_os_private.h"
 
 /*********************
  *      DEFINES
@@ -25,6 +24,28 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+/**
+ * On demand glyph bitmap loader.
+ */
+struct _lv_font_fmt_txt_glyph_loader_t {
+    /**
+     * Load the raw (i.e. still encoded the same way as `glyph_bitmap` would store it) bitmap of a
+     * glyph and return a pointer to it.
+     *
+     * Called with `lock` held.
+     *
+     * @param loader    pointer to the loader itself
+     * @param gid       glyph index to load, i.e. the index in `lv_font_fmt_txt_dsc_t.glyph_dsc`
+     * @return          pointer to the raw bitmap or `NULL` on error
+     */
+    const uint8_t * (*get_glyph_bitmap_cb)(lv_font_fmt_txt_glyph_loader_t * loader, uint32_t gid);
+
+    /** Serializes the access to the shared scratch buffer and to the underlying source */
+    lv_mutex_t lock;
+};
+
+#if LV_USE_FONT_COMPRESSED
 
 typedef enum {
     RLE_STATE_SINGLE = 0,

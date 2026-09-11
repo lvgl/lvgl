@@ -5,6 +5,7 @@ from .lv_style import (
     style_prop_name,
     decode_selector,
     format_style_value,
+    read_symbol,
 )
 from .lv_rb import LVRedBlackTree
 from .lv_cache import LVCache
@@ -26,7 +27,7 @@ from .lv_anim import LVAnim
 from .lv_timer import LVTimer
 from .lv_image_decoder import LVImageDecoder
 from .lv_fs import LVFsDrv
-from .lv_utils import format_coord
+from .lv_utils import format_coord, format_enum
 
 __all__ = [
     "LVList",
@@ -55,4 +56,6 @@ __all__ = [
     "LVImageDecoder",
     "LVFsDrv",
     "format_coord",
+    "format_enum",
+    "read_symbol",
 ]

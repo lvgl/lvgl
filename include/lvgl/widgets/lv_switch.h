@@ -51,7 +51,8 @@ typedef enum {
 
 /**
  * Create a switch object
- * @param parent    pointer to an object, it will be the parent of the new switch
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created switch
  */
 lv_obj_t * lv_switch_create(lv_obj_t * parent);

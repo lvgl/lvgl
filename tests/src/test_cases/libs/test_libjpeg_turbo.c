@@ -69,8 +69,8 @@ void test_jpg_2(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
 
-    size_t mem_before = lv_test_get_free_mem();
-    for(uint32_t i = 0; i < 20; i++) {
+    size_t allocs_before = lv_test_get_allocation_count();
+    for(uint32_t i = 0; i < 40; i++) {
         create_images();
 
         lv_obj_invalidate(lv_screen_active());
@@ -79,11 +79,7 @@ void test_jpg_2(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
 
-#if LV_USE_DRAW_VRAM
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 128);
-#else
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 64);
-#endif
+    TEST_ASSERT_NO_MEM_LEAK(allocs_before);
 }
 
 void test_jpg_cmyk(void)

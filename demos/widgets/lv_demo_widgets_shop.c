@@ -147,7 +147,7 @@ void lv_demo_widgets_shop_create(lv_obj_t * parent)
 
     lv_obj_t * list = lv_obj_create(parent);
     if(disp_size == DISP_SMALL) {
-        lv_obj_add_flag(list, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+        lv_obj_set_flex_in_new_track(list, true);
         lv_obj_set_height(list, LV_PCT(100));
     }
     else {
@@ -157,7 +157,7 @@ void lv_demo_widgets_shop_create(lv_obj_t * parent)
 
     lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(list, 1);
-    lv_obj_add_flag(list, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    lv_obj_set_flex_in_new_track(list, true);
 
     title = lv_demo_widgets_title_create(list, "Top products");
 
@@ -170,7 +170,7 @@ void lv_demo_widgets_shop_create(lv_obj_t * parent)
 
     lv_obj_t * notifications = lv_obj_create(parent);
     if(disp_size == DISP_SMALL) {
-        lv_obj_add_flag(notifications, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+        lv_obj_set_flex_in_new_track(notifications, true);
         lv_obj_set_height(notifications, LV_PCT(100));
     }
     else  {

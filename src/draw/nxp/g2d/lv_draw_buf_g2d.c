@@ -15,7 +15,6 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include "../../lv_draw_buf_private.h"
 #include <g2d.h>
@@ -91,4 +90,3 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 }
 
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/

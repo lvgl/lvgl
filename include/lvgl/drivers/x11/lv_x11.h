@@ -47,7 +47,7 @@ typedef void(*lv_x11_close_cb)(void * user_data);
  * - create mouse (with scrollwheel, lv_x11_mouse_create lv_x11_mousewheel_create)
  *
  * @param[in] disp      the created X11 display object from @ref lv_x11_window_create
- * @param[in] mouse_img optional image description for the mouse cursor (NULL for no/invisible mouse cursor)
+ * @param[in] mouse_img optional image description for the mouse cursor @nullable. Use NULL for no/invisible mouse cursor
  */
 void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img);
 

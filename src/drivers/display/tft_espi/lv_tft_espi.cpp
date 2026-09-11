@@ -42,6 +42,7 @@ static void resolution_changed_event_cb(lv_event_t * e);
 
 lv_display_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes)
 {
+    LV_CHECK_ARG(buf != NULL, return NULL);
     lv_tft_espi_t * dsc = (lv_tft_espi_t *)lv_malloc_zeroed(sizeof(lv_tft_espi_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;

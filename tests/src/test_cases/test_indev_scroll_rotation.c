@@ -45,7 +45,7 @@ void setUp(void)
     container = lv_obj_create(lv_screen_active());
     lv_obj_set_size(container, 200, 200);
     lv_obj_center(container);
-    lv_obj_add_flag(container, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(container, true);
     lv_obj_set_scroll_dir(container, LV_DIR_HOR);
     lv_obj_add_event_cb(container, scroll_begin_cb, LV_EVENT_SCROLL_BEGIN, NULL);
 
@@ -56,22 +56,22 @@ void setUp(void)
     /* List: vertical scrollable, remove SCROLL_CHAIN_VER (like widget_list) */
     list_obj = lv_obj_create(container);
     lv_obj_set_size(list_obj, 200, 200);
-    lv_obj_add_flag(list_obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(list_obj, true);
     lv_obj_set_scroll_dir(list_obj, LV_DIR_VER);
-    lv_obj_remove_flag(list_obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+    lv_obj_set_scroll_chain_ver(list_obj, false);
 
     /* Rotated container (like barcode div with rotate 90deg) */
     rotated_obj = lv_obj_create(list_obj);
     lv_obj_set_size(rotated_obj, 100, 50);
     lv_obj_center(rotated_obj);
     lv_obj_set_style_transform_rotation(rotated_obj, 900, LV_PART_MAIN);
-    lv_obj_remove_flag(rotated_obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(rotated_obj, false);
 
     /* Inner touch target (like barcode obj) */
     inner_obj = lv_obj_create(rotated_obj);
     lv_obj_set_size(inner_obj, 80, 30);
     lv_obj_center(inner_obj);
-    lv_obj_remove_flag(inner_obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(inner_obj, false);
 
     lv_test_wait(50);
 }

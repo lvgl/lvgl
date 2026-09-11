@@ -35,6 +35,8 @@
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
+
     lv_memzero(dsc, sizeof(lv_draw_line_dsc_t));
     dsc->width = 1;
     dsc->opa = LV_OPA_COVER;
@@ -44,11 +46,16 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 
 lv_draw_line_dsc_t * lv_draw_task_get_line_dsc(lv_draw_task_t * task)
 {
+    LV_CHECK_ARG(task != NULL, return NULL);
+
     return task->type == LV_DRAW_TASK_TYPE_LINE ? (lv_draw_line_dsc_t *)task->draw_dsc : NULL;
 }
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -128,6 +135,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
 void lv_draw_line_iterate(lv_draw_task_t * t, lv_draw_line_dsc_t * dsc,
                           void (*draw_line_cb)(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc))
 {
+    LV_CHECK_ARG(t != NULL, return);
+    LV_CHECK_ARG(dsc != NULL, return);
+    LV_CHECK_ARG(draw_line_cb != NULL, return);
+
     uint32_t i;
     lv_point_precise_t * points = dsc->points;
     if(points == NULL) {

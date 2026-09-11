@@ -1,0 +1,32 @@
+config LV_USE_GENERIC_MIPI
+	bool "Generic MIPI"
+	default n
+	help
+		Driver for LCD devices connected via SPI or parallel port.
+		Use it if your LCD controller is not listed among the dedicated drivers below.
+
+config LV_USE_ST7735
+	bool "ST7735"
+	default n
+	select LV_USE_GENERIC_MIPI
+
+config LV_USE_ST7789
+	bool "ST7789"
+	default n
+	select LV_USE_GENERIC_MIPI
+
+config LV_USE_ST7796
+	bool "ST7796"
+	default n
+	select LV_USE_GENERIC_MIPI
+
+config LV_USE_ILI9341
+	bool "ILI9341"
+	default n
+	select LV_USE_GENERIC_MIPI
+
+config LV_USE_NV3007
+	bool "NV3007"
+	default n
+	select LV_USE_GENERIC_MIPI
+

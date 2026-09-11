@@ -1,0 +1,36 @@
+<!--
+ @title Arc change rate
+ @brief Limit how fast the value can change while dragging.
+
+ change_rate caps the maximum value change per second triggered by user input. The lower
+ setting responds sluggishly to fast pointer gestures, while the higher setting tracks
+ the pointer almost instantly — useful for fine-tuning versus quick-jump knobs.
+-->
+<screen>
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_track_place="center">
+		<!-- 💡 Drag each arc quickly: lower change_rate responds more slowly, higher change_rate tracks your pointer faster. -->
+		<!-- Slower response arc -->
+		<lv_arc name="arc_1"
+			width="120"
+			height="120"
+			bg_start_angle="135"
+			bg_end_angle="45"
+			change_rate="40"
+			value="35"
+		>
+			<lv_label name="label_1" align="center" text="rate=40" />
+		</lv_arc>
+
+		<!-- Faster response arc -->
+		<lv_arc name="arc_2"
+			width="120"
+			height="120"
+			bg_start_angle="135"
+			bg_end_angle="45"
+			change_rate="360"
+			value="35"
+		>
+			<lv_label name="label_2" align="center" text="rate=360" />
+		</lv_arc>
+	</view>
+</screen>

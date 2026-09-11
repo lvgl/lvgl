@@ -53,7 +53,7 @@ typedef enum {
     LV_BUTTONMATRIX_CTRL_NO_REPEAT    = 0x0020, /**< Do not emit LV_EVENT_LONG_PRESSED_REPEAT events while button is long-pressed. */
     LV_BUTTONMATRIX_CTRL_DISABLED     = 0x0040, /**< Disables button like LV_STATE_DISABLED on normal Widgets. */
     LV_BUTTONMATRIX_CTRL_CHECKABLE    = 0x0080, /**< Enable toggling of LV_STATE_CHECKED when clicked. */
-    LV_BUTTONMATRIX_CTRL_CHECKED      = 0x0100, /**< Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles. */
+    LV_BUTTONMATRIX_CTRL_CHECKED      = 0x0100, /**< Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECKED` styles. */
     LV_BUTTONMATRIX_CTRL_CLICK_TRIG   = 0x0200, /**< 1: Enables sending LV_EVENT_VALUE_CHANGE on CLICK, 0: sends LV_EVENT_VALUE_CHANGE on PRESS. */
     LV_BUTTONMATRIX_CTRL_POPOVER      = 0x0400, /**< Show button text in a pop-over while being pressed. */
     LV_BUTTONMATRIX_CTRL_RECOLOR      = 0x0800, /**< Enable text recoloring with `#color` */
@@ -82,7 +82,8 @@ enum _lv_property_buttonmatrix_id_t {
 
 /**
  * Create a button matrix object
- * @param parent    pointer to an object, it will be the parent of the new button matrix
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the created button matrix
  */
 lv_obj_t * lv_buttonmatrix_create(lv_obj_t * parent);
@@ -194,7 +195,7 @@ uint32_t lv_buttonmatrix_get_selected_button(const lv_obj_t * obj);
  * Get the button's text
  * @param obj       pointer to button matrix object
  * @param btn_id    the index a button not counting new line characters.
- * @return          text of btn_index` button
+ * @return          text of `btn_index` button
  */
 const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_id);
 

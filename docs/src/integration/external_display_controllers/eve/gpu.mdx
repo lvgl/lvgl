@@ -11,8 +11,8 @@ from the driving MCU so it can be a lower-spec part or dedicate more of its
 processing time to other tasks. The SPI interface is simpler to connect than
 parallel RGB especially if the EVE chip is integrated into a display assembly.
 
-LVGL features a renderer for EVE. LVGL UIs can be rendered by EVE
-and are effectively indistinguishable from the software renderer is most cases.
+LVGL features a [renderer](/main-modules/draw) for EVE. LVGL UIs can be rendered by EVE
+and are effectively indistinguishable from the software renderer in most cases.
 
 See also the [EVE (FT81x)](/integration/external_display_controllers/eve/frame_buffer_mode) framebuffer driver. It drives the same EVE chips
 but is a simpler, more standalone implementation which uses software rendering
@@ -33,11 +33,11 @@ and sends all the pixels over SPI so it is much slower.
 Find your display parameters and populate a <ApiLink name="lv_draw_eve_parameters_t" />
 struct with them.
 
-Here is an example [lv_draw_eve_target_parameters.h` for the Riverdi RVT50HQBNWC00-B
+Here is an example `lv_draw_eve_target_parameters.h` for the Riverdi RVT50HQBNWC00-B
 which has a BT817Q --- the EVE chip.
 These parameters were taken from the collection of configs provided by the EVE
 library supporting this renderer.
-`See here](https://github.com/RudolphRiedel/FT800-FT813/blob/ee35fa45c37aed78dc4f1196b874ee1c8f80429f/EVE_config.h#L856-L872).
+[See here](https://github.com/RudolphRiedel/FT800-FT813/blob/ee35fa45c37aed78dc4f1196b874ee1c8f80429f/EVE_config.h#L856-L872).
 Check there for your board parameters.
 
 ```c
@@ -125,10 +125,10 @@ needs to be drawn, a series of commands are sent to EVE.
 
 ### Touch Indev Creation
 
-<ApiLink name="lv_draw_eve_touch_create" display="lv_draw_eve_touch_create(disp)" /> creates a touch [Input devices (lv_indev)](/main-modules/indev) for the display.
+<ApiLink name="lv_draw_eve_touch_create" display="lv_draw_eve_touch_create(disp)" /> creates a touch [input device (lv_indev)](/main-modules/indev) for the display.
 
 You may need to configure the i2c address of the touch controller connected to EVE.
-See the section [EVE Register Access](/integration/external_display_controllers/eve/gpu) for more info about register access.
+See the section [EVE Register Access](#eve-register-access) for more info about register access.
 
 Here is an example of setting the `REG_TOUCH_CONFIG` register on a BT817q EVE chip
 for a capacitive touch screen with a controller that has the i2c address `0x15`.
@@ -205,7 +205,7 @@ are available if needed. They are wrappers around `EVE_memRead8()`, etc.
 
 Register definitions and other EVE enumerations are available when you include
 `lvgl.h` under the prefix namespace `LV_EVE_`. I.e., `REG_ID` is available
-as <ApiLink name="LV_EVE_REG_ID" /> and <ApiLink name="EVE_ROM_CHIPID" /> is available as
+as <ApiLink name="LV_EVE_REG_ID" /> and `EVE_ROM_CHIPID` is available as
 <ApiLink name="LV_EVE_EVE_ROM_CHIPID" />, etc.
 
 ### Further Reading

@@ -35,6 +35,8 @@ extern "C" {
  */
 void lv_draw_nanovg_init(void);
 
+const lv_draw_buf_handlers_t * lv_draw_nanovg_get_draw_buf_handlers(void);
+
 /**********************
  *      MACROS
  **********************/

@@ -9,7 +9,7 @@
     "timer",
     "animation",
     "fs",
-    "observer",
+    "data_binding",
     "draw",
     "translation"
   ]

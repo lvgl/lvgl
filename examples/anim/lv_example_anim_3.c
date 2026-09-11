@@ -78,8 +78,8 @@ static int32_t anim_path_bezier3_cb(const lv_anim_t * a)
 
 static void refer_chart_cubic_bezier(void)
 {
-    for(uint16_t i = 0; i <= CHART_POINTS_NUM; i ++) {
-        int32_t t = i * (1024 / CHART_POINTS_NUM);
+    for(uint16_t i = 0; i < CHART_POINTS_NUM; i ++) {
+        int32_t t = (int32_t)i * 1024 / (CHART_POINTS_NUM - 1);
         int32_t step = lv_bezier3(t, 0, ginfo.p1, ginfo.p2, 1024);
         lv_chart_set_series_value_by_id2(ginfo.chart, ginfo.ser1, i, t, step);
     }
@@ -125,7 +125,7 @@ static void page_obj_init(lv_obj_t * par)
     ginfo.anim_obj = lv_obj_create(par);
     lv_obj_set_size(ginfo.anim_obj, 30, 30);
     lv_obj_set_align(ginfo.anim_obj, LV_ALIGN_TOP_LEFT);
-    lv_obj_remove_flag(ginfo.anim_obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(ginfo.anim_obj, false);
     lv_obj_set_style_bg_color(ginfo.anim_obj, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
     lv_obj_set_grid_cell(ginfo.anim_obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);
 

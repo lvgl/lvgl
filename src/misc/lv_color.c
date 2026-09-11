@@ -88,9 +88,9 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
     }
 }
 
-bool lv_color_format_has_alpha(lv_color_format_t cf)
+bool lv_color_format_has_alpha(lv_color_format_t src_cf)
 {
-    switch(cf) {
+    switch(src_cf) {
         case LV_COLOR_FORMAT_A1:
         case LV_COLOR_FORMAT_A2:
         case LV_COLOR_FORMAT_A4:
@@ -253,9 +253,9 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
  * @param color color
  * @return the given color in HSV
  */
-lv_color_hsv_t lv_color_to_hsv(lv_color_t c)
+lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
 {
-    return lv_color_rgb_to_hsv(c.red, c.green, c.blue);
+    return lv_color_rgb_to_hsv(color.red, color.green, color.blue);
 }
 
 uint8_t lv_color_format_get_size(lv_color_format_t cf)
@@ -345,6 +345,8 @@ lv_color_t lv_color_black(void)
 
 void lv_color_premultiply(lv_color32_t * c)
 {
+    LV_CHECK_ARG(c != NULL, return);
+
     if(c->alpha == LV_OPA_COVER) {
         return;
     }
@@ -361,6 +363,8 @@ void lv_color_premultiply(lv_color32_t * c)
 
 void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
 {
+    LV_CHECK_ARG(c != NULL, return);
+
     if(a == LV_OPA_COVER) {
         return;
     }
@@ -387,6 +391,8 @@ uint8_t lv_color16_luminance(const lv_color16_t c)
 
 uint8_t lv_color24_luminance(const uint8_t * c)
 {
+    LV_CHECK_ARG(c != NULL, return 0);
+
     return (uint8_t)((uint16_t)(77u * c[2] + 151u * c[1] + 28u * c[0]) >> 8);
 }
 

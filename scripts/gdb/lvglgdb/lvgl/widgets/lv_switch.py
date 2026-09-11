@@ -13,16 +13,17 @@ class LVSwitch(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_switch_t", ptr=True) or self
+        self._wv_lv_switch_t = self.cast("lv_switch_t", ptr=True) or self
+        self._wv = self._wv_lv_switch_t
 
     @property
     def anim_state(self):
-        return int(self._wv.safe_field("anim_state", 0))
+        return int(self._wv_lv_switch_t.safe_field("anim_state", 0))
 
     @property
     def orientation(self):
         """Orientation of switch"""
-        return int(self._wv.safe_field("orientation", 0))
+        return int(self._wv_lv_switch_t.safe_field("orientation", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

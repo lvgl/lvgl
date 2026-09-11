@@ -8,6 +8,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+/*These tests exercise the deprecated `lv_file_explorer` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * file_explorer_obj;
 static lv_file_explorer_t * file_explorer;
@@ -132,5 +135,7 @@ void test_file_explorer_show_back_button(void)
     lv_file_explorer_show_back_button(file_explorer_obj, false);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/file_explorer_01.png");
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

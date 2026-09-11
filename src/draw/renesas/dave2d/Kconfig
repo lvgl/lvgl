@@ -1,0 +1,5 @@
+config LV_USE_DRAW_DAVE2D
+	bool "Dave2D renderer"
+	default n
+	help
+		Accelerate drawing with the Dave2D GPU found on Renesas RA platforms.

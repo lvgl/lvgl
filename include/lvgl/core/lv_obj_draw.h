@@ -117,6 +117,15 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
 void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc);
 
 /**
+ * Set a custom extra draw area (around the widget) to draw shadow, outline, or children etc.
+ * @param obj       pointer to an object
+ * @param size      the extra size to allow around the object
+ * @note            `LV_OBJ_FLAG_OVERFLOW_VISIBLE` should be set on `obj` to allow the
+ *                  children overflowing the parent.
+ */
+void lv_obj_set_ext_draw_size(lv_obj_t * obj, int32_t size);
+
+/**
  * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
  * @param obj       pointer to an object
  * @param part      part of the object

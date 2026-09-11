@@ -17,7 +17,7 @@ liquid crystal, it is possible to make a display system with fewer components.
 
 The ST7735 LCD controller
 [driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/display/st7735) is a
-platform-agnostic driver, based on the generic MIPI driver.  It implements
+platform-agnostic driver, based on the [generic MIPI driver](/integration/external_display_controllers/gen_mipi).  It implements
 display initialization, supports display rotation and implements the display flush
 callback.  The user needs to implement only two platform-specific functions to send a
 command or pixel data to the controller via SPI or parallel bus.  Typically these are
@@ -82,16 +82,16 @@ Setting the color format is also recommended (please refer to [Color Format](/ma
 ```c
 /* Example of initializing ST7735 display and its draw buffers */
 uint32_t buf_size = 128 * 160 / 10 * sizeof(lv_color_t);
-```
 
 lv_color_t *buf1 = malloc(buf_size);
-	lv_color_t *buf2 = malloc(buf_size);
-	assert(buf1 != NULL && buf2 != NULL);
-	lv_display_t *const disp = lv_st7735_create(128, 160, LV_LCD_FLAG_NONE,
-			my_lcd_send_cmd, my_lcd_send_color);
-	lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
-	lv_display_set_buffers(disp, buf1, buf2, buf_size,
-			LV_DISPLAY_RENDER_MODE_PARTIAL);
+lv_color_t *buf2 = malloc(buf_size);
+assert(buf1 != NULL && buf2 != NULL);
+lv_display_t *const disp = lv_st7735_create(128, 160, LV_LCD_FLAG_NONE,
+        my_lcd_send_cmd, my_lcd_send_color);
+lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
+lv_display_set_buffers(disp, buf1, buf2, buf_size,
+        LV_DISPLAY_RENDER_MODE_PARTIAL);
+```
 
-For additional details and a working example see the generic MIPI driver
-documentation.
+For additional details and a working example see the
+[generic MIPI driver](/integration/external_display_controllers/gen_mipi) documentation.

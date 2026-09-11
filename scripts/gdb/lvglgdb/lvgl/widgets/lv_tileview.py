@@ -14,11 +14,12 @@ class LVTileview(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_tileview_t", ptr=True) or self
+        self._wv_lv_tileview_t = self.cast("lv_tileview_t", ptr=True) or self
+        self._wv = self._wv_lv_tileview_t
 
     @property
     def tile_act(self):
-        return ptr_or_none(self._wv.safe_field("tile_act"))
+        return ptr_or_none(self._wv_lv_tileview_t.safe_field("tile_act"))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

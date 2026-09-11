@@ -1,0 +1,41 @@
+<!--
+ @title Size and padding
+ @brief Set a Widget's width and padding; its height follows the content.
+
+ Both cards share one style but set a different `width` (140 vs 240) and
+ `style_pad_all` (12 vs 28). `height="content"` lets each grow to exactly
+ fit its label plus that padding, so the same style yields a tight chip
+ and a roomy panel — size comes only from these properties.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- One clean card surface; size + padding vary per instance -->
+		<style
+			name="style_card"
+			radius="16"
+			bg_opa="100%"
+			bg_color="0xffffff"
+			border_width="0"
+			shadow_color="#accent"
+			shadow_width="22"
+			shadow_offset_y="6"
+			shadow_opa="55"
+		/>
+	</styles>
+
+	<view>
+		<!-- 💡 Change a card's `width` or `style_pad_all`; `height="content"` keeps it exactly as tall as its text. -->
+		<lv_obj name="container_1" width="140" height="content" align="center" y="-40" style_pad_all="12">
+			<style name="style_card" />
+			<lv_label name="label_1" align="center" text="140 wide" />
+		</lv_obj>
+
+		<lv_obj name="container_2" width="260" height="content" align="center" y="40" style_pad_all="28">
+			<style name="style_card" />
+			<lv_label name="label_2" align="center" text="260 wide, roomy padding" />
+		</lv_obj>
+	</view>
+</screen>

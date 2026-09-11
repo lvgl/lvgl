@@ -101,6 +101,7 @@ void lv_test_fs_clear_close_cb(bool is_clear)
 
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
+    LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
     lv_fs_file_t * file_p = lv_malloc(sizeof(lv_fs_file_t));
     LV_ASSERT_MALLOC(file_p);
@@ -119,6 +120,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
     lv_fs_res_t res = lv_fs_close(file_p);
     lv_free(file_p);
@@ -127,30 +129,40 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(buf != NULL || btr == 0);
+    LV_ASSERT(br != NULL);
     LV_UNUSED(drv);
     return lv_fs_read(file_p, buf, btr, br);
 }
 
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(buf != NULL || btw == 0);
+    LV_ASSERT(bw != NULL);
     LV_UNUSED(drv);
     return lv_fs_write(file_p, buf, btw, bw);
 }
 
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
+    LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
     return lv_fs_seek(file_p, pos, whence);
 }
 
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
+    LV_ASSERT(file_p != NULL);
+    LV_ASSERT(pos_p != NULL);
     LV_UNUSED(drv);
     return lv_fs_tell(file_p, pos_p);
 }
 
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
+    LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
     lv_fs_dir_t * rddir_p = lv_malloc(sizeof(lv_fs_dir_t));
     if(rddir_p == NULL) {
@@ -168,12 +180,16 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * rddir_p, char * fn, uint32_t fn_len)
 {
+    LV_ASSERT(rddir_p != NULL);
+    LV_ASSERT(fn != NULL);
+    LV_ASSERT(fn_len > 0);
     LV_UNUSED(drv);
     return lv_fs_dir_read(rddir_p, fn, fn_len);
 }
 
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * rddir_p)
 {
+    LV_ASSERT(rddir_p != NULL);
     LV_UNUSED(drv);
     lv_fs_res_t res = lv_fs_dir_close(rddir_p);
     lv_free(rddir_p);
@@ -182,6 +198,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * rddir_p)
 
 static bool fs_ready(lv_fs_drv_t * drv)
 {
+    LV_ASSERT(drv != NULL);
     LV_UNUSED(drv);
     return is_ready;
 }

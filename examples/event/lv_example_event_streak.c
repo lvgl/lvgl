@@ -34,7 +34,7 @@ void lv_example_event_streak(void)
     lv_label_set_text(info_label, "No events yet");
 
     lv_obj_t * btn = lv_button_create(lv_screen_active());
-    lv_obj_set_size(btn, 100, 50);
+    lv_obj_set_size(btn, 150, 50);
     lv_obj_center(btn);
     lv_obj_add_event_cb(btn, short_click_event_cb, LV_EVENT_SHORT_CLICKED, info_label);
     lv_obj_add_event_cb(btn, streak_event_cb, LV_EVENT_SINGLE_CLICKED, (void *) "Single clicked");

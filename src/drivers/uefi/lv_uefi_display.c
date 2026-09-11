@@ -65,6 +65,7 @@ static EFI_GUID _uefi_guid_edid_active = EFI_EDID_ACTIVE_PROTOCOL_GUID;
  */
 lv_display_t * lv_uefi_display_create(void * handle)
 {
+    LV_CHECK_ARG(handle != NULL, return NULL);
     lv_display_t * display = NULL;
     lv_uefi_display_context_t * display_ctx;
 
@@ -210,7 +211,7 @@ static void _display_flush_cb(lv_display_t * display, const lv_area_t * area, ui
     int32_t h;
 
     lv_uefi_display_context_t * display_ctx = (lv_uefi_display_context_t *)lv_display_get_user_data(display);
-    LV_ASSERT_NULL(display_ctx);
+    LV_ASSERT(display_ctx != NULL);
 
     w = (int32_t)area->x2 - (int32_t)area->x1 + 1;
     h = (int32_t)area->y2 - (int32_t)area->y1 + 1;

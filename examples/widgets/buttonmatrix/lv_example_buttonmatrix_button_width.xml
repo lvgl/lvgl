@@ -1,0 +1,26 @@
+<!--
+ @title Button matrix button widths
+ @brief Set per-button relative widths through `ctrl_map`.
+
+ Each token in `ctrl_map` corresponds to one button in `map` (row-break tokens are
+ skipped). Tokens like `width_1`..`width_15` give the button a relative width that
+ acts like CSS flex-grow within its row. Here the second row uses `width_1`,
+ `width_2`, `width_3`, splitting the row into a 1/6, 2/6, 3/6 ratio.
+
+ The row break itself is written as `'&#10;'` — the XML numeric character entity
+ for a newline (U+000A) — because a raw `\n` inside an attribute would stay as
+ the literal backslash-n.
+-->
+<screen>
+	<view>
+		<!-- 💡 Change a `width_*` token (1..15) to see the matching button stretch relative to its row neighbors. -->
+		<!-- First row: equal widths. Second row: 1:2:3 split via width_1/2/3 tokens. -->
+		<lv_buttonmatrix name="buttonmatrix"
+			align="center"
+			width="90%"
+			height="140"
+			map="'A' 'B' 'C' '&#10;' 'x1' 'x2' 'x3'"
+			ctrl_map="none none none width_1 width_2 width_3"
+		/>
+	</view>
+</screen>

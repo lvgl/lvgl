@@ -14,72 +14,73 @@ class LVMenu(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_menu_t", ptr=True) or self
+        self._wv_lv_menu_t = self.cast("lv_menu_t", ptr=True) or self
+        self._wv = self._wv_lv_menu_t
 
     @property
     def storage(self):
         """a pointer to obj that is the parent of all pages not displayed"""
-        return ptr_or_none(self._wv.safe_field("storage"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("storage"))
 
     @property
     def main(self):
-        return ptr_or_none(self._wv.safe_field("main"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("main"))
 
     @property
     def main_page(self):
-        return ptr_or_none(self._wv.safe_field("main_page"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("main_page"))
 
     @property
     def main_header(self):
-        return ptr_or_none(self._wv.safe_field("main_header"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("main_header"))
 
     @property
     def main_header_title(self):
-        return ptr_or_none(self._wv.safe_field("main_header_title"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("main_header_title"))
 
     @property
     def sidebar(self):
-        return ptr_or_none(self._wv.safe_field("sidebar"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("sidebar"))
 
     @property
     def sidebar_page(self):
-        return ptr_or_none(self._wv.safe_field("sidebar_page"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("sidebar_page"))
 
     @property
     def sidebar_header(self):
-        return ptr_or_none(self._wv.safe_field("sidebar_header"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("sidebar_header"))
 
     @property
     def sidebar_header_title(self):
-        return ptr_or_none(self._wv.safe_field("sidebar_header_title"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("sidebar_header_title"))
 
     @property
     def selected_tab(self):
-        return ptr_or_none(self._wv.safe_field("selected_tab"))
+        return ptr_or_none(self._wv_lv_menu_t.safe_field("selected_tab"))
 
     @property
     def history_ll(self):
-        return safe_wrapper(self._wv, "history_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
+        return safe_wrapper(self._wv_lv_menu_t, "history_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
 
     @property
     def cur_depth(self):
-        return int(self._wv.safe_field("cur_depth", 0))
+        return int(self._wv_lv_menu_t.safe_field("cur_depth", 0))
 
     @property
     def prev_depth(self):
-        return int(self._wv.safe_field("prev_depth", 0))
+        return int(self._wv_lv_menu_t.safe_field("prev_depth", 0))
 
     @property
     def sidebar_generated(self):
-        return int(self._wv.safe_field("sidebar_generated", 0))
+        return int(self._wv_lv_menu_t.safe_field("sidebar_generated", 0))
 
     @property
     def mode_header(self):
-        return int(self._wv.safe_field("mode_header", 0))
+        return int(self._wv_lv_menu_t.safe_field("mode_header", 0))
 
     @property
     def mode_root_back_btn(self):
-        return int(self._wv.safe_field("mode_root_back_btn", 0))
+        return int(self._wv_lv_menu_t.safe_field("mode_root_back_btn", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

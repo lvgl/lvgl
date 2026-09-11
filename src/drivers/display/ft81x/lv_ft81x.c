@@ -89,7 +89,9 @@ static void lv_ft81x_encode_write_address(void * dst_3_bytes, uint32_t address);
 lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size,
                                lv_ft81x_spi_cb_t spi_cb, void * user_data)
 {
-    LV_ASSERT_NULL(spi_cb);
+    LV_CHECK_ARG(spi_cb != NULL, return NULL);
+    LV_CHECK_ARG(params != NULL, return NULL);
+    LV_CHECK_ARG(partial_buf != NULL, return NULL);
 
     lv_display_t * disp = lv_display_create(params->hor_res, params->ver_res);
 
@@ -115,6 +117,8 @@ lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * part
 
 void * lv_ft81x_get_user_data(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return NULL);
+
     lv_ft81x_driver_data_t * drv = lv_display_get_driver_data(disp);
     return drv->user_data;
 }

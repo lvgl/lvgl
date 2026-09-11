@@ -1,0 +1,45 @@
+<globals>
+    <api>
+        <!-- Add <enumdefs> here -->
+    </api>
+
+    <consts>
+        <!-- Add <px>, <int>, <color> etc here -->
+    </consts>
+
+    <styles>
+        <!-- Add <style> tags here -->
+    </styles>
+
+    <subjects>
+        <!-- Generic subjects used by the data-binding examples. Each binding
+             example reuses these so users don't have to invent new subject
+             names per example. -->
+        <int    name="subject_value"  value="50"  min_value="0" max_value="100"/>
+        <int    name="subject_value2" value="20"  min_value="0" max_value="100"/>
+        <int    name="subject_opa"    value="128" min_value="0" max_value="255"/>
+        <int    name="subject_index"  value="0"/>
+        <int    name="subject_flag"   value="0"/>
+        <string name="subject_text"   value="Hello"/>
+    </subjects>
+
+    <images>
+        <!-- The name matches the pre-built `img_example_lvgl_logo` descriptor in
+             `demos/widgets/assets/img_example_lvgl_logo.c`, so the generated C links
+             against that symbol and the example doesn't depend on the
+             editor's image-conversion pipeline. `src_path` is only the
+             editor's preview/source. -->
+        <data name="img_example_lvgl_logo"   src_path="images/img_example_lvgl_logo.png" color_format="argb8888"/>
+
+        <data name="img_arc_bg"              src_path="images/img_arc_bg.png" color_format="argb8888"/>
+        <data name="img_arc_indicator"       src_path="images/img_arc_indicator.png" color_format="argb8888"/>
+        <!-- Bar image-source images (280×30, matching 280×30 bar widget) -->
+        <data name="img_bar_bg"              src_path="images/img_bar_bg.png" color_format="argb8888"/>
+        <data name="img_bar_indicator"       src_path="images/img_bar_indicator.png" color_format="argb8888"/>
+    </images>
+
+    <fonts>
+        <!-- Add <bin> , <tiny_ttf>, <freetype> tags here -->
+        <bin name="font_example_large" src_path="fonts/Montserrat-Medium.ttf" size="32" bpp="4" as_file="false" />
+    </fonts>
+</globals>

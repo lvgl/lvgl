@@ -43,6 +43,8 @@ static void lv_async_timer_cb(lv_timer_t * timer);
 
 lv_result_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
 {
+    LV_CHECK_ARG(async_xcb != NULL, return LV_RESULT_INVALID);
+
     /*Allocate an info structure*/
     lv_async_info_t * info = lv_malloc(sizeof(lv_async_info_t));
 
@@ -66,6 +68,8 @@ lv_result_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
 
 lv_result_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data)
 {
+    LV_CHECK_ARG(async_xcb != NULL, return LV_RESULT_INVALID);
+
     lv_timer_t * timer = lv_timer_get_next(NULL);
     lv_result_t res = LV_RESULT_INVALID;
 

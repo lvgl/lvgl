@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 struct _lv_sysmon_backend_data_t {
-    lv_subject_t subject;
+    lv_subject_t * subject;
     lv_timer_t * timer;
 };
 

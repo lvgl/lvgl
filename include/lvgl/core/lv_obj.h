@@ -173,6 +173,37 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, CHILD_COUNT,                LV_PROPERTY_TYPE_INT,       72),
     LV_PROPERTY_ID(OBJ, INDEX,                      LV_PROPERTY_TYPE_INT,       73),
 
+    /*Dedicated boolean properties backing the per-flag setters/getters.
+     *The OBJ_FLAG_* properties above are kept for backward compatibility.*/
+    LV_PROPERTY_ID(OBJ, HIDDEN,                     LV_PROPERTY_TYPE_BOOL,      74),
+    LV_PROPERTY_ID(OBJ, CLICKABLE,                  LV_PROPERTY_TYPE_BOOL,      75),
+    LV_PROPERTY_ID(OBJ, CLICK_FOCUSABLE,            LV_PROPERTY_TYPE_BOOL,      76),
+    LV_PROPERTY_ID(OBJ, CHECKABLE,                  LV_PROPERTY_TYPE_BOOL,      77),
+    LV_PROPERTY_ID(OBJ, SCROLLABLE,                 LV_PROPERTY_TYPE_BOOL,      78),
+    LV_PROPERTY_ID(OBJ, SCROLL_ELASTIC,             LV_PROPERTY_TYPE_BOOL,      79),
+    LV_PROPERTY_ID(OBJ, SCROLL_MOMENTUM,            LV_PROPERTY_TYPE_BOOL,      80),
+    LV_PROPERTY_ID(OBJ, SCROLL_ONE,                 LV_PROPERTY_TYPE_BOOL,      81),
+    LV_PROPERTY_ID(OBJ, SCROLL_CHAIN_HOR,           LV_PROPERTY_TYPE_BOOL,      82),
+    LV_PROPERTY_ID(OBJ, SCROLL_CHAIN_VER,           LV_PROPERTY_TYPE_BOOL,      83),
+    LV_PROPERTY_ID(OBJ, SCROLL_ON_FOCUS,            LV_PROPERTY_TYPE_BOOL,      84),
+    LV_PROPERTY_ID(OBJ, SCROLL_WITH_ARROW,          LV_PROPERTY_TYPE_BOOL,      85),
+    LV_PROPERTY_ID(OBJ, SNAPPABLE,                  LV_PROPERTY_TYPE_BOOL,      86),
+    LV_PROPERTY_ID(OBJ, PRESS_LOCK,                 LV_PROPERTY_TYPE_BOOL,      87),
+    LV_PROPERTY_ID(OBJ, EVENT_BUBBLE,               LV_PROPERTY_TYPE_BOOL,      88),
+    LV_PROPERTY_ID(OBJ, GESTURE_BUBBLE,             LV_PROPERTY_TYPE_BOOL,      89),
+    LV_PROPERTY_ID(OBJ, ADV_HITTEST,                LV_PROPERTY_TYPE_BOOL,      90),
+    LV_PROPERTY_ID(OBJ, IGNORE_LAYOUT,              LV_PROPERTY_TYPE_BOOL,      91),
+    LV_PROPERTY_ID(OBJ, FLOATING,                   LV_PROPERTY_TYPE_BOOL,      92),
+    LV_PROPERTY_ID(OBJ, SEND_DRAW_TASK_EVENTS,      LV_PROPERTY_TYPE_BOOL,      93),
+    LV_PROPERTY_ID(OBJ, OVERFLOW_VISIBLE,           LV_PROPERTY_TYPE_BOOL,      94),
+    LV_PROPERTY_ID(OBJ, EVENT_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      95),
+    LV_PROPERTY_ID(OBJ, STATE_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      96),
+    LV_PROPERTY_ID(OBJ, FLEX_IN_NEW_TRACK,          LV_PROPERTY_TYPE_BOOL,      97),
+
+#if LV_USE_OBJ_NAME
+    LV_PROPERTY_ID(OBJ, NAME,               		LV_PROPERTY_TYPE_TEXT,  	98),
+#endif
+
     LV_PROPERTY_OBJ_END,
 };
 #endif
@@ -188,7 +219,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
 
 /**
  * Create a base object (a rectangle)
- * @param parent    pointer to a parent object. If NULL then a screen will be created.
+ * @param parent    pointer to a parent widget @nullable. When NULL, the widget
+ *                  is created as a screen on the default display.
  * @return          pointer to the new object
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent);
@@ -201,14 +233,18 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent);
  * Set one or more flags
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to set.
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, true)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, true).")
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Remove one or more flags
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to clear.
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, false)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, false).")
 void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
@@ -216,8 +252,166 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to update.
  * @param v     true: add the flags; false: remove the flags
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, en)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, en).")
 void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
+
+/** Make the object hidden. (Like it wasn't there at all)
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the hidden property
+ */
+void lv_obj_set_hidden(lv_obj_t * obj, bool en);
+
+/** Make the object clickable by the input devices
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the clickable property
+ */
+void lv_obj_set_clickable(lv_obj_t * obj, bool en);
+
+/** Add focused state to the object when clicked
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the click focusable property
+ */
+void lv_obj_set_click_focusable(lv_obj_t * obj, bool en);
+
+/** Toggle checked state when the object is clicked
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the checkable property
+ */
+void lv_obj_set_checkable(lv_obj_t * obj, bool en);
+
+/** Make the object scrollable
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the scrollable property
+ */
+void lv_obj_set_scrollable(lv_obj_t * obj, bool en);
+
+/** Allow scrolling inside but with slower speed
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the scroll elastic property
+ */
+void lv_obj_set_scroll_elastic(lv_obj_t * obj, bool en);
+
+/** Make the object scroll further when "thrown"
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the scroll momentum property
+ */
+void lv_obj_set_scroll_momentum(lv_obj_t * obj, bool en);
+
+/** Allow scrolling only one snappable child
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the scroll one property
+ */
+void lv_obj_set_scroll_one(lv_obj_t * obj, bool en);
+
+/** Allow propagating the scrolling in any directions to a parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable scroll chaining
+ */
+void lv_obj_set_scroll_chain(lv_obj_t * obj, bool en);
+
+/** Allow propagating the horizontal scroll to a parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable horizontal scroll chaining
+ */
+void lv_obj_set_scroll_chain_hor(lv_obj_t * obj, bool en);
+
+/** Allow propagating the vertical scroll to a parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable vertical scroll chaining
+ */
+void lv_obj_set_scroll_chain_ver(lv_obj_t * obj, bool en);
+
+/** Automatically scroll object to make it visible when focused
+ * @param obj     pointer to a widget
+ * @param en      enable or disable scroll on focus
+ */
+void lv_obj_set_scroll_on_focus(lv_obj_t * obj, bool en);
+
+/** Allow scrolling the focused object with arrow keys
+ * @param obj     pointer to a widget
+ * @param en      enable or disable scroll with arrow keys
+ */
+void lv_obj_set_scroll_with_arrow(lv_obj_t * obj, bool en);
+
+/** Allow snapping to this object if scroll snap is enabled on the parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the snappable property
+ */
+void lv_obj_set_snappable(lv_obj_t * obj, bool en);
+
+/** Keep the object pressed even if the press slid from the object
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the press lock property
+ */
+void lv_obj_set_press_lock(lv_obj_t * obj, bool en);
+
+/** Propagate the events to the parent too
+ * @param obj     pointer to a widget
+ * @param en      enable or disable event bubbling
+ */
+void lv_obj_set_event_bubble(lv_obj_t * obj, bool en);
+
+/** Propagate the gestures to the parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable gesture bubbling
+ */
+void lv_obj_set_gesture_bubble(lv_obj_t * obj, bool en);
+
+/** Allow performing more accurate hit test
+ * @param obj     pointer to a widget
+ * @param en      enable or disable advanced hit testing
+ */
+void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
+
+/** Make the object not positioned by layouts
+ * @param obj     pointer to a widget
+ * @param en      enable or disable ignoring layout
+ */
+void lv_obj_set_ignore_layout(lv_obj_t * obj, bool en);
+
+/** Do not scroll the object when the parent scrolls and ignore layout
+ * @param obj     pointer to a widget
+ * @param en      enable or disable floating mode
+ */
+void lv_obj_set_floating(lv_obj_t * obj, bool en);
+
+/** Send LV_EVENT_DRAW_TASK_ADDED events
+ * @param obj     pointer to a widget
+ * @param en      enable or disable draw task events
+ */
+void lv_obj_set_send_draw_task_events(lv_obj_t * obj, bool en);
+
+/** Do not clip the children to the parent's extended draw size
+ * @param obj     pointer to a widget
+ * @param en      enable or disable overflow visibility
+ */
+void lv_obj_set_overflow_visible(lv_obj_t * obj, bool en);
+
+/** Propagate the events to the children too
+ * @param obj     pointer to a widget
+ * @param en      enable or disable event trickling
+ */
+void lv_obj_set_event_trickle(lv_obj_t * obj, bool en);
+
+/** Propagate the states to the children too
+ * @param obj     pointer to a widget
+ * @param en      enable or disable state trickling
+ */
+void lv_obj_set_state_trickle(lv_obj_t * obj, bool en);
+
+/** Allow only one RADIO_BUTTON sibling to be checked
+ * @param obj     pointer to a widget
+ * @param en      enable or disable radio button behavior
+ */
+void lv_obj_set_radio_button(lv_obj_t * obj, bool en);
+
+/** Start a new flex track on this item
+ * @param obj     pointer to a widget
+ * @param en      enable or disable new flex track
+ */
+void lv_obj_set_flex_in_new_track(lv_obj_t * obj, bool en);
 
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.
@@ -243,19 +437,98 @@ void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state);
  */
 void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
 
+/** Add or remove `LV_STATE_ALT`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_alt(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_CHECKED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_checked(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_FOCUSED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_focused(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_FOCUS_KEY`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_focus_key(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_EDITED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_edited(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_HOVERED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_hovered(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_PRESSED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_pressed(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_SCROLLED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_scrolled(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_DISABLED`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_disabled(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_USER_1`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_state_user_1(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_USER_2`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_state_user_2(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_USER_3`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_state_user_3(lv_obj_t * obj, bool en);
+
+/** Add or remove `LV_STATE_USER_4`. The other states remain unchanged.
+ * @param obj     pointer to a widget
+ * @param en      true: add the state; false: remove the state
+ */
+void lv_obj_set_state_user_4(lv_obj_t * obj, bool en);
+
 /**
  * Set the user_data field of the object
  * @param obj   pointer to an object
- * @param user_data   pointer to the new user_data.
+ * @param user_data   pointer to the new user_data. @nullable
  */
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
 
-
-/** Allow only one RADIO_BUTTON sibling to be checked
- * @param obj     pointer to a widget
- * @param en      enable or disable radio button behavior
+/**
+ * Set one of the 4 flags available for the user
+ * @param obj   pointer to an object
+ * @param bit   the index of the bit (0..3)
+ * @param v     the value of the bit, true or false
  */
-void lv_obj_set_radio_button(lv_obj_t * obj, bool en);
+void lv_obj_set_user_flag(lv_obj_t * obj, uint32_t bit, bool v);
 
 /*=======================
  * Getter functions
@@ -266,7 +539,9 @@ void lv_obj_set_radio_button(lv_obj_t * obj, bool en);
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
  * @return      true: all flags are set; false: not all flags are set
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_is_hidden(obj)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
@@ -274,8 +549,161 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
  * @return      true: at least one flag is set; false: none of the flags are set
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
+
+/** Get whether the object is hidden
+ * @param obj     pointer to a widget
+ * @return        true if the object is hidden, false otherwise
+ */
+bool lv_obj_is_hidden(const lv_obj_t * obj);
+
+/** Get whether the object is clickable by input devices
+ * @param obj     pointer to a widget
+ * @return        true if the object is clickable
+ */
+bool lv_obj_is_clickable(const lv_obj_t * obj);
+
+/** Get whether the object gets focused when clicked
+ * @param obj     pointer to a widget
+ * @return        true if click focusable is enabled
+ */
+bool lv_obj_is_click_focusable(const lv_obj_t * obj);
+
+/** Get whether the object toggles checked state when clicked
+ * @param obj     pointer to a widget
+ * @return        true if the object is checkable
+ */
+bool lv_obj_is_checkable(const lv_obj_t * obj);
+
+/** Get whether the object is scrollable
+ * @param obj     pointer to a widget
+ * @return        true if the object is scrollable
+ */
+bool lv_obj_is_scrollable(const lv_obj_t * obj);
+
+/** Get whether elastic scrolling is enabled
+ * @param obj     pointer to a widget
+ * @return        true if scroll elastic is enabled
+ */
+bool lv_obj_is_scroll_elastic(const lv_obj_t * obj);
+
+/** Get whether scroll momentum is enabled
+ * @param obj     pointer to a widget
+ * @return        true if scroll momentum is enabled
+ */
+bool lv_obj_is_scroll_momentum(const lv_obj_t * obj);
+
+/** Get whether only one snappable child can be scrolled
+ * @param obj     pointer to a widget
+ * @return        true if scroll one is enabled
+ */
+bool lv_obj_is_scroll_one(const lv_obj_t * obj);
+
+/** Get whether horizontal scroll chaining is enabled
+ * @param obj     pointer to a widget
+ * @return        true if horizontal scroll chaining is enabled
+ */
+bool lv_obj_is_scroll_chain_hor(const lv_obj_t * obj);
+
+/** Get whether vertical scroll chaining is enabled
+ * @param obj     pointer to a widget
+ * @return        true if vertical scroll chaining is enabled
+ */
+bool lv_obj_is_scroll_chain_ver(const lv_obj_t * obj);
+
+/** Get whether the object auto-scrolls into view when focused
+ * @param obj     pointer to a widget
+ * @return        true if scroll on focus is enabled
+ */
+bool lv_obj_is_scroll_on_focus(const lv_obj_t * obj);
+
+/** Get whether the focused object can be scrolled with arrow keys
+ * @param obj     pointer to a widget
+ * @return        true if scroll with arrow keys is enabled
+ */
+bool lv_obj_is_scroll_with_arrow(const lv_obj_t * obj);
+
+/** Get whether the object is snappable by a scrolling parent
+ * @param obj     pointer to a widget
+ * @return        true if the object is snappable
+ */
+bool lv_obj_is_snappable(const lv_obj_t * obj);
+
+/** Get whether press lock is enabled
+ * @param obj     pointer to a widget
+ * @return        true if press lock is enabled
+ */
+bool lv_obj_is_press_lock(const lv_obj_t * obj);
+
+/** Get whether events bubble to the parent
+ * @param obj     pointer to a widget
+ * @return        true if event bubbling is enabled
+ */
+bool lv_obj_is_event_bubble(const lv_obj_t * obj);
+
+/** Get whether gestures bubble to the parent
+ * @param obj     pointer to a widget
+ * @return        true if gesture bubbling is enabled
+ */
+bool lv_obj_is_gesture_bubble(const lv_obj_t * obj);
+
+/** Get whether advanced hit testing is enabled
+ * @param obj     pointer to a widget
+ * @return        true if advanced hit testing is enabled
+ */
+bool lv_obj_is_adv_hittest(const lv_obj_t * obj);
+
+/** Get whether the object ignores layout positioning
+ * @param obj     pointer to a widget
+ * @return        true if ignore layout is enabled
+ */
+bool lv_obj_is_ignore_layout(const lv_obj_t * obj);
+
+/** Get whether the object is floating
+ * @param obj     pointer to a widget
+ * @return        true if floating mode is enabled
+ */
+bool lv_obj_is_floating(const lv_obj_t * obj);
+
+/** Get whether draw task events are sent
+ * @param obj     pointer to a widget
+ * @return        true if draw task events are enabled
+ */
+bool lv_obj_is_send_draw_task_events(const lv_obj_t * obj);
+
+/** Get whether overflow is visible outside the parent
+ * @param obj     pointer to a widget
+ * @return        true if overflow is visible
+ */
+bool lv_obj_is_overflow_visible(const lv_obj_t * obj);
+
+/** Get whether events trickle to the children
+ * @param obj     pointer to a widget
+ * @return        true if event trickling is enabled
+ */
+bool lv_obj_is_event_trickle(const lv_obj_t * obj);
+
+/** Get whether states trickle to the children
+ * @param obj     pointer to a widget
+ * @return        true if state trickling is enabled
+ */
+bool lv_obj_is_state_trickle(const lv_obj_t * obj);
+
+/** Get whether the object is a radio button
+ * @param obj     pointer to a widget
+ * @return        true if radio button behavior is enabled
+ */
+bool lv_obj_is_radio_button(const lv_obj_t * obj);
+
+/**
+ * Get whether the widget should be placed in a new flex track
+ * @param obj   pointer to a widget
+ * @return      true if flex in new track is enabled
+ */
+bool lv_obj_is_flex_in_new_track(const lv_obj_t * obj);
 
 /**
  * Get the state of an object
@@ -292,11 +720,83 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj);
  */
 bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
 
-/** Get whether the object is a radio button
+/** Get whether the object is in `LV_STATE_ALT`
  * @param obj     pointer to a widget
- * @return        true if radio button behavior is enabled
+ * @return        true if the state is set
  */
-bool lv_obj_is_radio_button(const lv_obj_t * obj);
+bool lv_obj_is_alt(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_CHECKED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_checked(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_FOCUSED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_focused(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_FOCUS_KEY`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_focus_key(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_EDITED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_edited(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_HOVERED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_hovered(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_PRESSED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_pressed(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_SCROLLED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_scrolled(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_DISABLED`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_disabled(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_USER_1`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_state_user_1(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_USER_2`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_state_user_2(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_USER_3`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_state_user_3(const lv_obj_t * obj);
+
+/** Get whether the object is in `LV_STATE_USER_4`
+ * @param obj     pointer to a widget
+ * @return        true if the state is set
+ */
+bool lv_obj_is_state_user_4(const lv_obj_t * obj);
 
 /**
  * Get the group of the object
@@ -311,6 +811,14 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj);
  * @return      the pointer to the user_data of the object
  */
 void * lv_obj_get_user_data(lv_obj_t * obj);
+
+/**
+ * Get the value of one of the 4 flags available for the user
+ * @param obj   pointer to an object
+ * @param bit   the index of the bit (0..3)
+ * @return      the value of the bit, true or false
+ */
+bool lv_obj_get_user_flag(lv_obj_t * obj, uint32_t bit);
 
 /*=======================
  * Other functions
@@ -341,11 +849,21 @@ bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p);
 const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
 
 /**
- * Check if any object is still "alive".
- * @param obj       pointer to an object
- * @return          true: valid
+ * Walk up `obj`'s parent chain to its root and check whether that root is
+ * present in some `lv_display_t`'s screen list.
+ *
+ * For any properly-created live object this returns true: the public API
+ * does not allow creating a screen without registering it on a display, nor
+ * detaching a subtree from its display. The function is therefore primarily
+ * a defensive check — it returns false for NULL, and (best-effort) for
+ * stale/corrupted pointers whose memory no longer reads back as a chain
+ * terminating at a registered screen. It is not a reliable use-after-free
+ * detector: freed memory may still satisfy the check by coincidence.
+ *
+ * @param obj   pointer to an object
+ * @return      true if the root of `obj`'s parent chain is a registered screen
  */
-bool lv_obj_is_valid(const lv_obj_t * obj);
+bool lv_obj_is_in_widget_tree(const lv_obj_t * obj);
 
 /**
  * Utility to set an object reference to NULL when it gets deleted.
@@ -371,7 +889,7 @@ void lv_obj_null_on_delete(lv_obj_t ** obj_ptr);
  *
  * @param obj       Pointer to the LVGL object to attach the delete callback to.
  * @param cb        The delete callback function to register.
- * @param user_data     User data pointer passed to `cb` when the object is deleted.
+ * @param user_data     User data pointer passed to `cb` when the object is deleted. @nullable
  *
  * @return      Pointer to the delete descriptor or NULL if the operation failed.
  */
@@ -382,7 +900,7 @@ lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void *
  *
  * Removes a delete descriptor previously created via @ref lv_obj_add_delete_cb
  *
- * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op
+ * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op @nullable
  */
 void lv_obj_remove_delete_cb(lv_delete_dsc_t * dsc);
 
@@ -427,7 +945,7 @@ void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 /**
  * Set an id for an object.
  * @param obj   pointer to an object
- * @param id    the id of the object
+ * @param id    the id of the object @nullable. When NULL any previous id is dropped.
  */
 void lv_obj_set_id(lv_obj_t * obj, void * id);
 
@@ -439,17 +957,19 @@ void lv_obj_set_id(lv_obj_t * obj, void * id);
 void * lv_obj_get_id(const lv_obj_t * obj);
 
 /**
- * DEPRECATED IDs are used only to print the widget trees.
- * To find a widget use `lv_obj_find_by_name`
  *
  * Get the child object by its id.
  * It will check children and grandchildren recursively.
  * Function `lv_obj_id_compare` is used to matched obj id with given id.
  *
- * @param obj       pointer to an object
+ * @deprecated IDs are used only to print the widget trees. To find a widget use `lv_obj_find_by_name`
+ *
+ * @param obj       pointer to an object @nullable. When NULL the active screen is
+ *                  searched.
  * @param id        the id of the child object
  * @return          pointer to the child object or NULL if not found
  */
+LV_DEPRECATED("IDs are used only to print the widget trees. To find a widget use lv_obj_find_by_name")
 lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id);
 
 /**
@@ -478,8 +998,8 @@ void lv_obj_free_id(lv_obj_t * obj);
  * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method for compare.
  * Otherwise, it must be implemented externally.
  *
- * @param id1: the first id
- * @param id2: the second id
+ * @param id1: the first id @nullable
+ * @param id2: the second id @nullable
  * @return     0 if they are equal, non-zero otherwise.
  */
 int lv_obj_id_compare(const void * id1, const void * id2);
@@ -506,14 +1026,27 @@ void lv_objid_builtin_destroy(void);
  **********************/
 
 #if LV_USE_ASSERT_OBJ
-#  define LV_ASSERT_OBJ(obj_p, obj_class)                                                               \
-    do {                                                                                                \
-        LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
-        LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
-        LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
+/**
+ * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
+ *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
+ *             and executes the supplied action, which is safer in production.
+ */
+#define LV_ASSERT_OBJ(obj_p, obj_class)                                                                      \
+    do {                                                                                                     \
+        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");                  \
+        LV_ASSERT_INTERNAL(obj_p != NULL, "");                                                               \
+        LV_ASSERT_INTERNAL(lv_obj_has_class(obj_p, obj_class) == true, "");                                  \
+        LV_ASSERT_INTERNAL(lv_obj_is_in_widget_tree(obj_p) == true, "");                                     \
     } while(0)
 # else
-#  define LV_ASSERT_OBJ(obj_p, obj_class) LV_ASSERT_NULL(obj_p)
+/**
+ * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
+ */
+#define LV_ASSERT_OBJ(obj_p, obj_class) \
+    do { \
+        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead."); \
+        LV_ASSERT_INTERNAL(obj_p, ""); \
+    } while(0)
 #endif
 
 #if LV_USE_LOG && LV_LOG_TRACE_OBJ_CREATE

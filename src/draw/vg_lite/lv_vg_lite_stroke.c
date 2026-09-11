@@ -14,6 +14,7 @@
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_path.h"
 #include "../lv_draw_vector_private.h"
+#include "../../misc/lv_array.h"
 
 /*********************
  *      DEFINES

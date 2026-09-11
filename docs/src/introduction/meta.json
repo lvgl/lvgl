@@ -1,9 +1,11 @@
 {
-  "title": "Key Features",
+  "title": "Introduction",
   "pages": [
+    "key_features",
     "requirements",
     "license",
-    "faq",
-    "repo"
+    "policies",
+    "security",
+    "faq"
   ]
 }

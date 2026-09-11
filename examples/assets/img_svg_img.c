@@ -12,7 +12,7 @@ LV_IMAGE_DSC_CONST lv_image_dsc_t img_svg_img = {
 const lv_image_dsc_t img_svg_img = {
 #endif
     .header = {
-        .cf = LV_COLOR_FORMAT_NATIVE,
+        .cf = LV_COLOR_FORMAT_DEFAULT,
         .w = 450,
         .h = 150,
         .stride = 0,

@@ -16,7 +16,6 @@ extern "C" {
 
 #include "../lv_types.h"
 #include "../config/lv_conf_internal.h"
-#include "../misc/lv_array.h"
 
 
 /*********************
@@ -52,6 +51,10 @@ typedef enum {
     LV_EVENT_SCROLL_END,          /**< Scrolling ends */
     LV_EVENT_SCROLL,              /**< Scrolling */
     LV_EVENT_GESTURE,             /**< A gesture is detected. Get gesture with `lv_indev_get_gesture_dir(lv_indev_active());` */
+    LV_EVENT_GESTURE_UP,          /**< An upwards gesture is detected. Sent right after `LV_EVENT_GESTURE`. */
+    LV_EVENT_GESTURE_DOWN,        /**< A downwards gesture is detected. Sent right after `LV_EVENT_GESTURE`. */
+    LV_EVENT_GESTURE_LEFT,        /**< A leftwards gesture is detected. Sent right after `LV_EVENT_GESTURE`. */
+    LV_EVENT_GESTURE_RIGHT,       /**< A rightwards gesture is detected. Sent right after `LV_EVENT_GESTURE`. */
     LV_EVENT_KEY,                 /**< A key is sent to Widget. Get key with `lv_indev_get_key(lv_indev_active());`*/
     LV_EVENT_ROTARY,              /**< An encoder or wheel was rotated. Get rotation count with `lv_event_get_rotary_diff(e);`*/
     LV_EVENT_FOCUSED,             /**< Widget received focus */
@@ -80,6 +83,8 @@ typedef enum {
     LV_EVENT_READY,               /**< A process has finished */
     LV_EVENT_CANCEL,              /**< A process has been cancelled */
     LV_EVENT_STATE_CHANGED,       /**< The state of the widget changed*/
+    LV_EVENT_CHECKED,             /**< A checkable Widget became checked. Sent right after `LV_EVENT_VALUE_CHANGED`. */
+    LV_EVENT_UNCHECKED,           /**< A checkable Widget became unchecked. Sent right after `LV_EVENT_VALUE_CHANGED`. */
 
     /** Other events */
     LV_EVENT_CREATE,              /**< Object is being created */
@@ -127,17 +132,13 @@ typedef enum {
 
     LV_EVENT_LAST,                 /** Number of default events */
 
+    LV_EVENT_LAST_CUSTOM = 0x7FFF,  /** Sentinel for the last custom event code*/
+
     LV_EVENT_PREPROCESS = 0x8000,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */
     LV_EVENT_MARKED_DELETING = 0x10000,
 } lv_event_code_t;
 
-typedef struct {
-    lv_array_t array;
-    uint8_t is_traversing: 1;          /**< True: the list is being nested traversed */
-    uint8_t has_marked_deleting: 1;    /**< True: the list has marked deleting objects
-                                         when some of events are marked as deleting */
-} lv_event_list_t;
 
 /**
  * @brief Event callback.
@@ -145,9 +146,30 @@ typedef struct {
  * For details, see ::lv_event_t.
  */
 
+/**
+ * Send an event to the callbacks of an event list.
+ * @param list          pointer to an event list. @nullable When NULL there is nothing
+ *                      to notify and LV_RESULT_OK is returned. Widgets without
+ *                      `spec_attr` legitimately have no list.
+ * @param e             pointer to the event to send
+ * @param preprocess    true: send only to the preprocess callbacks
+ * @return              LV_RESULT_OK: the target wasn't deleted in the event
+ */
 lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
 
+/**
+ * Add an event callback to an event list.
+ *
+ * @param list      pointer to an event list
+ * @param cb        the callback to invoke when a matching event is sent
+ * @param filter    event code to react to
+ * @param user_data custom pointer stored with the callback and retrievable
+ *                  inside it via `lv_event_get_user_data()`. @nullable.
+ * @return          pointer to the newly created event descriptor, or `NULL` on failure.
+ *                  Can be passed to `lv_event_remove_dsc()` later.
+ */
 lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
+
 bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc);
 
 uint32_t lv_event_get_count(lv_event_list_t * list);
@@ -230,7 +252,7 @@ void lv_event_free_user_data_cb(lv_event_t * e);
 /**
  * Register a new, custom event ID.
  * It can be used the same way as e.g. `LV_EVENT_CLICKED` to send custom events
- * @return      the new event id
+ * @return      the new event id, or `LV_EVENT_LAST` if `LV_EVENT_LAST_CUSTOM` is reached
  *
  * Example:
  * @code
@@ -257,8 +279,10 @@ const char * lv_event_code_get_name(lv_event_code_t code);
  * when the event descriptor is removed or destroyed.
  * @param dsc         pointer to an event descriptor (from lv_obj_add_event_cb)
  * @param data        pointer to the external data to associate with the event descriptor
+ *                    @nullable
  * @param free_cb     function pointer to a destructor that will be called to clean up the external data.
  *                    The destructor will receive the data pointer as its parameter.
+ *                    @nullable When NULL no cleanup is performed.
  */
 void lv_event_desc_set_external_data(lv_event_dsc_t * dsc, void * data, void (* free_cb)(void * data));
 #endif

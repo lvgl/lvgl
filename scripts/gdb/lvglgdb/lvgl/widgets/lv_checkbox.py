@@ -14,15 +14,16 @@ class LVCheckbox(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_checkbox_t", ptr=True) or self
+        self._wv_lv_checkbox_t = self.cast("lv_checkbox_t", ptr=True) or self
+        self._wv = self._wv_lv_checkbox_t
 
     @property
     def txt(self):
-        return safe_string(self._wv, "txt")
+        return safe_string(self._wv_lv_checkbox_t, "txt")
 
     @property
     def static_txt(self):
-        return int(self._wv.safe_field("static_txt", 0))
+        return int(self._wv_lv_checkbox_t.safe_field("static_txt", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

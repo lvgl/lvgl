@@ -1,0 +1,26 @@
+config LV_USE_DEMO_MUSIC
+	bool "Music player demo"
+	default n
+if LV_USE_DEMO_MUSIC
+
+config LV_DEMO_MUSIC_SQUARE
+	bool "Square layout"
+	default n
+
+config LV_DEMO_MUSIC_LANDSCAPE
+	bool "Landscape layout"
+	default n
+
+config LV_DEMO_MUSIC_ROUND
+	bool "Round layout"
+	default n
+
+config LV_DEMO_MUSIC_LARGE
+	bool "Large layout"
+	default n
+
+config LV_DEMO_MUSIC_AUTO_PLAY
+	bool "Auto play"
+	default n
+
+endif #LV_USE_DEMO_MUSIC

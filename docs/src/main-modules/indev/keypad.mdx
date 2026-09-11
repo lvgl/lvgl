@@ -93,6 +93,25 @@ void key_event_cb(lv_event_t *e)
 lv_indev_add_event_cb(keyboard, key_event_cb, LV_EVENT_KEY, NULL);
 ```
 
+LVGL automatically converts direction keys to `LV_KEY_XXX`. For other keys
+you can get their value by querying <ApiLink name="lv_evdev_get_raw_key" /> in a <ApiLink name="LV_EVENT_KEY" /> handler.
+
+```c
+
+void key_event_cb(lv_event_t *e)
+{
+    if(lv_evdev_is_raw_key(e))
+    {
+        LV_LOG_USER("%d", lv_evdev_get_raw_key(e));
+    }
+}
+
+...
+
+lv_obj_add_event_cb(lv_screen_active(), key_event_cb, LV_EVENT_KEY, NULL);
+
+```
+
 ## Key Remapping
 
 Some applications require assigning physical buttons to multiple key events depending

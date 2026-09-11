@@ -80,6 +80,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
     LV_ASSERT_MSG(prim->indicesAccessor.has_value(),
                   "We specify fastgltf::Options::GenerateMeshIndices, so we should always have indices");
 
+    bool unlit = false;
     if(!prim->materialIndex.has_value()) {
         if(add_define(result, "ALPHAMODE", "_OPAQUE", false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
@@ -91,6 +92,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             return LV_RESULT_INVALID;
         }
         if(material.unlit) {
+            unlit = true;
             if(add_define(result, "MATERIAL_UNLIT", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
@@ -104,6 +106,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                && material.emissiveStrength > 0.0f) {
                 /* Special case where settings preclude IBL's ability to have visible effect, so disable it entirely */
                 LV_LOG_TRACE("Special case identified, disabling IBL and enabling UNLIT\n");
+                unlit = true;
                 if(add_define(result, "MATERIAL_UNLIT", NULL, false) == LV_RESULT_INVALID) {
                     return LV_RESULT_INVALID;
                 }
@@ -258,11 +261,13 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             }
         }
     }
-    if(add_define_if_primitive_attribute_exists(result, asset, prim, "NORMAL", "HAS_NORMAL_VEC3") == LV_RESULT_INVALID) {
-        return LV_RESULT_INVALID;
-    }
-    if(add_define_if_primitive_attribute_exists(result, asset, prim, "TANGENT", "HAS_TANGENT_VEC4") == LV_RESULT_INVALID) {
-        return LV_RESULT_INVALID;
+    if(!unlit) {
+        if(add_define_if_primitive_attribute_exists(result, asset, prim, "NORMAL", "HAS_NORMAL_VEC3") == LV_RESULT_INVALID) {
+            return LV_RESULT_INVALID;
+        }
+        if(add_define_if_primitive_attribute_exists(result, asset, prim, "TANGENT", "HAS_TANGENT_VEC4") == LV_RESULT_INVALID) {
+            return LV_RESULT_INVALID;
+        }
     }
     if(add_define_if_primitive_attribute_exists(result, asset, prim, "TEXCOORD_0", "HAS_TEXCOORD_0_VEC2") ==
        LV_RESULT_INVALID) {

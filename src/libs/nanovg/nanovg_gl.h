@@ -209,13 +209,14 @@ struct GLNVGfragUniforms {
         float strokeThr;
         int texType;
         int type;
+        union NVGcolor recolor;
     } s;
 };
 typedef struct GLNVGfragUniforms GLNVGfragUniforms;
 #else
 // note: after modifying layout or size of uniform array,
 // don't forget to also update the fragment shader source!
-#define NANOVG_GL_UNIFORMARRAY_SIZE 11
+#define NANOVG_GL_UNIFORMARRAY_SIZE 12
 union GLNVGfragUniforms {
     struct {
         float scissorMat[12]; // matrices are actually 3 vec4s
@@ -231,6 +232,7 @@ union GLNVGfragUniforms {
         float strokeThr;
         float texType;
         float type;
+        union NVGcolor recolor;
     } s;
     float uniformArray[NANOVG_GL_UNIFORMARRAY_SIZE][4];
 };
@@ -543,7 +545,7 @@ static int glnvg__renderCreate(void * uptr)
 #if NANOVG_GL_USE_UNIFORMBUFFER
         "#define USE_UNIFORMBUFFER 1\n"
 #else
-        "#define UNIFORMARRAY_SIZE 11\n"
+        "#define UNIFORMARRAY_SIZE 12\n"
 #endif
         "\n";
 
@@ -588,6 +590,7 @@ static int glnvg__renderCreate(void * uptr)
         "		float strokeThr;\n"
         "		int texType;\n"
         "		int type;\n"
+        "		vec4 recolor;\n"
         "	};\n"
         "#else\n"
         "	uniform vec4 frag[UNIFORMARRAY_SIZE];\n"
@@ -635,6 +638,7 @@ static int glnvg__renderCreate(void * uptr)
         "		float strokeThr;\n"
         "		int texType;\n"
         "		int type;\n"
+        "		vec4 recolor;\n"
         "	};\n"
         "#else\n" // NANOVG_GL3 && !USE_UNIFORMBUFFER
         "	uniform vec4 frag[UNIFORMARRAY_SIZE];\n"
@@ -667,6 +671,7 @@ static int glnvg__renderCreate(void * uptr)
         "	#define strokeThr frag[10].y\n"
         "	#define texType int(frag[10].z)\n"
         "	#define type int(frag[10].w)\n"
+        "	#define recolor frag[11]\n"
         "#endif\n"
         "\n"
         "float sdroundrect(vec2 pt, vec2 ext, float rad) {\n"
@@ -720,6 +725,8 @@ static int glnvg__renderCreate(void * uptr)
         "		else if (texType == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle (premultiplied)
         "		else if (texType == 4) color = vec4(color.bgr, 1.0);"  // BGRX -> RGB with alpha=1
         "		else if (texType == 5) color = vec4(color.bgr*color.a, color.a);"  // BGR swizzle + premultiply
+        "		// Apply image recolor (premultiplied-aware) before tint/opacity.\n"
+        "		if (recolor.a > 0.0) color.rgb = mix(color.rgb, recolor.rgb*color.a, recolor.a);\n"
         "		// Apply color tint and alpha.\n"
         "		color *= innerCol;\n"
         "		// Combine alpha\n"
@@ -1078,6 +1085,7 @@ static int glnvg__convertPaint(GLNVGcontext * gl, GLNVGfragUniforms * frag, NVGp
             frag->s.texType = 2.0f;
 #endif
         //      printf("frag->texType = %d\n", frag->texType);
+        frag->s.recolor = paint->recolor;
     }
     else {
         frag->s.type = NSVG_SHADER_FILLGRAD;

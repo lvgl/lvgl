@@ -41,6 +41,11 @@ extern "C" {
 
 #  define TEST_ASSERT_MEM_LEAK_LESS_THAN(prev_usage, threshold)  TEST_ASSERT_LESS_OR_EQUAL(threshold, LV_ABS((int64_t)(prev_usage) - (int64_t)lv_test_get_free_mem()));
 
+/* Assert that no allocation was leaked since prev_cnt was taken with
+ * lv_test_get_allocation_count()
+ */
+#  define TEST_ASSERT_NO_MEM_LEAK(prev_cnt)                      TEST_ASSERT_EQUAL(prev_cnt, lv_test_get_allocation_count());
+
 #ifdef LV_BUILD_TEST_PERF
 
 #include <time.h>

@@ -38,11 +38,14 @@
 
 GLuint lv_gltf_data_get_skin_texture_at(lv_gltf_model_t * data, size_t index)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(index < data->skin_tex.size());
     return data->skin_tex[index];
 }
 
 bool lv_gltf_data_validated_skins_contains(lv_gltf_model_t * data, size_t index)
 {
+    LV_ASSERT(data != NULL);
     return ((std::find(data->validated_skins.begin(),
                        data->validated_skins.end(),
                        index) != data->validated_skins.end()));
@@ -50,15 +53,19 @@ bool lv_gltf_data_validated_skins_contains(lv_gltf_model_t * data, size_t index)
 
 void lv_gltf_data_validate_skin(lv_gltf_model_t * data, size_t index)
 {
+    LV_ASSERT(data != NULL);
     data->validated_skins.push_back(index);
 }
 
 size_t lv_gltf_data_get_skins_size(lv_gltf_model_t * data)
 {
+    LV_ASSERT(data != NULL);
     return data->validated_skins.size();
 }
 size_t lv_gltf_data_get_skin(lv_gltf_model_t * data, size_t index)
 {
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(index < data->validated_skins.size());
     return data->validated_skins[index];
 }
 

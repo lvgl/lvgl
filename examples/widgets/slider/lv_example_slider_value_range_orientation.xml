@@ -1,0 +1,45 @@
+<!--
+ @title Slider value, range, and orientation
+ @brief Set a custom numeric range and choose horizontal or vertical layout.
+
+ The horizontal slider uses min_value=-20 and max_value=80 to show that ranges need not
+ start at zero. The vertical slider sets orientation="vertical" explicitly and uses a
+ tall, narrow size so the knob travels upward instead of left-to-right.
+-->
+<screen>
+	<consts>
+		<color name="text_color" value="0x013992" />
+	</consts>
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 Edit min_value/max_value/value and orientation to see how fill direction and knob travel change. -->
+		<!-- Horizontal slider with custom range -->
+		<lv_slider name="slider_1" width="90%" height="20" min_value="-20" max_value="80" value="35">
+			<lv_label name="label_1" align="center" text="Horizontal" style_text_color="#text_color" />
+		</lv_slider>
+
+		<!-- Vertical slider with explicit vertical orientation -->
+		<lv_slider
+			name="slider_2"
+			width="20"
+			height="130"
+			orientation="vertical"
+			min_value="0"
+			max_value="100"
+			value="60"
+		>
+			<lv_label
+				name="label_2"
+				align="center"
+				text="V&#10;e&#10;r"
+				style_text_color="#text_color"
+				style_text_align="center"
+			/>
+		</lv_slider>
+	</view>
+</screen>

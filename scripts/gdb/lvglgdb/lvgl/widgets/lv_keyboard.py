@@ -14,22 +14,23 @@ class LVKeyboard(LVButtonmatrix):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_keyboard_t", ptr=True) or self
+        self._wv_lv_keyboard_t = self.cast("lv_keyboard_t", ptr=True) or self
+        self._wv = self._wv_lv_keyboard_t
 
     @property
     def ta(self):
         """Pointer to the assigned text area"""
-        return ptr_or_none(self._wv.safe_field("ta"))
+        return ptr_or_none(self._wv_lv_keyboard_t.safe_field("ta"))
 
     @property
     def mode(self):
         """Key map type"""
-        return int(self._wv.safe_field("mode", 0))
+        return int(self._wv_lv_keyboard_t.safe_field("mode", 0))
 
     @property
     def popovers(self):
         """Show button titles in popovers on press"""
-        return int(self._wv.safe_field("popovers", 0))
+        return int(self._wv_lv_keyboard_t.safe_field("popovers", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

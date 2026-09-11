@@ -46,7 +46,7 @@ extern "C" {
  * Normally the redrawing is periodically executed in `lv_timer_handler` but a long blocking process
  * can prevent the call of `lv_timer_handler`. In this case if the GUI is updated in the process
  * (e.g. progress bar) this function can be called when the screen should be updated.
- * @param disp pointer to display to refresh. NULL to refresh all displays.
+ * @param disp pointer to display to refresh. @nullable When NULL all displays are refreshed.
  */
 void lv_refr_now(lv_display_t * disp);
 
@@ -59,7 +59,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj);
 
 /**
  * Called periodically to handle the refreshing
- * @param timer pointer to the timer itself, or `NULL`
+ * @param timer pointer to the timer itself. @nullable When NULL the default display is refreshed
  */
 void lv_display_refr_timer(lv_timer_t * timer);
 

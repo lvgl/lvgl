@@ -6,21 +6,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*This example shows the deprecated `lv_file_explorer` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static void file_explorer_event_handler(lv_event_t * e)
 {
+#if LV_USE_LOG
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
+
         LV_LOG_USER("%s%s", cur_path, sel_fn);
     }
+#else
+    LV_UNUSED(e);
+#endif
 }
 
 /**
  * @title File explorer with quick access
  * @brief Open a file explorer on the active screen and log the selected path.
+ *
+ * @deprecated The `lv_file_explorer` widget is deprecated. See `lv_example_table_file_browser`.
  *
  * `lv_file_explorer_create` builds a full-screen browser, `lv_file_explorer_set_sort`
  * sorts entries by `LV_EXPLORER_SORT_KIND`, and `lv_file_explorer_open_dir` opens the
@@ -92,5 +102,7 @@ void lv_example_file_explorer_1(void)
 
     lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

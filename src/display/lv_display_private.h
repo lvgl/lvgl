@@ -14,10 +14,14 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lvgl_public.h"
+#include "../misc/lv_event_private.h"
 
 #if LV_USE_SYSMON
 #include "../debugging/sysmon/lv_sysmon_private.h"
 #endif
+
+#define LOG_NULL_DISPLAY_DEPRECATED_MESSAGE() \
+    LV_LOG_DEPRECATED("Calling this function with a NULL display is deprecated. You can retrieve the default display with `lv_display_get_default()`")
 
 /*********************
  *      DEFINES
@@ -134,8 +138,6 @@ struct _lv_display_t {
      * Layer
      *--------------------*/
     lv_layer_t * layer_head;
-    void (*layer_init)(lv_display_t * disp, lv_layer_t * layer);
-    void (*layer_deinit)(lv_display_t * disp, lv_layer_t * layer);
 
     /*---------------------
      * Screens
@@ -194,6 +196,14 @@ struct _lv_display_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * TODO(v10): rework the draw buffer abstraction so a buffer describes its own storage, and remove this.
+ *
+ * @param disp      pointer to a display
+ * @param handlers  the handlers to set on every draw buffer of the display
+ */
+void lv_display_set_draw_buf_handlers(lv_display_t * disp, const lv_draw_buf_handlers_t * handlers);
 
 /**********************
  *      MACROS

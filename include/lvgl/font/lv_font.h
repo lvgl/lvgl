@@ -111,7 +111,7 @@ typedef enum {
 
 /** Describe the properties of a font*/
 struct _lv_font_t {
-    LV_FONT_DSC_CONST void * dsc;   /**< Store implementation specific or run_time data or caching here*/
+    LV_FONT_DSC_CONST void * dsc;              /**< Store implementation specific or run_time data or caching here*/
     const lv_font_t * fallback;     /**< Fallback font for missing glyph. Resolved recursively */
     void * user_data;               /**< Custom user data for font.*/
 
@@ -216,6 +216,7 @@ struct _lv_font_info_t {
  * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index
  *                      and the format.
  * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph.
+ *                      @nullable Fonts returning an image source do not use it.
  * @return              pointer to the glyph's data.
  *                      It can be a draw buffer for bitmap fonts or an image source for imgfonts.
  */
@@ -224,7 +225,7 @@ LV_IMAGE_DSC_CONST void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, 
 
 /**
  * Return the bitmap as it is. It works only if the font stores the bitmap in
- * a non-volitile memory.
+ * a non-volatile memory.
  * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index
  *                      and the format.
  * @return              the bitmap as it is

@@ -56,7 +56,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdownlist_class;
 
 /**
  * Create a drop-down list object
- * @param parent pointer to an object, it will be the parent of the new drop-down list
+ * @param parent pointer to a parent widget @nullable. When NULL, the widget
+ *               is created as a screen on the default display.
  * @return pointer to the created drop-down list
  */
 lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
@@ -70,7 +71,8 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
  * If set to `NULL` the selected option's text will be displayed on the button.
  * If set to a specific text then that text will be shown regardless of the selected option.
  * @param obj       pointer to a drop-down list object
- * @param text      the text as a string (Copy is saved)
+ * @param text      the text as a string (Copy is saved). @nullable When NULL the
+ *                  selected option's text is displayed.
  */
 void lv_dropdown_set_text(lv_obj_t * obj, const char * text);
 
@@ -79,9 +81,22 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text);
  * If set to `NULL` the selected option's text will be displayed on the button.
  * If set to a specific text then that text will be shown regardless of the selected option.
  * @param obj       pointer to a drop-down list object
- * @param text      the text as a string (Only its pointer is saved)
+ * @param text      the text as a string (Only its pointer is saved). @nullable When
+ *                  NULL the selected option's text is displayed.
  */
 void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text);
+
+#if LV_USE_TRANSLATION
+
+/**
+ * Assign a translation tag for the drop-down list's button text. Memory will be allocated to store the tag.
+ * The button text will automatically update when the language is changed via `lv_translation_set_language`.
+ * @param obj       pointer to a drop-down list object
+ * @param tag       '\0' terminated character string.
+ */
+void lv_dropdown_set_text_translation_tag(lv_obj_t * obj, const char * tag);
+
+#endif /*LV_USE_TRANSLATION*/
 
 /**
  * Set the options in a drop-down list from a string.
@@ -98,6 +113,19 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options);
  * @param options   a static string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options);
+
+#if LV_USE_TRANSLATION
+
+/**
+ * Assign a translation tag for the options of the drop-down list. Memory will be allocated to store the tag.
+ * The options will automatically update when the language is changed via `lv_translation_set_language`.
+ * The translation should contain the options in a '\n' separated list. E.g. "One\nTwo\nThree"
+ * @param obj       pointer to a drop-down list object
+ * @param tag       '\0' terminated character string.
+ */
+void lv_dropdown_set_options_translation_tag(lv_obj_t * obj, const char * tag);
+
+#endif /*LV_USE_TRANSLATION*/
 
 /**
  * Add an options to a drop-down list from a string.  Only works for non-static options.
@@ -130,7 +158,8 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir);
 /**
  * Set an arrow or other symbol to display when on drop-down list's button. Typically a down caret or arrow.
  * @param obj       pointer to drop-down list object
- * @param symbol    a text like `LV_SYMBOL_DOWN`, an image (pointer or path) or NULL to not draw symbol icon
+ * @param symbol    a text like `LV_SYMBOL_DOWN` or an image (pointer or path).
+ *                  @nullable When NULL no symbol icon is drawn.
  * @note angle and zoom transformation can be applied if the symbol is an image.
  * E.g. when drop down is checked (opened) rotate the symbol by 180 degree
  */

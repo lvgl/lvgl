@@ -69,14 +69,14 @@ static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image(lv_color_f
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_dsc)
+void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * dsc)
 {
     /*Do not draw transparent things*/
-    if(blend_dsc->opa <= LV_OPA_MIN) return;
-    if(blend_dsc->mask_buf && blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_TRANSP) return;
+    if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->mask_buf && dsc->mask_res == LV_DRAW_SW_MASK_RES_TRANSP) return;
 
     lv_area_t blend_area;
-    if(!lv_area_intersect(&blend_area, blend_dsc->blend_area, &t->clip_area)) return;
+    if(!lv_area_intersect(&blend_area, dsc->blend_area, &t->clip_area)) return;
 
     LV_PROFILER_DRAW_BEGIN;
     lv_layer_t * layer = t->target_layer;
@@ -84,23 +84,23 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
 
     lv_draw_sw_blend_handler_t handler = lv_draw_sw_get_blend_handler(layer->color_format);
     if(handler) {
-        handler(t, blend_dsc);
+        handler(t, dsc);
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    if(blend_dsc->src_buf == NULL) {
+    if(dsc->src_buf == NULL) {
         lv_draw_sw_blend_fill_dsc_t fill_dsc;
         fill_dsc.dest_w = lv_area_get_width(&blend_area);
         fill_dsc.dest_h = lv_area_get_height(&blend_area);
         fill_dsc.dest_stride = layer_stride_byte;
-        fill_dsc.opa = blend_dsc->opa;
-        fill_dsc.color = blend_dsc->color;
+        fill_dsc.opa = dsc->opa;
+        fill_dsc.color = dsc->color;
         fill_dsc.mask_stride = 0;
 
-        if(blend_dsc->mask_buf == NULL) fill_dsc.mask_buf = NULL;
-        else if(blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) fill_dsc.mask_buf = NULL;
-        else fill_dsc.mask_buf = blend_dsc->mask_buf;
+        if(dsc->mask_buf == NULL) fill_dsc.mask_buf = NULL;
+        else if(dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) fill_dsc.mask_buf = NULL;
+        else fill_dsc.mask_buf = dsc->mask_buf;
 
 
         fill_dsc.relative_area  = blend_area;
@@ -108,20 +108,20 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
         fill_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                    blend_area.y1 - layer->buf_area.y1);
         if(fill_dsc.mask_buf) {
-            fill_dsc.mask_stride = blend_dsc->mask_stride == 0  ? lv_area_get_width(blend_dsc->mask_area) : blend_dsc->mask_stride;
-            fill_dsc.mask_buf += fill_dsc.mask_stride * (blend_area.y1 - blend_dsc->mask_area->y1) +
-                                 (blend_area.x1 - blend_dsc->mask_area->x1);
+            fill_dsc.mask_stride = dsc->mask_stride == 0  ? lv_area_get_width(dsc->mask_area) : dsc->mask_stride;
+            fill_dsc.mask_buf += fill_dsc.mask_stride * (blend_area.y1 - dsc->mask_area->y1) +
+                                 (blend_area.x1 - dsc->mask_area->x1);
         }
 
         lv_draw_sw_blend_color(layer->color_format, &fill_dsc);
     }
     else {
-        if(!lv_area_intersect(&blend_area, &blend_area, blend_dsc->src_area)) {
+        if(!lv_area_intersect(&blend_area, &blend_area, dsc->src_area)) {
             LV_PROFILER_DRAW_END;
             return;
         }
 
-        if(blend_dsc->mask_area && !lv_area_intersect(&blend_area, &blend_area, blend_dsc->mask_area)) {
+        if(dsc->mask_area && !lv_area_intersect(&blend_area, &blend_area, dsc->mask_area)) {
             LV_PROFILER_DRAW_END;
             return;
         }
@@ -131,34 +131,34 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
         image_dsc.dest_h = lv_area_get_height(&blend_area);
         image_dsc.dest_stride = layer_stride_byte;
 
-        image_dsc.opa = blend_dsc->opa;
-        image_dsc.blend_mode = blend_dsc->blend_mode;
-        image_dsc.src_stride = blend_dsc->src_stride;
-        image_dsc.src_color_format = blend_dsc->src_color_format;
+        image_dsc.opa = dsc->opa;
+        image_dsc.blend_mode = dsc->blend_mode;
+        image_dsc.src_stride = dsc->src_stride;
+        image_dsc.src_color_format = dsc->src_color_format;
 
-        const uint8_t * src_buf = blend_dsc->src_buf;
-        uint32_t src_px_size = lv_color_format_get_bpp(blend_dsc->src_color_format);
-        src_buf += image_dsc.src_stride * (blend_area.y1 - blend_dsc->src_area->y1);
-        src_buf += ((blend_area.x1 - blend_dsc->src_area->x1) * src_px_size) >> 3;
+        const uint8_t * src_buf = dsc->src_buf;
+        uint32_t src_px_size = lv_color_format_get_bpp(dsc->src_color_format);
+        src_buf += image_dsc.src_stride * (blend_area.y1 - dsc->src_area->y1);
+        src_buf += ((blend_area.x1 - dsc->src_area->x1) * src_px_size) >> 3;
         image_dsc.src_buf = src_buf;
         image_dsc.mask_stride = 0;
 
-        if(blend_dsc->mask_buf == NULL) image_dsc.mask_buf = NULL;
-        else if(blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) image_dsc.mask_buf = NULL;
-        else image_dsc.mask_buf = blend_dsc->mask_buf;
+        if(dsc->mask_buf == NULL) image_dsc.mask_buf = NULL;
+        else if(dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) image_dsc.mask_buf = NULL;
+        else image_dsc.mask_buf = dsc->mask_buf;
 
         if(image_dsc.mask_buf) {
-            LV_ASSERT_NULL(blend_dsc->mask_area);
-            image_dsc.mask_buf = blend_dsc->mask_buf;
-            image_dsc.mask_stride = blend_dsc->mask_stride ? blend_dsc->mask_stride : lv_area_get_width(blend_dsc->mask_area);
-            image_dsc.mask_buf += image_dsc.mask_stride * (blend_area.y1 - blend_dsc->mask_area->y1) +
-                                  (blend_area.x1 - blend_dsc->mask_area->x1);
+            LV_ASSERT_NULL(dsc->mask_area);
+            image_dsc.mask_buf = dsc->mask_buf;
+            image_dsc.mask_stride = dsc->mask_stride ? dsc->mask_stride : lv_area_get_width(dsc->mask_area);
+            image_dsc.mask_buf += image_dsc.mask_stride * (blend_area.y1 - dsc->mask_area->y1) +
+                                  (blend_area.x1 - dsc->mask_area->x1);
         }
 
         image_dsc.relative_area  = blend_area;
         lv_area_move(&image_dsc.relative_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-        image_dsc.src_area  = *blend_dsc->src_area;
+        image_dsc.src_area  = *dsc->src_area;
         lv_area_move(&image_dsc.src_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
         image_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,

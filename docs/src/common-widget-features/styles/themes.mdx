@@ -5,22 +5,12 @@ description: "A Theme is a collection of styles with the knowledge of which subs
 
 ## Overview
 
-A Theme is a collection of styles with the knowledge of which subset of styles
-are applied to which types of Widgets. If there is an active theme LVGL
-applies it to every newly-created widget. This will give a default appearance
-to the UI which can then be modified by adding further styles.
+A theme is a collection of styles plus the knowledge of which styles apply to which
+Widget types. An active theme is applied to every newly created Widget, giving the UI
+a default look that further styles can refine. Each display can use its own theme
+(e.g. a colorful TFT alongside a monochrome secondary display).
 
-Every display can have a different theme. For example, you could have a
-colorful theme on a TFT and monochrome theme on a secondary monochrome
-display.
-
-To set a theme for a display, two steps are required:
-
-1. Initialize the theme.
-2. Assign the initialized theme to the display.
-
-Theme initialization functions can have different prototypes. This
-example shows how to set the "default" theme:
+Setting a theme takes two calls — initialize it, then assign it to the display:
 
 ```c
 lv_theme_t * th = lv_theme_default_init(display,                 /* Use DPI, size, etc. from this display */
@@ -34,18 +24,17 @@ lv_theme_t * th = lv_theme_default_init(display,                 /* Use DPI, siz
 lv_display_set_theme(display, th); /* Assign theme to display */
 ```
 
-The included themes are enabled in `lv_conf.h`. If the default theme
-is enabled by <ApiLink name="LV_USE_THEME_DEFAULT" /> LVGL automatically initializes
-and sets it when a display is created.
+If <ApiLink name="LV_USE_THEME_DEFAULT" /> is enabled in `lv_conf.h`, LVGL initializes and
+sets the default theme automatically when a display is created.
 
 ## Extending themes
 
-Built-in themes can be extended. If a custom theme is created, a parent
-theme can be selected. The parent theme's styles will be added before
-the custom theme's styles. Any number of themes can be chained this way.
-E.g. default theme -> custom theme -> dark theme.
+<LvglExample name="lv_example_style_theme" path="styles/lv_example_style_theme" />
 
-<ApiLink name="lv_theme_set_parent" display="lv_theme_set_parent(new_theme, base_theme)" /> extends the
-`base_theme` with the `new_theme`.
+This extends the current theme with an extra button style. It is C-only because a
+`lv_theme_*` callback has no XML form.
 
-There is an example of this among the [Style examples](/common-widget-features/styles/overview).
+A custom theme can select a parent theme: the parent's styles are applied before the
+custom theme's, and themes can be chained (e.g. default → custom → dark).
+<ApiLink name="lv_theme_set_parent" display="lv_theme_set_parent(new_theme, base_theme)" />
+extends `base_theme` with `new_theme`.

@@ -8,6 +8,7 @@
  *********************/
 #include "../../lvgl_public.h"
 
+#include "../../lvgl_public.h"
 #if LV_USE_GIF
 #include "../../misc/lv_timer_private.h"
 #include "../../misc/cache/lv_cache.h"
@@ -81,7 +82,7 @@ lv_obj_t * lv_gif_create(lv_obj_t * parent)
 
 void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(gifobj->color_format == color_format) {
@@ -110,7 +111,7 @@ void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format)
 
 void lv_gif_set_src(lv_obj_t * obj, const void * src)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(gifobj->is_open) {
@@ -124,7 +125,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
 void lv_gif_restart(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -145,7 +146,7 @@ void lv_gif_restart(lv_obj_t * obj)
 
 void lv_gif_pause(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     lv_timer_pause(gifobj->timer);
@@ -153,7 +154,7 @@ void lv_gif_pause(lv_obj_t * obj)
 
 void lv_gif_resume(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -166,7 +167,7 @@ void lv_gif_resume(lv_obj_t * obj)
 
 bool lv_gif_is_loaded(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     return gifobj->is_open;
@@ -174,7 +175,7 @@ bool lv_gif_is_loaded(lv_obj_t * obj)
 
 int32_t lv_gif_get_loop_count(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -186,7 +187,7 @@ int32_t lv_gif_get_loop_count(lv_obj_t * obj)
 
 void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -199,7 +200,7 @@ void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
 
 void lv_gif_set_auto_pause_invisible(lv_obj_t * obj, bool auto_pause)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     gifobj->is_auto_pause = auto_pause;
@@ -207,9 +208,9 @@ void lv_gif_set_auto_pause_invisible(lv_obj_t * obj, bool auto_pause)
 
 bool lv_gif_get_size(const char * src, uint16_t * w, uint16_t * h)
 {
-    LV_ASSERT_NULL(src);
-    LV_ASSERT_NULL(w);
-    LV_ASSERT_NULL(h);
+    LV_CHECK_ARG(src != NULL, return false);
+    LV_CHECK_ARG(w != NULL, return false);
+    LV_CHECK_ARG(h != NULL, return false);
 
     LV_PROFILER_DECODER_BEGIN;
     GIFIMAGE gif;
@@ -230,7 +231,7 @@ bool lv_gif_get_size(const char * src, uint16_t * w, uint16_t * h)
 
 int32_t lv_gif_get_frame_count(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -252,7 +253,7 @@ int32_t lv_gif_get_frame_count(lv_obj_t * obj)
 
 int32_t lv_gif_get_current_frame_index(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -268,6 +269,7 @@ int32_t lv_gif_get_current_frame_index(lv_obj_t * obj)
 
 static void lv_gif_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
 
     lv_gif_t * gifobj = (lv_gif_t *) obj;
@@ -282,6 +284,7 @@ static void lv_gif_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     LV_UNUSED(class_p);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
@@ -303,6 +306,8 @@ static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static inline void gif_blend_to_rgb565(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf)
 {
+    LV_ASSERT(pDraw != NULL);
+    LV_ASSERT(draw_buf != NULL);
     LV_PROFILER_DECODER_BEGIN;
 
     uint8_t pixel;
@@ -325,6 +330,8 @@ static inline void gif_blend_to_rgb565(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf
 
 static inline void gif_blend_to_rgb888(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf)
 {
+    LV_ASSERT(pDraw != NULL);
+    LV_ASSERT(draw_buf != NULL);
     LV_PROFILER_DECODER_BEGIN;
 
     uint8_t pixel;
@@ -350,6 +357,8 @@ static inline void gif_blend_to_rgb888(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf
 
 static inline void gif_blend_to_argb8888(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf)
 {
+    LV_ASSERT(pDraw != NULL);
+    LV_ASSERT(draw_buf != NULL);
     LV_PROFILER_DECODER_BEGIN;
 
     uint8_t pixel;
@@ -376,6 +385,7 @@ static inline void gif_blend_to_argb8888(GIFDRAW * pDraw, lv_draw_buf_t * draw_b
 
 static void gif_draw_raw_cb(GIFDRAW * pDraw)
 {
+    LV_ASSERT(pDraw != NULL);
     lv_gif_t * gifobj = (lv_gif_t *) pDraw->pUser;
 
     switch(pDraw->ucPaletteType) {
@@ -397,6 +407,7 @@ static void gif_draw_raw_cb(GIFDRAW * pDraw)
 
 static void gif_previous_close(lv_gif_t * gifobj)
 {
+    LV_ASSERT(gifobj != NULL);
     LV_PROFILER_DECODER_BEGIN;
 
     /* Close previous gif if any */
@@ -421,6 +432,7 @@ static void gif_previous_close(lv_gif_t * gifobj)
 
 static void gif_initialize(lv_gif_t * gifobj)
 {
+    LV_ASSERT(gifobj != NULL);
     LV_PROFILER_DECODER_BEGIN;
 
     animatedgif_color_format_t decoder_cf;
@@ -503,14 +515,16 @@ static void gif_initialize(lv_gif_t * gifobj)
  * Only disposal method 2 ("restore to background") is handled in this function.
  *
  * @param gif      Pointer to the GIFIMAGE structure representing the current GIF frame.
- * @param drawbuf  Pointer to the draw buffer where the frame is rendered.
+ * @param draw_buf Pointer to the draw buffer where the frame is rendered.
  *
  * Assumptions:
  *   - The coordinates and dimensions (iX, iY, iWidth, iHeight) are within the bounds of the draw buffer.
  *   - The palette type and background color are valid for the current GIF frame.
  */
-static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
+static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * draw_buf)
 {
+    LV_ASSERT(gif != NULL);
+    LV_ASSERT(draw_buf != NULL);
     LV_PROFILER_DECODER_BEGIN;
 
     int x = gif->iX;
@@ -522,7 +536,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
 
     /* Bounds validation to prevent out-of-bounds access */
     if(x < 0 || y < 0 || w <= 0 || h <= 0 ||
-       x + w > drawbuf->header.w || y + h > drawbuf->header.h) {
+       x + w > draw_buf->header.w || y + h > draw_buf->header.h) {
         LV_PROFILER_DECODER_END;
         return;
     }
@@ -542,7 +556,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                     if(gif->ucGIFBits & 1) color = 0;
 
                     for(i = y; i < y + h; i++) {
-                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
                         for(j = x; j < x + w; j++) {
                             *(uint16_t *)(dst + 2 * j) = color;
                         }
@@ -562,7 +576,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                     }
 
                     for(i = y; i < y + h; i++) {
-                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
                         for(j = x; j < x + w; j++) {
                             dst[3 * j] = r;
                             dst[3 * j + 1] = g;
@@ -580,7 +594,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                     }
 
                     for(i = y; i < y + h; i++) {
-                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        uint8_t * dst = draw_buf->data + draw_buf->header.stride * i;
                         for(j = x; j < x + w; j++) {
                             *(lv_color32_t *)(dst + 4 * j) = bg_color;
                         }
@@ -602,6 +616,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
 
 static void gif_next_frame_task_cb(lv_timer_t * t)
 {
+    LV_ASSERT(t != NULL);
     lv_obj_t * obj = t->user_data;
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 

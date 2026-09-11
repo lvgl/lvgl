@@ -47,7 +47,7 @@ void * lv_nuttx_uv_init(lv_nuttx_uv_t * uv_info);
 
 /**
  * Deinitialize the uv_loop configuration for NuttX porting layer.
- * @param data Pointer to user data.
+ * @param data Pointer to user data. @nullable
  */
 void lv_nuttx_uv_deinit(void ** data);
 

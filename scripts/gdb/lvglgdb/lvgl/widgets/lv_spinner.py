@@ -13,17 +13,18 @@ class LVSpinner(LVArc):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_spinner_t", ptr=True) or self
+        self._wv_lv_spinner_t = self.cast("lv_spinner_t", ptr=True) or self
+        self._wv = self._wv_lv_spinner_t
 
     @property
     def duration(self):
         """Anim duration in ms"""
-        return int(self._wv.safe_field("duration", 0))
+        return int(self._wv_lv_spinner_t.safe_field("duration", 0))
 
     @property
     def angle(self):
         """Anim angle in degrees"""
-        return int(self._wv.safe_field("angle", 0))
+        return int(self._wv_lv_spinner_t.safe_field("angle", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -179,21 +179,23 @@ lv_dir_t lv_event_get_two_fingers_swipe_dir(lv_event_t * gesture_event);
  * it is usually called from the indev read callback
  * @param data the indev data
  * @param recognizer pointer to a gesture recognizer
+ * @param type          the gesture type
  */
 void lv_indev_set_gesture_data(lv_indev_data_t * data, lv_indev_gesture_recognizer_t * recognizer,
                                lv_indev_gesture_type_t type);
 
 /**
  * Obtains the center point of a gesture
- * @param gesture_event     pointer to a gesture recognizer event
+ * @param recognizer        pointer to a gesture recognizer event
  * @param point             pointer to a point
  */
 void lv_indev_get_gesture_center_point(lv_indev_gesture_recognizer_t * recognizer, lv_point_t * point);
 
 /**
  * Obtains the current state of the gesture recognizer attached to an event
- * @param gesture_event     pointer to a gesture recognizer event
- * @return                  current state of the gesture recognizer
+ * @param gesture_event pointer to a gesture recognizer event
+ * @param type          the gesture type
+ * @return              current state of the gesture recognizer
  */
 lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event, lv_indev_gesture_type_t type);
 

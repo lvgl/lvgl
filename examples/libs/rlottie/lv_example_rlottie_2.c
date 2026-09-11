@@ -6,6 +6,8 @@
  * @title Rlottie animation from file
  * @brief Play a Lottie JSON file loaded directly through the rlottie stdio path.
  *
+ * @deprecated rlottie is deprecated. Use the `lv_lottie` widget instead.
+ *
  * `lv_rlottie_create_from_file` opens
  * `lvgl/examples/libs/rlottie/lv_example_rlottie_approve.json` as a 100x100
  * widget centered on the active screen. The path has no LVGL drive letter
@@ -15,8 +17,10 @@
 void lv_example_rlottie_2(void)
 {
     /*The rlottie library uses STDIO file API, so there is no driver letter for LVGL*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * lottie = lv_rlottie_create_from_file(lv_screen_active(), 100, 100,
                                                     "lvgl/examples/libs/rlottie/lv_example_rlottie_approve.json");
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_center(lottie);
 }
 

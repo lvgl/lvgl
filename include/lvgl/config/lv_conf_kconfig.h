@@ -1,4 +1,8 @@
-/** * @file lv_conf_kconfig.h * Configs that need special handling when LVGL is used with Kconfig */
+/**
+ * GENERATED FILE, DO NOT EDIT IT!
+ * @file lv_conf_kconfig.h
+ * Configs that need special handling when LVGL is used with Kconfig
+ */
 
 #ifndef LV_CONF_KCONFIG_H
 #define LV_CONF_KCONFIG_H
@@ -8,163 +12,169 @@ extern "C" {
 #endif
 
 #ifdef LV_CONF_KCONFIG_EXTERNAL_INCLUDE
-#  include LV_CONF_KCONFIG_EXTERNAL_INCLUDE
+#include LV_CONF_KCONFIG_EXTERNAL_INCLUDE
 #else
 
-#  ifdef ESP_PLATFORM
-#    include "sdkconfig.h"
-#    include "esp_attr.h"
-#  endif
+#ifdef ESP_PLATFORM
+#include "sdkconfig.h"
+#include "esp_attr.h"
+#endif
 
-#  ifdef __NuttX__
-#    include <nuttx/config.h>
+#ifdef __NuttX__
+#include <nuttx/config.h>
 /*
  * Make sure version number in Kconfig file is correctly set.
  * Mismatch can happen when user manually copy lvgl/Kconfig file to their project, like what NuttX does.
  */
-#    include "../lv_version.h"
+#include "../lv_version.h"
 
-#    if CONFIG_LVGL_VERSION_MAJOR != LVGL_VERSION_MAJOR || CONFIG_LVGL_VERSION_MINOR != LVGL_VERSION_MINOR \
+#if CONFIG_LVGL_VERSION_MAJOR != LVGL_VERSION_MAJOR || CONFIG_LVGL_VERSION_MINOR != LVGL_VERSION_MINOR \
         || CONFIG_LVGL_VERSION_PATCH != LVGL_VERSION_PATCH
-#        warning "Version mismatch between Kconfig and lvgl/lv_version.h"
-#    endif
-#  elif defined(__RTTHREAD__)
-#    define LV_CONF_INCLUDE_SIMPLE
-#    include <lv_rt_thread_conf.h>
-#  endif
+#warning "Version mismatch between Kconfig and lvgl/lv_version.h"
+#endif
+#elif defined(__RTTHREAD__)
+#define LV_CONF_INCLUDE_SIMPLE
+#include <lv_rt_thread_conf.h>
+#endif
 
 #endif /*LV_CONF_KCONFIG_EXTERNAL_INCLUDE*/
 
 /*******************
- * LV_USE_STDLIB_MALLOC
+ * LV_COLOR_FORMAT_DEFAULT
  *******************/
-
-#ifdef CONFIG_LV_USE_BUILTIN_MALLOC
-#  define CONFIG_LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN
-#elif defined(CONFIG_LV_USE_CLIB_MALLOC)
-#  define CONFIG_LV_USE_STDLIB_MALLOC LV_STDLIB_CLIB
-#elif defined(CONFIG_LV_USE_MICROPYTHON_MALLOC)
-#  define CONFIG_LV_USE_STDLIB_MALLOC LV_STDLIB_MICROPYTHON
-#elif defined(CONFIG_LV_USE_RTTHREAD_MALLOC)
-#  define CONFIG_LV_USE_STDLIB_MALLOC LV_STDLIB_RTTHREAD
-#elif defined (CONFIG_LV_USE_CUSTOM_MALLOC)
-#  define CONFIG_LV_USE_STDLIB_MALLOC LV_STDLIB_CUSTOM
+#ifdef CONFIG_LV_COLOR_FORMAT_I1
+#  define CONFIG_LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_I1
+#elif defined(CONFIG_LV_COLOR_FORMAT_L8)
+#  define CONFIG_LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_L8
+#elif defined(CONFIG_LV_COLOR_FORMAT_RGB565)
+#  define CONFIG_LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
+#elif defined(CONFIG_LV_COLOR_FORMAT_RGB565_SWAPPED)
+#  define CONFIG_LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565_SWAPPED
+#elif defined(CONFIG_LV_COLOR_FORMAT_RGB888)
+#  define CONFIG_LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB888
+#elif defined(CONFIG_LV_COLOR_FORMAT_XRGB8888)
+#  define CONFIG_LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_XRGB8888
+#elif defined(CONFIG_LV_COLOR_FORMAT_ARGB8888)
+#  define CONFIG_LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_ARGB8888
+#elif defined(CONFIG_LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED)
+#  define CONFIG_LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
 #endif
 
 /*******************
- * LV_USE_STDLIB_STRING
+ * LV_TXT_ENC
  *******************/
-
-#ifdef CONFIG_LV_USE_BUILTIN_STRING
-#  define CONFIG_LV_USE_STDLIB_STRING LV_STDLIB_BUILTIN
-#elif defined(CONFIG_LV_USE_CLIB_STRING)
-#  define CONFIG_LV_USE_STDLIB_STRING LV_STDLIB_CLIB
-#elif defined(CONFIG_LV_USE_MICROPYTHON_STRING)
-#  define CONFIG_LV_USE_STDLIB_STRING LV_STDLIB_MICROPYTHON
-#elif defined(CONFIG_LV_USE_RTTHREAD_STRING)
-#  define CONFIG_LV_USE_STDLIB_STRING LV_STDLIB_RTTHREAD
-#elif defined (CONFIG_LV_USE_CUSTOM_STRING)
-#  define CONFIG_LV_USE_STDLIB_STRING LV_STDLIB_CUSTOM
+#ifdef CONFIG_LV_TXT_ENC_UTF8
+#  define CONFIG_LV_TXT_ENC LV_TXT_ENC_UTF8
+#elif defined(CONFIG_LV_TXT_ENC_ASCII)
+#  define CONFIG_LV_TXT_ENC LV_TXT_ENC_ASCII
 #endif
 
 /*******************
- * LV_USE_STDLIB_SPRINTF
+ * LV_BIDI_BASE_DIR_DEF
  *******************/
-
-#ifdef CONFIG_LV_USE_BUILTIN_SPRINTF
-#  define CONFIG_LV_USE_STDLIB_SPRINTF LV_STDLIB_BUILTIN
-#elif defined(CONFIG_LV_USE_CLIB_SPRINTF)
-#  define CONFIG_LV_USE_STDLIB_SPRINTF LV_STDLIB_CLIB
-#elif defined(CONFIG_LV_USE_MICROPYTHON_SPRINTF)
-#  define CONFIG_LV_USE_STDLIB_SPRINTF LV_STDLIB_MICROPYTHON
-#elif defined(CONFIG_LV_USE_RTTHREAD_SPRINTF)
-#  define CONFIG_LV_USE_STDLIB_SPRINTF LV_STDLIB_RTTHREAD
-#elif defined (CONFIG_LV_USE_CUSTOM_SPRINTF)
-#  define CONFIG_LV_USE_STDLIB_SPRINTF LV_STDLIB_CUSTOM
+#ifdef CONFIG_LV_BASE_DIR_LTR
+#  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_LTR
+#elif defined(CONFIG_LV_BASE_DIR_RTL)
+#  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_RTL
+#elif defined(CONFIG_LV_BASE_DIR_AUTO)
+#  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_AUTO
 #endif
 
 /*******************
- * LV_USE_OS
+ * LV_FONT_DEFAULT
  *******************/
-
-#ifdef CONFIG_LV_OS_NONE
-#  define CONFIG_LV_USE_OS LV_OS_NONE
-#elif defined(CONFIG_LV_OS_PTHREAD)
-#  define CONFIG_LV_USE_OS LV_OS_PTHREAD
-#elif defined(CONFIG_LV_OS_FREERTOS)
-#  define CONFIG_LV_USE_OS LV_OS_FREERTOS
-#elif defined(CONFIG_LV_OS_CMSIS_RTOS2)
-#  define CONFIG_LV_USE_OS LV_OS_CMSIS_RTOS2
-#elif defined (CONFIG_LV_OS_RTTHREAD)
-#  define CONFIG_LV_USE_OS LV_OS_RTTHREAD
-#elif defined (CONFIG_LV_OS_WINDOWS)
-#  define CONFIG_LV_USE_OS LV_OS_WINDOWS
-#elif defined (CONFIG_LV_OS_MQX)
-#  define CONFIG_LV_USE_OS LV_OS_MQX
-#elif defined (CONFIG_LV_OS_SDL2)
-#  define CONFIG_LV_USE_OS LV_OS_SDL2
-#elif defined (CONFIG_LV_OS_CUSTOM)
-#  define CONFIG_LV_USE_OS LV_OS_CUSTOM
+#ifdef CONFIG_LV_FONT_DEFAULT_MONTSERRAT_8
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_8
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_10)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_10
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_12)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_12
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_14)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_14
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_16)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_16
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_18)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_18
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_20)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_20
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_22)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_22
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_24)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_24
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_26)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_26
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_28)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_28
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_30)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_30
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_32)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_32
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_34)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_34
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_36)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_36
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_38)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_38
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_40)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_40
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_42)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_42
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_44)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_44
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_46)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_46
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_48)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_48
+#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED
+#elif defined(CONFIG_LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
+#elif defined(CONFIG_LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK
+#elif defined(CONFIG_LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK
+#elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_8)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_UNSCII_8
+#elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_16)
+#  define CONFIG_LV_FONT_DEFAULT LV_FONT_DEFAULT_UNSCII_16
 #endif
 
 /*******************
- * LV_USE_NEMA_LIB
+ * LV_LINUX_FBDEV_RENDER_MODE
  *******************/
-#ifdef CONFIG_LV_NEMA_LIB_NONE
-#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_NONE
-#elif defined(CONFIG_LV_NEMA_LIB_M33_REVC)
-#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_M33_REVC
-#elif defined(CONFIG_LV_NANOVG_BACKEND_GLES2)
-#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_M33_NEMAPVG
-#elif defined(CONFIG_LV_NANOVG_BACKEND_GLES3)
-#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_M55
-#elif defined(CONFIG_LV_NEMA_LIB_M7)
-#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_M7
+#ifdef CONFIG_LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+#  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
+#elif defined(CONFIG_LV_LINUX_FBDEV_RENDER_MODE_DIRECT)
+#  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
+#elif defined(CONFIG_LV_LINUX_FBDEV_RENDER_MODE_FULL)
+#  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
 #endif
 
 /*******************
- * LV_USE_NEMA_HAL
+ * LV_SDL_RENDER_MODE
  *******************/
-#ifdef CONFIG_LV_NEMA_HAL_STM32
-#  define CONFIG_LV_USE_NEMA_HAL LV_NEMA_HAL_STM32
-#elif defined(CONFIG_LV_NEMA_HAL_CUSTOM)
-#  define CONFIG_LV_USE_NEMA_HAL LV_NEMA_HAL_CUSTOM
+#ifdef CONFIG_LV_SDL_RENDER_MODE_PARTIAL
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
+#elif defined(CONFIG_LV_SDL_RENDER_MODE_DIRECT)
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
+#elif defined(CONFIG_LV_SDL_RENDER_MODE_FULL)
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
 #endif
 
 /*******************
- * LV_NANOVG_BACKEND
+ * LV_X11_RENDER_MODE
  *******************/
-
-#ifdef CONFIG_LV_NANOVG_BACKEND_GL2
-#  define CONFIG_LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GL2
-#elif defined(CONFIG_LV_NANOVG_BACKEND_GL3)
-#  define CONFIG_LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GL3
-#elif defined(CONFIG_LV_NANOVG_BACKEND_GLES2)
-#  define CONFIG_LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GLES2
-#elif defined(CONFIG_LV_NANOVG_BACKEND_GLES3)
-#  define CONFIG_LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GLES3
+#ifdef CONFIG_LV_X11_RENDER_MODE_PARTIAL
+#  define CONFIG_LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
+#elif defined(CONFIG_LV_X11_RENDER_MODE_DIRECT)
+#  define CONFIG_LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
+#elif defined(CONFIG_LV_X11_RENDER_MODE_FULL)
+#  define CONFIG_LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
 #endif
 
 /*******************
- * LV_MEM_SIZE
+ * LV_USE_PERF_MONITOR_POS
  *******************/
-
-#ifdef CONFIG_LV_MEM_SIZE_KILOBYTES
-#  if(CONFIG_LV_MEM_SIZE_KILOBYTES < 2)
-#    error "LV_MEM_SIZE >= 2kB is required"
-#  endif
-
-#  define CONFIG_LV_MEM_SIZE (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
-#endif
-
-#ifdef CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
-#  define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
-#endif
-
-/*------------------
- * MONITOR POSITION
- *-----------------*/
-
 #ifdef CONFIG_LV_PERF_MONITOR_ALIGN_TOP_LEFT
 #  define CONFIG_LV_USE_PERF_MONITOR_POS LV_ALIGN_TOP_LEFT
 #elif defined(CONFIG_LV_PERF_MONITOR_ALIGN_TOP_MID)
@@ -185,6 +195,9 @@ extern "C" {
 #  define CONFIG_LV_USE_PERF_MONITOR_POS LV_ALIGN_CENTER
 #endif
 
+/*******************
+ * LV_USE_MEM_MONITOR_POS
+ *******************/
 #ifdef CONFIG_LV_MEM_MONITOR_ALIGN_TOP_LEFT
 #  define CONFIG_LV_USE_MEM_MONITOR_POS LV_ALIGN_TOP_LEFT
 #elif defined(CONFIG_LV_MEM_MONITOR_ALIGN_TOP_MID)
@@ -205,142 +218,145 @@ extern "C" {
 #  define CONFIG_LV_USE_MEM_MONITOR_POS LV_ALIGN_CENTER
 #endif
 
-/********************
- * FONT SELECTION
+/*******************
+ * LV_MEM_SIZE
  *******************/
 
-/**
- * NOTE: In Kconfig instead of `LV_DEFAULT_FONT`
- *       `CONFIG_LV_FONT_DEFAULT_<font_name>` is defined
- *       hence the large selection with if-s
- */
-
-/*------------------
- * DEFAULT FONT
- *-----------------*/
-#ifdef CONFIG_LV_FONT_DEFAULT_MONTSERRAT_8
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_8
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_10)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_10
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_12)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_12
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_14)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_14
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_16)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_16
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_18)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_18
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_20)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_20
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_22)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_22
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_24)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_24
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_26)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_26
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_28)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_28
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_30)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_30
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_32)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_32
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_34)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_34
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_36)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_36
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_38)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_38
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_40)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_40
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_42)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_42
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_44)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_44
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_46)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_46
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_48)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_48
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_12_SUBPX)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_12_subpx
-#elif defined(CONFIG_LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_28_compressed
-#elif defined(CONFIG_LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_dejavu_16_persian_hebrew
-#elif defined(CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_14_CJK)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_source_han_sans_sc_14_cjk
-#elif defined(CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_16_CJK)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_source_han_sans_sc_16_cjk
-#elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_8)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_unscii_8
-#elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_16)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_unscii_16
+#if defined(CONFIG_LV_MEM_SIZE_KILOBYTES) && CONFIG_LV_MEM_SIZE_KILOBYTES > 0
+#warning "LV_MEM_SIZE_KILOBYTES is deprecated, use LV_MEM_SIZE instead (value in bytes)"
+#ifndef CONFIG_LV_MEM_SIZE
+#define CONFIG_LV_MEM_SIZE (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
+#else
+#warning "Both LV_MEM_SIZE and LV_MEM_SIZE_KILOBYTES are defined. Using LV_MEM_SIZE"
+#endif
 #endif
 
-/*------------------
- * TEXT ENCODING
- *-----------------*/
-#ifdef CONFIG_LV_TXT_ENC_UTF8
-#  define CONFIG_LV_TXT_ENC LV_TXT_ENC_UTF8
-#elif defined(CONFIG_LV_TXT_ENC_ASCII)
-#  define CONFIG_LV_TXT_ENC LV_TXT_ENC_ASCII
+#if defined(CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES) && CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES > 0
+#warning "LV_MEM_POOL_EXPAND_SIZE_KILOBYTES is deprecated, set the full memory size with LV_MEM_SIZE instead (value in bytes)"
+#define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
 #endif
 
-/*------------------
- * BIDI DIRECTION
- *-----------------*/
+/*******************
+ * LV_ASSERT_HANDLER_INCLUDE
+ *******************/
 
-#ifdef CONFIG_LV_BASE_DIR_LTR
-#  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_LTR
-#elif defined(CONFIG_LV_BASE_DIR_RTL)
-#  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_RTL
-#elif defined(CONFIG_LV_BASE_DIR_AUTO)
-#  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_AUTO
+#if defined(CONFIG_LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE) && CONFIG_LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE
+#warning LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE instead.
+#define LV_ASSERT_HANDLER_INCLUDE CONFIG_LV_ASSERT_HANDLER_INCLUDE
 #endif
 
-/*------------------
- * SDL
- *-----------------*/
+/*******************
+ * LV_SDL_BUF_COUNT
+ *******************/
 
-#ifdef CONFIG_LV_SDL_RENDER_MODE_PARTIAL
-#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
-#elif defined(CONFIG_LV_SDL_RENDER_MODE_DIRECT)
-#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
-#elif defined(CONFIG_LV_SDL_RENDER_MODE_FULL)
-#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
+#if defined(CONFIG_LV_SDL_SINGLE_BUFFER)
+#warning "LV_SDL_SINGLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
+#undef CONFIG_LV_SDL_BUF_COUNT
+#define CONFIG_LV_SDL_BUF_COUNT 1
+#elif defined(CONFIG_LV_SDL_DOUBLE_BUFFER)
+#warning "LV_SDL_DOUBLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
+#undef CONFIG_LV_SDL_BUF_COUNT
+#define CONFIG_LV_SDL_BUF_COUNT 2
 #endif
 
-/*------------------
- * WAYLAND
- *-----------------*/
+/*******************
+ * LV_CONF_MINIMAL
+ *******************/
 
-#ifdef CONFIG_LV_WAYLAND_RENDER_MODE_PARTIAL
-#  define CONFIG_LV_WAYLAND_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
-#elif defined(CONFIG_LV_WAYLAND_RENDER_MODE_DIRECT)
-#  define CONFIG_LV_WAYLAND_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
-#elif defined(CONFIG_LV_WAYLAND_RENDER_MODE_FULL)
-#  define CONFIG_LV_WAYLAND_RENDER_MODE_FULL LV_DISPLAY_RENDER_MODE_FULL
+#if defined(CONFIG_LV_CONF_MINIMAL)
+#warning "LV_CONF_MINIMAL has been removed and no longer has any effect. Start from configs/defconfigs/minimal.defconfig instead."
+#undef CONFIG_LV_CONF_MINIMAL
 #endif
 
-/*------------------
- * LINUX FBDEV
- *-----------------*/
+/*
+ * CONFIG_* options that no longer exist and haven't worked _ever_ in Kconfig
+ *
+ * Up to v9.5 lv_conf_internal.h bridged CONFIG_<OPTION> to <OPTION> for every
+ * option it knew, including ones whose value is a C expression (an attribute,
+ * a function name, a macro body). Which are not part of kconfig and would
+ * get ignored by projects using them
+ *
+ */ 
 
-#ifdef CONFIG_LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
-#  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
-#elif defined(CONFIG_LV_LINUX_FBDEV_RENDER_MODE_DIRECT)
-#  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
-#elif defined(CONFIG_LV_LINUX_FBDEV_RENDER_MODE_FULL)
-#  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
+#ifndef LV_KCONFIG_IGNORE
+
+#ifdef CONFIG_LV_ASSERT_HANDLER
+#error "CONFIG_LV_ASSERT_HANDLER has no effect: LV_ASSERT_HANDLER is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ASSERT_USE_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER in the header named by LV_ASSERT_CUSTOM_INCLUDE."
 #endif
 
-
-#ifdef CONFIG_LV_USE_CALENDAR
-#  ifdef CONFIG_LV_CALENDAR_WEEK_STARTS_MONDAY
-#    define CONFIG_LV_CALENDAR_DEFAULT_DAY_NAMES { CONFIG_LV_MONDAY_STR , CONFIG_LV_TUESDAY_STR, CONFIG_LV_WEDNESDAY_STR, CONFIG_LV_THURSDAY_STR, CONFIG_LV_FRIDAY_STR, CONFIG_LV_SATURDAY_STR, CONFIG_LV_SUNDAY_STR }
-#  else
-#    define CONFIG_LV_CALENDAR_DEFAULT_DAY_NAMES { CONFIG_LV_SUNDAY_STR, CONFIG_LV_MONDAY_STR , CONFIG_LV_TUESDAY_STR, CONFIG_LV_WEDNESDAY_STR, CONFIG_LV_THURSDAY_STR, CONFIG_LV_FRIDAY_STR, CONFIG_LV_SATURDAY_STR }
-#  endif
+#ifdef CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+#error "CONFIG_LV_ATTRIBUTE_EXTERN_DATA has no effect: LV_ATTRIBUTE_EXTERN_DATA is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_EXTERN_DATA in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
 #endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_FAST_MEM
+#error "CONFIG_LV_ATTRIBUTE_FAST_MEM has no effect: LV_ATTRIBUTE_FAST_MEM is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_FAST_MEM in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_FLUSH_READY
+#error "CONFIG_LV_ATTRIBUTE_FLUSH_READY has no effect: LV_ATTRIBUTE_FLUSH_READY is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_FLUSH_READY in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_LARGE_CONST
+#error "CONFIG_LV_ATTRIBUTE_LARGE_CONST has no effect: LV_ATTRIBUTE_LARGE_CONST is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_LARGE_CONST in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY
+#error "CONFIG_LV_ATTRIBUTE_LARGE_RAM_ARRAY has no effect: LV_ATTRIBUTE_LARGE_RAM_ARRAY is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_LARGE_RAM_ARRAY in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN
+#error "CONFIG_LV_ATTRIBUTE_MEM_ALIGN has no effect: LV_ATTRIBUTE_MEM_ALIGN is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_MEM_ALIGN in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_SYNC_READY
+#error "CONFIG_LV_ATTRIBUTE_SYNC_READY has no effect: LV_ATTRIBUTE_SYNC_READY is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_SYNC_READY in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_TICK_INC
+#error "CONFIG_LV_ATTRIBUTE_TICK_INC has no effect: LV_ATTRIBUTE_TICK_INC is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_TICK_INC in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_ATTRIBUTE_TIMER_HANDLER
+#error "CONFIG_LV_ATTRIBUTE_TIMER_HANDLER has no effect: LV_ATTRIBUTE_TIMER_HANDLER is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_ATTRIBUTE_TIMER_HANDLER in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_EXPORT_CONST_INT
+#error "CONFIG_LV_EXPORT_CONST_INT has no effect: LV_EXPORT_CONST_INT is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_ATTRIBUTE_USE_CUSTOM_INCLUDE and define LV_EXPORT_CONST_INT in the header named by LV_ATTRIBUTE_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_FONT_CUSTOM_DECLARE
+#error "CONFIG_LV_FONT_CUSTOM_DECLARE has no effect: LV_FONT_CUSTOM_DECLARE is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_FONT_USE_CUSTOM_INCLUDE and define LV_FONT_CUSTOM_DECLARE in the header named by LV_FONT_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+#error "CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM has no effect: LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_NEMA_USE_CUSTOM_INCLUDE and define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM in the header named by LV_NEMA_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_SYSMON_GET_IDLE
+#error "CONFIG_LV_SYSMON_GET_IDLE has no effect: LV_SYSMON_GET_IDLE is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_SYSMON_USE_CUSTOM_INCLUDE and define LV_SYSMON_GET_IDLE in the header named by LV_SYSMON_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_SYSMON_GET_PROC_IDLE
+#error "CONFIG_LV_SYSMON_GET_PROC_IDLE has no effect: LV_SYSMON_GET_PROC_IDLE is a C expression, which Kconfig cannot carry. To keep the setting, enable LV_SYSMON_USE_CUSTOM_INCLUDE and define LV_SYSMON_GET_PROC_IDLE in the header named by LV_SYSMON_CUSTOM_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_PROFILER_BEGIN
+#error "CONFIG_LV_PROFILER_BEGIN has no effect: LV_PROFILER_BEGIN is a C expression, which Kconfig cannot carry. To keep the setting, define LV_PROFILER_BEGIN in the header named by LV_PROFILER_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_PROFILER_BEGIN_TAG
+#error "CONFIG_LV_PROFILER_BEGIN_TAG has no effect: LV_PROFILER_BEGIN_TAG is a C expression, which Kconfig cannot carry. To keep the setting, define LV_PROFILER_BEGIN_TAG in the header named by LV_PROFILER_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_PROFILER_END
+#error "CONFIG_LV_PROFILER_END has no effect: LV_PROFILER_END is a C expression, which Kconfig cannot carry. To keep the setting, define LV_PROFILER_END in the header named by LV_PROFILER_INCLUDE."
+#endif
+
+#ifdef CONFIG_LV_PROFILER_END_TAG
+#error "CONFIG_LV_PROFILER_END_TAG has no effect: LV_PROFILER_END_TAG is a C expression, which Kconfig cannot carry. To keep the setting, define LV_PROFILER_END_TAG in the header named by LV_PROFILER_INCLUDE."
+#endif
+
+#endif /*LV_KCONFIG_IGNORE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

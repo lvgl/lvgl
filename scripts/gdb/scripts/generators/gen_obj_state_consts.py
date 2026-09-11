@@ -5,9 +5,10 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from lvgl_paths import include_dir, lvgl_root
 from enum_parser import parse_bitmask_enum, generate_dict_module
 
-LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
+LVGL_INC = include_dir(lvgl_root(__file__))
 OUTPUT = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "core" / "lv_obj_state_consts.py"
 
 SKIP = {"LV_STATE_ANY"}

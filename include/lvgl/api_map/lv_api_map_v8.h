@@ -95,7 +95,7 @@ static inline void lv_obj_move_foreground(lv_obj_t * obj)
         return;
     }
 
-    lv_obj_move_to_index(obj, lv_obj_get_child_count(parent) - 1);
+    lv_obj_move_to_index(obj, (int32_t)lv_obj_get_child_count(parent) - 1);
 }
 
 /**

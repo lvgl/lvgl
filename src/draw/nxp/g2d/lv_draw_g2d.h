@@ -22,7 +22,6 @@ extern "C" {
 
 #include "../../../lvgl_public.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include "../../sw/lv_draw_sw_private.h"
 
@@ -36,7 +35,7 @@ extern "C" {
 
 typedef struct lv_draw_g2d_unit {
     lv_draw_unit_t base_unit;
-#if LV_USE_OS
+#if LV_USE_G2D_DRAW_THREAD
     lv_draw_sw_thread_dsc_t thread_dsc;
 #else
     lv_draw_task_t * task_act;
@@ -62,7 +61,6 @@ void lv_draw_g2d_img(lv_draw_task_t * t);
  **********************/
 
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

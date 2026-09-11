@@ -1,0 +1,49 @@
+<!--
+ @title Cascading styles
+ @brief Stack a second style that overrides only a few properties of a shared base.
+
+ `style_base` defines the whole card — fill, border, shadow, radius,
+ padding, text color. `style_warning` sets only `bg_color`,
+ `border_color`, and `text_color`. The right card has both: the later
+ style wins for the properties it sets, the base shows through for the
+ rest, so one small style re-themes the card without redefining it.
+-->
+<screen>
+	<consts>
+		<color name="base" value="0x6366f1" />
+		<color name="warn" value="0xf59e0b" />
+	</consts>
+	<styles>
+		<!-- Full card definition -->
+		<style
+			name="style_base"
+			radius="14"
+			bg_opa="100%"
+			bg_color="#base"
+			border_width="2"
+			border_color="0x4338ca"
+			shadow_color="0x312e81"
+			shadow_width="14"
+			shadow_offset_y="5"
+			shadow_opa="120"
+			pad_all="16"
+			text_color="0xffffff"
+		/>
+		<!-- Override: only the three color properties -->
+		<style name="style_warning" bg_color="#warn" border_color="0xb45309" text_color="0x1f2937" />
+	</styles>
+
+	<view flex_flow="row" style_flex_main_place="center" style_flex_track_place="center">
+		<!-- 💡 Both cards share `style_base`; the right one adds `style_warning`, which only repaints color. -->
+		<lv_obj name="container_2" width="110" height="content">
+			<style name="style_base" />
+			<lv_label name="label_1" align="center" text="Base" />
+		</lv_obj>
+
+		<lv_obj name="container_3" width="110" height="content">
+			<style name="style_base" />
+			<style name="style_warning" />
+			<lv_label name="label_2" align="center" text="Warning" />
+		</lv_obj>
+	</view>
+</screen>

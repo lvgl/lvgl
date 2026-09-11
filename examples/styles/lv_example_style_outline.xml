@@ -1,0 +1,36 @@
+<!--
+ @title Outline
+ @brief Add a focus-style ring that sits outside the card and ignores layout.
+
+ An outline is painted outside the box, so unlike a border it never
+ resizes the Widget. `outline_color` + `outline_width="3"` draw the ring
+ and `outline_pad="6"` is the gap between the card edge and the ring —
+ the look of a modern keyboard-focus halo.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- Detached focus ring 6 px outside the card -->
+		<style
+			name="style_focus"
+			radius="14"
+			bg_opa="100%"
+			bg_color="0xffffff"
+			border_width="1"
+			border_color="0xe2e8f0"
+			outline_color="#accent"
+			outline_width="3"
+			outline_pad="6"
+		/>
+	</styles>
+
+	<view>
+		<!-- 💡 Raise `outline_pad` to push the ring further out; the card and layout never move. -->
+		<lv_obj name="container" align="center" width="200" height="120">
+			<style name="style_focus" />
+			<lv_label name="label" align="center" text="Focused" />
+		</lv_obj>
+	</view>
+</screen>

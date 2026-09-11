@@ -222,7 +222,7 @@ static lv_obj_t * add_list_button(lv_obj_t * parent, uint32_t track_id)
     lv_image_set_inner_align(border, LV_IMAGE_ALIGN_TILE);
     lv_obj_set_width(border, lv_pct(120));
     lv_obj_align(border, LV_ALIGN_BOTTOM_MID, 0, 0);
-    lv_obj_add_flag(border, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_set_ignore_layout(border, true);
 
     return btn;
 }

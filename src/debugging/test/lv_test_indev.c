@@ -57,20 +57,14 @@ void lv_test_indev_create_all(void)
 
 void lv_test_indev_delete_all(void)
 {
-    if(_state.mouse_indev) {
-        lv_indev_delete(_state.mouse_indev);
-        _state.mouse_indev = NULL;
-    }
+    lv_indev_delete(_state.mouse_indev);
+    _state.mouse_indev = NULL;
 
-    if(_state.keypad_indev) {
-        lv_indev_delete(_state.keypad_indev);
-        _state.keypad_indev = NULL;
-    }
+    lv_indev_delete(_state.keypad_indev);
+    _state.keypad_indev = NULL;
 
-    if(_state.encoder_indev) {
-        lv_indev_delete(_state.encoder_indev);
-        _state.encoder_indev = NULL;
-    }
+    lv_indev_delete(_state.encoder_indev);
+    _state.encoder_indev = NULL;
 }
 
 lv_indev_t * lv_test_indev_get_indev(lv_indev_type_t type)
@@ -97,6 +91,8 @@ void lv_test_mouse_move_to(int32_t x, int32_t y)
 
 void lv_test_mouse_move_to_obj(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, &lv_obj_class, return);
+
     int32_t x = obj->coords.x1 + lv_obj_get_width(obj) / 2;
     int32_t y = obj->coords.y1 + lv_obj_get_height(obj) / 2;
     lv_test_mouse_move_to(x, y);
@@ -188,6 +184,7 @@ void lv_test_encoder_click(void)
 static void lv_test_mouse_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_UNUSED(indev);
+    LV_ASSERT(data != NULL);
     lv_point_set(&data->point, _state.x_act, _state.y_act);
     data->state = _state.mouse_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
@@ -196,6 +193,7 @@ static void lv_test_mouse_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 static void lv_test_keypad_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_UNUSED(indev);
+    LV_ASSERT(data != NULL);
     data->key = _state.key_act;
     data->state = _state.key_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
@@ -204,6 +202,7 @@ static void lv_test_keypad_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 static void lv_test_encoder_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_UNUSED(indev);
+    LV_ASSERT(data != NULL);
     data->enc_diff = _state.diff_act;
     data->state = _state.enc_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
     _state.diff_act = 0;

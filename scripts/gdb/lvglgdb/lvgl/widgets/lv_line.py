@@ -13,22 +13,23 @@ class LVLine(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_line_t", ptr=True) or self
+        self._wv_lv_line_t = self.cast("lv_line_t", ptr=True) or self
+        self._wv = self._wv_lv_line_t
 
     @property
     def point_num(self):
         """Number of points in 'point_array'"""
-        return int(self._wv.safe_field("point_num", 0))
+        return int(self._wv_lv_line_t.safe_field("point_num", 0))
 
     @property
     def y_inv(self):
         """1: y == 0 will be on the bottom"""
-        return int(self._wv.safe_field("y_inv", 0))
+        return int(self._wv_lv_line_t.safe_field("y_inv", 0))
 
     @property
     def point_array_is_mutable(self):
         """whether the point array is const or mutable"""
-        return int(self._wv.safe_field("point_array_is_mutable", 0))
+        return int(self._wv_lv_line_t.safe_field("point_array_is_mutable", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

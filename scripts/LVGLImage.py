@@ -357,6 +357,14 @@ def write_c_array_file(
 
     macro = "LV_ATTRIBUTE_" + varname.upper()
     header = f'''
+#ifdef __has_include
+    #if __has_include("lvgl.h")
+        #if !defined(LV_LVGL_H_INCLUDE_SIMPLE) && !defined(LV_LVGL_H_INCLUDE_SYSTEM) && !defined(LV_BUILD_TEST)
+            #define LV_LVGL_H_INCLUDE_SIMPLE
+        #endif
+    #endif
+#endif
+
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
 #elif defined(LV_LVGL_H_INCLUDE_SYSTEM)

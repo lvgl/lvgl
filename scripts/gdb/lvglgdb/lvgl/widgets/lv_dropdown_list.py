@@ -14,11 +14,12 @@ class LVDropdownList(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_dropdown_list_t", ptr=True) or self
+        self._wv_lv_dropdown_list_t = self.cast("lv_dropdown_list_t", ptr=True) or self
+        self._wv = self._wv_lv_dropdown_list_t
 
     @property
     def dropdown(self):
-        return ptr_or_none(self._wv.safe_field("dropdown"))
+        return ptr_or_none(self._wv_lv_dropdown_list_t.safe_field("dropdown"))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -3,15 +3,15 @@ title: LVGL Application on Buildroot
 description: "How to build and deploy an LVGL application into a Buildroot rootfs overlay."
 ---
 
-# LVGL application
+## LVGL application
 
 This section provides information about the steps to follow to get a custom
 application using LVGL running on the board.
 
-## Update RootFS
+### Update RootFS
 
 Depending on the application, it might be necessary to update the rootfs. Let's
-take as example the compilation of LVGL with DRM. The system must have
+take as example the compilation of LVGL with [DRM](/integration/embedded_linux/drivers/drm). The system must have
 `libdrm` installed.
 
 ```bash
@@ -41,7 +41,7 @@ find build/ -name "*libdrm*"
 
 You should see the include folder and the .so files.
 
-## Generate SDK and set up environment
+### Generate SDK and set up environment
 
 Generate an SDK that you can use to cross-compile the application for the
 target (RPi4).
@@ -90,10 +90,10 @@ export CFLAGS="--sysroot=${SYSROOT}"
 export LDFLAGS="--sysroot=${SYSROOT}"
 ```
 
-## Build the application
+### Build the application
 
 The environment is now set up, and we're ready to build an application using
-the [lv_benchmark` repository that is inspired from `lv_port_linux](https://github.com/lvgl/lv_port_linux).
+the [`lv_benchmark`](https://github.com/EDGEMTech/lv_benchmark) repository, which is inspired by [`lv_port_linux`](https://github.com/lvgl/lv_port_linux).
 
 Navigate back to the root of the project and clone the repository:
 
@@ -124,7 +124,7 @@ The output should contain these information:
 - ARM aarch64
     - interpreter /lib/ld-linux-aarch64.so.1
 
-## Set a rootfs overlay
+### Set a rootfs overlay
 
 In Buildroot, a rootfs overlay (or root filesystem overlay) is a mechanism that
 allows you to add custom files, directories, and configurations directly into

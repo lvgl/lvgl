@@ -76,7 +76,7 @@ static inline uint32_t lv_swap_bytes_32(uint32_t x)
  */
 static inline uint16_t lv_swap_bytes_16(uint16_t x)
 {
-    return (x << 8) | (x >> 8);
+    return (uint16_t)(x << 8) | (x >> 8);
 }
 
 /**********************

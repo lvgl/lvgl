@@ -57,6 +57,11 @@ extern GPU2D_HandleTypeDef hgpu2d;
  *  STATIC VARIABLES
  **********************/
 
+/* Default to no special attribute; override via LV_NEMA_CUSTOM_INCLUDE. */
+#ifndef LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+    #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+#endif
+
 static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE] LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM; /* NemaGFX memory pool */
 
 static nema_ringbuffer_t ring_buffer_str;

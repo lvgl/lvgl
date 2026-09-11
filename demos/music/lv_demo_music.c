@@ -36,7 +36,7 @@
  **********************/
 static lv_obj_t * ctrl;
 static lv_obj_t * list;
-static uint32_t music_height;
+static int32_t music_height;
 
 static const char * title_list[] = {
     "Waiting for true love",
@@ -245,7 +245,7 @@ static void auto_step_cb(lv_timer_t * t)
                 lv_obj_set_style_text_font(num, font_large, 0);
 #if LV_USE_PERF_MONITOR
                 lv_display_t * disp = lv_display_get_default();
-                const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(&disp->perf_sysmon_backend.subject);
+                const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(disp->perf_sysmon_backend.subject);
                 lv_label_set_text_fmt(num, "%" LV_PRIu32, info->calculated.fps_avg_total);
 #endif
                 lv_obj_align(num, LV_ALIGN_TOP_MID, 0, 120);

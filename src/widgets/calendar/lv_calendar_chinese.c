@@ -27,6 +27,8 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
+static const char * check_solar_term(uint16_t year, uint8_t month, uint8_t day);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -40,18 +42,18 @@ static const uint32_t calendar_chinese_table[199] = {/*1901-2099*/
     0x0B5546, 0x555ABB, 0x04DA4E, 0x0A5B43, 0x352BB8, 0x052B4C, 0x8A953F, 0x0E9552, 0x06AA48, 0x6AD53C, /*1951-1960*/
     0x0AB54F, 0x04B645, 0x4A5739, 0x0A574D, 0x052642, 0x3E9335, 0x0D9549, 0x75AABE, 0x056A51, 0x096D46, /*1961-1970*/
     0x54AEBB, 0x04AD4F, 0x0A4D43, 0x4D26B7, 0x0D254B, 0x8D52BF, 0x0B5452, 0x0B6A47, 0x696D3C, 0x095B50, /*1971-1980*/
-    0x049B45, 0x4A4BB9, 0x0A4B4D, 0xAB25C2, 0x06A554, 0x06D449, 0x6ADA3D, 0x0AB651, 0x093746, 0x5497BB, /*1981-1990*/
+    0x049B45, 0x4A4BB9, 0x0A4B4D, 0xAB25C2, 0x06A554, 0x06D449, 0x6ADA3D, 0x0AB651, 0x095746, 0x5497BB, /*1981-1990*/
     0x04974F, 0x064B44, 0x36A537, 0x0EA54A, 0x86B2BF, 0x05AC53, 0x0AB647, 0x5936BC, 0x092E50, 0x0C9645, /*1991-2000*/
     0x4D4AB8, 0x0D4A4C, 0x0DA541, 0x25AAB6, 0x056A49, 0x7AADBD, 0x025D52, 0x092D47, 0x5C95BA, 0x0A954E, /*2001-2010*/
     0x0B4A43, 0x4B5537, 0x0AD54A, 0x955ABF, 0x04BA53, 0x0A5B48, 0x652BBC, 0x052B50, 0x0A9345, 0x474AB9, /*2011-2020*/
-    0x06AA4C, 0x0AD541, 0x24DAB6, 0x04B64A, 0x69573D, 0x0A4E51, 0x0D2646, 0x5E933A, 0x0D534D, 0x05AA43, /*2021-2030*/
+    0x06AA4C, 0x0AD541, 0x24DAB6, 0x04B64A, 0x6A573D, 0x0A4E51, 0x0D2646, 0x5E933A, 0x0D534D, 0x05AA43, /*2021-2030*/
     0x36B537, 0x096D4B, 0xB4AEBF, 0x04AD53, 0x0A4D48, 0x6D25BC, 0x0D254F, 0x0D5244, 0x5DAA38, 0x0B5A4C, /*2031-2040*/
     0x056D41, 0x24ADB6, 0x049B4A, 0x7A4BBE, 0x0A4B51, 0x0AA546, 0x5B52BA, 0x06D24E, 0x0ADA42, 0x355B37, /*2041-2050*/
-    0x09374B, 0x8497C1, 0x049753, 0x064B48, 0x66A53C, 0x0EA54F, 0x06B244, 0x4AB638, 0x0AAE4C, 0x092E42, /*2051-2060*/
+    0x09374B, 0x8497C1, 0x049753, 0x064B48, 0x66A53C, 0x0EA54F, 0x06AA44, 0x4AB638, 0x0AAE4C, 0x092E42, /*2051-2060*/
     0x3C9735, 0x0C9649, 0x7D4ABD, 0x0D4A51, 0x0DA545, 0x55AABA, 0x056A4E, 0x0A6D43, 0x452EB7, 0x052D4B, /*2061-2070*/
     0x8A95BF, 0x0A9553, 0x0B4A47, 0x6B553B, 0x0AD54F, 0x055A45, 0x4A5D38, 0x0A5B4C, 0x052B42, 0x3A93B6, /*2071-2080*/
-    0x069349, 0x7729BD, 0x06AA51, 0x0AD546, 0x54DABA, 0x04B64E, 0x0A5743, 0x452738, 0x0D264A, 0x8E933E, /*2081-2090*/
-    0x0D5252, 0x0DAA47, 0x66B53B, 0x056D4F, 0x04AE45, 0x4A4EB9, 0x0A4D4C, 0x0D1541, 0x2D92B5  /*2091-2099*/
+    0x069349, 0x7729BD, 0x06AA51, 0x0AD546, 0x54DABA, 0x04B64E, 0x0A5743, 0x452738, 0x0D164A, 0x8E933E, /*2081-2090*/
+    0x0D5252, 0x0DAA47, 0x66B53B, 0x056D4F, 0x04AE45, 0x4A4EB9, 0x0A2D4C, 0x0D1541, 0x2D92B5  /*2091-2099*/
 };
 
 static const uint16_t month_total_day[13] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
@@ -104,6 +106,56 @@ static const lv_calendar_festival_t festivals_base_gregorian[] = {
     {"圣诞节", 12, 25},
 };
 
+static const uint64_t solar_terms_data[200] = {
+    0x6aaaa6aa9a5a, 0xaaaaaabaaa6a, 0xaaabbabbafaa, 0x5aa665a65aab, 0x6aaaa6aa9a5a,  /* 1901 ~ 1905 */
+    0xaaaaaaaaaa6a, 0xaaabbabbafaa, 0x5aa665a65aab, 0x6aaaa6aa9a5a, 0xaaaaaaaaaa6a,
+    0xaaabbabbafaa, 0x5aa665a65aab, 0x6aaaa6aa9a56, 0xaaaaaaaa9a5a, 0xaaabaabaaeaa,
+    0x569665a65aaa, 0x5aa6a6a69a56, 0x6aaaaaaa9a5a, 0xaaabaabaaeaa, 0x569665a65aaa,
+    0x5aa6a6a65a56, 0x6aaaaaaa9a5a, 0xaaabaabaaa6a, 0x569665a65aaa, 0x5aa6a6a65a56,
+    0x6aaaa6aa9a5a, 0xaaaaaabaaa6a, 0x555665665aaa, 0x5aa665a65a56, 0x6aaaa6aa9a5a,
+    0xaaaaaabaaa6a, 0x555665665aaa, 0x5aa665a65a56, 0x6aaaa6aa9a5a, 0xaaaaaaaaaa6a,
+    0x555665665aaa, 0x5aa665a65a56, 0x6aaaa6aa9a5a, 0xaaaaaaaaaa6a, 0x555665665aaa,
+    0x5aa665a65a56, 0x6aaaa6aa9a5a, 0xaaaaaaaaaa6a, 0x555665655aaa, 0x569665a65a56,
+    0x6aa6a6aa9a56, 0xaaaaaaaa9a5a, 0x5556556559aa, 0x569665a65a55, 0x6aa6a6a65a56,
+    0xaaaaaaaa9a5a, 0x5556556559aa, 0x569665a65a55, 0x5aa6a6a65a56, 0x6aaaa6aa9a5a,
+    0x5556556555aa, 0x569665a65a55, 0x5aa665a65a56, 0x6aaaa6aa9a5a, 0x55555565556a,
+    0x555665665a55, 0x5aa665a65a56, 0x6aaaa6aa9a5a, 0x55555565556a, 0x555665665a55,
+    0x5aa665a65a56, 0x6aaaa6aa9a5a, 0x55555555556a, 0x555665665a55, 0x5aa665a65a56,
+    0x6aaaa6aa9a5a, 0x55555555556a, 0x555665655a55, 0x5aa665a65a56, 0x6aa6a6aa9a5a,
+    0x55555555456a, 0x555655655a55, 0x5a9665a65a56, 0x6aa6a6a69a5a, 0x55555555456a,
+    0x555655655a55, 0x569665a65a56, 0x6aa6a6a65a56, 0x55555155455a, 0x555655655955,
+    0x569665a65a55, 0x5aa6a5a65a56, 0x15555155455a, 0x555555655555, 0x569665665a55,
+    0x5aa665a65a56, 0x15555155455a, 0x555555655515, 0x555665665a55, 0x5aa665a65a56,
+    0x15555155455a, 0x555555555515, 0x555665665a55, 0x5aa665a65a56, 0x15555155455a,
+    0x555555555515, 0x555665665a55, 0x5aa665a65a56, 0x15555155455a, 0x555555555515,
+    0x555655655a55, 0x5aa665a65a56, 0x15515155455a, 0x555555554515, 0x555655655a55,
+    0x5a9665a65a56, 0x15515151455a, 0x555551554515, 0x555655655a55, 0x569665a65a56,
+    0x155151510556, 0x555551554505, 0x555655655955, 0x569665665a55, 0x155110510556,
+    0x155551554505, 0x555555655555, 0x569665665a55, 0x55110510556, 0x155551554505,
+    0x555555555515, 0x555665665a55, 0x55110510556, 0x155551554505, 0x555555555515,
+    0x555665665a55, 0x55110510556, 0x155551554505, 0x555555555515, 0x555655655a55,
+    0x55110510556, 0x155551554505, 0x555555555515, 0x555655655a55, 0x55110510556,
+    0x155151514505, 0x555555554515, 0x555655655a55, 0x54110510556, 0x155151510505,
+    0x555551554515, 0x555655655a55, 0x14110110556, 0x155110510501, 0x555551554505,
+    0x555555655555, 0x14110110555, 0x155110510501, 0x555551554505, 0x555555555555,
+    0x14110110555, 0x55110510501, 0x155551554505, 0x555555555555, 0x110110555,
+    0x55110510501, 0x155551554505, 0x555555555515, 0x110110555, 0x55110510501,
+    0x155551554505, 0x555555555515, 0x100100555, 0x55110510501, 0x155151514505,
+    0x555555555515, 0x100100555, 0x54110510501, 0x155151514505, 0x555551554515,
+    0x100100555, 0x54110510501, 0x155150510505, 0x555551554515, 0x100100555,
+    0x14110110501, 0x155110510505, 0x555551554505, 0x100055, 0x14110110500,
+    0x155110510501, 0x555551554505, 0x55, 0x14110110500, 0x55110510501,
+    0x155551554505, 0x55, 0x110110500, 0x55110510501, 0x155551554505,
+    0x15, 0x100110500, 0x55110510501, 0x155551554505, 0x555555555515
+};
+
+static const char * solar_terms_name[24] = {
+    "小寒", "大寒", "立春", "雨水", "惊蛰", "春分",
+    "清明节", "谷雨", "立夏", "小满", "芒种", "夏至",
+    "小暑", "大暑", "立秋", "处暑", "白露", "秋分",
+    "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"
+};
+
 /**********************
  *      MACROS
  **********************/
@@ -114,6 +166,8 @@ static const lv_calendar_festival_t festivals_base_gregorian[] = {
 
 void lv_calendar_set_chinese_mode(lv_obj_t * obj, bool en)
 {
+    LV_CHECK_OBJ(obj, &lv_calendar_class, return);
+
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     calendar->use_chinese_calendar = en;
     lv_calendar_set_month_shown(obj, calendar->today.year, calendar->today.month);
@@ -121,12 +175,16 @@ void lv_calendar_set_chinese_mode(lv_obj_t * obj, bool en)
 
 const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)
 {
+    LV_CHECK_ARG(gregorian != NULL, return NULL);
+
     uint16_t i, len;
     lv_calendar_chinese_t chinese_calendar;
-    lv_calendar_gregorian_to_chinese(gregorian, &chinese_calendar);
+    const char * solar_term_name;
 
     if(gregorian->year > 2099 || gregorian->year < 1901)
         return NULL;
+
+    lv_calendar_gregorian_to_chinese(gregorian, &chinese_calendar);
 
     len = sizeof(festivals_base_chinese) / sizeof(lv_calendar_festival_t);
     for(i = 0; i < len; i++) {
@@ -158,6 +216,11 @@ const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)
             return festivals_base_gregorian[i].festival_name;
     }
 
+    solar_term_name = check_solar_term(gregorian->year, gregorian->month, gregorian->day);
+    if(solar_term_name != NULL) {
+        return solar_term_name;
+    }
+
     if(chinese_calendar.today.day == 1) {
         if(chinese_calendar.leep_month == false)
             return chinese_calendar_month_name[chinese_calendar.today.month - 1];
@@ -171,6 +234,9 @@ const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)
 
 void lv_calendar_gregorian_to_chinese(lv_calendar_date_t * gregorian_time, lv_calendar_chinese_t * chinese_time)
 {
+    LV_CHECK_ARG(gregorian_time != NULL, return);
+    LV_CHECK_ARG(chinese_time != NULL, return);
+
     uint16_t year = gregorian_time->year;
     uint8_t month = gregorian_time->month;
     uint8_t day = gregorian_time->day;
@@ -281,5 +347,52 @@ void lv_calendar_gregorian_to_chinese(lv_calendar_date_t * gregorian_time, lv_ca
 /**********************
  *  STATIC FUNCTIONS
  **********************/
+
+/**
+ * Check if a specific date is a solar term
+ * @param year  year
+ * @param month month
+ * @param day   day
+ * @return      solar term name if the date is a solar term, NULL otherwise
+ */
+static const char * check_solar_term(uint16_t year, uint8_t month, uint8_t day)
+{
+    uint8_t i;
+    uint8_t offsets[24];
+    uint8_t term_month, term_day;
+    uint16_t date_value = month * 100 + day;
+    uint8_t char_count_len = 2;
+    uint8_t range_end_num = 24;
+
+    static const uint8_t solar_terms_min_day[24] = {
+        4, 19, 3, 18, 4, 19, 4, 19, 4, 20, 4, 20,
+        6, 22, 6, 22, 6, 22, 7, 22, 6, 21, 6, 21
+    };
+
+    if(year < 1901 || year > 2099) {
+        return NULL;
+    }
+
+    uint64_t data = solar_terms_data[year - 1901];
+
+    /* Uncompress the solar term data for that year */
+    for(i = 0; i < range_end_num; i++) {
+        uint8_t right = char_count_len * (range_end_num - i - 1);
+        uint64_t x = data >> right;
+        offsets[i] = (uint8_t)(x & 0x3u);
+    }
+
+    /* Check whether the date is any solar term. */
+    for(i = 0; i < 24; i++) {
+        term_month = i / 2 + 1;
+        term_day = solar_terms_min_day[i] + offsets[i];
+        uint16_t term_date = (uint16_t)(term_month * 100 + term_day);
+        if(term_date == date_value) {
+            return solar_terms_name[i];
+        }
+    }
+
+    return NULL;
+}
 
 #endif /*LV_USE_CALENDAR_CHINESE*/

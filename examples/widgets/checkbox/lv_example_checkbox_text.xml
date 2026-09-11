@@ -1,0 +1,22 @@
+<!--
+ @title Checkbox text
+ @brief Set the label that appears next to the tick box.
+
+ Three checkboxes share a layout but each carries a different text: a short word, a
+ longer single-line sentence, and a multi-line label using `&#10;` for the line break.
+ The text attribute is what `lv_checkbox_set_text` would set in code, and the gap
+ between tick box and label is controlled by `pad_column` on the main part.
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+		<!-- 💡 Edit each text attribute to see the label update next to the tick box. -->
+		<!-- Short label -->
+		<lv_checkbox name="checkbox_1" text="Enable" />
+
+		<!-- Longer label -->
+		<lv_checkbox name="checkbox_2" text="Send anonymous usage data" />
+
+		<!-- Multi-line label via &amp;#10; -->
+		<lv_checkbox name="checkbox_3" text="I agree to the terms&#10;and the privacy policy" />
+	</view>
+</screen>

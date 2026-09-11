@@ -1,6 +1,84 @@
 ---
 title: Drivers
+description: "LVGL's Linux drivers come in two kinds: display drivers that put pixels on a screen, and input drivers that read touch, mouse and keyboard events. Most setups need one of each."
 ---
 
+## Overview
+
+LVGL's Linux drivers come in two kinds, and most setups need one of each:
+
+- **Display drivers** get rendered pixels onto a screen — or into a texture, or a file.
+- **Input drivers** read touch, mouse and keyboard events.
+
+Some display drivers bring their own input, so pairing is not always necessary. The tables below say which.
+
+If you are not sure which display driver you want, start from
+[Choosing a Display Driver](/integration/embedded_linux#choosing-a-display-driver), which picks one based on
+what your system already has.
+
+## Display Drivers
+
+| Driver | Best for | Rotation | Hardware acceleration | Runtime resolution change | Input |
+|---|---|---|---|---|---|
+| **[fbdev](/integration/embedded_linux/drivers/fbdev)** | Minimal systems exposing only `/dev/fb` | Software | None | No | Pair separately |
+| **[DRM](/integration/embedded_linux/drivers/drm)** | Production embedded targets | EGL backend only | EGL backend | EGL backend only | Pair separately |
+| **[Wayland](/integration/embedded_linux/drivers/wayland)** | Systems running a compositor | Yes, all backends | EGL or G2D backend | Yes | Built in |
+| **[X11](/integration/embedded_linux/drivers/X11)** | Development on an X desktop | None | None | Yes | Built in |
+| **[GLFW](/integration/embedded_linux/drivers/glfw)** | Development with an instant GL context | Hardware | OpenGL ES | No | Built in |
+| **[OpenGL Driver](/integration/embedded_linux/drivers/opengl_driver)** | Embedding LVGL in your own GL application | Hardware | OpenGL ES | Manual | None — you own the window |
+| **[EGL](/integration/embedded_linux/drivers/egl)** | The layer under the accelerated backends, and headless rendering | Hardware | OpenGL ES | Depends on the driver | Depends on the driver |
+
+Each driver page carries a fuller **Support** table, including color formats, multiple-display support and the
+render mode.
+
+<Callout type="info" title="SDL is documented elsewhere">
+The [SDL driver](/integration/pc/sdl) is a perfectly good option on Linux and is often the quickest way to get
+a window during development. Because it is cross-platform it lives under
+[Running on PC](/integration/pc) rather than here. Its
+[draw unit](/integration/embedded_linux/draw_units/draw_sdl) is documented with the other draw units.
+</Callout>
+
+### A note on EGL
+
+[EGL](/integration/embedded_linux/drivers/egl) is not usually a driver you select. It is the OpenGL ES
+platform layer that the DRM, Wayland and SDL drivers use for their hardware-accelerated backends, so
+selecting one of those backends turns it on for you. You reach for the EGL page directly in two cases:
+custom platform integration, and off-screen rendering with no display server at all.
+
+## Input Drivers
+
+| Driver | Best for | Discovery and hotplug | Full keyboard | Touch calibration | Find device by capability |
+|---|---|---|---|---|---|
+| **[evdev](/integration/embedded_linux/drivers/evdev)** | The common case — a known touchscreen or mouse | Yes | No | Yes | No |
+| **[libinput](/integration/embedded_linux/drivers/libinput)** | Text entry, or devices needing quirks | No | Yes, via XKB | Not needed | Yes |
+
+Use **evdev** unless you need real keyboard support — layouts and modifiers — or your device requires
+libinput's quirk handling. evdev is lighter and is the only one of the two with automatic device discovery and
+hotplug.
+
+Pair an input driver with a display driver by attaching it to the display:
+
+```c
+lv_indev_t * touch = lv_evdev_create(LV_INDEV_TYPE_POINTER, "/dev/input/event0");
+lv_indev_set_display(touch, disp);
+```
+
+## Rendering
+
+Drivers decide how a frame reaches the screen; **draw units** decide who rasterizes it. The two are chosen
+independently — see [Draw Units](/integration/embedded_linux/draw_units) and
+[OpenGL Overview](/integration/embedded_linux/opengl).
+
+One consequence worth knowing before you start: on every GPU and compositor path the render mode is fixed by
+the driver rather than configurable, because something other than LVGL owns the buffers. Only the CPU-blit
+drivers — fbdev, X11 and SDL's software backend — let you choose it.
+
+## See Also
+
+- [Choosing a Display Driver](/integration/embedded_linux#choosing-a-display-driver) - decision table
+- [Draw Units](/integration/embedded_linux/draw_units) - who does the rasterizing
+- [OpenGL Overview](/integration/embedded_linux/opengl) - which drivers provide a GL context
+- [Dependency Management](/integration/building/cmake) - how enabling a driver pulls in its libraries
+- [lv_port_linux](https://github.com/lvgl/lv_port_linux) - reference project with every driver preconfigured
 
 <DirectoryIndex />

@@ -1,8 +1,10 @@
 include(FetchContent)
 
-set(FETCHCONTENT_BASE_DIR
-    "${CMAKE_SOURCE_DIR}/.deps"
-    CACHE PATH "Directory for fetched dependencies" FORCE)
+if(NOT DEFINED FETCHCONTENT_BASE_DIR)
+  set(FETCHCONTENT_BASE_DIR
+      "${CMAKE_SOURCE_DIR}/.deps"
+      CACHE PATH "Directory for fetched dependencies" FORCE)
+endif()
 
 find_package(PkgConfig)
 
@@ -11,6 +13,10 @@ if(UNIX AND NOT PkgConfig_FOUND)
     WARNING
       "pkg-config not found - system libraries will only be resolved via find_package. "
       "Install `pkg-config` to improve dependency detection.")
+endif()
+
+if(UNIX)
+  lvgl_link_system_lib(TARGETS m PKG_LIB_PRIVATE -lm)
 endif()
 
 # ====== Draw Units ====== #
@@ -27,11 +33,12 @@ if(CONFIG_LV_USE_SDL)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/sdl2.cmake)
 endif()
 
-if(CONFIG_LV_USE_LINUX_DRM)
+if(CONFIG_LV_USE_LINUX_DRM OR CONFIG_LV_WAYLAND_USE_DMABUF_PROTOCOL)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/drm.cmake)
 endif()
 
-if(CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS OR CONFIG_LV_LINUX_DRM_USE_EGL)
+if(CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS OR CONFIG_LV_LINUX_DRM_USE_EGL OR
+   CONFIG_LV_WAYLAND_USE_DMABUF)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/gbm.cmake)
 endif()
 
@@ -45,6 +52,11 @@ endif()
 
 if(CONFIG_LV_USE_GLFW)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw.cmake)
+endif()
+
+# ====== OS ====== #
+if(CONFIG_LV_USE_NUTTX_LIBUV)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/libuv.cmake)
 endif()
 
 # ====== Indev ====== #

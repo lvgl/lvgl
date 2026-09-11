@@ -1,0 +1,1271 @@
+{
+  "@context": "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+  "@graph": [
+    {
+      "type": "CreationInfo",
+      "@id": "_:creationinfo",
+      "specVersion": "3.0.1",
+      "created": "2026-07-20T16:40:55Z",
+      "createdBy": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft"
+      ],
+      "createdUsing": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Tool-generate_sbom.py"
+      ]
+    },
+    {
+      "type": "Tool",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Tool-generate_sbom.py",
+      "creationInfo": "_:creationinfo",
+      "name": "scripts/generate_sbom.py"
+    },
+    {
+      "type": "expandedlicensing_CustomLicense",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#CustomLicense-LicenseRef_TJpgDec",
+      "creationInfo": "_:creationinfo",
+      "name": "LicenseRef-TJpgDec",
+      "simplelicensing_licenseText": "/*----------------------------------------------------------------------------/\n/ TJpgDec - Tiny JPEG Decompressor R0.03                      (C)ChaN, 2021\n/-----------------------------------------------------------------------------/\n/ The TJpgDec is a generic JPEG decompressor module for tiny embedded systems.\n/ This is a free software that opened for education, research and commercial\n/  developments under license policy of following terms.\n/\n/  Copyright (C) 2021, ChaN, all right reserved.\n/\n/ * The TJpgDec module is a free software and there is NO WARRANTY.\n/ * No restriction on use. You can use, modify and redistribute it for\n/   personal, non-profit or commercial products UNDER YOUR RESPONSIBILITY.\n/ * Redistributions of source code must retain the above copyright notice.\n/\n/-----------------------------------------------------------------------------/\n",
+      "expandedlicensing_isOsiApproved": false
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Apache_2.0",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "Apache-2.0"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_2_Clause",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "BSD-2-Clause"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_3_Clause",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "BSD-3-Clause"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-FTL_OR_GPL_2.0_or_later",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "FTL OR GPL-2.0-or-later"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-LicenseRef_TJpgDec",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "LicenseRef-TJpgDec",
+      "simplelicensing_customIdToUri": [
+        {
+          "type": "DictionaryEntry",
+          "key": "LicenseRef-TJpgDec",
+          "value": "https://lvgl.io/spdx/lvgl-9.6.0-dev#CustomLicense-LicenseRef_TJpgDec"
+        }
+      ]
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "MIT"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_AND_BSD_3_Clause",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "MIT AND BSD-3-Clause"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_OR_Unlicense",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "MIT OR Unlicense"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MPL_2.0",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "MPL-2.0"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-OFL_1.1",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "OFL-1.1"
+    },
+    {
+      "type": "simplelicensing_LicenseExpression",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Zlib",
+      "creationInfo": "_:creationinfo",
+      "simplelicensing_licenseExpression": "Zlib"
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "creationInfo": "_:creationinfo",
+      "name": "lvgl",
+      "summary": "Light and Versatile Graphics Library",
+      "software_packageVersion": "9.6.0-dev",
+      "software_copyrightText": "Copyright (c) 2025 LVGL Kft",
+      "software_downloadLocation": "https://github.com/lvgl/lvgl",
+      "software_homePage": "https://lvgl.io",
+      "software_primaryPurpose": "library",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/lvgl/lvgl@9.6.0-dev"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-barcode",
+      "creationInfo": "_:creationinfo",
+      "name": "Barcode (Barcode generator)",
+      "software_packageVersion": "NOASSERTION",
+      "software_copyrightText": "Copyright (c) 2013-2015 LKC Technologies, Inc.",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/barcode",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LKC-Technologies-Inc",
+      "software_downloadLocation": "https://github.com/fhunleth/code128",
+      "software_homePage": "https://github.com/fhunleth/code128",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/fhunleth/code128"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-freetype",
+      "creationInfo": "_:creationinfo",
+      "name": "FreeType (Font rendering library)",
+      "software_packageVersion": "NOASSERTION",
+      "software_copyrightText": "Copyright (C) 1996-2022 by David Turner, Robert Wilhelm, and Werner Lemberg (The FreeType Project)",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/freetype | Only the interfaces are used; FreeType itself is not part of LVGL.",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-The-FreeType-Project",
+      "software_downloadLocation": "https://github.com/freetype/freetype",
+      "software_homePage": "https://github.com/freetype/freetype",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/freetype/freetype"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-liberation-sans",
+      "creationInfo": "_:creationinfo",
+      "name": "Liberation Sans (default demo font)",
+      "software_packageVersion": "NOASSERTION",
+      "software_copyrightText": "Digitized data copyright (c) 2010 Google Corporation with Reserved Font Arimo, Tinos and Cousine; Copyright (c) 2012 Red Hat, Inc. with Reserved Font Name Liberation.",
+      "software_primaryPurpose": "file",
+      "comment": "In-tree path: src/libs/freetype/LiberationSans-Regular.ttf | Font asset bundled alongside the FreeType interface; licensed separately from FreeType.",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Red-Hat-Inc",
+      "software_downloadLocation": "https://github.com/liberationfonts/liberation-fonts",
+      "software_homePage": "https://github.com/liberationfonts/liberation-fonts",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/liberationfonts/liberation-fonts"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lodepng",
+      "creationInfo": "_:creationinfo",
+      "name": "LodePNG (PNG decoder)",
+      "software_packageVersion": "20230410",
+      "software_copyrightText": "Copyright (c) 2005-2023 Lode Vandevenne",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/lodepng",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Lode-Vandevenne",
+      "software_downloadLocation": "https://github.com/lvandeve/lodepng",
+      "software_homePage": "https://github.com/lvandeve/lodepng",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/lvandeve/lodepng@20230410"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lz4",
+      "creationInfo": "_:creationinfo",
+      "name": "LZ4 (Compression/Decompression)",
+      "software_packageVersion": "1.10.0",
+      "software_copyrightText": "Copyright (c) 2011-2023 Yann Collet",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/lz4",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Yann-Collet",
+      "software_downloadLocation": "https://github.com/lz4/lz4",
+      "software_homePage": "https://github.com/lz4/lz4",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/lz4/lz4@1.10.0"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qrcode",
+      "creationInfo": "_:creationinfo",
+      "name": "QR Code (QR code generator)",
+      "software_packageVersion": "NOASSERTION",
+      "software_copyrightText": "Copyright (c) Project Nayuki. (MIT License)",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/qrcode",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Project-Nayuki",
+      "software_downloadLocation": "https://github.com/nayuki/QR-Code-generator",
+      "software_homePage": "https://github.com/nayuki/QR-Code-generator",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/nayuki/QR-Code-generator"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-thorvg",
+      "creationInfo": "_:creationinfo",
+      "name": "ThorVG (Vector graphics rendering)",
+      "software_packageVersion": "0.15.3",
+      "software_copyrightText": "Copyright (c) 2020 - 2025 notice for the ThorVG Project (see CONTRIBUTORS)",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/thorvg",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-The-ThorVG-Project",
+      "software_downloadLocation": "https://github.com/thorvg/thorvg",
+      "software_homePage": "https://github.com/thorvg/thorvg",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/thorvg/thorvg@0.15.3"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-rapidjson",
+      "creationInfo": "_:creationinfo",
+      "name": "RapidJSON (JSON parser/generator)",
+      "software_packageVersion": "1.1.0",
+      "software_copyrightText": "Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.; Copyright (c) 2006-2013 Alexander Chemeris (msinttypes)",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/thorvg/rapidjson | Bundled inside the ThorVG tree (used by ThorVG's Lottie parser); licensed separately from ThorVG. The bundled msinttypes helper (rapidjson/msinttypes) is BSD-3-Clause (Copyright (c) 2006-2013 Alexander Chemeris), hence the combined license expression.",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-THL-A29-Limited-a-Tencent-company",
+      "software_downloadLocation": "https://github.com/Tencent/rapidjson",
+      "software_homePage": "https://github.com/Tencent/rapidjson",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/Tencent/rapidjson@1.1.0"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tiny_ttf",
+      "creationInfo": "_:creationinfo",
+      "name": "TinyTTF",
+      "software_packageVersion": "1.26",
+      "software_copyrightText": "Copyright (c) 2017 Sean Barrett; Copyright (c) 2022 honey the codewitch",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/tiny_ttf | Additional source: https://github.com/codewitch-honey-crisis/tiny_ttf (Modified version of the original STB library)",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Sean-Barrett",
+      "software_downloadLocation": "https://github.com/nothings/stb",
+      "software_homePage": "https://github.com/nothings/stb",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/nothings/stb@1.26"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tjpgd",
+      "creationInfo": "_:creationinfo",
+      "name": "TJPGD (JPEG decoder)",
+      "software_packageVersion": "R0.03",
+      "software_copyrightText": "Copyright (C) 2021, ChaN, all right reserved.",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/tjpgd",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-ChaN",
+      "software_downloadLocation": "http://elm-chan.org/fsw/tjpgd/00index.html",
+      "software_homePage": "http://elm-chan.org/fsw/tjpgd/00index.html",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:generic/tjpgd?download_url=http://elm-chan.org/fsw/tjpgd/00index.html"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tlsf",
+      "creationInfo": "_:creationinfo",
+      "name": "TLSF (Two-Level Segregate Fit memory allocator)",
+      "software_packageVersion": "3.1",
+      "software_copyrightText": "Copyright (c) 2006-2016 Matthew Conte",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/stdlib/builtin",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Matthew-Conte",
+      "software_downloadLocation": "https://github.com/mattconte/tlsf",
+      "software_homePage": "https://github.com/mattconte/tlsf",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/mattconte/tlsf@3.1"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-printf",
+      "creationInfo": "_:creationinfo",
+      "name": "Printf (Printf formatting library)",
+      "software_packageVersion": "NOASSERTION",
+      "software_copyrightText": "Copyright (c) 2014 Marco Paland",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/stdlib/builtin",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Marco-Paland",
+      "software_downloadLocation": "https://github.com/mpaland/printf",
+      "software_homePage": "https://github.com/mpaland/printf",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/mpaland/printf"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-ft800-ft813",
+      "creationInfo": "_:creationinfo",
+      "name": "FT800-FT813 (EVE GPU driver)",
+      "software_packageVersion": "5.0",
+      "software_copyrightText": "Copyright (c) 2016-2024 Rudolph Riedel",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/FT800-FT813",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Rudolph-Riedel",
+      "software_downloadLocation": "https://github.com/RudolphRiedel/FT800-FT813",
+      "software_homePage": "https://github.com/RudolphRiedel/FT800-FT813",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/RudolphRiedel/FT800-FT813@5.0"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-gif",
+      "creationInfo": "_:creationinfo",
+      "name": "AnimatedGIF (GIF decoder library)",
+      "software_packageVersion": "NOASSERTION",
+      "software_copyrightText": "Copyright (c) 2020 BitBank Software, Inc. All rights reserved.",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/gif",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-BitBank-Software-Inc",
+      "software_downloadLocation": "https://github.com/bitbank2/AnimatedGIF",
+      "software_homePage": "https://github.com/bitbank2/AnimatedGIF",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/bitbank2/AnimatedGIF"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-nanovg",
+      "creationInfo": "_:creationinfo",
+      "name": "NanoVG (Anti-aliased vector graphics rendering)",
+      "software_packageVersion": "NOASSERTION",
+      "software_copyrightText": "Copyright (c) 2013 Mikko Mononen memon@inside.org",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/nanovg | Compiled when LV_USE_NANOVG (or the LV_USE_DRAW_NANOVG backend) is enabled.",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Mikko-Mononen",
+      "software_downloadLocation": "https://github.com/memononen/nanovg",
+      "software_homePage": "https://github.com/memononen/nanovg",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/memononen/nanovg"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-frogfs",
+      "creationInfo": "_:creationinfo",
+      "name": "FrogFS (read-only filesystem)",
+      "software_packageVersion": "1.0",
+      "software_copyrightText": "Copyright (c) Jeff Kent",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/frogfs",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Jeff-Kent",
+      "software_downloadLocation": "https://github.com/jkent/frogfs",
+      "software_homePage": "https://github.com/jkent/frogfs",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/jkent/frogfs@1.0"
+        }
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-barcode",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-barcode"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-barcode",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-barcode",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_2_Clause"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-barcode",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-barcode",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_2_Clause"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-freetype",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-freetype"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-freetype",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-freetype",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-FTL_OR_GPL_2.0_or_later"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-freetype",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-freetype",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-FTL_OR_GPL_2.0_or_later"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-liberation-sans",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-liberation-sans"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-liberation-sans",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-liberation-sans",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-OFL_1.1"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-liberation-sans",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-liberation-sans",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-OFL_1.1"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-lodepng",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lodepng"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lodepng",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lodepng",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Zlib"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lodepng",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lodepng",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Zlib"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-lz4",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lz4"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lz4",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lz4",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_2_Clause"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lz4",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lz4",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_2_Clause"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-qrcode",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qrcode"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-qrcode",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qrcode",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-qrcode",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qrcode",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-thorvg",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-thorvg"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-thorvg",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-thorvg",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-thorvg",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-thorvg",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-rapidjson",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-rapidjson"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-rapidjson",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-rapidjson",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_AND_BSD_3_Clause"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-rapidjson",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-rapidjson",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_AND_BSD_3_Clause"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tiny_ttf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tiny_ttf"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tiny_ttf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tiny_ttf",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_OR_Unlicense"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tiny_ttf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tiny_ttf",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_OR_Unlicense"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tjpgd",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tjpgd"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tjpgd",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tjpgd",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-LicenseRef_TJpgDec"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tjpgd",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tjpgd",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-LicenseRef_TJpgDec"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tlsf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tlsf"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tlsf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tlsf",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_3_Clause"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tlsf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tlsf",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_3_Clause"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-printf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-printf"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-printf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-printf",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-printf",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-printf",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-ft800-ft813",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-ft800-ft813"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-ft800-ft813",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-ft800-ft813",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-ft800-ft813",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-ft800-ft813",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-gif",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-gif"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-gif",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-gif",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Apache_2.0"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-gif",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-gif",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Apache_2.0"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-nanovg",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-nanovg"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-nanovg",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-nanovg",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Zlib"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-nanovg",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-nanovg",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Zlib"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-frogfs",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-frogfs"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-frogfs",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-frogfs",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MPL_2.0"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-frogfs",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-frogfs",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MPL_2.0"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lvgl",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lvgl",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft",
+      "creationInfo": "_:creationinfo",
+      "name": "LVGL Kft"
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LKC-Technologies-Inc",
+      "creationInfo": "_:creationinfo",
+      "name": "LKC Technologies, Inc."
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-The-FreeType-Project",
+      "creationInfo": "_:creationinfo",
+      "name": "The FreeType Project"
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Red-Hat-Inc",
+      "creationInfo": "_:creationinfo",
+      "name": "Red Hat, Inc."
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Lode-Vandevenne",
+      "creationInfo": "_:creationinfo",
+      "name": "Lode Vandevenne"
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Yann-Collet",
+      "creationInfo": "_:creationinfo",
+      "name": "Yann Collet"
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Project-Nayuki",
+      "creationInfo": "_:creationinfo",
+      "name": "Project Nayuki"
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-The-ThorVG-Project",
+      "creationInfo": "_:creationinfo",
+      "name": "The ThorVG Project"
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-THL-A29-Limited-a-Tencent-company",
+      "creationInfo": "_:creationinfo",
+      "name": "THL A29 Limited, a Tencent company"
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Sean-Barrett",
+      "creationInfo": "_:creationinfo",
+      "name": "Sean Barrett"
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-ChaN",
+      "creationInfo": "_:creationinfo",
+      "name": "ChaN"
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Matthew-Conte",
+      "creationInfo": "_:creationinfo",
+      "name": "Matthew Conte"
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Marco-Paland",
+      "creationInfo": "_:creationinfo",
+      "name": "Marco Paland"
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Rudolph-Riedel",
+      "creationInfo": "_:creationinfo",
+      "name": "Rudolph Riedel"
+    },
+    {
+      "type": "Organization",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-BitBank-Software-Inc",
+      "creationInfo": "_:creationinfo",
+      "name": "BitBank Software, Inc."
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Mikko-Mononen",
+      "creationInfo": "_:creationinfo",
+      "name": "Mikko Mononen"
+    },
+    {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Jeff-Kent",
+      "creationInfo": "_:creationinfo",
+      "name": "Jeff Kent"
+    },
+    {
+      "type": "software_Sbom",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#SBOM",
+      "creationInfo": "_:creationinfo",
+      "software_sbomType": [
+        "source"
+      ],
+      "rootElement": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl"
+      ],
+      "element": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Tool-generate_sbom.py",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#CustomLicense-LicenseRef_TJpgDec",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Apache_2.0",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_2_Clause",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_3_Clause",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-FTL_OR_GPL_2.0_or_later",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-LicenseRef_TJpgDec",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_AND_BSD_3_Clause",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_OR_Unlicense",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MPL_2.0",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-OFL_1.1",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Zlib",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-barcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-freetype",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-liberation-sans",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lodepng",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lz4",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qrcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-thorvg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-rapidjson",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tiny_ttf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tjpgd",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tlsf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-printf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-ft800-ft813",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-gif",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-nanovg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-barcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-barcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-barcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-freetype",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-freetype",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-freetype",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-liberation-sans",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-liberation-sans",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-liberation-sans",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-lodepng",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lodepng",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lodepng",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-lz4",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lz4",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lz4",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-qrcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-qrcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-qrcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-thorvg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-thorvg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-thorvg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-rapidjson",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-rapidjson",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-rapidjson",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tiny_ttf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tiny_ttf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tiny_ttf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tjpgd",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tjpgd",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tjpgd",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tlsf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tlsf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tlsf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-printf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-printf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-printf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-ft800-ft813",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-ft800-ft813",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-ft800-ft813",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-gif",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-gif",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-gif",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-nanovg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-nanovg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-nanovg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lvgl",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lvgl",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LKC-Technologies-Inc",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-The-FreeType-Project",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Red-Hat-Inc",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Lode-Vandevenne",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Yann-Collet",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Project-Nayuki",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-The-ThorVG-Project",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-THL-A29-Limited-a-Tencent-company",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Sean-Barrett",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-ChaN",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Matthew-Conte",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Marco-Paland",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Rudolph-Riedel",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-BitBank-Software-Inc",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Mikko-Mononen",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Jeff-Kent"
+      ]
+    },
+    {
+      "type": "SpdxDocument",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#SPDXDocument",
+      "creationInfo": "_:creationinfo",
+      "name": "LVGL 9.6.0-dev SBOM",
+      "profileConformance": [
+        "core",
+        "software",
+        "simpleLicensing",
+        "expandedLicensing"
+      ],
+      "rootElement": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#SBOM"
+      ],
+      "element": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Tool-generate_sbom.py",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#CustomLicense-LicenseRef_TJpgDec",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Apache_2.0",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_2_Clause",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-BSD_3_Clause",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-FTL_OR_GPL_2.0_or_later",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-LicenseRef_TJpgDec",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_AND_BSD_3_Clause",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT_OR_Unlicense",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MPL_2.0",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-OFL_1.1",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-Zlib",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-barcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-freetype",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-liberation-sans",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lodepng",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lz4",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qrcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-thorvg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-rapidjson",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tiny_ttf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tjpgd",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-tlsf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-printf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-ft800-ft813",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-gif",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-nanovg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-barcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-barcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-barcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-freetype",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-freetype",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-freetype",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-liberation-sans",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-liberation-sans",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-liberation-sans",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-lodepng",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lodepng",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lodepng",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-lz4",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lz4",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lz4",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-qrcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-qrcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-qrcode",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-thorvg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-thorvg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-thorvg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-rapidjson",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-rapidjson",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-rapidjson",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tiny_ttf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tiny_ttf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tiny_ttf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tjpgd",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tjpgd",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tjpgd",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-tlsf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-tlsf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-tlsf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-printf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-printf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-printf",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-ft800-ft813",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-ft800-ft813",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-ft800-ft813",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-gif",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-gif",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-gif",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-nanovg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-nanovg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-nanovg",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lvgl",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lvgl",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LKC-Technologies-Inc",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-The-FreeType-Project",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Red-Hat-Inc",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Lode-Vandevenne",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Yann-Collet",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Project-Nayuki",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-The-ThorVG-Project",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-THL-A29-Limited-a-Tencent-company",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Sean-Barrett",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-ChaN",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Matthew-Conte",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Marco-Paland",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Rudolph-Riedel",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-BitBank-Software-Inc",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Mikko-Mononen",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Jeff-Kent",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#SBOM"
+      ]
+    }
+  ]
+}

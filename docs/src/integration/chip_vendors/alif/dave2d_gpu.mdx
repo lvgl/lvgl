@@ -1,5 +1,44 @@
 ---
 title: Dave2D GPU
+description: "Alif Ensemble chips contain a D/AVE 2D GPU. LVGL's Dave2D draw unit accelerates rendering on them without any application-side changes."
+faqs:
+  - question: "Do Alif chips have a GPU that LVGL can use?"
+    answer: "Yes. Alif Ensemble devices contain a TES D/AVE 2D GPU, and LVGL's Dave2D draw unit renders through the same D/AVE 2D driver API, so no Alif-specific draw unit is needed."
+  - question: "How do I enable the GPU in an Alif project?"
+    answer: "Set LV_USE_DRAW_DAVE2D to 1 in lv_conf.h. The alif_m55-lvgl example project already has it enabled."
+  - question: "Which drawing operations are accelerated?"
+    answer: "Rectangles including gradients, images with scaling and rotation, letters, triangles, and lines. Everything else is rendered by the software renderer."
 ---
 
+Alif Ensemble chips contain a [D/AVE 2D](https://www.renesas.com/document/mas/tes-dave2d-driver-documentation)
+GPU. LVGL renders on it through the same **Dave2D** [draw unit](/main-modules/draw) that is used on
+Renesas devices, because both platforms expose the same D/AVE 2D driver API. No Alif-specific draw
+unit is required.
 
+## Usage
+
+Set <ApiLink name="LV_USE_DRAW_DAVE2D" /> to `1` in your `lv_conf.h`:
+
+```c
+#define LV_USE_DRAW_DAVE2D 1
+```
+
+The [alif_m55-lvgl](https://github.com/alifsemi/alif_m55-lvgl) project used in the
+[Overview](/integration/chip_vendors/alif/overview) guide already has the draw unit enabled, so it
+accelerates rendering out of the box.
+
+## Accelerated Operations
+
+The draw unit offloads most of LVGL's drawing operations to the GPU while the CPU stays free for
+the rest of the application:
+
+- Rectangle drawing, even with gradients
+- Image drawing, scaling, and rotation
+- Letter drawing
+- Triangle drawing
+- Line drawing
+
+Anything the GPU cannot handle is rendered by LVGL's software renderer.
+
+The draw unit itself, its supported image color formats, and its tuning options are described on
+the [Renesas Dave2D GPU](/integration/chip_vendors/renesas/dave2d_gpu) page.

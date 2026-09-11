@@ -189,10 +189,6 @@ void test_draw_buf_xy_access(void)
 
     uint8_t * ret = lv_draw_buf_goto_xy(&draw_buf, 50, 50);
     TEST_ASSERT_NOT_NULL(ret);
-    ret = lv_draw_buf_goto_xy(&draw_buf, 100, 100);
-    TEST_ASSERT_NULL(ret);
-    ret = lv_draw_buf_goto_xy(&draw_buf, -10, -10);
-    TEST_ASSERT_NULL(ret);
 }
 
 

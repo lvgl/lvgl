@@ -30,7 +30,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_tileview_tile_class;
 
 /**
  * Create a tileview object
- * @param parent      pointer to an object, it will be the parent of the new tileview
+ * @param parent      pointer to a parent widget @nullable. When NULL, the widget
+ *                    is created as a screen on the default display.
  * @return            pointer to the created tileview
  */
 lv_obj_t * lv_tileview_create(lv_obj_t * parent);
@@ -47,11 +48,11 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
 
 /**
  * Set the active tile in the tileview.
- * @param parent      pointer to the tileview object
+ * @param obj         pointer to the tileview object
  * @param tile_obj    pointer to the tile object to be set as active
  * @param anim_en     animation enable flag (LV_ANIM_ON or LV_ANIM_OFF)
  */
-void lv_tileview_set_tile(lv_obj_t * tv, lv_obj_t * tile_obj, lv_anim_enable_t anim_en);
+void lv_tileview_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t anim_en);
 
 /**
  * Set the active tile by index in the tileview

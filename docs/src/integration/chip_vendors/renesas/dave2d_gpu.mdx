@@ -1,5 +1,73 @@
 ---
 title: Dave2D GPU
+description: "Dave2D is the 2D GPU of the Renesas RA and RZ/A devices. LVGL has a built-in draw unit for it that offloads most drawing operations from the CPU."
+faqs:
+  - question: "How do I enable the Dave2D GPU in LVGL?"
+    answer: "Set LV_USE_DRAW_DAVE2D to 1 in lv_conf.h. The D/AVE 2D driver also has to be added to the project in the FSP configurator, because the LVGL draw unit includes the FSP headers bsp_api.h and dave_driver.h."
+  - question: "Do I have to change my drawing code to use Dave2D?"
+    answer: "No. Dave2D is a draw unit, so LVGL dispatches the supported drawing tasks to it automatically and renders the rest with the CPU. The result is identical, only faster."
+  - question: "Which image color formats are accelerated?"
+    answer: "A8, RGB565, ARGB1555, ARGB4444, ARGB8888, and XRGB8888. The 3 byte RGB888 format is not supported by the hardware, so images in other formats are drawn by the software renderer."
+  - question: "How much CPU time does Dave2D save?"
+    answer: "In practice CPU usage during rendering drops to one half or one third, depending on how much of the screen is covered by accelerated operations."
 ---
 
+[Dave2D](https://www.renesas.com/document/mas/tes-dave2d-driver-documentation) (also written as
+D/AVE 2D) is the 2D GPU found in Renesas RA and RZ/A devices. LVGL contains a built-in draw
+unit for it, so the accelerated operations are dispatched to the GPU while the CPU is free to
+run the rest of the application.
 
+## Accelerated Operations
+
+Dave2D can accelerate most of the [drawing](/main-modules/draw) operations of LVGL:
+
+- Rectangle drawing, even with gradients
+- Image drawing, scaling, and rotation
+- Letter drawing
+- Triangle drawing
+- Line drawing
+
+Everything that Dave2D cannot handle is rendered by LVGL's software renderer, so no operation
+is lost by enabling the GPU.
+
+## Prerequisites
+
+- The **D/AVE 2D** driver needs to be added to the project in the `Configuration Window` of
+  e² studio. The LVGL draw unit includes the FSP headers `bsp_api.h` and `dave_driver.h`, so
+  missing this step causes a compilation error.
+- The boards LVGL maintains a project for already have the driver configured. See the
+  [RA Family](/integration/chip_vendors/renesas/ra_family) and
+  [RZ/A Family](/integration/chip_vendors/renesas/rza_family) pages.
+
+## Usage
+
+Set <ApiLink name="LV_USE_DRAW_DAVE2D" /> to `1` in your `lv_conf.h`:
+
+```c
+#define LV_USE_DRAW_DAVE2D 1
+```
+
+There is nothing else to do. No platform-specific function needs to be implemented and no
+drawing code needs to be changed.
+
+### Supported image color formats
+
+Images are accelerated in the following color formats:
+
+- <ApiLink name="LV_COLOR_FORMAT_A8" />
+- <ApiLink name="LV_COLOR_FORMAT_RGB565" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB1555" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB4444" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />
+- <ApiLink name="LV_COLOR_FORMAT_XRGB8888" />
+
+<Callout type="info">
+<ApiLink name="LV_COLOR_FORMAT_RGB888" /> is a 3 byte format, while the matching Dave2D mode is
+a 4 byte format. Therefore RGB888 images are drawn by the software renderer.
+</Callout>
+
+### Fine-tuning
+
+`LV_DAVE2D_MAX_DRAW_PRESSURE` controls how many pending drawing tasks are collected into one
+display list before it is submitted to the GPU. Its default value is `256`, which is also the
+minimum; with smaller values the Dave engine may crash.

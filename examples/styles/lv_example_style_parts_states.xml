@@ -1,0 +1,32 @@
+<!--
+ @title Parts and states
+ @brief Style one part normally and again for a state with `selector`.
+
+ `selector="indicator"` gives the slider's filled part a violet→pink
+ gradient. `selector="pressed|indicator"` adds a glow that applies only
+ while the indicator is pressed, so the same part carries one base look
+ plus a state-specific overlay — the core of LVGL's part/state model.
+-->
+<screen>
+	<styles>
+		<!-- Indicator, any state: gradient fill -->
+		<style
+			name="style_indicator"
+			bg_opa="100%"
+			bg_color="0x8b5cf6"
+			bg_grad_color="0xec4899"
+			bg_grad_dir="hor"
+			radius="10"
+		/>
+		<!-- Indicator, pressed only: soft glow -->
+		<style name="style_indicator_pressed" shadow_color="0xec4899" shadow_width="18" shadow_spread="2" />
+	</styles>
+
+	<view>
+		<!-- 💡 Press and hold the slider: the indicator keeps its gradient but gains the pressed glow. -->
+		<lv_slider name="slider" align="center" width="220" height="16" min_value="0" max_value="100" value="65">
+			<style name="style_indicator" selector="indicator" />
+			<style name="style_indicator_pressed" selector="pressed|indicator" />
+		</lv_slider>
+	</view>
+</screen>

@@ -7,11 +7,11 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_event_private.h"
+#include "../lvgl_public.h"
 #include "lv_obj_event_private.h"
 #include "lv_obj_class_private.h"
 #include "lv_obj_private.h"
 #include "../indev/lv_indev_private.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -28,7 +28,9 @@
 static lv_result_t event_send_core(lv_event_t * e);
 static bool event_is_bubbled(lv_event_t * e);
 static bool event_is_trickled(lv_event_t * e);
-static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * arr, uint32_t len);
+#if LV_USE_CHECK_ARG
+    static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * arr, uint32_t len);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -49,9 +51,7 @@ static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * ar
 
 lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 {
-    LV_CHECK_ARG(obj != NULL, return LV_RESULT_OK);
-
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     lv_event_t e;
     e.current_target = obj;
@@ -106,7 +106,7 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
     LV_CHECK_ARG(event_cb != NULL, return NULL);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     if(!lv_obj_allocate_spec_attr(obj)) {
         return NULL;
@@ -148,7 +148,6 @@ bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc)
 uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
     LV_CHECK_ARG(obj != NULL, return 0);
-    LV_CHECK_ARG(event_cb != NULL, return 0);
 
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t removed_count = 0;
@@ -158,7 +157,7 @@ uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 
     for(i = event_cnt - 1; i >= 0; i--) {
         lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
-        if(dsc && dsc->cb == event_cb) {
+        if(dsc && (event_cb == NULL || dsc->cb == event_cb)) {
             lv_obj_remove_event(obj, i);
             removed_count++;
         }
@@ -170,7 +169,6 @@ uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
 {
     LV_CHECK_ARG(obj != NULL, return 0);
-    LV_CHECK_ARG(event_cb != NULL, return 0);
 
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t removed_count = 0;
@@ -191,120 +189,156 @@ uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t eve
 
 lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
 {
+    LV_CHECK_ARG(e != NULL, return NULL);
     return lv_event_get_current_target(e);
 }
 
 lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
 {
+    LV_CHECK_ARG(e != NULL, return NULL);
     return lv_event_get_target(e);
 }
 
 lv_indev_t * lv_event_get_indev(lv_event_t * e)
 {
+    LV_CHECK_ARG(e != NULL, return NULL);
+#if LV_USE_CHECK_ARG
     static const lv_event_code_t indev_codes[] = {
         LV_EVENT_PRESSED,           LV_EVENT_PRESSING,          LV_EVENT_PRESS_LOST,
         LV_EVENT_SHORT_CLICKED,     LV_EVENT_LONG_PRESSED,      LV_EVENT_LONG_PRESSED_REPEAT,
         LV_EVENT_CLICKED,           LV_EVENT_RELEASED,
         LV_EVENT_SCROLL_BEGIN,      LV_EVENT_SCROLL_END,        LV_EVENT_SCROLL,
-        LV_EVENT_GESTURE,           LV_EVENT_KEY,
+        LV_EVENT_GESTURE,           LV_EVENT_GESTURE_UP,        LV_EVENT_GESTURE_DOWN,
+        LV_EVENT_GESTURE_LEFT,      LV_EVENT_GESTURE_RIGHT,
+        LV_EVENT_KEY,
         LV_EVENT_FOCUSED,           LV_EVENT_DEFOCUSED,         LV_EVENT_LEAVE,
         LV_EVENT_HOVER_OVER,        LV_EVENT_HOVER_LEAVE,
     };
-    LV_CHECK_ARG(event_code_in_array(e->code, indev_codes, sizeof(indev_codes) / sizeof(indev_codes[0])),
-                 return NULL, "invalid event code %" LV_PRId32, (int32_t)e->code);
+#endif
+    LV_CHECK_ARG_FORMAT_MSG(
+        event_code_in_array(e->code, indev_codes, sizeof(indev_codes) / sizeof(indev_codes[0])),
+        return NULL,
+        "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 lv_layer_t * lv_event_get_layer(lv_event_t * e)
 {
+    LV_CHECK_ARG(e != NULL, return NULL);
+#if LV_USE_CHECK_ARG
     static const lv_event_code_t draw_codes[] = {
         LV_EVENT_DRAW_MAIN,     LV_EVENT_DRAW_MAIN_BEGIN,   LV_EVENT_DRAW_MAIN_END,
         LV_EVENT_DRAW_POST,     LV_EVENT_DRAW_POST_BEGIN,   LV_EVENT_DRAW_POST_END,
     };
-    LV_CHECK_ARG(event_code_in_array(e->code, draw_codes, sizeof(draw_codes) / sizeof(draw_codes[0])),
-                 return NULL, "invalid event code %" LV_PRId32, (int32_t)e->code);
+#endif
+    LV_CHECK_ARG_FORMAT_MSG(
+        event_code_in_array(e->code, draw_codes, sizeof(draw_codes) / sizeof(draw_codes[0])),
+        return NULL,
+        "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 const lv_area_t * lv_event_get_old_size(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_SIZE_CHANGED, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return NULL);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_SIZE_CHANGED,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 uint32_t lv_event_get_key(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_KEY, return 0,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return 0);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_KEY,
+                            return 0,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     uint32_t * k = lv_event_get_param(e);
     return k ? *k : 0;
 }
 
 int32_t lv_event_get_rotary_diff(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_ROTARY, return 0,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return 0);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_ROTARY,
+                            return 0,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     int32_t * r = lv_event_get_param(e);
     return r ? *r : 0;
 }
 
 lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_SCROLL_BEGIN, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return NULL);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_SCROLL_BEGIN,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE, return,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE,
+                            return,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     int32_t * cur_size = lv_event_get_param(e);
     *cur_size = LV_MAX(*cur_size, size);
 }
 
 lv_point_t * lv_event_get_self_size_info(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_GET_SELF_SIZE, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return NULL);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_GET_SELF_SIZE,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 lv_hit_test_info_t * lv_event_get_hit_test_info(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_HIT_TEST, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return NULL);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_HIT_TEST,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 const lv_area_t * lv_event_get_cover_area(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_COVER_CHECK, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return NULL);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_COVER_CHECK,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     lv_cover_check_info_t * p = lv_event_get_param(e);
     return p->area;
 }
 
 void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_COVER_CHECK, return,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_COVER_CHECK,
+                            return,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     lv_cover_check_info_t * p = lv_event_get_param(e);
     if(res > p->res) p->res = res;  /*Save only "stronger" results*/
 }
 
 lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_DRAW_TASK_ADDED, return NULL,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return NULL);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_DRAW_TASK_ADDED,
+                            return NULL,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
 }
 
 lv_state_t lv_event_get_prev_state(lv_event_t * e)
 {
-    LV_CHECK_ARG(e->code == LV_EVENT_STATE_CHANGED, return 0,
-                 "invalid event code %" LV_PRId32, (int32_t)e->code);
+    LV_CHECK_ARG(e != NULL, return 0);
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_STATE_CHANGED,
+                            return 0,
+                            "invalid event code %" LV_PRId32, (int32_t)e->code);
     lv_state_t * state = lv_event_get_param(e);
     return state ? *state : 0;
 }
@@ -380,7 +414,7 @@ static bool event_is_bubbled(lv_event_t * e)
     }
 
     /*Check other codes only if bubbling is enabled*/
-    if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_BUBBLE) == false) return false;
+    if(lv_obj_is_event_bubble(e->current_target) == false) return false;
 
     switch(e->code) {
         case LV_EVENT_HIT_TEST:
@@ -412,7 +446,7 @@ static bool event_is_trickled(lv_event_t * e)
     if(e->stop_trickling) return false;
 
     /*Check other codes only if trickle is enabled*/
-    if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_TRICKLE) == false) return false;
+    if(lv_obj_is_event_trickle(e->current_target) == false) return false;
 
     switch(e->code) {
         case LV_EVENT_HIT_TEST:
@@ -439,6 +473,7 @@ static bool event_is_trickled(lv_event_t * e)
     }
 }
 
+#if LV_USE_CHECK_ARG
 static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * arr, uint32_t len)
 {
     uint32_t i;
@@ -447,3 +482,4 @@ static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * ar
     }
     return false;
 }
+#endif

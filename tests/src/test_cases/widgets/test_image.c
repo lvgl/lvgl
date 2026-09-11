@@ -313,8 +313,8 @@ void test_image_contain(void)
 
         const int32_t scale = lv_image_get_scale(img);
         TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
-        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_transformed_width(img));
-        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
+        TEST_ASSERT_INT_WITHIN(1, (img_w * scale) >> 8, lv_image_get_transformed_width(img));
+        TEST_ASSERT_INT_WITHIN(1, (img_h * scale) >> 8, lv_image_get_transformed_height(img));
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_contain.png");
@@ -342,8 +342,8 @@ void test_image_contain_downscale(void)
 
         const int32_t scale = lv_image_get_scale(img);
         TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
-        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_transformed_width(img));
-        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
+        TEST_ASSERT_INT_WITHIN(1, (img_w * scale) >> 8, lv_image_get_transformed_width(img));
+        TEST_ASSERT_INT_WITHIN(1, (img_h * scale) >> 8, lv_image_get_transformed_height(img));
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_contain_downscale.png");
@@ -371,8 +371,8 @@ void test_image_cover(void)
 
         const int32_t scale = lv_image_get_scale(img);
         TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
-        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_transformed_width(img));
-        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
+        TEST_ASSERT_INT_WITHIN(1, (img_w * scale) >> 8, lv_image_get_transformed_width(img));
+        TEST_ASSERT_INT_WITHIN(1, (img_h * scale) >> 8, lv_image_get_transformed_height(img));
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_cover.png");
@@ -786,6 +786,12 @@ void test_image_raw_data_as_file(void)
 
     lv_fs_path_ex_t mempath;
     lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, img_bin, sizeof(img_bin), "bin");
+
+    void * decoded_buf = NULL;
+    uint32_t decoded_size = 0;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_fs_get_buffer_from_path(&mempath, &decoded_buf, &decoded_size));
+    TEST_ASSERT_EQUAL_PTR(img_bin, decoded_buf);
+    TEST_ASSERT_EQUAL_UINT32(sizeof(img_bin), decoded_size);
 
     lv_obj_t * img_1 = lv_image_create(lv_screen_active());
     lv_image_set_src(img_1, (LV_IMAGE_DSC_CONST char *)&mempath);

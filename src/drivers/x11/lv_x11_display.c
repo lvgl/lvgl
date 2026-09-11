@@ -23,14 +23,6 @@
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
 
-#if LV_X11_RENDER_MODE_PARTIAL
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
-#elif defined LV_X11_RENDER_MODE_DIRECT
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
-#elif defined LV_X11_RENDER_MODE_FULL
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -74,7 +66,7 @@ typedef struct {
 typedef lv_color32_t color_t;
 static inline lv_color32_t get_px(color_t p)
 {
-    return (lv_color32_t)p;
+    return p;
 }
 #elif LV_COLOR_DEPTH == 24
 typedef lv_color_t color_t;
@@ -120,7 +112,7 @@ static void x11_reset_flush_area(x11_disp_data_t * xd)
 static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT(xd != NULL);
 
     /* build display update area until lv_display_flush_is_last */
     xd->flush_area.x1 = MIN(xd->flush_area.x1, area->x1);
@@ -168,7 +160,7 @@ static void x11_resolution_evt_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_user_data(e);
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT(xd != NULL);
 
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
@@ -224,7 +216,7 @@ static void x11_disp_delete_evt_cb(lv_event_t * e)
 static void x11_hide_cursor(lv_display_t * disp)
 {
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT(xd != NULL);
 
     XColor black = { .red = 0, .green = 0, .blue = 0 };
     char empty_data[] = { 0 };
@@ -252,7 +244,7 @@ static void x11_event_handler(lv_timer_t * t)
 {
     lv_display_t * disp = lv_timer_get_user_data(t);
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT(xd != NULL);
 
     /* handle all outstanding X events */
     XEvent event;
@@ -293,7 +285,7 @@ static void x11_event_handler(lv_timer_t * t)
 static void * x11_tick_thread(void * data)
 {
     x11_disp_data_t * xd = data;
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT(xd != NULL);
 
     while(!xd->terminated) {
         usleep(5000);
@@ -305,7 +297,7 @@ static void * x11_tick_thread(void * data)
 static void x11_window_create(lv_display_t * disp, char const * title)
 {
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT(xd != NULL);
 
     /* setup display/screen */
     xd->hdr.display = XOpenDisplay(NULL);
@@ -363,6 +355,8 @@ static void x11_window_create(lv_display_t * disp, char const * title)
 
 lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t ver_res)
 {
+    LV_CHECK_ARG(title != NULL, return NULL);
+
     x11_disp_data_t * xd = lv_malloc_zeroed(sizeof(x11_disp_data_t));
     LV_ASSERT_MALLOC(xd);
     if(NULL == xd) return NULL;

@@ -11,14 +11,17 @@ from .lv_animimg import LVAnimimg
 from .lv_arc import LVArc
 from .lv_arclabel import LVArclabel
 from .lv_bar import LVBar
+from .lv_canvas import LVCanvas
+from .lv_barcode import LVBarcode
 from .lv_button import LVButton
 from .lv_buttonmatrix import LVButtonmatrix
 from .lv_calendar import LVCalendar
-from .lv_canvas import LVCanvas
 from .lv_chart import LVChart
 from .lv_checkbox import LVCheckbox
 from .lv_dropdown import LVDropdown
 from .lv_dropdown_list import LVDropdownList
+from .lv_ffmpeg_player import LVFfmpegPlayer
+from .lv_gstreamer import LVGstreamer
 from .lv_imagebutton import LVImagebutton
 from .lv_ime_pinyin import LVImePinyin
 from .lv_keyboard import LVKeyboard
@@ -28,6 +31,7 @@ from .lv_line import LVLine
 from .lv_menu import LVMenu
 from .lv_menu_page import LVMenuPage
 from .lv_msgbox import LVMsgbox
+from .lv_qrcode import LVQrcode
 from .lv_roller import LVRoller
 from .lv_scale import LVScale
 from .lv_slider import LVSlider
@@ -49,14 +53,17 @@ WIDGET_REGISTRY: dict[str, type] = {
     "lv_arc": LVArc,
     "lv_arclabel": LVArclabel,
     "lv_bar": LVBar,
+    "lv_canvas": LVCanvas,
+    "lv_barcode": LVBarcode,
     "lv_button": LVButton,
     "lv_buttonmatrix": LVButtonmatrix,
     "lv_calendar": LVCalendar,
-    "lv_canvas": LVCanvas,
     "lv_chart": LVChart,
     "lv_checkbox": LVCheckbox,
     "lv_dropdown": LVDropdown,
     "lv_dropdown_list": LVDropdownList,
+    "lv_ffmpeg_player": LVFfmpegPlayer,
+    "lv_gstreamer": LVGstreamer,
     "lv_imagebutton": LVImagebutton,
     "lv_ime_pinyin": LVImePinyin,
     "lv_keyboard": LVKeyboard,
@@ -66,6 +73,7 @@ WIDGET_REGISTRY: dict[str, type] = {
     "lv_menu": LVMenu,
     "lv_menu_page": LVMenuPage,
     "lv_msgbox": LVMsgbox,
+    "lv_qrcode": LVQrcode,
     "lv_roller": LVRoller,
     "lv_scale": LVScale,
     "lv_slider": LVSlider,
@@ -105,14 +113,17 @@ __all__ = [
     "LVArc",
     "LVArclabel",
     "LVBar",
+    "LVCanvas",
+    "LVBarcode",
     "LVButton",
     "LVButtonmatrix",
     "LVCalendar",
-    "LVCanvas",
     "LVChart",
     "LVCheckbox",
     "LVDropdown",
     "LVDropdownList",
+    "LVFfmpegPlayer",
+    "LVGstreamer",
     "LVImagebutton",
     "LVImePinyin",
     "LVKeyboard",
@@ -122,6 +133,7 @@ __all__ = [
     "LVMenu",
     "LVMenuPage",
     "LVMsgbox",
+    "LVQrcode",
     "LVRoller",
     "LVScale",
     "LVSlider",

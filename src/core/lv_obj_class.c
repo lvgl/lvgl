@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_class_private.h"
+#include "../lvgl_public.h"
 #include "lv_obj_private.h"
 #include "../display/lv_display_private.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -83,13 +83,13 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         /*Set coordinates to full screen size*/
         obj->coords.x1 = 0;
         obj->coords.y1 = 0;
-        obj->coords.x2 = lv_display_get_horizontal_resolution(NULL) - 1;
-        obj->coords.y2 = lv_display_get_vertical_resolution(NULL) - 1;
+        obj->coords.x2 = lv_display_get_horizontal_resolution(disp) - 1;
+        obj->coords.y2 = lv_display_get_vertical_resolution(disp) - 1;
     }
     /*Create a normal object*/
     else {
         LV_TRACE_OBJ_CREATE("creating normal object");
-        LV_ASSERT_OBJ(parent, MY_CLASS);
+        LV_CHECK_OBJ(parent, MY_CLASS, return NULL);
 
         if(!lv_obj_allocate_spec_attr(parent)) {
             lv_free(obj);
@@ -190,7 +190,7 @@ bool lv_obj_is_group_def(const lv_obj_t * obj)
 #if LV_USE_EXT_DATA
 void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void * data))
 {
-    LV_CHECK_ARG(obj != NULL, return, "Can't attach external user data and destructor callback to a NULL object");
+    LV_CHECK_ARG_MSG(obj != NULL, return, "Can't attach external user data and destructor callback to a NULL object");
 
     obj->ext_data.data = data;
     obj->ext_data.free_cb = free_cb;

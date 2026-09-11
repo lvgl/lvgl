@@ -1,0 +1,167 @@
+---
+title: LovyanGFX Driver
+description: "Use LVGL with a LovyanGFX display configuration."
+---
+
+## Overview
+
+The LovyanGFX driver lets LVGL render through a user-provided
+[LovyanGFX](https://github.com/lovyan03/LovyanGFX) display class. It is intended
+for Arduino-style C++ environments where LovyanGFX already knows how to initialize
+the display bus, panel, backlight, and optional touch controller.
+
+The driver is a thin bridge between LVGL and LovyanGFX:
+
+- it creates an LVGL display with <ApiLink name="lv_display_create" />
+- it creates an `LGFX` instance from the header selected by `LV_LGFX_USER_INCLUDE`
+- it initializes LovyanGFX, DMA, rotation, brightness, and clears the display
+- it flushes LVGL draw buffers with LovyanGFX `pushImageDMA()`
+- it maps LVGL display rotation to LovyanGFX rotation values `0` to `3`
+- when requested, it creates an LVGL pointer input device and reads touch data with `getTouch()`
+
+## Prerequisites
+
+Add LovyanGFX to your project and create a LovyanGFX configuration header that
+defines an `LGFX` class. The class normally inherits from `lgfx::LGFX_Device`
+and configures your panel, bus, backlight, and touch controller.
+
+LovyanGFX provides a complete pattern in its
+[`2_user_setting.ino`](https://github.com/lovyan03/LovyanGFX/blob/master/examples/HowToUse/2_user_setting/2_user_setting.ino)
+example. LVGL also ships `src/drivers/display/lovyan_gfx/lv_lgfx_user.hpp` as a
+starting point.
+
+## Configure LVGL
+
+Enable the driver and point `LV_LGFX_USER_INCLUDE` at your configuration header:
+
+```c
+#define LV_USE_LOVYAN_GFX 1
+#define LV_LGFX_USER_INCLUDE "my_display.hpp"
+```
+
+The selected header must be reachable from the compiler include path. For example,
+Arduino users often keep the header as another sketch tab, while PlatformIO users
+often place it in the project's `include/` directory.
+
+## Configuration Options
+
+The user include can provide `LGFX` in three ways:
+
+- Use a board supported by LovyanGFX. Enable the matching LovyanGFX board macro
+  and include `LGFX_AUTODETECT.hpp`.
+- Use display and touch drivers supported by LovyanGFX, but not a complete board
+  preset. Define `LGFX` as a class derived from `lgfx::LGFX_Device` and configure
+  the LovyanGFX bus, panel, backlight, and touch objects yourself.
+- Use hardware not supported by LovyanGFX. Define an `LGFX`-compatible wrapper
+  class around another display driver and implement the methods called by
+  `lv_lovyan_gfx.cpp`.
+
+The shipped `lv_lgfx_user.hpp` contains a short example for each path. Copy it
+into your project or use it as the value of `LV_LGFX_USER_INCLUDE`, then select
+the path with `LV_LGFX_TYPE`:
+
+```c
+#define LV_LGFX_TYPE LV_LGFX_USE_LOVYAN_BOARD
+```
+
+## The `LGFX` Class
+
+The driver includes `LV_LGFX_USER_INCLUDE` and expects that header to define a
+default-constructible class named `LGFX`.
+
+For a normal LovyanGFX setup, that class should provide the LovyanGFX API used by
+the LVGL bridge:
+
+```cpp
+class LGFX : public lgfx::LGFX_Device {
+public:
+    LGFX();
+};
+```
+
+If you wrap another graphics library behind an `LGFX`-compatible class, implement
+the same methods used by `lv_lovyan_gfx.cpp`.
+
+## Usage
+
+Include LVGL, initialize it, provide a draw buffer, and create the display:
+
+```cpp
+#include <lvgl.h>
+
+#define HOR_RES 320
+#define VER_RES 480
+#define BUF_SIZE (HOR_RES * 40 * 2)
+
+static uint8_t draw_buf[BUF_SIZE];
+
+static uint32_t my_tick(void)
+{
+    return millis();
+}
+
+void setup()
+{
+    lv_init();
+    lv_tick_set_cb(my_tick);
+
+    lv_display_t * disp = lv_lovyan_gfx_create(HOR_RES, VER_RES, draw_buf, sizeof(draw_buf), true);
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Hello LovyanGFX");
+    lv_obj_center(label);
+}
+
+void loop()
+{
+    lv_timer_handler();
+    delay(5);
+}
+```
+
+The `touch` argument controls whether the driver registers an LVGL pointer input
+device:
+
+```cpp
+lv_lovyan_gfx_create(HOR_RES, VER_RES, draw_buf, sizeof(draw_buf), false);
+```
+
+Use `false` when the configured `LGFX` class has no touch controller or when you
+want to register input devices yourself.
+
+## Color Format and Buffer Size
+
+The driver sets the LVGL display color format to
+<ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED" /> and uses
+<ApiLink name="LV_DISPLAY_RENDER_MODE_PARTIAL" />.
+
+Pass the buffer size in bytes. For RGB565, one pixel is 2 bytes, so a partial
+buffer for `40` display rows is:
+
+```cpp
+static uint8_t draw_buf[HOR_RES * 40 * 2];
+```
+
+Increase the row count for fewer flushes, or reduce it when RAM is limited.
+
+## Platform Notes
+
+For Arduino, install both LVGL and LovyanGFX from the Arduino Library Manager or
+as ZIP libraries, then keep your `LGFX` configuration header next to the sketch.
+
+For PlatformIO, add both libraries to `platformio.ini` and make sure the directory
+containing your `LGFX` configuration header is in the include path:
+
+```ini
+lib_deps =
+    lvgl/lvgl
+    lovyan03/LovyanGFX
+
+build_flags =
+    -I include
+```
+
+See the [Arduino](/integration/frameworks/arduino) and
+[PlatformIO](/integration/frameworks/platformio) integration pages for general
+LVGL project setup.

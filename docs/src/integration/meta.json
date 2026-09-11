@@ -2,6 +2,7 @@
   "title": "Integration",
   "pages": [
     "overview",
+    "configuration",
     "pc",
     "embedded_linux",
     "rtos",

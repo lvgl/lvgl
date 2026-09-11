@@ -14,15 +14,16 @@ class LVCanvas(LVImage):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_canvas_t", ptr=True) or self
+        self._wv_lv_canvas_t = self.cast("lv_canvas_t", ptr=True) or self
+        self._wv = self._wv_lv_canvas_t
 
     @property
     def draw_buf(self):
-        return ptr_or_none(self._wv.safe_field("draw_buf"))
+        return ptr_or_none(self._wv_lv_canvas_t.safe_field("draw_buf"))
 
     @property
     def static_buf(self):
-        return safe_wrapper(self._wv, "static_buf", "lvglgdb.lvgl.draw.lv_draw_buf", "LVDrawBuf")
+        return safe_wrapper(self._wv_lv_canvas_t, "static_buf", "lvglgdb.lvgl.draw.lv_draw_buf", "LVDrawBuf")
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

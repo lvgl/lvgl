@@ -1,0 +1,79 @@
+<!--
+ @title Scrollbar mode
+ @brief Compare an always-hidden scrollbar with an always-visible one.
+
+ Two identical overflowing panels differ only in `scrollbar_mode`: the
+ left one is `off` (scrollable, but the bar is never drawn), the right
+ one is `on` (the bar is always drawn even when idle). The other modes
+ are `auto` (bar only while scrollable) and `active` (bar only while
+ actively scrolling).
+-->
+<screen>
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="12"
+	>
+		<!-- 💡 Both panels scroll; only the right one ever shows a scrollbar. -->
+		<lv_obj
+			name="container_1"
+			width="100%"
+			height="160"
+			flex_flow="row"
+			style_flex_main_place="center"
+			style_pad_column="16"
+		>
+			<!-- scrollbar_mode="off": scrolls, bar never shown -->
+			<lv_obj
+				name="container_2"
+				width="130"
+				height="100%"
+				flex_flow="column"
+				style_pad_row="8"
+				scrollbar_mode="off"
+			>
+				<lv_label name="label_1" text="mode: off" />
+				<lv_button name="button_1" width="100%">
+					<lv_label name="label_2" align="center" text="A" />
+				</lv_button>
+				<lv_button name="button_2" width="100%">
+					<lv_label name="label_3" align="center" text="B" />
+				</lv_button>
+				<lv_button name="button_3" width="100%">
+					<lv_label name="label_4" align="center" text="C" />
+				</lv_button>
+				<lv_button name="button_4" width="100%">
+					<lv_label name="label_5" align="center" text="D" />
+				</lv_button>
+			</lv_obj>
+
+			<!-- scrollbar_mode="on": bar always visible -->
+			<lv_obj
+				name="container_3"
+				width="130"
+				height="100%"
+				flex_flow="column"
+				style_pad_row="8"
+				scrollbar_mode="on"
+				style_bg_color-scrollbar="0x9429ff"
+				style_bg_opa-scrollbar="100%"
+			>
+				<lv_label name="label_6" text="mode: on" />
+				<lv_button name="button_5" width="100%">
+					<lv_label name="label_7" align="center" text="A" />
+				</lv_button>
+				<lv_button name="button_6" width="100%">
+					<lv_label name="label_8" align="center" text="B" />
+				</lv_button>
+				<lv_button name="button_7" width="100%">
+					<lv_label name="label_9" align="center" text="C" />
+				</lv_button>
+				<lv_button name="button_8" width="100%">
+					<lv_label name="label_10" align="center" text="D" />
+				</lv_button>
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>

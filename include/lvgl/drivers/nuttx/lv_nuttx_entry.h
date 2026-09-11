@@ -64,13 +64,13 @@ void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc);
 /**
  * Initialize the LVGL display driver for NuttX using the provided configuration information.
  * @param dsc Pointer to the lv_nuttx_dsc_t structure containing the configuration information for the display driver.
- * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler.
+ * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler. @nullable
  */
 void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result);
 
 /**
  * Deinitialize the LVGL display driver for NuttX.
- * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler.
+ * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler. @nullable
  */
 void lv_nuttx_deinit(lv_nuttx_result_t * result);
 

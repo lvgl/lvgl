@@ -49,6 +49,7 @@ lv_display_t * lv_windows_create_display(
     bool allow_dpi_override,
     bool simulator_mode)
 {
+    LV_CHECK_ARG(title != NULL, return NULL);
     lv_windows_create_display_data_t data;
 
     lv_memzero(&data, sizeof(lv_windows_create_display_data_t));
@@ -88,6 +89,7 @@ lv_display_t * lv_windows_create_display(
 
 HWND lv_windows_get_display_window_handle(lv_display_t * display)
 {
+    LV_CHECK_ARG(display != NULL, return NULL);
     return (HWND)lv_display_get_driver_data(display);
 }
 
@@ -119,7 +121,7 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
     void * parameter)
 {
     lv_windows_create_display_data_t * data = parameter;
-    LV_ASSERT_NULL(data);
+    LV_ASSERT(data != NULL);
 
     DWORD window_style = WS_OVERLAPPEDWINDOW;
     DWORD ext_window_style = WS_EX_CLIENTEDGE;
@@ -164,7 +166,9 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
     ShowWindow(window_handle, SW_SHOW);
     UpdateWindow(window_handle);
 
-    LV_ASSERT(SetEvent(data->mutex));
+    BOOL event_set = SetEvent(data->mutex);
+    LV_ASSERT(event_set);
+    LV_UNUSED(event_set);
 
     data = NULL;
 

@@ -4,6 +4,9 @@
 
 #include "unity/unity.h"
 
+/* These tests exercise the deprecated lv_list widget on purpose. */
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static lv_obj_t * list;
 
 void setUp(void)
@@ -119,5 +122,7 @@ void test_list_translation_tag(void)
     TEST_ASSERT_EQUAL_STRING(lv_list_get_button_text(list, list_button), "rabbit");
 
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

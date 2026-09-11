@@ -1,0 +1,13 @@
+# Test configuration to be added on top of builtin_heap.defconfig.
+
+CONFIG_LV_USE_MEM_MONITOR=y
+CONFIG_LV_OBJ_STYLE_CACHE=y
+
+# Non power of 2 so that we do not accidentally rely on the alignment
+# lv_malloc() happens to return.
+CONFIG_LV_DRAW_BUF_ALIGN=852
+
+# Exercise the generic widget property get/set API. Only covered here because it
+# relies on C11 anonymous structs and unions, so the build cannot be pedantic.
+CONFIG_LV_USE_OBJ_PROPERTY=y
+CONFIG_LV_USE_OBJ_PROPERTY_NAME=y

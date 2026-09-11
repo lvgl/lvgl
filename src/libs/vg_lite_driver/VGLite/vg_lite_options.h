@@ -31,9 +31,21 @@
 #include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
-    #define VG_LITE_OPTIONS VG_LITE_OPTIONS_2
-    #define VG_LITE_OPTIONS_2  <../VGLite/Series/LV_VG_LITE_HAL_GPU_SERIES/LV_VG_LITE_HAL_GPU_REVISION/vg_lite_options.h>
-    #include VG_LITE_OPTIONS
+    #if LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC255_0X40A
+        #include <../VGLite/Series/gc255/0x40A/vg_lite_options.h>
+    #elif LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC355_0X0_1215
+        #include <../VGLite/Series/gc355/0x0_1215/vg_lite_options.h>
+    #elif LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC355_0X0_1216
+        #include <../VGLite/Series/gc355/0x0_1216/vg_lite_options.h>
+    #elif LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC555_0X423
+        #include <../VGLite/Series/gc555/0x423/vg_lite_options.h>
+    #elif LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC555_0X423_ECO
+        #include <../VGLite/Series/gc555/0x423_ECO/vg_lite_options.h>
+    #elif LV_VG_LITE_GPU == LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
+        #include <../VGLite/Series/gcnanoultrav/0x1003/vg_lite_options.h>
+    #else
+        #error "Unknown LV_VG_LITE_GPU; select a supported VG-Lite GPU in your config"
+    #endif
 
 #endif /* LV_USE_VG_LITE_DRIVER */
 

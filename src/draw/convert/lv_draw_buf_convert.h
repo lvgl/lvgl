@@ -26,9 +26,9 @@ extern "C" {
 
 /**
  * Convert draw_buf  to premultiplied format
- * @param buf     pointer to a draw buf
+ * @param draw_buf pointer to a draw buf
  */
-lv_result_t lv_draw_buf_convert_premultiply(lv_draw_buf_t * buf);
+lv_result_t lv_draw_buf_convert_premultiply(lv_draw_buf_t * draw_buf);
 
 
 #ifdef __cplusplus

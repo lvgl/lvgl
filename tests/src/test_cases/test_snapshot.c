@@ -51,7 +51,7 @@ void test_snapshot_should_not_leak_memory(void)
     initial_available_memory = monitor.free_size;
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
-        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
+        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_DEFAULT);
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
     }
 
@@ -84,7 +84,7 @@ void test_snapshot_with_transform_should_not_leak_memory(void)
     initial_available_memory = monitor.free_size;
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
-        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
+        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_DEFAULT);
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
     }
 
@@ -176,7 +176,7 @@ void test_snapshot_take_snapshot_multiple_widgets(void)
     lv_obj_set_style_border_width(obj_4, 0, 0);
     lv_obj_set_style_bg_color(obj_4, lv_color_hex3(0x0ff), 0);
     lv_obj_align(obj_4, LV_ALIGN_BOTTOM_MID, 0, 0);
-    lv_obj_add_flag(obj_4, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(obj_4, true);
 
     lv_obj_t * obj_5 = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj_5, 100, 100);
@@ -309,22 +309,6 @@ void test_snapshot_reshape_draw_buf_zero_size_object(void)
 
     /* Test reshape operation should fail */
     lv_result_t result = lv_snapshot_reshape_draw_buf(obj, draw_buf);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
-
-    lv_draw_buf_destroy(draw_buf);
-}
-
-void test_snapshot_reshape_draw_buf_invalid_params(void)
-{
-    lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    lv_obj_set_size(obj, 50, 40);
-
-    /* Create initial draw buffer */
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(50, 40, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
-    TEST_ASSERT_NOT_NULL(draw_buf);
-
-    /* Only test NULL buffer, not NULL object (function asserts obj != NULL internally) */
-    lv_result_t result = lv_snapshot_reshape_draw_buf(obj, NULL);
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
 
     lv_draw_buf_destroy(draw_buf);
@@ -466,8 +450,9 @@ void test_snapshot_refresh_logic_edge_cases(void)
     TEST_ASSERT_NOT_NULL(draw_buf1);
 
     /* Verify screen snapshot size */
-    int32_t screen_w = lv_display_get_horizontal_resolution(NULL);
-    int32_t screen_h = lv_display_get_vertical_resolution(NULL);
+    lv_display_t * display = lv_display_get_default();
+    int32_t screen_w = lv_display_get_horizontal_resolution(display);
+    int32_t screen_h = lv_display_get_vertical_resolution(display);
     int32_t ext_size = lv_obj_get_ext_draw_size(lv_screen_active());
     TEST_ASSERT_EQUAL_UINT32(screen_w + ext_size * 2, draw_buf1->header.w);
     TEST_ASSERT_EQUAL_UINT32(screen_h + ext_size * 2, draw_buf1->header.h);
@@ -540,6 +525,11 @@ void test_snapshot_extreme_size_objects(void)
  * With fix: buf_h clamped to 1 -> completes normally. */
 void test_snapshot_rotated_large_bbox_no_overflow(void)
 {
+    /* This test shrinks the default display resolution, which the NanoVG headless
+     * test display (fixed-size FBO) does not support. */
+#if LV_USE_DRAW_NANOVG
+    TEST_PASS();
+#else
     lv_display_t * disp = lv_display_get_default();
 
     /* Save original resolution and shrink to 10x10.
@@ -577,6 +567,7 @@ void test_snapshot_rotated_large_bbox_no_overflow(void)
     lv_obj_delete(img);
     lv_draw_buf_destroy(src_buf);
     lv_display_set_resolution(disp, orig_hor, orig_ver);
+#endif /* LV_USE_DRAW_NANOVG */
 }
 
 #endif

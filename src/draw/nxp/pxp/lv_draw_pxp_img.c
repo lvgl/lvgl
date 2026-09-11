@@ -15,12 +15,11 @@
 
 #include "lv_draw_pxp.h"
 
-#if LV_USE_PXP
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 #include "../../lv_draw_image_private.h"
-#include "../../lv_image_decoder_private.h"
+#include "../../../image/lv_image_decoder_private.h"
 
 #include <math.h>
 
@@ -93,11 +92,11 @@ static void _pxp_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, clipped_img_area);
+    rel_clip_area = *clipped_img_area;
     lv_area_move(&rel_clip_area, -img_coords->x1, -img_coords->y1);
 
     lv_area_t rel_img_coords;
-    lv_area_copy(&rel_img_coords, img_coords);
+    rel_img_coords = *img_coords;
     lv_area_move(&rel_img_coords, -img_coords->x1, -img_coords->y1);
 
     const uint8_t * src_buf = decoded->data;
@@ -339,4 +338,3 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t d
 }
 
 #endif /*LV_USE_DRAW_PXP*/
-#endif /*LV_USE_PXP*/

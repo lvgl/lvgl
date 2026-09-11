@@ -1,0 +1,149 @@
+---
+title: LVGL Pro and XML
+description: "LVGL's XML-based declarative UI, the LVGL Pro Editor, CLI, Online Share, and Figma plugin are now documented at lvgl.io/docs/pro."
+---
+
+## XML documentation has moved to the LVGL Pro Docs
+
+The full documentation for LVGL's **XML-based declarative UI**, the **LVGL Pro
+Editor**, the **CLI**, **Online Share**, and the **Figma plugin** now lives in the
+LVGL Pro Docs:
+
+**[LVGL Pro Documentation is now at lvgl.io/docs/pro](https://lvgl.io/docs/pro)**
+
+The Open Docs (this site) still cover the LVGL C library, widgets, styles, and
+integrations. Anything related to authoring UIs in XML, the LVGL Editor, and the
+surrounding tooling has been promoted to its own dedicated documentation under
+**LVGL Pro**.
+
+---
+
+## What you can find in the Pro Docs
+
+Use the links below to jump straight to the topic you were searching for. Every
+page that used to live under `/xml/...` on the Open Docs has a direct counterpart
+in the Pro Docs.
+
+### Introduction & getting started
+
+- [Introduction to LVGL Pro](https://lvgl.io/docs/pro) — overview of the XML
+  Editor, Online Share, CLI, and Figma plugin.
+- [Learn by Examples](https://lvgl.io/docs/pro/learn-by-examples) — Hello
+  World, components, assets, screens, layouts, data binding, translations, and
+  animations tutorials, runnable in
+  [viewer.lvgl.io](https://viewer.lvgl.io/).
+
+### XML language
+
+- [XML overview](https://lvgl.io/docs/pro/syntax/introduction) — declarative
+  UI, version-control-friendly plain text, reusable patterns, AI-friendly,
+  runtime-loadable, cross-platform.
+- [XML syntax](https://lvgl.io/docs/pro/syntax/overview) — elements,
+  attributes, references, and the `<widget>`, `<component>`, `<screen>` root
+  tags.
+
+### UI elements (XML tags)
+
+- [Widgets](https://lvgl.io/docs/pro/syntax/widgets) (`<widget>`) — core
+  building blocks compiled into the application as C code; can have a rich
+  `set`/`get`/`add` API.
+- [Components](https://lvgl.io/docs/pro/syntax/components) (`<component>`) —
+  reusable elements built from widgets and other components, loadable from XML
+  at runtime.
+- [Screens](https://lvgl.io/docs/pro/syntax/screens) (`<screen>`) — top-level
+  views referenced by screen load events.
+- [View](https://lvgl.io/docs/pro/syntax/view) — the visible tree inside a
+  component or screen.
+- [API](https://lvgl.io/docs/pro/syntax/api) — exposing properties on
+  components.
+- [Constants](https://lvgl.io/docs/pro/syntax/constants) (`consts`) — named
+  values reusable across XML files.
+- [Styles](https://lvgl.io/docs/pro/syntax/styles) — defining and applying
+  LVGL styles in XML.
+- [Animations](https://lvgl.io/docs/pro/syntax/animations) — timeline-based
+  animations triggered from events.
+- [Events](https://lvgl.io/docs/pro/syntax/events) — wiring UI events to
+  actions and callbacks.
+- [Preview](https://lvgl.io/docs/pro/syntax/preview) — pixel-perfect preview
+  of components and screens.
+
+### Assets
+
+- [Images](https://lvgl.io/docs/pro/syntax/images) — declaring and referencing
+  image assets.
+- [Fonts](https://lvgl.io/docs/pro/syntax/fonts) — declaring and using fonts
+  in XML.
+
+### Features
+
+- [Subjects](https://lvgl.io/docs/pro/syntax/data-binding) — data bindings
+  between UI elements and shared state.
+- [Translations](https://lvgl.io/docs/pro/syntax/translations) — multi-language
+  text with preview support.
+- [Tests](https://lvgl.io/docs/pro/syntax/testing) — describing UI tests in
+  XML and running them in CI/CD.
+- **`globals.xml`** — globally available styles, constants, images, fonts, and
+  subjects for data bindings.
+
+### Integration
+
+See [Integration in the Pro Docs](https://lvgl.io/docs/pro/integration) for full
+coverage of the topics below.
+
+- **C code export** — generating C source from XML using the Editor or CLI.
+- **Runtime XML loading** — parsing XML at runtime without recompiling.
+- **Zephyr** integration.
+- **Arduino** integration.
+- **Renesas dev tools** integration.
+
+### Tools
+
+- [LVGL Editor](https://lvgl.io/docs/pro/editor) — desktop XML editor with
+  autocomplete, syntax highlighting, live preview, inspector mode, C code
+  generation, and Figma integration.
+- [CLI](https://lvgl.io/docs/pro/cli) — command-line tool to validate XML
+  files, generate C code, and run UI tests in CI/CD pipelines.
+- [Online Share](https://lvgl.io/docs/pro/online-viewer)
+  ([viewer.lvgl.io](https://viewer.lvgl.io/)) — browser-based viewer that
+  loads XML files directly from a GitHub repository, no setup required.
+- [Figma plugin](https://lvgl.io/docs/pro/figma) — extract style properties
+  from Figma elements and sync them into the Editor or via the CLI.
+
+### Editor
+
+- [Installation](https://lvgl.io/docs/pro/editor/installation),
+  [user interface](https://lvgl.io/docs/pro/editor/user-interface), and
+  [hotkeys](https://lvgl.io/docs/pro/editor/hotkeys) for the LVGL Pro Editor.
+
+---
+
+## Quick reference: what is the LVGL XML format?
+
+LVGL's XML Module implements LVGL's **declarative UI** by letting you describe
+user interfaces in XML. Advantages over a pure drag-and-drop workflow:
+
+- **Familiar syntax** — works like HTML, easy to learn and read.
+- **Version-control friendly** — plain text with human-readable diffs, no
+  binary files.
+- **Easy to share** — copy, paste, and send as text.
+- **Reusable patterns** — copy snippets across projects.
+- **Automation-ready** — scripts and CI/CD can process XML effortlessly.
+- **AI-compatible** — LLMs can read, generate, and refactor XML.
+- **Modular by design** — reusable components for structured UIs.
+- **Fast to edit** — quicker to type than to drag and drop.
+- **Runtime loading** — parse XML at runtime without recompiling.
+- **Cross-platform** — the same XML works across all LVGL targets.
+
+The three root tags are:
+
+- `<widget>` — compiled-in custom widgets with C logic and a rich API.
+- `<component>` — XML-only reusable elements, loadable at runtime.
+- `<screen>` — top-level screens, loadable at runtime.
+
+XML files can either be **loaded at runtime** by LVGL or **converted to C
+code** using the LVGL Editor or CLI.
+
+---
+
+For everything else — full reference, tutorials, screenshots, and downloads —
+head to **[lvgl.io/docs/pro](https://lvgl.io/docs/pro)**.

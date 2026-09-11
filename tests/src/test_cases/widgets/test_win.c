@@ -3,6 +3,9 @@
 #include "../../lvgl_private.h"
 #include "unity/unity.h"
 
+/* These tests exercise the deprecated lv_win widget on purpose. */
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * win = NULL;
 static lv_obj_t * header = NULL;
@@ -157,5 +160,7 @@ void test_win_add_multiple_elements(void)
     // Check the output remains visually consistent
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/win_02.png");
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

@@ -1,0 +1,47 @@
+<!--
+ @title Scroll snapping
+ @brief Snap children to the centre, and opt one child out of snapping.
+
+ The row panel sets `scroll_snap_x="center"`, so when a drag is released
+ the nearest panel animates to the centre. The third button sets
+ `snappable="false"`, removing it from the snap candidates: scrolling
+ glides over it and lands on a neighbouring, snappable panel instead.
+-->
+<screen>
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="12"
+	>
+		<!-- 💡 Release a drag — panels snap to centre; "No snap" is skipped because `snappable="false"`. -->
+		<lv_obj name="container" width="290" height="150" flex_flow="row" style_pad_column="10" scroll_snap_x="center">
+			<lv_button name="button_1" width="120" height="100%" scroll_on_focus="false">
+				<lv_label name="label_1" align="center" text="Panel 1" />
+			</lv_button>
+			<lv_button name="button_2" width="120" height="100%" scroll_on_focus="false">
+				<lv_label name="label_2" align="center" text="Panel 2" />
+			</lv_button>
+			<lv_button
+				name="button_3"
+				width="120"
+				height="100%"
+				snappable="false"
+				style_bg_color="0x9429ff"
+				scroll_on_focus="false"
+			>
+				<lv_label name="label_3" align="center" text="No snap" />
+			</lv_button>
+			<lv_button name="button_4" width="120" height="100%" scroll_on_focus="false">
+				<lv_label name="label_4" align="center" text="Panel 4" />
+			</lv_button>
+			<lv_button name="button_5" width="120" height="100%" scroll_on_focus="false">
+				<lv_label name="label_5" align="center" text="Panel 5" />
+			</lv_button>
+			<lv_button name="button_6" width="120" height="100%" scroll_on_focus="false">
+				<lv_label name="label_6" align="center" text="Panel 6" />
+			</lv_button>
+		</lv_obj>
+	</view>
+</screen>

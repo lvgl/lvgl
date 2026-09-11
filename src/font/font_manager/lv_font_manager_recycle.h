@@ -60,7 +60,8 @@ lv_font_t * lv_font_manager_recycle_get_reuse(lv_font_manager_recycle_t * manage
 /**
  * Set fonts to be reused.
  * @param manager pointer to font recycle manager.
- * @param ft_info font info.
+ * @param font    pointer to the font to reuse
+ * @param ft_info font info
  */
 void lv_font_manager_recycle_set_reuse(lv_font_manager_recycle_t * manager, lv_font_t * font,
                                        const lv_font_info_t * ft_info);

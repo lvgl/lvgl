@@ -1,6 +1,15 @@
 ---
 title: Overview
 description: "STMicroelectronics is a chip vendor and board manufacturer of 32-bit ARM MCUs and MPUs."
+faqs:
+  - question: "Which IDE should I use for STM32?"
+    answer: "STM32CubeIDE is the usual choice. It is Eclipse-based, configures the project, builds, flashes, and debugs, and integrates LVGL like any other Eclipse-based IDE. STM32CubeMX generates the boilerplate for building outside CubeIDE, and STM32CubeCLT integrates the ST tools into other IDEs such as VS Code."
+  - question: "Are there ready-to-use LVGL projects for STM32 boards?"
+    answer: "Yes. See lvgl.io/boards#st for boards certified by LVGL with up-to-date integration, and the lv_port_stm repositories on GitHub for the others."
+  - question: "Which STM32 graphical peripherals does LVGL support?"
+    answer: "LTDC as a display controller, DMA2D for asynchronous pixel data operations, and NeoChrom as a 2D GPU. Some of them can be used together; each page states how."
+  - question: "I use Zephyr or NuttX on an STM32. Where do I start?"
+    answer: "With the documentation of that framework. Such projects behave like a Zephyr or NuttX project that happens to run on STM32, rather than an STM32 HAL project."
 ---
 
 ## About

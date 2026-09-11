@@ -1,0 +1,85 @@
+/**
+ * @file lv_gstreamer_private.h
+ *
+ */
+
+#ifndef LV_GSTREAMER_PRIVATE_H
+#define LV_GSTREAMER_PRIVATE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "../../lvgl_public.h"
+
+#if LV_USE_GSTREAMER
+
+#include <gst/gst.h>
+#include <gst/video/video.h>
+#include "../image/lv_image_private.h"
+
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**
+ * How many decoded frames may wait to be displayed.
+ * Only the newest one is ever shown, so this only has to absorb the jitter between the
+ * thread that decodes and the LVGL timer that displays.
+ */
+#define LV_GSTREAMER_MAX_QUEUED_FRAMES 2
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+struct _lv_gstreamer_t {
+    lv_image_t image;
+    lv_image_dsc_t frame;
+    GstVideoInfo video_info;
+    GstMapInfo last_map_info;
+    GstBuffer * last_buffer;
+    GstSample * last_sample;
+    GstElement * pipeline;
+    GstElement * audio_convert;
+    GstElement * video_convert;
+    GstElement * audio_volume;
+    lv_draw_buf_t * aligned_frame;
+    lv_color_format_t color_format;
+    lv_timer_t * gstreamer_timer;
+    GAsyncQueue * frame_queue;
+    bool is_video_info_valid;
+};
+
+typedef struct {
+    uint8_t * frame_data;
+    uint32_t width;
+    uint32_t height;
+    uint32_t stride;
+    size_t data_size;
+} frame_data_t;
+
+typedef struct _lv_gstreamer_t lv_gstreamer_t;
+
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gstreamer_class;
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+#endif /* LV_USE_GSTREAMER != 0 */
+
+#ifdef __cplusplus
+} /*extern "C"*/
+#endif
+
+#endif /*LV_GSTREAMER_PRIVATE_H*/

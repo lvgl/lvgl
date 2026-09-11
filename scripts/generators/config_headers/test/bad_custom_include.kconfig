@@ -1,0 +1,5 @@
+# Fixture for the missing-gate error: a *_CUSTOM_INCLUDE with no companion
+# *_USE_CUSTOM_INCLUDE gate and not on the CUSTOM_INCLUDE_NO_GATE exemption list.
+config LV_BAR_CUSTOM_INCLUDE
+	string "Path to custom bar header (no gate!)"
+	default ""

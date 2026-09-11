@@ -1,3 +1,5 @@
+import gdb
+
 from lvglgdb.value import Value, ValueInput
 from ..misc.lv_ll import LVList
 
@@ -59,10 +61,23 @@ class LVGroup(Value):
     def obj_count(self) -> int:
         return LVList(self.obj_ll, "lv_obj_t").len
 
+    def _members(self):
+        """The objects in the group.
+
+        lv_group_init() sizes obj_ll for `lv_obj_t *`, so each node holds a
+        pointer to the object rather than the object itself. Reading the node as
+        an lv_obj_t would report the list's own memory as a widget.
+        """
+        obj_ptr_t = gdb.lookup_type("lv_obj_t").pointer()
+        for node in LVList(self.obj_ll):
+            # The node's payload is the pointer, so read through it the same way
+            # LVList reads its own next/prev links.
+            yield Value(int(node)).cast(obj_ptr_t, ptr=True).dereference()
+
     def __iter__(self):
         from .lv_obj import LVObject
 
-        for obj_ptr in LVList(self.obj_ll, "lv_obj_t"):
+        for obj_ptr in self._members():
             yield LVObject(obj_ptr)
 
     def snapshot(self):
@@ -80,7 +95,7 @@ class LVGroup(Value):
             focused_addr = None
 
         member_addrs = []
-        for obj_ptr in LVList(self.obj_ll, "lv_obj_t"):
+        for obj_ptr in self._members():
             addr = int(obj_ptr)
             if addr:
                 member_addrs.append(hex(addr))

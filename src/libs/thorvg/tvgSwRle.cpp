@@ -970,7 +970,7 @@ SwRle* rleRender(SwRle* rle, const SwOutline* outline, const SwBBox& renderRegio
     return rw.rle;
 
 error:
-    lv_free(rw.rle);
+    rleFree(rw.rle);
     return nullptr;
 }
 

@@ -25,10 +25,10 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_get_started_1(void);
-void lv_example_get_started_2(void);
-void lv_example_get_started_3(void);
-void lv_example_get_started_4(void);
+void lv_example_get_started_button(void);
+void lv_example_get_started_hello_world(void);
+void lv_example_get_started_slider(void);
+void lv_example_get_started_styles(void);
 
 /**********************
  *      MACROS
@@ -39,3 +39,4 @@ void lv_example_get_started_4(void);
 #endif
 
 #endif /*LV_EXAMPLE_GET_STARTED_H*/
+

@@ -36,7 +36,7 @@ extern "C" {
 #define LV_ARCH_64
 
 /*Otherwise use compiler-dependent means to determine arch size*/
-#elif defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined (__aarch64__)
+#elif defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined (__aarch64__) || defined(__loongarch_lp64) || (defined(__riscv) && __riscv_xlen == 64)
 #define LV_ARCH_64
 
 #endif
@@ -125,6 +125,7 @@ typedef struct _lv_draw_task_t lv_draw_task_t;
 typedef struct _lv_indev_t lv_indev_t;
 
 typedef struct _lv_event_t lv_event_t;
+typedef struct _lv_event_list_t lv_event_list_t;
 
 typedef struct _lv_timer_t lv_timer_t;
 
@@ -358,6 +359,10 @@ typedef uint32_t lv_prop_id_t;
 
 typedef struct _lv_draw_buf_t lv_draw_buf_t;
 
+#if LV_USE_SVG
+typedef struct _lv_svg_node_t lv_svg_node_t;
+#endif
+
 #if LV_USE_OBJ_PROPERTY
 typedef struct _lv_property_name_t lv_property_name_t;
 #endif
@@ -447,6 +452,22 @@ typedef struct _lv_draw_buf_vram_res_t lv_draw_buf_vram_res_t;
 #define LV_ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
 #endif /*LV_ARRAYLEN*/
 
+#ifndef LV_RESTRICT
+#if defined(__cplusplus)
+#define LV_RESTRICT __restrict
+#else
+#define LV_RESTRICT restrict
+#endif
+#endif
+
+#ifndef LV_NONNULL
+#if defined(__GNUC__) || defined(__clang__)
+#define LV_NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
+#else
+#define LV_NONNULL(...)
+#endif
+#endif
+
 /**
  * Mark a function as deprecated so the compiler emits a warning at every call site.
  *
@@ -474,6 +495,28 @@ typedef struct _lv_draw_buf_vram_res_t lv_draw_buf_vram_res_t;
 #endif
 #endif /* LV_DEPRECATED not defined */
 
+#ifndef LV_DEPRECATIONS_IGNORE_BEGIN
+#if defined(PYCPARSER)
+#define LV_DEPRECATIONS_IGNORE_BEGIN
+#define LV_DEPRECATIONS_IGNORE_END
+#elif defined(__IAR_SYSTEMS_ICC__)
+#define LV_DEPRECATIONS_IGNORE_BEGIN _Pragma("diag_suppress=Pe1444")
+#define LV_DEPRECATIONS_IGNORE_END   _Pragma("diag_default=Pe1444")
+#elif defined(__GNUC__) || defined(__clang__)
+#define LV_DEPRECATIONS_IGNORE_BEGIN \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define LV_DEPRECATIONS_IGNORE_END \
+    _Pragma("GCC diagnostic pop")
+#elif defined(_MSC_VER)
+#define LV_DEPRECATIONS_IGNORE_BEGIN __pragma(warning(push)) __pragma(warning(disable: 4996))
+#define LV_DEPRECATIONS_IGNORE_END   __pragma(warning(pop))
+#else
+#define LV_DEPRECATIONS_IGNORE_BEGIN
+#define LV_DEPRECATIONS_IGNORE_END
+#endif
+#endif /* LV_DEPRECATIONS_IGNORE_BEGIN */
+
 /**
  * Helper used inside deprecated macro bodies to emit a compiler warning at the
  * expansion site in user code.
@@ -492,11 +535,11 @@ typedef struct _lv_draw_buf_vram_res_t lv_draw_buf_vram_res_t;
 #define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
 #elif defined(__GNUC__) || defined(__clang__) || defined(__IAR_SYSTEMS_ICC__)
 #define LV_DEPRECATED_MACRO_WARN(msg) \
-do { \
-typedef int __attribute__((deprecated(msg))) __lv_deprecated_t; \
-__lv_deprecated_t __lv_deprecated_dummy; \
-(void)__lv_deprecated_dummy; \
-} while(0)
+    do { \
+        typedef int __attribute__((deprecated(msg))) __lv_deprecated_t; \
+        __lv_deprecated_t __lv_deprecated_dummy; \
+        (void)__lv_deprecated_dummy; \
+    } while(0)
 #else
 /* Fallback: no warning, but the macro still compiles */
 #define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
