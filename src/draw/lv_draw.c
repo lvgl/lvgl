@@ -466,8 +466,9 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 #if LV_USE_DRAW_VRAM
     /*Create a header-only draw_buf for deferred allocation via lv_draw_buf_ensure_resident.
      *No pixel data is allocated — backing is lazily allocated when a draw unit requests it.
-     *Only for child layers (layer_init may set draw_buf via display callback).*/
-    if(new_layer->draw_buf == NULL) {
+     *Only for child layers: a display's top layer gets its draw_buf from the display
+     *(see lv_refr), so pre-creating one there would just leak.*/
+    if(parent_layer != NULL && new_layer->draw_buf == NULL) {
         int32_t w = lv_area_get_width(area);
         int32_t h = lv_area_get_height(area);
         new_layer->draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
@@ -595,15 +596,19 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer, lv_draw_unit_t * draw_unit)
                 LV_PROFILER_DRAW_END;
                 return NULL;
             }
+            layer->buffer_owned = true;
 
             if(lv_color_format_has_alpha(layer->color_format)) {
                 lv_draw_buf_clear(layer->draw_buf, NULL);
             }
         }
 
-        layer->buffer_owned = true;
-        _draw_info.used_memory_for_layers += layer_size_byte;
-        LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
+        /*Only account for buffers LVGL owns. A display's own draw buffer can also be
+         *lazily backed here, but it is freed by the display, not by `lv_draw_layer_dealloc_buf`.*/
+        if(layer->buffer_owned) {
+            _draw_info.used_memory_for_layers += layer_size_byte;
+            LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
+        }
     }
 
     LV_PROFILER_DRAW_END;
