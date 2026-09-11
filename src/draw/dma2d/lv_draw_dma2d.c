@@ -415,7 +415,10 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(t == NULL) {
         return LV_DRAW_UNIT_IDLE;
     }
-    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) return LV_DRAW_UNIT_IDLE;
+    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
+        return LV_DRAW_UNIT_IDLE;
+    }
 
     void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
     if(buf == NULL) {

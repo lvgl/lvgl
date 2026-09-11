@@ -302,7 +302,10 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             else return taken_cnt;
         }
 
-        if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) continue;
+        if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+            t->state = LV_DRAW_TASK_STATE_FAILED;
+            continue;
+        }
 
         /*Allocate a buffer if not done yet.*/
         void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
@@ -341,6 +344,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
         LV_PROFILER_DRAW_END;
         return LV_DRAW_UNIT_IDLE;
     }

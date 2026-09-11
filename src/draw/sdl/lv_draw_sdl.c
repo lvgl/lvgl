@@ -150,7 +150,10 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_task_t * t = NULL;
     t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_SDL);
     if(t == NULL) return -1;
-    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) return -1;
+    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
+        return -1;
+    }
 
     lv_display_t * disp = lv_refr_get_disp_refreshing();
     SDL_Texture * texture = layer_get_texture(layer);
