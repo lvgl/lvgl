@@ -1570,6 +1570,55 @@ void test_vram_partial_clear_allocation_failure(void)
     lv_draw_buf_destroy(buf);
 }
 
+void test_vram_static_buffer_round_trip_content(void)
+{
+    LV_DRAW_BUF_DEFINE_STATIC(buf, 10, 10, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(buf);
+    fill_pattern(&buf, 0x55);
+    uint8_t * original_data = buf.data;
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(&buf, &s_fake_unit_a));
+    fake_vram_res_t * vr = (fake_vram_res_t *)buf.vram_res;
+    lv_memset(vr->fake_vram, 0xAA, vr->alloc_size);
+
+    uint8_t * px = lv_draw_buf_goto_xy(&buf, 0, 0);
+    TEST_ASSERT_EQUAL_PTR(original_data, px);
+    TEST_ASSERT_EQUAL_HEX8(0xAA, *px);
+    TEST_ASSERT_NULL(buf.vram_res);
+    fill_pattern(&buf, 0x77);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(&buf, &s_fake_unit_b));
+    TEST_ASSERT_TRUE(vram_contains_pattern(&buf, 0x77));
+    fake_vram_free_cb(&s_fake_unit_b, &buf);
+}
+
+void test_vram_static_buffer_cross_unit_preserves_gpu_writes(void)
+{
+    LV_DRAW_BUF_DEFINE_STATIC(buf, 10, 10, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(buf);
+    fill_pattern(&buf, 0x55);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(&buf, &s_fake_unit_a));
+    fake_vram_res_t * vr = (fake_vram_res_t *)buf.vram_res;
+    lv_memset(vr->fake_vram, 0xAA, vr->alloc_size);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(&buf, &s_fake_unit_b));
+    TEST_ASSERT_TRUE(vram_contains_pattern(&buf, 0xAA));
+    fake_vram_free_cb(&s_fake_unit_b, &buf);
+}
+
+void test_vram_static_download_failure_retains_backing(void)
+{
+    LV_DRAW_BUF_DEFINE_STATIC(buf, 10, 10, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(buf);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(&buf, &s_fake_unit_a));
+    lv_draw_buf_vram_res_t * backing = buf.vram_res;
+    uint8_t * data = buf.data;
+    s_stats_a.fail_download = true;
+    TEST_ASSERT_FALSE(lv_draw_buf_ensure_resident(&buf, NULL));
+    TEST_ASSERT_EQUAL_PTR(backing, buf.vram_res);
+    TEST_ASSERT_EQUAL_PTR(data, buf.data);
+    s_stats_a.fail_download = false;
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(&buf, NULL));
+    TEST_ASSERT_NULL(buf.vram_res);
+}
+
 #endif /* LV_USE_DRAW_VRAM */
 
 typedef int _keep_pedantic_happy; /* avoid empty translation unit when VRAM is disabled */

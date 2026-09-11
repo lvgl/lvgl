@@ -525,9 +525,7 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
                             "coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32,
                             x, y, (uint32_t)buf->header.w, (uint32_t)buf->header.h);
 #if LV_USE_DRAW_VRAM
-    if(buf->data == NULL) {
-        if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)buf, NULL)) return NULL;
-    }
+    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)buf, NULL)) return NULL;
 #endif
     LV_CHECK_ARG(buf->data != NULL, return NULL);
 
@@ -773,7 +771,8 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
 
     /* Already CPU-resident for a CPU unit — reuse.
      * CLEARZERO: data was already zeroed by lv_draw_buf_clear, just clear the flag. */
-    if(!unit_has_vram && has_cpu) {
+    bool mutable_cpu = (buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) != 0;
+    if(!unit_has_vram && has_cpu && (!has_vram || !mutable_cpu)) {
         if(clearzero) {
             buf->header.flags &= ~LV_IMAGE_FLAGS_CLEARZERO;
         }
@@ -784,46 +783,51 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
     if(has_vram) {
         lv_draw_unit_t * old_unit = buf->vram_res->unit;
 
-        /* Download to CPU first if no CPU copy exists.
-         * Skip download when content is discardable — stale data
-         * need not be preserved across unit transitions. */
-        if(!has_cpu && !discard) {
-            uint32_t w = buf->header.w;
-            uint32_t h = buf->header.h;
-            lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
-            uint32_t stride = buf->header.stride;
-            if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+        /*Mutable buffers retain caller-owned CPU storage during upload, but VRAM
+         *is authoritative until the next CPU access. Immutable images keep their
+         *original CPU copy and must never be downloaded into ROM.*/
+        if(!discard && (!has_cpu || mutable_cpu)) {
+            bool allocated_cpu = !has_cpu;
+            uint32_t old_size = buf->data_size;
+            if(old_unit->vram_download_cb == NULL) return false;
 
-            uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
-            void * data = draw_buf_malloc(buf->handlers ? buf->handlers : &default_handlers, size, cf);
-            if(data == NULL) {
-                LV_LOG_WARN("VRAM download: CPU alloc failed");
-                return false;
-            }
+            if(allocated_cpu) {
+                uint32_t w = buf->header.w;
+                uint32_t h = buf->header.h;
+                lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
+                uint32_t stride = buf->header.stride;
+                if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
-            buf->unaligned_data = data;
-            buf->data = lv_draw_buf_align(data, cf);
-            buf->data_size = size;
-            buf->header.flags |= LV_IMAGE_FLAGS_ALLOCATED;
-
-            if(old_unit->vram_download_cb) {
-                if(!old_unit->vram_download_cb(old_unit, buf)) {
-                    draw_buf_free(buf->handlers ? buf->handlers : &default_handlers, data);
-                    buf->unaligned_data = NULL;
-                    buf->data = NULL;
-                    buf->data_size = 0;
+                uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+                void * data = draw_buf_malloc(buf->handlers ? buf->handlers : &default_handlers, size, cf);
+                if(data == NULL) {
+                    LV_LOG_WARN("VRAM download: CPU alloc failed");
                     return false;
                 }
+                buf->unaligned_data = data;
+                buf->data = lv_draw_buf_align(data, cf);
+                buf->data_size = size;
             }
 
-            /* If the downloaded content is premultiplied, retag the color format
-             * so CPU-side code (SW renderer blend functions, canvas drawing) uses
-             * the correct premultiplied blend path. */
+            if(!old_unit->vram_download_cb(old_unit, buf)) {
+                if(allocated_cpu) {
+                    draw_buf_free(buf->handlers ? buf->handlers : &default_handlers, buf->unaligned_data);
+                    buf->unaligned_data = NULL;
+                    buf->data = NULL;
+                    buf->data_size = old_size;
+                }
+                return false;
+            }
+            if(allocated_cpu) buf->header.flags |= LV_IMAGE_FLAGS_ALLOCATED;
+
             if((buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED)
                && buf->header.cf == LV_COLOR_FORMAT_ARGB8888) {
                 buf->header.cf = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
             }
             has_cpu = true;
+        }
+        else if(clearzero && has_cpu && mutable_cpu) {
+            lv_memzero(buf->data, buf->data_size);
         }
 
         /* Free old VRAM */
@@ -850,7 +854,10 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
         /* Target is SW unit. If we have CPU data (normal download path),
          * we're done. If discard skipped the download, fall through to
          * the "no backing" path to allocate fresh CPU memory. */
-        if(buf->data != NULL) return true;
+        if(buf->data != NULL) {
+            buf->header.flags &= ~LV_IMAGE_FLAGS_CLEARZERO;
+            return true;
+        }
     }
 
     /* CPU data only, no VRAM */

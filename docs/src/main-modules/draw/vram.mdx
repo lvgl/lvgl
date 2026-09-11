@@ -40,8 +40,11 @@ When called with a draw unit, it:
   <ApiLink name="LV_IMAGE_FLAGS_CLEARZERO" /> flags to skip unnecessary
   transfers.
 
-After a successful upload to VRAM, the CPU-side allocation is freed to
-minimize RAM usage.  Conversely, after a download to CPU memory, the VRAM
+After a successful upload to VRAM, an LVGL-owned CPU-side allocation is freed to
+minimize RAM usage. Caller-owned storage is retained; for mutable buffers,
+ensure CPU residency before accessing it so that any VRAM changes are downloaded
+and the VRAM backing is released. Read-only images can retain both copies.
+Conversely, after a download to CPU memory, the VRAM
 allocation may be released.  The rationale is that minimizing RAM usage is
 a more relevant use case than optimizing for mixed draw-unit performance.
 
