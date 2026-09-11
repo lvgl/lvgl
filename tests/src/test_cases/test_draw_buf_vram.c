@@ -1619,6 +1619,47 @@ void test_vram_static_download_failure_retains_backing(void)
     TEST_ASSERT_NULL(buf.vram_res);
 }
 
+void test_vram_copy_after_clear_preserves_uploaded_pixels(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(8, 8, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(8, 8, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(src, NULL));
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(dest, NULL));
+    fill_pattern(src, 0x55);
+    lv_draw_buf_clear(dest, NULL);
+    lv_draw_buf_copy(dest, NULL, src, NULL);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(dest, &s_fake_unit_a));
+    fake_vram_res_t * vr = (fake_vram_res_t *)dest->vram_res;
+    for(uint32_t y = 0; y < dest->header.h; y++) {
+        const uint8_t * row = (const uint8_t *)vr->fake_vram + y * dest->header.stride;
+        for(uint32_t x = 0; x < dest->header.w * 4; x++) {
+            TEST_ASSERT_EQUAL_HEX8(0x55, row[x]);
+        }
+    }
+    lv_draw_buf_destroy(src);
+    lv_draw_buf_destroy(dest);
+}
+
+void test_vram_partial_copy_into_cleared_vram(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(8, 8, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(8, 8, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(src, NULL));
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(dest, NULL));
+    fill_pattern(src, 0x55);
+    fill_pattern(dest, 0xAA);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(src, &s_fake_unit_a));
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(dest, &s_fake_unit_a));
+    lv_draw_buf_clear(dest, NULL);
+    lv_area_t area = {1, 1, 3, 3};
+    lv_draw_buf_copy(dest, &area, src, &area);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(dest, NULL));
+    TEST_ASSERT_EQUAL_HEX32(0x55555555, *(uint32_t *)lv_draw_buf_goto_xy(dest, 2, 2));
+    TEST_ASSERT_EQUAL_HEX32(0, *(uint32_t *)lv_draw_buf_goto_xy(dest, 0, 0));
+    lv_draw_buf_destroy(src);
+    lv_draw_buf_destroy(dest);
+}
+
 #endif /* LV_USE_DRAW_VRAM */
 
 typedef int _keep_pedantic_happy; /* avoid empty translation unit when VRAM is disabled */
