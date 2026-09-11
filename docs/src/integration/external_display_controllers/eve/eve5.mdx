@@ -1,0 +1,130 @@
+---
+title: EVE5 (BT820) Renderer and Display Driver
+description: "Use EVE HAL to render LVGL on BT820 and earlier EVE generations, with VRAM residency, touch, and optional asset filesystems."
+---
+
+The EVE5 driver uses EVE HAL to send drawing commands to the EVE coprocessor.
+On BT820, render targets provide hardware rendering of layers, including alpha
+and blend modes. Earlier EVE generations use a screen-only rendering path;
+off-screen layers fall through to the software renderer.
+
+This implementation uses `LV_USE_DRAW_EVE5` and `LV_USE_EVE5`. The separate
+[EVE external GPU renderer](/integration/external_display_controllers/eve/gpu)
+uses `LV_USE_DRAW_EVE` and has different dependencies and limitations.
+
+## Requirements
+
+- LVGL with VRAM residency support.
+- EVE HAL and the matching `eve_extras` GPU allocator and resource helpers from
+  the EVE Screen Designer SDK. Required headers include `EVE_Hal.h`,
+  `EVE_GpuAlloc.h`, `EVE_ResourceProbe.h`, and `EVE_ResourceQuery.h`.
+- A HAL platform configuration for the target EVE generation, board, display,
+  and host transport. Configure and boot the controller using the SDK's board
+  example before creating the LVGL display. On BT820, the HAL must also reserve
+  and configure the swapchain framebuffers.
+
+The HAL and its platform libraries are external dependencies. Add their include
+paths and libraries to the application and LVGL build. Use a matching HAL and
+`eve_extras` version; older HAL packages may lack the render-target, resource,
+allocator, or synchronization APIs this driver uses. For emulator builds, use
+an SDK configuration that supplies the EVE emulator and its host dependencies.
+
+## Configuration and initialization
+
+Enable these options in `lv_conf.h`, or their `CONFIG_` equivalents in a Kconfig
+configuration:
+
+```c
+#define LV_USE_DRAW_VRAM 1
+#define LV_USE_EVE5 1
+#define LV_USE_DRAW_EVE5 1
+#define LV_USE_DRAW_SW 1
+```
+
+Keep the software renderer enabled for tasks that cannot use the hardware path,
+particularly off-screen layers on earlier EVE generations. The optional
+`LV_USE_FS_EVE5_SDCARD` and `LV_USE_FS_EVE5_FLASH` options default to `0`.
+
+After calling `lv_init()` and booting the HAL, create the display before
+registering the draw unit. The following helper takes a booted HAL context and
+an allocator object reserved for this display:
+
+```c
+#include "lvgl.h"
+#include "src/drivers/display/eve5/lv_eve5.h"
+#include "src/draw/eve5/lv_draw_eve5.h"
+
+lv_display_t * create_eve_display(EVE_HalContext * hal, EVE_GpuAlloc * allocator)
+{
+    lv_display_t * disp = lv_eve5_create(hal, allocator);
+    if(disp == NULL) return NULL;
+
+    lv_draw_eve5_init(hal, allocator);
+    return disp;
+}
+```
+
+These include paths assume the LVGL repository root is on the include path.
+`lv_eve5_create()` initializes and resets the GPU allocator, installs the display
+callbacks and draw buffers, and uses `EVE_millis` as the tick source if no tick
+callback is set. Keep the HAL context and allocator alive while the display is
+in use. The driver owns `hal->UserContext` and assumes one display and draw unit
+per HAL context. Continue calling `lv_timer_handler()` from the application's
+normal LVGL loop.
+
+For single-point touch, call `lv_eve5_touch_create(disp)`. Calibration is available
+through `lv_eve5_touch_calibrate(disp)`; save and restore its six-element matrix
+with `lv_eve5_touch_get_calibration()` and `lv_eve5_touch_set_calibration()`.
+Capacitive multi-touch is available through `lv_eve5_multitouch_create()`;
+perform calibration in single-touch mode first.
+
+## Rendering modes
+
+| Mode | Behavior |
+| --- | --- |
+| `LV_EVE5_RENDER_MODE_PARTIAL` | Default on BT820. Renders tiles and composites them into a single scanout buffer. Updates are not synchronized to scanout and can tear. |
+| `LV_EVE5_RENDER_MODE_FULL` | Renders a whole frame. On BT820, uses the HAL's two swapchain framebuffers for double-buffered output. Dense scenes must fit the hardware display-list limits. |
+
+Select a mode at creation with `lv_eve5_create_ex(hal, allocator, mode)`, or between
+frames with `lv_eve5_set_render_mode(disp, mode)`. Switching can briefly tear.
+Controllers without render-target support are forced to full mode and use a
+single display list per frame; they do not gain BT820's hardware layer support.
+
+## Images, fonts, and storage
+
+The renderer supports LVGL bitmap fonts, EVE ROM fonts created with
+`lv_eve5_rom_font_create()`, and native font assets loaded with
+`lv_eve5_asset_font_create()`. Native EVE fonts require the EVE5 draw unit.
+
+Hardware image decoding can load supported assets from LVGL filesystems into
+RAM_G and cache them through VRAM residency. Assets on EVE's SD card can be
+loaded directly by the coprocessor. Format availability depends on the EVE
+generation; native EVE bitmap assets can use Screen Designer metadata.
+
+Optional filesystem drivers are read-only. Initialize them after creating the
+display:
+
+- `lv_fs_eve5_sdcard_init(disp)` registers the SD-card drive, default `S:`
+  (for example, `S:/image.png`). The SD-card commands require BT820.
+- `lv_fs_eve5_flash_init(disp)` registers the flash drive, default `F:`.
+  Paths such as `F:/123456` address a decimal byte offset in flash, not a named
+  file. Flash commands require a controller with flash support (BT815 or later).
+
+## Limitations and performance
+
+- Horizontal and vertical gradients use temporary bitmaps. Complex gradients
+  are not implemented; use a pre-rendered bitmap when needed.
+- Triangle edges and flat arc caps are not anti-aliased.
+- Layers with alpha are rendered in premultiplied form.
+- Blur extends edge pixels into its padding instead of masking samples outside
+  the region and renormalizing the kernel.
+- Alpha correctness and some blend modes require extra passes and temporary
+  buffers. Canvas updates can read and write the entire canvas, even when only
+  a small region changes.
+- An image-only canvas can take ownership of the image's VRAM allocation,
+  invalidating the cached image to avoid keeping duplicate allocations.
+
+The HAL tracks coprocessor progress and the allocator defers freeing GPU buffers
+until queued commands finish. Drawing can therefore be pipelined. Hardware image
+loads and transfers from RAM_G to CPU memory can block; rendering cost also
+includes temporary-buffer allocation and any required alpha or blend passes.
