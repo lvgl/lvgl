@@ -370,6 +370,11 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
     const void * data = qrcode->data;
     const uint32_t data_len = qrcode->data_len;
 
+#if LV_USE_DRAW_VRAM
+    /*The palette and the modules are written directly into the buffer, so it needs CPU backing*/
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return LV_RESULT_INVALID;
+#endif
+
     lv_draw_buf_clear(draw_buf, NULL);
     /*Set the palette directly on the draw buffer to avoid an extra invalidation here;
      *the caller (or the draw pass) takes care of refreshing the object*/
