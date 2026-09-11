@@ -1660,6 +1660,41 @@ void test_vram_partial_copy_into_cleared_vram(void)
     lv_draw_buf_destroy(dest);
 }
 
+static uint32_t custom_align_calls;
+
+static void * custom_buf_malloc(size_t size, lv_color_format_t cf)
+{
+    LV_UNUSED(cf);
+    return lv_malloc(size + 16);
+}
+
+static void * custom_buf_align(void * data, lv_color_format_t cf)
+{
+    LV_UNUSED(cf);
+    custom_align_calls++;
+    return (uint8_t *)data + 16;
+}
+
+void test_vram_custom_alignment_on_allocation_and_download(void)
+{
+    lv_draw_buf_handlers_t handlers;
+    lv_draw_buf_init_with_default_handlers(&handlers);
+    handlers.buf_malloc_cb = custom_buf_malloc;
+    handlers.align_pointer_cb = custom_buf_align;
+    custom_align_calls = 0;
+    lv_draw_buf_t * buf = lv_draw_buf_create_ex(&handlers, 8, 8, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, NULL));
+    TEST_ASSERT_EQUAL_UINT32(1, custom_align_calls);
+    TEST_ASSERT_EQUAL_PTR((uint8_t *)buf->unaligned_data + 16, buf->data);
+    fill_pattern(buf, 0x55);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, &s_fake_unit_a));
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, NULL));
+    TEST_ASSERT_EQUAL_UINT32(2, custom_align_calls);
+    TEST_ASSERT_EQUAL_PTR((uint8_t *)buf->unaligned_data + 16, buf->data);
+    TEST_ASSERT_EQUAL_HEX8(0x55, buf->data[0]);
+    lv_draw_buf_destroy(buf);
+}
+
 #endif /* LV_USE_DRAW_VRAM */
 
 typedef int _keep_pedantic_happy; /* avoid empty translation unit when VRAM is disabled */

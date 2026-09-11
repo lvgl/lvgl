@@ -803,7 +803,7 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
                     return false;
                 }
                 buf->unaligned_data = data;
-                buf->data = lv_draw_buf_align(data, cf);
+                buf->data = lv_draw_buf_align_ex(buf->handlers ? buf->handlers : &default_handlers, data, cf);
                 buf->data_size = size;
             }
 
@@ -907,7 +907,7 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
         }
 
         buf->unaligned_data = data;
-        buf->data = lv_draw_buf_align(data, cf);
+        buf->data = lv_draw_buf_align_ex(buf->handlers ? buf->handlers : &default_handlers, data, cf);
         buf->data_size = size;
         buf->header.stride = stride;
         buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
