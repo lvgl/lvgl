@@ -4623,6 +4623,14 @@
     #endif
 #endif
 
+#ifndef LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+    #ifdef CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+        #define LV_ATTRIBUTE_FAST_MEM_USE_IRAM CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+    #else
+        #define LV_ATTRIBUTE_FAST_MEM_USE_IRAM 0
+    #endif
+#endif
+
 
 
 /*============================================================================

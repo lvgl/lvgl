@@ -2516,6 +2516,12 @@
 
 #endif /*LV_ATTRIBUTE_USE_CUSTOM_INCLUDE*/
 
+/** Configure LV_ATTRIBUTE_FAST_MEM to use IRAM.
+ *  This option is only applicable to ESP32 targets.
+ */
+#define LV_ATTRIBUTE_FAST_MEM_USE_IRAM 0
+
+
 
 /*============================================================================
  * EXAMPLES

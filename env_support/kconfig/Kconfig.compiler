@@ -69,4 +69,10 @@ config LV_ATTRIBUTE_CUSTOM_INCLUDE
 	    Leave undefined if not using a binding.
 	    e.g. mp_rom_map_elem_t entry = {MP_ROM_QSTR(MP_QSTR_##int_value), MP_ROM_INT(int_value)}
 
+config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+	bool "Place LV_ATTRIBUTE_FAST_MEM functions in IRAM (ESP32 only)"
+	help
+	  Configure LV_ATTRIBUTE_FAST_MEM to use IRAM.
+	  This option is only applicable to ESP32 targets.
+
 endmenu #"Compiler Settings"
