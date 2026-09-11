@@ -11,6 +11,10 @@
 
 #if LV_USE_FS_POSIX
 
+#ifdef _WIN32
+    #error "Win32 does not support the full POSIX API"
+#endif
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/types.h>
