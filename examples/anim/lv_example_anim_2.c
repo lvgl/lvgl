@@ -12,13 +12,21 @@ static void anim_size_cb(void * var, int32_t v)
 }
 
 /**
- * Create a playback animation
+ * @title Infinite playback animation
+ * @brief Grow a red circle while sliding it right, then reverse and repeat.
+ *
+ * A red circular object sits on the left edge of the active screen. One
+ * `lv_anim_t` drives `lv_obj_set_size` from 10 to 50 over 1000 ms; the same
+ * configured animation is then reused with `lv_obj_set_x` running from 10
+ * to 240. Both run with `lv_anim_path_ease_in_out`, a 300 ms reverse stage
+ * after a 100 ms reverse delay, a 500 ms gap between cycles, and
+ * `LV_ANIM_REPEAT_INFINITE`.
  */
 void lv_example_anim_2(void)
 {
 
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(obj, false);
     lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_RED), 0);
     lv_obj_set_style_radius(obj, LV_RADIUS_CIRCLE, 0);
 

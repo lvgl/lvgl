@@ -1,20 +1,35 @@
 #include "../../lv_examples.h"
 #if LV_USE_GRIDNAV && LV_USE_LIST && LV_BUILD_EXAMPLES
 
+/*The navigated content is built from the deprecated `lv_list` widget.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 /**
- * Grid navigation on a list
+ * @title Keypad navigation across two lists
+ * @brief Side-by-side list widgets with distinct `lv_gridnav_ctrl_t` modes.
+ *
+ * Two `lv_list` widgets sit at the left and right edges. The left list registers
+ * with `LV_GRIDNAV_CTRL_NONE` and is populated with 15 `LV_SYMBOL_FILE` buttons;
+ * the right list uses `LV_GRIDNAV_CTRL_ROLLOVER` and holds 15 `LV_SYMBOL_DIRECTORY`
+ * buttons. Each list is added to the default group while every item is removed
+ * with `lv_group_remove_obj` so gridnav drives focus inside the list.
  */
 void lv_example_gridnav_2(void)
 {
-    /*It's assumed that the default group is set and
+    /*The example requires that a default group is set and
      *there is a keyboard indev*/
+    lv_group_t * group = lv_group_get_default();
+    if(!group) {
+        LV_LOG_WARN("Gridnav example requires a default group");
+        return;
+    }
 
     lv_obj_t * list1 = lv_list_create(lv_screen_active());
     lv_gridnav_add(list1, LV_GRIDNAV_CTRL_NONE);
     lv_obj_set_size(list1, lv_pct(45), lv_pct(80));
     lv_obj_align(list1, LV_ALIGN_LEFT_MID, 5, 0);
     lv_obj_set_style_bg_color(list1, lv_palette_lighten(LV_PALETTE_BLUE, 5), LV_STATE_FOCUSED);
-    lv_group_add_obj(lv_group_get_default(), list1);
+    lv_group_add_obj(group, list1);
 
     char buf[32];
     uint32_t i;
@@ -30,7 +45,7 @@ void lv_example_gridnav_2(void)
     lv_obj_set_size(list2, lv_pct(45), lv_pct(80));
     lv_obj_align(list2, LV_ALIGN_RIGHT_MID, -5, 0);
     lv_obj_set_style_bg_color(list2, lv_palette_lighten(LV_PALETTE_BLUE, 5), LV_STATE_FOCUSED);
-    lv_group_add_obj(lv_group_get_default(), list2);
+    lv_group_add_obj(group, list2);
 
     for(i = 0; i < 15; i++) {
         lv_snprintf(buf, sizeof(buf), "Folder %d", i + 1);
@@ -39,5 +54,7 @@ void lv_example_gridnav_2(void)
         lv_group_remove_obj(item);
     }
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

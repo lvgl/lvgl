@@ -45,15 +45,15 @@ python ./lvgl/scripts/generate_lv_conf.py \
   --config $LV_CONF_PATH \
   --defaults lvgl/configs/ci/docs/lv_conf_docs.defaults
 
-mkdir cmbuild
-cd cmbuild
-emcmake cmake .. -DLV_BUILD_CONF_PATH=$LV_CONF_PATH -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-emmake make -j$(nproc)
-rm -rf CMakeFiles
-cd ..
+
+emcmake cmake -B cmbuild -GNinja -DLV_BUILD_CONF_PATH=$LV_CONF_PATH -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+cmake --build cmbuild
+
+rm -rf cmbuild/CMakeFiles
+
 if [ "$ARG_1" != "--symlink" ]; then
-  cp -a cmbuild ../docs/src/_static/built_lv_examples
+  cp -a cmbuild ../docs/built_lv_examples
 else
-  cp -a cmbuild lvgl/docs/src/_static/built_lv_examples
+  cp -a cmbuild lvgl/docs/built_lv_examples
 fi
 cd ..

@@ -4,7 +4,7 @@
  * @file lv_switch_properties.c
  */
 
-#include "../switch/lv_switch.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

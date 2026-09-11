@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_nuttx_mouse.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NUTTX
 
@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include "../../lvgl_private.h"
+#include "lv_nuttx_mouse.h"
 
 #ifdef __NuttX__
     #include <debug.h>
@@ -66,7 +67,7 @@ lv_indev_t * lv_nuttx_mouse_create(const char * dev_path)
     lv_indev_t * indev;
     int fd;
 
-    LV_ASSERT_NULL(dev_path);
+    LV_CHECK_ARG(dev_path != NULL, return NULL);
     LV_LOG_USER("mouse %s opening", dev_path);
     fd = open(dev_path, O_RDONLY | O_NONBLOCK);
     if(fd < 0) {

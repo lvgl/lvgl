@@ -1,17 +1,2 @@
-/**
- * @file lv_uefi_gnu_efi.h
- *
- */
-
-#ifndef LV_UEFI_GNU_EFI_H
-#define LV_UEFI_GNU_EFI_H
-
-#if LV_USE_UEFI
-
-    #define LV_UEFI_GNU_EFI_HEADERS    1
-
-    #include <efi.h>
-
-#endif
-
-#endif
+#warning Include public headers from the `src` folder is deprecated. This file will be removed soon. To ensure your application keeps working, you can choose to include the new header in <include/lvgl/drivers/uefi/lv_uefi_gnu_efi.h> or include the main header file <include/lvgl/lvgl.h>
+#include "../../../include/lvgl/lvgl.h"

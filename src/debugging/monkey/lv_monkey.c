@@ -8,12 +8,7 @@
  *********************/
 #include "lv_monkey_private.h"
 
-#if LV_USE_MONKEY != 0
-
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../display/lv_display.h"
+#if LV_USE_MONKEY
 
 /*********************
  *      DEFINES
@@ -61,6 +56,8 @@ static void lv_monkey_timer_cb(lv_timer_t * timer);
 
 void lv_monkey_config_init(lv_monkey_config_t * config)
 {
+    LV_CHECK_ARG(config != NULL, return);
+
     lv_memzero(config, sizeof(lv_monkey_config_t));
     config->type = LV_INDEV_TYPE_POINTER;
     config->period_range.min = MONKEY_PERIOD_RANGE_MIN_DEF;
@@ -69,6 +66,8 @@ void lv_monkey_config_init(lv_monkey_config_t * config)
 
 lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 {
+    LV_CHECK_ARG(config != NULL, return NULL);
+
     lv_monkey_t * monkey = lv_malloc_zeroed(sizeof(lv_monkey_t));
     LV_ASSERT_MALLOC(monkey);
 
@@ -85,37 +84,39 @@ lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 
 lv_indev_t * lv_monkey_get_indev(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return NULL);
     return monkey->indev;
 }
 
 void lv_monkey_set_enable(lv_monkey_t * monkey, bool en)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return);
     en ? lv_timer_resume(monkey->timer) : lv_timer_pause(monkey->timer);
 }
 
 bool lv_monkey_get_enable(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return false);
     return !lv_timer_get_paused(monkey->timer);
 }
 
 void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return);
     monkey->user_data = user_data;
 }
 
 void * lv_monkey_get_user_data(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_CHECK_ARG(monkey != NULL, return NULL);
     return monkey->user_data;
 }
 
 void lv_monkey_delete(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    if(!monkey) {
+        return;
+    }
 
     lv_timer_delete(monkey->timer);
     lv_indev_delete(monkey->indev);
@@ -128,7 +129,10 @@ void lv_monkey_delete(lv_monkey_t * monkey)
 
 static void lv_monkey_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
+    LV_ASSERT(indev != NULL);
+    LV_ASSERT(data != NULL);
     lv_monkey_t * monkey = lv_indev_get_user_data(indev);
+    LV_ASSERT(monkey != NULL);
 
     data->btn_id = monkey->indev_data.btn_id;
     data->point = monkey->indev_data.point;
@@ -147,7 +151,10 @@ static int32_t lv_monkey_random(int32_t howsmall, int32_t howbig)
 
 static void lv_monkey_timer_cb(lv_timer_t * timer)
 {
+    LV_ASSERT(timer != NULL);
     lv_monkey_t * monkey = lv_timer_get_user_data(timer);
+    LV_ASSERT(monkey != NULL);
+    LV_ASSERT(monkey->indev != NULL);
     lv_indev_data_t * data = &monkey->indev_data;
 
     switch(lv_indev_get_type(monkey->indev)) {
@@ -172,6 +179,7 @@ static void lv_monkey_timer_cb(lv_timer_t * timer)
 
     data->state = lv_monkey_random(0, 100) < 50 ? LV_INDEV_STATE_RELEASED : LV_INDEV_STATE_PRESSED;
 
+    LV_ASSERT(monkey->timer != NULL);
     lv_timer_set_period(monkey->timer, lv_monkey_random(monkey->config.period_range.min, monkey->config.period_range.max));
 }
 

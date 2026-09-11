@@ -24,6 +24,11 @@ void test_event_object_deletion(void)
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
+static void event_noop_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+}
+
 /* Add and then remove event should not memory leak */
 void test_event_should_not_memory_lean(void)
 {
@@ -33,7 +38,7 @@ void test_event_should_not_memory_lean(void)
     size_t initial_free_size = monitor.free_size;
 
     for(int i = 0; i < 10; i++) {
-        lv_obj_add_event_cb(obj, NULL, LV_EVENT_ALL, NULL);
+        lv_obj_add_event_cb(obj, event_noop_cb, LV_EVENT_ALL, NULL);
     }
 
     lv_obj_delete(obj);
@@ -137,7 +142,6 @@ void test_event_delete_obj_in_recursive_event_call(void)
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 200, 100);
     lv_obj_add_event_cb(obj, event_click_to_delete_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_add_event_cb(obj, NULL, LV_EVENT_CLICKED, NULL);
     lv_obj_add_event_cb(obj, event_click_to_delete_cb, LV_EVENT_CLICKED, NULL);
     lv_test_mouse_click_at(30, 30);
 }
@@ -175,6 +179,94 @@ void test_event_remove_event_cb(void)
     TEST_ASSERT_EQUAL_UINT32(0, event_count_after_remove);
 
     lv_obj_delete(obj);
+}
+
+/* A single descriptor can be removed while the others are left in place */
+void test_event_remove_event_dsc(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+
+    lv_event_dsc_t * dsc_1 = lv_obj_add_event_cb(obj, test_event_cb_1, LV_EVENT_CLICKED, NULL);
+    lv_event_dsc_t * dsc_2 = lv_obj_add_event_cb(obj, test_event_cb_1, LV_EVENT_PRESSED, NULL);
+    TEST_ASSERT_EQUAL_UINT32(2, lv_obj_get_event_count(obj));
+
+    TEST_ASSERT_TRUE(lv_obj_remove_event_dsc(obj, dsc_1));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_obj_get_event_count(obj));
+    TEST_ASSERT_EQUAL_PTR(dsc_2, lv_obj_get_event_dsc(obj, 0));
+
+    /* Removing the same descriptor twice must fail */
+    TEST_ASSERT_FALSE(lv_obj_remove_event_dsc(obj, dsc_1));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_obj_get_event_count(obj));
+
+    TEST_ASSERT_TRUE(lv_obj_remove_event_dsc(obj, dsc_2));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_obj_get_event_count(obj));
+
+    /* A descriptor of another widget doesn't belong to this list */
+    lv_obj_t * other = lv_obj_create(lv_screen_active());
+    lv_event_dsc_t * dsc_other = lv_obj_add_event_cb(other, test_event_cb_1, LV_EVENT_CLICKED, NULL);
+    TEST_ASSERT_FALSE(lv_obj_remove_event_dsc(obj, dsc_other));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_obj_get_event_count(other));
+
+    lv_obj_delete(other);
+    lv_obj_delete(obj);
+}
+
+static uint32_t bubble_child_cnt;
+static uint32_t bubble_parent_cnt;
+static bool bubble_stop;
+
+static void event_bubble_child_cb(lv_event_t * e)
+{
+    bubble_child_cnt++;
+    if(bubble_stop) lv_event_stop_bubbling(e);
+}
+
+static void event_bubble_parent_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    bubble_parent_cnt++;
+}
+
+/* lv_event_stop_bubbling() keeps the event from reaching the parent */
+void test_event_stop_bubbling(void)
+{
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
+    lv_obj_t * child = lv_obj_create(parent);
+    lv_obj_set_event_bubble(child, true);
+
+    lv_obj_add_event_cb(child, event_bubble_child_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(parent, event_bubble_parent_cb, LV_EVENT_CLICKED, NULL);
+
+    bubble_child_cnt = 0;
+    bubble_parent_cnt = 0;
+    bubble_stop = false;
+    lv_obj_send_event(child, LV_EVENT_CLICKED, NULL);
+    TEST_ASSERT_EQUAL_UINT32(1, bubble_child_cnt);
+    TEST_ASSERT_EQUAL_UINT32(1, bubble_parent_cnt);
+
+    bubble_child_cnt = 0;
+    bubble_parent_cnt = 0;
+    bubble_stop = true;
+    lv_obj_send_event(child, LV_EVENT_CLICKED, NULL);
+    TEST_ASSERT_EQUAL_UINT32(1, bubble_child_cnt);
+    TEST_ASSERT_EQUAL_UINT32(0, bubble_parent_cnt);
+
+    lv_obj_delete(parent);
+}
+
+void test_event_register_id_stops_at_last_custom(void)
+{
+    uint32_t saved = LV_GLOBAL_DEFAULT()->event_last_register_id;
+
+    LV_GLOBAL_DEFAULT()->event_last_register_id = (uint32_t)LV_EVENT_LAST_CUSTOM - 1;
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)LV_EVENT_LAST_CUSTOM, lv_event_register_id());
+
+    TEST_ASSERT_EQUAL_UINT32(LV_EVENT_LAST, lv_event_register_id());
+    TEST_ASSERT_EQUAL_UINT32(LV_EVENT_LAST, lv_event_register_id());
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)LV_EVENT_LAST_CUSTOM,
+                             LV_GLOBAL_DEFAULT()->event_last_register_id);
+
+    LV_GLOBAL_DEFAULT()->event_last_register_id = saved;
 }
 
 #endif

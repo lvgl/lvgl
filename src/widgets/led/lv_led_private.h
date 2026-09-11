@@ -14,10 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_led.h"
+#include "../../core/lv_obj_private.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_LED
-#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES

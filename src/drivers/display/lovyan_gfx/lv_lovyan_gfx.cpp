@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_lovyan_gfx.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_LOVYAN_GFX
 
 #include LV_LGFX_USER_INCLUDE
@@ -43,6 +43,7 @@ static void read_touch(lv_indev_t * indev_driver, lv_indev_data_t * data);
 
 lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes, bool touch)
 {
+    LV_CHECK_ARG(buf != NULL, return NULL);
     lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_malloc_zeroed(sizeof(lv_lovyan_gfx_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
@@ -91,7 +92,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
 
     if(dsc->tft->getStartCount() == 0) {
-        dsc->tft->endWrite();
+        dsc->tft->startWrite();
     }
     dsc->tft->pushImageDMA(area->x1, area->y1, w, h, (uint16_t *)px_map);
     dsc->tft->waitDMA();

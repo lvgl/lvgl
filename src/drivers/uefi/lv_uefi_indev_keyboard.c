@@ -7,21 +7,30 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_text_private.h"
+#include "lv_uefi_private.h"
 
 #if LV_USE_UEFI
 
-#include "lv_uefi_indev.h"
-#include "lv_uefi_private.h"
+#include "../../misc/lv_text_private.h"
 
 /*********************
  *      DEFINES
  *********************/
 
 #define SIMPLE_TEXT_INPUT_INDEV_SIGNATURE 0x53495449
+#ifndef SCAN_UP
+    #define SCAN_UP         0x0001
+    #define SCAN_DOWN       0x0002
+    #define SCAN_RIGHT      0x0003
+    #define SCAN_LEFT       0x0004
+    #define SCAN_HOME       0x0005
+    #define SCAN_END        0x0006
+    #define SCAN_DELETE     0x0008
+    #define SCAN_ESC        0x0017
+#endif
+#ifndef SCAN_SUSPEND
+    #define SCAN_SUSPEND    0x0102
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -109,11 +118,12 @@ lv_indev_t * lv_uefi_simple_text_input_indev_create(void)
 */
 bool lv_uefi_simple_text_input_indev_add_handle(lv_indev_t * indev, EFI_HANDLE handle)
 {
+    LV_CHECK_ARG(indev != NULL, return false);
     EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL * interface = NULL;
     lv_uefi_simple_text_input_handle_context_t * handle_ctx = NULL;
 
     lv_uefi_simple_text_input_context_t * indev_ctx = (lv_uefi_simple_text_input_context_t *)lv_indev_get_user_data(indev);
-    LV_ASSERT_NULL(indev_ctx);
+    LV_CHECK_ARG(indev_ctx != NULL, return false);
 
     if(indev_ctx->signature != SIMPLE_TEXT_INPUT_INDEV_SIGNATURE) return false;
 
@@ -139,13 +149,14 @@ bool lv_uefi_simple_text_input_indev_add_handle(lv_indev_t * indev, EFI_HANDLE h
 */
 void lv_uefi_simple_text_input_indev_add_all(lv_indev_t * indev)
 {
+    LV_CHECK_ARG(indev != NULL, return);
     EFI_STATUS status;
     EFI_HANDLE * handles = NULL;
     UINTN no_handles;
     UINTN index;
 
     lv_uefi_simple_text_input_context_t * indev_ctx = (lv_uefi_simple_text_input_context_t *)lv_indev_get_user_data(indev);
-    LV_ASSERT_NULL(indev_ctx);
+    LV_CHECK_ARG(indev_ctx != NULL, return);
 
     if(indev_ctx->signature != SIMPLE_TEXT_INPUT_INDEV_SIGNATURE) return;
 
@@ -189,7 +200,7 @@ static void _simple_text_input_read_cb(lv_indev_t * indev, lv_indev_data_t * dat
     void * node = NULL;
 
     lv_uefi_simple_text_input_context_t * indev_ctx = (lv_uefi_simple_text_input_context_t *)lv_indev_get_user_data(indev);
-    LV_ASSERT_NULL(indev_ctx);
+    LV_ASSERT(indev_ctx != NULL);
 
     /* Empty the buffer before reading new values */
     if(lv_ll_is_empty(&indev_ctx->key_cache)) {
@@ -245,8 +256,8 @@ static void _simple_text_input_read(lv_uefi_simple_text_input_context_t * indev_
     uint32_t key;
     lv_uefi_simple_text_input_key_cache_t * cache = NULL;
 
-    LV_ASSERT_NULL(indev_ctx);
-    LV_ASSERT_NULL(handle_ctx);
+    LV_ASSERT(indev_ctx != NULL);
+    LV_ASSERT(handle_ctx != NULL);
 
     status = handle_ctx->interface->ReadKeyStrokeEx(
                      handle_ctx->interface,
@@ -302,25 +313,27 @@ static uint32_t _utf8_from_unicode(UINT32 unicode)
 
 static uint32_t _key_from_uefi_key(const EFI_KEY_DATA * key)
 {
-    LV_ASSERT_NULL(key);
+    LV_ASSERT(key != NULL);
 
     switch(key->Key.ScanCode) {
-        case 0x01:
+        case SCAN_UP:
             return LV_KEY_UP;
-        case 0x02:
+        case SCAN_DOWN:
             return LV_KEY_DOWN;
-        case 0x04:
+        case SCAN_LEFT:
             return LV_KEY_LEFT;
-        case 0x03:
+        case SCAN_RIGHT:
             return LV_KEY_RIGHT;
-        case 0x08:
+        case SCAN_DELETE:
             return LV_KEY_DEL;
-        case 0x05:
+        case SCAN_HOME:
             return LV_KEY_HOME;
-        case 0x06:
+        case SCAN_END:
             return LV_KEY_END;
-        case 0x17:
+        case SCAN_ESC:
             return LV_KEY_ESC;
+        case SCAN_SUSPEND:
+            return LV_KEY_ENTER;
         /* ignore all other scan codes */
         default:
             break;

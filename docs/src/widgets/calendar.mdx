@@ -1,0 +1,132 @@
+---
+title: "Calendar (lv_calendar)"
+description: "A classic month calendar that can show day names, highlight today, and mark any user-defined dates."
+---
+
+## Overview
+
+Calendar is a classic month calendar. It can:
+
+- show the days of any month in a 7x7 grid,
+- show the name of each day,
+- highlight today, and
+- highlight any user-defined dates.
+
+Calendar is added to the default group (if one is set). It is an editable
+widget — dates can be picked with a pointer, an encoder, or a keyboard.
+
+To stay flexible, Calendar does not show the current year or month by
+default. Optional "headers" can be attached to add this.
+
+## Styling
+
+The calendar Widget uses the [Button Matrix](/widgets/buttonmatrix)
+Widget under the hood to arrange the days into a matrix.
+
+- <ApiLink name="LV_PART_MAIN" /> Calendar background. Uses the [typical
+  background style properties](/common-widget-features/styles/overview).
+- <ApiLink name="LV_PART_ITEMS" /> Refers to dates and day names. Button matrix
+  control flags are set to differentiate the buttons and a custom drawer event is
+  added to modify the properties of the buttons as follows:
+
+  - day names have no border, no background and are drawn with a gray color
+  - days of the previous and next month have the <ApiLink name="LV_BUTTONMATRIX_CTRL_DISABLED" /> flag
+  - today has a thicker border with the theme's primary color - highlighted days have some opacity with the theme's primary color.
+
+<LvglExample name="lv_example_calendar_basic" path="widgets/calendar/lv_example_calendar_basic" />
+
+Some functions use the <ApiLink name="lv_calendar_date_t" /> type which is a
+structure with `year`, `month` and `day` fields.
+
+## Current date
+
+To set the current date (today), use the
+<ApiLink name="lv_calendar_set_today_date" display="lv_calendar_set_today_date(calendar, year, month, day)" /> function.
+`month` needs to be in 1..12 range and `day` in 1..31 range.
+
+## Month shown
+
+To set the shown date, use
+<ApiLink name="lv_calendar_set_month_shown" display="lv_calendar_set_month_shown(calendar, year, month)" />
+
+## Highlighted days
+
+The list of highlighted dates should be stored in a
+<ApiLink name="lv_calendar_date_t" /> array and applied to the Calendar by calling
+<ApiLink name="lv_calendar_set_highlighted_dates" display="lv_calendar_set_highlighted_dates(calendar, highlighted_dates, date_num)" />.
+Only the array's pointer will be saved so the array should be have static or
+global scope.
+
+Highlighted dates aren't yet exposed through XML attributes (the dates need
+a static array that outlives the widget). This C example also wires an
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> callback that logs the tapped date — the typical
+pattern for picking a day:
+
+<LvglExample name="lv_example_calendar_highlighted_days" path="widgets/calendar/lv_example_calendar_highlighted_days" />
+
+## Names of days
+
+The names of the days can be adjusted with
+<ApiLink name="lv_calendar_set_day_names" display="lv_calendar_set_day_names(calendar, day_names)" /> where `day_names`
+looks like `const char * day_names[7] = {"Su", "Mo", ...};` Only the
+pointer of the day names is saved so the array should have static or
+global scope.
+
+```c
+static const char * day_names[7] = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
+lv_calendar_set_day_names(calendar, day_names);
+```
+
+## Custom year list
+
+Set a custom year list with <ApiLink name="lv_calendar_header_dropdown_set_year_list" display="lv_calendar_header_dropdown_set_year_list(calendar, years_list)" />
+where `years_list` is a pointer to the custom years list. It can be a constant string
+like `static const char * years = "2023\n2022\n2021\n2020\n2019";`,
+or can be generated dynamically into a buffer as well.  Calendar stores these in a
+Drop-Down List Widget via <ApiLink name="lv_dropdown_set_options" /> so the passed string
+pointer can be supplied by a local variable or buffer and does not need to persist
+beyond the call.
+
+```c
+lv_calendar_header_dropdown_set_year_list(calendar, "2026\n2025\n2024\n2023");
+```
+
+## Chinese calendar
+
+<ApiLink name="lv_calendar_set_chinese_mode" display="lv_calendar_set_chinese_mode(calendar, true)" /> adds lunar-date and
+solar-term annotations alongside each Gregorian day. Requires
+<ApiLink name="LV_USE_CALENDAR_CHINESE" /> and a CJK font.
+
+<LvglExample name="lv_example_calendar_chinese" path="widgets/calendar/lv_example_calendar_chinese" />
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent if a date is clicked.
+   <ApiLink name="lv_calendar_get_pressed_date" display="lv_calendar_get_pressed_date(calendar, &date)" /> to set `date` to the
+   date currently being pressed. Returns <ApiLink name="LV_RESULT_OK" /> if there is a
+   valid pressed date; otherwise it returns <ApiLink name="LV_RESULT_INVALID" />.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_DOWN/UP/LEFT/RIGHT` To navigate among the buttons to dates
+- <ApiLink name="LV_KEY_ENTER" /> To press/release the selected date
+
+Learn more about [Keys](/main-modules/indev/keypad).
+
+## Headers
+
+**From LVGL v8.1 onward, the header is added directly into the Calendar Widget and
+the API of the headers has been changed.**
+
+### Arrow buttons
+
+<ApiLink name="lv_calendar_add_header_arrow" display="lv_calendar_add_header_arrow(calendar)" /> creates a header that
+contains a left and right arrow on the sides and text between the arrows showing the
+current year and month.
+
+### Drop-down
+
+<ApiLink name="lv_calendar_add_header_dropdown" display="lv_calendar_add_header_dropdown(calendar)" /> creates a header that
+contains 2 Drop-Drown List Widgets for the year and month.

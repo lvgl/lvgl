@@ -44,7 +44,18 @@ static void slider_prg_event_handler(lv_event_t * e)
 }
 
 /**
- * Create an animation timeline
+ * @title Animation timeline with transport controls
+ * @brief Drive staggered grow animations through a timeline the user can pause or scrub.
+ *
+ * Three 90x70 objects are laid out in a flex row with a checkable Start
+ * button, a Pause button, and a progress slider ranged to
+ * `LV_ANIM_TIMELINE_PROGRESS_MAX`. An `lv_anim_timeline_t` schedules width
+ * and height animations for each object (`lv_anim_path_overshoot` for width
+ * and `lv_anim_path_ease_out` for height, each 300 ms) starting at offsets
+ * 0, 200, and 400 ms, plus a linear 700 ms animation that sweeps the
+ * slider. The Start button toggles forward and reverse playback via
+ * `lv_anim_timeline_set_reverse`, Pause calls `lv_anim_timeline_pause`, and
+ * dragging the slider calls `lv_anim_timeline_set_progress`.
  */
 void lv_example_anim_timeline_1(void)
 {
@@ -58,8 +69,8 @@ void lv_example_anim_timeline_1(void)
     /* create btn_start */
     lv_obj_t * btn_start = lv_button_create(par);
     lv_obj_add_event_cb(btn_start, btn_start_event_handler, LV_EVENT_VALUE_CHANGED, anim_timeline);
-    lv_obj_add_flag(btn_start, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_obj_add_flag(btn_start, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_set_ignore_layout(btn_start, true);
+    lv_obj_set_checkable(btn_start, true);
     lv_obj_align(btn_start, LV_ALIGN_TOP_MID, -100, 20);
 
     lv_obj_t * label_start = lv_label_create(btn_start);
@@ -69,7 +80,7 @@ void lv_example_anim_timeline_1(void)
     /* create btn_pause */
     lv_obj_t * btn_pause = lv_button_create(par);
     lv_obj_add_event_cb(btn_pause, btn_pause_event_handler, LV_EVENT_CLICKED, anim_timeline);
-    lv_obj_add_flag(btn_pause, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_set_ignore_layout(btn_pause, true);
     lv_obj_align(btn_pause, LV_ALIGN_TOP_MID, 100, 20);
 
     lv_obj_t * label_pause = lv_label_create(btn_pause);
@@ -79,7 +90,7 @@ void lv_example_anim_timeline_1(void)
     /* create slider_prg */
     lv_obj_t * slider_prg = lv_slider_create(par);
     lv_obj_add_event_cb(slider_prg, slider_prg_event_handler, LV_EVENT_VALUE_CHANGED, anim_timeline);
-    lv_obj_add_flag(slider_prg, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_set_ignore_layout(slider_prg, true);
     lv_obj_align(slider_prg, LV_ALIGN_BOTTOM_MID, 0, -20);
     lv_slider_set_range(slider_prg, 0, LV_ANIM_TIMELINE_PROGRESS_MAX);
 

@@ -1,0 +1,18 @@
+{
+  "title": "Common Widget Features",
+  "pages": [
+    "basics",
+    "api",
+    "tree",
+    "screens",
+    "coordinates",
+    "parts_and_states",
+    "layers",
+    "styles",
+    "events",
+    "flags",
+    "layouts",
+    "scrolling",
+    "obj_property"
+  ]
+}

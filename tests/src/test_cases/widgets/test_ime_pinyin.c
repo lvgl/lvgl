@@ -108,7 +108,7 @@ void test_ime_pinyin_get_cand_panel(void)
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
     TEST_ASSERT_NOT_NULL(cand_panel);
-    TEST_ASSERT_TRUE(lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN));
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(cand_panel));
 }
 
 /* Test mode switching */
@@ -177,7 +177,7 @@ void test_ime_pinyin_kb_event(void)
     TEST_ASSERT_NOT_NULL(cand_panel);
 
     /* Verify cand_panel is initially hidden */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN));
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(cand_panel));
 
     /* Simulate keyboard button click for 'n' */
     lv_buttonmatrix_set_selected_button(g_kb, 26); /* 'n' key position */
@@ -313,12 +313,15 @@ void test_ime_pinyin_destructor(void)
     lv_obj_t * kb_ref = lv_ime_pinyin_get_kb(g_pinyin_ime);
     lv_obj_t * cand_ref = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
 
+    lv_obj_null_on_delete(&kb_ref);
+    lv_obj_null_on_delete(&cand_ref);
+
     /* Delete the IME object */
     lv_obj_delete(g_pinyin_ime);
 
     /* The keyboard and cand_panel should also be deleted */
-    TEST_ASSERT_FALSE(lv_obj_is_valid(kb_ref));
-    TEST_ASSERT_FALSE(lv_obj_is_valid(cand_ref));
+    TEST_ASSERT_NULL(kb_ref);
+    TEST_ASSERT_NULL(cand_ref);
 }
 
 /* Test K9 mode with default dictionary */
@@ -374,7 +377,7 @@ void test_ime_pinyin_cand_panel_visibility(void)
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
 
     /* Initially hidden */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN));
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(cand_panel));
 
     /* After entering some text, it should be visible (if valid pinyin) */
     /* This is tested indirectly by verifying the structure */
@@ -388,14 +391,14 @@ void test_ime_pinyin_kb_validity(void)
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
 
     lv_obj_t * retrieved = lv_ime_pinyin_get_kb(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(retrieved));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(retrieved));
 }
 
 /* Test cand_panel object validity */
 void test_ime_pinyin_cand_panel_validity(void)
 {
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 }
 
 /* Test getter functions */
@@ -411,7 +414,7 @@ void test_ime_pinyin_getters(void)
     /* Test get_cand_panel */
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
     TEST_ASSERT_NOT_NULL(cand_panel);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 
     /* Test get_dict (should return default dict) */
     const lv_pinyin_dict_t * dict = lv_ime_pinyin_get_dict(g_pinyin_ime);
@@ -428,7 +431,7 @@ void test_ime_pinyin_edge_cases(void)
 
     /* Verify cand_panel is valid */
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 }
 
 /* Test rendering with default dictionary */
@@ -661,11 +664,13 @@ void test_ime_pinyin_deletion_order(void)
     /* Store references */
     lv_obj_t * kb_ref = lv_ime_pinyin_get_kb(g_pinyin_ime);
 
+    lv_obj_null_on_delete(&kb_ref);
+
     /* Delete keyboard first */
     lv_obj_delete(g_kb);
 
     /* Verify g_kb reference is invalid */
-    TEST_ASSERT_FALSE(lv_obj_is_valid(kb_ref));
+    TEST_ASSERT_NULL(kb_ref);
 }
 
 /* Test with empty input */
@@ -773,7 +778,7 @@ void test_ime_pinyin_cand_selection(void)
     lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
 
     /* If candidates exist, simulate selection */
-    if(ime->cand_num > 0 && !lv_obj_has_flag(ime->cand_panel, LV_OBJ_FLAG_HIDDEN)) {
+    if(ime->cand_num > 0 && !lv_obj_is_hidden(ime->cand_panel)) {
         /* Select first candidate (button id 1, 0 is left arrow) */
         lv_buttonmatrix_set_selected_button(ime->cand_panel, 1);
         lv_obj_send_event(ime->cand_panel, LV_EVENT_VALUE_CHANGED, NULL);
@@ -957,7 +962,7 @@ void test_ime_pinyin_cand_page_buttons(void)
     press_button_by_text(g_kb, "n");
 
     /* If candidate panel is visible, test navigation */
-    if(!lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN) && ime->cand_num > 0) {
+    if(!lv_obj_is_hidden(cand_panel) && ime->cand_num > 0) {
         /* Try to click left/right buttons on candidate panel */
         lv_buttonmatrix_set_selected_button(cand_panel, 0); /* Left button */
         lv_obj_send_event(cand_panel, LV_EVENT_VALUE_CHANGED, NULL);

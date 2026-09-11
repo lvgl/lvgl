@@ -1,0 +1,76 @@
+---
+title: "Arc Label (lv_arclabel)"
+description: "Display text along an arc — useful for gauges, dials, and other curved layouts."
+---
+
+## Overview
+
+The Arc Label displays text along an arc. Useful for gauges, dials, and any
+layout where the text needs to follow a curved path. You can set the text,
+direction, radius, alignment, and color.
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> covers both the arc path and the text drawn
+  along it. Use the typical text and background style properties to change
+  the look.
+
+## Text Management
+
+- Text can be set using <ApiLink name="lv_arclabel_set_text" display="lv_arclabel_set_text(arclabel, &quot;Your text&quot;)" />.
+- For formatted text, use <ApiLink name="lv_arclabel_set_text_fmt" display="lv_arclabel_set_text_fmt(arclabel, &quot;Formatted %s&quot;, &quot;text&quot;)" />.
+- Static text can be set with <ApiLink name="lv_arclabel_set_text_static" display="lv_arclabel_set_text_static(arclabel, static_text)" />, which avoids dynamic memory allocation.
+
+## Angle Configuration
+
+- Set the starting angle of the arc with <ApiLink name="lv_arclabel_set_angle_start" display="lv_arclabel_set_angle_start(arclabel, angle)" />.
+- Define the arc size (angular span) using <ApiLink name="lv_arclabel_set_angle_size" display="lv_arclabel_set_angle_size(arclabel, size)" />.
+- Angles are measured in degrees, starting from the positive x-axis (3 o'clock position) and increasing clockwise.
+
+## Direction
+
+Specify the text direction along the arc using <ApiLink name="lv_arclabel_set_dir" display="lv_arclabel_set_dir(arclabel, LV_ARCLABEL_DIR_CLOCKWISE)" /> or <ApiLink name="lv_arclabel_set_dir" display="lv_arclabel_set_dir(arclabel, LV_ARCLABEL_DIR_COUNTERCLOCKWISE)" />.
+
+- <ApiLink name="LV_ARCLABEL_DIR_CLOCKWISE" /> Text flows in a clockwise direction along the arc.
+- <ApiLink name="LV_ARCLABEL_DIR_COUNTERCLOCKWISE" /> Text flows in a counter-clockwise direction along the arc.
+
+## Alignment
+
+Adjust vertical text alignment with <ApiLink name="lv_arclabel_set_text_vertical_align" display="lv_arclabel_set_text_vertical_align(arclabel, LV_ARCLABEL_TEXT_ALIGN_CENTER)" />.
+Set horizontal alignment using <ApiLink name="lv_arclabel_set_text_horizontal_align" display="lv_arclabel_set_text_horizontal_align(arclabel, LV_ARCLABEL_TEXT_ALIGN_CENTER)" />.
+
+Both vertical and horizontal use the same logic.
+
+- <ApiLink name="LV_ARCLABEL_TEXT_ALIGN_DEFAULT" /> Uses the default alignment.
+- <ApiLink name="LV_ARCLABEL_TEXT_ALIGN_LEADING" /> Aligns text to the leading edge of the arc.
+- <ApiLink name="LV_ARCLABEL_TEXT_ALIGN_CENTER" /> Centers text along the arc.
+- <ApiLink name="LV_ARCLABEL_TEXT_ALIGN_TRAILING" /> Aligns text to the trailing edge of the arc.
+
+## Radius and Center Offset
+
+- Set the radius of the arc with <ApiLink name="lv_arclabel_set_radius" display="lv_arclabel_set_radius(arclabel, radius)" />.
+- Adjust the center offset of the arc using <ApiLink name="lv_arclabel_set_center_offset_x" display="lv_arclabel_set_center_offset_x(arclabel, x)" /> and <ApiLink name="lv_arclabel_set_center_offset_y" display="lv_arclabel_set_center_offset_y(arclabel, y)" />.
+
+## Color and Recoloring
+
+Enable text recoloring with <ApiLink name="lv_arclabel_set_recolor" display="lv_arclabel_set_recolor(arclabel, true)" />. This allows parts of the text to be colored differently using color commands embedded in the text string.
+
+## Interactive Behavior
+
+Arc Label is not clickable by default. Add the
+<ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag if you want it to receive
+input events.
+
+## Events
+
+No special events. The widget inherits the events common to all widgets.
+
+## Keys
+
+No special keys. Add the widget to a group if you need keypad input.
+
+## Example
+
+### Simple Arc Label
+
+<LvglExample name="lv_example_arclabel_curved_text" path="widgets/arclabel/lv_example_arclabel_curved_text" />

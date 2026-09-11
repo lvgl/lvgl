@@ -15,7 +15,7 @@
 */
 
 #include "lv_port_disp.h"
-#include "./src/drivers/display/st7789/lv_st7789.h"
+#include "lv_port_lcd_stm32_template.h"
 
 /*********************
  *      DEFINES

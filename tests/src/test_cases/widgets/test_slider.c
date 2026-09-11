@@ -39,8 +39,8 @@ void test_textarea_should_have_valid_documented_default_values(void)
 
     /* Horizontal slider */
     TEST_ASSERT_TRUE(objw >= objh);
-    TEST_ASSERT_FALSE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN));
-    TEST_ASSERT_FALSE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLLABLE));
+    TEST_ASSERT_FALSE((lv_obj_is_scroll_chain_hor(slider) && lv_obj_is_scroll_chain_ver(slider)));
+    TEST_ASSERT_FALSE(lv_obj_is_scrollable(slider));
 }
 
 void test_slider_event_keys_right_and_up_increment_value_by_one(void)
@@ -322,7 +322,7 @@ void test_slider_scroll_chain_horizontal(void)
     lv_obj_send_event(slider, LV_EVENT_RELEASED, NULL);
 
     /* Horizontal ptr should allow vertical scroll chain */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
+    TEST_ASSERT_TRUE(lv_obj_is_scroll_chain_ver(slider));
 }
 
 void test_slider_scroll_chain_vertical(void)
@@ -335,7 +335,7 @@ void test_slider_scroll_chain_vertical(void)
     lv_obj_send_event(slider, LV_EVENT_RELEASED, NULL);
 
     /* Vertical ptr should allow horizontal scroll chain */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
+    TEST_ASSERT_TRUE(lv_obj_is_scroll_chain_hor(slider));
 }
 
 void test_slider_range_mode_key_decrement_left_value(void)
@@ -608,6 +608,142 @@ void test_slider_range_mode_vertical_rtl_drag_start_value_selection(void)
     assert_slider_drag_start_selection(slider_ver,
                                        (right_knob.x1 + right_knob.x2) / 2, right_knob.y1 - 20,
                                        &ptr_ver->bar.cur_value, -1);
+}
+
+void test_slider_large_range_drag_no_int32_overflow_horiz(void)
+{
+    /* Prevent int32 overflow during horizontal drag.
+     * 600px slider x range 20M → pixel * range > INT32_MAX for pixel > ~107. */
+    lv_obj_set_size(slider, 600, 20);
+    lv_obj_center(slider);
+    lv_slider_set_range(slider, 0, 20000000);
+    lv_slider_set_value(slider, 0, LV_ANIM_OFF);
+    lv_obj_update_layout(slider);
+    lv_refr_now(NULL);
+
+    /* Drag from center to right: pixel ~300 → value should be ~10M (not overflowed) */
+    lv_test_mouse_move_to_obj(slider);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_move_by(150, 0);  /* drag right ~50% more */
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    int32_t val = lv_slider_get_value(slider);
+    /* Value must NOT be 0 (overflow collapse). Should be in upper half of range. */
+    TEST_ASSERT_TRUE(val > 5000000);
+    TEST_ASSERT_TRUE(val <= 20000000);
+}
+
+void test_slider_large_range_drag_no_int32_overflow_vert(void)
+{
+    /* Prevent int32 overflow during vertical drag. */
+    lv_obj_set_size(slider, 20, 400);
+    lv_obj_center(slider);
+    lv_slider_set_range(slider, 0, 20000000);
+    lv_slider_set_value(slider, 0, LV_ANIM_OFF);
+    lv_obj_update_layout(slider);
+    lv_refr_now(NULL);
+
+    lv_test_mouse_move_to_obj(slider);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_move_by(0, -100);
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    int32_t val = lv_slider_get_value(slider);
+    TEST_ASSERT_TRUE(val > 5000000);
+    TEST_ASSERT_TRUE(val <= 20000000);
+}
+
+void test_slider_large_range_key_up_increments(void)
+{
+    lv_obj_set_size(slider, 600, 20);
+    lv_slider_set_range(slider, 0, 20000000);
+    lv_slider_set_value(slider, 10000000, LV_ANIM_OFF);
+
+    uint32_t key = LV_KEY_RIGHT;
+    lv_obj_send_event(slider, LV_EVENT_KEY, (void *)&key);
+
+    int32_t val = lv_slider_get_value(slider);
+    TEST_ASSERT_TRUE(val > 10000000);
+}
+
+static uint32_t value_changed_cnt;
+
+static void value_changed_event_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    value_changed_cnt++;
+}
+
+void test_slider_knob_follows_drag_while_parent_is_scrolled(void)
+{
+    /* A slider dragged to its end doesn't change value, so it keeps its vertical scroll
+     * chain and a vertical move can make the parent the indev's scroll object.
+     * The knob must keep following the pointer anyway because the drag is already ongoing. */
+    lv_obj_t * cont = lv_obj_create(active_screen);
+    lv_obj_set_size(cont, 300, 160);
+    lv_obj_center(cont);
+    lv_obj_set_scroll_dir(cont, LV_DIR_VER);
+    lv_obj_set_style_pad_all(cont, 0, 0);
+    /* No momentum so the scroll ends with the release */
+    lv_obj_set_scroll_momentum(cont, false);
+
+    lv_obj_t * slider_in_cont = lv_slider_create(cont);
+    lv_obj_set_size(slider_in_cont, 200, 20);
+    lv_obj_set_pos(slider_in_cont, 0, 60);
+    lv_slider_set_value(slider_in_cont, 100, LV_ANIM_OFF);
+
+    value_changed_cnt = 0;
+    lv_obj_add_event_cb(slider_in_cont, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    /* Make the container really scrollable downwards */
+    lv_obj_t * spacer = lv_obj_create(cont);
+    lv_obj_set_size(spacer, 10, 100);
+    lv_obj_set_pos(spacer, 0, 200);
+
+    lv_obj_update_layout(cont);
+    lv_refr_now(NULL);
+    TEST_ASSERT_GREATER_THAN_INT32(0, lv_obj_get_scroll_bottom(cont));
+
+    lv_area_t coords;
+    lv_obj_get_coords(slider_in_cont, &coords);
+    const int32_t press_y = (coords.y1 + coords.y2) / 2;
+    const int32_t target_x = (coords.x1 + coords.x2) / 2;
+
+    /* Press at the right end and drag further right: dragging starts but the value
+     * stays clamped at the maximum */
+    lv_test_mouse_move_to(coords.x2 - 2, press_y);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_move_by(20, 0);
+    lv_test_wait(50);
+
+    TEST_ASSERT_TRUE(lv_slider_is_dragged(slider_in_cont));
+    TEST_ASSERT_EQUAL_INT32(100, lv_slider_get_value(slider_in_cont));
+    TEST_ASSERT_EQUAL_UINT32(0, value_changed_cnt);
+
+    /* Move up so the indev starts scrolling the container */
+    lv_test_mouse_move_by(0, -40);
+    lv_test_wait(50);
+
+    lv_indev_t * mouse = lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
+    TEST_ASSERT_EQUAL_PTR(cont, lv_indev_get_scroll_obj(mouse));
+    TEST_ASSERT_TRUE(lv_slider_is_dragged(slider_in_cont));
+
+    /* Drag back to the middle. The knob must follow even though a scroll object is active */
+    lv_test_mouse_move_by(target_x - (coords.x2 - 2 + 20), 0);
+    lv_test_wait(50);
+
+    TEST_ASSERT_INT_WITHIN(5, 50, lv_slider_get_value(slider_in_cont));
+    TEST_ASSERT_GREATER_THAN_UINT32(0, value_changed_cnt);
+
+    lv_test_mouse_release();
+    lv_test_wait(200);
 }
 
 #endif

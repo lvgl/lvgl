@@ -1,0 +1,82 @@
+---
+title: "Switch (lv_switch)"
+description: "A small slider showing an on/off value. Click or tap to toggle."
+---
+
+## Overview
+
+A Switch looks like a small slider. It shows — and lets the user toggle —
+an on/off value.
+
+A Switch is horizontal by default. It turns vertical when `height` is
+greater than `width`.
+
+## Change state
+
+<LvglExample name="lv_example_switch_state" path="widgets/switch/lv_example_switch_state" />
+
+The switch uses <ApiLink name="LV_STATE_CHECKED" />:
+
+- <ApiLink name="lv_obj_add_state" display="lv_obj_add_state(sw, LV_STATE_CHECKED)" /> — turn on.
+- <ApiLink name="lv_obj_remove_state" display="lv_obj_remove_state(sw, LV_STATE_CHECKED)" /> — turn off.
+- <ApiLink name="lv_obj_has_state" display="lv_obj_has_state(sw, LV_STATE_CHECKED)" /> — query.
+
+## Change orientation
+
+<LvglExample name="lv_example_switch_orientation" path="widgets/switch/lv_example_switch_orientation" />
+
+<ApiLink name="lv_switch_set_orientation" display="lv_switch_set_orientation(sw, LV_SWITCH_ORIENTATION_…)" /> overrides the
+default `AUTO` (which picks based on `width`/`height`). Pass
+`HORIZONTAL` or `VERTICAL` to force one.
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> Switch's background; uses the [typical
+   background style properties](/common-widget-features/styles/overview). `padding` makes the indicator smaller
+   in the respective direction.
+- <ApiLink name="LV_PART_INDICATOR" /> The indicator that shows the current state of
+   the Switch; also uses the [typical background style properties](/common-widget-features/styles/overview).
+- <ApiLink name="LV_PART_KNOB" /> A rectangle (or circle) drawn at the left or right
+   side of the indicator; also uses the [typical background style properties](/common-widget-features/styles/overview) to modify the knob's appearance. By default, the knob is round
+   (radius-style can modify this) with diameter slightly smaller than the smaller
+   side of the slider.  The knob can be made larger with the `padding` values.
+   Padding values can be asymmetric as well.
+
+<LvglExample name="lv_example_switch_styling" path="widgets/switch/lv_example_switch_styling" />
+
+Switch has three stylable parts: <ApiLink name="LV_PART_MAIN" /> (the
+rounded track), <ApiLink name="LV_PART_INDICATOR" /> (the filled side that
+appears when the switch is on), and <ApiLink name="LV_PART_KNOB" /> (the
+circle that slides). The on-state look is normally attached with
+`selector="indicator|checked"` so the indicator paints only while the
+switch is checked. Local `style_*` props on the `<lv_switch>` tag target
+MAIN.
+
+Padding controls the relative sizes of these parts:
+
+- `pad_*` on <ApiLink name="LV_PART_MAIN" /> shrinks the indicator *inwards*.
+  The indicator fills the padded content area of MAIN, so the more padding
+  you add the more of the track stays visible around the coloured fill —
+  e.g. `pad_all="6"` keeps a 6 px ring of track exposed behind the
+  indicator.
+- `pad_*` on <ApiLink name="LV_PART_KNOB" /> grows the knob *outside* the
+  track. With `pad_all="0"` the knob is exactly as tall as MAIN. Positive
+  padding makes it overhang, which (with a soft shadow) produces the
+  typical floating-knob look. Negative padding would shrink it inside the
+  track.
+
+## Events
+
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent sent when Switch changes state.
+
+<LvglExample name="lv_example_switch_event" path="widgets/switch/lv_example_switch_event" />
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_UP/RIGHT` Turns Switch ON
+- `LV_KEY_DOWN/LEFT` Turns Switch OFF
+- <ApiLink name="LV_KEY_ENTER" /> Toggles the Switch
+
+Learn more about [Keys](/main-modules/indev/keypad).

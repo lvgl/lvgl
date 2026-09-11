@@ -19,12 +19,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
-#if LV_USE_PXP
-#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
-#include "fsl_pxp.h"
-#include "../../../misc/lv_color.h"
+#if LV_USE_DRAW_PXP
+#include <fsl_pxp.h>
 
 /*********************
  *      DEFINES
@@ -60,7 +58,6 @@ pxp_output_pixel_format_t pxp_get_out_px_format(lv_color_format_t cf);
 
 pxp_as_pixel_format_t pxp_get_as_px_format(lv_color_format_t cf);
 
-#if LV_USE_DRAW_PXP
 pxp_ps_pixel_format_t pxp_get_ps_px_format(lv_color_format_t cf);
 
 bool pxp_buf_aligned(const void * buf, uint32_t stride);
@@ -74,8 +71,6 @@ bool pxp_buf_aligned(const void * buf, uint32_t stride);
  **********************/
 
 #endif /*LV_USE_DRAW_PXP*/
-#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
-#endif /*LV_USE_PXP*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_libinput.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_LIBINPUT
 
@@ -53,6 +53,7 @@ struct _lv_libinput_t {
     lv_libinput_event_t last_event; /* Report when no new events
                                    * to keep indev state consistent
                                    */
+    bool running; /* Worker thread is running */
     bool deinit; /* Tell worker thread to quit */
     pthread_mutex_t event_lock;
     pthread_t worker_thread;

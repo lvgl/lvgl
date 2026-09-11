@@ -1,0 +1,23 @@
+<!--
+ @title Scroll basics
+ @brief A panel becomes scrollable on its own when its children overflow it.
+
+ The panel is only 140 px tall but stacks six full-width buttons, so the
+ content is taller than the panel. LVGL makes the panel scrollable and
+ shows a vertical scrollbar automatically — no scroll-specific API is
+ used here, only content that exceeds the bounds.
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
+		<!-- 💡 Drag the panel up and down — it scrolls only because its content is taller than its 140 px height. -->
+		<!-- Fixed-height panel; the column of buttons overflows it -->
+		<lv_obj name="container" width="220" height="140" flex_flow="column" style_pad_row="8">
+			<lv_button name="button_1" width="100%"><lv_label name="label_1" align="center" text="Item 1" /></lv_button>
+			<lv_button name="button_2" width="100%"><lv_label name="label_2" align="center" text="Item 2" /></lv_button>
+			<lv_button name="button_3" width="100%"><lv_label name="label_3" align="center" text="Item 3" /></lv_button>
+			<lv_button name="button_4" width="100%"><lv_label name="label_4" align="center" text="Item 4" /></lv_button>
+			<lv_button name="button_5" width="100%"><lv_label name="label_5" align="center" text="Item 5" /></lv_button>
+			<lv_button name="button_6" width="100%"><lv_label name="label_6" align="center" text="Item 6" /></lv_button>
+		</lv_obj>
+	</view>
+</screen>

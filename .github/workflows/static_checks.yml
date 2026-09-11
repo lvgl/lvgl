@@ -1,0 +1,224 @@
+name: Static Checks
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    name: Static Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # ------------------------------------------------------------------
+      # Every header in include/lvgl/ must appear in include/lvgl/lvgl.h
+      # ------------------------------------------------------------------
+      - name: "Check: public API umbrella (include/lvgl/lvgl.h)"
+        id: public-api
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py public-api
+
+      # ------------------------------------------------------------------
+      # Every header in src/ must appear in src/lvgl_private.h
+      # ------------------------------------------------------------------
+      - name: "Check: private API umbrella (src/lvgl_private.h)"
+        id: private-api
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py private-api
+
+      # ------------------------------------------------------------------
+      # - All #includes inside must be valid relative paths.
+      # - Angle-bracket includes must be in the explicit allow-list
+      #   - see `ALLOWED_EXTERNAL_HEADERS` in `scripts/static_checks/check_headers.py`
+      # - forbidden headers (stdint.h etc.) must use LV_*_INCLUDE macros.
+      # ------------------------------------------------------------------
+      - name: "Check: include path validity + angle-bracket policy"
+        id: include-paths
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py include-paths
+
+      # ------------------------------------------------------------------
+      # All external headers in the allow-list (see check above), are used
+      # ------------------------------------------------------------------
+      - name: "Check: all headers in allow-list are used"
+        id: allowed-list
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py allowed-list-audit
+
+      # ------------------------------------------------------------------
+      # No file may include a deprecated header
+      # ------------------------------------------------------------------
+      - name: "Check: no deprecated header includes"
+        id: deprecated
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py deprecated
+
+      # ------------------------------------------------------------------
+      # Every header file inside `src` must use `lvgl_public.h` to access
+      # the public API
+      # ------------------------------------------------------------------
+      - name: "Check: no direct public include from source files"
+        id: direct-public-include
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py no-direct-public-include
+
+      # ------------------------------------------------------------------
+      # Every typedef struct/enum in include/lvgl/lv_types.h must have
+      #    a real definition (with a body) somewhere
+      # ------------------------------------------------------------------
+      - name: "Check: lv_types.h forward declarations have a real definition"
+        id: lv_types
+        continue-on-error: true
+        run: python scripts/static_checks/check_lv_types.py
+
+      # ------------------------------------------------------------------
+      # Defconfigs are up to date and produce no warnings
+      # ------------------------------------------------------------------
+      - name: "Check: Defconfings are up to date"
+        id: defconfigs
+        continue-on-error: true
+        run: |
+          pip install kconfiglib
+          python scripts/static_checks/check_defconfigs.py
+
+      # ------------------------------------------------------------------
+      # Every glob in .github/labeler.yml still matches a tracked file
+      # ------------------------------------------------------------------
+      - name: "Check: labeler globs match tracked files"
+        id: labeler-globs
+        continue-on-error: true
+        run: |
+          pip install pyyaml
+          python scripts/static_checks/check_labeler.py globs
+
+      # ------------------------------------------------------------------
+      # Every label used by .github/labeler.yml exists on the repo
+      # ------------------------------------------------------------------
+      - name: "Check: labeler labels exist"
+        id: labeler-labels
+        if: github.repository == 'lvgl/lvgl'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/static_checks/check_labeler.py labels-exist
+
+      # ------------------------------------------------------------------
+      # C sources/headers must use block comments (/* */), not //.
+      # Scoped per-module while the conversion is rolled out; widen the
+      # path list as each module is cleaned.
+      # ------------------------------------------------------------------
+      - name: "Check: no // comments in C sources (src/core)"
+        id: comments
+        continue-on-error: true
+        run: python scripts/static_checks/check_comments.py src/core
+
+      # ------------------------------------------------------------------
+      # The file name dependent parts of every lv_*.c/lv_*.h file
+      # (@file comment, include guards) must match the file name
+      # ------------------------------------------------------------------
+      - name: "Check: file templates match file names"
+        id: file-template
+        continue-on-error: true
+        run: python scripts/static_checks/check_file_template.py
+
+      # ------------------------------------------------------------------
+      # All public API functions have their argument checks
+      # ------------------------------------------------------------------
+      - name: Install doxygen
+        continue-on-error: true
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq doxygen
+
+      - name: "Check: public API argument checks did not regress"
+        id: arg-checks
+        continue-on-error: true
+        run: |
+          python scripts/static_checks/check_arg_checks.py
+
+      # ------------------------------------------------------------------
+      # Final gate
+      # ------------------------------------------------------------------
+      - name: "Gate: report the results and fail if any check failed"
+        if: ${{ !cancelled() }}
+        run: |
+          results="public-api=${{ steps.public-api.outcome }}
+                   private-api=${{ steps.private-api.outcome }}
+                   include-paths=${{ steps.include-paths.outcome }}
+                   allowed-list=${{ steps.allowed-list.outcome }}
+                   direct-public-include=${{ steps.direct-public-include.outcome }}
+                   deprecated=${{ steps.deprecated.outcome }}
+                   lv_types=${{ steps.lv_types.outcome }}
+                   defconfigs=${{ steps.defconfigs.outcome }}
+                   labeler-globs=${{ steps.labeler-globs.outcome }}
+                   labeler-labels=${{ steps.labeler-labels.outcome }}
+                   comments=${{ steps.comments.outcome }}
+                   file-template=${{ steps.file-template.outcome }}
+                   arg-checks=${{ steps.arg-checks.outcome }}"
+
+          failed=""
+          skipped=""
+
+          echo "Policy check results:"
+          echo "---------------------"
+          for result in $results; do
+            name="${result%%=*}"
+            outcome="${result#*=}"
+            case "$outcome" in
+              success) echo "  ✅ $name" ;;
+              failure) echo "  ❌ $name"; failed="$failed $name" ;;
+              # The check never ran, e.g. an install step before it failed
+              *)       echo "  ⏭️ $name ($outcome)"; skipped="$skipped $name" ;;
+            esac
+          done
+          echo "---------------------"
+
+          if [ -n "$failed" ]; then
+            icon=fail
+            summary="$(echo $failed | wc -w) check(s) failing"
+          elif [ -n "$skipped" ]; then
+            icon=warn
+            summary="$(echo $skipped | wc -w) check(s) did not run"
+          else
+            icon=ok
+            summary="all checks passed"
+          fi
+
+          {
+            for name in $failed;  do echo "- ❌ \`$name\` failed"; done
+            for name in $skipped; do echo "- ⏭️ \`$name\` did not run"; done
+            [ -z "$failed$skipped" ] || echo
+            [ -z "$failed$skipped" ] || \
+              echo "See the *Static Checks* job log for the details of each."
+          } > details.md
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python3 scripts/pr_report/pr_report.py emit \
+              --output reports/static_checks.json \
+              --section "Static Checks" --icon "$icon" --summary "$summary" \
+              --details-file details.md
+          fi
+
+          if [ -n "$failed" ]; then
+            echo "One or more policy checks failed. See above for details."
+            exit 1
+          fi
+
+      - name: Upload the PR report
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-report-static-checks
+          path: reports/
+          if-no-files-found: ignore

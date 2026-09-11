@@ -1,0 +1,51 @@
+<!--
+ @title Dropdown styling
+ @brief Style the dropdown button (MAIN) with rounded corners and a focused border.
+
+ The dropdown's primary surface is MAIN (the button users tap). Local `style_*` props
+ give it a card-like rounded look with padding and a custom border. A `focused` state
+ style applied to MAIN brightens the border ring when the dropdown receives focus, so
+ the example also demonstrates a state-specific style on a non-button widget.
+-->
+<screen>
+	<styles>
+		<!-- Main button: rounded, light fill, padded, custom text color -->
+		<style
+			name="style_dropdown_main"
+			bg_opa="100%"
+			bg_color="0xffffff"
+			radius="10"
+			border_color="0xd1d5db"
+			border_width="2"
+			text_color="0x111827"
+			pad_left="14"
+			pad_right="14"
+			pad_top="10"
+			pad_bottom="10"
+		/>
+		<!-- Main button, focused: accent border + halo -->
+		<style
+			name="style_dropdown_focused"
+			border_color="0x6366f1"
+			outline_color="0x6366f1"
+			outline_width="3"
+			outline_pad="2"
+			outline_opa="120"
+		/>
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 Tap or focus the dropdown to see the focused-state border swap in. -->
+		<lv_dropdown name="dropdown" width="200" options="Apple&#10;Banana&#10;Cherry&#10;Date">
+			<style name="style_dropdown_main" selector="main" />
+			<style name="style_dropdown_focused" selector="main|focused" />
+			<lv_dropdown-list style_bg_color-selected-checked="0x6366f1" />
+		</lv_dropdown>
+	</view>
+</screen>

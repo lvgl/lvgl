@@ -11,7 +11,6 @@
 
 #if LV_WAYLAND_USE_SHM
 
-#include "../../draw/sw/lv_draw_sw_utils.h"
 #include "../../display/lv_display_private.h"
 #include <errno.h>
 #include <fcntl.h>
@@ -55,7 +54,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void * shm_init(void);
+static lv_result_t shm_init(void ** backend_data);
 static void shm_deinit(void *);
 static void * shm_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height);
 static void * shm_resize_display(void * backend_ctx, lv_display_t * display);
@@ -87,10 +86,13 @@ static const struct wl_buffer_listener buffer_listener = {
     .release = buffer_release
 };
 
-const lv_wayland_backend_ops_t wl_backend_ops = {
+const lv_wayland_backend_ops_t wl_shm_ops = {
     .init = shm_init,
     .deinit = shm_deinit,
     .global_handler = shm_global_handler,
+};
+
+const lv_wayland_backend_display_ops_t wl_shm_display_ops = {
     .init_display = shm_init_display,
     .deinit_display = shm_deinit_display,
     .resize_display = shm_resize_display,
@@ -146,17 +148,22 @@ static int32_t lv_cf_to_shm_cf(lv_color_format_t cf)
     }
 }
 
-static void * shm_init(void)
+static lv_result_t shm_init(void ** backend_data)
 {
     lv_memzero(&shm_ctx, sizeof(shm_ctx));
-    return &shm_ctx;
+    *backend_data = &shm_ctx;
+    return LV_RESULT_OK;
 }
 
 static void shm_deinit(void * backend_ctx)
 {
     lv_wl_shm_ctx_t * ctx = backend_ctx;
+    if(!ctx) {
+        return;
+    }
     if(ctx->shm) {
         wl_shm_destroy(ctx->shm);
+        ctx->shm = NULL;
     }
 }
 
@@ -404,10 +411,13 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     if(ddata->shm_cf == WL_SHM_FORMAT_ARGB8888 && cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
         const int32_t w = lv_area_get_width(area);
         const int32_t h = lv_area_get_height(area);
-        size_t index = 0;
+        const int32_t buf_w = lv_display_get_horizontal_resolution(disp);
+        lv_color32_t * start_pos = (lv_color32_t *)px_map + (area->y1 * buf_w) + area->x1;
+
         for(int32_t y = 0; y < h; ++y) {
+            size_t index = y * buf_w;
             for(int32_t x = 0; x < w; ++x) {
-                lv_color_premultiply((lv_color32_t *) px_map + (index++));
+                lv_color_premultiply(start_pos + (index++));
             }
         }
     }
@@ -425,8 +435,8 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         size_t buf_size = dest_stride * phy_height;
         uint8_t * wl_buf = (uint8_t *)ddata->mmap_ptr + (ddata->curr_wl_buffer_idx * buf_size);
 
-        lv_draw_sw_rotate(ddata->rotated_buf, wl_buf, hor_res, ver_res,
-                          src_stride, dest_stride, rotation, cf);
+        lv_draw_rotate(ddata->rotated_buf, wl_buf, hor_res, ver_res,
+                       src_stride, dest_stride, rotation, cf);
 
         wl_surface_damage(surface, 0, 0, phy_width, phy_height);
     }
@@ -456,4 +466,4 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     ddata->curr_wl_buffer_idx = (ddata->curr_wl_buffer_idx + 1) % LV_WL_SHM_BUF_COUNT;
 }
 
-#endif /*LV_WAYLAND_USE_SHM*/
+#endif /*LV_USE_WAYLAND*/

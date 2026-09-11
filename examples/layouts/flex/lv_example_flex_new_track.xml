@@ -1,0 +1,47 @@
+<!--
+ @title Flex new track
+ @brief Force an item to start a new wrap row.
+
+ In a row_wrap container an item with flex_in_new_track="true" begins a fresh track
+ instead of continuing the previous one. Here the weekend labels are pushed onto their
+ own row regardless of how much horizontal space remains on the first row.
+-->
+<screen>
+	<styles>
+		<!-- Shared style for day labels -->
+		<style name="style_day" bg_opa="100%" text_color="0xffffff" pad_all="6" />
+	</styles>
+
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center">
+		<!-- 💡 Move or remove flex_in_new_track to control exactly where a new row starts. -->
+		<!-- A row-wrap container holds 7 items grouped into 2 tracks.
+		     The sixth item is forced to start in a new tracks -->
+		<!-- Demo container showing explicit new-track start -->
+		<lv_obj name="container" flex_flow="row_wrap" width="90%" height="content">
+			<!-- Track 1 -->
+			<lv_label name="label_1" style_bg_color="0x3498db" text="Mon">
+				<style name="style_day" />
+			</lv_label>
+			<lv_label name="label_2" style_bg_color="0x3498db" text="Tue">
+				<style name="style_day" />
+			</lv_label>
+			<lv_label name="label_3" style_bg_color="0x3498db" text="Wed">
+				<style name="style_day" />
+			</lv_label>
+			<lv_label name="label_4" style_bg_color="0x3498db" text="Thu">
+				<style name="style_day" />
+			</lv_label>
+			<lv_label name="label_5" style_bg_color="0x3498db" text="Fri">
+				<style name="style_day" />
+			</lv_label>
+
+			<!-- Track 2 — forced onto a new track -->
+			<lv_label name="label_6" flex_in_new_track="true" style_bg_color="0xe74c3c" text="Sat">
+				<style name="style_day" />
+			</lv_label>
+			<lv_label name="label_7" style_bg_color="0xe74c3c" text="Sun">
+				<style name="style_day" />
+			</lv_label>
+		</lv_obj>
+	</view>
+</screen>

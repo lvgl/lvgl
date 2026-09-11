@@ -9,7 +9,8 @@
 
 #include "lv_button_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_BUTTON != 0
+
+#if LV_USE_BUTTON
 
 /*********************
  *      DEFINES
@@ -63,8 +64,8 @@ static void lv_button_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scrollable(obj, false);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

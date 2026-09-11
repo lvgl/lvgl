@@ -7,12 +7,16 @@
  *      INCLUDES
  *********************/
 #include "lv_file_explorer_private.h"
-#include "../../misc/lv_fs_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_FILE_EXPLORER
 
-#include "../../lvgl.h"
+#include "../../fs/lv_fs_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../lvgl_public.h"
 #include "../../core/lv_global.h"
+
+/*This widget is deprecated and it is built from the deprecated `lv_list` widget.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
 
 /*********************
  *      DEFINES
@@ -78,6 +82,7 @@ const lv_obj_class_t lv_file_explorer_class = {
 
 lv_obj_t * lv_file_explorer_create(lv_obj_t * parent)
 {
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
@@ -90,12 +95,14 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent)
 #if LV_FILE_EXPLORER_QUICK_ACCESS
 void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir_t dir, const char * path)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(path != NULL, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     /*If path is unavailable */
-    if((path == NULL) || (lv_strlen(path) <= 0)) return;
+    if(lv_strlen(path) <= 0) return;
 
     char ** dir_str = NULL;
     switch(dir) {
@@ -137,7 +144,8 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
 
 void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -148,7 +156,8 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 
 void lv_file_explorer_show_back_button(lv_obj_t * obj, bool show)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -160,7 +169,8 @@ void lv_file_explorer_show_back_button(lv_obj_t * obj, bool show)
  *====================*/
 const char * lv_file_explorer_get_selected_file_name(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -169,7 +179,8 @@ const char * lv_file_explorer_get_selected_file_name(const lv_obj_t * obj)
 
 const char * lv_file_explorer_get_current_path(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -178,7 +189,8 @@ const char * lv_file_explorer_get_current_path(const lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -187,7 +199,8 @@ lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -196,7 +209,8 @@ lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -206,7 +220,8 @@ lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 #if LV_FILE_EXPLORER_QUICK_ACCESS
 lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -215,7 +230,8 @@ lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -224,7 +240,8 @@ lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -235,7 +252,8 @@ lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj)
 
 lv_file_explorer_sort_t lv_file_explorer_get_sort(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -247,7 +265,9 @@ lv_file_explorer_sort_t lv_file_explorer_get_sort(const lv_obj_t * obj)
  *====================*/
 void lv_file_explorer_open_dir(lv_obj_t * obj, const char * dir)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(dir != NULL, return);
 
     show_dir(obj, dir);
 }
@@ -305,7 +325,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*The area displayed above the file browse list(head)*/
     explorer->head_area = lv_obj_create(explorer->browser_area);
     lv_obj_set_size(explorer->head_area, LV_PCT(100), LV_PCT(14));
-    lv_obj_remove_flag(explorer->head_area, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(explorer->head_area, false);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
     /*Two lists of quick access bar*/
@@ -502,7 +522,7 @@ static void quick_access_area_event_handler(lv_event_t * e)
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     if(code == LV_EVENT_LAYOUT_CHANGED) {
-        if(lv_obj_has_flag(area, LV_OBJ_FLAG_HIDDEN))
+        if(lv_obj_is_hidden(area))
             lv_obj_set_size(explorer->browser_area, LV_PCT(100), LV_PCT(100));
         else
             lv_obj_set_size(explorer->browser_area, LV_PCT(FILE_EXPLORER_BROWSER_AREA_WIDTH), LV_PCT(100));
@@ -517,7 +537,8 @@ static void browser_file_event_handler(lv_event_t * e)
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
-    lv_indev_type_t type = lv_indev_get_type(lv_indev_active());
+    lv_indev_t * indev = lv_indev_active();
+    lv_indev_type_t type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
     lv_event_code_t active_code = type == LV_INDEV_TYPE_POINTER ||
                                   type == LV_INDEV_TYPE_BUTTON ? LV_EVENT_VALUE_CHANGED : LV_EVENT_CLICKED;
 
@@ -741,7 +762,7 @@ static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 
 static void file_explorer_sort(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -803,5 +824,7 @@ static bool is_end_with(const char * str1, const char * str2)
 
     return true;
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif  /*LV_USE_FILE_EXPLORER*/

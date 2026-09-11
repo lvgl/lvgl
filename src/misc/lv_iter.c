@@ -7,11 +7,8 @@
  *      INCLUDES
  *********************/
 
-#include "lv_assert.h"
-
-#include "lv_iter.h"
-
-#include "lv_circle_buf.h"
+#include "lv_iter_private.h"
+#include "lv_circle_buf_private.h"
 
 /*********************
  *      DEFINES

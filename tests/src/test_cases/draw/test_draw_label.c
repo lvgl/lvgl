@@ -103,7 +103,7 @@ static void all_decor_labels_create(lv_text_decor_t decor)
 
     lv_obj_t * label;
     label = decor_label_create(decor, LV_TEXT_ALIGN_LEFT, LV_OPA_COVER);
-    lv_obj_add_flag(label, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    lv_obj_set_flex_in_new_track(label, true);
 
     label = decor_label_create(decor, LV_TEXT_ALIGN_CENTER, LV_OPA_COVER);
     label = decor_label_create(decor, LV_TEXT_ALIGN_RIGHT, LV_OPA_COVER);

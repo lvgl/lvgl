@@ -1,0 +1,16 @@
+{
+  "title": "Main Modules",
+  "pages": [
+    "display",
+    "indev",
+    "fonts",
+    "images",
+    "color",
+    "timer",
+    "animation",
+    "fs",
+    "data_binding",
+    "draw",
+    "translation"
+  ]
+}

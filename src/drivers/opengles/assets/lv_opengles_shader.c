@@ -3,7 +3,6 @@
 #if LV_USE_OPENGLES
 
 #include "../opengl_shader/lv_opengl_shader_internal.h"
-#include "../../../misc/lv_types.h"
 
 static const lv_opengl_shader_t src_includes_v100[] = {{
         "hsv_adjust.glsl", R"(
@@ -86,6 +85,7 @@ static const char *src_fragment_shader_v100 = R"(
     uniform bool u_IsFill;
     uniform vec3 u_FillColor;
     uniform bool u_SwapRB;
+    uniform bool u_PremultipliedSrc;
     
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
@@ -104,7 +104,8 @@ static const char *src_fragment_shader_v100 = R"(
             gl_FragColor = vec4(vec3(gray * u_Opa), u_Opa);
         } else {
             float combinedAlpha = texColor.a * u_Opa;
-            gl_FragColor = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
+            float rgbScale = u_PremultipliedSrc ? u_Opa : combinedAlpha;
+            gl_FragColor = vec4(texColor.rgb * rgbScale, combinedAlpha);
         }
         if (u_SwapRB) {
             gl_FragColor.bgr = gl_FragColor.rgb;
@@ -213,6 +214,7 @@ static const char *src_fragment_shader_v300es = R"(
     uniform sampler2D u_Texture;
     uniform lowp float u_Opa;
     uniform bool u_SwapRB;
+    uniform bool u_PremultipliedSrc;
     
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
@@ -234,7 +236,7 @@ static const char *src_fragment_shader_v300es = R"(
                 color.gba = vec3(color.rr, u_Opa);
             } else {
                 color.a *= u_Opa;
-                color.rgb *= color.a;
+                color.rgb *= u_PremultipliedSrc ? u_Opa : color.a;
             }
         }
         if (u_SwapRB) {

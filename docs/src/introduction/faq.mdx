@@ -1,0 +1,137 @@
+---
+title: FAQ
+description: "Check these questions and answers first to quickly solve common issues"
+---
+
+## Where can I ask questions from the community?
+
+You can ask questions in the [forum](https://forum.lvgl.io/).
+
+We use [GitHub issues](https://github.com/lvgl/lvgl/issues) for development related discussion.
+You should use them only if your question or issue is tightly related to the development of the library.
+
+Before posting a question, please read this FAQ section since you might find the answer to your issue here as well.
+
+## Where can I get professional support?
+
+LVGL LTD, the company behind LVGL, provides UI development services, consultancy, and training. We also have a wide range of
+partners globally, so we can connect you with trusted local experts.
+
+Contact us via [lvgl@lvgl.io](mailto:lvgl@lvgl.io)
+
+## Is my MCU or MPU supported?
+
+Every MCU and MPU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the [Requirements](/introduction/requirements) is supported by LVGL.
+
+This includes:
+
+- "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, PIC32, TI AMxxx, etc.
+- Bluetooth, GSM, Wi-Fi modules like Nordic NRF, Espressif ESP32 and Raspberry Pi Pico
+- Linux with frame buffer device such as /dev/fb0. This includes Single-board computers like the Raspberry Pi
+- Anything else with a strong enough MCU and a peripheral to drive a display
+
+## Is my display supported?
+
+LVGL needs just one simple driver function to copy an array of pixels into a given area of the display.
+If you can do this with your display then you can use it with LVGL.
+
+Some examples of the supported display types:
+
+- TFTs with 16 or 24 bit color depth
+- Monitors with an HDMI port
+- Small monochrome displays
+- Gray-scale displays
+- even LED matrices
+- or any other display where you can control the color/state of the pixels
+
+See the [Display (lv_display)](/main-modules/display) section to learn more.
+
+## LVGL doesn't start, randomly crashes or nothing is drawn on the display. What might be the problem?
+
+- Try increasing <ApiLink name="LV_MEM_SIZE" />.
+- Be sure that your display works without LVGL. E.g. paint it to red on start up.
+- Enable [Logging](/debugging/log).
+- Enable assertions in `lv_conf.h` (`LV_USE_ASSERT_...`).
+- If you use an RTOS, increase the stack size of the task that calls <ApiLink name="lv_timer_handler" />.
+
+## My display driver is not called. What have I missed?
+
+Be sure you are calling <ApiLink name="lv_tick_inc" display="lv_tick_inc(x)" /> or have set
+<ApiLink name="lv_tick_set_cb" display="lv_tick_set_cb(my_cb)" /> as described in
+[Tick Interface](/integration/overview#tick-interface) and are calling <ApiLink name="lv_timer_handler" /> as described in
+[Timer Handler](/integration/overview#timer-handler).
+
+## Why is the display driver called only once? Only the upper part of the display is refreshed.
+
+Be sure you are calling <ApiLink name="lv_display_flush_ready" display="lv_display_flush_ready(disp)" /> at the end of your
+"*display flush callback*" as per the [Flush Callback](/main-modules/display/setup#flush-callback) section.
+
+## Why do I see only garbage on the screen?
+
+There is probably a bug in your display driver. Try the following code without using
+LVGL.  You should see a square with red-blue gradient.
+
+```c
+#define BUF_WIDTH 255
+uint16_t buf[BUF_WIDTH];
+uint32_t i;
+for(i = 0; i < BUF_WIDTH; i++) {
+  lv_color_t c = lv_color_mix(lv_color_hex(0xff0000), lv_color_hex(0x00ff00), i);
+  buf[i] = lv_color_to_u16(c);
+
+  lv_area_t a;
+  a.x1 = 5;
+  a.x2 = a.x1 + BUF_WIDTH - 1;
+  a.y1 = 10 + i;
+  a.y2 = 10 + i;
+  my_flush_cb(NULL, &a, (void*) buf);
+}
+```
+
+## Why do I see nonsense colors on the screen?
+
+The configured LVGL color format is probably not compatible with your display's color
+format.  Check <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> in *lv_conf.h*.
+
+If you're using a 16 bit (RGB565) display connected via SPI the bytes might be swapped. Try
+setting <ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565_SWAPPED)" />
+
+
+## How do I speed up my UI?
+
+- Turn on compiler optimization
+- Enable instruction- and data-caching if your MCU has them.
+- Increase the clock speed of the SPI or parallel port if you use them to drive the display.
+- If your display has an SPI port consider changing to a model with a parallel interface because it has much higher throughput.
+- In case of [Partial rendering mode](/main-modules/display/setup#draw-buffers):
+    - Increase the size of the display buffer. 1/10 screen size is the minimum, but 1/5 is recommended
+    - Use two display buffers and flush the buffer with DMA (or similar peripheral) in the background.
+- If you have enough RAM use [Direct rendering mode](/main-modules/display/setup#draw-buffers) with 2 frame buffers and:
+    - Switch only the frame buffer address in the `flush_cb`
+    - Call <ApiLink name="lv_display_flush_ready" display="lv_display_flush_ready(display)"/> from the VSYNC ready interrupt, so that you are not blocking while waiting for the frame buffer switch
+- Keep the display buffer in internal RAM (not in external SRAM) because LVGL uses it a lot and it should have fast access time.
+- Consider minimizing LVGL CPU overhead by updating Widgets:
+  - Only once just before each display refresh, and
+  - Only when it will change what the end user sees.
+
+## How do I reduce flash/ROM usage?
+
+You can disable unused features (such as widgets, file system, GPU etc.) and widget types in *lv_conf.h*.
+
+If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG and newer GCC versions.
+
+## How do I reduce RAM usage?
+
+- In case of [Partial rendering mode](/main-modules/display/setup#draw-buffers) lower the size of the *Display buffer(s)*.
+- Switch to Partial rendering mode from Direct or Full rendering mode
+- Reduce <ApiLink name="LV_MEM_SIZE" /> in *lv_conf.h*. This memory is used when you create Widgets like buttons, labels, etc.
+- To work with lower <ApiLink name="LV_MEM_SIZE" /> you can create Widgets only when required and delete them when they are no longer needed.
+
+## How do I use LVGL with an operating system?
+
+To work with an operating system where tasks can interrupt each other (preemptively),
+you must ensure that no LVGL function call be called while another LVGL call is in
+progress.  LVGL has built-in mechanisms to support this, and also has built-in support to use mainstream operating systems out of the box.
+
+There are several ways to do this.  See the [Operating Systems and Threads](/integration/overview#operating-system-support) section to
+learn more.

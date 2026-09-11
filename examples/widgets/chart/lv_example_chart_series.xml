@@ -1,0 +1,24 @@
+<!--
+ @title Chart data series
+ @brief Two series on the same chart, each bound to its own Y axis.
+
+ Two `<lv_chart-series>` children sit on one chart but reference different
+ axes via `axis="primary_y"` and `axis="secondary_y"`. Each axis gets its
+ own `<lv_chart-axis>` range, so a 0..100 temperature series and a 0..2000
+ pressure series share the plot without one squashing the other. The series
+ colour matches the conceptual reading, not the axis.
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+		<!-- 💡 Edit either axis range; the series tied to that axis rescales while the other stays put. -->
+		<lv_chart name="chart" width="90%" height="180" type="line" point_count="8">
+			<!-- Temperature: left axis, 0..100 -->
+			<lv_chart-series color="0xef4444" axis="primary_y" values="22 28 35 50 65 70 60 45" />
+			<!-- Pressure: right axis, 0..2000 -->
+			<lv_chart-series color="0x6366f1" axis="secondary_y" values="980 1100 1400 1600 1750 1850 1900 1700" />
+
+			<lv_chart-axis axis="primary_y"   min_value="0" max_value="100" />
+			<lv_chart-axis axis="secondary_y" min_value="0" max_value="2000" />
+		</lv_chart>
+	</view>
+</screen>

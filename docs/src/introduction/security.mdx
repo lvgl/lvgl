@@ -1,0 +1,100 @@
+---
+title: Security
+description: "LVGL's security commitment, vulnerability reporting process, SBOM, and how LVGL supports our users' EU Cyber Resilience Act (CRA) obligations"
+---
+
+## Our commitment
+
+LVGL is used in millions of devices, many of them shipped commercially and
+placed on regulated markets. We take the security of the library and of the
+products built on it seriously. LVGL Kft., as the legal entity stewarding the
+project, maintains a cybersecurity policy that covers:
+
+- a documented **coordinated vulnerability disclosure** process,
+- a published, machine-readable **Software Bill of Materials (SBOM)**,
+- vulnerability handling with public security advisories, and
+- cooperation with users, integrators, and the relevant authorities.
+
+This page describes those processes and how they help you meet your own
+obligations under regulations such as the EU Cyber Resilience Act (CRA).
+
+## Reporting a vulnerability
+
+**Please do not open a public GitHub issue for security problems.**
+
+Report suspected vulnerabilities privately by email to
+[security@lvgl.io](mailto:security@lvgl.io).
+
+Please include, as far as you can:
+
+- the affected version(s) and configuration (`lv_conf.h` toggles, target),
+- a description of the impact,
+- steps to reproduce or a proof of concept, and
+- any suggested fix or mitigation.
+
+We support **coordinated disclosure**: we ask that you give us a reasonable
+window to release a fix before any public disclosure, and we will credit you in
+the advisory unless you prefer otherwise.
+
+## How we handle reports
+
+| Stage | What happens |
+| --- | --- |
+| Acknowledge | We confirm receipt of your report, typically within a few business days. |
+| Triage | We reproduce and assess severity, and determine the affected versions. |
+| Fix | We develop and review a fix on a private track when needed. |
+| Advisory | We publish a [GitHub Security Advisory](https://github.com/lvgl/lvgl/security/advisories) and, where applicable, request a CVE identifier. |
+| Release | The fix ships in a patch release; see [Policies](/introduction/policies) for the supported versions. |
+
+Fixes are made available for the actively supported releases listed on the
+[Policies](/introduction/policies) page.
+
+## Software Bill of Materials (SBOM)
+
+LVGL publishes two views of its component inventory:
+
+- [**`sbom/lvgl.spdx.json`**](https://github.com/lvgl/lvgl/blob/master/sbom/lvgl.spdx.json): the **machine-readable** SBOM, in the
+  [SPDX 3.0.1](https://spdx.github.io/spdx-spec/v3.0.1/) JSON-LD format, a
+  commonly used standard suitable for automated tooling.
+- [**`COPYRIGHTS.md`**](https://github.com/lvgl/lvgl/blob/master/COPYRIGHTS.md): the **human-readable** list of every third-party component with its license
+  and copyright.
+
+Both are generated from a single source of truth,
+[`sbom/third_party.json`](https://github.com/lvgl/lvgl/blob/master/sbom/third_party.json),
+and their correctness is enforced by CI, so they always track the checked-out
+version.
+
+See the [SBOM README](https://github.com/lvgl/lvgl/blob/master/sbom/README.md)
+for the file layout, how to regenerate the artifacts, and how to validate them.
+
+Note that some optional dependencies (for example FreeType) are **provided by
+the integrator** rather than bundled with LVGL; the SBOM lists LVGL's
+integration interface, but you are responsible for the SBOM entries of the
+components you supply yourself.
+
+## LVGL and the EU Cyber Resilience Act (CRA)
+
+The CRA (Regulation (EU) 2024/2847) places obligations on **manufacturers**
+who place *products with digital elements* on the EU market. LVGL is a free and
+open-source **software component**, not a finished product placed on the market
+by LVGL Kft. The CRA obligations for a shipped product therefore fall on the
+**manufacturer that integrates LVGL** into that product.
+
+What LVGL provides is the upstream foundation that makes meeting those
+obligations easier:
+
+- a **machine-readable SBOM** covering LVGL and its bundled third-party
+  components,
+- a **coordinated vulnerability disclosure** process and public security
+  advisories, and
+- clear licensing and component provenance in `COPYRIGHTS.md`.
+
+As the open-source steward of the project, LVGL Kft. maintains the cybersecurity
+policy described on this page and cooperates with users and authorities on
+vulnerability handling.
+
+> **Not legal advice.** This page describes LVGL's processes and artifacts. It
+> is not legal advice, and it does not by itself make any product compliant. The
+> precise classification of your product and of LVGL Kft. under the CRA, and the
+> steps required for your conformity, should be confirmed with qualified
+> counsel. For questions, contact [lvgl@lvgl.io](mailto:lvgl@lvgl.io).

@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*This example shows the deprecated `lv_file_explorer` widget on purpose.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 {
     const char * tmp;
@@ -48,10 +51,12 @@ static void file_explorer_event_handler(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
+#if LV_USE_LOG
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
 
         LV_LOG_USER("%s%s", cur_path, sel_fn);
+#endif
     }
     else if(code == LV_EVENT_READY) {
         lv_obj_t * tb = lv_file_explorer_get_file_table(obj);
@@ -61,6 +66,18 @@ static void file_explorer_event_handler(lv_event_t * e)
     }
 }
 
+/**
+ * @title Custom file explorer sort
+ * @brief Apply a 3-way quicksort over the file table after each directory load.
+ *
+ * @deprecated The `lv_file_explorer` widget is deprecated. See `lv_example_table_file_browser`.
+ *
+ * The file explorer is created with `LV_EXPLORER_SORT_NONE` so that default sorting
+ * stays out of the way. On `LV_EVENT_READY`, `lv_file_explorer_get_file_table`
+ * returns the underlying table and a static 3-way quicksort reorders rows by the
+ * kind column. `LV_EVENT_VALUE_CHANGED` still logs the current path and selected
+ * file name.
+ */
 void lv_example_file_explorer_3(void)
 {
     lv_obj_t * file_explorer = lv_file_explorer_create(lv_screen_active());
@@ -124,5 +141,7 @@ void lv_example_file_explorer_3(void)
 
     lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

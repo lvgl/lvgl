@@ -1,3 +1,10 @@
+# ============================================================
+# zlib Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "ZLIB")
+set(PKG_CONFIG_NAME "zlib")
+set(PKG_LIB_PRIVATE "-lz")
+
 option(LV_USE_FIND_PACKAGE_ZLIB "Resolve zlib via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_ZLIB "Resolve zlib via pkg-config"
@@ -5,7 +12,7 @@ option(LV_USE_PKG_CONFIG_ZLIB "Resolve zlib via pkg-config"
 option(LV_FETCH_ZLIB "Fetch zlib from source" ${LV_FETCH_DEPENDENCIES})
 
 if(LV_USE_FIND_PACKAGE_ZLIB)
-  find_package(ZLIB QUIET)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(ZLIB_FOUND)
     message(STATUS "lvgl: zlib: found via find_package")
     return()
@@ -13,7 +20,7 @@ if(LV_USE_FIND_PACKAGE_ZLIB)
 endif()
 
 if(LV_USE_PKG_CONFIG_ZLIB AND PkgConfig_FOUND)
-  pkg_check_modules(ZLIB IMPORTED_TARGET QUIET zlib)
+  pkg_check_modules(ZLIB IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(ZLIB_FOUND)
     message(STATUS "lvgl: zlib: found via pkg-config")
     return()

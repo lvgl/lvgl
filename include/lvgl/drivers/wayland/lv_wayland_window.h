@@ -1,0 +1,127 @@
+
+/**
+ * @file lv_wayland_window.h
+ *
+ */
+
+#ifndef LV_WAYLAND_WINDOW_H
+#define LV_WAYLAND_WINDOW_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "../../display/lv_display.h"
+
+#if LV_USE_WAYLAND
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * display);
+#define LV_WAYLAND_PHYSICAL_DISPLAY_ANY 0xFF
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+/**
+ * Creates a window
+ * @param hor_res The width of the window in pixels
+ * @param ver_res The height of the window in pixels
+ * @param title The title of the window
+ * @param close_cb The callback that will be execute when the user closes the window
+ * @return The LVGL display associated to the window
+ */
+lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
+                                        lv_wayland_display_close_cb_t close_cb);
+
+/**
+ * Closes the window programmatically
+ * @param display Reference to the LVGL display associated to the window @nullable
+ */
+void lv_wayland_window_close(lv_display_t * display);
+
+/**
+ * Check if the window is open
+ * @param display Reference to the LVGL display associated to the window
+ * @return true: The window is open
+ */
+bool lv_wayland_window_is_open(lv_display_t * display);
+
+/**
+ * Assigns the window to a specific physical display
+ * @param display Reference to the LVGL display associated to the window
+ * @param phys_display Physical display number or LV_WAYLAND_PHYSICAL_DISPLAY_ANY
+ *                     to unassign a previously set physical display
+ */
+void lv_wayland_window_set_physical_display(lv_display_t * display, uint8_t phys_display);
+
+/**
+ * Unassigns the current physical display attached to the window
+ * @param display Reference to the LVGL display associated to the window
+ */
+void lv_wayland_window_remove_physical_display(lv_display_t * display);
+
+/**
+ * Sets the fullscreen state of the window
+ * @param display Reference to the LVGL display associated to the window
+ * @param fullscreen If true the window enters fullscreen
+ *
+ * @note The fullscreen request is made asynchronously and may not be fulfilled
+ * if the compositor doesn't allow it. lv_wayland_window_is_fullscreen() can be
+ * used to determine the fullscreen state of the window.
+ */
+void lv_wayland_window_set_fullscreen(lv_display_t * display, bool fullscreen);
+
+/**
+ * Check if window is fullscreen
+ * @param disp Reference to the LVGL display associated to the window
+ * @returns the fullscreen state of the window as reported by the compositor
+ */
+bool lv_wayland_window_is_fullscreen(lv_display_t * disp);
+
+/**
+ * Requests the window be maximized/unmaximized
+ * @param display Reference to the LVGL display associated to the window
+ * @param maximize true: maximize the window false: unmaximize the window
+ *
+ * @note The maximized request is made asynchronously and may not be fulfilled
+ * if the compositor doesn't allow it. lv_wayland_window_is_maximized() can be
+ * used to determine the maximized state of the window.
+ */
+void lv_wayland_window_set_maximized(lv_display_t * display, bool maximize);
+
+/**
+ * Check if window is maximized
+ * @param disp Reference to the LVGL display associated to the window
+ * @returns the maximized state of the window as reported by the compositor
+ */
+bool lv_wayland_window_is_maximized(lv_display_t * disp);
+
+/**
+ * Minimizes the window
+ * @param display Reference to the LVGL display associated to the window
+ */
+void lv_wayland_window_set_minimized(lv_display_t * display);
+
+/**********************
+ *      MACROS
+ **********************/
+
+#endif /* LV_USE_WAYLAND */
+
+#ifdef __cplusplus
+} /*extern "C"*/
+#endif
+
+#endif /*LV_WAYLAND_WINDOW_H*/

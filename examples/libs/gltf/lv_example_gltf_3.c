@@ -133,7 +133,18 @@ static void move_plant(plant_t * plant, const lv_3dpoint_t * point)
 }
 
 /**
- * Load multiple models in a single glTF object and modify their position, rotation and scale at runtime
+ * @title Drag plants across a glTF scene
+ * @brief Pick and drag one of five glTF plants along the ground plane with a cursor model.
+ *
+ * Five copies of `webp_diffuse_transmission_plant.glb` are loaded into a
+ * single `lv_gltf` viewer and spaced across the ground at fixed x and z
+ * offsets, while `support_assets.glb` contributes a `/cursor` node hidden
+ * by zeroing its scale. Pointer events
+ * cast a ray through `lv_gltf_get_ray_from_2d_coordinate` into the ground
+ * plane built by `lv_get_ground_plane`. On `LV_EVENT_PRESSED` the nearest
+ * plant within a squared distance of `0.1` is selected; `LV_EVENT_PRESSING`
+ * moves the plant and cursor to the hit point and nudges rotation, and
+ * `LV_EVENT_RELEASED` hides the cursor again.
  */
 void lv_example_gltf_3(void)
 {

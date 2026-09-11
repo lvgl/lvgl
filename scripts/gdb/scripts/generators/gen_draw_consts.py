@@ -6,12 +6,15 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from lvgl_paths import include_dir, lvgl_root
 from enum_parser import parse_enum, generate_dict_module
 
-LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
+LVGL_ROOT = lvgl_root(__file__)
+LVGL_SRC = LVGL_ROOT / "src"
+LVGL_INC = include_dir(LVGL_ROOT)
 OUTPUT = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "draw" / "lv_draw_consts.py"
 
-DRAW_H = LVGL_SRC / "draw" / "lv_draw.h"
+DRAW_H = LVGL_INC / "draw" / "lv_draw.h"
 DRAW_DIR = LVGL_SRC / "draw"
 
 

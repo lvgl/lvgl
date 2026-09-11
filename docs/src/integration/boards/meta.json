@@ -1,0 +1,8 @@
+{
+  "title": "Board Support",
+  "pages": [
+    "lvgl_supported",
+    "partner_supported",
+    "manufacturers"
+  ]
+}

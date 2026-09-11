@@ -7,15 +7,11 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_text_private.h"
+#include "lv_uefi_private.h"
 
 #if LV_USE_UEFI
 
-#include "lv_uefi_indev.h"
-#include "lv_uefi_private.h"
+#include "../../misc/lv_text_private.h"
 
 /*********************
  *      DEFINES
@@ -67,11 +63,6 @@ static EFI_GUID _uefi_guid_absolute_pointer = EFI_ABSOLUTE_POINTER_PROTOCOL_GUID
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * @brief Create a LVGL indev object.
- * @param display_res The resolution of the display in pixels, needed to scale the input.
- * @return The created LVGL indev object.
-*/
 lv_indev_t * lv_uefi_absolute_pointer_indev_create(lv_point_t * display_res)
 {
     lv_indev_t * indev = NULL;
@@ -110,11 +101,12 @@ lv_indev_t * lv_uefi_absolute_pointer_indev_create(lv_point_t * display_res)
 */
 bool lv_uefi_absolute_pointer_indev_add_handle(lv_indev_t * indev, EFI_HANDLE handle)
 {
+    LV_CHECK_ARG(indev != NULL, return false);
     EFI_ABSOLUTE_POINTER_PROTOCOL * interface = NULL;
     lv_uefi_absolute_pointer_handle_context_t * handle_ctx = NULL;
 
     lv_uefi_absolute_pointer_context_t * indev_ctx = (lv_uefi_absolute_pointer_context_t *)lv_indev_get_user_data(indev);
-    LV_ASSERT_NULL(indev_ctx);
+    LV_CHECK_ARG(indev_ctx != NULL, return false);
 
     if(indev_ctx->signature != ABSOLUTE_POINTER_INDEV_SIGNATURE) return false;
 
@@ -147,13 +139,14 @@ bool lv_uefi_absolute_pointer_indev_add_handle(lv_indev_t * indev, EFI_HANDLE ha
 */
 void lv_uefi_absolute_pointer_indev_add_all(lv_indev_t * indev)
 {
+    LV_CHECK_ARG(indev != NULL, return);
     EFI_STATUS status;
     EFI_HANDLE * handles = NULL;
     UINTN no_handles;
     UINTN index;
 
     lv_uefi_absolute_pointer_context_t * indev_ctx = (lv_uefi_absolute_pointer_context_t *)lv_indev_get_user_data(indev);
-    LV_ASSERT_NULL(indev_ctx);
+    LV_CHECK_ARG(indev_ctx != NULL, return);
 
     if(indev_ctx->signature != ABSOLUTE_POINTER_INDEV_SIGNATURE) return;
 
@@ -195,7 +188,7 @@ static void _absolute_pointer_read_cb(lv_indev_t * indev, lv_indev_data_t * data
     void * node = NULL;
 
     lv_uefi_absolute_pointer_context_t * indev_ctx = (lv_uefi_absolute_pointer_context_t *)lv_indev_get_user_data(indev);
-    LV_ASSERT_NULL(indev_ctx);
+    LV_ASSERT(indev_ctx != NULL);
 
     /* Read from all registered devices */
     for(node = lv_ll_get_head(&indev_ctx->handles); node != NULL; node = lv_ll_get_next(&indev_ctx->handles, node)) {
@@ -260,9 +253,9 @@ static void _absolute_pointer_read(lv_uefi_absolute_pointer_context_t * indev_ct
     EFI_ABSOLUTE_POINTER_STATE state;
     lv_point_t pointer_pos;
 
-    LV_ASSERT_NULL(indev_ctx);
-    LV_ASSERT_NULL(handle_ctx);
-    LV_ASSERT_NULL(was_pressed);
+    LV_ASSERT(indev_ctx != NULL);
+    LV_ASSERT(handle_ctx != NULL);
+    LV_ASSERT(was_pressed != NULL);
 
     status = handle_ctx->interface->GetState(
                      handle_ctx->interface,

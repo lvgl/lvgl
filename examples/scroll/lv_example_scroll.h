@@ -10,36 +10,21 @@
 extern "C" {
 #endif
 
-/*********************
- *      INCLUDES
- *********************/
-
-#include "../lv_examples.h"
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
-void lv_example_scroll_1(void);
-void lv_example_scroll_2(void);
-void lv_example_scroll_3(void);
-void lv_example_scroll_4(void);
-void lv_example_scroll_5(void);
-void lv_example_scroll_6(void);
-void lv_example_scroll_7(void);
-void lv_example_scroll_8(void);
-void lv_example_scroll_9(void);
-
-/**********************
- *      MACROS
- **********************/
+void lv_example_scroll_chain(void);
+void lv_example_scroll_circular(void);
+void lv_example_scroll_events(void);
+void lv_example_scroll_floating(void);
+void lv_example_scroll_infinite(void);
+void lv_example_scroll_one(void);
+void lv_example_scroll_overview(void);
+void lv_example_scroll_properties(void);
+void lv_example_scroll_rtl(void);
+void lv_example_scroll_scrollable(void);
+void lv_example_scroll_scrollbar_mode(void);
+void lv_example_scroll_scrollbar_style(void);
+void lv_example_scroll_snap(void);
+void lv_example_scroll_to(void);
+void lv_example_scroll_translate(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

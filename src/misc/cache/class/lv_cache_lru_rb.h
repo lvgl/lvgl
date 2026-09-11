@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lv_cache_private.h"
+#include "../lv_cache.h"
 
 /*********************
  *      DEFINES

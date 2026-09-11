@@ -1,0 +1,104 @@
+config LV_USE_PROFILER
+	bool "Profiler"
+	default n
+	help
+		Instrument LVGL internals with trace hooks to measure runtime performance.
+
+config LV_USE_PROFILER_BUILTIN
+	bool "Built-in profiler"
+	default n
+	select LV_USE_PROFILER
+
+if LV_USE_PROFILER_BUILTIN
+
+config LV_PROFILER_BUILTIN_BUF_SIZE
+	int "Trace buffer size (bytes)"
+	default 16384
+
+config LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+	bool "Start profiling at init"
+	default y
+
+config LV_USE_PROFILER_BUILTIN_POSIX
+	bool "POSIX port"
+	default n
+
+
+endif #LV_USE_PROFILER_BUILTIN
+
+if LV_USE_PROFILER
+
+config LV_PROFILER_INCLUDE
+	string "Profiler header"
+	default "lvgl/debugging/profiler/lv_profiler_builtin.h"
+	help
+	  Path to a header that defines the following profiler hook macros:
+
+	  LV_PROFILER_BEGIN
+	    Called at the start of a profiled scope.
+	    e.g. #define LV_PROFILER_BEGIN  my_profiler_begin()
+
+	  LV_PROFILER_END
+	    Called at the end of a profiled scope.
+	    e.g. #define LV_PROFILER_END    my_profiler_end()
+
+	  LV_PROFILER_BEGIN_TAG(tag)
+	    Called at the start of a profiled scope with a string tag.
+	    e.g. #define LV_PROFILER_BEGIN_TAG(tag)  my_profiler_begin_tag(tag)
+
+	  LV_PROFILER_END_TAG(tag)
+	    Called at the end of a profiled scope with a string tag.
+	    e.g. #define LV_PROFILER_END_TAG(tag)    my_profiler_end_tag(tag)
+
+	  The default header provides these via the built-in profiler.
+	  Set this to your own header to use a custom profiler backend.
+
+menu "Profiled modules"
+
+config LV_PROFILER_LAYOUT
+	bool "Layout"
+	default y
+
+config LV_PROFILER_REFR
+	bool "Display refresh"
+	default y
+
+config LV_PROFILER_DRAW
+	bool "Draw"
+	default y
+
+config LV_PROFILER_INDEV
+	bool "Input devices"
+	default y
+
+config LV_PROFILER_DECODER
+	bool "Image decoder"
+	default y
+
+config LV_PROFILER_FONT
+	bool "Font"
+	default y
+
+config LV_PROFILER_FS
+	bool "File system"
+	default y
+
+config LV_PROFILER_STYLE
+	bool "Style"
+	default n
+
+config LV_PROFILER_TIMER
+	bool "Timer"
+	default y
+
+config LV_PROFILER_CACHE
+	bool "Cache"
+	default y
+
+config LV_PROFILER_EVENT
+	bool "Events"
+	default y
+
+endmenu
+
+endif # LV_USE_PROFILER

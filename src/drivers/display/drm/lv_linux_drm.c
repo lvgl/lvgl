@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linux_drm.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_LINUX_DRM && !LV_LINUX_DRM_USE_EGL
 
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>
@@ -21,9 +21,6 @@
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 #include <drm_fourcc.h>
-
-#include "../../../stdlib/lv_sprintf.h"
-#include "../../../draw/lv_draw_buf.h"
 
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
     #include <gbm.h>
@@ -205,6 +202,8 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_
 {
     int ret;
 
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(file != NULL, return LV_RESULT_INVALID);
     drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
 
     ret = drm_setup(drm_dev, file, connector_id, DRM_FOURCC);

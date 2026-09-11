@@ -1,0 +1,6 @@
+menu "Examples"
+config LV_BUILD_EXAMPLES
+	bool "Build examples"
+	default y
+
+endmenu #"Examples"

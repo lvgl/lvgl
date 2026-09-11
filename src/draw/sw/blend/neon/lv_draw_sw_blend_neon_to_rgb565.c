@@ -9,8 +9,6 @@
 #include "lv_draw_sw_blend_neon_to_rgb565.h"
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
 
-#include "../../../../misc/lv_color.h"
-#include "../../../../misc/lv_types.h"
 #include "../lv_draw_sw_blend_private.h"
 #include <arm_neon.h>
 
@@ -1336,7 +1334,7 @@ static inline uint16x8_t lv_color_24_16_mix_8_with_mask(const uint8_t * src, con
         g_pixels               = vmovl_u8(rgba.val[1]);
         r_pixels               = vmovl_u8(rgba.val[2]);
     }
-    else if(src_px_size == 4) {
+    else {
         const uint8x8x4_t rgba = vld4_u8(src);
         b_pixels               = vmovl_u8(rgba.val[0]);
         g_pixels               = vmovl_u8(rgba.val[1]);
@@ -1361,7 +1359,7 @@ static inline uint16x4_t lv_color_24_16_mix_4_with_mask(const uint8_t * src, con
         g_pixels               = vget_low_u16(vmovl_u8(rgba.val[1]));
         r_pixels               = vget_low_u16(vmovl_u8(rgba.val[2]));
     }
-    else if(src_px_size == 4) {
+    else {
         const uint8x8x4_t rgba = vld4_u8(src);
         b_pixels               = vget_low_u16(vmovl_u8(rgba.val[0]));
         g_pixels               = vget_low_u16(vmovl_u8(rgba.val[1]));
@@ -1387,7 +1385,7 @@ static inline uint16x8_t lv_color_24_16_mix_8_with_opa_mask(const uint8_t * src,
         g_pixels               = vmovl_u8(rgba.val[1]);
         r_pixels               = vmovl_u8(rgba.val[2]);
     }
-    else if(src_px_size == 4) {
+    else {
         const uint8x8x4_t rgba = vld4_u8(src);
         b_pixels               = vmovl_u8(rgba.val[0]);
         g_pixels               = vmovl_u8(rgba.val[1]);
@@ -1414,7 +1412,7 @@ static inline uint16x4_t lv_color_24_16_mix_4_with_opa_mask(const uint8_t * src,
         g_pixels               = vget_low_u16(vmovl_u8(rgba.val[1]));
         r_pixels               = vget_low_u16(vmovl_u8(rgba.val[2]));
     }
-    else if(src_px_size == 4) {
+    else {
         const uint8x8x4_t rgba = vld4_u8(src);
         b_pixels               = vget_low_u16(vmovl_u8(rgba.val[0]));
         g_pixels               = vget_low_u16(vmovl_u8(rgba.val[1]));
@@ -1448,7 +1446,7 @@ static inline uint16x8_t lv_color_24_16_mix_8_with_opa(const uint8_t * src, cons
         g_pixels               = vmovl_u8(rgba.val[1]);
         r_pixels               = vmovl_u8(rgba.val[2]);
     }
-    else if(src_px_size == 4) {
+    else {
         const uint8x8x4_t rgba = vld4_u8(src);
         b_pixels               = vmovl_u8(rgba.val[0]);
         g_pixels               = vmovl_u8(rgba.val[1]);
@@ -1489,7 +1487,7 @@ static inline uint16x4_t lv_color_24_16_mix_4_with_opa(const uint8_t * src, cons
         g_pixels               = vget_low_u16(vmovl_u8(rgba.val[1]));
         r_pixels               = vget_low_u16(vmovl_u8(rgba.val[2]));
     }
-    else if(src_px_size == 4) {
+    else {
         const uint8x8x4_t rgba = vld4_u8(src);
         b_pixels               = vget_low_u16(vmovl_u8(rgba.val[0]));
         g_pixels               = vget_low_u16(vmovl_u8(rgba.val[1]));
@@ -1875,7 +1873,7 @@ static inline uint16x8_t rgb888_to_rgb565_8(const uint8_t * src, uint8_t src_px_
         g_pixels               = vmovl_u8(rgba.val[1]);
         r_pixels               = vmovl_u8(rgba.val[2]);
     }
-    else if(src_px_size == 4) {
+    else {
         const uint8x8x4_t rgba = vld4_u8(src);
         b_pixels               = vmovl_u8(rgba.val[0]);
         g_pixels               = vmovl_u8(rgba.val[1]);
@@ -1901,7 +1899,7 @@ static inline uint16x4_t rgb888_to_rgb565_4(const uint8_t * src, uint8_t src_px_
         g_pixels               = vget_low_u16(vmovl_u8(rgba.val[1]));
         r_pixels               = vget_low_u16(vmovl_u8(rgba.val[2]));
     }
-    else if(src_px_size == 4) {
+    else {
         const uint8x8x4_t rgba = vld4_u8(src);
         b_pixels               = vget_low_u16(vmovl_u8(rgba.val[0]));
         g_pixels               = vget_low_u16(vmovl_u8(rgba.val[1]));

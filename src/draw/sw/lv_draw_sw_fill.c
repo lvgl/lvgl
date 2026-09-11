@@ -14,12 +14,7 @@
 
 #include "blend/lv_draw_sw_blend_private.h"
 #include "lv_draw_sw_grad.h"
-#include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../core/lv_refr.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_string.h"
-#include "../lv_draw_mask.h"
 
 /*********************
  *      DEFINES
@@ -50,7 +45,7 @@ void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area
     if(dsc->opa <= LV_OPA_MIN) return;
 
     lv_area_t bg_coords;
-    lv_area_copy(&bg_coords, coords);
+    bg_coords = *coords;
 
     lv_area_t clipped_coords;
     if(!lv_area_intersect(&clipped_coords, &bg_coords, &t->clip_area)) return;

@@ -1,0 +1,38 @@
+<!--
+ @title Arc image indicator
+ @brief Use bitmaps as the arc background and indicator — the arc shape is cut from each image.
+
+ `arc_image_src` replaces the solid `arc_color` with pixels sampled from a bitmap,
+ centred on the arc's centre point. Here the MAIN part uses a dark segmented-ring
+ bitmap so the background track shows individual tiles, and the INDICATOR part uses
+ a glowing-cyan version of the same ring so the filled portion lights up. Both images
+ are 224×224 and match the 180×180 widget with `arc_width="23"`.
+-->
+<screen>
+	<styles>
+		<!-- Background ring: dark segmented bitmap replaces the arc colour -->
+		<style name="style_arc_bg" arc_image_src="img_arc_bg" arc_width="40" arc_rounded="false" />
+		<!-- Indicator ring: glowing cyan bitmap clipped to the swept angle -->
+		<style name="style_arc_indicator" arc_image_src="img_arc_indicator" arc_width="40" arc_rounded="false" />
+		<!-- Knob: Just hid it -->
+		<style name="style_arc_knob" opa="0" />
+	</styles>
+
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="0">
+		<!-- 💡 Change value to sweep the glowing cyan indicator across the dark segmented background. -->
+		<lv_arc name="arc"
+			width="200"
+			height="200"
+			min_value="0"
+			max_value="22"
+			bg_start_angle="138"
+			bg_end_angle="41"
+			bind_value="subject_value2"
+		>
+			<style name="style_arc_bg" selector="main" />
+			<style name="style_arc_indicator" selector="indicator" />
+			<style name="style_arc_knob" selector="knob" />
+			<lv_label name="label" align="center" bind_text="subject_value2" />
+		</lv_arc>
+	</view>
+</screen>

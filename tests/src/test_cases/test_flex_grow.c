@@ -47,7 +47,7 @@ void test_grid_fr(void)
                 lv_obj_set_style_bg_color(child_grow_1, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
                 lv_obj_set_size(child_grow_1, 1, 10);
                 lv_obj_set_flex_grow(child_grow_1, grow_1);
-                lv_obj_add_flag(child_grow_1, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+                lv_obj_set_flex_in_new_track(child_grow_1, true);
 
                 lv_obj_t * child_grow_2 = lv_obj_create(container);
                 simple_style(child_grow_2);

@@ -14,9 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../core/lv_obj_private.h"
-#include "lv_arc.h"
+#include "../../lvgl_public.h"
 
-#if LV_USE_ARC != 0
+#if LV_USE_ARC
 
 /*********************
  *      DEFINES

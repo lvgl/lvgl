@@ -1,0 +1,36 @@
+<!--
+ @title Text area cursor styling
+ @brief Style the cursor part as a solid block or a thin bar.
+
+ Both text areas style the `cursor` part with a named style. The first fills
+ the cell with an opaque background for a block cursor; the second leaves the
+ background transparent and draws only a left border for a bar cursor — the
+ same part, two looks.
+-->
+<screen>
+	<styles>
+		<!-- Block: opaque fill over the character cell -->
+		<style name="style_block_cursor" bg_opa="100%" bg_color="0x2563eb" text_color="0xffffff" border_side="none" />
+		<!-- Bar: transparent fill, only a left edge -->
+		<style name="style_bar_cursor" bg_opa="0%" border_side="left" border_width="2" border_color="0xdc2626" />
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 The cursor is its own part — restyle it without touching the field's look. -->
+		<!-- Block cursor -->
+		<lv_textarea name="textarea_1" width="60%" one_line="true" text="Block" cursor_pos="2" focused="true">
+			<style name="style_block_cursor" selector="cursor|focused" />
+		</lv_textarea>
+
+		<!-- Bar cursor -->
+		<lv_textarea name="textarea_2" width="60%" one_line="true" text="Bar" cursor_pos="2" focused="true">
+			<style name="style_bar_cursor" selector="cursor|focused" />
+		</lv_textarea>
+	</view>
+</screen>

@@ -30,7 +30,14 @@ static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, u
 }
 
 /**
- * draw img in label or span obj
+ * @title Image glyphs inside label text
+ * @brief Replace private-use code points with PNG images rendered by `lv_imgfont`.
+ *
+ * `lv_imgfont_create` builds an 80 px image font whose path callback returns an
+ * embedded `emoji_F617` image for `U+F617` and a file path for `U+F600` (prefixed
+ * with `"A:"` unless `LV_USE_FFMPEG` is enabled). The font's `fallback` is set to
+ * `LV_FONT_DEFAULT` so ASCII characters fall through. A centered label renders
+ * `"12\uF600\uF617AB"`, mixing the two emoji images with normal text.
  */
 void lv_example_imgfont_1(void)
 {

@@ -1,0 +1,118 @@
+---
+title: "Keyboard (lv_keyboard)"
+description: "On-screen virtual keyboard that writes into a Text Area. Built on top of Button Matrix with preset keymaps."
+---
+
+## Overview
+
+The Keyboard is an on-screen virtual keyboard built on top of
+[Button Matrix](/widgets/buttonmatrix). It ships with preset keymaps and
+writes the typed characters into a [Text Area](/widgets/textarea).
+
+## Styling
+
+Similar to Button Matrix, the Keyboard Widget consists of 2 parts:
+
+- <ApiLink name="LV_PART_MAIN" /> The main part. Uses the [typical background
+  style properties](/common-widget-features/styles/overview)
+- <ApiLink name="LV_PART_ITEMS" /> The buttons. Also uses the [typical background
+  style properties](/common-widget-features/styles/overview) as well as *text* properties.
+
+## Modes
+
+<LvglExample name="lv_example_keyboard_modes" path="widgets/keyboard/lv_example_keyboard_modes" />
+
+Keyboards have the following modes:
+
+- <ApiLink name="LV_KEYBOARD_MODE_TEXT_LOWER" /> Display lower case letters
+- <ApiLink name="LV_KEYBOARD_MODE_TEXT_UPPER" /> Display upper case letters
+- <ApiLink name="LV_KEYBOARD_MODE_SPECIAL" /> Display special characters
+- <ApiLink name="LV_KEYBOARD_MODE_NUMBER" /> Display numbers, +/- sign, and decimal dot
+- <ApiLink name="LV_KEYBOARD_MODE_USER_1" /> through <ApiLink name="LV_KEYBOARD_MODE_USER_4" /> User-defined modes.
+
+The layouts of the `TEXT` modes contain "keys" to change mode.
+
+To set the mode programmatically, use <ApiLink name="lv_keyboard_set_mode" display="lv_keyboard_set_mode(kb, mode)" />. The
+default mode is <ApiLink name="LV_KEYBOARD_MODE_TEXT_UPPER" />.
+
+## Assign Text Area
+
+<LvglExample name="lv_example_keyboard_textarea" path="widgets/keyboard/lv_example_keyboard_textarea" />
+
+You can assign a [Text area](/widgets/textarea) to the Keyboard to
+automatically put the clicked characters there. To assign the Text Area,
+use <ApiLink name="lv_keyboard_set_textarea" display="lv_keyboard_set_textarea(kb, text_area)" />.
+
+## Key Pop-Overs
+
+<LvglExample name="lv_example_keyboard_popovers" path="widgets/keyboard/lv_example_keyboard_popovers" />
+
+To enable key pop-overs on press, like on common Android and iOS
+keyboards, use <ApiLink name="lv_keyboard_set_popovers" display="lv_keyboard_set_popovers(kb, true)" />. Default
+control maps are preconfigured to only show the pop-overs on keys that
+produce a symbol (i.e. not on space). If you use a custom keymap (see below), set
+the <ApiLink name="LV_BUTTONMATRIX_CTRL_POPOVER" /> flag for each key for which
+a pop-over should be shown.
+
+Note that pop-overs for keys in the top row will draw outside the Widget
+boundaries. To account for this, reserve extra free space on top of the
+Keyboard or ensure that the Keyboard is added *after* any Widgets
+adjacent to its top boundary (placing it "above" those Widgets) so that pop-overs
+will be drawn over them.
+
+Pop-overs currently are merely a visual effect and don't allow
+selecting additional characters such as accented characters yet.
+
+## New Keymap
+
+<ApiLink name="lv_keyboard_set_map" display="lv_keyboard_set_map(kb, LV_KEYBOARD_MODE_…, kb_map, kb_ctrl)" /> replaces a
+layout. The two arrays share the shape of a [button matrix](/widgets/buttonmatrix)
+map (`\n` for row breaks, terminated with `""`).
+
+<LvglExample name="lv_example_keyboard_custom_map" path="widgets/keyboard/lv_example_keyboard_custom_map" />
+
+Reserved key strings get the same built-in behaviour as in the default
+maps:
+
+| Key string | Behaviour |
+|---|---|
+| <ApiLink name="LV_SYMBOL_OK" /> | Send <ApiLink name="LV_EVENT_READY" /> to the textarea. |
+| <ApiLink name="LV_SYMBOL_CLOSE" /> / <ApiLink name="LV_SYMBOL_KEYBOARD" /> | Send <ApiLink name="LV_EVENT_CANCEL" />. |
+| <ApiLink name="LV_SYMBOL_BACKSPACE" /> | Delete the character before the cursor. |
+| <ApiLink name="LV_SYMBOL_LEFT" /> / <ApiLink name="LV_SYMBOL_RIGHT" /> | Move the cursor. |
+| <ApiLink name="LV_SYMBOL_NEW_LINE" /> | Insert a newline. |
+| `"ABC"` / `"abc"` / `"1#"` | Switch to upper / lower / number map. |
+
+## Key customization
+
+Each key can be customized by using draw events such as <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />.
+
+The handler receives every draw task the keyboard emits; mutating the fill
+descriptor recolours the key, and swapping in an image draw lets you
+replace text glyphs with bitmaps. This example colours each key and
+substitutes the OK glyph with a star image:
+
+<LvglExample name="lv_example_keyboard_custom_draw" path="widgets/keyboard/lv_example_keyboard_custom_draw" />
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when the button is pressed/released
+   or repeated after long press. The event data contains the ID of the
+   pressed/released button.
+- <ApiLink name="LV_EVENT_READY" />: The *Ok* button was clicked.
+- <ApiLink name="LV_EVENT_CANCEL" />: The *Close* button was clicked.
+
+The Keyboard has a **default event handler** callback called
+<ApiLink name="lv_keyboard_def_event_cb" />, which handles the button pressing, map
+changing, sending events to the assigned text area, etc. You can remove it and replace it
+with a custom event handler if you wish, or add an additional call-back of your own.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_RIGHT/UP/LEFT/RIGHT` To navigate among the buttons,
+   selecting the one navigated to.
+- <ApiLink name="LV_KEY_ENTER" /> To press/release the selected button.
+
+Learn more about [Keys](/main-modules/indev/keypad).

@@ -30,7 +30,13 @@ class LVCacheLRURBIterator(LVCacheIteratorBase):
         """
         for ll_node in LVList(lru_cache.ll):
             ll_addr = int(ll_node)
+            # The node holds a pointer to the rb node, so the cast is to
+            # lv_rb_node_t ** and the pointer has to be read through before any
+            # field of it can be.
             rb_node = Value(ll_node).cast(rb_node_pp_t)
+            if not rb_node:
+                continue
+            rb_node = rb_node.dereference()
             if not rb_node:
                 continue
             data = rb_node.data

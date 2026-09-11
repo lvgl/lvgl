@@ -1,0 +1,50 @@
+---
+title: "Button (lv_button)"
+description: "A clickable Base Widget with defaults tuned for buttons (not scrollable, added to the default group, sized to fit its child)."
+---
+
+## Overview
+
+A Button is a clickable [base widget](/widgets/base_widget) with three
+defaults tuned for its role: not scrollable, added to the default group,
+and <ApiLink name="LV_SIZE_CONTENT" /> for both axes so it hugs its label child.
+
+<LvglExample name="lv_example_button_basic" path="widgets/button/lv_example_button_basic" />
+
+## States
+
+The two button-relevant states are <ApiLink name="LV_STATE_CHECKED" /> (toggled by a
+click when the <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> flag is set) and <ApiLink name="LV_STATE_DISABLED" />
+(greys out the button and ignores input).
+
+<LvglExample name="lv_example_button_states" path="widgets/button/lv_example_button_states" />
+
+## Styling
+
+A button has only <ApiLink name="LV_PART_MAIN" /> but picks up the full base-widget style
+stack: `bg_color`, `radius`, `border_*`, `outline_*`, `shadow_*`,
+`pad_*`, `text_color`.
+
+<LvglExample name="lv_example_button_styling" path="widgets/button/lv_example_button_styling" />
+
+State-aware styling is the headline feature: attach separate styles with
+`selector="pressed"`, `"checked"`, `"focused"`, or `"disabled"` so the
+button changes look as the user interacts with it.
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> when the <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> flag is
+   enabled and the Widget is clicked. The event happens on transition
+   to/from the checked state.
+
+<LvglExample name="lv_example_button_event" path="widgets/button/lv_example_button_event" />
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+Note that the state of <ApiLink name="LV_KEY_ENTER" /> is translated to
+<ApiLink name="LV_EVENT_PRESSED" />, <ApiLink name="LV_EVENT_PRESSING" />
+and <ApiLink name="LV_EVENT_RELEASED" /> etc.
+
+Learn more about [Keys](/main-modules/indev/keypad).

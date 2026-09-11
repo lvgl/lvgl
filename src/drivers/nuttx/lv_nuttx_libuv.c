@@ -5,12 +5,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_nuttx_libuv.h"
-
-#include "../../lvgl.h"
-#include "../../lvgl_private.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NUTTX
+#include "../../lvgl_private.h"
+
 #include <stdlib.h>
 
 #if LV_USE_NUTTX_LIBUV
@@ -77,6 +76,7 @@ static void lv_nuttx_uv_input_deinit(lv_nuttx_uv_ctx_t * uv_ctx);
 
 void * lv_nuttx_uv_init(lv_nuttx_uv_t * uv_info)
 {
+    LV_CHECK_ARG(uv_info != NULL, return NULL);
     lv_nuttx_uv_ctx_t * uv_ctx;
     int ret;
 
@@ -108,6 +108,7 @@ err_out:
 
 void lv_nuttx_uv_deinit(void ** data)
 {
+    if(data == NULL) return;
     lv_nuttx_uv_ctx_t * uv_ctx = *data;
 
     if(uv_ctx == NULL) return;
@@ -154,8 +155,8 @@ static int lv_nuttx_uv_timer_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * u
 {
     uv_loop_t * loop = uv_info->loop;
 
-    LV_ASSERT_NULL(uv_ctx);
-    LV_ASSERT_NULL(loop);
+    LV_ASSERT(uv_ctx != NULL);
+    LV_ASSERT(loop != NULL);
 
     uv_ctx->uv_timer.data = uv_ctx;
     uv_timer_init(loop, &uv_ctx->uv_timer);
@@ -244,9 +245,9 @@ static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_c
     uv_loop_t * loop = uv_info->loop;
     lv_display_t * disp = uv_info->disp;
 
-    LV_ASSERT_NULL(uv_ctx);
-    LV_ASSERT_NULL(disp);
-    LV_ASSERT_NULL(loop);
+    LV_ASSERT(uv_ctx != NULL);
+    LV_ASSERT(disp != NULL);
+    LV_ASSERT(loop != NULL);
 
     lv_nuttx_uv_fb_ctx_t * fb_ctx = &uv_ctx->fb_ctx;
     fb_ctx->fd = *(int *)lv_display_get_driver_data(disp);
@@ -317,8 +318,8 @@ static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * u
         return 0;
     }
 
-    LV_ASSERT_NULL(uv_ctx);
-    LV_ASSERT_NULL(loop);
+    LV_ASSERT(uv_ctx != NULL);
+    LV_ASSERT(loop != NULL);
 
     if(lv_indev_get_mode(indev) == LV_INDEV_MODE_EVENT) {
         LV_LOG_ERROR("input device has been running in event-driven mode");

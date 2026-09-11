@@ -6,17 +6,26 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_lottie_private.h"
-#include "../../lv_conf_internal.h"
+
 #if LV_USE_LOTTIE
 
-#if LV_USE_THORVG_EXTERNAL
-    #include <thorvg_capi.h>
-#else
-    #include "../../libs/thorvg/thorvg_capi.h"
+/*Check dependencies*/
+#if LV_USE_CANVAS == 0
+    #error "lv_lottie: lv_canvas is required. Enable it in lv_conf.h (LV_USE_CANVAS 1)"
 #endif
 
-#include "../../misc/lv_timer.h"
+#if LV_USE_THORVG == 0
+    #error "lv_lottie: ThorVG is required. Enable it in lv_conf.h (LV_USE_THORVG_INTERNAL/EXTERNAL 1)"
+#endif
+
+#if LV_USE_THORVG_INTERNAL
+    #include "../../libs/thorvg/thorvg_capi.h"
+#else
+    #include <thorvg_capi.h>
+#endif
+
 #include "../../core/lv_obj_class_private.h"
 #include "../../misc/cache/lv_cache.h"
 
@@ -72,6 +81,9 @@ lv_obj_t * lv_lottie_create(lv_obj_t * parent)
 
 void lv_lottie_set_buffer(lv_obj_t * obj, int32_t w, int32_t h, void * buf)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(buf != NULL, return);
+
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     int32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     buf = lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
@@ -93,6 +105,9 @@ void lv_lottie_set_buffer(lv_obj_t * obj, int32_t w, int32_t h, void * buf)
 
 void lv_lottie_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(draw_buf != NULL, return);
+
     if(draw_buf->header.cf != LV_COLOR_FORMAT_ARGB8888 && draw_buf->header.cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
         LV_LOG_WARN("The draw buf needs to have ARGB8888 or ARGB8888_PREMULTIPLIED color format");
         return;
@@ -116,6 +131,9 @@ void lv_lottie_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 
 void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(src != NULL, return);
+
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     tvg_picture_load_data(lottie->tvg_paint, src, src_size, "lottie", true);
     lv_draw_buf_t * canvas_draw_buf = lv_canvas_get_draw_buf(obj);
@@ -124,8 +142,10 @@ void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
     }
 
     float f_total;
+    float duration;
     tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
-    lv_anim_set_duration(lottie->anim, (int32_t)f_total * 1000 / 60); /*60 FPS*/
+    tvg_animation_get_duration(lottie->tvg_anim, &duration);
+    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
     lottie->anim->act_time = 0;
     lottie->anim->end_value = (int32_t)f_total;
     lottie->anim->reverse_play_in_progress = false;
@@ -134,6 +154,9 @@ void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
 
 void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(src != NULL, return);
+
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     tvg_picture_load(lottie->tvg_paint, src);
     lv_draw_buf_t * canvas_draw_buf = lv_canvas_get_draw_buf(obj);
@@ -142,8 +165,10 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
     }
 
     float f_total;
+    float duration;
     tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
-    lv_anim_set_duration(lottie->anim, (int32_t)f_total * 1000 / 60); /*60 FPS*/
+    tvg_animation_get_duration(lottie->tvg_anim, &duration);
+    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
     lottie->anim->act_time = 0;
     lottie->anim->end_value = (int32_t)f_total;
     lottie->anim->reverse_play_in_progress = false;
@@ -153,7 +178,7 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
 
 lv_anim_t * lv_lottie_get_anim(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     return lottie->anim;
 }
@@ -190,6 +215,13 @@ static void lv_lottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
+
+    /*Drop the cached image so a later widget reusing the same draw_buf address
+     *doesn't hit a stale entry (e.g. NanoVG's GPU texture keyed by the buffer).*/
+    const void * src = lv_image_get_src(obj);
+    if(src) {
+        lv_image_cache_drop(src);
+    }
 
     tvg_animation_del(lottie->tvg_anim);
     tvg_canvas_destroy(lottie->tvg_canvas);

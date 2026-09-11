@@ -1,0 +1,16 @@
+{
+  "title": "Integration",
+  "pages": [
+    "overview",
+    "configuration",
+    "pc",
+    "embedded_linux",
+    "rtos",
+    "frameworks",
+    "boards",
+    "chip_vendors",
+    "external_display_controllers",
+    "building",
+    "bindings"
+  ]
+}

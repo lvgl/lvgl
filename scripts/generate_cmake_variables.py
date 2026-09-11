@@ -51,64 +51,51 @@ def write_set_cmd(fout, expr, is_parent_scope):
     if is_parent_scope == True:
         fout.write(f'set({expr} PARENT_SCOPE)\n')
 
+# Boolean options outside of the LV_USE_*/LV_BUILD_*
+# namespaces to be export to CMake
+EXTRA_SYMBOLS = [
+    "LV_CHECK_ARG_ASSERT_ON_FAIL",
+]
+
+def symbol_pattern(prefix: str):
+    """Match the `#define`s to export, `prefix` being "" or "CONFIG_".
+
+    Only the LV_USE_*/LV_BUILD_* namespaces and the symbols explicitly listed
+    in EXTRA_SYMBOLS are exported."""
+    assert prefix == "" or prefix == "CONFIG_"
+
+    namespaces = ["LV_USE", "LV_BUILD", "LV_[0-9A-Z_]+_USE"]
+    extras = ["%s\\b" % symbol for symbol in EXTRA_SYMBOLS]
+    alternatives = "|".join(prefix + name for name in namespaces + extras)
+
+    return "^#define +(%s)" % alternatives
+
 def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, debug: bool, is_parent_scope: bool):
     fin = open(path_input)
     fout = open(path_output, "w", newline='')
 
-    # If we use Kconfig, we must check the CONFIG_LV_USE_* and 
-    # CONFIG_LV_BUILD_* defines
+    BARE_PATTERN = symbol_pattern("")
+
     if kconfig:
-        CONFIG_PATTERN="^#define +(CONFIG_LV_USE|CONFIG_LV_BUILD|CONFIG_LV_[0-9A-Z_]+_USE)"
-        CONFIG_PREFIX=""
-    # Otherwise check the LV_USE_* and LV_BUILD_* defines
+        # If we use Kconfig, we must check for CONFIG_LV_USE_* and 
+        # CONFIG_LV_BUILD_* defines
+        CONFIG_PATTERN = symbol_pattern("CONFIG_")
+        CONFIG_PREFIX = ""
     else:
-        CONFIG_PATTERN="^#define +(LV_USE|LV_BUILD|LV_[0-9A-Z_]+_USE)"
-        CONFIG_PREFIX="CONFIG_"
+        # Otherwise check the LV_USE_* and LV_BUILD_* defines
+        CONFIG_PATTERN = BARE_PATTERN
+        CONFIG_PREFIX = "CONFIG_"
 
 
     # Using the expanded lv_conf_internal, we don't have to deal with regexp,
     # as all the #define will be aligned on the left with a single space before the value
     for line in fin.read().splitlines():
 
-        # Treat the LV_USE_STDLIB_* configs in a special way, as we need
-        # to convert the define to full config with 1 value when enabled
-        if re.search(f'{CONFIG_PATTERN}_STDLIB', line):
-
-            parts = line.split()
-            if len(parts) < 3:
-                continue
-
-            name = parts[1]
-            value = parts[2].strip()
-
-            type = value.split("LV_STDLIB_")[1]
-
-            name = name.replace("STDLIB", type)
-
-            write_set_cmd(fout, f'{CONFIG_PREFIX}{name} 1', is_parent_scope)
-
-        # Treat the LV_USE_OS config in a special way, as we need
-        # to convert the define to full config with 1 value when enabled
-        if re.search(f'{CONFIG_PATTERN}_OS', line):
-
-            parts = line.split()
-            if len(parts) < 3:
-                continue
-
-            name = parts[1]
-            value = parts[2].strip()
-
-            type = value.split("LV_OS")[1]
-
-            name += type
-
-            write_set_cmd(fout, f'{CONFIG_PREFIX}{name} 1', is_parent_scope)
-
         # For the rest of the configs, simply add CONFIG_ and write the name of the define
         # all LV_USE_* or LV_BUILD_* configs where the value is 0 or 1,
         # as these are the ones that are needed in cmake
         # To detect the configuration of LVGL to perform conditional compilation/linking
-        elif re.search(f'{CONFIG_PATTERN}.* +[01] *$', line):
+        if re.search(f'{CONFIG_PATTERN}.* +[01] *$', line):
 
             parts = line.split()
             if len(parts) < 3:
@@ -118,6 +105,18 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, d
             value = parts[2].strip()
 
             write_set_cmd(fout, f'{CONFIG_PREFIX}{name} {value}', is_parent_scope)
+
+        # When using kconfig: catch bare LV_* defines with a literal 0/1 value
+        # that aren't backed by Kconfig (value is not a CONFIG_* reference)
+        elif kconfig and re.search(f'{BARE_PATTERN}.* +[01] *$', line):
+            parts = line.split()
+            if len(parts) < 3:
+                continue
+
+            name = parts[1]
+            value = parts[2].strip()
+            # Export with CONFIG_ prefix so it's consistent with kconfig-backed vars
+            write_set_cmd(fout, f'CONFIG_{name} {value}', is_parent_scope)
 
         else:
             # Useful for debugging expressions that are unhandled,

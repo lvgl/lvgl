@@ -14,11 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_UEFI
-
-#include "lv_uefi.h"
 
 /*********************
  *      DEFINES

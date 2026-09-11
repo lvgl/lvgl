@@ -1,11 +1,11 @@
 #ifndef _THORVG_H_
 #define _THORVG_H_
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 /*Testing of dependencies*/
 #if LV_USE_THORVG && LV_USE_VECTOR_GRAPHIC == 0
-#error "ThorVG: LV_USE_VECTOR_GRAPHIC is required. Enable it in lv_conf.h"
+    #error "ThorVG: LV_USE_VECTOR_GRAPHIC is required. Enable it in lv_conf.h"
 #endif
 
 #if LV_USE_THORVG_INTERNAL
@@ -17,9 +17,6 @@
 #include <memory>
 #include <string>
 #include <list>
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
-#include "../../misc/lv_assert.h"
 
 #ifdef TVG_API
     #undef TVG_API

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_types.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_DRAW_NANOVG
 
@@ -34,6 +34,8 @@ extern "C" {
  * Initialize NanoVG rendering
  */
 void lv_draw_nanovg_init(void);
+
+const lv_draw_buf_handlers_t * lv_draw_nanovg_get_draw_buf_handlers(void);
 
 /**********************
  *      MACROS

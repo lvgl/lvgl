@@ -21,7 +21,7 @@ extern "C" {
  *********************/
 #if LV_USE_OS == LV_OS_CMSIS_RTOS2
 
-#include "cmsis_os2.h"
+#include <cmsis_os2.h>
 
 /*********************
  *      DEFINES

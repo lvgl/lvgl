@@ -21,6 +21,18 @@ static void event_cb(lv_event_t * e)
     }
 }
 
+/**
+ * @title Snapshot a container into an image
+ * @brief Capture a widget tree on press and release with `lv_snapshot_take`.
+ *
+ * A 180x180 container is filled with four star images in an
+ * `LV_FLEX_FLOW_ROW_WRAP` layout. A separate `lv_image` on the screen is scaled
+ * to 128 and rotated 300. Every star is clickable, and both `LV_EVENT_PRESSED`
+ * and `LV_EVENT_RELEASED` run a callback that destroys the previous snapshot
+ * buffer with `lv_draw_buf_destroy`, takes a fresh one via
+ * `lv_snapshot_take(parent, LV_COLOR_FORMAT_ARGB8888)`, and assigns it as the
+ * image's source.
+ */
 void lv_example_snapshot_1(void)
 {
     LV_IMAGE_DECLARE(img_star);
@@ -50,7 +62,7 @@ void lv_example_snapshot_1(void)
         lv_obj_set_style_bg_color(img, lv_color_black(), 0);
         lv_obj_set_style_bg_opa(img, LV_OPA_COVER, 0);
         //        lv_obj_set_style_transform_scale(img, 400, LV_STATE_PRESSED);
-        lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_set_clickable(img, true);
         lv_obj_add_event_cb(img, event_cb, LV_EVENT_PRESSED, snapshot_obj);
         lv_obj_add_event_cb(img, event_cb, LV_EVENT_RELEASED, snapshot_obj);
     }

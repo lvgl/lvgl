@@ -6,8 +6,6 @@
 #ifndef LV_TLSF_PRIVATE_H
 #define LV_TLSF_PRIVATE_H
 
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +15,8 @@ extern "C" {
  *********************/
 
 #include "lv_tlsf.h"
+
+#if LV_USE_TLSF
 #include "../../osal/lv_os_private.h"
 
 /*********************
@@ -45,10 +45,10 @@ typedef struct {
  *      MACROS
  **********************/
 
+#endif /*LV_USE_TLSF*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
-
-#endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
 #endif /*LV_TLSF_PRIVATE_H*/

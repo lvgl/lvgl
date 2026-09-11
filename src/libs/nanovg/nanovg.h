@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NANOVG
 
@@ -52,6 +52,10 @@ struct NVGpaint {
     NVGcolor innerColor;
     NVGcolor outerColor;
     int image;
+    /* LVGL extension: per-pixel image recolor performed in the fragment shader.
+     * recolor.rgb is the target color, recolor.a is the recolor opacity
+     * (0 = disabled, 1 = full replace). Only applied to image paints. */
+    NVGcolor recolor;
 };
 typedef struct NVGpaint NVGpaint;
 

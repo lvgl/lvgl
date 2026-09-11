@@ -1,0 +1,59 @@
+---
+title: Overview
+description: "NXP has integrated LVGL into the MCUXpresso SDK packages as an optional software component. This page explains how to start a project and which accelerators LVGL can use."
+faqs:
+  - question: "Do I have to integrate LVGL into an MCUXpresso SDK project myself?"
+    answer: "No. LVGL is an optional software component of the MCUXpresso SDK packages. An SDK downloaded for a supported board comes fully configured with LVGL, including PXP or G2D support if those modules are present."
+  - question: "Which accelerator does my NXP chip use?"
+    answer: "On i.MX RT (MCU) platforms the acceleration is done by the PXP (PiXel Pipeline) or by the Verisilicon GPU through the VG-Lite API. On i.MX (MPU) platforms it is done by the NXP G2D library."
+  - question: "Can several accelerators be used at the same time?"
+    answer: "Yes. Each accelerator has its own context, so they can be used individually or simultaneously with each other and with the CPU when LVGL runs in multithreading mode."
+  - question: "Where is the NXP VGLite draw unit?"
+    answer: "It was removed in LVGL v9.4. Use the generic VG-Lite draw unit (LV_USE_DRAW_VG_LITE) instead, which talks to the same Verisilicon VG-Lite API."
+---
+
+NXP has integrated LVGL into the MCUXpresso SDK packages for several of our
+microcontrollers as an optional software component, allowing easy evaluation and
+migration into your product design. LVGL is a free and open-source embedded
+graphic library with features that enable you to create embedded GUIs with
+intuitive graphical elements, beautiful visual effects and a low memory
+footprint. The complete graphic framework includes a variety of widgets for you
+to use in the creation of your GUI, and supports more advanced functions such as
+animations and anti-aliasing.
+
+LVGL enables graphics in our free GUI Guider UI tool. It's available for use
+with NXP's general purpose and crossover microcontrollers, providing developers
+with a tool for creating complete, high quality GUI applications with LVGL.
+
+## Creating a New Project with LVGL
+
+[Download an SDK for a supported board](https://www.nxp.com/design/software/embedded-software/littlevgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY?&tid=vanLITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
+today and get started with your next GUI application. It comes fully configured
+with LVGL (and with PXP/G2D support if the modules are present), no
+additional integration work is required.
+
+## HW acceleration for NXP iMX RT platforms
+
+Depending on the RT platform used, the acceleration can be done by NXP PXP
+(PiXel Pipeline) and/or the Verisilicon GPU through an API named VGLite. Each
+accelerator has its own context that allows them to be used individually as well as
+simultaneously (in LVGL multithreading mode).
+
+- [PXP GPU](/integration/chip_vendors/nxp/pxp_gpu) — configuration, supported
+  features, and limitations of the PXP draw unit.
+- [VG-Lite General GPU](/integration/chip_vendors/nxp/vg_lite_gpu) — the generic
+  VG-Lite draw unit, which replaced the NXP-specific VGLite draw unit in LVGL v9.4.
+
+## HW acceleration for NXP iMX platforms
+
+On MPU platforms, the acceleration can be done (hardware independent) by NXP G2D
+library. This accelerator has its own context that allows them to be used
+individually as well as simultaneously with the CPU (in LVGL multithreading mode).
+
+- [G2D GPU](/integration/chip_vendors/nxp/g2d_gpu) — configuration, supported
+  features, and limitations of the G2D draw unit.
+
+## Display Output
+
+Displays connected through the RGB interface, or through MIPI-DSI on capable devices, can be
+driven with the [eLCDIF driver](/integration/chip_vendors/nxp/elcdif).

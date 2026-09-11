@@ -39,6 +39,18 @@ static lv_thread_t increment_thread;
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * @title Thread-safe counter with OSAL sync
+ * @brief Count button clicks from a worker thread using `lv_thread_sync_t`.
+ *
+ * A button is aligned near the center of the active screen and its
+ * `LV_EVENT_CLICKED` callback signals an `lv_thread_sync_t`. A worker
+ * thread created with `lv_thread_init` at `LV_THREAD_PRIO_MID` creates a
+ * counter label under `lv_lock` / `lv_unlock`, then loops on
+ * `lv_thread_sync_wait`, incrementing a press counter and updating the
+ * label text on each signal. The locking pairs keep label updates safe
+ * across the UI and worker threads.
+ */
 void lv_example_osal(void)
 {
     lv_obj_t * counter_button;

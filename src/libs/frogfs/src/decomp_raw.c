@@ -2,11 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #include LV_STDDEF_INCLUDE
 #include LV_STDINT_INCLUDE
-#include "../../../stdlib/lv_string.h"
-#include "../../../misc/lv_fs.h"
 
 #include "frogfs_priv.h"
 #include "frogfs_format.h"

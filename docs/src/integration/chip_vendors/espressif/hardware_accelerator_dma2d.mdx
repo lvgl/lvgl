@@ -1,0 +1,69 @@
+---
+title: "2D Direct Memory Access (DMA2D) Support"
+description: "The DMA2D peripheral of chips like the ESP32-P4 copies 2-D data without CPU intervention. The Espressif LVGL port uses it to move rendered buffers to the display."
+faqs:
+  - question: "Does LVGL talk to the DMA2D peripheral directly?"
+    answer: "No. The display driver of the Espressif LVGL port component uses DMA2D to copy the drawn buffer to the display buffer without CPU intervention."
+  - question: "How do I enable the DMA2D transfer in the LVGL port?"
+    answer: "Set CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR in sdkconfig.defaults. It is only available with PSRAM and double buffer mode, otherwise the build fails with a compiler error."
+  - question: "Can I enable DMA2D when configuring the display manually?"
+    answer: "Yes, set dpi_config.flags.use_dma2d to true in the panel configuration at runtime."
+---
+
+## Overview
+
+Some Espressif chips, such as the ESP32-P4 family, feature a peripheral that speeds up
+copying 2-D data from one place to another, including sending that 2-D data to other
+peripherals.
+
+This peripheral is the 2-D direct memory access, or DMA2D. ESP-IDF offers a full-featured
+driver for it that is automatically enabled on the supported chips.
+
+One of its primary roles is to support the Pixel Processing Accelerator (PPA): it copies the
+source image data to the desired PPA client, splitting the data into fixed size blocks called
+bursts. The DMA2D is also used to pick the output chunks from the PPA client and copy them to
+the destination buffer, or the display frame buffer.
+
+More information about PPA can be found in: [PPA (Pixel Processing Accelerator) Support](/integration/chip_vendors/espressif/hardware_accelerator_ppa).
+
+## Interacting with the DMA2D
+
+LVGL does not interact with the DMA2D directly. Instead, the display driver of the Espressif
+LVGL port component uses the DMA2D to copy the drawn buffer to the display buffer without CPU
+intervention. This has to be enabled explicitly on the display driver of the port component.
+
+To enable it, set `CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR` in your `sdkconfig.defaults`, which tells
+the driver to use the DMA2D to optimize the transfer.
+
+<Callout type="warn">
+This option is only available when using PSRAM memory and double buffer mode, otherwise a
+compiler error is raised.
+</Callout>
+
+If you configure the display manually, the DMA2D can be enabled at runtime by setting the DMA2D
+flag to true:
+
+```c
+/* Gets the default configuration for the MIPI display controller */
+esp_lcd_dpi_panel_config_t dpi_config = EK79007_1024_600_PANEL_60HZ_CONFIG(LCD_COLOR_PIXEL_FORMAT_RGB888);
+
+/* Explicitly set the DMA2D to assist the buffer transfer */
+dpi_config.flags.use_dma2d = true;
+
+ek79007_vendor_config_t vendor_config = {
+    .mipi_config = {
+        .dsi_bus = mipi_dsi_bus,
+        .dpi_config = &dpi_config,
+    },
+};
+
+esp_lcd_panel_dev_config_t lcd_dev_config = {
+    .reset_gpio_num = UI_FIRMWARE_PIN_NUM_LCD_RST,
+    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
+    .bits_per_pixel = 24,
+    .vendor_config = &vendor_config,
+};
+
+/* Configures and enable the display */
+ESP_ERROR_CHECK(esp_lcd_new_panel_ek79007(mipi_dbi_io, &lcd_dev_config, &mipi_dpi_panel));
+```

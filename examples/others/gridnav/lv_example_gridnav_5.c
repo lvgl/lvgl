@@ -19,14 +19,26 @@ static void roller_key_cb(lv_event_t * e)
 }
 
 /**
- * Grid navigation for only one axis
+ * @title Single-axis gridnav with pass-through keys
+ * @brief Forward the unused axis to sliders and rollers so they mirror each other.
+ *
+ * The top container registers with `LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY` and holds
+ * three sliders; left and right arrows pass through as `LV_EVENT_KEY` to the
+ * focused slider. The bottom container uses `LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY`
+ * and holds three rollers; up and down pass through to the focused roller. Key
+ * callbacks mirror values so roller i tracks slider i through
+ * `lv_roller_set_selected` and `lv_slider_set_value` with `LV_ANIM_ON`.
  */
 void lv_example_gridnav_5(void)
 {
-    /*It's assumed that the default group is set and
+    /*The example requires that a default group is set and
      *there is a keyboard indev*/
-
     lv_group_t * group = lv_group_get_default();
+    if(!group) {
+        LV_LOG_WARN("Gridnav example requires a default group");
+        return;
+    }
+
     lv_obj_t * cont;
 
     cont = lv_obj_create(lv_screen_active());
@@ -55,6 +67,7 @@ void lv_example_gridnav_5(void)
     /* only left/right keys will be used for grid navigation in this container. */
     /* up/down will be sent to the rollers */
     lv_gridnav_add(cont, LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY);
+
     lv_group_add_obj(group, cont);
     for(uint32_t i = 0; i < 3; i++) {
         lv_obj_t * roller = lv_roller_create(cont);

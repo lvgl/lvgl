@@ -1,0 +1,21 @@
+<!--
+ @title LED brightness
+ @brief Same hue, three different brightness values.
+
+ The brightness attribute scales how lit each LED appears, in the 0..255 range. With
+ lower brightness the color darkens; with 255 it reaches the configured peak. The
+ three LEDs share one color so the effect of brightness alone is visible.
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+		<!-- 💡 Edit each brightness value (0..255) to dim or brighten the matching LED. -->
+		<!-- Dim -->
+		<lv_led name="led_1" width="40" height="40" color="0xff8000" brightness="60" />
+
+		<!-- Mid -->
+		<lv_led name="led_2" width="40" height="40" color="0xff8000" brightness="150" />
+
+		<!-- Full -->
+		<lv_led name="led_3" width="40" height="40" color="0xff8000" brightness="255" />
+	</view>
+</screen>

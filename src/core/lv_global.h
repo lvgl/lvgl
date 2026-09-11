@@ -13,32 +13,17 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "../lvgl_public.h"
 
-#include "../misc/lv_types.h"
-#include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 #include "../draw/sw/lv_draw_sw.h"
 #endif
-#include "../misc/lv_anim.h"
-#include "../misc/lv_area.h"
-#include "../misc/lv_color_op.h"
-#include "../misc/lv_ll.h"
-#include "../misc/lv_log.h"
-#include "../misc/lv_style.h"
-#include "../misc/lv_timer.h"
 #include "../osal/lv_os_private.h"
-#include "../debugging/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
 #include "../font/fmt_txt/lv_font_fmt_txt_private.h"
 #endif
-
-#include "../tick/lv_tick.h"
-#include "../layouts/lv_layout.h"
-
-#include "../misc/lv_types.h"
 
 #include "../misc/lv_timer_private.h"
 #include "../misc/lv_anim_private.h"
@@ -95,6 +80,9 @@ typedef struct _lv_global_t {
 
     lv_ll_t style_trans_ll;
     bool style_refresh;
+    /** Number of widgets that currently have blur or a drop shadow (see
+     * lv_obj_t::has_blur). If it is zero lv_obj_invalidate_expand_blur() is skipped. */
+    uint32_t blur_obj_cnt;
     uint32_t style_custom_table_size;
     uint32_t style_last_custom_prop_id;
     uint8_t * style_custom_prop_flag_lookup_table;
@@ -136,6 +124,11 @@ typedef struct _lv_global_t {
 
     lv_draw_global_info_t draw_info;
     lv_ll_t draw_sw_blend_handler_ll;
+
+#if LV_USE_OBSERVER
+    lv_ll_t subject_ll;
+#endif
+
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif
@@ -284,7 +277,9 @@ typedef struct _lv_global_t {
  **********************/
 
 #if LV_ENABLE_GLOBAL_CUSTOM
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE
 #include LV_GLOBAL_CUSTOM_INCLUDE
+#endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE*/
 
 #ifndef LV_GLOBAL_CUSTOM
 #define LV_GLOBAL_CUSTOM() lv_global_default()
@@ -293,7 +288,7 @@ typedef struct _lv_global_t {
 #else
 LV_ATTRIBUTE_EXTERN_DATA extern lv_global_t lv_global;
 #define LV_GLOBAL_DEFAULT() (&lv_global)
-#endif
+#endif /*LV_ENABLE_GLOBAL_CUSTOM*/
 
 /**********************
  * GLOBAL PROTOTYPES

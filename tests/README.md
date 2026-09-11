@@ -59,6 +59,8 @@ docker run --rm -it -v $(pwd):/work lvgl_test_env "./tests/main.py"
 
 This ensures you are testing in a consistent environment with the same dependencies as the CI pipeline.
 
+There is a script which automates these steps: `scripts/run_tests_docker.sh`. It will build a Docker container and run tests in that. Run the script with `--help` for more detail.
+
 ## Running automatically
 
 GitHub's CI automatically runs these tests on pushes and pull requests to `master` and `release/v8.*` branches.
@@ -66,12 +68,48 @@ GitHub's CI automatically runs these tests on pushes and pull requests to `maste
 ## Directory structure
 - `src` Source files of the tests
     - `test_cases` The written tests,
+        - `public_api` Tests that call a public function with an argument it is
+          documented to reject, see below,
     - `test_cases_perf` The performance tests,
     - `test_runners` Generated automatically from the files in `test_cases`.
     - other miscellaneous files and folders
+- `configs` Kconfig defconfig fragments the build configurations are made of
 - `ref_imgs` - Reference images for screenshot compare
 - `report` - Coverage report. Generated if the `report` flag was passed to `./main.py`
 - `unity` Source files of the test engine
+
+## Build configurations
+
+Every build configuration is a list of defconfig fragments from `configs`,
+merged in order so that a later fragment overrides an earlier one. The recipes
+live in `build_only_options` and `test_options` in [`main.py`](./main.py), which
+passes them to CMake through `LV_BUILD_DEFCONFIG_PATH`. `CMakeLists.txt` derives
+the rest - warning flags, which reference images to compare against, which
+libraries LVGL needs - from the resulting configuration, so a new configuration
+usually only takes a new fragment plus an entry in `main.py`.
+
+```sh
+cmake -B build -DLV_BUILD_TESTS=ON -DLVGL_TEST_ENABLE=ON \
+      -DLV_BUILD_DEFCONFIG_PATH="tests/configs/common.defconfig;tests/configs/full.defconfig;..."
+```
+
+Prefer `main.py` as it picks the right fragments for the host and architecture but this is useful when debugging the build itself.
+
+The test case folders are listed one by one in `CMakeLists.txt`, so that a folder can be tied to a configuration option:
+
+```cmake
+lvgl_add_test_folder(test_cases/widgets)
+lvgl_add_test_folder_if(NOT CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL test_cases/public_api)
+```
+
+See [`lvgl_test_helpers.cmake`](./lvgl_test_helpers.cmake).
+
+### Public API tests
+
+LVGL test run with `LV_CHECK_ARG_ASSERT_ON_FAIL` to ensure LVGL internals respect 
+its public API. The test cases that check that a public function behaves correctly when 
+invalid parameters are passed exist in `src/test_cases/public_api`. These tests are only 
+exercised when `LV_CHECK_ARG_ASSERT_ON_FAIL` is disabled.
 
 ## Add new tests
 
@@ -125,7 +163,7 @@ You can also run this script by passing a performance test config to the `main.p
 ## Emulated benchmarks
 
 In addition to unit and performance tests, LVGL automatically runs the `lv_demo_benchmark` inside the same ARM emulated
-environment mentionned in the previous section through CI to prevent unintentional slowdowns.
+environment mentioned in the previous section through CI to prevent unintentional slowdowns.
 
 ### Requirements
 

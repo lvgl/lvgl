@@ -13,7 +13,7 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
-    lv_display_set_color_format(NULL, LV_COLOR_FORMAT_XRGB8888);
+    lv_display_set_color_format(lv_display_get_default(), LV_COLOR_FORMAT_XRGB8888);
 }
 
 void test_render_to_rgb565_swapped(void)
@@ -21,7 +21,11 @@ void test_render_to_rgb565_swapped(void)
 #if LV_USE_DRAW_VG_LITE
     TEST_IGNORE_MESSAGE("VG_LITE doesn't support RGB565_SWAPPED format");
 #endif
-    lv_display_set_color_format(NULL, LV_COLOR_FORMAT_RGB565_SWAPPED);
+#if LV_USE_DRAW_NANOVG
+    /*NanoVG reads back the FBO as 32bpp BGRA, so non-XRGB8888 targets don't apply*/
+    TEST_PASS();
+#else
+    lv_display_set_color_format(lv_display_get_default(), LV_COLOR_FORMAT_RGB565_SWAPPED);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
     uint32_t opa;
@@ -42,6 +46,7 @@ void test_render_to_rgb565_swapped(void)
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
         }
     }
+#endif /* LV_USE_DRAW_NANOVG */
 }
 
 #endif

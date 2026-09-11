@@ -36,11 +36,11 @@ extern "C" {
 #define inline __inline
 #endif
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
-#include <stddef.h>
-#include <stdint.h>
+#include LV_STDDEF_INCLUDE
+#include LV_STDINT_INCLUDE
 
 /*  VGLite API Constants *******************************************************************************************************************/
 

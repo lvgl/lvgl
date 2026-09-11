@@ -4,7 +4,13 @@
 #if LV_USE_LIBJPEG_TURBO
 
 /**
- * Load a JPG image
+ * @title Decode JPEG with libjpeg-turbo
+ * @brief Load a JPEG file through the libjpeg-turbo decoder and center it on the screen.
+ *
+ * An image widget is created on the active screen with its source set to
+ * `A:lvgl/examples/libs/libjpeg_turbo/flower.jpg`, so the libjpeg-turbo
+ * image decoder reads the file through the filesystem driver registered
+ * under drive letter `A`.
  */
 void lv_example_libjpeg_turbo_1(void)
 {

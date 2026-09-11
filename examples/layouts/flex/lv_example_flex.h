@@ -10,31 +10,15 @@
 extern "C" {
 #endif
 
-/*********************
- *      INCLUDES
- *********************/
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
-void lv_example_flex_1(void);
-void lv_example_flex_2(void);
-void lv_example_flex_3(void);
-void lv_example_flex_4(void);
-void lv_example_flex_5(void);
-void lv_example_flex_6(void);
-
-/**********************
- *      MACROS
- **********************/
+void lv_example_flex_align(void);
+void lv_example_flex_flow(void);
+void lv_example_flex_grow(void);
+void lv_example_flex_ignore_layout(void);
+void lv_example_flex_internal_padding(void);
+void lv_example_flex_list(void);
+void lv_example_flex_new_track(void);
+void lv_example_flex_rtl(void);
+void lv_example_flex_win(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

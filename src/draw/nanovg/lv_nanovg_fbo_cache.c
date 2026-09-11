@@ -14,6 +14,8 @@
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
 #include "../../libs/nanovg/nanovg_gl_utils.h"
+#include "../../misc/cache/class/lv_cache_lru_ll.h"
+#include "../../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES

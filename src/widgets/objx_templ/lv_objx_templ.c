@@ -15,7 +15,7 @@
 /*********************
  *      INCLUDES
  *********************/
-//#include "lv_templ.h" /*TODO uncomment this*/
+//#include "lv_objx_templ.h" /*TODO uncomment this*/
 
 #if defined(LV_USE_TEMPL) && LV_USE_TEMPL != 0
 

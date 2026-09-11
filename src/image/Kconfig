@@ -1,0 +1,73 @@
+menu "Image Settings"
+
+config LV_CACHE_DEF_SIZE
+	int "Default image cache size (bytes, 0 = disabled)"
+	default 0
+	help
+		Avoids repeatedly opening and decoding the same images, at the cost of RAM.
+		Of little benefit with only the built-in image formats.
+
+config LV_IMAGE_HEADER_CACHE_DEF_CNT
+	int "Default image header cache size (entries, 0 = disabled)"
+	default 0
+	help
+		Avoids repeatedly reading image headers, at the cost of RAM.
+		Of little benefit with only the built-in image formats.
+
+config LV_USE_RLE
+	bool "RLE compression"
+	help
+		Decoder for LVGL's run-length encoded binary image format.
+
+config LV_USE_LZ4
+	bool "LZ4 compression"
+	default n
+	help
+		LZ4 compress/decompress functions, used by LVGL's compressed binary images.
+
+config LV_USE_LZ4_INTERNAL
+	bool "Bundled LZ4"
+	depends on LV_USE_LZ4
+	default y
+
+config LV_BIN_DECODER_RAM_LOAD
+	bool "Decode binary images to RAM"
+	default n
+
+config LV_USE_LODEPNG
+	bool "PNG decoder (LodePNG)"
+
+config LV_USE_LIBPNG
+	bool "PNG decoder (libpng)"
+
+config LV_USE_BMP
+	bool "BMP decoder"
+
+config LV_USE_TJPGD
+	bool "JPEG decoder (TJpgDec)"
+	help
+		Also decodes split JPEG, a custom format optimized for embedded systems.
+
+config LV_USE_LIBJPEG_TURBO
+	bool "JPEG decoder (libjpeg-turbo)"
+	help
+		High-performance decoder supporting the complete JPEG specifications.
+
+config LV_USE_LIBWEBP
+	bool "WebP decoder"
+
+config LV_USE_SVG
+	bool "SVG"
+	depends on LV_DRAW_HAS_VECTOR_SUPPORT
+	select LV_USE_VECTOR_GRAPHIC
+
+if LV_USE_SVG
+config LV_USE_SVG_ANIMATION
+	bool "SVG animation"
+
+config LV_USE_SVG_DEBUG
+	bool "SVG debug logs"
+	default n
+endif #LV_USE_SVG
+
+endmenu

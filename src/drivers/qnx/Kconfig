@@ -1,0 +1,13 @@
+config LV_USE_QNX
+	bool "QNX"
+	default n
+	help
+		Create a display on a QNX Screen window and read pointer and keyboard input.
+
+if LV_USE_QNX
+
+config LV_QNX_BUF_COUNT
+	int "Number of screen-sized buffers"
+	default 1
+
+endif #LV_USE_QNX

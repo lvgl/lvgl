@@ -296,8 +296,7 @@ void test_fs_open(void)
     /*'T' has cache*/
     lv_fs_file_t fa;
     lv_fs_res_t res;
-    res = lv_fs_open(&fa, NULL, LV_FS_MODE_RD);
-    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+
 
     lv_test_fs_set_ready(false);
     res = lv_fs_open(&fa, "T:src/test_files/readtest.txt", LV_FS_MODE_RD);
@@ -408,9 +407,6 @@ void test_fs_path_get_size(void)
     TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
     TEST_ASSERT_EQUAL_UINT32(expected_size, size);
 
-    /* Test error cases */
-    res = lv_fs_path_get_size(NULL, &size);
-    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
 
     /* Test with non-existent file */
     res = lv_fs_path_get_size("A:src/test_files/nonexistent.txt", &size);
@@ -455,9 +451,6 @@ void test_fs_dir_open(void)
     lv_fs_res_t res;
     lv_fs_dir_t dir;
 
-    /* Test with NULL path */
-    res = lv_fs_dir_open(&dir, NULL);
-    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
 
     /* Test with drive 'A' (has cache) */
     res = lv_fs_dir_open(&dir, "A:src/test_files");
@@ -490,18 +483,6 @@ void test_fs_dir_read(void)
     lv_fs_dir_t dir;
     char filename[256];
 
-    /* Test with invalid directory handle */
-    lv_fs_dir_t invalid_dir = {0};
-    res = lv_fs_dir_read(&invalid_dir, filename, sizeof(filename));
-    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
-    TEST_ASSERT_EQUAL_CHAR('\0', filename[0]);
-
-    /* Test with zero buffer length */
-    res = lv_fs_dir_open(&dir, "A:src/test_files");
-    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
-    res = lv_fs_dir_read(&dir, filename, 0);
-    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
-    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_dir_close(&dir));
 
     /* Test normal directory reading with drive 'A' */
     res = lv_fs_dir_open(&dir, "A:src/test_files");

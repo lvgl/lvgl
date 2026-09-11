@@ -3,10 +3,6 @@
  *
  */
 
-/**
- * Modified by NXP in 2024
- */
-
 #ifndef LV_DRAW_PRIVATE_H
 #define LV_DRAW_PRIVATE_H
 
@@ -18,9 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw.h"
+#include "../lvgl_public.h"
 #include "../osal/lv_os_private.h"
 #include "../misc/cache/lv_cache.h"
+#include "../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES
@@ -44,9 +41,6 @@ struct _lv_draw_task_t {
      * The real draw area. E.g. for shadow, outline, or transformed images it's different from `area`
      */
     lv_area_t _real_area;
-
-    /** The original area which is updated*/
-    lv_area_t clip_area_original;
 
     /**
      * The clip area of the layer is saved here when the draw task is created.
@@ -198,6 +192,13 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Free a draw task and everything it owns
+ * Used both by the normal dispatch path and to unwind a redraw that is being abandoned.
+ * @param  t      draw task to free
+ */
+void lv_draw_cleanup_task(lv_draw_task_t * t);
 
 /**********************
  *      MACROS

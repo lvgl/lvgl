@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_color_op_private.h"
-#include "lv_log.h"
+
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -85,6 +85,8 @@ uint8_t lv_color_brightness(lv_color_t c)
 
 void lv_color_filter_dsc_init(lv_color_filter_dsc_t * dsc, lv_color_filter_cb_t cb)
 {
+    LV_CHECK_ARG(dsc != NULL, return);
+
     dsc->filter_cb = cb;
 }
 

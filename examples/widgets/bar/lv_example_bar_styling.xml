@@ -1,0 +1,37 @@
+<!--
+ @title Bar styling
+ @brief Style the MAIN track and the INDICATOR independently, with a gradient fill.
+
+ Bar exposes two parts: MAIN (the background track) and INDICATOR (the filled portion).
+ Each is styled separately via `selector="main"` and `selector="indicator"`. The
+ indicator style adds a horizontal gradient and a darker inner shadow so the fill
+ reads as a glossy progress strip on top of the recessed track.
+-->
+<screen>
+	<styles>
+		<!-- Track: dark inset, rounded, subtle inner shadow -->
+		<style name="style_bar_track"
+			bg_opa="100%" bg_color="0x1f2937"
+			radius="12"
+			border_color="0x0f172a" border_width="1" />
+		<!-- Indicator: horizontal gradient with rounded ends -->
+		<style name="style_bar_indicator"
+			bg_opa="100%" bg_color="0x10b981" bg_grad_color="0x06b6d4" bg_grad_dir="hor"
+			radius="12"
+			shadow_color="0x064e3b" shadow_width="8" shadow_spread="-2" shadow_opa="180" />
+	</styles>
+
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="20">
+		<!-- 💡 Adjust min/max/value to see how the gradient indicator scales inside the styled track. -->
+		<!-- Tall pill-shaped bar with named styles for both parts -->
+		<lv_bar name="bar_1" width="90%" height="22" min_value="0" max_value="100" value="65">
+			<style name="style_bar_track" selector="main" />
+			<style name="style_bar_indicator" selector="indicator" />
+		</lv_bar>
+
+		<!-- Same widget, local style_* overrides for a flat alternative look -->
+		<lv_bar name="bar_2" width="90%" height="10" min_value="0" max_value="100" value="35"
+			style_bg_color="0xe5e7eb" style_bg_opa="100%" style_radius="2"
+			style_border_color="0xd1d5db" style_border_width="1" />
+	</view>
+</screen>

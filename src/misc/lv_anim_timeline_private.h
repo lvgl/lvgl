@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_anim_timeline.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

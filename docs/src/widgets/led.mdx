@@ -1,0 +1,55 @@
+---
+title: "LED (lv_led)"
+description: "A small rectangle or circle that mimics an LED. Brightness controls how dark the color appears."
+---
+
+## Overview
+
+An LED is a small rectangle or circle with adjustable brightness. Lower
+brightness makes the color darker.
+
+## Color
+
+You can set the color of the LED with
+<ApiLink name="lv_led_set_color" display="lv_led_set_color(led, lv_color_hex(0xff0080))" />. This will be used as its
+background color, border color, and shadow color.
+
+<LvglExample name="lv_example_led_color" path="widgets/led/lv_example_led_color" />
+
+## Brightness
+
+You can set their brightness with <ApiLink name="lv_led_set_brightness" display="lv_led_set_brightness(led, brightness)" />.
+The `brightness` value should be in the range 0 (darkest) to 255 (lightest).
+
+<LvglExample name="lv_example_led_brightness" path="widgets/led/lv_example_led_brightness" />
+
+## Toggle
+
+Use <ApiLink name="lv_led_on" display="lv_led_on(led)" /> and <ApiLink name="lv_led_off" display="lv_led_off(led)" /> to set the brightness to
+a predefined ON or OFF value. The <ApiLink name="lv_led_toggle" display="lv_led_toggle(led)" /> toggles between
+the ON and OFF state.
+
+You can set custom LED ON and OFF brightness values by defining macros
+<ApiLink name="LV_LED_BRIGHT_MAX" /> and <ApiLink name="LV_LED_BRIGHT_MIN" /> in your project.  Their default
+values are 255 and 80. These too must be in the range [0..255].
+
+## Styling
+
+- <ApiLink name="LV_LED_PART_MAIN" /> uses the [typical background style
+  properties](/common-widget-features/styles/overview).
+
+<LvglExample name="lv_example_led_styling" path="widgets/led/lv_example_led_styling" />
+
+<ApiLink name="lv_led_set_color" /> drives the base lit look (background, border, and
+shadow color), but the LED is still a base widget so the full style
+stack applies on top. Use `style_border_*` for a tight ring, a tinted
+`style_outline_*` for a soft halo, `style_shadow_*` for the glow, and
+`style_radius` to switch between round, rounded-square, and hard
+square indicators. The example demonstrates three different LED
+looks — round with halo, square with hard border, and a dimmed
+"pending" indicator — built entirely from local `style_*` props.
+
+## Events
+
+By default, LED Widgets are created without the  <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag,
+but you can add it to make the Widget detect and send events <ApiLink name="LV_EVENT_CLICKED" />.

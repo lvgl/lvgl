@@ -8,18 +8,14 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
+
 #if LV_USE_OPENGLES
+
 #include "lv_opengl_shader_internal.h"
-#include "../../../misc/lv_assert.h"
-#include "../../../misc/lv_log.h"
-#include "../../../misc/lv_rb.h"
-#include "../../../misc/lv_types.h"
-#include "../../../stdlib/lv_mem.h"
-#include "../../../stdlib/lv_sprintf.h"
+#include "../../../misc/lv_rb_private.h"
 #include "../lv_opengles_private.h"
 #include "../lv_opengles_debug.h"
-#include "../../../stdlib/lv_string.h"
 
 #include <string.h>
 
@@ -115,6 +111,7 @@ void lv_opengl_shader_manager_init(lv_opengl_shader_manager_t * manager, const l
 
     manager->bg_index_buf = 0;
     manager->bg_vertex_buf = 0;
+    manager->bg_vao = 0;
     manager->bg_program = 0;
 }
 
@@ -177,7 +174,7 @@ lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * 
     char define[512];
     uint32_t hash = lv_opengl_shader_hash(shader_identifier);
     for(size_t i = 0; i < permutations_len; ++i) {
-        LV_ASSERT_NULL(permutations[i].name);
+        LV_ASSERT(permutations[i].name != NULL);
         if(permutations[i].value) {
             lv_snprintf(define, sizeof(define), "%s%s", permutations[i].name, permutations[i].value);
         }

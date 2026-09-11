@@ -6,12 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_sdl_mouse.h"
-#if LV_USE_SDL
 
-#include "../../core/lv_group.h"
-#include "../../stdlib/lv_string.h"
 #include "lv_sdl_private.h"
+
+#if LV_USE_SDL
 
 /*********************
  *      DEFINES

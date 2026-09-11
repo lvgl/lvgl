@@ -1,0 +1,17 @@
+config LV_USE_TINY_TTF
+	bool "Tiny TTF"
+	default n
+	help
+		Built-in TTF decoder
+if LV_USE_TINY_TTF
+config LV_TINY_TTF_FILE_SUPPORT
+	bool "Load TTF data from files"
+	default n
+config LV_TINY_TTF_CACHE_GLYPH_CNT
+	int "Glyph cache size (glyphs)"
+	default 128
+
+config LV_TINY_TTF_CACHE_KERNING_CNT
+	int "Kerning cache size (entries)"
+	default 256
+endif #LV_USE_TINY_TTF

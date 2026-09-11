@@ -1,0 +1,22 @@
+<!--
+ @title Line stroke
+ @brief Style a polyline's color, thickness, and rounded end caps.
+
+ `line_color` and `line_width` set the stroke while `line_rounded="true"`
+ rounds both the end caps and the vertices, so the bends read as smooth
+ curves instead of sharp mitred corners. The point list is fixed — only
+ the stroke style changes how the same polyline looks.
+-->
+<screen>
+	<styles>
+		<!-- Thick, round-capped neutral stroke -->
+		<style name="style_stroke" line_color="0x9e9e9e" line_width="6" line_rounded="true" />
+	</styles>
+
+	<view>
+		<!-- 💡 Raise `line_width` or toggle `line_rounded`; the stroke thickens and the bends round off instead of mitring. -->
+		<lv_line name="line" align="center" points="(10 30) (60 90) (130 20) (200 70)">
+			<style name="style_stroke" />
+		</lv_line>
+	</view>
+</screen>

@@ -16,7 +16,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #include "../../../misc/lv_area_private.h"
 #include "../../../draw/lv_draw_private.h"
 #include "../../../draw/lv_draw_image_private.h"
@@ -24,8 +24,8 @@ extern "C" {
 #if LV_USE_DRAW_ARM2D_SYNC
 
 #define __ARM_2D_IMPL__
-#include "arm_2d.h"
-#include "__arm_2d_impl.h"
+#include <arm_2d.h>
+#include <__arm_2d_impl.h>
 
 #if defined(__IS_COMPILER_ARM_COMPILER_5__)
 #pragma diag_suppress 174,177,188,68,513,144,1296
@@ -38,9 +38,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_DRAW_SW_RGB565_SWAP
-    #define LV_DRAW_SW_RGB565_SWAP(__buf_ptr, __buf_size_px)                    \
-        lv_draw_sw_rgb565_swap_helium((__buf_ptr), (__buf_size_px))
+#ifndef LV_DRAW_RGB565_SWAP
+    #define LV_DRAW_RGB565_SWAP(__buf_ptr, __buf_size_px)                    \
+        lv_draw_rgb565_swap_helium((__buf_ptr), (__buf_size_px))
 #endif
 
 #ifndef LV_DRAW_SW_IMAGE
@@ -164,7 +164,7 @@ extern void arm_2d_helper_swap_rgb16(uint16_t * phwBuffer, uint32_t wCount);
         }                                                                       \
     } while(0);
 
-static inline lv_result_t lv_draw_sw_rgb565_swap_helium(void * buf, uint32_t buf_size_px)
+static inline lv_result_t lv_draw_rgb565_swap_helium(void * buf, uint32_t buf_size_px)
 {
     arm_2d_helper_swap_rgb16((uint16_t *)buf, buf_size_px);
     return LV_RESULT_OK;
@@ -601,8 +601,8 @@ static inline lv_result_t lv_draw_sw_image_helium(
                     );
 
             } 
-    #endif
         }
+    #endif
         else {
             break;
         }

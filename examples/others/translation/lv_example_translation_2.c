@@ -39,7 +39,15 @@ static void language_change_cb(lv_event_t * e)
 }
 
 /**
- * Change label text when the translation language changes
+ * @title Live language switching from a dropdown
+ * @brief Refresh translated labels on `LV_EVENT_TRANSLATION_LANGUAGE_CHANGED`.
+ *
+ * A dropdown lists the entries in the `languages` array (English, Deutsch, Español). Its
+ * `LV_EVENT_VALUE_CHANGED` callback reads the selected string and calls
+ * `lv_translation_set_language`. One label is created per tag in the `tags`
+ * array and subscribes to `LV_EVENT_TRANSLATION_LANGUAGE_CHANGED`; the handler
+ * rewrites its text with `lv_tr(tag)`. The screen uses a centered column flex
+ * layout and starts in English.
  */
 void lv_example_translation_2(void)
 {

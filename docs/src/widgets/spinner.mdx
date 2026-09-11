@@ -1,0 +1,33 @@
+---
+title: "Spinner (lv_spinner)"
+description: "A spinning arc over a ring. Used to show that some activity is in progress."
+---
+
+## Overview
+
+The Spinner shows a spinning arc over a static ring. It is typically used
+to indicate that an activity is in progress.
+
+## Create a spinner
+
+<LvglExample name="lv_example_spinner_basic" path="widgets/spinner/lv_example_spinner_basic" />
+
+<ApiLink name="lv_spinner_create" display="lv_spinner_create(parent)" /> creates the widget;
+<ApiLink name="lv_spinner_set_anim_params" display="lv_spinner_set_anim_params(spinner, spin_duration, angle)" /> tunes one
+revolution's duration (ms) and the moving arc's length (degrees).
+
+## Styling
+
+<LvglExample name="lv_example_spinner_styling" path="widgets/spinner/lv_example_spinner_styling" />
+
+Spinner reuses <ApiLink name="lv_arc" />'s parts: <ApiLink name="LV_PART_MAIN" /> (static background
+ring) and <ApiLink name="LV_PART_INDICATOR" /> (moving arc segment). Style each with the
+arc-family properties — `arc_color`, `arc_width`, `arc_rounded`. A faint
+MAIN with an accent INDICATOR gives the familiar loading look.
+
+## Events
+
+By default, Spinner Widgets are created without the  <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag,
+but you can add it to make the Widget detect and send events <ApiLink name="LV_EVENT_CLICKED" />.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.

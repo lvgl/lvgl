@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_sysmon.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_SYSMON
 
@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 struct _lv_sysmon_backend_data_t {
-    lv_subject_t subject;
+    lv_subject_t * subject;
     lv_timer_t * timer;
 };
 

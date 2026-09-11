@@ -1,0 +1,46 @@
+<!--
+ @title Opacity and transform
+ @brief Fade and geometrically transform a Widget via style properties.
+
+ Three identical buttons: the first is untouched, the second sets
+ `style_opa="128"` (50%), the third also rotates 15° with
+ `style_transform_rotation="150"` and scales to 1.25× with
+ `style_transform_scale_x/y="320"`. `opa` and the transforms render the
+ button to a layer first, so its label fades and transforms with it.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- Shared modern button look -->
+		<style name="style_btn"
+			radius="10"
+			bg_opa="100%"
+			bg_color="#accent"
+			pad_all="12"
+			text_color="0xffffff" />
+	</styles>
+
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
+		<!-- 💡 The third button shares the same style; only `opa` + the `transform_*` props change it. -->
+		<lv_button name="button_1" width="130">
+			<style name="style_btn" />
+			<lv_label name="label_1" align="center" text="Normal" />
+		</lv_button>
+
+		<lv_button name="button_2" width="130" style_opa="128">
+			<style name="style_btn" />
+			<lv_label name="label_2" align="center" text="Opa 50%" />
+		</lv_button>
+
+		<lv_button name="button_3" width="130" style_opa="128"
+			style_transform_rotation="110"
+			style_transform_pivot_x="50%"
+			style_transform_pivot_y="50%"
+			style_transform_scale_x="420">
+			<style name="style_btn" />
+			<lv_label name="label_3" align="center" text="Transformed" />
+		</lv_button>
+	</view>
+</screen>

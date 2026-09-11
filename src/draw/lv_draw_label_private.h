@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_label.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -62,6 +62,9 @@ struct _lv_draw_glyph_dsc_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+void lv_draw_unit_draw_letter_internal(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
+                                       const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb);
 
 /**********************
  *      MACROS

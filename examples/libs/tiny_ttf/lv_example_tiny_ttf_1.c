@@ -2,7 +2,13 @@
 #if LV_USE_TINY_TTF && LV_BUILD_EXAMPLES
 
 /**
- * Load a font with Tiny_TTF
+ * @title Tiny TTF font from memory
+ * @brief Render a multi-line label with a 30 px TTF decoded from an embedded byte array.
+ *
+ * `lv_tiny_ttf_create_data` loads the external `ubuntu_font` byte array at
+ * 30 px. A style binds the resulting `lv_font_t` and centers text, then a
+ * label is placed at the center of the active screen showing a four-line
+ * greeting drawn with the decoded font.
  */
 void lv_example_tiny_ttf_1(void)
 {

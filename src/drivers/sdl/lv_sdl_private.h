@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../misc/lv_types.h"
-#include "lv_sdl_window.h"
+
+#include "../../lvgl_public.h"
 
 #if LV_USE_SDL
 
@@ -68,21 +68,6 @@ void lv_sdl_keyboard_handler(SDL_Event * event);
 void lv_sdl_mouse_handler(SDL_Event * event);
 void lv_sdl_mousewheel_handler(SDL_Event * event);
 lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id);
-
-
-#if LV_SDL_USE_EGL
-lv_result_t lv_sdl_egl_init(lv_display_t * disp);
-lv_result_t lv_sdl_egl_resize(lv_display_t * disp);
-void lv_sdl_egl_deinit(lv_display_t * disp);
-#elif LV_USE_DRAW_SDL
-lv_result_t lv_sdl_texture_init(lv_display_t * disp);
-lv_result_t lv_sdl_texture_resize(lv_display_t * disp);
-void lv_sdl_texture_deinit(lv_display_t * disp);
-#else
-lv_result_t lv_sdl_sw_init(lv_display_t * disp);
-lv_result_t lv_sdl_sw_resize(lv_display_t * disp);
-void lv_sdl_sw_deinit(lv_display_t * disp);
-#endif
 
 /**********************
  *      MACROS

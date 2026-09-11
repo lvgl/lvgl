@@ -116,7 +116,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
         /*Open a file for read*/
         f = ...         /*Add your code here*/
     }
-    else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) {
+    else if(mode == ((lv_fs_mode_t)(LV_FS_MODE_WR | LV_FS_MODE_RD))) {
         /*Open a file for read and write*/
         f = ...         /*Add your code here*/
     }

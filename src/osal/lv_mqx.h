@@ -17,8 +17,8 @@ extern "C" {
 
 #if LV_USE_OS == LV_OS_MQX
 
-#include "mqx.h"
-#include "mutex.h"
+#include <mqx.h>
+#include <mutex.h>
 
 /*********************
  *      DEFINES

@@ -1,0 +1,24 @@
+config LV_USE_DRAW_EVE
+	bool "EVE renderer"
+	default n
+	help
+		Offload drawing to an external EVE (FT81X/BT81X) graphics controller over SPI.
+
+if LV_USE_DRAW_EVE
+
+config LV_DRAW_EVE_EVE_GENERATION
+	int "EVE generation"
+	default 4
+	range 2 4
+	help
+		Generation of the connected controller: 2 = FT81x, 3 = BT815/BT816,
+		4 = BT817/BT818. Higher generations expose more commands and registers.
+
+config LV_DRAW_EVE_WRITE_BUFFER_SIZE
+	int "SPI write buffer size (bytes)"
+	default 2048
+	help
+		Bytes buffered before each SPI transmission. 0 disables buffering;
+		values below 4 are treated as 0.
+
+endif

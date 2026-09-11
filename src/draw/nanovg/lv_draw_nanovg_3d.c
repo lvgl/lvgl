@@ -11,8 +11,6 @@
 
 #if LV_USE_DRAW_NANOVG && LV_USE_3DTEXTURE
 
-#include "../../draw/lv_draw_3d.h"
-#include "../../drivers/opengles/lv_opengles_driver.h"
 #include "../../drivers/opengles/lv_opengles_private.h"
 #include "lv_nanovg_utils.h"
 #include "lv_nanovg_fbo_cache.h"

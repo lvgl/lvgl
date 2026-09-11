@@ -33,6 +33,18 @@ static const lv_fragment_class_t sample_cls = {
 
 static lv_obj_t * container = NULL;
 
+/**
+ * @title Push and pop fragment stack
+ * @brief Build a navigation stack where Push and Pop buttons drive `lv_fragment_manager_push`/`pop`.
+ *
+ * A grid layout splits the screen into a content cell and two buttons labelled
+ * "Push" and "Pop". Each stacked fragment tracks its depth and a click counter,
+ * and its `create_obj_cb` builds a column with a depth label, a counter label,
+ * and a `+1` button that updates the counter. "Push" calls
+ * `lv_fragment_manager_push` with the current stack size as the starting depth;
+ * "Pop" calls `lv_fragment_manager_pop`. The root's `LV_EVENT_DELETE` tears the
+ * manager down.
+ */
 void lv_example_fragment_2(void)
 {
     lv_obj_t * root = lv_obj_create(lv_screen_active());

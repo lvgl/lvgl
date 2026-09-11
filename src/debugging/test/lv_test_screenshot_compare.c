@@ -11,18 +11,18 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
+
 #if LV_USE_TEST && defined(LV_USE_TEST_SCREENSHOT_COMPARE) && LV_USE_TEST_SCREENSHOT_COMPARE
 
 #if LV_USE_LODEPNG == 0
     #error "lodepng is required for screenshot compare. Enable it in lv_conf.h (LV_USE_LODEPNG 1)"
 #endif
 
-#include "../../lvgl.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
+#include LV_STDARG_INCLUDE
 #include <errno.h>
 #include "../../libs/lodepng/lodepng.h"
 
@@ -56,7 +56,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8_t tolerance);
 static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width, unsigned * height,
                                const char * file_name);
 static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
@@ -77,27 +76,21 @@ static void create_folders_if_needed(const char * path) ;
 
 lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
 {
+    LV_CHECK_ARG(fn_ref != NULL, return LV_TEST_SCREENSHOT_RESULT_FAILED);
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_invalidate(scr);
     lv_refr_now(NULL);
 
     lv_test_screenshot_result_t res;
-    res = screenshot_compare(fn_ref, REF_IMG_TOLERANCE);
+    res = lv_test_screenshot_compare_core(fn_ref);
     return res;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-/**
- * Compare the content of the frame buffer with a reference image
- * @param fn_ref    reference image path
- * @return          An element of lv_test_screenshot_result_t
- */
-static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8_t tolerance)
+lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 {
+    LV_CHECK_ARG(fn_ref != NULL, return LV_TEST_SCREENSHOT_RESULT_FAILED);
+
     char fn_ref_full[256];
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
 
@@ -105,7 +98,7 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
     create_folders_if_needed(fn_ref_full);
 #endif
 
-    lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
+    lv_draw_buf_t * draw_buf = lv_display_get_buf_active(lv_display_get_default());
 
     uint8_t * screen_buf_xrgb8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);
     if(!screen_buf_xrgb8888) {
@@ -150,9 +143,11 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
             uint8_t * ptr_ref = &(ref_row[x * 4]);
             uint8_t * ptr_act = &screen_buf_tmp[x * 4];
 
-            if(LV_ABS((int32_t) ptr_act[0] - (int32_t) ptr_ref[0]) > tolerance ||
-               LV_ABS((int32_t) ptr_act[1] - (int32_t) ptr_ref[1]) > tolerance ||
-               LV_ABS((int32_t) ptr_act[2] - (int32_t) ptr_ref[2]) > tolerance) {
+            if(LV_ABS((int32_t) ptr_act[0] - (int32_t) ptr_ref[0]) > REF_IMG_TOLERANCE ||
+               LV_ABS((int32_t) ptr_act[1] - (int32_t) ptr_ref[1]) > REF_IMG_TOLERANCE ||
+               LV_ABS((int32_t) ptr_act[2] - (int32_t) ptr_ref[2]) > REF_IMG_TOLERANCE) {
+                err = true;
+#if LV_USE_LOG
                 uint32_t act_px = (ptr_act[2] << 16) + (ptr_act[1] << 8) + (ptr_act[0] << 0);
                 uint32_t ref_px = 0;
                 memcpy(&ref_px, ptr_ref, 3);
@@ -162,8 +157,8 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
                        "  - Expected: %X\n"
                        "  - Actual:   %X\n"
                        "  - Tolerance: %d\n",
-                       fn_ref_full,  x, y, ref_px, act_px, tolerance);
-                err = true;
+                       fn_ref_full,  x, y, ref_px, act_px, REF_IMG_TOLERANCE);
+#endif
                 break;
             }
         }
@@ -188,9 +183,17 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
 
 }
 
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
 static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width, unsigned * height,
                                const char * file_name)
 {
+    LV_ASSERT(refr_draw_buf != NULL);
+    LV_ASSERT(width != NULL);
+    LV_ASSERT(height != NULL);
+    LV_ASSERT(file_name != NULL);
     unsigned  error = lodepng_decode32_file((void *)refr_draw_buf, width, height, file_name);
     if(error) LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
     return error;
@@ -198,6 +201,8 @@ static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width,
 
 static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name)
 {
+    LV_ASSERT(raw_img != NULL);
+    LV_ASSERT(file_name != NULL);
     unsigned  error = lodepng_encode32_file(file_name, raw_img, width, height);
     if(error) LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
     return error;
@@ -205,13 +210,15 @@ static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height,
 
 static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
 {
+    LV_ASSERT(draw_buf != NULL);
+    LV_ASSERT(buf_out != NULL);
     uint32_t stride = draw_buf->header.stride;
     lv_color_format_t cf_in = draw_buf->header.cf;
     const uint8_t * buf_in = draw_buf->data;
 
     if(cf_in == LV_COLOR_FORMAT_RGB565 || cf_in == LV_COLOR_FORMAT_RGB565_SWAPPED) {
         if(cf_in == LV_COLOR_FORMAT_RGB565_SWAPPED) {
-            lv_draw_sw_rgb565_swap(draw_buf->data, draw_buf->header.w * draw_buf->header.h);
+            lv_draw_rgb565_swap(draw_buf->data, draw_buf->header.w * draw_buf->header.h);
         }
         uint32_t y;
         for(y = 0; y < draw_buf->header.h; y++) {
@@ -315,6 +322,7 @@ static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
 
 static void create_folders_if_needed(const char * path)
 {
+    LV_ASSERT(path != NULL);
     char * ptr;
     char * path_copy = lv_strdup(path);
     if(path_copy == NULL) {

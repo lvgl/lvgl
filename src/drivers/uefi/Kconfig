@@ -1,0 +1,20 @@
+config LV_USE_UEFI
+	bool "UEFI"
+	default n
+	help
+		Display and input drivers for UEFI firmware, based on the Graphics Output, keyboard and pointer protocols.
+
+if LV_USE_UEFI
+
+config LV_USE_UEFI_INCLUDE
+	string "Header wrapping the UEFI framework (EDK2, gnu-efi, ...)"
+	default "myefi.h"
+
+config LV_UEFI_USE_MEMORY_SERVICES
+	bool "Memory services from the boot services table"
+	default n
+	help
+		Allocate memory with the UEFI boot services instead of the C library.
+		Only takes effect with the custom stdlib malloc implementation.
+
+endif #LV_USE_UEFI

@@ -1,0 +1,11 @@
+{
+  "title": "Running on PC",
+  "pages": [
+    "linux",
+    "windows",
+    "macos",
+    "browser",
+    "sdl",
+    "uefi"
+  ]
+}

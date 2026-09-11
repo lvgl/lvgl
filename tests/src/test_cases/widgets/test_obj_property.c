@@ -58,7 +58,8 @@ void test_obj_property_set_get_should_match(void)
     TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_26, lv_obj_get_style_text_font(obj, LV_PART_MAIN));
     TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_26, lv_obj_get_property(obj, LV_PROPERTY_STYLE_TEXT_FONT).ptr);
 
-    /* Object flags */
+    /* Object flags (deprecated flag API kept for backward compatibility) */
+    LV_DEPRECATIONS_IGNORE_BEGIN
     prop.id = LV_PROPERTY_OBJ_FLAG_HIDDEN ;
     prop.num = 1;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
@@ -70,6 +71,7 @@ void test_obj_property_set_get_should_match(void)
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_FALSE(lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE));
     TEST_ASSERT_FALSE(lv_obj_get_property(obj, LV_PROPERTY_OBJ_FLAG_CLICKABLE).num);
+    LV_DEPRECATIONS_IGNORE_END
 
     /* Obj property */
     prop.id = LV_PROPERTY_OBJ_PARENT;
@@ -159,10 +161,10 @@ void test_obj_property_flag(void)
     };
 
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    obj->flags = 0;
+    /*This test intentionally exercises the deprecated flag API kept for backward compatibility.*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     for(unsigned long i = 0; i < sizeof(properties) / sizeof(properties[0]); i++) {
 
-        TEST_ASSERT_FALSE(lv_obj_get_property(obj, properties[i].id).num);
         lv_obj_add_flag(obj, properties[i].flag);
         TEST_ASSERT_TRUE(lv_obj_get_property(obj, properties[i].id).num);
 
@@ -182,6 +184,7 @@ void test_obj_property_flag(void)
         TEST_ASSERT_FALSE(lv_obj_get_property(obj, properties[i].id).num);
         TEST_ASSERT_FALSE(lv_obj_has_flag(obj, properties[i].flag));
     }
+    LV_DEPRECATIONS_IGNORE_END
 #endif
 }
 

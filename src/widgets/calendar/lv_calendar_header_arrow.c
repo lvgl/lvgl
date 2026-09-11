@@ -6,15 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../../core/lv_obj_class_private.h"
-#include "lv_calendar_header_arrow.h"
+
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_ARROW
 
-#include "lv_calendar.h"
-#include "../button/lv_button.h"
-#include "../label/lv_label.h"
-#include "../../layouts/flex/lv_flex.h"
-#include "../../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -42,8 +38,12 @@ const lv_obj_class_t lv_calendar_header_arrow_class = {
     .height_def = LV_DPI_DEF / 3,
     .name = "lv_calendar_header_arrow",
 };
-
+#if defined(LV_CALENDAR_DEFAULT_MONTH_NAMES) && !LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES
+#warning "LV_CALENDAR_DEFAULT_MONTH_NAMES is deprecated and will be removed in the next release. Use LV_JANUARY_STR, LV_FEBRUARY_STR,... to set each month name"
 static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
+#else
+static const char * month_names_def[12] = { LV_JANUARY_STR, LV_FEBRUARY_STR, LV_MARCH_STR, LV_APRIL_STR, LV_MAY_STR, LV_JUNE_STR, LV_JULY_STR, LV_AUGUST_STR, LV_SEPTEMBER_STR, LV_OCTOBER_STR, LV_NOVEMBER_STR, LV_DECEMBER_STR };
+#endif
 
 /**********************
  *      MACROS
@@ -55,6 +55,8 @@ static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
 
 lv_obj_t * lv_calendar_add_header_arrow(lv_obj_t * parent)
 {
+    LV_CHECK_OBJ(parent, &lv_calendar_class, return NULL);
+
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_arrow_class, parent);
     lv_obj_class_init_obj(obj);
     return obj;
@@ -69,6 +71,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("begin");
 
     LV_UNUSED(class_p);
+    LV_ASSERT(obj != NULL);
 
     lv_obj_move_to_index(obj, 0);
 
@@ -83,7 +86,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_width(mo_prev, btn_size);
 
     lv_obj_add_event_cb(mo_prev, month_event_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_remove_flag(mo_prev, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_set_click_focusable(mo_prev, false);
 
     lv_obj_t * label = lv_label_create(obj);
     lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
@@ -95,7 +98,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_size(mo_next, btn_size, btn_size);
 
     lv_obj_add_event_cb(mo_next, month_event_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_remove_flag(mo_next, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_set_click_focusable(mo_next, false);
 
     lv_obj_add_event_cb(obj, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     /*Refresh the drop downs*/
@@ -104,10 +107,13 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void month_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * btn = lv_event_get_current_target(e);
 
     lv_obj_t * header = lv_obj_get_parent(btn);
+    LV_ASSERT(header != NULL);
     lv_obj_t * calendar = lv_obj_get_parent(header);
+    LV_ASSERT(calendar != NULL);
 
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);
@@ -144,8 +150,11 @@ static void month_event_cb(lv_event_t * e)
 
 static void value_changed_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_obj_t * header = lv_event_get_current_target(e);
+    LV_ASSERT(header != NULL);
     lv_obj_t * calendar = lv_obj_get_parent(header);
+    LV_ASSERT(calendar != NULL);
 
     const lv_calendar_date_t * date = lv_calendar_get_showed_date(calendar);
     LV_ASSERT_FORMAT_MSG(date->month >= 1 && date->month <= 12,

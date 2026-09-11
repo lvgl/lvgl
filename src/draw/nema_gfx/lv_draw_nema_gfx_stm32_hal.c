@@ -9,16 +9,13 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #if LV_USE_NEMA_GFX
 
 #if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
 
 #include "lv_draw_nema_gfx_utils.h"
 
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_string.h"
 #include "../../osal/lv_os_private.h"
 
 #include <assert.h>
@@ -59,6 +56,11 @@ extern GPU2D_HandleTypeDef hgpu2d;
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+/* Default to no special attribute; override via LV_NEMA_CUSTOM_INCLUDE. */
+#ifndef LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+    #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+#endif
 
 static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE] LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM; /* NemaGFX memory pool */
 

@@ -1,0 +1,5 @@
+config LV_USE_TFT_ESPI
+	bool "TFT_eSPI"
+	default n
+	help
+		Display driver built on the TFT_eSPI Arduino library, which must be available in the build.

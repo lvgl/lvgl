@@ -1,0 +1,814 @@
+/**
+ * @file lv_observer.h
+ *
+ */
+
+#ifndef LV_OBSERVER_H
+#define LV_OBSERVER_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "lv_obj.h"
+#include "lv_ext_data.h"
+#include "../misc/lv_ll.h"
+
+#if LV_USE_OBSERVER
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**
+ * Values for lv_subject_t's `type` field
+ */
+typedef enum {
+    LV_SUBJECT_TYPE_INVALID =   0,   /**< indicates Subject not initialized yet */
+    LV_SUBJECT_TYPE_NONE =      1,   /**< a null value like None or NILt */
+    LV_SUBJECT_TYPE_INT =       2,   /**< an int32_t */
+    LV_SUBJECT_TYPE_FLOAT =     3,   /**< a float, requires `LV_USE_FLOAT 1` */
+    LV_SUBJECT_TYPE_POINTER =   4,   /**< a void pointer */
+    LV_SUBJECT_TYPE_COLOR   =   5,   /**< an lv_color_t */
+    LV_SUBJECT_TYPE_GROUP  =    6,   /**< an array of Subjects */
+    LV_SUBJECT_TYPE_STRING  =   7,   /**< a char pointer */
+} lv_subject_type_t;
+
+/**
+ * A common type to handle all the various observable types in the same way
+ */
+typedef union {
+    int32_t num;           /**< Integer number (opacity, enums, booleans or "normal" numbers) */
+    const void * pointer;  /**< Constant pointer  (string buffer, format string, font, cone text, etc.) */
+    lv_color_t color;      /**< Color */
+#if LV_USE_FLOAT
+    float float_v;         /**< Floating point value*/
+#endif
+} lv_subject_value_t;
+
+/**
+ * The Subject (an observable value)
+ */
+struct _lv_subject_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
+    lv_ll_t subs_ll;                     /**< Subscribers */
+    lv_subject_value_t value;            /**< Current value */
+    lv_subject_value_t prev_value;       /**< Previous value */
+    lv_subject_value_t min_value;        /**< Minimum value for min. int or float*/
+    lv_subject_value_t max_value;        /**< Maximum value for max. int or float*/
+    void * user_data;                    /**< Additional parameter, can be used freely by user */
+
+    uint32_t type                 :  4;  /**< One of the LV_SUBJECT_TYPE_... values */
+    uint32_t size                 : 24;  /**< String buffer size or group length */
+    uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notification,
+                                          * start notifying from the beginning. */
+};
+
+/**
+  * Callback called to notify Observer that Subject's value has changed
+  * @param observer     pointer to Observer
+  * @param subject      pointer to Subject being observed
+  */
+typedef void (*lv_observer_cb_t)(lv_observer_t * observer, lv_subject_t * subject);
+
+
+/**
+ * Generic callback called to set a boolean value on a Widget.
+ * @param obj       pointer to Widget
+ * @param value     new value
+ */
+typedef void (*lv_obj_set_bool_t)(lv_obj_t * obj, bool value);
+
+/**
+ * Generic callback called to set an int value on a Widget.
+ * @param obj       pointer to Widget
+ * @param value     new value
+ */
+typedef void (*lv_obj_set_int_t)(lv_obj_t * obj, int32_t value);
+
+/**
+ * Generic callback called to set a float value on a Widget.
+ * @param obj       pointer to Widget
+ * @param value     new value
+ */
+typedef void (*lv_obj_set_float_t)(lv_obj_t * obj, float value);
+
+/**
+ * Generic callback called to set a string value on a Widget.
+ * @param obj       pointer to Widget
+ * @param value     new value
+ */
+typedef void (*lv_obj_set_string_t)(lv_obj_t * obj, const char * value);
+
+/**
+ * Generic callback called to set a color value on a Widget.
+ * @param obj       pointer to Widget
+ * @param value     new value
+ */
+typedef void (*lv_obj_set_color_t)(lv_obj_t * obj, lv_color_t value);
+
+/**
+ * Generic callback called to set a pointer value on a Widget.
+ * @param obj       pointer to Widget
+ * @param value     new value
+ */
+typedef void (*lv_obj_set_pointer_t)(lv_obj_t * obj, const void * value);
+
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+/**
+ * Create a subject of type `type`
+ * @param type   the type of the subject. See @ref lv_subject_type_t
+ */
+lv_subject_t * lv_subject_create(lv_subject_type_t type);
+
+/**
+ * Delete a subject
+ * @param subject   the subject to delete @nullable
+ */
+void lv_subject_delete(lv_subject_t * subject);
+
+/**
+ * Initialize an integer-type Subject.
+ * @param subject   pointer to Subject
+ * @param value     initial value
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
+ */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
+void lv_subject_init_int(lv_subject_t * subject, int32_t value);
+
+/**
+ * Set value of an integer Subject and notify Observers.
+ * @param subject   pointer to Subject
+ * @param value     new value
+ */
+void lv_subject_set_int(lv_subject_t * subject, int32_t value);
+
+/**
+ * Get current value of an integer Subject.
+ * @param subject   pointer to Subject
+ * @return          current value
+ */
+int32_t lv_subject_get_int(lv_subject_t * subject);
+
+/**
+ * Get previous value of an integer Subject.
+ * @param subject   pointer to Subject
+ * @return          current value
+ */
+int32_t lv_subject_get_previous_int(lv_subject_t * subject);
+
+
+/**
+ * Set a minimum value for an integer subject
+ * @param subject   pointer to Subject
+ * @param min_value the minimum value
+ */
+void lv_subject_set_min_value_int(lv_subject_t * subject, int32_t min_value);
+
+/**
+ * Set a maximum value for an integer subject
+ * @param subject   pointer to Subject
+ * @param max_value the maximum value
+ */
+void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value);
+
+#if LV_USE_FLOAT
+
+/**
+ * Initialize an float-type Subject.
+ * @param subject   pointer to Subject
+ * @param value     initial value
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
+ */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
+void lv_subject_init_float(lv_subject_t * subject, float value);
+
+/**
+ * Set value of an float Subject and notify Observers.
+ * @param subject   pointer to Subject
+ * @param value     new value
+ */
+void lv_subject_set_float(lv_subject_t * subject, float value);
+
+/**
+ * Get current value of an float Subject.
+ * @param subject   pointer to Subject
+ * @return          current value
+ */
+float lv_subject_get_float(lv_subject_t * subject);
+
+/**
+ * Get previous value of an float Subject.
+ * @param subject   pointer to Subject
+ * @return          current value
+ */
+float lv_subject_get_previous_float(lv_subject_t * subject);
+
+/**
+ * Set a minimum value for a float subject
+ * @param subject   pointer to Subject
+ * @param min_value the minimum value
+ */
+void lv_subject_set_min_value_float(lv_subject_t * subject, float min_value);
+
+/**
+ * Set a maximum value for a float subject
+ * @param subject   pointer to Subject
+ * @param max_value the maximum value
+ */
+void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value);
+
+#endif /*LV_USE_FLOAT*/
+
+/**
+ * Initialize a string-type Subject.
+ * @param subject   pointer to Subject
+ * @param buf       pointer to buffer to store string
+ * @param prev_buf  pointer to buffer to store previous string. @nullable When NULL the
+ *                  previous string is not tracked.
+ * @param size      size of buffer(s)
+ * @param value     initial value of string, e.g. "hello"
+ * @note            A string Subject stores its own copy of the string, not just the pointer.
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
+ */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
+void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value);
+
+/**
+ * Set the buffers where a string subject will store its value
+ * The buffers must out-live the subject
+ *
+ * @param subject   pointer to Subject
+ * @param buf       pointer to buffer to store string
+ * @param prev_buf  pointer to buffer to store previous string. @nullable When NULL the
+ *                  previous string is not tracked.
+ * @param size      size of buffer(s)
+ * @note            A string Subject stores its own copy of the string, not just the pointer.
+ */
+void lv_subject_set_string_buffer_static(lv_subject_t * subject, char * buf, char * prev_buf, size_t size);
+
+/**
+ * Set a Subject's string value and notify Observers if it changed.
+ * @param subject   pointer to Subject
+ * @param buf       new string
+ * @note            The Subject stores its own copy of the string, not just the pointer.
+ */
+void lv_subject_set_string(lv_subject_t * subject, const char * buf);
+
+/**
+ * Format a new string, updating Subject, and notify Observers if it changed.
+ * @param subject   pointer to Subject
+ * @param format    format string
+ */
+void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...) LV_FORMAT_ATTRIBUTE(2, 3);
+
+/**
+ * Get current value of a string Subject.
+ * @param subject   pointer to Subject
+ * @return          pointer to buffer containing current value
+ */
+const char * lv_subject_get_string(lv_subject_t * subject);
+
+/**
+ * Get previous value of a string Subject.
+ * @param subject   pointer to Subject
+ * @return          pointer to buffer containing previous value
+ */
+const char * lv_subject_get_previous_string(lv_subject_t * subject);
+
+/**
+ * Initialize a pointer-type Subject.
+ * @param subject   pointer to Subject
+ * @param value     initial value @nullable
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
+ */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
+void lv_subject_init_pointer(lv_subject_t * subject, void * value);
+
+/**
+ * Set value of a pointer Subject and notify Observers (regardless of whether it changed).
+ * @param subject   pointer to Subject
+ * @param ptr       new value @nullable
+ */
+void lv_subject_set_pointer(lv_subject_t * subject, void * ptr);
+
+/**
+ * Get current value of a pointer Subject.
+ * @param subject   pointer to Subject
+ * @return          current value
+ */
+const void * lv_subject_get_pointer(lv_subject_t * subject);
+
+/**
+ * Get previous value of a pointer Subject.
+ * @param subject   pointer to Subject
+ * @return          previous value
+ */
+const void * lv_subject_get_previous_pointer(lv_subject_t * subject);
+
+/**
+ * Initialize a color-type Subject.
+ * @param subject   pointer to Subject
+ * @param color     initial value
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
+ */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
+void lv_subject_init_color(lv_subject_t * subject, lv_color_t color);
+
+/**
+ * Set value of a color Subject and notify Observers if it changed.
+ * @param subject   pointer to Subject
+ * @param color     new value
+ */
+void lv_subject_set_color(lv_subject_t * subject, lv_color_t color);
+
+/**
+ * Get current value of a color Subject.
+ * @param subject   pointer to Subject
+ * @return          current value
+ */
+lv_color_t lv_subject_get_color(lv_subject_t * subject);
+
+/**
+ * Get previous value of a color Subject.
+ * @param subject   pointer to Subject
+ * @return          previous value
+ */
+lv_color_t lv_subject_get_previous_color(lv_subject_t * subject);
+
+/**
+ * Initialize a Group-type Subject.
+ * @param group_subject  pointer to Group-type Subject
+ * @param list           list of other Subject addresses; when any of these have values
+ *                       updated, Observers of `group_subject` will be notified.
+ * @param list_len       number of elements in `list[]`
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
+ */
+LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
+void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len);
+
+/**
+ * Set the subject list of a group subject
+ *
+ * @param subject   pointer to group Subject
+ * @param list      list of other Subject addresses; when any of these have values
+ *                  updated, Observers of `group_subject` will be notified.
+ * @param list_len  number of elements in `list[]`
+ */
+void lv_subject_set_group_list_static(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len);
+
+/**
+ * Remove all Observers from a Subject and free allocated memory, and delete
+ * any associated Widget-Binding events.  This leaves `subject` "disconnected" from
+ * all Observers and all associated Widget events established through Widget Binding.
+ * @param subject   pointer to Subject @nullable
+ * @note            This can safely be called regardless of whether any Observers
+ *                  added with `lv_subject_add_observer_obj()` or bound to a Widget Property
+ *                  with one of the `..._bind_...()` functions.
+ * @deprecated      The subject init API is deprecated, use `lv_subject_create`/`lv_subject_delete` instead
+ */
+LV_DEPRECATED("The subject init API is deprecated, use `lv_subject_create`/`lv_subject_delete` instead")
+void lv_subject_deinit(lv_subject_t * subject);
+
+/**
+ * Get an element from Subject Group's list.
+ * @param subject   pointer to Group-type Subject
+ * @param index     index of element to get
+ * @return          pointer to indexed Subject from list, or NULL if index is out of bounds
+ */
+lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index);
+
+/**
+ * Add Observer to Subject. When Subject's value changes `observer_cb` will be called.
+ * @param subject       pointer to Subject
+ * @param observer_cb   notification callback
+ * @param user_data     optional user data @nullable
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t observer_cb, void * user_data);
+
+/**
+ * Add Observer to Subject for a Widget.
+ * When the Widget is deleted, Observer will be unsubscribed from Subject automatically.
+ * @param subject       pointer to Subject
+ * @param observer_cb   notification callback
+ * @param obj           pointer to Widget. @nullable When NULL the Observer is not
+ *                      bound to a Widget.
+ * @param user_data     optional user data @nullable
+ * @return              pointer to newly-created Observer
+ * @note                Do not call `lv_observer_delete()` on Observers created this way.
+ *                      Only clean up such Observers by either:
+ *                      - deleting the Widget, or
+ *                      - calling `lv_subject_deinit()` to gracefully de-couple and
+ *                        remove all Observers.
+ */
+lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t observer_cb, lv_obj_t * obj,
+                                            void * user_data);
+
+/**
+ * Add an Observer to a Subject and also save a target pointer.
+ * @param subject       pointer to Subject
+ * @param observer_cb   notification callback
+ * @param target        any pointer @nullable
+ * @param user_data     optional user data @nullable
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t observer_cb,
+                                                    void * target, void * user_data);
+
+/**
+ * Remove Observer from its Subject.
+ * @param observer      pointer to Observer @nullable
+ */
+void lv_observer_delete(lv_observer_t * observer);
+
+/**
+ * Remove Observers associated with Widget `obj` from specified `subject` or all Subjects.
+ * @param obj       pointer to Widget whose Observers should be removed
+ * @param subject   Subject to remove Widget from. @nullable When NULL the Widget is
+ *                  removed from all Subjects.
+ * @note            This function can be used e.g. when a Widget's Subject(s) needs to
+ *                  be replaced by other Subject(s)
+ */
+void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject);
+
+/**
+ * Get target of an Observer.
+ * @param observer      pointer to Observer
+ * @return              pointer to saved target
+ */
+void * lv_observer_get_target(lv_observer_t * observer);
+
+/**
+ * Get target Widget of Observer.
+ * This is the same as `lv_observer_get_target()`, except it returns `target`
+ * as an `lv_obj_t *`.
+ * @param observer      pointer to Observer
+ * @return              pointer to saved Widget target
+ */
+lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer);
+
+/**
+ * Get Observer's user data.
+ * @param observer      pointer to Observer
+ * @return              void pointer to saved user data
+*/
+void * lv_observer_get_user_data(const lv_observer_t * observer);
+
+#if LV_USE_EXT_DATA
+
+/**
+ * @brief Attaches external user data to an integer Subject with lifecycle management
+ *
+ * Associates arbitrary user-defined data with an LVGL observer and registers a destructor
+ * callback that will be automatically invoked when the observer is deleted. This enables:
+ * - Safe resource cleanup through the destructor mechanism
+ * - Contextual data storage for observer callbacks
+ * - Proper memory management for observer-related resources
+ *
+ * @param subject    pointer to Subject
+ * @param data       User-defined data pointer to associate @nullable
+ * @param free_cb    Cleanup function called when: @nullable
+ *                   - Observer is explicitly deleted
+ *                   - Observed object is deleted
+ *                   - New data replaces current association
+ *                   NULL indicates no cleanup required
+ */
+void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data));
+#endif
+
+/**
+ * Set Observer's user data.
+ * @param observer      pointer to Observer
+ * @param user_data     pointer to user-owned data (may be NULL) @nullable
+ */
+void lv_observer_set_user_data(lv_observer_t * observer, void * user_data);
+
+/**
+ * Notify all Observers of Subject.
+ * @param subject       pointer to Subject
+ */
+void lv_subject_notify(lv_subject_t * subject);
+
+/**
+ * Add an event handler to increment (or decrement) the value of a subject on a trigger.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param step      value to add on trigger
+ *                  if the minimum value is reached, the maximum value will be set on rollover.
+ */
+lv_subject_increment_dsc_t * lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject,
+                                                                lv_event_code_t trigger, int32_t step);
+
+/**
+ * Set the minimum subject value to set by the event
+ * @param obj           pointer to the Widget to which the event is attached
+ * @param dsc           pointer to the descriptor returned by `lv_obj_add_subject_increment_event()`
+ * @param min_value     the minimum value to set
+ */
+void lv_obj_set_subject_increment_event_min_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t min_value);
+
+/**
+ * Set the maximum subject value to set by the event
+ * @param obj           pointer to the Widget to which the event is attached
+ * @param dsc           pointer to the descriptor returned by `lv_obj_add_subject_increment_event()`
+ * @param max_value     the maximum value to set
+ */
+void lv_obj_set_subject_increment_event_max_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t max_value);
+
+/**
+ * Set what to do when the min/max value is crossed.
+ * @param obj           pointer to the Widget to which the event is attached
+ * @param dsc           pointer to the descriptor returned by `lv_obj_add_subject_increment_event()`
+ * @param rollover      false: stop at the min/max value; true: jump to the other end
+ * @note                the subject also can have min/max values and always the smaller range will be considered
+ */
+void lv_obj_set_subject_increment_event_rollover(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, bool rollover);
+
+/**
+* Toggle the value of an integer subject on an event. If it was != 0 it will be 0.
+* If it was 0, it will be 1.
+* @param obj       pointer to a widget
+* @param subject   pointer to a subject to toggle
+* @param trigger   the trigger on which the subject should be changed
+*/
+void lv_obj_add_subject_toggle_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger);
+
+/**
+ * Set the value of an integer subject.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param value     the value to set
+ */
+void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value);
+
+
+#if LV_USE_FLOAT
+/**
+ * Set the value of a float subject.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param value     the value to set
+ */
+void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, float value);
+#endif
+
+/**
+ * Set the value of a string subject.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param value     the value to set
+ */
+void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
+                                         const char * value);
+
+/**
+ * Bind a boolean value to a Widget: `set_bool_cb` is called with the Subject's
+ * value (as a `bool`) on subscribing and whenever it changes. A dedicated per-flag
+ * setter such as `lv_obj_set_hidden` can be passed directly.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to an integer Subject
+ * @param set_bool_cb   callback that applies the boolean value to the Widget
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_bool(lv_obj_t * obj, lv_subject_t * subject, lv_obj_set_bool_t set_bool_cb);
+
+/**
+ * Bind an integer value to a Widget: `set_int_cb` is called with the Subject's
+ * value on subscribing and whenever it changes.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to an integer Subject
+ * @param set_int_cb    callback that applies the integer value to the Widget
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_int(lv_obj_t * obj, lv_subject_t * subject, lv_obj_set_int_t set_int_cb);
+
+#if LV_USE_FLOAT
+/**
+ * Bind a float value to a Widget: `set_float_cb` is called with the Subject's
+ * value on subscribing and whenever it changes.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to a float Subject
+ * @param set_float_cb  callback that applies the float value to the Widget
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_float(lv_obj_t * obj, lv_subject_t * subject, lv_obj_set_float_t set_float_cb);
+#endif
+
+/**
+ * Bind a string value to a Widget: `set_string_cb` is called with the Subject's
+ * value on subscribing and whenever it changes.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to a string Subject
+ * @param set_string_cb callback that applies the string value to the Widget
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_string(lv_obj_t * obj, lv_subject_t * subject, lv_obj_set_string_t set_string_cb);
+
+/**
+ * Bind a color value to a Widget: `set_color_cb` is called with the Subject's
+ * value on subscribing and whenever it changes.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to a color Subject
+ * @param set_color_cb  callback that applies the color value to the Widget
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_color(lv_obj_t * obj, lv_subject_t * subject, lv_obj_set_color_t set_color_cb);
+
+/**
+ * Bind a pointer value to a Widget: `set_pointer_cb` is called with the Subject's
+ * value on subscribing and whenever it changes.
+ * @param obj            pointer to Widget
+ * @param subject        pointer to a pointer Subject
+ * @param set_pointer_cb callback that applies the pointer value to the Widget
+ * @return               pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_pointer(lv_obj_t * obj, lv_subject_t * subject, lv_obj_set_pointer_t set_pointer_cb);
+
+/**
+ * Set Widget's flag(s) if an integer Subject's value is equal to a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param flag          flag(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+/**
+ * Set Widget's flag(s) if an integer Subject's value is not equal to a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param flag          flag(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag,
+                                           int32_t ref_value);
+
+/**
+ * Set Widget's flag(s) if an integer Subject's value is greater than a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param flag          flag(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+/**
+ * Set Widget's flag(s) if an integer Subject's value is greater than or equal to a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param flag          flag(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+/**
+ * Set Widget's flag(s) if an integer Subject's value is less than a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param flag          flag(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+/**
+ * Set Widget's flag(s) if an integer Subject's value is less than or equal to a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param flag          flag(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+
+/**
+ * Set Widget's state(s) if an integer Subject's value is equal to a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param state         state(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
+
+/**
+ * Set a Widget's state(s) if an integer Subject's value is not equal to a reference value, clear flag otherwise
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param state         state(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state,
+                                            int32_t ref_value);
+
+/**
+ * Set Widget's state(s) if an integer Subject's value is greater than a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param state         state(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
+
+/**
+ * Set Widget's state(s) if an integer Subject's value is greater than or equal to a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param state         state(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
+
+/**
+ * Set Widget's state(s) if an integer Subject's value is less than a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param state         state(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
+
+/**
+ * Set Widget's state(s) if an integer Subject's value is less than or equal to a reference value, clear flag otherwise.
+ * @param obj           pointer to Widget
+ * @param subject       pointer to Subject
+ * @param state         state(s) (can be bit-wise OR-ed) to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ * @deprecated Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.
+ */
+LV_DEPRECATED("Use `lv_obj_bind_bool()` or `lv_subject_add_observer_obj()` instead.")
+lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
+
+/**
+ * Set an integer Subject to 1 when a Widget is checked and set it 0 when unchecked, and
+ * clear Widget's checked state when Subject's value changes to 0 and set it when non-zero.
+ * @param obj       pointer to Widget
+ * @param subject   pointer to a Subject
+ * @return          pointer to newly-created Observer
+ * @note            Ensure Widget's `LV_OBJ_FLAG_CHECKABLE` flag is set.
+ */
+lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
+
+
+/**********************
+ *      MACROS
+ **********************/
+
+#endif /*LV_USE_OBSERVER*/
+
+#ifdef __cplusplus
+} /*extern "C"*/
+#endif
+
+#endif /*LV_OBSERVER_H*/

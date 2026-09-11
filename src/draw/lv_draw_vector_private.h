@@ -14,9 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vector.h"
+#include "lv_draw_private.h"
 
 #if LV_USE_VECTOR_GRAPHIC
+
+#include "../misc/lv_array.h"
 
 /*********************
  *      DEFINES
@@ -124,9 +126,9 @@ typedef struct {
  * @param task_list     pointer to the linked list in `lv_draw_vector_dsc_t` that stores
  *                      the path shapes and their attributes.
  * @param cb            the callback used to iterate through the task
- * @param user_data     a custom pointer that will be passed to the callback
+ * @param user_data     a custom pointer that will be passed to the callback @nullable
  */
-void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * used_data);
+void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * user_data);
 
 /**********************
  *      MACROS

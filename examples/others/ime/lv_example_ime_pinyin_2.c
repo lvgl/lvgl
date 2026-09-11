@@ -10,16 +10,27 @@ static void ta_event_cb(lv_event_t * e)
     if(code == LV_EVENT_FOCUSED) {
         if(lv_indev_get_type(lv_indev_active()) != LV_INDEV_TYPE_KEYPAD) {
             lv_keyboard_set_textarea(kb, ta);
-            lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_hidden(kb, false);
         }
     }
     else if(code == LV_EVENT_READY) {
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_hidden(kb, true);
         lv_obj_remove_state(ta, LV_STATE_FOCUSED);
         lv_indev_reset(NULL, ta);   /*To forget the last clicked object to make it focusable again*/
     }
 }
 
+/**
+ * @title Pinyin IME in 9-key mode
+ * @brief Switch the pinyin IME into `LV_IME_PINYIN_MODE_K9` for phone-style input.
+ *
+ * Mirrors the 26-key example but calls `lv_ime_pinyin_set_mode` with
+ * `LV_IME_PINYIN_MODE_K9` so the attached keyboard uses a 9-key layout. The
+ * textarea callback hides the keyboard on `LV_EVENT_READY` instead of
+ * `LV_EVENT_CANCEL`, and `lv_ime_pinyin_get_cand_panel` is aligned above the
+ * keyboard at 100% width and 10% height. A reference label displays Chinese
+ * sample text to type.
+ */
 void lv_example_ime_pinyin_2(void)
 {
     lv_obj_t * pinyin_ime = lv_ime_pinyin_create(lv_screen_active());

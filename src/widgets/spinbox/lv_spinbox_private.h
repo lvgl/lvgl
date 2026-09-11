@@ -14,10 +14,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../textarea/lv_textarea_private.h"
-#include "lv_spinbox.h"
+#include "../../core/lv_obj_private.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_SPINBOX
+
+#include "../textarea/lv_textarea_private.h"
 
 /*********************
  *      DEFINES

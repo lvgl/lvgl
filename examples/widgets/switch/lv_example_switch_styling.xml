@@ -1,0 +1,53 @@
+<!--
+ @title Switch styling
+ @brief Style the track (MAIN), the filled portion (INDICATOR), and the knob.
+
+ A switch has three drawable parts: `MAIN` (the rounded track), `INDICATOR`
+ (the filled side when the switch is on), and `KNOB` (the circle that slides).
+ The on-state look is attached with `selector="indicator|checked"` so the
+ indicator only paints when the switch is checked.
+
+ Padding plays a dual role here:
+
+   * `pad_*` on MAIN shrinks the INDICATOR inwards (the indicator fills the
+     content area of MAIN, which padding makes smaller). Use this to leave a
+     visible track around the coloured fill — `pad_all="6"` gives a 6 px
+     ring of track that stays visible behind the indicator.
+   * `pad_*` on KNOB grows the knob *outside* the track. `pad_all="0"` makes
+     the knob exactly as tall as MAIN; positive padding makes it overhang.
+     `pad_all="2"` here lets the knob sit slightly larger than the track,
+     which (combined with a shadow) gives the typical floating-knob look.
+-->
+<screen>
+	<styles>
+		<style name="style_switch_main" bg_color="0xc4d8cb" bg_opa="100%" radius="999" pad_all="6" border_width="0" />
+		<style name="style_switch_indicator_checked" bg_color="0x22c55e" bg_opa="100%" />
+		<style
+			name="style_switch_knob"
+			bg_color="0xffffff"
+			bg_opa="100%"
+            pad_all="2"
+			border_color="0xd1d5db"
+			border_width="1"
+			shadow_color="0x000000"
+			shadow_opa="40%"
+			shadow_width="16"
+			shadow_offset_y="2"
+		/>
+	</styles>
+
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+		<!-- 💡 Bump `pad_all` on `style_switch_main` to widen the track around the indicator; bump it on `style_switch_knob` to grow the knob past the track height. -->
+		<lv_switch name="sw_1" width="60" height="30">
+			<style name="style_switch_main" selector="main" />
+			<style name="style_switch_indicator_checked" selector="indicator|checked" />
+			<style name="style_switch_knob" selector="knob" />
+		</lv_switch>
+
+		<lv_switch name="sw_2" width="60" height="30" checked="true">
+			<style name="style_switch_main" selector="main" />
+			<style name="style_switch_indicator_checked" selector="indicator|checked" />
+			<style name="style_switch_knob" selector="knob" />
+		</lv_switch>
+	</view>
+</screen>

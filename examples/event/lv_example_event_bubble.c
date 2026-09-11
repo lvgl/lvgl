@@ -17,7 +17,14 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Demonstrate event bubbling
+ * @title Event bubbling to a parent
+ * @brief Handle clicks on child buttons from a single container callback.
+ *
+ * A 290x200 container uses `LV_FLEX_FLOW_ROW_WRAP` and holds 30 small
+ * buttons, each flagged with `LV_OBJ_FLAG_EVENT_BUBBLE`. One
+ * `LV_EVENT_CLICKED` callback on the container reads
+ * `lv_event_get_target_obj` to identify which button was clicked and paints
+ * its background red; clicks on the container itself are ignored.
  */
 void lv_example_event_bubble(void)
 {
@@ -31,7 +38,7 @@ void lv_example_event_bubble(void)
     for(i = 0; i < 30; i++) {
         lv_obj_t * btn = lv_button_create(cont);
         lv_obj_set_size(btn, 70, 50);
-        lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
+        lv_obj_set_event_bubble(btn, true);
 
         lv_obj_t * label = lv_label_create(btn);
         lv_label_set_text_fmt(label, "%" LV_PRIu32, i);

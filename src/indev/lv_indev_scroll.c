@@ -6,16 +6,17 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../core/lv_obj_scroll_private.h"
 #include "../core/lv_obj_private.h"
-#include "lv_indev.h"
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
+#include "../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define ELASTIC_SLOWNESS_FACTOR 4   /*Scrolling on elastic parts are slower by this factor*/
+#define ELASTIC_SLOWNESS_FACTOR LV_INDEV_DEF_SCROLL_ELASTIC_FACTOR
 
 /**********************
  *      TYPEDEFS
@@ -69,9 +70,9 @@ void lv_indev_scroll_handler(lv_indev_t * indev)
     int16_t scale_y = 256;
     lv_obj_t * parent = scroll_obj;
     while(parent) {
-        angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
-        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
-        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
+        angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
         scale_x = (scale_x * zoom_act_x) >> 8;
         scale_y = (scale_y * zoom_act_y) >> 8;
         parent = lv_obj_get_parent(parent);
@@ -129,7 +130,7 @@ void lv_indev_scroll_throw_handler(lv_indev_t * indev)
 
     int32_t scroll_throw = indev->scroll_throw;
 
-    if(lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_MOMENTUM) == false) {
+    if(lv_obj_is_scroll_momentum(scroll_obj) == false) {
         indev->pointer.scroll_throw_vect.y = 0;
         indev->pointer.scroll_throw_vect.x = 0;
     }
@@ -293,9 +294,9 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
         lv_point_t pivot = { 0, 0 };
         lv_obj_t * parent = obj_act;
         while(parent) {
-            angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
-            int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
-            int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
+            angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+            int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+            int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
             scale_x = (scale_x * zoom_act_x) >> 8;
             scale_y = (scale_y * zoom_act_y) >> 8;
             parent = lv_obj_get_parent(parent);
@@ -317,17 +318,22 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
             lv_point_transform(&obj_scroll_sum, angle, scale_x, scale_y, &pivot, false);
         }
 
+        /*Determine scroll direction in current object's coordinate system.
+         *Reset both flags each iteration so that a child's transform rotation
+         *does not pollute the direction judgment of its ancestors.*/
         if(LV_ABS(obj_scroll_sum.x) > LV_ABS(obj_scroll_sum.y)) {
             hor_en = true;
+            ver_en = false;
         }
         else {
             ver_en = true;
+            hor_en = false;
         }
 
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
+        if(lv_obj_is_scrollable(obj_act) == false) {
             /*If this object don't want to chain the scroll to the parent stop searching*/
-            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false && hor_en) break;
-            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_VER) == false && ver_en) break;
+            if(lv_obj_is_scroll_chain_hor(obj_act) == false && hor_en) break;
+            if(lv_obj_is_scroll_chain_ver(obj_act) == false && ver_en) break;
 
             obj_act = lv_obj_get_parent(obj_act);
             continue;
@@ -417,8 +423,8 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
         }
 
         /*If this object don't want to chain the scroll to the parent stop searching*/
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false && hor_en) break;
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_VER) == false && ver_en) break;
+        if(lv_obj_is_scroll_chain_hor(obj_act) == false && hor_en) break;
+        if(lv_obj_is_scroll_chain_ver(obj_act) == false && ver_en) break;
 
         /*Try the parent*/
         obj_act = lv_obj_get_parent(obj_act);
@@ -443,7 +449,7 @@ static void init_scroll_limits(lv_indev_t * indev)
 {
     lv_obj_t * obj = indev->pointer.scroll_obj;
     /*If there no STOP allow scrolling anywhere*/
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ONE) == false) {
+    if(lv_obj_is_scroll_one(obj) == false) {
         lv_area_set(&indev->pointer.scroll_area, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MAX, LV_COORD_MAX);
     }
     /*With STOP limit the scrolling to the perv and next snap point*/
@@ -520,15 +526,15 @@ static int32_t find_snap_point_x(const lv_obj_t * obj, int32_t min, int32_t max,
 
     int32_t dist = LV_COORD_MAX;
 
-    int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    int32_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    int32_t pad_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
+    int32_t pad_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_MAIN);
 
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
-        if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPPABLE)) {
+        if((lv_obj_is_hidden(child) || lv_obj_is_floating(child))) continue;
+        if(lv_obj_is_snappable(child)) {
             int32_t x_child = 0;
             int32_t x_parent = 0;
             switch(align) {
@@ -576,15 +582,15 @@ static int32_t find_snap_point_y(const lv_obj_t * obj, int32_t min, int32_t max,
 
     int32_t dist = LV_COORD_MAX;
 
-    int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    int32_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    int32_t pad_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
+    int32_t pad_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
 
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
-        if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPPABLE)) {
+        if((lv_obj_is_hidden(child) || lv_obj_is_floating(child))) continue;
+        if(lv_obj_is_snappable(child)) {
             int32_t y_child = 0;
             int32_t y_parent = 0;
             switch(align) {
@@ -644,7 +650,7 @@ static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_
     if(diff == 0) return 0;
 
     /*Scroll back to the edge if required*/
-    if(!lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_ELASTIC)) {
+    if(!lv_obj_is_scroll_elastic(scroll_obj)) {
         /*
          * If the scrolling object does not set the `LV_OBJ_FLAG_SCROLL_ELASTIC` flag,
          * make sure that `diff` will not cause the scroll to exceed the `start` or `end` boundary of the content.
@@ -717,18 +723,18 @@ static void has_more_snap_points(lv_obj_t * scroll_obj, lv_dir_t dir, bool * has
         int32_t x = 0;
         switch(snap) {
             case LV_SCROLL_SNAP_CENTER: {
-                    int32_t pad_left = lv_obj_get_style_pad_left(scroll_obj, LV_PART_MAIN);
-                    int32_t pad_right = lv_obj_get_style_pad_right(scroll_obj, LV_PART_MAIN);
+                    int32_t pad_left = lv_obj_get_style_pad_left_internal(scroll_obj, LV_PART_MAIN);
+                    int32_t pad_right = lv_obj_get_style_pad_right_internal(scroll_obj, LV_PART_MAIN);
                     x = scroll_obj->coords.x1;
                     x += (lv_area_get_width(&scroll_obj->coords) - pad_left - pad_right) / 2;
                     x += pad_left;
                 }
                 break;
             case LV_SCROLL_SNAP_START:
-                x = scroll_obj->coords.x1 + lv_obj_get_style_pad_left(scroll_obj, LV_PART_MAIN);
+                x = scroll_obj->coords.x1 + lv_obj_get_style_pad_left_internal(scroll_obj, LV_PART_MAIN);
                 break;
             case LV_SCROLL_SNAP_END:
-                x = scroll_obj->coords.x2 - lv_obj_get_style_pad_right(scroll_obj, LV_PART_MAIN);
+                x = scroll_obj->coords.x2 - lv_obj_get_style_pad_right_internal(scroll_obj, LV_PART_MAIN);
                 break;
             default:
                 break;
@@ -743,18 +749,18 @@ static void has_more_snap_points(lv_obj_t * scroll_obj, lv_dir_t dir, bool * has
         int32_t y = 0;
         switch(snap) {
             case LV_SCROLL_SNAP_CENTER: {
-                    int32_t pad_top = lv_obj_get_style_pad_top(scroll_obj, LV_PART_MAIN);
-                    int32_t pad_bottom = lv_obj_get_style_pad_bottom(scroll_obj, LV_PART_MAIN);
+                    int32_t pad_top = lv_obj_get_style_pad_top_internal(scroll_obj, LV_PART_MAIN);
+                    int32_t pad_bottom = lv_obj_get_style_pad_bottom_internal(scroll_obj, LV_PART_MAIN);
                     y = scroll_obj->coords.y1;
                     y += (lv_area_get_height(&scroll_obj->coords) - pad_top - pad_bottom) / 2;
                     y += pad_top;
                 }
                 break;
             case LV_SCROLL_SNAP_START:
-                y = scroll_obj->coords.y1 + lv_obj_get_style_pad_top(scroll_obj, LV_PART_MAIN);
+                y = scroll_obj->coords.y1 + lv_obj_get_style_pad_top_internal(scroll_obj, LV_PART_MAIN);
                 break;
             case LV_SCROLL_SNAP_END:
-                y = scroll_obj->coords.y2 - lv_obj_get_style_pad_bottom(scroll_obj, LV_PART_MAIN);
+                y = scroll_obj->coords.y2 - lv_obj_get_style_pad_bottom_internal(scroll_obj, LV_PART_MAIN);
                 break;
             default:
                 break;

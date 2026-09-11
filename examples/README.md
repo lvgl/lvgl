@@ -1,104 +1,76 @@
-# Examples Directory Requirements
+# LVGL Examples
 
-```
-lvgl/examples/
-    index.rst        (directory-order directive since sub-dirs
-                     are not presented in alphabetical order)
-    anim/
-        index.rst    (see below for expected contents)
-        lv_example_anim_1.c
-        lv_example_anim_2.c
-        lv_example_anim_3.c
-        lv_example_anim_4.c
-        lv_example_anim_timeline_1.c
-    ...
-    layouts/
-        flex/
-            index.rst    (see below for expected contents)
-            lv_example_flex_1.c
-            lv_example_flex_2.c
-            lv_example_flex_3.c
-            etc.
-        grid/
-            etc.
-    libs/
-        index.rst        (section-heading name: "3rd-Party Libraries"
-                         [since it is different than parent directory name])
-        barcode/
-            index.rst    (see below for expected contents)
-            lv_example_barcode_1.c
-            lv_example_barcode_1.h
-        bmp/
-            etc.
-        etc.
-    etc.
+The examples shown in the widget documentation live here. The fastest way to
+add one is to **copy an existing example next to the one you're adding** and
+adjust it — the surrounding files already follow every convention.
+
+## Two kinds
+
+- **XML (preferred)** — `lv_example_<module>_<feature>.xml` in its own
+  `<module>/<feature>/` folder. Use for anything declarative: layout,
+  styling, properties, data binding. The C examples are generated from it, see below.
+- **C-only** — `lv_example_<module>_<feature>.c` directly in the `<module>/`
+  folder. Use only when the point is imperative C that XML can't express
+  (event callbacks, animations, draw events), or a feature XML doesn't
+  support yet.
+
+Most widgets need many XML examples and zero or one C-only example.
+
+## Good examples to copy
+
+- XML: [`widgets/arc/lv_example_arc_set_angles.xml`](widgets/arc/lv_example_arc_set_angles.xml)
+- XML with data binding: [`widgets/slider/lv_example_slider_bind_value.xml`](widgets/slider/lv_example_slider_bind_value.xml)
+- C-only: [`widgets/arc/lv_example_arc_event.c`](widgets/arc/lv_example_arc_event.c)
+
+## Generating the C
+
+You write `.xml`; a script produces the shipped `.c`. **Never hand-edit a
+generated `.c`** — your changes will be overwritten.
+
+```bash
+python scripts/generate_examples.py [path ...]   # all examples if no path
 ```
 
+Run it after every new or edited XML, then build to confirm it compiles.
+The script auto-runs `scripts/code-format.py examples` at the end so every
+generated `.c` ships astyle-formatted, and then wipes all `.c`/`.h` files
+from `examples/xml_project/` (the CLI's project scaffolding) so they can't
+collide with the host project's source globbing.
 
-## index.rst Requirements
+The generator drives the **LVGL Pro editor CLI** (`lved-cli.js`), which
+ships with the LVGL Pro editor — see <https://lvgl.io/docs/pro>. The script
+picks it up from your `PATH`, or point at it explicitly:
 
-```
-Example 1 Title  <-- required for each example
----------------  <-- required for each example
-                                         <-- blank lines are ignored
-.. lv_example:: anim/lv_example_anim_1   <-- path relative to the `lvgl/examples/` dir
-    :language: c
-```
-
-Repeat the above pattern for each example in current directory.  That number may be zero (0) for directories like `libs/` in which all examples are in directories below that level.  See directory structure above.
-
-For paths outside the current directory, simply provide the path to the code example relative to the `lvgl/examples/` directory.  Example from `lvgl/examples/widgets/scale/index.rst`:
-
-```
-...
-
-A round scale style simulating a compass
-----------------------------------------
-
-.. lv_example:: widgets/scale/lv_example_scale_12
-  :language: c
-
-Axis ticks and labels with scrolling on a chart
------------------------------------------------
-
-.. lv_example:: widgets/chart/lv_example_chart_2     <-- path is outside scale/ dir
-  :language: c
+```bash
+python scripts/generate_examples.py --cli /path/to/lved-cli.js [path ...]
 ```
 
-#### Note
+## Hard rules
 
-Starting the example code filename with `lv_example_` is not a requirement of the `example_list.py` script, but does make it clear that it is an example, so this pattern should be preserved for new and changed examples.
+- **Fit 320×240** — every example runs in that target (see
+  [`xml_project/project.xml`](xml_project/project.xml)). Size widgets to fit.
+- **Reuse shared resources** — subjects, consts, styles and images come from
+  [`xml_project/globals.xml`](xml_project/globals.xml). Don't invent
+  per-example subjects; add to `globals.xml` only if nothing fits.
+- **One example = one feature.** Show a meaningful variation, not defaults.
+- Each example is surfaced in the docs with `<LvglExample>`.
 
+## Comments
 
-### Custom Section Headings
+Every XML example opens with a comment block directly above `<screen>`,
+plus one in-view hint. Keep the layers distinct — never repeat a sentence:
 
-If a section heading needs to be spelled differently than the capitalized name of the parent directory, then an `index.rst` file in that directory may contain the desired section-heading name in an `.. example_heading:` pseudo-directive.  Example from `lvgl/examples/libs/index.rst`:
+- **`@title`** — short, capitalized; mirrors the on-screen label. No "XML".
+- **`@brief`** — one sentence, less than 80 chars, ending with a period.
+- **Description** — 2–3 sentences after `@brief`: name the *specific*
+  attributes/values that vary and *why* it's interesting. Self-contained
+  (readable without the doc page).
+- **💡 hint** — first child of `<view>`: imperative and specific about what
+  to do and what visibly changes ("Drag each arc; lower `change_rate` lags
+  behind"), not a vague "Adjust the arc".
 
-```
-.. example_heading: 3rd-Party Libraries
-```
+## XML syntax
 
-
-### Optional Directory Reordering
-
-There are cases where it is not appropriate to present the contents of a set of subdirectories in alphabetical order.  When this is the case, a pseudo-directive in the `index.rst` file in the parent directory can be specified to govern the sequence its subdirectories are processed.  The example below is from `lvgl/examples/widgets/index.rst`.  It is provided in order to cause the "Base Widget" (obj) directory to be processed first (and thus included in the output first).
-
-```rst
-.. dir_order:
-
-    obj
-    animimg
-    arc
-    arclabel
-    bar
-    button
-    buttonmatrix
-    etc.
-```
-
-#### Note
-
-A warning is issued if either:
-
-- a subdirectory is named that does not exist, or
-- a subdirectory exists that is not in the list and not in the `avoid_dirs` list.
+The XML format and the editor are documented at
+<https://lvgl.io/docs/pro>. For the in-tree conventions, the best reference
+is the existing examples — match the file you copied.

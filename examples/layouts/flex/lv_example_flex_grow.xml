@@ -1,0 +1,34 @@
+<!--
+ @title Flex grow
+ @brief Distribute leftover row space by weight.
+
+ Three buttons share a row: the first has a fixed width and the other two use flex_grow.
+ The free space left in the row is split in proportion to the grow weights, so the
+ grow=2 item receives twice as much extra width as the grow=1 item.
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center">
+		<!-- 💡 Adjust the flex_grow values (e.g. 1, 3, 5) to see how free space is distributed. -->
+		<!-- A row with 3 items. The first have fixed widths.
+		     The middle and the right items grow to fill the remaining space.
+		     "A" gets 1 portion, "B" gets 2 portions of the free space.
+		     Try changing the style_flex_grow values to see the effect. -->
+		<!-- Demo row for grow behavior -->
+		<lv_obj name="container" flex_flow="row" width="90%" height="content">
+			<!-- Fixed-width item on the left -->
+			<lv_button name="button_1" width="50" height="content">
+				<lv_label name="label_1" text="Fix" align="center" />
+			</lv_button>
+
+			<!-- Grows with weight 1 -->
+			<lv_button name="button_2" height="content" flex_grow="1">
+				<lv_label name="label_2" text="Grow x1" align="center" />
+			</lv_button>
+
+			<!-- Grows with weight 2 — receives twice as much free space -->
+			<lv_button name="button_3" height="content" flex_grow="2">
+				<lv_label name="label_3" text="Grow x2" align="center" />
+			</lv_button>
+		</lv_obj>
+	</view>
+</screen>

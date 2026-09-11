@@ -1,0 +1,85 @@
+---
+title: Running Tests
+description: "How to build and run LVGL's unit, build-only and performance tests locally or in Docker before opening a pull request."
+---
+
+LVGL has an extensive test suite that runs automatically in CI on every push and pull
+request. Running it locally before opening a PR catches most problems long before a
+reviewer sees them.
+
+Everything on this page is covered in more detail in
+[`tests/README.md`](https://github.com/lvgl/lvgl/blob/master/tests/README.md) — including
+how to write new test cases, the layout of the `tests/` folder, and the available custom
+asserts. Read that file if you need anything beyond the basics below.
+
+## Test Types
+
+- **Unit tests** — functional tests in `tests/src/test_cases/`, with screenshot comparison
+  against reference images in `tests/ref_imgs/`.
+- **Build-only tests** — verify that LVGL still compiles and links with a range of
+  `lv_conf.h` configurations.
+- **Performance tests** — ARM-emulated benchmarks in `tests/src/test_cases_perf/`, run
+  under QEMU/SO3 so timings are consistent across machines.
+- **Emulated benchmarks** — automated `lv_demo_benchmark` runs in the same ARM emulation,
+  used to catch performance regressions.
+
+## Running Locally
+
+Install the prerequisites once:
+
+```sh
+scripts/install-prerequisites.sh
+```
+
+Then, from the repository root:
+
+```sh
+# Run all executable tests
+./tests/main.py test
+
+# Build all build-only tests
+./tests/main.py build
+
+# Clean, build everything, run the tests and generate a coverage report
+./tests/main.py --clean --report build test
+```
+
+Useful options:
+
+- `--test-suite <name>` — run a single test suite instead of all of them.
+- `--build-options <name>` — build or run only one build configuration.
+- `--update-image` — re-generate the screenshot reference images. This uses
+  `scripts/LVGLImage.py`, which needs `pngquant` and `pypng`. Note that different
+  `pngquant` versions produce different images; CI currently uses pngquant 2.13.1-1.
+
+Run `./tests/main.py --help` for the full list.
+
+## Running in Docker
+
+To test in an environment matching CI exactly:
+
+```sh
+docker build . -f tests/Dockerfile -t lvgl_test_env
+docker run --rm -it -v $(pwd):/work lvgl_test_env "./tests/main.py"
+```
+
+`scripts/run_tests_docker.sh` automates both steps; run it with `--help` for details.
+
+## Performance Tests and Benchmarks
+
+These require **Docker** and a **Linux host** (WSL may work but is untested), since they
+boot an ARM emulated environment:
+
+```sh
+./tests/perf.py test          # performance tests
+./tests/benchmark_emu.py run  # emulated lv_demo_benchmark
+```
+
+Both scripts accept `--help`.
+
+<Callout type="info" title="Adding new tests">
+New test files go into `tests/src/test_cases/` and are named `test_<name>.c`. Start from
+`_test_template.c`. See
+[`tests/README.md`](https://github.com/lvgl/lvgl/blob/master/tests/README.md#add-new-tests)
+for the LVGL-specific asserts such as `TEST_ASSERT_EQUAL_SCREENSHOT()`.
+</Callout>

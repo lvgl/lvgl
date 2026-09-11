@@ -5,10 +5,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_mem_private.h"
-#include "lv_string.h"
-#include "../misc/lv_assert.h"
-#include "../misc/lv_log.h"
+#include "../lvgl_public.h"
 #include "../core/lv_global.h"
 
 #if LV_USE_OS == LV_OS_PTHREAD
@@ -119,6 +116,10 @@ void * lv_malloc_zeroed(size_t size)
 void * lv_calloc(size_t num, size_t size)
 {
     LV_TRACE_MEM("allocating number of %zu each %zu bytes", num, size);
+    if(num != 0 && size > ((size_t) -1) / num) {
+        LV_LOG_WARN("lv_calloc: overflow detected (num=%zu, size=%zu)", num, size);
+        return NULL;
+    }
     return lv_malloc_zeroed(num * size);
 }
 
@@ -179,6 +180,8 @@ lv_result_t lv_mem_test(void)
 
 void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 {
+    LV_CHECK_ARG(mon_p != NULL, return);
+
     lv_memzero(mon_p, sizeof(lv_mem_monitor_t));
     lv_mem_monitor_core(mon_p);
 }

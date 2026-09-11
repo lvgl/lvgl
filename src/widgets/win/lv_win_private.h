@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_obj_private.h"
-#include "lv_win.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_WIN
 

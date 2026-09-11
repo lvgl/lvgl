@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_types.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_DRAW_VG_LITE
 
@@ -52,7 +52,7 @@ void lv_vg_lite_pending_destroy(lv_vg_lite_pending_t * pending);
  * Set a free callback for the pending list
  * @param pending pointer to the pending list
  * @param free_cb the free callback
- * @param user_data user data to pass to the free callback
+ * @param user_data user data to pass to the free callback @nullable
  */
 void lv_vg_lite_pending_set_free_cb(lv_vg_lite_pending_t * pending, lv_vg_lite_pending_free_cb_t free_cb,
                                     void * user_data);

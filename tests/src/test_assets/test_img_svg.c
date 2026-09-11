@@ -17,7 +17,7 @@ const lv_image_dsc_t test_image_svg = {
     .header.w = 250,
     .header.h = 250,
     .header.stride = 0,
-    .header.cf = LV_COLOR_FORMAT_NATIVE,
+    .header.cf = LV_COLOR_FORMAT_DEFAULT,
     .data = img_svg_data,
     .data_size = sizeof(img_svg_data) - 1, // ignore '\0'
 };

@@ -1,6 +1,5 @@
 /**
  * @file lv_array.h
- * Array. The elements are dynamically allocated by the 'lv_mem' module.
  */
 
 #ifndef LV_ARRAY_H
@@ -13,7 +12,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_types.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -32,14 +31,14 @@ extern "C" {
  **********************/
 
 /** Description of a array*/
-struct _lv_array_t {
+typedef struct _lv_array_t {
     uint8_t * data;
     uint32_t size;
     uint32_t capacity;
     uint32_t element_size;
 
     bool inner_alloc; /* true: data is allocated by the array; false: data is allocated by the user */
-};
+} lv_array_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -51,7 +50,7 @@ struct _lv_array_t {
  * @param capacity the initial capacity of the array
  * @param element_size the size of an element in bytes
  */
-void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size);
+lv_result_t lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size);
 
 /**
  * Init an array from a buffer.
@@ -120,7 +119,9 @@ static inline bool lv_array_is_full(const lv_array_t * array)
 
 /**
  * Copy an array to another.
- * @note this will create a new array with the same capacity and size as the source array.
+ * @note target is always made an exact copy of source. Any existing content in target is
+ *       deinitialized. If source is empty, target will also be empty. If target's previous
+ *       contents need to be preserved when source is empty, check `lv_array_is_empty` first.
  * @param target pointer to an `lv_array_t` variable to copy to
  * @param source pointer to an `lv_array_t` variable to copy from
  */
@@ -175,11 +176,12 @@ lv_result_t lv_array_remove_unordered(lv_array_t * array, uint32_t index);
 lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end);
 
 /**
- * Concatenate two arrays. Adds new elements to the end of the array.
- * @note The destination array is automatically expanded as necessary.
- * @param array pointer to an `lv_array_t` variable
- * @param other pointer to the array to concatenate
- * @return LV_RESULT_OK: success, otherwise: error
+ * Concatenate two arrays. Adds new elements from `other` to the end of `array`.
+ * @note Destination array capacity is automatically expanded as necessary.
+ * @note Both arrays must have matching element sizes.
+ * @param array pointer to destination `lv_array_t` variable
+ * @param other pointer to source `lv_array_t` variable to concatenate
+ * @return LV_RESULT_OK: success, LV_RESULT_INVALID: error (NULL pointer, size overflow, element size mismatch)
  */
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other);
 
@@ -198,7 +200,7 @@ lv_result_t lv_array_push_back(lv_array_t * array, const void * element);
  * @param array pointer to an `lv_array_t` variable
  * @param index the index of the element to replace
  * @param value pointer to the elements to add
- * @return true: success; false: error
+ * @return LV_RESULT_OK on success or LV_RESULT_INVALID on error
  */
 lv_result_t lv_array_assign(lv_array_t * array, uint32_t index, const void * value);
 

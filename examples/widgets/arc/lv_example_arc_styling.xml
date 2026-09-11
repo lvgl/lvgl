@@ -1,0 +1,57 @@
+<!--
+ @title Arc styling
+ @brief Style the background ring, the active indicator, and the knob.
+
+ Arc has three parts: MAIN (the unfilled background ring), INDICATOR (the active arc),
+ and KNOB. Each is styled with a named style block via `selector="main|indicator|knob"`.
+ `arc_color`, `arc_width`, and `arc_rounded` are the line-style equivalents for ring
+ segments; the knob uses the regular background properties since it's drawn as a fill.
+-->
+<screen>
+	<styles>
+		<!-- Background ring: thick, light, semi-transparent -->
+		<style
+			name="style_arc_bg"
+			arc_color="0xced8e4"
+			arc_width="22"
+			arc_rounded="true"
+			arc_opa="180"
+			bg_color="0xffffff"
+			bg_opa="100%"
+			pad_all="16"
+			radius="16"
+			shadow_color="0xcacaca"
+			shadow_offset_y="10"
+			shadow_width="21"
+		/>
+		<!-- Indicator ring: same thickness, accent color, rounded ends -->
+		<style name="style_arc_indicator" arc_color="0x6366f1" arc_width="14" arc_rounded="true" pad_all="4" />
+		<!-- Knob: filled circle with halo -->
+		<style
+			name="style_arc_knob"
+			bg_opa="100%"
+			bg_color="0x6366f1"
+			border_color="0xffffff"
+			border_width="3"
+			pad_all="6"
+			shadow_color="0x312e81"
+			shadow_width="10"
+			shadow_opa="160"
+		/>
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="20"
+	>
+		<!-- 💡 Drag the knob to repaint the indicator; styling is independent of value. -->
+		<lv_arc name="arc" width="180" height="180" min_value="0" max_value="100" value="65">
+			<style name="style_arc_bg" selector="main" />
+			<style name="style_arc_indicator" selector="indicator" />
+			<style name="style_arc_knob" selector="knob" />
+		</lv_arc>
+	</view>
+</screen>

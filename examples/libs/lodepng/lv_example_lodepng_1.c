@@ -2,7 +2,14 @@
 #if LV_USE_LODEPNG && LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
 /**
- * Open a PNG image from a file and a variable
+ * @title PNG from array and file with LodePNG
+ * @brief Show the same PNG decoded from an embedded array and from a file path.
+ *
+ * Two image widgets are created on the active screen. The left one binds
+ * to the `img_wink_png` descriptor declared with `LV_IMAGE_DECLARE`, and
+ * the right one reads `A:lvgl/examples/libs/lodepng/wink.png` through
+ * the filesystem driver registered under drive letter `A`. Both routes
+ * go through the LodePNG image decoder.
  */
 void lv_example_lodepng_1(void)
 {

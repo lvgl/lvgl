@@ -13,12 +13,10 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_eve_private.h"
+#include "../../lvgl_public.h"
 #if LV_USE_DRAW_EVE
 
-#include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
 #include "lv_draw_eve_ram_g.h"
 #include "lv_draw_eve.h"
 #include "lv_eve.h"
@@ -115,6 +113,9 @@ static int32_t eve_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
+
+    if(lv_draw_eve_unit_g == NULL || lv_draw_eve_unit_g->disp == NULL)
+        return 0;
 
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;

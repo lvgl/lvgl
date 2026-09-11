@@ -6,12 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linux_fbdev.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_LINUX_FBDEV
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <stddef.h>
+#include LV_STDDEF_INCLUDE
+#include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -53,7 +54,6 @@ struct bsd_fb_fix_info {
 
 typedef struct {
     const char * devname;
-    lv_color_format_t color_format;
 #if LV_LINUX_FBDEV_BSD
     struct bsd_fb_var_info vinfo;
     struct bsd_fb_fix_info finfo;
@@ -64,13 +64,20 @@ typedef struct {
 #if LV_LINUX_FBDEV_MMAP
     char * fbp;
 #endif
+    uint8_t * swap_line_buf;
     uint8_t * rotated_buf;
+    uint8_t * draw_buf_1;
+    uint8_t * draw_buf_2;
+    size_t swap_line_buf_size;
     size_t rotated_buf_size;
     long int screensize;
     int fbfd;
+    lv_color_format_t color_format;
     bool force_refresh;
-    uint8_t * draw_buf_1;
-    uint8_t * draw_buf_2;
+    bool wait_vsync_next;
+    bool vsync_supported;
+    bool skip_unblank;
+    bool swap_rb;
 } lv_linux_fb_t;
 
 /**********************
@@ -80,6 +87,9 @@ typedef struct {
 static void del_event_cb(lv_event_t * e);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static uint32_t tick_get_cb(void);
+static void swap_rb_line_16(uint8_t * dst, const uint8_t * src, int32_t pixel_count);
+static void swap_rb_line_24(uint8_t * dst, const uint8_t * src, int32_t pixel_count);
+static void swap_rb_line_32(uint8_t * dst, const uint8_t * src, int32_t pixel_count);
 
 /**********************
  *  STATIC VARIABLES
@@ -115,6 +125,10 @@ lv_display_t * lv_linux_fbdev_create(void)
         return NULL;
     }
     dsc->fbfd = -1;
+    /* assume supported by default*/
+    dsc->vsync_supported = true;
+    /* sync on first flush*/
+    dsc->wait_vsync_next = true;
     lv_display_set_driver_data(disp, dsc);
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_add_event_cb(disp, del_event_cb, LV_EVENT_DELETE, NULL);
@@ -124,6 +138,8 @@ lv_display_t * lv_linux_fbdev_create(void)
 
 lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 {
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(file != NULL, return LV_RESULT_INVALID);
     char * devname = lv_strdup(file);
     LV_ASSERT_MALLOC(devname);
     if(devname == NULL) {
@@ -143,10 +159,10 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     }
     LV_LOG_INFO("The framebuffer device was opened successfully");
 
-    /* Make sure that the display is on.*/
-    if(ioctl(dsc->fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
-        perror("ioctl(FBIOBLANK)");
-        /* Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK.*/
+    if(!dsc->skip_unblank) {
+        if(ioctl(dsc->fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
+            perror("ioctl(FBIOBLANK)");
+        }
     }
 
 #if LV_LINUX_FBDEV_BSD
@@ -187,6 +203,39 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     }
 #endif /* LV_LINUX_FBDEV_BSD */
 
+    /* AD5M and some other devices report incorrect bits_per_pixel via VSCREENINFO.
+     * The stride (line_length) is always correct, so calculate true bpp from it.
+     * Example: AD5M reports 16bpp but stride=3200 for 800px width = 4 bytes/pixel = 32bpp */
+    uint32_t stride_bpp = 0;
+    /* Use the virtual (padded) width when available; some framebuffers pad each
+     * line to xres_virtual, so xres alone yields an inflated bpp. The BSD
+     * fb_var_info shim has no xres_virtual field, so fall back to xres there. */
+#if LV_LINUX_FBDEV_BSD
+    uint32_t xres_for_stride = dsc->vinfo.xres;
+#else
+    uint32_t xres_for_stride = dsc->vinfo.xres_virtual > 0 ? dsc->vinfo.xres_virtual : dsc->vinfo.xres;
+#endif
+    if(xres_for_stride > 0) {
+        stride_bpp = (dsc->finfo.line_length * 8) / xres_for_stride;
+    }
+
+    /* Only override if stride_bpp is a standard depth (avoids false positives
+     * from alignment-padded strides or virtual-width framebuffers). */
+    if(stride_bpp > 0 && stride_bpp != dsc->vinfo.bits_per_pixel
+       && (stride_bpp == 8 || stride_bpp == 16 || stride_bpp == 24 || stride_bpp == 32)) {
+        LV_LOG_WARN("bits_per_pixel mismatch: vinfo says %d, stride indicates %d. Using stride value.",
+                    dsc->vinfo.bits_per_pixel, stride_bpp);
+        dsc->vinfo.bits_per_pixel = stride_bpp;
+    }
+    else if(stride_bpp > 0 && stride_bpp == dsc->vinfo.bits_per_pixel) {
+        LV_LOG_INFO("bits_per_pixel %d matches stride calculation", dsc->vinfo.bits_per_pixel);
+    }
+    else {
+        LV_LOG_INFO("bits_per_pixel %d retained; stride-derived bpp %u ignored (zero or non-standard)",
+                    dsc->vinfo.bits_per_pixel, stride_bpp);
+    }
+
+    /* Log the resolution after any bits_per_pixel correction so it reflects the value actually used */
     LV_LOG_INFO("%dx%d, %dbpp", dsc->vinfo.xres, dsc->vinfo.yres, dsc->vinfo.bits_per_pixel);
 
     /* Figure out the size of the screen in bytes*/
@@ -207,6 +256,16 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     LV_LOG_INFO("The framebuffer device was mapped to memory successfully");
 
     switch(dsc->vinfo.bits_per_pixel) {
+        case 8:
+#if !LV_LINUX_FBDEV_BSD
+            if(dsc->vinfo.grayscale != 1) {
+                LV_LOG_WARN("8bpp framebuffer does not report a grayscale format (grayscale = %u); "
+                            "LV_COLOR_FORMAT_L8 is not supported", (unsigned)dsc->vinfo.grayscale);
+                return LV_RESULT_INVALID;
+            }
+#endif
+            lv_display_set_color_format(disp, LV_COLOR_FORMAT_L8);
+            break;
         case 16:
             lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
             break;
@@ -221,6 +280,25 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
             return LV_RESULT_INVALID;
     }
 
+#if !LV_LINUX_FBDEV_BSD
+    /* Auto-detect BGR framebuffer layout from vinfo field offsets.
+     * Standard RGB: red.offset > blue.offset (e.g., red=16, blue=0 for 32bpp)
+     * BGR layout:   red.offset < blue.offset (e.g., red=0, blue=16 for 32bpp)
+     * When BGR is detected, R/B channels are swapped during flush. */
+    if(dsc->vinfo.red.length > 0 && dsc->vinfo.blue.length > 0) {
+        if(dsc->vinfo.red.offset < dsc->vinfo.blue.offset) {
+            dsc->swap_rb = true;
+            LV_LOG_INFO("BGR framebuffer detected (red.offset=%d, blue.offset=%d) — enabling R/B swap",
+                        dsc->vinfo.red.offset, dsc->vinfo.blue.offset);
+        }
+        else {
+            dsc->swap_rb = false;
+            LV_LOG_INFO("RGB framebuffer layout (red.offset=%d, blue.offset=%d)",
+                        dsc->vinfo.red.offset, dsc->vinfo.blue.offset);
+        }
+    }
+#endif
+
     int32_t hor_res = dsc->vinfo.xres;
     int32_t ver_res = dsc->vinfo.yres;
     int32_t width = dsc->vinfo.width;
@@ -232,16 +310,29 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
         draw_buf_size *= ver_res;
     }
 
+    lv_color_format_t cf = lv_display_get_color_format(disp);
     uint8_t * draw_buf = NULL;
     uint8_t * draw_buf_2 = NULL;
-    draw_buf = lv_malloc(draw_buf_size);
+
+    dsc->draw_buf_1 = lv_malloc(draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
+    LV_ASSERT_MALLOC(dsc->draw_buf_1);
+    if(dsc->draw_buf_1 == NULL) {
+        LV_LOG_ERROR("Failed to allocate draw buffer 1 (%u bytes)", draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
+        return LV_RESULT_INVALID;
+    }
+    draw_buf = lv_draw_buf_align(dsc->draw_buf_1, cf);
 
     if(LV_LINUX_FBDEV_BUFFER_COUNT == 2) {
-        draw_buf_2 = lv_malloc(draw_buf_size);
+        dsc->draw_buf_2 = lv_malloc(draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
+        LV_ASSERT_MALLOC(dsc->draw_buf_2);
+        if(dsc->draw_buf_2 == NULL) {
+            LV_LOG_ERROR("Failed to allocate draw buffer 2 (%u bytes)", draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
+            lv_free(dsc->draw_buf_1);
+            dsc->draw_buf_1 = NULL;
+            return LV_RESULT_INVALID;
+        }
+        draw_buf_2 = lv_draw_buf_align(dsc->draw_buf_2, cf);
     }
-
-    dsc->draw_buf_1 = draw_buf;
-    dsc->draw_buf_2 = draw_buf_2;
 
     lv_display_set_resolution(disp, hor_res, ver_res);
     lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
@@ -256,10 +347,32 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     return LV_RESULT_OK;
 }
 
+void lv_linux_fbdev_set_skip_unblank(lv_display_t * disp, bool skip)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
+    dsc->skip_unblank = skip;
+}
+
 void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->force_refresh = enabled;
+}
+
+void lv_linux_fbdev_set_swap_rb(lv_display_t * disp, bool enabled)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
+    dsc->swap_rb = enabled;
+}
+
+bool lv_linux_fbdev_get_swap_rb(lv_display_t * disp)
+{
+    LV_CHECK_ARG(disp != NULL, return false);
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
+    return dsc->swap_rb;
 }
 
 /**********************
@@ -297,6 +410,7 @@ static void del_event_cb(lv_event_t * e)
         dsc->fbfd = -1;
     }
     if(dsc->rotated_buf) lv_free(dsc->rotated_buf);
+    if(dsc->swap_line_buf) lv_free(dsc->swap_line_buf);
     if(dsc->draw_buf_1) lv_free(dsc->draw_buf_1);
     if(dsc->draw_buf_2) lv_free(dsc->draw_buf_2);
     if(dsc->devname) lv_free((void *)dsc->devname);
@@ -316,9 +430,22 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     }
 #endif
 
+    /* Wait once per frame before drawing the next frame */
+    if(LV_LINUX_FBDEV_VSYNC && dsc->vsync_supported && dsc->wait_vsync_next) {
+        uint32_t dummy = 0;
+        if(ioctl(dsc->fbfd, FBIO_WAITFORVSYNC, &dummy) == -1) {
+            /* Disable the optional wait if the framebuffer does not support FBIO_WAITFORVSYNC*/
+            LV_LOG_WARN("FBIO_WAITFORVSYNC unsupported (%s); disabling vsync wait", strerror(errno));
+            dsc->vsync_supported = false;
+        }
+    }
+
+
     const bool wait_for_last_flush = LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_FULL;
     const bool is_last_flush = lv_display_flush_is_last(disp);
     const bool skip_flush = wait_for_last_flush && !is_last_flush;
+    /* wait for vsync every first frame*/
+    dsc->wait_vsync_next = is_last_flush;
 
     if(skip_flush) {
         lv_display_flush_ready(disp);
@@ -374,7 +501,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             LV_ASSERT_MALLOC(dsc->rotated_buf);
             dsc->rotated_buf_size = buf_size;
         }
-        lv_draw_sw_rotate(color_p, dsc->rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
+        lv_draw_rotate(color_p, dsc->rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
         area = &rotated_area;
         color_p = dsc->rotated_buf;
     }
@@ -395,12 +522,37 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         (clipped_area.y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
     const int32_t w = lv_area_get_width(&clipped_area);
 
+    /* Prepare swap line buffer if R/B swap is active */
+    const size_t line_bytes = w * px_size;
+    uint8_t * swap_buf = NULL;
+    if(dsc->swap_rb) {
+        if(!dsc->swap_line_buf || dsc->swap_line_buf_size < line_bytes) {
+            uint8_t * tmp = lv_realloc(dsc->swap_line_buf, line_bytes);
+            LV_ASSERT_MALLOC(tmp);
+            if(tmp == NULL) {
+                LV_LOG_WARN("Failed to (re)allocate swap line buffer; skipping R/B swap this frame");
+            }
+            else {
+                dsc->swap_line_buf = tmp;
+                dsc->swap_line_buf_size = line_bytes;
+            }
+        }
+        swap_buf = dsc->swap_line_buf && dsc->swap_line_buf_size >= line_bytes ? dsc->swap_line_buf : NULL;
+    }
+
     if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
         uint32_t color_pos =
             (clipped_area.x1 - disp->offset_x) * px_size +
             (clipped_area.y1 - disp->offset_y) * disp->hor_res * px_size;
         for(int32_t y = clipped_area.y1; y <= clipped_area.y2; y++) {
-            write_to_fb(dsc, fb_pos, &color_p[color_pos], w * px_size);
+            const uint8_t * src = &color_p[color_pos];
+            if(swap_buf) {
+                if(px_size == 4)      swap_rb_line_32(swap_buf, src, w);
+                else if(px_size == 3) swap_rb_line_24(swap_buf, src, w);
+                else                  swap_rb_line_16(swap_buf, src, w);
+                src = swap_buf;
+            }
+            write_to_fb(dsc, fb_pos, src, line_bytes);
             fb_pos += dsc->finfo.line_length;
             color_pos += disp->hor_res * px_size;
         }
@@ -414,7 +566,14 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         color_p += y_offset * stride + x_offset * px_size;
 
         for(int32_t y = clipped_area.y1; y <= clipped_area.y2; y++) {
-            write_to_fb(dsc, fb_pos, color_p, w * px_size);
+            const uint8_t * src = color_p;
+            if(swap_buf) {
+                if(px_size == 4)      swap_rb_line_32(swap_buf, src, w);
+                else if(px_size == 3) swap_rb_line_24(swap_buf, src, w);
+                else                  swap_rb_line_16(swap_buf, src, w);
+                src = swap_buf;
+            }
+            write_to_fb(dsc, fb_pos, src, line_bytes);
             fb_pos += dsc->finfo.line_length;
             color_p += stride;
         }
@@ -436,6 +595,44 @@ static uint32_t tick_get_cb(void)
     clock_gettime(CLOCK_MONOTONIC, &t);
     uint64_t time_ms = t.tv_sec * 1000 + (t.tv_nsec / 1000000);
     return time_ms;
+}
+
+/* Swap red and blue channels for BGR framebuffers.
+ * LVGL renders as RGB; these convert to BGR during the line copy. */
+
+static void swap_rb_line_16(uint8_t * dst, const uint8_t * src, int32_t pixel_count)
+{
+    const uint16_t * s = (const uint16_t *)src;
+    uint16_t * d = (uint16_t *)dst;
+    for(int32_t i = 0; i < pixel_count; i++) {
+        uint16_t px = s[i];
+        /* RGB565: RRRRRGGG_GGGBBBBB -> BGR565: BBBBBGGG_GGGRRRRR */
+        uint16_t r = (px >> 11) & 0x1F;
+        uint16_t g = (px >> 5) & 0x3F;
+        uint16_t b = px & 0x1F;
+        d[i] = (b << 11) | (g << 5) | r;
+    }
+}
+
+static void swap_rb_line_24(uint8_t * dst, const uint8_t * src, int32_t pixel_count)
+{
+    for(int32_t i = 0; i < pixel_count; i++) {
+        int32_t off = i * 3;
+        dst[off + 0] = src[off + 2];
+        dst[off + 1] = src[off + 1];
+        dst[off + 2] = src[off + 0];
+    }
+}
+
+static void swap_rb_line_32(uint8_t * dst, const uint8_t * src, int32_t pixel_count)
+{
+    const uint32_t * s = (const uint32_t *)src;
+    uint32_t * d = (uint32_t *)dst;
+    for(int32_t i = 0; i < pixel_count; i++) {
+        uint32_t px = s[i];
+        /* xRGB -> xBGR: swap bits [23:16] (R) and bits [7:0] (B), keep G and x */
+        d[i] = (px & 0xFF00FF00u) | ((px >> 16) & 0xFFu) | ((px & 0xFFu) << 16);
+    }
 }
 
 #endif /*LV_USE_LINUX_FBDEV*/

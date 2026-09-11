@@ -6,12 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_style_private.h"
+
+#include "../lvgl_public.h"
 #include "../core/lv_global.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
-#include "lv_assert.h"
-#include "lv_types.h"
+#include "lv_style_private.h"
 
 /*********************
  *      DEFINES
@@ -33,6 +31,7 @@
  **********************/
 
 const lv_style_prop_t lv_style_const_prop_id_inv = LV_STYLE_PROP_INV;
+
 
 const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROPS] = {
     [LV_STYLE_WIDTH] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
@@ -167,6 +166,7 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROP
 #endif
     [LV_STYLE_IMAGE_COLORKEY]         = 0,
 
+    [LV_STYLE_TEXT_LEADING_TRIM] =     LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
 };
 
 /**********************
@@ -183,6 +183,7 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROP
 
 void lv_style_init(lv_style_t * style)
 {
+    LV_CHECK_ARG(style != NULL, return);
 #if LV_USE_ASSERT_STYLE
     if(style->sentinel == LV_STYLE_SENTINEL_VALUE && style->prop_cnt > 1) {
         LV_LOG_WARN("Style might be already inited. (Potential memory leak)");
@@ -197,7 +198,7 @@ void lv_style_init(lv_style_t * style)
 
 void lv_style_reset(lv_style_t * style)
 {
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 
     if(style->prop_cnt != 255) lv_free(style->values_and_props);
     lv_memzero(style, sizeof(lv_style_t));
@@ -209,7 +210,9 @@ void lv_style_reset(lv_style_t * style)
 
 void lv_style_copy(lv_style_t * dst, const lv_style_t * src)
 {
-    if(lv_style_is_const(dst)) {
+    LV_CHECK_ARG(dst != NULL, return);
+    LV_CHECK_ARG(src != NULL, return);
+    if(lv_style_is_const_internal(dst)) {
         LV_LOG_WARN("The destination can not be a constant style");
         return;
     }
@@ -221,7 +224,9 @@ void lv_style_copy(lv_style_t * dst, const lv_style_t * src)
 
 void lv_style_merge(lv_style_t * dst, const lv_style_t * src)
 {
-    if(lv_style_is_const(dst)) {
+    LV_CHECK_ARG(dst != NULL, return);
+    LV_CHECK_ARG(src != NULL, return);
+    if(lv_style_is_const_internal(dst)) {
         LV_LOG_WARN("The destination can not be a constant style");
         return;
     }
@@ -238,7 +243,7 @@ void lv_style_merge(lv_style_t * dst, const lv_style_t * src)
 
     /* Merge the styles */
     int32_t i;
-    if(lv_style_is_const(src)) {
+    if(lv_style_is_const_internal(src)) {
         lv_style_const_prop_t * props_and_values = (lv_style_const_prop_t *)src->values_and_props;
         for(i = 0; props_and_values[i].prop != LV_STYLE_PROP_INV; i++) {
             lv_style_set_prop(dst, props_and_values[i].prop, props_and_values[i].value);
@@ -291,9 +296,9 @@ lv_style_prop_t lv_style_get_num_custom_props(void)
 
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
 
-    if(lv_style_is_const(style)) {
+    if(lv_style_is_const_internal(style)) {
         LV_LOG_ERROR("Cannot remove prop from const style");
         return false;
     }
@@ -344,14 +349,14 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 
-    if(lv_style_is_const(style)) {
+    if(lv_style_is_const_internal(style)) {
         LV_LOG_ERROR("Cannot set property of constant style");
         return;
     }
 
-    LV_ASSERT(prop != LV_STYLE_PROP_INV);
+    LV_CHECK_ARG(prop != LV_STYLE_PROP_INV, return);
     LV_PROFILER_STYLE_BEGIN;
     lv_style_prop_t * props;
     int32_t i;
@@ -399,12 +404,16 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
-    return lv_style_get_prop_inlined(style, prop, value);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return LV_STYLE_RES_NOT_FOUND);
+    LV_CHECK_ARG(value != NULL, return LV_STYLE_RES_NOT_FOUND);
+    return lv_style_get_prop_internal(style, prop, value);
 }
 
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
                                   lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data)
 {
+    LV_CHECK_ARG(tr != NULL, return);
+    LV_CHECK_ARG(props != NULL, return);
     lv_memzero(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
     tr->path_xcb = path_cb == NULL ? lv_anim_path_linear : path_cb;
@@ -498,9 +507,15 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 
 bool lv_style_is_empty(const lv_style_t * style)
 {
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
 
     return style->prop_cnt == 0;
+}
+
+bool lv_style_is_const(const lv_style_t * style)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
+    return lv_style_is_const_internal(style);
 }
 
 uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop)
@@ -514,6 +529,73 @@ uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop)
     if(lv_style_custom_prop_flag_lookup_table != NULL && prop < lv_style_custom_prop_flag_lookup_table_size)
         return lv_style_custom_prop_flag_lookup_table[prop];
     return 0;
+}
+
+void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_width(style, width);
+    lv_style_set_height(style, height);
+}
+
+void lv_style_set_pad_all(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+void lv_style_set_pad_hor(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+}
+
+void lv_style_set_pad_ver(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+void lv_style_set_pad_gap(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_pad_row(style, value);
+    lv_style_set_pad_column(style, value);
+}
+
+void lv_style_set_margin_hor(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_margin_left(style, value);
+    lv_style_set_margin_right(style, value);
+}
+
+void lv_style_set_margin_ver(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_margin_top(style, value);
+    lv_style_set_margin_bottom(style, value);
+}
+
+void lv_style_set_margin_all(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_margin_left(style, value);
+    lv_style_set_margin_right(style, value);
+    lv_style_set_margin_top(style, value);
+    lv_style_set_margin_bottom(style, value);
+}
+
+void lv_style_set_transform_scale(lv_style_t * style, int32_t value)
+{
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
+    lv_style_set_transform_scale_x(style, value);
+    lv_style_set_transform_scale_y(style, value);
 }
 
 /**********************

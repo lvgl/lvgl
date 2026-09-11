@@ -1,0 +1,22 @@
+<!--
+ @title Chart cursor
+ @brief A cross-hair cursor pinned to a specific (X, Y) location on the chart.
+
+ `<lv_chart-cursor>` adds a cursor overlay to a chart. `dir` chooses which
+ lines extend from the cursor point (`all` draws a full cross-hair; `hor`,
+ `ver`, `left`, `right`, `top`, `bottom` for partial guides). `pos_x`/`pos_y`
+ place it in chart value coordinates, so a position of `60, 70` lines up
+ with the 60th X step and the 70-on-the-Y-axis grid line. A typical use is
+ highlighting "today" on a time-series, or marking a threshold without
+ baking the line into the series.
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+		<!-- 💡 Tweak `pos_x`/`pos_y` or `dir` to see how the cross-hair lines hug the cursor point. -->
+		<lv_chart name="chart" width="90%" height="180" type="line" point_count="8">
+			<lv_chart-series color="0x6366f1" axis="primary_y" values="10 35 25 55 40 70 60 85" />
+			<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
+			<lv_chart-cursor color="0xef4444" dir="hor" pos_x="60" pos_y="70" />
+		</lv_chart>
+	</view>
+</screen>

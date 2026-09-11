@@ -6,27 +6,20 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_msgbox_private.h"
-#include "../../core/lv_obj_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_MSGBOX
 
-#include "../label/lv_label.h"
-#include "../image/lv_image.h"
-#include "../../misc/lv_assert.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
-#include "../../display/lv_display.h"
-#include "../../layouts/flex/lv_flex.h"
-#include "../../stdlib/lv_string.h"
-
-#if LV_USE_LABEL == 0
-    #error "lv_mbox: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
-#endif
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_MSGBOX_FLAG_AUTO_PARENT  LV_OBJ_FLAG_WIDGET_1        /*Mark that the parent was automatically created*/
 #define MY_CLASS (&lv_msgbox_class)
 
 /**********************
@@ -117,7 +110,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent)
         parent = lv_obj_class_create_obj(&lv_msgbox_backdrop_class, lv_layer_top());
         LV_ASSERT_MALLOC(parent);
         lv_obj_class_init_obj(parent);
-        lv_obj_remove_flag(parent, LV_OBJ_FLAG_IGNORE_LAYOUT);
+        lv_obj_set_ignore_layout(parent, false);
         lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
     }
 
@@ -128,7 +121,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent)
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
 
-    if(auto_parent) lv_obj_add_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT);
+    mbox->auto_parent = auto_parent;
 
     mbox->content = lv_obj_class_create_obj(&lv_msgbox_content_class, obj);
     LV_ASSERT_MALLOC(mbox->content);
@@ -146,6 +139,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent)
 
 lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->header == NULL) {
         mbox->header = lv_obj_class_create_obj(&lv_msgbox_header_class, obj);
@@ -156,7 +151,7 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
         lv_obj_set_size(mbox->header, lv_pct(100), lv_display_get_dpi(lv_obj_get_display(obj)) / 3);
         lv_obj_set_flex_flow(mbox->header, LV_FLEX_FLOW_ROW);
         lv_obj_set_flex_align(mbox->header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-        lv_obj_remove_flag(mbox->header, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_scrollable(mbox->header, false);
         lv_obj_move_to_index(mbox->header, 0);
     }
 
@@ -172,6 +167,8 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
 
 lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->header == NULL) {
         lv_msgbox_add_title(obj, ""); /*Just to push the buttons to the right*/
@@ -181,7 +178,7 @@ lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
     LV_ASSERT_MALLOC(btn);
     if(btn == NULL) return NULL;
     lv_obj_class_init_obj(btn);
-    lv_obj_remove_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(btn, false);
 
     if(icon) {
         lv_obj_t * img = lv_image_create(btn);
@@ -194,6 +191,9 @@ lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
 
 lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(text != NULL, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
 
     lv_obj_t * label = lv_label_create(mbox->content);
@@ -205,6 +205,9 @@ lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text)
 
 lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_CHECK_ARG(fmt != NULL, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
 
     va_list args;
@@ -219,6 +222,8 @@ lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 
 lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->footer == NULL) {
         mbox->footer = lv_obj_class_create_obj(&lv_msgbox_footer_class, obj);
@@ -228,14 +233,14 @@ lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
 
         lv_obj_set_flex_flow(mbox->footer, LV_FLEX_FLOW_ROW);
         lv_obj_set_flex_align(mbox->footer, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-        lv_obj_remove_flag(mbox->footer, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_scrollable(mbox->footer, false);
     }
 
     lv_obj_t * btn = lv_obj_class_create_obj(&lv_msgbox_footer_button_class, mbox->footer);
     LV_ASSERT_MALLOC(btn);
     if(btn == NULL) return NULL;
     lv_obj_class_init_obj(btn);
-    lv_obj_remove_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(btn, false);
 
     if(text) {
         lv_obj_t * label = lv_label_create(btn);
@@ -248,6 +253,8 @@ lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
 
 lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
     lv_obj_t * btn = lv_msgbox_add_header_button(obj, LV_SYMBOL_CLOSE);
     lv_obj_add_event_cb(btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
     return btn;
@@ -255,41 +262,45 @@ lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * obj)
 
 lv_obj_t * lv_msgbox_get_header(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->header;
 }
 
 lv_obj_t * lv_msgbox_get_footer(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->footer;
 }
 
 lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->content;
 }
 
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->title;
 }
 
 void lv_msgbox_close(lv_obj_t * obj)
 {
-    if(lv_obj_has_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_delete(lv_obj_get_parent(obj));
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
+    if(mbox->auto_parent) lv_obj_delete(lv_obj_get_parent(obj));
     else lv_obj_delete(obj);
 }
 
 void lv_msgbox_close_async(lv_obj_t * obj)
 {
-    if(lv_obj_has_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_delete_async(lv_obj_get_parent(obj));
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
+    if(mbox->auto_parent) lv_obj_delete_async(lv_obj_get_parent(obj));
     else lv_obj_delete_async(obj);
 }
 
@@ -299,16 +310,27 @@ void lv_msgbox_close_async(lv_obj_t * obj)
 
 static void msgbox_close_click_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e);
     lv_obj_t * btn = lv_event_get_current_target(e);
-    lv_obj_t * mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
+    LV_ASSERT(btn);
+    lv_obj_t * btn_parent = lv_obj_get_parent(btn);
+    LV_ASSERT(btn_parent);
+    lv_obj_t * mbox = lv_obj_get_parent(btn_parent);
+
+    LV_ASSERT(mbox);
     lv_msgbox_close(mbox);
 }
 
 static void msgbox_size_changed_event_cb(lv_event_t * e)
 {
+
+    LV_ASSERT(e);
     lv_obj_t * mbox = lv_event_get_target(e);
+    LV_ASSERT(mbox);
     lv_obj_t * content = lv_msgbox_get_content(mbox);
-    bool is_msgbox_height_size_content = (lv_obj_get_style_height(mbox, LV_PART_MAIN) == LV_SIZE_CONTENT);
+    LV_ASSERT(content);
+
+    bool is_msgbox_height_size_content = (lv_obj_get_style_height_internal(mbox, LV_PART_MAIN) == LV_SIZE_CONTENT);
     lv_obj_set_flex_grow(content, !is_msgbox_height_size_content);
 }
 

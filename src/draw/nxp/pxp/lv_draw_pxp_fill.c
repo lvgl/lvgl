@@ -15,7 +15,6 @@
 
 #include "lv_draw_pxp.h"
 
-#if LV_USE_PXP
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
@@ -59,11 +58,11 @@ void lv_draw_pxp_fill(lv_draw_task_t * t)
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     lv_area_t rel_coords;
-    lv_area_copy(&rel_coords, coords);
+    rel_coords = *coords;
     lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, &t->clip_area);
+    rel_clip_area = t->clip_area;
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
@@ -148,4 +147,3 @@ static void _pxp_fill(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t d
 }
 
 #endif /*LV_USE_DRAW_PXP*/
-#endif /*LV_USE_PXP*/

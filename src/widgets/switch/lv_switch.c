@@ -10,13 +10,10 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
 
-#if LV_USE_SWITCH != 0
+#if LV_USE_SWITCH
 
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
 #include "../../misc/lv_anim_private.h"
-#include "../../indev/lv_indev.h"
-#include "../../display/lv_display.h"
+#include "../../core/lv_obj_style_internal.h"
 
 /*********************
  *      DEFINES
@@ -99,7 +96,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent)
 
 void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientation)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     sw->orientation = orientation;
@@ -112,7 +109,7 @@ void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientati
 
 lv_switch_orientation_t lv_switch_get_orientation(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     return sw->orientation;
@@ -132,9 +129,9 @@ static void lv_switch_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     sw->anim_state = LV_SWITCH_ANIM_STATE_INV;
     sw->orientation = LV_SWITCH_ORIENTATION_AUTO;
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scrollable(obj, false);
+    lv_obj_set_checkable(obj, true);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -161,10 +158,10 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        int32_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
-        int32_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
-        int32_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
-        int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+        int32_t knob_left = lv_obj_get_style_pad_left_internal(obj,   LV_PART_KNOB);
+        int32_t knob_right = lv_obj_get_style_pad_right_internal(obj,  LV_PART_KNOB);
+        int32_t knob_top = lv_obj_get_style_pad_top_internal(obj,    LV_PART_KNOB);
+        int32_t knob_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
         int32_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
@@ -209,7 +206,7 @@ static void draw_main(lv_event_t * e)
 
     /*Draw the knob*/
     lv_area_t knob_area;
-    lv_area_copy(&knob_area, &obj->coords);
+    knob_area = obj->coords;
 
     int32_t switch_w = lv_area_get_width(&obj->coords);
     int32_t switch_h = lv_area_get_height(&obj->coords);
@@ -242,7 +239,7 @@ static void draw_main(lv_event_t * e)
             anim_value_x = chk ? anim_length : 0;
         }
 
-        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
+        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN)) {
             anim_value_x = anim_length - anim_value_x;
         }
         knob_area.x1 += anim_value_x;
@@ -262,7 +259,7 @@ static void draw_main(lv_event_t * e)
             anim_value_y = chk ? anim_length : 0;
         }
 
-        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
+        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN)) {
             anim_value_y = anim_length - anim_value_y;
         }
 
@@ -270,10 +267,10 @@ static void draw_main(lv_event_t * e)
         knob_area.y1 = knob_area.y2 - (knob_size > 0 ? knob_size - 1 : 0);
     }
 
-    int32_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
-    int32_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
-    int32_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
-    int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+    int32_t knob_left = lv_obj_get_style_pad_left_internal(obj, LV_PART_KNOB);
+    int32_t knob_right = lv_obj_get_style_pad_right_internal(obj, LV_PART_KNOB);
+    int32_t knob_top = lv_obj_get_style_pad_top_internal(obj, LV_PART_KNOB);
+    int32_t knob_bottom = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_KNOB);
 
     /*Apply the paddings on the knob area*/
     knob_area.x1 -= knob_left;
@@ -312,13 +309,13 @@ static void lv_switch_anim_completed(lv_anim_t * a)
  */
 static void lv_switch_trigger_anim(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     /*If the widget is not rendered yet show state changes immediately*/
     if(!obj->rendered) return;
 
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    uint32_t anim_dur_full = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
+    uint32_t anim_dur_full = lv_obj_get_style_anim_duration_internal(obj, LV_PART_MAIN);
 
     if(anim_dur_full > 0) {
         bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;

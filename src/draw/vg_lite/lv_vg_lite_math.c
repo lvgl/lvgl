@@ -11,7 +11,7 @@
 
 #if LV_USE_DRAW_VG_LITE
 
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES

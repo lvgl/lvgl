@@ -1,0 +1,5 @@
+config LV_USE_EVDEV
+	bool "evdev"
+	default n
+	help
+		Read touchscreen, mouse and keyboard input from Linux /dev/input event devices.

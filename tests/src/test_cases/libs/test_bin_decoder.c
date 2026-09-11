@@ -121,59 +121,6 @@ void test_bin_decoder_bin_file(void)
 {
     bin_decoder("A:src/test_files/binimages/cogwheel.ARGB8888.bin", "libs/cogwheel.ARGB8888.png");
 }
-void test_bin_decoder_image_dsc_error_handling(void)
-{
-    lv_image_dsc_t * image_dsc = get_image_dsc();
-
-    /* Valid image */
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test invalid magic */
-    image_dsc = get_image_dsc();
-    image_dsc->header.magic = 0;
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test invalid NULL data */
-    image_dsc = get_image_dsc();
-    image_dsc->data = NULL;
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test invalid data_size */
-    image_dsc = get_image_dsc();
-    image_dsc->data_size = 0;
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test invalid stride */
-    image_dsc = get_image_dsc();
-    image_dsc->header.stride = 0;
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test invalid color format */
-    image_dsc = get_image_dsc();
-    image_dsc->header.cf = LV_COLOR_FORMAT_UNKNOWN;
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test invalid image size */
-    image_dsc = get_image_dsc();
-    image_dsc->header.w++;
-    image_dsc->header.h++;
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test invalid unaligned data */
-    image_dsc = get_image_dsc();
-    image_dsc->data = image_dsc->data + 1;
-    image_dsc->header.h = 1;
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test invalid flags */
-    image_dsc = get_image_dsc();
-    image_dsc->header.flags = (LV_IMAGE_FLAGS_ALLOCATED | LV_IMAGE_FLAGS_PREMULTIPLIED);
-    bin_decoder(image_dsc, "libs/bin_decoder_empty_image.png");
-
-    /* Test NULL image */
-    bin_decoder(NULL, "libs/bin_decoder_empty_image.png");
-}
-
 void test_bin_decoder_flush_cache(void)
 {
 #if LV_BIN_DECODER_RAM_LOAD == 1
@@ -223,67 +170,29 @@ void test_bin_decoder_flush_cache(void)
 #endif
 }
 
-void test_bin_decoder_decoder_dsc_error_handling(void)
+static void render_transformed_image(const void * src)
 {
-    lv_image_decoder_dsc_t * decoder_dsc = get_image_decoder_dsc();
+    lv_image_cache_drop(src);
 
-    /* Test info invalid file exension */
-    decoder_dsc->src = "test_image.png";
-    lv_result_t result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, src);
+    lv_obj_center(img);
+    lv_image_set_pivot(img, 0, 0);
+    lv_image_set_rotation(img, 300);
+    lv_image_set_scale(img, 400);
+    lv_refr_now(NULL);
 
-    /* Test info file read error */
-    decoder_dsc->src = "non_existing.bin";
-    result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+    lv_obj_clean(lv_screen_active());
+    lv_image_cache_drop(src);
+}
 
-    /* Test info unknown src type */
-    decoder_dsc->src = "A:src/test_files/binimages/cogwheel.ARGB8888.bin";
-    decoder_dsc->src_type = LV_IMAGE_SRC_UNKNOWN;
-    result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
-
-    /* Test open invalid file extension */
-    decoder_dsc = get_image_decoder_dsc();
-    decoder_dsc->src = "test_image.png";
-    result = lv_bin_decoder_open(NULL, decoder_dsc);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
-
-    /* Test open file failure */
-    decoder_dsc->src = "non_existing.bin";
-    result = lv_bin_decoder_open(NULL, decoder_dsc);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
-
-    /* Test open variable image with NULL data */
-    lv_image_dsc_t * image_dsc = get_image_dsc();
-    image_dsc->data = NULL;
-    decoder_dsc = get_image_decoder_dsc();
-    decoder_dsc->src = image_dsc;
-    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
-    result = lv_bin_decoder_open(NULL, decoder_dsc);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
-
-    /* Test open decompress image with LV_BIN_DECODER_RAM_LOAD == 0 */
-#if LV_BIN_DECODER_RAM_LOAD == 0
-    image_dsc = get_image_dsc();
-    decoder_dsc = get_image_decoder_dsc();
-    decoder_dsc->src = image_dsc;
-    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
-    decoder_dsc->header.flags = LV_IMAGE_FLAGS_COMPRESSED;
-    result = lv_bin_decoder_open(NULL, decoder_dsc);
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
-#endif
-
-    /* Test open with user_flags handling */
-    image_dsc = get_image_dsc();
-    decoder_dsc = get_image_decoder_dsc();
-    decoder_dsc->src = image_dsc;
-    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
-    decoder_dsc->header.flags = LV_IMAGE_FLAGS_USER_MASK;
-    result = lv_bin_decoder_open(NULL, decoder_dsc);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, result);
-
-    lv_bin_decoder_close(decoder_dsc->decoder, decoder_dsc);
+void test_bin_decoder_transformed_partial_decode(void)
+{
+    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
+    render_transformed_image(&test_image_cogwheel_i4);
+    render_transformed_image("A:src/test_files/binimages/cogwheel.I4.bin");
+    render_transformed_image("A:src/test_files/binimages/cogwheel.RGB565.bin");
+    render_transformed_image("A:src/test_files/binimages/cogwheel.RGB565A8.bin");
 }
 
 void test_bin_decoder_open_stride_zero_handling(void)

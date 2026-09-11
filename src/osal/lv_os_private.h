@@ -17,10 +17,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
-
-#include "lv_os.h"
-#include "../misc/lv_types.h"
+#include "../lvgl_public.h"
 
 #ifdef __linux__
 #include "lv_linux.h"
@@ -96,7 +93,7 @@ uint32_t lv_os_get_proc_idle_percent(void);
  * @param prio          priority of the thread
  * @param callback      function of the thread
  * @param stack_size    stack size in bytes
- * @param user_data     arbitrary data, will be available in the callback
+ * @param user_data     arbitrary data, will be available in the callback @nullable
  * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: failure
  */
 lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name,

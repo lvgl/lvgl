@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h" /*To see all the widgets*/
+#include "../../lvgl_public.h"
 
 #if LV_USE_THEME_DEFAULT
 
 #include "../lv_theme_private.h"
-#include "../../misc/lv_color.h"
+#include "../../display/lv_display_private.h"
 #include "../../core/lv_global.h"
 
 /*********************
@@ -197,6 +197,7 @@ static void resolution_change_event_cb(lv_event_t * e);
 
 static void style_init(my_theme_t * theme)
 {
+    LV_ASSERT(theme != NULL);
 #if TRANSITION_TIME
     static const lv_style_prop_t trans_props[] = {
         LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
@@ -283,9 +284,9 @@ static void style_init(my_theme_t * theme)
     lv_style_set_bg_color(&theme->styles.btn, theme->color_grey);
     if(!(theme->base.flags & MODE_DARK)) {
         lv_style_set_shadow_color(&theme->styles.btn, lv_palette_main(LV_PALETTE_GREY));
-        lv_style_set_shadow_width(&theme->styles.btn, LV_DPX(3));
+        lv_style_set_shadow_width(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, 3));
         lv_style_set_shadow_opa(&theme->styles.btn, LV_OPA_50);
-        lv_style_set_shadow_offset_y(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, LV_DPX(4)));
+        lv_style_set_shadow_offset_y(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, 3));
     }
     lv_style_set_text_color(&theme->styles.btn, theme->color_text);
     lv_style_set_pad_hor(&theme->styles.btn, PAD_DEF);
@@ -611,10 +612,10 @@ static void style_init(my_theme_t * theme)
 #if LV_USE_SCALE
     style_init_reset(&theme->styles.scale);
     lv_style_set_line_color(&theme->styles.scale, theme->color_text);
-    lv_style_set_line_width(&theme->styles.scale, LV_DPX(2));
+    lv_style_set_line_width(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 2));
     lv_style_set_arc_color(&theme->styles.scale, theme->color_text);
-    lv_style_set_arc_width(&theme->styles.scale, LV_DPX(2));
-    lv_style_set_length(&theme->styles.scale, LV_DPX(6));
+    lv_style_set_arc_width(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 2));
+    lv_style_set_length(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 6));
 #endif
 }
 
@@ -625,6 +626,14 @@ static void style_init(my_theme_t * theme)
 lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary, lv_color_t color_secondary, bool dark,
                                    const lv_font_t * font)
 {
+    LV_CHECK_ARG(font != NULL, return NULL);
+
+    if(!disp) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
+
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. MicroPython)
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
@@ -636,7 +645,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
     my_theme_t * theme = theme_def;
 
-    lv_display_t * new_disp = disp == NULL ? lv_display_get_default() : disp;
+    lv_display_t * new_disp = disp;
     int32_t new_dpi = lv_display_get_dpi(new_disp);
     int32_t hor_res = lv_display_get_horizontal_resolution(new_disp);
     int32_t ver_res = lv_display_get_vertical_resolution(new_disp);
@@ -672,17 +681,19 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     theme->base.ext_data.data = NULL;
 #endif
 
-    style_init(theme);
+    /*Remove the callback before triggering style refresh to prevent
+     *resolution_change_event_cb from re-entering lv_theme_default_init
+     *during lv_obj_report_style_change. Re-added below.*/
+    lv_display_remove_event_cb_with_user_data(new_disp, resolution_change_event_cb, theme);
 
-    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
-        lv_obj_report_style_change(NULL);
-    }
+    style_init(theme);
 
     theme->inited = true;
 
-    /*Re-initialize the styles if the resolution changes as a different display size might
-     *result in different paddings */
-    lv_display_remove_event_cb_with_user_data(new_disp, resolution_change_event_cb, theme);
+    if(lv_display_get_theme(disp) == (lv_theme_t *)theme) {
+        lv_obj_report_style_change(NULL);
+    }
+
     lv_display_add_event_cb(new_disp, resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED, theme);
 
     return (lv_theme_t *) theme;
@@ -733,6 +744,7 @@ void lv_theme_default_deinit(void)
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
+    LV_ASSERT(obj != NULL);
 
     my_theme_t * theme = theme_def;
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -746,6 +758,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
     if(lv_obj_check_type(obj, &lv_obj_class)) {
 #if LV_USE_TABVIEW
+        lv_obj_t * grandparent = lv_obj_get_parent(parent);
         /*Tabview content area*/
         if(lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_child(parent, 1) == obj) {
             return;
@@ -758,7 +771,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             return;
         }
         /*Tabview pages*/
-        else if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
+        else if(grandparent && lv_obj_check_type(grandparent, &lv_tabview_class)) {
             lv_obj_add_style(obj, &theme->styles.pad_normal, 0);
             lv_obj_add_style(obj, &theme->styles.rotary_scroll, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
@@ -988,6 +1001,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
     else if(lv_obj_check_type(obj, &lv_dropdownlist_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
+        lv_obj_add_style(obj, &theme->styles.clip_corner, 0);
         lv_obj_add_style(obj, &theme->styles.line_space_large, 0);
         lv_obj_add_style(obj, &theme->styles.dropdown_list, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
@@ -1225,6 +1239,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 static void style_init_reset(lv_style_t * style)
 {
+    LV_ASSERT(style != NULL);
     if(lv_theme_default_is_inited()) {
         lv_style_reset(style);
     }
@@ -1236,12 +1251,14 @@ static void style_init_reset(lv_style_t * style)
 
 static void resolution_change_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_display_t * disp = lv_event_get_target(e);
     my_theme_t * theme = lv_event_get_user_data(e);
+    LV_ASSERT(disp != NULL);
+    LV_ASSERT(theme != NULL);
 
-    lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary, theme->base.flags,
-                          theme->base.font_normal);
-
+    lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary,
+                          theme->base.flags & MODE_DARK, theme->base.font_normal);
 }
 
 #endif

@@ -16,8 +16,8 @@ def fmt_cb(cb) -> str:
 
 
 def ptr_or_none(val) -> Optional[str]:
-    """Convert pointer to hex string or None if NULL."""
-    if not val.is_ok:
+    """Convert pointer to hex string or None if NULL/missing."""
+    if val is None or not val.is_ok:
         return None
     addr = int(val)
     return hex(addr) if addr else None
@@ -37,7 +37,7 @@ def safe_collect(
         def collect_xxx(): ...
 
     In decorator mode, exceptions cause a gdb warning and return [].
-    In iteration mode, per-item exceptions are skipped silently.
+    In iteration mode, a failing item is warned about and left out.
     """
     if isinstance(items_or_label, str):
         label = items_or_label
@@ -60,8 +60,11 @@ def safe_collect(
         for item in items_or_label:
             try:
                 result.append(transform(item))
-            except Exception:
+            except Exception as e:
+                # Dropping an object drops everything below it too, so say so
+                # rather than letting a whole subtree vanish from a dump.
+                gdb.write(f"Warning: skipped an item: {type(e).__name__}: {e}\n")
                 continue
-    except Exception:
-        pass
+    except Exception as e:
+        gdb.write(f"Warning: stopped collecting early: {type(e).__name__}: {e}\n")
     return result

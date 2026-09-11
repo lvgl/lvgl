@@ -4,7 +4,7 @@
  * @file lv_arc_properties.c
  */
 
-#include "../arc/lv_arc.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

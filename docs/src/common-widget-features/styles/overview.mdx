@@ -1,0 +1,209 @@
+---
+title: Styles Overview
+description: Styles are used to set the appearance of Widgets. Styles in LVGL are heavily inspired by CSS.
+---
+
+Styles are used to set the appearance of Widgets. Styles in LVGL are heavily inspired
+by CSS. The concept in a nutshell is that a style is an <ApiLink name="lv_style_t" />
+variable which can hold properties like border width, font, text color and so on.
+It's similar to a `class` in CSS.
+
+- Styles can be assigned to Widgets to change their appearance. Upon assignment, the
+  target part (pseudo-element in CSS) and target state (pseudo-class in CSS) can be
+  specified. For example one can add `style_blue` to the knob of a slider when it's
+  in pressed state.
+- The same style can be used by any number of Widgets.
+- Styles can be cascaded which means multiple styles may be assigned to a Widget and
+  each style can have different properties. Therefore, not all properties have to be
+  specified in a style. LVGL will search for a property until a style defines it or
+  use a default value if it's not specified by any of the styles. For example
+  `style_btn` can result in a default gray button and `style_btn_red` can add only
+  a `background-color=red` to overwrite the background color.
+- The most recently added style has higher precedence. This means if a property is
+  specified in two styles the newest style in the Widget will be used.
+- Some properties (e.g. text color) can be inherited from a parent(s) if it's not
+  specified in a Widget.
+- Widgets can also have [local styles](/common-widget-features/styles/local_styles) with higher precedence than
+  "normal" styles.
+- Unlike CSS (where pseudo-classes describe different states, e.g. `:focus`), in
+  LVGL a property is assigned to a given state.
+- Transitions can be applied when the Widget changes state.
+
+See the [full list of style properties](/common-widget-features/styles/style-properties).
+
+## States
+
+The Widgets can be in the combination of the following states:
+
+- <ApiLink name="LV_STATE_DEFAULT" />: (0x0000) Normal, released state
+- <ApiLink name="LV_STATE_CHECKED" />: (0x0001) Toggled or checked state
+- <ApiLink name="LV_STATE_FOCUSED" />: (0x0002) Focused via keypad or encoder or
+  clicked via touchpad/mouse
+- <ApiLink name="LV_STATE_FOCUS_KEY" />: (0x0004) Focused via keypad or encoder but
+  not via touchpad/mouse
+- <ApiLink name="LV_STATE_EDITED" />: (0x0008) Edit by an encoder
+- <ApiLink name="LV_STATE_HOVERED" />: (0x0010) Hovered by mouse
+- <ApiLink name="LV_STATE_PRESSED" />: (0x0020) Being pressed
+- <ApiLink name="LV_STATE_SCROLLED" />: (0x0040) Being scrolled
+- <ApiLink name="LV_STATE_DISABLED" />: (0x0080) Disabled state
+- <ApiLink name="LV_STATE_USER_1" />: (0x1000) Custom state
+- <ApiLink name="LV_STATE_USER_2" />: (0x2000) Custom state
+- <ApiLink name="LV_STATE_USER_3" />: (0x4000) Custom state
+- <ApiLink name="LV_STATE_USER_4" />: (0x8000) Custom state
+
+A Widget can be in a combination of states such as being focused and pressed at the
+same time. This is represented as <ApiLink name="LV_STATE_FOCUSED" display="LV_STATE_FOCUSED | LV_STATE_PRESSED" />.
+
+A style can be added to any state or state combination. For example, setting a
+different background color for the default and pressed states. If a property is not
+defined in a state the best matching state's property will be used. Typically this
+means the property with <ApiLink name="LV_STATE_DEFAULT" /> is used. If the property is
+not set even for the default state the default value will be used.
+
+### What "best matching" means
+
+Each state's precedence equals its value in the list above — a higher value wins. When
+a property isn't set for the current state, the value from the highest-precedence
+matching state is used; if none matches, the default state's value (or the global
+default) applies.
+
+For example, with `bg_color` white in `LV_STATE_DEFAULT`, gray in `LV_STATE_PRESSED`
+(0x0020) and red in `LV_STATE_FOCUSED` (0x0002):
+
+- Pressed → gray (0x0020 beats default's 0x0000).
+- Focused → red.
+- Focused + pressed → gray (pressed outranks focused).
+- `LV_STATE_PRESSED | LV_STATE_FOCUSED` set to rose → rose (0x0022 beats either alone).
+- Checked → white (no checked value, so it falls back to default).
+
+The ordering is intentional: a pressed Widget should still look pressed while focused.
+To cover every state, set the property in the default state. For combinations that are
+hard to enumerate, vary one part per state (e.g. background color for pressed/checked,
+border color for focused).
+
+## Cascading Styles
+
+<LvglExample name="lv_example_style_multiple" path="styles/lv_example_style_multiple" />
+
+It's not required to set all the properties in one style. It's possible to add more
+styles to a Widget and have the latter added style modify or extend appearance. For
+example, create a general gray button style and create a new one for red buttons where
+only the new background color is set.
+
+This is much like in CSS when used classes are listed like `<div class=".btn
+.btn-red">`.
+
+Styles added later have precedence over ones set earlier. So in the gray/red button
+example above, the normal button style should be added first and the red style second.
+However, the precedence of the states are still taken into account. So let's examine
+the following case:
+
+- the basic button style defines dark-gray color for the default state and light-gray
+  color for the pressed state
+- the red button style defines the background color as red only in the default state
+
+In this case, when the button is released (it's in default state) it will be red
+because a perfect match is found in the most recently added style (red). When the
+button is pressed the light-gray color is a better match because it describes the
+current state perfectly, so the button will be light-gray.
+
+## Inheritance
+
+Some properties (typically those related to text) can be inherited from the parent
+Widget's styles. Inheritance is applied only if the given property is not set in the
+Widget's styles (even in default state). In this case, if the property is inheritable,
+the property's value will be searched up the parent hierarchy until a Widget specifies
+a value for the property. The parents will use their own state to determine the value.
+So if a button is pressed, and the text color comes from a parent, the pressed text
+color will be used.
+
+## Parts
+
+<LvglExample name="lv_example_style_parts_states" path="styles/lv_example_style_parts_states" />
+
+Widgets can be composed of *parts* which may each have their own styles.
+
+The following predefined parts exist in LVGL:
+
+- <ApiLink name="LV_PART_MAIN" />: (0x000000) A background like rectangle
+- <ApiLink name="LV_PART_SCROLLBAR" />: (0x010000) The scrollbar(s)
+- <ApiLink name="LV_PART_INDICATOR" />: (0x020000) Indicator, e.g. for slider, bar,
+  switch, or the tick box of the checkbox
+- <ApiLink name="LV_PART_KNOB" />: (0x030000) Like a handle to grab to adjust a value
+- <ApiLink name="LV_PART_SELECTED" />: (0x040000) Indicate the currently selected
+  option or section
+- <ApiLink name="LV_PART_ITEMS" />: (0x050000) Used if the widget has multiple similar
+  elements (e.g. table cells)
+- <ApiLink name="LV_PART_CURSOR" />: (0x060000) Mark a specific place e.g. Text Area's
+  or chart's cursor
+- <ApiLink name="LV_PART_CUSTOM_FIRST" />: (0x080000) Custom part identifiers can be
+  added starting from here.
+- <ApiLink name="LV_PART_ANY" />: (0x0F0000) Special value can be used in some
+  functions to target all parts.
+
+For example a [Slider](/widgets/slider) has three parts:
+
+- Main (background)
+- Indicator
+- Knob
+
+This means all three parts of the slider can have their own styles. See later how to
+add styles to Widgets and parts.
+
+Since <ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_STATE_DEFAULT" /> both have
+zero values, you can simply pass `0` as the `selector` argument instead of
+`LV_PART_MAIN | LV_STATE_DEFAULT` as a shortcut when adding styles to an object.
+
+## Properties Requiring New Layers
+
+<LvglExample name="lv_example_style_opacity_transform" path="styles/lv_example_style_opacity_transform" />
+
+Setting `opa`, `blend_mode`, `transform_angle`, or `transform_zoom` to a non-default
+value on the `MAIN` part makes LVGL snapshot the Widget and its children into an
+intermediate *layer* so the whole Widget is blended together.
+
+If only `opa` and/or `blend_mode` is set, the layer is built from smaller chunks sized
+by these `lv_conf.h` options (transformations force a single full-size layer):
+
+- <ApiLink name="LV_LAYER_SIMPLE_BUF_SIZE" /> — target chunk buffer size in bytes.
+- <ApiLink name="LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE" /> — used if the above can't be allocated.
+
+## Typical Background Properties
+
+In documentation of widgets you will see sentences like "XY Widget
+uses the typical background style properties".  These "typical
+background properties" are the properties being referred to:
+
+- Background
+- Border
+- Outline
+- Shadow
+- Padding
+- Width and height transformation
+- X and Y translation
+
+## Effects
+
+Examples that combine several style properties for a visual effect.
+Per-property examples are on the
+[Style Properties](/common-widget-features/styles/style-properties) page.
+
+### Conic gradient knob
+
+<LvglExample name="lv_example_style_gradient_conic" path="styles/lv_example_style_gradient_conic" />
+
+### Radial gradient background
+
+<LvglExample name="lv_example_style_gradient_radial" path="styles/lv_example_style_gradient_radial" />
+
+### Gradient button backgrounds
+
+<LvglExample name="lv_example_style_gradient_buttons" path="styles/lv_example_style_gradient_buttons" />
+
+### Modal overlay
+
+<LvglExample name="lv_example_style_modal" path="styles/lv_example_style_modal" />
+
+### Interactive transform
+
+<LvglExample name="lv_example_style_transform_card" path="styles/lv_example_style_transform_card" />

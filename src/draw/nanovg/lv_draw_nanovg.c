@@ -11,8 +11,8 @@
 
 #if LV_USE_DRAW_NANOVG
 
-#include "../../display/lv_display.h"
 #include "../../core/lv_refr_private.h"
+#include "../lv_draw_buf_private.h"
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
 #include "lv_nanovg_image_cache.h"
@@ -82,10 +82,15 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 static void draw_event_cb(lv_event_t * e);
+static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer);
+static void bind_layer_framebuffer(lv_layer_t * layer);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static lv_draw_nanovg_unit_t * g_unit;
+static lv_draw_buf_handlers_t gpu_draw_buf_handlers;
 
 /**********************
  *      MACROS
@@ -115,6 +120,17 @@ void lv_draw_nanovg_init(void)
     lv_nanovg_image_cache_init(unit);
     lv_nanovg_fbo_cache_init(unit);
     lv_draw_nanovg_label_init(unit);
+    lv_draw_nanovg_blur_init(unit);
+
+    lv_draw_buf_init_with_default_handlers(&gpu_draw_buf_handlers);
+    gpu_draw_buf_handlers.buf_clear_cb = gpu_buf_clear_cb;
+
+    g_unit = unit;
+}
+
+const lv_draw_buf_handlers_t * lv_draw_nanovg_get_draw_buf_handlers(void)
+{
+    return &gpu_draw_buf_handlers;
 }
 
 int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb)
@@ -184,7 +200,7 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_nanovg_line(t, t->draw_dsc);
+            lv_draw_line_iterate(t, t->draw_dsc, lv_draw_nanovg_line);
             break;
 
         case LV_DRAW_TASK_TYPE_ARC:
@@ -210,32 +226,99 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             lv_draw_nanovg_3d(t, t->draw_dsc, &t->area);
             break;
 #endif
+
+        case LV_DRAW_TASK_TYPE_BLUR:
+            lv_draw_nanovg_blur(t, t->draw_dsc, &t->area);
+            break;
+
         default:
             LV_LOG_ERROR("unknown draw task type: %d", t->type);
             break;
     }
 }
 
-static void on_layer_changed(lv_layer_t * new_layer)
+static void bind_layer_framebuffer(lv_layer_t * layer)
 {
-    LV_PROFILER_DRAW_BEGIN;
-
-    if(!new_layer->user_data) {
+    if(!layer->user_data) {
         /* Bind the default framebuffer for normal rendering */
         nvgluBindFramebuffer(NULL);
-        LV_PROFILER_DRAW_END;
         return;
     }
 
     LV_PROFILER_BEGIN_TAG("nvgBindFramebuffer");
-    nvgluBindFramebuffer(lv_nanovg_fbo_cache_entry_to_fb(new_layer->user_data));
+    nvgluBindFramebuffer(lv_nanovg_fbo_cache_entry_to_fb(layer->user_data));
     LV_PROFILER_END_TAG("nvgBindFramebuffer");
+}
 
-    /* Clear the off-screen framebuffer */
+static void on_layer_changed(lv_layer_t * new_layer)
+{
+    LV_PROFILER_DRAW_BEGIN;
+
+    bind_layer_framebuffer(new_layer);
+
+    if(new_layer->user_data) {
+        LV_PROFILER_DRAW_BEGIN_TAG("glClear");
+        glClearColor(0, 0, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        LV_PROFILER_DRAW_END_TAG("glClear");
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
+static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer)
+{
+    LV_UNUSED(draw_buf);
+
+    if(g_unit == NULL || layer == NULL) return;
+
+    LV_PROFILER_DRAW_BEGIN;
+
+    lv_nanovg_end_frame(g_unit);
+
+    bind_layer_framebuffer(layer);
+    g_unit->current_layer = NULL;
+
+    const int32_t buf_w = lv_area_get_width(&layer->buf_area);
+    const int32_t buf_h = lv_area_get_height(&layer->buf_area);
+
+    lv_area_t buf_bounds;
+    lv_area_set(&buf_bounds, 0, 0, buf_w - 1, buf_h - 1);
+
+    /* `a` is relative to the draw buffer, which matches the framebuffer origin. */
+    lv_area_t clear_area;
+    if(a == NULL) {
+        clear_area = buf_bounds;
+    }
+    else if(!lv_area_intersect(&clear_area, a, &buf_bounds)) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
+    const int32_t w = lv_area_get_width(&clear_area);
+    const int32_t h = lv_area_get_height(&clear_area);
+    if(w <= 0 || h <= 0) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
+    GLboolean prev_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
+    GLint prev_scissor_box[4] = {0};
+    GLfloat prev_clear_color[4] = {0};
+    glGetIntegerv(GL_SCISSOR_BOX, prev_scissor_box);
+    glGetFloatv(GL_COLOR_CLEAR_VALUE, prev_clear_color);
+
     LV_PROFILER_DRAW_BEGIN_TAG("glClear");
+    glEnable(GL_SCISSOR_TEST);
+    /* GL puts the origin at the bottom left */
+    glScissor(clear_area.x1, buf_h - clear_area.y1 - h, w, h);
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     LV_PROFILER_DRAW_END_TAG("glClear");
+
+    if(!prev_scissor_test) glDisable(GL_SCISSOR_TEST);
+    glScissor(prev_scissor_box[0], prev_scissor_box[1], prev_scissor_box[2], prev_scissor_box[3]);
+    glClearColor(prev_clear_color[0], prev_clear_color[1], prev_clear_color[2], prev_clear_color[3]);
 
     LV_PROFILER_DRAW_END;
 }
@@ -243,7 +326,7 @@ static void on_layer_changed(lv_layer_t * new_layer)
 static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
 {
     LV_PROFILER_DRAW_BEGIN;
-    LV_ASSERT_NULL(u);
+    LV_UNUSED(u);
     LV_ASSERT_NULL(layer);
 
     lv_cache_entry_t * entry = layer->user_data;
@@ -342,6 +425,11 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     if(u->current_layer != layer) {
+        /* Flush any draws still queued for the previous layer before
+         * rebinding to the new layer's FBO. Otherwise those queued draws
+         * get rerouted to the new FBO when nvgEndFrame is eventually
+         * called (and the previous layer ends up missing them). */
+        lv_nanovg_end_frame(u);
         on_layer_changed(layer);
         u->current_layer = layer;
     }
@@ -371,7 +459,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
-    LV_UNUSED(draw_unit);
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL:
@@ -393,6 +481,11 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 #endif
             break;
 
+        case LV_DRAW_TASK_TYPE_BLUR:
+            /* Only accept blur if FBO support is available (blur_state was created) */
+            if(u->blur_state == NULL) return 0;
+            break;
+
         default:
             /*The draw unit is not able to draw this task. */
             return 0;
@@ -410,6 +503,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_nanovg_unit_t * unit = (lv_draw_nanovg_unit_t *)draw_unit;
+    lv_draw_nanovg_blur_deinit(unit);
     lv_draw_nanovg_label_deinit(unit);
     lv_nanovg_fbo_cache_deinit(unit);
     lv_nanovg_image_cache_deinit(unit);

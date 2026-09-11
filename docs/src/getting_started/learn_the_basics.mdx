@@ -1,0 +1,252 @@
+---
+title: Learn the Basics
+description: "Learn how to use LVGL in a few minutes"
+---
+
+
+In LVGL you dynamically create and delete screens and widgets to build up your UI. Styles, animations, event handlers, and data bindings
+can also be added to make the UI look better and connect it easily to an application.
+
+
+## Display
+
+A *Display* refers to the actual hardware. In order to connect LVGL to the hardware an <ApiLink name="lv_display_t" />
+object needs to be created and initialized.
+
+See the [Quick porting guide](/getting_started/porting).
+
+## Screen
+
+Screens are LVGL widgets created on a *Display*. They are logical containers for other widgets. A display can
+have multiple screens, but there is always a single active screen, which can be retrieved by using <ApiLink name="lv_screen_active" />.
+It returns an <ApiLink name="lv_obj_t" display="lv_obj_t *" /> pointer. See [Active Screen](/common-widget-features/screens) for more information.
+
+The most common way to create a screen is by creating a [Base widget](/widgets/base_widget) with a `NULL` parent. E.g.
+
+```c
+lv_obj_t * my_screen = lv_obj_create(NULL);
+```
+
+A screen can be loaded like this: <ApiLink name="lv_screen_load" display="lv_screen_load(my_screen)" />
+
+## Widgets
+
+Widgets are the basic building blocks of the UI. For example:
+[Button (lv_button)](/widgets/button), [Slider (lv_slider)](/widgets/slider), [Drop-Down List (lv_dropdown)](/widgets/dropdown), [Chart (lv_chart)](/widgets/chart), etc.
+
+Widgets can be created dynamically by calling their respective create functions. The
+create function returns an `lv_obj_t *` pointer which can be used to configure the widget later.
+
+Each create function has a single `parent` argument that defines which widget the new one will be added to.
+
+For example:
+
+```c
+lv_obj_t * my_button1 = lv_button_create(lv_screen_active());
+lv_obj_t * my_label1 = lv_label_create(my_button1);
+```
+
+If a widget or screen is no longer needed, it can be removed by calling
+<ApiLink name="lv_obj_delete" display="lv_obj_delete(my_button1)" />
+
+To change the properties of widgets, two sets of functions can be used:
+
+- `lv_obj_...()` functions for common properties, e.g. <ApiLink name="lv_obj_set_width" />, <ApiLink name="lv_obj_add_style" />, etc. These are covered in [Common Widget Features](/common-widget-features).
+- `lv_<widget_type>_...()` functions for type-specific properties, e.g.  <ApiLink name="lv_label_set_text" />, <ApiLink name="lv_slider_set_value" />, etc.
+
+Here is an example that also shows some non-pixel units for sizes:
+
+```c
+lv_obj_t * my_button1 = lv_button_create(lv_screen_active());
+/* Set parent-sized width, and content-sized height */
+lv_obj_set_size(my_button1, lv_pct(100), LV_SIZE_CONTENT);
+/* Align to the right center with 20px offset horizontally */
+lv_obj_align(my_button1, LV_ALIGN_RIGHT_MID, -20, 0);
+
+lv_obj_t * my_label1 = lv_label_create(my_button1);
+lv_label_set_text(my_label1, "Click me!");
+/* Make the text red */
+lv_obj_set_style_text_color(my_label1, lv_color_hex(0xff0000), 0);
+```
+
+To see the full API for any widget, see its documentation at [All Widgets](/widgets), or check
+its related header file in the source code.
+
+## Events
+
+Events are used to inform the application that something has happened with a Widget.
+You can assign one or more callbacks to a Widget which will be called when the Widget
+is clicked, released, dragged, being deleted, etc.
+
+A callback is assigned like this:
+
+```c
+lv_obj_add_event_cb(btn, my_btn_event_cb, LV_EVENT_CLICKED, NULL);
+
+...
+
+void my_btn_event_cb(lv_event_t * e)
+{
+    printf("Clicked\n");
+}
+```
+
+<ApiLink name="LV_EVENT_ALL" /> can be used instead of <ApiLink name="LV_EVENT_CLICKED" />
+to invoke the callback for all events.
+
+Event callbacks receive the argument <ApiLink name="lv_event_t" display="lv_event_t * e" /> containing the
+current event code and other event-related information. The current event code can
+be retrieved with:
+
+```c
+lv_event_code_t code = lv_event_get_code(e);
+```
+
+The Widget that triggered the event can be retrieved with:
+
+```c
+lv_obj_t * widget = lv_event_get_target_obj(e);
+```
+
+Learn all about Events in the [events](/common-widget-features/events) section.
+
+## Parts and States
+
+### Parts
+
+Widgets are built from one or more *parts*. For example, a button
+has only one part called <ApiLink name="LV_PART_MAIN" />. However, a
+[Slider (lv_slider)](/widgets/slider) has <ApiLink name="LV_PART_MAIN" />, <ApiLink name="LV_PART_INDICATOR" />
+and <ApiLink name="LV_PART_KNOB" />.
+
+By using [parts](/common-widget-features/parts_and_states) you can apply different [styles](/common-widget-features/styles) to the different parts
+of a widget.
+
+Read the specific Widget's documentation to learn which parts it uses.
+
+### States
+
+Widgets can be in a combination of the following states:
+
+- <ApiLink name="LV_STATE_DEFAULT" />: Normal, released state
+- <ApiLink name="LV_STATE_ALT" />: Alternative style settings, e.g. dark mode.
+- <ApiLink name="LV_STATE_CHECKED" />: Toggled or checked state
+- <ApiLink name="LV_STATE_FOCUSED" />: Focused via keypad or encoder or clicked via touchpad/mouse
+- <ApiLink name="LV_STATE_FOCUS_KEY" />: Focused via keypad or encoder but not via touchpad/mouse
+- <ApiLink name="LV_STATE_EDITED" />: Edited by an encoder
+- <ApiLink name="LV_STATE_HOVERED" />: Hovered by mouse
+- <ApiLink name="LV_STATE_PRESSED" />: Being pressed
+- <ApiLink name="LV_STATE_SCROLLED" />: Being scrolled
+- <ApiLink name="LV_STATE_DISABLED" />: Disabled
+
+For example, if you press a Widget it will automatically go to the
+<ApiLink name="LV_STATE_FOCUSED" /> and <ApiLink name="LV_STATE_PRESSED" /> states. When you
+release it, the <ApiLink name="LV_STATE_PRESSED" /> state will be removed while the
+<ApiLink name="LV_STATE_FOCUSED" /> state remains active.
+
+To check if a Widget is in a given state use
+<ApiLink name="lv_obj_has_state" display="lv_obj_has_state(widget, LV_STATE_...)" />. It will return `true` if the
+Widget is currently in that state.
+
+To programmatically add or remove states use:
+
+```c
+lv_obj_add_state(widget, LV_STATE_...);
+lv_obj_remove_state(widget, LV_STATE_...);
+```
+
+## Styles
+
+### Initializing styles
+
+Styles are carried in <ApiLink name="lv_style_t" /> objects. They contain properties such as
+background color, border width, font, etc.
+
+The styles can be added to a widget's given [Part](/common-widget-features/parts_and_states) and [State](/common-widget-features/parts_and_states).
+Only their pointer is saved in the Widgets so they need to be defined as static or global variables.
+
+Before using a style it needs to be initialized with <ApiLink name="lv_style_init" display="lv_style_init(&style1)" />.
+After that, properties can be added to configure the style. For example:
+
+```c
+static lv_style_t style1;
+lv_style_init(&style1);
+lv_style_set_bg_color(&style1, lv_color_hex(0xa03080));
+lv_style_set_border_width(&style1, 2);
+```
+
+See [Styles Overview](/common-widget-features/styles/overview) for more details.
+
+See [Style Properties](/common-widget-features/styles/style-properties) to see the full list.
+
+### Adding styles to the widgets
+
+After that it can be added to widgets:
+
+```c
+lv_obj_add_style(my_button1, &style1, 0); /*0 means add to the main part and default state*/
+lv_obj_add_style(my_checkbox1, &style1, LV_STATE_DISABLED); /*Add to checkbox's disabled state*/
+lv_obj_add_style(my_slider1, &style1, LV_PART_KNOB | LV_STATE_PRESSED); /*Add to the slider's knob pressed state*/
+```
+
+### Inheritance
+
+Some properties (particularly the text-related ones) can be inherited. This
+means if a property is not set in a Widget it will be searched for in
+its parents. For example, you can set the font once in the screen's
+style and all text on that screen will inherit it by default, unless the
+font is specified on the widget or one of its parents.
+
+### Local styles
+
+Local style properties can also be added to Widgets. The local style properties affect only the targeted widget.
+
+```c
+lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
+```
+
+See [Styles](/common-widget-features/styles) for full details.
+
+## Data bindings
+
+To realize data bindings, LVGL uses the Subject/Observer pattern.
+
+Subjects are <ApiLink name="lv_subject_t" /> objects that store integer, color, string, etc. values.
+They are created with <ApiLink name="lv_subject_create" /> and freed with <ApiLink name="lv_subject_delete" />.
+
+Either the UI or the application can subscribe to these subjects by creating *observer callbacks* that
+are notified when the subject changes.
+
+A widget can also subscribe to a subject. This way, when the widget is deleted, it will be automatically unsubscribed.
+
+For some widgets, helper functions make it simple to connect them to subjects. E.g.:
+<ApiLink name="lv_slider_bind_value" />, <ApiLink name="lv_label_bind_text" />.
+
+In general, using subjects and observers is a way to connect various parts of the UI and make them dynamically
+react to application data changes, or allow the application to react to UI changes.
+
+```c
+static void label_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * label = lv_observer_get_target_obj(observer);
+    lv_label_set_text_fmt(label, "Progress: %d", lv_subject_get_int(subject));
+}
+
+...
+
+static lv_subject_t * subject1;
+subject1 = lv_subject_create(LV_SUBJECT_TYPE_INT);
+lv_subject_set_int(subject1, 10);
+
+lv_obj_t * label1 = lv_label_create(lv_screen_active());
+/*lv_label_bind_text could have been used too*/
+lv_subject_add_observer_obj(subject1, label_observer_cb, label1, NULL);
+
+lv_obj_t * slider1 = lv_slider_create(lv_screen_active());
+lv_slider_bind_value(slider1, subject1);
+lv_obj_set_y(slider1, 30);
+
+lv_subject_set_int(subject1, 30);
+```
+
+Learn more on the documentation page of [Observers](/main-modules/data_binding/observers).

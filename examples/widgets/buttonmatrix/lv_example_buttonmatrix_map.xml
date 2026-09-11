@@ -1,0 +1,24 @@
+<!--
+ @title Button matrix map
+ @brief Lay out buttons in rows using the `map` attribute.
+
+ The `map` attribute is a space-separated list of single-quoted button labels. A
+ quoted newline token starts a new row, so the 3x3 keypad shown here is written
+ as nine labels split by two row breaks. The newline is written as the XML entity
+ `&#10;` (numeric character reference for line feed, U+000A) because a raw `\n`
+ inside an attribute would be kept as the literal two characters `\` and `n`.
+ Within a row the matrix shares the available width equally between buttons by
+ default.
+-->
+<screen>
+	<view>
+		<!-- 💡 Move or remove `'&#10;'` (the XML newline entity) tokens inside `map` to change how buttons are grouped into rows. -->
+		<!-- 3x3 numeric keypad: rows split by '&#10;' (XML entity = newline) inside the map -->
+		<lv_buttonmatrix name="buttonmatrix"
+			align="center"
+			width="90%"
+			height="200"
+			map="'1' '2' '3' '&#10;' '4' '5' '6' '&#10;' '7' '8' '9'"
+		/>
+	</view>
+</screen>

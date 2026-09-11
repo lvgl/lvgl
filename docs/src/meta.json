@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "introduction",
+    "getting_started",
+    "integration",
+    "main-modules",
+    "common-widget-features",
+    "widgets",
+    "xml",
+    "auxiliary-modules",
+    "libs",
+    "debugging",
+    "examples",
+    "contributing",
+    "api",
+    "changelog"
+  ]
+}

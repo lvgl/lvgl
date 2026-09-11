@@ -33,7 +33,7 @@
     - LZ4 source repository : https://github.com/lz4/lz4
 */
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #if LV_USE_LZ4_INTERNAL
 #if defined (__cplusplus)
 extern "C" {

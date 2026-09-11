@@ -32,12 +32,8 @@
 
 /*Original repository: https://github.com/mpaland/printf*/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
-
-#include "../lv_sprintf.h"
-#include "../lv_string.h"
-#include "../../misc/lv_types.h"
 
 #define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_USE_FLOAT)
 
@@ -863,6 +859,9 @@ static int lv_vsnprintf_inner(out_fct_type out, char * buffer, const size_t maxl
 
 int lv_snprintf(char * buffer, size_t count, const char * format, ...)
 {
+    LV_ASSERT(format != NULL);
+    LV_ASSERT_MSG(count == 0 || buffer != NULL, "NULL buffer with non-zero count");
+
     va_list va;
     va_start(va, format);
     const int ret = lv_vsnprintf_inner(_out_buffer, buffer, count, format, va);
@@ -872,6 +871,9 @@ int lv_snprintf(char * buffer, size_t count, const char * format, ...)
 
 int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va)
 {
+    LV_ASSERT(format != NULL);
+    LV_ASSERT_MSG(count == 0 || buffer != NULL, "NULL buffer with non-zero count");
+
     return lv_vsnprintf_inner(_out_buffer, buffer, count, format, va);
 }
 

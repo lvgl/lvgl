@@ -15,8 +15,6 @@
 #include "lv_draw_sw_blend_riscv_v_to_rgb888.h"
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_RISCV_V
 
-#include "../../../../misc/lv_color.h"
-#include "../../../../misc/lv_types.h"
 #include "../lv_draw_sw_blend_private.h"
 #include "lv_blend_riscv_v_private.h"
 

@@ -15,7 +15,6 @@
 
 #include "lv_g2d_utils.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include "lv_g2d_buf_map.h"
 #include "lv_draw_g2d.h"
@@ -173,4 +172,3 @@ void g2d_rotate(lv_draw_buf_t * buf1, lv_draw_buf_t * buf2, int32_t width, int32
 **********************/
 
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/

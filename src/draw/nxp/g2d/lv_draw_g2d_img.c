@@ -15,13 +15,12 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <math.h>
-#include "g2d.h"
+#include <g2d.h>
 #include "../../../misc/lv_area_private.h"
 #include "../../lv_draw_image_private.h"
-#include "../../lv_image_decoder_private.h"
+#include "../../../image/lv_image_decoder_private.h"
 #include "lv_g2d_utils.h"
 #include "lv_g2d_buf_map.h"
 
@@ -101,11 +100,11 @@ static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, clipped_img_area);
+    rel_clip_area = *clipped_img_area;
     lv_area_move(&rel_clip_area, -img_coords->x1, -img_coords->y1);
 
     lv_area_t rel_img_coords;
-    lv_area_copy(&rel_img_coords, img_coords);
+    rel_img_coords = *img_coords;
     lv_area_move(&rel_img_coords, -img_coords->x1, -img_coords->y1);
 
     lv_area_t src_area;
@@ -309,4 +308,3 @@ static void _g2d_blit_two_steps(void * handle, struct g2d_surface * dst_surf, st
     g2d_disable(handle, G2D_BLEND);
 }
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/

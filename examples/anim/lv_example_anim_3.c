@@ -1,13 +1,6 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_SLIDER && LV_USE_CHART && LV_USE_BUTTON && LV_USE_GRID
 
-/**
- * the example show the use of cubic-bezier3 in animation.
- * the control point P1,P2 of cubic-bezier3 can be adjusted by slider.
- * and the chart shows the cubic-bezier3 in real time. you can click
- * run button see animation in current point of cubic-bezier3.
- */
-
 #define CHART_POINTS_NUM 256
 
 struct {
@@ -32,7 +25,17 @@ static void page_obj_init(lv_obj_t * par);
 static void anim_x_cb(void * var, int32_t v);
 
 /**
- * create an animation
+ * @title Cubic-bezier animation editor
+ * @brief Edit a cubic-bezier path with two sliders while a chart plots it live.
+ *
+ * A 320x240 grid container holds an animated red square, two sliders that
+ * set the p1 and p2 control points of `lv_bezier3` (both ranged 0 to 1024),
+ * value labels, a play button with `LV_SYMBOL_PLAY`, and a scatter
+ * `lv_chart_t` that plots the current curve across 256 points. Slider
+ * `LV_EVENT_VALUE_CHANGED` callbacks update the stored control points and
+ * refresh the chart; clicking the play button calls `lv_anim_start` to run
+ * the square across the container using the custom bezier path callback
+ * over 2000 ms.
  */
 void lv_example_anim_3(void)
 {
@@ -75,8 +78,8 @@ static int32_t anim_path_bezier3_cb(const lv_anim_t * a)
 
 static void refer_chart_cubic_bezier(void)
 {
-    for(uint16_t i = 0; i <= CHART_POINTS_NUM; i ++) {
-        int32_t t = i * (1024 / CHART_POINTS_NUM);
+    for(uint16_t i = 0; i < CHART_POINTS_NUM; i ++) {
+        int32_t t = (int32_t)i * 1024 / (CHART_POINTS_NUM - 1);
         int32_t step = lv_bezier3(t, 0, ginfo.p1, ginfo.p2, 1024);
         lv_chart_set_series_value_by_id2(ginfo.chart, ginfo.ser1, i, t, step);
     }
@@ -122,7 +125,7 @@ static void page_obj_init(lv_obj_t * par)
     ginfo.anim_obj = lv_obj_create(par);
     lv_obj_set_size(ginfo.anim_obj, 30, 30);
     lv_obj_set_align(ginfo.anim_obj, LV_ALIGN_TOP_LEFT);
-    lv_obj_remove_flag(ginfo.anim_obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(ginfo.anim_obj, false);
     lv_obj_set_style_bg_color(ginfo.anim_obj, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
     lv_obj_set_grid_cell(ginfo.anim_obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);
 

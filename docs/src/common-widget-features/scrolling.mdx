@@ -1,0 +1,233 @@
+---
+title: Scrolling
+description: "In LVGL scrolling works very intuitively: if a Widget is outside its parent content area (the size without padding), the parent becomes scrollable and scrollbar(s) will appear. That's it."
+---
+
+## Overview
+
+<LvglExample name="lv_example_scroll_overview" path="scroll/lv_example_scroll_overview" />
+
+In LVGL scrolling works very intuitively: if a Widget is outside its parent
+content area (the size without padding), the parent becomes scrollable and
+scrollbar(s) will appear. No scroll-specific API is required — content that
+overflows is enough.
+
+Any Widget can be scrollable, including the [base widget](/widgets/base_widget),
+`lv_image`, `lv_button`, etc. A Widget scrolls either horizontally or
+vertically in one stroke; diagonal scrolling is not possible.
+
+## Scrollbar
+
+### Mode
+
+<LvglExample name="lv_example_scroll_scrollbar_mode" path="scroll/lv_example_scroll_scrollbar_mode" />
+
+The scrollbar is shown according to the configured mode, set with
+<ApiLink name="lv_obj_set_scrollbar_mode" display="lv_obj_set_scrollbar_mode(widget, LV_SCROLLBAR_MODE_...)" />:
+
+- <ApiLink name="LV_SCROLLBAR_MODE_OFF" /> — never show the scrollbar.
+- <ApiLink name="LV_SCROLLBAR_MODE_ON" /> — always show the scrollbar.
+- <ApiLink name="LV_SCROLLBAR_MODE_ACTIVE" /> — show it only while the Widget is being scrolled.
+- <ApiLink name="LV_SCROLLBAR_MODE_AUTO" /> — show it only when the content is large enough to scroll.
+
+### Styling
+
+<LvglExample name="lv_example_scroll_scrollbar_style" path="scroll/lv_example_scroll_scrollbar_style" />
+
+The scrollbar is a dedicated part of every scrollable Widget,
+<ApiLink name="LV_PART_SCROLLBAR" />. Add a style to that part to recolor or
+resize it:
+
+```c
+static lv_style_t style_red;
+lv_style_init(&style_red);
+lv_style_set_bg_color(&style_red, lv_color_red());
+
+lv_obj_add_style(widget, &style_red, LV_PART_SCROLLBAR);
+```
+
+A Widget enters the <ApiLink name="LV_STATE_SCROLLED" /> state while it is being
+scrolled, so a style added to `LV_PART_SCROLLBAR | LV_STATE_SCROLLED` takes
+effect only during scrolling.
+
+`pad_left/right/top/bottom` set the spacing around the scrollbar, `width` sets
+its thickness, and `length` sets its length. If `length` is `0` it is sized
+automatically from the content. The minimum length is fixed to 10; the maximum
+is the Widget's height or width depending on the scrollbar's orientation.
+
+### Right-to-left scrolling
+
+<LvglExample name="lv_example_scroll_rtl" path="scroll/lv_example_scroll_rtl" />
+
+When the base direction is <ApiLink name="LV_BASE_DIR_RTL" />, the vertical
+scrollbar is placed on the left side. `base_dir` is inherited, so it can be set
+on the <ApiLink name="LV_PART_SCROLLBAR" /> part, on the Widget's
+`LV_PART_MAIN`, or on any parent.
+
+## Scrollable
+
+<LvglExample name="lv_example_scroll_scrollable" path="scroll/lv_example_scroll_scrollable" />
+
+A Widget can be made non-scrollable by clearing its
+<ApiLink name="LV_OBJ_FLAG_SCROLLABLE" /> flag with
+<ApiLink name="lv_obj_remove_flag" display="lv_obj_remove_flag(widget, LV_OBJ_FLAG_SCROLLABLE)" />
+(XML: `scrollable="false"`). Overflowing content is then simply clipped.
+Non-scrollable Widgets can still propagate scrolling to their parents.
+
+The scrollable direction is controlled by
+<ApiLink name="lv_obj_set_scroll_dir" display="lv_obj_set_scroll_dir(widget, LV_DIR_...)" />:
+
+- <ApiLink name="LV_DIR_TOP" />, <ApiLink name="LV_DIR_BOTTOM" />,
+  <ApiLink name="LV_DIR_LEFT" />, <ApiLink name="LV_DIR_RIGHT" /> — one side only.
+- <ApiLink name="LV_DIR_HOR" />, <ApiLink name="LV_DIR_VER" /> — one axis.
+- <ApiLink name="LV_DIR_ALL" /> — any direction.
+
+OR-ed values are possible, e.g. <ApiLink name="LV_DIR_TOP" display="LV_DIR_TOP | LV_DIR_LEFT" />.
+
+## Scroll chaining
+
+<LvglExample name="lv_example_scroll_chain" path="scroll/lv_example_scroll_chain" />
+
+If a Widget can't be scrolled further, the additional scroll is propagated to
+its parent and continues up to the [Screen](/common-widget-features/screens).
+This is called *scroll chaining* and is controlled by the
+`LV_OBJ_FLAG_SCROLL_CHAIN_HOR/VER` flags (XML: `scroll_chain`). With chaining
+disabled, propagation stops at the Widget and the parent does not move.
+
+## Scroll momentum and elastic scroll
+
+<LvglExample name="lv_example_scroll_properties" path="scroll/lv_example_scroll_properties" />
+
+These behaviors only reveal themselves through interaction, so one example
+toggles them live on a list:
+
+- <ApiLink name="LV_OBJ_FLAG_SCROLL_MOMENTUM" /> — when the user "throws" the
+  Widget, scrolling continues and slows down smoothly.
+- <ApiLink name="LV_OBJ_FLAG_SCROLL_ELASTIC" /> — the content can be
+  over-scrolled past its edge with resistance, then animates back when
+  released.
+- <ApiLink name="LV_OBJ_FLAG_SCROLLABLE" /> and the chaining flag from the
+  previous section are toggled in the same example.
+
+## Snapping
+
+<LvglExample name="lv_example_scroll_snap" path="scroll/lv_example_scroll_snap" />
+
+Children can be snapped to a position when scrolling ends. Make a child
+snappable with the <ApiLink name="LV_OBJ_FLAG_SNAPPABLE" /> flag (XML:
+`snappable`), and choose the alignment with
+<ApiLink name="lv_obj_set_scroll_snap_x" display="lv_obj_set_scroll_snap_x(widget, LV_SCROLL_SNAP_...)" />
+or <ApiLink name="lv_obj_set_scroll_snap_y" display="lv_obj_set_scroll_snap_y(widget, LV_SCROLL_SNAP_...)" />:
+
+- <ApiLink name="LV_SCROLL_SNAP_NONE" /> — snapping disabled (default).
+- <ApiLink name="LV_SCROLL_SNAP_START" /> — align to the left/top side.
+- <ApiLink name="LV_SCROLL_SNAP_END" /> — align to the right/bottom side.
+- <ApiLink name="LV_SCROLL_SNAP_CENTER" /> — align to the center.
+
+On release, LVGL computes where momentum would end, finds the nearest snap
+point, and animates to it.
+
+### Scroll one
+
+<LvglExample name="lv_example_scroll_one" path="scroll/lv_example_scroll_one" />
+
+The <ApiLink name="LV_OBJ_FLAG_SCROLL_ONE" /> flag (XML: `scroll_one`) limits
+each gesture to a single snappable child. It requires snappable children and a
+snap alignment other than <ApiLink name="LV_SCROLL_SNAP_NONE" />.
+
+## Scroll on focus
+
+When the "scroll on focus" feature is enabled, LVGL automatically scrolls a
+focused child into view — recursively, so nested scrollable Widgets and even
+off-page tabview content are handled. This is driven by input-device focus
+(e.g. pressing "Tab" in a group) rather than by declarative setup.
+
+## Floating children
+
+<LvglExample name="lv_example_scroll_floating" path="scroll/lv_example_scroll_floating" />
+
+A child with the <ApiLink name="LV_OBJ_FLAG_FLOATING" /> flag (XML:
+`floating="true"`) is ignored by the layout and is not moved when its parent
+scrolls. It stays pinned in place — the typical pattern for a floating action
+button over a scrollable list.
+
+## Scrolling programmatically
+
+<LvglExample name="lv_example_scroll_to" path="scroll/lv_example_scroll_to" />
+
+Scroll position can be moved from code, with or without animation:
+
+- <ApiLink name="lv_obj_scroll_by" display="lv_obj_scroll_by(widget, dx, dy, anim_enable)" /> — scroll by a delta.
+- <ApiLink name="lv_obj_scroll_by_bounded" display="lv_obj_scroll_by_bounded(widget, dx, dy, anim_enable)" /> — scroll by a delta, clamped to the edges.
+- <ApiLink name="lv_obj_scroll_to" display="lv_obj_scroll_to(widget, x, y, anim_enable)" /> — scroll to a coordinate.
+- <ApiLink name="lv_obj_scroll_to_x" display="lv_obj_scroll_to_x(widget, x, anim_enable)" /> / <ApiLink name="lv_obj_scroll_to_y" display="lv_obj_scroll_to_y(widget, y, anim_enable)" /> — scroll one axis.
+- <ApiLink name="lv_obj_scroll_to_view" display="lv_obj_scroll_to_view(widget, anim_enable)" /> / <ApiLink name="lv_obj_scroll_to_view_recursive" display="lv_obj_scroll_to_view_recursive(widget, anim_enable)" /> — bring a child into view.
+
+The current position is read with:
+
+- <ApiLink name="lv_obj_get_scroll_x" display="lv_obj_get_scroll_x(widget)" /> / <ApiLink name="lv_obj_get_scroll_y" display="lv_obj_get_scroll_y(widget)" /> — pixels scrolled past the left/top edge.
+- <ApiLink name="lv_obj_get_scroll_top" display="lv_obj_get_scroll_top(widget)" /> / <ApiLink name="lv_obj_get_scroll_bottom" display="lv_obj_get_scroll_bottom(widget)" /> — pixels available above/below the view.
+- <ApiLink name="lv_obj_get_scroll_left" display="lv_obj_get_scroll_left(widget)" /> / <ApiLink name="lv_obj_get_scroll_right" display="lv_obj_get_scroll_right(widget)" /> — pixels available left/right of the view.
+
+
+## Scrolling events
+
+The following events are emitted while scrolling:
+
+- <ApiLink name="LV_EVENT_SCROLL_BEGIN" /> — scrolling has begun. The event
+  parameter is `NULL` or an `lv_anim_t *` scroll-animation descriptor that may
+  be modified.
+- <ApiLink name="LV_EVENT_SCROLL_END" /> — scrolling has ended.
+- <ApiLink name="LV_EVENT_SCROLL" /> — the scroll position changed; sent on
+  every position change.
+
+<LvglExample name="lv_example_scroll_events" path="scroll/lv_example_scroll_events" />
+
+Any scroll coordinate can be read from the callback (see
+[Scrolling programmatically](#scrolling-programmatically)) to drive other UI.
+
+### Transforming children while scrolling
+
+<LvglExample name="lv_example_scroll_translate" path="scroll/lv_example_scroll_translate" />
+
+Because `LV_EVENT_SCROLL` fires on every position change, the handler can
+reposition or restyle children relative to the viewport — here each child is
+projected onto a circle and faded with distance, an effect the declarative
+style layer cannot express.
+
+## Scrolling patterns
+
+### Infinite scrolling
+
+<LvglExample name="lv_example_scroll_infinite" path="scroll/lv_example_scroll_infinite" />
+
+Rows are created on demand and far-off rows are deleted as the column is
+scrolled, so the element count stays bounded no matter how far the user goes.
+
+### Endless circular scrolling
+
+<LvglExample name="lv_example_scroll_circular" path="scroll/lv_example_scroll_circular" />
+
+When an edge is reached, the boundary child is moved to the opposite end and
+the scroll position is compensated, so a finite list feels infinite in both
+directions.
+
+## Self size
+
+Self size establishes the size of a Widget's content. For example a table with
+10 rows of 50 px has a "self height" of 500 px; if the user sets only 200 px of
+height, LVGL sees the larger self size and makes the table scrollable. So not
+only children but also a larger self size can make a Widget scrollable.
+
+Normally this is only relevant when creating a custom widget. LVGL queries it
+through the <ApiLink name="LV_EVENT_GET_SELF_SIZE" /> event:
+
+```c
+if(event_code == LV_EVENT_GET_SELF_SIZE) {
+    lv_point_t * p = lv_event_get_param(e);
+
+    /* If x or y < 0 it doesn't need to be calculated now. */
+    if(p->x >= 0) p->x = 200; /* self width  */
+    if(p->y >= 0) p->y = 50;  /* self height */
+}
+```

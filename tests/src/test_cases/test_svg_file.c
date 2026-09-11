@@ -1,6 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "src/draw/lv_draw_vector.h"
+#include "../lvgl_private.h"
 
 #include "unity/unity.h"
 

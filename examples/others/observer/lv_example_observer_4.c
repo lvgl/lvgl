@@ -7,23 +7,31 @@ static void btn_click_event_cb(lv_event_t * e);
 static void btn_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void indicator_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
-static lv_subject_t current_tab_subject;
-static lv_subject_t slider_subject[4];
-static lv_subject_t dropdown_subject[3];
-static lv_subject_t roller_subject[2];
+static lv_subject_t * current_tab_subject;
+static lv_subject_t * slider_subject[4];
+static lv_subject_t * dropdown_subject[3];
+static lv_subject_t * roller_subject[2];
 
+/**
+ * @title Tabbed content driven by a subject
+ * @brief One int subject selects which set of bound widgets appears in the content area.
+ *
+ * `current_tab_subject` is watched by three observers. One rebuilds the content
+ * area on change, creating four sliders, three dropdowns, or two rollers bound
+ * to their respective subject arrays. Children are faded and slid in and out
+ * with `lv_anim_t` using `lv_anim_path_ease_in_out` at 300 ms. Another observer
+ * toggles `LV_STATE_CHECKED` on the footer buttons, and a third animates an
+ * indicator bar under the active button using `lv_obj_get_x_aligned` as the
+ * start value.
+ */
 void lv_example_observer_4(void)
 {
-    lv_subject_init_int(&current_tab_subject, 0);
-    lv_subject_init_int(&slider_subject[0], 0);
-    lv_subject_init_int(&slider_subject[1], 0);
-    lv_subject_init_int(&slider_subject[2], 0);
-    lv_subject_init_int(&slider_subject[3], 0);
-    lv_subject_init_int(&dropdown_subject[0], 0);
-    lv_subject_init_int(&dropdown_subject[1], 0);
-    lv_subject_init_int(&dropdown_subject[2], 0);
-    lv_subject_init_int(&roller_subject[0], 0);
-    lv_subject_init_int(&roller_subject[1], 0);
+    uint32_t i;
+
+    current_tab_subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    for(i = 0; i < 4; i++) slider_subject[i] = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    for(i = 0; i < 3; i++) dropdown_subject[i] = lv_subject_create(LV_SUBJECT_TYPE_INT);
+    for(i = 0; i < 2; i++) roller_subject[i] = lv_subject_create(LV_SUBJECT_TYPE_INT);
 
     lv_obj_t * main_cont = lv_obj_create(lv_screen_active());
     lv_obj_remove_style_all(main_cont);
@@ -36,7 +44,7 @@ void lv_example_observer_4(void)
     lv_obj_set_flex_grow(cont, 1);
     lv_obj_set_style_pad_all(cont, 8, 0);
     lv_obj_set_width(cont, lv_pct(100));
-    lv_subject_add_observer_obj(&current_tab_subject, cont_observer_cb, cont, NULL);
+    lv_subject_add_observer_obj(current_tab_subject, cont_observer_cb, cont, NULL);
     lv_obj_set_scroll_dir(cont, LV_DIR_VER);
 
     lv_obj_t * footer = lv_obj_create(main_cont);
@@ -54,14 +62,14 @@ void lv_example_observer_4(void)
     lv_obj_t * indicator = lv_obj_create(footer);
     lv_obj_remove_style(indicator, NULL, 0);
     lv_obj_set_style_bg_opa(indicator, LV_OPA_40, 0);
-    lv_subject_add_observer_obj(&current_tab_subject, indicator_observer_cb, indicator, NULL);
+    lv_subject_add_observer_obj(current_tab_subject, indicator_observer_cb, indicator, NULL);
     lv_obj_set_height(indicator, 10);
     lv_obj_align(indicator, LV_ALIGN_BOTTOM_LEFT, 0, 0);
-    lv_obj_add_flag(indicator, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_set_ignore_layout(indicator, true);
 
     /*Be sure the indicator has the correct size*/
     lv_obj_update_layout(indicator);
-    lv_subject_notify(&current_tab_subject);
+    lv_subject_notify(current_tab_subject);
 }
 
 static int32_t anim_get_x_cb(lv_anim_t * a)
@@ -111,21 +119,21 @@ static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     if(cur_v == 0) {
         for(i = 0; i < 4; i++) {
             lv_obj_t * slider = lv_slider_create(cont);
-            lv_slider_bind_value(slider, &slider_subject[i]);
+            lv_slider_bind_value(slider, slider_subject[i]);
             lv_obj_align(slider, LV_ALIGN_TOP_MID, 0, 10 + i * 30);
         }
     }
     if(cur_v == 1) {
         for(i = 0; i < 3; i++) {
             lv_obj_t * dropdown = lv_dropdown_create(cont);
-            lv_dropdown_bind_value(dropdown, &dropdown_subject[i]);
+            lv_dropdown_bind_value(dropdown, dropdown_subject[i]);
             lv_obj_align(dropdown, LV_ALIGN_TOP_MID, 0, i * 50);
         }
     }
     if(cur_v == 2) {
         for(i = 0; i < 2; i++) {
             lv_obj_t * roller = lv_roller_create(cont);
-            lv_roller_bind_value(roller, &roller_subject[i]);
+            lv_roller_bind_value(roller, roller_subject[i]);
             lv_obj_align(roller, LV_ALIGN_CENTER, - 80 + i * 160, 0);
         }
     }
@@ -155,7 +163,7 @@ static void btn_create(lv_obj_t * parent, const char * text)
     lv_obj_set_flex_grow(btn, 1);
     lv_obj_set_height(btn, lv_pct(100));
     lv_obj_set_style_radius(btn, 0, 0);
-    lv_subject_add_observer_obj(&current_tab_subject, btn_observer_cb, btn, NULL);
+    lv_subject_add_observer_obj(current_tab_subject, btn_observer_cb, btn, NULL);
     lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * label = lv_label_create(btn);
@@ -167,7 +175,7 @@ static void btn_click_event_cb(lv_event_t * e)
 {
     lv_obj_t * btn = lv_event_get_target_obj(e);
     uint32_t idx = lv_obj_get_index(btn);
-    lv_subject_set_int(&current_tab_subject, idx);
+    lv_subject_set_int(current_tab_subject, idx);
 }
 
 static void btn_observer_cb(lv_observer_t * observer, lv_subject_t * subject)

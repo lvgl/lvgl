@@ -1,0 +1,58 @@
+<!--
+ @title Roller styling
+ @brief Style the main listbox and the selected item; use `text_line_space` to set the selected band's height.
+
+ Roller has two relevant parts: `MAIN` (the whole listbox, where unselected
+ items are drawn) and `SELECTED` (the highlighted row in the middle). Name a
+ style for each and attach them with `selector="main"` and
+ `selector="selected"`.
+
+ `text_line_space` on MAIN does more than space the text rows: because the
+ selected indicator always sits in the gap between two list items, growing
+ `text_line_space` directly grows the height of the highlighted band — so
+ the selected row gets visually taller without a separate height setting.
+-->
+<screen>
+	<styles>
+		<!-- Main: rounded card, soft background, muted unselected text, generous line space
+		     (line space sets the gap *and* the selected-band height). -->
+		<style
+			name="style_roller_main"
+			bg_color="0xf3f4f6"
+			bg_opa="100%"
+			radius="12"
+			border_color="0xd1d5db"
+			border_width="1"
+			text_color="0x6b7280"
+			text_line_space="20"
+		/>
+		<!-- Selected: accent fill, bold white text -->
+		<style
+			name="style_roller_selected"
+			bg_color="0x6366f1"
+			bg_opa="100%"
+			text_color="0xffffff"
+			text_font="font_example_large"
+		/>
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 Bump `text_line_space` on `style_roller_main` to grow the selected band's height — the indicator always fills the gap between rows. -->
+		<lv_roller
+			name="roller"
+			width="160"
+			visible_row_count="5"
+			options="Berlin&#10;Paris&#10;Tokyo&#10;Sydney&#10;New York"
+			selected="2"
+		>
+			<style name="style_roller_main" selector="main" />
+			<style name="style_roller_selected" selector="selected" />
+		</lv_roller>
+	</view>
+</screen>

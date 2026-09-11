@@ -1,0 +1,33 @@
+---
+title: "Animation Image (lv_animimg)"
+description: "Like the Image widget, but plays an array of source images as frames of an animation."
+---
+
+## Overview
+
+Animation Image behaves like the [Image](/widgets/image) widget, but
+plays an array of source images as frames of an animation. You can set
+the duration and the repeat count.
+
+## Image sources
+
+<LvglExample name="lv_example_animimg_play" path="widgets/animimg/lv_example_animimg_play" />
+
+To set the image animation sources, use
+<ApiLink name="lv_animimg_set_src" display="lv_animimg_set_src(animimg, dsc[], num)" />.
+
+To set the sources for flip (reverse) playback, use
+<ApiLink name="lv_animimg_set_src_reverse" display="lv_animimg_set_src_reverse(animimg, dsc[], num)" />.
+
+## Using the inner animation
+
+The animation used internally by the widget can be retrieved with
+<ApiLink name="lv_animimg_get_anim" display="lv_animimg_get_anim(animimg)" />. This gives access to all
+[Animation](/main-modules/animation) functions — for example
+<ApiLink name="lv_anim_set_values" display="lv_anim_set_values(anim, start, end)" /> or attaching a
+completion callback.
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> A background rectangle that uses the [typical
+   background style properties](/common-widget-features/styles/overview) and the image style properties.

@@ -12,19 +12,7 @@
 #if LV_DRAW_SW_SUPPORT_A8
 
 #include "lv_draw_sw_blend_private.h"
-#include "../../../misc/lv_math.h"
-#include "../../../display/lv_display.h"
-#include "../../../core/lv_refr.h"
-#include "../../../misc/lv_color.h"
-#include "../../../stdlib/lv_string.h"
 
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
-    #include "neon/lv_blend_neon.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
-    #include "helium/lv_blend_helium.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
-    #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
-#endif
 
 /*********************
  *      DEFINES
@@ -277,6 +265,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_a8(lv_draw_sw_blend_image_d
             argb8888_image_blend(dsc);
             break;
 #endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        /*Only the alpha is used here and premultiplying doesn't change it*/
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            argb8888_image_blend(dsc);
+            break;
+#endif
         case LV_COLOR_FORMAT_A8:
             a8_image_blend(dsc);
             break;
@@ -296,7 +290,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_a8(lv_draw_sw_blend_image_d
             break;
 #endif
         default:
-            LV_LOG_WARN("Not supported source color format");
+            LV_LOG_WARN("Not supported source color format 0x%02X", dsc->src_color_format);
             break;
     }
 }

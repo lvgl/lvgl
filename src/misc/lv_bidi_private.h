@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_bidi.h"
+#include "../lvgl_public.h"
 #if LV_USE_BIDI
 
 /*********************
@@ -39,7 +39,11 @@ extern "C" {
 void lv_bidi_process(const char * str_in, char * str_out, lv_base_dir_t base_dir);
 
 /**
- * Auto-detect the direction of a text based on the first strong character
+ * Auto-detect the base direction of a text by scanning all strong characters.
+ * RTL takes priority: if any RTL strong character is found, `LV_BASE_DIR_RTL` is returned
+ * immediately. Otherwise, `LV_BASE_DIR_LTR` is returned if any LTR strong character is found.
+ * If no strong character is present, falls back to `LV_BIDI_BASE_DIR_DEF`. When
+ * `LV_BIDI_BASE_DIR_DEF` is `LV_BASE_DIR_AUTO`, this function returns `LV_BASE_DIR_LTR`.
  * @param txt the text to process
  * @return `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL`
  */
@@ -88,12 +92,37 @@ uint16_t lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t 
 void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_base_dir_t base_dir,
                                uint16_t * pos_conv_out, uint16_t pos_conv_len);
 
-/**********************
- *      MACROS
- **********************/
+
 
 #endif /*LV_USE_BIDI*/
 
+/**
+ * Internal implementation of @ref lv_bidi_calculate_align
+ */
+static inline void lv_bidi_calculate_align_internal(lv_text_align_t * align, lv_base_dir_t * base_dir,
+                                                    const char * txt)
+{
+#if LV_USE_BIDI
+    LV_ASSERT(align != NULL);
+    LV_ASSERT(base_dir != NULL);
+    LV_ASSERT(txt != NULL);
+    if(*base_dir == LV_BASE_DIR_AUTO) *base_dir = lv_bidi_detect_base_dir(txt);
+
+    if(*align == LV_TEXT_ALIGN_AUTO) {
+        if(*base_dir == LV_BASE_DIR_RTL) *align = LV_TEXT_ALIGN_RIGHT;
+        else *align = LV_TEXT_ALIGN_LEFT;
+    }
+#else
+    LV_UNUSED(txt);
+    LV_UNUSED(base_dir);
+    LV_ASSERT(align != NULL);
+    if(*align == LV_TEXT_ALIGN_AUTO) * align = LV_TEXT_ALIGN_LEFT;
+#endif
+}
+
+/**********************
+ *      MACROS
+ **********************/
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

@@ -14,8 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_demos.h"
-#include "../../src/draw/lv_draw.h"
-#include "../../src/draw/lv_draw_triangle.h"
+#include "../../include/lvgl/draw/lv_draw.h"
+#include "../../include/lvgl/draw/lv_draw_triangle.h"
 
 #if LV_USE_DEMO_WIDGETS
 
