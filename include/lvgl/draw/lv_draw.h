@@ -152,6 +152,9 @@ struct _lv_layer_t  {
 
     /** true if LVGL is responsible for freeing `draw_buf`*/
     bool buffer_owned;
+
+    /**Bytes charged to the layer memory budget; zero until backing is allocated.*/
+    uint32_t allocated_buf_size;
 };
 
 typedef struct {

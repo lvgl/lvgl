@@ -471,17 +471,8 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     if(parent_layer != NULL && new_layer->draw_buf == NULL) {
         int32_t w = lv_area_get_width(area);
         int32_t h = lv_area_get_height(area);
-        new_layer->draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
-        if(new_layer->draw_buf) {
-            new_layer->draw_buf->header.magic = LV_IMAGE_HEADER_MAGIC;
-            new_layer->draw_buf->header.w = w;
-            new_layer->draw_buf->header.h = h;
-            new_layer->draw_buf->header.cf = color_format;
-            new_layer->draw_buf->header.stride = lv_draw_buf_width_to_stride(w, color_format);
-            new_layer->draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
-            new_layer->draw_buf->handlers = lv_draw_buf_get_handlers();
-            new_layer->buffer_owned = true;
-        }
+        new_layer->draw_buf = lv_draw_buf_create(w, h, color_format, LV_STRIDE_AUTO);
+        if(new_layer->draw_buf) new_layer->buffer_owned = true;
     }
 #endif
 
@@ -525,90 +516,51 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer, lv_draw_unit_t * draw_unit)
     LV_CHECK_ARG(layer != NULL, return NULL);
     LV_PROFILER_DRAW_BEGIN;
 
-#if LV_USE_DRAW_VRAM
-    /*If a draw_buf already exists, check if it already has backing (CPU or VRAM).
-     *If so, use ensure_resident to migrate it to the requesting unit if needed,
-     *without re-allocating or re-accounting.*/
-    if(layer->draw_buf != NULL
-       && (layer->draw_buf->data != NULL || layer->draw_buf->vram_res != NULL)) {
-        if(draw_unit != NULL) {
-            if(!lv_draw_buf_ensure_resident(layer->draw_buf, draw_unit)) {
-                LV_PROFILER_DRAW_END;
-                return NULL;
-            }
-        }
+    int32_t w = lv_area_get_width(&layer->buf_area);
+    int32_t h = lv_area_get_height(&layer->buf_area);
+    uint32_t stride = layer->draw_buf ? layer->draw_buf->header.stride
+                      : lv_draw_buf_width_to_stride(w, layer->color_format);
+    uint32_t layer_size_byte = h * stride;
+    bool account_buffer = (layer->draw_buf == NULL || layer->buffer_owned) && layer->allocated_buf_size == 0;
+
+#if LV_DRAW_LAYER_MAX_MEMORY > 0
+    if(account_buffer && (layer_size_byte > LV_DRAW_LAYER_MAX_MEMORY
+                          || _draw_info.used_memory_for_layers > LV_DRAW_LAYER_MAX_MEMORY - layer_size_byte)) {
+        LV_LOG_WARN("LV_DRAW_LAYER_MAX_MEMORY was reached when allocating the layer.");
         LV_PROFILER_DRAW_END;
-        return layer->draw_buf->data;
-    }
-#else
-    LV_UNUSED(draw_unit);
-    /*If the buffer of the layer is already allocated return it*/
-    if(layer->draw_buf != NULL) {
-        LV_PROFILER_DRAW_END;
-        return layer->draw_buf->data;
+        return NULL;
     }
 #endif
 
-    {
-        /*First allocation — buffer has no backing yet (header-only or NULL).
-         *Account the layer size before allocating.*/
-        int32_t w = lv_area_get_width(&layer->buf_area);
-        int32_t h = lv_area_get_height(&layer->buf_area);
-        uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
-
-#if LV_DRAW_LAYER_MAX_MEMORY > 0
-        if((_draw_info.used_memory_for_layers + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
-            LV_LOG_WARN("LV_DRAW_LAYER_MAX_MEMORY was reached when allocating the layer.");
+    if(layer->draw_buf == NULL) {
+        layer->draw_buf = lv_draw_buf_create(w, h, layer->color_format, LV_STRIDE_AUTO);
+        if(layer->draw_buf == NULL) {
+            LV_LOG_WARN("Allocating layer buffer failed. Try later");
             LV_PROFILER_DRAW_END;
             return NULL;
         }
-#endif
+        layer->buffer_owned = true;
+        if(lv_color_format_has_alpha(layer->color_format)) {
+            lv_draw_buf_clear(layer->draw_buf, NULL);
+        }
+    }
 
 #if LV_USE_DRAW_VRAM
-        /*Use ensure_resident for the first allocation when a draw unit is provided.
-         *This allocates in the correct memory space (VRAM or CPU) for the unit.*/
-        if(draw_unit != NULL && layer->draw_buf != NULL) {
-            if(!lv_draw_buf_ensure_resident(layer->draw_buf, draw_unit)) {
-                LV_LOG_WARN("Allocating layer buffer failed. Try later");
-                LV_PROFILER_DRAW_END;
-                return NULL;
-            }
-        }
-        else
+    /*NULL requests CPU residency too, including for an existing VRAM buffer.*/
+    if(!lv_draw_buf_ensure_resident(layer->draw_buf, draw_unit)) {
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
+#else
+    LV_UNUSED(draw_unit);
 #endif
-        {
-            /*CPU-only path: no draw unit or no VRAM support*/
-#if LV_USE_DRAW_VRAM
-            if(layer->draw_buf != NULL) {
-                /*Header-only draw_buf exists — replace with fully allocated one*/
-                lv_draw_buf_t * old = layer->draw_buf;
-                layer->draw_buf = lv_draw_buf_create(w, h, layer->color_format, 0);
-                lv_free(old);
-            }
-            else
-#endif
-            {
-                layer->draw_buf = lv_draw_buf_create(w, h, layer->color_format, 0);
-            }
 
-            if(layer->draw_buf == NULL) {
-                LV_LOG_WARN("Allocating layer buffer failed. Try later");
-                LV_PROFILER_DRAW_END;
-                return NULL;
-            }
-            layer->buffer_owned = true;
-
-            if(lv_color_format_has_alpha(layer->color_format)) {
-                lv_draw_buf_clear(layer->draw_buf, NULL);
-            }
-        }
-
-        /*Only account for buffers LVGL owns. A display's own draw buffer can also be
-         *lazily backed here, but it is freed by the display, not by `lv_draw_layer_dealloc_buf`.*/
-        if(layer->buffer_owned) {
-            _draw_info.used_memory_for_layers += layer_size_byte;
-            LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
-        }
+    /*Ownership of a lazy header is separate from accounting for its backing.
+     *Remember the exact charge so unbacked or reshaped layers free the right amount.*/
+    if(account_buffer) {
+        _draw_info.used_memory_for_layers += layer_size_byte;
+        layer->allocated_buf_size = layer_size_byte;
+        LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
     }
 
     LV_PROFILER_DRAW_END;
@@ -787,7 +739,8 @@ void lv_draw_layer_dealloc_buf(lv_layer_t * layer)
     LV_CHECK_ARG(layer != NULL, return);
     if(layer->draw_buf == NULL || !layer->buffer_owned) return;
 
-    uint32_t layer_size_byte = lv_area_get_height(&layer->buf_area) * layer->draw_buf->header.stride;
+    uint32_t layer_size_byte = layer->allocated_buf_size;
+    layer->allocated_buf_size = 0;
     if(_draw_info.used_memory_for_layers >= layer_size_byte) {
         _draw_info.used_memory_for_layers -= layer_size_byte;
     }

@@ -1695,6 +1695,43 @@ void test_vram_custom_alignment_on_allocation_and_download(void)
     lv_draw_buf_destroy(buf);
 }
 
+void test_vram_layer_accounting_tracks_backing(void)
+{
+    lv_layer_t parent;
+    lv_layer_init(&parent);
+    parent.display = lv_display_get_default();
+    lv_area_t area = {0, 0, 7, 7};
+    lv_layer_t * backed = lv_draw_layer_create(&parent, LV_COLOR_FORMAT_ARGB8888, &area);
+    lv_layer_t * lazy = lv_draw_layer_create(&parent, LV_COLOR_FORMAT_ARGB8888, &area);
+    uint32_t before = LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers;
+    TEST_ASSERT_NOT_NULL(lv_draw_layer_alloc_buf(backed, NULL));
+    uint32_t charged = LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers;
+    TEST_ASSERT_GREATER_THAN(before, charged);
+    lv_draw_layer_delete(lazy);
+    TEST_ASSERT_EQUAL_UINT32(charged, LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(backed->draw_buf, &s_fake_unit_a));
+    TEST_ASSERT_NOT_NULL(lv_draw_layer_alloc_buf(backed, NULL));
+    TEST_ASSERT_EQUAL_UINT32(charged, LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers);
+    lv_draw_layer_delete(backed);
+    TEST_ASSERT_EQUAL_UINT32(before, LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers);
+}
+
+void test_vram_failed_layer_allocation_is_not_charged(void)
+{
+    lv_layer_t parent;
+    lv_layer_init(&parent);
+    parent.display = lv_display_get_default();
+    lv_area_t area = {0, 0, 7, 7};
+    lv_layer_t * layer = lv_draw_layer_create(&parent, LV_COLOR_FORMAT_ARGB8888, &area);
+    uint32_t before = LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers;
+    s_stats_a.fail_alloc = true;
+    TEST_ASSERT_NULL(lv_draw_layer_alloc_buf(layer, &s_fake_unit_a));
+    TEST_ASSERT_NULL(layer->draw_buf->vram_res);
+    TEST_ASSERT_EQUAL_UINT32(before, LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers);
+    lv_draw_layer_delete(layer);
+    TEST_ASSERT_EQUAL_UINT32(before, LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers);
+}
+
 #endif /* LV_USE_DRAW_VRAM */
 
 typedef int _keep_pedantic_happy; /* avoid empty translation unit when VRAM is disabled */
