@@ -256,11 +256,82 @@ static void on_layer_changed(lv_layer_t * new_layer)
 
     bind_layer_framebuffer(new_layer);
 
-    if(new_layer->user_data) {
-        LV_PROFILER_DRAW_BEGIN_TAG("glClear");
-        glClearColor(0, 0, 0, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        LV_PROFILER_DRAW_END_TAG("glClear");
+    LV_PROFILER_DRAW_END;
+}
+
+/**
+ * Upload the current content of a layer's draw buffer into its framebuffer.
+ */
+static void layer_upload(lv_layer_t * layer, struct NVGLUframebuffer * fb)
+{
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
+
+    GLenum format;
+    GLenum type;
+
+    switch(draw_buf->header.cf) {
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            format = GL_BGRA;
+            type = GL_UNSIGNED_BYTE;
+            break;
+
+        case LV_COLOR_FORMAT_RGB565:
+            format = GL_RGB;
+            type = GL_UNSIGNED_SHORT_5_6_5;
+            break;
+
+        default:
+            /* RGB888 would need a swizzle, which would modify the source buffer */
+            LV_LOG_WARN("Unsupported color format: %d", draw_buf->header.cf);
+            return;
+    }
+
+    const int32_t w = lv_area_get_width(&layer->buf_area);
+    const int32_t h = lv_area_get_height(&layer->buf_area);
+
+    LV_PROFILER_DRAW_BEGIN_TAG("glTexSubImage2D");
+    glBindTexture(GL_TEXTURE_2D, fb->texture);
+    for(int32_t y = 0; y < h; y++) {
+        /* GL puts the origin at the bottom left, LVGL at the top left */
+        const void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, y, w, 1, format, type, row);
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
+    LV_PROFILER_DRAW_END_TAG("glTexSubImage2D");
+}
+
+static void on_layer_created(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
+{
+    struct NVGLUframebuffer * fb = lv_nanovg_fbo_cache_entry_to_fb(layer->user_data);
+    if(!fb) return;
+
+    LV_PROFILER_DRAW_BEGIN;
+
+    /* Raw OpenGL so that so that we don't disturb any on-going nanovg tasks. */
+    nvgluBindFramebuffer(fb);
+
+    /* Clear the framebuffer as it might still have data from the previous usage */
+    GLfloat prev_clear_color[4] = {0};
+    glGetFloatv(GL_COLOR_CLEAR_VALUE, prev_clear_color);
+
+    LV_PROFILER_DRAW_BEGIN_TAG("glClear");
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    LV_PROFILER_DRAW_END_TAG("glClear");
+
+    glClearColor(prev_clear_color[0], prev_clear_color[1], prev_clear_color[2], prev_clear_color[3]);
+    nvgluBindFramebuffer(NULL);
+
+    if(layer->draw_buf) layer_upload(layer, fb);
+
+    /* Restore the framebuffer the unit was rendering into */
+    if(u->current_layer) {
+        bind_layer_framebuffer(u->current_layer);
+    }
+    else {
+        nvgluBindFramebuffer(NULL);
     }
 
     LV_PROFILER_DRAW_END;
@@ -329,7 +400,7 @@ static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
     LV_UNUSED(u);
     LV_ASSERT_NULL(layer);
 
-    lv_cache_entry_t * entry = layer->user_data;
+    lv_nanovg_fbo_t * entry = layer->user_data;
 
     if(!entry) {
         LV_LOG_WARN("No entry available for layer: %p", (void *)layer);
@@ -527,13 +598,14 @@ static void draw_event_cb(lv_event_t * e)
             break;
         case LV_EVENT_CHILD_CREATED: {
                 /* The internal rendering uses RGBA format, which is switched to LVGL BGRA format during readback. */
-                lv_cache_entry_t * entry = lv_nanovg_fbo_cache_get(u, lv_area_get_width(&layer->buf_area),
-                                                                   lv_area_get_height(&layer->buf_area), 0, NVG_TEXTURE_RGBA);
+                lv_nanovg_fbo_t * entry = lv_nanovg_fbo_cache_get(u, lv_area_get_width(&layer->buf_area),
+                                                                  lv_area_get_height(&layer->buf_area), 0, NVG_TEXTURE_RGBA);
                 layer->user_data = entry;
+                on_layer_created(u, layer);
             }
             break;
         case LV_EVENT_CHILD_DELETED: {
-                lv_cache_entry_t * entry = layer->user_data;
+                lv_nanovg_fbo_t * entry = layer->user_data;
                 if(entry) {
                     lv_nanovg_fbo_cache_release(u, entry);
                     layer->user_data = NULL;

@@ -73,7 +73,7 @@ typedef struct _lv_draw_nanovg_unit_t {
     lv_cache_t * letter_cache;
     struct _lv_pending_t * letter_pending;
 
-    lv_cache_t * fbo_cache;
+    lv_ll_t fbo_pool;
 
     struct NVGLUblurState * blur_state;
 } lv_draw_nanovg_unit_t;

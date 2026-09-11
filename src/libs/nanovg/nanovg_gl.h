@@ -551,11 +551,8 @@ static int glnvg__renderCreate(void * uptr)
 
     static const char * fillVertShader =
         "#ifdef GL_ES\n"
-        "#if defined(NANOVG_GL3)\n"
+        /* highp is always available in a vertex shader in GLSL ES */
         " precision highp float;\n"
-        "#else\n"
-        " precision mediump float;\n"
-        "#endif\n"
         "#endif\n"
         "#ifdef NANOVG_GL3\n"
         "	uniform vec2 viewSize;\n"
@@ -616,7 +613,7 @@ static int glnvg__renderCreate(void * uptr)
 
     static const char * fillFragShader =
         "#ifdef GL_ES\n"
-        "#if defined(NANOVG_GL3)\n"
+        "#if defined(NANOVG_GL3) || defined(GL_FRAGMENT_PRECISION_HIGH)\n"
         " precision highp float;\n"
         "#else\n"
         " precision mediump float;\n"
