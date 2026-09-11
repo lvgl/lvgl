@@ -1,0 +1,23 @@
+config LV_USE_EVE5
+	bool "EVE5 display and touch"
+	default n
+	depends on LV_USE_DRAW_VRAM
+	help
+		Display and touch driver using EVE HAL and the EVE GPU allocator.
+		Requires the VRAM residency module and external EVE HAL libraries.
+
+if LV_USE_EVE5
+
+config LV_USE_FS_EVE5_SDCARD
+	bool "EVE5 SD card filesystem"
+	default n
+	help
+		Access files on an SD card connected to the EVE controller.
+
+config LV_USE_FS_EVE5_FLASH
+	bool "EVE5 flash filesystem"
+	default n
+	help
+		Access assets in flash connected to the EVE controller.
+
+endif
