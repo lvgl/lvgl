@@ -20,7 +20,7 @@
 
 #if LV_USE_DRAW_EVE5
 
-#include "../lv_image_decoder_private.h"
+#include "../../image/lv_image_decoder_private.h"
 #include "../../misc/cache/instance/lv_image_header_cache.h"
 #include "EVE_ResourceProbe.h"
 #include "EVE_ResourceQuery.h"

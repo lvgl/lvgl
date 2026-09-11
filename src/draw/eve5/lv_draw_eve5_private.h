@@ -23,7 +23,7 @@ extern "C" {
 
 #include "../lv_draw_private.h"
 #include "../lv_draw_label_private.h"
-#include "../lv_image_decoder_private.h"
+#include "../../image/lv_image_decoder_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../drivers/display/eve5/lv_eve5.h"
