@@ -1732,6 +1732,61 @@ void test_vram_failed_layer_allocation_is_not_charged(void)
     TEST_ASSERT_EQUAL_UINT32(before, LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers);
 }
 
+void test_vram_gif_next_frame_after_upload(void)
+{
+#if LV_USE_GIF
+    lv_obj_t * gif = lv_gif_create(lv_screen_active());
+    lv_gif_set_src(gif, "A:src/test_assets/totoro_transparent.gif");
+    TEST_ASSERT_TRUE(lv_gif_is_loaded(gif));
+    lv_gif_set_auto_pause_invisible(gif, false);
+    lv_draw_buf_t * buf = (lv_draw_buf_t *)lv_image_get_src(gif);
+    int32_t frame = lv_gif_get_current_frame_index(gif);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, &s_fake_unit_a));
+    TEST_ASSERT_NULL(buf->data);
+    lv_timer_t * refr = lv_display_get_refr_timer(lv_display_get_default());
+    lv_timer_pause(refr);
+    lv_tick_inc(1000);
+    lv_timer_handler();
+    lv_timer_resume(refr);
+    TEST_ASSERT_NOT_NULL(buf->data);
+    TEST_ASSERT_NULL(buf->vram_res);
+    TEST_ASSERT_NOT_EQUAL(frame, lv_gif_get_current_frame_index(gif));
+    lv_obj_delete(gif);
+#endif
+}
+
+
+void test_vram_gif_download_failure_preserves_frame(void)
+{
+#if LV_USE_GIF
+    lv_obj_t * gif = lv_gif_create(lv_screen_active());
+    lv_gif_set_src(gif, "A:src/test_assets/totoro_transparent.gif");
+    TEST_ASSERT_TRUE(lv_gif_is_loaded(gif));
+    lv_gif_set_auto_pause_invisible(gif, false);
+    lv_draw_buf_t * buf = (lv_draw_buf_t *)lv_image_get_src(gif);
+    int32_t frame = lv_gif_get_current_frame_index(gif);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, &s_fake_unit_a));
+    s_stats_a.fail_download = true;
+    lv_timer_t * refr = lv_display_get_refr_timer(lv_display_get_default());
+    lv_timer_pause(refr);
+    lv_tick_inc(1000);
+    lv_timer_handler();
+    lv_timer_resume(refr);
+    TEST_ASSERT_NULL(buf->data);
+    TEST_ASSERT_NOT_NULL(buf->vram_res);
+    TEST_ASSERT_EQUAL_INT32(frame, lv_gif_get_current_frame_index(gif));
+    s_stats_a.fail_download = false;
+    lv_timer_pause(refr);
+    lv_tick_inc(1000);
+    lv_timer_handler();
+    lv_timer_resume(refr);
+    TEST_ASSERT_NOT_NULL(buf->data);
+    TEST_ASSERT_NOT_EQUAL(frame, lv_gif_get_current_frame_index(gif));
+    lv_obj_delete(gif);
+#endif
+}
+
+
 #endif /* LV_USE_DRAW_VRAM */
 
 typedef int _keep_pedantic_happy; /* avoid empty translation unit when VRAM is disabled */

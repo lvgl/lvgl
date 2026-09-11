@@ -633,6 +633,11 @@ static void gif_next_frame_task_cb(lv_timer_t * t)
         return;
     }
 
+    if(!lv_draw_buf_ensure_resident(gifobj->draw_buf, NULL)) {
+        LV_PROFILER_DECODER_END;
+        return;
+    }
+
     GIFIMAGE * gif = &gifobj->gif;
     int ms_delay_next;
 
