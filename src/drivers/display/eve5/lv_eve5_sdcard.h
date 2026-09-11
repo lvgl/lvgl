@@ -31,12 +31,11 @@ extern "C" {
  *********************/
 #include "../../../lvgl_public.h"
 
-#include "EVE_Hal.h"
-
 /* SD card coprocessor commands (CMD_SDATTACH, CMD_FS*, CMD_GETIMAGE) are
  * BT820-only. On earlier chips these public functions are no-op stubs. */
 #if LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
 
+#include "EVE_Hal.h"
 #include "EVE_GpuAlloc.h"
 #include "EVE_ResourceProbe.h"
 
