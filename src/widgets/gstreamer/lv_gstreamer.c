@@ -589,6 +589,11 @@ static bool gstreamer_copy_to_aligned_frame(lv_gstreamer_t * streamer, const Gst
         streamer->aligned_frame = dest;
     }
 
+    if(!lv_draw_buf_ensure_resident(dest, NULL)) {
+        LV_LOG_ERROR("Failed to allocate CPU backing for an aligned frame");
+        return false;
+    }
+
     const uint32_t dest_stride = dest->header.stride;
     const uint32_t row_size = LV_MIN(src_stride, dest_stride);
     for(uint32_t y = 0; y < h; y++) {
