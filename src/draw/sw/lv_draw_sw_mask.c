@@ -29,19 +29,19 @@
  **********************/
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_line(lv_opa_t * mask_buf, int32_t abs_x,
                                                                            int32_t abs_y, int32_t len,
-                                                                           lv_draw_sw_mask_line_param_t * param);
+                                                                           void * param);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_radius(lv_opa_t * mask_buf, int32_t abs_x,
                                                                              int32_t abs_y, int32_t len,
-                                                                             lv_draw_sw_mask_radius_param_t * param);
+                                                                             void * param);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_angle(lv_opa_t * mask_buf, int32_t abs_x,
                                                                             int32_t abs_y, int32_t len,
-                                                                            lv_draw_sw_mask_angle_param_t * param);
+                                                                            void * param);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_fade(lv_opa_t * mask_buf, int32_t abs_x,
                                                                            int32_t abs_y, int32_t len,
-                                                                           lv_draw_sw_mask_fade_param_t * param);
+                                                                           void * param);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_map(lv_opa_t * mask_buf, int32_t abs_x,
                                                                           int32_t abs_y, int32_t len,
-                                                                          lv_draw_sw_mask_map_param_t * param);
+                                                                          void * param);
 
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ line_mask_flat(lv_opa_t * mask_buf, int32_t abs_x,
                                                                         int32_t abs_y,
@@ -154,7 +154,7 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int3
     param->flat = (LV_ABS(p2x - p1x) > LV_ABS(p2y - p1y)) ? 1 : 0;
     param->yx_steep = 0;
     param->xy_steep = 0;
-    param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_line;
+    param->dsc.cb = lv_draw_mask_line;
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_LINE;
 
     int32_t dx = p2x - p1x;
@@ -251,7 +251,7 @@ void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, int32_t v
     param->cfg.start_angle = start_angle;
     param->cfg.end_angle = end_angle;
     lv_point_set(&param->cfg.vertex_p, vertex_x, vertex_y);
-    param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_angle;
+    param->dsc.cb = lv_draw_mask_angle;
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_ANGLE;
 
     LV_ASSERT_MSG(start_angle >= 0 && start_angle <= 360, "Unexpected start angle");
@@ -291,7 +291,7 @@ lv_result_t lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, 
     param->cfg.rect = *rect;
     param->cfg.radius = radius;
     param->cfg.outer = inv ? 1 : 0;
-    param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_radius;
+    param->dsc.cb = lv_draw_mask_radius;
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_RADIUS;
 
     if(radius == 0) {
@@ -321,7 +321,7 @@ void lv_draw_sw_mask_fade_init(lv_draw_sw_mask_fade_param_t * param, const lv_ar
     param->cfg.opa_bottom = opa_bottom;
     param->cfg.y_top = y_top;
     param->cfg.y_bottom = y_bottom;
-    param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_fade;
+    param->dsc.cb = lv_draw_mask_fade;
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_FADE;
 }
 
@@ -329,7 +329,7 @@ void lv_draw_sw_mask_map_init(lv_draw_sw_mask_map_param_t * param, const lv_area
 {
     param->cfg.coords = *coords;
     param->cfg.map = map;
-    param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_map;
+    param->dsc.cb = lv_draw_mask_map;
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_MAP;
 }
 
@@ -339,8 +339,9 @@ void lv_draw_sw_mask_map_init(lv_draw_sw_mask_map_param_t * param, const lv_area
 
 static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_line(lv_opa_t * mask_buf, int32_t abs_x,
                                                                      int32_t abs_y, int32_t len,
-                                                                     lv_draw_sw_mask_line_param_t * p)
+                                                                     void * param)
 {
+    lv_draw_sw_mask_line_param_t * p = param;
     /*Make to points relative to the vertex*/
     abs_y -= p->origo.y;
     abs_x -= p->origo.x;
@@ -659,8 +660,9 @@ static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM line_mask_steep(lv_opa_t * ma
 
 static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_angle(lv_opa_t * mask_buf, int32_t abs_x,
                                                                       int32_t abs_y, int32_t len,
-                                                                      lv_draw_sw_mask_angle_param_t * p)
+                                                                      void * param)
 {
+    lv_draw_sw_mask_angle_param_t * p = param;
     int32_t rel_y = abs_y - p->cfg.vertex_p.y;
     int32_t rel_x = abs_x - p->cfg.vertex_p.x;
 
@@ -797,8 +799,9 @@ static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_angle(lv_opa_t *
 
 static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_radius(lv_opa_t * mask_buf, int32_t abs_x,
                                                                        int32_t abs_y, int32_t len,
-                                                                       lv_draw_sw_mask_radius_param_t * p)
+                                                                       void * param)
 {
+    lv_draw_sw_mask_radius_param_t * p = param;
     bool outer = p->cfg.outer;
     int32_t radius = p->cfg.radius;
     lv_area_t rect;
@@ -907,8 +910,9 @@ static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_radius(lv_opa_t 
 
 static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_fade(lv_opa_t * mask_buf, int32_t abs_x,
                                                                      int32_t abs_y, int32_t len,
-                                                                     lv_draw_sw_mask_fade_param_t * p)
+                                                                     void * param)
 {
+    lv_draw_sw_mask_fade_param_t * p = param;
     if(abs_y < p->cfg.coords.y1) return LV_DRAW_SW_MASK_RES_FULL_COVER;
     if(abs_y > p->cfg.coords.y2) return LV_DRAW_SW_MASK_RES_FULL_COVER;
     if(abs_x + len < p->cfg.coords.x1) return LV_DRAW_SW_MASK_RES_FULL_COVER;
@@ -953,8 +957,9 @@ static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_fade(lv_opa_t * 
 
 static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_map(lv_opa_t * mask_buf, int32_t abs_x,
                                                                     int32_t abs_y, int32_t len,
-                                                                    lv_draw_sw_mask_map_param_t * p)
+                                                                    void * param)
 {
+    lv_draw_sw_mask_map_param_t * p = param;
     /*Handle out of the mask cases*/
     if(abs_y < p->cfg.coords.y1) return LV_DRAW_SW_MASK_RES_FULL_COVER;
     if(abs_y > p->cfg.coords.y2) return LV_DRAW_SW_MASK_RES_FULL_COVER;
