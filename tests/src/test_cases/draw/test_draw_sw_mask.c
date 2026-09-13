@@ -1,7 +1,7 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "unity/unity.h"
-#include "src/draw/sw/lv_draw_sw_mask_private.h"
+#include "lvgl_private.h"
 
 void setUp(void)
 {
@@ -24,8 +24,6 @@ void test_radius_mask_overflow(void)
 
     lv_timer_handler();
 }
-
-#if LV_DRAW_SW_COMPLEX
 
 /* With Clang's function sanitizer enabled, these tests also check that the
  * initializer installs a callback compatible with lv_draw_sw_mask_xcb_t. */
@@ -80,5 +78,4 @@ void test_map_mask_callback_type(void)
     check_mask_callback(&mask);
 }
 
-#endif /* LV_DRAW_SW_COMPLEX */
 #endif /* LV_BUILD_TEST */
