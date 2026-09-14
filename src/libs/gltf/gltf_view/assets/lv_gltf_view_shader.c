@@ -7,3596 +7,3594 @@
 
 static const lv_opengl_shader_t src_includes[] = {
     {
-        "tonemapping.glsl", R"(
-
-        uniform float u_Exposure;
-
-
-        // const float STANDARD_GAMMA = 2.2; // Retained for reference - unused
-
-        const float GAMMA = )" LV_GLTF_TONEMAP_GAMMA R"(;
-        const float INV_GAMMA = 1.0 / GAMMA;
-
-
-        // sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
-        const mat3 ACESInputMat = mat3
-        (
-            0.59719, 0.07600, 0.02840,
-            0.35458, 0.90834, 0.13383,
-            0.04823, 0.01566, 0.83777
-        );
-
-
-        // ODT_SAT => XYZ => D60_2_D65 => sRGB
-        const mat3 ACESOutputMat = mat3
-        (
-            1.60475, -0.10208, -0.00327,
-            -0.53108,  1.10813, -0.07276,
-            -0.07367, -0.00605,  1.07602
-        );
-
-
-        // linear to sRGB approximation
-        // see http://chilliant.blogspot.com/2012/08/srgb-approximations-for-hlsl.html
-        vec3 linearTosRGB(vec3 color)
-        {
-            return pow(color, vec3(INV_GAMMA));
-        }
-
-
-        // sRGB to linear approximation
-        // see http://chilliant.blogspot.com/2012/08/srgb-approximations-for-hlsl.html
-        vec3 sRGBToLinear(vec3 srgbIn)
-        {
-            return vec3(pow(srgbIn.xyz, vec3(GAMMA)));
-        }
-
-
-        vec4 sRGBToLinear(vec4 srgbIn)
-        {
-            return vec4(sRGBToLinear(srgbIn.xyz), srgbIn.w);
-        }
-
-
-        // ACES tone map (faster approximation)
-        // see: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
-        vec3 toneMapACES_Narkowicz(vec3 color)
-        {
-            const float A = 2.51;
-            const float B = 0.03;
-            const float C = 2.43;
-            const float D = 0.59;
-            const float E = 0.14;
-            return clamp((color * (A * color + B)) / (color * (C * color + D) + E), 0.0, 1.0);
-        }
-
-
-        // ACES filmic tone map approximation
-        // see https://github.com/TheRealMJP/BakingLab/blob/master/BakingLab/ACES.hlsl
-        vec3 RRTAndODTFit(vec3 color)
-        {
-            vec3 a = color * (color + 0.0245786) - 0.000090537;
-            vec3 b = color * (0.983729 * color + 0.4329510) + 0.238081;
-            return a / b;
-        }
-
-
-        // tone mapping
-        vec3 toneMapACES_Hill(vec3 color)
-        {
-            color = ACESInputMat * color;
-
-            // Apply RRT and ODT
-            color = RRTAndODTFit(color);
-
-            color = ACESOutputMat * color;
-
-            // Clamp to [0, 1]
-            color = clamp(color, 0.0, 1.0);
-
-            return color;
-        }
-
-        // Khronos PBR neutral tone mapping
-        #ifdef TONEMAP_KHR_PBR_NEUTRAL
-        vec3 toneMap_KhronosPbrNeutral( vec3 color )
-        {
-            const float startCompression = 0.8 - 0.04;
-            const float desaturation = 0.15;
-
-            float x = min(color.r, min(color.g, color.b));
-            float offset = x < 0.08 ? x - 6.25 * x * x : 0.04;
-            color -= offset;
-
-            float peak = max(color.r, max(color.g, color.b));
-            if (peak < startCompression) return color;
-
-            const float d = 1. - startCompression;
-            float newPeak = 1. - d * d / (peak + d - startCompression);
-            color *= newPeak / peak;
-
-            float g = 1. - 1. / (desaturation * (peak - newPeak) + 1.);
-            return mix(color, newPeak * vec3(1, 1, 1), g);
-        }
-        #endif
-
-        vec3 toneMap(vec3 color)
-        {
-            color *= u_Exposure;
-
-        #ifdef TONEMAP_ACES_NARKOWICZ
-            color = toneMapACES_Narkowicz(color);
-        #endif
-
-        #ifdef TONEMAP_ACES_HILL
-            color = toneMapACES_Hill(color);
-        #endif
-
-        #ifdef TONEMAP_ACES_HILL_EXPOSURE_BOOST
-            // boost exposure as discussed in https://github.com/mrdoob/three.js/pull/19621
-            // this factor is based on the exposure correction of Krzysztof Narkowicz in his
-            // implementation of ACES tone mapping
-            color /= 0.6;
-            color = toneMapACES_Hill(color);
-        #endif
-
-        #ifdef TONEMAP_KHR_PBR_NEUTRAL
-            color = toneMap_KhronosPbrNeutral(color);
-        #endif
-
-            return linearTosRGB(color);
-        }
-
-        )"
+        "tonemapping.glsl", "\n"
+            "\n"
+            "        uniform float u_Exposure;\n"
+            "\n"
+            "\n"
+            "        // const float STANDARD_GAMMA = 2.2; // Retained for reference - unused\n"
+            "\n"
+            "        const float GAMMA = " LV_GLTF_TONEMAP_GAMMA ";\n"
+            "        const float INV_GAMMA = 1.0 / GAMMA;\n"
+            "\n"
+            "\n"
+            "        // sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT\n"
+            "        const mat3 ACESInputMat = mat3\n"
+            "        (\n"
+            "            0.59719, 0.07600, 0.02840,\n"
+            "            0.35458, 0.90834, 0.13383,\n"
+            "            0.04823, 0.01566, 0.83777\n"
+            "        );\n"
+            "\n"
+            "\n"
+            "        // ODT_SAT => XYZ => D60_2_D65 => sRGB\n"
+            "        const mat3 ACESOutputMat = mat3\n"
+            "        (\n"
+            "            1.60475, -0.10208, -0.00327,\n"
+            "            -0.53108,  1.10813, -0.07276,\n"
+            "            -0.07367, -0.00605,  1.07602\n"
+            "        );\n"
+            "\n"
+            "\n"
+            "        // linear to sRGB approximation\n"
+            "        // see http://chilliant.blogspot.com/2012/08/srgb-approximations-for-hlsl.html\n"
+            "        vec3 linearTosRGB(vec3 color)\n"
+            "        {\n"
+            "            return pow(color, vec3(INV_GAMMA));\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        // sRGB to linear approximation\n"
+            "        // see http://chilliant.blogspot.com/2012/08/srgb-approximations-for-hlsl.html\n"
+            "        vec3 sRGBToLinear(vec3 srgbIn)\n"
+            "        {\n"
+            "            return vec3(pow(srgbIn.xyz, vec3(GAMMA)));\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        vec4 sRGBToLinear(vec4 srgbIn)\n"
+            "        {\n"
+            "            return vec4(sRGBToLinear(srgbIn.xyz), srgbIn.w);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        // ACES tone map (faster approximation)\n"
+            "        // see: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/\n"
+            "        vec3 toneMapACES_Narkowicz(vec3 color)\n"
+            "        {\n"
+            "            const float A = 2.51;\n"
+            "            const float B = 0.03;\n"
+            "            const float C = 2.43;\n"
+            "            const float D = 0.59;\n"
+            "            const float E = 0.14;\n"
+            "            return clamp((color * (A * color + B)) / (color * (C * color + D) + E), 0.0, 1.0);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        // ACES filmic tone map approximation\n"
+            "        // see https://github.com/TheRealMJP/BakingLab/blob/master/BakingLab/ACES.hlsl\n"
+            "        vec3 RRTAndODTFit(vec3 color)\n"
+            "        {\n"
+            "            vec3 a = color * (color + 0.0245786) - 0.000090537;\n"
+            "            vec3 b = color * (0.983729 * color + 0.4329510) + 0.238081;\n"
+            "            return a / b;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        // tone mapping\n"
+            "        vec3 toneMapACES_Hill(vec3 color)\n"
+            "        {\n"
+            "            color = ACESInputMat * color;\n"
+            "\n"
+            "            // Apply RRT and ODT\n"
+            "            color = RRTAndODTFit(color);\n"
+            "\n"
+            "            color = ACESOutputMat * color;\n"
+            "\n"
+            "            // Clamp to [0, 1]\n"
+            "            color = clamp(color, 0.0, 1.0);\n"
+            "\n"
+            "            return color;\n"
+            "        }\n"
+            "\n"
+            "        // Khronos PBR neutral tone mapping\n"
+            "        #ifdef TONEMAP_KHR_PBR_NEUTRAL\n"
+            "        vec3 toneMap_KhronosPbrNeutral( vec3 color )\n"
+            "        {\n"
+            "            const float startCompression = 0.8 - 0.04;\n"
+            "            const float desaturation = 0.15;\n"
+            "\n"
+            "            float x = min(color.r, min(color.g, color.b));\n"
+            "            float offset = x < 0.08 ? x - 6.25 * x * x : 0.04;\n"
+            "            color -= offset;\n"
+            "\n"
+            "            float peak = max(color.r, max(color.g, color.b));\n"
+            "            if (peak < startCompression) return color;\n"
+            "\n"
+            "            const float d = 1. - startCompression;\n"
+            "            float newPeak = 1. - d * d / (peak + d - startCompression);\n"
+            "            color *= newPeak / peak;\n"
+            "\n"
+            "            float g = 1. - 1. / (desaturation * (peak - newPeak) + 1.);\n"
+            "            return mix(color, newPeak * vec3(1, 1, 1), g);\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "        vec3 toneMap(vec3 color)\n"
+            "        {\n"
+            "            color *= u_Exposure;\n"
+            "\n"
+            "        #ifdef TONEMAP_ACES_NARKOWICZ\n"
+            "            color = toneMapACES_Narkowicz(color);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef TONEMAP_ACES_HILL\n"
+            "            color = toneMapACES_Hill(color);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef TONEMAP_ACES_HILL_EXPOSURE_BOOST\n"
+            "            // boost exposure as discussed in https://github.com/mrdoob/three.js/pull/19621\n"
+            "            // this factor is based on the exposure correction of Krzysztof Narkowicz in his\n"
+            "            // implementation of ACES tone mapping\n"
+            "            color /= 0.6;\n"
+            "            color = toneMapACES_Hill(color);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef TONEMAP_KHR_PBR_NEUTRAL\n"
+            "            color = toneMap_KhronosPbrNeutral(color);\n"
+            "        #endif\n"
+            "\n"
+            "            return linearTosRGB(color);\n"
+            "        }\n"
+            "\n"
+            "        "
     },
     {
-        "textures1.glsl", R"(
-
-        // IBL
-
-        uniform int u_MipCount;
-        uniform samplerCube u_LambertianEnvSampler;
-        uniform samplerCube u_GGXEnvSampler;
-        uniform sampler2D u_GGXLUT;
-        uniform samplerCube u_CharlieEnvSampler;
-        uniform sampler2D u_CharlieLUT;
-        uniform sampler2D u_SheenELUT;
-        uniform mat3 u_EnvRotation;
-
-
-        // General Material
-
-
-        uniform sampler2D u_NormalSampler;
-        uniform float u_NormalScale;
-        uniform int u_NormalUVSet;
-        uniform mat3 u_NormalUVTransform;
-
-        uniform vec3 u_EmissiveFactor;
-        uniform sampler2D u_EmissiveSampler;
-        uniform int u_EmissiveUVSet;
-        uniform mat3 u_EmissiveUVTransform;
-
-        uniform sampler2D u_OcclusionSampler;
-        uniform int u_OcclusionUVSet;
-        uniform float u_OcclusionStrength;
-        uniform mat3 u_OcclusionUVTransform;
-
-
-        in vec2 v_texcoord_0;
-        in vec2 v_texcoord_1;
-
-
-        vec2 getNormalUV()
-        {
-            vec3 uv = vec3(u_NormalUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-
-        #ifdef HAS_NORMAL_UV_TRANSFORM
-            uv = u_NormalUVTransform * uv;
-        #endif
-
-            return uv.xy;
-        }
-
-
-        vec2 getEmissiveUV()
-        {
-            vec3 uv = vec3(u_EmissiveUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-
-        #ifdef HAS_EMISSIVE_UV_TRANSFORM
-            uv = u_EmissiveUVTransform * uv;
-        #endif
-
-            return uv.xy;
-        }
-
-
-        vec2 getOcclusionUV()
-        {
-            vec3 uv = vec3(u_OcclusionUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-
-        #ifdef HAS_OCCLUSION_UV_TRANSFORM
-            uv = u_OcclusionUVTransform * uv;
-        #endif
-
-            return uv.xy;
-        }
-
-
-        // MK TEMP - Added special optimized handling for unlit materials
-        #ifdef MATERIAL_UNLIT
-            uniform sampler2D u_BaseColorSampler;
-            uniform int u_BaseColorUVSet;
-            uniform mat3 u_BaseColorUVTransform;
-            
-            vec2 getBaseColorUV()
-            {
-                vec3 uv = vec3(u_BaseColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-
-            #ifdef HAS_BASECOLOR_UV_TRANSFORM
-                uv = u_BaseColorUVTransform * uv;
-            #endif
-
-                return uv.xy;
-            }
-        #else
-            // Metallic Roughness Material
-            #ifdef MATERIAL_METALLICROUGHNESS
-
-            uniform sampler2D u_BaseColorSampler;
-            uniform int u_BaseColorUVSet;
-            uniform mat3 u_BaseColorUVTransform;
-
-            uniform sampler2D u_MetallicRoughnessSampler;
-            uniform int u_MetallicRoughnessUVSet;
-            uniform mat3 u_MetallicRoughnessUVTransform;
-
-            vec2 getBaseColorUV()
-            {
-                vec3 uv = vec3(u_BaseColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-
-            #ifdef HAS_BASECOLOR_UV_TRANSFORM
-                uv = u_BaseColorUVTransform * uv;
-            #endif
-
-                return uv.xy;
-            }
-
-            vec2 getMetallicRoughnessUV()
-            {
-                vec3 uv = vec3(u_MetallicRoughnessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-
-            #ifdef HAS_METALLICROUGHNESS_UV_TRANSFORM
-                uv = u_MetallicRoughnessUVTransform * uv;
-            #endif
-
-                return uv.xy;
-            }
-
-            #endif
-        #endif
-
-    )"
+        "textures1.glsl", "\n"
+            "\n"
+            "        // IBL\n"
+            "\n"
+            "        uniform int u_MipCount;\n"
+            "        uniform samplerCube u_LambertianEnvSampler;\n"
+            "        uniform samplerCube u_GGXEnvSampler;\n"
+            "        uniform sampler2D u_GGXLUT;\n"
+            "        uniform samplerCube u_CharlieEnvSampler;\n"
+            "        uniform sampler2D u_CharlieLUT;\n"
+            "        uniform sampler2D u_SheenELUT;\n"
+            "        uniform mat3 u_EnvRotation;\n"
+            "\n"
+            "\n"
+            "        // General Material\n"
+            "\n"
+            "\n"
+            "        uniform sampler2D u_NormalSampler;\n"
+            "        uniform float u_NormalScale;\n"
+            "        uniform int u_NormalUVSet;\n"
+            "        uniform mat3 u_NormalUVTransform;\n"
+            "\n"
+            "        uniform vec3 u_EmissiveFactor;\n"
+            "        uniform sampler2D u_EmissiveSampler;\n"
+            "        uniform int u_EmissiveUVSet;\n"
+            "        uniform mat3 u_EmissiveUVTransform;\n"
+            "\n"
+            "        uniform sampler2D u_OcclusionSampler;\n"
+            "        uniform int u_OcclusionUVSet;\n"
+            "        uniform float u_OcclusionStrength;\n"
+            "        uniform mat3 u_OcclusionUVTransform;\n"
+            "\n"
+            "\n"
+            "        in vec2 v_texcoord_0;\n"
+            "        in vec2 v_texcoord_1;\n"
+            "\n"
+            "\n"
+            "        vec2 getNormalUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_NormalUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "\n"
+            "        #ifdef HAS_NORMAL_UV_TRANSFORM\n"
+            "            uv = u_NormalUVTransform * uv;\n"
+            "        #endif\n"
+            "\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        vec2 getEmissiveUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_EmissiveUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "\n"
+            "        #ifdef HAS_EMISSIVE_UV_TRANSFORM\n"
+            "            uv = u_EmissiveUVTransform * uv;\n"
+            "        #endif\n"
+            "\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        vec2 getOcclusionUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_OcclusionUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "\n"
+            "        #ifdef HAS_OCCLUSION_UV_TRANSFORM\n"
+            "            uv = u_OcclusionUVTransform * uv;\n"
+            "        #endif\n"
+            "\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        // MK TEMP - Added special optimized handling for unlit materials\n"
+            "        #ifdef MATERIAL_UNLIT\n"
+            "            uniform sampler2D u_BaseColorSampler;\n"
+            "            uniform int u_BaseColorUVSet;\n"
+            "            uniform mat3 u_BaseColorUVTransform;\n"
+            "            \n"
+            "            vec2 getBaseColorUV()\n"
+            "            {\n"
+            "                vec3 uv = vec3(u_BaseColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "\n"
+            "            #ifdef HAS_BASECOLOR_UV_TRANSFORM\n"
+            "                uv = u_BaseColorUVTransform * uv;\n"
+            "            #endif\n"
+            "\n"
+            "                return uv.xy;\n"
+            "            }\n"
+            "        #else\n"
+            "            // Metallic Roughness Material\n"
+            "            #ifdef MATERIAL_METALLICROUGHNESS\n"
+            "\n"
+            "            uniform sampler2D u_BaseColorSampler;\n"
+            "            uniform int u_BaseColorUVSet;\n"
+            "            uniform mat3 u_BaseColorUVTransform;\n"
+            "\n"
+            "            uniform sampler2D u_MetallicRoughnessSampler;\n"
+            "            uniform int u_MetallicRoughnessUVSet;\n"
+            "            uniform mat3 u_MetallicRoughnessUVTransform;\n"
+            "\n"
+            "            vec2 getBaseColorUV()\n"
+            "            {\n"
+            "                vec3 uv = vec3(u_BaseColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "\n"
+            "            #ifdef HAS_BASECOLOR_UV_TRANSFORM\n"
+            "                uv = u_BaseColorUVTransform * uv;\n"
+            "            #endif\n"
+            "\n"
+            "                return uv.xy;\n"
+            "            }\n"
+            "\n"
+            "            vec2 getMetallicRoughnessUV()\n"
+            "            {\n"
+            "                vec3 uv = vec3(u_MetallicRoughnessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "\n"
+            "            #ifdef HAS_METALLICROUGHNESS_UV_TRANSFORM\n"
+            "                uv = u_MetallicRoughnessUVTransform * uv;\n"
+            "            #endif\n"
+            "\n"
+            "                return uv.xy;\n"
+            "            }\n"
+            "\n"
+            "            #endif\n"
+            "        #endif\n"
+            "\n"
+            "    "
     },
     {
-        "textures2.glsl", R"(
-        // Specular Glossiness Material
-
-
-        #ifdef MATERIAL_SPECULARGLOSSINESS
-
-        uniform sampler2D u_DiffuseSampler;
-        uniform int u_DiffuseUVSet;
-        uniform mat3 u_DiffuseUVTransform;
-
-        uniform sampler2D u_SpecularGlossinessSampler;
-        uniform int u_SpecularGlossinessUVSet;
-        uniform mat3 u_SpecularGlossinessUVTransform;
-
-
-        vec2 getSpecularGlossinessUV()
-        {
-            vec3 uv = vec3(u_SpecularGlossinessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-
-        #ifdef HAS_SPECULARGLOSSINESS_UV_TRANSFORM
-            uv = u_SpecularGlossinessUVTransform * uv;
-        #endif
-
-            return uv.xy;
-        }
-
-        vec2 getDiffuseUV()
-        {
-            vec3 uv = vec3(u_DiffuseUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-
-        #ifdef HAS_DIFFUSE_UV_TRANSFORM
-            uv = u_DiffuseUVTransform * uv;
-        #endif
-
-            return uv.xy;
-        }
-
-        #endif
-
-
-        // Clearcoat Material
-
-
-        #ifdef MATERIAL_CLEARCOAT
-
-        uniform sampler2D u_ClearcoatSampler;
-        uniform int u_ClearcoatUVSet;
-        uniform mat3 u_ClearcoatUVTransform;
-
-        uniform sampler2D u_ClearcoatRoughnessSampler;
-        uniform int u_ClearcoatRoughnessUVSet;
-        uniform mat3 u_ClearcoatRoughnessUVTransform;
-
-        uniform sampler2D u_ClearcoatNormalSampler;
-        uniform int u_ClearcoatNormalUVSet;
-        uniform mat3 u_ClearcoatNormalUVTransform;
-        uniform float u_ClearcoatNormalScale;
-
-
-        vec2 getClearcoatUV()
-        {
-            vec3 uv = vec3(u_ClearcoatUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_CLEARCOAT_UV_TRANSFORM
-            uv = u_ClearcoatUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        vec2 getClearcoatRoughnessUV()
-        {
-            vec3 uv = vec3(u_ClearcoatRoughnessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_CLEARCOATROUGHNESS_UV_TRANSFORM
-            uv = u_ClearcoatRoughnessUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        vec2 getClearcoatNormalUV()
-        {
-            vec3 uv = vec3(u_ClearcoatNormalUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_CLEARCOATNORMAL_UV_TRANSFORM
-            uv = u_ClearcoatNormalUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        #endif
-
-
-        // Sheen Material
-
-
-        #ifdef MATERIAL_SHEEN
-
-        uniform sampler2D u_SheenColorSampler;
-        uniform int u_SheenColorUVSet;
-        uniform mat3 u_SheenColorUVTransform;
-        uniform sampler2D u_SheenRoughnessSampler;
-        uniform int u_SheenRoughnessUVSet;
-        uniform mat3 u_SheenRoughnessUVTransform;
-
-    )"
+        "textures2.glsl", "\n"
+            "        // Specular Glossiness Material\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_SPECULARGLOSSINESS\n"
+            "\n"
+            "        uniform sampler2D u_DiffuseSampler;\n"
+            "        uniform int u_DiffuseUVSet;\n"
+            "        uniform mat3 u_DiffuseUVTransform;\n"
+            "\n"
+            "        uniform sampler2D u_SpecularGlossinessSampler;\n"
+            "        uniform int u_SpecularGlossinessUVSet;\n"
+            "        uniform mat3 u_SpecularGlossinessUVTransform;\n"
+            "\n"
+            "\n"
+            "        vec2 getSpecularGlossinessUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_SpecularGlossinessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "\n"
+            "        #ifdef HAS_SPECULARGLOSSINESS_UV_TRANSFORM\n"
+            "            uv = u_SpecularGlossinessUVTransform * uv;\n"
+            "        #endif\n"
+            "\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getDiffuseUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_DiffuseUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "\n"
+            "        #ifdef HAS_DIFFUSE_UV_TRANSFORM\n"
+            "            uv = u_DiffuseUVTransform * uv;\n"
+            "        #endif\n"
+            "\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        // Clearcoat Material\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_CLEARCOAT\n"
+            "\n"
+            "        uniform sampler2D u_ClearcoatSampler;\n"
+            "        uniform int u_ClearcoatUVSet;\n"
+            "        uniform mat3 u_ClearcoatUVTransform;\n"
+            "\n"
+            "        uniform sampler2D u_ClearcoatRoughnessSampler;\n"
+            "        uniform int u_ClearcoatRoughnessUVSet;\n"
+            "        uniform mat3 u_ClearcoatRoughnessUVTransform;\n"
+            "\n"
+            "        uniform sampler2D u_ClearcoatNormalSampler;\n"
+            "        uniform int u_ClearcoatNormalUVSet;\n"
+            "        uniform mat3 u_ClearcoatNormalUVTransform;\n"
+            "        uniform float u_ClearcoatNormalScale;\n"
+            "\n"
+            "\n"
+            "        vec2 getClearcoatUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_ClearcoatUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_CLEARCOAT_UV_TRANSFORM\n"
+            "            uv = u_ClearcoatUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getClearcoatRoughnessUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_ClearcoatRoughnessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_CLEARCOATROUGHNESS_UV_TRANSFORM\n"
+            "            uv = u_ClearcoatRoughnessUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getClearcoatNormalUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_ClearcoatNormalUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_CLEARCOATNORMAL_UV_TRANSFORM\n"
+            "            uv = u_ClearcoatNormalUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        // Sheen Material\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_SHEEN\n"
+            "\n"
+            "        uniform sampler2D u_SheenColorSampler;\n"
+            "        uniform int u_SheenColorUVSet;\n"
+            "        uniform mat3 u_SheenColorUVTransform;\n"
+            "        uniform sampler2D u_SheenRoughnessSampler;\n"
+            "        uniform int u_SheenRoughnessUVSet;\n"
+            "        uniform mat3 u_SheenRoughnessUVTransform;\n"
+            "\n"
+            "    "
     },
     {
-        "textures3.glsl", R"(
-        vec2 getSheenColorUV()
-        {
-            vec3 uv = vec3(u_SheenColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_SHEENCOLOR_UV_TRANSFORM
-            uv = u_SheenColorUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        vec2 getSheenRoughnessUV()
-        {
-            vec3 uv = vec3(u_SheenRoughnessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_SHEENROUGHNESS_UV_TRANSFORM
-            uv = u_SheenRoughnessUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        #endif
-
-
-        // Specular Material
-
-
-        #ifdef MATERIAL_SPECULAR
-
-        uniform sampler2D u_SpecularSampler;
-        uniform int u_SpecularUVSet;
-        uniform mat3 u_SpecularUVTransform;
-        uniform sampler2D u_SpecularColorSampler;
-        uniform int u_SpecularColorUVSet;
-        uniform mat3 u_SpecularColorUVTransform;
-
-
-        vec2 getSpecularUV()
-        {
-            vec3 uv = vec3(u_SpecularUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_SPECULAR_UV_TRANSFORM
-            uv = u_SpecularUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        vec2 getSpecularColorUV()
-        {
-            vec3 uv = vec3(u_SpecularColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_SPECULARCOLOR_UV_TRANSFORM
-            uv = u_SpecularColorUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        #endif
-
-
-        // Transmission Material
-
-
-        #ifdef MATERIAL_TRANSMISSION
-
-        uniform sampler2D u_TransmissionSampler;
-        uniform int u_TransmissionUVSet;
-        uniform mat3 u_TransmissionUVTransform;
-        uniform sampler2D u_TransmissionFramebufferSampler;
-        uniform ivec2 u_TransmissionFramebufferSize;
-
-
-        vec2 getTransmissionUV()
-        {
-            vec3 uv = vec3(u_TransmissionUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_TRANSMISSION_UV_TRANSFORM
-            uv = u_TransmissionUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        #endif
-
-
-        // Volume Material
-
-
-        #ifdef MATERIAL_VOLUME
-
-        uniform sampler2D u_ThicknessSampler;
-        uniform int u_ThicknessUVSet;
-        uniform mat3 u_ThicknessUVTransform;
-
-
-    )"
+        "textures3.glsl", "\n"
+            "        vec2 getSheenColorUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_SheenColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_SHEENCOLOR_UV_TRANSFORM\n"
+            "            uv = u_SheenColorUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getSheenRoughnessUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_SheenRoughnessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_SHEENROUGHNESS_UV_TRANSFORM\n"
+            "            uv = u_SheenRoughnessUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        // Specular Material\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_SPECULAR\n"
+            "\n"
+            "        uniform sampler2D u_SpecularSampler;\n"
+            "        uniform int u_SpecularUVSet;\n"
+            "        uniform mat3 u_SpecularUVTransform;\n"
+            "        uniform sampler2D u_SpecularColorSampler;\n"
+            "        uniform int u_SpecularColorUVSet;\n"
+            "        uniform mat3 u_SpecularColorUVTransform;\n"
+            "\n"
+            "\n"
+            "        vec2 getSpecularUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_SpecularUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_SPECULAR_UV_TRANSFORM\n"
+            "            uv = u_SpecularUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getSpecularColorUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_SpecularColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_SPECULARCOLOR_UV_TRANSFORM\n"
+            "            uv = u_SpecularColorUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        // Transmission Material\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_TRANSMISSION\n"
+            "\n"
+            "        uniform sampler2D u_TransmissionSampler;\n"
+            "        uniform int u_TransmissionUVSet;\n"
+            "        uniform mat3 u_TransmissionUVTransform;\n"
+            "        uniform sampler2D u_TransmissionFramebufferSampler;\n"
+            "        uniform ivec2 u_TransmissionFramebufferSize;\n"
+            "\n"
+            "\n"
+            "        vec2 getTransmissionUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_TransmissionUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_TRANSMISSION_UV_TRANSFORM\n"
+            "            uv = u_TransmissionUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        // Volume Material\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_VOLUME\n"
+            "\n"
+            "        uniform sampler2D u_ThicknessSampler;\n"
+            "        uniform int u_ThicknessUVSet;\n"
+            "        uniform mat3 u_ThicknessUVTransform;\n"
+            "\n"
+            "\n"
+            "    "
     },
     {
-        "textures4.glsl", R"(
-        vec2 getThicknessUV()
-        {
-            vec3 uv = vec3(u_ThicknessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_THICKNESS_UV_TRANSFORM
-            uv = u_ThicknessUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        #endif
-
-
-        // Iridescence
-
-
-        #ifdef MATERIAL_IRIDESCENCE
-
-        uniform sampler2D u_IridescenceSampler;
-        uniform int u_IridescenceUVSet;
-        uniform mat3 u_IridescenceUVTransform;
-
-        uniform sampler2D u_IridescenceThicknessSampler;
-        uniform int u_IridescenceThicknessUVSet;
-        uniform mat3 u_IridescenceThicknessUVTransform;
-
-
-        vec2 getIridescenceUV()
-        {
-            vec3 uv = vec3(u_IridescenceUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_IRIDESCENCE_UV_TRANSFORM
-            uv = u_IridescenceUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        vec2 getIridescenceThicknessUV()
-        {
-            vec3 uv = vec3(u_IridescenceThicknessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_IRIDESCENCETHICKNESS_UV_TRANSFORM
-            uv = u_IridescenceThicknessUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        #endif
-
-
-        // Diffuse Transmission
-
-        #ifdef MATERIAL_DIFFUSE_TRANSMISSION
-
-        uniform sampler2D u_DiffuseTransmissionSampler;
-        uniform int u_DiffuseTransmissionUVSet;
-        uniform mat3 u_DiffuseTransmissionUVTransform;
-
-        uniform sampler2D u_DiffuseTransmissionColorSampler;
-        uniform int u_DiffuseTransmissionColorUVSet;
-        uniform mat3 u_DiffuseTransmissionColorUVTransform;
-
-
-        vec2 getDiffuseTransmissionUV()
-        {
-            vec3 uv = vec3(u_DiffuseTransmissionUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_DIFFUSETRANSMISSION_UV_TRANSFORM
-            uv = u_DiffuseTransmissionUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        vec2 getDiffuseTransmissionColorUV()
-        {
-            vec3 uv = vec3(u_DiffuseTransmissionColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_DIFFUSETRANSMISSIONCOLOR_UV_TRANSFORM
-            uv = u_DiffuseTransmissionColorUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        #endif
-
-        // Anisotropy
-
-        #ifdef MATERIAL_ANISOTROPY
-
-        uniform sampler2D u_AnisotropySampler;
-        uniform int u_AnisotropyUVSet;
-        uniform mat3 u_AnisotropyUVTransform;
-
-        vec2 getAnisotropyUV()
-        {
-            vec3 uv = vec3(u_AnisotropyUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);
-        #ifdef HAS_ANISOTROPY_UV_TRANSFORM
-            uv = u_AnisotropyUVTransform * uv;
-        #endif
-            return uv.xy;
-        }
-
-        #endif
-
-    )"
+        "textures4.glsl", "\n"
+            "        vec2 getThicknessUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_ThicknessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_THICKNESS_UV_TRANSFORM\n"
+            "            uv = u_ThicknessUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        // Iridescence\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_IRIDESCENCE\n"
+            "\n"
+            "        uniform sampler2D u_IridescenceSampler;\n"
+            "        uniform int u_IridescenceUVSet;\n"
+            "        uniform mat3 u_IridescenceUVTransform;\n"
+            "\n"
+            "        uniform sampler2D u_IridescenceThicknessSampler;\n"
+            "        uniform int u_IridescenceThicknessUVSet;\n"
+            "        uniform mat3 u_IridescenceThicknessUVTransform;\n"
+            "\n"
+            "\n"
+            "        vec2 getIridescenceUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_IridescenceUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_IRIDESCENCE_UV_TRANSFORM\n"
+            "            uv = u_IridescenceUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getIridescenceThicknessUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_IridescenceThicknessUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_IRIDESCENCETHICKNESS_UV_TRANSFORM\n"
+            "            uv = u_IridescenceThicknessUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        // Diffuse Transmission\n"
+            "\n"
+            "        #ifdef MATERIAL_DIFFUSE_TRANSMISSION\n"
+            "\n"
+            "        uniform sampler2D u_DiffuseTransmissionSampler;\n"
+            "        uniform int u_DiffuseTransmissionUVSet;\n"
+            "        uniform mat3 u_DiffuseTransmissionUVTransform;\n"
+            "\n"
+            "        uniform sampler2D u_DiffuseTransmissionColorSampler;\n"
+            "        uniform int u_DiffuseTransmissionColorUVSet;\n"
+            "        uniform mat3 u_DiffuseTransmissionColorUVTransform;\n"
+            "\n"
+            "\n"
+            "        vec2 getDiffuseTransmissionUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_DiffuseTransmissionUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_DIFFUSETRANSMISSION_UV_TRANSFORM\n"
+            "            uv = u_DiffuseTransmissionUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getDiffuseTransmissionColorUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_DiffuseTransmissionColorUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_DIFFUSETRANSMISSIONCOLOR_UV_TRANSFORM\n"
+            "            uv = u_DiffuseTransmissionColorUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "        // Anisotropy\n"
+            "\n"
+            "        #ifdef MATERIAL_ANISOTROPY\n"
+            "\n"
+            "        uniform sampler2D u_AnisotropySampler;\n"
+            "        uniform int u_AnisotropyUVSet;\n"
+            "        uniform mat3 u_AnisotropyUVTransform;\n"
+            "\n"
+            "        vec2 getAnisotropyUV()\n"
+            "        {\n"
+            "            vec3 uv = vec3(u_AnisotropyUVSet < 1 ? v_texcoord_0 : v_texcoord_1, 1.0);\n"
+            "        #ifdef HAS_ANISOTROPY_UV_TRANSFORM\n"
+            "            uv = u_AnisotropyUVTransform * uv;\n"
+            "        #endif\n"
+            "            return uv.xy;\n"
+            "        }\n"
+            "\n"
+            "        #endif\n"
+            "\n"
+            "    "
     },
     {
-        "functions.glsl", R"(
-
-        const float M_PI = 3.141592653589793;
-
-
-        in vec3 v_Position;
-
-
-        #ifdef HAS_NORMAL_VEC3
-        #ifdef HAS_TANGENT_VEC4
-        in mat3 v_TBN;
-        #else
-        in vec3 v_Normal;
-        #endif
-        #endif
-
-
-        #ifdef HAS_COLOR_0_VEC3
-        in vec3 v_Color;
-        #endif
-        #ifdef HAS_COLOR_0_VEC4
-        in vec4 v_Color;
-        #endif
-
-
-        vec4 getVertexColor()
-        {
-        vec4 color = vec4(1.0);
-
-        #ifdef HAS_COLOR_0_VEC3
-            color.rgb = v_Color.rgb;
-        #endif
-        #ifdef HAS_COLOR_0_VEC4
-            color = v_Color;
-        #endif
-
-        return color;
-        }
-
-
-        struct NormalInfo {
-            vec3 ng;   // Geometry normal
-            vec3 t;    // Geometry tangent
-            vec3 b;    // Geometry bitangent
-            vec3 n;    // Shading normal
-            vec3 ntex; // Normal from texture, scaling is accounted for.
-        };
-
-
-        float clampedDot(vec3 x, vec3 y)
-        {
-            return clamp(dot(x, y), 0.0, 1.0);
-        }
-
-
-        float max3(vec3 v)
-        {
-            return max(max(v.x, v.y), v.z);
-        }
-
-
-        float sq(float t)
-        {
-            return t * t;
-        }
-
-        vec2 sq(vec2 t)
-        {
-            return t * t;
-        }
-
-        vec3 sq(vec3 t)
-        {
-            return t * t;
-        }
-
-        vec4 sq(vec4 t)
-        {
-            return t * t;
-        }
-
-
-        float applyIorToRoughness(float roughness, float ior)
-        {
-            // Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
-            // an IOR of 1.5 results in the default amount of microfacet refraction.
-            return roughness * clamp(ior * 2.0 - 2.0, 0.0, 1.0);
-        }
-
-        vec3 rgb_mix(vec3 base, vec3 layer, vec3 rgb_alpha)
-        {
-            float rgb_alpha_max = max(rgb_alpha.r, max(rgb_alpha.g, rgb_alpha.b));
-            return (1.0 - rgb_alpha_max) * base + rgb_alpha * layer;
-        }
-
-
-    )"
+        "functions.glsl", "\n"
+            "\n"
+            "        const float M_PI = 3.141592653589793;\n"
+            "\n"
+            "\n"
+            "        in vec3 v_Position;\n"
+            "\n"
+            "\n"
+            "        #ifdef HAS_NORMAL_VEC3\n"
+            "        #ifdef HAS_TANGENT_VEC4\n"
+            "        in mat3 v_TBN;\n"
+            "        #else\n"
+            "        in vec3 v_Normal;\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef HAS_COLOR_0_VEC3\n"
+            "        in vec3 v_Color;\n"
+            "        #endif\n"
+            "        #ifdef HAS_COLOR_0_VEC4\n"
+            "        in vec4 v_Color;\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        vec4 getVertexColor()\n"
+            "        {\n"
+            "        vec4 color = vec4(1.0);\n"
+            "\n"
+            "        #ifdef HAS_COLOR_0_VEC3\n"
+            "            color.rgb = v_Color.rgb;\n"
+            "        #endif\n"
+            "        #ifdef HAS_COLOR_0_VEC4\n"
+            "            color = v_Color;\n"
+            "        #endif\n"
+            "\n"
+            "        return color;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        struct NormalInfo {\n"
+            "            vec3 ng;   // Geometry normal\n"
+            "            vec3 t;    // Geometry tangent\n"
+            "            vec3 b;    // Geometry bitangent\n"
+            "            vec3 n;    // Shading normal\n"
+            "            vec3 ntex; // Normal from texture, scaling is accounted for.\n"
+            "        };\n"
+            "\n"
+            "\n"
+            "        float clampedDot(vec3 x, vec3 y)\n"
+            "        {\n"
+            "            return clamp(dot(x, y), 0.0, 1.0);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        float max3(vec3 v)\n"
+            "        {\n"
+            "            return max(max(v.x, v.y), v.z);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        float sq(float t)\n"
+            "        {\n"
+            "            return t * t;\n"
+            "        }\n"
+            "\n"
+            "        vec2 sq(vec2 t)\n"
+            "        {\n"
+            "            return t * t;\n"
+            "        }\n"
+            "\n"
+            "        vec3 sq(vec3 t)\n"
+            "        {\n"
+            "            return t * t;\n"
+            "        }\n"
+            "\n"
+            "        vec4 sq(vec4 t)\n"
+            "        {\n"
+            "            return t * t;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        float applyIorToRoughness(float roughness, float ior)\n"
+            "        {\n"
+            "            // Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and\n"
+            "            // an IOR of 1.5 results in the default amount of microfacet refraction.\n"
+            "            return roughness * clamp(ior * 2.0 - 2.0, 0.0, 1.0);\n"
+            "        }\n"
+            "\n"
+            "        vec3 rgb_mix(vec3 base, vec3 layer, vec3 rgb_alpha)\n"
+            "        {\n"
+            "            float rgb_alpha_max = max(rgb_alpha.r, max(rgb_alpha.g, rgb_alpha.b));\n"
+            "            return (1.0 - rgb_alpha_max) * base + rgb_alpha * layer;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "    "
     },
     {
-        "brdf1.glsl", R"(
-        //
-        // Fresnel
-        //
-        // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-        // https://github.com/wdas/brdf/tree/master/src/brdfs
-        // https://google.github.io/filament/Filament.md.html
-        //
-
-        // The following equation models the Fresnel reflectance term of the spec equation (aka F())
-        // Implementation of fresnel from [4], Equation 15
-        vec3 F_Schlick(vec3 f0, vec3 f90, float VdotH) 
-        {
-            return f0 + (f90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
-        }
-
-        float F_Schlick(float f0, float f90, float VdotH)
-        {
-            float x = clamp(1.0 - VdotH, 0.0, 1.0);
-            float x2 = x * x;
-            float x5 = x * x2 * x2;
-            return f0 + (f90 - f0) * x5;
-        }
-
-        float F_Schlick(float f0, float VdotH)
-        {
-            float f90 = 1.0; //clamp(50.0 * f0, 0.0, 1.0);
-            return F_Schlick(f0, f90, VdotH);
-        }
-
-        vec3 F_Schlick(vec3 f0, float f90, float VdotH)
-        {
-            float x = clamp(1.0 - VdotH, 0.0, 1.0);
-            float x2 = x * x;
-            float x5 = x * x2 * x2;
-            return f0 + (f90 - f0) * x5;
-        }
-
-        vec3 F_Schlick(vec3 f0, float VdotH)
-        {
-            float f90 = 1.0; //clamp(dot(f0, vec3(50.0 * 0.33)), 0.0, 1.0);
-            return F_Schlick(f0, f90, VdotH);
-        }
-
-        vec3 Schlick_to_F0(vec3 f, vec3 f90, float VdotH) {
-            float x = clamp(1.0 - VdotH, 0.0, 1.0);
-            float x2 = x * x;
-            float x5 = clamp(x * x2 * x2, 0.0, 0.9999);
-
-            return (f - f90 * x5) / (1.0 - x5);
-        }
-
-        float Schlick_to_F0(float f, float f90, float VdotH) {
-            float x = clamp(1.0 - VdotH, 0.0, 1.0);
-            float x2 = x * x;
-            float x5 = clamp(x * x2 * x2, 0.0, 0.9999);
-
-            return (f - f90 * x5) / (1.0 - x5);
-        }
-
-        vec3 Schlick_to_F0(vec3 f, float VdotH) {
-            return Schlick_to_F0(f, vec3(1.0), VdotH);
-        }
-
-        float Schlick_to_F0(float f, float VdotH) {
-            return Schlick_to_F0(f, 1.0, VdotH);
-        }
-
-    )"
+        "brdf1.glsl", "\n"
+            "        //\n"
+            "        // Fresnel\n"
+            "        //\n"
+            "        // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html\n"
+            "        // https://github.com/wdas/brdf/tree/master/src/brdfs\n"
+            "        // https://google.github.io/filament/Filament.md.html\n"
+            "        //\n"
+            "\n"
+            "        // The following equation models the Fresnel reflectance term of the spec equation (aka F())\n"
+            "        // Implementation of fresnel from [4], Equation 15\n"
+            "        vec3 F_Schlick(vec3 f0, vec3 f90, float VdotH) \n"
+            "        {\n"
+            "            return f0 + (f90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);\n"
+            "        }\n"
+            "\n"
+            "        float F_Schlick(float f0, float f90, float VdotH)\n"
+            "        {\n"
+            "            float x = clamp(1.0 - VdotH, 0.0, 1.0);\n"
+            "            float x2 = x * x;\n"
+            "            float x5 = x * x2 * x2;\n"
+            "            return f0 + (f90 - f0) * x5;\n"
+            "        }\n"
+            "\n"
+            "        float F_Schlick(float f0, float VdotH)\n"
+            "        {\n"
+            "            float f90 = 1.0; //clamp(50.0 * f0, 0.0, 1.0);\n"
+            "            return F_Schlick(f0, f90, VdotH);\n"
+            "        }\n"
+            "\n"
+            "        vec3 F_Schlick(vec3 f0, float f90, float VdotH)\n"
+            "        {\n"
+            "            float x = clamp(1.0 - VdotH, 0.0, 1.0);\n"
+            "            float x2 = x * x;\n"
+            "            float x5 = x * x2 * x2;\n"
+            "            return f0 + (f90 - f0) * x5;\n"
+            "        }\n"
+            "\n"
+            "        vec3 F_Schlick(vec3 f0, float VdotH)\n"
+            "        {\n"
+            "            float f90 = 1.0; //clamp(dot(f0, vec3(50.0 * 0.33)), 0.0, 1.0);\n"
+            "            return F_Schlick(f0, f90, VdotH);\n"
+            "        }\n"
+            "\n"
+            "        vec3 Schlick_to_F0(vec3 f, vec3 f90, float VdotH) {\n"
+            "            float x = clamp(1.0 - VdotH, 0.0, 1.0);\n"
+            "            float x2 = x * x;\n"
+            "            float x5 = clamp(x * x2 * x2, 0.0, 0.9999);\n"
+            "\n"
+            "            return (f - f90 * x5) / (1.0 - x5);\n"
+            "        }\n"
+            "\n"
+            "        float Schlick_to_F0(float f, float f90, float VdotH) {\n"
+            "            float x = clamp(1.0 - VdotH, 0.0, 1.0);\n"
+            "            float x2 = x * x;\n"
+            "            float x5 = clamp(x * x2 * x2, 0.0, 0.9999);\n"
+            "\n"
+            "            return (f - f90 * x5) / (1.0 - x5);\n"
+            "        }\n"
+            "\n"
+            "        vec3 Schlick_to_F0(vec3 f, float VdotH) {\n"
+            "            return Schlick_to_F0(f, vec3(1.0), VdotH);\n"
+            "        }\n"
+            "\n"
+            "        float Schlick_to_F0(float f, float VdotH) {\n"
+            "            return Schlick_to_F0(f, 1.0, VdotH);\n"
+            "        }\n"
+            "\n"
+            "    "
     },
     {
-        "brdf2.glsl", R"(
-        // Smith Joint GGX
-        // Note: Vis = G / (4 * NdotL * NdotV)
-        // see Eric Heitz. 2014. Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs. Journal of Computer Graphics Techniques, 3
-        // see Real-Time Rendering. Page 331 to 336.
-        // see https://google.github.io/filament/Filament.md.html#materialsystem/specularbrdf/geometricshadowing(specularg)
-        float V_GGX(float NdotL, float NdotV, float alphaRoughness)
-        {
-            float alphaRoughnessSq = alphaRoughness * alphaRoughness;
-
-            float GGXV = NdotL * sqrt(NdotV * NdotV * (1.0 - alphaRoughnessSq) + alphaRoughnessSq);
-            float GGXL = NdotV * sqrt(NdotL * NdotL * (1.0 - alphaRoughnessSq) + alphaRoughnessSq);
-
-            float GGX = GGXV + GGXL;
-            if (GGX > 0.0)
-            {
-                return 0.5 / GGX;
-            }
-            return 0.0;
-        }
-
-
-        // The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())
-        // Implementation from "Average Irregularity Representation of a Roughened Surface for Ray Reflection" by T. S. Trowbridge, and K. P. Reitz
-        // Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.
-        float D_GGX(float NdotH, float alphaRoughness)
-        {
-            float alphaRoughnessSq = alphaRoughness * alphaRoughness;
-            float f = (NdotH * NdotH) * (alphaRoughnessSq - 1.0) + 1.0;
-            return alphaRoughnessSq / (M_PI * f * f);
-        }
-
-
-        float lambdaSheenNumericHelper(float x, float alphaG)
-        {
-            // The first four coefficients are packed into a vec4 so a single
-            // vectorized mix() replaces four scalar ones, instead of relying on
-            // the shader compiler to vectorize them.
-            vec4 mixA = vec4(21.5473, 3.82987, 0.19823, -1.97760);
-            vec4 mixB = vec4(25.3245, 3.32435, 0.16801, -1.27393);
-            float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);
-            vec4 abcd = mix(mixA, mixB, vec4(oneMinusAlphaSq));
-            float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);
-            return abcd.x / (1.0 + abcd.y * pow(x, abcd.z)) + abcd.w * x + e;
-        }
-
-
-        float lambdaSheen(float cosTheta, float alphaG)
-        {
-            if (abs(cosTheta) < 0.5)
-            {
-                return exp(lambdaSheenNumericHelper(cosTheta, alphaG));
-            }
-            else
-            {
-                return exp(2.0 * lambdaSheenNumericHelper(0.5, alphaG) - lambdaSheenNumericHelper(1.0 - cosTheta, alphaG));
-            }
-        }
-
-
-        float V_Sheen(float NdotL, float NdotV, float sheenRoughness)
-        {
-            sheenRoughness = max(sheenRoughness, 0.000001); //clamp (0,1]
-            float alphaG = sheenRoughness * sheenRoughness;
-
-            return clamp(1.0 / ((1.0 + lambdaSheen(NdotV, alphaG) + lambdaSheen(NdotL, alphaG)) *
-                (4.0 * NdotV * NdotL)), 0.0, 1.0);
-        }
-
-
-        //Sheen implementation-------------------------------------------------------------------------------------
-        // See  https://github.com/sebavan/glTF/tree/KHR_materials_sheen/extensions/2.0/Khronos/KHR_materials_sheen
-
-        // Estevez and Kulla http://www.aconty.com/pdf/s2017_pbs_imageworks_sheen.pdf
-        float D_Charlie(float sheenRoughness, float NdotH)
-        {
-            sheenRoughness = max(sheenRoughness, 0.000001); //clamp (0,1]
-            float alphaG = sheenRoughness * sheenRoughness;
-            float invR = 1.0 / alphaG;
-            float cos2h = NdotH * NdotH;
-            float sin2h = 1.0 - cos2h;
-            return (2.0 + invR) * pow(sin2h, invR * 0.5) / (2.0 * M_PI);
-        }
-    )"
+        "brdf2.glsl", "\n"
+            "        // Smith Joint GGX\n"
+            "        // Note: Vis = G / (4 * NdotL * NdotV)\n"
+            "        // see Eric Heitz. 2014. Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs. Journal of Computer Graphics Techniques, 3\n"
+            "        // see Real-Time Rendering. Page 331 to 336.\n"
+            "        // see https://google.github.io/filament/Filament.md.html#materialsystem/specularbrdf/geometricshadowing(specularg)\n"
+            "        float V_GGX(float NdotL, float NdotV, float alphaRoughness)\n"
+            "        {\n"
+            "            float alphaRoughnessSq = alphaRoughness * alphaRoughness;\n"
+            "\n"
+            "            float GGXV = NdotL * sqrt(NdotV * NdotV * (1.0 - alphaRoughnessSq) + alphaRoughnessSq);\n"
+            "            float GGXL = NdotV * sqrt(NdotL * NdotL * (1.0 - alphaRoughnessSq) + alphaRoughnessSq);\n"
+            "\n"
+            "            float GGX = GGXV + GGXL;\n"
+            "            if (GGX > 0.0)\n"
+            "            {\n"
+            "                return 0.5 / GGX;\n"
+            "            }\n"
+            "            return 0.0;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        // The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())\n"
+            "        // Implementation from \"Average Irregularity Representation of a Roughened Surface for Ray Reflection\" by T. S. Trowbridge, and K. P. Reitz\n"
+            "        // Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.\n"
+            "        float D_GGX(float NdotH, float alphaRoughness)\n"
+            "        {\n"
+            "            float alphaRoughnessSq = alphaRoughness * alphaRoughness;\n"
+            "            float f = (NdotH * NdotH) * (alphaRoughnessSq - 1.0) + 1.0;\n"
+            "            return alphaRoughnessSq / (M_PI * f * f);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        float lambdaSheenNumericHelper(float x, float alphaG)\n"
+            "        {\n"
+            "            // The first four coefficients are packed into a vec4 so a single\n"
+            "            // vectorized mix() replaces four scalar ones, instead of relying on\n"
+            "            // the shader compiler to vectorize them.\n"
+            "            vec4 mixA = vec4(21.5473, 3.82987, 0.19823, -1.97760);\n"
+            "            vec4 mixB = vec4(25.3245, 3.32435, 0.16801, -1.27393);\n"
+            "            float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);\n"
+            "            vec4 abcd = mix(mixA, mixB, vec4(oneMinusAlphaSq));\n"
+            "            float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);\n"
+            "            return abcd.x / (1.0 + abcd.y * pow(x, abcd.z)) + abcd.w * x + e;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        float lambdaSheen(float cosTheta, float alphaG)\n"
+            "        {\n"
+            "            if (abs(cosTheta) < 0.5)\n"
+            "            {\n"
+            "                return exp(lambdaSheenNumericHelper(cosTheta, alphaG));\n"
+            "            }\n"
+            "            else\n"
+            "            {\n"
+            "                return exp(2.0 * lambdaSheenNumericHelper(0.5, alphaG) - lambdaSheenNumericHelper(1.0 - cosTheta, alphaG));\n"
+            "            }\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        float V_Sheen(float NdotL, float NdotV, float sheenRoughness)\n"
+            "        {\n"
+            "            sheenRoughness = max(sheenRoughness, 0.000001); //clamp (0,1]\n"
+            "            float alphaG = sheenRoughness * sheenRoughness;\n"
+            "\n"
+            "            return clamp(1.0 / ((1.0 + lambdaSheen(NdotV, alphaG) + lambdaSheen(NdotL, alphaG)) *\n"
+            "                (4.0 * NdotV * NdotL)), 0.0, 1.0);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        //Sheen implementation-------------------------------------------------------------------------------------\n"
+            "        // See  https://github.com/sebavan/glTF/tree/KHR_materials_sheen/extensions/2.0/Khronos/KHR_materials_sheen\n"
+            "\n"
+            "        // Estevez and Kulla http://www.aconty.com/pdf/s2017_pbs_imageworks_sheen.pdf\n"
+            "        float D_Charlie(float sheenRoughness, float NdotH)\n"
+            "        {\n"
+            "            sheenRoughness = max(sheenRoughness, 0.000001); //clamp (0,1]\n"
+            "            float alphaG = sheenRoughness * sheenRoughness;\n"
+            "            float invR = 1.0 / alphaG;\n"
+            "            float cos2h = NdotH * NdotH;\n"
+            "            float sin2h = 1.0 - cos2h;\n"
+            "            return (2.0 + invR) * pow(sin2h, invR * 0.5) / (2.0 * M_PI);\n"
+            "        }\n"
+            "    "
     },
     {
-        "brdf3.glsl", R"(
-
-        //https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
-        vec3 BRDF_lambertian(vec3 diffuseColor)
-        {
-            // see https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/
-            return (diffuseColor / M_PI);
-        }
-
-        //  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
-        vec3 BRDF_specularGGX(float alphaRoughness, float NdotL, float NdotV, float NdotH)
-        {
-            float Vis = V_GGX(NdotL, NdotV, alphaRoughness);
-            float D = D_GGX(NdotH, alphaRoughness);
-
-            return vec3(Vis * D);
-        }
-
-
-        #ifdef MATERIAL_ANISOTROPY
-        // GGX Distribution Anisotropic (Same as Babylon.js)
-        // https://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf Addenda
-        float D_GGX_anisotropic(float NdotH, float TdotH, float BdotH, float anisotropy, float at, float ab)
-        {
-            float a2 = at * ab;
-            vec3 f = vec3(ab * TdotH, at * BdotH, a2 * NdotH);
-            float w2 = a2 / dot(f, f);
-            return a2 * w2 * w2 / M_PI;
-        }
-
-        // GGX Mask/Shadowing Anisotropic (Same as Babylon.js - smithVisibility_GGXCorrelated_Anisotropic)
-        // Heitz http://jcgt.org/published/0003/02/03/paper.pdf
-        float V_GGX_anisotropic(float NdotL, float NdotV, float BdotV, float TdotV, float TdotL, float BdotL, float at, float ab)
-        {
-            float GGXV = NdotL * length(vec3(at * TdotV, ab * BdotV, NdotV));
-            float GGXL = NdotV * length(vec3(at * TdotL, ab * BdotL, NdotL));
-            float v = 0.5 / (GGXV + GGXL);
-            return clamp(v, 0.0, 1.0);
-        }
-
-        vec3 BRDF_specularGGXAnisotropy(float alphaRoughness, float anisotropy, vec3 n, vec3 v, vec3 l, vec3 h, vec3 t, vec3 b)
-        {
-            // Roughness along the anisotropy bitangent is the material roughness, while the tangent roughness increases with anisotropy.
-            float at = mix(alphaRoughness, 1.0, anisotropy * anisotropy);
-            float ab = clamp(alphaRoughness, 0.001, 1.0);
-
-            float NdotL = clamp(dot(n, l), 0.0, 1.0);
-            float NdotH = clamp(dot(n, h), 0.001, 1.0);
-            float NdotV = dot(n, v);
-
-            float V = V_GGX_anisotropic(NdotL, NdotV, dot(b, v), dot(t, v), dot(t, l), dot(b, l), at, ab);
-            float D = D_GGX_anisotropic(NdotH, dot(t, h), dot(b, h), anisotropy, at, ab);
-
-            return vec3(V * D);
-        }
-        #endif
-
-
-        // f_sheen
-        vec3 BRDF_specularSheen(vec3 sheenColor, float sheenRoughness, float NdotL, float NdotV, float NdotH)
-        {
-            float sheenDistribution = D_Charlie(sheenRoughness, NdotH);
-            float sheenVisibility = V_Sheen(NdotL, NdotV, sheenRoughness);
-            return sheenColor * sheenDistribution * sheenVisibility;
-        }
-    )"
+        "brdf3.glsl", "\n"
+            "\n"
+            "        //https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB\n"
+            "        vec3 BRDF_lambertian(vec3 diffuseColor)\n"
+            "        {\n"
+            "            // see https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/\n"
+            "            return (diffuseColor / M_PI);\n"
+            "        }\n"
+            "\n"
+            "        //  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB\n"
+            "        vec3 BRDF_specularGGX(float alphaRoughness, float NdotL, float NdotV, float NdotH)\n"
+            "        {\n"
+            "            float Vis = V_GGX(NdotL, NdotV, alphaRoughness);\n"
+            "            float D = D_GGX(NdotH, alphaRoughness);\n"
+            "\n"
+            "            return vec3(Vis * D);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_ANISOTROPY\n"
+            "        // GGX Distribution Anisotropic (Same as Babylon.js)\n"
+            "        // https://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf Addenda\n"
+            "        float D_GGX_anisotropic(float NdotH, float TdotH, float BdotH, float anisotropy, float at, float ab)\n"
+            "        {\n"
+            "            float a2 = at * ab;\n"
+            "            vec3 f = vec3(ab * TdotH, at * BdotH, a2 * NdotH);\n"
+            "            float w2 = a2 / dot(f, f);\n"
+            "            return a2 * w2 * w2 / M_PI;\n"
+            "        }\n"
+            "\n"
+            "        // GGX Mask/Shadowing Anisotropic (Same as Babylon.js - smithVisibility_GGXCorrelated_Anisotropic)\n"
+            "        // Heitz http://jcgt.org/published/0003/02/03/paper.pdf\n"
+            "        float V_GGX_anisotropic(float NdotL, float NdotV, float BdotV, float TdotV, float TdotL, float BdotL, float at, float ab)\n"
+            "        {\n"
+            "            float GGXV = NdotL * length(vec3(at * TdotV, ab * BdotV, NdotV));\n"
+            "            float GGXL = NdotV * length(vec3(at * TdotL, ab * BdotL, NdotL));\n"
+            "            float v = 0.5 / (GGXV + GGXL);\n"
+            "            return clamp(v, 0.0, 1.0);\n"
+            "        }\n"
+            "\n"
+            "        vec3 BRDF_specularGGXAnisotropy(float alphaRoughness, float anisotropy, vec3 n, vec3 v, vec3 l, vec3 h, vec3 t, vec3 b)\n"
+            "        {\n"
+            "            // Roughness along the anisotropy bitangent is the material roughness, while the tangent roughness increases with anisotropy.\n"
+            "            float at = mix(alphaRoughness, 1.0, anisotropy * anisotropy);\n"
+            "            float ab = clamp(alphaRoughness, 0.001, 1.0);\n"
+            "\n"
+            "            float NdotL = clamp(dot(n, l), 0.0, 1.0);\n"
+            "            float NdotH = clamp(dot(n, h), 0.001, 1.0);\n"
+            "            float NdotV = dot(n, v);\n"
+            "\n"
+            "            float V = V_GGX_anisotropic(NdotL, NdotV, dot(b, v), dot(t, v), dot(t, l), dot(b, l), at, ab);\n"
+            "            float D = D_GGX_anisotropic(NdotH, dot(t, h), dot(b, h), anisotropy, at, ab);\n"
+            "\n"
+            "            return vec3(V * D);\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        // f_sheen\n"
+            "        vec3 BRDF_specularSheen(vec3 sheenColor, float sheenRoughness, float NdotL, float NdotV, float NdotH)\n"
+            "        {\n"
+            "            float sheenDistribution = D_Charlie(sheenRoughness, NdotH);\n"
+            "            float sheenVisibility = V_Sheen(NdotL, NdotV, sheenRoughness);\n"
+            "            return sheenColor * sheenDistribution * sheenVisibility;\n"
+            "        }\n"
+            "    "
     },
     {
-        "punctual1.glsl", R"(
-        struct Light
-        {
-            vec3 direction;
-            float range;
-
-            vec3 color;
-            float intensity;
-
-            vec3 position;
-            float innerConeCos;
-
-            float outerConeCos;
-            int type;
-        };
-
-        const int LightType_Directional = 0;
-        const int LightType_Point = 1;
-        const int LightType_Spot = 2;
-
-
-        #ifdef USE_PUNCTUAL
-        //Light u_Lights[LIGHT_COUNT + 1]; //Array [0] is not allowed
-        uniform Light u_Lights[LIGHT_COUNT + 1]; //Array [0] is not allowed
-        #endif
-
-        float getRangeAttenuation(float range, float distance)
-        {
-            if (range <= 0.0)
-            {
-                // negative range means unlimited
-                return 1.0 / pow(distance, 2.0);
-            }
-            return max(min(1.0 - pow(distance / range, 4.0), 1.0), 0.0) / pow(distance, 2.0);
-        }
-        float getSpotAttenuation(vec3 pointToLight, vec3 spotDirection, float outerConeCos, float innerConeCos)
-        {
-            float actualCos = dot(normalize(spotDirection), normalize(-pointToLight));
-            if (actualCos > outerConeCos)
-            {
-                if (actualCos < innerConeCos)
-                {
-                    float angularAttenuation = (actualCos - outerConeCos) / (innerConeCos - outerConeCos);
-                    return angularAttenuation * angularAttenuation;
-                }
-                return 1.0;
-            }
-            return 0.0;
-        }
-        vec3 getLighIntensity(Light light, vec3 pointToLight)
-        {
-            float rangeAttenuation = 1.0;
-            float spotAttenuation = 1.0;
-
-            if (light.type != LightType_Directional)
-            {
-                rangeAttenuation = getRangeAttenuation(light.range, length(pointToLight));
-            }
-            if (light.type == LightType_Spot)
-            {
-                spotAttenuation = getSpotAttenuation(pointToLight, light.direction, light.outerConeCos, light.innerConeCos);
-            }
-
-            return rangeAttenuation * spotAttenuation * light.intensity * light.color;
-        }
-
-    )"
+        "punctual1.glsl", "\n"
+            "        struct Light\n"
+            "        {\n"
+            "            vec3 direction;\n"
+            "            float range;\n"
+            "\n"
+            "            vec3 color;\n"
+            "            float intensity;\n"
+            "\n"
+            "            vec3 position;\n"
+            "            float innerConeCos;\n"
+            "\n"
+            "            float outerConeCos;\n"
+            "            int type;\n"
+            "        };\n"
+            "\n"
+            "        const int LightType_Directional = 0;\n"
+            "        const int LightType_Point = 1;\n"
+            "        const int LightType_Spot = 2;\n"
+            "\n"
+            "\n"
+            "        #ifdef USE_PUNCTUAL\n"
+            "        //Light u_Lights[LIGHT_COUNT + 1]; //Array [0] is not allowed\n"
+            "        uniform Light u_Lights[LIGHT_COUNT + 1]; //Array [0] is not allowed\n"
+            "        #endif\n"
+            "\n"
+            "        float getRangeAttenuation(float range, float distance)\n"
+            "        {\n"
+            "            if (range <= 0.0)\n"
+            "            {\n"
+            "                // negative range means unlimited\n"
+            "                return 1.0 / pow(distance, 2.0);\n"
+            "            }\n"
+            "            return max(min(1.0 - pow(distance / range, 4.0), 1.0), 0.0) / pow(distance, 2.0);\n"
+            "        }\n"
+            "        float getSpotAttenuation(vec3 pointToLight, vec3 spotDirection, float outerConeCos, float innerConeCos)\n"
+            "        {\n"
+            "            float actualCos = dot(normalize(spotDirection), normalize(-pointToLight));\n"
+            "            if (actualCos > outerConeCos)\n"
+            "            {\n"
+            "                if (actualCos < innerConeCos)\n"
+            "                {\n"
+            "                    float angularAttenuation = (actualCos - outerConeCos) / (innerConeCos - outerConeCos);\n"
+            "                    return angularAttenuation * angularAttenuation;\n"
+            "                }\n"
+            "                return 1.0;\n"
+            "            }\n"
+            "            return 0.0;\n"
+            "        }\n"
+            "        vec3 getLighIntensity(Light light, vec3 pointToLight)\n"
+            "        {\n"
+            "            float rangeAttenuation = 1.0;\n"
+            "            float spotAttenuation = 1.0;\n"
+            "\n"
+            "            if (light.type != LightType_Directional)\n"
+            "            {\n"
+            "                rangeAttenuation = getRangeAttenuation(light.range, length(pointToLight));\n"
+            "            }\n"
+            "            if (light.type == LightType_Spot)\n"
+            "            {\n"
+            "                spotAttenuation = getSpotAttenuation(pointToLight, light.direction, light.outerConeCos, light.innerConeCos);\n"
+            "            }\n"
+            "\n"
+            "            return rangeAttenuation * spotAttenuation * light.intensity * light.color;\n"
+            "        }\n"
+            "\n"
+            "    "
     },
     {
-        "punctual2.glsl", R"(
-        vec3 getPunctualRadianceTransmission(vec3 normal, vec3 view, vec3 pointToLight, float alphaRoughness,
-            vec3 baseColor, float ior)
-        {
-            float transmissionRougness = applyIorToRoughness(alphaRoughness, ior);
-
-            vec3 n = normalize(normal);
-            vec3 v = normalize(view);
-            vec3 l = normalize(pointToLight);
-            vec3 l_mirror = normalize(l + 2.0*n*dot(-l, n));
-            vec3 h = normalize(l_mirror + v);
-
-            float D = D_GGX(clamp(dot(n, h), 0.0, 1.0), transmissionRougness);
-            float Vis = V_GGX(clamp(dot(n, l_mirror), 0.0, 1.0), clamp(dot(n, v), 0.0, 1.0), transmissionRougness);
-
-            // Transmission BTDF
-            return baseColor * D * Vis;
-        }
-
-
-        vec3 getPunctualRadianceClearCoat(vec3 clearcoatNormal, vec3 v, vec3 l, vec3 h, float VdotH, vec3 f0, vec3 f90, float clearcoatRoughness)
-        {
-            float NdotL = clampedDot(clearcoatNormal, l);
-            float NdotV = clampedDot(clearcoatNormal, v);
-            float NdotH = clampedDot(clearcoatNormal, h);
-            return NdotL * BRDF_specularGGX(clearcoatRoughness * clearcoatRoughness, NdotL, NdotV, NdotH);
-        }
-
-
-        vec3 getPunctualRadianceSheen(vec3 sheenColor, float sheenRoughness, float NdotL, float NdotV, float NdotH)
-        {
-            return NdotL * BRDF_specularSheen(sheenColor, sheenRoughness, NdotL, NdotV, NdotH);
-        }
-
-
-        vec3 applyVolumeAttenuation(vec3 radiance, float transmissionDistance, vec3 attenuationColor, float attenuationDistance)
-        {
-            if (attenuationDistance == 0.0)
-            {
-                // Attenuation distance is +∞ (which we indicate by zero), i.e. the transmitted color is not attenuated at all.
-                return radiance;
-            }
-            else
-            {
-                vec3 transmittance = pow(attenuationColor, vec3(transmissionDistance / attenuationDistance));
-                return transmittance * radiance;
-            }
-        }
-
-
-        vec3 getVolumeTransmissionRay(vec3 n, vec3 v, float thickness, float ior, mat4 modelMatrix)
-        {
-            vec3 refractionVector = refract(-v, normalize(n), 1.0 / ior);
-            vec3 modelScale;
-            modelScale.x = length(vec3(modelMatrix[0].xyz));
-            modelScale.y = length(vec3(modelMatrix[1].xyz));
-            modelScale.z = length(vec3(modelMatrix[2].xyz));
-            return normalize(refractionVector) * thickness * modelScale;
-        }
-
-    )"
+        "punctual2.glsl", "\n"
+            "        vec3 getPunctualRadianceTransmission(vec3 normal, vec3 view, vec3 pointToLight, float alphaRoughness,\n"
+            "            vec3 baseColor, float ior)\n"
+            "        {\n"
+            "            float transmissionRougness = applyIorToRoughness(alphaRoughness, ior);\n"
+            "\n"
+            "            vec3 n = normalize(normal);\n"
+            "            vec3 v = normalize(view);\n"
+            "            vec3 l = normalize(pointToLight);\n"
+            "            vec3 l_mirror = normalize(l + 2.0*n*dot(-l, n));\n"
+            "            vec3 h = normalize(l_mirror + v);\n"
+            "\n"
+            "            float D = D_GGX(clamp(dot(n, h), 0.0, 1.0), transmissionRougness);\n"
+            "            float Vis = V_GGX(clamp(dot(n, l_mirror), 0.0, 1.0), clamp(dot(n, v), 0.0, 1.0), transmissionRougness);\n"
+            "\n"
+            "            // Transmission BTDF\n"
+            "            return baseColor * D * Vis;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        vec3 getPunctualRadianceClearCoat(vec3 clearcoatNormal, vec3 v, vec3 l, vec3 h, float VdotH, vec3 f0, vec3 f90, float clearcoatRoughness)\n"
+            "        {\n"
+            "            float NdotL = clampedDot(clearcoatNormal, l);\n"
+            "            float NdotV = clampedDot(clearcoatNormal, v);\n"
+            "            float NdotH = clampedDot(clearcoatNormal, h);\n"
+            "            return NdotL * BRDF_specularGGX(clearcoatRoughness * clearcoatRoughness, NdotL, NdotV, NdotH);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        vec3 getPunctualRadianceSheen(vec3 sheenColor, float sheenRoughness, float NdotL, float NdotV, float NdotH)\n"
+            "        {\n"
+            "            return NdotL * BRDF_specularSheen(sheenColor, sheenRoughness, NdotL, NdotV, NdotH);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        vec3 applyVolumeAttenuation(vec3 radiance, float transmissionDistance, vec3 attenuationColor, float attenuationDistance)\n"
+            "        {\n"
+            "            if (attenuationDistance == 0.0)\n"
+            "            {\n"
+            "                // Attenuation distance is +∞ (which we indicate by zero), i.e. the transmitted color is not attenuated at all.\n"
+            "                return radiance;\n"
+            "            }\n"
+            "            else\n"
+            "            {\n"
+            "                vec3 transmittance = pow(attenuationColor, vec3(transmissionDistance / attenuationDistance));\n"
+            "                return transmittance * radiance;\n"
+            "            }\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        vec3 getVolumeTransmissionRay(vec3 n, vec3 v, float thickness, float ior, mat4 modelMatrix)\n"
+            "        {\n"
+            "            vec3 refractionVector = refract(-v, normalize(n), 1.0 / ior);\n"
+            "            vec3 modelScale;\n"
+            "            modelScale.x = length(vec3(modelMatrix[0].xyz));\n"
+            "            modelScale.y = length(vec3(modelMatrix[1].xyz));\n"
+            "            modelScale.z = length(vec3(modelMatrix[2].xyz));\n"
+            "            return normalize(refractionVector) * thickness * modelScale;\n"
+            "        }\n"
+            "\n"
+            "    "
     },
     {
-        "ibl1.glsl", R"(
-
-        uniform float u_EnvIntensity;
-
-        vec3 getDiffuseLight(vec3 n)
-        {
-            // MK TEMP (for some reason, this one still seems to have positive effect - check for inverted Y at IBL diffuse generation phase)
-            // n.y *= -1.0;
-            vec4 textureSample = texture(u_LambertianEnvSampler, u_EnvRotation * n);
-            textureSample.rgb *= u_EnvIntensity;
-            return textureSample.rgb;
-        }
-
-        vec4 getSpecularSample(vec3 reflection, float lod)
-        {
-            vec4 textureSample = textureLod(u_GGXEnvSampler, u_EnvRotation * reflection, lod);
-            textureSample.rgb *= u_EnvIntensity;
-            return textureSample;
-        }
-
-        vec4 getSheenSample(vec3 reflection, float lod)
-        {
-            vec4 textureSample =  textureLod(u_CharlieEnvSampler, u_EnvRotation * reflection, lod);
-            textureSample.rgb *= u_EnvIntensity;
-            return textureSample;
-        }
-
-        vec3 getIBLGGXFresnel(vec3 n, vec3 v, float roughness, vec3 F0, float specularWeight)
-        {
-            // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
-            // Roughness dependent fresnel, from Fdez-Aguera
-            float NdotV = clampedDot(n, v);
-            vec2 brdfSamplePoint = clamp(vec2(NdotV, roughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
-            vec2 f_ab = texture(u_GGXLUT, brdfSamplePoint).rg;
-            vec3 Fr = max(vec3(1.0 - roughness), F0) - F0;
-            vec3 k_S = F0 + Fr * pow(1.0 - NdotV, 5.0);
-            vec3 FssEss = specularWeight * (k_S * f_ab.x + f_ab.y);
-
-            // Multiple scattering, from Fdez-Aguera
-            float Ems = (1.0 - (f_ab.x + f_ab.y));
-            vec3 F_avg = specularWeight * (F0 + (1.0 - F0) / 21.0);
-            vec3 FmsEms = Ems * FssEss * F_avg / (1.0 - F_avg * Ems);
-
-            return FssEss + FmsEms;
-        }
-
-        vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness)
-        {
-            float NdotV = clampedDot(n, v);
-            float lod = roughness * float(u_MipCount - 1);
-
-            vec3 reflection = normalize(reflect(-v, n));
-            vec4 specularSample = getSpecularSample(reflection, lod);
-
-            vec3 specularLight = specularSample.rgb;
-
-            return specularLight;
-        }
-
-
-        #ifdef MATERIAL_TRANSMISSION
-        vec3 getTransmissionSample(vec2 fragCoord, float roughness, float ior)
-        {
-            float framebufferLod = log2(float(u_TransmissionFramebufferSize.x)) * applyIorToRoughness(roughness, ior);
-            vec3 transmittedLight = textureLod(u_TransmissionFramebufferSampler, fragCoord.xy, framebufferLod).bgr; // r/b switched intentionally;
-
-            return transmittedLight;
-        }
-        #endif
-
-        #ifdef MATERIAL_TRANSMISSION
-        vec3 getIBLVolumeRefraction(vec3 n, vec3 v, float perceptualRoughness, vec3 baseColor, vec3 position, mat4 modelMatrix,
-            mat4 viewMatrix, mat4 projMatrix, float ior, float thickness, vec3 attenuationColor, float attenuationDistance, float dispersion)
-        {
-    )"
+        "ibl1.glsl", "\n"
+            "\n"
+            "        uniform float u_EnvIntensity;\n"
+            "\n"
+            "        vec3 getDiffuseLight(vec3 n)\n"
+            "        {\n"
+            "            // MK TEMP (for some reason, this one still seems to have positive effect - check for inverted Y at IBL diffuse generation phase)\n"
+            "            // n.y *= -1.0;\n"
+            "            vec4 textureSample = texture(u_LambertianEnvSampler, u_EnvRotation * n);\n"
+            "            textureSample.rgb *= u_EnvIntensity;\n"
+            "            return textureSample.rgb;\n"
+            "        }\n"
+            "\n"
+            "        vec4 getSpecularSample(vec3 reflection, float lod)\n"
+            "        {\n"
+            "            vec4 textureSample = textureLod(u_GGXEnvSampler, u_EnvRotation * reflection, lod);\n"
+            "            textureSample.rgb *= u_EnvIntensity;\n"
+            "            return textureSample;\n"
+            "        }\n"
+            "\n"
+            "        vec4 getSheenSample(vec3 reflection, float lod)\n"
+            "        {\n"
+            "            vec4 textureSample =  textureLod(u_CharlieEnvSampler, u_EnvRotation * reflection, lod);\n"
+            "            textureSample.rgb *= u_EnvIntensity;\n"
+            "            return textureSample;\n"
+            "        }\n"
+            "\n"
+            "        vec3 getIBLGGXFresnel(vec3 n, vec3 v, float roughness, vec3 F0, float specularWeight)\n"
+            "        {\n"
+            "            // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results\n"
+            "            // Roughness dependent fresnel, from Fdez-Aguera\n"
+            "            float NdotV = clampedDot(n, v);\n"
+            "            vec2 brdfSamplePoint = clamp(vec2(NdotV, roughness), vec2(0.0, 0.0), vec2(1.0, 1.0));\n"
+            "            vec2 f_ab = texture(u_GGXLUT, brdfSamplePoint).rg;\n"
+            "            vec3 Fr = max(vec3(1.0 - roughness), F0) - F0;\n"
+            "            vec3 k_S = F0 + Fr * pow(1.0 - NdotV, 5.0);\n"
+            "            vec3 FssEss = specularWeight * (k_S * f_ab.x + f_ab.y);\n"
+            "\n"
+            "            // Multiple scattering, from Fdez-Aguera\n"
+            "            float Ems = (1.0 - (f_ab.x + f_ab.y));\n"
+            "            vec3 F_avg = specularWeight * (F0 + (1.0 - F0) / 21.0);\n"
+            "            vec3 FmsEms = Ems * FssEss * F_avg / (1.0 - F_avg * Ems);\n"
+            "\n"
+            "            return FssEss + FmsEms;\n"
+            "        }\n"
+            "\n"
+            "        vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness)\n"
+            "        {\n"
+            "            float NdotV = clampedDot(n, v);\n"
+            "            float lod = roughness * float(u_MipCount - 1);\n"
+            "\n"
+            "            vec3 reflection = normalize(reflect(-v, n));\n"
+            "            vec4 specularSample = getSpecularSample(reflection, lod);\n"
+            "\n"
+            "            vec3 specularLight = specularSample.rgb;\n"
+            "\n"
+            "            return specularLight;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_TRANSMISSION\n"
+            "        vec3 getTransmissionSample(vec2 fragCoord, float roughness, float ior)\n"
+            "        {\n"
+            "            float framebufferLod = log2(float(u_TransmissionFramebufferSize.x)) * applyIorToRoughness(roughness, ior);\n"
+            "            vec3 transmittedLight = textureLod(u_TransmissionFramebufferSampler, fragCoord.xy, framebufferLod).bgr; // r/b switched intentionally;\n"
+            "\n"
+            "            return transmittedLight;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_TRANSMISSION\n"
+            "        vec3 getIBLVolumeRefraction(vec3 n, vec3 v, float perceptualRoughness, vec3 baseColor, vec3 position, mat4 modelMatrix,\n"
+            "            mat4 viewMatrix, mat4 projMatrix, float ior, float thickness, vec3 attenuationColor, float attenuationDistance, float dispersion)\n"
+            "        {\n"
+            "    "
     },
     {
-        "ibl2.glsl", R"(
-
-        #ifdef MATERIAL_DISPERSION
-            // Dispersion will spread out the ior values for each r,g,b channel
-            float halfSpread = (ior - 1.0) * 0.025 * dispersion;
-            vec3 iors = vec3(ior - halfSpread, ior, ior + halfSpread);
-
-            vec3 transmittedLight;
-            float transmissionRayLength;
-            for (int i = 0; i < 3; i++)
-            {
-                vec3 transmissionRay = getVolumeTransmissionRay(n, v, thickness, iors[i], modelMatrix);
-                // TODO: taking length of blue ray, ideally we would take the length of the green ray. For now overwriting seems ok
-                transmissionRayLength = length(transmissionRay);
-                vec3 refractedRayExit = position + transmissionRay;
-
-                // Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
-                vec4 ndcPos = projMatrix * viewMatrix * vec4(refractedRayExit, 1.0);
-                vec2 refractionCoords = ndcPos.xy / ndcPos.w;
-                refractionCoords += 1.0;
-                refractionCoords /= 2.0;
-
-                // Sample framebuffer to get pixel the refracted ray hits for this color channel.
-                transmittedLight[i] = getTransmissionSample(refractionCoords, perceptualRoughness, iors[i])[i];
-            }
-        #else
-            vec3 transmissionRay = getVolumeTransmissionRay(n, v, thickness, ior, modelMatrix);
-            float transmissionRayLength = length(transmissionRay);
-            vec3 refractedRayExit = position + transmissionRay;
-
-            // Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
-            vec4 ndcPos = projMatrix * viewMatrix * vec4(refractedRayExit, 1.0);
-            vec2 refractionCoords = ndcPos.xy / ndcPos.w;
-            refractionCoords += 1.0;
-            refractionCoords /= 2.0;
-
-            // Sample framebuffer to get pixel the refracted ray hits.
-            vec3 transmittedLight = getTransmissionSample(refractionCoords, perceptualRoughness, ior);
-
-        #endif // MATERIAL_DISPERSION
-            vec3 attenuatedColor = applyVolumeAttenuation(transmittedLight, transmissionRayLength, attenuationColor, attenuationDistance);
-
-            return attenuatedColor * baseColor;
-        }
-        #endif
-
-
-        #ifdef MATERIAL_ANISOTROPY
-        vec3 getIBLRadianceAnisotropy(vec3 n, vec3 v, float roughness, float anisotropy, vec3 anisotropyDirection)
-        {
-            float NdotV = clampedDot(n, v);
-
-            float tangentRoughness = mix(roughness, 1.0, anisotropy * anisotropy);
-            vec3  anisotropicTangent  = cross(anisotropyDirection, v);
-            vec3  anisotropicNormal   = cross(anisotropicTangent, anisotropyDirection);
-            float bendFactor          = 1.0 - anisotropy * (1.0 - roughness);
-            float bendFactorPow4      = bendFactor * bendFactor * bendFactor * bendFactor;
-            vec3  bentNormal          = normalize(mix(anisotropicNormal, n, bendFactorPow4));
-
-            float lod = roughness * float(u_MipCount - 1);
-            vec3 reflection = normalize(reflect(-v, bentNormal));
-
-            vec4 specularSample = getSpecularSample(reflection, lod);
-
-            vec3 specularLight = specularSample.rgb;
-
-            return specularLight;
-        }
-        #endif
-
-
-        vec3 getIBLRadianceCharlie(vec3 n, vec3 v, float sheenRoughness, vec3 sheenColor)
-        {
-            float NdotV = clampedDot(n, v);
-            float lod = sheenRoughness * float(u_MipCount - 1);
-            vec3 reflection = normalize(reflect(-v, n));
-
-            vec2 brdfSamplePoint = clamp(vec2(NdotV, sheenRoughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
-            float brdf = texture(u_CharlieLUT, brdfSamplePoint).b;
-            vec4 sheenSample = getSheenSample(reflection, lod);
-
-            vec3 sheenLight = sheenSample.rgb;
-            return sheenLight * sheenColor * brdf;
-        }
-            
-    )"
+        "ibl2.glsl", "\n"
+            "\n"
+            "        #ifdef MATERIAL_DISPERSION\n"
+            "            // Dispersion will spread out the ior values for each r,g,b channel\n"
+            "            float halfSpread = (ior - 1.0) * 0.025 * dispersion;\n"
+            "            vec3 iors = vec3(ior - halfSpread, ior, ior + halfSpread);\n"
+            "\n"
+            "            vec3 transmittedLight;\n"
+            "            float transmissionRayLength;\n"
+            "            for (int i = 0; i < 3; i++)\n"
+            "            {\n"
+            "                vec3 transmissionRay = getVolumeTransmissionRay(n, v, thickness, iors[i], modelMatrix);\n"
+            "                // TODO: taking length of blue ray, ideally we would take the length of the green ray. For now overwriting seems ok\n"
+            "                transmissionRayLength = length(transmissionRay);\n"
+            "                vec3 refractedRayExit = position + transmissionRay;\n"
+            "\n"
+            "                // Project refracted vector on the framebuffer, while mapping to normalized device coordinates.\n"
+            "                vec4 ndcPos = projMatrix * viewMatrix * vec4(refractedRayExit, 1.0);\n"
+            "                vec2 refractionCoords = ndcPos.xy / ndcPos.w;\n"
+            "                refractionCoords += 1.0;\n"
+            "                refractionCoords /= 2.0;\n"
+            "\n"
+            "                // Sample framebuffer to get pixel the refracted ray hits for this color channel.\n"
+            "                transmittedLight[i] = getTransmissionSample(refractionCoords, perceptualRoughness, iors[i])[i];\n"
+            "            }\n"
+            "        #else\n"
+            "            vec3 transmissionRay = getVolumeTransmissionRay(n, v, thickness, ior, modelMatrix);\n"
+            "            float transmissionRayLength = length(transmissionRay);\n"
+            "            vec3 refractedRayExit = position + transmissionRay;\n"
+            "\n"
+            "            // Project refracted vector on the framebuffer, while mapping to normalized device coordinates.\n"
+            "            vec4 ndcPos = projMatrix * viewMatrix * vec4(refractedRayExit, 1.0);\n"
+            "            vec2 refractionCoords = ndcPos.xy / ndcPos.w;\n"
+            "            refractionCoords += 1.0;\n"
+            "            refractionCoords /= 2.0;\n"
+            "\n"
+            "            // Sample framebuffer to get pixel the refracted ray hits.\n"
+            "            vec3 transmittedLight = getTransmissionSample(refractionCoords, perceptualRoughness, ior);\n"
+            "\n"
+            "        #endif // MATERIAL_DISPERSION\n"
+            "            vec3 attenuatedColor = applyVolumeAttenuation(transmittedLight, transmissionRayLength, attenuationColor, attenuationDistance);\n"
+            "\n"
+            "            return attenuatedColor * baseColor;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_ANISOTROPY\n"
+            "        vec3 getIBLRadianceAnisotropy(vec3 n, vec3 v, float roughness, float anisotropy, vec3 anisotropyDirection)\n"
+            "        {\n"
+            "            float NdotV = clampedDot(n, v);\n"
+            "\n"
+            "            float tangentRoughness = mix(roughness, 1.0, anisotropy * anisotropy);\n"
+            "            vec3  anisotropicTangent  = cross(anisotropyDirection, v);\n"
+            "            vec3  anisotropicNormal   = cross(anisotropicTangent, anisotropyDirection);\n"
+            "            float bendFactor          = 1.0 - anisotropy * (1.0 - roughness);\n"
+            "            float bendFactorPow4      = bendFactor * bendFactor * bendFactor * bendFactor;\n"
+            "            vec3  bentNormal          = normalize(mix(anisotropicNormal, n, bendFactorPow4));\n"
+            "\n"
+            "            float lod = roughness * float(u_MipCount - 1);\n"
+            "            vec3 reflection = normalize(reflect(-v, bentNormal));\n"
+            "\n"
+            "            vec4 specularSample = getSpecularSample(reflection, lod);\n"
+            "\n"
+            "            vec3 specularLight = specularSample.rgb;\n"
+            "\n"
+            "            return specularLight;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        vec3 getIBLRadianceCharlie(vec3 n, vec3 v, float sheenRoughness, vec3 sheenColor)\n"
+            "        {\n"
+            "            float NdotV = clampedDot(n, v);\n"
+            "            float lod = sheenRoughness * float(u_MipCount - 1);\n"
+            "            vec3 reflection = normalize(reflect(-v, n));\n"
+            "\n"
+            "            vec2 brdfSamplePoint = clamp(vec2(NdotV, sheenRoughness), vec2(0.0, 0.0), vec2(1.0, 1.0));\n"
+            "            float brdf = texture(u_CharlieLUT, brdfSamplePoint).b;\n"
+            "            vec4 sheenSample = getSheenSample(reflection, lod);\n"
+            "\n"
+            "            vec3 sheenLight = sheenSample.rgb;\n"
+            "            return sheenLight * sheenColor * brdf;\n"
+            "        }\n"
+            "            \n"
+            "    "
     },
     {
-        "material_info1.glsl", R"(
-
-        // Metallic Roughness
-        uniform float u_MetallicFactor;
-        uniform float u_RoughnessFactor;
-        uniform vec4 u_BaseColorFactor;
-
-        // Sheen
-        uniform float u_SheenRoughnessFactor;
-        uniform vec3 u_SheenColorFactor;
-
-        // Clearcoat
-        uniform float u_ClearcoatFactor;
-        uniform float u_ClearcoatRoughnessFactor;
-
-        // Specular
-        uniform vec3 u_KHR_materials_specular_specularColorFactor;
-        uniform float u_KHR_materials_specular_specularFactor;
-
-        // Transmission
-        uniform float u_TransmissionFactor;
-
-        // Volume
-        uniform float u_ThicknessFactor;
-        uniform vec3 u_AttenuationColor;
-        uniform float u_AttenuationDistance;
-
-        // Iridescence
-        uniform float u_IridescenceFactor;
-        uniform float u_IridescenceIor;
-        uniform float u_IridescenceThicknessMinimum;
-        uniform float u_IridescenceThicknessMaximum;
-
-        // Diffuse Transmission
-        uniform float u_DiffuseTransmissionFactor;
-        uniform vec3 u_DiffuseTransmissionColorFactor;
-
-        // Emissive Strength
-        uniform float u_EmissiveStrength;
-
-        // IOR
-        uniform float u_Ior;
-
-        // Anisotropy
-        uniform vec3 u_Anisotropy;
-
-        // Dispersion
-        uniform float u_Dispersion;
-
-        // Alpha mode
-        uniform float u_AlphaCutoff;
-
-        uniform vec3 u_Camera;
-
-        #ifdef MATERIAL_TRANSMISSION
-        uniform ivec2 u_ScreenSize;
-        #endif
-
-        uniform highp mat4 u_ModelMatrix;
-        uniform mat4 u_ViewMatrix;
-        uniform mat4 u_ProjectionMatrix;
-
-
-        struct MaterialInfo
-        {
-            vec4 baseColorFactor;
-            float alphaCutoff;
-	        int flags;
-            vec2 padding;  // Above props temporary from earlier shader version -mk
-            
-                float occlusionStrength;
-                float normalScale;
-    
-            float ior;
-            float perceptualRoughness;      // roughness value, as authored by the model creator (input to shader)
-            vec3 f0_dielectric;
-
-            float alphaRoughness;           // roughness mapped to a more linear change in the roughness (proposed by [2])
-
-            float fresnel_w;
-
-            vec3 f90;                       // reflectance color at grazing angle
-            vec3 f90_dielectric;
-            float metallic;
-
-            vec3 baseColor;
-
-            float sheenRoughnessFactor;
-            vec3 sheenColorFactor;
-
-            vec3 clearcoatF0;
-            vec3 clearcoatF90;
-            float clearcoatFactor;
-            vec3 clearcoatNormal;
-            float clearcoatRoughness;
-
-            // KHR_materials_specular 
-            float specularWeight; // product of specularFactor and specularTexture.a
-
-            float transmissionFactor;
-    )"
+        "material_info1.glsl", "\n"
+            "\n"
+            "        // Metallic Roughness\n"
+            "        uniform float u_MetallicFactor;\n"
+            "        uniform float u_RoughnessFactor;\n"
+            "        uniform vec4 u_BaseColorFactor;\n"
+            "\n"
+            "        // Sheen\n"
+            "        uniform float u_SheenRoughnessFactor;\n"
+            "        uniform vec3 u_SheenColorFactor;\n"
+            "\n"
+            "        // Clearcoat\n"
+            "        uniform float u_ClearcoatFactor;\n"
+            "        uniform float u_ClearcoatRoughnessFactor;\n"
+            "\n"
+            "        // Specular\n"
+            "        uniform vec3 u_KHR_materials_specular_specularColorFactor;\n"
+            "        uniform float u_KHR_materials_specular_specularFactor;\n"
+            "\n"
+            "        // Transmission\n"
+            "        uniform float u_TransmissionFactor;\n"
+            "\n"
+            "        // Volume\n"
+            "        uniform float u_ThicknessFactor;\n"
+            "        uniform vec3 u_AttenuationColor;\n"
+            "        uniform float u_AttenuationDistance;\n"
+            "\n"
+            "        // Iridescence\n"
+            "        uniform float u_IridescenceFactor;\n"
+            "        uniform float u_IridescenceIor;\n"
+            "        uniform float u_IridescenceThicknessMinimum;\n"
+            "        uniform float u_IridescenceThicknessMaximum;\n"
+            "\n"
+            "        // Diffuse Transmission\n"
+            "        uniform float u_DiffuseTransmissionFactor;\n"
+            "        uniform vec3 u_DiffuseTransmissionColorFactor;\n"
+            "\n"
+            "        // Emissive Strength\n"
+            "        uniform float u_EmissiveStrength;\n"
+            "\n"
+            "        // IOR\n"
+            "        uniform float u_Ior;\n"
+            "\n"
+            "        // Anisotropy\n"
+            "        uniform vec3 u_Anisotropy;\n"
+            "\n"
+            "        // Dispersion\n"
+            "        uniform float u_Dispersion;\n"
+            "\n"
+            "        // Alpha mode\n"
+            "        uniform float u_AlphaCutoff;\n"
+            "\n"
+            "        uniform vec3 u_Camera;\n"
+            "\n"
+            "        #ifdef MATERIAL_TRANSMISSION\n"
+            "        uniform ivec2 u_ScreenSize;\n"
+            "        #endif\n"
+            "\n"
+            "        uniform highp mat4 u_ModelMatrix;\n"
+            "        uniform mat4 u_ViewMatrix;\n"
+            "        uniform mat4 u_ProjectionMatrix;\n"
+            "\n"
+            "\n"
+            "        struct MaterialInfo\n"
+            "        {\n"
+            "            vec4 baseColorFactor;\n"
+            "            float alphaCutoff;\n"
+            "	        int flags;\n"
+            "            vec2 padding;  // Above props temporary from earlier shader version -mk\n"
+            "            \n"
+            "                float occlusionStrength;\n"
+            "                float normalScale;\n"
+            "    \n"
+            "            float ior;\n"
+            "            float perceptualRoughness;      // roughness value, as authored by the model creator (input to shader)\n"
+            "            vec3 f0_dielectric;\n"
+            "\n"
+            "            float alphaRoughness;           // roughness mapped to a more linear change in the roughness (proposed by [2])\n"
+            "\n"
+            "            float fresnel_w;\n"
+            "\n"
+            "            vec3 f90;                       // reflectance color at grazing angle\n"
+            "            vec3 f90_dielectric;\n"
+            "            float metallic;\n"
+            "\n"
+            "            vec3 baseColor;\n"
+            "\n"
+            "            float sheenRoughnessFactor;\n"
+            "            vec3 sheenColorFactor;\n"
+            "\n"
+            "            vec3 clearcoatF0;\n"
+            "            vec3 clearcoatF90;\n"
+            "            float clearcoatFactor;\n"
+            "            vec3 clearcoatNormal;\n"
+            "            float clearcoatRoughness;\n"
+            "\n"
+            "            // KHR_materials_specular \n"
+            "            float specularWeight; // product of specularFactor and specularTexture.a\n"
+            "\n"
+            "            float transmissionFactor;\n"
+            "    "
     },
     {
-        "material_info2.glsl", R"(
-            float thickness;
-            vec3 attenuationColor;
-            float attenuationDistance;
-
-            // KHR_materials_iridescence
-            float iridescenceFactor;
-            float iridescenceIor;
-            float iridescenceThickness;
-
-            float diffuseTransmissionFactor;
-            vec3 diffuseTransmissionColorFactor;
-
-            // KHR_materials_anisotropy
-            vec3 anisotropicT;
-            vec3 anisotropicB;
-            float anisotropyStrength;
-
-            // KHR_materials_dispersion
-            float dispersion;
-        };
-
-
-        // Get normal, tangent and bitangent vectors.
-        NormalInfo getNormalInfo(vec3 v)
-        {
-            vec2 UV = getNormalUV();
-            vec2 uv_dx = dFdx(UV);
-            vec2 uv_dy = dFdy(UV);
-
-            if (length(uv_dx) <= 1e-2) {
-            uv_dx = vec2(1.0, 0.0);
-            }
-
-            if (length(uv_dy) <= 1e-2) {
-            uv_dy = vec2(0.0, 1.0);
-            }
-
-            vec3 t_ = (uv_dy.t * dFdx(v_Position) - uv_dx.t * dFdy(v_Position)) /
-                (uv_dx.s * uv_dy.t - uv_dy.s * uv_dx.t);
-
-            vec3 n, t, b, ng;
-
-            // Compute geometrical TBN:
-        #ifdef HAS_NORMAL_VEC3
-        #ifdef HAS_TANGENT_VEC4
-            // Trivial TBN computation, present as vertex attribute.
-            // Normalize eigenvectors as matrix is linearly interpolated.
-            t = normalize(v_TBN[0]);
-            b = normalize(v_TBN[1]);
-            ng = normalize(v_TBN[2]);
-        #else
-            // Normals are either present as vertex attributes or approximated.
-            ng = normalize(v_Normal);
-            t = normalize(t_ - ng * dot(ng, t_));
-            b = cross(ng, t);
-        #endif
-        #else
-            ng = normalize(cross(dFdx(v_Position), dFdy(v_Position)));
-            t = normalize(t_ - ng * dot(ng, t_));
-            b = cross(ng, t);
-        #endif
-
-        #ifndef NOT_TRIANGLE
-            // For a back-facing surface, the tangential basis vectors are negated.
-            if (gl_FrontFacing == false)
-            {
-                t *= -1.0;
-                b *= -1.0;
-                ng *= -1.0;
-            }
-        #endif
-
-            // Compute normals:
-            NormalInfo info;
-            info.ng = ng;
-        #ifdef HAS_NORMAL_MAP
-            info.ntex = texture(u_NormalSampler, UV).rgb * 2.0 - vec3(1.0);
-            info.ntex *= vec3(u_NormalScale, u_NormalScale, 1.0);
-            info.ntex = normalize(info.ntex);
-            info.n = normalize(mat3(t, b, ng) * info.ntex);
-        #else
-            info.n = ng;
-        #endif
-            info.t = t;
-            info.b = b;
-            return info;
-        }
-
-
-        #ifdef MATERIAL_CLEARCOAT
-        vec3 getClearcoatNormal(NormalInfo normalInfo)
-        {
-        #ifdef HAS_CLEARCOAT_NORMAL_MAP
-            vec3 n = texture(u_ClearcoatNormalSampler, getClearcoatNormalUV()).rgb * 2.0 - vec3(1.0);
-            n *= vec3(u_ClearcoatNormalScale, u_ClearcoatNormalScale, 1.0);
-            n = mat3(normalInfo.t, normalInfo.b, normalInfo.ng) * normalize(n);
-            return n;
-        #else
-            return normalInfo.ng;
-        #endif
-        }
-        #endif
-
-    )"
+        "material_info2.glsl", "\n"
+            "            float thickness;\n"
+            "            vec3 attenuationColor;\n"
+            "            float attenuationDistance;\n"
+            "\n"
+            "            // KHR_materials_iridescence\n"
+            "            float iridescenceFactor;\n"
+            "            float iridescenceIor;\n"
+            "            float iridescenceThickness;\n"
+            "\n"
+            "            float diffuseTransmissionFactor;\n"
+            "            vec3 diffuseTransmissionColorFactor;\n"
+            "\n"
+            "            // KHR_materials_anisotropy\n"
+            "            vec3 anisotropicT;\n"
+            "            vec3 anisotropicB;\n"
+            "            float anisotropyStrength;\n"
+            "\n"
+            "            // KHR_materials_dispersion\n"
+            "            float dispersion;\n"
+            "        };\n"
+            "\n"
+            "\n"
+            "        // Get normal, tangent and bitangent vectors.\n"
+            "        NormalInfo getNormalInfo(vec3 v)\n"
+            "        {\n"
+            "            vec2 UV = getNormalUV();\n"
+            "            vec2 uv_dx = dFdx(UV);\n"
+            "            vec2 uv_dy = dFdy(UV);\n"
+            "\n"
+            "            if (length(uv_dx) <= 1e-2) {\n"
+            "            uv_dx = vec2(1.0, 0.0);\n"
+            "            }\n"
+            "\n"
+            "            if (length(uv_dy) <= 1e-2) {\n"
+            "            uv_dy = vec2(0.0, 1.0);\n"
+            "            }\n"
+            "\n"
+            "            vec3 t_ = (uv_dy.t * dFdx(v_Position) - uv_dx.t * dFdy(v_Position)) /\n"
+            "                (uv_dx.s * uv_dy.t - uv_dy.s * uv_dx.t);\n"
+            "\n"
+            "            vec3 n, t, b, ng;\n"
+            "\n"
+            "            // Compute geometrical TBN:\n"
+            "        #ifdef HAS_NORMAL_VEC3\n"
+            "        #ifdef HAS_TANGENT_VEC4\n"
+            "            // Trivial TBN computation, present as vertex attribute.\n"
+            "            // Normalize eigenvectors as matrix is linearly interpolated.\n"
+            "            t = normalize(v_TBN[0]);\n"
+            "            b = normalize(v_TBN[1]);\n"
+            "            ng = normalize(v_TBN[2]);\n"
+            "        #else\n"
+            "            // Normals are either present as vertex attributes or approximated.\n"
+            "            ng = normalize(v_Normal);\n"
+            "            t = normalize(t_ - ng * dot(ng, t_));\n"
+            "            b = cross(ng, t);\n"
+            "        #endif\n"
+            "        #else\n"
+            "            ng = normalize(cross(dFdx(v_Position), dFdy(v_Position)));\n"
+            "            t = normalize(t_ - ng * dot(ng, t_));\n"
+            "            b = cross(ng, t);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifndef NOT_TRIANGLE\n"
+            "            // For a back-facing surface, the tangential basis vectors are negated.\n"
+            "            if (gl_FrontFacing == false)\n"
+            "            {\n"
+            "                t *= -1.0;\n"
+            "                b *= -1.0;\n"
+            "                ng *= -1.0;\n"
+            "            }\n"
+            "        #endif\n"
+            "\n"
+            "            // Compute normals:\n"
+            "            NormalInfo info;\n"
+            "            info.ng = ng;\n"
+            "        #ifdef HAS_NORMAL_MAP\n"
+            "            info.ntex = texture(u_NormalSampler, UV).rgb * 2.0 - vec3(1.0);\n"
+            "            info.ntex *= vec3(u_NormalScale, u_NormalScale, 1.0);\n"
+            "            info.ntex = normalize(info.ntex);\n"
+            "            info.n = normalize(mat3(t, b, ng) * info.ntex);\n"
+            "        #else\n"
+            "            info.n = ng;\n"
+            "        #endif\n"
+            "            info.t = t;\n"
+            "            info.b = b;\n"
+            "            return info;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_CLEARCOAT\n"
+            "        vec3 getClearcoatNormal(NormalInfo normalInfo)\n"
+            "        {\n"
+            "        #ifdef HAS_CLEARCOAT_NORMAL_MAP\n"
+            "            vec3 n = texture(u_ClearcoatNormalSampler, getClearcoatNormalUV()).rgb * 2.0 - vec3(1.0);\n"
+            "            n *= vec3(u_ClearcoatNormalScale, u_ClearcoatNormalScale, 1.0);\n"
+            "            n = mat3(normalInfo.t, normalInfo.b, normalInfo.ng) * normalize(n);\n"
+            "            return n;\n"
+            "        #else\n"
+            "            return normalInfo.ng;\n"
+            "        #endif\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "    "
     },
     {
-        "material_info3.glsl", R"(
-        vec4 getBaseColor()
-        {
-            vec4 baseColor = u_BaseColorFactor;
-
-            #ifdef MATERIAL_UNLIT
-                #if defined(HAS_BASE_COLOR_MAP)
-                    baseColor *= texture(u_BaseColorSampler, getBaseColorUV());
-                #endif
-                return baseColor;
-            #else
-                #ifdef MATERIAL_METALLICROUGHNESS
-                    #if defined(HAS_BASE_COLOR_MAP)
-                        baseColor *= texture(u_BaseColorSampler, getBaseColorUV());
-                    #endif
-                #endif
-                return baseColor * getVertexColor();
-            #endif
-
-        }
-
-
-        #ifdef MATERIAL_METALLICROUGHNESS
-        MaterialInfo getMetallicRoughnessInfo(MaterialInfo info)
-        {
-            info.metallic = u_MetallicFactor;
-            info.perceptualRoughness = u_RoughnessFactor;
-
-        #ifdef HAS_METALLIC_ROUGHNESS_MAP
-            // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
-            // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
-            vec4 mrSample = texture(u_MetallicRoughnessSampler, getMetallicRoughnessUV());
-            info.perceptualRoughness *= mrSample.g;
-            info.metallic *= mrSample.b;
-        #endif
-
-            return info;
-        }
-        #endif
-
-
-        #ifdef MATERIAL_SHEEN
-        MaterialInfo getSheenInfo(MaterialInfo info)
-        {
-            info.sheenColorFactor = u_SheenColorFactor;
-            info.sheenRoughnessFactor = u_SheenRoughnessFactor;
-
-        #ifdef HAS_SHEEN_COLOR_MAP
-            vec4 sheenColorSample = texture(u_SheenColorSampler, getSheenColorUV());
-            info.sheenColorFactor *= sheenColorSample.rgb;
-        #endif
-
-        #ifdef HAS_SHEEN_ROUGHNESS_MAP
-            vec4 sheenRoughnessSample = texture(u_SheenRoughnessSampler, getSheenRoughnessUV());
-            info.sheenRoughnessFactor *= sheenRoughnessSample.a;
-        #endif
-            return info;
-        }
-        #endif
-
-
-        #ifdef MATERIAL_SPECULAR
-        MaterialInfo getSpecularInfo(MaterialInfo info)
-        {   
-            vec4 specularTexture = vec4(1.0);
-        #ifdef HAS_SPECULAR_MAP
-            specularTexture.a = texture(u_SpecularSampler, getSpecularUV()).a;
-        #endif
-        #ifdef HAS_SPECULAR_COLOR_MAP
-            specularTexture.rgb = texture(u_SpecularColorSampler, getSpecularColorUV()).rgb;
-        #endif
-
-            info.f0_dielectric = min(info.f0_dielectric * u_KHR_materials_specular_specularColorFactor * specularTexture.rgb, vec3(1.0));
-            info.specularWeight = u_KHR_materials_specular_specularFactor * specularTexture.a;
-            info.f90_dielectric = vec3(info.specularWeight);
-            return info;
-        }
-        #endif
-
-
-        #ifdef MATERIAL_TRANSMISSION
-        MaterialInfo getTransmissionInfo(MaterialInfo info)
-        {
-            info.transmissionFactor = u_TransmissionFactor;
-
-        #ifdef HAS_TRANSMISSION_MAP
-            vec4 transmissionSample = texture(u_TransmissionSampler, getTransmissionUV());
-            info.transmissionFactor *= transmissionSample.r;
-        #endif
-
-        #ifdef MATERIAL_DISPERSION
-            info.dispersion = u_Dispersion;
-        #else
-            info.dispersion = 0.0;
-        #endif
-            return info;
-        }
-        #endif
-    )"
+        "material_info3.glsl", "\n"
+            "        vec4 getBaseColor()\n"
+            "        {\n"
+            "            vec4 baseColor = u_BaseColorFactor;\n"
+            "\n"
+            "            #ifdef MATERIAL_UNLIT\n"
+            "                #if defined(HAS_BASE_COLOR_MAP)\n"
+            "                    baseColor *= texture(u_BaseColorSampler, getBaseColorUV());\n"
+            "                #endif\n"
+            "                return baseColor;\n"
+            "            #else\n"
+            "                #ifdef MATERIAL_METALLICROUGHNESS\n"
+            "                    #if defined(HAS_BASE_COLOR_MAP)\n"
+            "                        baseColor *= texture(u_BaseColorSampler, getBaseColorUV());\n"
+            "                    #endif\n"
+            "                #endif\n"
+            "                return baseColor * getVertexColor();\n"
+            "            #endif\n"
+            "\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_METALLICROUGHNESS\n"
+            "        MaterialInfo getMetallicRoughnessInfo(MaterialInfo info)\n"
+            "        {\n"
+            "            info.metallic = u_MetallicFactor;\n"
+            "            info.perceptualRoughness = u_RoughnessFactor;\n"
+            "\n"
+            "        #ifdef HAS_METALLIC_ROUGHNESS_MAP\n"
+            "            // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.\n"
+            "            // This layout intentionally reserves the 'r' channel for (optional) occlusion map data\n"
+            "            vec4 mrSample = texture(u_MetallicRoughnessSampler, getMetallicRoughnessUV());\n"
+            "            info.perceptualRoughness *= mrSample.g;\n"
+            "            info.metallic *= mrSample.b;\n"
+            "        #endif\n"
+            "\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_SHEEN\n"
+            "        MaterialInfo getSheenInfo(MaterialInfo info)\n"
+            "        {\n"
+            "            info.sheenColorFactor = u_SheenColorFactor;\n"
+            "            info.sheenRoughnessFactor = u_SheenRoughnessFactor;\n"
+            "\n"
+            "        #ifdef HAS_SHEEN_COLOR_MAP\n"
+            "            vec4 sheenColorSample = texture(u_SheenColorSampler, getSheenColorUV());\n"
+            "            info.sheenColorFactor *= sheenColorSample.rgb;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_SHEEN_ROUGHNESS_MAP\n"
+            "            vec4 sheenRoughnessSample = texture(u_SheenRoughnessSampler, getSheenRoughnessUV());\n"
+            "            info.sheenRoughnessFactor *= sheenRoughnessSample.a;\n"
+            "        #endif\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_SPECULAR\n"
+            "        MaterialInfo getSpecularInfo(MaterialInfo info)\n"
+            "        {   \n"
+            "            vec4 specularTexture = vec4(1.0);\n"
+            "        #ifdef HAS_SPECULAR_MAP\n"
+            "            specularTexture.a = texture(u_SpecularSampler, getSpecularUV()).a;\n"
+            "        #endif\n"
+            "        #ifdef HAS_SPECULAR_COLOR_MAP\n"
+            "            specularTexture.rgb = texture(u_SpecularColorSampler, getSpecularColorUV()).rgb;\n"
+            "        #endif\n"
+            "\n"
+            "            info.f0_dielectric = min(info.f0_dielectric * u_KHR_materials_specular_specularColorFactor * specularTexture.rgb, vec3(1.0));\n"
+            "            info.specularWeight = u_KHR_materials_specular_specularFactor * specularTexture.a;\n"
+            "            info.f90_dielectric = vec3(info.specularWeight);\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_TRANSMISSION\n"
+            "        MaterialInfo getTransmissionInfo(MaterialInfo info)\n"
+            "        {\n"
+            "            info.transmissionFactor = u_TransmissionFactor;\n"
+            "\n"
+            "        #ifdef HAS_TRANSMISSION_MAP\n"
+            "            vec4 transmissionSample = texture(u_TransmissionSampler, getTransmissionUV());\n"
+            "            info.transmissionFactor *= transmissionSample.r;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_DISPERSION\n"
+            "            info.dispersion = u_Dispersion;\n"
+            "        #else\n"
+            "            info.dispersion = 0.0;\n"
+            "        #endif\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "    "
     },
     {
-        "material_info4.glsl", R"(
-        #ifdef MATERIAL_VOLUME
-        MaterialInfo getVolumeInfo(MaterialInfo info)
-        {
-            info.thickness = u_ThicknessFactor;
-            info.attenuationColor = u_AttenuationColor;
-            info.attenuationDistance = u_AttenuationDistance;
-
-        #ifdef HAS_THICKNESS_MAP
-            vec4 thicknessSample = texture(u_ThicknessSampler, getThicknessUV());
-            info.thickness *= thicknessSample.g;
-        #endif
-            return info;
-        }
-        #endif
-
-
-        #ifdef MATERIAL_IRIDESCENCE
-        MaterialInfo getIridescenceInfo(MaterialInfo info)
-        {
-            info.iridescenceFactor = u_IridescenceFactor;
-            info.iridescenceIor = u_IridescenceIor;
-            info.iridescenceThickness = u_IridescenceThicknessMaximum;
-
-            #ifdef HAS_IRIDESCENCE_MAP
-                info.iridescenceFactor *= texture(u_IridescenceSampler, getIridescenceUV()).r;
-            #endif
-
-            #ifdef HAS_IRIDESCENCE_THICKNESS_MAP
-                float thicknessSampled = texture(u_IridescenceThicknessSampler, getIridescenceThicknessUV()).g;
-                float thickness = mix(u_IridescenceThicknessMinimum, u_IridescenceThicknessMaximum, thicknessSampled);
-                info.iridescenceThickness = thickness;
-            #endif
-
-            return info;
-        }
-        #endif
-
-
-        #ifdef MATERIAL_DIFFUSE_TRANSMISSION
-        MaterialInfo getDiffuseTransmissionInfo(MaterialInfo info)
-        {
-            info.diffuseTransmissionFactor = u_DiffuseTransmissionFactor;
-            info.diffuseTransmissionColorFactor = u_DiffuseTransmissionColorFactor;
-
-            #ifdef HAS_DIFFUSE_TRANSMISSION_MAP
-                info.diffuseTransmissionFactor *= texture(u_DiffuseTransmissionSampler, getDiffuseTransmissionUV()).a;
-            #endif
-
-            #ifdef HAS_DIFFUSE_TRANSMISSION_COLOR_MAP
-                info.diffuseTransmissionColorFactor *= texture(u_DiffuseTransmissionColorSampler, getDiffuseTransmissionColorUV()).rgb;
-            #endif
-
-            return info;
-        }
-        #endif
-    )"
+        "material_info4.glsl", "\n"
+            "        #ifdef MATERIAL_VOLUME\n"
+            "        MaterialInfo getVolumeInfo(MaterialInfo info)\n"
+            "        {\n"
+            "            info.thickness = u_ThicknessFactor;\n"
+            "            info.attenuationColor = u_AttenuationColor;\n"
+            "            info.attenuationDistance = u_AttenuationDistance;\n"
+            "\n"
+            "        #ifdef HAS_THICKNESS_MAP\n"
+            "            vec4 thicknessSample = texture(u_ThicknessSampler, getThicknessUV());\n"
+            "            info.thickness *= thicknessSample.g;\n"
+            "        #endif\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_IRIDESCENCE\n"
+            "        MaterialInfo getIridescenceInfo(MaterialInfo info)\n"
+            "        {\n"
+            "            info.iridescenceFactor = u_IridescenceFactor;\n"
+            "            info.iridescenceIor = u_IridescenceIor;\n"
+            "            info.iridescenceThickness = u_IridescenceThicknessMaximum;\n"
+            "\n"
+            "            #ifdef HAS_IRIDESCENCE_MAP\n"
+            "                info.iridescenceFactor *= texture(u_IridescenceSampler, getIridescenceUV()).r;\n"
+            "            #endif\n"
+            "\n"
+            "            #ifdef HAS_IRIDESCENCE_THICKNESS_MAP\n"
+            "                float thicknessSampled = texture(u_IridescenceThicknessSampler, getIridescenceThicknessUV()).g;\n"
+            "                float thickness = mix(u_IridescenceThicknessMinimum, u_IridescenceThicknessMaximum, thicknessSampled);\n"
+            "                info.iridescenceThickness = thickness;\n"
+            "            #endif\n"
+            "\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_DIFFUSE_TRANSMISSION\n"
+            "        MaterialInfo getDiffuseTransmissionInfo(MaterialInfo info)\n"
+            "        {\n"
+            "            info.diffuseTransmissionFactor = u_DiffuseTransmissionFactor;\n"
+            "            info.diffuseTransmissionColorFactor = u_DiffuseTransmissionColorFactor;\n"
+            "\n"
+            "            #ifdef HAS_DIFFUSE_TRANSMISSION_MAP\n"
+            "                info.diffuseTransmissionFactor *= texture(u_DiffuseTransmissionSampler, getDiffuseTransmissionUV()).a;\n"
+            "            #endif\n"
+            "\n"
+            "            #ifdef HAS_DIFFUSE_TRANSMISSION_COLOR_MAP\n"
+            "                info.diffuseTransmissionColorFactor *= texture(u_DiffuseTransmissionColorSampler, getDiffuseTransmissionColorUV()).rgb;\n"
+            "            #endif\n"
+            "\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "    "
     },
     {
-        "material_info5.glsl", R"(
-
-        #ifdef MATERIAL_CLEARCOAT
-        MaterialInfo getClearCoatInfo(MaterialInfo info, NormalInfo normalInfo)
-        {
-            info.clearcoatFactor = u_ClearcoatFactor;
-            info.clearcoatRoughness = u_ClearcoatRoughnessFactor;
-            info.clearcoatF0 = vec3(pow((info.ior - 1.0) / (info.ior + 1.0), 2.0));
-            info.clearcoatF90 = vec3(1.0);
-
-        #ifdef HAS_CLEARCOAT_MAP
-            vec4 clearcoatSample = texture(u_ClearcoatSampler, getClearcoatUV());
-            info.clearcoatFactor *= clearcoatSample.r;
-        #endif
-
-        #ifdef HAS_CLEARCOAT_ROUGHNESS_MAP
-            vec4 clearcoatSampleRoughness = texture(u_ClearcoatRoughnessSampler, getClearcoatRoughnessUV());
-            info.clearcoatRoughness *= clearcoatSampleRoughness.g;
-        #endif
-
-            info.clearcoatNormal = getClearcoatNormal(normalInfo);
-            info.clearcoatRoughness = clamp(info.clearcoatRoughness, 0.0, 1.0);
-            return info;
-        }
-        #endif
-
-
-        #ifdef MATERIAL_IOR
-        MaterialInfo getIorInfo(MaterialInfo info)
-        {
-            info.f0_dielectric = vec3(pow(( u_Ior - 1.0) /  (u_Ior + 1.0), 2.0));
-            info.ior = u_Ior;
-            return info;
-        }
-        #endif
-
-        #ifdef MATERIAL_ANISOTROPY
-        MaterialInfo getAnisotropyInfo(MaterialInfo info, NormalInfo normalInfo)
-        {
-            vec2 direction = vec2(1.0, 0.0);
-            float strengthFactor = 1.0;
-        #ifdef HAS_ANISOTROPY_MAP
-            vec3 anisotropySample = texture(u_AnisotropySampler, getAnisotropyUV()).xyz;
-            direction = anisotropySample.xy * 2.0 - vec2(1.0);
-            strengthFactor = anisotropySample.z;
-        #endif
-            vec2 directionRotation = u_Anisotropy.xy; // cos(theta), sin(theta)
-            mat2 rotationMatrix = mat2(directionRotation.x, directionRotation.y, -directionRotation.y, directionRotation.x);
-            direction = rotationMatrix * direction.xy;
-
-            info.anisotropicT = mat3(normalInfo.t, normalInfo.b, normalInfo.n) * normalize(vec3(direction, 0.0));
-            info.anisotropicB = cross(normalInfo.ng, info.anisotropicT);
-            info.anisotropyStrength = clamp(u_Anisotropy.z * strengthFactor, 0.0, 1.0);
-            return info;
-        }
-        #endif
-
-
-        float albedoSheenScalingLUT(float NdotV, float sheenRoughnessFactor)
-        {
-            //return NdotV;
-            return texture(u_SheenELUT, vec2(NdotV, sheenRoughnessFactor)).r;
-        }
-
-    )"
+        "material_info5.glsl", "\n"
+            "\n"
+            "        #ifdef MATERIAL_CLEARCOAT\n"
+            "        MaterialInfo getClearCoatInfo(MaterialInfo info, NormalInfo normalInfo)\n"
+            "        {\n"
+            "            info.clearcoatFactor = u_ClearcoatFactor;\n"
+            "            info.clearcoatRoughness = u_ClearcoatRoughnessFactor;\n"
+            "            info.clearcoatF0 = vec3(pow((info.ior - 1.0) / (info.ior + 1.0), 2.0));\n"
+            "            info.clearcoatF90 = vec3(1.0);\n"
+            "\n"
+            "        #ifdef HAS_CLEARCOAT_MAP\n"
+            "            vec4 clearcoatSample = texture(u_ClearcoatSampler, getClearcoatUV());\n"
+            "            info.clearcoatFactor *= clearcoatSample.r;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_CLEARCOAT_ROUGHNESS_MAP\n"
+            "            vec4 clearcoatSampleRoughness = texture(u_ClearcoatRoughnessSampler, getClearcoatRoughnessUV());\n"
+            "            info.clearcoatRoughness *= clearcoatSampleRoughness.g;\n"
+            "        #endif\n"
+            "\n"
+            "            info.clearcoatNormal = getClearcoatNormal(normalInfo);\n"
+            "            info.clearcoatRoughness = clamp(info.clearcoatRoughness, 0.0, 1.0);\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_IOR\n"
+            "        MaterialInfo getIorInfo(MaterialInfo info)\n"
+            "        {\n"
+            "            info.f0_dielectric = vec3(pow(( u_Ior - 1.0) /  (u_Ior + 1.0), 2.0));\n"
+            "            info.ior = u_Ior;\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_ANISOTROPY\n"
+            "        MaterialInfo getAnisotropyInfo(MaterialInfo info, NormalInfo normalInfo)\n"
+            "        {\n"
+            "            vec2 direction = vec2(1.0, 0.0);\n"
+            "            float strengthFactor = 1.0;\n"
+            "        #ifdef HAS_ANISOTROPY_MAP\n"
+            "            vec3 anisotropySample = texture(u_AnisotropySampler, getAnisotropyUV()).xyz;\n"
+            "            direction = anisotropySample.xy * 2.0 - vec2(1.0);\n"
+            "            strengthFactor = anisotropySample.z;\n"
+            "        #endif\n"
+            "            vec2 directionRotation = u_Anisotropy.xy; // cos(theta), sin(theta)\n"
+            "            mat2 rotationMatrix = mat2(directionRotation.x, directionRotation.y, -directionRotation.y, directionRotation.x);\n"
+            "            direction = rotationMatrix * direction.xy;\n"
+            "\n"
+            "            info.anisotropicT = mat3(normalInfo.t, normalInfo.b, normalInfo.n) * normalize(vec3(direction, 0.0));\n"
+            "            info.anisotropicB = cross(normalInfo.ng, info.anisotropicT);\n"
+            "            info.anisotropyStrength = clamp(u_Anisotropy.z * strengthFactor, 0.0, 1.0);\n"
+            "            return info;\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        float albedoSheenScalingLUT(float NdotV, float sheenRoughnessFactor)\n"
+            "        {\n"
+            "            //return NdotV;\n"
+            "            return texture(u_SheenELUT, vec2(NdotV, sheenRoughnessFactor)).r;\n"
+            "        }\n"
+            "\n"
+            "    "
     },
     {
-        "iridescence.glsl", R"(
-        const mat3 XYZ_TO_REC709 = mat3(
-            3.2404542, -0.9692660,  0.0556434,
-            -1.5371385,  1.8760108, -0.2040259,
-            -0.4985314,  0.0415560,  1.0572252
-        );
-
-        vec3 Fresnel0ToIor(vec3 fresnel0) {
-            vec3 sqrtF0 = sqrt(fresnel0);
-            return (vec3(1.0) + sqrtF0) / (vec3(1.0) - sqrtF0);
-        }
-
-        vec3 IorToFresnel0(vec3 transmittedIor, float incidentIor) {
-            return sq((transmittedIor - vec3(incidentIor)) / (transmittedIor + vec3(incidentIor)));
-        }
-
-        float IorToFresnel0(float transmittedIor, float incidentIor) {
-            return sq((transmittedIor - incidentIor) / (transmittedIor + incidentIor));
-        }
-
-        vec3 evalSensitivity(float OPD, vec3 shift) {
-            float phase = 2.0 * M_PI * OPD * 1.0e-9;
-            vec3 val = vec3(5.4856e-13, 4.4201e-13, 5.2481e-13);
-            vec3 pos = vec3(1.6810e+06, 1.7953e+06, 2.2084e+06);
-            vec3 var = vec3(4.3278e+09, 9.3046e+09, 6.6121e+09);
-
-            vec3 xyz = val * sqrt(2.0 * M_PI * var) * cos(pos * phase + shift) * exp(-sq(phase) * var);
-            xyz.x += 9.7470e-14 * sqrt(2.0 * M_PI * 4.5282e+09) * cos(2.2399e+06 * phase + shift[0]) * exp(-4.5282e+09 * sq(phase));
-            xyz /= 1.0685e-7;
-
-            vec3 srgb = XYZ_TO_REC709 * xyz;
-            return srgb;
-        }
-
-        vec3 evalIridescence(float outsideIOR, float eta2, float cosTheta1, float thinFilmThickness, vec3 baseF0) {
-            vec3 I;
-
-            // Force iridescenceIor -> outsideIOR when thinFilmThickness -> 0.0
-            float iridescenceIor = mix(outsideIOR, eta2, smoothstep(0.0, 0.03, thinFilmThickness));
-            // Evaluate the cosTheta on the base layer (Snell law)
-            float sinTheta2Sq = sq(outsideIOR / iridescenceIor) * (1.0 - sq(cosTheta1));
-
-            // Handle TIR:
-            float cosTheta2Sq = 1.0 - sinTheta2Sq;
-            if (cosTheta2Sq < 0.0) {
-                return vec3(1.0);
-            }
-
-            float cosTheta2 = sqrt(cosTheta2Sq);
-
-            // First interface
-            float R0 = IorToFresnel0(iridescenceIor, outsideIOR);
-            float R12 = F_Schlick(R0, cosTheta1);
-            float R21 = R12;
-            float T121 = 1.0 - R12;
-            float phi12 = 0.0;
-            if (iridescenceIor < outsideIOR) phi12 = M_PI;
-            float phi21 = M_PI - phi12;
-
-            // Second interface
-            vec3 baseIOR = Fresnel0ToIor(clamp(baseF0, 0.0, 0.9999)); // guard against 1.0
-            vec3 R1 = IorToFresnel0(baseIOR, iridescenceIor);
-            vec3 R23 = F_Schlick(R1, cosTheta2);
-            vec3 phi23 = vec3(0.0);
-            if (baseIOR[0] < iridescenceIor) phi23[0] = M_PI;
-            if (baseIOR[1] < iridescenceIor) phi23[1] = M_PI;
-            if (baseIOR[2] < iridescenceIor) phi23[2] = M_PI;
-
-            // Phase shift
-            float OPD = 2.0 * iridescenceIor * thinFilmThickness * cosTheta2;
-            vec3 phi = vec3(phi21) + phi23;
-
-            // Compound terms
-            vec3 R123 = clamp(R12 * R23, 1e-5, 0.9999);
-            vec3 r123 = sqrt(R123);
-            vec3 Rs = sq(T121) * R23 / (vec3(1.0) - R123);
-
-            // Reflectance term for m = 0 (DC term amplitude)
-            vec3 C0 = R12 + Rs;
-            I = C0;
-
-            // Reflectance term for m > 0 (pairs of diracs)
-            vec3 Cm = Rs - T121;
-            for (int m = 1; m <= 2; ++m)
-            {
-                Cm *= r123;
-                vec3 Sm = 2.0 * evalSensitivity(float(m) * OPD, float(m) * phi);
-                I += Cm * Sm;
-            }
-
-            // Since out of gamut colors might be produced, negative color values are clamped to 0.
-            return max(I, vec3(0.0));
-        }
-    )"
+        "iridescence.glsl", "\n"
+            "        const mat3 XYZ_TO_REC709 = mat3(\n"
+            "            3.2404542, -0.9692660,  0.0556434,\n"
+            "            -1.5371385,  1.8760108, -0.2040259,\n"
+            "            -0.4985314,  0.0415560,  1.0572252\n"
+            "        );\n"
+            "\n"
+            "        vec3 Fresnel0ToIor(vec3 fresnel0) {\n"
+            "            vec3 sqrtF0 = sqrt(fresnel0);\n"
+            "            return (vec3(1.0) + sqrtF0) / (vec3(1.0) - sqrtF0);\n"
+            "        }\n"
+            "\n"
+            "        vec3 IorToFresnel0(vec3 transmittedIor, float incidentIor) {\n"
+            "            return sq((transmittedIor - vec3(incidentIor)) / (transmittedIor + vec3(incidentIor)));\n"
+            "        }\n"
+            "\n"
+            "        float IorToFresnel0(float transmittedIor, float incidentIor) {\n"
+            "            return sq((transmittedIor - incidentIor) / (transmittedIor + incidentIor));\n"
+            "        }\n"
+            "\n"
+            "        vec3 evalSensitivity(float OPD, vec3 shift) {\n"
+            "            float phase = 2.0 * M_PI * OPD * 1.0e-9;\n"
+            "            vec3 val = vec3(5.4856e-13, 4.4201e-13, 5.2481e-13);\n"
+            "            vec3 pos = vec3(1.6810e+06, 1.7953e+06, 2.2084e+06);\n"
+            "            vec3 var = vec3(4.3278e+09, 9.3046e+09, 6.6121e+09);\n"
+            "\n"
+            "            vec3 xyz = val * sqrt(2.0 * M_PI * var) * cos(pos * phase + shift) * exp(-sq(phase) * var);\n"
+            "            xyz.x += 9.7470e-14 * sqrt(2.0 * M_PI * 4.5282e+09) * cos(2.2399e+06 * phase + shift[0]) * exp(-4.5282e+09 * sq(phase));\n"
+            "            xyz /= 1.0685e-7;\n"
+            "\n"
+            "            vec3 srgb = XYZ_TO_REC709 * xyz;\n"
+            "            return srgb;\n"
+            "        }\n"
+            "\n"
+            "        vec3 evalIridescence(float outsideIOR, float eta2, float cosTheta1, float thinFilmThickness, vec3 baseF0) {\n"
+            "            vec3 I;\n"
+            "\n"
+            "            // Force iridescenceIor -> outsideIOR when thinFilmThickness -> 0.0\n"
+            "            float iridescenceIor = mix(outsideIOR, eta2, smoothstep(0.0, 0.03, thinFilmThickness));\n"
+            "            // Evaluate the cosTheta on the base layer (Snell law)\n"
+            "            float sinTheta2Sq = sq(outsideIOR / iridescenceIor) * (1.0 - sq(cosTheta1));\n"
+            "\n"
+            "            // Handle TIR:\n"
+            "            float cosTheta2Sq = 1.0 - sinTheta2Sq;\n"
+            "            if (cosTheta2Sq < 0.0) {\n"
+            "                return vec3(1.0);\n"
+            "            }\n"
+            "\n"
+            "            float cosTheta2 = sqrt(cosTheta2Sq);\n"
+            "\n"
+            "            // First interface\n"
+            "            float R0 = IorToFresnel0(iridescenceIor, outsideIOR);\n"
+            "            float R12 = F_Schlick(R0, cosTheta1);\n"
+            "            float R21 = R12;\n"
+            "            float T121 = 1.0 - R12;\n"
+            "            float phi12 = 0.0;\n"
+            "            if (iridescenceIor < outsideIOR) phi12 = M_PI;\n"
+            "            float phi21 = M_PI - phi12;\n"
+            "\n"
+            "            // Second interface\n"
+            "            vec3 baseIOR = Fresnel0ToIor(clamp(baseF0, 0.0, 0.9999)); // guard against 1.0\n"
+            "            vec3 R1 = IorToFresnel0(baseIOR, iridescenceIor);\n"
+            "            vec3 R23 = F_Schlick(R1, cosTheta2);\n"
+            "            vec3 phi23 = vec3(0.0);\n"
+            "            if (baseIOR[0] < iridescenceIor) phi23[0] = M_PI;\n"
+            "            if (baseIOR[1] < iridescenceIor) phi23[1] = M_PI;\n"
+            "            if (baseIOR[2] < iridescenceIor) phi23[2] = M_PI;\n"
+            "\n"
+            "            // Phase shift\n"
+            "            float OPD = 2.0 * iridescenceIor * thinFilmThickness * cosTheta2;\n"
+            "            vec3 phi = vec3(phi21) + phi23;\n"
+            "\n"
+            "            // Compound terms\n"
+            "            vec3 R123 = clamp(R12 * R23, 1e-5, 0.9999);\n"
+            "            vec3 r123 = sqrt(R123);\n"
+            "            vec3 Rs = sq(T121) * R23 / (vec3(1.0) - R123);\n"
+            "\n"
+            "            // Reflectance term for m = 0 (DC term amplitude)\n"
+            "            vec3 C0 = R12 + Rs;\n"
+            "            I = C0;\n"
+            "\n"
+            "            // Reflectance term for m > 0 (pairs of diracs)\n"
+            "            vec3 Cm = Rs - T121;\n"
+            "            for (int m = 1; m <= 2; ++m)\n"
+            "            {\n"
+            "                Cm *= r123;\n"
+            "                vec3 Sm = 2.0 * evalSensitivity(float(m) * OPD, float(m) * phi);\n"
+            "                I += Cm * Sm;\n"
+            "            }\n"
+            "\n"
+            "            // Since out of gamut colors might be produced, negative color values are clamped to 0.\n"
+            "            return max(I, vec3(0.0));\n"
+            "        }\n"
+            "    "
     },
     {
-        "animation1.glsl", R"(
-
-        #ifdef HAS_MORPH_TARGETS
-        uniform highp sampler2DArray u_MorphTargetsSampler;
-        #endif
-
-        #ifdef USE_MORPHING
-        uniform float u_morphWeights[WEIGHT_COUNT];
-        #endif
-
-        #ifdef HAS_JOINTS_0_VEC4
-        in vec4 a_joints_0;
-        #endif
-
-        #ifdef HAS_JOINTS_1_VEC4
-        in vec4 a_joints_1;
-        #endif
-
-        #ifdef HAS_WEIGHTS_0_VEC4
-        in vec4 a_weights_0;
-        #endif
-
-        #ifdef HAS_WEIGHTS_1_VEC4
-        in vec4 a_weights_1;
-        #endif
-
-        #ifdef USE_SKINNING
-        uniform sampler2D u_jointsSampler;
-        #endif
-
-        #ifdef USE_SKINNING
-
-        mat4 getMatrixFromTexture(sampler2D s, int index)
-        {
-            mat4 result = mat4(1);
-            int texSize = textureSize(s, 0)[0];
-            int pixelIndex = index * 4;
-            for (int i = 0; i < 4; ++i)
-            {
-                int x = (pixelIndex + i) % texSize;
-                //Rounding mode of integers is undefined:
-                //https://www.khronos.org/registry/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf (section 12.33)
-                int y = (pixelIndex + i - x) / texSize; 
-                result[i] = texelFetch(s, ivec2(x,y), 0);
-            }
-            return result;
-        }
-
-        mat4 getSkinningMatrix()
-        {
-            mat4 skin = mat4(0);
-
-        #if defined(HAS_WEIGHTS_0_VEC4) && defined(HAS_JOINTS_0_VEC4)
-            skin +=
-                a_weights_0.x * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.x) * 2) +
-                a_weights_0.y * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.y) * 2) +
-                a_weights_0.z * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.z) * 2) +
-                a_weights_0.w * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.w) * 2);
-        #endif
-
-        #if defined(HAS_WEIGHTS_1_VEC4) && defined(HAS_JOINTS_1_VEC4)
-            skin +=
-                a_weights_1.x * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.x) * 2) +
-                a_weights_1.y * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.y) * 2) +
-                a_weights_1.z * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.z) * 2) +
-                a_weights_1.w * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.w) * 2);
-        #endif
-            if (skin == mat4(0)) { 
-                return mat4(1); 
-            }
-            return skin;
-        }
-
-
-        mat4 getSkinningNormalMatrix()
-        {
-            mat4 skin = mat4(0);
-
-        #if defined(HAS_WEIGHTS_0_VEC4) && defined(HAS_JOINTS_0_VEC4)
-            skin +=
-                a_weights_0.x * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.x) * 2 + 1) +
-                a_weights_0.y * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.y) * 2 + 1) +
-                a_weights_0.z * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.z) * 2 + 1) +
-                a_weights_0.w * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.w) * 2 + 1);
-        #endif
-
-        #if defined(HAS_WEIGHTS_1_VEC4) && defined(HAS_JOINTS_1_VEC4)
-            skin +=
-                a_weights_1.x * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.x) * 2 + 1) +
-                a_weights_1.y * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.y) * 2 + 1) +
-                a_weights_1.z * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.z) * 2 + 1) +
-                a_weights_1.w * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.w) * 2 + 1);
-        #endif
-            if (skin == mat4(0)) { 
-                return mat4(1); 
-            }
-            return skin;
-        }
-
-        #endif // !USE_SKINNING
-
-    )"
+        "animation1.glsl", "\n"
+            "\n"
+            "        #ifdef HAS_MORPH_TARGETS\n"
+            "        uniform highp sampler2DArray u_MorphTargetsSampler;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef USE_MORPHING\n"
+            "        uniform float u_morphWeights[WEIGHT_COUNT];\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_JOINTS_0_VEC4\n"
+            "        in vec4 a_joints_0;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_JOINTS_1_VEC4\n"
+            "        in vec4 a_joints_1;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_WEIGHTS_0_VEC4\n"
+            "        in vec4 a_weights_0;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_WEIGHTS_1_VEC4\n"
+            "        in vec4 a_weights_1;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef USE_SKINNING\n"
+            "        uniform sampler2D u_jointsSampler;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef USE_SKINNING\n"
+            "\n"
+            "        mat4 getMatrixFromTexture(sampler2D s, int index)\n"
+            "        {\n"
+            "            mat4 result = mat4(1);\n"
+            "            int texSize = textureSize(s, 0)[0];\n"
+            "            int pixelIndex = index * 4;\n"
+            "            for (int i = 0; i < 4; ++i)\n"
+            "            {\n"
+            "                int x = (pixelIndex + i) % texSize;\n"
+            "                //Rounding mode of integers is undefined:\n"
+            "                //https://www.khronos.org/registry/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf (section 12.33)\n"
+            "                int y = (pixelIndex + i - x) / texSize; \n"
+            "                result[i] = texelFetch(s, ivec2(x,y), 0);\n"
+            "            }\n"
+            "            return result;\n"
+            "        }\n"
+            "\n"
+            "        mat4 getSkinningMatrix()\n"
+            "        {\n"
+            "            mat4 skin = mat4(0);\n"
+            "\n"
+            "        #if defined(HAS_WEIGHTS_0_VEC4) && defined(HAS_JOINTS_0_VEC4)\n"
+            "            skin +=\n"
+            "                a_weights_0.x * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.x) * 2) +\n"
+            "                a_weights_0.y * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.y) * 2) +\n"
+            "                a_weights_0.z * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.z) * 2) +\n"
+            "                a_weights_0.w * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.w) * 2);\n"
+            "        #endif\n"
+            "\n"
+            "        #if defined(HAS_WEIGHTS_1_VEC4) && defined(HAS_JOINTS_1_VEC4)\n"
+            "            skin +=\n"
+            "                a_weights_1.x * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.x) * 2) +\n"
+            "                a_weights_1.y * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.y) * 2) +\n"
+            "                a_weights_1.z * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.z) * 2) +\n"
+            "                a_weights_1.w * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.w) * 2);\n"
+            "        #endif\n"
+            "            if (skin == mat4(0)) { \n"
+            "                return mat4(1); \n"
+            "            }\n"
+            "            return skin;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        mat4 getSkinningNormalMatrix()\n"
+            "        {\n"
+            "            mat4 skin = mat4(0);\n"
+            "\n"
+            "        #if defined(HAS_WEIGHTS_0_VEC4) && defined(HAS_JOINTS_0_VEC4)\n"
+            "            skin +=\n"
+            "                a_weights_0.x * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.x) * 2 + 1) +\n"
+            "                a_weights_0.y * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.y) * 2 + 1) +\n"
+            "                a_weights_0.z * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.z) * 2 + 1) +\n"
+            "                a_weights_0.w * getMatrixFromTexture(u_jointsSampler, int(a_joints_0.w) * 2 + 1);\n"
+            "        #endif\n"
+            "\n"
+            "        #if defined(HAS_WEIGHTS_1_VEC4) && defined(HAS_JOINTS_1_VEC4)\n"
+            "            skin +=\n"
+            "                a_weights_1.x * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.x) * 2 + 1) +\n"
+            "                a_weights_1.y * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.y) * 2 + 1) +\n"
+            "                a_weights_1.z * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.z) * 2 + 1) +\n"
+            "                a_weights_1.w * getMatrixFromTexture(u_jointsSampler, int(a_joints_1.w) * 2 + 1);\n"
+            "        #endif\n"
+            "            if (skin == mat4(0)) { \n"
+            "                return mat4(1); \n"
+            "            }\n"
+            "            return skin;\n"
+            "        }\n"
+            "\n"
+            "        #endif // !USE_SKINNING\n"
+            "\n"
+            "    "
     },
     {
-        "animation2.glsl", R"(
-        #ifdef USE_MORPHING
-
-        #ifdef HAS_MORPH_TARGETS
-        vec4 getDisplacement(int vertexID, int targetIndex, int texSize)
-        {
-            int x = vertexID % texSize;
-            //Rounding mode of integers is undefined:
-            //https://www.khronos.org/registry/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf (section 12.33)
-            int y = (vertexID - x) / texSize; 
-            return texelFetch(u_MorphTargetsSampler, ivec3(x, y, targetIndex), 0);
-        }
-        #endif
-
-
-        vec4 getTargetPosition(int vertexID)
-        {
-            vec4 pos = vec4(0);
-        #ifdef HAS_MORPH_TARGET_POSITION
-            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];
-            for(int i = 0; i < WEIGHT_COUNT; i++)
-            {
-                vec4 displacement = getDisplacement(vertexID, MORPH_TARGET_POSITION_OFFSET + i, texSize);
-                pos += u_morphWeights[i] * displacement;
-            }
-        #endif
-
-            return pos;
-        }
-
-        vec3 getTargetNormal(int vertexID)
-        {
-            vec3 normal = vec3(0);
-
-        #ifdef HAS_MORPH_TARGET_NORMAL
-            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];
-            for(int i = 0; i < WEIGHT_COUNT; i++)
-            {
-                vec3 displacement = getDisplacement(vertexID, MORPH_TARGET_NORMAL_OFFSET + i, texSize).xyz;
-                normal += u_morphWeights[i] * displacement;
-            }
-        #endif
-
-            return normal;
-        }
-
-
-        vec3 getTargetTangent(int vertexID)
-        {
-            vec3 tangent = vec3(0);
-
-        #ifdef HAS_MORPH_TARGET_TANGENT
-            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];
-            for(int i = 0; i < WEIGHT_COUNT; i++)
-            {
-                vec3 displacement = getDisplacement(vertexID, MORPH_TARGET_TANGENT_OFFSET + i, texSize).xyz;
-                tangent += u_morphWeights[i] * displacement;
-            }
-        #endif
-
-            return tangent;
-        }
-
-        vec2 getTargetTexCoord0(int vertexID)
-        {
-            vec2 uv = vec2(0);
-
-        #ifdef HAS_MORPH_TARGET_TEXCOORD_0
-            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];
-            for(int i = 0; i < WEIGHT_COUNT; i++)
-            {
-                vec2 displacement = getDisplacement(vertexID, MORPH_TARGET_TEXCOORD_0_OFFSET + i, texSize).xy;
-                uv += u_morphWeights[i] * displacement;
-            }
-        #endif
-
-            return uv;
-        }
-
-        vec2 getTargetTexCoord1(int vertexID)
-        {
-            vec2 uv = vec2(0);
-
-        #ifdef HAS_MORPH_TARGET_TEXCOORD_1
-            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];
-            for(int i = 0; i < WEIGHT_COUNT; i++)
-            {
-                vec2 displacement = getDisplacement(vertexID, MORPH_TARGET_TEXCOORD_1_OFFSET + i, texSize).xy;
-                uv += u_morphWeights[i] * displacement;
-            }
-        #endif
-
-            return uv;
-        }
-
-        vec4 getTargetColor0(int vertexID)
-        {
-            vec4 color = vec4(0);
-
-        #ifdef HAS_MORPH_TARGET_COLOR_0
-            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];
-            for(int i = 0; i < WEIGHT_COUNT; i++)
-            {
-                vec4 displacement = getDisplacement(vertexID, MORPH_TARGET_COLOR_0_OFFSET + i, texSize);
-                color += u_morphWeights[i] * displacement;
-            }
-        #endif
-
-            return color;
-        }
-
-        #endif // !USE_MORPHING
-    )"
+        "animation2.glsl", "\n"
+            "        #ifdef USE_MORPHING\n"
+            "\n"
+            "        #ifdef HAS_MORPH_TARGETS\n"
+            "        vec4 getDisplacement(int vertexID, int targetIndex, int texSize)\n"
+            "        {\n"
+            "            int x = vertexID % texSize;\n"
+            "            //Rounding mode of integers is undefined:\n"
+            "            //https://www.khronos.org/registry/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf (section 12.33)\n"
+            "            int y = (vertexID - x) / texSize; \n"
+            "            return texelFetch(u_MorphTargetsSampler, ivec3(x, y, targetIndex), 0);\n"
+            "        }\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        vec4 getTargetPosition(int vertexID)\n"
+            "        {\n"
+            "            vec4 pos = vec4(0);\n"
+            "        #ifdef HAS_MORPH_TARGET_POSITION\n"
+            "            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];\n"
+            "            for(int i = 0; i < WEIGHT_COUNT; i++)\n"
+            "            {\n"
+            "                vec4 displacement = getDisplacement(vertexID, MORPH_TARGET_POSITION_OFFSET + i, texSize);\n"
+            "                pos += u_morphWeights[i] * displacement;\n"
+            "            }\n"
+            "        #endif\n"
+            "\n"
+            "            return pos;\n"
+            "        }\n"
+            "\n"
+            "        vec3 getTargetNormal(int vertexID)\n"
+            "        {\n"
+            "            vec3 normal = vec3(0);\n"
+            "\n"
+            "        #ifdef HAS_MORPH_TARGET_NORMAL\n"
+            "            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];\n"
+            "            for(int i = 0; i < WEIGHT_COUNT; i++)\n"
+            "            {\n"
+            "                vec3 displacement = getDisplacement(vertexID, MORPH_TARGET_NORMAL_OFFSET + i, texSize).xyz;\n"
+            "                normal += u_morphWeights[i] * displacement;\n"
+            "            }\n"
+            "        #endif\n"
+            "\n"
+            "            return normal;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        vec3 getTargetTangent(int vertexID)\n"
+            "        {\n"
+            "            vec3 tangent = vec3(0);\n"
+            "\n"
+            "        #ifdef HAS_MORPH_TARGET_TANGENT\n"
+            "            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];\n"
+            "            for(int i = 0; i < WEIGHT_COUNT; i++)\n"
+            "            {\n"
+            "                vec3 displacement = getDisplacement(vertexID, MORPH_TARGET_TANGENT_OFFSET + i, texSize).xyz;\n"
+            "                tangent += u_morphWeights[i] * displacement;\n"
+            "            }\n"
+            "        #endif\n"
+            "\n"
+            "            return tangent;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getTargetTexCoord0(int vertexID)\n"
+            "        {\n"
+            "            vec2 uv = vec2(0);\n"
+            "\n"
+            "        #ifdef HAS_MORPH_TARGET_TEXCOORD_0\n"
+            "            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];\n"
+            "            for(int i = 0; i < WEIGHT_COUNT; i++)\n"
+            "            {\n"
+            "                vec2 displacement = getDisplacement(vertexID, MORPH_TARGET_TEXCOORD_0_OFFSET + i, texSize).xy;\n"
+            "                uv += u_morphWeights[i] * displacement;\n"
+            "            }\n"
+            "        #endif\n"
+            "\n"
+            "            return uv;\n"
+            "        }\n"
+            "\n"
+            "        vec2 getTargetTexCoord1(int vertexID)\n"
+            "        {\n"
+            "            vec2 uv = vec2(0);\n"
+            "\n"
+            "        #ifdef HAS_MORPH_TARGET_TEXCOORD_1\n"
+            "            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];\n"
+            "            for(int i = 0; i < WEIGHT_COUNT; i++)\n"
+            "            {\n"
+            "                vec2 displacement = getDisplacement(vertexID, MORPH_TARGET_TEXCOORD_1_OFFSET + i, texSize).xy;\n"
+            "                uv += u_morphWeights[i] * displacement;\n"
+            "            }\n"
+            "        #endif\n"
+            "\n"
+            "            return uv;\n"
+            "        }\n"
+            "\n"
+            "        vec4 getTargetColor0(int vertexID)\n"
+            "        {\n"
+            "            vec4 color = vec4(0);\n"
+            "\n"
+            "        #ifdef HAS_MORPH_TARGET_COLOR_0\n"
+            "            int texSize = textureSize(u_MorphTargetsSampler, 0)[0];\n"
+            "            for(int i = 0; i < WEIGHT_COUNT; i++)\n"
+            "            {\n"
+            "                vec4 displacement = getDisplacement(vertexID, MORPH_TARGET_COLOR_0_OFFSET + i, texSize);\n"
+            "                color += u_morphWeights[i] * displacement;\n"
+            "            }\n"
+            "        #endif\n"
+            "\n"
+            "            return color;\n"
+            "        }\n"
+            "\n"
+            "        #endif // !USE_MORPHING\n"
+            "    "
     },
     {
-        "vert_v1_chunk_00.glsl", R"(
-
-        #ifdef HAS_NORMAL_VEC3
-        in vec3 a_normal;
-        #endif
-
-        #ifdef HAS_NORMAL_VEC3
-        #ifdef HAS_TANGENT_VEC4
-        in vec4 a_tangent;
-        out mat3 v_TBN;
-        #else
-        out vec3 v_Normal;
-        #endif
-        #endif
-
-        #ifdef HAS_TEXCOORD_0_VEC2
-        in vec2 a_texcoord_0;
-        #endif
-
-        #ifdef HAS_TEXCOORD_1_VEC2
-        in vec2 a_texcoord_1;
-        #endif
-
-        out vec2 v_texcoord_0;
-        out vec2 v_texcoord_1;
-
-        #ifdef HAS_COLOR_0_VEC3
-        in vec3 a_color_0;
-        out vec3 v_Color;
-        #endif
-
-        #ifdef HAS_COLOR_0_VEC4
-        in vec4 a_color_0;
-        out vec4 v_Color;
-        #endif
-
-        #ifdef USE_INSTANCING
-        in mat4 a_instance_model_matrix;
-        #endif
-
-        #ifdef HAS_VERT_NORMAL_UV_TRANSFORM
-        uniform mat3 u_vertNormalUVTransform;
-        #endif
-
-        #ifdef USE_SKINNING
-        vec4 getPosition(mat4 skinningMatrix)
-        #else
-        vec4 getPosition()
-        #endif /*USE_SKINNING*/
-        {
-            vec4 pos = vec4(a_position, 1.0);
-
-        #ifdef USE_MORPHING
-            pos += getTargetPosition(gl_VertexID);
-        #endif
-
-        #ifdef USE_SKINNING
-            pos = skinningMatrix * pos;
-        #endif
-
-            return pos;
-        }
-
-
-        #ifdef HAS_NORMAL_VEC3
-        #ifdef USE_SKINNING
-            vec3 getNormal(mat4 skinningNormalMatrix)
-        #else
-            vec3 getNormal()
-        #endif /*USE_SKINNING*/
-        {
-            vec3 normal = a_normal;
-
-        #ifdef USE_MORPHING
-            normal += getTargetNormal(gl_VertexID);
-        #endif
-
-        #ifdef USE_SKINNING
-            normal = mat3(skinningNormalMatrix) * normal;
-        #endif
-
-            return normalize(normal);
-        }
-        #endif
-    )"
+        "vert_v1_chunk_00.glsl", "\n"
+            "\n"
+            "        #ifdef HAS_NORMAL_VEC3\n"
+            "        in vec3 a_normal;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_NORMAL_VEC3\n"
+            "        #ifdef HAS_TANGENT_VEC4\n"
+            "        in vec4 a_tangent;\n"
+            "        out mat3 v_TBN;\n"
+            "        #else\n"
+            "        out vec3 v_Normal;\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_TEXCOORD_0_VEC2\n"
+            "        in vec2 a_texcoord_0;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_TEXCOORD_1_VEC2\n"
+            "        in vec2 a_texcoord_1;\n"
+            "        #endif\n"
+            "\n"
+            "        out vec2 v_texcoord_0;\n"
+            "        out vec2 v_texcoord_1;\n"
+            "\n"
+            "        #ifdef HAS_COLOR_0_VEC3\n"
+            "        in vec3 a_color_0;\n"
+            "        out vec3 v_Color;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_COLOR_0_VEC4\n"
+            "        in vec4 a_color_0;\n"
+            "        out vec4 v_Color;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef USE_INSTANCING\n"
+            "        in mat4 a_instance_model_matrix;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef HAS_VERT_NORMAL_UV_TRANSFORM\n"
+            "        uniform mat3 u_vertNormalUVTransform;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef USE_SKINNING\n"
+            "        vec4 getPosition(mat4 skinningMatrix)\n"
+            "        #else\n"
+            "        vec4 getPosition()\n"
+            "        #endif /*USE_SKINNING*/\n"
+            "        {\n"
+            "            vec4 pos = vec4(a_position, 1.0);\n"
+            "\n"
+            "        #ifdef USE_MORPHING\n"
+            "            pos += getTargetPosition(gl_VertexID);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef USE_SKINNING\n"
+            "            pos = skinningMatrix * pos;\n"
+            "        #endif\n"
+            "\n"
+            "            return pos;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        #ifdef HAS_NORMAL_VEC3\n"
+            "        #ifdef USE_SKINNING\n"
+            "            vec3 getNormal(mat4 skinningNormalMatrix)\n"
+            "        #else\n"
+            "            vec3 getNormal()\n"
+            "        #endif /*USE_SKINNING*/\n"
+            "        {\n"
+            "            vec3 normal = a_normal;\n"
+            "\n"
+            "        #ifdef USE_MORPHING\n"
+            "            normal += getTargetNormal(gl_VertexID);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef USE_SKINNING\n"
+            "            normal = mat3(skinningNormalMatrix) * normal;\n"
+            "        #endif\n"
+            "\n"
+            "            return normalize(normal);\n"
+            "        }\n"
+            "        #endif\n"
+            "    "
     },
     {
-        "vert_v1_chunk_01a.glsl", R"(
-        #ifdef HAS_NORMAL_VEC3
-        #ifdef HAS_TANGENT_VEC4
-        #ifdef USE_SKINNING
-        vec3 getTangent(mat4 skinningMatrix)
-        #else
-        vec3 getTangent()
-        #endif /*USE_SKINNING*/
-        {
-            vec3 tangent = a_tangent.xyz;
-
-        #ifdef USE_MORPHING
-            tangent += getTargetTangent(gl_VertexID);
-        #endif
-        #ifdef USE_SKINNING
-            tangent = mat3(skinningMatrix) * tangent;
-        #endif
-            return normalize(tangent);
-        }
-        #endif /*HAS_TANGENT_VEC4*/
-        #endif /*HAS_NORMAL_VEC3*/
-
-        mat4 temp_makeNormalMatrixFromViewProj(mat4 _viewProjModelMatrix) {
-            mat4 normMat = _viewProjModelMatrix ;
-            normMat[0][0] = 1.0;
-            normMat[0][1] = 0.0;
-            normMat[0][2] = 0.0;
-            normMat[0][3] = 0.0;
-            normMat[1][0] = 0.0;
-            normMat[1][3] = 0.0;
-            normMat[2][0] = 0.0;
-            normMat[2][3] = 0.0;
-            normMat[3][0] = 0.0;
-            normMat[3][1] = 0.0;
-            normMat[3][2] = 0.0;
-            normMat[3][3] = 1.0;
-            return normMat;
-        }
-    )"
+        "vert_v1_chunk_01a.glsl", "\n"
+            "        #ifdef HAS_NORMAL_VEC3\n"
+            "        #ifdef HAS_TANGENT_VEC4\n"
+            "        #ifdef USE_SKINNING\n"
+            "        vec3 getTangent(mat4 skinningMatrix)\n"
+            "        #else\n"
+            "        vec3 getTangent()\n"
+            "        #endif /*USE_SKINNING*/\n"
+            "        {\n"
+            "            vec3 tangent = a_tangent.xyz;\n"
+            "\n"
+            "        #ifdef USE_MORPHING\n"
+            "            tangent += getTargetTangent(gl_VertexID);\n"
+            "        #endif\n"
+            "        #ifdef USE_SKINNING\n"
+            "            tangent = mat3(skinningMatrix) * tangent;\n"
+            "        #endif\n"
+            "            return normalize(tangent);\n"
+            "        }\n"
+            "        #endif /*HAS_TANGENT_VEC4*/\n"
+            "        #endif /*HAS_NORMAL_VEC3*/\n"
+            "\n"
+            "        mat4 temp_makeNormalMatrixFromViewProj(mat4 _viewProjModelMatrix) {\n"
+            "            mat4 normMat = _viewProjModelMatrix ;\n"
+            "            normMat[0][0] = 1.0;\n"
+            "            normMat[0][1] = 0.0;\n"
+            "            normMat[0][2] = 0.0;\n"
+            "            normMat[0][3] = 0.0;\n"
+            "            normMat[1][0] = 0.0;\n"
+            "            normMat[1][3] = 0.0;\n"
+            "            normMat[2][0] = 0.0;\n"
+            "            normMat[2][3] = 0.0;\n"
+            "            normMat[3][0] = 0.0;\n"
+            "            normMat[3][1] = 0.0;\n"
+            "            normMat[3][2] = 0.0;\n"
+            "            normMat[3][3] = 1.0;\n"
+            "            return normMat;\n"
+            "        }\n"
+            "    "
     },
     {
-        "vert_v1_chunk_01b.glsl", R"(
-        void main()
-        {
-            gl_PointSize = 1.0f;
-        #ifdef USE_INSTANCING
-            mat4 modelMatrix = a_instance_model_matrix;
-            mat4 normalMatrix = transpose(inverse(modelMatrix));
-        #else
-            mat4 modelMatrix = u_ModelMatrix;
-            //mat4 normalMatrix =  u_NormalMatrix;
-            mat4 normalMatrix =  transpose(inverse(modelMatrix));
-
-        #endif
-        #ifdef USE_SKINNING
-            mat4 skinMatrix = getSkinningMatrix();
-            vec4 pos = modelMatrix * getPosition(skinMatrix);
-        #else
-            vec4 pos = modelMatrix * getPosition();
-        #endif /*USE_SKINNING*/
-            v_Position = vec3(pos.xyz) / pos.w;
-
-        #ifdef HAS_NORMAL_VEC3
-        #ifdef HAS_TANGENT_VEC4
-        #ifdef USE_SKINNING
-            mat4 skinNormalMatrix = getSkinningNormalMatrix();
-            vec3 tangent = getTangent(skinMatrix);
-            vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(skinNormalMatrix), 0.0)));
-        #else
-            vec3 tangent = getTangent();
-            vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));
-        #endif /* USE_SKINNING */
-
-            vec3 tangentW = vec3(modelMatrix * vec4(tangent, 0.0));
-            vec3 bitangentW = cross(normalW, tangentW) * a_tangent.w;
-
-        #ifdef HAS_VERT_NORMAL_UV_TRANSFORM
-            tangentW = u_vertNormalUVTransform * tangentW;
-            bitangentW = u_vertNormalUVTransform * bitangentW;
-        #endif /* HAS_VERT_NORMAL_UV_TRANSFORM*/
-
-            bitangentW = normalize(bitangentW);
-            tangentW = normalize(tangentW);
-
-            v_TBN = mat3(tangentW, bitangentW, normalW);
-        #else
-        #ifdef USE_SKINNING
-            mat4 skinNormalMatrix = getSkinningNormalMatrix();
-            v_Normal = normalize(vec3(normalMatrix * vec4(getNormal(skinNormalMatrix), 0.0)));
-        #else
-            v_Normal = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));
-        #endif /*USE_SKINNING*/
-        #endif /*HAS_TANGENT_VEC4*/
-        #endif /*HAS_NORMAL_VEC3*/
-
-            v_texcoord_0 = vec2(0.0, 0.0);
-            v_texcoord_1 = vec2(0.0, 0.0);
-
-        #ifdef HAS_TEXCOORD_0_VEC2
-            v_texcoord_0 = a_texcoord_0;
-        #endif /*HAS_TEXCOORD_0_VEC2*/
-
-        #ifdef HAS_TEXCOORD_1_VEC2
-            v_texcoord_1 = a_texcoord_1;
-        #endif
-
-        #ifdef USE_MORPHING
-            v_texcoord_0 += getTargetTexCoord0(gl_VertexID);
-            v_texcoord_1 += getTargetTexCoord1(gl_VertexID);
-        #endif
-
-
-        #if defined(HAS_COLOR_0_VEC3) 
-            v_Color = a_color_0;
-        #if defined(USE_MORPHING)
-            v_Color = clamp(v_Color + getTargetColor0(gl_VertexID).xyz, 0.0f, 1.0f);
-        #endif
-        #endif
-
-        #if defined(HAS_COLOR_0_VEC4) 
-            v_Color = a_color_0;
-        #if defined(USE_MORPHING)
-            v_Color = clamp(v_Color + getTargetColor0(gl_VertexID), 0.0f, 1.0f);
-        #endif
-        #endif
-
-            gl_Position = u_ViewProjectionMatrix * pos;
-        }
-    )"
+        "vert_v1_chunk_01b.glsl", "\n"
+            "        void main()\n"
+            "        {\n"
+            "            gl_PointSize = 1.0f;\n"
+            "        #ifdef USE_INSTANCING\n"
+            "            mat4 modelMatrix = a_instance_model_matrix;\n"
+            "            mat4 normalMatrix = transpose(inverse(modelMatrix));\n"
+            "        #else\n"
+            "            mat4 modelMatrix = u_ModelMatrix;\n"
+            "            //mat4 normalMatrix =  u_NormalMatrix;\n"
+            "            mat4 normalMatrix =  transpose(inverse(modelMatrix));\n"
+            "\n"
+            "        #endif\n"
+            "        #ifdef USE_SKINNING\n"
+            "            mat4 skinMatrix = getSkinningMatrix();\n"
+            "            vec4 pos = modelMatrix * getPosition(skinMatrix);\n"
+            "        #else\n"
+            "            vec4 pos = modelMatrix * getPosition();\n"
+            "        #endif /*USE_SKINNING*/\n"
+            "            v_Position = vec3(pos.xyz) / pos.w;\n"
+            "\n"
+            "        #ifdef HAS_NORMAL_VEC3\n"
+            "        #ifdef HAS_TANGENT_VEC4\n"
+            "        #ifdef USE_SKINNING\n"
+            "            mat4 skinNormalMatrix = getSkinningNormalMatrix();\n"
+            "            vec3 tangent = getTangent(skinMatrix);\n"
+            "            vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(skinNormalMatrix), 0.0)));\n"
+            "        #else\n"
+            "            vec3 tangent = getTangent();\n"
+            "            vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));\n"
+            "        #endif /* USE_SKINNING */\n"
+            "\n"
+            "            vec3 tangentW = vec3(modelMatrix * vec4(tangent, 0.0));\n"
+            "            vec3 bitangentW = cross(normalW, tangentW) * a_tangent.w;\n"
+            "\n"
+            "        #ifdef HAS_VERT_NORMAL_UV_TRANSFORM\n"
+            "            tangentW = u_vertNormalUVTransform * tangentW;\n"
+            "            bitangentW = u_vertNormalUVTransform * bitangentW;\n"
+            "        #endif /* HAS_VERT_NORMAL_UV_TRANSFORM*/\n"
+            "\n"
+            "            bitangentW = normalize(bitangentW);\n"
+            "            tangentW = normalize(tangentW);\n"
+            "\n"
+            "            v_TBN = mat3(tangentW, bitangentW, normalW);\n"
+            "        #else\n"
+            "        #ifdef USE_SKINNING\n"
+            "            mat4 skinNormalMatrix = getSkinningNormalMatrix();\n"
+            "            v_Normal = normalize(vec3(normalMatrix * vec4(getNormal(skinNormalMatrix), 0.0)));\n"
+            "        #else\n"
+            "            v_Normal = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));\n"
+            "        #endif /*USE_SKINNING*/\n"
+            "        #endif /*HAS_TANGENT_VEC4*/\n"
+            "        #endif /*HAS_NORMAL_VEC3*/\n"
+            "\n"
+            "            v_texcoord_0 = vec2(0.0, 0.0);\n"
+            "            v_texcoord_1 = vec2(0.0, 0.0);\n"
+            "\n"
+            "        #ifdef HAS_TEXCOORD_0_VEC2\n"
+            "            v_texcoord_0 = a_texcoord_0;\n"
+            "        #endif /*HAS_TEXCOORD_0_VEC2*/\n"
+            "\n"
+            "        #ifdef HAS_TEXCOORD_1_VEC2\n"
+            "            v_texcoord_1 = a_texcoord_1;\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef USE_MORPHING\n"
+            "            v_texcoord_0 += getTargetTexCoord0(gl_VertexID);\n"
+            "            v_texcoord_1 += getTargetTexCoord1(gl_VertexID);\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #if defined(HAS_COLOR_0_VEC3) \n"
+            "            v_Color = a_color_0;\n"
+            "        #if defined(USE_MORPHING)\n"
+            "            v_Color = clamp(v_Color + getTargetColor0(gl_VertexID).xyz, 0.0f, 1.0f);\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "        #if defined(HAS_COLOR_0_VEC4) \n"
+            "            v_Color = a_color_0;\n"
+            "        #if defined(USE_MORPHING)\n"
+            "            v_Color = clamp(v_Color + getTargetColor0(gl_VertexID), 0.0f, 1.0f);\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "            gl_Position = u_ViewProjectionMatrix * pos;\n"
+            "        }\n"
+            "    "
     },
     {
-        "frag_v1_chunk_00.glsl", R"(
-        out vec4 g_finalColor;
-        void main()
-        {
-        
-        vec4 baseColor = getBaseColor();
-
-        #if ALPHAMODE == _OPAQUE
-            baseColor.a = 1.0;
-        #endif
-
-        vec4 temp_origBaseColor = baseColor;
-
-        vec3 color = vec3(0);
-
-        vec3 v = normalize(u_Camera - v_Position);
-
-        NormalInfo normalInfo = getNormalInfo(v);
-        vec3 n = normalInfo.n;
-        vec3 t = normalInfo.t;
-        vec3 b = normalInfo.b;
-
-        float NdotV = clampedDot(n, v);
-        float TdotV = clampedDot(t, v);
-        float BdotV = clampedDot(b, v);
-
-        MaterialInfo materialInfo;
-        materialInfo.baseColor = baseColor.rgb;
-        
-        // The default index of refraction of 1.5 yields a dielectric normal incidence reflectance of 0.04.
-        materialInfo.ior = 1.5;
-        materialInfo.f0_dielectric = vec3(0.04);
-        materialInfo.specularWeight = 1.0;
-
-        // Anything less than 2% is physically impossible and is instead considered to be shadowing. Compare to "Real-Time-Rendering" 4th editon on page 325.
-        materialInfo.f90 = vec3(1.0);
-        materialInfo.f90_dielectric = materialInfo.f90;
-
-        #ifdef MATERIAL_IOR
-            materialInfo = getIorInfo(materialInfo);
-        #endif
-
-        #ifdef MATERIAL_METALLICROUGHNESS
-            materialInfo = getMetallicRoughnessInfo(materialInfo);
-        #endif
-
-        #ifdef MATERIAL_SHEEN
-            materialInfo = getSheenInfo(materialInfo);
-        #endif
-    )"
+        "frag_v1_chunk_00.glsl", "\n"
+            "        out vec4 g_finalColor;\n"
+            "        void main()\n"
+            "        {\n"
+            "        \n"
+            "        vec4 baseColor = getBaseColor();\n"
+            "\n"
+            "        #if ALPHAMODE == _OPAQUE\n"
+            "            baseColor.a = 1.0;\n"
+            "        #endif\n"
+            "\n"
+            "        vec4 temp_origBaseColor = baseColor;\n"
+            "\n"
+            "        vec3 color = vec3(0);\n"
+            "\n"
+            "        vec3 v = normalize(u_Camera - v_Position);\n"
+            "\n"
+            "        NormalInfo normalInfo = getNormalInfo(v);\n"
+            "        vec3 n = normalInfo.n;\n"
+            "        vec3 t = normalInfo.t;\n"
+            "        vec3 b = normalInfo.b;\n"
+            "\n"
+            "        float NdotV = clampedDot(n, v);\n"
+            "        float TdotV = clampedDot(t, v);\n"
+            "        float BdotV = clampedDot(b, v);\n"
+            "\n"
+            "        MaterialInfo materialInfo;\n"
+            "        materialInfo.baseColor = baseColor.rgb;\n"
+            "        \n"
+            "        // The default index of refraction of 1.5 yields a dielectric normal incidence reflectance of 0.04.\n"
+            "        materialInfo.ior = 1.5;\n"
+            "        materialInfo.f0_dielectric = vec3(0.04);\n"
+            "        materialInfo.specularWeight = 1.0;\n"
+            "\n"
+            "        // Anything less than 2% is physically impossible and is instead considered to be shadowing. Compare to \"Real-Time-Rendering\" 4th editon on page 325.\n"
+            "        materialInfo.f90 = vec3(1.0);\n"
+            "        materialInfo.f90_dielectric = materialInfo.f90;\n"
+            "\n"
+            "        #ifdef MATERIAL_IOR\n"
+            "            materialInfo = getIorInfo(materialInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_METALLICROUGHNESS\n"
+            "            materialInfo = getMetallicRoughnessInfo(materialInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_SHEEN\n"
+            "            materialInfo = getSheenInfo(materialInfo);\n"
+            "        #endif\n"
+            "    "
     },
     {
-        "frag_v1_chunk_01a.glsl", R"(
-
-        #ifdef MATERIAL_CLEARCOAT
-            materialInfo = getClearCoatInfo(materialInfo, normalInfo);
-        #endif
-
-        #ifdef MATERIAL_SPECULAR
-            materialInfo = getSpecularInfo(materialInfo);
-        #endif
-
-        #ifdef MATERIAL_TRANSMISSION
-            materialInfo = getTransmissionInfo(materialInfo);
-        #endif
-
-        #ifdef MATERIAL_VOLUME
-            materialInfo = getVolumeInfo(materialInfo);
-        #endif
-
-        #ifdef MATERIAL_IRIDESCENCE
-            materialInfo = getIridescenceInfo(materialInfo);
-        #endif
-
-        #ifdef MATERIAL_DIFFUSE_TRANSMISSION
-            materialInfo = getDiffuseTransmissionInfo(materialInfo);
-        #endif
-
-        #ifdef MATERIAL_ANISOTROPY
-            materialInfo = getAnisotropyInfo(materialInfo, normalInfo);
-        #endif
-
-        materialInfo.perceptualRoughness = clamp(materialInfo.perceptualRoughness, 0.0, 1.0);
-        materialInfo.metallic = clamp(materialInfo.metallic, 0.0, 1.0);
-
-        // Roughness is authored as perceptual roughness; as is convention,
-        // convert to material roughness by squaring the perceptual roughness.
-        materialInfo.alphaRoughness = materialInfo.perceptualRoughness * materialInfo.perceptualRoughness;
-
-
-        // LIGHTING
-        vec3 f_specular_dielectric = vec3(0.0);
-        vec3 f_specular_metal = vec3(0.0);
-        vec3 f_diffuse = vec3(0.0);
-        vec3 f_dielectric_brdf_ibl = vec3(0.0);
-        vec3 f_metal_brdf_ibl = vec3(0.0);
-        vec3 f_emissive = vec3(0.0);
-        vec3 clearcoat_brdf = vec3(0.0);
-        vec3 f_sheen = vec3(0.0);
-        vec3 f_specular_transmission = vec3(0.0);
-        vec3 f_diffuse_transmission = vec3(0.0);
-
-        float clearcoatFactor = 0.0;
-        vec3 clearcoatFresnel = vec3(0);
-    )"
+        "frag_v1_chunk_01a.glsl", "\n"
+            "\n"
+            "        #ifdef MATERIAL_CLEARCOAT\n"
+            "            materialInfo = getClearCoatInfo(materialInfo, normalInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_SPECULAR\n"
+            "            materialInfo = getSpecularInfo(materialInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_TRANSMISSION\n"
+            "            materialInfo = getTransmissionInfo(materialInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_VOLUME\n"
+            "            materialInfo = getVolumeInfo(materialInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_IRIDESCENCE\n"
+            "            materialInfo = getIridescenceInfo(materialInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_DIFFUSE_TRANSMISSION\n"
+            "            materialInfo = getDiffuseTransmissionInfo(materialInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_ANISOTROPY\n"
+            "            materialInfo = getAnisotropyInfo(materialInfo, normalInfo);\n"
+            "        #endif\n"
+            "\n"
+            "        materialInfo.perceptualRoughness = clamp(materialInfo.perceptualRoughness, 0.0, 1.0);\n"
+            "        materialInfo.metallic = clamp(materialInfo.metallic, 0.0, 1.0);\n"
+            "\n"
+            "        // Roughness is authored as perceptual roughness; as is convention,\n"
+            "        // convert to material roughness by squaring the perceptual roughness.\n"
+            "        materialInfo.alphaRoughness = materialInfo.perceptualRoughness * materialInfo.perceptualRoughness;\n"
+            "\n"
+            "\n"
+            "        // LIGHTING\n"
+            "        vec3 f_specular_dielectric = vec3(0.0);\n"
+            "        vec3 f_specular_metal = vec3(0.0);\n"
+            "        vec3 f_diffuse = vec3(0.0);\n"
+            "        vec3 f_dielectric_brdf_ibl = vec3(0.0);\n"
+            "        vec3 f_metal_brdf_ibl = vec3(0.0);\n"
+            "        vec3 f_emissive = vec3(0.0);\n"
+            "        vec3 clearcoat_brdf = vec3(0.0);\n"
+            "        vec3 f_sheen = vec3(0.0);\n"
+            "        vec3 f_specular_transmission = vec3(0.0);\n"
+            "        vec3 f_diffuse_transmission = vec3(0.0);\n"
+            "\n"
+            "        float clearcoatFactor = 0.0;\n"
+            "        vec3 clearcoatFresnel = vec3(0);\n"
+            "    "
     },
     {
-        "frag_v1_chunk_01b.glsl", R"(
-        float albedoSheenScaling = 1.0;
-        float diffuseTransmissionThickness = 1.0;
-
-        #ifdef MATERIAL_IRIDESCENCE
-            vec3 iridescenceFresnel_dielectric = evalIridescence(1.0, materialInfo.iridescenceIor, NdotV, materialInfo.iridescenceThickness, materialInfo.f0_dielectric);
-            vec3 iridescenceFresnel_metallic = evalIridescence(1.0, materialInfo.iridescenceIor, NdotV, materialInfo.iridescenceThickness, baseColor.rgb);
-
-            if (materialInfo.iridescenceThickness == 0.0) {
-                materialInfo.iridescenceFactor = 0.0;
-            }
-        #endif
-
-        #ifdef MATERIAL_DIFFUSE_TRANSMISSION
-        #ifdef MATERIAL_VOLUME
-            diffuseTransmissionThickness = materialInfo.thickness *
-                (length(vec3(u_ModelMatrix[0].xyz)) + length(vec3(u_ModelMatrix[1].xyz)) + length(vec3(u_ModelMatrix[2].xyz))) / 3.0;
-        #endif
-        #endif
-
-        #ifdef MATERIAL_CLEARCOAT
-            clearcoatFactor = materialInfo.clearcoatFactor;
-            clearcoatFresnel = F_Schlick(materialInfo.clearcoatF0, materialInfo.clearcoatF90, clampedDot(materialInfo.clearcoatNormal, v));
-        #endif
-
-            // Calculate lighting contribution from image based lighting source (IBL)
-
-        #if defined(USE_IBL) || defined(MATERIAL_TRANSMISSION)
-
-            f_diffuse = getDiffuseLight(n) * baseColor.rgb ;
-
-        #ifdef MATERIAL_DIFFUSE_TRANSMISSION
-            vec3 diffuseTransmissionIBL = getDiffuseLight(-n) * materialInfo.diffuseTransmissionColorFactor;
-        #ifdef MATERIAL_VOLUME
-                diffuseTransmissionIBL = applyVolumeAttenuation(diffuseTransmissionIBL, diffuseTransmissionThickness, materialInfo.attenuationColor, materialInfo.attenuationDistance);
-        #endif
-            f_diffuse = mix(f_diffuse, diffuseTransmissionIBL, materialInfo.diffuseTransmissionFactor);
-        #endif
-
-
-        #if defined(MATERIAL_TRANSMISSION)
-            f_specular_transmission = getIBLVolumeRefraction(
-                n, v,
-                materialInfo.perceptualRoughness,
-                baseColor.rgb, v_Position, u_ModelMatrix, u_ViewMatrix, u_ProjectionMatrix,
-                materialInfo.ior, materialInfo.thickness, materialInfo.attenuationColor, materialInfo.attenuationDistance, materialInfo.dispersion);
-            f_diffuse = mix(f_diffuse, f_specular_transmission, materialInfo.transmissionFactor);
-        #endif
-    )"
+        "frag_v1_chunk_01b.glsl", "\n"
+            "        float albedoSheenScaling = 1.0;\n"
+            "        float diffuseTransmissionThickness = 1.0;\n"
+            "\n"
+            "        #ifdef MATERIAL_IRIDESCENCE\n"
+            "            vec3 iridescenceFresnel_dielectric = evalIridescence(1.0, materialInfo.iridescenceIor, NdotV, materialInfo.iridescenceThickness, materialInfo.f0_dielectric);\n"
+            "            vec3 iridescenceFresnel_metallic = evalIridescence(1.0, materialInfo.iridescenceIor, NdotV, materialInfo.iridescenceThickness, baseColor.rgb);\n"
+            "\n"
+            "            if (materialInfo.iridescenceThickness == 0.0) {\n"
+            "                materialInfo.iridescenceFactor = 0.0;\n"
+            "            }\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_DIFFUSE_TRANSMISSION\n"
+            "        #ifdef MATERIAL_VOLUME\n"
+            "            diffuseTransmissionThickness = materialInfo.thickness *\n"
+            "                (length(vec3(u_ModelMatrix[0].xyz)) + length(vec3(u_ModelMatrix[1].xyz)) + length(vec3(u_ModelMatrix[2].xyz))) / 3.0;\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_CLEARCOAT\n"
+            "            clearcoatFactor = materialInfo.clearcoatFactor;\n"
+            "            clearcoatFresnel = F_Schlick(materialInfo.clearcoatF0, materialInfo.clearcoatF90, clampedDot(materialInfo.clearcoatNormal, v));\n"
+            "        #endif\n"
+            "\n"
+            "            // Calculate lighting contribution from image based lighting source (IBL)\n"
+            "\n"
+            "        #if defined(USE_IBL) || defined(MATERIAL_TRANSMISSION)\n"
+            "\n"
+            "            f_diffuse = getDiffuseLight(n) * baseColor.rgb ;\n"
+            "\n"
+            "        #ifdef MATERIAL_DIFFUSE_TRANSMISSION\n"
+            "            vec3 diffuseTransmissionIBL = getDiffuseLight(-n) * materialInfo.diffuseTransmissionColorFactor;\n"
+            "        #ifdef MATERIAL_VOLUME\n"
+            "                diffuseTransmissionIBL = applyVolumeAttenuation(diffuseTransmissionIBL, diffuseTransmissionThickness, materialInfo.attenuationColor, materialInfo.attenuationDistance);\n"
+            "        #endif\n"
+            "            f_diffuse = mix(f_diffuse, diffuseTransmissionIBL, materialInfo.diffuseTransmissionFactor);\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #if defined(MATERIAL_TRANSMISSION)\n"
+            "            f_specular_transmission = getIBLVolumeRefraction(\n"
+            "                n, v,\n"
+            "                materialInfo.perceptualRoughness,\n"
+            "                baseColor.rgb, v_Position, u_ModelMatrix, u_ViewMatrix, u_ProjectionMatrix,\n"
+            "                materialInfo.ior, materialInfo.thickness, materialInfo.attenuationColor, materialInfo.attenuationDistance, materialInfo.dispersion);\n"
+            "            f_diffuse = mix(f_diffuse, f_specular_transmission, materialInfo.transmissionFactor);\n"
+            "        #endif\n"
+            "    "
     },
     {
-        "frag_v1_chunk_02a.glsl", R"(
-
-        #ifdef MATERIAL_ANISOTROPY
-            f_specular_metal = getIBLRadianceAnisotropy(n, v, materialInfo.perceptualRoughness, materialInfo.anisotropyStrength, materialInfo.anisotropicB);
-            f_specular_dielectric = f_specular_metal;
-        #else
-            f_specular_metal = getIBLRadianceGGX(n, v, materialInfo.perceptualRoughness);
-            f_specular_dielectric = f_specular_metal;
-        #endif
-
-            // Calculate fresnel mix for IBL  
-
-            vec3 f_metal_fresnel_ibl = getIBLGGXFresnel(n, v, materialInfo.perceptualRoughness, baseColor.rgb, 1.0);
-            f_metal_brdf_ibl = f_metal_fresnel_ibl * f_specular_metal;
-        
-            vec3 f_dielectric_fresnel_ibl = getIBLGGXFresnel(n, v, materialInfo.perceptualRoughness, materialInfo.f0_dielectric, materialInfo.specularWeight);
-            f_dielectric_brdf_ibl = mix(f_diffuse, f_specular_dielectric,  f_dielectric_fresnel_ibl);
-
-        #ifdef MATERIAL_IRIDESCENCE
-            f_metal_brdf_ibl = mix(f_metal_brdf_ibl, f_specular_metal * iridescenceFresnel_metallic, materialInfo.iridescenceFactor);
-            f_dielectric_brdf_ibl = mix(f_dielectric_brdf_ibl, rgb_mix(f_diffuse, f_specular_dielectric, iridescenceFresnel_dielectric), materialInfo.iridescenceFactor);
-        #endif
-
-        #ifdef MATERIAL_CLEARCOAT
-            clearcoat_brdf = getIBLRadianceGGX(materialInfo.clearcoatNormal, v, materialInfo.clearcoatRoughness);
-        #endif
-
-        #ifdef MATERIAL_SHEEN
-            f_sheen = getIBLRadianceCharlie(n, v, materialInfo.sheenRoughnessFactor, materialInfo.sheenColorFactor);
-            albedoSheenScaling = 1.0 - max3(materialInfo.sheenColorFactor) * albedoSheenScalingLUT(NdotV, materialInfo.sheenRoughnessFactor);
-        #endif
-
-            color = mix(f_dielectric_brdf_ibl, f_metal_brdf_ibl, materialInfo.metallic);
-            color = f_sheen + color * albedoSheenScaling;
-            color = mix(color, clearcoat_brdf, clearcoatFactor * clearcoatFresnel);
-
-        #ifdef HAS_OCCLUSION_MAP
-            float ao = 1.0;
-            ao = texture(u_OcclusionSampler,  getOcclusionUV()).r;
-            color = color * (1.0 + u_OcclusionStrength * (ao - 1.0)); 
-            //temp_origBaseColor.rgb *= (1.0 + u_OcclusionStrength * (ao - 1.0));
-
-            //color = vec4(1.0, 0.0, 0.5, 1.0);
-        #endif
-
-        //#else  // Temporary addition to enable occlusion maps in non-IBL mode, which isn't physically accurate and should eventually be removed.
-        //#ifdef HAS_OCCLUSION_MAP
-        //    float ao = 1.0;
-        //    ao = texture(u_OcclusionSampler,  getOcclusionUV()).r;
-        //    //color = vec3(1.0, 0.0, 0.5);
-        //    color = color * (1.0 + u_OcclusionStrength * (ao - 1.0)); 
-        //#endif
-        #endif //end USE_IBL
-
-
-        f_diffuse = vec3(0.0);
-
-    )"
+        "frag_v1_chunk_02a.glsl", "\n"
+            "\n"
+            "        #ifdef MATERIAL_ANISOTROPY\n"
+            "            f_specular_metal = getIBLRadianceAnisotropy(n, v, materialInfo.perceptualRoughness, materialInfo.anisotropyStrength, materialInfo.anisotropicB);\n"
+            "            f_specular_dielectric = f_specular_metal;\n"
+            "        #else\n"
+            "            f_specular_metal = getIBLRadianceGGX(n, v, materialInfo.perceptualRoughness);\n"
+            "            f_specular_dielectric = f_specular_metal;\n"
+            "        #endif\n"
+            "\n"
+            "            // Calculate fresnel mix for IBL  \n"
+            "\n"
+            "            vec3 f_metal_fresnel_ibl = getIBLGGXFresnel(n, v, materialInfo.perceptualRoughness, baseColor.rgb, 1.0);\n"
+            "            f_metal_brdf_ibl = f_metal_fresnel_ibl * f_specular_metal;\n"
+            "        \n"
+            "            vec3 f_dielectric_fresnel_ibl = getIBLGGXFresnel(n, v, materialInfo.perceptualRoughness, materialInfo.f0_dielectric, materialInfo.specularWeight);\n"
+            "            f_dielectric_brdf_ibl = mix(f_diffuse, f_specular_dielectric,  f_dielectric_fresnel_ibl);\n"
+            "\n"
+            "        #ifdef MATERIAL_IRIDESCENCE\n"
+            "            f_metal_brdf_ibl = mix(f_metal_brdf_ibl, f_specular_metal * iridescenceFresnel_metallic, materialInfo.iridescenceFactor);\n"
+            "            f_dielectric_brdf_ibl = mix(f_dielectric_brdf_ibl, rgb_mix(f_diffuse, f_specular_dielectric, iridescenceFresnel_dielectric), materialInfo.iridescenceFactor);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_CLEARCOAT\n"
+            "            clearcoat_brdf = getIBLRadianceGGX(materialInfo.clearcoatNormal, v, materialInfo.clearcoatRoughness);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_SHEEN\n"
+            "            f_sheen = getIBLRadianceCharlie(n, v, materialInfo.sheenRoughnessFactor, materialInfo.sheenColorFactor);\n"
+            "            albedoSheenScaling = 1.0 - max3(materialInfo.sheenColorFactor) * albedoSheenScalingLUT(NdotV, materialInfo.sheenRoughnessFactor);\n"
+            "        #endif\n"
+            "\n"
+            "            color = mix(f_dielectric_brdf_ibl, f_metal_brdf_ibl, materialInfo.metallic);\n"
+            "            color = f_sheen + color * albedoSheenScaling;\n"
+            "            color = mix(color, clearcoat_brdf, clearcoatFactor * clearcoatFresnel);\n"
+            "\n"
+            "        #ifdef HAS_OCCLUSION_MAP\n"
+            "            float ao = 1.0;\n"
+            "            ao = texture(u_OcclusionSampler,  getOcclusionUV()).r;\n"
+            "            color = color * (1.0 + u_OcclusionStrength * (ao - 1.0)); \n"
+            "            //temp_origBaseColor.rgb *= (1.0 + u_OcclusionStrength * (ao - 1.0));\n"
+            "\n"
+            "            //color = vec4(1.0, 0.0, 0.5, 1.0);\n"
+            "        #endif\n"
+            "\n"
+            "        //#else  // Temporary addition to enable occlusion maps in non-IBL mode, which isn't physically accurate and should eventually be removed.\n"
+            "        //#ifdef HAS_OCCLUSION_MAP\n"
+            "        //    float ao = 1.0;\n"
+            "        //    ao = texture(u_OcclusionSampler,  getOcclusionUV()).r;\n"
+            "        //    //color = vec3(1.0, 0.0, 0.5);\n"
+            "        //    color = color * (1.0 + u_OcclusionStrength * (ao - 1.0)); \n"
+            "        //#endif\n"
+            "        #endif //end USE_IBL\n"
+            "\n"
+            "\n"
+            "        f_diffuse = vec3(0.0);\n"
+            "\n"
+            "    "
     },
     {
-        "frag_v1_chunk_02b.glsl", R"(
-
-        f_specular_dielectric = vec3(0.0);
-        f_specular_metal = vec3(0.0);
-        vec3 f_dielectric_brdf = vec3(0.0);
-        vec3 f_metal_brdf = vec3(0.0);
-
-        #ifdef USE_PUNCTUAL
-        /*
-        Light temp_keylight = Light( 
-            normalize(vec3(-0.1, -0.75, -0.45)),    //vec3 direction
-            -1.0,                  //float range
-            vec3(1.0, 1.0, 1.0),    //vec3 color
-            1.0,                    //float intensity
-            vec3(0.0, 0.0, 0.0),    //vec3 position
-            0.0,                    //float innerConeCos
-            0.0,                    //float outerConeCos
-            0                       //int type;
-                                    //  const Type_Directional = 0;
-                                    //  const Type_Point = 1;
-                                    //  const Type_Spot = 2;
-            );
-        Light temp_filllight = Light( 
-            normalize(-vec3(-0.2, -0.65, -0.35)),    //vec3 direction
-            -1.0,                  //float range
-            vec3(1.0, 1.0, 1.0),    //vec3 color
-            0.5,                    //float intensity
-            vec3(0.0, 0.0, 0.0),    //vec3 position
-            0.0,                    //float innerConeCos
-            0.0,                    //float outerConeCos
-            0                       //int type;
-                                    //  const Type_Directional = 0;
-                                    //  const Type_Point = 1;
-                                    //  const Type_Spot = 2;
-            );        
-    )"
+        "frag_v1_chunk_02b.glsl", "\n"
+            "\n"
+            "        f_specular_dielectric = vec3(0.0);\n"
+            "        f_specular_metal = vec3(0.0);\n"
+            "        vec3 f_dielectric_brdf = vec3(0.0);\n"
+            "        vec3 f_metal_brdf = vec3(0.0);\n"
+            "\n"
+            "        #ifdef USE_PUNCTUAL\n"
+            "        /*\n"
+            "        Light temp_keylight = Light( \n"
+            "            normalize(vec3(-0.1, -0.75, -0.45)),    //vec3 direction\n"
+            "            -1.0,                  //float range\n"
+            "            vec3(1.0, 1.0, 1.0),    //vec3 color\n"
+            "            1.0,                    //float intensity\n"
+            "            vec3(0.0, 0.0, 0.0),    //vec3 position\n"
+            "            0.0,                    //float innerConeCos\n"
+            "            0.0,                    //float outerConeCos\n"
+            "            0                       //int type;\n"
+            "                                    //  const Type_Directional = 0;\n"
+            "                                    //  const Type_Point = 1;\n"
+            "                                    //  const Type_Spot = 2;\n"
+            "            );\n"
+            "        Light temp_filllight = Light( \n"
+            "            normalize(-vec3(-0.2, -0.65, -0.35)),    //vec3 direction\n"
+            "            -1.0,                  //float range\n"
+            "            vec3(1.0, 1.0, 1.0),    //vec3 color\n"
+            "            0.5,                    //float intensity\n"
+            "            vec3(0.0, 0.0, 0.0),    //vec3 position\n"
+            "            0.0,                    //float innerConeCos\n"
+            "            0.0,                    //float outerConeCos\n"
+            "            0                       //int type;\n"
+            "                                    //  const Type_Directional = 0;\n"
+            "                                    //  const Type_Point = 1;\n"
+            "                                    //  const Type_Spot = 2;\n"
+            "            );        \n"
+            "    "
     },
     {
-        "frag_v1_chunk_03a.glsl", R"(
-
-        u_Lights[1] = temp_keylight;
-        u_Lights[2] = temp_filllight;
-        */
-        for (int i = 0; i < LIGHT_COUNT; ++i)
-        {
-            Light light = u_Lights[i+1];
-
-            vec3 pointToLight;
-            if (light.type != LightType_Directional)
-            {
-                pointToLight = light.position - v_Position;
-            }
-            else
-            {
-                pointToLight = -light.direction;
-            }
-
-            // BSTF
-
-            vec3 l = normalize(pointToLight);   // Direction from surface point to light
-            vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
-            float NdotL = clampedDot(n, l);
-            float NdotV = clampedDot(n, v);
-            float NdotH = clampedDot(n, h);
-            float LdotH = clampedDot(l, h);
-            float VdotH = clampedDot(v, h);
-
-            vec3 dielectric_fresnel = F_Schlick(materialInfo.f0_dielectric * materialInfo.specularWeight, materialInfo.f90_dielectric, abs(VdotH));
-            vec3 metal_fresnel = F_Schlick(baseColor.rgb, vec3(1.0), abs(VdotH));
-            
-            vec3 lightIntensity = getLighIntensity(light, pointToLight);
-            
-            vec3 l_diffuse = lightIntensity * NdotL * BRDF_lambertian(baseColor.rgb);
-            vec3 l_specular_dielectric = vec3(0.0);
-            vec3 l_specular_metal = vec3(0.0);
-            vec3 l_dielectric_brdf = vec3(0.0);
-            vec3 l_metal_brdf = vec3(0.0);
-            vec3 l_clearcoat_brdf = vec3(0.0);
-            vec3 l_sheen = vec3(0.0);
-            float l_albedoSheenScaling = 1.0;
-          
-        #ifdef MATERIAL_DIFFUSE_TRANSMISSION
-            l_diffuse = l_diffuse * (1.0 - materialInfo.diffuseTransmissionFactor);
-            if (dot(n, l) < 0.0) {
-                float diffuseNdotL = clampedDot(-n, l);
-                vec3 diffuse_btdf = lightIntensity * diffuseNdotL * BRDF_lambertian(materialInfo.diffuseTransmissionColorFactor);
-
-                vec3 l_mirror = normalize(l + 2.0 * n * dot(-l, n)); // Mirror light reflection vector on surface
-                float diffuseVdotH = clampedDot(v, normalize(l_mirror + v));
-                dielectric_fresnel = F_Schlick(materialInfo.f0_dielectric * materialInfo.specularWeight, materialInfo.f90_dielectric, abs(diffuseVdotH));
-
-        #ifdef MATERIAL_VOLUME
-                    diffuse_btdf = applyVolumeAttenuation(diffuse_btdf, diffuseTransmissionThickness, materialInfo.attenuationColor, materialInfo.attenuationDistance);
-        #endif
-                    l_diffuse += diffuse_btdf * materialInfo.diffuseTransmissionFactor;
-                }
-        #endif // MATERIAL_DIFFUSE_TRANSMISSION
-
-        //temp_origBaseColor.rgb = vec3(l_diffuse);
-    )"
+        "frag_v1_chunk_03a.glsl", "\n"
+            "\n"
+            "        u_Lights[1] = temp_keylight;\n"
+            "        u_Lights[2] = temp_filllight;\n"
+            "        */\n"
+            "        for (int i = 0; i < LIGHT_COUNT; ++i)\n"
+            "        {\n"
+            "            Light light = u_Lights[i+1];\n"
+            "\n"
+            "            vec3 pointToLight;\n"
+            "            if (light.type != LightType_Directional)\n"
+            "            {\n"
+            "                pointToLight = light.position - v_Position;\n"
+            "            }\n"
+            "            else\n"
+            "            {\n"
+            "                pointToLight = -light.direction;\n"
+            "            }\n"
+            "\n"
+            "            // BSTF\n"
+            "\n"
+            "            vec3 l = normalize(pointToLight);   // Direction from surface point to light\n"
+            "            vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector\n"
+            "            float NdotL = clampedDot(n, l);\n"
+            "            float NdotV = clampedDot(n, v);\n"
+            "            float NdotH = clampedDot(n, h);\n"
+            "            float LdotH = clampedDot(l, h);\n"
+            "            float VdotH = clampedDot(v, h);\n"
+            "\n"
+            "            vec3 dielectric_fresnel = F_Schlick(materialInfo.f0_dielectric * materialInfo.specularWeight, materialInfo.f90_dielectric, abs(VdotH));\n"
+            "            vec3 metal_fresnel = F_Schlick(baseColor.rgb, vec3(1.0), abs(VdotH));\n"
+            "            \n"
+            "            vec3 lightIntensity = getLighIntensity(light, pointToLight);\n"
+            "            \n"
+            "            vec3 l_diffuse = lightIntensity * NdotL * BRDF_lambertian(baseColor.rgb);\n"
+            "            vec3 l_specular_dielectric = vec3(0.0);\n"
+            "            vec3 l_specular_metal = vec3(0.0);\n"
+            "            vec3 l_dielectric_brdf = vec3(0.0);\n"
+            "            vec3 l_metal_brdf = vec3(0.0);\n"
+            "            vec3 l_clearcoat_brdf = vec3(0.0);\n"
+            "            vec3 l_sheen = vec3(0.0);\n"
+            "            float l_albedoSheenScaling = 1.0;\n"
+            "          \n"
+            "        #ifdef MATERIAL_DIFFUSE_TRANSMISSION\n"
+            "            l_diffuse = l_diffuse * (1.0 - materialInfo.diffuseTransmissionFactor);\n"
+            "            if (dot(n, l) < 0.0) {\n"
+            "                float diffuseNdotL = clampedDot(-n, l);\n"
+            "                vec3 diffuse_btdf = lightIntensity * diffuseNdotL * BRDF_lambertian(materialInfo.diffuseTransmissionColorFactor);\n"
+            "\n"
+            "                vec3 l_mirror = normalize(l + 2.0 * n * dot(-l, n)); // Mirror light reflection vector on surface\n"
+            "                float diffuseVdotH = clampedDot(v, normalize(l_mirror + v));\n"
+            "                dielectric_fresnel = F_Schlick(materialInfo.f0_dielectric * materialInfo.specularWeight, materialInfo.f90_dielectric, abs(diffuseVdotH));\n"
+            "\n"
+            "        #ifdef MATERIAL_VOLUME\n"
+            "                    diffuse_btdf = applyVolumeAttenuation(diffuse_btdf, diffuseTransmissionThickness, materialInfo.attenuationColor, materialInfo.attenuationDistance);\n"
+            "        #endif\n"
+            "                    l_diffuse += diffuse_btdf * materialInfo.diffuseTransmissionFactor;\n"
+            "                }\n"
+            "        #endif // MATERIAL_DIFFUSE_TRANSMISSION\n"
+            "\n"
+            "        //temp_origBaseColor.rgb = vec3(l_diffuse);\n"
+            "    "
     },
     {
-        "frag_v1_chunk_03b.glsl", R"(
-                // BTDF (Bidirectional Transmittance Distribution Function)
-        #ifdef MATERIAL_TRANSMISSION
-                // If the light ray travels through the geometry, use the point it exits the geometry again.
-                // That will change the angle to the light source, if the material refracts the light ray.
-                vec3 transmissionRay = getVolumeTransmissionRay(n, v, materialInfo.thickness, materialInfo.ior, u_ModelMatrix);
-                pointToLight -= transmissionRay;
-                l = normalize(pointToLight);
-
-                vec3 transmittedLight = lightIntensity * getPunctualRadianceTransmission(n, v, l, materialInfo.alphaRoughness, baseColor.rgb, materialInfo.ior);
-
-        #ifdef MATERIAL_VOLUME
-                transmittedLight = applyVolumeAttenuation(transmittedLight, length(transmissionRay), materialInfo.attenuationColor, materialInfo.attenuationDistance);
-        #endif
-                l_diffuse = mix(l_diffuse, transmittedLight, materialInfo.transmissionFactor);
-        #endif
-                // Calculation of analytical light
-                // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
-                vec3 intensity = getLighIntensity(light, pointToLight);
-
-        #ifdef MATERIAL_ANISOTROPY
-                l_specular_metal = intensity * NdotL * BRDF_specularGGXAnisotropy(materialInfo.alphaRoughness, materialInfo.anisotropyStrength, n, v, l, h, materialInfo.anisotropicT, materialInfo.anisotropicB);
-                l_specular_dielectric = l_specular_metal;
-        #else
-                l_specular_metal = intensity * NdotL * BRDF_specularGGX(materialInfo.alphaRoughness, NdotL, NdotV, NdotH);
-                l_specular_dielectric = l_specular_metal;
-        #endif
-
-                l_metal_brdf = metal_fresnel * l_specular_metal;
-                l_dielectric_brdf = mix(l_diffuse, l_specular_dielectric, dielectric_fresnel); // Do we need to handle vec3 fresnel here?
-
-
-        #ifdef MATERIAL_IRIDESCENCE
-                l_metal_brdf = mix(l_metal_brdf, l_specular_metal * iridescenceFresnel_metallic, materialInfo.iridescenceFactor);
-                l_dielectric_brdf = mix(l_dielectric_brdf, rgb_mix(l_diffuse, l_specular_dielectric, iridescenceFresnel_dielectric), materialInfo.iridescenceFactor);
-        #endif
-
-        #ifdef MATERIAL_CLEARCOAT
-                l_clearcoat_brdf = intensity * getPunctualRadianceClearCoat(materialInfo.clearcoatNormal, v, l, h, VdotH,
-                    materialInfo.clearcoatF0, materialInfo.clearcoatF90, materialInfo.clearcoatRoughness);
-        #endif
-
-        #ifdef MATERIAL_SHEEN
-                l_sheen = intensity * getPunctualRadianceSheen(materialInfo.sheenColorFactor, materialInfo.sheenRoughnessFactor, NdotL, NdotV, NdotH);
-                l_albedoSheenScaling = min(1.0 - max3(materialInfo.sheenColorFactor) * albedoSheenScalingLUT(NdotV, materialInfo.sheenRoughnessFactor),
-                    1.0 - max3(materialInfo.sheenColorFactor) * albedoSheenScalingLUT(NdotL, materialInfo.sheenRoughnessFactor));
-        #endif
-
-                //temp_origBaseColor.rgb = (l_metal_brdf + l_dielectric_brdf).xyz;
-                
-                vec3 l_color = mix(l_dielectric_brdf, l_metal_brdf, materialInfo.metallic);
-                l_color = l_sheen + l_color * l_albedoSheenScaling;
-                l_color = mix(l_color, l_clearcoat_brdf, clearcoatFactor * clearcoatFresnel);
-                color += l_color;
-            }
-        #endif // USE_PUNCTUAL        
-    )"
+        "frag_v1_chunk_03b.glsl", "\n"
+            "                // BTDF (Bidirectional Transmittance Distribution Function)\n"
+            "        #ifdef MATERIAL_TRANSMISSION\n"
+            "                // If the light ray travels through the geometry, use the point it exits the geometry again.\n"
+            "                // That will change the angle to the light source, if the material refracts the light ray.\n"
+            "                vec3 transmissionRay = getVolumeTransmissionRay(n, v, materialInfo.thickness, materialInfo.ior, u_ModelMatrix);\n"
+            "                pointToLight -= transmissionRay;\n"
+            "                l = normalize(pointToLight);\n"
+            "\n"
+            "                vec3 transmittedLight = lightIntensity * getPunctualRadianceTransmission(n, v, l, materialInfo.alphaRoughness, baseColor.rgb, materialInfo.ior);\n"
+            "\n"
+            "        #ifdef MATERIAL_VOLUME\n"
+            "                transmittedLight = applyVolumeAttenuation(transmittedLight, length(transmissionRay), materialInfo.attenuationColor, materialInfo.attenuationDistance);\n"
+            "        #endif\n"
+            "                l_diffuse = mix(l_diffuse, transmittedLight, materialInfo.transmissionFactor);\n"
+            "        #endif\n"
+            "                // Calculation of analytical light\n"
+            "                // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB\n"
+            "                vec3 intensity = getLighIntensity(light, pointToLight);\n"
+            "\n"
+            "        #ifdef MATERIAL_ANISOTROPY\n"
+            "                l_specular_metal = intensity * NdotL * BRDF_specularGGXAnisotropy(materialInfo.alphaRoughness, materialInfo.anisotropyStrength, n, v, l, h, materialInfo.anisotropicT, materialInfo.anisotropicB);\n"
+            "                l_specular_dielectric = l_specular_metal;\n"
+            "        #else\n"
+            "                l_specular_metal = intensity * NdotL * BRDF_specularGGX(materialInfo.alphaRoughness, NdotL, NdotV, NdotH);\n"
+            "                l_specular_dielectric = l_specular_metal;\n"
+            "        #endif\n"
+            "\n"
+            "                l_metal_brdf = metal_fresnel * l_specular_metal;\n"
+            "                l_dielectric_brdf = mix(l_diffuse, l_specular_dielectric, dielectric_fresnel); // Do we need to handle vec3 fresnel here?\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_IRIDESCENCE\n"
+            "                l_metal_brdf = mix(l_metal_brdf, l_specular_metal * iridescenceFresnel_metallic, materialInfo.iridescenceFactor);\n"
+            "                l_dielectric_brdf = mix(l_dielectric_brdf, rgb_mix(l_diffuse, l_specular_dielectric, iridescenceFresnel_dielectric), materialInfo.iridescenceFactor);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_CLEARCOAT\n"
+            "                l_clearcoat_brdf = intensity * getPunctualRadianceClearCoat(materialInfo.clearcoatNormal, v, l, h, VdotH,\n"
+            "                    materialInfo.clearcoatF0, materialInfo.clearcoatF90, materialInfo.clearcoatRoughness);\n"
+            "        #endif\n"
+            "\n"
+            "        #ifdef MATERIAL_SHEEN\n"
+            "                l_sheen = intensity * getPunctualRadianceSheen(materialInfo.sheenColorFactor, materialInfo.sheenRoughnessFactor, NdotL, NdotV, NdotH);\n"
+            "                l_albedoSheenScaling = min(1.0 - max3(materialInfo.sheenColorFactor) * albedoSheenScalingLUT(NdotV, materialInfo.sheenRoughnessFactor),\n"
+            "                    1.0 - max3(materialInfo.sheenColorFactor) * albedoSheenScalingLUT(NdotL, materialInfo.sheenRoughnessFactor));\n"
+            "        #endif\n"
+            "\n"
+            "                //temp_origBaseColor.rgb = (l_metal_brdf + l_dielectric_brdf).xyz;\n"
+            "                \n"
+            "                vec3 l_color = mix(l_dielectric_brdf, l_metal_brdf, materialInfo.metallic);\n"
+            "                l_color = l_sheen + l_color * l_albedoSheenScaling;\n"
+            "                l_color = mix(l_color, l_clearcoat_brdf, clearcoatFactor * clearcoatFresnel);\n"
+            "                color += l_color;\n"
+            "            }\n"
+            "        #endif // USE_PUNCTUAL        \n"
+            "    "
     },
     {
-        "frag_v1_chunk_04.glsl", R"(
-        f_emissive = u_EmissiveFactor;
-        #ifdef MATERIAL_EMISSIVE_STRENGTH
-            f_emissive *= u_EmissiveStrength;
-        #endif
-        #ifdef HAS_EMISSIVE_MAP
-            f_emissive *= texture(u_EmissiveSampler, getEmissiveUV()).rgb;
-        #endif
-
-
-        #ifdef MATERIAL_UNLIT
-            #ifdef HAS_EMISSIVE_MAP
-                color = f_emissive;
-            #else
-                color = baseColor.rgb;
-            #endif
-        #elif defined(NOT_TRIANGLE) && !defined(HAS_NORMAL_VEC3)
-            //Points or Lines with no NORMAL attribute SHOULD be rendered without lighting and instead use the sum of the base color value and the emissive value.
-            color = f_emissive + baseColor.rgb;
-        #else
-            color = f_emissive * (1.0 - clearcoatFactor * clearcoatFresnel) + color;
-        #endif
-
-        //#if DEBUG == DEBUG_NONE
-
-        #if ALPHAMODE == _MASK
-            // Late discard to avoid sampling artifacts. See https://github.com/KhronosGroup/glTF-Sample-Viewer/issues/267
-            if (baseColor.a < u_AlphaCutoff)
-            {
-                discard;
-            }
-            baseColor.a = 1.0;
-        #endif
-
-        // The red and blue channels are switched after any tonemapping
-        // They will be switched back the correct way by the 2D shader
-        #ifdef LINEAR_OUTPUT
-            g_finalColor = vec4(color.bgr, baseColor.a);
-        #else
-            g_finalColor = vec4(toneMap(color).bgr, baseColor.a);
-        #endif
-
-            /*
-        #else
-            // In case of missing data for a debug view, render a checkerboard.
-            g_finalColor = vec4(1.0);
-            {
-                float frequency = 0.02;
-                float gray = 0.9;
-
-                vec2 v1 = step(0.5, fract(frequency * gl_FragCoord.xy));
-                vec2 v2 = step(0.5, vec2(1.0) - fract(frequency * gl_FragCoord.xy));
-                g_finalColor.rgb *= gray + v1.x * v1.y + v2.x * v2.y;
-            }
-        #endif
-        
-
-        
-            // Debug views:
-
-            // Generic:
-
-        #if DEBUG == DEBUG_UV_0 && defined(HAS_TEXCOORD_0_VEC2)
-            g_finalColor.rgb = vec3(v_texcoord_0, 0);
-        #endif
-        #if DEBUG == DEBUG_UV_1 && defined(HAS_TEXCOORD_1_VEC2)
-            g_finalColor.rgb = vec3(v_texcoord_1, 0);
-        #endif
-        #if DEBUG == DEBUG_NORMAL_TEXTURE && defined(HAS_NORMAL_MAP)
-            g_finalColor.rgb = (normalInfo.ntex + 1.0) / 2.0;
-        #endif
-        #if DEBUG == DEBUG_NORMAL_SHADING
-            g_finalColor.rgb = (n + 1.0) / 2.0;
-        #endif
-        #if DEBUG == DEBUG_NORMAL_GEOMETRY
-            g_finalColor.rgb = (normalInfo.ng + 1.0) / 2.0;
-        #endif
-        #if DEBUG == DEBUG_TANGENT
-            g_finalColor.rgb = (normalInfo.t + 1.0) / 2.0;
-        #endif
-        #if DEBUG == DEBUG_BITANGENT
-            g_finalColor.rgb = (normalInfo.b + 1.0) / 2.0;
-        #endif
-        #if DEBUG == DEBUG_ALPHA
-            g_finalColor.rgb = vec3(baseColor.a);
-        #endif
-        #if DEBUG == DEBUG_OCCLUSION && defined(HAS_OCCLUSION_MAP)
-            g_finalColor.rgb = vec3(ao);
-        #endif
-        #if DEBUG == DEBUG_EMISSIVE
-            g_finalColor.rgb = linearTosRGB(f_emissive);
-        #endif
-
-
-        #if DEBUG == DEBUG_METALLIC
-            g_finalColor.rgb = vec3(materialInfo.metallic);
-        #endif
-        #if DEBUG == DEBUG_ROUGHNESS
-            g_finalColor.rgb = vec3(materialInfo.perceptualRoughness);
-        #endif
-        #if DEBUG == DEBUG_BASE_COLOR
-            g_finalColor.rgb = linearTosRGB(materialInfo.baseColor);
-        #endif        
-    )"
+        "frag_v1_chunk_04.glsl", "\n"
+            "        f_emissive = u_EmissiveFactor;\n"
+            "        #ifdef MATERIAL_EMISSIVE_STRENGTH\n"
+            "            f_emissive *= u_EmissiveStrength;\n"
+            "        #endif\n"
+            "        #ifdef HAS_EMISSIVE_MAP\n"
+            "            f_emissive *= texture(u_EmissiveSampler, getEmissiveUV()).rgb;\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #ifdef MATERIAL_UNLIT\n"
+            "            #ifdef HAS_EMISSIVE_MAP\n"
+            "                color = f_emissive;\n"
+            "            #else\n"
+            "                color = baseColor.rgb;\n"
+            "            #endif\n"
+            "        #elif defined(NOT_TRIANGLE) && !defined(HAS_NORMAL_VEC3)\n"
+            "            //Points or Lines with no NORMAL attribute SHOULD be rendered without lighting and instead use the sum of the base color value and the emissive value.\n"
+            "            color = f_emissive + baseColor.rgb;\n"
+            "        #else\n"
+            "            color = f_emissive * (1.0 - clearcoatFactor * clearcoatFresnel) + color;\n"
+            "        #endif\n"
+            "\n"
+            "        //#if DEBUG == DEBUG_NONE\n"
+            "\n"
+            "        #if ALPHAMODE == _MASK\n"
+            "            // Late discard to avoid sampling artifacts. See https://github.com/KhronosGroup/glTF-Sample-Viewer/issues/267\n"
+            "            if (baseColor.a < u_AlphaCutoff)\n"
+            "            {\n"
+            "                discard;\n"
+            "            }\n"
+            "            baseColor.a = 1.0;\n"
+            "        #endif\n"
+            "\n"
+            "        // The red and blue channels are switched after any tonemapping\n"
+            "        // They will be switched back the correct way by the 2D shader\n"
+            "        #ifdef LINEAR_OUTPUT\n"
+            "            g_finalColor = vec4(color.bgr, baseColor.a);\n"
+            "        #else\n"
+            "            g_finalColor = vec4(toneMap(color).bgr, baseColor.a);\n"
+            "        #endif\n"
+            "\n"
+            "            /*\n"
+            "        #else\n"
+            "            // In case of missing data for a debug view, render a checkerboard.\n"
+            "            g_finalColor = vec4(1.0);\n"
+            "            {\n"
+            "                float frequency = 0.02;\n"
+            "                float gray = 0.9;\n"
+            "\n"
+            "                vec2 v1 = step(0.5, fract(frequency * gl_FragCoord.xy));\n"
+            "                vec2 v2 = step(0.5, vec2(1.0) - fract(frequency * gl_FragCoord.xy));\n"
+            "                g_finalColor.rgb *= gray + v1.x * v1.y + v2.x * v2.y;\n"
+            "            }\n"
+            "        #endif\n"
+            "        \n"
+            "\n"
+            "        \n"
+            "            // Debug views:\n"
+            "\n"
+            "            // Generic:\n"
+            "\n"
+            "        #if DEBUG == DEBUG_UV_0 && defined(HAS_TEXCOORD_0_VEC2)\n"
+            "            g_finalColor.rgb = vec3(v_texcoord_0, 0);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_UV_1 && defined(HAS_TEXCOORD_1_VEC2)\n"
+            "            g_finalColor.rgb = vec3(v_texcoord_1, 0);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_NORMAL_TEXTURE && defined(HAS_NORMAL_MAP)\n"
+            "            g_finalColor.rgb = (normalInfo.ntex + 1.0) / 2.0;\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_NORMAL_SHADING\n"
+            "            g_finalColor.rgb = (n + 1.0) / 2.0;\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_NORMAL_GEOMETRY\n"
+            "            g_finalColor.rgb = (normalInfo.ng + 1.0) / 2.0;\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_TANGENT\n"
+            "            g_finalColor.rgb = (normalInfo.t + 1.0) / 2.0;\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_BITANGENT\n"
+            "            g_finalColor.rgb = (normalInfo.b + 1.0) / 2.0;\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_ALPHA\n"
+            "            g_finalColor.rgb = vec3(baseColor.a);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_OCCLUSION && defined(HAS_OCCLUSION_MAP)\n"
+            "            g_finalColor.rgb = vec3(ao);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_EMISSIVE\n"
+            "            g_finalColor.rgb = linearTosRGB(f_emissive);\n"
+            "        #endif\n"
+            "\n"
+            "\n"
+            "        #if DEBUG == DEBUG_METALLIC\n"
+            "            g_finalColor.rgb = vec3(materialInfo.metallic);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_ROUGHNESS\n"
+            "            g_finalColor.rgb = vec3(materialInfo.perceptualRoughness);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_BASE_COLOR\n"
+            "            g_finalColor.rgb = linearTosRGB(materialInfo.baseColor);\n"
+            "        #endif        \n"
+            "    "
     },
     {
-        "frag_v1_chunk_05.glsl", R"(
-        // Clearcoat:
-        #ifdef MATERIAL_CLEARCOAT
-        #if DEBUG == DEBUG_CLEARCOAT_FACTOR
-            g_finalColor.rgb = vec3(materialInfo.clearcoatFactor);
-        #endif
-        #if DEBUG == DEBUG_CLEARCOAT_ROUGHNESS
-            g_finalColor.rgb = vec3(materialInfo.clearcoatRoughness);
-        #endif
-        #if DEBUG == DEBUG_CLEARCOAT_NORMAL
-            g_finalColor.rgb = (materialInfo.clearcoatNormal + vec3(1)) / 2.0;
-        #endif
-        #endif
-
-            // Sheen:
-        #ifdef MATERIAL_SHEEN
-        #if DEBUG == DEBUG_SHEEN_COLOR
-            g_finalColor.rgb = materialInfo.sheenColorFactor;
-        #endif
-        #if DEBUG == DEBUG_SHEEN_ROUGHNESS
-            g_finalColor.rgb = vec3(materialInfo.sheenRoughnessFactor);
-        #endif
-        #endif
-
-            // Specular:
-        #ifdef MATERIAL_SPECULAR
-        #if DEBUG == DEBUG_SPECULAR_FACTOR
-            g_finalColor.rgb = vec3(materialInfo.specularWeight);
-        #endif
-
-        #if DEBUG == DEBUG_SPECULAR_COLOR
-        vec3 specularTexture = vec3(1.0);
-        #ifdef HAS_SPECULAR_COLOR_MAP
-            specularTexture.rgb = texture(u_SpecularColorSampler, getSpecularColorUV()).rgb;
-        #endif
-            g_finalColor.rgb = u_KHR_materials_specular_specularColorFactor * specularTexture.rgb;
-        #endif
-        #endif
-
-            // Transmission, Volume:
-        #ifdef MATERIAL_TRANSMISSION
-        #if DEBUG == DEBUG_TRANSMISSION_FACTOR
-            g_finalColor.rgb = vec3(materialInfo.transmissionFactor);
-        #endif
-        #endif
-        #ifdef MATERIAL_VOLUME
-        #if DEBUG == DEBUG_VOLUME_THICKNESS
-            g_finalColor.rgb = vec3(materialInfo.thickness / u_ThicknessFactor);
-        #endif
-        #endif
-
-            // Iridescence:
-        #ifdef MATERIAL_IRIDESCENCE
-        #if DEBUG == DEBUG_IRIDESCENCE_FACTOR
-            g_finalColor.rgb = vec3(materialInfo.iridescenceFactor);
-        #endif
-        #if DEBUG == DEBUG_IRIDESCENCE_THICKNESS
-            g_finalColor.rgb = vec3(materialInfo.iridescenceThickness / 1200.0);
-        #endif
-        #endif
-
-            // Anisotropy:
-        #ifdef MATERIAL_ANISOTROPY
-        #if DEBUG == DEBUG_ANISOTROPIC_STRENGTH
-            g_finalColor.rgb = vec3(materialInfo.anisotropyStrength);
-        #endif
-        #if DEBUG == DEBUG_ANISOTROPIC_DIRECTION
-            vec2 direction = vec2(1.0, 0.0);
-        #ifdef HAS_ANISOTROPY_MAP
-            direction = texture(u_AnisotropySampler, getAnisotropyUV()).xy;
-            direction = direction * 2.0 - vec2(1.0); // [0, 1] -> [-1, 1]
-        #endif
-            vec2 directionRotation = u_Anisotropy.xy; // cos(theta), sin(theta)
-            mat2 rotationMatrix = mat2(directionRotation.x, directionRotation.y, -directionRotation.y, directionRotation.x);
-            direction = (direction + vec2(1.0)) * 0.5; // [-1, 1] -> [0, 1]
-
-            g_finalColor.rgb = vec3(direction, 0.0);
-        #endif
-        #endif
-
-            // Diffuse Transmission:
-        #ifdef MATERIAL_DIFFUSE_TRANSMISSION
-        #if DEBUG == DEBUG_DIFFUSE_TRANSMISSION_FACTOR
-            g_finalColor.rgb = linearTosRGB(vec3(materialInfo.diffuseTransmissionFactor));
-        #endif
-        #if DEBUG == DEBUG_DIFFUSE_TRANSMISSION_COLOR_FACTOR
-            g_finalColor.rgb = linearTosRGB(materialInfo.diffuseTransmissionColorFactor);
-        #endif
-        #endif
-        */
-        }        
-    )"
+        "frag_v1_chunk_05.glsl", "\n"
+            "        // Clearcoat:\n"
+            "        #ifdef MATERIAL_CLEARCOAT\n"
+            "        #if DEBUG == DEBUG_CLEARCOAT_FACTOR\n"
+            "            g_finalColor.rgb = vec3(materialInfo.clearcoatFactor);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_CLEARCOAT_ROUGHNESS\n"
+            "            g_finalColor.rgb = vec3(materialInfo.clearcoatRoughness);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_CLEARCOAT_NORMAL\n"
+            "            g_finalColor.rgb = (materialInfo.clearcoatNormal + vec3(1)) / 2.0;\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "            // Sheen:\n"
+            "        #ifdef MATERIAL_SHEEN\n"
+            "        #if DEBUG == DEBUG_SHEEN_COLOR\n"
+            "            g_finalColor.rgb = materialInfo.sheenColorFactor;\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_SHEEN_ROUGHNESS\n"
+            "            g_finalColor.rgb = vec3(materialInfo.sheenRoughnessFactor);\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "            // Specular:\n"
+            "        #ifdef MATERIAL_SPECULAR\n"
+            "        #if DEBUG == DEBUG_SPECULAR_FACTOR\n"
+            "            g_finalColor.rgb = vec3(materialInfo.specularWeight);\n"
+            "        #endif\n"
+            "\n"
+            "        #if DEBUG == DEBUG_SPECULAR_COLOR\n"
+            "        vec3 specularTexture = vec3(1.0);\n"
+            "        #ifdef HAS_SPECULAR_COLOR_MAP\n"
+            "            specularTexture.rgb = texture(u_SpecularColorSampler, getSpecularColorUV()).rgb;\n"
+            "        #endif\n"
+            "            g_finalColor.rgb = u_KHR_materials_specular_specularColorFactor * specularTexture.rgb;\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "            // Transmission, Volume:\n"
+            "        #ifdef MATERIAL_TRANSMISSION\n"
+            "        #if DEBUG == DEBUG_TRANSMISSION_FACTOR\n"
+            "            g_finalColor.rgb = vec3(materialInfo.transmissionFactor);\n"
+            "        #endif\n"
+            "        #endif\n"
+            "        #ifdef MATERIAL_VOLUME\n"
+            "        #if DEBUG == DEBUG_VOLUME_THICKNESS\n"
+            "            g_finalColor.rgb = vec3(materialInfo.thickness / u_ThicknessFactor);\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "            // Iridescence:\n"
+            "        #ifdef MATERIAL_IRIDESCENCE\n"
+            "        #if DEBUG == DEBUG_IRIDESCENCE_FACTOR\n"
+            "            g_finalColor.rgb = vec3(materialInfo.iridescenceFactor);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_IRIDESCENCE_THICKNESS\n"
+            "            g_finalColor.rgb = vec3(materialInfo.iridescenceThickness / 1200.0);\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "            // Anisotropy:\n"
+            "        #ifdef MATERIAL_ANISOTROPY\n"
+            "        #if DEBUG == DEBUG_ANISOTROPIC_STRENGTH\n"
+            "            g_finalColor.rgb = vec3(materialInfo.anisotropyStrength);\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_ANISOTROPIC_DIRECTION\n"
+            "            vec2 direction = vec2(1.0, 0.0);\n"
+            "        #ifdef HAS_ANISOTROPY_MAP\n"
+            "            direction = texture(u_AnisotropySampler, getAnisotropyUV()).xy;\n"
+            "            direction = direction * 2.0 - vec2(1.0); // [0, 1] -> [-1, 1]\n"
+            "        #endif\n"
+            "            vec2 directionRotation = u_Anisotropy.xy; // cos(theta), sin(theta)\n"
+            "            mat2 rotationMatrix = mat2(directionRotation.x, directionRotation.y, -directionRotation.y, directionRotation.x);\n"
+            "            direction = (direction + vec2(1.0)) * 0.5; // [-1, 1] -> [0, 1]\n"
+            "\n"
+            "            g_finalColor.rgb = vec3(direction, 0.0);\n"
+            "        #endif\n"
+            "        #endif\n"
+            "\n"
+            "            // Diffuse Transmission:\n"
+            "        #ifdef MATERIAL_DIFFUSE_TRANSMISSION\n"
+            "        #if DEBUG == DEBUG_DIFFUSE_TRANSMISSION_FACTOR\n"
+            "            g_finalColor.rgb = linearTosRGB(vec3(materialInfo.diffuseTransmissionFactor));\n"
+            "        #endif\n"
+            "        #if DEBUG == DEBUG_DIFFUSE_TRANSMISSION_COLOR_FACTOR\n"
+            "            g_finalColor.rgb = linearTosRGB(materialInfo.diffuseTransmissionColorFactor);\n"
+            "        #endif\n"
+            "        #endif\n"
+            "        */\n"
+            "        }        \n"
+            "    "
     },
 
     {
-        "cubemap.vert", R"(
-        uniform mat4 u_ViewProjectionMatrix;
-        uniform mat3 u_EnvRotation;
-
-        in vec3 a_position;
-        out vec3 v_TexCoords;
-
-        void main()
-        {
-            v_TexCoords = u_EnvRotation * a_position;
-            mat4 mat = u_ViewProjectionMatrix;
-            mat[3] = vec4(0.0, 0.0, 0.0, 0.1);
-            vec4 pos = mat * vec4(a_position, 1.0);
-            gl_Position = pos.xyww;
-        }
-    )"
+        "cubemap.vert", "\n"
+            "        uniform mat4 u_ViewProjectionMatrix;\n"
+            "        uniform mat3 u_EnvRotation;\n"
+            "\n"
+            "        in vec3 a_position;\n"
+            "        out vec3 v_TexCoords;\n"
+            "\n"
+            "        void main()\n"
+            "        {\n"
+            "            v_TexCoords = u_EnvRotation * a_position;\n"
+            "            mat4 mat = u_ViewProjectionMatrix;\n"
+            "            mat[3] = vec4(0.0, 0.0, 0.0, 0.1);\n"
+            "            vec4 pos = mat * vec4(a_position, 1.0);\n"
+            "            gl_Position = pos.xyww;\n"
+            "        }\n"
+            "    "
     },
     {
-        "cubemap.frag", R"(
-        precision highp float;
-#include <tonemapping.glsl>
-        uniform float u_EnvIntensity;
-        uniform float u_EnvBlurNormalized;
-        uniform int u_MipCount;
-        uniform samplerCube u_GGXEnvSampler;
-
-        out vec4 FragColor;
-        in vec3 v_TexCoords;
-
-
-        void main()
-        {
-            vec4 color = textureLod(u_GGXEnvSampler, v_TexCoords, u_EnvBlurNormalized * float(u_MipCount - 1));
-            color.rgb *= u_EnvIntensity;
-            color.a = 1.0;
-
-        #ifdef LINEAR_OUTPUT
-            FragColor = color.rgba;
-        #else
-            FragColor = vec4(toneMap(color.rgb), color.a);
-        #endif
-        }
-
-    )"
+        "cubemap.frag", "\n"
+            "        precision highp float;\n"
+            "#include <tonemapping.glsl>\n"
+            "        uniform float u_EnvIntensity;\n"
+            "        uniform float u_EnvBlurNormalized;\n"
+            "        uniform int u_MipCount;\n"
+            "        uniform samplerCube u_GGXEnvSampler;\n"
+            "\n"
+            "        out vec4 FragColor;\n"
+            "        in vec3 v_TexCoords;\n"
+            "\n"
+            "\n"
+            "        void main()\n"
+            "        {\n"
+            "            vec4 color = textureLod(u_GGXEnvSampler, v_TexCoords, u_EnvBlurNormalized * float(u_MipCount - 1));\n"
+            "            color.rgb *= u_EnvIntensity;\n"
+            "            color.a = 1.0;\n"
+            "\n"
+            "        #ifdef LINEAR_OUTPUT\n"
+            "            FragColor = color.rgba;\n"
+            "        #else\n"
+            "            FragColor = vec4(toneMap(color.rgb), color.a);\n"
+            "        #endif\n"
+            "        }\n"
+            "\n"
+            "    "
     },
 };
 
 static const lv_opengl_shader_t env_src_includes[] = {
     {
-        "fullscreen.vert", R"(
-        precision lowp float;  
-        // The vertex positions being supplied to this shader are
-        // always exactly 0 or 1, so low precision is fine here.
-
-        in vec2 aPosition;
-        in vec2 aTexCoord;
-
-        out vec2 texCoord;
-
-        void main(void) 
-        {
-            texCoord = aTexCoord;
-            gl_Position = vec4(aPosition, 0.0, 1.0);
-        }
-    )"
+        "fullscreen.vert", "\n"
+            "        precision lowp float;  \n"
+            "        // The vertex positions being supplied to this shader are\n"
+            "        // always exactly 0 or 1, so low precision is fine here.\n"
+            "\n"
+            "        in vec2 aPosition;\n"
+            "        in vec2 aTexCoord;\n"
+            "\n"
+            "        out vec2 texCoord;\n"
+            "\n"
+            "        void main(void) \n"
+            "        {\n"
+            "            texCoord = aTexCoord;\n"
+            "            gl_Position = vec4(aPosition, 0.0, 1.0);\n"
+            "        }\n"
+            "    "
     },
     {
-        "panorama_to_cubemap.frag", R"(
-        #define MATH_PI 3.1415926535897932384626433832795
-        #define MATH_INV_PI (1.0 / MATH_PI)
-
-        precision highp float;
-
-        in vec2 texCoord;
-        out vec4 fragmentColor;
-
-        uniform int u_currentFace;
-        uniform sampler2D u_panorama;
-
-        vec3 uvToXYZ(int face, vec2 uv)
-        {
-            if(face == 0)
-                return vec3(     1.f,   uv.y,    -uv.x);
-
-            else if(face == 1)
-                return vec3(    -1.f,   uv.y,     uv.x);
-
-            else if(face == 2)
-                return vec3(   +uv.x,   -1.f,    +uv.y);
-
-            else if(face == 3)
-                return vec3(   +uv.x,    1.f,    -uv.y);
-
-            else if(face == 4)
-                return vec3(   +uv.x,   uv.y,      1.f);
-
-            else //if(face == 5)
-            {	return vec3(    -uv.x,  +uv.y,     -1.f);}
-        }
-
-        vec2 dirToUV(vec3 dir)
-        {
-            return vec2(
-                0.5f + 0.5f * atan(dir.z, dir.x) / MATH_PI,
-                1.f - acos(dir.y) / MATH_PI);
-        }
-
-        vec3 panoramaToCubeMap(int face, vec2 texCoord)
-        {
-            vec2 texCoordNew = texCoord*2.0-1.0;
-            vec3 scan = uvToXYZ(face, texCoordNew);
-            vec3 direction = normalize(scan);
-            vec2 src = dirToUV(direction);
-
-            return  texture(u_panorama, src).rgb;
-        }
-
-        void main(void)
-        {
-            fragmentColor = vec4(0.0, 0.0, 0.0, 1.0);
-
-            fragmentColor.rgb = panoramaToCubeMap(u_currentFace, texCoord);
-        }
-
-    )"
+        "panorama_to_cubemap.frag", "\n"
+            "        #define MATH_PI 3.1415926535897932384626433832795\n"
+            "        #define MATH_INV_PI (1.0 / MATH_PI)\n"
+            "\n"
+            "        precision highp float;\n"
+            "\n"
+            "        in vec2 texCoord;\n"
+            "        out vec4 fragmentColor;\n"
+            "\n"
+            "        uniform int u_currentFace;\n"
+            "        uniform sampler2D u_panorama;\n"
+            "\n"
+            "        vec3 uvToXYZ(int face, vec2 uv)\n"
+            "        {\n"
+            "            if(face == 0)\n"
+            "                return vec3(     1.f,   uv.y,    -uv.x);\n"
+            "\n"
+            "            else if(face == 1)\n"
+            "                return vec3(    -1.f,   uv.y,     uv.x);\n"
+            "\n"
+            "            else if(face == 2)\n"
+            "                return vec3(   +uv.x,   -1.f,    +uv.y);\n"
+            "\n"
+            "            else if(face == 3)\n"
+            "                return vec3(   +uv.x,    1.f,    -uv.y);\n"
+            "\n"
+            "            else if(face == 4)\n"
+            "                return vec3(   +uv.x,   uv.y,      1.f);\n"
+            "\n"
+            "            else //if(face == 5)\n"
+            "            {	return vec3(    -uv.x,  +uv.y,     -1.f);}\n"
+            "        }\n"
+            "\n"
+            "        vec2 dirToUV(vec3 dir)\n"
+            "        {\n"
+            "            return vec2(\n"
+            "                0.5f + 0.5f * atan(dir.z, dir.x) / MATH_PI,\n"
+            "                1.f - acos(dir.y) / MATH_PI);\n"
+            "        }\n"
+            "\n"
+            "        vec3 panoramaToCubeMap(int face, vec2 texCoord)\n"
+            "        {\n"
+            "            vec2 texCoordNew = texCoord*2.0-1.0;\n"
+            "            vec3 scan = uvToXYZ(face, texCoordNew);\n"
+            "            vec3 direction = normalize(scan);\n"
+            "            vec2 src = dirToUV(direction);\n"
+            "\n"
+            "            return  texture(u_panorama, src).rgb;\n"
+            "        }\n"
+            "\n"
+            "        void main(void)\n"
+            "        {\n"
+            "            fragmentColor = vec4(0.0, 0.0, 0.0, 1.0);\n"
+            "\n"
+            "            fragmentColor.rgb = panoramaToCubeMap(u_currentFace, texCoord);\n"
+            "        }\n"
+            "\n"
+            "    "
     },
     {
-        "ibl_filtering.frag", R"(
-#include <ibl_filtering1.glsl>
-#include <ibl_filtering2.glsl>
-#include <ibl_filtering3.glsl>
-#include <ibl_filtering4.glsl>
-#include <ibl_filtering5a.glsl>
-#include <ibl_filtering5b.glsl>
-#include <ibl_filtering6.glsl>
-    )"
+        "ibl_filtering.frag", "\n"
+            "#include <ibl_filtering1.glsl>\n"
+            "#include <ibl_filtering2.glsl>\n"
+            "#include <ibl_filtering3.glsl>\n"
+            "#include <ibl_filtering4.glsl>\n"
+            "#include <ibl_filtering5a.glsl>\n"
+            "#include <ibl_filtering5b.glsl>\n"
+            "#include <ibl_filtering6.glsl>\n"
+            "    "
     },
     {
-        "ibl_filtering1.glsl", R"(
-
-        //#extension GL_ARB_separate_shader_objects : enable
-
-        precision highp float;
-        /* The Hammersley sequence below reverses the bits of a 32 bit value. Integers
-         * default to mediump in an ES fragment shader, which only has to hold 16 bits,
-         * and the sequence then collapses to a single direction. */
-        precision highp int;
-        #define MATH_PI 3.1415926535897932384626433832795
-        //#define MATH_INV_PI (1.0 / MATH_PI)
-
-        uniform samplerCube u_cubemapTexture;
-
-        // enum
-        const int cLambertian = 0;
-        const int cGGX = 1;
-        const int cCharlie = 2;
-
-
-        //layout(push_constant) uniform FilterParameters {
-        uniform  float u_roughness;
-        uniform  int u_sampleCount;
-        uniform  int u_width;
-        uniform  float u_lodBias;
-        uniform  int u_distribution; // enum
-        uniform int u_currentFace;
-        uniform int u_isGeneratingLUT;
-
-        // 0: Byte Target Texture (normalized) 
-        // 1: Float Target Texture
-        uniform int u_floatTexture; 
-
-        uniform  float u_intensityScale;
-
-        //layout (location = 0) in vec2 inUV;
-        in vec2 texCoord;
-
-
-        out vec4 fragmentColor;
-
-        //layout(location = 6) out vec3 outLUT;
-
-
-        vec3 uvToXYZ(int face, vec2 uv)
-        {
-            if(face == 0)
-                return vec3(     1.f,   uv.y,    -uv.x);
-
-            else if(face == 1)
-                return vec3(    -1.f,   uv.y,     uv.x);
-
-            else if(face == 2)
-                return vec3(   +uv.x,   -1.f,    +uv.y);
-
-            else if(face == 3)
-                return vec3(   +uv.x,    1.f,    -uv.y);
-
-            else if(face == 4)
-                return vec3(   +uv.x,   uv.y,      1.f);
-
-            else {//if(face == 5)
-                return vec3(    -uv.x,  +uv.y,     -1.f);}
-        }
-
-        vec2 dirToUV(vec3 dir)
-        {
-            return vec2(
-                    0.5f + 0.5f * atan(dir.z, dir.x) / MATH_PI,
-                    1.f - acos(dir.y) / MATH_PI);
-        }
-
-        float saturate(float v)
-        {
-            return clamp(v, 0.0f, 1.0f);
-        }
-
-        // Hammersley Points on the Hemisphere
-        // CC BY 3.0 (Holger Dammertz)
-        // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
-        // with adapted interface
-        float radicalInverse_VdC(uint bits)
-        {
-            bits = (bits << 16u) | (bits >> 16u);
-            bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
-            bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
-            bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
-            bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-            return float(bits) * 2.3283064365386963e-10; // / 0x100000000
-        }
-    )"
+        "ibl_filtering1.glsl", "\n"
+            "\n"
+            "        //#extension GL_ARB_separate_shader_objects : enable\n"
+            "\n"
+            "        precision highp float;\n"
+            "        /* The Hammersley sequence below reverses the bits of a 32 bit value. Integers\n"
+            "         * default to mediump in an ES fragment shader, which only has to hold 16 bits,\n"
+            "         * and the sequence then collapses to a single direction. */\n"
+            "        precision highp int;\n"
+            "        #define MATH_PI 3.1415926535897932384626433832795\n"
+            "        //#define MATH_INV_PI (1.0 / MATH_PI)\n"
+            "\n"
+            "        uniform samplerCube u_cubemapTexture;\n"
+            "\n"
+            "        // enum\n"
+            "        const int cLambertian = 0;\n"
+            "        const int cGGX = 1;\n"
+            "        const int cCharlie = 2;\n"
+            "\n"
+            "\n"
+            "        //layout(push_constant) uniform FilterParameters {\n"
+            "        uniform  float u_roughness;\n"
+            "        uniform  int u_sampleCount;\n"
+            "        uniform  int u_width;\n"
+            "        uniform  float u_lodBias;\n"
+            "        uniform  int u_distribution; // enum\n"
+            "        uniform int u_currentFace;\n"
+            "        uniform int u_isGeneratingLUT;\n"
+            "\n"
+            "        // 0: Byte Target Texture (normalized) \n"
+            "        // 1: Float Target Texture\n"
+            "        uniform int u_floatTexture; \n"
+            "\n"
+            "        uniform  float u_intensityScale;\n"
+            "\n"
+            "        //layout (location = 0) in vec2 inUV;\n"
+            "        in vec2 texCoord;\n"
+            "\n"
+            "\n"
+            "        out vec4 fragmentColor;\n"
+            "\n"
+            "        //layout(location = 6) out vec3 outLUT;\n"
+            "\n"
+            "\n"
+            "        vec3 uvToXYZ(int face, vec2 uv)\n"
+            "        {\n"
+            "            if(face == 0)\n"
+            "                return vec3(     1.f,   uv.y,    -uv.x);\n"
+            "\n"
+            "            else if(face == 1)\n"
+            "                return vec3(    -1.f,   uv.y,     uv.x);\n"
+            "\n"
+            "            else if(face == 2)\n"
+            "                return vec3(   +uv.x,   -1.f,    +uv.y);\n"
+            "\n"
+            "            else if(face == 3)\n"
+            "                return vec3(   +uv.x,    1.f,    -uv.y);\n"
+            "\n"
+            "            else if(face == 4)\n"
+            "                return vec3(   +uv.x,   uv.y,      1.f);\n"
+            "\n"
+            "            else {//if(face == 5)\n"
+            "                return vec3(    -uv.x,  +uv.y,     -1.f);}\n"
+            "        }\n"
+            "\n"
+            "        vec2 dirToUV(vec3 dir)\n"
+            "        {\n"
+            "            return vec2(\n"
+            "                    0.5f + 0.5f * atan(dir.z, dir.x) / MATH_PI,\n"
+            "                    1.f - acos(dir.y) / MATH_PI);\n"
+            "        }\n"
+            "\n"
+            "        float saturate(float v)\n"
+            "        {\n"
+            "            return clamp(v, 0.0f, 1.0f);\n"
+            "        }\n"
+            "\n"
+            "        // Hammersley Points on the Hemisphere\n"
+            "        // CC BY 3.0 (Holger Dammertz)\n"
+            "        // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html\n"
+            "        // with adapted interface\n"
+            "        float radicalInverse_VdC(uint bits)\n"
+            "        {\n"
+            "            bits = (bits << 16u) | (bits >> 16u);\n"
+            "            bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);\n"
+            "            bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);\n"
+            "            bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);\n"
+            "            bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);\n"
+            "            return float(bits) * 2.3283064365386963e-10; // / 0x100000000\n"
+            "        }\n"
+            "    "
     },
     {
-        "ibl_filtering2.glsl", R"(
-        // hammersley2d describes a sequence of points in the 2d unit square [0,1)^2
-        // that can be used for quasi Monte Carlo integration
-        vec2 hammersley2d(int i, int N) {
-            return vec2(float(i)/float(N), radicalInverse_VdC(uint(i)));
-        }
-
-        // Hemisphere Sample
-
-        // TBN generates a tangent bitangent normal coordinate frame from the normal
-        // (the normal must be normalized)
-        mat3 generateTBN(vec3 normal)
-        {
-            vec3 bitangent = vec3(0.0, 1.0, 0.0);
-
-            float NdotUp = dot(normal, vec3(0.0, 1.0, 0.0));
-            float epsilon = 0.0000001;
-            if (1.0 - abs(NdotUp) <= epsilon)
-            {
-                // Sampling +Y or -Y, so we need a more robust bitangent.
-                if (NdotUp > 0.0)
-                {
-                    bitangent = vec3(0.0, 0.0, 1.0);
-                }
-                else
-                {
-                    bitangent = vec3(0.0, 0.0, -1.0);
-                }
-            }
-
-            vec3 tangent = normalize(cross(bitangent, normal));
-            bitangent = cross(normal, tangent);
-
-            return mat3(tangent, bitangent, normal);
-        }
-
-        struct MicrofacetDistributionSample
-        {
-            float pdf;
-            float cosTheta;
-            float sinTheta;
-            float phi;
-        };
-
-        float D_GGX(float NdotH, float roughness) {
-            float a = NdotH * roughness;
-            float k = roughness / (1.0 - NdotH * NdotH + a * a);
-            return k * k * (1.0 / MATH_PI);
-        }
-
-        // GGX microfacet distribution
-        // https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html
-        // This implementation is based on https://bruop.github.io/ibl/,
-        //  https://www.tobias-franke.eu/log/2014/03/30/notes_on_importance_sampling.html
-        // and https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch20.html
-        MicrofacetDistributionSample GGX(vec2 xi, float roughness)
-        {
-            MicrofacetDistributionSample ggx;
-
-            // evaluate sampling equations
-            float alpha = roughness * roughness;
-            ggx.cosTheta = saturate(sqrt((1.0 - xi.y) / (1.0 + (alpha * alpha - 1.0) * xi.y)));
-            ggx.sinTheta = sqrt(1.0 - ggx.cosTheta * ggx.cosTheta);
-            ggx.phi = 2.0 * MATH_PI * xi.x;
-
-            // evaluate GGX pdf (for half vector)
-            ggx.pdf = D_GGX(ggx.cosTheta, alpha);
-
-            // Apply the Jacobian to obtain a pdf that is parameterized by l
-            // see https://bruop.github.io/ibl/
-            // Typically you'd have the following:
-            // float pdf = D_GGX(NoH, roughness) * NoH / (4.0 * VoH);
-            // but since V = N => VoH == NoH
-            ggx.pdf /= 4.0;
-
-            return ggx;
-        }
-
-        // NDF
-        float D_Ashikhmin(float NdotH, float roughness)
-        {
-            float alpha = roughness * roughness;
-            // Ashikhmin 2007, "Distribution-based BRDFs"
-            float a2 = alpha * alpha;
-            float cos2h = NdotH * NdotH;
-            float sin2h = 1.0 - cos2h;
-            float sin4h = sin2h * sin2h;
-            float cot2 = -cos2h / (a2 * sin2h);
-            return 1.0 / (MATH_PI * (4.0 * a2 + 1.0) * sin4h) * (4.0 * exp(cot2) + sin4h);
-        }
-    )"
+        "ibl_filtering2.glsl", "\n"
+            "        // hammersley2d describes a sequence of points in the 2d unit square [0,1)^2\n"
+            "        // that can be used for quasi Monte Carlo integration\n"
+            "        vec2 hammersley2d(int i, int N) {\n"
+            "            return vec2(float(i)/float(N), radicalInverse_VdC(uint(i)));\n"
+            "        }\n"
+            "\n"
+            "        // Hemisphere Sample\n"
+            "\n"
+            "        // TBN generates a tangent bitangent normal coordinate frame from the normal\n"
+            "        // (the normal must be normalized)\n"
+            "        mat3 generateTBN(vec3 normal)\n"
+            "        {\n"
+            "            vec3 bitangent = vec3(0.0, 1.0, 0.0);\n"
+            "\n"
+            "            float NdotUp = dot(normal, vec3(0.0, 1.0, 0.0));\n"
+            "            float epsilon = 0.0000001;\n"
+            "            if (1.0 - abs(NdotUp) <= epsilon)\n"
+            "            {\n"
+            "                // Sampling +Y or -Y, so we need a more robust bitangent.\n"
+            "                if (NdotUp > 0.0)\n"
+            "                {\n"
+            "                    bitangent = vec3(0.0, 0.0, 1.0);\n"
+            "                }\n"
+            "                else\n"
+            "                {\n"
+            "                    bitangent = vec3(0.0, 0.0, -1.0);\n"
+            "                }\n"
+            "            }\n"
+            "\n"
+            "            vec3 tangent = normalize(cross(bitangent, normal));\n"
+            "            bitangent = cross(normal, tangent);\n"
+            "\n"
+            "            return mat3(tangent, bitangent, normal);\n"
+            "        }\n"
+            "\n"
+            "        struct MicrofacetDistributionSample\n"
+            "        {\n"
+            "            float pdf;\n"
+            "            float cosTheta;\n"
+            "            float sinTheta;\n"
+            "            float phi;\n"
+            "        };\n"
+            "\n"
+            "        float D_GGX(float NdotH, float roughness) {\n"
+            "            float a = NdotH * roughness;\n"
+            "            float k = roughness / (1.0 - NdotH * NdotH + a * a);\n"
+            "            return k * k * (1.0 / MATH_PI);\n"
+            "        }\n"
+            "\n"
+            "        // GGX microfacet distribution\n"
+            "        // https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html\n"
+            "        // This implementation is based on https://bruop.github.io/ibl/,\n"
+            "        //  https://www.tobias-franke.eu/log/2014/03/30/notes_on_importance_sampling.html\n"
+            "        // and https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch20.html\n"
+            "        MicrofacetDistributionSample GGX(vec2 xi, float roughness)\n"
+            "        {\n"
+            "            MicrofacetDistributionSample ggx;\n"
+            "\n"
+            "            // evaluate sampling equations\n"
+            "            float alpha = roughness * roughness;\n"
+            "            ggx.cosTheta = saturate(sqrt((1.0 - xi.y) / (1.0 + (alpha * alpha - 1.0) * xi.y)));\n"
+            "            ggx.sinTheta = sqrt(1.0 - ggx.cosTheta * ggx.cosTheta);\n"
+            "            ggx.phi = 2.0 * MATH_PI * xi.x;\n"
+            "\n"
+            "            // evaluate GGX pdf (for half vector)\n"
+            "            ggx.pdf = D_GGX(ggx.cosTheta, alpha);\n"
+            "\n"
+            "            // Apply the Jacobian to obtain a pdf that is parameterized by l\n"
+            "            // see https://bruop.github.io/ibl/\n"
+            "            // Typically you'd have the following:\n"
+            "            // float pdf = D_GGX(NoH, roughness) * NoH / (4.0 * VoH);\n"
+            "            // but since V = N => VoH == NoH\n"
+            "            ggx.pdf /= 4.0;\n"
+            "\n"
+            "            return ggx;\n"
+            "        }\n"
+            "\n"
+            "        // NDF\n"
+            "        float D_Ashikhmin(float NdotH, float roughness)\n"
+            "        {\n"
+            "            float alpha = roughness * roughness;\n"
+            "            // Ashikhmin 2007, \"Distribution-based BRDFs\"\n"
+            "            float a2 = alpha * alpha;\n"
+            "            float cos2h = NdotH * NdotH;\n"
+            "            float sin2h = 1.0 - cos2h;\n"
+            "            float sin4h = sin2h * sin2h;\n"
+            "            float cot2 = -cos2h / (a2 * sin2h);\n"
+            "            return 1.0 / (MATH_PI * (4.0 * a2 + 1.0) * sin4h) * (4.0 * exp(cot2) + sin4h);\n"
+            "        }\n"
+            "    "
     },
     {
-        "ibl_filtering3.glsl", R"(
-        // NDF
-        float D_Charlie(float sheenRoughness, float NdotH)
-        {
-            sheenRoughness = max(sheenRoughness, 0.000001); //clamp (0,1]
-            float invR = 1.0 / sheenRoughness;
-            float cos2h = NdotH * NdotH;
-            float sin2h = 1.0 - cos2h;
-            return (2.0 + invR) * pow(sin2h, invR * 0.5) / (2.0 * MATH_PI);
-        }
-
-
-        MicrofacetDistributionSample Charlie(vec2 xi, float roughness)
-        {
-            MicrofacetDistributionSample charlie;
-
-            float alpha = roughness * roughness;
-            charlie.sinTheta = pow(xi.y, alpha / (2.0*alpha + 1.0));
-            charlie.cosTheta = sqrt(1.0 - charlie.sinTheta * charlie.sinTheta);
-            charlie.phi = 2.0 * MATH_PI * xi.x;
-
-            // evaluate Charlie pdf (for half vector)
-            charlie.pdf = D_Charlie(alpha, charlie.cosTheta);
-
-            // Apply the Jacobian to obtain a pdf that is parameterized by l
-            charlie.pdf /= 4.0;
-
-            return charlie;
-        }
-
-        MicrofacetDistributionSample Lambertian(vec2 xi, float roughness)
-        {
-            MicrofacetDistributionSample lambertian;
-
-            // Cosine weighted hemisphere sampling
-            // http://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations.html#Cosine-WeightedHemisphereSampling
-            lambertian.cosTheta = sqrt(1.0 - xi.y);
-            lambertian.sinTheta = sqrt(xi.y); // equivalent to `sqrt(1.0 - cosTheta*cosTheta)`;
-            lambertian.phi = 2.0 * MATH_PI * xi.x;
-
-            lambertian.pdf = lambertian.cosTheta / MATH_PI; // evaluation for solid angle, therefore drop the sinTheta
-
-            return lambertian;
-        }
-
-
-        // getImportanceSample returns an importance sample direction with pdf in the .w component
-        vec4 getImportanceSample(int sampleIndex, vec3 N, float roughness)
-        {
-            // generate a quasi monte carlo point in the unit square [0.1)^2
-            vec2 xi = hammersley2d(sampleIndex, u_sampleCount);
-
-            MicrofacetDistributionSample importanceSample;
-
-            // generate the points on the hemisphere with a fitting mapping for
-            // the distribution (e.g. lambertian uses a cosine importance)
-            if(u_distribution == cLambertian)
-            {
-                importanceSample = Lambertian(xi, roughness);
-            }
-            else if(u_distribution == cGGX)
-            {
-                // Trowbridge-Reitz / GGX microfacet model (Walter et al)
-                // https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html
-                importanceSample = GGX(xi, roughness);
-            }
-            else if(u_distribution == cCharlie)
-            {
-                importanceSample = Charlie(xi, roughness);
-            }
-
-            // transform the hemisphere sample to the normal coordinate frame
-            // i.e. rotate the hemisphere to the normal direction
-            vec3 localSpaceDirection = normalize(vec3(
-                importanceSample.sinTheta * cos(importanceSample.phi), 
-                importanceSample.sinTheta * sin(importanceSample.phi), 
-                importanceSample.cosTheta
-            ));
-            mat3 TBN = generateTBN(N);
-            vec3 direction = TBN * localSpaceDirection;
-
-            return vec4(direction, importanceSample.pdf);
-        }
-    )"
+        "ibl_filtering3.glsl", "\n"
+            "        // NDF\n"
+            "        float D_Charlie(float sheenRoughness, float NdotH)\n"
+            "        {\n"
+            "            sheenRoughness = max(sheenRoughness, 0.000001); //clamp (0,1]\n"
+            "            float invR = 1.0 / sheenRoughness;\n"
+            "            float cos2h = NdotH * NdotH;\n"
+            "            float sin2h = 1.0 - cos2h;\n"
+            "            return (2.0 + invR) * pow(sin2h, invR * 0.5) / (2.0 * MATH_PI);\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        MicrofacetDistributionSample Charlie(vec2 xi, float roughness)\n"
+            "        {\n"
+            "            MicrofacetDistributionSample charlie;\n"
+            "\n"
+            "            float alpha = roughness * roughness;\n"
+            "            charlie.sinTheta = pow(xi.y, alpha / (2.0*alpha + 1.0));\n"
+            "            charlie.cosTheta = sqrt(1.0 - charlie.sinTheta * charlie.sinTheta);\n"
+            "            charlie.phi = 2.0 * MATH_PI * xi.x;\n"
+            "\n"
+            "            // evaluate Charlie pdf (for half vector)\n"
+            "            charlie.pdf = D_Charlie(alpha, charlie.cosTheta);\n"
+            "\n"
+            "            // Apply the Jacobian to obtain a pdf that is parameterized by l\n"
+            "            charlie.pdf /= 4.0;\n"
+            "\n"
+            "            return charlie;\n"
+            "        }\n"
+            "\n"
+            "        MicrofacetDistributionSample Lambertian(vec2 xi, float roughness)\n"
+            "        {\n"
+            "            MicrofacetDistributionSample lambertian;\n"
+            "\n"
+            "            // Cosine weighted hemisphere sampling\n"
+            "            // http://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations.html#Cosine-WeightedHemisphereSampling\n"
+            "            lambertian.cosTheta = sqrt(1.0 - xi.y);\n"
+            "            lambertian.sinTheta = sqrt(xi.y); // equivalent to `sqrt(1.0 - cosTheta*cosTheta)`;\n"
+            "            lambertian.phi = 2.0 * MATH_PI * xi.x;\n"
+            "\n"
+            "            lambertian.pdf = lambertian.cosTheta / MATH_PI; // evaluation for solid angle, therefore drop the sinTheta\n"
+            "\n"
+            "            return lambertian;\n"
+            "        }\n"
+            "\n"
+            "\n"
+            "        // getImportanceSample returns an importance sample direction with pdf in the .w component\n"
+            "        vec4 getImportanceSample(int sampleIndex, vec3 N, float roughness)\n"
+            "        {\n"
+            "            // generate a quasi monte carlo point in the unit square [0.1)^2\n"
+            "            vec2 xi = hammersley2d(sampleIndex, u_sampleCount);\n"
+            "\n"
+            "            MicrofacetDistributionSample importanceSample;\n"
+            "\n"
+            "            // generate the points on the hemisphere with a fitting mapping for\n"
+            "            // the distribution (e.g. lambertian uses a cosine importance)\n"
+            "            if(u_distribution == cLambertian)\n"
+            "            {\n"
+            "                importanceSample = Lambertian(xi, roughness);\n"
+            "            }\n"
+            "            else if(u_distribution == cGGX)\n"
+            "            {\n"
+            "                // Trowbridge-Reitz / GGX microfacet model (Walter et al)\n"
+            "                // https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.html\n"
+            "                importanceSample = GGX(xi, roughness);\n"
+            "            }\n"
+            "            else if(u_distribution == cCharlie)\n"
+            "            {\n"
+            "                importanceSample = Charlie(xi, roughness);\n"
+            "            }\n"
+            "\n"
+            "            // transform the hemisphere sample to the normal coordinate frame\n"
+            "            // i.e. rotate the hemisphere to the normal direction\n"
+            "            vec3 localSpaceDirection = normalize(vec3(\n"
+            "                importanceSample.sinTheta * cos(importanceSample.phi), \n"
+            "                importanceSample.sinTheta * sin(importanceSample.phi), \n"
+            "                importanceSample.cosTheta\n"
+            "            ));\n"
+            "            mat3 TBN = generateTBN(N);\n"
+            "            vec3 direction = TBN * localSpaceDirection;\n"
+            "\n"
+            "            return vec4(direction, importanceSample.pdf);\n"
+            "        }\n"
+            "    "
     },
     {
-        "ibl_filtering4.glsl", R"(
-        // Mipmap Filtered Samples (GPU Gems 3, 20.4)
-        // https://developer.nvidia.com/gpugems/gpugems3/part-iii-rendering/chapter-20-gpu-based-importance-sampling
-        // https://cgg.mff.cuni.cz/~jaroslav/papers/2007-sketch-fis/Final_sap_0073.pdf
-        float computeLod(float pdf)
-        {
-            // // Solid angle of current sample -- bigger for less likely samples
-            //float omegaS = 1.0 / (float(u_sampleCount) * pdf);
-            // // Solid angle of texel
-            // // note: the factor of 4.0 * MATH_PI 
-            //float omegaP = 4.0 * MATH_PI / (6.0 * float(u_width) * float(u_width));
-            // // Mip level is determined by the ratio of our sample's solid angle to a texel's solid angle 
-            // // note that 0.5 * log2 is equivalent to log4
-            //float lod = 0.5 * log2(omegaS / omegaP);
-
-            // babylon introduces a factor of K (=4) to the solid angle ratio
-            // this helps to avoid undersampling the environment map
-            // this does not appear in the original formulation by Jaroslav Krivanek and Mark Colbert
-            // log4(4) == 1
-            // lod += 1.0;
-
-            // We achieved good results by using the original formulation from Krivanek & Colbert adapted to cubemaps
-
-            // https://cgg.mff.cuni.cz/~jaroslav/papers/2007-sketch-fis/Final_sap_0073.pdf
-            float lod = 0.5 * log2( 6.0 * float(u_width) * float(u_width) / (float(u_sampleCount) * pdf));
-            //float lod = 0.5 * log2( 3.0 * float(u_width) * float(u_width) / (float(u_sampleCount) * pdf));
-
-
-            return lod;
-        }
-
-        vec3 filterColor(vec3 N)
-        {
-            //return  textureLod(u_cubemapTexture, N, 3.0).rgb;
-            vec3 color = vec3(0.f);
-            float weight = 0.0f;
-
-            for(int i = 0; i < u_sampleCount; ++i)
-            {
-                vec4 importanceSample = getImportanceSample(i, N, u_roughness);
-
-                vec3 H = vec3(importanceSample.xyz);
-                float pdf = importanceSample.w;
-
-                // mipmap filtered samples (GPU Gems 3, 20.4)
-                float lod = computeLod(pdf);
-
-                // apply the bias to the lod
-                lod += u_lodBias;
-
-                if(u_distribution == cLambertian)
-                {
-                    // sample lambertian at a lower resolution to avoid fireflies
-                    vec3 lambertian = textureLod(u_cubemapTexture, H, lod).rgb * u_intensityScale;
-
-                    //// the below operations cancel each other out
-                    // lambertian *= NdotH; // lamberts law
-                    // lambertian /= pdf; // invert bias from importance sampling
-                    // lambertian /= MATH_PI; // convert irradiance to radiance https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/
-
-                    color += lambertian;
-                }
-                else if(u_distribution == cGGX || u_distribution == cCharlie)
-                {
-                    // Note: reflect takes incident vector.
-                    vec3 V = N;
-                    vec3 L = normalize(reflect(-V, H));
-                    
-                    float NdotL = dot(N, L);
-
-                    if (NdotL > 0.0)
-                    {
-                        if(u_roughness == 0.0)
-                        {
-                            // without this the roughness=0 lod is too high
-                            lod = u_lodBias;
-                        }
-                        vec3 sampleColor = textureLod(u_cubemapTexture, L, lod).rgb * u_intensityScale;
-                        color += sampleColor * NdotL;
-                        weight += NdotL;
-                    }
-                }
-            }
-
-            if(weight != 0.0f)
-            {
-                color /= weight;
-            }
-            else
-            {
-                color /= float(u_sampleCount);
-            }
-
-            return color.rgb ;
-        }
-    )"
+        "ibl_filtering4.glsl", "\n"
+            "        // Mipmap Filtered Samples (GPU Gems 3, 20.4)\n"
+            "        // https://developer.nvidia.com/gpugems/gpugems3/part-iii-rendering/chapter-20-gpu-based-importance-sampling\n"
+            "        // https://cgg.mff.cuni.cz/~jaroslav/papers/2007-sketch-fis/Final_sap_0073.pdf\n"
+            "        float computeLod(float pdf)\n"
+            "        {\n"
+            "            // // Solid angle of current sample -- bigger for less likely samples\n"
+            "            //float omegaS = 1.0 / (float(u_sampleCount) * pdf);\n"
+            "            // // Solid angle of texel\n"
+            "            // // note: the factor of 4.0 * MATH_PI \n"
+            "            //float omegaP = 4.0 * MATH_PI / (6.0 * float(u_width) * float(u_width));\n"
+            "            // // Mip level is determined by the ratio of our sample's solid angle to a texel's solid angle \n"
+            "            // // note that 0.5 * log2 is equivalent to log4\n"
+            "            //float lod = 0.5 * log2(omegaS / omegaP);\n"
+            "\n"
+            "            // babylon introduces a factor of K (=4) to the solid angle ratio\n"
+            "            // this helps to avoid undersampling the environment map\n"
+            "            // this does not appear in the original formulation by Jaroslav Krivanek and Mark Colbert\n"
+            "            // log4(4) == 1\n"
+            "            // lod += 1.0;\n"
+            "\n"
+            "            // We achieved good results by using the original formulation from Krivanek & Colbert adapted to cubemaps\n"
+            "\n"
+            "            // https://cgg.mff.cuni.cz/~jaroslav/papers/2007-sketch-fis/Final_sap_0073.pdf\n"
+            "            float lod = 0.5 * log2( 6.0 * float(u_width) * float(u_width) / (float(u_sampleCount) * pdf));\n"
+            "            //float lod = 0.5 * log2( 3.0 * float(u_width) * float(u_width) / (float(u_sampleCount) * pdf));\n"
+            "\n"
+            "\n"
+            "            return lod;\n"
+            "        }\n"
+            "\n"
+            "        vec3 filterColor(vec3 N)\n"
+            "        {\n"
+            "            //return  textureLod(u_cubemapTexture, N, 3.0).rgb;\n"
+            "            vec3 color = vec3(0.f);\n"
+            "            float weight = 0.0f;\n"
+            "\n"
+            "            for(int i = 0; i < u_sampleCount; ++i)\n"
+            "            {\n"
+            "                vec4 importanceSample = getImportanceSample(i, N, u_roughness);\n"
+            "\n"
+            "                vec3 H = vec3(importanceSample.xyz);\n"
+            "                float pdf = importanceSample.w;\n"
+            "\n"
+            "                // mipmap filtered samples (GPU Gems 3, 20.4)\n"
+            "                float lod = computeLod(pdf);\n"
+            "\n"
+            "                // apply the bias to the lod\n"
+            "                lod += u_lodBias;\n"
+            "\n"
+            "                if(u_distribution == cLambertian)\n"
+            "                {\n"
+            "                    // sample lambertian at a lower resolution to avoid fireflies\n"
+            "                    vec3 lambertian = textureLod(u_cubemapTexture, H, lod).rgb * u_intensityScale;\n"
+            "\n"
+            "                    //// the below operations cancel each other out\n"
+            "                    // lambertian *= NdotH; // lamberts law\n"
+            "                    // lambertian /= pdf; // invert bias from importance sampling\n"
+            "                    // lambertian /= MATH_PI; // convert irradiance to radiance https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/\n"
+            "\n"
+            "                    color += lambertian;\n"
+            "                }\n"
+            "                else if(u_distribution == cGGX || u_distribution == cCharlie)\n"
+            "                {\n"
+            "                    // Note: reflect takes incident vector.\n"
+            "                    vec3 V = N;\n"
+            "                    vec3 L = normalize(reflect(-V, H));\n"
+            "                    \n"
+            "                    float NdotL = dot(N, L);\n"
+            "\n"
+            "                    if (NdotL > 0.0)\n"
+            "                    {\n"
+            "                        if(u_roughness == 0.0)\n"
+            "                        {\n"
+            "                            // without this the roughness=0 lod is too high\n"
+            "                            lod = u_lodBias;\n"
+            "                        }\n"
+            "                        vec3 sampleColor = textureLod(u_cubemapTexture, L, lod).rgb * u_intensityScale;\n"
+            "                        color += sampleColor * NdotL;\n"
+            "                        weight += NdotL;\n"
+            "                    }\n"
+            "                }\n"
+            "            }\n"
+            "\n"
+            "            if(weight != 0.0f)\n"
+            "            {\n"
+            "                color /= weight;\n"
+            "            }\n"
+            "            else\n"
+            "            {\n"
+            "                color /= float(u_sampleCount);\n"
+            "            }\n"
+            "\n"
+            "            return color.rgb ;\n"
+            "        }\n"
+            "    "
     },
     {
-        "ibl_filtering5a.glsl", R"(
-        // From the filament docs. Geometric Shadowing function
-        // https://google.github.io/filament/Filament.html#toc4.4.2
-        float V_SmithGGXCorrelated(float NoV, float NoL, float roughness) {
-            float a2 = pow(roughness, 4.0);
-            float GGXV = NoL * sqrt(NoV * NoV * (1.0 - a2) + a2);
-            float GGXL = NoV * sqrt(NoL * NoL * (1.0 - a2) + a2);
-            return 0.5 / (GGXV + GGXL);
-        }
-
-        // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L136
-        float V_Ashikhmin(float NdotL, float NdotV)
-        {
-            return clamp(1.0 / (4.0 * (NdotL + NdotV - NdotL * NdotV)), 0.0, 1.0);
-        }
-
-        // The visibility of the sheen lobe as the material shader evaluates it. It is
-        // repeated here so that the sheen albedo table below integrates the very lobe
-        // that the table is later used to scale.
-        float lambdaSheenNumericHelper(float x, float alphaG)
-        {
-            // The first four coefficients are packed into a vec4 so a single
-            // vectorized mix() replaces four scalar ones, instead of relying on
-            // the shader compiler to vectorize them.
-            vec4 mixA = vec4(21.5473, 3.82987, 0.19823, -1.97760);
-            vec4 mixB = vec4(25.3245, 3.32435, 0.16801, -1.27393);
-            float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);
-            vec4 abcd = mix(mixA, mixB, vec4(oneMinusAlphaSq));
-            float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);
-            return abcd.x / (1.0 + abcd.y * pow(x, abcd.z)) + abcd.w * x + e;
-        }
-
-        float lambdaSheen(float cosTheta, float alphaG)
-        {
-            if (abs(cosTheta) < 0.5)
-            {
-                return exp(lambdaSheenNumericHelper(cosTheta, alphaG));
-            }
-            else
-            {
-                return exp(2.0 * lambdaSheenNumericHelper(0.5, alphaG) - lambdaSheenNumericHelper(1.0 - cosTheta, alphaG));
-            }
-        }
-
-        float V_Sheen(float NdotL, float NdotV, float alphaG)
-        {
-            return clamp(1.0 / ((1.0 + lambdaSheen(NdotV, alphaG) + lambdaSheen(NdotL, alphaG)) *
-                (4.0 * NdotV * NdotL)), 0.0, 1.0);
-        }
-
-        // Compute LUT for GGX distribution.
-        // See https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
-        vec3 LUT(float NdotV, float roughness)
-        {
-            // Compute spherical view vector: (sin(phi), 0, cos(phi))
-            vec3 V = vec3(sqrt(1.0 - NdotV * NdotV), 0.0, NdotV);
-
-            // The macro surface normal just points up.
-            vec3 N = vec3(0.0, 0.0, 1.0);
-
-            // To make the LUT independant from the material's F0, which is part of the Fresnel term
-            // when substituted by Schlick's approximation, we factor it out of the integral,
-            // yielding to the form: F0 * I1 + I2
-            // I1 and I2 are slightly different in the Fresnel term, but both only depend on
-            // NoL and roughness, so they are both numerically integrated and written into two channels.
-            float A = 0.0;
-            float B = 0.0;
-            float C = 0.0;
-    )"
+        "ibl_filtering5a.glsl", "\n"
+            "        // From the filament docs. Geometric Shadowing function\n"
+            "        // https://google.github.io/filament/Filament.html#toc4.4.2\n"
+            "        float V_SmithGGXCorrelated(float NoV, float NoL, float roughness) {\n"
+            "            float a2 = pow(roughness, 4.0);\n"
+            "            float GGXV = NoL * sqrt(NoV * NoV * (1.0 - a2) + a2);\n"
+            "            float GGXL = NoV * sqrt(NoL * NoL * (1.0 - a2) + a2);\n"
+            "            return 0.5 / (GGXV + GGXL);\n"
+            "        }\n"
+            "\n"
+            "        // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L136\n"
+            "        float V_Ashikhmin(float NdotL, float NdotV)\n"
+            "        {\n"
+            "            return clamp(1.0 / (4.0 * (NdotL + NdotV - NdotL * NdotV)), 0.0, 1.0);\n"
+            "        }\n"
+            "\n"
+            "        // The visibility of the sheen lobe as the material shader evaluates it. It is\n"
+            "        // repeated here so that the sheen albedo table below integrates the very lobe\n"
+            "        // that the table is later used to scale.\n"
+            "        float lambdaSheenNumericHelper(float x, float alphaG)\n"
+            "        {\n"
+            "            // The first four coefficients are packed into a vec4 so a single\n"
+            "            // vectorized mix() replaces four scalar ones, instead of relying on\n"
+            "            // the shader compiler to vectorize them.\n"
+            "            vec4 mixA = vec4(21.5473, 3.82987, 0.19823, -1.97760);\n"
+            "            vec4 mixB = vec4(25.3245, 3.32435, 0.16801, -1.27393);\n"
+            "            float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);\n"
+            "            vec4 abcd = mix(mixA, mixB, vec4(oneMinusAlphaSq));\n"
+            "            float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);\n"
+            "            return abcd.x / (1.0 + abcd.y * pow(x, abcd.z)) + abcd.w * x + e;\n"
+            "        }\n"
+            "\n"
+            "        float lambdaSheen(float cosTheta, float alphaG)\n"
+            "        {\n"
+            "            if (abs(cosTheta) < 0.5)\n"
+            "            {\n"
+            "                return exp(lambdaSheenNumericHelper(cosTheta, alphaG));\n"
+            "            }\n"
+            "            else\n"
+            "            {\n"
+            "                return exp(2.0 * lambdaSheenNumericHelper(0.5, alphaG) - lambdaSheenNumericHelper(1.0 - cosTheta, alphaG));\n"
+            "            }\n"
+            "        }\n"
+            "\n"
+            "        float V_Sheen(float NdotL, float NdotV, float alphaG)\n"
+            "        {\n"
+            "            return clamp(1.0 / ((1.0 + lambdaSheen(NdotV, alphaG) + lambdaSheen(NdotL, alphaG)) *\n"
+            "                (4.0 * NdotV * NdotL)), 0.0, 1.0);\n"
+            "        }\n"
+            "\n"
+            "        // Compute LUT for GGX distribution.\n"
+            "        // See https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf\n"
+            "        vec3 LUT(float NdotV, float roughness)\n"
+            "        {\n"
+            "            // Compute spherical view vector: (sin(phi), 0, cos(phi))\n"
+            "            vec3 V = vec3(sqrt(1.0 - NdotV * NdotV), 0.0, NdotV);\n"
+            "\n"
+            "            // The macro surface normal just points up.\n"
+            "            vec3 N = vec3(0.0, 0.0, 1.0);\n"
+            "\n"
+            "            // To make the LUT independant from the material's F0, which is part of the Fresnel term\n"
+            "            // when substituted by Schlick's approximation, we factor it out of the integral,\n"
+            "            // yielding to the form: F0 * I1 + I2\n"
+            "            // I1 and I2 are slightly different in the Fresnel term, but both only depend on\n"
+            "            // NoL and roughness, so they are both numerically integrated and written into two channels.\n"
+            "            float A = 0.0;\n"
+            "            float B = 0.0;\n"
+            "            float C = 0.0;\n"
+            "    "
     },
     {
-        "ibl_filtering5b.glsl", R"(
-            for(int i = 0; i < u_sampleCount; ++i)
-            {
-                // Importance sampling, depending on the distribution.
-                vec4 importanceSample = getImportanceSample(i, N, roughness);
-                vec3 H = importanceSample.xyz;
-                // float pdf = importanceSample.w;
-                vec3 L = normalize(reflect(-V, H));
-
-                float NdotL = saturate(L.z);
-                float NdotH = saturate(H.z);
-                float VdotH = saturate(dot(V, H));
-                if (NdotL > 0.0)
-                {
-                    if (u_distribution == cGGX)
-                    {
-                        // LUT for GGX distribution.
-
-                        // Taken from: https://bruop.github.io/ibl
-                        // Shadertoy: https://www.shadertoy.com/view/3lXXDB
-                        // Terms besides V are from the GGX PDF we're dividing by.
-                        float V_pdf = V_SmithGGXCorrelated(NdotV, NdotL, roughness) * VdotH * NdotL / NdotH;
-                        float Fc = pow(1.0 - VdotH, 5.0);
-                        A += (1.0 - Fc) * V_pdf;
-                        B += Fc * V_pdf;
-                        C += 0.0;
-                    }
-
-                    if (u_distribution == cCharlie)
-                    {
-                        // LUT for Charlie distribution.
-                        float sheenDistribution = D_Charlie(roughness, NdotH);
-                        float sheenVisibility = V_Ashikhmin(NdotL, NdotV);
-
-                        A += 0.0;
-                        B += 0.0;
-                        C += sheenVisibility * sheenDistribution * NdotL * VdotH;
-                    }
-                }
-            }
-
-            if (u_distribution == cCharlie)
-            {
-                // Directional albedo of the sheen BRDF, which the material shader reads
-                // from the red channel through u_SheenELUT to scale the base layer that
-                // sits under the sheen lobe.
-                //
-                // The light directions are sampled cosine weighted, so with a probability
-                // density of NdotL / pi the estimator collapses to pi times the average of
-                // the BRDF. The 0.25 cancels the factor of 4 applied to A below.
-                for(int i = 0; i < u_sampleCount; ++i)
-                {
-                    vec2 xi = hammersley2d(i, u_sampleCount);
-
-                    float cosThetaL = sqrt(1.0 - xi.y);
-                    float sinThetaL = sqrt(xi.y);
-                    float phiL = 2.0 * MATH_PI * xi.x;
-                    vec3 L = vec3(sinThetaL * cos(phiL), sinThetaL * sin(phiL), cosThetaL);
-                    vec3 Hl = normalize(V + L);
-
-                    float NdotLl = saturate(L.z);
-                    float NdotHl = saturate(Hl.z);
-                    if (NdotLl > 0.0)
-                    {
-                        // D_Charlie takes the squared roughness here, while the copy of
-                        // it in the material shader squares the roughness itself
-                        float alphaG = roughness * roughness;
-                        A += 0.25 * MATH_PI * D_Charlie(alphaG, NdotHl) * V_Sheen(NdotLl, NdotV, alphaG);
-                    }
-                }
-            }
-
-            // The PDF is simply pdf(v, h) -> NDF * <nh>.
-            // To parametrize the PDF over l, use the Jacobian transform, yielding to: pdf(v, l) -> NDF * <nh> / 4<vh>
-            // Since the BRDF divide through the PDF to be normalized, the 4 can be pulled out of the integral.
-            return vec3(4.0 * A, 4.0 * B, 4.0 * 2.0 * MATH_PI * C) / float(u_sampleCount);
-        }
-    )"
+        "ibl_filtering5b.glsl", "\n"
+            "            for(int i = 0; i < u_sampleCount; ++i)\n"
+            "            {\n"
+            "                // Importance sampling, depending on the distribution.\n"
+            "                vec4 importanceSample = getImportanceSample(i, N, roughness);\n"
+            "                vec3 H = importanceSample.xyz;\n"
+            "                // float pdf = importanceSample.w;\n"
+            "                vec3 L = normalize(reflect(-V, H));\n"
+            "\n"
+            "                float NdotL = saturate(L.z);\n"
+            "                float NdotH = saturate(H.z);\n"
+            "                float VdotH = saturate(dot(V, H));\n"
+            "                if (NdotL > 0.0)\n"
+            "                {\n"
+            "                    if (u_distribution == cGGX)\n"
+            "                    {\n"
+            "                        // LUT for GGX distribution.\n"
+            "\n"
+            "                        // Taken from: https://bruop.github.io/ibl\n"
+            "                        // Shadertoy: https://www.shadertoy.com/view/3lXXDB\n"
+            "                        // Terms besides V are from the GGX PDF we're dividing by.\n"
+            "                        float V_pdf = V_SmithGGXCorrelated(NdotV, NdotL, roughness) * VdotH * NdotL / NdotH;\n"
+            "                        float Fc = pow(1.0 - VdotH, 5.0);\n"
+            "                        A += (1.0 - Fc) * V_pdf;\n"
+            "                        B += Fc * V_pdf;\n"
+            "                        C += 0.0;\n"
+            "                    }\n"
+            "\n"
+            "                    if (u_distribution == cCharlie)\n"
+            "                    {\n"
+            "                        // LUT for Charlie distribution.\n"
+            "                        float sheenDistribution = D_Charlie(roughness, NdotH);\n"
+            "                        float sheenVisibility = V_Ashikhmin(NdotL, NdotV);\n"
+            "\n"
+            "                        A += 0.0;\n"
+            "                        B += 0.0;\n"
+            "                        C += sheenVisibility * sheenDistribution * NdotL * VdotH;\n"
+            "                    }\n"
+            "                }\n"
+            "            }\n"
+            "\n"
+            "            if (u_distribution == cCharlie)\n"
+            "            {\n"
+            "                // Directional albedo of the sheen BRDF, which the material shader reads\n"
+            "                // from the red channel through u_SheenELUT to scale the base layer that\n"
+            "                // sits under the sheen lobe.\n"
+            "                //\n"
+            "                // The light directions are sampled cosine weighted, so with a probability\n"
+            "                // density of NdotL / pi the estimator collapses to pi times the average of\n"
+            "                // the BRDF. The 0.25 cancels the factor of 4 applied to A below.\n"
+            "                for(int i = 0; i < u_sampleCount; ++i)\n"
+            "                {\n"
+            "                    vec2 xi = hammersley2d(i, u_sampleCount);\n"
+            "\n"
+            "                    float cosThetaL = sqrt(1.0 - xi.y);\n"
+            "                    float sinThetaL = sqrt(xi.y);\n"
+            "                    float phiL = 2.0 * MATH_PI * xi.x;\n"
+            "                    vec3 L = vec3(sinThetaL * cos(phiL), sinThetaL * sin(phiL), cosThetaL);\n"
+            "                    vec3 Hl = normalize(V + L);\n"
+            "\n"
+            "                    float NdotLl = saturate(L.z);\n"
+            "                    float NdotHl = saturate(Hl.z);\n"
+            "                    if (NdotLl > 0.0)\n"
+            "                    {\n"
+            "                        // D_Charlie takes the squared roughness here, while the copy of\n"
+            "                        // it in the material shader squares the roughness itself\n"
+            "                        float alphaG = roughness * roughness;\n"
+            "                        A += 0.25 * MATH_PI * D_Charlie(alphaG, NdotHl) * V_Sheen(NdotLl, NdotV, alphaG);\n"
+            "                    }\n"
+            "                }\n"
+            "            }\n"
+            "\n"
+            "            // The PDF is simply pdf(v, h) -> NDF * <nh>.\n"
+            "            // To parametrize the PDF over l, use the Jacobian transform, yielding to: pdf(v, l) -> NDF * <nh> / 4<vh>\n"
+            "            // Since the BRDF divide through the PDF to be normalized, the 4 can be pulled out of the integral.\n"
+            "            return vec3(4.0 * A, 4.0 * B, 4.0 * 2.0 * MATH_PI * C) / float(u_sampleCount);\n"
+            "        }\n"
+            "    "
     },
     {
-        "ibl_filtering6.glsl", R"(
-
-
-        // entry point
-        void main()
-        {
-            vec3 color = vec3(0);
-
-            if(u_isGeneratingLUT == 0)
-            {
-                vec2 newUV = texCoord ;
-
-                newUV = newUV*2.0-1.0;
-
-                vec3 scan = uvToXYZ(u_currentFace, newUV);
-
-                vec3 direction = normalize(scan);
-            
-                color = filterColor(direction);
-            }
-            else
-            {
-                color = LUT(texCoord.x, texCoord.y);
-                fragmentColor.rgb = color;
-                fragmentColor.a = 1.0;
-                return;
-            }
-        
-            fragmentColor.a = 1.0;
-            
-            if(u_floatTexture == 0) 
-            { 
-                float maxV = max(max(color.r,color.g),color.b);   
-                color /= u_intensityScale;       
-                color = clamp(color, 0.0f, 1.0f);
-            }
-            
-            fragmentColor.rgb = color;
-        }
-    )"
+        "ibl_filtering6.glsl", "\n"
+            "\n"
+            "\n"
+            "        // entry point\n"
+            "        void main()\n"
+            "        {\n"
+            "            vec3 color = vec3(0);\n"
+            "\n"
+            "            if(u_isGeneratingLUT == 0)\n"
+            "            {\n"
+            "                vec2 newUV = texCoord ;\n"
+            "\n"
+            "                newUV = newUV*2.0-1.0;\n"
+            "\n"
+            "                vec3 scan = uvToXYZ(u_currentFace, newUV);\n"
+            "\n"
+            "                vec3 direction = normalize(scan);\n"
+            "            \n"
+            "                color = filterColor(direction);\n"
+            "            }\n"
+            "            else\n"
+            "            {\n"
+            "                color = LUT(texCoord.x, texCoord.y);\n"
+            "                fragmentColor.rgb = color;\n"
+            "                fragmentColor.a = 1.0;\n"
+            "                return;\n"
+            "            }\n"
+            "        \n"
+            "            fragmentColor.a = 1.0;\n"
+            "            \n"
+            "            if(u_floatTexture == 0) \n"
+            "            { \n"
+            "                float maxV = max(max(color.r,color.g),color.b);   \n"
+            "                color /= u_intensityScale;       \n"
+            "                color = clamp(color, 0.0f, 1.0f);\n"
+            "            }\n"
+            "            \n"
+            "            fragmentColor.rgb = color;\n"
+            "        }\n"
+            "    "
     },
     {
-        "debug.frag", R"(
-
-        precision highp float;
-
-        in vec2 texCoord;
-        out vec4 fragmentColor;
-        
-        uniform int u_currentFace;
-        uniform samplerCube u_inputTexture;
-        
-        vec3 uvToXYZ(int face, vec2 uv)
-        {
-            if(face == 0)
-                return vec3(     1.f,   uv.y,    -uv.x);
-                
-            else if(face == 1)
-                return vec3(    -1.f,   uv.y,     uv.x);
-                
-            else if(face == 2)
-                return vec3(   +uv.x,   -1.f,    +uv.y);		
-            
-            else if(face == 3)
-                return vec3(   +uv.x,    1.f,    -uv.y);
-                
-            else if(face == 4)
-                return vec3(   +uv.x,   uv.y,      1.f);
-                
-            else //if(face == 5)
-            {	return vec3(    -uv.x,  +uv.y,     -1.f);}
-        }
-        
-        
-        void main(void)   
-        {
-            fragmentColor = vec4(texCoord.x*10.0, 0.0, texCoord.y*10.0, 1.0);
-            vec2 newUV =texCoord;
-            newUV = newUV*2.0-1.0;
-        
-            vec4 textureColor = vec4(0.0, 0.0, 0.0, 1.0);
-        
-            vec3 direction = normalize(uvToXYZ(u_currentFace, newUV.xy));
-         
-            textureColor = textureLod(u_inputTexture, direction,1.0);
-            //textureColor = texture(u_inputTexture, texCoord);
-            
-            if(texCoord.x>0.1)
-            {
-                fragmentColor = textureColor;
-            }
-        
-            if(texCoord.y>0.1)
-            {
-                fragmentColor = textureColor;
-            }
-        
-        }
-    )"
+        "debug.frag", "\n"
+            "\n"
+            "        precision highp float;\n"
+            "\n"
+            "        in vec2 texCoord;\n"
+            "        out vec4 fragmentColor;\n"
+            "        \n"
+            "        uniform int u_currentFace;\n"
+            "        uniform samplerCube u_inputTexture;\n"
+            "        \n"
+            "        vec3 uvToXYZ(int face, vec2 uv)\n"
+            "        {\n"
+            "            if(face == 0)\n"
+            "                return vec3(     1.f,   uv.y,    -uv.x);\n"
+            "                \n"
+            "            else if(face == 1)\n"
+            "                return vec3(    -1.f,   uv.y,     uv.x);\n"
+            "                \n"
+            "            else if(face == 2)\n"
+            "                return vec3(   +uv.x,   -1.f,    +uv.y);		\n"
+            "            \n"
+            "            else if(face == 3)\n"
+            "                return vec3(   +uv.x,    1.f,    -uv.y);\n"
+            "                \n"
+            "            else if(face == 4)\n"
+            "                return vec3(   +uv.x,   uv.y,      1.f);\n"
+            "                \n"
+            "            else //if(face == 5)\n"
+            "            {	return vec3(    -uv.x,  +uv.y,     -1.f);}\n"
+            "        }\n"
+            "        \n"
+            "        \n"
+            "        void main(void)   \n"
+            "        {\n"
+            "            fragmentColor = vec4(texCoord.x*10.0, 0.0, texCoord.y*10.0, 1.0);\n"
+            "            vec2 newUV =texCoord;\n"
+            "            newUV = newUV*2.0-1.0;\n"
+            "        \n"
+            "            vec4 textureColor = vec4(0.0, 0.0, 0.0, 1.0);\n"
+            "        \n"
+            "            vec3 direction = normalize(uvToXYZ(u_currentFace, newUV.xy));\n"
+            "         \n"
+            "            textureColor = textureLod(u_inputTexture, direction,1.0);\n"
+            "            //textureColor = texture(u_inputTexture, texCoord);\n"
+            "            \n"
+            "            if(texCoord.x>0.1)\n"
+            "            {\n"
+            "                fragmentColor = textureColor;\n"
+            "            }\n"
+            "        \n"
+            "            if(texCoord.y>0.1)\n"
+            "            {\n"
+            "                fragmentColor = textureColor;\n"
+            "            }\n"
+            "        \n"
+            "        }\n"
+            "    "
     },
 };
 
-static const char * src_vertex_shader = R"(
-    uniform mat4 u_ViewProjectionMatrix;
-    uniform highp mat4 u_ModelMatrix;
-    uniform mat4 u_NormalMatrix;
+static const char * src_vertex_shader = "\n"
+    "    uniform mat4 u_ViewProjectionMatrix;\n"
+    "    uniform highp mat4 u_ModelMatrix;\n"
+    "    uniform mat4 u_NormalMatrix;\n"
+    "\n"
+    "    in vec3 a_position;\n"
+    "    out vec3 v_Position;\n"
+    "#include <animation1.glsl>\n"
+    "#include <animation2.glsl>\n"
+    "#include <vert_v1_chunk_00.glsl>\n"
+    "// CHUNK 00 -> 01\n"
+    "#include <vert_v1_chunk_01a.glsl>\n"
+    "#include <vert_v1_chunk_01b.glsl>\n";
 
-    in vec3 a_position;
-    out vec3 v_Position;
-#include <animation1.glsl>
-#include <animation2.glsl>
-#include <vert_v1_chunk_00.glsl>
-// CHUNK 00 -> 01
-#include <vert_v1_chunk_01a.glsl>
-#include <vert_v1_chunk_01b.glsl>
-)";
-
-static const char *src_fragment_shader = R"(
-
-    //#define LIGHT_COUNT 0
-
-    //
-    // This fragment shader defines a reference implementation for Physically Based Shading of
-    // a microfacet surface material defined by a glTF model.
-    //
-    // References:
-    // [1] Real Shading in Unreal Engine 4
-    //     http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
-    // [2] Physically Based Shading at Disney
-    //     http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf
-    // [3] README.md - Environment Maps
-    //     https://github.com/KhronosGroup/glTF-WebGL-PBR/#environment-maps
-    // [4] "An Inexpensive BRDF Model for Physically based Rendering" by Christophe Schlick
-    //     https://www.cs.virginia.edu/~jdl/bib/appearance/analytic%20models/schlick94b.pdf
-    // [5] "KHR_materials_clearcoat"
-    //     https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
-
-    precision mediump float;
-
-#include <tonemapping.glsl>
-#include <textures1.glsl>
-#include <textures2.glsl>
-#include <textures3.glsl>
-#include <textures4.glsl>
-#include <functions.glsl>
-#include <brdf1.glsl>
-#include <brdf2.glsl>
-#include <brdf3.glsl>
-#include <punctual1.glsl>
-#include <punctual2.glsl>
-#include <ibl1.glsl>
-#include <ibl2.glsl>
-#include <material_info1.glsl>
-#include <material_info2.glsl>
-#include <material_info3.glsl>
-#include <material_info4.glsl>
-#include <material_info5.glsl>
-
-    #ifdef MATERIAL_IRIDESCENCE
-#include <iridescence.glsl>
-    #endif
-
-#include <frag_v1_chunk_00.glsl>
-
-// CHUNK 00 -> 01
-
-#include <frag_v1_chunk_01a.glsl>
-#include <frag_v1_chunk_01b.glsl>
-
-// CHUNK 01 -> 02
-
-#include <frag_v1_chunk_02a.glsl>
-#include <frag_v1_chunk_02b.glsl>
-
-// CHUNK 02 -> 03
-
-#include <frag_v1_chunk_03a.glsl>
-#include <frag_v1_chunk_03b.glsl>
-
-// CHUNK 03 -> 04
-
-#include <frag_v1_chunk_04.glsl>
-
-// CHUNK 04 -> 05
-
-#include <frag_v1_chunk_05.glsl>
-
-)";
+static const char *src_fragment_shader = "\n"
+    "\n"
+    "    //#define LIGHT_COUNT 0\n"
+    "\n"
+    "    //\n"
+    "    // This fragment shader defines a reference implementation for Physically Based Shading of\n"
+    "    // a microfacet surface material defined by a glTF model.\n"
+    "    //\n"
+    "    // References:\n"
+    "    // [1] Real Shading in Unreal Engine 4\n"
+    "    //     http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf\n"
+    "    // [2] Physically Based Shading at Disney\n"
+    "    //     http://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf\n"
+    "    // [3] README.md - Environment Maps\n"
+    "    //     https://github.com/KhronosGroup/glTF-WebGL-PBR/#environment-maps\n"
+    "    // [4] \"An Inexpensive BRDF Model for Physically based Rendering\" by Christophe Schlick\n"
+    "    //     https://www.cs.virginia.edu/~jdl/bib/appearance/analytic%20models/schlick94b.pdf\n"
+    "    // [5] \"KHR_materials_clearcoat\"\n"
+    "    //     https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat\n"
+    "\n"
+    "    precision mediump float;\n"
+    "\n"
+    "#include <tonemapping.glsl>\n"
+    "#include <textures1.glsl>\n"
+    "#include <textures2.glsl>\n"
+    "#include <textures3.glsl>\n"
+    "#include <textures4.glsl>\n"
+    "#include <functions.glsl>\n"
+    "#include <brdf1.glsl>\n"
+    "#include <brdf2.glsl>\n"
+    "#include <brdf3.glsl>\n"
+    "#include <punctual1.glsl>\n"
+    "#include <punctual2.glsl>\n"
+    "#include <ibl1.glsl>\n"
+    "#include <ibl2.glsl>\n"
+    "#include <material_info1.glsl>\n"
+    "#include <material_info2.glsl>\n"
+    "#include <material_info3.glsl>\n"
+    "#include <material_info4.glsl>\n"
+    "#include <material_info5.glsl>\n"
+    "\n"
+    "    #ifdef MATERIAL_IRIDESCENCE\n"
+    "#include <iridescence.glsl>\n"
+    "    #endif\n"
+    "\n"
+    "#include <frag_v1_chunk_00.glsl>\n"
+    "\n"
+    "// CHUNK 00 -> 01\n"
+    "\n"
+    "#include <frag_v1_chunk_01a.glsl>\n"
+    "#include <frag_v1_chunk_01b.glsl>\n"
+    "\n"
+    "// CHUNK 01 -> 02\n"
+    "\n"
+    "#include <frag_v1_chunk_02a.glsl>\n"
+    "#include <frag_v1_chunk_02b.glsl>\n"
+    "\n"
+    "// CHUNK 02 -> 03\n"
+    "\n"
+    "#include <frag_v1_chunk_03a.glsl>\n"
+    "#include <frag_v1_chunk_03b.glsl>\n"
+    "\n"
+    "// CHUNK 03 -> 04\n"
+    "\n"
+    "#include <frag_v1_chunk_04.glsl>\n"
+    "\n"
+    "// CHUNK 04 -> 05\n"
+    "\n"
+    "#include <frag_v1_chunk_05.glsl>\n"
+    "\n";
 
 static const size_t src_includes_count = sizeof src_includes / sizeof src_includes[0];
 

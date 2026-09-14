@@ -54,3 +54,6 @@ extend-ignore-identifiers-re = [
 "yout" = "yout"
 # Typo in STM32 HAL
 "FBStartAdress" = "FBStartAdress"
+# GLSL: textureLod() is a built-in, u_LodLevel a uniform name
+"textureLod" = "textureLod"
+"u_LodLevel" = "u_LodLevel"
