@@ -951,7 +951,11 @@ static void label_event_cb(lv_event_t * e)
 
     if(code == LV_EVENT_STYLE_CHANGED || code == LV_EVENT_SIZE_CHANGED) {
         lv_label_set_text(label, NULL);
-        if(code == LV_EVENT_SIZE_CHANGED) lv_obj_readjust_scroll(ta, LV_ANIM_ON);
+        if(code == LV_EVENT_SIZE_CHANGED) {
+            /*Stop pending scroll that was aimed at the old label*/
+            lv_obj_stop_scroll_anim(ta);
+            lv_obj_readjust_scroll(ta, LV_ANIM_ON);
+        }
         refr_cursor_area(ta);
         start_cursor_blink(ta);
     }
