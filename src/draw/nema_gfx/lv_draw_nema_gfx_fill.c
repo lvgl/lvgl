@@ -99,12 +99,7 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
 
         nema_vg_paint_clear(draw_nema_gfx_unit->paint);
 
-        /*The fill rule is global NemaVG state and is not set anywhere in this
-         *file. lv_draw_nema_gfx_vector.c sets it to NEMA_VG_STROKE for every
-         *path that has a stroke and never restores it, so a stroke-only vector
-         *icon leaves the GPU in stroke mode and the next gradient background is
-         *outlined instead of filled. Set it here, as the triangle and label
-         *draw paths already do.*/
+        /*The fill rule is global NemaVG state so make sure that it's set proeprly.*/
         nema_vg_set_fill_rule(NEMA_VG_FILL_EVEN_ODD);
 
         nema_vg_set_blend(NEMA_BL_SRC_OVER | NEMA_BLOP_SRC_PREMULT);
