@@ -99,7 +99,7 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
 
         nema_vg_paint_clear(draw_nema_gfx_unit->paint);
 
-        /*The fill rule is global NemaVG state so make sure that it's set proeprly.*/
+        /*The fill rule is global NemaVG state so make sure that it's set properly.*/
         nema_vg_set_fill_rule(NEMA_VG_FILL_EVEN_ODD);
 
         nema_vg_set_blend(NEMA_BL_SRC_OVER | NEMA_BLOP_SRC_PREMULT);
