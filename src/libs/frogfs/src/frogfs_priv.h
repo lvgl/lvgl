@@ -43,8 +43,8 @@ struct frogfs_dh_t {
 struct frogfs_decomp_funcs_t {
     int (*open)(frogfs_fh_t *f, unsigned int flags);
     void (*close)(frogfs_fh_t *f);
-    ssize_t (*read)(frogfs_fh_t *f, void *buf, size_t len);
-    ssize_t (*seek)(frogfs_fh_t *f, long offset, int mode);
+    frogfs_ssize_t (*read)(frogfs_fh_t *f, void *buf, size_t len);
+    frogfs_ssize_t (*seek)(frogfs_fh_t *f, long offset, int mode);
     size_t (*tell)(frogfs_fh_t *f);
 };
 
