@@ -2,15 +2,9 @@
 """
 Turn one or two runs of perf_qemu.py into a PR report section.
 
-The counts are exactly reproducible: QEMU under -icount shift=0 is deterministic and
-host independent, so any non-zero difference between two runs is a real difference and not
-noise. The threshold below only decides which way the row's icon points.
-
 Two things are reported. The instruction counts, per target and suite, against the
 baseline. And whether the rendering changed: the reference comparison records a digest of
-every rendered scene, so a digest that moved means the PR draws different pixels. That is
-reported rather than failed, because a deliberate rendering change is legitimate and only
-the author knows which it is.
+every rendered scene, so a digest that moved means the PR draws different pixels.
 
 The baseline is normally whatever master last published, not this branch's merge base, so
 the details say which revision it was and complain if it was measured with different

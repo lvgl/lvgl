@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 """
-Build and run the QEMU instruction-count benchmark for one LVGL tree.
+Build and run the QEMU instruction-count benchmark.
 
-Meant to run inside the container from scripts/perf_qemu/Dockerfile; run.sh is the wrapper
-that starts it. It builds the tree once per target and then fans the runs out, because QEMU
-under -icount is deterministic and single threaded per process, so N runs at once give
-byte-identical numbers to N in sequence.
-
-The tree to measure is an argument rather than this file's own repository, so that the same
-harness can measure a baseline worktree that does not contain scripts/perf_qemu.
+This script starts scripts/perf_qemu/Dockerfile, builds LVGL once per target and
+runs the benchmarks in parallel.
 """
 
 from __future__ import annotations
@@ -71,13 +66,7 @@ MEM_WARN_PCT = 85
 
 
 def build(lvgl: Path, target: str, opt: str, formats: list[str], build_dir: Path) -> None:
-    """Configure and build every image for one target.
-
-    Configured on every call, not only the first. The colour format list decides which
-    images exist, so skipping this when the build directory is already there left a run
-    with a different --formats looking for an executable nothing had built, and reported
-    it as QEMU failing to load a kernel.
-    """
+    #Configure and build every image for one target.
     cmd = [
         "cmake", "-GNinja",
         "-S", str(HERE / "harness"), "-B", str(build_dir),
@@ -88,10 +77,7 @@ def build(lvgl: Path, target: str, opt: str, formats: list[str], build_dir: Path
         f"-DPERF_QEMU_LVGL_DIR={lvgl}",
         "-DCMAKE_BUILD_TYPE=Release",
     ]
-    # No ccache launcher here, though tests/main.py uses one and the image has ccache:
-    # every compile carries --specs=, which ccache will not cache (measured: 591 of 591
-    # calls uncacheable). Getting the libc include path onto the compile line another way
-    # would fix it, see the note in the session's notes.md.
+
     subprocess.run(cmd, check=True)
     subprocess.run(["cmake", "--build", str(build_dir)], check=True)
 
@@ -104,12 +90,18 @@ def parse_suite(entry: str) -> tuple[str, str]:
     return suite, scene
 
 
+def selects(scene: str, other: str) -> bool:
+    """Does the scene selector `scene` also run the one `other` asks for?
+
+    Empty means the whole suite, and a name without an _opa_ suffix means every opacity of
+    that scene. The same rule bench_wanted() applies on the target, see harness/bench.h.
+    """
+    return scene == "" or other == scene or other.startswith(scene + "_opa")
+
+
 def run_image(target: str, elf: Path, cwd: Path, timeout: int, gdb_port: int | None,
               scene: str = "") -> str:
-    # The scene is passed at run time rather than compiled in, so selecting one does not
-    # mean linking an executable per scene; the target reads it with semihosting's
-    # SYS_GET_CMDLINE. Always passed, including the "*" that means every scene, because
-    # with no arg at all QEMU answers that call with the kernel's path instead.
+
     cmd = list(TARGETS[target]) + [
         "-semihosting-config", f"enable=on,arg={scene or ALL_SCENES}",
         "-kernel", str(elf),
@@ -117,9 +109,7 @@ def run_image(target: str, elf: Path, cwd: Path, timeout: int, gdb_port: int | N
     if gdb_port is not None:
         # -S stops before the first instruction, so a breakpoint can be set on main
         cmd += ["-gdb", f"tcp::{gdb_port}", "-S"]
-        # -nographic hands QEMU the terminal and its own escape sequences, so Ctrl-C goes
-        # to the emulated machine rather than ending the run. Say how to get out, because
-        # nothing else on screen does.
+
         print(
             f"waiting for gdb on port {gdb_port}. In another shell:\n"
             f"  gdb-multiarch -ex 'target remote :{gdb_port}' "
@@ -146,8 +136,6 @@ def parse(label: str, out: str) -> dict:
     if not scenes or not total:
         raise RuntimeError(f"{label}: no #SC or #TOTAL in the run output:\n" + out[-2000:])
 
-    # The target reports its own problems this way. A framebuffer it could not write would
-    # otherwise just be missing from the reference comparison, which would pass.
     errors = ERR_RE.findall(out)
     if errors:
         raise RuntimeError(f"{label}: the run reported " + "; ".join(errors))
@@ -157,8 +145,6 @@ def parse(label: str, out: str) -> dict:
     if mem:
         used, size = int(mem.group(1)), int(mem.group(2))
         data["heap"] = {"max_used": used, "total": size}
-        # With the assertions off a heap that ran out does not fail, it draws the wrong
-        # thing, and one that merely got tight makes the cache evict and the counts move
         if size and used * 100 // size >= MEM_WARN_PCT:
             raise RuntimeError(
                 f"{label}: LVGL's heap peaked at {used:,} of {size:,} bytes "
@@ -263,6 +249,19 @@ def main() -> int:
     except ValueError as err:
         print(err, file=sys.stderr)
         return 1
+    # Two selectors of one suite that share a scene would be two runs writing that scene's
+    # framebuffer dump at the same time, and its instructions would land in the suite's
+    # total twice.
+    for i, (suite, scene) in enumerate(selection):
+        for other_suite, other in selection[i + 1:]:
+            if suite != other_suite:
+                continue
+            if selects(scene, other) or selects(other, scene):
+                first = f"{suite}:{scene}" if scene else suite
+                second = f"{suite}:{other}" if other else suite
+                print(f"--suites has both {first} and {second}, which run the same scene. "
+                      f"Ask for one of them.", file=sys.stderr)
+                return 1
     suites = sorted({suite for suite, _ in selection})
     unknown = [t for t in targets if t not in TARGETS]
     if unknown:
@@ -335,7 +334,9 @@ def main() -> int:
                 have["scenes"].update(data["scenes"])
                 have["total"] += data["total"]
                 have["frames"] += data["frames"]
-                if "heap" in data:
+                # The peak of the merged runs, so it does not depend on the scene order
+                if "heap" in data and (
+                        data["heap"]["max_used"] > have.get("heap", {}).get("max_used", 0)):
                     have["heap"] = data["heap"]
             else:
                 results[target]["suites"][key] = data

@@ -13,8 +13,7 @@
 # enabled. The demos' images are C arrays, so no decoder is needed either.
 
 # --- Must match the reference images -----------------------------------------
-# tests/configs/depth_32.defconfig, and the DPI note in run_tests.defconfig
-CONFIG_LV_COLOR_DEPTH_32=y
+CONFIG_LV_COLOR_FORMAT_XRGB8888=y
 CONFIG_LV_DPI_DEF=130
 
 # tests/configs/full.defconfig
