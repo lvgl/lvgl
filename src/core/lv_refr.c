@@ -23,7 +23,7 @@
  *      DEFINES
  *********************/
 
-#if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP
+#if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP && !defined(LV_COLOR_16_SWAP_DISABLE_WARNING)
     #warning LV_COLOR_16_SWAP will be removed completely in v10 after being a private config since v9. Use LV_COLOR_FORMAT_RGB565_SWAPPED as the display color format instead
 #endif
 
