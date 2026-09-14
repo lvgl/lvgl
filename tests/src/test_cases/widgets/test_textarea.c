@@ -921,6 +921,37 @@ void test_textarea_one_line_scroll_screenshot(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/textarea_one_line_scroll.png");
 }
 
+/* A text area narrowed from its default width must not be left scrolled away from
+ * centred text. The label is resized after the text area, so a scroll started for
+ * the old label width has to be dropped when the label catches up. See #10689. */
+static void centred_textarea_should_not_scroll(bool one_line)
+{
+    lv_obj_clean(active_screen);
+
+    textarea = lv_textarea_create(active_screen);
+    lv_obj_set_width(textarea, 100);
+    lv_obj_center(textarea);
+    if(one_line) lv_textarea_set_one_line(textarea, true);
+    lv_obj_set_style_text_align(textarea, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_textarea_set_text(textarea, "test");
+
+    /*The bad scroll is animated, so a shorter wait passes without proving anything*/
+    lv_test_wait(500);
+
+    /*"test" is far narrower than the text area, so there is nothing to scroll*/
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_x(textarea));
+}
+
+void test_textarea_one_line_centred_text_should_not_be_scrolled_out_of_view(void)
+{
+    centred_textarea_should_not_scroll(true);
+}
+
+void test_textarea_centred_text_should_not_be_scrolled_out_of_view(void)
+{
+    centred_textarea_should_not_scroll(false);
+}
+
 void test_textarea_set_text_should_emit_value_changed_event_without_filters(void)
 {
     event_count = 0;
