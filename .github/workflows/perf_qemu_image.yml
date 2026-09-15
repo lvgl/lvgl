@@ -2,14 +2,14 @@ name: QEMU Benchmark Image
 
 # The benchmark's numbers only mean something when the compiler and the emulator are
 # identical everywhere, so the toolchain lives in one image that both CI and
-# scripts/perf_qemu/run.sh use. Publishing prints the digest; put that digest in
+# tests/perf_qemu/run.sh use. Publishing prints the digest; put that digest in
 # perf_qemu.yml and in run.sh, so a rebuild can never silently change the numbers.
 
 on:
   push:
     branches: 'master'
     paths:
-      - 'scripts/perf_qemu/Dockerfile'
+      - 'tests/perf_qemu/Dockerfile'
       - '.github/workflows/perf_qemu_image.yml'
   workflow_dispatch:
 
@@ -35,7 +35,7 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
-          context: scripts/perf_qemu
+          context: tests/perf_qemu
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/lv-perf-qemu:1
           cache-from: type=gha
@@ -43,7 +43,7 @@ jobs:
 
       - name: Report the digest to pin
         run: |
-          echo "Pin this in .github/workflows/perf_qemu.yml and scripts/perf_qemu/run.sh:" \
+          echo "Pin this in .github/workflows/perf_qemu.yml and tests/perf_qemu/run.sh:" \
             >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "ghcr.io/${{ github.repository_owner }}/lv-perf-qemu@${{ steps.push.outputs.digest }}" \

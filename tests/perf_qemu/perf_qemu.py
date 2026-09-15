@@ -2,7 +2,7 @@
 """
 Build and run the QEMU instruction-count benchmark.
 
-This script starts scripts/perf_qemu/Dockerfile, builds LVGL once per target and
+This script starts tests/perf_qemu/Dockerfile, builds LVGL once per target and
 runs the benchmarks in parallel.
 """
 

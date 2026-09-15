@@ -83,11 +83,50 @@ __asm__(
 );
 
 /*picolibc's stdio layer references these. There is no file system here.*/
-int open(const char * p, int f, ...) { (void)p; (void)f; return -1; }
-int close(int fd) { (void)fd; return -1; }
-long read(int fd, void * b, unsigned long n) { (void)fd; (void)b; (void)n; return -1; }
-long write(int fd, const void * b, unsigned long n) { (void)fd; (void)b; return (long)n; }
-long lseek(int fd, long o, int w) { (void)fd; (void)o; (void)w; return -1; }
-int unlink(const char * p) { (void)p; return -1; }
-int fstat(int fd, void * st) { (void)fd; (void)st; return -1; }
-int isatty(int fd) { (void)fd; return 1; }
+int open(const char * p, int f, ...)
+{
+    (void)p;
+    (void)f;
+    return -1;
+}
+int close(int fd)
+{
+    (void)fd;
+    return -1;
+}
+long read(int fd, void * b, unsigned long n)
+{
+    (void)fd;
+    (void)b;
+    (void)n;
+    return -1;
+}
+long write(int fd, const void * b, unsigned long n)
+{
+    (void)fd;
+    (void)b;
+    return (long)n;
+}
+long lseek(int fd, long o, int w)
+{
+    (void)fd;
+    (void)o;
+    (void)w;
+    return -1;
+}
+int unlink(const char * p)
+{
+    (void)p;
+    return -1;
+}
+int fstat(int fd, void * st)
+{
+    (void)fd;
+    (void)st;
+    return -1;
+}
+int isatty(int fd)
+{
+    (void)fd;
+    return 1;
+}

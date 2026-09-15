@@ -2,7 +2,7 @@
 #
 # The tree under measurement is passed in as PERF_QEMU_LVGL_DIR rather than being
 # this directory's parent, because the same harness has to build a baseline worktree,
-# which does not contain scripts/perf_qemu at all.
+# which does not contain tests/perf_qemu at all.
 cmake_minimum_required(VERSION 3.16)
 
 if(NOT PERF_QEMU_LVGL_DIR)

@@ -3,30 +3,30 @@
 # numbers match. Everything happens inside the container; nothing has to be installed here
 # but Docker.
 #
-#   scripts/perf_qemu/run.sh                         # everything, on this working tree
-#   scripts/perf_qemu/run.sh -t riscv32 -s render    # one target, one suite
-#   scripts/perf_qemu/run.sh -f rgb888 --opt Os      # another format and -Os
-#   scripts/perf_qemu/run.sh -t cortex-m7 -s render -f rgb565 --gdb
+#   tests/perf_qemu/run.sh                         # everything, on this working tree
+#   tests/perf_qemu/run.sh -t riscv32 -s render    # one target, one suite
+#   tests/perf_qemu/run.sh -f rgb888 --opt Os      # another format and -Os
+#   tests/perf_qemu/run.sh -t cortex-m7 -s render -f rgb565 --gdb
 #
 # -t, -f and -s take comma separated lists, so several of anything is one run:
 #
-#   scripts/perf_qemu/run.sh -f rgb565,rgb888              # two colour formats
-#   scripts/perf_qemu/run.sh -t cortex-m7,riscv32 -f l8    # two targets
+#   tests/perf_qemu/run.sh -f rgb565,rgb888              # two colour formats
+#   tests/perf_qemu/run.sh -t cortex-m7,riscv32 -f l8    # two targets
 #
 # A -s entry can name one scene, which is measured on its own instead of the whole suite.
 # A render scene without an _opa_ suffix covers both opacities:
 #
-#   scripts/perf_qemu/run.sh -s render:fill                # both opacities of one scene
-#   scripts/perf_qemu/run.sh -s render:fill_opa_128        # just that one
-#   scripts/perf_qemu/run.sh -s bench:moving_wallpaper     # one benchmark scene
-#   scripts/perf_qemu/run.sh -s bench:multiple_arcs,render:text
+#   tests/perf_qemu/run.sh -s render:fill                # both opacities of one scene
+#   tests/perf_qemu/run.sh -s render:fill_opa_128        # just that one
+#   tests/perf_qemu/run.sh -s bench:moving_wallpaper     # one benchmark scene
+#   tests/perf_qemu/run.sh -s bench:multiple_arcs,render:text
 #
 # --base takes either a directory of results-*.json from an earlier run, or a git revision
 # to measure. A revision is measured in a worktree of its own, stored under <out>/base and
 # reused on every later run with the same settings, so master is measured once:
 #
-#   scripts/perf_qemu/run.sh --base master           # measure master once, then reuse it
-#   scripts/perf_qemu/run.sh --base ~/master-results # results saved from an earlier run
+#   tests/perf_qemu/run.sh --base master           # measure master once, then reuse it
+#   tests/perf_qemu/run.sh --base ~/master-results # results saved from an earlier run
 #
 # Under --gdb the run stops before its first instruction and waits. Attach with
 #   gdb-multiarch -ex 'target remote :1234' <out>/build/<target>-<opt>/<suite>_<cf>.elf
@@ -203,14 +203,14 @@ elif [ -n "$BASE_REF" ]; then
     fi
     echo "baseline: $BASE_REF ($(git -C "$BASE_TREE" rev-parse --short HEAD))"
     docker run "${DOCKER_ARGS[@]}" -v "$BASE_TREE:/base:ro" "$IMAGE" \
-        python3 /repo/scripts/perf_qemu/perf_qemu.py \
+        python3 /repo/tests/perf_qemu/perf_qemu.py \
         --lvgl /base --out /out/base --reuse \
         --tree-id "$(tree_id "$BASE_TREE")" "${SELECT[@]}"
     BASE_IN_CONTAINER=/out/base
 fi
 
 docker run "${DOCKER_ARGS[@]}" "$IMAGE" \
-    python3 /repo/scripts/perf_qemu/perf_qemu.py --lvgl /lvgl --out /out \
+    python3 /repo/tests/perf_qemu/perf_qemu.py --lvgl /lvgl --out /out \
     --tree-id "$(tree_id "$LVGL")" "${RUN_ARGS[@]}"
 
 [ -n "$GDB_PORT" ] && exit 0
@@ -218,7 +218,7 @@ docker run "${DOCKER_ARGS[@]}" "$IMAGE" \
 REPORT_ARGS=(--new /out --output /out/render_performance.json)
 [ -n "$BASE_IN_CONTAINER" ] && REPORT_ARGS+=(--base "$BASE_IN_CONTAINER")
 docker run "${DOCKER_ARGS[@]}" "${BASE_MOUNT[@]}" "$IMAGE" \
-    python3 /repo/scripts/perf_qemu/report.py "${REPORT_ARGS[@]}"
+    python3 /repo/tests/perf_qemu/report.py "${REPORT_ARGS[@]}"
 docker run "${DOCKER_ARGS[@]}" "$IMAGE" python3 -c "
 import json, pathlib
 r = json.loads(pathlib.Path('/out/render_performance.json').read_text())

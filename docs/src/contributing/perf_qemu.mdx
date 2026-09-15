@@ -5,7 +5,7 @@ description: "Counts the instructions LVGL's software renderer executes, on emul
 
 ## Overview
 
-`scripts/perf_qemu` builds LVGL for a bare metal target, runs the benchmark demo and every
+`tests/perf_qemu` builds LVGL for a bare metal target, runs the benchmark demo and every
 `lv_demo_render` scene inside [QEMU](https://www.qemu.org/), and reports how many
 instructions each one took. It also compares every rendered scene against the reference
 images in `tests/ref_imgs/draw/render`, so a change that makes rendering faster and wrong
@@ -38,7 +38,7 @@ what makes a local count comparable with the one in a pull request.
 ## How to run it
 
 ```bash
-scripts/perf_qemu/run.sh
+tests/perf_qemu/run.sh
 ```
 
 That measures the current working tree with the default settings. The first run pulls the
@@ -52,8 +52,8 @@ run can be narrowed to a target, a colour format, an optimisation level, a suite
 single scene:
 
 ```bash
-scripts/perf_qemu/run.sh -t riscv32 -s render -f rgb565
-scripts/perf_qemu/run.sh -s render:fill              # a single render scene
+tests/perf_qemu/run.sh -t riscv32 -s render -f rgb565
+tests/perf_qemu/run.sh -s render:fill              # a single render scene
 ```
 
 `-t`, `-f` and `-s` take comma separated lists, so several of anything is a single run.
@@ -65,10 +65,10 @@ A number on its own says little. `--base` adds the comparison:
 
 ```bash
 # measure master once, then reuse that measurement on every later run
-scripts/perf_qemu/run.sh --base master
+tests/perf_qemu/run.sh --base master
 
 # or point at result files saved from an earlier run, yours or someone else's
-scripts/perf_qemu/run.sh --base ~/master-results
+tests/perf_qemu/run.sh --base ~/master-results
 ```
 
 Given a revision, `run.sh` measures it in a git worktree of its own and reuses that result
@@ -83,7 +83,7 @@ says whether any scene now renders different bytes than the baseline.
 Any single run can be stopped and handed to [GDB](https://sourceware.org/gdb/):
 
 ```bash
-scripts/perf_qemu/run.sh -t cortex-m7 -s render -f rgb565 --gdb
+tests/perf_qemu/run.sh -t cortex-m7 -s render -f rgb565 --gdb
 ```
 
 QEMU then waits before its first instruction, with the port published from the container, so

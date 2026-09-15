@@ -39,21 +39,63 @@ void Default_Handler(void)
 
 __attribute__((section(".vectors"), used))
 void * const g_vectors[] = {
-    (void *)&_estack, (void *)Reset_Handler,
+    (void *) & _estack, (void *)Reset_Handler,
     Default_Handler, Default_Handler, Default_Handler, Default_Handler, Default_Handler,
     0, 0, 0, 0, Default_Handler, Default_Handler, 0, Default_Handler, Default_Handler
 };
 
 /*newlib is linked with --specs=nosys.specs, which expects these*/
-int _close(int f) { (void)f; return -1; }
-int _fstat(int f, void * st) { (void)f; (void)st; return 0; }
-int _getpid(void) { return 1; }
-int _isatty(int f) { (void)f; return 1; }
-int _kill(int p, int s) { (void)p; (void)s; return -1; }
-int _lseek(int f, int o, int w) { (void)f; (void)o; (void)w; return 0; }
-int _read(int f, char * b, int n) { (void)f; (void)b; (void)n; return 0; }
-int _write(int f, const char * b, int n) { (void)f; (void)b; return n; }
-void _exit(int c) { (void)c; for(;;) ; }
+int _close(int f)
+{
+    (void)f;
+    return -1;
+}
+int _fstat(int f, void * st)
+{
+    (void)f;
+    (void)st;
+    return 0;
+}
+int _getpid(void)
+{
+    return 1;
+}
+int _isatty(int f)
+{
+    (void)f;
+    return 1;
+}
+int _kill(int p, int s)
+{
+    (void)p;
+    (void)s;
+    return -1;
+}
+int _lseek(int f, int o, int w)
+{
+    (void)f;
+    (void)o;
+    (void)w;
+    return 0;
+}
+int _read(int f, char * b, int n)
+{
+    (void)f;
+    (void)b;
+    (void)n;
+    return 0;
+}
+int _write(int f, const char * b, int n)
+{
+    (void)f;
+    (void)b;
+    return n;
+}
+void _exit(int c)
+{
+    (void)c;
+    for(;;) ;
+}
 
 void * _sbrk(int incr)
 {

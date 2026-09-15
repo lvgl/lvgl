@@ -1,20 +1,9 @@
 name: QEMU Emulated Render Performance
 
-# Counts retired instructions for the benchmark demo and every render demo scene on
+# Counts instructions for the benchmark demo and every render demo scene on
 # several bare metal targets, and diffs a pull request against the last results master published.
 #
-# The baseline is downloaded rather than measured, the same way perf_emulation.yml gets
-# its own, so a pull request pays for one measurement instead of two. That is only sound
-# because the counts are reproducible; see below.
-#
-# QEMU runs with -icount shift=0, where one instruction is one nanosecond of virtual time.
-# That makes the counts deterministic and host independent: the same tree gives the same
-# number on any runner, so a difference between the two sides is a real difference and not
-# noise. It counts instructions and not cycles, so it understates a change that removes
-# memory traffic and overstates one that only folds stores together.
-#
-# The same container runs locally through scripts/perf_qemu/run.sh, which also has a --gdb
-# option for stepping through a run.
+# The same container runs locally through tests/perf_qemu/run.sh.
 
 on:
   push:
@@ -29,7 +18,7 @@ concurrency:
 env:
   # Spelled out rather than left to perf_qemu.py's defaults, so that what CI measures is
   # visible here and a local run can be told to match with the same flags:
-  #   scripts/perf_qemu/run.sh -f rgb565,argb8888 --opt O2
+  #   tests/perf_qemu/run.sh -f rgb565,argb8888 --opt O2
   # The script knows six more colour formats and -Os/-O3 for trying things locally.
   PERF_QEMU_FORMATS: rgb565,argb8888
   PERF_QEMU_OPT: O2
@@ -57,7 +46,7 @@ jobs:
 
       - name: Benchmark this revision
         run: |
-          python3 scripts/perf_qemu/perf_qemu.py \
+          python3 tests/perf_qemu/perf_qemu.py \
             --lvgl "$GITHUB_WORKSPACE" \
             --out "$RUNNER_TEMP/out-new" \
             --targets ${{ matrix.target }} \
@@ -121,7 +110,7 @@ jobs:
           else
             echo "no published baseline yet, reporting absolute numbers only"
           fi
-          python3 scripts/perf_qemu/report.py \
+          python3 tests/perf_qemu/report.py \
             --new results/new "${BASE[@]}" \
             --output reports/render_performance.json
           # The report section points at this summary for the full tables

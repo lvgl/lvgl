@@ -2,9 +2,9 @@
 #
 # The point of pinning this by digest in CI is that the numbers only mean
 # something when the compiler and the emulator are identical everywhere. Run the
-# same image locally through scripts/perf_qemu/run.sh and you get the same counts.
+# same image locally through tests/perf_qemu/run.sh and you get the same counts.
 #
-#   docker build -t lv-perf-qemu scripts/perf_qemu
+#   docker build -t lv-perf-qemu tests/perf_qemu
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
