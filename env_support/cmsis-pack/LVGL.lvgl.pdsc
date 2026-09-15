@@ -2697,7 +2697,7 @@
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_skin.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_texture.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_model_node.cpp" />
-                <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_model_loader.c" />
+                <file category="sourceC"              name="src/libs/gltf/gltf_data/lv_gltf_model_loader.c" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_uniform_locations.cpp" />
                 <file category="sourceC"              name="src/libs/gltf/gltf_view/assets/lv_gltf_view_shader.c" />
                 <file category="sourceC"              name="src/libs/gltf/gltf_view/assets/chromatic.c" />
