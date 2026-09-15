@@ -104,7 +104,7 @@ menu "Asserts"
 		  Add a custom handler when assert happens e.g. to restart the MCU
 		  Optional header to override assert-related macros.
 
-	config LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE
+	config LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY
 		bool
 		default y if LV_ASSERT_HANDLER_INCLUDE != ""
 

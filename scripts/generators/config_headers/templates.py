@@ -294,11 +294,12 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
     #endif
 #endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
 
-#if defined(LV_ASSERT_HANDLER_INCLUDE) && !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-#warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
-#include LV_ASSERT_HANDLER_INCLUDE
+#if defined(LV_ASSERT_HANDLER_INCLUDE)
+    #if !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
+        #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
+    #endif
+    #include LV_ASSERT_HANDLER_INCLUDE
 #endif
-
 
 /*----------------------------------
  * End of compatibility block
@@ -463,8 +464,7 @@ KCONFIG_BRIDGE_DEPRECATIONS = """\
  * LV_ASSERT_HANDLER_INCLUDE
  *******************/
 
-#if defined(CONFIG_LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE) && CONFIG_LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE
-#warning LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE instead.
+#if defined(CONFIG_LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY) && CONFIG_LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY
 #define LV_ASSERT_HANDLER_INCLUDE CONFIG_LV_ASSERT_HANDLER_INCLUDE
 #endif
 
