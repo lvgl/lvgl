@@ -18,7 +18,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pr_report"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 from pr_report import write_report  # noqa: E402
 
 SECTION = "Render Performance"
