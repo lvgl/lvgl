@@ -168,7 +168,7 @@ void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_ma
         }
     }
     else {
-        lv_draw_rgb565_swap(px_map, lv_area_get_size(&offset_area));
+        lv_draw_rgb565_swap(px_map, lv_area_get_size(area));
     }
     ...
 }
