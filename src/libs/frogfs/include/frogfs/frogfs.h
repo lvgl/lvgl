@@ -192,7 +192,7 @@ int frogfs_is_raw(frogfs_fh_t *fh);
  * \return              actual number of bytes read, zero if end of file
  *                      reached
  */
-ssize_t frogfs_read(frogfs_fh_t *fh, void *buf, size_t len);
+frogfs_ssize_t frogfs_read(frogfs_fh_t *fh, void *buf, size_t len);
 
 /**
  * \brief       Seek to a position within an open file entry
@@ -201,7 +201,7 @@ ssize_t frogfs_read(frogfs_fh_t *fh, void *buf, size_t len);
  * \param[in]   mode    \a SEEK_SET, \a SEEK_CUR, or \a SEEK_END
  * \return              current position in file or < 0 upon error
  */
-ssize_t frogfs_seek(frogfs_fh_t *fh, long offset, int mode);
+frogfs_ssize_t frogfs_seek(frogfs_fh_t *fh, long offset, int mode);
 
 /**
  * \brief       Get the current position in an open file entry
