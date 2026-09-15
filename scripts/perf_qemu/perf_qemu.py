@@ -96,7 +96,7 @@ def selects(scene: str, other: str) -> bool:
     Empty means the whole suite, and a name without an _opa_ suffix means every opacity of
     that scene. The same rule bench_wanted() applies on the target, see harness/bench.h.
     """
-    return scene == "" or other == scene or other.startswith(scene + "_opa")
+    return scene in ("", ALL_SCENES) or other == scene or other.startswith(scene + "_opa")
 
 
 def run_image(target: str, elf: Path, cwd: Path, timeout: int, gdb_port: int | None,
