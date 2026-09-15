@@ -1011,6 +1011,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_PXP
+    #ifdef CONFIG_LV_USE_PXP
+        #define LV_USE_PXP CONFIG_LV_USE_PXP
+    #else
+        #define LV_USE_PXP 0
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_PXP
     #ifdef CONFIG_LV_USE_DRAW_PXP
         #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
@@ -1144,6 +1152,14 @@
         #define LV_DRAW_EVE_WRITE_BUFFER_SIZE CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
     #else
         #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
+    #endif
+#endif
+
+#ifndef LV_USE_G2D
+    #ifdef CONFIG_LV_USE_G2D
+        #define LV_USE_G2D CONFIG_LV_USE_G2D
+    #else
+        #define LV_USE_G2D 0
     #endif
 #endif
 
@@ -4623,6 +4639,14 @@
     #endif
 #endif
 
+#ifndef LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+    #ifdef CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+        #define LV_ATTRIBUTE_FAST_MEM_USE_IRAM CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+    #else
+        #define LV_ATTRIBUTE_FAST_MEM_USE_IRAM 0
+    #endif
+#endif
+
 
 
 /*============================================================================
@@ -4947,11 +4971,12 @@
     #endif
 #endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
 
-#if defined(LV_ASSERT_HANDLER_INCLUDE) && !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-#warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
-#include LV_ASSERT_HANDLER_INCLUDE
+#if defined(LV_ASSERT_HANDLER_INCLUDE)
+    #if !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
+        #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
+    #endif
+    #include LV_ASSERT_HANDLER_INCLUDE
 #endif
-
 
 /*----------------------------------
  * End of compatibility block
@@ -5331,6 +5356,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_NEMA_VG requires LV_USE_NEMA_GFX (Kconfig depends on)"
 #endif
 
+#if (LV_USE_PXP) && !LV_USE_DRAW_PXP
+    #error "LV_USE_DRAW_PXP must be enabled: Kconfig selects it from LV_USE_PXP"
+#endif
+
 #if LV_USE_ROTATE_PXP && !(LV_USE_DRAW_PXP)
     #error "LV_USE_ROTATE_PXP requires LV_USE_DRAW_PXP (Kconfig depends on)"
 #endif
@@ -5351,8 +5380,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_SIFLI_EPIC_ASSERT requires LV_USE_SIFLI_EPIC (Kconfig depends on)"
 #endif
 
-#if (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) && !LV_USE_DRAW_G2D
-    #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND"
+#if (LV_USE_G2D || (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)) && !LV_USE_DRAW_G2D
+    #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_USE_G2D || (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)"
 #endif
 
 #if LV_USE_G2D_ASSERT && !(LV_USE_DRAW_G2D && LV_USE_DRAW_G2D)

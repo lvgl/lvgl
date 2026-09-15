@@ -895,10 +895,11 @@ endmenu
 
 menu "PXP"
 config LV_USE_PXP
-	bool "PXP (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_PXP]"
+	bool "PXP (legacy)"
 	default n
+	select LV_USE_DRAW_PXP
 	help
-	  Deprecated and non-functional. Use LV_USE_DRAW_PXP instead.
+	  Use LV_USE_DRAW_PXP instead.
 
 config LV_USE_DRAW_PXP
 	bool "PXP renderer"
@@ -1061,10 +1062,11 @@ endmenu
 
 menu "G2D"
 config LV_USE_G2D
-	bool "G2D (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_G2D]"
+	bool "G2D (legacy)"
 	default n
+	select LV_USE_DRAW_G2D
 	help
-	  Deprecated and non-functional. Use LV_USE_DRAW_G2D instead.
+	  Use LV_USE_DRAW_G2D instead.
 
 config LV_USE_DRAW_G2D
 	bool "G2D renderer"
@@ -3606,7 +3608,7 @@ menu "Asserts"
 		  Add a custom handler when assert happens e.g. to restart the MCU
 		  Optional header to override assert-related macros.
 
-	config LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE
+	config LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY
 		bool
 		default y if LV_ASSERT_HANDLER_INCLUDE != ""
 
@@ -3793,6 +3795,12 @@ config LV_ATTRIBUTE_CUSTOM_INCLUDE
 	    MicroPython. Called for all constants in the form LV_<CONST>.
 	    Leave undefined if not using a binding.
 	    e.g. mp_rom_map_elem_t entry = {MP_ROM_QSTR(MP_QSTR_##int_value), MP_ROM_INT(int_value)}
+
+config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+	bool "Place LV_ATTRIBUTE_FAST_MEM functions in IRAM (ESP32 only)"
+	help
+	  Configure LV_ATTRIBUTE_FAST_MEM to use IRAM.
+	  This option is only applicable to ESP32 targets.
 
 endmenu #"Compiler Settings"
 menu "Examples"
