@@ -1,6 +1,3 @@
 {
-  "pages": [
-    "CHANGELOG",
-    "migration-v10"
-  ]
+  "pages": ["CHANGELOG", "migration-v9-6", "migration-v10"]
 }
