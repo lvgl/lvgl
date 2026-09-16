@@ -167,7 +167,7 @@ lv_result_t lv_rgb565_blend_normal_to_rgb565_mix_mask_opa_arm2d(lv_draw_sw_blend
 }
 
 lv_result_t lv_rgb888_blend_normal_to_rgb565_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                 uint32_t src_px_size)
+                                                   uint32_t src_px_size)
 {
     if(src_px_size == 3) {
         return LV_RESULT_INVALID;
@@ -187,7 +187,7 @@ lv_result_t lv_rgb888_blend_normal_to_rgb565_arm2d(lv_draw_sw_blend_image_dsc_t 
 }
 
 lv_result_t lv_rgb888_blend_normal_to_rgb565_with_opa_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                          uint32_t src_px_size)
+                                                            uint32_t src_px_size)
 {
     if(src_px_size == 3) {
         return LV_RESULT_INVALID;
@@ -228,7 +228,7 @@ lv_result_t lv_rgb888_blend_normal_to_rgb565_with_opa_arm2d(lv_draw_sw_blend_ima
 }
 
 lv_result_t lv_rgb888_blend_normal_to_rgb565_with_mask_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                           uint32_t src_px_size)
+                                                             uint32_t src_px_size)
 {
     if(src_px_size == 3) {
         return LV_RESULT_INVALID;
@@ -274,7 +274,7 @@ lv_result_t lv_rgb888_blend_normal_to_rgb565_with_mask_arm2d(lv_draw_sw_blend_im
 }
 
 lv_result_t lv_rgb888_blend_normal_to_rgb565_mix_mask_opa_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                              uint32_t src_px_size)
+                                                                uint32_t src_px_size)
 {
     if(src_px_size == 3) {
         return LV_RESULT_INVALID;
@@ -405,7 +405,7 @@ lv_result_t lv_color_blend_to_rgb888_arm2d(lv_draw_sw_blend_fill_dsc_t * dsc, ui
 }
 
 lv_result_t lv_color_blend_to_rgb888_with_opa_arm2d(lv_draw_sw_blend_fill_dsc_t * dsc,
-                                                                  uint32_t dst_px_size)
+                                                    uint32_t dst_px_size)
 {
     if(dst_px_size == 3) {
         return LV_RESULT_INVALID;
@@ -422,7 +422,7 @@ lv_result_t lv_color_blend_to_rgb888_with_opa_arm2d(lv_draw_sw_blend_fill_dsc_t 
 }
 
 lv_result_t lv_color_blend_to_rgb888_with_mask_arm2d(lv_draw_sw_blend_fill_dsc_t * dsc,
-                                                                   uint32_t dst_px_size)
+                                                     uint32_t dst_px_size)
 {
 
     if(dst_px_size == 3) {
@@ -441,7 +441,7 @@ lv_result_t lv_color_blend_to_rgb888_with_mask_arm2d(lv_draw_sw_blend_fill_dsc_t
 }
 
 lv_result_t lv_color_blend_to_rgb888_mix_mask_opa_arm2d(lv_draw_sw_blend_fill_dsc_t * dsc,
-                                                                      uint32_t dst_px_size)
+                                                        uint32_t dst_px_size)
 {
 
     if(dst_px_size == 3) {
@@ -461,7 +461,7 @@ lv_result_t lv_color_blend_to_rgb888_mix_mask_opa_arm2d(lv_draw_sw_blend_fill_ds
 }
 
 lv_result_t lv_rgb565_blend_normal_to_rgb888_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                 uint32_t dst_px_size)
+                                                   uint32_t dst_px_size)
 {
 
     if(dst_px_size == 3) {
@@ -483,7 +483,7 @@ lv_result_t lv_rgb565_blend_normal_to_rgb888_arm2d(lv_draw_sw_blend_image_dsc_t 
 }
 
 lv_result_t lv_rgb565_blend_normal_to_rgb888_with_opa_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                          uint32_t dst_px_size)
+                                                            uint32_t dst_px_size)
 {
 
     if(dst_px_size == 3) {
@@ -518,7 +518,7 @@ lv_result_t lv_rgb565_blend_normal_to_rgb888_with_opa_arm2d(lv_draw_sw_blend_ima
 }
 
 lv_result_t lv_rgb565_blend_normal_to_rgb888_with_mask_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                           uint32_t dst_px_size)
+                                                             uint32_t dst_px_size)
 {
 
     if(dst_px_size == 3) {
@@ -554,7 +554,7 @@ lv_result_t lv_rgb565_blend_normal_to_rgb888_with_mask_arm2d(lv_draw_sw_blend_im
 }
 
 lv_result_t lv_rgb565_blend_normal_to_rgb888_mix_mask_opa_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                              uint32_t dst_px_size)
+                                                                uint32_t dst_px_size)
 {
 
     if(dst_px_size == 3) {
@@ -591,8 +591,8 @@ lv_result_t lv_rgb565_blend_normal_to_rgb888_mix_mask_opa_arm2d(lv_draw_sw_blend
 }
 
 lv_result_t lv_rgb888_blend_normal_to_rgb888_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                 uint32_t dst_px_size,
-                                                                 uint32_t src_px_size)
+                                                   uint32_t dst_px_size,
+                                                   uint32_t src_px_size)
 {
     if((dst_px_size == 3) || (src_px_size == 3)) {
         return LV_RESULT_INVALID;
@@ -612,7 +612,7 @@ lv_result_t lv_rgb888_blend_normal_to_rgb888_arm2d(lv_draw_sw_blend_image_dsc_t 
 }
 
 lv_result_t lv_rgb888_blend_normal_to_rgb888_with_opa_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                          uint32_t dst_px_size, uint32_t src_px_size)
+                                                            uint32_t dst_px_size, uint32_t src_px_size)
 {
     if((dst_px_size == 3) || (src_px_size == 3)) {
         return LV_RESULT_INVALID;
@@ -633,7 +633,7 @@ lv_result_t lv_rgb888_blend_normal_to_rgb888_with_opa_arm2d(lv_draw_sw_blend_ima
 }
 
 lv_result_t lv_rgb888_blend_normal_to_rgb888_with_mask_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                           uint32_t dst_px_size, uint32_t src_px_size)
+                                                             uint32_t dst_px_size, uint32_t src_px_size)
 {
     if((dst_px_size == 3) || (src_px_size == 3)) {
         return LV_RESULT_INVALID;
@@ -655,7 +655,7 @@ lv_result_t lv_rgb888_blend_normal_to_rgb888_with_mask_arm2d(lv_draw_sw_blend_im
 }
 
 lv_result_t lv_rgb888_blend_normal_to_rgb888_mix_mask_opa_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                              uint32_t dst_px_size, uint32_t src_px_size)
+                                                                uint32_t dst_px_size, uint32_t src_px_size)
 {
     if((dst_px_size == 3) || (src_px_size == 3)) {
         return LV_RESULT_INVALID;
@@ -678,7 +678,7 @@ lv_result_t lv_rgb888_blend_normal_to_rgb888_mix_mask_opa_arm2d(lv_draw_sw_blend
 }
 
 lv_result_t lv_argb8888_blend_normal_to_rgb888_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                   uint32_t dst_px_size)
+                                                     uint32_t dst_px_size)
 {
 
     if(dst_px_size == 3) {
@@ -699,7 +699,7 @@ lv_result_t lv_argb8888_blend_normal_to_rgb888_arm2d(lv_draw_sw_blend_image_dsc_
 }
 
 lv_result_t lv_argb8888_blend_normal_to_rgb888_with_opa_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                            uint32_t dst_px_size)
+                                                              uint32_t dst_px_size)
 {
     if(dst_px_size == 3) {
         return LV_RESULT_INVALID;
@@ -720,7 +720,7 @@ lv_result_t lv_argb8888_blend_normal_to_rgb888_with_opa_arm2d(lv_draw_sw_blend_i
 }
 
 lv_result_t lv_argb8888_blend_normal_to_rgb888_with_mask_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                             uint32_t dst_px_size)
+                                                               uint32_t dst_px_size)
 {
 
     if(dst_px_size == 3) {
@@ -744,7 +744,7 @@ lv_result_t lv_argb8888_blend_normal_to_rgb888_with_mask_arm2d(lv_draw_sw_blend_
 }
 
 lv_result_t lv_argb8888_blend_normal_to_rgb888_mix_mask_opa_arm2d(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                                uint32_t dst_px_size)
+                                                                  uint32_t dst_px_size)
 {
     if(dst_px_size == 3) {
         return LV_RESULT_INVALID;
