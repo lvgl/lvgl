@@ -1,14 +1,7 @@
 /**
- * @file lv_blend_arm2d.h
+ * @file lv_blend_arm2d.c
  *
  */
-
-#ifndef LV_BLEND_ARM2D_H
-#define LV_BLEND_ARM2D_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*********************
  *      INCLUDES
@@ -772,9 +765,3 @@ lv_result_t lv_argb8888_blend_normal_to_rgb888_mix_mask_opa_arm2d(lv_draw_sw_ble
  **********************/
 
 #endif /* LV_USE_DRAW_ARM2D_SYNC */
-
-#ifdef __cplusplus
-} /*extern "C"*/
-#endif
-
-#endif /*LV_BLEND_ARM2D_H*/
