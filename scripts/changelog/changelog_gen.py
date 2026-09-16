@@ -153,7 +153,7 @@ def render(version, when, sections, repo_url, previous_tag):
         f"description: Summary of the changes of LVGL {version}",
         "---",
         "",
-        f"## {version} {when}",
+        f"## {version} ({when})",
         "",
     ]
 
