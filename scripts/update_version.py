@@ -206,9 +206,11 @@ def verify_generated(version: Version):
     expected = {
         'lv_conf_template.h': f"Configuration file for v{version.without_info}",
         os.path.join('sbom', 'lvgl.spdx.json'): f'"software_packageVersion": "{version}"',
-        'Kconfig': f"config LVGL_VERSION_MAJOR\n\tint\n\tdefault {version.major}",
-        'Kconfig': f"config LVGL_VERSION_MINOR\n\tint\n\tdefault {version.minor}",
-        'Kconfig': f"config LVGL_VERSION_PATCH\n\tint\n\tdefault {version.patch}",
+        'Kconfig': (
+            f"config LVGL_VERSION_MAJOR\n\tint\n\tdefault {version.major}\n"
+            f"config LVGL_VERSION_MINOR\n\tint\n\tdefault {version.minor}\n"
+            f"config LVGL_VERSION_PATCH\n\tint\n\tdefault {version.patch}",
+        ),
     }
 
     for path_relative, needle in expected.items():
