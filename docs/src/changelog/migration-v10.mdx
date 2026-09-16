@@ -144,6 +144,36 @@ its flush callback has to handle the pixel layout it is handed, and the draw
 buffer(s) must be large enough for the new format.
 </Callout>
 
+#### LV_COLOR_16_SWAP
+
+`LV_COLOR_16_SWAP` was kept for compatibility with LVGL v8, with the addition of <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> which you can use to make LVGL
+render natively in big-endian RGB565 format, this config now produces a warning and will be completely removed in v10.
+
+If you're still using this configuration, simply define <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> as <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED"/> 
+or set the display's color format at runtime with <ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565_SWAPPED)"/>.
+
+As a last resort option, if none of the above options work for you, the following snippet of code can be used in your flush callback.
+
+```c
+void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
+{
+    if(lv_display_get_render_mode(display) == LV_DISPLAY_RENDER_MODE_DIRECT) {
+        lv_draw_buf_t * draw_buf = lv_display_get_buf_active(display);
+        uint16_t * fb = (uint16_t *)px_map;
+        uint32_t stride_px = draw_buf->header.stride / 2; /* RGB565: 2 bytes/px */
+        int32_t w = lv_area_get_width(area);
+        int32_t h = lv_area_get_height(area);
+        for(int32_t y = 0; y < h; y++) {
+            lv_draw_rgb565_swap(fb + (uint32_t)(area->y1 + y) * stride_px + area->x1, w);
+        }
+    }
+    else {
+        lv_draw_rgb565_swap(px_map, lv_area_get_size(area));
+    }
+    ...
+}
+```
+
 #### Memory
 
 | Removed | Replacement |
