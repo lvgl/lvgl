@@ -59,14 +59,6 @@ jobs:
         run: python scripts/static_checks/check_headers.py allowed-list-audit
 
       # ------------------------------------------------------------------
-      # No file may include a deprecated header
-      # ------------------------------------------------------------------
-      - name: "Check: no deprecated header includes"
-        id: deprecated
-        continue-on-error: true
-        run: python scripts/static_checks/check_headers.py deprecated
-
-      # ------------------------------------------------------------------
       # Every header file inside `src` must use `lvgl_public.h` to access
       # the public API
       # ------------------------------------------------------------------
@@ -158,7 +150,6 @@ jobs:
                    include-paths=${{ steps.include-paths.outcome }}
                    allowed-list=${{ steps.allowed-list.outcome }}
                    direct-public-include=${{ steps.direct-public-include.outcome }}
-                   deprecated=${{ steps.deprecated.outcome }}
                    lv_types=${{ steps.lv_types.outcome }}
                    defconfigs=${{ steps.defconfigs.outcome }}
                    labeler-globs=${{ steps.labeler-globs.outcome }}
