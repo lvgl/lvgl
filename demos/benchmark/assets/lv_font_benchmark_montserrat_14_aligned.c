@@ -18,10 +18,6 @@
     #include "lvgl/lvgl.h"
 #endif
 
-#if !LV_VERSION_CHECK(9, 3, 0)
-    #error "At least LVGL v9.3 is required to use the stride attribute of the fonts"
-#endif
-
 #ifndef LV_FONT_BENCHMARK_MONTSERRAT_14_ALIGNED
     #define LV_FONT_BENCHMARK_MONTSERRAT_14_ALIGNED 1
 #endif
