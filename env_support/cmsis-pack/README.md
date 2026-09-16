@@ -58,13 +58,11 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_SMARTWATCH
    - LV_USE_DEMO_GLTF
    - LV_USE_DRAW_VG_LITE
-   - LV_USE_PXP
    - LV_USE_FS_FROGFS
    - LV_USE_GLTF
    - LV_USE_GSTREAMER
    - LV_USE_VG_LITE_DRIVER
    - LV_USE_LOVYAN_GFX
-   - LV_USE_G2D
    - LV_USE_DRAW_SDL
    - LV_USE_DRAW_ARM2D_SYNC
    - LV_USE_DRAW_ARM2D_ASYNC
@@ -72,6 +70,7 @@ remove the misleading guide above this code segment.
    - LV_USE_DRAW_DMA2D
    - LV_USE_DRAW_EVE
    - LV_USE_DRAW_NANOVG
+   - LV_USE_SIFLI_EPIC
    - LV_USE_NANOVG
    - LV_USE_PPA
    - LV_USE_NV3007
@@ -103,7 +102,6 @@ remove the misleading guide above this code segment.
 
 7. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
-#define LV_ATTRIBUTE_MEM_ALIGN_SIZE     1
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
@@ -111,7 +109,6 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
 
 8. Remove following macro definitions in the `3rd party libraries` section:
 
-    - \#define LV_USE_FS_STDIO 0
     - \#define LV_USE_FS_POSIX 0
     - \#define LV_USE_FS_WIN32 0
     - \#define LV_USE_FS_FATFS 0
@@ -144,12 +141,9 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     
     /* Enable ThorVG (vector graphics library) from the src/libs folder */
     #   define LV_USE_THORVG_INTERNAL 0
-    
-    /* Enable ThorVG by assuming that its installed and linked to the project */
-    #   define LV_USE_THORVG_EXTERNAL 0
     #endif
     ```
-
+    
 10. update the definition of following macros: `LV_USE_LZ4`, `LV_USE_LZ4_INTERNAL` and `LV_USE_LZ4_EXTERNAL` as 
 
     ```c
@@ -160,13 +154,11 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     /*Use lvgl built-in LZ4 lib*/
     #   define LV_USE_LZ4_INTERNAL  0
     
-    /*Use external LZ4 library*/
-    #   define LV_USE_LZ4_EXTERNAL  0
     #endif
     ```
 
 
-11. Add the following code to `HAL SETTINGS`:
+11. Add the following code to `OTHERS`:
 
 ```c
 /*customize tick-get */
@@ -203,23 +195,6 @@ with:
         #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
     #endif
 ```
-
-13. Update macro `LV_PROFILER_INCLUDE`:
-
-```c
-#define LV_PROFILER_INCLUDE "src/misc/lv_profiler_builtin.h"
-```
-
-
-
-14. Add the following macro definition to **COLOR SETTINGS** section:
-
-```c
-/** Swap the high and low bytes for RGB565 */
-#define LV_COLOR_16_SWAP 0
-```
-
-
 
 14. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
