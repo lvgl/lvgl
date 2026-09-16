@@ -9,14 +9,16 @@
 #define __ASSEMBLY__
 #endif
 
-#include "../../../../lvgl_public.h"
-
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && LV_USE_NATIVE_HELIUM_ASM
-
+/* _RTE_ is not defined by lv_conf, it is defined by MDK RTE system */
 #if defined(_RTE_)
 #include "Pre_Include_Global.h"
 #include "RTE_Components.h"
 #endif
+
+
+#include "../../../../lvgl_public.h"
+
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && LV_USE_NATIVE_HELIUM_ASM
 
 /*GCC Workaround: missing .note.GNU-stack section implies executable stack*/
 #ifdef __ELF__

@@ -651,7 +651,11 @@
                 <file category="sourceC"            name="src/draw/sw/blend/neon/lv_draw_sw_blend_neon_to_rgb565.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/neon/lv_draw_sw_blend_neon_to_rgb888.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/sve2/lv_draw_sw_blend_sve2_to_rgb888.c" />
+                
+                
                 <file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.S"  condition="Helium GNU Assembler"/>
+                <file category="sourceC"            name="src/draw/sw/blend/arm2d/lv_blend_arm2d.c" condition="Helium" />
+                
                 <file category="sourceC"            name="src/draw/sw/blend/riscv_v/lv_draw_sw_blend_riscv_v_to_rgb888.c" />
                 
                 
