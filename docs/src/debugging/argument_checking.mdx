@@ -1,0 +1,133 @@
+---
+title: Argument Checking
+description: "LVGL validates the arguments of its public API functions at runtime, so an invalid call is reported and rejected instead of corrupting memory or crashing."
+---
+
+Every public LVGL function validates its arguments before doing any work. If a
+check fails, LVGL logs a warning and the function returns early instead of
+running with an invalid pointer or an out-of-range value. This turns a whole
+class of hard-to-debug crashes into a single log line that names the function
+and the condition that failed.
+
+This is controlled by <ApiLink name="LV_USE_CHECK_ARG" />, which is **enabled by
+default**.
+
+## What it does
+
+The checks are implemented with the <ApiLink name="LV_CHECK_ARG" /> and
+<ApiLink name="LV_CHECK_OBJ" /> macros. For example,
+<ApiLink name="lv_label_set_text" /> starts with:
+
+```c
+void lv_label_set_text(lv_obj_t * obj, const char * text)
+{
+    LV_CHECK_OBJ(obj, &lv_label_class, return);
+    ...
+}
+```
+
+So calling it with a `NULL` object does nothing and produces:
+
+```
+[Warn]	(5.123, +12)	lv_label_set_text: Check failed: obj != NULL lv_label.c:134
+```
+
+The condition that failed is part of the message, so you can see exactly which
+argument was wrong. Log output requires <ApiLink name="LV_USE_LOG" /> and a
+log mode other than `NONE` (see below); the early return happens either way.
+
+<Callout type="warning" title="Checks reject the call, they don't fix it">
+  A failed check means the call had no effect. Getters return a default value
+  (`NULL`, `0`, etc.) and setters do nothing. It protects your application from
+  undefined behavior, it does not make an invalid call succeed.
+</Callout>
+
+## Configuration
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| <ApiLink name="LV_USE_CHECK_ARG" /> | `1` | Master switch. When `0`, every check below compiles to nothing. |
+| `LV_CHECK_ARG_LOG_MODE` | `NONE` in `lv_conf.h`, `VERBOSE` in Kconfig when logging is on | How much is logged on a failed check. |
+| `LV_CHECK_ARG_ASSERT_ON_FAIL` | `0` | Also run `LV_ASSERT_HANDLER` (halt or breakpoint) before returning. |
+| `LV_USE_CHECK_OBJ_CLASSTYPE` | `0` | Also verify that a widget argument has the expected class. |
+| `LV_USE_CHECK_OBJ_VALIDITY` | `0` | Also verify that a widget argument is still part of the widget tree. |
+| `LV_USE_CHECK_OBJ_PARENT_LINK` | `0` | While checking validity, also verify that parent and child point at each other. |
+
+### Log mode
+
+`LV_CHECK_ARG_LOG_MODE` selects how much detail a failed check produces. It
+requires <ApiLink name="LV_USE_LOG" />; with logging disabled, no output is
+produced regardless of the setting.
+
+- `LV_CHECK_ARG_LOG_MODE_NONE` means no output. The check still returns early.
+- `LV_CHECK_ARG_LOG_MODE_MINIMAL` logs `"Check failed"` plus file and line.
+  Keeps the condition strings out of the binary, which saves flash.
+- `LV_CHECK_ARG_LOG_MODE_VERBOSE` logs `"Check failed: <cond>"` plus any
+  message LVGL supplied for that check.
+
+### Widget checks
+
+By default a widget argument is only checked for `NULL`. Two extra layers can be
+enabled while developing:
+
+```c
+/* lv_conf.h */
+#define LV_USE_CHECK_OBJ_CLASSTYPE  1   /* is it really a label? */
+#define LV_USE_CHECK_OBJ_VALIDITY   1   /* is it still alive in the widget tree? */
+```
+
+`LV_USE_CHECK_OBJ_CLASSTYPE` catches passing a widget of the wrong type (a
+button to <ApiLink name="lv_label_set_text" />, for example).
+`LV_USE_CHECK_OBJ_VALIDITY` catches use-after-delete: a pointer to a widget that
+was already deleted is no longer in the widget tree, so the call is rejected
+instead of dereferencing freed memory.
+
+`LV_USE_CHECK_OBJ_PARENT_LINK` extends the validity check to also verify that
+each parent's children list contains the child it is walking up from. It finds
+widget-tree corruption and requires `LV_USE_CHECK_OBJ_VALIDITY` and
+<ApiLink name="LV_USE_ASSERT" />.
+
+<Callout type="warning" title="Enable the widget checks only during development">
+  `lv_obj_has_class()` walks the class hierarchy and `lv_obj_is_in_widget_tree()`
+  walks the widget tree on *every* call. That is significant overhead in
+  rendering-heavy code. Keep `LV_USE_CHECK_OBJ_CLASSTYPE`,
+  `LV_USE_CHECK_OBJ_VALIDITY` and `LV_USE_CHECK_OBJ_PARENT_LINK` at `0` in
+  production builds.
+</Callout>
+
+### Asserting on failure
+
+During a debugging session it is often easier to stop at the offending call than
+to read a log afterwards. Setting `LV_CHECK_ARG_ASSERT_ON_FAIL` to `1` runs
+<ApiLink name="LV_ASSERT_HANDLER" /> before the early return, so you can use pair it with
+a debugger to check what the call stack looks like.
+
+## Suggested settings
+
+**Development:** catch as much as possible.
+
+```c
+#define LV_USE_CHECK_ARG            1
+#define LV_CHECK_ARG_LOG_MODE       LV_CHECK_ARG_LOG_MODE_VERBOSE
+#define LV_USE_CHECK_OBJ_CLASSTYPE  1
+#define LV_USE_CHECK_OBJ_VALIDITY   1
+```
+
+**Production:** keep the guards, drop the expensive parts.
+
+```c
+#define LV_USE_CHECK_ARG            1
+#define LV_CHECK_ARG_LOG_MODE       LV_CHECK_ARG_LOG_MODE_MINIMAL
+#define LV_USE_CHECK_OBJ_CLASSTYPE  0
+#define LV_USE_CHECK_OBJ_VALIDITY   0
+```
+
+Only turn <ApiLink name="LV_USE_CHECK_ARG" /> off if flash size or the last few percent of
+performance genuinely require it.
+
+<Callout type="warning" title="Disabling argument checks is dangerous">
+  With `LV_USE_CHECK_ARG = 0` there is no `NULL` guard and no early return
+  anywhere in the public API. Passing an invalid argument to any LVGL function
+  becomes undefined behavior. Only disable it if you can guarantee that every
+  call site in your application passes valid arguments.
+</Callout>
