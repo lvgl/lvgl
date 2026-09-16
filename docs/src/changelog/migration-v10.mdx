@@ -367,6 +367,30 @@ configuration works now.
 
 ---
 
+## Integration
+
+Starting in v9.6, LVGL's public API headers were moved into `include/lvgl`.
+The canonical way to bring in LVGL is to add `lvgl/include` to your
+include paths and use:
+
+```c
+#include <lvgl/lvgl.h>
+```
+
+Including the top-level `lvgl/lvgl.h` file is also fully supported if adding a new include path
+isn't an option for your project.
+
+The header files remaining under `src` are now LVGL's **private API**
+and are not meant to be included directly.
+
+**If your project includes headers that were moved out of `src` directly:**
+Those headers still exist and still work in v9.6, but including any of
+them now triggers a deprecation warning. Direct access to headers under
+`src` will be removed entirely in v10, so switch to including via
+`lvgl/include/lvgl/` or `lvgl/lvgl.h` before upgrading.
+
+---
+
 ## Core
 
 ### Argument checking
