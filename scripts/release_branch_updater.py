@@ -145,15 +145,17 @@ def main():
             # update the submodule in the port if it exists
             port_lvgl_submodule_path = None
             if os.path.exists(os.path.join(port_clone_tmpdir, ".gitmodules")): 
-                out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "config", "--file",
-                                               ".gitmodules", "--get-regexp", "path"))
+                res = subprocess.run(("git", "-C", port_clone_tmpdir, "config", "--file",
+                                      ".gitmodules", "--get-regexp", "path"),
+                                     stdout=subprocess.PIPE)
                 port_lvgl_submodule_path = next((
                     line.partition("lvgl.path ")[2]
                     for line
-                    in out.decode().strip().splitlines()
+                    in res.stdout.decode().strip().splitlines()
                     if "lvgl.path " in line
                 ), None)
 
+            if port_lvgl_submodule_path is not None:
                 # check if the submodule is really in the index and not just a leftover in .gitmodules
                 out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "submodule", "status"))
                 if not any(
