@@ -5,7 +5,9 @@ description: "LVGL provides two sets of macros for validating conditions at runt
 
 LVGL provides two sets of macros for validating conditions at runtime:
 **assertions** and **argument checking**. This page explains when and how to use
-each within LVGL's codebase.
+each within LVGL's codebase. If you are using LVGL rather than contributing to
+it, see [Argument Checking](/debugging/argument_checking) for what these checks
+mean for your application and how to configure them.
 
 ## Overview
 
@@ -110,6 +112,7 @@ This macro is useful for:
 ### Configuration
 
 - <ApiLink name="LV_USE_CHECK_ARG" /> — Set to `1` to enable, `0` to disable.
+  Enabled by default.
   When disabled, all `LV_CHECK_ARG` and `LV_CHECK_OBJ` calls compile to nothing.
 
   <Callout type="warning" title="Disabling argument checks is dangerous">
@@ -186,7 +189,8 @@ The checks performed by <ApiLink name="LV_CHECK_OBJ" /> macros are layered and i
 | Class type | `LV_USE_CHECK_OBJ_CLASSTYPE = 1` | `lv_obj_has_class(obj, cls)` — verifies the object is the expected widget type. |
 | Validity | `LV_USE_CHECK_OBJ_VALIDITY = 1` | `lv_obj_is_in_widget_tree(obj)` — verifies the object is still part of the live widget tree. |
 
-All options default to `0`. Enable them selectively:
+`LV_USE_CHECK_ARG` defaults to `1`; both `LV_USE_CHECK_OBJ_*` options default
+to `0`. Enable them selectively:
 
 ```c
 /* lv_conf.h */

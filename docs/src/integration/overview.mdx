@@ -56,6 +56,12 @@ project, LVGL's root directory also contains a header file that
 includes the full public API, so `#include <lvgl/lvgl.h>` works there
 too. Both paths are fully supported.
 
+Every function of the public API validates its arguments at runtime. If a call
+passes an invalid argument, LVGL logs a warning and the function returns without
+doing anything instead of running into undefined behavior. This is enabled by
+default (<ApiLink name="LV_USE_CHECK_ARG" />) and its behaviour can be configured.
+See [Argument Checking](/debugging/argument_checking).
+
 ## Configuration
 
 LVGL has many compile-time settings: color depth, which Widgets are built, GPU
