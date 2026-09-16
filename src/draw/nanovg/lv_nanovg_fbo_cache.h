@@ -27,8 +27,10 @@ extern "C" {
  **********************/
 
 struct _lv_draw_nanovg_unit_t;
-struct _lv_cache_entry_t;
 struct NVGLUframebuffer;
+
+/** A framebuffer checked out of the pool. Owned by the pool, not the caller. */
+typedef struct _lv_nanovg_fbo_t lv_nanovg_fbo_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -47,30 +49,29 @@ void lv_nanovg_fbo_cache_init(struct _lv_draw_nanovg_unit_t * u);
 void lv_nanovg_fbo_cache_deinit(struct _lv_draw_nanovg_unit_t * u);
 
 /**
- * @brief Get the FBO from the cache, create a new one if not found
+ * @brief Check a framebuffer out of the pool, creating one if none is free
  * @param u pointer to the nanovg unit
  * @param width the width of the FBO
  * @param height the height of the FBO
  * @param flags the FBO flags
  * @param format the texture format
- * @return the FBO cache entry, or NULL if not found
+ * @return the framebuffer, or NULL on failure
  */
-struct _lv_cache_entry_t * lv_nanovg_fbo_cache_get(struct _lv_draw_nanovg_unit_t * u, int width, int height, int flags,
-                                                   int format);
+lv_nanovg_fbo_t * lv_nanovg_fbo_cache_get(struct _lv_draw_nanovg_unit_t * u, int width, int height, int flags,
+                                          int format);
 
 /**
- * @brief Release the FBO from the cache
+ * @brief Return a framebuffer to the pool
  * @param u pointer to the nanovg unit
- * @param entry the FBO cache entry to release
+ * @param fbo the framebuffer to return
  */
-void lv_nanovg_fbo_cache_release(struct _lv_draw_nanovg_unit_t * u, struct _lv_cache_entry_t * entry);
+void lv_nanovg_fbo_cache_release(struct _lv_draw_nanovg_unit_t * u, lv_nanovg_fbo_t * fbo);
 
 /**
  * @brief Convert a cache entry to a framebuffer
- * @param entry the FBO cache entry
  * @return the framebuffer pointer
  */
-struct NVGLUframebuffer * lv_nanovg_fbo_cache_entry_to_fb(struct _lv_cache_entry_t * entry);
+struct NVGLUframebuffer * lv_nanovg_fbo_cache_entry_to_fb(lv_nanovg_fbo_t * fbo);
 
 /**********************
  *      MACROS
