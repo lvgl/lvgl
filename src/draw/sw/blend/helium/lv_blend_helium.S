@@ -15,9 +15,10 @@
 #include "RTE_Components.h"
 #endif
 
-#include "lvgl/config/lv_conf_internal.h"
+
+#include "../../../../../include/lvgl/config/lv_conf_internal.h"
 #if !defined(LV_KCONFIG_IGNORE)
-#include "lvgl/config/lv_conf_kconfig.h"
+#include "../../../../../include/lvgl/config/lv_conf_kconfig.h"
 #endif
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && LV_USE_NATIVE_HELIUM_ASM
