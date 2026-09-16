@@ -18,20 +18,20 @@
 #include <__arm_2d_impl.h>
 
 #if defined(__IS_COMPILER_ARM_COMPILER_5__)
-#pragma diag_suppress 174,177,188,68,513,144,1296
+    #pragma diag_suppress 174,177,188,68,513,144,1296
 #elif defined(__IS_COMPILER_IAR__)
-#pragma diag_suppress=Pa093
+    #pragma diag_suppress=Pa093
 #elif defined(__IS_COMPILER_GCC__)
-#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+    #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 #endif
 
 
 #if ARM_2D_VERSION < 10106ul
-#error Please upgrade to Arm-2D v1.1.6 or above
+    #error Please upgrade to Arm-2D v1.1.6 or above
 #endif
 
 #ifndef LV_ARM2D_XRGB888_ALPHA_ALWAYS_FF
-#define LV_ARM2D_XRGB888_ALPHA_ALWAYS_FF 1
+    #define LV_ARM2D_XRGB888_ALPHA_ALWAYS_FF 1
 #endif
 
 /*********************
