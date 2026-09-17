@@ -697,7 +697,11 @@ void lv_draw_unit_draw_letter_internal(lv_draw_task_t * t, lv_draw_glyph_dsc_t *
                     LV_LOG_WARN("Failed to allocate memory for glyph draw buffer");
                     goto exit;
                 }
-                lv_draw_buf_ensure_resident(draw_buf, NULL);
+                if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) {
+                    LV_LOG_WARN("Failed to allocate memory for glyph draw buffer");
+                    lv_draw_buf_destroy(draw_buf);
+                    goto exit;
+                }
                 draw_buf->header.h = g.box_h;
                 dsc->_draw_buf = draw_buf;
             }

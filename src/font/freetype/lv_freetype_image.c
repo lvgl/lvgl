@@ -207,9 +207,21 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     }
     lv_draw_buf_clear(data->draw_buf, NULL);
 
+    /*Take the pixel pointer through lv_draw_buf_goto_xy: it makes the buffer CPU-resident
+     *and consumes the CLEARZERO flag set by the clear, so the glyph gets uploaded later*/
+    uint8_t * glyph_dst = lv_draw_buf_goto_xy(data->draw_buf, 0, 0);
+    if(glyph_dst == NULL) {
+        LV_LOG_WARN("Could not access the glyph draw buffer");
+        lv_draw_buf_destroy(data->draw_buf);
+        data->draw_buf = NULL;
+        FT_Done_Glyph(glyph);
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+        LV_PROFILER_FONT_END;
+        return false;
+    }
+
     for(int y = 0; y < box_h; ++y) {
-        lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * pitch,
-                  pitch);
+        lv_memcpy(glyph_dst + y * stride, glyph_bitmap->bitmap.buffer + y * pitch, pitch);
     }
 
     lv_draw_buf_flush_cache(data->draw_buf, NULL);

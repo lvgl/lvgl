@@ -439,10 +439,6 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
             }
             decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, w_px, 1, cf_decoded, LV_STRIDE_AUTO);
             if(decoded == NULL) return LV_RESULT_INVALID;
-            if(!lv_draw_buf_ensure_resident(decoded, NULL)) {
-                lv_draw_buf_destroy(decoded);
-                return LV_RESULT_INVALID;
-            }
             decoder_data->decoded_partial = decoded; /*Free on decoder close*/
         }
         *decoded_area = *full_area;
@@ -454,6 +450,8 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded = decoder_data->decoded_partial; /*Already allocated*/
     }
 
+    /*A draw unit may have moved the row buffer out of CPU memory since the previous line*/
+    if(!lv_draw_buf_ensure_resident(decoded, NULL)) return LV_RESULT_INVALID;
     img_data = decoded->data; /*Get the buffer to operate on*/
 
     if(decoded_area->y1 > full_area->y2) {

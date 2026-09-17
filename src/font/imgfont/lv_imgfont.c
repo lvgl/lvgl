@@ -73,6 +73,9 @@ void lv_imgfont_destroy(lv_font_t * font)
     if(font == NULL) return;
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
+#if LV_USE_DRAW_VRAM
+    lv_font_release_vram(font);
+#endif
     lv_free(dsc);
 }
 

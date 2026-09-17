@@ -119,10 +119,6 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
 
     if(draw_buf == NULL) return;
 
-#if LV_USE_DRAW_VRAM
-    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return;
-#endif
-
     lv_color_format_t cf = draw_buf->header.cf;
     uint8_t * data = lv_draw_buf_goto_xy(draw_buf, x, y);
     if(data == NULL) return;
@@ -330,8 +326,12 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     LV_CHECK_ARG(draw_buf != NULL, return);
 
 #if LV_USE_DRAW_VRAM
-    {
-        bool is_zero_fill = false;
+    /*A fill that leaves every pixel zero only needs the CLEARZERO flag, so a lazy or
+     *VRAM-resident buffer does not have to be pulled into CPU memory for it.
+     *Indexed formats are excluded: their pixels are palette indices, so zero is not
+     *black, and the palette itself is stored in front of the pixels.*/
+    if(!LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
+        bool is_zero_fill;
         if(lv_color_format_has_alpha(draw_buf->header.cf)) {
             is_zero_fill = (opa <= LV_OPA_MIN);
         }
@@ -339,14 +339,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
             is_zero_fill = (color.red == 0 && color.green == 0 && color.blue == 0);
         }
         if(is_zero_fill) {
-            /* Zero the CPU data if present, then mark CLEARZERO so
-             * ensure_resident skips uploading zeroed content to VRAM.
-             * If data is NULL (lazy/VRAM-only), just set the flag. */
-            if(draw_buf->data != NULL) {
-                lv_memzero(draw_buf->data, draw_buf->header.stride * draw_buf->header.h);
-            }
-            lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_CLEARZERO);
-            lv_draw_buf_flush_cache(draw_buf, NULL);
+            lv_draw_buf_clear(draw_buf, NULL);
             lv_obj_invalidate(obj);
             return;
         }

@@ -195,6 +195,9 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
 
     if(font->dsc != NULL) {
         ttf_font_desc_t * ttf = (ttf_font_desc_t *)font->dsc;
+#if LV_USE_DRAW_VRAM
+        lv_font_release_vram(font);
+#endif
 #if LV_TINY_TTF_FILE_SUPPORT != 0
         lv_mutex_lock(&ttf->stream.mutex);
         if(ttf->stream.file != NULL) {

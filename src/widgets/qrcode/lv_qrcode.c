@@ -430,7 +430,13 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
     int32_t obj_w = draw_buf->header.w;
     int scaled = qr_size * scale;
     int margin = (obj_w - scaled) / 2;
-    uint8_t * buf_u8 = draw_buf->data + 8;    /*+8 skip the palette*/
+    /*lv_draw_buf_goto_xy skips the palette and, with VRAM residency enabled, consumes the
+     *CLEARZERO flag set by the clear above so the modules written here get uploaded*/
+    uint8_t * buf_u8 = lv_draw_buf_goto_xy(draw_buf, 0, 0);
+    if(buf_u8 == NULL) {
+        lv_display_enable_invalidation(lv_obj_get_display(obj), true);
+        return LV_RESULT_INVALID;
+    }
     lv_color_t c = lv_color_hex(1);
 
     /* Copy the qr code canvas:

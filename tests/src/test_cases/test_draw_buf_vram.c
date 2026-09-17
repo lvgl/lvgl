@@ -874,6 +874,54 @@ void test_vram_canvas_round_trip(void)
     lv_draw_buf_destroy(buf);
 }
 
+/** A transparent fill on an indexed canvas must not take the zero-fill shortcut: the pixels
+ *  are palette indices, so zero is not "empty", and the palette lives in front of them */
+void test_vram_canvas_fill_bg_indexed_keeps_palette(void)
+{
+    lv_obj_t * canvas_obj = lv_canvas_create(lv_screen_active());
+    lv_draw_buf_t * buf = lv_draw_buf_create(8, 8, LV_COLOR_FORMAT_I1, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_canvas_set_draw_buf(canvas_obj, buf);
+    lv_canvas_set_palette(canvas_obj, 0, lv_color32_make(0xff, 0x00, 0x00, 0xff));
+    lv_canvas_set_palette(canvas_obj, 1, lv_color32_make(0x00, 0x00, 0xff, 0xff));
+
+    /*For indexed formats the fill color carries the palette index in its blue channel*/
+    lv_color_t index_1 = lv_color_make(0x00, 0x00, 0x01);
+    lv_canvas_fill_bg(canvas_obj, index_1, LV_OPA_TRANSP);
+
+    TEST_ASSERT_FALSE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_CLEARZERO));
+    const lv_color32_t * palette = (const lv_color32_t *)buf->data;
+    TEST_ASSERT_EQUAL_HEX8(0xff, palette[0].red);
+    TEST_ASSERT_EQUAL_HEX8(0xff, palette[1].blue);
+    const uint8_t * row = lv_draw_buf_goto_xy(buf, 0, 3);
+    TEST_ASSERT_NOT_NULL(row);
+    TEST_ASSERT_EQUAL_HEX8(0xff, row[0]);
+
+    lv_draw_buf_destroy(buf);
+}
+
+/** The QR code writes its modules straight into the buffer after clearing it, so the
+ *  clear-to-zero state must be consumed and the modules uploaded, not discarded */
+void test_vram_qrcode_encode_uploads_modules(void)
+{
+#if LV_USE_QRCODE
+    lv_obj_t * qr = lv_qrcode_create(lv_screen_active());
+    lv_qrcode_set_size(qr, 64);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, "vram", 4));
+    lv_draw_buf_t * buf = lv_canvas_get_draw_buf(qr);
+    TEST_ASSERT_NOT_NULL(buf);
+    TEST_ASSERT_NOT_NULL(buf->data);
+    TEST_ASSERT_FALSE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_CLEARZERO));
+
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, &s_fake_unit_a));
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.upload_count);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.alloc_count);
+    TEST_ASSERT_FALSE(vram_contains_pattern(buf, 0x00));
+
+    lv_obj_delete(qr);
+#endif
+}
+
 /*----------------------------------------------------------------------
  * 10. Image descriptor (non-ALLOCATED, ROM-like) VRAM handling
  *----------------------------------------------------------------------*/
@@ -972,6 +1020,57 @@ void test_vram_font_release(void)
     lv_draw_buf_vram_font_release(&dsc.base.vram_res, &dsc.base);
     TEST_ASSERT_NULL(dsc.base.vram_res);
     TEST_ASSERT_EQUAL_INT(1, s_stats_a.font_free_count);
+}
+
+/** Attach a fake VRAM residency to a font descriptor, as a draw unit would */
+static void attach_fake_font_vram(lv_font_t * font)
+{
+    fake_vram_res_t * vr = lv_malloc_zeroed(sizeof(fake_vram_res_t));
+    vr->fake_vram = lv_malloc(64);
+    vr->alloc_size = 64;
+    vr->valid = true;
+    vr->base.unit = &s_fake_unit_a;
+    vr->base.size = 64;
+    ((lv_font_dsc_base_t *)font->dsc)->vram_res = &vr->base;
+}
+
+/** Destroying a TinyTTF font releases its VRAM residency through the owning unit */
+void test_vram_tiny_ttf_destroy_releases_font_vram(void)
+{
+#if LV_USE_TINY_TTF
+    extern const uint8_t test_ubuntu_font[];
+    extern size_t test_ubuntu_font_size;
+    lv_font_t * font = lv_tiny_ttf_create_data(test_ubuntu_font, test_ubuntu_font_size, 30);
+    TEST_ASSERT_NOT_NULL(font);
+    attach_fake_font_vram(font);
+    lv_tiny_ttf_destroy(font);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.font_free_count);
+#endif
+}
+
+#if LV_USE_IMGFONT
+static const void * imgfont_test_path_cb(const lv_font_t * font, uint32_t unicode, uint32_t unicode_next,
+                                         int32_t * offset_y, void * user_data)
+{
+    LV_UNUSED(font);
+    LV_UNUSED(unicode);
+    LV_UNUSED(unicode_next);
+    LV_UNUSED(offset_y);
+    LV_UNUSED(user_data);
+    return NULL;
+}
+#endif
+
+/** Destroying an image font releases its VRAM residency through the owning unit */
+void test_vram_imgfont_destroy_releases_font_vram(void)
+{
+#if LV_USE_IMGFONT
+    lv_font_t * font = lv_imgfont_create(20, imgfont_test_path_cb, NULL);
+    TEST_ASSERT_NOT_NULL(font);
+    attach_fake_font_vram(font);
+    lv_imgfont_destroy(font);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.font_free_count);
+#endif
 }
 
 /** lv_draw_buf_vram_font_release is safe with NULL */
