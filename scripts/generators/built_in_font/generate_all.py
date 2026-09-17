@@ -72,11 +72,6 @@ def generate_all():
 
     outputs.append(
         gen_font(
-            "lv_font_montserrat_12_subpx.c", "12 px subpx", "--size", "12", "--subpx"
-        )
-    )
-    outputs.append(
-        gen_font(
             "lv_font_montserrat_28_compressed.c",
             "28 px compressed",
             "--size",
