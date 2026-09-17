@@ -1611,6 +1611,47 @@ void test_vram_copy_region_same_unit(void)
     lv_draw_buf_destroy(src);
 }
 
+/** A copy must not go through VRAM handles the unit has already lost */
+void test_vram_copy_skips_lost_vram(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(src);
+    TEST_ASSERT_NOT_NULL(dest);
+    lv_draw_buf_ensure_resident(src, &s_fake_unit_a);
+    lv_draw_buf_ensure_resident(dest, &s_fake_unit_a);
+
+    invalidate_vram(src);
+    lv_draw_buf_copy(dest, NULL, src, NULL);
+
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.copy_count);
+    TEST_ASSERT_NOT_NULL(dest->data);
+    TEST_ASSERT_NOT_NULL(src->data);
+    TEST_ASSERT_NULL(src->vram_res);
+
+    lv_draw_buf_destroy(dest);
+    lv_draw_buf_destroy(src);
+}
+
+/** A duplicate must not go through a VRAM handle the unit has already lost */
+void test_vram_dup_skips_lost_vram(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_draw_buf_ensure_resident(buf, &s_fake_unit_a);
+
+    invalidate_vram(buf);
+    lv_draw_buf_t * dup = lv_draw_buf_dup(buf);
+    TEST_ASSERT_NOT_NULL(dup);
+
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.dup_count);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.download_count);
+    TEST_ASSERT_NOT_NULL(dup->data);
+
+    lv_draw_buf_destroy(dup);
+    lv_draw_buf_destroy(buf);
+}
+
 /** Alpha format lazy alloc to CPU is zero-filled */
 void test_vram_alpha_format_lazy_zeroed(void)
 {

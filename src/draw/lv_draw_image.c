@@ -29,6 +29,9 @@ static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
                                 lv_image_decoder_dsc_t * decoder_dsc, lv_area_t * relative_decoded_area,
                                 const lv_area_t * img_area, const lv_area_t * clipped_img_area,
                                 lv_draw_image_core_cb draw_core_cb);
+#if LV_USE_DRAW_VRAM
+    static bool decoded_piece_to_cpu(lv_image_decoder_dsc_t * decoder_dsc);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -412,6 +415,13 @@ static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
         lv_result_t res = LV_RESULT_OK;
 
         while(res == LV_RESULT_OK) {
+#if LV_USE_DRAW_VRAM
+            /*The decoder writes the next piece into the same buffer on the CPU*/
+            if(!decoded_piece_to_cpu(decoder_dsc)) {
+                LV_LOG_WARN("Failed to ensure image residency");
+                return;
+            }
+#endif
             res = lv_image_decoder_get_area(decoder_dsc, &relative_full_area_to_decode, relative_decoded_area);
 
             lv_area_t absolute_decoded_area = *relative_decoded_area;
@@ -431,5 +441,24 @@ static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
                 }
             }
         }
+
+#if LV_USE_DRAW_VRAM
+        /*Leave the piece buffer CPU-only: the decoder frees it on close without knowing about VRAM*/
+        decoded_piece_to_cpu(decoder_dsc);
+#endif
     }
 }
+
+#if LV_USE_DRAW_VRAM
+/**
+ * Make a decoder's piece buffer CPU-resident. The piece it holds has been consumed,
+ * so a VRAM copy is dropped rather than downloaded.
+ */
+static bool decoded_piece_to_cpu(lv_image_decoder_dsc_t * decoder_dsc)
+{
+    lv_draw_buf_t * decoded = (lv_draw_buf_t *)decoder_dsc->decoded;
+    if(decoded == NULL) return true;
+    lv_draw_buf_set_flag(decoded, LV_IMAGE_FLAGS_DISCARDABLE);
+    return lv_draw_buf_ensure_resident(decoded, NULL);
+}
+#endif

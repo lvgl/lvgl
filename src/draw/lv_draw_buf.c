@@ -37,6 +37,9 @@ static void draw_buf_free(const lv_draw_buf_handlers_t * handler, void * buf);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
 static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
 static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * full_area);
+#if LV_USE_DRAW_VRAM
+    static void draw_buf_validate_vram(lv_draw_buf_t * buf);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -381,6 +384,7 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
 
 #if LV_USE_DRAW_VRAM
     /*If source is VRAM-resident, try a VRAM-side duplicate to avoid a CPU round trip*/
+    draw_buf_validate_vram((lv_draw_buf_t *)draw_buf);
     if(draw_buf->vram_res != NULL) {
         lv_draw_unit_t * unit = draw_buf->vram_res->unit;
         if(unit != NULL && unit->vram_dup_cb != NULL) {
@@ -489,6 +493,10 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
                  return);
 
 #if LV_USE_DRAW_VRAM
+    /*Drop residency the units have lost before touching their handles*/
+    draw_buf_validate_vram(dest);
+    draw_buf_validate_vram((lv_draw_buf_t *)src);
+
     /*If both buffers are VRAM-resident on the same unit, try a VRAM-side copy*/
     if(dest->vram_res != NULL && src->vram_res != NULL
        && !((dest->header.flags | src->header.flags) & LV_IMAGE_FLAGS_CLEARZERO)) {
