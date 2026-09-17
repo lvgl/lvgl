@@ -558,7 +558,8 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
                 lv_draw_unit_t * vr_unit = cached_data->decoded->vram_res->unit;
                 lost = vr_unit != NULL && !vr_unit->vram_check_cb(vr_unit, cached_data->decoded);
             }
-            else if(cached_data->decoded->data == NULL) {
+            else if(cached_data->decoded->data == NULL && cached_data->decoded->unaligned_data == NULL) {
+                /*Custom-draw decoders (e.g. SVG) keep their result in unaligned_data with no pixels*/
                 lost = true;
             }
             if(lost) {

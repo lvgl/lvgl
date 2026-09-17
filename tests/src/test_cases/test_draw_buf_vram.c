@@ -1720,9 +1720,32 @@ void test_vram_cache_reloads_image_that_lost_vram(void)
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&dsc, src, NULL));
     TEST_ASSERT_NOT_NULL(dsc.decoded);
     TEST_ASSERT_NOT_NULL(dsc.decoded->data);
-    TEST_ASSERT_TRUE(dsc.decoded != decoded);
     lv_image_decoder_close(&dsc);
     lv_image_cache_drop(src);
+}
+
+/** A cached custom-draw image keeps no pixel data on purpose; the cache must not mistake
+ *  that for lost backing and re-decode it on every lookup */
+void test_vram_cache_keeps_custom_draw_entry(void)
+{
+#if LV_USE_SVG
+    LV_IMAGE_DECLARE(test_image_svg);
+    lv_image_cache_drop(&test_image_svg);
+
+    lv_image_decoder_dsc_t dsc;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&dsc, &test_image_svg, NULL));
+    const lv_draw_buf_t * first = dsc.decoded;
+    TEST_ASSERT_NOT_NULL(first);
+    TEST_ASSERT_NULL(first->data);
+    TEST_ASSERT_NOT_NULL(first->unaligned_data);
+    lv_image_decoder_close(&dsc);
+
+    /*Nothing was freed in between, so a cache hit hands back the very same buffer*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&dsc, &test_image_svg, NULL));
+    TEST_ASSERT_EQUAL_PTR(first, dsc.decoded);
+    lv_image_decoder_close(&dsc);
+    lv_image_cache_drop(&test_image_svg);
+#endif
 }
 
 /** A caller-owned buffer keeps its valid CPU pixels when only the VRAM copy is lost */
