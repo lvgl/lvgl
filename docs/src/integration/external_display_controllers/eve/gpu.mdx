@@ -116,14 +116,15 @@ and increase experimentally in your testing.
 To create the LVGL display for the EVE renderer, you call
 <ApiLink name="lv_draw_eve_display_create" display="lv_draw_eve_display_create(params)" />, which
 returns the created display but does not touch the chip yet, and then
-<ApiLink name="lv_draw_eve_display_init" display="lv_draw_eve_display_init(disp, op_cb)" />, which
-powers up and configures EVE. The display is unusable until the second call, so it almost always
-follows on the next line. Only what `op_cb` needs goes in between:
+<ApiLink name="lv_draw_eve_display_init" display="lv_draw_eve_display_init(disp)" />, which
+powers up and configures EVE. `op_cb` is set in between with
+<ApiLink name="lv_draw_eve_display_set_operation_cb" />, and init fails without it:
 
 ```c
 lv_display_t * disp = lv_draw_eve_display_create(&params);
 lv_display_set_user_data(disp, your_user_data);   /* optional */
-if(lv_draw_eve_display_init(disp, op_cb) != LV_RESULT_OK) {
+lv_draw_eve_display_set_operation_cb(disp, op_cb);
+if(lv_draw_eve_display_init(disp) != LV_RESULT_OK) {
     /* EVE did not come up */
 }
 ```

@@ -83,12 +83,11 @@ lv_display_t * lv_st7735_create(uint32_t hor_res, uint32_t ver_res)
     return lv_lcd_generic_mipi_create(hor_res, ver_res);
 }
 
-lv_result_t lv_st7735_init(lv_display_t * disp, lv_lcd_flag_t flags,
-                           lv_st7735_send_cmd_cb_t send_cmd_cb, lv_st7735_send_color_cb_t send_color_cb)
+lv_result_t lv_st7735_init(lv_display_t * disp, lv_lcd_flag_t flags)
 {
     LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
 
-    lv_result_t res = lv_lcd_generic_mipi_init(disp, flags, send_cmd_cb, send_color_cb);
+    lv_result_t res = lv_lcd_generic_mipi_init(disp, flags);
     if(res != LV_RESULT_OK) {
         return res;
     }

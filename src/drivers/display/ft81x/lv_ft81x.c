@@ -104,13 +104,23 @@ lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * part
     return disp;
 }
 
-lv_result_t lv_ft81x_init(lv_display_t * disp, lv_ft81x_spi_cb_t spi_cb)
+void lv_ft81x_set_spi_cb(lv_display_t * disp, lv_ft81x_spi_cb_t spi_cb)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(spi_cb != NULL, return);
+
+    ((lv_ft81x_driver_data_t *)lv_display_get_driver_data(disp))->spi_cb = spi_cb;
+}
+
+lv_result_t lv_ft81x_init(lv_display_t * disp)
 {
     LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(spi_cb != NULL, return LV_RESULT_INVALID);
 
     lv_ft81x_driver_data_t * drv = lv_display_get_driver_data(disp);
-    drv->spi_cb = spi_cb;
+    if(drv->spi_cb == NULL) {
+        LV_LOG_ERROR("lv_ft81x_set_spi_cb() must be called before init");
+        return LV_RESULT_INVALID;
+    }
 
     lv_result_t res = initialize(disp);
     if(res != LV_RESULT_OK) {

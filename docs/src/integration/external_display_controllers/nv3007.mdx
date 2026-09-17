@@ -68,16 +68,15 @@ To create an NV3007-based display use the function
 lv_display_t * lv_nv3007_create(uint32_t hor_res, uint32_t ver_res);
 
 /**
- * Initialize the NV3007 controller of a display created with `lv_nv3007_create()`.
+ * Initialize the NV3007 controller of a display created with `lv_nv3007_create()`. Set the
+ * callbacks with `lv_lcd_generic_mipi_set_send_cmd_cb()` and
+ * `lv_lcd_generic_mipi_set_send_color_cb()` first; this function fails without them.
  * The display is not flushed before this function returns.
  * @param disp          display object
  * @param flags         default configuration settings (mirror, RGB ordering, etc.)
- * @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
- * @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
  * @return              LV_RESULT_OK on success
  */
-lv_result_t lv_nv3007_init(lv_display_t * disp, lv_lcd_flag_t flags,
-                           lv_nv3007_send_cmd_cb_t send_cmd_cb, lv_nv3007_send_color_cb_t send_color_cb);
+lv_result_t lv_nv3007_init(lv_display_t * disp, lv_lcd_flag_t flags);
 ```
 
 ## Arduino Example
@@ -178,7 +177,9 @@ void setup()
 
     /*  Create NV3007 display */
     lv_display_t *disp = lv_nv3007_create(142, 428);
-    if (lv_nv3007_init(disp, LV_LCD_FLAG_NONE, my_lcd_send_cmd, my_lcd_send_color) != LV_RESULT_OK) {
+    lv_lcd_generic_mipi_set_send_cmd_cb(disp, my_lcd_send_cmd);
+    lv_lcd_generic_mipi_set_send_color_cb(disp, my_lcd_send_color);
+    if (lv_nv3007_init(disp, LV_LCD_FLAG_NONE) != LV_RESULT_OK) {
         lv_display_delete(disp);
         return;
     }

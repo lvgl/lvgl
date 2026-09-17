@@ -184,17 +184,29 @@ typedef struct {
 lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res);
 
 /**
+ * Set the function that sends a command to the LCD controller. Required before init.
+ * @param disp          display object
+ * @param send_cmd_cb   platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
+ */
+void lv_lcd_generic_mipi_set_send_cmd_cb(lv_display_t * disp, lv_lcd_send_cmd_cb_t send_cmd_cb);
+
+/**
+ * Set the function that sends pixel data to the LCD controller. Required before init.
+ * @param disp          display object
+ * @param send_color_cb platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer).
+ *                      `lv_display_flush_ready` must be called after the transfer has finished.
+ */
+void lv_lcd_generic_mipi_set_send_color_cb(lv_display_t * disp, lv_lcd_send_color_cb_t send_color_cb);
+
+/**
  * Initialize the LCD controller of a display created with `lv_lcd_generic_mipi_create()`.
+ * Fails if the send_cmd or send_color callback has not been set.
  * The display is not flushed before this function returns.
  * @param disp          display object
  * @param flags         default configuration settings (mirror, RGB ordering, etc.)
- * @param send_cmd_cb   platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
- * @param send_color_cb platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer).
- *                      `lv_display_flush_ready` must be called after the transfer has finished.
  * @return              LV_RESULT_OK on success
  */
-lv_result_t lv_lcd_generic_mipi_init(lv_display_t * disp, lv_lcd_flag_t flags, lv_lcd_send_cmd_cb_t send_cmd_cb,
-                                     lv_lcd_send_color_cb_t send_color_cb);
+lv_result_t lv_lcd_generic_mipi_init(lv_display_t * disp, lv_lcd_flag_t flags);
 
 /**
  * Set gap, i.e., the offset of the (0,0) pixel in the VRAM

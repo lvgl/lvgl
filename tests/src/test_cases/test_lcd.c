@@ -18,8 +18,7 @@ typedef struct {
 } test_lcd_ctx_t;
 
 typedef lv_display_t * (*lcd_create_cb_t)(uint32_t hor_res, uint32_t ver_res);
-typedef lv_result_t (*lcd_init_cb_t)(lv_display_t * disp, lv_lcd_flag_t flags,
-                                     lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_color_cb_t send_color_cb);
+typedef lv_result_t (*lcd_init_cb_t)(lv_display_t * disp, lv_lcd_flag_t flags);
 typedef void (*lcd_set_gap_cb_t)(lv_display_t * disp, uint16_t x, uint16_t y);
 typedef void (*lcd_set_invert_cb_t)(lv_display_t * disp, bool invert);
 typedef void (*lcd_set_gamma_curve_cb_t)(lv_display_t * disp, uint8_t gamma);
@@ -124,7 +123,12 @@ static void test_lcd_generic_mipi(lcd_create_cb_t create_cb,
     lv_memzero(&ctx, sizeof(test_lcd_ctx_t));
     lv_display_set_user_data(disp, &ctx);
 
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, init_cb(disp, LV_LCD_FLAG_NONE, lcd_send_cmd_cb, lcd_send_color_cb));
+    /* init must refuse to run until both callbacks are set */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, init_cb(disp, LV_LCD_FLAG_NONE));
+
+    lv_lcd_generic_mipi_set_send_cmd_cb(disp, lcd_send_cmd_cb);
+    lv_lcd_generic_mipi_set_send_color_cb(disp, lcd_send_color_cb);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, init_cb(disp, LV_LCD_FLAG_NONE));
 
     lv_lcd_generic_mipi_driver_t * driver = lv_display_get_driver_data(disp);
 
@@ -301,7 +305,11 @@ void test_lcd_ft81x(void)
     TEST_ASSERT_NOT_NULL(disp);
 
     lv_display_set_user_data(disp, &user_data);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_ft81x_init(disp, lcd_ft81x_spi_cb));
+
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_ft81x_init(disp));
+
+    lv_ft81x_set_spi_cb(disp, lcd_ft81x_spi_cb);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_ft81x_init(disp));
 
     const uint32_t * user_data_ptr = lv_display_get_user_data(disp);
     TEST_ASSERT_EQUAL_PTR(user_data_ptr, &user_data);
