@@ -67,8 +67,7 @@ void lv_draw_eve_init(void)
     lv_draw_eve_unit_g = draw_eve_unit;
 }
 
-void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_parameters_t * params,
-                                  lv_draw_eve_operation_cb_t op_cb)
+void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_parameters_t * params)
 {
     if(lv_draw_eve_unit_g == NULL) {
         LV_LOG_WARN("lv_draw_eve is not initialized.");
@@ -77,9 +76,18 @@ void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_paramet
 
     lv_draw_eve_unit_g->disp = disp;
     lv_draw_eve_unit_g->params = *params; /* make a copy */
-    lv_draw_eve_unit_g->op_cb = op_cb;
 
     lv_display_add_event_cb(disp, disp_delete_cb, LV_EVENT_DELETE, NULL);
+}
+
+void lv_draw_eve_set_operation_cb(lv_draw_eve_operation_cb_t op_cb)
+{
+    if(lv_draw_eve_unit_g == NULL) {
+        LV_LOG_WARN("lv_draw_eve is not initialized.");
+        return;
+    }
+
+    lv_draw_eve_unit_g->op_cb = op_cb;
 }
 
 /**********************

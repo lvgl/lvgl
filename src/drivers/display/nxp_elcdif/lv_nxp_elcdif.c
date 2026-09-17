@@ -63,7 +63,7 @@ lv_display_t * lv_nxp_display_elcdif_create_direct(LCDIF_Type * base, const elcd
     lv_color_format_t color_format = lv_nxp_elcdif_to_lvgl_color_converter((elcdif_rgb_mode_config_t *)config);
     lv_display_set_color_format(disp, color_format);
     lv_display_set_buffers(disp, frame_buffer1, frame_buffer2, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
-    lv_display_set_user_data(disp, base);
+    lv_display_set_driver_data(disp, base);
 
     ELCDIF_EnableInterrupts(base, kELCDIF_CurFrameDoneInterruptEnable);
     NVIC_EnableIRQ(eLCDIF_IRQn);
@@ -103,7 +103,7 @@ void lv_nxp_display_elcdif_event_handler(const lv_display_t * disp)
         return;
     }
 
-    LCDIF_Type * base = (LCDIF_Type *)lv_display_get_user_data((lv_display_t *)disp);
+    LCDIF_Type * base = (LCDIF_Type *)lv_display_get_driver_data((lv_display_t *)disp);
     uint32_t intStatus = ELCDIF_GetInterruptStatus(base);
 
     ELCDIF_ClearInterruptStatus(base, intStatus);
@@ -125,7 +125,7 @@ void lv_nxp_display_elcdif_event_handler(const lv_display_t * disp)
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
-    LCDIF_Type * base = (LCDIF_Type *)lv_display_get_user_data(disp);
+    LCDIF_Type * base = (LCDIF_Type *)lv_display_get_driver_data(disp);
 
     DCACHE_CleanInvalidateByRange((uint32_t)color_p, lv_display_get_draw_buf_size(disp));
 
@@ -138,7 +138,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 static void flush_partial_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
-    LCDIF_Type * base = (LCDIF_Type *)lv_display_get_user_data(disp);
+    LCDIF_Type * base = (LCDIF_Type *)lv_display_get_driver_data(disp);
 
     DCACHE_CleanInvalidateByRange((uint32_t)color_p, lv_display_get_draw_buf_size(disp));
 

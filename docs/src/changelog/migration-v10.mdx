@@ -148,7 +148,7 @@ buffer(s) must be large enough for the new format.
 `LV_COLOR_16_SWAP` was kept for compatibility with LVGL v8, with the addition of <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> which you can use to make LVGL
 render natively in big-endian RGB565 format, this config now produces a warning and will be completely removed in v10.
 
-If you're still using this configuration, simply define <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> as <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED"/> 
+If you're still using this configuration, simply define <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> as <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED"/>
 or set the display's color format at runtime with <ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565_SWAPPED)"/>.
 
 As a last resort option, if none of the above options work for you, the following snippet of code can be used in your flush callback.
@@ -621,6 +621,38 @@ Calling the following functions with `NULL` as the display parameter is deprecat
 - <ApiLink name="lv_display_get_buf_active"/>
 - <ApiLink name="lv_display_get_draw_buf_size"/>
 - <ApiLink name="lv_display_get_invalidated_draw_buf_size"/>
+
+### Display driver creation is split from initialization
+
+`_create()` used to send the first commands to the hardware, so the `send_cmd` /
+`send_color` callbacks ran before you had any chance to give them a user data pointer to
+work with. Creation and initialization are now separate: `_create()` only builds the
+`lv_display_t`, `_init()` takes the callbacks and talks to the hardware, and you set the
+user data in between.
+
+```c
+/* Before */
+lv_display_t * disp = lv_st7789_create(240, 320, LV_LCD_FLAG_NONE, my_send_cmd, my_send_color);
+
+/* After */
+lv_display_t * disp = lv_st7789_create(240, 320);
+lv_display_set_user_data(disp, &my_context);   /* the callbacks can read this now */
+lv_st7789_init(disp, LV_LCD_FLAG_NONE, my_send_cmd, my_send_color);
+```
+
+This applies to the generic MIPI driver and the controllers built on it (`lv_st7735`,
+`lv_st7789`, `lv_st7796`, `lv_ili9341`, `lv_nv3007`), plus `lv_ft81x` and the EVE display.
+Every `_init()` returns `lv_result_t`, and the display has no flush callback until it
+succeeds, so a failed or forgotten init leaves the screen blank.
+
+- `lv_ft81x_create()` lost its `spi_cb` and `user_data` parameters and no longer deletes the
+  display on failure; pass the callback to `lv_ft81x_init()`.
+- `lv_draw_eve_display_create()` lost its `op_cb` and `user_data` parameters; pass the
+  callback to `lv_draw_eve_display_init()`.
+- `lv_ft81x_get_user_data()` and `lv_draw_eve_display_get_user_data()` are removed, use
+  <ApiLink name="lv_display_get_user_data"/>.
+- The NXP eLCDIF driver used the display user data for its `LCDIF_Type *`; it now uses the
+  driver data, so <ApiLink name="lv_display_set_user_data"/> is free there too.
 
 ---
 
