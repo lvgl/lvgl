@@ -48,35 +48,42 @@ static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * params, lv_draw_eve_operation_cb_t op_cb,
-                                          void * user_data)
+lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * params)
 {
     static uint32_t dummy_buf; /* It won't be used as it will send commands instead of draw pixels. */
 
     LV_CHECK_ARG(params != NULL, return NULL);
 
     lv_display_t * disp = lv_display_create(params->hor_res, params->ver_res);
-    lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_buffers(disp, &dummy_buf, NULL,
                            params->hor_res * params->ver_res * LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_DEFAULT),
                            LV_DISPLAY_RENDER_MODE_FULL); /* recreate the full display list each refresh */
     lv_display_add_event_cb(disp, resolution_changed_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(disp, render_start_cb, LV_EVENT_RENDER_START, NULL);
     lv_display_add_event_cb(disp, render_ready_cb, LV_EVENT_RENDER_READY, NULL);
-    lv_display_set_driver_data(disp, user_data);
 
-    lv_draw_eve_set_display_data(disp, params, op_cb);
-
-    EVE_init();
-    EVE_memWrite8(REG_PWM_DUTY, EVE_BACKLIGHT_PWM); /* 0 = off, 0x80 = max */
+    lv_draw_eve_set_display_data(disp, params);
 
     return disp;
 }
 
-void * lv_draw_eve_display_get_user_data(lv_display_t * disp)
+lv_result_t lv_draw_eve_display_init(lv_display_t * disp, lv_draw_eve_operation_cb_t op_cb)
 {
-    LV_CHECK_ARG(disp != NULL, return NULL);
-    return lv_display_get_driver_data(disp);
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(op_cb != NULL, return LV_RESULT_INVALID);
+
+    lv_draw_eve_set_operation_cb(op_cb);
+
+    if(EVE_init() != E_OK) {
+        LV_LOG_WARN("EVE_init failed.");
+        return LV_RESULT_INVALID;
+    }
+    EVE_memWrite8(REG_PWM_DUTY, EVE_BACKLIGHT_PWM); /* 0 = off, 0x80 = max */
+
+    /* registered last: until the chip is initialized the display must not be flushed */
+    lv_display_set_flush_cb(disp, flush_cb);
+
+    return LV_RESULT_OK;
 }
 
 lv_indev_t * lv_draw_eve_touch_create(lv_display_t * disp)

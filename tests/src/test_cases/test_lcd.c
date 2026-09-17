@@ -17,8 +17,9 @@ typedef struct {
     uint8_t param_size;
 } test_lcd_ctx_t;
 
-typedef lv_display_t * (*lcd_create_cb_t)(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                          lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_color_cb_t send_color_cb);
+typedef lv_display_t * (*lcd_create_cb_t)(uint32_t hor_res, uint32_t ver_res);
+typedef lv_result_t (*lcd_init_cb_t)(lv_display_t * disp, lv_lcd_flag_t flags,
+                                     lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_color_cb_t send_color_cb);
 typedef void (*lcd_set_gap_cb_t)(lv_display_t * disp, uint16_t x, uint16_t y);
 typedef void (*lcd_set_invert_cb_t)(lv_display_t * disp, bool invert);
 typedef void (*lcd_set_gamma_curve_cb_t)(lv_display_t * disp, uint8_t gamma);
@@ -65,7 +66,7 @@ static void lcd_send_cmd_cb(lv_display_t * disp, const uint8_t * cmd, size_t cmd
     TEST_ASSERT_GREATER_THAN(0, cmd_size);
 
     test_lcd_ctx_t * ctx = lv_display_get_user_data(disp);
-    if(!ctx) return;
+    TEST_ASSERT_NOT_NULL(ctx);
 
     TEST_ASSERT(cmd_size > 0 && cmd_size <= TEST_LCD_BUF_SIZE);
     lv_memcpy(ctx->cmd_buf, cmd, cmd_size);
@@ -105,22 +106,25 @@ static void flush_wait_cb(lv_display_t * disp)
 }
 
 static void test_lcd_generic_mipi(lcd_create_cb_t create_cb,
+                                  lcd_init_cb_t init_cb,
                                   lcd_set_gap_cb_t set_gap_cb,
                                   lcd_set_invert_cb_t set_invert_cb,
                                   lcd_set_gamma_curve_cb_t set_gamma_curve_cb,
                                   lcd_send_cmd_list_cb_t send_cmd_list_cb)
 {
-    lv_display_t * disp = create_cb(TEST_LCD_WIDTH, TEST_LCD_HEIGHT, LV_LCD_FLAG_NONE, lcd_send_cmd_cb,
-                                    lcd_send_color_cb);
+    lv_display_t * disp = create_cb(TEST_LCD_WIDTH, TEST_LCD_HEIGHT);
     TEST_ASSERT_NOT_NULL(disp);
 
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(64, 64, LV_COLOR_FORMAT_RGB565, LV_STRIDE_AUTO);
     lv_display_set_draw_buffers(disp, draw_buf, NULL);
     lv_display_set_flush_wait_cb(disp, flush_wait_cb);
 
+    /* the point of the create/init split: the callbacks see this from their very first call */
     test_lcd_ctx_t ctx;
     lv_memzero(&ctx, sizeof(test_lcd_ctx_t));
     lv_display_set_user_data(disp, &ctx);
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, init_cb(disp, LV_LCD_FLAG_NONE, lcd_send_cmd_cb, lcd_send_color_cb));
 
     lv_lcd_generic_mipi_driver_t * driver = lv_display_get_driver_data(disp);
 
@@ -197,26 +201,29 @@ void tearDown(void)
 
 void test_lcd_st7735(void)
 {
-    test_lcd_generic_mipi(lv_st7735_create, lv_st7735_set_gap, lv_st7735_set_invert, lv_st7735_set_gamma_curve,
+    test_lcd_generic_mipi(lv_st7735_create, lv_st7735_init, lv_st7735_set_gap, lv_st7735_set_invert,
+                          lv_st7735_set_gamma_curve,
                           lv_st7735_send_cmd_list);
 }
 
 void test_lcd_st7789(void)
 {
-    test_lcd_generic_mipi(lv_st7789_create, lv_st7789_set_gap, lv_st7789_set_invert, lv_st7789_set_gamma_curve,
+    test_lcd_generic_mipi(lv_st7789_create, lv_st7789_init, lv_st7789_set_gap, lv_st7789_set_invert,
+                          lv_st7789_set_gamma_curve,
                           lv_st7789_send_cmd_list);
 }
 
 void test_lcd_st7796(void)
 {
-    test_lcd_generic_mipi(lv_st7796_create, lv_st7796_set_gap, lv_st7796_set_invert, NULL,
+    test_lcd_generic_mipi(lv_st7796_create, lv_st7796_init, lv_st7796_set_gap, lv_st7796_set_invert, NULL,
                           lv_st7796_send_cmd_list);
 
 }
 
 void test_lcd_ili9341(void)
 {
-    test_lcd_generic_mipi(lv_ili9341_create, lv_ili9341_set_gap, lv_ili9341_set_invert, lv_ili9341_set_gamma_curve,
+    test_lcd_generic_mipi(lv_ili9341_create, lv_ili9341_init, lv_ili9341_set_gap, lv_ili9341_set_invert,
+                          lv_ili9341_set_gamma_curve,
                           lv_ili9341_send_cmd_list);
 }
 
@@ -228,6 +235,7 @@ static uint32_t lv_ft81x_encode_read_address(uint32_t address)
 static void lcd_ft81x_spi_cb(lv_display_t * disp, lv_ft81x_spi_operation_t operation, void * data, uint32_t length)
 {
     TEST_ASSERT_NOT_NULL(disp);
+    TEST_ASSERT_NOT_NULL(lv_display_get_user_data(disp));
 
     test_disp_resolution_with_rotation(disp);
 
@@ -289,15 +297,13 @@ void test_lcd_ft81x(void)
 
     uint32_t user_data = 0x1234;
 
-    lv_display_t * disp = lv_ft81x_create(
-                              &params,
-                              partial_buf->data,
-                              partial_buf->data_size,
-                              lcd_ft81x_spi_cb,
-                              &user_data);
+    lv_display_t * disp = lv_ft81x_create(&params, partial_buf->data, partial_buf->data_size);
     TEST_ASSERT_NOT_NULL(disp);
 
-    const uint32_t * user_data_ptr = lv_ft81x_get_user_data(disp);
+    lv_display_set_user_data(disp, &user_data);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_ft81x_init(disp, lcd_ft81x_spi_cb));
+
+    const uint32_t * user_data_ptr = lv_display_get_user_data(disp);
     TEST_ASSERT_EQUAL_PTR(user_data_ptr, &user_data);
     TEST_ASSERT_EQUAL_UINT32(*user_data_ptr, 0x1234);
 

@@ -38,8 +38,9 @@ extern "C" {
 
 void lv_draw_eve_init(void);
 
-void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_parameters_t * params,
-                                  lv_draw_eve_operation_cb_t op_cb);
+void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_parameters_t * params);
+
+void lv_draw_eve_set_operation_cb(lv_draw_eve_operation_cb_t op_cb);
 
 /**********************
  *      MACROS
