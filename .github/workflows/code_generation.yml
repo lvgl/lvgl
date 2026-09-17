@@ -56,7 +56,7 @@ jobs:
 
       - name: Install lv_font_conv
         env:
-          LV_FONT_CONV_REF: ed6084a0649046ba4061ef1f9312e13bdcfe6fbd
+          LV_FONT_CONV_REF: 2107ab79b615a6ff7051796fa9f7ae52f042437b
         run: |
           git clone https://github.com/lvgl/lv_font_conv.git "$RUNNER_TEMP/lv_font_conv"
           git -C "$RUNNER_TEMP/lv_font_conv" checkout "$LV_FONT_CONV_REF"
@@ -134,8 +134,8 @@ jobs:
         continue-on-error: true
         run: |
           python3 scripts/generators/built_in_font/generate_all.py
-          git add src/font
-          git diff --exit-code -- src/font \
+          git add -A -- src/font demos/benchmark/assets
+          git diff --cached --exit-code -- src/font demos/benchmark/assets \
           || (echo "::error::Generated built-in fonts are out of date. Run scripts/generators/built_in_font/generate_all.py and commit the result."; exit 1)
           git reset --hard
 
