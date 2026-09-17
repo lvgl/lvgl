@@ -752,12 +752,17 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    if(lv_indev_get_ccw(i)) {
-        lv_display_rotate_point_ccw(i->disp, &data->point);
-    }
-    else {
-        lv_display_rotate_point(i->disp, &data->point);
-    }
+    /* The point travels from the panel to the screen, the opposite way to the rendering*/
+    const lv_rotation_t inverse = lv_rotation_invert(lv_display_get_rotation(i->disp));
+
+    /* Handle the case where the indev rotation direction is ccw.
+     * This is a essentially a no-op in the default case*/
+    const lv_rotation_t rotation = lv_rotation_resolve(inverse, indev_rotation_dir(i));
+
+    const int32_t display_width = lv_display_get_original_horizontal_resolution(i->disp);
+    const int32_t display_height = lv_display_get_original_vertical_resolution(i->disp);
+
+    lv_point_rotate(&data->point, rotation, display_width, display_height);
 
     /*Simple sanity check*/
     if(data->point.x < 0) {
