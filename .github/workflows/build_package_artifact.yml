@@ -85,7 +85,7 @@ jobs:
             libdrm-dev libgbm-dev \
             libinput-dev libxkbcommon-dev libudev-dev libfreetype-dev \
             libpng-dev libjpeg-turbo8-dev libwebp-dev libevdev-dev
-          python3 -m pip install kconfiglib
+          python3 -m pip install --break-system-packages kconfiglib
 
       - name: Configure CMake
         run: |
