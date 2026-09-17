@@ -749,6 +749,12 @@ static void draw_buf_validate_vram(lv_draw_buf_t * buf)
         /* VRAM lost — free the stale descriptor via vram_free_cb
          * which NULLs buf->vram_res. */
         vr_unit->vram_free_cb(vr_unit, buf);
+
+        /* Without a CPU copy the content is gone for good. Mark the buffer
+         * clear-to-zero so the replacement backing starts out deterministic
+         * instead of exposing whatever the allocator hands back. A retained
+         * CPU copy is still valid and must not be flagged. */
+        if(buf->data == NULL) buf->header.flags |= LV_IMAGE_FLAGS_CLEARZERO;
     }
 }
 

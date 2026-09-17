@@ -1611,34 +1611,47 @@ void test_vram_copy_region_same_unit(void)
     lv_draw_buf_destroy(src);
 }
 
-/** A copy must not go through VRAM handles the unit has already lost */
+/** A copy must not go through VRAM handles the unit has already lost. The lost content is
+ *  replaced by zeros, so the result is deterministic even for a format LVGL does not clear
+ *  on allocation otherwise. */
 void test_vram_copy_skips_lost_vram(void)
 {
-    lv_draw_buf_t * src = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
-    lv_draw_buf_t * dest = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * src = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_RGB565, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_RGB565, 0);
     TEST_ASSERT_NOT_NULL(src);
     TEST_ASSERT_NOT_NULL(dest);
+    lv_draw_buf_ensure_resident(src, NULL);
+    fill_pattern(src, 0xAB);
     lv_draw_buf_ensure_resident(src, &s_fake_unit_a);
     lv_draw_buf_ensure_resident(dest, &s_fake_unit_a);
+    TEST_ASSERT_NULL(src->data);
 
     invalidate_vram(src);
     lv_draw_buf_copy(dest, NULL, src, NULL);
 
     TEST_ASSERT_EQUAL_INT(0, s_stats_a.copy_count);
-    TEST_ASSERT_NOT_NULL(dest->data);
-    TEST_ASSERT_NOT_NULL(src->data);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.download_count);
     TEST_ASSERT_NULL(src->vram_res);
+    TEST_ASSERT_NOT_NULL(src->data);
+    TEST_ASSERT_NOT_NULL(dest->data);
+    TEST_ASSERT_EACH_EQUAL_HEX8(0x00, src->data, src->header.stride * src->header.h);
+    TEST_ASSERT_EACH_EQUAL_HEX8(0x00, dest->data, dest->header.stride * dest->header.h);
+    TEST_ASSERT_FALSE(lv_draw_buf_has_flag(src, LV_IMAGE_FLAGS_CLEARZERO));
 
     lv_draw_buf_destroy(dest);
     lv_draw_buf_destroy(src);
 }
 
-/** A duplicate must not go through a VRAM handle the unit has already lost */
+/** A duplicate must not go through a VRAM handle the unit has already lost, and it
+ *  duplicates the zeroed replacement content */
 void test_vram_dup_skips_lost_vram(void)
 {
-    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_RGB565, 0);
     TEST_ASSERT_NOT_NULL(buf);
+    lv_draw_buf_ensure_resident(buf, NULL);
+    fill_pattern(buf, 0xCD);
     lv_draw_buf_ensure_resident(buf, &s_fake_unit_a);
+    TEST_ASSERT_NULL(buf->data);
 
     invalidate_vram(buf);
     lv_draw_buf_t * dup = lv_draw_buf_dup(buf);
@@ -1646,10 +1659,30 @@ void test_vram_dup_skips_lost_vram(void)
 
     TEST_ASSERT_EQUAL_INT(0, s_stats_a.dup_count);
     TEST_ASSERT_EQUAL_INT(0, s_stats_a.download_count);
+    TEST_ASSERT_NOT_NULL(buf->data);
     TEST_ASSERT_NOT_NULL(dup->data);
+    TEST_ASSERT_EACH_EQUAL_HEX8(0x00, buf->data, buf->header.stride * buf->header.h);
+    TEST_ASSERT_EACH_EQUAL_HEX8(0x00, dup->data, dup->header.stride * dup->header.h);
 
     lv_draw_buf_destroy(dup);
     lv_draw_buf_destroy(buf);
+}
+
+/** A caller-owned buffer keeps its valid CPU pixels when only the VRAM copy is lost */
+void test_vram_lost_vram_keeps_cpu_copy(void)
+{
+    LV_DRAW_BUF_DEFINE_STATIC(sbuf, 10, 10, LV_COLOR_FORMAT_RGB565);
+    LV_DRAW_BUF_INIT_STATIC(sbuf);
+    fill_pattern(&sbuf, 0x5A);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(&sbuf, &s_fake_unit_a));
+    TEST_ASSERT_NOT_NULL(sbuf.data);
+
+    invalidate_vram(&sbuf);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(&sbuf, NULL));
+
+    TEST_ASSERT_NULL(sbuf.vram_res);
+    TEST_ASSERT_FALSE(lv_draw_buf_has_flag(&sbuf, LV_IMAGE_FLAGS_CLEARZERO));
+    TEST_ASSERT_EACH_EQUAL_HEX8(0x5A, sbuf.data, sbuf.header.stride * sbuf.header.h);
 }
 
 /** Alpha format lazy alloc to CPU is zero-filled */
