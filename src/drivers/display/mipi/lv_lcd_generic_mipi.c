@@ -69,16 +69,32 @@ lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res)
     return disp;
 }
 
-lv_result_t lv_lcd_generic_mipi_init(lv_display_t * disp, lv_lcd_flag_t flags, lv_lcd_send_cmd_cb_t send_cmd_cb,
-                                     lv_lcd_send_color_cb_t send_color_cb)
+void lv_lcd_generic_mipi_set_send_cmd_cb(lv_display_t * disp, lv_lcd_send_cmd_cb_t send_cmd_cb)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(send_cmd_cb != NULL, return);
+
+    get_driver(disp)->send_cmd = send_cmd_cb;
+}
+
+void lv_lcd_generic_mipi_set_send_color_cb(lv_display_t * disp, lv_lcd_send_color_cb_t send_color_cb)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(send_color_cb != NULL, return);
+
+    get_driver(disp)->send_color = send_color_cb;
+}
+
+lv_result_t lv_lcd_generic_mipi_init(lv_display_t * disp, lv_lcd_flag_t flags)
 {
     LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(send_cmd_cb != NULL, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(send_color_cb != NULL, return LV_RESULT_INVALID);
 
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
-    drv->send_cmd = send_cmd_cb;
-    drv->send_color = send_color_cb;
+    if(drv->send_cmd == NULL || drv->send_color == NULL) {
+        LV_LOG_ERROR("lv_lcd_generic_mipi_set_send_cmd_cb() and lv_lcd_generic_mipi_set_send_color_cb() "
+                     "must be called before init");
+        return LV_RESULT_INVALID;
+    }
 
     /* init controller */
     init(drv, flags);

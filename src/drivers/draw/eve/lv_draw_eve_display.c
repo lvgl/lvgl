@@ -65,12 +65,22 @@ lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * param
     return disp;
 }
 
-lv_result_t lv_draw_eve_display_init(lv_display_t * disp, lv_draw_eve_operation_cb_t op_cb)
+void lv_draw_eve_display_set_operation_cb(lv_display_t * disp, lv_draw_eve_operation_cb_t op_cb)
 {
-    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(op_cb != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(op_cb != NULL, return);
 
     lv_draw_eve_set_operation_cb(op_cb);
+}
+
+lv_result_t lv_draw_eve_display_init(lv_display_t * disp)
+{
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+
+    if(lv_draw_eve_get_operation_cb() == NULL) {
+        LV_LOG_ERROR("lv_draw_eve_display_set_operation_cb() must be called before init");
+        return LV_RESULT_INVALID;
+    }
 
     if(EVE_init() != E_OK) {
         LV_LOG_WARN("EVE_init failed.");

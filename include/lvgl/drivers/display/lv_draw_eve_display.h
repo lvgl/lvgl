@@ -41,14 +41,21 @@ extern "C" {
 lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * params);
 
 /**
- * Initialize the EVE chip of a display created with `lv_draw_eve_display_create()`.
- * The display is not flushed before this function returns.
+ * Set the function that performs the pin and SPI IO operations. Required before init.
  * @param disp        the EVE display
  * @param op_cb       A callback that will be called to perform pin and SPI IO operations with the EVE
  *                    chip. Use `lv_display_get_user_data()` to reach your own context inside it.
+ */
+void lv_draw_eve_display_set_operation_cb(lv_display_t * disp, lv_draw_eve_operation_cb_t op_cb);
+
+/**
+ * Initialize the EVE chip of a display created with `lv_draw_eve_display_create()`.
+ * Fails if the operation callback has not been set.
+ * The display is not flushed before this function returns.
+ * @param disp        the EVE display
  * @return            LV_RESULT_OK on success
  */
-lv_result_t lv_draw_eve_display_init(lv_display_t * disp, lv_draw_eve_operation_cb_t op_cb);
+lv_result_t lv_draw_eve_display_init(lv_display_t * disp);
 
 /**
  * Create a touchscreen indev for the EVE display.

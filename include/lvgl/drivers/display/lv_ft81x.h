@@ -74,14 +74,21 @@ typedef void (*lv_ft81x_spi_cb_t)(lv_display_t * disp, lv_ft81x_spi_operation_t 
 lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size);
 
 /**
- * Initialize the ft81x chip of a display created with `lv_ft81x_create()`.
- * The display is not flushed before this function returns.
+ * Set the function that performs the SPI operations. Required before init.
  * @param disp      pointer to the ft81x display
  * @param spi_cb    a callback called by the driver to perform SPI operations. Use
  *                  `lv_display_get_user_data()` to reach your own context inside it.
+ */
+void lv_ft81x_set_spi_cb(lv_display_t * disp, lv_ft81x_spi_cb_t spi_cb);
+
+/**
+ * Initialize the ft81x chip of a display created with `lv_ft81x_create()`.
+ * Fails if the SPI callback has not been set.
+ * The display is not flushed before this function returns.
+ * @param disp      pointer to the ft81x display
  * @return          LV_RESULT_OK on success
  */
-lv_result_t lv_ft81x_init(lv_display_t * disp, lv_ft81x_spi_cb_t spi_cb);
+lv_result_t lv_ft81x_init(lv_display_t * disp);
 
 /**********************
  *      MACROS

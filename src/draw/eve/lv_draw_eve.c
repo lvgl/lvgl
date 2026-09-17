@@ -90,6 +90,11 @@ void lv_draw_eve_set_operation_cb(lv_draw_eve_operation_cb_t op_cb)
     lv_draw_eve_unit_g->op_cb = op_cb;
 }
 
+lv_draw_eve_operation_cb_t lv_draw_eve_get_operation_cb(void)
+{
+    return lv_draw_eve_unit_g == NULL ? NULL : lv_draw_eve_unit_g->op_cb;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

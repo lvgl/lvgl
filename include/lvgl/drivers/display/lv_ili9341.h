@@ -46,16 +46,15 @@ typedef lv_lcd_send_color_cb_t lv_ili9341_send_color_cb_t;
 lv_display_t * lv_ili9341_create(uint32_t hor_res, uint32_t ver_res);
 
 /**
- * Initialize the ILI9341 controller of a display created with `lv_ili9341_create()`.
+ * Initialize the ILI9341 controller of a display created with `lv_ili9341_create()`. Set the
+ * callbacks with `lv_lcd_generic_mipi_set_send_cmd_cb()` and
+ * `lv_lcd_generic_mipi_set_send_color_cb()` first; this function fails without them.
  * The display is not flushed before this function returns.
  * @param disp          display object
  * @param flags         default configuration settings (mirror, RGB ordering, etc.)
- * @param send_cmd_cb   platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
- * @param send_color_cb platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
  * @return              LV_RESULT_OK on success
  */
-lv_result_t lv_ili9341_init(lv_display_t * disp, lv_lcd_flag_t flags,
-                            lv_ili9341_send_cmd_cb_t send_cmd_cb, lv_ili9341_send_color_cb_t send_color_cb);
+lv_result_t lv_ili9341_init(lv_display_t * disp, lv_lcd_flag_t flags);
 
 /**
  * Set gap, i.e., the offset of the (0,0) pixel in the VRAM
