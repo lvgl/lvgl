@@ -1630,7 +1630,8 @@ void test_vram_copy_skips_lost_vram(void)
     lv_draw_buf_copy(dest, NULL, src, NULL);
 
     TEST_ASSERT_EQUAL_INT(0, s_stats_a.copy_count);
-    TEST_ASSERT_EQUAL_INT(0, s_stats_a.download_count);
+    /*Only the destination is downloaded: its VRAM content is still valid, the source's is gone*/
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.download_count);
     TEST_ASSERT_NULL(src->vram_res);
     TEST_ASSERT_NOT_NULL(src->data);
     TEST_ASSERT_NOT_NULL(dest->data);
