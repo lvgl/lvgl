@@ -12,6 +12,12 @@ extern "C" {
 
 #include "../core/lv_area.h"
 
+/* `display` is evaluated more than once, don't pass an expression with side effects*/
+#define lv_display_rotate_point_ccw(display, point)                            \
+    lv_point_rotate(point, lv_display_get_rotation(display),                   \
+                    lv_display_get_original_horizontal_resolution(display),    \
+                    lv_display_get_original_vertical_resolution(display))
+
 #define LV_DISPLAY_ROTATION_0   LV_ROTATION_0
 #define LV_DISPLAY_ROTATION_90  LV_ROTATION_90
 #define LV_DISPLAY_ROTATION_180 LV_ROTATION_180
