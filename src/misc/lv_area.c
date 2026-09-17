@@ -608,6 +608,20 @@ void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_precise_t * p2)
     *p2 = tmp;
 }
 
+lv_rotation_t lv_rotation_resolve(lv_rotation_t rotation, lv_rotation_dir_t direction)
+{
+    if(direction == LV_ROTATION_DIR_CW) {
+        return rotation;
+    }
+    if(rotation == LV_ROTATION_90) {
+        return LV_ROTATION_270;
+    }
+    if(rotation == LV_ROTATION_270) {
+        return LV_ROTATION_90;
+    }
+    return rotation;
+}
+
 void lv_point_rotate(lv_point_t * point, lv_rotation_t rotation, int32_t width, int32_t height)
 {
     LV_CHECK_ARG(point != NULL, return);

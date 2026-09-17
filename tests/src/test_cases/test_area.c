@@ -665,4 +665,16 @@ void test_point_rotate_corners(void)
     }
 }
 
+void test_rotation_resolve(void)
+{
+    TEST_ASSERT_EQUAL(LV_ROTATION_0, lv_rotation_resolve(LV_ROTATION_0, LV_ROTATION_DIR_CW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_90, lv_rotation_resolve(LV_ROTATION_90, LV_ROTATION_DIR_CW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_180, lv_rotation_resolve(LV_ROTATION_180, LV_ROTATION_DIR_CW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_270, lv_rotation_resolve(LV_ROTATION_270, LV_ROTATION_DIR_CW));
+
+    TEST_ASSERT_EQUAL(LV_ROTATION_0, lv_rotation_resolve(LV_ROTATION_0, LV_ROTATION_DIR_CCW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_270, lv_rotation_resolve(LV_ROTATION_90, LV_ROTATION_DIR_CCW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_180, lv_rotation_resolve(LV_ROTATION_180, LV_ROTATION_DIR_CCW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_90, lv_rotation_resolve(LV_ROTATION_270, LV_ROTATION_DIR_CCW));
+}
 #endif

@@ -215,6 +215,16 @@ void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_precise_t * p2);
  */
 void lv_point_rotate(lv_point_t * point, lv_rotation_t rotation, int32_t width, int32_t height);
 
+/**
+ * Resolve a rotation and direction pair into a single rotation expressed in
+ * LVGL's default rotation direction.
+ *
+ * @param rotation   the base rotation see @ref lv_rotation_t
+ * @param direction  the direction of the rotation see @ref lv_rotation_dir_t
+ * @return           the equivalent rotation in the default direction
+ */
+lv_rotation_t lv_rotation_resolve(lv_rotation_t rotation, lv_rotation_dir_t direction);
+
 /**********************
  *      MACROS
  **********************/
