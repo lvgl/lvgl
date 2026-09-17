@@ -4419,34 +4419,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_FILE_EXPLORER
-    #ifdef CONFIG_LV_USE_FILE_EXPLORER
-        #define LV_USE_FILE_EXPLORER CONFIG_LV_USE_FILE_EXPLORER
-    #else
-        #define LV_USE_FILE_EXPLORER 0
-    #endif
-#endif
-
-#ifndef LV_FILE_EXPLORER_PATH_MAX_LEN
-    #ifdef CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
-        #define LV_FILE_EXPLORER_PATH_MAX_LEN CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
-    #else
-        #define LV_FILE_EXPLORER_PATH_MAX_LEN 128
-    #endif
-#endif
-
-#ifndef LV_FILE_EXPLORER_QUICK_ACCESS
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
-            #define LV_FILE_EXPLORER_QUICK_ACCESS CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
-        #else
-            #define LV_FILE_EXPLORER_QUICK_ACCESS 0
-        #endif
-    #else
-          #define LV_FILE_EXPLORER_QUICK_ACCESS LV_USE_FILE_EXPLORER
-    #endif
-#endif
-
 
 
 /*============================================================================
@@ -5486,10 +5458,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_LOTTIE && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG)
     #error "LV_USE_LOTTIE requires LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG (Kconfig depends on)"
-#endif
-
-#if (LV_USE_FILE_EXPLORER) && !LV_USE_TABLE
-    #error "LV_USE_TABLE must be enabled: Kconfig selects it from LV_USE_FILE_EXPLORER"
 #endif
 
 #if LV_LINUX_FBDEV_BSD && !(LV_USE_LINUX_FBDEV)

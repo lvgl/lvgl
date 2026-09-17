@@ -194,7 +194,6 @@
 #include "osal/lv_rtthread.h"
 #include "osal/lv_sdl2.h"
 #include "osal/lv_windows.h"
-#include "others/file_explorer/lv_file_explorer_private.h"
 #include "others/fragment/lv_fragment_private.h"
 #include "others/translation/lv_translation_private.h"
 #include "stdlib/builtin/lv_tlsf.h"

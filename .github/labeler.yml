@@ -680,15 +680,6 @@ frogfs:
           - 'src/fs/lv_fs_frogfs.c'
           - 'docs/src/libs/fs_support/frogfs.mdx'
 
-file_explorer:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'include/lvgl/others/file_explorer/**'
-          - 'src/others/file_explorer/**'
-          - 'docs/src/auxiliary-modules/file_explorer.mdx'
-          - 'examples/others/file_explorer/**'
-          - 'tests/src/test_cases/test_file_explorer.c'
-
 fragment:
   - changed-files:
       - any-glob-to-any-file:
