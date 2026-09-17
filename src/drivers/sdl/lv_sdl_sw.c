@@ -305,9 +305,9 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
         int32_t fb_stride = lv_draw_buf_width_to_stride(display->hor_res, cf);
         uint8_t * fb_start = ddata->fb_act;
         fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
-        lv_display_rotation_t rotation = lv_display_get_rotation(display);
+        lv_rotation_t rotation = lv_display_get_rotation(display);
 
-        if(rotation == LV_DISPLAY_ROTATION_0) {
+        if(rotation == LV_ROTATION_0) {
             uint32_t px_map_line_bytes = lv_area_get_width(area) * px_size;
 
             int32_t y;

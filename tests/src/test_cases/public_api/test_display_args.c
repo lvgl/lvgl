@@ -31,7 +31,7 @@ void test_display_args_resolution_without_default_display(void)
     TEST_ASSERT_EQUAL_INT32(0, lv_display_get_physical_vertical_resolution(lv_display_get_default()));
     TEST_ASSERT_EQUAL_INT32(0, lv_display_get_offset_x(lv_display_get_default()));
     TEST_ASSERT_EQUAL_INT32(0, lv_display_get_offset_y(lv_display_get_default()));
-    TEST_ASSERT_EQUAL(LV_DISPLAY_ROTATION_0, lv_display_get_rotation(lv_display_get_default()));
+    TEST_ASSERT_EQUAL(LV_ROTATION_0, lv_display_get_rotation(lv_display_get_default()));
 }
 
 void test_display_args_dpi_tile_cnt_antialiasing_without_default_display(void)

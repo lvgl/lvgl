@@ -318,10 +318,10 @@ void test_display_event_resolution_changed(void)
     lv_display_set_resolution(test_disp, TEST_DISP_HOR_RES * 2, TEST_DISP_VER_RES * 2);
     TEST_ASSERT_EQUAL_UINT32(1, call_cnt);
 
-    lv_display_set_rotation(test_disp, LV_DISPLAY_ROTATION_90);
+    lv_display_set_rotation(test_disp, LV_ROTATION_90);
     TEST_ASSERT_EQUAL_UINT32(2, call_cnt);
 
-    lv_display_set_rotation(test_disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(test_disp, LV_ROTATION_0);
     TEST_ASSERT_EQUAL_UINT32(3, call_cnt);
 }
 

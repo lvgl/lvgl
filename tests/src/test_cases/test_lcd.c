@@ -35,14 +35,14 @@ static void test_disp_resolution_with_rotation(lv_display_t * disp)
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
 
     switch(lv_display_get_rotation(disp)) {
-        case LV_DISPLAY_ROTATION_0:
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_0:
+        case LV_ROTATION_180:
             TEST_ASSERT_EQUAL_INT32(hor_res, TEST_LCD_WIDTH);
             TEST_ASSERT_EQUAL_INT32(ver_res, TEST_LCD_HEIGHT);
             break;
 
-        case LV_DISPLAY_ROTATION_90:
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_90:
+        case LV_ROTATION_270:
             TEST_ASSERT_EQUAL_INT32(hor_res, TEST_LCD_HEIGHT);
             TEST_ASSERT_EQUAL_INT32(ver_res, TEST_LCD_WIDTH);
             break;
@@ -86,11 +86,11 @@ static void lcd_send_color_cb(lv_display_t * disp, const uint8_t * cmd, size_t c
 
 static void test_disp_full_rotation(lv_display_t * disp)
 {
-    static const lv_display_rotation_t rotations[] = {
-        LV_DISPLAY_ROTATION_0,
-        LV_DISPLAY_ROTATION_90,
-        LV_DISPLAY_ROTATION_180,
-        LV_DISPLAY_ROTATION_270,
+    static const lv_rotation_t rotations[] = {
+        LV_ROTATION_0,
+        LV_ROTATION_90,
+        LV_ROTATION_180,
+        LV_ROTATION_270,
     };
 
     for(size_t i = 0; i < sizeof(rotations) / sizeof(rotations[0]); i++) {

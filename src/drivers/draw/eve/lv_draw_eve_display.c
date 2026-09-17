@@ -230,23 +230,21 @@ static void resolution_changed_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_target(e);
 
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-    uint32_t cmd_value;
+    lv_rotation_t rotation = lv_display_get_rotation(disp);
+    uint32_t cmd_value = 0;
     switch(rotation) {
-        case LV_DISPLAY_ROTATION_0:
+        case LV_ROTATION_0:
             cmd_value = 0;
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             cmd_value = 2;
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             cmd_value = 1;
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             cmd_value = 3;
             break;
-        default:
-            return;
     }
 
     /* no need to rotate the touch coordinates with CMD_SETROTATE, as LVGL

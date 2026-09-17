@@ -77,11 +77,11 @@ Partial mode can be activated via the macro in the `src/board_init.c` file of th
 Software based screen rotation is supported in partial mode. It uses the common API, no extra configuration is required:
 
 ```c
-lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_90);
+lv_display_set_rotation(lv_display_get_default(), LV_ROTATION_90);
 /* OR */
-lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_180);
+lv_display_set_rotation(lv_display_get_default(), LV_ROTATION_180);
 /* OR */
-lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_270);
+lv_display_set_rotation(lv_display_get_default(), LV_ROTATION_270);
 ```
 
 Make sure the heap is large enough, as a buffer with the same size as the partial buffer will be allocated.

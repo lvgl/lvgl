@@ -89,20 +89,20 @@ static void resolution_changed_event_cb(lv_event_t * e)
     lv_tft_espi_t * dsc = (lv_tft_espi_t *)lv_display_get_driver_data(disp);
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
-    lv_display_rotation_t rot = lv_display_get_rotation(disp);
+    lv_rotation_t rot = lv_display_get_rotation(disp);
 
     /* handle rotation */
     switch(rot) {
-        case LV_DISPLAY_ROTATION_0:
+        case LV_ROTATION_0:
             dsc->tft->setRotation(0);   /* Portrait orientation */
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             dsc->tft->setRotation(1);   /* Landscape orientation */
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             dsc->tft->setRotation(2);   /* Portrait orientation, flipped */
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             dsc->tft->setRotation(3);   /* Landscape orientation, flipped */
             break;
     }
