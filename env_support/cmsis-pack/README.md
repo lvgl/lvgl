@@ -43,7 +43,6 @@ remove the misleading guide above this code segment.
 
    - LV_USE_IME_PINYIN
    - LV_USE_OS
-   - LV_USE_FILE_EXPLORER
    - LV_USE_DEMO_WIDGETS
    - LV_USE_DEMO_KEYPAD_AND_ENCODER
    - LV_USE_DEMO_BENCHMARK

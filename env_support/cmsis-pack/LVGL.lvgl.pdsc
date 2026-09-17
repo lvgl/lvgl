@@ -2563,22 +2563,6 @@
 
             </component>
 
-            <component Cgroup="Libraries and Others" Csub="File Explorer"  condition="LVGL-Essential">
-              <description>Add a file explorer</description>
-              <files>
-                <!-- src/others/file_explorer -->
-                <file category="sourceC"    name="src/others/file_explorer/lv_file_explorer.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable file explorer support */
-#define LV_USE_FILE_EXPLORER         1
-              </RTE_Components_h>
-
-            </component>
-
-
             <component Cgroup="Libraries and Others" Csub="Translation"  condition="LVGL-Essential">
               <description>Text translation support</description>
               <files>
