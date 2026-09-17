@@ -1669,6 +1669,31 @@ void test_vram_dup_skips_lost_vram(void)
     lv_draw_buf_destroy(buf);
 }
 
+/** A reloadable (cache-backed) buffer that lost its VRAM is not replaced with fabricated
+ *  content: residency fails so the producer re-decodes it on the next open */
+void test_vram_lost_vram_reloadable_is_not_replaced(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_RGB565, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_draw_buf_set_flag(buf, LV_IMAGE_FLAGS_RELOADABLE);
+    lv_draw_buf_ensure_resident(buf, NULL);
+    fill_pattern(buf, 0x3C);
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, &s_fake_unit_a));
+    TEST_ASSERT_NULL(buf->data);
+
+    invalidate_vram(buf);
+
+    TEST_ASSERT_FALSE(lv_draw_buf_ensure_resident(buf, &s_fake_unit_a));
+    TEST_ASSERT_NULL(buf->vram_res);
+    TEST_ASSERT_NULL(buf->data);
+    TEST_ASSERT_FALSE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_CLEARZERO));
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.alloc_count);
+    TEST_ASSERT_FALSE(lv_draw_buf_ensure_resident(buf, NULL));
+    TEST_ASSERT_NULL(buf->data);
+
+    lv_draw_buf_destroy(buf);
+}
+
 /** A caller-owned buffer keeps its valid CPU pixels when only the VRAM copy is lost */
 void test_vram_lost_vram_keeps_cpu_copy(void)
 {
