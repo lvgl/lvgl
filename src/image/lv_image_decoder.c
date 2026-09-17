@@ -550,11 +550,18 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 #if LV_USE_DRAW_VRAM
         /* Validate VRAM backing. If the GPU reclaimed or another consumer
          * stole the allocation, drop this stale cache entry and fall
-         * through to a fresh decode. */
-        if(cached_data->decoded != NULL && cached_data->decoded->vram_res != NULL) {
-            lv_draw_unit_t * vr_unit = cached_data->decoded->vram_res->unit;
-            if(vr_unit != NULL
-               && !vr_unit->vram_check_cb(vr_unit, cached_data->decoded)) {
+         * through to a fresh decode. A residency check may already have
+         * freed the lost handle, leaving the entry with no backing at all. */
+        if(cached_data->decoded != NULL) {
+            bool lost = false;
+            if(cached_data->decoded->vram_res != NULL) {
+                lv_draw_unit_t * vr_unit = cached_data->decoded->vram_res->unit;
+                lost = vr_unit != NULL && !vr_unit->vram_check_cb(vr_unit, cached_data->decoded);
+            }
+            else if(cached_data->decoded->data == NULL) {
+                lost = true;
+            }
+            if(lost) {
                 lv_cache_release(cache, entry, NULL);
                 lv_cache_drop(cache, &search_key, NULL);
                 LV_LOG_INFO("Decoder cache: VRAM lost, dropping entry");

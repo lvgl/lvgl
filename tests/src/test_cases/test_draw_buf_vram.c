@@ -1675,9 +1675,10 @@ void test_vram_lost_vram_reloadable_is_not_replaced(void)
 {
     lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_RGB565, 0);
     TEST_ASSERT_NOT_NULL(buf);
-    lv_draw_buf_set_flag(buf, LV_IMAGE_FLAGS_RELOADABLE);
     lv_draw_buf_ensure_resident(buf, NULL);
     fill_pattern(buf, 0x3C);
+    /*Producers mark a buffer reloadable once it holds content, as the image cache does*/
+    lv_draw_buf_set_flag(buf, LV_IMAGE_FLAGS_RELOADABLE);
     TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, &s_fake_unit_a));
     TEST_ASSERT_NULL(buf->data);
 
@@ -1692,6 +1693,36 @@ void test_vram_lost_vram_reloadable_is_not_replaced(void)
     TEST_ASSERT_NULL(buf->data);
 
     lv_draw_buf_destroy(buf);
+}
+
+/** Through the decoder cache: a cached image that lost its VRAM is skipped once and
+ *  re-decoded on the next open instead of being drawn from fabricated content */
+void test_vram_cache_reloads_image_that_lost_vram(void)
+{
+    const char * src = "A:src/test_assets/test_img_lvgl_logo.png";
+    lv_image_cache_drop(src);
+
+    lv_image_decoder_dsc_t dsc;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&dsc, src, NULL));
+    lv_draw_buf_t * decoded = (lv_draw_buf_t *)dsc.decoded;
+    TEST_ASSERT_NOT_NULL(decoded);
+    TEST_ASSERT_TRUE(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_RELOADABLE));
+    TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(decoded, &s_fake_unit_a));
+    TEST_ASSERT_NULL(decoded->data);
+
+    invalidate_vram(decoded);
+    /*The draw that detects the loss is refused rather than given empty content*/
+    TEST_ASSERT_FALSE(lv_draw_buf_ensure_resident(decoded, &s_fake_unit_a));
+    TEST_ASSERT_NULL(decoded->vram_res);
+    lv_image_decoder_close(&dsc);
+
+    /*The next open drops the dead entry and decodes the image again*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&dsc, src, NULL));
+    TEST_ASSERT_NOT_NULL(dsc.decoded);
+    TEST_ASSERT_NOT_NULL(dsc.decoded->data);
+    TEST_ASSERT_TRUE(dsc.decoded != decoded);
+    lv_image_decoder_close(&dsc);
+    lv_image_cache_drop(src);
 }
 
 /** A caller-owned buffer keeps its valid CPU pixels when only the VRAM copy is lost */
