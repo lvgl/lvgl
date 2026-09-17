@@ -105,8 +105,11 @@ static void _pxp_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
     if(!lv_area_intersect(&src_area, &rel_clip_area, &rel_img_coords))
         return;
 
-    int32_t src_stride = draw_dsc->header.stride;
-    lv_color_format_t src_cf = draw_dsc->header.cf;
+    int32_t src_stride = decoded->header.stride;
+    lv_color_format_t src_cf = decoded->header.cf;
+
+    lv_area_t rel_dest_area = *clipped_img_area;
+    lv_area_move(&rel_dest_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     uint8_t * dest_buf = draw_buf->data;
     int32_t dest_stride = draw_buf->header.stride;
@@ -116,13 +119,13 @@ static void _pxp_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
                           draw_dsc->scale_y != LV_SCALE_NONE);
 
     if(has_recolor && !has_transform)
-        _pxp_blit_recolor(dest_buf, clipped_img_area, dest_stride, dest_cf,
+        _pxp_blit_recolor(dest_buf, &rel_dest_area, dest_stride, dest_cf,
                           src_buf, &src_area, src_stride, src_cf, draw_dsc);
     else if(has_transform)
-        _pxp_blit_transform(dest_buf, clipped_img_area, dest_stride, dest_cf,
+        _pxp_blit_transform(dest_buf, &rel_dest_area, dest_stride, dest_cf,
                             src_buf, &src_area, src_stride, src_cf, draw_dsc);
     else
-        _pxp_blit(dest_buf, clipped_img_area, dest_stride, dest_cf,
+        _pxp_blit(dest_buf, &rel_dest_area, dest_stride, dest_cf,
                   src_buf, &src_area, src_stride, src_cf, draw_dsc->opa);
 }
 

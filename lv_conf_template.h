@@ -487,6 +487,12 @@
 
 #endif /*LV_USE_NEMA_GFX*/
 
+/** Use LV_USE_DRAW_PXP instead.
+ *
+ *  Enable: LV_USE_DRAW_PXP
+ */
+#define LV_USE_PXP 0
+
 /** Accelerate blends, fills and transforms with the PXP (Pixel Pipeline)
  *  engine of NXP i.MX RT SoCs.
  */
@@ -588,6 +594,12 @@
 #define LV_USE_DRAW_EVE5 0
 
 #endif /*LV_USE_EVE5*/
+
+/** Use LV_USE_DRAW_G2D instead.
+ *
+ *  Enable: LV_USE_DRAW_G2D
+ */
+#define LV_USE_G2D 0
 
 /** Accelerate blends, fills and image blits with the NXP G2D API (i.MX 2D GPU).
  *  Requires the g2d library and its headers.
