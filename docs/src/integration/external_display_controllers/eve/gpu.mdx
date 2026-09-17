@@ -122,7 +122,7 @@ powers up and configures EVE. `op_cb` is set in between with
 
 ```c
 lv_display_t * disp = lv_draw_eve_display_create(&params);
-lv_display_set_user_data(disp, your_user_data);   /* optional */
+lv_display_set_user_data(disp, your_user_data);   /* optional, can be used in for operation_cb */
 lv_draw_eve_display_set_operation_cb(disp, op_cb);
 if(lv_draw_eve_display_init(disp) != LV_RESULT_OK) {
     /* EVE did not come up */
