@@ -70,8 +70,11 @@ void lv_port_display_init(void)
      * `lcd_send_cmd` and `lcd_send_color` callbacks need - e.g. `lv_display_set_user_data()` -
      * must be set in between. */
     lcd_disp = lv_st7789_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
-    if(lv_st7789_init(lcd_disp, LV_LCD_FLAG_NONE, lcd_send_cmd, lcd_send_color) != LV_RESULT_OK)
+    if(lv_st7789_init(lcd_disp, LV_LCD_FLAG_NONE, lcd_send_cmd, lcd_send_color) != LV_RESULT_OK) {
+        lv_display_delete(lcd_disp);
+        lcd_disp = NULL;
         return;
+    }
 
     lv_display_set_rotation(lcd_disp, LV_DISPLAY_ROTATION_270);     /* set landscape orientation */
 

@@ -97,7 +97,7 @@ lv_color_t *buf1 = malloc(buf_size);
 lv_color_t *buf2 = malloc(buf_size);
 assert(buf1 != NULL && buf2 != NULL);
 lv_display_t *const disp = lv_st7735_create(128, 160);
-lv_st7735_init(disp, LV_LCD_FLAG_NONE, my_lcd_send_cmd, my_lcd_send_color);
+assert(lv_st7735_init(disp, LV_LCD_FLAG_NONE, my_lcd_send_cmd, my_lcd_send_color) == LV_RESULT_OK);
 lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
 lv_display_set_buffers(disp, buf1, buf2, buf_size,
         LV_DISPLAY_RENDER_MODE_PARTIAL);

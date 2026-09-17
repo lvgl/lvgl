@@ -31,6 +31,7 @@
  **********************/
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
+static void apply_rotation(lv_display_t * disp);
 static void resolution_changed_cb(lv_event_t * e);
 static void render_start_cb(lv_event_t * e);
 static void render_ready_cb(lv_event_t * e);
@@ -58,9 +59,6 @@ lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * param
     lv_display_set_buffers(disp, &dummy_buf, NULL,
                            params->hor_res * params->ver_res * LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_DEFAULT),
                            LV_DISPLAY_RENDER_MODE_FULL); /* recreate the full display list each refresh */
-    lv_display_add_event_cb(disp, resolution_changed_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
-    lv_display_add_event_cb(disp, render_start_cb, LV_EVENT_RENDER_START, NULL);
-    lv_display_add_event_cb(disp, render_ready_cb, LV_EVENT_RENDER_READY, NULL);
 
     lv_draw_eve_set_display_data(disp, params);
 
@@ -80,8 +78,14 @@ lv_result_t lv_draw_eve_display_init(lv_display_t * disp, lv_draw_eve_operation_
     }
     EVE_memWrite8(REG_PWM_DUTY, EVE_BACKLIGHT_PWM); /* 0 = off, 0x80 = max */
 
-    /* registered last: until the chip is initialized the display must not be flushed */
+    /* registered here, not in create: all of these reach the chip through op_cb */
+    lv_display_add_event_cb(disp, resolution_changed_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
+    lv_display_add_event_cb(disp, render_start_cb, LV_EVENT_RENDER_START, NULL);
+    lv_display_add_event_cb(disp, render_ready_cb, LV_EVENT_RENDER_READY, NULL);
     lv_display_set_flush_cb(disp, flush_cb);
+
+    /* a rotation set between create and init never raised an event, so apply it now */
+    apply_rotation(disp);
 
     return LV_RESULT_OK;
 }
@@ -235,8 +239,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
 static void resolution_changed_cb(lv_event_t * e)
 {
-    lv_display_t * disp = lv_event_get_target(e);
+    apply_rotation(lv_event_get_target(e));
+}
 
+static void apply_rotation(lv_display_t * disp)
+{
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
     uint32_t cmd_value;
     switch(rotation) {
