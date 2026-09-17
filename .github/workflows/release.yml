@@ -17,6 +17,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+
+      - name: Get version
+        id: get_version
+        run: |
+          VERSION=$(./scripts/find_version.sh)
+          echo "Detected version: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -26,7 +34,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            See the [CHANGELOG](https://github.com/lvgl/lvgl/blob/master/docs/CHANGELOG.rst)
+            See the [CHANGELOG](https://lvgl.io/docs/open/${{ steps.get_version.outputs.version }}/changelog/CHANGELOG)
           draft: false
           prerelease: false
 
