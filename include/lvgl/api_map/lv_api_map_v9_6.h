@@ -18,6 +18,10 @@ extern "C" {
 #define LV_DISPLAY_ROTATION_270 LV_ROTATION_270
 typedef lv_rotation_t lv_display_rotation_t;
 
+#define lv_indev_set_ccw(indev) lv_indev_set_rotation_dir(indev, LV_ROTATION_DIR_CCW)
+#define lv_indev_clear_ccw(indev) lv_indev_set_rotation_dir(indev, LV_ROTATION_DIR_CW)
+#define lv_indev_get_ccw(indev) (lv_indev_get_rotation_dir(indev) == LV_ROTATION_DIR_CCW)
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
