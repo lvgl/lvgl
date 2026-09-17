@@ -85,6 +85,13 @@ typedef enum {
     LV_DIR_ALL      = LV_DIR_HOR | LV_DIR_VER,
 } lv_dir_t;
 
+typedef enum {
+    LV_ROTATION_0 = 0,
+    LV_ROTATION_90,
+    LV_ROTATION_180,
+    LV_ROTATION_270,
+} lv_rotation_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -192,6 +199,16 @@ void lv_point_precise_set(lv_point_precise_t * p, lv_value_precise_t x, lv_value
 void lv_point_swap(lv_point_t * p1, lv_point_t * p2);
 
 void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_precise_t * p2);
+
+/**
+ * Rotate a point within a bounding box by a given rotation.
+ *
+ * @param point     pointer to the point to rotate; modified in place
+ * @param rotation  the rotation to apply see @ref lv_rotation_t
+ * @param width     width of the bounding box before rotation
+ * @param height    height of the bounding box before rotation
+ */
+void lv_point_rotate(lv_point_t * point, lv_rotation_t rotation, int32_t width, int32_t height);
 
 /**********************
  *      MACROS
