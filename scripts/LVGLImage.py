@@ -1310,6 +1310,8 @@ class RLEImage(LVGLImage):
             index += blksize  # move to next position
             if index >= len(data):  # data end
                 nonrepeat_count += repeat_cnt
+                if nonrepeat_count > 127:  # limit max repeat count to max value of signed char.
+                    nonrepeat_count = 127
                 break
 
         return nonrepeat_count
