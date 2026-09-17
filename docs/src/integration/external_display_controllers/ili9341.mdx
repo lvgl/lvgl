@@ -55,9 +55,8 @@ To create an ILI9341-based display use the function
 
 ```c
 /**
- * Create an LCD display with ILI9341 driver. The display is unusable until `lv_ili9341_init()`
- * runs, so it almost always follows on the next line. Only what the callbacks need goes in
- * between, such as `lv_display_set_user_data()`.
+ * Create an LCD display with ILI9341 driver.  
+ * `lv_ili9341_set_transfer_cb()` and `lv_ili9341_init()` and needs to be called after this.
  * @param hor_res       horizontal resolution
  * @param ver_res       vertical resolution
  * @return              pointer to the created display, or NULL on allocation failure
