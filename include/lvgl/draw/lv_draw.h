@@ -287,7 +287,7 @@ uint32_t lv_draw_get_unit_count(void);
 lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
 
 /**
- * Find an available draw task
+ * Find and available draw task
  * @param layer             the draw layer to search in
  * @param t_prev            continue searching from this task @nullable
  * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`

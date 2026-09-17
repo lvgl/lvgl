@@ -1074,7 +1074,7 @@ static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     LV_ASSERT(observer->target != NULL);
     LV_ASSERT(subject != NULL);
     if(subject->type == LV_SUBJECT_TYPE_POINTER) {
-        lv_image_set_src(observer->target, (LV_IMAGE_DSC_CONST void *)subject->value.pointer);
+        lv_image_set_src(observer->target, subject->value.pointer);
     }
 }
 

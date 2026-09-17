@@ -714,6 +714,7 @@ void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, lv_font_d
 {
     if(vram_res == NULL || *vram_res == NULL) return;
     lv_draw_unit_t * unit = (*vram_res)->unit;
+    if(unit == NULL || unit->vram_font_free_cb == NULL) return;
     unit->vram_font_free_cb(unit, font_dsc);
 }
 

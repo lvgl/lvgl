@@ -360,15 +360,6 @@ void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
  */
 void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 
-/**
- * Ensure a draw buffer is usable by the given draw unit.
- * Allocates, uploads, downloads, or no-ops as needed.
- * When `LV_USE_DRAW_VRAM` is disabled this is a no-op that always returns true.
- *
- * @param buf   the draw buffer (may have CPU data, VRAM data, both, or neither)
- * @param unit  the draw unit that needs to access this buffer
- * @return      true if the buffer is now resident for the unit
- */
 #if LV_USE_DRAW_VRAM
 struct _lv_font_dsc_base_t;
 /**
@@ -379,7 +370,18 @@ struct _lv_font_dsc_base_t;
  * @param font_dsc  pointer to lv_font_dsc_base_t, forwarded to vram_font_free_cb
  */
 void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, struct _lv_font_dsc_base_t * font_dsc);
+#endif
 
+/**
+ * Ensure a draw buffer is usable by the given draw unit.
+ * Allocates, uploads, downloads, or no-ops as needed.
+ * When `LV_USE_DRAW_VRAM` is disabled this is a no-op that always returns true.
+ *
+ * @param buf   the draw buffer (may have CPU data, VRAM data, both, or neither)
+ * @param unit  the draw unit that needs to access this buffer
+ * @return      true if the buffer is now resident for the unit
+ */
+#if LV_USE_DRAW_VRAM
 bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit);
 #else
 static inline bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)

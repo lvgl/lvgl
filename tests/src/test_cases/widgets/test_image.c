@@ -794,7 +794,7 @@ void test_image_raw_data_as_file(void)
     TEST_ASSERT_EQUAL_UINT32(sizeof(img_bin), decoded_size);
 
     lv_obj_t * img_1 = lv_image_create(lv_screen_active());
-    lv_image_set_src(img_1, (LV_IMAGE_DSC_CONST char *)&mempath);
+    lv_image_set_src(img_1, (const char *)&mempath);
     lv_obj_center(img_1);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_raw_data_as_file.png");

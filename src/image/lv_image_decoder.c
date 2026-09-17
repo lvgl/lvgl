@@ -126,8 +126,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
     return decoder ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src,
-                                  const lv_image_decoder_args_t * args)
+lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args)
 {
     LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
 

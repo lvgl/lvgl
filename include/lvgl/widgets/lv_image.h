@@ -91,7 +91,7 @@ lv_obj_t * lv_image_create(lv_obj_t * parent);
  * Set the image data to display on the object
  * @param obj       pointer to an image object
  * @param src       1) pointer to an ::lv_image_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
- *                  2) path to an image file (e.g. "S:/dir/img.bin") or
+ *                  2) path to an image file (e.g. "S:/dir/img.bin")or
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
  *                  @nullable When NULL the image is cleared.
  */
