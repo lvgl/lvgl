@@ -677,4 +677,13 @@ void test_rotation_resolve(void)
     TEST_ASSERT_EQUAL(LV_ROTATION_180, lv_rotation_resolve(LV_ROTATION_180, LV_ROTATION_DIR_CCW));
     TEST_ASSERT_EQUAL(LV_ROTATION_90, lv_rotation_resolve(LV_ROTATION_270, LV_ROTATION_DIR_CCW));
 }
+
+void test_rotation_invert(void)
+{
+    TEST_ASSERT_EQUAL(LV_ROTATION_0, lv_rotation_invert(LV_ROTATION_0));
+    TEST_ASSERT_EQUAL(LV_ROTATION_270, lv_rotation_invert(LV_ROTATION_90));
+    TEST_ASSERT_EQUAL(LV_ROTATION_180, lv_rotation_invert(LV_ROTATION_180));
+    TEST_ASSERT_EQUAL(LV_ROTATION_90, lv_rotation_invert(LV_ROTATION_270));
+}
+
 #endif
