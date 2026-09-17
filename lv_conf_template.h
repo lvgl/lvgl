@@ -588,11 +588,13 @@
 #endif /*LV_USE_DRAW_EVE*/
 
 #if LV_USE_EVE5
+#if LV_USE_DRAW_VRAM
 /** Render through EVE HAL, including BT820 render targets and VRAM residency.
  *  Requires the EVE5 display driver and the VRAM residency module.
  */
 #define LV_USE_DRAW_EVE5 0
 
+#endif /*LV_USE_DRAW_VRAM*/
 #endif /*LV_USE_EVE5*/
 
 /** Use LV_USE_DRAW_G2D instead.
@@ -1571,10 +1573,13 @@
 
 #endif /*LV_USE_LINUX_DRM*/
 
+#if LV_USE_DRAW_VRAM
 /** Display and touch driver using EVE HAL and the EVE GPU allocator.
  *  Requires the VRAM residency module and external EVE HAL libraries.
  */
 #define LV_USE_EVE5 0
+
+#endif /*LV_USE_DRAW_VRAM*/
 
 #if LV_USE_EVE5
 /** Access files on an SD card connected to the EVE controller. */
