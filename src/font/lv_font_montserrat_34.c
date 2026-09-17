@@ -18,13 +18,13 @@
     #include "../../lvgl.h"
 #endif
 
-
-
 #ifndef LV_FONT_MONTSERRAT_34
     #define LV_FONT_MONTSERRAT_34 1
 #endif
 
 #if LV_FONT_MONTSERRAT_34
+
+
 
 /*-----------------
  *    BITMAPS

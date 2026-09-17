@@ -18,13 +18,13 @@
     #include "../../lvgl.h"
 #endif
 
-
-
 #ifndef LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
     #define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK 1
 #endif
 
 #if LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
+
+
 
 /*-----------------
  *    BITMAPS

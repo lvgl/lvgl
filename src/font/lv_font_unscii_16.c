@@ -18,13 +18,13 @@
     #include "../../lvgl.h"
 #endif
 
-
-
 #ifndef LV_FONT_UNSCII_16
     #define LV_FONT_UNSCII_16 1
 #endif
 
 #if LV_FONT_UNSCII_16
+
+
 
 /*-----------------
  *    BITMAPS

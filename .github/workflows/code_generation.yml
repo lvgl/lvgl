@@ -56,7 +56,7 @@ jobs:
 
       - name: Install lv_font_conv
         env:
-          LV_FONT_CONV_REF: c332c00ffe51a45522da7bffb8520b726335be56
+          LV_FONT_CONV_REF: 2107ab79b615a6ff7051796fa9f7ae52f042437b
         run: |
           git clone https://github.com/lvgl/lv_font_conv.git "$RUNNER_TEMP/lv_font_conv"
           git -C "$RUNNER_TEMP/lv_font_conv" checkout "$LV_FONT_CONV_REF"
