@@ -92,6 +92,11 @@ typedef enum {
     LV_ROTATION_270,
 } lv_rotation_t;
 
+typedef enum {
+    LV_ROTATION_DIR_CW = 0,
+    LV_ROTATION_DIR_CCW,
+} lv_rotation_dir_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
