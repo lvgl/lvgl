@@ -1352,7 +1352,6 @@ void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_ob
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG_MSG(screen != NULL, return, "can't load a non-existing screen");
-    LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
 
     screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
     LV_ASSERT_MALLOC(dsc);
@@ -1371,7 +1370,6 @@ void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(screen_create_cb != NULL, return);
-    LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
 
     screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
     LV_ASSERT_MALLOC(dsc);

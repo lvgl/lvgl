@@ -1,6 +1,7 @@
 {
   "title": "Debugging",
   "pages": [
+    "argument_checking",
     "gdb_plugin",
     "log",
     "monkey",

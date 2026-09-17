@@ -21,7 +21,7 @@ if [ `uname -s` = "Linux" ]
   CMSIS_PACK_PATH="/home/$USER/.arm/Packs/ARM/CMSIS/5.7.0/"
   PATH_TO_ADD="$CMSIS_PACK_PATH/CMSIS/Utilities/Linux64/"
 else
-  CMSIS_PACK_PATH="/C/Users/$USER/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0"
+  CMSIS_PACK_PATH="/C/Users/$USER/AppData/Local/Arm/Packs/ARM/CMSIS"  #"/C/Users/$USER/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0"
   PATH_TO_ADD="/C/Program Files (x86)/7-Zip/:/C/Program Files/7-Zip/:$CMSIS_PACK_PATH/CMSIS/Utilities/Win32/:/C/xmllint/"
 fi
 [[ ":$PATH:" != *":$PATH_TO_ADD}:"* ]] && PATH="${PATH}:${PATH_TO_ADD}"
@@ -44,6 +44,7 @@ PACK_BUILD=build/
 # alternative: specify directory names to be added to pack base directory
 PACK_DIRS="
   ../../src
+  ../../include
   ../../libs
   ../../demos
 "
@@ -172,7 +173,7 @@ mv "${PACK_BUILD}/lv_cmsis_pack.txt" "${PACK_BUILD}/lv_cmsis_pack.c"
 # sudo apt-get install libxml2-utils
 
 echo Running schema check for $PACK_VENDOR.$PACK_NAME.pdsc
-$XMLLINT --noout --schema ${CMSIS_PACK_PATH}/CMSIS/Utilities/PACK.xsd $PACK_BUILD/$PACK_VENDOR.$PACK_NAME.pdsc
+$XMLLINT --noout --schema ${CMSIS_PACK_PATH}/PACK.xsd $PACK_BUILD/$PACK_VENDOR.$PACK_NAME.pdsc
 errorlevel=$?
 if [ $errorlevel -ne 0 ]; then
   echo "build aborted: Schema check of $PACK_VENDOR.$PACK_NAME.pdsc against PACK.xsd failed"
