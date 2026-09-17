@@ -2160,6 +2160,7 @@ static const lv_font_fmt_txt_kern_classes_t kern_classes = {
     static  lv_font_fmt_txt_glyph_cache_t cache;
 #endif
 
+/*Writable with LV_USE_DRAW_VRAM so a draw unit can attach VRAM residency, see LV_FONT_DSC_CONST*/
 #ifdef LV_FONT_DSC_CONST
 static LV_FONT_DSC_CONST lv_font_fmt_txt_dsc_t font_dsc = {
 #elif LVGL_VERSION_MAJOR >= 8

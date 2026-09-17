@@ -1003,18 +1003,18 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc, lv_draw_unit_t * dr
         return true;
     }
 
-    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)mask_decoder_dsc.decoded, draw_unit)) {
-        lv_image_decoder_close(&mask_decoder_dsc);
-        LV_LOG_WARN("Failed to ensure mask residency. The mask is not applied.");
-        return true;
-    }
-
     if(mask_decoder_dsc.decoded->header.cf != LV_COLOR_FORMAT_A8 &&
        mask_decoder_dsc.decoded->header.cf != LV_COLOR_FORMAT_L8) {
         lv_image_decoder_close(&mask_decoder_dsc);
         LV_LOG_WARN("The mask image is not A8/L8 format. The mask is not applied.");
         return true;
 
+    }
+
+    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)mask_decoder_dsc.decoded, draw_unit)) {
+        lv_image_decoder_close(&mask_decoder_dsc);
+        LV_LOG_WARN("Failed to ensure mask residency. The mask is not applied.");
+        return true;
     }
 
     const lv_draw_buf_t * mask_draw_buf = mask_decoder_dsc.decoded;

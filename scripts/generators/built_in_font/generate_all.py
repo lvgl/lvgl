@@ -39,6 +39,7 @@ def run(cmd, description):
         "static const lv_font_fmt_txt_dsc_t font_dsc = {\n"
     )
     dsc_const_vram = (
+        "/*Writable with LV_USE_DRAW_VRAM so a draw unit can attach VRAM residency, see LV_FONT_DSC_CONST*/\n"
         "#ifdef LV_FONT_DSC_CONST\n"
         "static LV_FONT_DSC_CONST lv_font_fmt_txt_dsc_t font_dsc = {\n"
         "#elif LVGL_VERSION_MAJOR >= 8\n"

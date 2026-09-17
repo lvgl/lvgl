@@ -684,6 +684,12 @@ void lv_image_buf_free(lv_image_dsc_t * dsc)
     if(dsc == NULL) return;
 
     if(dsc != NULL) {
+#if LV_USE_DRAW_VRAM
+        if(dsc->vram_res != NULL) {
+            lv_draw_unit_t * vr_unit = dsc->vram_res->unit;
+            if(vr_unit && vr_unit->vram_free_cb) vr_unit->vram_free_cb(vr_unit, (lv_draw_buf_t *)dsc);
+        }
+#endif
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);
 

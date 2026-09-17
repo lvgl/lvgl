@@ -417,6 +417,12 @@ static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
             lv_area_t absolute_decoded_area = *relative_decoded_area;
             lv_area_move(&absolute_decoded_area, img_area->x1, img_area->y1);
             if(res == LV_RESULT_OK) {
+                /*The decoder produced the row in CPU memory; the draw unit may need it elsewhere*/
+                if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc->decoded, t->draw_unit)) {
+                    LV_LOG_WARN("Failed to ensure image residency");
+                    return;
+                }
+
                 /*Limit draw area to the current decoded area and draw the image*/
                 lv_area_t clipped_img_area_sub;
                 if(lv_area_intersect(&clipped_img_area_sub, clipped_img_area, &absolute_decoded_area)) {

@@ -230,7 +230,13 @@ static void init_buffer(lv_wl_g2d_ctx_t * ctx, lv_wl_buffer_t * buffer, uint32_t
     uint32_t drm_cf = lv_cf_to_drm_cf(cf);
     uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
     buffer->lv_draw_buf = lv_draw_buf_create(width, height, cf, stride);
-    if(buffer->lv_draw_buf) lv_draw_buf_ensure_resident(buffer->lv_draw_buf, NULL);
+    if(buffer->lv_draw_buf == NULL || !lv_draw_buf_ensure_resident(buffer->lv_draw_buf, NULL)) {
+        LV_LOG_ERROR("Failed to allocate a %" LV_PRIu32 "x%" LV_PRIu32 " G2D buffer", width, height);
+        if(buffer->lv_draw_buf) lv_draw_buf_destroy(buffer->lv_draw_buf);
+        buffer->lv_draw_buf = NULL;
+        buffer->wl_buffer = NULL;
+        return;
+    }
     buffer->dmabuf_fd = g2d_get_buf_fd(buffer->lv_draw_buf);
     buffer->stride = stride;
     buffer->offset = 0;

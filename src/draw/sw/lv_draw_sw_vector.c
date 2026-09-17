@@ -509,11 +509,8 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
         stride = new_buf->header.stride;
     }
     else {
-#if LV_USE_DRAW_VRAM
-        if(draw_buf->data == NULL) {
-            if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return;
-        }
-#endif
+        /*Render into CPU memory: this also drops any VRAM copy that would go stale*/
+        if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return;
     }
 
     void * buf = allow_buffer ? new_buf->data : draw_buf->data;
@@ -535,15 +532,11 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
     }
 
     if(allow_buffer) {
-#if LV_USE_DRAW_VRAM
-        if(draw_buf->data == NULL) {
-            if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) {
-                lv_draw_buf_destroy(new_buf);
-                tvg_canvas_destroy(canvas);
-                return;
-            }
+        if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) {
+            lv_draw_buf_destroy(new_buf);
+            tvg_canvas_destroy(canvas);
+            return;
         }
-#endif
         lv_area_t src_area = {0, 0, width, height};
         _blend_draw_buf(draw_buf, &layer->buf_area, new_buf, &src_area);
         lv_draw_buf_destroy(new_buf);

@@ -310,11 +310,8 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
     LV_CHECK_ARG(canvas->draw_buf != NULL, return);
     LV_CHECK_ARG_MSG(canvas->draw_buf->header.cf == src_buf->header.cf, return, "Color formats must be the same");
 
-#if LV_USE_DRAW_VRAM
-    if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return;
-    if(!lv_draw_buf_ensure_resident(src_buf, NULL)) return;
-#endif
-
+    /*lv_draw_buf_copy stays in VRAM when both buffers are resident on the same unit
+     *and pulls them into CPU memory otherwise*/
     lv_draw_buf_copy(canvas->draw_buf, canvas_area, src_buf, src_area);
 }
 

@@ -392,8 +392,9 @@ void lv_display_refr_timer(lv_timer_t * timer)
     }
 #if LV_USE_DRAW_VRAM
     /* VRAM-capable displays may use lazy-allocated buffers (header-only,
-     * no CPU pixel data). ensure_resident handles allocation at dispatch. */
-    if(!(buf_act->data || buf_act->vram_res || buf_act->header.w > 0)) {
+     * no CPU pixel data). ensure_resident handles allocation at dispatch,
+     * but the size is needed regardless for the tiling math below. */
+    if(!((buf_act->data || buf_act->vram_res || buf_act->header.w > 0) && buf_act->data_size)) {
         LV_LOG_WARN("No draw buffer");
         LV_PROFILER_REFR_END;
         return;
