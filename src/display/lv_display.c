@@ -1427,36 +1427,6 @@ void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point)
     }
 }
 
-void lv_display_rotate_point_ccw(lv_display_t * disp, lv_point_t * point)
-{
-    LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(point != NULL, return);
-
-    lv_rotation_t rotation = lv_display_get_rotation(disp);
-
-    if(rotation == LV_ROTATION_0) return;
-
-    const int32_t x = point->x;
-    const int32_t y = point->y;
-
-    switch(rotation) {
-        case LV_ROTATION_90:
-            point->x = y;
-            point->y = disp->hor_res - x - 1;
-            break;
-        case LV_ROTATION_180:
-            point->x = disp->hor_res - x - 1;
-            point->y = disp->ver_res - y - 1;
-            break;
-        case LV_ROTATION_270:
-            point->x = disp->ver_res - y - 1;
-            point->y = x;
-            break;
-        default:
-            break;
-    }
-}
-
 uint32_t lv_display_get_draw_buf_size(lv_display_t * disp)
 {
     if(disp == NULL) {
