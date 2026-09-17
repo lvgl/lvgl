@@ -2117,7 +2117,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_EVDEV=1                  \
                          LV_USE_EXT_DATA=1               \
                          LV_USE_FFMPEG=1                 \
-                         LV_USE_FILE_EXPLORER=1          \
                          LV_USE_FLEX=1                   \
                          LV_USE_FLOAT=1                  \
                          LV_USE_FONT_COMPRESSED=1        \

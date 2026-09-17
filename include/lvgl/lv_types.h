@@ -291,8 +291,6 @@ typedef struct _lv_monkey_config_t lv_monkey_config_t;
 
 typedef struct _lv_ime_pinyin_t lv_ime_pinyin_t;
 
-typedef struct _lv_file_explorer_t lv_file_explorer_t;
-
 typedef struct _lv_barcode_t lv_barcode_t;
 
 typedef struct _lv_qrcode_t lv_qrcode_t;

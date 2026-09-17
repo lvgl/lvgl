@@ -152,7 +152,6 @@
 #include "misc/lv_math.h"
 #include "misc/lv_ll.h"
 #include "osal/lv_os.h"
-#include "others/file_explorer/lv_file_explorer.h"
 #include "others/fragment/lv_fragment.h"
 #include "stdlib/lv_mem.h"
 #include "stdlib/lv_sprintf.h"

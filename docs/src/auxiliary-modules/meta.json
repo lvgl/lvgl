@@ -1,7 +1,4 @@
 {
   "title": "Auxiliary Modules",
-  "pages": [
-    "file_explorer",
-    "fragment"
-  ]
+  "pages": ["fragment"]
 }

@@ -2291,22 +2291,6 @@
 /** Manage a widget subtree with its own lifecycle and back stack, similar to Android fragments. */
 #define LV_USE_FRAGMENT 0
 
-/** File explorer
- *
- *  Enable: LV_USE_TABLE
- */
-#define LV_USE_FILE_EXPLORER 0
-
-#if LV_USE_FILE_EXPLORER
-/** Maximum path length (bytes) */
-#define LV_FILE_EXPLORER_PATH_MAX_LEN 128
-
-/** Add a sidebar with shortcuts to common places. It can be hidden by clicking the
- *  button at the top left corner of the browsing area, which is useful on small screens.
- */
-#define LV_FILE_EXPLORER_QUICK_ACCESS 1
-
-#endif /*LV_USE_FILE_EXPLORER*/
 
 
 /*============================================================================

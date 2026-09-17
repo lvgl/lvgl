@@ -2123,22 +2123,6 @@
  * OTHERS
  *============================================================================*/
 
-/** File explorer
- *
- *  Enable: LV_USE_TABLE
- */
-
-#if LV_USE_FILE_EXPLORER
-/** Maximum path length (bytes) */
-#define LV_FILE_EXPLORER_PATH_MAX_LEN 128
-
-/** Add a sidebar with shortcuts to common places. It can be hidden by clicking the
- *  button at the top left corner of the browsing area, which is useful on small screens.
- */
-#define LV_FILE_EXPLORER_QUICK_ACCESS 1
-
-#endif /*LV_USE_FILE_EXPLORER*/
-
 /*customize tick-get */
 #if defined(__PERF_COUNTER__) && __PERF_COUNTER__
     #define LV_GLOBAL_INIT(__GLOBAL_PTR)                                    \

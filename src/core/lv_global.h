@@ -213,11 +213,6 @@ typedef struct _lv_global_t {
 #endif
 
 
-#if LV_USE_FILE_EXPLORER
-    lv_style_t file_explorer_quick_access_style;
-    size_t file_explorer_count;
-#endif
-
 #if LV_USE_MEM_MONITOR
     lv_sysmon_backend_data_t sysmon_mem;
 #endif
