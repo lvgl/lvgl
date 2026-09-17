@@ -913,10 +913,18 @@ void test_vram_qrcode_encode_uploads_modules(void)
     TEST_ASSERT_NOT_NULL(buf->data);
     TEST_ASSERT_FALSE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_CLEARZERO));
 
+    /*Keep the encoded modules so the VRAM copy can be compared against them*/
+    uint32_t encoded_size = buf->data_size;
+    uint8_t * encoded = lv_malloc(encoded_size);
+    TEST_ASSERT_NOT_NULL(encoded);
+    lv_memcpy(encoded, buf->data, encoded_size);
+
     TEST_ASSERT_TRUE(lv_draw_buf_ensure_resident(buf, &s_fake_unit_a));
     TEST_ASSERT_EQUAL_INT(1, s_stats_a.upload_count);
     TEST_ASSERT_EQUAL_INT(0, s_stats_a.alloc_count);
-    TEST_ASSERT_FALSE(vram_contains_pattern(buf, 0x00));
+    fake_vram_res_t * vr = (fake_vram_res_t *)buf->vram_res;
+    TEST_ASSERT_EQUAL_MEMORY(encoded, vr->fake_vram, LV_MIN(encoded_size, vr->alloc_size));
+    lv_free(encoded);
 
     lv_obj_delete(qr);
 #endif

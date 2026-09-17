@@ -435,6 +435,8 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
     uint8_t * buf_u8 = lv_draw_buf_goto_xy(draw_buf, 0, 0);
     if(buf_u8 == NULL) {
         lv_display_enable_invalidation(lv_obj_get_display(obj), true);
+        lv_free(qr0);
+        lv_free(data_tmp);
         return LV_RESULT_INVALID;
     }
     lv_color_t c = lv_color_hex(1);
