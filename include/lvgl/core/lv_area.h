@@ -225,6 +225,15 @@ void lv_point_rotate(lv_point_t * point, lv_rotation_t rotation, int32_t width, 
  */
 lv_rotation_t lv_rotation_resolve(lv_rotation_t rotation, lv_rotation_dir_t direction);
 
+/**
+ * Get the rotation that undoes a rotation, i.e. the same angle applied in the
+ * opposite direction.
+ *
+ * @param rotation  the rotation to invert see @ref lv_rotation_t
+ * @return          the inverse rotation
+ */
+lv_rotation_t lv_rotation_invert(lv_rotation_t rotation);
+
 /**********************
  *      MACROS
  **********************/

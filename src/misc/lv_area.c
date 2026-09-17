@@ -622,6 +622,11 @@ lv_rotation_t lv_rotation_resolve(lv_rotation_t rotation, lv_rotation_dir_t dire
     return rotation;
 }
 
+lv_rotation_t lv_rotation_invert(lv_rotation_t rotation)
+{
+    return lv_rotation_resolve(rotation, LV_ROTATION_DIR_CCW);
+}
+
 void lv_point_rotate(lv_point_t * point, lv_rotation_t rotation, int32_t width, int32_t height)
 {
     LV_CHECK_ARG(point != NULL, return);
