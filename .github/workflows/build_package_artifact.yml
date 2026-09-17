@@ -37,6 +37,7 @@ jobs:
             -DCONFIG_LV_USE_3DTEXTURE=ON \
             -DCONFIG_LV_USE_FFMPEG=ON \
             -DCONFIG_LV_USE_LOTTIE=ON \
+            -DCONFIG_LV_USE_THORVG=ON \
             -DCONFIG_LV_USE_RLOTTIE=ON \
             -DCONFIG_LV_USE_IME_PINYIN=ON \
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/out/install
