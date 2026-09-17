@@ -32,7 +32,7 @@ void test_rotate90_RGB565(void)
                    3, 2,
                    3 * sizeof(uint16_t),
                    2 * sizeof(uint16_t),
-                   LV_DISPLAY_ROTATION_90,
+                   LV_ROTATION_90,
                    LV_COLOR_FORMAT_RGB565);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -53,7 +53,7 @@ void test_rotate180_RGB565(void)
                    3, 2,
                    3 * sizeof(uint16_t),
                    3 * sizeof(uint16_t),
-                   LV_DISPLAY_ROTATION_180,
+                   LV_ROTATION_180,
                    LV_COLOR_FORMAT_RGB565);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -77,7 +77,7 @@ void test_rotate270_RGB565(void)
                    3, 2,
                    3 * sizeof(uint16_t),
                    2 * sizeof(uint16_t),
-                   LV_DISPLAY_ROTATION_270,
+                   LV_ROTATION_270,
                    LV_COLOR_FORMAT_RGB565);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -101,7 +101,7 @@ void test_rotate90_RGB888(void)
                    3, 2,
                    3 * 3,
                    2 * 3,
-                   LV_DISPLAY_ROTATION_90,
+                   LV_ROTATION_90,
                    LV_COLOR_FORMAT_RGB888);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -124,7 +124,7 @@ void test_rotate180_RGB888(void)
                    2, 3,
                    2 * 3,
                    2 * 3,
-                   LV_DISPLAY_ROTATION_180,
+                   LV_ROTATION_180,
                    LV_COLOR_FORMAT_RGB888);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -148,7 +148,7 @@ void test_rotate270_RGB888(void)
                    3, 2,
                    3 * 3,
                    2 * 3,
-                   LV_DISPLAY_ROTATION_270,
+                   LV_ROTATION_270,
                    LV_COLOR_FORMAT_RGB888);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -173,7 +173,7 @@ void test_rotate90_ARGB8888(void)
                    3, 2,
                    3 * sizeof(uint32_t),
                    2 * sizeof(uint32_t),
-                   LV_DISPLAY_ROTATION_90,
+                   LV_ROTATION_90,
                    LV_COLOR_FORMAT_ARGB8888);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -197,7 +197,7 @@ void test_rotate180_ARGB8888(void)
                    2, 3,
                    2 * sizeof(uint32_t),
                    2 * sizeof(uint32_t),
-                   LV_DISPLAY_ROTATION_180,
+                   LV_ROTATION_180,
                    LV_COLOR_FORMAT_ARGB8888);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -219,7 +219,7 @@ void test_rotate270_ARGB8888(void)
                    3, 2,
                    3 * sizeof(uint32_t),
                    2 * sizeof(uint32_t),
-                   LV_DISPLAY_ROTATION_270,
+                   LV_ROTATION_270,
                    LV_COLOR_FORMAT_ARGB8888);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -243,7 +243,7 @@ void test_rotate90_L8(void)
                    3, 2,
                    3 * sizeof(uint8_t),
                    2 * sizeof(uint8_t),
-                   LV_DISPLAY_ROTATION_90,
+                   LV_ROTATION_90,
                    LV_COLOR_FORMAT_L8);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -265,7 +265,7 @@ void test_rotate180_L8(void)
                    3, 2,
                    3 * sizeof(uint8_t),
                    3 * sizeof(uint8_t),
-                   LV_DISPLAY_ROTATION_180,
+                   LV_ROTATION_180,
                    LV_COLOR_FORMAT_L8);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
@@ -289,7 +289,7 @@ void test_rotate270_L8(void)
                    3, 2,
                    3 * sizeof(uint8_t),
                    2 * sizeof(uint8_t),
-                   LV_DISPLAY_ROTATION_270,
+                   LV_ROTATION_270,
                    LV_COLOR_FORMAT_L8);
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));

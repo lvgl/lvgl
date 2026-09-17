@@ -86,11 +86,11 @@ void lv_draw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32_t 
  * @param src_height    source height in pixels
  * @param src_stride     source stride in bytes (number of bytes in a row)
  * @param dest_stride   destination stride in bytes (number of bytes in a row)
- * @param rotation      LV_DISPLAY_ROTATION_0/90/180/270
+ * @param rotation      LV_ROTATION_0/90/180/270
  * @param color_format  LV_COLOR_FORMAT_RGB565/RGB888/XRGB8888/ARGB8888
  */
 void lv_draw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
-                    int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format);
+                    int32_t dest_stride, lv_rotation_t rotation, lv_color_format_t color_format);
 
 /***********************
  * GLOBAL VARIABLES

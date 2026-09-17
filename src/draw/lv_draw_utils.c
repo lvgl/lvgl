@@ -263,12 +263,12 @@ void lv_draw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32_t 
 }
 
 void lv_draw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
-                    int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format)
+                    int32_t dest_stride, lv_rotation_t rotation, lv_color_format_t color_format)
 {
     LV_CHECK_ARG(src != NULL, return);
     LV_CHECK_ARG(dest != NULL, return);
 
-    if(rotation == LV_DISPLAY_ROTATION_90) {
+    if(rotation == LV_ROTATION_90) {
         switch(color_format) {
             case LV_COLOR_FORMAT_L8:
                 rotate90_l8(src, dest, src_width, src_height, src_stride, dest_stride);
@@ -291,7 +291,7 @@ void lv_draw_rotate(const void * src, void * dest, int32_t src_width, int32_t sr
         return;
     }
 
-    if(rotation == LV_DISPLAY_ROTATION_180) {
+    if(rotation == LV_ROTATION_180) {
         switch(color_format) {
             case LV_COLOR_FORMAT_L8:
                 rotate180_l8(src, dest, src_width, src_height, src_stride, dest_stride);
@@ -314,7 +314,7 @@ void lv_draw_rotate(const void * src, void * dest, int32_t src_width, int32_t sr
         return;
     }
 
-    if(rotation == LV_DISPLAY_ROTATION_270) {
+    if(rotation == LV_ROTATION_270) {
         switch(color_format) {
             case LV_COLOR_FORMAT_L8:
                 rotate270_l8(src, dest, src_width, src_height, src_stride, dest_stride);

@@ -1001,8 +1001,8 @@ static void refr_configured_layer(lv_layer_t * layer)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     if(lv_display_get_matrix_rotation(disp_refr)) {
-        const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
-        if(rotation != LV_DISPLAY_ROTATION_0) {
+        const lv_rotation_t rotation = lv_display_get_rotation(disp_refr);
+        if(rotation != LV_ROTATION_0) {
             lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
 
             /**
@@ -1010,7 +1010,7 @@ static void refr_configured_layer(lv_layer_t * layer)
              * Use direct matrix assignment to reduce precision loss and improve efficiency.
              */
             switch(rotation) {
-                case LV_DISPLAY_ROTATION_90:
+                case LV_ROTATION_90:
                     /**
                      * lv_matrix_rotate(&layer->matrix, 270);
                      * lv_matrix_translate(&layer->matrix, -disp_refr->ver_res, 0);
@@ -1023,7 +1023,7 @@ static void refr_configured_layer(lv_layer_t * layer)
                     layer->matrix.m[1][2] = disp_refr->ver_res;
                     break;
 
-                case LV_DISPLAY_ROTATION_180:
+                case LV_ROTATION_180:
                     /**
                      * lv_matrix_rotate(&layer->matrix, 180);
                      * lv_matrix_translate(&layer->matrix, -disp_refr->hor_res, -disp_refr->ver_res);
@@ -1036,7 +1036,7 @@ static void refr_configured_layer(lv_layer_t * layer)
                     layer->matrix.m[1][2] = disp_refr->ver_res;
                     break;
 
-                case LV_DISPLAY_ROTATION_270:
+                case LV_ROTATION_270:
                     /**
                      * lv_matrix_rotate(&layer->matrix, 90);
                      * lv_matrix_translate(&layer->matrix, 0, -disp_refr->hor_res);

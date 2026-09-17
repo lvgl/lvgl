@@ -110,7 +110,7 @@ void g2d_rotate(lv_draw_buf_t * buf1, lv_draw_buf_t * buf2, int32_t width, int32
     int32_t src_width = width;
     int32_t src_height = height;
     if(has_rotation) {
-        if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
+        if(rotation == LV_ROTATION_90 || rotation == LV_ROTATION_270) {
             src_width = height;
             src_height = width;
         }
@@ -132,16 +132,16 @@ void g2d_rotate(lv_draw_buf_t * buf1, lv_draw_buf_t * buf2, int32_t width, int32
     enum g2d_rotation g2d_angle = G2D_ROTATION_0;
     if(has_rotation) {
         switch(rotation) {
-            case LV_DISPLAY_ROTATION_0:
+            case LV_ROTATION_0:
                 g2d_angle = G2D_ROTATION_0;
                 break;
-            case LV_DISPLAY_ROTATION_90:
+            case LV_ROTATION_90:
                 g2d_angle = G2D_ROTATION_90;
                 break;
-            case LV_DISPLAY_ROTATION_180:
+            case LV_ROTATION_180:
                 g2d_angle = G2D_ROTATION_180;
                 break;
-            case LV_DISPLAY_ROTATION_270:
+            case LV_ROTATION_270:
                 g2d_angle = G2D_ROTATION_270;
                 break;
             default:

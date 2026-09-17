@@ -623,6 +623,76 @@ Calling the following functions with `NULL` as the display parameter is deprecat
 - <ApiLink name="lv_display_get_draw_buf_size"/>
 - <ApiLink name="lv_display_get_invalidated_draw_buf_size"/>
 
+### Rotation type
+
+`lv_display_rotation_t` is replaced by <ApiLink name="lv_rotation_t"/>, and
+`LV_DISPLAY_ROTATION_0/90/180/270` by `LV_ROTATION_0/90/180/270`. Rotation is not a
+display-only concept anymore: the same enum is used by the indev and area APIs, so it
+now lives in `lv_area.h`.
+
+```c
+/* Before */
+lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+if(rotation == LV_DISPLAY_ROTATION_90) { ... }
+
+/* After */
+lv_rotation_t rotation = lv_display_get_rotation(disp);
+if(rotation == LV_ROTATION_90) { ... }
+```
+
+<ApiLink name="lv_display_set_rotation"/>, <ApiLink name="lv_display_get_rotation"/> and
+<ApiLink name="lv_draw_rotate"/> take and return the new type. The old names live on as
+compatibility macros in `lv_api_map_v9_6.h`, so they keep working unless you build with
+`LV_DISABLE_API_MAPPING`.
+
+### `lv_display_rotate_point_ccw`
+
+`lv_display_rotate_point_ccw()` is removed in favor of the generic
+<ApiLink name="lv_point_rotate"/>, which rotates a point in any bounding box instead of
+only the one of a display.
+
+```c
+/* Before */
+lv_display_rotate_point_ccw(disp, &point);
+
+/* After */
+lv_point_rotate(&point, lv_display_get_rotation(disp),
+                lv_display_get_original_horizontal_resolution(disp),
+                lv_display_get_original_vertical_resolution(disp));
+```
+
+<ApiLink name="lv_display_rotate_point"/> is unchanged. It applies the rotation the other
+way around, mapping a point from the panel's coordinate system to the screen's, which is
+what an input device needs.
+
+The old name is kept as a compatibility macro in `lv_api_map_v9_6.h`.
+
+---
+
+## Indev
+
+### Rotation direction
+
+An input device whose touch coordinates rotate opposite to the screen used to be
+configured with a set/clear/get triplet of boolean functions. They are replaced by
+<ApiLink name="lv_indev_set_rotation_dir"/> and <ApiLink name="lv_indev_get_rotation_dir"/>,
+taking an <ApiLink name="lv_rotation_dir_t"/> value.
+
+```c
+/* Before */
+lv_indev_set_ccw(indev);
+lv_indev_clear_ccw(indev);
+bool ccw = lv_indev_get_ccw(indev);
+
+/* After */
+lv_indev_set_rotation_dir(indev, LV_ROTATION_DIR_CCW);
+lv_indev_set_rotation_dir(indev, LV_ROTATION_DIR_CW);
+bool ccw = lv_indev_get_rotation_dir(indev) == LV_ROTATION_DIR_CCW;
+```
+
+`LV_ROTATION_DIR_CW` is the default, so an indev that was never configured behaves exactly
+as before. The old names are kept as compatibility macros in `lv_api_map_v9_6.h`.
+
 ---
 
 ## Sysmon
