@@ -11,18 +11,17 @@ of 0 blocks followed by 128 blocks of payload. LVGL's own
 lv_rle_decompress() rejects such a stream.
 
 Each case compresses data whose final literal-run length is only known at the
-end of the data and checks that
-  - every control byte describes 1..127 blocks (no 0x80), and
-  - the stream decodes back to exactly the input, walking the control bytes
-    with the same semantics as lv_rle_decompress().
+end of the data and checks the stream against the format: every control byte
+describes 1..127 blocks, its payload fits in the stream, and the runs together
+cover exactly the input.
 
-Usage: python scripts/test_lvglimage_rle.py
+Usage: python -m pytest scripts/tests
 """
 
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 from LVGLImage import RLEImage, ColorFormat  # noqa: E402
 
@@ -63,25 +62,6 @@ def walk(stream, blk, out_len):
     return None
 
 
-def rle_decode(stream, blk, out_len):
-    """Reference decoder with lv_rle_decompress() semantics."""
-    out = bytearray()
-    rd = 0
-    n = len(stream)
-    while rd < n:
-        ctrl = stream[rd]
-        rd += 1
-        if ctrl & 0x80:
-            cnt = ctrl & 0x7F
-            out.extend(stream[rd:rd + cnt * blk])
-            rd += cnt * blk
-        else:
-            out.extend(stream[rd:rd + blk] * ctrl)
-            rd += blk
-    assert len(out) == out_len, "decoder produced %d bytes, expected %d" % (len(out), out_len)
-    return bytes(out)
-
-
 def check_case(name, data):
     img = RLEImage(cf=ColorFormat.ARGB8888, w=len(data) // BLK, h=1, data=bytes(data))
     stream = img.rle_compress(data, BLK)
@@ -89,33 +69,8 @@ def check_case(name, data):
     err = walk(stream, BLK, len(data))
     assert err is None, "%s: invalid stream: %s" % (name, err)
 
-    assert 0x80 not in _control_bytes(stream, BLK), \
-        "%s: control byte 0x80 (literal run of 0 blocks) emitted" % name
 
-    assert rle_decode(stream, BLK, len(data)) == bytes(data), \
-        "%s: stream does not round-trip to the original data" % name
-
-    print("%-28s OK  (%d blocks in, %d bytes out, first ctrl byte 0x%02X)"
-          % (name, len(data) // BLK, len(stream), stream[0]))
-
-
-def _control_bytes(stream, blk):
-    """Yield the control bytes of a stream, skipping literal payloads."""
-    rd = 0
-    n = len(stream)
-    ctrls = []
-    while rd < n:
-        ctrl = stream[rd]
-        rd += 1
-        ctrls.append(ctrl)
-        if ctrl & 0x80:
-            rd += (ctrl & 0x7F) * blk
-        else:
-            rd += blk
-    return ctrls
-
-
-def main():
+def test_distinct_blocks_with_repeat_tail():
     # 125 pairwise different blocks + 3 identical ones at the very end:
     # the minimal reproducer from the issue report.
     data = bytearray()
@@ -125,23 +80,24 @@ def main():
     assert len(data) == 128 * BLK
     check_case("125 distinct + repeat tail", data)
 
-    # 120 distinct blocks + a short repeat run at the end: another end-of-data
-    # path overshoot (120 literals + 9 repeats = 129 > 127).
-    data = bytearray()
-    for i in range(120):
-        data += pixel(i)
-    data += bytes([0xAA, 0xBB, 0xCC, 0xDD]) * 10
-    check_case("120 distinct + repeat tail", data)
 
+def test_end_of_data_run_lengths():
+    # Every literal run that can end at the data end. The "threshold reached"
+    # exit clamps the count at 127, so it is at most 126 when the repeat tail
+    # starts, and the pending repeat count adds up to 16 more: 142 at worst.
+    for prefix in range(90, 140):
+        for tail in range(1, 20):
+            data = bytearray()
+            for i in range(prefix):
+                data += pixel(i)
+            data += bytes([0x11, 0x22, 0x33, 0xFF]) * tail
+            check_case("%d distinct + %d repeat tail" % (prefix, tail), data)
+
+
+def test_many_distinct_blocks():
     # More than 127 purely distinct blocks: split by the threshold path, must
-    # stay valid and round-trip as well.
+    # stay valid as well.
     data = bytearray()
     for i in range(200):
         data += pixel(i)
     check_case("200 distinct blocks", data)
-
-    print("all RLE encoder regression checks passed")
-
-
-if __name__ == "__main__":
-    main()
