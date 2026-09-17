@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Generate every built-in LVGL font into src/font/.
+Generate every built-in LVGL font into src/font/, and the stride-aligned
+fonts the benchmark demo uses into demos/benchmark/assets/.
 
 Needs lv_font_conv (https://github.com/lvgl/lv_font_conv) and astyle in PATH.
 Runs from anywhere:
@@ -17,8 +18,14 @@ LVGL_ROOT_DIR = SCRIPT_DIR.parents[2]
 FONT_GEN = SCRIPT_DIR / "built_in_font_gen.py"
 CODE_FORMAT_CFG = LVGL_ROOT_DIR / "scripts" / "code-format.cfg"
 OUTPUT_DIR = LVGL_ROOT_DIR / "src" / "font"
+BENCHMARK_OUTPUT_DIR = LVGL_ROOT_DIR / "demos" / "benchmark" / "assets"
 
 MONTSERRAT_SIZES = range(8, 49, 2)
+
+# The benchmark measures the aligned-glyph draw paths, so its fonts are
+# generated with a row stride and glyph start alignment
+BENCHMARK_ALIGNED_SIZES = (12, 14, 16, 18, 20, 24, 26)
+BENCHMARK_ALIGNMENT = 16
 
 PERSIAN_HEBREW_RANGE = "0x20-0x7f,0x5d0-0x5ea,0x600-0x6FF,0xFB50-0xFDFF,0xFE70-0xFEFF"
 
@@ -32,8 +39,8 @@ def run(cmd, description):
     subprocess.run(cmd, cwd=SCRIPT_DIR, check=True)
 
 
-def gen_font(output, description, *args):
-    run([sys.executable, str(FONT_GEN), "-o", output, "--bpp", "4", *args], description)
+def gen_font(output, description, *args, bpp="4"):
+    run([sys.executable, str(FONT_GEN), "-o", output, "--bpp", bpp, *args], description)
     return output
 
 
@@ -63,6 +70,7 @@ def gen_unscii(output, size):
 
 
 def generate_all():
+    """Return the generated file names grouped by the directory they belong in."""
     outputs = []
 
     for size in MONTSERRAT_SIZES:
@@ -111,7 +119,27 @@ def generate_all():
     outputs.append(gen_unscii("lv_font_unscii_8.c", 8))
     outputs.append(gen_unscii("lv_font_unscii_16.c", 16))
 
-    return [SCRIPT_DIR / name for name in outputs]
+    benchmark_outputs = []
+
+    for size in BENCHMARK_ALIGNED_SIZES:
+        benchmark_outputs.append(
+            gen_font(
+                f"lv_font_benchmark_montserrat_{size}_aligned.c",
+                f"{size} px benchmark aligned",
+                "--stride",
+                str(BENCHMARK_ALIGNMENT),
+                "--align",
+                str(BENCHMARK_ALIGNMENT),
+                "--size",
+                str(size),
+                bpp="8",
+            )
+        )
+
+    return {
+        OUTPUT_DIR: [SCRIPT_DIR / name for name in outputs],
+        BENCHMARK_OUTPUT_DIR: [SCRIPT_DIR / name for name in benchmark_outputs],
+    }
 
 
 def main():
@@ -119,11 +147,12 @@ def main():
         if shutil.which(tool) is None:
             sys.exit(f"error: '{tool}' is required but was not found in PATH")
 
-    fonts = generate_all()
+    fonts_by_dir = generate_all()
+    fonts = [font for group in fonts_by_dir.values() for font in group]
 
-    # The fonts end up in src/font/, so point lv_font_conv's include of the
-    # LVGL header at the repository root instead of an installed lvgl/ prefix
-    for font in fonts:
+    # The built-in fonts end up in src/font/, so point lv_font_conv's include of
+    # the LVGL header at the repository root instead of an installed lvgl/ prefix
+    for font in fonts_by_dir[OUTPUT_DIR]:
         font.write_text(
             font.read_text().replace('#include "lvgl/lvgl.h"', '#include "../../lvgl.h"')
         )
@@ -139,10 +168,11 @@ def main():
         check=True,
     )
 
-    for font in fonts:
-        shutil.move(font, OUTPUT_DIR / font.name)
-
-    print(f"\n{len(fonts)} fonts written to {OUTPUT_DIR}")
+    print()
+    for output_dir, group in fonts_by_dir.items():
+        for font in group:
+            shutil.move(font, output_dir / font.name)
+        print(f"{len(group)} fonts written to {output_dir}")
 
 
 if __name__ == "__main__":
