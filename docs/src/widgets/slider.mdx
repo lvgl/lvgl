@@ -115,9 +115,9 @@ To show the value live in a label next to the widget, attach a label and call <A
 
 <LvglExample name="lv_example_slider_bind_value" path="widgets/slider/lv_example_slider_bind_value" />
 
-A Slider's value can also drive another widget's state via the generic
-`bind_state_if_*` helpers — handy for guards like "disable submit when the
-value exceeds a threshold".
+A Slider's value can also drive another widget's state through a custom
+Observer added with <ApiLink name="lv_subject_add_observer_obj" /> — handy for
+guards like "disable submit when the value exceeds a threshold".
 
 <LvglExample name="lv_example_slider_bind_state" path="widgets/slider/lv_example_slider_bind_state" />
 

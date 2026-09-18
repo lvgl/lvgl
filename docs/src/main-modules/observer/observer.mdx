@@ -382,11 +382,6 @@ static void disabled_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
 lv_subject_add_observer_obj(subject, disabled_observer_cb, widget, NULL);
 ```
 
-<Callout type="warning">
-The `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` functions are
-**deprecated** in favor of the two approaches above.
-</Callout>
-
 #### Checked State
 
 The following method of subscribing to an integer Subject affects a Widget's
