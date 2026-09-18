@@ -2247,10 +2247,6 @@ config LV_USE_LOTTIE
 	help
 		Plays Lottie JSON animations using the ThorVG Lottie parser.
 
-config LV_USE_MENU
-	bool "Menu"
-	default y
-
 config LV_USE_MSGBOX
 	bool "Message box"
 	default y

@@ -1091,15 +1091,6 @@ lottie:
           - 'examples/libs/rlottie/**'
           - 'tests/src/test_cases/widgets/test_lottie.c'
 
-widget-menu:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'include/lvgl/widgets/lv_menu.h'
-          - 'src/widgets/menu/**'
-          - 'docs/src/widgets/menu.mdx'
-          - 'examples/widgets/menu/**'
-          - 'tests/src/test_cases/widgets/test_menu.c'
-
 widget-msgbox:
   - changed-files:
       - any-glob-to-any-file:
