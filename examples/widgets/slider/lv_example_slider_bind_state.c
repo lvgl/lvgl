@@ -9,10 +9,10 @@
  * @title Slider drives another widget's state
  * @brief Bind a button's `disabled` state to a subject driven by a slider's value.
  *
- * The slider edits `subject_value` (0..100). The "Submit" button uses
- * `bind_state_if_gt` to apply `disabled` whenever `subject_value > 80` — modelling
- * a guard like "block submit when the value is out of range". Slide past 80 to
- * watch the button grey out.
+ * The slider edits `subject_value` (0..100). The "Submit" button is bound with
+ * `lv_obj_bind_int` to a callback that applies `disabled` whenever
+ * `subject_value > 80` — modelling a guard like "block submit when the value is
+ * out of range". Slide past 80 to watch the button grey out.
  */
 static void disable_if_gt_80(lv_obj_t * obj, int32_t value)
 {
