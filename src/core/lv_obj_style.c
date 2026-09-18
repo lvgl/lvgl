@@ -354,27 +354,6 @@ bool lv_obj_get_style_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
     return !obj_style->is_disabled;
 }
 
-void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis)
-{
-    LV_LOG_DEPRECATED("use lv_obj_set_style_enabled instead (with inverted logic).");
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(style != NULL, return);
-
-    lv_obj_set_style_enabled(obj, style, selector, !dis);
-}
-
-bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
-{
-    LV_LOG_DEPRECATED("use lv_obj_get_style_enabled instead (with inverted logic).");
-    LV_CHECK_ARG(obj != NULL, return false);
-    LV_CHECK_ARG(style != NULL, return false);
-
-    lv_obj_style_t * obj_style = find_style(obj, style, selector);
-    if(obj_style == NULL) return false;
-
-    return obj_style->is_disabled;
-}
-
 
 void lv_obj_enable_style_refresh(bool en)
 {
