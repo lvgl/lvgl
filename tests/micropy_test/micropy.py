@@ -148,8 +148,7 @@ def create_ui():
     gird_rows = [100, GRID_FR(1), lv.GRID_CONTENT, lv.GRID_TEMPLATE_LAST]
     scr.set_grid_dsc_array(gird_cols, gird_rows)
 
-    chart_type_subject = lv.subject_t()
-    chart_type_subject.init_int(0)
+    chart_type_subject = lv.subject_create(lv.SUBJECT_TYPE.INT)
 
     # Create a widget
     dropdown = lv.dropdown(scr)

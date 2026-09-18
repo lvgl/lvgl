@@ -142,15 +142,6 @@ lv_subject_t * lv_subject_create(lv_subject_type_t type);
 void lv_subject_delete(lv_subject_t * subject);
 
 /**
- * Initialize an integer-type Subject.
- * @param subject   pointer to Subject
- * @param value     initial value
- * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
- */
-LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
-void lv_subject_init_int(lv_subject_t * subject, int32_t value);
-
-/**
  * Set value of an integer Subject and notify Observers.
  * @param subject   pointer to Subject
  * @param value     new value
@@ -189,15 +180,6 @@ void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value);
 #if LV_USE_FLOAT
 
 /**
- * Initialize an float-type Subject.
- * @param subject   pointer to Subject
- * @param value     initial value
- * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
- */
-LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
-void lv_subject_init_float(lv_subject_t * subject, float value);
-
-/**
  * Set value of an float Subject and notify Observers.
  * @param subject   pointer to Subject
  * @param value     new value
@@ -233,20 +215,6 @@ void lv_subject_set_min_value_float(lv_subject_t * subject, float min_value);
 void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value);
 
 #endif /*LV_USE_FLOAT*/
-
-/**
- * Initialize a string-type Subject.
- * @param subject   pointer to Subject
- * @param buf       pointer to buffer to store string
- * @param prev_buf  pointer to buffer to store previous string. @nullable When NULL the
- *                  previous string is not tracked.
- * @param size      size of buffer(s)
- * @param value     initial value of string, e.g. "hello"
- * @note            A string Subject stores its own copy of the string, not just the pointer.
- * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
- */
-LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
-void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value);
 
 /**
  * Set the buffers where a string subject will store its value
@@ -291,15 +259,6 @@ const char * lv_subject_get_string(lv_subject_t * subject);
 const char * lv_subject_get_previous_string(lv_subject_t * subject);
 
 /**
- * Initialize a pointer-type Subject.
- * @param subject   pointer to Subject
- * @param value     initial value @nullable
- * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
- */
-LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
-void lv_subject_init_pointer(lv_subject_t * subject, void * value);
-
-/**
  * Set value of a pointer Subject and notify Observers (regardless of whether it changed).
  * @param subject   pointer to Subject
  * @param ptr       new value @nullable
@@ -319,15 +278,6 @@ const void * lv_subject_get_pointer(lv_subject_t * subject);
  * @return          previous value
  */
 const void * lv_subject_get_previous_pointer(lv_subject_t * subject);
-
-/**
- * Initialize a color-type Subject.
- * @param subject   pointer to Subject
- * @param color     initial value
- * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
- */
-LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
-void lv_subject_init_color(lv_subject_t * subject, lv_color_t color);
 
 /**
  * Set value of a color Subject and notify Observers if it changed.
@@ -351,17 +301,6 @@ lv_color_t lv_subject_get_color(lv_subject_t * subject);
 lv_color_t lv_subject_get_previous_color(lv_subject_t * subject);
 
 /**
- * Initialize a Group-type Subject.
- * @param group_subject  pointer to Group-type Subject
- * @param list           list of other Subject addresses; when any of these have values
- *                       updated, Observers of `group_subject` will be notified.
- * @param list_len       number of elements in `list[]`
- * @deprecated      The subject init API is deprecated, use `lv_subject_create` instead
- */
-LV_DEPRECATED("The subject init API is deprecated,use `lv_subject_create` instead")
-void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len);
-
-/**
  * Set the subject list of a group subject
  *
  * @param subject   pointer to group Subject
@@ -370,19 +309,6 @@ void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], 
  * @param list_len  number of elements in `list[]`
  */
 void lv_subject_set_group_list_static(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len);
-
-/**
- * Remove all Observers from a Subject and free allocated memory, and delete
- * any associated Widget-Binding events.  This leaves `subject` "disconnected" from
- * all Observers and all associated Widget events established through Widget Binding.
- * @param subject   pointer to Subject @nullable
- * @note            This can safely be called regardless of whether any Observers
- *                  added with `lv_subject_add_observer_obj()` or bound to a Widget Property
- *                  with one of the `..._bind_...()` functions.
- * @deprecated      The subject init API is deprecated, use `lv_subject_create`/`lv_subject_delete` instead
- */
-LV_DEPRECATED("The subject init API is deprecated, use `lv_subject_create`/`lv_subject_delete` instead")
-void lv_subject_deinit(lv_subject_t * subject);
 
 /**
  * Get an element from Subject Group's list.
@@ -413,7 +339,7 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  * @note                Do not call `lv_observer_delete()` on Observers created this way.
  *                      Only clean up such Observers by either:
  *                      - deleting the Widget, or
- *                      - calling `lv_subject_deinit()` to gracefully de-couple and
+ *                      - calling `lv_subject_delete()` to gracefully de-couple and
  *                        remove all Observers.
  */
 lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t observer_cb, lv_obj_t * obj,
