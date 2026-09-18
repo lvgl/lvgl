@@ -74,7 +74,6 @@ LV_USE_LED        1
 LV_USE_LINE       1
 LV_USE_LIST       1
 LV_USE_LOTTIE     0
-LV_USE_MENU       1
 LV_USE_MSGBOX     1
 LV_USE_ROLLER     1
 LV_USE_SCALE      1

@@ -28,8 +28,6 @@ from .lv_keyboard import LVKeyboard
 from .lv_label import LVLabel
 from .lv_led import LVLed
 from .lv_line import LVLine
-from .lv_menu import LVMenu
-from .lv_menu_page import LVMenuPage
 from .lv_msgbox import LVMsgbox
 from .lv_qrcode import LVQrcode
 from .lv_roller import LVRoller
@@ -70,8 +68,6 @@ WIDGET_REGISTRY: dict[str, type] = {
     "lv_label": LVLabel,
     "lv_led": LVLed,
     "lv_line": LVLine,
-    "lv_menu": LVMenu,
-    "lv_menu_page": LVMenuPage,
     "lv_msgbox": LVMsgbox,
     "lv_qrcode": LVQrcode,
     "lv_roller": LVRoller,
@@ -130,8 +126,6 @@ __all__ = [
     "LVLabel",
     "LVLed",
     "LVLine",
-    "LVMenu",
-    "LVMenuPage",
     "LVMsgbox",
     "LVQrcode",
     "LVRoller",

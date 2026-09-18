@@ -1462,9 +1462,6 @@
 
 #endif /*LV_USE_THORVG*/
 
-/** Menu */
-#define LV_USE_MENU 1
-
 /** Message box
  *
  *  Enable: LV_USE_LABEL

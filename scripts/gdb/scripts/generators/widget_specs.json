@@ -480,45 +480,6 @@
       }
     }
   },
-  "lv_menu": {
-    "_auto": {
-      "fields": {
-        "storage": "pointer",
-        "main": "pointer",
-        "main_page": "pointer",
-        "main_header": "pointer",
-        "main_header_title": "pointer",
-        "sidebar": "pointer",
-        "sidebar_page": "pointer",
-        "sidebar_header": "pointer",
-        "sidebar_header_title": "pointer",
-        "selected_tab": "pointer",
-        "cur_depth": "int",
-        "prev_depth": "int",
-        "sidebar_generated": "bool",
-        "mode_header": "enum:3",
-        "mode_root_back_btn": "enum:2"
-      }
-    },
-    "summary_tpl": "",
-    "primary": [
-      "cur_depth",
-      "sidebar_generated"
-    ]
-  },
-  "lv_menu_page": {
-    "_auto": {
-      "fields": {
-        "title": "string",
-        "static_title": "bool"
-      }
-    },
-    "summary_tpl": "{title}",
-    "primary": [
-      "title",
-      "static_title"
-    ]
-  },
   "lv_msgbox": {
     "_auto": {
       "fields": {
