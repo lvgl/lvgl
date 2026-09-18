@@ -351,8 +351,8 @@ int32_t lv_display_get_horizontal_resolution(const lv_display_t * disp)
     LV_CHECK_ARG(disp != NULL, return 0);
 
     switch(disp->rotation) {
-        case LV_DISPLAY_ROTATION_90:
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_90:
+        case LV_ROTATION_270:
             return disp->ver_res;
         default:
             return disp->hor_res;
@@ -368,8 +368,8 @@ int32_t lv_display_get_vertical_resolution(const lv_display_t * disp)
 
     LV_CHECK_ARG(disp != NULL, return 0);
     switch(disp->rotation) {
-        case LV_DISPLAY_ROTATION_90:
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_90:
+        case LV_ROTATION_270:
             return disp->hor_res;
         default:
             return disp->ver_res;
@@ -408,8 +408,8 @@ int32_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp)
     LV_CHECK_ARG(disp != NULL, return 0);
 
     switch(disp->rotation) {
-        case LV_DISPLAY_ROTATION_90:
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_90:
+        case LV_ROTATION_270:
             return disp->physical_ver_res > 0 ? disp->physical_ver_res : disp->ver_res;
         default:
             return disp->physical_hor_res > 0 ? disp->physical_hor_res : disp->hor_res;
@@ -425,8 +425,8 @@ int32_t lv_display_get_physical_vertical_resolution(const lv_display_t * disp)
 
     LV_CHECK_ARG(disp != NULL, return 0);
     switch(disp->rotation) {
-        case LV_DISPLAY_ROTATION_90:
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_90:
+        case LV_ROTATION_270:
             return disp->physical_hor_res > 0 ? disp->physical_hor_res : disp->hor_res;
         default:
             return disp->physical_ver_res > 0 ? disp->physical_ver_res : disp->ver_res;
@@ -442,11 +442,11 @@ int32_t lv_display_get_offset_x(const lv_display_t * disp)
 
     LV_CHECK_ARG(disp != NULL, return 0);
     switch(disp->rotation) {
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             return disp->offset_y;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             return lv_display_get_physical_horizontal_resolution(disp) - disp->offset_x;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             return lv_display_get_physical_horizontal_resolution(disp) - disp->offset_y;
         default:
             return disp->offset_x;
@@ -462,11 +462,11 @@ int32_t lv_display_get_offset_y(const lv_display_t * disp)
 
     LV_CHECK_ARG(disp != NULL, return 0);
     switch(disp->rotation) {
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             return disp->offset_x;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             return lv_display_get_physical_vertical_resolution(disp) - disp->offset_y;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             return lv_display_get_physical_vertical_resolution(disp) - disp->offset_x;
         default:
             return disp->offset_y;
@@ -1103,7 +1103,7 @@ lv_area_t * lv_event_get_invalidated_area(lv_event_t * e)
     return lv_event_get_param(e);
 }
 
-void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation)
+void lv_display_set_rotation(lv_display_t * disp, lv_rotation_t rotation)
 {
     if(disp == NULL) {
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
@@ -1115,13 +1115,13 @@ void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation
     update_resolution(disp);
 }
 
-lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
+lv_rotation_t lv_display_get_rotation(lv_display_t * disp)
 {
     if(disp == NULL) {
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    LV_CHECK_ARG(disp != NULL, return LV_DISPLAY_ROTATION_0);
+    LV_CHECK_ARG(disp != NULL, return LV_ROTATION_0);
     return disp->rotation;
 }
 
@@ -1367,27 +1367,27 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
 {
     LV_CHECK_ARG(disp != NULL, return);
     LV_CHECK_ARG(area != NULL, return);
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    lv_rotation_t rotation = lv_display_get_rotation(disp);
 
-    if(rotation == LV_DISPLAY_ROTATION_0) return;
+    if(rotation == LV_ROTATION_0) return;
 
     int32_t w = lv_area_get_width(area);
     int32_t h = lv_area_get_height(area);
 
     switch(rotation) {
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             area->y2 = disp->ver_res - area->x1 - 1;
             area->x1 = area->y1;
             area->x2 = area->x1 + h - 1;
             area->y1 = area->y2 - w + 1;
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             area->y2 = disp->ver_res - area->y1 - 1;
             area->y1 = area->y2 - h + 1;
             area->x2 = disp->hor_res - area->x1 - 1;
             area->x1 = area->x2 - w + 1;
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             area->x1 = disp->hor_res - area->y2 - 1;
             area->y2 = area->x2;
             area->x2 = area->x1 + h - 1;
@@ -1402,55 +1402,25 @@ void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point)
 {
     LV_CHECK_ARG(disp != NULL, return);
     LV_CHECK_ARG(point != NULL, return);
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    lv_rotation_t rotation = lv_display_get_rotation(disp);
 
-    if(rotation == LV_DISPLAY_ROTATION_0) return;
-
-    const int32_t x = point->x;
-    const int32_t y = point->y;
-
-    switch(rotation) {
-        case LV_DISPLAY_ROTATION_90:
-            point->x = disp->ver_res - y - 1;
-            point->y = x;
-            break;
-        case LV_DISPLAY_ROTATION_180:
-            point->x = disp->hor_res - x - 1;
-            point->y = disp->ver_res - y - 1;
-            break;
-        case LV_DISPLAY_ROTATION_270:
-            point->x = y;
-            point->y = disp->hor_res - x - 1;
-            break;
-        default:
-            break;
-    }
-}
-
-void lv_display_rotate_point_ccw(lv_display_t * disp, lv_point_t * point)
-{
-    LV_CHECK_ARG(disp != NULL, return);
-    LV_CHECK_ARG(point != NULL, return);
-
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-
-    if(rotation == LV_DISPLAY_ROTATION_0) return;
+    if(rotation == LV_ROTATION_0) return;
 
     const int32_t x = point->x;
     const int32_t y = point->y;
 
     switch(rotation) {
-        case LV_DISPLAY_ROTATION_90:
-            point->x = y;
-            point->y = disp->hor_res - x - 1;
+        case LV_ROTATION_90:
+            point->x = disp->ver_res - y - 1;
+            point->y = x;
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             point->x = disp->hor_res - x - 1;
             point->y = disp->ver_res - y - 1;
             break;
-        case LV_DISPLAY_ROTATION_270:
-            point->x = disp->ver_res - y - 1;
-            point->y = x;
+        case LV_ROTATION_270:
+            point->x = y;
+            point->y = disp->hor_res - x - 1;
             break;
         default:
             break;

@@ -62,7 +62,7 @@ static void lv_opengles_shader_set_uniform3f(const char * name, float value_0, f
 static void lv_opengles_render_draw(void);
 static float lv_opengles_map_float(float x, float min_in, float max_in, float min_out, float max_out);
 static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN],
-                                   lv_display_rotation_t rotation, bool * h_flip, bool * v_flip,
+                                   lv_rotation_t rotation, bool * h_flip, bool * v_flip,
                                    float clip_x1, float clip_y1, float clip_x2, float clip_y2);
 
 /***********************
@@ -350,7 +350,7 @@ void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
 
-    lv_display_rotation_t rotation = lv_display_get_rotation(display);
+    lv_rotation_t rotation = lv_display_get_rotation(display);
     bool h_flip = params->h_flip;
     bool v_flip = params->v_flip;
 
@@ -820,7 +820,7 @@ static float lv_opengles_map_float(float x, float min_in, float max_in, float mi
 }
 
 static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN],
-                                   lv_display_rotation_t rotation, bool * h_flip, bool * v_flip, float clip_x1, float clip_y1, float clip_x2,
+                                   lv_rotation_t rotation, bool * h_flip, bool * v_flip, float clip_x1, float clip_y1, float clip_x2,
                                    float clip_y2)
 {
 #if !LV_USE_DRAW_OPENGLES
@@ -828,7 +828,7 @@ static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER
     LV_UNUSED(v_flip);
 #endif
     switch(rotation) {
-        case LV_DISPLAY_ROTATION_0:
+        case LV_ROTATION_0:
             vertex_buffer[0] = -1.f;
             vertex_buffer[1] = 1.0f;
             vertex_buffer[2] = clip_x1;
@@ -847,7 +847,7 @@ static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER
             vertex_buffer[15] = clip_y1;
             break;
 
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
 #if LV_USE_DRAW_OPENGLES
             *h_flip = !*h_flip;
             *v_flip = !*v_flip;
@@ -870,7 +870,7 @@ static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER
             vertex_buffer[15] = clip_y1;
             break;
 
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             vertex_buffer[0] = 1.0f;
             vertex_buffer[1] = -1.0f;
             vertex_buffer[2] = clip_x1;
@@ -888,7 +888,7 @@ static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER
             vertex_buffer[14] = clip_x1;
             vertex_buffer[15] = clip_y1;
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
 #if LV_USE_DRAW_OPENGLES
             *h_flip = !*h_flip;
             *v_flip = !*v_flip;

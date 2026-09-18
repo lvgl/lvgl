@@ -180,8 +180,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         int32_t area_width = lv_area_get_width(area);
         int32_t area_height = lv_area_get_height(area);
 
-        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-        if(rotation == LV_DISPLAY_ROTATION_0) {
+        lv_rotation_t rotation = lv_display_get_rotation(disp);
+        if(rotation == LV_ROTATION_0) {
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
             clean_dcache();
 

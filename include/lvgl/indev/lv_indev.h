@@ -486,23 +486,19 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
 void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb);
 
 /**
- * Set Counter-Clock-Wise (CCW) rotation processing for an indev
- * @param indev         indev to set CCW rotation processing on
+ * Set the direction in which the display rotation is applied to the indev's points.
+ *
+ * @param indev         pointer to an indev
+ * @param rotation_dir  rotation direction see @ref lv_rotation_dir_t
  */
-void lv_indev_set_ccw(lv_indev_t * indev);
+void lv_indev_set_rotation_dir(lv_indev_t * indev, lv_rotation_dir_t rotation_dir);
 
 /**
- * Clear Counter-Clock-Wise (CCW) rotation processing for an indev
- * @param indev         indev to clear CCW rotation processing on
+ * Get the direction in which the display rotation is applied to the indev's points.
+ * @param indev    pointer to an indev
+ * @return         a @ref lv_rotation_dir_t value
  */
-void lv_indev_clear_ccw(lv_indev_t * indev);
-
-/**
- * Get Counter-Clock-Wise (CCW) rotation processing for an indev
- * @param indev         indev to get CCW rotation from
- * @return              True if CCW processing is set for an indev, false if indev is NULL or CCW processing is not set.
- */
-bool lv_indev_get_ccw(const lv_indev_t * indev);
+lv_rotation_dir_t lv_indev_get_rotation_dir(const lv_indev_t * indev);
 
 #if LV_USE_EXT_DATA
 /**

@@ -56,6 +56,7 @@ static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
 static lv_result_t send_event(lv_event_code_t code, void * param);
 
+static lv_rotation_dir_t indev_rotation_dir(const lv_indev_t * indev);
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
 static void indev_scroll_throw_anim_cb(void * var, int32_t v);
 static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim);
@@ -709,27 +710,18 @@ void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap
     indev->key_remap_cb = remap_cb;
 }
 
-void lv_indev_set_ccw(lv_indev_t * indev)
+void lv_indev_set_rotation_dir(lv_indev_t * indev, lv_rotation_dir_t rotation_dir)
 {
     LV_CHECK_ARG(indev != NULL, return);
-    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return);
-    indev->pointer.ccw_rotation = 1;
+    LV_CHECK_ARG(indev->type == LV_INDEV_TYPE_POINTER, return);
+    indev->pointer.ccw_rotation = rotation_dir == LV_ROTATION_DIR_CCW;
 }
 
-
-void lv_indev_clear_ccw(lv_indev_t * indev)
-{
-    LV_CHECK_ARG(indev != NULL, return);
-    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return);
-    indev->pointer.ccw_rotation = 0;
-}
-
-
-bool lv_indev_get_ccw(const lv_indev_t * indev)
+lv_rotation_dir_t lv_indev_get_rotation_dir(const lv_indev_t * indev)
 {
     LV_CHECK_ARG(indev != NULL, return false);
-    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return false);
-    return (indev->pointer.ccw_rotation != 0);
+    LV_CHECK_ARG(indev->type == LV_INDEV_TYPE_POINTER, return false);
+    return indev_rotation_dir(indev);
 }
 
 #if LV_USE_EXT_DATA
@@ -760,12 +752,17 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    if(lv_indev_get_ccw(i)) {
-        lv_display_rotate_point_ccw(i->disp, &data->point);
-    }
-    else {
-        lv_display_rotate_point(i->disp, &data->point);
-    }
+    /* The point travels from the panel to the screen, the opposite way to the rendering*/
+    const lv_rotation_t inverse = lv_rotation_invert(lv_display_get_rotation(i->disp));
+
+    /* Handle the case where the indev rotation direction is ccw.
+     * This is a essentially a no-op in the default case*/
+    const lv_rotation_t rotation = lv_rotation_resolve(inverse, indev_rotation_dir(i));
+
+    const int32_t display_width = lv_display_get_original_horizontal_resolution(i->disp);
+    const int32_t display_height = lv_display_get_original_vertical_resolution(i->disp);
+
+    lv_point_rotate(&data->point, rotation, display_width, display_height);
 
     /*Simple sanity check*/
     if(data->point.x < 0) {
@@ -2042,4 +2039,10 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
+}
+static lv_rotation_dir_t indev_rotation_dir(const lv_indev_t * indev)
+{
+    LV_ASSERT(indev != NULL);
+    LV_ASSERT(indev->type == LV_INDEV_TYPE_POINTER);
+    return indev->pointer.ccw_rotation ? LV_ROTATION_DIR_CCW : LV_ROTATION_DIR_CW;
 }
