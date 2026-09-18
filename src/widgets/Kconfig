@@ -232,7 +232,4 @@ config LV_USE_TILEVIEW
 	bool "Tileview"
 	default y
 
-config LV_USE_WIN
-	bool "Window"
-	default y
 endmenu

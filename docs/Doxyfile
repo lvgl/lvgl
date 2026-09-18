@@ -2251,7 +2251,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_VG_LITE_DRIVER=1         \
                          LV_USE_VG_LITE_THORVG=1         \
                          LV_USE_WAYLAND=1                \
-                         LV_USE_WIN=1                    \
                          LV_USE_WINDOWS=1                \
                          LV_USE_X11=1                    \
                          LV_LIBINPUT_XKB=1

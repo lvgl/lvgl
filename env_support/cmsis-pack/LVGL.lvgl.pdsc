@@ -829,7 +829,6 @@
                 <file category="sourceC"            name="src/widgets/tabview/lv_tabview.c" />
                 <file category="sourceC"            name="src/widgets/textarea/lv_textarea.c" />
                 <file category="sourceC"            name="src/widgets/tileview/lv_tileview.c" />
-                <file category="sourceC"            name="src/widgets/win/lv_win.c" />
                 <file category="sourceC"            name="src/widgets/3dtexture/lv_3dtexture.c" />
                 
                 <file category="sourceC"            name="src/widgets/property/lv_arc_properties.c" />

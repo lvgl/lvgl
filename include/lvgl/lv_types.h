@@ -253,7 +253,6 @@ typedef struct _lv_tileview_t lv_tileview_t;
 
 typedef struct _lv_tileview_tile_t lv_tileview_tile_t;
 
-typedef struct _lv_win_t lv_win_t;
 
 typedef struct _lv_spinner_t lv_spinner_t;
 
