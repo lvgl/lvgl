@@ -2207,7 +2207,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_REFR_DEBUG=1             \
                          LV_USE_RENESAS_GLCDC=1          \
                          LV_USE_RLE=1                    \
-                         LV_USE_RLOTTIE=1                \
                          LV_USE_ROLLER=1                 \
                          LV_USE_ROTATE_G2D=1             \
                          LV_USE_ROTATE_PXP=1             \

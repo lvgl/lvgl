@@ -2391,21 +2391,6 @@
               </RTE_Components_h>
             </component>
 
-            <component Cgroup="Libraries and Others" Csub="Libs RLOTTIE"  condition="LVGL-Essential">
-              <description>Add Rlottie library, an extra librbary is required.</description>
-              <files>
-                <!-- src/libs/rlottie -->
-                <file category="sourceC"    name="src/libs/rlottie/lv_rlottie.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable Rlottie library */
-#define LV_USE_RLOTTIE         1
-              </RTE_Components_h>
-
-            </component>
-
             <component Cgroup="Libraries and Others" Csub="Libs ThorVG"  condition="LVGL-Essential">
               <description>Add ThorVG (vector graphics library), an extra librbary is required.</description>
               <files>
