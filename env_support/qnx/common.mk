@@ -69,7 +69,6 @@ $(SRC_ROOT)/others/monkey \
 $(SRC_ROOT)/others/ime \
 $(SRC_ROOT)/others/snapshot \
 $(SRC_ROOT)/others/imgfont \
-$(SRC_ROOT)/others/fragment \
 $(SRC_ROOT)/others/observer \
 $(SRC_ROOT)/others/vg_lite_tvg \
 $(SRC_ROOT)/others/sysmon \

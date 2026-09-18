@@ -1,8 +1,0 @@
-menu "Others"
-config LV_USE_FRAGMENT
-	bool "Fragment"
-	default n
-	help
-		Manage a widget subtree with its own lifecycle and back stack, similar to Android fragments.
-
-endmenu
