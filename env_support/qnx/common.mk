@@ -20,7 +20,6 @@ $(SRC_ROOT)/libs/libpng \
 $(SRC_ROOT)/libs/bin_decoder \
 $(SRC_ROOT)/libs/tiny_ttf \
 $(SRC_ROOT)/libs/barcode \
-$(SRC_ROOT)/libs/rlottie \
 $(SRC_ROOT)/libs/qrcode \
 $(SRC_ROOT)/libs/lz4 \
 $(SRC_ROOT)/libs/ffmpeg \

@@ -23,7 +23,6 @@ extern "C" {
 #include "lodepng/lv_example_lodepng.h"
 #include "libpng/lv_example_libpng.h"
 #include "qrcode/lv_example_qrcode.h"
-#include "rlottie/lv_example_rlottie.h"
 #include "tjpgd/lv_example_tjpgd.h"
 #include "libjpeg_turbo/lv_example_libjpeg_turbo.h"
 #include "libwebp/lv_example_libwebp.h"

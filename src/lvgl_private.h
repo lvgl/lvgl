@@ -151,7 +151,6 @@
 #include "libs/gltf/gltf_view/assets/lv_gltf_view_shader.h"
 #include "libs/gltf/gltf_view/lv_gltf_view_internal.h"
 #include "libs/rle/lv_rle_private.h"
-#include "libs/rlottie/lv_rlottie_private.h"
 #include "image/svg/lv_svg_decoder.h"
 #include "image/svg/lv_svg_private.h"
 #include "image/svg/lv_svg_parser.h"

@@ -1474,9 +1474,6 @@
  */
 #define LV_USE_QRCODE 0
 
-/** Legacy rlottie binding, kept for compatibility. Use LV_USE_LOTTIE instead. */
-#define LV_USE_RLOTTIE 0
-
 /** Roller
  *
  *  Enable: LV_USE_LABEL
