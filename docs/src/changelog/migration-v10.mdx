@@ -788,7 +788,7 @@ used afterwards.
 
 ### lv_span
 
-- `lv_spangroup_set_align()` is deprecated, use the `text_align` style property instead:
+- `lv_spangroup_set_align()` has been removed, use the `text_align` style property instead:
   ```c
   /* Before */
   lv_spangroup_set_align(obj, LV_TEXT_ALIGN_CENTER);
@@ -797,7 +797,7 @@ used afterwards.
   lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
   ```
 
-- `lv_spangroup_set_mode()` is deprecated, control expanding/wrapping by setting the widget width instead:
+- `lv_spangroup_set_mode()` has been removed, control expanding/wrapping by setting the widget width instead:
   ```c
   /* Before */
   lv_spangroup_set_mode(obj, LV_SPAN_MODE_EXPAND);
@@ -805,6 +805,10 @@ used afterwards.
   /* After — LV_SIZE_CONTENT expands to fit, a fixed value wraps */
   lv_obj_set_width(obj, LV_SIZE_CONTENT);
   ```
+
+  The `align` and `mode` entries of the property API (`LV_PROPERTY_SPAN_ALIGN`
+  and `LV_PROPERTY_SPAN_MODE`) are gone with them. Use the `text_align` style
+  property and the widget's width/height instead.
 
 ### lv_textarea
 
