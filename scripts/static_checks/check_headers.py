@@ -9,7 +9,6 @@ Subcommands (each exits 0 on success, 1 on failure):
                       (angle-bracket includes must appear in ALLOWED_EXTERNAL_HEADERS)
   allowed-list-audit  Report usage of every entry in ALLOWED_EXTERNAL_HEADERS across
                       src/ and include/lvgl/; fail if any entry is unused anywhere
-  deprecated          Check no source file includes a deprecated header
   no-direct-public-include
                       Check src/ never includes include/lvgl/ headers directly
 """
@@ -66,10 +65,6 @@ def _warn(location: str, msg: str) -> None:
 
 SOURCE_EXTENSIONS = {".c", ".cpp", ".h", ".hpp"}
 
-DEPRECATION_MARKERS = (
-    "#warning Include public headers from the `src` folder is deprecated",
-    "is no longer part of the public API",
-)
 
 # Angle-bracket includes that are explicitly forbidden.
 # Files should instead use the LVGL indirection macros shown below.
@@ -402,26 +397,13 @@ def _grep(pattern: str, directory: Path) -> list[tuple[Path, int, str]]:
         return hits
 
 
-def _find_deprecated_headers(folder: Path) -> set[Path]:
-    deprecated: set[Path] = set()
-    for path in folder.rglob("*.h"):
-        try:
-            content = path.read_text(encoding="utf-8", errors="ignore")
-        except OSError:
-            continue
-        if any(marker in content for marker in DEPRECATION_MARKERS):
-            # Store the path relative to the folder so it matches include directives
-            deprecated.add(path.relative_to(folder))
-    return deprecated
-
-
 # ---------------------------------------------------------------------------
 # Check 1 -- public API umbrella
 # ---------------------------------------------------------------------------
 
 
 def check_public_api(repo_root: Path) -> bool:
-    """Every non-deprecated .h under include/lvgl/ must be included by include/lvgl/lvgl.h."""
+    """Every .h under include/lvgl/ must be included by include/lvgl/lvgl.h."""
     include_dir = repo_root / "include" / "lvgl"
     umbrella = include_dir / "lvgl.h"
 
@@ -453,7 +435,7 @@ def check_public_api(repo_root: Path) -> bool:
 
 
 def check_private_api(repo_root: Path) -> bool:
-    """Every non-deprecated .h under src/ must be included by src/lvgl_private.h."""
+    """Every .h under src/ must be included by src/lvgl_private.h."""
     src_dir = repo_root / "src"
     umbrella = src_dir / "lvgl_private.h"
 
@@ -462,12 +444,11 @@ def check_private_api(repo_root: Path) -> bool:
         return False
 
     exceptions = {umbrella.name, "lv_templ.h", "lv_objx_templ.h"}
-    deprecated = [p.name for p in _find_deprecated_headers(repo_root)]
     covered = _collect_includes(umbrella)
     ok = True
 
     for header in sorted(src_dir.rglob("lv_*.h")):
-        if header.name in deprecated or header.name in exceptions:
+        if header.name in exceptions:
             continue
         if header.name not in covered:
             _error(
@@ -558,47 +539,6 @@ def check_include_paths(repo_root: Path) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Check 4 -- deprecated headers
-# ---------------------------------------------------------------------------
-
-
-def check_deprecated(repo_root: Path) -> bool:
-    """No source file anywhere in the repo may include a deprecated header."""
-    src_dir = repo_root / "src"
-    deprecated = _find_deprecated_headers(repo_root)
-
-    if not deprecated:
-        log_ok("no deprecated headers found in repo")
-        return True
-
-    include_re = re.compile(r'#\s*include\s*[<"]([^>"]+)[>"]')
-    offenders: dict[Path, list[tuple[int, str]]] = {}
-
-    for path in _source_files(repo_root):
-        hits = []
-        for lineno, line in enumerate(_read_lines(path), start=1):
-            m = include_re.search(line)
-            if m:
-                included_path = Path(m.group(1))
-                # Match against full relative paths, not just filenames
-                if included_path in deprecated:
-                    hits.append((lineno, line.strip()))
-        if hits:
-            offenders[path] = hits
-
-    if not offenders:
-        log_ok("no files include deprecated headers")
-        return True
-
-    for path, hits in sorted(offenders.items()):
-        for lineno, line in hits:
-            _error(
-                f"{path.relative_to(repo_root)}:{lineno}", f"deprecated include: {line}"
-            )
-    return False
-
-
-# ---------------------------------------------------------------------------
 # Check 5 -- internal code must not include include/lvgl/* directly
 # ---------------------------------------------------------------------------
 
@@ -611,7 +551,6 @@ def check_no_direct_public_include(repo_root: Path) -> bool:
     src_dir = repo_root / "src"
     include_dir = (repo_root / "include" / "lvgl").resolve()
     ok = True
-    deprecated = [p.name for p in _find_deprecated_headers(src_dir)]
 
     for path in _source_files(src_dir):
         for lineno, line in enumerate(_read_lines(path), start=1):
@@ -621,7 +560,7 @@ def check_no_direct_public_include(repo_root: Path) -> bool:
             resolved = (path.parent / quoted.group(1)).resolve()
             if path.name == "lvgl_public.h":
                 continue
-            if resolved.is_relative_to(include_dir) and path.name not in deprecated:
+            if resolved.is_relative_to(include_dir):
                 _error(
                     f"{path.relative_to(repo_root)}:{lineno}",
                     f'direct public include "{quoted.group(1)}". '
@@ -706,7 +645,6 @@ CHECKS = {
     "private-api": check_private_api,
     "include-paths": check_include_paths,
     "allowed-list-audit": check_allowed_list_audit,
-    "deprecated": check_deprecated,
     "no-direct-public-include": check_no_direct_public_include,
 }
 
