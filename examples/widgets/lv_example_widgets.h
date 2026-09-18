@@ -38,7 +38,6 @@ extern "C" {
 #include "line/lv_example_line.h"
 #include "list/lv_example_list.h"
 #include "lottie/lv_example_lottie.h"
-#include "menu/lv_example_menu.h"
 #include "msgbox/lv_example_msgbox.h"
 #include "obj/lv_example_obj.h"
 #include "roller/lv_example_roller.h"

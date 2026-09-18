@@ -25,7 +25,6 @@
 # CONFIG_LV_USE_LED is not set
 # CONFIG_LV_USE_LINE is not set
 # CONFIG_LV_USE_LIST is not set
-# CONFIG_LV_USE_MENU is not set
 # CONFIG_LV_USE_MSGBOX is not set
 # CONFIG_LV_USE_ROLLER is not set
 # CONFIG_LV_USE_SCALE is not set

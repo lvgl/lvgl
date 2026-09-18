@@ -3,7 +3,7 @@
 #include "../../src/themes/lv_theme_private.h"
 #include "unity/unity.h"
 
-/*The themes are tested on the deprecated `lv_menu`, `lv_list` and `lv_win` widgets too.*/
+/*The themes are tested on the deprecated `lv_list` and `lv_win` widgets too.*/
 LV_DEPRECATIONS_IGNORE_BEGIN
 
 void setUp(void)
@@ -138,9 +138,6 @@ static void test_widgets(const char * img_name)
     lv_label_set_text(tile_label, "Tile: 0;0");
 
     lv_led_create(scr_act);
-
-    lv_obj_t * menu = lv_menu_create(scr_act);
-    lv_obj_set_size(menu, 100, 100);
 
     lv_spinner_create(scr_act);
 

@@ -2170,7 +2170,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_LZ4_INTERNAL=1           \
                          LV_USE_MATRIX=1                 \
                          LV_USE_MEM_MONITOR=1            \
-                         LV_USE_MENU=1                   \
                          LV_USE_MONKEY=1                 \
                          LV_USE_MSGBOX=1                 \
                          LV_USE_NANOVG=1                 \

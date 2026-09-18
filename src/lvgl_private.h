@@ -222,7 +222,6 @@
 #include "widgets/led/lv_led_private.h"
 #include "widgets/line/lv_line_private.h"
 #include "widgets/lottie/lv_lottie_private.h"
-#include "widgets/menu/lv_menu_private.h"
 #include "widgets/msgbox/lv_msgbox_private.h"
 #include "widgets/qrcode/lv_qrcode_private.h"
 #include "widgets/roller/lv_roller_private.h"

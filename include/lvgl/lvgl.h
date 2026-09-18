@@ -189,7 +189,6 @@
 #include "widgets/lv_line.h"
 #include "widgets/lv_list.h"
 #include "widgets/lv_lottie.h"
-#include "widgets/lv_menu.h"
 #include "widgets/lv_msgbox.h"
 #include "widgets/lv_qrcode.h"
 #include "widgets/lv_rlottie.h"
