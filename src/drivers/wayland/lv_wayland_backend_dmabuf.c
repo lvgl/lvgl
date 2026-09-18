@@ -320,10 +320,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
     lv_color_format_t cf = lv_display_get_color_format(disp);
 
-    if(!lv_display_flush_is_last(disp)) {
-        lv_display_flush_ready(disp);
-        return;
-    }
 
     lv_wl_dmabuf_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
     struct wl_surface * surface = lv_wayland_get_window_surface(disp);
@@ -331,6 +327,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         lv_display_flush_ready(disp);
         return;
     }
+
+    wl_surface_damage(surface, area->x1, area->y1, lv_area_get_width(area), lv_area_get_height(area));
+    if(!lv_display_flush_is_last(disp)) {
+        lv_display_flush_ready(disp);
+        return;
+    }
+
 
     /* When using ARGB8888, the compositor expects premultiplied ARGB8888 so premultiply it here*/
     if(ddata->buffers[0].cf == DRM_FORMAT_ARGB8888 && cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
@@ -360,12 +363,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         return;
     }
 
-    const int32_t phy_width = lv_display_get_original_horizontal_resolution(disp);
-    const int32_t phy_height = lv_display_get_original_vertical_resolution(disp);
-
     struct wl_callback * callback = wl_surface_frame(surface);
     wl_callback_add_listener(callback, &frame_listener, disp);
-    lv_wayland_dmabuf_buffer_attach(&ctx.dmabuf, surface, &buf->base, phy_width, phy_height);
+    lv_wayland_dmabuf_buffer_attach(&ctx.dmabuf, surface, &buf->base);
 }
 
 
