@@ -506,7 +506,7 @@ Note that these assertions are not required and should be disabled to improve pe
 
 ### lv_obj
 
-- `lv_obj_find_by_id()` is deprecated, use `lv_obj_find_by_name()` instead:
+- `lv_obj_find_by_id()` has been removed, use <ApiLink name="lv_obj_find_by_name"/> instead:
   ```c
   /* Before */
   lv_obj_t * obj = lv_obj_find_by_id(parent, my_id);
@@ -516,9 +516,10 @@ Note that these assertions are not required and should be disabled to improve pe
   ```
 
 - The generic flag API — `lv_obj_add_flag()`, `lv_obj_remove_flag()`,
-  `lv_obj_set_flag()`, `lv_obj_has_flag()` and `lv_obj_has_flag_any()` — is
-  deprecated. Each flag now has a dedicated setter (`lv_obj_set_<flag>(obj, en)`)
-  and getter (`lv_obj_is_<flag>(obj)`):
+  `lv_obj_set_flag()`, `lv_obj_has_flag()` and `lv_obj_has_flag_any()` — has been
+  removed, along with the v8/v9 aliases `lv_obj_clear_flag()` and
+  `lv_obj_update_flag()`. Each flag now has a dedicated setter
+  (`lv_obj_set_<flag>(obj, en)`) and getter (`lv_obj_is_<flag>(obj)`):
   ```c
   /* Before */
   lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
@@ -535,6 +536,9 @@ Note that these assertions are not required and should be disabled to improve pe
   The custom-bit flags (`LV_OBJ_FLAG_USER_1`–`4`) can be accessed via
   `lv_obj_set/get_user_flag()`, which take a bit from 0 to 3 e.g `lv_obj_set_user_flag(obj, 0, true)`
   instead of lv_obj_get/set-flag(obj, LV_OBJ_FLAG_USER_1).
+
+  The `lv_obj_flag_t` enum itself is kept: the `LV_PROPERTY_OBJ_FLAG_*` property
+  range still uses it, and the GDB pretty-printer decodes a widget's flags from it.
 
   A migration script is available at `scripts/migration/migrate_obj_flags.py`:
   ```bash

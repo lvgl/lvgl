@@ -229,34 +229,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent);
  * Setter functions
  *====================*/
 
-/**
- * Set one or more flags
- * @param obj   pointer to an object
- * @param f     OR-ed values from `lv_obj_flag_t` to set.
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, true)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, true).")
-void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
-
-/**
- * Remove one or more flags
- * @param obj   pointer to an object
- * @param f     OR-ed values from `lv_obj_flag_t` to clear.
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, false)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, false).")
-void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
-
-/**
- * Set add or remove one or more flags.
- * @param obj   pointer to an object
- * @param f     OR-ed values from `lv_obj_flag_t` to update.
- * @param v     true: add the flags; false: remove the flags
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, en)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, en).")
-void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
-
 /** Make the object hidden. (Like it wasn't there at all)
  * @param obj     pointer to a widget
  * @param en      enable or disable the hidden property
@@ -533,26 +505,6 @@ void lv_obj_set_user_flag(lv_obj_t * obj, uint32_t bit, bool v);
 /*=======================
  * Getter functions
  *======================*/
-
-/**
- * Check if a given flag or all the given flags are set on an object.
- * @param obj   pointer to an object
- * @param f     the flag(s) to check (OR-ed values can be used)
- * @return      true: all flags are set; false: not all flags are set
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_is_hidden(obj)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
-bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
-
-/**
- * Check if a given flag or any of the flags are set on an object.
- * @param obj   pointer to an object
- * @param f     the flag(s) to check (OR-ed values can be used)
- * @return      true: at least one flag is set; false: none of the flags are set
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
-bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
 
 /** Get whether the object is hidden
  * @param obj     pointer to a widget
@@ -955,22 +907,6 @@ void lv_obj_set_id(lv_obj_t * obj, void * id);
  * @return      the id of the object
  */
 void * lv_obj_get_id(const lv_obj_t * obj);
-
-/**
- *
- * Get the child object by its id.
- * It will check children and grandchildren recursively.
- * Function `lv_obj_id_compare` is used to matched obj id with given id.
- *
- * @deprecated IDs are used only to print the widget trees. To find a widget use `lv_obj_find_by_name`
- *
- * @param obj       pointer to an object @nullable. When NULL the active screen is
- *                  searched.
- * @param id        the id of the child object
- * @return          pointer to the child object or NULL if not found
- */
-LV_DEPRECATED("IDs are used only to print the widget trees. To find a widget use lv_obj_find_by_name")
-lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id);
 
 /**
  * Assign id to object if not previously assigned.

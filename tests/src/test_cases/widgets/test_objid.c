@@ -28,19 +28,4 @@ void test_obj_id_should_grow_by_one(void)
     TEST_ASSERT_EQUAL(id1 + 1, id2);
 }
 
-void test_obj_id_get_child(void)
-{
-    lv_obj_t * parent = lv_obj_create(lv_screen_active());
-    lv_obj_t * child = lv_label_create(parent);
-    lv_obj_t * grandchild = lv_label_create(child);
-
-    lv_obj_set_id(child, (void *)(lv_uintptr_t)42);
-    lv_obj_set_id(grandchild, (void *)(lv_uintptr_t)43);
-
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    TEST_ASSERT_EQUAL_PTR(child, lv_obj_find_by_id(NULL, (void *)(lv_uintptr_t)42));
-    TEST_ASSERT_EQUAL_PTR(grandchild, lv_obj_find_by_id(NULL, (void *)(lv_uintptr_t)43));
-    LV_DEPRECATIONS_IGNORE_END
-}
-
 #endif

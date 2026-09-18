@@ -15,10 +15,7 @@ Enable Widget ID functionality by setting <ApiLink name="LV_USE_OBJ_ID" /> to `1
 Once enabled, several things change:
 
 - each Widget will now have a `void *` field called `id`;
-- these two API functions become available:
-  
-  - <ApiLink name="lv_obj_get_id" display="lv_obj_get_id(widget)" />,
-  - <ApiLink name="lv_obj_find_by_id" display="lv_obj_find_by_id(widget, id)" />;
+- <ApiLink name="lv_obj_get_id" display="lv_obj_get_id(widget)" /> becomes available;
 - several more Widget-ID-related API functions become available if
   <ApiLink name="LV_USE_OBJ_ID_BUILTIN" /> is non-zero (more on this below);
 - two additional configuration macros both <ApiLink name="LV_OBJ_ID_AUTO_ASSIGN" /> and
@@ -166,11 +163,10 @@ use of that pointer will likely cause a crash because the pointer is not valid a
 more.  However, a timely dump of the Widget Tree right before that point will show
 that the Widget no longer exists.
 
-### Find child by ID
+### Finding a child
 
-<Callout type="warn">
-`lv_obj_find_by_id(widget, id)` is deprecated. To find a widget use `obj_name`.
-</Callout>
-
-<ApiLink name="lv_obj_find_by_id" display="lv_obj_find_by_id(widget, id)" /> will perform a recursive walk through
-`widget`'s children and return the first child encountered having the given ID.
+IDs are only used to print the Widget Tree. To look a Widget up, give it a name
+with <ApiLink name="lv_obj_set_name" display="lv_obj_set_name(widget, &quot;my_widget&quot;)" />
+and find it with
+<ApiLink name="lv_obj_find_by_name" display="lv_obj_find_by_name(parent, &quot;my_widget&quot;)" />,
+which walks `parent`'s children recursively.
