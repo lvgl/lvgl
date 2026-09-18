@@ -44,7 +44,6 @@ COMPONENT_SRCDIRS := . \
                   src/libs/tiny_ttf \
                   src/libs/tjpgd \
                   src/libs/libjpeg_turbo \
-                  src/others/fragment \
                   src/others/gridnav \
                   src/others/ime \
                   src/others/imgfont \

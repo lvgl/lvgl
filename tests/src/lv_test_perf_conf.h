@@ -1058,9 +1058,6 @@
         /** 1: Enable grid navigation */
         #define LV_USE_GRIDNAV 0
 
-        /** 1: Enable `lv_obj` fragment logic */
-        #define LV_USE_FRAGMENT 0
-
         /** 1: Support using images as font in label or span widgets */
         #define LV_USE_IMGFONT 0
 

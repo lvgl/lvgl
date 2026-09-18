@@ -680,14 +680,6 @@ frogfs:
           - 'src/fs/lv_fs_frogfs.c'
           - 'docs/src/libs/fs_support/frogfs.mdx'
 
-fragment:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'include/lvgl/others/fragment/**'
-          - 'src/others/fragment/**'
-          - 'docs/src/auxiliary-modules/fragment.mdx'
-          - 'examples/others/fragment/**'
-
 # Layouts
 
 layout:

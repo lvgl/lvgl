@@ -3475,14 +3475,6 @@ config LV_USE_PARALLEL_DRAW_DEBUG
 		draw unit's index number on a white background (black for layers).
 endmenu
 endmenu
-menu "Others"
-config LV_USE_FRAGMENT
-	bool "Fragment"
-	default n
-	help
-		Manage a widget subtree with its own lifecycle and back stack, similar to Android fragments.
-
-endmenu
 menu "Build"
 
 config LVGL_VERSION_MAJOR
