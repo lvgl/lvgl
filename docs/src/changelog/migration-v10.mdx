@@ -959,6 +959,21 @@ can enable LVGL's private api by including `lvgl_private.h` or simply enabling `
 
 ## Libraries
 
+### glTF
+
+- `lv_gltf_set_env_brightness()` and `lv_gltf_get_env_brightness()` have been
+  removed. Use <ApiLink name="lv_gltf_set_environment_brightness"/> and
+  <ApiLink name="lv_gltf_get_environment_brightness"/>, which take and return a
+  multiplier (`1.0` = neutral) instead of a percentage.
+
+  ```c
+  /* Before */
+  lv_gltf_set_env_brightness(gltf, 150);
+
+  /* After */
+  lv_gltf_set_environment_brightness(gltf, 1.5f);
+  ```
+
 ### rlottie
 
 - The rlottie player is deprecated. Use the [`lv_lottie`](widgets/lottie) widget

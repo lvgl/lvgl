@@ -504,22 +504,6 @@ uint32_t lv_gltf_get_background_blur(const lv_obj_t * obj)
     return viewer->desc.blur_bg * 100;
 }
 
-void lv_gltf_set_env_brightness(lv_obj_t * obj, uint32_t value)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_LOG_DEPRECATED("use lv_gltf_set_environment_brightness() instead");
-    lv_gltf_set_environment_brightness(obj, (float)value / 100.0f);
-}
-
-uint32_t lv_gltf_get_env_brightness(const lv_obj_t * obj)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
-    LV_LOG_DEPRECATED("use lv_gltf_get_environment_brightness() instead");
-    float v = lv_gltf_get_environment_brightness(obj) * 100.0f;
-    if(v <= 0.0f) return 0;
-    return (uint32_t)((double)v + 0.5);
-}
-
 void lv_gltf_set_environment_brightness(lv_obj_t * obj, float value)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
