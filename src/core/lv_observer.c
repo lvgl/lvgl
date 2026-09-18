@@ -28,18 +28,9 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
-    FLAG_COND_EQ = 0,
-    FLAG_COND_GT = 1,
-    FLAG_COND_GE = 2
-} flag_cond_t;
-
 typedef struct {
-    uint32_t flag;
-    lv_subject_value_t value;
-    uint32_t inv     : 1;
-    flag_cond_t cond : 3;
-} flag_and_cond_t;
+    lv_state_t state;
+} bound_state_t;
 
 typedef struct {
     lv_subject_t * subject;
@@ -74,10 +65,8 @@ static void subject_increment_cb(lv_event_t * e);
 
 static void unsubscribe_on_delete_cb(lv_event_t * e);
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
-static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
-                                        int32_t ref_value, bool inv, flag_cond_t cond);
+static lv_observer_t * bind_state(lv_subject_t * subject, lv_obj_t * obj, lv_state_t state);
 
-static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_value_changed_event_cb(lv_event_t * e);
 
@@ -917,152 +906,6 @@ lv_observer_t * lv_obj_bind_pointer(lv_obj_t * obj, lv_subject_t * subject, lv_o
     return observable;
 }
 
-lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_EQ);
-    return observable;
-}
-
-lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag,
-                                           int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_EQ);
-    return observable;
-}
-lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_GT);
-    return observable;
-}
-
-lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_GE);
-    return observable;
-}
-
-lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    /* a < b == !(a >= b) */
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_GE);
-    return observable;
-}
-
-lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    /* a <= b == !(a > b) */
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_GT);
-    return observable;
-
-}
-
-lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
-                                                  FLAG_COND_EQ);
-    return observable;
-}
-
-lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state,
-                                            int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
-                                                  FLAG_COND_EQ);
-    return observable;
-}
-
-lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
-                                                  FLAG_COND_GT);
-    return observable;
-}
-
-lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
-                                                  FLAG_COND_GE);
-    return observable;
-}
-
-lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    /* a < b == !(a >= b) */
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
-                                                  FLAG_COND_GE);
-    return observable;
-
-}
-
-lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
-{
-    LV_CHECK_ARG(obj != NULL, return NULL);
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
-                            subject->type);
-
-    /* a <= b == !(a > b) */
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
-                                                  FLAG_COND_GT);
-    return observable;
-}
-
-
 lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_CHECK_ARG(obj != NULL, return NULL);
@@ -1070,8 +913,7 @@ lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
     LV_CHECK_ARG_FORMAT_MSG(subject->type == LV_SUBJECT_TYPE_INT, return NULL, "Incompatible subject type: %d",
                             subject->type);
 
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 0, true,
-                                                  FLAG_COND_EQ);
+    lv_observer_t * observable = bind_state(subject, obj, LV_STATE_CHECKED);
 
     lv_obj_add_event_cb(obj, obj_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
@@ -1321,91 +1163,38 @@ static void unsubscribe_on_delete_cb(lv_event_t * e)
     lv_observer_delete(observer);
 }
 
-static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
-                                        int32_t ref_value, bool inv, flag_cond_t cond)
+static lv_observer_t * bind_state(lv_subject_t * subject, lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT(subject != NULL);
     LV_ASSERT(obj != NULL);
     LV_ASSERT(subject->type == LV_SUBJECT_TYPE_INT);
 
-
-    flag_and_cond_t * p = lv_malloc(sizeof(flag_and_cond_t));
+    bound_state_t * p = lv_malloc(sizeof(bound_state_t));
     if(p == NULL) {
         LV_LOG_WARN("Out of memory");
         return NULL;
     }
 
-    p->flag = flag;
-    p->value.num = ref_value;
-    p->inv = inv;
-    p->cond = cond;
+    p->state = state;
 
-    lv_observer_t * observable = lv_subject_add_observer_obj(subject, cb, obj, p);
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, obj_state_observer_cb, obj, p);
     observable->auto_free_user_data = 1;
 
     return observable;
-}
-
-static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
-{
-    LV_ASSERT(observer != NULL);
-    LV_ASSERT(subject != NULL);
-    flag_and_cond_t * p = observer->user_data;
-    LV_ASSERT(p != NULL);
-
-    /* Initializing this keeps some compilers happy */
-    bool res = false;
-    switch(p->cond) {
-        case FLAG_COND_EQ:
-            res = subject->value.num == p->value.num;
-            break;
-        case FLAG_COND_GT:
-            res = subject->value.num > p->value.num;
-            break;
-        case FLAG_COND_GE:
-            res = subject->value.num >= p->value.num;
-            break;
-    }
-    if(p->inv) res = !res;
-
-    /*TODO: the flag binding API is deprecated separately; suppress the warning until then*/
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    if(res) {
-        lv_obj_add_flag(observer->target, p->flag);
-    }
-    else {
-        lv_obj_remove_flag(observer->target, p->flag);
-    }
-    LV_DEPRECATIONS_IGNORE_END
 }
 
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_ASSERT(observer != NULL);
     LV_ASSERT(subject != NULL);
-    flag_and_cond_t * p = observer->user_data;
+    bound_state_t * p = observer->user_data;
     LV_ASSERT(p != NULL);
 
-    /* Initializing this keeps some compilers happy */
-    bool res = false;
-    switch(p->cond) {
-        case FLAG_COND_EQ:
-            res = subject->value.num == p->value.num;
-            break;
-        case FLAG_COND_GT:
-            res = subject->value.num > p->value.num;
-            break;
-        case FLAG_COND_GE:
-            res = subject->value.num >= p->value.num;
-            break;
-    }
-    if(p->inv) res = !res;
-
-    if(res) {
-        lv_obj_add_state(observer->target, p->flag);
+    if(subject->value.num) {
+        lv_obj_add_state(observer->target, p->state);
     }
     else {
-        lv_obj_remove_state(observer->target, p->flag);
+        lv_obj_remove_state(observer->target, p->state);
     }
 }
 
