@@ -124,6 +124,21 @@ void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * r
                                                uint16_t touch_cnt);
 
 /**
+ * Obtains the center point for the gesture.
+ * @param gesture_event     pointer to a gesture event
+ * @param type              the gesture type
+ * @param point             output pointer for the center of the gesture; must
+ *                          not be `NULL`. When this function returns `true`,
+ *                          *point contains the center point of the gesture.
+ *                          When this function returns `false`, the contents of
+ *                          *point are unchanged.
+ * @return                  true if the gesture has a center point, false
+ *                          otherwise
+ */
+bool lv_event_get_gesture_center_point(lv_event_t * gesture_event, lv_indev_gesture_type_t type,
+                                       lv_point_t * point);
+
+/**
  * Set the threshold for the pinch gesture scale up, when the scale factor of gesture
  * reaches the threshold events get sent
  * @param indev             pointer to the indev device containing the pinch recognizer
