@@ -27,7 +27,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * display);
 #define LV_WAYLAND_PHYSICAL_DISPLAY_ANY 0xFF
 
 /**********************
@@ -39,11 +38,11 @@ typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * display);
  * @param hor_res The width of the window in pixels
  * @param ver_res The height of the window in pixels
  * @param title The title of the window
- * @param close_cb The callback that will be execute when the user closes the window
  * @return The LVGL display associated to the window
+ * @note  To react to the user closing the window, add an `LV_EVENT_DELETE`
+ *        event to the returned display.
  */
-lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
-                                        lv_wayland_display_close_cb_t close_cb);
+lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title);
 
 /**
  * Closes the window programmatically

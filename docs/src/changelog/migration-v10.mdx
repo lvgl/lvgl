@@ -418,6 +418,23 @@ them now triggers a deprecation warning. Direct access to headers under
 `src` will be removed entirely in v10, so switch to including via
 `lvgl/include/lvgl/` or `lvgl/lvgl.h` before upgrading.
 
+### Wayland
+
+- `lv_wayland_display_close_cb_t` and the `close_cb` parameter of
+  <ApiLink name="lv_wayland_window_create"/> have been removed. Add an
+  `LV_EVENT_DELETE` event to the display the function returns instead.
+
+  ```c
+  /* Before */
+  lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Title", my_close_cb);
+
+  /* After */
+  lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Title");
+  lv_display_add_event_cb(disp, my_close_cb, LV_EVENT_DELETE, NULL);
+  ```
+
+  The v9.4 alias `lv_wayland_display_close_f_t` is gone with it.
+
 ---
 
 ## Core
