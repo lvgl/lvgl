@@ -178,19 +178,17 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
                 }
             }
             else {
+                lv_area_t transformed_coords;
+                lv_image_buf_get_transformed_area(&transformed_coords,
+                                                  new_image_dsc.header.w, new_image_dsc.header.h,
+                                                  dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+                lv_area_move(&transformed_coords, coords->x1, coords->y1);
+
                 lv_area_t clip_area = draw_area;
-                if(lv_area_intersect(&clip_area, &clip_area, &coords_area)) {
-
-                    lv_image_buf_get_transformed_area(&coords_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
-                    lv_area_move(&coords_area, coords->x1, coords->y1);
-
-                    lv_image_buf_get_transformed_area(&clip_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
-                    lv_area_move(&clip_area, coords->x1, coords->y1);
-
+                if(lv_area_intersect(&clip_area, &clip_area, &transformed_coords)) {
                     if(lv_area_intersect(&clip_area, &clip_area, &obj_area)) {
-                        decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, &new_image_dsc, &clip_area);
+                        decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &transformed_coords,
+                                                            &new_image_dsc, &clip_area);
                     }
                 }
             }
