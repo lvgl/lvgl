@@ -3561,13 +3561,13 @@ menu "Asserts"
 		bool "LV_ASSERT_NULL"
 
 	config LV_USE_ASSERT_STYLE
-		bool "LV_ASSERT_STYLE"
+		bool "Style sentinel"
+		help
+		  Add a sentinel field to lv_style_t so a corrupted or uninitialized
+		  style can be detected. LV_STYLE_SENTINEL_OK() reads it.
 
 	config LV_USE_ASSERT_MEM_INTEGRITY
 		bool "LV_ASSERT_MEM_INTEGRITY"
-
-	config LV_USE_ASSERT_OBJ
-		bool "LV_ASSERT_OBJ"
 
 	config LV_ASSERT_HANDLER_INCLUDE
 		string "Assert handler header [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"

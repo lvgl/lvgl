@@ -653,28 +653,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t lv_style_const_prop_id_inv
 #  define LV_STYLE_SENTINEL_OK(style_p) (true)
 #endif
 
-#if LV_USE_ASSERT_STYLE
-/**
- * @deprecated Use `LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return ...)`
- *             instead. `LV_ASSERT_STYLE` aborts on failure; `LV_CHECK_ARG` logs a
- *             warning and executes the supplied action, which is safer in production.
- */
-#  define LV_ASSERT_STYLE(style_p)                                                                                 \
-    do {                                                                                                           \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_STYLE is deprecated. Use LV_CHECK_ARG instead.");                      \
-        LV_ASSERT_INTERNAL(style_p != NULL, "");                                                                   \
-        LV_ASSERT_INTERNAL(style_p->sentinel == LV_STYLE_SENTINEL_VALUE, "Style is not initialized or corrupted"); \
-    } while(0)
-#else
-/**
- * @deprecated Use `LV_CHECK_ARG(style != NULL, return ...)` instead.
- */
-#  define LV_ASSERT_STYLE(style_p)                                                                 \
-    do {                                                                                           \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_STYLE is deprecated. Use LV_CHECK_ARG instead.");      \
-    } while(0)
-#endif
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

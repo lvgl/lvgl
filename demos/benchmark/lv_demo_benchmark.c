@@ -1040,10 +1040,6 @@ static lv_obj_t * add_warning_label(lv_obj_t * scr, const char * text)
 
 static void add_warnings(lv_obj_t * scr)
 {
-#if LV_USE_ASSERT_OBJ
-    add_warning_label(scr, "LV_USE_ASSERT_OBJ is enabled making rendering slower");
-#endif
-
 #if LV_USE_CHECK_ARG
     add_warning_label(scr, "LV_USE_CHECK_ARG is enabled possibly making the widgets demo slower");
 #endif
