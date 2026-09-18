@@ -78,7 +78,6 @@ remove the misleading guide above this code segment.
    - LV_USE_SNAPSHOT
    - LV_USE_MONKEY
    - LV_USE_GRIDNAV
-   - LV_USE_FRAGMENT
    - LV_USE_IMGFONT
    - LV_USE_LINUX_DRM
    - LV_USE_LINUX_FBDEV

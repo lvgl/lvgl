@@ -2122,7 +2122,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_FONT_COMPRESSED=1        \
                          LV_USE_FONT_MANAGER=1           \
                          LV_USE_FONT_PLACEHOLDER=1       \
-                         LV_USE_FRAGMENT=1               \
                          LV_USE_FREERTOS_TASK_NOTIFY=1   \
                          LV_USE_FREETYPE=1               \
                          LV_USE_FS_ARDUINO_ESP_LITTLEFS=1 \

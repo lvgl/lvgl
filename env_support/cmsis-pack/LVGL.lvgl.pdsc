@@ -2578,22 +2578,6 @@
 
             </component>
 
-            <component Cgroup="Libraries and Others" Csub="Fragment"  condition="LVGL-Essential">
-              <description>Add the Fragment service</description>
-              <files>
-                <!-- src/others/fragment -->
-                <file category="sourceC"            name="src/others/fragment/lv_fragment.c" />
-                <file category="sourceC"            name="src/others/fragment/lv_fragment_manager.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable lv_obj fragment */
-#define LV_USE_FRAGMENT         1
-              </RTE_Components_h>
-
-            </component>
-            
             <component Cgroup="Libraries and Others" Csub="Grid Navigation"  condition="LVGL-Essential">
               <description>Add the Grid Navigation service</description>
               <files>

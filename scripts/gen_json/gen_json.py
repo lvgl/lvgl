@@ -72,7 +72,6 @@ def run(output_path, lv_conf_file, output_to_stdout, target_header, filter_priva
                         'LV_USE_BARCODE',
                         'LV_USE_TINY_TTF',
                         'LV_USE_GRIDNAV',
-                        'LV_USE_FRAGMENT',
                         'LV_USE_IMGFONT',
                         'LV_USE_SNAPSHOT',
                         'LV_USE_FREETYPE'
