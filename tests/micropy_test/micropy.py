@@ -255,7 +255,7 @@ def create_ui():
     a.set_path_cb(lv.anim_t.path_ease_out)
     a.start()
 
-    btn2.add_flag(lv.obj.FLAG.HIDDEN)
+    btn2.set_hidden(True)
 
     btn_label = btn3.get_child(0)
     btn_label.set_text("A multi-line text with a ° symbol")
@@ -322,12 +322,12 @@ def create_ui():
     img = lv.image(scr)
     img.set_src(test_img_lvgl_logo_jpg)
     img.align(lv.ALIGN.BOTTOM_RIGHT, -20, -20)
-    img.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
+    img.set_ignore_layout(True)
 
     img = lv.image(scr)
     img.set_src("A:test_img_lvgl_logo.png")
     img.set_pos(500, 420)
-    img.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
+    img.set_ignore_layout(True)
     img.set_rotation(200)
     img.set_scale_x(400)
 
