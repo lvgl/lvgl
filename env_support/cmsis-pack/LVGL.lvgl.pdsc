@@ -813,7 +813,6 @@
                 <file category="sourceC"            name="src/widgets/label/lv_label.c" />
                 <file category="sourceC"            name="src/widgets/led/lv_led.c" />
                 <file category="sourceC"            name="src/widgets/line/lv_line.c" />
-                <file category="sourceC"            name="src/widgets/list/lv_list.c" />
                 <file category="sourceC"            name="src/widgets/lottie/lv_lottie.c" />
                 <file category="sourceC"            name="src/widgets/menu/lv_menu.c" />
                 <file category="sourceC"            name="src/widgets/msgbox/lv_msgbox.c" />
