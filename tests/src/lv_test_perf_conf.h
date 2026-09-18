@@ -715,7 +715,6 @@
 
         #define LV_USE_LINE       1
 
-        #define LV_USE_LIST       1
 
         #define LV_USE_LOTTIE     0  /**< Requires: lv_canvas, thorvg */
 

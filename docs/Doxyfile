@@ -2159,7 +2159,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_LINE=1                   \
                          LV_USE_LINUX_DRM=1              \
                          LV_USE_LINUX_FBDEV=1            \
-                         LV_USE_LIST=1                   \
                          LV_USE_LODEPNG=1                \
                          LV_USE_LOG=1                    \
                          LV_USE_LOTTIE=1                 \

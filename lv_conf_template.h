@@ -1454,9 +1454,6 @@
 /** Line */
 #define LV_USE_LINE 1
 
-/** List */
-#define LV_USE_LIST 1
-
 #if LV_USE_THORVG
 /** Plays Lottie JSON animations using the ThorVG Lottie parser.
  *

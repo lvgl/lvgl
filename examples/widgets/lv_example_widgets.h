@@ -36,7 +36,6 @@ extern "C" {
 #include "label/lv_example_label.h"
 #include "led/lv_example_led.h"
 #include "line/lv_example_line.h"
-#include "list/lv_example_list.h"
 #include "lottie/lv_example_lottie.h"
 #include "msgbox/lv_example_msgbox.h"
 #include "obj/lv_example_obj.h"

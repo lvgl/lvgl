@@ -3,9 +3,6 @@
 #include "../../src/themes/lv_theme_private.h"
 #include "unity/unity.h"
 
-/*The themes are tested on the deprecated `lv_list` widget too.*/
-LV_DEPRECATIONS_IGNORE_BEGIN
-
 void setUp(void)
 {
     /* Function run before every test */
@@ -118,11 +115,6 @@ static void test_widgets(const char * img_name)
 
     lv_obj_t * keyboard = lv_keyboard_create(scr_act);
     lv_obj_set_size(keyboard, 300, 150);
-
-    lv_obj_t * list = lv_list_create(scr_act);
-    lv_obj_set_size(list, 100, 100);
-    lv_list_add_text(list, "List item");
-    lv_list_add_button(list, LV_SYMBOL_OK, "List button");
 
     lv_spinbox_create(scr_act);
 
@@ -237,8 +229,6 @@ void test_theme_simple(void)
     TEST_ASSERT_FALSE(lv_theme_simple_is_inited());
     TEST_ASSERT_NULL(lv_theme_simple_get());
 }
-
-LV_DEPRECATIONS_IGNORE_END
 
 void test_theme_user_data(void)
 {

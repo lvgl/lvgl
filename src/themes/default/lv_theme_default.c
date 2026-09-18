@@ -132,10 +132,6 @@ typedef struct {
     lv_style_t keyboard_button_bg;
 #endif
 
-#if LV_USE_LIST
-    lv_style_t list_bg, list_btn, list_item_grow;
-#endif
-
 #if LV_USE_TABVIEW
     lv_style_t tab_bg_focus, tab_btn;
 #endif
@@ -512,24 +508,6 @@ static void style_init(my_theme_t * theme)
 
     style_init_reset(&theme->styles.tab_bg_focus);
     lv_style_set_outline_pad(&theme->styles.tab_bg_focus, -BORDER_WIDTH);
-#endif
-
-#if LV_USE_LIST
-    style_init_reset(&theme->styles.list_bg);
-    lv_style_set_pad_hor(&theme->styles.list_bg, PAD_DEF);
-    lv_style_set_pad_ver(&theme->styles.list_bg, 0);
-    lv_style_set_pad_gap(&theme->styles.list_bg, 0);
-    lv_style_set_clip_corner(&theme->styles.list_bg, true);
-
-    style_init_reset(&theme->styles.list_btn);
-    lv_style_set_border_width(&theme->styles.list_btn, LV_DPX_CALC(theme->disp_dpi, 1));
-    lv_style_set_border_color(&theme->styles.list_btn, theme->color_grey);
-    lv_style_set_border_side(&theme->styles.list_btn, LV_BORDER_SIDE_BOTTOM);
-    lv_style_set_pad_all(&theme->styles.list_btn, PAD_SMALL);
-    lv_style_set_pad_column(&theme->styles.list_btn, PAD_SMALL);
-
-    style_init_reset(&theme->styles.list_item_grow);
-    lv_style_set_transform_width(&theme->styles.list_item_grow, PAD_DEF);
 #endif
 
 #if LV_USE_LED
@@ -995,28 +973,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_LABEL && LV_USE_TEXTAREA
     else if(lv_obj_check_type(obj, &lv_label_class) && lv_obj_check_type(parent, &lv_textarea_class)) {
         lv_obj_add_style(obj, &theme->styles.bg_color_primary, LV_PART_SELECTED);
-    }
-#endif
-
-#if LV_USE_LIST
-    else if(lv_obj_check_type(obj, &lv_list_class)) {
-        lv_obj_add_style(obj, &theme->styles.card, 0);
-        lv_obj_add_style(obj, &theme->styles.list_bg, 0);
-        lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
-        lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
-        return;
-    }
-    else if(lv_obj_check_type(obj, &lv_list_text_class)) {
-        lv_obj_add_style(obj, &theme->styles.bg_color_grey, 0);
-        lv_obj_add_style(obj, &theme->styles.list_item_grow, 0);
-    }
-    else if(lv_obj_check_type(obj, &lv_list_button_class)) {
-        lv_obj_add_style(obj, &theme->styles.bg_color_white, 0);
-        lv_obj_add_style(obj, &theme->styles.list_btn, 0);
-        lv_obj_add_style(obj, &theme->styles.bg_color_primary, LV_STATE_FOCUS_KEY);
-        lv_obj_add_style(obj, &theme->styles.list_item_grow, LV_STATE_FOCUS_KEY);
-        lv_obj_add_style(obj, &theme->styles.list_item_grow, LV_STATE_PRESSED);
-        lv_obj_add_style(obj, &theme->styles.pressed, LV_STATE_PRESSED);
     }
 #endif
 

@@ -199,12 +199,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_imgbtn_get_src_right  lv_imagebutton_get_src_right
 #endif /* LV_USE_IMAGEBUTTON */
 
-#if LV_USE_LIST
-#define lv_list_set_btn_text lv_list_set_button_text
-#define lv_list_get_btn_text lv_list_get_button_text
-#define lv_list_add_btn      lv_list_add_button
-#endif /* LV_USE_LIST */
-
 #if LV_USE_BUTTON
 #define lv_btn_create        lv_button_create
 #endif /* LV_USE_BUTTON */
