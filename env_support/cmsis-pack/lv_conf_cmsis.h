@@ -1444,7 +1444,6 @@
 #define LV_USE_TILEVIEW 1
 
 /** Window */
-#define LV_USE_WIN 1
 
 
 

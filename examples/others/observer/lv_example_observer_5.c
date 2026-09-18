@@ -1,8 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_USE_OBSERVER && LV_USE_ARC && LV_USE_LABEL && LV_USE_BUTTON && LV_USE_SPINNER && LV_BUILD_EXAMPLES
-
-/*The UI is built from the deprecated `lv_win` widget.*/
-LV_DEPRECATIONS_IGNORE_BEGIN
+#if LV_USE_OBSERVER && LV_USE_ARC && LV_USE_LABEL && LV_USE_BUTTON && LV_USE_SPINNER && LV_USE_FLEX \
+    && LV_BUILD_EXAMPLES
 
 typedef enum {
     FW_UPDATE_STATE_IDLE,
@@ -22,18 +20,54 @@ static lv_subject_t * fw_download_percent_subject;
 static lv_subject_t * fw_update_status_subject;
 
 /**
+ * Create a window: a flex column with a header bar on top and a content area
+ * below. The header holds the title and a close button, the content area grows
+ * to fill what is left.
+ */
+static lv_obj_t * win_create(lv_obj_t * parent)
+{
+    lv_obj_t * win = lv_obj_create(parent);
+    lv_obj_set_flex_flow(win, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_all(win, 0, 0);
+    lv_obj_set_style_pad_gap(win, 0, 0);
+
+    lv_obj_t * header = lv_obj_create(win);
+    lv_obj_set_width(header, lv_pct(100));
+    lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_radius(header, 0, 0);
+
+    lv_obj_t * content = lv_obj_create(win);
+    lv_obj_set_width(content, lv_pct(100));
+    lv_obj_set_flex_grow(content, 1);
+    lv_obj_set_style_radius(content, 0, 0);
+
+    return win;
+}
+
+static lv_obj_t * win_get_header(lv_obj_t * win)
+{
+    return lv_obj_get_child(win, 0);
+}
+
+static lv_obj_t * win_get_content(lv_obj_t * win)
+{
+    return lv_obj_get_child(win, 1);
+}
+
+/**
  * @title Firmware update state machine
  * @brief Drive a window through its update states using two int subjects.
  *
  * `fw_update_status_subject` holds an `lv_fw_update_state_t` value and
- * `fw_download_percent_subject` tracks progress. A start button opens an
- * `lv_win` whose observer renders the appropriate content: a spinner for
- * connecting, an arc plus percentage label bound with `lv_arc_bind_value`
- * and `lv_label_bind_text` for downloading, and a restart button for ready.
- * A separate app-side observer spawns `lv_timer_t` instances that simulate
- * the 2-second connect and a 50 ms per-step download. The window's close
- * button pushes `FW_UPDATE_STATE_CANCEL`, which the observer uses to delete
- * the window.
+ * `fw_download_percent_subject` tracks progress. A start button opens a window,
+ * built from a flex column by the static `win_*` helpers, whose observer renders
+ * the appropriate content: a spinner for connecting, an arc plus percentage label
+ * bound with `lv_arc_bind_value` and `lv_label_bind_text` for downloading, and a
+ * restart button for ready. A separate app-side observer spawns `lv_timer_t`
+ * instances that simulate the 2-second connect and a 50 ms per-step download.
+ * The window's close button pushes `FW_UPDATE_STATE_CANCEL`, which the observer
+ * uses to delete the window.
  */
 void lv_example_observer_5(void)
 {
@@ -54,16 +88,24 @@ void lv_example_observer_5(void)
 static void fw_update_btn_clicked_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
-    lv_obj_t * win = lv_win_create(lv_screen_active());
+    lv_obj_t * win = win_create(lv_screen_active());
     lv_obj_set_size(win, lv_pct(90), lv_pct(90));
-    lv_obj_set_height(lv_win_get_header(win), 40);
+    lv_obj_set_height(win_get_header(win), 40);
     lv_obj_set_style_radius(win, 8, 0);
     lv_obj_set_style_shadow_width(win, 24, 0);
     lv_obj_set_style_shadow_offset_x(win, 2, 0);
     lv_obj_set_style_shadow_offset_y(win, 3, 0);
     lv_obj_set_style_shadow_color(win, lv_color_hex3(0x888), 0);
-    lv_win_add_title(win, "Firmware update");
-    lv_obj_t * btn = lv_win_add_button(win, LV_SYMBOL_CLOSE, 40);
+
+    lv_obj_t * title = lv_label_create(win_get_header(win));
+    lv_label_set_text(title, "Firmware update");
+    lv_obj_set_flex_grow(title, 1);
+
+    lv_obj_t * btn = lv_button_create(win_get_header(win));
+    lv_obj_set_size(btn, 40, lv_pct(100));
+    lv_obj_t * btn_label = lv_label_create(btn);
+    lv_label_set_text(btn_label, LV_SYMBOL_CLOSE);
+    lv_obj_center(btn_label);
     lv_obj_add_event_cb(btn, fw_update_close_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_center(win);
 
@@ -87,7 +129,7 @@ static void restart_btn_click_event_cb(lv_event_t * e)
 static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * win = (lv_obj_t *) lv_observer_get_target(observer);
-    lv_obj_t * cont = lv_win_get_content(win);
+    lv_obj_t * cont = win_get_content(win);
     lv_fw_update_state_t status = (lv_fw_update_state_t) lv_subject_get_int(fw_update_status_subject);
     if(status == FW_UPDATE_STATE_IDLE) {
         lv_obj_clean(cont);
@@ -174,7 +216,5 @@ static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t
         lv_timer_create(download_timer_cb, 50, NULL);
     }
 }
-
-LV_DEPRECATIONS_IGNORE_END
 
 #endif

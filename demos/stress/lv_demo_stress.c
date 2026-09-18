@@ -10,7 +10,7 @@
 
 #if LV_USE_DEMO_STRESS
 
-/*The stressed widget set contains the deprecated `lv_list` and `lv_win` widgets.*/
+/*The stressed widget set contains the deprecated `lv_list` widget.*/
 LV_DEPRECATIONS_IGNORE_BEGIN
 
 /*********************
@@ -181,17 +181,32 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
             break;
 
-        case 8:
-            obj = lv_win_create(lv_screen_active());
-            lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
-            lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-            lv_win_add_title(obj, "Window title");
-            lv_win_add_button(obj, LV_SYMBOL_CLOSE, 40);
-            lv_win_add_button(obj, LV_SYMBOL_DOWN, 40);
-            auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 3 + 5);
+        case 8: {
+                /*A window: a flex column with a header row on top and a content area below*/
+                obj = lv_obj_create(lv_screen_active());
+                lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
+                lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+                lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
+                auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 3 + 5);
 
-            obj = lv_calendar_create(lv_win_get_content(obj));
-            break;
+                lv_obj_t * header = lv_obj_create(obj);
+                lv_obj_set_size(header, lv_pct(100), 40);
+                lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
+
+                lv_obj_t * title = lv_label_create(header);
+                lv_label_set_text(title, "Window title");
+                lv_obj_set_flex_grow(title, 1);
+
+                lv_obj_set_size(lv_button_create(header), 40, lv_pct(100));
+                lv_obj_set_size(lv_button_create(header), 40, lv_pct(100));
+
+                lv_obj_t * content = lv_obj_create(obj);
+                lv_obj_set_width(content, lv_pct(100));
+                lv_obj_set_flex_grow(content, 1);
+
+                obj = lv_calendar_create(content);
+                break;
+            }
         case 9:
             lv_textarea_set_text(ta, "A very very long text which will should make the text area scrollable"
                                  "Here area some dummy sentences to be sure the text area will be really scrollable.");

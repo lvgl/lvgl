@@ -1214,15 +1214,6 @@ widget-tileview:
           - 'docs/src/widgets/tileview.mdx'
           - 'examples/widgets/tileview/**'
 
-widget-win:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'include/lvgl/widgets/lv_win.h'
-          - 'src/widgets/win/**'
-          - 'docs/src/widgets/win.mdx'
-          - 'examples/widgets/win/**'
-          - 'tests/src/test_cases/widgets/test_win.c'
-
 # Drivers
 
 drivers:

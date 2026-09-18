@@ -267,9 +267,6 @@ extern "C" {
 /* tileview */
 #define lv_example_tileview_1      lv_example_tileview_l_shape
 
-/* win */
-#define lv_example_win_1           lv_example_win_toolbar
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

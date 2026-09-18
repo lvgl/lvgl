@@ -714,23 +714,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         }
 #endif
 
-#if LV_USE_WIN
-        /*Header*/
-        if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 0) == obj) {
-            lv_obj_add_style(obj, &theme->styles.bg_color_grey, 0);
-            lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
-            return;
-        }
-        /*Content*/
-        else if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 1) == obj) {
-            lv_obj_add_style(obj, &theme->styles.scr, 0);
-            lv_obj_add_style(obj, &theme->styles.pad_normal, 0);
-            lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
-            lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
-            return;
-        }
-#endif
-
 #if LV_USE_CALENDAR
         if(lv_obj_check_type(parent, &lv_calendar_class)) {
             /*No style*/
@@ -1102,12 +1085,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_tabview_class)) {
         lv_obj_add_style(obj, &theme->styles.scr, 0);
         lv_obj_add_style(obj, &theme->styles.pad_zero, 0);
-    }
-#endif
-
-#if LV_USE_WIN
-    else if(lv_obj_check_type(obj, &lv_win_class)) {
-        lv_obj_add_style(obj, &theme->styles.clip_corner, 0);
     }
 #endif
 

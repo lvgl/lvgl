@@ -862,10 +862,19 @@ used afterwards.
 
 ### lv_win
 
-- The `lv_win` widget is deprecated. A window is just a flex column with a header
-  bar and a content area, so build one directly from `lv_obj` instead. See the
+- The `lv_win` widget has been removed, along with `LV_USE_WIN`. A window is just a
+  flex column with a header bar and a content area, so build one directly from
+  `lv_obj` instead. See the
   [`lv_example_flex_win`](common-widget-features/layouts/flex#building-a-window)
   example for a starting point.
+
+  | Removed | Build it as |
+  |---|---|
+  | `lv_win_create` | an `lv_obj` with `LV_FLEX_FLOW_COLUMN` holding a header and a content child |
+  | `lv_win_get_header` | `lv_obj_get_child(win, 0)` |
+  | `lv_win_get_content` | `lv_obj_get_child(win, 1)` |
+  | `lv_win_add_title` | an `lv_label` in the header with `lv_obj_set_flex_grow(title, 1)` |
+  | `lv_win_add_button` | an `lv_button` in the header with a fixed width |
 
 ---
 

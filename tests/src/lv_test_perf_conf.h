@@ -750,7 +750,6 @@
 
         #define LV_USE_TILEVIEW   1
 
-        #define LV_USE_WIN        1
 
         /*==================
         * THEMES

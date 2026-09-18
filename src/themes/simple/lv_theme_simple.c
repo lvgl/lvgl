@@ -246,19 +246,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         }
 #endif
 
-#if LV_USE_WIN
-        /*Header*/
-        if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 0) == obj) {
-            lv_obj_add_style(obj, &theme->styles.light, 0);
-            return;
-        }
-        /*Content*/
-        else if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 1) == obj) {
-            lv_obj_add_style(obj, &theme->styles.light, 0);
-            lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
-            return;
-        }
-#endif
         lv_obj_add_style(obj, &theme->styles.white, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
     }
