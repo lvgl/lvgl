@@ -178,7 +178,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     }
 #endif
 
-    lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
+    lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
 }
 
 bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style,
@@ -219,9 +219,10 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
             continue;
         }
 
+        lv_style_selector_t selector_act = obj->styles[i].selector;
         lv_memzero(&obj->styles[i], sizeof(lv_obj_style_t));
         obj->styles[i].style = new_style;
-        obj->styles[i].selector = selector;
+        obj->styles[i].selector = selector_act;
 
         replaced = true;
         /*Don't break and continue replacing other occurrences*/
@@ -464,7 +465,7 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
     }
 #endif
 
-    lv_obj_refresh_style(obj, selector, prop);
+    lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), prop);
     LV_PROFILER_STYLE_END;
 }
 
@@ -504,7 +505,7 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_sty
     lv_result_t res = lv_style_remove_prop((lv_style_t *)obj->styles[i].style, prop);
     if(res == LV_RESULT_OK) {
         full_cache_refresh(obj, lv_obj_style_get_selector_part(selector));
-        lv_obj_refresh_style(obj, selector, prop);
+        lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), prop);
     }
 
     return res;
@@ -533,7 +534,7 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t p
 
     lv_obj_style_t * style_trans = get_trans_style(obj, part);
     lv_style_set_prop((lv_style_t *)style_trans->style, tr_dsc->prop, v1);  /*Be sure `trans_style` has a valid value*/
-    lv_obj_refresh_style(obj, tr_dsc->selector, tr_dsc->prop);
+    lv_obj_refresh_style(obj, part, tr_dsc->prop);
 
     if(tr_dsc->prop == LV_STYLE_RADIUS) {
         if(v1.num == LV_RADIUS_CIRCLE || v2.num == LV_RADIUS_CIRCLE) {
