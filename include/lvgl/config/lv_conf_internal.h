@@ -3115,18 +3115,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_WIN
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_WIN
-            #define LV_USE_WIN CONFIG_LV_USE_WIN
-        #else
-            #define LV_USE_WIN 0
-        #endif
-    #else
-        #define LV_USE_WIN 1
-    #endif
-#endif
-
 
 
 /*============================================================================

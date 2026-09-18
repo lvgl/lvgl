@@ -753,10 +753,5 @@
     "primary": [
       "dir"
     ]
-  },
-  "lv_win": {
-    "_auto": {
-      "fields": {}
-    }
   }
 }

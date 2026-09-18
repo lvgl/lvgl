@@ -80,7 +80,6 @@ $(SRC_ROOT)/widgets/checkbox \
 $(SRC_ROOT)/widgets/slider \
 $(SRC_ROOT)/widgets/calendar \
 $(SRC_ROOT)/widgets/bar \
-$(SRC_ROOT)/widgets/win \
 $(SRC_ROOT)/widgets/dropdown \
 $(SRC_ROOT)/widgets/switch \
 $(SRC_ROOT)/widgets/span \

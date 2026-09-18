@@ -91,7 +91,6 @@ COMPONENT_SRCDIRS := . \
                   src/widgets/tabview \
                   src/widgets/textarea \
                   src/widgets/tileview \
-                  src/widgets/win     \
                   src/stdlib \
                   src/stdlib/builtin
 

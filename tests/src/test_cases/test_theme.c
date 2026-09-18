@@ -3,7 +3,7 @@
 #include "../../src/themes/lv_theme_private.h"
 #include "unity/unity.h"
 
-/*The themes are tested on the deprecated `lv_list` and `lv_win` widgets too.*/
+/*The themes are tested on the deprecated `lv_list` widget too.*/
 LV_DEPRECATIONS_IGNORE_BEGIN
 
 void setUp(void)
@@ -71,11 +71,6 @@ static void test_widgets(const char * img_name)
     lv_obj_t * tabview = lv_tabview_create(scr_act);
     lv_obj_set_size(tabview, 100, 100);
     lv_tabview_add_tab(tabview, "Tab 1");
-
-    lv_obj_t * win = lv_win_create(scr_act);
-    lv_obj_set_size(win, 100, 100);
-    lv_win_add_title(win, "Window");
-    lv_win_add_button(win, LV_SYMBOL_CLOSE, 20);
 
     lv_button_create(scr_act);
 
