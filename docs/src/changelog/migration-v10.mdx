@@ -984,5 +984,14 @@ can enable LVGL's private api by including `lvgl_private.h` or simply enabling `
 
 ### rlottie
 
-- The rlottie player is deprecated. Use the [`lv_lottie`](widgets/lottie) widget
-  instead.
+- The rlottie player has been removed, along with `LV_USE_RLOTTIE` and the
+  `env_support/esp/rlottie` build glue. Use the
+  [`lv_lottie`](widgets/lottie) widget, which renders through ThorVG and needs
+  no external library.
+
+  | Removed | Replacement |
+  |---|---|
+  | `lv_rlottie_create_from_file` | <ApiLink name="lv_lottie_create"/> + <ApiLink name="lv_lottie_set_src_file"/> |
+  | `lv_rlottie_create_from_raw` | <ApiLink name="lv_lottie_create"/> + <ApiLink name="lv_lottie_set_src_data"/> |
+  | `lv_rlottie_set_play_mode` | <ApiLink name="lv_lottie_get_anim"/> and the `lv_anim` API |
+  | `lv_rlottie_set_current_frame` | <ApiLink name="lv_lottie_get_anim"/> and the `lv_anim` API |

@@ -920,8 +920,6 @@
             #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
         #endif
 
-        /** Rlottie library */
-        #define LV_USE_RLOTTIE 0
 
         /** Enable Vector Graphic APIs
         *  - Requires `LV_USE_MATRIX = 1` */

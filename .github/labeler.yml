@@ -1082,13 +1082,9 @@ lottie:
   - changed-files:
       - any-glob-to-any-file:
           - 'include/lvgl/widgets/lv_lottie.h'
-          - 'include/lvgl/widgets/lv_rlottie.h'
           - 'src/widgets/lottie/**'
-          - 'src/libs/rlottie/**'
           - 'docs/src/widgets/lottie.mdx'
-          - 'docs/src/libs/image_support/rlottie.mdx'
           - 'examples/widgets/lottie/**'
-          - 'examples/libs/rlottie/**'
           - 'tests/src/test_cases/widgets/test_lottie.c'
 
 widget-msgbox:
@@ -1393,7 +1389,6 @@ tft_espi:
 esp32:
   - changed-files:
       - any-glob-to-any-file:
-          - 'env_support/esp/**'
           - 'env_support/cmake/esp.cmake'
           - 'idf_component.yml'
           - 'component.mk'

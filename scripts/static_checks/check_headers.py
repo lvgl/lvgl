@@ -224,7 +224,6 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "r_glcdc_rx_if.h",
     "r_glcdc_rx_pinset.h",
     "riscv_vector.h",
-    "rlottie_capi.h",
     "rtthread.h",
     "screen/screen.h",
     "sdkconfig.h",

@@ -38,7 +38,6 @@ COMPONENT_SRCDIRS := . \
                   src/libs/lodepng \
                   src/libs/png \
                   src/libs/qrcode \
-                  src/libs/rlottie \
                   src/libs/rle \
                   src/libs/sjgp \
                   src/libs/tiny_ttf \
