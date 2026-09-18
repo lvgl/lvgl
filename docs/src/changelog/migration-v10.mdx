@@ -651,8 +651,8 @@ Calling the following functions with `NULL` as the display parameter is deprecat
 
 ### Subject create/delete
 
-The `lv_subject_init_<type>()` family and <ApiLink name="lv_subject_deinit"/> are
-deprecated. A Subject is now allocated by LVGL with
+The `lv_subject_init_<type>()` family and `lv_subject_deinit()` have been removed.
+A Subject is now allocated by LVGL with
 <ApiLink name="lv_subject_create"/>, which takes the type and returns a pointer, and
 freed with <ApiLink name="lv_subject_delete"/>. Every Subject is tracked by LVGL, so
 any Subject still alive at `lv_deinit()` is deleted automatically.
@@ -724,7 +724,7 @@ lv_subject_set_group_list_static(measurement, list, 3);
 Because the group list is filled at run time, a static initializer taking the
 addresses of the member Subjects has to become run-time assignments.
 
-<ApiLink name="lv_subject_delete"/> accepts `NULL`, and unlike
+<ApiLink name="lv_subject_delete"/> accepts `NULL`, and unlike the removed
 `lv_subject_deinit()` it also frees the Subject itself, so the pointer must not be
 used afterwards.
 

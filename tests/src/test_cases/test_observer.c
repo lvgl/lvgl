@@ -77,36 +77,21 @@ static void observer_int(lv_observer_t * observer, lv_subject_t * subject)
 
 void test_observer_add_remove(void)
 {
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    static lv_subject_t subject;
-    lv_subject_init_int(&subject, 5);
-    LV_DEPRECATIONS_IGNORE_END
-    lv_subject_t * created = subject_create(LV_SUBJECT_TYPE_INT);
-    lv_subject_set_int(created, 5);
-    lv_subject_t * test_subjects[] = {&subject, created};
+    lv_subject_t * subject = subject_create(LV_SUBJECT_TYPE_INT);
+    lv_subject_set_int(subject, 5);
 
-    for(size_t i = 0; i < LV_ARRAYLEN(test_subjects); ++i) {
-        lv_subject_t * sub = test_subjects[i];
+    lv_observer_t * observer = lv_subject_add_observer(subject, observer_int, NULL);
 
-        lv_observer_t * observer =
-            lv_subject_add_observer(sub, observer_int, NULL);
+    current_v = 0;
+    lv_subject_set_int(subject, 10);
+    TEST_ASSERT_EQUAL(10, lv_subject_get_int(subject));
+    TEST_ASSERT_EQUAL(10, current_v);
 
-        current_v = 0;
-        lv_subject_set_int(sub, 10);
-        TEST_ASSERT_EQUAL(10, lv_subject_get_int(sub));
-        TEST_ASSERT_EQUAL(10, current_v);
+    lv_observer_delete(observer);
 
-        lv_observer_delete(observer);
-
-        lv_subject_set_int(sub, 15);
-        TEST_ASSERT_EQUAL(15, lv_subject_get_int(sub));
-        TEST_ASSERT_EQUAL(10, current_v); /*The observer cb is not called*/
-    }
-
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    lv_subject_deinit(&subject);
-    LV_DEPRECATIONS_IGNORE_END
-
+    lv_subject_set_int(subject, 15);
+    TEST_ASSERT_EQUAL(15, lv_subject_get_int(subject));
+    TEST_ASSERT_EQUAL(10, current_v); /*The observer cb is not called*/
 }
 
 void test_object_observer_add_remove(void)
