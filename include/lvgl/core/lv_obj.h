@@ -1025,30 +1025,6 @@ void lv_objid_builtin_destroy(void);
  *      MACROS
  **********************/
 
-#if LV_USE_ASSERT_OBJ
-/**
- * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
- *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
- *             and executes the supplied action, which is safer in production.
- */
-#define LV_ASSERT_OBJ(obj_p, obj_class)                                                                      \
-    do {                                                                                                     \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");                  \
-        LV_ASSERT_INTERNAL(obj_p != NULL, "");                                                               \
-        LV_ASSERT_INTERNAL(lv_obj_has_class(obj_p, obj_class) == true, "");                                  \
-        LV_ASSERT_INTERNAL(lv_obj_is_in_widget_tree(obj_p) == true, "");                                     \
-    } while(0)
-# else
-/**
- * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
- */
-#define LV_ASSERT_OBJ(obj_p, obj_class) \
-    do { \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead."); \
-        LV_ASSERT_INTERNAL(obj_p, ""); \
-    } while(0)
-#endif
-
 #if LV_USE_LOG && LV_LOG_TRACE_OBJ_CREATE
 #  define LV_TRACE_OBJ_CREATE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else

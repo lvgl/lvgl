@@ -2080,7 +2080,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_ASSERT_MALLOC=1          \
                          LV_USE_ASSERT_MEM_INTEGRITY=1   \
                          LV_USE_ASSERT_NULL=1            \
-                         LV_USE_ASSERT_OBJ=1             \
                          LV_USE_ASSERT_STYLE=1           \
                          LV_USE_BAR=1                    \
                          LV_USE_BARCODE=1                \
