@@ -1,20 +1,76 @@
-#include "../../lv_examples.h"
-#if LV_USE_LIST && LV_BUILD_EXAMPLES
+/**
+ * @file lv_example_flex_list_reorder.c
+ */
 
-/*This example shows the deprecated `lv_list` widget on purpose.*/
-LV_DEPRECATIONS_IGNORE_BEGIN
+#include "../../lv_examples.h"
+#if LV_USE_FLEX && LV_USE_BUTTON && LV_USE_LABEL && LV_BUILD_EXAMPLES
+
+/*Both lists are plain flex columns: reordering a row is `lv_obj_move_to_index` on a
+ *flex child, no list widget involved.*/
 
 static lv_obj_t * list1;
 static lv_obj_t * list2;
 
 static lv_obj_t * currentButton = NULL;
 
+/**
+ * Create a list: a flex container that stacks its children in a column.
+ */
+static lv_obj_t * flex_list_create(lv_obj_t * parent)
+{
+    lv_obj_t * list = lv_obj_create(parent);
+    lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
+    return list;
+}
+
+/**
+ * Add a full-width button holding an optional icon and a text label.
+ */
+static lv_obj_t * flex_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+{
+    lv_obj_t * btn = lv_button_create(list);
+    lv_obj_set_size(btn, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(btn, LV_FLEX_FLOW_ROW);
+
+#if LV_USE_IMAGE == 1
+    if(icon) {
+        lv_obj_t * img = lv_image_create(btn);
+        lv_image_set_src(img, icon);
+    }
+#endif
+
+    lv_obj_t * label = lv_label_create(btn);
+    lv_label_set_text(label, txt);
+    lv_obj_set_flex_grow(label, 1);
+
+    return btn;
+}
+
+#if LV_USE_LOG
+/**
+ * Find the text of a list button by looking for its child label.
+ */
+static const char * flex_list_get_button_text(lv_obj_t * btn)
+{
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_count(btn); i++) {
+        lv_obj_t * child = lv_obj_get_child(btn, i);
+        if(lv_obj_check_type(child, &lv_label_class)) {
+            return lv_label_get_text(child);
+        }
+    }
+    return "";
+}
+#endif /*LV_USE_LOG*/
+
 static void event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target_obj(e);
     if(code == LV_EVENT_CLICKED) {
-        LV_LOG_USER("Clicked: %s", lv_list_get_button_text(list1, obj));
+#if LV_USE_LOG
+        LV_LOG_USER("Clicked: %s", flex_list_get_button_text(obj));
+#endif
 
         if(currentButton == obj) {
             currentButton = NULL;
@@ -112,21 +168,22 @@ static void event_handler_swap(lv_event_t * e)
 
 /**
  * @title Reorderable list with control panel
- * @brief Select a row in one list and move it with Top, Up, Center, Down, Bottom, or Shuffle.
+ * @brief Select a row in one flex column and move it with Top, Up, Center, Down, Bottom, or Shuffle.
  *
- * A 60% wide list on the left holds 15 `lv_button` rows labeled
- * `Item 0` through `Item 14`; clicking a row marks it as the current
- * selection with `LV_STATE_CHECKED` and clears the state on siblings.
- * A 40% wide list on the right pins Top, Up, Center, Down, Bottom,
- * and Shuffle buttons wired to `LV_EVENT_ALL` handlers that call
- * `lv_obj_move_to_index` and `lv_obj_scroll_to_view` to reposition
- * the selected row, with the Up, Center, Down, and Shuffle handlers
- * also firing on `LV_EVENT_LONG_PRESSED_REPEAT`.
+ * A 60% wide `LV_FLEX_FLOW_COLUMN` container on the left holds 15 `lv_button`
+ * rows labeled `Item 0` through `Item 14`; clicking a row marks it as the
+ * current selection with `LV_STATE_CHECKED` and clears the state on siblings.
+ * A 40% wide column on the right pins Top, Up, Center, Down, Bottom, and
+ * Shuffle buttons wired to `LV_EVENT_ALL` handlers that call
+ * `lv_obj_move_to_index` and `lv_obj_scroll_to_view` to reposition the selected
+ * row, with the Up, Center, Down, and Shuffle handlers also firing on
+ * `LV_EVENT_LONG_PRESSED_REPEAT`. Reordering is a flex-child operation, so it
+ * needs no list widget.
  */
-void lv_example_list_reorder(void)
+void lv_example_flex_list_reorder(void)
 {
-    /*Create a list*/
-    list1 = lv_list_create(lv_screen_active());
+    /*Create a list from a flex column*/
+    list1 = flex_list_create(lv_screen_active());
     lv_obj_set_size(list1, lv_pct(60), lv_pct(100));
     lv_obj_set_style_pad_row(list1, 5, 0);
 
@@ -147,36 +204,33 @@ void lv_example_list_reorder(void)
     lv_obj_add_state(currentButton, LV_STATE_CHECKED);
 
     /*Create a second list with up and down buttons*/
-    list2 = lv_list_create(lv_screen_active());
+    list2 = flex_list_create(lv_screen_active());
     lv_obj_set_size(list2, lv_pct(40), lv_pct(100));
     lv_obj_align(list2, LV_ALIGN_TOP_RIGHT, 0, 0);
-    lv_obj_set_flex_flow(list2, LV_FLEX_FLOW_COLUMN);
 
-    btn = lv_list_add_button(list2, NULL, "Top");
+    btn = flex_list_add_button(list2, NULL, "Top");
     lv_obj_add_event_cb(btn, event_handler_top, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_button(list2, LV_SYMBOL_UP, "Up");
+    btn = flex_list_add_button(list2, LV_SYMBOL_UP, "Up");
     lv_obj_add_event_cb(btn, event_handler_up, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_button(list2, LV_SYMBOL_LEFT, "Center");
+    btn = flex_list_add_button(list2, LV_SYMBOL_LEFT, "Center");
     lv_obj_add_event_cb(btn, event_handler_center, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_button(list2, LV_SYMBOL_DOWN, "Down");
+    btn = flex_list_add_button(list2, LV_SYMBOL_DOWN, "Down");
     lv_obj_add_event_cb(btn, event_handler_dn, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_button(list2, NULL, "Bottom");
+    btn = flex_list_add_button(list2, NULL, "Bottom");
     lv_obj_add_event_cb(btn, event_handler_bottom, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_button(list2, LV_SYMBOL_SHUFFLE, "Shuffle");
+    btn = flex_list_add_button(list2, LV_SYMBOL_SHUFFLE, "Shuffle");
     lv_obj_add_event_cb(btn, event_handler_swap, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 }
-
-LV_DEPRECATIONS_IGNORE_END
 
 #endif

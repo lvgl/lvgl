@@ -854,11 +854,23 @@ used afterwards.
 
 ### lv_list
 
-- The `lv_list` widget is deprecated. A list is just a flex container with a
-  column flow, so build one directly from `lv_obj` with a `LV_FLEX_FLOW_COLUMN`
-  layout instead. See the
+- The `lv_list` widget has been removed, along with `LV_USE_LIST`. A list is just a
+  flex container with a column flow, so build one directly from `lv_obj` with a
+  `LV_FLEX_FLOW_COLUMN` layout instead. See the
   [`lv_example_flex_list`](common-widget-features/layouts/flex#building-a-list)
-  example for a starting point.
+  example for a starting point, and `lv_example_flex_list_reorder` for reordering
+  rows with <ApiLink name="lv_obj_move_to_index"/>.
+
+  | Removed | Build it as |
+  |---|---|
+  | `lv_list_create` | an `lv_obj` with `LV_FLEX_FLOW_COLUMN` |
+  | `lv_list_add_button` | an `lv_button` with `lv_pct(100)` width holding an icon and a label |
+  | `lv_list_add_text` | a full-width `lv_label` |
+  | `lv_list_get_button_text` / `lv_list_set_button_text` | read/write the button's `lv_label` child |
+  | `lv_list_add_translation_tag`, `lv_list_add_button_translation_tag`, `lv_list_set_button_translation_tag` | <ApiLink name="lv_label_set_text"/> with a tag resolved through the translation API |
+
+  The v8 aliases `lv_list_add_btn`, `lv_list_set_btn_text` and `lv_list_get_btn_text`
+  are gone with them.
 
 ### lv_win
 

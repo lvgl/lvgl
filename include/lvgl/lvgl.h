@@ -187,7 +187,6 @@
 #include "widgets/lv_label.h"
 #include "widgets/lv_led.h"
 #include "widgets/lv_line.h"
-#include "widgets/lv_list.h"
 #include "widgets/lv_lottie.h"
 #include "widgets/lv_msgbox.h"
 #include "widgets/lv_qrcode.h"

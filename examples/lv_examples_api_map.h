@@ -158,10 +158,6 @@ extern "C" {
 /* line */
 #define lv_example_line_1          lv_example_line_points
 
-/* list */
-#define lv_example_list_1          lv_example_list_reorder
-#define lv_example_list_2          lv_example_list_sections
-
 /* lottie */
 #define lv_example_lottie_1        lv_example_lottie_from_data
 #define lv_example_lottie_2        lv_example_lottie_from_file

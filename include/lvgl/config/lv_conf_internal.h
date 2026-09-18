@@ -2927,18 +2927,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_LIST
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_LIST
-            #define LV_USE_LIST CONFIG_LV_USE_LIST
-        #else
-            #define LV_USE_LIST 0
-        #endif
-    #else
-        #define LV_USE_LIST 1
-    #endif
-#endif
-
 #ifndef LV_USE_LOTTIE
     #ifdef CONFIG_LV_USE_LOTTIE
         #define LV_USE_LOTTIE CONFIG_LV_USE_LOTTIE

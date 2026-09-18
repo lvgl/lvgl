@@ -76,7 +76,6 @@ COMPONENT_SRCDIRS := . \
                   src/widgets/label \
                   src/widgets/led \
                   src/widgets/line \
-                  src/widgets/list \
                   src/widgets/menu \
                   src/widgets/meter \
                   src/widgets/msgbox \

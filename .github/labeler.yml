@@ -1069,15 +1069,6 @@ widget-line:
           - 'examples/widgets/line/**'
           - 'tests/src/test_cases/widgets/test_line.c'
 
-widget-list:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'include/lvgl/widgets/lv_list.h'
-          - 'src/widgets/list/**'
-          - 'docs/src/widgets/list.mdx'
-          - 'examples/widgets/list/**'
-          - 'tests/src/test_cases/widgets/test_list.c'
-
 lottie:
   - changed-files:
       - any-glob-to-any-file:

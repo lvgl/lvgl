@@ -10,9 +10,6 @@
 
 #if LV_USE_DEMO_KEYPAD_AND_ENCODER
 
-/*The demo shows the deprecated `lv_list` widget too.*/
-LV_DEPRECATIONS_IGNORE_BEGIN
-
 /*********************
  *      DEFINES
  *********************/
@@ -30,6 +27,8 @@ static void msgbox_create(void);
 
 static void msgbox_event_cb(lv_event_t * e);
 static void ta_event_cb(lv_event_t * e);
+
+static lv_obj_t * list_add_button(lv_obj_t * list, const void * icon, const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -127,19 +126,21 @@ static void selectors_create(lv_obj_t * parent)
     obj = lv_roller_create(parent);
     lv_obj_set_scroll_on_focus(obj, true);
 
-    lv_obj_t * list = lv_list_create(parent);
+    /*A list is a flex column of full-width buttons*/
+    lv_obj_t * list = lv_obj_create(parent);
+    lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
     lv_obj_update_layout(list);
     if(lv_obj_get_height(list) > lv_obj_get_content_height(parent)) {
         lv_obj_set_height(list, lv_obj_get_content_height(parent));
     }
 
-    lv_list_add_button(list, LV_SYMBOL_OK, "Apply");
-    lv_list_add_button(list, LV_SYMBOL_CLOSE, "Close");
-    lv_list_add_button(list, LV_SYMBOL_EYE_OPEN, "Show");
-    lv_list_add_button(list, LV_SYMBOL_EYE_CLOSE, "Hide");
-    lv_list_add_button(list, LV_SYMBOL_TRASH, "Delete");
-    lv_list_add_button(list, LV_SYMBOL_COPY, "Copy");
-    lv_list_add_button(list, LV_SYMBOL_PASTE, "Paste");
+    list_add_button(list, LV_SYMBOL_OK, "Apply");
+    list_add_button(list, LV_SYMBOL_CLOSE, "Close");
+    list_add_button(list, LV_SYMBOL_EYE_OPEN, "Show");
+    list_add_button(list, LV_SYMBOL_EYE_CLOSE, "Hide");
+    list_add_button(list, LV_SYMBOL_TRASH, "Delete");
+    list_add_button(list, LV_SYMBOL_COPY, "Copy");
+    list_add_button(list, LV_SYMBOL_PASTE, "Paste");
 }
 
 static void text_input_create(lv_obj_t * parent)
@@ -217,6 +218,27 @@ static void ta_event_cb(lv_event_t * e)
     }
 }
 
-LV_DEPRECATIONS_IGNORE_END
+/**
+ * Add a full-width list button holding an icon and a text label to a flex column.
+ */
+static lv_obj_t * list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+{
+    lv_obj_t * btn = lv_button_create(list);
+    lv_obj_set_size(btn, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(btn, LV_FLEX_FLOW_ROW);
+
+#if LV_USE_IMAGE == 1
+    if(icon) {
+        lv_obj_t * img = lv_image_create(btn);
+        lv_image_set_src(img, icon);
+    }
+#endif
+
+    lv_obj_t * label = lv_label_create(btn);
+    lv_label_set_text(label, txt);
+    lv_obj_set_flex_grow(label, 1);
+
+    return btn;
+}
 
 #endif
