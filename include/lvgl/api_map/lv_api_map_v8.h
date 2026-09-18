@@ -120,7 +120,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 
 #define lv_obj_del                       lv_obj_delete
 #define lv_obj_del_async                 lv_obj_delete_async
-#define lv_obj_clear_flag                lv_obj_remove_flag
 #define lv_obj_clear_state               lv_obj_remove_state
 
 #define lv_indev_set_disp                lv_indev_set_display
