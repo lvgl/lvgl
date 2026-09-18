@@ -46,6 +46,41 @@ static lv_obj_t * build_rendered_subtree(void)
     return parent;
 }
 
+void test_active_state_style_changes_refresh_layout(void)
+{
+    lv_style_t base_style;
+    lv_style_init(&base_style);
+    lv_style_set_width(&base_style, 100);
+
+    lv_style_t checked_style;
+    lv_style_init(&checked_style);
+    lv_style_set_width(&checked_style, 150);
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_add_style(obj, &base_style, LV_PART_MAIN);
+    lv_obj_add_state(obj, LV_STATE_CHECKED);
+    lv_obj_update_layout(obj);
+    TEST_ASSERT_EQUAL(100, lv_obj_get_width(obj));
+
+    lv_obj_add_style(obj, &checked_style, LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_obj_update_layout(obj);
+    TEST_ASSERT_EQUAL(150, lv_obj_get_width(obj));
+
+    lv_obj_set_style_width(obj, 175, LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_obj_update_layout(obj);
+    TEST_ASSERT_EQUAL(175, lv_obj_get_width(obj));
+
+    TEST_ASSERT_TRUE(lv_obj_remove_local_style_prop(obj, LV_STYLE_WIDTH,
+                                                    LV_PART_MAIN | LV_STATE_CHECKED));
+    lv_obj_update_layout(obj);
+    TEST_ASSERT_EQUAL(150, lv_obj_get_width(obj));
+
+    lv_obj_remove_style(obj, &base_style, LV_PART_MAIN);
+    lv_obj_remove_style(obj, &checked_style, LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_style_reset(&base_style);
+    lv_style_reset(&checked_style);
+}
+
 /* A redraw-only, scrollbar-only state change must not reach any descendant. */
 void test_scrollbar_redraw_state_does_not_cascade_to_children(void)
 {

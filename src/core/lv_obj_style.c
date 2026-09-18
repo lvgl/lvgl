@@ -219,9 +219,10 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
             continue;
         }
 
+        lv_style_selector_t selector_act = obj->styles[i].selector;
         lv_memzero(&obj->styles[i], sizeof(lv_obj_style_t));
         obj->styles[i].style = new_style;
-        obj->styles[i].selector = selector;
+        obj->styles[i].selector = selector_act;
 
         replaced = true;
         /*Don't break and continue replacing other occurrences*/
