@@ -193,13 +193,6 @@ void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* f
 }
 #endif
 
-void lv_subject_init_int(lv_subject_t * subject, int32_t value)
-{
-    LV_CHECK_ARG(subject != NULL, return);
-    init_common(subject);
-    init_int(subject, value);
-}
-
 void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 {
     LV_CHECK_ARG(subject != NULL, return);
@@ -245,14 +238,6 @@ void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value)
 }
 
 #if LV_USE_FLOAT
-
-void lv_subject_init_float(lv_subject_t * subject, float value)
-{
-    LV_CHECK_ARG(subject != NULL, return);
-
-    init_common(subject);
-    init_float(subject, value);
-}
 
 void lv_subject_set_float(lv_subject_t * subject, float value)
 {
@@ -300,16 +285,6 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value)
 
 
 #endif /*LV_USE_FLOAT*/
-
-void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
-{
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(buf != NULL || size == 0, return);
-    LV_CHECK_ARG(value != NULL, return);
-
-    init_common(subject);
-    init_string(subject, buf, prev_buf, size, value);
-}
 
 void lv_subject_set_string_buffer_static(lv_subject_t * subject, char * buf, char * prev_buf, size_t size)
 {
@@ -379,15 +354,6 @@ const char * lv_subject_get_previous_string(lv_subject_t * subject)
     return subject->prev_value.pointer;
 }
 
-void lv_subject_init_pointer(lv_subject_t * subject, void * value)
-{
-    LV_CHECK_ARG(subject != NULL, return);
-
-    lv_memzero(subject, sizeof(lv_subject_t));
-    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
-    init_pointer(subject, value);
-}
-
 void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)
 {
     LV_CHECK_ARG(subject != NULL, return);
@@ -413,15 +379,6 @@ const void * lv_subject_get_previous_pointer(lv_subject_t * subject)
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_POINTER, return NULL);
 
     return subject->prev_value.pointer;
-}
-
-void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)
-{
-    LV_CHECK_ARG(subject != NULL, return);
-
-    lv_memzero(subject, sizeof(lv_subject_t));
-    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
-    init_color(subject, color);
 }
 
 void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
@@ -450,20 +407,6 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)
     return subject->prev_value.color;
 }
 
-void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len)
-{
-    LV_CHECK_ARG(subject != NULL, return);
-    LV_CHECK_ARG(list != NULL, return);
-
-    lv_memzero(subject, sizeof(*subject));
-    for(uint32_t i = 0; i < list_len; i++) {
-        LV_CHECK_ARG_FORMAT_MSG(list[i] != NULL, return, "Subject %" LV_PRIu32 " is NULL", i);
-    }
-
-    init_common(subject);
-    init_group(subject, list, list_len);
-}
-
 void lv_subject_set_group_list_static(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len)
 {
     LV_CHECK_ARG(subject != NULL, return);
@@ -484,12 +427,6 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
     LV_CHECK_ARG(index >= 0 && index < subject->size, return NULL);
 
     return ((lv_subject_t **)(subject->value.pointer))[index];
-}
-
-void lv_subject_deinit(lv_subject_t * subject)
-{
-    if(subject == NULL) return;
-    deinit(subject);
 }
 
 lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t observer_cb, void * user_data)
