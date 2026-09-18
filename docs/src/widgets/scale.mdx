@@ -155,12 +155,15 @@ move that end of the section band. Only integer subjects are supported.
 
 ### Styling Sections
 
-Attach a style to a section with
-<ApiLink name="lv_scale_section_set_style" display="lv_scale_section_set_style(section, PART, &style)" />.
-`PART` must be one of <ApiLink name="LV_PART_MAIN" />, <ApiLink name="LV_PART_ITEMS" />, or
-<ApiLink name="LV_PART_INDICATOR" /> — they can't be OR'd. To restyle multiple parts,
-attach the same style object to each part separately. Each (section, part)
-pair holds exactly one style; setting again replaces, not adds.
+Attach a style to a section with one setter per part:
+
+- <ApiLink name="lv_scale_set_section_style_main" display="lv_scale_set_section_style_main(scale, section, &style)" />
+- <ApiLink name="lv_scale_set_section_style_indicator" display="lv_scale_set_section_style_indicator(scale, section, &style)" />
+- <ApiLink name="lv_scale_set_section_style_items" display="lv_scale_set_section_style_items(scale, section, &style)" />
+
+To restyle multiple parts, attach the same style object to each part
+separately. Each (section, part) pair holds exactly one style; setting again
+replaces, not adds. Pass `NULL` to detach the part's style.
 
 Relevant style properties per part:
 

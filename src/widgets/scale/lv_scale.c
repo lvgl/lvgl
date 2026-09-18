@@ -512,29 +512,6 @@ void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * sec
     lv_obj_invalidate(scale);
 }
 
-void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style)
-{
-    LV_LOG_DEPRECATED("use lv_scale_set_section_style_main/indicator/items instead");
-    LV_CHECK_ARG(section != NULL, return);
-
-
-
-    switch(part) {
-        case LV_PART_MAIN:
-            section->main_style = section_part_style;
-            break;
-        case LV_PART_INDICATOR:
-            section->indicator_style = section_part_style;
-            break;
-        case LV_PART_ITEMS:
-            section->items_style = section_part_style;
-            break;
-        default:
-            /* Invalid part */
-            break;
-    }
-}
-
 /*=====================
  * Getter functions
  *====================*/
