@@ -505,6 +505,13 @@ void lv_obj_stop_scroll_anim(const lv_obj_t * obj)
     lv_anim_delete((lv_obj_t *)obj, scroll_x_anim);
 }
 
+void lv_obj_stop_scroll_anim_y(const lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    lv_anim_delete((lv_obj_t *)obj, scroll_y_anim);
+}
+
 void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
@@ -741,6 +748,32 @@ void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
             if(sl < 0 && sr > 0) {
                 sr = LV_MIN(sr, -sl);
                 lv_obj_scroll_by(obj, sl, 0, anim_en);
+            }
+        }
+    }
+}
+
+void lv_obj_readjust_scroll_y(lv_obj_t * obj, lv_anim_enable_t anim_en)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    /*Be sure the bottom side is not remains scrolled in*/
+    /*With snapping the content can't be scrolled in*/
+    if(lv_obj_get_scroll_snap_y(obj) == LV_SCROLL_SNAP_NONE) {
+        int32_t st = lv_obj_get_scroll_top(obj);
+        int32_t sb = lv_obj_get_scroll_bottom(obj);
+        if(sb < 0 && st > 0) {
+            sb = LV_MIN(st, -sb);
+            if(anim_en) {
+                lv_obj_scroll_by(obj, 0, sb, LV_ANIM_ON);
+            }
+            else {
+                lv_obj_stop_scroll_anim_y(obj);
+                lv_result_t res = lv_obj_send_event(obj, LV_EVENT_SCROLL_BEGIN, NULL);
+                if(res != LV_RESULT_OK) return;
+                res = lv_obj_scroll_by_raw(obj, 0, sb);
+                if(res != LV_RESULT_OK) return;
+                lv_obj_send_event(obj, LV_EVENT_SCROLL_END, NULL);
             }
         }
     }

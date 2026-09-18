@@ -30,6 +30,75 @@ void test_table_should_set_row_count_to_zero(void)
     TEST_ASSERT_EQUAL_UINT32(0, lv_table_get_row_count(table));
 }
 
+void test_table_should_readjust_scroll_when_rows_are_removed(void)
+{
+    lv_obj_set_size(table, 100, 100);
+    lv_table_set_row_count(table, 10);
+    lv_obj_update_layout(table);
+    lv_obj_scroll_to_y(table, LV_COORD_MAX, LV_ANIM_OFF);
+
+    TEST_ASSERT_GREATER_THAN_INT32(0, lv_obj_get_scroll_y(table));
+
+    lv_table_set_row_count(table, 1);
+
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_y(table));
+}
+
+void test_table_should_stop_scroll_animation_when_rows_are_removed(void)
+{
+    lv_obj_set_size(table, 100, 100);
+    lv_table_set_row_count(table, 10);
+    lv_obj_update_layout(table);
+    lv_obj_scroll_to_y(table, LV_COORD_MAX, LV_ANIM_OFF);
+
+    TEST_ASSERT_GREATER_THAN_INT32(0, lv_obj_get_scroll_y(table));
+
+    lv_obj_scroll_to_y(table, 0, LV_ANIM_ON);
+
+    TEST_ASSERT_TRUE(lv_obj_is_scrolling(table));
+
+    lv_table_set_row_count(table, 1);
+
+    TEST_ASSERT_FALSE(lv_obj_is_scrolling(table));
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_y(table));
+}
+
+void test_table_should_keep_scroll_animation_when_rows_are_added(void)
+{
+    lv_obj_set_size(table, 100, 100);
+    lv_table_set_row_count(table, 10);
+    lv_obj_update_layout(table);
+    lv_obj_scroll_to_y(table, LV_COORD_MAX, LV_ANIM_OFF);
+    lv_obj_scroll_to_y(table, 0, LV_ANIM_ON);
+
+    TEST_ASSERT_TRUE(lv_obj_is_scrolling(table));
+
+    lv_table_set_row_count(table, 11);
+
+    TEST_ASSERT_TRUE(lv_obj_is_scrolling(table));
+}
+
+void test_table_should_keep_horizontal_scroll_animation_when_rows_are_removed(void)
+{
+    lv_obj_set_size(table, 100, 100);
+    lv_table_set_column_width(table, 0, 500);
+    lv_table_set_row_count(table, 10);
+    lv_obj_update_layout(table);
+    lv_obj_scroll_to_x(table, LV_COORD_MAX, LV_ANIM_ON);
+
+    lv_point_t end_before;
+    lv_obj_get_scroll_end(table, &end_before);
+    TEST_ASSERT_TRUE(lv_obj_is_scrolling(table));
+    TEST_ASSERT_GREATER_THAN_INT32(0, end_before.x);
+
+    lv_table_set_row_count(table, 1);
+
+    lv_point_t end_after;
+    lv_obj_get_scroll_end(table, &end_after);
+    TEST_ASSERT_TRUE(lv_obj_is_scrolling(table));
+    TEST_ASSERT_EQUAL_INT32(end_before.x, end_after.x);
+}
+
 void test_table_should_return_assigned_cell_value(void)
 {
     uint16_t row = 0;
