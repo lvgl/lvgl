@@ -242,32 +242,6 @@ lv_draw_buf_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
     return draw_buf;
 }
 
-void lv_snapshot_free(lv_image_dsc_t * dsc)
-{
-    if(dsc == NULL) return;
-
-    LV_LOG_DEPRECATED("use lv_draw_buf_destroy directly");
-    lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
-}
-
-lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc,
-                                    void * buf,
-                                    uint32_t buf_size)
-{
-    LV_CHECK_OBJ(obj, &lv_obj_class, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(buf != NULL, return LV_RESULT_INVALID);
-
-    lv_draw_buf_t draw_buf;
-    LV_LOG_DEPRECATED("use lv_snapshot_take_to_draw_buf instead.");
-    lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);
-    lv_result_t res = lv_snapshot_take_to_draw_buf(obj, cf, &draw_buf);
-    if(res == LV_RESULT_OK) {
-        lv_memcpy((void *)dsc, &draw_buf, sizeof(lv_image_dsc_t));
-    }
-    return res;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
