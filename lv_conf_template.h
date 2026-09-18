@@ -2339,14 +2339,13 @@
 /** LV_ASSERT_NULL */
 #define LV_USE_ASSERT_NULL 0
 
-/** LV_ASSERT_STYLE */
+/** Add a sentinel field to lv_style_t so a corrupted or uninitialized
+ *  style can be detected. LV_STYLE_SENTINEL_OK() reads it.
+ */
 #define LV_USE_ASSERT_STYLE 0
 
 /** LV_ASSERT_MEM_INTEGRITY */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0
-
-/** LV_ASSERT_OBJ */
-#define LV_USE_ASSERT_OBJ 0
 
 /** Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
  *  This setting allows you to keep using old LVGL versions which rely on

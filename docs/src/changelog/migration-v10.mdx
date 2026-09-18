@@ -424,16 +424,24 @@ them now triggers a deprecation warning. Direct access to headers under
 
 ### Argument checking
 
-LVGL v9.6 standardizes public-API argument validation. `LV_ASSERT_OBJ` is
-replaced by <ApiLink name="LV_CHECK_OBJ" />, which logs a warning and lets the
-caller recover gracefully instead of halting the program.
+LVGL v9.6 standardizes public-API argument validation. `LV_ASSERT_OBJ` and
+`LV_ASSERT_STYLE` have been removed. Use <ApiLink name="LV_CHECK_OBJ" /> and
+<ApiLink name="LV_CHECK_ARG" />, which log a warning and let the caller recover
+gracefully instead of halting the program.
 
 ```c
 /* Before */
 LV_ASSERT_OBJ(obj, &lv_label_class);
+LV_ASSERT_STYLE(style);
 /* After */
 LV_CHECK_OBJ(obj, &lv_label_class, return);
+LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 ```
+
+The `LV_USE_ASSERT_OBJ` config option is gone with `LV_ASSERT_OBJ`. The
+equivalent checks are configured per layer with `LV_USE_CHECK_OBJ_CLASSTYPE`
+and `LV_USE_CHECK_OBJ_VALIDITY`, see below. `LV_USE_ASSERT_STYLE` remains, it
+still controls the style sentinel field that `LV_STYLE_SENTINEL_OK()` reads.
 
 #### What `LV_CHECK_OBJ` actually checks
 
