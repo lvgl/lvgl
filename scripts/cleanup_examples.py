@@ -506,13 +506,22 @@ def _load_globals_subjects() -> dict[str, dict]:
     return subjects
 
 
+# A Subject is allocated by LVGL and handed back as a pointer, so an example
+# holds `static lv_subject_t * name` and passes `name` around unchanged.
+SUBJECT_TYPE_ENUM = {
+    "int": "LV_SUBJECT_TYPE_INT",
+    "float": "LV_SUBJECT_TYPE_FLOAT",
+    "string": "LV_SUBJECT_TYPE_STRING",
+}
+
+
 def _subject_decl_lines(name: str, meta: dict) -> list[str]:
     """Top-of-function static declarations for a subject (4-space indent).
 
     `string` subjects need two backing buffers — value and previous-value —
-    plus the subject itself.
+    next to the subject pointer.
     """
-    out = [f"    static lv_subject_t {name};"]
+    out = [f"    static lv_subject_t * {name};"]
     if meta["type"] == "string":
         out.append(f"    static char {name}_buf[{SUBJECT_STRING_BUF_SIZE}];")
         out.append(f"    static char {name}_prev_buf[{SUBJECT_STRING_BUF_SIZE}];")
@@ -520,31 +529,39 @@ def _subject_decl_lines(name: str, meta: dict) -> list[str]:
 
 
 def _subject_init_lines(name: str, meta: dict) -> list[str]:
-    """Init-block calls for a subject (8-space indent, inside `if (!inited)`)."""
+    """Init-block calls for a subject (8-space indent, inside `if (!inited)`).
+
+    The min/max bounds are set before the first value because
+    `lv_subject_set_int()` clamps to them.
+    """
     typ = meta["type"]
     value = meta["value"]
-    out: list[str] = []
+    subject_type = SUBJECT_TYPE_ENUM.get(typ)
+    if subject_type is None:
+        return []
+
+    out = [f"        {name} = lv_subject_create({subject_type});"]
     if typ == "int":
-        out.append(f"        lv_subject_init_int(&{name}, {value});")
         if meta.get("min_value") is not None:
             out.append(
-                f"        lv_subject_set_min_value_int(&{name}, {meta['min_value']});"
+                f"        lv_subject_set_min_value_int({name}, {meta['min_value']});"
             )
         if meta.get("max_value") is not None:
             out.append(
-                f"        lv_subject_set_max_value_int(&{name}, {meta['max_value']});"
+                f"        lv_subject_set_max_value_int({name}, {meta['max_value']});"
             )
+        out.append(f"        lv_subject_set_int({name}, {value});")
     elif typ == "float":
-        out.append(f"        lv_subject_init_float(&{name}, {value});")
+        out.append(f"        lv_subject_set_float({name}, {value});")
     elif typ == "string":
         # Multi-line call to match the canonical formatting of generated
         # project code; the args are too long to fit comfortably on one line.
         out.extend([
-            f"        lv_subject_init_string(&{name},",
-            f"                               {name}_buf,",
-            f"                               {name}_prev_buf,",
-            f"                               {SUBJECT_STRING_BUF_SIZE},",
-            f'                               "{value}");',
+            f"        lv_subject_set_string_buffer_static({name},",
+            f"                                            {name}_buf,",
+            f"                                            {name}_prev_buf,",
+            f"                                            {SUBJECT_STRING_BUF_SIZE});",
+            f'        lv_subject_set_string({name}, "{value}");',
         ])
     return out
 
@@ -572,19 +589,19 @@ INITED_BLOCK_RE = re.compile(
 
 
 def _used_subjects(source: str) -> list[str]:
-    """Return subjects from globals.xml referenced as `&name` in `source`,
+    """Return subjects from globals.xml referenced by name in `source`,
     keeping `globals.xml` order (for stable output)."""
     meta = _load_globals_subjects()
-    return [n for n in meta if re.search(rf"&{re.escape(n)}\b", source)]
+    return [n for n in meta if re.search(rf"\b{re.escape(n)}\b", source)]
 
 
 def init_subjects(source: str, path: Path) -> str:
     """Add `static lv_subject_t` declarations + init calls for any subject
     the example references, so the file is self-contained.
 
-    Idempotent: a subject that already has a `static lv_subject_t <name>`
-    declaration isn't re-declared, and one that already has an
-    `lv_subject_init_*(&<name>` call isn't re-initialised.
+    Idempotent: a subject that already has a `static lv_subject_t * <name>`
+    declaration isn't re-declared, and one that already has a
+    `<name> = lv_subject_create(` call isn't re-created.
     """
     meta = _load_globals_subjects()
     if not meta:
@@ -597,11 +614,12 @@ def init_subjects(source: str, path: Path) -> str:
     new_decls: list[str] = []
     new_inits: list[str] = []
     for name in used:
-        if not re.search(rf"\bstatic\s+lv_subject_t\s+{re.escape(name)}\b", source):
+        if not re.search(
+            rf"\bstatic\s+lv_subject_t\s*\*\s*{re.escape(name)}\b", source
+        ):
             new_decls.extend(_subject_decl_lines(name, meta[name]))
         if not re.search(
-            rf"lv_subject_init_(?:int|float|string)\s*\(\s*&{re.escape(name)}\b",
-            source,
+            rf"\b{re.escape(name)}\s*=\s*lv_subject_create\s*\(", source
         ):
             new_inits.extend(_subject_init_lines(name, meta[name]))
 

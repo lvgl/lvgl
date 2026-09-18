@@ -43,19 +43,13 @@ static void delete_event(lv_event_t * e);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
-                                        lv_wayland_display_close_cb_t close_cb)
+lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title)
 {
     LV_CHECK_ARG(title != NULL, return NULL);
 
     lv_result_t res = lv_wayland_init();
     if(res != LV_RESULT_OK) {
         return NULL;
-    }
-
-    if(close_cb) {
-        LV_LOG_DEPRECATED("'lv_wayland_display_close_cb_t' is deprecated and will be removed in the next release. "
-                          "Bind an LV_EVENT_DELETE to the display returned by `lv_wayland_window_create` instead.");
     }
 
     lv_wl_window_t * window = lv_ll_ins_tail(&lv_wl_ctx.window_ll);
@@ -66,8 +60,6 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     }
 
     lv_memset(window, 0, sizeof(*window));
-
-    window->close_cb = close_cb;
 
     window->lv_disp = lv_display_create(hor_res, ver_res);
     if(!window->lv_disp) {
@@ -183,7 +175,6 @@ void lv_wayland_window_close(lv_display_t * display)
     if(!window) {
         return;
     }
-    window->close_cb = NULL;
     lv_display_delete(window->lv_disp);
 }
 
@@ -304,9 +295,6 @@ static void delete_event(lv_event_t * e)
         return;
     }
 
-    if(window->close_cb) {
-        window->close_cb(window->lv_disp);
-    }
     lv_wayland_xdg_delete_window(&window->xdg);
 
     /* Commit a NULL buffer to the body surface so that we release buffers*/

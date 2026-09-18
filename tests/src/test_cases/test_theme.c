@@ -3,9 +3,6 @@
 #include "../../src/themes/lv_theme_private.h"
 #include "unity/unity.h"
 
-/*The themes are tested on the deprecated `lv_menu`, `lv_list` and `lv_win` widgets too.*/
-LV_DEPRECATIONS_IGNORE_BEGIN
-
 void setUp(void)
 {
     /* Function run before every test */
@@ -72,11 +69,6 @@ static void test_widgets(const char * img_name)
     lv_obj_set_size(tabview, 100, 100);
     lv_tabview_add_tab(tabview, "Tab 1");
 
-    lv_obj_t * win = lv_win_create(scr_act);
-    lv_obj_set_size(win, 100, 100);
-    lv_win_add_title(win, "Window");
-    lv_win_add_button(win, LV_SYMBOL_CLOSE, 20);
-
     lv_button_create(scr_act);
 
     lv_obj_t * btnm = lv_buttonmatrix_create(scr_act);
@@ -124,11 +116,6 @@ static void test_widgets(const char * img_name)
     lv_obj_t * keyboard = lv_keyboard_create(scr_act);
     lv_obj_set_size(keyboard, 300, 150);
 
-    lv_obj_t * list = lv_list_create(scr_act);
-    lv_obj_set_size(list, 100, 100);
-    lv_list_add_text(list, "List item");
-    lv_list_add_button(list, LV_SYMBOL_OK, "List button");
-
     lv_spinbox_create(scr_act);
 
     lv_obj_t * tileview = lv_tileview_create(scr_act);
@@ -138,9 +125,6 @@ static void test_widgets(const char * img_name)
     lv_label_set_text(tile_label, "Tile: 0;0");
 
     lv_led_create(scr_act);
-
-    lv_obj_t * menu = lv_menu_create(scr_act);
-    lv_obj_set_size(menu, 100, 100);
 
     lv_spinner_create(scr_act);
 
@@ -245,8 +229,6 @@ void test_theme_simple(void)
     TEST_ASSERT_FALSE(lv_theme_simple_is_inited());
     TEST_ASSERT_NULL(lv_theme_simple_get());
 }
-
-LV_DEPRECATIONS_IGNORE_END
 
 void test_theme_user_data(void)
 {

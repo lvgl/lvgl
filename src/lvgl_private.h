@@ -151,7 +151,6 @@
 #include "libs/gltf/gltf_view/assets/lv_gltf_view_shader.h"
 #include "libs/gltf/gltf_view/lv_gltf_view_internal.h"
 #include "libs/rle/lv_rle_private.h"
-#include "libs/rlottie/lv_rlottie_private.h"
 #include "image/svg/lv_svg_decoder.h"
 #include "image/svg/lv_svg_private.h"
 #include "image/svg/lv_svg_parser.h"
@@ -194,8 +193,6 @@
 #include "osal/lv_rtthread.h"
 #include "osal/lv_sdl2.h"
 #include "osal/lv_windows.h"
-#include "others/file_explorer/lv_file_explorer_private.h"
-#include "others/fragment/lv_fragment_private.h"
 #include "others/translation/lv_translation_private.h"
 #include "stdlib/builtin/lv_tlsf.h"
 #include "stdlib/builtin/lv_tlsf_private.h"
@@ -224,7 +221,6 @@
 #include "widgets/led/lv_led_private.h"
 #include "widgets/line/lv_line_private.h"
 #include "widgets/lottie/lv_lottie_private.h"
-#include "widgets/menu/lv_menu_private.h"
 #include "widgets/msgbox/lv_msgbox_private.h"
 #include "widgets/qrcode/lv_qrcode_private.h"
 #include "widgets/roller/lv_roller_private.h"
@@ -238,7 +234,6 @@
 #include "widgets/tabview/lv_tabview_private.h"
 #include "widgets/textarea/lv_textarea_private.h"
 #include "widgets/tileview/lv_tileview_private.h"
-#include "widgets/win/lv_win_private.h"
 
 /*********************
  *      DEFINES

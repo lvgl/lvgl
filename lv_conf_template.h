@@ -1450,9 +1450,6 @@
 /** Line */
 #define LV_USE_LINE 1
 
-/** List */
-#define LV_USE_LIST 1
-
 #if LV_USE_THORVG
 /** Plays Lottie JSON animations using the ThorVG Lottie parser.
  *
@@ -1461,9 +1458,6 @@
 #define LV_USE_LOTTIE 0
 
 #endif /*LV_USE_THORVG*/
-
-/** Menu */
-#define LV_USE_MENU 1
 
 /** Message box
  *
@@ -1476,9 +1470,6 @@
  *  Enable: LV_USE_CANVAS
  */
 #define LV_USE_QRCODE 0
-
-/** Legacy rlottie binding, kept for compatibility. Use LV_USE_LOTTIE instead. */
-#define LV_USE_RLOTTIE 0
 
 /** Roller
  *
@@ -1533,9 +1524,6 @@
 
 /** Tileview */
 #define LV_USE_TILEVIEW 1
-
-/** Window */
-#define LV_USE_WIN 1
 
 
 
@@ -2285,31 +2273,6 @@
 
 
 /*============================================================================
- * OTHERS
- *============================================================================*/
-
-/** Manage a widget subtree with its own lifecycle and back stack, similar to Android fragments. */
-#define LV_USE_FRAGMENT 0
-
-/** File explorer
- *
- *  Enable: LV_USE_TABLE
- */
-#define LV_USE_FILE_EXPLORER 0
-
-#if LV_USE_FILE_EXPLORER
-/** Maximum path length (bytes) */
-#define LV_FILE_EXPLORER_PATH_MAX_LEN 128
-
-/** Add a sidebar with shortcuts to common places. It can be hidden by clicking the
- *  button at the top left corner of the browsing area, which is useful on small screens.
- */
-#define LV_FILE_EXPLORER_QUICK_ACCESS 1
-
-#endif /*LV_USE_FILE_EXPLORER*/
-
-
-/*============================================================================
  * BUILD
  *============================================================================*/
 
@@ -2367,14 +2330,13 @@
 /** LV_ASSERT_NULL */
 #define LV_USE_ASSERT_NULL 0
 
-/** LV_ASSERT_STYLE */
+/** Add a sentinel field to lv_style_t so a corrupted or uninitialized
+ *  style can be detected. LV_STYLE_SENTINEL_OK() reads it.
+ */
 #define LV_USE_ASSERT_STYLE 0
 
 /** LV_ASSERT_MEM_INTEGRITY */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0
-
-/** LV_ASSERT_OBJ */
-#define LV_USE_ASSERT_OBJ 0
 
 /** Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
  *  This setting allows you to keep using old LVGL versions which rely on

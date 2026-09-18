@@ -84,10 +84,9 @@ static inline bool has_state(const lv_obj_t * obj, lv_state_t state);
     static lv_result_t lv_obj_get_any(const lv_obj_t *, lv_prop_id_t, lv_property_t *);
 
     static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj);
-#endif
 
-#if LV_USE_OBJ_ID
-    static lv_obj_t * obj_find_by_id(const lv_obj_t * obj, const void * id);
+    static void obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
+    static bool obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
 #endif
 
 /**********************
@@ -389,119 +388,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
 /*-----------------
  * Attribute set
  *----------------*/
-
-void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
-{
-    LV_LOG_DEPRECATED("use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, true).");
-
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    if(f >= LV_OBJ_FLAG_LAYOUT_1) lv_obj_allocate_spec_attr(obj);
-
-    /* If all requested flags are already set, do nothing */
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    if(lv_obj_has_flag(obj, f)) return;
-    LV_DEPRECATIONS_IGNORE_END
-
-    if(f & LV_OBJ_FLAG_HIDDEN)               lv_obj_set_hidden(obj, true);
-    if(f & LV_OBJ_FLAG_CLICKABLE)            lv_obj_set_clickable(obj, true);
-    if(f & LV_OBJ_FLAG_CLICK_FOCUSABLE)      lv_obj_set_click_focusable(obj, true);
-    if(f & LV_OBJ_FLAG_CHECKABLE)            lv_obj_set_checkable(obj, true);
-    if(f & LV_OBJ_FLAG_SCROLLABLE)           lv_obj_set_scrollable(obj, true);
-    if(f & LV_OBJ_FLAG_SCROLL_ELASTIC)       lv_obj_set_scroll_elastic(obj, true);
-    if(f & LV_OBJ_FLAG_SCROLL_MOMENTUM)      lv_obj_set_scroll_momentum(obj, true);
-    if(f & LV_OBJ_FLAG_SCROLL_ONE)            lv_obj_set_scroll_one(obj, true);
-    if(f & LV_OBJ_FLAG_SCROLL_CHAIN_HOR)     lv_obj_set_scroll_chain_hor(obj, true);
-    if(f & LV_OBJ_FLAG_SCROLL_CHAIN_VER)     lv_obj_set_scroll_chain_ver(obj, true);
-    if(f & LV_OBJ_FLAG_SCROLL_ON_FOCUS)      lv_obj_set_scroll_on_focus(obj, true);
-    if(f & LV_OBJ_FLAG_SCROLL_WITH_ARROW)    lv_obj_set_scroll_with_arrow(obj, true);
-    if(f & LV_OBJ_FLAG_SNAPPABLE)             lv_obj_set_snappable(obj, true);
-    if(f & LV_OBJ_FLAG_PRESS_LOCK)            lv_obj_set_press_lock(obj, true);
-    if(f & LV_OBJ_FLAG_EVENT_BUBBLE)          lv_obj_set_event_bubble(obj, true);
-    if(f & LV_OBJ_FLAG_GESTURE_BUBBLE)        lv_obj_set_gesture_bubble(obj, true);
-    if(f & LV_OBJ_FLAG_ADV_HITTEST)           lv_obj_set_adv_hittest(obj, true);
-    if(f & LV_OBJ_FLAG_IGNORE_LAYOUT)         lv_obj_set_ignore_layout(obj, true);
-    if(f & LV_OBJ_FLAG_FLOATING)              lv_obj_set_floating(obj, true);
-    if(f & LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS) lv_obj_set_send_draw_task_events(obj, true);
-    if(f & LV_OBJ_FLAG_OVERFLOW_VISIBLE)      lv_obj_set_overflow_visible(obj, true);
-    if(f & LV_OBJ_FLAG_EVENT_TRICKLE)         lv_obj_set_event_trickle(obj, true);
-    if(f & LV_OBJ_FLAG_STATE_TRICKLE)         lv_obj_set_state_trickle(obj, true);
-    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_flags |= 1 << 0;
-    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_flags |= 1 << 1;
-    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_flags |= 1 << 2;
-    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_flags |= 1 << 3;
-    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_flags |= 1 << 4;
-    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_flags |= 1 << 5;
-    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_flags |= 1 << 6;
-    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_flags |= 1 << 7;
-
-    if((f & LV_OBJ_FLAG_LAYOUT_1) || (f & LV_OBJ_FLAG_LAYOUT_2)) {
-        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
-        lv_obj_mark_layout_as_dirty(obj);
-    }
-}
-
-
-void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
-{
-    LV_LOG_DEPRECATED("use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, false).");
-
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    if(f >= LV_OBJ_FLAG_LAYOUT_1) lv_obj_allocate_spec_attr(obj);
-
-    /* If none of the requested flags are set, do nothing */
-    if(f & LV_OBJ_FLAG_HIDDEN)               lv_obj_set_hidden(obj, false);
-    if(f & LV_OBJ_FLAG_CLICKABLE)            lv_obj_set_clickable(obj, false);
-    if(f & LV_OBJ_FLAG_CLICK_FOCUSABLE)      lv_obj_set_click_focusable(obj, false);
-    if(f & LV_OBJ_FLAG_CHECKABLE)            lv_obj_set_checkable(obj, false);
-    if(f & LV_OBJ_FLAG_SCROLLABLE)           lv_obj_set_scrollable(obj, false);
-    if(f & LV_OBJ_FLAG_SCROLL_ELASTIC)       lv_obj_set_scroll_elastic(obj, false);
-    if(f & LV_OBJ_FLAG_SCROLL_MOMENTUM)      lv_obj_set_scroll_momentum(obj, false);
-    if(f & LV_OBJ_FLAG_SCROLL_ONE)            lv_obj_set_scroll_one(obj, false);
-    if(f & LV_OBJ_FLAG_SCROLL_CHAIN_HOR)     lv_obj_set_scroll_chain_hor(obj, false);
-    if(f & LV_OBJ_FLAG_SCROLL_CHAIN_VER)     lv_obj_set_scroll_chain_ver(obj, false);
-    if(f & LV_OBJ_FLAG_SCROLL_ON_FOCUS)      lv_obj_set_scroll_on_focus(obj, false);
-    if(f & LV_OBJ_FLAG_SCROLL_WITH_ARROW)    lv_obj_set_scroll_with_arrow(obj, false);
-    if(f & LV_OBJ_FLAG_SNAPPABLE)             lv_obj_set_snappable(obj, false);
-    if(f & LV_OBJ_FLAG_PRESS_LOCK)            lv_obj_set_press_lock(obj, false);
-    if(f & LV_OBJ_FLAG_EVENT_BUBBLE)          lv_obj_set_event_bubble(obj, false);
-    if(f & LV_OBJ_FLAG_GESTURE_BUBBLE)        lv_obj_set_gesture_bubble(obj, false);
-    if(f & LV_OBJ_FLAG_ADV_HITTEST)           lv_obj_set_adv_hittest(obj, false);
-    if(f & LV_OBJ_FLAG_IGNORE_LAYOUT)         lv_obj_set_ignore_layout(obj, false);
-    if(f & LV_OBJ_FLAG_FLOATING)              lv_obj_set_floating(obj, false);
-    if(f & LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS) lv_obj_set_send_draw_task_events(obj, false);
-    if(f & LV_OBJ_FLAG_OVERFLOW_VISIBLE)      lv_obj_set_overflow_visible(obj, false);
-    if(f & LV_OBJ_FLAG_EVENT_TRICKLE)         lv_obj_set_event_trickle(obj, false);
-    if(f & LV_OBJ_FLAG_STATE_TRICKLE)         lv_obj_set_state_trickle(obj, false);
-    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_flags &= ~(1 << 0);
-    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_flags &= ~(1 << 1);
-    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_flags &= ~(1 << 2);
-    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_flags &= ~(1 << 3);
-    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_flags &= ~(1 << 4);
-    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_flags &= ~(1 << 5);
-    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_flags &= ~(1 << 6);
-    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_flags &= ~(1 << 7);
-
-    if((f & LV_OBJ_FLAG_LAYOUT_1) || (f & LV_OBJ_FLAG_LAYOUT_2)) {
-        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
-        lv_obj_mark_layout_as_dirty(obj);
-    }
-}
-
-
-void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
-{
-    LV_LOG_DEPRECATED("use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, en).");
-
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    if(v) lv_obj_add_flag(obj, f);
-    else lv_obj_remove_flag(obj, f);
-    LV_DEPRECATIONS_IGNORE_END
-}
-
 
 void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 {
@@ -855,94 +741,6 @@ void lv_obj_set_state_user_4(lv_obj_t * obj, bool en)
 /*=======================
  * Getter functions
  *======================*/
-
-bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
-{
-    LV_LOG_DEPRECATED("use the dedicated lv_obj_is_<flag>() getters instead, e.g. lv_obj_is_hidden(obj).");
-
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
-
-    if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;;
-
-    if((f & LV_OBJ_FLAG_HIDDEN) && !obj->hidden) return false;
-    if((f & LV_OBJ_FLAG_CLICKABLE) && !obj->clickable) return false;
-    if((f & LV_OBJ_FLAG_CLICK_FOCUSABLE) && !obj->click_focusable) return false;
-    if((f & LV_OBJ_FLAG_CHECKABLE) && !obj->checkable) return false;
-    if((f & LV_OBJ_FLAG_SCROLLABLE) && !obj->scrollable) return false;
-    if((f & LV_OBJ_FLAG_SCROLL_ELASTIC) && !obj->scroll_elastic) return false;
-    if((f & LV_OBJ_FLAG_SCROLL_MOMENTUM) && !obj->scroll_momentum) return false;
-    if((f & LV_OBJ_FLAG_SCROLL_ONE) && !obj->scroll_one) return false;
-    if((f & LV_OBJ_FLAG_SCROLL_CHAIN_HOR) && !obj->scroll_chain_hor) return false;
-    if((f & LV_OBJ_FLAG_SCROLL_CHAIN_VER) && !obj->scroll_chain_ver) return false;
-    if((f & LV_OBJ_FLAG_SCROLL_ON_FOCUS) && !obj->scroll_on_focus) return false;
-    if((f & LV_OBJ_FLAG_SCROLL_WITH_ARROW) && !obj->scroll_with_arrow) return false;
-    if((f & LV_OBJ_FLAG_SNAPPABLE) && !obj->snappable) return false;
-    if((f & LV_OBJ_FLAG_PRESS_LOCK) && !obj->press_lock) return false;
-    if((f & LV_OBJ_FLAG_EVENT_BUBBLE) && !obj->event_bubble) return false;
-    if((f & LV_OBJ_FLAG_GESTURE_BUBBLE) && !obj->gesture_bubble) return false;
-    if((f & LV_OBJ_FLAG_ADV_HITTEST) && !obj->adv_hittest) return false;
-    if((f & LV_OBJ_FLAG_IGNORE_LAYOUT) && !obj->ignore_layout) return false;
-    if((f & LV_OBJ_FLAG_FLOATING) && !obj->floating) return false;
-    if((f & LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS) && !obj->send_draw_task_events) return false;
-    if((f & LV_OBJ_FLAG_OVERFLOW_VISIBLE) && !obj->overflow_visible) return false;
-    if((f & LV_OBJ_FLAG_EVENT_TRICKLE) && !obj->event_trickle) return false;
-    if((f & LV_OBJ_FLAG_STATE_TRICKLE) && !obj->state_trickle) return false;
-    if((f & LV_OBJ_FLAG_LAYOUT_1) && !(obj->spec_attr->user_flags & (1 << 0))) return false;
-    if((f & LV_OBJ_FLAG_LAYOUT_2) && !(obj->spec_attr->user_flags & (1 << 1))) return false;
-    if((f & LV_OBJ_FLAG_WIDGET_1) && !(obj->spec_attr->user_flags & (1 << 2))) return false;
-    if((f & LV_OBJ_FLAG_WIDGET_2) && !(obj->spec_attr->user_flags & (1 << 3))) return false;
-    if((f & LV_OBJ_FLAG_USER_1) && !(obj->spec_attr->user_flags & (1 << 4))) return false;
-    if((f & LV_OBJ_FLAG_USER_2) && !(obj->spec_attr->user_flags & (1 << 5))) return false;
-    if((f & LV_OBJ_FLAG_USER_3) && !(obj->spec_attr->user_flags & (1 << 6))) return false;
-    if((f & LV_OBJ_FLAG_USER_4) && !(obj->spec_attr->user_flags & (1 << 7))) return false;
-
-    return true;
-}
-
-bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
-{
-    LV_LOG_DEPRECATED("use the dedicated lv_obj_is_<flag>() getters instead, e.g. lv_obj_is_hidden(obj).");
-
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
-
-    if((f & LV_OBJ_FLAG_HIDDEN) && obj->hidden) return true;
-    if((f & LV_OBJ_FLAG_CLICKABLE) && obj->clickable) return true;
-    if((f & LV_OBJ_FLAG_CLICK_FOCUSABLE) && obj->click_focusable) return true;
-    if((f & LV_OBJ_FLAG_CHECKABLE) && obj->checkable) return true;
-    if((f & LV_OBJ_FLAG_SCROLLABLE) && obj->scrollable) return true;
-    if((f & LV_OBJ_FLAG_SCROLL_ELASTIC) && obj->scroll_elastic) return true;
-    if((f & LV_OBJ_FLAG_SCROLL_MOMENTUM) && obj->scroll_momentum) return true;
-    if((f & LV_OBJ_FLAG_SCROLL_ONE) && obj->scroll_one) return true;
-    if((f & LV_OBJ_FLAG_SCROLL_CHAIN_HOR) && obj->scroll_chain_hor) return true;
-    if((f & LV_OBJ_FLAG_SCROLL_CHAIN_VER) && obj->scroll_chain_ver) return true;
-    if((f & LV_OBJ_FLAG_SCROLL_ON_FOCUS) && obj->scroll_on_focus) return true;
-    if((f & LV_OBJ_FLAG_SCROLL_WITH_ARROW) && obj->scroll_with_arrow) return true;
-    if((f & LV_OBJ_FLAG_SNAPPABLE) && obj->snappable) return true;
-    if((f & LV_OBJ_FLAG_PRESS_LOCK) && obj->press_lock) return true;
-    if((f & LV_OBJ_FLAG_EVENT_BUBBLE) && obj->event_bubble) return true;
-    if((f & LV_OBJ_FLAG_GESTURE_BUBBLE) && obj->gesture_bubble) return true;
-    if((f & LV_OBJ_FLAG_ADV_HITTEST) && obj->adv_hittest) return true;
-    if((f & LV_OBJ_FLAG_IGNORE_LAYOUT) && obj->ignore_layout) return true;
-    if((f & LV_OBJ_FLAG_FLOATING) && obj->floating) return true;
-    if((f & LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS) && obj->send_draw_task_events) return true;
-    if((f & LV_OBJ_FLAG_OVERFLOW_VISIBLE) && obj->overflow_visible) return true;
-    if((f & LV_OBJ_FLAG_EVENT_TRICKLE) && obj->event_trickle) return true;
-    if((f & LV_OBJ_FLAG_STATE_TRICKLE) && obj->state_trickle) return true;
-
-    if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;
-
-    if((f & LV_OBJ_FLAG_LAYOUT_1) && (obj->spec_attr->user_flags & (1 << 0))) return true;
-    if((f & LV_OBJ_FLAG_LAYOUT_2) && (obj->spec_attr->user_flags & (1 << 1))) return true;
-    if((f & LV_OBJ_FLAG_WIDGET_1) && (obj->spec_attr->user_flags & (1 << 2))) return true;
-    if((f & LV_OBJ_FLAG_WIDGET_2) && (obj->spec_attr->user_flags & (1 << 3))) return true;
-    if((f & LV_OBJ_FLAG_USER_1) && (obj->spec_attr->user_flags & (1 << 4))) return true;
-    if((f & LV_OBJ_FLAG_USER_2) && (obj->spec_attr->user_flags & (1 << 5))) return true;
-    if((f & LV_OBJ_FLAG_USER_3) && (obj->spec_attr->user_flags & (1 << 6))) return true;
-    if((f & LV_OBJ_FLAG_USER_4) && (obj->spec_attr->user_flags & (1 << 7))) return true;
-
-    return false;
-}
-
 
 bool lv_obj_is_hidden(const lv_obj_t * obj)
 {
@@ -1337,14 +1135,6 @@ void * lv_obj_get_id(const lv_obj_t * obj)
     return obj->id;
 }
 
-lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
-{
-    LV_CHECK_ARG(id != NULL, return NULL);
-    LV_LOG_DEPRECATED("IDs are used only to print the widget trees. To find a widget use obj_name");
-    if(obj == NULL) obj = lv_display_get_screen_active(lv_display_get_default());
-    if(obj == NULL) return NULL;
-    return obj_find_by_id(obj, id);
-}
 #endif
 
 void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_obj_t * screen,
@@ -2250,6 +2040,99 @@ static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj)
     return point;
 }
 
+static void obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    if(f >= LV_OBJ_FLAG_LAYOUT_1) lv_obj_allocate_spec_attr(obj);
+
+    if(f & LV_OBJ_FLAG_HIDDEN)                lv_obj_set_hidden(obj, v);
+    if(f & LV_OBJ_FLAG_CLICKABLE)             lv_obj_set_clickable(obj, v);
+    if(f & LV_OBJ_FLAG_CLICK_FOCUSABLE)       lv_obj_set_click_focusable(obj, v);
+    if(f & LV_OBJ_FLAG_CHECKABLE)             lv_obj_set_checkable(obj, v);
+    if(f & LV_OBJ_FLAG_SCROLLABLE)            lv_obj_set_scrollable(obj, v);
+    if(f & LV_OBJ_FLAG_SCROLL_ELASTIC)        lv_obj_set_scroll_elastic(obj, v);
+    if(f & LV_OBJ_FLAG_SCROLL_MOMENTUM)       lv_obj_set_scroll_momentum(obj, v);
+    if(f & LV_OBJ_FLAG_SCROLL_ONE)            lv_obj_set_scroll_one(obj, v);
+    if(f & LV_OBJ_FLAG_SCROLL_CHAIN_HOR)      lv_obj_set_scroll_chain_hor(obj, v);
+    if(f & LV_OBJ_FLAG_SCROLL_CHAIN_VER)      lv_obj_set_scroll_chain_ver(obj, v);
+    if(f & LV_OBJ_FLAG_SCROLL_ON_FOCUS)       lv_obj_set_scroll_on_focus(obj, v);
+    if(f & LV_OBJ_FLAG_SCROLL_WITH_ARROW)     lv_obj_set_scroll_with_arrow(obj, v);
+    if(f & LV_OBJ_FLAG_SNAPPABLE)             lv_obj_set_snappable(obj, v);
+    if(f & LV_OBJ_FLAG_PRESS_LOCK)            lv_obj_set_press_lock(obj, v);
+    if(f & LV_OBJ_FLAG_EVENT_BUBBLE)          lv_obj_set_event_bubble(obj, v);
+    if(f & LV_OBJ_FLAG_GESTURE_BUBBLE)        lv_obj_set_gesture_bubble(obj, v);
+    if(f & LV_OBJ_FLAG_ADV_HITTEST)           lv_obj_set_adv_hittest(obj, v);
+    if(f & LV_OBJ_FLAG_IGNORE_LAYOUT)         lv_obj_set_ignore_layout(obj, v);
+    if(f & LV_OBJ_FLAG_FLOATING)              lv_obj_set_floating(obj, v);
+    if(f & LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS) lv_obj_set_send_draw_task_events(obj, v);
+    if(f & LV_OBJ_FLAG_OVERFLOW_VISIBLE)      lv_obj_set_overflow_visible(obj, v);
+    if(f & LV_OBJ_FLAG_EVENT_TRICKLE)         lv_obj_set_event_trickle(obj, v);
+    if(f & LV_OBJ_FLAG_STATE_TRICKLE)         lv_obj_set_state_trickle(obj, v);
+
+    /*The layout, widget and user flags live in spec_attr->user_flags, bits 0..7*/
+    uint32_t user_bits = 0;
+    if(f & LV_OBJ_FLAG_LAYOUT_1)              user_bits |= 1 << 0;
+    if(f & LV_OBJ_FLAG_LAYOUT_2)              user_bits |= 1 << 1;
+    if(f & LV_OBJ_FLAG_WIDGET_1)              user_bits |= 1 << 2;
+    if(f & LV_OBJ_FLAG_WIDGET_2)              user_bits |= 1 << 3;
+    if(f & LV_OBJ_FLAG_USER_1)                user_bits |= 1 << 4;
+    if(f & LV_OBJ_FLAG_USER_2)                user_bits |= 1 << 5;
+    if(f & LV_OBJ_FLAG_USER_3)                user_bits |= 1 << 6;
+    if(f & LV_OBJ_FLAG_USER_4)                user_bits |= 1 << 7;
+    if(user_bits) {
+        if(v) obj->spec_attr->user_flags |= user_bits;
+        else obj->spec_attr->user_flags &= ~user_bits;
+    }
+
+    if(f & (LV_OBJ_FLAG_LAYOUT_1 | LV_OBJ_FLAG_LAYOUT_2)) {
+        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+        lv_obj_mark_layout_as_dirty(obj);
+    }
+}
+
+static bool obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+
+    if((f & LV_OBJ_FLAG_HIDDEN) && obj->hidden) return true;
+    if((f & LV_OBJ_FLAG_CLICKABLE) && obj->clickable) return true;
+    if((f & LV_OBJ_FLAG_CLICK_FOCUSABLE) && obj->click_focusable) return true;
+    if((f & LV_OBJ_FLAG_CHECKABLE) && obj->checkable) return true;
+    if((f & LV_OBJ_FLAG_SCROLLABLE) && obj->scrollable) return true;
+    if((f & LV_OBJ_FLAG_SCROLL_ELASTIC) && obj->scroll_elastic) return true;
+    if((f & LV_OBJ_FLAG_SCROLL_MOMENTUM) && obj->scroll_momentum) return true;
+    if((f & LV_OBJ_FLAG_SCROLL_ONE) && obj->scroll_one) return true;
+    if((f & LV_OBJ_FLAG_SCROLL_CHAIN_HOR) && obj->scroll_chain_hor) return true;
+    if((f & LV_OBJ_FLAG_SCROLL_CHAIN_VER) && obj->scroll_chain_ver) return true;
+    if((f & LV_OBJ_FLAG_SCROLL_ON_FOCUS) && obj->scroll_on_focus) return true;
+    if((f & LV_OBJ_FLAG_SCROLL_WITH_ARROW) && obj->scroll_with_arrow) return true;
+    if((f & LV_OBJ_FLAG_SNAPPABLE) && obj->snappable) return true;
+    if((f & LV_OBJ_FLAG_PRESS_LOCK) && obj->press_lock) return true;
+    if((f & LV_OBJ_FLAG_EVENT_BUBBLE) && obj->event_bubble) return true;
+    if((f & LV_OBJ_FLAG_GESTURE_BUBBLE) && obj->gesture_bubble) return true;
+    if((f & LV_OBJ_FLAG_ADV_HITTEST) && obj->adv_hittest) return true;
+    if((f & LV_OBJ_FLAG_IGNORE_LAYOUT) && obj->ignore_layout) return true;
+    if((f & LV_OBJ_FLAG_FLOATING) && obj->floating) return true;
+    if((f & LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS) && obj->send_draw_task_events) return true;
+    if((f & LV_OBJ_FLAG_OVERFLOW_VISIBLE) && obj->overflow_visible) return true;
+    if((f & LV_OBJ_FLAG_EVENT_TRICKLE) && obj->event_trickle) return true;
+    if((f & LV_OBJ_FLAG_STATE_TRICKLE) && obj->state_trickle) return true;
+
+    if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;
+
+    if((f & LV_OBJ_FLAG_LAYOUT_1) && (obj->spec_attr->user_flags & (1 << 0))) return true;
+    if((f & LV_OBJ_FLAG_LAYOUT_2) && (obj->spec_attr->user_flags & (1 << 1))) return true;
+    if((f & LV_OBJ_FLAG_WIDGET_1) && (obj->spec_attr->user_flags & (1 << 2))) return true;
+    if((f & LV_OBJ_FLAG_WIDGET_2) && (obj->spec_attr->user_flags & (1 << 3))) return true;
+    if((f & LV_OBJ_FLAG_USER_1) && (obj->spec_attr->user_flags & (1 << 4))) return true;
+    if((f & LV_OBJ_FLAG_USER_2) && (obj->spec_attr->user_flags & (1 << 5))) return true;
+    if((f & LV_OBJ_FLAG_USER_3) && (obj->spec_attr->user_flags & (1 << 6))) return true;
+    if((f & LV_OBJ_FLAG_USER_4) && (obj->spec_attr->user_flags & (1 << 7))) return true;
+
+    return false;
+}
+
 static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_property_t * prop)
 {
     LV_ASSERT(obj != NULL);
@@ -2258,10 +2141,7 @@ static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_prop
         /*The flag properties are kept for backward compatibility; the dedicated
          *per-flag setters are registered as normal properties (see lv_obj_properties).*/
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
-        LV_DEPRECATIONS_IGNORE_BEGIN
-        if(prop->num) lv_obj_add_flag(obj, flag);
-        else lv_obj_remove_flag(obj, flag);
-        LV_DEPRECATIONS_IGNORE_END
+        obj_set_flag(obj, flag, prop->num != 0);
         return LV_RESULT_OK;
     }
     else if(id >= LV_PROPERTY_OBJ_STATE_START && id <= LV_PROPERTY_OBJ_STATE_END) {
@@ -2285,9 +2165,7 @@ static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_prop
     if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
         prop->id = id;
-        LV_DEPRECATIONS_IGNORE_BEGIN
-        prop->num = lv_obj_has_flag_any(obj, flag);
-        LV_DEPRECATIONS_IGNORE_END
+        prop->num = obj_has_flag_any(obj, flag);
         return LV_RESULT_OK;
     }
     else if(id >= LV_PROPERTY_OBJ_STATE_START && id <= LV_PROPERTY_OBJ_STATE_END) {
@@ -2307,16 +2185,3 @@ static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_prop
 }
 #endif /*LV_USE_OBJ_PROPERTY*/
 
-#if LV_USE_OBJ_ID
-static lv_obj_t * obj_find_by_id(const lv_obj_t * obj, const void * id)
-{
-    uint32_t child_cnt = lv_obj_get_child_count(obj);
-    for(uint32_t i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = obj->spec_attr->children[i];
-        if(lv_obj_id_compare(child->id, id) == 0) return child;
-        lv_obj_t * found = obj_find_by_id(child, id);
-        if(found != NULL) return found;
-    }
-    return NULL;
-}
-#endif

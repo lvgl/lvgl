@@ -568,27 +568,6 @@ void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
     lv_memcpy((void *)img, buf, sizeof(lv_image_dsc_t));
 }
 
-void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
-{
-    LV_CHECK_ARG(dsc != NULL, return);
-
-    LV_LOG_DEPRECATED("Use lv_draw_buf_set_palette instead.");
-    lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
-}
-
-void lv_image_buf_free(lv_image_dsc_t * dsc)
-{
-    LV_LOG_DEPRECATED("Use lv_draw_buf_destroy instead.");
-    if(dsc == NULL) return;
-
-    if(dsc != NULL) {
-        if(dsc->data != NULL)
-            lv_free((void *)dsc->data);
-
-        lv_free((void *)dsc);
-    }
-}
-
 bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
 {
     LV_CHECK_ARG(draw_buf != NULL, return false);

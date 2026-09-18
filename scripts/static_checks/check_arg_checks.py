@@ -49,7 +49,6 @@ SKIPPED_HEADER_DIRS = (
     "include/lvgl/config/",  # generated configuration, no functions
     "include/lvgl/api_map/",  # v8/v9 compatibility aliases
     "include/lvgl/stdlib/",  # for the stdlib LVGL follows lib C so it's either plain if or ASSERT when UB is defined
-    "include/lvgl/others/fragment",  # deprecated
 )
 SKIPPED_FUNCTIONS = (
     "lv_font_get_bitmap_fmt_txt",  # hot-path function that is also part of the public API for now

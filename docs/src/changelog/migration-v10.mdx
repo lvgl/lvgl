@@ -418,22 +418,47 @@ them now triggers a deprecation warning. Direct access to headers under
 `src` will be removed entirely in v10, so switch to including via
 `lvgl/include/lvgl/` or `lvgl/lvgl.h` before upgrading.
 
+### Wayland
+
+- `lv_wayland_display_close_cb_t` and the `close_cb` parameter of
+  <ApiLink name="lv_wayland_window_create"/> have been removed. Add an
+  `LV_EVENT_DELETE` event to the display the function returns instead.
+
+  ```c
+  /* Before */
+  lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Title", my_close_cb);
+
+  /* After */
+  lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Title");
+  lv_display_add_event_cb(disp, my_close_cb, LV_EVENT_DELETE, NULL);
+  ```
+
+  The v9.4 alias `lv_wayland_display_close_f_t` is gone with it.
+
 ---
 
 ## Core
 
 ### Argument checking
 
-LVGL v9.6 standardizes public-API argument validation. `LV_ASSERT_OBJ` is
-replaced by <ApiLink name="LV_CHECK_OBJ" />, which logs a warning and lets the
-caller recover gracefully instead of halting the program.
+LVGL v9.6 standardizes public-API argument validation. `LV_ASSERT_OBJ` and
+`LV_ASSERT_STYLE` have been removed. Use <ApiLink name="LV_CHECK_OBJ" /> and
+<ApiLink name="LV_CHECK_ARG" />, which log a warning and let the caller recover
+gracefully instead of halting the program.
 
 ```c
 /* Before */
 LV_ASSERT_OBJ(obj, &lv_label_class);
+LV_ASSERT_STYLE(style);
 /* After */
 LV_CHECK_OBJ(obj, &lv_label_class, return);
+LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 ```
+
+The `LV_USE_ASSERT_OBJ` config option is gone with `LV_ASSERT_OBJ`. The
+equivalent checks are configured per layer with `LV_USE_CHECK_OBJ_CLASSTYPE`
+and `LV_USE_CHECK_OBJ_VALIDITY`, see below. `LV_USE_ASSERT_STYLE` remains, it
+still controls the style sentinel field that `LV_STYLE_SENTINEL_OK()` reads.
 
 #### What `LV_CHECK_OBJ` actually checks
 
@@ -498,7 +523,7 @@ Note that these assertions are not required and should be disabled to improve pe
 
 ### lv_obj
 
-- `lv_obj_find_by_id()` is deprecated, use `lv_obj_find_by_name()` instead:
+- `lv_obj_find_by_id()` has been removed, use <ApiLink name="lv_obj_find_by_name"/> instead:
   ```c
   /* Before */
   lv_obj_t * obj = lv_obj_find_by_id(parent, my_id);
@@ -508,9 +533,10 @@ Note that these assertions are not required and should be disabled to improve pe
   ```
 
 - The generic flag API — `lv_obj_add_flag()`, `lv_obj_remove_flag()`,
-  `lv_obj_set_flag()`, `lv_obj_has_flag()` and `lv_obj_has_flag_any()` — is
-  deprecated. Each flag now has a dedicated setter (`lv_obj_set_<flag>(obj, en)`)
-  and getter (`lv_obj_is_<flag>(obj)`):
+  `lv_obj_set_flag()`, `lv_obj_has_flag()` and `lv_obj_has_flag_any()` — has been
+  removed, along with the v8/v9 aliases `lv_obj_clear_flag()` and
+  `lv_obj_update_flag()`. Each flag now has a dedicated setter
+  (`lv_obj_set_<flag>(obj, en)`) and getter (`lv_obj_is_<flag>(obj)`):
   ```c
   /* Before */
   lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
@@ -528,13 +554,16 @@ Note that these assertions are not required and should be disabled to improve pe
   `lv_obj_set/get_user_flag()`, which take a bit from 0 to 3 e.g `lv_obj_set_user_flag(obj, 0, true)`
   instead of lv_obj_get/set-flag(obj, LV_OBJ_FLAG_USER_1).
 
+  The `lv_obj_flag_t` enum itself is kept: the `LV_PROPERTY_OBJ_FLAG_*` property
+  range still uses it, and the GDB pretty-printer decodes a widget's flags from it.
+
   A migration script is available at `scripts/migration/migrate_obj_flags.py`:
   ```bash
   	python3 scripts/migration/migrate_obj_flags.py path/to/your/project
   ```
   _Note: Only raw flag constants can be converted automatically. Expressions using variables will be skipped for safety._
 
-- `lv_obj_style_set_disabled()` and `lv_obj_style_get_disabled()` are deprecated
+- `lv_obj_style_set_disabled()` and `lv_obj_style_get_disabled()` have been removed
   in favor of the positive-logic <ApiLink name="lv_obj_set_style_enabled"/> and
   <ApiLink name="lv_obj_get_style_enabled"/>. Note that the meaning of the
   `bool` is inverted:
@@ -643,8 +672,8 @@ Calling the following functions with `NULL` as the display parameter is deprecat
 
 ### Subject create/delete
 
-The `lv_subject_init_<type>()` family and <ApiLink name="lv_subject_deinit"/> are
-deprecated. A Subject is now allocated by LVGL with
+The `lv_subject_init_<type>()` family and `lv_subject_deinit()` have been removed.
+A Subject is now allocated by LVGL with
 <ApiLink name="lv_subject_create"/>, which takes the type and returns a pointer, and
 freed with <ApiLink name="lv_subject_delete"/>. Every Subject is tracked by LVGL, so
 any Subject still alive at `lv_deinit()` is deleted automatically.
@@ -716,7 +745,7 @@ lv_subject_set_group_list_static(measurement, list, 3);
 Because the group list is filled at run time, a static initializer taking the
 addresses of the member Subjects has to become run-time assignments.
 
-<ApiLink name="lv_subject_delete"/> accepts `NULL`, and unlike
+<ApiLink name="lv_subject_delete"/> accepts `NULL`, and unlike the removed
 `lv_subject_deinit()` it also frees the Subject itself, so the pointer must not be
 used afterwards.
 
@@ -735,7 +764,7 @@ used afterwards.
 ### lv_obj_bind_flag_if_* / lv_obj_bind_state_if_*
 
 - The `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` families
-  (`_eq`/`_not_eq`/`_gt`/`_ge`/`_lt`/`_le`) are deprecated. For a boolean subject,
+  (`_eq`/`_not_eq`/`_gt`/`_ge`/`_lt`/`_le`) have been removed. For a boolean subject,
   bind a widget flag with `lv_obj_bind_bool()` — the dedicated per-flag setters
   (`lv_obj_set_hidden()`, `lv_obj_set_clickable()`, …) can be passed directly as
   the callback. For a state, or for any comparison against a reference value, add
@@ -788,7 +817,7 @@ used afterwards.
 
 ### lv_span
 
-- `lv_spangroup_set_align()` is deprecated, use the `text_align` style property instead:
+- `lv_spangroup_set_align()` has been removed, use the `text_align` style property instead:
   ```c
   /* Before */
   lv_spangroup_set_align(obj, LV_TEXT_ALIGN_CENTER);
@@ -797,7 +826,7 @@ used afterwards.
   lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
   ```
 
-- `lv_spangroup_set_mode()` is deprecated, control expanding/wrapping by setting the widget width instead:
+- `lv_spangroup_set_mode()` has been removed, control expanding/wrapping by setting the widget width instead:
   ```c
   /* Before */
   lv_spangroup_set_mode(obj, LV_SPAN_MODE_EXPAND);
@@ -806,9 +835,13 @@ used afterwards.
   lv_obj_set_width(obj, LV_SIZE_CONTENT);
   ```
 
+  The `align` and `mode` entries of the property API (`LV_PROPERTY_SPAN_ALIGN`
+  and `LV_PROPERTY_SPAN_MODE`) are gone with them. Use the `text_align` style
+  property and the widget's width/height instead.
+
 ### lv_textarea
 
-- `lv_textarea_set_align()` is deprecated, use the `text_align` style property instead:
+- `lv_textarea_set_align()` has been removed, use the `text_align` style property instead:
   ```c
   /* Before */
   lv_textarea_set_align(obj, LV_TEXT_ALIGN_CENTER);
@@ -819,7 +852,7 @@ used afterwards.
 
 ### lv_scale
 
-- `lv_scale_section_set_style()` is deprecated, use the per-part setters instead:
+- `lv_scale_section_set_style()` has been removed, use the per-part setters instead:
   ```c
   /* Before */
   lv_scale_section_set_style(section, LV_PART_MAIN,      &my_style);
@@ -834,7 +867,7 @@ used afterwards.
 
 ### lv_menu
 
-- The `lv_menu` widget is deprecated. A menu is page navigation over base widgets
+- The `lv_menu` widget is removed. A menu is page navigation over base widgets
   — pages built from `lv_obj` and a back button that swaps the visible page — so
   build it directly instead. See the
   [`lv_example_menu_navigation`](widgets/menu#building-a-menu-without-lv_menu)
@@ -842,18 +875,39 @@ used afterwards.
 
 ### lv_list
 
-- The `lv_list` widget is deprecated. A list is just a flex container with a
-  column flow, so build one directly from `lv_obj` with a `LV_FLEX_FLOW_COLUMN`
-  layout instead. See the
+- The `lv_list` widget has been removed, along with `LV_USE_LIST`. A list is just a
+  flex container with a column flow, so build one directly from `lv_obj` with a
+  `LV_FLEX_FLOW_COLUMN` layout instead. See the
   [`lv_example_flex_list`](common-widget-features/layouts/flex#building-a-list)
-  example for a starting point.
+  example for a starting point, and `lv_example_flex_list_reorder` for reordering
+  rows with <ApiLink name="lv_obj_move_to_index"/>.
+
+  | Removed | Build it as |
+  |---|---|
+  | `lv_list_create` | an `lv_obj` with `LV_FLEX_FLOW_COLUMN` |
+  | `lv_list_add_button` | an `lv_button` with `lv_pct(100)` width holding an icon and a label |
+  | `lv_list_add_text` | a full-width `lv_label` |
+  | `lv_list_get_button_text` / `lv_list_set_button_text` | read/write the button's `lv_label` child |
+  | `lv_list_add_translation_tag`, `lv_list_add_button_translation_tag`, `lv_list_set_button_translation_tag` | <ApiLink name="lv_label_set_text"/> with a tag resolved through the translation API |
+
+  The v8 aliases `lv_list_add_btn`, `lv_list_set_btn_text` and `lv_list_get_btn_text`
+  are gone with them.
 
 ### lv_win
 
-- The `lv_win` widget is deprecated. A window is just a flex column with a header
-  bar and a content area, so build one directly from `lv_obj` instead. See the
+- The `lv_win` widget has been removed, along with `LV_USE_WIN`. A window is just a
+  flex column with a header bar and a content area, so build one directly from
+  `lv_obj` instead. See the
   [`lv_example_flex_win`](common-widget-features/layouts/flex#building-a-window)
   example for a starting point.
+
+  | Removed | Build it as |
+  |---|---|
+  | `lv_win_create` | an `lv_obj` with `LV_FLEX_FLOW_COLUMN` holding a header and a content child |
+  | `lv_win_get_header` | `lv_obj_get_child(win, 0)` |
+  | `lv_win_get_content` | `lv_obj_get_child(win, 1)` |
+  | `lv_win_add_title` | an `lv_label` in the header with `lv_obj_set_flex_grow(title, 1)` |
+  | `lv_win_add_button` | an `lv_button` in the header with a fixed width |
 
 ---
 
@@ -861,13 +915,13 @@ used afterwards.
 
 ### lv_draw_buf
 
-- `lv_image_buf_set_palette()` is deprecated, use `lv_draw_buf_set_palette()` instead.
-- `lv_image_buf_free()` is deprecated, use `lv_draw_buf_destroy()` instead.
+- `lv_image_buf_set_palette()` has been removed, use <ApiLink name="lv_draw_buf_set_palette"/> instead.
+- `lv_image_buf_free()` has been removed, use <ApiLink name="lv_draw_buf_destroy"/> instead.
 
 ### lv_snapshot
 
-- `lv_snapshot_free()` is deprecated, use `lv_draw_buf_destroy()` directly instead.
-- `lv_snapshot_take_to_buf()` is deprecated, use `lv_snapshot_take_to_draw_buf()` instead:
+- `lv_snapshot_free()` has been removed, use <ApiLink name="lv_draw_buf_destroy"/> directly instead.
+- `lv_snapshot_take_to_buf()` has been removed, use <ApiLink name="lv_snapshot_take_to_draw_buf"/> instead:
 
 ```c
   /* Before */
@@ -881,15 +935,14 @@ used afterwards.
 
 ## Layouts
 
-<ApiLink name="lv_layout_register"/> is deprecated and is replaced with <ApiLink name="lv_layout_create"/>.
+`lv_layout_register` has been removed. Use <ApiLink name="lv_layout_create"/>, which
+takes a callback struct so a layout can also report its minimum size.
 
 ```c
+/* Before */
 uint32_t layout = lv_layout_register(my_layout_update, &user_data);
-```
 
-Becomes:
-
-```c
+/* After */
 lv_layout_callbacks_t callbacks = { .layout_update_cb = my_layout_update };
 uint32_t layout = lv_layout_create(callbacks, &user_data);
 ```
@@ -942,17 +995,45 @@ can enable LVGL's private api by including `lvgl_private.h` or simply enabling `
 
 ### lv_file_explorer
 
-- The `lv_file_explorer` widget is deprecated. A file explorer is a path header
+- The `lv_file_explorer` widget has been removed. A file explorer is a path header
   plus a table of directory entries read with the [`lv_fs`](main-modules/fs) API,
   so build it directly instead. See the
   [`lv_example_table_file_browser`](widgets/table#building-a-file-explorer) example
   for a starting point.
 
+### lv_fragment
+
+- The `lv_fragment` module has been removed.
+
 ---
 
 ## Libraries
 
+### glTF
+
+- `lv_gltf_set_env_brightness()` and `lv_gltf_get_env_brightness()` have been
+  removed. Use <ApiLink name="lv_gltf_set_environment_brightness"/> and
+  <ApiLink name="lv_gltf_get_environment_brightness"/>, which take and return a
+  multiplier (`1.0` = neutral) instead of a percentage.
+
+  ```c
+  /* Before */
+  lv_gltf_set_env_brightness(gltf, 150);
+
+  /* After */
+  lv_gltf_set_environment_brightness(gltf, 1.5f);
+  ```
+
 ### rlottie
 
-- The rlottie player is deprecated. Use the [`lv_lottie`](widgets/lottie) widget
-  instead.
+- The rlottie player has been removed, along with `LV_USE_RLOTTIE` and the
+  `env_support/esp/rlottie` build glue. Use the
+  [`lv_lottie`](widgets/lottie) widget, which renders through ThorVG and needs
+  no external library.
+
+  | Removed | Replacement |
+  |---|---|
+  | `lv_rlottie_create_from_file` | <ApiLink name="lv_lottie_create"/> + <ApiLink name="lv_lottie_set_src_file"/> |
+  | `lv_rlottie_create_from_raw` | <ApiLink name="lv_lottie_create"/> + <ApiLink name="lv_lottie_set_src_data"/> |
+  | `lv_rlottie_set_play_mode` | <ApiLink name="lv_lottie_get_anim"/> and the `lv_anim` API |
+  | `lv_rlottie_set_current_frame` | <ApiLink name="lv_lottie_get_anim"/> and the `lv_anim` API |

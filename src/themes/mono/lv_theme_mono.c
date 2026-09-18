@@ -312,21 +312,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         }
 #endif
 
-#if LV_USE_WIN
-        /*Header*/
-        if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 0) == 0) {
-            lv_obj_add_style(obj, &theme->styles.card, 0);
-            lv_obj_add_style(obj, &theme->styles.no_radius, 0);
-            return;
-        }
-        /*Content*/
-        else if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 1) == obj) {
-            lv_obj_add_style(obj, &theme->styles.card, 0);
-            lv_obj_add_style(obj, &theme->styles.no_radius, 0);
-            lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
-            return;
-        }
-#endif
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
     }
@@ -529,22 +514,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_LIST
-    else if(lv_obj_check_type(obj, &lv_list_class)) {
-        lv_obj_add_style(obj, &theme->styles.card, 0);
-        lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
-        return;
-    }
-    else if(lv_obj_check_type(obj, &lv_list_text_class)) {
-
-    }
-    else if(lv_obj_check_type(obj, &lv_list_button_class)) {
-        lv_obj_add_style(obj, &theme->styles.card, 0);
-        lv_obj_add_style(obj, &theme->styles.pr, LV_STATE_PRESSED);
-        lv_obj_add_style(obj, &theme->styles.focus, LV_STATE_FOCUS_KEY);
-        lv_obj_add_style(obj, &theme->styles.large_border, LV_STATE_EDITED);
-    }
-#endif
 #if LV_USE_MSGBOX
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);

@@ -125,7 +125,7 @@ class LVObject(Value):
         if not raw:
             return 0
 
-        # The order lv_obj_add_flag() writes them in, from bit 0 up.
+        # The order LVGL writes them in, from bit 0 up.
         names = ("LAYOUT_1", "LAYOUT_2", "WIDGET_1", "WIDGET_2",
                  "USER_1", "USER_2", "USER_3", "USER_4")
         bit_of = {name: bit for bit, name in OBJ_FLAG_NAMES.items()}

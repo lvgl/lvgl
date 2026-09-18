@@ -2927,35 +2927,11 @@
     #endif
 #endif
 
-#ifndef LV_USE_LIST
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_LIST
-            #define LV_USE_LIST CONFIG_LV_USE_LIST
-        #else
-            #define LV_USE_LIST 0
-        #endif
-    #else
-        #define LV_USE_LIST 1
-    #endif
-#endif
-
 #ifndef LV_USE_LOTTIE
     #ifdef CONFIG_LV_USE_LOTTIE
         #define LV_USE_LOTTIE CONFIG_LV_USE_LOTTIE
     #else
         #define LV_USE_LOTTIE 0
-    #endif
-#endif
-
-#ifndef LV_USE_MENU
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_MENU
-            #define LV_USE_MENU CONFIG_LV_USE_MENU
-        #else
-            #define LV_USE_MENU 0
-        #endif
-    #else
-        #define LV_USE_MENU 1
     #endif
 #endif
 
@@ -2976,14 +2952,6 @@
         #define LV_USE_QRCODE CONFIG_LV_USE_QRCODE
     #else
         #define LV_USE_QRCODE 0
-    #endif
-#endif
-
-#ifndef LV_USE_RLOTTIE
-    #ifdef CONFIG_LV_USE_RLOTTIE
-        #define LV_USE_RLOTTIE CONFIG_LV_USE_RLOTTIE
-    #else
-        #define LV_USE_RLOTTIE 0
     #endif
 #endif
 
@@ -3132,18 +3100,6 @@
         #endif
     #else
         #define LV_USE_TILEVIEW 1
-    #endif
-#endif
-
-#ifndef LV_USE_WIN
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_WIN
-            #define LV_USE_WIN CONFIG_LV_USE_WIN
-        #else
-            #define LV_USE_WIN 0
-        #endif
-    #else
-        #define LV_USE_WIN 1
     #endif
 #endif
 
@@ -4408,48 +4364,6 @@
 
 
 /*============================================================================
- * OTHERS
- *============================================================================*/
-
-#ifndef LV_USE_FRAGMENT
-    #ifdef CONFIG_LV_USE_FRAGMENT
-        #define LV_USE_FRAGMENT CONFIG_LV_USE_FRAGMENT
-    #else
-        #define LV_USE_FRAGMENT 0
-    #endif
-#endif
-
-#ifndef LV_USE_FILE_EXPLORER
-    #ifdef CONFIG_LV_USE_FILE_EXPLORER
-        #define LV_USE_FILE_EXPLORER CONFIG_LV_USE_FILE_EXPLORER
-    #else
-        #define LV_USE_FILE_EXPLORER 0
-    #endif
-#endif
-
-#ifndef LV_FILE_EXPLORER_PATH_MAX_LEN
-    #ifdef CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
-        #define LV_FILE_EXPLORER_PATH_MAX_LEN CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
-    #else
-        #define LV_FILE_EXPLORER_PATH_MAX_LEN 128
-    #endif
-#endif
-
-#ifndef LV_FILE_EXPLORER_QUICK_ACCESS
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
-            #define LV_FILE_EXPLORER_QUICK_ACCESS CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
-        #else
-            #define LV_FILE_EXPLORER_QUICK_ACCESS 0
-        #endif
-    #else
-          #define LV_FILE_EXPLORER_QUICK_ACCESS LV_USE_FILE_EXPLORER
-    #endif
-#endif
-
-
-
-/*============================================================================
  * BUILD
  *============================================================================*/
 
@@ -4522,14 +4436,6 @@
         #define LV_USE_ASSERT_MEM_INTEGRITY CONFIG_LV_USE_ASSERT_MEM_INTEGRITY
     #else
         #define LV_USE_ASSERT_MEM_INTEGRITY 0
-    #endif
-#endif
-
-#ifndef LV_USE_ASSERT_OBJ
-    #ifdef CONFIG_LV_USE_ASSERT_OBJ
-        #define LV_USE_ASSERT_OBJ CONFIG_LV_USE_ASSERT_OBJ
-    #else
-        #define LV_USE_ASSERT_OBJ 0
     #endif
 #endif
 
@@ -5486,10 +5392,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_LOTTIE && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG)
     #error "LV_USE_LOTTIE requires LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG (Kconfig depends on)"
-#endif
-
-#if (LV_USE_FILE_EXPLORER) && !LV_USE_TABLE
-    #error "LV_USE_TABLE must be enabled: Kconfig selects it from LV_USE_FILE_EXPLORER"
 #endif
 
 #if LV_LINUX_FBDEV_BSD && !(LV_USE_LINUX_FBDEV)

@@ -91,14 +91,12 @@ void test_span_set_text_static_with_previous_text_overwrites(void)
     TEST_ASSERT_EQUAL_STRING(span->txt, new_test_text);
 }
 
-void test_spangroup_set_align(void)
+void test_spangroup_get_align(void)
 {
-    LV_DEPRECATIONS_IGNORE_BEGIN
     const lv_text_align_t align = LV_TEXT_ALIGN_CENTER;
-    lv_spangroup_set_align(spangroup, align);
+    lv_obj_set_style_text_align(spangroup, align, LV_PART_MAIN);
 
     TEST_ASSERT_EQUAL(align, lv_spangroup_get_align(spangroup));
-    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_spangroup_set_overflow(void)
@@ -126,27 +124,17 @@ void test_spangroup_set_indent(void)
     TEST_ASSERT_EQUAL(indent, lv_spangroup_get_indent(spangroup));
 }
 
-void test_spangroup_set_mode(void)
+void test_spangroup_get_mode(void)
 {
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
+    /* The mode is derived from the width/height being LV_SIZE_CONTENT or fixed */
+    lv_obj_set_size(spangroup, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_EXPAND, lv_spangroup_get_mode(spangroup));
 
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+    lv_obj_set_size(spangroup, 100, LV_SIZE_CONTENT);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_BREAK, lv_spangroup_get_mode(spangroup));
 
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_FIXED);
+    lv_obj_set_size(spangroup, 100, 100);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_FIXED, lv_spangroup_get_mode(spangroup));
-    LV_DEPRECATIONS_IGNORE_END
-}
-
-void test_spangroup_set_mode_invalid_parameter_mode_not_changed(void)
-{
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_LAST);
-    TEST_ASSERT_EQUAL(LV_SPAN_MODE_EXPAND, lv_spangroup_get_mode(spangroup));
-    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_spangroup_set_max_lines(void)
@@ -585,12 +573,6 @@ void test_span_properties(void)
 
     lv_property_t prop = { };
 
-    /* Test ALIGN property */
-    prop.id = LV_PROPERTY_SPAN_ALIGN;
-    prop.num = LV_TEXT_ALIGN_CENTER;
-    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(LV_TEXT_ALIGN_CENTER, lv_obj_get_property(obj, LV_PROPERTY_SPAN_ALIGN).num);
-
     /* Test OVERFLOW property */
     prop.id = LV_PROPERTY_SPAN_OVERFLOW;
     prop.num = LV_SPAN_OVERFLOW_ELLIPSIS;
@@ -602,12 +584,6 @@ void test_span_properties(void)
     prop.num = 20;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(20, lv_obj_get_property(obj, LV_PROPERTY_SPAN_INDENT).num);
-
-    /* Test MODE property */
-    prop.id = LV_PROPERTY_SPAN_MODE;
-    prop.num = LV_SPAN_MODE_BREAK;
-    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(LV_SPAN_MODE_BREAK, lv_obj_get_property(obj, LV_PROPERTY_SPAN_MODE).num);
 
     /* Test MAX_LINES property */
     prop.id = LV_PROPERTY_SPAN_MAX_LINES;

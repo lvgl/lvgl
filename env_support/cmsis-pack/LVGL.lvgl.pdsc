@@ -813,7 +813,6 @@
                 <file category="sourceC"            name="src/widgets/label/lv_label.c" />
                 <file category="sourceC"            name="src/widgets/led/lv_led.c" />
                 <file category="sourceC"            name="src/widgets/line/lv_line.c" />
-                <file category="sourceC"            name="src/widgets/list/lv_list.c" />
                 <file category="sourceC"            name="src/widgets/lottie/lv_lottie.c" />
                 <file category="sourceC"            name="src/widgets/menu/lv_menu.c" />
                 <file category="sourceC"            name="src/widgets/msgbox/lv_msgbox.c" />
@@ -829,7 +828,6 @@
                 <file category="sourceC"            name="src/widgets/tabview/lv_tabview.c" />
                 <file category="sourceC"            name="src/widgets/textarea/lv_textarea.c" />
                 <file category="sourceC"            name="src/widgets/tileview/lv_tileview.c" />
-                <file category="sourceC"            name="src/widgets/win/lv_win.c" />
                 <file category="sourceC"            name="src/widgets/3dtexture/lv_3dtexture.c" />
                 
                 <file category="sourceC"            name="src/widgets/property/lv_arc_properties.c" />
@@ -2391,21 +2389,6 @@
               </RTE_Components_h>
             </component>
 
-            <component Cgroup="Libraries and Others" Csub="Libs RLOTTIE"  condition="LVGL-Essential">
-              <description>Add Rlottie library, an extra librbary is required.</description>
-              <files>
-                <!-- src/libs/rlottie -->
-                <file category="sourceC"    name="src/libs/rlottie/lv_rlottie.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable Rlottie library */
-#define LV_USE_RLOTTIE         1
-              </RTE_Components_h>
-
-            </component>
-
             <component Cgroup="Libraries and Others" Csub="Libs ThorVG"  condition="LVGL-Essential">
               <description>Add ThorVG (vector graphics library), an extra librbary is required.</description>
               <files>
@@ -2563,22 +2546,6 @@
 
             </component>
 
-            <component Cgroup="Libraries and Others" Csub="File Explorer"  condition="LVGL-Essential">
-              <description>Add a file explorer</description>
-              <files>
-                <!-- src/others/file_explorer -->
-                <file category="sourceC"    name="src/others/file_explorer/lv_file_explorer.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable file explorer support */
-#define LV_USE_FILE_EXPLORER         1
-              </RTE_Components_h>
-
-            </component>
-
-
             <component Cgroup="Libraries and Others" Csub="Translation"  condition="LVGL-Essential">
               <description>Text translation support</description>
               <files>
@@ -2594,22 +2561,6 @@
 
             </component>
 
-            <component Cgroup="Libraries and Others" Csub="Fragment"  condition="LVGL-Essential">
-              <description>Add the Fragment service</description>
-              <files>
-                <!-- src/others/fragment -->
-                <file category="sourceC"            name="src/others/fragment/lv_fragment.c" />
-                <file category="sourceC"            name="src/others/fragment/lv_fragment_manager.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable lv_obj fragment */
-#define LV_USE_FRAGMENT         1
-              </RTE_Components_h>
-
-            </component>
-            
             <component Cgroup="Libraries and Others" Csub="Grid Navigation"  condition="LVGL-Essential">
               <description>Add the Grid Navigation service</description>
               <files>

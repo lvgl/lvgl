@@ -31,17 +31,16 @@ in detail in their own section of documentation.
 There are some flags that can be used on Widgets to affect how they behave with
 layouts:
 
-- <ApiLink name="LV_OBJ_FLAG_HIDDEN" /> Hidden Widgets are ignored in layout
+- <ApiLink name="lv_obj_set_hidden" /> Hidden Widgets are ignored in layout
   calculations.
-- <ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> The Widget is simply ignored by the
+- <ApiLink name="lv_obj_set_ignore_layout" /> The Widget is simply ignored by the
   layouts. Its coordinates can be set as usual.
-- <ApiLink name="LV_OBJ_FLAG_FLOATING" /> Same as
-  <ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> but the Widget with
-  <ApiLink name="LV_OBJ_FLAG_FLOATING" /> will be ignored in
-  <ApiLink name="LV_SIZE_CONTENT" /> calculations.
+- <ApiLink name="lv_obj_set_floating" /> Same as
+  <ApiLink name="lv_obj_set_ignore_layout" /> but a floating Widget is also
+  ignored in <ApiLink name="LV_SIZE_CONTENT" /> calculations.
 
-These flags can be added/removed with <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(widget, FLAG)" /> and
-<ApiLink name="lv_obj_remove_flag" display="lv_obj_remove_flag(widget, FLAG)" />
+Each is read back with the matching `lv_obj_is_<attribute>()` getter. See
+[Flags](/common-widget-features/flags) for the full list.
 
 ## Adding New Layouts
 

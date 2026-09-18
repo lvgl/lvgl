@@ -10,9 +10,6 @@
 
 #if LV_USE_DEMO_STRESS
 
-/*The stressed widget set contains the deprecated `lv_list` and `lv_win` widgets.*/
-LV_DEPRECATIONS_IGNORE_BEGIN
-
 /*********************
  *      DEFINES
  *********************/
@@ -29,6 +26,7 @@ static void msgbox_delete(lv_timer_t * tmr);
 static void set_y_anim(void * obj, int32_t v);
 static void set_width_anim(void * obj, int32_t v);
 static void arc_set_end_angle_anim(void * obj, int32_t v);
+static lv_obj_t * list_add_button(lv_obj_t * list, const void * icon, const char * txt);
 static void obj_test_task_cb(lv_timer_t * tmr);
 
 /**********************
@@ -181,17 +179,32 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
             break;
 
-        case 8:
-            obj = lv_win_create(lv_screen_active());
-            lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
-            lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-            lv_win_add_title(obj, "Window title");
-            lv_win_add_button(obj, LV_SYMBOL_CLOSE, 40);
-            lv_win_add_button(obj, LV_SYMBOL_DOWN, 40);
-            auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 3 + 5);
+        case 8: {
+                /*A window: a flex column with a header row on top and a content area below*/
+                obj = lv_obj_create(lv_screen_active());
+                lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
+                lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+                lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
+                auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 3 + 5);
 
-            obj = lv_calendar_create(lv_win_get_content(obj));
-            break;
+                lv_obj_t * header = lv_obj_create(obj);
+                lv_obj_set_size(header, lv_pct(100), 40);
+                lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
+
+                lv_obj_t * title = lv_label_create(header);
+                lv_label_set_text(title, "Window title");
+                lv_obj_set_flex_grow(title, 1);
+
+                lv_obj_set_size(lv_button_create(header), 40, lv_pct(100));
+                lv_obj_set_size(lv_button_create(header), 40, lv_pct(100));
+
+                lv_obj_t * content = lv_obj_create(obj);
+                lv_obj_set_width(content, lv_pct(100));
+                lv_obj_set_flex_grow(content, 1);
+
+                obj = lv_calendar_create(content);
+                break;
+            }
         case 9:
             lv_textarea_set_text(ta, "A very very long text which will should make the text area scrollable"
                                  "Here area some dummy sentences to be sure the text area will be really scrollable.");
@@ -283,18 +296,20 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 18:
-            obj = lv_list_create(main_page);
+            /*A list is a flex column of full-width buttons*/
+            obj = lv_obj_create(main_page);
+            lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
             {
                 lv_obj_t * b;
-                b = lv_list_add_button(obj, LV_SYMBOL_OK, "1. Some very long text to scroll");
+                b = list_add_button(obj, LV_SYMBOL_OK, "1. Some very long text to scroll");
                 auto_delete(b, 10);
-                lv_list_add_button(obj, LV_SYMBOL_OK, "2. Some very long text to scroll");
-                lv_list_add_button(obj, LV_SYMBOL_OK, "3. Some very long text to scroll");
-                b = lv_list_add_button(obj, LV_SYMBOL_OK, "4. Some very long text to scroll");
+                list_add_button(obj, LV_SYMBOL_OK, "2. Some very long text to scroll");
+                list_add_button(obj, LV_SYMBOL_OK, "3. Some very long text to scroll");
+                b = list_add_button(obj, LV_SYMBOL_OK, "4. Some very long text to scroll");
                 auto_delete(b, LV_DEMO_STRESS_TIME_STEP);
-                b = lv_list_add_button(obj, LV_SYMBOL_OK, "5. Some very long text to scroll");
+                b = list_add_button(obj, LV_SYMBOL_OK, "5. Some very long text to scroll");
                 auto_delete(b, LV_DEMO_STRESS_TIME_STEP + 90);
-                b = lv_list_add_button(obj, LV_SYMBOL_OK, "6. Some very long text to scroll");
+                b = list_add_button(obj, LV_SYMBOL_OK, "6. Some very long text to scroll");
                 auto_delete(b, LV_DEMO_STRESS_TIME_STEP + 10);
                 lv_obj_scroll_to_view(lv_obj_get_child(obj, -1),  LV_ANIM_ON);
             }
@@ -461,6 +476,28 @@ static void arc_set_end_angle_anim(void * obj, int32_t v)
     lv_arc_set_end_angle(obj, v);
 }
 
-LV_DEPRECATIONS_IGNORE_END
+/**
+ * A list is a flex column of full-width buttons. Add one holding an optional icon
+ * and a text label.
+ */
+static lv_obj_t * list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+{
+    lv_obj_t * btn = lv_button_create(list);
+    lv_obj_set_size(btn, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(btn, LV_FLEX_FLOW_ROW);
+
+#if LV_USE_IMAGE == 1
+    if(icon) {
+        lv_obj_t * img = lv_image_create(btn);
+        lv_image_set_src(img, icon);
+    }
+#endif
+
+    lv_obj_t * label = lv_label_create(btn);
+    lv_label_set_text(label, txt);
+    lv_obj_set_flex_grow(label, 1);
+
+    return btn;
+}
 
 #endif /* LV_USE_DEMO_STRESS */

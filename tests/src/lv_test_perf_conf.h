@@ -389,7 +389,6 @@
         #define LV_USE_ASSERT_MALLOC        1   /**< Checks is the memory is successfully allocated or no. (Very fast, recommended) */
         #define LV_USE_ASSERT_STYLE         0   /**< Check if the styles are properly initialized. (Very fast, recommended) */
         #define LV_USE_ASSERT_MEM_INTEGRITY 0   /**< Check the integrity of `lv_mem` after critical operations. (Slow) */
-        #define LV_USE_ASSERT_OBJ           0   /**< Check the object's type and existence (e.g. not deleted). (Slow) */
 
         /** Add a custom handler when assert happens e.g. to restart MCU. */
         #define LV_ASSERT_HANDLER_INCLUDE <stdint.h>
@@ -716,11 +715,8 @@
 
         #define LV_USE_LINE       1
 
-        #define LV_USE_LIST       1
 
         #define LV_USE_LOTTIE     0  /**< Requires: lv_canvas, thorvg */
-
-        #define LV_USE_MENU       1
 
         #define LV_USE_MSGBOX     1
 
@@ -753,7 +749,6 @@
 
         #define LV_USE_TILEVIEW   1
 
-        #define LV_USE_WIN        1
 
         /*==================
         * THEMES
@@ -923,8 +918,6 @@
             #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
         #endif
 
-        /** Rlottie library */
-        #define LV_USE_RLOTTIE 0
 
         /** Enable Vector Graphic APIs
         *  - Requires `LV_USE_MATRIX = 1` */
@@ -1058,9 +1051,6 @@
         /** 1: Enable grid navigation */
         #define LV_USE_GRIDNAV 0
 
-        /** 1: Enable `lv_obj` fragment logic */
-        #define LV_USE_FRAGMENT 0
-
         /** 1: Support using images as font in label or span widgets */
         #define LV_USE_IMGFONT 0
 
@@ -1083,17 +1073,6 @@
             #if LV_IME_PINYIN_USE_K9_MODE == 1
                 #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
             #endif /*LV_IME_PINYIN_USE_K9_MODE*/
-        #endif
-
-        /** 1: Enable file explorer.
-        *  - Requires: lv_table */
-        #define LV_USE_FILE_EXPLORER                     0
-        #if LV_USE_FILE_EXPLORER
-            /** Maximum length of path */
-            #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
-            /** Quick access bar, 1:use, 0:do not use.
-            *  - Requires: lv_list */
-            #define LV_FILE_EXPLORER_QUICK_ACCESS        1
         #endif
 
         /** 1: Enable freetype font manager
