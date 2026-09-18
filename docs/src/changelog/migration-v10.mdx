@@ -881,15 +881,14 @@ used afterwards.
 
 ## Layouts
 
-<ApiLink name="lv_layout_register"/> is deprecated and is replaced with <ApiLink name="lv_layout_create"/>.
+`lv_layout_register` has been removed. Use <ApiLink name="lv_layout_create"/>, which
+takes a callback struct so a layout can also report its minimum size.
 
 ```c
+/* Before */
 uint32_t layout = lv_layout_register(my_layout_update, &user_data);
-```
 
-Becomes:
-
-```c
+/* After */
 lv_layout_callbacks_t callbacks = { .layout_update_cb = my_layout_update };
 uint32_t layout = lv_layout_create(callbacks, &user_data);
 ```
