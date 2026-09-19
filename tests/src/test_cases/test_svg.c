@@ -3,6 +3,9 @@
 #include "../lvgl_private.h"
 
 #include "unity/unity.h"
+#include "refr/lv_test_refr.h"
+
+#include <math.h>
 
 #define LV_ARRAY_GET(array, index, type) ((type*)lv_array_at((array), (index)))
 
@@ -941,6 +944,57 @@ void testBadCase(void)
     TEST_ASSERT_EQUAL_FLOAT(matrix->m[1][2], 255.00942f);
 
     lv_svg_node_delete(svg);
+}
+
+void test_rotated_svg_keeps_its_position(void)
+{
+    /*Red square with a 4x4 blue marker centered at (8,8). Static, because the image cache keeps the source pointer*/
+    static const char svg[] =
+        "<svg width=\"40\" height=\"40\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect width=\"40\" height=\"40\" fill=\"#FF0000\"/>"
+        "<rect x=\"6\" y=\"6\" width=\"4\" height=\"4\" fill=\"#0000FF\"/>"
+        "</svg>";
+    static lv_image_dsc_t svg_dsc;
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 40;
+    svg_dsc.header.h = 40;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    refr_disp_create(80, 80, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_FULL, 1, 80);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+
+    lv_obj_t * image = lv_image_create(refr_screen());
+    lv_image_set_src(image, &svg_dsc);
+    lv_obj_set_pos(image, 20, 20);
+    lv_image_set_pivot(image, 20, 20);
+
+    /*The marker's center must stay where the exact rotation around (40,40) on screen puts it*/
+    static const int32_t angles[] = {720, 900, 1800};
+    for(uint32_t i = 0; i < sizeof(angles) / sizeof(angles[0]); i++) {
+        lv_image_set_rotation(image, angles[i]);
+        refr_frame();
+
+        /*Center of the blue pixels, weighted by coverage*/
+        float sum_x = 0.0f, sum_y = 0.0f, sum_w = 0.0f;
+        for(int32_t y = 0; y < 80; y++) {
+            for(int32_t x = 0; x < 80; x++) {
+                float w = (float)(refr_screen_px(x, y) & 0xff) / 255.0f;
+                sum_x += w * ((float)x + 0.5f);
+                sum_y += w * ((float)y + 0.5f);
+                sum_w += w;
+            }
+        }
+
+        float rad = (float)angles[i] / 10.0f * 3.14159265f / 180.0f;
+        float exp_x = 40.0f - 12.0f * cosf(rad) + 12.0f * sinf(rad);
+        float exp_y = 40.0f - 12.0f * sinf(rad) - 12.0f * cosf(rad);
+        ASSERT_PX_TRUE(sum_w > 0.0f);
+        ASSERT_PX_TRUE(fabsf(sum_x / sum_w - exp_x) < 0.25f);
+        ASSERT_PX_TRUE(fabsf(sum_y / sum_w - exp_y) < 0.25f);
+    }
+
+    refr_disp_delete();
 }
 
 #endif
