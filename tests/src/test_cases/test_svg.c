@@ -3,6 +3,7 @@
 #include "../lvgl_private.h"
 
 #include "unity/unity.h"
+#include "refr/lv_test_refr.h"
 
 #define LV_ARRAY_GET(array, index, type) ((type*)lv_array_at((array), (index)))
 
@@ -87,6 +88,42 @@ void test_property_is_inherited(void)
 #else
     TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.lp32.png");
 #endif
+}
+
+void test_stretched_svg_is_drawn_in_partial_render_mode(void)
+{
+    static const char svg[] =
+        "<svg width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect width=\"44\" height=\"44\" fill=\"#FF0000\"/>"
+        "</svg>";
+
+    lv_image_dsc_t svg_dsc = { 0 };
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 44;
+    svg_dsc.header.h = 44;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    refr_disp_create(88, 88, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_PARTIAL, 1, 20);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+
+    lv_obj_t * image = lv_image_create(refr_screen());
+    lv_image_set_src(image, &svg_dsc);
+    lv_obj_set_size(image, 88, 88);
+    lv_image_set_inner_align(image, LV_IMAGE_ALIGN_STRETCH);
+
+    refr_frame();
+
+    uint32_t top_px = refr_screen_px(44, 10);
+    uint32_t bottom_px = refr_screen_px(44, 70);
+    ASSERT_PX_TRUE(((top_px >> 16) & 0xff) >= 0xf0);
+    ASSERT_PX_TRUE(((top_px >> 8) & 0xff) <= 0x0f);
+    ASSERT_PX_TRUE((top_px & 0xff) <= 0x0f);
+    ASSERT_PX_TRUE(((bottom_px >> 16) & 0xff) >= 0xf0);
+    ASSERT_PX_TRUE(((bottom_px >> 8) & 0xff) <= 0x0f);
+    ASSERT_PX_TRUE((bottom_px & 0xff) <= 0x0f);
+
+    refr_disp_delete();
 }
 
 void testSvgElement(void)
