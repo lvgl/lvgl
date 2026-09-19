@@ -13,6 +13,7 @@
 
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_scroll_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
@@ -255,6 +256,10 @@ void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt)
     }
 
     refr_size_form_row(obj, 0);
+    if(old_row_cnt > row_cnt) {
+        lv_obj_stop_scroll_anim_y(obj);
+        lv_obj_readjust_scroll_y(obj, LV_ANIM_OFF);
+    }
 }
 
 void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
