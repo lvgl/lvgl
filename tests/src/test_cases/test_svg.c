@@ -997,4 +997,79 @@ void testBadCase(void)
     lv_svg_node_delete(svg);
 }
 
+void test_rotated_svg_keeps_its_position(void)
+{
+    /*Red square with a blue marker in one corner, so a wrong rotation origin is visible.
+     *Static, because the image cache keeps the source pointer*/
+    static const char svg[] =
+        "<svg width=\"40\" height=\"40\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect x=\"2\" y=\"2\" width=\"36\" height=\"36\" fill=\"#FF0000\"/>"
+        "<rect x=\"6\" y=\"6\" width=\"10\" height=\"10\" fill=\"#0000FF\"/>"
+        "</svg>";
+    static lv_image_dsc_t svg_dsc;
+    lv_memzero(&svg_dsc, sizeof(svg_dsc));
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 40;
+    svg_dsc.header.h = 40;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    /*Right angles only: an odd angle renders differently on 32 and 64 bit builds*/
+    static const int32_t angles[] = {0, 900, 1800, 2700};
+    const int32_t tile = 56;
+    const int32_t scene_w = tile * 4;
+    const int32_t scene_h = tile;
+
+    refr_disp_create(scene_w, scene_h, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_FULL, 1, scene_h);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+
+    uint32_t i;
+    for(i = 0; i < sizeof(angles) / sizeof(angles[0]); i++) {
+        int32_t x = (int32_t)i * tile + 8;
+
+        /*White frame marking where the image has to stay at every angle*/
+        lv_obj_t * frame = lv_obj_create(refr_screen());
+        lv_obj_remove_style_all(frame);
+        lv_obj_set_size(frame, 44, 44);
+        lv_obj_set_pos(frame, x - 2, 6);
+        lv_obj_set_style_border_width(frame, 1, 0);
+        lv_obj_set_style_border_color(frame, lv_color_white(), 0);
+
+        lv_obj_t * image = lv_image_create(refr_screen());
+        lv_image_set_src(image, &svg_dsc);
+        lv_obj_set_pos(image, x, 8);
+        lv_image_set_pivot(image, 20, 20);
+        lv_image_set_rotation(image, angles[i]);
+    }
+
+    refr_frame();
+
+    /*Keep the rendered frame, then drop the display*/
+    lv_draw_buf_t * frame = lv_draw_buf_create(scene_w, scene_h, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(frame);
+    int32_t y;
+    for(y = 0; y < scene_h; y++) {
+        lv_memcpy(frame->data + (uint32_t)y * frame->header.stride,
+                  refr_ctx.full_frame_buffer + (uint32_t)y * refr_ctx.full_frame_buffer_stride,
+                  refr_ctx.full_frame_buffer_stride);
+    }
+    refr_disp_delete();
+
+    /*Blown up 3x without interpolation, so a one pixel shift is three pixels of the
+     *margin between the image and its frame, and the reference stays exact*/
+    lv_obj_t * shown = lv_image_create(lv_screen_active());
+    lv_image_set_src(shown, frame);
+    lv_image_set_antialias(shown, false);
+    lv_image_set_scale(shown, 3 * LV_SCALE_NONE);
+    lv_obj_center(shown);
+
+    /*These draw units render on the GPU, the CPU draw buffer stays empty*/
+#if !(LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES)
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_rotation_origin.png");
+#endif
+
+    lv_obj_delete(shown);
+    lv_draw_buf_destroy(frame);
+}
+
 #endif
