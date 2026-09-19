@@ -289,6 +289,7 @@ void test_draw_buf_save_to_file_and_read_decode(void)
 {
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(draw_buf);
+    lv_draw_buf_ensure_resident(draw_buf, NULL);
 
     for(int32_t y = 0; y < 10; y++) {
         for(int32_t x = 0; x < 10; x++) {

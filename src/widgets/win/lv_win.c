@@ -71,7 +71,7 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)
     return title;
 }
 
-lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
+lv_obj_t * lv_win_add_button(lv_obj_t * win, LV_IMAGE_DSC_CONST void * icon, int32_t btn_w)
 {
     LV_CHECK_OBJ(win, MY_CLASS, return NULL);
 

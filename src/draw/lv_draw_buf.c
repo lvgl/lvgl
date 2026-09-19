@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_buf_private.h"
+#include "lv_draw_private.h"
 #include "../core/lv_global.h"
 #include "../misc/lv_area_private.h"
 #include "convert/lv_draw_buf_convert.h"
@@ -36,6 +37,9 @@ static void draw_buf_free(const lv_draw_buf_handlers_t * handler, void * buf);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
 static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
 static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * full_area);
+#if LV_USE_DRAW_VRAM
+    static void draw_buf_validate_vram(lv_draw_buf_t * buf);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -195,9 +199,27 @@ void lv_draw_buf_clear_ex(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_laye
     uint32_t stride = header->stride;
 
     if(a == NULL) {
+#if LV_USE_DRAW_VRAM
+        if(draw_buf->data == NULL) {
+            /* Lazy buffer: no backing memory yet. Just mark CLEARZERO so that
+             * ensure_resident will zero the buffer when it actually allocates. */
+            lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_CLEARZERO);
+            LV_PROFILER_DRAW_END;
+            return;
+        }
+#endif
         uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, 0, 0);
+        if(buf == NULL) {
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         lv_memzero(buf, header->h * stride);
         lv_draw_buf_flush_cache(draw_buf, a);
+#if LV_USE_DRAW_VRAM
+        /* Full clear to zero = content is empty. CLEARZERO tells ensure_resident
+         * to skip uploading this zeroed data (implies DISCARDABLE). */
+        lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_CLEARZERO);
+#endif
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -225,6 +247,10 @@ void lv_draw_buf_clear_ex(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_laye
     }
 
     uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
+    if(buf == NULL) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
     uint8_t bpp = lv_color_format_get_bpp(header->cf);
     uint32_t line_length = (lv_area_get_width(&a_clipped) * bpp + 7) >> 3;
     int32_t y;
@@ -290,6 +316,19 @@ lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, u
 
     uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
 
+#if LV_USE_DRAW_VRAM
+    /* Lazy allocation: only create the header. Actual pixel data is allocated
+     * on demand by lv_draw_buf_ensure_resident() — either in CPU memory or
+     * VRAM, depending on which draw unit needs access first. */
+    draw_buf->header.w = w;
+    draw_buf->header.h = h;
+    draw_buf->header.cf = cf;
+    draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+    draw_buf->header.stride = stride;
+    draw_buf->header.magic = LV_IMAGE_HEADER_MAGIC;
+    draw_buf->data_size = size;
+    draw_buf->handlers = handlers;
+#else
     void * buf = draw_buf_malloc(handlers, size, cf);
     /*Do not assert here as LVGL or the app might just want to try creating a draw_buf*/
     if(buf == NULL) {
@@ -310,6 +349,7 @@ lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, u
     draw_buf->unaligned_data = buf;
     draw_buf->data_size = size;
     draw_buf->handlers = handlers;
+#endif
     LV_PROFILER_DRAW_END;
     return draw_buf;
 }
@@ -335,6 +375,35 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
     }
 
     lv_draw_buf_set_flag(new_buf, draw_buf->header.flags | LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED);
+
+#if LV_USE_DRAW_VRAM
+    /*A duplicate is not cache-backed: nothing re-creates its content if the
+     *VRAM backing is discarded, so it must not inherit reloadability.*/
+    lv_draw_buf_clear_flag(new_buf, LV_IMAGE_FLAGS_RELOADABLE);
+#endif
+
+#if LV_USE_DRAW_VRAM
+    /*If source is VRAM-resident, try a VRAM-side duplicate to avoid a CPU round trip*/
+    draw_buf_validate_vram((lv_draw_buf_t *)draw_buf);
+    if(draw_buf->vram_res != NULL) {
+        lv_draw_unit_t * unit = draw_buf->vram_res->unit;
+        if(unit != NULL && unit->vram_dup_cb != NULL) {
+            if(unit->vram_dup_cb(unit, new_buf, draw_buf)) {
+                LV_PROFILER_DRAW_END;
+                return new_buf;
+            }
+            /*vram_dup_cb failed — fall through to CPU copy*/
+        }
+    }
+#endif
+
+    /*Ensure both source and destination have CPU-resident data*/
+    if(!lv_draw_buf_ensure_resident(new_buf, NULL) ||
+       !lv_draw_buf_ensure_resident((lv_draw_buf_t *)draw_buf, NULL)) {
+        lv_draw_buf_destroy(new_buf);
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
 
     /*Choose the smaller size to copy*/
     uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);
@@ -379,6 +448,17 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
         return;
     }
     LV_PROFILER_DRAW_BEGIN;
+
+#if LV_USE_DRAW_VRAM
+    if(draw_buf->vram_res != NULL) {
+        lv_draw_unit_t * vr_unit = draw_buf->vram_res->unit;
+        if(vr_unit && vr_unit->vram_free_cb) {
+            vr_unit->vram_free_cb(vr_unit, draw_buf);
+            /* vram_free_cb NULLs draw_buf->vram_res and clears the flag */
+        }
+    }
+#endif
+
     if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_ALLOCATED)) {
         LV_ASSERT_NULL(draw_buf->handlers);
         LV_ASSERT_FORMAT_MSG(draw_buf->header.magic == LV_IMAGE_HEADER_MAGIC,
@@ -411,6 +491,30 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
                  (lv_area_get_width(src_area) == lv_area_get_width(dest_area) &&
                   lv_area_get_height(src_area) == lv_area_get_height(dest_area)),
                  return);
+
+#if LV_USE_DRAW_VRAM
+    /*Drop residency the units have lost before touching their handles*/
+    draw_buf_validate_vram(dest);
+    draw_buf_validate_vram((lv_draw_buf_t *)src);
+
+    /*If both buffers are VRAM-resident on the same unit, try a VRAM-side copy*/
+    if(dest->vram_res != NULL && src->vram_res != NULL
+       && !((dest->header.flags | src->header.flags) & LV_IMAGE_FLAGS_CLEARZERO)) {
+        lv_draw_unit_t * unit = dest->vram_res->unit;
+        if(unit == src->vram_res->unit && unit->vram_copy_cb != NULL) {
+            if(unit->vram_copy_cb(unit, dest, dest_area, src, src_area)) {
+                lv_draw_buf_clear_flag(dest, LV_IMAGE_FLAGS_DISCARDABLE);
+                return;
+            }
+            /*vram_copy_cb failed — fall through to CPU copy*/
+        }
+    }
+
+    /*Ensure both buffers have CPU-resident data before copying*/
+    if(!lv_draw_buf_ensure_resident(dest, NULL)) return;
+    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)src, NULL)) return;
+#endif
+
     dest->handlers->buf_copy_cb(dest, dest_area, src, src_area);
 }
 
@@ -426,6 +530,9 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
                             return NULL,
                             "coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32,
                             x, y, (uint32_t)buf->header.w, (uint32_t)buf->header.h);
+#if LV_USE_DRAW_VRAM
+    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)buf, NULL)) return NULL;
+#endif
     LV_CHECK_ARG(buf->data != NULL, return NULL);
 
     uint8_t * data = buf->data;
@@ -557,6 +664,9 @@ lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * i
     }
 
     buf->header.flags = img->header.flags;
+#if LV_USE_DRAW_VRAM
+    buf->vram_res = img->vram_res;
+#endif
     return res;
 }
 
@@ -582,6 +692,12 @@ void lv_image_buf_free(lv_image_dsc_t * dsc)
     if(dsc == NULL) return;
 
     if(dsc != NULL) {
+#if LV_USE_DRAW_VRAM
+        if(dsc->vram_res != NULL) {
+            lv_draw_unit_t * vr_unit = dsc->vram_res->unit;
+            if(vr_unit && vr_unit->vram_free_cb) vr_unit->vram_free_cb(vr_unit, (lv_draw_buf_t *)dsc);
+        }
+#endif
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);
 
@@ -606,6 +722,239 @@ void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
     LV_CHECK_ARG(draw_buf != NULL, return);
     draw_buf->header.flags &= ~flag;
 }
+#if LV_USE_DRAW_VRAM
+
+void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, lv_font_dsc_base_t * font_dsc)
+{
+    if(vram_res == NULL || *vram_res == NULL) return;
+    lv_draw_unit_t * unit = (*vram_res)->unit;
+    if(unit == NULL || unit->vram_font_free_cb == NULL) return;
+    unit->vram_font_free_cb(unit, font_dsc);
+}
+
+/**
+ * Check if a draw buffer's VRAM residency is still valid.
+ * If the VRAM backing was lost (reclaimed, stolen, etc.), frees
+ * the stale vram_res so subsequent code treats the buffer as
+ * non-resident.
+ */
+static void draw_buf_validate_vram(lv_draw_buf_t * buf)
+{
+    if(buf == NULL || buf->vram_res == NULL) return;
+
+    lv_draw_unit_t * vr_unit = buf->vram_res->unit;
+    if(vr_unit == NULL) return;
+
+    if(!vr_unit->vram_check_cb(vr_unit, buf)) {
+        /* VRAM lost — free the stale descriptor via vram_free_cb
+         * which NULLs buf->vram_res. */
+        vr_unit->vram_free_cb(vr_unit, buf);
+
+        /* Without a CPU copy the content is gone for good. Mark the buffer
+         * clear-to-zero so the replacement backing starts out deterministic
+         * instead of exposing whatever the allocator hands back. A retained
+         * CPU copy is still valid and must not be flagged, and a reloadable
+         * buffer is regenerated by its producer rather than replaced. */
+        if(buf->data == NULL && !(buf->header.flags & LV_IMAGE_FLAGS_RELOADABLE)) {
+            buf->header.flags |= LV_IMAGE_FLAGS_CLEARZERO;
+        }
+    }
+}
+
+bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
+{
+    if(buf == NULL) return false;
+
+    /* Drop stale VRAM residency before checking */
+    draw_buf_validate_vram(buf);
+
+    bool has_cpu = (buf->data != NULL);
+    bool has_vram = (buf->vram_res != NULL);
+
+    /* A reloadable buffer that lost its only backing is not replaced here:
+     * its producer regenerates it (the image cache drops the entry and
+     * re-decodes on the next open), so refuse and let this draw be skipped
+     * instead of rendering fabricated content. */
+    if(!has_cpu && !has_vram && (buf->header.flags & LV_IMAGE_FLAGS_RELOADABLE)) {
+        LV_LOG_INFO("Reloadable buffer lost its VRAM backing, waiting for the producer to reload it");
+        return false;
+    }
+    bool unit_has_vram = (unit != NULL && unit->vram_alloc_cb != NULL);
+
+    /* CLEARZERO implies DISCARDABLE — content should be zeroed, so skip
+     * upload/download. Guard writes: const ROM images must not be written to. */
+    bool clearzero = (buf->header.flags & LV_IMAGE_FLAGS_CLEARZERO) != 0;
+    bool discard = clearzero || (buf->header.flags & LV_IMAGE_FLAGS_DISCARDABLE) != 0;
+
+    /* Already resident on this unit — reuse as-is.
+     * CLEARZERO and DISCARDABLE stay on flags for the draw unit to handle
+     * (e.g., has_content=false). SW renderers don't check these flags,
+     * so they must be cleared before returning for CPU-only paths. */
+    if(has_vram && buf->vram_res->unit == unit) {
+        return true;
+    }
+
+    /* Past the VRAM-reuse path — clear DISCARDABLE so it doesn't leak
+     * through CPU-resident paths to a future SW→HW transition. */
+    if(discard && !clearzero) {
+        buf->header.flags &= ~LV_IMAGE_FLAGS_DISCARDABLE;
+    }
+
+    /* Already CPU-resident for a CPU unit — reuse.
+     * CLEARZERO: data was already zeroed by lv_draw_buf_clear, just clear the flag. */
+    bool mutable_cpu = (buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) != 0;
+    if(!unit_has_vram && has_cpu && (!has_vram || !mutable_cpu)) {
+        if(clearzero) {
+            buf->header.flags &= ~LV_IMAGE_FLAGS_CLEARZERO;
+        }
+        return true;
+    }
+
+    /* Buffer is in a different unit's VRAM */
+    if(has_vram) {
+        lv_draw_unit_t * old_unit = buf->vram_res->unit;
+
+        /*Mutable buffers retain caller-owned CPU storage during upload, but VRAM
+         *is authoritative until the next CPU access. Immutable images keep their
+         *original CPU copy and must never be downloaded into ROM.*/
+        if(!discard && (!has_cpu || mutable_cpu)) {
+            bool allocated_cpu = !has_cpu;
+            uint32_t old_size = buf->data_size;
+            if(old_unit->vram_download_cb == NULL) return false;
+
+            if(allocated_cpu) {
+                uint32_t w = buf->header.w;
+                uint32_t h = buf->header.h;
+                lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
+                uint32_t stride = buf->header.stride;
+                if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+                uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+                void * data = draw_buf_malloc(buf->handlers ? buf->handlers : &default_handlers, size, cf);
+                if(data == NULL) {
+                    LV_LOG_WARN("VRAM download: CPU alloc failed");
+                    return false;
+                }
+                buf->unaligned_data = data;
+                buf->data = lv_draw_buf_align_ex(buf->handlers ? buf->handlers : &default_handlers, data, cf);
+                buf->data_size = size;
+            }
+
+            if(!old_unit->vram_download_cb(old_unit, buf)) {
+                if(allocated_cpu) {
+                    draw_buf_free(buf->handlers ? buf->handlers : &default_handlers, buf->unaligned_data);
+                    buf->unaligned_data = NULL;
+                    buf->data = NULL;
+                    buf->data_size = old_size;
+                }
+                return false;
+            }
+            if(allocated_cpu) buf->header.flags |= LV_IMAGE_FLAGS_ALLOCATED;
+
+            if((buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED)
+               && buf->header.cf == LV_COLOR_FORMAT_ARGB8888) {
+                buf->header.cf = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+            }
+            has_cpu = true;
+        }
+        else if(clearzero && has_cpu && mutable_cpu) {
+            lv_memzero(buf->data, buf->data_size);
+        }
+
+        /* Free old VRAM */
+        if(old_unit->vram_free_cb) {
+            old_unit->vram_free_cb(old_unit, buf);
+            /* vram_free_cb NULLs buf->vram_res and clears the flag */
+        }
+
+        /* Upload to new unit if it has VRAM.
+         * Discard: just allocate, don't upload stale content. */
+        if(unit_has_vram) {
+            bool ok = discard ? unit->vram_alloc_cb(unit, buf)
+                      : unit->vram_upload_cb(unit, buf);
+            if(!ok) return false;
+            /* Free CPU data after successful VRAM alloc/upload if LVGL owns it.
+             * Keep data_size — it's the logical buffer capacity used by tiling math. */
+            if((buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) && buf->unaligned_data != NULL) {
+                draw_buf_free(buf->handlers ? buf->handlers : &default_handlers, buf->unaligned_data);
+                buf->unaligned_data = NULL;
+                buf->data = NULL;
+            }
+            return true;
+        }
+        /* Target is SW unit. If we have CPU data (normal download path),
+         * we're done. If discard skipped the download, fall through to
+         * the "no backing" path to allocate fresh CPU memory. */
+        if(buf->data != NULL) {
+            buf->header.flags &= ~LV_IMAGE_FLAGS_CLEARZERO;
+            return true;
+        }
+    }
+
+    /* CPU data only, no VRAM */
+    if(has_cpu) {
+        if(unit_has_vram) {
+            /* Image descriptors (handlers == NULL) always upload — never discard,
+             * since the CPU data is ROM and always valid. */
+            bool is_image_dsc = (buf->handlers == NULL);
+            bool ok = (discard && !is_image_dsc) ? unit->vram_alloc_cb(unit, buf)
+                      : unit->vram_upload_cb(unit, buf);
+            if(!ok) return false;
+            /* Free CPU data after successful VRAM alloc/upload if LVGL owns it.
+             * Keep data_size — it's the logical buffer capacity used by tiling math.
+             * Image descriptors have no ALLOCATED flag and no unaligned_data. */
+            if((buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) && buf->unaligned_data != NULL) {
+                draw_buf_free(buf->handlers ? buf->handlers : &default_handlers, buf->unaligned_data);
+                buf->unaligned_data = NULL;
+                buf->data = NULL;
+            }
+            return true;
+        }
+        /* Unit uses CPU, buffer is already in CPU. Reuse. */
+        return true;
+    }
+
+    /* No backing at all (lazy/header-only) */
+    if(unit_has_vram) {
+        if(!unit->vram_alloc_cb(unit, buf)) return false;
+        /* CLEARZERO: vram_alloc_cb sets has_content=false by default,
+         * which is sufficient — clear the flag since it's been handled. */
+        if(clearzero) {
+            buf->header.flags &= ~LV_IMAGE_FLAGS_CLEARZERO;
+        }
+    }
+    else {
+        /* Allocate CPU buffer */
+        uint32_t w = buf->header.w;
+        uint32_t h = buf->header.h;
+        lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
+        uint32_t stride = buf->header.stride;
+        if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+        uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+        const lv_draw_buf_handlers_t * handlers = buf->handlers ? buf->handlers : &default_handlers;
+        void * data = draw_buf_malloc(handlers, size, cf);
+        if(data == NULL) {
+            LV_LOG_WARN("Lazy alloc failed");
+            return false;
+        }
+
+        buf->unaligned_data = data;
+        buf->data = lv_draw_buf_align_ex(buf->handlers ? buf->handlers : &default_handlers, data, cf);
+        buf->data_size = size;
+        buf->header.stride = stride;
+        buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+
+        /* CLEARZERO or alpha-format: clear the freshly allocated buffer.
+         * Use data_size (not stride*h) so indexed-format palette bytes are included. */
+        if(clearzero || lv_color_format_has_alpha(cf)) {
+            lv_memzero(buf->data, size);
+            buf->header.flags &= ~LV_IMAGE_FLAGS_CLEARZERO;
+        }
+    }
+    return true;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

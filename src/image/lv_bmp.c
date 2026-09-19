@@ -236,6 +236,8 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         p += (decoded_area->x1) * (b->bpp / 8);
         lv_fs_seek(&b->f, p, LV_FS_SEEK_SET);
         uint32_t line_width_byte = lv_area_get_width(full_area) * (b->bpp / 8);
+        /*A draw unit may have moved the row buffer out of CPU memory since the previous line*/
+        if(!lv_draw_buf_ensure_resident(decoded, NULL)) return LV_RESULT_INVALID;
         lv_fs_read(&b->f, decoded->data, line_width_byte, NULL);
 
         return LV_RESULT_OK;

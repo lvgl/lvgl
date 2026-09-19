@@ -38,7 +38,7 @@ typedef struct _lv_freetype_image_cache_data_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+static LV_IMAGE_DSC_CONST void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void * user_data);
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * node, void * user_data);
@@ -84,7 +84,7 @@ void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc)
  *   STATIC FUNCTIONS
  **********************/
 
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+static LV_IMAGE_DSC_CONST void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT(g_dsc != NULL);
     LV_UNUSED(draw_buf);
@@ -194,8 +194,12 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     uint32_t pitch = glyph_bitmap->bitmap.pitch;
     uint32_t stride = lv_draw_buf_width_to_stride(box_w, col_format);
     data->draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, box_w, box_h, col_format, stride);
-    if(!data->draw_buf) {
+    if(!data->draw_buf || !lv_draw_buf_ensure_resident(data->draw_buf, NULL)) {
         LV_LOG_WARN("Could not create draw buffer");
+        if(data->draw_buf) {
+            lv_draw_buf_destroy(data->draw_buf);
+            data->draw_buf = NULL;
+        }
         FT_Done_Glyph(glyph);
         lv_mutex_unlock(&dsc->cache_node->face_lock);
         LV_PROFILER_FONT_END;
@@ -203,9 +207,24 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     }
     lv_draw_buf_clear(data->draw_buf, NULL);
 
-    for(int y = 0; y < box_h; ++y) {
-        lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * pitch,
-                  pitch);
+    /*An empty glyph (e.g. a space) has no pixels to copy, and no valid pixel position either*/
+    if(box_w != 0 && box_h != 0) {
+        /*Take the pixel pointer through lv_draw_buf_goto_xy: it makes the buffer CPU-resident
+         *and consumes the CLEARZERO flag set by the clear, so the glyph gets uploaded later*/
+        uint8_t * glyph_dst = lv_draw_buf_goto_xy(data->draw_buf, 0, 0);
+        if(glyph_dst == NULL) {
+            LV_LOG_WARN("Could not access the glyph draw buffer");
+            lv_draw_buf_destroy(data->draw_buf);
+            data->draw_buf = NULL;
+            FT_Done_Glyph(glyph);
+            lv_mutex_unlock(&dsc->cache_node->face_lock);
+            LV_PROFILER_FONT_END;
+            return false;
+        }
+
+        for(int y = 0; y < box_h; ++y) {
+            lv_memcpy(glyph_dst + y * stride, glyph_bitmap->bitmap.buffer + y * pitch, pitch);
+        }
     }
 
     lv_draw_buf_flush_cache(data->draw_buf, NULL);

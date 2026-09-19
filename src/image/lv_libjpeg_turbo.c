@@ -368,6 +368,10 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
 
     /* Allocate the decoded draw buffer */
     decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, width, height, fm, LV_STRIDE_AUTO);
+    if(decoded != NULL && !lv_draw_buf_ensure_resident(decoded, NULL)) {
+        lv_draw_buf_destroy(decoded);
+        decoded = NULL;
+    }
     if(decoded != NULL) {
         uint32_t line_index = 0;
         /* while (scan lines remain to be read) */

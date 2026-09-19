@@ -38,7 +38,7 @@
  **********************/
 static void index_change(lv_obj_t * obj, int32_t idx);
 static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_animimg_set_src_inner(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse);
+static void lv_animimg_set_src_inner(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * dsc[], size_t num, bool reverse);
 
 /**********************
  *  STATIC VARIABLES
@@ -93,7 +93,7 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num)
+void lv_animimg_set_src(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * dsc[], size_t num)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(dsc != NULL, return);
@@ -101,7 +101,7 @@ void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num)
     lv_animimg_set_src_inner(obj, dsc, num, false);
 }
 
-void lv_animimg_set_src_reverse(lv_obj_t * obj, const void * dsc[], size_t num)
+void lv_animimg_set_src_reverse(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * dsc[], size_t num)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(dsc != NULL, return);
@@ -174,7 +174,7 @@ void lv_animimg_set_completed_cb(lv_obj_t * obj, lv_anim_completed_cb_t complete
  * Getter functions
  *====================*/
 
-const void ** lv_animimg_get_src(lv_obj_t * obj)
+LV_IMAGE_DSC_CONST void ** lv_animimg_get_src(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
@@ -248,7 +248,7 @@ static void index_change(lv_obj_t * obj, int32_t idx)
     lv_image_set_src(obj, animimg->dsc[idx]);
 }
 
-static void lv_animimg_set_src_inner(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse)
+static void lv_animimg_set_src_inner(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * dsc[], size_t num, bool reverse)
 {
     LV_ASSERT(obj != NULL);
     LV_ASSERT(dsc != NULL);

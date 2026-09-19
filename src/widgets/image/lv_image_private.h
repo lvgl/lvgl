@@ -32,8 +32,8 @@ extern "C" {
  */
 struct _lv_image_t {
     lv_obj_t obj;
-    const void * src;       /**< Image source: Pointer to an array or a file or a symbol*/
-    const lv_image_dsc_t * bitmap_mask_src; /**< Pointer to an A8 bitmap mask */
+    LV_IMAGE_DSC_CONST void * src;       /**< Image source: Pointer to an array or a file or a symbol*/
+    LV_IMAGE_DSC_CONST lv_image_dsc_t * bitmap_mask_src; /**< Pointer to an A8 bitmap mask */
     lv_point_t offset;
     int32_t w;              /**< Width of the image (Handled by the library)*/
     int32_t h;              /**< Height of the image (Handled by the library)*/

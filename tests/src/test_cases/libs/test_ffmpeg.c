@@ -16,7 +16,7 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-static void create_image_item(lv_obj_t * parent, const void * src, const char * text)
+static void create_image_item(lv_obj_t * parent, LV_IMAGE_DSC_CONST void * src, const char * text)
 {
     lv_obj_t * cont = lv_obj_create(parent);
     lv_obj_remove_style_all(cont);
