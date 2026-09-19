@@ -4983,6 +4983,19 @@
  -----------------------------------*/
 
 
+/*----------------------------------
+ * Start of outdated config check block
+ -----------------------------------*/
+
+#if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP
+    #error LV_COLOR_16_SWAP has been removed. Use LV_COLOR_FORMAT_RGB565_SWAPPED as the display color format instead
+#endif
+
+/*----------------------------------
+ * End of outdated config check block
+ -----------------------------------*/
+
+
 /* Values fixed by another option's selected token (see LV_CONF_PASTE). */
 
 /** LV_COLOR_DEPTH - derived from LV_COLOR_FORMAT_DEFAULT. */
