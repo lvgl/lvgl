@@ -138,4 +138,103 @@ void test_draw_layer_alloc_failed_no_deadlock(void)
     handlers->buf_malloc_cb = original_malloc_cb;
 }
 
+/**
+ * Regression test: lv_draw_layer() must always mark its source layer's
+ * all_tasks_added, even at a zero/negative scale where nothing will
+ * actually be drawn.
+ *
+ * Before the fix, lv_draw_layer() returned immediately for scale_x/scale_y
+ * <= 0, before lv_draw_add_task() ever ran and before all_tasks_added was
+ * touched. dsc->src is a layer the caller already created and rendered
+ * *before* calling this function (see lv_refr.c), so skipping that flag
+ * left it permanently unfinished: lv_draw_dispatch_layer() only notices a
+ * child layer is done, and reaps the LV_DRAW_TASK_TYPE_LAYER task that's
+ * waiting on it, once all_tasks_added is true and the child's own task
+ * list is empty (src/draw/lv_draw.c). Miss that and both the lv_layer_t
+ * and its draw buffer are orphaned - leaked - forever.
+ *
+ * This calls lv_draw_layer() directly rather than through a widget or
+ * animation. That's deliberate: as of this writing, lv_refr.c's own
+ * layer_get_area() already refuses to render an object whose transformed
+ * area collapses to nothing at scale 0, so a plain widget can no longer
+ * drive lv_draw_layer() itself down to a degenerate scale (confirmed by
+ * tracing - every direct/animated/gradual attempt through the widget and
+ * style system bails out before reaching this function at all). That
+ * upstream guard is a good thing, but it doesn't make this function's own
+ * contract optional: if that guard is ever loosened, or some other caller
+ * (a custom widget, a future draw pipeline) is less careful, lv_draw_layer()
+ * must still not orphan its source layer - and if no caller can ever reach
+ * it with a degenerate scale, this guard is dead code and the fix should be
+ * reverted rather than carried as an unreachable landmine.
+ */
+void test_draw_layer_scale_zero_marks_all_tasks_added(void)
+{
+    lv_area_t coords = {0, 0, 59, 74};
+
+    lv_layer_t parent;
+    lv_memzero(&parent, sizeof(parent));
+    parent.opa = LV_OPA_COVER;
+    parent._clip_area = coords;
+
+    lv_layer_t layer_to_draw;
+    lv_memzero(&layer_to_draw, sizeof(layer_to_draw));
+    layer_to_draw.parent = &parent;
+
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
+    dsc.src = &layer_to_draw;
+    dsc.scale_x = 0;
+    dsc.scale_y = 0;
+
+    lv_draw_layer(&parent, &dsc, &coords);
+
+    TEST_ASSERT_TRUE(layer_to_draw.all_tasks_added);
+    TEST_ASSERT_NOT_NULL(parent.draw_task_head);
+
+    /*Nothing should actually be drawn: the task's own clip area must be empty.*/
+    lv_area_t dummy;
+    TEST_ASSERT_FALSE(lv_area_intersect(&dummy, &parent.draw_task_head->clip_area, &coords));
+
+    /*With all_tasks_added set and no pending tasks of its own, the child layer is
+     *"ready" - lv_draw_dispatch_layer() must find and unblock the waiting task in
+     *the parent rather than leaving it (and the child layer) stuck forever.*/
+    lv_draw_dispatch_layer(NULL, &layer_to_draw);
+    TEST_ASSERT_NOT_EQUAL(LV_DRAW_TASK_STATE_BLOCKED, parent.draw_task_head->state);
+
+    /*Not lv_draw_cleanup_task(): for a TYPE_LAYER task that calls
+     *lv_draw_layer_delete(dsc->src), which lv_free()s it - fine for a real,
+     *heap-allocated child layer, but layer_to_draw here is a stack variable.*/
+    lv_free(parent.draw_task_head);
+}
+
+/*Same as above, but with a negative scale rather than exactly zero.*/
+void test_draw_layer_scale_negative_marks_all_tasks_added(void)
+{
+    lv_area_t coords = {0, 0, 59, 74};
+
+    lv_layer_t parent;
+    lv_memzero(&parent, sizeof(parent));
+    parent.opa = LV_OPA_COVER;
+    parent._clip_area = coords;
+
+    lv_layer_t layer_to_draw;
+    lv_memzero(&layer_to_draw, sizeof(layer_to_draw));
+    layer_to_draw.parent = &parent;
+
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
+    dsc.src = &layer_to_draw;
+    dsc.scale_x = LV_SCALE_NONE;
+    dsc.scale_y = -10;
+
+    lv_draw_layer(&parent, &dsc, &coords);
+
+    TEST_ASSERT_TRUE(layer_to_draw.all_tasks_added);
+
+    lv_draw_dispatch_layer(NULL, &layer_to_draw);
+    TEST_ASSERT_NOT_EQUAL(LV_DRAW_TASK_STATE_BLOCKED, parent.draw_task_head->state);
+
+    lv_free(parent.draw_task_head);
+}
+
 #endif

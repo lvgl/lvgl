@@ -79,15 +79,13 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     if(dsc->scale_x <= 0 || dsc->scale_y <= 0) {
         /* Nothing will be visible at a zero/negative scale. Force the task's own clip area
          * empty (inverted, x2 < x1) but still schedule the task to ensure proper finalisation. */
-        lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                          dsc->rotation, 0, 0, &dsc->pivot);
         t->clip_area.x2 = t->clip_area.x1 - 1;
     }
     else {
         lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
                                           dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+        lv_area_move(&t->_real_area, coords->x1, coords->y1);
     }
-    lv_area_move(&t->_real_area, coords->x1, coords->y1);
 
     /*If the image_area is not set assume that it's the same as the rendering area */
     if(new_image_dsc->image_area.x2 == LV_COORD_MIN) {
