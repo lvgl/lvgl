@@ -19,6 +19,10 @@ endif()
 
 set(LVGL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+if(MSVC)
+  add_compile_options(/utf-8)
+endif()
+
 if(ESP_PLATFORM)
   include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/esp.cmake)
 elseif(MICROPY_DIR)
