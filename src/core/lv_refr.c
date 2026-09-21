@@ -1127,6 +1127,8 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
 
     parent = lv_obj_get_parent(top_obj);
 
+    const lv_color32_t layer_recolor = layer->recolor;
+
     /*Calculate the recolor before the parent*/
     if(parent) {
         layer->recolor = lv_obj_get_style_recolor_recursive(parent, LV_PART_MAIN);
@@ -1162,6 +1164,8 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
         /*Go a level deeper*/
         parent = lv_obj_get_parent(parent);
     }
+
+    layer->recolor = layer_recolor;
     LV_PROFILER_REFR_END;
 }
 
