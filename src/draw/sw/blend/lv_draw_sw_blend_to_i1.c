@@ -67,6 +67,9 @@ static inline uint8_t /* LV_ATTRIBUTE_FAST_MEM */ get_bit(const uint8_t * buf, i
 
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
+static void i1_blend_color_generic(lv_draw_sw_blend_fill_dsc_t * dsc);
+static void i1_blend_image_generic(lv_draw_sw_blend_image_dsc_t * dsc);
+
 #if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
     static inline lv_color16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color16_from_u16(uint16_t raw);
 #endif
@@ -215,6 +218,11 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_i1(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
+    if(dsc->dest_vtiled || dsc->dest_lsb_first) {
+        i1_blend_color_generic(dsc);
+        return;
+    }
+
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
@@ -330,6 +338,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_i1(lv_draw_sw_blend_fill_ds
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_i1(lv_draw_sw_blend_image_dsc_t * dsc)
 {
+    if(dsc->dest_vtiled || dsc->dest_lsb_first) {
+        i1_blend_image_generic(dsc);
+        return;
+    }
+
     switch(dsc->src_color_format) {
 #if LV_DRAW_SW_SUPPORT_RGB565
         case LV_COLOR_FORMAT_RGB565:
@@ -1278,6 +1291,366 @@ static inline uint8_t LV_ATTRIBUTE_FAST_MEM get_bit(const uint8_t * buf, int32_t
 {
     return (buf[bit_idx / 8] >> (7 - (bit_idx % 8))) & 1;
 }
+
+/*
+ * The normal I1 implementation above is deliberately kept as the fast path for the
+ * format LVGL has historically exposed: horizontal tiles, MSB first.  The four layout
+ * implementations below are selected once per blend operation.  The layout expressions
+ * are macro arguments rather than runtime flags, so the pixel loops contain no branch for
+ * horizontal/vertical tiling or MSB/LSB order.
+ */
+#define I1_H_BYTE(base, x, y, stride, bit_ofs) ((base) + (y) * (stride) + (((x) + (bit_ofs)) >> 3))
+#define I1_H_MSB_BIT(x, y, stride, bit_ofs) (7 - (((x) + (bit_ofs)) & 7))
+#define I1_H_LSB_BIT(x, y, stride, bit_ofs) (((x) + (bit_ofs)) & 7)
+
+#define I1_V_BYTE(base, x, y, stride, bit_ofs) ((base) + (((y) + (bit_ofs)) >> 3) * (stride) + (x))
+#define I1_V_MSB_BIT(x, y, stride, bit_ofs) (7 - (((y) + (bit_ofs)) & 7))
+#define I1_V_LSB_BIT(x, y, stride, bit_ofs) (((y) + (bit_ofs)) & 7)
+
+#if LV_DRAW_SW_SUPPORT_RGB565
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_rgb565(const uint8_t * src, int32_t x)
+{
+    return lv_color_to_32(lv_color16_to_color(((const lv_color16_t *)src)[x]), LV_OPA_COVER);
+}
+#endif
+
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_rgb565_swapped(const uint8_t * src, int32_t x)
+{
+    uint16_t raw = ((const uint16_t *)src)[x];
+    return lv_color_to_32(lv_color16_to_color(lv_color16_from_u16(lv_color_swap_16(raw))),
+                          LV_OPA_COVER);
+}
+#endif
+
+#if LV_DRAW_SW_SUPPORT_RGB888
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_rgb888(const uint8_t * src, int32_t x)
+{
+    lv_color32_t color = {
+        .blue = src[x * 3],
+        .green = src[x * 3 + 1],
+        .red = src[x * 3 + 2],
+        .alpha = LV_OPA_COVER,
+    };
+
+    return color;
+}
+#endif
+
+#if LV_DRAW_SW_SUPPORT_XRGB8888
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_xrgb8888(const uint8_t * src, int32_t x)
+{
+    lv_color32_t color = {
+        .blue = src[x * 4],
+        .green = src[x * 4 + 1],
+        .red = src[x * 4 + 2],
+        .alpha = LV_OPA_COVER,
+    };
+
+    return color;
+}
+#endif
+
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_argb8888(const uint8_t * src, int32_t x)
+{
+    return ((const lv_color32_t *)src)[x];
+}
+#endif
+
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_argb8888_premultiplied(const uint8_t * src,
+                                                                                  int32_t x)
+{
+    return lv_color32_unpremultiply(((const lv_color32_t *)src)[x]);
+}
+#endif
+
+#if LV_DRAW_SW_SUPPORT_L8
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_l8(const uint8_t * src, int32_t x)
+{
+    lv_color32_t color = {
+        .blue = src[x],
+        .green = src[x],
+        .red = src[x],
+        .alpha = LV_OPA_COVER,
+    };
+
+    return color;
+}
+#endif
+
+#if LV_DRAW_SW_SUPPORT_AL88
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_al88(const uint8_t * src, int32_t x)
+{
+    const lv_color16a_t * pixel = &((const lv_color16a_t *)src)[x];
+    lv_color32_t color = {
+        .blue = pixel->lumi,
+        .green = pixel->lumi,
+        .red = pixel->lumi,
+        .alpha = pixel->alpha,
+    };
+
+    return color;
+}
+#endif
+
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM i1_source_i1(const uint8_t * src, int32_t x)
+{
+    uint8_t value = get_bit(src, x) * 255;
+    lv_color32_t color = {
+        .blue = value,
+        .green = value,
+        .red = value,
+        .alpha = LV_OPA_COVER,
+    };
+
+    return color;
+}
+
+#define I1_DEFINE_GENERIC_FILL(name, byte_expr, bit_expr)                                      \
+    static void LV_ATTRIBUTE_FAST_MEM name(lv_draw_sw_blend_fill_dsc_t * dsc)                    \
+    {                                                                                              \
+        int32_t w = dsc->dest_w;                                                                   \
+        int32_t h = dsc->dest_h;                                                                   \
+        uint8_t src_color = lv_color_luminance(dsc->color) / (I1_LUM_THRESHOLD + 1);              \
+        int32_t bit_ofs = dsc->dest_vtiled ? dsc->relative_area.y1 % 8 :                   \
+        dsc->relative_area.x1 % 8;                                             \
+        uint8_t * dest = dsc->dest_buf;                                                            \
+        \
+        for(int32_t y = 0; y < h; y++) {                                                           \
+            for(int32_t x = 0; x < w; x++) {                                                       \
+                uint8_t * dest_byte = byte_expr(dest, x, y, dsc->dest_stride, bit_ofs);           \
+                uint8_t dest_bit = (*dest_byte >> bit_expr(x, y, dsc->dest_stride, bit_ofs)) & 1; \
+                uint8_t result = dest_bit * 255;                                                   \
+                uint8_t mix = dsc->opa;                                                            \
+                if(dsc->mask_buf != NULL) mix = LV_OPA_MIX2(dsc->mask_buf[x], mix);                \
+                lv_color_8_8_mix(src_color * 255, &result, mix);                                   \
+                if(result > I1_LUM_THRESHOLD) {                                                    \
+                    *dest_byte |= (uint8_t)(1U << bit_expr(x, y, dsc->dest_stride, bit_ofs));     \
+                }                                                                                  \
+                else {                                                                             \
+                    *dest_byte &= (uint8_t)~(1U << bit_expr(x, y, dsc->dest_stride, bit_ofs));    \
+                }                                                                                  \
+            }                                                                                      \
+            if(dsc->mask_buf != NULL) dsc->mask_buf += dsc->mask_stride;                            \
+        }                                                                                          \
+    }
+
+#define I1_DEFINE_GENERIC_IMAGE(name, byte_expr, bit_expr, source_fn)                           \
+    static void LV_ATTRIBUTE_FAST_MEM name(lv_draw_sw_blend_image_dsc_t * dsc)                    \
+    {                                                                                               \
+        int32_t w = dsc->dest_w;                                                                    \
+        int32_t h = dsc->dest_h;                                                                    \
+        int32_t bit_ofs = dsc->dest_vtiled ? dsc->relative_area.y1 % 8 :                    \
+        dsc->relative_area.x1 % 8;                                              \
+        uint8_t * dest = dsc->dest_buf;                                                             \
+        const uint8_t * src = dsc->src_buf;                                                        \
+        const lv_opa_t * mask = dsc->mask_buf;                                                     \
+        \
+        for(int32_t y = 0; y < h; y++) {                                                           \
+            for(int32_t x = 0; x < w; x++) {                                                       \
+                lv_color32_t src_color = source_fn(src, x);                                        \
+                uint8_t * dest_byte = byte_expr(dest, x, y, dsc->dest_stride, bit_ofs);           \
+                uint8_t bit = (uint8_t)bit_expr(x, y, dsc->dest_stride, bit_ofs);                 \
+                uint8_t dest_lumi = ((*dest_byte >> bit) & 1) * 255;                              \
+                if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {                                      \
+                    uint8_t mix = LV_OPA_MIX2(src_color.alpha, dsc->opa);                         \
+                    if(mask != NULL) mix = LV_OPA_MIX2(mask[x], mix);                              \
+                    lv_color_8_8_mix(lv_color32_luminance(src_color), &dest_lumi, mix);            \
+                }                                                                                  \
+                else {                                                                             \
+                    uint8_t src_lumi = lv_color32_luminance(src_color);                            \
+                    uint8_t result;                                                               \
+                    switch(dsc->blend_mode) {                                                      \
+                        case LV_BLEND_MODE_ADDITIVE:                                               \
+                            result = LV_MIN(dest_lumi + src_lumi, 255);                            \
+                            break;                                                                 \
+                        case LV_BLEND_MODE_SUBTRACTIVE:                                            \
+                            result = LV_MAX(dest_lumi - src_lumi, 0);                              \
+                            break;                                                                 \
+                        case LV_BLEND_MODE_MULTIPLY:                                               \
+                            result = (dest_lumi * src_lumi) >> 8;                                  \
+                            break;                                                                 \
+                        case LV_BLEND_MODE_DIFFERENCE:                                             \
+                            result = LV_ABS(dest_lumi - src_lumi);                                 \
+                            break;                                                                 \
+                        default:                                                                   \
+                            result = dest_lumi;                                                    \
+                            break;                                                                 \
+                    }                                                                              \
+                    uint8_t mix = dsc->opa;                                                        \
+                    if(mask != NULL) mix = LV_OPA_MIX2(mask[x], mix);                              \
+                    lv_color_8_8_mix(result, &dest_lumi, LV_OPA_MIX2(src_color.alpha, mix));       \
+                }                                                                                  \
+                if(dest_lumi > I1_LUM_THRESHOLD) {                                                 \
+                    *dest_byte |= (uint8_t)(1U << bit);                                           \
+                }                                                                                  \
+                else {                                                                             \
+                    *dest_byte &= (uint8_t)~(1U << bit);                                          \
+                }                                                                                  \
+            }                                                                                      \
+            src += dsc->src_stride;                                                                \
+            if(mask != NULL) mask += dsc->mask_stride;                                              \
+        }                                                                                           \
+    }
+
+I1_DEFINE_GENERIC_FILL(i1_fill_hmsb, I1_H_BYTE, I1_H_MSB_BIT)
+I1_DEFINE_GENERIC_FILL(i1_fill_hlsb, I1_H_BYTE, I1_H_LSB_BIT)
+I1_DEFINE_GENERIC_FILL(i1_fill_vmsb, I1_V_BYTE, I1_V_MSB_BIT)
+I1_DEFINE_GENERIC_FILL(i1_fill_vlsb, I1_V_BYTE, I1_V_LSB_BIT)
+
+#define I1_DEFINE_SOURCE_LAYOUTS(suffix, source_fn)                                            \
+    I1_DEFINE_GENERIC_IMAGE(i1_image_hmsb_##suffix, I1_H_BYTE, I1_H_MSB_BIT, source_fn)       \
+    I1_DEFINE_GENERIC_IMAGE(i1_image_hlsb_##suffix, I1_H_BYTE, I1_H_LSB_BIT, source_fn)       \
+    I1_DEFINE_GENERIC_IMAGE(i1_image_vmsb_##suffix, I1_V_BYTE, I1_V_MSB_BIT, source_fn)       \
+    I1_DEFINE_GENERIC_IMAGE(i1_image_vlsb_##suffix, I1_V_BYTE, I1_V_LSB_BIT, source_fn)
+
+#if LV_DRAW_SW_SUPPORT_RGB565
+    I1_DEFINE_SOURCE_LAYOUTS(rgb565, i1_source_rgb565)
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+    I1_DEFINE_SOURCE_LAYOUTS(rgb565_swapped, i1_source_rgb565_swapped)
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
+    I1_DEFINE_SOURCE_LAYOUTS(rgb888, i1_source_rgb888)
+#endif
+#if LV_DRAW_SW_SUPPORT_XRGB8888
+    I1_DEFINE_SOURCE_LAYOUTS(xrgb8888, i1_source_xrgb8888)
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+    I1_DEFINE_SOURCE_LAYOUTS(argb8888, i1_source_argb8888)
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+    I1_DEFINE_SOURCE_LAYOUTS(argb8888_premultiplied, i1_source_argb8888_premultiplied)
+#endif
+#if LV_DRAW_SW_SUPPORT_L8
+    I1_DEFINE_SOURCE_LAYOUTS(l8, i1_source_l8)
+#endif
+#if LV_DRAW_SW_SUPPORT_AL88
+    I1_DEFINE_SOURCE_LAYOUTS(al88, i1_source_al88)
+#endif
+I1_DEFINE_SOURCE_LAYOUTS(i1, i1_source_i1)
+
+static void i1_blend_color_generic(lv_draw_sw_blend_fill_dsc_t * dsc)
+{
+    if(dsc->dest_vtiled) {
+        if(dsc->dest_lsb_first) i1_fill_vlsb(dsc);
+        else i1_fill_vmsb(dsc);
+    }
+    else if(dsc->dest_lsb_first) {
+        i1_fill_hlsb(dsc);
+    }
+    else {
+        i1_fill_hmsb(dsc);
+    }
+}
+
+static void i1_blend_image_generic(lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    switch(dsc->src_color_format) {
+#if LV_DRAW_SW_SUPPORT_RGB565
+        case LV_COLOR_FORMAT_RGB565:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_rgb565(dsc);
+                else i1_image_vmsb_rgb565(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_rgb565(dsc);
+            else i1_image_hmsb_rgb565(dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_rgb565_swapped(dsc);
+                else i1_image_vmsb_rgb565_swapped(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_rgb565_swapped(dsc);
+            else i1_image_hmsb_rgb565_swapped(dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
+        case LV_COLOR_FORMAT_RGB888:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_rgb888(dsc);
+                else i1_image_vmsb_rgb888(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_rgb888(dsc);
+            else i1_image_hmsb_rgb888(dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_XRGB8888
+        case LV_COLOR_FORMAT_XRGB8888:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_xrgb8888(dsc);
+                else i1_image_vmsb_xrgb8888(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_xrgb8888(dsc);
+            else i1_image_hmsb_xrgb8888(dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+        case LV_COLOR_FORMAT_ARGB8888:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_argb8888(dsc);
+                else i1_image_vmsb_argb8888(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_argb8888(dsc);
+            else i1_image_hmsb_argb8888(dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_argb8888_premultiplied(dsc);
+                else i1_image_vmsb_argb8888_premultiplied(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_argb8888_premultiplied(dsc);
+            else i1_image_hmsb_argb8888_premultiplied(dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_L8
+        case LV_COLOR_FORMAT_L8:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_l8(dsc);
+                else i1_image_vmsb_l8(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_l8(dsc);
+            else i1_image_hmsb_l8(dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_AL88
+        case LV_COLOR_FORMAT_AL88:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_al88(dsc);
+                else i1_image_vmsb_al88(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_al88(dsc);
+            else i1_image_hmsb_al88(dsc);
+            break;
+#endif
+        case LV_COLOR_FORMAT_I1:
+            if(dsc->dest_vtiled) {
+                if(dsc->dest_lsb_first) i1_image_vlsb_i1(dsc);
+                else i1_image_vmsb_i1(dsc);
+            }
+            else if(dsc->dest_lsb_first) i1_image_hlsb_i1(dsc);
+            else i1_image_hmsb_i1(dsc);
+            break;
+        default:
+            break;
+    }
+}
+
+#undef I1_DEFINE_GENERIC_IMAGE
+#undef I1_DEFINE_SOURCE_LAYOUTS
+#undef I1_DEFINE_GENERIC_FILL
+#undef I1_V_LSB_BIT
+#undef I1_V_MSB_BIT
+#undef I1_V_BYTE
+#undef I1_H_LSB_BIT
+#undef I1_H_MSB_BIT
+#undef I1_H_BYTE
 
 #if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
 static inline lv_color16_t LV_ATTRIBUTE_FAST_MEM lv_color16_from_u16(uint16_t raw)
