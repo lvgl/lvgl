@@ -3,6 +3,7 @@
 #include "../lvgl_private.h"
 
 #include "unity/unity.h"
+#include "refr/lv_test_refr.h"
 
 #define LV_ARRAY_GET(array, index, type) ((type*)lv_array_at((array), (index)))
 
@@ -87,6 +88,59 @@ void test_property_is_inherited(void)
 #else
     TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.lp32.png");
 #endif
+}
+
+void test_stretched_svg_is_drawn_in_partial_render_mode(void)
+{
+    static const char svg[] =
+        "<svg width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect width=\"44\" height=\"44\" fill=\"#FF0000\"/>"
+        "</svg>";
+
+    /*Static because the image cache is keyed on the address of the descriptor*/
+    static lv_image_dsc_t svg_dsc;
+    lv_memzero(&svg_dsc, sizeof(svg_dsc));
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 44;
+    svg_dsc.header.h = 44;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    /*A draw buffer of 40 rows, so the 400 rows of the display are rendered in 10 bands*/
+    refr_disp_create(400, 400, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_PARTIAL, 1, 40);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+
+    lv_obj_t * image = lv_image_create(refr_screen());
+    lv_image_set_src(image, &svg_dsc);
+    lv_obj_set_size(image, 400, 400);
+    lv_image_set_inner_align(image, LV_IMAGE_ALIGN_STRETCH);
+
+    refr_frame();
+
+    /*Keep the frame that was assembled from the flushed bands, then drop the display*/
+    lv_draw_buf_t * frame = lv_draw_buf_create(400, 400, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(frame);
+    int32_t y;
+    for(y = 0; y < 400; y++) {
+        lv_memcpy(frame->data + (uint32_t)y * frame->header.stride,
+                  refr_ctx.full_frame_buffer + (uint32_t)y * refr_ctx.full_frame_buffer_stride,
+                  refr_ctx.full_frame_buffer_stride);
+    }
+    refr_disp_delete();
+
+    /*Show it on the test display so it can be compared with a reference image*/
+    lv_obj_t * shown = lv_image_create(lv_screen_active());
+    lv_image_set_src(shown, frame);
+    lv_obj_center(shown);
+
+    /*These draw units render on the GPU, the CPU draw buffer the harness assembles stays
+     *empty, just like `ASSERT_PX_*` is a no-op for them in lv_test_refr.h*/
+#if !(LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES)
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_stretch_partial.png");
+#endif
+
+    lv_obj_delete(shown);
+    lv_draw_buf_destroy(frame);
 }
 
 void testSvgElement(void)
