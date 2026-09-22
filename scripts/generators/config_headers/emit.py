@@ -497,6 +497,8 @@ def generate_internal(kconf: Kconfig, entries) -> str:
         + "\n"
         + templates.INTERNAL_COMPATIBILITY_BLOCK
         + "\n"
+        + templates.INTERNAL_OUTDATED_CONFIG_CHECK_BLOCK
+        + "\n"
         + "\n".join(derived_consts)
         + "\n".join(deferred)
         + "\n".join(custom_inc)

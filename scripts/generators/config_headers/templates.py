@@ -306,6 +306,20 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
  -----------------------------------*/
 """
 
+INTERNAL_OUTDATED_CONFIG_CHECK_BLOCK = r"""
+/*----------------------------------
+ * Start of outdated config check block
+ -----------------------------------*/
+
+#if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP
+    #error LV_COLOR_16_SWAP has been removed. Use LV_COLOR_FORMAT_RGB565_SWAPPED as the display color format instead
+#endif
+
+/*----------------------------------
+ * End of outdated config check block
+ -----------------------------------*/
+"""
+
 INTERNAL_FOOTER = r"""
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
