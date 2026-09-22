@@ -35,6 +35,8 @@ extern "C" {
 #define LV_DRAW_PPA_CACHE_LINE_SIZE CONFIG_CACHE_L2_CACHE_LINE_SIZE
 #elif defined(CONFIG_CACHE_L1_DCACHE_LINE_SIZE)
 #define LV_DRAW_PPA_CACHE_LINE_SIZE CONFIG_CACHE_L1_DCACHE_LINE_SIZE
+#elif defined(CONFIG_ESP32_CACHE_L2_LINE_SIZE)
+#define LV_DRAW_PPA_CACHE_LINE_SIZE CONFIG_ESP32_CACHE_L2_LINE_SIZE
 #else
 #error "Cannot determine the data cache line size for the PPA draw unit"
 #endif
