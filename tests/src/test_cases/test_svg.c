@@ -217,6 +217,7 @@ void test_svg_is_drawn_without_a_widget(void)
 {
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_draw_buf_t * buf = lv_draw_buf_create(120, 120, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
     lv_canvas_set_draw_buf(canvas, buf);
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
 
