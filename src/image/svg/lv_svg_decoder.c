@@ -363,7 +363,7 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * decoder_
     lv_matrix_identity(&matrix);
     dsc->ctx->scissor_area = *clip_area;
     if(image_dsc) {
-        /*Start from the untransformed image area, coords is the integer-rounded transformed bounding box*/
+        /*Start from the untransformed image area*/
         lv_matrix_translate(&matrix, image_dsc->image_area.x1, image_dsc->image_area.y1);
         lv_matrix_translate(&matrix, image_dsc->pivot.x, image_dsc->pivot.y);
         lv_matrix_rotate(&matrix, image_dsc->rotation / 10.0f);
