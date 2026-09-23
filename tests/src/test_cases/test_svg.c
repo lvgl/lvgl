@@ -143,6 +143,101 @@ void test_stretched_svg_is_drawn_in_partial_render_mode(void)
     lv_draw_buf_destroy(frame);
 }
 
+/*Static, because the image cache keeps the source pointer after the test returns*/
+static const lv_image_dsc_t * red_svg_dsc(void)
+{
+    static const char svg[] =
+        "<svg width=\"120\" height=\"120\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect width=\"120\" height=\"120\" fill=\"#FF0000\"/>"
+        "</svg>";
+    static lv_image_dsc_t dsc;
+
+    lv_memzero(&dsc, sizeof(dsc));
+    dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    dsc.header.w = 120;
+    dsc.header.h = 120;
+    dsc.data_size = sizeof(svg) - 1;
+    dsc.data = (const uint8_t *)svg;
+    return &dsc;
+}
+
+/*Black background of its own, so no style is left behind on the screen*/
+static lv_obj_t * svg_test_board(void)
+{
+    lv_obj_t * board = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(board);
+    lv_obj_set_size(board, 460, 380);
+    lv_obj_center(board);
+    lv_obj_set_style_bg_opa(board, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(board, lv_color_black(), 0);
+    return board;
+}
+
+void test_scaled_svg_is_not_clipped_to_the_widget(void)
+{
+    lv_obj_t * board = svg_test_board();
+
+    /*120x120 widget drawn at twice its size around its centre*/
+    lv_obj_t * image = lv_image_create(board);
+    lv_image_set_src(image, red_svg_dsc());
+    lv_obj_set_pos(image, 170, 130);
+    lv_image_set_pivot(image, 60, 60);
+    lv_image_set_scale(image, 2 * LV_SCALE_NONE);
+
+    /*The widget's own area, drawn on top: the picture has to reach outside it*/
+    lv_obj_t * frame = lv_obj_create(board);
+    lv_obj_remove_style_all(frame);
+    lv_obj_set_size(frame, 124, 124);
+    lv_obj_set_pos(frame, 168, 128);
+    lv_obj_set_style_border_width(frame, 1, 0);
+    lv_obj_set_style_border_color(frame, lv_color_white(), 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_scaled_not_clipped.png");
+}
+
+void test_svg_is_drawn_in_a_layer(void)
+{
+    /*NanoVG leaks the vector paths of an SVG drawn in a child layer*/
+#if LV_USE_DRAW_NANOVG
+    TEST_PASS();
+#else
+    lv_obj_t * board = svg_test_board();
+
+    /*Layered opacity renders the widget into a child layer*/
+    lv_obj_t * image = lv_image_create(board);
+    lv_image_set_src(image, red_svg_dsc());
+    lv_obj_set_pos(image, 170, 130);
+    lv_obj_set_style_opa_layered(image, LV_OPA_50, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_in_layer.png");
+#endif
+}
+
+void test_svg_is_drawn_without_a_widget(void)
+{
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_draw_buf_t * buf = lv_draw_buf_create(120, 120, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_canvas_set_draw_buf(canvas, buf);
+    lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
+
+    /*No base.obj: the image is not drawn by a widget*/
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
+    dsc.src = red_svg_dsc();
+    lv_area_t area = {0, 0, 119, 119};
+    lv_draw_image(&layer, &dsc, &area);
+    lv_canvas_finish_layer(canvas, &layer);
+
+    lv_obj_center(canvas);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_without_widget.png");
+
+    lv_obj_delete(canvas);
+    lv_draw_buf_destroy(buf);
+}
+
 void testSvgElement(void)
 {
     const char * svg_1 = \
