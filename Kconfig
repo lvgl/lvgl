@@ -1060,6 +1060,16 @@ config LV_DRAW_EVE_WRITE_BUFFER_SIZE
 endif
 endmenu
 
+menu "EVE5"
+config LV_USE_DRAW_EVE5
+	bool "EVE5 renderer"
+	default n
+	depends on LV_USE_EVE5 && LV_USE_DRAW_VRAM
+	help
+		Render through EVE HAL, including BT820 render targets and VRAM residency.
+		Requires the EVE5 display driver and the VRAM residency module.
+endmenu
+
 menu "G2D"
 config LV_USE_G2D
 	bool "G2D (legacy)"
@@ -2387,6 +2397,29 @@ config LV_USE_LINUX_DRM_GBM_BUFFERS
 	bool
 
 endif # LV_USE_LINUX_DRM
+config LV_USE_EVE5
+	bool "EVE5 display and touch"
+	default n
+	depends on LV_USE_DRAW_VRAM
+	help
+		Display and touch driver using EVE HAL and the EVE GPU allocator.
+		Requires the VRAM residency module and external EVE HAL libraries.
+
+if LV_USE_EVE5
+
+config LV_USE_FS_EVE5_SDCARD
+	bool "EVE5 SD card filesystem"
+	default n
+	help
+		Access files on an SD card connected to the EVE controller.
+
+config LV_USE_FS_EVE5_FLASH
+	bool "EVE5 flash filesystem"
+	default n
+	help
+		Access assets in flash connected to the EVE controller.
+
+endif
 config LV_USE_LINUX_FBDEV
 	bool "Linux framebuffer (fbdev)"
 	default n

@@ -1155,6 +1155,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_DRAW_EVE5
+    #ifdef CONFIG_LV_USE_DRAW_EVE5
+        #define LV_USE_DRAW_EVE5 CONFIG_LV_USE_DRAW_EVE5
+    #else
+        #define LV_USE_DRAW_EVE5 0
+    #endif
+#endif
+
 #ifndef LV_USE_G2D
     #ifdef CONFIG_LV_USE_G2D
         #define LV_USE_G2D CONFIG_LV_USE_G2D
@@ -3178,6 +3186,30 @@
         #define LV_LINUX_DRM_BACKEND CONFIG_LV_LINUX_DRM_BACKEND
     #else
         #define LV_LINUX_DRM_BACKEND LV_LINUX_DRM_BACKEND_FBDEV
+    #endif
+#endif
+
+#ifndef LV_USE_EVE5
+    #ifdef CONFIG_LV_USE_EVE5
+        #define LV_USE_EVE5 CONFIG_LV_USE_EVE5
+    #else
+        #define LV_USE_EVE5 0
+    #endif
+#endif
+
+#ifndef LV_USE_FS_EVE5_SDCARD
+    #ifdef CONFIG_LV_USE_FS_EVE5_SDCARD
+        #define LV_USE_FS_EVE5_SDCARD CONFIG_LV_USE_FS_EVE5_SDCARD
+    #else
+        #define LV_USE_FS_EVE5_SDCARD 0
+    #endif
+#endif
+
+#ifndef LV_USE_FS_EVE5_FLASH
+    #ifdef CONFIG_LV_USE_FS_EVE5_FLASH
+        #define LV_USE_FS_EVE5_FLASH CONFIG_LV_USE_FS_EVE5_FLASH
+    #else
+        #define LV_USE_FS_EVE5_FLASH 0
     #endif
 #endif
 
@@ -5393,6 +5425,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_SIFLI_EPIC_ASSERT requires LV_USE_SIFLI_EPIC (Kconfig depends on)"
 #endif
 
+#if LV_USE_DRAW_EVE5 && !(LV_USE_EVE5 && LV_USE_DRAW_VRAM)
+    #error "LV_USE_DRAW_EVE5 requires LV_USE_EVE5 && LV_USE_DRAW_VRAM (Kconfig depends on)"
+#endif
+
 #if (LV_USE_G2D || (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)) && !LV_USE_DRAW_G2D
     #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_USE_G2D || (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)"
 #endif
@@ -5503,6 +5539,18 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if (LV_USE_FILE_EXPLORER) && !LV_USE_TABLE
     #error "LV_USE_TABLE must be enabled: Kconfig selects it from LV_USE_FILE_EXPLORER"
+#endif
+
+#if LV_USE_EVE5 && !(LV_USE_DRAW_VRAM)
+    #error "LV_USE_EVE5 requires LV_USE_DRAW_VRAM (Kconfig depends on)"
+#endif
+
+#if LV_USE_FS_EVE5_SDCARD && !(LV_USE_EVE5)
+    #error "LV_USE_FS_EVE5_SDCARD requires LV_USE_EVE5 (Kconfig depends on)"
+#endif
+
+#if LV_USE_FS_EVE5_FLASH && !(LV_USE_EVE5)
+    #error "LV_USE_FS_EVE5_FLASH requires LV_USE_EVE5 (Kconfig depends on)"
 #endif
 
 #if LV_LINUX_FBDEV_BSD && !(LV_USE_LINUX_FBDEV)

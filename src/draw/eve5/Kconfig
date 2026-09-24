@@ -1,0 +1,7 @@
+config LV_USE_DRAW_EVE5
+	bool "EVE5 renderer"
+	default n
+	depends on LV_USE_EVE5 && LV_USE_DRAW_VRAM
+	help
+		Render through EVE HAL, including BT820 render targets and VRAM residency.
+		Requires the EVE5 display driver and the VRAM residency module.
