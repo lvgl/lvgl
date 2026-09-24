@@ -490,8 +490,11 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
 
     lv_layer_t * layer = dsc->base.layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
-    if(draw_buf == NULL)
+    if(draw_buf == NULL) {
+        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
+        dsc->task_list = NULL;
         return;
+    }
 
     void * buf = draw_buf->data;
     int32_t width = lv_area_get_width(&layer->buf_area);
