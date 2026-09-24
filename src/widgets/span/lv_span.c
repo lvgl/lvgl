@@ -795,7 +795,6 @@ lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_CHECK_ARG(span != NULL, return NULL);
-    LV_CHECK_OBJ(span, &span_class, return NULL);
     LV_CHECK_ARG(subject, return NULL);
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT ||
                  subject->type == LV_SUBJECT_TYPE_STRING || subject->type == LV_SUBJECT_TYPE_POINTER,
