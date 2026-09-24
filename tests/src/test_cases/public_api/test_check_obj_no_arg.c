@@ -1,6 +1,7 @@
 #if LV_BUILD_TEST
-/* Variant: LV_USE_CHECK_ARG=0 */
 #define LV_USE_CHECK_ARG 0
+#define LV_USE_CHECK_OBJ_CLASSTYPE 0
+#define LV_USE_CHECK_OBJ_VALIDITY 0
 #include "../lvgl.h"
 #include "test_cases/public_api/test_check_obj_impl.h"
 
