@@ -220,6 +220,26 @@ void lv_eve5_set_coprocessor_reset_handler(lv_display_t * disp,
                                            void (*handler)(struct _lv_draw_unit_t * draw_unit));
 
 /**
+ * Read back the frame the display is showing, for screenshots and tests.
+ *
+ * Nothing is rendered and RAM_G is not written, so this works the same on
+ * hardware as on the emulator:
+ *   - BT820: waits for the render engine, then reads the scanout buffer from
+ *     RAM_G. Only PARTIAL mode is supported, where the swapchain is single
+ *     buffered; in FULL mode the driver does not know which of the two
+ *     buffers is on screen.
+ *   - EVE1–EVE4: renders the display list line by line into RAM_COMPOSITE
+ *     through the REG_SNAPSHOT registers, which stops the scanout meanwhile.
+ *
+ * @param disp   pointer to an EVE5 display
+ * @param buf    destination, width × height pixels of 4 bytes, R, G, B and
+ *               0xFF, the byte order of lv_test_screenshot_compare()
+ * @param stride bytes per row in buf
+ * @return       true on success
+ */
+bool lv_eve5_read_screen(lv_display_t * disp, uint8_t * buf, uint32_t stride);
+
+/**
  * Get the EVE HAL context from the display
  * @param disp pointer to an EVE5 display
  * @return     pointer to EVE HAL context, or NULL if invalid

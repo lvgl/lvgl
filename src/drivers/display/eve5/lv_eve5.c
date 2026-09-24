@@ -403,6 +403,84 @@ void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync)
     drvr->full_frame_hw_rendered = true;
 }
 
+bool lv_eve5_read_screen(lv_display_t * disp, uint8_t * buf, uint32_t stride)
+{
+    if(disp == NULL || buf == NULL) return false;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL || drvr->hal == NULL) return false;
+    EVE_HalContext * phost = drvr->hal;
+    uint32_t w = phost->Width;
+    uint32_t h = phost->Height;
+    bool ok = false;
+
+#if LV_USE_OS
+    lv_mutex_lock(&drvr->hal_mutex);
+#endif
+
+#ifdef EVE_SUPPORT_RENDERTARGET
+    if(EVE_Hal_supportRenderTarget(phost)) {
+        if(drvr->render_mode != LV_EVE5_RENDER_MODE_PARTIAL) {
+            LV_LOG_WARN("EVE5: read_screen needs PARTIAL mode, the FULL mode front buffer is unknown");
+        }
+        else {
+            /* The last CMD_SWAP may still be rendering into the scanout buffer */
+            EVE_CoCmd_graphicsFinish(phost);
+            EVE_Cmd_waitFlush(phost);
+
+            /* PARTIAL mode aliases PTR1 to PTR0, so frame_buffer_0 is on
+             * screen. RGB8 stores B, G, R per pixel. */
+            uint32_t row_bytes = w * FB_BYTES_PER_PIXEL;
+            uint8_t * row = lv_malloc(row_bytes);
+            if(row != NULL) {
+                for(uint32_t y = 0; y < h; y++) {
+                    EVE_Hal_rdMem(phost, row, drvr->frame_buffer_0 + y * row_bytes, row_bytes);
+                    uint8_t * dst = buf + y * stride;
+                    for(uint32_t x = 0; x < w; x++) {
+                        dst[x * 4 + 0] = row[x * 3 + 2];
+                        dst[x * 4 + 1] = row[x * 3 + 1];
+                        dst[x * 4 + 2] = row[x * 3 + 0];
+                        dst[x * 4 + 3] = 0xFF;
+                    }
+                }
+                lv_free(row);
+                ok = true;
+            }
+        }
+    }
+    else
+#endif
+    {
+#if (EVE_SUPPORT_CHIPID < EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        /* Register snapshot, as in eve_common's vc1dump: render one line at a
+         * time into RAM_COMPOSITE as ARGB8 (B, G, R, A bytes). */
+        EVE_Cmd_waitFlush(phost);
+        EVE_Hal_wr32(phost, REG_SNAPFORMAT, 0x20);
+        EVE_Hal_wr32(phost, REG_RENDERMODE, 1);
+        for(uint32_t y = 0; y < h; y++) {
+            uint8_t * dst = buf + y * stride;
+            EVE_Hal_wr32(phost, REG_SNAPY, y);
+            EVE_Hal_wr32(phost, REG_SNAPSHOT, 1);
+            while(EVE_Hal_rd32(phost, REG_BUSYBITS) != 0) {
+            }
+            EVE_Hal_rdMem(phost, dst, RAM_COMPOSITE, w * 4);
+            for(uint32_t x = 0; x < w; x++) {
+                uint8_t b = dst[x * 4 + 0];
+                dst[x * 4 + 0] = dst[x * 4 + 2];
+                dst[x * 4 + 2] = b;
+                dst[x * 4 + 3] = 0xFF;
+            }
+        }
+        EVE_Hal_wr32(phost, REG_RENDERMODE, 0);
+        ok = true;
+#endif
+    }
+
+#if LV_USE_OS
+    lv_mutex_unlock(&drvr->hal_mutex);
+#endif
+    return ok;
+}
+
 void lv_eve5_request_invalidate(lv_display_t * disp)
 {
     if(disp == NULL) return;
