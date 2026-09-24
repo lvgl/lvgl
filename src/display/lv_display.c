@@ -1140,6 +1140,15 @@ void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
     disp->matrix_rotation = enable;
 }
 
+#if LV_USE_DRAW_VRAM
+void lv_display_set_flush_from_vram(lv_display_t * disp, bool enable)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+
+    disp->flush_from_vram = enable;
+}
+#endif
+
 bool lv_display_get_matrix_rotation(lv_display_t * disp)
 {
     if(disp == NULL) {

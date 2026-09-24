@@ -1442,6 +1442,16 @@ static void draw_buf_flush(lv_display_t * disp)
 
     bool flushing_last = disp->flushing_last;
 
+#if LV_USE_DRAW_VRAM
+    /*A draw unit with VRAM may have left the frame only there, but flush_cb, or the application
+     *without one, reads it from CPU memory*/
+    if(!disp->flush_from_vram && layer->draw_buf->vram_res != NULL) {
+        if(!lv_draw_buf_ensure_resident(layer->draw_buf, NULL)) {
+            LV_LOG_WARN("Could not bring the frame to CPU memory for flushing");
+        }
+    }
+#endif
+
     if(disp->flush_cb) {
         call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf->data);
     }

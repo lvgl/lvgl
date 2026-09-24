@@ -549,6 +549,10 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
 {
     LV_CHECK_ARG(src != NULL, return LV_RESULT_INVALID);
+#if LV_USE_DRAW_VRAM
+    /*A draw unit may have left the pixels only in VRAM*/
+    if(!lv_draw_buf_ensure_resident(src, NULL)) return LV_RESULT_INVALID;
+#endif
     LV_CHECK_ARG(src->data != NULL, return LV_RESULT_INVALID);
     LV_PROFILER_DRAW_BEGIN;
 
@@ -620,6 +624,10 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
     LV_CHECK_ARG(draw_buf != NULL, return LV_RESULT_INVALID);
     LV_CHECK_ARG(!lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED), return LV_RESULT_INVALID);
     LV_CHECK_ARG(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_MODIFIABLE), return LV_RESULT_INVALID);
+#if LV_USE_DRAW_VRAM
+    /*A draw unit may have left the pixels only in VRAM*/
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return LV_RESULT_INVALID;
+#endif
 
     LV_PROFILER_DRAW_BEGIN;
 
@@ -645,6 +653,10 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
 void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color)
 {
     LV_CHECK_ARG(draw_buf != NULL, return);
+#if LV_USE_DRAW_VRAM
+    /*A draw unit may have left the palette only in VRAM*/
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return;
+#endif
     LV_CHECK_ARG(draw_buf->data != NULL, return);
     LV_CHECK_ARG_MSG(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf), return, "Color format is not indexed");
 

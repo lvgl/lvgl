@@ -167,6 +167,17 @@ void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation
  */
 void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable);
 
+#if LV_USE_DRAW_VRAM
+/**
+ * Pass the draw buffer to the flush callback as the draw unit left it, which can be
+ * only in VRAM, with `px_map` NULL or stale. For drivers that present the frame from
+ * VRAM themselves. By default the buffer is brought back to CPU memory before flushing.
+ * @param disp      pointer to a display
+ * @param enable    true: flush from VRAM; false: flush from CPU memory
+ */
+void lv_display_set_flush_from_vram(lv_display_t * disp, bool enable);
+#endif
+
 /**
  * Set the DPI (dot per inch) of the display.
  * dpi = sqrt(hor_res^2 + ver_res^2) / diagonal"
