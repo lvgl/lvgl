@@ -105,6 +105,12 @@ extern "C" {
 /* L8 render-target alpha recovery for tasks that trash alpha. See lv_draw_eve5.c header. */
 #define EVE5_USE_RENDERTARGET_ALPHA 1
 
+/* Diagnostics: log the display list entries each task and each render target
+ * use, measured with REG_CMD_DL after draining the command FIFO (slow) */
+#ifndef EVE5_DL_STATS
+#define EVE5_DL_STATS 0
+#endif
+
 /* Test mode: split each layer's task queue into two slices at a varying point */
 #ifndef EVE5_TEST_SLICE_SPLIT
 #define EVE5_TEST_SLICE_SPLIT 0
@@ -264,11 +270,27 @@ typedef struct {
 #endif
 } image_skew_t;
 
-/* A compressed image in memory (LV_IMAGE_SRC_VARIABLE) is not a bitmap, it
- * has to be decoded like a file */
-static inline bool eve5_image_is_compressed(const void * src)
+/* Area a transformed image's bitmap is drawn over, clipped by the scissor:
+ * its transformed bounds rather than the clip area, so the bitmap transform,
+ * and its rounding, doesn't depend on which part of the image a tile or a
+ * partial refresh draws, which would show as seams. Bounds too large for
+ * BITMAP_SIZE fall back to the clip area. */
+static inline const lv_area_t * eve5_transform_area(const lv_draw_task_t * t)
 {
-    return (((const lv_image_dsc_t *)src)->header.flags & LV_IMAGE_FLAGS_COMPRESSED) != 0;
+    if(lv_area_get_width(&t->_real_area) > 2048 || lv_area_get_height(&t->_real_area) > 2048) {
+        return &t->clip_area;
+    }
+    return &t->_real_area;
+}
+
+/* A compressed image in memory (LV_IMAGE_SRC_VARIABLE), or one that holds
+ * encoded data such as a PNG file (RAW color formats), is not a bitmap: it
+ * has to be decoded like a file */
+static inline bool eve5_image_needs_decoder(const void * src)
+{
+    const lv_image_header_t * header = &((const lv_image_dsc_t *)src)->header;
+    return (header->flags & LV_IMAGE_FLAGS_COMPRESSED) != 0
+           || header->cf == LV_COLOR_FORMAT_RAW || header->cf == LV_COLOR_FORMAT_RAW_ALPHA;
 }
 
 /* EVE REPEAT wrap mode masks against next_pow2(BITMAP_SIZE_H) - 1, so it only

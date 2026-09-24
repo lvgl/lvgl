@@ -175,9 +175,12 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, EVE_GpuAlloc *allocator,
 
     lv_display_set_driver_data(disp, drvr);
     lv_display_set_flush_cb(disp, flush_cb);
+    /* flush_cb composites from VRAM, don't bring the tiles back to the CPU */
+    lv_display_set_flush_from_vram(disp, true);
     lv_display_set_flush_wait_cb(disp, wait_cb);
 
-    /* Expand invalidated areas by 1px to cover EVE's AA fringe bleed */
+    /* Expand invalidated areas by 1px to cover EVE's AA fringe bleed, and
+     * align them to the render engine's 16 pixel sampling groups */
     lv_display_add_event_cb(disp, invalidate_area_cb, LV_EVENT_INVALIDATE_AREA, NULL);
 
     /* Drain deferred-invalidate requests from the draw unit after each refresh */
@@ -419,32 +422,34 @@ bool lv_eve5_read_screen(lv_display_t * disp, uint8_t * buf, uint32_t stride)
 
 #ifdef EVE_SUPPORT_RENDERTARGET
     if(EVE_Hal_supportRenderTarget(phost)) {
-        if(drvr->render_mode != LV_EVE5_RENDER_MODE_PARTIAL) {
-            LV_LOG_WARN("EVE5: read_screen needs PARTIAL mode, the FULL mode front buffer is unknown");
-        }
-        else {
-            /* The last CMD_SWAP may still be rendering into the scanout buffer */
-            EVE_CoCmd_graphicsFinish(phost);
-            EVE_Cmd_waitFlush(phost);
+        /* The last CMD_SWAP may still be rendering into the scanout buffer */
+        EVE_CoCmd_graphicsFinish(phost);
+        EVE_Cmd_waitFlush(phost);
 
-            /* PARTIAL mode aliases PTR1 to PTR0, so frame_buffer_0 is on
-             * screen. RGB8 stores B, G, R per pixel. */
-            uint32_t row_bytes = w * FB_BYTES_PER_PIXEL;
-            uint8_t * row = lv_malloc(row_bytes);
-            if(row != NULL) {
-                for(uint32_t y = 0; y < h; y++) {
-                    EVE_Hal_rdMem(phost, row, drvr->frame_buffer_0 + y * row_bytes, row_bytes);
-                    uint8_t * dst = buf + y * stride;
-                    for(uint32_t x = 0; x < w; x++) {
-                        dst[x * 4 + 0] = row[x * 3 + 2];
-                        dst[x * 4 + 1] = row[x * 3 + 1];
-                        dst[x * 4 + 2] = row[x * 3 + 0];
-                        dst[x * 4 + 3] = 0xFF;
-                    }
+        /* PARTIAL mode aliases PTR1 to PTR0, so frame_buffer_0 is on screen.
+         * FULL mode alternates between two buffers and which one is on
+         * screen isn't known, so the frame only counts when both agree. */
+        bool double_buffered = drvr->frame_buffer_1 != drvr->frame_buffer_0;
+        uint32_t row_bytes = w * FB_BYTES_PER_PIXEL;
+        uint8_t * row = lv_malloc(row_bytes * 2);
+        if(row != NULL) {
+            ok = true;
+            for(uint32_t y = 0; y < h && ok; y++) {
+                EVE_Hal_rdMem(phost, row, drvr->frame_buffer_0 + y * row_bytes, row_bytes);
+                if(double_buffered) {
+                    EVE_Hal_rdMem(phost, row + row_bytes, drvr->frame_buffer_1 + y * row_bytes, row_bytes);
+                    if(lv_memcmp(row, row + row_bytes, row_bytes) != 0) ok = false;
                 }
-                lv_free(row);
-                ok = true;
+                /* RGB8 stores B, G, R per pixel */
+                uint8_t * dst = buf + y * stride;
+                for(uint32_t x = 0; x < w; x++) {
+                    dst[x * 4 + 0] = row[x * 3 + 2];
+                    dst[x * 4 + 1] = row[x * 3 + 1];
+                    dst[x * 4 + 2] = row[x * 3 + 0];
+                    dst[x * 4 + 3] = 0xFF;
+                }
             }
+            lv_free(row);
         }
     }
     else
@@ -725,9 +730,13 @@ static void invalidate_area_cb(lv_event_t * e)
     if(area == NULL) return;
 
     lv_display_t * disp = lv_event_get_target(e);
-    area->x1 = LV_MAX(area->x1 - 1, 0);
+    /* The render engine samples bitmaps with a precision that depends on the
+     * pixel's x position within its 16 pixel group, relative to the render
+     * target. Keeping tiles on the same 16 pixel grid as the full screen makes
+     * a partial redraw sample transformed bitmaps exactly like a full one. */
+    area->x1 = LV_MAX(area->x1 - 1, 0) & ~15;
     area->y1 = LV_MAX(area->y1 - 1, 0);
-    area->x2 = LV_MIN(area->x2 + 1, lv_display_get_horizontal_resolution(disp) - 1);
+    area->x2 = LV_MIN((area->x2 + 1) | 15, lv_display_get_horizontal_resolution(disp) - 1);
     area->y2 = LV_MIN(area->y2 + 1, lv_display_get_vertical_resolution(disp) - 1);
 }
 

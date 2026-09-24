@@ -104,7 +104,7 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
     lv_memzero(resolved, sizeof(*resolved));
 
     lv_image_src_t src_type = lv_image_src_get_type(src);
-    if(src_type == LV_IMAGE_SRC_VARIABLE && !eve5_image_is_compressed(src)) {
+    if(src_type == LV_IMAGE_SRC_VARIABLE && !eve5_image_needs_decoder(src)) {
         resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)src;
         resolved->decoder_open = false;
         if(draw_unit != NULL) {
@@ -116,7 +116,7 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
         return true;
     }
 
-    /* Files, and compressed images in memory, go through the decoders */
+    /* Files, and images in memory that aren't bitmaps, go through the decoders */
     if(src_type == LV_IMAGE_SRC_FILE || src_type == LV_IMAGE_SRC_VARIABLE) {
         lv_image_decoder_args_t args;
         lv_memzero(&args, sizeof(args));
@@ -1256,7 +1256,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const 
 {
     lv_image_src_t src_type = lv_image_src_get_type(src);
 
-    if(src_type == LV_IMAGE_SRC_FILE || (src_type == LV_IMAGE_SRC_VARIABLE && eve5_image_is_compressed(src))) {
+    if(src_type == LV_IMAGE_SRC_FILE || (src_type == LV_IMAGE_SRC_VARIABLE && eve5_image_needs_decoder(src))) {
         eve5_resolved_image_t resolved = {0};
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));

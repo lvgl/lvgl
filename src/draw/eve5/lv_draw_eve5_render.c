@@ -191,6 +191,11 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
 
         t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
 
+#if EVE5_DL_STATS
+        EVE_Cmd_waitFlush(u->hal);
+        uint32_t dl_stats_before = EVE_Hal_rd32(u->hal, REG_CMD_DL);
+#endif
+
         EVE5_LOG("EVE5: Render task: type=%-10s area=(%d,%d)-(%d,%d)",
                  task_type_str(t->type),
                  t->area.x1, t->area.y1, t->area.x2, t->area.y2);
@@ -328,6 +333,13 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
                 EVE5_LOG("EVE5:   Unhandled task type %d, skipping", t->type);
                 break;
         }
+
+#if EVE5_DL_STATS
+        EVE_Cmd_waitFlush(u->hal);
+        LV_LOG_USER("DLSTAT task %s %" LV_PRIu32 " area %" LV_PRId32 "x%" LV_PRId32,
+                    task_type_str(t->type), (EVE_Hal_rd32(u->hal, REG_CMD_DL) - dl_stats_before) / 4,
+                    lv_area_get_width(&t->area), lv_area_get_height(&t->area));
+#endif
 
         if(finish_tasks) t->state = LV_DRAW_TASK_STATE_FINISHED;
         rendered_count++;

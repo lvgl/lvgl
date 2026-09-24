@@ -891,6 +891,12 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         }
     }
 
+#if EVE5_DL_STATS
+    EVE_Cmd_waitFlush(u->hal);
+    LV_LOG_USER("DLSTAT layer %" LV_PRIu32 " tasks %d screen %d", EVE_Hal_rd32(u->hal, REG_CMD_DL) / 4,
+                rendered_count, (int)is_screen);
+#endif
+
     EVE_CoDl_display(u->hal);
     EVE_CoCmd_swap(u->hal);
     EVE_CoCmd_graphicsFinish(u->hal);

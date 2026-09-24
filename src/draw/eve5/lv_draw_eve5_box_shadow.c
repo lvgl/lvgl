@@ -339,6 +339,39 @@ void lv_draw_eve5_box_shadow_init(lv_draw_eve5_unit_t * u)
 }
 
 /**
+ * LVGL draws a shadow only outside its widget, which shows where the widget's
+ * background doesn't cover it. Marks the widget's rounded rectangle in the
+ * stencil over the shadow's area and leaves the stencil test drawing where it
+ * is clear. The caller restores the stencil state with its saved context.
+ */
+static void exclude_widget_area(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
+                                const lv_draw_box_shadow_dsc_t * dsc)
+{
+    EVE_HalContext * phost = u->hal;
+    lv_layer_t * layer = t->target_layer;
+    const lv_area_t * bg = &t->area;
+    int32_t lx = layer->buf_area.x1;
+    int32_t ly = layer->buf_area.y1;
+
+    int32_t r_bg = dsc->radius;
+    int32_t short_side = LV_MIN(lv_area_get_width(bg), lv_area_get_height(bg));
+    if(r_bg > short_side / 2) r_bg = short_side / 2;
+
+    lv_draw_eve5_clear_stencil(u, t->_real_area.x1 - lx, t->_real_area.y1 - ly,
+                               t->_real_area.x2 - lx, t->_real_area.y2 - ly,
+                               &t->clip_area, &layer->buf_area);
+    EVE_CoDl_saveContext(phost);
+    EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
+    EVE_CoDl_stencilOp(phost, KEEP, REPLACE);
+    EVE_CoDl_stencilFunc(phost, ALWAYS, 255, 255);
+    lv_draw_eve5_draw_rect(u, bg->x1 - lx, bg->y1 - ly, bg->x2 - lx, bg->y2 - ly, r_bg,
+                           &t->clip_area, &layer->buf_area);
+    EVE_CoDl_restoreContext(phost);
+    EVE_CoDl_stencilOp(phost, KEEP, KEEP);
+    EVE_CoDl_stencilFunc(phost, NOTEQUAL, 255, 255);
+}
+
+/**
  * Render box shadow using 9-slice Gaussian textures.
  */
 void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
@@ -412,6 +445,7 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_tas
 
     EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
+    if(!dsc->bg_cover) exclude_widget_area(u, t, dsc);
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
     EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
@@ -565,7 +599,23 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_tas
  * For direct-to-alpha: redraw 9-slice with L8 textures. Since A=L, the
  * Gaussian gradient is captured as varying alpha, modulated by colorA(dsc->opa).
  */
+static void alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb);
+
 void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
+{
+    const lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
+    if(dsc->bg_cover || dsc->opa <= LV_OPA_MIN || dsc->width <= 0) {
+        alpha_draw_box_shadow(u, t, alpha_to_rgb);
+        return;
+    }
+
+    EVE_CoDl_saveContext(u->hal);
+    exclude_widget_area(u, t, dsc);
+    alpha_draw_box_shadow(u, t, alpha_to_rgb);
+    EVE_CoDl_restoreContext(u->hal);
+}
+
+static void alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
     EVE_HalContext *phost = u->hal;
     lv_layer_t * layer = t->target_layer;

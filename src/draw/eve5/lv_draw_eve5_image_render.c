@@ -298,8 +298,9 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         int32_t draw_y = dsc->tile ? (dsc->image_area.y1 - layer->buf_area.y1) : y;
         if(dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE
            || dsc->skew_x != 0 || dsc->skew_y != 0) {
-            int32_t clip_x = t->clip_area.x1 - layer->buf_area.x1;
-            int32_t clip_y = t->clip_area.y1 - layer->buf_area.y1;
+            const lv_area_t * transform_area = eve5_transform_area(t);
+            int32_t clip_x = transform_area->x1 - layer->buf_area.x1;
+            int32_t clip_y = transform_area->y1 - layer->buf_area.y1;
             draw_x = clip_x;
             draw_y = clip_y;
 
@@ -327,8 +328,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
                 EVE_CoCmd_translate(u->hal, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
                 EVE_CoCmd_setMatrix(u->hal);
                 EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                                    LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                                    LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                                    LV_MIN(lv_area_get_width(transform_area), 2048),
+                                    LV_MIN(lv_area_get_height(transform_area), 2048));
             }
         }
 
@@ -553,9 +554,10 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         bool has_skew = (dsc->skew_x != 0 || dsc->skew_y != 0);
 
         int32_t draw_vx, draw_vy;
+        const lv_area_t * transform_area = eve5_transform_area(t);
         if(has_transform) {
-            draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-            draw_vy = t->clip_area.y1 - layer->buf_area.y1;
+            draw_vx = transform_area->x1 - layer->buf_area.x1;
+            draw_vy = transform_area->y1 - layer->buf_area.y1;
         }
         else {
             draw_vx = dsc->tile ? (dsc->image_area.x1 - layer->buf_area.x1) : x;
@@ -597,8 +599,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoCmd_setMatrix(u->hal);
             EVE_CoCmd_loadIdentity(u->hal);
             EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                                LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                                LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                                LV_MIN(lv_area_get_width(transform_area), 2048),
+                                LV_MIN(lv_area_get_height(transform_area), 2048));
         }
 
         if(has_colorkey) {

@@ -225,9 +225,9 @@ void lv_eve5_set_coprocessor_reset_handler(lv_display_t * disp,
  * Nothing is rendered and RAM_G is not written, so this works the same on
  * hardware as on the emulator:
  *   - BT820: waits for the render engine, then reads the scanout buffer from
- *     RAM_G. Only PARTIAL mode is supported, where the swapchain is single
- *     buffered; in FULL mode the driver does not know which of the two
- *     buffers is on screen.
+ *     RAM_G. In FULL mode the driver does not know which of the two swapchain
+ *     buffers is on screen, so it fails unless both hold the same frame;
+ *     presenting the frame once more makes them agree.
  *   - EVE1–EVE4: renders the display list line by line into RAM_COMPOSITE
  *     through the REG_SNAPSHOT registers, which stops the scanout meanwhile.
  *

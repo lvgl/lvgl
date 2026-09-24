@@ -62,8 +62,8 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t * u,
 
     int32_t draw_vx, draw_vy;
     if(has_transform) {
-        draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-        draw_vy = t->clip_area.y1 - layer->buf_area.y1;
+        draw_vx = eve5_transform_area(t)->x1 - layer->buf_area.x1;
+        draw_vy = eve5_transform_area(t)->y1 - layer->buf_area.y1;
     }
     else {
         draw_vx = dsc->tile ? (dsc->image_area.x1 - layer->buf_area.x1) : img_x;
@@ -119,8 +119,8 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t * u,
         EVE_CoCmd_setMatrix(phost);
         EVE_CoCmd_loadIdentity(phost);
         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                            LV_MIN(lv_area_get_width(eve5_transform_area(t)), 2048),
+                            LV_MIN(lv_area_get_height(eve5_transform_area(t)), 2048));
     }
 
     /* Build 6-pass colorkey stencil */
@@ -330,8 +330,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
 
                     int32_t draw_vx, draw_vy;
                     if(has_transform) {
-                        draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-                        draw_vy = t->clip_area.y1 - layer->buf_area.y1;
+                        draw_vx = eve5_transform_area(t)->x1 - layer->buf_area.x1;
+                        draw_vy = eve5_transform_area(t)->y1 - layer->buf_area.y1;
                     }
                     else {
                         draw_vx = dsc->tile ? (dsc->image_area.x1 - layer->buf_area.x1) : x;
@@ -365,8 +365,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
                         EVE_CoCmd_setMatrix(phost);
                         EVE_CoCmd_loadIdentity(phost);
                         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                                            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                                            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                                            LV_MIN(lv_area_get_width(eve5_transform_area(t)), 2048),
+                                            LV_MIN(lv_area_get_height(eve5_transform_area(t)), 2048));
                     }
 
                     EVE_CoDl_begin(phost, BITMAPS);
@@ -501,8 +501,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
 
     int32_t draw_vx, draw_vy;
     if(has_transform) {
-        draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-        draw_vy = t->clip_area.y1 - layer->buf_area.y1;
+        draw_vx = eve5_transform_area(t)->x1 - layer->buf_area.x1;
+        draw_vy = eve5_transform_area(t)->y1 - layer->buf_area.y1;
     }
     else {
         draw_vx = dsc->tile ? (dsc->image_area.x1 - layer->buf_area.x1) : x;
@@ -547,8 +547,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
         EVE_CoCmd_loadIdentity(phost);
         /* Expand bitmapSize to cover rotated/scaled output */
         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                            LV_MIN(lv_area_get_width(eve5_transform_area(t)), 2048),
+                            LV_MIN(lv_area_get_height(eve5_transform_area(t)), 2048));
     }
 
     if(has_colorkey) {
