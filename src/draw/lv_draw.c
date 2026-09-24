@@ -568,11 +568,14 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer, lv_draw_unit_t * draw_unit)
 }
 
 #if LV_USE_DRAW_VRAM
-/*An image in memory can be made resident unless it is compressed, which only the decoders can read*/
+/*An image in memory can be made resident unless it is compressed or holds encoded data (RAW color
+ *formats), which only the decoders can read*/
 static bool is_resident_image_src(const void * src)
 {
-    return src && lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE &&
-           !(((const lv_image_dsc_t *)src)->header.flags & LV_IMAGE_FLAGS_COMPRESSED);
+    if(src == NULL || lv_image_src_get_type(src) != LV_IMAGE_SRC_VARIABLE) return false;
+    const lv_image_header_t * header = &((const lv_image_dsc_t *)src)->header;
+    return !(header->flags & LV_IMAGE_FLAGS_COMPRESSED) &&
+           header->cf != LV_COLOR_FORMAT_RAW && header->cf != LV_COLOR_FORMAT_RAW_ALPHA;
 }
 
 bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t * unit)
