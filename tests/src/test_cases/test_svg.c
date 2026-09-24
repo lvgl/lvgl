@@ -197,10 +197,6 @@ void test_scaled_svg_is_not_clipped_to_the_widget(void)
 
 void test_svg_is_drawn_in_a_layer(void)
 {
-    /*NanoVG leaks the vector paths of an SVG drawn in a child layer*/
-#if LV_USE_DRAW_NANOVG
-    TEST_PASS();
-#else
     lv_obj_t * board = svg_test_board();
 
     /*Layered opacity renders the widget into a child layer*/
@@ -209,7 +205,13 @@ void test_svg_is_drawn_in_a_layer(void)
     lv_obj_set_pos(image, 170, 130);
     lv_obj_set_style_opa_layered(image, LV_OPA_50, 0);
 
+    /*NanoVG draws nothing into a child layer yet, so the result is not compared there.
+     *The scene is still rendered, so that the sanitizers see the vector paths being
+     *freed at the end of the run*/
+#if !LV_USE_DRAW_NANOVG
     TEST_ASSERT_EQUAL_SCREENSHOT("svg_in_layer.png");
+#else
+    lv_refr_now(NULL);
 #endif
 }
 
@@ -237,6 +239,48 @@ void test_svg_is_drawn_without_a_widget(void)
 
     lv_obj_delete(canvas);
     lv_draw_buf_destroy(buf);
+}
+
+void test_svg_drop_shadow_is_drawn(void)
+{
+    /*Static, because the image cache keeps the source pointer after the test returns*/
+    static const char svg[] =
+        "<svg width=\"120\" height=\"120\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect x=\"10\" y=\"10\" width=\"100\" height=\"100\" fill=\"#FF0000\"/>"
+        "</svg>";
+    static lv_image_dsc_t svg_dsc;
+    lv_memzero(&svg_dsc, sizeof(svg_dsc));
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 120;
+    svg_dsc.header.h = 120;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    /*Own background, so no style is left behind on the screen*/
+    lv_obj_t * board = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(board);
+    lv_obj_set_size(board, 460, 380);
+    lv_obj_center(board);
+    lv_obj_set_style_bg_opa(board, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(board, lv_color_white(), 0);
+
+    /*The shadow is rendered into an A8 layer, which is where the SVG used to be dropped*/
+    lv_obj_t * image = lv_image_create(board);
+    lv_image_set_src(image, &svg_dsc);
+    lv_obj_set_pos(image, 150, 110);
+    lv_obj_set_style_drop_shadow_radius(image, 12, 0);
+    lv_obj_set_style_drop_shadow_offset_x(image, 20, 0);
+    lv_obj_set_style_drop_shadow_offset_y(image, 20, 0);
+    lv_obj_set_style_drop_shadow_color(image, lv_color_black(), 0);
+    lv_obj_set_style_drop_shadow_opa(image, LV_OPA_COVER, 0);
+
+    /*NanoVG has its own blend path and does not produce the shadow yet, so the result is
+     *not compared there. The scene is still rendered, as above*/
+#if !LV_USE_DRAW_NANOVG
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_drop_shadow.png");
+#else
+    lv_refr_now(NULL);
+#endif
 }
 
 void testSvgElement(void)

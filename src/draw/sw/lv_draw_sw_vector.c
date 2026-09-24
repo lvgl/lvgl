@@ -20,6 +20,7 @@
 #include "blend/lv_draw_sw_blend_private.h"
 #include "blend/lv_draw_sw_blend_to_rgb565.h"
 #include "blend/lv_draw_sw_blend_to_rgb888.h"
+#include "blend/lv_draw_sw_blend_to_a8.h"
 
 /*********************
  *      DEFINES
@@ -423,6 +424,11 @@ static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area
             lv_draw_sw_blend_image_to_rgb888(&fill_dsc, 3);
             break;
 #endif
+#if LV_DRAW_SW_SUPPORT_A8
+        case LV_COLOR_FORMAT_A8:
+            lv_draw_sw_blend_image_to_a8(&fill_dsc);
+            break;
+#endif
         default:
             break;
     }
@@ -484,8 +490,11 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
 
     lv_layer_t * layer = dsc->base.layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
-    if(draw_buf == NULL)
+    if(draw_buf == NULL) {
+        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
+        dsc->task_list = NULL;
         return;
+    }
 
     void * buf = draw_buf->data;
     int32_t width = lv_area_get_width(&layer->buf_area);
