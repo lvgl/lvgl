@@ -10,6 +10,7 @@
     "coding_style",
     "assertions",
     "deprecations",
+    "perf_qemu",
     "configuration"
   ]
 }
