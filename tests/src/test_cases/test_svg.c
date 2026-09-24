@@ -997,4 +997,53 @@ void testBadCase(void)
     lv_svg_node_delete(svg);
 }
 
+void test_rotated_svg_keeps_its_position(void)
+{
+    /*Red square with a blue marker in one corner, so a wrong rotation origin is visible.
+     *Static, because the image cache keeps the source pointer*/
+    static const char svg[] =
+        "<svg width=\"120\" height=\"120\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect x=\"6\" y=\"6\" width=\"108\" height=\"108\" fill=\"#FF0000\"/>"
+        "<rect x=\"18\" y=\"18\" width=\"30\" height=\"30\" fill=\"#0000FF\"/>"
+        "</svg>";
+    static lv_image_dsc_t svg_dsc;
+    lv_memzero(&svg_dsc, sizeof(svg_dsc));
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 120;
+    svg_dsc.header.h = 120;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    /*Own background, so no style is left behind on the screen for the other tests*/
+    lv_obj_t * board = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(board);
+    lv_obj_set_size(board, 760, 200);
+    lv_obj_center(board);
+    lv_obj_set_style_bg_opa(board, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(board, lv_color_black(), 0);
+
+    /*Right angles only: an odd angle renders differently on 32 and 64 bit builds*/
+    static const int32_t angles[] = {0, 900, 1800, 2700};
+    uint32_t i;
+    for(i = 0; i < sizeof(angles) / sizeof(angles[0]); i++) {
+        int32_t x = 30 + (int32_t)i * 180;
+
+        /*White frame marking where the image has to stay at every angle*/
+        lv_obj_t * frame = lv_obj_create(board);
+        lv_obj_remove_style_all(frame);
+        lv_obj_set_size(frame, 124, 124);
+        lv_obj_set_pos(frame, x - 2, 36);
+        lv_obj_set_style_border_width(frame, 1, 0);
+        lv_obj_set_style_border_color(frame, lv_color_white(), 0);
+
+        lv_obj_t * image = lv_image_create(board);
+        lv_image_set_src(image, &svg_dsc);
+        lv_obj_set_pos(image, x, 38);
+        lv_image_set_pivot(image, 60, 60);
+        lv_image_set_rotation(image, angles[i]);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_rotation_origin.png");
+}
+
 #endif
