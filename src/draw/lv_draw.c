@@ -568,6 +568,13 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer, lv_draw_unit_t * draw_unit)
 }
 
 #if LV_USE_DRAW_VRAM
+/*An image in memory can be made resident unless it is compressed, which only the decoders can read*/
+static bool is_resident_image_src(const void * src)
+{
+    return src && lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE &&
+           !(((const lv_image_dsc_t *)src)->header.flags & LV_IMAGE_FLAGS_COMPRESSED);
+}
+
 bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t * unit)
 {
     LV_ASSERT_NULL(t);
@@ -576,10 +583,10 @@ bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                if(dsc->src && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
+                if(is_resident_image_src(dsc->src)) {
                     if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->src, unit)) return false;
                 }
-                if(dsc->bitmap_mask_src && lv_image_src_get_type(dsc->bitmap_mask_src) == LV_IMAGE_SRC_VARIABLE) {
+                if(is_resident_image_src(dsc->bitmap_mask_src)) {
                     if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->bitmap_mask_src, unit)) return false;
                 }
                 break;
@@ -590,14 +597,14 @@ bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t
                 if(src_layer && src_layer->draw_buf) {
                     if(!lv_draw_buf_ensure_resident(src_layer->draw_buf, unit)) return false;
                 }
-                if(dsc->bitmap_mask_src && lv_image_src_get_type(dsc->bitmap_mask_src) == LV_IMAGE_SRC_VARIABLE) {
+                if(is_resident_image_src(dsc->bitmap_mask_src)) {
                     if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->bitmap_mask_src, unit)) return false;
                 }
                 break;
             }
         case LV_DRAW_TASK_TYPE_ARC: {
                 lv_draw_arc_dsc_t * dsc = t->draw_dsc;
-                if(dsc->img_src && lv_image_src_get_type(dsc->img_src) == LV_IMAGE_SRC_VARIABLE) {
+                if(is_resident_image_src(dsc->img_src)) {
                     if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->img_src, unit)) return false;
                 }
                 break;
