@@ -42,7 +42,7 @@ typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * display);
  * @param close_cb The callback that will be execute when the user closes the window
  * @return The LVGL display associated to the window
  */
-lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
+lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, const char * title,
                                         lv_wayland_display_close_cb_t close_cb);
 
 /**
