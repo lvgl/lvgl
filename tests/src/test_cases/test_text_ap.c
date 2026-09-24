@@ -88,6 +88,34 @@ void test_ap_proc_ascii_passthrough(void)
     TEST_ASSERT_EQUAL_STRING(input, s_output);
 }
 
+void test_ap_proc_persian_digits_pass_through(void)
+{
+    /* Persian digits U+06F0..U+06F9 must not be reshaped */
+    const char * input =
+        "\xDB\xB0\xDB\xB1\xDB\xB2\xDB\xB3\xDB\xB4\xDB\xB5\xDB\xB6\xDB\xB7\xDB\xB8\xDB\xB9";
+    size_t out_bytes = lv_text_ap_strlen(input);
+
+    output = (char *)calloc(out_bytes + 1, 1);
+    TEST_ASSERT_NOT_NULL(output);
+
+    lv_text_ap_proc(input, output);
+    TEST_ASSERT_EQUAL_STRING(input, output);
+}
+
+void test_ap_proc_persian_date_keeps_digit_two(void)
+{
+    /* U+06F2 must not be replaced by U+06F0, e.g. the date 1405/06/24 */
+    const char * input =
+        "\xDB\xB1\xDB\xB4\xDB\xB0\xDB\xB5/\xDB\xB0\xDB\xB6/\xDB\xB2\xDB\xB4";
+    size_t out_bytes = lv_text_ap_strlen(input);
+
+    output = (char *)calloc(out_bytes + 1, 1);
+    TEST_ASSERT_NOT_NULL(output);
+
+    lv_text_ap_proc(input, output);
+    TEST_ASSERT_EQUAL_STRING(input, output);
+}
+
 void test_ap_proc_output_not_null_for_arabic(void)
 {
     /* "مرحبا" */
