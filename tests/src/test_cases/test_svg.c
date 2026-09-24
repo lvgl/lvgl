@@ -206,7 +206,8 @@ void test_svg_is_drawn_in_a_layer(void)
     lv_obj_set_style_opa_layered(image, LV_OPA_50, 0);
 
     /*NanoVG draws nothing into a child layer yet, so the result is not compared there.
-     *The scene is still rendered, so a vector path left behind would be caught*/
+     *The scene is still rendered, so that the sanitizers see the vector paths being
+     *freed at the end of the run*/
 #if !LV_USE_DRAW_NANOVG
     TEST_ASSERT_EQUAL_SCREENSHOT("svg_in_layer.png");
 #else
