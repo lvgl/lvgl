@@ -59,6 +59,7 @@ void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc)
 
     lv_layer_t * layer = dsc->base.layer;
     if(layer->draw_buf == NULL) {
+        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
         LV_PROFILER_DRAW_END;
         return;
     }

@@ -20,6 +20,7 @@
 #include "blend/lv_draw_sw_blend_private.h"
 #include "blend/lv_draw_sw_blend_to_rgb565.h"
 #include "blend/lv_draw_sw_blend_to_rgb888.h"
+#include "blend/lv_draw_sw_blend_to_a8.h"
 
 /*********************
  *      DEFINES
@@ -421,6 +422,11 @@ static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area
 #if LV_DRAW_SW_SUPPORT_RGB888
         case LV_COLOR_FORMAT_RGB888:
             lv_draw_sw_blend_image_to_rgb888(&fill_dsc, 3);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_A8
+        case LV_COLOR_FORMAT_A8:
+            lv_draw_sw_blend_image_to_a8(&fill_dsc);
             break;
 #endif
         default:
