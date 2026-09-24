@@ -152,50 +152,19 @@ static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t * u, uint32_t addr,
         return true;
     }
 
-    /* 4bpp with odd width: nibbles pack continuously across rows */
-    if(bpp == 4) {
-        uint32_t src_i = 0;
-        uint8_t key = 0;
-
-        for(uint32_t y = 0; y < height; y++) {
-            lv_memzero(row_buf, eve_stride);
-
-            uint32_t row_i;
-            for(row_i = 0; row_i < (width / 2); ++row_i) {
-                uint8_t n1, n2;
-                if(key == 0) {
-                    n1 = GET_NIBBLE_HI(src[src_i]);
-                    n2 = GET_NIBBLE_LO(src[src_i]);
-                }
-                else {
-                    n1 = GET_NIBBLE_LO(src[src_i - 1]);
-                    n2 = GET_NIBBLE_HI(src[src_i]);
-                }
-                row_buf[row_i] = (n1 << 4) | n2;
-                src_i++;
-            }
-
-            if(width % 2 != 0) {
-                row_buf[row_i] = (key == 0) ?
-                                 (GET_NIBBLE_HI(src[src_i]) << 4) :
-                                 (GET_NIBBLE_LO(src[src_i - 1]) << 4);
-            }
-
-            key = (key == 0) ? 1 : 0;
-            src_i += (key == 1) ? 1 : 0;
-
-            EVE_Hal_wrMem(u->hal, addr + y * eve_stride, row_buf, eve_stride);
-        }
-
-        lv_free(row_buf);
-        EVE_Hal_requestFenceBeforeSwap(u->hal);
-        return true;
-    }
-
-    /* 1bpp/2bpp fallback */
+    /* No row alignment: rows of 1, 2 or 4 bpp pixels follow each other without
+     * padding, so a row can start in the middle of a byte. Unpack every row
+     * onto its own EVE row. Pixels never straddle a byte, as bpp divides 8. */
+    uint32_t row_bits = width * bpp;
+    uint8_t mask = (uint8_t)((1u << bpp) - 1u);
     for(uint32_t y = 0; y < height; y++) {
         lv_memzero(row_buf, eve_stride);
-        lv_memcpy(row_buf, src + y * natural_stride, natural_stride);
+        uint32_t src_bit = y * row_bits;
+        for(uint32_t i = 0; i < row_bits; i += bpp) {
+            uint32_t b = src_bit + i;
+            uint8_t v = (uint8_t)((src[b >> 3] >> (8u - bpp - (b & 7u))) & mask);
+            row_buf[i >> 3] |= (uint8_t)(v << (8u - bpp - (i & 7u)));
+        }
         EVE_Hal_wrMem(u->hal, addr + y * eve_stride, row_buf, eve_stride);
     }
 

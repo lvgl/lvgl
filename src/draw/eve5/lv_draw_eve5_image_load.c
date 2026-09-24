@@ -104,7 +104,7 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
     lv_memzero(resolved, sizeof(*resolved));
 
     lv_image_src_t src_type = lv_image_src_get_type(src);
-    if(src_type == LV_IMAGE_SRC_VARIABLE) {
+    if(src_type == LV_IMAGE_SRC_VARIABLE && !eve5_image_is_compressed(src)) {
         resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)src;
         resolved->decoder_open = false;
         if(draw_unit != NULL) {
@@ -116,7 +116,8 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
         return true;
     }
 
-    if(src_type == LV_IMAGE_SRC_FILE) {
+    /* Files, and compressed images in memory, go through the decoders */
+    if(src_type == LV_IMAGE_SRC_FILE || src_type == LV_IMAGE_SRC_VARIABLE) {
         lv_image_decoder_args_t args;
         lv_memzero(&args, sizeof(args));
         args.use_indexed = true;
@@ -124,7 +125,7 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
         lv_result_t res = lv_image_decoder_open(&resolved->decoder_dsc, src, &args);
         if(res != LV_RESULT_OK || resolved->decoder_dsc.decoded == NULL) {
             if(res == LV_RESULT_OK) lv_image_decoder_close(&resolved->decoder_dsc);
-            LV_LOG_WARN("EVE5: Failed to decode file image");
+            LV_LOG_WARN("EVE5: Failed to decode image");
             return false;
         }
 
@@ -132,7 +133,7 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
         resolved->decoder_open = true;
         if(draw_unit != NULL) {
             if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit)) {
-                LV_LOG_WARN("EVE5: Failed to ensure file image residency");
+                LV_LOG_WARN("EVE5: Failed to ensure decoded image residency");
                 lv_image_decoder_close(&resolved->decoder_dsc);
                 resolved->decoder_open = false;
                 resolved->img_dsc = NULL;
@@ -157,11 +158,13 @@ void lv_draw_eve5_release_image_source(eve5_resolved_image_t * resolved)
 
 #if EVE5_HW_IMAGE_DECODE
 
+#if LV_USE_FS_EVE5_SDCARD
 /* Defined in the decoder section below. Forward-declared here because the
  * SD loader (lv_draw_eve5_try_load_sdcard_image, this block) consumes the
  * info→open staging handoff installed by eve5_decoder_info. */
 static bool eve5_pending_staging_take(const char * path, EVE_GpuHandle * out_handle,
                                       uint32_t * out_size, EVE_ResourceInfo * out_info);
+#endif
 
 /**********************
  * HARDWARE IMAGE LOADING (LVGL FS)
@@ -511,6 +514,9 @@ bool lv_draw_eve5_lvgl_bin_cf_supported(uint8_t lv_cf)
     }
 }
 
+#if LV_USE_FS_EVE5_SDCARD
+/* The SD card zero-copy path is the only user of these */
+
 /* True if the LVGL bin body bytes are already in the EVE bitmap format that
  * lv_draw_eve5_get_eve_format_info would map to, with no conversion required.
  * Stride match is checked separately (see the caller). @p phost is needed for
@@ -594,6 +600,7 @@ static uint32_t eve5_lvgl_bin_eve_stride(lv_color_format_t lv_cf, uint32_t w)
     uint32_t bpp = lv_color_format_get_bpp(lv_cf);
     return ((w * bpp + 7u) / 8u + 3u) & ~3u;
 }
+#endif /* LV_USE_FS_EVE5_SDCARD */
 
 bool lv_draw_eve5_try_load_lvgl_bin_image(lv_draw_eve5_unit_t * u, const void * src,
                                           uint32_t * ram_g_addr, uint16_t * eve_format,
@@ -1249,7 +1256,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const 
 {
     lv_image_src_t src_type = lv_image_src_get_type(src);
 
-    if(src_type == LV_IMAGE_SRC_FILE) {
+    if(src_type == LV_IMAGE_SRC_FILE || (src_type == LV_IMAGE_SRC_VARIABLE && eve5_image_is_compressed(src))) {
         eve5_resolved_image_t resolved = {0};
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
@@ -1289,6 +1296,8 @@ static lv_draw_eve5_unit_t * s_decoder_unit;
 /**********************
  * INFO→OPEN STAGING HANDOFF
  **********************/
+
+#if LV_USE_FS_EVE5_SDCARD
 
 /* Single-slot handoff for the EVE-SD info→open transition. When the
  * patch_queryassets firmware patch isn't loaded (or isn't compiled in),
@@ -1365,6 +1374,7 @@ static void decoder_query_reset_cb(EVE_HalContext * phost, void * userdata)
     (void)phost;
     lv_eve5_reset_coprocessor((lv_display_t *)userdata);
 }
+#endif /* LV_USE_FS_EVE5_SDCARD */
 
 /* Map an EVE bitmap format back to its LVGL color format equivalent for the
  * decoded buffer's header.cf.
@@ -1477,6 +1487,7 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
 
     lv_draw_eve5_unit_t * u = s_decoder_unit;
     EVE_HalContext * phost = u->hal;
+    LV_UNUSED(phost);
     EVE_ResourceInfo info;
 
 #if LV_USE_FS_EVE5_SDCARD

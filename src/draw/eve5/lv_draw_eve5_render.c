@@ -116,8 +116,8 @@ bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t * t, const lv_draw
 {
     const lv_draw_line_dsc_t * dsc = t->draw_dsc;
 
-    int32_t dx = dsc->p2.x - dsc->p1.x;
-    int32_t dy = dsc->p2.y - dsc->p1.y;
+    int32_t dx = (int32_t)(dsc->p2.x - dsc->p1.x);
+    int32_t dy = (int32_t)(dsc->p2.y - dsc->p1.y);
     bool this_is_hv = (dx == 0 || dy == 0);
     if(!this_is_hv) return true;
 
@@ -129,8 +129,8 @@ bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t * t, const lv_draw
                         (prev_dsc->p2.x == dsc->p1.x && prev_dsc->p2.y == dsc->p1.y) ||
                         (prev_dsc->p2.x == dsc->p2.x && prev_dsc->p2.y == dsc->p2.y);
         if(connects) {
-            int32_t prev_dx = prev_dsc->p2.x - prev_dsc->p1.x;
-            int32_t prev_dy = prev_dsc->p2.y - prev_dsc->p1.y;
+            int32_t prev_dx = (int32_t)(prev_dsc->p2.x - prev_dsc->p1.x);
+            int32_t prev_dy = (int32_t)(prev_dsc->p2.y - prev_dsc->p1.y);
             if(prev_dx != 0 && prev_dy != 0) {
                 return false;
             }
@@ -146,8 +146,8 @@ bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t * t, const lv_draw
                         (next_dsc->p2.x == dsc->p1.x && next_dsc->p2.y == dsc->p1.y) ||
                         (next_dsc->p2.x == dsc->p2.x && next_dsc->p2.y == dsc->p2.y);
         if(connects) {
-            int32_t next_dx = next_dsc->p2.x - next_dsc->p1.x;
-            int32_t next_dy = next_dsc->p2.y - next_dsc->p1.y;
+            int32_t next_dx = (int32_t)(next_dsc->p2.x - next_dsc->p1.x);
+            int32_t next_dy = (int32_t)(next_dsc->p2.y - next_dsc->p1.y);
             if(next_dx != 0 && next_dy != 0) {
                 return false;
             }

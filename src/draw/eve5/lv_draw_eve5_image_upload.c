@@ -439,6 +439,9 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
         img_dsc->vram_res = NULL;
     }
 
+    /* Compressed data needs a decoder, see lv_draw_eve5_resolve_image_source */
+    if(img_dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) return NULL;
+
     const uint8_t * src_buf = img_dsc->data;
     int32_t src_w = img_dsc->header.w;
     int32_t src_h = img_dsc->header.h;

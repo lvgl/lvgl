@@ -257,6 +257,13 @@ typedef struct {
 #endif
 } image_skew_t;
 
+/* A compressed image in memory (LV_IMAGE_SRC_VARIABLE) is not a bitmap, it
+ * has to be decoded like a file */
+static inline bool eve5_image_is_compressed(const void * src)
+{
+    return (((const lv_image_dsc_t *)src)->header.flags & LV_IMAGE_FLAGS_COMPRESSED) != 0;
+}
+
 /* EVE REPEAT wrap mode masks against next_pow2(BITMAP_SIZE_H) - 1, so it only
  * samples correctly when the source bitmap dimensions are powers of two.
  * For non-POW2 sources under tile rendering we fall back to BORDER wrap with

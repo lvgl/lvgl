@@ -147,6 +147,7 @@ static bool s_eve5_enabled = true;
 void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
 {
 	EVE_HalContext *phost = hal;
+	LV_UNUSED(phost); /* Only the multi-target macro expansions use it */
 
     lv_draw_eve5_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_eve5_unit_t));
 #ifdef EVE_SUPPORT_RENDERTARGET

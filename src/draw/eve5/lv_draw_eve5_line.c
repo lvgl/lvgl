@@ -60,7 +60,8 @@ bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t * t)
 
     if(dsc->p1.x == dsc->p2.x && dsc->p1.y == dsc->p2.y) return false;
 
-    return line_segment_needs_alpha_rendertarget(dsc, dsc->p2.x - dsc->p1.x, dsc->p2.y - dsc->p1.y);
+    return line_segment_needs_alpha_rendertarget(dsc, (int32_t)(dsc->p2.x - dsc->p1.x),
+                                                 (int32_t)(dsc->p2.y - dsc->p1.y));
 }
 
 static bool line_segment_needs_alpha_rendertarget(const lv_draw_line_dsc_t * dsc, int32_t dx, int32_t dy)
@@ -140,10 +141,10 @@ static void draw_line_segment(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
 {
     lv_layer_t * layer = t->target_layer;
 
-    int32_t x1 = dsc->p1.x - layer->buf_area.x1;
-    int32_t y1 = dsc->p1.y - layer->buf_area.y1;
-    int32_t x2 = dsc->p2.x - layer->buf_area.x1;
-    int32_t y2 = dsc->p2.y - layer->buf_area.y1;
+    int32_t x1 = (int32_t)(dsc->p1.x - layer->buf_area.x1);
+    int32_t y1 = (int32_t)(dsc->p1.y - layer->buf_area.y1);
+    int32_t x2 = (int32_t)(dsc->p2.x - layer->buf_area.x1);
+    int32_t y2 = (int32_t)(dsc->p2.y - layer->buf_area.y1);
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
@@ -475,10 +476,10 @@ static void alpha_draw_line_segment(lv_draw_eve5_unit_t * u, const lv_draw_task_
 {
     lv_layer_t * layer = t->target_layer;
 
-    int32_t x1 = dsc->p1.x - layer->buf_area.x1;
-    int32_t y1 = dsc->p1.y - layer->buf_area.y1;
-    int32_t x2 = dsc->p2.x - layer->buf_area.x1;
-    int32_t y2 = dsc->p2.y - layer->buf_area.y1;
+    int32_t x1 = (int32_t)(dsc->p1.x - layer->buf_area.x1);
+    int32_t y1 = (int32_t)(dsc->p1.y - layer->buf_area.y1);
+    int32_t x2 = (int32_t)(dsc->p2.x - layer->buf_area.x1);
+    int32_t y2 = (int32_t)(dsc->p2.y - layer->buf_area.y1);
 
     uint32_t line_w = dsc->width * 8;
     int32_t off = (dsc->width & 1) ? 0 : -1;

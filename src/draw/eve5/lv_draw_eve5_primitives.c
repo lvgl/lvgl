@@ -582,23 +582,23 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t * u, const lv_draw_task_t 
 
         if(dsc->side & LV_BORDER_SIDE_TOP) {
             int32_t y = y1 + dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, x1 << 1, (y << 1) - 1);
-            EVE_CoDl_vertex2f_1(u->hal, x2 << 1, (y << 1) - 1);
+            EVE_CoDl_vertex2f_1(u->hal, x1 * 2, (y * 2) - 1);
+            EVE_CoDl_vertex2f_1(u->hal, x2 * 2, (y * 2) - 1);
         }
         if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
             int32_t y = y2 - dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, x1 << 1, (y << 1) + 1);
-            EVE_CoDl_vertex2f_1(u->hal, x2 << 1, (y << 1) + 1);
+            EVE_CoDl_vertex2f_1(u->hal, x1 * 2, (y * 2) + 1);
+            EVE_CoDl_vertex2f_1(u->hal, x2 * 2, (y * 2) + 1);
         }
         if(dsc->side & LV_BORDER_SIDE_LEFT) {
             int32_t x = x1 + dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, (x << 1) - 1, y1 << 1);
-            EVE_CoDl_vertex2f_1(u->hal, (x << 1) - 1, y2 << 1);
+            EVE_CoDl_vertex2f_1(u->hal, (x * 2) - 1, y1 * 2);
+            EVE_CoDl_vertex2f_1(u->hal, (x * 2) - 1, y2 * 2);
         }
         if(dsc->side & LV_BORDER_SIDE_RIGHT) {
             int32_t x = x2 - dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, (x << 1) + 1, y1 << 1);
-            EVE_CoDl_vertex2f_1(u->hal, (x << 1) + 1, y2 << 1);
+            EVE_CoDl_vertex2f_1(u->hal, (x * 2) + 1, y1 * 2);
+            EVE_CoDl_vertex2f_1(u->hal, (x * 2) + 1, y2 * 2);
         }
 
         EVE_CoDl_end(u->hal);

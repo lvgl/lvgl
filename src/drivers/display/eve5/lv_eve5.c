@@ -98,6 +98,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 static void wait_cb(lv_display_t * disp);
 static void invalidate_area_cb(lv_event_t * e);
 static void refr_ready_cb(lv_event_t * e);
+static void delete_event_cb(lv_event_t * e);
 static void composite_to_framebuffer(lv_eve5_driver_t * drvr);
 static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area, const uint8_t * px_map);
 static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf);
@@ -181,6 +182,8 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, EVE_GpuAlloc *allocator,
 
     /* Drain deferred-invalidate requests from the draw unit after each refresh */
     lv_display_add_event_cb(disp, refr_ready_cb, LV_EVENT_REFR_READY, NULL);
+
+    lv_display_add_event_cb(disp, delete_event_cb, LV_EVENT_DELETE, NULL);
 
     /* Create both draw buffers up front. Only one is active at a time (selected
      * by render mode). Keeping both around avoids alloc/free churn on mode switch. */
@@ -294,12 +297,14 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, EVE_GpuAlloc *allocator,
 
 EVE_HalContext * lv_eve5_get_hal(lv_display_t * disp)
 {
+    if(disp == NULL) return NULL;
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
     return drvr ? drvr->hal : NULL;
 }
 
 EVE_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp)
 {
+    if(disp == NULL) return NULL;
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
     return drvr ? drvr->allocator : NULL;
 }
@@ -307,12 +312,15 @@ EVE_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp)
 #if LV_USE_OS
 void lv_eve5_hal_lock(lv_display_t * disp)
 {
+    /* The draw unit can still release VRAM after the display is deleted */
+    if(disp == NULL) return;
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
     if(drvr) lv_mutex_lock(&drvr->hal_mutex);
 }
 
 void lv_eve5_hal_unlock(lv_display_t * disp)
 {
+    if(disp == NULL) return;
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
     if(drvr) lv_mutex_unlock(&drvr->hal_mutex);
 }
@@ -659,6 +667,38 @@ static void refr_ready_cb(lv_event_t * e)
         LV_LOG_INFO("EVE5: deferred screen invalidate (post-GC retry)");
         lv_obj_invalidate(scr);
     }
+}
+
+static void delete_event_cb(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_target(e);
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL) return;
+
+    /* Let the GPU finish with the textures released below */
+    EVE_Cmd_waitFlush(drvr->hal);
+
+    for(int i = 0; i < drvr->pending_count; i++) {
+        EVE_GpuAlloc_Free(drvr->allocator, drvr->pending_regions[i].handle);
+    }
+    drvr->pending_count = 0;
+
+    /* Releases the tile's VRAM residency and any CPU backing */
+    lv_draw_buf_destroy(drvr->tile_buf);
+
+    /* The swapchain descriptor belongs to the driver, vram_free_cb leaves it
+     * alone, so detach it before destroying the buffer and its CPU backing */
+    lv_draw_buf_vram_res_t * swapchain_res = drvr->full_buf->vram_res;
+    drvr->full_buf->vram_res = NULL;
+    lv_draw_buf_destroy(drvr->full_buf);
+    lv_free(swapchain_res);
+
+    if(drvr->hal->UserContext == disp) drvr->hal->UserContext = NULL;
+#if LV_USE_OS
+    lv_mutex_delete(&drvr->hal_mutex);
+#endif
+    lv_display_set_driver_data(disp, NULL);
+    lv_free(drvr);
 }
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)

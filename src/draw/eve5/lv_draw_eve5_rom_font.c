@@ -180,6 +180,7 @@ static inline void * rom_font_owner(lv_draw_eve5_unit_t * u, uint8_t rom_idx)
 void lv_draw_eve5_rom_font_init(lv_draw_eve5_unit_t * u)
 {
     EVE_HalContext * phost = u->hal;
+    LV_UNUSED(phost); /* Only the multi-target EVE_GEN expansion uses it */
 
     for(uint8_t i = 0; i < LV_DRAW_EVE5_ROM_FONT_NBCAP; i++) {
         u->rom_font_slots[i].handle = 0xFFu;
@@ -202,6 +203,7 @@ void lv_draw_eve5_rom_font_init(lv_draw_eve5_unit_t * u)
 uint8_t lv_draw_eve5_rom_font_resolve(lv_draw_eve5_unit_t * u, uint8_t rom_idx)
 {
     EVE_HalContext * phost = u->hal;
+    LV_UNUSED(phost); /* Only the multi-target EVE_GEN expansion uses it */
 
     /* Compile-time bound first so the slot array access can't overrun on
      * builds where CAP is 32 (no LARGEFONT support). */

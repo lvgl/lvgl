@@ -219,31 +219,31 @@ bool compute_image_skew(image_skew_t * out,
     int16_t sky_deg = (int16_t)((skew_y + 5) / 10);
 
     /* lv_trigo_sin/cos return Q15, shift left 1 for 16.16 */
-    int32_t cos_r = lv_trigo_cos(rot_deg) << 1;
-    int32_t sin_r = lv_trigo_sin(rot_deg) << 1;
+    int32_t cos_r = lv_trigo_cos(rot_deg) * 2;
+    int32_t sin_r = lv_trigo_sin(rot_deg) * 2;
 
     /* tan(skew) = sin/cos in 16.16, clamp when |cos| < 5% */
     int32_t tan_skx, tan_sky;
     {
-        int32_t cos_skx = lv_trigo_cos(skx_deg) << 1;
-        int32_t sin_skx = lv_trigo_sin(skx_deg) << 1;
+        int32_t cos_skx = lv_trigo_cos(skx_deg) * 2;
+        int32_t sin_skx = lv_trigo_sin(skx_deg) * 2;
         if(LV_ABS(cos_skx) < 3277)
             tan_skx = (cos_skx >= 0) ? 0x7FFFFFFF : (int32_t)0x80000001;
         else
-            tan_skx = (int32_t)(((int64_t)sin_skx << 16) / cos_skx);
+            tan_skx = (int32_t)(((int64_t)sin_skx * 65536) / cos_skx);
     }
     {
-        int32_t cos_sky = lv_trigo_cos(sky_deg) << 1;
-        int32_t sin_sky = lv_trigo_sin(sky_deg) << 1;
+        int32_t cos_sky = lv_trigo_cos(sky_deg) * 2;
+        int32_t sin_sky = lv_trigo_sin(sky_deg) * 2;
         if(LV_ABS(cos_sky) < 3277)
             tan_sky = (cos_sky >= 0) ? 0x7FFFFFFF : (int32_t)0x80000001;
         else
-            tan_sky = (int32_t)(((int64_t)sin_sky << 16) / cos_sky);
+            tan_sky = (int32_t)(((int64_t)sin_sky * 65536) / cos_sky);
     }
 
     /* Scale: 8.8 to 16.16 */
-    int32_t fsx = (int32_t)scale_x << 8;
-    int32_t fsy = (int32_t)scale_y << 8;
+    int32_t fsx = (int32_t)scale_x * 256;
+    int32_t fsy = (int32_t)scale_y * 256;
 
 #define FP_MUL(a, b) ((int32_t)(((int64_t)(a) * (b)) >> 16))
 
@@ -258,17 +258,17 @@ bool compute_image_skew(image_skew_t * out,
         return false;
 
     /* Inverse matrix coefficients */
-    out->ia = (int32_t)(((int64_t)me << 16) / det);
-    out->ib = (int32_t)(-((int64_t)mb << 16) / det);
-    out->i_d = (int32_t)(-((int64_t)md << 16) / det);
-    out->ie = (int32_t)(((int64_t)ma << 16) / det);
+    out->ia = (int32_t)(((int64_t)me * 65536) / det);
+    out->ib = (int32_t)(-((int64_t)mb * 65536) / det);
+    out->i_d = (int32_t)(-((int64_t)md * 65536) / det);
+    out->ie = (int32_t)(((int64_t)ma * 65536) / det);
 
     /* Translation */
-    int32_t ox_fp = (img_x - draw_vx) << 16;
-    int32_t local_piv_x_fp = ox_fp + (pivot_x << 16);
-    int32_t local_piv_y_fp = ((img_y - draw_vy) << 16) + (pivot_y << 16);
-    out->ic = (pivot_x << 16) - (FP_MUL(out->ia, local_piv_x_fp) + FP_MUL(out->ib, local_piv_y_fp));
-    out->i_f = (pivot_y << 16) - (FP_MUL(out->i_d, local_piv_x_fp) + FP_MUL(out->ie, local_piv_y_fp));
+    int32_t ox_fp = (img_x - draw_vx) * 65536;
+    int32_t local_piv_x_fp = ox_fp + (pivot_x * 65536);
+    int32_t local_piv_y_fp = ((img_y - draw_vy) * 65536) + (pivot_y * 65536);
+    out->ic = (pivot_x * 65536) - (FP_MUL(out->ia, local_piv_x_fp) + FP_MUL(out->ib, local_piv_y_fp));
+    out->i_f = (pivot_y * 65536) - (FP_MUL(out->i_d, local_piv_x_fp) + FP_MUL(out->ie, local_piv_y_fp));
 
     /* Format: use 8.8 if any |coeff| >= 2.0, else signed 1.15 */
     out->p = 1;
@@ -279,14 +279,14 @@ bool compute_image_skew(image_skew_t * out,
 
     /* Bounding box from transformed corners */
     int32_t cx[4], cy[4];
-    cx[0] = -(pivot_x << 16);
-    cy[0] = -(pivot_y << 16);
-    cx[1] = (src_w - pivot_x) << 16;
-    cy[1] = -(pivot_y << 16);
-    cx[2] = -(pivot_x << 16);
-    cy[2] = (src_h - pivot_y) << 16;
-    cx[3] = (src_w - pivot_x) << 16;
-    cy[3] = (src_h - pivot_y) << 16;
+    cx[0] = -(pivot_x * 65536);
+    cy[0] = -(pivot_y * 65536);
+    cx[1] = (src_w - pivot_x) * 65536;
+    cy[1] = -(pivot_y * 65536);
+    cx[2] = -(pivot_x * 65536);
+    cy[2] = (src_h - pivot_y) * 65536;
+    cx[3] = (src_w - pivot_x) * 65536;
+    cy[3] = (src_h - pivot_y) * 65536;
     int32_t bx_min = 0, bx_max = 0, by_min = 0, by_max = 0;
     for(int i = 0; i < 4; i++) {
         int32_t sx = FP_MUL(ma, cx[i]) + FP_MUL(mb, cy[i]);
