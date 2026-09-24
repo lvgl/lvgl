@@ -200,10 +200,10 @@ void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
     }
 
     LV_LOG_INFO("EVE5: Draw unit initialized, ID=%d", DRAW_UNIT_ID_EVE5);
-    LV_LOG_INFO("EVE5: SW fallback config: FILL=%d BORDER=%d LINE=%d TRI=%d LABEL=%d ARC=%d SHADOW=%d CANVAS=%d",
+    LV_LOG_INFO("EVE5: SW fallback config: FILL=%d BORDER=%d LINE=%d TRI=%d LABEL=%d ARC=%d SHADOW=%d CANVAS=%d VECTOR=%d",
                 LV_DRAW_EVE5_SW_FILL, LV_DRAW_EVE5_SW_BORDER, LV_DRAW_EVE5_SW_LINE,
                 LV_DRAW_EVE5_SW_TRIANGLE, LV_DRAW_EVE5_SW_LABEL, LV_DRAW_EVE5_SW_ARC,
-                LV_DRAW_EVE5_SW_BOX_SHADOW, LV_DRAW_EVE5_SW_CANVAS);
+                LV_DRAW_EVE5_SW_BOX_SHADOW, LV_DRAW_EVE5_SW_CANVAS, LV_DRAW_EVE5_SW_VECTOR);
 }
 
 void lv_draw_eve5_deinit(void)

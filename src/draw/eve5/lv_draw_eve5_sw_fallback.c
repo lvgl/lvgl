@@ -18,10 +18,27 @@
 
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
+#if LV_DRAW_EVE5_SW_VECTOR
+    #include "../lv_draw_vector_private.h"
+#endif
 
 /**********************
  * SW FALLBACK HELPERS
  **********************/
+
+#if LV_DRAW_EVE5_SW_VECTOR
+/**
+ * Area of the SW buffer for a vector task. The SW vector renderer sets its
+ * initial clip from the task's clip area with only partial_y_offset applied,
+ * which the paths can't widen, so the buffer has to start at x = 0 for that
+ * clip to land where the buffer does.
+ */
+static void eve5_sw_vector_area(const lv_draw_task_t * t, lv_area_t * area)
+{
+    *area = t->_real_area;
+    if(area->x1 > 0) area->x1 = 0;
+}
+#endif
 
 /**
  * Get descriptor data pointer and size for cache comparison.
@@ -62,15 +79,20 @@ uint8_t * lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t * u,
     lv_memzero(buf_data, buf_size);
 
     lv_draw_buf_t sw_buf;
+    /* Packed rows, as lv_draw_eve5_hal_upload_texture reads them. The
+     * automatic stride can be wider with LV_DRAW_BUF_STRIDE_ALIGN. */
     lv_draw_buf_init(&sw_buf, buf_w, buf_h,
-                     LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO,
+                     LV_COLOR_FORMAT_ARGB8888, buf_stride,
                      buf_data, buf_size);
 
     lv_area_t norm_area;
     lv_area_set(&norm_area, 0, 0, buf_w - 1, buf_h - 1);
 
+    /* The tasks added to the layer take its opacity, which is the original
+     * task's, see lv_draw_add_task */
     lv_layer_t temp_layer;
-    lv_memzero(&temp_layer, sizeof(temp_layer));
+    lv_layer_init(&temp_layer);
+    temp_layer.opa = t->opa;
     temp_layer.draw_buf = &sw_buf;
     temp_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
     temp_layer.buf_area = norm_area;
@@ -233,6 +255,30 @@ uint8_t * lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t * u,
             }
 #endif
 
+#if LV_DRAW_EVE5_SW_VECTOR
+        case LV_DRAW_TASK_TYPE_VECTOR: {
+                /* The paths are in screen coordinates, so the layer covers the
+                 * area in those, see eve5_sw_vector_area */
+                eve5_sw_vector_area(t, &temp_layer.buf_area);
+                temp_layer._clip_area = t->clip_area;
+                temp_layer.phy_clip_area = t->clip_area;
+                temp_layer.partial_y_offset = temp_layer.buf_area.y1;
+
+                /* The task list moves to the SW task, which destroys it once
+                 * drawn, so it can only be drawn once */
+                lv_draw_vector_dsc_t * src_dsc = t->draw_dsc;
+                lv_draw_vector_dsc_t vector_dsc;
+                lv_memcpy(&vector_dsc, src_dsc, sizeof(vector_dsc));
+                vector_dsc.base.layer = &temp_layer;
+                vector_dsc.base.user_data = (void *)1;
+                src_dsc->task_list = NULL;
+
+                lv_draw_vector(&vector_dsc);
+                render_ok = true;
+                break;
+            }
+#endif
+
         default:
             LV_LOG_WARN("EVE5: No SW fallback for task type %d", t->type);
             break;
@@ -334,6 +380,31 @@ void lv_draw_eve5_sw_render_task(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     int32_t tex_w, tex_h;
     uint32_t tex_stride;
     bool from_cache;
+
+#if LV_DRAW_EVE5_SW_VECTOR
+    if(t->type == LV_DRAW_TASK_TYPE_VECTOR) {
+        /* The descriptor only holds pointers to the paths, which can't identify
+         * the drawing for the cache, so render every time */
+        lv_area_t area;
+        eve5_sw_vector_area(t, &area);
+        tex_w = lv_area_get_width(&area);
+        tex_h = lv_area_get_height(&area);
+        if(tex_w <= 0 || tex_h <= 0) return;
+        uint8_t * buf_data = lv_draw_eve5_sw_render_to_buffer(u, t, tex_w, tex_h);
+        if(!buf_data) return;
+        EVE_GpuHandle handle = lv_draw_eve5_hal_upload_texture(u, buf_data, tex_w, tex_h, &tex_stride);
+        lv_free(buf_data);
+        uint32_t vaddr = EVE_GpuAlloc_Get(u->allocator, handle);
+        if(vaddr == GA_INVALID) {
+            LV_LOG_WARN("EVE5: SW fallback failed for task type %d", t->type);
+            return;
+        }
+        lv_draw_eve5_hal_draw_texture(u, t, vaddr, tex_w, tex_h, tex_stride, &area);
+        /* Released once the GPU is done with the current render */
+        EVE_GpuAlloc_ScopedFree(u->allocator, handle);
+        return;
+    }
+#endif
 
     EVE_GpuHandle handle = lv_draw_eve5_sw_render_cached(u, t, &tex_w, &tex_h, &tex_stride, &from_cache);
 

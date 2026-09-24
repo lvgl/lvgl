@@ -61,6 +61,12 @@ extern "C" {
 #define LV_DRAW_EVE5_SW_CANVAS 0
 #endif
 
+/* Vector graphics have no hardware path, the SW renderer draws them into a
+ * texture. Set to 0 to drop vector tasks instead. */
+#ifndef LV_DRAW_EVE5_SW_VECTOR
+#define LV_DRAW_EVE5_SW_VECTOR LV_USE_VECTOR_GRAPHIC
+#endif
+
 /*
  * Master switch for the entire SW fallback feature (cache, render-to-buffer, upload).
  * Defaults to enabled when any per-task LV_DRAW_EVE5_SW_* flag is set.
@@ -69,7 +75,8 @@ extern "C" {
 #ifndef LV_DRAW_EVE5_SW_FALLBACK
 #define LV_DRAW_EVE5_SW_FALLBACK (LV_DRAW_EVE5_SW_FILL || LV_DRAW_EVE5_SW_BORDER || \
                                   LV_DRAW_EVE5_SW_LINE || LV_DRAW_EVE5_SW_TRIANGLE || LV_DRAW_EVE5_SW_LABEL || \
-                                  LV_DRAW_EVE5_SW_ARC || LV_DRAW_EVE5_SW_BOX_SHADOW || LV_DRAW_EVE5_SW_CANVAS)
+                                  LV_DRAW_EVE5_SW_ARC || LV_DRAW_EVE5_SW_BOX_SHADOW || LV_DRAW_EVE5_SW_CANVAS || \
+                                  LV_DRAW_EVE5_SW_VECTOR)
 #endif
 
 /* Whole-font upload thresholds. Fonts exceeding either limit use per-glyph mode. */

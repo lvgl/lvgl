@@ -318,6 +318,12 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
                 lv_draw_eve5_hal_draw_mask_rect(u, t);
                 break;
 
+#if LV_USE_VECTOR_GRAPHIC && LV_DRAW_EVE5_SW_VECTOR
+            case LV_DRAW_TASK_TYPE_VECTOR:
+                lv_draw_eve5_sw_render_task(u, t);
+                break;
+#endif
+
             default:
                 EVE5_LOG("EVE5:   Unhandled task type %d, skipping", t->type);
                 break;
