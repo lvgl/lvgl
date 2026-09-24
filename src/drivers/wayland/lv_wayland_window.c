@@ -43,7 +43,7 @@ static void delete_event(lv_event_t * e);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
+lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, const char * title,
                                         lv_wayland_display_close_cb_t close_cb)
 {
     LV_CHECK_ARG(title != NULL, return NULL);
