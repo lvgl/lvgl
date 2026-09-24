@@ -163,36 +163,20 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         }
 
         if(decoder_dsc.decoder && decoder_dsc.decoder->custom_draw_cb) {
-            lv_area_t draw_area = layer->buf_area;
-            lv_area_t coords_area = *coords;
+            lv_area_t transformed_coords;
+            lv_image_buf_get_transformed_area(&transformed_coords,
+                                              new_image_dsc.header.w, new_image_dsc.header.h,
+                                              dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+            lv_area_move(&transformed_coords, coords->x1, coords->y1);
 
-            lv_area_t obj_area = dsc->base.obj->coords;
-            if(layer->parent) { /* child layer */
-                if(lv_area_intersect(&coords_area, &coords_area, &obj_area)) {
-                    int32_t xpos = coords->x1 - draw_area.x1;
-                    int32_t ypos = coords->y1 - draw_area.y1;
-
-                    lv_area_move(&coords_area, -(coords->x1 - xpos), -(coords->y1 - ypos));
-                    layer->_clip_area = coords_area;
-                    decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, &new_image_dsc, &coords_area);
+            /*Clip like bitmap images: the layer's clip area includes the extra draw size of the transform*/
+            lv_area_t clip_area = layer->buf_area;
+            if(lv_area_intersect(&clip_area, &clip_area, &transformed_coords)) {
+                if(lv_area_intersect(&clip_area, &clip_area, &layer->_clip_area)) {
+                    decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &transformed_coords,
+                                                        &new_image_dsc, &clip_area);
                 }
             }
-            else {
-                lv_area_t transformed_coords;
-                lv_image_buf_get_transformed_area(&transformed_coords,
-                                                  new_image_dsc.header.w, new_image_dsc.header.h,
-                                                  dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
-                lv_area_move(&transformed_coords, coords->x1, coords->y1);
-
-                lv_area_t clip_area = draw_area;
-                if(lv_area_intersect(&clip_area, &clip_area, &transformed_coords)) {
-                    if(lv_area_intersect(&clip_area, &clip_area, &obj_area)) {
-                        decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &transformed_coords,
-                                                            &new_image_dsc, &clip_area);
-                    }
-                }
-            }
-
         }
 
         lv_image_decoder_close(&decoder_dsc);
