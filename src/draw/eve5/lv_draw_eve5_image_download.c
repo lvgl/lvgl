@@ -27,6 +27,7 @@
 
 static void convert_rgb8_to_xrgb8888(const uint8_t * src, uint8_t * dst, uint32_t w);
 static void convert_argb8_to_rgb565a8(const uint8_t * src, uint8_t * rgb_dst, uint8_t * alpha_dst, uint32_t w);
+static void unpremultiply_argb8(uint8_t * row, uint32_t w);
 static void convert_rgb565_to_swapped(const uint8_t * src, uint8_t * dst, uint32_t w);
 
 /**********************
@@ -45,6 +46,34 @@ static void convert_rgb8_to_xrgb8888(const uint8_t * src, uint8_t * dst, uint32_
 }
 
 /** Convert ARGB8 (BGRA, 4 bpp) to RGB565 + separate A8 plane. */
+/**
+ * Premultiplied ARGB8 (B, G, R, A in memory) back to straight alpha, in place.
+ *
+ * The exact inverse of the render engine's multiply, so a buffer uploaded
+ * again and drawn with SRC_ALPHA blending gets back the same premultiplied
+ * pixels: for every alpha a and channel p <= a, the result x is the value
+ * nearest p * 255 / a for which (x * a + 128 + ((x * a + 128) >> 8)) >> 8,
+ * the multiply BT8XXEMU models, is p again. Checked exhaustively. Channels
+ * above their alpha can't be premultiplied values and saturate to 255.
+ */
+static void unpremultiply_argb8(uint8_t * row, uint32_t w)
+{
+    for(uint32_t x = 0; x < w; x++) {
+        uint8_t * px = row + 4 * x;
+        uint32_t a = px[3];
+        if(a == 255) continue;
+        if(a == 0) {
+            px[0] = px[1] = px[2] = 0;
+            continue;
+        }
+        uint32_t r = ((255u << 16) + a - 1) / a;
+        for(uint32_t c = 0; c < 3; c++) {
+            uint32_t v = (px[c] * r + 0x8000u) >> 16;
+            px[c] = (uint8_t)(v > 255 ? 255 : v);
+        }
+    }
+}
+
 static void convert_argb8_to_rgb565a8(const uint8_t * src, uint8_t * rgb_dst, uint8_t * alpha_dst, uint32_t w)
 {
     for(uint32_t x = 0; x < w; x++) {
@@ -114,6 +143,15 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
     uint32_t lv_stride = buf->header.stride;
     if(lv_stride == 0) lv_stride = lv_draw_buf_width_to_stride(w, lv_cf);
 
+    /* Content EVE rendered is premultiplied. A buffer declared straight gets
+     * its pixels back straight. */
+    bool unpremultiply = false;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    unpremultiply = vr->is_premultiplied && eve_fmt == ARGB8
+                    && lv_cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
+                    && !(buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED);
+#endif
+
     /* Check if format conversion is needed */
     bool needs_conversion = false;
     switch(lv_cf) {
@@ -150,6 +188,9 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 EVE_Hal_rdMem(u->hal, buf->data + y * lv_stride,
                               gpu_addr + y * eve_stride, row_bytes);
             }
+        }
+        if(unpremultiply) {
+            for(int32_t y = 0; y < h; y++) unpremultiply_argb8(buf->data + y * lv_stride, (uint32_t)w);
         }
         return true;
     }
@@ -195,6 +236,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
 
                 for(int32_t y = 0; y < h; y++) {
                     EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w * 4);
+                    if(unpremultiply) unpremultiply_argb8(row_buf, (uint32_t)w);
                     convert_argb8_to_rgb565a8(row_buf,
                                               buf->data + y * rgb_stride,
                                               alpha_plane + y * alpha_stride, w);
@@ -377,6 +419,7 @@ generic_download: {
                         argb_row[4 * x + 2] = r;
                         argb_row[4 * x + 3] = a;
                     }
+                    if(unpremultiply) unpremultiply_argb8(argb_row, (uint32_t)w);
 
                     /* Pack ARGB8 to target LVGL format */
                     uint8_t * dst_row = buf->data + y * lv_stride;

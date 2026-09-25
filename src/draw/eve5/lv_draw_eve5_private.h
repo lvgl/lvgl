@@ -356,7 +356,7 @@ typedef struct {
  * lv_draw_eve5_dl_bound.c. */
 
 /* Worst-case entries of the per-layer steps around the tasks */
-#define EVE5_DL_INIT_LAYER      35  /**< lv_draw_eve5_hal_init_layer */
+#define EVE5_DL_INIT_LAYER      37  /**< lv_draw_eve5_hal_init_layer */
 #define EVE5_DL_FINISH_LAYER    1   /**< lv_draw_eve5_hal_finish_layer (DISPLAY) */
 #define EVE5_DL_INIT_L8         28  /**< lv_draw_eve5_hal_init_l8_rendertarget */
 #define EVE5_DL_FINISH_L8       1   /**< lv_draw_eve5_hal_finish_l8_rendertarget */

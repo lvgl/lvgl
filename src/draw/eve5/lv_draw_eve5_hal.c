@@ -620,7 +620,11 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     bool existing_is_premultiplied = false;
     uint16_t existing_format = ARGB8;
     uint32_t existing_stride = 0;
+    uint32_t existing_source_offset = 0;
+    bool existing_luminance = false;
     bool existing_needs_conversion = false;
+    EVE_GpuHandle kept_handle = GA_HANDLE_INVALID;  /* Content kept past a reallocation */
+    uint32_t kept_palette_offset = GA_INVALID;
 
     int32_t w = lv_area_get_width(&layer->buf_area);
     int32_t h = lv_area_get_height(&layer->buf_area);
@@ -672,15 +676,35 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
          * Height overflow: existing stride × current aligned_h exceeds allocation.
          *   This catches the case where a reused buffer is wider (larger stride)
          *   but the current layer is taller — stride × height would overrun.
-         * Any reallocation is an implicit discard (has_content = false). */
+         * Content that doesn't fit, such as a canvas buffer uploaded as a texture
+         * or kept in another format, stays as the source of the incremental
+         * render below, which converts it. Only the new buffer is ever a
+         * render target. */
         uint32_t needed_stride = (uint32_t)aligned_w * target_bpp;
         bool realloc_needed = (vr->eve_format != target_eve_fmt)
                               || (vr->stride < needed_stride)
                               || (eve5_rt_surface_size(vr->eve_format, vr->stride, (uint32_t)aligned_h) > vr->base.size);
+        bool discard = layer->draw_buf != NULL
+                       && lv_draw_buf_has_flag(layer->draw_buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
+        bool keep = realloc_needed && vr->has_content && !discard
+                    && !slice->isolated && slice->prev_handle.Id == GA_HANDLE_INVALID.Id;
         if(realloc_needed) {
             uint32_t needed_size = eve5_rt_surface_size(target_eve_fmt, needed_stride, (uint32_t)aligned_h);
-            /* ScopedFree: previous buffer may be referenced by a prior frame's compositing DL */
-            EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
+            if(keep) {
+                kept_handle = vr->gpu_handle;
+                kept_palette_offset = vr->palette_offset;
+                existing_has_content = true;
+                existing_needs_conversion = true;
+                existing_is_premultiplied = vr->is_premultiplied;
+                existing_format = vr->eve_format;
+                existing_stride = vr->stride;
+                existing_source_offset = vr->source_offset;
+                existing_luminance = vr->sample_as_luminance;
+            }
+            else {
+                /* ScopedFree: previous buffer may be referenced by a prior frame's compositing DL */
+                EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
+            }
             vr->gpu_handle = EVE_GpuAlloc_Alloc(u->allocator, needed_size, GA_ALIGN_128);
             vr->eve_format = target_eve_fmt;
             vr->stride = needed_stride;
@@ -692,9 +716,9 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
         ram_g_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle);
         if(ram_g_addr != GA_INVALID) {
+            /* A compatible buffer may be wider than needed; keep its stride */
             aligned_w = vr->stride / target_bpp;
-            if(layer->draw_buf && lv_draw_buf_has_flag(layer->draw_buf,
-                                                       LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE)) {
+            if(discard) {
                 lv_draw_buf_clear_flag(layer->draw_buf,
                                        LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
                 vr->has_content = false;
@@ -704,6 +728,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                 existing_is_premultiplied = vr->is_premultiplied;
                 existing_format = vr->eve_format;
                 existing_stride = vr->stride;
+                existing_source_offset = vr->source_offset;
+                existing_luminance = vr->sample_as_luminance;
                 if(existing_format != target_eve_fmt) {
                     existing_needs_conversion = true;
                 }
@@ -711,6 +737,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         }
         else {
             LV_LOG_ERROR("EVE5: VRAM handle invalid for layer %p", (void *)layer);
+            EVE_GpuAlloc_ScopedFree(u->allocator, kept_handle);
             /* vram_res stays attached, so the caller proceeds to
              * finish_layer; open the scope to keep its CloseScope paired. */
             EVE_GpuAlloc_OpenScope(u->allocator);
@@ -722,13 +749,15 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return;
     }
 
-    /* EVE5 renders with SRC_ALPHA blending, producing premultiplied output */
+    /* EVE5 renders with SRC_ALPHA blending, producing premultiplied output.
+     * Only the VRAM copy is premultiplied: the layer's buffer keeps its own
+     * format, and a download converts back to it. */
     if(lv_color_format_has_alpha(layer->color_format)) {
         if(vr != NULL) vr->is_premultiplied = true;
-        if(layer->draw_buf != NULL) {
-            lv_draw_buf_set_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
-        }
     }
+
+    /* An L8 render target holds luminance, as LVGL's L8 does, not coverage */
+    if(vr != NULL && target_eve_fmt == L8) vr->sample_as_luminance = true;
 
     /* Epoch scope: assets resolved while building this DL stay pinned
      * against pressure eviction until finish_layer's sync completes.
@@ -766,7 +795,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
             EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
             EVE_CoDl_bitmapSource(phost, prev_addr);
-            EVE_CoDl_bitmapLayout(u->hal, (uint8_t)target_eve_fmt, aligned_w * target_bpp, h);
+            eve5_set_image_bitmap_layout(u->hal, target_eve_fmt, (int32_t)(aligned_w * target_bpp), h,
+                                         vr->sample_as_luminance);
             EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, w, h);
             EVE_CoDl_begin(u->hal, BITMAPS);
             EVE_CoDl_vertex2f_0(u->hal, 0, 0);
@@ -794,20 +824,26 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
          * 1. Can't clear-then-blit from the same buffer (clear destroys content)
          * 2. Alpha pass needs original content to incorporate existing alpha as
          *    the "base layer" before compositing new tasks */
-        uint32_t src_addr = ram_g_addr;
+        uint32_t src_addr = ram_g_addr + existing_source_offset;
         uint16_t src_format = existing_format;
         uint32_t src_stride = existing_stride;
 
         EVE_GpuHandle old_handle = GA_HANDLE_INVALID;
         bool have_old_handle = false;
 
+        /* Content kept past a reallocation: the new buffer is already the layer's */
+        uint32_t kept_base = kept_handle.Id != GA_HANDLE_INVALID.Id ? EVE_GpuAlloc_Get(u->allocator, kept_handle) : GA_INVALID;
+        if(kept_base != GA_INVALID) src_addr = kept_base + existing_source_offset;
+
         uint32_t new_size = eve5_rt_surface_size(target_eve_fmt,
                                                  (uint32_t)aligned_w * target_bpp, (uint32_t)aligned_h);
-        EVE_GpuHandle new_handle = EVE_GpuAlloc_Alloc(u->allocator, new_size, GA_ALIGN_128);
+        EVE_GpuHandle new_handle = kept_base != GA_INVALID ? vr->gpu_handle
+                                   : EVE_GpuAlloc_Alloc(u->allocator, new_size, GA_ALIGN_128);
         uint32_t new_addr = EVE_GpuAlloc_Get(u->allocator, new_handle);
 
-        if(new_addr == GA_INVALID) {
+        if(new_addr == GA_INVALID || (kept_handle.Id != GA_HANDLE_INVALID.Id && kept_base == GA_INVALID)) {
             LV_LOG_ERROR("EVE5: Failed to allocate buffer for canvas incremental render");
+            EVE_GpuAlloc_ScopedFree(u->allocator, kept_handle);
             EVE_CoDl_clearColorRgb(u->hal, 0, 0, 0);
             EVE_CoDl_clearColorA(u->hal, 0);
             EVE_CoDl_clear(u->hal, 1, 1, 1);
@@ -815,7 +851,12 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         }
 
         uint32_t src_palette = GA_INVALID;
-        {
+        if(kept_base != GA_INVALID) {
+            old_handle = kept_handle;
+            have_old_handle = true;
+            if(kept_palette_offset != GA_INVALID) src_palette = kept_base + kept_palette_offset;
+        }
+        else {
             old_handle = vr->gpu_handle;
             have_old_handle = true;
             if(vr->palette_offset != GA_INVALID) {
@@ -851,7 +892,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
         /* Blit existing content, converting to premultiplied if needed */
         EVE_CoDl_saveContext(u->hal);
-        if(existing_needs_conversion || existing_is_premultiplied) {
+        if(existing_is_premultiplied) {
             EVE_CoDl_blendFunc(u->hal, ONE, ZERO);
         }
         else {
@@ -863,7 +904,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         }
         EVE_CoDl_colorArgb_ex(u->hal, 0xFFFFFFFF);
         EVE_CoCmd_setBitmap(u->hal, src_addr, (uint8_t)src_format, w, h);
-        EVE_CoDl_bitmapLayout(u->hal, (uint8_t)src_format, src_stride, h);
+        eve5_set_image_bitmap_layout(u->hal, src_format, (int32_t)src_stride, h, existing_luminance);
         EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, w, h);
         if(src_palette != GA_INVALID) {
             EVE_CoDl_paletteSource(u->hal, src_palette);

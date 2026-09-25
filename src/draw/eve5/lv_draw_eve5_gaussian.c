@@ -25,6 +25,7 @@
  */
 
 #include "lv_draw_eve5_private.h"
+#include "../../drivers/display/eve5/lv_eve5_image_private.h"
 
 #if LV_USE_DRAW_EVE5
 #ifdef EVE_SUPPORT_RENDERTARGET
@@ -546,9 +547,22 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     int32_t layer_w = lv_area_get_width(layer_area);
     int32_t layer_h = lv_area_get_height(layer_area);
-    int32_t layer_aw = ALIGN_UP(layer_w, 16);
     int32_t layer_ah = ALIGN_UP(layer_h, 16);
-    uint32_t layer_stride = (uint32_t)layer_aw * 4;
+
+    /* The layer buffer is in the layer's render target format, which the blur
+     * reads and writes back; the pyramid levels are ARGB8 */
+    lv_eve5_vram_res_t * layer_vr = eve5_get_vram_res(layer);
+    uint16_t layer_fmt = layer_vr != NULL ? layer_vr->eve_format : ARGB8;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    if(layer_fmt == YCBCR) {
+        LV_LOG_WARN("EVE5 gaussian: blur on a YCBCR layer is not supported");
+        return true;
+    }
+#endif
+    int32_t layer_bpp = eve5_format_bpp(layer_fmt);
+    bool layer_luminance = layer_vr != NULL && layer_vr->sample_as_luminance;
+    uint32_t layer_stride = layer_vr != NULL ? layer_vr->stride : (uint32_t)ALIGN_UP(layer_w, 16) * 4;
+    int32_t layer_aw = (int32_t)(layer_stride / (uint32_t)layer_bpp);
 
     uint32_t dst_addr = EVE_GpuAlloc_Get(u->allocator, dst_handle);
     if(dst_addr == GA_INVALID) return false;
@@ -608,7 +622,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_GpuAlloc_OpenScope(u->allocator);
 
     {
-        uint32_t src_ofs = (uint32_t)by1 * layer_stride + (uint32_t)bx1 * 4;
+        uint32_t src_ofs = (uint32_t)by1 * layer_stride + (uint32_t)bx1 * (uint32_t)layer_bpp;
 
         EVE_CoCmd_renderTarget(phost, extract_addr, ARGB8, paw, pah);
         EVE_CoCmd_dlStart(phost);
@@ -620,7 +634,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
         EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(phost, dst_addr + src_ofs);
-        EVE_CoDl_bitmapLayout(phost, ARGB8, layer_stride, layer_h - by1);
+        eve5_set_image_bitmap_layout(phost, layer_fmt, (int32_t)layer_stride, layer_h - by1, layer_luminance);
 
         /* Draw 1: stretch source to fill padded buffer (edge extension) */
         {
@@ -669,7 +683,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoDl_blendFunc(phost, ONE, ZERO);
         EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(phost, dst_addr + src_ofs);
-        EVE_CoDl_bitmapLayout(phost, ARGB8, layer_stride, layer_h - by1);
+        eve5_set_image_bitmap_layout(phost, layer_fmt, (int32_t)layer_stride, layer_h - by1, layer_luminance);
         EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, bw, bh);
         EVE_CoDl_bitmapTransform_identity(phost);
 
@@ -909,14 +923,14 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         uint32_t scale_x = (uint32_t)final_lev->w * 256 / (uint32_t)pw;
         uint32_t scale_y = (uint32_t)final_lev->h * 256 / (uint32_t)ph;
 
-        EVE_CoCmd_renderTarget(phost, dst_addr, ARGB8, layer_aw, layer_ah);
+        EVE_CoCmd_renderTarget(phost, dst_addr, layer_fmt, layer_aw, layer_ah);
         EVE_CoCmd_dlStart(phost);
 
         /* Blit entire source layer as background (preserves unchanged areas) */
         EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
         EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(phost, dst_addr);
-        EVE_CoDl_bitmapLayout(phost, ARGB8, layer_stride, layer_h);
+        eve5_set_image_bitmap_layout(phost, layer_fmt, (int32_t)layer_stride, layer_h, layer_luminance);
         EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, layer_w, layer_h);
         EVE_CoDl_bitmapTransform_identity(phost);
         EVE_CoDl_blendFunc(phost, ONE, ZERO);
