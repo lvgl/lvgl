@@ -38,7 +38,9 @@
  *
  * On an L8 layer, LVGL applies the mode to the luminances. The math then runs
  * once, on the luminance an L8 render target stores ((r + g + b) / 3), and
- * writes the result to all three channels.
+ * writes the result to all three channels. With LV_DRAW_EVE5_L8_EXACT, dst
+ * and src first get LVGL's luminance on all three channels
+ * (lv_draw_eve5_blend_luminance), and the math reads one.
  *
  * Per-channel pass counts:
  *   MULTIPLY:    3 draws/channel = 9 + 1 alpha = 10 draws, 2 DLs
@@ -68,7 +70,7 @@
  **********************/
 
 /** Pseudo channel for the per-channel math: the luminance an L8 render
- *  target stores, (r + g + b) / 3 */
+ *  target stores, (r + g + b) / 3, or LVGL's with LV_DRAW_EVE5_L8_EXACT */
 #define LUMINANCE 0xFF
 
 /**********************
@@ -225,11 +227,15 @@ static void copy_src_alpha(EVE_HalContext *phost, uint32_t src_addr,
  * alpha = bitmap.channel, or (add) min(alpha + bitmap.channel, 255).
  * LUMINANCE sums the three channels, each scaled by a third through COLOR_A.
  * The rounding of each third leaves it within 1 of the L8 render target's
- * (r + g + b) / 3.
+ * (r + g + b) / 3. With LV_DRAW_EVE5_L8_EXACT, the bitmap holds the
+ * luminance on every channel, and LUMINANCE reads red.
  */
 static void draw_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stride,
                          int32_t w, int32_t h, uint8_t channel, bool add)
 {
+#if LV_DRAW_EVE5_L8_EXACT
+    if(channel == LUMINANCE) channel = RED;
+#endif
     if(channel == LUMINANCE) {
         EVE_CoDl_colorArgb_ex(phost, 0x55FFFFFF);
         for(int i = 0; i < 3; i++) {
@@ -323,7 +329,7 @@ static bool composite_over_dst(lv_draw_eve5_unit_t * u, EVE_GpuHandle *out_resul
         return false;
     }
 
-    EVE_GpuHandle result_handle = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    EVE_GpuHandle result_handle = lv_draw_eve5_alloc(u, buf_size, GA_ALIGN_128);
     uint32_t result_addr = EVE_GpuAlloc_Get(u->allocator, result_handle);
     if(result_addr == GA_INVALID) {
         EVE_GpuAlloc_ScopedFree(u->allocator, temp_handle);
@@ -356,6 +362,76 @@ static bool composite_over_dst(lv_draw_eve5_unit_t * u, EVE_GpuHandle *out_resul
  * GLOBAL FUNCTIONS
  **********************/
 
+#if LV_DRAW_EVE5_L8_EXACT
+/**
+ * Give an ARGB8 buffer of the layer's size (premultiplied) LVGL's luminance
+ * on all three channels, keeping its alpha, for the math on an L8 layer's
+ * luminances: lv_draw_eve5_draw_luminance computes it into an L8 render
+ * target, which is drawn back as gray. Returns the new buffer and releases
+ * the old one, or returns the old one when out of memory.
+ */
+EVE_GpuHandle lv_draw_eve5_blend_luminance(lv_draw_eve5_unit_t * u, lv_layer_t * layer, EVE_GpuHandle handle)
+{
+    EVE_HalContext *phost = u->hal;
+    int32_t w = lv_area_get_width(&layer->buf_area);
+    int32_t h = lv_area_get_height(&layer->buf_area);
+    int32_t aw = ALIGN_UP(w, 16);
+    int32_t ah = ALIGN_UP(h, 16);
+    uint32_t stride = aw * 4;
+
+    uint32_t addr = EVE_GpuAlloc_Get(u->allocator, handle);
+    if(addr == GA_INVALID) return handle;
+
+    EVE_GpuHandle l8 = lv_draw_eve5_alloc(u, (uint32_t)aw * (uint32_t)ah, GA_ALIGN_128);
+    EVE_GpuHandle gray = lv_draw_eve5_alloc(u, stride * (uint32_t)ah, GA_ALIGN_128);
+    uint32_t l8_addr = EVE_GpuAlloc_Get(u->allocator, l8);
+    uint32_t gray_addr = EVE_GpuAlloc_Get(u->allocator, gray);
+    if(l8_addr == GA_INVALID || gray_addr == GA_INVALID) {
+        LV_LOG_WARN("EVE5: Out of memory for the luminance of a blend, using (r + g + b) / 3");
+        if(l8_addr != GA_INVALID) EVE_GpuAlloc_Free(u->allocator, l8);
+        if(gray_addr != GA_INVALID) EVE_GpuAlloc_Free(u->allocator, gray);
+        return handle;
+    }
+
+    EVE_GpuAlloc_OpenScope(u->allocator);
+
+    EVE_CoCmd_renderTarget(phost, l8_addr, L8, aw, ah);
+    EVE_CoCmd_dlStart(phost);
+    EVE_CoDl_scissorXY(phost, 0, 0);
+    EVE_CoDl_scissorSize(phost, w, h);
+    EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+    EVE_CoDl_clear(phost, 1, 1, 1);
+    EVE_CoDl_vertexFormat(phost, 0);
+    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoDl_bitmapSource(phost, addr);
+    EVE_CoDl_bitmapTransform_identity(phost);
+    lv_draw_eve5_draw_luminance(phost, ARGB8, stride, w, h);
+    finish_channel_dl(phost);
+
+    begin_channel_dl(phost, gray_addr, aw, ah, w, h);
+    EVE_CoDl_blendFunc(phost, ONE, ZERO);
+    EVE_CoDl_colorMask(phost, 1, 1, 1, 0);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoDl_bitmapSource(phost, l8_addr);
+    EVE_CoDl_bitmapLayout(phost, GLFORMAT, aw, h);
+    EVE_CoDl_bitmapExtFormat(phost, L8);
+    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, w, h);
+    EVE_CoDl_bitmapSwizzle(phost, ALPHA, ALPHA, ALPHA, ONE);
+    EVE_CoDl_bitmapTransform_identity(phost);
+    draw_bitmap(phost);
+    EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+    setup_blit(phost, addr, stride, w, h);
+    draw_bitmap(phost);
+    finish_channel_dl(phost);
+
+    EVE_GpuAlloc_ScopedFree(u->allocator, l8);
+    EVE_GpuAlloc_ScopedFree(u->allocator, handle);
+    EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
+    return gray;
+}
+#endif
+
 /**
  * MULTIPLY: temp.c = d.c * P.c
  * @param luminance  true: run on the luminances (L8 layers)
@@ -380,7 +456,7 @@ bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
-    EVE_GpuHandle temp = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    EVE_GpuHandle temp = lv_draw_eve5_alloc(u, buf_size, GA_ALIGN_128);
     uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);
     if(temp_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
@@ -442,7 +518,7 @@ bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
-    EVE_GpuHandle temp = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    EVE_GpuHandle temp = lv_draw_eve5_alloc(u, buf_size, GA_ALIGN_128);
     uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);
     if(temp_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
@@ -498,7 +574,7 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
-    EVE_GpuHandle scaled = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    EVE_GpuHandle scaled = lv_draw_eve5_alloc(u, buf_size, GA_ALIGN_128);
     uint32_t scaled_addr = EVE_GpuAlloc_Get(u->allocator, scaled);
     if(scaled_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
@@ -520,7 +596,7 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     finish_channel_dl(phost);
 
     /* DL2: temp.c = max(scaled.c - P.c, 0) + max(P.c - scaled.c, 0) */
-    EVE_GpuHandle temp = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    EVE_GpuHandle temp = lv_draw_eve5_alloc(u, buf_size, GA_ALIGN_128);
     uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);
     /* Re-resolve addresses (the allocator may have moved things) */
     scaled_addr = EVE_GpuAlloc_Get(u->allocator, scaled);
@@ -585,7 +661,7 @@ bool lv_draw_eve5_blend_additive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
-    EVE_GpuHandle temp = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    EVE_GpuHandle temp = lv_draw_eve5_alloc(u, buf_size, GA_ALIGN_128);
     uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);
     if(temp_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
@@ -611,7 +687,7 @@ bool lv_draw_eve5_blend_additive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     finish_channel_dl(phost);
 
     /* DL2: out.c = 1 - (D.c*(1 - a) + temp.c) */
-    EVE_GpuHandle result = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    EVE_GpuHandle result = lv_draw_eve5_alloc(u, buf_size, GA_ALIGN_128);
     uint32_t result_addr = EVE_GpuAlloc_Get(u->allocator, result);
     /* Re-resolve addresses (the allocator may have moved things) */
     temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);

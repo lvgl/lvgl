@@ -129,7 +129,7 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
                                           bool is_screen, bool layer_has_alpha,
                                           const lv_draw_eve5_slice_t * slice, bool apply_bitmap_mask);
 static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
-static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_task_t * end);
+static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_task_t * end, bool luminance);
 #endif
 
 /* Non-render-target dispatch path for EVE generations without CMD_RENDERTARGET
@@ -708,7 +708,7 @@ static void eve5_render_range(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         if(stop == range->end) return;
 
         lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
-        EVE_GpuHandle next = EVE_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
+        EVE_GpuHandle next = lv_draw_eve5_alloc(u, vr->base.size, GA_ALIGN_128);
         if(EVE_GpuAlloc_Get(u->allocator, next) == GA_INVALID) {
             LV_LOG_ERROR("EVE5: Failed to allocate buffer for the next slice, dropping its tasks");
             eve5_finish_queued(stop, range->end);
@@ -768,7 +768,7 @@ static bool eve5_argb8_detach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, lv_ev
     uint32_t stride = (uint32_t)aw * 4;
     uint32_t size = stride * (uint32_t)ah;
 
-    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
+    EVE_GpuHandle handle = lv_draw_eve5_alloc(u, size, GA_ALIGN_128);
     if(EVE_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
         LV_LOG_ERROR("EVE5: Failed to allocate ARGB8 intermediate for slicing (%" LV_PRIu32 " bytes)", size);
         return false;
@@ -845,7 +845,7 @@ static EVE_GpuHandle eve5_argb8_attach(lv_draw_eve5_unit_t * u, lv_layer_t * lay
         int32_t ah = ALIGN_UP(lv_area_get_height(&layer->buf_area), 16);
         vr->stride = (uint32_t)aw * (uint32_t)eve5_format_bpp(saved->eve_format);
         vr->base.size = eve5_rt_surface_size(saved->eve_format, vr->stride, (uint32_t)ah);
-        vr->gpu_handle = EVE_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
+        vr->gpu_handle = lv_draw_eve5_alloc(u, vr->base.size, GA_ALIGN_128);
         vr->source_offset = 0;
         vr->palette_offset = GA_INVALID;
         vr->has_content = false;
@@ -957,29 +957,37 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
      * is presented or converted once complete. */
     bool whole_only = is_swapchain || (vr != NULL && eve5_format_is_lossy(layer_format));
 
+    /* LV_DRAW_EVE5_L8_EXACT: an L8 layer always renders to an ARGB8
+     * intermediate, and gets LVGL's luminance of it once complete */
+    bool exact_luminance = LV_DRAW_EVE5_L8_EXACT && vr != NULL && layer_format == L8;
+
     /* Slice-boundary splitting: scan for tasks that require splitting the render
      * queue into slices. Two kinds:
      * - Blend modes (IMAGE/LAYER with non-standard blend): isolated render + per-channel blend math
      * - Blur: mipmap downsample chain on the accumulated content
      * Each such task becomes a slice boundary. Between boundaries, the display
      * list budget may split the tasks further (eve5_render_range). */
-    lv_draw_task_t * blend_task = eve5_find_blend_task(layer->draw_task_head, NULL);
+    lv_draw_task_t * blend_task = eve5_find_blend_task(layer->draw_task_head, NULL, exact_luminance);
 
     if(blend_task == NULL) {
         lv_draw_eve5_slice_t range;
         lv_memzero(&range, sizeof(range));
         range.prev_handle = GA_HANDLE_INVALID;
 
-        if(!whole_only || lv_draw_eve5_range_fits_dl(u, layer->draw_task_head, NULL,
-                                                     EVE5_DL_INIT_LAYER + EVE5_DL_FINISH_LAYER)) {
+        if(!exact_luminance && (!whole_only || lv_draw_eve5_range_fits_dl(u, layer->draw_task_head, NULL,
+                                                                          EVE5_DL_INIT_LAYER + EVE5_DL_FINISH_LAYER))) {
             eve5_render_range(u, layer, is_screen, layer_has_alpha, &range, true);
         }
         else {
-            /* The layer may not fit one display list: render the slices to
-             * an intermediate, and present or convert that */
+            /* The layer may not fit one display list, or gets its
+             * luminance exactly: render the slices to an intermediate, and
+             * present or convert that */
             eve5_argb8_state_t saved;
             if(!eve5_argb8_detach(u, layer, vr, &saved)) {
-                eve5_finish_queued(layer->draw_task_head, NULL);
+                /* Without memory for it, a layer still renders directly,
+                 * with less precision; the swapchain can't */
+                if(is_swapchain) eve5_finish_queued(layer->draw_task_head, NULL);
+                else eve5_render_range(u, layer, is_screen, layer_has_alpha, &range, true);
                 goto render_done;
             }
             eve5_render_range(u, layer, is_screen, layer_has_alpha, &range, true);
@@ -1041,7 +1049,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
         while(cursor) {
             /* Find next slice-boundary task from cursor */
-            blend_task = eve5_find_blend_task(cursor, NULL);
+            blend_task = eve5_find_blend_task(cursor, NULL, exact_luminance);
 
             if(blend_task == NULL) {
                 /* No more blend tasks — render remainder as final slice */
@@ -1052,9 +1060,9 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 slice_tail.prev_handle = prev;
                 slice_tail.isolated = false;
 
-                if(argb8_sliced && (!whole_only
-                                    || lv_draw_eve5_range_fits_dl(u, cursor, NULL,
-                                                                  EVE5_DL_INIT_LAYER + EVE5_DL_FINISH_LAYER))) {
+                if(argb8_sliced && !exact_luminance
+                   && (!whole_only || lv_draw_eve5_range_fits_dl(u, cursor, NULL,
+                                                                 EVE5_DL_INIT_LAYER + EVE5_DL_FINISH_LAYER))) {
                     /* Render the tail directly into the layer's own format,
                      * or to the swapchain. Free the fresh intermediate
                      * reserved for it. No guard Get: it would re-stamp the
@@ -1069,8 +1077,9 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     eve5_render_range(u, layer, is_screen, layer_has_alpha, &slice_tail, true);
                 }
                 else if(argb8_sliced) {
-                    /* The tail may need several slices: render them to the
-                     * intermediate as the layer, then present or convert it */
+                    /* The tail may need several slices, or the layer gets its
+                     * luminance exactly: render them to the intermediate as
+                     * the layer, then present or convert it */
                     eve5_render_range(u, layer, is_screen, layer_has_alpha, &slice_tail, true);
                     bool has_content = vr->has_content;
                     EVE_GpuHandle inter = eve5_argb8_attach(u, layer, vr, &saved);
@@ -1115,7 +1124,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                  * unchanged and no buffer swap is needed. */
                 if(vr != NULL && vr->has_content) {
                     EVE_GpuHandle dst_handle = vr->gpu_handle;
-                    EVE_GpuHandle new_handle = EVE_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
+                    EVE_GpuHandle new_handle = lv_draw_eve5_alloc(u, vr->base.size, GA_ALIGN_128);
                     if(EVE_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
                         vr->gpu_handle = new_handle;
                         vr->has_content = false;
@@ -1150,7 +1159,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 lv_draw_eve5_hal_init_layer(u, layer, inter_is_screen, &slice_base);
                 if(eve5_get_vram_res(layer) != NULL) {
                     lv_draw_eve5_hal_finish_layer(u, layer, inter_is_screen, 0);
-                    EVE_GpuHandle new_handle = EVE_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
+                    EVE_GpuHandle new_handle = lv_draw_eve5_alloc(u, vr->base.size, GA_ALIGN_128);
                     if(EVE_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
                         prev = vr->gpu_handle;
                         vr->gpu_handle = new_handle;
@@ -1165,7 +1174,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 int32_t aw = ALIGN_UP(lv_area_get_width(&layer->buf_area), 16);
                 int32_t ah = ALIGN_UP(lv_area_get_height(&layer->buf_area), 16);
                 uint32_t sz = (uint32_t)aw * (uint32_t)ah * 4;
-                prev = EVE_GpuAlloc_Alloc(u->allocator, sz, GA_ALIGN_128);
+                prev = lv_draw_eve5_alloc(u, sz, GA_ALIGN_128);
                 uint32_t pa = EVE_GpuAlloc_Get(u->allocator, prev);
                 if(pa != GA_INVALID) {
                     /* Clear-only DL: samples no allocator-managed memory,
@@ -1198,7 +1207,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
             if(vr != NULL && vr->has_content) {
                 src_handle = vr->gpu_handle;
                 /* Allocate fresh buffer for the next phase */
-                EVE_GpuHandle new_handle = EVE_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
+                EVE_GpuHandle new_handle = lv_draw_eve5_alloc(u, vr->base.size, GA_ALIGN_128);
                 if(EVE_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
                     vr->gpu_handle = new_handle;
                     vr->has_content = false;
@@ -1215,6 +1224,14 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 const lv_draw_image_dsc_t * dsc = blend_task->draw_dsc;
                 EVE_GpuHandle result = GA_HANDLE_INVALID;
                 bool blend_attempted = false;
+
+#if LV_DRAW_EVE5_L8_EXACT
+                /* The math runs on LVGL's luminances of both */
+                if(exact_luminance) {
+                    prev = lv_draw_eve5_blend_luminance(u, layer, prev);
+                    src_handle = lv_draw_eve5_blend_luminance(u, layer, src_handle);
+                }
+#endif
 
                 if(dsc->blend_mode == LV_BLEND_MODE_MULTIPLY) {
                     lv_draw_eve5_blend_multiply(u, layer, prev, src_handle, blend_luminance, &result);
@@ -1246,7 +1263,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     uint32_t bstride = (uint32_t)baw * 4;
                     uint32_t bsize = bstride * (uint32_t)bah;
 
-                    result = EVE_GpuAlloc_Alloc(u->allocator, bsize, GA_ALIGN_128);
+                    result = lv_draw_eve5_alloc(u, bsize, GA_ALIGN_128);
                     uint32_t result_addr = EVE_GpuAlloc_Get(u->allocator, result);
                     uint32_t prev_addr = EVE_GpuAlloc_Get(u->allocator, prev);
                     uint32_t src_addr = EVE_GpuAlloc_Get(u->allocator, src_handle);
@@ -1358,7 +1375,7 @@ render_done:
  * NULL if none. Centralizes the search used by eve5_render_layer and
  * eve5_render_layer_full_screen_sliced.
  */
-static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_task_t * end)
+static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_task_t * end, bool luminance)
 {
     for(lv_draw_task_t * t = cursor; t != end; t = t->next) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5) continue;
@@ -1376,9 +1393,11 @@ static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_ta
              * whole image is partially covered, so it is sliced for the exact
              * math (lv_draw_eve5_blend_additive); at full opacity, only
              * antialiased edges and translucent pixels over bright content
-             * differ, and it stays inline for speed. */
+             * differ, and it stays inline for speed. On a layer that gets
+             * LVGL's luminance exactly, the sum saturates on the luminance,
+             * not on each channel: always sliced. */
             if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
-                if(dsc->opa < LV_OPA_MAX) return t;
+                if(dsc->opa < LV_OPA_MAX || luminance) return t;
             }
             else if(dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
                 return t;

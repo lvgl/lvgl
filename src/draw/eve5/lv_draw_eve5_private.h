@@ -130,6 +130,27 @@ extern "C" {
 #define LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 0
 #endif
 
+/* Match LVGL's luminance on L8 render targets: screen tiles of L8, AL88 and
+ * I1 displays, L8 layers and L8 canvases. The render engine stores
+ * (r + g + b) / 3 when it writes an L8 line, LVGL (77 r + 151 g + 28 b) / 256.
+ * With this on, such a layer always renders in color to an ARGB8
+ * intermediate, which is then drawn into the L8 target once per channel,
+ * swizzled to gray and scaled by LVGL's weight. Blend modes on L8 use the same
+ * weights. Costs the intermediate (4 bytes per pixel while the layer renders)
+ * and a conversion pass. */
+#ifndef LV_DRAW_EVE5_L8_EXACT
+#define LV_DRAW_EVE5_L8_EXACT 1
+#endif
+
+/* LVGL's luminance weights 77/151/28 of 256, tripled, as color scales of 255
+ * for the channels of an L8 render target's (r + g + b) / 3: red and blue,
+ * and green's share over 255 (451), added to red and blue where they have
+ * room. See lv_draw_eve5_draw_luminance. */
+#define EVE5_LUMINANCE_R 230
+#define EVE5_LUMINANCE_B 84
+#define EVE5_LUMINANCE_G_R 25
+#define EVE5_LUMINANCE_G_B 171
+
 /* Render opaque canvas layers into YCBCR render targets (BT820+ only).
  * YCBCR is a 2x2-pixel block format (4 bytes per block: line stride is
  * 2 bytes/pixel, each stored line covers two display rows) — 1 byte per
@@ -991,6 +1012,11 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src
  * LAYER MANAGEMENT
  **********************/
 
+#if LV_DRAW_EVE5_L8_EXACT
+void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, uint32_t stride,
+                                 int32_t w, int32_t h);
+#endif
+EVE_GpuHandle lv_draw_eve5_alloc(lv_draw_eve5_unit_t * u, uint32_t size, uint32_t flags);
 void lv_draw_eve5_hal_layer_format(lv_draw_eve5_unit_t * u, const lv_layer_t * layer, bool is_screen,
                                    uint16_t * target_eve_fmt, uint8_t * target_bpp);
 void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen,
@@ -1119,6 +1145,9 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                 EVE_GpuHandle dst_handle, const lv_draw_task_t * blur_task);
 
 /* Blend mode support (MULTIPLY, SUBTRACTIVE, DIFFERENCE) */
+#if LV_DRAW_EVE5_L8_EXACT
+EVE_GpuHandle lv_draw_eve5_blend_luminance(lv_draw_eve5_unit_t * u, lv_layer_t * layer, EVE_GpuHandle handle);
+#endif
 bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
                                  bool luminance, EVE_GpuHandle *out_result);

@@ -256,7 +256,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, size, alloc_flags);
+    EVE_GpuHandle handle = lv_draw_eve5_alloc(u, size, alloc_flags);
     if(EVE_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
         LV_LOG_WARN("EVE5 VRAM alloc failed (%ux%u fmt=%d, %u bytes)", w, h, eve_fmt, size);
 #if LV_USE_OS
@@ -298,6 +298,20 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     LV_LOG_INFO("EVE5 VRAM alloc: %ux%u fmt=%d stride=%u -> handle %d",
                 w, h, eve_fmt, vr->stride, handle.Id);
     return true;
+}
+
+/* Allocate VRAM for a render target or an intermediate. Freed memory is
+ * reclaimed once the display lists that used it have completed, which the
+ * HAL only notices while it waits for the coprocessor: a frame with many
+ * large intermediates, such as a screen of blend modes, can run out first.
+ * On failure, wait for the coprocessor, reclaim, and try once more. */
+EVE_GpuHandle lv_draw_eve5_alloc(lv_draw_eve5_unit_t * u, uint32_t size, uint32_t flags)
+{
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, size, flags);
+    if(handle.Id != GA_HANDLE_INVALID.Id) return handle;
+    EVE_Cmd_waitFlush(u->hal);
+    EVE_GpuAlloc_UpdateFree(u->allocator, EVE_Cmd_syncCompleted(u->hal));
+    return EVE_GpuAlloc_Alloc(u->allocator, size, flags);
 }
 
 static void eve5_vram_free_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
@@ -436,6 +450,35 @@ void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
 #ifdef EVE_SUPPORT_RENDERTARGET
 /* init_layer / finish_layer / blit_l8_to_alpha drive the BT820 render engine
  * (CMD_RENDERTARGET, SWAPCHAIN_0, RGB8/ARGB8 layer formats). */
+
+#if LV_DRAW_EVE5_L8_EXACT
+/* Draw a color bitmap (source set on the current handle) into an L8 render
+ * target as LVGL's luminance, (77 r + 151 g + 28 b) / 256. The render engine
+ * stores (r + g + b) / 3 of each line, so the draws make the channels sum to
+ * three times the luminance: red and blue scaled by three times their weight,
+ * green in full, and the rest of green's weight added to red and blue, where
+ * it fits. The render engine rounds each product and truncates the third, as
+ * LVGL truncates its sum: 81% of all colors come out exact and the rest 1
+ * off, and grays are unchanged, so content that goes through again doesn't
+ * drift. The source is premultiplied or opaque: alpha takes no part. */
+void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, uint32_t stride,
+                                 int32_t w, int32_t h)
+{
+    EVE_CoDl_bitmapLayout(phost, GLFORMAT, stride, h);
+    EVE_CoDl_bitmapExtFormat(phost, eve_format);
+    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, w, h);
+    EVE_CoDl_begin(phost, BITMAPS);
+    EVE_CoDl_blendFunc(phost, ONE, ZERO);
+    EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ONE);
+    EVE_CoDl_colorRgb(phost, EVE5_LUMINANCE_R, 255, EVE5_LUMINANCE_B);
+    EVE_CoDl_vertex2f_0(phost, 0, 0);
+    EVE_CoDl_blendFunc(phost, ONE, ONE);
+    EVE_CoDl_bitmapSwizzle(phost, GREEN, ZERO, GREEN, ONE);
+    EVE_CoDl_colorRgb(phost, EVE5_LUMINANCE_G_R, 0, EVE5_LUMINANCE_G_B);
+    EVE_CoDl_vertex2f_0(phost, 0, 0);
+    EVE_CoDl_end(phost);
+}
+#endif
 
 /* Render target format of a layer: a partial-mode screen tile's, from the
  * display's format, or the render target format of the layer's color format,
@@ -631,7 +674,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                 /* ScopedFree: previous buffer may be referenced by a prior frame's compositing DL */
                 EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
             }
-            vr->gpu_handle = EVE_GpuAlloc_Alloc(u->allocator, needed_size, GA_ALIGN_128);
+            vr->gpu_handle = lv_draw_eve5_alloc(u, needed_size, GA_ALIGN_128);
             vr->eve_format = target_eve_fmt;
             vr->stride = needed_stride;
             vr->source_offset = 0;
@@ -727,11 +770,20 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
             EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
             EVE_CoDl_bitmapSource(phost, prev_addr);
-            eve5_set_image_bitmap_layout(u->hal, prev_fmt, (int32_t)prev_stride, h, prev_luminance);
-            EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, w, h);
-            EVE_CoDl_begin(u->hal, BITMAPS);
-            EVE_CoDl_vertex2f_0(u->hal, 0, 0);
-            EVE_CoDl_end(u->hal);
+#if LV_DRAW_EVE5_L8_EXACT
+            if(target_eve_fmt == L8 && prev_fmt != L8) {
+                /* An L8 layer's content in color (its ARGB8 intermediate) */
+                lv_draw_eve5_draw_luminance(phost, prev_fmt, prev_stride, w, h);
+            }
+            else
+#endif
+            {
+                eve5_set_image_bitmap_layout(u->hal, prev_fmt, (int32_t)prev_stride, h, prev_luminance);
+                EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, w, h);
+                EVE_CoDl_begin(u->hal, BITMAPS);
+                EVE_CoDl_vertex2f_0(u->hal, 0, 0);
+                EVE_CoDl_end(u->hal);
+            }
             EVE_CoDl_restoreContext(u->hal);
 
             u->canvas_orig_addr = prev_addr;
@@ -769,7 +821,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         uint32_t new_size = eve5_rt_surface_size(target_eve_fmt,
                                                  (uint32_t)aligned_w * target_bpp, (uint32_t)aligned_h);
         EVE_GpuHandle new_handle = kept_base != GA_INVALID ? vr->gpu_handle
-                                   : EVE_GpuAlloc_Alloc(u->allocator, new_size, GA_ALIGN_128);
+                                   : lv_draw_eve5_alloc(u, new_size, GA_ALIGN_128);
         uint32_t new_addr = EVE_GpuAlloc_Get(u->allocator, new_handle);
 
         if(new_addr == GA_INVALID || (kept_handle.Id != GA_HANDLE_INVALID.Id && kept_base == GA_INVALID)) {
@@ -935,7 +987,7 @@ EVE_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
     EVE_HalContext *phost = u->hal;
 
     uint32_t l8_size = (uint32_t)aligned_w * aligned_h;
-    EVE_GpuHandle l8_handle = EVE_GpuAlloc_Alloc(u->allocator, l8_size, GA_ALIGN_128);
+    EVE_GpuHandle l8_handle = lv_draw_eve5_alloc(u, l8_size, GA_ALIGN_128);
     uint32_t l8_addr = EVE_GpuAlloc_Get(u->allocator, l8_handle);
 
     if(l8_addr == GA_INVALID) {

@@ -136,6 +136,13 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
         return false;
     }
 
+    /* An L8 canvas holds luminance: an image in color goes through the render
+     * path, which converts it */
+    if(layer->draw_buf->header.cf == LV_COLOR_FORMAT_L8
+       && !(src_vr->eve_format == L8 && src_vr->sample_as_luminance)) {
+        return false;
+    }
+
     /* STEAL the GPU allocation from the source: the canvas takes sole
      * ownership of the handle. Sharing would be unsound — a canvas can be
      * drawn onto (mutating bytes the cached source still believes it owns)
