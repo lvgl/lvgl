@@ -130,6 +130,14 @@ typedef enum {
     LV_EVENT_TRANSLATION_LANGUAGE_CHANGED, /**< Sent when the translation language changed. */
 #endif /*LV_USE_TRANSLATION*/
 
+    LV_EVENT_KEY_PRESSED,         /**< A key has been pressed. */
+    LV_EVENT_KEY_SHORT_CLICKED,   /**< A key was pressed for less than `long_press_time`, then released. */
+    LV_EVENT_KEY_LONG_CLICKED,    /**< A key was pressed for at least `long_press_time`, then released. */
+    LV_EVENT_KEY_LONG_PRESSED,    /**< A key has been pressed for at least `long_press_time`. */
+    LV_EVENT_KEY_LONG_PRESSED_REPEAT, /**< Sent after `long_press_time` in every `long_press_repeat_time` ms while a key is pressed. */
+    LV_EVENT_KEY_CLICKED,         /**< A key was pressed, then released, after either a short or a long press. */
+    LV_EVENT_KEY_RELEASED,        /**< A key has been released. */
+
     LV_EVENT_LAST,                 /** Number of default events */
 
     LV_EVENT_LAST_CUSTOM = 0x7FFF,  /** Sentinel for the last custom event code*/

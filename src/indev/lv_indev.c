@@ -55,6 +55,7 @@ static bool indev_reset_check(lv_indev_t * indev);
 static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
 static lv_result_t send_event(lv_event_code_t code, void * param);
+static lv_result_t send_key_event(lv_event_code_t code, bool to_obj);
 
 static lv_rotation_dir_t indev_rotation_dir(const lv_indev_t * indev);
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
@@ -867,6 +868,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_INFO("%" LV_PRIu32 " key is pressed", data->key);
         i->pr_timestamp = i->timestamp;
 
+        const bool key_to_obj = is_enabled && data->key != LV_KEY_NEXT && data->key != LV_KEY_PREV;
+
+        if(send_key_event(LV_EVENT_KEY_PRESSED, key_to_obj) == LV_RESULT_INVALID) return;
+
         if(g == NULL) {
             if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
         }
@@ -907,18 +912,22 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Pressing*/
-    else if(is_enabled && data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
+    else if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
 
-        if(g == NULL || data->key == LV_KEY_ENTER) {
+        const bool key_to_obj = is_enabled && data->key != LV_KEY_NEXT && data->key != LV_KEY_PREV;
+
+        if(is_enabled && (g == NULL || data->key == LV_KEY_ENTER)) {
             if(send_event(LV_EVENT_PRESSING, indev_act) == LV_RESULT_INVALID) return;
         }
 
         /*Long press time has elapsed?*/
         if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) >= i->long_press_time) {
             i->long_pr_sent = 1;
-            if(g == NULL || data->key == LV_KEY_ENTER) {
-                i->longpr_rep_timestamp = i->timestamp;
+            i->longpr_rep_timestamp = i->timestamp;
 
+            if(send_key_event(LV_EVENT_KEY_LONG_PRESSED, key_to_obj) == LV_RESULT_INVALID) return;
+
+            if(is_enabled && (g == NULL || data->key == LV_KEY_ENTER)) {
                 if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
             }
         }
@@ -928,36 +937,51 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             i->longpr_rep_timestamp = i->timestamp;
 
+            if(send_key_event(LV_EVENT_KEY_LONG_PRESSED_REPEAT, key_to_obj) == LV_RESULT_INVALID) return;
+
             /*Send LONG_PRESS_REP on ENTER*/
-            if(g == NULL || data->key == LV_KEY_ENTER) {
+            if(is_enabled && (g == NULL || data->key == LV_KEY_ENTER)) {
                 if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
             }
             /*Move the focus on NEXT again*/
-            else if(data->key == LV_KEY_NEXT) {
+            else if(is_enabled && data->key == LV_KEY_NEXT) {
                 lv_group_set_editing(g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
                 lv_group_focus_next(g);
                 if(indev_reset_check(i)) return;
             }
             /*Move the focus on PREV again*/
-            else if(data->key == LV_KEY_PREV) {
+            else if(is_enabled && data->key == LV_KEY_PREV) {
                 lv_group_set_editing(g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
                 lv_group_focus_prev(g);
                 if(indev_reset_check(i)) return;
             }
             /*Just send other keys again to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT)*/
-            else {
+            else if(is_enabled) {
                 lv_group_send_data(g, data->key);
                 if(indev_reset_check(i)) return;
             }
         }
     }
     /*Release happened*/
-    else if(is_enabled && data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
+    else if(data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
         LV_LOG_INFO("%" LV_PRIu32 " key is released", data->key);
 
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
-        if(g == NULL || data->key == LV_KEY_ENTER) {
+        i->keypad.last_key = prev_key;
+
+        const bool key_to_obj = is_enabled && data->key != LV_KEY_NEXT && data->key != LV_KEY_PREV;
+
+        if(send_key_event(LV_EVENT_KEY_RELEASED, key_to_obj) == LV_RESULT_INVALID) return;
+        if(i->long_pr_sent == 0) {
+            if(send_key_event(LV_EVENT_KEY_SHORT_CLICKED, key_to_obj) == LV_RESULT_INVALID) return;
+        }
+        else {
+            if(send_key_event(LV_EVENT_KEY_LONG_CLICKED, key_to_obj) == LV_RESULT_INVALID) return;
+        }
+        if(send_key_event(LV_EVENT_KEY_CLICKED, key_to_obj) == LV_RESULT_INVALID) return;
+
+        if(is_enabled && (g == NULL || data->key == LV_KEY_ENTER)) {
 
             if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
 
@@ -996,6 +1020,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*Save the last keys before anything else.
      *They need to be already saved if the function returns for any reason*/
+    uint32_t prev_key = i->keypad.last_key;
     lv_indev_state_t last_state     = i->keypad.last_state;
     i->keypad.last_state = data->state;
     i->keypad.last_key   = data->key;
@@ -1018,6 +1043,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_INFO("pressed");
 
         i->pr_timestamp = i->timestamp;
+
+        if(send_key_event(LV_EVENT_KEY_PRESSED, is_enabled) == LV_RESULT_INVALID) return;
 
         if(data->key == LV_KEY_ENTER) {
             bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
@@ -1060,6 +1087,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->long_pr_sent = 1;
             i->longpr_rep_timestamp = i->timestamp;
 
+            if(send_key_event(LV_EVENT_KEY_LONG_PRESSED, is_enabled) == LV_RESULT_INVALID) return;
+
             if(data->key == LV_KEY_ENTER) {
                 /* Always send event to indev callbacks*/
                 lv_indev_send_event(indev_act, LV_EVENT_LONG_PRESSED, indev_obj_act);
@@ -1093,6 +1122,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             i->longpr_rep_timestamp = i->timestamp;
 
+            if(send_key_event(LV_EVENT_KEY_LONG_PRESSED_REPEAT, is_enabled) == LV_RESULT_INVALID) return;
+
             if(data->key == LV_KEY_ENTER) {
                 if(is_enabled) {
                     if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
@@ -1117,6 +1148,18 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Release happened*/
     else if(data->state == LV_INDEV_STATE_RELEASED && last_state == LV_INDEV_STATE_PRESSED) {
         LV_LOG_INFO("released");
+
+        data->key = prev_key;
+        i->keypad.last_key = prev_key;
+
+        if(send_key_event(LV_EVENT_KEY_RELEASED, is_enabled) == LV_RESULT_INVALID) return;
+        if(i->long_pr_sent == 0) {
+            if(send_key_event(LV_EVENT_KEY_SHORT_CLICKED, is_enabled) == LV_RESULT_INVALID) return;
+        }
+        else {
+            if(send_key_event(LV_EVENT_KEY_LONG_CLICKED, is_enabled) == LV_RESULT_INVALID) return;
+        }
+        if(send_key_event(LV_EVENT_KEY_CLICKED, is_enabled) == LV_RESULT_INVALID) return;
 
         if(data->key == LV_KEY_ENTER) {
             bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
@@ -1980,7 +2023,14 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
        code == LV_EVENT_LONG_PRESSED ||
        code == LV_EVENT_LONG_PRESSED_REPEAT ||
        code == LV_EVENT_ROTARY ||
-       code == LV_EVENT_KEY) {
+       code == LV_EVENT_KEY ||
+       code == LV_EVENT_KEY_PRESSED ||
+       code == LV_EVENT_KEY_SHORT_CLICKED ||
+       code == LV_EVENT_KEY_LONG_CLICKED ||
+       code == LV_EVENT_KEY_LONG_PRESSED ||
+       code == LV_EVENT_KEY_LONG_PRESSED_REPEAT ||
+       code == LV_EVENT_KEY_CLICKED ||
+       code == LV_EVENT_KEY_RELEASED) {
         lv_indev_send_event(indev, code, indev_obj_act);
         if(indev_reset_check(indev)) return LV_RESULT_INVALID;
 
@@ -1993,6 +2043,27 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
 
     if(indev_obj_act) {
         lv_obj_send_event(indev_obj_act, code, param);
+        if(indev_reset_check(indev)) return LV_RESULT_INVALID;
+    }
+
+    return LV_RESULT_OK;
+}
+
+static lv_result_t send_key_event(lv_event_code_t code, bool to_obj)
+{
+    lv_indev_t * indev = indev_act;
+    uint32_t key = indev->keypad.last_key;
+
+    lv_indev_send_event(indev, code, &key);
+    if(indev_reset_check(indev)) return LV_RESULT_INVALID;
+
+    if(indev_stop_processing_check(indev)) {
+        indev->stop_processing_query = 0;
+        return LV_RESULT_OK;
+    }
+
+    if(to_obj && indev_obj_act) {
+        lv_obj_send_event(indev_obj_act, code, &key);
         if(indev_reset_check(indev)) return LV_RESULT_INVALID;
     }
 
