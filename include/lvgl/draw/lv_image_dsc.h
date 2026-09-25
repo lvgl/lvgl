@@ -97,7 +97,13 @@ typedef enum {
 
 #if LV_BIG_ENDIAN_SYSTEM
 typedef struct {
-    uint32_t reserved_2: 16;    /**< Reserved to be used later*/
+    uint32_t reserved_2: 14;    /**< Reserved to be used later*/
+    uint32_t lsb_first: 1;      /**< For packed pixel formats.
+                                  *   1: the first pixel of each 8-pixel group is in the LSB of the byte,
+                                  *   0: it's in the MSB of the byte.*/
+    uint32_t vtiled: 1;         /**< For packed pixel formats.
+                                  *   1: each byte packs 8 vertically stacked pixels of a column (vertical tiling),
+                                  *   0: each byte packs 8 horizontally adjacent pixels of a row (horizontal tiling).*/
     uint32_t stride: 16;        /**< Number of bytes in a row*/
     uint32_t h: 16;
     uint32_t w: 16;
@@ -114,7 +120,13 @@ typedef struct {
     uint32_t w: 16;
     uint32_t h: 16;
     uint32_t stride: 16;        /**< Number of bytes in a row*/
-    uint32_t reserved_2: 16;    /**< Reserved to be used later*/
+    uint32_t vtiled: 1;         /**< For packed pixel formats.
+                                  *   1: each byte packs 8 vertically stacked pixels of a column (vertical tiling),
+                                  *   0: each byte packs 8 horizontally adjacent pixels of a row (horizontal tiling).*/
+    uint32_t lsb_first: 1;      /**< For packed pixel formats.
+                                  *   1: the first pixel of each 8-pixel group is in the LSB of the byte,
+                                  *   0: it's in the MSB of the byte.*/
+    uint32_t reserved_2: 14;    /**< Reserved to be used later*/
 } lv_image_header_t;
 #endif
 

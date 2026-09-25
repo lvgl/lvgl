@@ -11,6 +11,7 @@
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_anim_private.h"
 #include "../draw/lv_draw_private.h"
+#include "../draw/lv_draw_buf_private.h"
 #include "../core/lv_obj_private.h"
 #include "../core/lv_refr_private.h"
 #include "../core/lv_global.h"
@@ -556,23 +557,29 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
 
     bool is_auto_stride = stride == LV_STRIDE_AUTO;
     if(is_auto_stride) {
-        stride = lv_draw_buf_width_to_stride(w, cf);
+        stride = lv_draw_buf_width_to_stride_packed(w, cf, disp->vtiled);
     }
 
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         LV_CHECK_ARG_FORMAT_MSG(stride != 0, return, "stride is 0, check your color format %d and width: %" LV_PRIu32, cf, w);
         /* for partial mode, we calculate the height based on the buf_size and stride */
-        h = buf_size / stride;
+        uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t);
+        LV_CHECK_ARG_MSG(buf_size > palette_size, return, "the buffer is too small");
+        uint32_t stride_rows = (buf_size - palette_size) / stride;
+        h = disp->vtiled && lv_color_format_get_bpp(cf) == 1 ? stride_rows * 8 : stride_rows;
         LV_CHECK_ARG_MSG(h, return, "the buffer is too small");
     }
     else {
-        LV_CHECK_ARG_FORMAT_MSG(stride * h <= buf_size, return, "%s mode requires screen sized buffer(s)",
+        LV_CHECK_ARG_FORMAT_MSG(stride * lv_draw_buf_stride_rows(h, cf, disp->vtiled) <= buf_size, return,
+                                "%s mode requires screen sized buffer(s)",
                                 render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
     }
 
-    lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
+    lv_draw_buf_init_with_mono_flags(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size,
+                                     disp->vtiled, disp->lsb_first);
     if(buf2) {
-        lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
+        lv_draw_buf_init_with_mono_flags(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size,
+                                         disp->vtiled, disp->lsb_first);
     }
     lv_display_set_draw_buffers(disp, &disp->_static_buf1, buf2 ? &disp->_static_buf2 : NULL);
     lv_display_set_render_mode(disp, render_mode);
@@ -678,6 +685,58 @@ lv_color_format_t lv_display_get_color_format(lv_display_t * disp)
     LV_CHECK_ARG(disp != NULL, return LV_COLOR_FORMAT_UNKNOWN);
 
     return disp->color_format;
+}
+
+void lv_display_set_vtiled(lv_display_t * disp, bool vtiled)
+{
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return);
+
+    disp->vtiled = vtiled;
+
+    if(disp->buf_1) disp->buf_1->header.vtiled = vtiled;
+    if(disp->buf_2) disp->buf_2->header.vtiled = vtiled;
+    if(disp->buf_3) disp->buf_3->header.vtiled = vtiled;
+}
+
+bool lv_display_get_vtiled(lv_display_t * disp)
+{
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return false);
+
+    return disp->vtiled;
+}
+
+void lv_display_set_lsb_first(lv_display_t * disp, bool lsb_first)
+{
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return);
+
+    disp->lsb_first = lsb_first;
+
+    if(disp->buf_1) disp->buf_1->header.lsb_first = lsb_first;
+    if(disp->buf_2) disp->buf_2->header.lsb_first = lsb_first;
+    if(disp->buf_3) disp->buf_3->header.lsb_first = lsb_first;
+}
+
+bool lv_display_get_lsb_first(lv_display_t * disp)
+{
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return false);
+
+    return disp->lsb_first;
 }
 
 void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
@@ -1453,8 +1512,8 @@ uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t 
     }
 
     lv_color_format_t cf = lv_display_get_color_format(disp);
-    uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
-    uint32_t buf_size = stride * height;
+    uint32_t stride = lv_draw_buf_width_to_stride_packed(width, cf, disp->vtiled);
+    uint32_t buf_size = stride * lv_draw_buf_stride_rows(height, cf, disp->vtiled);
 
     LV_ASSERT(disp->buf_1 == NULL || disp->buf_1->data_size >= buf_size);
     LV_ASSERT(disp->buf_2 == NULL || disp->buf_2->data_size >= buf_size);

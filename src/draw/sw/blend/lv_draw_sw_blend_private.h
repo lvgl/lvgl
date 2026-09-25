@@ -57,6 +57,8 @@ struct _lv_draw_sw_blend_fill_dsc_t {
     lv_color_t color;
     lv_opa_t opa;
     lv_area_t relative_area;
+    bool dest_vtiled;           /**< Vertical tiling of the packed destination format. */
+    bool dest_lsb_first;        /**< LSB-first bit order of the packed destination format. */
 };
 
 struct _lv_draw_sw_blend_image_dsc_t {
@@ -73,6 +75,8 @@ struct _lv_draw_sw_blend_image_dsc_t {
     lv_blend_mode_t blend_mode;
     lv_area_t relative_area;    /**< The blend area relative to the layer's buffer area. */
     lv_area_t src_area;             /**< The original src area. */
+    bool dest_vtiled;           /**< Vertical tiling of the packed destination format. */
+    bool dest_lsb_first;        /**< LSB-first bit order of the packed destination format. */
 };
 
 
