@@ -320,10 +320,10 @@ void lv_image_buf_get_transformed_footprint(lv_area_t * res, int32_t w, int32_t 
 {
     if(angle == 0) {
         /*The first and the last touched pixel, rounded outwards*/
-        res->x1 = pivot->x + ((-pivot->x * scale_x) >> 8);
-        res->y1 = pivot->y + ((-pivot->y * scale_y) >> 8);
-        res->x2 = pivot->x + (((w - pivot->x) * scale_x + 255) >> 8) - 1;
-        res->y2 = pivot->y + (((h - pivot->y) * scale_y + 255) >> 8) - 1;
+        res->x1 = pivot->x + (int32_t)((-(int64_t)pivot->x * scale_x) >> 8);
+        res->y1 = pivot->y + (int32_t)((-(int64_t)pivot->y * scale_y) >> 8);
+        res->x2 = pivot->x + (int32_t)(((int64_t)(w - pivot->x) * scale_x + 255) >> 8) - 1;
+        res->y2 = pivot->y + (int32_t)(((int64_t)(h - pivot->y) * scale_y + 255) >> 8) - 1;
         return;
     }
 
