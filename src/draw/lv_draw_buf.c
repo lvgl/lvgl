@@ -862,11 +862,8 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
                 return false;
             }
             if(allocated_cpu) buf->header.flags |= LV_IMAGE_FLAGS_ALLOCATED;
-
-            if((buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED)
-               && buf->header.cf == LV_COLOR_FORMAT_ARGB8888) {
-                buf->header.cf = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
-            }
+            /*The download delivers the pixels in the buffer's own color format,
+             *straight or premultiplied as its flags say, whatever the unit keeps*/
             has_cpu = true;
         }
         else if(clearzero && has_cpu && mutable_cpu) {
