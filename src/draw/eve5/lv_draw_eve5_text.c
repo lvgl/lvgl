@@ -1070,6 +1070,50 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 }
 
 /**********************
+ * DISPLAY LIST BOUND
+ **********************/
+
+/* Worst-case entries of a label: around the glyphs, and per glyph callback.
+ * alpha_glyph_cb and the alpha label functions stay within these. */
+#define DL_LABEL            12  /* lv_draw_eve5_hal_draw_label */
+#define DL_GLYPH            10  /* Bitmap glyph (draw_glyph_cb) */
+#define DL_GLYPH_XFORM      18  /* Rotated bitmap glyph */
+#define DL_GLYPH_IMAGE      23  /* Image glyph, only from fonts other than plain fmt_txt */
+#define DL_GLYPH_DECOR      13  /* Underline, strikethrough or selection fill */
+#define DL_CMDTEXT_COLOR    2   /* rom_line_set_color */
+
+uint32_t lv_draw_eve5_label_dl_bound(const lv_draw_task_t * t)
+{
+    const lv_draw_label_dsc_t * dsc = t->draw_dsc;
+    if(dsc->text == NULL) return 0;
+
+    /* Each character is at least one byte */
+    uint32_t bytes = 0;
+    while(bytes < dsc->text_length && dsc->text[bytes] != '\0') bytes++;
+
+    /* A glyph costs the most on the costliest font it may resolve to */
+    uint32_t glyph = (dsc->rotation % 3600 != 0) ? DL_GLYPH_XFORM : DL_GLYPH;
+    for(const lv_font_t * f = dsc->font; f != NULL; f = f->fallback) {
+        if(!font_is_cmdtext_font(f) && !is_plain_fmt_txt(f)) {
+            glyph = LV_MAX(glyph, DL_GLYPH_IMAGE);
+            break;
+        }
+    }
+
+    /* CMD_TEXT path: a color change and at most one CMD_TEXT per character.
+     * Also bounds the CMD_TEXT fallback for fonts without bitmaps. */
+    glyph = LV_MAX(glyph, DL_CMDTEXT_COLOR + EVE_CO_DL_ENTRIES_TEXT(1));
+
+    /* LVGL calls the glyph callback for these fills per character */
+    uint32_t decor = 0;
+    if(dsc->decor & LV_TEXT_DECOR_UNDERLINE) decor++;
+    if(dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH) decor++;
+    if(dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) decor++;
+
+    return DL_LABEL + bytes * (glyph + decor * DL_GLYPH_DECOR);
+}
+
+/**********************
  * LABEL DRAWING
  **********************/
 

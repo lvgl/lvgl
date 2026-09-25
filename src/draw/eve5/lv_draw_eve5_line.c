@@ -77,6 +77,54 @@ static bool line_segment_needs_alpha_rendertarget(const lv_draw_line_dsc_t * dsc
 }
 
 /**********************
+ * DISPLAY LIST BOUND
+ **********************/
+
+/* Worst-case entries of one segment in draw_line_segment / alpha_draw_line_segment,
+ * and of one dash gap mask */
+#define DL_LINE_SEGMENT         53
+#define DL_LINE_SEGMENT_ALPHA   48
+#define DL_LINE_DASH_GAP        4
+
+/* Upper bound of the dash gap loop iterations of a segment: the gap centers
+ * step by dash_width + dash_gap across the segment length plus one gap. The
+ * Manhattan length is at least the segment length. */
+static uint32_t line_segment_dash_gaps(const lv_draw_line_dsc_t * dsc, int32_t dx, int32_t dy)
+{
+    if(dsc->dash_gap <= 0 || dsc->dash_width <= 0) return 0;
+    int32_t len = LV_ABS(dx) + LV_ABS(dy);
+    return (uint32_t)((len + dsc->dash_gap) / (dsc->dash_width + dsc->dash_gap)) + 2;
+}
+
+void lv_draw_eve5_line_dl_bound(const lv_draw_task_t * t, lv_draw_eve5_dl_bound_t * bound)
+{
+    const lv_draw_line_dsc_t * dsc = t->draw_dsc;
+    uint32_t segments = 0;
+    uint32_t gaps = 0;
+
+    if(dsc->points != NULL) {
+        for(int32_t i = 0; i < dsc->point_cnt - 1; i++) {
+            if(dsc->points[i].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i].y == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].y == LV_DRAW_LINE_POINT_NONE) {
+                continue;
+            }
+            segments++;
+            gaps += line_segment_dash_gaps(dsc, (int32_t)(dsc->points[i + 1].x - dsc->points[i].x),
+                                           (int32_t)(dsc->points[i + 1].y - dsc->points[i].y));
+        }
+    }
+    else {
+        segments = 1;
+        gaps = line_segment_dash_gaps(dsc, (int32_t)(dsc->p2.x - dsc->p1.x), (int32_t)(dsc->p2.y - dsc->p1.y));
+    }
+
+    bound->rgb = DL_LINE_SEGMENT * segments + DL_LINE_DASH_GAP * gaps;
+    bound->alpha = DL_LINE_SEGMENT_ALPHA * segments + DL_LINE_DASH_GAP * gaps;
+}
+
+/**********************
  * LINE DRAWING
  **********************/
 

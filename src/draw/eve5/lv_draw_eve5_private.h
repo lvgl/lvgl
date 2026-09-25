@@ -111,11 +111,6 @@ extern "C" {
 #define EVE5_DL_STATS 0
 #endif
 
-/* Test mode: split each layer's task queue into two slices at a varying point */
-#ifndef EVE5_TEST_SLICE_SPLIT
-#define EVE5_TEST_SLICE_SPLIT 0
-#endif
-
 /* Replace all float usage with integer-only alternatives (for FPU-less targets) */
 #ifndef LV_DRAW_EVE5_NO_FLOAT
 #define LV_DRAW_EVE5_NO_FLOAT 1
@@ -345,6 +340,51 @@ typedef struct {
     uint16_t prev_eve_format;
     uint32_t prev_stride;       /**< Stride of prev_handle in bytes (only used when prev_eve_format != 0) */
 } lv_draw_eve5_slice_t;
+
+/**********************
+ * DISPLAY LIST BUDGET
+ **********************/
+
+/* A render target cycle is one display list of at most EVE_DL_COUNT entries.
+ * The RGB pass tracks the entries written so far (phost->DlEntries, counted by
+ * the HAL after the CoDl optimizer) plus a worst-case bound of the next task
+ * and of what must still follow (alpha pass, deferred masks, DISPLAY), and
+ * ends the slice before a task that would not fit. The next slice continues
+ * from the previous slice's output. Nothing waits on the coprocessor.
+ *
+ * The bounds come from a static analysis of the draw functions; see
+ * lv_draw_eve5_dl_bound.c. */
+
+/* Worst-case entries of the per-layer steps around the tasks */
+#define EVE5_DL_INIT_LAYER      35  /**< lv_draw_eve5_hal_init_layer */
+#define EVE5_DL_FINISH_LAYER    1   /**< lv_draw_eve5_hal_finish_layer (DISPLAY) */
+#define EVE5_DL_INIT_L8         28  /**< lv_draw_eve5_hal_init_l8_rendertarget */
+#define EVE5_DL_FINISH_L8       1   /**< lv_draw_eve5_hal_finish_l8_rendertarget */
+#define EVE5_DL_BLIT_L8         25  /**< lv_draw_eve5_hal_blit_l8_to_alpha */
+#define EVE5_DL_ALPHA_PASS      48  /**< lv_draw_eve5_alpha_pass, excluding its tasks */
+#define EVE5_DL_BITMAP_MASK     30  /**< lv_draw_eve5_apply_bitmap_mask */
+
+/* Entries kept free as a guard */
+#define EVE5_DL_MARGIN          8
+
+/* Test mode: a small display list budget, to split layers into many slices */
+#ifndef EVE5_DL_BUDGET_TEST
+#define EVE5_DL_BUDGET_TEST 0
+#endif
+
+/* Worst-case display list entries of one draw task */
+typedef struct {
+    uint32_t rgb;    /**< RGB pass; also bounds the task in the L8 alpha render-target pass */
+    uint32_t alpha;  /**< Direct-to-alpha pass */
+} lv_draw_eve5_dl_bound_t;
+
+/* Budget state of the RGB pass of one slice */
+typedef struct {
+    uint32_t reserve;        /**< Entries that must follow the RGB pass; grows with each task's alpha and mask cost */
+    bool alpha_pass;         /**< The direct-to-alpha pass follows: reserve each task's alpha cost */
+    bool can_split;          /**< End the slice before a task that does not fit */
+    lv_draw_task_t * stop;   /**< Out: first task left for the next slice (the slice end when none) */
+} lv_draw_eve5_budget_t;
 
 /* Bitmap handle pool with LRU eviction.
  *
@@ -960,7 +1000,16 @@ void apply_image_skew(EVE_HalContext *phost, const image_skew_t * skew,
  **********************/
 
 int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen, bool finish_tasks,
-                              const lv_draw_eve5_slice_t * slice);
+                              const lv_draw_eve5_slice_t * slice, lv_draw_eve5_budget_t * budget);
+lv_draw_task_t * lv_draw_eve5_fill_matching_border(lv_draw_task_t * t, const lv_draw_task_t * end);
+
+/* Display list budget (lv_draw_eve5_dl_bound.c) */
+uint32_t lv_draw_eve5_dl_budget(EVE_HalContext * phost);
+void lv_draw_eve5_task_dl_bound(lv_draw_task_t * t, const lv_draw_task_t * end, lv_draw_eve5_dl_bound_t * bound);
+bool lv_draw_eve5_range_fits_dl(lv_draw_eve5_unit_t * u, lv_draw_task_t * start, const lv_draw_task_t * end,
+                                uint32_t overhead);
+void lv_draw_eve5_line_dl_bound(const lv_draw_task_t * t, lv_draw_eve5_dl_bound_t * bound);
+uint32_t lv_draw_eve5_label_dl_bound(const lv_draw_task_t * t);
 void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, const lv_draw_eve5_slice_t * slice);
 void lv_draw_eve5_alpha_pass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, const lv_draw_eve5_slice_t * slice);
 bool lv_draw_eve5_is_fully_inside_opaque(lv_draw_eve5_unit_t * u, const lv_area_t * task_area,
@@ -973,7 +1022,8 @@ void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t * u, lv_layer_t * lay
 EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                               int32_t aligned_w, int32_t aligned_h,
                                               int32_t w, int32_t h,
-                                              const lv_draw_eve5_slice_t * slice);
+                                              const lv_draw_eve5_slice_t * slice,
+                                              uint32_t rgb_overhead, lv_draw_task_t ** stop);
 #endif
 
 /**********************

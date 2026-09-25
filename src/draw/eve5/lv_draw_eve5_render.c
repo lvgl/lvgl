@@ -162,18 +162,48 @@ bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t * t, const lv_draw
  **********************/
 
 /**
+ * The BORDER task drawn together with FILL task `t` by the unified FILL+BORDER
+ * path, or NULL. The pair never crosses the slice end `end`.
+ */
+lv_draw_task_t * lv_draw_eve5_fill_matching_border(lv_draw_task_t * t, const lv_draw_task_t * end)
+{
+    lv_draw_task_t * next = t->next;
+    if(next == NULL || next == end ||
+       next->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
+       next->state != LV_DRAW_TASK_STATE_QUEUED ||
+       next->type != LV_DRAW_TASK_TYPE_BORDER ||
+       next->target_layer != t->target_layer) {
+        return NULL;
+    }
+
+    const lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
+    const lv_draw_border_dsc_t * border_dsc = next->draw_dsc;
+    if(!eve5_fill_border_area_match(&t->area, &next->area) || fill_dsc->radius != border_dsc->radius) {
+        return NULL;
+    }
+    return next;
+}
+
+/**
  * RGB render pass: process all QUEUED tasks for a layer.
  *
  * MASK_RECTANGLE tasks are deferred on non-screen layers until after alpha
  * correction; they scale all premultiplied RGBA channels and must run after
  * alpha is corrected. Tasks are left IN_PROGRESS so the alpha pass can find them.
+ *
+ * When the budget allows splitting, the pass stops before the first task that
+ * may not fit the display list and returns it in budget->stop.
  */
 int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen, bool finish_tasks,
-                              const lv_draw_eve5_slice_t * slice)
+                              const lv_draw_eve5_slice_t * slice, lv_draw_eve5_budget_t * budget)
 {
+    EVE_HalContext * phost = u->hal;
+    uint32_t dl_budget = lv_draw_eve5_dl_budget(phost);
     lv_draw_task_t * t = eve5_slice_first(slice, layer);
     lv_draw_task_t * prev_task = NULL;
     int rendered_count = 0;
+
+    budget->stop = slice->end;
 
     while(t && t != slice->end) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
@@ -183,7 +213,28 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
             continue;
         }
 
-        if(!is_screen && t->type == LV_DRAW_TASK_TYPE_MASK_RECTANGLE) {
+        /* Display list budget: the entries written so far, this task's bound,
+         * and everything that must still follow in this display list */
+        lv_draw_eve5_dl_bound_t bound;
+        lv_draw_eve5_task_dl_bound(t, slice->end, &bound);
+        bool deferred_mask = !is_screen && t->type == LV_DRAW_TASK_TYPE_MASK_RECTANGLE;
+        uint32_t rgb = deferred_mask ? 0 : bound.rgb;
+        uint32_t after = deferred_mask ? bound.rgb : (budget->alpha_pass ? bound.alpha : 0);
+        if(phost->DlEntries + rgb + budget->reserve + after > dl_budget) {
+            if(budget->can_split && rendered_count > 0) {
+                EVE5_LOG("EVE5: Display list budget: slice ends before task %p (%" LV_PRIu32 " written)",
+                         (void *)t, phost->DlEntries);
+                budget->stop = t;
+                break;
+            }
+            /* The bound is pessimistic, so the task will most likely still fit */
+            LV_LOG_INFO("EVE5: %s task may overflow the display list (%" LV_PRIu32 " + %" LV_PRIu32 " + %" LV_PRIu32
+                        " > %" LV_PRIu32 ")", rendered_count ? "Unsplittable" : "Single",
+                        phost->DlEntries, rgb, budget->reserve + after, dl_budget);
+        }
+        budget->reserve += after;
+
+        if(deferred_mask) {
             prev_task = t;
             t = t->next;
             continue;
@@ -194,6 +245,7 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
 #if EVE5_DL_STATS
         EVE_Cmd_waitFlush(u->hal);
         uint32_t dl_stats_before = EVE_Hal_rd32(u->hal, REG_CMD_DL);
+        uint32_t dl_count_before = phost->DlEntries;
 #endif
 
         EVE5_LOG("EVE5: Render task: type=%-10s area=(%d,%d)-(%d,%d)",
@@ -202,24 +254,10 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
 
         switch(t->type) {
             case LV_DRAW_TASK_TYPE_FILL: {
-                    /* Check for matching BORDER from same lv_draw_rect() for unified rendering */
-                    lv_draw_task_t * next = t->next;
-                    bool has_matching_border = false;
+                    /* Matching BORDER from the same lv_draw_rect(): unified rendering */
+                    lv_draw_task_t * next = lv_draw_eve5_fill_matching_border(t, slice->end);
 
-                    if(next &&
-                       next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-                       next->state == LV_DRAW_TASK_STATE_QUEUED &&
-                       next->type == LV_DRAW_TASK_TYPE_BORDER &&
-                       next->target_layer == t->target_layer) {
-
-                        const lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
-                        const lv_draw_border_dsc_t * border_dsc = next->draw_dsc;
-
-                        has_matching_border = eve5_fill_border_area_match(&t->area, &next->area) &&
-                                              (fill_dsc->radius == border_dsc->radius);
-                    }
-
-                    if(has_matching_border) {
+                    if(next) {
                         EVE5_LOG("EVE5: Unified FILL+BORDER rendering");
 
                         next->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
@@ -336,9 +374,15 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
 
 #if EVE5_DL_STATS
         EVE_Cmd_waitFlush(u->hal);
-        LV_LOG_USER("DLSTAT task %s %" LV_PRIu32 " area %" LV_PRId32 "x%" LV_PRId32,
-                    task_type_str(t->type), (EVE_Hal_rd32(u->hal, REG_CMD_DL) - dl_stats_before) / 4,
-                    lv_area_get_width(&t->area), lv_area_get_height(&t->area));
+        {
+            uint32_t measured = (EVE_Hal_rd32(u->hal, REG_CMD_DL) - dl_stats_before) / 4;
+            uint32_t counted = phost->DlEntries - dl_count_before;
+            LV_LOG_USER("DLSTAT task %s %" LV_PRIu32 " counted %" LV_PRIu32 " bound %" LV_PRIu32
+                        " area %" LV_PRId32 "x%" LV_PRId32 "%s",
+                        task_type_str(t->type), measured, counted, bound.rgb,
+                        lv_area_get_width(&t->area), lv_area_get_height(&t->area),
+                        (measured > counted || counted > bound.rgb) ? " OVER" : "");
+        }
 #endif
 
         if(finish_tasks) t->state = LV_DRAW_TASK_STATE_FINISHED;
@@ -547,13 +591,25 @@ void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t * u, lv_layer_t * lay
 EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                               int32_t aligned_w, int32_t aligned_h,
                                               int32_t w, int32_t h,
-                                              const lv_draw_eve5_slice_t * slice)
+                                              const lv_draw_eve5_slice_t * slice,
+                                              uint32_t rgb_overhead, lv_draw_task_t ** stop)
 {
+    *stop = slice->end;
+
     EVE_GpuHandle l8_handle = lv_draw_eve5_hal_init_l8_rendertarget(u,
                                                                     aligned_w, aligned_h, w, h);
     if(EVE_GpuAlloc_Get(u->allocator, l8_handle) == GA_INVALID) {
         return GA_HANDLE_INVALID;
     }
+
+    /* This pass decides where the slice ends, as the RGB pass must draw the
+     * same tasks: both this display list and the bounds of the RGB one that
+     * follows (which cannot be measured yet) must fit. */
+    EVE_HalContext * phost = u->hal;
+    uint32_t dl_budget = lv_draw_eve5_dl_budget(phost);
+    uint32_t rgb_total = rgb_overhead;
+    lv_draw_task_t * merged = NULL;
+    bool any = false;
 
     const lv_area_t * layer_area = &layer->buf_area;
     lv_draw_task_t * t = eve5_slice_first(slice, layer);
@@ -565,6 +621,22 @@ EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_
             prev_task = t;
             t = t->next;
             continue;
+        }
+
+        /* The border of a unified FILL+BORDER pair is counted with its fill */
+        if(t != merged) {
+            lv_draw_eve5_dl_bound_t bound;
+            lv_draw_eve5_task_dl_bound(t, slice->end, &bound);
+            /* The pair is drawn here as two tasks, within the pair's bound */
+            if(t->type == LV_DRAW_TASK_TYPE_FILL) merged = lv_draw_eve5_fill_matching_border(t, slice->end);
+            if(any && (phost->DlEntries + bound.rgb + EVE5_DL_FINISH_L8 > dl_budget
+                       || rgb_total + bound.rgb > dl_budget)) {
+                EVE5_LOG("EVE5: Display list budget: L8 alpha slice ends before task %p", (void *)t);
+                *stop = t;
+                break;
+            }
+            rgb_total += bound.rgb;
+            any = true;
         }
 
         if(t->type == LV_DRAW_TASK_TYPE_MASK_RECTANGLE) {
