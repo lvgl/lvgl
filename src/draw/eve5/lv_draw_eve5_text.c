@@ -71,8 +71,7 @@ static bool upload_whole_font(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc
                               lv_draw_eve5_font_vram_t * fv);
 static bool upload_single_glyph(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc_t * font_dsc,
                                 lv_draw_eve5_font_vram_t * fv, uint32_t gid);
-static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                              lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_draw_glyph_dsc_t * glyph_dsc,
                               const lv_draw_letter_dsc_t * letter_dsc,
                               uint16_t g_w, uint16_t g_h,
                               int32_t x, int32_t y);
@@ -617,8 +616,35 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
 /**
  * Emit a glyph vertex with optional affine transform.
  */
-static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                              lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+/* Draw a glyph at (x, y) transformed around its pivot. The bitmap covers the
+ * transformed glyph's bounds, wherever in the clip area they are. */
+static void emit_transformed_glyph(lv_draw_eve5_unit_t * u, int32_t rotation, int32_t scale_x, int32_t scale_y,
+                                   int32_t skew_x, int32_t skew_y, int32_t pivot_x, int32_t pivot_y,
+                                   uint16_t g_w, uint16_t g_h, int32_t x, int32_t y)
+{
+    image_skew_t xform;
+    if(!compute_image_skew(&xform, rotation, scale_x, scale_y, skew_x, skew_y, pivot_x, pivot_y,
+                           g_w, g_h, x, y, x, y))
+        return;
+
+    /* One pixel around the bounds for the filtered edge */
+    int32_t draw_vx = x + pivot_x + xform.bounds_x1 - 1;
+    int32_t draw_vy = y + pivot_y + xform.bounds_y1 - 1;
+    int32_t bounds_w = xform.bounds_x2 - xform.bounds_x1 + 2;
+    int32_t bounds_h = xform.bounds_y2 - xform.bounds_y1 + 2;
+    if(!compute_image_skew(&xform, rotation, scale_x, scale_y, skew_x, skew_y, pivot_x, pivot_y,
+                           g_w, g_h, x, y, draw_vx, draw_vy))
+        return;
+    xform.bmp_w = LV_MIN(bounds_w, 2048);
+    xform.bmp_h = LV_MIN(bounds_h, 2048);
+
+    EVE_CoDl_saveContext(u->hal);
+    apply_image_skew(u->hal, &xform, NEAREST, 0, 0);
+    EVE_CoDl_vertex2f_0(u->hal, draw_vx, draw_vy);
+    EVE_CoDl_restoreContext(u->hal);
+}
+
+static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_draw_glyph_dsc_t * glyph_dsc,
                               const lv_draw_letter_dsc_t * letter_dsc,
                               uint16_t g_w, uint16_t g_h,
                               int32_t x, int32_t y)
@@ -632,41 +658,18 @@ static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     bool has_label_rotation = (letter_dsc == NULL)
                               && (glyph_dsc->rotation % 3600 != 0);
 
+    /* As in LVGL's software renderer, a glyph turns around the letter's pivot
+     * on the baseline, relative to the glyph bitmap */
+    int32_t pivot_x = glyph_dsc->pivot.x - glyph_dsc->g->ofs_x;
+    int32_t pivot_y = glyph_dsc->g->box_h + glyph_dsc->g->ofs_y;
+
     if(has_letter_transform) {
-        int32_t draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-        int32_t draw_vy = t->clip_area.y1 - layer->buf_area.y1;
-
-        image_skew_t xform;
-        if(!compute_image_skew(&xform,
-                               letter_dsc->rotation, letter_dsc->scale_x, letter_dsc->scale_y,
-                               letter_dsc->skew_x, letter_dsc->skew_y,
-                               letter_dsc->pivot.x, letter_dsc->pivot.y,
-                               g_w, g_h, x, y, draw_vx, draw_vy))
-            return;
-
-        EVE_CoDl_saveContext(u->hal);
-        apply_image_skew(u->hal, &xform, NEAREST, 0, 0);
-        EVE_CoDl_vertex2f_0(u->hal, draw_vx, draw_vy);
-        EVE_CoDl_restoreContext(u->hal);
+        emit_transformed_glyph(u, letter_dsc->rotation, letter_dsc->scale_x, letter_dsc->scale_y,
+                               letter_dsc->skew_x, letter_dsc->skew_y, pivot_x, pivot_y, g_w, g_h, x, y);
     }
     else if(has_label_rotation) {
-        int32_t draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-        int32_t draw_vy = t->clip_area.y1 - layer->buf_area.y1;
-        int32_t pivot_x = glyph_dsc->pivot.x;
-        int32_t pivot_y = glyph_dsc->g->box_h + glyph_dsc->g->ofs_y;
-
-        image_skew_t xform;
-        if(!compute_image_skew(&xform,
-                               glyph_dsc->rotation, LV_SCALE_NONE, LV_SCALE_NONE,
-                               0, 0,
-                               pivot_x, pivot_y,
-                               g_w, g_h, x, y, draw_vx, draw_vy))
-            return;
-
-        EVE_CoDl_saveContext(u->hal);
-        apply_image_skew(u->hal, &xform, NEAREST, 0, 0);
-        EVE_CoDl_vertex2f_0(u->hal, draw_vx, draw_vy);
-        EVE_CoDl_restoreContext(u->hal);
+        emit_transformed_glyph(u, glyph_dsc->rotation, LV_SCALE_NONE, LV_SCALE_NONE, 0, 0,
+                               pivot_x, pivot_y, g_w, g_h, x, y);
     }
     else {
         EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, g_w, g_h);
@@ -954,7 +957,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
     EVE_CoDl_bitmapLayout(u->hal, (uint8_t)eve_format, g_stride, g_h);
 
-    emit_glyph_vertex(u, layer, t, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
+    emit_glyph_vertex(u, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
 }
 
 static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
@@ -1063,7 +1066,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
     EVE_CoDl_bitmapLayout(u->hal, (uint8_t)eve_format, g_stride, g_h);
 
-    emit_glyph_vertex(u, layer, t, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y);
+    emit_glyph_vertex(u, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y);
 }
 
 /**********************

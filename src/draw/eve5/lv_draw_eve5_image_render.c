@@ -30,6 +30,16 @@
  * IMAGE DRAWING
  **********************/
 
+/* Vertex color of an image: white, or with the recolor mixed in. LVGL draws
+ * alpha-only images (A1..A8) in the recolor color; their texture is white, so
+ * the vertex color is the recolor. */
+static lv_color_t image_tint(const lv_draw_image_dsc_t * dsc, bool alpha_only)
+{
+    if(alpha_only) return dsc->recolor;
+    if(dsc->recolor_opa > LV_OPA_MIN) return lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
+    return lv_color_white();
+}
+
 /**
  * Draw image or layer to the target layer.
  *
@@ -98,6 +108,11 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         sample_as_luminance = img->sample_as_luminance;
     }
 
+    /* L formats sample as (255, 255, 255, L): alpha, unless the source is a
+     * luminance image */
+    bool alpha_only = !sample_as_luminance
+                      && (eve_format == L1 || eve_format == L2 || eve_format == L4 || eve_format == L8);
+
     /* Load bitmap mask if set */
     bool has_bitmap_mask = false;
     uint32_t mask_ram_g_addr = GA_INVALID;
@@ -160,29 +175,18 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         is_premultiplied = false;
     }
 
+    lv_color_t tint = image_tint(dsc, alpha_only);
     if(is_premultiplied) {
         uint8_t opa = dsc->opa;
-        if(dsc->recolor_opa > LV_OPA_MIN) {
-            lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-            EVE_CoDl_colorRgb(u->hal,
-                              (uint8_t)(mixed.red * opa / 255),
-                              (uint8_t)(mixed.green * opa / 255),
-                              (uint8_t)(mixed.blue * opa / 255));
-        }
-        else {
-            EVE_CoDl_colorRgb(u->hal, opa, opa, opa);
-        }
+        EVE_CoDl_colorRgb(u->hal,
+                          (uint8_t)(tint.red * opa / 255),
+                          (uint8_t)(tint.green * opa / 255),
+                          (uint8_t)(tint.blue * opa / 255));
         EVE_CoDl_colorA(u->hal, opa);
     }
     else {
         EVE_CoDl_colorA(u->hal, dsc->opa);
-        if(dsc->recolor_opa > LV_OPA_MIN) {
-            lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-            EVE_CoDl_colorRgb(u->hal, mixed.red, mixed.green, mixed.blue);
-        }
-        else {
-            EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
-        }
+        EVE_CoDl_colorRgb(u->hal, tint.red, tint.green, tint.blue);
     }
 
     /* Set up bitmap */
@@ -399,13 +403,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
                 EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE);
             else
                 EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
-            if(dsc->recolor_opa > LV_OPA_MIN) {
-                lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-                EVE_CoDl_colorRgb(phost, mixed.red, mixed.green, mixed.blue);
-            }
-            else {
-                EVE_CoDl_colorRgb(phost, 255, 255, 255);
-            }
+            EVE_CoDl_colorRgb(phost, tint.red, tint.green, tint.blue);
             EVE_CoDl_colorA(phost, 255);
             EVE_CoDl_begin(phost, BITMAPS);
             if(tile_stamps && !has_any_transform) {
@@ -418,7 +416,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             }
             EVE_CoDl_end(phost);
         }
-        else if(dsc->recolor_opa > LV_OPA_MIN) {
+        else if(!alpha_only && dsc->recolor_opa > LV_OPA_MIN) {
             /* Per-pixel recolor: out = image*(1-mix) + recolor*mix */
             uint8_t mix = dsc->recolor_opa;
 
@@ -487,7 +485,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             lv_draw_eve5_track_alpha_trashed(u, mask_x1, mask_y1, mask_x2, mask_y2);
         }
     }
-    else if(!is_premultiplied && dsc->recolor_opa > LV_OPA_MIN) {
+    else if(!is_premultiplied && !alpha_only && dsc->recolor_opa > LV_OPA_MIN) {
         /* Unified recolor: out = src * (1-mix) + recolor * mix */
         uint8_t mix = dsc->recolor_opa;
 
@@ -613,27 +611,15 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             /* Restore colors */
             if(is_premultiplied) {
                 uint8_t opa = dsc->opa;
-                if(dsc->recolor_opa > LV_OPA_MIN) {
-                    lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-                    EVE_CoDl_colorRgb(phost,
-                                      (uint8_t)(mixed.red * opa / 255),
-                                      (uint8_t)(mixed.green * opa / 255),
-                                      (uint8_t)(mixed.blue * opa / 255));
-                }
-                else {
-                    EVE_CoDl_colorRgb(phost, opa, opa, opa);
-                }
+                EVE_CoDl_colorRgb(phost,
+                                  (uint8_t)(tint.red * opa / 255),
+                                  (uint8_t)(tint.green * opa / 255),
+                                  (uint8_t)(tint.blue * opa / 255));
                 EVE_CoDl_colorA(phost, opa);
             }
             else {
                 EVE_CoDl_colorA(phost, dsc->opa);
-                if(dsc->recolor_opa > LV_OPA_MIN) {
-                    lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-                    EVE_CoDl_colorRgb(phost, mixed.red, mixed.green, mixed.blue);
-                }
-                else {
-                    EVE_CoDl_colorRgb(phost, 255, 255, 255);
-                }
+                EVE_CoDl_colorRgb(phost, tint.red, tint.green, tint.blue);
             }
         }
 

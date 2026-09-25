@@ -171,23 +171,17 @@ bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_
  * VRAM CALLBACKS
  **********************/
 
-static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
+/* VRAM format of a buffer that can be rendered to: the render target format
+ * of its color format, promoted as configured */
+static void eve5_vram_rt_format(lv_draw_eve5_unit_t * u, lv_color_format_t cf, uint16_t * eve_fmt, uint8_t * bpp)
 {
-    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
-
-    uint32_t w = buf->header.w;
-    uint32_t h = buf->header.h;
-    lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
-
-    uint16_t eve_fmt;
-    uint8_t bpp;
-    lv_draw_eve5_get_render_target_format(u->hal, cf, &eve_fmt, &bpp);
+    lv_draw_eve5_get_render_target_format(u->hal, cf, eve_fmt, bpp);
 
 #if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 && defined(EVE_SUPPORT_RENDERTARGET)
     /* RGB8 promotion is BT820-only. */
-    if(EVE_Hal_supportRenderTarget(u->hal) && !lv_color_format_has_alpha(cf) && eve_fmt != ARGB8) {
-        eve_fmt = RGB8;
-        bpp = 3;
+    if(EVE_Hal_supportRenderTarget(u->hal) && !lv_color_format_has_alpha(cf) && *eve_fmt != ARGB8) {
+        *eve_fmt = RGB8;
+        *bpp = 3;
     }
 #endif
 
@@ -199,10 +193,38 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
      * non-screen layer qualify. Overrides the RGB8 promotion above. */
     if(u->alloc_canvas_hint && EVE_Hal_supportRenderTarget(u->hal)
        && !lv_color_format_has_alpha(cf)) {
-        eve_fmt = YCBCR;
-        bpp = 2; /* Line-stride bytes per pixel; sizing accounts for row pairing */
+        *eve_fmt = YCBCR;
+        *bpp = 2; /* Line-stride bytes per pixel; sizing accounts for row pairing */
     }
 #endif
+}
+
+/* Whether the pixels of color format `cf` can be uploaded into its render
+ * target format, as they are or through a row conversion. A8 or L8 can't be
+ * held in ARGB8, and RGB565A8 has no row conversion to it, for example: such
+ * buffers are uploaded as textures in their own format. */
+static bool eve5_vram_rt_holds(lv_draw_eve5_unit_t * u, lv_color_format_t cf)
+{
+    uint16_t rt_fmt, tex_fmt;
+    uint8_t rt_bpp, tex_bpp;
+    bool needs_conv = false;
+    eve5_vram_rt_format(u, cf, &rt_fmt, &rt_bpp);
+    if(!lv_draw_eve5_get_eve_format_info(u->hal, cf, &tex_fmt, &tex_bpp, &needs_conv)) return false;
+    if(tex_fmt != rt_fmt) return false;
+    return !needs_conv || lv_draw_eve5_convert_row(cf, rt_fmt, NULL, NULL, 0);
+}
+
+static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
+{
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+
+    uint32_t w = buf->header.w;
+    uint32_t h = buf->header.h;
+    lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
+
+    uint16_t eve_fmt;
+    uint8_t bpp;
+    eve5_vram_rt_format(u, cf, &eve_fmt, &bpp);
 
     uint32_t aligned_w = ALIGN_UP(w, 16);
     uint32_t aligned_h = ALIGN_UP(h, 16);
@@ -305,12 +327,15 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     }
 
     /* MODIFIABLE + ALLOCATED: render-target-capable buffer with pixel data.
-     * Indexed formats need proper palette conversion, so route through read-only path. */
+     * Indexed formats need proper palette conversion, and pixels the render
+     * target format can't hold go in their own format, so both route through
+     * the read-only path. */
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
     if((buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE)
-       && !LV_COLOR_FORMAT_IS_INDEXED(buf->header.cf)) {
+       && !LV_COLOR_FORMAT_IS_INDEXED(buf->header.cf)
+       && eve5_vram_rt_holds(u, (lv_color_format_t)buf->header.cf)) {
         if(!eve5_vram_alloc_cb(draw_unit, buf)) return false;
 
-        lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
         lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
 
 #if LV_USE_OS
@@ -412,7 +437,6 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     /* Read-only image data: upload with image alignment.
      * upload_image_to_gpu checks existing vram_res, uploads if needed,
      * and attaches vram_res directly to the image descriptor. */
-    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
 
 #if LV_USE_OS
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));

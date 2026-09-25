@@ -306,6 +306,10 @@ bool compute_image_skew(image_skew_t * out,
     out->bmp_h = ((by_max - by_min) >> 16) + 2;
     if(out->bmp_w > 2048) out->bmp_w = 2048;
     if(out->bmp_h > 2048) out->bmp_h = 2048;
+    out->bounds_x1 = bx_min >> 16;
+    out->bounds_y1 = by_min >> 16;
+    out->bounds_x2 = (bx_max + 0xFFFF) >> 16;
+    out->bounds_y2 = (by_max + 0xFFFF) >> 16;
 
 #undef FP_MUL
 #else
@@ -377,6 +381,10 @@ bool compute_image_skew(image_skew_t * out,
     out->bmp_h = (int32_t)(by_max - by_min + 1.5f);
     if(out->bmp_w > 2048) out->bmp_w = 2048;
     if(out->bmp_h > 2048) out->bmp_h = 2048;
+    out->bounds_x1 = (int32_t)floorf(bx_min);
+    out->bounds_y1 = (int32_t)floorf(by_min);
+    out->bounds_x2 = (int32_t)ceilf(bx_max);
+    out->bounds_y2 = (int32_t)ceilf(by_max);
 #endif
 
     return true;

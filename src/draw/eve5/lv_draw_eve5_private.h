@@ -262,6 +262,8 @@ typedef struct {
     float ia, ib, ic, i_d, ie, i_f;
 #endif
     int32_t bmp_w, bmp_h;
+    int32_t bounds_x1, bounds_y1;  /* Transformed bounds relative to the pivot, in pixels */
+    int32_t bounds_x2, bounds_y2;
 #if LV_DRAW_EVE5_NO_FLOAT
     int32_t p;  /* 1 = signed 1.15, 0 = unsigned 8.8 */
 #else

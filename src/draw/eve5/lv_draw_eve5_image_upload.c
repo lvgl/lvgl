@@ -172,6 +172,8 @@ static void convert_a2_to_l4(const uint8_t * src, uint8_t * dst, uint32_t w)
  * Limitations: handles only formats that have a 1:1 pixel layout. RGB565A8
  * (separate alpha plane) and indexed formats (palette lookup) need their
  * own paths that don't fit this signature.
+ *
+ * With w = 0 no pixel is touched: the result tells whether the conversion exists.
  */
 bool lv_draw_eve5_convert_row(lv_color_format_t lv_cf, uint16_t eve_fmt,
                               const uint8_t * src_row, uint8_t * dst_row, int32_t w)
