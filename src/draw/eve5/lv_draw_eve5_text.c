@@ -108,6 +108,17 @@ static bool is_bpp_supported(uint8_t bpp)
     return bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8;
 }
 
+/* A built-in format font whose glyph bitmaps are in memory and can be
+ * uploaded as they are. Compressed glyphs, and glyphs a loader brings in on
+ * demand (glyph_bitmap is then the loader), go through get_glyph_bitmap like
+ * other fonts. */
+static bool is_plain_fmt_txt(const lv_font_t * font)
+{
+    if(font->get_glyph_bitmap != lv_font_get_bitmap_fmt_txt) return false;
+    const lv_font_fmt_txt_dsc_t * font_dsc = font->dsc;
+    return font_dsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN && !font_dsc->are_glyphs_dynamic_loaded;
+}
+
 /**
  * Upload glyph bitmap to RAM_G with EVE-aligned stride.
  * Handles stride differences between LVGL font formats and EVE requirements.
@@ -575,7 +586,7 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
     uint32_t src_stride = glyph_data->header.stride;
     if(src_stride == 0) src_stride = g_w;
 
-    if(eve_stride == g_w) {
+    if(eve_stride == src_stride) {
         EVE_Hal_wrMem(u->hal, addr, glyph_data->data, eve_stride * g_h);
     }
     else {
@@ -904,7 +915,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
     uint32_t ram_g_addr;
     uint32_t eve_format;
 
-    if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
+    if(is_plain_fmt_txt(font)) {
         lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
         if(!is_bpp_supported((uint8_t)font_dsc->bpp)) {
             LV_LOG_WARN("EVE5: Unsupported font bpp: %d", font_dsc->bpp);
@@ -1017,7 +1028,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
     uint32_t ram_g_addr;
     uint32_t eve_format;
 
-    if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
+    if(is_plain_fmt_txt(font)) {
         lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
         if(!is_bpp_supported((uint8_t)font_dsc->bpp)) return;
 
@@ -1078,7 +1089,7 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
 
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap != NULL) {
-        if(dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
+        if(is_plain_fmt_txt(dsc->font)) {
             const lv_font_fmt_txt_dsc_t * font_dsc = dsc->font->dsc;
             use_bitmap_font = is_bpp_supported((uint8_t)font_dsc->bpp);
         }
@@ -1227,7 +1238,7 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, 
 
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap != NULL) {
-        if(dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
+        if(is_plain_fmt_txt(dsc->font)) {
             const lv_font_fmt_txt_dsc_t * font_dsc = dsc->font->dsc;
             use_bitmap_font = is_bpp_supported((uint8_t)font_dsc->bpp);
         }

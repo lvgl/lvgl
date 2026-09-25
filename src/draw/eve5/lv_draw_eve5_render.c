@@ -28,7 +28,7 @@
  * DEFINES
  *********************/
 
-#if EVE5_DEBUG_LOG
+#if EVE5_DEBUG_LOG || EVE5_DL_STATS
 static const char * task_type_str(lv_draw_task_type_t type)
 {
     switch(type) {
