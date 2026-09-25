@@ -207,6 +207,9 @@ void lv_draw_buf_clear_ex(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_laye
             LV_PROFILER_DRAW_END;
             return;
         }
+        /* Mark it before touching the memory: a VRAM copy is then dropped,
+         * not downloaded into memory that is about to be zeroed */
+        lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_CLEARZERO);
 #endif
         uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, 0, 0);
         if(buf == NULL) {
