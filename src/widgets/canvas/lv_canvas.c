@@ -37,6 +37,9 @@
 static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static bool layer_is_descendant(const lv_layer_t * layer, const lv_layer_t * ancestor);
+#if LV_USE_DRAW_VRAM
+    static void static_buf_write_back(lv_canvas_t * canvas);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -76,11 +79,19 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
     LV_CHECK_ARG(buf != NULL, return);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
+#if LV_USE_DRAW_VRAM
+    static_buf_write_back(canvas);
+#endif
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     lv_result_t res = lv_draw_buf_init(&canvas->static_buf, w, h, cf, stride, buf, stride * h);
     if(res != LV_RESULT_OK) {
         return;
     }
+#if LV_USE_DRAW_VRAM
+    /*The canvas draws into the caller's memory, so the pixels a draw unit
+     *leaves in VRAM are written back to it when the CPU needs them*/
+    lv_draw_buf_set_flag(&canvas->static_buf, LV_IMAGE_FLAGS_MODIFIABLE);
+#endif
     canvas->draw_buf = &canvas->static_buf;
 
     const void * src = lv_image_get_src(obj);
@@ -99,6 +110,9 @@ void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
     LV_CHECK_ARG_MSG(draw_buf->handlers != NULL, return, "draw_buf has no handlers, is it initialized?");
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
+#if LV_USE_DRAW_VRAM
+    if(draw_buf != &canvas->static_buf) static_buf_write_back(canvas);
+#endif
     canvas->draw_buf = draw_buf;
 
     const void * src = lv_image_get_src(obj);
@@ -505,8 +519,31 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
+#if LV_USE_DRAW_VRAM
+    static_buf_write_back(canvas);
+#endif
     lv_image_cache_drop(&canvas->draw_buf);
 }
+
+#if LV_USE_DRAW_VRAM
+/**
+ * Write the pixels a draw unit left in VRAM back to the caller's memory under
+ * the static buffer, and release the VRAM, before the canvas drops the
+ * descriptor. The memory then holds the canvas, as with the software renderer.
+ */
+static void static_buf_write_back(lv_canvas_t * canvas)
+{
+    lv_draw_buf_t * buf = &canvas->static_buf;
+    if(buf->vram_res == NULL) return;
+
+    if(!lv_draw_buf_ensure_resident(buf, NULL)) {
+        LV_LOG_WARN("Couldn't write the canvas back to its buffer");
+        /*The descriptor is dropped anyway: don't leave the VRAM behind*/
+        lv_draw_unit_t * unit = buf->vram_res ? buf->vram_res->unit : NULL;
+        if(unit && unit->vram_free_cb) unit->vram_free_cb(unit, buf);
+    }
+}
+#endif
 static bool layer_is_descendant(const lv_layer_t * layer, const lv_layer_t * ancestor)
 {
     layer = layer->parent;
