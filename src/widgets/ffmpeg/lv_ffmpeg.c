@@ -975,6 +975,13 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
         return;
     }
 
+#if LV_USE_DRAW_VRAM
+    /*The next frame replaces the whole image: drop a draw unit's copy of the
+     *previous one without reading it back*/
+    lv_draw_buf_set_flag((lv_draw_buf_t *)&player->imgdsc, LV_IMAGE_FLAGS_DISCARDABLE);
+    lv_draw_buf_ensure_resident((lv_draw_buf_t *)&player->imgdsc, NULL);
+#endif
+
     int has_next = ffmpeg_update_next_frame(player->ffmpeg_ctx);
 
     if(has_next < 0) {
