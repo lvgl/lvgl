@@ -60,6 +60,7 @@
 
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
+#include "../../drivers/display/eve5/lv_eve5_image_private.h"
 
 /*********************
  * DEFINES
@@ -454,13 +455,17 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
             }
 
             /* The previous slice's output is the layer content. The swapchain
-             * cannot take it over; blit it with an otherwise empty slice. */
+             * cannot take it over, nor can a layer in another format; blit it
+             * with an otherwise empty slice. */
             lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
             if(!slice->isolated && slice->prev_handle.Id != GA_HANDLE_INVALID.Id && vr != NULL) {
-                if(vr->is_swapchain) {
-                    lv_draw_eve5_hal_init_layer(u, layer, true, slice);
-                    if(eve5_get_vram_res(layer) != NULL) {
-                        lv_draw_eve5_hal_finish_layer(u, layer, true, 0);
+                if(vr->is_swapchain || slice->prev_eve_format != 0) {
+                    bool is_swapchain = vr->is_swapchain;
+                    lv_draw_eve5_hal_init_layer(u, layer, is_screen, slice);
+                    vr = eve5_get_vram_res(layer);
+                    if(vr != NULL) {
+                        lv_draw_eve5_hal_finish_layer(u, layer, is_screen, 0);
+                        if(!is_swapchain) vr->has_content = true;
                     }
                 }
                 else {
@@ -486,8 +491,8 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
         if(prev_addr != GA_INVALID) {
             lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
             u->canvas_orig_addr = prev_addr;
-            u->canvas_orig_format = vr ? vr->eve_format : ARGB8;
-            u->canvas_orig_stride = vr ? vr->stride : 0;
+            u->canvas_orig_format = slice->prev_eve_format ? slice->prev_eve_format : (vr ? vr->eve_format : ARGB8);
+            u->canvas_orig_stride = slice->prev_eve_format ? slice->prev_stride : (vr ? vr->stride : 0);
             u->canvas_orig_palette = GA_INVALID;
             u->canvas_orig_w = lv_area_get_width(&layer->buf_area);
             u->canvas_orig_h = lv_area_get_height(&layer->buf_area);
@@ -690,28 +695,33 @@ static void eve5_render_range(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 }
 
-/* Swapchain state of the full-mode screen layer while its slices render to
- * an intermediate */
+/* Layer state while its slices render to ARGB8 intermediates. The blend math,
+ * and the intermediates between slices, are ARGB8: a layer in another format
+ * (an opaque canvas in RGB565, RGB8 or L8) converts its content in and its
+ * result back. The full-mode screen does the same, as the swapchain can only
+ * take its final frame. */
 typedef struct {
-    EVE_GpuHandle gpu_handle;
+    bool is_swapchain;
+    EVE_GpuHandle gpu_handle;   /**< The swapchain, or the layer's buffer until its content is converted */
     uint16_t eve_format;
     uint32_t stride;
     uint32_t base_size;
     bool has_content;
     bool is_premultiplied;
+    bool sample_as_luminance;
     lv_color_format_t layer_cf;
     lv_color_format_t buf_cf;
     uint16_t buf_flags;
-    uint32_t inter_stride;  /**< Stride of the ARGB8 intermediates */
-} eve5_swapchain_state_t;
+    uint32_t inter_stride;      /**< Stride of the ARGB8 intermediates */
+} eve5_argb8_state_t;
 
 /**
- * Point the full-mode screen layer at a fresh ARGB8 intermediate so its slices
- * render into regular memory, like a layer. Returns false when the allocation
- * fails.
+ * Point the layer at a fresh ARGB8 intermediate so its slices render there,
+ * like an ARGB8 layer, starting from the layer's content. Returns false when
+ * the allocation fails.
  */
-static bool eve5_swapchain_detach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, lv_eve5_vram_res_t * vr,
-                                  eve5_swapchain_state_t * saved)
+static bool eve5_argb8_detach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, lv_eve5_vram_res_t * vr,
+                              eve5_argb8_state_t * saved)
 {
     int32_t aw = ALIGN_UP(lv_area_get_width(&layer->buf_area), 16);
     int32_t ah = ALIGN_UP(lv_area_get_height(&layer->buf_area), 16);
@@ -720,16 +730,18 @@ static bool eve5_swapchain_detach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, l
 
     EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
     if(EVE_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
-        LV_LOG_ERROR("EVE5: Failed to allocate ARGB8 intermediate for full-mode slicing (%" LV_PRIu32 " bytes)", size);
+        LV_LOG_ERROR("EVE5: Failed to allocate ARGB8 intermediate for slicing (%" LV_PRIu32 " bytes)", size);
         return false;
     }
 
+    saved->is_swapchain = vr->is_swapchain;
     saved->gpu_handle = vr->gpu_handle;
     saved->eve_format = vr->eve_format;
     saved->stride = vr->stride;
     saved->base_size = vr->base.size;
     saved->has_content = vr->has_content;
     saved->is_premultiplied = vr->is_premultiplied;
+    saved->sample_as_luminance = vr->sample_as_luminance;
     saved->layer_cf = layer->color_format;
     saved->buf_cf = layer->draw_buf ? layer->draw_buf->header.cf : LV_COLOR_FORMAT_UNKNOWN;
     saved->buf_flags = layer->draw_buf ? (uint16_t)layer->draw_buf->header.flags : 0;
@@ -742,24 +754,62 @@ static bool eve5_swapchain_detach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, l
     vr->base.size = size;
     vr->has_content = false;
     vr->is_premultiplied = false;
+    vr->sample_as_luminance = false;
     layer->color_format = LV_COLOR_FORMAT_ARGB8888;
     if(layer->draw_buf) layer->draw_buf->header.cf = LV_COLOR_FORMAT_ARGB8888;
+
+    /* The layer's content, converted, is the base of the first slice. The
+     * conversion consumes the layer's buffer. */
+    if(!saved->is_swapchain && saved->has_content) {
+        lv_draw_eve5_slice_t conv;
+        lv_memzero(&conv, sizeof(conv));
+        conv.prev_handle = saved->gpu_handle;
+        conv.prev_eve_format = saved->eve_format;
+        conv.prev_stride = saved->stride;
+        conv.prev_luminance = saved->sample_as_luminance;
+        lv_draw_eve5_hal_init_layer(u, layer, false, &conv);
+        if(eve5_get_vram_res(layer) != NULL) {
+            lv_draw_eve5_hal_finish_layer(u, layer, false, 0);
+            vr->has_content = true;
+            vr->is_premultiplied = true;
+        }
+        saved->gpu_handle = GA_HANDLE_INVALID;
+    }
     return true;
 }
 
-/* Restore the swapchain on the screen layer. Returns the current intermediate,
- * which the caller now owns. */
-static EVE_GpuHandle eve5_swapchain_attach(lv_layer_t * layer, lv_eve5_vram_res_t * vr,
-                                           const eve5_swapchain_state_t * saved)
+/**
+ * Give the layer its own format back. The swapchain returns as it was; a
+ * layer gets a new buffer in its format, for the last slice or the
+ * conversion of the result. Returns the current intermediate, which the
+ * caller now owns.
+ */
+static EVE_GpuHandle eve5_argb8_attach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, lv_eve5_vram_res_t * vr,
+                                       const eve5_argb8_state_t * saved)
 {
     EVE_GpuHandle inter = vr->gpu_handle;
-    vr->is_swapchain = true;
-    vr->gpu_handle = saved->gpu_handle;
+    vr->is_swapchain = saved->is_swapchain;
     vr->eve_format = saved->eve_format;
-    vr->stride = saved->stride;
-    vr->base.size = saved->base_size;
-    vr->has_content = saved->has_content;
     vr->is_premultiplied = saved->is_premultiplied;
+    vr->sample_as_luminance = saved->sample_as_luminance;
+    if(saved->is_swapchain) {
+        vr->gpu_handle = saved->gpu_handle;
+        vr->stride = saved->stride;
+        vr->base.size = saved->base_size;
+        vr->has_content = saved->has_content;
+    }
+    else {
+        /* An unconverted buffer, which had no content, isn't needed anymore */
+        EVE_GpuAlloc_ScopedFree(u->allocator, saved->gpu_handle);
+        int32_t aw = ALIGN_UP(lv_area_get_width(&layer->buf_area), 16);
+        int32_t ah = ALIGN_UP(lv_area_get_height(&layer->buf_area), 16);
+        vr->stride = (uint32_t)aw * (uint32_t)eve5_format_bpp(saved->eve_format);
+        vr->base.size = eve5_rt_surface_size(saved->eve_format, vr->stride, (uint32_t)ah);
+        vr->gpu_handle = EVE_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
+        vr->source_offset = 0;
+        vr->palette_offset = GA_INVALID;
+        vr->has_content = false;
+    }
     layer->color_format = saved->layer_cf;
     if(layer->draw_buf) {
         /* init_layer marks the intermediate's format premultiplied */
@@ -770,10 +820,13 @@ static EVE_GpuHandle eve5_swapchain_attach(lv_layer_t * layer, lv_eve5_vram_res_
 }
 
 /**
- * Present an ARGB8 intermediate (consumed) on the swapchain with an otherwise
- * empty slice. Without one, clear, to keep the swapchain rotation consistent.
+ * Put an ARGB8 intermediate (consumed) in the attached layer with an otherwise
+ * empty slice: present it on the swapchain, or convert it to the layer's
+ * format. Without one, the swapchain is cleared to keep its rotation, and a
+ * layer stays empty.
  */
-static void eve5_swapchain_present(lv_draw_eve5_unit_t * u, lv_layer_t * layer, EVE_GpuHandle inter)
+static void eve5_argb8_finish(lv_draw_eve5_unit_t * u, lv_layer_t * layer, EVE_GpuHandle inter,
+                              const eve5_argb8_state_t * saved)
 {
     int32_t w = lv_area_get_width(&layer->buf_area);
     int32_t h = lv_area_get_height(&layer->buf_area);
@@ -783,13 +836,15 @@ static void eve5_swapchain_present(lv_draw_eve5_unit_t * u, lv_layer_t * layer, 
         lv_memzero(&slice_empty, sizeof(slice_empty));
         slice_empty.prev_handle = inter;
         slice_empty.prev_eve_format = ARGB8;
-        slice_empty.prev_stride = (uint32_t)ALIGN_UP(w, 16) * 4;
-        lv_draw_eve5_hal_init_layer(u, layer, true, &slice_empty);
-        if(eve5_get_vram_res(layer) != NULL) {
-            lv_draw_eve5_hal_finish_layer(u, layer, true, 0);
+        slice_empty.prev_stride = saved->inter_stride;
+        lv_draw_eve5_hal_init_layer(u, layer, saved->is_swapchain, &slice_empty);
+        lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+        if(vr != NULL) {
+            lv_draw_eve5_hal_finish_layer(u, layer, saved->is_swapchain, 0);
+            if(!saved->is_swapchain) vr->has_content = true;
         }
     }
-    else {
+    else if(saved->is_swapchain) {
         EVE_HalContext * phost = u->hal;
         lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
         EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, vr->eve_format, w, h);
@@ -871,19 +926,19 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
             /* The screen may not fit one display list, and the swapchain
              * cannot continue a slice: render the slices to an intermediate
              * and present that */
-            eve5_swapchain_state_t saved;
-            if(!eve5_swapchain_detach(u, layer, vr, &saved)) {
+            eve5_argb8_state_t saved;
+            if(!eve5_argb8_detach(u, layer, vr, &saved)) {
                 eve5_finish_queued(layer->draw_task_head, NULL);
                 goto render_done;
             }
             eve5_render_range(u, layer, true, false, &range, true);
             bool has_content = vr->has_content;
-            EVE_GpuHandle inter = eve5_swapchain_attach(layer, vr, &saved);
+            EVE_GpuHandle inter = eve5_argb8_attach(u, layer, vr, &saved);
             if(!has_content) {
                 EVE_GpuAlloc_ScopedFree(u->allocator, inter);
                 inter = GA_HANDLE_INVALID;
             }
-            eve5_swapchain_present(u, layer, inter);
+            eve5_argb8_finish(u, layer, inter, &saved);
         }
         goto render_done;
     }
@@ -891,15 +946,18 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
     {
         EVE5_LOG("EVE5: Slice split at task %p (type=%d)", (void *)blend_task, blend_task->type);
 
-        /* Slicing intermediates need to be regular allocator-backed buffers.
-         * For non-screen layers the layer's own vram_res already plays that
-         * role. For full-mode-screen the layer's vram_res is virtual
-         * (is_swapchain), so we temporarily swap it to a fresh ARGB8 RAM_G
-         * allocation for the duration of the slice loop. The tail slice
-         * restores swapchain state so the final render writes directly to
-         * SWAPCHAIN_0 with the prev intermediate decoded as ARGB8. */
-        bool is_full_screen_sliced = is_swapchain;
-        eve5_swapchain_state_t saved;
+        /* Slicing intermediates are ARGB8 buffers, as the blend math is. An
+         * ARGB8 layer's own vram_res plays that role. The full-mode screen's
+         * vram_res is virtual (is_swapchain), and a layer in another format
+         * can't hold them, so these swap it for a fresh ARGB8 allocation for
+         * the duration of the slice loop (eve5_argb8_detach). The tail slice
+         * then restores the layer, and renders into its own format with the
+         * ARGB8 intermediate as its base. A partial-mode screen tile renders
+         * ARGB8 whatever its format says (init_layer). */
+        bool argb8_sliced = is_swapchain || (!is_screen && vr != NULL && vr->eve_format != ARGB8);
+        eve5_argb8_state_t saved;
+        /* LVGL blends on an L8 layer's luminances */
+        bool blend_luminance = false;
 
         /* Per-iteration eve5_render_slice parameters. For non-screen-layer
          * slicing, intermediates and the tail share the outer is_screen /
@@ -910,14 +968,17 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
         bool inter_is_screen = is_screen;
         bool inter_layer_has_alpha = layer_has_alpha;
 
-        if(is_full_screen_sliced) {
-            if(!eve5_swapchain_detach(u, layer, vr, &saved)) {
+        if(argb8_sliced) {
+            if(!eve5_argb8_detach(u, layer, vr, &saved)) {
                 /* Frame is dropped */
                 eve5_finish_queued(layer->draw_task_head, NULL);
                 goto render_done;
             }
             inter_is_screen = false;
             inter_layer_has_alpha = true;
+            /* Only where the layer is stored as L8: a screen tile in another
+             * format stays in color */
+            blend_luminance = saved.layer_cf == LV_COLOR_FORMAT_L8 && saved.eve_format == L8;
         }
 
         EVE_GpuHandle prev = GA_HANDLE_INVALID;
@@ -936,34 +997,33 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 slice_tail.prev_handle = prev;
                 slice_tail.isolated = false;
 
-                if(is_full_screen_sliced) {
-                    if(lv_draw_eve5_range_fits_dl(u, cursor, NULL, EVE5_DL_INIT_LAYER + EVE5_DL_FINISH_LAYER)) {
-                        /* Render the tail directly to the swapchain. Free the
-                         * fresh intermediate reserved for it. No guard Get: it
-                         * would re-stamp the entry to the upcoming epoch and
-                         * defer the release past the tail slice; ScopedFree
-                         * validates internally. */
-                        EVE_GpuAlloc_ScopedFree(u->allocator, eve5_swapchain_attach(layer, vr, &saved));
+                if(argb8_sliced && (!is_swapchain
+                                    || lv_draw_eve5_range_fits_dl(u, cursor, NULL,
+                                                                  EVE5_DL_INIT_LAYER + EVE5_DL_FINISH_LAYER))) {
+                    /* Render the tail directly into the layer's own format,
+                     * or to the swapchain. Free the fresh intermediate
+                     * reserved for it. No guard Get: it would re-stamp the
+                     * entry to the upcoming epoch and defer the release past
+                     * the tail slice; ScopedFree validates internally. */
+                    EVE_GpuAlloc_ScopedFree(u->allocator, eve5_argb8_attach(u, layer, vr, &saved));
 
-                        /* prev was rendered as ARGB8 — tell init_layer's
-                         * prev_handle blit to decode the source as ARGB8 (target
-                         * is RGB8 swapchain). */
-                        slice_tail.prev_eve_format = ARGB8;
-                        slice_tail.prev_stride = saved.inter_stride;
-                        eve5_render_range(u, layer, true, false, &slice_tail, true);
+                    /* prev was rendered as ARGB8 — tell init_layer's
+                     * prev_handle blit to decode the source as ARGB8 */
+                    slice_tail.prev_eve_format = ARGB8;
+                    slice_tail.prev_stride = saved.inter_stride;
+                    eve5_render_range(u, layer, is_screen, layer_has_alpha, &slice_tail, true);
+                }
+                else if(argb8_sliced) {
+                    /* The screen's tail may need several slices: render them
+                     * to the intermediate as a screen, then present it */
+                    eve5_render_range(u, layer, true, false, &slice_tail, true);
+                    bool has_content = vr->has_content;
+                    EVE_GpuHandle inter = eve5_argb8_attach(u, layer, vr, &saved);
+                    if(!has_content) {
+                        EVE_GpuAlloc_ScopedFree(u->allocator, inter);
+                        inter = GA_HANDLE_INVALID;
                     }
-                    else {
-                        /* The tail may need several slices: render them to the
-                         * intermediate as a screen, then present it */
-                        eve5_render_range(u, layer, true, false, &slice_tail, true);
-                        bool has_content = vr->has_content;
-                        EVE_GpuHandle inter = eve5_swapchain_attach(layer, vr, &saved);
-                        if(!has_content) {
-                            EVE_GpuAlloc_ScopedFree(u->allocator, inter);
-                            inter = GA_HANDLE_INVALID;
-                        }
-                        eve5_swapchain_present(u, layer, inter);
-                    }
+                    eve5_argb8_finish(u, layer, inter, &saved);
                 }
                 else {
                     eve5_render_range(u, layer, is_screen, layer_has_alpha, &slice_tail, true);
@@ -1025,8 +1085,27 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
             }
 
             /* If prev is still INVALID (first task in queue is a blend task with
-             * nothing before), the dst is effectively transparent black. Allocate
-             * and clear an ARGB8 buffer so blend math has a defined dst. */
+             * nothing before), the dst is the layer's content, such as a
+             * canvas's: an empty slice renders it into an ARGB8 render target,
+             * premultiplied, as the blend math takes it. */
+            if(prev.Id == GA_HANDLE_INVALID.Id && vr != NULL && vr->has_content) {
+                lv_draw_eve5_slice_t slice_base;
+                lv_memzero(&slice_base, sizeof(slice_base));
+                slice_base.prev_handle = GA_HANDLE_INVALID;
+                lv_draw_eve5_hal_init_layer(u, layer, inter_is_screen, &slice_base);
+                if(eve5_get_vram_res(layer) != NULL) {
+                    lv_draw_eve5_hal_finish_layer(u, layer, inter_is_screen, 0);
+                    EVE_GpuHandle new_handle = EVE_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
+                    if(EVE_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
+                        prev = vr->gpu_handle;
+                        vr->gpu_handle = new_handle;
+                        vr->has_content = false;
+                    }
+                }
+            }
+
+            /* Without content, the dst is transparent black. Allocate and clear
+             * an ARGB8 buffer so blend math has a defined dst. */
             if(prev.Id == GA_HANDLE_INVALID.Id) {
                 int32_t aw = ALIGN_UP(lv_area_get_width(&layer->buf_area), 16);
                 int32_t ah = ALIGN_UP(lv_area_get_height(&layer->buf_area), 16);
@@ -1083,15 +1162,15 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 bool blend_attempted = false;
 
                 if(dsc->blend_mode == LV_BLEND_MODE_MULTIPLY) {
-                    lv_draw_eve5_blend_multiply(u, layer, prev, src_handle, &result);
+                    lv_draw_eve5_blend_multiply(u, layer, prev, src_handle, blend_luminance, &result);
                     blend_attempted = true;
                 }
                 else if(dsc->blend_mode == LV_BLEND_MODE_SUBTRACTIVE) {
-                    lv_draw_eve5_blend_subtractive(u, layer, prev, src_handle, &result);
+                    lv_draw_eve5_blend_subtractive(u, layer, prev, src_handle, blend_luminance, &result);
                     blend_attempted = true;
                 }
                 else if(dsc->blend_mode == LV_BLEND_MODE_DIFFERENCE) {
-                    lv_draw_eve5_blend_difference(u, layer, prev, src_handle, &result);
+                    lv_draw_eve5_blend_difference(u, layer, prev, src_handle, blend_luminance, &result);
                     blend_attempted = true;
                 }
 
@@ -1181,15 +1260,15 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
         /* Edge case: cursor became NULL because the very last task was a
          * blend (no remaining tasks for a tail slice).
-         * Non-screen-layer: store prev on vr so the parent can composite it.
-         * Full-mode-screen: free the unused fresh buffer, restore swapchain
-         *   state, then present prev. */
+         * ARGB8 layer: store prev on vr so the parent can composite it.
+         * Others: free the unused fresh buffer, restore the layer, then
+         *   present prev or convert it to the layer's format. */
         if(cursor == NULL) {
-            if(is_full_screen_sliced) {
+            if(argb8_sliced) {
                 /* No guard Get: it would re-stamp the entry and defer the
                  * release; ScopedFree validates internally. */
-                EVE_GpuAlloc_ScopedFree(u->allocator, eve5_swapchain_attach(layer, vr, &saved));
-                eve5_swapchain_present(u, layer, prev);
+                EVE_GpuAlloc_ScopedFree(u->allocator, eve5_argb8_attach(u, layer, vr, &saved));
+                eve5_argb8_finish(u, layer, prev, &saved);
             }
             else if(prev.Id != GA_HANDLE_INVALID.Id) {
                 if(vr != NULL) {

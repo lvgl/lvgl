@@ -786,6 +786,12 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         /* Previous slice output: blit as starting point (always premultiplied) */
         uint32_t prev_addr = EVE_GpuAlloc_Get(u->allocator, slice->prev_handle);
         if(prev_addr != GA_INVALID) {
+            /* The previous slice's output is in the target format, unless the
+             * slice says otherwise (ARGB8 intermediates, see eve5_argb8_detach) */
+            uint16_t prev_fmt = slice->prev_eve_format ? slice->prev_eve_format : target_eve_fmt;
+            uint32_t prev_stride = slice->prev_eve_format ? slice->prev_stride : (uint32_t)aligned_w * target_bpp;
+            bool prev_luminance = slice->prev_eve_format ? slice->prev_luminance : vr->sample_as_luminance;
+
             EVE_CoDl_clearColorRgb(u->hal, 0, 0, 0);
             EVE_CoDl_clearColorA(u->hal, is_screen ? 255 : 0);
             EVE_CoDl_clear(u->hal, 1, 1, 1);
@@ -795,8 +801,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
             EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
             EVE_CoDl_bitmapSource(phost, prev_addr);
-            eve5_set_image_bitmap_layout(u->hal, target_eve_fmt, (int32_t)(aligned_w * target_bpp), h,
-                                         vr->sample_as_luminance);
+            eve5_set_image_bitmap_layout(u->hal, prev_fmt, (int32_t)prev_stride, h, prev_luminance);
             EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, w, h);
             EVE_CoDl_begin(u->hal, BITMAPS);
             EVE_CoDl_vertex2f_0(u->hal, 0, 0);
@@ -804,8 +809,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             EVE_CoDl_restoreContext(u->hal);
 
             u->canvas_orig_addr = prev_addr;
-            u->canvas_orig_format = target_eve_fmt;
-            u->canvas_orig_stride = aligned_w * target_bpp;
+            u->canvas_orig_format = prev_fmt;
+            u->canvas_orig_stride = prev_stride;
             u->canvas_orig_palette = GA_INVALID;
             u->canvas_orig_w = w;
             u->canvas_orig_h = h;

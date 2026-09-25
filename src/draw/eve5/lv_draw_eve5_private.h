@@ -339,6 +339,7 @@ typedef struct {
      * targets SWAPCHAIN_0 in RGB8. */
     uint16_t prev_eve_format;
     uint32_t prev_stride;       /**< Stride of prev_handle in bytes (only used when prev_eve_format != 0) */
+    bool prev_luminance;        /**< prev_handle holds luminance (L8 as LVGL's L8), with prev_eve_format */
 } lv_draw_eve5_slice_t;
 
 /**********************
@@ -1068,13 +1069,13 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 /* Blend mode support (MULTIPLY, SUBTRACTIVE, DIFFERENCE) */
 bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
-                                 EVE_GpuHandle *out_result);
+                                 bool luminance, EVE_GpuHandle *out_result);
 bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                     EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
-                                    EVE_GpuHandle *out_result);
+                                    bool luminance, EVE_GpuHandle *out_result);
 bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                    EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
-                                   EVE_GpuHandle *out_result);
+                                   bool luminance, EVE_GpuHandle *out_result);
 
 /* Bitmap mask, applied at child layer finish */
 void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
