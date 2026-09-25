@@ -29,6 +29,10 @@
  *   SUBTRACTIVE: max(d-s, 0)*a = max(d*a - P, 0)
  *   DIFFERENCE:  |d-s|*a       = max(d*a - P, 0) + max(P - d*a, 0)
  *
+ * ADDITIVE isn't here: it's drawn inline with the hardware blend, which
+ * differs where the sum saturates under partial coverage. See
+ * eve5_find_blend_task for how to make it exact.
+ *
  * On an L8 layer, LVGL applies the mode to the luminances. The math then runs
  * once, on the luminance an L8 render target stores ((r + g + b) / 3), and
  * writes the result to all three channels.

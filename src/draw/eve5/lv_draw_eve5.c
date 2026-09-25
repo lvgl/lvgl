@@ -1326,6 +1326,23 @@ static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_ta
         }
         if(t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER) {
             const lv_draw_image_dsc_t * dsc = t->draw_dsc;
+            /* ADDITIVE is drawn inline with the hardware blend, which gives
+             * min(d + s*a, 1). LVGL's software renderer mixes the saturated
+             * sum over dst by the coverage a: min(d + s, 1)*a + d*(1 - a).
+             * The two only differ where d + s > 1 under partial coverage
+             * (half-transparent images, antialiased edges over bright
+             * content), where the hardware result is brighter. Kept inline
+             * for speed. To make it exact, slice it here like the other modes
+             * and add it to lv_draw_eve5_blend.c: with D = 1 - d and the
+             * premultiplied source P = s*a,
+             *   1 - out = D*(1 - a) + max(D*a - P, 0),
+             * which is subtractive applied to the complemented dst. The
+             * channel DL computes temp.c = max(D.c*a - P.c, 0) (load d.c,
+             * invert, multiply by a, subtract P.c); the composite DL computes
+             * out.c = 1 - (D.c*(1 - a) + temp.c) per channel in the alpha
+             * scratch (load d.c, invert, multiply by 1 - a with
+             * blend(ZERO, ONE_MINUS_SRC_ALPHA), add temp.c, invert, store),
+             * and alpha = a + d.a*(1 - a). */
             if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
                dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
                 return t;
