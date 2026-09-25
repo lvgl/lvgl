@@ -503,8 +503,25 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
         }
     }
     else {
-        u->canvas_orig_addr = GA_INVALID;
-        u->canvas_orig_palette = GA_INVALID;
+        /* Without a previous slice, the layer's content, such as a canvas's,
+         * is the background, unless init_layer discards it */
+        lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+        bool discard = layer->draw_buf != NULL
+                       && lv_draw_buf_has_flag(layer->draw_buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
+        uint32_t base = (vr != NULL && vr->has_content && !vr->is_swapchain && !discard)
+                        ? EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) : GA_INVALID;
+        if(base != GA_INVALID) {
+            u->canvas_orig_addr = base + vr->source_offset;
+            u->canvas_orig_format = vr->eve_format;
+            u->canvas_orig_stride = vr->stride;
+            u->canvas_orig_palette = vr->palette_offset != GA_INVALID ? base + vr->palette_offset : GA_INVALID;
+            u->canvas_orig_w = lv_area_get_width(&layer->buf_area);
+            u->canvas_orig_h = lv_area_get_height(&layer->buf_area);
+        }
+        else {
+            u->canvas_orig_addr = GA_INVALID;
+            u->canvas_orig_palette = GA_INVALID;
+        }
     }
 
     u->has_alpha_opaque = false;
