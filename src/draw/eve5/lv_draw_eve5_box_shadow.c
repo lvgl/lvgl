@@ -38,20 +38,30 @@
  *     (0,0) transparent -----> X
  *       |
  *       v    +---------+
- *       Y    |    .--' |  <- Gaussian falloff around the core's edge,
- *            |  .'     |     blur texels in from (0,0)
+ *       Y    |    .--' |  <- falloff around the core's edge, a blur
+ *            |  .'     |     (and a little) in from (0,0)
  *            | |  solid|
  *            +---------+
  *                    (SIZE-1, SIZE-1) = alpha 255
  *
- * == Gaussian Math ==
+ * == Blur ==
  *
- * For each texel:
- *   signed_dist = distance to the core's rounded rectangle (negative inside)
- *   alpha = 0.5 × (1 - erf(signed_dist / (sigma × √2)))
+ * The software renderer blurs a corner buffer of the core twice with a box
+ * along each axis, each about a blur wide. The textures do the same at their
+ * scale: the core's coverage per texel, filtered twice along each axis by a
+ * box of fractional width. Being separable, the blur leaves the corners
+ * squarer than a round (Gaussian) one would.
  *
- * sigma = 0.41 × blur, the deviation of the two box blurs of the software
- * renderer, each blur wide.
+ * The software renderer's box of even width has its window half a pixel off
+ * centre, toward the outside of its corner buffer, which it mirrors to all
+ * four corners: each of its two blurs of even width moves the shadow in by
+ * half a pixel. The slices sample the textures that much further out. Below a
+ * width of 4, its first blur is a single pixel, and it skips blurring: the
+ * shadow is the core, drawn as a rounded rectangle.
+ *
+ * The box width and the core's edge come from tests/tools/shadow_fit in
+ * eve_apps, which fits them to the software renderer over a range of sizes,
+ * radii and widths: a box of 0.94 blur, and the edge 0.965 blur in.
  *
  * == Texture Caching ==
  *
@@ -67,22 +77,21 @@
 
 #if LV_USE_DRAW_EVE5
 
-#if !LV_DRAW_EVE5_NO_FLOAT
-    #include <math.h>
-#endif
-
 /*********************
  *      DEFINES
  *********************/
 
 #define SHADOW_TEX_SIZE      EVE5_SHADOW_TEX_SIZE
 #define SHADOW_BITMAP_HANDLE EVE_CO_SCRATCH_HANDLE
-#define SHADOW_SIGMA_PCT     41  /* sigma in percent of the blur */
+#define SHADOW_BOX_PERMILLE  940   /* Box width, in thousandths of the blur */
+#define SHADOW_EDGE_PERMILLE 965   /* Core's edge from the outer end, in thousandths of the blur */
+#define SHADOW_MIN_BLURRED   4     /* Narrower shadows are the core, as in the software renderer */
+#define SHADOW_COV_ONE       4096  /* Coverage 1.0 while filtering (Q12) */
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void generate_corner_texture(uint8_t * buf, int32_t ratio_idx);
+static bool generate_corner_texture(uint8_t * buf, int32_t ratio_idx);
 static void generate_edge_texture(uint8_t * buf, int32_t ratio_idx);
 static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx);
 static int32_t calc_ratio_index(int32_t radius, int32_t corner_size);
@@ -100,165 +109,116 @@ static int32_t calc_ratio_index(int32_t radius, int32_t corner_size)
     return (radius * (SHADOW_TEX_SIZE - 1)) / corner_size;
 }
 
-#if LV_DRAW_EVE5_NO_FLOAT
-
-/**
- * Precomputed Gaussian CDF lookup table for integer-only platforms.
- * Maps erf input x ∈ [-4.0, +4.0] to alpha ∈ [0, 255].
- * Index: i = (x × 32) + 128, clamped to [0, 255]
- */
-static const uint8_t s_gauss_cdf[256] = {
-    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 254,
-    254, 254, 254, 254, 254, 254, 254, 253, 253, 253, 253, 253, 252, 252, 252, 251,
-    251, 250, 250, 249, 248, 248, 247, 246, 245, 244, 243, 242, 241, 239, 238, 237,
-    235, 233, 231, 230, 227, 225, 223, 221, 218, 216, 213, 210, 207, 204, 201, 197,
-    194, 190, 187, 183, 179, 175, 171, 167, 163, 158, 154, 150, 145, 141, 136, 132,
-    128, 123, 119, 114, 110, 105, 101,  97,  92,  88,  84,  80,  76,  72,  68,  65,
-    61,  58,  54,  51,  48,  45,  42,  39,  37,  34,  32,  30,  28,  25,  24,  22,
-    20,  18,  17,  16,  14,  13,  12,  11,  10,   9,   8,   7,   7,   6,   5,   5,
-    4,   4,   3,   3,   3,   2,   2,   2,   2,   2,   1,   1,   1,   1,   1,   1,
-    1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-};
-
-static inline uint8_t gauss_cdf_lookup(int32_t signed_dist_256, int32_t sigma_sqrt2_256)
-{
-    int32_t idx = (int32_t)(((int64_t)signed_dist_256 * 32) / sigma_sqrt2_256) + 128;
-    if(idx < 0) idx = 0;
-    if(idx > 255) idx = 255;
-    return s_gauss_cdf[idx];
-}
-
-#else
-
-/**
- * Fast erf approximation using Abramowitz & Stegun formula.
- * Maximum error ~1.5×10⁻⁷.
- */
-static float fast_erf(float x)
-{
-    float a1 =  0.254829592f;
-    float a2 = -0.284496736f;
-    float a3 =  1.421413741f;
-    float a4 = -1.453152027f;
-    float a5 =  1.061405429f;
-    float p  =  0.3275911f;
-
-    int sign = (x >= 0) ? 1 : -1;
-    x = fabsf(x);
-
-    float t = 1.0f / (1.0f + p * x);
-    float y = 1.0f - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * expf(-x * x);
-
-    return sign * y;
-}
-
-#endif
-
-/* The textures span corner_size pixels in SHADOW_TEX_SIZE texels. In texels:
- * the radius, the blur on each side of the core's edge (which is blur in from
- * the outer end), and the corner's centre at blur + radius. */
-#if LV_DRAW_EVE5_NO_FLOAT
-
-static void texture_shape_256(int32_t ratio_idx, int32_t * radius_256, int32_t * blur_256,
-                              int32_t * sigma_sqrt2_256)
+/* The textures span corner_size pixels in SHADOW_TEX_SIZE texels. In 1/256
+ * texel from the outer end: the radius, the core's edge, and the box width */
+static void texture_shape(int32_t ratio_idx, int32_t * radius_256, int32_t * edge_256, int32_t * box_256)
 {
     *radius_256 = ratio_idx * SHADOW_TEX_SIZE * 256 / (SHADOW_TEX_SIZE - 1);
-    *blur_256 = (SHADOW_TEX_SIZE * 256 - *radius_256) / 2;
-    int32_t sigma_256 = *blur_256 * SHADOW_SIGMA_PCT / 100;
-    if(sigma_256 < 128) sigma_256 = 128;
-    *sigma_sqrt2_256 = sigma_256 * 1414 / 1000;
+    int32_t blur_256 = (SHADOW_TEX_SIZE * 256 - *radius_256) / 2;
+    *edge_256 = blur_256 * SHADOW_EDGE_PERMILLE / 1000;
+    *box_256 = blur_256 * SHADOW_BOX_PERMILLE / 1000;
 }
 
-#else
-
-static float texture_shape(int32_t ratio_idx, float * radius, float * blur)
+/* Integral of a line of texels (Q12) from 0 to t (1/256 texel), in Q12 ×
+ * 1/256; beyond the ends, the line continues as at its end */
+static int32_t line_integral(const int32_t * v, const int32_t * prefix, int32_t t)
 {
-    *radius = (float)ratio_idx * SHADOW_TEX_SIZE / (SHADOW_TEX_SIZE - 1);
-    *blur = (SHADOW_TEX_SIZE - *radius) * 0.5f;
-    float sigma = *blur * (SHADOW_SIGMA_PCT / 100.0f);
-    if(sigma < 0.5f) sigma = 0.5f;
-    return 1.0f / (sigma * 1.41421356f);
+    if(t <= 0) return t * v[0];
+    if(t >= SHADOW_TEX_SIZE * 256) return prefix[SHADOW_TEX_SIZE] * 256 + (t - SHADOW_TEX_SIZE * 256) * v[SHADOW_TEX_SIZE - 1];
+    return prefix[t >> 8] * 256 + (t & 255) * v[t >> 8];
 }
 
-#endif
+/* Box filter of width_256 (1/256 texel) over a line of texels, in place */
+static void box_filter_line(int32_t * v, int32_t width_256)
+{
+    int32_t prefix[SHADOW_TEX_SIZE + 1];
+    int32_t out[SHADOW_TEX_SIZE];
+    if(width_256 <= 0) return;
+    prefix[0] = 0;
+    for(int32_t i = 0; i < SHADOW_TEX_SIZE; i++) prefix[i + 1] = prefix[i] + v[i];
+    for(int32_t i = 0; i < SHADOW_TEX_SIZE; i++) {
+        int32_t a = i * 256 + 128 - width_256 / 2;
+        int32_t b = a + width_256;
+        out[i] = (line_integral(v, prefix, b) - line_integral(v, prefix, a) + width_256 / 2) / width_256;
+    }
+    lv_memcpy(v, out, sizeof(out));
+}
+
+static uint8_t coverage_to_alpha(int32_t v)
+{
+    return (uint8_t)((v * 255 + SHADOW_COV_ONE / 2) / SHADOW_COV_ONE);
+}
 
 /**
- * Generate 2D corner texture for Gaussian shadow falloff: the outer corner at
- * (0, 0), the corner's centre toward (SIZE-1, SIZE-1). Texels hold the
- * shadow at their centres, which the slices sample at the pixel centres.
+ * Generate 2D corner texture for the shadow's falloff: the outer corner at
+ * (0, 0), the corner's centre toward (SIZE-1, SIZE-1). The core's coverage of
+ * each texel (4 × 4 samples), blurred twice along each axis. Beyond the
+ * texture, each row and column continues as at its end: outside the core on
+ * the outer side, past the rounded corner on the inner side.
  */
-static void generate_corner_texture(uint8_t * buf, int32_t ratio_idx)
+static bool generate_corner_texture(uint8_t * buf, int32_t ratio_idx)
 {
-#if LV_DRAW_EVE5_NO_FLOAT
-    int32_t radius_256, blur_256, sigma_sqrt2_256;
-    texture_shape_256(ratio_idx, &radius_256, &blur_256, &sigma_sqrt2_256);
-    int32_t centre_256 = blur_256 + radius_256;
+    int32_t radius_256, edge_256, box_256;
+    texture_shape(ratio_idx, &radius_256, &edge_256, &box_256);
+    int32_t centre_256 = edge_256 + radius_256;
+
+    int16_t * g = lv_malloc(SHADOW_TEX_SIZE * SHADOW_TEX_SIZE * sizeof(int16_t));
+    if(g == NULL) return false;
 
     for(int32_t y = 0; y < SHADOW_TEX_SIZE; y++) {
         for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) {
-            /* Signed distance to the rounded rectangle, positive outside */
-            int32_t dx = centre_256 - (x * 256 + 128);
-            int32_t dy = centre_256 - (y * 256 + 128);
-            int32_t ox = LV_MAX(dx, 0);
-            int32_t oy = LV_MAX(dy, 0);
-            int32_t dist_256 = (int32_t)lv_sqrt32((uint32_t)(ox * ox + oy * oy))
-                               + LV_MIN(LV_MAX(dx, dy), 0) - radius_256;
-            buf[y * SHADOW_TEX_SIZE + x] = gauss_cdf_lookup(dist_256, sigma_sqrt2_256);
+            int32_t n = 0;
+            for(int32_t sy = 0; sy < 4; sy++) {
+                for(int32_t sx = 0; sx < 4; sx++) {
+                    int32_t px = x * 256 + sx * 64 + 32;
+                    int32_t py = y * 256 + sy * 64 + 32;
+                    int32_t dx = centre_256 - px;
+                    int32_t dy = centre_256 - py;
+                    if(dx > 0 && dy > 0) n += dx * dx + dy * dy <= radius_256 * radius_256;
+                    else n += px >= edge_256 && py >= edge_256;
+                }
+            }
+            g[y * SHADOW_TEX_SIZE + x] = (int16_t)(n * (SHADOW_COV_ONE / 16));
         }
     }
-#else
-    float radius, blur;
-    float inv_sigma_sqrt2 = texture_shape(ratio_idx, &radius, &blur);
-    float centre = blur + radius;
 
-    for(int32_t y = 0; y < SHADOW_TEX_SIZE; y++) {
+    int32_t line[SHADOW_TEX_SIZE];
+    for(int32_t pass = 0; pass < 2; pass++) {
+        for(int32_t y = 0; y < SHADOW_TEX_SIZE; y++) {
+            for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) line[x] = g[y * SHADOW_TEX_SIZE + x];
+            box_filter_line(line, box_256);
+            for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) g[y * SHADOW_TEX_SIZE + x] = (int16_t)line[x];
+        }
         for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) {
-            /* Signed distance to the rounded rectangle, positive outside */
-            float dx = centre - ((float)x + 0.5f);
-            float dy = centre - ((float)y + 0.5f);
-            float ox = dx > 0.0f ? dx : 0.0f;
-            float oy = dy > 0.0f ? dy : 0.0f;
-            float inside = dx > dy ? dx : dy;
-            if(inside > 0.0f) inside = 0.0f;
-            float dist = sqrtf(ox * ox + oy * oy) + inside - radius;
-            float alpha = 0.5f * (1.0f - fast_erf(dist * inv_sigma_sqrt2));
-
-            buf[y * SHADOW_TEX_SIZE + x] = (uint8_t)(alpha * 255.0f + 0.5f);
+            for(int32_t y = 0; y < SHADOW_TEX_SIZE; y++) line[y] = g[y * SHADOW_TEX_SIZE + x];
+            box_filter_line(line, box_256);
+            for(int32_t y = 0; y < SHADOW_TEX_SIZE; y++) g[y * SHADOW_TEX_SIZE + x] = (int16_t)line[y];
         }
     }
-#endif
+
+    for(int32_t i = 0; i < SHADOW_TEX_SIZE * SHADOW_TEX_SIZE; i++) buf[i] = coverage_to_alpha(g[i]);
+    lv_free(g);
+    return true;
 }
 
 /**
  * Generate 1D edge texture for straight shadow edges: transparent at x = 0,
- * the core's edge blur in, solid at x = SIZE-1.
+ * solid at x = SIZE-1, the same falloff across the core's edge as the corner.
  */
 static void generate_edge_texture(uint8_t * buf, int32_t ratio_idx)
 {
-#if LV_DRAW_EVE5_NO_FLOAT
-    int32_t radius_256, blur_256, sigma_sqrt2_256;
-    texture_shape_256(ratio_idx, &radius_256, &blur_256, &sigma_sqrt2_256);
+    int32_t radius_256, edge_256, box_256;
+    texture_shape(ratio_idx, &radius_256, &edge_256, &box_256);
 
+    int32_t line[SHADOW_TEX_SIZE];
     for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) {
-        buf[x] = gauss_cdf_lookup(blur_256 - (x * 256 + 128), sigma_sqrt2_256);
+        int32_t n = 0;
+        for(int32_t sx = 0; sx < 4; sx++) n += x * 256 + sx * 64 + 32 >= edge_256;
+        line[x] = n * (SHADOW_COV_ONE / 4);
     }
-#else
-    float radius, blur;
-    float inv_sigma_sqrt2 = texture_shape(ratio_idx, &radius, &blur);
-
-    for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) {
-        float dist = blur - ((float)x + 0.5f);
-        float alpha = 0.5f * (1.0f - fast_erf(dist * inv_sigma_sqrt2));
-
-        buf[x] = (uint8_t)(alpha * 255.0f + 0.5f);
-    }
-#endif
+    box_filter_line(line, box_256);
+    box_filter_line(line, box_256);
+    for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) buf[x] = coverage_to_alpha(line[x]);
 }
 
 /**
@@ -297,7 +257,13 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
             return false;
         }
 
-        generate_corner_texture(buf, ratio_idx);
+        if(!generate_corner_texture(buf, ratio_idx)) {
+            LV_LOG_ERROR("EVE5: Failed to allocate corner generation buffer");
+            lv_free(buf);
+            EVE_GpuAlloc_Free(u->allocator, slot->corner_handle);
+            slot->corner_handle = GA_HANDLE_INVALID;
+            return false;
+        }
         EVE_Hal_wrMem(u->hal, corner_addr, buf, corner_bytes);
         lv_free(buf);
         EVE_Hal_requestFenceBeforeSwap(u->hal);
@@ -395,6 +361,9 @@ typedef struct {
     int32_t corner_size;                    /**< Pixels the textures span */
     int32_t left, right, top, bottom;       /**< Widths of the slices on each side */
     int32_t ratio_idx;
+    int32_t in_halves;                      /**< Half pixels the shadow moves in */
+    bool core_only;                         /**< Too narrow to blur: the core alone */
+    int32_t cx1, cy1, cx2, cy2, radius;     /**< The core, inclusive, and its radius */
 } shadow_slices_t;
 
 static bool shadow_slices(const lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * dsc, shadow_slices_t * sl)
@@ -413,6 +382,20 @@ static bool shadow_slices(const lv_draw_task_t * t, const lv_draw_box_shadow_dsc
     int32_t short_side = LV_MIN(lv_area_get_width(&core_area), lv_area_get_height(&core_area));
     if(r_sh > short_side / 2) r_sh = short_side / 2;
     if(r_sh < 0) r_sh = 0;
+
+    sl->cx1 = core_area.x1 - layer_area->x1;
+    sl->cy1 = core_area.y1 - layer_area->y1;
+    sl->cx2 = core_area.x2 - layer_area->x1;
+    sl->cy2 = core_area.y2 - layer_area->y1;
+    sl->radius = r_sh;
+    sl->core_only = dsc->width < SHADOW_MIN_BLURRED;
+    if(sl->core_only) return true;
+
+    /* The software renderer's blurs, of width / 2 and one more for an odd
+     * width: the even ones move the shadow in */
+    int32_t box1 = dsc->width >> 1;
+    int32_t box2 = box1 + (dsc->width & 1);
+    sl->in_halves = (box1 % 2 == 0) + (box2 % 2 == 0);
 
     int32_t blur = (dsc->width + 1) / 2;
     sl->corner_size = 2 * blur + r_sh;
@@ -466,27 +449,30 @@ static void draw_shadow_slices(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t
     int32_t yt = sl->sy1 + sl->top;            /* Bottom of the top slices */
     int32_t yb = sl->sy2 + 1 - sl->bottom;     /* Top of the bottom slices */
     /* Pixel and texel centres are both at integer coordinates: the mirrored
-     * slices start at the texture coordinate of their outermost pixel */
-    int32_t cr = scale * (sl->right - 1);
-    int32_t cb = scale * (sl->bottom - 1);
+     * slices start at the texture coordinate of their outermost pixel. Both
+     * sides sample further out by the shadow's move in. */
+    int32_t in = sl->in_halves * (scale / 2);
+    int32_t cn = -in;
+    int32_t cr = scale * (sl->right - 1) - in;
+    int32_t cb = scale * (sl->bottom - 1) - in;
 
     /* CORNERS */
     EVE_CoDl_bitmapHandle(phost, SHADOW_BITMAP_HANDLE);
     EVE_CoDl_bitmapSource(phost, corner_addr);
     EVE_CoDl_bitmapLayout(phost, L8, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE);
     EVE_CoDl_begin(phost, BITMAPS);
-    shadow_slice(phost, sl->sx1, sl->sy1, sl->left, sl->top, scale, 0, 0, 0, scale, 0);
-    shadow_slice(phost, xr, sl->sy1, sl->right, sl->top, -scale, 0, cr, 0, scale, 0);
-    shadow_slice(phost, sl->sx1, yb, sl->left, sl->bottom, scale, 0, 0, 0, -scale, cb);
+    shadow_slice(phost, sl->sx1, sl->sy1, sl->left, sl->top, scale, 0, cn, 0, scale, cn);
+    shadow_slice(phost, xr, sl->sy1, sl->right, sl->top, -scale, 0, cr, 0, scale, cn);
+    shadow_slice(phost, sl->sx1, yb, sl->left, sl->bottom, scale, 0, cn, 0, -scale, cb);
     shadow_slice(phost, xr, yb, sl->right, sl->bottom, -scale, 0, cr, 0, -scale, cb);
 
     /* EDGES: the one-row texture across the edge, rotated for the top and
      * bottom */
     EVE_CoDl_bitmapSource(phost, edge_addr);
     EVE_CoDl_bitmapLayout(phost, L8, SHADOW_TEX_SIZE, 1);
-    shadow_slice(phost, xl, sl->sy1, xr - xl, sl->top, 0, scale, 0, 0, 0, 0);
+    shadow_slice(phost, xl, sl->sy1, xr - xl, sl->top, 0, scale, cn, 0, 0, 0);
     shadow_slice(phost, xl, yb, xr - xl, sl->bottom, 0, -scale, cb, 0, 0, 0);
-    shadow_slice(phost, sl->sx1, yt, sl->left, yb - yt, scale, 0, 0, 0, 0, 0);
+    shadow_slice(phost, sl->sx1, yt, sl->left, yb - yt, scale, 0, cn, 0, 0, 0);
     shadow_slice(phost, xr, yt, sl->right, yb - yt, -scale, 0, cr, 0, 0, 0);
     EVE_CoDl_end(phost);
 
@@ -508,6 +494,19 @@ static void draw_shadow_slices(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t
             EVE_CoDl_end(phost);
             lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
         }
+    }
+}
+
+/* The shadow in the current color and opacity: the slices, or the core alone */
+static void draw_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, const shadow_slices_t * sl,
+                        uint32_t corner_addr, uint32_t edge_addr)
+{
+    if(sl->core_only) {
+        lv_draw_eve5_draw_rect(u, sl->cx1, sl->cy1, sl->cx2, sl->cy2, sl->radius, &t->clip_area,
+                               &t->target_layer->buf_area);
+    }
+    else {
+        draw_shadow_slices(u, t, sl, corner_addr, edge_addr);
     }
 }
 
@@ -538,9 +537,9 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_tas
     if(dsc->width <= 0) return;
 
     shadow_slices_t sl;
-    uint32_t corner_addr, edge_addr;
+    uint32_t corner_addr = GA_INVALID, edge_addr = GA_INVALID;
     if(!shadow_slices(t, dsc, &sl)) return;
-    if(!shadow_textures(u, sl.ratio_idx, &corner_addr, &edge_addr)) return;
+    if(!sl.core_only && !shadow_textures(u, sl.ratio_idx, &corner_addr, &edge_addr)) return;
 
     EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
@@ -549,7 +548,7 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_tas
 
     EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
     EVE_CoDl_colorA(phost, dsc->opa);
-    draw_shadow_slices(u, t, &sl, corner_addr, edge_addr);
+    draw_shadow(u, t, &sl, corner_addr, edge_addr);
 
     EVE_CoDl_restoreContext(phost);
 }
@@ -573,10 +572,10 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_t
     if(dsc->width <= 0) return;
 
     shadow_slices_t sl;
-    uint32_t corner_addr, edge_addr;
+    uint32_t corner_addr = GA_INVALID, edge_addr = GA_INVALID;
     if(!shadow_slices(t, dsc, &sl)) return;
     /* The L8 render target pass runs before the RGB pass that would make them */
-    if(!shadow_textures(u, sl.ratio_idx, &corner_addr, &edge_addr)) return;
+    if(!sl.core_only && !shadow_textures(u, sl.ratio_idx, &corner_addr, &edge_addr)) return;
 
     EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
@@ -585,7 +584,7 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_t
 
     if(alpha_to_rgb) EVE_CoDl_colorRgb(phost, 255, 255, 255);
     EVE_CoDl_colorA(phost, dsc->opa);
-    draw_shadow_slices(u, t, &sl, corner_addr, edge_addr);
+    draw_shadow(u, t, &sl, corner_addr, edge_addr);
 
     EVE_CoDl_restoreContext(phost);
 }
