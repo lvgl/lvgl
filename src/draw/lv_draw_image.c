@@ -81,8 +81,8 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
     t->state = LV_DRAW_TASK_STATE_BLOCKED;
 
-    lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+    lv_image_buf_get_transformed_footprint(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
+                                           dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
     lv_area_move(&t->_real_area, coords->x1, coords->y1);
 
     /*If the image_area is not set assume that it's the same as the rendering area */
@@ -145,8 +145,8 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_IMAGE);
         lv_memcpy(t->draw_dsc, &new_image_dsc, sizeof(lv_draw_image_dsc_t));
 
-        lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                          dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+        lv_image_buf_get_transformed_footprint(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
+                                               dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
         lv_area_move(&t->_real_area, coords->x1, coords->y1);
 
         lv_draw_finalize_task_creation(layer, t);
@@ -164,9 +164,9 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
         if(decoder_dsc.decoder && decoder_dsc.decoder->custom_draw_cb) {
             lv_area_t transformed_coords;
-            lv_image_buf_get_transformed_area(&transformed_coords,
-                                              new_image_dsc.header.w, new_image_dsc.header.h,
-                                              dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+            lv_image_buf_get_transformed_footprint(&transformed_coords,
+                                                   new_image_dsc.header.w, new_image_dsc.header.h,
+                                                   dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
             lv_area_move(&transformed_coords, coords->x1, coords->y1);
 
             /*Clip like bitmap images: the layer's clip area includes the extra draw size of the transform*/
@@ -229,8 +229,8 @@ void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 
-        lv_image_buf_get_transformed_area(&draw_area, w, h, draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y,
-                                          &draw_dsc->pivot);
+        lv_image_buf_get_transformed_footprint(&draw_area, w, h, draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y,
+                                               &draw_dsc->pivot);
 
         draw_area.x1 += coords->x1;
         draw_area.y1 += coords->y1;
@@ -313,6 +313,34 @@ void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
     }
 
     lv_image_decoder_close(&decoder_dsc);
+}
+
+void lv_image_buf_get_transformed_footprint(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
+                                            uint16_t scale_x, uint16_t scale_y, const lv_point_t * pivot)
+{
+    if(angle == 0) {
+        /*The first and the last touched pixel, rounded outwards*/
+        res->x1 = pivot->x + (int32_t)((-(int64_t)pivot->x * scale_x) >> 8);
+        res->y1 = pivot->y + (int32_t)((-(int64_t)pivot->y * scale_y) >> 8);
+        res->x2 = pivot->x + (int32_t)(((int64_t)(w - pivot->x) * scale_x + 255) >> 8) - 1;
+        res->y2 = pivot->y + (int32_t)(((int64_t)(h - pivot->y) * scale_y + 255) >> 8) - 1;
+        return;
+    }
+
+    /*Transform the corners, not the last pixels*/
+    lv_point_t p[4] = {
+        {0, 0},
+        {w, 0},
+        {0, h},
+        {w, h},
+    };
+    uint32_t i;
+    for(i = 0; i < 4; i++) lv_point_transform(&p[i], angle, scale_x, scale_y, pivot, true);
+
+    res->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
+    res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
+    res->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
+    res->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
 }
 
 void lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
