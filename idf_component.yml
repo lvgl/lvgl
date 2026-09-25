@@ -3,6 +3,11 @@ url: https://lvgl.io/
 repository: https://github.com/lvgl/lvgl.git
 documentation: https://docs.lvgl.io/
 issues: https://github.com/lvgl/lvgl/issues
+files:
+  exclude:
+    - "tests/**/*"
+    - "env_support/cmsis-pack/**/*"
+    - "demos/**/screenshot*"
 dependencies:
   espressif/freetype:
     require: private
