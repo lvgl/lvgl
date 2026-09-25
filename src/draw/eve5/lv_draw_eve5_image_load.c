@@ -21,6 +21,7 @@
 #if LV_USE_DRAW_EVE5
 
 #include "../../image/lv_image_decoder_private.h"
+#include "../../core/lv_global.h"
 #include "../../misc/cache/instance/lv_image_header_cache.h"
 #include "EVE_ResourceProbe.h"
 #include "EVE_ResourceQuery.h"
@@ -30,6 +31,9 @@
 #if LV_USE_FS_EVE5_FLASH
     #include "../../drivers/display/eve5/lv_eve5_flash.h"
 #endif
+
+/* Bytes of a JPEG read for its EXIF orientation, which is in the first IFD */
+#define EVE5_EXIF_HEAD_SIZE 4096
 
 /**********************
  * HW-DECODE BAD-PATH CACHE
@@ -94,6 +98,79 @@ static void eve5_decoder_mark_path_bad(const char * path)
  * IMAGE SOURCE RESOLUTION
  **********************/
 
+/* Owner of the full images read from strip decoders in the image cache: a
+ * cache hit has nothing to close */
+static lv_image_decoder_t s_strip_decoder = { .name = "EVE5 strips" };
+
+/**
+ * Read the image of a decoder that only decodes strips (get_area_cb, such as
+ * the BMP decoder) into a full buffer, as a decoder's own full decode would be.
+ */
+static lv_draw_buf_t * decode_strips(lv_image_decoder_dsc_t * dsc)
+{
+    const lv_image_header_t * header = &dsc->header;
+    uint32_t bpp = lv_color_format_get_bpp(header->cf);
+    if(dsc->decoder->get_area_cb == NULL || bpp == 0 || bpp % 8 != 0
+       || LV_COLOR_FORMAT_IS_INDEXED(header->cf)) {
+        return NULL;
+    }
+
+    lv_draw_buf_t * full = lv_draw_buf_create_ex(&(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers),
+                                                 header->w, header->h, header->cf, LV_STRIDE_AUTO);
+    if(full == NULL) return NULL;
+    /* Pixel memory is allocated on first residency */
+    if(!lv_draw_buf_ensure_resident(full, NULL)) {
+        lv_draw_buf_destroy(full);
+        return NULL;
+    }
+
+    lv_area_t full_area = { 0, 0, header->w - 1, header->h - 1 };
+    lv_area_t decoded_area = { LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN };
+    while(lv_image_decoder_get_area(dsc, &full_area, &decoded_area) == LV_RESULT_OK) {
+        const lv_draw_buf_t * strip = dsc->decoded;
+        uint32_t row_bytes = (uint32_t)lv_area_get_width(&decoded_area) * bpp / 8;
+        for(int32_t y = decoded_area.y1; y <= decoded_area.y2; y++) {
+            lv_memcpy(full->data + y * full->header.stride + decoded_area.x1 * bpp / 8,
+                      strip->data + (y - decoded_area.y1) * strip->header.stride, row_bytes);
+        }
+    }
+    return full;
+}
+
+/**
+ * Replace the open decoder session of a strip decoder with the full image,
+ * kept in the image cache so it stays resident in VRAM between frames.
+ * Without the cache, the resolved image owns it.
+ */
+static bool resolve_strips(eve5_resolved_image_t * resolved)
+{
+    lv_image_decoder_dsc_t * dsc = &resolved->decoder_dsc;
+    lv_draw_buf_t * full = decode_strips(dsc);
+    lv_image_decoder_close(dsc);
+    if(full == NULL) return false;
+
+    if(!dsc->args.no_cache && lv_image_cache_is_enabled() && dsc->cache != NULL) {
+        lv_image_cache_data_t search_key;
+        search_key.src_type = dsc->src_type;
+        search_key.src = dsc->src;
+        search_key.slot.size = full->data_size;
+        lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(&s_strip_decoder, &search_key, full, NULL);
+        if(entry != NULL) {
+            dsc->decoder = &s_strip_decoder;
+            dsc->decoded = full;
+            dsc->cache_entry = entry;
+            resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)full;
+            resolved->decoder_open = true;
+            return true;
+        }
+    }
+
+    resolved->owned_buf = full;
+    resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)full;
+    resolved->decoder_open = false;
+    return true;
+}
+
 /**
  * Resolve an image source to an lv_image_dsc_t.
  * For files, opens with use_indexed=true to preserve indexed formats.
@@ -123,20 +200,24 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
         args.use_indexed = true;
 
         lv_result_t res = lv_image_decoder_open(&resolved->decoder_dsc, src, &args);
-        if(res != LV_RESULT_OK || resolved->decoder_dsc.decoded == NULL) {
-            if(res == LV_RESULT_OK) lv_image_decoder_close(&resolved->decoder_dsc);
+        if(res == LV_RESULT_OK && resolved->decoder_dsc.decoded == NULL) {
+            if(!resolve_strips(resolved)) {
+                LV_LOG_WARN("EVE5: Failed to decode image");
+                return false;
+            }
+        }
+        else if(res != LV_RESULT_OK || resolved->decoder_dsc.decoded == NULL) {
             LV_LOG_WARN("EVE5: Failed to decode image");
             return false;
         }
-
-        resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)resolved->decoder_dsc.decoded;
-        resolved->decoder_open = true;
+        else {
+            resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)resolved->decoder_dsc.decoded;
+            resolved->decoder_open = true;
+        }
         if(draw_unit != NULL) {
             if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit)) {
                 LV_LOG_WARN("EVE5: Failed to ensure decoded image residency");
-                lv_image_decoder_close(&resolved->decoder_dsc);
-                resolved->decoder_open = false;
-                resolved->img_dsc = NULL;
+                lv_draw_eve5_release_image_source(resolved);
                 return false;
             }
         }
@@ -152,6 +233,10 @@ void lv_draw_eve5_release_image_source(eve5_resolved_image_t * resolved)
     if(resolved->decoder_open) {
         lv_image_decoder_close(&resolved->decoder_dsc);
         resolved->decoder_open = false;
+    }
+    if(resolved->owned_buf != NULL) {
+        lv_draw_buf_destroy(resolved->owned_buf);
+        resolved->owned_buf = NULL;
     }
     resolved->img_dsc = NULL;
 }
@@ -1383,7 +1468,7 @@ static void decoder_query_reset_cb(EVE_HalContext * phost, void * userdata)
  *   - true  → L8 ⇒ LV_COLOR_FORMAT_L8 (luminance-as-RGB intent). Used for the
  *             HW JPEG/PNG path because PNG ct=0 / JPEG OPT_MONO / grayscale-
  *             palette promotion all carry a grayscale-image intent. The
- *             draw-time BITMAP_SWIZZLE(ALPHA,ALPHA,ALPHA,ONE) restores
+ *             draw-time BITMAP_SWIZZLE(ALPHA,ALPHA,ALPHA,RED) restores
  *             luminance-RGB sampling on top of EVE's alpha-with-white L8.
  *   - false → L8 ⇒ LV_COLOR_FORMAT_A8 (alpha-only intent). Used for the
  *             .esdm raw-asset path: native EVE bitmaps in L# format are
@@ -1560,6 +1645,27 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
          * PNG color_type / bit_depth screening — same gate, same chipId-
          * derived decision, derived in one place.
          * Two-pass for grayscale-JPEG auto-promote (see try_load_file_image). */
+#if LV_USE_LIBJPEG_TURBO
+        /* CMD_LOADIMAGE decodes as stored, and LVGL's libjpeg-turbo decoder
+         * applies the EXIF orientation: leave turned JPEGs to it */
+        if(is_jpeg) {
+            uint32_t orientation = 1;
+            uint8_t * head = lv_malloc(EVE5_EXIF_HEAD_SIZE);
+            if(head != NULL) {
+                uint32_t got = 0;
+                if(lv_fs_seek(&dsc->file, 0, LV_FS_SEEK_SET) == LV_FS_RES_OK
+                   && lv_fs_read(&dsc->file, head, EVE5_EXIF_HEAD_SIZE, &got) == LV_FS_RES_OK) {
+                    orientation = eve5_jpeg_exif_orientation(head, got);
+                }
+                lv_free(head);
+            }
+            if(orientation != 1) {
+                LV_LOG_INFO("EVE5 decoder: declining %s (EXIF orientation %" LV_PRIu32 ")", fn, orientation);
+                return LV_RESULT_INVALID;
+            }
+        }
+#endif
+
         uint32_t probe_opts = OPT_TRUECOLOR;
         int probe_status = 0;
         for(int pass = 0; pass < 2; ++pass) {

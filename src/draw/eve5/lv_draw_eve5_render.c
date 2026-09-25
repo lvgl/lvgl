@@ -309,6 +309,12 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
 #if LV_DRAW_EVE5_SW_LABEL
                 lv_draw_eve5_sw_render_task(u, t);
 #else
+#if LV_DRAW_EVE5_SW_OUTLINE_FONT
+                if(lv_draw_eve5_label_needs_sw(t)) {
+                    lv_draw_eve5_sw_render_task(u, t);
+                    break;
+                }
+#endif
                 lv_draw_eve5_hal_draw_label(u, t);
 #endif
                 break;
@@ -398,19 +404,29 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
  * OPAQUE AREA PRE-PASS
  **********************/
 
+/* A task of the slice being rendered: queued, or drawn and waiting for the
+ * alpha pass */
+static inline bool prepass_task_pending(const lv_draw_task_t * t)
+{
+    return t->state == LV_DRAW_TASK_STATE_QUEUED || t->state == LV_DRAW_TASK_STATE_IN_PROGRESS;
+}
+
 /**
  * Opaque area pre-pass: find the largest opaque fill for alpha skip optimization.
  * Tasks fully inside this area can skip individual alpha correction since the
- * opaque fill will overwrite their alpha to 255 anyway.
+ * opaque fill will overwrite their alpha to 255 anyway. Runs again before the
+ * direct-to-alpha pass, over the tasks the RGB pass fitted into the slice.
  */
 void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, const lv_draw_eve5_slice_t * slice)
 {
     const lv_area_t * layer_area = &layer->buf_area;
     lv_draw_task_t * t = eve5_slice_first(slice, layer);
 
+    u->has_alpha_opaque = false;
+
     while(t && t != slice->end) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
-           t->state != LV_DRAW_TASK_STATE_QUEUED) {
+           !prepass_task_pending(t)) {
             t = t->next;
             continue;
         }
@@ -448,7 +464,7 @@ void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, co
                     lv_draw_task_t * next = t->next;
                     if(next &&
                        next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-                       next->state == LV_DRAW_TASK_STATE_QUEUED &&
+                       prepass_task_pending(next) &&
                        next->type == LV_DRAW_TASK_TYPE_BORDER &&
                        next->target_layer == t->target_layer) {
 
@@ -465,7 +481,7 @@ void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, co
                                 int32_t bh = by2 - by1 + 1;
                                 int32_t rout = LV_MIN3((bw - 1) / 2, (bh - 1) / 2,
                                                        border_dsc->radius);
-                                lv_draw_eve5_track_alpha_opaque(u, bx1, by1, bx2, by2, rout);
+                                lv_draw_eve5_track_alpha_opaque(u, bx1, by1, bx2, by2, rout, next);
                             }
                             t = next->next;
                             continue;
@@ -473,7 +489,7 @@ void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, co
                     }
 
                     if(fill_opa >= LV_OPA_MAX) {
-                        lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, real_radius);
+                        lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, real_radius, t);
                     }
                     break;
                 }
@@ -494,7 +510,7 @@ void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, co
 
                         lv_area_t border_local = { x1, y1, x2, y2 };
                         if(eve5_fill_border_area_match(&u->alpha_opaque_area, &border_local)) {
-                            lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, rout);
+                            lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, rout, t);
                         }
                     }
                     break;
@@ -614,6 +630,9 @@ EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_
     const lv_area_t * layer_area = &layer->buf_area;
     lv_draw_task_t * t = eve5_slice_first(slice, layer);
     lv_draw_task_t * prev_task = NULL;
+    /* This pass may end before the task that completes the opaque area, so
+     * tasks inside it are only skipped once that task is drawn */
+    bool opaque_drawn = false;
 
     while(t && t != slice->end) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
@@ -646,7 +665,7 @@ EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_
         }
 
         /* Skip tasks inside opaque area; alpha will be overwritten to 255 */
-        if(lv_draw_eve5_is_fully_inside_opaque(u, &t->_real_area, &t->clip_area, layer_area)) {
+        if(opaque_drawn && lv_draw_eve5_is_fully_inside_opaque(u, &t->_real_area, &t->clip_area, layer_area)) {
             prev_task = t;
             t = t->next;
             continue;
@@ -679,6 +698,12 @@ EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_
                 break;
 
             case LV_DRAW_TASK_TYPE_LABEL:
+#if LV_DRAW_EVE5_SW_TEXTURES
+                if(LV_DRAW_EVE5_SW_LABEL || lv_draw_eve5_label_sw_texture(t)) {
+                    lv_draw_eve5_sw_alpha_draw_task_texture(u, t);
+                    break;
+                }
+#endif
                 lv_draw_eve5_alpha_draw_label(u, (lv_draw_task_t *)t, true);
                 break;
 
@@ -690,10 +715,17 @@ EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_
                 lv_draw_eve5_alpha_draw_box_shadow(u, t, true);
                 break;
 
+#if LV_USE_VECTOR_GRAPHIC && LV_DRAW_EVE5_SW_VECTOR
+            case LV_DRAW_TASK_TYPE_VECTOR:
+                lv_draw_eve5_sw_alpha_draw_task_texture(u, t);
+                break;
+#endif
+
             default:
                 break;
         }
 
+        if(t == u->alpha_opaque_task) opaque_drawn = true;
         prev_task = t;
         t = t->next;
     }
@@ -828,6 +860,12 @@ void lv_draw_eve5_alpha_pass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, const 
                 break;
 
             case LV_DRAW_TASK_TYPE_LABEL:
+#if LV_DRAW_EVE5_SW_TEXTURES
+                if(LV_DRAW_EVE5_SW_LABEL || lv_draw_eve5_label_sw_texture(t)) {
+                    lv_draw_eve5_sw_alpha_draw_task_texture(u, t);
+                    break;
+                }
+#endif
                 lv_draw_eve5_alpha_draw_label(u, t, false);
                 break;
 
@@ -846,6 +884,12 @@ void lv_draw_eve5_alpha_pass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, const 
             case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
                 /* Deferred: processed after alpha pass */
                 break;
+
+#if LV_USE_VECTOR_GRAPHIC && LV_DRAW_EVE5_SW_VECTOR
+            case LV_DRAW_TASK_TYPE_VECTOR:
+                lv_draw_eve5_sw_alpha_draw_task_texture(u, t);
+                break;
+#endif
 
             default:
                 break;

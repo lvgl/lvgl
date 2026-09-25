@@ -21,6 +21,9 @@
 #if LV_DRAW_EVE5_SW_VECTOR
     #include "../lv_draw_vector_private.h"
 #endif
+#if LV_DRAW_EVE5_SW_OUTLINE_FONT
+    #include "../../font/freetype/lv_freetype_private.h"
+#endif
 
 /**********************
  * SW FALLBACK HELPERS
@@ -194,7 +197,7 @@ uint8_t * lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t * u,
             }
 #endif
 
-#if LV_DRAW_EVE5_SW_LABEL
+#if LV_DRAW_EVE5_SW_LABEL || LV_DRAW_EVE5_SW_OUTLINE_FONT
         case LV_DRAW_TASK_TYPE_LABEL: {
                 lv_draw_label_dsc_t label_dsc;
                 lv_memcpy(&label_dsc, t->draw_dsc, sizeof(label_dsc));
@@ -372,6 +375,130 @@ EVE_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u,
     return handle;
 }
 
+#if LV_DRAW_EVE5_SW_OUTLINE_FONT
+/* A label in a FreeType outline font, whose glyphs are vector paths */
+bool lv_draw_eve5_label_needs_sw(const lv_draw_task_t * t)
+{
+    const lv_draw_label_dsc_t * dsc = t->draw_dsc;
+    for(const lv_font_t * f = dsc->font; f != NULL; f = f->fallback) {
+        if(lv_freetype_is_outline_font(f)) return true;
+    }
+    return false;
+}
+#endif
+
+#if LV_DRAW_EVE5_SW_TEXTURES
+/**
+ * Texture of a task the SW renderer draws, rendered on first use in the
+ * slice. A vector descriptor only holds pointers to the paths, which can't
+ * identify the drawing for the SW cache, and the paths are consumed by the
+ * render, so the texture is kept for the slice's other passes instead.
+ */
+static const lv_draw_eve5_sw_texture_t * sw_task_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
+{
+    for(uint32_t i = 0; i < u->sw_texture_count; i++) {
+        if(u->sw_textures[i].task == t) return &u->sw_textures[i];
+    }
+
+    if(u->sw_texture_count == u->sw_texture_capacity) {
+        uint32_t capacity = u->sw_texture_capacity ? u->sw_texture_capacity * 2 : 4;
+        lv_draw_eve5_sw_texture_t * textures = lv_realloc(u->sw_textures, capacity * sizeof(*textures));
+        if(textures == NULL) return NULL;
+        u->sw_textures = textures;
+        u->sw_texture_capacity = capacity;
+    }
+
+    lv_area_t area = t->_real_area;
+    /* ThorVG writes premultiplied pixels (TVG_COLORSPACE_ARGB8888), LVGL's
+     * blending into the transparent buffer straight ones */
+    bool premultiplied = false;
+#if LV_DRAW_EVE5_SW_VECTOR
+    if(t->type == LV_DRAW_TASK_TYPE_VECTOR) {
+        eve5_sw_vector_area(t, &area);
+        premultiplied = true;
+    }
+#endif
+    int32_t w = lv_area_get_width(&area);
+    int32_t h = lv_area_get_height(&area);
+    if(w <= 0 || h <= 0) return NULL;
+
+    uint8_t * buf_data = lv_draw_eve5_sw_render_to_buffer(u, t, w, h);
+    if(!buf_data) return NULL;
+    uint32_t stride;
+    EVE_GpuHandle handle = lv_draw_eve5_hal_upload_texture(u, buf_data, w, h, &stride);
+    lv_free(buf_data);
+    if(EVE_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
+        LV_LOG_WARN("EVE5: SW fallback failed for task type %d", t->type);
+        return NULL;
+    }
+
+    lv_draw_eve5_sw_texture_t * tex = &u->sw_textures[u->sw_texture_count++];
+    tex->task = t;
+    tex->handle = handle;
+    tex->area = area;
+    tex->stride = stride;
+    tex->premultiplied = premultiplied;
+    return tex;
+}
+
+/* Draw the SW texture of a task */
+void lv_draw_eve5_sw_draw_task_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
+{
+    const lv_draw_eve5_sw_texture_t * tex = sw_task_texture(u, t);
+    if(tex == NULL) return;
+    uint32_t addr = EVE_GpuAlloc_Get(u->allocator, tex->handle);
+    lv_draw_eve5_hal_draw_texture(u, t, addr, lv_area_get_width(&tex->area), lv_area_get_height(&tex->area),
+                                  tex->stride, &tex->area, tex->premultiplied);
+}
+
+/**
+ * Coverage of a SW texture for the alpha passes: white with the texture's
+ * alpha, so the L8 render target gets it as luminance, and the direct pass,
+ * which only writes alpha, its "over" alpha.
+ */
+void lv_draw_eve5_sw_alpha_draw_task_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
+{
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    const lv_draw_eve5_sw_texture_t * tex = sw_task_texture(u, t);
+    if(tex == NULL) return;
+    uint32_t addr = EVE_GpuAlloc_Get(u->allocator, tex->handle);
+    if(addr == GA_INVALID) return;
+
+    EVE_HalContext * phost = u->hal;
+    lv_layer_t * layer = t->target_layer;
+    int32_t h = lv_area_get_height(&tex->area);
+
+    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+    EVE_CoDl_bitmapTransform_identity(phost);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoDl_bitmapSource(phost, addr);
+    EVE_CoDl_bitmapLayout(phost, GLFORMAT, tex->stride, h);
+    EVE_CoDl_bitmapExtFormat(phost, ARGB8);
+    EVE_CoDl_bitmapSwizzle(phost, ONE, ONE, ONE, ALPHA);
+    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, lv_area_get_width(&tex->area), h);
+    EVE_CoDl_begin(phost, BITMAPS);
+    EVE_CoDl_vertex2f_0(phost, tex->area.x1 - layer->buf_area.x1, tex->area.y1 - layer->buf_area.y1);
+    EVE_CoDl_end(phost);
+#else
+    LV_UNUSED(u);
+    LV_UNUSED(t);
+#endif
+}
+
+/* Release the SW textures once the slice that draws them is finished */
+void lv_draw_eve5_sw_release_textures(lv_draw_eve5_unit_t * u)
+{
+    for(uint32_t i = 0; i < u->sw_texture_count; i++) {
+        EVE_GpuAlloc_ScopedFree(u->allocator, u->sw_textures[i].handle);
+    }
+    lv_free(u->sw_textures);
+    u->sw_textures = NULL;
+    u->sw_texture_count = 0;
+    u->sw_texture_capacity = 0;
+}
+#endif
+
 /**
  * Render a task via SW fallback and blit to current layer.
  */
@@ -381,27 +508,9 @@ void lv_draw_eve5_sw_render_task(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     uint32_t tex_stride;
     bool from_cache;
 
-#if LV_DRAW_EVE5_SW_VECTOR
-    if(t->type == LV_DRAW_TASK_TYPE_VECTOR) {
-        /* The descriptor only holds pointers to the paths, which can't identify
-         * the drawing for the cache, so render every time */
-        lv_area_t area;
-        eve5_sw_vector_area(t, &area);
-        tex_w = lv_area_get_width(&area);
-        tex_h = lv_area_get_height(&area);
-        if(tex_w <= 0 || tex_h <= 0) return;
-        uint8_t * buf_data = lv_draw_eve5_sw_render_to_buffer(u, t, tex_w, tex_h);
-        if(!buf_data) return;
-        EVE_GpuHandle handle = lv_draw_eve5_hal_upload_texture(u, buf_data, tex_w, tex_h, &tex_stride);
-        lv_free(buf_data);
-        uint32_t vaddr = EVE_GpuAlloc_Get(u->allocator, handle);
-        if(vaddr == GA_INVALID) {
-            LV_LOG_WARN("EVE5: SW fallback failed for task type %d", t->type);
-            return;
-        }
-        lv_draw_eve5_hal_draw_texture(u, t, vaddr, tex_w, tex_h, tex_stride, &area);
-        /* Released once the GPU is done with the current render */
-        EVE_GpuAlloc_ScopedFree(u->allocator, handle);
+#if LV_DRAW_EVE5_SW_TEXTURES
+    if(t->type == LV_DRAW_TASK_TYPE_VECTOR || t->type == LV_DRAW_TASK_TYPE_LABEL) {
+        lv_draw_eve5_sw_draw_task_texture(u, t);
         return;
     }
 #endif
@@ -413,7 +522,7 @@ void lv_draw_eve5_sw_render_task(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         LV_LOG_WARN("EVE5: SW fallback failed for task type %d", t->type);
         return;
     }
-    lv_draw_eve5_hal_draw_texture(u, t, addr, tex_w, tex_h, tex_stride, &t->_real_area);
+    lv_draw_eve5_hal_draw_texture(u, t, addr, tex_w, tex_h, tex_stride, &t->_real_area, false);
 }
 
 #endif /* LV_USE_DRAW_EVE5 && LV_DRAW_EVE5_SW_FALLBACK */

@@ -34,13 +34,13 @@
 /* RGB pass (lv_draw_eve5_hal_draw_*), direct-to-alpha pass (lv_draw_eve5_alpha_draw_*).
  * The L8 alpha render-target pass calls the RGB functions, or alpha functions
  * that stay within the RGB bound. The SW fallback (lv_draw_eve5_sw_render_task,
- * 20) is within every RGB bound. */
+ * 22) is within every RGB bound. */
 #define DL_FILL                 65
 #define DL_FILL_ALPHA           55
 #define DL_FILL_BORDER          121 /* Unified FILL+BORDER */
 #define DL_FILL_BORDER_ALPHA    13  /* Unified opaque pair; others take DL_FILL_ALPHA + DL_BORDER_ALPHA */
 #define DL_BORDER               56
-#define DL_BORDER_ALPHA         32
+#define DL_BORDER_ALPHA         43
 #define DL_TRIANGLE             67
 #define DL_TRIANGLE_ALPHA       39
 #define DL_ARC                  183
@@ -48,11 +48,12 @@
 #define DL_IMAGE                167 /* Plus DL_IMAGE_STAMP per tile stamp */
 #define DL_IMAGE_ALPHA          97
 #define DL_IMAGE_STAMP          2
-#define DL_BOX_SHADOW           102
-#define DL_BOX_SHADOW_ALPHA     98
+#define DL_BOX_SHADOW           129
+#define DL_BOX_SHADOW_ALPHA     129
 #define DL_MASK_RECT            31
-#define DL_LETTER               39  /* 16 around the glyph, plus DL_GLYPH_IMAGE; CMD_TEXT path 32 */
-#define DL_SW_TASK              20
+#define DL_LETTER               72  /* 16 around the glyph callback (56, a placeholder box); CMD_TEXT path 32 */
+#define DL_SW_TASK              22
+#define DL_SW_TASK_ALPHA        22  /* lv_draw_eve5_sw_alpha_draw_task_texture */
 
 /*********************
  * GLOBAL FUNCTIONS
@@ -126,6 +127,11 @@ void lv_draw_eve5_task_dl_bound(lv_draw_task_t * t, const lv_draw_task_t * end, 
             break;
 
         case LV_DRAW_TASK_TYPE_LABEL:
+            if(LV_DRAW_EVE5_SW_LABEL || lv_draw_eve5_label_sw_texture(t)) {
+                bound->rgb = DL_SW_TASK;
+                bound->alpha = DL_SW_TASK_ALPHA;
+                break;
+            }
             bound->rgb = lv_draw_eve5_label_dl_bound(t);
             bound->alpha = bound->rgb;
             break;
@@ -166,6 +172,7 @@ void lv_draw_eve5_task_dl_bound(lv_draw_task_t * t, const lv_draw_task_t * end, 
 #if LV_USE_VECTOR_GRAPHIC && LV_DRAW_EVE5_SW_VECTOR
         case LV_DRAW_TASK_TYPE_VECTOR:
             bound->rgb = DL_SW_TASK;
+            bound->alpha = DL_SW_TASK_ALPHA;
             break;
 #endif
 

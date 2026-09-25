@@ -140,6 +140,14 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
 
 static bool s_eve5_enabled = true;
 
+/* Whether a layer is the display's screen layer, which renders into the
+ * display's buffer. A snapshot also makes its layer the display's layer_head
+ * while it draws, into a buffer of its own. */
+static inline bool eve5_is_screen_layer(const lv_display_t * disp, const lv_layer_t * layer)
+{
+    return disp != NULL && layer->parent == NULL && layer == disp->layer_head
+           && layer->draw_buf == disp->buf_act;
+}
 
 /**********************
  * GLOBAL FUNCTIONS
@@ -251,7 +259,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     if(target != NULL && target->draw_buf != NULL && target->parent == NULL) {
         lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
         lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
-        if(!disp || target != disp->layer_head) {
+        if(!eve5_is_screen_layer(disp, target)) {
             EVE5_LOG("EVE5: Evaluate: type=%s -> declined (canvas layer)", task_type_str(task->type));
             return 0;
         }
@@ -360,7 +368,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         {
             lv_display_t * hint_disp = lv_eve5_disp_from_hal(u->hal);
             u->alloc_canvas_hint = (layer->draw_buf != NULL && layer->parent == NULL
-                                    && (hint_disp == NULL || layer != hint_disp->layer_head));
+                                    && !eve5_is_screen_layer(hint_disp, layer));
         }
 #endif
         lv_draw_layer_alloc_buf(layer, draw_unit);
@@ -617,6 +625,8 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
             else
 #endif
             {
+                /* The slice may end before the tasks the pre-pass saw */
+                lv_draw_eve5_opaque_prepass(u, layer, slice);
                 lv_draw_eve5_alpha_pass(u, layer, slice);
             }
         }
@@ -883,7 +893,7 @@ static void eve5_argb8_finish(lv_draw_eve5_unit_t * u, lv_layer_t * layer, EVE_G
 static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 {
     lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
-    bool is_screen = (layer->parent == NULL && disp && layer == disp->layer_head);
+    bool is_screen = eve5_is_screen_layer(disp, layer);
 
     u->rendering_in_progress = true;
 
@@ -1190,6 +1200,10 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     lv_draw_eve5_blend_difference(u, layer, prev, src_handle, blend_luminance, &result);
                     blend_attempted = true;
                 }
+                else if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
+                    lv_draw_eve5_blend_additive(u, layer, prev, src_handle, blend_luminance, &result);
+                    blend_attempted = true;
+                }
 
                 if(!blend_attempted) {
                     /* Unimplemented blend mode: composite src over dst normally.
@@ -1329,22 +1343,16 @@ static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_ta
             /* ADDITIVE is drawn inline with the hardware blend, which gives
              * min(d + s*a, 1). LVGL's software renderer mixes the saturated
              * sum over dst by the coverage a: min(d + s, 1)*a + d*(1 - a).
-             * The two only differ where d + s > 1 under partial coverage
-             * (half-transparent images, antialiased edges over bright
-             * content), where the hardware result is brighter. Kept inline
-             * for speed. To make it exact, slice it here like the other modes
-             * and add it to lv_draw_eve5_blend.c: with D = 1 - d and the
-             * premultiplied source P = s*a,
-             *   1 - out = D*(1 - a) + max(D*a - P, 0),
-             * which is subtractive applied to the complemented dst. The
-             * channel DL computes temp.c = max(D.c*a - P.c, 0) (load d.c,
-             * invert, multiply by a, subtract P.c); the composite DL computes
-             * out.c = 1 - (D.c*(1 - a) + temp.c) per channel in the alpha
-             * scratch (load d.c, invert, multiply by 1 - a with
-             * blend(ZERO, ONE_MINUS_SRC_ALPHA), add temp.c, invert, store),
-             * and alpha = a + d.a*(1 - a). */
-            if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
-               dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
+             * The two only differ where d + s > 1 under partial coverage,
+             * where the hardware result is brighter. Below full opacity the
+             * whole image is partially covered, so it is sliced for the exact
+             * math (lv_draw_eve5_blend_additive); at full opacity, only
+             * antialiased edges and translucent pixels over bright content
+             * differ, and it stays inline for speed. */
+            if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
+                if(dsc->opa < LV_OPA_MAX) return t;
+            }
+            else if(dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
                 return t;
             }
         }
@@ -1388,7 +1396,7 @@ static int32_t evaluate_nort(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
     lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
-    if(disp == NULL || target != disp->layer_head) {
+    if(!eve5_is_screen_layer(disp, target)) {
         EVE5_LOG("EVE5 NORT: Evaluate: type=%s -> declined (not screen layer)", task_type_str(task->type));
         return 0;
     }
@@ -1536,6 +1544,9 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
+#if LV_DRAW_EVE5_SW_TEXTURES
+    lv_draw_eve5_sw_release_textures(u);
+#endif
     /* No sync marker needed here: this is the pre-BT820 NORT path, where the
      * allocator is GA3 — frees ride the Update sweep below, not the sync
      * pipeline. (CMD_SWAP itself is blocking on these gens anyway.) */

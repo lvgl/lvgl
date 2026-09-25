@@ -67,6 +67,15 @@ extern "C" {
 #define LV_DRAW_EVE5_SW_VECTOR LV_USE_VECTOR_GRAPHIC
 #endif
 
+/* Labels in FreeType outline fonts, whose glyphs are vector paths: the SW
+ * renderer draws them into a texture */
+#ifndef LV_DRAW_EVE5_SW_OUTLINE_FONT
+#define LV_DRAW_EVE5_SW_OUTLINE_FONT (LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG && LV_USE_DRAW_SW)
+#endif
+
+/* SW textures kept for the passes of a slice */
+#define LV_DRAW_EVE5_SW_TEXTURES (LV_DRAW_EVE5_SW_VECTOR || LV_DRAW_EVE5_SW_OUTLINE_FONT)
+
 /*
  * Master switch for the entire SW fallback feature (cache, render-to-buffer, upload).
  * Defaults to enabled when any per-task LV_DRAW_EVE5_SW_* flag is set.
@@ -76,7 +85,7 @@ extern "C" {
 #define LV_DRAW_EVE5_SW_FALLBACK (LV_DRAW_EVE5_SW_FILL || LV_DRAW_EVE5_SW_BORDER || \
                                   LV_DRAW_EVE5_SW_LINE || LV_DRAW_EVE5_SW_TRIANGLE || LV_DRAW_EVE5_SW_LABEL || \
                                   LV_DRAW_EVE5_SW_ARC || LV_DRAW_EVE5_SW_BOX_SHADOW || LV_DRAW_EVE5_SW_CANVAS || \
-                                  LV_DRAW_EVE5_SW_VECTOR)
+                                  LV_DRAW_EVE5_SW_VECTOR || LV_DRAW_EVE5_SW_OUTLINE_FONT)
 #endif
 
 /* Whole-font upload thresholds. Fonts exceeding either limit use per-glyph mode. */
@@ -217,6 +226,18 @@ typedef struct {
     uint32_t frame;
     bool initialized;
 } lv_draw_eve5_sw_cache_t;
+
+#if LV_DRAW_EVE5_SW_TEXTURES
+/* Texture a task was rendered to by the SW renderer. Kept until the slice
+ * is finished, for the alpha passes to draw it again. */
+typedef struct {
+    const lv_draw_task_t * task;
+    EVE_GpuHandle handle;
+    lv_area_t area;
+    uint32_t stride;
+    bool premultiplied;
+} lv_draw_eve5_sw_texture_t;
+#endif
 #endif
 
 /* Shadow texture slot, one per ratio index */
@@ -247,6 +268,7 @@ typedef struct {
     LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc;
     lv_image_decoder_dsc_t decoder_dsc;
     bool decoder_open;
+    lv_draw_buf_t * owned_buf;  /**< Full image read from a strip decoder, without the image cache */
 } eve5_resolved_image_t;
 
 /* Image transform parameters */
@@ -278,6 +300,14 @@ static inline const lv_area_t * eve5_transform_area(const lv_draw_task_t * t)
         return &t->clip_area;
     }
     return &t->_real_area;
+}
+
+/* Clip radius of an image draw. LVGL's software renderer draws rotated and
+ * scaled images without it, and so does EVE5. */
+static inline int32_t eve5_image_clip_radius(const lv_draw_image_dsc_t * dsc)
+{
+    bool transformed = dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE;
+    return transformed ? 0 : dsc->clip_radius;
 }
 
 /* A compressed image in memory (LV_IMAGE_SRC_VARIABLE), or one that holds
@@ -461,6 +491,11 @@ typedef struct {
 #if LV_DRAW_EVE5_SW_FALLBACK
     lv_draw_eve5_sw_cache_t sw_cache;
 #endif
+#if LV_DRAW_EVE5_SW_TEXTURES
+    lv_draw_eve5_sw_texture_t * sw_textures; /**< SW textures of the slice being rendered */
+    uint32_t sw_texture_count;
+    uint32_t sw_texture_capacity;
+#endif
 
     /* Bitmap handle pool: LRU allocator over the chip's bitmap handles, with
      * owner-identity tracking for eviction detection. CO scratch is reserved. */
@@ -486,6 +521,7 @@ typedef struct {
     /* Per-layer alpha repair tracking (layer-relative coordinates) */
     lv_area_t alpha_opaque_area;
     int32_t alpha_opaque_radius;
+    const lv_draw_task_t * alpha_opaque_task; /**< Task the opaque area is complete after */
     lv_area_t alpha_trashed_area;
     bool has_alpha_opaque;
     bool has_alpha_trashed;
@@ -680,10 +716,12 @@ static inline void eve5_set_bitmap_layout(EVE_HalContext *phost, uint16_t eve_fo
  * Image-source bitmap layout with luminance-vs-alpha compensation for L# sources.
  *
  * When @p sample_as_luminance is set and @p eve_format is L1 / L2 / L4 / L8, the
- * chip is put in GLFORMAT mode with BITMAP_SWIZZLE(ALPHA, ALPHA, ALPHA, ONE) —
+ * chip is put in GLFORMAT mode with BITMAP_SWIZZLE(ALPHA, ALPHA, ALPHA, RED) —
  * the stored value, which EVE delivers in the sample's ALPHA channel (RGB is a
  * constant 255 for the L# formats — reading RED gives 1, not the value), is
- * routed to all three RGB channels with alpha forced to 1. Restores
+ * routed to all three RGB channels, and the constant RED is the alpha: 1 on
+ * the bitmap, and 0 outside it with BORDER wrap, so a transformed image keeps
+ * its bounds (ONE would fill the whole bitmap size). Restores
  * luminance-as-RGB (A=255) semantics on top of EVE's default L# sampling
  * (alpha-only with white RGB). Requires BITMAP_SWIZZLE (BT815+). On older
  * chips the flag is ignored and the source renders with the alpha-as-luminance
@@ -708,7 +746,7 @@ static inline void eve5_set_image_bitmap_layout(EVE_HalContext *phost,
        && (eve_format == L8 || eve_format == L4 || eve_format == L2 || eve_format == L1)) {
         EVE_CoDl_bitmapLayout(phost, GLFORMAT, stride, height);
         EVE_CoDl_bitmapExtFormat(phost, eve_format);
-        EVE_CoDl_bitmapSwizzle(phost, ALPHA, ALPHA, ALPHA, ONE);
+        EVE_CoDl_bitmapSwizzle(phost, ALPHA, ALPHA, ALPHA, RED);
         return;
     }
 #else
@@ -717,11 +755,12 @@ static inline void eve5_set_image_bitmap_layout(EVE_HalContext *phost,
     eve5_set_bitmap_layout(phost, eve_format, stride, height);
 }
 
-/* Alpha repair tracking: call for fully opaque fills (records largest) */
+/* Alpha repair tracking: call for fully opaque fills (records largest), with
+ * the task the fill is complete after */
 static inline void lv_draw_eve5_track_alpha_opaque(lv_draw_eve5_unit_t * u,
                                                    int32_t x1, int32_t y1,
                                                    int32_t x2, int32_t y2,
-                                                   int32_t radius)
+                                                   int32_t radius, const lv_draw_task_t * task)
 {
     int64_t new_size = (int64_t)(x2 - x1 + 1) * (y2 - y1 + 1);
     if(!u->has_alpha_opaque) {
@@ -729,6 +768,7 @@ static inline void lv_draw_eve5_track_alpha_opaque(lv_draw_eve5_unit_t * u,
             x1, y1, x2, y2
         };
         u->alpha_opaque_radius = radius;
+        u->alpha_opaque_task = task;
         u->has_alpha_opaque = true;
     }
     else {
@@ -739,6 +779,7 @@ static inline void lv_draw_eve5_track_alpha_opaque(lv_draw_eve5_unit_t * u,
                 x1, y1, x2, y2
             };
             u->alpha_opaque_radius = radius;
+            u->alpha_opaque_task = task;
         }
     }
 }
@@ -867,7 +908,8 @@ EVE_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u, const uin
                                               int32_t buf_w, int32_t buf_h, uint32_t * out_stride);
 void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                                    uint32_t ram_g_addr, int32_t tex_w, int32_t tex_h,
-                                   uint32_t eve_stride, const lv_area_t * draw_area);
+                                   uint32_t eve_stride, const lv_area_t * draw_area,
+                                   bool premultiplied);
 bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t * u, EVE_GpuHandle handle);
 #endif
 
@@ -1079,6 +1121,9 @@ bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                    EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
                                    bool luminance, EVE_GpuHandle *out_result);
+bool lv_draw_eve5_blend_additive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                 EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
+                                 bool luminance, EVE_GpuHandle *out_result);
 
 /* Bitmap mask, applied at child layer finish */
 void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
@@ -1094,6 +1139,25 @@ EVE_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u, const lv_dr
                                             uint32_t * out_stride, bool *out_from_cache);
 void lv_draw_eve5_sw_render_task(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t);
 #endif
+#if LV_DRAW_EVE5_SW_TEXTURES
+void lv_draw_eve5_sw_draw_task_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t);
+void lv_draw_eve5_sw_alpha_draw_task_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t);
+void lv_draw_eve5_sw_release_textures(lv_draw_eve5_unit_t * u);
+#endif
+#if LV_DRAW_EVE5_SW_OUTLINE_FONT
+bool lv_draw_eve5_label_needs_sw(const lv_draw_task_t * t);
+#endif
+
+/* A label the SW renderer draws into a texture */
+static inline bool lv_draw_eve5_label_sw_texture(const lv_draw_task_t * t)
+{
+#if LV_DRAW_EVE5_SW_OUTLINE_FONT
+    return lv_draw_eve5_label_needs_sw(t);
+#else
+    LV_UNUSED(t);
+    return false;
+#endif
+}
 
 #endif /* LV_USE_DRAW_EVE5 */
 

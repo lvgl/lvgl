@@ -85,9 +85,10 @@ typedef struct {
                                             (R=255, G=255, B=255, A=value) — alpha-only with white RGB; luminance
                                             semantics need (R=G=B=value, A=255). When this flag is set the image
                                             draw paths put the chip in GLFORMAT mode with
-                                            BITMAP_SWIZZLE(ALPHA,ALPHA,ALPHA,ONE) — the stored value lives in the
-                                            sample's ALPHA channel, so ALPHA gets routed to all RGB outputs while
-                                            alpha is forced to 1. Distinguishes from LVGL A1-A8 sources
+                                            BITMAP_SWIZZLE(ALPHA,ALPHA,ALPHA,RED) — the stored value lives in the
+                                            sample's ALPHA channel, so ALPHA gets routed to all RGB outputs, and
+                                            the constant RED (1 on the bitmap, 0 outside it) is the alpha.
+                                            Distinguishes from LVGL A1-A8 sources
                                             (sample_as_luminance=false) which map to EVE L1-L8 and render
                                             correctly as alpha by default. Requires BT815+ (BITMAP_SWIZZLE). */
     bool is_swapchain;                 /**< True for the full-mode screen draw_buf: render target is SWAPCHAIN_0

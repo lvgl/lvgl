@@ -108,12 +108,13 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t * u,
         EVE_CoCmd_loadIdentity(phost);
         EVE_CoCmd_translate(phost, F16(img_x - draw_vx + dsc->pivot.x),
                             F16(img_y - draw_vy + dsc->pivot.y));
+        /* Rotate after scaling (LVGL scales along the image axes) */
+        if(dsc->rotation != 0) {
+            EVE_CoCmd_rotate(phost, DEGREES(dsc->rotation));
+        }
         if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
             EVE_CoCmd_scale(phost, F16_SCALE_DIV_256(dsc->scale_x),
                             F16_SCALE_DIV_256(dsc->scale_y));
-        }
-        if(dsc->rotation != 0) {
-            EVE_CoCmd_rotate(phost, DEGREES(dsc->rotation));
         }
         EVE_CoCmd_translate(phost, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
         EVE_CoCmd_setMatrix(phost);
@@ -206,13 +207,13 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
 
     /* Masking path: clip_radius or bitmap_mask. Draw clip shape at opa.
      * Exact for opaque formats, approximate for ARGB with per-pixel alpha. */
-    if(dsc->clip_radius > 0 || dsc->bitmap_mask_src != NULL) {
+    if(eve5_image_clip_radius(dsc) > 0 || dsc->bitmap_mask_src != NULL) {
 #if EVE5_ALPHA_STENCIL_APPROX
         /* Stencil-based clip: build clip shape in stencil, then draw through it.
          * Handles clip + mask (mask bitmap through stencil) and clip + ARGB
          * (source bitmap through stencil for per-pixel alpha).
          * Colorkey excluded because its own 6-pass stencil would conflict. */
-        if(dsc->clip_radius > 0 && dsc->colorkey == NULL) {
+        if(eve5_image_clip_radius(dsc) > 0 && dsc->colorkey == NULL) {
             uint32_t mask_bmp_addr = GA_INVALID;
             int32_t mask_bmp_stride = 0;
             int32_t mask_bmp_w = 0, mask_bmp_h = 0;
@@ -243,7 +244,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
                 int32_t clip_y2 = dsc->image_area.y2 - layer->buf_area.y1;
                 int32_t clip_w = clip_x2 - clip_x1 + 1;
                 int32_t clip_h = clip_y2 - clip_y1 + 1;
-                int32_t real_radius = LV_MIN3(clip_w / 2, clip_h / 2, (int32_t)dsc->clip_radius);
+                int32_t real_radius = LV_MIN3(clip_w / 2, clip_h / 2, eve5_image_clip_radius(dsc));
 
                 lv_draw_eve5_clear_stencil(u, clip_x1, clip_y1, clip_x2, clip_y2,
                                            &t->clip_area, &layer->buf_area);
@@ -354,12 +355,13 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
                         EVE_CoCmd_loadIdentity(phost);
                         EVE_CoCmd_translate(phost, F16(x - draw_vx + dsc->pivot.x),
                                             F16(y - draw_vy + dsc->pivot.y));
+                        /* Rotate after scaling (LVGL scales along the image axes) */
+                        if(dsc->rotation != 0) {
+                            EVE_CoCmd_rotate(phost, DEGREES(dsc->rotation));
+                        }
                         if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
                             EVE_CoCmd_scale(phost, F16_SCALE_DIV_256(dsc->scale_x),
                                             F16_SCALE_DIV_256(dsc->scale_y));
-                        }
-                        if(dsc->rotation != 0) {
-                            EVE_CoCmd_rotate(phost, DEGREES(dsc->rotation));
                         }
                         EVE_CoCmd_translate(phost, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
                         EVE_CoCmd_setMatrix(phost);
@@ -401,7 +403,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
             }
         }
 
-        if(dsc->clip_radius > 0 && dsc->bitmap_mask_src == NULL) {
+        if(eve5_image_clip_radius(dsc) > 0 && dsc->bitmap_mask_src == NULL) {
             /* clip_radius only: draw rounded rect at opa */
             int32_t mask_x1 = dsc->image_area.x1 - layer->buf_area.x1;
             int32_t mask_y1 = dsc->image_area.y1 - layer->buf_area.y1;
@@ -409,7 +411,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
             int32_t mask_y2 = dsc->image_area.y2 - layer->buf_area.y1;
             EVE_CoDl_colorA(phost, dsc->opa);
             lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2,
-                                   dsc->clip_radius, &t->clip_area, &layer->buf_area);
+                                   eve5_image_clip_radius(dsc), &t->clip_area, &layer->buf_area);
         }
         else {
             /* bitmap_mask (with or without clip_radius): draw mask bitmap at opa */
@@ -536,11 +538,12 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
     else if(has_transform) {
         EVE_CoCmd_loadIdentity(phost);
         EVE_CoCmd_translate(phost, F16(x - draw_vx + dsc->pivot.x), F16(y - draw_vy + dsc->pivot.y));
-        if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
-            EVE_CoCmd_scale(phost, F16_SCALE_DIV_256(dsc->scale_x), F16_SCALE_DIV_256(dsc->scale_y));
-        }
+        /* Rotate after scaling (LVGL scales along the image axes) */
         if(dsc->rotation != 0) {
             EVE_CoCmd_rotate(phost, DEGREES(dsc->rotation));
+        }
+        if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
+            EVE_CoCmd_scale(phost, F16_SCALE_DIV_256(dsc->scale_x), F16_SCALE_DIV_256(dsc->scale_y));
         }
         EVE_CoCmd_translate(phost, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
         EVE_CoCmd_setMatrix(phost);

@@ -69,7 +69,7 @@ bool lv_draw_eve5_fill_needs_alpha_rendertarget(const lv_draw_task_t * t)
 /**
  * BORDER: true when using the alpha-as-scratch masking path.
  * Two RGB paths exist:
- *   - LINES path (rout==0 + full opa, or all corners clipped): no alpha trashing
+ *   - Sides path (rout==0 + full opa, or all corners clipped): no alpha trashing
  *   - Masking path (outer rect minus inner rect via alpha): trashes alpha
  */
 bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t * t)
@@ -93,10 +93,10 @@ bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t * t)
     int32_t max_r = (LV_MIN(w, h) - 1) / 2;
     if(rout > max_r) rout = max_r;
 
-    /* LINES path: no alpha trashing */
+    /* Sides path: no alpha trashing */
     if(rout == 0 && dsc->opa >= LV_OPA_MAX) return false;
 
-    /* Check if all corners are clipped away (falls back to LINES path) */
+    /* Check if all corners are clipped away (falls back to the sides path) */
     int32_t clip_x1 = t->clip_area.x1 - layer_area->x1;
     int32_t clip_y1 = t->clip_area.y1 - layer_area->y1;
     int32_t clip_x2 = t->clip_area.x2 - layer_area->x1;
@@ -334,37 +334,22 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t * u, const lv_draw_task_
     lv_draw_eve5_set_scissor(u, clip, layer_area);
 
     if(corners_clipped || (rout == 0 && dsc->opa >= LV_OPA_MAX)) {
-        /* LINES path: redraw the border lines */
+        /* Sides path: redraw the sides */
         EVE_CoDl_colorA(u->hal, dsc->opa);
-        EVE_CoDl_lineWidth(u->hal, dsc->width * 8);
 
-        int32_t off = (dsc->width & 1) ? 0 : -1;
-        LV_UNUSED(off);
-
-        EVE_CoDl_begin(u->hal, LINES);
-
+        int32_t bw = dsc->width;
         if(dsc->side & LV_BORDER_SIDE_TOP) {
-            int32_t y = y1 + dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, x1 * 2, (y * 2) - 1);
-            EVE_CoDl_vertex2f_1(u->hal, x2 * 2, (y * 2) - 1);
+            lv_draw_eve5_draw_rect(u, x1, y1, x2, y1 + bw - 1, 0, clip, layer_area);
         }
         if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
-            int32_t y = y2 - dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, x1 * 2, (y * 2) + 1);
-            EVE_CoDl_vertex2f_1(u->hal, x2 * 2, (y * 2) + 1);
+            lv_draw_eve5_draw_rect(u, x1, y2 - bw + 1, x2, y2, 0, clip, layer_area);
         }
         if(dsc->side & LV_BORDER_SIDE_LEFT) {
-            int32_t x = x1 + dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, (x * 2) - 1, y1 * 2);
-            EVE_CoDl_vertex2f_1(u->hal, (x * 2) - 1, y2 * 2);
+            lv_draw_eve5_draw_rect(u, x1, y1, x1 + bw - 1, y2, 0, clip, layer_area);
         }
         if(dsc->side & LV_BORDER_SIDE_RIGHT) {
-            int32_t x = x2 - dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, (x * 2) + 1, y1 * 2);
-            EVE_CoDl_vertex2f_1(u->hal, (x * 2) + 1, y2 * 2);
+            lv_draw_eve5_draw_rect(u, x2 - bw + 1, y1, x2, y2, 0, clip, layer_area);
         }
-
-        EVE_CoDl_end(u->hal);
     }
     else {
 #if EVE5_ALPHA_STENCIL_APPROX

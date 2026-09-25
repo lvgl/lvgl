@@ -60,7 +60,7 @@ bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t * t)
     if(dsc->opa <= LV_OPA_MIN) return false;
 
     /* Clip stencil path: clip_radius + no colorkey + (mask bitmap OR ARGB source) */
-    if(dsc->clip_radius > 0 && dsc->colorkey == NULL) {
+    if(eve5_image_clip_radius(dsc) > 0 && dsc->colorkey == NULL) {
         if(dsc->bitmap_mask_src != NULL) return true;
         if(t->type == LV_DRAW_TASK_TYPE_LAYER) return true;
         if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
@@ -247,11 +247,13 @@ bool compute_image_skew(image_skew_t * out,
 
 #define FP_MUL(a, b) ((int32_t)(((int64_t)(a) * (b)) >> 16))
 
-    /* Forward matrix M = Scale * Skew * Rotation */
-    int32_t ma = FP_MUL(fsx, cos_r) + FP_MUL(FP_MUL(tan_skx, fsy), sin_r);
-    int32_t mb = FP_MUL(-fsx, sin_r) + FP_MUL(FP_MUL(tan_skx, fsy), cos_r);
-    int32_t md = FP_MUL(FP_MUL(tan_sky, fsx), cos_r) + FP_MUL(fsy, sin_r);
-    int32_t me = FP_MUL(FP_MUL(-tan_sky, fsx), sin_r) + FP_MUL(fsy, cos_r);
+    /* Forward matrix M = Rotation * Scale * Skew, the order of LVGL's
+     * matrix transform: the image is skewed and scaled along its own axes,
+     * then rotated */
+    int32_t ma = FP_MUL(cos_r, fsx) - FP_MUL(sin_r, FP_MUL(fsy, tan_sky));
+    int32_t mb = FP_MUL(cos_r, FP_MUL(fsx, tan_skx)) - FP_MUL(sin_r, fsy);
+    int32_t md = FP_MUL(sin_r, fsx) + FP_MUL(cos_r, FP_MUL(fsy, tan_sky));
+    int32_t me = FP_MUL(sin_r, FP_MUL(fsx, tan_skx)) + FP_MUL(cos_r, fsy);
 
     int32_t det = FP_MUL(ma, me) - FP_MUL(mb, md);
     if(LV_ABS(det) < 66)
@@ -323,11 +325,11 @@ bool compute_image_skew(image_skew_t * out,
     float tan_skx = tanf(skew_x * ((float)M_PI / 1800.0f));
     float tan_sky = tanf(skew_y * ((float)M_PI / 1800.0f));
 
-    /* Forward matrix M = Scale * Skew * Rotation */
-    float ma = fsx * cos_r + tan_skx * fsy * sin_r;
-    float mb = -fsx * sin_r + tan_skx * fsy * cos_r;
-    float md = tan_sky * fsx * cos_r + fsy * sin_r;
-    float me = -tan_sky * fsx * sin_r + fsy * cos_r;
+    /* Forward matrix M = Rotation * Scale * Skew (see above) */
+    float ma = cos_r * fsx - sin_r * fsy * tan_sky;
+    float mb = cos_r * fsx * tan_skx - sin_r * fsy;
+    float md = sin_r * fsx + cos_r * fsy * tan_sky;
+    float me = sin_r * fsx * tan_skx + cos_r * fsy;
 
     float det = ma * me - mb * md;
     if(fabsf(det) < 1e-6f)

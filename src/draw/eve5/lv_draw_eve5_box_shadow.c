@@ -23,27 +23,35 @@
  * - Edges use a 1D texture (64x1 L8) stretched along the edge
  * - Center is a solid fill at full opacity
  *
- * == Corner Texture Layout ==
+ * == Shape ==
+ *
+ * As in LVGL's software renderer, the shadow is the core rectangle (the
+ * widget grown by the spread and moved by the offset, with the radius)
+ * blurred over the shadow width: half on the core's edge, fading out to
+ * blur = width / 2 outside it and in to full blur inside it. The corner
+ * and edge slices are corner_size = blur + blur + radius wide, from the
+ * shadow's outer edge to where the shadow is solid; a shadow narrower than
+ * two slices is split between them.
+ *
+ * == Texture Layout ==
  *
  *     (0,0) transparent -----> X
  *       |
- *       |     blur region
- *       |         |
- *       v         v
- *       Y    +---------+
- *            |    .--' |  <- Gaussian falloff
- *            |  .'     |
- *            | |  solid|  <- solid quarter-circle
+ *       v    +---------+
+ *       Y    |    .--' |  <- Gaussian falloff around the core's edge,
+ *            |  .'     |     blur texels in from (0,0)
+ *            | |  solid|
  *            +---------+
  *                    (SIZE-1, SIZE-1) = alpha 255
  *
  * == Gaussian Math ==
  *
  * For each texel:
- *   signed_dist = distance_to_corner - solid_radius
+ *   signed_dist = distance to the core's rounded rectangle (negative inside)
  *   alpha = 0.5 × (1 - erf(signed_dist / (sigma × √2)))
  *
- * Produces smooth falloff: 255 inside, ~128 at boundary, 0 far outside.
+ * sigma = 0.41 × blur, the deviation of the two box blurs of the software
+ * renderer, each blur wide.
  *
  * == Texture Caching ==
  *
@@ -69,12 +77,13 @@
 
 #define SHADOW_TEX_SIZE      EVE5_SHADOW_TEX_SIZE
 #define SHADOW_BITMAP_HANDLE EVE_CO_SCRATCH_HANDLE
+#define SHADOW_SIGMA_PCT     41  /* sigma in percent of the blur */
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void generate_corner_texture(uint8_t * buf, int32_t tex_size, int32_t solid_radius_idx);
-static void generate_edge_texture(uint8_t * buf, int32_t tex_size, int32_t solid_radius_idx);
+static void generate_corner_texture(uint8_t * buf, int32_t ratio_idx);
+static void generate_edge_texture(uint8_t * buf, int32_t ratio_idx);
 static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx);
 static int32_t calc_ratio_index(int32_t radius, int32_t corner_size);
 
@@ -151,95 +160,101 @@ static float fast_erf(float x)
 
 #endif
 
+/* The textures span corner_size pixels in SHADOW_TEX_SIZE texels. In texels:
+ * the radius, the blur on each side of the core's edge (which is blur in from
+ * the outer end), and the corner's centre at blur + radius. */
+#if LV_DRAW_EVE5_NO_FLOAT
+
+static void texture_shape_256(int32_t ratio_idx, int32_t * radius_256, int32_t * blur_256,
+                              int32_t * sigma_sqrt2_256)
+{
+    *radius_256 = ratio_idx * SHADOW_TEX_SIZE * 256 / (SHADOW_TEX_SIZE - 1);
+    *blur_256 = (SHADOW_TEX_SIZE * 256 - *radius_256) / 2;
+    int32_t sigma_256 = *blur_256 * SHADOW_SIGMA_PCT / 100;
+    if(sigma_256 < 128) sigma_256 = 128;
+    *sigma_sqrt2_256 = sigma_256 * 1414 / 1000;
+}
+
+#else
+
+static float texture_shape(int32_t ratio_idx, float * radius, float * blur)
+{
+    *radius = (float)ratio_idx * SHADOW_TEX_SIZE / (SHADOW_TEX_SIZE - 1);
+    *blur = (SHADOW_TEX_SIZE - *radius) * 0.5f;
+    float sigma = *blur * (SHADOW_SIGMA_PCT / 100.0f);
+    if(sigma < 0.5f) sigma = 0.5f;
+    return 1.0f / (sigma * 1.41421356f);
+}
+
+#endif
+
 /**
- * Generate 2D corner texture for Gaussian shadow falloff.
- * Solid quarter-circle at (tex_size-1, tex_size-1), blur toward (0, 0).
+ * Generate 2D corner texture for Gaussian shadow falloff: the outer corner at
+ * (0, 0), the corner's centre toward (SIZE-1, SIZE-1). Texels hold the
+ * shadow at their centres, which the slices sample at the pixel centres.
  */
-static void generate_corner_texture(uint8_t * buf, int32_t tex_size, int32_t solid_radius_idx)
+static void generate_corner_texture(uint8_t * buf, int32_t ratio_idx)
 {
 #if LV_DRAW_EVE5_NO_FLOAT
-    int32_t solid_radius_256 = (int32_t)((int64_t)solid_radius_idx * tex_size * 256 / (SHADOW_TEX_SIZE - 1));
+    int32_t radius_256, blur_256, sigma_sqrt2_256;
+    texture_shape_256(ratio_idx, &radius_256, &blur_256, &sigma_sqrt2_256);
+    int32_t centre_256 = blur_256 + radius_256;
 
-    int32_t blur_region_256 = tex_size * 256 - solid_radius_256;
-    if(blur_region_256 < 256) blur_region_256 = 256;
-
-    int32_t sigma_256 = blur_region_256 * 45 / 100;
-    if(sigma_256 < 128) sigma_256 = 128;
-
-    int32_t sigma_sqrt2_256 = sigma_256 * 1414 / 1000;
-    if(sigma_sqrt2_256 < 1) sigma_sqrt2_256 = 1;
-
-    for(int32_t y = 0; y < tex_size; y++) {
-        for(int32_t x = 0; x < tex_size; x++) {
-            int32_t dx = tex_size - 1 - x;
-            int32_t dy = tex_size - 1 - y;
-            int32_t dist_256 = lv_sqrt32((uint32_t)(dx * dx + dy * dy) << 16);
-            int32_t signed_dist_256 = dist_256 - solid_radius_256;
-
-            buf[y * tex_size + x] = gauss_cdf_lookup(signed_dist_256, sigma_sqrt2_256);
+    for(int32_t y = 0; y < SHADOW_TEX_SIZE; y++) {
+        for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) {
+            /* Signed distance to the rounded rectangle, positive outside */
+            int32_t dx = centre_256 - (x * 256 + 128);
+            int32_t dy = centre_256 - (y * 256 + 128);
+            int32_t ox = LV_MAX(dx, 0);
+            int32_t oy = LV_MAX(dy, 0);
+            int32_t dist_256 = (int32_t)lv_sqrt32((uint32_t)(ox * ox + oy * oy))
+                               + LV_MIN(LV_MAX(dx, dy), 0) - radius_256;
+            buf[y * SHADOW_TEX_SIZE + x] = gauss_cdf_lookup(dist_256, sigma_sqrt2_256);
         }
     }
 #else
-    float solid_radius = (float)solid_radius_idx * tex_size / (SHADOW_TEX_SIZE - 1);
+    float radius, blur;
+    float inv_sigma_sqrt2 = texture_shape(ratio_idx, &radius, &blur);
+    float centre = blur + radius;
 
-    float blur_region = tex_size - solid_radius;
-    if(blur_region < 1.0f) blur_region = 1.0f;
+    for(int32_t y = 0; y < SHADOW_TEX_SIZE; y++) {
+        for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) {
+            /* Signed distance to the rounded rectangle, positive outside */
+            float dx = centre - ((float)x + 0.5f);
+            float dy = centre - ((float)y + 0.5f);
+            float ox = dx > 0.0f ? dx : 0.0f;
+            float oy = dy > 0.0f ? dy : 0.0f;
+            float inside = dx > dy ? dx : dy;
+            if(inside > 0.0f) inside = 0.0f;
+            float dist = sqrtf(ox * ox + oy * oy) + inside - radius;
+            float alpha = 0.5f * (1.0f - fast_erf(dist * inv_sigma_sqrt2));
 
-    float sigma = blur_region * 0.45f;
-    if(sigma < 0.5f) sigma = 0.5f;
-
-    float inv_sigma_sqrt2 = 1.0f / (sigma * 1.41421356f);
-
-    for(int32_t y = 0; y < tex_size; y++) {
-        for(int32_t x = 0; x < tex_size; x++) {
-            float dx = (float)(tex_size - 1 - x);
-            float dy = (float)(tex_size - 1 - y);
-            float dist = sqrtf(dx * dx + dy * dy);
-            float signed_dist = dist - solid_radius;
-            float alpha = 0.5f * (1.0f - fast_erf(signed_dist * inv_sigma_sqrt2));
-
-            buf[y * tex_size + x] = (uint8_t)(alpha * 255.0f + 0.5f);
+            buf[y * SHADOW_TEX_SIZE + x] = (uint8_t)(alpha * 255.0f + 0.5f);
         }
     }
 #endif
 }
 
 /**
- * Generate 1D edge texture for straight shadow edges.
- * Solid at x = tex_size-1, transparent at x = 0.
+ * Generate 1D edge texture for straight shadow edges: transparent at x = 0,
+ * the core's edge blur in, solid at x = SIZE-1.
  */
-static void generate_edge_texture(uint8_t * buf, int32_t tex_size, int32_t solid_radius_idx)
+static void generate_edge_texture(uint8_t * buf, int32_t ratio_idx)
 {
 #if LV_DRAW_EVE5_NO_FLOAT
-    int32_t solid_width_256 = (int32_t)((int64_t)solid_radius_idx * tex_size * 256 / (SHADOW_TEX_SIZE - 1));
-    int32_t blur_region_256 = tex_size * 256 - solid_width_256;
-    if(blur_region_256 < 256) blur_region_256 = 256;
+    int32_t radius_256, blur_256, sigma_sqrt2_256;
+    texture_shape_256(ratio_idx, &radius_256, &blur_256, &sigma_sqrt2_256);
 
-    int32_t sigma_256 = blur_region_256 * 45 / 100;
-    if(sigma_256 < 128) sigma_256 = 128;
-
-    int32_t sigma_sqrt2_256 = sigma_256 * 1414 / 1000;
-    if(sigma_sqrt2_256 < 1) sigma_sqrt2_256 = 1;
-
-    for(int32_t x = 0; x < tex_size; x++) {
-        int32_t signed_dist_256 = (tex_size - 1 - x) * 256 - solid_width_256;
-        buf[x] = gauss_cdf_lookup(signed_dist_256, sigma_sqrt2_256);
+    for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) {
+        buf[x] = gauss_cdf_lookup(blur_256 - (x * 256 + 128), sigma_sqrt2_256);
     }
 #else
-    float solid_width = (float)solid_radius_idx * tex_size / (SHADOW_TEX_SIZE - 1);
+    float radius, blur;
+    float inv_sigma_sqrt2 = texture_shape(ratio_idx, &radius, &blur);
 
-    float blur_region = tex_size - solid_width;
-    if(blur_region < 1.0f) blur_region = 1.0f;
-
-    float sigma = blur_region * 0.45f;
-    if(sigma < 0.5f) sigma = 0.5f;
-
-    float inv_sigma_sqrt2 = 1.0f / (sigma * 1.41421356f);
-
-    for(int32_t x = 0; x < tex_size; x++) {
-        float dist_from_solid = (float)(tex_size - 1 - x);
-        float signed_dist = dist_from_solid - solid_width;
-        float alpha = 0.5f * (1.0f - fast_erf(signed_dist * inv_sigma_sqrt2));
+    for(int32_t x = 0; x < SHADOW_TEX_SIZE; x++) {
+        float dist = blur - ((float)x + 0.5f);
+        float alpha = 0.5f * (1.0f - fast_erf(dist * inv_sigma_sqrt2));
 
         buf[x] = (uint8_t)(alpha * 255.0f + 0.5f);
     }
@@ -282,7 +297,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
             return false;
         }
 
-        generate_corner_texture(buf, SHADOW_TEX_SIZE, ratio_idx);
+        generate_corner_texture(buf, ratio_idx);
         EVE_Hal_wrMem(u->hal, corner_addr, buf, corner_bytes);
         lv_free(buf);
         EVE_Hal_requestFenceBeforeSwap(u->hal);
@@ -314,7 +329,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
         }
 
         lv_memzero(buf, edge_bytes);
-        generate_edge_texture(buf, SHADOW_TEX_SIZE, ratio_idx);
+        generate_edge_texture(buf, ratio_idx);
         EVE_Hal_wrMem(u->hal, edge_addr, buf, edge_bytes);
         lv_free(buf);
         EVE_Hal_requestFenceBeforeSwap(u->hal);
@@ -340,21 +355,24 @@ void lv_draw_eve5_box_shadow_init(lv_draw_eve5_unit_t * u)
 
 /**
  * LVGL draws a shadow only outside its widget, which shows where the widget's
- * background doesn't cover it. Marks the widget's rounded rectangle in the
- * stencil over the shadow's area and leaves the stencil test drawing where it
- * is clear. The caller restores the stencil state with its saved context.
+ * background doesn't cover it. Marks the widget's rounded rectangle, one pixel
+ * smaller so the shadow reaches under its antialiased edge as in the software
+ * renderer, in the stencil over the shadow's area and leaves the stencil test
+ * drawing where it is clear. The caller restores the stencil state with its
+ * saved context.
  */
 static void exclude_widget_area(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                                 const lv_draw_box_shadow_dsc_t * dsc)
 {
     EVE_HalContext * phost = u->hal;
     lv_layer_t * layer = t->target_layer;
-    const lv_area_t * bg = &t->area;
+    lv_area_t bg = t->area;
+    lv_area_increase(&bg, -1, -1);
     int32_t lx = layer->buf_area.x1;
     int32_t ly = layer->buf_area.y1;
 
     int32_t r_bg = dsc->radius;
-    int32_t short_side = LV_MIN(lv_area_get_width(bg), lv_area_get_height(bg));
+    int32_t short_side = LV_MIN(lv_area_get_width(&bg), lv_area_get_height(&bg));
     if(r_bg > short_side / 2) r_bg = short_side / 2;
 
     lv_draw_eve5_clear_stencil(u, t->_real_area.x1 - lx, t->_real_area.y1 - ly,
@@ -364,27 +382,25 @@ static void exclude_widget_area(lv_draw_eve5_unit_t * u, const lv_draw_task_t * 
     EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
     EVE_CoDl_stencilOp(phost, KEEP, REPLACE);
     EVE_CoDl_stencilFunc(phost, ALWAYS, 255, 255);
-    lv_draw_eve5_draw_rect(u, bg->x1 - lx, bg->y1 - ly, bg->x2 - lx, bg->y2 - ly, r_bg,
+    lv_draw_eve5_draw_rect(u, bg.x1 - lx, bg.y1 - ly, bg.x2 - lx, bg.y2 - ly, r_bg,
                            &t->clip_area, &layer->buf_area);
     EVE_CoDl_restoreContext(phost);
     EVE_CoDl_stencilOp(phost, KEEP, KEEP);
     EVE_CoDl_stencilFunc(phost, NOTEQUAL, 255, 255);
 }
 
-/**
- * Render box shadow using 9-slice Gaussian textures.
- */
-void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
+/* The 9 slices of a shadow, layer-local */
+typedef struct {
+    int32_t sx1, sy1, sx2, sy2;             /**< Shadow bounds, inclusive */
+    int32_t corner_size;                    /**< Pixels the textures span */
+    int32_t left, right, top, bottom;       /**< Widths of the slices on each side */
+    int32_t ratio_idx;
+} shadow_slices_t;
+
+static bool shadow_slices(const lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * dsc, shadow_slices_t * sl)
 {
-    EVE_HalContext *phost = u->hal;
-
-    lv_layer_t * layer = t->target_layer;
-    lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
-
-    if(dsc->opa <= LV_OPA_MIN) return;
-    if(dsc->width <= 0) return;
-
     const lv_area_t * coords = &t->area;
+    const lv_area_t * layer_area = &t->target_layer->buf_area;
 
     /* Core area: widget bounds with offset and spread applied */
     lv_area_t core_area;
@@ -396,189 +412,144 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_tas
     int32_t r_sh = dsc->radius;
     int32_t short_side = LV_MIN(lv_area_get_width(&core_area), lv_area_get_height(&core_area));
     if(r_sh > short_side / 2) r_sh = short_side / 2;
+    if(r_sh < 0) r_sh = 0;
 
-    int32_t blur_radius = (dsc->width + 1) / 2;
-    int32_t corner_size = blur_radius + r_sh;
-    if(corner_size <= 0) return;
+    int32_t blur = (dsc->width + 1) / 2;
+    sl->corner_size = 2 * blur + r_sh;
+    if(sl->corner_size <= 0) return false;
+    sl->ratio_idx = calc_ratio_index(r_sh, sl->corner_size);
 
-    int32_t ratio_idx = calc_ratio_index(r_sh, corner_size);
+    sl->sx1 = core_area.x1 - blur - layer_area->x1;
+    sl->sy1 = core_area.y1 - blur - layer_area->y1;
+    sl->sx2 = core_area.x2 + blur - layer_area->x1;
+    sl->sy2 = core_area.y2 + blur - layer_area->y1;
 
-    if(!ensure_shadow_textures(u, ratio_idx)) {
-        return;
-    }
+    /* A shadow narrower than two slices is split between them */
+    int32_t w = sl->sx2 - sl->sx1 + 1;
+    int32_t h = sl->sy2 - sl->sy1 + 1;
+    sl->left = LV_MIN(sl->corner_size, w / 2);
+    sl->right = LV_MIN(sl->corner_size, w - sl->left);
+    sl->top = LV_MIN(sl->corner_size, h / 2);
+    sl->bottom = LV_MIN(sl->corner_size, h - sl->top);
+    return true;
+}
 
-    lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
-    uint32_t corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
-    uint32_t edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
+/* One slice of the bitmap set up, with its texture transform (s8.8, 15.8) */
+static void shadow_slice(EVE_HalContext * phost, int32_t x, int32_t y, int32_t w, int32_t h,
+                         int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f)
+{
+    if(w <= 0 || h <= 0) return;
+    EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, w, h);
+    EVE_CoDl_bitmapTransformA(phost, a);
+    EVE_CoDl_bitmapTransformB(phost, b);
+    EVE_CoDl_bitmapTransformC(phost, c);
+    EVE_CoDl_bitmapTransformD(phost, d);
+    EVE_CoDl_bitmapTransformE(phost, e);
+    EVE_CoDl_bitmapTransformF(phost, f);
+    EVE_CoDl_vertex2f_0(phost, x, y);
+}
 
-    if(corner_addr == GA_INVALID || edge_addr == GA_INVALID) {
-        LV_LOG_WARN("EVE5: Shadow textures evicted unexpectedly");
-        return;
-    }
+/**
+ * Draw the slices in the current color and opacity, within the scissor set to
+ * the clip area. The textures are sampled from the shadow's outer edge, and
+ * mirrored for the right and bottom slices.
+ */
+static void draw_shadow_slices(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, const shadow_slices_t * sl,
+                               uint32_t corner_addr, uint32_t edge_addr)
+{
+    EVE_HalContext * phost = u->hal;
+    lv_layer_t * layer = t->target_layer;
 
-    /* Shadow bounding box: core expanded by blur_radius */
-    lv_area_t shadow_area;
-    shadow_area.x1 = core_area.x1 - blur_radius;
-    shadow_area.x2 = core_area.x2 + blur_radius;
-    shadow_area.y1 = core_area.y1 - blur_radius;
-    shadow_area.y2 = core_area.y2 + blur_radius;
+    int32_t scale = (SHADOW_TEX_SIZE * 256) / sl->corner_size;
+    int32_t xl = sl->sx1 + sl->left;           /* Right of the left slices */
+    int32_t xr = sl->sx2 + 1 - sl->right;      /* Left of the right slices */
+    int32_t yt = sl->sy1 + sl->top;            /* Bottom of the top slices */
+    int32_t yb = sl->sy2 + 1 - sl->bottom;     /* Top of the bottom slices */
+    /* Pixel and texel centres are both at integer coordinates: the mirrored
+     * slices start at the texture coordinate of their outermost pixel */
+    int32_t cr = scale * (sl->right - 1);
+    int32_t cb = scale * (sl->bottom - 1);
 
-    /* Convert to layer-local coordinates */
-    int32_t lx = layer->buf_area.x1;
-    int32_t ly = layer->buf_area.y1;
-
-    int32_t sx1 = shadow_area.x1 - lx;
-    int32_t sy1 = shadow_area.y1 - ly;
-    int32_t sx2 = shadow_area.x2 - lx;
-    int32_t sy2 = shadow_area.y2 - ly;
-
-    int32_t shadow_w = sx2 - sx1 + 1;
-    int32_t shadow_h = sy2 - sy1 + 1;
-
-    /* Clamp render corner size to prevent overlap on pill/circle shapes */
-    int32_t render_corner_w = LV_MIN(corner_size, shadow_w / 2);
-    int32_t render_corner_h = LV_MIN(corner_size, shadow_h / 2);
-
-    /* Texture scale: maps output pixels to texture coordinates (s8.8 format) */
-    int32_t scale = (SHADOW_TEX_SIZE * 256) / corner_size;
-    int32_t tex_max = (SHADOW_TEX_SIZE - 1) * 256;
-
-    EVE_CoDl_vertexFormat(phost, 0);
-    EVE_CoDl_saveContext(phost);
-    if(!dsc->bg_cover) exclude_widget_area(u, t, dsc);
-    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
-
-    EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
-    EVE_CoDl_colorA(phost, dsc->opa);
-
-    /*
-     * CORNERS: Texture has solid at (SIZE-1, SIZE-1). Each corner is flipped
-     * so the solid region points toward the widget center.
-     */
-
+    /* CORNERS */
     EVE_CoDl_bitmapHandle(phost, SHADOW_BITMAP_HANDLE);
     EVE_CoDl_bitmapSource(phost, corner_addr);
     EVE_CoDl_bitmapLayout(phost, L8, SHADOW_TEX_SIZE, SHADOW_TEX_SIZE);
-    EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, render_corner_w, render_corner_h);
-
     EVE_CoDl_begin(phost, BITMAPS);
+    shadow_slice(phost, sl->sx1, sl->sy1, sl->left, sl->top, scale, 0, 0, 0, scale, 0);
+    shadow_slice(phost, xr, sl->sy1, sl->right, sl->top, -scale, 0, cr, 0, scale, 0);
+    shadow_slice(phost, sl->sx1, yb, sl->left, sl->bottom, scale, 0, 0, 0, -scale, cb);
+    shadow_slice(phost, xr, yb, sl->right, sl->bottom, -scale, 0, cr, 0, -scale, cb);
 
-    /* Top-left: identity */
-    EVE_CoDl_bitmapTransformA(phost, scale);
-    EVE_CoDl_bitmapTransformB(phost, 0);
-    EVE_CoDl_bitmapTransformC(phost, 0);
-    EVE_CoDl_bitmapTransformD(phost, 0);
-    EVE_CoDl_bitmapTransformE(phost, scale);
-    EVE_CoDl_bitmapTransformF(phost, 0);
-    EVE_CoDl_vertex2f_0(phost, sx1, sy1);
-
-    /* Top-right: flip X */
-    EVE_CoDl_bitmapTransformA(phost, -scale);
-    EVE_CoDl_bitmapTransformC(phost, tex_max);
-    EVE_CoDl_vertex2f_0(phost, sx2 + 1 - render_corner_w, sy1);
-
-    /* Bottom-left: flip Y */
-    EVE_CoDl_bitmapTransformA(phost, scale);
-    EVE_CoDl_bitmapTransformC(phost, 0);
-    EVE_CoDl_bitmapTransformE(phost, -scale);
-    EVE_CoDl_bitmapTransformF(phost, tex_max);
-    EVE_CoDl_vertex2f_0(phost, sx1, sy2 + 1 - render_corner_h);
-
-    /* Bottom-right: flip both */
-    EVE_CoDl_bitmapTransformA(phost, -scale);
-    EVE_CoDl_bitmapTransformC(phost, tex_max);
-    EVE_CoDl_vertex2f_0(phost, sx2 + 1 - render_corner_w, sy2 + 1 - render_corner_h);
-
-    EVE_CoDl_end(phost);
-
-    /*
-     * EDGES: 1D texture with solid at x=SIZE-1, transparent at x=0.
-     * Rotated 90° for horizontal edges. Flipped so solid faces widget.
-     */
-
-    int32_t edge_h_len = shadow_w - 2 * render_corner_w;
-    int32_t edge_v_len = shadow_h - 2 * render_corner_h;
-    int32_t edge_scale = (SHADOW_TEX_SIZE * 256) / corner_size;
-    int32_t edge_tex_max = (SHADOW_TEX_SIZE - 1) * 256;
-
+    /* EDGES: the one-row texture across the edge, rotated for the top and
+     * bottom */
     EVE_CoDl_bitmapSource(phost, edge_addr);
     EVE_CoDl_bitmapLayout(phost, L8, SHADOW_TEX_SIZE, 1);
+    shadow_slice(phost, xl, sl->sy1, xr - xl, sl->top, 0, scale, 0, 0, 0, 0);
+    shadow_slice(phost, xl, yb, xr - xl, sl->bottom, 0, -scale, cb, 0, 0, 0);
+    shadow_slice(phost, sl->sx1, yt, sl->left, yb - yt, scale, 0, 0, 0, 0, 0);
+    shadow_slice(phost, xr, yt, sl->right, yb - yt, -scale, 0, cr, 0, 0, 0);
+    EVE_CoDl_end(phost);
 
-    /* Horizontal edges */
-    if(edge_h_len > 0) {
-        EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, edge_h_len, render_corner_h);
-
-        /* Top edge */
-        EVE_CoDl_bitmapTransformA(phost, 0);
-        EVE_CoDl_bitmapTransformB(phost, edge_scale);
-        EVE_CoDl_bitmapTransformC(phost, 0);
-        EVE_CoDl_bitmapTransformD(phost, 0);
-        EVE_CoDl_bitmapTransformE(phost, 0);
-        EVE_CoDl_bitmapTransformF(phost, 0);
-
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, sx1 + render_corner_w, sy1);
-        EVE_CoDl_end(phost);
-
-        /* Bottom edge */
-        EVE_CoDl_bitmapTransformB(phost, -edge_scale);
-        EVE_CoDl_bitmapTransformC(phost, edge_tex_max);
-
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, sx1 + render_corner_w, sy2 + 1 - render_corner_h);
-        EVE_CoDl_end(phost);
-    }
-
-    /* Vertical edges */
-    if(edge_v_len > 0) {
-        EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, render_corner_w, edge_v_len);
-
-        /* Left edge */
-        EVE_CoDl_bitmapTransformA(phost, edge_scale);
-        EVE_CoDl_bitmapTransformB(phost, 0);
-        EVE_CoDl_bitmapTransformC(phost, 0);
-
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, sx1, sy1 + render_corner_h);
-        EVE_CoDl_end(phost);
-
-        /* Right edge */
-        EVE_CoDl_bitmapTransformA(phost, -edge_scale);
-        EVE_CoDl_bitmapTransformC(phost, edge_tex_max);
-
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, sx2 + 1 - render_corner_w, sy1 + render_corner_h);
-        EVE_CoDl_end(phost);
-    }
-
-    /* CENTER: solid fill between edge regions */
-    int32_t cx1 = sx1 + render_corner_w;
-    int32_t cy1 = sy1 + render_corner_h;
-    int32_t cx2 = sx2 + 1 - render_corner_w;
-    int32_t cy2 = sy2 + 1 - render_corner_h;
-
-    if(cx2 > cx1 && cy2 > cy1) {
-        /* Use scissored rect to avoid EVE RECTS alpha artifacts */
+    /* CENTER: solid, as a scissored rect to avoid EVE RECTS alpha artifacts */
+    if(xr > xl && yb > yt) {
         lv_area_t center_screen;
-        center_screen.x1 = cx1 + layer->buf_area.x1;
-        center_screen.y1 = cy1 + layer->buf_area.y1;
-        center_screen.x2 = cx2 + layer->buf_area.x1 - 1;
-        center_screen.y2 = cy2 + layer->buf_area.y1 - 1;
+        center_screen.x1 = xl + layer->buf_area.x1;
+        center_screen.y1 = yt + layer->buf_area.y1;
+        center_screen.x2 = xr + layer->buf_area.x1 - 1;
+        center_screen.y2 = yb + layer->buf_area.y1 - 1;
 
         lv_area_t center_scissor;
         if(lv_area_intersect(&center_scissor, &center_screen, &t->clip_area)) {
             lv_draw_eve5_set_scissor(u, &center_scissor, &layer->buf_area);
-
-            int32_t radius = 1;
-            EVE_CoDl_lineWidth(phost, radius * 16);
+            EVE_CoDl_lineWidth(phost, 16);
             EVE_CoDl_begin(phost, RECTS);
-            EVE_CoDl_vertex2f_0(phost, cx1 - 1, cy1 - 1);
-            EVE_CoDl_vertex2f_0(phost, cx2, cy2);
+            EVE_CoDl_vertex2f_0(phost, xl - 1, yt - 1);
+            EVE_CoDl_vertex2f_0(phost, xr, yb);
             EVE_CoDl_end(phost);
-
             lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
         }
     }
+}
+
+/* Textures of a shadow's slices, made when missing */
+static bool shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx, uint32_t * corner_addr, uint32_t * edge_addr)
+{
+    if(!ensure_shadow_textures(u, ratio_idx)) return false;
+
+    lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
+    *corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
+    *edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
+    if(*corner_addr == GA_INVALID || *edge_addr == GA_INVALID) {
+        LV_LOG_WARN("EVE5: Shadow textures evicted unexpectedly");
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Render box shadow using 9-slice Gaussian textures.
+ */
+void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
+{
+    EVE_HalContext * phost = u->hal;
+    const lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
+
+    if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->width <= 0) return;
+
+    shadow_slices_t sl;
+    uint32_t corner_addr, edge_addr;
+    if(!shadow_slices(t, dsc, &sl)) return;
+    if(!shadow_textures(u, sl.ratio_idx, &corner_addr, &edge_addr)) return;
+
+    EVE_CoDl_vertexFormat(phost, 0);
+    EVE_CoDl_saveContext(phost);
+    if(!dsc->bg_cover) exclude_widget_area(u, t, dsc);
+    lv_draw_eve5_set_scissor(u, &t->clip_area, &t->target_layer->buf_area);
+
+    EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
+    EVE_CoDl_colorA(phost, dsc->opa);
+    draw_shadow_slices(u, t, &sl, corner_addr, edge_addr);
 
     EVE_CoDl_restoreContext(phost);
 }
@@ -588,203 +559,35 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_tas
  **********************/
 
 /**
- * Draw box shadow alpha coverage for alpha recovery passes.
- *
- * BT820 L8 decodes as (R=255, G=255, B=255, A=L), so luminance maps to alpha.
- * During RGB render, the varying A modulates the shadow color via blend.
- *
- * For alpha_to_rgb (L8 render-target): draw flat rect at dsc->opa since the
- * L8 render target captures luminance, not the source texture's L8 gradient.
- *
- * For direct-to-alpha: redraw 9-slice with L8 textures. Since A=L, the
- * Gaussian gradient is captured as varying alpha, modulated by colorA(dsc->opa).
+ * Draw box shadow alpha coverage for alpha recovery passes: the same slices.
+ * L8 decodes as (R=255, G=255, B=255, A=L), so the shadow is the source
+ * alpha: in white, the L8 render target captures it as luminance, and the
+ * direct-to-alpha pass, which only writes alpha, as alpha.
  */
-static void alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb);
-
 void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
-    const lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
-    if(dsc->bg_cover || dsc->opa <= LV_OPA_MIN || dsc->width <= 0) {
-        alpha_draw_box_shadow(u, t, alpha_to_rgb);
-        return;
-    }
-
-    EVE_CoDl_saveContext(u->hal);
-    exclude_widget_area(u, t, dsc);
-    alpha_draw_box_shadow(u, t, alpha_to_rgb);
-    EVE_CoDl_restoreContext(u->hal);
-}
-
-static void alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
-{
-    EVE_HalContext *phost = u->hal;
-    lv_layer_t * layer = t->target_layer;
+    EVE_HalContext * phost = u->hal;
     const lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width <= 0) return;
 
-    const lv_area_t * coords = &t->area;
-    lv_area_t core_area;
-    core_area.x1 = coords->x1 + dsc->ofs_x - dsc->spread;
-    core_area.x2 = coords->x2 + dsc->ofs_x + dsc->spread;
-    core_area.y1 = coords->y1 + dsc->ofs_y - dsc->spread;
-    core_area.y2 = coords->y2 + dsc->ofs_y + dsc->spread;
+    shadow_slices_t sl;
+    uint32_t corner_addr, edge_addr;
+    if(!shadow_slices(t, dsc, &sl)) return;
+    /* The L8 render target pass runs before the RGB pass that would make them */
+    if(!shadow_textures(u, sl.ratio_idx, &corner_addr, &edge_addr)) return;
 
-    int32_t r_sh = dsc->radius;
-    int32_t short_side = LV_MIN(lv_area_get_width(&core_area), lv_area_get_height(&core_area));
-    if(r_sh > short_side / 2) r_sh = short_side / 2;
+    EVE_CoDl_vertexFormat(phost, 0);
+    EVE_CoDl_saveContext(phost);
+    if(!dsc->bg_cover) exclude_widget_area(u, t, dsc);
+    lv_draw_eve5_set_scissor(u, &t->clip_area, &t->target_layer->buf_area);
 
-    int32_t blur_radius = (dsc->width + 1) / 2;
-    int32_t corner_size = blur_radius + r_sh;
-    if(corner_size <= 0) return;
-
-    int32_t lx = layer->buf_area.x1;
-    int32_t ly = layer->buf_area.y1;
-    int32_t sx1 = core_area.x1 - blur_radius - lx;
-    int32_t sy1 = core_area.y1 - blur_radius - ly;
-    int32_t sx2 = core_area.x2 + blur_radius - lx;
-    int32_t sy2 = core_area.y2 + blur_radius - ly;
-
-    if(alpha_to_rgb) {
-        /* L8 render-target: flat rect at dsc->opa */
-        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
-        EVE_CoDl_colorA(phost, dsc->opa);
-        EVE_CoDl_lineWidth(phost, 16);
-        EVE_CoDl_begin(phost, RECTS);
-        EVE_CoDl_vertex2f_0(phost, sx1, sy1);
-        EVE_CoDl_vertex2f_0(phost, sx2, sy2);
-        EVE_CoDl_end(phost);
-        return;
-    }
-
-    /* Direct-to-alpha: redraw 9-slice */
-    int32_t ratio_idx = (r_sh * (EVE5_SHADOW_TEX_SIZE - 1)) / corner_size;
-    if(ratio_idx < 0) ratio_idx = 0;
-    if(ratio_idx >= EVE5_SHADOW_TEX_SIZE) ratio_idx = EVE5_SHADOW_TEX_SIZE - 1;
-
-    lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
-    uint32_t corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
-    uint32_t edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
-
-    if(corner_addr == GA_INVALID || edge_addr == GA_INVALID) return;
-
-    int32_t shadow_w = sx2 - sx1 + 1;
-    int32_t shadow_h = sy2 - sy1 + 1;
-
-    int32_t render_corner_w = LV_MIN(corner_size, shadow_w / 2);
-    int32_t render_corner_h = LV_MIN(corner_size, shadow_h / 2);
-
-    int32_t scale = (EVE5_SHADOW_TEX_SIZE * 256) / corner_size;
-    int32_t tex_max = (EVE5_SHADOW_TEX_SIZE - 1) * 256;
-
-    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
-
+    if(alpha_to_rgb) EVE_CoDl_colorRgb(phost, 255, 255, 255);
     EVE_CoDl_colorA(phost, dsc->opa);
+    draw_shadow_slices(u, t, &sl, corner_addr, edge_addr);
 
-    /* Corners */
-    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
-    EVE_CoDl_bitmapSource(phost, corner_addr);
-    EVE_CoDl_bitmapLayout(phost, L8, EVE5_SHADOW_TEX_SIZE, EVE5_SHADOW_TEX_SIZE);
-    EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, render_corner_w, render_corner_h);
-
-    EVE_CoDl_begin(phost, BITMAPS);
-
-    EVE_CoDl_bitmapTransformA(phost, scale);
-    EVE_CoDl_bitmapTransformB(phost, 0);
-    EVE_CoDl_bitmapTransformC(phost, 0);
-    EVE_CoDl_bitmapTransformD(phost, 0);
-    EVE_CoDl_bitmapTransformE(phost, scale);
-    EVE_CoDl_bitmapTransformF(phost, 0);
-    EVE_CoDl_vertex2f_0(phost, sx1, sy1);
-
-    EVE_CoDl_bitmapTransformA(phost, -scale);
-    EVE_CoDl_bitmapTransformC(phost, tex_max);
-    EVE_CoDl_vertex2f_0(phost, sx2 + 1 - render_corner_w, sy1);
-
-    EVE_CoDl_bitmapTransformA(phost, scale);
-    EVE_CoDl_bitmapTransformC(phost, 0);
-    EVE_CoDl_bitmapTransformE(phost, -scale);
-    EVE_CoDl_bitmapTransformF(phost, tex_max);
-    EVE_CoDl_vertex2f_0(phost, sx1, sy2 + 1 - render_corner_h);
-
-    EVE_CoDl_bitmapTransformA(phost, -scale);
-    EVE_CoDl_bitmapTransformC(phost, tex_max);
-    EVE_CoDl_vertex2f_0(phost, sx2 + 1 - render_corner_w, sy2 + 1 - render_corner_h);
-
-    EVE_CoDl_end(phost);
-
-    /* Edges */
-    int32_t edge_h_len = shadow_w - 2 * render_corner_w;
-    int32_t edge_v_len = shadow_h - 2 * render_corner_h;
-    int32_t edge_scale = (EVE5_SHADOW_TEX_SIZE * 256) / corner_size;
-    int32_t edge_tex_max = (EVE5_SHADOW_TEX_SIZE - 1) * 256;
-
-    EVE_CoDl_bitmapSource(phost, edge_addr);
-    EVE_CoDl_bitmapLayout(phost, L8, EVE5_SHADOW_TEX_SIZE, 1);
-
-    if(edge_h_len > 0) {
-        EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, edge_h_len, render_corner_h);
-
-        EVE_CoDl_bitmapTransformA(phost, 0);
-        EVE_CoDl_bitmapTransformB(phost, edge_scale);
-        EVE_CoDl_bitmapTransformC(phost, 0);
-        EVE_CoDl_bitmapTransformD(phost, 0);
-        EVE_CoDl_bitmapTransformE(phost, 0);
-        EVE_CoDl_bitmapTransformF(phost, 0);
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, sx1 + render_corner_w, sy1);
-        EVE_CoDl_end(phost);
-
-        EVE_CoDl_bitmapTransformB(phost, -edge_scale);
-        EVE_CoDl_bitmapTransformC(phost, edge_tex_max);
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, sx1 + render_corner_w, sy2 + 1 - render_corner_h);
-        EVE_CoDl_end(phost);
-    }
-
-    if(edge_v_len > 0) {
-        EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, render_corner_w, edge_v_len);
-
-        EVE_CoDl_bitmapTransformA(phost, edge_scale);
-        EVE_CoDl_bitmapTransformB(phost, 0);
-        EVE_CoDl_bitmapTransformC(phost, 0);
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, sx1, sy1 + render_corner_h);
-        EVE_CoDl_end(phost);
-
-        EVE_CoDl_bitmapTransformA(phost, -edge_scale);
-        EVE_CoDl_bitmapTransformC(phost, edge_tex_max);
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, sx2 + 1 - render_corner_w, sy1 + render_corner_h);
-        EVE_CoDl_end(phost);
-    }
-
-    /* Center */
-    int32_t cx1 = sx1 + render_corner_w;
-    int32_t cy1 = sy1 + render_corner_h;
-    int32_t cx2 = sx2 + 1 - render_corner_w;
-    int32_t cy2 = sy2 + 1 - render_corner_h;
-
-    if(cx2 > cx1 && cy2 > cy1) {
-        lv_area_t center_screen;
-        center_screen.x1 = cx1 + layer->buf_area.x1;
-        center_screen.y1 = cy1 + layer->buf_area.y1;
-        center_screen.x2 = cx2 + layer->buf_area.x1 - 1;
-        center_screen.y2 = cy2 + layer->buf_area.y1 - 1;
-
-        lv_area_t center_scissor;
-        if(lv_area_intersect(&center_scissor, &center_screen, &t->clip_area)) {
-            lv_draw_eve5_set_scissor(u, &center_scissor, &layer->buf_area);
-
-            int32_t radius = 1;
-            EVE_CoDl_lineWidth(phost, radius * 16);
-            EVE_CoDl_begin(phost, RECTS);
-            EVE_CoDl_vertex2f_0(phost, cx1 - 1, cy1 - 1);
-            EVE_CoDl_vertex2f_0(phost, cx2, cy2);
-            EVE_CoDl_end(phost);
-        }
-    }
+    EVE_CoDl_restoreContext(phost);
 }
 
 #endif /* LV_USE_DRAW_EVE5 */

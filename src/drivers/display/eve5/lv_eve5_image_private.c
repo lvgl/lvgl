@@ -41,6 +41,55 @@ bool eve5_is_jpeg_or_png(const char * path, bool *is_jpeg, bool *is_png)
     return *is_jpeg || *is_png;
 }
 
+/* Walks the JPEG segments to the Exif APP1 and the orientation tag (0x0112)
+ * of its first IFD */
+uint32_t eve5_jpeg_exif_orientation(const uint8_t * data, uint32_t len)
+{
+    if(len < 4 || data[0] != 0xFF || data[1] != 0xD8) return 1;
+
+    uint32_t pos = 2;
+    while(pos + 4 <= len) {
+        if(data[pos] != 0xFF) return 1;
+        uint8_t marker = data[pos + 1];
+        if(marker == 0xFF) {
+            pos++;
+            continue;
+        }
+        /* The image data follows: no Exif before it */
+        if(marker == 0xDA || marker == 0xD9) return 1;
+        uint32_t seg_len = ((uint32_t)data[pos + 2] << 8) | data[pos + 3];
+        if(seg_len < 2 || pos + 2 + seg_len > len) return 1;
+
+        const uint8_t * seg = data + pos + 4;
+        uint32_t seg_size = seg_len - 2;
+        if(marker == 0xE1 && seg_size >= 14 && lv_memcmp(seg, "Exif\0\0", 6) == 0) {
+            const uint8_t * tiff = seg + 6;
+            uint32_t tiff_size = seg_size - 6;
+            bool le = tiff[0] == 'I' && tiff[1] == 'I';
+            if(!le && !(tiff[0] == 'M' && tiff[1] == 'M')) return 1;
+#define EXIF_U16(p) (le ? (uint32_t)((p)[0] | ((p)[1] << 8)) : (uint32_t)(((p)[0] << 8) | (p)[1]))
+#define EXIF_U32(p) (le ? ((uint32_t)(p)[0] | ((uint32_t)(p)[1] << 8) | ((uint32_t)(p)[2] << 16) | ((uint32_t)(p)[3] << 24)) \
+                        : (((uint32_t)(p)[0] << 24) | ((uint32_t)(p)[1] << 16) | ((uint32_t)(p)[2] << 8) | (uint32_t)(p)[3]))
+            uint32_t ifd = EXIF_U32(tiff + 4);
+            if(ifd + 2 > tiff_size) return 1;
+            uint32_t count = EXIF_U16(tiff + ifd);
+            for(uint32_t i = 0; i < count; i++) {
+                const uint8_t * entry = tiff + ifd + 2 + i * 12;
+                if(entry + 12 > tiff + tiff_size) return 1;
+                if(EXIF_U16(entry) == 0x0112) {
+                    uint32_t orientation = EXIF_U16(entry + 8);
+                    return (orientation >= 1 && orientation <= 8) ? orientation : 1;
+                }
+            }
+#undef EXIF_U16
+#undef EXIF_U32
+            return 1;
+        }
+        pos += 2 + seg_len;
+    }
+    return 1;
+}
+
 /**********************
  * ESDM METADATA SIDECAR
  **********************/

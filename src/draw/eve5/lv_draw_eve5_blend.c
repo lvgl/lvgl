@@ -29,9 +29,12 @@
  *   SUBTRACTIVE: max(d-s, 0)*a = max(d*a - P, 0)
  *   DIFFERENCE:  |d-s|*a       = max(d*a - P, 0) + max(P - d*a, 0)
  *
- * ADDITIVE isn't here: it's drawn inline with the hardware blend, which
- * differs where the sum saturates under partial coverage. See
- * eve5_find_blend_task for how to make it exact.
+ * ADDITIVE is drawn inline with the hardware blend, min(d + s*a, 1), which
+ * differs where the sum saturates under partial coverage. Below full
+ * opacity it comes here, where with D = 1 - d
+ *   ADDITIVE:    1 - min(d+s, 1)*a - d*(1-a) = D*(1-a) + max(D*a - P, 0)
+ * which is computed in the complemented dst, and gives the result directly
+ * rather than a term to composite.
  *
  * On an L8 layer, LVGL applies the mode to the luminances. The math then runs
  * once, on the luminance an L8 render target stores ((r + g + b) / 3), and
@@ -41,6 +44,7 @@
  *   MULTIPLY:    3 draws/channel = 9 + 1 alpha = 10 draws, 2 DLs
  *   SUBTRACTIVE: 6 draws/channel = 18 + 1 alpha = 19 draws, 2 DLs
  *   DIFFERENCE:  d*a (2 draws), then 10 draws/channel = 30 + 1 alpha, 3 DLs
+ *   ADDITIVE:    7 draws/channel = 21, then 6 draws/channel = 18 + 2 alpha, 2 DLs
  *   Luminance: 2 more draws for each read of a bitmap, for one channel only
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
@@ -117,6 +121,7 @@ static void multiply_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stri
                              int32_t w, int32_t h, uint8_t channel);
 static void subtract_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stride,
                              int32_t w, int32_t h, uint8_t channel);
+static void invert_alpha(EVE_HalContext *phost, int32_t w, int32_t h);
 static void store_alpha(EVE_HalContext *phost, int32_t w, int32_t h,
                         uint8_t r_mask, uint8_t g_mask, uint8_t b_mask, bool add);
 static bool composite_over_dst(lv_draw_eve5_unit_t * u, EVE_GpuHandle *out_result,
@@ -277,9 +282,14 @@ static void multiply_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stri
 static void subtract_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stride,
                              int32_t w, int32_t h, uint8_t channel)
 {
-    EVE_CoDl_blendFunc(phost, ONE_MINUS_DST_ALPHA, ZERO);
-    draw_rect(phost, w, h);
+    invert_alpha(phost, w, h);
     add_channel(phost, addr, stride, w, h, channel);
+    invert_alpha(phost, w, h);
+}
+
+/** alpha = 255 - alpha */
+static void invert_alpha(EVE_HalContext *phost, int32_t w, int32_t h)
+{
     EVE_CoDl_blendFunc(phost, ONE_MINUS_DST_ALPHA, ZERO);
     draw_rect(phost, w, h);
 }
@@ -547,6 +557,105 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     bool ok = composite_over_dst(u, out_result, dst_addr, temp, aw, ah, w, h, stride, buf_size);
     EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
     return ok;
+}
+
+/**
+ * ADDITIVE: out.c = min(d.c + s.c, 1)*a + d.c*(1 - a). With D = 1 - d,
+ *   1 - out.c = D.c*(1 - a) + max(D.c*a - P.c, 0)
+ * @param luminance  true: run on the luminances (L8 layers)
+ * 2 DL cycles: temp.c = max(D.c*a - P.c, 0), then the result, with alpha
+ * a + d.a*(1 - a).
+ */
+bool lv_draw_eve5_blend_additive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                 EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
+                                 bool luminance, EVE_GpuHandle *out_result)
+{
+    EVE_HalContext *phost = u->hal;
+    int32_t w = lv_area_get_width(&layer->buf_area);
+    int32_t h = lv_area_get_height(&layer->buf_area);
+    int32_t aw = ALIGN_UP(w, 16);
+    int32_t ah = ALIGN_UP(h, 16);
+    uint32_t stride = aw * 4;
+    uint32_t buf_size = stride * ah;
+
+    uint32_t dst_addr = EVE_GpuAlloc_Get(u->allocator, dst_handle);
+    uint32_t src_addr = EVE_GpuAlloc_Get(u->allocator, src_handle);
+    if(dst_addr == GA_INVALID || src_addr == GA_INVALID) {
+        *out_result = GA_HANDLE_INVALID;
+        return false;
+    }
+
+    EVE_GpuHandle temp = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);
+    if(temp_addr == GA_INVALID) {
+        *out_result = GA_HANDLE_INVALID;
+        return false;
+    }
+
+    /* One epoch scope covers both of this op's DL segments */
+    EVE_GpuAlloc_OpenScope(u->allocator);
+
+    const blend_channel_t * chs = luminance ? luminance_channel : rgb_channels;
+    int n = luminance ? 1 : 3;
+
+    /* DL1: temp.c = max(D.c*a - P.c, 0) */
+    begin_channel_dl(phost, temp_addr, aw, ah, w, h);
+    for(int i = 0; i < n; i++) {
+        const blend_channel_t * ch = &chs[i];
+        load_channel(phost, dst_addr, stride, w, h, ch->channel);
+        invert_alpha(phost, w, h);
+        multiply_channel(phost, src_addr, stride, w, h, ALPHA);
+        subtract_channel(phost, src_addr, stride, w, h, ch->channel);
+        store_alpha(phost, w, h, ch->r_mask, ch->g_mask, ch->b_mask, false);
+    }
+    finish_channel_dl(phost);
+
+    /* DL2: out.c = 1 - (D.c*(1 - a) + temp.c) */
+    EVE_GpuHandle result = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    uint32_t result_addr = EVE_GpuAlloc_Get(u->allocator, result);
+    /* Re-resolve addresses (the allocator may have moved things) */
+    temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);
+    src_addr = EVE_GpuAlloc_Get(u->allocator, src_handle);
+    dst_addr = EVE_GpuAlloc_Get(u->allocator, dst_handle);
+    if(result_addr == GA_INVALID || temp_addr == GA_INVALID ||
+       src_addr == GA_INVALID || dst_addr == GA_INVALID) {
+        EVE_GpuAlloc_ScopedFree(u->allocator, temp);
+        if(result_addr != GA_INVALID) EVE_GpuAlloc_Free(u->allocator, result);
+        EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
+        *out_result = GA_HANDLE_INVALID;
+        return false;
+    }
+
+    begin_channel_dl(phost, result_addr, aw, ah, w, h);
+    for(int i = 0; i < n; i++) {
+        const blend_channel_t * ch = &chs[i];
+        load_channel(phost, dst_addr, stride, w, h, ch->channel);
+        invert_alpha(phost, w, h);
+        /* Times 1 - a: the swizzled src has a as its alpha */
+        EVE_CoDl_blendFunc(phost, ZERO, ONE_MINUS_SRC_ALPHA);
+        setup_swizzled_blit(phost, src_addr, stride, w, h, ALPHA);
+        draw_bitmap(phost);
+        /* temp holds the luminance result in all three channels */
+        add_channel(phost, temp_addr, stride, w, h, luminance ? RED : ch->channel);
+        invert_alpha(phost, w, h);
+        store_alpha(phost, w, h, ch->r_mask, ch->g_mask, ch->b_mask, false);
+    }
+    /* alpha = a + d.a*(1 - a) */
+    EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+    EVE_CoDl_blendFunc(phost, ONE, ZERO);
+    setup_blit(phost, dst_addr, stride, w, h);
+    draw_bitmap(phost);
+    EVE_CoDl_blendFunc(phost, ONE, ONE_MINUS_SRC_ALPHA);
+    EVE_CoDl_bitmapSource(phost, src_addr);
+    draw_bitmap(phost);
+    finish_channel_dl(phost);
+
+    /* Released at the op scope's close sync */
+    EVE_GpuAlloc_ScopedFree(u->allocator, temp);
+
+    *out_result = result;
+    EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
+    return true;
 }
 
 #endif /* EVE_SUPPORT_RENDERTARGET */

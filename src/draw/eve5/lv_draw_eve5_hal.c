@@ -870,6 +870,11 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
      * during the layer release once this epoch retires. */
     EVE_GpuAlloc_CloseScope(u->allocator, sync);
 
+#if LV_DRAW_EVE5_SW_TEXTURES
+    /* Done with the SW textures the passes of this layer drew */
+    lv_draw_eve5_sw_release_textures(u);
+#endif
+
     /* In FULL mode the screen layer renders directly into SWAPCHAIN_0, so the
      * CMD_SWAP above is the actual frame swap. Record the sync so a runtime
      * mode switch can drain the scanout pipeline before reconfiguring registers.
@@ -1095,7 +1100,8 @@ void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u,
                                    uint32_t ram_g_addr,
                                    int32_t tex_w, int32_t tex_h,
                                    uint32_t eve_stride,
-                                   const lv_area_t * draw_area)
+                                   const lv_area_t * draw_area,
+                                   bool premultiplied)
 {
     EVE_HalContext * phost = u->hal;
     lv_layer_t * layer = t->target_layer;
@@ -1124,9 +1130,11 @@ void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u,
 #endif
     EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, tex_w, tex_h);
 
+    if(premultiplied) EVE_CoDl_blendFunc(phost, ONE, ONE_MINUS_SRC_ALPHA);
     EVE_CoDl_begin(phost, BITMAPS);
     EVE_CoDl_vertex2f_0(phost, x, y);
     EVE_CoDl_end(u->hal);
+    if(premultiplied) EVE_CoDl_blendFunc_default(phost);
 }
 
 bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t * u, EVE_GpuHandle handle)

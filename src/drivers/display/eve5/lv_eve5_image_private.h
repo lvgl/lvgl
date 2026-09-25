@@ -40,6 +40,10 @@ bool eve5_has_extension(const char * path, const char * ext);
 /** Check if a path is a JPEG or PNG file. Sets *is_jpeg and *is_png accordingly. */
 bool eve5_is_jpeg_or_png(const char * path, bool *is_jpeg, bool *is_png);
 
+/** EXIF orientation of a JPEG from its first bytes: 1 (as stored) to 8, and 1
+ *  when the data has none. CMD_LOADIMAGE decodes as stored. */
+uint32_t eve5_jpeg_exif_orientation(const uint8_t * data, uint32_t len);
+
 /**********************
  * EVE FORMAT HELPERS
  **********************/

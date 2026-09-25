@@ -840,6 +840,31 @@ static void rom_label_render(lv_draw_eve5_unit_t * u, lv_draw_task_t * t,
  * GLYPH CALLBACKS
  **********************/
 
+#if LV_USE_FONT_PLACEHOLDER
+/* A glyph the fonts don't have, drawn as the outline of its box as LVGL's
+ * software renderer does, between the BITMAPS of the glyph stream. In color,
+ * or in the alpha passes only at opacity. */
+static void draw_glyph_placeholder(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, const lv_layer_t * layer,
+                                   const lv_draw_glyph_dsc_t * glyph_dsc, bool color)
+{
+    const lv_area_t * box = glyph_dsc->bg_coords;
+    const lv_area_t * layer_area = &layer->buf_area;
+    int32_t x1 = box->x1 - layer_area->x1;
+    int32_t y1 = box->y1 - layer_area->y1;
+    int32_t x2 = box->x2 - layer_area->x1;
+    int32_t y2 = box->y2 - layer_area->y1;
+
+    EVE_CoDl_end(u->hal);
+    if(color) EVE_CoDl_colorRgb(u->hal, glyph_dsc->color.red, glyph_dsc->color.green, glyph_dsc->color.blue);
+    EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
+    lv_draw_eve5_draw_rect(u, x1, y1, x2, y1, 0, &t->clip_area, layer_area);
+    lv_draw_eve5_draw_rect(u, x1, y2, x2, y2, 0, &t->clip_area, layer_area);
+    lv_draw_eve5_draw_rect(u, x1, y1 + 1, x1, y2 - 1, 0, &t->clip_area, layer_area);
+    lv_draw_eve5_draw_rect(u, x2, y1 + 1, x2, y2 - 1, 0, &t->clip_area, layer_area);
+    EVE_CoDl_begin(u->hal, BITMAPS);
+}
+#endif
+
 static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
                           lv_draw_fill_dsc_t * fill_dsc, const lv_area_t * fill_area)
 {
@@ -867,14 +892,20 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     if(glyph_dsc == NULL) return;
 
+    /* No glyph, and no resolved font for a glyph the fonts don't have */
+    if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_NONE) {
+#if LV_USE_FONT_PLACEHOLDER
+        if(glyph_dsc->bg_coords != NULL) draw_glyph_placeholder(u, t, layer, glyph_dsc, true);
+#endif
+        return;
+    }
+
     const lv_font_t * font = glyph_dsc->g->resolved_font;
 
     if(!font) {
         LV_LOG_WARN("EVE5: Font not resolved");
         return;
     }
-
-    if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_NONE) return;
 
     /* Image glyph (e.g., emoji): draw as full-color image */
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
@@ -901,14 +932,11 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         EVE_CoDl_bitmapSource(u->hal, addr);
         set_palette_if_needed(u->hal, vr->eve_format, palette_addr);
         eve5_set_image_bitmap_layout(u->hal, vr->eve_format, (int32_t)vr->stride, g_h, vr->sample_as_luminance);
-        EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, g_w, g_h);
         EVE_CoDl_bitmapTransform_identity(u->hal);
 
+        /* Rotated, scaled or skewed with the letter */
         EVE_CoDl_begin(u->hal, BITMAPS);
-        EVE_CoDl_vertex2f_0(u->hal, x, y);
-        EVE_CoDl_end(u->hal);
-
-        EVE_CoDl_begin(u->hal, BITMAPS);
+        emit_glyph_vertex(u, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
         return;
     }
 
@@ -987,7 +1015,12 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     if(glyph_dsc == NULL) return;
 
-    if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_NONE) return;
+    if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_NONE) {
+#if LV_USE_FONT_PLACEHOLDER
+        if(glyph_dsc->bg_coords != NULL) draw_glyph_placeholder(u, t, layer, glyph_dsc, false);
+#endif
+        return;
+    }
 
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
         void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
@@ -1012,14 +1045,10 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         EVE_CoDl_bitmapSource(u->hal, addr);
         set_palette_if_needed(u->hal, vr->eve_format, palette_addr);
         eve5_set_image_bitmap_layout(u->hal, vr->eve_format, (int32_t)vr->stride, g_h, vr->sample_as_luminance);
-        EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, g_w, g_h);
         EVE_CoDl_bitmapTransform_identity(u->hal);
 
         EVE_CoDl_begin(u->hal, BITMAPS);
-        EVE_CoDl_vertex2f_0(u->hal, x, y);
-        EVE_CoDl_end(u->hal);
-
-        EVE_CoDl_begin(u->hal, BITMAPS);
+        emit_glyph_vertex(u, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y);
         return;
     }
 
@@ -1078,8 +1107,9 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 #define DL_LABEL            12  /* lv_draw_eve5_hal_draw_label */
 #define DL_GLYPH            10  /* Bitmap glyph (draw_glyph_cb) */
 #define DL_GLYPH_XFORM      18  /* Rotated bitmap glyph */
-#define DL_GLYPH_IMAGE      23  /* Image glyph, only from fonts other than plain fmt_txt */
+#define DL_GLYPH_IMAGE      43  /* Image glyph, only from fonts other than plain fmt_txt */
 #define DL_GLYPH_DECOR      13  /* Underline, strikethrough or selection fill */
+#define DL_GLYPH_PLACEHOLDER 43 /* Box of a glyph the fonts don't have (draw_glyph_placeholder) */
 #define DL_CMDTEXT_COLOR    2   /* rom_line_set_color */
 
 uint32_t lv_draw_eve5_label_dl_bound(const lv_draw_task_t * t)
@@ -1110,7 +1140,22 @@ uint32_t lv_draw_eve5_label_dl_bound(const lv_draw_task_t * t)
     if(dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH) decor++;
     if(dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) decor++;
 
-    return DL_LABEL + bytes * (glyph + decor * DL_GLYPH_DECOR);
+    /* Characters the fonts don't have are drawn as boxes */
+    uint32_t missing = 0;
+#if LV_USE_FONT_PLACEHOLDER
+    if(dsc->font != NULL) {
+        uint32_t i = 0;
+        while(i < bytes) {
+            uint32_t letter = lv_text_encoded_next(dsc->text, &i);
+            /* Line breaks and markers are not drawn */
+            if(letter < 0x20 || lv_text_is_marker(letter)) continue;
+            lv_font_glyph_dsc_t g;
+            if(!lv_font_get_glyph_dsc(dsc->font, &g, letter, 0)) missing++;
+        }
+    }
+#endif
+
+    return DL_LABEL + bytes * (glyph + decor * DL_GLYPH_DECOR) + missing * DL_GLYPH_PLACEHOLDER;
 }
 
 /**********************

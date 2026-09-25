@@ -216,7 +216,11 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
             uint8_t frac0 = grad->stops[si].frac;
             uint8_t frac1 = grad->stops[si + 1].frac;
 
-            if(frac1 == frac0) {
+            /* Before the first stop and after the last, the stop color */
+            if(i <= frac0) {
+                pixels[i] = stop_colors[si];
+            }
+            else if(i >= frac1) {
                 pixels[i] = stop_colors[si + 1];
             }
             else {
@@ -568,40 +572,28 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t * u, const lv_draw_task_t 
                             clip_y2 < y2 - rout);
 
     if(corners_clipped || (rout == 0 && dsc->opa >= LV_OPA_MAX)) {
-        /* Draw borders as simple lines (safe when corners aren't visible or at full opacity) */
-        lv_draw_eve5_set_scissor(u, clip, layer_area);
-
+        /* Draw the sides as hard-edged rects (safe when corners aren't
+         * visible or at full opacity). LINES would soften their edges with
+         * the line antialiasing. */
         if(alpha_to_rgb)
             EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
         else
             EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
         EVE_CoDl_colorA(u->hal, dsc->opa);
-        EVE_CoDl_lineWidth(u->hal, dsc->width * 8);
 
-        EVE_CoDl_begin(u->hal, LINES);
-
+        int32_t bw = dsc->width;
         if(dsc->side & LV_BORDER_SIDE_TOP) {
-            int32_t y = y1 + dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, x1 * 2, (y * 2) - 1);
-            EVE_CoDl_vertex2f_1(u->hal, x2 * 2, (y * 2) - 1);
+            lv_draw_eve5_draw_rect(u, x1, y1, x2, y1 + bw - 1, 0, clip, layer_area);
         }
         if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
-            int32_t y = y2 - dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, x1 * 2, (y * 2) + 1);
-            EVE_CoDl_vertex2f_1(u->hal, x2 * 2, (y * 2) + 1);
+            lv_draw_eve5_draw_rect(u, x1, y2 - bw + 1, x2, y2, 0, clip, layer_area);
         }
         if(dsc->side & LV_BORDER_SIDE_LEFT) {
-            int32_t x = x1 + dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, (x * 2) - 1, y1 * 2);
-            EVE_CoDl_vertex2f_1(u->hal, (x * 2) - 1, y2 * 2);
+            lv_draw_eve5_draw_rect(u, x1, y1, x1 + bw - 1, y2, 0, clip, layer_area);
         }
         if(dsc->side & LV_BORDER_SIDE_RIGHT) {
-            int32_t x = x2 - dsc->width / 2;
-            EVE_CoDl_vertex2f_1(u->hal, (x * 2) + 1, y1 * 2);
-            EVE_CoDl_vertex2f_1(u->hal, (x * 2) + 1, y2 * 2);
+            lv_draw_eve5_draw_rect(u, x2 - bw + 1, y1, x2, y2, 0, clip, layer_area);
         }
-
-        EVE_CoDl_end(u->hal);
         return;
     }
 
