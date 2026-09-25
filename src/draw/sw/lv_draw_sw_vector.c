@@ -298,6 +298,13 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
         return;
     }
 
+    /*ThorVG reads the pixels, which a draw unit may keep in its VRAM*/
+    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, NULL)) {
+        lv_image_decoder_close(&decoder_dsc);
+        LV_LOG_ERROR("Image not resident");
+        return;
+    }
+
     const lv_image_header_t * header = &decoder_dsc.decoded->header;
     lv_color_format_t cf = header->cf;
 
