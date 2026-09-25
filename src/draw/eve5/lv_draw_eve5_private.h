@@ -515,6 +515,11 @@ typedef struct {
      * YCBCR policy can pick the right format on first allocation. */
     bool alloc_canvas_hint;
 
+    /* Dispatch-scoped hint: the next vram_alloc_cb is allocating a
+     * partial-mode screen tile, which renders in the display's format as
+     * init_layer picks it for the screen */
+    bool alloc_screen_hint;
+
     /* Box shadow texture cache */
     lv_draw_eve5_shadow_slot_t shadow_slots[EVE5_SHADOW_TEX_SIZE];
 
@@ -986,6 +991,8 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src
  * LAYER MANAGEMENT
  **********************/
 
+void lv_draw_eve5_hal_layer_format(lv_draw_eve5_unit_t * u, const lv_layer_t * layer, bool is_screen,
+                                   uint16_t * target_eve_fmt, uint8_t * target_bpp);
 void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen,
                                  const lv_draw_eve5_slice_t * slice);
 void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen,

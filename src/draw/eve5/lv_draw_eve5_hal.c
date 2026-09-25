@@ -171,10 +171,38 @@ bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_
  * VRAM CALLBACKS
  **********************/
 
+/* Render target format of a partial-mode screen tile. The tiles are
+ * composited into the RGB8 scanout, so the display's color format only picks
+ * the precision they render at, and the screen's alpha never shows. Formats
+ * without color render luminance to L8, which the compositor samples as such
+ * (and thresholds for I1). */
+static void eve5_screen_rt_format(lv_draw_eve5_unit_t * u, lv_color_format_t cf, uint16_t * eve_fmt, uint8_t * bpp)
+{
+    if(cf == LV_COLOR_FORMAT_L8 || cf == LV_COLOR_FORMAT_AL88 || cf == LV_COLOR_FORMAT_I1) {
+        *eve_fmt = L8;
+        *bpp = 1;
+        return;
+    }
+
+    lv_draw_eve5_get_render_target_format(u->hal, cf, eve_fmt, bpp);
+
+#if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 && defined(EVE_SUPPORT_RENDERTARGET)
+    if(EVE_Hal_supportRenderTarget(u->hal) && *eve_fmt == RGB565) {
+        *eve_fmt = RGB8;
+        *bpp = 3;
+    }
+#endif
+}
+
 /* VRAM format of a buffer that can be rendered to: the render target format
- * of its color format, promoted as configured */
+ * of its color format, promoted as configured, or a screen tile's */
 static void eve5_vram_rt_format(lv_draw_eve5_unit_t * u, lv_color_format_t cf, uint16_t * eve_fmt, uint8_t * bpp)
 {
+    if(u->alloc_screen_hint) {
+        eve5_screen_rt_format(u, cf, eve_fmt, bpp);
+        return;
+    }
+
     lv_draw_eve5_get_render_target_format(u->hal, cf, eve_fmt, bpp);
 
 #if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 && defined(EVE_SUPPORT_RENDERTARGET)
@@ -409,6 +437,45 @@ void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
 /* init_layer / finish_layer / blit_l8_to_alpha drive the BT820 render engine
  * (CMD_RENDERTARGET, SWAPCHAIN_0, RGB8/ARGB8 layer formats). */
 
+/* Render target format of a layer: a partial-mode screen tile's, from the
+ * display's format, or the render target format of the layer's color format,
+ * promoted as configured. The layer's buffer may hold another format until
+ * init_layer converts it. */
+void lv_draw_eve5_hal_layer_format(lv_draw_eve5_unit_t * u, const lv_layer_t * layer, bool is_screen,
+                                   uint16_t * target_eve_fmt, uint8_t * target_bpp)
+{
+    lv_color_format_t target_lv_cf = layer->draw_buf != NULL ? layer->draw_buf->header.cf : layer->color_format;
+    if(is_screen) {
+        eve5_screen_rt_format(u, target_lv_cf, target_eve_fmt, target_bpp);
+    }
+    else {
+        lv_draw_eve5_get_render_target_format(u->hal, target_lv_cf, target_eve_fmt, target_bpp);
+
+#if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
+        if(EVE_Hal_supportRenderTarget(u->hal)
+           && !lv_color_format_has_alpha(target_lv_cf) && *target_eve_fmt != ARGB8) {
+            *target_eve_fmt = RGB8;
+            *target_bpp = 3;
+        }
+#endif
+
+#if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
+        /* Opaque canvas layers (draw_buf-backed, parentless, not the screen
+         * — is_screen is false in this branch) render into YCBCR, a
+         * 2x2-pixel block format (line stride = 2 bytes/pixel, surface
+         * totals 1 byte/pixel; see eve5_rt_surface_size). Overrides the
+         * RGB8 promotion. Matches the vram_alloc_cb hint path so the first
+         * allocation already lands in the right format. */
+        if(EVE_Hal_supportRenderTarget(u->hal)
+           && layer->draw_buf != NULL && layer->parent == NULL
+           && !lv_color_format_has_alpha(target_lv_cf)) {
+            *target_eve_fmt = YCBCR;
+            *target_bpp = 2; /* Line-stride bytes per pixel */
+        }
+#endif
+    }
+}
+
 void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  bool is_screen,
                                  const lv_draw_eve5_slice_t * slice)
@@ -517,41 +584,9 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     int32_t aligned_h = ALIGN_UP(h, 16);
 
     /* Determine target render format */
-    uint16_t target_eve_fmt = ARGB8;
-    uint8_t target_bpp = 4;
-    if(!is_screen) {
-        lv_color_format_t target_lv_cf;
-        if(layer->draw_buf != NULL) {
-            target_lv_cf = layer->draw_buf->header.cf;
-        }
-        else {
-            target_lv_cf = layer->color_format;
-        }
-        lv_draw_eve5_get_render_target_format(u->hal, target_lv_cf, &target_eve_fmt, &target_bpp);
-
-#if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
-        if(EVE_Hal_supportRenderTarget(u->hal)
-           && !lv_color_format_has_alpha(target_lv_cf) && target_eve_fmt != ARGB8) {
-            target_eve_fmt = RGB8;
-            target_bpp = 3;
-        }
-#endif
-
-#if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
-        /* Opaque canvas layers (draw_buf-backed, parentless, not the screen
-         * — is_screen is false in this branch) render into YCBCR, a
-         * 2x2-pixel block format (line stride = 2 bytes/pixel, surface
-         * totals 1 byte/pixel; see eve5_rt_surface_size). Overrides the
-         * RGB8 promotion. Matches the vram_alloc_cb hint path so the first
-         * allocation already lands in the right format. */
-        if(EVE_Hal_supportRenderTarget(u->hal)
-           && layer->draw_buf != NULL && layer->parent == NULL
-           && !lv_color_format_has_alpha(target_lv_cf)) {
-            target_eve_fmt = YCBCR;
-            target_bpp = 2; /* Line-stride bytes per pixel */
-        }
-#endif
-    }
+    uint16_t target_eve_fmt;
+    uint8_t target_bpp;
+    lv_draw_eve5_hal_layer_format(u, layer, is_screen, &target_eve_fmt, &target_bpp);
 
     lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
     if(vr != NULL) {

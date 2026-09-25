@@ -35,13 +35,14 @@ typedef struct {
     EVE_GpuHandle handle;
     lv_area_t area;
     /* Source format and stride captured at flush time. The HW path's tile VRAM
-     * format follows the layer's color format (typically the display's natural
-     * cf — RGB565 for LV_COLOR_DEPTH=16, RGB8 for 24, ARGB8 for 32). The SW
-     * path goes through px_map in EVE_SW_BITMAP_FORMAT. The compositor must
-     * sample each region with its actual format/stride or it'll read garbage. */
+     * format follows the display's color format (RGB565, RGB8, ARGB8, or L8
+     * holding luminance for L8, AL88 and I1). The SW path goes through px_map
+     * in the display's format. The compositor must sample each region with
+     * its actual format/stride or it'll read garbage. */
     uint16_t eve_format;
     uint32_t eve_stride;
     bool is_gpu_rendered;
+    bool monochrome;    /**< I1 display: threshold the luminance */
 } rendered_region_t;
 
 typedef struct {
@@ -121,6 +122,13 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode);
     #define SW_BYTES_PER_PIXEL 4
 #else
     #error "Unsupported LV_COLOR_DEPTH - must be 16, 24, or 32"
+#endif
+
+/* LVGL's threshold for I1 pixels */
+#ifdef LV_DRAW_SW_I1_LUM_THRESHOLD
+    #define I1_LUM_THRESHOLD LV_DRAW_SW_I1_LUM_THRESHOLD
+#else
+    #define I1_LUM_THRESHOLD 127
 #endif
 
 /* Framebuffer (screen memory) is always RGB8 */
@@ -897,9 +905,33 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     }
 
     if(!is_gpu_rendered) {
-        /* SW path: copy px_map (system RAM) to VRAM. The pixel format is the
-         * display's native LVGL format (EVE_SW_BITMAP_FORMAT) packed tight. */
-        uint32_t size = (w * h) * SW_BYTES_PER_PIXEL;
+        /* SW path: copy px_map (system RAM) to VRAM, in the display's color
+         * format, or the native LVGL format (EVE_SW_BITMAP_FORMAT) for one
+         * the compositor can't sample */
+        uint16_t sw_format = EVE_SW_BITMAP_FORMAT;
+        uint32_t sw_stride = (uint32_t)w * SW_BYTES_PER_PIXEL;
+        lv_color_format_t cf = lv_display_get_color_format(disp);
+        switch(cf) {
+            case LV_COLOR_FORMAT_RGB565:
+                sw_format = RGB565;
+                break;
+            case LV_COLOR_FORMAT_RGB888:
+                sw_format = RGB8;
+                break;
+            case LV_COLOR_FORMAT_XRGB8888:
+            case LV_COLOR_FORMAT_ARGB8888:
+            case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+                sw_format = ARGB8;
+                break;
+            case LV_COLOR_FORMAT_L8:
+                sw_format = L8;
+                break;
+            default:
+                cf = LV_COLOR_FORMAT_UNKNOWN;
+                break;
+        }
+        if(cf != LV_COLOR_FORMAT_UNKNOWN) sw_stride = lv_draw_buf_width_to_stride((uint32_t)w, cf);
+        uint32_t size = sw_stride * (uint32_t)h;
 
         handle = EVE_GpuAlloc_Alloc(drvr->allocator, size, GA_ALIGN_4);
         uint32_t gpu_addr = EVE_GpuAlloc_Get(drvr->allocator, handle);
@@ -907,8 +939,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         if(gpu_addr != GA_INVALID) {
             EVE_Hal_wrMem(phost, gpu_addr, px_map, size);
             EVE_Hal_requestFenceBeforeSwap(phost);
-            region_format = EVE_SW_BITMAP_FORMAT;
-            region_stride = (uint32_t)w * SW_BYTES_PER_PIXEL;
+            region_format = sw_format;
+            region_stride = sw_stride;
         }
         else {
             LV_LOG_ERROR("EVE5: OOM in flush_cb SW path");
@@ -927,6 +959,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         drvr->pending_regions[drvr->pending_count].eve_format = region_format;
         drvr->pending_regions[drvr->pending_count].eve_stride = region_stride;
         drvr->pending_regions[drvr->pending_count].is_gpu_rendered = is_gpu_rendered;
+        drvr->pending_regions[drvr->pending_count].monochrome =
+            region_format == L8 && lv_display_get_color_format(disp) == LV_COLOR_FORMAT_I1;
         drvr->pending_count++;
     }
 
@@ -1014,14 +1048,31 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
         EVE_CoDl_bitmapSource(phost, gpu_addr);
 
         /* Sample the region in its actual format/stride captured at flush time.
-         * HW: layer-cf-derived (RGB565 for LV_COLOR_DEPTH=16, RGB8 for 24, ARGB8
-         * for 32 or alpha-promoted layers), 16-px aligned stride from the EVE5
-         * draw unit's vram_alloc_cb. SW: EVE_SW_BITMAP_FORMAT tightly packed. */
-        EVE_CoDl_bitmapLayout(phost, (uint8_t)region->eve_format,
-                              region->eve_stride, h);
+         * HW: the display's format, 16-px aligned stride from the EVE5 draw
+         * unit's vram_alloc_cb. SW: the display's format as LVGL packs it.
+         * L8 holds luminance, which the swizzle spreads over RGB. */
+        if(region->eve_format == L8) {
+            EVE_CoDl_bitmapLayout(phost, GLFORMAT, region->eve_stride, h);
+            EVE_CoDl_bitmapExtFormat(phost, L8);
+            EVE_CoDl_bitmapSwizzle(phost, region->monochrome ? ZERO : ALPHA,
+                                   region->monochrome ? ZERO : ALPHA,
+                                   region->monochrome ? ZERO : ALPHA, RED);
+        }
+        else {
+            EVE_CoDl_bitmapLayout(phost, (uint8_t)region->eve_format,
+                                  region->eve_stride, h);
+        }
         EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, w, h);
         EVE_CoDl_begin(phost, BITMAPS);
         EVE_CoDl_vertex2f_0(phost, region->area.x1, region->area.y1);
+        if(region->monochrome) {
+            /* I1: black where drawn above, white where the luminance is over
+             * LVGL's threshold */
+            EVE_CoDl_bitmapSwizzle(phost, ONE, ONE, ONE, ALPHA);
+            EVE_CoDl_alphaFunc(phost, GREATER, I1_LUM_THRESHOLD);
+            EVE_CoDl_vertex2f_0(phost, region->area.x1, region->area.y1);
+            EVE_CoDl_alphaFunc(phost, ALWAYS, 0);
+        }
         EVE_CoDl_end(phost);
     }
 
