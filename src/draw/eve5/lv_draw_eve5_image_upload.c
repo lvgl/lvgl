@@ -21,8 +21,27 @@
 #if LV_USE_DRAW_EVE5
 
 /**********************
+ *      TYPEDEFS
+ **********************/
+
+/** Writes the rows of a texture to RAM_G, see row_writer_init */
+typedef struct {
+    EVE_HalContext * hal;
+    uint32_t addr;      /**< RAM_G address of row 0, 4-byte aligned */
+    uint32_t stride;
+    int32_t h;
+    int32_t group;      /**< Rows per write */
+    uint8_t * buf;      /**< group * stride bytes */
+} row_writer_t;
+
+/**********************
  * STATIC PROTOTYPES
  **********************/
+
+static int32_t texture_stride(uint16_t eve_format, int32_t w, uint8_t bpp);
+static bool row_writer_init(row_writer_t * wr, EVE_HalContext * hal, uint32_t addr, uint32_t stride, int32_t h);
+static uint8_t * row_writer_row(row_writer_t * wr, int32_t y);
+static void row_writer_commit(row_writer_t * wr, int32_t y);
 
 static void convert_rgb565a8_to_argb8(const uint8_t * rgb, const uint8_t * alpha,
                                       uint8_t * dst, uint32_t w);
@@ -420,12 +439,86 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
  **********************/
 
 /**
+ * A texture's line stride: its row of pixels, rounded up to the multiple
+ * BITMAP_LAYOUT takes for the format. No wider: a transformed draw samples
+ * whole rows (BITMAP_SIZE only bounds the drawn area), so padding would be
+ * drawn as part of the image, black in an opaque format.
+ */
+static int32_t texture_stride(uint16_t eve_format, int32_t w, uint8_t bpp)
+{
+    int32_t row = (w * bpp + 7) / 8;
+    int32_t unit = 1;
+    if(eve_format == ARGB1555 || eve_format == ARGB4 || eve_format == RGB565) unit = 2;
+#ifdef ARGB8
+    if(eve_format == RGB8) unit = 3;
+    if(eve_format == ARGB8) unit = 4;
+#endif
+#ifdef ARGB6
+    if(eve_format == RGB6 || eve_format == ARGB6) unit = 3;
+    if(eve_format == LA8) unit = 2;
+#endif
+    return (row + unit - 1) / unit * unit;
+}
+
+/**
+ * Start writing rows of `stride` bytes from `addr`, which is 4-byte aligned.
+ * BT820 host writes start 4-byte aligned, and the stride needn't be a
+ * multiple of 4, so rows are staged until they end on a 4-byte boundary:
+ * every row, 2 or 4 rows. The allocation must cover the image's size rounded
+ * up to 4 bytes.
+ */
+static bool row_writer_init(row_writer_t * wr, EVE_HalContext * hal, uint32_t addr, uint32_t stride, int32_t h)
+{
+    wr->hal = hal;
+    wr->addr = addr;
+    wr->stride = stride;
+    wr->h = h;
+    wr->group = (stride & 1) ? 4 : ((stride & 2) ? 2 : 1);
+    wr->buf = lv_malloc(stride * (uint32_t)wr->group);
+    return wr->buf != NULL;
+}
+
+/** The zeroed buffer for row y, to fill before row_writer_commit */
+static uint8_t * row_writer_row(row_writer_t * wr, int32_t y)
+{
+    uint8_t * row = wr->buf + (uint32_t)(y % wr->group) * wr->stride;
+    lv_memzero(row, wr->stride);
+    return row;
+}
+
+/** Row y is filled: write the staged rows once they end on a 4-byte boundary, or with the last row */
+static void row_writer_commit(row_writer_t * wr, int32_t y)
+{
+    int32_t staged = y % wr->group + 1;
+    if(staged < wr->group && y + 1 < wr->h) return;
+
+    /* A partial last group is padded to 4 bytes, within the buffer */
+    uint32_t len = (uint32_t)staged * wr->stride;
+    uint32_t padded = ALIGN_UP(len, 4);
+    if(padded > len) lv_memzero(wr->buf + len, padded - len);
+    EVE_Hal_wrMem(wr->hal, wr->addr + (uint32_t)(y + 1 - staged) * wr->stride, wr->buf, padded);
+}
+
+/**
  * Upload image to GPU. Allocates and attaches vram_res directly on img_dsc.
  * Returns pointer to the attached vram_res, or NULL on failure.
  * If vram_res already exists and is valid, returns it without re-uploading.
  */
 lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                                       LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc)
+{
+    return lv_draw_eve5_upload_image_to_gpu_ex(u, img_dsc, true);
+}
+
+/**
+ * Upload image to GPU, see lv_draw_eve5_upload_image_to_gpu.
+ * @param evictable  true: the allocation may be evicted under pressure, as
+ *                   the pixels can be uploaded again from the CPU copy or
+ *                   reloaded by their producer; false: it's pinned
+ */
+lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u,
+                                                         LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc,
+                                                         bool evictable)
 {
     /* Check vram_res for image already uploaded to GPU */
     lv_eve5_vram_res_t * existing = eve5_get_image_vram_res(img_dsc);
@@ -463,8 +556,9 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
         src_stride = (src_w * src_bpp + 7) / 8;
     }
 
-    int32_t eve_stride = ALIGN_UP((src_w * bpp + 7) / 8, 4);
-    int32_t eve_size = eve_stride * src_h;
+    int32_t eve_stride = texture_stride(eve_format, src_w, bpp);
+    /* Rounded up for the row writer's last write */
+    int32_t eve_size = ALIGN_UP(eve_stride * src_h, 4);
 
     /* EVE PALETTEDARGB8 always uses 256-entry ARGB8888 palette (1024 bytes).
      * On non-RT chips we expand indexed images to ARGB4 inline — the palette
@@ -476,12 +570,12 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     }
 #endif
 
-    /* Allocate RAM_G space. GC-flagged: image sources re-upload on demand
-     * when the handle goes invalid (the existing-vram_res check above frees
-     * the stale descriptor and falls through to a fresh upload). Pre-BT820
+    /* Allocate RAM_G space. GC-flagged when evictable: image sources re-upload
+     * on demand when the handle goes invalid (the existing-vram_res check above
+     * frees the stale descriptor and falls through to a fresh upload). Pre-BT820
      * the sweep reclaims unused images (that allocator also caps live
      * handles at 64); BT820+ evicts them under allocation pressure. */
-    uint32_t alloc_flags = GA_ALIGN_4 | GA_GC_FLAG;
+    uint32_t alloc_flags = GA_ALIGN_4 | (evictable ? GA_GC_FLAG : 0);
     EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, palette_size + eve_size, alloc_flags);
     uint32_t base_addr = EVE_GpuAlloc_Get(u->allocator, handle);
 
@@ -496,33 +590,21 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
         /* Direct copy, native EVE format */
         int32_t row_bytes = (src_w * bpp + 7) / 8;
         if(eve_stride == src_stride) {
-            EVE_Hal_wrMem(u->hal, ram_g_addr, src_buf, eve_size);
-        }
-        else if(eve_stride == row_bytes) {
-            /* Stride matches pixel data width — no padding, upload row by row */
-            for(int32_t y = 0; y < src_h; y++) {
-                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                              src_buf + y * src_stride, row_bytes);
-            }
+            EVE_Hal_wrMem(u->hal, ram_g_addr, src_buf, (uint32_t)(eve_stride * src_h));
         }
         else {
-            /* EVE stride wider than pixel data — zero-pad each row */
-            uint8_t * row_buf = lv_malloc(eve_stride);
-            if(row_buf != NULL) {
-                for(int32_t y = 0; y < src_h; y++) {
-                    lv_memzero(row_buf, eve_stride);
-                    lv_memcpy(row_buf, src_buf + y * src_stride, row_bytes);
-                    EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, row_buf, eve_stride);
-                }
-                lv_free(row_buf);
+            /* Repack the rows to the texture's stride */
+            row_writer_t wr;
+            if(!row_writer_init(&wr, u->hal, ram_g_addr, (uint32_t)eve_stride, src_h)) {
+                LV_LOG_ERROR("EVE5: Failed to allocate row buffer");
+                EVE_GpuAlloc_Free(u->allocator, handle);
+                return NULL;
             }
-            else {
-                /* Fallback: upload pixel data without padding (padding bytes undefined) */
-                for(int32_t y = 0; y < src_h; y++) {
-                    EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                                  src_buf + y * src_stride, row_bytes);
-                }
+            for(int32_t y = 0; y < src_h; y++) {
+                lv_memcpy(row_writer_row(&wr, y), src_buf + y * src_stride, row_bytes);
+                row_writer_commit(&wr, y);
             }
+            lv_free(wr.buf);
         }
     }
     else switch(src_cf) {
@@ -548,8 +630,8 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                             }
                         }
 
-                        uint8_t * tmp_buf = lv_malloc(eve_stride);
-                        if(!tmp_buf) {
+                        row_writer_t wr;
+                        if(!row_writer_init(&wr, u->hal, ram_g_addr, (uint32_t)eve_stride, src_h)) {
                             LV_LOG_ERROR("EVE5: Failed to allocate index expansion buffer");
                             EVE_GpuAlloc_Free(u->allocator, handle);
                             return NULL;
@@ -558,9 +640,9 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                         if(src_cf == LV_COLOR_FORMAT_I8) {
                             int32_t row_bytes = src_w;
                             for(int32_t y = 0; y < src_h; y++) {
-                                lv_memzero(tmp_buf, eve_stride);
+                                uint8_t * tmp_buf = row_writer_row(&wr, y);
                                 lv_memcpy(tmp_buf, index_data + y * src_stride, row_bytes);
-                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                                row_writer_commit(&wr, y);
                             }
                         }
                         else {
@@ -570,17 +652,17 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
 
                             for(int32_t y = 0; y < src_h; y++) {
                                 const uint8_t * src_row = index_data + y * src_stride;
-                                lv_memzero(tmp_buf, eve_stride);
+                                uint8_t * tmp_buf = row_writer_row(&wr, y);
                                 for(int32_t x = 0; x < src_w; x++) {
                                     uint32_t byte_idx = x / pixels_per_byte;
                                     /* MSB-first packing */
                                     uint32_t bit_shift = (pixels_per_byte - 1 - (x % pixels_per_byte)) * src_bpp_val;
                                     tmp_buf[x] = (src_row[byte_idx] >> bit_shift) & index_mask;
                                 }
-                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                                row_writer_commit(&wr, y);
                             }
                         }
-                        lv_free(tmp_buf);
+                        lv_free(wr.buf);
                     }
                     else
 #endif
@@ -599,8 +681,8 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                                           | (g & 0xF0) | (b >> 4));
                         }
 
-                        uint8_t * tmp_buf = lv_malloc(eve_stride);
-                        if(!tmp_buf) {
+                        row_writer_t wr;
+                        if(!row_writer_init(&wr, u->hal, ram_g_addr, (uint32_t)eve_stride, src_h)) {
                             LV_LOG_ERROR("EVE5: Failed to allocate ARGB4 expansion buffer");
                             EVE_GpuAlloc_Free(u->allocator, handle);
                             return NULL;
@@ -608,13 +690,13 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
 
                         if(src_cf == LV_COLOR_FORMAT_I8) {
                             for(int32_t y = 0; y < src_h; y++) {
-                                lv_memzero(tmp_buf, eve_stride);
+                                uint8_t * tmp_buf = row_writer_row(&wr, y);
                                 uint16_t * dst_row = (uint16_t *)tmp_buf;
                                 const uint8_t * src_row = index_data + y * src_stride;
                                 for(int32_t x = 0; x < src_w; x++) {
                                     dst_row[x] = palette_argb4[src_row[x]];
                                 }
-                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                                row_writer_commit(&wr, y);
                             }
                         }
                         else {
@@ -623,7 +705,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                             uint32_t index_mask = (1u << src_bpp_val) - 1u;
 
                             for(int32_t y = 0; y < src_h; y++) {
-                                lv_memzero(tmp_buf, eve_stride);
+                                uint8_t * tmp_buf = row_writer_row(&wr, y);
                                 uint16_t * dst_row = (uint16_t *)tmp_buf;
                                 const uint8_t * src_row = index_data + y * src_stride;
                                 for(int32_t x = 0; x < src_w; x++) {
@@ -632,17 +714,17 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                     uint8_t idx = (src_row[byte_idx] >> bit_shift) & index_mask;
                                     dst_row[x] = palette_argb4[idx];
                                 }
-                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                                row_writer_commit(&wr, y);
                             }
                         }
-                        lv_free(tmp_buf);
+                        lv_free(wr.buf);
                     }
                     break;
                 }
 
             case LV_COLOR_FORMAT_RGB565A8: {
-                    uint8_t * tmp_buf = lv_malloc(eve_stride);
-                    if(!tmp_buf) {
+                    row_writer_t wr;
+                    if(!row_writer_init(&wr, u->hal, ram_g_addr, (uint32_t)eve_stride, src_h)) {
                         LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
                         EVE_GpuAlloc_Free(u->allocator, handle);
                         return NULL;
@@ -653,7 +735,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                     int32_t alpha_stride = src_stride / 2;
 
                     for(int32_t y = 0; y < src_h; y++) {
-                        lv_memzero(tmp_buf, eve_stride);
+                        uint8_t * tmp_buf = row_writer_row(&wr, y);
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
                         if(eve_format == ARGB8) {
                             convert_rgb565a8_to_argb8(src_buf + y * src_stride,
@@ -667,9 +749,9 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                                       alpha_buf + y * alpha_stride,
                                                       tmp_buf, src_w);
                         }
-                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                        row_writer_commit(&wr, y);
                     }
-                    lv_free(tmp_buf);
+                    lv_free(wr.buf);
                     break;
                 }
 
@@ -680,25 +762,25 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
             case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED: {
-                    uint8_t * tmp_buf = lv_malloc(eve_stride);
-                    if(!tmp_buf) {
+                    row_writer_t wr;
+                    if(!row_writer_init(&wr, u->hal, ram_g_addr, (uint32_t)eve_stride, src_h)) {
                         LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
                         EVE_GpuAlloc_Free(u->allocator, handle);
                         return NULL;
                     }
 
                     for(int32_t y = 0; y < src_h; y++) {
-                        lv_memzero(tmp_buf, eve_stride);
+                        uint8_t * tmp_buf = row_writer_row(&wr, y);
                         if(!lv_draw_eve5_convert_row(src_cf, eve_format,
                                                      src_buf + y * src_stride, tmp_buf, src_w)) {
                             LV_LOG_ERROR("EVE5: No row conversion for cf=%d eve_fmt=%d", src_cf, eve_format);
-                            lv_free(tmp_buf);
+                            lv_free(wr.buf);
                             EVE_GpuAlloc_Free(u->allocator, handle);
                             return NULL;
                         }
-                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                        row_writer_commit(&wr, y);
                     }
-                    lv_free(tmp_buf);
+                    lv_free(wr.buf);
                     break;
                 }
 
@@ -729,6 +811,8 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     vr->source_offset = palette_size;
     vr->palette_offset = (palette_size > 0) ? 0 : GA_INVALID;
     vr->has_content = true;
+    vr->is_premultiplied = (img_dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) != 0
+                           || src_cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
     /* LVGL L8 source is luminance-as-RGB; EVE samples L8 as alpha-with-white.
      * Set the flag so the image draw paths apply the swizzle. LVGL A8 stays
      * unflagged — A8 source semantics match EVE L8's default sampling. */

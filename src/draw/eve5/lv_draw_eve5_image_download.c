@@ -22,8 +22,25 @@
 #if LV_USE_DRAW_EVE5
 
 /**********************
+ *      TYPEDEFS
+ **********************/
+
+/** Reads the rows of a bitmap from RAM_G, see row_reader_init */
+typedef struct {
+    EVE_HalContext * hal;
+    uint32_t addr;      /**< RAM_G address of row 0, 4-byte aligned */
+    uint32_t stride;
+    int32_t h;
+    int32_t group;      /**< Rows per read */
+    uint8_t * buf;      /**< group * stride bytes */
+} row_reader_t;
+
+/**********************
  * STATIC PROTOTYPES
  **********************/
+
+static bool row_reader_init(row_reader_t * rd, EVE_HalContext * hal, uint32_t addr, uint32_t stride, int32_t h);
+static uint8_t * row_reader_row(row_reader_t * rd, int32_t y);
 
 static void convert_rgb8_to_xrgb8888(const uint8_t * src, uint8_t * dst, uint32_t w);
 static void convert_argb8_to_rgb565a8(const uint8_t * src, uint8_t * rgb_dst, uint8_t * alpha_dst, uint32_t w);
@@ -35,6 +52,36 @@ static void convert_rgb565_to_swapped(const uint8_t * src, uint8_t * dst, uint32
  **********************/
 
 /** Convert RGB8 (BGR, 3 bpp) to XRGB8888 (BGRX, 4 bpp). Inserts alpha=0xFF. */
+/**
+ * Start reading rows of `stride` bytes from `addr`, which is 4-byte aligned.
+ * BT820 host reads start 4-byte aligned, and a texture's stride needn't be a
+ * multiple of 4, so rows are read in groups that end on a 4-byte boundary:
+ * every row, 2 or 4 rows.
+ */
+static bool row_reader_init(row_reader_t * rd, EVE_HalContext * hal, uint32_t addr, uint32_t stride, int32_t h)
+{
+    rd->hal = hal;
+    rd->addr = addr;
+    rd->stride = stride;
+    rd->h = h;
+    rd->group = (stride & 1) ? 4 : ((stride & 2) ? 2 : 1);
+    rd->buf = lv_malloc(stride * (uint32_t)rd->group);
+    return rd->buf != NULL;
+}
+
+/** Row y, read with its group when it's the group's first row. Rows go in order. */
+static uint8_t * row_reader_row(row_reader_t * rd, int32_t y)
+{
+    int32_t index = y % rd->group;
+    if(index == 0) {
+        int32_t rows = LV_MIN(rd->group, rd->h - y);
+        /* A partial last group reads up to 3 bytes more, within the buffer */
+        uint32_t len = ALIGN_UP((uint32_t)rows * rd->stride, 4);
+        EVE_Hal_rdMem(rd->hal, rd->buf, rd->addr + (uint32_t)y * rd->stride, len);
+    }
+    return rd->buf + (uint32_t)index * rd->stride;
+}
+
 static void convert_rgb8_to_xrgb8888(const uint8_t * src, uint8_t * dst, uint32_t w)
 {
     for(uint32_t x = 0; x < w; x++) {
@@ -184,10 +231,15 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
             EVE_Hal_rdMem(u->hal, buf->data, gpu_addr, lv_stride * h);
         }
         else {
-            for(int32_t y = 0; y < h; y++) {
-                EVE_Hal_rdMem(u->hal, buf->data + y * lv_stride,
-                              gpu_addr + y * eve_stride, row_bytes);
+            row_reader_t rd;
+            if(!row_reader_init(&rd, u->hal, gpu_addr, eve_stride, h)) {
+                LV_LOG_ERROR("EVE5: Failed to allocate download row buffer");
+                return false;
             }
+            for(int32_t y = 0; y < h; y++) {
+                lv_memcpy(buf->data + y * lv_stride, row_reader_row(&rd, y), row_bytes);
+            }
+            lv_free(rd.buf);
         }
         if(unpremultiply) {
             for(int32_t y = 0; y < h; y++) unpremultiply_argb8(buf->data + y * lv_stride, (uint32_t)w);
@@ -196,8 +248,9 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
     }
 
     /* Conversion path: read into temp buffer, convert per row */
-    uint8_t * row_buf = lv_malloc(eve_stride);
-    if(row_buf == NULL) {
+    row_reader_t rd;
+    uint8_t * row_buf;
+    if(!row_reader_init(&rd, u->hal, gpu_addr, eve_stride, h)) {
         LV_LOG_ERROR("EVE5: Failed to allocate download conversion buffer");
         return false;
     }
@@ -205,7 +258,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
     switch(lv_cf) {
         case LV_COLOR_FORMAT_RGB565_SWAPPED:
             for(int32_t y = 0; y < h; y++) {
-                EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w * 2);
+                row_buf = row_reader_row(&rd, y);
                 convert_rgb565_to_swapped(row_buf, buf->data + y * lv_stride, w);
             }
             break;
@@ -215,7 +268,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
             if(eve_fmt == RGB8) {
                 /* BT820: EVE stores RGB8 (3 bpp) → expand to XRGB8888 (4 bpp) */
                 for(int32_t y = 0; y < h; y++) {
-                    EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w * 3);
+                    row_buf = row_reader_row(&rd, y);
                     convert_rgb8_to_xrgb8888(row_buf, buf->data + y * lv_stride, w);
                 }
                 break;
@@ -235,7 +288,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 uint8_t * alpha_plane = buf->data + rgb_stride * h;
 
                 for(int32_t y = 0; y < h; y++) {
-                    EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w * 4);
+                    row_buf = row_reader_row(&rd, y);
                     if(unpremultiply) unpremultiply_argb8(row_buf, (uint32_t)w);
                     convert_argb8_to_rgb565a8(row_buf,
                                               buf->data + y * rgb_stride,
@@ -248,7 +301,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
              * non-ARGB8 sources isn't currently supported — would need a
              * 2-plane conversion writer. */
             LV_LOG_WARN("EVE5: RGB565A8 download from eve_fmt=%d not supported", eve_fmt);
-            lv_free(row_buf);
+            lv_free(rd.buf);
             return false;
 
         case LV_COLOR_FORMAT_I1:
@@ -263,7 +316,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 {
                     LV_LOG_WARN("EVE5: Cannot download %d format to indexed I%d (no quantization)",
                                 eve_fmt, lv_color_format_get_bpp(lv_cf));
-                    lv_free(row_buf);
+                    lv_free(rd.buf);
                     return false;
                 }
                 uint32_t src_palette_entries = LV_COLOR_INDEXED_PALETTE_SIZE(lv_cf);
@@ -285,7 +338,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 uint32_t dst_row_bytes = (w * bpp + 7) / 8;
 
                 for(int32_t y = 0; y < h; y++) {
-                    EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w);
+                    row_buf = row_reader_row(&rd, y);
 
                     uint8_t * dst_row = index_dst + y * lv_stride;
                     lv_memzero(dst_row, dst_row_bytes);
@@ -309,7 +362,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 {
                     LV_LOG_WARN("EVE5: Cannot download %d format to indexed I8 (no quantization)",
                                 eve_fmt);
-                    lv_free(row_buf);
+                    lv_free(rd.buf);
                     return false;
                 }
                 uint32_t palette_bytes = 256 * sizeof(lv_color32_t);
@@ -324,8 +377,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
 
                 uint8_t * index_dst = buf->data + palette_bytes;
                 for(int32_t y = 0; y < h; y++) {
-                    EVE_Hal_rdMem(u->hal, index_dst + y * lv_stride,
-                                  gpu_addr + y * eve_stride, w);
+                    lv_memcpy(index_dst + y * lv_stride, row_reader_row(&rd, y), w);
                 }
                 break;
             }
@@ -333,18 +385,15 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
         default:
 generic_download: {
                 /* Generic mismatch: expand EVE pixels to ARGB8, then pack to LVGL format */
-                int32_t eve_bpp = eve5_format_bpp(eve_fmt);
-                uint32_t eve_row_bytes = (uint32_t)(w * eve_bpp);
-
                 uint8_t * argb_row = lv_malloc(w * 4);
                 if(argb_row == NULL) {
                     LV_LOG_ERROR("EVE5: Failed to allocate ARGB8 conversion buffer");
-                    lv_free(row_buf);
+                    lv_free(rd.buf);
                     return false;
                 }
 
                 for(int32_t y = 0; y < h; y++) {
-                    EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, eve_row_bytes);
+                    row_buf = row_reader_row(&rd, y);
 
                     /* Expand EVE format to ARGB8 (B,G,R,A in memory) */
                     for(int32_t x = 0; x < w; x++) {
@@ -490,7 +539,7 @@ generic_download: {
             }
     }
 
-    lv_free(row_buf);
+    lv_free(rd.buf);
     return true;
 }
 

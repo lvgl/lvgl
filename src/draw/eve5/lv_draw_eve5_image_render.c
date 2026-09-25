@@ -485,8 +485,10 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             lv_draw_eve5_track_alpha_trashed(u, mask_x1, mask_y1, mask_x2, mask_y2);
         }
     }
-    else if(!is_premultiplied && !alpha_only && dsc->recolor_opa > LV_OPA_MIN) {
-        /* Unified recolor: out = src * (1-mix) + recolor * mix */
+    else if(!alpha_only && dsc->recolor_opa > LV_OPA_MIN) {
+        /* Unified recolor: out = src * (1-mix) + recolor * mix.
+         * TODO: draws without the rotation, scale and skew the standard path
+         * below applies. */
         uint8_t mix = dsc->recolor_opa;
 
         int32_t mask_x1 = t->clip_area.x1 - layer->buf_area.x1;
@@ -500,17 +502,21 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         EVE_CoDl_bitmapTransform_identity(phost);
         EVE_CoDl_vertexFormat(phost, 0);
 
-        /* Dim pass: render image with colorRgb(1-mix) for partial recolor */
+        /* Dim pass: render image with colorRgb(1-mix) for partial recolor.
+         * Premultiplied pixels are scaled by opa themselves. */
         if(mix < LV_OPA_COVER) {
             uint8_t dim = 255 - mix;
+            if(is_premultiplied) dim = (uint8_t)((uint32_t)dim * dsc->opa / 255);
             EVE_CoDl_colorRgb(phost, dim, dim, dim);
             EVE_CoDl_colorA(phost, dsc->opa);
-            if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
-                EVE_CoDl_blendFunc(phost, SRC_ALPHA, ONE);
+            bool set_blend = dsc->blend_mode == LV_BLEND_MODE_ADDITIVE || is_premultiplied;
+            if(set_blend)
+                EVE_CoDl_blendFunc(phost, is_premultiplied ? ONE : SRC_ALPHA,
+                                   dsc->blend_mode == LV_BLEND_MODE_ADDITIVE ? ONE : ONE_MINUS_SRC_ALPHA);
             EVE_CoDl_begin(phost, BITMAPS);
             EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
             EVE_CoDl_end(phost);
-            if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
+            if(set_blend)
                 EVE_CoDl_blendFunc_default(phost);
         }
 

@@ -880,6 +880,9 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
 void lv_draw_eve5_release_image_source(eve5_resolved_image_t * resolved);
 lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                                       LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc);
+lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u,
+                                                         LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc,
+                                                         bool evictable);
 lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const void * src);
 
 #if EVE5_HW_IMAGE_DECODE

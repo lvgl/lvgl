@@ -199,21 +199,6 @@ static void eve5_vram_rt_format(lv_draw_eve5_unit_t * u, lv_color_format_t cf, u
 #endif
 }
 
-/* Whether the pixels of color format `cf` can be uploaded into its render
- * target format, as they are or through a row conversion. A8 or L8 can't be
- * held in ARGB8, and RGB565A8 has no row conversion to it, for example: such
- * buffers are uploaded as textures in their own format. */
-static bool eve5_vram_rt_holds(lv_draw_eve5_unit_t * u, lv_color_format_t cf)
-{
-    uint16_t rt_fmt, tex_fmt;
-    uint8_t rt_bpp, tex_bpp;
-    bool needs_conv = false;
-    eve5_vram_rt_format(u, cf, &rt_fmt, &rt_bpp);
-    if(!lv_draw_eve5_get_eve_format_info(u->hal, cf, &tex_fmt, &tex_bpp, &needs_conv)) return false;
-    if(tex_fmt != rt_fmt) return false;
-    return !needs_conv || lv_draw_eve5_convert_row(cf, rt_fmt, NULL, NULL, 0);
-}
-
 static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 {
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
@@ -230,8 +215,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     uint32_t aligned_h = ALIGN_UP(h, 16);
     uint32_t size = eve5_rt_surface_size(eve_fmt, aligned_w * bpp, aligned_h);
 
-    /* Reloadable content (decoder-cache-backed images uploaded through the
-     * MODIFIABLE residency branch) is GC-flagged: evictable under allocation
+    /* Reloadable content is GC-flagged: evictable under allocation
      * pressure. The cache lookup validates the handle and re-decodes dropped
      * entries. Unique content (canvas buffers, layer render targets) stays
      * unflagged and pinned. */
@@ -326,123 +310,24 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
         return eve5_vram_alloc_cb(draw_unit, buf);
     }
 
-    /* MODIFIABLE + ALLOCATED: render-target-capable buffer with pixel data.
-     * Indexed formats need proper palette conversion, and pixels the render
-     * target format can't hold go in their own format, so both route through
-     * the read-only path. */
+    /* Pixel data uploads as a texture, in the layout an image needs: rows
+     * only as wide as the pixels (rounded up to 4 bytes), as a transformed
+     * draw samples the whole row. Images are never render targets. A canvas or layer that is drawn into
+     * gets a render target in init_layer, which renders into a fresh buffer
+     * with the old content as its base anyway.
+     * A buffer LVGL allocated loses its CPU copy after the upload
+     * (lv_draw_buf_ensure_resident), so unless its producer can reload it,
+     * the texture is the only copy and is pinned. */
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
-    if((buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE)
-       && !LV_COLOR_FORMAT_IS_INDEXED(buf->header.cf)
-       && eve5_vram_rt_holds(u, (lv_color_format_t)buf->header.cf)) {
-        if(!eve5_vram_alloc_cb(draw_unit, buf)) return false;
-
-        lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
-
-#if LV_USE_OS
-        lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
-#endif
-
-        uint32_t gpu_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle);
-        if(gpu_addr == GA_INVALID) {
-#if LV_USE_OS
-            lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
-#endif
-            return false;
-        }
-
-        uint32_t cpu_stride = buf->header.stride;
-        if(cpu_stride == 0) cpu_stride = lv_draw_buf_width_to_stride(buf->header.w, buf->header.cf);
-        uint32_t gpu_stride = vr->stride;
-        uint8_t * src = buf->data;
-
-        if(src != NULL) {
-            /* Determine whether the LVGL CPU bytes can land on the GPU as-is or
-             * need per-pixel format conversion (e.g., ARGB8888 → ARGB4 on
-             * pre-BT820, where ARGB8 doesn't exist). */
-            uint16_t expected_eve_fmt;
-            uint8_t expected_bpp;
-            bool needs_conv = false;
-            (void)lv_draw_eve5_get_eve_format_info(u->hal, buf->header.cf,
-                                                   &expected_eve_fmt, &expected_bpp, &needs_conv);
-
-            if(needs_conv && expected_eve_fmt == vr->eve_format) {
-                /* Convert each row through the unified per-pixel converter. */
-                uint8_t * row_buf = lv_malloc(gpu_stride);
-                if(row_buf == NULL) {
-                    LV_LOG_ERROR("EVE5: Failed to allocate row buffer for upload conversion");
-#if LV_USE_OS
-                    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
-#endif
-                    return false;
-                }
-                bool ok = true;
-                for(int32_t y = 0; y < buf->header.h; y++) {
-                    lv_memzero(row_buf, gpu_stride);
-                    if(!lv_draw_eve5_convert_row(buf->header.cf, vr->eve_format,
-                                                 src + y * cpu_stride, row_buf, buf->header.w)) {
-                        LV_LOG_ERROR("EVE5: No row conversion for cf=%d eve_fmt=%d",
-                                     buf->header.cf, vr->eve_format);
-                        ok = false;
-                        break;
-                    }
-                    EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, row_buf, gpu_stride);
-                }
-                lv_free(row_buf);
-                if(!ok) {
-#if LV_USE_OS
-                    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
-#endif
-                    return false;
-                }
-            }
-            else {
-                /* Direct byte-for-byte upload (CPU and GPU layouts match). */
-                uint32_t row_bytes = LV_MIN(cpu_stride, gpu_stride);
-                if(gpu_stride == row_bytes) {
-                    for(int32_t y = 0; y < buf->header.h; y++) {
-                        EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, src + y * cpu_stride, row_bytes);
-                    }
-                }
-                else {
-                    /* GPU stride wider than source — zero-pad each row */
-                    uint8_t * row_buf = lv_malloc(gpu_stride);
-                    if(row_buf != NULL) {
-                        for(int32_t y = 0; y < buf->header.h; y++) {
-                            lv_memzero(row_buf, gpu_stride);
-                            lv_memcpy(row_buf, src + y * cpu_stride, row_bytes);
-                            EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, row_buf, gpu_stride);
-                        }
-                        lv_free(row_buf);
-                    }
-                    else {
-                        for(int32_t y = 0; y < buf->header.h; y++) {
-                            EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, src + y * cpu_stride, row_bytes);
-                        }
-                    }
-                }
-            }
-            vr->is_premultiplied = lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED)
-                                   || buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
-            vr->sample_as_luminance = (buf->header.cf == LV_COLOR_FORMAT_L8);
-            vr->has_content = true;
-            EVE_Hal_requestFenceBeforeSwap(u->hal);
-        }
-
-#if LV_USE_OS
-        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
-#endif
-        return true;
-    }
-
-    /* Read-only image data: upload with image alignment.
-     * upload_image_to_gpu checks existing vram_res, uploads if needed,
-     * and attaches vram_res directly to the image descriptor. */
+    bool evictable = !(buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED)
+                     || (buf->header.flags & LV_IMAGE_FLAGS_RELOADABLE);
 
 #if LV_USE_OS
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu(u, (LV_IMAGE_DSC_CONST lv_image_dsc_t *)buf);
+    lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu_ex(u, (LV_IMAGE_DSC_CONST lv_image_dsc_t *)buf,
+                                                                   evictable);
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
@@ -676,14 +561,20 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
          * Height overflow: existing stride × current aligned_h exceeds allocation.
          *   This catches the case where a reused buffer is wider (larger stride)
          *   but the current layer is taller — stride × height would overrun.
+         * Not render target aligned: a texture (pixel data uploads as one,
+         *   4-byte aligned, see eve5_vram_upload_cb), or an image a canvas
+         *   took over. CMD_RENDERTARGET needs a 128-byte aligned address.
          * Content that doesn't fit, such as a canvas buffer uploaded as a texture
          * or kept in another format, stays as the source of the incremental
          * render below, which converts it. Only the new buffer is ever a
          * render target. */
         uint32_t needed_stride = (uint32_t)aligned_w * target_bpp;
+        uint32_t current_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle);
         bool realloc_needed = (vr->eve_format != target_eve_fmt)
                               || (vr->stride < needed_stride)
-                              || (eve5_rt_surface_size(vr->eve_format, vr->stride, (uint32_t)aligned_h) > vr->base.size);
+                              || (eve5_rt_surface_size(vr->eve_format, vr->stride, (uint32_t)aligned_h) > vr->base.size)
+                              || (current_addr != GA_INVALID
+                                  && (vr->source_offset != 0 || (current_addr & 0x7F) != 0));
         bool discard = layer->draw_buf != NULL
                        && lv_draw_buf_has_flag(layer->draw_buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
         bool keep = realloc_needed && vr->has_content && !discard
