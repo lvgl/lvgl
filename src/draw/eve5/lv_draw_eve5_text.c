@@ -638,8 +638,11 @@ static void emit_transformed_glyph(lv_draw_eve5_unit_t * u, int32_t rotation, in
     xform.bmp_w = LV_MIN(bounds_w, 2048);
     xform.bmp_h = LV_MIN(bounds_h, 2048);
 
+    /* Filtered, as the software renderer draws a transformed glyph as an
+     * antialiased image. Nearest sampling would move it by up to half a
+     * texel wherever the texels don't land on pixels. */
     EVE_CoDl_saveContext(u->hal);
-    apply_image_skew(u->hal, &xform, NEAREST, 0, 0);
+    apply_image_skew(u->hal, &xform, BILINEAR, 0, 0);
     EVE_CoDl_vertex2f_0(u->hal, draw_vx, draw_vy);
     EVE_CoDl_restoreContext(u->hal);
 }

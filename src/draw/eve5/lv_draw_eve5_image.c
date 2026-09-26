@@ -202,6 +202,18 @@ void build_colorkey_stencil(EVE_HalContext *phost,
  * transformed bounding box needed for BITMAP_SIZE.
  * Returns false if the transform matrix is degenerate.
  */
+#if LV_DRAW_EVE5_NO_FLOAT
+/* Sine and cosine (Q15) of an angle in tenths of a degree, interpolated
+ * between whole degrees as the software renderer's transform does */
+static void trigo_tenths(int32_t angle, int32_t * sin_q15, int32_t * cos_q15)
+{
+    int32_t low = angle / 10;
+    int32_t rem = angle - low * 10;
+    *sin_q15 = (lv_trigo_sin((int16_t)low) * (10 - rem) + lv_trigo_sin((int16_t)(low + 1)) * rem) / 10;
+    *cos_q15 = (lv_trigo_sin((int16_t)(low + 90)) * (10 - rem) + lv_trigo_sin((int16_t)(low + 91)) * rem) / 10;
+}
+#endif
+
 bool compute_image_skew(image_skew_t * out,
                         int32_t rotation, int32_t scale_x, int32_t scale_y,
                         int32_t skew_x, int32_t skew_y,
@@ -211,30 +223,32 @@ bool compute_image_skew(image_skew_t * out,
                         int32_t draw_vx, int32_t draw_vy)
 {
 #if LV_DRAW_EVE5_NO_FLOAT
-    /* Integer-only path using lv_trigo_sin/cos (1-degree resolution)
-     * and 16.16 fixed-point matrix math. */
+    /* Integer-only path using lv_trigo_sin, to a tenth of a degree as the
+     * software renderer, and 16.16 fixed-point matrix math. */
 
-    int16_t rot_deg = (int16_t)((rotation + 5) / 10);
-    int16_t skx_deg = (int16_t)((skew_x + 5) / 10);
-    int16_t sky_deg = (int16_t)((skew_y + 5) / 10);
-
-    /* lv_trigo_sin/cos return Q15, shift left 1 for 16.16 */
-    int32_t cos_r = lv_trigo_cos(rot_deg) * 2;
-    int32_t sin_r = lv_trigo_sin(rot_deg) * 2;
+    /* Q15, shift left 1 for 16.16 */
+    int32_t cos_r, sin_r;
+    trigo_tenths(rotation, &sin_r, &cos_r);
+    cos_r *= 2;
+    sin_r *= 2;
 
     /* tan(skew) = sin/cos in 16.16, clamp when |cos| < 5% */
     int32_t tan_skx, tan_sky;
     {
-        int32_t cos_skx = lv_trigo_cos(skx_deg) * 2;
-        int32_t sin_skx = lv_trigo_sin(skx_deg) * 2;
+        int32_t cos_skx, sin_skx;
+        trigo_tenths(skew_x, &sin_skx, &cos_skx);
+        cos_skx *= 2;
+        sin_skx *= 2;
         if(LV_ABS(cos_skx) < 3277)
             tan_skx = (cos_skx >= 0) ? 0x7FFFFFFF : (int32_t)0x80000001;
         else
             tan_skx = (int32_t)(((int64_t)sin_skx * 65536) / cos_skx);
     }
     {
-        int32_t cos_sky = lv_trigo_cos(sky_deg) * 2;
-        int32_t sin_sky = lv_trigo_sin(sky_deg) * 2;
+        int32_t cos_sky, sin_sky;
+        trigo_tenths(skew_y, &sin_sky, &cos_sky);
+        cos_sky *= 2;
+        sin_sky *= 2;
         if(LV_ABS(cos_sky) < 3277)
             tan_sky = (cos_sky >= 0) ? 0x7FFFFFFF : (int32_t)0x80000001;
         else
