@@ -1148,6 +1148,7 @@ bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t * t);
 bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t * t);
 bool lv_draw_eve5_arc_needs_alpha_rendertarget(const lv_draw_task_t * t);
 bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t * t);
+bool lv_draw_eve5_box_shadow_needs_alpha_rendertarget(const lv_draw_task_t * t);
 
 /**********************
  * SPECIAL CASES

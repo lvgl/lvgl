@@ -571,6 +571,9 @@ void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t * u, lv_layer_t * lay
             case LV_DRAW_TASK_TYPE_LAYER:
                 needs_rt = lv_draw_eve5_image_needs_alpha_rendertarget(t);
                 break;
+            case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+                needs_rt = lv_draw_eve5_box_shadow_needs_alpha_rendertarget(t);
+                break;
             default:
                 break;
         }

@@ -48,8 +48,8 @@
 #define DL_IMAGE                167 /* Plus DL_IMAGE_STAMP per tile stamp */
 #define DL_IMAGE_ALPHA          97
 #define DL_IMAGE_STAMP          2
-#define DL_BOX_SHADOW           129
-#define DL_BOX_SHADOW_ALPHA     129
+#define DL_BOX_SHADOW           151
+#define DL_BOX_SHADOW_ALPHA     151
 #define DL_MASK_RECT            31
 #define DL_LETTER               72  /* 16 around the glyph callback (56, a placeholder box); CMD_TEXT path 32 */
 #define DL_SW_TASK              22

@@ -325,7 +325,9 @@ void lv_draw_eve5_box_shadow_init(lv_draw_eve5_unit_t * u)
  * smaller so the shadow reaches under its antialiased edge as in the software
  * renderer, in the stencil over the shadow's area and leaves the stencil test
  * drawing where it is clear. The caller restores the stencil state with its
- * saved context.
+ * saved context. The stencil has no antialiasing: only the direct-to-alpha
+ * pass uses this, where the alpha channel it writes can't be a mask as well
+ * (see draw_shadow_outside_widget).
  */
 static void exclude_widget_area(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                                 const lv_draw_box_shadow_dsc_t * dsc)
@@ -389,7 +391,14 @@ static bool shadow_slices(const lv_draw_task_t * t, const lv_draw_box_shadow_dsc
     sl->cy2 = core_area.y2 - layer_area->y1;
     sl->radius = r_sh;
     sl->core_only = dsc->width < SHADOW_MIN_BLURRED;
-    if(sl->core_only) return true;
+    if(sl->core_only) {
+        /* The shadow is the core */
+        sl->sx1 = sl->cx1;
+        sl->sy1 = sl->cy1;
+        sl->sx2 = sl->cx2;
+        sl->sy2 = sl->cy2;
+        return true;
+    }
 
     /* The software renderer's blurs, of width / 2 and one more for an odd
      * width: the even ones move the shadow in */
@@ -510,6 +519,60 @@ static void draw_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, const
     }
 }
 
+/**
+ * A shadow drawn only outside its widget, as LVGL's software renderer draws
+ * it: the shadow's coverage times the inverse of the widget's antialiased
+ * rounded rectangle, one pixel smaller than the widget
+ * (lv_draw_sw_mask_radius_init, inverted). The mask is made in the alpha
+ * channel over the shadow's area, which it trashes: cleared, the shadow's
+ * coverage at its opacity written where it's drawn (nothing elsewhere, as past
+ * the rounded corners of a core-only shadow), times the inverse of the widget.
+ * The color is drawn through it: in the RGB pass, the shadow's color; in the
+ * L8 alpha pass, white. Call inside a saved context, with the vertex format
+ * set.
+ */
+static void draw_shadow_outside_widget(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, const shadow_slices_t * sl,
+                                       uint32_t corner_addr, uint32_t edge_addr, lv_color_t color)
+{
+    EVE_HalContext * phost = u->hal;
+    const lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_area_t bg = t->area;
+    lv_area_increase(&bg, -1, -1);
+    int32_t lx = layer->buf_area.x1;
+    int32_t ly = layer->buf_area.y1;
+
+    int32_t r_bg = dsc->radius;
+    int32_t short_side = LV_MIN(lv_area_get_width(&bg), lv_area_get_height(&bg));
+    if(r_bg > short_side / 2) r_bg = short_side / 2;
+
+    /* Cleared. A rectangle without radius clips with the scissor, which it
+     * leaves set. */
+    EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+    EVE_CoDl_blendFunc(phost, ZERO, ZERO);
+    lv_draw_eve5_draw_rect(u, sl->sx1, sl->sy1, sl->sx2, sl->sy2, 0, &t->clip_area, &layer->buf_area);
+    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+
+    /* The shadow at its opacity */
+    EVE_CoDl_colorA(phost, dsc->opa);
+    EVE_CoDl_blendFunc(phost, ONE, ZERO);
+    draw_shadow(u, t, sl, corner_addr, edge_addr);
+    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+
+    /* Times the inverse of the widget */
+    EVE_CoDl_colorA(phost, 255);
+    EVE_CoDl_blendFunc(phost, ZERO, ONE_MINUS_SRC_ALPHA);
+    lv_draw_eve5_draw_rect(u, bg.x1 - lx, bg.y1 - ly, bg.x2 - lx, bg.y2 - ly, r_bg, &t->clip_area, &layer->buf_area);
+    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+
+    /* The color through the mask */
+    EVE_CoDl_colorMask(phost, 1, 1, 1, 0);
+    EVE_CoDl_colorRgb(phost, color.red, color.green, color.blue);
+    EVE_CoDl_colorA(phost, 255);
+    EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
+    lv_draw_eve5_draw_rect(u, sl->sx1, sl->sy1, sl->sx2, sl->sy2, 0, &t->clip_area, &layer->buf_area);
+}
+
 /* Textures of a shadow's slices, made when missing */
 static bool shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx, uint32_t * corner_addr, uint32_t * edge_addr)
 {
@@ -543,14 +606,28 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_tas
 
     EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
-    if(!dsc->bg_cover) exclude_widget_area(u, t, dsc);
     lv_draw_eve5_set_scissor(u, &t->clip_area, &t->target_layer->buf_area);
 
-    EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
-    EVE_CoDl_colorA(phost, dsc->opa);
-    draw_shadow(u, t, &sl, corner_addr, edge_addr);
+    if(dsc->bg_cover) {
+        EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
+        EVE_CoDl_colorA(phost, dsc->opa);
+        draw_shadow(u, t, &sl, corner_addr, edge_addr);
+    }
+    else {
+        draw_shadow_outside_widget(u, t, &sl, corner_addr, edge_addr, dsc->color);
+        lv_draw_eve5_track_alpha_trashed(u, sl.sx1, sl.sy1, sl.sx2, sl.sy2);
+    }
 
     EVE_CoDl_restoreContext(phost);
+}
+
+/* The widget's area is kept out of the shadow by an antialiased mask in the
+ * alpha channel, which the direct-to-alpha pass can't use: it writes the
+ * alpha itself. The L8 render-target pass can. */
+bool lv_draw_eve5_box_shadow_needs_alpha_rendertarget(const lv_draw_task_t * t)
+{
+    const lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
+    return !dsc->bg_cover && dsc->opa > LV_OPA_MIN && dsc->width > 0;
 }
 
 /**********************
@@ -579,12 +656,19 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_t
 
     EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
-    if(!dsc->bg_cover) exclude_widget_area(u, t, dsc);
-    lv_draw_eve5_set_scissor(u, &t->clip_area, &t->target_layer->buf_area);
+    if(!dsc->bg_cover && alpha_to_rgb) {
+        /* The alpha channel of the L8 render target is free as the mask */
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &t->target_layer->buf_area);
+        draw_shadow_outside_widget(u, t, &sl, corner_addr, edge_addr, lv_color_white());
+    }
+    else {
+        if(!dsc->bg_cover) exclude_widget_area(u, t, dsc);
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &t->target_layer->buf_area);
 
-    if(alpha_to_rgb) EVE_CoDl_colorRgb(phost, 255, 255, 255);
-    EVE_CoDl_colorA(phost, dsc->opa);
-    draw_shadow(u, t, &sl, corner_addr, edge_addr);
+        if(alpha_to_rgb) EVE_CoDl_colorRgb(phost, 255, 255, 255);
+        EVE_CoDl_colorA(phost, dsc->opa);
+        draw_shadow(u, t, &sl, corner_addr, edge_addr);
+    }
 
     EVE_CoDl_restoreContext(phost);
 }
