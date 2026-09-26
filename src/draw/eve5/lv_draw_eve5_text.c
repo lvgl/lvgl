@@ -71,10 +71,11 @@ static bool upload_whole_font(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc
                               lv_draw_eve5_font_vram_t * fv);
 static bool upload_single_glyph(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc_t * font_dsc,
                                 lv_draw_eve5_font_vram_t * fv, uint32_t gid);
+typedef struct glyph_alpha_t glyph_alpha_t;
 static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_draw_glyph_dsc_t * glyph_dsc,
                               const lv_draw_letter_dsc_t * letter_dsc,
                               uint16_t g_w, uint16_t g_h,
-                              int32_t x, int32_t y);
+                              int32_t x, int32_t y, const glyph_alpha_t * alpha);
 static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
                           lv_draw_fill_dsc_t * fill_dsc, const lv_area_t * fill_area);
 static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
@@ -613,15 +614,33 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
  * GLYPH TRANSFORM + DRAW
  **********************/
 
+/* An alpha-only glyph (L1, L2, L4 or L8, sampled as white with its alpha)
+ * and how to draw it. Filtered, it is drawn premultiplied: outside the bitmap,
+ * BORDER samples (0, 0, 0, 0), so the white is pulled toward black wherever the
+ * ink meets the bitmap's edge, which a glyph's ink does on every side, and the
+ * SRC_ALPHA blend then darkens those edges a second time. Swizzled to its
+ * alpha in every channel, the sample is the premultiplied white, which BORDER
+ * leaves correct, drawn with the color scaled by opa and blend(ONE,
+ * ONE_MINUS_SRC_ALPHA), or (ONE, ONE) for an additive letter. */
+struct glyph_alpha_t {
+    uint8_t format;     /**< L1, L2, L4 or L8 */
+    uint16_t stride;
+    lv_color_t color;   /**< White in the alpha passes: the direct one only writes alpha */
+    uint8_t opa;
+    bool additive;
+};
+
 /**
  * Emit a glyph vertex with optional affine transform.
  */
 /* Draw a glyph at (x, y) transformed around its pivot. The bitmap covers the
- * transformed glyph's bounds, wherever in the clip area they are. */
+ * transformed glyph's bounds, wherever in the clip area they are. The layout
+ * of an alpha-only glyph is set here, the caller sets that of an image. */
 static void emit_transformed_glyph(lv_draw_eve5_unit_t * u, int32_t rotation, int32_t scale_x, int32_t scale_y,
                                    int32_t skew_x, int32_t skew_y, int32_t pivot_x, int32_t pivot_y,
-                                   uint16_t g_w, uint16_t g_h, int32_t x, int32_t y)
+                                   uint16_t g_w, uint16_t g_h, int32_t x, int32_t y, const glyph_alpha_t * alpha)
 {
+    EVE_HalContext * phost = u->hal;
     image_skew_t xform;
     if(!compute_image_skew(&xform, rotation, scale_x, scale_y, skew_x, skew_y, pivot_x, pivot_y,
                            g_w, g_h, x, y, x, y))
@@ -641,16 +660,36 @@ static void emit_transformed_glyph(lv_draw_eve5_unit_t * u, int32_t rotation, in
     /* Filtered, as the software renderer draws a transformed glyph as an
      * antialiased image. Nearest sampling would move it by up to half a
      * texel wherever the texels don't land on pixels. */
-    EVE_CoDl_saveContext(u->hal);
-    apply_image_skew(u->hal, &xform, BILINEAR, 0, 0);
-    EVE_CoDl_vertex2f_0(u->hal, draw_vx, draw_vy);
-    EVE_CoDl_restoreContext(u->hal);
+    EVE_CoDl_saveContext(phost);
+    if(alpha != NULL) {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        if(EVE_CHIPID >= EVE_BT815) {
+            EVE_CoDl_bitmapLayout(phost, GLFORMAT, alpha->stride, g_h);
+            EVE_CoDl_bitmapExtFormat(phost, alpha->format);
+            EVE_CoDl_bitmapSwizzle(phost, ALPHA, ALPHA, ALPHA, ALPHA);
+            EVE_CoDl_colorRgb(phost, (uint8_t)(alpha->color.red * alpha->opa / 255),
+                              (uint8_t)(alpha->color.green * alpha->opa / 255),
+                              (uint8_t)(alpha->color.blue * alpha->opa / 255));
+            EVE_CoDl_blendFunc(phost, ONE, alpha->additive ? ONE : ONE_MINUS_SRC_ALPHA);
+        }
+        else
+#endif
+        {
+            EVE_CoDl_bitmapLayout(phost, alpha->format, alpha->stride, g_h);
+        }
+    }
+    apply_image_skew(phost, &xform, BILINEAR, 0, 0);
+    EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
+    EVE_CoDl_restoreContext(phost);
 }
 
+/* Draw a glyph at (x, y), transformed with the letter or label. @p alpha
+ * describes an alpha-only glyph, NULL for an image glyph whose layout the
+ * caller has set. */
 static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_draw_glyph_dsc_t * glyph_dsc,
                               const lv_draw_letter_dsc_t * letter_dsc,
                               uint16_t g_w, uint16_t g_h,
-                              int32_t x, int32_t y)
+                              int32_t x, int32_t y, const glyph_alpha_t * alpha)
 {
     bool has_letter_transform = (letter_dsc != NULL)
                                 && (letter_dsc->rotation != 0
@@ -668,13 +707,15 @@ static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_draw_glyph_dsc_t * gly
 
     if(has_letter_transform) {
         emit_transformed_glyph(u, letter_dsc->rotation, letter_dsc->scale_x, letter_dsc->scale_y,
-                               letter_dsc->skew_x, letter_dsc->skew_y, pivot_x, pivot_y, g_w, g_h, x, y);
+                               letter_dsc->skew_x, letter_dsc->skew_y, pivot_x, pivot_y, g_w, g_h, x, y, alpha);
     }
     else if(has_label_rotation) {
         emit_transformed_glyph(u, glyph_dsc->rotation, LV_SCALE_NONE, LV_SCALE_NONE, 0, 0,
-                               pivot_x, pivot_y, g_w, g_h, x, y);
+                               pivot_x, pivot_y, g_w, g_h, x, y, alpha);
     }
     else {
+        /* Nearest, at the texel centers: the bitmap's border never mixes in */
+        if(alpha != NULL) EVE_CoDl_bitmapLayout(u->hal, alpha->format, alpha->stride, g_h);
         EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, g_w, g_h);
         EVE_CoDl_vertex2f_0(u->hal, x, y);
     }
@@ -952,7 +993,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
         /* Rotated, scaled or skewed with the letter */
         EVE_CoDl_begin(u->hal, BITMAPS);
-        emit_glyph_vertex(u, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
+        emit_glyph_vertex(u, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y, NULL);
 
         if(premultiplied) {
             if(additive) EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE);
@@ -1004,9 +1045,13 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
     EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
 
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
-    EVE_CoDl_bitmapLayout(u->hal, (uint8_t)eve_format, g_stride, g_h);
 
-    emit_glyph_vertex(u, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
+    /* A letter may be drawn additively, inside its blend */
+    glyph_alpha_t alpha = {
+        .format = (uint8_t)eve_format, .stride = g_stride, .color = glyph_dsc->color, .opa = glyph_dsc->opa,
+        .additive = s_current_letter_dsc != NULL && s_current_letter_dsc->blend_mode == LV_BLEND_MODE_ADDITIVE,
+    };
+    emit_glyph_vertex(u, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y, &alpha);
 }
 
 static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
@@ -1070,7 +1115,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         EVE_CoDl_bitmapTransform_identity(u->hal);
 
         EVE_CoDl_begin(u->hal, BITMAPS);
-        emit_glyph_vertex(u, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y);
+        emit_glyph_vertex(u, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y, NULL);
         return;
     }
 
@@ -1115,9 +1160,13 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
     EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
 
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
-    EVE_CoDl_bitmapLayout(u->hal, (uint8_t)eve_format, g_stride, g_h);
 
-    emit_glyph_vertex(u, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y);
+    /* White: the coverage for the L8 alpha pass, masked in the direct one */
+    glyph_alpha_t alpha = {
+        .format = (uint8_t)eve_format, .stride = g_stride, .color = lv_color_white(), .opa = glyph_dsc->opa,
+        .additive = false,
+    };
+    emit_glyph_vertex(u, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y, &alpha);
 }
 
 /**********************
@@ -1128,7 +1177,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
  * alpha_glyph_cb and the alpha label functions stay within these. */
 #define DL_LABEL            12  /* lv_draw_eve5_hal_draw_label */
 #define DL_GLYPH            10  /* Bitmap glyph (draw_glyph_cb) */
-#define DL_GLYPH_XFORM      18  /* Rotated bitmap glyph */
+#define DL_GLYPH_XFORM      22  /* Rotated bitmap glyph */
 #define DL_GLYPH_IMAGE      43  /* Image glyph, only from fonts other than plain fmt_txt */
 #define DL_GLYPH_DECOR      13  /* Underline, strikethrough or selection fill */
 #define DL_GLYPH_PLACEHOLDER 43 /* Box of a glyph the fonts don't have (draw_glyph_placeholder) */

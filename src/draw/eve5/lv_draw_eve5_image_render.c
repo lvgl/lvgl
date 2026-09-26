@@ -42,10 +42,21 @@ static lv_color_t image_tint(const lv_draw_image_dsc_t * dsc, bool alpha_only)
 
 /* Bitmap layout of an image source. An alpha layer, such as the A8 layer of
  * a drop shadow, is rendered in a color format: it samples as white with its
- * alpha, as an L8 image does. */
+ * alpha, as an L8 image does. An alpha-only source drawn premultiplied
+ * (alpha_premultiplied) samples its alpha in every channel. */
 static void set_image_layout(EVE_HalContext * phost, uint16_t eve_format, int32_t stride, int32_t height,
-                             bool sample_as_luminance, bool alpha_layer)
+                             bool sample_as_luminance, bool alpha_layer, bool alpha_premultiplied)
 {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+    if(alpha_premultiplied) {
+        EVE_CoDl_bitmapLayout(phost, GLFORMAT, stride, height);
+        EVE_CoDl_bitmapExtFormat(phost, eve_format);
+        EVE_CoDl_bitmapSwizzle(phost, ALPHA, ALPHA, ALPHA, ALPHA);
+        return;
+    }
+#else
+    LV_UNUSED(alpha_premultiplied);
+#endif
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     if(alpha_layer) {
         EVE_CoDl_bitmapLayout(phost, GLFORMAT, stride, height);
@@ -241,12 +252,33 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
+    bool has_any_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
+                              || dsc->scale_y != LV_SCALE_NONE
+                              || dsc->skew_x != 0 || dsc->skew_y != 0);
+    /* Masked: drawn through a mask in the alpha channel, which holds the
+     * image's alpha (clip radius, bitmap mask, colorkey with recolor, and the
+     * L8 alpha pass) */
+    bool masked = eve5_image_clip_radius(dsc) > 0 || has_bitmap_mask || alpha_to_rgb
+                  || (dsc->colorkey != NULL && dsc->recolor_opa > LV_OPA_MIN);
+
+    /* An alpha-only image filtered by a transform is drawn premultiplied, its
+     * alpha sampled in every channel: it samples as white with its alpha, and
+     * outside the bitmap BORDER gives (0, 0, 0, 0), which pulls the white
+     * toward black at the edges, darkened again by the SRC_ALPHA blend.
+     * Premultiplied, BORDER's zero is right. Through a mask, the image's alpha
+     * is in the mask and its color is drawn flat instead. */
+    bool alpha_premultiplied = false;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+    alpha_premultiplied = alpha_only && has_any_transform && dsc->antialias && !masked && dsc->colorkey == NULL
+                          && EVE_CHIPID >= EVE_BT815;
+#endif
+
     /* Premultiplied content (RGB already scaled by alpha) uses blend(ONE,
      * ONE_MINUS_SRC_ALPHA) to avoid double-applying alpha. Vertex color is
      * scaled by opa for attenuation. The flag comes from the resolved VRAM
      * resource: for a file or decoded source that is the decoded image, not
      * the source descriptor. Only the alpha of an alpha layer is drawn. */
-    bool is_premultiplied = src_premultiplied && !alpha_layer;
+    bool is_premultiplied = (src_premultiplied && !alpha_layer) || alpha_premultiplied;
 
     lv_color_t tint = image_tint(dsc, alpha_only);
     if(is_premultiplied) {
@@ -266,12 +298,9 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
     set_palette_if_needed(u->hal, eve_format, palette_addr);
-    set_image_layout(u->hal, eve_format, eve_stride, layout_h, sample_as_luminance, alpha_layer);
+    set_image_layout(u->hal, eve_format, eve_stride, layout_h, sample_as_luminance, alpha_layer, alpha_premultiplied);
     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
     bool tile_stamps = dsc->tile && eve5_image_tile_needs_stamps(src_w, src_h);
-    bool has_any_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
-                              || dsc->scale_y != LV_SCALE_NONE
-                              || dsc->skew_x != 0 || dsc->skew_y != 0);
     /* dsc->image_area is the first-tile origin (src-sized); t->area is the full
      * fill region. Extent runs from image_area corner to t->area's far edge. */
     int32_t tile_extent_w = dsc->tile ? (t->area.x2 - dsc->image_area.x1 + 1) : 0;
@@ -294,8 +323,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
      * Phase 1b2: apply bitmap mask (if bitmap_mask_src)
      * Phase 1c: multiply mask by image alpha
      * Phase 2: draw image through mask */
-    if(eve5_image_clip_radius(dsc) > 0 || has_bitmap_mask || alpha_to_rgb
-       || (dsc->colorkey != NULL && dsc->recolor_opa > LV_OPA_MIN)) {
+    if(masked) {
         int32_t mask_x1 = dsc->image_area.x1 - layer->buf_area.x1;
         int32_t mask_y1 = dsc->image_area.y1 - layer->buf_area.y1;
         int32_t mask_x2 = dsc->image_area.x2 - layer->buf_area.x1;
@@ -372,7 +400,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
             EVE_CoDl_bitmapSource(phost, ram_g_addr);
             set_palette_if_needed(phost, eve_format, palette_addr);
-            set_image_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance, alpha_layer);
+            set_image_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance, alpha_layer, false);
             if(dsc->tile && !tile_stamps) {
                 EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT,
                                     LV_MIN(tile_extent_w, 2048), LV_MIN(tile_extent_h, 2048));
@@ -485,15 +513,26 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoDl_end(phost);
         }
         else {
-            /* No recolor: standard compositing through mask, alpha-only
-             * images in their color */
+            /* No recolor: standard compositing through mask. An alpha-only
+             * image is its color over the mask, which holds its alpha: drawn
+             * flat, as its white would be darkened where filtering mixes in
+             * the bitmap's border. */
             if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
                 EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE);
             else
                 EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
             EVE_CoDl_colorRgb(phost, tint.red, tint.green, tint.blue);
             EVE_CoDl_colorA(phost, 255);
-            draw_image_bitmap(phost, draw_x, draw_y, stamp_w, stamp_h, src_w, src_h);
+            if(alpha_only) {
+                EVE_CoDl_lineWidth(phost, 16);
+                EVE_CoDl_begin(phost, RECTS);
+                EVE_CoDl_vertex2f_0(phost, box_x1, box_y1);
+                EVE_CoDl_vertex2f_0(phost, box_x2, box_y2);
+                EVE_CoDl_end(phost);
+            }
+            else {
+                draw_image_bitmap(phost, draw_x, draw_y, stamp_w, stamp_h, src_w, src_h);
+            }
         }
 
         EVE_CoDl_restoreContext(phost);
