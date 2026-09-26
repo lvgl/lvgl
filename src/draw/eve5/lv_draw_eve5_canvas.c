@@ -167,9 +167,9 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
         EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
     }
 
+    /* The pixels are the source's, premultiplied or not */
     *vr = *src_vr;
     vr->base.unit = (lv_draw_unit_t *)u;
-    vr->is_premultiplied = false;
     vr->has_content = true;
 
     /* Decoder allocations are born GC-flagged (reloadable on demand via the

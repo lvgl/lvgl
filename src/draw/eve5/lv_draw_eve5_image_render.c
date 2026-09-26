@@ -153,6 +153,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     uint32_t palette_addr = GA_INVALID;
     bool sample_as_luminance = false;
     bool alpha_layer = false;
+    bool src_premultiplied = false;
     EVE_GpuHandle child_handle = GA_HANDLE_INVALID;
 
     /* Resolve bitmap source */
@@ -182,6 +183,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         eve_stride = (int32_t)child_vr->stride;
         layout_h = src_h;
         sample_as_luminance = child_vr->sample_as_luminance;
+        src_premultiplied = child_vr->is_premultiplied;
         if(child_vr->palette_offset != GA_INVALID) {
             uint32_t base = EVE_GpuAlloc_Get(u->allocator, child_handle);
             palette_addr = base + child_vr->palette_offset;
@@ -202,6 +204,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         src_h = img->height;
         layout_h = src_h;
         sample_as_luminance = img->sample_as_luminance;
+        src_premultiplied = img->is_premultiplied;
     }
 
     /* L formats sample as (255, 255, 255, L): alpha, unless the source is a
@@ -238,42 +241,12 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    /* Determine if content is premultiplied (RGB already scaled by alpha).
-     * Premultiplied content uses blend(ONE, ONE_MINUS_SRC_ALPHA) to avoid
-     * double-applying alpha. Vertex color is scaled by opa for attenuation. */
-    bool is_layer = (t->type == LV_DRAW_TASK_TYPE_LAYER);
-    bool is_premultiplied;
-    if(alpha_layer) {
-        /* Only its alpha is drawn */
-        is_premultiplied = false;
-    }
-    else if(is_layer) {
-        lv_layer_t * child_layer = (lv_layer_t *)dsc->src;
-        lv_eve5_vram_res_t * pvr = eve5_get_vram_res(child_layer);
-        if(pvr != NULL) {
-            is_premultiplied = pvr->is_premultiplied;
-        }
-        else if(child_layer->draw_buf != NULL) {
-            is_premultiplied = lv_draw_buf_has_flag(child_layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
-        }
-        else {
-            is_premultiplied = false;
-        }
-    }
-    else if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
-        const lv_image_dsc_t * img_dsc = (const lv_image_dsc_t *)dsc->src;
-        lv_eve5_vram_res_t * ivr = eve5_get_image_vram_res(img_dsc);
-        if(ivr != NULL) {
-            is_premultiplied = ivr->is_premultiplied;
-        }
-        else {
-            is_premultiplied = (img_dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) != 0
-                               || img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
-        }
-    }
-    else {
-        is_premultiplied = false;
-    }
+    /* Premultiplied content (RGB already scaled by alpha) uses blend(ONE,
+     * ONE_MINUS_SRC_ALPHA) to avoid double-applying alpha. Vertex color is
+     * scaled by opa for attenuation. The flag comes from the resolved VRAM
+     * resource: for a file or decoded source that is the decoded image, not
+     * the source descriptor. Only the alpha of an alpha layer is drawn. */
+    bool is_premultiplied = src_premultiplied && !alpha_layer;
 
     lv_color_t tint = image_tint(dsc, alpha_only);
     if(is_premultiplied) {
