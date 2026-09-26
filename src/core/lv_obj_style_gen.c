@@ -275,7 +275,7 @@ const lv_grad_dsc_t * lv_obj_get_style_bg_grad(const lv_obj_t * obj, lv_part_t p
     return lv_obj_get_style_bg_grad_internal(obj, part);
 }
 
-const void * lv_obj_get_style_bg_image_src(const lv_obj_t * obj, lv_part_t part)
+LV_IMAGE_DSC_CONST void * lv_obj_get_style_bg_image_src(const lv_obj_t * obj, lv_part_t part)
 {
     LV_CHECK_OBJ(obj, &lv_obj_class, return NULL);
     return lv_obj_get_style_bg_image_src_internal(obj, part);
@@ -521,7 +521,7 @@ lv_opa_t lv_obj_get_style_arc_opa(const lv_obj_t * obj, lv_part_t part)
     return lv_obj_get_style_arc_opa_internal(obj, part);
 }
 
-const void * lv_obj_get_style_arc_image_src(const lv_obj_t * obj, lv_part_t part)
+LV_IMAGE_DSC_CONST void * lv_obj_get_style_arc_image_src(const lv_obj_t * obj, lv_part_t part)
 {
     LV_CHECK_OBJ(obj, &lv_obj_class, return NULL);
     return lv_obj_get_style_arc_image_src_internal(obj, part);
@@ -755,7 +755,7 @@ lv_base_dir_t lv_obj_get_style_base_dir(const lv_obj_t * obj, lv_part_t part)
     return lv_obj_get_style_base_dir_internal(obj, part);
 }
 
-const void * lv_obj_get_style_bitmap_mask_src(const lv_obj_t * obj, lv_part_t part)
+LV_IMAGE_DSC_CONST void * lv_obj_get_style_bitmap_mask_src(const lv_obj_t * obj, lv_part_t part)
 {
     LV_CHECK_OBJ(obj, &lv_obj_class, return NULL);
     return lv_obj_get_style_bitmap_mask_src_internal(obj, part);

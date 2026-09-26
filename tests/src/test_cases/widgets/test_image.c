@@ -542,7 +542,7 @@ static void create_test_images(int32_t radius, int32_t scale, int32_t angle)
     LV_IMAGE_DECLARE(test_XRGB8888_NONE_align64);
     LV_IMAGE_DECLARE(test_ARGB8888_NONE_align64);
 
-    const lv_image_dsc_t * img_dscs[] = {
+    LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dscs[] = {
         &test_I1_NONE_align64,
         &test_I2_NONE_align64,
         &test_I4_NONE_align64,

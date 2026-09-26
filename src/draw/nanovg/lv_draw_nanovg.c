@@ -424,6 +424,11 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
     }
 
+    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
+        return LV_DRAW_UNIT_IDLE;
+    }
+
     if(u->current_layer != layer) {
         /* Flush any draws still queued for the previous layer before
          * rebinding to the new layer's FBO. Otherwise those queued draws

@@ -34,7 +34,7 @@ typedef struct {
     int32_t radius;
 
     /*Background img*/
-    const void * bg_image_src;
+    LV_IMAGE_DSC_CONST void * bg_image_src;
     const void * bg_image_symbol_font;
     lv_color_t bg_image_recolor;
     lv_opa_t bg_image_opa;

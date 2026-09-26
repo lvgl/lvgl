@@ -70,7 +70,7 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent);
  * @param dsc       pointer to a series images
  * @param num       images' number
  */
-void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num);
+void lv_animimg_set_src(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * dsc[], size_t num);
 
 /**
  *  Set the images source for flip playback of animation image.
@@ -78,7 +78,7 @@ void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num);
  * @param dsc       pointer to a series images
  * @param num       images' number
  */
-void lv_animimg_set_src_reverse(lv_obj_t * obj, const void * dsc[], size_t num);
+void lv_animimg_set_src_reverse(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * dsc[], size_t num);
 
 /**
  * Startup the image animation.
@@ -143,7 +143,7 @@ void lv_animimg_set_completed_cb(lv_obj_t * obj, lv_anim_completed_cb_t complete
  * @param obj   pointer to an animation image object
  * @return a     pointer that will point to a series images
  */
-const void ** lv_animimg_get_src(lv_obj_t * obj);
+LV_IMAGE_DSC_CONST void ** lv_animimg_get_src(lv_obj_t * obj);
 
 /**
  * Get the image animation images source.

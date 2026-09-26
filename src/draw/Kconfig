@@ -245,4 +245,13 @@ endmenu
 menu "SDL"
 rsource "sdl/Kconfig"
 endmenu
+
+config LV_USE_DRAW_VRAM
+	bool "VRAM buffer residency support for hardware draw units"
+	default n
+	help
+		Let draw units keep image, font and layer buffers resident in their
+		own memory (VRAM) and migrate them between CPU memory and VRAM on
+		demand. Image and font descriptors become non-const so the residency
+		state can be attached at runtime.
 endmenu

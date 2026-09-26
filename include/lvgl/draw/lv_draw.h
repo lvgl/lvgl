@@ -152,6 +152,9 @@ struct _lv_layer_t  {
 
     /** true if LVGL is responsible for freeing `draw_buf`*/
     bool buffer_owned;
+
+    /**Bytes charged to the layer memory budget; zero until backing is allocated.*/
+    uint32_t allocated_buf_size;
 };
 
 typedef struct {
@@ -345,10 +348,16 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
 
 /**
  * Try to allocate a buffer for the layer.
+ * When `LV_USE_DRAW_VRAM` is enabled and `draw_unit` is not NULL,
+ * calls `lv_draw_buf_ensure_resident` to allocate the buffer in the
+ * correct memory space (VRAM or CPU) for the requesting draw unit.
  * @param layer             pointer to a layer
- * @return                  pointer to the allocated aligned buffer or NULL on failure
+ * @param draw_unit         the draw unit requesting the buffer (NULL for CPU-only fallback)
+ * @return                  pointer to the allocated aligned buffer, or NULL on failure.
+ *                          For VRAM-only layers the return value is NULL but the layer
+ *                          is usable — check `layer->draw_buf->vram_res` instead.
  */
-void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
+void * lv_draw_layer_alloc_buf(lv_layer_t * layer, lv_draw_unit_t * draw_unit);
 
 /**
  * Got to a pixel at X and Y coordinate on a layer
@@ -358,6 +367,28 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
  * @return                  `buf` offset to point to the given X and Y coordinate
  */
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y);
+
+/**
+ * Ensure all source buffers referenced by a draw task are resident
+ * for the given draw unit. Draw units should call this after
+ * `lv_draw_get_available_task` / `lv_draw_get_next_available_task` returns
+ * a task and before processing it.
+ * Handles IMAGE src, LAYER child draw_buf, bitmap masks, and arc img_src.
+ * When `LV_USE_DRAW_VRAM` is disabled this is a no-op that always returns true.
+ * @param t     the draw task whose sources need to be resident
+ * @param unit  the draw unit that will process the task
+ * @return      true if all sources are now resident, false on failure
+ */
+#if LV_USE_DRAW_VRAM
+bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t * unit);
+#else
+static inline bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t * unit)
+{
+    LV_UNUSED(t);
+    LV_UNUSED(unit);
+    return true;
+}
+#endif
 
 /**
  * Get the type of a draw task

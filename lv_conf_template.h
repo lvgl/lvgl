@@ -666,6 +666,13 @@
  */
 #define LV_USE_DRAW_SDL 0
 
+/** Let draw units keep image, font and layer buffers resident in their
+ *  own memory (VRAM) and migrate them between CPU memory and VRAM on
+ *  demand. Image and font descriptors become non-const so the residency
+ *  state can be attached at runtime.
+ */
+#define LV_USE_DRAW_VRAM 0
+
 
 
 /*============================================================================

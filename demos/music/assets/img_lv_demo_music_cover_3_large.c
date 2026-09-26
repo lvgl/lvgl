@@ -444,7 +444,11 @@ img_lv_demo_music_cover_3_map[] = {
 
 };
 
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_cover_3 = {
+#else
 const lv_image_dsc_t img_lv_demo_music_cover_3 = {
+#endif
     .header.w = 428,
     .header.h = 428,
     .header.stride = 1712,

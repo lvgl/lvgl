@@ -22,7 +22,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, const char * name, const char * category,
+static lv_obj_t * create_shop_item(lv_obj_t * parent, LV_IMAGE_DSC_CONST void * img_src, const char * name,
+                                   const char * category,
                                    const char * price);
 static void shop_chart_event_cb(lv_event_t * e);
 
@@ -211,7 +212,8 @@ void lv_demo_widgets_shop_create(lv_obj_t * parent)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, const char * name, const char * category,
+static lv_obj_t * create_shop_item(lv_obj_t * parent, LV_IMAGE_DSC_CONST void * img_src, const char * name,
+                                   const char * category,
                                    const char * price)
 {
     static int32_t grid_col_dsc[] = {LV_GRID_CONTENT, 5, LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
