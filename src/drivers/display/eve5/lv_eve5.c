@@ -16,6 +16,7 @@
 #if LV_USE_EVE5
 
 #include "../../../display/lv_display_private.h"
+#include "../../../draw/lv_draw_buf_private.h"
 #include "../../../core/lv_refr_private.h"
 #if LV_USE_OS
     #include "../../../osal/lv_os_private.h"
@@ -61,6 +62,14 @@ typedef struct {
      * double-buffered configuration after a partial-mode override. */
     uint32_t frame_buffer_1_orig;
     uint32_t current_fb;
+    /* FULL mode: the swapchain buffer (0: frame_buffer_0, 1: frame_buffer_1)
+     * that holds the last presented frame. Nothing reports which buffer a
+     * render into SWAPCHAIN_0 goes to, but it alternates with every present
+     * whose flip has taken effect, which is only after REG_FRAMES advanced
+     * (lv_eve5_swapchain_presented waits for that). A present before would
+     * replace the pending frame in the same buffer. Found at create by
+     * clearing the buffers in two colors. */
+    uint32_t last_fb;
     rendered_region_t pending_regions[MAX_REGIONS];
     int pending_count;
     EVE_CmdSync last_frame_sync;
@@ -102,6 +111,7 @@ static void refr_ready_cb(lv_event_t * e);
 static void delete_event_cb(lv_event_t * e);
 static void composite_to_framebuffer(lv_eve5_driver_t * drvr);
 static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area, const uint8_t * px_map);
+static void swapchain_presented(lv_eve5_driver_t * drvr);
 static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf);
 static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost);
 static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode);
@@ -275,7 +285,10 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, EVE_GpuAlloc *allocator,
     EVE_CoDl_clear(phost, true, true, true);
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
-    if(EVE_Hal_supportRenderTarget(phost)) EVE_CoCmd_graphicsFinish(phost);
+    if(EVE_Hal_supportRenderTarget(phost)) {
+        EVE_CoCmd_graphicsFinish(phost);
+        swapchain_presented(drvr);
+    }
     EVE_Cmd_waitFlush(phost);
 
     EVE_CoCmd_dlStart(phost);
@@ -284,7 +297,10 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, EVE_GpuAlloc *allocator,
     EVE_CoDl_clear(phost, true, true, true);
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
-    if(EVE_Hal_supportRenderTarget(phost)) EVE_CoCmd_graphicsFinish(phost);
+    if(EVE_Hal_supportRenderTarget(phost)) {
+        EVE_CoCmd_graphicsFinish(phost);
+        swapchain_presented(drvr);
+    }
     EVE_Cmd_waitFlush(phost);
 
     /* Detect which buffer is front by reading back the test color. Only
@@ -294,9 +310,11 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, EVE_GpuAlloc *allocator,
         uint32_t test_pixel = EVE_Hal_rd32(phost, drvr->frame_buffer_0);
         if((test_pixel & 0xFFFFFF) == 0x008000) {
             drvr->current_fb = 1;
+            drvr->last_fb = 1;
         }
         else if((test_pixel & 0xFFFFFF) == 0x000080) {
             drvr->current_fb = 0;
+            drvr->last_fb = 0;
         }
         else {
             eve_printf("Warning: Unable to determine current framebuffer state\n");
@@ -403,6 +421,27 @@ void lv_eve5_link_draw_unit(lv_display_t * disp, struct _lv_draw_unit_t * draw_u
     }
 }
 
+/* After a CMD_SWAP with SWAPCHAIN_0 as the render target, and its
+ * CMD_GRAPHICSFINISH: the flip only takes effect once REG_FRAMES advances, and
+ * a render into the swapchain before that would replace the pending frame in
+ * the same buffer. The coprocessor waits for it, the host doesn't. */
+static void swapchain_presented(lv_eve5_driver_t * drvr)
+{
+#ifdef EVE_SUPPORT_RENDERTARGET
+    EVE_HalContext * phost = drvr->hal;
+    EVE_CoCmd_waitChange(phost, REG_FRAMES);
+#endif
+    drvr->last_fb ^= 1;
+}
+
+void lv_eve5_swapchain_presented(lv_display_t * disp)
+{
+    if(disp == NULL) return;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL || drvr->hal == NULL) return;
+    swapchain_presented(drvr);
+}
+
 void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync)
 {
     if(disp == NULL) return;
@@ -435,19 +474,16 @@ bool lv_eve5_read_screen(lv_display_t * disp, uint8_t * buf, uint32_t stride)
         EVE_Cmd_waitFlush(phost);
 
         /* PARTIAL mode aliases PTR1 to PTR0, so frame_buffer_0 is on screen.
-         * FULL mode alternates between two buffers and which one is on
-         * screen isn't known, so the frame only counts when both agree. */
-        bool double_buffered = drvr->frame_buffer_1 != drvr->frame_buffer_0;
+         * FULL mode alternates between two buffers: the last presented frame
+         * is in the one last_fb tracks. */
+        uint32_t fb = drvr->frame_buffer_0;
+        if(drvr->render_mode == LV_EVE5_RENDER_MODE_FULL && drvr->last_fb == 1) fb = drvr->frame_buffer_1;
         uint32_t row_bytes = w * FB_BYTES_PER_PIXEL;
-        uint8_t * row = lv_malloc(row_bytes * 2);
+        uint8_t * row = lv_malloc(row_bytes);
         if(row != NULL) {
             ok = true;
-            for(uint32_t y = 0; y < h && ok; y++) {
-                EVE_Hal_rdMem(phost, row, drvr->frame_buffer_0 + y * row_bytes, row_bytes);
-                if(double_buffered) {
-                    EVE_Hal_rdMem(phost, row + row_bytes, drvr->frame_buffer_1 + y * row_bytes, row_bytes);
-                    if(lv_memcmp(row, row + row_bytes, row_bytes) != 0) ok = false;
-                }
+            for(uint32_t y = 0; y < h; y++) {
+                EVE_Hal_rdMem(phost, row, fb + y * row_bytes, row_bytes);
                 /* RGB8 stores B, G, R per pixel */
                 uint8_t * dst = buf + y * stride;
                 for(uint32_t x = 0; x < w; x++) {
@@ -574,6 +610,29 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
     return buf;
 }
 
+/* lv_refr clears the screen layer of a display with an alpha color format
+ * before drawing. On the CPU, that would give the swapchain buffer CPU memory
+ * (and a black frame to present). The swapchain needs none: every FULL mode
+ * frame starts by clearing it (init_layer), to black, what transparent is on
+ * the RGB8 swapchain. The CPU memory of the SW path is cleared as usual. */
+static void full_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer)
+{
+    LV_UNUSED(layer);
+    if(draw_buf->data != NULL) lv_draw_buf_clear_ex(draw_buf, a, NULL);
+}
+
+static const lv_draw_buf_handlers_t * full_buf_handlers(void)
+{
+    static lv_draw_buf_handlers_t handlers;
+    static bool initialized;
+    if(!initialized) {
+        lv_draw_buf_init_with_default_handlers(&handlers);
+        handlers.buf_clear_cb = full_buf_clear_cb;
+        initialized = true;
+    }
+    return &handlers;
+}
+
 /**
  * Build the full-mode screen draw buffer.
  *
@@ -615,7 +674,6 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
     int32_t W = phost->Width;
     int32_t H = phost->Height;
     uint32_t stride = lv_draw_buf_width_to_stride((uint32_t)W, LV_COLOR_FORMAT_RGB888);
-    uint32_t cpu_size = stride * (uint32_t)H;
 
     vr->base.unit = NULL; /* Set by lv_eve5_link_draw_unit on EVE5 draw unit init */
     vr->base.size = 0;    /* No GPU allocation — virtual */
@@ -650,10 +708,14 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
      * lv_draw_buf_reshape rejects shapes whose computed size exceeds data_size,
      * and lv_refr's layer_reshape_draw_buf calls reshape on every refresh.
      * For HW path, no CPU memory is actually allocated (data stays NULL). For
-     * SW path, ensure_resident allocates CPU memory matching this size. */
-    buf->data_size = cpu_size;
+     * SW path, ensure_resident allocates CPU memory matching this size.
+     * Sized for the widest color format the display may be given (4 bytes a
+     * pixel, ARGB8888 or XRGB8888): a frame that doesn't fit makes lv_refr
+     * split it into tile layers, and every tile would render and present the
+     * swapchain on its own, as none of them is the screen layer. */
+    buf->data_size = lv_draw_buf_width_to_stride((uint32_t)W, LV_COLOR_FORMAT_ARGB8888) * (uint32_t)H;
     buf->data = NULL;
-    buf->handlers = lv_draw_buf_get_handlers();
+    buf->handlers = full_buf_handlers();
     buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
     return buf;
 }
@@ -1177,7 +1239,10 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
     /* CMD_GRAPHICSFINISH is BT820-only; previous gens have a blocking CMD_SWAP. */
-    if(EVE_Hal_supportRenderTarget(phost)) EVE_CoCmd_graphicsFinish(phost);
+    if(EVE_Hal_supportRenderTarget(phost)) {
+        EVE_CoCmd_graphicsFinish(phost);
+        swapchain_presented(drvr);
+    }
 
     EVE_CmdSync sync = EVE_Cmd_sync(phost);
 

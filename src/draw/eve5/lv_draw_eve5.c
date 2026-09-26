@@ -896,6 +896,7 @@ static void eve5_argb8_finish(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
         EVE_CoDl_display(phost);
         EVE_CoCmd_swap(phost);
         EVE_CoCmd_graphicsFinish(phost);
+        lv_eve5_swapchain_presented(lv_eve5_disp_from_hal(phost));
     }
 }
 

@@ -180,6 +180,18 @@ void lv_eve5_link_draw_unit(lv_display_t * disp, struct _lv_draw_unit_t * draw_u
 void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync);
 
 /**
+ * Call after every CMD_SWAP with SWAPCHAIN_0 as the render target, and its
+ * CMD_GRAPHICSFINISH (FULL mode frames). The swapchain only advances to the
+ * other buffer once REG_FRAMES advanced after the swap, and a render into it
+ * before that would replace the pending frame in the same buffer: this makes
+ * the coprocessor wait for REG_FRAMES to change, so every present alternates,
+ * and tracks the buffer that holds the last presented frame for
+ * lv_eve5_read_screen. The host doesn't wait.
+ * @param disp pointer to an EVE5 display
+ */
+void lv_eve5_swapchain_presented(lv_display_t * disp);
+
+/**
  * Queue a full-screen invalidate for after the current refresh completes.
  * Direct lv_obj_invalidate during rendering trips an assert in lv_inv_area;
  * this flag is consumed by a LV_EVENT_REFR_READY handler in the driver.
@@ -226,9 +238,11 @@ void lv_eve5_set_coprocessor_reset_handler(lv_display_t * disp,
  * Nothing is rendered and RAM_G is not written, so this works the same on
  * hardware as on the emulator:
  *   - BT820: waits for the render engine, then reads the scanout buffer from
- *     RAM_G. In FULL mode the driver does not know which of the two swapchain
- *     buffers is on screen, so it fails unless both hold the same frame;
- *     presenting the frame once more makes them agree.
+ *     RAM_G. In FULL mode, the swapchain buffer that holds the last presented
+ *     frame, which the driver tracks from the colors it cleared the buffers
+ *     to at create, and every present since (lv_eve5_swapchain_presented).
+ *     After a switch from PARTIAL mode at runtime, whose presents aren't
+ *     paced, that buffer isn't known.
  *   - EVE1–EVE4: renders the display list line by line into RAM_COMPOSITE
  *     through the REG_SNAPSHOT registers, which stops the scanout meanwhile.
  *

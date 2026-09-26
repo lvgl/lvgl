@@ -948,6 +948,10 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_CoDl_display(u->hal);
     EVE_CoCmd_swap(u->hal);
     EVE_CoCmd_graphicsFinish(u->hal);
+    /* A FULL mode frame: the swapchain advances before the next one renders */
+    if(is_screen && finish_vr != NULL && finish_vr->is_swapchain) {
+        lv_eve5_swapchain_presented(lv_eve5_disp_from_hal(u->hal));
+    }
 
     EVE_CmdSync sync = EVE_Cmd_sync(u->hal);
 
