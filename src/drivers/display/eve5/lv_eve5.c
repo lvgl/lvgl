@@ -43,7 +43,6 @@ typedef struct {
     uint16_t eve_format;
     uint32_t eve_stride;
     bool is_gpu_rendered;
-    bool monochrome;    /**< I1 display: threshold the luminance */
 } rendered_region_t;
 
 typedef struct {
@@ -132,13 +131,6 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode);
     #define SW_BYTES_PER_PIXEL 4
 #else
     #error "Unsupported LV_COLOR_DEPTH - must be 16, 24, or 32"
-#endif
-
-/* LVGL's threshold for I1 pixels */
-#ifdef LV_DRAW_SW_I1_LUM_THRESHOLD
-    #define I1_LUM_THRESHOLD LV_DRAW_SW_I1_LUM_THRESHOLD
-#else
-    #define I1_LUM_THRESHOLD 127
 #endif
 
 /* Framebuffer (screen memory) is always RGB8 */
@@ -1021,8 +1013,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         drvr->pending_regions[drvr->pending_count].eve_format = region_format;
         drvr->pending_regions[drvr->pending_count].eve_stride = region_stride;
         drvr->pending_regions[drvr->pending_count].is_gpu_rendered = is_gpu_rendered;
-        drvr->pending_regions[drvr->pending_count].monochrome =
-            region_format == L8 && lv_display_get_color_format(disp) == LV_COLOR_FORMAT_I1;
         drvr->pending_count++;
     }
 
@@ -1112,13 +1102,12 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
         /* Sample the region in its actual format/stride captured at flush time.
          * HW: the display's format, 16-px aligned stride from the EVE5 draw
          * unit's vram_alloc_cb. SW: the display's format as LVGL packs it.
-         * L8 holds luminance, which the swizzle spreads over RGB. */
+         * L8 holds luminance, which the swizzle spreads over RGB (for I1,
+         * already thresholded by the draw unit). */
         if(region->eve_format == L8) {
             EVE_CoDl_bitmapLayout(phost, GLFORMAT, region->eve_stride, h);
             EVE_CoDl_bitmapExtFormat(phost, L8);
-            EVE_CoDl_bitmapSwizzle(phost, region->monochrome ? ZERO : ALPHA,
-                                   region->monochrome ? ZERO : ALPHA,
-                                   region->monochrome ? ZERO : ALPHA, RED);
+            EVE_CoDl_bitmapSwizzle(phost, ALPHA, ALPHA, ALPHA, RED);
         }
         else {
             EVE_CoDl_bitmapLayout(phost, (uint8_t)region->eve_format,
@@ -1127,14 +1116,6 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
         EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, w, h);
         EVE_CoDl_begin(phost, BITMAPS);
         EVE_CoDl_vertex2f_0(phost, region->area.x1, region->area.y1);
-        if(region->monochrome) {
-            /* I1: black where drawn above, white where the luminance is over
-             * LVGL's threshold */
-            EVE_CoDl_bitmapSwizzle(phost, ONE, ONE, ONE, ALPHA);
-            EVE_CoDl_alphaFunc(phost, GREATER, I1_LUM_THRESHOLD);
-            EVE_CoDl_vertex2f_0(phost, region->area.x1, region->area.y1);
-            EVE_CoDl_alphaFunc(phost, ALWAYS, 0);
-        }
         EVE_CoDl_end(phost);
     }
 

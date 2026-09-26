@@ -116,36 +116,40 @@ bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_
             *bpp = 2;
             return true;
 
+        /* The render engine blends at ARGB8 and encodes to the target format
+         * at DISPLAY: a layer in a reduced format quantizes once, as the
+         * software renderer's result is quantized */
         case LV_COLOR_FORMAT_ARGB1555:
-#ifdef EVE_SUPPORT_RENDERTARGET
-            if(has_argb8) {
-                /* Use ARGB8 for better alpha precision */
-                *eve_fmt = ARGB8;
-                *bpp = 4;
-                return true;
-            }
-#endif
             *eve_fmt = ARGB1555;
             *bpp = 2;
             return true;
 
         case LV_COLOR_FORMAT_ARGB4444:
-#ifdef EVE_SUPPORT_RENDERTARGET
-            if(has_argb8) {
-                /* Use ARGB8 for better alpha precision */
-                *eve_fmt = ARGB8;
-                *bpp = 4;
-                return true;
-            }
-#endif
             *eve_fmt = ARGB4;
             *bpp = 2;
             return true;
 
+        /* L8, AL88 and I1 hold luminance, which the render engine doesn't
+         * encode as LVGL does: they render to an ARGB8 intermediate and are
+         * reduced to it (see lv_draw_eve5_layer_reduction). I1 is stored as
+         * L8, thresholded. */
         case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_I1:
             *eve_fmt = L8;
             *bpp = 1;
             return true;
+
+#ifdef EVE_SUPPORT_RENDERTARGET
+        case LV_COLOR_FORMAT_AL88:
+            if(has_argb8) {
+                *eve_fmt = LA8;
+                *bpp = 2;
+                return true;
+            }
+            *eve_fmt = ARGB4;
+            *bpp = 2;
+            return false;
+#endif
 
         default:
             if(lv_color_format_has_alpha(lv_cf)) {
@@ -480,6 +484,86 @@ void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, ui
 }
 #endif
 
+/* Draw a previous slice's output as a layer's base content, converted to the
+ * target's format: from color into an L8 or LA8 target, LVGL's luminance (and
+ * the alpha); from luminance, gray, or black and white past LVGL's I1
+ * threshold. Expects the target cleared to black. */
+static void eve5_draw_prev(lv_draw_eve5_unit_t * u, uint16_t target_fmt, uint32_t prev_addr, uint16_t prev_fmt,
+                           uint32_t prev_stride, int32_t w, int32_t h, bool prev_luminance, bool prev_threshold)
+{
+    EVE_HalContext * phost = u->hal;
+    EVE_CoDl_saveContext(phost);
+    EVE_CoDl_blendFunc(phost, ONE, ZERO);
+    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoDl_bitmapSource(phost, prev_addr);
+    if(prev_threshold) {
+        EVE_CoDl_bitmapLayout(phost, GLFORMAT, prev_stride, h);
+        EVE_CoDl_bitmapExtFormat(phost, prev_fmt);
+        EVE_CoDl_bitmapSwizzle(phost, ONE, ONE, ONE, ALPHA);
+        EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, w, h);
+        EVE_CoDl_alphaFunc(phost, GREATER, EVE5_I1_LUM_THRESHOLD);
+        EVE_CoDl_begin(phost, BITMAPS);
+        EVE_CoDl_vertex2f_0(phost, 0, 0);
+        EVE_CoDl_end(phost);
+    }
+#if LV_DRAW_EVE5_L8_EXACT
+    else if((target_fmt == L8 || target_fmt == LA8) && prev_fmt != L8) {
+        /* A luminance layer's content in color (its ARGB8 intermediate) */
+        if(target_fmt == LA8) EVE_CoDl_colorMask(phost, 1, 1, 1, 0);
+        lv_draw_eve5_draw_luminance(phost, prev_fmt, prev_stride, w, h);
+        if(target_fmt == LA8) {
+            EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+            EVE_CoDl_bitmapLayout(phost, (uint8_t)prev_fmt, prev_stride, h);
+            EVE_CoDl_begin(phost, BITMAPS);
+            EVE_CoDl_vertex2f_0(phost, 0, 0);
+            EVE_CoDl_end(phost);
+        }
+    }
+#endif
+    else {
+        eve5_set_image_bitmap_layout(u->hal, prev_fmt, (int32_t)prev_stride, h, prev_luminance);
+        EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, w, h);
+        EVE_CoDl_begin(u->hal, BITMAPS);
+        EVE_CoDl_vertex2f_0(u->hal, 0, 0);
+        EVE_CoDl_end(u->hal);
+    }
+    EVE_CoDl_restoreContext(phost);
+    LV_UNUSED(target_fmt);
+}
+
+EVE_GpuHandle lv_draw_eve5_hal_luminance(lv_draw_eve5_unit_t * u, EVE_GpuHandle inter, uint32_t inter_stride,
+                                         int32_t w, int32_t h, uint32_t * out_stride)
+{
+    EVE_HalContext * phost = u->hal;
+    int32_t aw = ALIGN_UP(w, 16);
+    int32_t ah = ALIGN_UP(h, 16);
+    EVE_GpuHandle lum = lv_draw_eve5_alloc(u, (uint32_t)aw * (uint32_t)ah, GA_ALIGN_128);
+    uint32_t dst = EVE_GpuAlloc_Get(u->allocator, lum);
+    uint32_t src = EVE_GpuAlloc_Get(u->allocator, inter);
+    if(dst == GA_INVALID || src == GA_INVALID) {
+        EVE_GpuAlloc_Free(u->allocator, lum);
+        return GA_HANDLE_INVALID;
+    }
+
+    EVE_GpuAlloc_OpenScope(u->allocator);
+    EVE_CoCmd_renderTarget(phost, dst, L8, aw, ah);
+    EVE_CoCmd_dlStart(phost);
+    EVE_CoDl_scissorXY(phost, 0, 0);
+    EVE_CoDl_scissorSize(phost, aw, ah);
+    EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+    EVE_CoDl_clear(phost, 1, 1, 1);
+    eve5_draw_prev(u, L8, src, ARGB8, inter_stride, w, h, false, false);
+    EVE_CoDl_display(phost);
+    EVE_CoCmd_swap(phost);
+    EVE_CoCmd_graphicsFinish(phost);
+    EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
+
+    EVE_GpuAlloc_ScopedFree(u->allocator, inter);
+    *out_stride = (uint32_t)aw;
+    return lum;
+}
+
 /* Render target format of a layer: a partial-mode screen tile's, from the
  * display's format, or the render target format of the layer's color format,
  * promoted as configured. The layer's buffer may hold another format until
@@ -574,18 +658,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                     EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
                     EVE_CoDl_clearColorA(phost, 255);
                     EVE_CoDl_clear(phost, 1, 1, 1);
-
-                    EVE_CoDl_saveContext(phost);
-                    EVE_CoDl_blendFunc(phost, ONE, ZERO);
-                    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
-                    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
-                    EVE_CoDl_bitmapSource(phost, prev_addr);
-                    EVE_CoDl_bitmapLayout(phost, (uint8_t)prev_fmt, prev_stride, sh);
-                    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, sw, sh);
-                    EVE_CoDl_begin(phost, BITMAPS);
-                    EVE_CoDl_vertex2f_0(phost, 0, 0);
-                    EVE_CoDl_end(phost);
-                    EVE_CoDl_restoreContext(phost);
+                    eve5_draw_prev(u, sc_vr->eve_format, prev_addr, prev_fmt, prev_stride, sw, sh,
+                                   slice->prev_luminance, slice->prev_threshold);
 
                     EVE_GpuAlloc_ScopedFree(u->allocator, slice->prev_handle);
                 }
@@ -765,26 +839,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             EVE_CoDl_clearColorA(u->hal, is_screen ? 255 : 0);
             EVE_CoDl_clear(u->hal, 1, 1, 1);
 
-            EVE_CoDl_saveContext(phost);
-            EVE_CoDl_blendFunc(phost, ONE, ZERO);
-            EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
-            EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
-            EVE_CoDl_bitmapSource(phost, prev_addr);
-#if LV_DRAW_EVE5_L8_EXACT
-            if(target_eve_fmt == L8 && prev_fmt != L8) {
-                /* An L8 layer's content in color (its ARGB8 intermediate) */
-                lv_draw_eve5_draw_luminance(phost, prev_fmt, prev_stride, w, h);
-            }
-            else
-#endif
-            {
-                eve5_set_image_bitmap_layout(u->hal, prev_fmt, (int32_t)prev_stride, h, prev_luminance);
-                EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, w, h);
-                EVE_CoDl_begin(u->hal, BITMAPS);
-                EVE_CoDl_vertex2f_0(u->hal, 0, 0);
-                EVE_CoDl_end(u->hal);
-            }
-            EVE_CoDl_restoreContext(u->hal);
+            eve5_draw_prev(u, target_eve_fmt, prev_addr, prev_fmt, prev_stride, w, h, prev_luminance,
+                           slice->prev_threshold);
 
             u->canvas_orig_addr = prev_addr;
             u->canvas_orig_format = prev_fmt;

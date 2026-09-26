@@ -406,7 +406,24 @@ typedef struct {
     uint16_t prev_eve_format;
     uint32_t prev_stride;       /**< Stride of prev_handle in bytes (only used when prev_eve_format != 0) */
     bool prev_luminance;        /**< prev_handle holds luminance (L8 as LVGL's L8), with prev_eve_format */
+    bool prev_threshold;        /**< Draw that luminance thresholded, black and white (I1) */
 } lv_draw_eve5_slice_t;
+
+/* How a layer's content is reduced to the color format it's stored in. A
+ * layer that needs it renders to an ARGB8 intermediate, which the render
+ * engine blends at anyway, and is reduced once complete. */
+typedef enum {
+    LV_DRAW_EVE5_REDUCE_NONE,       /**< Rendered directly in its format */
+    LV_DRAW_EVE5_REDUCE_LUMINANCE,  /**< LVGL's luminance (L8; AL88 with its alpha; gray on the swapchain) */
+    LV_DRAW_EVE5_REDUCE_THRESHOLD,  /**< LVGL's luminance thresholded (I1, stored as L8 of 0 and 255) */
+} lv_draw_eve5_reduction_t;
+
+/* LVGL's threshold of the luminance for I1 */
+#ifdef LV_DRAW_SW_I1_LUM_THRESHOLD
+    #define EVE5_I1_LUM_THRESHOLD LV_DRAW_SW_I1_LUM_THRESHOLD
+#else
+    #define EVE5_I1_LUM_THRESHOLD 127
+#endif
 
 /**********************
  * DISPLAY LIST BUDGET
@@ -423,7 +440,7 @@ typedef struct {
  * lv_draw_eve5_dl_bound.c. */
 
 /* Worst-case entries of the per-layer steps around the tasks */
-#define EVE5_DL_INIT_LAYER      37  /**< lv_draw_eve5_hal_init_layer */
+#define EVE5_DL_INIT_LAYER      41  /**< lv_draw_eve5_hal_init_layer */
 #define EVE5_DL_FINISH_LAYER    1   /**< lv_draw_eve5_hal_finish_layer (DISPLAY) */
 #define EVE5_DL_INIT_L8         28  /**< lv_draw_eve5_hal_init_l8_rendertarget */
 #define EVE5_DL_FINISH_L8       1   /**< lv_draw_eve5_hal_finish_l8_rendertarget */
@@ -1032,6 +1049,14 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src
 void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, uint32_t stride,
                                  int32_t w, int32_t h);
 #endif
+
+/**
+ * LVGL's luminance of a layer's ARGB8 content (inter, consumed), in a new L8
+ * buffer, for a layer drawn from it: thresholded, or as gray on the swapchain.
+ * Returns GA_HANDLE_INVALID, keeping inter, without memory for it.
+ */
+EVE_GpuHandle lv_draw_eve5_hal_luminance(lv_draw_eve5_unit_t * u, EVE_GpuHandle inter, uint32_t inter_stride,
+                                         int32_t w, int32_t h, uint32_t * out_stride);
 EVE_GpuHandle lv_draw_eve5_alloc(lv_draw_eve5_unit_t * u, uint32_t size, uint32_t flags);
 void lv_draw_eve5_hal_layer_format(lv_draw_eve5_unit_t * u, const lv_layer_t * layer, bool is_screen,
                                    uint16_t * target_eve_fmt, uint8_t * target_bpp);

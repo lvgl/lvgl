@@ -194,7 +194,8 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
      * its pixels back straight. */
     bool unpremultiply = false;
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
-    unpremultiply = vr->is_premultiplied && eve_fmt == ARGB8
+    unpremultiply = vr->is_premultiplied
+                    && (eve_fmt == ARGB8 || eve_fmt == ARGB4 || eve_fmt == ARGB1555 || eve_fmt == LA8)
                     && lv_cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
                     && !(buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED);
 #endif
@@ -219,6 +220,10 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                                                     &expected_bpp, &upload_converts)) {
                     if(eve_fmt != expected_eve_fmt || upload_converts) needs_conversion = true;
                 }
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+                /* Premultiplied content in a packed format is unpremultiplied as ARGB8 */
+                if(unpremultiply && eve_fmt != ARGB8) needs_conversion = true;
+#endif
             }
             break;
     }
@@ -448,6 +453,12 @@ generic_download: {
                             case L8:
                                 r = g = b = row_buf[x];
                                 break;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+                            case LA8:
+                                r = g = b = row_buf[2 * x + 0];
+                                a = row_buf[2 * x + 1];
+                                break;
+#endif
                             case ARGB2: {
                                     uint8_t c = row_buf[x];
                                     uint8_t a2 = (c >> 6) & 0x3;
@@ -525,6 +536,14 @@ generic_download: {
                         case LV_COLOR_FORMAT_A8:
                             for(int32_t x = 0; x < w; x++) {
                                 dst_row[x] = argb_row[4 * x + 3];
+                            }
+                            break;
+                        case LV_COLOR_FORMAT_AL88:
+                            /* LVGL's luminance, exact for gray */
+                            for(int32_t x = 0; x < w; x++) {
+                                dst_row[2 * x + 0] = (uint8_t)((77u * argb_row[4 * x + 2] + 151u * argb_row[4 * x + 1]
+                                                                + 28u * argb_row[4 * x + 0]) >> 8);
+                                dst_row[2 * x + 1] = argb_row[4 * x + 3];
                             }
                             break;
                         default:
