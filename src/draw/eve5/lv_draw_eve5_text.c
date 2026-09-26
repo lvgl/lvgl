@@ -920,17 +920,30 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         uint16_t g_w = glyph_dsc->g->box_w;
         uint16_t g_h = glyph_dsc->g->box_h;
 
-        lv_eve5_vram_res_t * vr = lv_draw_eve5_resolve_to_gpu(u, img_src);
+        /* Uploaded premultiplied if its pixels come from the CPU */
+        lv_eve5_vram_res_t * vr = lv_draw_eve5_resolve_to_gpu_ex(u, img_src, LV_DRAW_EVE5_PREMULTIPLY_IMAGE_GLYPHS);
         if(vr == NULL) return;
 
         uint32_t addr, palette_addr;
         eve5_vram_res_resolve(u->allocator, vr, &addr, &palette_addr);
         if(addr == GA_INVALID) return;
 
+        bool premultiplied = vr->is_premultiplied;
+        /* A letter may be drawn additively, inside its blend */
+        bool additive = s_current_letter_dsc != NULL
+                        && s_current_letter_dsc->blend_mode == LV_BLEND_MODE_ADDITIVE;
+
         EVE_CoDl_end(u->hal);
 
-        EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
-        EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
+        uint8_t opa = glyph_dsc->opa;
+        if(premultiplied) {
+            EVE_CoDl_colorRgb(u->hal, opa, opa, opa);
+            EVE_CoDl_blendFunc(u->hal, ONE, additive ? ONE : ONE_MINUS_SRC_ALPHA);
+        }
+        else {
+            EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
+        }
+        EVE_CoDl_colorA(u->hal, opa);
         EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(u->hal, addr);
         set_palette_if_needed(u->hal, vr->eve_format, palette_addr);
@@ -940,6 +953,11 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         /* Rotated, scaled or skewed with the letter */
         EVE_CoDl_begin(u->hal, BITMAPS);
         emit_glyph_vertex(u, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
+
+        if(premultiplied) {
+            if(additive) EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE);
+            else EVE_CoDl_blendFunc_default(u->hal);
+        }
         return;
     }
 
@@ -1034,7 +1052,8 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         uint16_t g_w = glyph_dsc->g->box_w;
         uint16_t g_h = glyph_dsc->g->box_h;
 
-        lv_eve5_vram_res_t * vr = lv_draw_eve5_resolve_to_gpu(u, img_src);
+        /* Uploaded premultiplied if its pixels come from the CPU */
+        lv_eve5_vram_res_t * vr = lv_draw_eve5_resolve_to_gpu_ex(u, img_src, LV_DRAW_EVE5_PREMULTIPLY_IMAGE_GLYPHS);
         if(vr == NULL) return;
 
         uint32_t addr, palette_addr;

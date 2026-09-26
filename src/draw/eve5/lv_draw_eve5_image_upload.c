@@ -53,6 +53,7 @@ static void convert_xrgb8888_to_rgb565(const uint8_t * src, uint8_t * dst, uint3
 static void convert_rgb565a8_to_argb4(const uint8_t * rgb, const uint8_t * alpha,
                                       uint8_t * dst, uint32_t w);
 static void convert_a2_to_l4(const uint8_t * src, uint8_t * dst, uint32_t w);
+static void premultiply_argb8888(const uint8_t * src, uint8_t * dst, uint32_t w);
 
 /**********************
  * IMAGE FORMAT CONVERSION
@@ -181,6 +182,26 @@ static void convert_a2_to_l4(const uint8_t * src, uint8_t * dst, uint32_t w)
         else {
             dst[dst_byte] |= l4;
         }
+    }
+}
+
+/**
+ * ARGB8888 (B, G, R, A in memory) to premultiplied, the color channels
+ * multiplied as the render engine multiplies them, round(c * a / 255): a
+ * premultiplied pixel drawn with blend(ONE, ONE_MINUS_SRC_ALPHA) gives what
+ * the straight one gives with SRC_ALPHA blending.
+ */
+static void premultiply_argb8888(const uint8_t * src, uint8_t * dst, uint32_t w)
+{
+    for(uint32_t x = 0; x < w; x++) {
+        const uint8_t * px = src + 4 * x;
+        uint8_t * out = dst + 4 * x;
+        uint32_t a = px[3];
+        for(uint32_t c = 0; c < 3; c++) {
+            uint32_t v = px[c] * a + 128;
+            out[c] = (uint8_t)((v + (v >> 8)) >> 8);
+        }
+        out[3] = (uint8_t)a;
     }
 }
 
@@ -507,18 +528,21 @@ static void row_writer_commit(row_writer_t * wr, int32_t y)
 lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                                       LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc)
 {
-    return lv_draw_eve5_upload_image_to_gpu_ex(u, img_dsc, true);
+    return lv_draw_eve5_upload_image_to_gpu_ex(u, img_dsc, true, false);
 }
 
 /**
  * Upload image to GPU, see lv_draw_eve5_upload_image_to_gpu.
- * @param evictable  true: the allocation may be evicted under pressure, as
- *                   the pixels can be uploaded again from the CPU copy or
- *                   reloaded by their producer; false: it's pinned
+ * @param evictable    true: the allocation may be evicted under pressure, as
+ *                     the pixels can be uploaded again from the CPU copy or
+ *                     reloaded by their producer; false: it's pinned
+ * @param premultiply  upload straight ARGB8888 premultiplied (as ARGB8, with
+ *                     is_premultiplied set). An image already uploaded stays
+ *                     as it is.
  */
 lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u,
                                                          LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc,
-                                                         bool evictable)
+                                                         bool evictable, bool premultiply)
 {
     /* Check vram_res for image already uploaded to GPU */
     lv_eve5_vram_res_t * existing = eve5_get_image_vram_res(img_dsc);
@@ -586,7 +610,29 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u
 
     uint32_t ram_g_addr = base_addr + palette_size;
 
-    if(!needs_conversion) {
+    bool premultiplied = false;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    premultiply = premultiply && src_cf == LV_COLOR_FORMAT_ARGB8888 && eve_format == ARGB8
+                  && !(img_dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED);
+#else
+    premultiply = false;
+#endif
+
+    if(premultiply) {
+        row_writer_t wr;
+        if(!row_writer_init(&wr, u->hal, ram_g_addr, (uint32_t)eve_stride, src_h)) {
+            LV_LOG_ERROR("EVE5: Failed to allocate row buffer");
+            EVE_GpuAlloc_Free(u->allocator, handle);
+            return NULL;
+        }
+        for(int32_t y = 0; y < src_h; y++) {
+            premultiply_argb8888(src_buf + y * src_stride, row_writer_row(&wr, y), (uint32_t)src_w);
+            row_writer_commit(&wr, y);
+        }
+        lv_free(wr.buf);
+        premultiplied = true;
+    }
+    else if(!needs_conversion) {
         /* Direct copy, native EVE format */
         int32_t row_bytes = (src_w * bpp + 7) / 8;
         if(eve_stride == src_stride) {
@@ -811,7 +857,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u
     vr->source_offset = palette_size;
     vr->palette_offset = (palette_size > 0) ? 0 : GA_INVALID;
     vr->has_content = true;
-    vr->is_premultiplied = (img_dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) != 0
+    vr->is_premultiplied = premultiplied || (img_dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) != 0
                            || src_cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
     /* LVGL L8 source is luminance-as-RGB; EVE samples L8 as alpha-with-white.
      * Set the flag so the image draw paths apply the swizzle. LVGL A8 stays

@@ -1339,6 +1339,17 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src
  */
 lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const void * src)
 {
+    return lv_draw_eve5_resolve_to_gpu_ex(u, src, false);
+}
+
+/**
+ * Load any image source to GPU, see lv_draw_eve5_resolve_to_gpu.
+ * @param premultiply  an image the CPU uploads in straight ARGB8888 goes up
+ *                     premultiplied, see lv_draw_eve5_upload_image_to_gpu_ex.
+ *                     Images the coprocessor decodes or loads stay straight.
+ */
+lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu_ex(lv_draw_eve5_unit_t * u, const void * src, bool premultiply)
+{
     lv_image_src_t src_type = lv_image_src_get_type(src);
 
     if(src_type == LV_IMAGE_SRC_FILE || (src_type == LV_IMAGE_SRC_VARIABLE && eve5_image_needs_decoder(src))) {
@@ -1354,13 +1365,13 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const 
 
         /* upload_image_to_gpu checks existing vram_res, uploads if needed,
          * and attaches vram_res to the image descriptor. */
-        lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu(u, resolved.img_dsc);
+        lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu_ex(u, resolved.img_dsc, true, premultiply);
         lv_draw_eve5_release_image_source(&resolved);
         return vr;
     }
 
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
-        return lv_draw_eve5_upload_image_to_gpu(u, (LV_IMAGE_DSC_CONST lv_image_dsc_t *)src);
+        return lv_draw_eve5_upload_image_to_gpu_ex(u, (LV_IMAGE_DSC_CONST lv_image_dsc_t *)src, true, premultiply);
     }
 
     LV_LOG_WARN("EVE5: Unsupported image source type %d", src_type);

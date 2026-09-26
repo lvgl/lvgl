@@ -151,6 +151,21 @@ extern "C" {
 #define EVE5_LUMINANCE_G_R 25
 #define EVE5_LUMINANCE_G_B 171
 
+/* Upload image glyphs (LV_FONT_GLYPH_FORMAT_IMAGE, such as lv_imgfont's)
+ * whose pixels come from the CPU in straight ARGB8888 premultiplied, and draw
+ * them with blend(ONE, ONE_MINUS_SRC_ALPHA). A rotated or scaled glyph is
+ * filtered bilinearly, and with straight alpha the filter mixes the black of
+ * transparent texels and of the bitmap's border into the color of its edges,
+ * which then get their alpha applied a second time by the blend: dark
+ * outlines. The texture is the image's, flagged is_premultiplied, so other
+ * draws of the same image use it as premultiplied too. Only the upload that
+ * makes the image resident decides: an image drawn before as something else
+ * stays straight, and images the coprocessor decodes or loads are left as
+ * they are. An untransformed glyph draws the same either way. */
+#ifndef LV_DRAW_EVE5_PREMULTIPLY_IMAGE_GLYPHS
+#define LV_DRAW_EVE5_PREMULTIPLY_IMAGE_GLYPHS 1
+#endif
+
 /* Render opaque canvas layers into YCBCR render targets (BT820+ only).
  * YCBCR is a 2x2-pixel block format (4 bytes per block: line stride is
  * 2 bytes/pixel, each stored line covers two display rows) — 1 byte per
@@ -950,8 +965,9 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                                       LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc);
 lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u,
                                                          LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc,
-                                                         bool evictable);
+                                                         bool evictable, bool premultiply);
 lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const void * src);
+lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu_ex(lv_draw_eve5_unit_t * u, const void * src, bool premultiply);
 
 #if EVE5_HW_IMAGE_DECODE
 void lv_draw_eve5_register_image_decoder(lv_draw_eve5_unit_t * unit);

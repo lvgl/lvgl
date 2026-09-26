@@ -369,7 +369,7 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 #endif
 
     lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu_ex(u, (LV_IMAGE_DSC_CONST lv_image_dsc_t *)buf,
-                                                                   evictable);
+                                                                   evictable, false);
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
