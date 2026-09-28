@@ -533,36 +533,38 @@ static void eve5_draw_prev(lv_draw_eve5_unit_t * u, uint16_t target_fmt, uint32_
     LV_UNUSED(target_fmt);
 }
 
-EVE_GpuHandle lv_draw_eve5_hal_luminance(lv_draw_eve5_unit_t * u, EVE_GpuHandle inter, uint32_t inter_stride,
-                                         int32_t w, int32_t h, uint32_t * out_stride)
+EVE_GpuHandle lv_draw_eve5_hal_reduce(lv_draw_eve5_unit_t * u, EVE_GpuHandle inter, uint32_t inter_stride,
+                                      int32_t w, int32_t h, uint16_t eve_format, uint8_t bpp,
+                                      uint32_t * out_stride)
 {
     EVE_HalContext * phost = u->hal;
     int32_t aw = ALIGN_UP(w, 16);
     int32_t ah = ALIGN_UP(h, 16);
-    EVE_GpuHandle lum = lv_draw_eve5_alloc(u, (uint32_t)aw * (uint32_t)ah, GA_ALIGN_128);
-    uint32_t dst = EVE_GpuAlloc_Get(u->allocator, lum);
+    uint32_t stride = (uint32_t)aw * bpp;
+    EVE_GpuHandle reduced = lv_draw_eve5_alloc(u, stride * (uint32_t)ah, GA_ALIGN_128);
+    uint32_t dst = EVE_GpuAlloc_Get(u->allocator, reduced);
     uint32_t src = EVE_GpuAlloc_Get(u->allocator, inter);
     if(dst == GA_INVALID || src == GA_INVALID) {
-        EVE_GpuAlloc_Free(u->allocator, lum);
+        EVE_GpuAlloc_Free(u->allocator, reduced);
         return GA_HANDLE_INVALID;
     }
 
     EVE_GpuAlloc_OpenScope(u->allocator);
-    EVE_CoCmd_renderTarget(phost, dst, L8, aw, ah);
+    EVE_CoCmd_renderTarget(phost, dst, eve_format, aw, ah);
     EVE_CoCmd_dlStart(phost);
     EVE_CoDl_scissorXY(phost, 0, 0);
     EVE_CoDl_scissorSize(phost, aw, ah);
     EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
     EVE_CoDl_clear(phost, 1, 1, 1);
-    eve5_draw_prev(u, L8, src, ARGB8, inter_stride, w, h, false, false);
+    eve5_draw_prev(u, eve_format, src, ARGB8, inter_stride, w, h, false, false);
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
     EVE_CoCmd_graphicsFinish(phost);
     EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
 
     EVE_GpuAlloc_ScopedFree(u->allocator, inter);
-    *out_stride = (uint32_t)aw;
-    return lum;
+    *out_stride = stride;
+    return reduced;
 }
 
 /* Render target format of a layer: a partial-mode screen tile's, from the

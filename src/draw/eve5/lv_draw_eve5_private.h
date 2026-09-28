@@ -149,6 +149,18 @@ extern "C" {
 #define EVE5_LUMINANCE_G 150
 #define EVE5_LUMINANCE_B 28
 
+/* Give a FULL-mode frame the display's color format, as a partial-mode
+ * screen tile has it: LVGL's luminance for L8 and AL88, thresholded for I1,
+ * and the quantization of RGB565 and the other formats with less precision.
+ * The swapchain is RGB8, so the frame renders to an ARGB8 intermediate, which
+ * is reduced into a buffer of that format and presented from it: the
+ * intermediate, the buffer and two more passes each frame. Off, a FULL-mode
+ * frame renders straight into the swapchain in full color, whatever the
+ * display's color format. */
+#ifndef LV_DRAW_EVE5_FULL_COLOR_FORMAT
+#define LV_DRAW_EVE5_FULL_COLOR_FORMAT 0
+#endif
+
 /* Upload image glyphs (LV_FONT_GLYPH_FORMAT_IMAGE, such as lv_imgfont's)
  * whose pixels come from the CPU in straight ARGB8888 premultiplied, and draw
  * them with blend(ONE, ONE_MINUS_SRC_ALPHA). A rotated or scaled glyph is
@@ -414,6 +426,7 @@ typedef enum {
     LV_DRAW_EVE5_REDUCE_NONE,       /**< Rendered directly in its format */
     LV_DRAW_EVE5_REDUCE_LUMINANCE,  /**< LVGL's luminance (L8; AL88 with its alpha; gray on the swapchain) */
     LV_DRAW_EVE5_REDUCE_THRESHOLD,  /**< LVGL's luminance thresholded (I1, stored as L8 of 0 and 255) */
+    LV_DRAW_EVE5_REDUCE_QUANTIZE,   /**< Quantized to a screen tile's format (the swapchain of an RGB565 display) */
 } lv_draw_eve5_reduction_t;
 
 /* LVGL's threshold of the luminance for I1 */
@@ -1049,12 +1062,15 @@ void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, ui
 #endif
 
 /**
- * LVGL's luminance of a layer's ARGB8 content (inter, consumed), in a new L8
- * buffer, for a layer drawn from it: thresholded, or as gray on the swapchain.
- * Returns GA_HANDLE_INVALID, keeping inter, without memory for it.
+ * A layer's ARGB8 content (inter, consumed) in a new buffer of a format with
+ * less precision, for a layer drawn from it: LVGL's luminance in L8,
+ * thresholded or as gray on the swapchain, or quantized to RGB565 and the
+ * like on the swapchain. Returns GA_HANDLE_INVALID, keeping inter, without
+ * memory for it.
  */
-EVE_GpuHandle lv_draw_eve5_hal_luminance(lv_draw_eve5_unit_t * u, EVE_GpuHandle inter, uint32_t inter_stride,
-                                         int32_t w, int32_t h, uint32_t * out_stride);
+EVE_GpuHandle lv_draw_eve5_hal_reduce(lv_draw_eve5_unit_t * u, EVE_GpuHandle inter, uint32_t inter_stride,
+                                      int32_t w, int32_t h, uint16_t eve_format, uint8_t bpp,
+                                      uint32_t * out_stride);
 EVE_GpuHandle lv_draw_eve5_alloc(lv_draw_eve5_unit_t * u, uint32_t size, uint32_t flags);
 void lv_draw_eve5_hal_layer_format(lv_draw_eve5_unit_t * u, const lv_layer_t * layer, bool is_screen,
                                    uint16_t * target_eve_fmt, uint8_t * target_bpp);

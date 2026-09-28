@@ -757,16 +757,38 @@ static inline bool eve5_format_is_lossy(uint16_t eve_format)
 
 /* How the layer's content is reduced to its color format: luminance formats
  * don't render directly as LVGL encodes them. The full-mode swapchain is RGB8,
- * so its frame is reduced to the display's color format (as gray). */
-static lv_draw_eve5_reduction_t eve5_layer_reduction(const lv_layer_t * layer, bool is_swapchain)
+ * so with LV_DRAW_EVE5_FULL_COLOR_FORMAT its frame is reduced to the format
+ * of a screen tile of the display's color format (luminance as gray). */
+static lv_draw_eve5_reduction_t eve5_layer_reduction(lv_draw_eve5_unit_t * u, const lv_layer_t * layer,
+                                                     bool is_swapchain)
 {
     lv_color_format_t cf = layer->draw_buf != NULL ? layer->draw_buf->header.cf : layer->color_format;
+    if(is_swapchain) {
+#if LV_DRAW_EVE5_FULL_COLOR_FORMAT
+        switch(cf) {
+            case LV_COLOR_FORMAT_L8:
+            case LV_COLOR_FORMAT_AL88:
+                return LV_DRAW_EVE5_REDUCE_LUMINANCE;
+            case LV_COLOR_FORMAT_I1:
+                return LV_DRAW_EVE5_REDUCE_THRESHOLD;
+            default: {
+                    uint16_t tile_format;
+                    uint8_t tile_bpp;
+                    lv_draw_eve5_hal_layer_format(u, layer, true, &tile_format, &tile_bpp);
+                    return eve5_format_is_lossy(tile_format) ? LV_DRAW_EVE5_REDUCE_QUANTIZE : LV_DRAW_EVE5_REDUCE_NONE;
+                }
+        }
+#else
+        LV_UNUSED(u);
+        return LV_DRAW_EVE5_REDUCE_NONE;
+#endif
+    }
     switch(cf) {
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_AL88:
             /* Without LV_DRAW_EVE5_L8_EXACT, a layer takes the render engine's
              * luminance (red) directly */
-            return (LV_DRAW_EVE5_L8_EXACT || is_swapchain) ? LV_DRAW_EVE5_REDUCE_LUMINANCE : LV_DRAW_EVE5_REDUCE_NONE;
+            return LV_DRAW_EVE5_L8_EXACT ? LV_DRAW_EVE5_REDUCE_LUMINANCE : LV_DRAW_EVE5_REDUCE_NONE;
         case LV_COLOR_FORMAT_I1:
             return LV_DRAW_EVE5_REDUCE_THRESHOLD;
         default:
@@ -899,17 +921,23 @@ static void eve5_argb8_finish(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
         slice_empty.prev_stride = saved->inter_stride;
 
         /* The swapchain, and a thresholded layer, are drawn from the
-         * luminance, first put in an L8 buffer. An L8 or LA8 layer gets it as
-         * it converts. */
+         * reduced content, first put in a buffer of its format: the
+         * luminance in L8, or the screen tile's format. An L8 or LA8 layer
+         * gets it as it converts. */
         if(reduction == LV_DRAW_EVE5_REDUCE_THRESHOLD
-           || (reduction == LV_DRAW_EVE5_REDUCE_LUMINANCE && saved->is_swapchain)) {
-            uint32_t lum_stride;
-            EVE_GpuHandle lum = lv_draw_eve5_hal_luminance(u, inter, saved->inter_stride, w, h, &lum_stride);
-            if(lum.Id != GA_HANDLE_INVALID.Id) {
-                slice_empty.prev_handle = lum;
-                slice_empty.prev_eve_format = L8;
-                slice_empty.prev_stride = lum_stride;
-                slice_empty.prev_luminance = true;
+           || (reduction != LV_DRAW_EVE5_REDUCE_NONE && saved->is_swapchain)) {
+            bool luminance = reduction != LV_DRAW_EVE5_REDUCE_QUANTIZE;
+            uint16_t reduced_format = L8;
+            uint8_t reduced_bpp = 1;
+            if(!luminance) lv_draw_eve5_hal_layer_format(u, layer, true, &reduced_format, &reduced_bpp);
+            uint32_t reduced_stride;
+            EVE_GpuHandle reduced = lv_draw_eve5_hal_reduce(u, inter, saved->inter_stride, w, h,
+                                                            reduced_format, reduced_bpp, &reduced_stride);
+            if(reduced.Id != GA_HANDLE_INVALID.Id) {
+                slice_empty.prev_handle = reduced;
+                slice_empty.prev_eve_format = reduced_format;
+                slice_empty.prev_stride = reduced_stride;
+                slice_empty.prev_luminance = luminance;
                 slice_empty.prev_threshold = reduction == LV_DRAW_EVE5_REDUCE_THRESHOLD;
             }
         }
@@ -994,11 +1022,13 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
      * is presented or converted once complete. */
     bool whole_only = is_swapchain || (vr != NULL && eve5_format_is_lossy(layer_format));
 
-    /* A layer in a luminance format always renders to an ARGB8
-     * intermediate, and is reduced to its format once complete */
-    lv_draw_eve5_reduction_t reduction = vr != NULL ? eve5_layer_reduction(layer, is_swapchain)
+    /* A layer in a luminance format, and a FULL-mode frame given the
+     * display's color format, always render to an ARGB8 intermediate, and are
+     * reduced to their format once complete */
+    lv_draw_eve5_reduction_t reduction = vr != NULL ? eve5_layer_reduction(u, layer, is_swapchain)
                                          : LV_DRAW_EVE5_REDUCE_NONE;
     bool reduced = reduction != LV_DRAW_EVE5_REDUCE_NONE;
+    bool reduced_luminance = reduced && reduction != LV_DRAW_EVE5_REDUCE_QUANTIZE;
 
     /* Slice-boundary splitting: scan for tasks that require splitting the render
      * queue into slices. Two kinds:
@@ -1006,7 +1036,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
      * - Blur: mipmap downsample chain on the accumulated content
      * Each such task becomes a slice boundary. Between boundaries, the display
      * list budget may split the tasks further (eve5_render_range). */
-    lv_draw_task_t * blend_task = eve5_find_blend_task(layer->draw_task_head, NULL, reduced);
+    lv_draw_task_t * blend_task = eve5_find_blend_task(layer->draw_task_head, NULL, reduced_luminance);
 
     if(blend_task == NULL) {
         lv_draw_eve5_slice_t range;
@@ -1018,9 +1048,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
             eve5_render_range(u, layer, is_screen, layer_has_alpha, &range, true);
         }
         else {
-            /* The layer may not fit one display list, or gets its
-             * luminance exactly: render the slices to an intermediate, and
-             * present or convert that */
+            /* The layer may not fit one display list, or is reduced: render
+             * the slices to an intermediate, and present or convert that */
             eve5_argb8_state_t saved;
             if(!eve5_argb8_detach(u, layer, vr, &saved)) {
                 /* Without memory for it, a layer still renders directly,
@@ -1088,7 +1117,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
         while(cursor) {
             /* Find next slice-boundary task from cursor */
-            blend_task = eve5_find_blend_task(cursor, NULL, reduced);
+            blend_task = eve5_find_blend_task(cursor, NULL, reduced_luminance);
 
             if(blend_task == NULL) {
                 /* No more blend tasks — render remainder as final slice */
@@ -1116,9 +1145,9 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     eve5_render_range(u, layer, is_screen, layer_has_alpha, &slice_tail, true);
                 }
                 else if(argb8_sliced) {
-                    /* The tail may need several slices, or the layer gets its
-                     * luminance exactly: render them to the intermediate as
-                     * the layer, then present or convert it */
+                    /* The tail may need several slices, or the layer is
+                     * reduced: render them to the intermediate as the layer,
+                     * then present or convert it */
                     eve5_render_range(u, layer, is_screen, layer_has_alpha, &slice_tail, true);
                     bool has_content = vr->has_content;
                     EVE_GpuHandle inter = eve5_argb8_attach(u, layer, vr, &saved);
@@ -1266,7 +1295,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
 #if LV_DRAW_EVE5_L8_EXACT
                 /* The math runs on LVGL's luminances of both */
-                if(reduced) {
+                if(reduced_luminance) {
                     prev = lv_draw_eve5_blend_luminance(u, layer, prev);
                     src_handle = lv_draw_eve5_blend_luminance(u, layer, src_handle);
                 }
