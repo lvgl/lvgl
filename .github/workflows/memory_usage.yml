@@ -24,7 +24,7 @@ env:
 jobs:
   flash-usage-check:
     name: Check memory usage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout
         uses: actions/checkout@v6
