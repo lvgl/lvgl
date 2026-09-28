@@ -130,26 +130,24 @@ extern "C" {
 #define LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 0
 #endif
 
-/* Match LVGL's luminance on L8 render targets: screen tiles of L8, AL88 and
- * I1 displays, L8 layers and L8 canvases. The render engine stores
- * (r + g + b) / 3 when it writes an L8 line, LVGL (77 r + 151 g + 28 b) / 256.
- * With this on, such a layer always renders in color to an ARGB8
- * intermediate, which is then drawn into the L8 target once per channel,
- * swizzled to gray and scaled by LVGL's weight. Blend modes on L8 use the same
- * weights. Costs the intermediate (4 bytes per pixel while the layer renders)
- * and a conversion pass. */
+/* Give L8 render targets LVGL's luminance weights: screen tiles of L8, AL88
+ * and I1 displays, L8 layers and L8 canvases. The render engine stores red when
+ * it writes an L8 line, LVGL (77 r + 151 g + 28 b) / 256. With this on, such
+ * a layer always renders in color to an ARGB8 intermediate, which is then
+ * drawn into the L8 target once per channel, swizzled to gray and scaled by
+ * LVGL's weight. Blend modes on L8 use the same weights. Costs the
+ * intermediate (4 bytes per pixel while the layer renders) and a conversion
+ * pass. */
 #ifndef LV_DRAW_EVE5_L8_EXACT
 #define LV_DRAW_EVE5_L8_EXACT 1
 #endif
 
-/* LVGL's luminance weights 77/151/28 of 256, tripled, as color scales of 255
- * for the channels of an L8 render target's (r + g + b) / 3: red and blue,
- * and green's share over 255 (451), added to red and blue where they have
- * room. See lv_draw_eve5_draw_luminance. */
-#define EVE5_LUMINANCE_R 230
-#define EVE5_LUMINANCE_B 84
-#define EVE5_LUMINANCE_G_R 25
-#define EVE5_LUMINANCE_G_B 171
+/* LVGL's luminance weights 77/151/28 of 256 as color scales of 255: red and
+ * blue as LVGL's, green the rest, so white stays white. See
+ * lv_draw_eve5_draw_luminance. */
+#define EVE5_LUMINANCE_R 77
+#define EVE5_LUMINANCE_G 150
+#define EVE5_LUMINANCE_B 28
 
 /* Upload image glyphs (LV_FONT_GLYPH_FORMAT_IMAGE, such as lv_imgfont's)
  * whose pixels come from the CPU in straight ARGB8888 premultiplied, and draw
@@ -440,7 +438,7 @@ typedef enum {
  * lv_draw_eve5_dl_bound.c. */
 
 /* Worst-case entries of the per-layer steps around the tasks */
-#define EVE5_DL_INIT_LAYER      41  /**< lv_draw_eve5_hal_init_layer */
+#define EVE5_DL_INIT_LAYER      45  /**< lv_draw_eve5_hal_init_layer */
 #define EVE5_DL_FINISH_LAYER    1   /**< lv_draw_eve5_hal_finish_layer (DISPLAY) */
 #define EVE5_DL_INIT_L8         28  /**< lv_draw_eve5_hal_init_l8_rendertarget */
 #define EVE5_DL_FINISH_L8       1   /**< lv_draw_eve5_hal_finish_l8_rendertarget */

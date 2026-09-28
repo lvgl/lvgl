@@ -458,13 +458,11 @@ void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
 #if LV_DRAW_EVE5_L8_EXACT
 /* Draw a color bitmap (source set on the current handle) into an L8 render
  * target as LVGL's luminance, (77 r + 151 g + 28 b) / 256. The render engine
- * stores (r + g + b) / 3 of each line, so the draws make the channels sum to
- * three times the luminance: red and blue scaled by three times their weight,
- * green in full, and the rest of green's weight added to red and blue, where
- * it fits. The render engine rounds each product and truncates the third, as
- * LVGL truncates its sum: 81% of all colors come out exact and the rest 1
- * off, and grays are unchanged, so content that goes through again doesn't
- * drift. The source is premultiplied or opaque: alpha takes no part. */
+ * stores red as an L8 line's luminance, so each channel is drawn as gray,
+ * scaled by its weight, and the three draws add up. The render engine rounds
+ * each product where LVGL truncates its sum: 47% of all colors come out
+ * exact, the rest at most 2 above, white stays white and grays at most 1
+ * above. The source is premultiplied or opaque: alpha takes no part. */
 void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, uint32_t stride,
                                  int32_t w, int32_t h)
 {
@@ -473,12 +471,15 @@ void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, ui
     EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, w, h);
     EVE_CoDl_begin(phost, BITMAPS);
     EVE_CoDl_blendFunc(phost, ONE, ZERO);
-    EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ONE);
-    EVE_CoDl_colorRgb(phost, EVE5_LUMINANCE_R, 255, EVE5_LUMINANCE_B);
+    EVE_CoDl_bitmapSwizzle(phost, RED, RED, RED, ONE);
+    EVE_CoDl_colorRgb(phost, EVE5_LUMINANCE_R, EVE5_LUMINANCE_R, EVE5_LUMINANCE_R);
     EVE_CoDl_vertex2f_0(phost, 0, 0);
     EVE_CoDl_blendFunc(phost, ONE, ONE);
-    EVE_CoDl_bitmapSwizzle(phost, GREEN, ZERO, GREEN, ONE);
-    EVE_CoDl_colorRgb(phost, EVE5_LUMINANCE_G_R, 0, EVE5_LUMINANCE_G_B);
+    EVE_CoDl_bitmapSwizzle(phost, GREEN, GREEN, GREEN, ONE);
+    EVE_CoDl_colorRgb(phost, EVE5_LUMINANCE_G, EVE5_LUMINANCE_G, EVE5_LUMINANCE_G);
+    EVE_CoDl_vertex2f_0(phost, 0, 0);
+    EVE_CoDl_bitmapSwizzle(phost, BLUE, BLUE, BLUE, ONE);
+    EVE_CoDl_colorRgb(phost, EVE5_LUMINANCE_B, EVE5_LUMINANCE_B, EVE5_LUMINANCE_B);
     EVE_CoDl_vertex2f_0(phost, 0, 0);
     EVE_CoDl_end(phost);
 }

@@ -765,7 +765,7 @@ static lv_draw_eve5_reduction_t eve5_layer_reduction(const lv_layer_t * layer, b
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_AL88:
             /* Without LV_DRAW_EVE5_L8_EXACT, a layer takes the render engine's
-             * (r + g + b) / 3 directly */
+             * luminance (red) directly */
             return (LV_DRAW_EVE5_L8_EXACT || is_swapchain) ? LV_DRAW_EVE5_REDUCE_LUMINANCE : LV_DRAW_EVE5_REDUCE_NONE;
         case LV_COLOR_FORMAT_I1:
             return LV_DRAW_EVE5_REDUCE_THRESHOLD;

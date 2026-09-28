@@ -37,17 +37,16 @@
  * rather than a term to composite.
  *
  * On an L8 layer, LVGL applies the mode to the luminances. The math then runs
- * once, on the luminance an L8 render target stores ((r + g + b) / 3), and
- * writes the result to all three channels. With LV_DRAW_EVE5_L8_EXACT, dst
- * and src first get LVGL's luminance on all three channels
- * (lv_draw_eve5_blend_luminance), and the math reads one.
+ * once, on the luminance an L8 render target stores (red), and writes the
+ * result to all three channels. With LV_DRAW_EVE5_L8_EXACT, dst and src first
+ * get LVGL's luminance on all three channels (lv_draw_eve5_blend_luminance).
  *
  * Per-channel pass counts:
  *   MULTIPLY:    3 draws/channel = 9 + 1 alpha = 10 draws, 2 DLs
  *   SUBTRACTIVE: 6 draws/channel = 18 + 1 alpha = 19 draws, 2 DLs
  *   DIFFERENCE:  d*a (2 draws), then 10 draws/channel = 30 + 1 alpha, 3 DLs
  *   ADDITIVE:    7 draws/channel = 21, then 6 draws/channel = 18 + 2 alpha, 2 DLs
- *   Luminance: 2 more draws for each read of a bitmap, for one channel only
+ *   Luminance: the same for one channel only
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
@@ -69,9 +68,10 @@
  *      DEFINES
  **********************/
 
-/** Pseudo channel for the per-channel math: the luminance an L8 render
- *  target stores, (r + g + b) / 3, or LVGL's with LV_DRAW_EVE5_L8_EXACT */
-#define LUMINANCE 0xFF
+/** Channel of the luminance for the per-channel math: red, which an L8
+ *  render target stores, and which holds LVGL's luminance (as all channels
+ *  do) with LV_DRAW_EVE5_L8_EXACT */
+#define LUMINANCE RED
 
 /**********************
  *      TYPEDEFS
@@ -223,33 +223,13 @@ static void copy_src_alpha(EVE_HalContext *phost, uint32_t src_addr,
  * Caller must have begun a channel DL.
  **********************/
 
-/**
- * alpha = bitmap.channel, or (add) min(alpha + bitmap.channel, 255).
- * LUMINANCE sums the three channels, each scaled by a third through COLOR_A.
- * The rounding of each third leaves it within 1 of the L8 render target's
- * (r + g + b) / 3. With LV_DRAW_EVE5_L8_EXACT, the bitmap holds the
- * luminance on every channel, and LUMINANCE reads red.
- */
+/** alpha = bitmap.channel, or (add) min(alpha + bitmap.channel, 255) */
 static void draw_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stride,
                          int32_t w, int32_t h, uint8_t channel, bool add)
 {
-#if LV_DRAW_EVE5_L8_EXACT
-    if(channel == LUMINANCE) channel = RED;
-#endif
-    if(channel == LUMINANCE) {
-        EVE_CoDl_colorArgb_ex(phost, 0x55FFFFFF);
-        for(int i = 0; i < 3; i++) {
-            EVE_CoDl_blendFunc(phost, ONE, (add || i > 0) ? ONE : ZERO);
-            setup_swizzled_blit(phost, addr, stride, w, h, rgb_channels[i].channel);
-            draw_bitmap(phost);
-        }
-        EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
-    }
-    else {
-        EVE_CoDl_blendFunc(phost, ONE, add ? ONE : ZERO);
-        setup_swizzled_blit(phost, addr, stride, w, h, channel);
-        draw_bitmap(phost);
-    }
+    EVE_CoDl_blendFunc(phost, ONE, add ? ONE : ZERO);
+    setup_swizzled_blit(phost, addr, stride, w, h, channel);
+    draw_bitmap(phost);
 }
 
 /** alpha = bitmap.channel */
@@ -268,7 +248,7 @@ static void add_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stride,
     draw_channel(phost, addr, stride, w, h, channel, true);
 }
 
-/** alpha = alpha * bitmap.channel / 255 (a real channel, not LUMINANCE) */
+/** alpha = alpha * bitmap.channel / 255 */
 static void multiply_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stride,
                              int32_t w, int32_t h, uint8_t channel)
 {
@@ -279,8 +259,6 @@ static void multiply_channel(EVE_HalContext *phost, uint32_t addr, uint32_t stri
 
 /**
  * alpha = max(alpha - bitmap.channel, 0)
- * The additions clamp at 255 as they go, which gives the same result as
- * clamping LUMINANCE's sum once.
  *
  * Uses complement identity: a - b = 255 - ((255 - a) + b).
  * Hardware clamps the addition to 255, so when b > a the final invert gives 0.
@@ -387,7 +365,7 @@ EVE_GpuHandle lv_draw_eve5_blend_luminance(lv_draw_eve5_unit_t * u, lv_layer_t *
     uint32_t l8_addr = EVE_GpuAlloc_Get(u->allocator, l8);
     uint32_t gray_addr = EVE_GpuAlloc_Get(u->allocator, gray);
     if(l8_addr == GA_INVALID || gray_addr == GA_INVALID) {
-        LV_LOG_WARN("EVE5: Out of memory for the luminance of a blend, using (r + g + b) / 3");
+        LV_LOG_WARN("EVE5: Out of memory for the luminance of a blend, using red");
         if(l8_addr != GA_INVALID) EVE_GpuAlloc_Free(u->allocator, l8);
         if(gray_addr != GA_INVALID) EVE_GpuAlloc_Free(u->allocator, gray);
         return handle;
@@ -467,24 +445,15 @@ bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
      * stamps gate their scoped frees on the op's close sync. */
     EVE_GpuAlloc_OpenScope(u->allocator);
 
+    const blend_channel_t * chs = luminance ? luminance_channel : rgb_channels;
+    int n = luminance ? 1 : 3;
+
     begin_channel_dl(phost, temp_addr, aw, ah, w, h);
-    if(luminance) {
-        /* A sum can't scale alpha in one draw: store the dst luminance,
-         * then scale the stored value by the src luminance */
-        load_channel(phost, dst_addr, stride, w, h, LUMINANCE);
-        store_alpha(phost, w, h, 1, 1, 1, false);
-        load_channel(phost, src_addr, stride, w, h, LUMINANCE);
-        EVE_CoDl_colorMask(phost, 1, 1, 1, 0);
-        EVE_CoDl_blendFunc(phost, ZERO, DST_ALPHA);
-        draw_rect(phost, w, h);
-    }
-    else {
-        for(int i = 0; i < 3; i++) {
-            const blend_channel_t * ch = &rgb_channels[i];
-            load_channel(phost, dst_addr, stride, w, h, ch->channel);
-            multiply_channel(phost, src_addr, stride, w, h, ch->channel);
-            store_alpha(phost, w, h, ch->r_mask, ch->g_mask, ch->b_mask, false);
-        }
+    for(int i = 0; i < n; i++) {
+        const blend_channel_t * ch = &chs[i];
+        load_channel(phost, dst_addr, stride, w, h, ch->channel);
+        multiply_channel(phost, src_addr, stride, w, h, ch->channel);
+        store_alpha(phost, w, h, ch->r_mask, ch->g_mask, ch->b_mask, false);
     }
     copy_src_alpha(phost, src_addr, stride, w, h);
     finish_channel_dl(phost);
