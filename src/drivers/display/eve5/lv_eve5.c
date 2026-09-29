@@ -638,19 +638,19 @@ void lv_eve5_set_coprocessor_reset_handler(lv_display_t * disp,
 /**
  * Build the partial-mode tile draw buffer.
  *
- * With LV_USE_DRAW_VRAM, header-only initially; backing allocated on first
+ * Header-only initially. With LV_USE_DRAW_VRAM, backing allocated on first
  * dispatch:
  *   - EVE5 draw unit: VRAM only (via vram_alloc_cb)
  *   - SW fallback: CPU memory (lazy-allocated by LVGL)
  * DISCARDABLE flag set after each flush prevents stale uploads when the
- * tile is re-used across frames or after a mode switch. Without, it has CPU
- * memory, which the EVE5 draw unit doesn't use: its tiles render into EVE
- * memory, which the draw unit records as the buffer's.
+ * tile is re-used across frames or after a mode switch. Without, it gets CPU
+ * memory while the display is in PARTIAL mode (back_buf), which the EVE5 draw
+ * unit doesn't use: its tiles render into EVE memory, which the draw unit
+ * records as the buffer's.
  */
 static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf)
 {
     uint32_t stride = lv_draw_buf_width_to_stride(phost->Width, cf);
-#if LV_USE_DRAW_VRAM
     lv_draw_buf_t * buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     if(buf == NULL) return NULL;
 
@@ -662,14 +662,33 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
     buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     /* As the swapchain's: a tile the EVE5 draw unit renders needs no CPU clear */
     buf->handlers = full_buf_handlers();
-#else
-    lv_draw_buf_t * buf = lv_draw_buf_create_ex(full_buf_handlers(), phost->Width, 64, cf, stride);
-    if(buf == NULL) return NULL;
-#endif
     /* 64 rows, which the size sets, as lv_refr fits the tiles to it */
     buf->data_size = stride * 64;
     return buf;
 }
+
+#if !LV_USE_DRAW_VRAM
+/* Give the draw buffer LVGL renders the frame in the CPU memory LVGL requires
+ * of it, and take it from the other, which the display doesn't use */
+static bool back_buf(lv_draw_buf_t * buf, bool backed)
+{
+    if(backed && buf->unaligned_data == NULL) {
+        void * mem = buf->handlers->buf_malloc_cb(buf->data_size, (lv_color_format_t)buf->header.cf);
+        if(mem == NULL) {
+            LV_LOG_ERROR("EVE5: No CPU memory for the display's draw buffer (%" LV_PRIu32 " bytes)", buf->data_size);
+            return false;
+        }
+        buf->unaligned_data = mem;
+        buf->data = lv_draw_buf_align_ex(buf->handlers, mem, (lv_color_format_t)buf->header.cf);
+    }
+    else if(!backed && buf->unaligned_data != NULL) {
+        buf->handlers->buf_free_cb(buf->unaligned_data);
+        buf->unaligned_data = NULL;
+        buf->data = NULL;
+    }
+    return true;
+}
+#endif
 
 /* lv_refr clears the screen layer of a display with an alpha color format
  * before drawing. On the CPU, with LV_USE_DRAW_VRAM, that would give the
@@ -678,8 +697,8 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
  * needs it: every FULL mode frame starts by clearing the swapchain
  * (init_layer), to black, what transparent is on the RGB8 swapchain, and so
  * does every tile. The CPU memory of the SW path is cleared as usual. Without
- * LV_USE_DRAW_VRAM, the buffers always have CPU memory, which the draw unit,
- * when it renders the frame, doesn't use. */
+ * LV_USE_DRAW_VRAM, the display's draw buffer always has CPU memory, which the
+ * draw unit, when it renders the frame, doesn't use. */
 static void full_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer)
 {
 #if LV_USE_DRAW_VRAM
@@ -691,12 +710,15 @@ static void full_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_
     if(draw_buf->data != NULL) lv_draw_buf_clear_ex(draw_buf, a, NULL);
 }
 
+/* LVGL's draw buffer handlers, which an application may have given its own
+ * allocator, with the clear of the display's buffers. Taken when the first
+ * display is created. */
 static const lv_draw_buf_handlers_t * full_buf_handlers(void)
 {
     static lv_draw_buf_handlers_t handlers;
     static bool initialized;
     if(!initialized) {
-        lv_draw_buf_init_with_default_handlers(&handlers);
+        handlers = *lv_draw_buf_get_handlers();
         handlers.buf_clear_cb = full_buf_clear_cb;
         initialized = true;
     }
@@ -720,8 +742,9 @@ static const lv_draw_buf_handlers_t * full_buf_handlers(void)
  *     allocated CPU buffer; flush_cb's FULL-mode SW branch uploads it to a
  *     temp VRAM and presents via SWAPCHAIN_0 + CMD_SWAP.
  * Without, the draw unit records the swapchain as its EVE memory
- * (lv_eve5_set_vram_handlers), and the buffer has the CPU memory LVGL
- * requires, which only the SW path renders into.
+ * (lv_eve5_set_vram_handlers), and the buffer gets the CPU memory LVGL
+ * requires while the display is in FULL mode (back_buf), which only the SW
+ * path renders into.
  *
  * Format is RGB8 to match the HAL-reserved swapchain. With LV_COLOR_DEPTH != 24,
  * applying this mode causes lv_display_set_color_format to retag the display
@@ -751,7 +774,6 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
      * swapchain on its own, as none of them is the screen layer. */
     uint32_t data_size = lv_draw_buf_width_to_stride((uint32_t)W, LV_COLOR_FORMAT_ARGB8888) * (uint32_t)H;
 
-#if LV_USE_DRAW_VRAM
     lv_draw_buf_t * buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     if(buf == NULL) return NULL;
     buf->header.magic = LV_IMAGE_HEADER_MAGIC;
@@ -762,10 +784,6 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
     buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     buf->data = NULL;
     buf->handlers = full_buf_handlers();
-#else
-    lv_draw_buf_t * buf = lv_draw_buf_create_ex(full_buf_handlers(), W, H, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
-    if(buf == NULL) return NULL;
-#endif
     buf->header.cf = LV_COLOR_FORMAT_RGB888;
     buf->header.stride = stride;
     buf->data_size = data_size;
@@ -836,6 +854,10 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
         (void)phost;
 #endif
 
+#if !LV_USE_DRAW_VRAM
+        back_buf(drvr->tile_buf, false);
+        back_buf(drvr->full_buf, true);
+#endif
         lv_display_set_draw_buffers(disp, drvr->full_buf, NULL);
         /* set_color_format propagates to disp, layer_head, and the active
          * draw_buf's header.cf — sets things up for FULL render mode. */
@@ -860,6 +882,10 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
         EVE_Hal_wr32(phost, REG_SC0_PTR1, drvr->frame_buffer_0);
         drvr->frame_buffer_1 = drvr->frame_buffer_0;
 
+#if !LV_USE_DRAW_VRAM
+        back_buf(drvr->full_buf, false);
+        back_buf(drvr->tile_buf, true);
+#endif
         lv_display_set_draw_buffers(disp, drvr->tile_buf, NULL);
         lv_display_set_color_format(disp, drvr->partial_cf);
         lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
