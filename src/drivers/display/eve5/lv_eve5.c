@@ -123,6 +123,7 @@ static void delete_event_cb(lv_event_t * e);
 static void composite_to_framebuffer(lv_eve5_driver_t * drvr);
 static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area, const uint8_t * px_map);
 static void swapchain_presented(lv_eve5_driver_t * drvr);
+static const lv_draw_buf_handlers_t * full_buf_handlers(void);
 static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf);
 static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost);
 static lv_eve5_vram_res_t * create_swapchain_res(EVE_HalContext * phost, const lv_draw_buf_t * full_buf);
@@ -656,7 +657,8 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
     buf->header.cf = cf;
     buf->header.stride = stride;
     buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
-    buf->handlers = lv_draw_buf_get_handlers();
+    /* As the swapchain's: a tile the EVE5 draw unit renders needs no CPU clear */
+    buf->handlers = full_buf_handlers();
 #else
     lv_draw_buf_t * buf = lv_draw_buf_create_ex(lv_draw_buf_get_handlers(), phost->Width, 64, cf, stride);
     if(buf == NULL) return NULL;
@@ -668,11 +670,12 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
 
 /* lv_refr clears the screen layer of a display with an alpha color format
  * before drawing. On the CPU, with LV_USE_DRAW_VRAM, that would give the
- * swapchain buffer CPU memory (and a black frame to present). The swapchain
- * needs none: every FULL mode frame starts by clearing it (init_layer), to
- * black, what transparent is on the RGB8 swapchain. The CPU memory of the SW
- * path is cleared as usual, which without LV_USE_DRAW_VRAM the buffer always
- * has. */
+ * swapchain buffer CPU memory (and a black frame to present), and a partial
+ * mode tile CPU memory, cleared and uploaded as the tile's content. Neither
+ * needs it: every FULL mode frame starts by clearing the swapchain
+ * (init_layer), to black, what transparent is on the RGB8 swapchain, and so
+ * does every tile. The CPU memory of the SW path is cleared as usual, which
+ * without LV_USE_DRAW_VRAM the buffers always have. */
 static void full_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer)
 {
     LV_UNUSED(layer);
