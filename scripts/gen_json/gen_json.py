@@ -11,7 +11,7 @@ sys.path.insert(0, base_path)
 
 project_dir = os.path.abspath(os.path.join(base_path, '..', '..'))
 docs_path = os.path.join(project_dir, 'docs')
-sys.path.insert(0, docs_path)
+sys.path.insert(0, os.path.dirname(base_path))
 
 import create_fake_lib_c  # NOQA
 import pycparser_monkeypatch  # NOQA
