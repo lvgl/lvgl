@@ -103,7 +103,7 @@ class ApiDocs:
             raise RuntimeError(f"duplicate macro definition for {name}: {locations}")
         (macro,) = definitions
         return SimpleNamespace(
-            name=macro.name, description=macro.doc,
+            name=macro.name, description=macro.doc or "",
             # Preserve the historical null representation for zero arguments.
             params=macro.params or None, initializer=macro.initializer,
         )
