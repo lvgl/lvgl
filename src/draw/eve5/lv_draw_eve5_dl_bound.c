@@ -95,7 +95,8 @@ static uint32_t image_stamps(const lv_draw_task_t * t)
  * Worst-case entries of task `t`, and for a FILL of the BORDER it unifies with.
  * `end` is the exclusive end of the slice, which the unified pair must not cross.
  */
-void lv_draw_eve5_task_dl_bound(lv_draw_task_t * t, const lv_draw_task_t * end, lv_draw_eve5_dl_bound_t * bound)
+void lv_draw_eve5_task_dl_bound(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, const lv_draw_task_t * end,
+                                lv_draw_eve5_dl_bound_t * bound)
 {
     bound->rgb = 0;
     bound->alpha = 0;
@@ -144,7 +145,7 @@ void lv_draw_eve5_task_dl_bound(lv_draw_task_t * t, const lv_draw_task_t * end, 
         case LV_DRAW_TASK_TYPE_LAYER: {
                 /* A child without GPU content draws nothing */
                 const lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                lv_eve5_vram_res_t * child_vr = eve5_get_vram_res((lv_layer_t *)dsc->src);
+                lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(u, (lv_layer_t *)dsc->src);
                 if(child_vr == NULL) break;
             }
             /* fallthrough */
@@ -200,7 +201,7 @@ bool lv_draw_eve5_range_fits_dl(lv_draw_eve5_unit_t * u, lv_draw_task_t * start,
             continue;
         }
         lv_draw_eve5_dl_bound_t bound;
-        lv_draw_eve5_task_dl_bound(t, end, &bound);
+        lv_draw_eve5_task_dl_bound(u, t, end, &bound);
         if(t->type == LV_DRAW_TASK_TYPE_FILL) merged = lv_draw_eve5_fill_matching_border(t, end);
         total += bound.rgb;
         if(total > budget) return false;

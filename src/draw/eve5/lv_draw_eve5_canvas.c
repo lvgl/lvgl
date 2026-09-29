@@ -83,12 +83,10 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
 
     /* Skip direct load for canvases with existing GPU content.
      * The render path handles incremental updates; direct load replaces everything. */
-    lv_eve5_vram_res_t * existing_vr = eve5_get_vram_res(layer);
-    if(existing_vr != NULL && layer->draw_buf != NULL) {
-        if(lv_draw_buf_has_flag(layer->draw_buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE)) {
-            existing_vr->has_content = false;
-            lv_draw_buf_clear_flag(layer->draw_buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
-        }
+    lv_eve5_vram_res_t * existing_vr = eve5_get_vram_res(u, layer);
+    if(existing_vr != NULL && eve5_buf_discarded(layer->draw_buf)) {
+        existing_vr->has_content = false;
+        eve5_buf_clear_discarded(layer->draw_buf);
     }
     if(existing_vr != NULL && existing_vr->has_content) {
         return false;
@@ -154,13 +152,13 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
      * use the LVGL decoder cache's residency check (lv_image_decoder.c, the
      * vram_check_cb hook) fails for that entry, drops it, and re-decodes
      * fresh. */
-    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
-    if(vr == NULL) {
+    lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
+    bool attach = vr == NULL;
+    if(attach) {
         vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
         if(vr == NULL) {
             return false;
         }
-        layer->draw_buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
     }
     else {
         /* ScopedFree: previous canvas content may be in an in-flight display list */
@@ -171,6 +169,7 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
     *vr = *src_vr;
     vr->base.unit = (lv_draw_unit_t *)u;
     vr->has_content = true;
+    if(attach) lv_draw_eve5_res_set(u, layer->draw_buf, vr);
 
     /* Decoder allocations are born GC-flagged (reloadable on demand via the
      * decoder cache). The canvas has no reload path — clear the eviction-tier

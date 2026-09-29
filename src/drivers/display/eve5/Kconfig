@@ -1,10 +1,9 @@
 config LV_USE_EVE5
 	bool "EVE5 display and touch"
 	default n
-	depends on LV_USE_DRAW_VRAM
 	help
 		Display and touch driver using EVE HAL and the EVE GPU allocator.
-		Requires the VRAM residency module and external EVE HAL libraries.
+		Requires external EVE HAL libraries.
 
 if LV_USE_EVE5
 

@@ -11,6 +11,8 @@
  *   dlStart -> commands -> display -> swap -> graphicsFinish
  * - Screen partial textures are handed to the display driver via draw_buf->vram_res
  * - Child layer textures are freed via lv_draw_buf_destroy -> vram_free_cb
+ * - Without LV_USE_DRAW_VRAM, the unit records them itself, and frees a child
+ *   layer's when LVGL deletes it (lv_draw_eve5_residency.c)
  *
  * Alpha Recovery:
  * EVE hardware applies the same blend equation to all four channels. With standard
@@ -138,7 +140,13 @@ static int32_t dispatch_nort(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t evaluate_nort(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
 
+#if !LV_USE_DRAW_VRAM
+static int32_t eve5_delete(lv_draw_unit_t * draw_unit);
+#endif
+
 static bool s_eve5_enabled = true;
+
+lv_draw_eve5_stats_t lv_draw_eve5_stats;
 
 /* Whether a layer is the display's screen layer, which renders into the
  * display's buffer. A snapshot also makes its layer the display's layer_head
@@ -148,6 +156,22 @@ static inline bool eve5_is_screen_layer(const lv_display_t * disp, const lv_laye
     return disp != NULL && layer->parent == NULL && layer == disp->layer_head
            && layer->draw_buf == disp->buf_act;
 }
+
+#if !LV_USE_DRAW_VRAM
+/* Whether what the draw unit renders on a layer gets where LVGL needs it.
+ * Without VRAM residency, LVGL flushes another display's frame from its draw
+ * buffer in CPU memory, which nothing asks the draw unit to fill: the software
+ * renderer draws those. A canvas's and a snapshot's are read back when LVGL
+ * asks for them (LV_EVENT_SCREEN_LOAD_START), the EVE5 display presents its
+ * own frame. */
+static inline bool eve5_renders_for(const lv_display_t * eve5_disp, const lv_layer_t * layer)
+{
+    while(layer->parent != NULL) layer = layer->parent;
+    const lv_display_t * disp = layer->display;
+    if(disp == NULL || disp == eve5_disp || layer->draw_buf == NULL) return true;
+    return layer->draw_buf != disp->buf_act;
+}
+#endif
 
 /**********************
  * GLOBAL FUNCTIONS
@@ -189,8 +213,15 @@ void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
     lv_draw_eve5_handle_pool_init(unit);
     lv_draw_eve5_rom_font_init(unit);
 
+#if LV_USE_DRAW_VRAM
     lv_draw_eve5_register_vram_callbacks(unit);
     unit->base_unit.vram_font_free_cb = lv_draw_eve5_vram_font_free;
+#else
+    /* LVGL tells the draw units about layers deleted, results it needs back
+     * in a layer's buffer, and images dropped from its cache */
+    unit->base_unit.event_cb = lv_draw_eve5_res_event;
+    unit->base_unit.delete_cb = eve5_delete;
+#endif
 
 #if EVE5_HW_IMAGE_DECODE
     lv_draw_eve5_register_image_decoder(unit);
@@ -207,6 +238,11 @@ void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
         lv_display_t * disp = (lv_display_t *)hal->UserContext;
         lv_eve5_link_draw_unit(disp, &unit->base_unit);
         lv_eve5_set_coprocessor_reset_handler(disp, lv_draw_eve5_handle_coprocessor_reset);
+#if !LV_USE_DRAW_VRAM
+        lv_eve5_set_vram_handlers(disp, lv_draw_eve5_res_attach_cb, lv_draw_eve5_res_detach_cb);
+        lv_display_add_event_cb(disp, lv_draw_eve5_res_refresh_event, LV_EVENT_REFR_START, unit);
+        lv_display_add_event_cb(disp, lv_draw_eve5_res_refresh_event, LV_EVENT_REFR_READY, unit);
+#endif
     }
 
     LV_LOG_INFO("EVE5: Draw unit initialized, ID=%d", DRAW_UNIT_ID_EVE5);
@@ -221,6 +257,21 @@ void lv_draw_eve5_deinit(void)
     LV_LOG_INFO("EVE5: Draw unit deinitialized");
 }
 
+#if !LV_USE_DRAW_VRAM
+/* lv_deinit: the EVE memory the unit recorded goes with the allocator */
+static int32_t eve5_delete(lv_draw_unit_t * draw_unit)
+{
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
+    if(disp != NULL) {
+        lv_eve5_set_vram_handlers(disp, NULL, NULL);
+        lv_display_remove_event_cb_with_user_data(disp, lv_draw_eve5_res_refresh_event, u);
+    }
+    lv_draw_eve5_res_deinit(u);
+    return 0;
+}
+#endif
+
 void lv_draw_eve5_set_enabled(bool enabled)
 {
     LV_LOG_WARN("EVE5: set_enabled %d -> %d", (int)s_eve5_enabled, (int)enabled);
@@ -230,6 +281,11 @@ void lv_draw_eve5_set_enabled(bool enabled)
 bool lv_draw_eve5_get_enabled(void)
 {
     return s_eve5_enabled;
+}
+
+const lv_draw_eve5_stats_t * lv_draw_eve5_get_stats(void)
+{
+    return &lv_draw_eve5_stats;
 }
 
 /**********************
@@ -267,6 +323,14 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     }
 #else
     LV_UNUSED(draw_unit);
+#endif
+
+#if !LV_USE_DRAW_VRAM
+    if(task->target_layer != NULL
+       && !eve5_renders_for(lv_eve5_disp_from_hal(((lv_draw_eve5_unit_t *)draw_unit)->hal), task->target_layer)) {
+        EVE5_LOG("EVE5: Evaluate: type=%s -> declined (another display)", task_type_str(task->type));
+        return 0;
+    }
 #endif
 
     task->preference_score = 10;
@@ -365,20 +429,23 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
          * to a canvas layer (draw_buf-backed, parentless, not the screen), so
          * the screen's format and the opaque-canvas YCBCR policy apply on the
          * first allocation instead of through an init_layer realloc. */
-        {
-            lv_display_t * hint_disp = lv_eve5_disp_from_hal(u->hal);
-            u->alloc_screen_hint = eve5_is_screen_layer(hint_disp, layer);
+        lv_display_t * hint_disp = lv_eve5_disp_from_hal(u->hal);
+        u->alloc_screen_hint = eve5_is_screen_layer(hint_disp, layer);
 #if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
-            u->alloc_canvas_hint = (layer->draw_buf != NULL && layer->parent == NULL
-                                    && !u->alloc_screen_hint);
+        u->alloc_canvas_hint = (layer->draw_buf != NULL && layer->parent == NULL
+                                && !u->alloc_screen_hint);
 #endif
-        }
+#if LV_USE_DRAW_VRAM
         lv_draw_layer_alloc_buf(layer, draw_unit);
+#else
+        lv_draw_eve5_res_prepare_layer(u, layer, u->alloc_screen_hint);
+#endif
         u->alloc_screen_hint = false;
 #if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
         u->alloc_canvas_hint = false;
 #endif
 
+#if LV_USE_DRAW_VRAM
         t = layer->draw_task_head;
         while(t) {
             if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
@@ -390,6 +457,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             }
             t = t->next;
         }
+#endif
 
         eve5_render_layer(u, layer);
         lv_draw_dispatch_request();
@@ -436,7 +504,7 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
                 if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
                     lv_draw_image_dsc_t * dsc = t->draw_dsc;
                     lv_layer_t * child = (lv_layer_t *)dsc->src;
-                    lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(child);
+                    lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(u, child);
                     if(child_vr != NULL && child_vr->has_content) {
                         has_visible_tasks = true;
                         break;
@@ -468,12 +536,12 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
             /* The previous slice's output is the layer content. The swapchain
              * cannot take it over, nor can a layer in another format; blit it
              * with an otherwise empty slice. */
-            lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+            lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
             if(!slice->isolated && slice->prev_handle.Id != GA_HANDLE_INVALID.Id && vr != NULL) {
                 if(vr->is_swapchain || slice->prev_eve_format != 0) {
                     bool is_swapchain = vr->is_swapchain;
                     lv_draw_eve5_hal_init_layer(u, layer, is_screen, slice);
-                    vr = eve5_get_vram_res(layer);
+                    vr = eve5_get_vram_res(u, layer);
                     if(vr != NULL) {
                         lv_draw_eve5_hal_finish_layer(u, layer, is_screen, 0);
                         if(!is_swapchain) vr->has_content = true;
@@ -500,7 +568,7 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
     else if(slice->prev_handle.Id != GA_HANDLE_INVALID.Id) {
         uint32_t prev_addr = EVE_GpuAlloc_Get(u->allocator, slice->prev_handle);
         if(prev_addr != GA_INVALID) {
-            lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+            lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
             u->canvas_orig_addr = prev_addr;
             u->canvas_orig_format = slice->prev_eve_format ? slice->prev_eve_format : (vr ? vr->eve_format : ARGB8);
             u->canvas_orig_stride = slice->prev_eve_format ? slice->prev_stride : (vr ? vr->stride : 0);
@@ -516,9 +584,8 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
     else {
         /* Without a previous slice, the layer's content, such as a canvas's,
          * is the background, unless init_layer discards it */
-        lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
-        bool discard = layer->draw_buf != NULL
-                       && lv_draw_buf_has_flag(layer->draw_buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
+        lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
+        bool discard = eve5_buf_discarded(layer->draw_buf);
         uint32_t base = (vr != NULL && vr->has_content && !vr->is_swapchain && !discard)
                         ? EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) : GA_INVALID;
         if(base != GA_INVALID) {
@@ -576,7 +643,7 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
 
     lv_draw_eve5_hal_init_layer(u, layer, is_screen, slice);
 
-    if(eve5_get_vram_res(layer) == NULL) {
+    if(eve5_get_vram_res(u, layer) == NULL) {
         LV_LOG_ERROR("EVE5: Layer allocation failed!");
 
         t = eve5_slice_first(slice, layer);
@@ -604,7 +671,7 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
     /* Display list budget. The L8 alpha pass has already fixed the slice end,
      * and the swapchain is only rendered to when all of it fits. */
     lv_draw_eve5_budget_t budget;
-    lv_eve5_vram_res_t * target_vr = eve5_get_vram_res(layer);
+    lv_eve5_vram_res_t * target_vr = eve5_get_vram_res(u, layer);
     budget.alpha_pass = !finish_tasks;
     budget.can_split = !l8_alpha && !target_vr->is_swapchain;
     budget.reserve = EVE5_DL_FINISH_LAYER;
@@ -707,7 +774,7 @@ static void eve5_render_range(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         lv_draw_task_t * stop = eve5_render_slice(u, layer, is_screen, layer_has_alpha, &slice, apply_bitmap_mask);
         if(stop == range->end) return;
 
-        lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+        lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
         EVE_GpuHandle next = lv_draw_eve5_alloc(u, vr->base.size, GA_ALIGN_128);
         if(EVE_GpuAlloc_Get(u->allocator, next) == GA_INVALID) {
             LV_LOG_ERROR("EVE5: Failed to allocate buffer for the next slice, dropping its tasks");
@@ -849,7 +916,7 @@ static bool eve5_argb8_detach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, lv_ev
         conv.prev_stride = saved->stride;
         conv.prev_luminance = saved->sample_as_luminance;
         lv_draw_eve5_hal_init_layer(u, layer, false, &conv);
-        if(eve5_get_vram_res(layer) != NULL) {
+        if(eve5_get_vram_res(u, layer) != NULL) {
             lv_draw_eve5_hal_finish_layer(u, layer, false, 0);
             vr->has_content = true;
             vr->is_premultiplied = true;
@@ -942,7 +1009,7 @@ static void eve5_argb8_finish(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
             }
         }
         lv_draw_eve5_hal_init_layer(u, layer, is_screen, &slice_empty);
-        lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+        lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
         if(vr != NULL) {
             lv_draw_eve5_hal_finish_layer(u, layer, is_screen, 0);
             if(!saved->is_swapchain) vr->has_content = true;
@@ -950,7 +1017,7 @@ static void eve5_argb8_finish(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
     }
     else if(saved->is_swapchain) {
         EVE_HalContext * phost = u->hal;
-        lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+        lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
         EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, vr->eve_format, w, h);
         EVE_CoCmd_dlStart(phost);
         EVE_CoDl_scissorXY(phost, 0, 0);
@@ -1007,7 +1074,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
         return;
     }
 
-    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+    lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
     bool is_swapchain = is_screen && vr != NULL && vr->is_swapchain;
 
     /* The format the layer renders to. Its buffer may still hold another,
@@ -1225,7 +1292,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 lv_memzero(&slice_base, sizeof(slice_base));
                 slice_base.prev_handle = GA_HANDLE_INVALID;
                 lv_draw_eve5_hal_init_layer(u, layer, inter_is_screen, &slice_base);
-                if(eve5_get_vram_res(layer) != NULL) {
+                if(eve5_get_vram_res(u, layer) != NULL) {
                     lv_draw_eve5_hal_finish_layer(u, layer, inter_is_screen, 0);
                     EVE_GpuHandle new_handle = lv_draw_eve5_alloc(u, vr->base.size, GA_ALIGN_128);
                     if(EVE_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
@@ -1568,6 +1635,7 @@ static int32_t dispatch_nort(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     /* All queued and ready — render atomically */
     if(queued_count > 0 && layer->all_tasks_added && blocked_count == 0) {
+#if LV_USE_DRAW_VRAM
         lv_draw_layer_alloc_buf(layer, draw_unit);
 
         for(t = layer->draw_task_head; t != NULL; t = t->next) {
@@ -1579,6 +1647,21 @@ static int32_t dispatch_nort(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
                 }
             }
         }
+#else
+        /* The screen renders to the implicit framebuffer. The child layers
+         * the software renderer drew are uploaded, as LVGL's VRAM residency
+         * would make them resident. */
+        u->res_render++;
+        for(t = layer->draw_task_head; t != NULL; t = t->next) {
+            if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 || t->state != LV_DRAW_TASK_STATE_QUEUED) continue;
+            if(t->type != LV_DRAW_TASK_TYPE_LAYER) continue;
+            lv_layer_t * child = (lv_layer_t *)((lv_draw_image_dsc_t *)t->draw_dsc)->src;
+            if(child != NULL && child->draw_buf != NULL && child->draw_buf->data != NULL
+               && lv_draw_eve5_res_image(u, (const lv_image_dsc_t *)child->draw_buf) == NULL) {
+                lv_draw_eve5_upload_image_to_gpu_ex(u, (lv_image_dsc_t *)child->draw_buf, true, false);
+            }
+        }
+#endif
 
         eve5_render_layer_nort(u, layer);
         lv_draw_dispatch_request();
@@ -1698,7 +1781,7 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
     }
 
     /* Bookkeeping mirrors lv_draw_eve5_hal_finish_layer */
-    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+    lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
     if(vr != NULL && rendered_count > 0) {
         vr->is_premultiplied = true;
         vr->has_content = true;

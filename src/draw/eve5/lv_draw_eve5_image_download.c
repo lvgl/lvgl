@@ -170,6 +170,8 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
     uint32_t gpu_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle);
     if(gpu_addr == GA_INVALID) return false;
     gpu_addr += vr->source_offset;
+    lv_draw_eve5_stats.downloads++;
+    lv_draw_eve5_stats.download_bytes += (uint64_t)vr->stride * (uint32_t)buf->header.h;
 
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     /* YCBCR surfaces (opaque canvas render targets under

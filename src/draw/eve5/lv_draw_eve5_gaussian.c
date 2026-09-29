@@ -551,7 +551,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     /* The layer buffer is in the layer's render target format, which the blur
      * reads and writes back; the pyramid levels are ARGB8 */
-    lv_eve5_vram_res_t * layer_vr = eve5_get_vram_res(layer);
+    lv_eve5_vram_res_t * layer_vr = eve5_get_vram_res(u, layer);
     uint16_t layer_fmt = layer_vr != NULL ? layer_vr->eve_format : ARGB8;
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     if(layer_fmt == YCBCR) {

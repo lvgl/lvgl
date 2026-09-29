@@ -30,6 +30,18 @@ extern "C" {
 
 #define LV_EVE5_TOUCH_POINTS_MAX 5
 
+/* LVGL's VRAM residency module, which not every LVGL has. Without it, the
+ * EVE5 draw unit records the EVE copies of LVGL's buffers itself. */
+#ifndef LV_USE_DRAW_VRAM
+#define LV_USE_DRAW_VRAM 0
+#endif
+
+/* Image data the VRAM residency module makes writable, so that a draw unit
+ * can attach its residency. Const without it. */
+#ifndef LV_IMAGE_DSC_CONST
+#define LV_IMAGE_DSC_CONST const
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -64,13 +76,29 @@ typedef enum {
     LV_EVE5_RENDER_MODE_FULL = 1,
 } lv_eve5_render_mode_t;
 
+struct _lv_draw_unit_t;
+
 /**
- * EVE5 VRAM residency descriptor that extends lv_draw_buf_vram_res_t with
- * GPU handle and EVE-specific metadata. Attached to draw_buf->vram_res
- * for buffers backed by EVE5 RAM_G allocations.
+ * Owner and size of an EVE copy of an LVGL buffer. With LVGL's VRAM residency
+ * module, its residency descriptor; without, the same two fields.
+ */
+#if LV_USE_DRAW_VRAM
+typedef lv_draw_buf_vram_res_t lv_eve5_vram_base_t;
+#else
+typedef struct {
+    struct _lv_draw_unit_t * unit;     /**< The draw unit the EVE memory belongs to */
+    uint32_t size;                     /**< Bytes of EVE memory */
+} lv_eve5_vram_base_t;
+#endif
+
+/**
+ * EVE5 VRAM residency descriptor: the EVE memory holding a copy of an LVGL
+ * buffer (a layer, a canvas, an image), with its GPU handle and EVE-specific
+ * metadata. With LV_USE_DRAW_VRAM, attached to the buffer's vram_res; without,
+ * recorded by the EVE5 draw unit, by the buffer's address.
  */
 typedef struct {
-    lv_draw_buf_vram_res_t base;       /**< Must be first member */
+    lv_eve5_vram_base_t base;          /**< Must be first member */
     EVE_GpuHandle gpu_handle;          /**< RAM_G allocation handle (GA_HANDLE_INVALID when is_swapchain) */
     uint16_t eve_format;               /**< EVE bitmap format (ARGB8, RGB565, etc.) */
     uint32_t stride;                   /**< Bytes per row in RAM_G */
@@ -155,16 +183,33 @@ bool lv_eve5_set_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode);
 lv_eve5_render_mode_t lv_eve5_get_render_mode(lv_display_t * disp);
 
 /**
- * Set the EVE5 draw unit pointer on the display's full_buf vram_res, so LVGL
- * can dispatch vram callbacks (vram_check, vram_free, etc.) on the swapchain
- * draw buffer. Called automatically by lv_draw_eve5_init() — the draw unit
- * looks up the display through hal->UserContext (set by lv_eve5_create*).
+ * Connect the EVE5 draw unit to the display: its residency owns the swapchain
+ * of FULL mode (with LV_USE_DRAW_VRAM, so LVGL can dispatch the vram callbacks
+ * on the swapchain draw buffer), and the display dispatches the hooks the draw
+ * unit registers to it. Called automatically by lv_draw_eve5_init() — the
+ * draw unit looks up the display through hal->UserContext (set by
+ * lv_eve5_create*).
  *
- * Safe to call multiple times. No-op if the display has no full_buf or if
- * draw_unit is NULL.
+ * Safe to call multiple times. No-op if draw_unit is NULL.
  */
-struct _lv_draw_unit_t;
 void lv_eve5_link_draw_unit(lv_display_t * disp, struct _lv_draw_unit_t * draw_unit);
+
+#if !LV_USE_DRAW_VRAM
+/**
+ * Without LVGL's VRAM residency module, the draw unit records which EVE memory
+ * holds a copy of which LVGL buffer, including the display's draw buffers.
+ * Registered by lv_draw_eve5_init() after lv_eve5_link_draw_unit(): the
+ * display records the swapchain of FULL mode with attach_cb, and takes the
+ * EVE memory of a rendered tile of PARTIAL mode, or of its draw buffers when
+ * it's deleted, with detach_cb, which returns NULL for a buffer without.
+ * Pass NULL to clear.
+ */
+void lv_eve5_set_vram_handlers(lv_display_t * disp,
+                               void (*attach_cb)(struct _lv_draw_unit_t * draw_unit, const void * key,
+                                                 lv_eve5_vram_res_t * vr),
+                               lv_eve5_vram_res_t * (*detach_cb)(struct _lv_draw_unit_t * draw_unit,
+                                                                 const void * key));
+#endif
 
 /**
  * Record the sync marker that follows the screen-swapping CMD_SWAP. Called by
@@ -284,7 +329,8 @@ EVE_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp);
 
 /**
  * Detach the GPU handle from a draw_buf's vram_res, transferring ownership
- * to the caller. The vram_res is freed and set to NULL.
+ * to the caller. The vram_res is freed and set to NULL. With LV_USE_DRAW_VRAM
+ * only: without, the draw unit records the EVE memory of buffers.
  *
  * Optionally also returns the EVE bitmap format and stride that the buffer
  * was rendered in — the compositor needs these to sample each tile correctly,
@@ -301,8 +347,10 @@ EVE_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp);
  * @return           true if a handle was detached, false if no VRAM residency
  *                   (or it was the swapchain descriptor)
  */
+#if LV_USE_DRAW_VRAM
 bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, EVE_GpuHandle *out_handle,
                                uint16_t *out_format, uint32_t *out_stride);
+#endif
 
 /*--------------------
  * Single Touch

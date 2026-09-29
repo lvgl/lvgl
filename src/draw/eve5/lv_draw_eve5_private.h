@@ -239,9 +239,12 @@ extern "C" {
  **********************/
 
 /* Font VRAM residency: one entry per font, stores either a single whole-font
- * GPU allocation with per-glyph offset table, or per-glyph GPU handles. */
+ * GPU allocation with per-glyph offset table, or per-glyph GPU handles. With
+ * LV_USE_DRAW_VRAM, attached to the font's descriptor (lv_font_dsc_base_t);
+ * without, found in the unit's list by the descriptor's address, and checked
+ * against the font it was made for, which LVGL doesn't say it deleted. */
 typedef struct lv_draw_eve5_font_vram_t {
-    lv_draw_buf_vram_res_t base;    /**< Must be first member (.unit = owning draw unit) */
+    lv_eve5_vram_base_t base;       /**< Must be first member (.unit = owning draw unit) */
     struct lv_draw_eve5_font_vram_t * prev; /**< Intrusive list: previous resident font */
     struct lv_draw_eve5_font_vram_t * next; /**< Intrusive list: next resident font */
     EVE_GpuHandle gpu_handle;       /**< Whole-font: single GPU allocation. Per-glyph: GA_HANDLE_INVALID */
@@ -250,7 +253,43 @@ typedef struct lv_draw_eve5_font_vram_t {
     uint32_t glyph_count;           /**< Array size for glyph_offsets or glyph_handles */
     uint8_t bpp;                    /**< Bits per pixel (1/2/4/8) */
     bool whole_font;                /**< true = single allocation, false = per-glyph handles */
+#if !LV_USE_DRAW_VRAM
+    const void * dsc;               /**< The font descriptor, the key, and the font it was then: */
+    LV_IMAGE_DSC_CONST void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, lv_draw_buf_t *);
+    const void * glyph_bitmap;      /**< Bitmaps of a font in LVGL's format */
+    int32_t line_height;
+    int32_t base_line;
+#endif
 } lv_draw_eve5_font_vram_t;
+
+#if !LV_USE_DRAW_VRAM
+/* What the EVE copy of a residency without LV_USE_DRAW_VRAM copies, which
+ * decides how long it's kept (see lv_draw_eve5_residency.c) */
+typedef enum {
+    LV_DRAW_EVE5_RES_LAYER,     /**< A child layer, which has no buffer: kept until LVGL deletes the layer */
+    LV_DRAW_EVE5_RES_TARGET,    /**< A display buffer the CPU doesn't hold the frame in, never checked */
+    LV_DRAW_EVE5_RES_BUFFER,    /**< An image in CPU memory, or a canvas's buffer: kept while it's unchanged */
+    LV_DRAW_EVE5_RES_SOURCE,    /**< An image the decoders read, a file or encoded data: kept until dropped */
+} lv_draw_eve5_res_kind_t;
+
+typedef struct lv_draw_eve5_res_entry_t lv_draw_eve5_res_entry_t;
+
+/* Buckets of the residency table, a power of two */
+#ifndef LV_DRAW_EVE5_RES_BUCKETS
+#define LV_DRAW_EVE5_RES_BUCKETS 256
+#endif
+
+/* Images and buffers kept resident at most, beyond which the least recently
+ * used are released */
+#ifndef LV_DRAW_EVE5_RES_MAX
+#define LV_DRAW_EVE5_RES_MAX 512
+#endif
+
+/* Fonts kept resident at most */
+#ifndef LV_DRAW_EVE5_FONT_MAX
+#define LV_DRAW_EVE5_FONT_MAX 64
+#endif
+#endif
 
 
 #if LV_DRAW_EVE5_SW_FALLBACK
@@ -551,7 +590,19 @@ typedef struct {
     EVE_GpuAlloc * allocator;
 
     /* Asset caches */
-    lv_draw_eve5_font_vram_t * font_list; /**< Head of intrusive list of resident fonts */
+    lv_draw_eve5_font_vram_t * font_list; /**< Head of intrusive list of resident fonts, most recent first */
+#if !LV_USE_DRAW_VRAM
+    uint32_t font_count;
+
+    /* Residency without LVGL's VRAM residency module (lv_draw_eve5_residency.c) */
+    lv_draw_eve5_res_entry_t * res_buckets[LV_DRAW_EVE5_RES_BUCKETS];
+    lv_draw_eve5_res_entry_t * res_lru_head;  /**< Most recently used */
+    lv_draw_eve5_res_entry_t * res_lru_tail;
+    uint32_t res_count;
+    uint32_t res_render;      /**< Counts layer renders: an entry used in the current one is kept */
+    uint32_t res_refresh;     /**< Counts display refreshes, odd while one is in progress */
+    bool decode_to_gpu;       /**< The HW decoder decodes into a residency for the draw unit, no pixels */
+#endif
 #if LV_DRAW_EVE5_SW_FALLBACK
     lv_draw_eve5_sw_cache_t sw_cache;
 #endif
@@ -608,14 +659,55 @@ typedef struct {
     lv_draw_eve5_ring_t scratch_ring;
 } lv_draw_eve5_unit_t;
 
+/* Counted as they happen, see lv_draw_eve5_get_stats */
+extern lv_draw_eve5_stats_t lv_draw_eve5_stats;
+
+static inline void lv_draw_eve5_count_upload(uint32_t bytes)
+{
+    lv_draw_eve5_stats.uploads++;
+    lv_draw_eve5_stats.upload_bytes += bytes;
+}
+
 /**********************
  * INLINE HELPERS
  **********************/
 
-static inline lv_eve5_vram_res_t * eve5_get_vram_res(lv_layer_t * layer)
+/**********************
+ * RESIDENCY
+ **********************/
+
+/* The EVE memory holding a copy of an LVGL buffer, an image, a canvas or a
+ * layer. With LVGL's VRAM residency module (LV_USE_DRAW_VRAM), it's attached
+ * to the buffer (vram_res) and LVGL moves buffers between CPU memory and EVE
+ * memory as the draw units need them. Without, the draw unit records it by the
+ * buffer's address: a layer's buffer, or the layer itself when LVGL gave it
+ * none, an image source. It only keeps what it can tell is still a copy, from
+ * the notifications LVGL sends the draw units and by checking the CPU memory
+ * of the buffers the CPU can change (lv_draw_eve5_residency.c). */
+
+#if LV_USE_DRAW_VRAM
+static inline lv_eve5_vram_res_t * lv_draw_eve5_res_get(lv_draw_eve5_unit_t * u, const void * buf)
 {
-    if(layer == NULL || layer->draw_buf == NULL || layer->draw_buf->vram_res == NULL) return NULL;
-    return (lv_eve5_vram_res_t *)layer->draw_buf->vram_res;
+    LV_UNUSED(u);
+    return buf ? (lv_eve5_vram_res_t *)((const lv_draw_buf_t *)buf)->vram_res : NULL;
+}
+
+static inline void lv_draw_eve5_res_set(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vram_res_t * vr)
+{
+    LV_UNUSED(u);
+    ((lv_draw_buf_t *)buf)->vram_res = (lv_draw_buf_vram_res_t *)vr;
+}
+
+/* The buffer a layer renders to */
+static inline const void * eve5_layer_key(const lv_layer_t * layer)
+{
+    return layer->draw_buf;
+}
+
+/* An image's EVE copy, NULL without one */
+static inline lv_eve5_vram_res_t * lv_draw_eve5_res_image(lv_draw_eve5_unit_t * u, const lv_image_dsc_t * img)
+{
+    return lv_draw_eve5_res_get(u, img);
 }
 
 static inline lv_draw_eve5_font_vram_t * eve5_get_font_vram_from_dsc(lv_font_dsc_base_t * font_dsc)
@@ -625,17 +717,87 @@ static inline lv_draw_eve5_font_vram_t * eve5_get_font_vram_from_dsc(lv_font_dsc
     return (lv_draw_eve5_font_vram_t *)font_dsc->vram_res;
 }
 
-static inline lv_draw_eve5_font_vram_t * eve5_get_font_vram(const lv_font_t * font)
+static inline lv_draw_eve5_font_vram_t * eve5_get_font_vram(lv_draw_eve5_unit_t * u, const lv_font_t * font)
 {
+    LV_UNUSED(u);
     if(font == NULL || font->dsc == NULL) return NULL;
     return eve5_get_font_vram_from_dsc((lv_font_dsc_base_t *)font->dsc);
 }
-
-static inline lv_eve5_vram_res_t * eve5_get_image_vram_res(const lv_image_dsc_t * img)
+#else
+lv_eve5_vram_res_t * lv_draw_eve5_res_get(lv_draw_eve5_unit_t * u, const void * key);
+/** Record vr as the EVE copy of key, replacing any (not freed), or forget it with NULL */
+void lv_draw_eve5_res_set_kind(lv_draw_eve5_unit_t * u, const void * key, lv_eve5_vram_res_t * vr,
+                               lv_draw_eve5_res_kind_t kind);
+static inline void lv_draw_eve5_res_set(lv_draw_eve5_unit_t * u, const void * key, lv_eve5_vram_res_t * vr)
 {
-    if(img == NULL || img->vram_res == NULL) return NULL;
-    return (lv_eve5_vram_res_t *)img->vram_res;
+    lv_draw_eve5_res_set_kind(u, key, vr, LV_DRAW_EVE5_RES_BUFFER);
 }
+/** Forget key's EVE copy and return it, NULL without one */
+lv_eve5_vram_res_t * lv_draw_eve5_res_detach(lv_draw_eve5_unit_t * u, const void * key);
+/** Free key's EVE copy, the EVE memory once the display lists using it complete */
+void lv_draw_eve5_res_free(lv_draw_eve5_unit_t * u, const void * key);
+/** An image's EVE copy, NULL without one or when the image changed since */
+lv_eve5_vram_res_t * lv_draw_eve5_res_image(lv_draw_eve5_unit_t * u, const lv_image_dsc_t * img);
+/** The EVE copy of an image the decoders read (a file path or data), NULL without one */
+lv_eve5_vram_res_t * lv_draw_eve5_res_source(lv_draw_eve5_unit_t * u, const void * src);
+/** Record vr as the EVE copy of the decoded image of src, which frees it on failure */
+bool lv_draw_eve5_res_set_source(lv_draw_eve5_unit_t * u, const void * src, lv_eve5_vram_res_t * vr);
+/** Note that the CPU memory of buf matches its EVE copy now, after an upload or a download */
+void lv_draw_eve5_res_commit(lv_draw_eve5_unit_t * u, const lv_draw_buf_t * buf);
+/** Give the layer the EVE memory it renders to, in time for rendering it (dispatch) */
+bool lv_draw_eve5_res_prepare_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen);
+/** The draw unit's event callback: layers deleted, results read back, images dropped */
+void lv_draw_eve5_res_event(lv_event_t * e);
+/** Refresh counting, for checking CPU memory once per refresh */
+void lv_draw_eve5_res_refresh_event(lv_event_t * e);
+void lv_draw_eve5_res_deinit(lv_draw_eve5_unit_t * u);
+/** Display hooks, see lv_eve5_set_vram_handlers */
+void lv_draw_eve5_res_attach_cb(lv_draw_unit_t * draw_unit, const void * key, lv_eve5_vram_res_t * vr);
+lv_eve5_vram_res_t * lv_draw_eve5_res_detach_cb(lv_draw_unit_t * draw_unit, const void * key);
+
+/* A layer's buffer, or the layer when LVGL gave it none */
+static inline const void * eve5_layer_key(const lv_layer_t * layer)
+{
+    return layer->draw_buf ? (const void *)layer->draw_buf : (const void *)layer;
+}
+
+lv_draw_eve5_font_vram_t * eve5_get_font_vram(lv_draw_eve5_unit_t * u, const lv_font_t * font);
+void lv_draw_eve5_font_free_all(lv_draw_eve5_unit_t * u);
+#endif
+
+/* LVGL's VRAM residency module flags a buffer whose content was cleared
+ * (CLEARZERO) or went stale (DISCARDABLE) without touching its EVE copy: the
+ * copy is to be dropped. Without the module, the draw unit sees a cleared
+ * buffer in its CPU memory. */
+static inline bool eve5_buf_discarded(const lv_draw_buf_t * buf)
+{
+#if LV_USE_DRAW_VRAM
+    return buf != NULL && lv_draw_buf_has_flag((lv_draw_buf_t *)buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
+#else
+    LV_UNUSED(buf);
+    return false;
+#endif
+}
+
+static inline void eve5_buf_clear_discarded(lv_draw_buf_t * buf)
+{
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_clear_flag(buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
+#else
+    LV_UNUSED(buf);
+#endif
+}
+
+static inline lv_eve5_vram_res_t * eve5_get_vram_res(lv_draw_eve5_unit_t * u, const lv_layer_t * layer)
+{
+    if(layer == NULL || eve5_layer_key(layer) == NULL) return NULL;
+    return lv_draw_eve5_res_get(u, eve5_layer_key(layer));
+}
+
+/** EVE memory for a render target of a buffer or layer w by h of color format
+ * cf, as the draw unit renders it (lv_draw_eve5_hal.c) */
+lv_eve5_vram_res_t * lv_draw_eve5_vram_create(lv_draw_eve5_unit_t * u, uint32_t w, uint32_t h,
+                                              lv_color_format_t cf, uint32_t alloc_flags);
 
 static inline void eve5_vram_res_resolve(EVE_GpuAlloc *alloc, const lv_eve5_vram_res_t * vr,
                                          uint32_t * out_addr, uint32_t * out_palette_addr)
@@ -884,9 +1046,11 @@ static inline lv_draw_task_t * eve5_slice_first(const lv_draw_eve5_slice_t * sli
  * CACHE API
  **********************/
 
-/* Font VRAM residency — stored on font->vram_res.
+/* Font VRAM residency — stored on font->vram_res with LV_USE_DRAW_VRAM.
  * vram_font_free_cb implementation registered on the draw unit. */
+#if LV_USE_DRAW_VRAM
 void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t * font_dsc);
+#endif
 lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
                                                     const lv_font_t * font);
 uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t * u,
@@ -944,7 +1108,9 @@ void lv_draw_eve5_sw_cache_drop(lv_draw_eve5_unit_t * u, lv_draw_task_type_t typ
  * VRAM & FORMAT API
  **********************/
 
+#if LV_USE_DRAW_VRAM
 void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u);
+#endif
 bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_t lv_cf,
                                            uint16_t * eve_fmt, uint8_t * bpp);
 bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal, lv_color_format_t src_cf,
@@ -1139,7 +1305,8 @@ lv_draw_task_t * lv_draw_eve5_fill_matching_border(lv_draw_task_t * t, const lv_
 
 /* Display list budget (lv_draw_eve5_dl_bound.c) */
 uint32_t lv_draw_eve5_dl_budget(EVE_HalContext * phost);
-void lv_draw_eve5_task_dl_bound(lv_draw_task_t * t, const lv_draw_task_t * end, lv_draw_eve5_dl_bound_t * bound);
+void lv_draw_eve5_task_dl_bound(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, const lv_draw_task_t * end,
+                                lv_draw_eve5_dl_bound_t * bound);
 bool lv_draw_eve5_range_fits_dl(lv_draw_eve5_unit_t * u, lv_draw_task_t * start, const lv_draw_task_t * end,
                                 uint32_t overhead);
 void lv_draw_eve5_line_dl_bound(const lv_draw_task_t * t, lv_draw_eve5_dl_bound_t * bound);

@@ -269,6 +269,7 @@ static bool upload_whole_font(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc
     fv->gpu_handle = handle;
     fv->glyph_offsets = offsets;
     fv->whole_font = true;
+    lv_draw_eve5_count_upload(total_size);
 
     LV_LOG_INFO("EVE5: Uploaded whole font (%"PRIu32" glyphs, %"PRIu32" bytes, %"PRIu8" bpp)",
                 glyph_count, total_size, bpp);
@@ -305,6 +306,7 @@ static bool upload_single_glyph(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_d
     }
 
     fv->glyph_handles[gid] = handle;
+    lv_draw_eve5_count_upload(glyph_size);
     return true;
 }
 
@@ -324,13 +326,8 @@ static void font_list_insert(lv_draw_eve5_unit_t * u, lv_draw_eve5_font_vram_t *
     u->font_list = fv;
 }
 
-void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t * font_dsc)
+static void font_release(lv_draw_eve5_unit_t * u, lv_draw_eve5_font_vram_t * fv)
 {
-    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
-
-    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram_from_dsc(font_dsc);
-    if(fv == NULL) return;
-
     font_list_remove(u, fv);
 
     /* Early exit: gpu_handle is GA_HANDLE_INVALID when never assigned (sentinel) */
@@ -349,8 +346,89 @@ void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t 
     if(fv->glyph_offsets) lv_free(fv->glyph_offsets);
     if(fv->glyph_handles) lv_free(fv->glyph_handles);
     lv_free(fv);
+#if !LV_USE_DRAW_VRAM
+    u->font_count--;
+#endif
+}
+
+#if LV_USE_DRAW_VRAM
+void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t * font_dsc)
+{
+    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram_from_dsc(font_dsc);
+    if(fv == NULL) return;
+    font_release((lv_draw_eve5_unit_t *)draw_unit, fv);
     font_dsc->vram_res = NULL;
 }
+
+/* Attach the residency to the font, or detach it with NULL */
+static inline void font_attach(lv_draw_eve5_unit_t * u, const lv_font_t * font, lv_draw_eve5_font_vram_t * fv)
+{
+    LV_UNUSED(u);
+    ((lv_font_dsc_base_t *)font->dsc)->vram_res = (struct _lv_draw_buf_vram_res_t *)fv;
+}
+#else
+/* The bitmaps of a font in LVGL's format */
+static const void * font_glyph_bitmap(const lv_font_t * font)
+{
+    if(font->get_glyph_bitmap != lv_font_get_bitmap_fmt_txt) return NULL;
+    return ((const lv_font_fmt_txt_dsc_t *)font->dsc)->glyph_bitmap;
+}
+
+/* LVGL doesn't tell the draw units about fonts it deletes, and another font
+ * can take the memory of one: the residency is the font's while the font
+ * looks the same, its callbacks, bitmaps and metrics */
+static bool font_matches(const lv_draw_eve5_font_vram_t * fv, const lv_font_t * font)
+{
+    return fv->get_glyph_bitmap == font->get_glyph_bitmap && fv->glyph_bitmap == font_glyph_bitmap(font)
+           && fv->line_height == font->line_height && fv->base_line == font->base_line;
+}
+
+lv_draw_eve5_font_vram_t * eve5_get_font_vram(lv_draw_eve5_unit_t * u, const lv_font_t * font)
+{
+    if(font == NULL || font->dsc == NULL) return NULL;
+    for(lv_draw_eve5_font_vram_t * fv = u->font_list; fv != NULL; fv = fv->next) {
+        if(fv->dsc != font->dsc) continue;
+        if(!font_matches(fv, font)) {
+            font_release(u, fv);
+            return NULL;
+        }
+        /* Most recently used first */
+        if(fv != u->font_list) {
+            font_list_remove(u, fv);
+            font_list_insert(u, fv);
+        }
+        return fv;
+    }
+    return NULL;
+}
+
+/* Record the residency as the font's, releasing the least recently used
+ * fonts beyond LV_DRAW_EVE5_FONT_MAX; forget it with NULL */
+static void font_attach(lv_draw_eve5_unit_t * u, const lv_font_t * font, lv_draw_eve5_font_vram_t * fv)
+{
+    if(fv == NULL) {
+        u->font_count--;
+        return;
+    }
+    fv->dsc = font->dsc;
+    fv->get_glyph_bitmap = font->get_glyph_bitmap;
+    fv->glyph_bitmap = font_glyph_bitmap(font);
+    fv->line_height = font->line_height;
+    fv->base_line = font->base_line;
+    u->font_count++;
+    while(u->font_count > LV_DRAW_EVE5_FONT_MAX) {
+        lv_draw_eve5_font_vram_t * last = u->font_list;
+        while(last != NULL && last->next != NULL) last = last->next;
+        if(last == NULL || last == fv) break;
+        font_release(u, last);
+    }
+}
+
+void lv_draw_eve5_font_free_all(lv_draw_eve5_unit_t * u)
+{
+    while(u->font_list != NULL) font_release(u, u->font_list);
+}
+#endif
 
 /**
  * Ensure font VRAM residency. Creates or validates GPU state.
@@ -365,22 +443,24 @@ lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
 
     const lv_font_fmt_txt_dsc_t * font_dsc = (const lv_font_fmt_txt_dsc_t *)font->dsc;
 
-    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(font);
-    if(fv != NULL) {
-        if(fv->base.unit != (lv_draw_unit_t *)u) {
-            lv_draw_unit_t * old_unit = fv->base.unit;
-            if(old_unit && old_unit->vram_font_free_cb) {
-                old_unit->vram_font_free_cb(old_unit, (lv_font_dsc_base_t *)font->dsc);
-            }
-            else {
-                if(fv->glyph_offsets) lv_free(fv->glyph_offsets);
-                if(fv->glyph_handles) lv_free(fv->glyph_handles);
-                lv_free(fv);
-                ((lv_font_dsc_base_t *)font->dsc)->vram_res = NULL;
-            }
-            fv = NULL;
+    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(u, font);
+#if LV_USE_DRAW_VRAM
+    if(fv != NULL && fv->base.unit != (lv_draw_unit_t *)u) {
+        lv_draw_unit_t * old_unit = fv->base.unit;
+        if(old_unit && old_unit->vram_font_free_cb) {
+            old_unit->vram_font_free_cb(old_unit, (lv_font_dsc_base_t *)font->dsc);
         }
-        else if(fv->whole_font) {
+        else {
+            if(fv->glyph_offsets) lv_free(fv->glyph_offsets);
+            if(fv->glyph_handles) lv_free(fv->glyph_handles);
+            lv_free(fv);
+            ((lv_font_dsc_base_t *)font->dsc)->vram_res = NULL;
+        }
+        fv = NULL;
+    }
+#endif
+    if(fv != NULL) {
+        if(fv->whole_font) {
             if(EVE_GpuAlloc_Get(u->allocator, fv->gpu_handle) != GA_INVALID) {
                 return fv;
             }
@@ -403,7 +483,7 @@ lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
         fv->glyph_count = compute_glyph_count(font_dsc);
         fv->gpu_handle = GA_HANDLE_INVALID;
 
-        ((lv_font_dsc_base_t *)font->dsc)->vram_res = (struct _lv_draw_buf_vram_res_t *)fv;
+        font_attach(u, font, fv);
     }
 
     /* Whole-font for small plain fonts, per-glyph otherwise */
@@ -443,7 +523,7 @@ lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
     fv->glyph_handles = lv_malloc(fv->glyph_count * sizeof(EVE_GpuHandle));
     if(!fv->glyph_handles) {
         lv_free(fv);
-        ((lv_font_dsc_base_t *)font->dsc)->vram_res = NULL;
+        font_attach(u, font, NULL);
         return NULL;
     }
     for(uint32_t i = 0; i < fv->glyph_count; i++) {
@@ -496,24 +576,22 @@ uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t * u,
  */
 static lv_draw_eve5_font_vram_t * font_ensure_generic(lv_draw_eve5_unit_t * u, const lv_font_t * font)
 {
-    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(font);
-    if(fv != NULL) {
-        if(fv->base.unit != (lv_draw_unit_t *)u) {
-            lv_draw_unit_t * old_unit = fv->base.unit;
-            if(old_unit && old_unit->vram_font_free_cb) {
-                old_unit->vram_font_free_cb(old_unit, (lv_font_dsc_base_t *)font->dsc);
-            }
-            else {
-                if(fv->glyph_handles) lv_free(fv->glyph_handles);
-                lv_free(fv);
-                ((lv_font_dsc_base_t *)font->dsc)->vram_res = NULL;
-            }
-            fv = NULL;
+    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(u, font);
+#if LV_USE_DRAW_VRAM
+    if(fv != NULL && fv->base.unit != (lv_draw_unit_t *)u) {
+        lv_draw_unit_t * old_unit = fv->base.unit;
+        if(old_unit && old_unit->vram_font_free_cb) {
+            old_unit->vram_font_free_cb(old_unit, (lv_font_dsc_base_t *)font->dsc);
         }
         else {
-            return fv;
+            if(fv->glyph_handles) lv_free(fv->glyph_handles);
+            lv_free(fv);
+            ((lv_font_dsc_base_t *)font->dsc)->vram_res = NULL;
         }
+        fv = NULL;
     }
+#endif
+    if(fv != NULL) return fv;
 
     fv = lv_malloc_zeroed(sizeof(lv_draw_eve5_font_vram_t));
     if(!fv) return NULL;
@@ -525,7 +603,7 @@ static lv_draw_eve5_font_vram_t * font_ensure_generic(lv_draw_eve5_unit_t * u, c
     fv->whole_font = false;
     fv->glyph_handles = NULL;
 
-    ((lv_font_dsc_base_t *)font->dsc)->vram_res = (struct _lv_draw_buf_vram_res_t *)fv;
+    font_attach(u, font, fv);
     font_list_insert(u, fv);
     return fv;
 }
@@ -605,6 +683,7 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
     }
 
     EVE_Hal_requestFenceBeforeSwap(u->hal);
+    lv_draw_eve5_count_upload(glyph_size);
 
     fv->glyph_handles[gid] = handle;
     return addr;
@@ -953,7 +1032,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     /* Image glyph (e.g., emoji): draw as full-color image */
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
-        void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
+        const void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
         if(img_src == NULL) return;
 
         int32_t x = glyph_dsc->letter_coords->x1 - layer->buf_area.x1;
@@ -1089,7 +1168,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
     }
 
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
-        void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
+        const void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
         if(img_src == NULL) return;
 
         int32_t x = glyph_dsc->letter_coords->x1 - layer->buf_area.x1;

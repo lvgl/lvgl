@@ -118,11 +118,13 @@ static lv_draw_buf_t * decode_strips(lv_image_decoder_dsc_t * dsc)
     lv_draw_buf_t * full = lv_draw_buf_create_ex(&(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers),
                                                  header->w, header->h, header->cf, LV_STRIDE_AUTO);
     if(full == NULL) return NULL;
+#if LV_USE_DRAW_VRAM
     /* Pixel memory is allocated on first residency */
     if(!lv_draw_buf_ensure_resident(full, NULL)) {
         lv_draw_buf_destroy(full);
         return NULL;
     }
+#endif
 
     lv_area_t full_area = { 0, 0, header->w - 1, header->h - 1 };
     lv_area_t decoded_area = { LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN };
@@ -171,25 +173,37 @@ static bool resolve_strips(eve5_resolved_image_t * resolved)
     return true;
 }
 
+#if EVE5_HW_IMAGE_DECODE
+static lv_image_decoder_t * s_hw_decoder;
+#endif
+
 /**
  * Resolve an image source to an lv_image_dsc_t.
  * For files, opens with use_indexed=true to preserve indexed formats.
+ * Without LV_USE_DRAW_VRAM, the decoded image isn't cached: the draw unit
+ * keeps its EVE copy, by the source. The hardware decoder decodes into it
+ * without pixels in CPU memory, leaving img_dsc NULL.
  */
 bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t * resolved,
                                        lv_draw_unit_t * draw_unit)
 {
     lv_memzero(resolved, sizeof(*resolved));
+#if !LV_USE_DRAW_VRAM
+    LV_UNUSED(draw_unit);
+#endif
 
     lv_image_src_t src_type = lv_image_src_get_type(src);
     if(src_type == LV_IMAGE_SRC_VARIABLE && !eve5_image_needs_decoder(src)) {
         resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)src;
         resolved->decoder_open = false;
+#if LV_USE_DRAW_VRAM
         if(draw_unit != NULL) {
             if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit)) {
                 LV_LOG_WARN("EVE5: Failed to ensure variable image residency");
                 return false;
             }
         }
+#endif
         return true;
     }
 
@@ -198,8 +212,18 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
         lv_image_decoder_args_t args;
         lv_memzero(&args, sizeof(args));
         args.use_indexed = true;
+#if !LV_USE_DRAW_VRAM
+        args.no_cache = true;
+#endif
 
         lv_result_t res = lv_image_decoder_open(&resolved->decoder_dsc, src, &args);
+#if !LV_USE_DRAW_VRAM && EVE5_HW_IMAGE_DECODE
+        if(res == LV_RESULT_OK && resolved->decoder_dsc.decoded == NULL
+           && resolved->decoder_dsc.decoder == s_hw_decoder) {
+            resolved->decoder_open = true;
+            return true;
+        }
+#endif
         if(res == LV_RESULT_OK && resolved->decoder_dsc.decoded == NULL) {
             if(!resolve_strips(resolved)) {
                 LV_LOG_WARN("EVE5: Failed to decode image");
@@ -214,6 +238,7 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
             resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)resolved->decoder_dsc.decoded;
             resolved->decoder_open = true;
         }
+#if LV_USE_DRAW_VRAM
         if(draw_unit != NULL) {
             if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit)) {
                 LV_LOG_WARN("EVE5: Failed to ensure decoded image residency");
@@ -221,6 +246,7 @@ bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t *
                 return false;
             }
         }
+#endif
         return true;
     }
 
@@ -856,6 +882,7 @@ bool lv_draw_eve5_try_load_lvgl_bin_image(lv_draw_eve5_unit_t * u, const void * 
     int32_t up_h = up_vr->height;
     uint32_t up_src_off = up_vr->source_offset;
     uint32_t up_pal_off = up_vr->palette_offset;
+    lv_draw_eve5_res_set(u, &synth, NULL);
     lv_free(up_vr);
 
     uint32_t base = EVE_GpuAlloc_Get(u->allocator, handle);
@@ -1353,19 +1380,47 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu_ex(lv_draw_eve5_unit_t * u, con
     lv_image_src_t src_type = lv_image_src_get_type(src);
 
     if(src_type == LV_IMAGE_SRC_FILE || (src_type == LV_IMAGE_SRC_VARIABLE && eve5_image_needs_decoder(src))) {
+#if !LV_USE_DRAW_VRAM
+        /* Decoded before: its EVE copy, by the file or the data */
+        lv_eve5_vram_res_t * decoded_vr = lv_draw_eve5_res_source(u, src);
+        if(decoded_vr != NULL && EVE_GpuAlloc_Get(u->allocator, decoded_vr->gpu_handle) != GA_INVALID) {
+            return decoded_vr;
+        }
+#endif
         eve5_resolved_image_t resolved = {0};
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
+#if !LV_USE_DRAW_VRAM
+        u->decode_to_gpu = true;
+#endif
         bool ok = lv_draw_eve5_resolve_image_source(src, &resolved, &u->base_unit);
+#if !LV_USE_DRAW_VRAM
+        u->decode_to_gpu = false;
+#endif
 #if LV_USE_OS
         lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
         if(!ok) return NULL;
 
+#if !LV_USE_DRAW_VRAM
+        /* The hardware decoder decoded it into its EVE copy */
+        if(resolved.img_dsc == NULL) {
+            lv_draw_eve5_release_image_source(&resolved);
+            return lv_draw_eve5_res_source(u, src);
+        }
+#endif
+
         /* upload_image_to_gpu checks existing vram_res, uploads if needed,
          * and attaches vram_res to the image descriptor. */
         lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu_ex(u, resolved.img_dsc, true, premultiply);
+#if !LV_USE_DRAW_VRAM
+        /* The decoded pixels aren't kept: the upload is the source's EVE copy */
+        if(vr != NULL) {
+            lv_draw_eve5_res_set(u, resolved.img_dsc, NULL);
+            if(!lv_draw_eve5_res_set_source(u, src, vr)) vr = NULL;
+        }
+#endif
         lv_draw_eve5_release_image_source(&resolved);
         return vr;
     }
@@ -1516,6 +1571,66 @@ static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt, bool prefer_lumin
             return LV_COLOR_FORMAT_ARGB8888;
     }
 }
+
+#if !LV_USE_DRAW_VRAM
+/**
+ * Complete an open of the hardware decoder from the image's EVE copy, which
+ * the draw unit keeps (lv_draw_eve5_res_source). The draw unit asks for no
+ * pixels (decode_to_gpu), other users get them in CPU memory, read back from
+ * the EVE copy, as a decoder gives them.
+ */
+static lv_result_t eve5_decoder_pixels(lv_draw_eve5_unit_t * u, lv_image_decoder_t * decoder,
+                                       lv_image_decoder_dsc_t * dsc, const lv_eve5_vram_res_t * vr,
+                                       lv_color_format_t lv_cf)
+{
+    dsc->header.w = vr->width;
+    dsc->header.h = vr->height;
+    dsc->header.cf = lv_cf;
+    if(u->decode_to_gpu) {
+        dsc->decoded = NULL;
+        return LV_RESULT_OK;
+    }
+
+    lv_draw_buf_t * decoded = lv_draw_buf_create_ex(&(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers),
+                                                    vr->width, vr->height, lv_cf, LV_STRIDE_AUTO);
+    if(decoded == NULL) return LV_RESULT_INVALID;
+    if(vr->is_premultiplied) lv_draw_buf_set_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED);
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
+#endif
+    /* The load may still be in flight */
+    EVE_Cmd_waitFlush(u->hal);
+    bool ok = lv_draw_eve5_download_image(u, decoded, vr);
+#if LV_USE_OS
+    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
+#endif
+    if(!ok) {
+        LV_LOG_WARN("EVE5 HW decoder: can't read format %d back into CPU memory", vr->eve_format);
+        lv_draw_buf_destroy(decoded);
+        return LV_RESULT_INVALID;
+    }
+
+    dsc->decoded = decoded;
+    dsc->header.stride = decoded->header.stride;
+    if(lv_image_cache_is_enabled() && !dsc->args.no_cache) {
+        lv_image_cache_data_t search_key;
+        lv_memzero(&search_key, sizeof(search_key));
+        search_key.src = dsc->src;
+        search_key.src_type = dsc->src_type;
+        search_key.slot.size = decoded->data_size;
+        dsc->cache_entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
+    }
+    return LV_RESULT_OK;
+}
+
+/* Pixels the image cache doesn't own are the open's */
+static void eve5_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+{
+    LV_UNUSED(decoder);
+    if(dsc->decoded != NULL && dsc->cache_entry == NULL) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
+}
+#endif
 
 static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
                                      lv_image_decoder_dsc_t * dsc,
@@ -1739,6 +1854,17 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     bool is_image_ext = eve5_is_jpeg_or_png(path, &is_jpeg, &is_png);
     bool is_bin_ext = eve5_has_extension(path, ".bin");
 
+#if !LV_USE_DRAW_VRAM
+    /* Decoded before: the draw unit keeps its EVE copy. A .bin's color format
+     * is its header's, which info_cb gave. */
+    lv_eve5_vram_res_t * decoded_vr = lv_draw_eve5_res_source(u, path);
+    if(decoded_vr != NULL && EVE_GpuAlloc_Get(u->allocator, decoded_vr->gpu_handle) != GA_INVALID) {
+        lv_color_format_t decoded_cf = is_bin_ext ? (lv_color_format_t)dsc->header.cf
+                                       : eve_format_to_lv_cf(decoded_vr->eve_format, is_image_ext);
+        return eve5_decoder_pixels(u, decoder, dsc, decoded_vr, decoded_cf);
+    }
+#endif
+
     uint32_t ram_g_addr = GA_INVALID, palette_addr = GA_INVALID;
     /* Initial format placeholder; the chosen loader fills in the actual EVE
      * format. Pre-BT820 has no ARGB8 — use RGB565 so the symbol exists. */
@@ -1814,6 +1940,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
         }
         return LV_RESULT_INVALID;
     }
+    lv_draw_eve5_stats.hw_decodes++;
 
     /* Detect grayscale PALETTEDARGB8 and promote to L8.
      * BT820 produces PALETTEDARGB8 for grayscale PNGs. If the palette is a
@@ -1896,6 +2023,11 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
                               ? bin_lv_cf
                               : eve_format_to_lv_cf(eve_format, /*prefer_luminance_for_l8*/ is_image_ext);
     vr->sample_as_luminance = (lv_cf == LV_COLOR_FORMAT_L8);
+#if !LV_USE_DRAW_VRAM
+    if(!lv_draw_eve5_res_set_source(u, path, vr)) return LV_RESULT_INVALID;
+    LV_LOG_INFO("EVE5 HW decoder: decoded %s (%dx%d fmt=%d)", path, src_w, src_h, eve_format);
+    return eve5_decoder_pixels(u, decoder, dsc, vr, lv_cf);
+#else
     lv_draw_buf_t * decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     if(decoded == NULL) {
         lv_free(vr);
@@ -1934,6 +2066,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     LV_LOG_INFO("EVE5 HW decoder: opened %s (%dx%d fmt=%d) → LVGL cache", path, src_w, src_h, eve_format);
 
     return LV_RESULT_OK;
+#endif /* LV_USE_DRAW_VRAM */
 }
 
 void lv_draw_eve5_register_image_decoder(lv_draw_eve5_unit_t * unit)
@@ -1943,7 +2076,11 @@ void lv_draw_eve5_register_image_decoder(lv_draw_eve5_unit_t * unit)
     lv_image_decoder_t * dec = lv_image_decoder_create();
     lv_image_decoder_set_info_cb(dec, eve5_decoder_info);
     lv_image_decoder_set_open_cb(dec, eve5_decoder_open);
+#if !LV_USE_DRAW_VRAM
+    lv_image_decoder_set_close_cb(dec, eve5_decoder_close);
+#endif
     dec->name = "EVE5_HW";
+    s_hw_decoder = dec;
 }
 
 #endif /* EVE5_HW_IMAGE_DECODE */

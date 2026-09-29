@@ -37,6 +37,7 @@ extern "C" {
 #if LV_USE_EVE5
 
 #include "EVE_Hal.h"
+#include "lv_eve5.h"
 
 /**********************
  *      DEFINES

@@ -171,7 +171,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
         src_w = lv_area_get_width(&child_layer->buf_area);
         src_h = lv_area_get_height(&child_layer->buf_area);
 
-        lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(child_layer);
+        lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(u, child_layer);
         if(child_vr == NULL) return;
         if(!child_vr->has_content) return;
         EVE_GpuHandle child_handle = child_vr->gpu_handle;

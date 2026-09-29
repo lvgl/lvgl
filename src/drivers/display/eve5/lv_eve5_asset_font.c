@@ -64,7 +64,9 @@
  **********************/
 
 typedef struct {
+#if LV_USE_DRAW_VRAM
     lv_font_dsc_base_t base;
+#endif
     EVE_HalContext * hal;
     EVE_GpuAlloc * allocator;
     EVE_GpuHandle gpu_handle;

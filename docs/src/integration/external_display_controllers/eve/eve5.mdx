@@ -1,6 +1,6 @@
 ---
 title: EVE5 (BT820) Renderer and Display Driver
-description: "Use EVE HAL to render LVGL on BT820 and earlier EVE generations, with VRAM residency, touch, and optional asset filesystems."
+description: "Use EVE HAL to render LVGL on BT820 and earlier EVE generations, with touch, optional VRAM residency, and optional asset filesystems."
 ---
 
 The EVE5 driver uses EVE HAL to send drawing commands to the EVE coprocessor.
@@ -14,7 +14,10 @@ uses `LV_USE_DRAW_EVE` and has different dependencies and limitations.
 
 ## Requirements
 
-- LVGL with VRAM residency support.
+- Optionally, LVGL's VRAM residency module (`LV_USE_DRAW_VRAM`). The driver
+  works with LVGL as it is, and keeps images, fonts and layers in EVE memory
+  with fewer transfers and less CPU memory when the module is available; see
+  [Without VRAM residency](#without-vram-residency).
 - EVE HAL and the matching `eve_extras` GPU allocator and resource helpers from
   the EVE Screen Designer SDK. Required headers include `EVE_Hal.h`,
   `EVE_GpuAlloc.h`, `EVE_ResourceProbe.h`, and `EVE_ResourceQuery.h`.
@@ -35,10 +38,10 @@ Enable these options in `lv_conf.h`, or their `CONFIG_` equivalents in a Kconfig
 configuration:
 
 ```c
-#define LV_USE_DRAW_VRAM 1
 #define LV_USE_EVE5 1
 #define LV_USE_DRAW_EVE5 1
 #define LV_USE_DRAW_SW 1
+#define LV_USE_DRAW_VRAM 1  /* Where LVGL has it */
 ```
 
 Keep the software renderer enabled for tasks that cannot use the hardware path,
@@ -97,7 +100,8 @@ The renderer supports LVGL bitmap fonts, EVE ROM fonts created with
 `lv_eve5_asset_font_create()`. Native EVE fonts require the EVE5 draw unit.
 
 Hardware image decoding can load supported assets from LVGL filesystems into
-RAM_G and cache them through VRAM residency. Assets on EVE's SD card can be
+RAM_G and cache them there, through VRAM residency or the draw unit's own
+record of the images it keeps. Assets on EVE's SD card can be
 loaded directly by the coprocessor. Format availability depends on the EVE
 generation; native EVE bitmap assets can use Screen Designer metadata.
 
@@ -123,6 +127,37 @@ display:
   a small region changes.
 - An image-only canvas can take ownership of the image's VRAM allocation,
   invalidating the cached image to avoid keeping duplicate allocations.
+
+## Without VRAM residency
+
+Without `LV_USE_DRAW_VRAM`, LVGL's buffers are in CPU memory, and the draw unit
+keeps its copies in EVE memory by the address of what they copy. It relies on
+the notifications LVGL sends the draw units: layers created and deleted
+(`LV_EVENT_CHILD_CREATED`, `LV_EVENT_CHILD_DELETED`), results LVGL needs in a
+layer's buffer (`LV_EVENT_SCREEN_LOAD_START`, sent by canvases and snapshots),
+and images dropped from the image cache (`LV_EVENT_INVALIDATE_AREA`, from
+`lv_image_cache_drop()`). Rendering is the same; what it costs differs:
+
+- The display needs draw buffers in CPU memory, as LVGL requires, although
+  the draw unit renders the frame in EVE memory: a tile of 64 rows in partial
+  mode, a full frame of 4 bytes a pixel in full mode.
+- A canvas or snapshot drawn on by the draw unit is read back into its buffer
+  when LVGL asks for it, whether or not the CPU uses the pixels.
+- Nothing tells a draw unit that the CPU wrote into a buffer, such as with
+  `lv_canvas_set_px()`: the draw unit compares a hash of the pixels of every
+  draw buffer it draws as an image, once per refresh, and uploads them again
+  when they changed. Images in the program (not allocated or modifiable) are
+  taken as constant; call `lv_image_cache_drop()` after changing one.
+- Decoded images aren't kept in CPU memory: the draw unit keeps their EVE
+  copy, by file path or image, decoded again after `lv_image_cache_drop()`.
+  The hardware decoder reads pixels back for other users, such as the software
+  renderer.
+- LVGL doesn't tell draw units about deleted fonts: glyphs are kept by font
+  descriptor and checked against the font's metrics, and the least recently
+  used fonts are released.
+- Only the EVE5 display's frame, and canvases and snapshots, are rendered by
+  the draw unit. Other displays are left to the software renderer, since
+  LVGL flushes them from CPU memory.
 
 The HAL tracks coprocessor progress and the allocator defers freeing GPU buffers
 until queued commands finish. Drawing can therefore be pipelined. Hardware image

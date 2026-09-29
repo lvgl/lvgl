@@ -521,7 +521,8 @@ static void row_writer_commit(row_writer_t * wr, int32_t y)
 }
 
 /**
- * Upload image to GPU. Allocates and attaches vram_res directly on img_dsc.
+ * Upload image to GPU. Allocates and attaches vram_res directly on img_dsc
+ * (without LV_USE_DRAW_VRAM, records it as the image's EVE copy).
  * Returns pointer to the attached vram_res, or NULL on failure.
  * If vram_res already exists and is valid, returns it without re-uploading.
  */
@@ -545,7 +546,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u
                                                          bool evictable, bool premultiply)
 {
     /* Check vram_res for image already uploaded to GPU */
-    lv_eve5_vram_res_t * existing = eve5_get_image_vram_res(img_dsc);
+    lv_eve5_vram_res_t * existing = lv_draw_eve5_res_image(u, img_dsc);
     if(existing != NULL) {
         uint32_t addr = EVE_GpuAlloc_Get(u->allocator, existing->gpu_handle);
         if(addr != GA_INVALID) {
@@ -554,8 +555,8 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u
             return existing;
         }
         /* Handle expired: free stale vram_res */
+        lv_draw_eve5_res_set(u, img_dsc, NULL);
         lv_free(existing);
-        img_dsc->vram_res = NULL;
     }
 
     /* Compressed or encoded data needs a decoder, see lv_draw_eve5_resolve_image_source */
@@ -838,6 +839,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u
     /* All RAM_G writes above (palette + pixel data, direct or converted) must
      * be visible to the graphics engine before it samples this bitmap. */
     EVE_Hal_requestFenceBeforeSwap(u->hal);
+    lv_draw_eve5_count_upload(palette_size + eve_size);
 
     /* Allocate and attach vram_res to the image descriptor */
     lv_eve5_vram_res_t * vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
@@ -864,8 +866,9 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u
      * unflagged — A8 source semantics match EVE L8's default sampling. */
     vr->sample_as_luminance = (src_cf == LV_COLOR_FORMAT_L8);
 
-    /* If the application crashes here, it's likely that img_dsc is declared const */
-    img_dsc->vram_res = (struct _lv_draw_buf_vram_res_t *)vr;
+    /* With LV_USE_DRAW_VRAM, if the application crashes here, it's likely
+     * that img_dsc is declared const */
+    lv_draw_eve5_res_set(u, img_dsc, vr);
 
     LV_LOG_TRACE("EVE5: Uploaded image %dx%d cf=%d as EVE format %d at 0x%08X (palette %u)",
                  src_w, src_h, src_cf, eve_format, ram_g_addr, palette_size);

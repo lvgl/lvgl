@@ -231,14 +231,10 @@ static void eve5_vram_rt_format(lv_draw_eve5_unit_t * u, lv_color_format_t cf, u
 #endif
 }
 
-static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
+/* The caller holds the HAL lock */
+lv_eve5_vram_res_t * lv_draw_eve5_vram_create(lv_draw_eve5_unit_t * u, uint32_t w, uint32_t h,
+                                              lv_color_format_t cf, uint32_t alloc_flags)
 {
-    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
-
-    uint32_t w = buf->header.w;
-    uint32_t h = buf->header.h;
-    lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
-
     uint16_t eve_fmt;
     uint8_t bpp;
     eve5_vram_rt_format(u, cf, &eve_fmt, &bpp);
@@ -247,38 +243,19 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     uint32_t aligned_h = ALIGN_UP(h, 16);
     uint32_t size = eve5_rt_surface_size(eve_fmt, aligned_w * bpp, aligned_h);
 
-    /* Reloadable content is GC-flagged: evictable under allocation
-     * pressure. The cache lookup validates the handle and re-decodes dropped
-     * entries. Unique content (canvas buffers, layer render targets) stays
-     * unflagged and pinned. */
-    uint32_t alloc_flags = GA_ALIGN_128;
-    if(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_RELOADABLE)) {
-        alloc_flags |= GA_GC_FLAG;
-    }
-
-#if LV_USE_OS
-    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
-#endif
-
     EVE_GpuHandle handle = lv_draw_eve5_alloc(u, size, alloc_flags);
     if(EVE_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
         LV_LOG_WARN("EVE5 VRAM alloc failed (%ux%u fmt=%d, %u bytes)", w, h, eve_fmt, size);
-#if LV_USE_OS
-        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
-#endif
-        return false;
+        return NULL;
     }
 
     lv_eve5_vram_res_t * vr = lv_malloc_zeroed(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
         EVE_GpuAlloc_Free(u->allocator, handle);
-#if LV_USE_OS
-        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
-#endif
-        return false;
+        return NULL;
     }
 
-    vr->base.unit = draw_unit;
+    vr->base.unit = (lv_draw_unit_t *)u;
     vr->base.size = size;
     vr->gpu_handle = handle;
     vr->eve_format = eve_fmt;
@@ -293,16 +270,40 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
      * sets it to true. Must be zero-initialized to avoid init_layer taking
      * the swapchain branch on sub-layer vr's via uninitialized memory. */
 
-    buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
+    LV_LOG_INFO("EVE5 VRAM alloc: %ux%u fmt=%d stride=%u -> handle %d",
+                w, h, eve_fmt, vr->stride, handle.Id);
+    return vr;
+}
+
+#if LV_USE_DRAW_VRAM
+static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
+{
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+
+    /* Reloadable content is GC-flagged: evictable under allocation
+     * pressure. The cache lookup validates the handle and re-decodes dropped
+     * entries. Unique content (canvas buffers, layer render targets) stays
+     * unflagged and pinned. */
+    uint32_t alloc_flags = GA_ALIGN_128;
+    if(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_RELOADABLE)) {
+        alloc_flags |= GA_GC_FLAG;
+    }
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
+#endif
+
+    lv_eve5_vram_res_t * vr = lv_draw_eve5_vram_create(u, buf->header.w, buf->header.h,
+                                                       (lv_color_format_t)buf->header.cf, alloc_flags);
+    if(vr != NULL) buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    LV_LOG_INFO("EVE5 VRAM alloc: %ux%u fmt=%d stride=%u -> handle %d",
-                w, h, eve_fmt, vr->stride, handle.Id);
-    return true;
+    return vr != NULL;
 }
+#endif /* LV_USE_DRAW_VRAM */
 
 /* Allocate VRAM for a render target or an intermediate. Freed memory is
  * reclaimed once the display lists that used it have completed, which the
@@ -318,6 +319,7 @@ EVE_GpuHandle lv_draw_eve5_alloc(lv_draw_eve5_unit_t * u, uint32_t size, uint32_
     return EVE_GpuAlloc_Alloc(u->allocator, size, flags);
 }
 
+#if LV_USE_DRAW_VRAM
 static void eve5_vram_free_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 {
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
@@ -446,6 +448,7 @@ void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
     u->base_unit.vram_download_cb = eve5_vram_download_cb;
     u->base_unit.vram_check_cb    = eve5_vram_check_cb;
 }
+#endif /* LV_USE_DRAW_VRAM */
 
 /**********************
  * LAYER MANAGEMENT
@@ -624,7 +627,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
      * time. That would also make per-frame triple buffering possible.
      */
     {
-        lv_eve5_vram_res_t * sc_vr = eve5_get_vram_res(layer);
+        lv_eve5_vram_res_t * sc_vr = eve5_get_vram_res(u, layer);
         if(sc_vr != NULL && sc_vr->is_swapchain) {
             int32_t sw = lv_area_get_width(&layer->buf_area);
             int32_t sh = lv_area_get_height(&layer->buf_area);
@@ -708,7 +711,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint8_t target_bpp;
     lv_draw_eve5_hal_layer_format(u, layer, is_screen, &target_eve_fmt, &target_bpp);
 
-    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+    lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
     if(vr != NULL) {
         /* Reallocate if format or dimensions don't match current layer needs.
          * Format mismatch: e.g., display buffer format vs render target format.
@@ -730,8 +733,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                               || (eve5_rt_surface_size(vr->eve_format, vr->stride, (uint32_t)aligned_h) > vr->base.size)
                               || (current_addr != GA_INVALID
                                   && (vr->source_offset != 0 || (current_addr & 0x7F) != 0));
-        bool discard = layer->draw_buf != NULL
-                       && lv_draw_buf_has_flag(layer->draw_buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
+        bool discard = eve5_buf_discarded(layer->draw_buf);
         bool keep = realloc_needed && vr->has_content && !discard
                     && !slice->isolated && slice->prev_handle.Id == GA_HANDLE_INVALID.Id;
         if(realloc_needed) {
@@ -765,8 +767,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             /* A compatible buffer may be wider than needed; keep its stride */
             aligned_w = vr->stride / target_bpp;
             if(discard) {
-                lv_draw_buf_clear_flag(layer->draw_buf,
-                                       LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
+                eve5_buf_clear_discarded(layer->draw_buf);
                 vr->has_content = false;
             }
             if(vr->has_content) {
@@ -986,7 +987,7 @@ canvas_cleared:
 void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                    bool is_screen, int rendered_count)
 {
-    lv_eve5_vram_res_t * finish_vr = eve5_get_vram_res(layer);
+    lv_eve5_vram_res_t * finish_vr = eve5_get_vram_res(u, layer);
     if(finish_vr != NULL) {
         /* Only update state when tasks actually rendered.
          * A discarded/fresh layer that ran zero tasks should retain
@@ -1238,6 +1239,7 @@ EVE_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u,
     *out_stride = eve_stride;
 
     EVE_Hal_requestFenceBeforeSwap(u->hal);
+    lv_draw_eve5_count_upload(eve_size);
 
     LV_LOG_TRACE("EVE5: Uploaded texture %"PRId32"x%"PRId32" to 0x%08X",
                  buf_w, buf_h, ram_g_addr);

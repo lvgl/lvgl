@@ -40,6 +40,7 @@ extern "C" {
 
 #include "EVE_Hal.h"
 #include "EVE_GpuAlloc.h"
+#include "lv_eve5.h"
 
 /**********************
  *      DEFINES

@@ -216,7 +216,7 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
         /* Display list budget: the entries written so far, this task's bound,
          * and everything that must still follow in this display list */
         lv_draw_eve5_dl_bound_t bound;
-        lv_draw_eve5_task_dl_bound(t, slice->end, &bound);
+        lv_draw_eve5_task_dl_bound(u, t, slice->end, &bound);
         bool deferred_mask = !is_screen && t->type == LV_DRAW_TASK_TYPE_MASK_RECTANGLE;
         uint32_t rgb = deferred_mask ? 0 : bound.rgb;
         uint32_t after = deferred_mask ? bound.rgb : (budget->alpha_pass ? bound.alpha : 0);
@@ -343,7 +343,7 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
                     lv_draw_image_dsc_t * dsc = t->draw_dsc;
                     lv_layer_t * child = (lv_layer_t *)dsc->src;
 
-                    if(eve5_get_vram_res(child) == NULL) {
+                    if(eve5_get_vram_res(u, child) == NULL) {
                         if(child->draw_buf == NULL) {
                             break;
                         }
@@ -648,7 +648,7 @@ EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_
         /* The border of a unified FILL+BORDER pair is counted with its fill */
         if(t != merged) {
             lv_draw_eve5_dl_bound_t bound;
-            lv_draw_eve5_task_dl_bound(t, slice->end, &bound);
+            lv_draw_eve5_task_dl_bound(u, t, slice->end, &bound);
             /* The pair is drawn here as two tasks, within the pair's bound */
             if(t->type == LV_DRAW_TASK_TYPE_FILL) merged = lv_draw_eve5_fill_matching_border(t, slice->end);
             if(any && (phost->DlEntries + bound.rgb + EVE5_DL_FINISH_L8 > dl_budget

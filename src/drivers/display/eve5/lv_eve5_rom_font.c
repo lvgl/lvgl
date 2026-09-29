@@ -31,7 +31,9 @@
  **********************/
 
 typedef struct {
+#if LV_USE_DRAW_VRAM
     lv_font_dsc_base_t base;
+#endif
     uint8_t  rom_idx;
     lv_eve5_font_block_t block;
 } lv_eve5_rom_font_dsc_t;

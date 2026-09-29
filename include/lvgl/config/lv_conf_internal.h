@@ -5412,8 +5412,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_SIFLI_EPIC_ASSERT requires LV_USE_SIFLI_EPIC (Kconfig depends on)"
 #endif
 
-#if LV_USE_DRAW_EVE5 && !(LV_USE_EVE5 && LV_USE_DRAW_VRAM)
-    #error "LV_USE_DRAW_EVE5 requires LV_USE_EVE5 && LV_USE_DRAW_VRAM (Kconfig depends on)"
+#if LV_USE_DRAW_EVE5 && !(LV_USE_EVE5)
+    #error "LV_USE_DRAW_EVE5 requires LV_USE_EVE5 (Kconfig depends on)"
 #endif
 
 #if (LV_USE_G2D || (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)) && !LV_USE_DRAW_G2D
@@ -5526,10 +5526,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if (LV_USE_FILE_EXPLORER) && !LV_USE_TABLE
     #error "LV_USE_TABLE must be enabled: Kconfig selects it from LV_USE_FILE_EXPLORER"
-#endif
-
-#if LV_USE_EVE5 && !(LV_USE_DRAW_VRAM)
-    #error "LV_USE_EVE5 requires LV_USE_DRAW_VRAM (Kconfig depends on)"
 #endif
 
 #if LV_USE_FS_EVE5_SDCARD && !(LV_USE_EVE5)
