@@ -601,7 +601,9 @@ typedef struct {
     uint32_t res_count;
     uint32_t res_render;      /**< Counts layer renders: an entry used in the current one is kept */
     uint32_t res_refresh;     /**< Counts display refreshes, odd while one is in progress */
-    bool decode_to_gpu;       /**< The HW decoder decodes into a residency for the draw unit, no pixels */
+    bool decode_to_gpu;       /**< The HW decoder decodes into a residency for the draw unit, no pixels.
+                                   *   Set by the draw unit around its own decoder open, which with an OS
+                                   *   assumes no other thread opens images meanwhile. */
 #endif
 #if LV_DRAW_EVE5_SW_FALLBACK
     lv_draw_eve5_sw_cache_t sw_cache;
