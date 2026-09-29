@@ -91,11 +91,11 @@ void test_barcode_properties_after_text(void)
     TEST_ASSERT_NOT_NULL(barcode);
     lv_obj_center(barcode);
 
-    /*Needed before anything can be generated - see test_barcode_text_before_size_recovers()*/
+    /*The bars cannot be generated without a height - see test_barcode_text_before_size_recovers()*/
     lv_obj_set_height(barcode, 50);
 
-    /*Properties set after the data used to be dropped. The result has to be the same
-     *bitmap test_barcode_normal() gets by setting them first.*/
+    /*Properties set after the text must give the same bitmap as test_barcode_normal(),
+     *which sets them first*/
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_text(barcode, "https://lvgl.io"));
 
     lv_barcode_set_dark_color(barcode, lv_color_black());
@@ -127,12 +127,12 @@ void test_barcode_text_before_size_recovers(void)
     lv_obj_center(barcode);
     lv_barcode_set_scale(barcode, 2);
 
-    /*A barcode sizes itself to its content, so with no height there is no canvas to
-     *allocate. This could not succeed before the change either.*/
+    /*A barcode sizes itself to its content. Without a height, there is no canvas to
+     *allocate.*/
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_barcode_set_text(barcode, "https://lvgl.io"));
     TEST_ASSERT_FALSE(lv_barcode_is_render_valid(barcode));
 
-    /*New: the data is remembered, so it appears once there is a height to fit it to*/
+    /*The text is kept, so the barcode shows when the object gets a height*/
     lv_barcode_set_dark_color(barcode, lv_color_black());
     lv_barcode_set_light_color(barcode, lv_color_white());
     lv_obj_set_height(barcode, 50);
@@ -175,7 +175,7 @@ void test_barcode_resize_regenerates(void)
     lv_obj_set_height(barcode, 50);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_text(barcode, "https://lvgl.io"));
 
-    /*Used to keep the height it had when the data was set*/
+    /*The canvas has the height of the object*/
     const lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(barcode);
     TEST_ASSERT_NOT_NULL(draw_buf);
     TEST_ASSERT_EQUAL(50, draw_buf->header.h);
@@ -211,7 +211,7 @@ void test_barcode_update_mode_default_is_immediate(void)
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
 
-    /*Immediate keeps existing code's behaviour*/
+    /*Immediate is the default*/
     TEST_ASSERT_EQUAL(LV_BARCODE_UPDATE_MODE_IMMEDIATE, lv_barcode_get_update_mode(barcode));
 
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
@@ -230,8 +230,7 @@ void test_barcode_update_mode_deferred_fills_on_redraw(void)
     lv_barcode_set_dark_color(barcode, lv_color_black());
     lv_barcode_set_light_color(barcode, lv_color_white());
 
-    /*Deliberately omit the explicit lv_barcode_render() to cover the fallback: the redraw
-     *warns and fills the bars in anyway, so the bitmap must still be correct.*/
+    /*No lv_barcode_render() call. The redraw must fill the bars and log a warning.*/
     lv_log_register_print_cb(count_barcode_logs_cb);
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_text(barcode, "https://lvgl.io"));
@@ -257,8 +256,8 @@ void test_barcode_deferred_text_is_not_filled_until_render(void)
 
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
 
-    /*Setting the data obeys the mode too: the canvas is sized, so this reports OK, but the
-     *bars are still pending*/
+    /*lv_barcode_set_text() also obeys the mode. The canvas is resized, so this returns OK,
+     *but the bars are not filled yet.*/
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_text(barcode, "https://lvgl.io"));
     TEST_ASSERT_TRUE(((lv_barcode_t *)barcode)->needs_update);
     TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
@@ -280,7 +279,7 @@ void test_barcode_render_applies_deferred_changes(void)
 
     lv_log_register_print_cb(count_barcode_logs_cb);
 
-    /*The intended flow: change the properties, then generate once explicitly*/
+    /*Change the properties, then generate one time*/
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
     lv_barcode_set_scale(barcode, 2);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_render(barcode));
@@ -288,7 +287,7 @@ void test_barcode_render_applies_deferred_changes(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
     lv_log_register_print_cb(NULL);
 
-    /*Nothing left for the redraw to do*/
+    /*The redraw has nothing to do*/
 #if LV_USE_LOG
     TEST_ASSERT_EQUAL(0, redraw_warning_cnt);
 #endif
@@ -327,8 +326,8 @@ void test_barcode_update_mode_immediate_applies_pending_change(void)
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_text(barcode, "https://lvgl.io"));
     lv_barcode_set_scale(barcode, 2);
 
-    /*Must still apply the deferred change. The draw hook asserts a bitmap is only out of
-     *date in deferred mode, so if it did not, the redraw below would abort the test.*/
+    /*The switch must apply the deferred change. The draw hook asserts that a bitmap is out
+     *of date only in deferred mode, so the redraw below fails if the switch does not.*/
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_IMMEDIATE);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
@@ -347,8 +346,8 @@ void test_barcode_failed_render_is_detectable(void)
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_text(barcode, "https://lvgl.io"));
     TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
 
-    /*Zero height leaves no canvas to allocate, and the resize handler returns void, so
-     *this flag is the only way to notice*/
+    /*A zero height leaves no canvas to allocate. The resize handler returns void, so
+     *only lv_barcode_is_render_valid() shows the failure.*/
     lv_obj_set_height(barcode, 0);
     lv_obj_update_layout(barcode);
     TEST_ASSERT_FALSE(lv_barcode_is_render_valid(barcode));
@@ -370,7 +369,7 @@ void test_barcode_failed_render_is_not_retried_every_frame(void)
 
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
 
-    /*A known-bad state must not be retried on every redraw, so the draw hook stays quiet*/
+    /*The draw hook does not retry a failed generation, so it logs nothing*/
     lv_obj_set_height(barcode, 0);
     lv_obj_update_layout(barcode);
     TEST_ASSERT_FALSE(lv_barcode_is_render_valid(barcode));
@@ -388,7 +387,7 @@ void test_barcode_failed_render_is_not_retried_every_frame(void)
     TEST_ASSERT_EQUAL(0, redraw_warning_cnt);
 #endif
 
-    /*A property change is what allows another attempt - proven by one that can succeed*/
+    /*A change starts a new attempt, and this one succeeds*/
     lv_obj_set_height(barcode, 50);
     lv_obj_update_layout(barcode);
     lv_refr_now(NULL);
@@ -407,21 +406,20 @@ void test_barcode_regeneration_encodes_the_text_once(void)
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_text(barcode, "https://lvgl.io"));
     lv_refr_now(NULL);
 
-    /*The pattern is handed from the sizing pass to the fill, so a regeneration is a single
-     *pass over the code128 encoder rather than one per stage*/
+    /*The sizing pass gives the pattern to the fill, so one generation encodes one time*/
     lv_log_register_print_cb(count_barcode_logs_cb);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_render(barcode));
     lv_log_register_print_cb(NULL);
     TEST_ASSERT_EQUAL(1, encode_cnt);
 
-    /*A scale change is fitted from the cached bar count - one encode, for the fill*/
+    /*A scale change uses the cached bar count to resize. Only the fill encodes.*/
     encode_cnt = 0;
     lv_log_register_print_cb(count_barcode_logs_cb);
     lv_barcode_set_scale(barcode, 2);
     lv_log_register_print_cb(NULL);
     TEST_ASSERT_EQUAL(1, encode_cnt);
 
-    /*Deferred mode collapses several property changes into a single encode*/
+    /*In deferred mode, many property changes cause one encode*/
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
     encode_cnt = 0;
     lv_log_register_print_cb(count_barcode_logs_cb);
