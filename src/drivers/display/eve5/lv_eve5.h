@@ -202,13 +202,16 @@ void lv_eve5_link_draw_unit(lv_display_t * disp, struct _lv_draw_unit_t * draw_u
  * display records the swapchain of FULL mode with attach_cb, and takes the
  * EVE memory of a rendered tile of PARTIAL mode, or of its draw buffers when
  * it's deleted, with detach_cb, which returns NULL for a buffer without.
- * Pass NULL to clear.
+ * renders_cb tells whether the draw unit renders the frame, which the draw
+ * buffers' CPU memory then doesn't hold, so it isn't cleared. Pass NULL to
+ * clear.
  */
 void lv_eve5_set_vram_handlers(lv_display_t * disp,
                                void (*attach_cb)(struct _lv_draw_unit_t * draw_unit, const void * key,
                                                  lv_eve5_vram_res_t * vr),
                                lv_eve5_vram_res_t * (*detach_cb)(struct _lv_draw_unit_t * draw_unit,
-                                                                 const void * key));
+                                                                 const void * key),
+                               bool (*renders_cb)(void));
 #endif
 
 /**

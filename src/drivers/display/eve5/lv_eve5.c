@@ -95,6 +95,7 @@ typedef struct {
      * lv_eve5_set_vram_handlers */
     void (*vram_attach_cb)(struct _lv_draw_unit_t * draw_unit, const void * key, lv_eve5_vram_res_t * vr);
     lv_eve5_vram_res_t * (*vram_detach_cb)(struct _lv_draw_unit_t * draw_unit, const void * key);
+    bool (*renders_cb)(void);
 #endif
     /* Both draw buffers are created at init and kept alive for the display's
      * lifetime so mode switching is allocation-free. Only one is bound to the
@@ -457,7 +458,8 @@ void lv_eve5_set_vram_handlers(lv_display_t * disp,
                                void (*attach_cb)(struct _lv_draw_unit_t * draw_unit, const void * key,
                                                  lv_eve5_vram_res_t * vr),
                                lv_eve5_vram_res_t * (*detach_cb)(struct _lv_draw_unit_t * draw_unit,
-                                                                 const void * key))
+                                                                 const void * key),
+                               bool (*renders_cb)(void))
 {
     if(disp == NULL) return;
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
@@ -467,6 +469,7 @@ void lv_eve5_set_vram_handlers(lv_display_t * disp,
     if(drvr->vram_detach_cb != NULL) drvr->vram_detach_cb(drvr->draw_unit, drvr->full_buf);
     drvr->vram_attach_cb = attach_cb;
     drvr->vram_detach_cb = detach_cb;
+    drvr->renders_cb = renders_cb;
     if(attach_cb != NULL) attach_cb(drvr->draw_unit, drvr->full_buf, drvr->swapchain_res);
 }
 #endif
@@ -660,7 +663,7 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
     /* As the swapchain's: a tile the EVE5 draw unit renders needs no CPU clear */
     buf->handlers = full_buf_handlers();
 #else
-    lv_draw_buf_t * buf = lv_draw_buf_create_ex(lv_draw_buf_get_handlers(), phost->Width, 64, cf, stride);
+    lv_draw_buf_t * buf = lv_draw_buf_create_ex(full_buf_handlers(), phost->Width, 64, cf, stride);
     if(buf == NULL) return NULL;
 #endif
     /* 64 rows, which the size sets, as lv_refr fits the tiles to it */
@@ -674,11 +677,17 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
  * mode tile CPU memory, cleared and uploaded as the tile's content. Neither
  * needs it: every FULL mode frame starts by clearing the swapchain
  * (init_layer), to black, what transparent is on the RGB8 swapchain, and so
- * does every tile. The CPU memory of the SW path is cleared as usual, which
- * without LV_USE_DRAW_VRAM the buffers always have. */
+ * does every tile. The CPU memory of the SW path is cleared as usual. Without
+ * LV_USE_DRAW_VRAM, the buffers always have CPU memory, which the draw unit,
+ * when it renders the frame, doesn't use. */
 static void full_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer)
 {
+#if LV_USE_DRAW_VRAM
     LV_UNUSED(layer);
+#else
+    lv_eve5_driver_t * drvr = layer != NULL && layer->display != NULL ? lv_display_get_driver_data(layer->display) : NULL;
+    if(drvr != NULL && drvr->renders_cb != NULL && drvr->renders_cb()) return;
+#endif
     if(draw_buf->data != NULL) lv_draw_buf_clear_ex(draw_buf, a, NULL);
 }
 

@@ -239,7 +239,8 @@ void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
         lv_eve5_link_draw_unit(disp, &unit->base_unit);
         lv_eve5_set_coprocessor_reset_handler(disp, lv_draw_eve5_handle_coprocessor_reset);
 #if !LV_USE_DRAW_VRAM
-        lv_eve5_set_vram_handlers(disp, lv_draw_eve5_res_attach_cb, lv_draw_eve5_res_detach_cb);
+        lv_eve5_set_vram_handlers(disp, lv_draw_eve5_res_attach_cb, lv_draw_eve5_res_detach_cb,
+                                  lv_draw_eve5_get_enabled);
         lv_display_add_event_cb(disp, lv_draw_eve5_res_refresh_event, LV_EVENT_REFR_START, unit);
         lv_display_add_event_cb(disp, lv_draw_eve5_res_refresh_event, LV_EVENT_REFR_READY, unit);
 #endif
@@ -264,7 +265,7 @@ static int32_t eve5_delete(lv_draw_unit_t * draw_unit)
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
     lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
     if(disp != NULL) {
-        lv_eve5_set_vram_handlers(disp, NULL, NULL);
+        lv_eve5_set_vram_handlers(disp, NULL, NULL, NULL);
         lv_display_remove_event_cb_with_user_data(disp, lv_draw_eve5_res_refresh_event, u);
     }
     lv_draw_eve5_res_deinit(u);
