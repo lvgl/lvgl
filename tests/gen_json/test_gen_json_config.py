@@ -10,6 +10,7 @@ from conftest import COLLECTIONS, generate
 
 
 def test_default_configuration_preserves_disabled_blocks(fixture_repo, tmp_path):
+    # --develop retains and reports the intermediate directory for lv_conf.h inspection.
     result = subprocess.run([
         sys.executable, str(fixture_repo / "scripts/gen_json/gen_json.py"),
         "--develop", "--no-docstrings", "--output-path", str(tmp_path / "output"),
@@ -20,6 +21,7 @@ def test_default_configuration_preserves_disabled_blocks(fixture_repo, tmp_path)
     intermediate = Path(result.stdout.rsplit(prefix, 1)[1].strip())
     try:
         template = (fixture_repo / "lv_conf_template.h").read_text()
+        # Enable only the outer guard; nested #if 0 blocks must stay disabled.
         assert (intermediate / "lv_conf.h").read_text() == template.replace("#if 0", "#if 1", 1)
     finally:
         shutil.rmtree(intermediate)

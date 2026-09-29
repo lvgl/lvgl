@@ -535,6 +535,12 @@ def _enum_member(value) -> EnumMember:
 
 
 def _macro_from_memberdef(member, root: Path) -> Macro | None:
+    """Map a Doxygen define while preserving macro kind and replacement text.
+
+    Object-like macros have no parameters; function-like parameters come from
+    XML, with an explicit zero-argument list kept distinct. Initializers remain
+    unevaluated C replacement text, preserving literal whitespace and escapes.
+    """
     name = member.findtext("name")
     if not name:
         return None
