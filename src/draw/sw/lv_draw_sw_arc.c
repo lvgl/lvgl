@@ -32,7 +32,7 @@ static void fill_circle_mask(lv_opa_t * circle_mask, const lv_area_t * circle_ar
  *********************/
 #define SPLIT_RADIUS_LIMIT 10  /*With radius greater than this the arc will drawn in quarters. A quarter is drawn only if there is arc in it*/
 #define SPLIT_ANGLE_GAP_LIMIT 60  /*With small gaps in the arc don't bother with splitting because there is nothing to skip.*/
-#define CIRCLE_SHIFT 4  /*The round ends are placed with 1/16 px precision*/
+#define CIRCLE_SHIFT 4  /*The round ends are placed in 1/CIRCLE_UNIT px*/
 #define CIRCLE_UNIT (1 << CIRCLE_SHIFT)
 
 /**********************
@@ -165,24 +165,30 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
         /*The two ends are placed with sub-pixel precision, each with its own offset,
          *so their anti-aliased edges differ and each end needs its own mask.
          *A circle not aligned to the pixel grid spans one more column and row: (width + 1) x (width + 1).*/
-        int32_t circle_mask_size = (width + 1) * (width + 1);
-        circle_mask_1 = lv_malloc(circle_mask_size * 2);
-        LV_ASSERT_MALLOC(circle_mask_1);
-        circle_mask_2 = circle_mask_1 + circle_mask_size;
-        lv_point_t circle_center;
+        uint64_t circle_mask_size = (uint64_t)(width + 1) * (width + 1);
+        /*On 32-bit targets a huge (unrealistic but valid) size would be truncated by the cast to `size_t`*/
+        if(circle_mask_size * 2 <= SIZE_MAX) circle_mask_1 = lv_malloc((size_t)(circle_mask_size * 2));
 
-        /*Only the part of a mask inside the clip area is read by `add_circle`,
-         *so there is no need to fill the mask of an end that lies completely outside it.*/
-        get_rounded_area(start_angle, dsc->radius, width, &round_area_1, &circle_center);
-        lv_area_move(&round_area_1, dsc->center.x, dsc->center.y);
-        if(lv_area_is_on(&round_area_1, &clipped_area)) {
-            fill_circle_mask(circle_mask_1, &round_area_1, &circle_center, width);
+        if(circle_mask_1 == NULL) {
+            LV_LOG_WARN("Couldn't allocate the masks of the round ends, the arc is drawn without them");
         }
+        else {
+            circle_mask_2 = circle_mask_1 + circle_mask_size;
+            lv_point_t circle_center;
 
-        get_rounded_area(end_angle, dsc->radius, width, &round_area_2, &circle_center);
-        lv_area_move(&round_area_2, dsc->center.x, dsc->center.y);
-        if(lv_area_is_on(&round_area_2, &clipped_area)) {
-            fill_circle_mask(circle_mask_2, &round_area_2, &circle_center, width);
+            /*Only the part of a mask inside the clip area is read by `add_circle`,
+             *so there is no need to fill the mask of an end that lies completely outside it.*/
+            get_rounded_area(start_angle, dsc->radius, width, &round_area_1, &circle_center);
+            lv_area_move(&round_area_1, dsc->center.x, dsc->center.y);
+            if(lv_area_is_on(&round_area_1, &clipped_area)) {
+                fill_circle_mask(circle_mask_1, &round_area_1, &circle_center, width);
+            }
+
+            get_rounded_area(end_angle, dsc->radius, width, &round_area_2, &circle_center);
+            lv_area_move(&round_area_2, dsc->center.x, dsc->center.y);
+            if(lv_area_is_on(&round_area_2, &clipped_area)) {
+                fill_circle_mask(circle_mask_2, &round_area_2, &circle_center, width);
+            }
         }
     }
 
@@ -191,7 +197,7 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
         lv_memset(mask_buf, 0xff, blend_w);
         blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, blend_area.y1, blend_w);
 
-        if(dsc->rounded) {
+        if(circle_mask_1) {
             if(blend_area.y1 >= round_area_1.y1 && blend_area.y1 <= round_area_1.y2) {
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
                     lv_memzero(mask_buf, blend_w);
@@ -291,8 +297,9 @@ static void get_rounded_area(int16_t angle, int32_t radius, int32_t thickness, l
     int32_t middle_radius = 2 * radius - thickness;
 
     /*circle_x, circle_y and circle_radius are in 1/CIRCLE_UNIT px, relative to the center of the arc*/
-    int32_t circle_x = (middle_radius * lv_trigo_cos(angle) + round_half) >> shift;
-    int32_t circle_y = (middle_radius * lv_trigo_sin(angle) + round_half) >> shift;
+    /*int64_t: with a huge radius the products overflow int32_t*/
+    int32_t circle_x = (int32_t)(((int64_t)middle_radius * lv_trigo_cos(angle) + round_half) >> shift);
+    int32_t circle_y = (int32_t)(((int64_t)middle_radius * lv_trigo_sin(angle) + round_half) >> shift);
     int32_t circle_radius = thickness * CIRCLE_UNIT / 2;
 
     /*The pixels the circle can cover are those overlapped by its extent
@@ -318,12 +325,16 @@ static void get_rounded_area(int16_t angle, int32_t radius, int32_t thickness, l
 static void fill_circle_mask(lv_opa_t * circle_mask, const lv_area_t * circle_area, const lv_point_t * circle_center,
                              int32_t thickness)
 {
-    /*circle_radius, dx and dy are in 1/CIRCLE_UNIT px*/
+    /*circle_radius, dx and dy are in 1/CIRCLE_UNIT px.
+     *The squares are int64_t as huge thicknesses overflow int32_t. The division stays 32-bit (faster):
+     *it holds because `lv_draw_sw_arc` limits the thickness to the radius, a `uint16_t`.*/
+    LV_ASSERT(thickness <= UINT16_MAX);
+
     int32_t circle_radius = thickness * CIRCLE_UNIT / 2;
-    int32_t circle_sqr = circle_radius * circle_radius;
-    int32_t outer_sqr = circle_sqr + circle_radius * CIRCLE_UNIT;
-    int32_t inner_sqr = LV_MAX(circle_sqr - circle_radius * CIRCLE_UNIT, 0);
-    int32_t edge_sqr = outer_sqr - inner_sqr;
+    int64_t circle_sqr = (int64_t)circle_radius * circle_radius;
+    int64_t outer_sqr = circle_sqr + (int64_t)circle_radius * CIRCLE_UNIT;
+    int64_t inner_sqr = LV_MAX(circle_sqr - (int64_t)circle_radius * CIRCLE_UNIT, (int64_t)0);
+    uint32_t edge_sqr = (uint32_t)(outer_sqr - inner_sqr);
     int32_t mask_width = lv_area_get_width(circle_area);
     int32_t mask_height = lv_area_get_height(circle_area);
 
@@ -331,15 +342,15 @@ static void fill_circle_mask(lv_opa_t * circle_mask, const lv_area_t * circle_ar
      *is measured from the pixel's center, hence the `+ CIRCLE_UNIT / 2` (0.5 px)*/
     for(int32_t y = 0; y < mask_height; y++) {
         int32_t dy = y * CIRCLE_UNIT + CIRCLE_UNIT / 2 - circle_center->y;
-        int32_t dy_sqr = dy * dy;
+        int64_t dy_sqr = (int64_t)dy * dy;
 
         for(int32_t x = 0; x < mask_width; x++) {
             int32_t dx = x * CIRCLE_UNIT + CIRCLE_UNIT / 2 - circle_center->x;
-            int32_t dist_sqr = dx * dx + dy_sqr;
+            int64_t dist_sqr = (int64_t)dx * dx + dy_sqr;
 
             if(dist_sqr >= outer_sqr) *circle_mask = LV_OPA_TRANSP;
             else if(dist_sqr <= inner_sqr) *circle_mask = LV_OPA_COVER;
-            else *circle_mask = (lv_opa_t)(((outer_sqr - dist_sqr) * LV_OPA_COVER) / edge_sqr);
+            else *circle_mask = (lv_opa_t)(((uint32_t)(outer_sqr - dist_sqr) * LV_OPA_COVER) / edge_sqr);
 
             circle_mask++;
         }
