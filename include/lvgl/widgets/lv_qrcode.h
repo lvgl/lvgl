@@ -31,10 +31,8 @@ extern "C" {
  **********************/
 
 /**
- * Controls when a property change is turned into a new QR code bitmap.
- * Only the properties that require re-encoding (size, quiet zone) are affected;
- * the payload setters always encode right away and the colors are always a
- * palette-only write.
+ * When a change of the size or the quiet zone re-encodes the QR code.
+ * The payload setters always encode immediately. A color change only writes the palette.
  */
 typedef enum {
     LV_QRCODE_UPDATE_MODE_IMMEDIATE = 0,    /**< Re-encode as soon as a property changes (default) */
@@ -77,10 +75,9 @@ void lv_qrcode_set_dark_color(lv_obj_t * obj, lv_color_t color);
 void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color);
 
 /**
- * Set the binary payload of a QR code object and generate the bitmap.
- * The bytes are encoded verbatim. A copy is stored, so a later `lv_qrcode_set_size()` or
- * `lv_qrcode_set_quiet_zone()` can re-encode it; the properties may therefore be set
- * before or after the payload, in any order.
+ * Set a binary payload and generate the bitmap. All `data_len` bytes are encoded.
+ * The Widget keeps a copy, so `lv_qrcode_set_size()` and `lv_qrcode_set_quiet_zone()`
+ * can re-encode it. You can call them before or after this function.
  * Use `lv_qrcode_set_text()` for a NUL terminated string.
  * @param obj      pointer to a QR code object
  * @param data     payload to encode
@@ -90,9 +87,8 @@ void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color);
 lv_result_t lv_qrcode_set_data(lv_obj_t * obj, const void * data, uint32_t data_len);
 
 /**
- * Set the text payload of a QR code object and generate the bitmap.
- * The NUL terminator is stored but not encoded, so the QR code holds exactly the string.
- * Use `lv_qrcode_set_data()` for arbitrary binary data.
+ * Set a text payload and generate the bitmap. The NUL terminator is not encoded.
+ * Use `lv_qrcode_set_data()` for binary data.
  * @param obj  pointer to a QR code object
  * @param text payload to encode, as a NUL terminated string
  * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error
@@ -100,34 +96,29 @@ lv_result_t lv_qrcode_set_data(lv_obj_t * obj, const void * data, uint32_t data_
 lv_result_t lv_qrcode_set_text(lv_obj_t * obj, const char * text);
 
 /**
- * Get the payload of a QR code object as a string.
- * Only a payload set with `lv_qrcode_set_text()` is returned; use `lv_qrcode_get_data()`
- * for binary ones.
+ * Get the payload set with `lv_qrcode_set_text()`.
+ * Use `lv_qrcode_get_data()` for a payload set with `lv_qrcode_set_data()`.
  * @param obj pointer to a QR code object
- * @return the stored text as a NUL terminated string, or NULL if the payload is binary or
- *         no payload is set. The buffer is owned by the QR code object.
+ * @return the text, or NULL if the payload is binary or no payload is set.
+ *         The QR code object owns the string.
  */
 const char * lv_qrcode_get_text(lv_obj_t * obj);
 
 /**
- * Copy the payload of a QR code object into a caller-provided buffer.
- * Works for both text and binary payloads; a text payload's NUL terminator is not
- * included, so the result is always the same length that was encoded.
- * Pass `buf == NULL` (or `buf_size == 0`) to query the length without copying.
+ * Copy the payload into a buffer. Works for text and binary payloads.
+ * The NUL terminator of a text payload is not copied.
+ * Pass `buf == NULL` or `buf_size == 0` to get only the length.
  * @param obj      pointer to a QR code object
- * @param buf      buffer to copy the payload into (may be NULL)
+ * @param buf      buffer for the payload @nullable
  * @param buf_size size of `buf` in bytes
- * @return the full length of the payload in bytes. If this is greater than `buf_size`,
- *         only `buf_size` bytes were copied (the payload was truncated).
+ * @return the full length of the payload in bytes. If it is larger than `buf_size`,
+ *         only `buf_size` bytes were copied.
  */
 uint32_t lv_qrcode_get_data(lv_obj_t * obj, void * buf, uint32_t buf_size);
 
 /**
- * (Re)generate the QR code bitmap from the payload that is already stored.
- * Unlike `lv_qrcode_set_data()` / `lv_qrcode_set_text()` this needs no payload, so it is the way to apply property
- * changes made in LV_QRCODE_UPDATE_MODE_DEFERRED: set the size and quiet zone, then call
- * this once to encode them and get the result.
- * The bitmap is regenerated whether or not anything changed.
+ * Encode the stored payload again. The bitmap is always regenerated.
+ * In LV_QRCODE_UPDATE_MODE_DEFERRED, call this after you set the size and the quiet zone.
  * @param obj pointer to a QR code object
  * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error (e.g. no data set, or
  *         the payload does not fit the current size)
@@ -143,21 +134,15 @@ lv_result_t lv_qrcode_render(lv_obj_t * obj);
 void lv_qrcode_set_quiet_zone(lv_obj_t * obj, bool enable);
 
 /**
- * Set when a property change is turned into a new QR code bitmap.
- * With LV_QRCODE_UPDATE_MODE_IMMEDIATE (the default) changing the size or the quiet
- * zone re-encodes the stored data right away. With LV_QRCODE_UPDATE_MODE_DEFERRED
- * such a change only marks the bitmap as out of date and several changes are
- * collapsed into a single re-encode on the next redraw.
- * @note In deferred mode you are expected to call `lv_qrcode_render()` yourself once
- *       the properties are set. It encodes right away and returns the result, leaving
- *       the next redraw nothing to do. If it is forgotten, the encode is done by the
- *       redraw instead: the bitmap is still correct, but the work is charged to that
- *       refresh and its result cannot be reported to anyone, so a warning is logged.
- *       Prefer the explicit call.
- * @note Switching back to LV_QRCODE_UPDATE_MODE_IMMEDIATE while the bitmap is out of
- *       date also re-encodes it, but this function returns void, so an encode failure
- *       can only be logged, not reported. A warning is emitted in that case. Call
- *       `lv_qrcode_render()` first and switch the mode afterwards to get the result.
+ * Set when a change of the size or the quiet zone re-encodes the QR code.
+ * LV_QRCODE_UPDATE_MODE_IMMEDIATE (the default) re-encodes in the setter.
+ * LV_QRCODE_UPDATE_MODE_DEFERRED only marks the bitmap as out of date.
+ * @note In deferred mode, call `lv_qrcode_render()` after you set the properties.
+ *       If you do not, the next redraw encodes the bitmap and logs a warning. A failure
+ *       in the redraw is only logged.
+ * @note A switch to LV_QRCODE_UPDATE_MODE_IMMEDIATE encodes a bitmap that is out of
+ *       date and logs a warning. This function cannot return the result. To get it,
+ *       call `lv_qrcode_render()` before you switch the mode.
  * @param obj  pointer to a QR code object
  * @param mode the mode to use
  */
@@ -171,20 +156,16 @@ void lv_qrcode_set_update_mode(lv_obj_t * obj, lv_qrcode_update_mode_t mode);
 lv_qrcode_update_mode_t lv_qrcode_get_update_mode(lv_obj_t * obj);
 
 /**
- * Check whether the QR code bitmap is free of a known encode failure. Most encodes report
- * their result directly: `lv_qrcode_set_data()` returns it.
- * The ones that cannot are the re-encodes triggered by a property change - they happen
- * in a void setter or, in LV_QRCODE_UPDATE_MODE_DEFERRED, in the draw pass. Use this to
- * detect those, e.g. after shrinking the object below the size its payload needs.
- * @note A failed encode leaves the bitmap marked as out of date, so it is never reported
- *       as current, and it is not retried on every redraw - only a property change makes
- *       the Widget try again. Encode failures are not logged when the caller can see the
- *       result; the one exception is the re-encode done by the redraw, which has no
- *       caller, so that one is logged.
+ * Check if the last encode failed. Use this after a change of the size or the quiet
+ * zone, or after a redraw in LV_QRCODE_UPDATE_MODE_DEFERRED. These encodes cannot
+ * return a result. The payload setters and `lv_qrcode_render()` return their result.
+ * @note The Widget does not retry a failed encode on each redraw. The next change of
+ *       the size, the quiet zone or the payload starts a new attempt.
  * @param obj pointer to a QR code object
- * @return true: no encode attempt is known to have failed. A property change re-arms the
- *               Widget, so this is also true while a deferred re-encode is still pending;
- *         false: the last encode attempt failed, or no data has been set yet
+ * @return true: no encode failed since the last change of the size, the quiet zone or
+ *               the payload.
+ *               This is also true while a deferred encode is pending;
+ *         false: the last encode failed, or no payload is set
  */
 bool lv_qrcode_is_render_valid(lv_obj_t * obj);
 

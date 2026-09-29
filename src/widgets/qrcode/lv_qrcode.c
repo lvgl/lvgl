@@ -126,14 +126,10 @@ void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 lv_result_t lv_qrcode_set_data(lv_obj_t * obj, const void * data, uint32_t data_len)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_CHECK_ARG_MSG(data != NULL, return LV_RESULT_INVALID, "data must not be NULL");
+    LV_CHECK_ARG(data != NULL, return LV_RESULT_INVALID);
     LV_CHECK_ARG_FORMAT_MSG(data_len <= qrcodegen_BUFFER_LEN_MAX, return LV_RESULT_INVALID,
                             "data_len %u exceeds the maximum %u",
                             (unsigned)data_len, (unsigned)qrcodegen_BUFFER_LEN_MAX);
-
-    /*LV_CHECK_ARG compiles to nothing when argument checks are disabled, and the payload
-     *is dereferenced while copying it, so this has to be guarded unconditionally*/
-    if(data == NULL) return LV_RESULT_INVALID;
 
     /*A payload that already ends with a NUL gets a second one appended, so it cannot be
      *mistaken for the single terminator lv_qrcode_set_text() stores*/
@@ -145,17 +141,12 @@ lv_result_t lv_qrcode_set_data(lv_obj_t * obj, const void * data, uint32_t data_
 lv_result_t lv_qrcode_set_text(lv_obj_t * obj, const char * text)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_CHECK_ARG_MSG(text != NULL, return LV_RESULT_INVALID, "text must not be NULL");
+    LV_CHECK_ARG(text != NULL, return LV_RESULT_INVALID);
 
-    /*LV_CHECK_ARG compiles to nothing when argument checks are disabled, and the
-     *lv_strlen() below dereferences `text`, so this has to be guarded unconditionally*/
-    if(text == NULL) return LV_RESULT_INVALID;
-
-    /*One byte of the limit is reserved for the NUL terminator stored with the text*/
     const size_t len = lv_strlen(text);
-    LV_CHECK_ARG_FORMAT_MSG(len <= qrcodegen_BUFFER_LEN_MAX - 1, return LV_RESULT_INVALID,
+    LV_CHECK_ARG_FORMAT_MSG(len <= qrcodegen_BUFFER_LEN_MAX, return LV_RESULT_INVALID,
                             "text length %u exceeds the maximum %u",
-                            (unsigned)len, (unsigned)(qrcodegen_BUFFER_LEN_MAX - 1));
+                            (unsigned)len, (unsigned)qrcodegen_BUFFER_LEN_MAX);
 
     /*The terminator is stored so the copy stays usable as a C string; it is not encoded*/
     return qrcode_store_and_encode(obj, text, (uint32_t)len, true);

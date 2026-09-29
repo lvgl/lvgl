@@ -298,7 +298,7 @@ void test_qrcode_render_applies_deferred_changes(void)
 #endif
 }
 
-void test_qrcode_update_before_switching_mode_reports_result(void)
+void test_qrcode_render_before_switching_mode_reports_result(void)
 {
     lv_color_t bg_color = lv_palette_lighten(LV_PALETTE_LIGHT_BLUE, 5);
     lv_color_t fg_color = lv_palette_darken(LV_PALETTE_BLUE, 4);
@@ -450,7 +450,7 @@ void test_qrcode_failures_are_silent_when_the_caller_sees_the_result(void)
 }
 
 
-void test_qrcode_update_reports_unencodable_payload(void)
+void test_qrcode_set_data_reports_unencodable_payload(void)
 {
     lv_obj_t * qr = lv_qrcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(qr);
