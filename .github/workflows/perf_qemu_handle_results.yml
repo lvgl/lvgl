@@ -1,14 +1,5 @@
 name: QEMU Render Performance Results Handler
 
-# Publishes master's instruction counts to a pre-release, which perf_qemu.yml then
-# downloads as the baseline for every pull request. Same arrangement as
-# perf_emulation_handle_results.yml, so that a pull request measures one revision instead
-# of two.
-#
-# Unlike the wall-clock benchmark, these counts do not need a history to average over:
-# QEMU under -icount shift=0 is deterministic and host independent, so one published run
-# of master is as good as ten. The assets are therefore the plain results-<target>.json
-# files, replaced each time rather than accumulated.
 
 on:
   workflow_run:
@@ -21,16 +12,13 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  # contents: write to publish the release. actions: read as well, because naming any
-  # permission sets every unnamed one to none, and dawidd6/action-download-artifact needs
-  # to read the triggering run's artifacts.
+  # contents: write is required to publish the pre-release
   contents: write
   actions: read
 
 jobs:
   publish:
-    # Only a successful push to master, never a pull request: a fork must not be able to
-    # move the baseline everyone else is compared against.
+    # Only update the release if the workflow is triggered after a push to master
     if: ${{ github.event.workflow_run.conclusion == 'success'
             && github.event.workflow_run.event == 'push'
             && github.event.workflow_run.head_branch == 'master' }}

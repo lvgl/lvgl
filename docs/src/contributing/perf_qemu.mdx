@@ -5,7 +5,7 @@ description: "Counts the instructions LVGL's software renderer executes, on emul
 
 ## Overview
 
-`tests/perf_qemu` builds LVGL for a bare metal target, runs the benchmark demo and every
+`tests/perf_qemu` builds LVGL for an emulated architecture, runs the benchmark demo and every
 `lv_demo_render` scene inside [QEMU](https://www.qemu.org/), and reports how many
 instructions each one took. It also compares every rendered scene against the reference
 images in `tests/ref_imgs/draw/render`, so a change that makes rendering faster and wrong

@@ -1,9 +1,6 @@
 name: QEMU Benchmark Image
 
-# The benchmark's numbers only mean something when the compiler and the emulator are
-# identical everywhere, so the toolchain lives in one image that both CI and
-# tests/perf_qemu/run.sh use. Publishing prints the digest; put that digest in
-# perf_qemu.yml and in run.sh, so a rebuild can never silently change the numbers.
+# Build a docker image to run the qemu tests
 
 on:
   push:

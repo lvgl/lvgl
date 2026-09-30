@@ -16,10 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Spelled out rather than left to perf_qemu.py's defaults, so that what CI measures is
-  # visible here and a local run can be told to match with the same flags:
-  #   tests/perf_qemu/run.sh -f rgb565,argb8888 --opt O2
-  # The script knows six more colour formats and -Os/-O3 for trying things locally.
+  # See the script for the full list of supported color formats and optimization levels
   PERF_QEMU_FORMATS: rgb565,argb8888
   PERF_QEMU_OPT: O2
 
@@ -27,9 +24,6 @@ jobs:
   benchmark:
     runs-on: ubuntu-24.04
     name: QEMU Benchmark - ${{ matrix.target }}
-    # Published by the "QEMU Benchmark Image" workflow, which prints the digest to pin
-    # here. The counts are only comparable across runs while this does not move, so it
-    # should change deliberately. `container` takes no expressions, hence the literal.
     container: ghcr.io/lvgl/lv-perf-qemu@sha256:66cf814ae11c32e4eba451e95b30b24fa53b181c8f1f8bd47c2edc5ec59d2a77
     strategy:
       fail-fast: false
@@ -40,8 +34,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Mark the checkout safe for git
-        # The container runs as a different user than the one that wrote the checkout, and
-        # perf_qemu.py records the measured revision in its results
+        # The container runs as a different user than the one who ran the checkout
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Benchmark this revision
@@ -91,8 +84,6 @@ jobs:
       - name: Collect the baseline master published
         id: baseline
         if: ${{ needs.benchmark.result == 'success' }}
-        # The baseline is a public pre-release, so this needs no more than the read-only
-        # token a pull request from a fork gets
         uses: robinraju/release-downloader@v1
         continue-on-error: true # The release may not exist yet
         with:

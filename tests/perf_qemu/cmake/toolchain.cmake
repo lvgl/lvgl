@@ -19,27 +19,17 @@ list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES PERF_QEMU_TARGET)
 if(PERF_QEMU_TARGET STREQUAL "cortex-m7")
     set(CMAKE_SYSTEM_PROCESSOR arm)
     set(_prefix arm-none-eabi-)
-    # The classic software-rendering MCU, and the target the numbers in the session notes
-    # were taken on. -mfloat-abi=hard because LV_USE_FLOAT is on and the M7 has an FPU.
     set(_arch "-mcpu=cortex-m7 -mthumb -mfloat-abi=hard")
     set(_libc "--specs=nosys.specs")
 elseif(PERF_QEMU_TARGET STREQUAL "cortex-m55")
     set(CMAKE_SYSTEM_PROCESSOR arm)
     set(_prefix arm-none-eabi-)
-    # +nomve for two reasons. It keeps this a software-rendering measurement: with MVE
-    # available GCC's -O2 auto-vectorizes into it, which is not the scalar C path the
-    # other two targets run. And it dodges a build failure: lv_blend_helium.S opens on
-    # __ARM_FEATURE_MVE and includes lvgl_public.h before it checks
-    # LV_USE_NATIVE_HELIUM_ASM, and those headers do not honour __ASSEMBLY__, so the
-    # assembler sees C declarations and fails whatever the config says.
-    # The FPU stays: LV_USE_FLOAT is on, and -mfloat-abi=hard is what an M55 build uses.
-    set(_arch "-mcpu=cortex-m55+nomve -mthumb -mfloat-abi=hard")
+    set(_arch "-mcpu=cortex-m55 -mthumb -mfloat-abi=hard")
     set(_libc "--specs=nosys.specs")
 elseif(PERF_QEMU_TARGET STREQUAL "riscv32")
     set(CMAKE_SYSTEM_PROCESSOR riscv)
     set(_prefix riscv64-unknown-elf-)
-    # rv32imac is the common MCU core: integer only, so LV_USE_FLOAT goes through
-    # libgcc's soft float. Deterministic, just slower than a target with an FPU.
+    # rv32imac is the common integer only MCU core. Any floating point instructions goes through libgcc's soft float
     set(_arch "-march=rv32imac_zicsr -mabi=ilp32")
     set(_libc "--specs=picolibc.specs")
 elseif(PERF_QEMU_TARGET STREQUAL "cortex-a53")
