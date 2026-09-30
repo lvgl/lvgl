@@ -374,11 +374,11 @@ void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, struct _l
 #endif
 
 /**
- * Drop the draw unit's copy of a buffer, without bringing it back to CPU memory.
- * For the owner of a buffer that goes away, or gets new pixels, other than through
- * `lv_draw_buf_destroy`: a buffer kept in another struct, a static buffer initialized
- * again, an image descriptor overwritten. Pixels only the draw unit's copy holds are lost.
- * When `LV_USE_DRAW_VRAM` is disabled this is a no-op.
+ * Release a buffer's VRAM residency without downloading its pixels. Call before discarding,
+ * reinitializing, or overwriting a descriptor that will not pass through lv_draw_buf_destroy, such
+ * as an embedded buffer, a static buffer, or a reused image descriptor. Pixels that exist only in
+ * VRAM are lost.
+ * When LV_USE_DRAW_VRAM is disabled, this is a no-op.
  * @param buf   the draw buffer, or an image descriptor cast to one
  */
 #if LV_USE_DRAW_VRAM

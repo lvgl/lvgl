@@ -496,7 +496,7 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
                  return);
 
 #if LV_USE_DRAW_VRAM
-    /*Drop residency the units have lost before touching their handles*/
+    /* Discard invalid VRAM residencies before accessing their GPU handles. */
     draw_buf_validate_vram(dest);
     draw_buf_validate_vram((lv_draw_buf_t *)src);
 
@@ -852,7 +852,7 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
                 uint32_t stride = buf->header.stride;
                 if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
-                /*As large as the buffer was: its stride can have been narrowed since*/
+                /* Preserve the original buffer capacity even if its current stride is narrower. */
                 uint32_t size = LV_MAX(_calculate_draw_buf_size(w, h, cf, stride), buf->data_size);
                 void * data = draw_buf_malloc(buf->handlers ? buf->handlers : &default_handlers, size, cf);
                 if(data == NULL) {
@@ -874,8 +874,10 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
                 return false;
             }
             if(allocated_cpu) buf->header.flags |= LV_IMAGE_FLAGS_ALLOCATED;
-            /*The download delivers the pixels in the buffer's own color format,
-             *straight or premultiplied as its flags say, whatever the unit keeps*/
+            /*
+             * Download in the descriptor's color format and alpha convention, regardless of the
+             * format used in VRAM.
+             */
             has_cpu = true;
         }
         else if(clearzero && has_cpu && mutable_cpu) {
@@ -952,7 +954,7 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
         uint32_t stride = buf->header.stride;
         if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
-        /*As large as the buffer was, if it had CPU memory before: its stride can have been narrowed since*/
+        /* Allocate at least the previous CPU buffer capacity, even if its current stride is narrower. */
         uint32_t size = LV_MAX(_calculate_draw_buf_size(w, h, cf, stride), buf->data_size);
         const lv_draw_buf_handlers_t * handlers = buf->handlers ? buf->handlers : &default_handlers;
         void * data = draw_buf_malloc(handlers, size, cf);

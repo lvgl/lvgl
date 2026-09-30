@@ -191,34 +191,37 @@ If you are implementing a draw unit with VRAM, you need to:
    void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
    ```
 
-4. **Release what LVGL never destroys** when the draw unit is deleted
-   (`delete_cb`, from `lv_deinit`).  Static buffers and image descriptors in
-   the program keep the VRAM attached to them for as long as they exist, so
-   keep a list of the descriptors you attach, and free those still attached
-   to their buffer, setting the buffer's `vram_res` to `NULL`.  Otherwise they
-   point at a deleted draw unit after `lv_deinit`.
+4. **Release residencies attached to static buffers and descriptors** in the
+   draw unit's `delete_cb`, called by `lv_deinit`. LVGL does not destroy these
+   buffers, so track the residencies you attach to them. During teardown,
+   release each remaining residency and set its buffer's `vram_res` to `NULL`.
+   Otherwise, those buffers retain pointers to a deleted draw unit.
 
 ### Releasing VRAM of Buffers You Own
 
-<ApiLink name="lv_draw_buf_destroy" /> frees a buffer's VRAM with the
-buffer.  Code that keeps an <ApiLink name="lv_draw_buf_t" /> or
-<ApiLink name="lv_image_dsc_t" /> in memory of its own (inside another struct,
-a static buffer, an image descriptor it writes anew for every frame) and drops,
-initializes again or overwrites it without destroying it must release the VRAM
-first, or the draw unit's descriptor and VRAM are lost:
+<ApiLink name="lv_draw_buf_destroy" /> releases a buffer's VRAM residency
+when destroying the buffer. If you manage an <ApiLink name="lv_draw_buf_t" />
+or <ApiLink name="lv_image_dsc_t" /> yourself, release its residency before
+discarding, reinitializing, or overwriting the descriptor. This applies to
+embedded structs, static buffers, and image descriptors reused for each frame.
+Overwriting `vram_res` without releasing it leaks the residency descriptor and
+its GPU allocation:
 
 ```c
 lv_draw_buf_release_vram((lv_draw_buf_t *)&player->frame_dsc);
 player->frame_dsc = next_frame_dsc;
 ```
 
-<ApiLink name="lv_draw_buf_release_vram" /> drops the VRAM without bringing its
-pixels back to CPU memory.  To keep pixels only the draw unit has, call
-`lv_draw_buf_ensure_resident(buf, NULL)` first.  LVGL does this for the
-display's buffers (<ApiLink name="lv_display_set_buffers" />),
-`LV_DRAW_BUF_INIT_STATIC`, the canvas's buffer
-(<ApiLink name="lv_canvas_set_buffer" />, which writes the pixels back), and
-the FFmpeg and GStreamer widgets.
+<ApiLink name="lv_draw_buf_release_vram" /> releases VRAM without downloading
+pixels. If VRAM contains the only current copy and you need to preserve it,
+first call `lv_draw_buf_ensure_resident(buf, NULL)` and check that it succeeds.
+
+LVGL releases old residencies when replacing display buffers through
+<ApiLink name="lv_display_set_buffers" />, reinitializing buffers with
+`LV_DRAW_BUF_INIT_STATIC`, and replacing frames in the FFmpeg and GStreamer
+widgets. When <ApiLink name="lv_canvas_set_buffer" /> replaces a canvas's
+static buffer, LVGL also writes the rendered pixels back to caller-owned
+memory before releasing the residency.
 
 ### For Application Developers
 

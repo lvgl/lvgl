@@ -169,9 +169,9 @@ void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable);
 
 #if LV_USE_DRAW_VRAM
 /**
- * Pass the draw buffer to the flush callback as the draw unit left it, which can be
- * only in VRAM, with `px_map` NULL or stale. For drivers that present the frame from
- * VRAM themselves. By default the buffer is brought back to CPU memory before flushing.
+ * Allow the display driver to flush directly from VRAM. Pass the draw buffer without downloading
+ * its pixels; px_map may be NULL or stale. Enable this only for drivers that can present
+ * GPU-resident pixels. By default, LVGL ensures CPU residency before flushing.
  * @param disp      pointer to a display
  * @param enable    true: flush from VRAM; false: flush from CPU memory
  */

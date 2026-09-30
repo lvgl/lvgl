@@ -555,8 +555,10 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer, lv_draw_unit_t * draw_unit)
     LV_UNUSED(draw_unit);
 #endif
 
-    /*Ownership of a lazy header is separate from accounting for its backing.
-     *Remember the exact charge so unbacked or reshaped layers free the right amount.*/
+    /*
+     * Track descriptor ownership separately from the layer's memory budget charge. Save the exact
+     * charge so releasing an unbacked or reshaped layer restores the correct budget.
+     */
     if(account_buffer) {
         _draw_info.used_memory_for_layers += layer_size_byte;
         layer->allocated_buf_size = layer_size_byte;

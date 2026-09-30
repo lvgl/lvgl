@@ -209,8 +209,11 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
 
     /*An empty glyph (e.g. a space) has no pixels to copy, and no valid pixel position either*/
     if(box_w != 0 && box_h != 0) {
-        /*Take the pixel pointer through lv_draw_buf_goto_xy: it makes the buffer CPU-resident
-         *and consumes the CLEARZERO flag set by the clear, so the glyph gets uploaded later*/
+        /*
+         * Use lv_draw_buf_goto_xy to ensure CPU residency and consume the CLEARZERO flag before
+         * writing glyph pixels. Otherwise, a later upload could treat the new glyph as an empty
+         * buffer.
+         */
         uint8_t * glyph_dst = lv_draw_buf_goto_xy(data->draw_buf, 0, 0);
         if(glyph_dst == NULL) {
             LV_LOG_WARN("Could not access the glyph draw buffer");

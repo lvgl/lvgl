@@ -555,7 +555,7 @@ static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample,
     }
 
     const lv_draw_buf_t * copy = streamer->aligned_frame;
-    /*The descriptor is written anew: a draw unit's copy of the previous frame goes*/
+    /* Release the previous frame's VRAM residency before overwriting its descriptor. */
     lv_draw_buf_release_vram((lv_draw_buf_t *)&streamer->frame);
     streamer->frame = (lv_image_dsc_t) {
         .data = aligned ? map->data : copy->data,

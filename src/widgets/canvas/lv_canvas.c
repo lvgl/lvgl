@@ -527,9 +527,9 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 #if LV_USE_DRAW_VRAM
 /**
- * Write the pixels a draw unit left in VRAM back to the caller's memory under
- * the static buffer, and release the VRAM, before the canvas drops the
- * descriptor. The memory then holds the canvas, as with the software renderer.
+ * Before discarding the canvas's static buffer descriptor, copy any GPU-rendered pixels back into
+ * the caller's storage and release the VRAM residency. This preserves the final canvas image in the
+ * caller's memory, as software rendering does.
  */
 static void static_buf_write_back(lv_canvas_t * canvas)
 {
@@ -538,7 +538,7 @@ static void static_buf_write_back(lv_canvas_t * canvas)
 
     if(!lv_draw_buf_ensure_resident(buf, NULL)) {
         LV_LOG_WARN("Couldn't write the canvas back to its buffer");
-        /*The descriptor is dropped anyway: don't leave the VRAM behind*/
+        /* Release the VRAM residency even if readback failed, since the descriptor will be discarded. */
         lv_draw_unit_t * unit = buf->vram_res ? buf->vram_res->unit : NULL;
         if(unit && unit->vram_free_cb) unit->vram_free_cb(unit, buf);
     }

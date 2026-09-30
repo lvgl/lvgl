@@ -88,9 +88,11 @@ void lv_image_cache_drop(const void * src)
     lv_draw_unit_send_event(NULL, LV_EVENT_INVALIDATE_AREA, (void *)src);
 
 #if LV_USE_DRAW_VRAM
-    /*A VRAM copy of an image the CPU owns is stale now. A modifiable buffer's
-     *VRAM can hold what a draw unit drew into it, which only it has, so it
-     *stays: the CPU writes to it through lv_draw_buf_ensure_resident.*/
+    /*
+     * Discard stale GPU copies of immutable CPU images. Keep mutable buffers' VRAM residencies
+     * because they may contain the only current rendered pixels. CPU access to those buffers must
+     * go through lv_draw_buf_ensure_resident to synchronize them first.
+     */
     if(src != NULL && lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
         lv_draw_buf_t * buf = (lv_draw_buf_t *)src;
         if(buf->vram_res != NULL && !(buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE)) {
