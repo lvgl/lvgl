@@ -555,6 +555,8 @@ static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample,
     }
 
     const lv_draw_buf_t * copy = streamer->aligned_frame;
+    /*The descriptor is written anew: a draw unit's copy of the previous frame goes*/
+    lv_draw_buf_release_vram((lv_draw_buf_t *)&streamer->frame);
     streamer->frame = (lv_image_dsc_t) {
         .data = aligned ? map->data : copy->data,
         .data_size = aligned ? map->size : copy->data_size,
@@ -642,6 +644,8 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         gst_object_unref(streamer->pipeline);
     }
     gstreamer_release_frame(streamer);
+    /*The frame's descriptor is kept in the widget, freed with it*/
+    lv_draw_buf_release_vram((lv_draw_buf_t *)&streamer->frame);
     if(streamer->aligned_frame) {
         lv_draw_buf_destroy(streamer->aligned_frame);
     }

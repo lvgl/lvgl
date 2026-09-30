@@ -244,6 +244,10 @@ void lv_display_delete(lv_display_t * disp)
 
     lv_draw_layer_delete(disp->layer_head);
 
+    /*The memory of lv_display_set_buffers is the caller's, the descriptors the display's*/
+    lv_draw_buf_release_vram(&disp->_static_buf1);
+    lv_draw_buf_release_vram(&disp->_static_buf2);
+
 #if LV_USE_EXT_DATA
     if(disp->ext_data.free_cb) {
         disp->ext_data.free_cb(disp->ext_data.data);
@@ -570,6 +574,9 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
                                 render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
     }
 
+    /*The display's own descriptors of the buffers: a draw unit's copy of the old ones goes*/
+    lv_draw_buf_release_vram(&disp->_static_buf1);
+    lv_draw_buf_release_vram(&disp->_static_buf2);
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
     if(buf2) {
         lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);

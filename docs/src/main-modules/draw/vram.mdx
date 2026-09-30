@@ -191,6 +191,35 @@ If you are implementing a draw unit with VRAM, you need to:
    void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
    ```
 
+4. **Release what LVGL never destroys** when the draw unit is deleted
+   (`delete_cb`, from `lv_deinit`).  Static buffers and image descriptors in
+   the program keep the VRAM attached to them for as long as they exist, so
+   keep a list of the descriptors you attach, and free those still attached
+   to their buffer, setting the buffer's `vram_res` to `NULL`.  Otherwise they
+   point at a deleted draw unit after `lv_deinit`.
+
+### Releasing VRAM of Buffers You Own
+
+<ApiLink name="lv_draw_buf_destroy" /> frees a buffer's VRAM with the
+buffer.  Code that keeps an <ApiLink name="lv_draw_buf_t" /> or
+<ApiLink name="lv_image_dsc_t" /> in memory of its own (inside another struct,
+a static buffer, an image descriptor it writes anew for every frame) and drops,
+initializes again or overwrites it without destroying it must release the VRAM
+first, or the draw unit's descriptor and VRAM are lost:
+
+```c
+lv_draw_buf_release_vram((lv_draw_buf_t *)&player->frame_dsc);
+player->frame_dsc = next_frame_dsc;
+```
+
+<ApiLink name="lv_draw_buf_release_vram" /> drops the VRAM without bringing its
+pixels back to CPU memory.  To keep pixels only the draw unit has, call
+`lv_draw_buf_ensure_resident(buf, NULL)` first.  LVGL does this for the
+display's buffers (<ApiLink name="lv_display_set_buffers" />),
+`LV_DRAW_BUF_INIT_STATIC`, the canvas's buffer
+(<ApiLink name="lv_canvas_set_buffer" />, which writes the pixels back), and
+the FFmpeg and GStreamer widgets.
+
 ### For Application Developers
 
 When <ApiLink name="LV_USE_DRAW_VRAM" /> is enabled and a VRAM-capable draw unit is
