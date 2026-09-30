@@ -8,7 +8,7 @@
  * to read files from the FAT filesystem on the SD card.
  *
  * Architecture:
- * - Files are loaded into RAM_G on open and stay there (read-only access)
+ * - Files are loaded into RAM_G on first read and retained for read-only access
  * - Read operations fetch directly from RAM_G
  * - Use lv_eve5_sdcard_steal_ramg() to take ownership of the RAM_G allocation
  *   for direct GPU use (zero-copy path for textures)
@@ -84,8 +84,8 @@ void lv_fs_eve5_sdcard_init(lv_display_t * disp);
 bool lv_eve5_sdcard_ready(void);
 
 /**
- * Deinitialize the EVE5 SD card filesystem driver.
- * Unregisters the filesystem driver. Any open files should be closed first.
+ * Deinitialize the EVE5 SD card filesystem context. Close all open files first. The filesystem
+ * driver remains registered because LVGL does not support unregistering it.
  */
 void lv_fs_eve5_sdcard_deinit(void);
 

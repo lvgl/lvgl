@@ -11,8 +11,9 @@
  *   dlStart -> commands -> display -> swap -> graphicsFinish
  * - Screen partial textures are handed to the display driver via draw_buf->vram_res
  * - Child layer textures are freed via lv_draw_buf_destroy -> vram_free_cb
- * - Without LV_USE_DRAW_VRAM, the unit records them itself, and frees a child
- *   layer's when LVGL deletes it (lv_draw_eve5_residency.c)
+ * - Without LV_USE_DRAW_VRAM, the unit tracks GPU allocations itself and frees
+ *   each child layer's allocation when LVGL deletes that layer
+ *   (lv_draw_eve5_residency.c)
  *
  * Alpha Recovery:
  * EVE hardware applies the same blend equation to all four channels. With standard
@@ -34,7 +35,7 @@
  *
  * 1. Direct-to-Alpha (default):
  *    Replays alpha-affecting tasks into the alpha channel after RGB rendering.
- *    Works for squared-alpha errors since the math is predictable and reversible.
+ *    Rebuilds alpha from the shapes using the correct alpha blend equation.
  *
  * 2. L8 Render-Target (EVE5_USE_RENDERTARGET_ALPHA=1, when needed):
  *    When any task uses alpha-as-mask, the alpha channel is irrecoverably trashed.
@@ -146,9 +147,10 @@ static bool s_eve5_enabled = true;
 
 lv_draw_eve5_stats_t lv_draw_eve5_stats;
 
-/* Whether a layer is the display's screen layer, which renders into the
- * display's buffer. A snapshot also makes its layer the display's layer_head
- * while it draws, into a buffer of its own. */
+/*
+ * Check whether this layer renders into the display's active screen buffer. A snapshot temporarily
+ * replaces layer_head, but renders into its own buffer.
+ */
 static inline bool eve5_is_screen_layer(const lv_display_t * disp, const lv_layer_t * layer)
 {
     return disp != NULL && layer->parent == NULL && layer == disp->layer_head
@@ -156,12 +158,12 @@ static inline bool eve5_is_screen_layer(const lv_display_t * disp, const lv_laye
 }
 
 #if !LV_USE_DRAW_VRAM
-/* Whether what the draw unit renders on a layer gets where LVGL needs it.
- * Without VRAM residency, LVGL flushes another display's frame from its draw
- * buffer in CPU memory, which nothing asks the draw unit to fill: the software
- * renderer draws those. A canvas's and a snapshot's are read back when LVGL
- * asks for them (LV_EVENT_SCREEN_LOAD_START), the EVE5 display presents its
- * own frame. */
+/*
+ * Check whether EVE5 can deliver this layer's rendered pixels to its consumer. The EVE5 display
+ * presents GPU memory directly. Canvas and snapshot buffers are read back on
+ * LV_EVENT_SCREEN_LOAD_START. Other displays need a CPU framebuffer for flushing, and there is no
+ * readback event for those buffers, so they must use the software renderer.
+ */
 static inline bool eve5_renders_for(const lv_display_t * eve5_disp, const lv_layer_t * layer)
 {
     while(layer->parent != NULL) layer = layer->parent;
@@ -215,8 +217,9 @@ void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
     lv_draw_eve5_register_vram_callbacks(unit);
     unit->base_unit.vram_font_free_cb = lv_draw_eve5_vram_font_free;
 #else
-    /* LVGL tells the draw units about layers deleted, results it needs back
-     * in a layer's buffer, and images dropped from its cache */
+    /*
+     * Register handlers for layer deletion, layer readback, and image cache invalidation.
+     */
     unit->base_unit.event_cb = lv_draw_eve5_res_event;
 #endif
     unit->base_unit.delete_cb = eve5_delete;
@@ -256,7 +259,7 @@ void lv_draw_eve5_deinit(void)
     LV_LOG_INFO("EVE5: Draw unit deinitialized");
 }
 
-/* lv_deinit: release what the unit still holds, as the allocator outlives it */
+/* Release the draw unit's remaining GPU resources during lv_deinit, before the allocator is destroyed. */
 static int32_t eve5_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
@@ -532,9 +535,10 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
                 t = t->next;
             }
 
-            /* The previous slice's output is the layer content. The swapchain
-             * cannot take it over, nor can a layer in another format; blit it
-             * with an otherwise empty slice. */
+            /*
+             * The previous slice contains the layer's current pixels. A swapchain or a layer in a
+             * different format cannot adopt that buffer, so copy it with an otherwise empty slice.
+             */
             lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
             if(!slice->isolated && slice->prev_handle.Id != GA_HANDLE_INVALID.Id && vr != NULL) {
                 if(vr->is_swapchain || slice->prev_eve_format != 0) {
@@ -581,8 +585,10 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
         }
     }
     else {
-        /* Without a previous slice, the layer's content, such as a canvas's,
-         * is the background, unless init_layer discards it */
+        /*
+         * Use the layer's existing pixels as the background, unless init_layer discards them. This
+         * preserves existing canvas content when there is no previous slice.
+         */
         lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
         bool discard = eve5_buf_discarded(layer->draw_buf);
         uint32_t base = (vr != NULL && vr->has_content && !vr->is_swapchain && !discard)
@@ -667,8 +673,10 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
 #endif
     bool finish_tasks = is_screen || !layer_has_alpha || l8_alpha;
 
-    /* Display list budget. The L8 alpha pass has already fixed the slice end,
-     * and the swapchain is only rendered to when all of it fits. */
+    /*
+     * Set the display list budget. The L8 alpha pass has already fixed the slice end. Render
+     * directly to the swapchain only if the entire slice fits.
+     */
     lv_draw_eve5_budget_t budget;
     lv_eve5_vram_res_t * target_vr = eve5_get_vram_res(u, layer);
     budget.alpha_pass = !finish_tasks;
@@ -694,7 +702,7 @@ static lv_draw_task_t * eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * 
             else
 #endif
             {
-                /* The slice may end before the tasks the pre-pass saw */
+                /* The RGB pass may stop before the last task examined by the pre-pass. */
                 lv_draw_eve5_opaque_prepass(u, layer, slice);
                 lv_draw_eve5_alpha_pass(u, layer, slice);
             }
@@ -758,10 +766,10 @@ static void eve5_finish_queued(lv_draw_task_t * start, const lv_draw_task_t * en
 }
 
 /**
- * Render the task range of `range` as consecutive slices that each fit the
- * display list budget, the first on top of range->prev_handle (consumed).
- * Each further slice continues in a fresh buffer on top of the previous
- * slice's output. The output stays in the layer's buffer.
+ * Render range as consecutive slices that each fit the display list budget. The first slice uses
+ * range->prev_handle as its background and takes ownership of that buffer. Each subsequent slice
+ * uses a fresh buffer with the previous slice's output as its background. Leave the final output in
+ * the layer's buffer.
  */
 static void eve5_render_range(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                               bool is_screen, bool layer_has_alpha,
@@ -791,11 +799,12 @@ static void eve5_render_range(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 }
 
-/* Layer state while its slices render to ARGB8 intermediates. The blend math,
- * and the intermediates between slices, are ARGB8: a layer in another format
- * (an opaque canvas in RGB565, RGB8 or L8) converts its content in and its
- * result back. The full-mode screen does the same, as the swapchain can only
- * take its final frame. */
+/*
+ * Save the layer's state while rendering its slices into ARGB8 buffers. This preserves the
+ * precision used by the blend operations. For other layer formats, convert the existing content to
+ * ARGB8 before rendering and convert the completed result back. In full mode, also use an
+ * intermediate buffer because the swapchain can only receive the final frame.
+ */
 typedef struct {
     bool is_swapchain;
     EVE_GpuHandle gpu_handle;   /**< The swapchain, or the layer's buffer until its content is converted */
@@ -811,20 +820,23 @@ typedef struct {
     uint32_t inter_stride;      /**< Stride of the ARGB8 intermediates */
 } eve5_argb8_state_t;
 
-/* A render target format with less precision than the ARGB8 the render
- * engine blends at, which a layer continued over several slices would lose
- * between them. RGB8 only drops alpha, which the layers it's used for don't
- * have. */
+/*
+ * Check whether the render target has less precision than ARGB8. Converting to such a format
+ * between slices would lose precision. RGB8 only drops alpha, and is used for opaque layers, so it
+ * needs no intermediate buffer for precision.
+ */
 static inline bool eve5_format_is_lossy(uint16_t eve_format)
 {
     return eve_format == RGB565 || eve_format == L8 || eve_format == LA8 || eve_format == ARGB4
            || eve_format == ARGB1555 || eve_format == YCBCR;
 }
 
-/* How the layer's content is reduced to its color format: luminance formats
- * don't render directly as LVGL encodes them. The full-mode swapchain is RGB8,
- * so with LV_DRAW_EVE5_FULL_COLOR_FORMAT its frame is reduced to the format
- * of a screen tile of the display's color format (luminance as gray). */
+/*
+ * Choose the conversion for the completed layer. Luminance formats need an explicit conversion to
+ * match LVGL's encoding. The full-mode swapchain is RGB8; when LV_DRAW_EVE5_FULL_COLOR_FORMAT is
+ * enabled, first reduce its frame to the screen tile format to reproduce the display's configured
+ * color precision.
+ */
 static lv_draw_eve5_reduction_t eve5_layer_reduction(lv_draw_eve5_unit_t * u, const lv_layer_t * layer,
                                                      bool is_swapchain)
 {
@@ -926,10 +938,9 @@ static bool eve5_argb8_detach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, lv_ev
 }
 
 /**
- * Give the layer its own format back. The swapchain returns as it was; a
- * layer gets a new buffer in its format, for the last slice or the
- * conversion of the result. Returns the current intermediate, which the
- * caller now owns.
+ * Restore the layer's original format. Restore the saved descriptor for a swapchain; otherwise,
+ * allocate a new buffer in the original format for the final slice or conversion. Return the
+ * current ARGB8 intermediate buffer and transfer ownership to the caller.
  */
 static EVE_GpuHandle eve5_argb8_attach(lv_draw_eve5_unit_t * u, lv_layer_t * layer, lv_eve5_vram_res_t * vr,
                                        const eve5_argb8_state_t * saved)
@@ -967,10 +978,10 @@ static EVE_GpuHandle eve5_argb8_attach(lv_draw_eve5_unit_t * u, lv_layer_t * lay
 }
 
 /**
- * Put an ARGB8 intermediate (consumed) in the attached layer with an otherwise
- * empty slice: present it on the swapchain, or convert it to the layer's
- * format, reduced as it says. Without one, the swapchain is cleared to keep
- * its rotation, and a layer stays empty.
+ * Copy the ARGB8 intermediate into the restored layer using an otherwise empty slice. Take
+ * ownership of inter and apply the requested reduction before presenting or storing the result. If
+ * inter is invalid, clear and present the swapchain to advance its buffer order; leave other layers
+ * empty.
  */
 static void eve5_argb8_finish(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen,
                               EVE_GpuHandle inter, const eve5_argb8_state_t * saved,
@@ -986,10 +997,11 @@ static void eve5_argb8_finish(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool 
         slice_empty.prev_eve_format = ARGB8;
         slice_empty.prev_stride = saved->inter_stride;
 
-        /* The swapchain, and a thresholded layer, are drawn from the
-         * reduced content, first put in a buffer of its format: the
-         * luminance in L8, or the screen tile's format. An L8 or LA8 layer
-         * gets it as it converts. */
+        /*
+         * For a swapchain or a thresholded layer, first convert the intermediate to L8 or the
+         * screen tile format, then draw that result into the destination. For ordinary L8 and LA8
+         * layers, the final blit performs the conversion directly.
+         */
         if(reduction == LV_DRAW_EVE5_REDUCE_THRESHOLD
            || (reduction != LV_DRAW_EVE5_REDUCE_NONE && saved->is_swapchain)) {
             bool luminance = reduction != LV_DRAW_EVE5_REDUCE_QUANTIZE;
@@ -1088,9 +1100,11 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
      * is presented or converted once complete. */
     bool whole_only = is_swapchain || (vr != NULL && eve5_format_is_lossy(layer_format));
 
-    /* A layer in a luminance format, and a FULL-mode frame given the
-     * display's color format, always render to an ARGB8 intermediate, and are
-     * reduced to their format once complete */
+    /*
+     * Luminance layers and FULL-mode frames that emulate the display's configured color format
+     * always render into ARGB8 first. Convert to the target format only after rendering is
+     * complete.
+     */
     lv_draw_eve5_reduction_t reduction = vr != NULL ? eve5_layer_reduction(u, layer, is_swapchain)
                                          : LV_DRAW_EVE5_REDUCE_NONE;
     bool reduced = reduction != LV_DRAW_EVE5_REDUCE_NONE;
@@ -1114,8 +1128,10 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
             eve5_render_range(u, layer, is_screen, layer_has_alpha, &range, true);
         }
         else {
-            /* The layer may not fit one display list, or is reduced: render
-             * the slices to an intermediate, and present or convert that */
+            /*
+             * Use an intermediate buffer if the layer needs multiple display lists or a final color
+             * conversion. Present or convert the completed result.
+             */
             eve5_argb8_state_t saved;
             if(!eve5_argb8_detach(u, layer, vr, &saved)) {
                 /* Without memory for it, a layer still renders directly,
@@ -1139,14 +1155,13 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
     {
         EVE5_LOG("EVE5: Slice split at task %p (type=%d)", (void *)blend_task, blend_task->type);
 
-        /* Slicing intermediates are ARGB8 buffers, as the blend math is. An
-         * ARGB8 layer's own vram_res plays that role. The full-mode screen's
-         * vram_res is virtual (is_swapchain), and a layer in another format
-         * can't hold them, so these swap it for a fresh ARGB8 allocation for
-         * the duration of the slice loop (eve5_argb8_detach). The tail slice
-         * then restores the layer, and renders into its own format with the
-         * ARGB8 intermediate as its base. A partial-mode screen tile is such
-         * a layer unless the display's format makes it ARGB8 (init_layer). */
+        /*
+         * Keep intermediate slices in ARGB8 to preserve blend precision. An ARGB8 layer can use its
+         * own vram_res. For a swapchain or a layer in another format, eve5_argb8_detach temporarily
+         * replaces the residency with an ARGB8 allocation. The final slice restores the original
+         * layer format and uses the ARGB8 result as its background. This also applies to
+         * partial-mode screen tiles unless init_layer selected ARGB8 for them.
+         */
         bool argb8_sliced = is_swapchain || (vr != NULL && layer_format != ARGB8);
         eve5_argb8_state_t saved;
         /* LVGL blends on an L8 layer's luminances */
@@ -1211,9 +1226,10 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     eve5_render_range(u, layer, is_screen, layer_has_alpha, &slice_tail, true);
                 }
                 else if(argb8_sliced) {
-                    /* The tail may need several slices, or the layer is
-                     * reduced: render them to the intermediate as the layer,
-                     * then present or convert it */
+                    /*
+                     * Render the remaining slices into the intermediate buffer, then present or
+                     * convert the completed result.
+                     */
                     eve5_render_range(u, layer, is_screen, layer_has_alpha, &slice_tail, true);
                     bool has_content = vr->has_content;
                     EVE_GpuHandle inter = eve5_argb8_attach(u, layer, vr, &saved);
@@ -1282,10 +1298,11 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 continue;
             }
 
-            /* If prev is still INVALID (first task in queue is a blend task with
-             * nothing before), the dst is the layer's content, such as a
-             * canvas's: an empty slice renders it into an ARGB8 render target,
-             * premultiplied, as the blend math takes it. */
+            /*
+             * If the first task is a blend task, prev is still INVALID. Use the layer's existing
+             * content, such as a canvas image, as the blend destination: copy it into a
+             * premultiplied ARGB8 target with an empty slice.
+             */
             if(prev.Id == GA_HANDLE_INVALID.Id && vr != NULL && vr->has_content) {
                 lv_draw_eve5_slice_t slice_base;
                 lv_memzero(&slice_base, sizeof(slice_base));
@@ -1360,7 +1377,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 bool blend_attempted = false;
 
 #if LV_DRAW_EVE5_L8_EXACT
-                /* The math runs on LVGL's luminances of both */
+                /* Convert both source and destination to LVGL luminance before blending. */
                 if(reduced_luminance) {
                     prev = lv_draw_eve5_blend_luminance(u, layer, prev);
                     src_handle = lv_draw_eve5_blend_luminance(u, layer, src_handle);
@@ -1403,9 +1420,11 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     uint32_t src_addr = EVE_GpuAlloc_Get(u->allocator, src_handle);
 
                     if(result_addr != GA_INVALID && prev_addr != GA_INVALID && src_addr != GA_INVALID) {
-                        /* Epoch scope for the fallback composite segment;
-                         * the prev/src Gets above carry its epoch, gating
-                         * their scoped frees below on this DL's sync */
+                        /*
+                         * Track this composite display list in an epoch scope. The Get calls above
+                         * associate prev and src with this epoch, so ScopedFree waits until the
+                         * display list completes before releasing them.
+                         */
                         EVE_GpuAlloc_OpenScope(u->allocator);
 
                         EVE_CoCmd_renderTarget(u->hal, result_addr, ARGB8, baw, bah);
@@ -1527,9 +1546,9 @@ static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_ta
              * whole image is partially covered, so it is sliced for the exact
              * math (lv_draw_eve5_blend_additive); at full opacity, only
              * antialiased edges and translucent pixels over bright content
-             * differ, and it stays inline for speed. On a layer that gets
-             * LVGL's luminance exactly, the sum saturates on the luminance,
-             * not on each channel: always sliced. */
+             * differ, so keep those tasks inline for speed. With exact LVGL
+             * luminance, addition must saturate the luminance rather than each
+             * RGB channel, so always use a separate slice for that case. */
             if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
                 if(dsc->opa < LV_OPA_MAX || luminance) return t;
             }

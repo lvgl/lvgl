@@ -98,13 +98,15 @@ static void eve5_decoder_mark_path_bad(const char * path)
  * IMAGE SOURCE RESOLUTION
  **********************/
 
-/* Owner of the full images read from strip decoders in the image cache: a
- * cache hit has nothing to close */
+/*
+ * Use this decoder as the cache owner for full images assembled from strips. Cache hits need no
+ * decoder-specific cleanup.
+ */
 static lv_image_decoder_t s_strip_decoder = { .name = "EVE5 strips" };
 
 /**
- * Read the image of a decoder that only decodes strips (get_area_cb, such as
- * the BMP decoder) into a full buffer, as a decoder's own full decode would be.
+ * Assemble a complete image from a strip decoder's get_area_cb output, such as BMP strips. Return a
+ * full buffer like those produced by decoders that decode the entire image at once.
  */
 static lv_draw_buf_t * decode_strips(lv_image_decoder_dsc_t * dsc)
 {
@@ -140,9 +142,9 @@ static lv_draw_buf_t * decode_strips(lv_image_decoder_dsc_t * dsc)
 }
 
 /**
- * Replace the open decoder session of a strip decoder with the full image,
- * kept in the image cache so it stays resident in VRAM between frames.
- * Without the cache, the resolved image owns it.
+ * Replace the strip decoder session with a complete decoded image. Store the image in the image
+ * cache so its VRAM copy can be reused between frames. If caching is disabled, transfer ownership
+ * to the resolved image.
  */
 static bool resolve_strips(eve5_resolved_image_t * resolved)
 {
@@ -179,10 +181,9 @@ static lv_image_decoder_t * s_hw_decoder;
 
 /**
  * Resolve an image source to an lv_image_dsc_t.
- * For files, opens with use_indexed=true to preserve indexed formats.
- * Without LV_USE_DRAW_VRAM, the decoded image isn't cached: the draw unit
- * keeps its EVE copy, by the source. The hardware decoder decodes into it
- * without pixels in CPU memory, leaving img_dsc NULL.
+ * For files, open with use_indexed=true to preserve indexed formats. Without LV_USE_DRAW_VRAM, keep
+ * a GPU copy keyed by the source instead of caching CPU pixels. The hardware decoder can produce
+ * this GPU copy directly; in that case, img_dsc remains NULL.
  */
 bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t * resolved,
                                        lv_draw_unit_t * draw_unit)
@@ -349,7 +350,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     /* Two-pass probe to capture single-channel JPEGs: pass 1 with OPT_TRUECOLOR
      * (default for HW decode); if the source is a grayscale JPEG (Type=JPEG,
      * Channels=1), pass 2 with OPT_MONO so Size/Stride/Format predict the L8
-     * decode (half the RAM_G footprint of ARGB8) and the load picks up the
+     * decode (one byte per pixel instead of four for ARGB8) and the load picks up the
      * matching option. L8 from JPEG renders as opaque luminance through the
      * existing eve_format_to_lv_cf(L8, prefer_luminance_for_l8=true) mapping
      * in the open path. PNG color_type=0 already decodes to L8 without
@@ -1370,10 +1371,10 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const 
 }
 
 /**
- * Load any image source to GPU, see lv_draw_eve5_resolve_to_gpu.
- * @param premultiply  an image the CPU uploads in straight ARGB8888 goes up
- *                     premultiplied, see lv_draw_eve5_upload_image_to_gpu_ex.
- *                     Images the coprocessor decodes or loads stay straight.
+ * Load any image source to the GPU; see lv_draw_eve5_resolve_to_gpu.
+ * @param premultiply  If true, convert CPU-uploaded straight ARGB8888 pixels to premultiplied alpha
+ * (see lv_draw_eve5_upload_image_to_gpu_ex). Images decoded or loaded by the coprocessor remain
+ * straight.
  */
 lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu_ex(lv_draw_eve5_unit_t * u, const void * src, bool premultiply)
 {
@@ -1381,7 +1382,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu_ex(lv_draw_eve5_unit_t * u, con
 
     if(src_type == LV_IMAGE_SRC_FILE || (src_type == LV_IMAGE_SRC_VARIABLE && eve5_image_needs_decoder(src))) {
 #if !LV_USE_DRAW_VRAM
-        /* Decoded before: its EVE copy, by the file or the data */
+        /* Look up the cached GPU image by file path or source data. */
         lv_eve5_vram_res_t * decoded_vr = lv_draw_eve5_res_source(u, src);
         if(decoded_vr != NULL && EVE_GpuAlloc_Get(u->allocator, decoded_vr->gpu_handle) != GA_INVALID) {
             return decoded_vr;
@@ -1415,10 +1416,12 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu_ex(lv_draw_eve5_unit_t * u, con
          * and attaches vram_res to the image descriptor. */
         lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu_ex(u, resolved.img_dsc, true, premultiply);
 #if LV_USE_DRAW_VRAM
-        /* A decoder that doesn't cache what it decodes (ffmpeg's) frees it when
-         * closed: the upload is kept for this layer only. Not an image that is
-         * its own decoded image, nor the upload of the image a decoder's
-         * descriptor copies (lv_draw_buf_from_image). */
+        /*
+         * An uncached decoder, such as ffmpeg, frees its temporary pixels when closed. Keep their
+         * GPU copy only until this layer finishes rendering. Source images and shallow copies made
+         * by lv_draw_buf_from_image can instead retain a GPU copy associated with the original
+         * source.
+         */
         if(vr != NULL && resolved.decoder_open && resolved.decoder_dsc.cache_entry == NULL
            && (const void *)resolved.img_dsc != src && vr->owner == (lv_draw_buf_t *)resolved.img_dsc) {
             lv_draw_eve5_res_keep_for_layer(u, resolved.img_dsc, vr);
@@ -1583,10 +1586,9 @@ static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt, bool prefer_lumin
 
 #if !LV_USE_DRAW_VRAM
 /**
- * Complete an open of the hardware decoder from the image's EVE copy, which
- * the draw unit keeps (lv_draw_eve5_res_source). The draw unit asks for no
- * pixels (decode_to_gpu), other users get them in CPU memory, read back from
- * the EVE copy, as a decoder gives them.
+ * Complete a hardware decoder open using the cached GPU image from lv_draw_eve5_res_source. With
+ * decode_to_gpu, leave the pixels in GPU memory. For other callers, read the pixels back into CPU
+ * memory as a normal decoder would.
  */
 static lv_result_t eve5_decoder_pixels(lv_draw_eve5_unit_t * u, lv_image_decoder_t * decoder,
                                        lv_image_decoder_dsc_t * dsc, const lv_eve5_vram_res_t * vr,
@@ -1633,7 +1635,7 @@ static lv_result_t eve5_decoder_pixels(lv_draw_eve5_unit_t * u, lv_image_decoder
     return LV_RESULT_OK;
 }
 
-/* Pixels the image cache doesn't own are the open's */
+/* If the image cache does not own the CPU pixels, the decoder session must free them when closed. */
 static void eve5_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
@@ -1781,8 +1783,10 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
          * derived decision, derived in one place.
          * Two-pass for grayscale-JPEG auto-promote (see try_load_file_image). */
 #if LV_USE_LIBJPEG_TURBO
-        /* CMD_LOADIMAGE decodes as stored, and LVGL's libjpeg-turbo decoder
-         * applies the EXIF orientation: leave turned JPEGs to it */
+        /*
+         * CMD_LOADIMAGE ignores EXIF orientation. Leave JPEGs that require an orientation transform
+         * to LVGL's libjpeg-turbo decoder.
+         */
         if(is_jpeg) {
             uint32_t orientation = 1;
             uint8_t * head = lv_malloc(EVE5_EXIF_HEAD_SIZE);
@@ -1864,8 +1868,10 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     bool is_bin_ext = eve5_has_extension(path, ".bin");
 
 #if !LV_USE_DRAW_VRAM
-    /* Decoded before: the draw unit keeps its EVE copy. A .bin's color format
-     * is its header's, which info_cb gave. */
+    /*
+     * Reuse the cached GPU image. For .bin images, keep the color format read from the file header
+     * by info_cb.
+     */
     lv_eve5_vram_res_t * decoded_vr = lv_draw_eve5_res_source(u, path);
     if(decoded_vr != NULL && EVE_GpuAlloc_Get(u->allocator, decoded_vr->gpu_handle) != GA_INVALID) {
         lv_color_format_t decoded_cf = is_bin_ext ? (lv_color_format_t)dsc->header.cf

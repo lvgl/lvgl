@@ -375,9 +375,10 @@ static const void * font_glyph_bitmap(const lv_font_t * font)
     return ((const lv_font_fmt_txt_dsc_t *)font->dsc)->glyph_bitmap;
 }
 
-/* LVGL doesn't tell the draw units about fonts it deletes, and another font
- * can take the memory of one: the residency is the font's while the font
- * looks the same, its callbacks, bitmaps and metrics */
+/*
+ * LVGL sends no font deletion notification, so a new font may reuse an old descriptor's address.
+ * Validate the saved bitmap callback, bitmap pointer, and metrics before reusing its GPU residency.
+ */
 static bool font_matches(const lv_draw_eve5_font_vram_t * fv, const lv_font_t * font)
 {
     return fv->get_glyph_bitmap == font->get_glyph_bitmap && fv->glyph_bitmap == font_glyph_bitmap(font)
@@ -403,8 +404,10 @@ lv_draw_eve5_font_vram_t * eve5_get_font_vram(lv_draw_eve5_unit_t * u, const lv_
     return NULL;
 }
 
-/* Record the residency as the font's, releasing the least recently used
- * fonts beyond LV_DRAW_EVE5_FONT_MAX; forget it with NULL */
+/*
+ * Associate the residency with the font, or remove the association with NULL. Evict least recently
+ * used fonts when the cache exceeds LV_DRAW_EVE5_FONT_MAX.
+ */
 static void font_attach(lv_draw_eve5_unit_t * u, const lv_font_t * font, lv_draw_eve5_font_vram_t * fv)
 {
     if(fv == NULL) {
@@ -431,7 +434,7 @@ void lv_draw_eve5_font_free_all(lv_draw_eve5_unit_t * u)
 {
     while(u->font_list != NULL) {
 #if LV_USE_DRAW_VRAM
-        /* A font LVGL never destroys (a static one) still holds it */
+        /* Clear the residency pointer in static font descriptors that LVGL has not destroyed. */
         lv_font_dsc_base_t * dsc = (lv_font_dsc_base_t *)u->font_list->dsc;
         if(dsc != NULL && dsc->vram_res == (struct _lv_draw_buf_vram_res_t *)u->font_list) dsc->vram_res = NULL;
 #endif
@@ -702,14 +705,14 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
  * GLYPH TRANSFORM + DRAW
  **********************/
 
-/* An alpha-only glyph (L1, L2, L4 or L8, sampled as white with its alpha)
- * and how to draw it. Filtered, it is drawn premultiplied: outside the bitmap,
- * BORDER samples (0, 0, 0, 0), so the white is pulled toward black wherever the
- * ink meets the bitmap's edge, which a glyph's ink does on every side, and the
- * SRC_ALPHA blend then darkens those edges a second time. Swizzled to its
- * alpha in every channel, the sample is the premultiplied white, which BORDER
- * leaves correct, drawn with the color scaled by opa and blend(ONE,
- * ONE_MINUS_SRC_ALPHA), or (ONE, ONE) for an additive letter. */
+/*
+ * Choose how to draw alpha-only glyphs (L1, L2, L4, or L8). These formats normally sample as white
+ * with glyph coverage in alpha. When filtering, BORDER mixes transparent black into edge samples;
+ * straight-alpha blending would then apply coverage again and darken the edges.
+ * For filtered glyphs, swizzle alpha into all channels to obtain premultiplied white. Scale the
+ * draw color by opa and use blend(ONE, ONE_MINUS_SRC_ALPHA), or blend(ONE, ONE) for additive
+ * letters.
+ */
 struct glyph_alpha_t {
     uint8_t format;     /**< L1, L2, L4 or L8 */
     uint16_t stride;
@@ -721,9 +724,11 @@ struct glyph_alpha_t {
 /**
  * Emit a glyph vertex with optional affine transform.
  */
-/* Draw a glyph at (x, y) transformed around its pivot. The bitmap covers the
- * transformed glyph's bounds, wherever in the clip area they are. The layout
- * of an alpha-only glyph is set here, the caller sets that of an image. */
+/*
+ * Draw a glyph at (x, y), transformed around its pivot. Use its transformed bounds for the bitmap
+ * and the scissor for clipping. Set the layout here for alpha-only glyphs; the caller sets it for
+ * image glyphs.
+ */
 static void emit_transformed_glyph(lv_draw_eve5_unit_t * u, int32_t rotation, int32_t scale_x, int32_t scale_y,
                                    int32_t skew_x, int32_t skew_y, int32_t pivot_x, int32_t pivot_y,
                                    uint16_t g_w, uint16_t g_h, int32_t x, int32_t y, const glyph_alpha_t * alpha)
@@ -745,9 +750,11 @@ static void emit_transformed_glyph(lv_draw_eve5_unit_t * u, int32_t rotation, in
     xform.bmp_w = LV_MIN(bounds_w, 2048);
     xform.bmp_h = LV_MIN(bounds_h, 2048);
 
-    /* Filtered, as the software renderer draws a transformed glyph as an
-     * antialiased image. Nearest sampling would move it by up to half a
-     * texel wherever the texels don't land on pixels. */
+    /*
+     * Use bilinear filtering to match the software renderer's antialiased transformed glyphs.
+     * Nearest sampling can shift an edge by up to half a texel when texels do not align with
+     * pixels.
+     */
     EVE_CoDl_saveContext(phost);
     if(alpha != NULL) {
 #if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
@@ -973,9 +980,11 @@ static void rom_label_render(lv_draw_eve5_unit_t * u, lv_draw_task_t * t,
  **********************/
 
 #if LV_USE_FONT_PLACEHOLDER
-/* A glyph the fonts don't have, drawn as the outline of its box as LVGL's
- * software renderer does, between the BITMAPS of the glyph stream. In color,
- * or in the alpha passes only at opacity. */
+/*
+ * Draw a missing-glyph placeholder as a box outline, matching the software renderer. Insert it
+ * between BITMAPS primitives in the glyph stream. Draw its color in the RGB pass and its coverage
+ * in the alpha passes.
+ */
 static void draw_glyph_placeholder(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, const lv_layer_t * layer,
                                    const lv_draw_glyph_dsc_t * glyph_dsc, bool color)
 {
@@ -1058,7 +1067,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         if(addr == GA_INVALID) return;
 
         bool premultiplied = vr->is_premultiplied;
-        /* A letter may be drawn additively, inside its blend */
+        /* Preserve the caller's additive blend mode when drawing this letter. */
         bool additive = s_current_letter_dsc != NULL
                         && s_current_letter_dsc->blend_mode == LV_BLEND_MODE_ADDITIVE;
 
@@ -1134,7 +1143,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
 
-    /* A letter may be drawn additively, inside its blend */
+    /* Preserve the caller's additive blend mode when drawing this letter. */
     glyph_alpha_t alpha = {
         .format = (uint8_t)eve_format, .stride = g_stride, .color = glyph_dsc->color, .opa = glyph_dsc->opa,
         .additive = s_current_letter_dsc != NULL && s_current_letter_dsc->blend_mode == LV_BLEND_MODE_ADDITIVE,
@@ -1249,7 +1258,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
 
-    /* White: the coverage for the L8 alpha pass, masked in the direct one */
+    /* Use white for coverage in the L8 pass. In the direct pass, the color mask allows only alpha writes. */
     glyph_alpha_t alpha = {
         .format = (uint8_t)eve_format, .stride = g_stride, .color = lv_color_white(), .opa = glyph_dsc->opa,
         .additive = false,
@@ -1280,7 +1289,7 @@ uint32_t lv_draw_eve5_label_dl_bound(const lv_draw_task_t * t)
     uint32_t bytes = 0;
     while(bytes < dsc->text_length && dsc->text[bytes] != '\0') bytes++;
 
-    /* A glyph costs the most on the costliest font it may resolve to */
+    /* Budget for the most expensive glyph among all fonts that fallback resolution may select. */
     uint32_t glyph = (dsc->rotation % 3600 != 0) ? DL_GLYPH_XFORM : DL_GLYPH;
     for(const lv_font_t * f = dsc->font; f != NULL; f = f->fallback) {
         if(!font_is_cmdtext_font(f) && !is_plain_fmt_txt(f)) {

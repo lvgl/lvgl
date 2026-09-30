@@ -764,7 +764,7 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
      * produce at load time (ARGB8 / RGB8 / PALETTEDARGB8 instead of the
      * default RGB565 / ARGB4). The query then reports the exact RAM_G
      * allocation we need. Single-channel JPEGs are re-queried with OPT_MONO
-     * below so they decode to L8 (half the RAM_G of ARGB8) and render as
+     * below so they decode to L8 (one byte per pixel instead of four for ARGB8) and render as
      * opaque luminance through the EVE5 image decoder's L8 → LV_COLOR_FORMAT_L8
      * mapping. */
     uint32_t opts = OPT_TRUECOLOR;
@@ -790,7 +790,7 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     }
 
     /* Grayscale JPEG auto-promote: re-query with OPT_MONO for the L8 prediction
-     * (half the RAM_G of ARGB8). Re-query first; only adopt on success so the
+     * (one byte per pixel instead of four for ARGB8). Re-query first; only adopt on success so the
      * first staging stays valid on rejection. CMD path runs CMD_QUERYIMAGE_fs
      * again with no SD round-trip; SW path re-stages the file bytes. */
     if(info.Type == EVE_RESOURCE_JPEG && info.Channels == 1) {

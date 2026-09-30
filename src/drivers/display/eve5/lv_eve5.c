@@ -61,13 +61,13 @@ typedef struct {
      * double-buffered configuration after a partial-mode override. */
     uint32_t frame_buffer_1_orig;
     uint32_t current_fb;
-    /* FULL mode: the swapchain buffer (0: frame_buffer_0, 1: frame_buffer_1)
-     * that holds the last presented frame. Nothing reports which buffer a
-     * render into SWAPCHAIN_0 goes to, but it alternates with every present
-     * whose flip has taken effect, which is only after REG_FRAMES advanced
-     * (lv_eve5_swapchain_presented waits for that). A present before would
-     * replace the pending frame in the same buffer. Found at create by
-     * clearing the buffers in two colors. */
+    /*
+     * FULL-mode swapchain buffer holding the last presented frame (0: frame_buffer_0, 1:
+     * frame_buffer_1). EVE does not report which buffer SWAPCHAIN_0 targets. Track alternating
+     * completed flips, waiting for REG_FRAMES to advance in lv_eve5_swapchain_presented. A render
+     * before that advance would overwrite the pending frame in the same buffer. Identify the
+     * initial buffer at creation by clearing the two buffers to different colors.
+     */
     uint32_t last_fb;
     rendered_region_t pending_regions[MAX_REGIONS];
     int pending_count;
@@ -97,12 +97,12 @@ typedef struct {
     lv_eve5_vram_res_t * (*vram_detach_cb)(struct _lv_draw_unit_t * draw_unit, const void * key);
     bool (*renders_cb)(void);
 #endif
-    /* Both draw buffers are created at init and kept alive for the display's
-     * lifetime so mode switching is allocation-free. Only one is bound to the
-     * display via lv_display_set_draw_buffers at any given time. Without
-     * LV_USE_DRAW_VRAM, both have CPU memory, which LVGL requires of a
-     * display's draw buffers, though the frame is only rendered there by the
-     * software renderer. */
+    /*
+     * Keep both draw buffer descriptors for the display's lifetime and bind only the active one
+     * with lv_display_set_draw_buffers. Without LV_USE_DRAW_VRAM, allocate CPU storage for the
+     * active buffer and release the inactive buffer's storage when switching modes. Only software
+     * rendering writes frame pixels to that CPU storage.
+     */
     lv_draw_buf_t * tile_buf;       /**< Partial mode: small W×64 tile, RGB565 (or LV_COLOR_DEPTH-derived) */
     lv_draw_buf_t * full_buf;       /**< Full mode: virtual W×H, RGB8, rendered into the swapchain */
     lv_eve5_vram_res_t * swapchain_res; /**< The full_buf's EVE memory, is_swapchain (attached with LV_USE_DRAW_VRAM) */
@@ -380,7 +380,7 @@ bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, EVE_GpuHandle *out_handle,
     *out_handle = vr->gpu_handle;
     if(out_format) *out_format = vr->eve_format;
     if(out_stride) *out_stride = vr->stride;
-    /* The caller has the EVE memory now; the draw unit frees the rest */
+    /* Transfer the GPU allocation to the caller and free its residency descriptor through the draw unit. */
     vr->gpu_handle = GA_HANDLE_INVALID;
     lv_draw_buf_release_vram(buf);
     return true;
@@ -465,8 +465,10 @@ void lv_eve5_set_vram_handlers(lv_display_t * disp,
     if(disp == NULL) return;
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
     if(drvr == NULL) return;
-    /* The swapchain is the display's: the draw unit renders it as the
-     * full_buf's EVE memory, as with the VRAM residency module */
+    /*
+     * The display owns the swapchain descriptor. Register it as full_buf's GPU residency so the
+     * draw unit can render into it.
+     */
     if(drvr->vram_detach_cb != NULL) drvr->vram_detach_cb(drvr->draw_unit, drvr->full_buf);
     drvr->vram_attach_cb = attach_cb;
     drvr->vram_detach_cb = detach_cb;
@@ -475,10 +477,11 @@ void lv_eve5_set_vram_handlers(lv_display_t * disp,
 }
 #endif
 
-/* After a CMD_SWAP with SWAPCHAIN_0 as the render target, and its
- * CMD_GRAPHICSFINISH: the flip only takes effect once REG_FRAMES advances, and
- * a render into the swapchain before that would replace the pending frame in
- * the same buffer. The coprocessor waits for it, the host doesn't. */
+/*
+ * After CMD_SWAP and CMD_GRAPHICSFINISH for SWAPCHAIN_0, queue a coprocessor wait for REG_FRAMES to
+ * advance. The next render can then use the other buffer without overwriting the pending frame.
+ * This queues the wait without blocking the host.
+ */
 static void swapchain_presented(lv_eve5_driver_t * drvr)
 {
 #ifdef EVE_SUPPORT_RENDERTARGET
@@ -644,10 +647,10 @@ void lv_eve5_set_coprocessor_reset_handler(lv_display_t * disp,
  *   - EVE5 draw unit: VRAM only (via vram_alloc_cb)
  *   - SW fallback: CPU memory (lazy-allocated by LVGL)
  * DISCARDABLE flag set after each flush prevents stale uploads when the
- * tile is re-used across frames or after a mode switch. Without, it gets CPU
- * memory while the display is in PARTIAL mode (back_buf), which the EVE5 draw
- * unit doesn't use: its tiles render into EVE memory, which the draw unit
- * records as the buffer's.
+ * tile is reused across frames or after a mode switch. Without LV_USE_DRAW_VRAM,
+ * back_buf provides CPU storage while PARTIAL mode is active. EVE5 renders
+ * tiles in GPU memory and tracks them by buffer address; only the software
+ * renderer uses the CPU storage.
  */
 static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf)
 {
@@ -663,14 +666,16 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
     buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     /* As the swapchain's: a tile the EVE5 draw unit renders needs no CPU clear */
     buf->handlers = full_buf_handlers();
-    /* 64 rows, which the size sets, as lv_refr fits the tiles to it */
+    /* Reserve 64 rows; lv_refr uses this capacity to determine tile height. */
     buf->data_size = stride * 64;
     return buf;
 }
 
 #if !LV_USE_DRAW_VRAM
-/* Give the draw buffer LVGL renders the frame in the CPU memory LVGL requires
- * of it, and take it from the other, which the display doesn't use */
+/*
+ * Allocate CPU storage for the active draw buffer, as required by LVGL without native VRAM support.
+ * Release the inactive buffer's CPU storage.
+ */
 static bool back_buf(lv_draw_buf_t * buf, bool backed)
 {
     if(backed && buf->unaligned_data == NULL) {
@@ -691,15 +696,13 @@ static bool back_buf(lv_draw_buf_t * buf, bool backed)
 }
 #endif
 
-/* lv_refr clears the screen layer of a display with an alpha color format
- * before drawing. On the CPU, with LV_USE_DRAW_VRAM, that would give the
- * swapchain buffer CPU memory (and a black frame to present), and a partial
- * mode tile CPU memory, cleared and uploaded as the tile's content. Neither
- * needs it: every FULL mode frame starts by clearing the swapchain
- * (init_layer), to black, what transparent is on the RGB8 swapchain, and so
- * does every tile. The CPU memory of the SW path is cleared as usual. Without
- * LV_USE_DRAW_VRAM, the display's draw buffer always has CPU memory, which the
- * draw unit, when it renders the frame, doesn't use. */
+/*
+ * Skip CPU clearing when EVE5 renders the screen layer. init_layer already clears each GPU tile or
+ * FULL-mode swapchain target; transparent pixels appear black on the RGB8 swapchain. A CPU clear
+ * would unnecessarily allocate, clear, and upload a buffer with LV_USE_DRAW_VRAM. Without it, CPU
+ * storage exists but the hardware path does not use it. Preserve normal CPU clearing for the
+ * software renderer.
+ */
 static void full_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer)
 {
 #if LV_USE_DRAW_VRAM
@@ -711,9 +714,10 @@ static void full_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_
     if(draw_buf->data != NULL) lv_draw_buf_clear_ex(draw_buf, a, NULL);
 }
 
-/* LVGL's draw buffer handlers, which an application may have given its own
- * allocator, with the clear of the display's buffers. Taken when the first
- * display is created. */
+/*
+ * Copy LVGL's draw buffer handlers when the first display is created, preserving any application
+ * allocator. Override only the clear callback for display buffers.
+ */
 static const lv_draw_buf_handlers_t * full_buf_handlers(void)
 {
     static lv_draw_buf_handlers_t handlers;
@@ -742,10 +746,9 @@ static const lv_draw_buf_handlers_t * full_buf_handlers(void)
  *     descriptor is owned by the driver). The SW renderer renders into the
  *     allocated CPU buffer; flush_cb's FULL-mode SW branch uploads it to a
  *     temp VRAM and presents via SWAPCHAIN_0 + CMD_SWAP.
- * Without, the draw unit records the swapchain as its EVE memory
- * (lv_eve5_set_vram_handlers), and the buffer gets the CPU memory LVGL
- * requires while the display is in FULL mode (back_buf), which only the SW
- * path renders into.
+ * Without LV_USE_DRAW_VRAM, register the swapchain through
+ * lv_eve5_set_vram_handlers. back_buf provides the CPU storage LVGL requires
+ * while FULL mode is active; only the software path renders into it.
  *
  * Format is RGB8 to match the HAL-reserved swapchain. With LV_COLOR_DEPTH != 24,
  * applying this mode causes lv_display_set_color_format to retag the display
@@ -764,15 +767,12 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
     int32_t H = phost->Height;
     uint32_t stride = lv_draw_buf_width_to_stride((uint32_t)W, LV_COLOR_FORMAT_RGB888);
 
-    /* data_size mirrors what the CPU buffer would occupy. Required because
-     * lv_draw_buf_reshape rejects shapes whose computed size exceeds data_size,
-     * and lv_refr's layer_reshape_draw_buf calls reshape on every refresh.
-     * For HW path, no CPU memory is actually allocated (data stays NULL). For
-     * SW path, ensure_resident allocates CPU memory matching this size.
-     * Sized for the widest color format the display may be given (4 bytes a
-     * pixel, ARGB8888 or XRGB8888): a frame that doesn't fit makes lv_refr
-     * split it into tile layers, and every tile would render and present the
-     * swapchain on its own, as none of them is the screen layer. */
+    /*
+     * Set data_size to the maximum CPU buffer size, even when CPU storage has not been allocated.
+     * lv_draw_buf_reshape checks this capacity on every refresh. Allow four bytes per pixel for
+     * ARGB8888 or XRGB8888; otherwise, a color format change could make lv_refr split the frame
+     * into tiles, each rendering and presenting the swapchain separately.
+     */
     uint32_t data_size = lv_draw_buf_width_to_stride((uint32_t)W, LV_COLOR_FORMAT_ARGB8888) * (uint32_t)H;
 
     lv_draw_buf_t * buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
@@ -791,8 +791,10 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
     return buf;
 }
 
-/* The swapchain, the EVE memory the full-mode screen renders to: virtual,
- * SWAPCHAIN_0, resolved by the render engine */
+/*
+ * Virtual residency for the FULL-mode swapchain. The render engine resolves SWAPCHAIN_0 to a
+ * physical framebuffer.
+ */
 static lv_eve5_vram_res_t * create_swapchain_res(EVE_HalContext * phost, const lv_draw_buf_t * full_buf)
 {
     LV_UNUSED(phost);
@@ -959,8 +961,10 @@ static void delete_event_cb(lv_event_t * e)
     if(drvr->full_buf->vram_res == (lv_draw_buf_vram_res_t *)drvr->swapchain_res) drvr->full_buf->vram_res = NULL;
     lv_draw_buf_destroy(drvr->full_buf);
 #else
-    /* The draw unit forgets the buffers: a rendered tile it hasn't handed
-     * over, and the swapchain */
+    /*
+     * Detach the swapchain and any rendered tile still tracked by the draw unit before releasing
+     * the display's buffers.
+     */
     if(drvr->vram_detach_cb != NULL) {
         lv_eve5_vram_res_t * tile_res = drvr->vram_detach_cb(drvr->draw_unit, drvr->tile_buf);
         if(tile_res != NULL) {
@@ -1192,8 +1196,10 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
 
     uint32_t read_fb = drvr->current_fb == 0 ? drvr->frame_buffer_1 : drvr->frame_buffer_0;
 
-    /* Epoch scope for the compositor DL segment: the region texture Gets
-     * below stamp it, gating their scoped frees on this frame's sync */
+    /*
+     * Track the compositor display list in an epoch scope. Get calls below associate its textures
+     * with this epoch, deferring their release until this frame's sync completes.
+     */
     EVE_GpuAlloc_OpenScope(drvr->allocator);
 
     EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, FB_BITMAP_FORMAT, phost->Width, phost->Height);
@@ -1324,8 +1330,11 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
     EVE_Hal_wrMem(phost, gpu_addr, px_map, size);
     EVE_Hal_requestFenceBeforeSwap(phost);
 
-    /* Epoch scope for the present DL segment; the temp bitmap's alloc/Get
-     * above carries the about-to-be-minted epoch, gating its scoped free */
+    /*
+     * Track the presentation display list in an epoch scope. The temporary bitmap's allocation and
+     * Get call above associate it with this epoch, deferring its release until presentation
+     * completes.
+     */
     EVE_GpuAlloc_OpenScope(drvr->allocator);
 
     /* SWAPCHAIN_0 is a BT820+ render-target sentinel. On non-RT chips, just

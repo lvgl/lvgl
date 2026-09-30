@@ -68,9 +68,10 @@
  *      DEFINES
  **********************/
 
-/** Channel of the luminance for the per-channel math: red, which an L8
- *  render target stores, and which holds LVGL's luminance (as all channels
- *  do) with LV_DRAW_EVE5_L8_EXACT */
+/**
+ * Use the red channel for luminance blend operations because L8 render targets store red. With
+ * LV_DRAW_EVE5_L8_EXACT, all three color channels contain LVGL's weighted luminance.
+ */
 #define LUMINANCE RED
 
 /**********************
@@ -342,11 +343,10 @@ static bool composite_over_dst(lv_draw_eve5_unit_t * u, EVE_GpuHandle *out_resul
 
 #if LV_DRAW_EVE5_L8_EXACT
 /**
- * Give an ARGB8 buffer of the layer's size (premultiplied) LVGL's luminance
- * on all three channels, keeping its alpha, for the math on an L8 layer's
- * luminances: lv_draw_eve5_draw_luminance computes it into an L8 render
- * target, which is drawn back as gray. Returns the new buffer and releases
- * the old one, or returns the old one when out of memory.
+ * Convert a premultiplied ARGB8 buffer of the layer's size to grayscale while preserving alpha.
+ * This lets blend operations on L8 layers use LVGL's luminance: compute luminance into an L8
+ * target, then draw it back as gray. Return the new buffer and release the old one. On allocation
+ * failure, return the old buffer unchanged.
  */
 EVE_GpuHandle lv_draw_eve5_blend_luminance(lv_draw_eve5_unit_t * u, lv_layer_t * layer, EVE_GpuHandle handle)
 {

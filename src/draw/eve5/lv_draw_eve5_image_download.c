@@ -69,7 +69,10 @@ static bool row_reader_init(row_reader_t * rd, EVE_HalContext * hal, uint32_t ad
     return rd->buf != NULL;
 }
 
-/** Row y, read with its group when it's the group's first row. Rows go in order. */
+/**
+ * Return row y. Read its group from EVE memory when y is the group's first row. The caller must
+ * request rows in order.
+ */
 static uint8_t * row_reader_row(row_reader_t * rd, int32_t y)
 {
     int32_t index = y % rd->group;
@@ -192,8 +195,10 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
     uint32_t lv_stride = buf->header.stride;
     if(lv_stride == 0) lv_stride = lv_draw_buf_width_to_stride(w, lv_cf);
 
-    /* Content EVE rendered is premultiplied. A buffer declared straight gets
-     * its pixels back straight. */
+    /*
+     * EVE produces premultiplied pixels. Convert them back to straight alpha if the destination
+     * buffer requires it.
+     */
     bool unpremultiply = false;
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     unpremultiply = vr->is_premultiplied

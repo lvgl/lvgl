@@ -66,12 +66,10 @@ struct _lv_draw_unit_t;
 void lv_draw_eve5_handle_coprocessor_reset(struct _lv_draw_unit_t * draw_unit);
 
 /**
- * What the draw unit moved between CPU memory and EVE memory since the program
- * started, besides display lists: the pixels it wrote into EVE memory (images,
- * glyphs, the textures of the software renderer), the images the coprocessor
- * decoded or loaded (files, SD card, flash), the pixels it read back into CPU
- * memory, and the CPU memory it hashed to tell whether its EVE copies are
- * still current (without LV_USE_DRAW_VRAM).
+ * Cumulative transfer, decode, and hash counters since program startup, excluding display lists.
+ * Count pixel uploads to EVE memory, images loaded or decoded by the coprocessor, and pixel
+ * readbacks to CPU memory. Without LV_USE_DRAW_VRAM, also count CPU bytes hashed to detect changes
+ * to cached GPU images.
  */
 typedef struct {
     uint64_t upload_bytes;

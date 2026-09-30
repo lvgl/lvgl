@@ -31,10 +31,9 @@
 
 #if LV_DRAW_EVE5_SW_VECTOR
 /**
- * Area of the SW buffer for a vector task. The SW vector renderer sets its
- * initial clip from the task's clip area with only partial_y_offset applied,
- * which the paths can't widen, so the buffer has to start at x = 0 for that
- * clip to land where the buffer does.
+ * Choose the software buffer area for a vector task. The software vector renderer adjusts the
+ * initial task clip only by partial_y_offset, and paths cannot widen that clip. Start the buffer at
+ * x = 0 so the clip and buffer coordinates agree.
  */
 static void eve5_sw_vector_area(const lv_draw_task_t * t, lv_area_t * area)
 {
@@ -91,8 +90,9 @@ uint8_t * lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t * u,
     lv_area_t norm_area;
     lv_area_set(&norm_area, 0, 0, buf_w - 1, buf_h - 1);
 
-    /* The tasks added to the layer take its opacity, which is the original
-     * task's, see lv_draw_add_task */
+    /*
+     * Copy the original task's opacity to the layer so tasks added by lv_draw_add_task inherit it.
+     */
     lv_layer_t temp_layer;
     lv_layer_init(&temp_layer);
     temp_layer.opa = t->opa;
@@ -260,15 +260,19 @@ uint8_t * lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t * u,
 
 #if LV_DRAW_EVE5_SW_VECTOR
         case LV_DRAW_TASK_TYPE_VECTOR: {
-                /* The paths are in screen coordinates, so the layer covers the
-                 * area in those, see eve5_sw_vector_area */
+                /*
+                 * Vector paths use screen coordinates, so place the layer in the same coordinate
+                 * system (see eve5_sw_vector_area).
+                 */
                 eve5_sw_vector_area(t, &temp_layer.buf_area);
                 temp_layer._clip_area = t->clip_area;
                 temp_layer.phy_clip_area = t->clip_area;
                 temp_layer.partial_y_offset = temp_layer.buf_area.y1;
 
-                /* The task list moves to the SW task, which destroys it once
-                 * drawn, so it can only be drawn once */
+                /*
+                 * Transfer ownership of the vector task list to the software task. Rendering
+                 * consumes and destroys the list, so it can be rendered only once.
+                 */
                 lv_draw_vector_dsc_t * src_dsc = t->draw_dsc;
                 lv_draw_vector_dsc_t vector_dsc;
                 lv_memcpy(&vector_dsc, src_dsc, sizeof(vector_dsc));
@@ -389,10 +393,9 @@ bool lv_draw_eve5_label_needs_sw(const lv_draw_task_t * t)
 
 #if LV_DRAW_EVE5_SW_TEXTURES
 /**
- * Texture of a task the SW renderer draws, rendered on first use in the
- * slice. A vector descriptor only holds pointers to the paths, which can't
- * identify the drawing for the SW cache, and the paths are consumed by the
- * render, so the texture is kept for the slice's other passes instead.
+ * Render a software fallback texture on first use and retain it for the slice's other passes.
+ * Vector descriptors contain path pointers that cannot identify the drawing for cache lookup, and
+ * rendering consumes those paths, so reuse the texture instead of rendering them again.
  */
 static const lv_draw_eve5_sw_texture_t * sw_task_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
@@ -409,8 +412,10 @@ static const lv_draw_eve5_sw_texture_t * sw_task_texture(lv_draw_eve5_unit_t * u
     }
 
     lv_area_t area = t->_real_area;
-    /* ThorVG writes premultiplied pixels (TVG_COLORSPACE_ARGB8888), LVGL's
-     * blending into the transparent buffer straight ones */
+    /*
+     * ThorVG produces premultiplied pixels with TVG_COLORSPACE_ARGB8888. LVGL's software blend path
+     * produces straight-alpha pixels in this transparent buffer.
+     */
     bool premultiplied = false;
 #if LV_DRAW_EVE5_SW_VECTOR
     if(t->type == LV_DRAW_TASK_TYPE_VECTOR) {
@@ -452,9 +457,8 @@ void lv_draw_eve5_sw_draw_task_texture(lv_draw_eve5_unit_t * u, const lv_draw_ta
 }
 
 /**
- * Coverage of a SW texture for the alpha passes: white with the texture's
- * alpha, so the L8 render target gets it as luminance, and the direct pass,
- * which only writes alpha, its "over" alpha.
+ * Draw the software texture's alpha coverage in white. The L8 pass stores the coverage as
+ * luminance; the direct-to-alpha pass composites it with the correct over alpha equation.
  */
 void lv_draw_eve5_sw_alpha_draw_task_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {

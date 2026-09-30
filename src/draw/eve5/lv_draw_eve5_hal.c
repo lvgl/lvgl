@@ -116,9 +116,10 @@ bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_
             *bpp = 2;
             return true;
 
-        /* The render engine blends at ARGB8 and encodes to the target format
-         * at DISPLAY: a layer in a reduced format quantizes once, as the
-         * software renderer's result is quantized */
+        /*
+         * The render engine blends in ARGB8, then encodes the result in the target format at
+         * DISPLAY. This quantizes the completed layer once, matching the software renderer.
+         */
         case LV_COLOR_FORMAT_ARGB1555:
             *eve_fmt = ARGB1555;
             *bpp = 2;
@@ -129,10 +130,10 @@ bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_
             *bpp = 2;
             return true;
 
-        /* L8, AL88 and I1 hold luminance, which the render engine doesn't
-         * encode as LVGL does: they render to an ARGB8 intermediate and are
-         * reduced to it (see lv_draw_eve5_layer_reduction). I1 is stored as
-         * L8, thresholded. */
+        /*
+         * L8, AL88, and I1 need LVGL's luminance encoding. Render into ARGB8 first, then convert
+         * the completed result (see lv_draw_eve5_layer_reduction). Store I1 as thresholded L8.
+         */
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_I1:
             *eve_fmt = L8;
@@ -175,11 +176,12 @@ bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_
  * VRAM CALLBACKS
  **********************/
 
-/* Render target format of a partial-mode screen tile. The tiles are
- * composited into the RGB8 scanout, so the display's color format only picks
- * the precision they render at, and the screen's alpha never shows. Formats
- * without color render luminance to L8, which the compositor samples as such
- * (and thresholds for I1). */
+/*
+ * Choose the render target format for a partial-mode screen tile. Tiles are composited into RGB8
+ * scanout, so their format determines color precision; their alpha is not displayed. For grayscale
+ * formats, store luminance in L8 and sample it as gray during compositing. Apply the I1 threshold
+ * when needed.
+ */
 static void eve5_screen_rt_format(lv_draw_eve5_unit_t * u, lv_color_format_t cf, uint16_t * eve_fmt, uint8_t * bpp)
 {
     if(cf == LV_COLOR_FORMAT_L8 || cf == LV_COLOR_FORMAT_AL88 || cf == LV_COLOR_FORMAT_I1) {
@@ -198,8 +200,11 @@ static void eve5_screen_rt_format(lv_draw_eve5_unit_t * u, lv_color_format_t cf,
 #endif
 }
 
-/* VRAM format of a buffer that can be rendered to: the render target format
- * of its color format, promoted as configured, or a screen tile's */
+/*
+ * Choose a renderable VRAM format for the buffer. Use the screen tile format for display tiles;
+ * otherwise, map the buffer's color format to a render target format and apply the configured
+ * promotion.
+ */
 static void eve5_vram_rt_format(lv_draw_eve5_unit_t * u, lv_color_format_t cf, uint16_t * eve_fmt, uint8_t * bpp)
 {
     if(u->alloc_screen_hint) {
@@ -488,10 +493,12 @@ void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, ui
 }
 #endif
 
-/* Draw a previous slice's output as a layer's base content, converted to the
- * target's format: from color into an L8 or LA8 target, LVGL's luminance (and
- * the alpha); from luminance, gray, or black and white past LVGL's I1
- * threshold. Expects the target cleared to black. */
+/*
+ * Draw the previous slice as the layer's background, converting to the target format. For L8 and
+ * LA8 targets, compute LVGL luminance and preserve alpha where applicable. Sample a luminance
+ * source as gray, or threshold it to black and white for I1. The target must already be cleared to
+ * black.
+ */
 static void eve5_draw_prev(lv_draw_eve5_unit_t * u, uint16_t target_fmt, uint32_t prev_addr, uint16_t prev_fmt,
                            uint32_t prev_stride, int32_t w, int32_t h, bool prev_luminance, bool prev_threshold)
 {
@@ -570,10 +577,11 @@ EVE_GpuHandle lv_draw_eve5_hal_reduce(lv_draw_eve5_unit_t * u, EVE_GpuHandle int
     return reduced;
 }
 
-/* Render target format of a layer: a partial-mode screen tile's, from the
- * display's format, or the render target format of the layer's color format,
- * promoted as configured. The layer's buffer may hold another format until
- * init_layer converts it. */
+/*
+ * Choose the layer's render target format: use the display format for a partial-mode screen tile,
+ * or the layer's color format with the configured promotion for other layers. The existing buffer
+ * may use a different format until init_layer converts its content.
+ */
 void lv_draw_eve5_hal_layer_format(lv_draw_eve5_unit_t * u, const lv_layer_t * layer, bool is_screen,
                                    uint16_t * target_eve_fmt, uint8_t * target_bpp)
 {
@@ -833,8 +841,10 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         /* Previous slice output: blit as starting point (always premultiplied) */
         uint32_t prev_addr = EVE_GpuAlloc_Get(u->allocator, slice->prev_handle);
         if(prev_addr != GA_INVALID) {
-            /* The previous slice's output is in the target format, unless the
-             * slice says otherwise (ARGB8 intermediates, see eve5_argb8_detach) */
+            /*
+             * Use the target format for the previous slice unless prev_eve_format overrides it, as
+             * for an ARGB8 intermediate (see eve5_argb8_detach).
+             */
             uint16_t prev_fmt = slice->prev_eve_format ? slice->prev_eve_format : target_eve_fmt;
             uint32_t prev_stride = slice->prev_eve_format ? slice->prev_stride : (uint32_t)aligned_w * target_bpp;
             bool prev_luminance = slice->prev_eve_format ? slice->prev_luminance : vr->sample_as_luminance;
@@ -874,7 +884,10 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_GpuHandle old_handle = GA_HANDLE_INVALID;
         bool have_old_handle = false;
 
-        /* Content kept past a reallocation: the new buffer is already the layer's */
+        /*
+         * The layer already owns the new destination buffer. Use the old allocation as the source
+         * to preserve its content.
+         */
         uint32_t kept_base = kept_handle.Id != GA_HANDLE_INVALID.Id ? EVE_GpuAlloc_Get(u->allocator, kept_handle) : GA_INVALID;
         if(kept_base != GA_INVALID) src_addr = kept_base + existing_source_offset;
 
@@ -1015,18 +1028,19 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     EVE_CmdSync sync = EVE_Cmd_sync(u->hal);
 
-    /* Close the epoch scope opened in init_layer. The sync follows the
-     * graphicsFinish, so its completion implies the render engine finished
-     * sampling everything this layer's DL referenced. Scoped frees issued
-     * during the layer release once this epoch retires. */
+    /*
+     * Close the epoch scope opened in init_layer. The sync follows graphicsFinish, so completion
+     * means the render engine has finished sampling every resource referenced by this display list.
+     * ScopedFree can then release resources queued for this epoch.
+     */
     EVE_GpuAlloc_CloseScope(u->allocator, sync);
 
 #if LV_DRAW_EVE5_SW_TEXTURES
-    /* Done with the SW textures the passes of this layer drew */
+    /* Release the software fallback textures used by this layer's passes. */
     lv_draw_eve5_sw_release_textures(u);
 #endif
 #if LV_USE_DRAW_VRAM
-    /* and with the images decoded for it that nothing keeps */
+    /* Release decoded images retained only for this layer. */
     lv_draw_eve5_res_release_layer(u);
 #endif
 

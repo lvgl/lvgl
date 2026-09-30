@@ -310,8 +310,10 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     const uint32_t tvg_stride = header->w * sizeof(uint32_t);
     uint32_t * premultiplied = NULL;
     if(!lv_draw_buf_has_flag((lv_draw_buf_t *)decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)) {
-        /*ThorVG takes premultiplied pixels, which `args.premultiply` only requests:
-         *premultiply a copy of the ones the decoder didn't*/
+        /*
+         * ThorVG requires premultiplied pixels, but args.premultiply is only a request to the
+         * decoder. If the decoder returned straight-alpha pixels, copy and premultiply them.
+         */
         premultiplied = lv_malloc(tvg_stride * header->h);
         if(premultiplied == NULL) {
             lv_image_decoder_close(&decoder_dsc);

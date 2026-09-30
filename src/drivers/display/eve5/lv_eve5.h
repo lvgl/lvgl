@@ -30,8 +30,10 @@ extern "C" {
 
 #define LV_EVE5_TOUCH_POINTS_MAX 5
 
-/* LVGL's VRAM residency module, which not every LVGL has. Without it, the
- * EVE5 draw unit records the EVE copies of LVGL's buffers itself. */
+/*
+ * Native LVGL VRAM support is optional. Without it, the EVE5 draw unit tracks GPU copies of LVGL
+ * buffers itself.
+ */
 #ifndef LV_USE_DRAW_VRAM
 #define LV_USE_DRAW_VRAM 0
 #endif
@@ -79,8 +81,8 @@ typedef enum {
 struct _lv_draw_unit_t;
 
 /**
- * Owner and size of an EVE copy of an LVGL buffer. With LVGL's VRAM residency
- * module, its residency descriptor; without, the same two fields.
+ * Base fields for a buffer's GPU residency: owning draw unit and allocation size. Use LVGL's native
+ * residency type when available; otherwise, define the same two fields locally.
  */
 #if LV_USE_DRAW_VRAM
 typedef lv_draw_buf_vram_res_t lv_eve5_vram_base_t;
@@ -125,11 +127,12 @@ typedef struct _lv_eve5_vram_res_t {
                                             Backbuffer lifetime is tied to scanout (not render-engine sync), so
                                             this vram_res must not be ScopedFree'd while it's still scanout source. */
 #if LV_USE_DRAW_VRAM
-    lv_draw_buf_t * owner;             /**< The buffer it's attached to, in the draw unit's list, which releases
-                                            what buffers LVGL never destroys (static ones) with the draw unit.
-                                            NULL when not in the list (the swapchain's, which the display owns) */
+    lv_draw_buf_t * owner;             /**< Owning buffer, tracked for draw unit teardown so static
+                                        * buffers release their residencies. NULL for unlisted
+                                        * residencies, including the display-owned swapchain.
+                                        */
     struct _lv_eve5_vram_res_t * owner_prev;
-    struct _lv_eve5_vram_res_t * owner_next; /**< Also the next of the layer's, without an owner */
+    struct _lv_eve5_vram_res_t * owner_next; /**< Also links temporary residencies retained for a layer, where owner is NULL */
 #endif
 } lv_eve5_vram_res_t;
 
@@ -190,28 +193,23 @@ bool lv_eve5_set_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode);
 lv_eve5_render_mode_t lv_eve5_get_render_mode(lv_display_t * disp);
 
 /**
- * Connect the EVE5 draw unit to the display: its residency owns the swapchain
- * of FULL mode (with LV_USE_DRAW_VRAM, so LVGL can dispatch the vram callbacks
- * on the swapchain draw buffer), and the display dispatches the hooks the draw
- * unit registers to it. Called automatically by lv_draw_eve5_init() — the
- * draw unit looks up the display through hal->UserContext (set by
- * lv_eve5_create*).
- *
- * Safe to call multiple times. No-op if draw_unit is NULL.
+ * Connect the EVE5 draw unit to the display. With LV_USE_DRAW_VRAM, associate the swapchain
+ * residency with this unit so LVGL can dispatch its VRAM callbacks. The display also invokes hooks
+ * registered by the draw unit.
+ * Called automatically by lv_draw_eve5_init(), which finds the display through hal->UserContext set
+ * by lv_eve5_create*. Safe to call repeatedly; no effect if draw_unit is NULL.
  */
 void lv_eve5_link_draw_unit(lv_display_t * disp, struct _lv_draw_unit_t * draw_unit);
 
 #if !LV_USE_DRAW_VRAM
 /**
- * Without LVGL's VRAM residency module, the draw unit records which EVE memory
- * holds a copy of which LVGL buffer, including the display's draw buffers.
- * Registered by lv_draw_eve5_init() after lv_eve5_link_draw_unit(): the
- * display records the swapchain of FULL mode with attach_cb, and takes the
- * EVE memory of a rendered tile of PARTIAL mode, or of its draw buffers when
- * it's deleted, with detach_cb, which returns NULL for a buffer without.
- * renders_cb tells whether the draw unit renders the frame, which the draw
- * buffers' CPU memory then doesn't hold, so it isn't cleared. Pass NULL to
- * clear.
+ * Register residency hooks for operation without LV_USE_DRAW_VRAM. Called by lv_draw_eve5_init()
+ * after lv_eve5_link_draw_unit().
+ * attach_cb registers the FULL-mode swapchain as the draw buffer's GPU residency. detach_cb
+ * transfers a rendered PARTIAL-mode tile to the display, and removes draw buffer residencies during
+ * display deletion; it returns NULL if no residency exists. renders_cb reports whether EVE5 is
+ * rendering the frame, allowing the driver to skip clearing unused CPU pixels. Pass NULL to clear
+ * the hooks.
  */
 void lv_eve5_set_vram_handlers(lv_display_t * disp,
                                void (*attach_cb)(struct _lv_draw_unit_t * draw_unit, const void * key,
@@ -235,13 +233,10 @@ void lv_eve5_set_vram_handlers(lv_display_t * disp,
 void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync);
 
 /**
- * Call after every CMD_SWAP with SWAPCHAIN_0 as the render target, and its
- * CMD_GRAPHICSFINISH (FULL mode frames). The swapchain only advances to the
- * other buffer once REG_FRAMES advanced after the swap, and a render into it
- * before that would replace the pending frame in the same buffer: this makes
- * the coprocessor wait for REG_FRAMES to change, so every present alternates,
- * and tracks the buffer that holds the last presented frame for
- * lv_eve5_read_screen. The host doesn't wait.
+ * Call after CMD_SWAP and CMD_GRAPHICSFINISH for a FULL-mode frame targeting SWAPCHAIN_0. Queue a
+ * coprocessor wait for REG_FRAMES to advance before the next render; otherwise, that render could
+ * overwrite the pending frame in the same buffer. Track the completed flip so lv_eve5_read_screen
+ * can locate the last presented frame. The host does not wait.
  * @param disp pointer to an EVE5 display
  */
 void lv_eve5_swapchain_presented(lv_display_t * disp);
@@ -288,22 +283,17 @@ void lv_eve5_set_coprocessor_reset_handler(lv_display_t * disp,
                                            void (*handler)(struct _lv_draw_unit_t * draw_unit));
 
 /**
- * Read back the frame the display is showing, for screenshots and tests.
- *
- * Nothing is rendered and RAM_G is not written, so this works the same on
- * hardware as on the emulator:
- *   - BT820: waits for the render engine, then reads the scanout buffer from
- *     RAM_G. In FULL mode, the swapchain buffer that holds the last presented
- *     frame, which the driver tracks from the colors it cleared the buffers
- *     to at create, and every present since (lv_eve5_swapchain_presented).
- *     After a switch from PARTIAL mode at runtime, whose presents aren't
- *     paced, that buffer isn't known.
- *   - EVE1–EVE4: renders the display list line by line into RAM_COMPOSITE
- *     through the REG_SNAPSHOT registers, which stops the scanout meanwhile.
- *
+ * Read back the displayed frame for screenshots and tests without writing RAM_G. The same path
+ * works on hardware and the emulator.
+ * On BT820, wait for the render engine, then read the scanout buffer from RAM_G. In FULL mode, use
+ * the last presented swapchain buffer, identified at creation by distinct clear colors and tracked
+ * by lv_eve5_swapchain_presented. After a runtime switch from PARTIAL mode, the unpaced
+ * partial-mode presents leave the buffer identity unknown. Readback may then select the wrong buffer.
+ * On EVE1 through EVE4, render the display list one line at a time into RAM_COMPOSITE using the
+ * REG_SNAPSHOT registers. Scanout pauses during this operation.
  * @param disp   pointer to an EVE5 display
- * @param buf    destination, width × height pixels of 4 bytes, R, G, B and
- *               0xFF, the byte order of lv_test_screenshot_compare()
+ * @param buf    destination for width times height pixels, four bytes each: R, G, B, 0xFF, matching
+ * lv_test_screenshot_compare()
  * @param stride bytes per row in buf
  * @return       true on success
  */

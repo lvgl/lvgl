@@ -25,43 +25,43 @@
  *
  * == Shape ==
  *
- * As in LVGL's software renderer, the shadow is the core rectangle (the
- * widget grown by the spread and moved by the offset, with the radius)
- * blurred over the shadow width: half on the core's edge, fading out to
- * blur = width / 2 outside it and in to full blur inside it. The corner
- * and edge slices are corner_size = blur + blur + radius wide, from the
- * shadow's outer edge to where the shadow is solid; a shadow narrower than
- * two slices is split between them.
+ * Start with the core rectangle: the widget expanded by the shadow spread,
+ * translated by the shadow offset, and rounded to the shadow radius. Blur
+ * its boundary over the shadow width, as in LVGL's software renderer.
+ * Coverage is roughly half at the core edge, fading to zero outside and full
+ * coverage inside over a distance of blur = width / 2 in each direction.
+ * Corner and edge slices span corner_size = 2 * blur + radius, from the
+ * shadow's outer edge to its solid interior. If the shadow is too narrow for
+ * two full slices, divide the available width between them.
  *
  * == Texture Layout ==
  *
  *     (0,0) transparent -----> X
  *       |
  *       v    +---------+
- *       Y    |    .--' |  <- falloff around the core's edge, a blur
- *            |  .'     |     (and a little) in from (0,0)
+ *       Y    |    .--' |  <- falloff around the core's edge
+ *            |  .'     |     (approximately blur units from the outer edge)
  *            | |  solid|
  *            +---------+
  *                    (SIZE-1, SIZE-1) = alpha 255
  *
  * == Blur ==
  *
- * The software renderer blurs a corner buffer of the core twice with a box
- * along each axis, each about a blur wide. The textures do the same at their
- * scale: the core's coverage per texel, filtered twice along each axis by a
- * box of fractional width. Being separable, the blur leaves the corners
- * squarer than a round (Gaussian) one would.
+ * The software renderer applies two box blurs along each axis of the core's
+ * corner buffer. Each filter is approximately blur pixels wide. The textures
+ * approximate this at their own resolution, using fractional filter widths.
+ * This separable box blur produces squarer corners than a Gaussian blur.
  *
- * The software renderer's box of even width has its window half a pixel off
- * centre, toward the outside of its corner buffer, which it mirrors to all
- * four corners: each of its two blurs of even width moves the shadow in by
- * half a pixel. The slices sample the textures that much further out. Below a
- * width of 4, its first blur is a single pixel, and it skips blurring: the
- * shadow is the core, drawn as a rounded rectangle.
+ * Each even-width filter window is offset outward by half a pixel. Mirroring
+ * the corner buffer to all four corners shifts the shadow inward by half a
+ * pixel per even-width pass. Compensate by sampling the textures farther
+ * outward. For shadow widths below 4, the software renderer skips blurring;
+ * draw the core as a rounded rectangle instead.
  *
- * The box width and the core's edge come from tests/tools/shadow_fit in
- * eve_apps, which fits them to the software renderer over a range of sizes,
- * radii and widths: a box of 0.94 blur, and the edge 0.965 blur in.
+ * The filter width and core edge position were fitted to the software renderer
+ * across multiple sizes, radii, and shadow widths using tests/tools/shadow_fit
+ * in eve_apps. The fitted filter width is 0.94 * blur, and the core edge is
+ * 0.965 * blur from the texture's outer edge.
  *
  * == Texture Caching ==
  *
@@ -119,8 +119,10 @@ static void texture_shape(int32_t ratio_idx, int32_t * radius_256, int32_t * edg
     *box_256 = blur_256 * SHADOW_BOX_PERMILLE / 1000;
 }
 
-/* Integral of a line of texels (Q12) from 0 to t (1/256 texel), in Q12 ×
- * 1/256; beyond the ends, the line continues as at its end */
+/*
+ * Integrate a line of Q12 texels from 0 to t, where t is in 1/256 texel units. The result is in Q12
+ * times 1/256 units. Beyond either end of the line, repeat the endpoint texel value.
+ */
 static int32_t line_integral(const int32_t * v, const int32_t * prefix, int32_t t)
 {
     if(t <= 0) return t * v[0];
@@ -150,11 +152,10 @@ static uint8_t coverage_to_alpha(int32_t v)
 }
 
 /**
- * Generate 2D corner texture for the shadow's falloff: the outer corner at
- * (0, 0), the corner's centre toward (SIZE-1, SIZE-1). The core's coverage of
- * each texel (4 × 4 samples), blurred twice along each axis. Beyond the
- * texture, each row and column continues as at its end: outside the core on
- * the outer side, past the rounded corner on the inner side.
+ * Generate a 2D texture for the shadow's corner falloff. The outer corner is at (0, 0), and the
+ * rounded corner's center is toward (SIZE-1, SIZE-1). Estimate core coverage with 4 by 4 samples
+ * per texel, then apply two box blurs along each axis. Extend each row and column beyond the
+ * texture by repeating its endpoint value.
  */
 static bool generate_corner_texture(uint8_t * buf, int32_t ratio_idx)
 {
@@ -320,14 +321,12 @@ void lv_draw_eve5_box_shadow_init(lv_draw_eve5_unit_t * u)
 }
 
 /**
- * LVGL draws a shadow only outside its widget, which shows where the widget's
- * background doesn't cover it. Marks the widget's rounded rectangle, one pixel
- * smaller so the shadow reaches under its antialiased edge as in the software
- * renderer, in the stencil over the shadow's area and leaves the stencil test
- * drawing where it is clear. The caller restores the stencil state with its
- * saved context. The stencil has no antialiasing: only the direct-to-alpha
- * pass uses this, where the alpha channel it writes can't be a mask as well
- * (see draw_shadow_outside_widget).
+ * Exclude the widget's interior from the shadow using the stencil buffer. Shrink the widget's
+ * rounded rectangle by one pixel so the shadow extends under its antialiased edge, matching the
+ * software renderer. Leave the stencil test enabled to draw only outside that rectangle; the caller
+ * restores the saved stencil state.
+ * The stencil has no antialiasing. Use it only in the direct-to-alpha pass, where the alpha channel
+ * cannot also serve as a temporary mask (see draw_shadow_outside_widget).
  */
 static void exclude_widget_area(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                                 const lv_draw_box_shadow_dsc_t * dsc)
@@ -363,7 +362,7 @@ typedef struct {
     int32_t corner_size;                    /**< Pixels the textures span */
     int32_t left, right, top, bottom;       /**< Widths of the slices on each side */
     int32_t ratio_idx;
-    int32_t in_halves;                      /**< Half pixels the shadow moves in */
+    int32_t in_halves;                      /**< Inward shadow offset in half-pixel units */
     bool core_only;                         /**< Too narrow to blur: the core alone */
     int32_t cx1, cy1, cx2, cy2, radius;     /**< The core, inclusive, and its radius */
 } shadow_slices_t;
@@ -400,8 +399,10 @@ static bool shadow_slices(const lv_draw_task_t * t, const lv_draw_box_shadow_dsc
         return true;
     }
 
-    /* The software renderer's blurs, of width / 2 and one more for an odd
-     * width: the even ones move the shadow in */
+    /*
+     * The two software box blurs have widths width / 2 and (width + 1) / 2. Each even-width blur
+     * shifts the shadow inward by half a pixel.
+     */
     int32_t box1 = dsc->width >> 1;
     int32_t box2 = box1 + (dsc->width & 1);
     sl->in_halves = (box1 % 2 == 0) + (box2 % 2 == 0);
@@ -457,9 +458,11 @@ static void draw_shadow_slices(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t
     int32_t xr = sl->sx2 + 1 - sl->right;      /* Left of the right slices */
     int32_t yt = sl->sy1 + sl->top;            /* Bottom of the top slices */
     int32_t yb = sl->sy2 + 1 - sl->bottom;     /* Top of the bottom slices */
-    /* Pixel and texel centres are both at integer coordinates: the mirrored
-     * slices start at the texture coordinate of their outermost pixel. Both
-     * sides sample further out by the shadow's move in. */
+    /*
+     * Pixel and texel centers lie at integer coordinates, so each mirrored slice starts at the
+     * texture coordinate of its outermost pixel. Offset both sides' texture coordinates outward to
+     * compensate for the blur's inward shift.
+     */
     int32_t in = sl->in_halves * (scale / 2);
     int32_t cn = -in;
     int32_t cr = scale * (sl->right - 1) - in;
@@ -520,16 +523,13 @@ static void draw_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, const
 }
 
 /**
- * A shadow drawn only outside its widget, as LVGL's software renderer draws
- * it: the shadow's coverage times the inverse of the widget's antialiased
- * rounded rectangle, one pixel smaller than the widget
- * (lv_draw_sw_mask_radius_init, inverted). The mask is made in the alpha
- * channel over the shadow's area, which it trashes: cleared, the shadow's
- * coverage at its opacity written where it's drawn (nothing elsewhere, as past
- * the rounded corners of a core-only shadow), times the inverse of the widget.
- * The color is drawn through it: in the RGB pass, the shadow's color; in the
- * L8 alpha pass, white. Call inside a saved context, with the vertex format
- * set.
+ * Draw the shadow outside the widget, matching the software renderer. Build a mask in the alpha
+ * channel over the shadow's area: clear alpha, draw the shadow coverage at the requested opacity,
+ * then multiply by the inverse of the widget's antialiased rounded rectangle. Shrink that rectangle
+ * by one pixel, as in lv_draw_sw_mask_radius_init with inversion enabled.
+ * Draw through the completed mask using the shadow color in the RGB pass or white in the L8 alpha
+ * pass. This overwrites the target's alpha channel. The caller must save the context and set the
+ * vertex format.
  */
 static void draw_shadow_outside_widget(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, const shadow_slices_t * sl,
                                        uint32_t corner_addr, uint32_t edge_addr, lv_color_t color)
@@ -635,10 +635,9 @@ bool lv_draw_eve5_box_shadow_needs_alpha_rendertarget(const lv_draw_task_t * t)
  **********************/
 
 /**
- * Draw box shadow alpha coverage for alpha recovery passes: the same slices.
- * L8 decodes as (R=255, G=255, B=255, A=L), so the shadow is the source
- * alpha: in white, the L8 render target captures it as luminance, and the
- * direct-to-alpha pass, which only writes alpha, as alpha.
+ * Draw the same shadow slices for alpha recovery. L8 textures decode as (R=255, G=255, B=255, A=L),
+ * so source alpha contains the shadow coverage. Draw in white to capture that coverage as luminance
+ * in the L8 pass, or write only alpha in the direct-to-alpha pass.
  */
 void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
@@ -651,13 +650,13 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_t
     shadow_slices_t sl;
     uint32_t corner_addr = GA_INVALID, edge_addr = GA_INVALID;
     if(!shadow_slices(t, dsc, &sl)) return;
-    /* The L8 render target pass runs before the RGB pass that would make them */
+    /* Create the shadow textures now: the L8 pass runs before the RGB pass, which normally creates them. */
     if(!sl.core_only && !shadow_textures(u, sl.ratio_idx, &corner_addr, &edge_addr)) return;
 
     EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
     if(!dsc->bg_cover && alpha_to_rgb) {
-        /* The alpha channel of the L8 render target is free as the mask */
+        /* Use the L8 target's alpha channel as a temporary mask. */
         lv_draw_eve5_set_scissor(u, &t->clip_area, &t->target_layer->buf_area);
         draw_shadow_outside_widget(u, t, &sl, corner_addr, edge_addr, lv_color_white());
     }

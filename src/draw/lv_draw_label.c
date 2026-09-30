@@ -625,13 +625,13 @@ static uint8_t hex_char_to_num(char hex)
 }
 
 /**
- * Follow the recolor commands through text that is not drawn, as the
- * iteration of the drawn lines does
+ * Process recolor commands in skipped text so subsequent visible lines start with the correct color
+ * state.
  * @param txt           the text
  * @param len           its length in bytes
- * @param base_color    the color of the text outside the commands
- * @param state         the recolor state, updated
- * @param recolor       the color of the open command, updated
+ * @param base_color    the color of text outside recolor commands
+ * @param state         the recolor state to update
+ * @param recolor       the active command's color to update
  */
 static void recolor_skip_text(const char * txt, uint32_t len, lv_color_t base_color,
                               cmd_state_t * state, lv_color_t * recolor)

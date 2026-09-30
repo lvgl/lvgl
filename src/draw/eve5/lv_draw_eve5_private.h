@@ -130,48 +130,48 @@ extern "C" {
 #define LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 0
 #endif
 
-/* Give L8 render targets LVGL's luminance weights: screen tiles of L8, AL88
- * and I1 displays, L8 layers and L8 canvases. The render engine stores red when
- * it writes an L8 line, LVGL (77 r + 151 g + 28 b) / 256. With this on, such
- * a layer always renders in color to an ARGB8 intermediate, which is then
- * drawn into the L8 target once per channel, swizzled to gray and scaled by
- * LVGL's weight. Blend modes on L8 use the same weights. Costs the
- * intermediate (4 bytes per pixel while the layer renders) and a conversion
- * pass. */
+/*
+ * Use LVGL's luminance weights for L8 render targets, including L8 layers and canvases, and screen
+ * tiles for L8, AL88, and I1 displays. EVE stores the red channel in L8, whereas LVGL computes (77
+ * r + 151 g + 28 b) / 256. When enabled, render the layer into ARGB8, then add three weighted
+ * grayscale draws into the L8 target, one per color channel. L8 blend modes use the same weights.
+ * This requires a 4-byte-per-pixel intermediate buffer while rendering and a final conversion pass.
+ */
 #ifndef LV_DRAW_EVE5_L8_EXACT
 #define LV_DRAW_EVE5_L8_EXACT 1
 #endif
 
-/* LVGL's luminance weights 77/151/28 of 256 as color scales of 255: red and
- * blue as LVGL's, green the rest, so white stays white. See
- * lv_draw_eve5_draw_luminance. */
+/*
+ * Express LVGL's luminance weights (77/151/28 out of 256) as color scales out of 255. Keep red and
+ * blue at their LVGL values and assign the remainder to green so white stays white. See
+ * lv_draw_eve5_draw_luminance.
+ */
 #define EVE5_LUMINANCE_R 77
 #define EVE5_LUMINANCE_G 150
 #define EVE5_LUMINANCE_B 28
 
-/* Give a FULL-mode frame the display's color format, as a partial-mode
- * screen tile has it: LVGL's luminance for L8 and AL88, thresholded for I1,
- * and the quantization of RGB565 and the other formats with less precision.
- * The swapchain is RGB8, so the frame renders to an ARGB8 intermediate, which
- * is reduced into a buffer of that format and presented from it: the
- * intermediate, the buffer and two more passes each frame. Off, a FULL-mode
- * frame renders straight into the swapchain in full color, whatever the
- * display's color format. */
+/*
+ * Make FULL-mode frames reproduce the display's configured color format, as partial-mode tiles do.
+ * Apply LVGL luminance for L8 and AL88, a threshold for I1, or quantization for formats such as
+ * RGB565. Since the swapchain is RGB8, render into ARGB8 first, convert to the screen tile format,
+ * then present that buffer. This costs two temporary buffers and two additional passes per frame.
+ * When disabled, FULL mode renders directly into the RGB8 swapchain regardless of the configured
+ * display format.
+ */
 #ifndef LV_DRAW_EVE5_FULL_COLOR_FORMAT
 #define LV_DRAW_EVE5_FULL_COLOR_FORMAT 0
 #endif
 
-/* Upload image glyphs (LV_FONT_GLYPH_FORMAT_IMAGE, such as lv_imgfont's)
- * whose pixels come from the CPU in straight ARGB8888 premultiplied, and draw
- * them with blend(ONE, ONE_MINUS_SRC_ALPHA). A rotated or scaled glyph is
- * filtered bilinearly, and with straight alpha the filter mixes the black of
- * transparent texels and of the bitmap's border into the color of its edges,
- * which then get their alpha applied a second time by the blend: dark
- * outlines. The texture is the image's, flagged is_premultiplied, so other
- * draws of the same image use it as premultiplied too. Only the upload that
- * makes the image resident decides: an image drawn before as something else
- * stays straight, and images the coprocessor decodes or loads are left as
- * they are. An untransformed glyph draws the same either way. */
+/*
+ * Premultiply CPU-uploaded ARGB8888 image glyphs (LV_FONT_GLYPH_FORMAT_IMAGE, such as lv_imgfont
+ * glyphs) and draw them with blend(ONE, ONE_MINUS_SRC_ALPHA). Bilinear filtering of straight-alpha
+ * pixels mixes black from transparent texels and the bitmap border into edge colors. Applying
+ * SRC_ALPHA blending then darkens those edges again.
+ * Mark the shared image texture as is_premultiplied so other draws use the same blend convention.
+ * The first upload determines the convention: an image already uploaded with straight alpha remains
+ * straight. Images decoded or loaded by the coprocessor are also unchanged. Untransformed glyphs
+ * look the same with either convention.
+ */
 #ifndef LV_DRAW_EVE5_PREMULTIPLY_IMAGE_GLYPHS
 #define LV_DRAW_EVE5_PREMULTIPLY_IMAGE_GLYPHS 1
 #endif
@@ -238,11 +238,12 @@ extern "C" {
  * TYPEDEFS
  **********************/
 
-/* Font VRAM residency: one entry per font, stores either a single whole-font
- * GPU allocation with per-glyph offset table, or per-glyph GPU handles. With
- * LV_USE_DRAW_VRAM, attached to the font's descriptor (lv_font_dsc_base_t);
- * without, found in the unit's list by the descriptor's address, and checked
- * against the font it was made for, which LVGL doesn't say it deleted. */
+/*
+ * Track one VRAM residency per font: either a whole-font allocation with glyph offsets or
+ * individual glyph handles. With LV_USE_DRAW_VRAM, attach the residency to lv_font_dsc_base_t.
+ * Otherwise, look it up by descriptor address and validate the saved font identity before reuse,
+ * because LVGL sends no font deletion notification.
+ */
 typedef struct lv_draw_eve5_font_vram_t {
     lv_eve5_vram_base_t base;       /**< Must be first member (.unit = owning draw unit) */
     struct lv_draw_eve5_font_vram_t * prev; /**< Intrusive list: previous resident font */
@@ -253,8 +254,9 @@ typedef struct lv_draw_eve5_font_vram_t {
     uint32_t glyph_count;           /**< Array size for glyph_offsets or glyph_handles */
     uint8_t bpp;                    /**< Bits per pixel (1/2/4/8) */
     bool whole_font;                /**< true = single allocation, false = per-glyph handles */
-    const void * dsc;               /**< The font descriptor, which holds the residency with LV_USE_DRAW_VRAM;
-                                         without, the key, and the font it was then: */
+    const void * dsc;               /**< Font descriptor: stores the residency with LV_USE_DRAW_VRAM;
+                                     * otherwise used as the lookup key
+                                     */
 #if !LV_USE_DRAW_VRAM
     LV_IMAGE_DSC_CONST void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, lv_draw_buf_t *);
     const void * glyph_bitmap;      /**< Bitmaps of a font in LVGL's format */
@@ -264,11 +266,13 @@ typedef struct lv_draw_eve5_font_vram_t {
 } lv_draw_eve5_font_vram_t;
 
 #if !LV_USE_DRAW_VRAM
-/* What the EVE copy of a residency without LV_USE_DRAW_VRAM copies, which
- * decides how long it's kept (see lv_draw_eve5_residency.c) */
+/*
+ * Source type for a residency tracked without LV_USE_DRAW_VRAM. Determines its lifetime; see
+ * lv_draw_eve5_residency.c.
+ */
 typedef enum {
     LV_DRAW_EVE5_RES_LAYER,     /**< A child layer, which has no buffer: kept until LVGL deletes the layer */
-    LV_DRAW_EVE5_RES_TARGET,    /**< A display buffer the CPU doesn't hold the frame in, never checked */
+    LV_DRAW_EVE5_RES_TARGET,    /**< Display buffer whose CPU pixels do not represent the frame; skip content checks */
     LV_DRAW_EVE5_RES_BUFFER,    /**< An image in CPU memory, or a canvas's buffer: kept while it's unchanged */
     LV_DRAW_EVE5_RES_SOURCE,    /**< An image the decoders read, a file or encoded data: kept until dropped */
 } lv_draw_eve5_res_kind_t;
@@ -280,13 +284,14 @@ typedef struct lv_draw_eve5_res_entry_t lv_draw_eve5_res_entry_t;
 #define LV_DRAW_EVE5_RES_BUCKETS 256
 #endif
 
-/* Images and buffers kept resident at most, beyond which the least recently
- * used are released */
+/*
+ * Maximum cached image and buffer residencies; evict least recently used entries above this limit
+ */
 #ifndef LV_DRAW_EVE5_RES_MAX
 #define LV_DRAW_EVE5_RES_MAX 512
 #endif
 
-/* Fonts kept resident at most */
+/* Maximum number of resident fonts */
 #ifndef LV_DRAW_EVE5_FONT_MAX
 #define LV_DRAW_EVE5_FONT_MAX 64
 #endif
@@ -375,11 +380,11 @@ typedef struct {
 #endif
 } image_skew_t;
 
-/* Area a transformed image's bitmap is drawn over, clipped by the scissor:
- * its transformed bounds rather than the clip area, so the bitmap transform,
- * and its rounding, doesn't depend on which part of the image a tile or a
- * partial refresh draws, which would show as seams. Bounds too large for
- * BITMAP_SIZE fall back to the clip area. */
+/*
+ * Draw a transformed bitmap over its transformed bounds and clip with the scissor. Using the clip
+ * area as the bitmap bounds would change transform rounding between tiles or partial refreshes,
+ * producing seams. Fall back to the clip area only when the bounds exceed BITMAP_SIZE limits.
+ */
 static inline const lv_area_t * eve5_transform_area(const lv_draw_task_t * t)
 {
     if(lv_area_get_width(&t->_real_area) > 2048 || lv_area_get_height(&t->_real_area) > 2048) {
@@ -459,9 +464,10 @@ typedef struct {
     bool prev_threshold;        /**< Draw that luminance thresholded, black and white (I1) */
 } lv_draw_eve5_slice_t;
 
-/* How a layer's content is reduced to the color format it's stored in. A
- * layer that needs it renders to an ARGB8 intermediate, which the render
- * engine blends at anyway, and is reduced once complete. */
+/*
+ * Final conversion from ARGB8 to the layer's storage format. Layers requiring this conversion
+ * render into ARGB8 first, preserving blend precision, and convert only when complete.
+ */
 typedef enum {
     LV_DRAW_EVE5_REDUCE_NONE,       /**< Rendered directly in its format */
     LV_DRAW_EVE5_REDUCE_LUMINANCE,  /**< LVGL's luminance (L8; AL88 with its alpha; gray on the swapchain) */
@@ -594,7 +600,7 @@ typedef struct {
     lv_draw_eve5_font_vram_t * font_list; /**< Head of intrusive list of resident fonts, most recent first */
 #if LV_USE_DRAW_VRAM
     lv_eve5_vram_res_t * owned_list;      /**< The residencies attached to buffers (lv_draw_eve5_res_set) */
-    lv_eve5_vram_res_t * layer_list;      /**< Those of decoded images no buffer keeps, freed with the layer */
+    lv_eve5_vram_res_t * layer_list;      /**< Residencies for temporary decoded images, released when the layer finishes */
 #else
     uint32_t font_count;
 
@@ -605,9 +611,10 @@ typedef struct {
     uint32_t res_count;
     uint32_t res_render;      /**< Counts layer renders: an entry used in the current one is kept */
     uint32_t res_refresh;     /**< Counts display refreshes, odd while one is in progress */
-    bool decode_to_gpu;       /**< The HW decoder decodes into a residency for the draw unit, no pixels.
-                                   *   Set by the draw unit around its own decoder open, which with an OS
-                                   *   assumes no other thread opens images meanwhile. */
+    bool decode_to_gpu;       /**< Skip CPU readback when the draw unit opens the hardware decoder.
+                               * With an OS, this assumes no other thread opens images while the
+                               * flag is set.
+                               */
 #endif
 #if LV_DRAW_EVE5_SW_FALLBACK
     lv_draw_eve5_sw_cache_t sw_cache;
@@ -636,9 +643,10 @@ typedef struct {
      * YCBCR policy can pick the right format on first allocation. */
     bool alloc_canvas_hint;
 
-    /* Dispatch-scoped hint: the next vram_alloc_cb is allocating a
-     * partial-mode screen tile, which renders in the display's format as
-     * init_layer picks it for the screen */
+    /*
+     * Tell the next vram_alloc_cb that it is allocating a partial-mode screen tile. Use the display
+     * format selected by init_layer.
+     */
     bool alloc_screen_hint;
 
     /* Box shadow texture cache */
@@ -647,7 +655,7 @@ typedef struct {
     /* Per-layer alpha repair tracking (layer-relative coordinates) */
     lv_area_t alpha_opaque_area;
     int32_t alpha_opaque_radius;
-    const lv_draw_task_t * alpha_opaque_task; /**< Task the opaque area is complete after */
+    const lv_draw_task_t * alpha_opaque_task; /**< Task after which the tracked opaque area has been fully drawn */
     lv_area_t alpha_trashed_area;
     bool has_alpha_opaque;
     bool has_alpha_trashed;
@@ -682,14 +690,13 @@ static inline void lv_draw_eve5_count_upload(uint32_t bytes)
  * RESIDENCY
  **********************/
 
-/* The EVE memory holding a copy of an LVGL buffer, an image, a canvas or a
- * layer. With LVGL's VRAM residency module (LV_USE_DRAW_VRAM), it's attached
- * to the buffer (vram_res) and LVGL moves buffers between CPU memory and EVE
- * memory as the draw units need them. Without, the draw unit records it by the
- * buffer's address: a layer's buffer, or the layer itself when LVGL gave it
- * none, an image source. It only keeps what it can tell is still a copy, from
- * the notifications LVGL sends the draw units and by checking the CPU memory
- * of the buffers the CPU can change (lv_draw_eve5_residency.c). */
+/*
+ * GPU copy of an LVGL buffer, image, canvas, or layer. With LV_USE_DRAW_VRAM, attach the residency
+ * to the buffer's vram_res field; LVGL synchronizes CPU and GPU pixels as needed. Otherwise, the
+ * draw unit tracks GPU copies by buffer address, layer address for bufferless layers, or image
+ * source. It uses LVGL events and CPU pixel checks to detect stale copies (see
+ * lv_draw_eve5_residency.c).
+ */
 
 #if LV_USE_DRAW_VRAM
 static inline lv_eve5_vram_res_t * lv_draw_eve5_res_get(lv_draw_eve5_unit_t * u, const void * buf)
@@ -698,12 +705,14 @@ static inline lv_eve5_vram_res_t * lv_draw_eve5_res_get(lv_draw_eve5_unit_t * u,
     return buf ? (lv_eve5_vram_res_t *)((const lv_draw_buf_t *)buf)->vram_res : NULL;
 }
 
-/** Attach vr to buf, replacing any (not freed), or detach it with NULL. The draw
- *  unit keeps the residencies it attached, to release them when it's deleted. */
+/**
+ * Attach vr to buf, or detach with NULL. Replacing a residency does not free the previous one.
+ * Track attached residencies so the draw unit can release them during teardown.
+ */
 void lv_draw_eve5_res_set(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vram_res_t * vr);
-/** Free a residency, which the buffers it was attached to no longer hold */
+/** Destroy an unreferenced residency descriptor. The caller must release its GPU allocation separately. */
 void lv_draw_eve5_res_destroy(lv_eve5_vram_res_t * vr);
-/** Keep a residency until the layer being rendered is finished, detached from buf */
+/** Detach the residency from buf and retain it until the current layer finishes rendering. */
 void lv_draw_eve5_res_keep_for_layer(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vram_res_t * vr);
 /** Free the residencies kept for the layer, once it's finished */
 void lv_draw_eve5_res_release_layer(lv_draw_eve5_unit_t * u);
@@ -740,26 +749,26 @@ static inline void lv_draw_eve5_res_destroy(lv_eve5_vram_res_t * vr)
 {
     lv_free(vr);
 }
-/** Record vr as the EVE copy of key, replacing any (not freed), or forget it with NULL */
+/** Associate vr with key, or remove the association with NULL. Do not free the previous residency. */
 void lv_draw_eve5_res_set_kind(lv_draw_eve5_unit_t * u, const void * key, lv_eve5_vram_res_t * vr,
                                lv_draw_eve5_res_kind_t kind);
 static inline void lv_draw_eve5_res_set(lv_draw_eve5_unit_t * u, const void * key, lv_eve5_vram_res_t * vr)
 {
     lv_draw_eve5_res_set_kind(u, key, vr, LV_DRAW_EVE5_RES_BUFFER);
 }
-/** Forget key's EVE copy and return it, NULL without one */
+/** Remove and return the residency associated with key, or return NULL if none exists. */
 lv_eve5_vram_res_t * lv_draw_eve5_res_detach(lv_draw_eve5_unit_t * u, const void * key);
-/** Free key's EVE copy, the EVE memory once the display lists using it complete */
+/** Remove key's residency and defer freeing its GPU memory until all display lists using it complete. */
 void lv_draw_eve5_res_free(lv_draw_eve5_unit_t * u, const void * key);
-/** An image's EVE copy, NULL without one or when the image changed since */
+/** Return the image's GPU residency, or NULL if no copy exists or the image has changed. */
 lv_eve5_vram_res_t * lv_draw_eve5_res_image(lv_draw_eve5_unit_t * u, const lv_image_dsc_t * img);
-/** The EVE copy of an image the decoders read (a file path or data), NULL without one */
+/** Look up a decoded image's GPU residency by file path or encoded source data; return NULL if absent. */
 lv_eve5_vram_res_t * lv_draw_eve5_res_source(lv_draw_eve5_unit_t * u, const void * src);
-/** Record vr as the EVE copy of the decoded image of src, which frees it on failure */
+/** Cache vr for decoded source src. Free vr if adding the cache entry fails. */
 bool lv_draw_eve5_res_set_source(lv_draw_eve5_unit_t * u, const void * src, lv_eve5_vram_res_t * vr);
 /** Note that the CPU memory of buf matches its EVE copy now, after an upload or a download */
 void lv_draw_eve5_res_commit(lv_draw_eve5_unit_t * u, const lv_draw_buf_t * buf);
-/** Give the layer the EVE memory it renders to, in time for rendering it (dispatch) */
+/** Prepare the layer's GPU memory before dispatching its draw tasks. */
 bool lv_draw_eve5_res_prepare_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen);
 /** The draw unit's event callback: layers deleted, results read back, images dropped */
 void lv_draw_eve5_res_event(lv_event_t * e);
@@ -778,9 +787,11 @@ static inline const void * eve5_layer_key(const lv_layer_t * layer)
 lv_draw_eve5_font_vram_t * eve5_get_font_vram(lv_draw_eve5_unit_t * u, const lv_font_t * font);
 #endif
 
-/** Release what the draw unit still holds as it's deleted (lv_deinit): with
- *  LV_USE_DRAW_VRAM, the residencies of the buffers and fonts LVGL never
- *  destroys (static ones), detached from them; without, everything recorded */
+/**
+ * Release remaining resources during draw unit teardown (lv_deinit). With LV_USE_DRAW_VRAM, detach
+ * and release residencies of static buffers and fonts that LVGL does not destroy. Otherwise,
+ * release all tracked residencies.
+ */
 void lv_draw_eve5_res_deinit(lv_draw_eve5_unit_t * u);
 void lv_draw_eve5_font_free_all(lv_draw_eve5_unit_t * u);
 
@@ -813,8 +824,10 @@ static inline lv_eve5_vram_res_t * eve5_get_vram_res(lv_draw_eve5_unit_t * u, co
     return lv_draw_eve5_res_get(u, eve5_layer_key(layer));
 }
 
-/** EVE memory for a render target of a buffer or layer w by h of color format
- * cf, as the draw unit renders it (lv_draw_eve5_hal.c) */
+/**
+ * Allocate GPU memory for a w by h render target in the format selected for cf
+ * (lv_draw_eve5_hal.c).
+ */
 lv_eve5_vram_res_t * lv_draw_eve5_vram_create(lv_draw_eve5_unit_t * u, uint32_t w, uint32_t h,
                                               lv_color_format_t cf, uint32_t alloc_flags);
 
@@ -1005,8 +1018,9 @@ static inline void eve5_set_image_bitmap_layout(EVE_HalContext *phost,
     eve5_set_bitmap_layout(phost, eve_format, stride, height);
 }
 
-/* Alpha repair tracking: call for fully opaque fills (records largest), with
- * the task the fill is complete after */
+/*
+ * Track the largest fully opaque fill and the task after which it has been completely drawn.
+ */
 static inline void lv_draw_eve5_track_alpha_opaque(lv_draw_eve5_unit_t * u,
                                                    int32_t x1, int32_t y1,
                                                    int32_t x2, int32_t y2,
@@ -1247,11 +1261,10 @@ void lv_draw_eve5_draw_luminance(EVE_HalContext * phost, uint16_t eve_format, ui
 #endif
 
 /**
- * A layer's ARGB8 content (inter, consumed) in a new buffer of a format with
- * less precision, for a layer drawn from it: LVGL's luminance in L8,
- * thresholded or as gray on the swapchain, or quantized to RGB565 and the
- * like on the swapchain. Returns GA_HANDLE_INVALID, keeping inter, without
- * memory for it.
+ * Convert the layer's ARGB8 buffer inter to a new buffer with lower color precision. Use L8 for
+ * luminance, optionally thresholded for I1, or a format such as RGB565 for quantization before
+ * swapchain presentation. On success, release inter and return the new buffer. On allocation
+ * failure, return GA_HANDLE_INVALID and leave inter owned by the caller.
  */
 EVE_GpuHandle lv_draw_eve5_hal_reduce(lv_draw_eve5_unit_t * u, EVE_GpuHandle inter, uint32_t inter_stride,
                                       int32_t w, int32_t h, uint16_t eve_format, uint8_t bpp,

@@ -261,23 +261,25 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     bool masked = eve5_image_clip_radius(dsc) > 0 || has_bitmap_mask || alpha_to_rgb
                   || (dsc->colorkey != NULL && dsc->recolor_opa > LV_OPA_MIN);
 
-    /* An alpha-only image filtered by a transform is drawn premultiplied, its
-     * alpha sampled in every channel: it samples as white with its alpha, and
-     * outside the bitmap BORDER gives (0, 0, 0, 0), which pulls the white
-     * toward black at the edges, darkened again by the SRC_ALPHA blend.
-     * Premultiplied, BORDER's zero is right. Through a mask, the image's alpha
-     * is in the mask and its color is drawn flat instead. */
+    /*
+     * Draw transformed alpha-only images as premultiplied pixels by sampling alpha into every
+     * channel. With straight alpha, BORDER samples mix black into the white color at bitmap edges,
+     * then SRC_ALPHA blending darkens those edges again. Premultiplied sampling makes BORDER's zero
+     * value correct. When drawing through a mask, put image alpha in the mask and draw a solid
+     * color through it instead.
+     */
     bool alpha_premultiplied = false;
 #if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
     alpha_premultiplied = alpha_only && has_any_transform && dsc->antialias && !masked && dsc->colorkey == NULL
                           && EVE_CHIPID >= EVE_BT815;
 #endif
 
-    /* Premultiplied content (RGB already scaled by alpha) uses blend(ONE,
-     * ONE_MINUS_SRC_ALPHA) to avoid double-applying alpha. Vertex color is
-     * scaled by opa for attenuation. The flag comes from the resolved VRAM
-     * resource: for a file or decoded source that is the decoded image, not
-     * the source descriptor. Only the alpha of an alpha layer is drawn. */
+    /*
+     * Premultiplied pixels use blend(ONE, ONE_MINUS_SRC_ALPHA) to avoid applying alpha twice. Scale
+     * the vertex color by opa for opacity. Read the premultiplied flag from the resolved VRAM
+     * resource: for decoded images, the flag belongs to the decoded pixels, not the source
+     * descriptor. For alpha layers, draw only alpha.
+     */
     bool is_premultiplied = (src_premultiplied && !alpha_layer) || alpha_premultiplied;
 
     lv_color_t tint = image_tint(dsc, alpha_only);
@@ -513,10 +515,11 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoDl_end(phost);
         }
         else {
-            /* No recolor: standard compositing through mask. An alpha-only
-             * image is its color over the mask, which holds its alpha: drawn
-             * flat, as its white would be darkened where filtering mixes in
-             * the bitmap's border. */
+            /*
+             * Composite through the mask without recoloring. For an alpha-only image, the mask
+             * already contains its coverage, so draw its color as a solid fill. Sampling the white
+             * texture again would darken edges where filtering includes the black bitmap border.
+             */
             if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
                 EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE);
             else

@@ -1,42 +1,36 @@
 /**
  * @file lv_draw_eve5_residency.c
  *
- * EVE5 (BT820) Residency: the draw unit's record of its EVE copies
+ * EVE5 (BT820) GPU residency tracking
  *
- * With LV_USE_DRAW_VRAM, LVGL attaches the EVE copy of a buffer to the buffer
- * (vram_res), tells the draw unit when it destroys the buffer, and moves the
- * pixels between CPU memory and EVE memory when a draw unit or the CPU needs
- * them. The draw unit keeps a list of the copies it attached, as LVGL never
- * destroys some buffers (static ones, image descriptors in the program): it
- * releases those when it's deleted (lv_deinit).
+ * With LV_USE_DRAW_VRAM, LVGL stores the residency in each buffer's vram_res,
+ * notifies the draw unit when the buffer is destroyed, and synchronizes CPU
+ * and GPU pixels as needed. The draw unit also tracks attached residencies
+ * so it can release those belonging to static buffers and image descriptors
+ * during lv_deinit.
  *
- * Without it, the buffers are LVGL's own, in CPU memory, and the draw unit
- * records the EVE copies itself, by the address of what they copy:
+ * Without LV_USE_DRAW_VRAM, the draw unit maintains its own GPU cache:
  *
- * - A child layer has no buffer: its render target is recorded by the layer,
- *   and freed when LVGL deletes the layer (LV_EVENT_CHILD_DELETED).
- * - A layer with a buffer, a canvas's or a snapshot's, renders on an EVE copy
- *   of the buffer's pixels, uploaded unless the copy is known to be current.
- *   LVGL asks for the result when the layer is done (LV_EVENT_SCREEN_LOAD_START),
- *   which reads it back into the buffer. The EVE copy is kept, as the image
- *   of the buffer.
- * - An image in CPU memory is uploaded when drawn, and kept while it's
- *   unchanged. LVGL's image cache drops an image it's told changed
- *   (lv_image_cache_drop, LV_EVENT_INVALIDATE_AREA). Nothing tells about the
- *   CPU writing into a buffer, such as a canvas's pixels: those are compared
- *   with a hash of the pixels the copy was made from, once per refresh. An
- *   image in the program (no handlers, neither allocated nor modifiable) is
- *   taken as constant.
- * - An image the decoders read, a file or encoded data, is decoded into EVE
- *   memory, by the hardware or from the pixels a software decoder gives,
- *   which aren't kept. It's recorded by the file's path or by the data.
- * - The display's buffers, which the CPU doesn't render the frame into, are
- *   recorded by the display driver (the swapchain) or at dispatch (the tile
- *   of the frame, which the display takes when it's flushed).
+ * - Bufferless child layers: key the render target by layer address and free
+ *   it on LV_EVENT_CHILD_DELETED.
+ * - Canvas and snapshot layers: upload the existing buffer pixels unless a
+ *   current GPU copy exists. Read the result back on LV_EVENT_SCREEN_LOAD_START
+ *   and retain the GPU copy for subsequent image draws.
+ * - CPU images: upload on first use and reuse while unchanged. Handle image
+ *   cache invalidation through LV_EVENT_INVALIDATE_AREA. For mutable buffers,
+ *   hash the CPU pixels once per refresh to detect writes that emit no event.
+ *   Treat static images without handlers, allocation, or modification flags
+ *   as immutable.
+ * - Files and encoded images: cache the GPU image by file path or source data.
+ *   Use hardware decoding where possible; otherwise, upload software-decoded
+ *   pixels without retaining the CPU copy.
+ * - Display buffers: the driver registers the swapchain, while dispatch
+ *   registers partial-mode tiles. The display takes ownership of each tile
+ *   when it is flushed.
  *
- * Images are released, least recently used first, when more than
- * LV_DRAW_EVE5_RES_MAX are recorded, and their EVE memory is evictable, since
- * they can be uploaded or decoded again.
+ * Above LV_DRAW_EVE5_RES_MAX entries, evict the least recently used images.
+ * Their GPU allocations are evictable because they can be uploaded or decoded
+ * again.
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
@@ -56,16 +50,16 @@ struct lv_draw_eve5_res_entry_t {
     lv_draw_eve5_res_entry_t * lru_prev;
     lv_draw_eve5_res_entry_t * lru_next;
     const void * key;           /**< The layer, buffer, image, or encoded image data */
-    char * path;                /**< The key of a file, its own copy of the path */
+    char * path;                /**< Owned copy of the file path, used as the cache key */
     lv_eve5_vram_res_t * vr;
     lv_draw_eve5_res_kind_t kind;
     uint32_t used;              /**< res_render it was last used in */
 
-    /* A BUFFER as it was when its EVE copy was last known to be current */
+    /* Buffer metadata saved when the GPU copy was last synchronized */
     lv_image_header_t header;
     const void * data;
     uint32_t data_size;
-    uint64_t hash;              /**< Of the pixels, when check_pixels */
+    uint64_t hash;              /**< Pixel hash, used when check_pixels is set */
     uint32_t checked;           /**< res_refresh the hash was last compared in */
     bool check_pixels;          /**< The CPU can change the pixels without notice */
 };
@@ -122,8 +116,11 @@ static uint64_t pixels_hash(const uint8_t * p, uint32_t n, bool * zero)
     return h;
 }
 
-/* The bytes of an image's pixels, and palette or alpha plane: data_size can
- * be more than there is, when LVGL aligned the data of a buffer it was given */
+/*
+ * Compute the byte count for pixels plus any palette or alpha plane, bounded by data_size. Do not
+ * hash trailing space: data_size may include bytes lost when LVGL aligned a caller-supplied data
+ * pointer.
+ */
 static uint32_t pixels_size(const lv_image_dsc_t * img)
 {
     const lv_image_header_t * header = &img->header;
@@ -134,9 +131,11 @@ static uint32_t pixels_size(const lv_image_dsc_t * img)
     return LV_MIN(size, img->data_size);
 }
 
-/* A buffer the program allocated or can write, a canvas's, a draw buffer, can
- * change in CPU memory without LVGL telling. An image descriptor in the
- * program is constant. */
+/*
+ * Mutable buffers can change in CPU memory without notifying LVGL. Check allocated or modifiable
+ * buffers and buffers with draw handlers. Treat static image descriptors without those properties
+ * as immutable.
+ */
 static inline bool buffer_is_mutable(const lv_image_dsc_t * img)
 {
     return (img->header.flags & (LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED)) != 0
@@ -232,7 +231,7 @@ static void entry_free(lv_draw_eve5_unit_t * u, lv_draw_eve5_res_entry_t * e, bo
     lru_unlink(u, e);
     u->res_count--;
 
-    /* The display's buffers are the display's */
+    /* The display driver owns and releases its buffer residencies. */
     if(free_vr && e->vr != NULL && e->kind != LV_DRAW_EVE5_RES_TARGET) {
         /* ScopedFree: the texture may still be referenced by an in-flight
          * display list, and is reclaimed once it completes */
@@ -243,7 +242,7 @@ static void entry_free(lv_draw_eve5_unit_t * u, lv_draw_eve5_res_entry_t * e, bo
     lv_free(e);
 }
 
-/* Note the buffer as it is now, its EVE copy being current */
+/* Save the current CPU buffer metadata and pixel hash to mark the GPU copy as synchronized. */
 static void commit(lv_draw_eve5_unit_t * u, lv_draw_eve5_res_entry_t * e, const lv_image_dsc_t * img)
 {
     e->header = img->header;
@@ -254,14 +253,16 @@ static void commit(lv_draw_eve5_unit_t * u, lv_draw_eve5_res_entry_t * e, const 
     e->checked = u->res_refresh;
 }
 
-/* Whether the EVE copy of a buffer is still a copy of it */
+/* Check whether the cached GPU pixels still match the CPU buffer. */
 static bool is_current(lv_draw_eve5_unit_t * u, lv_draw_eve5_res_entry_t * e, const lv_image_dsc_t * img)
 {
     if(e->data != img->data || e->data_size != img->data_size) return false;
     if(lv_memcmp(&e->header, &img->header, sizeof(lv_image_header_t)) != 0) return false;
     if(!e->check_pixels) return true;
-    /* Once per refresh: nothing runs between the tiles of a refresh to change
-     * the pixels. Outside a refresh, such as while a canvas is drawn on, always. */
+    /*
+     * Check pixels once per refresh; they cannot change between its tiles. Outside a refresh, check
+     * on every call, since a canvas may have changed.
+     */
     if((u->res_refresh & 1) && e->checked == u->res_refresh) return true;
     if(pixels_hash(img->data, pixels_size(img), NULL) != e->hash) return false;
     e->checked = u->res_refresh;
@@ -348,7 +349,10 @@ lv_eve5_vram_res_t * lv_draw_eve5_res_source(lv_draw_eve5_unit_t * u, const void
     }
     else if(type == LV_IMAGE_SRC_VARIABLE) {
         e = find(u, src);
-        /* Encoded data is constant; another image at its address differs */
+        /*
+         * Treat encoded pixels as immutable, but invalidate the cached image if the descriptor at
+         * this address has a different data pointer, size, or header.
+         */
         const lv_image_dsc_t * img = src;
         if(e != NULL && e->kind == LV_DRAW_EVE5_RES_SOURCE
            && (e->data != img->data || e->data_size != img->data_size
@@ -408,7 +412,7 @@ bool lv_draw_eve5_res_prepare_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     const void * key = eve5_layer_key(layer);
     lv_draw_buf_t * buf = layer->draw_buf;
 
-    /* A new render: what it uses is kept until the next */
+    /* Start a new render. Protect residencies used during this render from eviction until the next render. */
     u->res_render++;
 
 #if LV_USE_OS
@@ -436,8 +440,10 @@ bool lv_draw_eve5_res_prepare_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
     else if(e == NULL || e->vr == NULL || EVE_GpuAlloc_Get(u->allocator, e->vr->gpu_handle) == GA_INVALID
             || !is_current(u, e, (const lv_image_dsc_t *)buf)) {
-        /* A canvas or a snapshot: the layer draws on the buffer's pixels,
-         * unless they're all zero, as a buffer that was cleared is */
+        /*
+         * Preserve existing canvas or snapshot pixels as the layer's background. If the CPU buffer
+         * is all zero, create a cleared target instead of uploading it.
+         */
         if(e != NULL) entry_free(u, e, true);
         bool zero = true;
         if(buf->data != NULL) pixels_hash(buf->data, pixels_size((const lv_image_dsc_t *)buf), &zero);
@@ -462,8 +468,10 @@ bool lv_draw_eve5_res_prepare_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     return ok;
 }
 
-/* The layer is done: read its result back into its buffer, which the
- * program owns. Its EVE copy stays, the buffer's image. */
+/*
+ * Read the completed layer back into its caller-owned buffer. Retain the synchronized GPU copy for
+ * subsequent image draws.
+ */
 static void read_back(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 {
     lv_draw_buf_t * buf = layer->draw_buf;
@@ -483,7 +491,7 @@ static void read_back(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
     EVE_GpuAlloc_UpdateFlags(u->allocator, e->vr->gpu_handle, GA_GC_FLAG, GA_GC_FLAG);
 }
 
-/* LVGL's image cache was told an image changed, or all of them with NULL */
+/* Invalidate the cached GPU copy when LVGL invalidates an image. A NULL source invalidates all images. */
 static void drop(lv_draw_eve5_unit_t * u, const void * src)
 {
     if(src == NULL) {
@@ -513,9 +521,10 @@ void lv_draw_eve5_res_event(lv_event_t * event)
 
     switch(lv_event_get_code(event)) {
         case LV_EVENT_CHILD_DELETED: {
-                /* A layer's render target, or the upload of a child layer
-                 * the software renderer drew (non render-target chips). A
-                 * canvas's or a snapshot's stays the image of its buffer. */
+                /*
+                 * Release the deleted child layer's render target or uploaded software-rendered
+                 * pixels. Keep canvas and snapshot residencies associated with their buffers.
+                 */
                 lv_layer_t * layer = lv_event_get_param(event);
                 if(layer == NULL || layer->parent == NULL) break;
 #if LV_USE_OS
@@ -600,7 +609,10 @@ void lv_draw_eve5_res_set(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vra
 {
     lv_draw_buf_t * b = (lv_draw_buf_t *)buf;
     lv_eve5_vram_res_t * old = (lv_eve5_vram_res_t *)b->vram_res;
-    /* A copy of another buffer's descriptor can hold the other's residency */
+    /*
+     * A shallow copy of a buffer descriptor may point to another buffer's residency. Unlink the old
+     * residency only if this buffer owns it.
+     */
     if(old != NULL && old != vr && old->owner == b) owned_remove(old);
     b->vram_res = (lv_draw_buf_vram_res_t *)vr;
     if(vr == NULL) return;
@@ -651,9 +663,10 @@ void lv_draw_eve5_res_deinit(lv_draw_eve5_unit_t * u)
             lv_free(vr);
         }
         else {
-            /* Left as it is: the buffer was dropped or written anew without
-             * releasing it (lv_draw_buf_release_vram), and a copy of its
-             * descriptor may still hold it */
+            /*
+             * The buffer descriptor was replaced without lv_draw_buf_release_vram. Leave the
+             * residency alive because another copy of the descriptor may still reference it.
+             */
             LV_LOG_WARN("EVE5: buffer %p lost its residency %p without releasing it",
                         (void *)vr->owner, (void *)vr);
         }

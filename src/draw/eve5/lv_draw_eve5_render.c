@@ -621,9 +621,10 @@ EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_
         return GA_HANDLE_INVALID;
     }
 
-    /* This pass decides where the slice ends, as the RGB pass must draw the
-     * same tasks: both this display list and the bounds of the RGB one that
-     * follows (which cannot be measured yet) must fit. */
+    /*
+     * Choose the slice end so both this L8 display list and the following RGB display list fit. The
+     * RGB list is not built yet, so use its estimated upper bound.
+     */
     EVE_HalContext * phost = u->hal;
     uint32_t dl_budget = lv_draw_eve5_dl_budget(phost);
     uint32_t rgb_total = rgb_overhead;

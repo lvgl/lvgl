@@ -52,10 +52,11 @@ LV_IMAGE_DSC_CONST void * lv_eve5_asset_font_glyph_bitmap_sentinel(lv_font_glyph
 
 /** Font asset source. */
 typedef enum {
-    /** Stream a host file through lv_fs (LV_USE_FS_STDIO or any registered
-     *  non-EVE LVGL FS driver). The file is pre-read into a host buffer
-     *  then fed into the command FIFO. Use this for filesystem backends
-     *  that don't have an EVE-side zero-copy alternative. */
+    /**
+     * Load a host file through lv_fs using a non-EVE filesystem driver, such as LV_USE_FS_STDIO.
+     * Read the file into a host buffer, stage it in RAM_G, then feed CMD_LOADASSET through
+     * MediaFIFO. Use this for backends without a direct EVE-side load path.
+     */
     LV_EVE5_ASSET_FONT_SRC_FILE = 0,
     /** Load from the BT820 SD card. Bypasses LVGL I/O. Path may include
      *  an LVGL drive-letter prefix (e.g. "S:/foo.reloc"); it's stripped

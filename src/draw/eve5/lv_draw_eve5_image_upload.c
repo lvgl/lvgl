@@ -186,10 +186,9 @@ static void convert_a2_to_l4(const uint8_t * src, uint8_t * dst, uint32_t w)
 }
 
 /**
- * ARGB8888 (B, G, R, A in memory) to premultiplied, the color channels
- * multiplied as the render engine multiplies them, round(c * a / 255): a
- * premultiplied pixel drawn with blend(ONE, ONE_MINUS_SRC_ALPHA) gives what
- * the straight one gives with SRC_ALPHA blending.
+ * Convert ARGB8888 pixels (B, G, R, A in memory) to premultiplied alpha in place. Match the render
+ * engine's multiplication, round(c * a / 255), so drawing with blend(ONE, ONE_MINUS_SRC_ALPHA)
+ * gives the same result as drawing the original straight-alpha pixels with SRC_ALPHA blending.
  */
 static void premultiply_argb8888(const uint8_t * src, uint8_t * dst, uint32_t w)
 {
@@ -460,10 +459,9 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
  **********************/
 
 /**
- * A texture's line stride: its row of pixels, rounded up to the multiple
- * BITMAP_LAYOUT takes for the format. No wider: a transformed draw samples
- * whole rows (BITMAP_SIZE only bounds the drawn area), so padding would be
- * drawn as part of the image, black in an opaque format.
+ * Compute the texture stride by rounding the pixel row size up to the alignment required by
+ * BITMAP_LAYOUT. Add no extra padding: transformed draws sample whole rows, while BITMAP_SIZE only
+ * limits the drawn area. Extra padding would appear in the image, as black for opaque formats.
  */
 static int32_t texture_stride(uint16_t eve_format, int32_t w, uint8_t bpp)
 {
@@ -482,11 +480,10 @@ static int32_t texture_stride(uint16_t eve_format, int32_t w, uint8_t bpp)
 }
 
 /**
- * Start writing rows of `stride` bytes from `addr`, which is 4-byte aligned.
- * BT820 host writes start 4-byte aligned, and the stride needn't be a
- * multiple of 4, so rows are staged until they end on a 4-byte boundary:
- * every row, 2 or 4 rows. The allocation must cover the image's size rounded
- * up to 4 bytes.
+ * Start writing rows of stride bytes at the 4-byte-aligned address addr. BT820 host writes must
+ * start on a 4-byte boundary. If stride is not a multiple of 4, stage groups of 2 or 4 rows so each
+ * write starts aligned; otherwise, write one row at a time. The allocation must cover the image
+ * size rounded up to 4 bytes.
  */
 static bool row_writer_init(row_writer_t * wr, EVE_HalContext * hal, uint32_t addr, uint32_t stride, int32_t h)
 {
@@ -507,7 +504,7 @@ static uint8_t * row_writer_row(row_writer_t * wr, int32_t y)
     return row;
 }
 
-/** Row y is filled: write the staged rows once they end on a 4-byte boundary, or with the last row */
+/** Row y is ready. Write the staged group when it ends on a 4-byte boundary, or when y is the last row. */
 static void row_writer_commit(row_writer_t * wr, int32_t y)
 {
     int32_t staged = y % wr->group + 1;
