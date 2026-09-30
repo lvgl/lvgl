@@ -67,6 +67,7 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 #define LV_DRAW_BUF_INIT_STATIC(name) \
     do { \
         lv_image_header_t * header = &name.header; \
+        lv_draw_buf_release_vram(&name); \
         lv_draw_buf_init(&name, header->w, header->h, (lv_color_format_t)header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
         lv_draw_buf_set_flag(&name, LV_IMAGE_FLAGS_MODIFIABLE); \
     } while(0)
@@ -370,6 +371,23 @@ struct _lv_font_dsc_base_t;
  * @param font_dsc  pointer to lv_font_dsc_base_t, forwarded to vram_font_free_cb
  */
 void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, struct _lv_font_dsc_base_t * font_dsc);
+#endif
+
+/**
+ * Drop the draw unit's copy of a buffer, without bringing it back to CPU memory.
+ * For the owner of a buffer that goes away, or gets new pixels, other than through
+ * `lv_draw_buf_destroy`: a buffer kept in another struct, a static buffer initialized
+ * again, an image descriptor overwritten. Pixels only the draw unit's copy holds are lost.
+ * When `LV_USE_DRAW_VRAM` is disabled this is a no-op.
+ * @param buf   the draw buffer, or an image descriptor cast to one
+ */
+#if LV_USE_DRAW_VRAM
+void lv_draw_buf_release_vram(lv_draw_buf_t * buf);
+#else
+static inline void lv_draw_buf_release_vram(lv_draw_buf_t * buf)
+{
+    LV_UNUSED(buf);
+}
 #endif
 
 /**

@@ -747,6 +747,14 @@ void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, lv_font_d
     unit->vram_font_free_cb(unit, font_dsc);
 }
 
+void lv_draw_buf_release_vram(lv_draw_buf_t * buf)
+{
+    if(buf == NULL || buf->vram_res == NULL) return;
+    lv_draw_unit_t * unit = buf->vram_res->unit;
+    if(unit && unit->vram_free_cb) unit->vram_free_cb(unit, buf);
+    /* vram_free_cb NULLs buf->vram_res */
+}
+
 /**
  * Check if a draw buffer's VRAM residency is still valid.
  * If the VRAM backing was lost (reclaimed, stolen, etc.), frees
