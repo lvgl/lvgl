@@ -1,0 +1,154 @@
+/**
+ * @file lv_draw_ipa_private.h
+ *
+ */
+
+#ifndef LV_DRAW_IPA_PRIVATE_H
+#define LV_DRAW_IPA_PRIVATE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "../../../lvgl_public.h"
+#if LV_USE_DRAW_IPA
+
+#include "../../lv_draw_private.h"
+#include "../../sw/lv_draw_sw.h"
+#include LV_DRAW_IPA_HAL_INCLUDE
+
+/*********************
+ *      DEFINES
+ *********************/
+
+#if LV_USE_DRAW_IPA_INTERRUPT && LV_USE_OS
+#define LV_DRAW_IPA_ASYNC 1
+#else
+#define LV_DRAW_IPA_ASYNC 0
+#endif
+
+#if defined(__CORTEX_M) && ((__CORTEX_M == 7) || (__CORTEX_M == 55))
+#define LV_DRAW_IPA_CACHE 1
+#else
+#define LV_DRAW_IPA_CACHE 0
+#endif
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+typedef enum {
+    LV_DRAW_IPA_OUTPUT_CF_ARGB8888 = 0,
+    LV_DRAW_IPA_OUTPUT_CF_RGB888,
+    LV_DRAW_IPA_OUTPUT_CF_RGB565,
+    LV_DRAW_IPA_OUTPUT_CF_ARGB1555,
+    LV_DRAW_IPA_OUTPUT_CF_ARGB4444
+} lv_draw_ipa_output_cf_t;
+
+typedef enum {
+    LV_DRAW_IPA_FGBG_CF_ARGB8888 = 0,
+    LV_DRAW_IPA_FGBG_CF_RGB888,
+    LV_DRAW_IPA_FGBG_CF_RGB565,
+    LV_DRAW_IPA_FGBG_CF_ARGB1555,
+    LV_DRAW_IPA_FGBG_CF_ARGB4444,
+    LV_DRAW_IPA_FGBG_CF_L8,
+    LV_DRAW_IPA_FGBG_CF_AL44,
+    LV_DRAW_IPA_FGBG_CF_AL88,
+    LV_DRAW_IPA_FGBG_CF_L4,
+    LV_DRAW_IPA_FGBG_CF_A8,
+    LV_DRAW_IPA_FGBG_CF_A4,
+    LV_DRAW_IPA_FGBG_CF_YUV444,
+    LV_DRAW_IPA_FGBG_CF_UYVY422,
+    LV_DRAW_IPA_FGBG_CF_VYUY422,
+    LV_DRAW_IPA_FGBG_CF_YUV420,
+    LV_DRAW_IPA_FGBG_CF_YVU420
+} lv_draw_ipa_fgbg_cf_t;
+
+typedef enum {
+    LV_DRAW_IPA_MODE_MEMORY_TO_MEMORY = 0,
+    LV_DRAW_IPA_MODE_MEMORY_TO_MEMORY_WITH_PFC,
+    LV_DRAW_IPA_MODE_MEMORY_TO_MEMORY_WITH_BLENDING,
+    LV_DRAW_IPA_MODE_REGISTER_TO_MEMORY
+} lv_draw_ipa_mode_t;
+
+typedef enum {
+    LV_DRAW_IPA_ALPHA_MODE_NO_MODIFY_IMAGE_ALPHA_CHANNEL = 0,
+    LV_DRAW_IPA_ALPHA_MODE_REPLACE_ALPHA_CHANNEL,
+    LV_DRAW_IPA_ALPHA_MODE_MULTIPLY_IMAGE_ALPHA_CHANNEL
+} lv_draw_ipa_alpha_mode_t;
+
+typedef struct {
+    lv_draw_ipa_mode_t mode;
+    uint32_t w;
+    uint32_t h;
+
+    void * output_address;
+    uint32_t output_offset;
+    lv_draw_ipa_output_cf_t output_cf;
+
+    uint32_t reg_to_mem_mode_color;
+
+    const void * fg_address;
+    uint32_t fg_offset;
+    lv_draw_ipa_fgbg_cf_t fg_cf;
+    uint32_t fg_color;
+    uint32_t fg_alpha_mode;
+    uint32_t fg_alpha;
+
+    const void * bg_address;
+    uint32_t bg_offset;
+    lv_draw_ipa_fgbg_cf_t bg_cf;
+    uint32_t bg_color;
+    uint32_t bg_alpha_mode;
+    uint32_t bg_alpha;
+
+} lv_draw_ipa_configuration_t;
+
+typedef struct {
+    lv_draw_unit_t base_unit;
+    lv_draw_task_t * volatile task_act;
+
+    /** Last draw task clipped area, stored here so that we can invalidate
+    the cache after the drawing operation is done. This can either happen
+    immediately after the draw operation is done or on the IPA IRQ callback */
+    lv_area_t last_clipped_area;
+#if LV_DRAW_IPA_ASYNC
+    lv_thread_sync_t interrupt_signal;
+#endif
+} lv_draw_ipa_unit_t;
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+void lv_draw_ipa_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32_t h, int32_t stride);
+void lv_draw_ipa_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+                       const lv_area_t * coords);
+/**
+ * Start compositing a rendered layer with IPA.
+ * @param t             drawing task
+ * @param draw_dsc      descriptor whose source is a layer
+ * @param coords        destination area of the source buffer
+ * @return              true if a hardware transfer was started
+ */
+bool lv_draw_ipa_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
+
+lv_draw_ipa_output_cf_t lv_draw_cf_to_ipa_output_cf(lv_color_format_t cf);
+uint32_t lv_draw_ipa_color_to_ipa_color(lv_draw_ipa_output_cf_t cf, lv_color_t color);
+void lv_draw_ipa_configure_and_start_transfer(const lv_draw_ipa_configuration_t * conf);
+
+/**********************
+ *      MACROS
+ **********************/
+
+#endif /*LV_USE_DRAW_IPA*/
+
+#ifdef __cplusplus
+} /*extern "C"*/
+#endif
+
+#endif /*LV_DRAW_IPA_PRIVATE_H*/

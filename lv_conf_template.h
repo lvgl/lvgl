@@ -660,6 +660,26 @@
 
 #endif /*LV_USE_DRAW_OPENGLES*/
 
+/** Accelerate rendering with the GD32 IPA peripheral. */
+#define LV_USE_DRAW_IPA 0
+
+#if LV_USE_DRAW_IPA
+/** Header that provides the IPA peripheral definitions for the target
+ *  GD32 family. Use gd32h7xx.h for GD32H7 devices, or the corresponding
+ *  device header for another supported GD32 family.
+ */
+#define LV_DRAW_IPA_HAL_INCLUDE "gd32h7xx.h"
+
+#if LV_USE_OS == LV_OS_FREERTOS
+/** Use FreeRTOS synchronization for IPA transfers.
+ *  Call lv_draw_ipa_transfer_complete_interrupt_handler()
+ *  from the IPA interrupt handler.
+ */
+#define LV_USE_DRAW_IPA_INTERRUPT 0
+
+#endif /*LV_USE_OS == LV_OS_FREERTOS*/
+#endif /*LV_USE_DRAW_IPA*/
+
 /** Render with the SDL renderer API, caching widgets and images as SDL textures.
  *
  *  Enable: LV_USE_DRAW_SW
