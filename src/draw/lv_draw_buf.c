@@ -844,7 +844,8 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
                 uint32_t stride = buf->header.stride;
                 if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
-                uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+                /*As large as the buffer was: its stride can have been narrowed since*/
+                uint32_t size = LV_MAX(_calculate_draw_buf_size(w, h, cf, stride), buf->data_size);
                 void * data = draw_buf_malloc(buf->handlers ? buf->handlers : &default_handlers, size, cf);
                 if(data == NULL) {
                     LV_LOG_WARN("VRAM download: CPU alloc failed");
@@ -943,7 +944,8 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
         uint32_t stride = buf->header.stride;
         if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
-        uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+        /*As large as the buffer was, if it had CPU memory before: its stride can have been narrowed since*/
+        uint32_t size = LV_MAX(_calculate_draw_buf_size(w, h, cf, stride), buf->data_size);
         const lv_draw_buf_handlers_t * handlers = buf->handlers ? buf->handlers : &default_handlers;
         void * data = draw_buf_malloc(handlers, size, cf);
         if(data == NULL) {
