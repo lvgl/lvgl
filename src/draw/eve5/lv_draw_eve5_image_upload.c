@@ -556,7 +556,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu_ex(lv_draw_eve5_unit_t * u
         }
         /* Handle expired: free stale vram_res */
         lv_draw_eve5_res_set(u, img_dsc, NULL);
-        lv_free(existing);
+        lv_draw_eve5_res_destroy(existing);
     }
 
     /* Compressed or encoded data needs a decoder, see lv_draw_eve5_resolve_image_source */

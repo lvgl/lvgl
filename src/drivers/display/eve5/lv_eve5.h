@@ -97,7 +97,7 @@ typedef struct {
  * metadata. With LV_USE_DRAW_VRAM, attached to the buffer's vram_res; without,
  * recorded by the EVE5 draw unit, by the buffer's address.
  */
-typedef struct {
+typedef struct _lv_eve5_vram_res_t {
     lv_eve5_vram_base_t base;          /**< Must be first member */
     EVE_GpuHandle gpu_handle;          /**< RAM_G allocation handle (GA_HANDLE_INVALID when is_swapchain) */
     uint16_t eve_format;               /**< EVE bitmap format (ARGB8, RGB565, etc.) */
@@ -124,6 +124,13 @@ typedef struct {
                                             render engine to the current back buffer (one of REG_SC0_PTR0/PTR1).
                                             Backbuffer lifetime is tied to scanout (not render-engine sync), so
                                             this vram_res must not be ScopedFree'd while it's still scanout source. */
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_t * owner;             /**< The buffer it's attached to, in the draw unit's list, which releases
+                                            what buffers LVGL never destroys (static ones) with the draw unit.
+                                            NULL when not in the list (the swapchain's, which the display owns) */
+    struct _lv_eve5_vram_res_t * owner_prev;
+    struct _lv_eve5_vram_res_t * owner_next; /**< Also the next of the layer's, without an owner */
+#endif
 } lv_eve5_vram_res_t;
 
 typedef struct {

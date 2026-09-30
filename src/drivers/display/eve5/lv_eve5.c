@@ -380,8 +380,9 @@ bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, EVE_GpuHandle *out_handle,
     *out_handle = vr->gpu_handle;
     if(out_format) *out_format = vr->eve_format;
     if(out_stride) *out_stride = vr->stride;
-    lv_free(vr);
-    buf->vram_res = NULL;
+    /* The caller has the EVE memory now; the draw unit frees the rest */
+    vr->gpu_handle = GA_HANDLE_INVALID;
+    lv_draw_buf_release_vram(buf);
     return true;
 }
 #endif
@@ -955,7 +956,7 @@ static void delete_event_cb(lv_event_t * e)
 
     /* The swapchain descriptor belongs to the driver, vram_free_cb leaves it
      * alone, so detach it before destroying the buffer and its CPU backing */
-    drvr->full_buf->vram_res = NULL;
+    if(drvr->full_buf->vram_res == (lv_draw_buf_vram_res_t *)drvr->swapchain_res) drvr->full_buf->vram_res = NULL;
     lv_draw_buf_destroy(drvr->full_buf);
 #else
     /* The draw unit forgets the buffers: a rendered tile it hasn't handed

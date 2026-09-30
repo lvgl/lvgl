@@ -883,7 +883,7 @@ bool lv_draw_eve5_try_load_lvgl_bin_image(lv_draw_eve5_unit_t * u, const void * 
     uint32_t up_src_off = up_vr->source_offset;
     uint32_t up_pal_off = up_vr->palette_offset;
     lv_draw_eve5_res_set(u, &synth, NULL);
-    lv_free(up_vr);
+    lv_draw_eve5_res_destroy(up_vr);
 
     uint32_t base = EVE_GpuAlloc_Get(u->allocator, handle);
     if(base == GA_INVALID) {
@@ -1414,7 +1414,16 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu_ex(lv_draw_eve5_unit_t * u, con
         /* upload_image_to_gpu checks existing vram_res, uploads if needed,
          * and attaches vram_res to the image descriptor. */
         lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu_ex(u, resolved.img_dsc, true, premultiply);
-#if !LV_USE_DRAW_VRAM
+#if LV_USE_DRAW_VRAM
+        /* A decoder that doesn't cache what it decodes (ffmpeg's) frees it when
+         * closed: the upload is kept for this layer only. Not an image that is
+         * its own decoded image, nor the upload of the image a decoder's
+         * descriptor copies (lv_draw_buf_from_image). */
+        if(vr != NULL && resolved.decoder_open && resolved.decoder_dsc.cache_entry == NULL
+           && (const void *)resolved.img_dsc != src && vr->owner == (lv_draw_buf_t *)resolved.img_dsc) {
+            lv_draw_eve5_res_keep_for_layer(u, resolved.img_dsc, vr);
+        }
+#else
         /* The decoded pixels aren't kept: the upload is the source's EVE copy */
         if(vr != NULL) {
             lv_draw_eve5_res_set(u, resolved.img_dsc, NULL);
@@ -2044,7 +2053,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     decoded->data = NULL;
     decoded->unaligned_data = NULL;
     decoded->handlers = lv_draw_buf_get_image_handlers();
-    decoded->vram_res = (lv_draw_buf_vram_res_t *)vr;
+    lv_draw_eve5_res_set(u, decoded, vr);
 
     dsc->decoded = decoded;
 

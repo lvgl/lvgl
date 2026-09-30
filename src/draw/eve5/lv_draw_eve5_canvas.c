@@ -155,7 +155,7 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
     lv_eve5_vram_res_t * vr = eve5_get_vram_res(u, layer);
     bool attach = vr == NULL;
     if(attach) {
-        vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
+        vr = lv_malloc_zeroed(sizeof(lv_eve5_vram_res_t));
         if(vr == NULL) {
             return false;
         }
@@ -165,8 +165,19 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
         EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
     }
 
-    /* The pixels are the source's, premultiplied or not */
+    /* The pixels are the source's, premultiplied or not. The residency stays
+     * where it is in the draw unit's list. */
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_t * owner = vr->owner;
+    lv_eve5_vram_res_t * owner_prev = vr->owner_prev;
+    lv_eve5_vram_res_t * owner_next = vr->owner_next;
     *vr = *src_vr;
+    vr->owner = owner;
+    vr->owner_prev = owner_prev;
+    vr->owner_next = owner_next;
+#else
+    *vr = *src_vr;
+#endif
     vr->base.unit = (lv_draw_unit_t *)u;
     vr->has_content = true;
     if(attach) lv_draw_eve5_res_set(u, layer->draw_buf, vr);

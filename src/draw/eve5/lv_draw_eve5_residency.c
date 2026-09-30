@@ -1,13 +1,17 @@
 /**
  * @file lv_draw_eve5_residency.c
  *
- * EVE5 (BT820) Residency without LVGL's VRAM residency module
+ * EVE5 (BT820) Residency: the draw unit's record of its EVE copies
  *
  * With LV_USE_DRAW_VRAM, LVGL attaches the EVE copy of a buffer to the buffer
  * (vram_res), tells the draw unit when it destroys the buffer, and moves the
  * pixels between CPU memory and EVE memory when a draw unit or the CPU needs
- * them. Without it, the buffers are LVGL's own, in CPU memory, and the draw
- * unit records the EVE copies itself, by the address of what they copy:
+ * them. The draw unit keeps a list of the copies it attached, as LVGL never
+ * destroys some buffers (static ones, image descriptors in the program): it
+ * releases those when it's deleted (lv_deinit).
+ *
+ * Without it, the buffers are LVGL's own, in CPU memory, and the draw unit
+ * records the EVE copies itself, by the address of what they copy:
  *
  * - A child layer has no buffer: its render target is recorded by the layer,
  *   and freed when LVGL deletes the layer (LV_EVENT_CHILD_DELETED).
@@ -576,3 +580,87 @@ void lv_draw_eve5_res_deinit(lv_draw_eve5_unit_t * u)
 }
 
 #endif /* LV_USE_DRAW_EVE5 && !LV_USE_DRAW_VRAM */
+
+#if LV_USE_DRAW_EVE5 && LV_USE_DRAW_VRAM
+
+/* Take vr out of the list of residencies attached to buffers */
+static void owned_remove(lv_eve5_vram_res_t * vr)
+{
+    if(vr->owner == NULL) return;
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)vr->base.unit;
+    if(vr->owner_prev != NULL) vr->owner_prev->owner_next = vr->owner_next;
+    else u->owned_list = vr->owner_next;
+    if(vr->owner_next != NULL) vr->owner_next->owner_prev = vr->owner_prev;
+    vr->owner = NULL;
+    vr->owner_prev = NULL;
+    vr->owner_next = NULL;
+}
+
+void lv_draw_eve5_res_set(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vram_res_t * vr)
+{
+    lv_draw_buf_t * b = (lv_draw_buf_t *)buf;
+    lv_eve5_vram_res_t * old = (lv_eve5_vram_res_t *)b->vram_res;
+    /* A copy of another buffer's descriptor can hold the other's residency */
+    if(old != NULL && old != vr && old->owner == b) owned_remove(old);
+    b->vram_res = (lv_draw_buf_vram_res_t *)vr;
+    if(vr == NULL) return;
+    if(vr->owner == NULL) {
+        vr->owner_prev = NULL;
+        vr->owner_next = u->owned_list;
+        if(u->owned_list != NULL) u->owned_list->owner_prev = vr;
+        u->owned_list = vr;
+    }
+    vr->owner = b;
+}
+
+void lv_draw_eve5_res_destroy(lv_eve5_vram_res_t * vr)
+{
+    if(vr == NULL) return;
+    owned_remove(vr);
+    lv_free(vr);
+}
+
+void lv_draw_eve5_res_keep_for_layer(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vram_res_t * vr)
+{
+    lv_draw_eve5_res_set(u, buf, NULL);
+    owned_remove(vr);
+    vr->owner_next = u->layer_list;
+    u->layer_list = vr;
+}
+
+void lv_draw_eve5_res_release_layer(lv_draw_eve5_unit_t * u)
+{
+    while(u->layer_list != NULL) {
+        lv_eve5_vram_res_t * vr = u->layer_list;
+        u->layer_list = vr->owner_next;
+        /* ScopedFree: the layer's display lists may still be running */
+        EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
+        lv_free(vr);
+    }
+}
+
+void lv_draw_eve5_res_deinit(lv_draw_eve5_unit_t * u)
+{
+    lv_draw_eve5_res_release_layer(u);
+    lv_eve5_vram_res_t * vr = u->owned_list;
+    while(vr != NULL) {
+        lv_eve5_vram_res_t * next = vr->owner_next;
+        if(vr->owner->vram_res == (lv_draw_buf_vram_res_t *)vr) {
+            vr->owner->vram_res = NULL;
+            EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
+            lv_free(vr);
+        }
+        else {
+            /* Left as it is: the buffer was dropped or written anew without
+             * releasing it (lv_draw_buf_release_vram), and a copy of its
+             * descriptor may still hold it */
+            LV_LOG_WARN("EVE5: buffer %p lost its residency %p without releasing it",
+                        (void *)vr->owner, (void *)vr);
+        }
+        vr = next;
+    }
+    u->owned_list = NULL;
+    lv_draw_eve5_font_free_all(u);
+}
+
+#endif /* LV_USE_DRAW_EVE5 && LV_USE_DRAW_VRAM */

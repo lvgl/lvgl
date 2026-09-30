@@ -253,8 +253,9 @@ typedef struct lv_draw_eve5_font_vram_t {
     uint32_t glyph_count;           /**< Array size for glyph_offsets or glyph_handles */
     uint8_t bpp;                    /**< Bits per pixel (1/2/4/8) */
     bool whole_font;                /**< true = single allocation, false = per-glyph handles */
+    const void * dsc;               /**< The font descriptor, which holds the residency with LV_USE_DRAW_VRAM;
+                                         without, the key, and the font it was then: */
 #if !LV_USE_DRAW_VRAM
-    const void * dsc;               /**< The font descriptor, the key, and the font it was then: */
     LV_IMAGE_DSC_CONST void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, lv_draw_buf_t *);
     const void * glyph_bitmap;      /**< Bitmaps of a font in LVGL's format */
     int32_t line_height;
@@ -591,7 +592,10 @@ typedef struct {
 
     /* Asset caches */
     lv_draw_eve5_font_vram_t * font_list; /**< Head of intrusive list of resident fonts, most recent first */
-#if !LV_USE_DRAW_VRAM
+#if LV_USE_DRAW_VRAM
+    lv_eve5_vram_res_t * owned_list;      /**< The residencies attached to buffers (lv_draw_eve5_res_set) */
+    lv_eve5_vram_res_t * layer_list;      /**< Those of decoded images no buffer keeps, freed with the layer */
+#else
     uint32_t font_count;
 
     /* Residency without LVGL's VRAM residency module (lv_draw_eve5_residency.c) */
@@ -694,11 +698,15 @@ static inline lv_eve5_vram_res_t * lv_draw_eve5_res_get(lv_draw_eve5_unit_t * u,
     return buf ? (lv_eve5_vram_res_t *)((const lv_draw_buf_t *)buf)->vram_res : NULL;
 }
 
-static inline void lv_draw_eve5_res_set(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vram_res_t * vr)
-{
-    LV_UNUSED(u);
-    ((lv_draw_buf_t *)buf)->vram_res = (lv_draw_buf_vram_res_t *)vr;
-}
+/** Attach vr to buf, replacing any (not freed), or detach it with NULL. The draw
+ *  unit keeps the residencies it attached, to release them when it's deleted. */
+void lv_draw_eve5_res_set(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vram_res_t * vr);
+/** Free a residency, which the buffers it was attached to no longer hold */
+void lv_draw_eve5_res_destroy(lv_eve5_vram_res_t * vr);
+/** Keep a residency until the layer being rendered is finished, detached from buf */
+void lv_draw_eve5_res_keep_for_layer(lv_draw_eve5_unit_t * u, const void * buf, lv_eve5_vram_res_t * vr);
+/** Free the residencies kept for the layer, once it's finished */
+void lv_draw_eve5_res_release_layer(lv_draw_eve5_unit_t * u);
 
 /* The buffer a layer renders to */
 static inline const void * eve5_layer_key(const lv_layer_t * layer)
@@ -727,6 +735,11 @@ static inline lv_draw_eve5_font_vram_t * eve5_get_font_vram(lv_draw_eve5_unit_t 
 }
 #else
 lv_eve5_vram_res_t * lv_draw_eve5_res_get(lv_draw_eve5_unit_t * u, const void * key);
+/** Free a residency the draw unit no longer records */
+static inline void lv_draw_eve5_res_destroy(lv_eve5_vram_res_t * vr)
+{
+    lv_free(vr);
+}
 /** Record vr as the EVE copy of key, replacing any (not freed), or forget it with NULL */
 void lv_draw_eve5_res_set_kind(lv_draw_eve5_unit_t * u, const void * key, lv_eve5_vram_res_t * vr,
                                lv_draw_eve5_res_kind_t kind);
@@ -752,7 +765,6 @@ bool lv_draw_eve5_res_prepare_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 void lv_draw_eve5_res_event(lv_event_t * e);
 /** Refresh counting, for checking CPU memory once per refresh */
 void lv_draw_eve5_res_refresh_event(lv_event_t * e);
-void lv_draw_eve5_res_deinit(lv_draw_eve5_unit_t * u);
 /** Display hooks, see lv_eve5_set_vram_handlers */
 void lv_draw_eve5_res_attach_cb(lv_draw_unit_t * draw_unit, const void * key, lv_eve5_vram_res_t * vr);
 lv_eve5_vram_res_t * lv_draw_eve5_res_detach_cb(lv_draw_unit_t * draw_unit, const void * key);
@@ -764,8 +776,13 @@ static inline const void * eve5_layer_key(const lv_layer_t * layer)
 }
 
 lv_draw_eve5_font_vram_t * eve5_get_font_vram(lv_draw_eve5_unit_t * u, const lv_font_t * font);
-void lv_draw_eve5_font_free_all(lv_draw_eve5_unit_t * u);
 #endif
+
+/** Release what the draw unit still holds as it's deleted (lv_deinit): with
+ *  LV_USE_DRAW_VRAM, the residencies of the buffers and fonts LVGL never
+ *  destroys (static ones), detached from them; without, everything recorded */
+void lv_draw_eve5_res_deinit(lv_draw_eve5_unit_t * u);
+void lv_draw_eve5_font_free_all(lv_draw_eve5_unit_t * u);
 
 /* LVGL's VRAM residency module flags a buffer whose content was cleared
  * (CLEARZERO) or went stale (DISCARDABLE) without touching its EVE copy: the

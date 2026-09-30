@@ -365,6 +365,7 @@ static inline void font_attach(lv_draw_eve5_unit_t * u, const lv_font_t * font, 
 {
     LV_UNUSED(u);
     ((lv_font_dsc_base_t *)font->dsc)->vram_res = (struct _lv_draw_buf_vram_res_t *)fv;
+    if(fv != NULL) fv->dsc = font->dsc;
 }
 #else
 /* The bitmaps of a font in LVGL's format */
@@ -424,11 +425,19 @@ static void font_attach(lv_draw_eve5_unit_t * u, const lv_font_t * font, lv_draw
     }
 }
 
+#endif
+
 void lv_draw_eve5_font_free_all(lv_draw_eve5_unit_t * u)
 {
-    while(u->font_list != NULL) font_release(u, u->font_list);
-}
+    while(u->font_list != NULL) {
+#if LV_USE_DRAW_VRAM
+        /* A font LVGL never destroys (a static one) still holds it */
+        lv_font_dsc_base_t * dsc = (lv_font_dsc_base_t *)u->font_list->dsc;
+        if(dsc != NULL && dsc->vram_res == (struct _lv_draw_buf_vram_res_t *)u->font_list) dsc->vram_res = NULL;
 #endif
+        font_release(u, u->font_list);
+    }
+}
 
 /**
  * Ensure font VRAM residency. Creates or validates GPU state.

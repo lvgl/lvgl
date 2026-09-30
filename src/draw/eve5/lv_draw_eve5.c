@@ -140,9 +140,7 @@ static int32_t dispatch_nort(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t evaluate_nort(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
 
-#if !LV_USE_DRAW_VRAM
 static int32_t eve5_delete(lv_draw_unit_t * draw_unit);
-#endif
 
 static bool s_eve5_enabled = true;
 
@@ -220,8 +218,8 @@ void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
     /* LVGL tells the draw units about layers deleted, results it needs back
      * in a layer's buffer, and images dropped from its cache */
     unit->base_unit.event_cb = lv_draw_eve5_res_event;
-    unit->base_unit.delete_cb = eve5_delete;
 #endif
+    unit->base_unit.delete_cb = eve5_delete;
 
 #if EVE5_HW_IMAGE_DECODE
     lv_draw_eve5_register_image_decoder(unit);
@@ -258,20 +256,20 @@ void lv_draw_eve5_deinit(void)
     LV_LOG_INFO("EVE5: Draw unit deinitialized");
 }
 
-#if !LV_USE_DRAW_VRAM
-/* lv_deinit: the EVE memory the unit recorded goes with the allocator */
+/* lv_deinit: release what the unit still holds, as the allocator outlives it */
 static int32_t eve5_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+#if !LV_USE_DRAW_VRAM
     lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
     if(disp != NULL) {
         lv_eve5_set_vram_handlers(disp, NULL, NULL, NULL);
         lv_display_remove_event_cb_with_user_data(disp, lv_draw_eve5_res_refresh_event, u);
     }
+#endif
     lv_draw_eve5_res_deinit(u);
     return 0;
 }
-#endif
 
 void lv_draw_eve5_set_enabled(bool enabled)
 {
@@ -1745,6 +1743,9 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
     EVE_CoCmd_swap(phost);
 #if LV_DRAW_EVE5_SW_TEXTURES
     lv_draw_eve5_sw_release_textures(u);
+#endif
+#if LV_USE_DRAW_VRAM
+    lv_draw_eve5_res_release_layer(u);
 #endif
     /* No sync marker needed here: this is the pre-BT820 NORT path, where the
      * allocator is GA3 — frees ride the Update sweep below, not the sync

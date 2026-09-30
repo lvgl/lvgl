@@ -295,7 +295,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 
     lv_eve5_vram_res_t * vr = lv_draw_eve5_vram_create(u, buf->header.w, buf->header.h,
                                                        (lv_color_format_t)buf->header.cf, alloc_flags);
-    if(vr != NULL) buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
+    if(vr != NULL) lv_draw_eve5_res_set(u, buf, vr);
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
@@ -346,8 +346,8 @@ static void eve5_vram_free_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    lv_free(vr);
-    buf->vram_res = NULL;
+    lv_draw_eve5_res_set(u, buf, NULL);
+    lv_draw_eve5_res_destroy(vr);
 }
 
 static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
@@ -1024,6 +1024,10 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 #if LV_DRAW_EVE5_SW_TEXTURES
     /* Done with the SW textures the passes of this layer drew */
     lv_draw_eve5_sw_release_textures(u);
+#endif
+#if LV_USE_DRAW_VRAM
+    /* and with the images decoded for it that nothing keeps */
+    lv_draw_eve5_res_release_layer(u);
 #endif
 
     /* In FULL mode the screen layer renders directly into SWAPCHAIN_0, so the
