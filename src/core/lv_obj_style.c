@@ -127,7 +127,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
         lv_obj_invalidate(obj);
     }
 
-    bool trans_removed = remove_trans_styles(obj, selector, LV_STYLE_PROP_ANY, NULL);
+    bool trans_removed = remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
 
     /*Try removing the style first to be sure it won't be added twice*/
     lv_obj_remove_style(obj, style, selector);
@@ -199,7 +199,7 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
     }
 
     /*Similar to lv_obj_add_style, delete transition*/
-    bool trans_removed = remove_trans_styles(obj, selector, LV_STYLE_PROP_ANY, NULL);
+    bool trans_removed = remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
 
     bool replaced = false;
     uint32_t i;
