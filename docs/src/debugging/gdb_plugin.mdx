@@ -426,9 +426,9 @@ multi-process systems, use `--pid` to specify the target process.
 
 ## Data Export API
 
-Each wrapper class provides a `snapshot()` method that returns a `Snapshot
+Each wrapper class provides a `snapshot()` method that returns a `Snapshot`
 object containing a pure Python dict (JSON-serializable) plus an optional
-reference to the original wrapper via source`.
+reference to the original wrapper via `source`.
 
 ```python
 from lvglgdb import LVTimer, curr_inst

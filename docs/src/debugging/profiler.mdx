@@ -27,10 +27,10 @@ To enable the profiler, set <ApiLink name="LV_USE_PROFILER" /> in `lv_conf.h` an
 1. Enable the built-in profiler functionality by setting <ApiLink name="LV_USE_PROFILER_BUILTIN" />. If you have POSIX environment support, you can enable <ApiLink name="LV_USE_PROFILER_BUILTIN_POSIX" />.
 2. Buffer configuration: Set the value of <ApiLink name="LV_PROFILER_BUILTIN_BUF_SIZE" /> to configure the buffer size. A larger buffer can store more trace event information, reducing interference with rendering. However, it also results in higher memory consumption.
 3. Timestamp configuration: LVGL uses the <ApiLink name="lv_tick_get" /> function with a precision of 1ms by default to obtain timestamps when events occur. Therefore, it cannot accurately measure intervals below 1ms. If your system environment can provide higher precision (e.g., 1us), you can configure the profiler as follows:
-   
+
    - Recommended configuration in **Arduino** environments:
-   
-```c   
+
+```c
 static uint64_t my_get_tick_cb(void)
 {
     /* Use the microsecond time stamp provided by Arduino */
@@ -48,8 +48,8 @@ void my_profiler_init(void)
 ```
 
 4. Log output configuration: LVGL uses the <ApiLink name="LV_LOG" /> interface by default to output trace information. If you want to use another interface to output log information (e.g. stdout), you can redirect the log output using the following code:
-   
-```c   
+
+```c
 static void my_log_print_cb(const char * buf)
 {
     printf("%s", buf);
@@ -100,7 +100,7 @@ LVGL-1 [0] 2892.003573: tracing_mark_write: E|1|lv_draw_rect
 ...
 ```
 
-Import the processed [trace.systrace` file into `Perfetto](https://ui.perfetto.dev) and wait for it to be parsed.
+Import the processed `trace.systrace` file into [Perfetto](https://ui.perfetto.dev) and wait for it to be parsed.
 
 ### Performance analysis
 
@@ -169,7 +169,7 @@ Please check the completeness of the logs. If the logs are incomplete, it may be
 ### Function execution time displayed as 0s in Perfetto
 
 If the function execution time is lower than the precision of the timestamps, this situation can occur. You can refer to the configuration instructions above to use a higher precision timestamp.
-See Configuration_ for an example of this.
+See [Configuration](#configuration) for an example of this.
 
 ### Significant stuttering occurs during profiling
 

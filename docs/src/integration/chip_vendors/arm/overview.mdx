@@ -43,7 +43,7 @@ AC6 is not free, but it offers a community license that can be activated as foll
 
 ## IDE Support
 
-There are no limitations on the supported IDEs. LVGL works in various vendors' IDEs, including Arm's Keil MDK, IAR, Renesas's e2 studio, NXP's MCUXpresso, ST's CubeIDE, as well as custom make or CMake projects.
+There are no limitations on the supported IDEs. LVGL works in various vendors' IDEs, including Arm's Keil MDK, IAR, Renesas's e² studio, NXP's MCUXpresso, ST's CubeIDE, as well as custom make or CMake projects.
 
 ## Arm2D and the Helium instruction set
 
@@ -85,7 +85,7 @@ however, ensure that only `Arm-2D/Library/Source` is compiled.
 
 <Step>
 **Add CMSIS DSP**: The CMSIS DSP library also needs to be added to the project. You can use
-CMSIS-PACKS or add it manually.
+CMSIS-Packs or add it manually.
 </Step>
 
 <Step>
@@ -113,7 +113,7 @@ LVGL has built-in support to improve the performance of software rendering by ut
 
 ## Architecture Support
 
-Both 32-bit and 64-bit ARM architectures are supported. Simply set <ApiLink name="LV_USE_DRAW_SW_ASM" /> to <ApiLink name="LV_DRAW_SW_ASM_NEON" /> in `lv_conf`.
+Both 32-bit and 64-bit ARM architectures are supported. Simply set <ApiLink name="LV_USE_DRAW_SW_ASM" /> to <ApiLink name="LV_DRAW_SW_ASM_NEON" /> in `lv_conf.h`.
 
 <Callout type="info">
 All ARM Cortex-A and Cortex-R 64-bit processors include Neon support as a mandatory feature starting with the ARMv8 architecture specification. This makes Neon acceleration universally available on all 64-bit ARM platforms, including current and future ARM architectures.

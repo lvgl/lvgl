@@ -90,7 +90,7 @@ A few terms are useful to know:
 - **`defconfig`** — a short config that stores only the options you changed from
   their defaults. It is a handy, reusable "preset" (see [Presets](#presets-defconfigs)).
 
-When LVGL is part of a bigger Kconfig-based project. In that case the parent
+When LVGL is part of a bigger Kconfig-based project, the parent
 project's tools configure LVGL for you by including LVGL's `Kconfig` file.
 For example, under ESP-IDF you run `idf.py menuconfig`. The details depend on
 the project, so they are not covered here.
@@ -123,7 +123,7 @@ With the tools installed you can now use them in two ways:
 
 #### Option 1: Generate a header file from your `.config`
 
-Here you let Kconfig create a normal `.h` file and tell LVGL to include it. 
+Here you let Kconfig create a normal `.h` file and tell LVGL to include it.
 
 1. Create your configuration:
 
@@ -182,10 +182,10 @@ Use one of them as a starting point for your project:
 ```bash
 cd <lvgl_repo>
 defconfig configs/defconfigs/sdl2.defconfig # generates a .config from the sdl2 preset
-menuconfig # update it so it fits your projects needs
+menuconfig # update it so it fits your project's needs
 ```
 
-Or build diretly from one with `-DLV_BUILD_DEFCONFIG_PATH`:
+Or build directly from one with `-DLV_BUILD_DEFCONFIG_PATH`:
 
 ```bash
 cmake -B build -DLV_BUILD_USE_KCONFIG=ON -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/sdl2.defconfig
@@ -208,7 +208,7 @@ cmake --build build
 ### Editing a configuration that came from a defconfig
 
 When using one or multiple defconfigs, LVGL merges them into `build/.config`.
-You can then edit that file by hand or with `menuconfig`. On the next 
+You can then edit that file by hand or with `menuconfig`. On the next
 `cmake --build build` the change is picked up
 
 ```bash
@@ -229,7 +229,7 @@ what you need.
 
 <Callout type="info" title="Replaces LV_CONF_MINIMAL">
   Earlier versions had an `LV_CONF_MINIMAL` switch. It has been removed in favor
-  of this defconfig. See the [migration guide](/migration-v10#minimal-configuration).
+  of this defconfig. See the [migration guide](/changelog/migration-v10#minimal-configuration).
 </Callout>
 
 ### Creating your own preset
@@ -242,7 +242,7 @@ menuconfig                                  # make your changes
 savedefconfig                               # writes ./defconfig (non-default values only)
 cp defconfig configs/defconfigs/my_defconfig
 # Build LVGL from it
-cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/my_defconfig
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/my_defconfig
 cmake --build build
 ```
 

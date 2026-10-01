@@ -8,7 +8,7 @@ A minimal framebuffer driver for EVE FT81x smart display controllers. Works for 
 For a faster, GPU-accelerated alternative that drives the same EVE chips, see the
 [EVE External GPU Renderer](/integration/external_display_controllers/eve/gpu).
 
-Single-buffered partial render mode supported for now. It may not support DSPI or QSPI currently.
+Single-buffered partial render mode is supported for now. It may not support DSPI or QSPI currently.
 
 Tested at 32 MHz on ft812 and at 23 MHz on bt817.
 
@@ -18,7 +18,7 @@ Tested at 32 MHz on ft812 and at 23 MHz on bt817.
 #define FB_SIZE             800 * 2 * 50
 #define MAX_TRANSFER_SIZE   FB_SIZE
 
-static void spi_cb(lv_display_t * disp, lv_ft81x_spi_operation operation, void * data, uint32_t length)
+static void spi_cb(lv_display_t * disp, lv_ft81x_spi_operation_t operation, void * data, uint32_t length)
 {
     spi_device_handle_t spi = lv_ft81x_get_user_data(disp);
     switch(operation) {

@@ -6,7 +6,7 @@ description: "Linear or circular scale with configurable range, ticks, labels, a
 ## Overview
 
 The Scale widget shows linear or circular scales with configurable ranges,
-tick counts, placement, labeling, and subsections ([Sections](/widgets/scale))
+tick counts, placement, labeling, and subsections ([Sections](#sections))
 with custom styling.
 
 ## Mode
@@ -131,7 +131,7 @@ lv_scale_section_t * sec = lv_scale_add_section(scale);
 lv_scale_section_set_range(sec, 80, 100);
 ```
 
-A fresh section has range `[0..0]` and no styles, so it won't draw until
+A fresh section has range `[0..-1]` and no styles, so it won't draw until
 both are set. Setting a range outside the scale's own range silently
 hides the section — a quick way to toggle it off
 (<ApiLink name="lv_scale_section_set_range" display="lv_scale_section_set_range(sec, 0, -1)" />).

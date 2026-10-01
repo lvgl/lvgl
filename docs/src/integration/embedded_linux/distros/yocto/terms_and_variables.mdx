@@ -1,10 +1,10 @@
 ---
 title: Yocto Project Terms
-description: Getting started in Yocto can be overwhelming. There are many terms used that are specific to Yocto and Bitbake environment.
+description: Getting started in Yocto can be overwhelming. There are many terms used that are specific to Yocto and BitBake environment.
 ---
 
 Getting started in Yocto can be overwhelming. There are many terms used that are
-specific to Yocto and Bitbake environment.
+specific to Yocto and BitBake environment.
 
 A list of terms and definitions users new to the Yocto Project
 development environment might find helpful can be found [here](https://docs.yoctoproject.org/ref-manual/terms.html).
@@ -93,14 +93,14 @@ ${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/${PN}/${EXTENDPE}${PV}-${PR}
 The actual directory depends on several things:
 
 -  **TMPDIR**: The top-level build output directory
-   -  **MULTIMACH_TARGET_SYS**: The target system identifier
-   -  **PN**: The recipe name
-   -  **EXTENDPE**: The epoch — if PE is not specified, which is usually the
-      case for most recipes, then EXTENDPE is blank.
-   -  **PV**: The recipe version
-   -  **PR**: The recipe revision
+-  **MULTIMACH_TARGET_SYS**: The target system identifier
+-  **PN**: The recipe name
+-  **EXTENDPE**: The epoch — if PE is not specified, which is usually the
+   case for most recipes, then EXTENDPE is blank.
+-  **PV**: The recipe version
+-  **PR**: The recipe revision
 
-As an example, assume a Source Directory top-level folder name poky, a default
+As an example, assume a Source Directory top-level folder named poky, a default
 Build Directory at poky/build, and a qemux86-poky-linux machine target system.
 Furthermore, suppose your recipe is named foo_1.3.0-r0.bb. In this case, the
 work directory the build system uses to build the package would be as follows:

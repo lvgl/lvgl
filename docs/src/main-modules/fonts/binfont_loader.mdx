@@ -13,7 +13,7 @@ to have a special binary format. (Not TTF or WOFF). Use
 ## Loading from File
 
 <Callout type="tip">
-To load a font [LVGL's filesystem](/main-modules/fs) needs to be enabled and a driver must be added. 
+To load a font [LVGL's filesystem](/main-modules/fs) needs to be enabled and a driver must be added.
 </Callout>
 
 This is how you can use it in practice:
@@ -35,7 +35,7 @@ This function may be useful to load a font from an external file system, which i
 supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
 
 <Callout type="tip">
-To load a font from a buffer [LVGL's filesystem](/main-modules/fs) needs to be enabled and the MEMFS driver must be added. 
+To load a font from a buffer [LVGL's filesystem](/main-modules/fs) needs to be enabled and the MEMFS driver must be added.
 </Callout>
 
 This is how you can use it in practice:
@@ -49,7 +49,7 @@ uint32_t bufsize;
 ...
 
 /* Load font from the buffer */
-my_font = lv_binfont_create_from_buffer((void *)buf, buf));
+my_font = lv_binfont_create_from_buffer((void *)buf, bufsize);
 if(my_font == NULL) return;
 /* Use the font */
 
@@ -74,11 +74,11 @@ This is decided per font, so a font that is drawn constantly can be loaded norma
 rarely used one is loaded dynamically. It works with both plain and compressed fonts.
 
 <Callout type="tip">
-The font file is kept open for as long as the font is alive. `lv_binfont_destroy()` closes it. 
+The font file is kept open for as long as the font is alive. `lv_binfont_destroy()` closes it.
 </Callout>
 
 <Callout type="warn">
-Every drawn glyph costs a seek and a read in the font file, so the file system should be reasonably fast. 
+Every drawn glyph costs a seek and a read in the font file, so the file system should be reasonably fast.
 </Callout>
 
 This is how you can use it in practice:

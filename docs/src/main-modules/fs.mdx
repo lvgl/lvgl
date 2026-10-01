@@ -7,7 +7,7 @@ LVGL has a "File system" abstraction module that enables you to attach
 any type of file system.  A file system is identified by an assigned
 identifier letter.  For example, if an SD card is associated with the letter
 `'S'`, a file can be reached using `"S:/path/to/file.txt"`.  See details
-under [Identifier Letters](/main-modules/fs).
+under [Identifier Letters](#identifier-letters).
 
 <Callout type="info">
 If you want to skip the drive-letter prefix in Unix-like paths, you can use the
@@ -30,7 +30,7 @@ the appropriate registered file-system driver for a given path.
 
 You register a driver for your file system and assign it an identifier letter.  This
 letter must be unique among all registered file-system drivers, and in the range [A-Z]
-or the character '/'.  See [Adding a Driver](/main-modules/fs) for how this is done.
+or the character '/'.  See [Adding a Driver](#adding-a-driver) for how this is done.
 
 Later, when using paths to files on your file system, you prefix the path with that
 identifier character plus a colon (':').
@@ -54,6 +54,7 @@ then the path strings you pass to `lv_fs_...()` functions would look like this:
      driver (i.e. set of functions) that apply to that file system.
 ```
 
+Note also that the path can be a relative path or a "rooted path" (beginning with
 `/`), though rooted paths are recommended since the driver does not yet provide a
 way to set the default directory.
 
@@ -114,7 +115,7 @@ supported.
 
 ### Implementing the callbacks
 
-##### Open callback
+#### Open callback
 
 The prototype of `open_cb` looks like this:
 
@@ -144,7 +145,7 @@ the data to write, `btw` is the number of "bytes to write", `bw` is the number o
 "bytes written" (written to during the function call).
 
 For a list of prototypes for these callbacks see
-[lv_fs_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_fs_template.c).
+[lv_port_fs_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_fs_template.c).
 This file also provides a template for new file-system drivers you can use if the
 one you need is not already provided.
 
@@ -175,12 +176,12 @@ If you are using one of the following file-system drivers:
 
 you will have a `LV_FS_xxx_PATH` macro available to you in `lv_conf.h` that you
 can use to provide a path that gets dynamically prefixed to the `path_to_file`
-portion of of the path strings provided to `lv_fs_...()` functions when files and
+portion of the path strings provided to `lv_fs_...()` functions when files and
 directories are opened.  This can be useful to limit directory access (e.g. when a
 portion of a path can be typed by an end user), or simply to reduce the length of the
 path strings provided to `lv_fs_...()` functions.
 
-Do this by filling in the full path to the directory you wish his access to be
+Do this by filling in the full path to the directory you wish access to be
 limited to in the applicable `LV_FS_xxx_PATH` macro in `lv_conf.h`.  Do not
 prefix the path with the driver-identifier letter, and do append a directory
 separator character at the end.
@@ -287,7 +288,7 @@ The implementation is documented below. Note that the FS functions make calls
 to other driver FS functions when the cache is enabled. i.e., `lv_fs_read` may call the driver's `seek`
 so the driver needs to implement more callbacks when the cache is enabled.
 
-### `lv_fs_read` :sub:`(behavior when cache is enabled)`
+### `lv_fs_read` (behavior when cache is enabled)
 
 ```mermaid
 %%{init: {'theme':'neutral'}}%%
@@ -334,18 +335,18 @@ flowchart LR
 
 (Use mouse wheel to zoom in, and drag image to pan it.)
 
-### `lv_fs_write` :sub:`(behavior when cache is enabled)`
+### `lv_fs_write` (behavior when cache is enabled)
 
 The part of the cache that coincides with the written content
 will be updated to reflect the written content.
 
-### `lv_fs_seek` :sub:`(behavior when cache is enabled)`
+### `lv_fs_seek` (behavior when cache is enabled)
 
 The driver's `seek` will not actually be called unless the `whence`
 is <ApiLink name="LV_FS_SEEK_END" />, in which case `seek` and `tell` will be called
 to determine where the end of the file is.
 
-### `lv_fs_tell` :sub:`(behavior when cache is enabled)`
+### `lv_fs_tell` (behavior when cache is enabled)
 
 The driver's `tell` will not actually be called.
 
