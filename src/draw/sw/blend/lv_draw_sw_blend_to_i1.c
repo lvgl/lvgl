@@ -9,6 +9,8 @@
 #include "lv_draw_sw_blend_to_i1.h"
 #if LV_USE_DRAW_SW
 
+#if LV_DRAW_SW_SUPPORT_I1
+
 #include "lv_draw_sw_blend_private.h"
 
 
@@ -47,7 +49,7 @@ static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(lv_draw_sw_blend_imag
                                                            const uint8_t src_px_size);
 #endif
 
-#if LV_DRAW_SW_SUPPORT_ARGB8888
+#if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc,
                                                              bool premultiplied);
 #endif
@@ -728,7 +730,7 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
 }
 #endif
 
-#if LV_DRAW_SW_SUPPORT_ARGB8888
+#if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc,
                                                        bool premultiplied)
 {
@@ -1288,6 +1290,8 @@ static inline lv_color16_t LV_ATTRIBUTE_FAST_MEM lv_color16_from_u16(uint16_t ra
     c.blue = raw & 0x1F;
     return c;
 }
+#endif
+
 #endif
 
 #endif
