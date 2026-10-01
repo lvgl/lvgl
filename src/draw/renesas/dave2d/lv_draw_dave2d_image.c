@@ -213,6 +213,12 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     if(LV_COLOR_FORMAT_RGB565 == cf) {
         d2_settextureoperation(u->d2_handle, d2_to_replace, d2_to_copy, d2_to_copy, d2_to_copy);
     }
+    else if(LV_COLOR_FORMAT_A8 == cf) {
+        d2_settexopparam(u->d2_handle, d2_cc_red, draw_dsc->recolor.red, 0);
+        d2_settexopparam(u->d2_handle, d2_cc_green, draw_dsc->recolor.green, 0);
+        d2_settexopparam(u->d2_handle, d2_cc_blue, draw_dsc->recolor.blue, 0);
+        d2_settextureoperation(u->d2_handle, d2_to_multiply, d2_to_replace, d2_to_replace, d2_to_replace);
+    }
     else { //Formats with an alpha channel,
         d2_settextureoperation(u->d2_handle, d2_to_multiply, d2_to_copy, d2_to_copy, d2_to_copy);
     }
