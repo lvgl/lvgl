@@ -2,8 +2,8 @@
 """
 Build and run the QEMU instruction-count benchmark.
 
-This script starts tests/perf_qemu/Dockerfile, builds LVGL once per target and
-runs the benchmarks in parallel.
+This script runs inside the container from tests/perf_qemu/Dockerfile, which run.sh
+starts; it builds LVGL once per target and runs the benchmarks in parallel.
 """
 
 from __future__ import annotations
