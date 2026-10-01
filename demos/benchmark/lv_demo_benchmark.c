@@ -507,7 +507,7 @@ void lv_demo_benchmark_scene(uint32_t scene)
     benchmark_start(scene, scene);
 }
 
-uint32_t lv_demo_benchmark_get_scene_act(void)
+uint32_t lv_demo_benchmark_get_current_scene(void)
 {
     return scene_act;
 }

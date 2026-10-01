@@ -4,7 +4,7 @@
  *
  * The counts come from the display's RENDER_START and RENDER_READY events, so they are the
  * rendering only and exclude the demo's own scene setup. Each frame is charged to
- * lv_demo_benchmark_get_scene_act(), and the reported figure is the mean over that scene's
+ * lv_demo_benchmark_get_current_scene(), and the reported figure is the mean over that scene's
  * frames, because the demo plays each scene for a fixed number of milliseconds rather than
  * a fixed number of frames.
  */
@@ -25,7 +25,7 @@ static void render_event_cb(lv_event_t * e)
         g_frame_start = plat_instr();
     }
     else if(code == LV_EVENT_RENDER_READY) {
-        uint32_t scene = lv_demo_benchmark_get_scene_act();
+        uint32_t scene = lv_demo_benchmark_get_current_scene();
         if(scene < MAX_SCENES) {
             g_instr[scene] += plat_instr() - g_frame_start;
             g_count[scene]++;
