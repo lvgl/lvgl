@@ -1269,6 +1269,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 break;
             case LV_STYLE_TRANSITION:
             case LV_STYLE_TEXT_FONT:
+            case LV_STYLE_BG_IMAGE_SRC:
                 if(v < 255) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
@@ -1278,6 +1279,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 else if(v < 128) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
+            /*Colors*/
             case LV_STYLE_RECOLOR:
             case LV_STYLE_BG_COLOR:
             case LV_STYLE_BG_GRAD_COLOR:
@@ -1289,6 +1291,30 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 if(v <= 0) value_final.color = tr->start_value.color;
                 else if(v >= 255) value_final.color = tr->end_value.color;
                 else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
+                break;
+            /*Opacities*/
+            case LV_STYLE_OPA:
+            case LV_STYLE_OPA_LAYERED:
+            case LV_STYLE_RECOLOR_OPA:
+            case LV_STYLE_COLOR_FILTER_OPA:
+            case LV_STYLE_BG_OPA:
+            case LV_STYLE_BG_GRAD_OPA:
+            case LV_STYLE_BG_MAIN_OPA:
+            case LV_STYLE_BG_IMAGE_OPA:
+            case LV_STYLE_BG_IMAGE_RECOLOR_OPA:
+            case LV_STYLE_BORDER_OPA:
+            case LV_STYLE_OUTLINE_OPA:
+            case LV_STYLE_SHADOW_OPA:
+            case LV_STYLE_LINE_OPA:
+            case LV_STYLE_ARC_OPA:
+            case LV_STYLE_TEXT_OPA:
+            case LV_STYLE_IMAGE_OPA:
+            case LV_STYLE_IMAGE_RECOLOR_OPA:
+            case LV_STYLE_DROP_SHADOW_OPA:
+            case LV_STYLE_TEXT_OUTLINE_STROKE_OPA:
+                if(v <= 0) value_final.num = tr->start_value.num;
+                else if(v >= 255) value_final.num = tr->end_value.num;
+                else value_final.num =  LV_CLAMP(0, tr->start_value.num + ((tr->end_value.num - tr->start_value.num) * v >> 8), 255);
                 break;
 
             default:
