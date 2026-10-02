@@ -59,4 +59,54 @@ void test_update_layer_type_on_state_change(void)
 
 }
 
+/**
+ * Regression test: lv_draw_sw_transform() must not crash at a zero (or
+ * negative) scale.
+ *
+ * transform_point_upscaled() maps destination pixels back into source
+ * space by dividing by draw_dsc->scale_x/scale_y. Before the fix that
+ * division had no zero-guard, so a scale of exactly 0 crashed with a
+ * divide-by-zero the instant a fold/scale-down animation finished.
+ *
+ * Higher-level callers are expected to skip drawing entirely at a
+ * non-positive scale (e.g. lv_draw_layer() forces an empty clip area
+ * instead of ever reaching this function - see test_draw_layer_scale_zero_no_leak
+ * in test_draw_layer.c), but this exercises the guard directly so the
+ * function is safe regardless of caller, and confirms it's a true no-op
+ * (the destination buffer is left untouched).
+ */
+void test_transform_zero_scale_no_div_by_zero(void)
+{
+    uint8_t src_buf[10 * 10 * 4];
+    lv_memset(src_buf, 0xAA, sizeof(src_buf));
+
+    uint8_t dest_buf[10 * 10 * 4];
+    uint8_t sentinel[10 * 10 * 4];
+    lv_memset(dest_buf, 0x55, sizeof(dest_buf));
+    lv_memset(sentinel, 0x55, sizeof(sentinel));
+
+    lv_area_t dest_area = { 0, 0, 9, 9 };
+
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
+
+    lv_draw_image_sup_t sup;
+    lv_memzero(&sup, sizeof(sup));
+
+    static const int32_t scale_x[] = { 0,   0, -5, 256 };
+    static const int32_t scale_y[] = { 0, -20,  0,  -1 };
+    uint32_t i;
+    for(i = 0; i < sizeof(scale_x) / sizeof(scale_x[0]); i++) {
+        dsc.scale_x = scale_x[i];
+        dsc.scale_y = scale_y[i];
+
+        /*Must not crash - that alone is the regression check.*/
+        lv_draw_sw_transform(&dest_area, src_buf, 10, 10, 10 * 4, &dsc, &sup,
+                             LV_COLOR_FORMAT_ARGB8888, dest_buf);
+
+        /*And it must be a true no-op: nothing visible at this scale, so nothing should be drawn.*/
+        TEST_ASSERT_EQUAL_UINT8_ARRAY(sentinel, dest_buf, sizeof(dest_buf));
+    }
+}
+
 #endif
