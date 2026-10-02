@@ -151,6 +151,14 @@ struct _lv_obj_t {
 
 
     /**
+     * When a widget needs to be redrawn its current area will be invalidated.
+     * This flag indicates that further change doesn't requires invalidation as
+     * intermediate changes are not rendered immediately only when an actual rendering happens.
+     * Before rendering when this flag is set the final area will be invalidated too.
+     */
+    uint16_t redraw_requested : 1;
+
+    /**
      * Shows that the coordinates of the widget or its children needs to be recalculated
      * when X, Y, width height, layout other related property changes.
      */
