@@ -144,6 +144,7 @@ void lv_draw_dma2d_deinit(void)
 #if LV_DRAW_DMA2D_ASYNC
     lv_result_t res = lv_thread_sync_delete(&g_unit->interrupt_signal);
     LV_ASSERT(res == LV_RESULT_OK);
+    LV_UNUSED(res);
 
     g_unit = NULL;
 #endif
