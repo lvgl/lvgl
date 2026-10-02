@@ -35,7 +35,9 @@ ESP-IDF does not route these trace hooks, so on ESP-IDF 5.2 or newer LVGL reads 
 idle tasks' run time counters instead, on every core. Enable
 `CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS` in menuconfig
 (`Component config → FreeRTOS → Kernel`); without it, LVGL cannot see the idle time and
-the performance monitor reports 100% CPU usage.
+the performance monitor reports 100% CPU usage. This needs ESP-IDF's default FreeRTOS
+kernel; with `CONFIG_FREERTOS_SMP` enabled, provide your own implementation as described
+below.
 
 Alternatively, on multi-core environments (like the ESP32 SMP), this default
 implementation can be insufficient or inaccurate. In this case, you can set

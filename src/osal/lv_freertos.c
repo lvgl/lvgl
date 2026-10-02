@@ -17,7 +17,7 @@
 
 #ifdef ESP_PLATFORM
     #include <freertos/atomic.h>
-    #include "esp_idf_version.h"
+    #include <esp_idf_version.h>
 #else
     #include <atomic.h>
 #endif
@@ -447,7 +447,8 @@ uint32_t lv_os_get_idle_percent(void)
 {
     if(globals->freertos_non_idle_time_sum + globals->freertos_idle_time_sum == 0) {
 #ifdef ESP_PLATFORM
-        LV_LOG_WARN("Idle time is not tracked. Enable CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS (ESP-IDF 5.2+)");
+        LV_LOG_WARN("Idle time is not tracked. Needs ESP-IDF 5.2+, CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS "
+                    "and a non-SMP kernel, or a custom lv_os_get_idle_percent() (LV_OS_IDLE_PERCENT_CUSTOM)");
 #else
         LV_LOG_WARN("Not enough time elapsed to provide idle percentage");
 #endif
