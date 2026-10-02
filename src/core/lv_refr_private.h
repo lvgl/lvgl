@@ -49,6 +49,8 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p);
 
 /**
  * Drop every invalidated area of a display, so nothing is redrawn because of them.
+ * It also drops the redraw requests the Widgets have made but the refresh has not turned
+ * into areas yet, so the display really is left with nothing to redraw.
  * @param disp pointer to a display (NULL can be used if there is only one display)
  */
 void lv_refr_clear_invalid_areas(lv_display_t * disp);
