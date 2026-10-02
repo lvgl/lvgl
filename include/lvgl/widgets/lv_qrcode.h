@@ -98,6 +98,15 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 void lv_qrcode_set_data(lv_obj_t * obj, const char * data);
 
 /**
+ * Get the payload of a QR code object.
+ * @param obj      pointer to a QR code object
+ * @param data_len where to store the payload length in bytes @nullable
+ * @return the stored payload, or NULL if none has been set. It is owned by the Widget and
+ *         is replaced by the next `lv_qrcode_update()`. It is not NUL terminated.
+ */
+const void * lv_qrcode_get_data(lv_obj_t * obj, uint32_t * data_len);
+
+/**
  * (Re)generate the QR code bitmap from the payload that is already stored.
  * Unlike `lv_qrcode_update()` this needs no payload, so it is the way to apply property
  * changes made in LV_QRCODE_UPDATE_MODE_DEFERRED: set the size and quiet zone, then call

@@ -30,18 +30,12 @@
 static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_barcode_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h);
-static void lv_barcode_clear(lv_obj_t * obj);
+static bool barcode_resize(lv_obj_t * obj);
+static void barcode_clear(lv_obj_t * obj);
 static bool barcode_store_data(lv_barcode_t * barcode, const char * data);
-static void barcode_forget_data(lv_barcode_t * barcode);
-static void barcode_drop_encoded(lv_barcode_t * barcode);
-static uint8_t * barcode_encode(const lv_barcode_t * barcode, int32_t * bar_count);
-static bool barcode_fit(lv_obj_t * obj);
-static bool barcode_fit_needed(lv_obj_t * obj);
-static bool barcode_fit_only(lv_obj_t * obj);
-static lv_result_t barcode_fill(lv_obj_t * obj);
-static lv_result_t barcode_render(lv_obj_t * obj);
-static lv_result_t barcode_mark_dirty(lv_obj_t * obj);
+static uint8_t * barcode_encode_data(const char * data, lv_barcode_encoding_t encoding, int32_t * bar_count);
+static void barcode_mark_dirty(lv_obj_t * obj);
+static lv_result_t barcode_generate(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -51,7 +45,10 @@ const lv_obj_class_t lv_barcode_class = {
     .constructor_cb = lv_barcode_constructor,
     .destructor_cb = lv_barcode_destructor,
     .event_cb = lv_barcode_event,
+    /*As long as the bars need, and thick enough to be scannable out of the box. The
+     *thickness is a plain size, so lv_obj_set_height() overrides it as usual.*/
     .width_def = LV_SIZE_CONTENT,
+    .height_def = LV_DPI_DEF,
     .instance_size = sizeof(lv_barcode_t),
     .base_class = &lv_canvas_class,
     .name = "lv_barcode",
@@ -73,16 +70,83 @@ lv_obj_t * lv_barcode_create(lv_obj_t * parent)
     return obj;
 }
 
+void lv_barcode_set_size(lv_obj_t * obj, int32_t size)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG_MSG(size > 0, return, "size must be at least 1");
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+
+    if(barcode->size == size) return;
+
+    const int32_t old_size = barcode->size;
+    barcode->size = size;
+    if(!barcode_resize(obj)) {
+        /*Put back what the canvas still holds, so asking for this size again retries*/
+        barcode->size = old_size;
+        return;
+    }
+
+    /*The new buffer is empty; regenerate the bars into it*/
+    barcode_mark_dirty(obj);
+}
+
+void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+
+    if(barcode->scale == scale) return;
+    barcode->scale = scale;
+    barcode_mark_dirty(obj);
+}
+
+void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG_MSG(direction == LV_DIR_HOR || direction == LV_DIR_VER, return,
+                     "direction must be LV_DIR_HOR or LV_DIR_VER");
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+
+    if(barcode->direction == direction) return;
+
+    /*The canvas is one pixel thick, so the two directions need a different buffer*/
+    const lv_dir_t old_direction = barcode->direction;
+    barcode->direction = direction;
+    if(!barcode_resize(obj)) {
+        /*Put back what the canvas still holds, so asking for this direction again retries*/
+        barcode->direction = old_direction;
+        return;
+    }
+
+    barcode_mark_dirty(obj);
+}
+
+void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+
+    if(barcode->encoding == encoding) return;
+    barcode->encoding = encoding;
+    barcode_mark_dirty(obj);
+}
+
 void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
+    /*Nothing to do if the color is unchanged: skip the palette write and cache drop*/
     if(lv_color_eq(barcode->dark_color, color)) return;
     barcode->dark_color = color;
 
-    /*Write the palette now so the color also applies to bars that are already drawn*/
+    /*Apply the color right away so it takes effect even if the bars have already been
+     *generated (e.g. the color is set after the data)*/
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     if(draw_buf == NULL) return;
     lv_canvas_set_palette(obj, 1, lv_color_to_32(color, LV_OPA_COVER));
@@ -95,93 +159,54 @@ void lv_barcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
+    /*Nothing to do if the color is unchanged: skip the palette write and cache drop*/
     if(lv_color_eq(barcode->light_color, color)) return;
     barcode->light_color = color;
 
-    /*Write the palette now so the color also applies to bars that are already drawn*/
+    /*Apply the color right away so it takes effect even if the bars have already been
+     *generated (e.g. the color is set after the data)*/
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     if(draw_buf == NULL) return;
     lv_canvas_set_palette(obj, 0, lv_color_to_32(color, LV_OPA_COVER));
     lv_image_cache_drop(draw_buf);
 }
 
-void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_CHECK_ARG(scale > 0, return);
-
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    if(barcode->scale == scale) return;
-    barcode->scale = scale;
-    barcode_mark_dirty(obj);
-}
-
-void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    if(barcode->direction == direction) return;
-    barcode->direction = direction;
-    barcode_mark_dirty(obj);
-}
-
-void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    if((bool)barcode->tiled == tiled) return;
-    barcode->tiled = tiled;
-    lv_image_set_inner_align(obj, tiled ? LV_IMAGE_ALIGN_TILE : LV_IMAGE_ALIGN_DEFAULT);
-    barcode_mark_dirty(obj);
-}
-
-void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    if(barcode->encoding == encoding) return;
-    barcode->encoding = encoding;
-    barcode_drop_encoded(barcode);
-    barcode_mark_dirty(obj);
-}
-
-lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
+lv_result_t lv_barcode_set_data(lv_obj_t * obj, const char * data)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(data != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG_MSG(data != NULL, return LV_RESULT_INVALID, "data must not be NULL");
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
+    /*Empty data encodes to the guard bars alone, which is not a barcode anyone wants.
+     *Forget what was there and show nothing.*/
     if(data[0] == '\0') {
-        LV_LOG_WARN("data is empty");
-        barcode_forget_data(barcode);
+        LV_LOG_WARN("data is empty, clearing the barcode");
+        lv_free(barcode->data);
+        barcode->data = NULL;
         barcode->needs_update = false;
         barcode->render_valid = false;
-        lv_barcode_clear(obj);
+        barcode_clear(obj);
         return LV_RESULT_INVALID;
     }
 
+    /*Keep a copy of the data so a later property change can regenerate the bars*/
     if(!barcode_store_data(barcode, data)) return LV_RESULT_INVALID;
 
-    return barcode_mark_dirty(obj);
+    /*New data leaves the bitmap out of date, and makes any earlier failure moot*/
+    barcode->needs_update = true;
+    barcode->render_valid = true;
+
+    /*Setting the data always generates right away, in either update mode*/
+    return lv_barcode_render(obj);
 }
 
 lv_result_t lv_barcode_render(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
 
-    lv_result_t res = barcode_render(obj);
-
-    if(res != LV_RESULT_OK) lv_barcode_clear(obj);
-    else lv_obj_invalidate(obj);
-
+    lv_result_t res = barcode_generate(obj);
+    lv_obj_invalidate(obj);
     return res;
 }
 
@@ -191,8 +216,12 @@ void lv_barcode_set_update_mode(lv_obj_t * obj, lv_barcode_update_mode_t mode)
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
-    if(mode == LV_BARCODE_UPDATE_MODE_IMMEDIATE && barcode->needs_update && barcode->data != NULL) {
-        if(lv_barcode_render(obj) != LV_RESULT_OK) {
+    /*Going back to immediate mode has to apply whatever was deferred, but this setter
+     *returns void, so a failure would be dropped. Warn and generate anyway: the order that
+     *can report the failure is lv_barcode_render() first, then switch mode.*/
+    if(mode == LV_BARCODE_UPDATE_MODE_IMMEDIATE && barcode->needs_update) {
+        barcode_generate(obj);
+        if(!barcode->render_valid) {
             LV_LOG_ERROR("regenerating on the switch to immediate update mode failed; "
                          "call lv_barcode_render() before switching the mode to get the result");
         }
@@ -200,6 +229,7 @@ void lv_barcode_set_update_mode(lv_obj_t * obj, lv_barcode_update_mode_t mode)
             LV_LOG_WARN("switching to immediate update mode while the bitmap was out of date; "
                         "call lv_barcode_render() before switching the mode to get the result");
         }
+        lv_obj_invalidate(obj);
     }
 
     barcode->update_mode = mode;
@@ -219,6 +249,46 @@ bool lv_barcode_is_render_valid(lv_obj_t * obj)
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     return barcode->render_valid;
+}
+
+const char * lv_barcode_get_data(lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    return barcode->data;
+}
+
+int32_t lv_barcode_get_size(lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    return barcode->size;
+}
+
+uint16_t lv_barcode_get_scale(lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    return barcode->scale;
+}
+
+lv_dir_t lv_barcode_get_direction(lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return LV_DIR_HOR);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    return barcode->direction;
+}
+
+lv_barcode_encoding_t lv_barcode_get_encoding(lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return LV_BARCODE_ENCODING_CODE128_GS1);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    return barcode->encoding;
 }
 
 lv_color_t lv_barcode_get_dark_color(lv_obj_t * obj)
@@ -241,22 +311,6 @@ lv_color_t lv_barcode_get_light_color(lv_obj_t * obj)
     return barcode->light_color;
 }
 
-uint16_t lv_barcode_get_scale(lv_obj_t * obj)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
-
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-    return barcode->scale;
-}
-
-lv_barcode_encoding_t lv_barcode_get_encoding(const lv_obj_t * obj)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
-
-    const lv_barcode_t * barcode = (const lv_barcode_t *)obj;
-    return barcode->encoding;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -270,17 +324,22 @@ static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     barcode->dark_color = lv_color_black();
     barcode->light_color = lv_color_white();
     barcode->data = NULL;
-    barcode->pattern = NULL;
-    barcode->bar_count = 0;
-    barcode->scale = 1;
+    barcode->size = 0;
+    barcode->scale = 0;
     barcode->direction = LV_DIR_HOR;
     barcode->encoding = LV_BARCODE_ENCODING_CODE128_GS1;
-    barcode->tiled = false;
     barcode->update_mode = LV_BARCODE_UPDATE_MODE_IMMEDIATE;
     barcode->needs_update = false;
-    barcode->render_valid = false;   /*Nothing generated yet*/
-    barcode->fitting = false;
-    lv_image_set_inner_align(obj, LV_IMAGE_ALIGN_DEFAULT);
+    /*No bitmap has been generated yet, so there is nothing valid to report*/
+    barcode->render_valid = false;
+
+    /*The canvas holds a strip one pixel thick and the tiling repeats it across whatever
+     *thickness the application gives the Widget*/
+    lv_image_set_inner_align(obj, LV_IMAGE_ALIGN_TILE);
+
+    /*Set default size. Code 128 needs 11 modules per character plus 35 for the guards and
+     *the checksum, so a smaller default would not hold a payload worth encoding.*/
+    lv_barcode_set_size(obj, LV_DPI_DEF * 2);
 }
 
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
@@ -289,7 +348,8 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_ASSERT(obj != NULL);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
-    barcode_forget_data(barcode);
+    lv_free(barcode->data);
+    barcode->data = NULL;
 
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     if(draw_buf == NULL) return;
@@ -302,6 +362,7 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 static void lv_barcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
+    LV_ASSERT(e != NULL);
 
     lv_event_code_t code = lv_event_get_code(e);
 
@@ -309,31 +370,25 @@ static void lv_barcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_result_t res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RESULT_OK) return;
 
-    lv_obj_t * obj = lv_event_get_current_target(e);
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    if(code == LV_EVENT_SIZE_CHANGED) {
-        /*Refitting reallocates the canvas, which is itself a content size change and comes
-         *back here: `fitting` catches that echo within the call, barcode_fit_needed() the
-         *one a layout pass later. An out of date bitmap is always refitted, so a size that
-         *could not be fitted before gets another go.*/
-        if(!barcode->fitting && (barcode->needs_update || barcode_fit_needed(obj))) {
-            barcode_mark_dirty(obj);
-        }
-    }
-    else if(code == LV_EVENT_DRAW_MAIN_BEGIN) {
-        /*A failed state is not retried here; only a change makes the Widget try again*/
+    if(code == LV_EVENT_DRAW_MAIN_BEGIN) {
+        lv_obj_t * obj = lv_event_get_current_target(e);
+        lv_barcode_t * barcode = (lv_barcode_t *)obj;
+        /*A state that already failed is not retried here: it can only start working again
+         *when a property changes, and that sets `render_valid` again.*/
         if(barcode->needs_update && barcode->render_valid) {
+            /*Only deferred mode leaves the bitmap out of date; immediate mode regenerates in the setter*/
             LV_ASSERT(barcode->update_mode == LV_BARCODE_UPDATE_MODE_DEFERRED);
 
-            /*Safe: the setter already resized the canvas, so nothing is reallocated here*/
-            LV_LOG_WARN("filling in the barcode during the redraw because lv_barcode_render() "
-                        "was not called after the property changes; this adds the work to the "
-                        "refresh and its result cannot be reported");
+            /*Deferred mode expects an explicit lv_barcode_render() once the properties are
+             *set. Generating here still produces the right bitmap, but it charges the work
+             *to this refresh and there is no caller left to return the result to.*/
+            LV_LOG_WARN("regenerating the barcode during the redraw because "
+                        "lv_barcode_render() was not called after the property changes; this adds the "
+                        "work to the refresh and its result cannot be reported");
 
-            if(barcode_fill(obj) != LV_RESULT_OK) {
-                barcode->render_valid = false;
-                LV_LOG_ERROR("the barcode could not be filled in during the redraw "
+            if(barcode_generate(obj) != LV_RESULT_OK) {
+                /*Nothing here can return the failure to the application, so report it*/
+                LV_LOG_ERROR("the barcode could not be regenerated during the redraw "
                              "(scale %d, %s); the bitmap is left blank",
                              (int)barcode->scale, barcode->direction == LV_DIR_VER ? "vertical" : "horizontal");
             }
@@ -341,25 +396,20 @@ static void lv_barcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
 }
 
-static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
+/**
+ * Give the canvas the geometry the current size and direction ask for: a strip one pixel
+ * thick and `size` long. The thickness comes from the image tiling, not from the buffer,
+ * so nothing here depends on the Widget's own size.
+ */
+static bool barcode_resize(lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(obj);
-    if(w <= 0 || h <= 0) {
-        LV_LOG_WARN("invalid size: %" LV_PRId32 " x %" LV_PRId32, w, h);
-        return false;
-    }
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+
+    const bool hor = (barcode->direction == LV_DIR_HOR);
+    const int32_t w = hor ? barcode->size : 1;
+    const int32_t h = hor ? 1 : barcode->size;
 
     lv_draw_buf_t * old_buf = lv_canvas_get_draw_buf(obj);
-
-    /*Reuse the buffer at an unchanged geometry, to avoid the invalidation and relayout a
-     *reallocation triggers*/
-    if(old_buf != NULL &&
-       (int32_t)old_buf->header.w == w &&
-       (int32_t)old_buf->header.h == h &&
-       old_buf->header.cf == LV_COLOR_FORMAT_I1) {
-        return true;
-    }
-
     lv_draw_buf_t * new_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_I1, LV_STRIDE_AUTO);
     if(new_buf == NULL) {
         LV_LOG_ERROR("malloc failed for canvas buffer");
@@ -367,19 +417,21 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
     }
 
     lv_canvas_set_draw_buf(obj, new_buf);
-    LV_LOG_INFO("set canvas buffer: %p, width = %" LV_PRId32, (void *)new_buf, w);
+    LV_LOG_INFO("set canvas buffer: %p, size = %" LV_PRId32 " x %" LV_PRId32, (void *)new_buf, w, h);
+
+    /*Clear canvas buffer*/
+    lv_draw_buf_clear(new_buf, NULL);
 
     if(old_buf != NULL) lv_draw_buf_destroy(old_buf);
     return true;
 }
 
-static void lv_barcode_clear(lv_obj_t * obj)
+static void barcode_clear(lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT(obj != NULL);
+
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
-    if(!draw_buf) {
-        return;
-    }
+    if(draw_buf == NULL) return;
 
     lv_draw_buf_clear(draw_buf, NULL);
     lv_image_cache_drop(draw_buf);
@@ -388,6 +440,9 @@ static void lv_barcode_clear(lv_obj_t * obj)
 
 static bool barcode_store_data(lv_barcode_t * barcode, const char * data)
 {
+    LV_ASSERT(barcode != NULL);
+    LV_ASSERT(data != NULL);
+
     const size_t len = lv_strlen(data);
 
     /*Assign only on success, so a failed realloc leaves the previous data owned by
@@ -400,29 +455,17 @@ static bool barcode_store_data(lv_barcode_t * barcode, const char * data)
     new_data[len] = '\0';
 
     barcode->data = new_data;
-
-    barcode_drop_encoded(barcode);
     return true;
 }
 
-static void barcode_forget_data(lv_barcode_t * barcode)
+/**
+ * Turn the data into one byte per bar: 0 for a light bar, non-zero for a dark one.
+ * @return the bars, to be freed by the caller, or NULL if the data cannot be encoded
+ */
+static uint8_t * barcode_encode_data(const char * data, lv_barcode_encoding_t encoding, int32_t * bar_count)
 {
-    lv_free(barcode->data);
-    barcode->data = NULL;
-    barcode_drop_encoded(barcode);
-}
-
-static void barcode_drop_encoded(lv_barcode_t * barcode)
-{
-    lv_free(barcode->pattern);
-    barcode->pattern = NULL;
-    barcode->bar_count = 0;
-}
-
-static uint8_t * barcode_encode(const lv_barcode_t * barcode, int32_t * bar_count)
-{
-    const char * data = barcode->data;
-    LV_ASSERT_NULL(data);
+    LV_ASSERT(data != NULL);
+    LV_ASSERT(bar_count != NULL);
 
     size_t len = code128_estimate_len(data);
     LV_LOG_INFO("data: %s, len = %zu", data, len);
@@ -435,12 +478,12 @@ static uint8_t * barcode_encode(const lv_barcode_t * barcode, int32_t * bar_coun
     }
 
     int32_t w = 0;
-    switch(barcode->encoding) {
+    switch(encoding) {
         case LV_BARCODE_ENCODING_CODE128_GS1:
-            w = (int32_t) code128_encode_gs1(data, (char *)pattern, len);
+            w = (int32_t)code128_encode_gs1(data, (char *)pattern, len);
             break;
         case LV_BARCODE_ENCODING_CODE128_RAW:
-            w = (int32_t) code128_encode_raw(data, (char *)pattern, len);
+            w = (int32_t)code128_encode_raw(data, (char *)pattern, len);
             break;
         default:
             LV_ASSERT(false);
@@ -458,198 +501,96 @@ static uint8_t * barcode_encode(const lv_barcode_t * barcode, int32_t * bar_coun
     return pattern;
 }
 
-static bool barcode_fit(lv_obj_t * obj)
+static void barcode_mark_dirty(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
-    if(barcode->bar_count == 0) {
-        barcode->pattern = barcode_encode(barcode, &barcode->bar_count);
-        if(barcode->pattern == NULL) return false;
-    }
+    /*Nothing to regenerate until there is data*/
+    if(barcode->data == NULL) return;
 
-    const int32_t bar_count = barcode->bar_count;
-    const int32_t scale = barcode->scale;
-
-    if(bar_count > INT32_MAX / scale) {
-        LV_LOG_WARN("%" LV_PRId32 " bars at scale %" LV_PRId32 " do not fit an int32_t",
-                    bar_count, scale);
-        return false;
-    }
-    const int32_t bars_px = bar_count * scale;
-
-    int32_t buf_w;
-    int32_t buf_h;
-
-    if(barcode->tiled) {
-        buf_w = (barcode->direction == LV_DIR_HOR) ? bars_px : 1;
-        buf_h = (barcode->direction == LV_DIR_VER) ? bars_px : 1;
-    }
-    else {
-        lv_obj_update_layout(obj);
-        buf_w = (barcode->direction == LV_DIR_HOR) ? bars_px : lv_obj_get_width(obj);
-        buf_h = (barcode->direction == LV_DIR_VER) ? bars_px : lv_obj_get_height(obj);
-    }
-
-    /*Reallocating changes the content size, which comes straight back as SIZE_CHANGED*/
-    barcode->fitting = true;
-    bool ok = lv_barcode_change_buf_size(obj, buf_w, buf_h);
-    barcode->fitting = false;
-
-    return ok;
-}
-
-static bool barcode_fit_needed(lv_obj_t * obj)
-{
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    if(barcode->data == NULL) return false;
-
-    if(barcode->tiled) return false;
-
-    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
-    if(draw_buf == NULL) return true;
-
-    const bool hor = (barcode->direction == LV_DIR_HOR);
-    const int32_t have = hor ? (int32_t)draw_buf->header.h : (int32_t)draw_buf->header.w;
-    const int32_t want = hor ? lv_obj_get_height(obj) : lv_obj_get_width(obj);
-    return have != want;
-}
-
-static bool barcode_fit_only(lv_obj_t * obj)
-{
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    barcode->render_valid = false;
     barcode->needs_update = true;
 
-    if(barcode->data == NULL) return false;
-    if(!barcode_fit(obj)) return false;
-
+    /*The property change may well make the bars fit again, so allow a new attempt*/
     barcode->render_valid = true;
-    return true;
+
+    /*Deferred mode collapses several changes into one regeneration on the next redraw*/
+    if(barcode->update_mode == LV_BARCODE_UPDATE_MODE_IMMEDIATE) barcode_generate(obj);
+
+    lv_obj_invalidate(obj);
 }
 
-static lv_result_t barcode_fill(lv_obj_t * obj)
+static lv_result_t barcode_generate(lv_obj_t * obj)
 {
+    LV_ASSERT(obj != NULL);
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
+
+    /*Start invalid and settle both flags only on the single success path, so no early
+     *return can forget to record the outcome. `needs_update` deliberately survives a
+     *failure: the bitmap still does not match the properties, and reporting it as up to
+     *date would be a lie. A cleared `render_valid` is what keeps the draw hook from
+     *retrying a known-bad state on every frame; a property change sets it again to allow a
+     *new attempt. Failures are never logged here - the result is returned, and it is up to
+     *the caller to report it if nothing else will.*/
+    barcode->render_valid = false;
 
     if(barcode->data == NULL) return LV_RESULT_INVALID;
 
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     if(draw_buf == NULL) return LV_RESULT_INVALID;
 
-    uint8_t * pattern = barcode->pattern;
-    barcode->pattern = NULL;
-    if(pattern == NULL) {
-        pattern = barcode_encode(barcode, &barcode->bar_count);
-        if(pattern == NULL) return LV_RESULT_INVALID;
-    }
+    lv_draw_buf_clear(draw_buf, NULL);
+    /*Set the palette directly on the draw buffer to avoid an extra invalidation here;
+     *the caller (or the draw pass) takes care of refreshing the object*/
+    lv_draw_buf_set_palette(draw_buf, 0, lv_color_to_32(barcode->light_color, LV_OPA_COVER));
+    lv_draw_buf_set_palette(draw_buf, 1, lv_color_to_32(barcode->dark_color, LV_OPA_COVER));
+    lv_image_cache_drop(draw_buf);
 
-    const int32_t bar_count = barcode->bar_count;
-    const int32_t scale = barcode->scale;
-    const int32_t buf_w = (int32_t)draw_buf->header.w;
-    const int32_t buf_h = (int32_t)draw_buf->header.h;
+    int32_t bar_count = 0;
+    uint8_t * pattern = barcode_encode_data(barcode->data, barcode->encoding, &bar_count);
+    if(pattern == NULL) return LV_RESULT_INVALID;
 
-    const int32_t avail = (barcode->direction == LV_DIR_HOR) ? buf_w : buf_h;
-    if(bar_count > INT32_MAX / scale || bar_count * scale > avail) {
-        LV_LOG_WARN("the bars (%" LV_PRId32 " x %" LV_PRId32 " px) do not fit the %"
-                    LV_PRId32 " px canvas", bar_count, scale, avail);
+    /*The buffer is what the bars have to fit, which is the size the last resize managed*/
+    const bool hor = (barcode->direction == LV_DIR_HOR);
+    const int32_t avail = hor ? (int32_t)draw_buf->header.w : (int32_t)draw_buf->header.h;
+
+    /*Canvas pixels per bar. A fitted scale of zero means not even a one pixel wide bar
+     *fits, which would leave the bitmap blank, so report that instead of succeeding.*/
+    const int32_t scale = barcode->scale ? barcode->scale : avail / bar_count;
+    if(scale <= 0 || bar_count > avail / scale) {
+        LV_LOG_WARN("%" LV_PRId32 " bars of %" LV_PRId32 " px do not fit %" LV_PRId32 " px",
+                    bar_count, scale, avail);
         lv_free(pattern);
         return LV_RESULT_INVALID;
     }
 
+    /*Centre the bars in the leftover space, as the QR code does*/
+    const int32_t margin = (avail - bar_count * scale) / 2;
+
     /*Temporarily disable invalidation to improve the efficiency of lv_canvas_set_px*/
     lv_display_enable_invalidation(lv_obj_get_display(obj), false);
 
-    uint32_t stride = draw_buf->header.stride;
-    const lv_color_t color = lv_color_hex(1);
+    const lv_color_t color = lv_color_hex(1);   /*Palette index 1, the dark color*/
 
-    lv_draw_buf_clear(draw_buf, NULL);
-
-    /*Set the palette on the draw buffer, not via lv_canvas_set_palette(), to avoid an
-     *invalidation here - the caller or the draw pass refreshes the object*/
-    lv_draw_buf_set_palette(draw_buf, 0, lv_color_to_32(barcode->light_color, LV_OPA_COVER));
-    lv_draw_buf_set_palette(draw_buf, 1, lv_color_to_32(barcode->dark_color, LV_OPA_COVER));
-
-    for(int32_t x = 0; x < bar_count; x++) {
-        /*skip empty data*/
-        if(pattern[x] == 0) {
-            continue;
-        }
+    for(int32_t bar = 0; bar < bar_count; bar++) {
+        /*A light bar is already there: the buffer was cleared to palette index 0*/
+        if(pattern[bar] == 0) continue;
 
         for(int32_t i = 0; i < scale; i++) {
-            int32_t offset = x * scale + i;
-            if(barcode->direction == LV_DIR_HOR) {
-                lv_canvas_set_px(obj, offset, 0, color, LV_OPA_COVER);
-            }
-            else { /*LV_DIR_VER*/
-                if(barcode->tiled) {
-                    lv_canvas_set_px(obj, 0, offset, color, LV_OPA_COVER);
-                }
-                else {
-                    uint8_t * dest = lv_draw_buf_goto_xy(draw_buf, 0, offset);
-                    lv_memset(dest, 0xFF, stride);
-                }
-            }
-        }
-    }
-
-    if(!barcode->tiled && barcode->direction == LV_DIR_HOR && buf_h > 1) {
-        int32_t h = buf_h - 1;
-        const uint8_t * src = lv_draw_buf_goto_xy(draw_buf, 0, 0);
-        uint8_t * dest = lv_draw_buf_goto_xy(draw_buf, 0, 1);
-        while(h--) {
-            lv_memcpy(dest, src, stride);
-            dest += stride;
+            const int32_t px = margin + bar * scale + i;
+            if(hor) lv_canvas_set_px(obj, px, 0, color, LV_OPA_COVER);
+            else lv_canvas_set_px(obj, 0, px, color, LV_OPA_COVER);
         }
     }
 
     lv_display_enable_invalidation(lv_obj_get_display(obj), true);
-    lv_image_cache_drop(draw_buf);
 
     lv_free(pattern);
 
+    /*Only now does the bitmap match the properties*/
     barcode->needs_update = false;
     barcode->render_valid = true;
     return LV_RESULT_OK;
-}
-
-static lv_result_t barcode_render(lv_obj_t * obj)
-{
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    /*Start invalid so no early return can forget to record a failure; only barcode_fill()'s
-     *success path sets `render_valid`. `needs_update` survives a failure on purpose - the
-     *bitmap still does not match the properties - and a cleared `render_valid` keeps the
-     *draw hook from retrying a known-bad state every frame. Nothing is logged here: the
-     *result is returned, and the caller reports it if nothing else will.*/
-    barcode->render_valid = false;
-    barcode->needs_update = true;
-
-    if(barcode->data == NULL) return LV_RESULT_INVALID;
-    if(!barcode_fit(obj)) return LV_RESULT_INVALID;
-
-    return barcode_fill(obj);
-}
-
-static lv_result_t barcode_mark_dirty(lv_obj_t * obj)
-{
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
-    if(barcode->data == NULL) return LV_RESULT_INVALID;
-
-    /*The change may well make the data encodable again, so allow a new attempt*/
-    barcode->render_valid = true;
-
-    /*The canvas is resized in both modes, because the draw pass cannot do it*/
-    const bool ok = (barcode->update_mode == LV_BARCODE_UPDATE_MODE_IMMEDIATE)
-                    ? (barcode_render(obj) == LV_RESULT_OK)
-                    : barcode_fit_only(obj);
-
-    if(ok) lv_obj_invalidate(obj);
-    else lv_barcode_clear(obj);
-
-    return ok ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
 #endif /*LV_USE_BARCODE*/
