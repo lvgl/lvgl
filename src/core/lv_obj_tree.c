@@ -741,7 +741,13 @@ static void obj_delete_core(lv_obj_t * obj)
             disp->screens[i] = disp->screens[i + 1];
         }
         disp->screen_cnt--;
-        disp->screens = lv_realloc(disp->screens, disp->screen_cnt * sizeof(lv_obj_t *));
+        lv_obj_t ** new_screens = lv_realloc(disp->screens, disp->screen_cnt * sizeof(lv_obj_t *));
+        if(new_screens != NULL) {
+            disp->screens = new_screens;
+        }
+        else {
+            LV_LOG_INFO("Failed to shrink the screen array");
+        }
     }
     /*Remove the object from the child list of its parent*/
     else {
