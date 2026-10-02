@@ -123,6 +123,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
     }
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LINE);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        lv_free(new_points);
+        LV_PROFILER_DRAW_END;
+        return;
+    }
     lv_draw_line_dsc_t * line_draw_dsc = t->draw_dsc;
     lv_memcpy(line_draw_dsc, dsc, sizeof(*dsc));
     line_draw_dsc->points = new_points;
