@@ -488,7 +488,7 @@ void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size)
                 }
                 else {
                     /*Use the name as it is as a fallback*/
-                    lv_strlcpy(buf, obj->spec_attr->name, buf_size);
+                    lv_strlcpy(buf, name, buf_size);
                 }
                 break;
             }
@@ -515,7 +515,7 @@ void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size)
     }
     else {
         /*Just use the set name*/
-        lv_strlcpy(buf, obj->spec_attr->name, buf_size);
+        lv_strlcpy(buf, name, buf_size);
     }
 }
 
