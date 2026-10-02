@@ -465,6 +465,10 @@ static void transform_and_recolor(lv_layer_t * layer, const lv_draw_image_dsc_t 
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     LV_ASSERT_MALLOC(transformed_buf);
+    if(!transformed_buf) {
+        LV_LOG_WARN("failed to allocate buffer for transformation");
+        return;
+    }
 
     blend_dsc.src_buf = transformed_buf;
     blend_dsc.src_color_format = cf_final;
