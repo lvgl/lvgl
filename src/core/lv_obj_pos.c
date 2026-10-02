@@ -1017,8 +1017,13 @@ lv_result_t lv_obj_invalidate(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
 
+    /*Already invalidated*/
+    if(obj->redraw_requested) return LV_RESULT_OK;
+
     lv_display_t * disp = lv_obj_get_display(obj);
     if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
+
+    obj->redraw_requested = 1;
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
