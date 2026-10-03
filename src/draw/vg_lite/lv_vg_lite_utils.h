@@ -111,12 +111,6 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf);
 
 vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf);
 
-void lv_vg_lite_buffer_format_bytes(
-    vg_lite_buffer_format_t format,
-    uint32_t * mul,
-    uint32_t * div,
-    uint32_t * bytes_align);
-
 uint32_t lv_vg_lite_width_to_stride(uint32_t w, vg_lite_buffer_format_t color_format);
 
 void lv_vg_lite_buffer_init(
