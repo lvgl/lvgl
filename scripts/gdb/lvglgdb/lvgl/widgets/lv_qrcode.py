@@ -32,7 +32,7 @@ class LVQrcode(LVCanvas):
 
     @property
     def data_len(self):
-        """Stored payload length in bytes"""
+        """Stored payload length in bytes, including the stored NUL if there is one"""
         return int(self._wv_lv_qrcode_t.safe_field("data_len", 0))
 
     @property
