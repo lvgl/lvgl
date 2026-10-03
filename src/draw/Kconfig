@@ -230,6 +230,10 @@ menu "EVE"
 rsource "eve/Kconfig"
 endmenu
 
+menu "EVE5"
+rsource "eve5/Kconfig"
+endmenu
+
 menu "G2D"
 rsource "nxp/g2d/Kconfig"
 endmenu

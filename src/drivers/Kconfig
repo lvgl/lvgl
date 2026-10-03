@@ -1,5 +1,6 @@
 menu "Drivers"
 rsource "display/drm/Kconfig"
+rsource "display/eve5/Kconfig"
 rsource "display/fb/Kconfig"
 rsource "display/ft81x/Kconfig"
 rsource "display/lovyan_gfx/Kconfig"
