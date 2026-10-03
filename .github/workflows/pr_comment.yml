@@ -3,7 +3,7 @@ name: PR Report Comment
 # Renders a single PR comment from the report artifacts that other workflows
 # upload.
 #
-# Producers write a JSON file using `pr_report.py` library and upload it as 
+# Producers write a JSON file using `pr_report.py` library and upload it as
 # an artifact whose name starts with `pr-report`
 #
 # To add a section, list the producing workflow below and have it upload its
@@ -16,6 +16,7 @@ on:
       - "Static Checks"
       - "Emulated Performance Test"
       - "Memory Usage"
+      - "QEMU Emulated Render Performance"
     types:
       - completed
 
@@ -55,7 +56,7 @@ jobs:
             fs.mkdirSync('reports', { recursive: true });
             let found = 0;
 
-            // Interate oldest to newest so we always get the latest results
+            // Iterate oldest to newest so we always get the latest results
             for (const run of runs.reverse()) {
               const artifacts = await github.paginate(
                 github.rest.actions.listWorkflowRunArtifacts,
