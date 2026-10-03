@@ -160,22 +160,19 @@ bool lv_wayland_dmabuf_buffer_is_ready(const lv_wayland_dmabuf_buffer_t * buf);
 /**
  * @brief Attach a buffer to a surface and mark it busy.
  *
- * Wraps wl_surface_attach() + wl_surface_damage() + wl_surface_commit(),
- * setting buf->busy = true beforehand so the caller can immediately treat the
- * buffer as in-flight. buf->busy is cleared later by the release listener
- * registered in lv_wayland_dmabuf_create_buffer(), when the compositor sends
+ * Wraps wl_surface_attach() + wl_surface_commit(), setting buf->busy = true
+ * beforehand so the caller can immediately treat the buffer as in-flight.
+ * buf->busy is cleared later by the release listener registered in
+ * lv_wayland_dmabuf_create_buffer(), when the compositor sends
  * wl_buffer::release.
  *
  * @param ctx      DMA-BUF context
  * @param surface  wl_surface to attach the buffer to
  * @param buf      per-buffer protocol state; caller must ensure
  *                 lv_wayland_dmabuf_buffer_is_valid(buf) is true
- * @param width    damage width in pixels
- * @param height   damage height in pixels
  */
 void lv_wayland_dmabuf_buffer_attach(lv_wayland_dmabuf_ctx_t * ctx, struct wl_surface * surface,
-                                     lv_wayland_dmabuf_buffer_t * buf,
-                                     uint32_t width, uint32_t height);
+                                     lv_wayland_dmabuf_buffer_t * buf);
 
 #endif /*LV_WAYLAND_USE_DMABUF_PROTOCOL*/
 
