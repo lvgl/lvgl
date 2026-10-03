@@ -124,7 +124,7 @@ LV_IMAGE_DECLARE(test_RGB888_LZ4_align64);
 LV_IMAGE_DECLARE(test_XRGB8888_LZ4_align64);
 LV_IMAGE_DECLARE(test_ARGB8888_LZ4_align64);
 
-static const void * c_array_images[sizeof(stride_align)][sizeof(compressions)][sizeof(color_formats)] = {
+static LV_IMAGE_DSC_CONST void * c_array_images[sizeof(stride_align)][sizeof(compressions)][sizeof(color_formats)] = {
     {
         {
             &test_I1_NONE_align1,
@@ -236,7 +236,7 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-static void img_create(const char * name, const void * img_src, bool rotate, bool recolor)
+static void img_create(const char * name, LV_IMAGE_DSC_CONST void * img_src, bool rotate, bool recolor)
 {
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, 120, LV_SIZE_CONTENT);
@@ -273,7 +273,7 @@ static void c_array_image_create(bool rotate, bool recolor, int align, int compr
     char name[32];
     for(unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
         lv_snprintf(name, sizeof(name), "%s%s", compressions[compress], color_formats[i]);
-        const void * src = c_array_images[align][compress][i];
+        LV_IMAGE_DSC_CONST void * src = c_array_images[align][compress][i];
         img_create(name, src, rotate, recolor);
     }
 }

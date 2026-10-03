@@ -35,7 +35,7 @@ struct _lv_dropdown_t {
     lv_obj_t obj;
     lv_obj_t * list;                /**< The dropped down list*/
     char * text;                    /**< Text to display on the dropdown's button*/
-    const void * symbol;            /**< Arrow or other icon when the drop-down list is closed*/
+    LV_IMAGE_DSC_CONST void * symbol;            /**< Arrow or other icon when the drop-down list is closed*/
     char * options;                 /**< Options in a '\n' separated list*/
 #if LV_USE_TRANSLATION
     char * text_translation_tag;    /**< Translation tag for the button's text*/

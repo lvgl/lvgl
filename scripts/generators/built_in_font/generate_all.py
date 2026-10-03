@@ -38,6 +38,26 @@ def run(cmd, description):
     # run from the asset directory and keep every path in it a bare file name
     subprocess.run(cmd, cwd=SCRIPT_DIR, check=True)
 
+    # lv_font_conv emits a plain const font descriptor. With LV_USE_DRAW_VRAM the
+    # descriptor has to be writable so a draw unit can attach VRAM residency, so
+    # give the definition a LV_FONT_DSC_CONST branch (see lv_font.h)
+    dsc_const = (
+        "#if LVGL_VERSION_MAJOR >= 8\n"
+        "static const lv_font_fmt_txt_dsc_t font_dsc = {\n"
+    )
+    dsc_const_vram = (
+        "/*Writable with LV_USE_DRAW_VRAM so a draw unit can attach VRAM residency, see LV_FONT_DSC_CONST*/\n"
+        "#ifdef LV_FONT_DSC_CONST\n"
+        "static LV_FONT_DSC_CONST lv_font_fmt_txt_dsc_t font_dsc = {\n"
+        "#elif LVGL_VERSION_MAJOR >= 8\n"
+        "static const lv_font_fmt_txt_dsc_t font_dsc = {\n"
+    )
+    output = SCRIPT_DIR / cmd[cmd.index("-o") + 1]
+    text = output.read_text()
+    if text.count(dsc_const) != 1:
+        sys.exit(f"error: unexpected font descriptor definition in {output.name}")
+    output.write_text(text.replace(dsc_const, dsc_const_vram))
+
 
 def gen_font(output, description, *args, bpp="4"):
     run([sys.executable, str(FONT_GEN), "-o", output, "--bpp", bpp, *args], description)

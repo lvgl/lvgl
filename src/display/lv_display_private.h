@@ -119,6 +119,9 @@ struct _lv_display_t {
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
     uint32_t tile_cnt     : 8;       /**< Divide the display buffer into these number of tiles */
     uint32_t stride_is_auto : 1;     /**< 1: The stride of the buffers was not set explicitly. */
+#if LV_USE_DRAW_VRAM
+    uint32_t flush_from_vram : 1;    /**< 1: flush_cb takes the draw buffer as left in VRAM, see lv_display_set_flush_from_vram */
+#endif
 
 
     /** 1: The current screen rendering is in progress*/

@@ -87,7 +87,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
     return obj;
 }
 
-lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+lv_obj_t * lv_list_add_button(lv_obj_t * list, LV_IMAGE_DSC_CONST void * icon, const char * txt)
 {
     LV_CHECK_OBJ(list, MY_CLASS, return NULL);
 
@@ -166,7 +166,7 @@ lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag)
     return obj;
 }
 
-lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon, const char * tag)
+lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, LV_IMAGE_DSC_CONST void * icon, const char * tag)
 {
     LV_CHECK_OBJ(list, MY_CLASS, return NULL);
 

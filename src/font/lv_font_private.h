@@ -32,12 +32,12 @@ int32_t lv_font_glyph_dsc_compare(const lv_font_glyph_dsc_t * lhs, const lv_font
 /*
  * Internal implementation of @ref lv_font_get_glyph_bitmap
  */
-const void * lv_font_get_glyph_bitmap_internal(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_bitmap_internal(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /*
  * Internal implementation of @ref lv_font_get_glyph_static_bitmap
  */
-const void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_dsc);
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_dsc);
 
 /*
  * Internal implementation of @ref lv_font_glyph_release_draw_data

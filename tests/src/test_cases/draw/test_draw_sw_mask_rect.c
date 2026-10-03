@@ -27,6 +27,7 @@ static lv_draw_buf_t * mask_rect_buf_create(void)
 {
     lv_draw_buf_t * buf = lv_draw_buf_create(BUF_SIZE, BUF_SIZE, LV_COLOR_FORMAT_ARGB8888, 0);
     TEST_ASSERT_NOT_NULL(buf);
+    lv_draw_buf_ensure_resident(buf, NULL);
 
     /*Fill with opaque white so any masking is visible in the alpha channel*/
     uint32_t y;

@@ -214,6 +214,7 @@ lv_display_t * refr_disp_create(int32_t w, int32_t h, lv_color_format_t cf,
     for(i = 0; i < buf_cnt; i++) {
         refr_ctx.buf[i] = lv_draw_buf_create(w, buf_h, cf, LV_STRIDE_AUTO);
         TEST_ASSERT_NOT_NULL(refr_ctx.buf[i]);
+        lv_draw_buf_ensure_resident(refr_ctx.buf[i], NULL);
     }
     lv_display_set_draw_buffers(disp, refr_ctx.buf[0], buf_cnt > 1 ? refr_ctx.buf[1] : NULL);
     if(buf_cnt > 2) lv_display_set_3rd_draw_buffer(disp, refr_ctx.buf[2]);

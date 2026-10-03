@@ -74,7 +74,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt);
  * @deprecated Add a full-width `lv_button` to a flex container instead. See `lv_example_flex_list`.
  */
 LV_DEPRECATED(LV_LIST_DEPRECATED_MSG)
-lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt);
+lv_obj_t * lv_list_add_button(lv_obj_t * list, LV_IMAGE_DSC_CONST void * icon, const char * txt);
 
 /**
  * Get text of a given list button
@@ -118,7 +118,7 @@ lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag);
  * @deprecated The `lv_list` widget is deprecated. See `lv_example_flex_list`.
  */
 LV_DEPRECATED(LV_LIST_DEPRECATED_MSG)
-lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon, const char * tag);
+lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, LV_IMAGE_DSC_CONST void * icon, const char * tag);
 
 /**
  * Set translation tag text of a given list button

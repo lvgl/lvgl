@@ -340,7 +340,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
     LV_IMAGE_DECLARE(img_render_lvgl_logo_i1);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565a8);
 
-    const void * srcs[] = {
+    LV_IMAGE_DSC_CONST void * srcs[] = {
         &img_render_lvgl_logo_argb8888,
         &img_render_lvgl_logo_argb8888_premultiplied,
         &img_render_lvgl_logo_xrgb8888,
@@ -776,7 +776,7 @@ static void create_blend_mode_image_buffer(lv_obj_t * canvas)
     lv_canvas_finish_layer(canvas, &layer);
 }
 
-static lv_obj_t * create_blend_mode_obj(lv_obj_t * parent, int32_t col, int32_t row, const void * src,
+static lv_obj_t * create_blend_mode_obj(lv_obj_t * parent, int32_t col, int32_t row, LV_IMAGE_DSC_CONST void * src,
                                         lv_blend_mode_t blend_mode)
 {
     lv_obj_t * obj = lv_image_create(parent);
