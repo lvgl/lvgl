@@ -46,39 +46,69 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                          lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_color_cb_t send_color_cb)
+lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res)
 {
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {
         return NULL;
     }
 
-    lv_lcd_generic_mipi_driver_t * drv = (lv_lcd_generic_mipi_driver_t *)lv_malloc(sizeof(lv_lcd_generic_mipi_driver_t));
+    /* zeroed: init() no longer resets the gaps, so a set_gap() before it must survive */
+    lv_lcd_generic_mipi_driver_t * drv = lv_malloc_zeroed(sizeof(lv_lcd_generic_mipi_driver_t));
     if(drv == NULL) {
         lv_display_delete(disp);
         return NULL;
     }
 
-    /* init driver struct */
     drv->disp = disp;
-    drv->send_cmd = send_cmd_cb;
-    drv->send_color = send_color_cb;
     lv_display_set_driver_data(disp, (void *)drv);
-
-    /* init controller */
-    init(drv, flags);
-
-    /* register resolution change callback (NOTE: this handles screen rotation as well) */
-    lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
     /* register object deletion callback for freeing driver struct */
     lv_display_add_event_cb(disp, delete_cb, LV_EVENT_DELETE, NULL);
 
-    /* register flush callback */
+    return disp;
+}
+
+void lv_lcd_generic_mipi_set_send_cmd_cb(lv_display_t * disp, lv_lcd_send_cmd_cb_t send_cmd_cb)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(send_cmd_cb != NULL, return);
+
+    get_driver(disp)->send_cmd = send_cmd_cb;
+}
+
+void lv_lcd_generic_mipi_set_send_color_cb(lv_display_t * disp, lv_lcd_send_color_cb_t send_color_cb)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(send_color_cb != NULL, return);
+
+    get_driver(disp)->send_color = send_color_cb;
+}
+
+lv_result_t lv_lcd_generic_mipi_init(lv_display_t * disp, lv_lcd_flag_t flags)
+{
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+
+    lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
+    if(drv->send_cmd == NULL || drv->send_color == NULL) {
+        LV_LOG_ERROR("lv_lcd_generic_mipi_set_send_cmd_cb() and lv_lcd_generic_mipi_set_send_color_cb() "
+                     "must be called before init");
+        return LV_RESULT_INVALID;
+    }
+
+    /* init controller */
+    init(drv, flags);
+
+    /* a rotation set between create and init never raised an event, so apply it now */
+    set_rotation(drv, lv_display_get_rotation(disp));
+
+    /* register resolution change callback (NOTE: this handles screen rotation as well) */
+    lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
+
+    /* registered last: until the controller is initialized the display must not be flushed */
     lv_display_set_flush_cb(disp, flush_cb);
 
-    return disp;
+    return LV_RESULT_OK;
 }
 
 void lv_lcd_generic_mipi_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
@@ -125,6 +155,8 @@ void lv_lcd_generic_mipi_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_
     LV_CHECK_ARG(disp != NULL, return);
     LV_CHECK_ARG(cmd_list != NULL, return);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
+    LV_ASSERT_MSG(drv->send_cmd != NULL, "the LCD controller is not initialized yet");
+
     while(1) {
         uint8_t cmd = *cmd_list++;
         uint8_t num = *cmd_list++;
@@ -155,6 +187,8 @@ void lv_lcd_generic_mipi_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_
  */
 static void send_cmd(lv_lcd_generic_mipi_driver_t * drv, uint8_t cmd, uint8_t * param, size_t param_size)
 {
+    LV_ASSERT_MSG(drv->send_cmd != NULL, "the LCD controller is not initialized yet");
+
     uint8_t cmdbuf = cmd;       /* MIPI uses 8 bit commands */
     drv->send_cmd(drv->disp, &cmdbuf, 1, param, param_size);
 }
@@ -179,9 +213,6 @@ static void send_color(lv_lcd_generic_mipi_driver_t * drv, uint8_t cmd, uint8_t 
  */
 static void init(lv_lcd_generic_mipi_driver_t * drv, lv_lcd_flag_t flags)
 {
-    drv->x_gap = 0;
-    drv->y_gap = 0;
-
     /* init color mode and RGB order */
     drv->madctl_reg = flags & LV_LCD_FLAG_BGR ? LV_LCD_BIT_RGB_ORDER__BGR : LV_LCD_BIT_RGB_ORDER__RGB;
     drv->colmod_reg = flags & LV_LCD_FLAG_RGB666 ? LV_LCD_PIXEL_FORMAT_RGB666 : LV_LCD_PIXEL_FORMAT_RGB565;
@@ -255,7 +286,7 @@ static void set_swap_xy(lv_lcd_generic_mipi_driver_t * drv, bool swap)
  * @param area          area stored in the buffer
  * @param px_map        buffer containing pixel data
  * @note                transfers pixel data to the LCD controller using the callbacks 'send_cmd' and 'send_color', which were
- *                      passed to the 'lv_st7789_create()' function
+ *                      passed to the 'lv_st7789_init()' function
  */
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {

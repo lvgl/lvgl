@@ -63,23 +63,32 @@ typedef void (*lv_ft81x_spi_cb_t)(lv_display_t * disp, lv_ft81x_spi_operation_t 
  **********************/
 
 /**
- * Create a framebuffer-based ft81x driver display.
+ * Create a framebuffer-based ft81x driver display. The display is unusable until
+ * `lv_ft81x_init()` runs, so it almost always follows on the next line. Only what the SPI
+ * callback needs goes in between, such as `lv_display_set_user_data()`.
  * @param params      pointer to a struct of display panel properties. does not need to be static.
  * @param partial_buf a single partial buffer
  * @param buf_size    size of the partial buffer
- * @param spi_cb      a callback called by the driver to perform SPI operations
- * @param user_data   use `lv_ft81x_get_user_data` to get this pointer inside the SPI callback @nullable
  * @return pointer to the display
  */
-lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size,
-                               lv_ft81x_spi_cb_t spi_cb, void * user_data);
+lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size);
 
 /**
- * Get the `user_data` parameter that was passed to `lv_ft81x_create`. Useful in the SPI callback.
+ * Set the function that performs the SPI operations. Required before init.
  * @param disp      pointer to the ft81x display
- * @return          the `user_data` pointer
+ * @param spi_cb    a callback called by the driver to perform SPI operations. Use
+ *                  `lv_display_get_user_data()` to reach your own context inside it.
  */
-void * lv_ft81x_get_user_data(lv_display_t * disp);
+void lv_ft81x_set_spi_cb(lv_display_t * disp, lv_ft81x_spi_cb_t spi_cb);
+
+/**
+ * Initialize the ft81x chip of a display created with `lv_ft81x_create()`.
+ * Fails if the SPI callback has not been set.
+ * The display is not flushed before this function returns.
+ * @param disp      pointer to the ft81x display
+ * @return          LV_RESULT_OK on success
+ */
+lv_result_t lv_ft81x_init(lv_display_t * disp);
 
 /**********************
  *      MACROS

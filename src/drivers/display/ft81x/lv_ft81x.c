@@ -31,8 +31,8 @@
  **********************/
 
 typedef struct {
+    lv_ft81x_parameters_t params;
     lv_ft81x_spi_cb_t spi_cb;
-    void * user_data;
     uint16_t cmd_offset;
 } lv_ft81x_driver_data_t;
 
@@ -45,7 +45,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_result_t initialize(lv_display_t * disp, const lv_ft81x_parameters_t * params);
+static lv_result_t initialize(lv_display_t * disp);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void delete_cb(lv_event_t * e);
 static void lv_ft81x_cmd(lv_display_t * disp, uint8_t command, uint8_t parameter);
@@ -86,10 +86,8 @@ static void lv_ft81x_encode_write_address(void * dst_3_bytes, uint32_t address);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size,
-                               lv_ft81x_spi_cb_t spi_cb, void * user_data)
+lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size)
 {
-    LV_CHECK_ARG(spi_cb != NULL, return NULL);
     LV_CHECK_ARG(params != NULL, return NULL);
     LV_CHECK_ARG(partial_buf != NULL, return NULL);
 
@@ -97,38 +95,52 @@ lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * part
 
     lv_ft81x_driver_data_t * drv = lv_malloc_zeroed(sizeof(lv_ft81x_driver_data_t));
     LV_ASSERT_MALLOC(drv);
-    drv->spi_cb = spi_cb;
-    drv->user_data = user_data;
-    drv->cmd_offset = 0;
+    drv->params = *params;
     lv_display_set_driver_data(disp, drv);
-    lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
     lv_display_set_buffers(disp, partial_buf, NULL, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_add_event_cb(disp, delete_cb, LV_EVENT_DELETE, NULL);
 
-    lv_result_t init_res = initialize(disp, params);
-    if(init_res != LV_RESULT_OK) {
-        lv_display_delete(disp);
-        return NULL;
-    }
-
     return disp;
 }
 
-void * lv_ft81x_get_user_data(lv_display_t * disp)
+void lv_ft81x_set_spi_cb(lv_display_t * disp, lv_ft81x_spi_cb_t spi_cb)
 {
-    LV_CHECK_ARG(disp != NULL, return NULL);
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(spi_cb != NULL, return);
+
+    ((lv_ft81x_driver_data_t *)lv_display_get_driver_data(disp))->spi_cb = spi_cb;
+}
+
+lv_result_t lv_ft81x_init(lv_display_t * disp)
+{
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
 
     lv_ft81x_driver_data_t * drv = lv_display_get_driver_data(disp);
-    return drv->user_data;
+    if(drv->spi_cb == NULL) {
+        LV_LOG_ERROR("lv_ft81x_set_spi_cb() must be called before init");
+        return LV_RESULT_INVALID;
+    }
+
+    lv_result_t res = initialize(disp);
+    if(res != LV_RESULT_OK) {
+        return res;
+    }
+
+    /* registered last: until the chip is initialized the display must not be flushed */
+    lv_display_set_flush_cb(disp, flush_cb);
+
+    return LV_RESULT_OK;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t initialize(lv_display_t * disp, const lv_ft81x_parameters_t * params)
+static lv_result_t initialize(lv_display_t * disp)
 {
+    const lv_ft81x_parameters_t * params = &((lv_ft81x_driver_data_t *)lv_display_get_driver_data(disp))->params;
+
     lv_ft81x_cmd(disp, params->has_crystal ? EVE_CLKEXT : EVE_CLKINT, 0);
     if(params->is_bt81x) lv_ft81x_cmd(disp, EVE_CLKSEL, 0x46);
     lv_ft81x_cmd(disp, EVE_ACTIVE, 0);

@@ -82,12 +82,22 @@ static const uint8_t init_cmd_list[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_ili9341_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                 lv_ili9341_send_cmd_cb_t send_cmd_cb, lv_ili9341_send_color_cb_t send_color_cb)
+lv_display_t * lv_ili9341_create(uint32_t hor_res, uint32_t ver_res)
 {
-    lv_display_t * disp = lv_lcd_generic_mipi_create(hor_res, ver_res, flags, send_cmd_cb, send_color_cb);
+    return lv_lcd_generic_mipi_create(hor_res, ver_res);
+}
+
+lv_result_t lv_ili9341_init(lv_display_t * disp, lv_lcd_flag_t flags)
+{
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+
+    lv_result_t res = lv_lcd_generic_mipi_init(disp, flags);
+    if(res != LV_RESULT_OK) {
+        return res;
+    }
+
     lv_lcd_generic_mipi_send_cmd_list(disp, init_cmd_list);
-    return disp;
+    return LV_RESULT_OK;
 }
 
 void lv_ili9341_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
