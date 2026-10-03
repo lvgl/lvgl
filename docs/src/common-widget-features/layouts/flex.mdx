@@ -109,7 +109,7 @@ See justify-content_, align-items_ and align-content_ for illustrations of these
 <LvglExample name="lv_example_flex_grow" path="layouts/flex/lv_example_flex_grow" />
 
 Flex grow can be used to make one or more children fill available space in the track.
-When more than one child Widget have non-zero grow values, all available space will
+When more than one child Widget has non-zero grow values, all available space will
 be distributed in proportion to their respective grow values.  For example, if there
 is 400 px space remaining and 3 child Widgets with non-zero grow values:
 
@@ -132,11 +132,11 @@ can use them as you would any other style property.
 
 The following flex related style properties exist:
 
-- <ApiLink name="FLEX_FLOW" />
-- <ApiLink name="FLEX_MAIN_PLACE" />
-- <ApiLink name="FLEX_CROSS_PLACE" />
-- <ApiLink name="FLEX_TRACK_PLACE" />
-- <ApiLink name="FLEX_GROW" />
+- <ApiLink name="LV_STYLE_FLEX_FLOW" />
+- <ApiLink name="LV_STYLE_FLEX_MAIN_PLACE" />
+- <ApiLink name="LV_STYLE_FLEX_CROSS_PLACE" />
+- <ApiLink name="LV_STYLE_FLEX_TRACK_PLACE" />
+- <ApiLink name="LV_STYLE_FLEX_GROW" />
 
 ### Internal padding
 
@@ -155,7 +155,7 @@ Widgets: <ApiLink name="lv_style_set_pad_column" display="lv_style_set_pad_colum
 
 <LvglExample name="lv_example_flex_rtl" path="layouts/flex/lv_example_flex_rtl" />
 
-If the base direction of the container is set the
+If the base direction of the container is set to
 <ApiLink name="LV_BASE_DIR_RTL" /> the meaning of
 <ApiLink name="LV_FLEX_ALIGN_START" /> and
 <ApiLink name="LV_FLEX_ALIGN_END" /> is swapped on `ROW` layouts. I.e.

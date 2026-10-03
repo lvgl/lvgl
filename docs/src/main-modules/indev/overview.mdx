@@ -90,9 +90,13 @@ lv_indev_set_mode(indev, LV_INDEV_MODE_EVENT);
 lv_indev_read(indev);
 ```
 
+<Callout type="info">
+<ApiLink name="lv_indev_read" />, <ApiLink name="lv_timer_handler" />, and <ApiLink name="lv_display_refr_timer" /> cannot run at the same time.
+</Callout>
 
-
-
+<Callout type="info">
+For devices in event-driven mode, `data->continue_reading` is ignored.
+</Callout>
 
 ### Pausing the Indev Timer
 
@@ -100,7 +104,7 @@ It's not always possible to take an indev reading directly inside
 a raw interrupt handler. Typically, a flag would be set inside the interrupt handler
 which would be checked and reset inside the indev read callback where the reading
 would actually be taken. This works fine, but the indev read callback is constantly
-polling a flag which may go for long periods unset. We cannot use [Event-Driven Mode](/main-modules/indev/overview)
+polling a flag which may go for long periods unset. We cannot use [Event-Driven Mode](#event-driven-mode)
 because <ApiLink name="lv_indev_read" /> should not be called in an interrupt handler.
 
 For this situation, you can use the timer-based indev read callback as usual but

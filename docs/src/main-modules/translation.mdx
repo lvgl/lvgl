@@ -72,7 +72,7 @@ If the tag is not found at all, the tag itself will be used as a fallback as wel
 Several Widgets provide a convenient API to support translations. These functions also update the texts if the target language changes. Some examples:
 
 - <ApiLink name="lv_label_set_translation_tag" display="lv_label_set_translation_tag(label, &quot;some_tag&quot;)" />
-- <ApiLink name="lv_tabview_set_tab_translation_tag" display="lv_tabview_set_tab_translation_tag(tab, &quot;some_tag&quot;)" />
+- <ApiLink name="lv_tabview_set_tab_translation_tag" display="lv_tabview_set_tab_translation_tag(tabview, &quot;some_tag&quot;)" />
 
 For more information check the documentation page of the given widget.
 
@@ -101,7 +101,7 @@ lv_obj_t * label = lv_label_create(lv_screen_active());
 lv_obj_add_event_cb(label, on_language_change, LV_EVENT_TRANSLATION_LANGUAGE_CHANGED, "tag1");
 ```
 
-See the the bottom of this page for a complete example.
+See the bottom of this page for a complete example.
 
 ## Example
 

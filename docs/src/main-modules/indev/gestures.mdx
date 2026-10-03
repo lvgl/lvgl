@@ -58,7 +58,7 @@ To trigger a gesture, two things need to happen. The movement needs to be:
    greater than Indev's `gesture_min_distance`
 
 These limits can be set via <ApiLink name="lv_indev_set_gesture_min_velocity" /> and
-<ApiLink name="lv_indev_set_gesture_min_distance" /> accordingly.
+<ApiLink name="lv_indev_set_gesture_min_distance" /> respectively.
 
 ## Multi-touch Gestures
 
@@ -131,7 +131,7 @@ use these functions to gather more information about the gesture:
 - <ApiLink name="lv_event_get_gesture_state" display="lv_event_get_gesture_state(lv_event_t * e, lv_indev_gesture_type_t type)" />:
   Get the state of the gesture as <ApiLink name="lv_indev_gesture_state_t" />. It can be one
   of:
-  
+
   - <ApiLink name="LV_INDEV_GESTURE_STATE_NONE" />: The gesture is not active.
   - <ApiLink name="LV_INDEV_GESTURE_STATE_RECOGNIZED" />: The gesture is recognized and
     can be used.

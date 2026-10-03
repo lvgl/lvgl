@@ -11,7 +11,7 @@ For a detailed introduction to glTF, see: https://www.khronos.org/gltf/
 
 ## What is glTF?
 
-glTF (Graphics Library Transmission Format) is a 3D file format that stores 3D model information in JSON format. It supports:
+glTF (GL Transmission Format) is a 3D file format that stores 3D model information in JSON format. It supports:
 
 - **Geometry**: Meshes, primitives, and vertex data
 - **Materials**: PBR (Physically Based Rendering) materials with textures
@@ -107,7 +107,7 @@ The recommended way to integrate the required libraries is using CMake's FetchCo
 ```cmake
 include(FetchContent)
 # Set policy to allow to run the target_link_libraries cmd on targets that are
-# build in another directory. Currently, the linking is not handled by
+# built in another directory. Currently, the linking is not handled by
 cmake_policy(SET CMP0079 NEW)
 # Fetch fastgltf library
 FetchContent_Declare(
@@ -257,7 +257,7 @@ Customize the visual appearance of your 3D scene:
 
 ```c
 /* Background settings */
-lv_gltf_set_background_mode(gltf, LV_GLTF_BG_ENVIRONMENT);
+lv_gltf_set_background_mode(gltf, LV_GLTF_BG_MODE_ENVIRONMENT);
 lv_gltf_set_background_blur(gltf, 50);
 
 /* Lighting and exposure */
@@ -265,14 +265,14 @@ lv_gltf_set_environment_brightness(gltf, 1.5f);
 lv_gltf_set_image_exposure(gltf, 1.2f);
 
 /* Anti-aliasing */
-lv_gltf_set_antialiasing_mode(gltf, LV_GLTF_AA_DYNAMIC);
+lv_gltf_set_antialiasing_mode(gltf, LV_GLTF_AA_MODE_DYNAMIC);
 ```
 
 ### Runtime Node Manipulation
 
 You can dynamically modify node properties (position, rotation, scale) at runtime and receive notifications when these values change.
 
-##### Reading Node Properties
+#### Setting Node Properties
 
 Change individual node properties using setter functions. Changes are queued and applied during the next render cycle:
 
@@ -296,7 +296,7 @@ lv_gltf_model_node_set_scale_y(node, 2.0f);
 lv_gltf_model_node_set_scale_z(node, 2.0f);
 ```
 
-##### Reading Node Properties
+#### Reading Node Properties
 
 For performance reasons, the node properties are only calculated during rendering.
 In order to read them, you must first register an event callback.
@@ -394,14 +394,14 @@ IBL captures the entire lighting environment in an image, producing natural-look
 - **Subtle lighting effects** like under-lighting and color variation based on viewing angle
 - **Visual cohesiveness** that makes models appear naturally placed in their environment
 
-For example, using an High-Dynamic-Range (HDR) image of a forest will make your 3D model appear to be sitting in a forest.
+For example, using a High-Dynamic-Range (HDR) image of a forest will make your 3D model appear to be sitting in a forest.
 
-##### Default Behavior
+#### Default Behavior
 
 By default, each glTF viewer automatically creates an environment using an embedded default image with a cube map resolution of 128.
 This provides good visual quality for most use cases without any setup.
 
-##### Custom Environments
+#### Custom Environments
 
 For more control over lighting quality, to use custom HDR images, or to share environments across multiple viewers, you can create and manage environments manually:
 
@@ -410,7 +410,7 @@ For more control over lighting quality, to use custom HDR images, or to share en
 lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create();
 
 /* Set a custom cube map resolution. Higher resolution produces sharper results at a cost of longer setup time */
-lv_gltf_ibl_sampler_set_cube_map_pixel_resolution(256);
+lv_gltf_ibl_sampler_set_cube_map_pixel_resolution(sampler, 256);
 
 /* Create environment from custom HDR/JPEG image (or NULL for default) */
 lv_gltf_environment_t * env = lv_gltf_environment_create(sampler, "/path/to/environment.hdr");
@@ -425,7 +425,7 @@ lv_gltf_set_environment(gltf, env);
 lv_gltf_environment_set_angle(env, 45.0f);
 ```
 
-##### Sharing Environments
+#### Sharing Environments
 
 The same environment can be shared across multiple glTF viewers for consistent lighting and reduced memory usage:
 
@@ -445,7 +445,7 @@ lv_gltf_set_environment(gltf1, env);
 lv_gltf_set_environment(gltf2, env);
 ```
 
-##### Environment Images
+#### Environment Images
 
 - Use equirectangular (360°) panoramic images in HDR or JPEG format
 - Source images are converted to cube map format at the sampler's cube map resolution
@@ -453,13 +453,13 @@ lv_gltf_set_environment(gltf2, env);
 - Lower resolution values (64-128) are more suitable for embedded systems
 - Free HDR environment maps are widely available online. Choose environments that match the "look" you want (outdoor, studio, warehouse, etc.)
 
-##### How It Works
+#### How It Works
 
 When an environment is created, the source image is processed into a cube map format (6 images representing each face of a cube).
 During rendering, for each pixel of your 3D model, the renderer samples the appropriate point from this cube map data to determine lighting color and intensity.
 The processing cost is paid once during environment creation.
 
-##### Performance Notes
+#### Performance Notes
 
 - Environment creation processes the source image into cube map data, which takes more time with larger resolution values
 - Processing time increases with both source image resolution and cube map resolution

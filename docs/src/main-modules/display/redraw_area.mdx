@@ -1,6 +1,6 @@
 ---
 title: Constraints on Redrawn Area
-description: "Some display controllers have specific requirements for the window area where the rendered image can be sent (e.g."
+description: "Some display controllers have specific requirements for the window area where the rendered image can be sent (e.g., x1 must be even, and x2 must be odd)."
 ---
 
 Some display controllers have specific requirements for the window area where the
@@ -8,7 +8,7 @@ rendered image can be sent (e.g., `x1` must be even, and `x2` must be odd).
 
 In the case of monochrome displays, `x1` must be `Nx8`, and `x2` must be `Nx8 - 1`.
 (If the display uses `LV_COLOR_FORMAT_I1`, LVGL automatically applies this rounding.
-See [Monochrome Displays](/main-modules/display/color_format).)
+See [Monochrome Displays](/main-modules/display/color_format#monochrome-displays).)
 
 The size of the invalidated (redrawn) area can be controlled as follows:
 

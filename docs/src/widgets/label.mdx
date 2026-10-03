@@ -70,13 +70,13 @@ was not already terminated by an ending `#` in the text.
 
 <LvglExample name="lv_example_label_text_selection" path="widgets/label/lv_example_label_text_selection" />
 
-If enabled by <ApiLink name="LV_LABEL_TEXT_SELECTION" /> part of the text can be
+If enabled by <ApiLink name="LV_LABEL_TEXT_SELECTION" />, part of the text can be
 selected. It's similar to when you use your mouse on a PC to select
 text. The whole mechanism (click and select the text as you drag your
 finger/mouse) is implemented in [Text Area (lv_textarea)](/widgets/textarea) and
 the Label Widget only allows programmatic text selection with
-<ApiLink name="lv_label_get_text_selection_start" display="lv_label_get_text_selection_start(label, start_char_index)" /> and
-<ApiLink name="lv_label_get_text_selection_end" display="lv_label_get_text_selection_end(label, end_char_index)" />.
+<ApiLink name="lv_label_set_text_selection_start" display="lv_label_set_text_selection_start(label, start_char_index)" /> and
+<ApiLink name="lv_label_set_text_selection_end" display="lv_label_set_text_selection_end(label, end_char_index)" />.
 
 ## Text alignment
 
@@ -99,7 +99,7 @@ feature, set <ApiLink name="LV_LABEL_LONG_TXT_HINT" /> to `1` in `lv_conf.h`.
 ## Custom scrolling animations
 
 Some aspects of the scrolling animations in long modes
-<ApiLink name="LV_LABEL_LONG_SCROLL" /> and <ApiLink name="LV_LABEL_LONG_SCROLL_CIRCULAR" /> can be
+<ApiLink name="LV_LABEL_LONG_MODE_SCROLL" /> and <ApiLink name="LV_LABEL_LONG_MODE_SCROLL_CIRCULAR" /> can be
 customized by setting the Label's animation style property, using
 <ApiLink name="lv_style_set_anim" />.
 It will be treated as a template which will be used to create the scroll animations.
@@ -117,7 +117,7 @@ the [Overview](/main-modules/fonts/overview) section to learn more about symbols
 - <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar that is shown when the text is
   larger than the Widget's size.
 - <ApiLink name="LV_PART_SELECTED" /> Tells the style of the
-  [selected text](/widgets/label). Only `text_color` and `bg_color` style
+  [selected text](#text-selection). Only `text_color` and `bg_color` style
   properties can be used.
 
 <LvglExample name="lv_example_label_styling" path="widgets/label/lv_example_label_styling" />
@@ -146,9 +146,9 @@ follows:
 | Field | Description |
 |-------|-------------|
 | `string Subject` | Subject's string is used to directly update the Label's text. |
-| `pointer Subject` | If NULL is passed as the `format_string` argument when subscribing, the Subject's pointer value is assumed to point to a NUL-terminated string and is used to directly update the Label's text. See [The ``format_string`` Argument](/widgets/label) for other options. |
-| `integer Subject` | Subject's integer value is used with the `format_string` argument. See [The ``format_string`` Argument](/widgets/label) for details. |
-| `float Subject` | Subject's float value is used with the `format_string` argument. Requires <ApiLink name="LV_USE_FLOAT" />. See [The ``format_string`` Argument](/widgets/label) for details. |
+| `pointer Subject` | If NULL is passed as the `format_string` argument when subscribing, the Subject's pointer value is assumed to point to a NUL-terminated string and is used to directly update the Label's text. See [The ``format_string`` Argument](#the-format_string-argument) for other options. |
+| `integer Subject` | Subject's integer value is used with the `format_string` argument. See [The ``format_string`` Argument](#the-format_string-argument) for details. |
+| `float Subject` | Subject's float value is used with the `format_string` argument. Requires <ApiLink name="LV_USE_FLOAT" />. See [The ``format_string`` Argument](#the-format_string-argument) for details. |
 
 - <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, subject, format_string)" />
 

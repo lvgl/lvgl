@@ -4,7 +4,7 @@ description: "Build and run the ready-to-use LVGL projects of the Linux-capable 
 faqs:
   - question: "Which display driver is used on the RZ/G boards?"
     answer: "The G2L has a Wayland desktop so the project appears as a Wayland window. The G2UL has no desktop, so the project runs fullscreen with the fbdev driver. The G3E project runs fullscreen with the OpenGL EGL+DRM driver."
-  - question: "Why does the G2L and G2UL project use LVGL v8.3?"
+  - question: "Why do the G2L and G2UL projects use LVGL v8.3?"
     answer: "The SDK of these boards currently ships LVGL v8.3, and the project mirrors the SDK version even though LVGL is statically linked. Newer versions can be used, see the v8-to-v9 migration guide for what needs to be addressed."
   - question: "Why is the screen still showing the vendor demo instead of my application?"
     answer: "A demo started automatically at boot is still using the display. On the G2UL run systemctl stop demo-launcher, and on the G3E stop the Wayland desktop with systemctl stop weston before starting the project."
@@ -92,7 +92,7 @@ and call some `lv_example_...()` functions, or add your own custom code.
 
 Edit `lv_conf.h` and `lv_drv_conf.h` to configure LVGL. The board image
 contains LVGL and lv_drivers as dynamically linkable libraries. This project builds
-LVGL statically for customizability and to port the LVGL v9 benchmark from LVGL v8.3.
+LVGL statically for customizability and to port the LVGL v9 benchmark to LVGL v8.3.
 
 ## G3E
 

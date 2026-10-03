@@ -6,7 +6,7 @@ description: "The evdev driver reads touchscreen, mouse and keyboard input strai
 ## Overview
 
 The [Linux event device](https://en.wikipedia.org/wiki/Evdev) (evdev) interface exposes input events from a touchscreen,
-mouse, keyboard or anything else the kernel recognizes, through device files under `/dev/input/`. 
+mouse, keyboard or anything else the kernel recognizes, through device files under `/dev/input/`.
 
 It's the lightest input option on Linux and the natural pairing for the [framebuffer](/integration/embedded_linux/drivers/fbdev)
 and [DRM](/integration/embedded_linux/drivers/drm) display drivers, neither of which brings its own input.
@@ -24,7 +24,7 @@ Enable <ApiLink name="LV_USE_EVDEV" />.
 The driver always requires `libevdev`.
 
 <Callout type="tip">
-LVGL's CMake integration resolves both.
+LVGL's CMake integration resolves it for you.
 Make sure the required libraries  are present on your system or in your sysroot.
 
 See [Dependency Management](/integration/building/cmake).

@@ -20,14 +20,14 @@ To describe a transition, an <ApiLink name="lv_style_transition_dsc_t" /> variab
 initialized and added to a style:
 
 ```c
-/* Only its pointer is saved so must static, global or dynamically allocated */
+/* Only its pointer is saved so it must be static, global or dynamically allocated */
 static const lv_style_prop_t trans_props[] = {
                                             LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
                                             0, /* End marker */
 };
 
 static lv_style_transition_dsc_t trans1;
-lv_style_transition_dsc_init(&trans1, trans_props, lv_anim_path_ease_out, duration_ms, delay_ms);
+lv_style_transition_dsc_init(&trans1, trans_props, lv_anim_path_ease_out, duration_ms, delay_ms, NULL);
 
 lv_style_set_transition(&style1, &trans1);
 ```
