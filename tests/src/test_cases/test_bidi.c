@@ -854,7 +854,8 @@ void test_bidi_mixed_digit_encodings_and_separators(void)
 void test_bidi_digits_do_not_choose_rtl_base_direction(void)
 {
     const char * numbers[] = {"0123456789", "\xd9\xa0\xd9\xa1\xd9\xa2\xd9\xa3\xd9\xa4\xd9\xa5\xd9\xa6\xd9\xa7\xd9\xa8\xd9\xa9",
-                             "\xdb\xb0\xdb\xb1\xdb\xb2\xdb\xb3\xdb\xb4\xdb\xb5\xdb\xb6\xdb\xb7\xdb\xb8\xdb\xb9"};
+                              "\xdb\xb0\xdb\xb1\xdb\xb2\xdb\xb3\xdb\xb4\xdb\xb5\xdb\xb6\xdb\xb7\xdb\xb8\xdb\xb9"
+                             };
     const uint16_t positions[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     for(uint32_t n = 0; n < sizeof(numbers) / sizeof(numbers[0]); n++) {
         char input[32];
@@ -895,11 +896,11 @@ void test_bidi_multibyte_digit_cursor_direction(void)
         for(uint16_t visual = 0; visual < 4; visual++) {
             bool is_rtl = !directions[visual];
             TEST_ASSERT_EQUAL_UINT16(positions[visual], lv_bidi_get_logical_pos(input, NULL,
-                                     (uint32_t)strlen(input), dirs[d], visual, &is_rtl));
+                                                                                (uint32_t)strlen(input), dirs[d], visual, &is_rtl));
             TEST_ASSERT_EQUAL(directions[visual], is_rtl);
             is_rtl = !directions[visual];
             TEST_ASSERT_EQUAL_UINT16(visual, lv_bidi_get_visual_pos(input, NULL,
-                                     (uint16_t)strlen(input), dirs[d], positions[visual], &is_rtl));
+                                                                    (uint16_t)strlen(input), dirs[d], positions[visual], &is_rtl));
             TEST_ASSERT_EQUAL(directions[visual], is_rtl);
         }
     }
@@ -907,7 +908,7 @@ void test_bidi_multibyte_digit_cursor_direction(void)
 
 void test_bidi_persian_date_keeps_digit_order(void)
 {
-    /*The date reported in #10746, before Arabic/Persian glyph shaping.*/
+    /* The date reported in #10746, before Arabic/Persian glyph shaping. */
     const char input[] = "\xd8\xb4\xd9\x86\xd8\xa8\xd9\x87\xd8\x8c \xdb\xb1\xdb\xb5 \xd9\x85\xd9\x87\xd8\xb1";
     const char expected[] = "\xd8\xb1\xd9\x87\xd9\x85 \xdb\xb1\xdb\xb5 \xd8\x8c\xd9\x87\xd8\xa8\xd9\x86\xd8\xb4";
     const uint16_t positions[] = {11, 10, 9, 8, 6, 7, 5, 4, 3, 2, 1, 0};
