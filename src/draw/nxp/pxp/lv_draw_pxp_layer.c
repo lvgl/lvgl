@@ -69,6 +69,7 @@ void lv_draw_pxp_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_
 
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = draw_buf;
+    new_draw_dsc.header = draw_buf->header;
     lv_draw_pxp_img(draw_unit, layer, clip_area, &new_draw_dsc, coords);
 
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
