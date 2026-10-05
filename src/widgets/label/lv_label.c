@@ -52,6 +52,7 @@ static void draw_main(lv_event_t * e);
 static void set_text_internal(lv_obj_t * obj, const char * text);
 static void remove_translation_tag(lv_obj_t * obj);
 static void lv_label_refr_text(lv_obj_t * obj);
+static void lv_label_warn_if_clipped(const lv_obj_t * obj, const lv_point_t * size, const lv_area_t * txt_coords);
 static void update_layout_completed_cb(lv_event_t * e);
 static void lv_label_revert_dots(lv_obj_t * label);
 static void lv_label_set_dots(lv_obj_t * label, uint32_t dot_begin);
@@ -1093,6 +1094,54 @@ static void update_layout_completed_cb(lv_event_t * e)
     lv_label_refr_text(obj);
 }
 
+static const char * lv_label_long_mode_name(lv_label_long_mode_t mode)
+{
+    switch(mode) {
+        case LV_LABEL_LONG_MODE_WRAP:
+            return "wrap";
+        case LV_LABEL_LONG_MODE_DOTS:
+            return "dots";
+        case LV_LABEL_LONG_MODE_CLIP:
+            return "clip";
+        default:
+            return "other";
+    }
+}
+
+static void lv_label_warn_if_clipped(const lv_obj_t * obj, const lv_point_t * size, const lv_area_t * txt_coords)
+{
+    const lv_label_t * label = (const lv_label_t *)obj;
+
+    /*Only CLIP discards the text outside the box. WRAP grows or wraps, DOTS rewrites the tail.*/
+    if(label->long_mode != LV_LABEL_LONG_MODE_CLIP) return;
+
+    const int32_t box_w = lv_area_get_width(txt_coords);
+    const int32_t box_h = lv_area_get_height(txt_coords);
+    if(box_w <= 0 || box_h <= 0 || label->text == NULL) return;
+
+    const bool cut_x = size->x > box_w;
+    const bool cut_y = size->y > box_h;
+    if(!cut_x && !cut_y) return;
+
+    const char * where;
+    if(cut_x && cut_y) where = "right and bottom";
+    else if(cut_x) where = "right";
+    else where = "bottom";
+
+    char preview[49];
+    size_t i = 0;
+    for(; i < sizeof(preview) - 1 && label->text[i] != '\0'; i++) {
+        const char c = label->text[i];
+        preview[i] = (c == '\n' || c == '\r') ? ' ' : c;
+    }
+    preview[i] = '\0';
+
+    LV_LOG_WARN("label text clipped (%s, %s): text %" LV_PRId32 " x %" LV_PRId32
+                ", box %" LV_PRId32 " x %" LV_PRId32 ", \"%s\"",
+                lv_label_long_mode_name(label->long_mode), where,
+                size->x, size->y, box_w, box_h, preview);
+}
+
 /**
  * Refresh the label with its text stored in its extended data
  * @param label pointer to a label object
@@ -1120,6 +1169,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
     lv_label_revert_dots(obj);
     lv_text_get_size_attributes(&size, label->text, font, &attributes);
     label->text_size = size;
+    lv_label_warn_if_clipped(obj, &size, &txt_coords);
 
     /*In scroll mode start an offset animation*/
     if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL) {
