@@ -532,7 +532,6 @@ void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj))) {
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
-        lv_obj_mark_layout_as_dirty(obj);
     }
 }
 
@@ -671,7 +670,6 @@ void lv_obj_set_ignore_layout(lv_obj_t * obj, bool en)
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj))) {
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
-        lv_obj_mark_layout_as_dirty(obj);
     }
 }
 
@@ -1483,13 +1481,9 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_obj_t * parent = obj->parent;
     if(parent) {
-        int32_t sl = lv_obj_get_scroll_left(parent);
-        int32_t st = lv_obj_get_scroll_top(parent);
-
-        obj->coords.y1 = parent->coords.y1 + lv_obj_get_style_pad_top_internal(parent, LV_PART_MAIN) - st;
-        obj->coords.y2 = obj->coords.y1 - 1;
-        obj->coords.x1  = parent->coords.x1 + lv_obj_get_style_pad_left_internal(parent, LV_PART_MAIN) - sl;
-        obj->coords.x2  = obj->coords.x1 - 1;
+        /*Zero sized area by default.
+         *Will be recalculated in lv_obj_update_layout before the first render*/
+        lv_area_set(&obj->coords, 0, 0, -1, -1);
     }
 
     /*Set attributes*/
@@ -1846,13 +1840,6 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_PRESS_LOST) {
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
     }
-    else if(code == LV_EVENT_STYLE_CHANGED) {
-        uint32_t child_cnt = lv_obj_get_child_count(obj);
-        for(uint32_t i = 0; i < child_cnt; i++) {
-            lv_obj_t * child = obj->spec_attr->children[i];
-            lv_obj_mark_layout_as_dirty(child);
-        }
-    }
     else if(code == LV_EVENT_KEY) {
         if(lv_obj_is_checkable(obj)) {
             uint32_t c = lv_event_get_key(e);
@@ -1945,27 +1932,6 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_DEFOCUSED) {
         lv_obj_remove_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
-    }
-    else if(code == LV_EVENT_SIZE_CHANGED) {
-        int32_t align = lv_obj_get_style_align_internal(obj, LV_PART_MAIN);
-        uint16_t layout = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
-        if(layout || align) {
-            lv_obj_mark_layout_as_dirty(obj);
-        }
-
-        uint32_t i;
-        uint32_t child_cnt = lv_obj_get_child_count(obj);
-        for(i = 0; i < child_cnt; i++) {
-            lv_obj_t * child = obj->spec_attr->children[i];
-            lv_obj_mark_layout_as_dirty(child);
-        }
-    }
-    else if(code == LV_EVENT_CHILD_CHANGED) {
-        int32_t align = lv_obj_get_style_align_internal(obj, LV_PART_MAIN);
-        uint16_t layout = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
-        if(layout || align || lv_obj_is_style_any_width_content(obj) || lv_obj_is_style_any_height_content(obj)) {
-            lv_obj_mark_layout_as_dirty(obj);
-        }
     }
     else if(code == LV_EVENT_CHILD_DELETED) {
         obj->readjust_scroll_after_layout = 1;

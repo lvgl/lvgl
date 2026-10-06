@@ -403,4 +403,23 @@ void test_table_properties(void)
 #endif
 }
 
+/*The row heights come from the cells' font, so changing it after creation has to resize the table*/
+void test_table_items_font_change_updates_the_height(void)
+{
+    lv_table_set_cell_value(table, 0, 0, "A");
+    lv_obj_update_layout(table);
+    int32_t h_ori = lv_obj_get_height(table);
+
+    lv_obj_set_style_text_font(table, &lv_font_montserrat_24, LV_PART_ITEMS);
+    lv_obj_update_layout(table);
+
+    lv_obj_t * ref = lv_table_create(scr);
+    lv_obj_set_style_text_font(ref, &lv_font_montserrat_24, LV_PART_ITEMS);
+    lv_table_set_cell_value(ref, 0, 0, "A");
+    lv_obj_update_layout(ref);
+
+    TEST_ASSERT_GREATER_THAN(h_ori, lv_obj_get_height(ref));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_height(ref), lv_obj_get_height(table));
+}
+
 #endif

@@ -36,6 +36,8 @@ void test_binding(void)
     /*Wait for the animation*/
     lv_test_wait(500);
 
+    lv_refr_now(NULL);
+
     TEST_ASSERT_EQUAL_SCREENSHOT("binding.png");
 }
 

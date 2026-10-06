@@ -166,7 +166,7 @@ void test_arclabel_overflow(void)
         lv_arclabel_set_overflow(arclabel, overflows[i]);
         lv_obj_center(arclabel);
 
-        lv_obj_refr_size(arclabel);
+        lv_obj_update_layout(arclabel);
         TEST_ASSERT_GREATER_THAN_FLOAT(178, lv_arclabel_get_text_angle(arclabel));
     }
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arclabel_overflow" EXT_NAME);

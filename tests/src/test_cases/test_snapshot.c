@@ -104,6 +104,8 @@ void test_snapshot_take_snapshot_immediately_after_obj_create(void)
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(label, &lv_font_montserrat_28, 0);
     lv_label_set_text(label, "Wubba lubba dub dub!");
+    lv_obj_set_style_bg_opa(label, 200, 0);
+    lv_obj_set_style_bg_color(label, lv_color_hex(0xff0000), 0);
 
     lv_draw_buf_t * draw_dsc = lv_snapshot_take(label, LV_COLOR_FORMAT_ARGB8888);
     lv_obj_t * img_obj = lv_image_create(lv_screen_active());

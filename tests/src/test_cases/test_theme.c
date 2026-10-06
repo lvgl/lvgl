@@ -66,6 +66,9 @@ void test_theme(void)
 static void test_widgets(const char * img_name)
 {
     lv_obj_t * scr_act = lv_screen_active();
+
+    lv_obj_clean(scr_act);
+
     lv_obj_set_flex_flow(scr_act, LV_FLEX_FLOW_ROW_WRAP);
 
     lv_obj_t * tabview = lv_tabview_create(scr_act);

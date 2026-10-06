@@ -46,7 +46,6 @@ class EVENT:
     SCREEN_UNLOADED: int
     SIZE_CHANGED: int
     STYLE_CHANGED: int
-    LAYOUT_CHANGED: int
     GET_SELF_SIZE: int
     PREPROCESS: int
     def __init__(self): ...
