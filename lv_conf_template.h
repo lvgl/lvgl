@@ -587,6 +587,15 @@
 
 #endif /*LV_USE_DRAW_EVE*/
 
+#if LV_USE_EVE5
+/** Render through EVE HAL, including BT820 render targets. Requires the
+ *  EVE5 display driver. Keeps images, fonts and layers resident in EVE
+ *  memory through the VRAM residency module when it is enabled.
+ */
+#define LV_USE_DRAW_EVE5 0
+
+#endif /*LV_USE_EVE5*/
+
 /** Use LV_USE_DRAW_G2D instead.
  *
  *  Enable: LV_USE_DRAW_G2D
@@ -1562,6 +1571,20 @@
 #define LV_LINUX_DRM_BACKEND LV_LINUX_DRM_BACKEND_FBDEV
 
 #endif /*LV_USE_LINUX_DRM*/
+
+/** Display and touch driver using EVE HAL and the EVE GPU allocator.
+ *  Requires external EVE HAL libraries.
+ */
+#define LV_USE_EVE5 0
+
+#if LV_USE_EVE5
+/** Access files on an SD card connected to the EVE controller. */
+#define LV_USE_FS_EVE5_SDCARD 0
+
+/** Access assets in flash connected to the EVE controller. */
+#define LV_USE_FS_EVE5_FLASH 0
+
+#endif /*LV_USE_EVE5*/
 
 /** Driver for /dev/fb */
 #define LV_USE_LINUX_FBDEV 0

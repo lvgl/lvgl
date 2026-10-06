@@ -1,0 +1,8 @@
+config LV_USE_DRAW_EVE5
+	bool "EVE5 renderer"
+	default n
+	depends on LV_USE_EVE5
+	help
+		Render through EVE HAL, including BT820 render targets. Requires the
+		EVE5 display driver. Keeps images, fonts and layers resident in EVE
+		memory through the VRAM residency module when it is enabled.

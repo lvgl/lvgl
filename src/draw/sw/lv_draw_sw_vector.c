@@ -309,7 +309,31 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     }
 
     const uint32_t tvg_stride = header->w * sizeof(uint32_t);
-    if(header->stride != tvg_stride) {
+    uint32_t * premultiplied = NULL;
+    if(!lv_draw_buf_has_flag((lv_draw_buf_t *)decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)) {
+        /*
+         * ThorVG requires premultiplied pixels, but args.premultiply is only a request to the
+         * decoder. If the decoder returned straight-alpha pixels, copy and premultiply them.
+         */
+        premultiplied = lv_malloc(tvg_stride * header->h);
+        if(premultiplied == NULL) {
+            lv_image_decoder_close(&decoder_dsc);
+            LV_LOG_ERROR("Out of memory");
+            return;
+        }
+        for(uint32_t y = 0; y < header->h; y++) {
+            const lv_color32_t * src = (const lv_color32_t *)(decoder_dsc.decoded->data + y * header->stride);
+            lv_color32_t * dst = (lv_color32_t *)premultiplied + y * header->w;
+            for(uint32_t x = 0; x < header->w; x++) {
+                lv_opa_t a = src[x].alpha;
+                dst[x].red = LV_UDIV255(src[x].red * a);
+                dst[x].green = LV_UDIV255(src[x].green * a);
+                dst[x].blue = LV_UDIV255(src[x].blue * a);
+                dst[x].alpha = a;
+            }
+        }
+    }
+    else if(header->stride != tvg_stride) {
         LV_LOG_WARN("img_stride != tvg_stride (%" LV_PRIu32 " != %" LV_PRIu32 "), width = %" LV_PRIu32,
                     (uint32_t)header->stride,
                     tvg_stride, (uint32_t)header->w);
@@ -322,7 +346,9 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     }
 
     Tvg_Paint * img = tvg_picture_new();
-    tvg_picture_load_raw(img, (uint32_t *)decoder_dsc.decoded->data, header->w, header->h, true);
+    tvg_picture_load_raw(img, premultiplied ? premultiplied : (uint32_t *)decoder_dsc.decoded->data,
+                         header->w, header->h, true);
+    lv_free(premultiplied);
     Tvg_Paint * clip_path = tvg_paint_duplicate(obj);
     tvg_paint_set_composite_method(img, clip_path, TVG_COMPOSITE_METHOD_CLIP_PATH);
     tvg_paint_set_opacity(img, LV_UDIV255(p->opa * opa));
