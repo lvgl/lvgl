@@ -322,17 +322,9 @@ static lv_base_dir_t lv_bidi_get_letter_dir(uint32_t letter)
  */
 static bool lv_bidi_letter_is_weak(uint32_t letter)
 {
-    uint32_t i = 0;
-    static const char weaks[] = "0123456789";
-
-    do {
-        uint32_t x = lv_text_encoded_next(weaks, &i);
-        if(letter == x) {
-            return true;
-        }
-    } while(weaks[i] != '\0');
-
-    return false;
+    return (letter >= '0' && letter <= '9') ||
+           (letter >= 0x0660 && letter <= 0x0669) ||
+           (letter >= 0x06F0 && letter <= 0x06F9);
 }
 /**
  * Tell whether a character is RTL or not
@@ -341,6 +333,9 @@ static bool lv_bidi_letter_is_weak(uint32_t letter)
  */
 static bool lv_bidi_letter_is_rtl(uint32_t letter)
 {
+    /* Digits remain weak even when they share the Arabic RTL block. */
+    if(lv_bidi_letter_is_weak(letter)) return false;
+
     if(letter == 0x202E) return true;               /*Unicode of LV_BIDI_RLO*/
 
     /*Check for Persian and Arabic characters [https://en.wikipedia.org/wiki/Arabic_script_in_Unicode]*/
@@ -509,7 +504,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
 
         /*Keep weak letters (numbers) as LTR*/
         if(lv_bidi_letter_is_weak(letter)) {
-            uint32_t last_weak = i;
+            uint32_t last_weak = i + lv_text_encoded_size(&src[i]);
             uint32_t first_weak = i;
             uint16_t pos_conv_last_weak = pos_conv_i;
             uint16_t pos_conv_first_weak = pos_conv_i;
@@ -534,10 +529,10 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
                 pos_conv_first_weak = 0;
             }
 
-            if(dest) lv_memcpy(&dest[wr], &src[first_weak], last_weak - first_weak + 1);
+            if(dest) lv_memcpy(&dest[wr], &src[first_weak], last_weak - first_weak);
             if(pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_last_weak - pos_conv_first_weak + 1,
                                                pos_conv_rd_base + pos_conv_first_weak);
-            wr += last_weak - first_weak + 1;
+            wr += last_weak - first_weak;
             pos_conv_wr += pos_conv_last_weak - pos_conv_first_weak + 1;
         }
 

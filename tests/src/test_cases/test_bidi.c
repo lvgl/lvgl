@@ -761,4 +761,159 @@ void test_bidi_trailing_partial_char_pos_conv(void)
     TEST_ASSERT_EQUAL_UINT16(0, lv_bidi_get_logical_pos(input, NULL, len, LV_BASE_DIR_RTL, 1, NULL));
 }
 
+static void assert_numeric_bidi(const char * input, const char * expected, lv_base_dir_t dir,
+                                const uint16_t * expected_positions, uint16_t char_count)
+{
+    char output[64];
+    uint16_t positions[32];
+    uint32_t len = (uint32_t)strlen(input);
+    TEST_ASSERT_LESS_THAN(sizeof(output) - 1, len);
+    TEST_ASSERT_LESS_THAN(32, char_count);
+    lv_memset(output, GUARD_BYTE, sizeof(output));
+    lv_memset(positions, GUARD_BYTE, sizeof(positions));
+
+    lv_bidi_process_paragraph(input, output, len, dir, positions, char_count);
+    TEST_ASSERT_EQUAL_STRING(expected, output);
+    TEST_ASSERT_EQUAL_UINT8(GUARD_BYTE, (uint8_t)output[len + 1]);
+    TEST_ASSERT_EQUAL_UINT16(0xAAAA, positions[char_count]);
+
+    for(uint16_t visual = 0; visual < char_count; visual++) {
+        uint16_t logical = expected_positions[visual];
+        TEST_ASSERT_EQUAL_UINT16(logical, positions[visual] & 0x7FFF);
+        TEST_ASSERT_EQUAL_UINT16(logical, lv_bidi_get_logical_pos(input, NULL, len, dir, visual, NULL));
+        TEST_ASSERT_EQUAL_UINT16(visual, lv_bidi_get_visual_pos(input, NULL, (uint16_t)len, dir, logical, NULL));
+    }
+
+    lv_memset(positions, GUARD_BYTE, sizeof(positions));
+    lv_bidi_process_paragraph(input, NULL, len, dir, positions, char_count);
+    for(uint16_t visual = 0; visual < char_count; visual++) {
+        TEST_ASSERT_EQUAL_UINT16(expected_positions[visual], positions[visual] & 0x7FFF);
+    }
+    TEST_ASSERT_EQUAL_UINT16(0xAAAA, positions[char_count]);
+}
+
+void test_bidi_arabic_and_persian_digit_runs(void)
+{
+    const char * numbers[] = {"15", "\xd9\xa1\xd9\xa5", "\xdb\xb1\xdb\xb5"};
+    const lv_base_dir_t dirs[] = {LV_BASE_DIR_LTR, LV_BASE_DIR_RTL, LV_BASE_DIR_AUTO};
+    const uint16_t positions[] = {4, 2, 3, 1, 0};
+
+    for(uint32_t n = 0; n < sizeof(numbers) / sizeof(numbers[0]); n++) {
+        char input[32];
+        char expected[32];
+        lv_snprintf(input, sizeof(input), "\xd8\xb9\xd8\xb1%s\xd8\xa8", numbers[n]);
+        lv_snprintf(expected, sizeof(expected), "\xd8\xa8%s\xd8\xb1\xd8\xb9", numbers[n]);
+        for(uint32_t d = 0; d < sizeof(dirs) / sizeof(dirs[0]); d++) {
+            assert_numeric_bidi(input, expected, dirs[d], positions, 5);
+        }
+    }
+}
+
+void test_bidi_multibyte_digits_at_run_boundaries(void)
+{
+    const uint16_t leading_positions[] = {3, 2, 0, 1};
+    const uint16_t trailing_positions[] = {2, 3, 1, 0};
+    const uint16_t single_positions[] = {1, 0};
+    const char * numbers[] = {"\xd9\xa1\xd9\xa5", "\xdb\xb1\xdb\xb5"};
+
+    for(uint32_t n = 0; n < sizeof(numbers) / sizeof(numbers[0]); n++) {
+        char input[32];
+        char expected[32];
+        lv_snprintf(input, sizeof(input), "%s\xd8\xb9\xd8\xb1", numbers[n]);
+        lv_snprintf(expected, sizeof(expected), "\xd8\xb1\xd8\xb9%s", numbers[n]);
+        assert_numeric_bidi(input, expected, LV_BASE_DIR_RTL, leading_positions, 4);
+        lv_snprintf(input, sizeof(input), "\xd8\xb9\xd8\xb1%s", numbers[n]);
+        lv_snprintf(expected, sizeof(expected), "%s\xd8\xb1\xd8\xb9", numbers[n]);
+        assert_numeric_bidi(input, expected, LV_BASE_DIR_RTL, trailing_positions, 4);
+        assert_numeric_bidi(input, expected, LV_BASE_DIR_LTR, trailing_positions, 4);
+    }
+    assert_numeric_bidi("\xd8\xb9\xdb\xb1", "\xdb\xb1\xd8\xb9", LV_BASE_DIR_LTR, single_positions, 2);
+    assert_numeric_bidi("\xdb\xb1\xd8\xb9", "\xd8\xb9\xdb\xb1", LV_BASE_DIR_RTL, single_positions, 2);
+}
+
+void test_bidi_mixed_digit_encodings_and_separators(void)
+{
+    const uint16_t mixed_positions[] = {4, 1, 2, 3, 0};
+    const uint16_t separator_positions[] = {6, 1, 2, 3, 4, 5, 0};
+    const char mixed[] = "1\xd9\xa2\xdb\xb3";
+    const char separated[] = "\xdb\xb1,\xdb\xb2.\xdb\xb3";
+    const char * numbers[] = {mixed, separated};
+
+    for(uint32_t n = 0; n < sizeof(numbers) / sizeof(numbers[0]); n++) {
+        char input[32];
+        char expected[32];
+        lv_snprintf(input, sizeof(input), "\xd8\xb9%s\xd8\xb1", numbers[n]);
+        lv_snprintf(expected, sizeof(expected), "\xd8\xb1%s\xd8\xb9", numbers[n]);
+        assert_numeric_bidi(input, expected, LV_BASE_DIR_LTR,
+                            n == 0 ? mixed_positions : separator_positions, n == 0 ? 5 : 7);
+        assert_numeric_bidi(input, expected, LV_BASE_DIR_RTL,
+                            n == 0 ? mixed_positions : separator_positions, n == 0 ? 5 : 7);
+    }
+}
+
+void test_bidi_digits_do_not_choose_rtl_base_direction(void)
+{
+    const char * numbers[] = {"0123456789", "\xd9\xa0\xd9\xa1\xd9\xa2\xd9\xa3\xd9\xa4\xd9\xa5\xd9\xa6\xd9\xa7\xd9\xa8\xd9\xa9",
+                              "\xdb\xb0\xdb\xb1\xdb\xb2\xdb\xb3\xdb\xb4\xdb\xb5\xdb\xb6\xdb\xb7\xdb\xb8\xdb\xb9"
+                             };
+    const uint16_t positions[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    for(uint32_t n = 0; n < sizeof(numbers) / sizeof(numbers[0]); n++) {
+        char input[32];
+        lv_snprintf(input, sizeof(input), "%sHello", numbers[n]);
+        TEST_ASSERT_EQUAL(LV_BASE_DIR_LTR, lv_bidi_detect_base_dir(input));
+        assert_numeric_bidi(numbers[n], numbers[n], LV_BASE_DIR_LTR, positions, 10);
+        assert_numeric_bidi(numbers[n], numbers[n], LV_BASE_DIR_RTL, positions, 10);
+        assert_numeric_bidi(numbers[n], numbers[n], LV_BASE_DIR_AUTO, positions, 10);
+    }
+}
+
+void test_bidi_truncated_multibyte_digit_run(void)
+{
+    const char input[] = "\xd8\xb9\xdb\xb1\xdb\xb5";
+    const char expected[] = "\xdb\xb1\xd8\xb9";
+    const lv_base_dir_t dirs[] = {LV_BASE_DIR_LTR, LV_BASE_DIR_RTL};
+    for(uint32_t d = 0; d < sizeof(dirs) / sizeof(dirs[0]); d++) {
+        char output[8];
+        uint16_t positions[3] = {0xAAAA, 0xAAAA, 0xAAAA};
+        lv_memset(output, GUARD_BYTE, sizeof(output));
+        lv_bidi_process_paragraph(input, output, 5, dirs[d], positions, 2);
+        TEST_ASSERT_EQUAL_STRING(expected, output);
+        TEST_ASSERT_EQUAL_UINT8(0, (uint8_t)output[5]);
+        TEST_ASSERT_EQUAL_UINT8(GUARD_BYTE, (uint8_t)output[6]);
+        TEST_ASSERT_EQUAL_UINT16(1, positions[0] & 0x7FFF);
+        TEST_ASSERT_EQUAL_UINT16(0, positions[1] & 0x7FFF);
+        TEST_ASSERT_EQUAL_UINT16(0xAAAA, positions[2]);
+    }
+}
+
+void test_bidi_multibyte_digit_cursor_direction(void)
+{
+    const char input[] = "\xd8\xb9\xdb\xb1\xd9\xa5\xd8\xb1";
+    const uint16_t positions[] = {3, 1, 2, 0};
+    const bool directions[] = {true, false, false, true};
+    const lv_base_dir_t dirs[] = {LV_BASE_DIR_LTR, LV_BASE_DIR_RTL};
+    for(uint32_t d = 0; d < sizeof(dirs) / sizeof(dirs[0]); d++) {
+        for(uint16_t visual = 0; visual < 4; visual++) {
+            bool is_rtl = !directions[visual];
+            TEST_ASSERT_EQUAL_UINT16(positions[visual], lv_bidi_get_logical_pos(input, NULL,
+                                                                                (uint32_t)strlen(input), dirs[d], visual, &is_rtl));
+            TEST_ASSERT_EQUAL(directions[visual], is_rtl);
+            is_rtl = !directions[visual];
+            TEST_ASSERT_EQUAL_UINT16(visual, lv_bidi_get_visual_pos(input, NULL,
+                                                                    (uint16_t)strlen(input), dirs[d], positions[visual], &is_rtl));
+            TEST_ASSERT_EQUAL(directions[visual], is_rtl);
+        }
+    }
+}
+
+void test_bidi_persian_date_keeps_digit_order(void)
+{
+    /* The date reported in #10746, before Arabic/Persian glyph shaping. */
+    const char input[] = "\xd8\xb4\xd9\x86\xd8\xa8\xd9\x87\xd8\x8c \xdb\xb1\xdb\xb5 \xd9\x85\xd9\x87\xd8\xb1";
+    const char expected[] = "\xd8\xb1\xd9\x87\xd9\x85 \xdb\xb1\xdb\xb5 \xd8\x8c\xd9\x87\xd8\xa8\xd9\x86\xd8\xb4";
+    const uint16_t positions[] = {11, 10, 9, 8, 6, 7, 5, 4, 3, 2, 1, 0};
+    assert_numeric_bidi(input, expected, LV_BASE_DIR_RTL, positions, 12);
+    assert_numeric_bidi(input, expected, LV_BASE_DIR_AUTO, positions, 12);
+}
+
 #endif /*LV_BUILD_TEST*/
