@@ -42,7 +42,7 @@ OUTPUT_DIRECTORY     = {out_dir}
 STRIP_FROM_PATH      = {repo_root}
 INPUT                = {inputs}
 RECURSIVE            = YES
-FILE_PATTERNS        = lv*.h lv*.c lv*.cpp lv*.hpp
+FILE_PATTERNS        = {file_patterns}
 EXTRACT_ALL          = YES
 EXTRACT_STATIC       = YES
 GENERATE_HTML        = NO
@@ -50,7 +50,7 @@ GENERATE_LATEX       = NO
 GENERATE_XML         = YES
 XML_PROGRAMLISTING   = NO
 SOURCE_BROWSER       = NO
-ALIASES              =
+{aliases}
 QUIET                = YES
 WARNINGS             = NO
 WARN_IF_UNDOCUMENTED = NO
@@ -65,6 +65,35 @@ def _text(el) -> str:
     if el is None:
         return ""
     return " ".join("".join(el.itertext()).split())
+
+
+def _doc(el) -> str | None:
+    """Render descriptions like the former gen_json documentation provider."""
+    if el is None or el.tag == "parameterlist":
+        return None
+
+    docstring = el.text.strip() if el.text else None
+    for child in el:
+        value = _doc(child)
+        if value:
+            if docstring:
+                docstring += " " + value
+            else:
+                docstring = value.strip()
+
+    if el.tag == "para" and docstring:
+        docstring = "\n\n" + docstring
+
+    if el.tag == "ref" and docstring:
+        docstring = f":ref:`{docstring}`"
+
+    if el.tail:
+        if docstring:
+            docstring += " " + el.tail.strip()
+        else:
+            docstring = el.tail.strip()
+
+    return docstring
 
 
 def _split_args(argsstring: str) -> list[str] | None:
@@ -108,6 +137,7 @@ class Param:
     name: str | None
     type: str
     doc: str = ""
+    detailed_doc: str | None = None
 
     @property
     def is_varargs(self) -> bool:
@@ -148,6 +178,8 @@ class Function:
     from_definition: bool = False
     decl_params: list[Param] = field(default_factory=list)
     decl_return_type: str = ""
+    doc: str | None = None
+    return_doc: str | None = None
 
     @property
     def declaration(self) -> tuple[str, list[Param]]:
@@ -187,6 +219,7 @@ class Function:
 class EnumMember:
     name: str
     value: str = ""
+    doc: str | None = None
 
 
 @dataclass
@@ -194,6 +227,7 @@ class Enum:
     name: str
     members: list[EnumMember]
     header: str | None
+    doc: str | None = None
 
     @property
     def is_public(self) -> bool:
@@ -204,6 +238,7 @@ class Enum:
 class Field:
     name: str
     type: str
+    doc: str | None = None
 
 
 @dataclass
@@ -212,6 +247,7 @@ class Struct:
     kind: str  # "struct" or "union"
     fields: list[Field]
     header: str | None
+    doc: str | None = None
 
     @property
     def is_public(self) -> bool:
@@ -223,10 +259,41 @@ class Typedef:
     name: str
     type: str
     header: str | None
+    doc: str | None = None
 
     @property
     def is_public(self) -> bool:
         return bool(self.header and self.header.startswith(PUBLIC_INCLUDE_DIR))
+
+
+@dataclass
+class Variable:
+    name: str
+    type: str
+    header: str | None
+    doc: str | None = None
+
+
+@dataclass
+class Macro:
+    """A Doxygen definition, not a translation unit's final macro value.
+
+    `params` is None for object-like macros and [] for zero-argument macros.
+    `initializer` is the unevaluated C replacement text, or None if absent.
+    """
+
+    name: str
+    params: list[str] | None
+    initializer: str | None
+    source_file: str | None
+    source_line: int | None
+    doc: str | None = None
+
+    @property
+    def is_public(self) -> bool:
+        return bool(
+            self.source_file and self.source_file.startswith(PUBLIC_INCLUDE_DIR + "/")
+        )
 
 
 @dataclass
@@ -235,6 +302,11 @@ class PublicApi:
     enums: dict[str, Enum] = field(default_factory=dict)
     structs: dict[str, Struct] = field(default_factory=dict)
     typedefs: dict[str, Typedef] = field(default_factory=dict)
+    variables: dict[str, Variable] = field(default_factory=dict)
+    # Global lookup index; members of named enums are the same objects
+    # stored in Enum.members. Also retains members of anonymous enums.
+    enum_members: dict[str, EnumMember] = field(default_factory=dict)
+    macros: dict[str, list[Macro]] = field(default_factory=dict)
 
     def public_functions(self) -> list[Function]:
         return [f for f in self.functions.values() if f.is_public]
@@ -248,6 +320,11 @@ class PublicApi:
     def public_typedefs(self) -> list[Typedef]:
         return [t for t in self.typedefs.values() if t.is_public]
 
+    def public_macros(self) -> list[Macro]:
+        return [
+            m for definitions in self.macros.values() for m in definitions if m.is_public
+        ]
+
     # -- construction ----------------------------------------------------
 
     @classmethod
@@ -256,6 +333,12 @@ class PublicApi:
         repo_root: Path,
         xml_dir: Path | None = None,
         inputs: tuple[str, ...] = (PUBLIC_INCLUDE_DIR, "src"),
+        lv_conf_path: Path | None = None,
+        doxygen_predefined: tuple[str, ...] | None = None,
+        doxygen_include_path: tuple[Path | str, ...] | None = None,
+        doxygen_exclude: tuple[str, ...] | None = None,
+        doxygen_file_patterns: tuple[str, ...] | None = None,
+        inherit_doxygen_aliases: bool = False,
     ) -> "PublicApi":
         """Build the model, running Doxygen unless `xml_dir` is supplied."""
         if xml_dir is not None:
@@ -263,7 +346,17 @@ class PublicApi:
         with tempfile.TemporaryDirectory(prefix="lvgl-api-") as tmp:
             out_dir = Path(tmp)
             root = Path(repo_root)
-            run_doxygen(root, out_dir, inputs)
+            run_doxygen(
+                root,
+                out_dir,
+                inputs,
+                lv_conf_path=lv_conf_path,
+                doxygen_predefined=doxygen_predefined,
+                doxygen_include_path=doxygen_include_path,
+                doxygen_exclude=doxygen_exclude,
+                doxygen_file_patterns=doxygen_file_patterns,
+                inherit_doxygen_aliases=inherit_doxygen_aliases,
+            )
             return cls._from_xml(out_dir / "xml", root)
 
     @classmethod
@@ -281,6 +374,7 @@ class PublicApi:
         if not paths:
             raise RuntimeError(f"no Doxygen XML files in {xml_dir}")
 
+        macro_members = []
         for path in paths:
             try:
                 tree = ET.parse(path)
@@ -295,18 +389,53 @@ class PublicApi:
                             api.functions.get(func.name), func
                         )
                 elif kind == "enum":
-                    en = _enum_from_memberdef(member, root)
+                    members = [
+                        _enum_member(value) for value in member.findall("enumvalue")
+                    ]
+                    en = _enum_from_memberdef(member, root, members)
                     if en is not None:
-                        api.enums.setdefault(en.name, en)
+                        en = api.enums.setdefault(en.name, en)
+                        members = en.members
+                    for item in members:
+                        api.enum_members.setdefault(item.name, item)
                 elif kind == "typedef":
                     td = _typedef_from_memberdef(member, root)
                     if td is not None:
                         api.typedefs.setdefault(td.name, td)
+                elif kind == "define":
+                    compound = tree.find("compounddef")
+                    if compound is not None and compound.get("kind") == "file":
+                        macro_members.append(member)
+
+            # Fields have their own documentation; only file-level variables
+            # belong in the global-variable lookup used by gen_json.
+            for compound in tree.iter("compounddef"):
+                if compound.get("kind") != "file":
+                    continue
+                for member in compound.iter("memberdef"):
+                    if member.get("kind") != "variable":
+                        continue
+                    name = member.findtext("name")
+                    if name:
+                        variable = Variable(
+                            name=name,
+                            type=_text(member.find("type")),
+                            header=_header_of(member, root),
+                            doc=_doc(member.find("detaileddescription")),
+                        )
+                        previous = api.variables.get(name)
+                        if previous is None or (not previous.doc and variable.doc):
+                            api.variables[name] = variable
 
             for compound in tree.iter("compounddef"):
                 st = _struct_from_compounddef(compound, root)
                 if st is not None:
                     api.structs.setdefault(st.name, st)
+
+        for member in macro_members:
+            macro = _macro_from_memberdef(member, root)
+            if macro is not None:
+                api.macros.setdefault(macro.name, []).append(macro)
         return api
 
 
@@ -339,6 +468,7 @@ def _function_from_memberdef(member, root: Path) -> Function | None:
     arg_parts = _split_args(member.findtext("argsstring") or "")
     decl_params = member.findall("param")
     docs = _param_docs(member)
+    detailed_docs = _detailed_param_docs(member)
 
     params: list[Param] = []
     for i, p in enumerate(decl_params):
@@ -352,7 +482,12 @@ def _function_from_memberdef(member, root: Path) -> Function | None:
                 r"\[[^\]]*\]\s*$", arg_parts[i].strip()
             ):
                 ptype += "[]"
-        params.append(Param(name=pname, type=ptype, doc=docs.get(pname or "", "")))
+        params.append(Param(
+            name=pname,
+            type=ptype,
+            doc=docs.get(pname or "", ""),
+            detailed_doc=detailed_docs.get(pname or ""),
+        ))
 
     declfile = _relative(loc.get("declfile") or loc.get("file"), root)
     declline = loc.get("declline") or loc.get("line")
@@ -376,6 +511,10 @@ def _function_from_memberdef(member, root: Path) -> Function | None:
         brief=_text(member.find("briefdescription")),
         detail=_text(member.find("detaileddescription")),
         from_definition=bool(file_attr and bodyfile and file_attr == bodyfile),
+        doc=_doc(member.find("detaileddescription")),
+        return_doc=_joined_docs(
+            _doc(el) for el in member.findall(".//simplesect[@kind='return']")
+        ),
     )
 
 
@@ -387,18 +526,55 @@ def _header_of(member, root: Path) -> str | None:
     return path if (path or "").endswith((".h", ".hpp")) else None
 
 
-def _enum_from_memberdef(member, root: Path) -> Enum | None:
+def _enum_member(value) -> EnumMember:
+    return EnumMember(
+        name=value.findtext("name") or "",
+        value=_text(value.find("initializer")).lstrip("= ").strip(),
+        doc=_doc(value.find("detaileddescription")),
+    )
+
+
+def _macro_from_memberdef(member, root: Path) -> Macro | None:
+    """Map a Doxygen define while preserving macro kind and replacement text.
+
+    Object-like macros have no parameters; function-like parameters come from
+    XML, with an explicit zero-argument list kept distinct. Initializers remain
+    unevaluated C replacement text, preserving literal whitespace and escapes.
+    """
+    name = member.findtext("name")
+    if not name:
+        return None
+    params = member.findall("param")
+    initializer = member.find("initializer")
+    location = member.find("location")
+    source_file = _relative(location.get("file"), root) if location is not None else None
+    line = location.get("line", "") if location is not None else ""
+    return Macro(
+        name=name,
+        params=(
+            [p.findtext("defname") for p in params if p.findtext("defname")]
+            if params else None
+        ),
+        # Do not use _text(): collapsing whitespace changes string literals.
+        initializer=(
+            "".join(initializer.itertext()).strip() if initializer is not None else None
+        ),
+        source_file=source_file,
+        source_line=int(line) if line.isdigit() else None,
+        doc=_doc(member.find("detaileddescription")),
+    )
+
+
+def _enum_from_memberdef(
+    member, root: Path, members: list[EnumMember]
+) -> Enum | None:
     name = member.findtext("name")
     if not name or name.startswith("@"):  # anonymous
         return None
-    members = [
-        EnumMember(
-            name=v.findtext("name") or "",
-            value=_text(v.find("initializer")).lstrip("= ").strip(),
-        )
-        for v in member.findall("enumvalue")
-    ]
-    return Enum(name=name, members=members, header=_header_of(member, root))
+    return Enum(
+        name=name, members=members, header=_header_of(member, root),
+        doc=_doc(member.find("detaileddescription")),
+    )
 
 
 def _typedef_from_memberdef(member, root: Path) -> Typedef | None:
@@ -408,7 +584,8 @@ def _typedef_from_memberdef(member, root: Path) -> Typedef | None:
     type_ = _text(member.find("type"))
     args = (member.findtext("argsstring") or "").strip()
     return Typedef(
-        name=name, type=(type_ + args).strip(), header=_header_of(member, root)
+        name=name, type=(type_ + args).strip(), header=_header_of(member, root),
+        doc=_doc(member.find("detaileddescription")),
     )
 
 
@@ -432,15 +609,25 @@ def _struct_from_compounddef(compound, root: Path) -> Struct | None:
         if not fname:
             continue
         ftype = _text(m.find("type")) + (m.findtext("argsstring") or "")
-        fields.append(Field(name=fname, type=" ".join(ftype.split())))
-    return Struct(name=name, kind=kind, fields=fields, header=header)
+        fields.append(Field(
+            name=fname, type=" ".join(ftype.split()),
+            doc=_doc(m.find("detaileddescription")),
+        ))
+    return Struct(
+        name=name, kind=kind, fields=fields, header=header,
+        doc=_doc(compound.find("detaileddescription")),
+    )
 
 
-def _combine_docs(have: str, extra: str) -> str:
+def _combine_docs(have: str | None, extra: str | None) -> str | None:
     """Fold `extra` into `have`, keeping whichever text says more."""
-    if not extra or extra in have:
+    if not extra:
         return have
-    if have and have in extra:
+    if not have:
+        return extra
+    if extra in have:
+        return have
+    if have in extra:
         return extra
     return f"{have} {extra}".strip()
 
@@ -458,6 +645,28 @@ def _param_docs(member) -> dict[str, str]:
             if name:
                 out[name] = _combine_docs(out.get(name, ""), desc)
     return out
+
+
+def _detailed_param_docs(member) -> dict[str, str | None]:
+    """Preserve paragraph-aware docs without changing Param.doc consumers."""
+    out: dict[str, str | None] = {}
+    detail = member.find("detaileddescription")
+    if detail is None:
+        return out
+    for item in detail.iter("parameteritem"):
+        desc = _doc(item.find("parameterdescription"))
+        for nm in item.iter("parametername"):
+            name = _text(nm)
+            if name:
+                out[name] = _combine_docs(out.get(name), desc)
+    return out
+
+
+def _joined_docs(values) -> str | None:
+    result = None
+    for value in values:
+        result = _combine_docs(result, value)
+    return result
 
 
 def _merge(prev: Function | None, new: Function) -> Function:
@@ -514,6 +723,9 @@ def _merge(prev: Function | None, new: Function) -> Function:
         for i, p in enumerate(params):
             if i < len(src.params):
                 p.doc = _combine_docs(p.doc, src.params[i].doc)
+                p.detailed_doc = _combine_docs(
+                    p.detailed_doc, src.params[i].detailed_doc
+                )
 
     return Function(
         name=prev.name,
@@ -529,6 +741,8 @@ def _merge(prev: Function | None, new: Function) -> Function:
         from_definition=bool(definition),
         decl_params=decl_params,
         decl_return_type=decl_return_type,
+        doc=_combine_docs(prev.doc, new.doc),
+        return_doc=_combine_docs(prev.return_doc, new.return_doc),
     )
 
 
@@ -536,7 +750,17 @@ def doxygen_available() -> bool:
     return shutil.which("doxygen") is not None
 
 
-def run_doxygen(repo_root: Path, out_dir: Path, inputs) -> None:
+def run_doxygen(
+    repo_root: Path,
+    out_dir: Path,
+    inputs,
+    lv_conf_path: Path | None = None,
+    doxygen_predefined: tuple[str, ...] | None = None,
+    doxygen_include_path: tuple[Path | str, ...] | None = None,
+    doxygen_exclude: tuple[str, ...] | None = None,
+    doxygen_file_patterns: tuple[str, ...] | None = None,
+    inherit_doxygen_aliases: bool = False,
+) -> None:
     """Generate Doxygen XML for `repo_root` into `out_dir`."""
     if not doxygen_available():
         raise RuntimeError(
@@ -548,14 +772,33 @@ def run_doxygen(repo_root: Path, out_dir: Path, inputs) -> None:
         raise RuntimeError(f"missing {docs_doxyfile}")
 
     doxyfile = out_dir / "Doxyfile"
-    doxyfile.write_text(
-        DOXYFILE_TEMPLATE.format(
-            docs_doxyfile=docs_doxyfile,
-            out_dir=out_dir,
-            repo_root=repo_root,
-            inputs=" ".join(str(repo_root / i) for i in inputs),
-        )
+    config = DOXYFILE_TEMPLATE.format(
+        docs_doxyfile=docs_doxyfile,
+        out_dir=out_dir,
+        repo_root=repo_root,
+        inputs=" ".join(str(repo_root / i) for i in inputs),
+        file_patterns=" ".join(doxygen_file_patterns or (
+            "lv*.h", "lv*.c", "lv*.cpp", "lv*.hpp",
+        )),
+        aliases=(
+            "" if inherit_doxygen_aliases else "ALIASES              ="
+        ),
     )
+    if lv_conf_path is not None:
+        conf = Path(lv_conf_path).resolve()
+        config += f'INCLUDE_PATH += "{conf.parent}"\n'
+    if doxygen_include_path:
+        include_paths = " ".join(
+            f'"{Path(path).resolve()}"' for path in doxygen_include_path
+        )
+        config += f"INCLUDE_PATH += {include_paths}\n"
+    if doxygen_predefined is not None:
+        config += "\nPREDEFINED = " + " ".join(doxygen_predefined) + "\n"
+    if doxygen_exclude:
+        config += "\nEXCLUDE += " + " ".join(
+            f'"{path}"' for path in doxygen_exclude
+        ) + "\n"
+    doxyfile.write_text(config)
     proc = subprocess.run(
         ["doxygen", str(doxyfile)],
         cwd=repo_root,
