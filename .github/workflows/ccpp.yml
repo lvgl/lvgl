@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build-ubuntu:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -83,7 +83,7 @@ jobs:
         CC: ${{ matrix.compiler }}
 
   build-esp32s3:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Build ESP IDF ESP32S3
     container: espressif/idf:v5.3.1
     steps:
@@ -103,7 +103,7 @@ jobs:
       run: . /opt/esp/idf/export.sh && idf.py build
 
   test-native:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       actions: read

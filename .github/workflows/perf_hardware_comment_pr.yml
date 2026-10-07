@@ -19,7 +19,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'pull_request'
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Comment PR with HW Performance tests results
     steps:
       - name: Download Results from PR
