@@ -70,6 +70,7 @@ void lv_draw_pxp_layer(lv_draw_task_t * t)
 
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = draw_buf;
+    new_draw_dsc.header = draw_buf->header;
     t->draw_dsc = &new_draw_dsc;
     lv_draw_pxp_img(t);
     t->draw_dsc = draw_dsc;
