@@ -40,16 +40,16 @@ descriptor are very useful to identify the Draw Task.  For example:
 ```c
 /* In LV_EVENT_DRAW_TASK_ADDED */
 lv_draw_task_t * t = lv_event_get_draw_task(e);
-lv_draw_base_dsc_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
-draw_dsc.obj;  /* The Widget for which the draw descriptor was created */
-draw_dsc.part; /* The Widget part for which the draw descriptor was created
+lv_draw_dsc_base_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
+draw_dsc->obj;  /* The Widget for which the draw descriptor was created */
+draw_dsc->part; /* The Widget part for which the draw descriptor was created
                   E.g. LV_PART_INDICATOR */
-draw_dsc.id1;  /* A Widget type specific ID (e.g. table row index).
+draw_dsc->id1;  /* A Widget type specific ID (e.g. table row index).
                   See the docs of the given Widget. */
-draw_dsc.id2;
+draw_dsc->id2;
 
-draw_dsc.layer; /* The target layer.
-                   Required when a new Draw Tasks are also created */
+draw_dsc->layer; /* The target layer.
+                   Required when new Draw Tasks are also created */
 ```
 
 ### Simple Initialization
@@ -143,7 +143,7 @@ radius, opacity, and color to draw a rectangle.  If opacity is 0, no draw task w
 be created.
 
 - <ApiLink name="lv_draw_fill_dsc_init" display="lv_draw_fill_dsc_init(&dsc)" /> initializes a fill Draw Task.
-- <ApiLink name="lv_draw_sw_fill" display="lv_draw_sw_fill(layer, &dsc, area)" /> creates a Draw Task to fill an area.
+- <ApiLink name="lv_draw_fill" display="lv_draw_fill(layer, &dsc, area)" /> creates a Draw Task to fill an area.
 - <ApiLink name="lv_draw_task_get_fill_dsc" display="lv_draw_task_get_fill_dsc(draw_task)" /> retrieves the fill descriptor from
   a Draw Task.
 
@@ -164,11 +164,11 @@ The following show some example gradients.
 
 <LvglExample name="lv_example_style_2" path="styles/lv_example_style_2" />
 
-<LvglExample name="lv_example_style_17" path="styles/lv_example_style_17" />
+<LvglExample name="lv_example_style_gradient_conic" path="styles/lv_example_style_gradient_conic" />
 
-<LvglExample name="lv_example_style_18" path="styles/lv_example_style_18" />
+<LvglExample name="lv_example_style_gradient_radial" path="styles/lv_example_style_gradient_radial" />
 
-<LvglExample name="lv_example_style_19" path="styles/lv_example_style_19" />
+<LvglExample name="lv_example_style_gradient_buttons" path="styles/lv_example_style_gradient_buttons" />
 
 For each gradient type, multiple color and opacity values can be assigned.  These are
 called "stops".  The maximum number of stops is limited to
@@ -237,7 +237,7 @@ descriptor.
 
 ### Linear Gradients
 
-The linear (or skew) gradient are similar to horizontal or vertical gradient but the
+The linear (or skew) gradient is similar to horizontal or vertical gradient but the
 angle of the gradient can be controlled.
 
 The linear gradient will be rendered along a line defined by 2 points.
@@ -280,7 +280,7 @@ After initializing the stops with <ApiLink name="lv_grad_init_stops" />, the con
 can be set up with:
 <ApiLink name="lv_grad_conical_init" display="lv_grad_conical_init(&grad, center_x, center_y, angle_start, angle_end, LV_GRAD_EXTEND_...)" />
 
-For both the center and edge coordinates, `px` or `lv_pct()` values can be used.
+For the center coordinates, `px` or `lv_pct()` values can be used.
 
 The zero angle is on the right-hand side, and 90 degrees is at the bottom.
 
@@ -293,7 +293,7 @@ width, color, and side fields.  If the opacity or width is 0, no Draw Task will
 be created.
 
 `side` can contain ORed values of <ApiLink name="lv_border_side_t" />, such as
-<ApiLink name="LV_BORDER_SIDE_BOTTOM" />.  <ApiLink name="LV_BORDER_SIDE_ALL" />
+<ApiLink name="LV_BORDER_SIDE_BOTTOM" />.  <ApiLink name="LV_BORDER_SIDE_FULL" />
 applies to all sides, while <ApiLink name="LV_BORDER_SIDE_INTERNAL" /> is used by
 higher layers (e.g. a table Widget) to calculate border sides.  However, the drawing
 routine receives only simpler values.
@@ -301,7 +301,7 @@ routine receives only simpler values.
 The following functions are used for border drawing:
 
 - <ApiLink name="lv_draw_border_dsc_init" display="lv_draw_border_dsc_init(&dsc)" /> initializes a border Draw Task.
-- <ApiLink name="lv_draw_sw_border" display="lv_draw_sw_border(layer, &dsc, area)" /> creates a Draw Task to draw a border
+- <ApiLink name="lv_draw_border" display="lv_draw_border(layer, &dsc, area)" /> creates a Draw Task to draw a border
   inward from its area.
 - <ApiLink name="lv_draw_task_get_border_dsc" display="lv_draw_task_get_border_dsc(draw_task)" /> retrieves the border descriptor
   from a Draw Task.
@@ -349,7 +349,7 @@ Note: Rendering large shadows may be slow or memory-intensive.
 The following functions are used for box shadow drawing:
 
 - <ApiLink name="lv_draw_box_shadow_dsc_init" display="lv_draw_box_shadow_dsc_init(&dsc)" /> initializes a box shadow Draw Task.
-- <ApiLink name="lv_draw_sw_box_shadow" display="lv_draw_sw_box_shadow(layer, &dsc, area)" /> creates a Draw Task for a rectangle's
+- <ApiLink name="lv_draw_box_shadow" display="lv_draw_box_shadow(layer, &dsc, area)" /> creates a Draw Task for a rectangle's
   shadow. The shadow's size and position depend on the width, spread, and offset.
 - <ApiLink name="lv_draw_task_get_box_shadow_dsc" display="lv_draw_task_get_box_shadow_dsc(draw_task)" /> retrieves the box shadow
   descriptor from a Draw Task.
@@ -426,7 +426,7 @@ for controlling text rendering:
 | `bidi_dir` | Base direction for right-to-left text rendering (e.g., Arabic). See <ApiLink name="lv_base_dir_t" />. |
 | `decor` | Text decoration, e.g., underline. See <ApiLink name="lv_text_decor_t" />. |
 | `flag` | Flags for text rendering. See <ApiLink name="lv_text_flag_t" />. |
-| `text_length` | Number of characters to render (0 means render until `\\0`). |
+| `text_length` | Number of characters to render (0 means render until `\0`). |
 | `text_local` | Set to 1 to allocate a buffer and copy the text. |
 | `text_static` | Indicates `text` is constant and its pointer can be cached. |
 | `hint` | Pointer to externally stored data to speed up rendering. See <ApiLink name="lv_draw_label_hint_t" />. |
@@ -440,7 +440,7 @@ Functions for text drawing:
 - <ApiLink name="lv_draw_task_get_label_dsc" display="lv_draw_task_get_label_dsc(draw_task)" /> retrieves the label descriptor from a task.
 
 For character-specific drawing in draw units, use
-<ApiLink name="lv_draw_label_iterate_characters" display="lv_draw_label_iterate_characters(draw_unit, draw_dsc, area, callback)" />.
+<ApiLink name="lv_draw_label_iterate_characters" display="lv_draw_label_iterate_characters(draw_task, draw_dsc, area, callback)" />.
 This iterates through all characters, calculates their positions, and calls the
 callback for rendering each character.  For callback details, see
 <ApiLink name="lv_draw_glyph_cb_t" />.
@@ -570,7 +570,7 @@ following fields:
 |-------|-------------|
 | `drop_shadow_opa` | Opacity (0--255 range). Values like `LV_OPA_TRANSP`, `LV_OPA_10`, etc., can also be used. If 0, the drop shadow won't be rendered |
 | `drop_shadow_color` | Drop shadow color. |
-| `drop_shadow_radius` | The blur radius of the drop shadow. |
+| `drop_shadow_blur_radius` | The blur radius of the drop shadow. |
 | `drop_shadow_ofs_x` | Horizontal offset. |
 | `drop_shadow_ofs_y` | Vertical offset. |
 
@@ -632,7 +632,7 @@ lv_vector_path_delete(path);
 lv_draw_vector_dsc_delete(dsc);
 ```
 
-To see all the path, stroke, and fill options, check out [lv_draw_vector.h](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_vector.h) .
+To see all the path, stroke, and fill options, check out [lv_draw_vector.h](https://github.com/lvgl/lvgl/blob/master/include/lvgl/draw/lv_draw_vector.h) .
 
 ## Masking Operation
 
@@ -640,7 +640,7 @@ There are several options to mask parts of a layer, Widget, or drawing:
 
 1. **Radius of Rectangles**:
    Set the `radius` style property or the `radius` in the draw descriptors.  This
-   creates rounded rectangles, borders, outlines, etc..  However, the content of
+   creates rounded rectangles, borders, outlines, etc.  However, the content of
    subsequent renderings will not be masked out in the corners.
 2. **Clip Radius of Images**:
    Similar to rectangles, images can also be rendered with a `radius`.  Since
@@ -671,15 +671,15 @@ There are several options to mask parts of a layer, Widget, or drawing:
    create a layer for the top and bottom corner areas of a Widget.  It renders the
    children there and blends it by setting `clip_radius` to the layer.
 5. **Bitmap Masking for Images**:
-   Using `..._style_bitmap_mask` or `bitmap_mask` in
+   Using `..._style_bitmap_mask_src` or `bitmap_mask_src` in
    <ApiLink name="lv_draw_image_dsc_t" /> allows setting an A8 or L8 image as a mask
    for an image/layer during blending.
 
    - Limitation:  The mask always aligns to the center, and only one bitmap mask can
      be used for an image/layer.
-   - When `..._style_bitmap_mask` is used, LVGL automatically creates a layer,
+   - When `..._style_bitmap_mask_src` is used, LVGL automatically creates a layer,
      renders the Widgets there, and applies the bitmap mask during blending.
-   - Alternatively, the `bitmap_mask` property in the draw descriptor can be
+   - Alternatively, the `bitmap_mask_src` property in the draw descriptor can be
      used directly for image drawing.
 
    By using the Canvas Widget with an <ApiLink name="LV_COLOR_FORMAT_L8" /> buffer,
@@ -687,5 +687,5 @@ There are several options to mask parts of a layer, Widget, or drawing:
 
 <LvglExample name="lv_example_label_4" path="widgets/label/lv_example_label_4" />
 
-<LvglExample name="lv_example_roller_3" path="widgets/roller/lv_example_roller_3" />
+<LvglExample name="lv_example_roller_fade_mask" path="widgets/roller/lv_example_roller_fade_mask" />
 

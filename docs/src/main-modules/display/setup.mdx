@@ -6,23 +6,23 @@ description: "During system initialization, you must do the following for each p
 During system initialization, you must do the following for each physical display
 panel you want LVGL to use:
 
-- [create an lv_display_t](/main-modules/display/setup) object for it,
-- assign its [Draw Buffer(s)](/main-modules/display/setup), and
-- assign a [Flush Callback](/main-modules/display/setup) for it.
+- [create an lv_display_t](#creating-a-display) object for it,
+- assign its [Draw Buffer(s)](#draw-buffers), and
+- assign a [Flush Callback](#flush-callback) for it.
 
 ## Creating a Display
 
 To create a display for LVGL:
 
 ```c
-lv_display_t * display1 = lv_display_create(hor_res, ver_res)
+lv_display_t * display1 = lv_display_create(hor_res, ver_res);
 ```
 
 You can create [multiple displays](/main-modules/display/overview) with a different driver for
 each (see below).
 
 When an `lv_display_t` object is created, with it are created 4 Screens set up
-to help you manage layering of displayed Widgets.  See [Transparent Screens](/main-modules/display/color_format) and
+to help you manage layering of displayed Widgets.  See [Transparent Screens](/main-modules/display/color_format#transparent-screens) and
 [Screen Layers](/main-modules/display/screen_layers) for more information.
 
 ### Default Display
@@ -45,7 +45,7 @@ During system initialization, you must set drawing buffers for LVGL to use for e
 display.  Do so by calling:
 
 ```c
-lv_display_set_buffers(display1, buf1, buf2, buf_size_in_bytes, render_mode)
+lv_display_set_buffers(display1, buf1, buf2, buf_size_in_bytes, render_mode);
 ```
 
 - `buf1` a buffer to which LVGL can render pixels
@@ -55,21 +55,21 @@ lv_display_set_buffers(display1, buf1, buf2, buf_size_in_bytes, render_mode)
 
    -  <ApiLink name="LV_DISPLAY_RENDER_MODE_PARTIAL" /> Use the buffer(s) to render
       to the display using buffers smaller than the size of the display.  Use of
-      buffers at least 1/10 display size is recommended.  In [Flush Callback](/main-modules/display/setup) the rendered
+      buffers at least 1/10 display size is recommended.  In [Flush Callback](#flush-callback) the rendered
       images need to be copied to the given area of the display.  In this mode if a
       button is pressed only the button's area will be redrawn.
    -  <ApiLink name="LV_DISPLAY_RENDER_MODE_DIRECT" /> The buffer size(s) must match
       the size of the display.  LVGL will render into the correct location of the
       buffer.  Using this method the buffer(s) always contain the whole display image.
       If two buffers are used, the rendered areas are automatically copied to the
-      other buffer after flushing.  Due to this in [Flush Callback](/main-modules/display/setup) typically
+      other buffer after flushing.  Due to this in [Flush Callback](#flush-callback) typically
       only a frame buffer address needs to be changed.  If a button is pressed
       only the button's area will be redrawn.
    -  <ApiLink name="LV_DISPLAY_RENDER_MODE_FULL" /> The buffer size(s) must match
       the size of the display.  LVGL will always redraw the whole screen even if only
       1 pixel has been changed.  If two display-sized draw buffers are provided,
       LVGL's display handling works like "traditional" double buffering.  This means
-      the [Flush Callback](/main-modules/display/setup) callback only has to update the address of the frame buffer to
+      the [Flush Callback](#flush-callback) callback only has to update the address of the frame buffer to
       the `px_map` parameter.
 
 ### Simple Example
@@ -85,7 +85,7 @@ lv_display_set_buffers(display1, buf1, NULL, sizeof(buf1), LV_DISPLAY_RENDER_MOD
 ### One Buffer
 
 If only one buffer is used, LVGL draws the content of the screen into
-that draw buffer and sends it to the display via the [Flush Callback](/main-modules/display/setup). LVGL
+that draw buffer and sends it to the display via the [Flush Callback](#flush-callback). LVGL
 then waits until <ApiLink name="lv_display_flush_ready" /> is called
 (that is, the content of the buffer has been sent to the
 display) before drawing something new into it.
@@ -109,7 +109,7 @@ The third buffer is configured using the <ApiLink name="lv_display_set_3rd_draw_
 ## Flush Callback
 
 Draw buffer(s) are simple array(s) that LVGL uses to render the display's
-content.  Once rendering is has been completed, the content of the draw buffer is
+content.  Once rendering has been completed, the content of the draw buffer is
 sent to the display using a Flush Callback function.
 
 An example looks like this:
@@ -140,7 +140,7 @@ During system initialization, tell LVGL you want that function to copy pixels fr
 rendered pixel-buffers to a particular display by doing the following:
 
 ```c
-lv_display_set_flush_cb(display1, my_flush_cb)
+lv_display_set_flush_cb(display1, my_flush_cb);
 ```
 
 Note that which display is targeted is passed to the function, so you can use the
@@ -148,6 +148,7 @@ same function for multiple displays, or use different functions for multiple
 displays.  It's up to you.
 
 <Callout type="info">
+<ApiLink name="lv_display_flush_ready" display="lv_display_flush_ready(display1)" /> needs to be called when flushing is
 complete to inform LVGL that the buffer is available again to render new content
 into it.
 </Callout>
@@ -162,7 +163,7 @@ By using <ApiLink name="lv_display_flush_ready" /> LVGL will normally spin in a 
 while waiting for flushing.
 
 However with the help of <ApiLink name="lv_display_set_flush_wait_cb" /> a custom
-wait callback be set for flushing.  This callback can use a semaphore, mutex,
+wait callback can be set for flushing.  This callback can use a semaphore, mutex,
 or anything else to optimize waiting for the flush to be completed.  The callback
 need not call <ApiLink name="lv_display_flush_ready" /> since the caller takes care of
 that (clearing the display's `flushing` flag) when your callback returns.

@@ -31,11 +31,11 @@ in detail in their own section of documentation.
 There are some flags that can be used on Widgets to affect how they behave with
 layouts:
 
-- <ApiLink name="LV_OBJ_FLAG_HIDDEN" /> Hidden Widgets are ignored in layout
+- <ApiLink name="LV_OBJ_FLAG_HIDDEN" />: Hidden Widgets are ignored in layout
   calculations.
-- <ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> The Widget is simply ignored by the
+- <ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" />: The Widget is simply ignored by the
   layouts. Its coordinates can be set as usual.
-- <ApiLink name="LV_OBJ_FLAG_FLOATING" /> Same as
+- <ApiLink name="LV_OBJ_FLAG_FLOATING" />: Same as
   <ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> but the Widget with
   <ApiLink name="LV_OBJ_FLAG_FLOATING" /> will be ignored in
   <ApiLink name="LV_SIZE_CONTENT" /> calculations.
@@ -48,7 +48,7 @@ These flags can be added/removed with <ApiLink name="lv_obj_add_flag" display="l
 LVGL can be freely extended by a custom layout like this:
 
 ```c
-lv_layout_callbacks_t callbacks {
+lv_layout_callbacks_t callbacks = {
     .layout_update_cb = my_layout_update,
     .get_min_size_cb = my_get_min_size, // or NULL
 };

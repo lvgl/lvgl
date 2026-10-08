@@ -33,7 +33,7 @@ Keyboards have the following modes:
 The layouts of the `TEXT` modes contain "keys" to change mode.
 
 To set the mode programmatically, use <ApiLink name="lv_keyboard_set_mode" display="lv_keyboard_set_mode(kb, mode)" />. The
-default mode is <ApiLink name="LV_KEYBOARD_MODE_TEXT_UPPER" />.
+default mode is <ApiLink name="LV_KEYBOARD_MODE_TEXT_LOWER" />.
 
 ## Assign Text Area
 
@@ -81,7 +81,7 @@ maps:
 | <ApiLink name="LV_SYMBOL_BACKSPACE" /> | Delete the character before the cursor. |
 | <ApiLink name="LV_SYMBOL_LEFT" /> / <ApiLink name="LV_SYMBOL_RIGHT" /> | Move the cursor. |
 | <ApiLink name="LV_SYMBOL_NEW_LINE" /> | Insert a newline. |
-| `"ABC"` / `"abc"` / `"1#"` | Switch to upper / lower / number map. |
+| `"ABC"` / `"abc"` / `"1#"` | Switch to upper / lower / special map. |
 
 ## Key customization
 
@@ -111,7 +111,7 @@ Learn more about [Events](/common-widget-features/events) emitted by all Widgets
 
 ## Keys
 
-- `LV_KEY_RIGHT/UP/LEFT/RIGHT` To navigate among the buttons,
+- `LV_KEY_RIGHT/UP/LEFT/DOWN` To navigate among the buttons,
    selecting the one navigated to.
 - <ApiLink name="LV_KEY_ENTER" /> To press/release the selected button.
 

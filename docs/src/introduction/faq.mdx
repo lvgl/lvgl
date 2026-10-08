@@ -25,7 +25,7 @@ Every MCU and MPU which is capable of driving a display via parallel port, SPI, 
 
 This includes:
 
-- "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, PIC32, TI AMxxx, etc.
+- "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, i.MX, PIC32, TI AMxxx, etc.
 - Bluetooth, GSM, Wi-Fi modules like Nordic NRF, Espressif ESP32 and Raspberry Pi Pico
 - Linux with frame buffer device such as /dev/fb0. This includes Single-board computers like the Raspberry Pi
 - Anything else with a strong enough MCU and a peripheral to drive a display
@@ -49,7 +49,7 @@ See the [Display (lv_display)](/main-modules/display) section to learn more.
 ## LVGL doesn't start, randomly crashes or nothing is drawn on the display. What might be the problem?
 
 - Try increasing <ApiLink name="LV_MEM_SIZE" />.
-- Be sure that your display works without LVGL. E.g. paint it to red on start up.
+- Be sure that your display works without LVGL. E.g. paint it red on startup.
 - Enable [Logging](/debugging/log).
 - Enable assertions in `lv_conf.h` (`LV_USE_ASSERT_...`).
 - If you use an RTOS, increase the stack size of the task that calls <ApiLink name="lv_timer_handler" />.
@@ -69,7 +69,7 @@ Be sure you are calling <ApiLink name="lv_display_flush_ready" display="lv_displ
 ## Why do I see only garbage on the screen?
 
 There is probably a bug in your display driver. Try the following code without using
-LVGL.  You should see a square with red-blue gradient.
+LVGL.  You should see a square with red-green gradient.
 
 ```c
 #define BUF_WIDTH 255
@@ -130,7 +130,7 @@ If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` com
 ## How do I use LVGL with an operating system?
 
 To work with an operating system where tasks can interrupt each other (preemptively),
-you must ensure that no LVGL function call be called while another LVGL call is in
+you must ensure that no LVGL function is called while another LVGL call is in
 progress.  LVGL has built-in mechanisms to support this, and also has built-in support to use mainstream operating systems out of the box.
 
 There are several ways to do this.  See the [Operating Systems and Threads](/integration/overview#operating-system-support) section to

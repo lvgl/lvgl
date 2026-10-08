@@ -26,7 +26,7 @@ arrows, the slider's value will be changed.
 
 ## Usage
 
-To create a group, use <ApiLink name="lv_group_t" display="lv_group_t * g = lv_group_create" />, and to add a
+To create a group, use <ApiLink name="lv_group_create" display="lv_group_t * g = lv_group_create()" />, and to add a
 widget to the group, use <ApiLink name="lv_group_add_obj" display="lv_group_add_obj(g, widget)" />.
 
 Once a widget has been added to a group, you can find out what group it belongs to
@@ -58,14 +58,14 @@ mode upon a short click. But for widgets where a short click has meaning (e.g., 
 [Button](/widgets/button)), a long press is required.
 
 Whether a widget is editable is set in the widget's class. See, for example,
-[.editable = LV_OBJ_CLASS_EDITABLE_TRUE` in
-`lv_slider.c](https://github.com/lvgl/lvgl/blob/master/src/widgets/slider/lv_slider.c).
+`.editable = LV_OBJ_CLASS_EDITABLE_TRUE` in
+[lv_slider.c](https://github.com/lvgl/lvgl/blob/master/src/widgets/slider/lv_slider.c).
 
 ## Default Group
 
 Interactive widgets (such as Buttons, Checkboxes, Sliders, etc.) can be automatically
 added to a default group. Just create a group with
-<ApiLink name="lv_group_t" display="lv_group_t * g = lv_group_create" /> and set the default group with
+<ApiLink name="lv_group_create" display="lv_group_t * g = lv_group_create()" /> and set the default group with
 <ApiLink name="lv_group_set_default" display="lv_group_set_default(g)" />.
 
 Don't forget to assign one or more input devices to the default group using

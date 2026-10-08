@@ -11,9 +11,9 @@ the solution, but it's necessary to convert the bitmap font (BDF) to a TTF.
 ## Convert BDF to TTF
 
 BDF are bitmap fonts where fonts are not described in outlines but in pixels. BDF files can be used but
-they must be converted into the TTF format using [mkttf`, which can be found
+they must be converted into the TTF format using `mkttf`, which can be found
 in this GitHub repository:  https://github.com/Tblue/mkttf .  This tool uses potrace to generate outlines from
-the bitmap information. The bitmap itself will be embedded into the TTF as well. `lv_font_conv](https://github.com/lvgl/lv_font_conv/) uses
+the bitmap information. The bitmap itself will be embedded into the TTF as well. [lv_font_conv](https://github.com/lvgl/lv_font_conv/) uses
 the embedded bitmap but it also needs the outlines. One might think you can use a fake MS Bitmap
 only sfnt (ttf) (TTF without outlines) created by fontforge, but this will not work.
 
@@ -33,7 +33,7 @@ git clone https://github.com/Tblue/mkttf
 
 Read the mkttf docs.
 
-Former versions of imagemagick needs the imagemagick call in front of convert, identify and so on.
+Former versions of imagemagick need the imagemagick call in front of convert, identify and so on.
 But newer versions don't. So you might want to change 2 lines in `potrace-wrapper.sh` ---
 open `potrace-wrapper.sh` and remove imagemagick from line 55 and line 64:
 
@@ -78,6 +78,6 @@ To create a font for LVGL:
 lv_font_conv --bpp 1 --size 12 --no-compress --font TerminusMedium-001.000.ttf --range 0x20-0x7e,0xa1-0xff --format lvgl -o terminus_1bpp_12px.c
 ```
 
-| Field | Description |
-|-------|-------------|
-| `note` | use 1-bpp because we don't use anti-aliasing. It doesn't look sharp on displays with a low resolution. |
+<Callout type="info">
+Use 1-bpp because we don't use anti-aliasing. It doesn't look sharp on displays with a low resolution.
+</Callout>

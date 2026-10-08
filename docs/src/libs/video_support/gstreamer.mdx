@@ -98,13 +98,13 @@ Follow the official GStreamer documentation to install its development libraries
 
     # Link with LVGL
     target_include_directories(lvgl PUBLIC
-    		$\{GSTREAMER_INCLUDE_DIRS\}
-    		$\{GSTREAMER_VIDEO_INCLUDE_DIRS\}
-    		$\{GSTREAMER_APP_INCLUDE_DIRS\})
+    		${GSTREAMER_INCLUDE_DIRS}
+    		${GSTREAMER_VIDEO_INCLUDE_DIRS}
+    		${GSTREAMER_APP_INCLUDE_DIRS})
     target_link_libraries(lvgl PUBLIC
-    		$\{GSTREAMER_LIBRARIES\}
-    		$\{GSTREAMER_VIDEO_LIBRARIES\}
-    		$\{GSTREAMER_APP_LIBRARIES\})
+    		${GSTREAMER_LIBRARIES}
+    		${GSTREAMER_VIDEO_LIBRARIES}
+    		${GSTREAMER_APP_LIBRARIES})
     ```
 
 4. **Manual Compilation with pkg-config**

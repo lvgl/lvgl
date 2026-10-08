@@ -6,7 +6,7 @@ description: "LVGL has a built-in Timer system. You can register a function to h
 LVGL has a built-in Timer system. You can register a function to have it
 be called periodically. The Timers are handled and called in
 <ApiLink name="lv_timer_handler" />, which needs to be called every few milliseconds.
-See [Timer Handler](/integration/overview) for more information.
+See [Timer Handler](/integration/overview#timer-handler) for more information.
 
 By default, LVGL itself uses Timers to:
 
@@ -15,7 +15,7 @@ By default, LVGL itself uses Timers to:
   value of <ApiLink name="LV_DEF_REFR_PERIOD" />, and also sends all display-related events,
   like <ApiLink name="LV_EVENT_REFR_START" />, <ApiLink name="LV_EVENT_REFR_READY" />,
   etc.
-- read input devices --- during the creation of each [Input devices (lv_indev)](/main-modules/indev), a Timer is
+- read input devices --- during the creation of each [Input Device](/main-modules/indev), a Timer is
   created for that Input Device based on the configured value of
   <ApiLink name="LV_DEF_REFR_PERIOD" />.  That Timer causes that input device to be read and
   also sends all input-device-related events, like <ApiLink name="LV_EVENT_CLICKED" />,
@@ -88,7 +88,7 @@ to instead be paused after it has run `count` times.  This can be handy if you
 reuse that timer repeatedly and want to avoid the CPU and <ApiLink name="lv_malloc" />
 overhead of repeatedly creating and deleting a timer.  If you use this option, you
 will need to set its repeat count (to either `-1` or a positive repeat count, since
-it will have decremented to `0`) and [resume](/main-modules/timer) it to
+it will have decremented to `0`) and [resume](#pause-and-resume) it to
 make it active again.
 
 ## Pause and Resume
@@ -178,6 +178,6 @@ lv_unlock();
 ```
 
 If you just want to delete a Widget and don't need to clean anything up
-in `my_screen_cleanup` you could just use <ApiLink name="lv_obj_delete_async" display="lv_obj_delete_async(widget)" /> which
+in `my_screen_clean_up` you could just use <ApiLink name="lv_obj_delete_async" display="lv_obj_delete_async(widget)" /> which
 will delete the Widget on the next call to <ApiLink name="lv_timer_handler" />.
 

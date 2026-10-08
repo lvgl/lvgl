@@ -7,9 +7,9 @@ The images module supports images in any of 3 forms:
 
 | Form | Source |
 | --- | --- |
-| Variables_ | <ApiLink name="lv_image_dsc_t" /> object + data in ROM or RAM |
-| Files_ | [File System (lv_fs_drv)](/main-modules/fs) path to file (e.g. JPG, PNG, BMP etc.) |
-| Symbols_ | C strings starting with Unicode characters (e.g. icons) in UTF-8 |
+| [Variables](#variables) | <ApiLink name="lv_image_dsc_t" /> object + data in ROM or RAM |
+| [Files](#files) | [File System (lv_fs_drv)](/main-modules/fs) path to file (e.g. JPG, PNG, BMP etc.) |
+| [Symbols](#symbols) | C strings starting with Unicode characters (e.g. icons) in UTF-8 |
 
 Image sources are set by calling one of the `..._set_src()` functions.  See code
 examples below.
@@ -97,8 +97,8 @@ lv_image_set_src(icon, LV_SYMBOL_BATTERY_FULL);
 lv_image_set_src(icon, LV_SYMBOL_OK " Accept");
 ```
 
-The file `./src/font/lv_symbol_def.h` contains a wide variety of Unicode symbols you
-can use directly, or you can make your own.  See [Adding a Custom Symbol](/main-modules/fonts/overview)
+The file `./include/lvgl/font/lv_symbol_def.h` contains a wide variety of Unicode symbols you
+can use directly, or you can make your own.  See [Adding a Custom Symbol](/main-modules/fonts/overview#adding-a-custom-symbol)
 for details.
 
 <Callout type="info">

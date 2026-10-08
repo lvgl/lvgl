@@ -1,6 +1,6 @@
 ---
 title: Image Decoders
-description: "Images that are encoded (i.e."
+description: "Images that are encoded (i.e. outside of the list of built-in supported Color Formats) are dealt with through an Image Decoder."
 ---
 
 ## What is an Image Decoder?
@@ -20,7 +20,7 @@ LVGL comes with a number of image decoders to support a number of popular image 
 | PNG | LV_USE_LODEPNG | [LodePNG Decoder](/libs/image_support/lodepng) | No | File or variable | Full image |
 | PNG | LV_USE_LIBPNG | [libpng Decoder](/libs/image_support/libpng) | Yes | File or variable | Full image |
 | JPG | LV_USE_LIBJPEG_TURBO | [libjpeg-turbo Decoder](/libs/image_support/libjpeg_turbo) | Yes | File only | 8x8 Pixel Tiles |
-| JPG | LV_USE_TJPGD | [Tiny JPEG Decoder](/libs/image_support/tjpgd) | Yes | File or variable | 8x8 Pixel Tiles |
+| JPG | LV_USE_TJPGD | [Tiny JPEG Decoder](/libs/image_support/tjpgd) | No | File or variable | 8x8 Pixel Tiles |
 | WEBP | LV_USE_LIBWEBP | [WebP Decoder](/libs/image_support/libwebp) | Yes | File only | Full image |
 | SVG | LV_USE_SVG | [SVG Decoder](/libs/image_support/svg) | No | File or variable | Full image |
 | GIF | LV_USE_GIF | [GIF (lv_gif)](/widgets/gif) | No | Use GIF Widget (File) | Widget + 1 frame |
@@ -38,7 +38,7 @@ To use the encoded file as a variable, choose one of these approaches:
   <ApiLink name="lv_image_dsc_t" /> object + data into a `.c` file and compile and link it
   into your project.  The color format is stored in the `header.cf` field of the
   <ApiLink name="lv_image_dsc_t" /> struct.
-- There could be case where it was needed to load an image file into
+- There could be a case where it is needed to load an image file into
   dynamically-allocated RAM at run-time and free it later, thus avoiding storing the
   images as part of the application.  In this case, you could manually create a
   <ApiLink name="lv_image_dsc_t" /> and point the `data` field to the byte array containing
@@ -77,7 +77,7 @@ the `RAW` formats.
 ### Custom Image Formats
 
 The easiest way to create a custom image is to use the online image converter and
-select `RAW` or `RAW_WITH_ALPHA` format. It will just take every byte of the
+select `RAW` or `RAW_ALPHA` format. It will just take every byte of the
 binary file you uploaded and write it as an image "bitmap". You then need to attach
 an image decoder that will parse that bitmap and generate the real, render-able
 bitmap.
@@ -100,11 +100,11 @@ as an example.  In `lv_libpng.c`, see the following functions as examples to fol
 | Create and register image decoder | lv_libpng_init() |
 | De-initialize image decoder | lv_libpng_deinit() |
 | Gather basic information about the image and store it in `header`. | decoder_info() |
-| Open a image and generate decoded image [^1] | decoder_open() |
+| Open an image and generate decoded image [^1] | decoder_open() |
 | Free any allocated resources | decoder_close() |
 | Partially decode based on specified area (Optional: use if `decoder_open()` does not decode whole image.) | decoder_get_area() [^2] |
 
-[^1]: In `decoder_open()`, you should try to open the image source pointed by `dsc->src`.  Its type is already in `dsc->src_type == LV_IMG_SRC_FILE/VARIABLE`. If this format/type is not supported by the decoder, return <ApiLink name="LV_RESULT_INVALID" />. However, if you can open the image, a pointer to the decoded image should be set in `dsc->decoded`.  If the format is known, but you don't want to decode the entire image (e.g. no memory for it), set `dsc->decoded = NULL` and use `decoder_get_area()` to get the image area pixels.
+[^1]: In `decoder_open()`, you should try to open the image source pointed by `dsc->src`.  Its type is already in `dsc->src_type == LV_IMAGE_SRC_FILE/VARIABLE`. If this format/type is not supported by the decoder, return <ApiLink name="LV_RESULT_INVALID" />. However, if you can open the image, a pointer to the decoded image should be set in `dsc->decoded`.  If the format is known, but you don't want to decode the entire image (e.g. no memory for it), set `dsc->decoded = NULL` and use `decoder_get_area()` to get the image area pixels.
 
 [^2]: `lv_bmp.c` has an example of `decoder_get_area()`.
 
@@ -122,16 +122,15 @@ lv_image_decoder_args_t args = { 0 }; /* Custom decoder behavior via args */
 res = lv_image_decoder_open(&dsc, &my_img_dsc, &args);
 
 if(res == LV_RESULT_OK) {
-    /* Do something with `dsc->decoded`. You can copy out the decoded image by `lv_draw_buf_dup(dsc.decoded)`*/
+    /* Do something with `dsc.decoded`. You can copy out the decoded image by `lv_draw_buf_dup(dsc.decoded)`*/
     lv_image_decoder_close(&dsc);
+}
 ```
-
-\}
 
 <Callout type="info">
 You would need to set <ApiLink name="LV_USE_PRIVATE_API" /> to `1` in `lv_conf.h`
 in order to do this since the definition of the <ApiLink name="lv_image_decoder_dsc_t" />
-and <ApiLink name="_lv_image_decoder_args_t" /> structs are both in a private header file.
+and <ApiLink name="lv_image_decoder_args_t" /> structs are both in a private header file.
 </Callout>
 
 ### Image Post-Processing
@@ -146,7 +145,7 @@ and stride alignment provided by <ApiLink name="lv_image_decoder_post_process" /
 
 - In your custom GPU [draw unit](/main-modules/draw/draw_pipeline), call a custom post-processing
   function after `lv_image_decoder_open` to adjust the data in the image cache, and
-- then mark the processing status in `cache_entry->process_state` (to avoid repeated
+- then mark the processing status in `cache_entry->flags` (to avoid repeated
   post-processing).
 
 The below code example assumes the image was opened using the decoder interface

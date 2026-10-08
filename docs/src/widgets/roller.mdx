@@ -53,8 +53,8 @@ call this again after any change to those styles.
      Use <ApiLink name="lv_obj_set_style_text_line_space" /> to set this value.
 
    - When the Roller is scrolled and doesn't stop exactly on an item, it will
-     automatically scroll to the nearest valid item in `anim_time`
-     milliseconds as specified in the `anim_duration` style.  Use
+     automatically scroll to the nearest valid item in the number of
+     milliseconds set in the `anim_duration` style.  Use
      <ApiLink name="lv_obj_set_style_anim_duration" /> to set this value.
 - <ApiLink name="LV_PART_SELECTED" /> The selected item (displayed in the  middle of
    the Roller).  Besides the typical background properties, it uses text style
@@ -104,7 +104,7 @@ the layer the roller is being drawn into:
 
 ## Events
 
-<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent sent when a new list item is selected.
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent when a new list item is selected.
 
 <LvglExample name="lv_example_roller_event" path="widgets/roller/lv_example_roller_event" />
 

@@ -7,9 +7,9 @@ LVGL's [File System (lv_fs_drv)](/main-modules/fs) module provides an abstractio
 any type of file system for LVGL's use.  File systems already supported are:
 
 - [FATFS](https://elm-chan.org/fsw/ff/)
-- STDIO (Linux and Windows using C standard function .e.g `fopen`, `fread`)
-- POSIX (Linux and Windows using POSIX function .e.g `open`, `read`)
-- WIN32 (Windows using Win32 API function .e.g `CreateFileA`, `ReadFile`)
+- STDIO (Linux and Windows using C standard function, e.g. `fopen`, `fread`)
+- POSIX (Linux and Windows using POSIX function, e.g. `open`, `read`)
+- WIN32 (Windows using Win32 API function, e.g. `CreateFileA`, `ReadFile`)
 - MEMFS (read a file from a memory buffer)
 - LITTLEFS (a little fail-safe filesystem designed for microcontrollers)
 - Arduino ESP LITTLEFS (a little fail-safe filesystem designed for Arduino ESP)
@@ -21,7 +21,7 @@ provides only the bridge between LVGL and these file systems.
 ## Usage
 
 In `lv_conf.h` enable `LV_USE_FS_...` (by setting its value to `1`) and assign
-an upper cased letter to `LV_FS_..._DRIVER_LETTER` (e.g. `'S'`).  If more than
+an upper cased letter to `LV_FS_..._LETTER` (e.g. `'S'`).  If more than
 one file system is enabled, each driver will need to have a unique driver-identifier
 letter.  After that you can access files using that driver letter.  Example with
 driver identifier letter `'S'`:

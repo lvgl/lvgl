@@ -34,14 +34,14 @@ Each folder utility will be explained throughout the guide.
 ## Get Buildroot
 
 First, according to the [Buildroot Manual](https://buildroot.org/downloads/manual/manual.html), Buildroot requires certain packages to be installed
-before starting the build. Lets install them using Ubuntu's package manager.
+before starting the build. Let's install them using Ubuntu's package manager.
 
 ```bash
 sudo apt install sed make binutils gcc g++ bash patch gzip bzip2 perl tar \
         cpio python3 unzip rsync wget libncurses-dev
 ```
 
-Now that we have satisfied all the prerequisites lets download a stable release
+Now that we have satisfied all the prerequisites let's download a stable release
 of Buildroot.
 
 ```bash
@@ -94,8 +94,8 @@ Running this script creates an output folder that contains everything the
 process will generate:
 
 - Fetched resources
-    - Toolchain
-    - Images
+- Toolchain
+- Images
 
 This helps maintain a clean Buildroot directory. When the script is executed,
 an (almost) empty folder named `output` is created, as the build process has
@@ -111,8 +111,8 @@ make menuconfig
 Change these configurations:
 
 - System host name to `lvgl-buildroot` under `system_configuration > System hostname`.
-    - Root password to `lvgl-buildroot`  under `system_configuration > Root password`.
-    - Enable SSH in `target-packages > Networking applications > openssh`
+- Root password to `lvgl-buildroot`  under `system_configuration > Root password`.
+- Enable SSH in `target-packages > Networking applications > openssh`
 
 Build the image
 
@@ -123,6 +123,8 @@ make
 ## What happened?
 
 Let's explore the contents of the output folder and what it contains.
+
+### build
 
 This folder contains the intermediate files and build artifacts for the various
 packages that are being compiled. Each package has its own subdirectory within

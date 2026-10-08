@@ -32,7 +32,7 @@ today and get started with your next GUI application. It comes fully configured
 with LVGL (and with PXP/G2D support if the modules are present), no
 additional integration work is required.
 
-## HW acceleration for NXP iMX RT platforms
+## HW acceleration for NXP i.MX RT platforms
 
 Depending on the RT platform used, the acceleration can be done by NXP PXP
 (PiXel Pipeline) and/or the Verisilicon GPU through an API named VGLite. Each
@@ -44,10 +44,10 @@ simultaneously (in LVGL multithreading mode).
 - [VG-Lite General GPU](/integration/chip_vendors/nxp/vg_lite_gpu) — the generic
   VG-Lite draw unit, which replaced the NXP-specific VGLite draw unit in LVGL v9.4.
 
-## HW acceleration for NXP iMX platforms
+## HW acceleration for NXP i.MX platforms
 
-On MPU platforms, the acceleration can be done (hardware independent) by NXP G2D
-library. This accelerator has its own context that allows them to be used
+On MPU platforms, the acceleration can be done (hardware independent) by the NXP G2D
+library. This accelerator has its own context that allows it to be used
 individually as well as simultaneously with the CPU (in LVGL multithreading mode).
 
 - [G2D GPU](/integration/chip_vendors/nxp/g2d_gpu) — configuration, supported
