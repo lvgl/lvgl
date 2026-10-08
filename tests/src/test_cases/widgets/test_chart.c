@@ -275,6 +275,52 @@ void test_chart_curve(void)
 #endif /*LV_USE_VECTOR_GRAPHIC*/
 }
 
+static int32_t series_line_min_y;
+static int32_t series_line_max_y;
+
+static void series_line_points_cb(lv_event_t * e)
+{
+    lv_draw_task_t * draw_task = lv_event_get_param(e);
+    if(lv_draw_task_get_type(draw_task) != LV_DRAW_TASK_TYPE_LINE) return;
+
+    lv_draw_line_dsc_t * line_dsc = lv_draw_task_get_line_dsc(draw_task);
+    if(line_dsc->base.part != LV_PART_ITEMS || line_dsc->points == NULL) return;
+
+    for(int32_t i = 0; i < line_dsc->point_cnt; i++) {
+        if(line_dsc->points[i].y == LV_DRAW_LINE_POINT_NONE) continue;
+        series_line_min_y = LV_MIN(series_line_min_y, (int32_t)line_dsc->points[i].y);
+        series_line_max_y = LV_MAX(series_line_max_y, (int32_t)line_dsc->points[i].y);
+    }
+}
+
+void test_chart_line_out_of_range_values_are_not_clamped(void)
+{
+    lv_obj_set_size(chart, 300, 200);
+    lv_obj_center(chart);
+    lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
+    lv_chart_set_point_count(chart, 3);
+    lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 100);
+
+    lv_chart_series_t * ser = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_PRIMARY_Y);
+    static const int32_t values[] = { -100, 50, 200 };
+    lv_chart_set_series_values(chart, ser, values, 3);
+
+    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_add_event_cb(chart, series_line_points_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+
+    series_line_min_y = INT32_MAX;
+    series_line_max_y = INT32_MIN;
+    lv_refr_now(NULL);
+
+    lv_area_t content;
+    lv_obj_get_content_coords(chart, &content);
+
+    /*The first and last values are out of the range so the line should leave the content area
+     *instead of running along its bottom and top edge*/
+    TEST_ASSERT_LESS_THAN_INT32(content.y1, series_line_min_y);
+    TEST_ASSERT_GREATER_THAN_INT32(content.y2 + 1, series_line_max_y);
+}
+
 void test_chart_properties(void)
 {
 #if LV_USE_OBJ_PROPERTY
