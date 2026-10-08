@@ -302,8 +302,13 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             else return taken_cnt;
         }
 
+        if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+            t->state = LV_DRAW_TASK_STATE_FAILED;
+            continue;
+        }
+
         /*Allocate a buffer if not done yet.*/
-        void * buf = lv_draw_layer_alloc_buf(layer);
+        void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
         /*Do not return is failed. The other thread might already have a buffer can do something. */
         if(buf == NULL) {
             t->state = LV_DRAW_TASK_STATE_FAILED;
@@ -338,7 +343,13 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
-    void * buf = lv_draw_layer_alloc_buf(layer);
+    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+        t->state = LV_DRAW_TASK_STATE_FAILED;
+        LV_PROFILER_DRAW_END;
+        return LV_DRAW_UNIT_IDLE;
+    }
+
+    void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
     if(buf == NULL) {
         t->state = LV_DRAW_TASK_STATE_FAILED;
         LV_PROFILER_DRAW_END;

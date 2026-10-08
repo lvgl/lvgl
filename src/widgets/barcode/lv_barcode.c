@@ -558,6 +558,14 @@ static lv_result_t barcode_fill(lv_obj_t * obj)
         return LV_RESULT_INVALID;
     }
 
+#if LV_USE_DRAW_VRAM
+    /*The palette and the bars are written directly into the buffer, so it needs CPU backing*/
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) {
+        lv_free(pattern);
+        return LV_RESULT_INVALID;
+    }
+#endif
+
     /*Temporarily disable invalidation to improve the efficiency of lv_canvas_set_px*/
     lv_display_enable_invalidation(lv_obj_get_display(obj), false);
 

@@ -57,7 +57,7 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u);
  *       buffer flags and are not cached, so callers don't need to decide.
  */
 int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
-                                     const void * src,
+                                     LV_IMAGE_DSC_CONST void * src,
                                      int image_flags,
                                      lv_image_header_t * header);
 

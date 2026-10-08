@@ -37,6 +37,9 @@
 static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static bool layer_is_descendant(const lv_layer_t * layer, const lv_layer_t * ancestor);
+#if LV_USE_DRAW_VRAM
+    static void static_buf_write_back(lv_canvas_t * canvas);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -76,11 +79,19 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
     LV_CHECK_ARG(buf != NULL, return);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
+#if LV_USE_DRAW_VRAM
+    static_buf_write_back(canvas);
+#endif
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     lv_result_t res = lv_draw_buf_init(&canvas->static_buf, w, h, cf, stride, buf, stride * h);
     if(res != LV_RESULT_OK) {
         return;
     }
+#if LV_USE_DRAW_VRAM
+    /*The canvas draws into the caller's memory, so the pixels a draw unit
+     *leaves in VRAM are written back to it when the CPU needs them*/
+    lv_draw_buf_set_flag(&canvas->static_buf, LV_IMAGE_FLAGS_MODIFIABLE);
+#endif
     canvas->draw_buf = &canvas->static_buf;
 
     const void * src = lv_image_get_src(obj);
@@ -99,6 +110,9 @@ void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
     LV_CHECK_ARG_MSG(draw_buf->handlers != NULL, return, "draw_buf has no handlers, is it initialized?");
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
+#if LV_USE_DRAW_VRAM
+    if(draw_buf != &canvas->static_buf) static_buf_write_back(canvas);
+#endif
     canvas->draw_buf = draw_buf;
 
     const void * src = lv_image_get_src(obj);
@@ -195,6 +209,10 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
 
     if(canvas->draw_buf == NULL) return;
 
+#if LV_USE_DRAW_VRAM
+    if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return;
+#endif
+
     lv_draw_buf_set_palette(canvas->draw_buf, index, color);
     lv_obj_invalidate(obj);
 }
@@ -218,6 +236,10 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     LV_CHECK_ARG(canvas->draw_buf != NULL, return ret);
     LV_CHECK_ARG(lv_draw_buf_is_position_valid(canvas->draw_buf, x, y), return ret);
+
+#if LV_USE_DRAW_VRAM
+    if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return ret;
+#endif
 
     lv_image_header_t * header = &canvas->draw_buf->header;
     const uint8_t * px = lv_draw_buf_goto_xy(canvas->draw_buf, x, y);
@@ -278,8 +300,12 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    if(canvas->draw_buf)
+    if(canvas->draw_buf) {
+#if LV_USE_DRAW_VRAM
+        if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return NULL;
+#endif
         return canvas->draw_buf->unaligned_data;
+    }
 
     return NULL;
 }
@@ -298,6 +324,8 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
     LV_CHECK_ARG(canvas->draw_buf != NULL, return);
     LV_CHECK_ARG_MSG(canvas->draw_buf->header.cf == src_buf->header.cf, return, "Color formats must be the same");
 
+    /*lv_draw_buf_copy stays in VRAM when both buffers are resident on the same unit
+     *and pulls them into CPU memory otherwise*/
     lv_draw_buf_copy(canvas->draw_buf, canvas_area, src_buf, src_area);
 }
 
@@ -307,6 +335,28 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_draw_buf_t * draw_buf = canvas->draw_buf;
     LV_CHECK_ARG(draw_buf != NULL, return);
+
+#if LV_USE_DRAW_VRAM
+    /*A fill that leaves every pixel zero only needs the CLEARZERO flag, so a lazy or
+     *VRAM-resident buffer does not have to be pulled into CPU memory for it.
+     *Indexed formats are excluded: their pixels are palette indices, so zero is not
+     *black, and the palette itself is stored in front of the pixels.*/
+    if(!LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
+        bool is_zero_fill;
+        if(lv_color_format_has_alpha(draw_buf->header.cf)) {
+            is_zero_fill = (opa <= LV_OPA_MIN);
+        }
+        else {
+            is_zero_fill = (color.red == 0 && color.green == 0 && color.blue == 0);
+        }
+        if(is_zero_fill) {
+            lv_draw_buf_clear(draw_buf, NULL);
+            lv_obj_invalidate(obj);
+            return;
+        }
+    }
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return;
+#endif
 
     lv_image_header_t * header = &draw_buf->header;
     uint32_t x;
@@ -469,8 +519,31 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
+#if LV_USE_DRAW_VRAM
+    static_buf_write_back(canvas);
+#endif
     lv_image_cache_drop(&canvas->draw_buf);
 }
+
+#if LV_USE_DRAW_VRAM
+/**
+ * Before discarding the canvas's static buffer descriptor, copy any GPU-rendered pixels back into
+ * the caller's storage and release the VRAM residency. This preserves the final canvas image in the
+ * caller's memory, as software rendering does.
+ */
+static void static_buf_write_back(lv_canvas_t * canvas)
+{
+    lv_draw_buf_t * buf = &canvas->static_buf;
+    if(buf->vram_res == NULL) return;
+
+    if(!lv_draw_buf_ensure_resident(buf, NULL)) {
+        LV_LOG_WARN("Couldn't write the canvas back to its buffer");
+        /* Release the VRAM residency even if readback failed, since the descriptor will be discarded. */
+        lv_draw_unit_t * unit = buf->vram_res ? buf->vram_res->unit : NULL;
+        if(unit && unit->vram_free_cb) unit->vram_free_cb(unit, buf);
+    }
+}
+#endif
 static bool layer_is_descendant(const lv_layer_t * layer, const lv_layer_t * ancestor)
 {
     layer = layer->parent;

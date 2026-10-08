@@ -165,7 +165,7 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
     return mbox->title;
 }
 
-lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
+lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * icon)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 

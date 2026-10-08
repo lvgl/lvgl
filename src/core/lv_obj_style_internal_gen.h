@@ -632,11 +632,11 @@ static inline const lv_grad_dsc_t * lv_obj_get_style_bg_grad_internal(const lv_o
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-static inline const void * lv_obj_get_style_bg_image_src_internal(const lv_obj_t * obj, lv_part_t part)
+static inline LV_IMAGE_DSC_CONST void * lv_obj_get_style_bg_image_src_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
     lv_style_value_t v = lv_obj_get_style_prop_internal(obj, part, LV_STYLE_BG_IMAGE_SRC);
-    return (const void *)v.ptr;
+    return (LV_IMAGE_DSC_CONST void *)v.ptr;
 }
 
 /**
@@ -1188,11 +1188,11 @@ static inline lv_opa_t lv_obj_get_style_arc_opa_internal(const lv_obj_t * obj, l
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-static inline const void * lv_obj_get_style_arc_image_src_internal(const lv_obj_t * obj, lv_part_t part)
+static inline LV_IMAGE_DSC_CONST void * lv_obj_get_style_arc_image_src_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
     lv_style_value_t v = lv_obj_get_style_prop_internal(obj, part, LV_STYLE_ARC_IMAGE_SRC);
-    return (const void *)v.ptr;
+    return (LV_IMAGE_DSC_CONST void *)v.ptr;
 }
 
 /**
@@ -1731,11 +1731,11 @@ static inline lv_base_dir_t lv_obj_get_style_base_dir_internal(const lv_obj_t * 
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-static inline const void * lv_obj_get_style_bitmap_mask_src_internal(const lv_obj_t * obj, lv_part_t part)
+static inline LV_IMAGE_DSC_CONST void * lv_obj_get_style_bitmap_mask_src_internal(const lv_obj_t * obj, lv_part_t part)
 {
     LV_ASSERT(obj != NULL);
     lv_style_value_t v = lv_obj_get_style_prop_internal(obj, part, LV_STYLE_BITMAP_MASK_SRC);
-    return (const void *)v.ptr;
+    return (LV_IMAGE_DSC_CONST void *)v.ptr;
 }
 
 /**

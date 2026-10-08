@@ -58,7 +58,11 @@ uint8_t img_render_lvgl_logo_l8_map[] = {
 
 };
 
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_render_lvgl_logo_l8 = {
+#else
 const lv_image_dsc_t img_render_lvgl_logo_l8 = {
+#endif
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_L8,
   .header.flags = 0,

@@ -97,7 +97,11 @@ uint8_t img_transform_avatar_15_map[] = {
 
 };
 
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_transform_avatar_15 = {
+#else
 const lv_image_dsc_t img_transform_avatar_15 = {
+#endif
   .header = {
     .magic = LV_IMAGE_HEADER_MAGIC,
     .cf = LV_COLOR_FORMAT_ARGB8888,

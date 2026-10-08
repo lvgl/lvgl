@@ -64,7 +64,7 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt);
  * @deprecated The `lv_win` widget is deprecated. See `lv_example_flex_win`.
  */
 LV_DEPRECATED(LV_WIN_DEPRECATED_MSG)
-lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w);
+lv_obj_t * lv_win_add_button(lv_obj_t * win, LV_IMAGE_DSC_CONST void * icon, int32_t btn_w);
 
 /**
  * Get the header of the window

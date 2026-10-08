@@ -196,7 +196,7 @@ props = [
  'dsc': "Set gradient definition. The pointed instance must exist while Widget is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors as well. If it's set other gradient related properties will be ignored."},
 
 {'name': 'BG_IMAGE_SRC',
- 'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'style_type': 'ptr',   'var_type': 'LV_IMAGE_DSC_CONST void *', 'set_var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set a background image. Can be a pointer to `lv_image_dsc_t`, a path to a file or an `LV_SYMBOL_...`."},
 
 {'name': 'BG_IMAGE_OPA',
@@ -344,7 +344,7 @@ props = [
  'dsc': "Set opacity of arcs."},
 
 {'name': 'ARC_IMAGE_SRC',
- 'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'ptr',   'var_type': 'LV_IMAGE_DSC_CONST void *', 'set_var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set an image from which arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file."},
 
 {'section': 'Text', 'dsc':'Properties to describe the properties of text. All these properties are inherited.',
@@ -499,7 +499,7 @@ props = [
  'dsc': "Set base direction of Widget. Possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
 
 {'name': 'BITMAP_MASK_SRC',
- 'style_type': 'ptr',   'var_type': 'const void *', 'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'ptr',   'var_type': 'LV_IMAGE_DSC_CONST void *', 'set_var_type': 'const void *', 'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "If set, a layer will be created for the widget and the layer will be masked with this A8 bitmap mask."},
 
 {'name': 'ROTARY_SENSITIVITY',
@@ -824,13 +824,18 @@ def invalid_return(prop):
     return '0'
 
 
+def get_set_var_type(p):
+    """Return the setter parameter type: set_var_type if present, otherwise var_type."""
+    return p.get('set_var_type', p['var_type'])
+
+
 def style_set_c(p):
     if 'section' in p: return
 
     check_null = check_null_value(p)
     cast = style_set_cast(p['style_type'])
     print()
-    print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + p['var_type'] + " value)")
+    print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + get_set_var_type(p) + " value)")
     print("{")
     print("    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);")
     if check_null:
@@ -846,7 +851,7 @@ def style_set_h(p):
     if 'section' in p: return
 
     style_set_doxygen_comment(p)
-    print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + p['var_type'] + " value);")
+    print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + get_set_var_type(p) + " value);")
     print()
 
 
@@ -964,8 +969,7 @@ def local_style_set_c(p):
     check_null = check_null_value(p)
     cast = style_set_cast(p['style_type'])
     print()
-    print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p[
-        'var_type'] + " value, lv_style_selector_t selector)")
+    print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + get_set_var_type(p) + " value, lv_style_selector_t selector)")
     print("{")
     print("    LV_CHECK_OBJ(obj, &lv_obj_class, return);")
     if check_null:
@@ -981,8 +985,7 @@ def local_style_set_h(p):
     if 'section' in p: return
 
     local_style_set_doxygen_comment(p)
-    print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p[
-        'var_type'] + " value, lv_style_selector_t selector);")
+    print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + get_set_var_type(p) + " value, lv_style_selector_t selector);")
     print()
 
 
