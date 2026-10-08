@@ -42,6 +42,9 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
 void lv_draw_vg_lite_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * dsc,
                                 const lv_area_t * coords);
 
+void lv_draw_vg_lite_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc,
+                          const lv_area_t * coords);
+
 void lv_draw_vg_lite_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
                             const lv_area_t * coords);
 
