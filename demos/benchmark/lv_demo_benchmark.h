@@ -103,14 +103,35 @@ typedef void (*lv_demo_benchmark_on_end_cb_t)(const lv_demo_benchmark_summary_t 
  */
 void lv_demo_benchmark(void);
 
-/*
+/**
+ * Run a single scene of the benchmark demo and then finish, instead of playing all of
+ * them. Useful for measuring one scene in isolation.
+ * @param scene     index of the scene, below the count implied by
+ *                  `lv_demo_benchmark_get_scene_name()`. Out of range does nothing.
+ */
+void lv_demo_benchmark_scene(uint32_t scene);
+
+/**
+ * Get the index of the scene being played.
+ * @return      the index, or the scene count once the demo is over
+ */
+uint32_t lv_demo_benchmark_get_current_scene(void);
+
+/**
+ * Get the name of a scene, for looking one up before the demo has run.
+ * @param scene     index of the scene
+ * @return          the name, or NULL if `scene` is out of range
+ */
+const char * lv_demo_benchmark_get_scene_name(uint32_t scene);
+
+/**
  * Register a function to call when the benchmark demo is over
  * @param cb    function to call when the demo is over
  */
 void lv_demo_benchmark_set_end_cb(lv_demo_benchmark_on_end_cb_t cb);
 
 
-/*
+/**
  * Display and log the summary
  * This function is called automatically if `lv_on_benchmark_end_cb` is not set
  * @param summary   summary of the benchmark results
