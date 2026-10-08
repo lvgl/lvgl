@@ -362,6 +362,39 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
 lv_color_format_t lv_display_get_color_format(lv_display_t * disp);
 
 /**
+ * Set the pixel packing direction used by 1 bit per pixel (indexed) color formats,
+ * e.g. `LV_COLOR_FORMAT_I1`. Only relevant for monochrome displays.
+ * @param disp              pointer to a display
+ * @param vtiled            true: each byte packs 8 vertically stacked pixels of a column
+ *                          (vertical tiling); false: each byte packs 8 horizontally
+ *                          adjacent pixels of a row (horizontal tiling, the default)
+ */
+void lv_display_set_vtiled(lv_display_t * disp, bool vtiled);
+
+/**
+ * Get the pixel packing direction used by 1 bit per pixel (indexed) color formats.
+ * @param disp              pointer to a display
+ * @return                  true: vertical tiling; false: horizontal tiling
+ */
+bool lv_display_get_vtiled(lv_display_t * disp);
+
+/**
+ * Set the bit order used within each packed byte by 1 bit per pixel (indexed) color
+ * formats, e.g. `LV_COLOR_FORMAT_I1`. Only relevant for monochrome displays.
+ * @param disp              pointer to a display
+ * @param lsb_first          true: the first pixel of each 8-pixel group is stored in the
+ *                          LSB of the byte; false: it's stored in the MSB (the default)
+ */
+void lv_display_set_lsb_first(lv_display_t * disp, bool lsb_first);
+
+/**
+ * Get the bit order used within each packed byte by 1 bit per pixel (indexed) color formats.
+ * @param disp              pointer to a display
+ * @return                  true: LSB first; false: MSB first
+ */
+bool lv_display_get_lsb_first(lv_display_t * disp);
+
+/**
  * Set the number of tiles for parallel rendering.
  * @param disp              pointer to a display
  * @param tile_cnt          number of tiles (1 =< tile_cnt < 256)
