@@ -574,6 +574,23 @@ Note that these assertions are not required and should be disabled to improve pe
   bool en = lv_obj_get_style_enabled(obj, &style, LV_PART_MAIN);
   ```
 
+### Object properties
+
+- The numeric values of the `LV_PROPERTY_*` IDs are not stable across major versions.
+  With the removal of deprecated properties (e.g. `LV_PROPERTY_SPAN_ALIGN` and
+  `LV_PROPERTY_SPAN_MODE`) the remaining IDs of a widget have been renumbered.
+  Always refer to properties by their enum name, or look them up by name at runtime
+  with <ApiLink name="lv_obj_property_get_id"/>, and don't store raw ID values:
+  ```c
+  /* Before: an ID value saved from a v9 build may now point to a different property */
+  lv_obj_set_property(obj, &(lv_property_t){ .id = saved_id, .num = 1 });
+
+  /* After */
+  lv_obj_set_property(obj, &(lv_property_t){ .id = LV_PROPERTY_SPAN_OVERFLOW, .num = 1 });
+  lv_prop_id_t id = lv_obj_property_get_id(obj, "overflow");
+  ```
+  Code built against the v10 headers is unaffected.
+
 ---
 
 ## Drawing/Rendering
