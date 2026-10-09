@@ -149,7 +149,7 @@ void lv_draw_sw_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, 
         border_dsc.color = fill_dsc.color;
         border_dsc.opa = LV_OPA_60;
         border_dsc.width = 2;
-        lv_draw_sw_border(t, &border_dsc, &area_rot);
+        lv_draw_sw_border(t->target_layer, &t->clip_area, &border_dsc, &area_rot);
     }
 
 #endif
@@ -169,7 +169,7 @@ void lv_draw_sw_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, 
         border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
         border_dsc.opa = LV_OPA_60;
         border_dsc.width = 1;
-        lv_draw_sw_border(t, &border_dsc, &area_rot);
+        lv_draw_sw_border(t->target_layer, &t->clip_area, &border_dsc, &area_rot);
 
         lv_point_t txt_size;
         lv_text_get_size_attributes(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);

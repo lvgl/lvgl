@@ -52,7 +52,8 @@ void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the rectangle
  */
-void lv_draw_sw_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_border(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_border_dsc_t * dsc,
+                       const lv_area_t * coords);
 
 /**
  * Draw box shadow with SW render.

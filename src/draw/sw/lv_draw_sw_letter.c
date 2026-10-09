@@ -128,7 +128,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    lv_draw_sw_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_sw_border(t->target_layer, &t->clip_area, &border_draw_dsc, glyph_draw_dsc->bg_coords);
 #endif
                 }
                 break;

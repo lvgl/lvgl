@@ -28,11 +28,11 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const lv_area_t * inner_area,
-                                int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa);
+static void draw_border_complex(lv_layer_t * layer, const lv_area_t * clip_area, const lv_area_t * outer_area,
+                                const lv_area_t * inner_area, int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa);
 
-static void draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area, const lv_area_t * inner_area,
-                               lv_color_t color, lv_opa_t opa);
+static void draw_border_simple(lv_layer_t * layer, const lv_area_t * clip_area, const lv_area_t * outer_area,
+                               const lv_area_t * inner_area, lv_color_t color, lv_opa_t opa);
 
 /**********************
  *  STATIC VARIABLES
@@ -46,7 +46,8 @@ static void draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area,
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sw_border(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_border_dsc_t * dsc,
+                       const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
@@ -70,10 +71,10 @@ void lv_draw_sw_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, con
     if(rin < 0) rin = 0;
 
     if(rout == 0 && rin == 0) {
-        draw_border_simple(t, coords, &area_inner, dsc->color, dsc->opa);
+        draw_border_simple(layer, clip_area, coords, &area_inner, dsc->color, dsc->opa);
     }
     else {
-        draw_border_complex(t, coords, &area_inner, rout, rin, dsc->color, dsc->opa);
+        draw_border_complex(layer, clip_area, coords, &area_inner, rout, rin, dsc->color, dsc->opa);
     }
 
 }
@@ -82,14 +83,16 @@ void lv_draw_sw_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, con
  *   STATIC FUNCTIONS
  **********************/
 
-void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const lv_area_t * inner_area,
-                         int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa)
+
+static void draw_border_complex(lv_layer_t * layer, const lv_area_t * clip_area, const lv_area_t * outer_area,
+                                const lv_area_t * inner_area,
+                                int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa)
 {
 #if LV_DRAW_SW_COMPLEX
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `coords`*/
     lv_area_t draw_area;
-    if(!lv_area_intersect(&draw_area, outer_area, &t->clip_area)) return;
+    if(!lv_area_intersect(&draw_area, outer_area, clip_area)) return;
     int32_t draw_area_w = lv_area_get_width(&draw_area);
 
     lv_draw_sw_blend_dsc_t blend_dsc;
@@ -146,7 +149,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
         blend_area.x2 = core_area.x2;
         blend_area.y1 = outer_area->y1;
         blend_area.y2 = inner_area->y1 - 1;
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clip_area, &blend_dsc);
     }
 
     if(bottom_side && split_hor) {
@@ -154,7 +157,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
         blend_area.x2 = core_area.x2;
         blend_area.y1 = inner_area->y2 + 1;
         blend_area.y2 = outer_area->y2;
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clip_area, &blend_dsc);
     }
 
     /*If the border is very thick and the vertical sides overlap horizontally draw a single rectangle*/
@@ -163,7 +166,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
         blend_area.x2 = outer_area->x2;
         blend_area.y1 = core_area.y1;
         blend_area.y2 = core_area.y2;
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clip_area, &blend_dsc);
     }
     else {
         if(left_side) {
@@ -171,7 +174,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
             blend_area.x2 = inner_area->x1 - 1;
             blend_area.y1 = core_area.y1;
             blend_area.y2 = core_area.y2;
-            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+            lv_draw_sw_blend(layer, clip_area, &blend_dsc);
         }
 
         if(right_side) {
@@ -179,7 +182,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
             blend_area.x2 = outer_area->x2;
             blend_area.y1 = core_area.y1;
             blend_area.y2 = core_area.y2;
-            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+            lv_draw_sw_blend(layer, clip_area, &blend_dsc);
         }
     }
 
@@ -203,13 +206,13 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
             if(top_y >= draw_area.y1) {
                 blend_area.y1 = top_y;
                 blend_area.y2 = top_y;
-                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+                lv_draw_sw_blend(layer, clip_area, &blend_dsc);
             }
 
             if(bottom_y <= draw_area.y2) {
                 blend_area.y1 = bottom_y;
                 blend_area.y2 = bottom_y;
-                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+                lv_draw_sw_blend(layer, clip_area, &blend_dsc);
             }
         }
     }
@@ -226,7 +229,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
 
                     lv_memset(mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+                    lv_draw_sw_blend(layer, clip_area, &blend_dsc);
                 }
             }
 
@@ -237,7 +240,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
 
                     lv_memset(mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+                    lv_draw_sw_blend(layer, clip_area, &blend_dsc);
                 }
             }
         }
@@ -257,7 +260,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
 
                     lv_memset(mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+                    lv_draw_sw_blend(layer, clip_area, &blend_dsc);
                 }
             }
 
@@ -268,7 +271,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
 
                     lv_memset(mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+                    lv_draw_sw_blend(layer, clip_area, &blend_dsc);
                 }
             }
         }
@@ -288,8 +291,9 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
     LV_UNUSED(opa);
 #endif /*LV_DRAW_SW_COMPLEX*/
 }
-static void draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area, const lv_area_t * inner_area,
-                               lv_color_t color, lv_opa_t opa)
+
+static void draw_border_simple(lv_layer_t * layer, const lv_area_t * clip_area, const lv_area_t * outer_area,
+                               const lv_area_t * inner_area, lv_color_t color, lv_opa_t opa)
 {
     lv_area_t a;
     lv_draw_sw_blend_dsc_t blend_dsc;
@@ -309,14 +313,14 @@ static void draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area,
     a.y1 = outer_area->y1;
     a.y2 = inner_area->y1 - 1;
     if(top_side) {
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clip_area, &blend_dsc);
     }
 
     /*Bottom*/
     a.y1 = inner_area->y2 + 1;
     a.y2 = outer_area->y2;
     if(bottom_side) {
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clip_area, &blend_dsc);
     }
 
     /*Left*/
@@ -325,14 +329,14 @@ static void draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area,
     a.y1 = (top_side) ? inner_area->y1 : outer_area->y1;
     a.y2 = (bottom_side) ? inner_area->y2 : outer_area->y2;
     if(left_side) {
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clip_area, &blend_dsc);
     }
 
     /*Right*/
     a.x1 = inner_area->x2 + 1;
     a.x2 = outer_area->x2;
     if(right_side) {
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clip_area, &blend_dsc);
     }
 }
 

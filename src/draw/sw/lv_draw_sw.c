@@ -417,7 +417,7 @@ static void execute_drawing(lv_draw_task_t * t)
             lv_draw_sw_fill(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_sw_border(t, t->draw_dsc, &t->area);
+            lv_draw_sw_border(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
             lv_draw_sw_box_shadow(t, t->draw_dsc, &t->area);
@@ -488,7 +488,7 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
         border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
         border_dsc.opa = LV_OPA_60;
         border_dsc.width = 1;
-        lv_draw_sw_border(t, &border_dsc, &draw_area);
+        lv_draw_sw_border(t->target_layer, &t->clip_area, &border_dsc, &draw_area);
 
         lv_point_t txt_size;
         lv_text_get_size_attributes(&txt_size, "W", LV_FONT_DEFAULT, &attributes);
