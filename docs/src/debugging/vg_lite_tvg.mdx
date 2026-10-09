@@ -19,7 +19,7 @@ the same rendered images as the real VG-Lite GPU hardware.
 ## Configuration
 
 1. Enable VG-Lite rendering backend, see [VG-Lite General GPU](/integration/chip_vendors/nxp/vg_lite_gpu).
-2. Enable ThorVG and turn on the configuration <ApiLink name="LV_USE_THORVG_INTERNAL" /> or <ApiLink name="LV_USE_THORVG_EXTERNAL" />.
+2. Enable ThorVG and turn on the configuration <ApiLink name="LV_USE_THORVG" />.
    It is recommended to use the internal ThorVG library to ensure uniform rendering results.
 3. Enable <ApiLink name="LV_USE_VG_LITE_THORVG" /> and set <ApiLink name="LV_DRAW_BUF_ALIGN" /> to 64. The rest of the options can remain default.
    Make sure <ApiLink name="LV_VG_LITE_USE_GPU_INIT" /> is enabled, because the thorvg drawing context needs to be initialized before it can be used.

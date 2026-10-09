@@ -164,21 +164,6 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
  */
 
 /*
- *  Before the user selected either LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL
- *  For v9.6 LV_USE_THORVG_EXTERNAL doesn't exist anymore, instead the user
- *  enables LV_USE_THORVG and disables LV_USE_THORVG_INTERNAL
- *  To support users using LV_USE_THORVG_EXTERNAL from before v9.6 we
- *  we enable LV_USE_THORVG for them
- */
-#if defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL
-#if !LV_USE_THORVG
-    #warning LV_USE_THORVG_EXTERNAL is deprecated and will be removed in a future release. Enable LV_USE_THORVG and disable LV_USE_THORVG_INTERNAL to continue using an external version of THORVG
-    #undef LV_USE_THORVG
-    #define LV_USE_THORVG 1
-#endif /*!LV_USE_THORVG*/
-#endif /*defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL*/
-
-/*
  *  Backward compatibility. Before the user selected either
  *  LV_X11_RENDER_MODE_PARTIAL or LV_X11_RENDER_MODE_DIRECT or
  *  LV_X11_RENDER_MODE_FULL. For v9.6, this becomes a single choice:
