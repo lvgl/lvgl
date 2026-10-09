@@ -920,6 +920,19 @@ used afterwards.
   | `lv_win_add_title` | an `lv_label` in the header with `lv_obj_set_flex_grow(title, 1)` |
   | `lv_win_add_button` | an `lv_button` in the header with a fixed width |
 
+### lv_gltf
+
+
+- `lv_gltf_set_animation_speed()` and `lv_gltf_get_animation_speed()` functions have been removed.
+   Instead the animation should be set for one of the loaded models.
+
+   ```c
+   /* Before */
+   lv_gltf_set_animation_speed(gltf, 1000);
+   /* After */
+   lv_gltf_model_t * model = lv_gltf_get_primary_model(gltf); /* or lv_gltf_get_model_by_index */
+   lv_gltf_model_set_animation_speed(model, 1000);
+   ```
 ---
 
 ## Drawing
