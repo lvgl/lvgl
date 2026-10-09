@@ -268,10 +268,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
 lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     if(!disp) return LV_RESULT_INVALID;
     if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
 
