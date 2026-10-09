@@ -3465,14 +3465,6 @@ config LV_CONF_SKIP
 	  Do not include lv_conf.h; take the configuration from this Kconfig
 	  tree and the built-in defaults instead.
 
-config LV_CONF_MINIMAL
-	bool "Minimal configuration [DEPRECATED: use the minimal defconfig]"
-	default n
-	help
-	  Deprecated and no longer functional. The minimal preset is now a
-	  defconfig: configs/defconfigs/minimal.defconfig. Setting this has no
-	  effect on the generated configuration and triggers a build warning.
-
 config LV_USE_PRIVATE_API
 	bool "Private API (lvgl_private.h)"
 	default n

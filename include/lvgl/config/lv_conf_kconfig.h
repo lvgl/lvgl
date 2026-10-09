@@ -240,15 +240,6 @@ extern "C" {
 #define CONFIG_LV_SDL_BUF_COUNT 2
 #endif
 
-/*******************
- * LV_CONF_MINIMAL
- *******************/
-
-#if defined(CONFIG_LV_CONF_MINIMAL)
-#warning "LV_CONF_MINIMAL has been removed and no longer has any effect. Start from configs/defconfigs/minimal.defconfig instead."
-#undef CONFIG_LV_CONF_MINIMAL
-#endif
-
 /*
  * CONFIG_* options that no longer exist and haven't worked _ever_ in Kconfig
  *
