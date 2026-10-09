@@ -154,7 +154,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             blend_dsc.mask_stride = glyph_draw_dsc->g->stride;
                             blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
                             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-                            lv_draw_sw_blend(t, &blend_dsc);
+                            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                         }
                         else {
                             glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
@@ -174,7 +174,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             blend_dsc.mask_stride = draw_buf->header.stride;
                             blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
                             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-                            lv_draw_sw_blend(t, &blend_dsc);
+                            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                         }
                     }
                     else {
