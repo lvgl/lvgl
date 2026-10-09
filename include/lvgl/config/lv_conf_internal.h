@@ -4439,14 +4439,6 @@
     #endif
 #endif
 
-#ifndef LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-    #ifdef CONFIG_LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-        #define LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING CONFIG_LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-    #else
-        #define LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING 0
-    #endif
-#endif
-
 #ifndef LV_ASSERT_USE_CUSTOM_INCLUDE
     #ifdef CONFIG_LV_ASSERT_USE_CUSTOM_INCLUDE
         #define LV_ASSERT_USE_CUSTOM_INCLUDE CONFIG_LV_ASSERT_USE_CUSTOM_INCLUDE
@@ -4876,13 +4868,6 @@
         #endif
     #endif
 #endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
-
-#if defined(LV_ASSERT_HANDLER_INCLUDE)
-    #if !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-        #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
-    #endif
-    #include LV_ASSERT_HANDLER_INCLUDE
-#endif
 
 /*----------------------------------
  * End of compatibility block
