@@ -123,26 +123,6 @@ __CONFIG_OPTIONS__
     #endif
 #endif
 
-/*
- * Detect if the user is using the xkb keymap configuration
- * in order to avoid warnings for users that have migrated.
- * we only need to check for it if LV_LIBINPUT_XKB is enabled
- * so evaluate it first and undef it afterwards
- */
-#ifndef LV_LIBINPUT_XKB
-    #ifdef CONFIG_LV_LIBINPUT_XKB
-        #define LV_LIBINPUT_XKB CONFIG_LV_LIBINPUT_XKB
-    #else
-        #define LV_LIBINPUT_XKB 0
-    #endif
-#endif
-#if LV_LIBINPUT_XKB && (defined(LV_LIBINPUT_XKB_RULES) || defined(CONFIG_LV_LIBINPUT_XKB_RULES))
-#define LV_LIBINPUT_XKB_DISABLE_KEY_MAP 1
-#else
-#define LV_LIBINPUT_XKB_DISABLE_KEY_MAP 0
-#endif
-#undef LV_LIBINPUT_XKB
-
 /*----------------------------------
  * Start parsing lv_conf_template.h
  -----------------------------------*/
