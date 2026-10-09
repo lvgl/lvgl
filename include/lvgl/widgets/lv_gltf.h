@@ -289,31 +289,6 @@ uint32_t lv_gltf_get_camera(const lv_obj_t * obj);
  */
 uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj);
 
-/**
- * DEPRECATED. See `lv_gltf_model_set_animation_speed`
- *
- * Set the animation speed ratio
- *
- * The actual ratio is the value parameter / LV_GLTF_ANIM_SPEED_NORMAL
- * Values greater than LV_GLTF_ANIM_SPEED_NORMAL will speed-up the animation
- * Values less than LV_GLTF_ANIM_SPEED_NORMAL will slow down the animation
- *
- * @param obj pointer to a glTF viewer object
- * @param value speed-up ratio of the animation
- */
-void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value);
-
-/**
- * DEPRECATED. See `lv_gltf_model_get_animation_speed`
- *
- * Get the animation speed ratio
- *
- * The actual ratio is the return value / LV_GLTF_ANIM_SPEED_NORMAL
- *
- * @param obj pointer to a glTF viewer object
- */
-uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj);
-
 /**********************
  * Visual Settings Functions
  **********************/

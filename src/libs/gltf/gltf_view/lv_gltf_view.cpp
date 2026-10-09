@@ -336,28 +336,6 @@ float lv_gltf_get_world_distance(const lv_obj_t * obj)
     return (lv_gltf_data_get_radius(model) * LV_GLTF_DISTANCE_SCALE_FACTOR) * view_desc->distance;
 }
 
-void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_LOG_WARN("Deprecated. lv_gltf_set_animation_speed should now be set on the model directly via `lv_gltf_model_set_animation_speed`. Setting it on the main model as a fallback");
-    lv_gltf_model_t * model = lv_gltf_get_primary_model(obj);
-    if(!model) {
-        return;
-    }
-    lv_gltf_model_set_animation_speed(model, value);
-}
-
-uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
-    LV_LOG_WARN("Deprecated. lv_gltf_get_animation_speed should now be called on the model directly via `lv_gltf_model_get_animation_speed`. Getting the animation speed from the main model as a fallback");
-    lv_gltf_model_t * model = lv_gltf_get_primary_model(obj);
-    if(!model) {
-        return 0;
-    }
-    return lv_gltf_model_get_animation_speed(model);
-}
-
 void lv_gltf_set_focal_x(lv_obj_t * obj, float value)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
