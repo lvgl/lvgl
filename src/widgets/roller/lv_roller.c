@@ -13,6 +13,7 @@
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
@@ -965,11 +966,13 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     int32_t scale_y = 256;
     lv_obj_t * parent = roller;
     while(parent) {
-        angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
-        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
-        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
-        scale_x = (scale_x * zoom_act_x) >> 8;
-        scale_y = (scale_y * zoom_act_y) >> 8;
+        if(lv_obj_get_layer_type(parent) == LV_LAYER_TYPE_TRANSFORM) {
+            angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+            int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+            int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
+            scale_x = (scale_x * zoom_act_x) >> 8;
+            scale_y = (scale_y * zoom_act_y) >> 8;
+        }
         parent = lv_obj_get_parent(parent);
     }
     lv_point_t pivot = { 0, 0 };

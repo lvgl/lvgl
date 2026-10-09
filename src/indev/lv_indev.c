@@ -1592,11 +1592,13 @@ static void indev_proc_release(lv_indev_t * indev)
             lv_point_t pivot = { 0, 0 };
             lv_obj_t * parent = scroll_obj;
             while(parent) {
-                angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
-                int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
-                int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
-                scale_x = (scale_x * zoom_act_x) >> 8;
-                scale_y = (scale_x * zoom_act_y) >> 8;
+                if(lv_obj_get_layer_type(parent) == LV_LAYER_TYPE_TRANSFORM) {
+                    angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+                    int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+                    int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
+                    scale_x = (scale_x * zoom_act_x) >> 8;
+                    scale_y = (scale_y * zoom_act_y) >> 8;
+                }
                 parent = lv_obj_get_parent(parent);
             }
 
