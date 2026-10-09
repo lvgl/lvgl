@@ -2164,7 +2164,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_LOTTIE=1                 \
                          LV_USE_LOVYAN_GFX=1             \
                          LV_USE_LZ4=1                    \
-                         LV_USE_LZ4_EXTERNAL=1           \
                          LV_USE_LZ4_INTERNAL=1           \
                          LV_USE_MATRIX=1                 \
                          LV_USE_MEM_MONITOR=1            \
