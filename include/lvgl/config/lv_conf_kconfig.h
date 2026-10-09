@@ -219,14 +219,6 @@ extern "C" {
 #endif
 
 /*******************
- * LV_ASSERT_HANDLER_INCLUDE
- *******************/
-
-#if defined(CONFIG_LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY) && CONFIG_LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY
-#define LV_ASSERT_HANDLER_INCLUDE CONFIG_LV_ASSERT_HANDLER_INCLUDE
-#endif
-
-/*******************
  * LV_SDL_BUF_COUNT
  *******************/
 

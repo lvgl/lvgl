@@ -2338,21 +2338,6 @@
 /** LV_ASSERT_MEM_INTEGRITY */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0
 
-/** Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
- *  This setting allows you to keep using old LVGL versions which rely on
- *  LV_ASSERT_HANDLER_INCLUDE without triggering a compiler warning.
- *
- *  LV_ASSERT_HANDLER_INCLUDE has been deprecated in favor of the new approach:
- *  define LV_ASSERT_CUSTOM_INCLUDE with the header path, and place the
- *  LV_ASSERT_HANDLER macro definition inside that header instead.
- *
- *  Only enable this if you are maintaining compatibility with existing code
- *  that uses LV_ASSERT_HANDLER_INCLUDE and cannot migrate immediately.
- *  New projects should use LV_ASSERT_CUSTOM_INCLUDE and LV_ASSERT_HANDLER
- *  directly.
- */
-#define LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING 0
-
 /** Include the header given by LV_ASSERT_CUSTOM_INCLUDE, which must define
  *  a custom LV_ASSERT_HANDLER.
  */
