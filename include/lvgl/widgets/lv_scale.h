@@ -235,15 +235,6 @@ void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 
 /**
- * DEPRECATED, use lv_scale_set_section_range instead.
- * Set range for specified Scale Section
- * @param section       pointer to Section
- * @param min           Section new minimum value
- * @param max           Section new maximum value
- */
-void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max);
-
-/**
  * Set the range of a scale section
  * @param scale         pointer to scale
  * @param section       pointer to section
