@@ -876,6 +876,16 @@ used afterwards.
   lv_scale_set_section_style_items(scale,     section, &my_style);
   ```
 
+- `lv_scale_section_set_range()` has been removed, use `lv_scale_set_section_range` instead:
+
+  ```c
+  /* Before */
+  lv_scale_section_set_range(section, 0, 10);
+
+  /* After */
+  lv_scale_set_section_range(scale, section, 0, 10);
+  ```
+
 ### lv_menu
 
 - The `lv_menu` widget is removed. A menu is page navigation over base widgets
