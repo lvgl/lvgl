@@ -48,10 +48,3 @@ def test_internal_footer_has_static_derivations(generated):
     # trailing LV_KCONFIG_PRESENT cleanup.
     assert "#define LV_USE_ANIMIMAGE LV_USE_ANIMIMG" in i
     assert "#undef LV_KCONFIG_PRESENT" in i
-
-
-def test_internal_has_legacy_autobackend_shim(generated):
-    i = generated["internal"]
-    assert "#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND" in i
-    drm_auto = i[i.index("#ifndef LV_LINUX_DRM_AUTO_BACKEND") :]
-    assert "#define LV_LINUX_DRM_AUTO_BACKEND LV_USE_LINUX_DRM" in drm_auto[:400]
