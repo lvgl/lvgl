@@ -113,7 +113,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
         lv_area_increase(&a, dsc->width, dsc->width);
     }
 
-    if(dsc->base.drop_shadow_opa) {
+    if(dsc->base.drop_shadow_opa && lv_draw_layer_check(layer)) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, &a);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_line_dsc_t ds_dsc = *dsc;

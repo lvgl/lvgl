@@ -67,7 +67,7 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
     a.x2 = dsc->center.x + dsc->radius - 1;
     a.y2 = dsc->center.y + dsc->radius - 1;
 
-    if(dsc->base.drop_shadow_opa) {
+    if(dsc->base.drop_shadow_opa && lv_draw_layer_check(layer)) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, &a);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_arc_dsc_t ds_dsc = *dsc;

@@ -11,6 +11,7 @@
 
 #if LV_USE_BAR
 
+#include "../../draw/lv_draw_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
@@ -610,7 +611,7 @@ static void draw_indic(lv_event_t * e)
     else if(indic_radius >= bg_radius) radius_issue = false;
     else if(lv_area_is_in(&indic_area, &bar_coords, bg_radius)) radius_issue = false;
 
-    if(radius_issue || mask_needed) {
+    if((radius_issue || mask_needed) && lv_draw_layer_check(layer)) {
         if(!radius_issue) {
             /*Draw only the shadow*/
             lv_draw_rect_dsc_t draw_rect_tmp_dsc = draw_rect_dsc;

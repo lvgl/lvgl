@@ -47,7 +47,8 @@ void test_refr_transformed_object_outside_the_clip_area(void)
     lv_obj_set_style_transform_pivot_x(obj, lv_pct(50), 0);
     lv_obj_set_style_transform_pivot_y(obj, lv_pct(50), 0);
     lv_obj_set_style_transform_rotation(obj, 450, 0);
-    TEST_ASSERT_EQUAL(LV_LAYER_TYPE_TRANSFORM, lv_obj_get_layer_type(obj));
+    TEST_ASSERT_EQUAL(lv_draw_layer_supported(refr_ctx.disp) ? LV_LAYER_TYPE_TRANSFORM : LV_LAYER_TYPE_NONE,
+                      lv_obj_get_layer_type(obj));
 
     uint32_t draw_cnt = 0;
     lv_obj_add_event_cb(obj, refr_draw_main_counter_cb, LV_EVENT_DRAW_MAIN, &draw_cnt);
@@ -143,9 +144,10 @@ void test_refr_clip_corner_splits_the_children(void)
     refr_frame();
 
     /*The children are rendered three times: the top, the middle and the bottom part*/
-    TEST_ASSERT_EQUAL_UINT32(3, child_draw_cnt);
+    TEST_ASSERT_EQUAL_UINT32(lv_draw_layer_supported(refr_ctx.disp) ? 3 : 1, child_draw_cnt);
     /*The corner of the child is cut off, the middle is not*/
-    ASSERT_PX_EQ(REFR_COLOR_BLACK, refr_screen_px(11, 11));
+    ASSERT_PX_EQ(lv_draw_layer_supported(refr_ctx.disp) ? REFR_COLOR_BLACK : REFR_COLOR_RED,
+                 refr_screen_px(11, 11));
     ASSERT_PX_EQ(REFR_COLOR_RED, refr_screen_px(40, 40));
     ASSERT_PX_EQ(REFR_COLOR_RED, refr_screen_px(40, 12));
 

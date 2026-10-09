@@ -71,7 +71,7 @@ void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_ds
     a.x2 = (int32_t)LV_MAX3(draw_dsc->p[0].x, draw_dsc->p[1].x, draw_dsc->p[2].x);
     a.y2 = (int32_t)LV_MAX3(draw_dsc->p[0].y, draw_dsc->p[1].y, draw_dsc->p[2].y);
 
-    if(draw_dsc->base.drop_shadow_opa) {
+    if(draw_dsc->base.drop_shadow_opa && lv_draw_layer_check(layer)) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &draw_dsc->base, &a);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_triangle_dsc_t ds_dsc = *draw_dsc;

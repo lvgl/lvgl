@@ -1570,7 +1570,8 @@ static void lv_obj_draw(lv_event_t * e)
     if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res == LV_COVER_RES_MASKED) return;
-        if(lv_obj_get_style_clip_corner_internal(obj, LV_PART_MAIN)) {
+        if(lv_obj_get_style_clip_corner_internal(obj, LV_PART_MAIN) &&
+           lv_draw_layer_supported(lv_obj_get_display(obj))) {
             info->res = LV_COVER_RES_MASKED;
             return;
         }

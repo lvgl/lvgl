@@ -176,7 +176,7 @@ void test_refr_layered_opacity_is_blended(void)
     uint32_t px = refr_screen_px(15, 15);
     uint32_t r = (px >> 16) & 0xFF;
     /*White over black with 50% opacity*/
-    ASSERT_PX_WITHIN(4, 128, r);
+    ASSERT_PX_WITHIN(4, lv_draw_layer_supported(refr_ctx.disp) ? 128 : 255, r);
 }
 
 void test_refr_simple_layer_is_split_into_chunks(void)
@@ -199,11 +199,11 @@ void test_refr_simple_layer_is_split_into_chunks(void)
     uint32_t px_size = lv_color_format_get_size(LV_COLOR_FORMAT_RGB565);
     uint32_t max_rgb_rows = LV_DRAW_LAYER_SIMPLE_BUF_SIZE / (uint32_t)w / px_size;
     uint32_t expected_rgb = ((uint32_t)h + max_rgb_rows - 1) / max_rgb_rows;
-    TEST_ASSERT_EQUAL_UINT32(expected_rgb, draw_cnt);
+    TEST_ASSERT_EQUAL_UINT32(lv_draw_layer_supported(refr_ctx.disp) ? expected_rgb : 1, draw_cnt);
 
     /*Every chunk is blended the same way*/
     uint32_t reference = refr_screen_px(w / 2, 0);
-    ASSERT_PX_WITHIN(12, 128, (reference >> 16) & 0xFF);
+    ASSERT_PX_WITHIN(12, lv_draw_layer_supported(refr_ctx.disp) ? 128 : 255, (reference >> 16) & 0xFF);
     int32_t y;
     for(y = 0; y < h; y += 7) {
         ASSERT_PX_EQ(reference, refr_screen_px(w / 2, y));
@@ -217,7 +217,7 @@ void test_refr_simple_layer_is_split_into_chunks(void)
 
     uint32_t max_argb_rows = LV_DRAW_LAYER_SIMPLE_BUF_SIZE / (uint32_t)w / sizeof(lv_color32_t);
     uint32_t expected_argb = ((uint32_t)h + max_argb_rows - 1) / max_argb_rows;
-    TEST_ASSERT_EQUAL_UINT32(expected_argb, draw_cnt);
+    TEST_ASSERT_EQUAL_UINT32(lv_draw_layer_supported(refr_ctx.disp) ? expected_argb : 1, draw_cnt);
     TEST_ASSERT_TRUE(expected_argb >= expected_rgb);
 }
 
@@ -231,7 +231,7 @@ void test_refr_bitmap_mask_forces_an_alpha_layer(void)
     refr_screen_set_color(REFR_COLOR_BLACK);
 
     lv_obj_t * obj = refr_rect_create(refr_screen(), 0, 0, w, h, REFR_COLOR_WHITE);
-    /*Keep the object on a layer of its own in every configuration*/
+    /*Request a separate layer; unsupported configurations keep a single direct draw.*/
     lv_obj_set_style_opa_layered(obj, 128, 0);
     uint32_t draw_cnt = 0;
     lv_obj_add_event_cb(obj, refr_draw_main_counter_cb, LV_EVENT_DRAW_MAIN, &draw_cnt);
@@ -241,18 +241,21 @@ void test_refr_bitmap_mask_forces_an_alpha_layer(void)
 
     uint32_t px_size = lv_color_format_get_size(LV_COLOR_FORMAT_RGB565);
     uint32_t max_rgb_rows = LV_DRAW_LAYER_SIMPLE_BUF_SIZE / (uint32_t)w / px_size;
-    TEST_ASSERT_EQUAL_UINT32(((uint32_t)h + max_rgb_rows - 1) / max_rgb_rows, draw_cnt);
+    TEST_ASSERT_EQUAL_UINT32(lv_draw_layer_supported(refr_ctx.disp) ?
+                             ((uint32_t)h + max_rgb_rows - 1) / max_rgb_rows : 1, draw_cnt);
 
     LV_IMAGE_DECLARE(test_image_cogwheel_a8);
     lv_obj_set_style_bitmap_mask_src(obj, &test_image_cogwheel_a8, 0);
-    TEST_ASSERT_EQUAL(LV_LAYER_TYPE_SIMPLE, lv_obj_get_layer_type(obj));
+    TEST_ASSERT_EQUAL(lv_draw_layer_supported(refr_ctx.disp) ? LV_LAYER_TYPE_SIMPLE : LV_LAYER_TYPE_NONE,
+                      lv_obj_get_layer_type(obj));
 
     draw_cnt = 0;
     lv_obj_invalidate(refr_screen());
     refr_frame();
 
     uint32_t max_argb_rows = LV_DRAW_LAYER_SIMPLE_BUF_SIZE / (uint32_t)w / sizeof(lv_color32_t);
-    TEST_ASSERT_EQUAL_UINT32(((uint32_t)h + max_argb_rows - 1) / max_argb_rows, draw_cnt);
+    TEST_ASSERT_EQUAL_UINT32(lv_draw_layer_supported(refr_ctx.disp) ?
+                             ((uint32_t)h + max_argb_rows - 1) / max_argb_rows : 1, draw_cnt);
 }
 
 void test_refr_children_of_a_transparent_parent_are_skipped(void)

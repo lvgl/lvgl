@@ -119,7 +119,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
     }
     LV_PROFILER_DRAW_BEGIN;
 
-    if(dsc->base.drop_shadow_opa) {
+    if(dsc->base.drop_shadow_opa && lv_draw_layer_check(layer)) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_label_dsc_t ds_dsc = *dsc;

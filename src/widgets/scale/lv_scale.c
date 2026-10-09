@@ -10,6 +10,7 @@
 
 #if LV_USE_SCALE
 
+#include "../../draw/lv_draw_private.h"
 #include "lv_scale_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
@@ -1083,7 +1084,7 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         return;
     }
 
-    if(label_rotation > 0) {
+    if(label_rotation > 0 && lv_draw_layer_check(layer)) {
         /*Draw the label to a new layer and draw the layer rotated*/
         lv_layer_t * layer_label = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &label_coords);
         lv_draw_label(layer_label, label_dsc, &label_coords);

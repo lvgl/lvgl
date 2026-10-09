@@ -461,8 +461,12 @@ lv_layer_type_t lv_obj_get_layer_type(const lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_LAYER_TYPE_NONE);
 
-    if(obj->spec_attr) return (lv_layer_type_t)obj->spec_attr->layer_type;
-    else return LV_LAYER_TYPE_NONE;
+    lv_layer_type_t type = obj->spec_attr ? (lv_layer_type_t)obj->spec_attr->layer_type : LV_LAYER_TYPE_NONE;
+    /* Keep the style's requested type cached. Geometry and rendering both
+     * use the effective type, so an omitted transform also stops affecting
+     * hit testing and invalidation, without modifying the stored style. */
+    if(type != LV_LAYER_TYPE_NONE && !lv_draw_layer_supported(lv_obj_get_display(obj))) return LV_LAYER_TYPE_NONE;
+    return type;
 }
 
 /**********************

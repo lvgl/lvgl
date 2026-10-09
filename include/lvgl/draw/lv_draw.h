@@ -219,6 +219,32 @@ void lv_draw_deinit(void);
 void * lv_draw_create_unit(size_t size);
 
 /**
+ * Whether the draw units can render layers on a display: an opaque fill into an
+ * ARGB8888 child layer, and the blend of that layer onto the display's layer.
+ * Evaluates probe tasks without allocating a draw buffer or dispatching work.
+ * Cached per display; this is basic off-screen availability, not a guarantee of
+ * support for every task or color format.
+ * @param disp  display to query @nullable, NULL for the default display
+ * @return true if the layer effects of the widgets are rendered
+ */
+bool lv_draw_layer_supported(lv_display_t * disp);
+
+/**
+ * Invalidate the cached layer support after configuring or enabling/disabling
+ * draw units. Unit creation and draw-module deinitialization do this as well.
+ * Call on the LVGL thread, outside drawing; request a refresh if needed.
+ */
+void lv_draw_invalidate_layer_support(void);
+
+/**
+ * Cumulative count of the automatic layer effects omitted on a display. Query
+ * differences across renders; capability probes don't count.
+ * @param disp  display to query @nullable, NULL for the default display
+ * @return the number of omitted layer effects since the display was created
+ */
+uint32_t lv_draw_get_layer_fallback_count(lv_display_t * disp);
+
+/**
  * Add an empty draw task to the draw task list of a layer.
  * @param layer     pointer to a layer
  * @param coords    the coordinates of the draw task

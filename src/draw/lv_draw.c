@@ -68,6 +68,7 @@ void lv_draw_deinit(void)
         lv_free(cur_unit);
     }
     _draw_info.unit_head = NULL;
+    lv_draw_invalidate_layer_support();
 #if LV_USE_OS
     lv_thread_sync_delete(&_draw_info.sync);
 #endif
@@ -83,8 +84,105 @@ void * lv_draw_create_unit(size_t size)
     _draw_info.unit_cnt++;
 
     new_unit->idx = _draw_info.unit_cnt;
+    lv_draw_invalidate_layer_support();
 
     return new_unit;
+}
+
+void lv_draw_invalidate_layer_support(void)
+{
+    for(lv_display_t * disp = lv_display_get_next(NULL); disp; disp = lv_display_get_next(disp)) {
+        disp->layer_support_valid = false;
+    }
+}
+
+/**
+ * Let the draw units evaluate a probe task: a task that is never queued or dispatched.
+ * @return true if a draw unit claimed it
+ */
+static bool probe_task(lv_draw_task_t * task, lv_layer_t * target, void * draw_dsc, const lv_area_t * area)
+{
+    task->target_layer = target;
+    task->draw_dsc = draw_dsc;
+    task->area = task->_real_area = task->clip_area = *area;
+    task->opa = LV_OPA_COVER;
+    task->state = LV_DRAW_TASK_STATE_WAITING;
+    task->preference_score = 100;
+    task->preferred_draw_unit_id = LV_DRAW_UNIT_NONE;
+    task->is_probe = true;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    task->matrix = target->matrix;
+#endif
+    for(lv_draw_unit_t * unit = _draw_info.unit_head; unit; unit = unit->next) {
+        if(unit->evaluate_cb) unit->evaluate_cb(unit, task);
+        if(task->preferred_draw_unit_id != LV_DRAW_UNIT_NONE) return true;
+    }
+    return false;
+}
+
+bool lv_draw_layer_supported(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL || disp->layer_head == NULL) return false;
+    if(disp->layer_support_valid) return disp->layer_supported;
+
+    /* Some draw units (SDL, OpenGL ES) evaluate against the display being refreshed */
+    lv_display_t * refr_ori = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(disp);
+
+    /* Do not use lv_draw_layer_create/init: those register layers and send
+     * events. A real child also has no draw buffer when first evaluated. */
+    const lv_area_t area = {0, 0, 31, 31};
+    lv_layer_t layer;
+    lv_layer_init(&layer);
+    layer.parent = disp->layer_head;
+    layer.display = disp;
+    layer.color_format = LV_COLOR_FORMAT_ARGB8888;
+    layer.buf_area = layer._clip_area = layer.phy_clip_area = area;
+
+    /* 1. an opaque fill into the child layer */
+    lv_draw_fill_dsc_t fill;
+    lv_draw_fill_dsc_init(&fill);
+    fill.base.layer = &layer;
+    lv_draw_task_t task = {0};
+    task.type = LV_DRAW_TASK_TYPE_FILL;
+    bool supported = probe_task(&task, &layer, &fill, &area);
+
+    /* 2. blending the child layer onto its parent, as the layer effects need */
+    if(supported) {
+        lv_draw_image_dsc_t blend;
+        lv_draw_image_dsc_init(&blend);
+        blend.base.layer = disp->layer_head;
+        blend.src = &layer;
+        blend.header.magic = LV_IMAGE_HEADER_MAGIC;
+        blend.header.cf = LV_COLOR_FORMAT_ARGB8888;
+        blend.header.w = lv_area_get_width(&area);
+        blend.header.h = lv_area_get_height(&area);
+        blend.header.stride = blend.header.w * sizeof(lv_color32_t);
+        blend.image_area = area;
+        lv_draw_task_t blend_task = {0};
+        blend_task.type = LV_DRAW_TASK_TYPE_LAYER;
+        supported = probe_task(&blend_task, disp->layer_head, &blend, &area);
+    }
+
+    lv_refr_set_disp_refreshing(refr_ori);
+    disp->layer_supported = supported;
+    disp->layer_support_valid = true;
+    return disp->layer_supported;
+}
+
+uint32_t lv_draw_get_layer_fallback_count(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    return disp ? disp->layer_fallback_count : 0;
+}
+
+bool lv_draw_layer_check(lv_layer_t * layer)
+{
+    lv_display_t * disp = layer->display ? layer->display : lv_display_get_default();
+    if(lv_draw_layer_supported(disp)) return true;
+    if(disp) disp->layer_fallback_count++;
+    return false;
 }
 
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type)

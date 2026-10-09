@@ -125,6 +125,12 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
         LV_PROFILER_REFR_END;
         return;
     }
+
+    /*The object asked for a layer effect that is omitted without layer support*/
+    if(obj->spec_attr && obj->spec_attr->layer_type != LV_LAYER_TYPE_NONE &&
+       lv_obj_get_layer_type(obj) == LV_LAYER_TYPE_NONE) {
+        lv_draw_layer_check(layer);
+    }
     /*If the object is visible on the current clip area*/
     layer->_clip_area = clip_coords_for_obj;
 
@@ -175,6 +181,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 radius = lv_obj_get_style_radius_internal(obj, LV_PART_MAIN);
                 if(radius == 0) clip_corner = false;
             }
+            if(clip_corner && !lv_draw_layer_check(layer)) clip_corner = false;
 
             if(clip_corner == false) {
                 for(i = 0; i < child_cnt; i++) {

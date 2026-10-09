@@ -138,6 +138,9 @@ struct _lv_display_t {
      * Layer
      *--------------------*/
     lv_layer_t * layer_head;
+    uint32_t layer_fallback_count; /**< Cumulative automatic layer effects omitted. */
+    uint8_t layer_support_valid : 1;
+    uint8_t layer_supported : 1;
 
     /*---------------------
      * Screens
