@@ -183,16 +183,6 @@
  * Detect if the user is using the new calendar day/month configuration
  * in order to avoid warnings for users that have migrated.
  */
-#if defined(LV_MONDAY_STR) || defined(CONFIG_LV_MONDAY_STR)
-#define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 1
-#else
-#define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 0
-#endif
-
-/*
- * Detect if the user is using the new calendar day/month configuration
- * in order to avoid warnings for users that have migrated.
- */
 #if defined(LV_JANUARY_STR) || defined(CONFIG_LV_JANUARY_STR)
 #define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 1
 #else
