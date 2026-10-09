@@ -52,6 +52,7 @@ static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x);
 static void invalidate_point(lv_obj_t * obj, uint32_t i);
 static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t cnt, int32_t ** a);
 static int32_t value_to_y(lv_obj_t * obj, lv_chart_series_t * ser, int32_t v, int32_t h);
+static int32_t value_to_y_unclamped(int32_t v, int32_t min_v, int32_t max_v, int32_t y_ofs, int32_t h);
 
 /**********************
  *  STATIC VARIABLES
@@ -1146,7 +1147,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                 int32_t v = ser->y_points[p_act];
                 int32_t min_v = chart->ymin[ser->y_axis_sec];
                 int32_t max_v = chart->ymax[ser->y_axis_sec];
-                p_y = (int32_t)lv_map(v, min_v, max_v, y_ofs + h, y_ofs);
+                p_y = value_to_y_unclamped(v, min_v, max_v, y_ofs, h);
             }
 
             /*In normal mode just collect the points here*/
@@ -1319,7 +1320,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
                 }
                 else {
                     scaled_points[2].x = p_x;
-                    scaled_points[2].y = (int32_t)lv_map(ser->y_points[p_next], min_v, max_v, y_ofs + h, y_ofs);
+                    scaled_points[2].y = value_to_y_unclamped(ser->y_points[p_next], min_v, max_v, y_ofs, h);
                     if(i == 0) {
                         scaled_points[0] = scaled_points[2];
                         scaled_points[1] = scaled_points[2];
@@ -1959,6 +1960,24 @@ static int32_t value_to_y(lv_obj_t * obj, lv_chart_series_t * ser, int32_t v, in
     lv_chart_t * chart = (lv_chart_t *) obj;
 
     return lv_map(v, chart->ymin[ser->y_axis_sec], chart->ymax[ser->y_axis_sec], 0, h);
+}
+
+/**
+ * Map a value to a y coordinate like `lv_map()` does, but without clamping it to the range.
+ * This way out of range values end up outside of the content area
+ * instead of being drawn along its top or bottom edge.
+ * @param v     the value to map
+ * @param min_v the minimum of the axis range
+ * @param max_v the maximum of the axis range
+ * @param y_ofs the y coordinate of the top of the content area
+ * @param h     the height of the content area
+ * @return      the y coordinate of the value
+ */
+static int32_t value_to_y_unclamped(int32_t v, int32_t min_v, int32_t max_v, int32_t y_ofs, int32_t h)
+{
+    if(max_v == min_v) return y_ofs + h;
+
+    return (int32_t)((((int64_t)v - min_v) * -h) / ((int64_t)max_v - min_v)) + y_ofs + h;
 }
 
 #endif
