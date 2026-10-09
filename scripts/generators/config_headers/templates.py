@@ -164,30 +164,6 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
  */
 
 /*
- *  Backward compatibility. Before the user selected either
- *  LV_X11_RENDER_MODE_PARTIAL or LV_X11_RENDER_MODE_DIRECT or
- *  LV_X11_RENDER_MODE_FULL. For v9.6, this becomes a single choice:
- *  LV_X11_RENDER_MODE which maps to a LV_DISPLAY_RENDER_MODE value.
- */
-#if defined(LV_X11_RENDER_MODE_PARTIAL) && LV_X11_RENDER_MODE_PARTIAL
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
-    #warning LV_X11_RENDER_MODE_PARTIAL is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_PARTIAL instead.
-#endif /*defined(LV_X11_RENDER_MODE_PARTIAL) && LV_X11_RENDER_MODE_PARTIAL*/
-
-#if defined(LV_X11_RENDER_MODE_DIRECT) && LV_X11_RENDER_MODE_DIRECT
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
-    #warning LV_X11_RENDER_MODE_DIRECT is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_DIRECT instead.
-#endif /*defined(LV_X11_RENDER_MODE_DIRECT) && LV_X11_RENDER_MODE_DIRECT*/
-
-#if defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
-    #warning LV_X11_RENDER_MODE_FULL is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_FULL instead.
-#endif /*defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL*/
-
-/*
  *  Before, the VG-Lite GPU was chosen with LV_VG_LITE_HAL_GPU_SERIES (a bare
  *  token such as gc255) and LV_VG_LITE_HAL_GPU_REVISION (a hex revision), which
  *  were pasted into the options include path.  For v9.x these are replaced by the
