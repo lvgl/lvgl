@@ -82,9 +82,10 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * dsc)
     lv_layer_t * layer = t->target_layer;
     uint32_t layer_stride_byte = layer->draw_buf->header.stride;
 
+    /* TODO: (v10) Gate adding custom blend handlers behind a config */
     lv_draw_sw_blend_handler_t handler = lv_draw_sw_get_blend_handler(layer->color_format);
     if(handler) {
-        handler(t, dsc);
+        handler(layer, &blend_area, dsc);
         LV_PROFILER_DRAW_END;
         return;
     }
