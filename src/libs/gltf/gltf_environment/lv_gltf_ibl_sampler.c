@@ -208,15 +208,6 @@ static lv_result_t ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char 
                 lv_free(file_data);
             }
         }
-
-        if(!data) {
-            /* TODO:(v10) kept for backwards compatibility with original gltf integration. remove this
-             * for v10 */
-            data = stbi_loadf(path, &src_width, &src_height, &src_nrChannels, 3);
-            if(data) {
-                LV_LOG_DEPRECATED("Passing a raw path to lv_gltf_environment_create is deprecated. Pass an LVGL filesystem path instead");
-            }
-        }
     }
 
     if(!data) {
