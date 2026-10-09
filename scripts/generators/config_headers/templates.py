@@ -124,16 +124,6 @@ __CONFIG_OPTIONS__
 #endif
 
 /*
- * Detect if the user is using the new calendar day/month configuration
- * in order to avoid warnings for users that have migrated.
- */
-#if defined(LV_JANUARY_STR) || defined(CONFIG_LV_JANUARY_STR)
-#define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 1
-#else
-#define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 0
-#endif
-
-/*
  * Detect if the user is using the xkb keymap configuration
  * in order to avoid warnings for users that have migrated.
  * we only need to check for it if LV_LIBINPUT_XKB is enabled
