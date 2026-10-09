@@ -60,7 +60,7 @@ void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area
     if(dsc->radius == 0 && (grad_dir == LV_GRAD_DIR_NONE)) {
         blend_dsc.blend_area = &bg_coords;
         blend_dsc.opa = dsc->opa;
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
         return;
     }
 
@@ -198,7 +198,7 @@ void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area
                 }
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             }
-            lv_draw_sw_blend(t, &blend_dsc);
+            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
         }
 
         if(bottom_y <= clipped_coords.y2) {
@@ -248,7 +248,7 @@ void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area
                 }
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             }
-            lv_draw_sw_blend(t, &blend_dsc);
+            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
         }
     }
 
@@ -260,7 +260,7 @@ void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area
         blend_area.y2 = bg_coords.y2 - rout;
         blend_dsc.opa = opa;
         blend_dsc.mask_buf = NULL;
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
     /*With gradient draw line by line*/
     else {
@@ -310,7 +310,7 @@ void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area
                 default:
                     break;
             }
-            lv_draw_sw_blend(t, &blend_dsc);
+            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
         }
     }
 

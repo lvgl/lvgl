@@ -208,7 +208,7 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
                 }
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -251,7 +251,7 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
                 }
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -292,11 +292,11 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
                     lv_memset(mask_buf, sh_buf_tmp[0], w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
                     if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-                    lv_draw_sw_blend(t, &blend_dsc);
+                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 }
                 else {
                     blend_dsc.opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : LV_OPA_MIX2(sh_buf_tmp[0], dsc->opa);
-                    lv_draw_sw_blend(t, &blend_dsc);
+                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 }
                 sh_buf_tmp += corner_size;
             }
@@ -342,11 +342,11 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
                     lv_memset(mask_buf, sh_buf_tmp[0], w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
                     if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-                    lv_draw_sw_blend(t, &blend_dsc);
+                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 }
                 else {
                     blend_dsc.opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->opa) >> 8;
-                    lv_draw_sw_blend(t, &blend_dsc);
+                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
 
                 }
                 sh_buf_tmp += corner_size;
@@ -391,7 +391,7 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
                     if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
             }
         }
     }
@@ -448,7 +448,7 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
                     if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
 
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
             }
         }
     }
@@ -491,7 +491,7 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
                     blend_dsc.mask_buf = sh_buf_tmp;
                 }
 
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -534,7 +534,7 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
                 }
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -561,7 +561,7 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
 
                 lv_memset(mask_buf, 0xff, w);
                 blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
             }
         }
     }
