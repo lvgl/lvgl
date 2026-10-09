@@ -28,7 +28,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define MAX_BUF_SIZE (uint32_t) (4 * lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing()) * lv_color_format_get_size(lv_display_get_color_format(lv_refr_get_disp_refreshing())))
 
 #ifndef LV_DRAW_SW_IMAGE
     #define LV_DRAW_SW_IMAGE(...)   LV_RESULT_INVALID
@@ -58,6 +57,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static uint32_t max_buf_size(const lv_layer_t * layer);
 
 
 #if LV_DRAW_SW_COMPLEX
@@ -349,7 +349,7 @@ static void recolor_only(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_ds
     if(buf_stride == 0) {
         buf_stride = 1;
     }
-    buf_h = MAX_BUF_SIZE / buf_stride;
+    buf_h = max_buf_size(t->target_layer) / buf_stride;
     buf_h = LV_CLAMP(1, buf_h, blend_h);
     tmp_buf = lv_malloc(buf_stride * buf_h);
     LV_ASSERT_MALLOC(tmp_buf);
@@ -450,19 +450,19 @@ static void transform_and_recolor(lv_layer_t * layer, const lv_draw_image_dsc_t 
     int32_t buf_h;
     if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
         uint32_t buf_stride = blend_w * 3;
-        buf_h = MAX_BUF_SIZE / buf_stride;
+        buf_h = max_buf_size(t->target_layer) / buf_stride;
         buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     else if(cf_final == LV_COLOR_FORMAT_AL88) {
         uint32_t buf_stride = blend_w;
-        buf_h = MAX_BUF_SIZE / (buf_stride * 2);
+        buf_h = max_buf_size(t->target_layer) / (buf_stride * 2);
         buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h * 2);
     }
     else {
         uint32_t buf_stride = blend_w * lv_color_format_get_size(cf_final);
-        buf_h = MAX_BUF_SIZE / buf_stride;
+        buf_h = max_buf_size(t->target_layer) / buf_stride;
         buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
@@ -1021,6 +1021,11 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc)
     lv_image_decoder_close(&mask_decoder_dsc);
 
     return true;
+}
+
+static uint32_t max_buf_size(const lv_layer_t * layer)
+{
+    return 4 * lv_area_get_width(&layer->buf_area) * lv_color_format_get_size(layer->color_format);
 }
 
 #endif /*LV_USE_DRAW_SW*/

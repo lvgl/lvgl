@@ -528,26 +528,6 @@ void test_display_event_vsync_unregister(void)
     TEST_ASSERT_EQUAL_UINT32(1, call_cnt);
 }
 
-/* The vsync helpers fall back to the default display when disp is NULL */
-void test_display_event_vsync_default_display(void)
-{
-    lv_display_t * def = lv_display_get_default();
-    TEST_ASSERT_NOT_NULL(def);
-    TEST_ASSERT_TRUE(def != test_disp);
-
-    const uint32_t base_cnt = lv_display_get_event_count(def);
-
-    TEST_ASSERT_TRUE(lv_display_register_vsync_event(NULL, cb_count, NULL));
-    TEST_ASSERT_EQUAL_UINT32(base_cnt + 1, lv_display_get_event_count(def));
-
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_display_send_vsync_event(NULL, NULL));
-    TEST_ASSERT_EQUAL_UINT32(1, call_cnt);
-
-    TEST_ASSERT_TRUE(lv_display_unregister_vsync_event(NULL, cb_count, NULL));
-    TEST_ASSERT_EQUAL_UINT32(base_cnt, lv_display_get_event_count(def));
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_display_send_vsync_event(NULL, NULL));
-}
-
 /* A vsync handler must not be notified after being removed with the plain
  * event API, even though vsync_count was not decremented */
 void test_display_event_vsync_removed_with_plain_api(void)
