@@ -187,7 +187,6 @@ if LV_USE_LINUX_DRM
 choice
 	prompt "Rendering backend"
 	default LV_LINUX_DRM_BACKEND_FBDEV
-	depends on !LV_LINUX_DRM_AUTO_BACKEND
 	config LV_LINUX_DRM_BACKEND_FBDEV
 		bool "Dumb buffers (no GPU)"
 	config LV_LINUX_DRM_BACKEND_EGL
@@ -207,10 +206,6 @@ config LV_LINUX_DRM_BACKEND
 config LV_LINUX_DRM_USE_EGL
 	bool
 	select LV_USE_EGL
-
-config LV_LINUX_DRM_AUTO_BACKEND
-	bool "Auto-select the DRM backend (legacy)"
-	default y
 
 endif # LV_USE_LINUX_DRM
 

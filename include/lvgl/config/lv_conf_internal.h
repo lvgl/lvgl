@@ -3097,18 +3097,6 @@
     #endif
 #endif
 
-#ifndef LV_LINUX_DRM_AUTO_BACKEND
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_LINUX_DRM_AUTO_BACKEND
-            #define LV_LINUX_DRM_AUTO_BACKEND CONFIG_LV_LINUX_DRM_AUTO_BACKEND
-        #else
-            #define LV_LINUX_DRM_AUTO_BACKEND 0
-        #endif
-    #else
-          #define LV_LINUX_DRM_AUTO_BACKEND LV_USE_LINUX_DRM
-    #endif
-#endif
-
 #ifndef LV_LINUX_DRM_BACKEND
     #ifdef CONFIG_LV_LINUX_DRM_BACKEND
         #define LV_LINUX_DRM_BACKEND CONFIG_LV_LINUX_DRM_BACKEND
@@ -4737,29 +4725,6 @@
  * These checks can't go to lv_conf_check.c as we export the correct
  * settings so the user code continues to work
  */
-
-/*
- *  Legacy backend inference for the Linux DRM and SDL drivers.  Historically the
- *  EGL backend was turned on automatically from LV_USE_OPENGLES; for v9.x each
- *  driver gets an explicit LV_<DRIVER>_BACKEND choice instead.  While the
- *  deprecated LV_<DRIVER>_AUTO_BACKEND is set (its default) we reproduce the old
- *  inference here and pre-define the per-driver flag, so the Derived-capability
- *  ladder below (which is #ifndef-guarded) leaves it untouched.  Runs before that
- *  ladder.  The #warning only fires when inference actually turns EGL on.
- */
-#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND
-    #ifndef LV_LINUX_DRM_USE_EGL
-        #if LV_USE_OPENGLES
-            #warning LV_LINUX_DRM_AUTO_BACKEND is deprecated and will be removed in a future release. Set it to 0 and select a backend with LV_LINUX_DRM_BACKEND.
-            #define LV_LINUX_DRM_USE_EGL 1
-        #else
-            #define LV_LINUX_DRM_USE_EGL 0
-        #endif
-    #endif
-    #ifndef LV_USE_LINUX_DRM_GBM_BUFFERS
-        #define LV_USE_LINUX_DRM_GBM_BUFFERS LV_LINUX_DRM_USE_EGL
-    #endif
-#endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND*/
 
 #if LV_USE_SDL && LV_SDL_AUTO_BACKEND
     #ifndef LV_SDL_USE_EGL

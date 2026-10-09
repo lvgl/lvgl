@@ -1535,12 +1535,6 @@
 #define LV_USE_LINUX_DRM 0
 
 #if LV_USE_LINUX_DRM
-/** Legacy behavior, slated for removal: the backend is inferred from
- *  LV_USE_OPENGLES (EGL when it is enabled). Disable this and pick a backend
- *  explicitly in the "Rendering backend" choice.
- */
-#define LV_LINUX_DRM_AUTO_BACKEND 1
-
 /** Select how the Linux DRM driver presents rendered frames.
  *  Possible values:
  *  - LV_LINUX_DRM_BACKEND_FBDEV: Dumb buffers (no GPU)

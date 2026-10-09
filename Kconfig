@@ -2307,18 +2307,9 @@ config LV_USE_LINUX_DRM
 
 if LV_USE_LINUX_DRM
 
-config LV_LINUX_DRM_AUTO_BACKEND
-	bool "Auto-select the DRM backend (legacy)"
-	default y
-	help
-	  Legacy behavior, slated for removal: the backend is inferred from
-	  LV_USE_OPENGLES (EGL when it is enabled). Disable this and pick a backend
-	  explicitly in the "Rendering backend" choice.
-
 choice
 	prompt "Rendering backend"
 	default LV_LINUX_DRM_BACKEND_FBDEV
-	depends on !LV_LINUX_DRM_AUTO_BACKEND
 	help
 	  Select how the Linux DRM driver presents rendered frames.
 
