@@ -113,18 +113,6 @@ config LV_MEM_SIZE
 	help
 	  Size of the pool `lv_malloc()` allocates from. Needs to be at least 2kB (2048).
 
-config LV_MEM_SIZE_KILOBYTES
-	int "Memory size (KB) [DEPRECATED: use LV_MEM_SIZE]"
-	default 0
-	help
-	  Deprecated. Use LV_MEM_SIZE (in bytes) instead.
-
-config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
-	int "Memory pool expand size (KB) [DEPRECATED: use LV_MEM_SIZE directly]"
-	default 0
-	help
-	  Deprecated. Modify LV_MEM_SIZE (in bytes) directly instead.
-
 config LV_MEM_ADR
 	hex "Memory pool address"
 	default 0x0
