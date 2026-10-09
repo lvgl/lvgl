@@ -115,20 +115,34 @@ void test_obj_flag_overflow_visible_1(void)
     cnt_1 = 0;
     cnt_2 = 0;
 
-    /*The clipped part of the left button (shouldn't trigger click event)*/
-    lv_test_mouse_click_at(185, 40);
+    if(lv_draw_layer_supported(lv_obj_get_display(obj_main))) {
+        /*The clipped part of the left button (shouldn't trigger click event)*/
+        lv_test_mouse_click_at(185, 40);
 
-    /*The non clipped part of the left button (should trigger click event)*/
-    lv_test_mouse_click_at(210, 80);
+        /*The non clipped part of the left button (should trigger click event)*/
+        lv_test_mouse_click_at(210, 80);
 
-    /*The left part of the right button (should trigger click event)*/
-    lv_test_mouse_click_at(590, 370);
+        /*The left part of the right button (should trigger click event)*/
+        lv_test_mouse_click_at(590, 370);
 
-    /*The outer part of the right button (should trigger click event as obj_child_2 has LV_OBJ_FLAG_OVERFLOW_VISIBLE)*/
-    lv_test_mouse_click_at(600, 430);
+        /*The outer part of the right button (should trigger click event as obj_child_2 has LV_OBJ_FLAG_OVERFLOW_VISIBLE)*/
+        lv_test_mouse_click_at(600, 430);
 
-    /*The clipped part of the right button (clipped because it's out of the red panel's ext draw size, shouldn't trigger click event)*/
-    lv_test_mouse_click_at(645, 430);
+        /*The clipped part of the right button (clipped because it's out of the red panel's ext draw size, shouldn't trigger click event)*/
+        lv_test_mouse_click_at(645, 430);
+
+    }
+    else {
+        /* Rotation is omitted: reuse the untransformed hit points, accounting
+         * for the two scroll operations above. */
+        int32_t main_scroll = lv_obj_get_scroll_x(obj_main);
+        int32_t right_scroll = main_scroll + lv_obj_get_scroll_x(obj_child_2);
+        lv_test_mouse_click_at(100 - main_scroll, 220);
+        lv_test_mouse_click_at(140 - main_scroll, 220);
+        lv_test_mouse_click_at(650 - right_scroll, 220);
+        lv_test_mouse_click_at(690 - right_scroll, 220);
+        lv_test_mouse_click_at(obj_main->coords.x2 + lv_obj_get_ext_draw_size(obj_main) + 1, 220);
+    }
 
     TEST_ASSERT_EQUAL_UINT32(1, cnt_1);
     TEST_ASSERT_EQUAL_UINT32(2, cnt_2);
