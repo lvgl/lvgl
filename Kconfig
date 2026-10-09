@@ -2735,18 +2735,9 @@ config LV_SDL_INCLUDE_PATH
 	string "SDL include path"
 	default "SDL2/SDL.h"
 
-config LV_SDL_AUTO_BACKEND
-	bool "Auto-select the SDL backend (legacy)"
-	default y
-	help
-	  Legacy behavior, slated for removal: EGL is inferred the legacy way
-	  (LV_USE_OPENGLES with an OpenGL draw unit). Disable this and pick a backend
-	  explicitly in the "Rendering backend" choice.
-
 choice
 	prompt "Rendering backend"
 	default LV_SDL_BACKEND_SW
-	depends on !LV_SDL_AUTO_BACKEND
 	help
 	  Select how the SDL driver presents rendered frames.
 

@@ -137,23 +137,6 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
  * Start of compatibility block
  -----------------------------------*/
 
-/*
- * TODO: Remove this for v10.
- * These checks can't go to lv_conf_check.c as we export the correct
- * settings so the user code continues to work
- */
-
-#if LV_USE_SDL && LV_SDL_AUTO_BACKEND
-    #ifndef LV_SDL_USE_EGL
-        #if LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
-            #warning LV_SDL_AUTO_BACKEND is deprecated and will be removed in a future release. Set it to 0 and select a backend with LV_SDL_BACKEND.
-            #define LV_SDL_USE_EGL 1
-        #else
-            #define LV_SDL_USE_EGL 0
-        #endif
-    #endif
-#endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
-
 /*----------------------------------
  * End of compatibility block
  -----------------------------------*/
