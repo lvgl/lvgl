@@ -209,6 +209,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
 lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font_t * font)
 {
     LV_CHECK_ARG(font != NULL, return NULL);
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. MicroPython)
@@ -232,7 +233,7 @@ lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font
 
     style_init(theme, dark_bg, font);
 
-    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
+    if(lv_display_get_theme(disp) == (lv_theme_t *)theme) {
         lv_obj_report_style_change(NULL);
     }
 

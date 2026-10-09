@@ -539,11 +539,6 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
                                    const lv_font_t * font)
 {
     LV_CHECK_ARG(font != NULL, return NULL);
-
-    if(!disp) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return NULL);
 
     /*This trick is required only to avoid the garbage collection of
