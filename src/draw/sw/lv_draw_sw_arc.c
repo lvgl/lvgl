@@ -73,7 +73,7 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
         cir_dsc.width = width;
         cir_dsc.radius = LV_RADIUS_CIRCLE;
         cir_dsc.side = LV_BORDER_SIDE_FULL;
-        lv_draw_sw_border(t, &cir_dsc, &area_out);
+        lv_draw_sw_border(t->target_layer, &t->clip_area, &cir_dsc, &area_out);
         return;
     }
 
@@ -216,7 +216,7 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
             }
         }
 
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &clipped_area, &blend_dsc);
 
         blend_area.y1 ++;
         blend_area.y2 ++;

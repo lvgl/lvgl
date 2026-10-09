@@ -128,7 +128,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    lv_draw_sw_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_sw_border(t->target_layer, &t->clip_area, &border_draw_dsc, glyph_draw_dsc->bg_coords);
 #endif
                 }
                 break;
@@ -154,7 +154,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             blend_dsc.mask_stride = glyph_draw_dsc->g->stride;
                             blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
                             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-                            lv_draw_sw_blend(t, &blend_dsc);
+                            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                         }
                         else {
                             glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
@@ -174,7 +174,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             blend_dsc.mask_stride = draw_buf->header.stride;
                             blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
                             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-                            lv_draw_sw_blend(t, &blend_dsc);
+                            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                         }
                     }
                     else {
@@ -208,7 +208,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_sw_fill(t, fill_draw_dsc, fill_area);
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, fill_draw_dsc, fill_area);
     }
 }
 

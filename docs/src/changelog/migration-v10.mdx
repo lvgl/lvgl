@@ -414,6 +414,22 @@ and are not meant to be included directly.
 
 ---
 
+## Rendering
+
+### SW draw unit
+
+- `lv_draw_sw_blend_handler_t` callback no longer takes a `lv_draw_task_t *`, instead the target layer and the blend area are passed directly.
+
+   ```c
+   /* Before */
+   void my_custon_blend_handler(lv_draw_task_t * task, const lv_draw_sw_blend_dsc_t * dsc);
+
+   /* After */
+   void my_custon_blend_handler(const lv_draw_sw_blend_dsc_t * dsc, lv_layer_t * layer, const lv_area_t * blend_area);
+   ```
+
+---
+
 ## Core
 
 ### Argument checking
