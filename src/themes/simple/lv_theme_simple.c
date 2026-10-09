@@ -144,6 +144,8 @@ static void style_init(my_theme_t * theme)
 
 lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return NULL);
+
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. MicroPython)
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
@@ -166,7 +168,7 @@ lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
 
     style_init(theme);
 
-    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
+    if(lv_display_get_theme(disp) == (lv_theme_t *)theme) {
         lv_obj_report_style_change(NULL);
     }
 
