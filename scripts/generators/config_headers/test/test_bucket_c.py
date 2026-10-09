@@ -17,6 +17,7 @@ def test_deprecated_buffer_choice_members_stay_ignored(entries):
     # shim -> excluded from the generated headers.
     assert "LV_SDL_SINGLE_BUFFER" not in entries
     assert "LV_SDL_DOUBLE_BUFFER" not in entries
+    assert "LV_SDL_ENABLE_BUF_COUNT" not in entries
 
 
 def test_font_default_emits_token(entries):

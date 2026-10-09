@@ -82,9 +82,18 @@ config LV_SDL_BUF_COUNT
 	range 1 2
 	default 1
 
+config LV_SDL_ENABLE_BUF_COUNT
+	bool "Set buffer count with the deprecated choice [DEPRECATED: use LV_SDL_BUF_COUNT]"
+	default n
+	help
+		Leave this off and set LV_SDL_BUF_COUNT instead. Turn it on only to
+		select the old single- or double-buffer choice. Old configs that
+		selected the double-buffer option must enable this and re-select it.
+
 choice
 	prompt "SDL buffer count [DEPRECATED: use LV_SDL_BUF_COUNT]"
-	optional
+	depends on LV_SDL_ENABLE_BUF_COUNT
+	default LV_SDL_SINGLE_BUFFER
 
 	config LV_SDL_SINGLE_BUFFER
 		bool "One screen-sized buffer [DEPRECATED: set LV_SDL_BUF_COUNT to 1]"
