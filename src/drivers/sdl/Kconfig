@@ -82,17 +82,6 @@ config LV_SDL_BUF_COUNT
 	range 1 2
 	default 1
 
-choice
-	prompt "SDL buffer count [DEPRECATED: use LV_SDL_BUF_COUNT]"
-	optional
-
-	config LV_SDL_SINGLE_BUFFER
-		bool "One screen-sized buffer [DEPRECATED: set LV_SDL_BUF_COUNT to 1]"
-
-	config LV_SDL_DOUBLE_BUFFER
-		bool "Two screen-sized buffers [DEPRECATED: set LV_SDL_BUF_COUNT to 2]"
-endchoice
-
 config LV_SDL_ACCELERATED
 	bool "Hardware acceleration"
 	default y

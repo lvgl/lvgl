@@ -218,20 +218,6 @@ extern "C" {
 #  define CONFIG_LV_USE_MEM_MONITOR_POS LV_ALIGN_CENTER
 #endif
 
-/*******************
- * LV_SDL_BUF_COUNT
- *******************/
-
-#if defined(CONFIG_LV_SDL_SINGLE_BUFFER)
-#warning "LV_SDL_SINGLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
-#undef CONFIG_LV_SDL_BUF_COUNT
-#define CONFIG_LV_SDL_BUF_COUNT 1
-#elif defined(CONFIG_LV_SDL_DOUBLE_BUFFER)
-#warning "LV_SDL_DOUBLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
-#undef CONFIG_LV_SDL_BUF_COUNT
-#define CONFIG_LV_SDL_BUF_COUNT 2
-#endif
-
 /*
  * CONFIG_* options that no longer exist and haven't worked _ever_ in Kconfig
  *

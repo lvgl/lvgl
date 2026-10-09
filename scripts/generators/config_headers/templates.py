@@ -427,22 +427,7 @@ extern "C" {
 
 """
 
-KCONFIG_BRIDGE_DEPRECATIONS = """\
-
-/*******************
- * LV_SDL_BUF_COUNT
- *******************/
-
-#if defined(CONFIG_LV_SDL_SINGLE_BUFFER)
-#warning "LV_SDL_SINGLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
-#undef CONFIG_LV_SDL_BUF_COUNT
-#define CONFIG_LV_SDL_BUF_COUNT 1
-#elif defined(CONFIG_LV_SDL_DOUBLE_BUFFER)
-#warning "LV_SDL_DOUBLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
-#undef CONFIG_LV_SDL_BUF_COUNT
-#define CONFIG_LV_SDL_BUF_COUNT 2
-#endif
-"""
+KCONFIG_BRIDGE_DEPRECATIONS = ""
 
 KCONFIG_BRIDGE_UNSUPPORTED = """\
 
