@@ -113,18 +113,6 @@ config LV_MEM_SIZE
 	help
 	  Size of the pool `lv_malloc()` allocates from. Needs to be at least 2kB (2048).
 
-config LV_MEM_SIZE_KILOBYTES
-	int "Memory size (KB) [DEPRECATED: use LV_MEM_SIZE]"
-	default 0
-	help
-	  Deprecated. Use LV_MEM_SIZE (in bytes) instead.
-
-config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
-	int "Memory pool expand size (KB) [DEPRECATED: use LV_MEM_SIZE directly]"
-	default 0
-	help
-	  Deprecated. Modify LV_MEM_SIZE (in bytes) directly instead.
-
 config LV_MEM_ADR
 	hex "Memory pool address"
 	default 0x0
@@ -2234,10 +2222,6 @@ config LV_USE_LINE
 	bool "Line"
 	default y
 
-config LV_USE_LIST
-	bool "List"
-	default y
-
 config LV_USE_LOTTIE
 	bool "Lottie"
 	default n
@@ -2247,10 +2231,6 @@ config LV_USE_LOTTIE
 	help
 		Plays Lottie JSON animations using the ThorVG Lottie parser.
 
-config LV_USE_MENU
-	bool "Menu"
-	default y
-
 config LV_USE_MSGBOX
 	bool "Message box"
 	default y
@@ -2259,12 +2239,6 @@ config LV_USE_MSGBOX
 config LV_USE_QRCODE
 	bool "QR code"
 	select LV_USE_CANVAS
-
-config LV_USE_RLOTTIE
-	bool "Lottie (rlottie, legacy)"
-	default n
-	help
-		Legacy rlottie binding, kept for compatibility. Use LV_USE_LOTTIE instead.
 
 config LV_USE_ROLLER
 	bool "Roller"
@@ -2323,9 +2297,6 @@ config LV_USE_TILEVIEW
 	bool "Tileview"
 	default y
 
-config LV_USE_WIN
-	bool "Window"
-	default y
 endmenu
 menu "Drivers"
 config LV_USE_LINUX_DRM
@@ -2336,18 +2307,9 @@ config LV_USE_LINUX_DRM
 
 if LV_USE_LINUX_DRM
 
-config LV_LINUX_DRM_AUTO_BACKEND
-	bool "Auto-select the DRM backend (legacy)"
-	default y
-	help
-	  Legacy behavior, slated for removal: the backend is inferred from
-	  LV_USE_OPENGLES (EGL when it is enabled). Disable this and pick a backend
-	  explicitly in the "Rendering backend" choice.
-
 choice
 	prompt "Rendering backend"
 	default LV_LINUX_DRM_BACKEND_FBDEV
-	depends on !LV_LINUX_DRM_AUTO_BACKEND
 	help
 	  Select how the Linux DRM driver presents rendered frames.
 
@@ -2773,18 +2735,9 @@ config LV_SDL_INCLUDE_PATH
 	string "SDL include path"
 	default "SDL2/SDL.h"
 
-config LV_SDL_AUTO_BACKEND
-	bool "Auto-select the SDL backend (legacy)"
-	default y
-	help
-	  Legacy behavior, slated for removal: EGL is inferred the legacy way
-	  (LV_USE_OPENGLES with an OpenGL draw unit). Disable this and pick a backend
-	  explicitly in the "Rendering backend" choice.
-
 choice
 	prompt "Rendering backend"
 	default LV_SDL_BACKEND_SW
-	depends on !LV_SDL_AUTO_BACKEND
 	help
 	  Select how the SDL driver presents rendered frames.
 
@@ -2844,17 +2797,6 @@ config LV_SDL_BUF_COUNT
 	int "Number of screen-sized buffers"
 	range 1 2
 	default 1
-
-choice
-	prompt "SDL buffer count [DEPRECATED: use LV_SDL_BUF_COUNT]"
-	optional
-
-	config LV_SDL_SINGLE_BUFFER
-		bool "One screen-sized buffer [DEPRECATED: set LV_SDL_BUF_COUNT to 1]"
-
-	config LV_SDL_DOUBLE_BUFFER
-		bool "Two screen-sized buffers [DEPRECATED: set LV_SDL_BUF_COUNT to 2]"
-endchoice
 
 config LV_SDL_ACCELERATED
 	bool "Hardware acceleration"
@@ -3475,33 +3417,6 @@ config LV_USE_PARALLEL_DRAW_DEBUG
 		draw unit's index number on a white background (black for layers).
 endmenu
 endmenu
-menu "Others"
-config LV_USE_FRAGMENT
-	bool "Fragment"
-	default n
-	help
-		Manage a widget subtree with its own lifecycle and back stack, similar to Android fragments.
-
-config LV_USE_FILE_EXPLORER
-	bool "File explorer"
-	default n
-	select LV_USE_TABLE
-
-if LV_USE_FILE_EXPLORER
-config LV_FILE_EXPLORER_PATH_MAX_LEN
-	int "Maximum path length (bytes)"
-	default 128
-
-config LV_FILE_EXPLORER_QUICK_ACCESS
-	bool "Quick access bar"
-	default y
-	help
-		Add a sidebar with shortcuts to common places. It can be hidden by clicking the
-		button at the top left corner of the browsing area, which is useful on small screens.
-
-endif #LV_USE_FILE_EXPLORER
-
-endmenu
 menu "Build"
 
 config LVGL_VERSION_MAJOR
@@ -3520,14 +3435,6 @@ config LV_CONF_SKIP
 	help
 	  Do not include lv_conf.h; take the configuration from this Kconfig
 	  tree and the built-in defaults instead.
-
-config LV_CONF_MINIMAL
-	bool "Minimal configuration [DEPRECATED: use the minimal defconfig]"
-	default n
-	help
-	  Deprecated and no longer functional. The minimal preset is now a
-	  defconfig: configs/defconfigs/minimal.defconfig. Setting this has no
-	  effect on the generated configuration and triggers a build warning.
 
 config LV_USE_PRIVATE_API
 	bool "Private API (lvgl_private.h)"
@@ -3592,42 +3499,13 @@ menu "Asserts"
 		bool "LV_ASSERT_NULL"
 
 	config LV_USE_ASSERT_STYLE
-		bool "LV_ASSERT_STYLE"
+		bool "Style sentinel"
+		help
+		  Add a sentinel field to lv_style_t so a corrupted or uninitialized
+		  style can be detected. LV_STYLE_SENTINEL_OK() reads it.
 
 	config LV_USE_ASSERT_MEM_INTEGRITY
 		bool "LV_ASSERT_MEM_INTEGRITY"
-
-	config LV_USE_ASSERT_OBJ
-		bool "LV_ASSERT_OBJ"
-
-	config LV_ASSERT_HANDLER_INCLUDE
-		string "Assert handler header [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"
-		default ""
-		help
-		  [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]
-		  Add a custom handler when assert happens e.g. to restart the MCU
-		  Optional header to override assert-related macros.
-
-	config LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY
-		bool
-		default y if LV_ASSERT_HANDLER_INCLUDE != ""
-
-	config LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-		bool "Disable LV_ASSERT_HANDLER_INCLUDE deprecated warning"
-		default n
-		help
-		  Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
-		  This setting allows you to keep using old LVGL versions which rely on
-		  LV_ASSERT_HANDLER_INCLUDE without triggering a compiler warning.
-
-		  LV_ASSERT_HANDLER_INCLUDE has been deprecated in favor of the new approach:
-		  define LV_ASSERT_CUSTOM_INCLUDE with the header path, and place the
-		  LV_ASSERT_HANDLER macro definition inside that header instead.
-
-		  Only enable this if you are maintaining compatibility with existing code
-		  that uses LV_ASSERT_HANDLER_INCLUDE and cannot migrate immediately.
-		  New projects should use LV_ASSERT_CUSTOM_INCLUDE and LV_ASSERT_HANDLER
-		  directly.
 
 	config LV_ASSERT_USE_CUSTOM_INCLUDE
 		bool "Custom assert handler header"

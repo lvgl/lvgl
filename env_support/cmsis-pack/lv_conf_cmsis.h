@@ -1372,7 +1372,6 @@
 #define LV_USE_LINE 1
 
 /** List */
-#define LV_USE_LIST 1
 
 #if LV_USE_THORVG
 /** Plays Lottie JSON animations using the ThorVG Lottie parser.
@@ -1382,9 +1381,6 @@
 #define LV_USE_LOTTIE 0
 
 #endif /*LV_USE_THORVG*/
-
-/** Menu */
-#define LV_USE_MENU 1
 
 /** Message box
  *
@@ -1447,7 +1443,6 @@
 #define LV_USE_TILEVIEW 1
 
 /** Window */
-#define LV_USE_WIN 1
 
 
 
@@ -2123,22 +2118,6 @@
  * OTHERS
  *============================================================================*/
 
-/** File explorer
- *
- *  Enable: LV_USE_TABLE
- */
-
-#if LV_USE_FILE_EXPLORER
-/** Maximum path length (bytes) */
-#define LV_FILE_EXPLORER_PATH_MAX_LEN 128
-
-/** Add a sidebar with shortcuts to common places. It can be hidden by clicking the
- *  button at the top left corner of the browsing area, which is useful on small screens.
- */
-#define LV_FILE_EXPLORER_QUICK_ACCESS 1
-
-#endif /*LV_USE_FILE_EXPLORER*/
-
 /*customize tick-get */
 #if defined(__PERF_COUNTER__) && __PERF_COUNTER__
     #define LV_GLOBAL_INIT(__GLOBAL_PTR)                                    \
@@ -2207,14 +2186,12 @@
 /** LV_ASSERT_NULL */
 #define LV_USE_ASSERT_NULL 0
 
-/** LV_ASSERT_STYLE */
+/** Style sentinel */
 #define LV_USE_ASSERT_STYLE 0
 
 /** LV_ASSERT_MEM_INTEGRITY */
 #define LV_USE_ASSERT_MEM_INTEGRITY 0
 
-/** LV_ASSERT_OBJ */
-#define LV_USE_ASSERT_OBJ 0
 
 /** Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
  *  This setting allows you to keep using old LVGL versions which rely on

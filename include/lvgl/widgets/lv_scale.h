@@ -235,15 +235,6 @@ void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 
 /**
- * DEPRECATED, use lv_scale_set_section_range instead.
- * Set range for specified Scale Section
- * @param section       pointer to Section
- * @param min           Section new minimum value
- * @param max           Section new maximum value
- */
-void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max);
-
-/**
  * Set the range of a scale section
  * @param scale         pointer to scale
  * @param section       pointer to section
@@ -267,16 +258,6 @@ void lv_scale_set_section_min_value(lv_obj_t * scale, lv_scale_section_t * secti
  * @param max           the section's new maximum value
  */
 void lv_scale_set_section_max_value(lv_obj_t * scale, lv_scale_section_t * section, int32_t max);
-
-/**
- * DEPRECATED, use lv_scale_set_section_style_main/indicator/items instead.
- * Set style for specified part of Section.
- * @param section             pointer to Section
- * @param part                the part of the Scale the style will apply to, e.g. LV_PART_INDICATOR
- * @param section_part_style  pointer to style to apply @nullable. Use NULL to detach a part style
- */
-LV_DEPRECATED("use lv_scale_set_section_style_main/indicator/items instead")
-void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style);
 
 /**
  * Set the style of the line on a section.

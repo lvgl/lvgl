@@ -21,7 +21,6 @@
     "label",
     "led",
     "line",
-    "list",
     "lottie",
     "menu",
     "msgbox",
@@ -36,7 +35,6 @@
     "tabview",
     "textarea",
     "tileview",
-    "win",
     "new_widget"
   ]
 }

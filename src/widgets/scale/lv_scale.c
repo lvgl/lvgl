@@ -476,15 +476,6 @@ void lv_scale_set_section_max_value(lv_obj_t * scale, lv_scale_section_t * secti
     lv_obj_invalidate(scale);
 }
 
-void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max)
-{
-    LV_CHECK_ARG(section != NULL, return);
-
-    section->range_min = min;
-    section->range_max = max;
-}
-
-
 void lv_scale_set_section_style_main(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style)
 {
     LV_CHECK_OBJ(scale, MY_CLASS, return);
@@ -510,29 +501,6 @@ void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * sec
 
     section->items_style = style;
     lv_obj_invalidate(scale);
-}
-
-void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style)
-{
-    LV_LOG_DEPRECATED("use lv_scale_set_section_style_main/indicator/items instead");
-    LV_CHECK_ARG(section != NULL, return);
-
-
-
-    switch(part) {
-        case LV_PART_MAIN:
-            section->main_style = section_part_style;
-            break;
-        case LV_PART_INDICATOR:
-            section->indicator_style = section_part_style;
-            break;
-        case LV_PART_ITEMS:
-            section->items_style = section_part_style;
-            break;
-        default:
-            /* Invalid part */
-            break;
-    }
 }
 
 /*=====================

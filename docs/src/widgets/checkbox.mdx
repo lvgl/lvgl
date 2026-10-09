@@ -57,9 +57,9 @@ see the new value.
 
 A Checkbox's checked state is exposed via the generic <ApiLink name="lv_obj_bind_checked" />.
 The link is two-way: flipping the box writes 0/1 into the int subject, and
-assigning the subject toggles the box. Pair it with `bind_flag_if_*` /
-`bind_state_if_*` on other widgets to react to that flag without writing
-any event callback.
+assigning the subject toggles the box. Pair it with
+<ApiLink name="lv_obj_bind_bool" /> on other widgets to react to that flag
+without writing any event callback.
 
 - <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked(obj, subject)" />
 

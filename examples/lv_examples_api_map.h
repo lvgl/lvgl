@@ -158,20 +158,9 @@ extern "C" {
 /* line */
 #define lv_example_line_1          lv_example_line_points
 
-/* list */
-#define lv_example_list_1          lv_example_list_reorder
-#define lv_example_list_2          lv_example_list_sections
-
 /* lottie */
 #define lv_example_lottie_1        lv_example_lottie_from_data
 #define lv_example_lottie_2        lv_example_lottie_from_file
-
-/* menu */
-#define lv_example_menu_1          lv_example_menu_custom_back_button
-#define lv_example_menu_2          lv_example_menu_floating_button
-#define lv_example_menu_3          lv_example_menu_root_back_button
-#define lv_example_menu_4          lv_example_menu_sidebar
-#define lv_example_menu_5          lv_example_menu_sub_page
 
 /* msgbox */
 #define lv_example_msgbox_1        lv_example_msgbox_blur
@@ -273,9 +262,6 @@ extern "C" {
 
 /* tileview */
 #define lv_example_tileview_1      lv_example_tileview_l_shape
-
-/* win */
-#define lv_example_win_1           lv_example_win_toolbar
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -28,8 +28,6 @@ from .lv_keyboard import LVKeyboard
 from .lv_label import LVLabel
 from .lv_led import LVLed
 from .lv_line import LVLine
-from .lv_menu import LVMenu
-from .lv_menu_page import LVMenuPage
 from .lv_msgbox import LVMsgbox
 from .lv_qrcode import LVQrcode
 from .lv_roller import LVRoller
@@ -44,7 +42,6 @@ from .lv_table import LVTable
 from .lv_tabview import LVTabview
 from .lv_tileview import LVTileview
 from .lv_tileview_tile import LVTileviewTile
-from .lv_win import LVWin
 
 WIDGET_REGISTRY: dict[str, type] = {
     "lv_3dtexture": LV3dtexture,
@@ -70,8 +67,6 @@ WIDGET_REGISTRY: dict[str, type] = {
     "lv_label": LVLabel,
     "lv_led": LVLed,
     "lv_line": LVLine,
-    "lv_menu": LVMenu,
-    "lv_menu_page": LVMenuPage,
     "lv_msgbox": LVMsgbox,
     "lv_qrcode": LVQrcode,
     "lv_roller": LVRoller,
@@ -86,7 +81,6 @@ WIDGET_REGISTRY: dict[str, type] = {
     "lv_tabview": LVTabview,
     "lv_tileview": LVTileview,
     "lv_tileview_tile": LVTileviewTile,
-    "lv_win": LVWin,
 }
 
 
@@ -130,8 +124,6 @@ __all__ = [
     "LVLabel",
     "LVLed",
     "LVLine",
-    "LVMenu",
-    "LVMenuPage",
     "LVMsgbox",
     "LVQrcode",
     "LVRoller",
@@ -146,7 +138,6 @@ __all__ = [
     "LVTabview",
     "LVTileview",
     "LVTileviewTile",
-    "LVWin",
     "WIDGET_REGISTRY",
     "wrap_widget",
 ]

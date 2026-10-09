@@ -174,14 +174,14 @@ The columns will be placed from right to left.
 
 <LvglExample name="lv_example_grid_ignore_layout" path="layouts/grid/lv_example_grid_ignore_layout" />
 
-To opt a child out of Grid positioning, set
-<ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> on that child:
+To opt a child out of Grid positioning, call
+<ApiLink name="lv_obj_set_ignore_layout" /> on that child:
 
 ```c
-lv_obj_add_flag(child, LV_OBJ_FLAG_IGNORE_LAYOUT);
+lv_obj_set_ignore_layout(child, true);
 ```
 
-When this flag is set, Grid skips the child completely. It does not occupy a
+When this is set, Grid skips the child completely. It does not occupy a
 grid cell and keeps its manually set position, which is useful for overlays
 or decorative elements.
 

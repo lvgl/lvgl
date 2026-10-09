@@ -309,10 +309,6 @@ void lv_init(void)
     LV_LOG_WARN("Memory integrity checks are enabled via LV_USE_ASSERT_MEM_INTEGRITY which makes LVGL much slower");
 #endif
 
-#if LV_USE_ASSERT_OBJ
-    LV_LOG_WARN("Object sanity checks are enabled via LV_USE_ASSERT_OBJ which makes LVGL much slower");
-#endif
-
 #if LV_USE_ASSERT_STYLE
     LV_LOG_WARN("Style sanity checks are enabled that uses more RAM");
 #endif

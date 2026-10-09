@@ -556,14 +556,6 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time)
     pwd_char_hider(obj);
 }
 
-void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    LV_LOG_DEPRECATED("Use text_align style property instead");
-    lv_obj_set_style_text_align(obj, align, 0);
-}
-
 /*=====================
  * Getter functions
  *====================*/

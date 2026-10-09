@@ -147,10 +147,6 @@ typedef struct _lv_image_decoder_dsc_t lv_image_decoder_dsc_t;
 
 typedef struct _lv_draw_image_dsc_t lv_draw_image_dsc_t;
 
-typedef struct _lv_fragment_t lv_fragment_t;
-typedef struct _lv_fragment_class_t lv_fragment_class_t;
-typedef struct _lv_fragment_managed_states_t lv_fragment_managed_states_t;
-
 typedef struct _lv_profiler_builtin_config_t lv_profiler_builtin_config_t;
 
 typedef struct _lv_color_filter_dsc_t lv_color_filter_dsc_t;
@@ -227,14 +223,6 @@ typedef struct _lv_led_t lv_led_t;
 
 typedef struct _lv_line_t lv_line_t;
 
-typedef struct _lv_menu_load_page_event_data_t lv_menu_load_page_event_data_t;
-
-typedef struct _lv_menu_history_t lv_menu_history_t;
-
-typedef struct _lv_menu_t lv_menu_t;
-
-typedef struct _lv_menu_page_t lv_menu_page_t;
-
 typedef struct _lv_msgbox_t lv_msgbox_t;
 
 typedef struct _lv_roller_t lv_roller_t;
@@ -265,7 +253,6 @@ typedef struct _lv_tileview_t lv_tileview_t;
 
 typedef struct _lv_tileview_tile_t lv_tileview_tile_t;
 
-typedef struct _lv_win_t lv_win_t;
 
 typedef struct _lv_spinner_t lv_spinner_t;
 
@@ -290,8 +277,6 @@ typedef struct _lv_subject_increment_dsc_t lv_subject_increment_dsc_t;
 typedef struct _lv_monkey_config_t lv_monkey_config_t;
 
 typedef struct _lv_ime_pinyin_t lv_ime_pinyin_t;
-
-typedef struct _lv_file_explorer_t lv_file_explorer_t;
 
 typedef struct _lv_barcode_t lv_barcode_t;
 
@@ -345,7 +330,6 @@ typedef struct _lv_draw_sw_blend_image_dsc_t lv_draw_sw_blend_image_dsc_t;
 
 typedef struct _lv_draw_buf_handlers_t lv_draw_buf_handlers_t;
 
-typedef struct _lv_rlottie_t lv_rlottie_t;
 
 typedef struct _lv_ffmpeg_player_t lv_ffmpeg_player_t;
 

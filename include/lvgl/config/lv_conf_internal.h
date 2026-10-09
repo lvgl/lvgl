@@ -180,26 +180,6 @@
 #endif
 
 /*
- * Detect if the user is using the new calendar day/month configuration
- * in order to avoid warnings for users that have migrated.
- */
-#if defined(LV_MONDAY_STR) || defined(CONFIG_LV_MONDAY_STR)
-#define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 1
-#else
-#define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 0
-#endif
-
-/*
- * Detect if the user is using the new calendar day/month configuration
- * in order to avoid warnings for users that have migrated.
- */
-#if defined(LV_JANUARY_STR) || defined(CONFIG_LV_JANUARY_STR)
-#define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 1
-#else
-#define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 0
-#endif
-
-/*
  * Detect if the user is using the xkb keymap configuration
  * in order to avoid warnings for users that have migrated.
  * we only need to check for it if LV_LIBINPUT_XKB is enabled
@@ -2927,35 +2907,11 @@
     #endif
 #endif
 
-#ifndef LV_USE_LIST
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_LIST
-            #define LV_USE_LIST CONFIG_LV_USE_LIST
-        #else
-            #define LV_USE_LIST 0
-        #endif
-    #else
-        #define LV_USE_LIST 1
-    #endif
-#endif
-
 #ifndef LV_USE_LOTTIE
     #ifdef CONFIG_LV_USE_LOTTIE
         #define LV_USE_LOTTIE CONFIG_LV_USE_LOTTIE
     #else
         #define LV_USE_LOTTIE 0
-    #endif
-#endif
-
-#ifndef LV_USE_MENU
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_MENU
-            #define LV_USE_MENU CONFIG_LV_USE_MENU
-        #else
-            #define LV_USE_MENU 0
-        #endif
-    #else
-        #define LV_USE_MENU 1
     #endif
 #endif
 
@@ -2976,14 +2932,6 @@
         #define LV_USE_QRCODE CONFIG_LV_USE_QRCODE
     #else
         #define LV_USE_QRCODE 0
-    #endif
-#endif
-
-#ifndef LV_USE_RLOTTIE
-    #ifdef CONFIG_LV_USE_RLOTTIE
-        #define LV_USE_RLOTTIE CONFIG_LV_USE_RLOTTIE
-    #else
-        #define LV_USE_RLOTTIE 0
     #endif
 #endif
 
@@ -3135,18 +3083,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_WIN
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_WIN
-            #define LV_USE_WIN CONFIG_LV_USE_WIN
-        #else
-            #define LV_USE_WIN 0
-        #endif
-    #else
-        #define LV_USE_WIN 1
-    #endif
-#endif
-
 
 
 /*============================================================================
@@ -3158,18 +3094,6 @@
         #define LV_USE_LINUX_DRM CONFIG_LV_USE_LINUX_DRM
     #else
         #define LV_USE_LINUX_DRM 0
-    #endif
-#endif
-
-#ifndef LV_LINUX_DRM_AUTO_BACKEND
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_LINUX_DRM_AUTO_BACKEND
-            #define LV_LINUX_DRM_AUTO_BACKEND CONFIG_LV_LINUX_DRM_AUTO_BACKEND
-        #else
-            #define LV_LINUX_DRM_AUTO_BACKEND 0
-        #endif
-    #else
-          #define LV_LINUX_DRM_AUTO_BACKEND LV_USE_LINUX_DRM
     #endif
 #endif
 
@@ -3602,18 +3526,6 @@
         #define LV_SDL_INCLUDE_PATH CONFIG_LV_SDL_INCLUDE_PATH
     #else
         #define LV_SDL_INCLUDE_PATH "SDL2/SDL.h"
-    #endif
-#endif
-
-#ifndef LV_SDL_AUTO_BACKEND
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_SDL_AUTO_BACKEND
-            #define LV_SDL_AUTO_BACKEND CONFIG_LV_SDL_AUTO_BACKEND
-        #else
-            #define LV_SDL_AUTO_BACKEND 0
-        #endif
-    #else
-          #define LV_SDL_AUTO_BACKEND LV_USE_SDL
     #endif
 #endif
 
@@ -4408,48 +4320,6 @@
 
 
 /*============================================================================
- * OTHERS
- *============================================================================*/
-
-#ifndef LV_USE_FRAGMENT
-    #ifdef CONFIG_LV_USE_FRAGMENT
-        #define LV_USE_FRAGMENT CONFIG_LV_USE_FRAGMENT
-    #else
-        #define LV_USE_FRAGMENT 0
-    #endif
-#endif
-
-#ifndef LV_USE_FILE_EXPLORER
-    #ifdef CONFIG_LV_USE_FILE_EXPLORER
-        #define LV_USE_FILE_EXPLORER CONFIG_LV_USE_FILE_EXPLORER
-    #else
-        #define LV_USE_FILE_EXPLORER 0
-    #endif
-#endif
-
-#ifndef LV_FILE_EXPLORER_PATH_MAX_LEN
-    #ifdef CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
-        #define LV_FILE_EXPLORER_PATH_MAX_LEN CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
-    #else
-        #define LV_FILE_EXPLORER_PATH_MAX_LEN 128
-    #endif
-#endif
-
-#ifndef LV_FILE_EXPLORER_QUICK_ACCESS
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
-            #define LV_FILE_EXPLORER_QUICK_ACCESS CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
-        #else
-            #define LV_FILE_EXPLORER_QUICK_ACCESS 0
-        #endif
-    #else
-          #define LV_FILE_EXPLORER_QUICK_ACCESS LV_USE_FILE_EXPLORER
-    #endif
-#endif
-
-
-
-/*============================================================================
  * BUILD
  *============================================================================*/
 
@@ -4522,22 +4392,6 @@
         #define LV_USE_ASSERT_MEM_INTEGRITY CONFIG_LV_USE_ASSERT_MEM_INTEGRITY
     #else
         #define LV_USE_ASSERT_MEM_INTEGRITY 0
-    #endif
-#endif
-
-#ifndef LV_USE_ASSERT_OBJ
-    #ifdef CONFIG_LV_USE_ASSERT_OBJ
-        #define LV_USE_ASSERT_OBJ CONFIG_LV_USE_ASSERT_OBJ
-    #else
-        #define LV_USE_ASSERT_OBJ 0
-    #endif
-#endif
-
-#ifndef LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-    #ifdef CONFIG_LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-        #define LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING CONFIG_LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-    #else
-        #define LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING 0
     #endif
 #endif
 
@@ -4859,124 +4713,6 @@
  * These checks can't go to lv_conf_check.c as we export the correct
  * settings so the user code continues to work
  */
-
-/*
- *  Before the user selected either LV_USE_LZ4_INTERNAL or LV_USE_LZ4_EXTERNAL
- *  For v9.6 LV_USE_LZ4_EXTERNAL doesn't exist anymore, instead the user
- *  enables LV_USE_LZ4 and disables LV_USE_LZ4_INTERNAL
- *  To support users using LV_USE_LZ4_EXTERNAL from before v9.6 we
- *  we enable LV_USE_LZ4 for them
- */
-#if defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL
-#if !LV_USE_LZ4
-    #warning LV_USE_LZ4_EXTERNAL is deprecated and will be removed in a future release. Enable LV_USE_LZ4 and disable LV_USE_LZ4_INTERNAL to continue using an external version of LZ4
-    #undef LV_USE_LZ4
-    #define LV_USE_LZ4 1
-#endif /*!LV_USE_LZ4*/
-#endif /*defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL*/
-
-/*
- *  Before the user selected either LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL
- *  For v9.6 LV_USE_THORVG_EXTERNAL doesn't exist anymore, instead the user
- *  enables LV_USE_THORVG and disables LV_USE_THORVG_INTERNAL
- *  To support users using LV_USE_THORVG_EXTERNAL from before v9.6 we
- *  we enable LV_USE_THORVG for them
- */
-#if defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL
-#if !LV_USE_THORVG
-    #warning LV_USE_THORVG_EXTERNAL is deprecated and will be removed in a future release. Enable LV_USE_THORVG and disable LV_USE_THORVG_INTERNAL to continue using an external version of THORVG
-    #undef LV_USE_THORVG
-    #define LV_USE_THORVG 1
-#endif /*!LV_USE_THORVG*/
-#endif /*defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL*/
-
-/*
- *  Backward compatibility. Before the user selected either
- *  LV_X11_RENDER_MODE_PARTIAL or LV_X11_RENDER_MODE_DIRECT or
- *  LV_X11_RENDER_MODE_FULL. For v9.6, this becomes a single choice:
- *  LV_X11_RENDER_MODE which maps to a LV_DISPLAY_RENDER_MODE value.
- */
-#if defined(LV_X11_RENDER_MODE_PARTIAL) && LV_X11_RENDER_MODE_PARTIAL
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
-    #warning LV_X11_RENDER_MODE_PARTIAL is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_PARTIAL instead.
-#endif /*defined(LV_X11_RENDER_MODE_PARTIAL) && LV_X11_RENDER_MODE_PARTIAL*/
-
-#if defined(LV_X11_RENDER_MODE_DIRECT) && LV_X11_RENDER_MODE_DIRECT
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
-    #warning LV_X11_RENDER_MODE_DIRECT is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_DIRECT instead.
-#endif /*defined(LV_X11_RENDER_MODE_DIRECT) && LV_X11_RENDER_MODE_DIRECT*/
-
-#if defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
-    #warning LV_X11_RENDER_MODE_FULL is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_FULL instead.
-#endif /*defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL*/
-
-/*
- *  Before, the VG-Lite GPU was chosen with LV_VG_LITE_HAL_GPU_SERIES (a bare
- *  token such as gc255) and LV_VG_LITE_HAL_GPU_REVISION (a hex revision), which
- *  were pasted into the options include path.  For v9.x these are replaced by the
- *  LV_VG_LITE_GPU choice.  Map the old hex revisions (each unique to one series)
- *  to it; anything else falls back to the GC255 default.
- */
-#if defined(LV_VG_LITE_HAL_GPU_REVISION)
-    /* Only remap when LV_VG_LITE_GPU is still at its default, i.e. the user has not
-    * migrated to it yet*/
-    #if LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC255_0X40A
-        #warning LV_VG_LITE_HAL_GPU_SERIES/LV_VG_LITE_HAL_GPU_REVISION are deprecated and will be removed in a future release. Select your GPU with LV_VG_LITE_GPU instead.
-        #undef LV_VG_LITE_GPU
-        #if LV_VG_LITE_HAL_GPU_REVISION == 0x423
-            #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC555_0X423
-        #elif LV_VG_LITE_HAL_GPU_REVISION == 0x1003
-            #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
-        #else
-            #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC255_0X40A
-        #endif
-    #endif /*LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC255_0X40A*/
-#endif /*defined(LV_VG_LITE_HAL_GPU_REVISION)*/
-
-/*
- *  Legacy backend inference for the Linux DRM and SDL drivers.  Historically the
- *  EGL backend was turned on automatically from LV_USE_OPENGLES; for v9.x each
- *  driver gets an explicit LV_<DRIVER>_BACKEND choice instead.  While the
- *  deprecated LV_<DRIVER>_AUTO_BACKEND is set (its default) we reproduce the old
- *  inference here and pre-define the per-driver flag, so the Derived-capability
- *  ladder below (which is #ifndef-guarded) leaves it untouched.  Runs before that
- *  ladder.  The #warning only fires when inference actually turns EGL on.
- */
-#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND
-    #ifndef LV_LINUX_DRM_USE_EGL
-        #if LV_USE_OPENGLES
-            #warning LV_LINUX_DRM_AUTO_BACKEND is deprecated and will be removed in a future release. Set it to 0 and select a backend with LV_LINUX_DRM_BACKEND.
-            #define LV_LINUX_DRM_USE_EGL 1
-        #else
-            #define LV_LINUX_DRM_USE_EGL 0
-        #endif
-    #endif
-    #ifndef LV_USE_LINUX_DRM_GBM_BUFFERS
-        #define LV_USE_LINUX_DRM_GBM_BUFFERS LV_LINUX_DRM_USE_EGL
-    #endif
-#endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND*/
-
-#if LV_USE_SDL && LV_SDL_AUTO_BACKEND
-    #ifndef LV_SDL_USE_EGL
-        #if LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
-            #warning LV_SDL_AUTO_BACKEND is deprecated and will be removed in a future release. Set it to 0 and select a backend with LV_SDL_BACKEND.
-            #define LV_SDL_USE_EGL 1
-        #else
-            #define LV_SDL_USE_EGL 0
-        #endif
-    #endif
-#endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
-
-#if defined(LV_ASSERT_HANDLER_INCLUDE)
-    #if !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-        #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
-    #endif
-    #include LV_ASSERT_HANDLER_INCLUDE
-#endif
 
 /*----------------------------------
  * End of compatibility block
@@ -5499,10 +5235,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_LOTTIE && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG)
     #error "LV_USE_LOTTIE requires LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG (Kconfig depends on)"
-#endif
-
-#if (LV_USE_FILE_EXPLORER) && !LV_USE_TABLE
-    #error "LV_USE_TABLE must be enabled: Kconfig selects it from LV_USE_FILE_EXPLORER"
 #endif
 
 #if LV_LINUX_FBDEV_BSD && !(LV_USE_LINUX_FBDEV)

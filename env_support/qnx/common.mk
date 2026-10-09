@@ -20,7 +20,6 @@ $(SRC_ROOT)/libs/libpng \
 $(SRC_ROOT)/libs/bin_decoder \
 $(SRC_ROOT)/libs/tiny_ttf \
 $(SRC_ROOT)/libs/barcode \
-$(SRC_ROOT)/libs/rlottie \
 $(SRC_ROOT)/libs/qrcode \
 $(SRC_ROOT)/libs/lz4 \
 $(SRC_ROOT)/libs/ffmpeg \
@@ -68,9 +67,7 @@ $(SRC_ROOT)/others \
 $(SRC_ROOT)/others/monkey \
 $(SRC_ROOT)/others/ime \
 $(SRC_ROOT)/others/snapshot \
-$(SRC_ROOT)/others/file_explorer \
 $(SRC_ROOT)/others/imgfont \
-$(SRC_ROOT)/others/fragment \
 $(SRC_ROOT)/others/observer \
 $(SRC_ROOT)/others/vg_lite_tvg \
 $(SRC_ROOT)/others/sysmon \
@@ -83,7 +80,6 @@ $(SRC_ROOT)/widgets/checkbox \
 $(SRC_ROOT)/widgets/slider \
 $(SRC_ROOT)/widgets/calendar \
 $(SRC_ROOT)/widgets/bar \
-$(SRC_ROOT)/widgets/win \
 $(SRC_ROOT)/widgets/dropdown \
 $(SRC_ROOT)/widgets/switch \
 $(SRC_ROOT)/widgets/span \
@@ -95,7 +91,6 @@ $(SRC_ROOT)/widgets/msgbox \
 $(SRC_ROOT)/widgets/property \
 $(SRC_ROOT)/widgets/chart \
 $(SRC_ROOT)/widgets/table \
-$(SRC_ROOT)/widgets/list \
 $(SRC_ROOT)/widgets/button \
 $(SRC_ROOT)/widgets/image \
 $(SRC_ROOT)/widgets/line \

@@ -104,26 +104,6 @@ void test_gltf_animation_speed(void)
     lv_gltf_model_delete(model);
 }
 
-/* The viewer level speed functions are deprecated but must keep working: they act on
- * the primary model of the viewer */
-void test_gltf_animation_deprecated_viewer_speed(void)
-{
-    lv_obj_t * gltf = lv_gltf_create(lv_screen_active());
-    lv_obj_set_size(gltf, 100, 100);
-    lv_gltf_model_t * model = lv_gltf_load_model_from_file(gltf, ASSET("animation.gltf"));
-    TEST_ASSERT_NOT_NULL(model);
-
-    TEST_ASSERT_EQUAL(LV_GLTF_ANIM_SPEED_NORMAL, lv_gltf_get_animation_speed(gltf));
-
-    lv_gltf_set_animation_speed(gltf, LV_GLTF_ANIM_SPEED_HALF);
-    TEST_ASSERT_EQUAL(LV_GLTF_ANIM_SPEED_HALF, lv_gltf_get_animation_speed(gltf));
-    TEST_ASSERT_EQUAL(LV_GLTF_ANIM_SPEED_HALF, lv_gltf_model_get_animation_speed(model));
-
-    /* And the other way around */
-    lv_gltf_model_set_animation_speed(model, LV_GLTF_ANIM_SPEED_3X);
-    TEST_ASSERT_EQUAL(LV_GLTF_ANIM_SPEED_3X, lv_gltf_get_animation_speed(gltf));
-}
-
 /* Every animation of the skinned and the light asset can be selected too */
 void test_gltf_animation_other_assets(void)
 {

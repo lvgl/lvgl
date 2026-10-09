@@ -91,7 +91,7 @@ clicking on the Slider bar. In the latter case the knob moves to the
 point clicked and the Slider value changes accordingly. In some cases it is
 desirable to set the Slider to react on dragging the knob only. This
 feature is enabled by adding the <ApiLink name="LV_OBJ_FLAG_ADV_HITTEST" /> flag:
-<ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(slider, LV_OBJ_FLAG_ADV_HITTEST)" />.
+<ApiLink name="lv_obj_set_adv_hittest" display="lv_obj_set_adv_hittest(slider, true)" />.
 
 Any extended click area (set by <ApiLink name="lv_obj_set_ext_click_area" display="lv_obj_set_ext_click_area(slider, value)" />)
 increases the knob's click area.
@@ -115,9 +115,9 @@ To show the value live in a label next to the widget, attach a label and call <A
 
 <LvglExample name="lv_example_slider_bind_value" path="widgets/slider/lv_example_slider_bind_value" />
 
-A Slider's value can also drive another widget's state via the generic
-`bind_state_if_*` helpers — handy for guards like "disable submit when the
-value exceeds a threshold".
+A Slider's value can also drive another widget's state through a custom
+Observer added with <ApiLink name="lv_subject_add_observer_obj" /> — handy for
+guards like "disable submit when the value exceeds a threshold".
 
 <LvglExample name="lv_example_slider_bind_state" path="widgets/slider/lv_example_slider_bind_state" />
 

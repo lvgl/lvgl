@@ -124,26 +124,6 @@ __CONFIG_OPTIONS__
 #endif
 
 /*
- * Detect if the user is using the new calendar day/month configuration
- * in order to avoid warnings for users that have migrated.
- */
-#if defined(LV_MONDAY_STR) || defined(CONFIG_LV_MONDAY_STR)
-#define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 1
-#else
-#define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 0
-#endif
-
-/*
- * Detect if the user is using the new calendar day/month configuration
- * in order to avoid warnings for users that have migrated.
- */
-#if defined(LV_JANUARY_STR) || defined(CONFIG_LV_JANUARY_STR)
-#define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 1
-#else
-#define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 0
-#endif
-
-/*
  * Detect if the user is using the xkb keymap configuration
  * in order to avoid warnings for users that have migrated.
  * we only need to check for it if LV_LIBINPUT_XKB is enabled
@@ -182,124 +162,6 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
  * These checks can't go to lv_conf_check.c as we export the correct
  * settings so the user code continues to work
  */
-
-/*
- *  Before the user selected either LV_USE_LZ4_INTERNAL or LV_USE_LZ4_EXTERNAL
- *  For v9.6 LV_USE_LZ4_EXTERNAL doesn't exist anymore, instead the user
- *  enables LV_USE_LZ4 and disables LV_USE_LZ4_INTERNAL
- *  To support users using LV_USE_LZ4_EXTERNAL from before v9.6 we
- *  we enable LV_USE_LZ4 for them
- */
-#if defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL
-#if !LV_USE_LZ4
-    #warning LV_USE_LZ4_EXTERNAL is deprecated and will be removed in a future release. Enable LV_USE_LZ4 and disable LV_USE_LZ4_INTERNAL to continue using an external version of LZ4
-    #undef LV_USE_LZ4
-    #define LV_USE_LZ4 1
-#endif /*!LV_USE_LZ4*/
-#endif /*defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL*/
-
-/*
- *  Before the user selected either LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL
- *  For v9.6 LV_USE_THORVG_EXTERNAL doesn't exist anymore, instead the user
- *  enables LV_USE_THORVG and disables LV_USE_THORVG_INTERNAL
- *  To support users using LV_USE_THORVG_EXTERNAL from before v9.6 we
- *  we enable LV_USE_THORVG for them
- */
-#if defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL
-#if !LV_USE_THORVG
-    #warning LV_USE_THORVG_EXTERNAL is deprecated and will be removed in a future release. Enable LV_USE_THORVG and disable LV_USE_THORVG_INTERNAL to continue using an external version of THORVG
-    #undef LV_USE_THORVG
-    #define LV_USE_THORVG 1
-#endif /*!LV_USE_THORVG*/
-#endif /*defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL*/
-
-/*
- *  Backward compatibility. Before the user selected either
- *  LV_X11_RENDER_MODE_PARTIAL or LV_X11_RENDER_MODE_DIRECT or
- *  LV_X11_RENDER_MODE_FULL. For v9.6, this becomes a single choice:
- *  LV_X11_RENDER_MODE which maps to a LV_DISPLAY_RENDER_MODE value.
- */
-#if defined(LV_X11_RENDER_MODE_PARTIAL) && LV_X11_RENDER_MODE_PARTIAL
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
-    #warning LV_X11_RENDER_MODE_PARTIAL is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_PARTIAL instead.
-#endif /*defined(LV_X11_RENDER_MODE_PARTIAL) && LV_X11_RENDER_MODE_PARTIAL*/
-
-#if defined(LV_X11_RENDER_MODE_DIRECT) && LV_X11_RENDER_MODE_DIRECT
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
-    #warning LV_X11_RENDER_MODE_DIRECT is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_DIRECT instead.
-#endif /*defined(LV_X11_RENDER_MODE_DIRECT) && LV_X11_RENDER_MODE_DIRECT*/
-
-#if defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL
-    #undef LV_X11_RENDER_MODE
-    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
-    #warning LV_X11_RENDER_MODE_FULL is deprecated and will be removed in a future release. Set LV_X11_RENDER_MODE to LV_DISPLAY_RENDER_MODE_FULL instead.
-#endif /*defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL*/
-
-/*
- *  Before, the VG-Lite GPU was chosen with LV_VG_LITE_HAL_GPU_SERIES (a bare
- *  token such as gc255) and LV_VG_LITE_HAL_GPU_REVISION (a hex revision), which
- *  were pasted into the options include path.  For v9.x these are replaced by the
- *  LV_VG_LITE_GPU choice.  Map the old hex revisions (each unique to one series)
- *  to it; anything else falls back to the GC255 default.
- */
-#if defined(LV_VG_LITE_HAL_GPU_REVISION)
-    /* Only remap when LV_VG_LITE_GPU is still at its default, i.e. the user has not
-    * migrated to it yet*/
-    #if LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC255_0X40A
-        #warning LV_VG_LITE_HAL_GPU_SERIES/LV_VG_LITE_HAL_GPU_REVISION are deprecated and will be removed in a future release. Select your GPU with LV_VG_LITE_GPU instead.
-        #undef LV_VG_LITE_GPU
-        #if LV_VG_LITE_HAL_GPU_REVISION == 0x423
-            #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC555_0X423
-        #elif LV_VG_LITE_HAL_GPU_REVISION == 0x1003
-            #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
-        #else
-            #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC255_0X40A
-        #endif
-    #endif /*LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC255_0X40A*/
-#endif /*defined(LV_VG_LITE_HAL_GPU_REVISION)*/
-
-/*
- *  Legacy backend inference for the Linux DRM and SDL drivers.  Historically the
- *  EGL backend was turned on automatically from LV_USE_OPENGLES; for v9.x each
- *  driver gets an explicit LV_<DRIVER>_BACKEND choice instead.  While the
- *  deprecated LV_<DRIVER>_AUTO_BACKEND is set (its default) we reproduce the old
- *  inference here and pre-define the per-driver flag, so the Derived-capability
- *  ladder below (which is #ifndef-guarded) leaves it untouched.  Runs before that
- *  ladder.  The #warning only fires when inference actually turns EGL on.
- */
-#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND
-    #ifndef LV_LINUX_DRM_USE_EGL
-        #if LV_USE_OPENGLES
-            #warning LV_LINUX_DRM_AUTO_BACKEND is deprecated and will be removed in a future release. Set it to 0 and select a backend with LV_LINUX_DRM_BACKEND.
-            #define LV_LINUX_DRM_USE_EGL 1
-        #else
-            #define LV_LINUX_DRM_USE_EGL 0
-        #endif
-    #endif
-    #ifndef LV_USE_LINUX_DRM_GBM_BUFFERS
-        #define LV_USE_LINUX_DRM_GBM_BUFFERS LV_LINUX_DRM_USE_EGL
-    #endif
-#endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND*/
-
-#if LV_USE_SDL && LV_SDL_AUTO_BACKEND
-    #ifndef LV_SDL_USE_EGL
-        #if LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
-            #warning LV_SDL_AUTO_BACKEND is deprecated and will be removed in a future release. Set it to 0 and select a backend with LV_SDL_BACKEND.
-            #define LV_SDL_USE_EGL 1
-        #else
-            #define LV_SDL_USE_EGL 0
-        #endif
-    #endif
-#endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
-
-#if defined(LV_ASSERT_HANDLER_INCLUDE)
-    #if !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-        #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
-    #endif
-    #include LV_ASSERT_HANDLER_INCLUDE
-#endif
 
 /*----------------------------------
  * End of compatibility block
@@ -454,57 +316,7 @@ extern "C" {
 
 """
 
-KCONFIG_BRIDGE_DEPRECATIONS = """\
-
-/*******************
- * LV_MEM_SIZE
- *******************/
-
-#if defined(CONFIG_LV_MEM_SIZE_KILOBYTES) && CONFIG_LV_MEM_SIZE_KILOBYTES > 0
-#warning "LV_MEM_SIZE_KILOBYTES is deprecated, use LV_MEM_SIZE instead (value in bytes)"
-#ifndef CONFIG_LV_MEM_SIZE
-#define CONFIG_LV_MEM_SIZE (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
-#else
-#warning "Both LV_MEM_SIZE and LV_MEM_SIZE_KILOBYTES are defined. Using LV_MEM_SIZE"
-#endif
-#endif
-
-#if defined(CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES) && CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES > 0
-#warning "LV_MEM_POOL_EXPAND_SIZE_KILOBYTES is deprecated, set the full memory size with LV_MEM_SIZE instead (value in bytes)"
-#define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
-#endif
-
-/*******************
- * LV_ASSERT_HANDLER_INCLUDE
- *******************/
-
-#if defined(CONFIG_LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY) && CONFIG_LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY
-#define LV_ASSERT_HANDLER_INCLUDE CONFIG_LV_ASSERT_HANDLER_INCLUDE
-#endif
-
-/*******************
- * LV_SDL_BUF_COUNT
- *******************/
-
-#if defined(CONFIG_LV_SDL_SINGLE_BUFFER)
-#warning "LV_SDL_SINGLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
-#undef CONFIG_LV_SDL_BUF_COUNT
-#define CONFIG_LV_SDL_BUF_COUNT 1
-#elif defined(CONFIG_LV_SDL_DOUBLE_BUFFER)
-#warning "LV_SDL_DOUBLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
-#undef CONFIG_LV_SDL_BUF_COUNT
-#define CONFIG_LV_SDL_BUF_COUNT 2
-#endif
-
-/*******************
- * LV_CONF_MINIMAL
- *******************/
-
-#if defined(CONFIG_LV_CONF_MINIMAL)
-#warning "LV_CONF_MINIMAL has been removed and no longer has any effect. Start from configs/defconfigs/minimal.defconfig instead."
-#undef CONFIG_LV_CONF_MINIMAL
-#endif
-"""
+KCONFIG_BRIDGE_DEPRECATIONS = ""
 
 KCONFIG_BRIDGE_UNSUPPORTED = """\
 
