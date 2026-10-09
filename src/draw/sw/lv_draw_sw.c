@@ -414,7 +414,7 @@ static void execute_drawing(lv_draw_task_t * t)
     /*Render the draw task*/
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_sw_fill(t, t->draw_dsc, &t->area);
+            lv_draw_sw_fill(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
             lv_draw_sw_border(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);

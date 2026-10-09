@@ -99,7 +99,7 @@ void lv_draw_pxp_layer(lv_draw_task_t * t)
     lv_draw_fill_dsc_init(&fill_dsc);
     fill_dsc.color = lv_color_hex(layer_to_draw->color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
     fill_dsc.opa = LV_OPA_20;
-    lv_draw_sw_fill(t, &fill_dsc, &area_rot);
+    lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &area_rot);
 
     lv_draw_border_dsc_t border_dsc;
     lv_draw_border_dsc_init(&border_dsc);
@@ -117,7 +117,7 @@ void lv_draw_pxp_layer(lv_draw_task_t * t)
     lv_draw_rect_dsc_init(&fill_dsc);
     fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
     fill_dsc.opa = LV_OPA_10;
-    lv_draw_sw_fill(t, &fill_dsc, &area_rot);
+    lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &area_rot);
 
     lv_draw_border_dsc_t border_dsc;
     lv_draw_border_dsc_init(&border_dsc);
@@ -137,7 +137,7 @@ void lv_draw_pxp_layer(lv_draw_task_t * t)
 
     lv_draw_fill_dsc_init(&fill_dsc);
     fill_dsc.color = lv_color_black();
-    lv_draw_sw_fill(t, &fill_dsc, &txt_area);
+    lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &txt_area);
 
     char buf[8];
     lv_snprintf(buf, sizeof(buf), "%d", idx);

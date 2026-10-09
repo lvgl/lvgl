@@ -82,7 +82,7 @@ void lv_draw_sw_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
             cir_area.y1 = (int32_t)dsc->p1.y - r;
             cir_area.x2 = (int32_t)dsc->p1.x + r - r_corr;
             cir_area.y2 = (int32_t)dsc->p1.y + r - r_corr ;
-            lv_draw_sw_fill(t, &cir_dsc, &cir_area);
+            lv_draw_sw_fill(t->target_layer, &t->clip_area, &cir_dsc, &cir_area);
         }
 
         if(dsc->round_end) {
@@ -90,7 +90,7 @@ void lv_draw_sw_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
             cir_area.y1 = (int32_t)dsc->p2.y - r;
             cir_area.x2 = (int32_t)dsc->p2.x + r - r_corr;
             cir_area.y2 = (int32_t)dsc->p2.y + r - r_corr ;
-            lv_draw_sw_fill(t, &cir_dsc, &cir_area);
+            lv_draw_sw_fill(t->target_layer, &t->clip_area, &cir_dsc, &cir_area);
         }
     }
     LV_PROFILER_DRAW_END;

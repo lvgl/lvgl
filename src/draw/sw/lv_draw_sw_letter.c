@@ -208,7 +208,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_sw_fill(t, fill_draw_dsc, fill_area);
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, fill_draw_dsc, fill_area);
     }
 }
 
