@@ -138,7 +138,8 @@ static void draw_bitmap_glyph(lv_draw_task_t * task, lv_draw_glyph_dsc_t * glyph
     EPIC_LayerConfigTypeDef bg_layer;
     EPIC_LayerConfigTypeDef output_layer;
 
-    if(lv_epic_setup_layers(&bg_layer, &output_layer, task, glyph_draw_dsc->letter_coords)) {
+    if(lv_epic_setup_layers(&bg_layer, &output_layer, task->target_layer, &task->clip_area,
+                            glyph_draw_dsc->letter_coords)) {
         return;
     }
 

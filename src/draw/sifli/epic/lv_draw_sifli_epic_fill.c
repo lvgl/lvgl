@@ -69,7 +69,7 @@ void lv_draw_sifli_epic_fill(lv_draw_task_t * task)
         EPIC_LayerConfigTypeDef input_layers[1];
         EPIC_LayerConfigTypeDef output_canvas;
 
-        if(lv_epic_setup_layers(&input_layers[0], &output_canvas, task, coords)) {
+        if(lv_epic_setup_layers(&input_layers[0], &output_canvas, task->target_layer, &task->clip_area, coords)) {
             return; /* Fully clipped */
         }
 

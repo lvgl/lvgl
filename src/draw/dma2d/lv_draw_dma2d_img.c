@@ -26,9 +26,10 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void lv_draw_dma2d_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                      const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                                     const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+                                     const lv_area_t * img_coords, const lv_area_t * clipped_img_area,
+                                     void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -46,10 +47,12 @@ void lv_draw_dma2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
                          const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
-        lv_draw_image_normal_helper(t, draw_dsc, coords, lv_draw_dma2d_image_core, NULL);
+        lv_draw_image_normal_helper(t->target_layer, &t->clip_area, draw_dsc, coords, lv_draw_dma2d_image_core, NULL,
+                                    NULL);
     }
     else {
-        lv_draw_image_tiled_helper(t, draw_dsc, coords, lv_draw_dma2d_image_core, NULL);
+        lv_draw_image_tiled_helper(t->target_layer, &t->clip_area, draw_dsc, coords, lv_draw_dma2d_image_core, NULL,
+                                   NULL);
     }
 }
 
@@ -57,14 +60,14 @@ void lv_draw_dma2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void lv_draw_dma2d_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                      const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                                     const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
+                                     const lv_area_t * img_coords, const lv_area_t * clipped_img_area,
+                                     void * user_data)
 {
+    LV_UNUSED(user_data);
     LV_UNUSED(sup);
     LV_UNUSED(img_coords);
-
-    lv_layer_t * layer = t->target_layer;
 
     void * dest_first_pixel = lv_draw_layer_go_to_xy(layer,
                                                      clipped_img_area->x1 - layer->buf_area.x1,

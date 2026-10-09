@@ -25,10 +25,10 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void img_decode_and_draw(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                 lv_image_decoder_dsc_t * decoder_dsc, lv_area_t * relative_decoded_area,
                                 const lv_area_t * img_area, const lv_area_t * clipped_img_area,
-                                lv_draw_image_core_cb draw_core_cb);
+                                lv_draw_image_core_cb draw_core_cb, void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -214,9 +214,9 @@ lv_image_src_t lv_image_src_get_type(const void * src)
     return LV_IMAGE_SRC_UNKNOWN;
 }
 
-void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_image_normal_helper(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb,
-                                 const lv_image_decoder_args_t * decoder_args)
+                                 const lv_image_decoder_args_t * decoder_args, void * user_data)
 {
     if(draw_core_cb == NULL) {
         LV_LOG_WARN("draw_core_cb is NULL");
@@ -239,7 +239,7 @@ void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     }
 
     lv_area_t clipped_img_area;
-    if(!lv_area_intersect(&clipped_img_area, &draw_area, &t->clip_area)) {
+    if(!lv_area_intersect(&clipped_img_area, &draw_area, clip_area)) {
         return;
     }
 
@@ -250,14 +250,14 @@ void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         return;
     }
 
-    img_decode_and_draw(t, draw_dsc, &decoder_dsc, NULL, coords, &clipped_img_area, draw_core_cb);
+    img_decode_and_draw(layer, draw_dsc, &decoder_dsc, NULL, coords, &clipped_img_area, draw_core_cb, user_data);
 
     lv_image_decoder_close(&decoder_dsc);
 }
 
-void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_image_tiled_helper(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_image_dsc_t * draw_dsc,
                                 const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb,
-                                const lv_image_decoder_args_t * decoder_args)
+                                const lv_image_decoder_args_t * decoder_args, void * user_data)
 {
     if(draw_core_cb == NULL) {
         LV_LOG_WARN("draw_core_cb is NULL");
@@ -297,9 +297,10 @@ void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
         while(tile_area.x1 <= coords->x2) {
 
             lv_area_t clipped_img_area;
-            if(lv_area_intersect(&clipped_img_area, &tile_area, coords)) {
-                img_decode_and_draw(t, draw_dsc, &decoder_dsc, &relative_decoded_area, &tile_area, &clipped_img_area,
-                                    draw_core_cb);
+            if(lv_area_intersect(&clipped_img_area, &tile_area, coords) &&
+               lv_area_intersect(&clipped_img_area, &clipped_img_area, clip_area)) {
+                img_decode_and_draw(layer, draw_dsc, &decoder_dsc, &relative_decoded_area, &tile_area,
+                                    &clipped_img_area, draw_core_cb, user_data);
             }
 
             tile_area.x1 += img_w;
@@ -346,10 +347,10 @@ void lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, in
  *   STATIC FUNCTIONS
  **********************/
 
-static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void img_decode_and_draw(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                 lv_image_decoder_dsc_t * decoder_dsc, lv_area_t * relative_decoded_area,
                                 const lv_area_t * img_area, const lv_area_t * clipped_img_area,
-                                lv_draw_image_core_cb draw_core_cb)
+                                lv_draw_image_core_cb draw_core_cb, void * user_data)
 {
     lv_draw_image_sup_t sup;
     sup.alpha_color = draw_dsc->recolor;
@@ -358,7 +359,7 @@ static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
 
     /*The whole image is available, just draw it*/
     if(decoder_dsc->decoded && (relative_decoded_area == NULL || relative_decoded_area->x1 == LV_COORD_MIN)) {
-        draw_core_cb(t, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area);
+        draw_core_cb(layer, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area, user_data);
     }
     /*Draw in smaller pieces*/
     else {
@@ -386,8 +387,8 @@ static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
                 /*Limit draw area to the current decoded area and draw the image*/
                 lv_area_t clipped_img_area_sub;
                 if(lv_area_intersect(&clipped_img_area_sub, clipped_img_area, &absolute_decoded_area)) {
-                    draw_core_cb(t, draw_dsc, decoder_dsc, &sup,
-                                 &absolute_decoded_area, &clipped_img_area_sub);
+                    draw_core_cb(layer, draw_dsc, decoder_dsc, &sup, &absolute_decoded_area, &clipped_img_area_sub,
+                                 user_data);
                 }
             }
         }
