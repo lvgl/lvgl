@@ -164,21 +164,6 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
  */
 
 /*
- *  Before the user selected either LV_USE_LZ4_INTERNAL or LV_USE_LZ4_EXTERNAL
- *  For v9.6 LV_USE_LZ4_EXTERNAL doesn't exist anymore, instead the user
- *  enables LV_USE_LZ4 and disables LV_USE_LZ4_INTERNAL
- *  To support users using LV_USE_LZ4_EXTERNAL from before v9.6 we
- *  we enable LV_USE_LZ4 for them
- */
-#if defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL
-#if !LV_USE_LZ4
-    #warning LV_USE_LZ4_EXTERNAL is deprecated and will be removed in a future release. Enable LV_USE_LZ4 and disable LV_USE_LZ4_INTERNAL to continue using an external version of LZ4
-    #undef LV_USE_LZ4
-    #define LV_USE_LZ4 1
-#endif /*!LV_USE_LZ4*/
-#endif /*defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL*/
-
-/*
  *  Before the user selected either LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL
  *  For v9.6 LV_USE_THORVG_EXTERNAL doesn't exist anymore, instead the user
  *  enables LV_USE_THORVG and disables LV_USE_THORVG_INTERNAL
