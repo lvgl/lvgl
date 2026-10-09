@@ -36,9 +36,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void _g2d_draw_core_cb(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                               const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup, const lv_area_t * img_coords,
-                              const lv_area_t * clipped_img_area);
+                              const lv_area_t * clipped_img_area, void * user_data);
 
 static struct g2d_buf * _g2d_handle_src_buf(const lv_draw_buf_t * data);
 
@@ -81,21 +81,22 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     bool is_tiled = (dsc->tile != 0);
 
     if(is_tiled)
-        lv_draw_image_tiled_helper(t, dsc, coords, _g2d_draw_core_cb, NULL);
+        lv_draw_image_tiled_helper(t->target_layer, &t->clip_area, dsc, coords, _g2d_draw_core_cb, NULL, NULL);
     else
-        lv_draw_image_normal_helper(t, dsc, coords, _g2d_draw_core_cb, NULL);
+        lv_draw_image_normal_helper(t->target_layer, &t->clip_area, dsc, coords, _g2d_draw_core_cb, NULL, NULL);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void _g2d_draw_core_cb(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                               const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup, const lv_area_t * img_coords,
-                              const lv_area_t * clipped_img_area)
+                              const lv_area_t * clipped_img_area, void * user_data)
 {
+    LV_UNUSED(user_data);
     LV_UNUSED(sup);
-    lv_draw_buf_t * draw_buf = t->target_layer->draw_buf;
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
 

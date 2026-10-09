@@ -12,6 +12,7 @@
 #include "../lv_draw_image_private.h"
 #include "../lv_draw_private.h"
 #include "lv_draw_sw.h"
+#include "lv_draw_sw_private.h"
 #if LV_USE_DRAW_SW
 
 #include "../../display/lv_display_private.h"
@@ -58,22 +59,18 @@
  **********************/
 
 
-static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                          const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
-
 
 #if LV_DRAW_SW_COMPLEX
-static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void radius_only(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                         const lv_image_decoder_dsc_t * decoder_dsc,
                         const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 #endif /*LV_DRAW_SW_COMPLEX*/
 
-static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void recolor_only(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                          const lv_image_decoder_dsc_t * decoder_dsc,
                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 
-static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void transform_and_recolor(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                   const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                   const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 
@@ -199,10 +196,11 @@ void lv_draw_sw_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                       const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
-        lv_draw_image_normal_helper(t, draw_dsc, coords, img_draw_core, NULL);
+        lv_draw_image_normal_helper(t->target_layer, &t->clip_area, draw_dsc, coords, lv_draw_sw_image_core, NULL,
+                                    NULL);
     }
     else {
-        lv_draw_image_tiled_helper(t, draw_dsc, coords, img_draw_core, NULL);
+        lv_draw_image_tiled_helper(t->target_layer, &t->clip_area, draw_dsc, coords, lv_draw_sw_image_core, NULL, NULL);
     }
 }
 
@@ -210,10 +208,11 @@ void lv_draw_sw_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
  *   STATIC FUNCTIONS
  **********************/
 
-static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                          const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
+void lv_draw_sw_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
+                           const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
+                           const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data)
 {
+    LV_UNUSED(user_data);
     bool transformed = draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                        draw_dsc->scale_y != LV_SCALE_NONE ? true : false;
 
@@ -233,7 +232,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
 
     if(!transformed && !radius && cf == LV_COLOR_FORMAT_A8) {
         lv_area_t clipped_coords;
-        if(!lv_area_intersect(&clipped_coords, img_coords, &t->clip_area)) return;
+        if(!lv_area_intersect(&clipped_coords, img_coords, clipped_img_area)) return;
 
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
         blend_dsc.mask_area = img_coords;
@@ -243,7 +242,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
 
         blend_dsc.blend_area = img_coords;
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clipped_img_area, &blend_dsc);
     }
     else if(!transformed && !radius && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa <= LV_OPA_MIN &&
             draw_dsc->colorkey == NULL) {
@@ -263,7 +262,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         blend_dsc.mask_area = img_coords;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clipped_img_area, &blend_dsc);
     }
     else if(!transformed && !radius && (cf == LV_COLOR_FORMAT_L8 || cf == LV_COLOR_FORMAT_AL88) &&
             draw_dsc->colorkey == NULL) {
@@ -271,7 +270,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         blend_dsc.src_buf = src_buf;
         blend_dsc.blend_area = img_coords;
         blend_dsc.src_color_format = cf;
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clipped_img_area, &blend_dsc);
     }
     /*The simplest case just copy the pixels into the draw_buf. Blending will convert the colors if needed*/
     else if(!transformed && !radius && draw_dsc->recolor_opa <= LV_OPA_MIN && draw_dsc->colorkey == NULL) {
@@ -279,15 +278,15 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         blend_dsc.src_buf = src_buf;
         blend_dsc.blend_area = img_coords;
         blend_dsc.src_color_format = cf;
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clipped_img_area, &blend_dsc);
     }
     else if(!transformed && !radius && draw_dsc->recolor_opa > LV_OPA_MIN && draw_dsc->colorkey == NULL) {
-        recolor_only(t, draw_dsc, decoder_dsc, img_coords,  clipped_img_area);
+        recolor_only(layer, draw_dsc, decoder_dsc, img_coords,  clipped_img_area);
     }
 #if LV_DRAW_SW_COMPLEX
     /*Handle masked RGB565, RGB888, XRGB888, or ARGB8888 images*/
     else if(!transformed && radius && draw_dsc->recolor_opa <= LV_OPA_MIN && draw_dsc->colorkey == NULL) {
-        radius_only(t, draw_dsc, decoder_dsc, img_coords,  clipped_img_area);
+        radius_only(layer, draw_dsc, decoder_dsc, img_coords,  clipped_img_area);
     }
 #endif /*LV_DRAW_SW_COMPLEX*/
     /* check whether it is possible to accelerate the operation in synchronous mode */
@@ -297,15 +296,15 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
                                                   img_coords,       /* src_h, src_w, src_x1, src_y1 */
                                                   img_stride,       /* image stride */
                                                   clipped_img_area, /* blend area */
-                                                  t,                /* target buffer, buffer width, buffer height, buffer stride */
+                                                  layer,            /* target buffer, buffer width, buffer height, buffer stride */
                                                   draw_dsc)) {      /* opa, recolour_opa and colour */
         /*In the other cases every pixel need to be checked one-by-one*/
-        transform_and_recolor(t, draw_dsc, decoder_dsc, sup, img_coords, clipped_img_area);
+        transform_and_recolor(layer, draw_dsc, decoder_dsc, sup, img_coords, clipped_img_area);
 
     }
 }
 #if LV_DRAW_SW_COMPLEX
-static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void radius_only(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                         const lv_image_decoder_dsc_t * decoder_dsc,
                         const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
 {
@@ -375,7 +374,7 @@ static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc
         }
 
         /*Blend*/
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clipped_img_area, &blend_dsc);
 
         /*Go to the next area*/
         blend_area.y1 ++;
@@ -387,7 +386,7 @@ static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc
 }
 #endif /*LV_DRAW_SW_COMPLEX*/
 
-static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void recolor_only(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                          const lv_image_decoder_dsc_t * decoder_dsc,
                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
 {
@@ -441,7 +440,7 @@ static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
 
         recolor(relative_area, decoded->data, tmp_buf, img_stride, blend_dsc.src_color_format, draw_dsc);
 
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clipped_img_area, &blend_dsc);
 
         /*Go to the next area*/
         blend_area.y1 = blend_area.y2 + 1;
@@ -456,7 +455,7 @@ static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
 
 }
 
-static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void transform_and_recolor(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                   const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                   const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
 
@@ -584,7 +583,7 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
         }
 
         /*Blend*/
-        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
+        lv_draw_sw_blend(layer, clipped_img_area, &blend_dsc);
 
         /*Go to the next area*/
         blend_area.y1 = blend_area.y2 + 1;

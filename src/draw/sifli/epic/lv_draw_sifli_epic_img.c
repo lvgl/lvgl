@@ -33,9 +33,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void epic_img_draw_core(lv_draw_task_t * task, const lv_draw_image_dsc_t * draw_dsc,
+static void epic_img_draw_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                               const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+                               const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data);
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -51,10 +51,10 @@ void lv_draw_sifli_epic_img(lv_draw_task_t * task)
     }
 
     if(dsc->tile) {
-        lv_draw_image_tiled_helper(task, dsc, coords, epic_img_draw_core, NULL);
+        lv_draw_image_tiled_helper(task->target_layer, &task->clip_area, dsc, coords, epic_img_draw_core, NULL, NULL);
     }
     else {
-        lv_draw_image_normal_helper(task, dsc, coords, epic_img_draw_core, NULL);
+        lv_draw_image_normal_helper(task->target_layer, &task->clip_area, dsc, coords, epic_img_draw_core, NULL, NULL);
     }
 }
 
@@ -62,10 +62,11 @@ void lv_draw_sifli_epic_img(lv_draw_task_t * task)
  *   STATIC FUNCTIONS
  **********************/
 
-static void epic_img_draw_core(lv_draw_task_t * task, const lv_draw_image_dsc_t * draw_dsc,
+static void epic_img_draw_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                               const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
+                               const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data)
 {
+    LV_UNUSED(user_data);
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
     const uint8_t * src_buf;
     lv_color_format_t cf;
@@ -101,7 +102,7 @@ static void epic_img_draw_core(lv_draw_task_t * task, const lv_draw_image_dsc_t 
     EPIC_LayerConfigTypeDef output_layer;
     uint8_t input_layer_cnt = 2;
 
-    if(lv_epic_setup_layers(&input_layers[0], &output_layer, task, clipped_img_area)) {
+    if(lv_epic_setup_layers(&input_layers[0], &output_layer, layer, clipped_img_area, clipped_img_area)) {
         return;
     }
 

@@ -101,16 +101,18 @@ struct _lv_draw_image_dsc_t {
 
 /**
  * PErform the actual rendering of a decoded image
- * @param t                 pointer to a draw task
+ * @param layer             the target layer
  * @param draw_dsc          the draw descriptor of the image
  * @param decoder_dsc       pointer to the decoded image's descriptor
  * @param sup               supplementary data
  * @param img_coords        the absolute coordinates of the image
- * @param clipped_img_area  the absolute clip coordinates
+ * @param clipped_img_area  the absolute coordinates of the image area to draw (already clipped)
+ * @param user_data         custom data passed to the image helper
  */
-typedef void (*lv_draw_image_core_cb)(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+typedef void (*lv_draw_image_core_cb)(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                       const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                                      const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+                                      const lv_area_t * img_coords, const lv_area_t * clipped_img_area,
+                                      void * user_data);
 
 /**********************
  * GLOBAL PROTOTYPES

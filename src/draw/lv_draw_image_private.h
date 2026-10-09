@@ -42,28 +42,32 @@ struct _lv_draw_image_sup_t {
 /**
  * Can be used by draw units to handle the decoding and
  * prepare everything for the actual image rendering
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param draw_dsc      the draw descriptor of the image
  * @param coords        the absolute coordinates of the image
  * @param draw_core_cb  a callback to perform the actual rendering
  * @param decoder_args  the args passed to image decoders, or NULL for defaults
+ * @param user_data     custom data passed to `draw_core_cb`
  */
-void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_image_normal_helper(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb,
-                                 const lv_image_decoder_args_t * decoder_args);
+                                 const lv_image_decoder_args_t * decoder_args, void * user_data);
 
 /**
  * Can be used by draw units for TILED images to handle the decoding and
  * prepare everything for the actual image rendering
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param draw_dsc      the draw descriptor of the image
  * @param coords        the absolute coordinates of the image
  * @param draw_core_cb  a callback to perform the actual rendering
  * @param decoder_args  the args passed to image decoders, or NULL for defaults
+ * @param user_data     custom data passed to `draw_core_cb`
  */
-void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_image_tiled_helper(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_image_dsc_t * draw_dsc,
                                 const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb,
-                                const lv_image_decoder_args_t * decoder_args);
+                                const lv_image_decoder_args_t * decoder_args, void * user_data);
 
 /**
  * Get the area of a rectangle if its rotated and scaled
