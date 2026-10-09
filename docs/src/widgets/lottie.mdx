@@ -21,8 +21,8 @@ into a buffer that you provide.
 ## Dependencies
 
 The Lottie Widget uses the [ThorVG](https://github.com/thorvg/thorvg) library which is [integrated into LVGL](https://github.com/lvgl/lvgl/tree/master/src/libs/thorvg).
-In order to use Lottie animations <ApiLink name="LV_USE_THORVG_INTERNAL" /> (to use the built-in ThorVG) or
-<ApiLink name="LV_USE_THORVG_EXTERNAL" /> (to link it externally) needs to be enabled in `lv_conf.h`. For vector graphics in general
+In order to use Lottie animations enable <ApiLink name="LV_USE_THORVG" /> and use either the internal version of the library 
+with <ApiLink name="LV_USE_THORVG_INTERNAL" />  or disable it to link with an external version. For vector graphics in general
 <ApiLink name="LV_USE_VECTOR_GRAPHIC" /> also needs to be enabled.
 
 As ThorVG is written in C++, when using <ApiLink name="LV_USE_THORVG_INTERNAL" /> be sure that you

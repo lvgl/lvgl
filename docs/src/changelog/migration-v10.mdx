@@ -202,12 +202,6 @@ and use the `_INTERNAL` flag to choose between the bundled source and an externa
 | `LV_USE_LZ4_EXTERNAL` | `LV_USE_LZ4` = 1 and `LV_USE_LZ4_INTERNAL` = 0 |
 | `LV_USE_THORVG_EXTERNAL` | `LV_USE_THORVG` = 1 and `LV_USE_THORVG_INTERNAL` = 0 |
 
-<Callout type="warning">
-    If your project previously had `LV_USE_THORVG_INTERNAL` enabled (with no `LV_USE_THORVG_EXTERNAL`), you must now also enable `LV_USE_THORVG`.
-    Leaving `LV_USE_THORVG` disabled while `LV_USE_THORVG_INTERNAL` is enabled will result in a build error.
-    The same applies to `LV_USE_LZ4` and `LV_USE_LZ4_INTERNAL`.
-</Callout>
-
 #### GPU (VG-Lite)
 
 The VG-Lite GPU is now chosen with a single `LV_VG_LITE_GPU` option instead of a free-form series/revision pair.

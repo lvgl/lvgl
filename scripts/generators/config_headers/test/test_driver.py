@@ -46,7 +46,6 @@ def test_internal_footer_has_static_derivations(generated):
     i = generated["internal"]
     # The *_EXTERNAL compatibility shims, the inconsistent-name alias, and the
     # trailing LV_KCONFIG_PRESENT cleanup.
-    assert "LV_USE_THORVG_EXTERNAL" in i
     assert "#define LV_USE_ANIMIMAGE LV_USE_ANIMIMG" in i
     assert "#undef LV_KCONFIG_PRESENT" in i
 

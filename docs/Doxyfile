@@ -2238,7 +2238,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_THEME_MONO=1             \
                          LV_USE_THEME_SIMPLE=1           \
                          LV_USE_THORVG=1                 \
-                         LV_USE_THORVG_EXTERNAL=1        \
                          LV_USE_THORVG_INTERNAL=1        \
                          LV_USE_TILEVIEW=1               \
                          LV_USE_TINY_TTF=1               \
