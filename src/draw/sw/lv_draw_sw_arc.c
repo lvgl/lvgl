@@ -216,7 +216,7 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
             }
         }
 
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &clipped_area, &blend_dsc);
 
         blend_area.y1 ++;
         blend_area.y2 ++;

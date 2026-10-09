@@ -146,7 +146,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
         blend_area.x2 = core_area.x2;
         blend_area.y1 = outer_area->y1;
         blend_area.y2 = inner_area->y1 - 1;
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 
     if(bottom_side && split_hor) {
@@ -154,7 +154,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
         blend_area.x2 = core_area.x2;
         blend_area.y1 = inner_area->y2 + 1;
         blend_area.y2 = outer_area->y2;
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 
     /*If the border is very thick and the vertical sides overlap horizontally draw a single rectangle*/
@@ -163,7 +163,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
         blend_area.x2 = outer_area->x2;
         blend_area.y1 = core_area.y1;
         blend_area.y2 = core_area.y2;
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
     else {
         if(left_side) {
@@ -171,7 +171,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
             blend_area.x2 = inner_area->x1 - 1;
             blend_area.y1 = core_area.y1;
             blend_area.y2 = core_area.y2;
-            lv_draw_sw_blend(t, &blend_dsc);
+            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
         }
 
         if(right_side) {
@@ -179,7 +179,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
             blend_area.x2 = outer_area->x2;
             blend_area.y1 = core_area.y1;
             blend_area.y2 = core_area.y2;
-            lv_draw_sw_blend(t, &blend_dsc);
+            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
         }
     }
 
@@ -203,13 +203,13 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
             if(top_y >= draw_area.y1) {
                 blend_area.y1 = top_y;
                 blend_area.y2 = top_y;
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
             }
 
             if(bottom_y <= draw_area.y2) {
                 blend_area.y1 = bottom_y;
                 blend_area.y2 = bottom_y;
-                lv_draw_sw_blend(t, &blend_dsc);
+                lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
             }
         }
     }
@@ -226,7 +226,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
 
                     lv_memset(mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(t, &blend_dsc);
+                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 }
             }
 
@@ -237,7 +237,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
 
                     lv_memset(mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(t, &blend_dsc);
+                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 }
             }
         }
@@ -257,7 +257,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
 
                     lv_memset(mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(t, &blend_dsc);
+                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 }
             }
 
@@ -268,7 +268,7 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
 
                     lv_memset(mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(t, &blend_dsc);
+                    lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
                 }
             }
         }
@@ -309,14 +309,14 @@ static void draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area,
     a.y1 = outer_area->y1;
     a.y2 = inner_area->y1 - 1;
     if(top_side) {
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 
     /*Bottom*/
     a.y1 = inner_area->y2 + 1;
     a.y2 = outer_area->y2;
     if(bottom_side) {
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 
     /*Left*/
@@ -325,14 +325,14 @@ static void draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area,
     a.y1 = (top_side) ? inner_area->y1 : outer_area->y1;
     a.y2 = (bottom_side) ? inner_area->y2 : outer_area->y2;
     if(left_side) {
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 
     /*Right*/
     a.x1 = inner_area->x2 + 1;
     a.x2 = outer_area->x2;
     if(right_side) {
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 }
 

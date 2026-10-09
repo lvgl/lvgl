@@ -125,7 +125,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_hor(lv_draw_task_t * t, const lv_dra
 
     /*If there is no mask then simply draw a rectangle*/
     if(!dashed) {
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 #if LV_DRAW_SW_COMPLEX
     /*If there other mask apply it*/
@@ -166,7 +166,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_hor(lv_draw_task_t * t, const lv_dra
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             }
 
-            lv_draw_sw_blend(t, &blend_dsc);
+            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
 
             blend_area.y1++;
             blend_area.y2++;
@@ -202,7 +202,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_ver(lv_draw_task_t * t, const lv_dra
 
     /*If there is no mask then simply draw a rectangle*/
     if(!dashed) {
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 
 #if LV_DRAW_SW_COMPLEX
@@ -237,8 +237,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_ver(lv_draw_task_t * t, const lv_dra
             }
             dash_cnt ++;
 
-            lv_draw_sw_blend(t, &blend_dsc);
-
+            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
             blend_area.y1++;
             blend_area.y2++;
         }
@@ -373,7 +372,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_skew(lv_draw_task_t * t, const lv_dr
         }
         else {
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-            lv_draw_sw_blend(t, &blend_dsc);
+            lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
 
             blend_area.y1 = blend_area.y2 + 1;
             blend_area.y2 = blend_area.y1;
@@ -386,7 +385,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_skew(lv_draw_task_t * t, const lv_dr
     if(blend_area.y1 != blend_area.y2) {
         blend_area.y2--;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 
     lv_free(mask_buf);

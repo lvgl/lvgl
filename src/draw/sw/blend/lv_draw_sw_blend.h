@@ -58,10 +58,11 @@ typedef struct {
 
 /**
  * Call the blend function of the `layer`.
- * @param t             pointer to a draw unit
+ * @param layer         pointer to the target layer
+ * @param clip_area     pointer to the current clip area
  * @param dsc           pointer to an initialized blend descriptor
  */
-void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * dsc);
+void lv_draw_sw_blend(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_sw_blend_dsc_t * dsc);
 
 /**********************
  *      MACROS

@@ -175,7 +175,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
                 }
             }
         }
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(t->target_layer, &t->clip_area, &blend_dsc);
     }
 
     lv_free(mask_buf);

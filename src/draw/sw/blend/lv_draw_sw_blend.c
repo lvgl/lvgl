@@ -69,17 +69,16 @@ static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image(lv_color_f
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * dsc)
+void lv_draw_sw_blend(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_sw_blend_dsc_t * dsc)
 {
     /*Do not draw transparent things*/
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->mask_buf && dsc->mask_res == LV_DRAW_SW_MASK_RES_TRANSP) return;
 
     lv_area_t blend_area;
-    if(!lv_area_intersect(&blend_area, dsc->blend_area, &t->clip_area)) return;
+    if(!lv_area_intersect(&blend_area, dsc->blend_area, clip_area)) return;
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_layer_t * layer = t->target_layer;
     uint32_t layer_stride_byte = layer->draw_buf->header.stride;
 
     /* TODO: (v10) Gate adding custom blend handlers behind a config */
