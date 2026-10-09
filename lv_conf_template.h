@@ -1786,12 +1786,6 @@
 /** SDL include path */
 #define LV_SDL_INCLUDE_PATH "SDL2/SDL.h"
 
-/** Legacy behavior, slated for removal: EGL is inferred the legacy way
- *  (LV_USE_OPENGLES with an OpenGL draw unit). Disable this and pick a backend
- *  explicitly in the "Rendering backend" choice.
- */
-#define LV_SDL_AUTO_BACKEND 1
-
 /** Select how the SDL driver presents rendered frames.
  *  Possible values:
  *  - LV_SDL_BACKEND_SW: Software (SDL surface)
