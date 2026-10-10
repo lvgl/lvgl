@@ -1182,4 +1182,63 @@ void test_image_draw_main_unknown_src_type(void)
     lv_refr_now(NULL);
 }
 
+void test_image_transformed_area_covers_scaled_extent(void)
+{
+    /* #10818: a scaled image's transformed area must cover w*scale x h*scale
+     * pixels. A 4x4 source stretched into a 32x32 widget is drawn at 8x, so
+     * the area is 32x32; per-edge truncation to (w-1)*scale+1 renders 25x25. */
+    lv_area_t area;
+    lv_point_t pivot = {0, 0};
+
+    lv_image_buf_get_transformed_area(&area, 4, 4, 0, 2048, 2048, &pivot);
+    TEST_ASSERT_EQUAL_INT32(32, lv_area_get_width(&area));
+    TEST_ASSERT_EQUAL_INT32(32, lv_area_get_height(&area));
+
+    /* The extent does not depend on the pivot. */
+    pivot.x = 1;
+    pivot.y = 1;
+    lv_image_buf_get_transformed_area(&area, 4, 4, 0, 2048, 2048, &pivot);
+    TEST_ASSERT_EQUAL_INT32(32, lv_area_get_width(&area));
+    TEST_ASSERT_EQUAL_INT32(32, lv_area_get_height(&area));
+
+    /* Downscale by half: 2x2 of a 4x4 source. */
+    pivot.x = 0;
+    pivot.y = 0;
+    lv_image_buf_get_transformed_area(&area, 4, 4, 0, 128, 128, &pivot);
+    TEST_ASSERT_EQUAL_INT32(2, lv_area_get_width(&area));
+    TEST_ASSERT_EQUAL_INT32(2, lv_area_get_height(&area));
+
+    /* 1x keeps the identity extent. */
+    lv_image_buf_get_transformed_area(&area, 4, 4, 0, 256, 256, &pivot);
+    TEST_ASSERT_EQUAL_INT32(4, lv_area_get_width(&area));
+    TEST_ASSERT_EQUAL_INT32(4, lv_area_get_height(&area));
+
+    /* Rotation at 1x is unaffected by the extent convention: a 10x6 rect
+     * rotated by 90 degrees covers a 6x10 area. */
+    lv_image_buf_get_transformed_area(&area, 10, 6, 900, 256, 256, &pivot);
+    TEST_ASSERT_EQUAL_INT32(6, lv_area_get_width(&area));
+    TEST_ASSERT_EQUAL_INT32(10, lv_area_get_height(&area));
+
+    /* Downscaled rotation must not clip transformed pixel centers: the
+     * extent covers every corner the inclusive corners reach. */
+    lv_point_t ctr[4] = {
+        {0, 0},
+        {9, 0},
+        {0, 5},
+        {9, 5},
+    };
+    uint32_t i;
+    int32_t cx1 = INT32_MAX, cx2 = INT32_MIN, cy1 = INT32_MAX, cy2 = INT32_MIN;
+    for(i = 0; i < 4; i++) {
+        lv_point_transform(&ctr[i], 450, 128, 128, &pivot, true);
+        cx1 = LV_MIN(cx1, ctr[i].x);
+        cx2 = LV_MAX(cx2, ctr[i].x);
+        cy1 = LV_MIN(cy1, ctr[i].y);
+        cy2 = LV_MAX(cy2, ctr[i].y);
+    }
+    lv_image_buf_get_transformed_area(&area, 10, 6, 450, 128, 128, &pivot);
+    TEST_ASSERT_TRUE(area.x1 <= cx1 && area.x2 >= cx2);
+    TEST_ASSERT_TRUE(area.y1 <= cy1 && area.y2 >= cy2);
+}
+
 #endif
