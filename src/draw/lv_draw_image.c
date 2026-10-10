@@ -326,20 +326,60 @@ void lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, in
         return;
     }
 
-    lv_point_t p[4] = {
+    /* Which corner convention bounds the rendered content depends on the
+     * scale along each axis. Above 1x a source pixel covers scale
+     * destination pixels, so the exclusive corners reach w * scale while
+     * the inclusive corners lose scale - 1 pixels per edge (#10818: a 4x4
+     * source at 8x rendered as 25x25 instead of 32x32). At 1x and below the
+     * transform maps pixel (i, j) to one destination pixel, so the
+     * inclusive corners carry the rendered content and the exclusive edge
+     * can cut the last column or row of a downscaled rotated image. The
+     * bounds are therefore selected per axis. */
+    lv_point_t p[7] = {
         {0, 0},
+        {w, 0},
+        {0, h},
+        {w, h},
         {w - 1, 0},
         {0, h - 1},
         {w - 1, h - 1},
     };
+    uint32_t i;
     lv_point_transform(&p[0], angle, scale_x, scale_y, pivot, true);
-    lv_point_transform(&p[1], angle, scale_x, scale_y, pivot, true);
-    lv_point_transform(&p[2], angle, scale_x, scale_y, pivot, true);
-    lv_point_transform(&p[3], angle, scale_x, scale_y, pivot, true);
-    res->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
-    res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
-    res->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
-    res->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
+    int32_t x1_excl = p[0].x, x2_excl = p[0].x;
+    int32_t y1_excl = p[0].y, y2_excl = p[0].y;
+    for(i = 1; i < 4; i++) {
+        lv_point_transform(&p[i], angle, scale_x, scale_y, pivot, true);
+        x1_excl = LV_MIN(x1_excl, p[i].x);
+        x2_excl = LV_MAX(x2_excl, p[i].x);
+        y1_excl = LV_MIN(y1_excl, p[i].y);
+        y2_excl = LV_MAX(y2_excl, p[i].y);
+    }
+    int32_t x1_incl = p[0].x, x2_incl = p[0].x;
+    int32_t y1_incl = p[0].y, y2_incl = p[0].y;
+    for(i = 4; i < 7; i++) {
+        lv_point_transform(&p[i], angle, scale_x, scale_y, pivot, true);
+        x1_incl = LV_MIN(x1_incl, p[i].x);
+        x2_incl = LV_MAX(x2_incl, p[i].x);
+        y1_incl = LV_MIN(y1_incl, p[i].y);
+        y2_incl = LV_MAX(y2_incl, p[i].y);
+    }
+    if(scale_x > LV_SCALE_NONE) {
+        res->x1 = x1_excl;
+        res->x2 = x2_excl - 1;
+    }
+    else {
+        res->x1 = x1_incl;
+        res->x2 = x2_incl;
+    }
+    if(scale_y > LV_SCALE_NONE) {
+        res->y1 = y1_excl;
+        res->y2 = y2_excl - 1;
+    }
+    else {
+        res->y1 = y1_incl;
+        res->y2 = y2_incl;
+    }
 }
 
 /**********************
