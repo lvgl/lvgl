@@ -46,6 +46,41 @@ static lv_obj_t * build_rendered_subtree(void)
     return parent;
 }
 
+void test_active_state_style_changes_refresh_layout(void)
+{
+    lv_style_t base_style;
+    lv_style_init(&base_style);
+    lv_style_set_width(&base_style, 100);
+
+    lv_style_t checked_style;
+    lv_style_init(&checked_style);
+    lv_style_set_width(&checked_style, 150);
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_add_style(obj, &base_style, LV_PART_MAIN);
+    lv_obj_add_state(obj, LV_STATE_CHECKED);
+    lv_obj_update_layout(obj);
+    TEST_ASSERT_EQUAL(100, lv_obj_get_width(obj));
+
+    lv_obj_add_style(obj, &checked_style, LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_obj_update_layout(obj);
+    TEST_ASSERT_EQUAL(150, lv_obj_get_width(obj));
+
+    lv_obj_set_style_width(obj, 175, LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_obj_update_layout(obj);
+    TEST_ASSERT_EQUAL(175, lv_obj_get_width(obj));
+
+    TEST_ASSERT_TRUE(lv_obj_remove_local_style_prop(obj, LV_STYLE_WIDTH,
+                                                    LV_PART_MAIN | LV_STATE_CHECKED));
+    lv_obj_update_layout(obj);
+    TEST_ASSERT_EQUAL(150, lv_obj_get_width(obj));
+
+    lv_obj_remove_style(obj, &base_style, LV_PART_MAIN);
+    lv_obj_remove_style(obj, &checked_style, LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_style_reset(&base_style);
+    lv_style_reset(&checked_style);
+}
+
 /* A redraw-only, scrollbar-only state change must not reach any descendant. */
 void test_scrollbar_redraw_state_does_not_cascade_to_children(void)
 {
@@ -132,6 +167,80 @@ void test_multi_part_redraw_state_cascades_to_children(void)
     lv_obj_remove_style(parent, &scrollbar_redraw, LV_PART_SCROLLBAR | LV_STATE_USER_1);
     lv_style_reset(&main_redraw);
     lv_style_reset(&scrollbar_redraw);
+}
+
+static lv_obj_t * create_obj_with_running_width_transition(lv_style_t * base_style,
+                                                           lv_style_t * pressed_style,
+                                                           lv_style_transition_dsc_t * transition_dsc)
+{
+    static const lv_style_prop_t transition_props[] = {LV_STYLE_WIDTH, LV_STYLE_PROP_INV};
+
+    lv_style_init(base_style);
+    lv_style_set_width(base_style, 100);
+
+    lv_style_init(pressed_style);
+    lv_style_set_width(pressed_style, 200);
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_add_style(obj, base_style, LV_PART_MAIN);
+    lv_obj_add_style(obj, pressed_style, LV_PART_MAIN | LV_STATE_PRESSED);
+
+    lv_style_transition_dsc_init(transition_dsc, transition_props, lv_anim_path_linear, 1000, 0, NULL);
+    lv_obj_set_style_transition(obj, transition_dsc, LV_PART_MAIN);
+
+    /*Transitions are created only after the object has been rendered.*/
+    lv_refr_now(NULL);
+    lv_obj_add_state(obj, LV_STATE_PRESSED);
+    lv_test_wait(100);
+
+    int32_t width = lv_obj_get_style_width(obj, LV_PART_MAIN);
+    TEST_ASSERT_GREATER_THAN_INT32(100, width);
+    TEST_ASSERT_LESS_THAN_INT32(200, width);
+
+    return obj;
+}
+
+void test_add_style_with_state_stops_running_transition(void)
+{
+    lv_style_t base_style;
+    lv_style_t pressed_style;
+    lv_style_t replacement_style;
+    lv_style_transition_dsc_t transition_dsc;
+
+    lv_obj_t * obj = create_obj_with_running_width_transition(&base_style, &pressed_style, &transition_dsc);
+
+    lv_style_init(&replacement_style);
+    lv_style_set_width(&replacement_style, 300);
+    lv_obj_add_style(obj, &replacement_style, LV_PART_MAIN | LV_STATE_PRESSED);
+
+    TEST_ASSERT_EQUAL_INT32(300, lv_obj_get_style_width(obj, LV_PART_MAIN));
+
+    lv_obj_delete(obj);
+    lv_style_reset(&base_style);
+    lv_style_reset(&pressed_style);
+    lv_style_reset(&replacement_style);
+}
+
+void test_replace_style_with_state_stops_running_transition(void)
+{
+    lv_style_t base_style;
+    lv_style_t pressed_style;
+    lv_style_t replacement_style;
+    lv_style_transition_dsc_t transition_dsc;
+
+    lv_obj_t * obj = create_obj_with_running_width_transition(&base_style, &pressed_style, &transition_dsc);
+
+    lv_style_init(&replacement_style);
+    lv_style_set_width(&replacement_style, 300);
+    TEST_ASSERT_TRUE(lv_obj_replace_style(obj, &pressed_style, &replacement_style,
+                                          LV_PART_MAIN | LV_STATE_PRESSED));
+
+    TEST_ASSERT_EQUAL_INT32(300, lv_obj_get_style_width(obj, LV_PART_MAIN));
+
+    lv_obj_delete(obj);
+    lv_style_reset(&base_style);
+    lv_style_reset(&pressed_style);
+    lv_style_reset(&replacement_style);
 }
 
 #endif

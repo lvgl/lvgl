@@ -28,17 +28,19 @@ static void cont_sub_event_cb(lv_event_t * e)
  */
 void lv_example_gridnav_3(void)
 {
-    /*It's assumed that the default group is set and
+    /*The example requires that a default group is set and
      *there is a keyboard indev*/
+    lv_group_t * group = lv_group_get_default();
+    if(!group) {
+        LV_LOG_WARN("Gridnav example requires a default group");
+        return;
+    }
 
     lv_obj_t * cont_main = lv_obj_create(lv_screen_active());
     lv_gridnav_add(cont_main, (lv_gridnav_ctrl_t)(LV_GRIDNAV_CTRL_ROLLOVER | LV_GRIDNAV_CTRL_SCROLL_FIRST));
 
     /*Only the container needs to be in a group*/
-    lv_group_t * g = lv_group_get_default();
-    if(g) {
-        lv_group_add_obj(g, cont_main);
-    }
+    lv_group_add_obj(group, cont_main);
 
     /*Use flex here, but works with grid or manually placed objects as well*/
     lv_obj_set_flex_flow(cont_main, LV_FLEX_FLOW_ROW_WRAP);
@@ -81,9 +83,7 @@ void lv_example_gridnav_3(void)
     lv_obj_t * cont_sub2 = lv_obj_create(cont_main);
     lv_gridnav_add(cont_sub2, LV_GRIDNAV_CTRL_ROLLOVER);
     /*Only the container needs to be in a group*/
-    if(g) {
-        lv_group_add_obj(g, cont_sub2);
-    }
+    lv_group_add_obj(group, cont_sub2);
 
     lv_obj_add_event_cb(cont_sub2, cont_sub_event_cb, LV_EVENT_KEY, NULL);
 

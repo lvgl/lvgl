@@ -25,6 +25,7 @@
 
 static int32_t ppa_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static bool other_unit_busy(const lv_layer_t * layer, const lv_draw_unit_t * self);
 static int32_t ppa_delete(lv_draw_unit_t * draw_unit);
 static void  ppa_execute_drawing(lv_draw_ppa_unit_t * u);
 
@@ -176,10 +177,25 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     }
 }
 
+static bool other_unit_busy(const lv_layer_t * layer, const lv_draw_unit_t * self)
+{
+    lv_draw_task_t * t = layer->draw_task_head;
+    while(t) {
+        if(t->state == LV_DRAW_TASK_STATE_IN_PROGRESS && t->draw_unit != self) return true;
+        t = t->next;
+    }
+    return false;
+}
+
 static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
     if(u->task_act) {
+        return LV_DRAW_UNIT_IDLE;
+    }
+
+    /* Row maintenance would discard another unit's pixels in the same rows */
+    if(other_unit_busy(layer, draw_unit)) {
         return LV_DRAW_UNIT_IDLE;
     }
 
@@ -222,9 +238,9 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
 
     /* Transformed images (rotate / scale) write the transformed on-screen
      * bounding box t->_real_area, which differs from the un-transformed t->area.
-     * Clip and invalidate THAT region so the guard does not skip a visible
-     * transformed image and the cache maintenance matches the pixels the PPA
-     * actually wrote. The individual paths still clamp to the buffer. */
+     * Clip and sync THAT region so the guard does not skip a visible transformed
+     * image and the cache maintenance matches the pixels the PPA actually
+     * touches. The individual paths still clamp to the buffer. */
     const lv_area_t * task_area = &t->area;
 #if LV_USE_PPA_IMG
     if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
@@ -237,12 +253,16 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
 #endif
 
     if(!lv_area_intersect(&area, task_area, &t->clip_area)) return;
-    lv_draw_buf_invalidate_cache(buf, &area);
+
+    /* The handlers take an area relative to the buffer */
+    lv_area_t buf_area = area;
+    lv_area_move(&buf_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
+    lv_draw_buf_flush_cache(buf, &buf_area);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_ppa_fill(t, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
-            lv_draw_buf_invalidate_cache(buf, &area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
@@ -263,12 +283,15 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
                 {
                     lv_draw_ppa_img(t, img_dsc, &t->area);
                 }
-                lv_draw_buf_invalidate_cache(buf, &area);
                 break;
             }
         default:
-            break;
+            LV_ASSERT_FORMAT_MSG(false, "Invalid draw task type: %d", t->type);
+            return;
     }
+
+    /* The software fallback wrote through the cache, so its lines must survive */
+    if(!u->img_sw_fallback) lv_draw_buf_invalidate_cache(buf, &buf_area);
 }
 
 #endif /*LV_USE_PPA*/

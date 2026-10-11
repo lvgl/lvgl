@@ -28,7 +28,7 @@ static void send_color(lv_lcd_generic_mipi_driver_t * drv, uint8_t cmd, uint8_t 
 static void init(lv_lcd_generic_mipi_driver_t * drv, lv_lcd_flag_t flags);
 static void set_mirror(lv_lcd_generic_mipi_driver_t * drv, bool mirror_x, bool mirror_y);
 static void set_swap_xy(lv_lcd_generic_mipi_driver_t * drv, bool swap);
-static void set_rotation(lv_lcd_generic_mipi_driver_t * drv, lv_display_rotation_t rot);
+static void set_rotation(lv_lcd_generic_mipi_driver_t * drv, lv_rotation_t rot);
 static void res_chg_event_cb(lv_event_t * e);
 static void delete_cb(lv_event_t * e);
 static lv_lcd_generic_mipi_driver_t * get_driver(lv_display_t * disp);
@@ -296,22 +296,22 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
  * @param drv           LCD driver object
  * @param rot           rotation
  */
-static void set_rotation(lv_lcd_generic_mipi_driver_t * drv, lv_display_rotation_t rot)
+static void set_rotation(lv_lcd_generic_mipi_driver_t * drv, lv_rotation_t rot)
 {
     switch(rot) {
-        case LV_DISPLAY_ROTATION_0:
+        case LV_ROTATION_0:
             set_swap_xy(drv, drv->swap_xy);
             set_mirror(drv, drv->mirror_x, drv->mirror_y);
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             set_swap_xy(drv, !drv->swap_xy);
             set_mirror(drv, drv->mirror_x, !drv->mirror_y);
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             set_swap_xy(drv, drv->swap_xy);
             set_mirror(drv, !drv->mirror_x, !drv->mirror_y);
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             set_swap_xy(drv, !drv->swap_xy);
             set_mirror(drv, !drv->mirror_x, drv->mirror_y);
             break;
@@ -332,7 +332,7 @@ static void res_chg_event_cb(lv_event_t * e)
 
     uint16_t hor_res = lv_display_get_horizontal_resolution(disp);
     uint16_t ver_res = lv_display_get_vertical_resolution(disp);
-    lv_display_rotation_t rot = lv_display_get_rotation(disp);
+    lv_rotation_t rot = lv_display_get_rotation(disp);
 
     /* TODO: implement resolution change */
     LV_UNUSED(hor_res);

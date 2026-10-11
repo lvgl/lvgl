@@ -419,7 +419,6 @@ static inline lv_result_t lv_draw_sw_image_helium(
 
             /* mask_buf = src_buf + src_stride * src_w / header->w * src_h; */
             const uint8_t *mask_buf = src_buf + src_stride * src_h;
-            int32_t mask_stride = src_stride / 2;
 
             static arm_2d_tile_t mask_tile;
             mask_tile = source_tile;

@@ -120,6 +120,31 @@ void test_style_replacement(void)
     lv_style_reset(&style_blue);
 }
 
+void test_style_replacement_with_wildcard_selector(void)
+{
+    lv_style_t style_red;
+    lv_style_t style_blue;
+
+    lv_style_init(&style_red);
+    lv_style_set_bg_color(&style_red, lv_color_hex(0xff0000));
+
+    lv_style_init(&style_blue);
+    lv_style_set_bg_color(&style_blue, lv_color_hex(0x0000ff));
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_add_style(obj, &style_red, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_add_state(obj, LV_STATE_PRESSED);
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
+
+    bool replaced = lv_obj_replace_style(obj, &style_red, &style_blue, LV_PART_ANY | LV_STATE_ANY);
+    TEST_ASSERT_TRUE(replaced);
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0x0000ff), lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
+
+    lv_obj_delete(obj);
+    lv_style_reset(&style_red);
+    lv_style_reset(&style_blue);
+}
+
 void test_style_copy(void)
 {
     lv_style_t style1;

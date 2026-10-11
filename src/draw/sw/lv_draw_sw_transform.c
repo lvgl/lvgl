@@ -18,10 +18,6 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
-    int32_t x_in;
-    int32_t y_in;
-    int32_t x_out;
-    int32_t y_out;
     int32_t sinma;
     int32_t cosma;
     int32_t scale_x;

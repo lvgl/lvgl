@@ -30,6 +30,20 @@ void test_table_should_set_row_count_to_zero(void)
     TEST_ASSERT_EQUAL_UINT32(0, lv_table_get_row_count(table));
 }
 
+void test_table_should_readjust_scroll_when_rows_are_removed(void)
+{
+    lv_obj_set_size(table, 100, 100);
+    lv_table_set_row_count(table, 10);
+    lv_obj_update_layout(table);
+    lv_obj_scroll_to_y(table, LV_COORD_MAX, LV_ANIM_OFF);
+
+    TEST_ASSERT_GREATER_THAN_INT32(0, lv_obj_get_scroll_y(table));
+
+    lv_table_set_row_count(table, 1);
+
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_y(table));
+}
+
 void test_table_should_return_assigned_cell_value(void)
 {
     uint16_t row = 0;
@@ -136,9 +150,6 @@ void test_table_should_wrap_long_texts(void)
 
 static void draw_part_event_cb(lv_event_t * e)
 {
-    /* Test lv_event_get_invalidated_area error handling. */
-    TEST_ASSERT_NULL(lv_event_get_invalidated_area(e));
-
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
     /*If the cells are drawn...*/

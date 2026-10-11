@@ -5,9 +5,9 @@ import os
 import shutil
 import sys
 
-# v10.0.0 -> fail if release/v10.0 is not there
+# v10.0.0 -> create release/v10.0 from the port's default branch and update it
 # v10.0.1 -> update release/v10.0
-# v10.1.0 -> create release/v10.1 from release/v10.0 and update it
+# v10.1.0 -> create release/v10.1 from the port's default branch and update it
 # v10.1.1 -> update release/v10.1
 
 LOG = "[release_branch_updater.py]"
@@ -48,6 +48,9 @@ def main():
         lvgl_release_branches = [br for br in lvgl_release_branches if br[0] >= oldest_major]
         print(LOG, 'LVGL release branches after "oldest-major" filter:',
               ", ".join(fmt_release(br) for br in lvgl_release_branches) or "(none)")
+
+    # only this one is created automatically in the ports. see below.
+    newest_lvgl_release = lvgl_release_branches[-1] if lvgl_release_branches else None
 
     with open(port_urls_path) as f:
         urls = f.read()
@@ -100,8 +103,10 @@ def main():
             port_submodule_was_updated = False
             port_lv_conf_h_was_updated = False
 
-            # if the branch does not exist in the port, create it from
-            # the closest minor of the same major.
+            # if the branch does not exist in the port, create it from the tip of the
+            # port's default branch. the port is kept up to date against LVGL's master,
+            # so by the time the release happens its default branch has already been
+            # adapted to the new version. the previous release branch has not.
             if port_branch in port_release_branches:
                 print(LOG, "... this port has a matching release branch.")
                 subprocess.run(("git", "-C", port_clone_tmpdir, "branch", "--track",
@@ -109,26 +114,24 @@ def main():
                                        f"origin/{fmt_release(port_branch)}"))
             elif port_branch != port_default_branch:
                 print(LOG, "... this port does not have this release branch minor ...")
-                port_does_not_have_the_branch = True
 
-                # get the port branch with this major and the next smallest minor
-                create_from = next((
-                    br
-                    for br in reversed(port_release_branches) # reverse it to get the newest (largest) minor
-                    if br[0] == port_branch[0]     # same major
-                       and br[1] < port_branch[1]  # smaller minor because exact minor does not exist
-                ), None)
-                if create_from is None:
-                    # there are no branches in the port that are this major
-                    # version. One must be created manually.
-                    print(LOG, "... this port has no major from which to create the minor. one must be created manually. continuing to next.")
+                if port_branch != newest_lvgl_release:
+                    print(LOG, "... this is not the newest LVGL release so it will not be created "
+                               "automatically. one must be created manually. continuing to next.")
                     continue
 
+                if port_default_branch is None:
+                    print(LOG, "... this port has no default branch to create it from. "
+                               "one must be created manually. continuing to next.")
+                    continue
+
+                port_does_not_have_the_branch = True
+
                 print(LOG, f"... creating the new branch {fmt_release(port_branch)} "
-                                             f"from {fmt_release(create_from)}")
+                                             f"from origin/{port_default_branch}")
                 res = subprocess.run(("git", "-C", port_clone_tmpdir, "branch",
-                                       fmt_release(port_branch),   # new branch name
-                                       fmt_release(create_from)))  # start point
+                                       fmt_release(port_branch),           # new branch name
+                                       f"origin/{port_default_branch}"))   # start point
 
                 if res.returncode != 0: continue
 
@@ -142,15 +145,17 @@ def main():
             # update the submodule in the port if it exists
             port_lvgl_submodule_path = None
             if os.path.exists(os.path.join(port_clone_tmpdir, ".gitmodules")): 
-                out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "config", "--file",
-                                               ".gitmodules", "--get-regexp", "path"))
+                res = subprocess.run(("git", "-C", port_clone_tmpdir, "config", "--file",
+                                      ".gitmodules", "--get-regexp", "path"),
+                                     stdout=subprocess.PIPE)
                 port_lvgl_submodule_path = next((
                     line.partition("lvgl.path ")[2]
                     for line
-                    in out.decode().strip().splitlines()
+                    in res.stdout.decode().strip().splitlines()
                     if "lvgl.path " in line
                 ), None)
 
+            if port_lvgl_submodule_path is not None:
                 # check if the submodule is really in the index and not just a leftover in .gitmodules
                 out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "submodule", "status"))
                 if not any(

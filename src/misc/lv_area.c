@@ -608,6 +608,50 @@ void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_precise_t * p2)
     *p2 = tmp;
 }
 
+lv_rotation_t lv_rotation_resolve(lv_rotation_t rotation, lv_rotation_dir_t direction)
+{
+    if(direction == LV_ROTATION_DIR_CW) {
+        return rotation;
+    }
+    if(rotation == LV_ROTATION_90) {
+        return LV_ROTATION_270;
+    }
+    if(rotation == LV_ROTATION_270) {
+        return LV_ROTATION_90;
+    }
+    return rotation;
+}
+
+lv_rotation_t lv_rotation_invert(lv_rotation_t rotation)
+{
+    return lv_rotation_resolve(rotation, LV_ROTATION_DIR_CCW);
+}
+
+void lv_point_rotate(lv_point_t * point, lv_rotation_t rotation, int32_t width, int32_t height)
+{
+    LV_CHECK_ARG(point != NULL, return);
+
+    const int32_t x = point->x;
+    const int32_t y = point->y;
+
+    switch(rotation) {
+        case LV_ROTATION_0:
+            break;
+        case LV_ROTATION_90:
+            point->x = y;
+            point->y = width - x - 1;
+            break;
+        case LV_ROTATION_180:
+            point->x = width - x - 1;
+            point->y = height - y - 1;
+            break;
+        case LV_ROTATION_270:
+            point->x = height - y - 1;
+            point->y = x;
+            break;
+    }
+}
+
 int32_t lv_pct(int32_t x)
 {
     return LV_PCT(x);

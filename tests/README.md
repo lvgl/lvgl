@@ -68,6 +68,8 @@ GitHub's CI automatically runs these tests on pushes and pull requests to `maste
 ## Directory structure
 - `src` Source files of the tests
     - `test_cases` The written tests,
+        - `public_api` Tests that call a public function with an argument it is
+          documented to reject, see below,
     - `test_cases_perf` The performance tests,
     - `test_runners` Generated automatically from the files in `test_cases`.
     - other miscellaneous files and folders
@@ -92,6 +94,22 @@ cmake -B build -DLV_BUILD_TESTS=ON -DLVGL_TEST_ENABLE=ON \
 ```
 
 Prefer `main.py` as it picks the right fragments for the host and architecture but this is useful when debugging the build itself.
+
+The test case folders are listed one by one in `CMakeLists.txt`, so that a folder can be tied to a configuration option:
+
+```cmake
+lvgl_add_test_folder(test_cases/widgets)
+lvgl_add_test_folder_if(NOT CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL test_cases/public_api)
+```
+
+See [`lvgl_test_helpers.cmake`](./lvgl_test_helpers.cmake).
+
+### Public API tests
+
+LVGL test run with `LV_CHECK_ARG_ASSERT_ON_FAIL` to ensure LVGL internals respect 
+its public API. The test cases that check that a public function behaves correctly when 
+invalid parameters are passed exist in `src/test_cases/public_api`. These tests are only 
+exercised when `LV_CHECK_ARG_ASSERT_ON_FAIL` is disabled.
 
 ## Add new tests
 

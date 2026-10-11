@@ -357,17 +357,14 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * decoder_
     /*Save the widget so that `LV_EVENT_DRAW_TASK_ADDED` can be sent to it in `lv_draw_vector`*/
     dsc->base.obj = image_dsc->base.obj;
 
+    LV_UNUSED(coords);
+
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
-    lv_matrix_translate(&matrix, coords->x1, coords->y1);
     dsc->ctx->scissor_area = *clip_area;
     if(image_dsc) {
-        int32_t off_x = (lv_area_get_width(coords) - (int32_t)image_dsc->header.w - 1) / 2;
-        int32_t off_y = (lv_area_get_height(coords) - (int32_t)image_dsc->header.h - 1) / 2;
-
-        if(image_dsc->pivot.x != 0 || image_dsc->pivot.y != 0) {
-            lv_matrix_translate(&matrix, off_x, off_y);
-        }
+        /*Start from the untransformed image area*/
+        lv_matrix_translate(&matrix, image_dsc->image_area.x1, image_dsc->image_area.y1);
         lv_matrix_translate(&matrix, image_dsc->pivot.x, image_dsc->pivot.y);
         lv_matrix_rotate(&matrix, image_dsc->rotation / 10.0f);
         lv_matrix_scale(&matrix, image_dsc->scale_x / 256.0f, image_dsc->scale_y / 256.0f);

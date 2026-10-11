@@ -218,6 +218,7 @@
     #include "api_map/lv_api_map_v9_3.h"
     #include "api_map/lv_api_map_v9_4.h"
     #include "api_map/lv_api_map_v9_5.h"
+    #include "api_map/lv_api_map_v9_6.h"
 #endif /*LV_DISABLE_API_MAPPING*/
 
 /**

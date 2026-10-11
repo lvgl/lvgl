@@ -178,7 +178,7 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
         return NULL;
     }
 
-    const lv_display_rotation_t rotation = lv_display_get_rotation(display);
+    const lv_rotation_t rotation = lv_display_get_rotation(display);
     lv_color_format_t cf = lv_display_get_color_format(display);
     int32_t shm_cf = lv_cf_to_shm_cf(cf);
 
@@ -191,7 +191,7 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
     /* safe cast as per check above*/
     ddata->shm_cf = (uint32_t)shm_cf;
 
-    const bool needs_rotation = rotation != LV_DISPLAY_ROTATION_0;
+    const bool needs_rotation = rotation != LV_ROTATION_0;
     const int32_t phy_width = lv_display_get_original_horizontal_resolution(display);
     const int32_t phy_height = lv_display_get_original_vertical_resolution(display);
     const uint32_t phy_stride = lv_draw_buf_width_to_stride(phy_width, cf);
@@ -404,7 +404,7 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         return;
     }
 
-    const lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    const lv_rotation_t rotation = lv_display_get_rotation(disp);
     const lv_color_format_t cf = lv_display_get_color_format(disp);
 
     /* When using ARGB8888, the compositor expects premultiplied ARGB8888 so premultiply it here*/
@@ -423,7 +423,7 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     }
 
     /* If we have rotation, copy from rotated_buf to Wayland buffer */
-    if(rotation != LV_DISPLAY_ROTATION_0) {
+    if(rotation != LV_ROTATION_0) {
         const int32_t hor_res = lv_display_get_horizontal_resolution(disp);
         const int32_t ver_res = lv_display_get_vertical_resolution(disp);
         const uint32_t src_stride = lv_draw_buf_width_to_stride(hor_res, cf);

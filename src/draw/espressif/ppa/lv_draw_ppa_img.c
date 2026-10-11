@@ -152,12 +152,11 @@ static inline uint32_t lv_draw_ppa_align_size(uint32_t size)
  * Byte span of a draw buffer to hand to the PPA and to cache maintenance.
  *
  * The peripheral wants a cache-line-aligned size, but rounding up must never run
- * past the allocation. This unit does not own it: lv_draw_buf_ppa_init_handlers()
- * only replaces invalidate_cache_cb, so a display buffer handed in through
- * lv_display_set_buffers() is exactly as large as the caller declared and need
- * not be a whole number of cache lines. Take the aligned pixel span, then cap it
- * at what was actually allocated - which is what lv_draw_ppa_buf.c already does
- * when it syncs draw_buf->data_size unrounded.
+ * past the allocation. This unit does not own the buffer: a display buffer handed
+ * in through lv_display_set_buffers() is exactly as large as the caller declared
+ * and need not be a whole number of cache lines. Take the aligned pixel span, then
+ * cap it at what was actually allocated - the same bound lv_draw_ppa_buf.c applies
+ * when it clamps a row range to draw_buf->data_size.
  */
 static inline uint32_t lv_draw_ppa_buf_span(const lv_draw_buf_t * buf)
 {
@@ -228,6 +227,12 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
          * header before decoding, so the real check belongs here. */
         LV_LOG_INFO("PPA SRM: stride is not a whole number of pixels, drawing in software");
         lv_image_decoder_close(&decoder_dsc);
+        /* The software unit writes through the CPU cache, so ppa_execute_drawing()
+         * must not invalidate those lines afterwards. The flag is what tells it to
+         * skip that, and it also keeps the fallback firing once per task when a
+         * partial decoder calls the core back per chunk. */
+        if(u->img_sw_fallback) return;
+        u->img_sw_fallback = true;
 #if LV_USE_DRAW_SW
         lv_draw_sw_image(t, dsc, &t->area);
 #else
@@ -301,15 +306,17 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
      * Fill it by duplicating the last rendered column/row.
      * Must invalidate CPU cache first: PPA wrote via DMA, CPU cache is stale. */
     if(ret == ESP_OK && (blk.gap_right || blk.gap_bottom)) {
-        /* No ESP_CACHE_MSYNC_FLAG_UNALIGNED here: esp_cache_msync() rejects it
-         * for M2C with ESP_ERR_INVALID_ARG, so passing it made the invalidate a
-         * no-op and the gap fill below then read a stale cache. The address is
-         * aligned by the draw buffer contract and lv_draw_ppa_buf_span() keeps
-         * the size a whole number of cache lines. */
-        esp_err_t inv = esp_cache_msync(dest_buf->data, aligned_size, ESP_CACHE_MSYNC_FLAG_DIR_M2C);
-        if(inv != ESP_OK) {
-            LV_LOG_WARN("PPA SRM: cache invalidate failed: %d", (int)inv);
-        }
+        /* Only the rows this fill touches. Syncing the whole buffer here used to
+         * be safe because the unit flushed all of it before every draw, but the
+         * flush is row-scoped now, so a whole-buffer invalidate would discard
+         * CPU-dirty lines another unit wrote elsewhere in the same layer. Going
+         * through the handlers also keeps the cache-line rounding in one place. */
+        lv_area_t gap_rows;
+        gap_rows.x1 = blk.dest_area.x1;
+        gap_rows.x2 = blk.dest_area.x1 + blk.clip_w - 1;
+        gap_rows.y1 = blk.dest_area.y1;
+        gap_rows.y2 = blk.dest_area.y1 + blk.clip_h - 1;
+        lv_draw_buf_invalidate_cache(dest_buf, &gap_rows);
 
         uint8_t * base = dest_buf->data;
         uint32_t stride = (uint32_t)dest_pitch * out_bpp;
@@ -331,8 +338,9 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                       (uint32_t)blk.clip_w * out_bpp);
         }
 
-        esp_cache_msync(dest_buf->data, aligned_size,
-                        ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_UNALIGNED);
+        /* Write the duplicated pixels back before ppa_execute_drawing()'s trailing
+         * invalidate runs over the same rows, otherwise it would discard them. */
+        lv_draw_buf_flush_cache(dest_buf, &gap_rows);
     }
 
     lv_image_decoder_close(&decoder_dsc);
@@ -424,6 +432,12 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
          * header before decoding, so the real check belongs here. */
         LV_LOG_INFO("PPA SRM: stride is not a whole number of pixels, drawing in software");
         lv_image_decoder_close(&decoder_dsc);
+        /* The software unit writes through the CPU cache, so ppa_execute_drawing()
+         * must not invalidate those lines afterwards. The flag is what tells it to
+         * skip that, and it also keeps the fallback firing once per task when a
+         * partial decoder calls the core back per chunk. */
+        if(u->img_sw_fallback) return;
+        u->img_sw_fallback = true;
 #if LV_USE_DRAW_SW
         lv_draw_sw_image(t, dsc, &t->area);
 #else

@@ -2,6 +2,7 @@
 
 import sys
 import os
+import re
 
 try:
     from pycparser import c_ast  # NOQA
@@ -385,16 +386,10 @@ class Enum(c_ast.Enum):
                 try:
                     value = eval("bytearray([b'" + code + "'])[0]")
                 except:  # NOQA
-                    index = code.find('L')
-
-                    while index >= 1:
-                        if code[index - 1].isdigit():
-                            code = list(code)
-                            code.pop(index)
-                            code = ''.join(code)
-
-                        index = code.find('L', index + 1)
-
+                    code = re.sub(
+                        r'(?<!\w)(0[xX][0-9a-fA-F]+|0[bB][01]+|[0-9]+)[uUlL]+',
+                        r'\1', code
+                    )
                     value = eval(code, member_namespace)
 
                 member_namespace[item_dict['name']] = value

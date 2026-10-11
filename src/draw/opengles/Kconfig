@@ -3,6 +3,7 @@ config LV_USE_DRAW_OPENGLES
 	default n
 	select LV_USE_OPENGLES
 	select LV_DRAW_HAS_3D_SUPPORT
+	select LV_DRAW_DISABLE_TILED_RENDERING
 	help
 		Draw with OpenGL ES, keeping rendered widgets and images as GPU textures.
 

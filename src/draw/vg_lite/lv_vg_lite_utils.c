@@ -1290,9 +1290,75 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 {
     lv_point_precise_t p;
     const vg_lite_float_t (*m)[3] = matrix->m;
-    p.x = (lv_value_precise_t)roundf(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
-    p.y = (lv_value_precise_t)roundf(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
+    float x = (float)point->x * m[0][0] + (float)point->y * m[0][1] + m[0][2];
+    float y = (float)point->x * m[1][0] + (float)point->y * m[1][1] + m[1][2];
+
+    /* perspective division, the matrix is not affine */
+    if(lv_vg_lite_matrix_has_perspective(matrix)) {
+        float w = (float)point->x * m[2][0] + (float)point->y * m[2][1] + m[2][2];
+        if(w != 0.0f) {
+            x /= w;
+            y /= w;
+        }
+    }
+
+    p.x = (lv_value_precise_t)roundf(x);
+    p.y = (lv_value_precise_t)roundf(y);
     return p;
+}
+
+bool lv_vg_lite_matrix_transform_area(lv_area_t * dest, const vg_lite_matrix_t * matrix, const lv_area_t * src)
+{
+    LV_ASSERT_NULL(dest);
+    LV_ASSERT_NULL(matrix);
+    LV_ASSERT_NULL(src);
+
+    const float corner_x[4] = {
+        (float)src->x1, (float)(src->x2 + 1), (float)(src->x2 + 1), (float)src->x1
+    };
+    const float corner_y[4] = {
+        (float)src->y1, (float)src->y1, (float)(src->y2 + 1), (float)(src->y2 + 1)
+    };
+
+    const vg_lite_float_t (*m)[3] = matrix->m;
+    const bool has_perspective = lv_vg_lite_matrix_has_perspective(matrix);
+
+    float min_x = 0, min_y = 0, max_x = 0, max_y = 0;
+
+    for(int i = 0; i < 4; i++) {
+        float x = corner_x[i] * m[0][0] + corner_y[i] * m[0][1] + m[0][2];
+        float y = corner_x[i] * m[1][0] + corner_y[i] * m[1][1] + m[1][2];
+
+        if(has_perspective) {
+            float w = corner_x[i] * m[2][0] + corner_y[i] * m[2][1] + m[2][2];
+
+            /* The corner is on or behind the vanishing line, the bounding box is not computable */
+            if(w <= 0.0f) {
+                return false;
+            }
+
+            x /= w;
+            y /= w;
+        }
+
+        if(i == 0) {
+            min_x = max_x = x;
+            min_y = max_y = y;
+            continue;
+        }
+
+        min_x = LV_MIN(min_x, x);
+        min_y = LV_MIN(min_y, y);
+        max_x = LV_MAX(max_x, x);
+        max_y = LV_MAX(max_y, y);
+    }
+
+    dest->x1 = (int32_t)floorf(min_x);
+    dest->y1 = (int32_t)floorf(min_y);
+    dest->x2 = (int32_t)ceilf(max_x) - 1;
+    dest->y2 = (int32_t)ceilf(max_y) - 1;
+
+    return true;
 }
 
 void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area)

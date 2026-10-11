@@ -52,7 +52,7 @@ typedef struct {
  */
 int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_trigo_sin(int16_t angle);
 
-int32_t LV_ATTRIBUTE_FAST_MEM lv_trigo_cos(int16_t angle);
+int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_trigo_cos(int16_t angle);
 
 /**
  * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.

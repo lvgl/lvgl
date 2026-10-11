@@ -169,7 +169,7 @@ void setup()
     /*  Create NV3007 display */
     lv_display_t *disp = lv_nv3007_create(142, 428, LV_LCD_FLAG_NONE, my_lcd_send_cmd, my_lcd_send_color);
     lv_nv3007_set_gap(disp, 0, 14);
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
+    lv_display_set_rotation(disp, LV_ROTATION_270);
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
     lv_display_set_buffers(disp, buf, NULL, BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
 

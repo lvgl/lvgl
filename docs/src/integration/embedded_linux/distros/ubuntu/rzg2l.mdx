@@ -1,0 +1,202 @@
+---
+title: Renesas RZ/G2L
+description: Run GPU-accelerated LVGL on a Renesas RZ/G2L board with Ubuntu, installing LVGL and the Mali driver with apt and building on the device instead of cross-compiling.
+faqs:
+  - question: "Do I need the Ubuntu Desktop image?"
+    answer: "No, use Ubuntu Server. The RZ/G2L SMARC EVK has 2 GB of RAM, which is tight for a GNOME desktop, and LVGL does not need one. The DRM driver drives the display directly through /dev/dri/card0 and renders on the GPU through EGL, with no compositor or X server involved."
+  - question: "Which Ubuntu release do the PPAs support?"
+    answer: "Both the LVGL PPA and the Renesas PPA publish for Ubuntu 24.04 LTS (noble) only, for arm64 and amd64. On any other release apt will not find the packages."
+  - question: "Why is the Mali driver mandatory?"
+    answer: "The liblvgl-drm-3d-dev build has the software renderer disabled (LV_USE_DRAW_SW is 0) and draws everything with the NanoVG draw unit on OpenGL ES. Without the Mali userspace driver there is no GL implementation to render with, so nothing appears, not even 2D widgets."
+  - question: "Do I need a cross-compilation toolchain?"
+    answer: "No. LVGL is installed as a prebuilt arm64 package, so LVGL itself is never compiled. Only lv_port_linux and the demo are built, which takes about 17 seconds on the board."
+  - question: "Why does the demo show a 'Demos not enabled' label?"
+    answer: "The PPA packages are built with LV_BUILD_DEMOS disabled, so LVGL's built-in demos (widgets, benchmark) are not in the package. The 3D truck demo lives in lv_port_linux itself, which is why it is enabled with -DCONFIG_LV_USE_DEMO_TRUCK=ON. Anything else you want to show goes in src/main.c."
+  - question: "Why does the truck demo fail to load its model?"
+    answer: "The demo loads its glTF assets from the relative path 3d, so run the binary from the lv_port_linux checkout root, or point LV_LINUX_3D_PATH at the directory."
+---
+
+## Overview
+
+The [RZ/G2L](https://www.renesas.com/en/design-resources/boards-kits/rz-g2l-evkit) is a dual-core
+Cortex-A55 MPU with an Arm Mali-G31 GPU. Canonical publishes Ubuntu images for it, which means LVGL can be
+installed with `apt` from the [LVGL PPA](/integration/embedded_linux/distros/ubuntu) instead of being
+cross-compiled, and the GPU can be used through the [DRM](/integration/embedded_linux/drivers/drm) driver's
+EGL backend with no compositor in the way.
+
+This guide goes from a booted board to LVGL's 3D truck demo running on the GPU, then to your own
+application. It requires two `apt` repositories:
+
+| PPA | Provides |
+| --- | --- |
+| `ppa:lvgl/lvgl` | Prebuilt LVGL, headers, `lvgl.pc` and CMake config |
+| `ppa:ubuntu-on-renesas/public-ppa` | `libmali-renesas-rz-g2l-g2lc`, the Mali EGL/GLES userspace driver |
+
+<Callout type="info">
+The steps were run on an **RZ/G2L SMARC Evaluation Board Kit** with a 1024x768 display. The `libmali`
+package covers both the RZ/G2L and the RZ/G2LC, and nothing in this guide is specific to the SMARC carrier
+board, so a different RZ/G2L board running the same Ubuntu image works the same way.
+</Callout>
+
+## Prerequisites
+
+### Ubuntu on the board
+
+Canonical publishes the images and the flashing instructions:
+
+- Images: [Ubuntu for Renesas IoT boards](https://ubuntu.com/download/renesas-iot)
+- Instructions: [Quick start guide to RZ/G2L with classic Ubuntu images](https://people.canonical.com/~platform/images/renesas-iot/Documentation/Quick%20start%20guide%20to%20RZ_G2L%20with%20classic%20Ubuntu%20images_x04.pdf) (PDF)
+
+<Callout type="warning" title="Use the server image, not the desktop one">
+Pick **Ubuntu Server 24.04 LTS (noble) arm64**. The board has 2 GB of RAM, which a GNOME desktop will spend
+on itself, and LVGL doesn't require it: the DRM driver owns the display directly and renders on the GPU
+through EGL. Wayland is not required.
+</Callout>
+
+### Build tooling
+
+Everything from here runs on the board, over SSH or on the serial console:
+
+```bash
+sudo apt update
+sudo apt install software-properties-common build-essential cmake git
+```
+
+`software-properties-common` provides `add-apt-repository` and `build-essential` provides the compiler.
+
+
+## Installing LVGL and the Mali Driver
+
+<Steps>
+
+<Step>
+**Add both PPAs:**
+
+```bash
+sudo add-apt-repository ppa:ubuntu-on-renesas/public-ppa
+sudo add-apt-repository ppa:lvgl/lvgl
+sudo apt update
+```
+</Step>
+
+<Step>
+**Install the driver and LVGL:**
+
+```bash
+sudo apt install libmali-renesas-rz-g2l-g2lc liblvgl-drm-3d-dev
+```
+</Step>
+
+</Steps>
+
+For this guide we recommend using `liblvgl-drm-3d-dev` a package with DRM and 3D support:
+
+| Setting | Value | Description |
+| --- | --- | --- |
+| <ApiLink name="LV_USE_LINUX_DRM" /> | Enabled | Renders straight to `/dev/dri/card0`, no compositor |
+| `LV_LINUX_DRM_BACKEND` | `LV_LINUX_DRM_BACKEND_EGL` | Rendering happens on the Mali GPU |
+| <ApiLink name="LV_USE_DRAW_NANOVG" /> | Enabled | GPU draw unit, and the only one in this build |
+| <ApiLink name="LV_USE_GLTF" /> | Enabled | Required for glTF and the 3D truck demo |
+| <ApiLink name="LV_USE_EVDEV" /> | Enabled | Touch, mouse and keyboard input |
+| <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> | `LV_COLOR_FORMAT_XRGB8888` | Matches the DRM EGL backend |
+
+The 2D-only `liblvgl-drm-dev` package works on this board too, but it has no glTF support, so the truck demo
+below needs the `-3d-` one. See the [package table](/integration/embedded_linux/distros/ubuntu) for the full
+list.
+
+## Running the 3D Truck Demo
+
+[`lv_port_linux`](https://github.com/lvgl/lv_port_linux) is LVGL's reference Linux project. Built with
+`LVGL_USE_INSTALLED=ON` it links against the LVGL that `apt` installed and compiles nothing but its own glue
+code and the demo.
+
+<Steps>
+
+<Step>
+**Clone the port:**
+
+```bash
+git clone https://github.com/lvgl/lv_port_linux.git
+cd lv_port_linux
+```
+
+No `--recurse-submodules`: the `lvgl` submodule is only needed when building LVGL from source.
+</Step>
+
+<Step>
+**Configure and build:**
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DLVGL_USE_INSTALLED=ON -DCONFIG_LV_USE_DEMO_TRUCK=ON
+cmake --build build -j$(nproc)
+```
+
+`LVGL_USE_INSTALLED=ON` makes the project use the installed LVGL through `find_package(lvgl)` and skips
+Kconfig entirely, so `.config` and the defconfigs are ignored and the feature set comes from the installed
+`lv_conf.h`. Because the `CONFIG_LV_*` symbols are not available in this mode, the demo is selected on the
+command line with `-DCONFIG_LV_USE_DEMO_TRUCK=ON`.
+
+This takes about 17 seconds on the board.
+</Step>
+
+<Step>
+**Run it from the checkout root:**
+
+```bash
+./build/bin/lvglsim
+```
+</Step>
+
+</Steps>
+
+<Callout type="info" title="The PPA packages contain no demos">
+The published packages are built with `LV_BUILD_DEMOS` disabled, so `lv_demo_widgets()` and
+`lv_demo_benchmark()` are not available. The truck demo is part of `lv_port_linux`, not of LVGL, which is
+why it still works. Without `-DCONFIG_LV_USE_DEMO_TRUCK=ON` the simulator starts with a "Demos not enabled"
+label, and `src/main.c` is where your own UI goes.
+</Callout>
+
+Useful flags: `-B` lists the display backends compiled into the binary (only DRM, for this package), `-b`
+picks one when several are available, `-R` rotates the display, and `-h` prints the rest.
+
+## Permissions
+
+Rendering and input come from two different device classes, each with its own group:
+
+| Device | Group | Needed for |
+| --- | --- | --- |
+| `/dev/dri/card0` | `video` | Opening the DRM device |
+| `/dev/input/event*` | `input` | Touch, mouse and keyboard through evdev |
+
+The default `ubuntu` user on the Renesas image is already in `video` so you don't need `sudo` to run it.
+
+In order to have input support you need to add the user to the input group.
+
+```bash
+sudo usermod -aG input ubuntu
+```
+
+Log out and back in, or run `newgrp input` in the current shell, for the new group to take effect. Check
+what you have with `id`.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| `apt` cannot find the packages | The PPAs only publish for 24.04 (noble) | Flash a 24.04 image |
+| Blank screen or very low fps | The Mali driver is missing, so there is no GL implementation | `sudo apt install libmali-renesas-rz-g2l-g2lc` |
+| Failure opening the DRM device | The user is not in `video`, or a desktop session owns the display | Add the user to `video`; on a desktop image stop the compositor |
+| Touch or mouse does nothing | The user is not in `input` | `sudo usermod -aG input ubuntu`, then log in again |
+| "Demos not enabled" label | Expected, the packages carry no demos | Pass `-DCONFIG_LV_USE_DEMO_TRUCK=ON`, or write your UI in `src/main.c` |
+| The truck demo cannot load its model | Assets are looked up at `./3d` | Run from the `lv_port_linux` root or set `LV_LINUX_3D_PATH` |
+| `undefined reference to lv_demo_truck` at link time | A 2D package is installed, so the demo compiled to nothing behind its `LV_USE_GLTF` guard | Install `liblvgl-drm-3d-dev` |
+
+## See Also
+
+- [Ubuntu](/integration/embedded_linux/distros/ubuntu) — the PPA, and the full list of published packages
+- [DRM](/integration/embedded_linux/drivers/drm) — backends, mode selection and support matrix
+- [evdev](/integration/embedded_linux/drivers/evdev) — finding and calibrating input devices
+- [NanoVG](/integration/embedded_linux/draw_units/draw_nanovg) — the GPU draw unit these packages use
+- [glTF](/libs/gltf) — loading 3D models
+- [RZ/G Family](/integration/chip_vendors/renesas/rzg_family) — the vendor-SDK projects for the RZ/G boards
+- Found a problem with a package, or want another configuration published? Open an issue at [github.com/lvgl/lvgl/issues](https://github.com/lvgl/lvgl/issues).

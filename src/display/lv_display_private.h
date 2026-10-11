@@ -165,7 +165,7 @@ struct _lv_display_t {
 
     lv_event_list_t event_list;
 
-    uint32_t rotation  : 3; /**< Element of  lv_display_rotation_t*/
+    uint32_t rotation  : 3; /**< Element of  lv_rotation_t*/
 
     uint32_t matrix_rotation : 1; /**< 1: Use matrix for display rotation*/
 

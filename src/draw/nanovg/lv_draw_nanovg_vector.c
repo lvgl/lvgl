@@ -59,6 +59,7 @@ void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc)
 
     lv_layer_t * layer = dsc->base.layer;
     if(layer->draw_buf == NULL) {
+        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -186,12 +187,12 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     }
 
     nvgSave(u->vg);
+    /*Set the scissor before the transform, nvgScissor() is transformed by the current matrix*/
+    lv_nanovg_set_clip_area(u->vg, &dsc->scissor_area);
     lv_nanovg_transform(u->vg, &dsc->matrix);
 
     lv_fpoint_t offset = {0, 0};
     lv_path_to_nvg(u->vg, path, &offset);
-
-    lv_nanovg_set_clip_area(u->vg, &dsc->scissor_area);
 
     const enum NVGcompositeOperation comp_op = lv_blend_to_nvg(dsc->blend_mode);
     nvgGlobalCompositeOperation(u->vg, comp_op);

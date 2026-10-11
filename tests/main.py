@@ -87,6 +87,17 @@ test_options = {
             "run_tests",
         ],
     },
+    "OPTIONS_TEST_PUBLIC_API": {
+        "description": "Public API argument checks, system heap, 32 bit color depth",
+        "defconfigs": [
+            "full",
+            "depth_32",
+            HOST,
+            "sys_heap",
+            "run_tests",
+            "public_api",
+        ],
+    },
     "OPTIONS_TEST_VG_LITE": {
         "description": "VG-Lite simulator with full config, 32 bit color depth",
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "vg_lite"],
@@ -252,33 +263,30 @@ def build_tests(options_name, build_type, clean):
 
     os.chdir(lvgl_test_dir)
 
-    if not os.path.isdir(build_dir):
-        os.mkdir(build_dir)
-        # The tests are built as part of the LVGL project, which pulls in
-        # tests/CMakeLists.txt when LV_BUILD_TESTS is set.
-        cmake_args = [
-            "cmake",
-            "-GNinja",
-            "-S",
-            lvgl_dir,
-            "-B",
-            build_dir,
-            "-DCMAKE_BUILD_TYPE=%s" % build_type,
-            "-DLV_BUILD_TESTS=ON",
-            "-DLV_BUILD_DEFCONFIG_PATH=%s"
-            % ";".join(get_defconfig_paths(options_name)),
-            "-DLVGL_TEST_ENABLE=%s" % ("ON" if options_name in test_options else "OFF"),
+    # The tests are built as part of the LVGL project, which pulls in
+    # tests/CMakeLists.txt when LV_BUILD_TESTS is set.
+    cmake_args = [
+        "cmake",
+        "-GNinja",
+        "-S",
+        lvgl_dir,
+        "-B",
+        build_dir,
+        "-DCMAKE_BUILD_TYPE=%s" % build_type,
+        "-DLV_BUILD_TESTS=ON",
+        "-DLV_BUILD_DEFCONFIG_PATH=%s" % ";".join(get_defconfig_paths(options_name)),
+        "-DLVGL_TEST_ENABLE=%s" % ("ON" if options_name in test_options else "OFF"),
+    ]
+    cmake_args += target_cmake_args()
+    # Use ccache as a compiler launcher when available. This dramatically
+    # speeds up rebuilds across the build matrix and repeated invocations
+    # (notably under emulation), and is a no-op when ccache is absent.
+    if shutil.which("ccache"):
+        cmake_args += [
+            "-DCMAKE_C_COMPILER_LAUNCHER=ccache",
+            "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",
         ]
-        cmake_args += target_cmake_args()
-        # Use ccache as a compiler launcher when available. This dramatically
-        # speeds up rebuilds across the build matrix and repeated invocations
-        # (notably under emulation), and is a no-op when ccache is absent.
-        if shutil.which("ccache"):
-            cmake_args += [
-                "-DCMAKE_C_COMPILER_LAUNCHER=ccache",
-                "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",
-            ]
-        subprocess.check_call(cmake_args)
+    subprocess.check_call(cmake_args)
     subprocess.check_call(["cmake", "--build", build_dir])
 
 

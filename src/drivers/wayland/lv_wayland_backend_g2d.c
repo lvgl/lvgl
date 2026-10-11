@@ -23,12 +23,16 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <errno.h>
+#include <poll.h>
 
 /*********************
  *      DEFINES
  *********************/
 
 #define LV_WL_G2D_BUF_COUNT 2
+
+#define LV_WL_G2D_RELEASE_TIMEOUT_MS 500
+#define LV_WL_G2D_RELEASE_POLL_MS 20
 
 /**********************
  *      TYPEDEFS
@@ -50,8 +54,7 @@ typedef struct {
      * and rotate it to one off the two main buffers*/
     lv_wl_buffer_t rotate_buffer;
     uint32_t drm_cf;
-    uint8_t last_used;
-    bool flushing;
+    uint8_t next_buf_idx;
 } lv_wl_g2d_display_data_t;
 
 typedef struct {
@@ -113,7 +116,7 @@ static void init_buffer(lv_wl_g2d_ctx_t * ctx, lv_wl_buffer_t * buffer, uint32_t
 static void delete_buffer(lv_wl_buffer_t * buffer);
 static void flush_wait_cb(lv_display_t * disp);
 
-static lv_wl_buffer_t * get_next_buffer(lv_wl_g2d_display_data_t * ddata);
+static bool wait_for_buffer_release(lv_wl_buffer_t * buffer);
 
 /**********************
  *  STATIC VARIABLES
@@ -202,10 +205,10 @@ static void wl_g2d_global_handler(void * backend_ctx, struct wl_registry * regis
                                   const char * interface, uint32_t version)
 {
 
-    LV_UNUSED(version);
     lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_ctx;
 
     if(lv_streq(interface, zwp_linux_dmabuf_v1_interface.name)) {
+        version = LV_MIN(version, (uint32_t)zwp_linux_dmabuf_v1_interface.version);
         ctx->handler = wl_registry_bind(registry, name, &zwp_linux_dmabuf_v1_interface, version);
 
         if(version >= 4) {
@@ -264,8 +267,12 @@ static void delete_buffer(lv_wl_buffer_t * buffer)
 static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * ctx, lv_display_t * display,
                                                              int32_t width, int32_t height)
 {
-    if(!ctx->handler)
-        lv_wl_g2d_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
+    LV_ASSERT(ctx != NULL);
+    if(!ctx->handler) {
+        LV_LOG_WARN("dmabuf registry not bound. Can't initialize a display with the g2d backend");
+        return NULL;
+    }
+    lv_wl_g2d_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
     LV_ASSERT_MALLOC(ddata);
     if(!ddata) {
         return NULL;
@@ -283,11 +290,11 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         init_buffer(ctx, &ddata->buffers[i], width, height, cf);
     }
 
-    lv_display_rotation_t rotation = lv_display_get_rotation(display);
-    if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
+    lv_rotation_t rotation = lv_display_get_rotation(display);
+    if(rotation == LV_ROTATION_90 || rotation == LV_ROTATION_270) {
         init_buffer(ctx, &ddata->rotate_buffer, height, width, cf);
     }
-    else if(rotation == LV_DISPLAY_ROTATION_180) {
+    else if(rotation == LV_ROTATION_180) {
         init_buffer(ctx, &ddata->rotate_buffer, width, height, cf);
     }
 
@@ -301,7 +308,7 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         }
     }
 
-    if(rotation == LV_DISPLAY_ROTATION_0) {
+    if(rotation == LV_ROTATION_0) {
         lv_display_set_draw_buffers(display, ddata->buffers[0].lv_draw_buf, ddata->buffers[1].lv_draw_buf);
         return ddata;
     }
@@ -579,15 +586,32 @@ static void dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dm
     }
 }
 
-static lv_wl_buffer_t * get_next_buffer(lv_wl_g2d_display_data_t * ddata)
+static bool wait_for_buffer_release(lv_wl_buffer_t * buffer)
 {
-    lv_wl_buffer_t * ret =  &ddata->buffers[ddata->last_used];
-    if(ret->busy) {
-        /* In theory this should never happen, log a warning in case it does */
-        LV_LOG_WARN("Failed to acquire a non-busy buffer");
+    struct pollfd pfd = { .fd = wl_display_get_fd(lv_wl_ctx.wl_display), .events = POLLIN };
+    const uint32_t start = lv_tick_get();
+
+    while(buffer->busy) {
+        if(lv_tick_elaps(start) >= LV_WL_G2D_RELEASE_TIMEOUT_MS) {
+            return false;
+        }
+
+        wl_display_flush(lv_wl_ctx.wl_display);
+        if(wl_display_prepare_read(lv_wl_ctx.wl_display) == 0) {
+            int ret = poll(&pfd, 1, LV_WL_G2D_RELEASE_POLL_MS);
+            if(ret > 0 && (pfd.revents & POLLIN)) {
+                wl_display_read_events(lv_wl_ctx.wl_display);
+            }
+            else {
+                wl_display_cancel_read(lv_wl_ctx.wl_display);
+            }
+        }
+        if(wl_display_dispatch_pending(lv_wl_ctx.wl_display) == -1) {
+            return false;
+        }
     }
-    ddata->last_used = (ddata->last_used + 1) % (LV_WL_G2D_BUF_COUNT);
-    return ret;
+
+    return true;
 }
 
 static void flush_wait_cb(lv_display_t * disp)
@@ -604,7 +628,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     lv_wl_g2d_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
     int32_t src_width = lv_area_get_width(area);
     int32_t src_height = lv_area_get_height(area);
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    lv_rotation_t rotation = lv_display_get_rotation(disp);
 
     struct wl_surface * surface = lv_wayland_get_window_surface(disp);
     /* Mark surface damage */
@@ -615,17 +639,15 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
         return;
     }
 
-    lv_wl_buffer_t * buf = get_next_buffer(ddata);
-
-    if(!buf) {
-        LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
-        return;
+    lv_wl_buffer_t * buf = &ddata->buffers[ddata->next_buf_idx];
+    if(buf->busy) {
+        LV_LOG_WARN("Rendered into a buffer the compositor still owns");
     }
 
     lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
 
     /*Rerender the whole surface if we're using rotation*/
-    if(rotation != LV_DISPLAY_ROTATION_0) {
+    if(rotation != LV_ROTATION_0) {
         wl_surface_damage(surface, 0, 0,
                           lv_display_get_original_horizontal_resolution(disp),
                           lv_display_get_original_vertical_resolution(disp));
@@ -647,7 +669,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     wl_surface_commit(surface);
 
     buf->busy = true;
-    return;
+
+    ddata->next_buf_idx = (ddata->next_buf_idx + 1) % LV_WL_G2D_BUF_COUNT;
+    if(!wait_for_buffer_release(&ddata->buffers[ddata->next_buf_idx])) {
+        LV_LOG_WARN("Timed out waiting for the compositor to release a buffer");
+    }
 }
 
 #endif /*LV_USE_WAYLAND_G2D*/

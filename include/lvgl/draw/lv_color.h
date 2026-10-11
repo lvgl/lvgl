@@ -358,7 +358,7 @@ uint32_t lv_color_to_u32(lv_color_t color);
  *                  mix == 255: c1
  *                  mix == 128: 0.5 x c1 + 0.5 x c2
  */
-uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_16_16_mix(uint16_t c1, uint16_t c2, uint8_t mix);
+uint16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color_16_16_mix(uint16_t c1, uint16_t c2, uint8_t mix);
 
 /**
  * Mix white to a color

@@ -12,7 +12,6 @@
 #include "lv_draw_g2d.h"
 
 #if LV_USE_DRAW_G2D
-#include "../../../misc/lv_area_private.h"
 #include <g2d.h>
 #include "lv_g2d_buf_map.h"
 #include "lv_g2d_utils.h"
@@ -149,6 +148,7 @@ static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
     return is_cf_supported;
 }
 
+#if 0
 static inline bool _g2d_src_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
@@ -184,6 +184,7 @@ static bool _g2d_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 
     return true;
 }
+#endif
 
 static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
