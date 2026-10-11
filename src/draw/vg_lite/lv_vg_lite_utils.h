@@ -172,24 +172,78 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
 
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point);
 
+/**
+ * Transform an area with a matrix and return the bounding box of the result.
+ * Perspective matrices are supported.
+ * @param dest   pointer to the transformed (bounding) area
+ * @param matrix pointer to the matrix
+ * @param src    pointer to the area to transform
+ * @return true: the transformed area is valid; false: the area can not be transformed
+ *         (a corner is on or behind the vanishing line)
+ */
+bool lv_vg_lite_matrix_transform_area(lv_area_t * dest, const vg_lite_matrix_t * matrix, const lv_area_t * src);
+
+/**
+ * Check if the fractional part of a float is near 0.5 (pixel boundary).
+ *
+ * The threshold 0.1 means: frac in [0.4, 0.6] is considered "near half".
+ * Values like 0.25 and 0.75 (frac distance to 0.5 = 0.25) are safe.
+ */
+static inline bool lv_vg_lite_float_frac_near_half(float v)
+{
+    float frac = v - (float)(int32_t)v;
+    if(frac < 0.0f) frac += 1.0f;
+    return (frac > 0.4f) && (frac < 0.6f);
+}
+
 static inline bool lv_vg_lite_matrix_has_transform(const vg_lite_matrix_t * matrix)
 {
     /**
-     * When the rotation angle is 0 or 180 degrees,
+     * When the rotation angle is 0 or 180 degrees and
+     * the translation does not land on a pixel boundary (x.5),
      * it is considered that there is no transformation.
      */
-    return !((matrix->m[0][0] == 1.0f || matrix->m[0][0] == -1.0f) &&
-             matrix->m[0][1] == 0.0f &&
-             matrix->m[1][0] == 0.0f &&
-             (matrix->m[1][1] == 1.0f || matrix->m[1][1] == -1.0f) &&
-             matrix->m[2][0] == 0.0f &&
-             matrix->m[2][1] == 0.0f &&
-             matrix->m[2][2] == 1.0f);
+    if(!((matrix->m[0][0] == 1.0f || matrix->m[0][0] == -1.0f) &&
+         matrix->m[0][1] == 0.0f &&
+         matrix->m[1][0] == 0.0f &&
+         (matrix->m[1][1] == 1.0f || matrix->m[1][1] == -1.0f) &&
+         matrix->m[2][0] == 0.0f &&
+         matrix->m[2][1] == 0.0f &&
+         matrix->m[2][2] == 1.0f)) {
+        return true;
+    }
+
+    /**
+     * When using VG_LITE_FILTER_POINT, the GPU samples at pixel centers.
+     * The initial sample coordinate c_step = 0.5 * step + translate.
+     * If the fractional part of translate is exactly 0.5, the sample
+     * lands on a pixel boundary where hardware rounding is ambiguous.
+     * Use a threshold around 0.5 to catch this case and force bilinear
+     * filtering for correct results.
+     */
+    if(lv_vg_lite_float_frac_near_half(matrix->m[0][2]) ||
+       lv_vg_lite_float_frac_near_half(matrix->m[1][2])) {
+        return true;
+    }
+
+    return false;
 }
 
 static inline vg_lite_filter_t lv_vg_lite_matrix_get_filter(const vg_lite_matrix_t * matrix)
 {
     return lv_vg_lite_matrix_has_transform(matrix) ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+}
+
+/**
+ * Check if the matrix has a perspective (non-affine) part.
+ * @param matrix pointer to the matrix
+ * @return true: the matrix is not affine, the transformed points need perspective division
+ */
+static inline bool lv_vg_lite_matrix_has_perspective(const vg_lite_matrix_t * matrix)
+{
+    return !(matrix->m[2][0] == 0.0f
+             && matrix->m[2][1] == 0.0f
+             && matrix->m[2][2] == 1.0f);
 }
 
 void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area);
@@ -317,6 +371,39 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
 }
+
+static inline void lv_vg_lite_blit(vg_lite_buffer_t * target,
+                                   vg_lite_buffer_t * source,
+                                   vg_lite_matrix_t * matrix,
+                                   vg_lite_blend_t blend,
+                                   vg_lite_color_t color,
+                                   vg_lite_filter_t filter)
+{
+    LV_VG_LITE_ASSERT_DEST_BUFFER(target);
+    LV_VG_LITE_ASSERT_SRC_BUFFER(source);
+    LV_VG_LITE_ASSERT_MATRIX(matrix);
+
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit");
+    LV_VG_LITE_CHECK_ERROR(vg_lite_blit(
+                               target,
+                               source,
+                               matrix,
+                               blend,
+                               color,
+                               filter),
+                           /* Dump parameters */
+    {
+        lv_vg_lite_buffer_dump_info(target);
+        lv_vg_lite_buffer_dump_info(source);
+        lv_vg_lite_matrix_dump_info(matrix);
+        LV_LOG_USER("blend: 0x%X", (int)blend);
+        lv_vg_lite_color_dump_info(color);
+        LV_LOG_USER("filter: 0x%X", (int)filter);
+    });
+    LV_PROFILER_DRAW_END_TAG("vg_lite_blit");
+}
+
+
 void lv_vg_lite_set_color_key(const lv_image_colorkey_t * colorkey);
 
 static inline void lv_vg_lite_clear(vg_lite_buffer_t * target, const lv_area_t * area, vg_lite_color_t color)

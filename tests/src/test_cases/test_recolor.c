@@ -5,15 +5,27 @@
 #include "unity/unity.h"
 
 static lv_obj_t * active_screen = NULL;
+static lv_color32_t top_layer_recolor;
+static uint32_t top_layer_draw_count;
+
+static void capture_layer_recolor_cb(lv_event_t * e)
+{
+    lv_layer_t * layer = lv_event_get_layer(e);
+    top_layer_recolor = layer->recolor;
+    top_layer_draw_count++;
+}
 
 void setUp(void)
 {
     active_screen = lv_screen_active();
+    top_layer_recolor = lv_color32_make(0, 0, 0, 0);
+    top_layer_draw_count = 0;
 }
 
 void tearDown(void)
 {
     lv_obj_clean(active_screen);
+    lv_obj_clean(lv_layer_top());
 }
 
 void test_recolor_1(void)
@@ -108,6 +120,47 @@ void test_recolor_1(void)
     lv_obj_set_style_text_opa(label3, LV_OPA_50, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("recolor_1.png");
+}
+
+void test_recolor_does_not_leak_to_top_layer(void)
+{
+    lv_obj_t * parent = lv_obj_create(active_screen);
+    lv_obj_set_pos(parent, 10, 10);
+    lv_obj_set_size(parent, 40, 40);
+    lv_obj_set_style_pad_all(parent, 0, 0);
+    lv_obj_set_style_border_width(parent, 0, 0);
+    lv_obj_set_style_radius(parent, 0, 0);
+    lv_obj_set_style_recolor(parent, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_recolor_opa(parent, LV_OPA_COVER, 0);
+
+    lv_obj_t * child = lv_obj_create(parent);
+    lv_obj_set_size(child, 20, 20);
+    lv_obj_set_style_border_width(child, 0, 0);
+    lv_obj_set_style_radius(child, 0, 0);
+    lv_obj_set_style_bg_opa(child, LV_OPA_COVER, 0);
+
+    lv_obj_t * top_obj = lv_obj_create(lv_layer_top());
+    lv_obj_set_pos(top_obj, 10, 10);
+    lv_obj_set_size(top_obj, 20, 20);
+    lv_obj_set_style_border_width(top_obj, 0, 0);
+    lv_obj_set_style_radius(top_obj, 0, 0);
+    lv_obj_set_style_bg_opa(top_obj, LV_OPA_COVER, 0);
+    lv_obj_add_event_cb(top_obj, capture_layer_recolor_cb, LV_EVENT_DRAW_MAIN, NULL);
+
+    /* Clear the initial full-screen invalidation, then exercise the optimized
+     * refresh path which starts at the opaque child instead of the screen. */
+    lv_refr_now(NULL);
+
+    lv_area_t child_area;
+    lv_obj_get_coords(child, &child_area);
+    TEST_ASSERT_EQUAL_PTR(child, lv_refr_get_top_obj(&child_area, active_screen));
+
+    top_layer_draw_count = 0;
+    lv_obj_invalidate(child);
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_GREATER_THAN_UINT32(0, top_layer_draw_count);
+    TEST_ASSERT_EQUAL_UINT8(LV_OPA_TRANSP, top_layer_recolor.alpha);
 }
 
 #endif

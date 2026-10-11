@@ -14,6 +14,7 @@ if(CONFIG_LV_USE_PRIVATE_API)
     install(CODE "
         file(READ \"${CMAKE_INSTALL_FULL_INCLUDEDIR}/lvgl_private/lvgl_public.h\" content)
         string(REPLACE \"../include/lvgl/lvgl.h\" \"../lvgl/lvgl.h\" content \"\${content}\")
+        string(REPLACE \"../include/lvgl/config/lv_conf_internal.h\" \"../lvgl/config/lv_conf_internal.h\" content \"\${content}\")
         file(WRITE \"${CMAKE_INSTALL_FULL_INCLUDEDIR}/lvgl_private/lvgl_public.h\" \"\${content}\")
     ")
 endif()
@@ -90,6 +91,13 @@ install(
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
 )
 
+set_target_properties(
+    lvgl
+    PROPERTIES OUTPUT_NAME lvgl
+    VERSION ${LVGL_VERSION}
+    SOVERSION ${LVGL_SOVERSION}
+)
+
 install(TARGETS lvgl
     EXPORT lvglTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -131,6 +139,13 @@ if(CONFIG_LV_BUILD_DEMOS)
         FILES_MATCHING PATTERN "*.h"
     )
 
+    set_target_properties(
+        lvgl_demos
+        PROPERTIES OUTPUT_NAME lvgl_demos
+        VERSION ${LVGL_VERSION}
+        SOVERSION ${LVGL_SOVERSION}
+    )
+
     # Demo library target (if you build one)
     install(TARGETS lvgl_demos
 	EXPORT lvglDemosTargets
@@ -152,6 +167,13 @@ if(CONFIG_LV_BUILD_EXAMPLES)
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl"
         FILES_MATCHING PATTERN "*.h"
+    )
+
+    set_target_properties(
+        lvgl_examples
+        PROPERTIES OUTPUT_NAME lvgl_examples
+        VERSION ${LVGL_VERSION}
+        SOVERSION ${LVGL_SOVERSION}
     )
 
     install(TARGETS lvgl_examples

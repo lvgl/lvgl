@@ -419,25 +419,25 @@ void test_draw_display_matrix_rotation(void)
     lv_display_set_matrix_rotation(disp, true);
     TEST_ASSERT_TRUE(lv_display_get_matrix_rotation(disp));
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(disp, LV_ROTATION_0);
     draw_during_rendering("shapes_disp_rotation_0", draw_shapes, LV_OPA_COVER);
     draw_during_rendering("lines_disp_rotation_0", draw_lines, LV_OPA_COVER);
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
+    lv_display_set_rotation(disp, LV_ROTATION_90);
     draw_during_rendering("shapes_disp_rotation_90", draw_shapes, LV_OPA_COVER);
     draw_during_rendering("lines_disp_rotation_90", draw_lines, LV_OPA_COVER);
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
+    lv_display_set_rotation(disp, LV_ROTATION_180);
     draw_during_rendering("shapes_disp_rotation_180", draw_shapes, LV_OPA_COVER);
     draw_during_rendering("lines_disp_rotation_180", draw_lines, LV_OPA_COVER);
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
+    lv_display_set_rotation(disp, LV_ROTATION_270);
     draw_during_rendering("shapes_disp_rotation_270", draw_shapes, LV_OPA_COVER);
     draw_during_rendering("lines_disp_rotation_270", draw_lines, LV_OPA_COVER);
 
     lv_display_set_matrix_rotation(disp, false);
     TEST_ASSERT_FALSE(lv_display_get_matrix_rotation(disp));
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(disp, LV_ROTATION_0);
     draw_during_rendering("shapes_disp_rotation_0", draw_shapes, LV_OPA_COVER);
     draw_during_rendering("lines_disp_rotation_0", draw_lines, LV_OPA_COVER);
 #else

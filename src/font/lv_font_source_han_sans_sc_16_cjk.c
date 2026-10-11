@@ -18,13 +18,13 @@
     #include "../../lvgl.h"
 #endif
 
-
-
 #ifndef LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
     #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK 1
 #endif
 
 #if LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
+
+
 
 /*-----------------
  *    BITMAPS
@@ -24631,7 +24631,6 @@ static const lv_font_fmt_txt_cmap_t cmaps[] = {
  *    KERNING
  *----------------*/
 
-
 /*Map glyph_ids to kern left classes*/
 static const uint8_t kern_left_class_mapping[] = {
     0, 0, 0, 1, 0, 0, 0, 0,
@@ -27746,7 +27745,7 @@ lv_font_t lv_font_source_han_sans_sc_16_cjk = {
     .underline_thickness = 1,
 #endif
 
-#if LV_VERSION_CHECK(9, 3, 0)
+#if LV_VERSION_CHECK(9, 3, 0) || LVGL_VERSION_MAJOR >= 10
     .static_bitmap = 1,    /*Bitmaps are stored as const so they are always static if not compressed */
 #endif
 

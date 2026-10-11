@@ -523,6 +523,8 @@ def run_tests(
     main_cmakelists = os.path.join(build_dir, "CMakeLists.txt")
     lvgl_src_dir = os.path.join(lvgl_test_dir, "..", "src")
     lvgl_include_dir = os.path.join(lvgl_test_dir, "..", "include")
+    lvgl_demos_dir = os.path.join(lvgl_test_dir, "..", "demos")
+    lvgl_examples_dir = os.path.join(lvgl_test_dir, "..", "examples")
     lv_conf_path = os.path.join(lvgl_test_dir, "src", lv_conf_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
     lvgl_private_h_path = os.path.join(lvgl_test_dir, "..", "lvgl_private.h")
@@ -536,6 +538,8 @@ def run_tests(
         # Replace container's lvgl source and lv_conf
         volume(lvgl_include_dir, so3_usr_lib("lvgl/include")),
         volume(lvgl_src_dir, so3_usr_lib("lvgl/src")),
+        volume(lvgl_demos_dir, so3_usr_lib("lvgl/demos")),
+        volume(lvgl_examples_dir, so3_usr_lib("lvgl/examples")),
         volume(lv_conf_path, so3_usr_lib("lv_conf.h")),
         volume(lvgl_h_path, so3_usr_lib("lvgl/lvgl.h")),
         volume(lvgl_private_h_path, so3_usr_lib("lvgl/lvgl_private.h")),

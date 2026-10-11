@@ -15,6 +15,7 @@ on:
       - "Build and Test"
       - "Static Checks"
       - "Emulated Performance Test"
+      - "Memory Usage"
     types:
       - completed
 

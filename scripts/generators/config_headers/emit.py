@@ -32,6 +32,8 @@ from .kconfig_utils import (
 )
 from .parse import classify, enum_backed_choices
 
+KCONFIG_ONLY_CONFIGS = {"LV_ATTRIBUTE_FAST_MEM_USE_IRAM"}
+
 
 class Emitter:
     """Renders one target (``"template"``, ``"internal"``) of the tree."""
@@ -120,6 +122,8 @@ class Emitter:
         if isinstance(entry, DerivedConstToken):
             if self.target == "internal":
                 self.derived_consts.append(entry)
+            return
+        if self.target == "template" and entry.name in KCONFIG_ONLY_CONFIGS:
             return
         lines = (
             entry.emit_template()
@@ -359,6 +363,7 @@ def generate_bridge(kconf: Kconfig, entries) -> str:
         + "\n\n".join(blocks)
         + "\n"
         + templates.KCONFIG_BRIDGE_DEPRECATIONS
+        + templates.KCONFIG_BRIDGE_UNSUPPORTED
         + templates.KCONFIG_BRIDGE_FOOTER
     )
 
@@ -458,6 +463,18 @@ def generate_internal(kconf: Kconfig, entries) -> str:
             deferred += flag.emit_internal()
             deferred.append("")
 
+    guards: list[str] = []
+    checks = constraint_checks(entries)
+    if checks:
+        guards.append("")
+        guards.append(
+            "/* Kconfig enforces `depends on` / `select`; these checks catch a"
+        )
+        guards.append(" * hand-written lv_conf.h that violates them. */")
+        for c in checks:
+            guards += c.emit_internal()
+            guards.append("")
+
     # Optional user headers that override config macros: include each one (once
     # both its gate and path are defined) so source files don't have to.
     custom_inc: list[str] = []
@@ -480,34 +497,12 @@ def generate_internal(kconf: Kconfig, entries) -> str:
         + "\n"
         + templates.INTERNAL_COMPATIBILITY_BLOCK
         + "\n"
+        + templates.INTERNAL_OUTDATED_CONFIG_CHECK_BLOCK
+        + "\n"
         + "\n".join(derived_consts)
         + "\n".join(deferred)
         + "\n".join(custom_inc)
         + templates.INTERNAL_FOOTER
-        + templates.INTERNAL_CLOSE
-    )
-
-
-def generate_checker(kconf: Kconfig, entries) -> str:
-    preamble = templates.CHECK_PREAMBLE
-    # Replay Kconfig `select` / `depends on` as #error guards on the lv_conf.h
-    # path.
-    guards: list[str] = []
-    checks = constraint_checks(entries)
-    if checks:
-        guards.append("")
-        guards.append(
-            "/* Kconfig enforces `depends on` / `select`; these checks catch a"
-        )
-        guards.append(" * hand-written lv_conf.h that violates them. */")
-        for c in checks:
-            guards += c.emit_internal()
-            guards.append("")
-
-    return (
-        preamble
-        + "\n"
-        + templates.CHECK_DEPRECATED_SYMBOLS_SECTION
         + "\n".join(guards)
-        + "\n"
+        + templates.INTERNAL_CLOSE
     )

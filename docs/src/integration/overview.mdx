@@ -41,6 +41,27 @@ directory. If your project needs examples and/or demos, add these
 directories to your project and enable them in `lv_conf.h` or `Kconfig`
 (`LV_BUILD_DEMOS` and `LV_BUILD_EXAMPLES`).
 
+### Public API
+
+LVGL's public API is located under `include/lvgl`.
+The canonical way to integrate LVGL is to add an include path pointing at
+`lvgl/include`. You can then include the full public API with:
+
+```c
+#include <lvgl/lvgl.h>
+```
+
+If setting up `lvgl/include` as an include path isn't an option for your
+project, LVGL's root directory also contains a header file that
+includes the full public API, so `#include <lvgl/lvgl.h>` works there
+too. Both paths are fully supported.
+
+Every function of the public API validates its arguments at runtime. If a call
+passes an invalid argument, LVGL logs a warning and the function returns without
+doing anything instead of running into undefined behavior. This is enabled by
+default (<ApiLink name="LV_USE_CHECK_ARG" />) and its behaviour can be configured.
+See [Argument Checking](/debugging/argument_checking).
+
 ## Configuration
 
 LVGL has many compile-time settings: color depth, which Widgets are built, GPU

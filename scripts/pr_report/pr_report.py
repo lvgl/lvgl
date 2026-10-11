@@ -46,6 +46,7 @@ EXPECTED_SECTIONS = [
     ("Static Checks", 10),
     ("Coverage", 20),
     ("Performance", 30),
+    ("Memory Usage", 40),
 ]
 
 

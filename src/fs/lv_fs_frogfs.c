@@ -255,7 +255,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
     LV_ASSERT(buf != NULL || btr == 0);
     LV_UNUSED(drv);
 
-    ssize_t res = frogfs_read(file_p, buf, btr);
+    frogfs_ssize_t res = frogfs_read(file_p, buf, btr);
     if(res < 0) {
         LV_LOG_WARN("Error reading frogfs file");
         *br = 0;
@@ -271,7 +271,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
     LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
 
-    ssize_t res = frogfs_seek(file_p, pos, whence);
+    frogfs_ssize_t res = frogfs_seek(file_p, pos, whence);
 
     if(res < 0) {
         LV_LOG_WARN("Error `seek`ing frogfs file");

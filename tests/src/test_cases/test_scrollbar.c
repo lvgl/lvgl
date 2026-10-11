@@ -15,6 +15,47 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
+static lv_obj_t * scrollbar_test_child(int32_t x, int32_t y)
+{
+    lv_obj_t * child = lv_obj_create(lv_screen_active());
+    lv_obj_set_scrollable(child, false);
+    lv_obj_set_size(child, 200, 200);
+    lv_obj_set_pos(child, x, y);
+    return child;
+}
+
+void test_scrollbar_is_redrawn_when_a_child_moves_between_outside_positions(void)
+{
+    lv_obj_t * child = scrollbar_test_child(-10, -10);
+    lv_refr_now(NULL);
+
+    /*Out of the parent before and after the move, so the scrollbar area has to be
+     *invalidated even though the child never was inside*/
+    lv_obj_set_pos(child, 700, 400);
+    lv_refr_now(NULL);
+
+    /*compare_core() so the screen is not invalidated as a whole before the comparison,
+     *that would repaint the scrollbars and hide the bug*/
+    TEST_ASSERT_MESSAGE(lv_test_screenshot_compare_core("scrollbar_child_moved_outside.png"),
+                        "scrollbar_child_moved_outside.png");
+}
+
+void test_scrollbar_is_redrawn_when_a_child_moves_into_the_parent(void)
+{
+    /*Hangs off the bottom edge, so the scrollbars stay visible for the whole test*/
+    scrollbar_test_child(500, 400);
+
+    lv_obj_t * mover = scrollbar_test_child(200, 1400);
+    lv_refr_now(NULL);
+
+    /*The scrollable area shrinks, so the scrollbar gets longer and has to be redrawn*/
+    lv_obj_set_pos(mover, 200, 100);
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_MESSAGE(lv_test_screenshot_compare_core("scrollbar_child_moved_inside.png"),
+                        "scrollbar_child_moved_inside.png");
+}
+
 void test_scrollbar_vertical(void)
 {
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW);

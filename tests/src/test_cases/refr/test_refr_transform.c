@@ -132,9 +132,9 @@ void test_refr_matrix_display_rotation(void)
     refr_screen_set_color(REFR_COLOR_BLACK);
     refr_rect_create(refr_screen(), 0, 0, 20, 20, REFR_COLOR_RED);
 
-    static const lv_display_rotation_t rotations[] = {
-        LV_DISPLAY_ROTATION_0, LV_DISPLAY_ROTATION_90,
-        LV_DISPLAY_ROTATION_180, LV_DISPLAY_ROTATION_270,
+    static const lv_rotation_t rotations[] = {
+        LV_ROTATION_0, LV_ROTATION_90,
+        LV_ROTATION_180, LV_ROTATION_270,
     };
     lv_area_t logical = {0, 0, 19, 19};
 
@@ -150,7 +150,7 @@ void test_refr_matrix_display_rotation(void)
         check_rotated_rect(refr_ctx.disp->buf_act, &logical, REFR_COLOR_RED);
     }
 
-    lv_display_set_rotation(refr_ctx.disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(refr_ctx.disp, LV_ROTATION_0);
     lv_display_set_matrix_rotation(refr_ctx.disp, false);
 #else
     TEST_IGNORE_MESSAGE("LV_DRAW_TRANSFORM_USE_MATRIX not enabled");
@@ -162,7 +162,7 @@ void test_refr_matrix_sync_areas_are_rotated(void)
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     refr_disp_create(64, 64, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_DIRECT, 2, 64);
     lv_display_set_matrix_rotation(refr_ctx.disp, true);
-    lv_display_set_rotation(refr_ctx.disp, LV_DISPLAY_ROTATION_90);
+    lv_display_set_rotation(refr_ctx.disp, LV_ROTATION_90);
 
     refr_screen_set_color(REFR_COLOR_BLACK);
     lv_obj_invalidate(refr_screen());
@@ -188,7 +188,7 @@ void test_refr_matrix_sync_areas_are_rotated(void)
     refr_frame();
     check_rotated_rect(next_buf, &logical, REFR_COLOR_RED);
 
-    lv_display_set_rotation(refr_ctx.disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(refr_ctx.disp, LV_ROTATION_0);
     lv_display_set_matrix_rotation(refr_ctx.disp, false);
 #else
     TEST_IGNORE_MESSAGE("LV_DRAW_TRANSFORM_USE_MATRIX not enabled");

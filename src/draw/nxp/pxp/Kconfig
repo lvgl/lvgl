@@ -1,8 +1,9 @@
 config LV_USE_PXP
-	bool "PXP (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_PXP]"
+	bool "PXP (legacy)"
 	default n
+	select LV_USE_DRAW_PXP
 	help
-	  Deprecated and non-functional. Use LV_USE_DRAW_PXP instead.
+	  Use LV_USE_DRAW_PXP instead.
 
 config LV_USE_DRAW_PXP
 	bool "PXP renderer"

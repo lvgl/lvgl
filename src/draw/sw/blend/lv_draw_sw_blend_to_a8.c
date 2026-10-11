@@ -30,7 +30,7 @@ static void /* LV_ATTRIBUTE_FAST_MEM */ a8_image_blend(lv_draw_sw_blend_image_ds
 
 #if LV_DRAW_SW_SUPPORT_L8 || LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888
 
-    static void LV_ATTRIBUTE_FAST_MEM mask_only_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
+    static void /* LV_ATTRIBUTE_FAST_MEM */ mask_only_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 
 #endif
 

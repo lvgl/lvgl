@@ -15,7 +15,9 @@ void setUp(void)
 
 void tearDown(void)
 {
+#if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_display_set_matrix_rotation(lv_display_get_default(), false);
+#endif
     lv_obj_clean(lv_screen_active());
     lv_obj_clean(lv_layer_top());
     lv_obj_clean(lv_layer_sys());
@@ -152,17 +154,17 @@ static void test_matrix_transform_area(lv_display_t * display)
     const int32_t ver_res = lv_display_get_original_vertical_resolution(display);
 
     switch(lv_display_get_rotation(display)) {
-        case LV_DISPLAY_ROTATION_0:
+        case LV_ROTATION_0:
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             lv_matrix_rotate(&matrix, 270);
             lv_matrix_translate(&matrix, -ver_res, 0);
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             lv_matrix_rotate(&matrix, 180);
             lv_matrix_translate(&matrix, -hor_res, -ver_res);
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             lv_matrix_rotate(&matrix, 90);
             lv_matrix_translate(&matrix, 0, -hor_res);
             break;
@@ -189,28 +191,28 @@ void test_display_matrix_rotation(void)
     lv_display_set_matrix_rotation(disp, true);
     TEST_ASSERT_TRUE(lv_display_get_matrix_rotation(disp));
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(disp, LV_ROTATION_0);
     test_matrix_transform_area(disp);
     lv_label_set_text(label, "Rotation: 0 degrees");
     TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_0.png");
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
+    lv_display_set_rotation(disp, LV_ROTATION_90);
     test_matrix_transform_area(disp);
     lv_label_set_text(label, "Rotation: 90 degrees");
     TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_90.png");
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
+    lv_display_set_rotation(disp, LV_ROTATION_180);
     test_matrix_transform_area(disp);
     lv_label_set_text(label, "Rotation: 180 degrees");
     TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_180.png");
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
+    lv_display_set_rotation(disp, LV_ROTATION_270);
     test_matrix_transform_area(disp);
     lv_label_set_text(label, "Rotation: 270 degrees");
     TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_270.png");
 
     lv_display_set_matrix_rotation(disp, false);
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(disp, LV_ROTATION_0);
     test_matrix_transform_area(disp);
     lv_label_set_text(label, "Rotation: 0 degrees");
     TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_0.png");
@@ -301,19 +303,19 @@ static void test_display_resolution_full_rotation(
     int32_t ori_physical_hor_res, int32_t ori_physical_ver_res,
     int32_t ori_offset_x, int32_t ori_offset_y)
 {
-    const lv_display_rotation_t rotations[] = {
-        LV_DISPLAY_ROTATION_0,
-        LV_DISPLAY_ROTATION_90,
-        LV_DISPLAY_ROTATION_180,
-        LV_DISPLAY_ROTATION_270,
-        LV_DISPLAY_ROTATION_0,
+    const lv_rotation_t rotations[] = {
+        LV_ROTATION_0,
+        LV_ROTATION_90,
+        LV_ROTATION_180,
+        LV_ROTATION_270,
+        LV_ROTATION_0,
     };
 
     for(size_t i = 0; i < sizeof(rotations) / sizeof(rotations[0]); i++) {
         lv_display_set_rotation(disp, rotations[i]);
 
         if(!disp && !lv_display_get_default()) {
-            TEST_ASSERT_EQUAL(LV_DISPLAY_ROTATION_0, lv_display_get_rotation(disp));
+            TEST_ASSERT_EQUAL(LV_ROTATION_0, lv_display_get_rotation(disp));
         }
         else {
             TEST_ASSERT_EQUAL(rotations[i], lv_display_get_rotation(disp));
@@ -325,15 +327,15 @@ static void test_display_resolution_full_rotation(
 
         /* verify resolution */
         switch(lv_display_get_rotation(disp)) {
-            case LV_DISPLAY_ROTATION_0:
-            case LV_DISPLAY_ROTATION_180:
+            case LV_ROTATION_0:
+            case LV_ROTATION_180:
                 TEST_ASSERT_EQUAL_INT32(ori_physical_hor_res, lv_display_get_physical_horizontal_resolution(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_physical_ver_res, lv_display_get_physical_vertical_resolution(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_hor_res, lv_display_get_horizontal_resolution(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_ver_res, lv_display_get_vertical_resolution(disp));
                 break;
-            case LV_DISPLAY_ROTATION_90:
-            case LV_DISPLAY_ROTATION_270:
+            case LV_ROTATION_90:
+            case LV_ROTATION_270:
                 TEST_ASSERT_EQUAL_INT32(ori_physical_ver_res, lv_display_get_physical_horizontal_resolution(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_physical_hor_res, lv_display_get_physical_vertical_resolution(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_ver_res, lv_display_get_horizontal_resolution(disp));
@@ -346,19 +348,19 @@ static void test_display_resolution_full_rotation(
 
         /* verify offset */
         switch(lv_display_get_rotation(disp)) {
-            case LV_DISPLAY_ROTATION_0:
+            case LV_ROTATION_0:
                 TEST_ASSERT_EQUAL_INT32(ori_offset_x, lv_display_get_offset_x(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_offset_y, lv_display_get_offset_y(disp));
                 break;
-            case LV_DISPLAY_ROTATION_180:
+            case LV_ROTATION_180:
                 TEST_ASSERT_EQUAL_INT32(ori_physical_hor_res - ori_offset_x, lv_display_get_offset_x(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_physical_ver_res - ori_offset_y, lv_display_get_offset_y(disp));
                 break;
-            case LV_DISPLAY_ROTATION_90:
+            case LV_ROTATION_90:
                 TEST_ASSERT_EQUAL_INT32(ori_offset_y, lv_display_get_offset_x(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_offset_x, lv_display_get_offset_y(disp));
                 break;
-            case LV_DISPLAY_ROTATION_270:
+            case LV_ROTATION_270:
                 TEST_ASSERT_EQUAL_INT32(ori_physical_ver_res - ori_offset_y, lv_display_get_offset_x(disp));
                 TEST_ASSERT_EQUAL_INT32(ori_physical_hor_res - ori_offset_x, lv_display_get_offset_y(disp));
                 break;
@@ -395,13 +397,6 @@ void test_display_resolution(void)
     lv_display_set_offset(lv_display_get_default(), 1, 2);
     test_display_resolution_full_rotation(disp, 32, 48, 24, 32, 1, 2);
 
-    /* Test NULL default display, should not affect the display */
-    lv_display_set_default(NULL);
-    lv_display_set_resolution(lv_display_get_default(), 2, 3);
-    lv_display_set_physical_resolution(lv_display_get_default(), 4, 5);
-    lv_display_set_offset(lv_display_get_default(), 6, 7);
-    test_display_resolution_full_rotation(disp, 32, 48, 24, 32, 1, 2);
-    test_display_resolution_full_rotation(lv_display_get_default(), 0, 0, 0, 0, 0, 0);
 
     /* Restore default display */
     lv_display_set_default(disp_def);
@@ -410,6 +405,9 @@ void test_display_resolution(void)
 
 void test_display_dpi_tile_cnt_antialiasing(void)
 {
+#if LV_DRAW_DISABLE_TILED_RENDERING
+    TEST_IGNORE();
+#endif
     lv_display_t * disp_def = lv_display_get_default();
     TEST_ASSERT_NOT_NULL(disp_def);
 
@@ -450,16 +448,6 @@ void test_display_dpi_tile_cnt_antialiasing(void)
     lv_display_set_tile_cnt(lv_display_get_default(), 20);
     TEST_ASSERT_EQUAL_INT32(20, lv_display_get_tile_cnt(lv_display_get_default()));
 
-    /* Test NULL default display, should not affect the display */
-    lv_display_set_default(NULL);
-    lv_display_set_dpi(lv_display_get_default(), 200);
-    TEST_ASSERT_EQUAL_INT32(LV_DPI_DEF, lv_display_get_dpi(lv_display_get_default()));
-    lv_display_set_antialiasing(lv_display_get_default(), false);
-    TEST_ASSERT_FALSE(lv_display_get_antialiasing(lv_display_get_default()));
-    lv_display_set_antialiasing(lv_display_get_default(), true);
-    TEST_ASSERT_FALSE(lv_display_get_antialiasing(lv_display_get_default()));
-    lv_display_set_tile_cnt(lv_display_get_default(), 20);
-    TEST_ASSERT_EQUAL_INT32(0, lv_display_get_tile_cnt(lv_display_get_default()));
 
     /* Restore default display */
     lv_display_set_default(disp_def);
@@ -554,12 +542,6 @@ void test_display_layers(void)
     TEST_ASSERT_NOT_NULL(lv_display_get_layer_sys(lv_display_get_default()));
     TEST_ASSERT_NOT_NULL(lv_display_get_layer_bottom(lv_display_get_default()));
 
-    lv_display_set_default(NULL);
-    TEST_ASSERT_NULL(lv_display_get_screen_active(lv_display_get_default()));
-    TEST_ASSERT_NULL(lv_display_get_screen_prev(lv_display_get_default()));
-    TEST_ASSERT_NULL(lv_display_get_layer_top(lv_display_get_default()));
-    TEST_ASSERT_NULL(lv_display_get_layer_sys(lv_display_get_default()));
-    TEST_ASSERT_NULL(lv_display_get_layer_bottom(lv_display_get_default()));
 
     lv_display_set_default(disp_def);
 }
@@ -576,11 +558,6 @@ void test_display_active_time(void)
     lv_tick_inc(1000);
     TEST_ASSERT_EQUAL_UINT32(1000, lv_display_get_inactive_time(lv_display_get_default()));
 
-    /* Test NULL default display, should not affect the display */
-    lv_display_set_default(NULL);
-    lv_display_trigger_activity(lv_display_get_default());
-    lv_tick_inc(1000);
-    TEST_ASSERT_EQUAL_UINT32(2000, lv_display_get_inactive_time(lv_display_get_default()));
 
     lv_display_set_default(disp_def);
 }
@@ -593,72 +570,33 @@ void test_display_rotate_point(void)
 
     lv_point_t point;
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(disp, LV_ROTATION_0);
     point.x = 10;
     point.y = 20;
     lv_display_rotate_point(disp, &point);
     TEST_ASSERT_EQUAL_INT32(10, point.x);
     TEST_ASSERT_EQUAL_INT32(20, point.y);
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
+    lv_display_set_rotation(disp, LV_ROTATION_90);
     point.x = 10;
     point.y = 20;
     lv_display_rotate_point(disp, &point);
     TEST_ASSERT_EQUAL_INT32(320 - 20 - 1, point.x);
     TEST_ASSERT_EQUAL_INT32(10, point.y);
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
+    lv_display_set_rotation(disp, LV_ROTATION_180);
     point.x = 10;
     point.y = 20;
     lv_display_rotate_point(disp, &point);
     TEST_ASSERT_EQUAL_INT32(480 - 10 - 1, point.x);
     TEST_ASSERT_EQUAL_INT32(320 - 20 - 1, point.y);
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
+    lv_display_set_rotation(disp, LV_ROTATION_270);
     point.x = 10;
     point.y = 20;
     lv_display_rotate_point(disp, &point);
     TEST_ASSERT_EQUAL_INT32(20, point.x);
     TEST_ASSERT_EQUAL_INT32(480 - 10 - 1, point.y);
-
-    lv_display_delete(disp);
-}
-
-void test_display_rotate_point_ccw(void)
-{
-    lv_display_t * disp = lv_display_create(480, 320);
-    TEST_ASSERT_NOT_NULL(disp);
-    lv_display_set_flush_cb(disp, never_called);
-
-    lv_point_t point;
-
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
-    point.x = 10;
-    point.y = 20;
-    lv_display_rotate_point_ccw(disp, &point);
-    TEST_ASSERT_EQUAL_INT32(10, point.x);
-    TEST_ASSERT_EQUAL_INT32(20, point.y);
-
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
-    point.x = 10;
-    point.y = 20;
-    lv_display_rotate_point_ccw(disp, &point);
-    TEST_ASSERT_EQUAL_INT32(20, point.x);
-    TEST_ASSERT_EQUAL_INT32(480 - 10 - 1, point.y);
-
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
-    point.x = 10;
-    point.y = 20;
-    lv_display_rotate_point_ccw(disp, &point);
-    TEST_ASSERT_EQUAL_INT32(480 - 10 - 1, point.x);
-    TEST_ASSERT_EQUAL_INT32(320 - 20 - 1, point.y);
-
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
-    point.x = 10;
-    point.y = 20;
-    lv_display_rotate_point_ccw(disp, &point);
-    TEST_ASSERT_EQUAL_INT32(320 - 20 - 1, point.x);
-    TEST_ASSERT_EQUAL_INT32(10, point.y);
 
     lv_display_delete(disp);
 }

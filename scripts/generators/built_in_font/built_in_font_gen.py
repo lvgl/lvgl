@@ -37,6 +37,16 @@ parser.add_argument('-o', '--output',
 					nargs='?',
 					metavar='file',
 					help='Output file name. E.g. my_font_20.c')
+parser.add_argument('--stride',
+					type=int,
+					metavar = 'bytes',
+					nargs='?',
+					help='Align every bitmap row to this many bytes (needs LVGL v9.3+)')
+parser.add_argument('--align',
+					type=int,
+					metavar = 'bytes',
+					nargs='?',
+					help='Align the start address of every glyph to this many bytes')
 parser.add_argument('--compressed', action='store_true',
 					help='Compress the bitmaps')
 parser.add_argument('--subpx', action='store_true',
@@ -64,7 +74,12 @@ if subpx:
     cmd.append(subpx)
 if compr:
     cmd.extend(compr.split())
-cmd.extend(["--bpp", str(args.bpp), "--size", str(args.size), "--font", args.font, "-r", args.range[0]])
+cmd.extend(["--bpp", str(args.bpp)])
+if args.stride:
+    cmd.extend(["--stride", str(args.stride)])
+if args.align:
+    cmd.extend(["--align", str(args.align)])
+cmd.extend(["--size", str(args.size), "--font", args.font, "-r", args.range[0]])
 if args.symbols[0]:
     cmd.extend(args.symbols[0].split())
 cmd.extend(["--font", "FontAwesome5-Solid+Brands+Regular.woff", "-r", syms, "--format", "lvgl"])

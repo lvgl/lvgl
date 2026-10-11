@@ -616,12 +616,10 @@ void lv_style_set_transform_scale(lv_style_t * style, int32_t value);
 /**
  * @brief Check if the style property has a specified behavioral flag.
  *
- * Do not pass multiple flags to this function as backwards-compatibility is not guaranteed
- * for that.
- *
- * @param prop Property ID
- * @param flag Flag
- * @return true if the flag is set for this property
+ * @param prop      a style property like `LV_STYLE_BG_COLOR`
+ * @param flag      a flag like `LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE`, or several
+ *                  flags OR-ed together
+ * @return true if at least one of the given flags is set for this property
  */
 static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
 {

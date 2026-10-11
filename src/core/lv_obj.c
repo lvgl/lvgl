@@ -1352,7 +1352,6 @@ void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_ob
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG_MSG(screen != NULL, return, "can't load a non-existing screen");
-    LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
 
     screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
     LV_ASSERT_MALLOC(dsc);
@@ -1371,7 +1370,6 @@ void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(screen_create_cb != NULL, return);
-    LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
 
     screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
     LV_ASSERT_MALLOC(dsc);
@@ -1802,9 +1800,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
-        void * param = lv_event_get_param(e);
+        lv_indev_t * indev = lv_event_get_indev(e);
         /*Go the checked state if enabled*/
-        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_is_checkable(obj)) {
+        if((indev == NULL || lv_indev_get_scroll_obj(indev) == NULL) && lv_obj_is_checkable(obj)) {
 
             bool was_checked = has_state(obj, LV_STATE_CHECKED);
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) {
@@ -1922,7 +1920,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_indev_t * indev = lv_indev_active();
         if(indev == NULL) indev = lv_event_get_indev(e);
 
-        lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        lv_indev_type_t indev_type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
         if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) state |= LV_STATE_FOCUS_KEY;
         if(editing) {
             state |= LV_STATE_EDITED;

@@ -86,6 +86,10 @@ config LV_DRAW_HAS_3D_SUPPORT
 	bool
 	default n
 
+config LV_DRAW_DISABLE_TILED_RENDERING
+	bool
+	default n
+
 config LV_DEF_REFR_PERIOD
 	int "Default refresh period (ms)"
 	default 33

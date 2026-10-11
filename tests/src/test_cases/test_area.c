@@ -611,4 +611,79 @@ void test_point_precise_swap(void)
     TEST_ASSERT_EQUAL_FLOAT(original_p5.y, p6.y);
 }
 
+void test_point_rotate(void)
+{
+    const int32_t w = 480;
+    const int32_t h = 320;
+
+    static const struct {
+        lv_rotation_t rotation;
+        int32_t x;
+        int32_t y;
+    } cases[] = {
+        {LV_ROTATION_0, 10, 20},
+        {LV_ROTATION_90, 20, 480 - 10 - 1},
+        {LV_ROTATION_180, 480 - 10 - 1, 320 - 20 - 1},
+        {LV_ROTATION_270, 320 - 20 - 1, 10},
+    };
+
+    for(uint32_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+        lv_point_t point = {10, 20};
+
+        lv_point_rotate(&point, cases[i].rotation, w, h);
+        TEST_ASSERT_EQUAL_INT32(cases[i].x, point.x);
+        TEST_ASSERT_EQUAL_INT32(cases[i].y, point.y);
+
+        /*The inverse rotation maps the point back. 90 and 270 swap the bounding box*/
+        const bool swapped = cases[i].rotation == LV_ROTATION_90 || cases[i].rotation == LV_ROTATION_270;
+        lv_point_rotate(&point, lv_rotation_invert(cases[i].rotation), swapped ? h : w, swapped ? w : h);
+        TEST_ASSERT_EQUAL_INT32(10, point.x);
+        TEST_ASSERT_EQUAL_INT32(20, point.y);
+    }
+}
+
+/*The rotated point has to stay inside the rotated bounding box*/
+void test_point_rotate_corners(void)
+{
+    const int32_t w = 480;
+    const int32_t h = 320;
+
+    static const lv_point_t corners[] = {{0, 0}, {479, 0}, {0, 319}, {479, 319}};
+    const lv_rotation_t rotations[] = {LV_ROTATION_0, LV_ROTATION_90, LV_ROTATION_180, LV_ROTATION_270};
+
+    for(uint32_t r = 0; r < sizeof(rotations) / sizeof(rotations[0]); r++) {
+        const bool swapped = rotations[r] == LV_ROTATION_90 || rotations[r] == LV_ROTATION_270;
+        const int32_t dst_w = swapped ? h : w;
+        const int32_t dst_h = swapped ? w : h;
+
+        for(uint32_t c = 0; c < sizeof(corners) / sizeof(corners[0]); c++) {
+            lv_point_t point = corners[c];
+            lv_point_rotate(&point, rotations[r], w, h);
+            TEST_ASSERT_TRUE(point.x >= 0 && point.x < dst_w);
+            TEST_ASSERT_TRUE(point.y >= 0 && point.y < dst_h);
+        }
+    }
+}
+
+void test_rotation_resolve(void)
+{
+    TEST_ASSERT_EQUAL(LV_ROTATION_0, lv_rotation_resolve(LV_ROTATION_0, LV_ROTATION_DIR_CW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_90, lv_rotation_resolve(LV_ROTATION_90, LV_ROTATION_DIR_CW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_180, lv_rotation_resolve(LV_ROTATION_180, LV_ROTATION_DIR_CW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_270, lv_rotation_resolve(LV_ROTATION_270, LV_ROTATION_DIR_CW));
+
+    TEST_ASSERT_EQUAL(LV_ROTATION_0, lv_rotation_resolve(LV_ROTATION_0, LV_ROTATION_DIR_CCW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_270, lv_rotation_resolve(LV_ROTATION_90, LV_ROTATION_DIR_CCW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_180, lv_rotation_resolve(LV_ROTATION_180, LV_ROTATION_DIR_CCW));
+    TEST_ASSERT_EQUAL(LV_ROTATION_90, lv_rotation_resolve(LV_ROTATION_270, LV_ROTATION_DIR_CCW));
+}
+
+void test_rotation_invert(void)
+{
+    TEST_ASSERT_EQUAL(LV_ROTATION_0, lv_rotation_invert(LV_ROTATION_0));
+    TEST_ASSERT_EQUAL(LV_ROTATION_270, lv_rotation_invert(LV_ROTATION_90));
+    TEST_ASSERT_EQUAL(LV_ROTATION_180, lv_rotation_invert(LV_ROTATION_180));
+    TEST_ASSERT_EQUAL(LV_ROTATION_90, lv_rotation_invert(LV_ROTATION_270));
+}
+
 #endif

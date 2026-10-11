@@ -372,8 +372,7 @@ static void lv_freetype_cleanup(lv_freetype_context_t * ctx)
 
 static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const char * pathname)
 {
-    size_t len = lv_strlen(pathname);
-    LV_ASSERT(len > 0);
+    LV_ASSERT(pathname && pathname[0] != '\0');
 
     lv_ll_t * ll_p = &ctx->face_id_ll;
     face_id_node_t * node;

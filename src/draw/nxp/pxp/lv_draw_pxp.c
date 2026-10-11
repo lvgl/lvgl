@@ -102,7 +102,7 @@ void lv_draw_pxp_deinit(void)
 }
 
 void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
-                        int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
+                        int32_t src_stride, int32_t dest_stride, lv_rotation_t rotation,
                         lv_color_format_t cf)
 {
     lv_pxp_reset();
@@ -112,21 +112,21 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
      * and the PXP constants are for clockwise rotation
      *
      *    counterclockwise          clockwise
-     * LV_DISPLAY_ROTATION_90  -> kPXP_Rotate270
-     * LV_DISPLAY_ROTATION_270 -> kPXP_Rotate90
+     * LV_ROTATION_90  -> kPXP_Rotate270
+     * LV_ROTATION_270 -> kPXP_Rotate90
      */
     pxp_rotate_degree_t pxp_rotation;
     switch(rotation) {
-        case LV_DISPLAY_ROTATION_0:
+        case LV_ROTATION_0:
             pxp_rotation = kPXP_Rotate0;
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             pxp_rotation = kPXP_Rotate90;
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             pxp_rotation = kPXP_Rotate180;
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             pxp_rotation = kPXP_Rotate270;
             break;
         default:

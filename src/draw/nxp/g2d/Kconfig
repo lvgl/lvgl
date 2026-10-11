@@ -1,8 +1,9 @@
 config LV_USE_G2D
-	bool "G2D (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_G2D]"
+	bool "G2D (legacy)"
 	default n
+	select LV_USE_DRAW_G2D
 	help
-	  Deprecated and non-functional. Use LV_USE_DRAW_G2D instead.
+	  Use LV_USE_DRAW_G2D instead.
 
 config LV_USE_DRAW_G2D
 	bool "G2D renderer"

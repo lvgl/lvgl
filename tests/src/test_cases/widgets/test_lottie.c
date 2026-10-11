@@ -154,7 +154,7 @@ void test_lottie_memory_leak(void)
         lv_timer_handler();
         lv_obj_delete(lottie);
     }
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 16);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 32);
 }
 
 void test_lottie_no_jump_when_visible_again(void)

@@ -34,5 +34,28 @@ try:
 except:  # NOQA
     pass
 
+# Check C bitmask enum expressions independently of LVGL's current values.
+sys.path.insert(0, os.path.dirname(SCRIPT_PATH))
+from pycparser import c_parser  # NOQA
+import pycparser_monkeypatch  # NOQA
+
+ast = c_parser.CParser().parse('''
+typedef enum {
+    TEST_FLAG_1 = (1u << 4),
+    TEST_FLAG_2 = (1u << 8),
+    TEST_FLAG_COMBINED = (TEST_FLAG_1 | TEST_FLAG_2)
+} test_flag_t;
+''')
+ast.setup_docs(True, '', '', '')
+values = {
+    item['name']: int(item['value'], 16)
+    for item in ast.to_dict()['enums'][0]['members']
+}
+assert values == {
+    'TEST_FLAG_1': 0x10,
+    'TEST_FLAG_2': 0x100,
+    'TEST_FLAG_COMBINED': 0x110,
+}
+
 print()
 print("TEST PASSED!")

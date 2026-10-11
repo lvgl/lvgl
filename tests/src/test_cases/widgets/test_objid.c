@@ -43,4 +43,22 @@ void test_obj_id_get_child(void)
     LV_DEPRECATIONS_IGNORE_END
 }
 
+void test_objid_builtin_destroy_resets_storage(void)
+{
+    lv_global_t * global = LV_GLOBAL_DEFAULT();
+    TEST_ASSERT_NOT_NULL(global->objid_array);
+
+    lv_objid_builtin_destroy();
+    TEST_ASSERT_NULL(global->objid_array);
+    TEST_ASSERT_EQUAL_UINT32(0, global->objid_count);
+
+    /*Calling destroy repeatedly and assigning a new ID afterwards must be safe.*/
+    lv_objid_builtin_destroy();
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    TEST_ASSERT_NOT_NULL(global->objid_array);
+    TEST_ASSERT_EQUAL_UINT32(1, (lv_uintptr_t)obj->id);
+
+    lv_obj_delete(obj);
+}
+
 #endif

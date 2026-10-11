@@ -327,7 +327,7 @@ int frogfs_is_raw(frogfs_fh_t *fh)
     return !!(fh->flags & FROGFS_OPEN_RAW);
 }
 
-ssize_t frogfs_read(frogfs_fh_t *fh, void *buf, size_t len)
+frogfs_ssize_t frogfs_read(frogfs_fh_t *fh, void *buf, size_t len)
 {
     LV_ASSERT_NULL(fh);
 
@@ -338,7 +338,7 @@ ssize_t frogfs_read(frogfs_fh_t *fh, void *buf, size_t len)
     return -1;
 }
 
-ssize_t frogfs_seek(frogfs_fh_t *fh, long offset, int mode)
+frogfs_ssize_t frogfs_seek(frogfs_fh_t *fh, long offset, int mode)
 {
     LV_ASSERT_NULL(fh);
 

@@ -1,5 +1,5 @@
 ---
-title: Migrating from v9 to v10
+title: Migrating from v9 to v10-dev
 description: How to update your LVGL v9 project to v10, covering all breaking changes and deprecations introduced across the v9.x series.
 ---
 
@@ -15,9 +15,8 @@ description: How to update your LVGL v9 project to v10, covering all breaking ch
   - Entries: a short bullet per changed symbol, with before/after code if helpful.
 */}
 
-<Callout type="info" title="v9.6 will be the last v9 release">
-  LVGL v9.6 is the final release in the v9 series. All symbols marked
-  `LV_DEPRECATED` are removed in v10.0.
+<Callout type="info" title="v10.0.0">
+  LVGL v10.0.0 is currently in development and not yet released.
 </Callout>
 
 ---
@@ -143,6 +142,36 @@ and two displays can run different formats. This needs support from the driver:
 its flush callback has to handle the pixel layout it is handed, and the draw
 buffer(s) must be large enough for the new format.
 </Callout>
+
+#### LV_COLOR_16_SWAP
+
+`LV_COLOR_16_SWAP` was kept for compatibility with LVGL v8, with the addition of <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> which you can use to make LVGL
+render natively in big-endian RGB565 format, this config has been removed in v10 and produces an error.
+
+If you're still using this configuration, simply define <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> as <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED"/> 
+or set the display's color format at runtime with <ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565_SWAPPED)"/>.
+
+As a last resort option, if none of the above options work for you, the following snippet of code can be used in your flush callback.
+
+```c
+void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
+{
+    if(lv_display_get_render_mode(display) == LV_DISPLAY_RENDER_MODE_DIRECT) {
+        lv_draw_buf_t * draw_buf = lv_display_get_buf_active(display);
+        uint16_t * fb = (uint16_t *)px_map;
+        uint32_t stride_px = draw_buf->header.stride / 2; /* RGB565: 2 bytes/px */
+        int32_t w = lv_area_get_width(area);
+        int32_t h = lv_area_get_height(area);
+        for(int32_t y = 0; y < h; y++) {
+            lv_draw_rgb565_swap(fb + (uint32_t)(area->y1 + y) * stride_px + area->x1, w);
+        }
+    }
+    else {
+        lv_draw_rgb565_swap(px_map, lv_area_get_size(area));
+    }
+    ...
+}
+```
 
 #### Memory
 
@@ -364,6 +393,24 @@ They have no effect and emit no warning. Use the real switches:
 
 See [Configuring LVGL](/integration/configuration) for the full picture of how
 configuration works now.
+
+---
+
+## Integration
+
+Starting in v9.6, LVGL's public API headers were moved into `include/lvgl`.
+The canonical way to bring in LVGL is to add `lvgl/include` to your
+include paths and use:
+
+```c
+#include <lvgl/lvgl.h>
+```
+
+Including the top-level `lvgl/lvgl.h` file is also fully supported if adding a new include path
+isn't an option for your project.
+
+The header files remaining under `src` are now LVGL's **private API**
+and are not meant to be included directly.
 
 ---
 

@@ -64,8 +64,10 @@ void lv_draw_vg_lite_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc
         return;
 
     lv_layer_t * layer = dsc->base.layer;
-    if(layer->draw_buf == NULL)
+    if(layer->draw_buf == NULL) {
+        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
         return;
+    }
 
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
 

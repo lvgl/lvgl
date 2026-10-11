@@ -31,7 +31,6 @@ def generated(fixture_kconfig):
     """The full generated text of every output file for the fixture."""
     from config_headers.emit import (
         generate_bridge,
-        generate_checker,
         generate_internal,
         generate_template,
     )
@@ -42,6 +41,5 @@ def generated(fixture_kconfig):
     return {
         "template": generate_template(kconf, entry_list),
         "internal": generate_internal(kconf, entry_list),
-        "checker": generate_checker(kconf, entry_list),
         "bridge": generate_bridge(kconf, entry_list),
     }

@@ -17,12 +17,8 @@ def build_command(cc, input_file, output_file, include_dirs, defs):
     """
     -dD    emit the #define/#undef directives along with the preprocessed output
     -P     omit the linemarkers
-    -nostdinc
-           the system include directories must not be searched, otherwise an
-           lv_conf.h of an LVGL installed on the system is picked up by the
-           __has_include() check of lv_conf_internal.h
     """
-    command = [cc, "-E", "-dD", "-P", "-nostdinc", "-x", "c", "-o", output_file]
+    command = [cc, "-E", "-dD", "-P", "-x", "c", "-o", output_file]
 
     for include_path in include_dirs:
         command.append(f"-I{include_path}")

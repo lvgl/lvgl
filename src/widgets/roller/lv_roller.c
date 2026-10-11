@@ -436,9 +436,10 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_PRESSING) {
         if(roller->option_cnt <= 1) return;
 
-        lv_indev_t * indev = lv_indev_active();
-        lv_point_t p;
-        lv_indev_get_vect(indev, &p);
+        lv_indev_t * indev = lv_event_get_indev(e);
+        /*Without an input device nothing moved, so the vector stays zero*/
+        lv_point_t p = { 0, 0 };
+        if(indev != NULL) lv_indev_get_vect(indev, &p);
         transform_vect_recursive(obj, &p);
         if(p.y) {
             lv_obj_t * label = get_label(obj);
@@ -450,12 +451,13 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         release_handler(obj);
     }
     else if(code == LV_EVENT_FOCUSED) {
-        lv_group_t * g             = lv_obj_get_group(obj);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
+        lv_group_t * g = lv_obj_get_group(obj);
+        lv_indev_t * indev = lv_indev_active();
+        lv_indev_type_t indev_type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            const bool editing = lv_group_get_editing(g);
+            const bool editing = g != NULL && lv_group_get_editing(g);
 
             /*Save the current state when entered to edit mode*/
             if(editing) {
@@ -807,19 +809,19 @@ static lv_result_t release_handler(lv_obj_t * obj)
     lv_roller_t * roller = (lv_roller_t *)obj;
 
     /*Leave edit mode once a new option is selected*/
-    lv_indev_type_t indev_type = lv_indev_get_type(indev);
+    lv_indev_type_t indev_type = indev != NULL ? lv_indev_get_type(indev) : LV_INDEV_TYPE_NONE;
     if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
         roller->sel_opt_id_ori = roller->sel_opt_id;
 
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             lv_group_t * g      = lv_obj_get_group(obj);
-            if(lv_group_get_editing(g)) {
+            if(g != NULL && lv_group_get_editing(g)) {
                 lv_group_set_editing(g, false);
             }
         }
     }
 
-    if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
+    if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
         /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
         int16_t new_opt  = -1;
         if(roller->moved == 0) {

@@ -9,7 +9,8 @@
 
 #include "lv_os_private.h"
 
-#if defined(__linux__)
+#if defined(__linux__) && \
+    (LV_USE_OS == LV_OS_NONE || LV_USE_OS == LV_OS_PTHREAD || LV_USE_OS == LV_OS_SDL2)
 
 #include "../core/lv_global.h"
 #include "lv_linux.h"

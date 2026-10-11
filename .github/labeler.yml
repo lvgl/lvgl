@@ -100,7 +100,6 @@ public-api:
           - 'include/**'
           - 'lvgl.h'
           - 'lvgl_private.h'
-          - 'lv_version.h'
           - 'lv_version.h.in'
 
 cmake:
@@ -525,10 +524,7 @@ image:
           - 'include/lvgl/draw/lv_image_dsc.h'
           - 'include/lvgl/draw/lv_draw_image.h'
           - 'src/image/**'
-          - 'src/libs/bin_decoder/**'
           - 'src/draw/lv_draw_image*'
-          - 'src/draw/lv_image_decoder.h'
-          - 'src/draw/lv_image_dsc.h'
           - 'docs/src/main-modules/images/**'
           - 'docs/src/libs/image_support/**'
           - 'scripts/LVGLImage.py'
@@ -562,7 +558,6 @@ libpng:
   - changed-files:
       - any-glob-to-any-file:
           - 'include/lvgl/image/lv_libpng.h'
-          - 'src/libs/libpng/**'
           - 'src/image/lv_libpng.c'
           - 'env_support/cmake/dependencies/png.cmake'
           - 'docs/src/libs/image_support/libpng.mdx'
@@ -584,7 +579,6 @@ libjpeg_turbo:
   - changed-files:
       - any-glob-to-any-file:
           - 'include/lvgl/image/lv_libjpeg_turbo.h'
-          - 'src/libs/libjpeg_turbo/**'
           - 'src/image/lv_libjpeg_turbo.c'
           - 'env_support/cmake/dependencies/jpeg.cmake'
           - 'docs/src/libs/image_support/libjpeg_turbo.mdx'
@@ -595,7 +589,6 @@ libwebp:
   - changed-files:
       - any-glob-to-any-file:
           - 'include/lvgl/image/lv_libwebp.h'
-          - 'src/libs/libwebp/**'
           - 'src/image/lv_libwebp.c'
           - 'env_support/cmake/dependencies/webp.cmake'
           - 'docs/src/libs/image_support/libwebp.mdx'
@@ -606,7 +599,6 @@ bmp:
   - changed-files:
       - any-glob-to-any-file:
           - 'include/lvgl/image/lv_bmp.h'
-          - 'src/libs/bmp/**'
           - 'src/image/lv_bmp.c'
           - 'docs/src/libs/image_support/bmp.mdx'
           - 'examples/libs/bmp/**'
@@ -654,7 +646,6 @@ fs:
       - any-glob-to-any-file:
           - 'include/lvgl/fs/**'
           - 'src/fs/**'
-          - 'src/libs/fsdrv/**'
           - 'src/debugging/test/lv_test_fs.*'
           - 'docs/src/main-modules/fs.mdx'
           - 'docs/src/libs/fs_support/**'
@@ -743,7 +734,6 @@ log:
       - any-glob-to-any-file:
           - 'include/lvgl/logging/**'
           - 'src/logging/**'
-          - 'src/misc/lv_log.h'
           - 'docs/src/debugging/log.mdx'
 
 sysmon:
@@ -758,7 +748,6 @@ profiler:
       - any-glob-to-any-file:
           - 'include/lvgl/debugging/profiler/**'
           - 'src/debugging/profiler/**'
-          - 'src/misc/lv_profiler*.h'
           - 'src/drivers/nuttx/lv_nuttx_profiler.*'
           - 'docs/src/debugging/profiler.mdx'
           - 'scripts/perf/**'
@@ -1001,7 +990,6 @@ ffmpeg:
       - any-glob-to-any-file:
           - 'include/lvgl/widgets/lv_ffmpeg.h'
           - 'src/widgets/ffmpeg/**'
-          - 'src/libs/ffmpeg/**'
           - 'env_support/cmake/dependencies/ffmpeg.cmake'
           - 'docs/src/libs/video_support/ffmpeg.mdx'
           - 'examples/libs/ffmpeg/**'
@@ -1036,7 +1024,6 @@ gstreamer:
       - any-glob-to-any-file:
           - 'include/lvgl/widgets/lv_gstreamer.h'
           - 'src/widgets/gstreamer/**'
-          - 'src/libs/gstreamer/**'
           - 'env_support/cmake/dependencies/gstreamer.cmake'
           - 'docs/src/libs/video_support/gstreamer.mdx'
           - 'examples/libs/gstreamer/**'
@@ -1388,12 +1375,6 @@ mipi:
           - 'include/lvgl/drivers/display/lv_nv3007.h'
           - 'include/lvgl/drivers/display/lv_st77*.h'
           - 'src/drivers/display/mipi/**'
-          - 'src/drivers/display/lcd/**'
-          - 'src/drivers/display/ili9341/**'
-          - 'src/drivers/display/nv3007/**'
-          - 'src/drivers/display/st7735/**'
-          - 'src/drivers/display/st7789/**'
-          - 'src/drivers/display/st7796/**'
           - 'docs/src/integration/external_display_controllers/gen_mipi.mdx'
           - 'docs/src/integration/external_display_controllers/ili9341.mdx'
           - 'docs/src/integration/external_display_controllers/nv3007.mdx'

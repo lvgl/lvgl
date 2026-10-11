@@ -346,6 +346,10 @@ config LV_DRAW_HAS_3D_SUPPORT
 	bool
 	default n
 
+config LV_DRAW_DISABLE_TILED_RENDERING
+	bool
+	default n
+
 config LV_DEF_REFR_PERIOD
 	int "Default refresh period (ms)"
 	default 33
@@ -522,6 +526,7 @@ endmenu
 config LV_DRAW_SW_DRAW_UNIT_CNT
 	int "Number of draw units"
 	default 1
+	range 1 255
 	depends on !LV_OS_NONE
 	help
 		Number of threads used to render a frame in parallel
@@ -890,10 +895,11 @@ endmenu
 
 menu "PXP"
 config LV_USE_PXP
-	bool "PXP (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_PXP]"
+	bool "PXP (legacy)"
 	default n
+	select LV_USE_DRAW_PXP
 	help
-	  Deprecated and non-functional. Use LV_USE_DRAW_PXP instead.
+	  Use LV_USE_DRAW_PXP instead.
 
 config LV_USE_DRAW_PXP
 	bool "PXP renderer"
@@ -1065,10 +1071,11 @@ endmenu
 
 menu "G2D"
 config LV_USE_G2D
-	bool "G2D (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_G2D]"
+	bool "G2D (legacy)"
 	default n
+	select LV_USE_DRAW_G2D
 	help
-	  Deprecated and non-functional. Use LV_USE_DRAW_G2D instead.
+	  Use LV_USE_DRAW_G2D instead.
 
 config LV_USE_DRAW_G2D
 	bool "G2D renderer"
@@ -1115,6 +1122,7 @@ config LV_USE_DRAW_NANOVG
 	select LV_USE_MATRIX
 	select LV_DRAW_HAS_VECTOR_SUPPORT
 	select LV_DRAW_HAS_3D_SUPPORT
+	select LV_DRAW_DISABLE_TILED_RENDERING
 	help
 		Draw with the NanoVG vector library on top of OpenGL / OpenGL ES shaders.
 
@@ -1165,6 +1173,7 @@ config LV_USE_DRAW_OPENGLES
 	default n
 	select LV_USE_OPENGLES
 	select LV_DRAW_HAS_3D_SUPPORT
+	select LV_DRAW_DISABLE_TILED_RENDERING
 	help
 		Draw with OpenGL ES, keeping rendered widgets and images as GPU textures.
 
@@ -1184,6 +1193,7 @@ menu "SDL"
 config LV_USE_DRAW_SDL
 	bool "SDL renderer"
 	select LV_USE_DRAW_SW
+	select LV_DRAW_DISABLE_TILED_RENDERING
 	default n
 	help
 		Render with the SDL renderer API, caching widgets and images as SDL textures.
@@ -2456,6 +2466,12 @@ config LV_LINUX_FBDEV_MMAP
 	help
 		Access the framebuffer through mmap() instead of write() calls.
 
+config LV_LINUX_FBDEV_VSYNC
+	bool "Synchronize flushes with vsync"
+	default n
+	help
+	  Wait for vsync before writing to the framebuffer to reduce tearing
+
 endif #LV_USE_LINUX_FBDEV
 config LV_USE_FT81X
 	bool "FT81X"
@@ -3499,10 +3515,10 @@ menu "Build"
 
 config LVGL_VERSION_MAJOR
 	int
-	default 9
+	default 10
 config LVGL_VERSION_MINOR
 	int
-	default 6
+	default 0
 config LVGL_VERSION_PATCH
 	int
 	default 0
@@ -3601,7 +3617,7 @@ menu "Asserts"
 		  Add a custom handler when assert happens e.g. to restart the MCU
 		  Optional header to override assert-related macros.
 
-	config LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE
+	config LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY
 		bool
 		default y if LV_ASSERT_HANDLER_INCLUDE != ""
 
@@ -3788,6 +3804,12 @@ config LV_ATTRIBUTE_CUSTOM_INCLUDE
 	    MicroPython. Called for all constants in the form LV_<CONST>.
 	    Leave undefined if not using a binding.
 	    e.g. mp_rom_map_elem_t entry = {MP_ROM_QSTR(MP_QSTR_##int_value), MP_ROM_INT(int_value)}
+
+config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+	bool "Place LV_ATTRIBUTE_FAST_MEM functions in IRAM (ESP32 only)"
+	help
+	  Configure LV_ATTRIBUTE_FAST_MEM to use IRAM.
+	  This option is only applicable to ESP32 targets.
 
 endmenu #"Compiler Settings"
 menu "Examples"

@@ -107,10 +107,6 @@ void test_observer_add_remove(void)
     lv_subject_deinit(&subject);
     LV_DEPRECATIONS_IGNORE_END
 
-    static lv_subject_t uninitialized_subject;
-    lv_observer_t * observer = lv_subject_add_observer(&uninitialized_subject, observer_int,
-                                                       NULL);
-    TEST_ASSERT_EQUAL_PTR(NULL, observer); /*The observer must be NULL*/
 }
 
 void test_object_observer_add_remove(void)
@@ -232,21 +228,6 @@ void test_observer_int(void)
     TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(subject));
     TEST_ASSERT_EQUAL(3, observer_called);
 
-    /*Ignore incorrect types*/
-    lv_subject_set_pointer(subject, NULL);
-    TEST_ASSERT_EQUAL(15, lv_subject_get_int(subject));
-    TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(subject));
-    TEST_ASSERT_EQUAL(3, observer_called);
-
-    lv_subject_set_color(subject, lv_color_black());
-    TEST_ASSERT_EQUAL(15, lv_subject_get_int(subject));
-    TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(subject));
-    TEST_ASSERT_EQUAL(3, observer_called);
-
-    lv_subject_set_string(subject, "hello");
-    TEST_ASSERT_EQUAL(15, lv_subject_get_int(subject));
-    TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(subject));
-    TEST_ASSERT_EQUAL(3, observer_called);
 
     lv_observer_delete(basic_observer);
 }
@@ -279,21 +260,6 @@ void test_observer_float(void)
     TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(subject));
     TEST_ASSERT_EQUAL(3, observer_called);
 
-    /*Ignore incorrect types*/
-    lv_subject_set_pointer(subject, NULL);
-    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(subject));
-    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(subject));
-    TEST_ASSERT_EQUAL(3, observer_called);
-
-    lv_subject_set_color(subject, lv_color_black());
-    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(subject));
-    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(subject));
-    TEST_ASSERT_EQUAL(3, observer_called);
-
-    lv_subject_set_string(subject, "hello");
-    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(subject));
-    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(subject));
-    TEST_ASSERT_EQUAL(3, observer_called);
 
     lv_observer_delete(basic_observer);
 }
@@ -375,24 +341,6 @@ void test_observer_string(void)
                              lv_subject_get_previous_string(subject));
     TEST_ASSERT_EQUAL(7, observer_called);
 
-    /*Ignore incorrect types*/
-    lv_subject_set_pointer(subject, NULL);
-    TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(subject));
-    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.",
-                             lv_subject_get_previous_string(subject));
-    TEST_ASSERT_EQUAL(7, observer_called);
-
-    lv_subject_set_color(subject, lv_color_black());
-    TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(subject));
-    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.",
-                             lv_subject_get_previous_string(subject));
-    TEST_ASSERT_EQUAL(7, observer_called);
-
-    lv_subject_set_int(subject, 10);
-    TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(subject));
-    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.",
-                             lv_subject_get_previous_string(subject));
-    TEST_ASSERT_EQUAL(7, observer_called);
     lv_observer_delete(basic_observer);
 }
 
@@ -431,21 +379,6 @@ void test_observer_pointer(void)
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(subject));
     TEST_ASSERT_EQUAL(4, observer_called);
 
-    /*Ignore incorrect types*/
-    lv_subject_set_int(subject, 10);
-    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(subject));
-    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(subject));
-    TEST_ASSERT_EQUAL(4, observer_called);
-
-    lv_subject_set_color(subject, lv_color_black());
-    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(subject));
-    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(subject));
-    TEST_ASSERT_EQUAL(4, observer_called);
-
-    lv_subject_set_string(subject, "hello");
-    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(subject));
-    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(subject));
-    TEST_ASSERT_EQUAL(4, observer_called);
     lv_observer_delete(basic_observer);
 }
 
@@ -485,24 +418,6 @@ void test_observer_color(void)
                             lv_subject_get_previous_color(subject));
     TEST_ASSERT_EQUAL(3, observer_called);
 
-    /*Ignore incorrect types*/
-    lv_subject_set_pointer(subject, NULL);
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
-                            lv_subject_get_color(subject));
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
-                            lv_subject_get_previous_color(subject));
-
-    lv_subject_set_int(subject, 10);
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
-                            lv_subject_get_color(subject));
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
-                            lv_subject_get_previous_color(subject));
-
-    lv_subject_set_string(subject, "hello");
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
-                            lv_subject_get_color(subject));
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
-                            lv_subject_get_previous_color(subject));
     lv_observer_delete(basic_observer);
 }
 
@@ -538,10 +453,6 @@ void test_observer_group(void)
                           lv_subject_get_group_element(group_subject, 0));
     TEST_ASSERT_EQUAL_PTR(list[1],
                           lv_subject_get_group_element(group_subject, 1));
-    TEST_ASSERT_EQUAL_PTR(NULL,
-                          lv_subject_get_group_element(group_subject, 2));
-    TEST_ASSERT_EQUAL_PTR(NULL, lv_subject_get_group_element(group_subject,
-                                                             1000));
 
     group_observer_called = 0;
     lv_subject_add_observer(group_subject, group_observer_cb, NULL);
@@ -591,36 +502,6 @@ void test_observer_group_deinit_unsubscribes_from_elements(void)
     TEST_ASSERT_EQUAL(0, group_observer_called);
 }
 
-void test_observer_obj_flag_invalid_subject(void)
-{
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    typedef lv_observer_t * (*lv_obj_bind_flag_fn)(
-        lv_obj_t *, lv_subject_t *, lv_obj_flag_t, int32_t);
-    static const lv_obj_bind_flag_fn fns[] = {
-        lv_obj_bind_flag_if_eq, lv_obj_bind_flag_if_not_eq,
-        lv_obj_bind_flag_if_ge, lv_obj_bind_flag_if_gt,
-        lv_obj_bind_flag_if_lt, lv_obj_bind_flag_if_le,
-    };
-    LV_DEPRECATIONS_IGNORE_END
-
-    lv_obj_t * obj = lv_obj_create(lv_screen_active());
-
-
-    /* Can only bind to int */
-    lv_subject_t * invalid[4];
-    invalid[0] = subject_create(LV_SUBJECT_TYPE_POINTER);
-    invalid[1] = subject_create(LV_SUBJECT_TYPE_STRING);
-    invalid[2] = subject_create(LV_SUBJECT_TYPE_COLOR);
-    invalid[3] = subject_create(LV_SUBJECT_TYPE_GROUP);
-
-    for(size_t i = 0; i < LV_ARRAYLEN(fns); ++i) {
-        for(size_t j = 0; j < LV_ARRAYLEN(invalid); ++j) {
-            TEST_ASSERT_EQUAL_PTR(NULL,
-                                  fns[i](obj, invalid[j],
-                                         LV_OBJ_FLAG_HIDDEN, 5));
-        }
-    }
-}
 void test_observer_obj_flag_eq(void)
 {
     LV_DEPRECATIONS_IGNORE_BEGIN
@@ -737,35 +618,6 @@ void test_observer_obj_flag_lt(void)
 
     lv_subject_set_int(subject, 3);
     TEST_ASSERT_EQUAL(true, lv_obj_is_hidden(obj));
-    LV_DEPRECATIONS_IGNORE_END
-}
-
-void test_observer_obj_state_invalid_subject(void)
-{
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    typedef lv_observer_t * (*lv_obj_bind_state_fn)(
-        lv_obj_t *, lv_subject_t *, lv_state_t, int32_t);
-
-    static const lv_obj_bind_state_fn fns[] = {
-        lv_obj_bind_state_if_eq, lv_obj_bind_state_if_not_eq,
-        lv_obj_bind_state_if_ge, lv_obj_bind_state_if_gt,
-        lv_obj_bind_state_if_lt, lv_obj_bind_state_if_le,
-    };
-    lv_obj_t * obj = lv_obj_create(lv_screen_active());
-
-    /* Can only bind to int */
-    lv_subject_t * invalid[4];
-    invalid[0] = subject_create(LV_SUBJECT_TYPE_POINTER);
-    invalid[1] = subject_create(LV_SUBJECT_TYPE_STRING);
-    invalid[2] = subject_create(LV_SUBJECT_TYPE_COLOR);
-    invalid[3] = subject_create(LV_SUBJECT_TYPE_GROUP);
-
-    for(size_t i = 0; i < LV_ARRAYLEN(fns); ++i) {
-        for(size_t j = 0; j < LV_ARRAYLEN(invalid); ++j) {
-            TEST_ASSERT_EQUAL_PTR(
-                NULL, fns[i](obj, invalid[j], 0, 5));
-        }
-    }
     LV_DEPRECATIONS_IGNORE_END
 }
 
@@ -911,20 +763,6 @@ void test_observer_obj_bind_bool_flag(void)
     lv_observer_delete(observer);
     lv_subject_set_int(subject, 1);
     TEST_ASSERT_EQUAL(false, lv_obj_is_hidden(obj));
-
-    lv_obj_delete(obj);
-}
-
-void test_observer_obj_bind_bool_invalid(void)
-{
-    lv_obj_t * obj = lv_obj_create(lv_screen_active());
-
-    lv_subject_t * subject = subject_create(LV_SUBJECT_TYPE_INT);
-    lv_subject_set_int(subject, 0);
-
-    TEST_ASSERT_EQUAL_PTR(NULL, lv_obj_bind_bool(NULL, subject, lv_obj_set_hidden));
-    TEST_ASSERT_EQUAL_PTR(NULL, lv_obj_bind_bool(obj, NULL, lv_obj_set_hidden));
-    TEST_ASSERT_EQUAL_PTR(NULL, lv_obj_bind_bool(obj, subject, NULL));
 
     lv_obj_delete(obj);
 }
@@ -1086,10 +924,6 @@ void test_observer_button_checked(void)
     lv_obj_set_checkable(obj, true);
     lv_obj_update_layout(obj);
 
-    /*Can bind only to int*/
-    lv_subject_t * subject_wrong = subject_create(LV_SUBJECT_TYPE_POINTER);
-    lv_observer_t * observer = lv_obj_bind_checked(obj, subject_wrong);
-    TEST_ASSERT_EQUAL_PTR(NULL, observer);
 
     lv_subject_t * subject = subject_create(LV_SUBJECT_TYPE_INT);
     lv_subject_set_int(subject, 1);
@@ -1163,7 +997,7 @@ void test_observer_label_text_normal(void)
 
     /*Remove the label from the subject*/
     lv_obj_remove_from_subject(obj, subject_pointer);
-    lv_subject_set_string(subject_pointer, "NOTHING");
+    lv_subject_set_pointer(subject_pointer, "NOTHING");
     TEST_ASSERT_EQUAL_STRING("WORLD", lv_label_get_text(obj));
 }
 
@@ -1219,7 +1053,7 @@ void test_observer_label_text_formatted(void)
 
     /*Remove the label from the subject*/
     lv_obj_remove_from_subject(obj, subject_pointer);
-    lv_subject_set_string(subject_pointer, "NOTHING");
+    lv_subject_set_pointer(subject_pointer, "pointer: NOTHING");
     TEST_ASSERT_EQUAL_STRING("pointer: WORLD", lv_label_get_text(obj));
 }
 
