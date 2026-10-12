@@ -15,6 +15,10 @@
 #include "../../../osal/lv_os_private.h"
 #include <main.h>
 
+#if USE_HAL_LTDC_REGISTER_CALLBACKS != 1
+    #error LV_USE_ST_LTDC requires USE_HAL_LTDC_REGISTER_CALLBACKS to be 1 in the STM32 HAL configuration
+#endif /*USE_HAL_LTDC_REGISTER_CALLBACKS != 1*/
+
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
     #if LV_USE_DRAW_DMA2D
         #error cannot use LV_ST_LTDC_USE_DMA2D_FLUSH with LV_USE_DRAW_DMA2D
@@ -249,6 +253,7 @@ static lv_color_format_t get_lv_cf_from_layer_cf(uint32_t cf)
         default:
             LV_ASSERT_MSG(0, "the LTDC color format is not supported");
     }
+    return LV_COLOR_FORMAT_UNKNOWN;
 }
 
 static void reload_event_callback(LTDC_HandleTypeDef * hltdc)
@@ -295,6 +300,7 @@ static uint32_t get_dma2d_output_cf_from_layer_cf(uint32_t cf)
         default:
             LV_ASSERT_MSG(0, "DMA2D cannot output to the LTDC color format");
     }
+    return DMA2D_OUTPUT_ARGB8888;
 }
 
 static uint32_t get_dma2d_input_cf_from_lv_cf(uint32_t cf)
@@ -315,6 +321,7 @@ static uint32_t get_dma2d_input_cf_from_lv_cf(uint32_t cf)
         default:
             LV_ASSERT_MSG(0, "the LVGL color format is not a DMA2D input color format");
     }
+    return DMA2D_INPUT_ARGB8888;
 }
 #endif /*LV_ST_LTDC_USE_DMA2D_FLUSH*/
 
