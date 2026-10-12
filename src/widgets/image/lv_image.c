@@ -39,6 +39,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_image(lv_event_t * e);
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y);
 static void update_align(lv_obj_t * obj);
+static lv_point_t get_transformed_size(lv_obj_t * obj);
 static void reset_image_attributes(lv_obj_t * obj);
 
 #if LV_USE_OBSERVER
@@ -585,32 +586,18 @@ int32_t lv_image_get_transformed_width(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
-    lv_image_t * img = (lv_image_t *)obj;
     update_align(obj);
 
-    lv_point_t pivot_px;
-    lv_image_get_pivot(obj, &pivot_px);
-
-    lv_area_t a;
-    lv_image_buf_get_transformed_area(&a, img->w, img->h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-
-    return lv_area_get_width(&a);
+    return get_transformed_size(obj).x;
 }
 
 int32_t lv_image_get_transformed_height(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
-    lv_image_t * img = (lv_image_t *)obj;
     update_align(obj);
 
-    lv_point_t pivot_px;
-    lv_image_get_pivot(obj, &pivot_px);
-
-    lv_area_t a;
-    lv_image_buf_get_transformed_area(&a, img->w, img->h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-
-    return lv_area_get_height(&a);
+    return get_transformed_size(obj).y;
 }
 
 lv_blend_mode_t lv_image_get_blend_mode(lv_obj_t * obj)
@@ -996,6 +983,34 @@ static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
     a.x2 += obj->coords.x1 + 1;
     a.y2 += obj->coords.y1 + 1;
     lv_obj_invalidate_area(obj, &a);
+}
+
+static lv_point_t get_transformed_size(lv_obj_t * obj)
+{
+    lv_image_t * img = (lv_image_t *)obj;
+    lv_point_t size;
+
+    if(img->rotation == 0) {
+        /*Exact, rounded to the nearest pixel*/
+        size.x = (int32_t)(((int64_t)img->w * img->scale_x + 128) >> 8);
+        size.y = (int32_t)(((int64_t)img->h * img->scale_y + 128) >> 8);
+        return size;
+    }
+
+    /*Transform the corners, not the last pixels*/
+    lv_point_t pivot_px;
+    lv_image_get_pivot(obj, &pivot_px);
+    lv_point_t p[4] = {
+        {0, 0},
+        {img->w, 0},
+        {0, img->h},
+        {img->w, img->h},
+    };
+    lv_point_array_transform(p, 4, img->rotation, img->scale_x, img->scale_y, &pivot_px, true);
+
+    size.x = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x) - LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
+    size.y = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y) - LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
+    return size;
 }
 
 static void update_align(lv_obj_t * obj)

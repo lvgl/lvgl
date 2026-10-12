@@ -1182,4 +1182,78 @@ void test_image_draw_main_unknown_src_type(void)
     lv_refr_now(NULL);
 }
 
+static const uint32_t checker_px[16] = {
+    0xFFFFFFFF, 0xFF000000, 0xFFFFFFFF, 0xFF000000,
+    0xFF000000, 0xFFFFFFFF, 0xFF000000, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFF000000, 0xFFFFFFFF, 0xFF000000,
+    0xFF000000, 0xFFFFFFFF, 0xFF000000, 0xFFFFFFFF,
+};
+
+static const lv_image_dsc_t checker = {
+    .header = {
+        .magic = LV_IMAGE_HEADER_MAGIC,
+        .cf = LV_COLOR_FORMAT_ARGB8888,
+        .w = 4,
+        .h = 4,
+        .stride = 4 * 4,
+    },
+    .data_size = sizeof(checker_px),
+    .data = (const uint8_t *)checker_px,
+};
+
+void test_image_stretch_small_source(void)
+{
+    /*#10818: a 4x4 source stretched to 32x32 was drawn and reported as 25x25*/
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &checker);
+    lv_obj_set_size(img, 32, 32);
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_STRETCH);
+
+    TEST_ASSERT_EQUAL_INT32(32, lv_image_get_transformed_width(img));
+    TEST_ASSERT_EQUAL_INT32(32, lv_image_get_transformed_height(img));
+
+#if LV_USE_SNAPSHOT
+    lv_draw_buf_t * snap = lv_snapshot_take(img, LV_COLOR_FORMAT_ARGB8888);
+    TEST_ASSERT_NOT_NULL(snap);
+
+    uint32_t painted = 0;
+    uint32_t x, y;
+    for(y = 0; y < snap->header.h; y++) {
+        for(x = 0; x < snap->header.w; x++) {
+            const uint8_t * px = lv_draw_buf_goto_xy(snap, x, y);
+            if(px[3]) painted++;
+        }
+    }
+    lv_draw_buf_destroy(snap);
+    TEST_ASSERT_EQUAL_UINT32(32 * 32, painted);
+#endif
+}
+
+void test_image_transformed_size_is_exact(void)
+{
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &checker);
+
+    lv_image_set_scale(img, 2048);
+    TEST_ASSERT_EQUAL_INT32(32, lv_image_get_transformed_width(img));
+    TEST_ASSERT_EQUAL_INT32(32, lv_image_get_transformed_height(img));
+
+    /*4 * 700 / 256 = 10.94*/
+    lv_image_set_scale_x(img, 700);
+    lv_image_set_scale_y(img, 128);
+    TEST_ASSERT_EQUAL_INT32(11, lv_image_get_transformed_width(img));
+    TEST_ASSERT_EQUAL_INT32(2, lv_image_get_transformed_height(img));
+
+    /*Rotation swaps the axes and keeps the scaled size*/
+    lv_image_set_scale_x(img, 512);
+    lv_image_set_scale_y(img, 256);
+    lv_image_set_rotation(img, 900);
+    TEST_ASSERT_EQUAL_INT32(4, lv_image_get_transformed_width(img));
+    TEST_ASSERT_EQUAL_INT32(8, lv_image_get_transformed_height(img));
+
+    lv_image_set_scale(img, LV_SCALE_NONE);
+    TEST_ASSERT_EQUAL_INT32(4, lv_image_get_transformed_width(img));
+    TEST_ASSERT_EQUAL_INT32(4, lv_image_get_transformed_height(img));
+}
+
 #endif
