@@ -42,6 +42,7 @@ typedef struct {
 static uint32_t lv_bidi_get_next_paragraph(const char * txt);
 static lv_base_dir_t lv_bidi_get_letter_dir(uint32_t letter);
 static bool lv_bidi_letter_is_weak(uint32_t letter);
+static bool lv_bidi_is_digit_separator(const char * txt, uint32_t pos, uint32_t letter, uint32_t next_letter);
 static bool lv_bidi_letter_is_rtl(uint32_t letter);
 static bool lv_bidi_letter_is_neutral(uint32_t letter);
 
@@ -327,6 +328,22 @@ static bool lv_bidi_letter_is_weak(uint32_t letter)
            (letter >= 0x06F0 && letter <= 0x06F9);
 }
 /**
+ * Tell whether a ':' or '/' is between two digits, e.g. in 12:45 or 2024/05/15
+ * @param txt         the text
+ * @param pos         byte index of `letter` in `txt`
+ * @param letter      the letter to check
+ * @param next_letter the letter after `letter`
+ * @return true/false
+ */
+static bool lv_bidi_is_digit_separator(const char * txt, uint32_t pos, uint32_t letter, uint32_t next_letter)
+{
+    if(letter != ':' && letter != '/') return false;
+    if(pos == 0 || lv_bidi_letter_is_weak(next_letter) == false) return false;
+
+    uint32_t prev_pos = pos;
+    return lv_bidi_letter_is_weak(lv_text_encoded_prev(txt, &prev_pos));
+}
+/**
  * Tell whether a character is RTL or not
  * @param letter a Unicode character
  * @return true/false
@@ -508,6 +525,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
             uint32_t first_weak = i;
             uint16_t pos_conv_last_weak = pos_conv_i;
             uint16_t pos_conv_first_weak = pos_conv_i;
+            uint32_t next_letter = letter;  /*The letter after `letter`, already part of the number*/
             while(i) {
                 letter = lv_text_encoded_prev(src, &i);
                 pos_conv_letter = --pos_conv_i;
@@ -516,13 +534,15 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
 
                 /*Finish on non-weak char*/
                 /*but treat number and currency related chars as weak*/
-                if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$' && letter != '%') {
+                if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$' && letter != '%' &&
+                   lv_bidi_is_digit_separator(src, i, letter, next_letter) == false) {
                     lv_text_encoded_next(src, &i);   /*Rewind one letter*/
                     pos_conv_i++;
                     first_weak = i;
                     pos_conv_first_weak = pos_conv_i;
                     break;
                 }
+                next_letter = letter;
             }
             if(i == 0) {
                 first_weak = 0;
