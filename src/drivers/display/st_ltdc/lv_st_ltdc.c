@@ -117,6 +117,17 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
     uint32_t layer_height = layer_cfg->ImageHeight;
     uint32_t layer_cf = layer_cfg->PixelFormat;
     lv_color_format_t cf = get_lv_cf_from_layer_cf(layer_cf);
+    if(cf == LV_COLOR_FORMAT_UNKNOWN) {
+        LV_LOG_ERROR("the LTDC layer color format %u is not supported", (unsigned int)layer_cf);
+        return NULL;
+    }
+
+#if LV_ST_LTDC_USE_DMA2D_FLUSH
+    if(mode == LV_DISPLAY_RENDER_MODE_PARTIAL && (cf == LV_COLOR_FORMAT_L8 || cf == LV_COLOR_FORMAT_AL88)) {
+        LV_LOG_ERROR("DMA2D flush cannot output to the LTDC layer color format %u", (unsigned int)layer_cf);
+        return NULL;
+    }
+#endif /*LV_ST_LTDC_USE_DMA2D_FLUSH*/
 
     lv_display_t * disp = lv_display_create(layer_width, layer_height);
     lv_display_set_color_format(disp, cf);
