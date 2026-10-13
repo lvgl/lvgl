@@ -205,6 +205,13 @@ struct _lv_display_t {
  */
 void lv_display_set_draw_buf_handlers(lv_display_t * disp, const lv_draw_buf_handlers_t * handlers);
 
+/**
+ * Clean up display state after a screen has been deleted.
+ * @param disp      pointer to the display
+ * @param screen    pointer value of the deleted screen
+ */
+void lv_display_handle_screen_delete(lv_display_t * disp, lv_obj_t * screen);
+
 /**********************
  *      MACROS
  **********************/
