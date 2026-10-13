@@ -916,4 +916,31 @@ void test_bidi_persian_date_keeps_digit_order(void)
     assert_numeric_bidi(input, expected, LV_BASE_DIR_AUTO, positions, 12);
 }
 
+void test_bidi_time_and_date_keep_order(void)
+{
+    /*':' and '/' between digits keep a time or a date together*/
+    const uint16_t time_positions[] = {5, 6, 7, 8, 9, 4, 3, 2, 1, 0};
+    assert_numeric_bidi("\xd8\xb3\xd8\xa7\xd8\xb9\xd8\xaa 12:45",
+                        "12:45 \xd8\xaa\xd8\xb9\xd8\xa7\xd8\xb3", LV_BASE_DIR_RTL, time_positions, 10);
+    assert_numeric_bidi("\xd8\xb3\xd8\xa7\xd8\xb9\xd8\xaa \xdb\xb1\xdb\xb2:\xdb\xb4\xdb\xb5",
+                        "\xdb\xb1\xdb\xb2:\xdb\xb4\xdb\xb5 \xd8\xaa\xd8\xb9\xd8\xa7\xd8\xb3", LV_BASE_DIR_RTL, time_positions, 10);
+
+    const uint16_t date_positions[] = {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 5, 4, 3, 2, 1, 0};
+    assert_numeric_bidi("\xd8\xaa\xd8\xa7\xd8\xb1\xdb\x8c\xd8\xae \xdb\xb1\xdb\xb4\xdb\xb0\xdb\xb3/\xdb\xb0\xdb\xb5/\xdb\xb1\xdb\xb5",
+                        "\xdb\xb1\xdb\xb4\xdb\xb0\xdb\xb3/\xdb\xb0\xdb\xb5/\xdb\xb1\xdb\xb5 \xd8\xae\xdb\x8c\xd8\xb1\xd8\xa7\xd8\xaa",
+                        LV_BASE_DIR_RTL, date_positions, 16);
+}
+
+void test_bidi_colon_outside_numbers_is_not_joined(void)
+{
+    /*A ':' after a word or after the last digit is not part of the number*/
+    const uint16_t after_word_positions[] = {6, 7, 5, 4, 3, 2, 1, 0};
+    assert_numeric_bidi("\xd8\xb3\xd8\xa7\xd8\xb9\xd8\xaa: 12",
+                        "12 :\xd8\xaa\xd8\xb9\xd8\xa7\xd8\xb3", LV_BASE_DIR_RTL, after_word_positions, 8);
+
+    const uint16_t trailing_positions[] = {7, 5, 6, 4, 3, 2, 1, 0};
+    assert_numeric_bidi("\xd8\xb3\xd8\xa7\xd8\xb9\xd8\xaa 12:",
+                        ":12 \xd8\xaa\xd8\xb9\xd8\xa7\xd8\xb3", LV_BASE_DIR_RTL, trailing_positions, 8);
+}
+
 #endif /*LV_BUILD_TEST*/
