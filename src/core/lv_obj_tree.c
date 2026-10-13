@@ -63,10 +63,14 @@ void lv_obj_delete(lv_obj_t * obj)
 
     lv_display_t * disp = NULL;
     bool act_screen_del = false;
+    bool prev_screen_del = false;
+    bool loading_screen_del = false;
     if(par == NULL) {
         disp = lv_obj_get_display(obj);
         if(!disp) return;   /*Shouldn't happen*/
         if(disp->act_scr == obj) act_screen_del = true;
+        if(disp->prev_scr == obj) prev_screen_del = true;
+        if(disp->scr_to_load == obj) loading_screen_del = true;
     }
 
     obj_delete_core(obj);
@@ -83,6 +87,8 @@ void lv_obj_delete(lv_obj_t * obj)
         LV_LOG_WARN("the active screen was deleted");
         disp->act_scr = NULL;
     }
+    if(prev_screen_del) disp->prev_scr = NULL;
+    if(loading_screen_del) disp->scr_to_load = NULL;
 
     LV_ASSERT_MEM_INTEGRITY();
     LV_LOG_TRACE("finished (delete %p)", (void *)obj);
