@@ -44,7 +44,7 @@ jobs:
 
       - name: Cache toolchains
         id: cache-toolchains
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ${{ env.ARM_TOOLCHAIN_DIR }}
