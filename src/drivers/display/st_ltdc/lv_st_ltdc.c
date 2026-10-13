@@ -264,7 +264,7 @@ static void reload_event_callback(LTDC_HandleTypeDef * hltdc)
 
 static void clean_dcache(void)
 {
-#if defined(__CORTEX_M) && __CORTEX_M == 7
+#if defined(__CORTEX_M) && ((__CORTEX_M == 7) || (__CORTEX_M == 55))
     SCB_CleanDCache();
 #elif defined(__CORTEX_A) && __CORTEX_A == 7
     L1C_CleanDCacheAll();
