@@ -8,6 +8,9 @@ files:
     - "tests/**/*"
     - "env_support/cmsis-pack/**/*"
     - "demos/**/screenshot*"
+    - "docs/src/**/*"
+    - "libs/nema_gfx/**/*"
+    - "scripts/generators/built_in_font/**/*"
 dependencies:
   espressif/freetype:
     require: private
