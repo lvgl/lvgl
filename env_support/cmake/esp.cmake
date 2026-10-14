@@ -68,8 +68,8 @@ endif()
 
 target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
 
-# REQUIRES can't depend on CONFIG_ (they are collected before the config exists), so link fatfs here
-if(CONFIG_LV_USE_FS_FATFS AND NOT CMAKE_BUILD_EARLY_EXPANSION)
+# On the first pass, CONFIG_XXX values are not yet exported so this condition is never taken
+if(CONFIG_LV_USE_FS_FATFS)
   idf_build_get_property(build_components BUILD_COMPONENTS)
   if(NOT fatfs IN_LIST build_components)
     message(FATAL_ERROR "LV_USE_FS_FATFS needs the fatfs component: add fatfs to REQUIRES in main/CMakeLists.txt")
