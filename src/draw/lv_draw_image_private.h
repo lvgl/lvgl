@@ -78,6 +78,22 @@ void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
 void lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
                                        uint16_t scale_x, uint16_t scale_y, const lv_point_t * pivot);
 
+/**
+ * Get the area a rotated and scaled image is painted into. Unlike
+ * `lv_image_buf_get_transformed_area()` it is never smaller than what gets drawn.
+ * Exact without rotation, can be a pixel larger with it.
+ * Use it for clip areas, draw areas, extended draw sizes and invalidations.
+ * @param res store the coordinates here
+ * @param w width of the image
+ * @param h height of the image
+ * @param angle angle of rotation
+ * @param scale_x zoom in x direction, (256 no zoom)
+ * @param scale_y zoom in y direction, (256 no zoom)
+ * @param pivot x,y pivot coordinates of rotation
+ */
+void lv_image_buf_get_transformed_footprint(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
+                                            uint16_t scale_x, uint16_t scale_y, const lv_point_t * pivot);
+
 /**********************
  *      MACROS
  **********************/
