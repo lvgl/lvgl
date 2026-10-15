@@ -109,16 +109,13 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
     new_task->draw_dsc = (uint8_t *)new_task + LV_ALIGN_UP(sizeof(lv_draw_task_t), 8);
     new_task->state = LV_DRAW_TASK_STATE_WAITING;
 
-    /*Find the tail*/
     if(layer->draw_task_head == NULL) {
         layer->draw_task_head = new_task;
     }
     else {
-        lv_draw_task_t * tail = layer->draw_task_head;
-        while(tail->next) tail = tail->next;
-
-        tail->next = new_task;
+        layer->draw_task_tail->next = new_task;
     }
+    layer->draw_task_tail = new_task;
     LV_LOG_TRACE("Added task %p (type %d), layer (%p) layer head (%p)", (void *)new_task, new_task->type,
                  (void *) layer, (void *)layer->draw_task_head);
 
@@ -254,6 +251,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
                 LV_LOG_ERROR("draw task failed, type: %d", (int)t->type);
             }
 
+            if(layer->draw_task_tail == t) layer->draw_task_tail = t_prev;
             lv_draw_cleanup_task(t);
             remove_task = true;
             if(t_prev != NULL)
@@ -641,6 +639,7 @@ void lv_draw_layer_deinit(lv_layer_t * layer)
         t = next;
     }
     layer->draw_task_head = NULL;
+    layer->draw_task_tail = NULL;
 
     if(layer->display) {
         lv_layer_t * l = layer->display->layer_head;

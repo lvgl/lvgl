@@ -333,6 +333,7 @@ static void snapshot_discard_layer_tasks(lv_layer_t * layer)
     }
 
     layer->draw_task_head = NULL;
+    layer->draw_task_tail = NULL;
 }
 
 #endif /*LV_USE_SNAPSHOT*/

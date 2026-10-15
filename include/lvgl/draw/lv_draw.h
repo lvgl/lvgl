@@ -101,6 +101,8 @@ struct _lv_layer_t  {
 
     /** Linked list of draw tasks */
     lv_draw_task_t * draw_task_head;
+    /** Last task in the list, to append in constant time */
+    lv_draw_task_t * draw_task_tail;
 
     /** The display assigned to this layer*/
     lv_display_t * display;
