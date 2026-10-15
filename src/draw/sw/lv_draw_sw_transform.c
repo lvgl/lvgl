@@ -137,6 +137,11 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
 {
     LV_UNUSED(sup);
 
+    if(draw_dsc->scale_x <= 0 || draw_dsc->scale_y <= 0) {
+        /* Avoid a division by zero crash in the transform code below. */
+        return;
+    }
+
     point_transform_dsc_t tr_dsc;
     tr_dsc.angle = -draw_dsc->rotation;
     tr_dsc.scale_x = draw_dsc->scale_x;
