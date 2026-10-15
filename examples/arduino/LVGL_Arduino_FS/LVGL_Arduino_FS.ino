@@ -3,7 +3,7 @@
 
 #include <lvgl.h>
 
-/*This example uses the LovyanGFX display interface, you would need to setup
+/*This example uses the LovyanGFX display interface, you need to setup
  *your display driver accordingly. 'my_display.hpp' contains the example configuration file
  *which by default uses LGFX_AUTODETECT.
  *Ensure your 'lv_conf.h' is set as below;
@@ -21,11 +21,11 @@
 #endif
 
 /*Setup your 'lv_conf.h' to enable the file system interfaces.
- *If using LITTLEFS, enable it and set a drive letter.
+ *If using LittleFS, enable it and set a drive letter.
  #define LV_USE_FS_ARDUINO_ESP_LITTLEFS 1
  #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER 67 // 'C'
 
- *If using LITTLEFS, enable it and set a drive letter.
+ *If using an SD card, enable it and set a drive letter.
  #define LV_USE_FS_ARDUINO_SD 1
  #define LV_FS_ARDUINO_SD_LETTER 68 // 'D'
 
@@ -38,11 +38,16 @@
 /*Set to your screen resolution and rotation*/
 #define TFT_HOR_RES   240
 #define TFT_VER_RES   320
-#define TFT_ROTATION  LV_ROTATION_90
+#define TFT_ROTATION  LV_ROTATION_0
+
+/* First time using LittleFS might require formatting */
+#define LFS_FORMAT_IF_FAILED false /* Set to true to format LittleFS if mounting fails. */
+
+#define SD_CS 4
 
 /*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
-#define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
-uint32_t draw_buf[DRAW_BUF_SIZE / 4];
+#define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * 2) /* 2 bytes per pixel for RGB565 */
+static uint8_t draw_buf[DRAW_BUF_SIZE];
 
 #if LV_USE_LOG != 0
 void my_print( lv_log_level_t level, const char * buf )
@@ -68,13 +73,13 @@ void setup()
     Serial.begin(115200);
     Serial.println(LVGL_Arduino);
 
-    bool state;
+    bool state = false;
 #if LV_USE_FS_ARDUINO_ESP_LITTLEFS
-    state = LittleFS.begin(true);
+    state = LittleFS.begin(LFS_FORMAT_IF_FAILED);
     Serial.println(state ? "LittleFS initialized" : "LittleFS init failed");
 #endif
 #if LV_USE_FS_ARDUINO_SD
-    state = SD.begin(4);
+    state = SD.begin(SD_CS);
     Serial.println(state ? "SD initialized" : "SD init failed");
 #endif
 
@@ -109,7 +114,6 @@ void setup()
      * ---------------------
      * In the sketch data folder, you'll find some sample PNG images.
      * Upload them to the LittleFS file system or copy them to the SD card.
-     * Use this plugin for LittleFS: https://github.com/lorol/arduino-esp32littlefs-plugin
      * Then load the images from the file systems by using the appropriate drive letter path.
      * Note: The PNG decoder must be enabled in 'lv_conf.h' (LV_USE_LODEPNG) to load PNG images. */
 

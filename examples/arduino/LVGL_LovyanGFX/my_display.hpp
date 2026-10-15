@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lvgl_public.h"
+#include <lvgl.h>
 
 #if LV_USE_LOVYAN_GFX
 

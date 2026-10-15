@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lvgl_public.h"
+#include <lvgl.h>
 
 #if LV_USE_LOVYAN_GFX
 
@@ -86,7 +86,7 @@ public:
             auto cfg = panel.config();
 
             cfg.pin_cs = 5;
-            cfg.pin_rst = 4;
+            cfg.pin_rst = -1;
             cfg.pin_busy = -1;
             cfg.memory_width = 240;
             cfg.memory_height = 240;
@@ -101,7 +101,7 @@ public:
             cfg.invert = false;
             cfg.rgb_order = false;
             cfg.dlen_16bit = false;
-            cfg.bus_shared = false;
+            cfg.bus_shared = true;
 
             panel.config(cfg);
         }
