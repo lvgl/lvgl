@@ -61,6 +61,8 @@ lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * b
     dsc->tft->setBrightness(255);
     dsc->tft->startWrite();
     dsc->tft->fillScreen(0x00000);
+    dsc->tft->waitDMA();
+    dsc->tft->endWrite();
 
     lv_display_set_driver_data(disp, (void *)dsc);
     lv_display_set_flush_cb(disp, flush_cb);
@@ -96,6 +98,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     }
     dsc->tft->pushImageDMA(area->x1, area->y1, w, h, (uint16_t *)px_map);
     dsc->tft->waitDMA();
+    /* Release the shared SPI bus before LVGL can access SD-backed assets. */
+    dsc->tft->endWrite();
 
     lv_display_flush_ready(disp);
 
