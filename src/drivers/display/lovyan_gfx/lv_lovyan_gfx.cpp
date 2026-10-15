@@ -93,13 +93,16 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     uint32_t h = (area->y2 - area->y1 + 1);
 
 
-    if(dsc->tft->getStartCount() == 0) {
+    bool started_write = dsc->tft->getStartCount() == 0;
+    if(started_write) {
         dsc->tft->startWrite();
     }
     dsc->tft->pushImageDMA(area->x1, area->y1, w, h, (uint16_t *)px_map);
     dsc->tft->waitDMA();
-    /* Release the shared SPI bus before LVGL can access SD-backed assets. */
-    dsc->tft->endWrite();
+    /* Release only the transaction started by this callback. */
+    if(started_write) {
+        dsc->tft->endWrite();
+    }
 
     lv_display_flush_ready(disp);
 
