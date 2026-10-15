@@ -587,7 +587,7 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
     uint32_t byte_pos = bit_pos >> 3;
     bit_pos = bit_pos & 0x7;
 
-    if(bit_pos + len >= 8) {
+    if(bit_pos + len > 8) {
         uint16_t in16 = (in[byte_pos] << 8) + in[byte_pos + 1];
         return (in16 >> (16 - bit_pos - len)) & bit_mask;
     }
