@@ -104,6 +104,11 @@ struct _lv_layer_t  {
     /** Last task in the list, to append in constant time */
     lv_draw_task_t * draw_task_tail;
 
+    /** Number of tasks whose creation is still in progress, including nested draw task events */
+    uint32_t unfinalized_tasks;
+    /** All tasks so far belong to draw units that wait for `all_tasks_added`; cleared once dispatched */
+    bool all_tasks_deferred;
+
     /** The display assigned to this layer*/
     lv_display_t * display;
 
