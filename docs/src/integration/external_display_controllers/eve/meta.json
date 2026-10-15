@@ -2,6 +2,7 @@
   "title": "EVE",
   "pages": [
     "frame_buffer_mode",
-    "gpu"
+    "gpu",
+    "eve5"
   ]
 }

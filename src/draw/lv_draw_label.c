@@ -38,6 +38,8 @@ typedef unsigned char cmd_state_t;
  *  STATIC PROTOTYPES
  **********************/
 static uint8_t hex_char_to_num(char hex);
+static void recolor_skip_text(const char * txt, uint32_t len, lv_color_t base_color,
+                              cmd_state_t * state, lv_color_t * recolor);
 
 /**********************
  *  STATIC VARIABLES
@@ -329,6 +331,13 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         if(dsc->text[line_start] == '\0') return;
     }
 
+    /*The lines skipped above can open or close a recolor command*/
+    cmd_state_t recolor_cmd_state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
+    lv_color_t recolor = lv_color_black(); /* Holds the selected color inside the recolor command */
+    if((dsc->flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+        recolor_skip_text(dsc->text, line_start, dsc->color, &recolor_cmd_state, &recolor);
+    }
+
     /*Align to middle*/
     if(align == LV_TEXT_ALIGN_CENTER) {
         line_width = lv_text_get_line_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
@@ -374,8 +383,6 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     uint32_t recolor_command_start_index = 0;
     int32_t letter_w;
 
-    cmd_state_t recolor_cmd_state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
-    lv_color_t recolor = lv_color_black(); /* Holds the selected color inside the recolor command */
     uint8_t is_first_space_after_cmd = 0;
 
     /*Write out all lines*/
@@ -615,6 +622,52 @@ static uint8_t hex_char_to_num(char hex)
     if(hex >= '0' && hex <= '9') return hex - '0';
     if(hex >= 'a') hex -= 'a' - 'A'; /*Convert to upper case*/
     return 'A' <= hex && hex <= 'F' ? hex - 'A' + 10 : 0;
+}
+
+/**
+ * Process recolor commands in skipped text so subsequent visible lines start with the correct color
+ * state.
+ * @param txt           the text
+ * @param len           its length in bytes
+ * @param base_color    the color of text outside recolor commands
+ * @param state         the recolor state to update
+ * @param recolor       the active command's color to update
+ */
+static void recolor_skip_text(const char * txt, uint32_t len, lv_color_t base_color,
+                              cmd_state_t * state, lv_color_t * recolor)
+{
+    uint32_t ofs = 0;
+    uint32_t par_start = 0;
+    while(ofs < len) {
+        uint32_t letter = lv_text_encoded_next(txt, &ofs);
+        if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
+            if(*state == RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER) {
+                par_start = ofs;
+                *state = RECOLOR_CMD_STATE_PARAMETER;
+                continue;
+            }
+            else if(*state == RECOLOR_CMD_STATE_PARAMETER) {
+                *state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
+            }
+            else {
+                *state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
+                continue;
+            }
+        }
+
+        if(*state == RECOLOR_CMD_STATE_PARAMETER && letter == ' ') {
+            if(ofs - par_start == LABEL_RECOLOR_PAR_LENGTH + 1) {
+                const char * par = &txt[par_start];
+                *recolor = lv_color_make((hex_char_to_num(par[0]) << 4) + hex_char_to_num(par[1]),
+                                         (hex_char_to_num(par[2]) << 4) + hex_char_to_num(par[3]),
+                                         (hex_char_to_num(par[4]) << 4) + hex_char_to_num(par[5]));
+            }
+            else {
+                *recolor = base_color;
+            }
+            *state = RECOLOR_CMD_STATE_TEXT_INPUT;
+        }
+    }
 }
 
 void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
