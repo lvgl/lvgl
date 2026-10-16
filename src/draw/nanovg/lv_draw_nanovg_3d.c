@@ -39,16 +39,15 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nanovg_3d(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     /* End NanoVG frame temporarily to allow direct OpenGL rendering */
     lv_nanovg_end_frame(u);
-
-    lv_layer_t * layer = t->target_layer;
 
     /* Get target layer info */
     int32_t layer_w = lv_area_get_width(&layer->buf_area);
@@ -59,8 +58,8 @@ void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const l
     lv_area_move(&dest_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     /* Calculate clip area relative to layer */
-    lv_area_t clip_area = t->clip_area;
-    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_t rel_clip_area = *clip_area;
+    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     /* Reinitialize OpenGL ES driver state after NanoVG modified it */
     lv_opengles_reinit_state();
@@ -75,7 +74,7 @@ void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const l
     params.opa = dsc->opa;
     params.disp_w = layer_w;
     params.disp_h = layer_h;
-    params.texture_clip_area = &clip_area;
+    params.texture_clip_area = &rel_clip_area;
     params.h_flip = dsc->h_flip;
     params.v_flip = dsc->v_flip;
     params.rb_swap = true;
