@@ -508,13 +508,13 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_dave2d_fill(t, t->draw_dsc, &t->area);
+            lv_draw_dave2d_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_dave2d_border(t, t->draw_dsc, &t->area);
+            lv_draw_dave2d_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-            //lv_draw_dave2d_box_shadow(t, t->draw_dsc, &t->area);
+            //lv_draw_dave2d_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 #if 0
         case LV_DRAW_TASK_TYPE_BG_IMG:
@@ -525,22 +525,22 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
             lv_draw_dave2d_label(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_dave2d_image(t, t->draw_dsc, &t->area);
+            lv_draw_dave2d_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_dave2d_line, t->draw_unit);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_dave2d_arc(t, t->draw_dsc, &t->area);
+            lv_draw_dave2d_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_dave2d_triangle(t, t->draw_dsc);
+            lv_draw_dave2d_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            //lv_draw_dave2d_layer(t, t->draw_dsc, &t->area);
+            //lv_draw_dave2d_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-            //lv_draw_dave2d_mask_rect(t, t->draw_dsc, &t->area);
+            //lv_draw_dave2d_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
         default:
             break;
