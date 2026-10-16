@@ -179,24 +179,29 @@ static const uint8_t init_cmd_list_2[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_nv3007_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                lv_nv3007_send_cmd_cb_t send_cmd_cb, lv_nv3007_send_color_cb_t send_color_cb)
+lv_display_t * lv_nv3007_create(uint32_t hor_res, uint32_t ver_res)
 {
-    lv_display_t * disp = lv_lcd_generic_mipi_create(hor_res, ver_res, flags, send_cmd_cb, send_color_cb);
+    return lv_lcd_generic_mipi_create(hor_res, ver_res);
+}
 
-    send_cmd_cb(disp, (const uint8_t[]) {
-        0xFF
-    }, 1, (const uint8_t[]) {
-        0xA5
-    }, 1);
+lv_result_t lv_nv3007_init(lv_display_t * disp, lv_lcd_flag_t flags)
+{
+    /* 0xFF unlocks (0xA5) and locks (0x00) the manufacturer command set */
+    static const uint8_t unlock_cmd_list[] = { 0xFF, 1, 0xA5, LV_LCD_CMD_DELAY_MS, LV_LCD_CMD_EOF };
+    static const uint8_t lock_cmd_list[] = { 0xFF, 1, 0x00, LV_LCD_CMD_DELAY_MS, LV_LCD_CMD_EOF };
+
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+
+    lv_result_t res = lv_lcd_generic_mipi_init(disp, flags);
+    if(res != LV_RESULT_OK) {
+        return res;
+    }
+
+    lv_lcd_generic_mipi_send_cmd_list(disp, unlock_cmd_list);
     lv_lcd_generic_mipi_send_cmd_list(disp, init_cmd_list);
-    send_cmd_cb(disp, (const uint8_t[]) {
-        0xFF
-    }, 1, (const uint8_t[]) {
-        0x00
-    }, 1);
+    lv_lcd_generic_mipi_send_cmd_list(disp, lock_cmd_list);
     lv_lcd_generic_mipi_send_cmd_list(disp, init_cmd_list_2);
-    return disp;
+    return LV_RESULT_OK;
 }
 
 void lv_nv3007_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
