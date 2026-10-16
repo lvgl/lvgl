@@ -465,7 +465,8 @@ static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u)
             break;
 
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_sifli_epic_label(task);
+            lv_draw_sifli_epic_label(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
+                                     &task->area);
             break;
 
         case LV_DRAW_TASK_TYPE_FILL:

@@ -165,19 +165,25 @@ void lv_draw_nanovg_label_deinit(lv_draw_nanovg_unit_t * u);
 
 /**
  * Draw letter on a NanoVG context
- * @param t pointer to a drawing task
+ * @param draw_unit the draw unit
+ * @param layer the target layer
+ * @param clip_area the clip area
  * @param dsc pointer to a letter descriptor
  * @param coords the coordinates of the letter
  */
-void lv_draw_nanovg_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_nanovg_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
 
 /**
  * Draw label on a NanoVG context
- * @param t pointer to a drawing task
+ * @param draw_unit the draw unit
+ * @param layer the target layer
+ * @param clip_area the clip area
  * @param dsc pointer to a label descriptor
  * @param coords the coordinates of the label
  */
-void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_nanovg_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 
 /**
  * Draw layer on a NanoVG context

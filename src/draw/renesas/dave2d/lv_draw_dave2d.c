@@ -522,7 +522,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
             break;
 #endif
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_dave2d_label(t, t->draw_dsc, &t->area);
+            lv_draw_dave2d_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_dave2d_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);

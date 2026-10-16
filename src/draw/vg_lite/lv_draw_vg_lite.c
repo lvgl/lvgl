@@ -146,10 +146,10 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LETTER:
-            lv_draw_vg_lite_letter(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_letter(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_vg_lite_label(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_vg_lite_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);

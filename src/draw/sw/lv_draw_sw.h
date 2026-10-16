@@ -78,15 +78,18 @@ void lv_draw_sw_box_shadow(lv_layer_t * layer, const lv_area_t * clip_area, cons
 void lv_draw_sw_image(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_image_dsc_t * draw_dsc,
                       const lv_area_t * coords);
 
-void lv_draw_sw_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_letter(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_letter_dsc_t * dsc,
+                       const lv_area_t * coords);
 
 /**
  * Draw a label with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the label
  */
-void lv_draw_sw_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_label(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_label_dsc_t * dsc,
+                      const lv_area_t * coords);
 
 /**
  * Draw an arc with SW render.

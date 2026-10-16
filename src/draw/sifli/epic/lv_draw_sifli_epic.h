@@ -96,9 +96,14 @@ void lv_draw_sifli_epic_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, c
 
 /**
  * EPIC label draw operation.
- * @param t Draw task
+ * @param draw_unit the draw unit
+ * @param layer the target layer
+ * @param clip_area the clip area
+ * @param dsc the draw descriptor
+ * @param coords the coordinates
  */
-void lv_draw_sifli_epic_label(lv_draw_task_t * t);
+void lv_draw_sifli_epic_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                              const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 
 /**
  * EPIC image draw operation.

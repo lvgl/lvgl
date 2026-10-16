@@ -58,10 +58,11 @@ void lv_draw_vg_lite_label_init(struct _lv_draw_vg_lite_unit_t * u);
 
 void lv_draw_vg_lite_label_deinit(struct _lv_draw_vg_lite_unit_t * u);
 
-void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_vg_lite_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_vg_lite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
-                           const lv_area_t * coords);
+void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                            const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
