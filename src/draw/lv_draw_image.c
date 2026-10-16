@@ -81,9 +81,7 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
     t->state = LV_DRAW_TASK_STATE_BLOCKED;
 
-    lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
-    lv_area_move(&t->_real_area, coords->x1, coords->y1);
+    lv_draw_image_get_transformed_area(&t->_real_area, dsc, coords);
 
     /*If the image_area is not set assume that it's the same as the rendering area */
     if(new_image_dsc->image_area.x2 == LV_COORD_MIN) {
@@ -145,9 +143,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_IMAGE);
         lv_memcpy(t->draw_dsc, &new_image_dsc, sizeof(lv_draw_image_dsc_t));
 
-        lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                          dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
-        lv_area_move(&t->_real_area, coords->x1, coords->y1);
+        lv_draw_image_get_transformed_area(&t->_real_area, dsc, coords);
 
         lv_draw_finalize_task_creation(layer, t);
     }
@@ -314,6 +310,13 @@ void lv_draw_image_tiled_helper(lv_layer_t * layer, const lv_area_t * clip_area,
     }
 
     lv_image_decoder_close(&decoder_dsc);
+}
+
+void lv_draw_image_get_transformed_area(lv_area_t * res, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_image_buf_get_transformed_area(res, lv_area_get_width(coords), lv_area_get_height(coords),
+                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+    lv_area_move(res, coords->x1, coords->y1);
 }
 
 void lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
