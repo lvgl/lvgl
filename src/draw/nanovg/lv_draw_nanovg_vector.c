@@ -66,7 +66,7 @@ void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc)
 
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
 
-    nvgGlobalAlpha(u->vg, t->opa / (float)LV_OPA_COVER);
+    nvgGlobalAlpha(u->vg, dsc->opa / (float)LV_OPA_COVER);
 
     lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, u);
     LV_PROFILER_DRAW_END;
