@@ -172,15 +172,15 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_nanovg_fill(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_nanovg_border(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-            lv_draw_nanovg_box_shadow(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_LETTER:
@@ -192,11 +192,11 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_nanovg_image(t, t->draw_dsc, &t->area, -1);
+            lv_draw_nanovg_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area, -1);
             break;
 
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_nanovg_layer(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_LINE:
@@ -204,31 +204,31 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_nanovg_arc(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_nanovg_triangle(t, t->draw_dsc);
+            lv_draw_nanovg_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-            lv_draw_nanovg_mask_rect(t, t->draw_dsc);
+            lv_draw_nanovg_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
-            lv_draw_nanovg_vector(t, t->draw_dsc);
+            lv_draw_nanovg_vector(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 #endif
 
 #if LV_USE_3DTEXTURE
         case LV_DRAW_TASK_TYPE_3D:
-            lv_draw_nanovg_3d(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_3d(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 #endif
 
         case LV_DRAW_TASK_TYPE_BLUR:
-            lv_draw_nanovg_blur(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_blur(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
         default:
