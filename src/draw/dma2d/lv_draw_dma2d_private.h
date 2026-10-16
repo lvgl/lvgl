@@ -123,9 +123,11 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_dma2d_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32_t h, int32_t stride);
-void lv_draw_dma2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                         const lv_area_t * coords);
+void lv_draw_dma2d_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords, void * first_pixel, int32_t w,
+                        int32_t h, int32_t stride);
+void lv_draw_dma2d_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
 lv_draw_dma2d_output_cf_t lv_draw_dma2d_cf_to_dma2d_output_cf(lv_color_format_t cf);
 uint32_t lv_draw_dma2d_color_to_dma2d_color(lv_draw_dma2d_output_cf_t cf, lv_color_t color);
 void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf);
