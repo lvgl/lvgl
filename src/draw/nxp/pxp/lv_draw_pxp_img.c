@@ -65,19 +65,19 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t d
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_pxp_img(lv_draw_task_t * t)
+void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
-    const lv_draw_image_dsc_t * dsc = t->draw_dsc;
-    const lv_area_t * coords = &t->area;
+    LV_UNUSED(draw_unit);
 
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
     bool is_tiled = (dsc->tile != 0);
     if(is_tiled)
-        lv_draw_image_tiled_helper(t->target_layer, &t->clip_area, dsc, coords, _pxp_draw_core_cb, NULL, NULL);
+        lv_draw_image_tiled_helper(layer, clip_area, dsc, coords, _pxp_draw_core_cb, NULL, NULL);
     else
-        lv_draw_image_normal_helper(t->target_layer, &t->clip_area, dsc, coords, _pxp_draw_core_cb, NULL, NULL);
+        lv_draw_image_normal_helper(layer, clip_area, dsc, coords, _pxp_draw_core_cb, NULL, NULL);
 }
 
 /**********************

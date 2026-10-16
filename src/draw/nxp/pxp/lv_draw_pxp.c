@@ -395,13 +395,13 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_pxp_fill(t);
+            lv_draw_pxp_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_pxp_img(t);
+            lv_draw_pxp_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_pxp_layer(t);
+            lv_draw_pxp_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         default:
             break;
