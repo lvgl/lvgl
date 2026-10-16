@@ -100,10 +100,12 @@ void lv_draw_sw_arc(lv_layer_t * layer, const lv_area_t * clip_area, const lv_dr
 
 /**
  * Draw a line with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
+ * @param user_data     unused
  */
-void lv_draw_sw_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc);
+void lv_draw_sw_line(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc, void * user_data);
 
 /**
  * Blend a layer with SW render

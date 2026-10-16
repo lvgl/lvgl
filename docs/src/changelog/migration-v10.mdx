@@ -457,6 +457,24 @@ and are not meant to be included directly.
    lv_draw_image_normal_helper(layer, clip_area, draw_dsc, coords, my_draw_image_cb, NULL, my_user_data);
    ```
 
+### Line
+
+- `lv_draw_line_iterate()` no longer takes a `lv_draw_task_t *`, instead it takes the target layer and the clip area.
+  It also takes a new last `user_data` parameter, which is forwarded to the callback. The callback's signature changes accordingly.
+
+   ```c
+   /* Before */
+   void my_draw_line_cb(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc);
+
+   lv_draw_line_iterate(t, dsc, my_draw_line_cb);
+
+   /* After */
+   void my_draw_line_cb(lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_line_dsc_t * dsc, void * user_data);
+
+   lv_draw_line_iterate(layer, clip_area, dsc, my_draw_line_cb, my_user_data);
+   ```
+
 
 ---
 

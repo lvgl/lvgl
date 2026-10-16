@@ -528,7 +528,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
             lv_draw_dave2d_image(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_line_iterate(t, t->draw_dsc, lv_draw_dave2d_line);
+            lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_dave2d_line, t->draw_unit);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
             lv_draw_dave2d_arc(t, t->draw_dsc, &t->area);

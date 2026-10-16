@@ -96,7 +96,8 @@ void lv_draw_dave2d_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, c
 
 void lv_draw_dave2d_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc);
+void lv_draw_dave2d_line(lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_line_dsc_t * dsc, void * user_data);
 
 void lv_draw_dave2d_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                           const lv_area_t * coords);

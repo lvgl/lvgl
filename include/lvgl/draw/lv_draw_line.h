@@ -105,12 +105,16 @@ void lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
  * A helper function to call a callback which draws a line between two points.
  * This way it doesn't matter if ``p1, p2`` or ``points`` were used as it calls the
  * ``callback`` as needed.
- * @param t             draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           pointer to a draw descriptor
  * @param draw_line_cb  a callback that draws a line between ``dsc->p1`` and ``dsc->p2``
+ * @param user_data     passed to draw_line_cb as is @nullable
  */
-void lv_draw_line_iterate(lv_draw_task_t * t, lv_draw_line_dsc_t * dsc,
-                          void (*draw_line_cb)(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc));
+void lv_draw_line_iterate(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_line_dsc_t * dsc,
+                          void (*draw_line_cb)(lv_layer_t * layer, const lv_area_t * clip_area,
+                                               const lv_draw_line_dsc_t * dsc, void * user_data),
+                          void * user_data);
 
 /**********************
  *      MACROS
