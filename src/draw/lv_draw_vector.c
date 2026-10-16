@@ -682,6 +682,7 @@ lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer)
     }
 
     dsc->base.layer = layer;
+    dsc->opa = LV_OPA_COVER;
 
     dsc->ctx = lv_zalloc(sizeof(lv_vector_path_ctx_t));
     if(dsc->ctx == NULL) {
@@ -1046,6 +1047,8 @@ void lv_draw_vector(lv_draw_vector_dsc_t * dsc)
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area), LV_DRAW_TASK_TYPE_VECTOR);
     lv_memcpy(t->draw_dsc, dsc, sizeof(lv_draw_vector_dsc_t));
+    lv_draw_vector_dsc_t * new_dsc = t->draw_dsc;
+    new_dsc->opa = layer->opa;
     lv_draw_finalize_task_creation(layer, t);
     dsc->task_list = NULL;
 }
