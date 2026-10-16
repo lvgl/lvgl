@@ -15,6 +15,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "../../../lvgl_public.h"
+
+#if LV_USE_FT81X
+
 /*********************
  *      DEFINES
  *********************/
@@ -838,6 +842,8 @@ extern "C" {
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_FT81X*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
