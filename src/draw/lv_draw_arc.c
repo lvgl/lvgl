@@ -77,6 +77,11 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
     }
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_ARC);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 

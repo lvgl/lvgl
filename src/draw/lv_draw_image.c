@@ -77,6 +77,13 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     LV_PROFILER_DRAW_BEGIN;
 
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LAYER);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        /*The layer is normally deleted when its draw task is cleaned up*/
+        lv_draw_layer_delete((lv_layer_t *)dsc->src);
+        LV_PROFILER_DRAW_END;
+        return;
+    }
     lv_draw_image_dsc_t * new_image_dsc = t->draw_dsc;
     lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
     t->state = LV_DRAW_TASK_STATE_BLOCKED;
@@ -143,6 +150,11 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     /*Typical case, draw the image as bitmap*/
     if(!(new_image_dsc.header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW)) {
         lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_IMAGE);
+        if(!t) {
+            LV_LOG_WARN("Failed to create draw task");
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         lv_memcpy(t->draw_dsc, &new_image_dsc, sizeof(lv_draw_image_dsc_t));
 
         lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
