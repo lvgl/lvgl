@@ -50,14 +50,16 @@ static void font_bitmap_to_ramg(uint32_t addr, const uint8_t * src, uint32_t wid
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_eve_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_eve_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
 {
+    LV_UNUSED(draw_unit);
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_eve_scissor(t->clip_area.x1, t->clip_area.y1, t->clip_area.x2, t->clip_area.y2);
+    lv_eve_scissor(clip_area->x1, clip_area->y1, clip_area->x2, clip_area->y2);
     lv_eve_save_context();
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
-    lv_draw_label_iterate_characters(t->target_layer, &t->clip_area, dsc, coords, lv_draw_eve_letter_cb, NULL);
+    lv_draw_label_iterate_characters(layer, clip_area, dsc, coords, lv_draw_eve_letter_cb, NULL);
     lv_eve_restore_context();
 }
 
