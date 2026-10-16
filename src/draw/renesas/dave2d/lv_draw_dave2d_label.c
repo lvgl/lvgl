@@ -129,7 +129,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_
                     img_dsc.scale_y = LV_SCALE_NONE;
                     img_dsc.opa = glyph_draw_dsc->opa;
                     img_dsc.src = glyph_draw_dsc->glyph_data;
-                    //lv_draw_sw_image(t, &img_dsc, glyph_draw_dsc->letter_coords);
+                    //lv_draw_sw_image(t->target_layer, &t->clip_area, &img_dsc, glyph_draw_dsc->letter_coords);
 #endif
                 }
                 break;
