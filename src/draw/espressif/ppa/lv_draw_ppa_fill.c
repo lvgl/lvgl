@@ -8,20 +8,20 @@
 
 #if LV_USE_PPA
 
-void lv_draw_ppa_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc,
-                      const lv_area_t * coords)
+void lv_draw_ppa_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
     ppa_fill_oper_config_t fill_cfg = {0};
-    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)t->draw_unit;
-    lv_draw_buf_t * draw_buf = t->target_layer->draw_buf;
+    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     lv_area_t rel_coords;
     rel_coords = *coords;
-    lv_area_move(&rel_coords, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
+    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t rel_clip_area;
-    rel_clip_area = t->clip_area;
-    lv_area_move(&rel_clip_area, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
+    rel_clip_area = *clip_area;
+    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
     if(!lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))

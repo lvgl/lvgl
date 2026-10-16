@@ -211,10 +211,10 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_ppa_fill(t, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
+            lv_draw_ppa_fill(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
+            lv_draw_ppa_img(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
             break;
         default:
             LV_ASSERT_FORMAT_MSG(false, "Invalid draw task type: %d", t->type);
