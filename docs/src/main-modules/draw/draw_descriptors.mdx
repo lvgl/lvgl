@@ -142,8 +142,8 @@ The main fields of <ApiLink name="lv_draw_fill_dsc_t" /> are straightforward.  I
 radius, opacity, and color to draw a rectangle.  If opacity is 0, no draw task will
 be created.
 
-- <ApiLink name="lv_draw_fill_dsc_init" display="lv_draw_fill_dsc_init(&dsc)" /> initializes a fill Draw Task.
-- <ApiLink name="lv_draw_sw_fill" display="lv_draw_sw_fill(layer, &dsc, area)" /> creates a Draw Task to fill an area.
+- <ApiLink name="lv_draw_fill_dsc_init" /> initializes a fill Draw Task.
+- <ApiLink name="lv_draw_sw_fill" /> creates a Draw Task to fill an area.
 - <ApiLink name="lv_draw_task_get_fill_dsc" display="lv_draw_task_get_fill_dsc(draw_task)" /> retrieves the fill descriptor from
   a Draw Task.
 
@@ -300,9 +300,8 @@ routine receives only simpler values.
 
 The following functions are used for border drawing:
 
-- <ApiLink name="lv_draw_border_dsc_init" display="lv_draw_border_dsc_init(&dsc)" /> initializes a border Draw Task.
-- <ApiLink name="lv_draw_sw_border" display="lv_draw_sw_border(layer, &dsc, area)" /> creates a Draw Task to draw a border
-  inward from its area.
+- <ApiLink name="lv_draw_border_dsc_init"/> initializes a border Draw Task.
+- <ApiLink name="lv_draw_sw_border"/> creates a Draw Task to draw a border inward from its area.
 - <ApiLink name="lv_draw_task_get_border_dsc" display="lv_draw_task_get_border_dsc(draw_task)" /> retrieves the border descriptor
   from a Draw Task.
 
@@ -348,8 +347,8 @@ Note: Rendering large shadows may be slow or memory-intensive.
 
 The following functions are used for box shadow drawing:
 
-- <ApiLink name="lv_draw_box_shadow_dsc_init" display="lv_draw_box_shadow_dsc_init(&dsc)" /> initializes a box shadow Draw Task.
-- <ApiLink name="lv_draw_sw_box_shadow" display="lv_draw_sw_box_shadow(layer, &dsc, area)" /> creates a Draw Task for a rectangle's
+- <ApiLink name="lv_draw_box_shadow_dsc_init" /> initializes a box shadow Draw Task.
+- <ApiLink name="lv_draw_sw_box_shadow" /> creates a Draw Task for a rectangle's
   shadow. The shadow's size and position depend on the width, spread, and offset.
 - <ApiLink name="lv_draw_task_get_box_shadow_dsc" display="lv_draw_task_get_box_shadow_dsc(draw_task)" /> retrieves the box shadow
   descriptor from a Draw Task.

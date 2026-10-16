@@ -128,7 +128,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    lv_draw_sw_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_sw_border(t->target_layer, &t->clip_area, &border_draw_dsc, glyph_draw_dsc->bg_coords);
 #endif
                 }
                 break;
@@ -191,7 +191,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             .x = glyph_draw_dsc->pivot.x - glyph_draw_dsc->g->ofs_x,
                             .y = glyph_draw_dsc->g->box_h + glyph_draw_dsc->g->ofs_y
                         };
-                        lv_draw_sw_image(t, &img_dsc, glyph_draw_dsc->letter_coords);
+                        lv_draw_sw_image(t->target_layer, &t->clip_area, &img_dsc, glyph_draw_dsc->letter_coords);
                     }
                     break;
                 }
@@ -208,7 +208,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_sw_fill(t, fill_draw_dsc, fill_area);
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, fill_draw_dsc, fill_area);
     }
 }
 
@@ -300,21 +300,9 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     lv_memcpy(&old_area, &t->clip_area, sizeof(lv_area_t));
     lv_memcpy(&t->clip_area, &buf_area, sizeof(lv_area_t));
 
-    /*Can't call lv_draw_vector() as it would create a new draw task while
-     *the main thread also can create draw tasks. So create a dummy draw task
-     *manually to draw the outline*/
+    /*Draw the outline directly; lv_draw_vector() would create a draw task*/
     if(vector_dsc->task_list) {
-        vector_dsc->base.layer = vector_dsc->base.layer;
-        lv_draw_task_t dummy_t;
-        lv_memzero(&dummy_t, sizeof(lv_draw_task_t));
-        dummy_t.area = vector_dsc->base.layer->_clip_area;
-        dummy_t._real_area = vector_dsc->base.layer->_clip_area;
-        dummy_t.clip_area = vector_dsc->base.layer->_clip_area;
-        dummy_t.target_layer = vector_dsc->base.layer;
-        dummy_t.type = LV_DRAW_TASK_TYPE_VECTOR;
-        dummy_t.opa = LV_OPA_COVER;
-        dummy_t.draw_dsc = vector_dsc;
-        lv_draw_sw_vector(&dummy_t, dummy_t.draw_dsc);
+        lv_draw_sw_vector(vector_dsc->base.layer, &vector_dsc->base.layer->_clip_area, vector_dsc);
     }
 
     /*Restore previous draw area of the entire text label*/
@@ -328,7 +316,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 
     lv_draw_image_dsc_init(&img_dsc);
     img_dsc.src = draw_buf;
-    lv_draw_sw_image(t, &img_dsc, &letter_coords);
+    lv_draw_sw_image(t->target_layer, &t->clip_area, &img_dsc, &letter_coords);
 
     lv_draw_vector_dsc_delete(vector_dsc);
     lv_draw_buf_destroy(draw_buf);

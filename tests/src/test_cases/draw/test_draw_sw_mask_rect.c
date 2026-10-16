@@ -59,12 +59,7 @@ static void mask_rect_run(lv_draw_buf_t * buf, const lv_area_t * clip_area, cons
     dsc.radius = radius;
     dsc.keep_outside = 1;
 
-    lv_draw_task_t t;
-    lv_memzero(&t, sizeof(t));
-    t.target_layer = &layer;
-    t.clip_area = *clip_area;
-
-    lv_draw_sw_mask_rect(&t, &dsc);
+    lv_draw_sw_mask_rect(&layer, clip_area, &dsc);
 }
 
 static lv_opa_t mask_rect_alpha_at(lv_draw_buf_t * buf, uint32_t x, uint32_t y)
