@@ -52,9 +52,11 @@ void lv_draw_g2d_deinit(void);
 
 void lv_draw_buf_g2d_init_handlers(void);
 
-void lv_draw_g2d_fill(lv_draw_task_t * t);
+void lv_draw_g2d_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_g2d_img(lv_draw_task_t * t);
+void lv_draw_g2d_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *      MACROS

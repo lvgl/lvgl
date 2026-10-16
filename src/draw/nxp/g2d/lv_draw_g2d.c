@@ -325,10 +325,10 @@ static void _g2d_execute_drawing(lv_draw_task_t * t)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_g2d_fill(t);
+            lv_draw_g2d_fill(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_fill_dsc_t *)t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_g2d_img(t);
+            lv_draw_g2d_img(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
             break;
         default:
             break;
