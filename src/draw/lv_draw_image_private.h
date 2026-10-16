@@ -82,6 +82,14 @@ void lv_draw_image_tiled_helper(lv_layer_t * layer, const lv_area_t * clip_area,
 void lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
                                        uint16_t scale_x, uint16_t scale_y, const lv_point_t * pivot);
 
+/**
+ * Get the area an image covers after rotation and scaling.
+ * @param res       store the result here
+ * @param dsc       the image draw descriptor (rotation, scale_x, scale_y, pivot are used)
+ * @param coords    the coordinates of the image
+ */
+void lv_draw_image_get_transformed_area(lv_area_t * res, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+
 /**********************
  *      MACROS
  **********************/
