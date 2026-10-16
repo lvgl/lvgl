@@ -460,7 +460,8 @@ static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u)
     /* Execute based on task type */
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_sifli_epic_border(task);
+            lv_draw_sifli_epic_border(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
+                                      &task->area);
             break;
 
         case LV_DRAW_TASK_TYPE_LABEL:
@@ -468,15 +469,16 @@ static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u)
             break;
 
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_sifli_epic_fill(task);
+            lv_draw_sifli_epic_fill(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc, &task->area);
             break;
 
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_sifli_epic_img(task);
+            lv_draw_sifli_epic_img(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc, &task->area);
             break;
 
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_sifli_epic_layer(task);
+            lv_draw_sifli_epic_layer(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
+                                     &task->area);
             break;
 
         default:

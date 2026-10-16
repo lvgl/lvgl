@@ -112,10 +112,8 @@ static void draw_placeholder_border(lv_draw_task_t * task, lv_draw_glyph_dsc_t *
     border_draw_dsc.color = glyph_draw_dsc->color;
     border_draw_dsc.width = 1;
 
-    lv_draw_task_t border_task = *task;
-    border_task.draw_dsc = &border_draw_dsc;
-    border_task.area = *glyph_draw_dsc->bg_coords;
-    lv_draw_sifli_epic_border(&border_task);
+    lv_draw_sifli_epic_border(task->draw_unit, task->target_layer, &task->clip_area, &border_draw_dsc,
+                              glyph_draw_dsc->bg_coords);
 }
 
 static void draw_bitmap_glyph(lv_draw_task_t * task, lv_draw_glyph_dsc_t * glyph_draw_dsc)
@@ -186,18 +184,13 @@ static void draw_glyph_as_image(lv_draw_task_t * task, lv_draw_glyph_dsc_t * gly
     img_dsc.pivot.x = glyph_draw_dsc->pivot.x;
     img_dsc.pivot.y = glyph_draw_dsc->g ? (glyph_draw_dsc->g->box_h + glyph_draw_dsc->g->ofs_y) : 0;
 
-    lv_draw_task_t img_task = *task;
-    img_task.draw_dsc = &img_dsc;
-    img_task.area = *glyph_draw_dsc->letter_coords;
-    lv_draw_sifli_epic_img(&img_task);
+    lv_draw_sifli_epic_img(task->draw_unit, task->target_layer, &task->clip_area, &img_dsc,
+                           glyph_draw_dsc->letter_coords);
 }
 
 static void draw_fill_part(lv_draw_task_t * task, lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
-    lv_draw_task_t fill_task = *task;
-    fill_task.draw_dsc = fill_draw_dsc;
-    fill_task.area = *fill_area;
-    lv_draw_sifli_epic_fill(&fill_task);
+    lv_draw_sifli_epic_fill(task->draw_unit, task->target_layer, &task->clip_area, fill_draw_dsc, fill_area);
 }
 
 #endif /*LV_USE_SIFLI_EPIC*/
