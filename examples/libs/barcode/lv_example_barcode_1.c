@@ -5,11 +5,12 @@
  * @title Barcode with palette colors
  * @brief Render a barcode encoding an LVGL URL with custom dark and light colors.
  *
- * A barcode widget is centered on the active screen with its height set to 50 px.
+ * A barcode widget is centered on the active screen. `lv_barcode_set_size` gives it a
+ * 200 px length along the bars, and `lv_obj_set_height` a 50 px thickness.
  * `lv_barcode_set_dark_color` and `lv_barcode_set_light_color` use darkened and
  * lightened entries from `LV_PALETTE_BLUE` and `LV_PALETTE_LIGHT_BLUE` for the
  * bars and background, a matching border color is applied, and
- * `lv_barcode_update` encodes `https://lvgl.io`.
+ * `lv_barcode_set_data` encodes `https://lvgl.io`.
  */
 void lv_example_barcode_1(void)
 {
@@ -17,8 +18,11 @@ void lv_example_barcode_1(void)
     lv_color_t fg_color = lv_palette_darken(LV_PALETTE_BLUE, 4);
 
     lv_obj_t * barcode = lv_barcode_create(lv_screen_active());
-    lv_obj_set_height(barcode, 50);
     lv_obj_center(barcode);
+
+    /*Set the length along the bars, and the thickness on the Widget itself*/
+    lv_barcode_set_size(barcode, 200);
+    lv_obj_set_height(barcode, 50);
 
     /*Set color*/
     lv_barcode_set_dark_color(barcode, fg_color);
@@ -28,7 +32,7 @@ void lv_example_barcode_1(void)
     lv_obj_set_style_border_color(barcode, bg_color, 0);
 
     /*Set data*/
-    lv_barcode_update(barcode, "https://lvgl.io");
+    lv_barcode_set_data(barcode, "https://lvgl.io");
 }
 
 #endif

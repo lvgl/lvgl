@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../core/lv_global.h"
 #include "lv_textarea_private.h"
 
 #if LV_USE_TEXTAREA
@@ -381,9 +382,6 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     set_cursor_pos_internal(obj, pos);
-
-    /*Position the label to make the cursor visible*/
-    lv_obj_update_layout(obj);
 
     lv_textarea_scroll_to_cursor_pos(obj, pos);
 }
@@ -1424,32 +1422,44 @@ static inline bool is_valid_but_non_printable_char(const uint32_t letter)
 static void lv_textarea_scroll_to_cursor_pos(lv_obj_t * obj, int32_t pos)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-
     lv_point_t cur_pos;
-    lv_obj_update_layout(ta->label);
-    const lv_font_t * font = lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
-    lv_label_get_letter_pos(ta->label, pos, &cur_pos);
 
-    /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
-
-    int32_t font_h = lv_font_get_line_height_internal(font);
-    int32_t h = lv_obj_get_content_height(obj);
-    int32_t w = lv_obj_get_content_width(obj);
-
-    /*Check the top, then bottom*/
-    if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
-        lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
+    /*It's an expensive function as it need to resolve the layouts.
+     *Make the text area non-scrollable if possible to avoid it*/
+    if(!lv_obj_is_scrollable(obj)) {
+        lv_label_get_letter_pos(ta->label, pos, &cur_pos);
     }
-    else if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
-        lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
-    }
+    else {
+        /*The text area and the label needs to have it's final size to see if
+         *the cursor is out of the area or not. Inside a layout pass, e.g. when this comes
+         *from LV_EVENT_SIZE_CHANGED, they already do.*/
+        if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(ta->label);
+        lv_label_get_letter_pos(ta->label, pos, &cur_pos);
 
-    /*Check the left, then right*/
-    if(cur_pos.x < lv_obj_get_scroll_left(obj)) {
-        lv_obj_scroll_to_x(obj, cur_pos.x, LV_ANIM_ON);
-    }
-    else if(cur_pos.x + font_h > lv_obj_get_scroll_left(obj) + w) {
-        lv_obj_scroll_to_x(obj, cur_pos.x - w + font_h, LV_ANIM_ON);
+        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+
+        /*Check the top*/
+        int32_t font_h = lv_font_get_line_height(font);
+        int32_t h = lv_obj_get_content_height(obj);
+        if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
+            lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
+        }
+        /*Check the bottom*/
+        else if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
+            lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
+        }
+
+        /*Check the left*/
+        int32_t w = lv_obj_get_content_width(obj);
+        if(cur_pos.x < lv_obj_get_scroll_left(obj)) {
+            lv_obj_scroll_to_x(obj, cur_pos.x, LV_ANIM_ON);
+        }
+        /*Check the right. `cur_pos.x` is a content coordinate, so the visible area
+         *ends at `scroll_left + w`. Without that the view scrolls even when the
+         *cursor is already visible.*/
+        else if(cur_pos.x + font_h > lv_obj_get_scroll_left(obj) + w) {
+            lv_obj_scroll_to_x(obj, cur_pos.x - w + font_h, LV_ANIM_ON);
+        }
     }
 
     ta->cursor.valid_x = cur_pos.x;

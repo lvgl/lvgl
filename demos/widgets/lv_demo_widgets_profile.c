@@ -392,6 +392,7 @@ static void ta_event_cb(lv_event_t * e)
         lv_obj_set_height(tv, LV_VER_RES);
         lv_obj_set_hidden(kb, true);
         lv_indev_reset(NULL, ta);   /*To forget the last clicked object to make it focusable again*/
+        lv_obj_readjust_scroll(tv, LV_ANIM_OFF);
     }
 }
 

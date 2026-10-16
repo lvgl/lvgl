@@ -379,7 +379,7 @@ void test_display_event_invalidate_area_can_be_modified(void)
     lv_obj_update_layout(obj);
 
     /* Drop everything invalidated while building the widget */
-    test_disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(test_disp);
 
     lv_display_add_event_cb(test_disp, cb_enlarge_invalidated_area, LV_EVENT_INVALIDATE_AREA, NULL);
     lv_obj_invalidate(obj);
@@ -587,8 +587,6 @@ void test_display_event_code_names(void)
     TEST_ASSERT_EQUAL_STRING("EVENT_INSERT", lv_event_code_get_name(LV_EVENT_INSERT));
     TEST_ASSERT_EQUAL_STRING("EVENT_CREATE", lv_event_code_get_name(LV_EVENT_CREATE));
     TEST_ASSERT_EQUAL_STRING("EVENT_REFRESH", lv_event_code_get_name(LV_EVENT_REFRESH));
-    TEST_ASSERT_EQUAL_STRING("EVENT_UPDATE_LAYOUT_COMPLETED",
-                             lv_event_code_get_name(LV_EVENT_UPDATE_LAYOUT_COMPLETED));
 
     /* The preprocess flag is not part of the name */
     TEST_ASSERT_EQUAL_STRING("EVENT_REFR_START",

@@ -24,7 +24,6 @@ LV_DEPRECATIONS_IGNORE_BEGIN
 #define MY_CLASS (&lv_file_explorer_class)
 
 #define FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH       (22)
-#define FILE_EXPLORER_BROWSER_AREA_WIDTH            (100 - FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH)
 
 #define LV_FILE_NAVIGATION_CURRENT_DIR  "."
 #define LV_FILE_NAVIGATION_PARENT_DIR   "Back"
@@ -45,7 +44,6 @@ static void init_style(lv_obj_t * obj);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
     static void quick_access_event_handler(lv_event_t * e);
-    static void quick_access_area_event_handler(lv_event_t * e);
 #endif
 
 static void browser_file_event_handler(lv_event_t * e);
@@ -309,17 +307,14 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     explorer->quick_access_area = lv_obj_create(explorer->cont);
     lv_obj_set_size(explorer->quick_access_area, LV_PCT(FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH), LV_PCT(100));
     lv_obj_set_flex_flow(explorer->quick_access_area, LV_FLEX_FLOW_COLUMN);
-    lv_obj_add_event_cb(explorer->quick_access_area, quick_access_area_event_handler, LV_EVENT_ALL,
-                        explorer);
 #endif
 
-    /*File table area on the right*/
+    /*File table area on the right.
+     *It grows into whatever the quick access area leaves, so hiding that area widens this
+     *one on its own: a hidden Widget takes no space in a flex layout.*/
     explorer->browser_area = lv_obj_create(explorer->cont);
-#if LV_FILE_EXPLORER_QUICK_ACCESS
-    lv_obj_set_size(explorer->browser_area, LV_PCT(FILE_EXPLORER_BROWSER_AREA_WIDTH), LV_PCT(100));
-#else
-    lv_obj_set_size(explorer->browser_area, LV_PCT(100), LV_PCT(100));
-#endif
+    lv_obj_set_height(explorer->browser_area, LV_PCT(100));
+    lv_obj_set_flex_grow(explorer->browser_area, 1);
     lv_obj_set_flex_flow(explorer->browser_area, LV_FLEX_FLOW_COLUMN);
 
     /*The area displayed above the file browse list(head)*/
@@ -513,21 +508,6 @@ static void quick_access_event_handler(lv_event_t * e)
     }
 }
 
-static void quick_access_area_event_handler(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * area = lv_event_get_current_target(e);
-    lv_obj_t * obj = lv_event_get_user_data(e);
-
-    lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
-
-    if(code == LV_EVENT_LAYOUT_CHANGED) {
-        if(lv_obj_is_hidden(area))
-            lv_obj_set_size(explorer->browser_area, LV_PCT(100), LV_PCT(100));
-        else
-            lv_obj_set_size(explorer->browser_area, LV_PCT(FILE_EXPLORER_BROWSER_AREA_WIDTH), LV_PCT(100));
-    }
-}
 #endif
 
 static void browser_file_event_handler(lv_event_t * e)

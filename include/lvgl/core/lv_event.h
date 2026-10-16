@@ -98,7 +98,6 @@ typedef enum {
     LV_EVENT_SCREEN_UNLOADED,     /**< A screen was unloaded */
     LV_EVENT_SIZE_CHANGED,        /**< Object coordinates/size have changed */
     LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed */
-    LV_EVENT_LAYOUT_CHANGED,      /**< A child's position position has changed due to a layout recalculation */
     LV_EVENT_GET_SELF_SIZE,       /**< Get internal size of a widget */
 
     /** Events of optional LVGL components */
@@ -122,7 +121,6 @@ typedef enum {
     LV_EVENT_SYNC_FINISH,         /**< Sent after sync callback call has returned. */
     LV_EVENT_SYNC_WAIT_START,     /**< Sent before sync wait callback is called. */
     LV_EVENT_SYNC_WAIT_FINISH,    /**< Sent after sync wait callback call has returned. */
-    LV_EVENT_UPDATE_LAYOUT_COMPLETED,    /**< Sent after layout update completes*/
 
     LV_EVENT_VSYNC,
     LV_EVENT_VSYNC_REQUEST,

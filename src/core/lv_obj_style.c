@@ -284,18 +284,30 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     bool is_inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_INHERITABLE);
     bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYER_UPDATE);
 
-    if(is_layout_refr) {
-        if(part == LV_PART_ANY ||
-           part == LV_PART_MAIN ||
-           lv_obj_get_style_height_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT ||
-           lv_obj_get_style_width_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
-            lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
-            lv_obj_mark_layout_as_dirty(obj);
+    if(is_layout_refr && (part == LV_PART_ANY || part == LV_PART_MAIN)) {
+        /*The layout is being resolved right now, so this change is already too late for
+         *this pass and would be silently dropped. It typically happens when width, height,
+         *x, y, flex, grid or similar properties are set LV_EVENT_SIZE_CHANGED */
+        if(LV_GLOBAL_DEFAULT()->layout_update_mutex) {
+            LV_LOG_ERROR("A layout related style is changed while the layout is being updated");
+            LV_ASSERT(0);
+            LV_PROFILER_STYLE_END;
+            return;
         }
+        lv_obj_mark_layout_as_dirty(obj);
+        /*The parent's content size can depend on this Widget, and its own size doesn't
+         *report the change: a layout sized child keeps its size here. The call above
+         *already walked up the ancestors, so this is one flag, not a second walk.*/
+        if(obj->parent) obj->parent->coords_invalid = 1;
+        lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
     }
-    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || is_layout_refr)) {
-        lv_obj_t * parent = lv_obj_get_parent(obj);
-        if(parent) lv_obj_mark_layout_as_dirty(parent);
+    /*Another part can set the self size, e.g. a table's cell font or a roller's selected font*/
+    else if(is_layout_refr &&
+            (lv_obj_get_style_width_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT ||
+             lv_obj_get_style_height_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT)) {
+        lv_obj_mark_layout_as_dirty(obj);
+        if(obj->parent) obj->parent->coords_invalid = 1;
+        lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
     }
 
     /*Cache the layer type*/
@@ -311,6 +323,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     if(prop == LV_STYLE_PROP_ANY || is_ext_draw) {
         lv_obj_refresh_ext_draw_size(obj);
     }
+
     lv_obj_invalidate(obj);
 
     if(prop == LV_STYLE_PROP_ANY || (is_inheritable && (is_ext_draw || is_layout_refr))) {
@@ -579,6 +592,10 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
                                                 lv_part_t * changed_part)
 {
     LV_CHECK_ARG(obj != NULL, return LV_STYLE_STATE_CMP_SAME);
+
+    /*TODO
+     *Optimize by iterating the style props, and ORing the style prop flags.
+     *Based on the flags we can decide what to invalidate/update */
 
     lv_style_state_cmp_t res = LV_STYLE_STATE_CMP_SAME;
 

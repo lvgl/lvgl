@@ -63,7 +63,7 @@ void test_refr_inv_area_disabled(void)
     TEST_ASSERT_EQUAL_UINT32(1, refr_ctx.disp->inv_p);
 }
 
-void test_refr_inv_area_null_area_clears_the_buffer(void)
+void test_refr_clear_invalid_areas_clears_the_buffer(void)
 {
     refr_disp_create(100, 100, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_DIRECT, 1, 100);
 
@@ -74,9 +74,10 @@ void test_refr_inv_area_null_area_clears_the_buffer(void)
     lv_inv_area(refr_ctx.disp, &a2);
     TEST_ASSERT_EQUAL_UINT32(2, refr_ctx.disp->inv_p);
 
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_inv_area(refr_ctx.disp, NULL));
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     TEST_ASSERT_EQUAL_UINT32(0, refr_ctx.disp->inv_p);
 
+    /*Nothing is left to redraw, not even the requests the Widgets made while being built*/
     refr_frame();
     TEST_ASSERT_EQUAL_UINT32(0, refr_ctx.flush_cnt);
 }

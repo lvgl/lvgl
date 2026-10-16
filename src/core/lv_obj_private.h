@@ -144,16 +144,71 @@ struct _lv_obj_t {
     /** Allow only one RADIO_BUTTON sibling to be checked */
     uint32_t radio_button : 1;
 
+    /**
+     * Stores the ORed state of the widget, like `LV_STATE_PRESSED`, `LV_STATE_CHECKED`
+     */
     uint16_t state;
-    uint16_t layout_inv : 1;
+
+
+    /**
+     * When a widget needs to be redrawn its current area will be invalidated.
+     * This flag indicates that further change doesn't requires invalidation as
+     * intermediate changes are not rendered immediately only when an actual rendering happens.
+     * Before rendering when this flag is set the final area will be invalidated too.
+     */
+    uint16_t redraw_requested : 1;
+
+    /**
+     * Shows that the coordinates of the widget or its children needs to be recalculated
+     * when X, Y, width height, layout other related property changes.
+     */
+    uint16_t coords_invalid : 1;
+
+    /**
+     * When `coords_invalid` is set this flag's the layout engine to look into this object and its children.
+     * If this flag is not set the entire subtree will be skipped.
+     */
+    uint16_t update_children_coords: 1;
+
+    /**
+     * When a child's coordinate changes this flag is set on the parent so that the parent will know to
+     * that is has to update its CONTENT size or layouts (if they set)
+     */
+    uint16_t child_coords_changed: 1;
+
+    /**
+     * Tells that during the layout calculation the widget's size changed further layout
+     * calculation might apply and `LV_EVENT_SIZE_CHANGLED` will be sent
+     */
+    uint16_t size_changed   : 1;
+
+    /**
+     *If the widget was scrolled to the end and due to a layout change
+     *the content got smaller make sure that the widget is scrolled inside
+     *and jump back to end if needed.*/
     uint16_t readjust_scroll_after_layout : 1;
-    uint16_t scr_layout_inv : 1;
     uint16_t skip_trans : 1;
     uint16_t style_cnt  : 6;
-    uint16_t h_layout   : 1;
-    uint16_t w_layout   : 1;
-    uint16_t h_ignore_size : 1; /* ignore this obj when calculating content height of parent */
-    uint16_t w_ignore_size : 1; /* ignore this obj when calculating content width of parent */
+
+    /**
+     * The height of the widget is controlled by a layout. Its value is valid only inside
+     * `lv_obj_update_layout()` */
+    uint16_t h_layout_controlled   : 1;
+
+    /**
+     * The width of the widget is controlled by a layout. Its value is valid only inside
+     * `lv_obj_update_layout()` */
+    uint16_t w_layout_controlled   : 1;
+
+    /**
+     * The height of the widget is `LV_SIZE_CONTENT` and is not controlled by a layout, so it
+     * is still unknown: it is set once the children are measured. Until then a child's
+     * percentage height counts as 0, because there is nothing to take a percentage of.
+     * Cleared when the height is settled. Valid only inside `lv_obj_update_layout()` */
+    uint16_t h_content_pending  : 1;
+
+    /** The same for the width */
+    uint16_t w_content_pending  : 1;
     uint16_t is_deleting : 1;
 
     /** The widget is rendered at least once already.
@@ -189,6 +244,44 @@ void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child);
  * @param disp  pointer to a display
  */
 void lv_obj_invalidate_expand_blur(lv_display_t * disp);
+
+/**
+ * @brief Calculates the width in pixels of an LVGL object based on its style and parent for a given width `prop`.
+ * @param obj Pointer to the LVGL object whose width is being calculated.
+ * @param prop Which style width to calculate for. Valid values are: LV_STYLE_WIDTH, LV_STYLE_MIN_WIDTH, or
+ * LV_STYLE_MAX_WIDTH.
+ * @return The computed width for the object:
+ * @note If the style width is a fixed value, that value is returned.
+ * @note If the style width is `LV_SIZE_CONTENT`, `LV_SIZE_CONTENT` is returned for `LV_STYLE_WIDTH`.
+ *       A min or max width does not support it and returns no limit.
+ * @note If the style width is a `LV_PCT()`, the percentage is applied to the parent's width.
+ *       A widget without a parent returns no limit for a min or max width, and 0 otherwise.
+ */
+int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop);
+
+/**
+ * @brief Calculates the height in pixels of an LVGL object based on its style and parent for a given height `prop`.
+ * @param obj Pointer to the LVGL object whose height is being calculated.
+ * @param prop Which style height to calculate for. Valid values are: LV_STYLE_HEIGHT, LV_STYLE_MIN_HEIGHT, or
+ * LV_STYLE_MAX_HEIGHT.
+ * @return The computed height for the object:
+ * @note If the style height is a fixed value, that value is returned.
+ * @note If the style height is `LV_SIZE_CONTENT`, `LV_SIZE_CONTENT` is returned for `LV_STYLE_HEIGHT`.
+ *       A min or max height does not support it and returns no limit.
+ * @note If the style height is a `LV_PCT()`, the percentage is applied to the parent's height.
+ *       A widget without a parent returns no limit for a min or max height, and 0 otherwise.
+ */
+int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop);
+
+/**
+ * Move the coordinates of all the descendants of a widget. Only the coordinates change,
+ * nothing is invalidated and no event is sent.
+ * @param obj               pointer to a widget
+ * @param x_diff            pixels to move horizontally
+ * @param y_diff            pixels to move vertically
+ * @param ignore_floating   true: don't move the floating children (and their descendants)
+ */
+void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, bool ignore_floating);
 
 /**********************
  *      MACROS

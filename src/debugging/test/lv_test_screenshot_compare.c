@@ -82,6 +82,7 @@ lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
     lv_obj_invalidate(scr);
     lv_refr_now(NULL);
 
+
     lv_test_screenshot_result_t res;
     res = lv_test_screenshot_compare_core(fn_ref);
     return res;

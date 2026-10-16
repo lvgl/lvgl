@@ -13,6 +13,7 @@
 
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_style_internal.h"
 #include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
@@ -610,7 +611,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_label_set_text_static(label, dropdown->options);
     lv_obj_set_width(dropdown->list, LV_SIZE_CONTENT);
 
-    lv_obj_update_layout(label);
+    lv_obj_update_layout(dropdown->list);
     /*Set smaller width to the width of the button*/
     if(lv_obj_get_width(dropdown->list) <= lv_obj_get_width(dropdown_obj) &&
        (dropdown->dir == LV_DIR_TOP || dropdown->dir == LV_DIR_BOTTOM)) {
@@ -876,9 +877,6 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         refresh_size(obj);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
-        lv_obj_refresh_self_size(obj);
-    }
-    else if(code == LV_EVENT_SIZE_CHANGED) {
         lv_obj_refresh_self_size(obj);
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {

@@ -8,6 +8,11 @@
 
 #include <string.h>
 
+#define BARCODE_DATA  "https://lvgl.io"
+#define BARCODE_SIZE  460
+#define BARCODE_SCALE 2
+#define BARCODE_THICK 50
+
 static lv_obj_t * active_screen = NULL;
 static uint32_t redraw_warning_cnt;
 static uint32_t encode_cnt;
@@ -17,8 +22,21 @@ static void count_barcode_logs_cb(lv_log_level_t level, const char * buf)
     LV_UNUSED(level);
     /*Emitted by the draw hook when a deferred change was not applied explicitly*/
     if(strstr(buf, "was not called after the property changes") != NULL) redraw_warning_cnt++;
-    /*Emitted by barcode_encode(), i.e. once per pass over the code128 encoder*/
+    /*Emitted by barcode_encode_data(), i.e. once per pass over the code128 encoder*/
     if(strstr(buf, "barcode width = ") != NULL) encode_cnt++;
+}
+
+/*A horizontal barcode with the defaults the screenshots were taken with*/
+static lv_obj_t * barcode_create_hor(void)
+{
+    lv_obj_t * barcode = lv_barcode_create(active_screen);
+    TEST_ASSERT_NOT_NULL(barcode);
+    lv_obj_center(barcode);
+
+    lv_barcode_set_size(barcode, BARCODE_SIZE);
+    lv_barcode_set_scale(barcode, BARCODE_SCALE);
+    lv_obj_set_height(barcode, BARCODE_THICK);
+    return barcode;
 }
 
 void setUp(void)
@@ -36,53 +54,30 @@ void tearDown(void)
 
 void test_barcode_normal(void)
 {
-    lv_obj_t * barcode = lv_barcode_create(active_screen);
-    TEST_ASSERT_NOT_NULL(barcode);
-
-    lv_obj_center(barcode);
+    lv_obj_t * barcode = barcode_create_hor();
 
     lv_color_t dark_color = lv_color_black();
     lv_color_t light_color = lv_color_white();
-    uint16_t scale = 2;
-    lv_result_t res;
 
     lv_barcode_set_dark_color(barcode, dark_color);
     lv_barcode_set_light_color(barcode, light_color);
-    lv_barcode_set_scale(barcode, scale);
 
-    TEST_ASSERT_EQUAL_COLOR(lv_barcode_get_dark_color(barcode), dark_color);
-    TEST_ASSERT_EQUAL_COLOR(lv_barcode_get_light_color(barcode), light_color);
-    TEST_ASSERT_EQUAL(lv_barcode_get_scale(barcode), scale);
+    TEST_ASSERT_EQUAL_COLOR(dark_color, lv_barcode_get_dark_color(barcode));
+    TEST_ASSERT_EQUAL_COLOR(light_color, lv_barcode_get_light_color(barcode));
+    TEST_ASSERT_EQUAL(BARCODE_SIZE, lv_barcode_get_size(barcode));
+    TEST_ASSERT_EQUAL(BARCODE_SCALE, lv_barcode_get_scale(barcode));
+    TEST_ASSERT_EQUAL(LV_DIR_HOR, lv_barcode_get_direction(barcode));
 
-    /* Test horizontal mode */
-    lv_barcode_set_direction(barcode, LV_DIR_HOR);
-    lv_obj_set_height(barcode, 50);
-    res = lv_barcode_update(barcode, "https://lvgl.io");
-    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
+    /*Horizontal*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
 
-    /* Test vertical mode */
+    /*Vertical. The length along the bars is the same; the thickness moves to the width.*/
     lv_barcode_set_direction(barcode, LV_DIR_VER);
-    lv_obj_set_size(barcode, 50, LV_SIZE_CONTENT);
-    res = lv_barcode_update(barcode, "https://lvgl.io");
-    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
+    lv_obj_set_size(barcode, BARCODE_THICK, LV_SIZE_CONTENT);
+    TEST_ASSERT_EQUAL(LV_DIR_VER, lv_barcode_get_direction(barcode));
+    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_2.png");
-
-    /* Test tiled + horizontal mode */
-    lv_barcode_set_tiled(barcode, true);
-    lv_barcode_set_direction(barcode, LV_DIR_HOR);
-    lv_obj_set_size(barcode, LV_SIZE_CONTENT, 50);
-
-    res = lv_barcode_update(barcode, "https://lvgl.io");
-    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_tiled_1.png");
-
-    /* Test tiled + vertical mode */
-    lv_barcode_set_direction(barcode, LV_DIR_VER);
-    lv_obj_set_size(barcode, 50, LV_SIZE_CONTENT);
-    res = lv_barcode_update(barcode, "https://lvgl.io");
-    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_tiled_2.png");
 }
 
 void test_barcode_properties_after_data(void)
@@ -91,119 +86,170 @@ void test_barcode_properties_after_data(void)
     TEST_ASSERT_NOT_NULL(barcode);
     lv_obj_center(barcode);
 
-    /*Needed before anything can be generated - see test_barcode_data_before_size_recovers()*/
-    lv_obj_set_height(barcode, 50);
-
-    /*Properties set after the data used to be dropped. The result has to be the same
-     *bitmap test_barcode_normal() gets by setting them first.*/
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
+    /*The data comes first here, the properties after. The result has to be the same
+     *bitmap test_barcode_normal() gets by setting them the other way round.*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
 
     lv_barcode_set_dark_color(barcode, lv_color_black());
     lv_barcode_set_light_color(barcode, lv_color_white());
-    lv_barcode_set_scale(barcode, 2);
-    lv_barcode_set_direction(barcode, LV_DIR_HOR);
+    lv_barcode_set_size(barcode, BARCODE_SIZE);
+    lv_barcode_set_scale(barcode, BARCODE_SCALE);
+    lv_obj_set_height(barcode, BARCODE_THICK);
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
 
-    /*Direction and object size*/
     lv_barcode_set_direction(barcode, LV_DIR_VER);
-    lv_obj_set_size(barcode, 50, LV_SIZE_CONTENT);
+    lv_obj_set_size(barcode, BARCODE_THICK, LV_SIZE_CONTENT);
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_2.png");
-
-    /*Tiled mode*/
-    lv_barcode_set_tiled(barcode, true);
-    lv_barcode_set_direction(barcode, LV_DIR_HOR);
-    lv_obj_set_size(barcode, LV_SIZE_CONTENT, 50);
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_tiled_1.png");
-
-    lv_barcode_set_direction(barcode, LV_DIR_VER);
-    lv_obj_set_size(barcode, 50, LV_SIZE_CONTENT);
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_tiled_2.png");
 }
 
-void test_barcode_data_before_size_recovers(void)
+void test_barcode_default_geometry(void)
+{
+    lv_obj_t * barcode = lv_barcode_create(active_screen);
+    TEST_ASSERT_NOT_NULL(barcode);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
+    lv_obj_update_layout(barcode);
+
+    /*As long as the bars need, and thick enough to see without setting anything*/
+    TEST_ASSERT_EQUAL(lv_barcode_get_size(barcode), lv_obj_get_width(barcode));
+    TEST_ASSERT_EQUAL(LV_DPI_DEF, lv_obj_get_height(barcode));
+
+    /*The thickness is a plain size, so the Widget's own setter wins*/
+    lv_obj_set_height(barcode, BARCODE_THICK);
+    lv_obj_update_layout(barcode);
+    TEST_ASSERT_EQUAL(BARCODE_THICK, lv_obj_get_height(barcode));
+}
+
+void test_barcode_size_drives_the_canvas(void)
+{
+    lv_obj_t * barcode = barcode_create_hor();
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
+
+    /*The canvas is one pixel thick and as long as the size; the image tiling supplies the
+     *rest of the thickness*/
+    const lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(barcode);
+    TEST_ASSERT_NOT_NULL(draw_buf);
+    TEST_ASSERT_EQUAL(BARCODE_SIZE, draw_buf->header.w);
+    TEST_ASSERT_EQUAL(1, draw_buf->header.h);
+
+    /*The size is the content width, and the thickness is the Widget's own height*/
+    lv_obj_update_layout(barcode);
+    TEST_ASSERT_EQUAL(BARCODE_SIZE, lv_obj_get_width(barcode));
+    TEST_ASSERT_EQUAL(BARCODE_THICK, lv_obj_get_height(barcode));
+
+    /*A longer size is a longer canvas*/
+    lv_barcode_set_size(barcode, BARCODE_SIZE + 100);
+    draw_buf = lv_canvas_get_draw_buf(barcode);
+    TEST_ASSERT_EQUAL(BARCODE_SIZE + 100, draw_buf->header.w);
+    TEST_ASSERT_EQUAL(1, draw_buf->header.h);
+    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
+
+    /*A vertical barcode turns the canvas on its side*/
+    lv_barcode_set_direction(barcode, LV_DIR_VER);
+    draw_buf = lv_canvas_get_draw_buf(barcode);
+    TEST_ASSERT_EQUAL(1, draw_buf->header.w);
+    TEST_ASSERT_EQUAL(BARCODE_SIZE + 100, draw_buf->header.h);
+    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
+}
+
+void test_barcode_object_size_does_not_touch_the_canvas(void)
+{
+    lv_obj_t * barcode = barcode_create_hor();
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
+
+    const lv_draw_buf_t * before = lv_canvas_get_draw_buf(barcode);
+    TEST_ASSERT_NOT_NULL(before);
+
+    /*The bitmap used to be regenerated on every resize, which is what made the Widget
+     *depend on its own size. The thickness is the tiling's job now.*/
+    lv_obj_set_height(barcode, BARCODE_THICK * 2);
+    lv_obj_update_layout(barcode);
+
+    TEST_ASSERT_EQUAL_PTR(before, lv_canvas_get_draw_buf(barcode));
+    TEST_ASSERT_EQUAL(BARCODE_THICK * 2, lv_obj_get_height(barcode));
+    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
+
+    /*Even a zero height, which used to leave nothing to allocate, is harmless*/
+    lv_obj_set_height(barcode, 0);
+    lv_obj_update_layout(barcode);
+    TEST_ASSERT_EQUAL_PTR(before, lv_canvas_get_draw_buf(barcode));
+    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
+}
+
+void test_barcode_scale_zero_fits_the_bars_to_the_size(void)
 {
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
     lv_obj_center(barcode);
-    lv_barcode_set_scale(barcode, 2);
+    lv_obj_set_height(barcode, BARCODE_THICK);
 
-    /*A barcode sizes itself to its content, so with no height there is no canvas to
-     *allocate. This could not succeed before the change either.*/
-    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_barcode_update(barcode, "https://lvgl.io"));
+    /*Zero is the default: the widest bar that fits*/
+    TEST_ASSERT_EQUAL(0, lv_barcode_get_scale(barcode));
+
+    /*Room for a bar twice as wide as the size the screenshots use one pixel bars at*/
+    lv_barcode_set_size(barcode, BARCODE_SIZE * 2);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
+    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
+
+    /*Too short for even one pixel per bar, so there is nothing to draw*/
+    lv_barcode_set_size(barcode, 8);
     TEST_ASSERT_FALSE(lv_barcode_is_render_valid(barcode));
 
-    /*New: the data is remembered, so it appears once there is a height to fit it to*/
-    lv_barcode_set_dark_color(barcode, lv_color_black());
-    lv_barcode_set_light_color(barcode, lv_color_white());
-    lv_obj_set_height(barcode, 50);
-    lv_obj_update_layout(barcode);
+    /*And it recovers once there is room again*/
+    lv_barcode_set_size(barcode, BARCODE_SIZE);
     TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
+}
+
+void test_barcode_scale_that_does_not_fit_is_detectable(void)
+{
+    lv_obj_t * barcode = barcode_create_hor();
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
+    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
+
+    /*A forced scale wins over the size, so it can ask for more room than there is. The
+     *setter returns void, so this flag is the only way to notice.*/
+    lv_barcode_set_scale(barcode, 100);
+    TEST_ASSERT_FALSE(lv_barcode_is_render_valid(barcode));
+
+    /*Back to a scale that fits*/
+    lv_barcode_set_scale(barcode, BARCODE_SCALE);
+    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
 }
 
 void test_barcode_encoding_after_data(void)
 {
-    lv_obj_t * barcode = lv_barcode_create(active_screen);
-    TEST_ASSERT_NOT_NULL(barcode);
-    lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
-    lv_barcode_set_scale(barcode, 2);
+    lv_obj_t * barcode = barcode_create_hor();
 
-    /*GS1 strips spaces, raw encodes them, so the bar count differs*/
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "LVGL 10"));
+    /*GS1 strips spaces, raw encodes them, so the two need a different scale to fit*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, "LVGL 10"));
     TEST_ASSERT_EQUAL(LV_BARCODE_ENCODING_CODE128_GS1, lv_barcode_get_encoding(barcode));
-    lv_obj_update_layout(barcode);
-    const int32_t gs1_w = lv_obj_get_width(barcode);
 
     lv_barcode_set_encoding(barcode, LV_BARCODE_ENCODING_CODE128_RAW);
     TEST_ASSERT_EQUAL(LV_BARCODE_ENCODING_CODE128_RAW, lv_barcode_get_encoding(barcode));
-    lv_obj_update_layout(barcode);
-    TEST_ASSERT_NOT_EQUAL(gs1_w, lv_obj_get_width(barcode));
     TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
 
-    /*Switching back returns to the original geometry*/
     lv_barcode_set_encoding(barcode, LV_BARCODE_ENCODING_CODE128_GS1);
-    lv_obj_update_layout(barcode);
-    TEST_ASSERT_EQUAL(gs1_w, lv_obj_get_width(barcode));
-}
-
-void test_barcode_resize_regenerates(void)
-{
-    lv_obj_t * barcode = lv_barcode_create(active_screen);
-    TEST_ASSERT_NOT_NULL(barcode);
-    lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
-
-    /*Used to keep the height it had when the data was set*/
-    const lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(barcode);
-    TEST_ASSERT_NOT_NULL(draw_buf);
-    TEST_ASSERT_EQUAL(50, draw_buf->header.h);
-
-    lv_obj_set_height(barcode, 80);
-    lv_obj_update_layout(barcode);
-
-    draw_buf = lv_canvas_get_draw_buf(barcode);
-    TEST_ASSERT_NOT_NULL(draw_buf);
-    TEST_ASSERT_EQUAL(80, draw_buf->header.h);
+    TEST_ASSERT_EQUAL(LV_BARCODE_ENCODING_CODE128_GS1, lv_barcode_get_encoding(barcode));
     TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
 }
 
-void test_barcode_scale_resizes_the_canvas(void)
+void test_barcode_get_data_returns_the_stored_copy(void)
 {
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
-    lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
 
-    const int32_t w1 = (int32_t)lv_canvas_get_draw_buf(barcode)->header.w;
+    /*Nothing set yet*/
+    TEST_ASSERT_NULL(lv_barcode_get_data(barcode));
 
-    /*Scale is the pixel width of one bar*/
-    lv_barcode_set_scale(barcode, 2);
-    TEST_ASSERT_EQUAL(2, lv_barcode_get_scale(barcode));
-    TEST_ASSERT_EQUAL(w1 * 2, (int32_t)lv_canvas_get_draw_buf(barcode)->header.w);
-    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
+    char data[] = BARCODE_DATA;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, data));
+
+    /*A copy, not the caller's buffer*/
+    TEST_ASSERT_NOT_EQUAL(data, lv_barcode_get_data(barcode));
+    TEST_ASSERT_EQUAL_STRING(BARCODE_DATA, lv_barcode_get_data(barcode));
+
+    /*Emptying forgets it*/
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_barcode_set_data(barcode, ""));
+    TEST_ASSERT_NULL(lv_barcode_get_data(barcode));
 }
 
 void test_barcode_update_mode_default_is_immediate(void)
@@ -211,7 +257,6 @@ void test_barcode_update_mode_default_is_immediate(void)
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
 
-    /*Immediate keeps existing code's behaviour*/
     TEST_ASSERT_EQUAL(LV_BARCODE_UPDATE_MODE_IMMEDIATE, lv_barcode_get_update_mode(barcode));
 
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
@@ -226,16 +271,17 @@ void test_barcode_update_mode_deferred_fills_on_redraw(void)
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
     lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
+    lv_obj_set_height(barcode, BARCODE_THICK);
     lv_barcode_set_dark_color(barcode, lv_color_black());
     lv_barcode_set_light_color(barcode, lv_color_white());
+    lv_barcode_set_size(barcode, BARCODE_SIZE);
 
     /*Deliberately omit the explicit lv_barcode_render() to cover the fallback: the redraw
-     *warns and fills the bars in anyway, so the bitmap must still be correct.*/
+     *warns and generates the bars anyway, so the bitmap must still be correct.*/
     lv_log_register_print_cb(count_barcode_logs_cb);
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
-    lv_barcode_set_scale(barcode, 2);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
+    lv_barcode_set_scale(barcode, BARCODE_SCALE);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
     lv_log_register_print_cb(NULL);
@@ -245,21 +291,23 @@ void test_barcode_update_mode_deferred_fills_on_redraw(void)
 #endif
 }
 
-void test_barcode_deferred_data_is_not_filled_until_render(void)
+void test_barcode_deferred_property_is_not_applied_until_render(void)
 {
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
     lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
+    lv_obj_set_height(barcode, BARCODE_THICK);
     lv_barcode_set_dark_color(barcode, lv_color_black());
     lv_barcode_set_light_color(barcode, lv_color_white());
-    lv_barcode_set_scale(barcode, 2);
+    lv_barcode_set_size(barcode, BARCODE_SIZE);
 
+    /*Setting the data always generates right away, in either mode, as the QR code does*/
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
+    TEST_ASSERT_FALSE(((lv_barcode_t *)barcode)->needs_update);
 
-    /*Setting the data obeys the mode too: the canvas is sized, so this reports OK, but the
-     *bars are still pending*/
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
+    /*A property change is what waits for the render*/
+    lv_barcode_set_scale(barcode, BARCODE_SCALE);
     TEST_ASSERT_TRUE(((lv_barcode_t *)barcode)->needs_update);
     TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
 
@@ -273,16 +321,17 @@ void test_barcode_render_applies_deferred_changes(void)
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
     lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
+    lv_obj_set_height(barcode, BARCODE_THICK);
     lv_barcode_set_dark_color(barcode, lv_color_black());
     lv_barcode_set_light_color(barcode, lv_color_white());
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
 
     lv_log_register_print_cb(count_barcode_logs_cb);
 
     /*The intended flow: change the properties, then generate once explicitly*/
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
-    lv_barcode_set_scale(barcode, 2);
+    lv_barcode_set_size(barcode, BARCODE_SIZE);
+    lv_barcode_set_scale(barcode, BARCODE_SCALE);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_render(barcode));
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
@@ -294,38 +343,19 @@ void test_barcode_render_applies_deferred_changes(void)
 #endif
 }
 
-void test_barcode_render_before_switching_mode_reports_result(void)
-{
-    lv_obj_t * barcode = lv_barcode_create(active_screen);
-    TEST_ASSERT_NOT_NULL(barcode);
-    lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
-    lv_barcode_set_dark_color(barcode, lv_color_black());
-    lv_barcode_set_light_color(barcode, lv_color_white());
-
-    lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
-    lv_barcode_set_scale(barcode, 2);
-
-    /*render() reports the result, so the mode switch afterwards has nothing left to do*/
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_render(barcode));
-    lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_IMMEDIATE);
-
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
-}
-
 void test_barcode_update_mode_immediate_applies_pending_change(void)
 {
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
     lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
+    lv_obj_set_height(barcode, BARCODE_THICK);
     lv_barcode_set_dark_color(barcode, lv_color_black());
     lv_barcode_set_light_color(barcode, lv_color_white());
 
     lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
-    lv_barcode_set_scale(barcode, 2);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
+    lv_barcode_set_size(barcode, BARCODE_SIZE);
+    lv_barcode_set_scale(barcode, BARCODE_SCALE);
 
     /*Must still apply the deferred change. The draw hook asserts a bitmap is only out of
      *date in deferred mode, so if it did not, the redraw below would abort the test.*/
@@ -334,47 +364,19 @@ void test_barcode_update_mode_immediate_applies_pending_change(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
 }
 
-void test_barcode_failed_render_is_detectable(void)
-{
-    lv_obj_t * barcode = lv_barcode_create(active_screen);
-    TEST_ASSERT_NOT_NULL(barcode);
-    lv_obj_center(barcode);
-
-    /*Nothing generated yet*/
-    TEST_ASSERT_FALSE(lv_barcode_is_render_valid(barcode));
-
-    lv_obj_set_height(barcode, 50);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
-    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
-
-    /*Zero height leaves no canvas to allocate, and the resize handler returns void, so
-     *this flag is the only way to notice*/
-    lv_obj_set_height(barcode, 0);
-    lv_obj_update_layout(barcode);
-    TEST_ASSERT_FALSE(lv_barcode_is_render_valid(barcode));
-
-    /*Growing it back succeeds*/
-    lv_obj_set_height(barcode, 50);
-    lv_obj_update_layout(barcode);
-    TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
-}
-
 void test_barcode_failed_render_is_not_retried_every_frame(void)
 {
-    lv_obj_t * barcode = lv_barcode_create(active_screen);
-    TEST_ASSERT_NOT_NULL(barcode);
-    lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
+    lv_obj_t * barcode = barcode_create_hor();
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
     lv_refr_now(NULL);
 
-    lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
-
-    /*A known-bad state must not be retried on every redraw, so the draw hook stays quiet*/
-    lv_obj_set_height(barcode, 0);
-    lv_obj_update_layout(barcode);
+    /*Fail while still in immediate mode, so the failure is recorded in the setter*/
+    lv_barcode_set_scale(barcode, 100);
     TEST_ASSERT_FALSE(lv_barcode_is_render_valid(barcode));
     TEST_ASSERT_TRUE(((lv_barcode_t *)barcode)->needs_update);
+
+    /*A known-bad state must not be retried on every redraw, so the draw hook stays quiet*/
+    lv_barcode_set_update_mode(barcode, LV_BARCODE_UPDATE_MODE_DEFERRED);
 
     lv_log_register_print_cb(count_barcode_logs_cb);
     for(int i = 0; i < 5; i++) {
@@ -389,8 +391,7 @@ void test_barcode_failed_render_is_not_retried_every_frame(void)
 #endif
 
     /*A property change is what allows another attempt - proven by one that can succeed*/
-    lv_obj_set_height(barcode, 50);
-    lv_obj_update_layout(barcode);
+    lv_barcode_set_scale(barcode, BARCODE_SCALE);
     lv_refr_now(NULL);
     TEST_ASSERT_TRUE(lv_barcode_is_render_valid(barcode));
     TEST_ASSERT_FALSE(((lv_barcode_t *)barcode)->needs_update);
@@ -400,24 +401,13 @@ void test_barcode_failed_render_is_not_retried_every_frame(void)
 
 void test_barcode_regeneration_encodes_the_data_once(void)
 {
-    lv_obj_t * barcode = lv_barcode_create(active_screen);
-    TEST_ASSERT_NOT_NULL(barcode);
-    lv_obj_center(barcode);
-    lv_obj_set_height(barcode, 50);
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_update(barcode, "https://lvgl.io"));
+    lv_obj_t * barcode = barcode_create_hor();
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_set_data(barcode, BARCODE_DATA));
     lv_refr_now(NULL);
 
-    /*The pattern is handed from the sizing pass to the fill, so a regeneration is a single
-     *pass over the code128 encoder rather than one per stage*/
+    /*A regeneration is a single pass over the code128 encoder*/
     lv_log_register_print_cb(count_barcode_logs_cb);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_render(barcode));
-    lv_log_register_print_cb(NULL);
-    TEST_ASSERT_EQUAL(1, encode_cnt);
-
-    /*A scale change is fitted from the cached bar count - one encode, for the fill*/
-    encode_cnt = 0;
-    lv_log_register_print_cb(count_barcode_logs_cb);
-    lv_barcode_set_scale(barcode, 2);
     lv_log_register_print_cb(NULL);
     TEST_ASSERT_EQUAL(1, encode_cnt);
 
@@ -426,7 +416,7 @@ void test_barcode_regeneration_encodes_the_data_once(void)
     encode_cnt = 0;
     lv_log_register_print_cb(count_barcode_logs_cb);
     lv_barcode_set_scale(barcode, 3);
-    lv_barcode_set_scale(barcode, 4);
+    lv_barcode_set_scale(barcode, 1);
     lv_barcode_set_direction(barcode, LV_DIR_VER);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_barcode_render(barcode));
     lv_log_register_print_cb(NULL);

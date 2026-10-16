@@ -148,7 +148,7 @@ buffer(s) must be large enough for the new format.
 `LV_COLOR_16_SWAP` was kept for compatibility with LVGL v8, with the addition of <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> which you can use to make LVGL
 render natively in big-endian RGB565 format, this config has been removed in v10 and produces an error.
 
-If you're still using this configuration, simply define <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> as <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED"/> 
+If you're still using this configuration, simply define <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> as <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED"/>
 or set the display's color format at runtime with <ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565_SWAPPED)"/>.
 
 As a last resort option, if none of the above options work for you, the following snippet of code can be used in your flush callback.
@@ -542,6 +542,8 @@ Note that these assertions are not required and should be disabled to improve pe
   bool en = lv_obj_get_style_enabled(obj, &style, LV_PART_MAIN);
   ```
 
+- <ApiLink name="lv_obj_invalidate"/> takes a non-`const` `lv_obj_t *`.
+
 ---
 
 ## Drawing/Rendering
@@ -780,6 +782,14 @@ used afterwards.
   re-encodes whose result cannot be returned (the void property setters, and the
   deferred re-encode done by the draw pass).
 
+### lv_barcode
+
+- `lv_barcode_update()` is renamed to <ApiLink name="lv_barcode_set_data"/>.
+- The length of the bars is set with <ApiLink name="lv_barcode_set_size"/> instead of the
+  widget's width. The thickness is the widget's other size, `LV_DPI_DEF` by default.
+- `lv_barcode_set_tiled()` is removed. The bars are always drawn as a 1 px strip repeated over
+  the thickness.
+
 ### lv_span
 
 - `lv_spangroup_set_align()` is deprecated, use the `text_align` style property instead:
@@ -876,17 +886,30 @@ used afterwards.
 ## Layouts
 
 <ApiLink name="lv_layout_register"/> is deprecated and is replaced with <ApiLink name="lv_layout_create"/>.
+A layout has two callbacks: one sets the children's sizes, the other places them.
 
 ```c
-uint32_t layout = lv_layout_register(my_layout_update, &user_data);
-```
-
-Becomes:
-
-```c
-lv_layout_callbacks_t callbacks = { .layout_update_cb = my_layout_update };
+lv_layout_callbacks_t callbacks = {
+    .update_sizes_cb = my_update_sizes,         /*Can be NULL*/
+    .update_positions_cb = my_update_positions,
+};
 uint32_t layout = lv_layout_create(callbacks, &user_data);
 ```
+
+- `layout_update_cb` and `get_min_size_cb` are removed. `lv_layout_update_cb_t` is renamed to
+  `lv_layout_update_position_cb_t`.
+- Removed: `lv_obj_refr_size()` and `lv_obj_refr_pos()`, use <ApiLink name="lv_obj_mark_layout_as_dirty"/>.
+  `lv_obj_move_to()`, use <ApiLink name="lv_obj_set_pos"/>.
+- Removed without replacement: `lv_obj_is_style_any_width/height_content()`,
+  `lv_obj_get_style_clamped_width/height()`, `lv_obj_is_width/height_min/max()`,
+  `lv_clamp_width/height()`.
+- Moved to the private API: `lv_obj_calc_dynamic_width/height()`, `lv_obj_move_children_by()`.
+- Removed events: `LV_EVENT_LAYOUT_CHANGED` (use `LV_EVENT_SIZE_CHANGED` on the child) and
+  `LV_EVENT_UPDATE_LAYOUT_COMPLETED`. The codes of the later events changed.
+- `LV_EVENT_CHILD_CHANGED` is no longer sent when a layout moves or resizes a child.
+- `LV_EVENT_SIZE_CHANGED` has no parameter in case of widgets, so `lv_event_get_old_size()` returns `NULL`.
+   It is sent during the layout update, so don't call <ApiLink name="lv_obj_update_layout"/> or change
+   a layout related `LV_PART_MAIN` style in its handler. Both assert.
 
 ---
 

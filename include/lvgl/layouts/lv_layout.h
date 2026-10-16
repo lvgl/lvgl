@@ -24,12 +24,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef void (*lv_layout_update_cb_t)(lv_obj_t *, void * user_data);
-typedef bool (*lv_layout_get_min_size_cb_t)(lv_obj_t *, int32_t * req_size, bool width, void * user_data);
+typedef void (*lv_layout_update_position_cb_t)(lv_obj_t * obj, void * user_data);
+typedef void (*lv_layout_update_sizes_cb_t)(lv_obj_t * obj, int32_t iteration, void * user_data);
 
 typedef struct {
-    lv_layout_update_cb_t layout_update_cb;
-    lv_layout_get_min_size_cb_t get_min_size_cb;
+    lv_layout_update_sizes_cb_t update_sizes_cb;
+    lv_layout_update_position_cb_t update_positions_cb;
 } lv_layout_callbacks_t;
 
 
@@ -66,7 +66,7 @@ uint32_t lv_layout_create(lv_layout_callbacks_t callbacks, void * user_data);
  * @return          the ID of the new layout
  */
 LV_DEPRECATED("Use lv_layout_create instead")
-uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data);
+uint32_t lv_layout_register(lv_layout_update_position_cb_t cb, void * user_data);
 
 /**********************
  *      MACROS
