@@ -17,12 +17,12 @@ static void lv_draw_img_ppa_core(lv_layer_t * layer, const lv_draw_image_dsc_t *
                                  const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data);
 
 
-void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                     const lv_area_t * coords)
+void lv_draw_ppa_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
-    lv_draw_image_normal_helper(t->target_layer, &t->clip_area, dsc, coords, lv_draw_img_ppa_core, NULL, t->draw_unit);
+    lv_draw_image_normal_helper(layer, clip_area, dsc, coords, lv_draw_img_ppa_core, NULL, draw_unit);
 }
 
 static void lv_draw_img_ppa_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
