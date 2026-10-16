@@ -69,7 +69,8 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
                     //lv_draw_sw_border(u, &border_draw_dsc, glyph_draw_dsc->bg_coords);
-                    lv_draw_dave2d_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_dave2d_border(t->draw_unit, t->target_layer, &t->clip_area, &border_draw_dsc,
+                                          glyph_draw_dsc->bg_coords);
 #endif
                 }
                 break;
@@ -155,7 +156,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_dave2d_fill(t, fill_draw_dsc, fill_area);
+        lv_draw_dave2d_fill(t->draw_unit, t->target_layer, &t->clip_area, fill_draw_dsc, fill_area);
     }
 }
 
