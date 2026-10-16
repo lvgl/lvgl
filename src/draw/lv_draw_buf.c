@@ -196,7 +196,8 @@ void lv_draw_buf_clear_ex(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_laye
 
     if(a == NULL) {
         uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, 0, 0);
-        lv_memzero(buf, header->h * stride);
+        lv_memzero(buf, stride * lv_draw_buf_stride_rows(header->h, header->cf,
+                                                         header->vtiled));
         lv_draw_buf_flush_cache(draw_buf, a);
         LV_PROFILER_DRAW_END;
         return;
@@ -224,6 +225,21 @@ void lv_draw_buf_clear_ex(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_laye
         return;
     }
 
+    if(header->vtiled && lv_color_format_get_bpp(header->cf) == 1) {
+        for(int32_t y = a_clipped.y1; y <= a_clipped.y2; y++) {
+            uint8_t bit = header->lsb_first ? (uint8_t)(y & 7) : (uint8_t)(7 - (y & 7));
+            uint8_t mask = (uint8_t)(1U << bit);
+            uint8_t * row = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, (uint32_t)y);
+
+            for(int32_t x = a_clipped.x1; x <= a_clipped.x2; x++) {
+                row[x - a_clipped.x1] &= (uint8_t)~mask;
+            }
+        }
+        lv_draw_buf_flush_cache(draw_buf, a);
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
     uint8_t bpp = lv_color_format_get_bpp(header->cf);
     uint32_t line_length = (lv_area_get_width(&a_clipped) * bpp + 7) >> 3;
@@ -239,17 +255,27 @@ void lv_draw_buf_clear_ex(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_laye
 lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride,
                              void * data, uint32_t data_size)
 {
+    return lv_draw_buf_init_with_mono_flags(draw_buf, w, h, cf, stride, data, data_size, false, false);
+}
+
+lv_result_t lv_draw_buf_init_with_mono_flags(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h,
+                                             lv_color_format_t cf, uint32_t stride, void * data,
+                                             uint32_t data_size, bool vtiled,
+                                             bool lsb_first)
+{
 
     LV_CHECK_ARG(draw_buf != NULL, return LV_RESULT_INVALID);
     LV_CHECK_ARG(data != NULL || (w * h == 0), return LV_RESULT_INVALID);
+
     lv_memzero(draw_buf, sizeof(lv_draw_buf_t));
 
-    if(stride == LV_STRIDE_AUTO) stride = lv_draw_buf_width_to_stride(w, cf);
+    if(stride == LV_STRIDE_AUTO) stride = lv_draw_buf_width_to_stride_packed(w, cf, vtiled);
 
-    LV_CHECK_ARG_FORMAT_MSG(data_size >= stride * h,
+    uint32_t stride_rows = lv_draw_buf_stride_rows(h, cf, vtiled);
+    LV_CHECK_ARG_FORMAT_MSG(data_size >= stride * stride_rows,
                             return LV_RESULT_INVALID,
                             "Data size too small, required: %" LV_PRId32 ", provided: %" LV_PRId32,
-                            stride * h, data_size);
+                            stride * stride_rows, data_size);
 
     lv_image_header_t * header = &draw_buf->header;
     header->w = w;
@@ -258,6 +284,8 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
     header->stride = stride;
     header->flags = 0;
     header->magic = LV_IMAGE_HEADER_MAGIC;
+    header->vtiled = vtiled;
+    header->lsb_first = lsb_first;
 
     draw_buf->data = data;
     draw_buf->unaligned_data = data;
@@ -271,47 +299,53 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
 
 lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
-    return lv_draw_buf_create_ex(&default_handlers, w, h, cf, stride);
+    return lv_draw_buf_create_ex_with_mono_flags(&default_handlers, w, h, cf, stride, false, false);
+}
+
+lv_draw_buf_t * lv_draw_buf_create_ex_with_mono_flags(const lv_draw_buf_handlers_t * handlers,
+                                                      uint32_t w, uint32_t h, lv_color_format_t cf,
+                                                      uint32_t stride, bool vtiled,
+                                                      bool lsb_first)
+{
+    LV_CHECK_ARG(handlers != NULL, return NULL);
+    if(stride == LV_STRIDE_AUTO) stride = lv_draw_buf_width_to_stride_packed(w, cf, vtiled);
+
+    uint32_t size = stride * lv_draw_buf_stride_rows(h, cf, vtiled);
+    if(cf == LV_COLOR_FORMAT_RGB565A8) {
+        size += (stride / 2) * h;
+    }
+    else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
+    }
+    size = LV_ROUND_UP(size, LV_DRAW_BUF_ALIGN);
+
+    lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+    if(draw_buf == NULL) return NULL;
+
+    void * unaligned_buf = draw_buf_malloc(handlers, size, cf);
+    if(unaligned_buf == NULL) {
+        lv_free(draw_buf);
+        return NULL;
+    }
+
+    void * buf = lv_draw_buf_align_ex(handlers, unaligned_buf, cf);
+    if(lv_draw_buf_init_with_mono_flags(draw_buf, w, h, cf, stride, buf, size,
+                                        vtiled, lsb_first) != LV_RESULT_OK) {
+        draw_buf_free(handlers, unaligned_buf);
+        lv_free(draw_buf);
+        return NULL;
+    }
+
+    draw_buf->unaligned_data = unaligned_buf;
+    draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+    draw_buf->handlers = handlers;
+    return draw_buf;
 }
 
 lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, uint32_t w, uint32_t h,
                                       lv_color_format_t cf, uint32_t stride)
 {
-    LV_CHECK_ARG(handlers != NULL, return NULL);
-
-    LV_PROFILER_DRAW_BEGIN;
-    lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
-    LV_ASSERT_MALLOC(draw_buf);
-    if(draw_buf == NULL) {
-        LV_PROFILER_DRAW_END;
-        return NULL;
-    }
-    if(stride == LV_STRIDE_AUTO) stride = lv_draw_buf_width_to_stride(w, cf);
-
-    uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
-
-    void * buf = draw_buf_malloc(handlers, size, cf);
-    /*Do not assert here as LVGL or the app might just want to try creating a draw_buf*/
-    if(buf == NULL) {
-        LV_LOG_WARN("No memory: %"LV_PRIu32"x%"LV_PRIu32", cf: %d, stride: %"LV_PRIu32", %"LV_PRIu32"Byte, ",
-                    w, h, cf, stride, size);
-        lv_free(draw_buf);
-        LV_PROFILER_DRAW_END;
-        return NULL;
-    }
-
-    draw_buf->header.w = w;
-    draw_buf->header.h = h;
-    draw_buf->header.cf = cf;
-    draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
-    draw_buf->header.stride = stride;
-    draw_buf->header.magic = LV_IMAGE_HEADER_MAGIC;
-    draw_buf->data = lv_draw_buf_align_ex(handlers, buf, cf);
-    draw_buf->unaligned_data = buf;
-    draw_buf->data_size = size;
-    draw_buf->handlers = handlers;
-    LV_PROFILER_DRAW_END;
-    return draw_buf;
+    return lv_draw_buf_create_ex_with_mono_flags(handlers, w, h, cf, stride, false, false);
 }
 
 lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
@@ -328,7 +362,10 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
 
     LV_PROFILER_DRAW_BEGIN;
     const lv_image_header_t * header = &draw_buf->header;
-    lv_draw_buf_t * new_buf = lv_draw_buf_create_ex(handlers, header->w, header->h, header->cf, header->stride);
+    lv_draw_buf_t * new_buf = lv_draw_buf_create_ex_with_mono_flags(handlers, header->w, header->h,
+                                                                    header->cf, header->stride,
+                                                                    header->vtiled,
+                                                                    header->lsb_first);
     if(new_buf == NULL) {
         LV_PROFILER_DRAW_END;
         return NULL;
@@ -354,9 +391,22 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
     LV_PROFILER_DRAW_BEGIN;
     /*If color format is unknown, keep using the original color format.*/
     if(cf == LV_COLOR_FORMAT_UNKNOWN) cf = draw_buf->header.cf;
-    if(stride == LV_STRIDE_AUTO) stride = lv_draw_buf_width_to_stride(w, cf);
+    bool vtiled = draw_buf->header.vtiled;
+    if(stride == LV_STRIDE_AUTO) stride = lv_draw_buf_width_to_stride_packed(w, cf, vtiled);
 
-    uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+    uint32_t size;
+    if(vtiled && lv_color_format_get_bpp(cf) == 1) {
+        /* `_calculate_draw_buf_size` assumes 1 `stride` sized chunk per pixel row, which
+         * doesn't hold for vertically tiled mono buffers (1 chunk per 8 pixel rows). */
+        size = stride * lv_draw_buf_stride_rows(h, cf, vtiled);
+        if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+            size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
+        }
+        size = LV_ROUND_UP(size, LV_DRAW_BUF_ALIGN);
+    }
+    else {
+        size = _calculate_draw_buf_size(w, h, cf, stride);
+    }
 
     if(size > draw_buf->data_size) {
         LV_LOG_TRACE("Draw buf too small for new shape");
@@ -432,6 +482,14 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 
     /*Skip palette*/
     data += LV_COLOR_INDEXED_PALETTE_SIZE(buf->header.cf) * sizeof(lv_color32_t);
+
+    if(buf->header.vtiled && lv_color_format_get_bpp(buf->header.cf) == 1) {
+        /* Each byte packs 8 vertically stacked pixels of one column, so `stride` advances
+         * once every 8 pixel rows, and every pixel column is its own byte. */
+        data += buf->header.stride * (y >> 3);
+        return data + x;
+    }
+
     data += buf->header.stride * y;
 
     if(x == 0) return data;
@@ -641,6 +699,9 @@ static void buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     /*Source and dest color format must be same. Color conversion is not supported yet.*/
     LV_ASSERT_FORMAT_MSG(dest->header.cf == src->header.cf, "Color format mismatch: %d != %d",
                          dest->header.cf, src->header.cf);
+    LV_ASSERT_MSG(dest->header.vtiled == src->header.vtiled &&
+                  dest->header.lsb_first == src->header.lsb_first,
+                  "Monochrome layout mismatch");
 
     if(dest_area == NULL) line_width = dest->header.w;
     else line_width = lv_area_get_width(dest_area);
@@ -680,6 +741,30 @@ static void buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     uint32_t src_stride = src->header.stride;
     uint32_t line_bytes = (line_width * lv_color_format_get_bpp(dest->header.cf) + 7) >> 3;
 
+    if(dest->header.vtiled && lv_color_format_get_bpp(dest->header.cf) == 1) {
+        for(int32_t y = start_y; y <= end_y; y++) {
+            uint8_t * dest_row = lv_draw_buf_goto_xy(dest, dest_area ? dest_area->x1 : 0,
+                                                     (uint32_t)y);
+            const uint8_t * src_row = lv_draw_buf_goto_xy(src, src_area ? src_area->x1 : 0,
+                                                          (uint32_t)(src_area ? src_area->y1 +
+                                                                     (y - start_y) : y));
+            uint8_t bit = dest->header.lsb_first ? (uint8_t)(y & 7) : (uint8_t)(7 - (y & 7));
+            uint8_t src_bit = src->header.lsb_first ? (uint8_t)((src_area ? src_area->y1 +
+                                                                 (y - start_y) : y) & 7) :
+                              (uint8_t)(7 - ((src_area ? src_area->y1 +
+                                              (y - start_y) : y) & 7));
+            uint8_t dest_mask = (uint8_t)(1U << bit);
+            uint8_t src_mask = (uint8_t)(1U << src_bit);
+
+            for(int32_t x = 0; x < line_width; x++) {
+                if((src_row[x] & src_mask) != 0U) dest_row[x] |= dest_mask;
+                else dest_row[x] &= (uint8_t)~dest_mask;
+            }
+        }
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     for(; start_y <= end_y; start_y++) {
         lv_memcpy(dest_bufc, src_bufc, line_bytes);
         dest_bufc += dest_stride;
@@ -706,6 +791,21 @@ static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format)
     width_byte = (width_byte + 7) >> 3; /*Round up*/
 
     return LV_ROUND_UP(width_byte, LV_DRAW_BUF_STRIDE_ALIGN);
+}
+
+uint32_t lv_draw_buf_stride_rows(uint32_t h, lv_color_format_t cf, bool vtiled)
+{
+    if(vtiled && lv_color_format_get_bpp(cf) == 1) return (h + 7) / 8;
+    return h;
+}
+
+uint32_t lv_draw_buf_width_to_stride_packed(uint32_t w, lv_color_format_t cf, bool vtiled)
+{
+    /* Vertically tiled 1 bit per pixel buffers pack 8 vertically stacked pixels of a
+     * column into a single byte, so a "row" of the buffer (as used for stride purposes)
+     * is 1 byte per pixel of width, instead of 1 bit per pixel of width. */
+    if(vtiled && lv_color_format_get_bpp(cf) == 1) return LV_ROUND_UP(w, LV_DRAW_BUF_STRIDE_ALIGN);
+    return lv_draw_buf_width_to_stride(w, cf);
 }
 
 static void * draw_buf_malloc(const lv_draw_buf_handlers_t * handlers, size_t size_bytes,

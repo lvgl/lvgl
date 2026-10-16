@@ -523,6 +523,35 @@ config LV_DRAW_SW_I1_LUM_THRESHOLD
 
 endmenu
 
+menu "I1 dest layouts"
+	depends on LV_DRAW_SW_SUPPORT_I1
+
+config LV_DRAW_SW_I1_HTILE_MSB
+	bool "I1 horizontal tile, MSB first"
+	default y
+	help
+		Historical default layout: 8-pixel rows, most-significant bit first.
+
+config LV_DRAW_SW_I1_HTILE_LSB
+	bool "I1 horizontal tile, LSB first"
+	default n
+	help
+		8-pixel rows, least-significant bit first.
+
+config LV_DRAW_SW_I1_VTILE_MSB
+	bool "I1 vertical tile, MSB first"
+	default n
+	help
+		8-pixel columns, most-significant bit first.
+
+config LV_DRAW_SW_I1_VTILE_LSB
+	bool "I1 vertical tile, LSB first"
+	default y
+	help
+		8-pixel columns, least-significant bit first.
+
+endmenu
+
 config LV_DRAW_SW_DRAW_UNIT_CNT
 	int "Number of draw units"
 	default 1

@@ -107,6 +107,8 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * dsc)
         lv_area_move(&fill_dsc.relative_area, -layer->buf_area.x1, -layer->buf_area.y1);
         fill_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                    blend_area.y1 - layer->buf_area.y1);
+        fill_dsc.dest_vtiled = layer->draw_buf->header.vtiled;
+        fill_dsc.dest_lsb_first = layer->draw_buf->header.lsb_first;
         if(fill_dsc.mask_buf) {
             fill_dsc.mask_stride = dsc->mask_stride == 0  ? lv_area_get_width(dsc->mask_area) : dsc->mask_stride;
             fill_dsc.mask_buf += fill_dsc.mask_stride * (blend_area.y1 - dsc->mask_area->y1) +
@@ -130,6 +132,10 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * dsc)
         image_dsc.dest_w = lv_area_get_width(&blend_area);
         image_dsc.dest_h = lv_area_get_height(&blend_area);
         image_dsc.dest_stride = layer_stride_byte;
+        image_dsc.dest_vtiled = layer->draw_buf->header.vtiled;
+        image_dsc.dest_lsb_first = layer->draw_buf->header.lsb_first;
+        image_dsc.src_vtiled = false;
+        image_dsc.src_lsb_first = false;
 
         image_dsc.opa = dsc->opa;
         image_dsc.blend_mode = dsc->blend_mode;
@@ -138,8 +144,21 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * dsc)
 
         const uint8_t * src_buf = dsc->src_buf;
         uint32_t src_px_size = lv_color_format_get_bpp(dsc->src_color_format);
-        src_buf += image_dsc.src_stride * (blend_area.y1 - dsc->src_area->y1);
-        src_buf += ((blend_area.x1 - dsc->src_area->x1) * src_px_size) >> 3;
+        int32_t src_x_ofs = blend_area.x1 - dsc->src_area->x1;
+        int32_t src_y_ofs = blend_area.y1 - dsc->src_area->y1;
+        if(src_px_size == 1) {
+            image_dsc.src_vtiled = dsc->src_vtiled;
+            image_dsc.src_lsb_first = dsc->src_lsb_first;
+        }
+        if(src_px_size == 1 && dsc->src_vtiled) {
+            /* vertically tiled 1 bpp source: one byte per column, one tile row per 8 pixels */
+            src_buf += image_dsc.src_stride * (src_y_ofs >> 3) + src_x_ofs;
+            image_dsc.src_ybit = src_y_ofs & 7;
+        }
+        else {
+            src_buf += image_dsc.src_stride * src_y_ofs + ((src_x_ofs * src_px_size) >> 3);
+            if(src_px_size == 1) image_dsc.src_xbit = src_x_ofs & 7;
+        }
         image_dsc.src_buf = src_buf;
         image_dsc.mask_stride = 0;
 

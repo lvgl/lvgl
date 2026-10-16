@@ -263,6 +263,8 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         blend_dsc.mask_area = img_coords;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
+        blend_dsc.src_vtiled = header->vtiled;
+        blend_dsc.src_lsb_first = header->lsb_first;
         lv_draw_sw_blend(t, &blend_dsc);
     }
     else if(!transformed && !radius && (cf == LV_COLOR_FORMAT_L8 || cf == LV_COLOR_FORMAT_AL88) &&
@@ -271,6 +273,8 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         blend_dsc.src_buf = src_buf;
         blend_dsc.blend_area = img_coords;
         blend_dsc.src_color_format = cf;
+        blend_dsc.src_vtiled = header->vtiled;
+        blend_dsc.src_lsb_first = header->lsb_first;
         lv_draw_sw_blend(t, &blend_dsc);
     }
     /*The simplest case just copy the pixels into the draw_buf. Blending will convert the colors if needed*/
@@ -279,6 +283,8 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         blend_dsc.src_buf = src_buf;
         blend_dsc.blend_area = img_coords;
         blend_dsc.src_color_format = cf;
+        blend_dsc.src_vtiled = header->vtiled;
+        blend_dsc.src_lsb_first = header->lsb_first;
         lv_draw_sw_blend(t, &blend_dsc);
     }
     else if(!transformed && !radius && draw_dsc->recolor_opa > LV_OPA_MIN && draw_dsc->colorkey == NULL) {
@@ -327,6 +333,8 @@ static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc
     blend_dsc.src_area = img_coords;
     blend_dsc.src_buf = decoded->data;
     blend_dsc.src_color_format = cf;
+    blend_dsc.src_vtiled = decoded->header.vtiled;
+    blend_dsc.src_lsb_first = decoded->header.lsb_first;
 
     lv_area_t blend_area = *clipped_img_area;
     blend_dsc.blend_area = &blend_area;

@@ -647,6 +647,46 @@
     #endif
 #endif
 
+#ifndef LV_DRAW_SW_I1_HTILE_MSB
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_I1_HTILE_MSB
+            #define LV_DRAW_SW_I1_HTILE_MSB CONFIG_LV_DRAW_SW_I1_HTILE_MSB
+        #else
+            #define LV_DRAW_SW_I1_HTILE_MSB 0
+        #endif
+    #else
+          #define LV_DRAW_SW_I1_HTILE_MSB LV_DRAW_SW_SUPPORT_I1 && LV_USE_DRAW_SW
+    #endif
+#endif
+
+#ifndef LV_DRAW_SW_I1_HTILE_LSB
+    #ifdef CONFIG_LV_DRAW_SW_I1_HTILE_LSB
+        #define LV_DRAW_SW_I1_HTILE_LSB CONFIG_LV_DRAW_SW_I1_HTILE_LSB
+    #else
+        #define LV_DRAW_SW_I1_HTILE_LSB 0
+    #endif
+#endif
+
+#ifndef LV_DRAW_SW_I1_VTILE_MSB
+    #ifdef CONFIG_LV_DRAW_SW_I1_VTILE_MSB
+        #define LV_DRAW_SW_I1_VTILE_MSB CONFIG_LV_DRAW_SW_I1_VTILE_MSB
+    #else
+        #define LV_DRAW_SW_I1_VTILE_MSB 0
+    #endif
+#endif
+
+#ifndef LV_DRAW_SW_I1_VTILE_LSB
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_I1_VTILE_LSB
+            #define LV_DRAW_SW_I1_VTILE_LSB CONFIG_LV_DRAW_SW_I1_VTILE_LSB
+        #else
+            #define LV_DRAW_SW_I1_VTILE_LSB 0
+        #endif
+    #else
+          #define LV_DRAW_SW_I1_VTILE_LSB LV_DRAW_SW_SUPPORT_I1 && LV_USE_DRAW_SW
+    #endif
+#endif
+
 #ifndef LV_DRAW_SW_DRAW_UNIT_CNT
     #ifdef CONFIG_LV_DRAW_SW_DRAW_UNIT_CNT
         #define LV_DRAW_SW_DRAW_UNIT_CNT CONFIG_LV_DRAW_SW_DRAW_UNIT_CNT
@@ -5299,6 +5339,14 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if (LV_USE_PPA || LV_USE_SIFLI_EPIC || LV_USE_DRAW_G2D || LV_USE_DRAW_SDL) && !LV_USE_DRAW_SW
     #error "LV_USE_DRAW_SW must be enabled: Kconfig selects it from LV_USE_PPA || LV_USE_SIFLI_EPIC || LV_USE_DRAW_G2D || LV_USE_DRAW_SDL"
+#endif
+
+#if LV_DRAW_SW_I1_HTILE_LSB && !(LV_DRAW_SW_SUPPORT_I1 && LV_USE_DRAW_SW)
+    #error "LV_DRAW_SW_I1_HTILE_LSB requires LV_DRAW_SW_SUPPORT_I1 && LV_USE_DRAW_SW (Kconfig depends on)"
+#endif
+
+#if LV_DRAW_SW_I1_VTILE_MSB && !(LV_DRAW_SW_SUPPORT_I1 && LV_USE_DRAW_SW)
+    #error "LV_DRAW_SW_I1_VTILE_MSB requires LV_DRAW_SW_SUPPORT_I1 && LV_USE_DRAW_SW (Kconfig depends on)"
 #endif
 
 #if LV_USE_DRAW_ARM2D_SYNC && !(LV_USE_DRAW_SW)

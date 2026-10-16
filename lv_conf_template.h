@@ -264,6 +264,18 @@
 /** Pixels brighter than this luminance become active (set) when rendering to I1. */
 #define LV_DRAW_SW_I1_LUM_THRESHOLD 127
 
+/** Historical default layout: 8-pixel rows, most-significant bit first. */
+#define LV_DRAW_SW_I1_HTILE_MSB 1
+
+/** 8-pixel rows, least-significant bit first. */
+#define LV_DRAW_SW_I1_HTILE_LSB 0
+
+/** 8-pixel columns, most-significant bit first. */
+#define LV_DRAW_SW_I1_VTILE_MSB 0
+
+/** 8-pixel columns, least-significant bit first. */
+#define LV_DRAW_SW_I1_VTILE_LSB 1
+
 #endif /*LV_DRAW_SW_SUPPORT_I1*/
 
 #if LV_USE_OS != LV_OS_NONE

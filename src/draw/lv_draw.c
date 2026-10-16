@@ -10,6 +10,7 @@
 #include "../misc/lv_area_private.h"
 #include "../misc/lv_event_private.h"
 #include "lv_draw_private.h"
+#include "lv_draw_buf_private.h"
 #include "lv_draw_vector_private.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
@@ -511,7 +512,10 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     /*If the buffer of the layer is not allocated yet, allocate it now*/
     int32_t w = lv_area_get_width(&layer->buf_area);
     int32_t h = lv_area_get_height(&layer->buf_area);
-    uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
+    bool vtiled = layer->display != NULL && layer->display->vtiled;
+    bool lsb_first = layer->display != NULL && layer->display->lsb_first;
+    uint32_t layer_size_byte = lv_draw_buf_width_to_stride_packed(w, layer->color_format, vtiled) *
+                               lv_draw_buf_stride_rows(h, layer->color_format, vtiled);
 
 #if LV_DRAW_LAYER_MAX_MEMORY > 0
     /* Do not allocate the layer if the sum of allocated layer sizes
@@ -522,7 +526,9 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     }
 #endif
 
-    layer->draw_buf = lv_draw_buf_create(w, h, layer->color_format, 0);
+    layer->draw_buf = lv_draw_buf_create_ex_with_mono_flags(lv_draw_buf_get_handlers(), w, h,
+                                                            layer->color_format, LV_STRIDE_AUTO,
+                                                            vtiled, lsb_first);
 
     if(layer->draw_buf == NULL) {
         LV_LOG_WARN("Allocating layer buffer failed. Try later");

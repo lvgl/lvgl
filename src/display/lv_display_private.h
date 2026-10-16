@@ -120,6 +120,14 @@ struct _lv_display_t {
     uint32_t tile_cnt     : 8;       /**< Divide the display buffer into these number of tiles */
     uint32_t stride_is_auto : 1;     /**< 1: The stride of the buffers was not set explicitly. */
 
+    /** For 1 bit per pixel (indexed) color formats only.
+     *  1: each byte packs 8 vertically stacked pixels of a column (vertical tiling),
+     *  0: each byte packs 8 horizontally adjacent pixels of a row (horizontal tiling). */
+    uint32_t vtiled : 1;
+
+    /** For 1 bit per pixel (indexed) color formats only.
+     *  1: the first pixel of each 8-pixel group is in the LSB of the byte, 0: it's in the MSB. */
+    uint32_t lsb_first : 1;
 
     /** 1: The current screen rendering is in progress*/
     uint32_t rendering_in_progress : 1;

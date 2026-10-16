@@ -45,6 +45,8 @@ struct _lv_draw_sw_blend_dsc_t {
     const lv_area_t * mask_area;    /**< The area of `mask_buf` with absolute coordinates*/
     int32_t mask_stride;
     lv_blend_mode_t blend_mode;     /**< E.g. LV_BLEND_MODE_ADDITIVE*/
+    bool src_vtiled;                /**< Vertical tiling of the packed source (I1 images)*/
+    bool src_lsb_first;             /**< LSB-first bit order of the packed source (I1 images)*/
 };
 
 struct _lv_draw_sw_blend_fill_dsc_t {
@@ -57,6 +59,8 @@ struct _lv_draw_sw_blend_fill_dsc_t {
     lv_color_t color;
     lv_opa_t opa;
     lv_area_t relative_area;
+    bool dest_vtiled;           /**< Vertical tiling of the packed destination format. */
+    bool dest_lsb_first;        /**< LSB-first bit order of the packed destination format. */
 };
 
 struct _lv_draw_sw_blend_image_dsc_t {
@@ -73,6 +77,14 @@ struct _lv_draw_sw_blend_image_dsc_t {
     lv_blend_mode_t blend_mode;
     lv_area_t relative_area;    /**< The blend area relative to the layer's buffer area. */
     lv_area_t src_area;             /**< The original src area. */
+    bool dest_vtiled;           /**< Vertical tiling of the packed destination format. */
+    bool dest_lsb_first;        /**< LSB-first bit order of the packed destination format. */
+    bool src_vtiled;            /**< Vertical tiling of the packed source format (I1 sources). */
+    bool src_lsb_first;         /**< LSB-first bit order of the packed source format. */
+    uint8_t src_xbit;           /**< Sub-byte x offset of the src pixel at the top-left of the
+                                  *   blend area, only for horizontally tiled 1 bpp sources. */
+    uint8_t src_ybit;           /**< Sub-byte y offset of the src pixel at the top-left of the
+                                  *   blend area, only for vertically tiled 1 bpp sources. */
 };
 
 
