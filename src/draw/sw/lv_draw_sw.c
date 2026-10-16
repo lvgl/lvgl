@@ -13,6 +13,7 @@
 #include "../../display/lv_display_private.h"
 #include "../../core/lv_global.h"
 #include "../../misc/lv_area_private.h"
+#include "../../misc/lv_text_private.h"
 
 #if LV_USE_THORVG
     #if LV_USE_THORVG_INTERNAL
