@@ -86,7 +86,7 @@ const lv_font_class_t lv_builtin_font_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+LV_IMAGE_DSC_CONST void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     /* TODO: We can't add an arg check here because this is used in a hot path for all fonts stored as a C array
      * changing this will mean also changing the font converter so for now these assertions are an exception */
@@ -110,10 +110,14 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
         if(raw == NULL) return NULL;
 
         glyph_bitmap_release(fdsc);
-        return raw;
+        return (LV_IMAGE_DSC_CONST void *)raw;
     }
 
     LV_ASSERT(draw_buf != NULL);
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_DISCARDABLE);
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return NULL;
+#endif
     uint8_t * bitmap_out = draw_buf->data;
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;

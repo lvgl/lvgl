@@ -1117,7 +1117,11 @@ static const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_
     0x34, 0x00, 0x03, 0x00, 0x01, 0x00, 0x00, 0x02, 0x02, 0x84, 0x0b, 0x00, 0x3b,
 };
 
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_bulb_gif = {
+#else
 const lv_image_dsc_t img_bulb_gif = {
+#endif
     .header = {
         .cf = LV_COLOR_FORMAT_RAW,
         .w = 0,

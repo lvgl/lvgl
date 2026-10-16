@@ -5799,6 +5799,12 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
     if(!state->error) {
         lv_draw_buf_t * decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, *w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
         if(decoded) {
+            if(!lv_draw_buf_ensure_resident(decoded, NULL)) {
+                lv_draw_buf_destroy(decoded);
+                decoded = NULL;
+            }
+        }
+        if(decoded) {
             *out = (unsigned char*)decoded;
             outsize = decoded->data_size;
         }
@@ -5839,6 +5845,10 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
         }
 
         lv_draw_buf_t * new_buf = lv_draw_buf_create_ex(image_cache_draw_buf_handlers,*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
+        if(new_buf && !lv_draw_buf_ensure_resident(new_buf, NULL)) {
+            lv_draw_buf_destroy(new_buf);
+            new_buf = NULL;
+        }
         if(new_buf == NULL) {
             state->error = 83; /*alloc fail*/
         }

@@ -233,7 +233,11 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_1F617 uint8_t emoji_F617_map[] =
 #endif
 };
 
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t emoji_F617 = {
+#else
 const lv_image_dsc_t emoji_F617 = {
+#endif
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
     .header.cf = LV_COLOR_FORMAT_L8,
 #elif LV_COLOR_DEPTH == 16

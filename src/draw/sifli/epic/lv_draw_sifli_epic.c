@@ -383,8 +383,13 @@ static int32_t _epic_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
     }
 
+    if(!lv_draw_buf_ensure_task_sources_resident(task, draw_unit)) {
+        task->state = LV_DRAW_TASK_STATE_FAILED;
+        return LV_DRAW_UNIT_IDLE;
+    }
+
     /* Allocate buffer for layer */
-    if(lv_draw_layer_alloc_buf(layer) == NULL) {
+    if(lv_draw_layer_alloc_buf(layer, draw_unit) == NULL) {
         EPIC_ASSERT_MSG(false, "EPIC: Failed to allocate layer draw buffer");
         return LV_DRAW_UNIT_IDLE;
     }

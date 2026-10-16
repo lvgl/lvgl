@@ -183,6 +183,8 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
         ffmpeg_close(player->ffmpeg_ctx);
         player->ffmpeg_ctx = NULL;
     }
+    /*The frame of the new video replaces the old one*/
+    lv_draw_buf_release_vram((lv_draw_buf_t *)&player->imgdsc);
 
     lv_timer_pause(player->timer);
 
@@ -388,6 +390,8 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     LV_ASSERT(dsc != NULL);
     LV_UNUSED(decoder);
     struct ffmpeg_context_s * ffmpeg_ctx = dsc->user_data;
+    /*The decoded image is kept in the context, freed with it*/
+    lv_draw_buf_release_vram(&ffmpeg_ctx->draw_buf);
     ffmpeg_close(ffmpeg_ctx);
 }
 
@@ -975,6 +979,10 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
         return;
     }
 
+    /*The next frame replaces the whole image: drop a draw unit's copy of the
+     *previous one without reading it back*/
+    lv_draw_buf_release_vram((lv_draw_buf_t *)&player->imgdsc);
+
     int has_next = ffmpeg_update_next_frame(player->ffmpeg_ctx);
 
     if(has_next < 0) {
@@ -1027,6 +1035,8 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
     }
 
     lv_image_cache_drop(lv_image_get_src(obj));
+    /*The frame is kept in the player, freed with it*/
+    lv_draw_buf_release_vram((lv_draw_buf_t *)&player->imgdsc);
 
     ffmpeg_close(player->ffmpeg_ctx);
     player->ffmpeg_ctx = NULL;

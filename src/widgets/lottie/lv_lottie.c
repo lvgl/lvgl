@@ -264,6 +264,11 @@ static void lottie_update(lv_lottie_t * lottie, int32_t v)
     tvg_canvas_draw(lottie->tvg_canvas);
     tvg_canvas_sync(lottie->tvg_canvas);
 
+#if LV_USE_DRAW_VRAM
+    /* ThorVG has written new pixels, so the buffer is no longer all zero. */
+    if(draw_buf) lv_draw_buf_clear_flag(draw_buf, LV_IMAGE_FLAGS_CLEARZERO);
+#endif
+
     lv_obj_invalidate(obj);
 }
 

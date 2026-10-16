@@ -242,6 +242,9 @@ endif()
 
 lvgl_add_test_folder_if(NOT CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL test_cases/public_api)
 lvgl_get_test_files(TEST_CASE_FILES)
+if(NOT CONFIG_LV_USE_DRAW_VRAM)
+    list(REMOVE_ITEM TEST_CASE_FILES ${LVGL_TEST_DIR}/src/test_cases/test_draw_buf_vram.c)
+endif()
 
 file(GLOB_RECURSE TEST_HELPERS_FILES src/test_helpers/*.c)
 

@@ -555,6 +555,8 @@ static bool gstreamer_store_frame(lv_gstreamer_t * streamer, GstSample * sample,
     }
 
     const lv_draw_buf_t * copy = streamer->aligned_frame;
+    /* Release the previous frame's VRAM residency before overwriting its descriptor. */
+    lv_draw_buf_release_vram((lv_draw_buf_t *)&streamer->frame);
     streamer->frame = (lv_image_dsc_t) {
         .data = aligned ? map->data : copy->data,
         .data_size = aligned ? map->size : copy->data_size,
@@ -587,6 +589,11 @@ static bool gstreamer_copy_to_aligned_frame(lv_gstreamer_t * streamer, const Gst
             return false;
         }
         streamer->aligned_frame = dest;
+    }
+
+    if(!lv_draw_buf_ensure_resident(dest, NULL)) {
+        LV_LOG_ERROR("Failed to allocate CPU backing for an aligned frame");
+        return false;
     }
 
     const uint32_t dest_stride = dest->header.stride;
@@ -637,6 +644,8 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         gst_object_unref(streamer->pipeline);
     }
     gstreamer_release_frame(streamer);
+    /*The frame's descriptor is kept in the widget, freed with it*/
+    lv_draw_buf_release_vram((lv_draw_buf_t *)&streamer->frame);
     if(streamer->aligned_frame) {
         lv_draw_buf_destroy(streamer->aligned_frame);
     }

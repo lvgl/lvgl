@@ -6,6 +6,7 @@
     "draw_layers",
     "draw_descriptors",
     "draw_units",
-    "snapshot"
+    "snapshot",
+    "vram"
   ]
 }

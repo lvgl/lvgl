@@ -72,6 +72,10 @@ if platform.system() == "Linux":
     }
 
 test_options = {
+    "OPTIONS_TEST_NO_VRAM": {
+        "description": "Test config without VRAM residency, system heap, 32 bit color depth",
+        "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "no_vram"],
+    },
     "OPTIONS_TEST_SYSHEAP": {
         "description": "Test config, system heap, 32 bit color depth",
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests"],

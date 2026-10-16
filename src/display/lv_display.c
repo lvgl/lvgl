@@ -244,6 +244,10 @@ void lv_display_delete(lv_display_t * disp)
 
     lv_draw_layer_delete(disp->layer_head);
 
+    /* lv_display_set_buffers uses caller-owned pixel memory and display-owned buffer descriptors. */
+    lv_draw_buf_release_vram(&disp->_static_buf1);
+    lv_draw_buf_release_vram(&disp->_static_buf2);
+
 #if LV_USE_EXT_DATA
     if(disp->ext_data.free_cb) {
         disp->ext_data.free_cb(disp->ext_data.data);
@@ -570,10 +574,20 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
                                 render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
     }
 
+    /* Release the old VRAM residencies before reusing the display's buffer descriptors. */
+    lv_draw_buf_release_vram(&disp->_static_buf1);
+    lv_draw_buf_release_vram(&disp->_static_buf2);
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
     if(buf2) {
         lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
     }
+#if LV_USE_DRAW_VRAM
+    /*
+     * Download GPU-rendered frames into the caller's CPU buffers before flushing.
+     */
+    lv_draw_buf_set_flag(&disp->_static_buf1, LV_IMAGE_FLAGS_MODIFIABLE);
+    if(buf2) lv_draw_buf_set_flag(&disp->_static_buf2, LV_IMAGE_FLAGS_MODIFIABLE);
+#endif
     lv_display_set_draw_buffers(disp, &disp->_static_buf1, buf2 ? &disp->_static_buf2 : NULL);
     lv_display_set_render_mode(disp, render_mode);
     disp->stride_is_auto = is_auto_stride;
@@ -1139,6 +1153,15 @@ void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
 
     disp->matrix_rotation = enable;
 }
+
+#if LV_USE_DRAW_VRAM
+void lv_display_set_flush_from_vram(lv_display_t * disp, bool enable)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+
+    disp->flush_from_vram = enable;
+}
+#endif
 
 bool lv_display_get_matrix_rotation(lv_display_t * disp)
 {

@@ -211,6 +211,7 @@ void test_draw_letter_image_format_pivot(void)
     /* Create a properly aligned 20x20 red draw buf */
     lv_draw_buf_t * dbuf = lv_draw_buf_create(20, 20, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(dbuf);
+    lv_draw_buf_ensure_resident(dbuf, NULL);
     lv_draw_buf_clear(dbuf, NULL);
     uint32_t stride = dbuf->header.stride;
     for(int y = 0; y < 20; y++) {
@@ -229,6 +230,7 @@ void test_draw_letter_image_format_pivot(void)
     lv_obj_t * canvas = canvas_create(500, 360);
     /* Fill canvas white so anti-aliasing edges blend cleanly */
     lv_draw_buf_t * canvas_buf = lv_canvas_get_draw_buf(canvas);
+    lv_draw_buf_ensure_resident(canvas_buf, NULL);
     lv_memset(canvas_buf->data, 0xFF, canvas_buf->header.stride * canvas_buf->header.h);
 
     lv_layer_t layer;

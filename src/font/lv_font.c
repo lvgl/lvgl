@@ -43,7 +43,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_CHECK_ARG(g_dsc != NULL, return NULL);
     LV_CHECK_ARG(g_dsc->resolved_font != NULL, return NULL);
@@ -51,7 +51,7 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
     return lv_font_get_glyph_bitmap_internal(g_dsc, draw_buf);
 }
 
-const void * lv_font_get_glyph_bitmap_internal(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_bitmap_internal(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT(g_dsc != NULL);
     LV_ASSERT(g_dsc->resolved_font != NULL);
@@ -60,19 +60,19 @@ const void * lv_font_get_glyph_bitmap_internal(lv_font_glyph_dsc_t * g_dsc, lv_d
 
     const uint8_t save_req = g_dsc->req_raw_bitmap;
     g_dsc->req_raw_bitmap = 0;
-    const void * bitmap = font_p->get_glyph_bitmap(g_dsc, draw_buf);
+    LV_IMAGE_DSC_CONST void * bitmap = font_p->get_glyph_bitmap(g_dsc, draw_buf);
     g_dsc->req_raw_bitmap = save_req;
 
     return bitmap;
 }
 
-const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
 {
     LV_CHECK_ARG(g_dsc != NULL, return NULL);
     return lv_font_get_glyph_static_bitmap_internal(g_dsc);
 
 }
-const void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_dsc)
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_dsc)
 {
     LV_ASSERT(g_dsc != NULL);
     LV_ASSERT(g_dsc->resolved_font != NULL);
@@ -86,11 +86,21 @@ const void * lv_font_get_glyph_static_bitmap_internal(lv_font_glyph_dsc_t * g_ds
 
     const uint8_t save_req = g_dsc->req_raw_bitmap;
     g_dsc->req_raw_bitmap = 1;
-    const void * bitmap = font_p->get_glyph_bitmap(g_dsc, NULL);
+    LV_IMAGE_DSC_CONST void * bitmap = font_p->get_glyph_bitmap(g_dsc, NULL);
     g_dsc->req_raw_bitmap = save_req;
 
     return bitmap;
 }
+
+#if LV_USE_DRAW_VRAM
+void lv_font_release_vram(const lv_font_t * font)
+{
+    if(font == NULL || font->dsc == NULL) return;
+    lv_font_dsc_base_t * base = (lv_font_dsc_base_t *)font->dsc;
+    if(base->vram_res == NULL) return;
+    lv_draw_buf_vram_font_release(&base->vram_res, base);
+}
+#endif
 
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 {

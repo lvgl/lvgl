@@ -370,6 +370,11 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
     const void * data = qrcode->data;
     const uint32_t data_len = qrcode->data_len;
 
+#if LV_USE_DRAW_VRAM
+    /*The palette and the modules are written directly into the buffer, so it needs CPU backing*/
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return LV_RESULT_INVALID;
+#endif
+
     lv_draw_buf_clear(draw_buf, NULL);
     /*Set the palette directly on the draw buffer to avoid an extra invalidation here;
      *the caller (or the draw pass) takes care of refreshing the object*/
@@ -425,7 +430,15 @@ static lv_result_t qrcode_encode(lv_obj_t * obj)
     int32_t obj_w = draw_buf->header.w;
     int scaled = qr_size * scale;
     int margin = (obj_w - scaled) / 2;
-    uint8_t * buf_u8 = draw_buf->data + 8;    /*+8 skip the palette*/
+    /*lv_draw_buf_goto_xy skips the palette and, with VRAM residency enabled, consumes the
+     *CLEARZERO flag set by the clear above so the modules written here get uploaded*/
+    uint8_t * buf_u8 = lv_draw_buf_goto_xy(draw_buf, 0, 0);
+    if(buf_u8 == NULL) {
+        lv_display_enable_invalidation(lv_obj_get_display(obj), true);
+        lv_free(qr0);
+        lv_free(data_tmp);
+        return LV_RESULT_INVALID;
+    }
     lv_color_t c = lv_color_hex(1);
 
     /* Copy the qr code canvas:

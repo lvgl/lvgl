@@ -271,6 +271,10 @@ void lv_freetype_font_delete(lv_font_t * font)
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)(font->dsc);
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
+#if LV_USE_DRAW_VRAM
+    lv_font_release_vram(font);
+#endif
+
     lv_cache_release(ctx->cache_node_cache, dsc->cache_node_entry, NULL);
     if(lv_cache_entry_get_ref(dsc->cache_node_entry) == 0) {
         lv_cache_drop(ctx->cache_node_cache, dsc->cache_node, NULL);

@@ -414,7 +414,7 @@ const lv_grad_dsc_t * lv_obj_get_style_bg_grad(const lv_obj_t * obj, lv_part_t p
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-const void * lv_obj_get_style_bg_image_src(const lv_obj_t * obj, lv_part_t part);
+LV_IMAGE_DSC_CONST void * lv_obj_get_style_bg_image_src(const lv_obj_t * obj, lv_part_t part);
 
 /**
  * Get opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means
@@ -765,7 +765,7 @@ lv_opa_t lv_obj_get_style_arc_opa(const lv_obj_t * obj, lv_part_t part);
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-const void * lv_obj_get_style_arc_image_src(const lv_obj_t * obj, lv_part_t part);
+LV_IMAGE_DSC_CONST void * lv_obj_get_style_arc_image_src(const lv_obj_t * obj, lv_part_t part);
 
 /**
  * Gets color of text.
@@ -1113,7 +1113,7 @@ lv_base_dir_t lv_obj_get_style_base_dir(const lv_obj_t * obj, lv_part_t part);
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
-const void * lv_obj_get_style_bitmap_mask_src(const lv_obj_t * obj, lv_part_t part);
+LV_IMAGE_DSC_CONST void * lv_obj_get_style_bitmap_mask_src(const lv_obj_t * obj, lv_part_t part);
 
 /**
  * Adjust sensitivity for rotary encoders in 1/256 unit. It means, 128: slow down the

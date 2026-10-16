@@ -161,7 +161,7 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
     if(dsc->img_src) {
         vg_lite_buffer_t src_buf;
         lv_image_decoder_dsc_t decoder_dsc;
-        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false, true)) {
+        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false, true, t->draw_unit)) {
 
             vg_lite_color_t img_color = 0;
             if(dsc->opa < LV_OPA_COVER) {

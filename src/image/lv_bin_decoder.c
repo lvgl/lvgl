@@ -450,6 +450,8 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded = decoder_data->decoded_partial; /*Already allocated*/
     }
 
+    /*A draw unit may have moved the row buffer out of CPU memory since the previous line*/
+    if(!lv_draw_buf_ensure_resident(decoded, NULL)) return LV_RESULT_INVALID;
     img_data = decoded->data; /*Get the buffer to operate on*/
 
     if(decoded_area->y1 > full_area->y2) {
@@ -612,8 +614,10 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 #if LV_BIN_DECODER_RAM_LOAD
         draw_buf_indexed = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
                                                  dsc->header.stride);
-        if(draw_buf_indexed == NULL) {
+        if(draw_buf_indexed == NULL || !lv_draw_buf_ensure_resident(draw_buf_indexed, NULL)) {
             LV_LOG_ERROR("Draw buffer alloc failed");
+            if(draw_buf_indexed) lv_draw_buf_destroy(draw_buf_indexed);
+            draw_buf_indexed = NULL;
             goto exit_with_buf;
         }
 
@@ -652,8 +656,10 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     lv_draw_buf_t * decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h,
                                                     LV_COLOR_FORMAT_ARGB8888,
                                                     0);
-    if(decoded == NULL) {
+    if(decoded == NULL || !lv_draw_buf_ensure_resident(decoded, NULL)) {
         LV_LOG_ERROR("No memory for indexed image");
+        if(decoded) lv_draw_buf_destroy(decoded);
+        decoded = NULL;
         goto exit_with_buf;
     }
 
@@ -748,8 +754,9 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_fs_file_t * f = decoder_data->f;
         lv_draw_buf_t * decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
                                                         dsc->header.stride);
-        if(decoded == NULL) {
+        if(decoded == NULL || !lv_draw_buf_ensure_resident(decoded, NULL)) {
             LV_LOG_ERROR("Draw buffer alloc failed");
+            if(decoded) lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
 
@@ -807,8 +814,9 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
 
     lv_draw_buf_t * decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
                                                     dsc->header.stride);
-    if(decoded == NULL) {
+    if(decoded == NULL || !lv_draw_buf_ensure_resident(decoded, NULL)) {
         LV_LOG_ERROR("No memory for rgb file read");
+        if(decoded) lv_draw_buf_destroy(decoded);
         return LV_RESULT_INVALID;
     }
 
@@ -867,8 +875,9 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
 
     decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, LV_COLOR_FORMAT_A8,
                                     buf_stride);
-    if(decoded == NULL) {
+    if(decoded == NULL || !lv_draw_buf_ensure_resident(decoded, NULL)) {
         LV_LOG_ERROR("Out of memory");
+        if(decoded) lv_draw_buf_destroy(decoded);
         return LV_RESULT_INVALID;
     }
 
@@ -1249,8 +1258,9 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
     lv_draw_buf_t * decompressed = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h,
                                                          dsc->header.cf,
                                                          dsc->header.stride);
-    if(decompressed == NULL) {
+    if(decompressed == NULL || !lv_draw_buf_ensure_resident(decompressed, NULL)) {
         LV_LOG_WARN("No memory for decompressed image, input: %" LV_PRIu32 ", output: %" LV_PRIu32, input_len, out_len);
+        if(decompressed) lv_draw_buf_destroy(decompressed);
         return LV_RESULT_INVALID;
     }
 

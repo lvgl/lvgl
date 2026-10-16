@@ -479,8 +479,12 @@ static void gif_initialize(lv_gif_t * gifobj)
 
     gifobj->draw_buf = lv_draw_buf_create(width, height, gifobj->color_format, LV_STRIDE_AUTO);
 
-    if(gifobj->draw_buf == NULL) {
+    if(gifobj->draw_buf == NULL || !lv_draw_buf_ensure_resident(gifobj->draw_buf, NULL)) {
         LV_LOG_WARN("Couldn't allocate memory for the gif with width: %"LV_PRIu32" and height: %"LV_PRIu32, width, height);
+        if(gifobj->draw_buf) {
+            lv_draw_buf_destroy(gifobj->draw_buf);
+            gifobj->draw_buf = NULL;
+        }
         GIF_close(gif);
         gifobj->is_open = 0;
         LV_PROFILER_DECODER_END;
@@ -625,6 +629,11 @@ static void gif_next_frame_task_cb(lv_timer_t * t)
     bool is_visible = lv_obj_is_visible(obj);
     if(gifobj->is_auto_pause && !is_visible) {
         lv_timer_pause(t);
+        LV_PROFILER_DECODER_END;
+        return;
+    }
+
+    if(!lv_draw_buf_ensure_resident(gifobj->draw_buf, NULL)) {
         LV_PROFILER_DECODER_END;
         return;
     }

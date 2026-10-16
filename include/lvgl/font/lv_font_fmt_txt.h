@@ -151,6 +151,7 @@ typedef enum {
 
 /** Describe store for additional data for fonts */
 typedef struct {
+    lv_font_dsc_base_t base;        /**< Common base — must be first member */
 
     /** The bitmaps of all glyphs or a lv_font_fmt_txt_glyph_loader_t *
      * depending on the state of `are_glyphs_dynamic_loaded`
@@ -224,7 +225,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_builtin_font_class;
  *                      @nullable It's OK not to use it.
  * @return pointer to an A8 bitmap (not necessarily bitmap_out) or NULL if `unicode_letter` not found
  */
-const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+LV_IMAGE_DSC_CONST void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**
  * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.
