@@ -111,6 +111,8 @@
 #include "draw/vg_lite/lv_vg_lite_pending.h"
 #include "draw/vg_lite/lv_vg_lite_stroke.h"
 #include "draw/vg_lite/lv_vg_lite_utils.h"
+#include "draw/gigadevice/ipa/lv_draw_ipa.h"
+#include "draw/gigadevice/ipa/lv_draw_ipa_private.h"
 #include "drivers/display/drm/lv_linux_drm_private.h"
 #include "drivers/display/drm/lv_linux_drm_egl_private.h"
 #include "drivers/display/ft81x/lv_ft81x_defines.h"

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#if defined(_RTE_)
+#if defined(_RTE_) && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
 #include <Pre_Include_Global.h>
 #include <lv_conf_cmsis.h>
 #endif
