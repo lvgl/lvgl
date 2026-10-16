@@ -47,7 +47,7 @@
 
 /*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
 #define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * 2) /* 2 bytes per pixel for RGB565 */
-static uint8_t draw_buf[DRAW_BUF_SIZE];
+uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
 #if LV_USE_LOG != 0
 void my_print( lv_log_level_t level, const char * buf )
