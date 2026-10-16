@@ -93,7 +93,8 @@ void lv_draw_dave2d_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
 void lv_draw_dave2d_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                                const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_dave2d_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_dave2d_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_dave2d_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                         const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);

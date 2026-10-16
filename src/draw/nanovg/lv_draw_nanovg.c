@@ -184,11 +184,11 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_LETTER:
-            lv_draw_nanovg_letter(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_letter(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_nanovg_label(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_IMAGE:

@@ -423,10 +423,10 @@ static void execute_drawing(lv_draw_task_t * t)
             lv_draw_sw_box_shadow(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LETTER:
-            lv_draw_sw_letter(t, t->draw_dsc, &t->area);
+            lv_draw_sw_letter(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_sw_label(t, t->draw_dsc, &t->area);
+            lv_draw_sw_label(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_sw_image(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
@@ -509,7 +509,7 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
         lv_draw_label_dsc_init(&label_dsc);
         label_dsc.color = lv_color_black();
         label_dsc.text = buf;
-        lv_draw_sw_label(t, &label_dsc, &txt_area);
+        lv_draw_sw_label(t->target_layer, &t->clip_area, &label_dsc, &txt_area);
     }
 }
 #endif

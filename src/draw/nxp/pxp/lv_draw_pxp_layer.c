@@ -145,7 +145,7 @@ void lv_draw_pxp_layer(lv_draw_task_t * t)
     lv_draw_label_dsc_init(&label_dsc);
     label_dsc.color = lv_color_white();
     label_dsc.text = buf;
-    lv_draw_sw_label(t, &label_dsc, &txt_area);
+    lv_draw_sw_label(t->target_layer, &t->clip_area, &label_dsc, &txt_area);
 #endif
 }
 
