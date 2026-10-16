@@ -345,34 +345,34 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_nema_gfx_fill(t, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_nema_gfx_img(t, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_nema_gfx_triangle(t, t->draw_dsc);
+            lv_draw_nema_gfx_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_nema_gfx_label(t, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_nema_gfx_layer(t, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_nema_gfx_line, t->draw_unit);
             break;
 #if LV_USE_NEMA_VG
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_nema_gfx_arc(t, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 #endif
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_nema_gfx_border(t, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
         case LV_DRAW_TASK_TYPE_VECTOR:
-            lv_draw_nema_gfx_vector(t, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_vector(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 #endif
         default:

@@ -40,7 +40,8 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_nema_gfx_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nema_gfx_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN)
         return;
@@ -49,9 +50,8 @@ void lv_draw_nema_gfx_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * ds
     if(dsc->side == LV_BORDER_SIDE_NONE)
         return;
 
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
 
-    lv_layer_t * layer = t->target_layer;
     lv_area_t inward_coords;
     int32_t width = dsc->width;
 
@@ -63,14 +63,15 @@ void lv_draw_nema_gfx_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * ds
 
     lv_area_move(&inward_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    lv_area_t clip_area;
-    clip_area = t->clip_area;
-    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_t rel_clip_area;
+    rel_clip_area = *clip_area;
+    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
+    nema_set_clip(rel_clip_area.x1, rel_clip_area.y1, lv_area_get_width(&rel_clip_area),
+                  lv_area_get_height(&rel_clip_area));
 
     lv_area_t clipped_coords;
-    if(!lv_area_intersect(&clipped_coords, &inward_coords, &clip_area))
+    if(!lv_area_intersect(&clipped_coords, &inward_coords, &rel_clip_area))
         return; /*Fully clipped, nothing to do*/
 
     lv_color_format_t dst_cf = layer->draw_buf->header.cf;
