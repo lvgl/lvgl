@@ -47,6 +47,8 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     lv_area_move(&buffer_area, x, y);
 
     bool dashed = dsc->dash_gap && dsc->dash_width;
+    /* TODO: dashed lines are drawn as solid lines */
+    LV_UNUSED(dashed);
 
     //
     // Generate render operations
