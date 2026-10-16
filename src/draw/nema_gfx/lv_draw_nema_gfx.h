@@ -99,7 +99,8 @@ void lv_draw_nema_gfx_label_init(lv_draw_unit_t * draw_unit);
 void lv_draw_nema_gfx_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                             const lv_area_t * coords);
 
-void lv_draw_nema_gfx_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc);
+void lv_draw_nema_gfx_line(lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_line_dsc_t * dsc, void * user_data);
 
 void lv_draw_nema_gfx_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
                              const lv_area_t * coords);

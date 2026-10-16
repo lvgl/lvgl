@@ -132,17 +132,20 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
 }
 
 
-void lv_draw_line_iterate(lv_draw_task_t * t, lv_draw_line_dsc_t * dsc,
-                          void (*draw_line_cb)(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc))
+void lv_draw_line_iterate(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_line_dsc_t * dsc,
+                          void (*draw_line_cb)(lv_layer_t * layer, const lv_area_t * clip_area,
+                                               const lv_draw_line_dsc_t * dsc, void * user_data),
+                          void * user_data)
 {
-    LV_CHECK_ARG(t != NULL, return);
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(clip_area != NULL, return);
     LV_CHECK_ARG(dsc != NULL, return);
     LV_CHECK_ARG(draw_line_cb != NULL, return);
 
     uint32_t i;
     lv_point_precise_t * points = dsc->points;
     if(points == NULL) {
-        draw_line_cb(t, dsc);
+        draw_line_cb(layer, clip_area, dsc, user_data);
     }
     else {
         /*Create a temporary dsc where the point array is replaced by 2 points*/
@@ -165,7 +168,7 @@ void lv_draw_line_iterate(lv_draw_task_t * t, lv_draw_line_dsc_t * dsc,
             dsc_tmp.p1 = points[i];
             dsc_tmp.p2 = points[i + 1];
 
-            draw_line_cb(t, &dsc_tmp);
+            draw_line_cb(layer, clip_area, &dsc_tmp, user_data);
         }
     }
 }

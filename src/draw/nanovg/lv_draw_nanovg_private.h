@@ -172,10 +172,13 @@ void lv_draw_nanovg_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
 
 /**
  * Draw line on a NanoVG context
- * @param t pointer to a drawing task
+ * @param layer the target layer
+ * @param clip_area the clip area
  * @param dsc pointer to a line descriptor
+ * @param user_data pointer to the NanoVG draw unit
  */
-void lv_draw_nanovg_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc);
+void lv_draw_nanovg_line(lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_line_dsc_t * dsc, void * user_data);
 
 /**
  * Draw triangle on a NanoVG context
