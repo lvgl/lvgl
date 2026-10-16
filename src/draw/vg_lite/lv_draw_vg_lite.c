@@ -152,38 +152,38 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
             lv_draw_vg_lite_label(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_vg_lite_fill(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_vg_lite_border(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-            lv_draw_vg_lite_box_shadow(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BLUR:
-            lv_draw_vg_lite_blur(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_blur(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_vg_lite_img(t, t->draw_dsc, &t->area, false);
+            lv_draw_vg_lite_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area, false);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_vg_lite_arc(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_vg_lite_line, t->draw_unit);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_vg_lite_layer(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_vg_lite_triangle(t, t->draw_dsc);
+            lv_draw_vg_lite_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-            lv_draw_vg_lite_mask_rect(t, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
-            lv_draw_vg_lite_vector(t, t->draw_dsc);
+            lv_draw_vg_lite_vector(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 #endif
         default:

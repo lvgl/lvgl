@@ -197,7 +197,8 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     image_dsc.src = glyph_draw_dsc->glyph_data;
                     image_dsc.rotation = glyph_draw_dsc->rotation;
                     image_dsc.pivot = glyph_draw_dsc->pivot;
-                    lv_draw_vg_lite_img(t, &image_dsc, glyph_draw_dsc->letter_coords, false);
+                    lv_draw_vg_lite_img(t->draw_unit, t->target_layer, &t->clip_area, &image_dsc,
+                                        glyph_draw_dsc->letter_coords, false);
                 }
                 break;
 
@@ -210,7 +211,8 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    lv_draw_vg_lite_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_vg_lite_border(t->draw_unit, t->target_layer, &t->clip_area, &border_draw_dsc,
+                                           glyph_draw_dsc->bg_coords);
                 }
                 break;
 #endif /* LV_USE_FONT_PLACEHOLDER */
@@ -221,7 +223,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_vg_lite_fill(t, fill_draw_dsc, fill_area);
+        lv_draw_vg_lite_fill(t->draw_unit, t->target_layer, &t->clip_area, fill_draw_dsc, fill_area);
     }
 
     /* Flush in time to avoid accumulation of drawing commands */

@@ -55,17 +55,17 @@ static int32_t get_downsample_factor(int32_t blur_radius);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vg_lite_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc,
-                          const lv_area_t * coords)
+void lv_draw_vg_lite_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->blur_radius <= 0) return;
 
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     /* Logical coordinates. The complete ROI defines the blur geometry so that
      * a partial clip does not change the downscale size or shift the result. */
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, coords, &t->clip_area)) return;
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, coords, clip_area)) return;
 
     const lv_area_t * roi = coords;
     const int32_t width = lv_area_get_width(roi);
@@ -92,7 +92,7 @@ void lv_draw_vg_lite_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc,
     }
 
     lv_draw_buf_t * small = lv_draw_buf_create(small_width, small_height,
-                                               t->target_layer->draw_buf->header.cf, LV_STRIDE_AUTO);
+                                               layer->draw_buf->header.cf, LV_STRIDE_AUTO);
     if(!small) {
         LV_LOG_ERROR("failed to allocate temporary buffer");
         LV_PROFILER_DRAW_END;
@@ -147,7 +147,7 @@ void lv_draw_vg_lite_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc,
 
     /* The path is in logical coordinates, G maps it like any other draw task */
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
-    lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
+    lv_vg_lite_path_set_bounding_box_area(path, &clipped_area);
     lv_vg_lite_path_append_rect(path,
                                 roi->x1, roi->y1,
                                 width, height,
