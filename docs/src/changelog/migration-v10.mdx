@@ -148,7 +148,7 @@ buffer(s) must be large enough for the new format.
 `LV_COLOR_16_SWAP` was kept for compatibility with LVGL v8, with the addition of <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> which you can use to make LVGL
 render natively in big-endian RGB565 format, this config has been removed in v10 and produces an error.
 
-If you're still using this configuration, simply define <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> as <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED"/> 
+If you're still using this configuration, simply define <ApiLink name="LV_COLOR_FORMAT_DEFAULT"/> as <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED"/>
 or set the display's color format at runtime with <ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565_SWAPPED)"/>.
 
 As a last resort option, if none of the above options work for you, the following snippet of code can be used in your flush callback.
@@ -772,6 +772,20 @@ used afterwards.
 - New: `lv_qrcode_set_update_mode(qr, LV_QRCODE_UPDATE_MODE_DEFERRED)` collapses
   several property changes into a single re-encode on the next redraw. The default,
   `LV_QRCODE_UPDATE_MODE_IMMEDIATE`, re-encodes inside the setter.
+
+- `lv_qrcode_update()` is removed. Use `lv_qrcode_set_data()`, which takes the same
+  arguments. `lv_qrcode_set_data()` took a `const char *` before. Use
+  `lv_qrcode_set_text()` for strings now. Both setters return the encode result.
+
+  ```c
+  /* Before */
+  lv_qrcode_update(qr, data, data_len);
+  lv_qrcode_set_data(qr, "https://lvgl.io");
+
+  /* After */
+  lv_qrcode_set_data(qr, data, data_len);
+  lv_qrcode_set_text(qr, "https://lvgl.io");
+  ```
 
 - New: `lv_qrcode_render()` re-encodes the stored payload without taking it as an
   argument, which is how property changes made in the deferred update mode are applied.
