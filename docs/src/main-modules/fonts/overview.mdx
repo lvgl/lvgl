@@ -38,7 +38,7 @@ LVGL also supports several other font engines:
 - `fmt_txt`: This is the built-in font engine that stores the fonts as a C array
 - `binfont`: Similar to the built-in format, but the font is stored as a file, so it can be loaded at runtime too
 - `tiny_ttf`: Small vector graphics engine to load TTF files at runtime at any size
-- `freetype`: Well known font rendering library load and render TTF fonts at runtime. Also supports letter strokes.
+- `freetype`: Well known font rendering library used to load and render TTF fonts at runtime. Also supports letter strokes.
 
 ## Unicode Support
 
@@ -50,7 +50,7 @@ and be sure that <ApiLink name="LV_TXT_ENC" /> is set to <ApiLink name="LV_TXT_E
 To test it try
 
 ```c
-lv_obj_t * label1 = lv_label_create(lv_screen_active(), NULL);
+lv_obj_t * label1 = lv_label_create(lv_screen_active());
 lv_label_set_text(label1, LV_SYMBOL_OK);
 ```
 
@@ -149,9 +149,9 @@ lv_label_set_text(label, LV_SYMBOL_OK "Apply"); /*Concatenate with a string*/
 2. Create a `#define` string from the UTF8 values: `#define MY_USB_SYMBOL "\xEF\x8A\x87"`
 3. Create a label and set the text. Eg. <ApiLink name="lv_label_set_text" display="lv_label_set_text(label, MY_USB_SYMBOL)" />
 
-| Field | Description |
-|-------|-------------|
-| `note` | <ApiLink name="lv_label_set_text" display="lv_label_set_text(label, MY_USB_SYMBOL)" /> searches for this symbol in the font defined in the style's `text.font` property. To use the symbol you will need to set the style's text font to use the generated font, e.g. <ApiLink name="lv_style_set_text_font" display="lv_style_set_text_font(&my_style, &my_font_name)" /> or <ApiLink name="lv_obj_set_style_text_font" display="lv_obj_set_style_text_font(label, &my_font_name, 0)" />. |
+<Callout type="info">
+<ApiLink name="lv_label_set_text" display="lv_label_set_text(label, MY_USB_SYMBOL)" /> searches for this symbol in the font defined in the style's `text_font` property. To use the symbol you will need to set the style's text font to use the generated font, e.g. <ApiLink name="lv_style_set_text_font" display="lv_style_set_text_font(&my_style, &my_font_name)" /> or <ApiLink name="lv_obj_set_style_text_font" display="lv_obj_set_style_text_font(label, &my_font_name, 0)" />.
+</Callout>
 
 Of course any other fonts can be used, just make sure that they define the
 symbols you need.

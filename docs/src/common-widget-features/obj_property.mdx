@@ -5,7 +5,7 @@ description: "Widget Properties provides a way to greatly reduce the size of the
 
 Widget Properties provides a way to greatly reduce the size of the interface between
 LVGL and whatever logic layer is just above it, to get and set the most important
-properties of Widgets.  It's intended use is to:
+properties of Widgets.  Its intended use is to:
 
 - simplify (decreasing development time) writing bindings for LVGL in another
   language, such as:
@@ -86,8 +86,8 @@ The 3 functions that then become available are:
 - <ApiLink name="lv_result_t" />  <ApiLink name="lv_obj_set_properties" display="lv_obj_set_properties(widget, lv_property_t * values, count)" />
   Sets multiple Widget properties from an array of <ApiLink name="lv_property_t" />.
 
-An `lv_prop_id_t` is a [Property ID](/common-widget-features/obj_property), whereas an `lv_property_t` is a
-struct that pairs a [Property ID](/common-widget-features/obj_property) with a [Property Value](/common-widget-features/obj_property).
+An `lv_prop_id_t` is a [Property ID](#property-id), whereas an `lv_property_t` is a
+struct that pairs a [Property ID](#property-id) with a [Property Value](#property-value).
 
 The following is an example of an array that could be used as the `values` argument
 in <ApiLink name="lv_obj_set_properties" />:
@@ -100,7 +100,7 @@ lv_property_t values[] = {
     { .id = LV_PROPERTY_OBJ_FLAG_CLICKABLE, .num = 1, },
     { .id = LV_STYLE_IMAGE_OPA, .num = 128, },
     { .id = LV_STYLE_BG_COLOR, .color = (lv_color_t){.red = 0x11, .green = 0x22, .blue = 0x33}, },
-}
+};
 ```
 
 Alternately, <ApiLink name="lv_obj_set_property" display="lv_obj_set_property(widget, value)" /> could be called using
@@ -117,24 +117,24 @@ the `properties[]` array initializing the `.id` fields in the array.  For exampl
 available to all Widgets are found near the top of the `lv_obj.c` file.
 
 That array is attached to the Widget's class, enabling "getter" and "setter" functions
-to be looked up for each type of Widget where Widget properties has been implemented.
+to be looked up for each type of Widget where Widget properties have been implemented.
 (Note:  this is done internally so you don't have to.)
 
 If the property you need to set or get using this API is not implemented yet, you can
-add your own Widget property ID following same rules and using one of two helper
+add your own Widget property ID following the same rules and using one of two helper
 macros in the `enum` in the Widget's primary `.h` file.  In both cases, the
 "assembled" value is a 32-bit value:
 
-- <ApiLink name="LV_PROPERTY_ID" /> (for single values -- see Single Values below)`;
+- <ApiLink name="LV_PROPERTY_ID" /> (for single values -- see Single Values below):
   bits `&lt;31:28>` contain the property's value type and bits `&lt;27:0>` contain the
   property ID.
-- <ApiLink name="LV_PROPERTY_ID2" /> (for paired values -- see Paired Values below)`;
+- <ApiLink name="LV_PROPERTY_ID2" /> (for paired values -- see Paired Values below):
   bits `&lt;31:28>` contain the type for the property's 1st value, bits `&lt;27:24>`
   contain the type for the 2nd value, and bits `&lt;23:0>` contain the property ID.
 
 Just make sure the ID is unique across all Widgets.
 
-Note that <ApiLink name="lv_style_prop_t" /> (enumerator values beginning with `LV_PROPERTY_STYLE_...`)
+Note that <ApiLink name="lv_style_prop_t" /> (enumerator values beginning with `LV_STYLE_...`)
 are also valid property IDs, and can be used to set or get a Widget's style values.
 
 ### Property Value
@@ -144,15 +144,15 @@ is the same as property ID described above, paired with a value, which is a unio
 all possible property types including integer, pointer and color.  The `value`
 field is also capable of carrying the different value types for styles.  It does this
 by being a union of all the different types that might be needed.  The list of
-"union-ed" fields at this writing are:
+"union-ed" fields at this writing is:
 
-##### Single Values
+#### Single Values
 
 ```c
 int32_t             num;      /**< Signed integer number (enums or "normal" numbers) */
 uint32_t            num_u;    /**< Unsigned integer number (opacity, Booleans) */
 bool                enable;   /**< Booleans */
-const void        * ptr;      /**< Constant pointers  (font, cone text, etc.) */
+const void        * ptr;      /**< Constant pointers  (font, const text, etc.) */
 lv_color_t          color;    /**< Colors */
 lv_value_precise_t  precise;  /**< float or int for precise value */
 lv_point_t          point;    /**< Point, contains two int32_t */
@@ -183,7 +183,7 @@ struct {
 };
 ```
 
-##### Paired Values
+#### Paired Values
 
 ```c
 /**
@@ -203,7 +203,7 @@ struct {
 ```
 
 You can find the current <ApiLink name="lv_property_t" /> struct in the
-[lv_obj_property.h](https://github.com/lvgl/lvgl/blob/master/src/core/lv_obj_property.h) file.
+[lv_obj_property.h](https://github.com/lvgl/lvgl/blob/master/include/lvgl/core/lv_obj_property.h) file.
 
 ### Property ID Lookup by Name
 

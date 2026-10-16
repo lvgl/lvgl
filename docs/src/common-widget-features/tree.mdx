@@ -18,7 +18,7 @@ LVGL provides many useful functions to modify the Widget tree and get informatio
   The Widget will become the top-most (last/youngest) child of the new parent.
 - <ApiLink name="lv_obj_get_child" display="lv_obj_get_child(parent, idx)" />: Return a specific child of a parent.
   Some examples for `idx`:
-  
+
   - `0`: get the first created child
   - `1`: get the second created child
   - `-1`: get the last created child
@@ -70,28 +70,28 @@ number of siblings with the same base name. If no name is provided, the default 
 Below is an example showing how manually and automatically assigned names are resolved:
 
 - Main `lv_obj` container named `"cont"`: "cont"
-  
+
   - `lv_obj` container named `"header"`: "header"
-  
+
     - `lv_label` with no name: "lv_label_0"
     - `lv_label` named `"title"`: "title"
     - `lv_label` with no name: "lv_label_1" (It's the third label, but custom-named Widgets are not counted)
-  
+
   - `lv_obj` container named `"buttons"`:
-  
+
     - `lv_button` with no name: "lv_button_0"
     - `lv_button` named `"second_button"`: "second_button"
     - `lv_button` with no name: "lv_button_1"
     - `lv_button` named `lv_button_#`: "lv_button_2"
     - `lv_button` named `mybtn_#`: "mybtn_0"
-    - `lv_button` with no name: "lv_button_2"
+    - `lv_button` with no name: "lv_button_3"
     - `lv_button` named `mybtn_#`: "mybtn_1"
     - `lv_button` named `mybtn_#`: "mybtn_2"
     - `lv_button` named `mybtn_#`: "mybtn_3"
 
 Note that these indices are "fluid", meaning if "mybtn_2" above is deleted, the button
 previously known as "mybtn_3" will thereafter be known as "mybtn_2", since the
-indices are resolved *when names are being found by name*, not when they are set.
+indices are resolved *when Widgets are being found by name*, not when they are set.
 Keep this in mind when Finding Widgets as described below.
 
 ### Finding Widgets

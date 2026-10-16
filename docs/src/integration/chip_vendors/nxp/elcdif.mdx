@@ -45,7 +45,7 @@ supports). In the code below this size is represented by `buf_size`.
 elcdif_rgb_mode_config_t config;
 ELCDIF_RgbModeGetDefaultConfig(&config);
 
-lv_display_t * g_disp = lv_nxp_display_elcdif_create_direct(LCDIF, config, buffer1, buffer2, buf_size);
+lv_display_t * g_disp = lv_nxp_display_elcdif_create_direct(LCDIF, &config, buffer1, buffer2, buf_size);
 lv_display_set_default(g_disp);
 ```
 
@@ -58,7 +58,7 @@ argument. In this case `BUF_SIZE` needs to hold at least 1/10 of the actual disp
 ```c
 #define BUF_SIZE (DISPLAY_HEIGHT * DISPLAY_WIDTH / 10 * 2) /*1/10 screen size for RGB565 format*/
 static uint8_t partial_draw_buf[BUF_SIZE];
-lv_display_t * g_disp = lv_nxp_display_elcdif_create_partial(LCDIF, config, partial_draw_buf, NULL, BUF_SIZE);
+lv_display_t * g_disp = lv_nxp_display_elcdif_create_partial(LCDIF, &config, partial_draw_buf, NULL, BUF_SIZE);
 ```
 
 At runtime, the event handler function of the eLCDIF driver must be called inside the eLCDIF interrupt

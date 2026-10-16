@@ -75,7 +75,7 @@ git -C lv_port_linux submodule update --init
 ```
 
 These commands create the project directory and the `Dockerfile`.
-`git` is used to download the `lv_port_linux` and `lvgl` repositories from Github.
+`git` is used to download the `lv_port_linux` and `lvgl` repositories from GitHub.
 
 <Callout type="info">
 By default, `lv_port_linux` is configured to use the legacy [framebuffer](/integration/embedded_linux/drivers/fbdev) device
@@ -163,7 +163,7 @@ this task.
 
 Read [this article](https://developer.toradex.com/torizon/application-development/working-with-containers/deploying-container-images-to-torizoncore/) for more information.
 
-For this guide, we are going to setup a Docker registry container on the development host
+For this guide, we are going to set up a Docker registry container on the development host
 which will be accessible from any device on your LAN. The Toradex board being on the same network
 will be able to pull the image from the registry.
 
@@ -184,7 +184,7 @@ docker push 127.0.0.1:5000/lvgl-app
 ```
 
 By default a local container registry uses clear text HTTP so the Docker instance
-running on the device has to be configured to allow fetching images from an 'insecure' repository.
+running on the device has to be configured to allow fetching images from an 'insecure' registry.
 
 Get the IP address of the development host and open a remote shell on the device.
 
@@ -226,10 +226,10 @@ docker run --device /dev/fb0:/dev/fb0 <IMAGE_ID>
 You now have a running LVGL application. Where to go from here?
 
 - You are now ready to build your LVGL application for Torizon OS.
-  It is recommended to get familiar with VSCode IDE extension
+  It is recommended to get familiar with VS Code IDE extension
   as it will simplify your workflow.
 
-  If you are a VSCode user, it is the best way to develop for Torizon OS. If you use
+  If you are a VS Code user, it is the best way to develop for Torizon OS. If you use
   another editor or IDE you can always
   write scripts to automate the building/pushing/pulling operations.
 - Read this [article](https://developer.toradex.com/torizon/application-development/application-development-overview)

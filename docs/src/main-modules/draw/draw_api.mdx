@@ -1,12 +1,12 @@
 ---
 title: Draw API
-description: "In most cases you use LVGL's Drawing API through the API of Widgets: by creating buttons, labels, etc., and setting the their styles, positions, and other properties."
+description: "In most cases you use LVGL's Drawing API through the API of Widgets: by creating buttons, labels, etc., and setting their styles, positions, and other properties."
 ---
 
 ## Where to Use the Drawing API
 
 In most cases you use LVGL's Drawing API through the API of Widgets:  by creating
-buttons, labels, etc., and setting the their styles, positions, and other properties.
+buttons, labels, etc., and setting their styles, positions, and other properties.
 In these cases rendering (drawing) is handled internally and you don't see the
 [Drawing Pipeline](/main-modules/draw/draw_pipeline) at all.
 
@@ -27,7 +27,7 @@ However there are three places where you can use LVGL's Drawing API directly.
 
    These are relevant if a new Widget is implemented and it uses custom drawing.
 2. **Modifying the created draw tasks**:
-   The when a draw task is created for a Widget <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />
+   When a draw task is created for a Widget <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />
    is sent.  In this event the created draw task can be modified or new draw tasks
    can be added.  Typical use cases for this are modifying each bar of a bar chart,
    or cells of a table.
@@ -60,7 +60,7 @@ Some functions and draw descriptors require area or point parameters.  These are
 always **absolute coordinates** on the display.  For example, if the target layer is
 on a 800x480 display and the layer's area is (100,100) (200,200), to render a 10x10
 object in the middle, the coordinates (145,145) (154,154) should be used
-(not (40,40) (49,49)).
+(not (45,45) (54,54)).
 
 Exception:  for the Canvas Widget the layer is always assumed to be at the (0,0)
 coordinate, regardless of the Canvas Widget's position.

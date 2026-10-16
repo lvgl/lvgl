@@ -36,16 +36,17 @@ See the [full list of style properties](/common-widget-features/styles/style-pro
 The Widgets can be in the combination of the following states:
 
 - <ApiLink name="LV_STATE_DEFAULT" />: (0x0000) Normal, released state
-- <ApiLink name="LV_STATE_CHECKED" />: (0x0001) Toggled or checked state
-- <ApiLink name="LV_STATE_FOCUSED" />: (0x0002) Focused via keypad or encoder or
+- <ApiLink name="LV_STATE_ALT" />: (0x0001) Alternative style settings, e.g. dark mode
+- <ApiLink name="LV_STATE_CHECKED" />: (0x0004) Toggled or checked state
+- <ApiLink name="LV_STATE_FOCUSED" />: (0x0008) Focused via keypad or encoder or
   clicked via touchpad/mouse
-- <ApiLink name="LV_STATE_FOCUS_KEY" />: (0x0004) Focused via keypad or encoder but
+- <ApiLink name="LV_STATE_FOCUS_KEY" />: (0x0010) Focused via keypad or encoder but
   not via touchpad/mouse
-- <ApiLink name="LV_STATE_EDITED" />: (0x0008) Edit by an encoder
-- <ApiLink name="LV_STATE_HOVERED" />: (0x0010) Hovered by mouse
-- <ApiLink name="LV_STATE_PRESSED" />: (0x0020) Being pressed
-- <ApiLink name="LV_STATE_SCROLLED" />: (0x0040) Being scrolled
-- <ApiLink name="LV_STATE_DISABLED" />: (0x0080) Disabled state
+- <ApiLink name="LV_STATE_EDITED" />: (0x0020) Being edited by an encoder
+- <ApiLink name="LV_STATE_HOVERED" />: (0x0040) Hovered by mouse
+- <ApiLink name="LV_STATE_PRESSED" />: (0x0080) Being pressed
+- <ApiLink name="LV_STATE_SCROLLED" />: (0x0100) Being scrolled
+- <ApiLink name="LV_STATE_DISABLED" />: (0x0200) Disabled state
 - <ApiLink name="LV_STATE_USER_1" />: (0x1000) Custom state
 - <ApiLink name="LV_STATE_USER_2" />: (0x2000) Custom state
 - <ApiLink name="LV_STATE_USER_3" />: (0x4000) Custom state
@@ -68,12 +69,12 @@ matching state is used; if none matches, the default state's value (or the globa
 default) applies.
 
 For example, with `bg_color` white in `LV_STATE_DEFAULT`, gray in `LV_STATE_PRESSED`
-(0x0020) and red in `LV_STATE_FOCUSED` (0x0002):
+(0x0080) and red in `LV_STATE_FOCUSED` (0x0008):
 
-- Pressed → gray (0x0020 beats default's 0x0000).
+- Pressed → gray (0x0080 beats default's 0x0000).
 - Focused → red.
 - Focused + pressed → gray (pressed outranks focused).
-- `LV_STATE_PRESSED | LV_STATE_FOCUSED` set to rose → rose (0x0022 beats either alone).
+- `LV_STATE_PRESSED | LV_STATE_FOCUSED` set to rose → rose (0x0088 beats either alone).
 - Checked → white (no checked value, so it falls back to default).
 
 The ordering is intentional: a pressed Widget should still look pressed while focused.
@@ -90,12 +91,12 @@ styles to a Widget and have the latter added style modify or extend appearance. 
 example, create a general gray button style and create a new one for red buttons where
 only the new background color is set.
 
-This is much like in CSS when used classes are listed like `<div class=".btn
-.btn-red">`.
+This is much like in CSS when used classes are listed like `<div class="btn
+btn-red">`.
 
 Styles added later have precedence over ones set earlier. So in the gray/red button
 example above, the normal button style should be added first and the red style second.
-However, the precedence of the states are still taken into account. So let's examine
+However, the precedence of the states is still taken into account. So let's examine
 the following case:
 
 - the basic button style defines dark-gray color for the default state and light-gray
@@ -158,14 +159,14 @@ zero values, you can simply pass `0` as the `selector` argument instead of
 
 <LvglExample name="lv_example_style_opacity_transform" path="styles/lv_example_style_opacity_transform" />
 
-Setting `opa`, `blend_mode`, `transform_angle`, or `transform_zoom` to a non-default
+Setting `opa_layered`, `blend_mode`, `transform_rotation`, or `transform_scale_x/y` to a non-default
 value on the `MAIN` part makes LVGL snapshot the Widget and its children into an
 intermediate *layer* so the whole Widget is blended together.
 
-If only `opa` and/or `blend_mode` is set, the layer is built from smaller chunks sized
+If only `opa_layered` and/or `blend_mode` is set, the layer is built from smaller chunks sized
 by these `lv_conf.h` options (transformations force a single full-size layer):
 
-- <ApiLink name="LV_LAYER_SIMPLE_BUF_SIZE" /> — target chunk buffer size in bytes.
+- <ApiLink name="LV_DRAW_LAYER_SIMPLE_BUF_SIZE" /> — target chunk buffer size in bytes.
 - <ApiLink name="LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE" /> — used if the above can't be allocated.
 
 ## Typical Background Properties

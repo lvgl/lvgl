@@ -46,7 +46,7 @@ If no Screen is being loaded, this function will return `NULL`.
 ## Top and System Layers
 
 LVGL uses the Top Layer and System Layer to empower you to ensure that certain
-[All Widgets](/widgets) are *always* on top of other layers.
+[Widgets](/widgets) are *always* on top of other layers.
 
 You can add "pop-up windows" to the *Top Layer* freely.  The Top Layer was meant to
 be used to create Widgets that are visible on all Screens shown on a Display.  But,
@@ -64,7 +64,7 @@ and <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(scr1, LV_OBJ_FLAG_C
 </Callout>
 
 If the <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag is set on the Top Layer, then it will
-absorb all user clicks and acts as a modal Widget.
+absorb all user clicks and act as a modal Widget.
 
 ```c
 lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);

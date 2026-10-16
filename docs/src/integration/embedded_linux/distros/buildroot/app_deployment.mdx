@@ -95,7 +95,7 @@ export LDFLAGS="--sysroot=${SYSROOT}"
 The environment is now set up, and we're ready to build an application using
 the [`lv_benchmark`](https://github.com/EDGEMTech/lv_benchmark) repository, which is inspired by [`lv_port_linux`](https://github.com/lvgl/lv_port_linux).
 
-Navigate back to the root of the project and clone the repository:
+From the `application` folder, clone the repository:
 
 ```bash
 git clone --recurse-submodules https://github.com/EDGEMTech/lv_benchmark.git
@@ -119,10 +119,10 @@ file bin/lvgl-app
 cd ../..
 ```
 
-The output should contain these information:
+The output should contain this information:
 
 - ARM aarch64
-    - interpreter /lib/ld-linux-aarch64.so.1
+- interpreter /lib/ld-linux-aarch64.so.1
 
 ### Set a rootfs overlay
 
@@ -152,7 +152,7 @@ directories` and use the relative path to the rootfs overlay with your
 application (**../resources/board/rootfs_overlay**) and save the
 configuration.
 
-Now use `make` command to apply the rootfs overlay and confirm the
+Now use the `make` command to apply the rootfs overlay and confirm the
 sysroot was updated as expected.
 
 ```bash

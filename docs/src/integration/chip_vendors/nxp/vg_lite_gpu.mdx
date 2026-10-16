@@ -30,7 +30,7 @@ This backend replaced the NXP-specific VGLite draw unit, which was removed in LV
 **Enable the backend**
 
 Set <ApiLink name="LV_USE_DRAW_VG_LITE" /> to 1 in `lv_conf.h` to enable the VG-Lite rendering backend.
-Make sure that your hardware has been adapted to the VG-Lite API and that the absolute path to `vg_lite.h`, which can be directly referenced by lvgl, has been exposed.
+Make sure that your hardware has been adapted to the VG-Lite API and that the absolute path to `vg_lite.h`, which can be directly referenced by LVGL, has been exposed.
 </Step>
 
 <Step>
@@ -58,14 +58,14 @@ Please note that enabling this check will decrease runtime performance. It is re
 **Specify the flush method**
 
 Set the <ApiLink name="LV_VG_LITE_FLUSH_MAX_COUNT" /> configuration to specify the flush method.
-VG-Lite uses two sets of command buffer buffers to render instructions, and utilizing this mechanism well can greatly improve drawing efficiency.
+VG-Lite uses two sets of command buffers to render instructions, and utilizing this mechanism well can greatly improve drawing efficiency.
 Currently, two buffering methods are supported:
 
 - Set <ApiLink name="LV_VG_LITE_FLUSH_MAX_COUNT" /> to zero (recommended). The rendering backend will obtain the GPU's working status every time it writes rendering instructions to the command buffer.
 
   When the GPU is idle, it will immediately call `vg_lite_flush` to notify the GPU to start rendering and swap the command buffer. When the GPU is busy, it will continue to fill the command buffer cache with rendering instructions.
   The underlying driver will automatically determine if the command buffer has been filled. When it is about to be filled, it will forcibly wait for the unfinished drawing tasks to end and swap the command buffer.
-  This method can effectively improve GPU utilization, especially in scenarios where rendering text, as the GPU's drawing time and the CPU's data preparation time are very close, allowing the CPU and GPU to run in parallel.
+  This method can effectively improve GPU utilization, especially when rendering text, as the GPU's drawing time and the CPU's data preparation time are very close, allowing the CPU and GPU to run in parallel.
 
 - Set <ApiLink name="LV_VG_LITE_FLUSH_MAX_COUNT" /> to a value greater than zero, such as 8. After writing 8 rendering instructions to the command buffer, the rendering backend
   will call `vg_lite_flush` to notify the GPU to start rendering and swap the command buffer.

@@ -1,13 +1,13 @@
 ---
 title: Refreshing
-description: "Normally the dirty (a.k."
+description: "Normally the dirty (a.k.a. invalid) areas are checked and redrawn every LV_DEF_REFR_PERIOD milliseconds."
 ---
 
 ## Default Refresh Behavior
 
-Normally the dirty (a.k.a invalid) areas are checked and redrawn in
+Normally the dirty (a.k.a invalid) areas are checked and redrawn
 every <ApiLink name="LV_DEF_REFR_PERIOD" /> milliseconds (set in `lv_conf.h`).
-This happens as a result of a refresh [Timer (lv_timer)](/main-modules/timer) created that gets created when
+This happens as a result of a refresh [Timer (lv_timer)](/main-modules/timer) that gets created when
 the display is created, and is executed at that interval.
 
 ## Decoupling the Display Refresh Timer
@@ -33,7 +33,9 @@ lv_display_refr_timer(NULL);
 If you have multiple displays call <ApiLink name="lv_display_set_default" display="lv_display_set_default(display1)" /> to
 select the display to refresh before <ApiLink name="lv_display_refr_timer" display="lv_display_refr_timer(NULL)" />.
 
-
+<Callout type="info">
+<ApiLink name="lv_timer_handler" /> and <ApiLink name="lv_display_refr_timer" /> must not run at the same time.
+</Callout>
 
 If the performance monitor is enabled, the value of <ApiLink name="LV_DEF_REFR_PERIOD" /> needs to be set
 to match the refresh period of the display to ensure that the statistical results are correct.
@@ -41,7 +43,7 @@ to match the refresh period of the display to ensure that the statistical result
 ## Forcing a Refresh
 
 Normally the invalidated areas (marked for redrawing) are rendered in
-<ApiLink name="lv_timer_handler" /> in every <ApiLink name="LV_DEF_REFR_PERIOD" /> milliseconds.
+<ApiLink name="lv_timer_handler" /> every <ApiLink name="LV_DEF_REFR_PERIOD" /> milliseconds.
 However, by using <ApiLink name="lv_refr_now" display="lv_refr_now(display)" /> you can tell LVGL to redraw the
 invalid areas immediately. The refreshing will happen in <ApiLink name="lv_refr_now" />
 which might take longer.

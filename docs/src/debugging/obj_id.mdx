@@ -16,13 +16,13 @@ Once enabled, several things change:
 
 - each Widget will now have a `void *` field called `id`;
 - these two API functions become available:
-  
+
   - <ApiLink name="lv_obj_get_id" display="lv_obj_get_id(widget)" />,
   - <ApiLink name="lv_obj_find_by_id" display="lv_obj_find_by_id(widget, id)" />;
 - several more Widget-ID-related API functions become available if
   <ApiLink name="LV_USE_OBJ_ID_BUILTIN" /> is non-zero (more on this below);
-- two additional configuration macros both <ApiLink name="LV_OBJ_ID_AUTO_ASSIGN" /> and
-  <ApiLink name="LV_USE_OBJ_ID_BUILTIN" /> now have meaning.
+- two additional configuration macros, <ApiLink name="LV_OBJ_ID_AUTO_ASSIGN" /> and
+  <ApiLink name="LV_USE_OBJ_ID_BUILTIN" />, now have meaning.
 
 ### `LV_OBJ_ID_AUTO_ASSIGN`
 
@@ -39,13 +39,13 @@ Because of this timing, custom versions of these functions can be used according
 the below, and they can even be used like "event hooks" to implement a trace
 operation that occurs when each Widget is created and deleted.
 
-##### `lv_obj_assign_id(class_p, widget)`
+#### `lv_obj_assign_id(class_p, widget)`
 
 This function (whether provided by LVGL or by you --- more on this below) is
-responsible for assigning a value to the Widget's `id` field, and possibly do
+responsible for assigning a value to the Widget's `id` field, and possibly doing
 other things, depending on the implementation.
 
-##### `lv_obj_free_id(widget)`
+#### `lv_obj_free_id(widget)`
 
 This function (whether provided by LVGL or by you --- more on this below) is
 responsible for doing the clean-up of any resources allocated by
@@ -76,12 +76,12 @@ string for it.  Example:  if the following 6 Widgets are created in this sequenc
 
 the strings produced by <ApiLink name="lv_obj_stringify_id" display="lv_obj_stringify_id(widget, buf, len)" /> would be
 
-- obj1
-- label1
-- btn1
-- label2
-- label3
-- image1
+- lv_obj1
+- lv_label1
+- lv_button1
+- lv_label2
+- lv_label3
+- lv_image1
 
 respectively.
 
@@ -130,7 +130,7 @@ If <ApiLink name="LV_OBJ_ID_AUTO_ASSIGN" /> equates to a non-zero value,
 for assigning a value to the Widget's `id` field.  A pointer to the Widget's final
 class is passed in its `class_p` argument in case it is needed for determining the
 value for the `id` field, or for other possible needs related to your design for
-Widget IDs.  Note that this pointer may be different than <ApiLink name="widget" display="widget->class_p" />
+Widget IDs.  Note that this pointer may be different than `widget->class_p`
 which is the class of the Widget currently being created.
 
 If <ApiLink name="LV_OBJ_ID_AUTO_ASSIGN" /> equates to a non-zero value,
@@ -161,7 +161,7 @@ This can be useful in the event of a UI crash.  From that log you can examine th
 state of the Widget Tree when <ApiLink name="lv_obj_dump_tree" display="lv_obj_dump_tree(widget)" /> was called.
 
 For example, if a pointer to a deleted Widget is stored in a Timer's
-<ApiLink name="timer" display="timer->user_data" /> field when the timer event callback is called, attempted
+`timer->user_data` field when the timer event callback is called, attempted
 use of that pointer will likely cause a crash because the pointer is not valid any
 more.  However, a timely dump of the Widget Tree right before that point will show
 that the Widget no longer exists.

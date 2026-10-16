@@ -1,11 +1,11 @@
 ---
 title: Draw Pipeline
-description: "Drawing (also known as :dfn:rendering) is writing pixel colors into a buffer from where they will be delivered to a display panel as pixels. It can mean filling areas with a color, blending images,..."
+description: "Drawing (also known as rendering) is writing pixel colors into a buffer from where they will be delivered to a display panel as pixels. It can mean filling areas with a color, blending images,..."
 ---
 
 ## What is Drawing?
 
-Drawing (also known as :dfn:`rendering`) is writing pixel colors into a buffer from
+Drawing (also known as *rendering*) is writing pixel colors into a buffer from
 where they will be delivered to a display panel as pixels. It can mean filling areas
 with a color, blending images, or using complex algorithms to, for example, calculate rounded
 corners or rotate images.
@@ -25,7 +25,7 @@ Modern embedded devices come with a wide variety of solutions to speed up render
 - and more
 
 To make it possible to utilize such facilities in the most efficient fashion, LVGL
-implements a :dfn:`Drawing Pipeline`, like an assembly line, where decisions are
+implements a *Drawing Pipeline*, like an assembly line, where decisions are
 made as to which drawing tasks (Draw Tasks) are given to which Draw Units
 (rendering engines) in order to be carried out.
 
@@ -33,7 +33,7 @@ This Pipeline is designed so that it is both flexible and extensible. You can us
 to perform custom rendering with a GPU or replace parts of the built-in software
 rendering logic to any extent desired.
 
-Using events, it's also possible to modify [Draw Tasks](/main-modules/draw/draw_pipeline) or insert new ones as
+Using events, it's also possible to modify [Draw Tasks](#draw-tasks) or insert new ones as
 LVGL renders Widgets.
 
 The following sections describe the basic terminology and concepts of rendering.
@@ -46,16 +46,14 @@ Functions such as <ApiLink name="lv_draw_rect" /> and <ApiLink name="lv_draw_lab
 one or more Draw Tasks and pass them down the Drawing Pipeline. Each Draw Task
 carries all the information required to:
 
-- compute which [Draw Unit](/main-modules/draw/draw_pipeline) should receive this task, and
+- compute which [Draw Unit](#draw-units) should receive this task, and
 - give the Draw Unit all the information required to accomplish the drawing task.
 
 A Draw Task carries the following information:
 
-:type:                    defines the drawing algorithm involved (e.g. line, fill,
-                          border, image, label, arc, triangle, etc.)
-
 | Field | Description |
 |-------|-------------|
+| `type` | defines the drawing algorithm involved (e.g. line, fill, border, image, label, arc, triangle, etc.) |
 | `area` | defines the rectangle in which drawing will occur |
 | `transformation matrix` | if <ApiLink name="LV_DRAW_TRANSFORM_USE_MATRIX" /> is configured to '1' |
 | `state` | waiting, queued, in progress, completed |
@@ -69,14 +67,14 @@ Draw Tasks are collected in a list and periodically dispatched to Draw Units.
 ## Draw Units
 
 A "Draw Unit" (based on <ApiLink name="lv_draw_unit_t" />) is any "logic entity" that can
-generate the output required by a [Draw Task](/main-modules/draw/draw_pipeline). This can be a CPU
+generate the output required by a [Draw Task](#draw-tasks). This can be a CPU
 core, a GPU, a custom rendering library for specific Draw Tasks, or any entity
 capable of performing rendering.
 
 For a reference implementation of a draw unit, see
 [lv_draw_sw.c](https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c).
 
-Learn more about [Draw Units](/main-modules/draw/draw_pipeline)
+Learn more about [Draw Units](/main-modules/draw/draw_units)
 
 ### Creating Draw Units
 
@@ -92,7 +90,7 @@ add custom `evaluate_cb` and `dispatch_cb` callbacks (mentioned later)
 to the new draw unit.
 
 For an example of how draw-unit creation and initialization is done, see
-<ApiLink name="lv_draw_sw_init" /> in lv_draw_sw.c_ or the other draw units whose `init`
+<ApiLink name="lv_draw_sw_init" /> in [lv_draw_sw.c](https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c) or the other draw units whose `init`
 functions are in <ApiLink name="lv_init" />.
 
 ### Thread Priority
@@ -121,7 +119,7 @@ can be used to increase the widget's clip area, allowing the children to overflo
 
 ## Draw Task Evaluation
 
-When each [Draw Task](/main-modules/draw/draw_pipeline) is created, each existing Draw Unit is
+When each [Draw Task](#draw-tasks) is created, each existing Draw Unit is
 "consulted" as to its "appropriateness" for the task. It does this through
 an "evaluation callback" function pointer (a.k.a. `evaluate_cb`), which each Draw
 Unit sets (for itself) during its initialization. Normally, that evaluation:
@@ -133,7 +131,7 @@ Unit sets (for itself) during its initialization. Normally, that evaluation:
 
 In this way, by the time the evaluation sequence is complete, the task will contain
 the score and the ID of the Draw Unit that will be used to perform that task when
-it is [dispatched](/main-modules/draw/draw_pipeline).
+it is [dispatched](#dispatching).
 
 This ensures that the same Draw Unit will be selected
 consistently, depending on the type (and nature) of the drawing task, avoiding any

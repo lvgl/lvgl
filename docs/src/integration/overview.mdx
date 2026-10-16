@@ -90,7 +90,7 @@ This is the case in [Zephyr](/integration/rtos/zephyr), [ESP-IDF](/integration/c
 LVGL also comes with many built-in display and input device drivers for on-chip
 [LCD peripheries](/integration/chip_vendors), [Embedded Linux](/integration/embedded_linux),
 [external display controllers](/integration/external_display_controllers), and many more.
-These drivers do the heavy lifting for the drivers and also serve as references
+These drivers do the heavy lifting for you and also serve as references
 for custom drivers.
 
 If the existing support in frameworks or the drivers is not enough, setting up
@@ -148,7 +148,7 @@ To process the timers of LVGL, you need to call <ApiLink name="lv_timer_handler"
 periodically in one of the following ways:
 
 - in the `while(1)` loop of the `main()` function, or
-- in an OS task periodically. (See [Operating Systems and Threads](/integration/overview).)
+- in an OS task periodically. (See [Operating Systems and Threads](#operating-systems-and-threads).)
 
 In the simplest case, it can be done like this:
 
@@ -192,7 +192,7 @@ LVGL run again later:
 - wait for an event that you will trigger when LVGL needs to run again, or
 - sleep the CPU (not just the thread)
 
-Also check the [Operating System Support](/integration/overview) section of the documentation to learn more
+Also check the [Operating System Support](#operating-system-support) section of the documentation to learn more
 about the considerations when using LVGL in an operating system.
 
 ## Sleep Management
@@ -311,7 +311,7 @@ because the thread that drives both of these is the thread that calls
 
 LVGL manages many complex data structures, and those structures are "system
 resources" that must be protected from being "seen" by other threads in an
-inconsistent state.  A high percentage LVGL functions (functions that start with
+inconsistent state.  A high percentage of LVGL functions (functions that start with
 `lv_`) either read from or change those data structures.  Those that change them
 place the data in an inconsistent state during call execution (because such changes are
 multi-step sequences), but return them to a consistent state before those functions
@@ -323,7 +323,7 @@ before any other LVGL function is started.
 These two LVGL functions may be called from any thread:
 
 - <ApiLink name="lv_tick_inc" /> (if writing to a `uint32_t` is atomic on your
-  platform; see [Tick Interface](/integration/overview) for more information) and
+  platform; see [Tick Interface](#tick-interface) for more information) and
 - <ApiLink name="lv_display_flush_ready" /> ([Flush Callback](/main-modules/display/setup) for more information)
 
 Use of MUTEXes requires:
@@ -375,7 +375,7 @@ void other_thread(void)
 ## Multiple Instances
 
 It is possible to run multiple, independent instances of LVGL in the same firmware.
-To enable its multi-instance feature, set <ApiLink name="LV_GLOBAL_CUSTOM" /> in `lv_conf.h`
+To enable its multi-instance feature, set <ApiLink name="LV_ENABLE_GLOBAL_CUSTOM" /> in `lv_conf.h`
 and provide a custom function to <ApiLink name="lv_global_default" /> using `__thread` or
 `pthread_key_t`. This allows running multiple LVGL instances by storing LVGL's
 global variables in TLS (Thread-Local Storage).

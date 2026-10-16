@@ -70,7 +70,7 @@ so it does not flood logs in hot paths.
 
 ---
 
-### 4. Add an entry to `docs/src/migration-v10.mdx`
+### 4. Add an entry to `docs/src/changelog/migration-v10.mdx`
 
 Document the change in the migration guide so users upgrading to v10 have a
 single, searchable reference. State the old symbol, the new symbol, and any
@@ -109,7 +109,7 @@ from **inside** the macro expansion using `LV_DEPRECATED_MACRO_WARN`.
 #endif
 ```
 
-The same four-step checklist still applies, the only difference is in step 2
+The same four-step checklist still applies, the only difference is in steps 2
 and 3: instead of `LV_DEPRECATED` on the declaration and `LV_LOG_DEPRECATED`
 in the body, you use `LV_DEPRECATED_MACRO_WARN` inside the macro body.
 
@@ -124,7 +124,7 @@ Use this when deprecating any symbol.
 | 1 | Add `@deprecated Use X instead.` to the Doxygen comment | Header file |
 | 2 | Add `LV_DEPRECATED("...")` on the function declaration **or** `LV_DEPRECATED_MACRO_WARN("...")` inside the macro body | Header file |
 | 3 | Add `LV_LOG_DEPRECATED` as the **first line** of the function body (functions only; macros handled in step 2) | Source file |
-| 4 | Add a migration entry in `docs/src/migration-v10.mdx` | Docs |
+| 4 | Add a migration entry in `docs/src/changelog/migration-v10.mdx` | Docs |
 
 ---
 

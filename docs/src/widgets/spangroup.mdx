@@ -14,7 +14,7 @@ any time.
 Add each needed Span to a Spangroup like this:
 
 ```c
-lv_span_t * span = lv_spangroup_new_span(spangroup);
+lv_span_t * span = lv_spangroup_add_span(spangroup);
 ```
 
 ## Set text
@@ -23,12 +23,12 @@ After a Span is created, use the following functions to set its text
 and style properties:
 
 - <ApiLink name="lv_span_set_text" display="lv_span_set_text(span, &quot;text&quot;)" />
-- <ApiLink name="lv_style_set_" display="lv_style_set_&lt;property_name>(&span->style, value)" />
+- `lv_style_set_<property_name>(lv_span_get_style(span), value)`
 
-Example of the latter:  <ApiLink name="lv_style_set_text_color" display="lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED))" />.
+Example of the latter:  <ApiLink name="lv_style_set_text_color" display="lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_RED))" />.
 
 If the Spangroup Widget's `mode != LV_SPAN_MODE_FIXED` call
-<ApiLink name="lv_spangroup_refr_mode" display="lv_spangroup_refr_mode(spangroup)" /> after you have modifying any of its
+<ApiLink name="lv_spangroup_refresh" display="lv_spangroup_refresh(spangroup)" /> after you have modified any of its
 Spans to ensure it is redrawn appropriately.
 
 ## Retrieving a Span child
@@ -59,7 +59,7 @@ You can remove a Span at any time during the Spangroup's life using the function
 
 ## Text align
 
-Like the Label Widget, a Spangroup can be set to one the following text-alignment modes:
+Like the Label Widget, a Spangroup can be set to one of the following text-alignment modes:
 
 - <ApiLink name="LV_TEXT_ALIGN_LEFT" /> Align text to left.
 - <ApiLink name="LV_TEXT_ALIGN_CENTER" /> Center text.
@@ -73,7 +73,7 @@ to set text alignment.
 
 **DEPRECATED**, set the width to <ApiLink name="LV_SIZE_CONTENT" /> or fixed value to control expanding/wrapping.
 
-A Spangroup can be set to one the following modes:
+A Spangroup can be set to one of the following modes:
 
 - <ApiLink name="LV_SPAN_MODE_FIXED" /> Fixes its size.
 - <ApiLink name="LV_SPAN_MODE_EXPAND" /> Expand size to text size but stay on one line.
@@ -86,7 +86,7 @@ Use <ApiLink name="lv_spangroup_set_mode" display="lv_spangroup_set_mode(spangro
 A Spangroup can be set to handle text overflow in one of the following ways:
 
 - <ApiLink name="LV_SPAN_OVERFLOW_CLIP" /> truncates text at the limit of the area.
-- <ApiLink name="LV_SPAN_OVERFLOW_ELLIPSIS" /> display an ellipsis (`...`) when text overflows the area.
+- <ApiLink name="LV_SPAN_OVERFLOW_ELLIPSIS" /> displays an ellipsis (`...`) when text overflows the area.
 
 Use <ApiLink name="lv_spangroup_set_overflow" display="lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)" /> to set
 the Spangroup's overflow mode.

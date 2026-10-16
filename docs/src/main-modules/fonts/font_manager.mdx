@@ -15,14 +15,14 @@ The font management functions currently provided include:
 ## Usage
 
 Enable FreeType and Font Manager in `lv_conf.h` by setting the
-<ApiLink name="LV_USE_FONT_MANAGER" /> macros to non-zero
+<ApiLink name="LV_USE_FREETYPE" /> and <ApiLink name="LV_USE_FONT_MANAGER" /> macros to non-zero
 values, and configure <ApiLink name="LV_FONT_MANAGER_NAME_MAX_LEN" /> to set the maximum
 length of the font name.
 
 ### Initialize Font Manager
 
 Use <ApiLink name="lv_font_manager_create" /> to create a font manager, where the
-<ApiLink name="recycle_cache_size" /> parameter is used to set the number of font recycling
+`recycle_cache_size` parameter is used to set the number of font recycling
 caches, which can improve font creation efficiency.
 
 Use <ApiLink name="lv_font_manager_add_src_static" /> to add a mapping between font names
@@ -68,12 +68,12 @@ font).
 static lv_font_t * g_font = NULL;
 
 /* Create font from font manager */
-lv_font_t * g_font = lv_font_manager_create_font(g_font_manager,
-                                                 "Lato-Regular,MyFont",
-                                                 LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
-                                                 24,
-                                                 LV_FREETYPE_FONT_STYLE_NORMAL,
-                                                 LV_FONT_KERNING_NONE);
+g_font = lv_font_manager_create_font(g_font_manager,
+                                     "Lato-Regular,MyFont",
+                                     LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                     24,
+                                     LV_FREETYPE_FONT_STYLE_NORMAL,
+                                     LV_FONT_KERNING_NONE);
 
 /* Handle error case */
 if(g_font == NULL) {

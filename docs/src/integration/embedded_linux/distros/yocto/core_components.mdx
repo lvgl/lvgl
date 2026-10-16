@@ -10,7 +10,7 @@ by describing their use and how they interact.
 BitBake handles the parsing and execution of the data files. The data
 itself is of various types:
 
-- *Recipes:* Provides details about particular pieces of software.
+- *Recipes:* Provide details about particular pieces of software.
 - *Class Data:* Abstracts common build information (e.g. how to build a
    Linux kernel).
 - *Configuration Data:* Defines machine-specific settings, policy
@@ -67,7 +67,7 @@ be processed.
 
 ## Recipes
 
-Files that have the `.bb` suffix are "recipes" files. In general, a
+Files that have the `.bb` suffix are "recipe" files. In general, a
 recipe contains information about a single piece of software. This
 information includes the location from which to download the unaltered
 source, any source patches to be applied to that source (if needed),
@@ -82,7 +82,7 @@ using the term "package" when referring to recipes.
 ## Classes
 
 Class files (`.bbclass`) contain information that is useful to share
-between recipes files. An example is the autotools* class,
+between recipe files. An example is the autotools class,
 which contains common settings for any application that is built with
 [GNU Autotools](https://en.wikipedia.org/wiki/GNU_Autotools).
 The "[Classes](https://docs.yoctoproject.org/ref-manual/classes.html#classes)" chapter in the Yocto Project

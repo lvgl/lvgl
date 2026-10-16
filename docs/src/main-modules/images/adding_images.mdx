@@ -5,9 +5,9 @@ description: "You can add images to LVGL in three ways:"
 
 You can add images to LVGL in three ways:
 
-- using the [online converter](/main-modules/images/adding_images)
-- using the [offline converter](/main-modules/images/adding_images)
-- [manually create images](/main-modules/images/adding_images)
+- using the [online converter](#online-converter)
+- using the [offline converter](#offline-converter)
+- [manually create images](#manually-creating-an-image)
 
 ## Online Converter
 
@@ -16,17 +16,17 @@ Adding an image to LVGL via the LVGL Online Image Converter is easy:
 1. Click [Select image file(s)] and select a BMP, PNG, JPG, WEBP or SVG image.
    Also supported:  GIF, SVGZ, TIF, TIFF, AI, DRW, PCT, PSP, XCF, PSD, RAW and HEIC.
 2. Select the [Color format](/main-modules/images/color_formats).  Currently supported:
-   
+
    - RGB565
    - RGB565A8
    - RGB888
    - XRGB8888
    - ARGB8888
-   
-   If you need another color format, use the [offline converter](/main-modules/images/adding_images).
-   
-   .. note::  BMP images are currently supported in file form only.
-              See [BMP and WEBP Files](/main-modules/images/adding_images) below.
+
+   If you need another color format, use the [offline converter](#offline-converter).
+
+   Note: BMP images are currently supported in file form only.
+   See [BMP and WEBP Files](#bmp-and-webp-files) below.
 3. Click the [Convert] button.  This will convert the file and open a "Save As..."
    dialog box.  The default filename will be the filename of the selected image file
    with a `.c` extension.
@@ -52,7 +52,7 @@ WEBP files, follow the instructions in [WebP Decoder](/libs/image_support/libweb
 ## BIN Files
 
 Another way you can add an image to your project is by using the
-[Offline Converter](/main-modules/images/adding_images) to create a `.bin` file.  Typically, you would do
+[Offline Converter](#offline-converter) to create a `.bin` file.  Typically, you would do
 this with a target color format matching the Display the image is going to be sent
 to. Optionally, you can use a command-line argument to cause the image contents to
 be compressed using RLE or LZ4 compression as well.  Of course, the decompression

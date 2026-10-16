@@ -75,15 +75,15 @@ A chart can be one of the following types:
   styles (for <ApiLink name="LV_PART_ITEMS" />) are set and both `width` and
   `height` have non-zero values.
 - <ApiLink name="LV_CHART_TYPE_CURVE" />: Similar to the LINE type, but it draws Bezier curves
-  between data points.  <ApiLink name="LV_USE_VECTOR_GRAPHICS" /> and a draw unit (e.g. VGLite, or ThorVG for
+  between data points.  <ApiLink name="LV_USE_VECTOR_GRAPHIC" /> and a draw unit (e.g. VGLite, or ThorVG for
   software rendering) need to be enabled. It also supports the `line_dash_gap/width` style
   properties.
 - <ApiLink name="LV_CHART_TYPE_BAR" />: Draw individual vertical bars for each point in each series.
 - <ApiLink name="LV_CHART_TYPE_STACKED" />: Draw vertical stacked bars where multiple data series
   are displayed as segments within a single bar for each data point. Supports only positive values.
-- <ApiLink name="LV_CHART_TYPE_SCATTER" />: X/Y chart drawing point's and optionally
+- <ApiLink name="LV_CHART_TYPE_SCATTER" />: X/Y chart drawing points and optionally
   lines between the points if line-width style values for
-  <ApiLink name="LV_PART_ITEMS" /> is a non-zero value, and the point's Y-value is
+  <ApiLink name="LV_PART_ITEMS" /> are non-zero, and the point's Y-value is
   something other than <ApiLink name="LV_CHART_POINT_NONE" />.  (Drawing of individual points on a
   SCATTER chart can be suppressed if their Y-values are set to <ApiLink name="LV_CHART_POINT_NONE" />.)
 
@@ -122,7 +122,7 @@ you can do so with
 You are responsible for ensuring the array you provide contains at least
 `chart->point_cnt` elements in it.
 
-`value_array` should look like this: `int32_t * value_array[num_points]`.  Only
+`value_array` should look like this: `int32_t value_array[num_points]`.  Only
 the array's pointer is saved in the series so its contents need to remain available
 for the life of the series, i.e. the array needs to be global, static or dynamically
 allocated.
@@ -155,7 +155,7 @@ Four ways to write a series value:
 | <ApiLink name="lv_chart_set_series_value_by_id" display="lv_chart_set_series_value_by_id(chart, ser, id, v)" /> | updating one specific point by index |
 | <ApiLink name="lv_chart_set_next_value" display="lv_chart_set_next_value(chart, ser, v)" /> | streaming live data — paired with [Update modes](#update-modes) |
 | <ApiLink name="lv_chart_set_all_values" display="lv_chart_set_all_values(chart, ser, v)" /> | filling the whole series with one value |
-| `ser->points[i] = v` + <ApiLink name="lv_chart_refresh" display="lv_chart_refresh(chart)" /> | bulk writes where the helpers would be overhead |
+| `ser->y_points[i] = v` + <ApiLink name="lv_chart_refresh" display="lv_chart_refresh(chart)" /> | bulk writes where the helpers would be overhead |
 
 Use <ApiLink name="LV_CHART_POINT_NONE" /> to hide a point. Scatter charts have
 `_set_series_value_by_id2` / `_set_next_value2` variants that take both X
@@ -183,9 +183,9 @@ array so provided contains at least `point_num` elements.
 
 On LINE charts, if the number of points is greater than the pixels
 horizontally, the Chart will draw only vertical lines to make the
-drawing of large amount of data effective. If there are, let's say, 10
+drawing of large amounts of data efficient. If there are, let's say, 10
 points to a pixel, LVGL searches the smallest and the largest value and
-draws a vertical lines between them to ensure no peaks are missed.
+draws a vertical line between them to ensure no peaks are missed.
 
 ## Vertical range
 

@@ -31,7 +31,8 @@ Widget under the hood to arrange the days into a matrix.
 
   - day names have no border, no background and are drawn with a gray color
   - days of the previous and next month have the <ApiLink name="LV_BUTTONMATRIX_CTRL_DISABLED" /> flag
-  - today has a thicker border with the theme's primary color - highlighted days have some opacity with the theme's primary color.
+  - today has a thicker border with the theme's primary color
+  - highlighted days have some opacity with the theme's primary color.
 
 <LvglExample name="lv_example_calendar_basic" path="widgets/calendar/lv_example_calendar_basic" />
 
@@ -54,7 +55,7 @@ To set the shown date, use
 The list of highlighted dates should be stored in a
 <ApiLink name="lv_calendar_date_t" /> array and applied to the Calendar by calling
 <ApiLink name="lv_calendar_set_highlighted_dates" display="lv_calendar_set_highlighted_dates(calendar, highlighted_dates, date_num)" />.
-Only the array's pointer will be saved so the array should be have static or
+Only the array's pointer will be saved so the array should have static or
 global scope.
 
 Highlighted dates aren't yet exposed through XML attributes (the dates need
@@ -102,7 +103,7 @@ solar-term annotations alongside each Gregorian day. Requires
 ## Events
 
 - <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent if a date is clicked.
-   <ApiLink name="lv_calendar_get_pressed_date" display="lv_calendar_get_pressed_date(calendar, &date)" /> to set `date` to the
+   Call <ApiLink name="lv_calendar_get_pressed_date" display="lv_calendar_get_pressed_date(calendar, &date)" /> to set `date` to the
    date currently being pressed. Returns <ApiLink name="LV_RESULT_OK" /> if there is a
    valid pressed date; otherwise it returns <ApiLink name="LV_RESULT_INVALID" />.
 
@@ -129,4 +130,4 @@ current year and month.
 ### Drop-down
 
 <ApiLink name="lv_calendar_add_header_dropdown" display="lv_calendar_add_header_dropdown(calendar)" /> creates a header that
-contains 2 Drop-Drown List Widgets for the year and month.
+contains 2 Drop-Down List Widgets for the year and month.

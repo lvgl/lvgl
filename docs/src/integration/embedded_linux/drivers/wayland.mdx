@@ -163,14 +163,14 @@ want it:
 
 ```c
 /* Assign to physical display 0 and go fullscreen there */
-lv_wayland_set_physical_display(disp, 0);
+lv_wayland_window_set_physical_display(disp, 0);
 lv_wayland_window_set_fullscreen(disp, true);
 ```
 
 <ApiLink name="LV_WAYLAND_PHYSICAL_DISPLAY_ANY" /> can be used to restore the default behaviour.
 
 ```c
-lv_wayland_set_physical_display(disp, LV_WAYLAND_PHYSICAL_DISPLAY_ANY);
+lv_wayland_window_set_physical_display(disp, LV_WAYLAND_PHYSICAL_DISPLAY_ANY);
 ```
 
 ### Physical outputs
@@ -191,7 +191,7 @@ int32_t output = lv_wayland_get_display_size("HDMI-A-1", &width, &height);
 
 if(output >= 0) {
     lv_display_t * disp = lv_wayland_window_create(width, height, "My window", NULL);
-    lv_wayland_set_physical_display(disp, output);
+    lv_wayland_window_set_physical_display(disp, output);
     lv_wayland_window_set_fullscreen(disp, true);
 }
 ```
@@ -231,7 +231,7 @@ in LVGL's rendering.
 
 It needs no GPU API of any kind, only `libdrm` and `libgbm` to allocate the buffers, so it is available on
 plenty of targets that cannot run the EGL backend. What it does need at runtime is a DRM primary node it
-can open, which means the process must have permission to do so. 
+can open, which means the process must have permission to do so.
 
 Rotation is handled in software, folded into that flush copy — unlike SHM there is no extra full-frame
 buffer and no additional pass.
@@ -263,7 +263,7 @@ widgets. For fullscreen and kiosk applications, you can simply omit them.
 | Runtime resolution change | Yes | Yes | Yes | Yes |
 | Runtime color format change | Yes | Yes | Yes | Yes |
 | Color formats | RGB565, XRGB8888, ARGB8888 | RGB565 or ARGB8888, from <ApiLink name="LV_COLOR_FORMAT_DEFAULT" /> | RGB565, XRGB8888, ARGB8888 | RGB565, XRGB8888, ARGB8888 |
-| Multiple displays / windows | Yes | Yes | Yes | Yes |
+| Multiple displays / windows | Yes | No, one window only | Yes | Yes |
 | Hardware acceleration | None — presentation only | OpenGL ES | NXP G2D | None |
 | Render mode | Direct — fixed | Full with NanoVG, otherwise Direct — fixed | Direct — fixed | Direct — fixed |
 | Input | Built in — keyboard, pointer, touch, encoder per window | Built in | Built in | Built in |

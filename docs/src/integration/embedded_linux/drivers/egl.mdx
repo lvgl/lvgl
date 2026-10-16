@@ -25,8 +25,8 @@ display server at all.
 LVGL loads `libEGL.so` and `libGLESv2.so` at runtime with `dlopen`, so EGL doesn't have any build-time dependencies.
 
 <Callout type="warning" title="EGL and GLFW are mutually exclusive">
-<ApiLink name="LV_USE_GLFW" /> cannot be combined with <ApiLink name="LV_USE_EGL" />
-each wants to own context creation.
+<ApiLink name="LV_USE_GLFW" /> cannot be combined with <ApiLink name="LV_USE_EGL" />.
+Each wants to own context creation.
 </Callout>
 
 ## Usage

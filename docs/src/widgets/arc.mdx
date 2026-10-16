@@ -25,8 +25,8 @@ To set the start and end angle of the background Arc use any of these functions:
 - <ApiLink name="lv_arc_set_bg_end_angle" display="lv_arc_set_bg_end_angle(arc, angle)" />
 - <ApiLink name="lv_arc_set_bg_angles" display="lv_arc_set_bg_angles(arc, start_angle, end_angle)" />
 
-Zero degrees is at the middle right (3 o'clock) of the Widget and the
-degrees increasing in the clockwise direction.  The angle values should be in
+Zero degrees is at the middle right (3 o'clock) of the Widget and
+degrees increase in the clockwise direction.  The angle values should be in
 the range [0..360].
 
 ## Rotation
@@ -129,7 +129,7 @@ lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 
 By default the whole bounding box of the arc accepts input. Enabling
 <ApiLink name="LV_OBJ_FLAG_ADV_HITTEST" /> narrows the hit area to the band between the
-start and end angles, with a <ApiLink name="lv_dpx" display="lv_dpx(50)" /> tolerance at each end.
+start and end angles, with a <ApiLink name="lv_dpx" display="lv_dpx(20)" /> tolerance at each end.
 <ApiLink name="lv_obj_set_ext_click_area" /> extends the sensitive area outward (or, with
 advanced hit-test, both inward and outward).
 

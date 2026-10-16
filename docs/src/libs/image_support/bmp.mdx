@@ -16,7 +16,7 @@ image sources.  Example:
 lv_image_set_src(my_img, "S:path/to/picture.bmp");
 ```
 
-Note that, a [File System (lv_fs_drv)](/main-modules/fs) driver needs to registered to open images from
+Note that, a [File System (lv_fs_drv)](/main-modules/fs) driver needs to be registered to open images from
 files.  Follow the instructions in [File System (lv_fs_drv)](/main-modules/fs).
 
 ## Limitations
@@ -28,7 +28,7 @@ files.  Follow the instructions in [File System (lv_fs_drv)](/main-modules/fs).
 - The BMP file's color format needs to match the color format of the display on which
    it will be rendered (<ApiLink name="LV_COLOR_FORMAT_DEFAULT" />, or whatever the
    display was later set to).  You can use GIMP to save the image in the required
-   format.  Both RGB888 and ARGB888 work with <ApiLink name="LV_COLOR_FORMAT_XRGB8888" />
+   format.  Both RGB888 and ARGB8888 work with <ApiLink name="LV_COLOR_FORMAT_XRGB8888" />
 - Color palettes are not supported.
 - Because the whole image is not loaded, it cannot be zoomed or rotated.
 

@@ -32,8 +32,8 @@ By default, esp_lvgl_port depends on the latest stable version of LVGL, so no ad
 
 ### Obtaining LVGL
 
-LVGL is distributed through [ESP Registry](https://components.espressif.com/), where all LVGL releases are uploaded.
-In case you do not want to use esp_lvgl_port, you can add [LVGL component](https://components.espressif.com/component/lvgl/lvgl) into your project with following command:
+LVGL is distributed through the [ESP Registry](https://components.espressif.com/), where all LVGL releases are uploaded.
+In case you do not want to use esp_lvgl_port, you can add the [LVGL component](https://components.espressif.com/components/lvgl/lvgl) into your project with the following command:
 
 ```sh
 idf.py add-dependency "lvgl/lvgl^9.*"
@@ -41,7 +41,7 @@ idf.py add-dependency "lvgl/lvgl^9.*"
 
 Adjust the `^9.*` part to match your LVGL version requirement. More information on version specifications can be found in the [IDF Component Manager documentation](https://docs.espressif.com/projects/idf-component-manager/en/latest/reference/versioning.html#range-specifications). During the next build, the LVGL component will be fetched from the component registry and added to the project.
 
-**Advanced usage: Use LVGL as local component**
+**Advanced usage: Use LVGL as a local component**
 
 For LVGL development and testing, it may be useful to use LVGL as a local component instead of from the ESP Registry, which offers only released versions and does not allow local modifications. To do this, clone LVGL to your project with the following command:
 
@@ -58,8 +58,8 @@ All components from `${project_dir}/components` are automatically added to the b
 For a successful LVGL project, you will need a [display](/main-modules/display) driver and optionally a touch driver. Espressif provides these drivers that are built on its [esp_lcd](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/lcd/index.html) component.
 
 - esp_lcd natively supports some [basic displays](https://github.com/espressif/esp-idf/tree/master/components/esp_lcd/src)
-- Other displays are maintained in [esp-bsp repository](https://github.com/espressif/esp-bsp/tree/master/components/lcd) and are uploaded to ESP Registry
-- Touch drivers are maintained in [esp-bsp repository](https://github.com/espressif/esp-bsp/tree/master/components/lcd_touch) and are uploaded to ESP Registry
+- Other displays are maintained in the [esp-bsp repository](https://github.com/espressif/esp-bsp/tree/master/components/lcd) and are uploaded to the ESP Registry
+- Touch drivers are maintained in the [esp-bsp repository](https://github.com/espressif/esp-bsp/tree/master/components/lcd_touch) and are uploaded to the ESP Registry
 
 These components share a common public API, making it easy to migrate your projects across different display and touch drivers.
 

@@ -1,10 +1,10 @@
 ---
 title: Draw Layers
-description: "Not to be confused with a Display's main 4 layers, a :dfn:Draw Layer is a buffer created during rendering, necessitated by certain style properties, so different sets of pixels are correctly combined."
+description: "Not to be confused with a Display's main 4 layers, a Draw Layer is a buffer created during rendering, necessitated by certain style properties, so different sets of pixels are correctly combined."
 ---
 
 Not to be confused with a [Display's main 4 layers](/main-modules/display/screen_layers), a
-:dfn:`Draw Layer` is a buffer created during rendering, necessitated by certain style
+*Draw Layer* is a buffer created during rendering, necessitated by certain style
 properties, so different sets of pixels are correctly combined.  Factors requiring
 such layers are:
 
@@ -45,12 +45,12 @@ The following style properties trigger the creation of a "Transform Layer":
 - `transform_scale_y`
 - `transform_skew_x`
 - `transform_skew_y`
-- `transform_rotate`
+- `transform_rotation`
 
 Due to the nature of transformations, the Widget being transformed (and its children)
 must be rendered first, followed by the transformation step.  This necessitates a
 temporary drawing area (layer), often larger than the Widget proper, to provide an
-area of adequate size for the transformation.  LVGL tries to render as small area of
+area of adequate size for the transformation.  LVGL tries to render as small an area of
 the widget as possible, but due to the nature of transformations no slicing is
 possible in this case.
 
@@ -120,7 +120,7 @@ in each case:
     layer of the display or another temporary layer created earlier during rendering.
     The current target layer can be retrieved using <ApiLink name="lv_event_get_layer" display="lv_event_get_layer(e)" />.
 
-    It also possible to create new layers in these events, but the previous layer is
+    It is also possible to create new layers in these events, but the previous layer is
     also required since it will be the parent layer in <ApiLink name="lv_draw_layer" />.
 2. **Modifying the created Draw Tasks**:
     In <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> the draw tasks created by
@@ -133,9 +133,9 @@ in each case:
 ```c
 /* In LV_EVENT_DRAW_TASK_ADDED */
 lv_draw_task_t * t = lv_event_get_draw_task(e);
-lv_draw_base_dsc_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
+lv_draw_dsc_base_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
 
-lv_layer_t * current_layer = draw_dsc.layer;
+lv_layer_t * current_layer = draw_dsc->layer;
 ```
 
 3. **Draw to the Canvas Widget**:

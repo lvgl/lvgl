@@ -70,7 +70,7 @@ following reasons:
 - avoid escaping `"` character in the JSON file
 - some compilers don't support very long strings
 
-`lvgl/scripts/filetohex.py` can be used to convert a Lottie file a hex
+`lvgl/scripts/filetohex.py` can be used to convert a Lottie file to a hex
 array. E.g.:
 
 ```bash
@@ -89,7 +89,7 @@ lv_obj_t* lottie = lv_rlottie_create_from_raw(parent, width, height, (const char
 
 ## Getting Animations
 
-Lottie is standard and popular format so you can find many animation
+Lottie is a standard and popular format so you can find many animation
 files on the web.  For example:  https://lottiefiles.com/ .
 
 You can also create your own animations with Adobe After Effects or
@@ -141,7 +141,7 @@ best performance:
 If your ESP32 chip does not have SPIRAM you will face severe limitations
 in render size.
 
-To give a better idea on this, lets assume you want to render a 240x320
+To give a better idea on this, let's assume you want to render a 240x320
 lottie animation.
 
 In order to pass initialization of the lv_rlottie_t object, you need
@@ -157,7 +157,7 @@ probably has minimal issues, but a 300 frame animation playing over 10
 seconds could very easily crash due to lack of memory as rlottie
 renders, depending on the complexity of the animation.
 
-Rlottie will not compile for the IDF using the `-02` compiler option at
+Rlottie will not compile for the IDF using the `-O2` compiler option at
 this time.
 
 For stability in lottie animations, this author has found that they run best in the
@@ -184,8 +184,7 @@ best when using rlottie as a submodule under the components directory.
 
 ```bash
 cd 'your/project/directory'
-git add submodule
-git add submodule https://github.com/Samsung/rlottie.git ./components/rlottie/rlottie
+git submodule add https://github.com/Samsung/rlottie.git ./components/rlottie/rlottie
 git submodule update --init --recursive
 ```
 
@@ -249,7 +248,7 @@ LVGL component settings.
 
 ### Additional Changes to Make Use of SPIRAM
 
-<ApiLink name="lv_alloc" display="lv_alloc/realloc" /> does not make use of SPIRAM. Given the high memory usage
+<ApiLink name="lv_malloc" display="lv_malloc/lv_realloc" /> does not make use of SPIRAM. Given the high memory usage
 of lottie animations, it is recommended to shift as much out of internal
 DRAM into SPIRAM as possible. In order to do so, SPIRAM will need to be
 enabled in the menuconfig options for your given espressif chip.
@@ -257,9 +256,9 @@ enabled in the menuconfig options for your given espressif chip.
 There may be a better solution for this, but for the moment the
 recommendation is to make local modifications to the LVGL component in
 your espressif project. This is as simple as swapping
-<ApiLink name="lv_alloc" display="lv_alloc/lv_realloc" /> calls in `lv_rlottie.c`` with <ApiLink name="heap_caps_malloc" /> (for
-IDF) with the appropriate <ApiLink name="MALLOC_CAP" /> call --- for SPIRAM usage this is
-<ApiLink name="MALLOC_CAP_SPIRAM" />.
+<ApiLink name="lv_malloc" display="lv_malloc/lv_realloc" /> calls in `lv_rlottie.c` with `heap_caps_malloc()` (for
+IDF) with the appropriate `MALLOC_CAP` call --- for SPIRAM usage this is
+`MALLOC_CAP_SPIRAM`.
 
 ```c
 rlottie->allocated_buf = heap_caps_malloc(allocated_buf_size+1, MALLOC_CAP_SPIRAM);

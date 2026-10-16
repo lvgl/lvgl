@@ -62,7 +62,7 @@ handle the supported draw tasks.
 If `LV_USE_G2D_DRAW_THREAD` is not defined, then no additional draw thread will be created
 and the G2D drawing task will get executed on the same LVGL main thread.
 
-`_g2d_evaluate()` will get called after each task is being created and will
+`_g2d_evaluate()` will get called after each task is created and will
 analyze if the task is supported by G2D or not. If it is supported, then a
 preferred score and the draw unit id will be set to the task. A `score` equal
 to `100` is the default CPU score. Smaller score means that G2D is capable of
@@ -72,7 +72,7 @@ drawing it faster.
 task (having the `DRAW_UNIT_ID_G2D` set) and will pass the task to the G2D draw
 unit for processing.
 
-`_g2d_delete()` will cleanup the G2D draw unit.
+`_g2d_delete()` will clean up the G2D draw unit.
 
 ## Features supported
 
@@ -81,10 +81,10 @@ Supported draw tasks are available in `src/draw/nxp/g2d/lv_draw_g2d.c`:
 ```c
 switch(t->type) {
     case LV_DRAW_TASK_TYPE_FILL:
-        lv_draw_g2d_fill(u, t->draw_dsc, &t->area);
+        lv_draw_g2d_fill(t);
         break;
     case LV_DRAW_TASK_TYPE_IMAGE:
-        lv_draw_g2d_img(u, t->draw_dsc, &t->area);
+        lv_draw_g2d_img(t);
         break;
     default:
         break;

@@ -12,7 +12,7 @@ address space.
 
 See www.qnx.com for more details.
 
-### Highlight of QNX
+### Highlights of QNX
 
 - 64-bit only, runs on x86_64 and ARMv8
 - Requires an MMU as the design mandates separation among processes
@@ -57,7 +57,7 @@ Follow the generic instructions for [getting started](/getting_started/porting) 
 you choose to build a library then you do not need to follow the instructions in
 the previous section.**
 
-The top-level `qnx` directory includes a recursive make file for building LVGL,
+The `env_support/qnx` directory includes a recursive make file for building LVGL,
 both as a shared library and as a static library for the supported
 architectures. To build all libraries, simply invoke `make` in this directory:
 
@@ -83,9 +83,9 @@ Before building the library, you may wish to edit
 `$(LVGL_ROOT)/env_support/qnx/lv_conf.h`, e.g. to add fonts or disable
 double-buffering.
 
-### Writing a LVGL Application
+### Writing an LVGL Application
 
-To create a LVGL application for QNX, follow these steps in your code:
+To create an LVGL application for QNX, follow these steps in your code:
 
 1. Initialize the library.
 2. Create a window.
@@ -94,7 +94,7 @@ To create a LVGL application for QNX, follow these steps in your code:
 5. Run the event loop.
 
 Steps 2, 3 and 5 use QNX-specific calls, but the rest of the code should be
-identical to that of a LVGL application written for any other platform.
+identical to that of an LVGL application written for any other platform.
 
 The following code shows how to create a "Hello World" application:
 

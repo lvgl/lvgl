@@ -87,10 +87,10 @@ The important files for us are `local.conf` and `bblayers.conf`
 
 To add layers to the project there are 2 options:
 
-**Bitbake commands (Option 1)**
+**BitBake commands (Option 1)**
 
 You need to be in the same terminal you did the `source` command. Add the
-layers with the Bitbake command like this
+layers with the BitBake command like this
 
 ```c
 bitbake-layers add-layer ../sources/meta-openembedded
@@ -99,7 +99,7 @@ bitbake-layers add-layer ../sources/meta-raspberrypi
 
 **Modify conf file (Option 2)**
 
-Open `conf/bblayers.conf` file and add manually the paths:
+Open `conf/bblayers.conf` file and manually add the paths:
 
 ```bash
 # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
@@ -121,7 +121,7 @@ ${TOPDIR}/../sources/meta-openembedded/meta-python \
 "
 ```
 
-To ensure the layers were added as expected, run the Bitbake command to show
+To ensure the layers were added as expected, run the BitBake command to show
 all the layers:
 
 ```c
@@ -145,7 +145,7 @@ The available machine configurations for Raspberrypi can be listed like this
 ls ../sources/meta-raspberrypi/conf/machine/*.conf
 ```
 
-To build an image for Raspberrypi3 64 bits, modify the file `local.conf` file
+To build an image for Raspberrypi3 64 bits, modify the `local.conf` file
 replacing the `MACHINE ??=` default value like this
 
 ```bash
@@ -162,7 +162,7 @@ LICENSE_FLAGS_ACCEPTED = "synaptics-killswitch"
 You can find more information about this variable [here](https://meta-raspberrypi.readthedocs.io/en/latest/ipcompliance.html#linux-firmware-rpidistro).
 </Callout>
 
-Everything is setup, time to build the image:
+Everything is set up, time to build the image:
 
 ```c
 bitbake core-image-base
@@ -284,7 +284,7 @@ There is a recipe in `meta-openembedded` since `honister`.
 In this guide, we are on the `scarthgap` branch, so we are using lvgl 9.1.0.
 
 Let's dive into this recipe to understand what is done. The objective is to add
-this library as a shared object in the target rootfs, and also to generate a
+this library as a shared object in the target rootfs, and also to generate an
 SDK with lvgl.
 
 This is the path of lvgl recipes: `lvgl_yocto_guide/sources/meta-openembedded/meta-oe/recipes-graphics/lvgl`
@@ -306,9 +306,9 @@ lvgl
 └── lvgl-demo-fb_9.1.0.bb
 ```
 
-- `file` folder contains all the patches that can be applied when
+- `files` folder contains all the patches that can be applied when
    building the recipe.
-- `lv_conf.inc` is an include file, usually containing common configuration
+- `lv-conf.inc` is an include file, usually containing common configuration
    settings for LVGL that can be shared between multiple recipes.
 - `lvgl_9.1.0.bb` is the recipe to build lvgl library.
 - `lvgl-demo-fb_9.1.0.bb` is a recipe to build an application using lvgl.
@@ -357,8 +357,8 @@ distributed under the MIT License.
 **LIC_FILES_CHKSUM**: This variable contains a checksum (in this case, an MD5 hash)
 for the license file (here assumed to be LICENCE.txt). This helps to ensure the
 integrity of the license file included in the package. In LVGL repository,
-there is a LICENSE.txt. To get the value of the hash of the file, you can do
-this command: `md5sum LICENSE.txt`
+there is a LICENCE.txt. To get the value of the hash of the file, you can do
+this command: `md5sum LICENCE.txt`
 
 **SRC_URI**: Specifies the locations of the source code and patches for the recipe:
 
@@ -405,7 +405,7 @@ bitbake lvgl -c fetch
 Fetch task fetches the package source from the local or remote repository.
 
 The fetch Repo address has to be stored in **SRC_URI** variable. In
-   **SRCREV** Variable the commit hash of github repo is defined.
+   **SRCREV** Variable the commit hash of GitHub repo is defined.
 
 When the fetch task has been completed, you can find the fetched sources in
    `build/downloads`.
@@ -426,7 +426,7 @@ Unpack task unpacks the package that has been downloaded with Fetch task.
 In the `lvgl_yocto_guide/build/tmp/work/cortexa53-poky-linux/lvgl/9.1.0`
    folder, you can now find the source code in `git` (as it was defined in
    the recipe). You will also see the patches that will be applied on the next
-   step. So for now, the sources are unmodified and the same than the commit
+   step. So for now, the sources are unmodified and the same as the commit
    that was specified.
 
 Patch (do_patch)
@@ -436,7 +436,7 @@ bitbake lvgl -c patch
 ```
 
 Patch task locates the patch files and applies the patches to the sources
-   if any patch is available. This is optional task, executes if patch is
+   if any patch is available. This is an optional task, executes if patch is
    available.
 
 Patch file is also defined in **SRC_URI** variable. By default it runs in
@@ -452,9 +452,9 @@ The Configuration task configures the source by enabling and disabling any
    build-time and configuration options for the software being built before
    compilation if any configuration is available.
 
-This is a optional steps, executes if configuration is available.
+This is an optional step, executes if configuration is available.
 
-In this case, it creates a build directory, It invokes CMake to configure
+In this case, it creates a build directory, it invokes CMake to configure
    the project, specifying build options and paths based on variables in your
    recipe. It generates Makefiles or project files needed for the build. Also,
    there are operations added in the task in `lv-conf.inc`.
@@ -472,12 +472,12 @@ bitbake lvgl -c compile
 The Compilation task compiles the source code if any compilation steps are
    available and generates a binary file.
 
-This is a optional steps, executes if compilation is available.
+This is an optional step, executes if compilation is available.
 
-If there are any compilation steps, then these steps are define in
+If there are any compilation steps, then these steps are defined in
    do_compile() function of bitbake.
 
-Like in the previous task, this is handle by `inherit cmake`.
+Like in the previous task, this is handled by `inherit cmake`.
 
 In the build folder, you can now see the built library. The `.so` files
    are available in `lvgl_yocto_guide/build/tmp/work/cortexa53-poky-linux/lvgl/9.1.0/build/lib`.
@@ -491,7 +491,7 @@ bitbake lvgl -c install
 ```
 
 The Install task copies files that are to be packaged into the holding area
-   **$\{D\}**. This task runs with the current working directory **$\{S\}** which
+   **$\{D\}**. This task runs with the current working directory **$\{B\}** which
    is the compilation directory.
 
 It creates the necessary directory for the header files in the destination
@@ -517,7 +517,9 @@ the library to the host SDK we will generate later on.
 
 With these modifications, you can now run the image recipe again:
 
+```bash
 bitbake core-image-base
+```
 
 This will execute all the previously described tasks.
 
@@ -531,22 +533,22 @@ Generating a Software Development Kit (SDK) in Yocto serves several important
 purposes, particularly in embedded development:
 
 - **Development Environment**: The SDK provides developers with a
-      ready-to-use development environment tailored for a specific target
-      hardware platform.
-      This includes the necessary tools, libraries, and headers to build
-      applications that run on the target device.
-    - **Cross-Compilation**: The SDK allows developers to cross-compile
-      applications from a host machine (typically x86 or x86_64 architecture)
-      for a different architecture (e.g., ARM). This is essential for embedded
-      systems, where development often occurs on more powerful machines.
-    - **Simplified Development**: By packaging all required components, the SDK
-      simplifies the process of setting up a development environment.
-      Developers don't need to manually install and configure tools and
-      libraries; everything needed is included in the SDK.
-    - **Consistent Build Environment**: The SDK ensures that developers are
-      working with the same versions of libraries and tools used in the Yocto
-      build, which helps to avoid compatibility issues and ensures that
-      applications will behave as expected on the target device.
+  ready-to-use development environment tailored for a specific target
+  hardware platform.
+  This includes the necessary tools, libraries, and headers to build
+  applications that run on the target device.
+- **Cross-Compilation**: The SDK allows developers to cross-compile
+  applications from a host machine (typically x86 or x86_64 architecture)
+  for a different architecture (e.g., ARM). This is essential for embedded
+  systems, where development often occurs on more powerful machines.
+- **Simplified Development**: By packaging all required components, the SDK
+  simplifies the process of setting up a development environment.
+  Developers don't need to manually install and configure tools and
+  libraries; everything needed is included in the SDK.
+- **Consistent Build Environment**: The SDK ensures that developers are
+  working with the same versions of libraries and tools used in the Yocto
+  build, which helps to avoid compatibility issues and ensures that
+  applications will behave as expected on the target device.
 
 To generate an SDK of the environment, run the following command:
 

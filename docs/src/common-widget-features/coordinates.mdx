@@ -46,7 +46,7 @@ lv_obj_t * btn = lv_button_create(lv_screen_active());
 lv_obj_add_style(btn, &style_main, LV_PART_MAIN);
 
 /* Using a local style to set the width in the PRESSED state */
-lv_obj_set_style_width(btn, 150, LV_PART_PRESSED);
+lv_obj_set_style_width(btn, 150, LV_STATE_PRESSED);
 ```
 
 Advantages of using styles:
@@ -100,7 +100,7 @@ lv_obj_remove_style_all(widget2);
 lv_obj_set_size(widget2, 200, 100);
 ```
 
-## Boxing Model
+## Box Model
 
 LVGL follows the CSS `border-box` model:
 

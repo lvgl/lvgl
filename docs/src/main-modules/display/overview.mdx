@@ -32,7 +32,7 @@ it is representing, as well as other things relevant to its lifetime:
 - Resolution (width and height in pixels)
 - Color Depth (bits per pixel)
 - Color Format (how colors in pixels are laid out)
-- DPI (default is configured <ApiLink name="LV_DPI_DEF" /> in `lv_conf.h`, but can be
+- DPI (default is configured by <ApiLink name="LV_DPI_DEF" /> in `lv_conf.h`, but can be
   modified with <ApiLink name="lv_display_set_dpi" display="lv_display_set_dpi(disp, new_dpi)" />).
 - 4 [Screen Layers](/main-modules/display/screen_layers) automatically created with each display
 - All [Screens](/common-widget-features/screens) created in association with this display (and not yet deleted---only
@@ -41,7 +41,7 @@ it is representing, as well as other things relevant to its lifetime:
 - The [Flush Callback](/main-modules/display/setup) function that moves pixels from [Draw Buffer(s)](/main-modules/display/setup) to Display hardware
 - What areas of the display have been updated (made "dirty") so rendering logic can
   compute what to render during a display refresh
-- Optional custom pointer as [User Data](/main-modules/display/overview)
+- Optional custom pointer as [User Data](#user-data)
 
 ## User Data
 

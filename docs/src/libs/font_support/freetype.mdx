@@ -12,8 +12,8 @@ For a detailed introduction, see:  https://freetype.org/ .
 
 ## Adding FreeType to Your Project
 
-First, Download FreeType from the [freetype2` folder (and optionally `freetype-docs`
-and `freetype-demos`) from its `official repository](https://sourceforge.net/projects/freetype/files/).  (The latest version is
+First, Download FreeType from the `freetype2` folder (and optionally `freetype-docs`
+and `freetype-demos`) from its [official repository](https://sourceforge.net/projects/freetype/files/).  (The latest version is
 recommended.)
 
 If you haven't already done so, now is a good time to get familiar with setting up
@@ -76,7 +76,7 @@ Set <ApiLink name="LV_USE_FREETYPE" /> in `lv_conf.h` to `1`.
 
 Cache configuration:
 
-- <ApiLink name="LV_FREETYPE_CACHE_FT_GLYPH_CNT" /> Maximum number of cached glyphs., etc.
+- <ApiLink name="LV_FREETYPE_CACHE_FT_GLYPH_CNT" /> Maximum number of cached glyphs.
 
 By default, the FreeType extension doesn't use LVGL's file system. You
 can simply pass the path to the font as usual on your operating system
@@ -89,7 +89,7 @@ to exclude the configured FreeType library's `ftsystem.c` file from being compil
 since LVGL's `lv_ftsystem.c` has custom versions of the functions defined therein.
 
 The font style supports *Italic* and **Bold** fonts processed by
-software, and can be set by using following values where style values are required:
+software, and can be set by using the following values where style values are required:
 
 - <ApiLink name="LV_FREETYPE_FONT_STYLE_NORMAL" />: Default style.
 - <ApiLink name="LV_FREETYPE_FONT_STYLE_ITALIC" />: Italic style.
@@ -130,7 +130,7 @@ This is achieved by setting the style attributes with the
 You will have to account for the increased width and height of letter due to the added letter outline,
 to avoid letters overlapping space them out using <ApiLink name="lv_style_set_text_letter_space" />
 
-To use vector fonts with ThorVG, you will have to enable <ApiLink name="LV_USE_VECTOR_GRAPHICS" /> in `lv_conf.h`
+To use vector fonts with ThorVG, you will have to enable <ApiLink name="LV_USE_VECTOR_GRAPHIC" /> in `lv_conf.h`
 
 <Callout type="info">
 This feature is currently experimental, there are clipping issues especially when using large font sizes.

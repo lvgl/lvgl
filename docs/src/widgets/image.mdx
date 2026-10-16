@@ -82,11 +82,11 @@ A color can be mixed with every pixel of an image with a given
 intensity. This can be useful to show different states (checked,
 inactive, pressed, etc.) of an image without storing more versions of
 the same image. This feature can be enabled in the style by setting
-`img_recolor_opa` between <ApiLink name="LV_OPA_TRANSP" /> (no recolor, value: 0) and
+`image_recolor_opa` between <ApiLink name="LV_OPA_TRANSP" /> (no recolor, value: 0) and
 <ApiLink name="LV_OPA_COVER" /> (full recolor, value: 255). The default value is
 <ApiLink name="LV_OPA_TRANSP" /> causing this feature to be disabled.
 
-The color to mix is set by `img_recolor`.
+The color to mix is set by `image_recolor`.
 
 This example binds `image_recolor_opa` to a subject via `<bind_style_prop>`
 and drives that subject from a slider — moving the slider retints the

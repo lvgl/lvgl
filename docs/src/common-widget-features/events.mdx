@@ -33,7 +33,7 @@ static void my_event_cb(lv_event_t * event)
 ```
 
 In the example <ApiLink name="LV_EVENT_CLICKED" /> means that only the click event will
-call `my_event_cb`. See the [list of event codes](/common-widget-features/events) for
+call `my_event_cb`. See the [list of event codes](#event-codes) for
 all the options. <ApiLink name="LV_EVENT_ALL" /> can be used to receive all events.
 
 The last parameter of <ApiLink name="lv_obj_add_event_cb" /> is a pointer to any custom
@@ -63,7 +63,7 @@ lv_obj_add_event_cb(widget, increment_on_click, LV_EVENT_CLICKED, &num1);
 lv_obj_add_event_cb(widget, increment_on_click, LV_EVENT_CLICKED, &num2);
 ```
 
-The events will be called in the order as they were added.
+The events will be called in the order they were added.
 
 Other Widgets can use the same *event callback*.
 
@@ -93,12 +93,12 @@ for(i = 0; i < event_cnt; i++) {
 The event codes can be grouped into these categories: - Input device
 events - Drawing events - Other events - Special events - Custom events
 
-All Widgets (such as Buttons/Labels/Sliders etc.) regardless their type
+All Widgets (such as Buttons/Labels/Sliders etc.) regardless of their type
 receive the *Input device*, *Drawing* and *Other* events.
 
 However, the *Special events* are specific to a particular widget type.
 See the [widgets' documentation](/widgets) to learn when they
-are sent,
+are sent.
 
 *Custom events* are added by the user and are never sent by LVGL.
 
@@ -116,7 +116,7 @@ The following event codes exist:
 - <ApiLink name="LV_EVENT_LONG_PRESSED" />: Widget has been pressed for at least `long_press_time`.  Not called if scrolled.
 - <ApiLink name="LV_EVENT_LONG_PRESSED_REPEAT" />: Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.
 - <ApiLink name="LV_EVENT_CLICKED" />: Called on release if not scrolled (regardless of long press)
-- <ApiLink name="LV_EVENT_RELEASED" />: Called in every cases when Widget has been released
+- <ApiLink name="LV_EVENT_RELEASED" />: Called in every case when Widget has been released
 - <ApiLink name="LV_EVENT_SCROLL_BEGIN" />: Scrolling begins. The event parameter is a pointer to the animation of the scroll. Can be modified
 - <ApiLink name="LV_EVENT_SCROLL_THROW_BEGIN" />:
 - <ApiLink name="LV_EVENT_SCROLL_END" />: Scrolling ends
@@ -157,8 +157,8 @@ indicating that invalidating an area is not allowed during rendering.
 
 ### Special Events
 
-- <ApiLink name="LV_EVENT_VALUE_CHANGED" />: Widget's value has changed (i.e. slider moved)
-- <ApiLink name="LV_EVENT_INSERT" />: A text is inserted to Widget. The event data is `char *` being inserted.
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" />: Widget's value has changed (e.g. slider moved)
+- <ApiLink name="LV_EVENT_INSERT" />: A text is inserted into the Widget. The event data is `char *` being inserted.
 - <ApiLink name="LV_EVENT_REFRESH" />: Notify Widget to refresh something on it (for the user)
 - <ApiLink name="LV_EVENT_READY" />: A process has finished
 - <ApiLink name="LV_EVENT_CANCEL" />: A process has been cancelled
@@ -186,10 +186,10 @@ indicating that invalidating an area is not allowed during rendering.
 
 ### Display Events
 
-- <ApiLink name="LV_EVENT_INVALIDATE_AREA" /> An area is invalidated (marked for redraw).
+- <ApiLink name="LV_EVENT_INVALIDATE_AREA" />: An area is invalidated (marked for redraw).
   <ApiLink name="lv_event_get_param" display="lv_event_get_param(e)" /> returns a pointer to an <ApiLink name="lv_area_t" />
   object with the coordinates of the area to be invalidated. The area can
-  be freely modified if needed to adapt it a special requirement of the
+  be freely modified if needed to adapt it to a special requirement of the
   display. Usually needed with monochrome displays to invalidate `N x 8`
   rows or columns in one pass.
 - <ApiLink name="LV_EVENT_RESOLUTION_CHANGED" />: Sent when the resolution changes due
@@ -209,7 +209,7 @@ indicating that invalidating an area is not allowed during rendering.
   `wait_for_flushing()` -- happens whether or not any waiting will actually occur.
   Call returns immediately if `disp->flushing == 0`.
 - <ApiLink name="LV_EVENT_FLUSH_WAIT_FINISH" />: Sent when the call to `wait_for_flushing()`
-  is about to return, regardless whether any actual waiting occurred.
+  is about to return, regardless of whether any actual waiting occurred.
 - <ApiLink name="LV_EVENT_SCREEN_UNLOAD_START" />: Sent when a screen starts to be unloaded on this display
 - <ApiLink name="LV_EVENT_SCREEN_LOAD_START" />: Sent when a screen starts to be loaded on this display
 - <ApiLink name="LV_EVENT_SCREEN_LOADED" />: Sent when a screen finishes being loaded on this display
@@ -248,8 +248,8 @@ lv_obj_send_event(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 ```
 
 The same works for display and input devices with
-`lv_display_send_event(widget, <EVENT_CODE>, &some_data)` and
-`lv_indev_send_event(widget, <EVENT_CODE>, &some_data)`.
+`lv_display_send_event(disp, <EVENT_CODE>, &some_data)` and
+`lv_indev_send_event(indev, <EVENT_CODE>, &some_data)`.
 
 ## Fields of lv_event_t
 
@@ -258,10 +258,10 @@ contains all data about the event. The following values can be retrieved from it
 
 - <ApiLink name="lv_event_get_code" display="lv_event_get_code(e)" />: get the event code
 - <ApiLink name="lv_event_get_current_target" display="lv_event_get_current_target(e)" />: get Widget to which an event was sent. I.e. the Widget whose event handler is being called.
-- <ApiLink name="lv_event_get_target" display="lv_event_get_target(e)" />: get the Widget, Display or Indev that originally triggered the event (different from <ApiLink name="lv_event_get_current_target" /> if [event bubbling](/common-widget-features/events) is enabled).
+- <ApiLink name="lv_event_get_target" display="lv_event_get_target(e)" />: get the Widget, Display or Indev that originally triggered the event (different from <ApiLink name="lv_event_get_current_target" /> if [event bubbling](#event-bubbling) is enabled).
 - <ApiLink name="lv_event_get_target_obj" display="lv_event_get_target_obj(e)" />: get the Widget that originally triggered the event.
 - <ApiLink name="lv_event_get_user_data" display="lv_event_get_user_data(e)" />: get the pointer passed as the last parameter of <ApiLink name="lv_obj_add_event_cb" />.
-- <ApiLink name="lv_event_get_param" display="lv_event_get_param(e)" />: get the parameter passed as the last parameter of <ApiLink name="lv_obj_send_event_cb" />
+- <ApiLink name="lv_event_get_param" display="lv_event_get_param(e)" />: get the parameter passed as the last parameter of <ApiLink name="lv_obj_send_event" />
 
 <Callout type="info">
 When using C++, prefer <ApiLink name="lv_event_get_target_obj" display="lv_event_get_target_obj(e)" /> over <ApiLink name="lv_event_get_target" display="lv_event_get_target(e)" />

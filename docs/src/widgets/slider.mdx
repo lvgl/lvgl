@@ -16,7 +16,7 @@ Defaults: `value` = 0, range = `[0..100]`, horizontal orientation,
 width/height roughly 2"/0.1" (scaled by <ApiLink name="LV_DPI_DEF" />).
 
 - <ApiLink name="lv_slider_set_value" display="lv_slider_set_value(slider, v, LV_ANIM_ON/OFF)" /> — animation length
-  comes from the `anim_time` style.
+  comes from the `anim_duration` style.
 - <ApiLink name="lv_slider_set_range" display="lv_slider_set_range(slider, min, max)" /> — pass `min > max` to flip
   the drawing direction (e.g. `100..0` for a right-to-left fill).
 - <ApiLink name="lv_slider_set_orientation" display="lv_slider_set_orientation(slider, LV_SLIDER_ORIENTATION_*)" /> —
@@ -37,9 +37,9 @@ orientation — useful for right-to-left progress or top-down level meters.
 The Slider can be in one of the following modes:
 
 - <ApiLink name="LV_SLIDER_MODE_NORMAL" /> A normal Slider as described above (default)
-- <ApiLink name="LV_SLIDER_SYMMETRICAL" /> Draw the indicator from the zero value to
+- <ApiLink name="LV_SLIDER_MODE_SYMMETRICAL" /> Draw the indicator from the zero value to
   current value. Requires negative minimum range and positive maximum range.
-- <ApiLink name="LV_SLIDER_RANGE" /> Allows setting the start value as well by
+- <ApiLink name="LV_SLIDER_MODE_RANGE" /> Allows setting the start value as well by
   <ApiLink name="lv_slider_set_start_value" display="lv_slider_set_start_value(slider, new_value, LV_ANIM_ON/OFF)" />. The start
   value must always be smaller than the end value.
 
@@ -104,7 +104,7 @@ changes, every widget bound to it updates automatically; and an
 interactive widget can write back into the subject so other subscribers
 see the new value.
 
-A Slider binds its integer value to a Subject. The link is two-way: the
+A Slider binds its value to a Subject. The link is two-way: the
 end user's drag updates the subject, and any application-side write into
 the subject moves the knob. Integer and float subjects are both supported.
 

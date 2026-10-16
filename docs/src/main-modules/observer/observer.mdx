@@ -12,7 +12,7 @@ This implementation consists of:
 | Field | Description |
 |-------|-------------|
 | `Subjects` | (in global memory or heap) are "logic packages", each containing the value being "observed" and its type (integer (`int32_t`), a string, a pointer, an <ApiLink name="lv_color_t" />, a `float`, or a group); |
-| `Observers` | (zero or more per Subject, always dynamically-allocated) are always attached to exactly one Subject, and provide user-defined notifications each the time Subject's value changes. |
+| `Observers` | (zero or more per Subject, always dynamically-allocated) are always attached to exactly one Subject, and provide user-defined notifications each time the Subject's value changes. |
 
 A Subject and its Observers can be used in various ways:
 
@@ -127,6 +127,7 @@ The following functions are used to update a Subject's value:
 | Field | Description |
 |-------|-------------|
 | `Integer` | void <ApiLink name="lv_subject_set_int" display="lv_subject_set_int(subject, int_value)" /> |
+| `Float` | void <ApiLink name="lv_subject_set_float" display="lv_subject_set_float(subject, float_value)" /> |
 | `String` | void <ApiLink name="lv_subject_set_string" display="lv_subject_set_string(subject, buf)" /> |
 | `Pointer` | void <ApiLink name="lv_subject_set_pointer" display="lv_subject_set_pointer(subject, ptr)" /> |
 | `Color` | void <ApiLink name="lv_subject_set_color" display="lv_subject_set_color(subject, color)" /> |
@@ -194,10 +195,10 @@ used. This is covered below.
 
 Alternately, if you want to bind a Subject's value to a Widget's property, one
 of the `lv_<widget_type>_bind_...()` functions can be used.  See
-[Widget Binding](/main-modules/data_binding) for more details.
+[Widget Binding](#widget-binding) for more details.
 
 By using  `lv_obj_add_subject_...()` it's also possible to change a subject's value
-on a trigger. It's covered in [change subject on event](/widgets/scale)
+on a trigger. It's covered in [change subject on event](#change-subject-on-event)
 
 For the most basic use case, subscribe to a Subject by using the following function:
 
@@ -220,7 +221,7 @@ both unsubscribes it from the Subject and deletes it from the LVGL heap.
 
 #### Subscribing While Associating Observer with a Non-Widget Object
 
-The function subscribes to a Subject additionally associates the Observer with a
+The function subscribes to a Subject and additionally associates the Observer with a
 pointer to any type of object, a copy of which is saved in the Observer's `target`
 field.  This function should be used when the pointer *does not* point to a Widget.
 
@@ -240,7 +241,7 @@ Subject.  A copy of the pointer to that Widget is saved in the Observer's `targe
 field.  This works exactly like the above method except that when the Widget is
 deleted, the Observer thus created will be automatically unsubscribed from the
 Subject and deleted from the LVGL heap.  Note this is different from
-[Widget Binding](/main-modules/data_binding).
+[Widget Binding](#widget-binding).
 
 lv_observer_t * observer =  <ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj(&some_subject, some_observer_cb, widget, user_data)" />
 
@@ -267,10 +268,10 @@ from memory using any of the methods below, depending on the effect you want to 
       from all associated Subjects.
     - <ApiLink name="lv_subject_delete" display="lv_subject_delete(subject)" /> gracefully disconnects `subject` from
       all associated Observers and Widget events, and frees it.  This includes subscriptions made
-      using any of the [Widget Binding](/main-modules/data_binding) functions covered below.
+      using any of the [Widget Binding](#widget-binding) functions covered below.
     - <ApiLink name="lv_observer_delete" display="lv_observer_delete(observer)" /> deletes that specific Observer and
       gracefully disconnects it from its `subject` and any associated Widgets,
-      where `observer` is the return value any of the above
+      where `observer` is the return value of any of the above
       `lv_subject_add_observer_...()` functions.
 
 ### Subject Groups
@@ -414,9 +415,9 @@ Note: these callbacks are **not** automatically removed when a subject is de-ini
 
 ##### Toggle
 
-<ApiLink name="lv_obj_add_subject_toggle_event" display="lv_obj_add_subject_toggle_event(obj, subject)" />
+<ApiLink name="lv_obj_add_subject_toggle_event" display="lv_obj_add_subject_toggle_event(obj, subject, trigger)" />
 
-Toggle the subjects value when the trigger happens. IF the value was not 0, it will be 0.
+Toggle the subject's value when the trigger happens. If the value was not 0, it will be 0.
 If it was 0 it will be 1.
 
 For example:
