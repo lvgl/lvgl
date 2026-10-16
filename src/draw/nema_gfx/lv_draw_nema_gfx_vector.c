@@ -45,15 +45,14 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_nema_gfx_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc,
-                             const lv_area_t * coords)
+void lv_draw_nema_gfx_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_vector_dsc_t * dsc, const lv_area_t * coords)
 {
     ctx_t c;
-    c.u = (lv_draw_nema_gfx_unit_t *) t->draw_unit;
+    c.u = (lv_draw_nema_gfx_unit_t *) draw_unit;
 
-    lv_layer_t * layer = t->target_layer;
     lv_area_t rel_clip_area;
-    rel_clip_area = t->clip_area;
+    rel_clip_area = *clip_area;
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     c.rel_translate_x = -layer->buf_area.x1;
