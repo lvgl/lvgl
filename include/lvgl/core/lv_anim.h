@@ -157,6 +157,7 @@ struct _lv_anim_t {
                                                * time animation timer executes), indicates this animation needs to be updated. */
     uint8_t start_cb_called : 1;              /**< Indicates that `start_cb` was already called */
     uint8_t early_apply  : 1;                 /**< 1: Apply start value immediately even is there is a `delay` */
+    struct _lv_anim_t * var_index_next;       /**< Internal: the next animation in the same `var` lookup bucket. Do not modify. */
 };
 
 /**********************
