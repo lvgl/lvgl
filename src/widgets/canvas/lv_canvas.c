@@ -467,9 +467,12 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_ASSERT(obj != NULL);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    if(canvas->draw_buf == NULL) return;
 
-    lv_image_cache_drop(&canvas->draw_buf);
+    /*Only static_buf is owned by the canvas and still valid here. A draw_buf
+     *set via lv_canvas_set_draw_buf() belongs to the caller, who may free it
+     *in an LV_EVENT_DELETE handler or before lv_obj_delete() (#10824).*/
+    if(canvas->draw_buf == &canvas->static_buf) lv_image_cache_drop(&canvas->static_buf);
+    canvas->draw_buf = NULL;
 }
 static bool layer_is_descendant(const lv_layer_t * layer, const lv_layer_t * ancestor)
 {
