@@ -376,7 +376,6 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_dave2d_unit_t * draw_dave2d_unit = (lv_draw_dave2d_unit_t *) draw_unit;
-    uint32_t deps = 0;
 
     if(draw_dave2d_unit->task_act) {
         /* Return immediately if it's busy with draw task */
@@ -407,7 +406,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 
     /*Disable the command buffer as a temporary fix to rendering issues. */
 #if 0
-    deps = lv_draw_get_dependent_count(t);
+    uint32_t deps = lv_draw_get_dependent_count(t);
     if(deps > 0 || draw_pressure > 0) {
         draw_pressure += deps;
         if(draw_pressure < LV_DAVE2D_MAX_DRAW_PRESSURE) {
@@ -464,7 +463,7 @@ static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit)
      * has been maxed out, defer the block of tasks to be rendered by the
      * Dave and wait for its interrupt. (Dave2D driver is RTOS aware, no need for semaphores);
      */
-    lv_draw_dave2d_unit_t * draw_dave2d_unit = (lv_draw_dave2d_unit_t *) draw_unit;
+    LV_UNUSED(draw_unit);
 
     if(!draw_pressure) {
         /* It reached here because Dave2D Draw Unit was not suitable to take a task
