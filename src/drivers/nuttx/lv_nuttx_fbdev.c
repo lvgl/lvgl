@@ -150,7 +150,16 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     uint32_t h = dsc->vinfo.yres;
     uint32_t stride = dsc->pinfo.stride;
     uint32_t data_size = h * stride;
-    lv_draw_buf_init(&dsc->buf1, w, h, color_format, stride, dsc->mem, data_size);
+    /* Compute visible memory start offset based on planeinfo offsets */
+    uint32_t px_size = lv_color_format_get_size(color_format);
+    uint32_t fb_offset = (dsc->pinfo.yoffset * stride) + (dsc->pinfo.xoffset * px_size);
+    if(fb_offset + data_size > dsc->pinfo.fblen) {
+        LV_LOG_ERROR("Framebuffer geometry exceeds fblen (%zu > %zu)",
+                     (size_t)(fb_offset + data_size), dsc->pinfo.fblen);
+        ret = -EINVAL;
+        goto errout;
+    }
+    lv_draw_buf_init(&dsc->buf1, w, h, color_format, stride, (uint8_t *)dsc->mem + fb_offset, data_size);
 
     /* Check buffer mode */
     bool double_buffer = dsc->pinfo.yres_virtual >= (dsc->vinfo.yres * 2);
@@ -264,9 +273,25 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
 
     if(dsc->mem_off_screen) {
-        /* When rendering in off-screen mode, copy the drawing buffer to fb */
-        /* buf2(off-screen buffer) -> buf1(fbmem)*/
-        lv_draw_buf_copy(&dsc->buf1, area, &dsc->buf2, area);
+        lv_color_format_t cf = lv_display_get_color_format(disp);
+        if(cf == LV_COLOR_FORMAT_ARGB8888 || cf == LV_COLOR_FORMAT_XRGB8888) {
+            /* Ensure opaque alpha (0xFF000000) during line-by-line copy */
+            int32_t y;
+            int32_t w = lv_area_get_width(area);
+            uint32_t stride = dsc->pinfo.stride;
+            for(y = area->y1; y <= area->y2; y++) {
+                uint32_t * dst = (uint32_t *)((uint8_t *)dsc->buf1.data + (y * stride)) + area->x1;
+                uint32_t * src = (uint32_t *)((uint8_t *)dsc->buf2.data + (y * stride)) + area->x1;
+                int32_t x;
+                for(x = 0; x < w; x++) {
+                    dst[x] = src[x] | 0xff000000u;
+                }
+            }
+        }
+        else {
+            /* Fallback to direct draw buffer copy */
+            lv_draw_buf_copy(&dsc->buf1, area, &dsc->buf2, area);
+        }
     }
 
     /* Skip the non-last flush */
@@ -328,7 +353,11 @@ static lv_color_format_t fb_fmt_to_color_format(int fmt)
         case FB_FMT_RGB24:
             return LV_COLOR_FORMAT_RGB888;
         case FB_FMT_RGB32:
-            return LV_COLOR_FORMAT_XRGB8888;
+            /* Use ARGB8888 instead of XRGB8888 so that LVGL renders an opaque (0xFF)
+             * alpha channel. Hardware display controllers and HDMI bridges in 32-bpp mode
+             * treat alpha=0x00 as transparent, resulting in black or distorted displays.
+             */
+            return LV_COLOR_FORMAT_ARGB8888;
         case FB_FMT_RGBA32:
             return LV_COLOR_FORMAT_ARGB8888;
         default:
