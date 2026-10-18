@@ -47,6 +47,7 @@ typedef struct {
     void * mem_off_screen;
     uint32_t mem2_yoffset;
     uint32_t mem3_yoffset;
+    uint32_t mem2_fblen;
 
     lv_draw_buf_t buf1;
     lv_draw_buf_t buf2;
@@ -62,6 +63,7 @@ static lv_color_format_t fb_fmt_to_color_format(int fmt);
 static int fbdev_get_pinfo(int fd, struct fb_planeinfo_s * pinfo);
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc);
 static int fbdev_init_mem3(lv_nuttx_fb_t * dsc);
+static void fbdev_cleanup(lv_nuttx_fb_t * dsc);
 static void display_refr_timer_cb(lv_timer_t * tmr);
 static void display_release_cb(lv_event_t * e);
 #if defined(CONFIG_FB_UPDATE)
@@ -106,7 +108,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     LV_ASSERT(disp && file);
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
 
-    if(dsc->fd >= 0) close(dsc->fd);
+    fbdev_cleanup(dsc);
 
     /* Open the file for reading and writing*/
 
@@ -135,13 +137,14 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
 
     lv_color_format_t color_format = fb_fmt_to_color_format(dsc->vinfo.fmt);
     if(color_format == LV_COLOR_FORMAT_UNKNOWN) {
+        ret = -EINVAL;
         goto errout;
     }
 
     dsc->mem = mmap(NULL, dsc->pinfo.fblen, PROT_READ | PROT_WRITE,
                     MAP_SHARED | MAP_FILE, dsc->fd, 0);
     if(dsc->mem == MAP_FAILED) {
-        LV_LOG_ERROR("ioctl(FBIOGET_PLANEINFO) failed: %d", errno);
+        LV_LOG_ERROR("mmap failed: %d", errno);
         ret = -errno;
         goto errout;
     }
@@ -150,25 +153,44 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     uint32_t h = dsc->vinfo.yres;
     uint32_t stride = dsc->pinfo.stride;
     uint32_t data_size = h * stride;
-    /* Compute visible memory start offset based on planeinfo offsets */
     uint32_t px_size = lv_color_format_get_size(color_format);
+
+    if(w == 0 || h == 0 || stride == 0) {
+        LV_LOG_ERROR("Invalid display geometry: %" LV_PRIu32 "x%" LV_PRIu32 ", stride: %" LV_PRIu32, w, h, stride);
+        ret = -EINVAL;
+        goto errout;
+    }
+
+    if((dsc->pinfo.xoffset + w) * px_size > stride) {
+        LV_LOG_ERROR("Framebuffer geometry exceeds stride (%zu > %zu)",
+                     (size_t)(dsc->pinfo.xoffset + w) * px_size, (size_t)stride);
+        ret = -EINVAL;
+        goto errout;
+    }
+
+    /* Check buffer mode */
+    bool double_buffer = dsc->pinfo.yres_virtual >= (dsc->vinfo.yres * 2);
+    if(double_buffer) {
+        dsc->pinfo.yoffset = 0;
+    }
+
+    /* Compute visible memory start offset based on planeinfo offsets */
     uint32_t fb_offset = (dsc->pinfo.yoffset * stride) + (dsc->pinfo.xoffset * px_size);
-    if(fb_offset + data_size > dsc->pinfo.fblen) {
+    size_t last_pixel_offset = (size_t)fb_offset + (size_t)(h - 1) * stride + (size_t)w * px_size;
+    if(last_pixel_offset > dsc->pinfo.fblen) {
         LV_LOG_ERROR("Framebuffer geometry exceeds fblen (%zu > %zu)",
-                     (size_t)(fb_offset + data_size), dsc->pinfo.fblen);
+                     last_pixel_offset, dsc->pinfo.fblen);
         ret = -EINVAL;
         goto errout;
     }
     lv_draw_buf_init(&dsc->buf1, w, h, color_format, stride, (uint8_t *)dsc->mem + fb_offset, data_size);
 
-    /* Check buffer mode */
-    bool double_buffer = dsc->pinfo.yres_virtual >= (dsc->vinfo.yres * 2);
     if(double_buffer) {
         if((ret = fbdev_init_mem2(dsc)) < 0) {
             goto errout;
         }
 
-        lv_draw_buf_init(&dsc->buf2, w, h, color_format, stride, dsc->mem2, data_size);
+        lv_draw_buf_init(&dsc->buf2, w, h, color_format, stride, (uint8_t *)dsc->mem2 + fb_offset, data_size);
         lv_display_set_draw_buffers(disp, &dsc->buf1, &dsc->buf2);
 
         bool triple_buffer = dsc->pinfo.yres_virtual >= (dsc->vinfo.yres * 3);
@@ -177,7 +199,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
                 goto errout;
             }
 
-            lv_draw_buf_init(&dsc->buf3, w, h, color_format, stride, dsc->mem3, data_size);
+            lv_draw_buf_init(&dsc->buf3, w, h, color_format, stride, (uint8_t *)dsc->mem3 + fb_offset, data_size);
             lv_display_set_3rd_draw_buffer(disp, &dsc->buf3);
         }
     }
@@ -209,8 +231,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     return 0;
 
 errout:
-    close(dsc->fd);
-    dsc->fd = -1;
+    fbdev_cleanup(dsc);
     return ret;
 }
 
@@ -444,6 +465,7 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
         return -errno;
     }
     dsc->mem2 = mem2;
+    dsc->mem2_fblen = fblen;
 
     LV_LOG_USER("Use of %sconsecutive mem2 = %p, yoffset = %" LV_PRIu32, is_consecutive ? "" : "non-", dsc->mem2,
                 dsc->mem2_yoffset);
@@ -505,6 +527,32 @@ static int fbdev_init_mem3(lv_nuttx_fb_t * dsc)
     return 0;
 }
 
+static void fbdev_cleanup(lv_nuttx_fb_t * dsc)
+{
+    if(dsc->mem_off_screen) {
+        free(dsc->mem_off_screen);
+        dsc->mem_off_screen = NULL;
+    }
+
+    if(dsc->mem2 != NULL && dsc->mem2 != MAP_FAILED) {
+        munmap(dsc->mem2, dsc->mem2_fblen);
+        dsc->mem2 = NULL;
+        dsc->mem2_fblen = 0;
+    }
+
+    if(dsc->mem != NULL && dsc->mem != MAP_FAILED) {
+        munmap(dsc->mem, dsc->pinfo.fblen);
+        dsc->mem = NULL;
+    }
+
+    if(dsc->fd >= 0) {
+        close(dsc->fd);
+        dsc->fd = -1;
+    }
+
+    dsc->mem3 = NULL;
+}
+
 static void display_release_cb(lv_event_t * e)
 {
     lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
@@ -513,16 +561,7 @@ static void display_release_cb(lv_event_t * e)
         lv_display_set_driver_data(disp, NULL);
         lv_display_set_flush_cb(disp, NULL);
 
-        if(dsc->fd >= 0) {
-            close(dsc->fd);
-            dsc->fd = -1;
-        }
-
-        if(dsc->mem_off_screen) {
-            /* Free the off-screen buffer */
-            free(dsc->mem_off_screen);
-            dsc->mem_off_screen = NULL;
-        }
+        fbdev_cleanup(dsc);
 
         lv_free(dsc);
     }
