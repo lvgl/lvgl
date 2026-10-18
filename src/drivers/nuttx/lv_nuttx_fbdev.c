@@ -63,7 +63,7 @@ static lv_color_format_t fb_fmt_to_color_format(int fmt);
 static int fbdev_get_pinfo(int fd, struct fb_planeinfo_s * pinfo);
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc);
 static int fbdev_init_mem3(lv_nuttx_fb_t * dsc);
-static void fbdev_cleanup(lv_nuttx_fb_t * dsc);
+static void fbdev_cleanup(lv_display_t * disp, lv_nuttx_fb_t * dsc);
 static void display_refr_timer_cb(lv_timer_t * tmr);
 static void display_release_cb(lv_event_t * e);
 #if defined(CONFIG_FB_UPDATE)
@@ -108,7 +108,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     LV_ASSERT(disp && file);
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
 
-    fbdev_cleanup(dsc);
+    fbdev_cleanup(disp, dsc);
 
     /* Open the file for reading and writing*/
 
@@ -221,6 +221,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
+    lv_timer_resume(disp->refr_timer);
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_display_set_matrix_rotation(disp, true);
@@ -231,7 +232,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     return 0;
 
 errout:
-    fbdev_cleanup(dsc);
+    fbdev_cleanup(disp, dsc);
     return ret;
 }
 
@@ -527,8 +528,18 @@ static int fbdev_init_mem3(lv_nuttx_fb_t * dsc)
     return 0;
 }
 
-static void fbdev_cleanup(lv_nuttx_fb_t * dsc)
+static void fbdev_cleanup(lv_display_t * disp, lv_nuttx_fb_t * dsc)
 {
+    if(disp) {
+        if(disp->refr_timer) {
+            lv_timer_pause(disp->refr_timer);
+        }
+        disp->buf_1 = NULL;
+        disp->buf_2 = NULL;
+        disp->buf_3 = NULL;
+        disp->buf_act = NULL;
+    }
+
     if(dsc->mem_off_screen) {
         free(dsc->mem_off_screen);
         dsc->mem_off_screen = NULL;
@@ -561,7 +572,7 @@ static void display_release_cb(lv_event_t * e)
         lv_display_set_driver_data(disp, NULL);
         lv_display_set_flush_cb(disp, NULL);
 
-        fbdev_cleanup(dsc);
+        fbdev_cleanup(disp, dsc);
 
         lv_free(dsc);
     }
