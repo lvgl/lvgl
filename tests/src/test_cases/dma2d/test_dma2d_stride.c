@@ -37,6 +37,18 @@ static lv_image_dsc_t img_dsc = {
     .data = (const uint8_t *)img_pixels,
 };
 
+static lv_image_dsc_t img_xrgb_dsc = {
+    .header = {
+        .magic = LV_IMAGE_HEADER_MAGIC,
+        .cf = LV_COLOR_FORMAT_XRGB8888,
+        .w = IMG_W,
+        .h = IMG_H,
+        .stride = IMG_STRIDE,
+    },
+    .data_size = sizeof(img_pixels),
+    .data = (const uint8_t *)img_pixels,
+};
+
 static void disp_create(lv_display_render_mode_t mode, bool padded_stride, uint32_t * stride);
 static void disp_delete(void);
 static void run_scene(scene_cb_t scene, check_cb_t check, bool padded_stride);
@@ -133,6 +145,63 @@ static void check_image(uint32_t stride_px)
 void test_image_uses_buffer_stride(void)
 {
     run_scene(scene_image, check_image, true);
+}
+
+static void scene_image_xrgb(lv_opa_t opa)
+{
+    refr_screen_set_color(REFR_COLOR_BLACK);
+    lv_obj_t * img = lv_image_create(refr_screen());
+    lv_image_set_src(img, &img_xrgb_dsc);
+    lv_obj_set_pos(img, 5, 5);
+    lv_obj_set_style_image_opa(img, opa, 0);
+}
+
+static void check_image_xrgb(lv_draw_dma2d_mode_t mode, uint32_t alpha)
+{
+    uint32_t i;
+    uint32_t cnt = 0;
+    for(i = 0; i < lv_test_dma2d_count(); i++) {
+        const DMA2D_TypeDef * t = lv_test_dma2d_get(i);
+        if(transfer_mode(t) != mode) continue;
+        TEST_ASSERT_EQUAL_UINT32_MESSAGE(IMG_W, transfer_w(t), mode_name);
+        TEST_ASSERT_EQUAL_UINT32_MESSAGE(alpha, (t->FGPFCCR >> DMA2D_FGPFCCR_ALPHA_Pos) & 0xff, mode_name);
+        TEST_ASSERT_EQUAL_UINT32_MESSAGE(LV_DRAW_DMA2D_ALPHA_MODE_REPLACE_ALPHA_CHANNEL,
+                                         (t->FGPFCCR >> DMA2D_FGPFCCR_AM_Pos) & 0x3, mode_name);
+        cnt++;
+    }
+    TEST_ASSERT_EQUAL_UINT32_MESSAGE(1, cnt, mode_name);
+}
+
+static void scene_image_xrgb_opa_50(void)
+{
+    scene_image_xrgb(LV_OPA_50);
+}
+
+static void check_image_xrgb_opa_50(uint32_t stride_px)
+{
+    LV_UNUSED(stride_px);
+    check_image_xrgb(LV_DRAW_DMA2D_MODE_MEMORY_TO_MEMORY_WITH_BLENDING, LV_OPA_50);
+}
+
+void test_xrgb8888_image_keeps_opa(void)
+{
+    run_scene(scene_image_xrgb_opa_50, check_image_xrgb_opa_50, false);
+}
+
+static void scene_image_xrgb_opa_254(void)
+{
+    scene_image_xrgb(LV_OPA_COVER - 1);
+}
+
+static void check_image_xrgb_opa_254(uint32_t stride_px)
+{
+    LV_UNUSED(stride_px);
+    check_image_xrgb(LV_DRAW_DMA2D_MODE_MEMORY_TO_MEMORY_WITH_PFC, LV_OPA_COVER);
+}
+
+void test_xrgb8888_image_near_cover_is_opaque(void)
+{
+    run_scene(scene_image_xrgb_opa_254, check_image_xrgb_opa_254, false);
 }
 
 void test_automatic_stride_unchanged(void)
