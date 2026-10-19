@@ -125,10 +125,10 @@ static void lv_draw_dma2d_image_core(lv_layer_t * layer, const lv_draw_image_dsc
         }
     }
 
-    /* Alpha channel should be treated as 0xFF if the cf is XRGB */
+    /* The alpha byte of XRGB is ignored, so replace it with the image opacity */
     if(image_cf == LV_COLOR_FORMAT_XRGB8888) {
         conf.fg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_REPLACE_ALPHA_CHANNEL;
-        conf.fg_alpha = 0xff;
+        conf.fg_alpha = opa >= LV_OPA_MAX ? 0xff : opa;
     }
     if(output_cf == LV_COLOR_FORMAT_XRGB8888) {
         conf.bg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_REPLACE_ALPHA_CHANNEL;
