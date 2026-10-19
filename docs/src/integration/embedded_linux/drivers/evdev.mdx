@@ -19,17 +19,6 @@ An input device under `/dev/input/`, typically `/dev/input/event0`, and permissi
 
 Enable <ApiLink name="LV_USE_EVDEV" />.
 
-## Building
-
-The driver always requires `libevdev`.
-
-<Callout type="tip">
-LVGL's CMake integration resolves both.
-Make sure the required libraries  are present on your system or in your sysroot.
-
-See [Dependency Management](/integration/building/cmake).
-</Callout>
-
 ## Usage
 
 Create an input device with <ApiLink name="lv_evdev_create" />, giving it the device type and node path, then

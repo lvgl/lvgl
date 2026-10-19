@@ -64,10 +64,6 @@ if(CONFIG_LV_USE_WAYLAND OR CONFIG_LV_USE_LIBINPUT)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/xkbcommon.cmake)
 endif()
 
-if(CONFIG_LV_USE_EVDEV)
-  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/evdev.cmake)
-endif()
-
 if(CONFIG_LV_USE_LIBINPUT)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/libinput.cmake)
 endif()
