@@ -48,6 +48,7 @@ typedef struct {
     uint32_t mem2_yoffset;
     uint32_t mem3_yoffset;
     uint32_t mem2_fblen;
+    uint32_t mem3_fblen;
 
     lv_draw_buf_t buf1;
     lv_draw_buf_t buf2;
@@ -180,6 +181,11 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         ret = -EINVAL;
         goto errout;
     }
+    if(px_size > 0 && dsc->pinfo.xoffset > SIZE_MAX / px_size) {
+        LV_LOG_ERROR("xoffset * px_size overflows size_t");
+        ret = -EINVAL;
+        goto errout;
+    }
     size_t y_part = (size_t)dsc->pinfo.yoffset * stride;
     size_t x_part = (size_t)dsc->pinfo.xoffset * px_size;
     if(SIZE_MAX - y_part < x_part) {
@@ -214,6 +220,13 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         bool triple_buffer = dsc->pinfo.yres_virtual >= (dsc->vinfo.yres * 3);
         if(triple_buffer) {
             if((ret = fbdev_init_mem3(dsc)) < 0) {
+                goto errout;
+            }
+
+            if(SIZE_MAX - fb_offset < data_size || fb_offset + data_size > dsc->mem3_fblen) {
+                LV_LOG_ERROR("Framebuffer mem3 geometry exceeds mem3_fblen (%zu > %zu)",
+                             fb_offset + data_size, (size_t)dsc->mem3_fblen);
+                ret = -EINVAL;
                 goto errout;
             }
 
@@ -550,12 +563,15 @@ static int fbdev_init_mem3(lv_nuttx_fb_t * dsc)
     if(buf_offset == 0) {
         dsc->mem3_yoffset = dsc->vinfo.yres * 2;
         dsc->mem3 = (uint8_t *)pinfo.fbmem + dsc->mem3_yoffset * pinfo.stride;
+        uint32_t offset = dsc->mem3_yoffset * pinfo.stride;
+        dsc->mem3_fblen = pinfo.fblen > offset ? pinfo.fblen - offset : 0;
         LV_LOG_USER("Use consecutive mem3 = %p, yoffset = %" LV_PRIu32,
                     dsc->mem3, dsc->mem3_yoffset);
     }
     else {
         dsc->mem3_yoffset = buf_offset / dsc->pinfo.stride;
         dsc->mem3 = pinfo.fbmem;
+        dsc->mem3_fblen = pinfo.fblen;
         LV_LOG_USER("Use non-consecutive mem3 = %p, yoffset = %" LV_PRIu32,
                     dsc->mem3, dsc->mem3_yoffset);
     }
@@ -597,6 +613,7 @@ static void fbdev_cleanup(lv_display_t * disp, lv_nuttx_fb_t * dsc)
     }
 
     dsc->mem3 = NULL;
+    dsc->mem3_fblen = 0;
 }
 
 static void display_release_cb(lv_event_t * e)
