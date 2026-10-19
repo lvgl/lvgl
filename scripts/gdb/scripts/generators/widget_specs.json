@@ -137,13 +137,9 @@
         "dark_color": "color",
         "light_color": "color",
         "data": "string",
-        "size": "int",
-        "scale": "int",
         "direction": "int",
         "encoding": "int",
-        "update_mode": "bool",
-        "needs_update": "bool",
-        "render_valid": "bool"
+        "scale": "int"
       }
     }
   },

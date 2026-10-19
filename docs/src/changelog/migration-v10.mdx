@@ -407,7 +407,7 @@ and are not meant to be included directly.
   lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Title", my_close_cb);
 
   /* After */
-  void my_close_cb(lv_event_t* e) { 
+  void my_close_cb(lv_event_t* e) {
       ...
   }
   lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Title");
@@ -910,6 +910,16 @@ used afterwards.
 - New: `lv_qrcode_is_render_valid()` reports whether the last encode succeeded, for the
   re-encodes whose result cannot be returned (the void property setters, and the
   deferred re-encode done by the draw pass).
+
+### lv_barcode
+
+- `lv_barcode_update()` is renamed to <ApiLink name="lv_barcode_set_data"/>.
+- The bars are no longer stretched to the widget's size. Each bar is `scale` pixels thick
+  (<ApiLink name="lv_barcode_set_scale"/>, 1 by default, 0 is not allowed) and the bars are centered
+  in the content area. The default width is `LV_SIZE_CONTENT`, so the widget is exactly as wide as the bars,
+  and the default height is `LV_DPI_DEF / 2`. With `LV_DIR_VER` set the width and height accordingly.
+- `lv_barcode_set_tiled()` is removed. The bars are always drawn as a 1 px strip repeated over
+  the thickness.
 
 ### lv_span
 
