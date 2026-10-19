@@ -174,12 +174,23 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         dsc->pinfo.yoffset = 0;
     }
 
-    /* Compute visible memory start offset based on planeinfo offsets */
-    uint32_t fb_offset = (dsc->pinfo.yoffset * stride) + (dsc->pinfo.xoffset * px_size);
-    size_t last_pixel_offset = (size_t)fb_offset + (size_t)(h - 1) * stride + (size_t)w * px_size;
-    if(last_pixel_offset > dsc->pinfo.fblen) {
+    /* Check for overflow before multiplication */
+    if(stride > 0 && dsc->pinfo.yoffset > SIZE_MAX / stride) {
+        LV_LOG_ERROR("yoffset * stride overflows size_t");
+        ret = -EINVAL;
+        goto errout;
+    }
+    size_t y_part = (size_t)dsc->pinfo.yoffset * stride;
+    size_t x_part = (size_t)dsc->pinfo.xoffset * px_size;
+    if(SIZE_MAX - y_part < x_part) {
+        LV_LOG_ERROR("fb_offset calculation overflows size_t");
+        ret = -EINVAL;
+        goto errout;
+    }
+    size_t fb_offset = y_part + x_part;
+    if(SIZE_MAX - fb_offset < data_size || fb_offset + data_size > dsc->pinfo.fblen) {
         LV_LOG_ERROR("Framebuffer geometry exceeds fblen (%zu > %zu)",
-                     last_pixel_offset, dsc->pinfo.fblen);
+                     fb_offset + data_size, (size_t)dsc->pinfo.fblen);
         ret = -EINVAL;
         goto errout;
     }
@@ -187,6 +198,13 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
 
     if(double_buffer) {
         if((ret = fbdev_init_mem2(dsc)) < 0) {
+            goto errout;
+        }
+
+        if(SIZE_MAX - fb_offset < data_size || fb_offset + data_size > dsc->mem2_fblen) {
+            LV_LOG_ERROR("Framebuffer mem2 geometry exceeds mem2_fblen (%zu > %zu)",
+                         fb_offset + data_size, (size_t)dsc->mem2_fblen);
+            ret = -EINVAL;
             goto errout;
         }
 
@@ -294,9 +312,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     LV_UNUSED(color_p);
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
 
+    lv_color_format_t cf = lv_display_get_color_format(disp);
+
     if(dsc->mem_off_screen) {
-        lv_color_format_t cf = lv_display_get_color_format(disp);
-        if(cf == LV_COLOR_FORMAT_ARGB8888 || cf == LV_COLOR_FORMAT_XRGB8888) {
+        if(cf == LV_COLOR_FORMAT_ARGB8888) {
             /* Ensure opaque alpha (0xFF000000) during line-by-line copy */
             int32_t y;
             int32_t w = lv_area_get_width(area);
@@ -313,6 +332,22 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         else {
             /* Fallback to direct draw buffer copy */
             lv_draw_buf_copy(&dsc->buf1, area, &dsc->buf2, area);
+        }
+    }
+    else if(cf == LV_COLOR_FORMAT_ARGB8888) {
+        /* In double/triple buffer mode, ensure opaque alpha even if bg_opa < 255 */
+        lv_draw_buf_t * act_buf = disp->buf_act;
+        if(act_buf && act_buf->data) {
+            int32_t y;
+            int32_t w = lv_area_get_width(area);
+            uint32_t stride = dsc->pinfo.stride;
+            for(y = area->y1; y <= area->y2; y++) {
+                uint32_t * line = (uint32_t *)((uint8_t *)act_buf->data + (y * stride)) + area->x1;
+                int32_t x;
+                for(x = 0; x < w; x++) {
+                    line[x] |= 0xff000000u;
+                }
+            }
         }
     }
 
