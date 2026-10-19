@@ -961,6 +961,21 @@ used afterwards.
   re-encodes whose result cannot be returned (the void property setters, and the
   deferred re-encode done by the draw pass).
 
+### lv_barcode
+
+- `lv_barcode_update()` is renamed to <ApiLink name="lv_barcode_set_data"/> and it returns `void`.
+  An empty string clears the barcode.
+- Removed: `lv_barcode_render()`, `lv_barcode_set/get_update_mode()`, `lv_barcode_is_render_valid()`
+  and `lv_barcode_update_mode_t`. Every change is applied right away, so just drop these calls.
+- The bars are no longer stretched to the widget's size. Each bar is `scale` pixels thick
+  (<ApiLink name="lv_barcode_set_scale"/>, 1 by default, 0 is not allowed) and the bars are centered
+  in the content area. The default width is `LV_SIZE_CONTENT`, so the widget is exactly as wide as the bars,
+  and the default height is `LV_DPI_DEF / 2`. With `LV_DIR_VER` set the width and height accordingly.
+- `lv_barcode_set_tiled()` is removed. The bars are always drawn as a 1 px strip repeated over
+  the thickness.
+- <ApiLink name="lv_barcode_get_encoding"/> takes `lv_obj_t *` instead of `const lv_obj_t *`.
+- Added <ApiLink name="lv_barcode_get_data"/> and <ApiLink name="lv_barcode_get_direction"/>.
+
 ### lv_span
 
 - `lv_spangroup_set_align()` has been removed, use the `text_align` style property instead:
