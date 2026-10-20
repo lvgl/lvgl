@@ -129,7 +129,7 @@ struct _lv_obj_t {
     /** Do not scroll the object when the parent scrolls and ignore layout */
     uint32_t floating : 1;
 
-    /** Send LV_EVENT_DRAW_TASK_ADDED events */
+    /** Send LV_EVENT_DRAW_DSC_BEGIN and LV_EVENT_DRAW_DSC_END events */
     uint32_t send_draw_dsc_events : 1;
 
     /** Do not clip the children to the parent's ext draw size */
