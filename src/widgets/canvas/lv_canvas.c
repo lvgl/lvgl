@@ -469,7 +469,7 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
-    lv_image_cache_drop(&canvas->draw_buf);
+    lv_image_cache_drop(canvas->draw_buf);
 }
 static bool layer_is_descendant(const lv_layer_t * layer, const lv_layer_t * ancestor)
 {
