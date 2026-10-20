@@ -5,7 +5,7 @@
 
 #include "unity/unity.h"
 
-#if LV_DRAW_SW_SUPPORT_ABGR8888
+#if LV_DRAW_SW_SUPPORT_ABGR8888 && !LV_USE_DRAW_VG_LITE && !LV_USE_DRAW_NANOVG
 
 void setUp(void)
 {
@@ -151,7 +151,7 @@ void tearDown(void)
 
 void test_render_to_abgr8888(void)
 {
-    TEST_IGNORE_MESSAGE("LV_DRAW_SW_SUPPORT_ABGR8888 is not enabled");
+    TEST_IGNORE_MESSAGE("ABGR8888 is only supported by the SW renderer");
 }
 
 #endif
