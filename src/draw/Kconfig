@@ -242,6 +242,10 @@ menu "OpenGL ES"
 rsource "opengles/Kconfig"
 endmenu
 
+menu "IPA"
+rsource "gigadevice/ipa/Kconfig"
+endmenu
+
 menu "SDL"
 rsource "sdl/Kconfig"
 endmenu
