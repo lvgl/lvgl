@@ -18,10 +18,9 @@ DRAW_TASK_TYPE_NAMES = {
     9: "ARC",
     10: "TRIANGLE",
     11: "MASK_RECTANGLE",
-    12: "MASK_BITMAP",
-    13: "BLUR",
-    14: "VECTOR",
-    15: "3D",
+    12: "BLUR",
+    13: "VECTOR",
+    14: "3D",
 }
 
 DRAW_TASK_STATE_NAMES = {
