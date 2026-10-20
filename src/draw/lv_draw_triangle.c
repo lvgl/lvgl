@@ -56,6 +56,14 @@ lv_draw_triangle_dsc_t * lv_draw_task_get_triangle_dsc(lv_draw_task_t * task)
     return task->type == LV_DRAW_DSC_TYPE_TRIANGLE ? (lv_draw_triangle_dsc_t *)task->draw_dsc : NULL;
 }
 
+lv_draw_triangle_dsc_t * lv_draw_dsc_get_triangle_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_TRIANGLE, return NULL);
+
+    return (lv_draw_triangle_dsc_t *)dsc;
+}
+
 void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_dsc)
 {
     LV_CHECK_ARG(layer != NULL, return);

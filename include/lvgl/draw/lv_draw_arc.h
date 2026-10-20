@@ -77,6 +77,14 @@ void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc);
 lv_draw_arc_dsc_t * lv_draw_task_get_arc_dsc(lv_draw_task_t * task);
 
 /**
+ * Get the arc draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_ARC, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the arc draw descriptor
+ */
+lv_draw_arc_dsc_t * lv_draw_dsc_get_arc_dsc(lv_draw_dsc_t * dsc);
+
+/**
  * Create an arc draw task.
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor variable

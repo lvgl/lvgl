@@ -1122,4 +1122,12 @@ lv_draw_vector_dsc_t * lv_draw_task_get_vector_dsc(lv_draw_task_t * task)
     return task->type == LV_DRAW_DSC_TYPE_VECTOR ? (lv_draw_vector_dsc_t *)task->draw_dsc : NULL;
 }
 
+lv_draw_vector_dsc_t * lv_draw_dsc_get_vector_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_VECTOR, return NULL);
+
+    return (lv_draw_vector_dsc_t *)dsc;
+}
+
 #endif /* LV_USE_VECTOR_GRAPHIC */
