@@ -1,6 +1,7 @@
 {
   "title": "RTOS Support",
   "pages": [
+    "chibios",
     "freertos",
     "mqx",
     "nuttx",
