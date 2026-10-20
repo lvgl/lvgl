@@ -552,6 +552,14 @@ void lv_draw_vector(lv_draw_vector_dsc_t * dsc);
  */
 lv_draw_vector_dsc_t * lv_draw_task_get_vector_dsc(lv_draw_task_t * task);
 
+/**
+ * Get the vector draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_VECTOR, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the vector draw descriptor
+ */
+lv_draw_vector_dsc_t * lv_draw_dsc_get_vector_dsc(lv_draw_dsc_t * dsc);
+
 /* Traverser for task list */
 typedef void (*vector_draw_task_cb)(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc);
 

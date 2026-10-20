@@ -93,6 +93,22 @@ lv_draw_label_dsc_t * lv_draw_task_get_label_dsc(lv_draw_task_t * task)
     return task->type == LV_DRAW_DSC_TYPE_LABEL ? (lv_draw_label_dsc_t *)task->draw_dsc : NULL;
 }
 
+lv_draw_label_dsc_t * lv_draw_dsc_get_label_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_LABEL, return NULL);
+
+    return (lv_draw_label_dsc_t *)dsc;
+}
+
+lv_draw_letter_dsc_t * lv_draw_dsc_get_letter_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_LETTER, return NULL);
+
+    return (lv_draw_letter_dsc_t *)dsc;
+}
+
 void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc)
 {
     LV_CHECK_ARG(dsc != NULL, return);

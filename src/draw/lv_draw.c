@@ -29,6 +29,7 @@
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t draw_unit_id);
 static inline size_t get_draw_dsc_size(lv_draw_dsc_type_t type);
+static lv_area_t * get_dsc_coords(lv_draw_task_t * t);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
@@ -139,6 +140,11 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_dsc_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
+    base_dsc->type = t->type;
+    lv_area_t * coords = get_dsc_coords(t);
+    if(coords) {
+        *coords = t->area;
+    }
 
     lv_draw_global_info_t * info = &_draw_info;
 
@@ -575,6 +581,14 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
     *area = t->area;
 }
 
+lv_draw_dsc_type_t lv_draw_dsc_get_type(const lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return LV_DRAW_DSC_TYPE_NONE);
+
+    return dsc->type;
+}
+
+
 lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_t * base,
                                               const lv_area_t * area)
 {
@@ -734,6 +748,38 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t
  * @param type      type of the draw task
  * @return          size of the draw descriptor in bytes
  */
+/**
+ * Get the area of a draw task's descriptor, for the types that are drawn to an area.
+ * @param t         the draw task
+ * @return          the `coords` of the draw descriptor, or NULL if its geometry is in other fields (e.g. lines)
+ */
+static lv_area_t * get_dsc_coords(lv_draw_task_t * t)
+{
+    switch(t->type) {
+        case LV_DRAW_DSC_TYPE_FILL:
+            return &((lv_draw_fill_dsc_t *)t->draw_dsc)->coords;
+        case LV_DRAW_DSC_TYPE_BORDER:
+            return &((lv_draw_border_dsc_t *)t->draw_dsc)->coords;
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
+            return &((lv_draw_box_shadow_dsc_t *)t->draw_dsc)->coords;
+        case LV_DRAW_DSC_TYPE_LETTER:
+            return &((lv_draw_letter_dsc_t *)t->draw_dsc)->coords;
+        case LV_DRAW_DSC_TYPE_LABEL:
+            return &((lv_draw_label_dsc_t *)t->draw_dsc)->coords;
+        case LV_DRAW_DSC_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_LAYER:
+            return &((lv_draw_image_dsc_t *)t->draw_dsc)->coords;
+        case LV_DRAW_DSC_TYPE_BLUR:
+            return &((lv_draw_blur_dsc_t *)t->draw_dsc)->coords;
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_DSC_TYPE_3D:
+            return &((lv_draw_3d_dsc_t *)t->draw_dsc)->coords;
+#endif
+        default:
+            return NULL;
+    }
+}
+
 static inline size_t get_draw_dsc_size(lv_draw_dsc_type_t type)
 {
     switch(type) {

@@ -48,6 +48,14 @@ lv_draw_blur_dsc_t * lv_draw_task_get_blur_dsc(lv_draw_task_t * task)
     return task->type == LV_DRAW_DSC_TYPE_BLUR ? (lv_draw_blur_dsc_t *)task->draw_dsc : NULL;
 }
 
+lv_draw_blur_dsc_t * lv_draw_dsc_get_blur_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_BLUR, return NULL);
+
+    return (lv_draw_blur_dsc_t *)dsc;
+}
+
 void LV_ATTRIBUTE_FAST_MEM lv_draw_blur(lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_CHECK_ARG(layer != NULL, return);
