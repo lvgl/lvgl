@@ -29,7 +29,7 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
  **********************/
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     int32_t radius;
 
@@ -75,7 +75,7 @@ typedef struct {
 } lv_draw_rect_dsc_t;
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**Radius, LV_RADIUS_CIRCLE for max. radius */
     int32_t radius;
@@ -93,7 +93,7 @@ typedef struct {
 } lv_draw_fill_dsc_t;
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**Radius, LV_RADIUS_CIRCLE for max. radius */
     int32_t radius;
@@ -117,7 +117,7 @@ typedef struct {
 } lv_draw_border_dsc_t;
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**Radius, LV_RADIUS_CIRCLE for max. radius */
     int32_t radius;

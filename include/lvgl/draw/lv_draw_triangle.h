@@ -24,7 +24,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**Points of the triangle. If `LV_USE_FLOAT` is enabled floats can be used here*/
     lv_point_precise_t p[3];

@@ -119,7 +119,7 @@ static void chart_event_cb(lv_event_t * e)
 
     if(code == LV_EVENT_DRAW_TASK_ADDED) {
         lv_draw_task_t * draw_task = lv_event_get_param(e);
-        lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+        lv_draw_dsc_t * base_dsc = draw_task->draw_dsc;
 
         lv_chart_type_t chart_type = lv_chart_get_type(obj);
         if(chart_type == LV_CHART_TYPE_LINE && base_dsc->part != LV_PART_INDICATOR)  return;

@@ -600,7 +600,7 @@ static void chart_event_cb(lv_event_t * e)
     }
     else if(code == LV_EVENT_DRAW_TASK_ADDED) {
         lv_draw_task_t * draw_task = lv_event_get_param(e);
-        lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+        lv_draw_dsc_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
 
         lv_draw_line_dsc_t * draw_line_dsc = lv_draw_task_get_line_dsc(draw_task);
         if(base_dsc->part == LV_PART_ITEMS && draw_line_dsc) {

@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**The color of the arc*/
     lv_color_t color;

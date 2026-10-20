@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 struct _lv_draw_image_dsc_t {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**The image source: pointer to `lv_image_dsc_t` or a path to a file*/
     const void * src;

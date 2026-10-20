@@ -42,7 +42,7 @@ typedef struct {
 } lv_draw_opengles_unit_t;
 
 typedef struct {
-    lv_draw_dsc_base_t * draw_dsc;
+    lv_draw_dsc_t * draw_dsc;
     int32_t w;
     int32_t h;
     unsigned int texture;
@@ -249,10 +249,10 @@ static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data
 
     const uint8_t * left_draw_dsc = (const uint8_t *)lhs->draw_dsc;
     const uint8_t * right_draw_dsc = (const uint8_t *)rhs->draw_dsc;
-    left_draw_dsc += sizeof(lv_draw_dsc_base_t);
-    right_draw_dsc += sizeof(lv_draw_dsc_base_t);
+    left_draw_dsc += sizeof(lv_draw_dsc_t);
+    right_draw_dsc += sizeof(lv_draw_dsc_t);
 
-    int cmp_res = lv_memcmp(left_draw_dsc, right_draw_dsc, lhs->draw_dsc->dsc_size - sizeof(lv_draw_dsc_base_t));
+    int cmp_res = lv_memcmp(left_draw_dsc, right_draw_dsc, lhs->draw_dsc->dsc_size - sizeof(lv_draw_dsc_t));
 
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
@@ -304,7 +304,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
      *which his not supported in OpenGL as it's not a texture.*/
     if(lv_refr_get_disp_refreshing() == NULL) return 0;
 
-    if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
+    if(((lv_draw_dsc_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_OPENGLES;
     }
@@ -342,7 +342,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
 
     lv_display_t * disp = lv_refr_get_disp_refreshing();
 
-    lv_obj_t * obj = ((lv_draw_dsc_base_t *)task->draw_dsc)->obj;
+    lv_obj_t * obj = ((lv_draw_dsc_t *)task->draw_dsc)->obj;
     bool original_send_draw_task_event = false;
     if(obj) {
         original_send_draw_task_event = lv_obj_is_send_draw_task_events(obj);
@@ -350,7 +350,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     }
 
     if(cache_data != NULL) {
-        lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
+        lv_draw_dsc_t * base_dsc = task->draw_dsc;
         cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
         LV_ASSERT_MALLOC(cache_data->draw_dsc);
         if(cache_data->draw_dsc == NULL) {
@@ -579,7 +579,7 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *)t->draw_unit;
     cache_data_t data_to_find;
-    data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
+    data_to_find.draw_dsc = (lv_draw_dsc_t *)t->draw_dsc;
     data_to_find.w = lv_area_get_width(&t->_real_area);
     data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = 0;

@@ -91,7 +91,7 @@ struct _lv_vector_path_ctx_t {
 };
 
 struct _lv_draw_vector_dsc_t {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /** Opacity of the whole vector drawing, taken from the layer's opa when it's drawn */
     lv_opa_t opa;

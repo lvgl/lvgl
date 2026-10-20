@@ -249,7 +249,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
 
-    const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+    const lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
 
     if(!_pxp_dest_cf_supported(draw_dsc_base->layer->color_format))
         return 0;

@@ -29,6 +29,8 @@ typedef lv_rotation_t lv_display_rotation_t;
 #define lv_indev_clear_ccw(indev) lv_indev_set_rotation_dir(indev, LV_ROTATION_DIR_CW)
 #define lv_indev_get_ccw(indev) (lv_indev_get_rotation_dir(indev) == LV_ROTATION_DIR_CCW)
 
+typedef lv_draw_dsc_t lv_draw_dsc_base_t;
+
 typedef lv_draw_dsc_type_t lv_draw_task_type_t;
 #define LV_DRAW_TASK_TYPE_NONE           LV_DRAW_DSC_TYPE_NONE
 #define LV_DRAW_TASK_TYPE_FILL           LV_DRAW_DSC_TYPE_FILL
