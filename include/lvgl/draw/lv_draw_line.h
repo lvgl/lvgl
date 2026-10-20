@@ -33,7 +33,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**The first point of the line. If `LV_USE_FLOAT` is enabled float number can be also used.
      *Ignored if `points` are set*/

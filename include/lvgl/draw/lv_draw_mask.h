@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 struct _lv_draw_mask_rect_dsc_t {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**The area to mask.*/
     lv_area_t area;

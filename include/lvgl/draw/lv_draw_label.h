@@ -30,7 +30,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**The text to draw*/
     const char * text;
@@ -114,7 +114,7 @@ typedef struct {
 } lv_draw_label_dsc_t;
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     uint32_t unicode;
     const lv_font_t * font;

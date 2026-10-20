@@ -389,7 +389,7 @@ static void draw_task_added_event_cb(lv_event_t * e)
 
     LV_ASSERT(obj != NULL);
     LV_ASSERT(draw_task != NULL);
-    if(((lv_draw_dsc_base_t *)draw_task->draw_dsc)->part != LV_PART_ITEMS) return;
+    if(((lv_draw_dsc_t *)draw_task->draw_dsc)->part != LV_PART_ITEMS) return;
 
     lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
     lv_draw_border_dsc_t * border_draw_dsc = lv_draw_task_get_border_dsc(draw_task);
@@ -398,7 +398,7 @@ static void draw_task_added_event_cb(lv_event_t * e)
         return;
     }
 
-    int32_t id = ((lv_draw_dsc_base_t *)draw_task->draw_dsc)->id1;
+    int32_t id = ((lv_draw_dsc_t *)draw_task->draw_dsc)->id1;
 
     /*Day name styles*/
     if(id < 7) {

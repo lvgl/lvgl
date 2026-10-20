@@ -718,7 +718,7 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
 static void table_draw_task_event_cb(lv_event_t * e)
 {
     lv_draw_task_t * t = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * draw_dsc_base = t->draw_dsc;
+    lv_draw_dsc_t * draw_dsc_base = t->draw_dsc;
     if(draw_dsc_base->part != LV_PART_ITEMS) return;
 
     int32_t row = draw_dsc_base->id1;
