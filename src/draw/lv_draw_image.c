@@ -60,7 +60,7 @@ lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_IMAGE ? (lv_draw_image_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_IMAGE ? (lv_draw_image_dsc_t *)task->draw_dsc : NULL;
 }
 
 void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
@@ -76,7 +76,7 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LAYER);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_LAYER);
     lv_draw_image_dsc_t * new_image_dsc = t->draw_dsc;
     lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
     t->state = LV_DRAW_TASK_STATE_BLOCKED;
@@ -140,7 +140,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     /*Typical case, draw the image as bitmap*/
     if(!(new_image_dsc.header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW)) {
-        lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_IMAGE);
+        lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_IMAGE);
         lv_memcpy(t->draw_dsc, &new_image_dsc, sizeof(lv_draw_image_dsc_t));
 
         lv_draw_image_get_transformed_area(&t->_real_area, dsc, coords);

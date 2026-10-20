@@ -90,7 +90,7 @@ lv_draw_label_dsc_t * lv_draw_task_get_label_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_LABEL ? (lv_draw_label_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_LABEL ? (lv_draw_label_dsc_t *)task->draw_dsc : NULL;
 }
 
 void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc)
@@ -129,7 +129,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
     }
 
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LABEL);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_LABEL);
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -219,7 +219,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
     dsc->pivot.x = g.adv_w / 2 ;
     dsc->pivot.y = font->line_height - font->base_line;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LETTER);
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_DSC_TYPE_LETTER);
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 

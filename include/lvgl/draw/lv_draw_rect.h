@@ -165,7 +165,7 @@ void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc);
 /**
  * Try to get a fill draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_FILL
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_FILL
  */
 lv_draw_fill_dsc_t * lv_draw_task_get_fill_dsc(lv_draw_task_t * task);
 
@@ -186,7 +186,7 @@ void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc);
 /**
  * Try to get a border draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_BORDER
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_BORDER
  */
 lv_draw_border_dsc_t * lv_draw_task_get_border_dsc(lv_draw_task_t * task);
 
@@ -207,7 +207,7 @@ void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
 /**
  * Try to get a box shadow draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_BOX_SHADOW
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_BOX_SHADOW
  */
 lv_draw_box_shadow_dsc_t * lv_draw_task_get_box_shadow_dsc(lv_draw_task_t * task);
 
