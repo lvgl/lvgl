@@ -4,12 +4,11 @@
 
 #include "unity/unity.h"
 
-static uint32_t checked_cnt;
 static uint32_t type_cnt[16];
+static lv_obj_t * main_obj;
 
 void setUp(void)
 {
-    checked_cnt = 0;
     lv_memzero(type_cnt, sizeof(type_cnt));
 }
 
@@ -18,49 +17,30 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-static void draw_task_added_cb(lv_event_t * e)
+static void draw_dsc_begin_cb(lv_event_t * e)
 {
-    lv_draw_task_t * t = lv_event_get_draw_task(e);
-    lv_draw_dsc_t * dsc = lv_draw_task_get_draw_dsc(t);
-    lv_draw_dsc_type_t type = lv_draw_task_get_type(t);
-
-    TEST_ASSERT_EQUAL(type, lv_draw_dsc_get_type(dsc));
-
-    /* The types drawn to an area have it in their own descriptor */
-    lv_area_t task_area;
-    lv_draw_task_get_area(t, &task_area);
-    const lv_area_t * coords = NULL;
-    if(type == LV_DRAW_DSC_TYPE_FILL) coords = &lv_draw_dsc_get_fill_dsc(dsc)->coords;
-    else if(type == LV_DRAW_DSC_TYPE_BORDER) coords = &lv_draw_dsc_get_border_dsc(dsc)->coords;
-    else if(type == LV_DRAW_DSC_TYPE_BOX_SHADOW) coords = &lv_draw_dsc_get_box_shadow_dsc(dsc)->coords;
-    else if(type == LV_DRAW_DSC_TYPE_LABEL) coords = &lv_draw_dsc_get_label_dsc(dsc)->coords;
-    if(coords) TEST_ASSERT_EQUAL_MEMORY(&task_area, coords, sizeof(lv_area_t));
+    lv_draw_dsc_t * dsc = lv_event_get_draw_dsc(e);
+    lv_draw_dsc_type_t type = lv_draw_dsc_get_type(dsc);
 
     void * typed = NULL;
     switch(type) {
         case LV_DRAW_DSC_TYPE_FILL:
             typed = lv_draw_dsc_get_fill_dsc(dsc);
-            TEST_ASSERT_EQUAL_PTR(lv_draw_task_get_fill_dsc(t), typed);
             break;
         case LV_DRAW_DSC_TYPE_BORDER:
             typed = lv_draw_dsc_get_border_dsc(dsc);
-            TEST_ASSERT_EQUAL_PTR(lv_draw_task_get_border_dsc(t), typed);
             break;
         case LV_DRAW_DSC_TYPE_BOX_SHADOW:
             typed = lv_draw_dsc_get_box_shadow_dsc(dsc);
-            TEST_ASSERT_EQUAL_PTR(lv_draw_task_get_box_shadow_dsc(t), typed);
             break;
         case LV_DRAW_DSC_TYPE_LABEL:
             typed = lv_draw_dsc_get_label_dsc(dsc);
-            TEST_ASSERT_EQUAL_PTR(lv_draw_task_get_label_dsc(t), typed);
             break;
         case LV_DRAW_DSC_TYPE_LINE:
             typed = lv_draw_dsc_get_line_dsc(dsc);
-            TEST_ASSERT_EQUAL_PTR(lv_draw_task_get_line_dsc(t), typed);
             break;
         case LV_DRAW_DSC_TYPE_ARC:
             typed = lv_draw_dsc_get_arc_dsc(dsc);
-            TEST_ASSERT_EQUAL_PTR(lv_draw_task_get_arc_dsc(t), typed);
             break;
         default:
             typed = dsc;
@@ -68,22 +48,29 @@ static void draw_task_added_cb(lv_event_t * e)
     }
     TEST_ASSERT_EQUAL_PTR(dsc, typed);
 
-    checked_cnt++;
+    /* Without a border, the background of a widget covers the widget */
+    if(dsc->obj == main_obj && dsc->part == LV_PART_MAIN && type == LV_DRAW_DSC_TYPE_FILL) {
+        TEST_ASSERT_EQUAL_MEMORY(&main_obj->coords, &lv_draw_dsc_get_fill_dsc(dsc)->coords, sizeof(lv_area_t));
+    }
+
     if(type < sizeof(type_cnt) / sizeof(type_cnt[0])) type_cnt[type]++;
 }
 
 static void enable_events(lv_obj_t * obj)
 {
     lv_obj_set_send_draw_dsc_events(obj, true);
-    lv_obj_add_event_cb(obj, draw_task_added_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(obj, draw_dsc_begin_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
 }
 
 void test_draw_dsc_getters(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    lv_obj_set_style_shadow_width(obj, 10, 0);
-    lv_obj_set_style_outline_width(obj, 2, 0);
-    enable_events(obj);
+    main_obj = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(main_obj);
+    lv_obj_set_size(main_obj, 100, 100);
+    lv_obj_set_style_bg_opa(main_obj, LV_OPA_COVER, 0);
+    lv_obj_set_style_shadow_width(main_obj, 10, 0);
+    lv_obj_set_style_outline_width(main_obj, 2, 0);
+    enable_events(main_obj);
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_pos(label, 300, 10);

@@ -6,14 +6,12 @@
 
 static uint32_t begin_cnt;
 static uint32_t end_cnt;
-static uint32_t added_cnt;
 static lv_draw_dsc_t * begin_dsc;
 
 void setUp(void)
 {
     begin_cnt = 0;
     end_cnt = 0;
-    added_cnt = 0;
     begin_dsc = NULL;
 }
 
@@ -47,12 +45,6 @@ static void begin_cb(lv_event_t * e)
     lv_area_t area = lv_draw_dsc_get_fill_dsc(dsc)->coords;
     lv_area_move(&area, -lv_area_get_width(&area) / 2, -lv_area_get_height(&area) / 2);
     fill(e, lv_color_hex(0x00ff00), &area);
-}
-
-static void added_cb(lv_event_t * e)
-{
-    added_cnt++;
-    TEST_ASSERT_EQUAL_PTR(begin_dsc, lv_draw_task_get_draw_dsc(lv_event_get_draw_task(e)));
 }
 
 static void end_cb(lv_event_t * e)
@@ -92,13 +84,11 @@ void test_draw_dsc_events_order(void)
 {
     lv_obj_t * obj = create_obj(lv_color_hex(0xff0000));
     lv_obj_add_event_cb(obj, begin_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
-    lv_obj_add_event_cb(obj, added_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_event_cb(obj, end_cb, LV_EVENT_DRAW_DSC_END, NULL);
     lv_refr_now(NULL);
 
     /* Only the background fill sends events, the fills drawn in the events don't */
     TEST_ASSERT_EQUAL_UINT32(1, begin_cnt);
-    TEST_ASSERT_EQUAL_UINT32(1, added_cnt);
     TEST_ASSERT_EQUAL_UINT32(1, end_cnt);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_dsc_events_order.png");

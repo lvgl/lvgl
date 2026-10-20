@@ -62,7 +62,7 @@ For scatter charts each data point is an (X, Y) pair, and the series
 binds to both an X axis and a Y axis with `LV_CHART_AXIS_PRIMARY_X | LV_CHART_AXIS_PRIMARY_Y`.
 This C example also tints each point between red and blue based on its
 position and fades older samples — both effects are driven from
-<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />, so they stay in C even though the chart
+<ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" />, so they stay in C even though the chart
 itself is pure widget config:
 
 <LvglExample name="lv_example_chart_scatter" path="widgets/chart/lv_example_chart_scatter" />
@@ -263,9 +263,11 @@ requires a callback.
 
 Chart styling stops at the part level — to vary appearance *per data point*
 or paint custom shapes alongside the series, hook
-<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />. The callback receives every draw task the chart
-emits and may mutate the fill/stroke descriptors before they execute, or
-draw extra shapes on the chart's layer.
+<ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" />. The callback receives every draw descriptor the chart
+draws and may mutate the fill/stroke descriptors before they are drawn, or
+draw extra shapes on the chart's layer below them (or on top of them in
+<ApiLink name="LV_EVENT_DRAW_DSC_END" />). These events are sent only if
+<ApiLink name="LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS" /> is set on the chart.
 
 Recolour bars between green and red based on their value:
 

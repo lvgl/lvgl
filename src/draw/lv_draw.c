@@ -784,7 +784,6 @@ static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t)
         tail->next = t;
     }
 
-    lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
     lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_DSC_END, base_dsc);
 }
 
