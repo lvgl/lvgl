@@ -154,6 +154,26 @@ void test_render_to_abgr8888(void)
     TEST_IGNORE_MESSAGE("ABGR8888 is only supported by the SW renderer");
 }
 
+void test_render_to_abgr8888_fill_byte_order(void)
+{
+    TEST_IGNORE_MESSAGE("ABGR8888 is only supported by the SW renderer");
+}
+
+void test_render_to_abgr8888_image(void)
+{
+    TEST_IGNORE_MESSAGE("ABGR8888 is only supported by the SW renderer");
+}
+
+void test_render_to_abgr8888_image_recolor(void)
+{
+    TEST_IGNORE_MESSAGE("ABGR8888 is only supported by the SW renderer");
+}
+
+void test_render_to_abgr8888_transformed_layer(void)
+{
+    TEST_IGNORE_MESSAGE("ABGR8888 is only supported by the SW renderer");
+}
+
 #endif
 
 #endif
