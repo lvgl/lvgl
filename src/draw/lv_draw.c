@@ -764,9 +764,6 @@ static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
             return sizeof(lv_draw_mask_rect_dsc_t);
 
-        /* no struct match for LV_DRAW_TASK_TYPE_MASK_BITMAP, set it to zero now */
-        case LV_DRAW_TASK_TYPE_MASK_BITMAP:
-            return 0;
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
             return sizeof(lv_draw_vector_dsc_t);

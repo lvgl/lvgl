@@ -270,7 +270,6 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
 #endif
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-        case LV_DRAW_TASK_TYPE_MASK_BITMAP:
         default:
             break;
     }
