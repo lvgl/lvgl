@@ -265,7 +265,7 @@ void lv_draw_label_iterate_characters(lv_layer_t * layer, const lv_area_t * clip
     }
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
-        if(base_dsc->obj && !lv_obj_is_send_draw_task_events(base_dsc->obj)) {
+        if(base_dsc->obj && !lv_obj_is_send_draw_dsc_events(base_dsc->obj)) {
             w = dsc->text_size.x;
         }
         else {

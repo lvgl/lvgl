@@ -49,7 +49,7 @@ static void event_cb(lv_event_t * e)
  * @brief Draw a pulsing red circle on top of a container with a draw task callback.
  *
  * A 200x200 container is centered and flagged with
- * `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`. An `LV_EVENT_DRAW_TASK_ADDED`
+ * `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS`. An `LV_EVENT_DRAW_TASK_ADDED`
  * callback inspects the draw task and, when `base_dsc->part` is
  * `LV_PART_MAIN`, calls `lv_draw_rect` to paint a pink circle with a red
  * border and outline. A 30 ms `lv_timer_t` bounces a `size` counter between
@@ -61,7 +61,7 @@ void lv_example_event_draw(void)
     lv_obj_set_size(cont, 200, 200);
     lv_obj_center(cont);
     lv_obj_add_event_cb(cont, event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(cont, true);
+    lv_obj_set_send_draw_dsc_events(cont, true);
     lv_timer_create(timer_cb, 30, cont);
 }
 

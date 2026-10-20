@@ -130,7 +130,7 @@ struct _lv_obj_t {
     uint32_t floating : 1;
 
     /** Send LV_EVENT_DRAW_TASK_ADDED events */
-    uint32_t send_draw_task_events : 1;
+    uint32_t send_draw_dsc_events : 1;
 
     /** Do not clip the children to the parent's ext draw size */
     uint32_t overflow_visible : 1;

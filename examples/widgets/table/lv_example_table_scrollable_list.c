@@ -99,7 +99,7 @@ void lv_example_table_scrollable_list(void)
     /*Add an event callback to to apply some custom drawing*/
     lv_obj_add_event_cb(table, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_event_cb(table, change_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_set_send_draw_task_events(table, true);
+    lv_obj_set_send_draw_dsc_events(table, true);
 
     lv_mem_monitor_t mon2;
     lv_mem_monitor(&mon2);

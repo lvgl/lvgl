@@ -27,7 +27,7 @@ static void draw_event_cb(lv_event_t * e)
  * @brief Bar chart that tints each bar between green and red based on its value.
  *
  * A 260x160 `LV_CHART_TYPE_BAR` chart holds 24 points on one series. The
- * chart sets `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` and subscribes to
+ * chart sets `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` and subscribes to
  * `LV_EVENT_DRAW_TASK_ADDED`. For each `LV_PART_ITEMS` fill task the
  * callback reads the underlying Y value and replaces the fill color
  * with an `lv_color_mix` of green and red proportional to the value.
@@ -44,7 +44,7 @@ void lv_example_chart_recolor_bars(void)
 
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_color_hex(0xff0000), LV_CHART_AXIS_PRIMARY_Y);
     lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_set_send_draw_dsc_events(chart, true);
 
     uint32_t i;
     for(i = 0; i < 24; i++) {

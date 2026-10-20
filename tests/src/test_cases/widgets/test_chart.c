@@ -179,7 +179,7 @@ void test_draw_task_hooking(void)
 
     lv_obj_set_parent(chart, chart_wrapper);
     lv_obj_set_size(chart, lv_pct(200), lv_pct(100));
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_set_send_draw_dsc_events(chart, true);
     lv_chart_set_div_line_count(chart, 0, 21);
     lv_chart_set_point_count(chart, 21);
     lv_obj_add_event_cb(chart, chart_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
@@ -305,7 +305,7 @@ void test_chart_line_out_of_range_values_are_not_clamped(void)
     static const int32_t values[] = { -100, 50, 200 };
     lv_chart_set_series_values(chart, ser, values, 3);
 
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_set_send_draw_dsc_events(chart, true);
     lv_obj_add_event_cb(chart, series_line_points_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
 
     series_line_min_y = INT32_MAX;

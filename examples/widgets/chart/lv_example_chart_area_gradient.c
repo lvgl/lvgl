@@ -13,7 +13,7 @@ static void draw_event_cb(lv_event_t * e);
  *
  * A 200x150 `LV_CHART_TYPE_LINE` chart with 10 points uses
  * `lv_chart_set_div_line_count` to draw 5 horizontal and 7 vertical
- * division lines. With `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` enabled, the
+ * division lines. With `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` enabled, the
  * `LV_EVENT_DRAW_TASK_ADDED` callback intercepts `LV_PART_ITEMS` line
  * tasks and fills each segment below the polyline with an
  * `lv_draw_triangle` and `lv_draw_rect` pair using a vertical gradient
@@ -33,7 +33,7 @@ void lv_example_chart_area_gradient(void)
     lv_chart_set_div_line_count(chart, 5, 7);
 
     lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_set_send_draw_dsc_events(chart, true);
 
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
 
