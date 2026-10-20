@@ -10,6 +10,7 @@
 #include "../misc/lv_area_private.h"
 #include "../misc/lv_event_private.h"
 #include "lv_draw_private.h"
+#include "lv_draw_image_private.h"
 #include "lv_draw_vector_private.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
@@ -30,6 +31,8 @@
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t draw_unit_id);
 static inline size_t get_draw_dsc_size(lv_draw_dsc_type_t type);
 static lv_area_t * get_dsc_coords(lv_draw_task_t * t);
+static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t);
+static void apply_coords_change(lv_draw_task_t * t);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
@@ -148,15 +151,15 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 
     lv_draw_global_info_t * info = &_draw_info;
 
-    /*Send LV_EVENT_DRAW_TASK_ADDED and dispatch only on the "main" draw_task
-     *and not on the draw tasks added in the event.
-     *Sending LV_EVENT_DRAW_TASK_ADDED events might cause recursive event sends and besides
-     *dispatching might remove the "main" draw task while it's still being used in the event*/
+    /*Send the draw events and dispatch only on the "main" draw_task
+     *and not on the draw tasks added in the events.
+     *Sending the draw events might cause recursive event sends and besides
+     *dispatching might remove the "main" draw task while it's still being used in the events*/
 
     if(info->task_running == false) {
         if(base_dsc->obj && lv_obj_is_send_draw_dsc_events(base_dsc->obj)) {
             info->task_running = true;
-            lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
+            send_draw_events(layer, t);
             info->task_running = false;
         }
 
@@ -744,10 +747,74 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t
 }
 
 /**
- * Get the size of the draw descriptor of a draw task
- * @param type      type of the draw task
- * @return          size of the draw descriptor in bytes
+ * Send the draw events of a new draw task
+ * @param layer     the layer of the draw task
+ * @param t         the new draw task
  */
+static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t)
+{
+    lv_draw_dsc_t * base_dsc = t->draw_dsc;
+
+    /*Remove the task while sending LV_EVENT_DRAW_DSC_BEGIN, so the tasks added in the event go before it*/
+    lv_draw_task_t * prev = NULL;
+    lv_draw_task_t * cur = layer->draw_task_head;
+    while(cur && cur != t) {
+        prev = cur;
+        cur = cur->next;
+    }
+    LV_ASSERT_NULL(cur);
+
+    if(prev) prev->next = NULL;
+    else layer->draw_task_head = NULL;
+
+    lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_DSC_BEGIN, base_dsc);
+
+    /* The event might have changed the coordinates of the descriptor
+     * so make sure the draw task is in sync
+     * TODO: this can be removed when draw tasks are removed from dispatching */
+    apply_coords_change(t);
+
+    /*Put the task back at the end*/
+    if(layer->draw_task_head == NULL) {
+        layer->draw_task_head = t;
+    }
+    else {
+        lv_draw_task_t * tail = layer->draw_task_head;
+        while(tail->next) tail = tail->next;
+        tail->next = t;
+    }
+
+    lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
+    lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_DSC_END, base_dsc);
+}
+
+static void apply_coords_change(lv_draw_task_t * t)
+{
+    LV_ASSERT(t != NULL);
+    const lv_area_t * old_coords = &t->area;
+    const lv_area_t * coords = get_dsc_coords(t);
+    if(coords == NULL || lv_area_is_equal(coords, old_coords)) return;
+
+    if(t->type == LV_DRAW_DSC_TYPE_IMAGE || t->type == LV_DRAW_DSC_TYPE_LAYER) {
+        lv_draw_image_dsc_t * image_dsc = t->draw_dsc;
+        if(lv_area_is_equal(&image_dsc->image_area, old_coords)) {
+            image_dsc->image_area = *coords;
+        }
+
+        /*The transformed area depends on the size, so compute it again*/
+        lv_draw_image_get_transformed_area(&t->_real_area, image_dsc, coords);
+        t->area = *coords;
+        return;
+    }
+
+    /* move _real_area by the same delta as coords */
+    t->_real_area.x1 += coords->x1 - old_coords->x1;
+    t->_real_area.y1 += coords->y1 - old_coords->y1;
+    t->_real_area.x2 += coords->x2 - old_coords->x2;
+    t->_real_area.y2 += coords->y2 - old_coords->y2;
+    t->area = *coords;
+}
+
 /**
  * Get the area of a draw task's descriptor, for the types that are drawn to an area.
  * @param t         the draw task
@@ -780,6 +847,11 @@ static lv_area_t * get_dsc_coords(lv_draw_task_t * t)
     }
 }
 
+/**
+ * Get the size of the draw descriptor of a draw task
+ * @param type      type of the draw task
+ * @return          size of the draw descriptor in bytes
+ */
 static inline size_t get_draw_dsc_size(lv_draw_dsc_type_t type)
 {
     switch(type) {
