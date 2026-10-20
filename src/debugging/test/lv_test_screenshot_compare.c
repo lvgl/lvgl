@@ -253,6 +253,14 @@ static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
             buf_out += draw_buf->header.w * 4;
         }
     }
+    else if(cf_in == LV_COLOR_FORMAT_ABGR8888) {
+        uint32_t y;
+        for(y = 0; y < draw_buf->header.h; y++) {
+            lv_memcpy(buf_out, buf_in, draw_buf->header.w * 4);
+            buf_in += stride;
+            buf_out += draw_buf->header.w * 4;
+        }
+    }
     else if(cf_in == LV_COLOR_FORMAT_RGB888) {
         uint32_t y;
         for(y = 0; y < draw_buf->header.h; y++) {

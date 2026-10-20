@@ -218,6 +218,22 @@ void lv_draw_sw_grad_cleanup(lv_draw_sw_grad_calc_t * grad)
     lv_free(grad);
 }
 
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+bool lv_draw_sw_grad_swap_for_layer(const lv_layer_t * layer, const lv_grad_dsc_t * dsc, lv_grad_dsc_t * swapped)
+{
+    if(layer->color_format != LV_COLOR_FORMAT_ABGR8888) return false;
+    if(dsc->dir == LV_GRAD_DIR_NONE || dsc->dir == LV_GRAD_DIR_VER) return false;
+
+    *swapped = *dsc;
+    uint32_t i;
+    for(i = 0; i < swapped->stops_count; i++) {
+        lv_color_t c = swapped->stops[i].color;
+        swapped->stops[i].color = lv_color_make(c.blue, c.green, c.red);
+    }
+    return true;
+}
+#endif
+
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 

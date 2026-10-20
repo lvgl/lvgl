@@ -126,6 +126,7 @@ class ColorFormat(Enum):
     RGB565A8 = 0x14
     RGB888 = 0x0F
     ARGB8888_PREMULTIPLIED = 0x1A
+    ABGR8888 = 0x1C
 
     @property
     def bpp(self) -> int:
@@ -151,6 +152,7 @@ class ColorFormat(Enum):
             ColorFormat.ARGB8565: 24,
             ColorFormat.RGB888: 24,
             ColorFormat.ARGB8888_PREMULTIPLIED: 32,
+            ColorFormat.ABGR8888: 32,
         }
 
         return cf_map[self] if self in cf_map else 0
@@ -189,7 +191,8 @@ class ColorFormat(Enum):
             ColorFormat.XRGB8888,  # const alpha: 0xff
             ColorFormat.ARGB8565,
             ColorFormat.RGB565A8,
-            ColorFormat.ARGB8888_PREMULTIPLIED)
+            ColorFormat.ARGB8888_PREMULTIPLIED,
+            ColorFormat.ABGR8888)
 
     @property
     def is_colormap(self) -> bool:
@@ -197,7 +200,8 @@ class ColorFormat(Enum):
                         ColorFormat.XRGB8888, ColorFormat.RGB565A8,
                         ColorFormat.ARGB8565, ColorFormat.RGB565,
                         ColorFormat.RGB565_SWAPPED,
-                        ColorFormat.ARGB8888_PREMULTIPLIED)
+                        ColorFormat.ARGB8888_PREMULTIPLIED,
+                        ColorFormat.ABGR8888)
 
     @property
     def is_luma_only(self) -> bool:
@@ -323,6 +327,8 @@ def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
         G = data[1::4]
         R = data[2::4]
         A = data[3::4]
+        if cf == ColorFormat.ABGR8888:
+            R, B = B, R
         if cf == ColorFormat.ARGB8888_PREMULTIPLIED:
             for r, g, b, a in zip(R, G, B, A):
                 r = (r * a // 255)
@@ -1081,6 +1087,10 @@ class LVGLImage:
 
                 # Pack into ARGB8888 format
                 return uint32_t((a << 24) | (r << 16) | (g << 8) | (b << 0))
+        elif cf == ColorFormat.ABGR8888:
+
+            def pack(r, g, b, a):
+                return uint32_t((a << 24) | (b << 16) | (g << 8) | (r << 0))
         elif cf == ColorFormat.XRGB8888:
 
             def pack(r, g, b, a):
@@ -1446,7 +1456,7 @@ def main():
         choices=[
             "L8", "I1", "I2", "I4", "I8", "A1", "A2", "A4", "A8", "AL88", "ARGB8888",
             "XRGB8888", "RGB565", "RGB565_SWAPPED", "RGB565A8", "ARGB8565", "RGB888", "AUTO",
-            "RAW", "RAW_ALPHA", "ARGB8888_PREMULTIPLIED"
+            "RAW", "RAW_ALPHA", "ARGB8888_PREMULTIPLIED", "ABGR8888"
         ])
 
     parser.add_argument('--rgb565dither', action='store_true',

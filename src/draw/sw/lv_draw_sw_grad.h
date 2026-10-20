@@ -57,6 +57,10 @@ lv_draw_sw_grad_calc_t * lv_draw_sw_grad_get(const lv_grad_dsc_t * gradient, int
  */
 void lv_draw_sw_grad_cleanup(lv_draw_sw_grad_calc_t * grad);
 
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+bool lv_draw_sw_grad_swap_for_layer(const lv_layer_t * layer, const lv_grad_dsc_t * dsc, lv_grad_dsc_t * swapped);
+#endif
+
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 
