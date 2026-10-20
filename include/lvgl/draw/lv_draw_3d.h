@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
     lv_3dtexture_id_t tex_id;
     bool h_flip;
     bool v_flip;

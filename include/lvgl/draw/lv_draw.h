@@ -194,7 +194,7 @@ typedef struct {
 
     /**Any custom user data*/
     void * user_data;
-} lv_draw_dsc_base_t;
+} lv_draw_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -381,10 +381,10 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area);
 
 
 
-lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_base_t * base,
+lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_t * base,
                                               const lv_area_t * area);
 
-void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_base_t * base);
+void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_t * base);
 
 
 

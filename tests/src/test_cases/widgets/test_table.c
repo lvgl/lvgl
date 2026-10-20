@@ -151,7 +151,7 @@ void test_table_should_wrap_long_texts(void)
 static void draw_part_event_cb(lv_event_t * e)
 {
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+    lv_draw_dsc_t * base_dsc = draw_task->draw_dsc;
     /*If the cells are drawn...*/
     if(base_dsc->part == LV_PART_ITEMS) {
         uint32_t row = base_dsc->id1;

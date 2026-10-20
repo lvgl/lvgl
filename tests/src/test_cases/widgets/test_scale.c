@@ -250,7 +250,7 @@ static void draw_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
     lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
     lv_draw_line_dsc_t * line_draw_dsc = lv_draw_task_get_line_dsc(draw_task);
     if(label_draw_dsc) {

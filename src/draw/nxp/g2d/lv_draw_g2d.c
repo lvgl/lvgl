@@ -193,7 +193,7 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         return 0;
     }
 
-    const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+    const lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
     lv_draw_buf_t * draw_buf = draw_dsc_base->layer->draw_buf;
 
     if(!_g2d_dest_cf_supported(draw_dsc_base->layer->color_format))

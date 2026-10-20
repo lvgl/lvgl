@@ -29,10 +29,10 @@ See [Style Properties](/common-widget-features/styles/style-properties) to see t
 ## Base Draw Descriptor
 
 In each draw descriptor there is a generic "base descriptor" with
-<ApiLink name="lv_draw_dsc_base_t" /> type and with `base` in its name.  For example
+<ApiLink name="lv_draw_dsc_t" /> type and with `base` in its name.  For example
 `label_dsc.base`.  This `struct` stores useful information about which Widget
 and part created the draw descriptor.  See all the fields in
-<ApiLink name="lv_draw_dsc_base_t" />.
+<ApiLink name="lv_draw_dsc_t" />.
 
 In an <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> event, the elements of the base draw
 descriptor are very useful to identify the Draw Task.  For example:

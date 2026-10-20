@@ -236,7 +236,7 @@ void lv_draw_label_iterate_characters(lv_layer_t * layer, const lv_area_t * clip
     LV_CHECK_ARG(dsc != NULL, return);
     LV_CHECK_ARG(coords != NULL, return);
 
-    const lv_draw_dsc_base_t * base_dsc = &dsc->base;
+    const lv_draw_dsc_t * base_dsc = &dsc->base;
     const lv_font_t * font = dsc->font;
     int32_t w;
 

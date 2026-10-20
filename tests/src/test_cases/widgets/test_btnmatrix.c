@@ -514,7 +514,7 @@ static uint32_t drawn_buttons_mask;
 static void partial_clip_draw_task_cb(lv_event_t * e)
 {
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
     if(base_dsc->part != LV_PART_ITEMS) return;
     if(lv_draw_task_get_fill_dsc(draw_task) == NULL) return;
     drawn_buttons_mask |= 1UL << base_dsc->id1;

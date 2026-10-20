@@ -133,7 +133,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
     LV_CHECK_ARG(t != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
+    lv_draw_dsc_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
 
     lv_draw_global_info_t * info = &_draw_info;
@@ -571,7 +571,7 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
     *area = t->area;
 }
 
-lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_base_t * base,
+lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_t * base,
                                               const lv_area_t * area)
 {
     LV_CHECK_ARG(parent_layer != NULL, return NULL);
@@ -591,7 +591,7 @@ lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const l
     return ds_layer;
 }
 
-void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_base_t * base)
+void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_t * base)
 {
     LV_CHECK_ARG(drop_shadow_layer != NULL, return);
     LV_CHECK_ARG(base != NULL, return);

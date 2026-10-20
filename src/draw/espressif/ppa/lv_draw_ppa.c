@@ -89,7 +89,7 @@ void lv_draw_ppa_deinit(void)
 static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
-    const lv_draw_dsc_base_t * base = (lv_draw_dsc_base_t *)t->draw_dsc;
+    const lv_draw_dsc_t * base = (lv_draw_dsc_t *)t->draw_dsc;
 
     if(!ppa_dest_cf_supported(base->layer->color_format)) return 0;
 
