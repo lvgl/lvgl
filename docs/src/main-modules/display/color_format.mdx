@@ -63,8 +63,13 @@ as-is, for example when running LVGL in WebAssembly.
 Enable it with <ApiLink name="LV_DRAW_SW_SUPPORT_ABGR8888" /> (it requires
 <ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888" />). Fills, borders, text, shadows, gradients and
 layers work as with <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />. Images are blended
-byte by byte, so they need to use the same channel order as the display: convert them to
-`ABGR8888` (e.g. with `LVGLImage.py --cf ABGR8888`), otherwise red and blue are swapped.
+with the ARGB8888 code, so only `ABGR8888`, `A8`, `L8` and `AL88` images are rendered with the
+right colors. All the other color images (`RGB565`, `RGB888`, `ARGB8888`, indexed, ...) have
+their red and blue channels swapped, so convert them to `ABGR8888` first (e.g. with
+`LVGLImage.py --cf ABGR8888`).
+
+Layers created on an `ABGR8888` layer are always `ABGR8888` too (except `A8` layers),
+whatever color format was requested.
 
 ## Monochrome Displays
 

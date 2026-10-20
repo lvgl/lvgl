@@ -29,13 +29,16 @@ All of the below format names are used in code by prefixing them with
 | ARGB8888 | 32 | Yes | Standard ARGB with 8 bits per color channel |
 | XRGB8888 | 32 | Yes | Like ARGB but alpha bytes are ignored |
 | ARGB8888_PREMULTIPLIED | 32 | Yes | ARGB8888 with RGB pre-darkened according to alpha channel value |
-| ABGR8888 | 32 | Yes | ARGB8888 with red and blue swapped (`R, G, B, A` bytes). Only for `ABGR8888` displays |
+| ABGR8888 [^4] | 32 | Yes | ARGB8888 with red and blue swapped (`R, G, B, A` bytes) |
 | RAW [^2] | ? | n/a | See [Custom Image Formats](/main-modules/images/decoders) |
 | RAW_ALPHA [^2] | ? | n/a | See [Custom Image Formats](/main-modules/images/decoders) |
 
 [^1]: I1, I2, I4 and I8 indexed formats require <ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888" /> to be configured to `1` in your `lv_conf.h` file.  Palette colors are always `ARGB8888`.
 
 [^2]: Custom formats can be supported by specifying one of the RAW color formats and using an external [image decoder](/main-modules/images/decoders) to decode it. See [Image Decoders](/main-modules/images/decoders).
+
+[^4]: Requires <ApiLink name="LV_DRAW_SW_SUPPORT_ABGR8888" />, and is only rendered correctly on
+    an `ABGR8888` display. See [Red and Blue Order](/main-modules/display/color_format#red-and-blue-order).
 
 ## Built-In Input and Output Formats
 
