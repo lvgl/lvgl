@@ -51,7 +51,7 @@ static void draw_event_cb(lv_event_t * e)
  * @brief Recolour and reformat scale labels during `LV_EVENT_DRAW_TASK_ADDED`.
  *
  * A horizontal-bottom scale (80% width, 100 px tall, 31 ticks, range
- * 10 to 40) enables `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` and subscribes
+ * 10 to 40) enables `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` and subscribes
  * to `LV_EVENT_DRAW_TASK_ADDED`. The callback inspects each draw
  * task targeting `LV_PART_INDICATOR`, rewrites the label text to a
  * one-decimal value formatted from `id2`, picks one of seven palette
@@ -75,7 +75,7 @@ void lv_example_scale_label_recolor(void)
     lv_scale_set_range(scale, 10, 40);
 
     lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(scale, true);
+    lv_obj_set_send_draw_dsc_events(scale, true);
 }
 
 #endif
