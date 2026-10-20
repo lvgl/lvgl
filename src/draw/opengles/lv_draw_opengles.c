@@ -364,7 +364,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     }
 
     switch(task->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 lv_draw_fill_dsc_t * fill_dsc = task->draw_dsc;
                 lv_draw_rect_dsc_t rect_dsc;
                 lv_draw_rect_dsc_init(&rect_dsc);
@@ -376,7 +376,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
                 lv_draw_rect(&dest_layer, &rect_dsc, &task->area);
             }
             break;
-        case LV_DRAW_TASK_TYPE_BORDER: {
+        case LV_DRAW_DSC_TYPE_BORDER: {
                 lv_draw_border_dsc_t * border_dsc = task->draw_dsc;
                 lv_draw_rect_dsc_t rect_dsc;
                 lv_draw_rect_dsc_init(&rect_dsc);
@@ -390,7 +390,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
                 lv_draw_rect(&dest_layer, &rect_dsc, &task->area);
                 break;
             }
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW: {
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW: {
                 lv_draw_box_shadow_dsc_t * box_shadow_dsc = task->draw_dsc;
                 lv_draw_rect_dsc_t rect_dsc;
                 lv_draw_rect_dsc_init(&rect_dsc);
@@ -406,35 +406,35 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
                 lv_draw_rect(&dest_layer, &rect_dsc, &task->area);
                 break;
             }
-        case LV_DRAW_TASK_TYPE_LABEL: {
+        case LV_DRAW_DSC_TYPE_LABEL: {
                 lv_draw_label_dsc_t label_dsc;
                 lv_memcpy(&label_dsc, task->draw_dsc, sizeof(label_dsc));
                 label_dsc.base.user_data = (void *)(uintptr_t)1;
                 lv_draw_label(&dest_layer, &label_dsc, &task->area);
             }
             break;
-        case LV_DRAW_TASK_TYPE_ARC: {
+        case LV_DRAW_DSC_TYPE_ARC: {
                 lv_draw_arc_dsc_t arc_dsc;
                 lv_memcpy(&arc_dsc, task->draw_dsc, sizeof(arc_dsc));
                 arc_dsc.base.user_data = (void *)(uintptr_t)1;
                 lv_draw_arc(&dest_layer, &arc_dsc);
             }
             break;
-        case LV_DRAW_TASK_TYPE_LINE: {
+        case LV_DRAW_DSC_TYPE_LINE: {
                 lv_draw_line_dsc_t line_dsc;
                 lv_memcpy(&line_dsc, task->draw_dsc, sizeof(line_dsc));
                 line_dsc.base.user_data = (void *)(uintptr_t)1;
                 lv_draw_line(&dest_layer, &line_dsc);
             }
             break;
-        case LV_DRAW_TASK_TYPE_TRIANGLE: {
+        case LV_DRAW_DSC_TYPE_TRIANGLE: {
                 lv_draw_triangle_dsc_t triangle_dsc;
                 lv_memcpy(&triangle_dsc, task->draw_dsc, sizeof(triangle_dsc));
                 triangle_dsc.base.user_data = (void *)(uintptr_t)1;
                 lv_draw_triangle(&dest_layer, &triangle_dsc);
             }
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 lv_draw_image_dsc_t image_dsc;
                 lv_memcpy(&image_dsc, task->draw_dsc, sizeof(image_dsc));
                 image_dsc.base.user_data = (void *)(uintptr_t)1;
@@ -510,7 +510,7 @@ static void blend_texture_layer(lv_draw_task_t * t)
     bool h_flip = false;
     bool v_flip = false;
 #if LV_USE_3DTEXTURE
-    if(t->type == LV_DRAW_TASK_TYPE_3D) {
+    if(t->type == LV_DRAW_DSC_TYPE_3D) {
         lv_draw_3d_dsc_t * _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
         h_flip = _3d_dsc->h_flip;
         v_flip = _3d_dsc->v_flip;
@@ -534,7 +534,7 @@ static void draw_texture_to_framebuffer(lv_draw_opengles_unit_t * u, unsigned in
     bool h_flip = false;
     bool v_flip = false;
 #if LV_USE_3DTEXTURE
-    if(t->type == LV_DRAW_TASK_TYPE_3D) {
+    if(t->type == LV_DRAW_DSC_TYPE_3D) {
         lv_draw_3d_dsc_t * _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
         h_flip = _3d_dsc->h_flip;
         v_flip = _3d_dsc->v_flip;
@@ -592,11 +592,11 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     /*img_dsc->image_area is an absolute coordinate so it's different
      *for the same image on a different position. So make it relative before using for cache. */
     lv_area_t a = t->area;
-    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+    if(t->type == LV_DRAW_DSC_TYPE_IMAGE) {
         lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)data_to_find.draw_dsc;
         lv_area_move(&img_dsc->image_area, -t->area.x1, -t->area.y1);
     }
-    else if(t->type == LV_DRAW_TASK_TYPE_TRIANGLE) {
+    else if(t->type == LV_DRAW_DSC_TYPE_TRIANGLE) {
         lv_draw_triangle_dsc_t * tri_dsc = (lv_draw_triangle_dsc_t *)data_to_find.draw_dsc;
         tri_dsc->p[0].x -= t->area.x1;
         tri_dsc->p[0].y -= t->area.y1;
@@ -605,14 +605,14 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
         tri_dsc->p[2].x -= t->area.x1;
         tri_dsc->p[2].y -= t->area.y1;
     }
-    else if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+    else if(t->type == LV_DRAW_DSC_TYPE_LINE) {
         lv_draw_line_dsc_t * line_dsc = (lv_draw_line_dsc_t *)data_to_find.draw_dsc;
         line_dsc->p1.x -= t->area.x1;
         line_dsc->p1.y -= t->area.y1;
         line_dsc->p2.x -= t->area.x1;
         line_dsc->p2.y -= t->area.y1;
     }
-    else if(t->type == LV_DRAW_TASK_TYPE_ARC) {
+    else if(t->type == LV_DRAW_DSC_TYPE_ARC) {
         lv_draw_arc_dsc_t * arc_dsc = (lv_draw_arc_dsc_t *)data_to_find.draw_dsc;
         arc_dsc->center.x -= t->area.x1;
         arc_dsc->center.y -= t->area.y1;
@@ -649,7 +649,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
 
     /* the shader-based fill is not working reliably with EGL. */
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
                 if(fill_dsc->radius == 0 && fill_dsc->grad.dir == LV_GRAD_DIR_NONE) {
                     lv_layer_t * layer = t->target_layer;
@@ -692,7 +692,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 }
                 break;
             }
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 /*Do not cache modifiable images as they might change in the next frame
                  *resulting in stale textures in the cache. */
                 lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
@@ -702,7 +702,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 }
                 break;
             }
-        case LV_DRAW_TASK_TYPE_LABEL: {
+        case LV_DRAW_DSC_TYPE_LABEL: {
                 /*Do not cache non static (const) texts as the text's pointer can be freed/reallocated
                  *at any time resulting in a wild pointer in the cached draw dsc. */
                 lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
@@ -712,7 +712,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 }
                 break;
             }
-        case LV_DRAW_TASK_TYPE_LINE: {
+        case LV_DRAW_DSC_TYPE_LINE: {
                 /*Do not cache lines rendered from points at dsc->points will be freed*/
                 lv_draw_line_dsc_t * line_dsc = t->draw_dsc;
                 if(line_dsc->points) {
@@ -721,12 +721,12 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 }
                 break;
             }
-        case LV_DRAW_TASK_TYPE_LAYER: {
+        case LV_DRAW_DSC_TYPE_LAYER: {
                 blend_texture_layer(t);
                 return;
             }
 #if LV_USE_3DTEXTURE
-        case LV_DRAW_TASK_TYPE_3D: {
+        case LV_DRAW_DSC_TYPE_3D: {
                 lv_draw_opengles_3d(t, t->draw_dsc, &t->area);
                 return;
             }

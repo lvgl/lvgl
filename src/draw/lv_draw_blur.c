@@ -45,7 +45,7 @@ lv_draw_blur_dsc_t * lv_draw_task_get_blur_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_BLUR ? (lv_draw_blur_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_BLUR ? (lv_draw_blur_dsc_t *)task->draw_dsc : NULL;
 }
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_blur(lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
@@ -58,7 +58,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_blur(lv_layer_t * layer, const lv_draw_blur_d
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BLUR);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BLUR);
     if(!t) {
         LV_LOG_WARN("Failed to create draw task");
         LV_PROFILER_DRAW_END;

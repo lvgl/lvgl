@@ -185,21 +185,21 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     LV_UNUSED(draw_unit);
 
     switch(task->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
-        case LV_DRAW_TASK_TYPE_BORDER:
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-        case LV_DRAW_TASK_TYPE_LABEL:
-        case LV_DRAW_TASK_TYPE_IMAGE:
-        case LV_DRAW_TASK_TYPE_LAYER:
-        case LV_DRAW_TASK_TYPE_LINE:
-        case LV_DRAW_TASK_TYPE_ARC:
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
+        case LV_DRAW_DSC_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
             break;
         default:
             return 0;
     }
 
-    if(task->type == LV_DRAW_TASK_TYPE_IMAGE &&
+    if(task->type == LV_DRAW_DSC_TYPE_IMAGE &&
        ((lv_draw_image_dsc_t *)task->draw_dsc)->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
         return 0;
     }
@@ -255,7 +255,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     }
 
     switch(task->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 lv_draw_fill_dsc_t * fill_dsc = task->draw_dsc;
                 lv_draw_rect_dsc_t rect_dsc;
                 lv_draw_rect_dsc_init(&rect_dsc);
@@ -268,7 +268,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
                 lv_draw_rect(&dest_layer, &rect_dsc, &task->area);
             }
             break;
-        case LV_DRAW_TASK_TYPE_BORDER: {
+        case LV_DRAW_DSC_TYPE_BORDER: {
                 lv_draw_border_dsc_t * border_dsc = task->draw_dsc;
                 lv_draw_rect_dsc_t rect_dsc;
                 lv_draw_rect_dsc_init(&rect_dsc);
@@ -282,7 +282,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
                 lv_draw_rect(&dest_layer, &rect_dsc, &task->area);
                 break;
             }
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW: {
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW: {
                 lv_draw_box_shadow_dsc_t * box_shadow_dsc = task->draw_dsc;
                 lv_draw_rect_dsc_t rect_dsc;
                 lv_draw_rect_dsc_init(&rect_dsc);
@@ -298,35 +298,35 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
                 lv_draw_rect(&dest_layer, &rect_dsc, &task->area);
                 break;
             }
-        case LV_DRAW_TASK_TYPE_LABEL: {
+        case LV_DRAW_DSC_TYPE_LABEL: {
                 lv_draw_label_dsc_t label_dsc;
                 lv_memcpy(&label_dsc, task->draw_dsc, sizeof(label_dsc));
                 label_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_label(&dest_layer, &label_dsc, &task->area);
             }
             break;
-        case LV_DRAW_TASK_TYPE_ARC: {
+        case LV_DRAW_DSC_TYPE_ARC: {
                 lv_draw_arc_dsc_t arc_dsc;
                 lv_memcpy(&arc_dsc, task->draw_dsc, sizeof(arc_dsc));
                 arc_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_arc(&dest_layer, &arc_dsc);
             }
             break;
-        case LV_DRAW_TASK_TYPE_LINE: {
+        case LV_DRAW_DSC_TYPE_LINE: {
                 lv_draw_line_dsc_t line_dsc;
                 lv_memcpy(&line_dsc, task->draw_dsc, sizeof(line_dsc));
                 line_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_line(&dest_layer, &line_dsc);
             }
             break;
-        case LV_DRAW_TASK_TYPE_TRIANGLE: {
+        case LV_DRAW_DSC_TYPE_TRIANGLE: {
                 lv_draw_triangle_dsc_t triangle_dsc;
                 lv_memcpy(&triangle_dsc, task->draw_dsc, sizeof(triangle_dsc));
                 triangle_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_triangle(&dest_layer, &triangle_dsc);
             }
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 lv_draw_image_dsc_t image_dsc;
                 lv_memcpy(&image_dsc, task->draw_dsc, sizeof(image_dsc));
                 image_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
@@ -424,11 +424,11 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
     /*Absolute coordinates are different for the same draw_dsc on a different position.
      *So make everything relative to 0;0  before caching*/
     lv_area_t a = t->area;
-    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+    if(t->type == LV_DRAW_DSC_TYPE_IMAGE) {
         lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)data_to_find.draw_dsc;
         lv_area_move(&img_dsc->image_area, -t->area.x1, -t->area.y1);
     }
-    else if(t->type == LV_DRAW_TASK_TYPE_TRIANGLE) {
+    else if(t->type == LV_DRAW_DSC_TYPE_TRIANGLE) {
         lv_draw_triangle_dsc_t * tri_dsc = (lv_draw_triangle_dsc_t *)data_to_find.draw_dsc;
         tri_dsc->p[0].x -= t->area.x1;
         tri_dsc->p[0].y -= t->area.y1;
@@ -437,14 +437,14 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
         tri_dsc->p[2].x -= t->area.x1;
         tri_dsc->p[2].y -= t->area.y1;
     }
-    else if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+    else if(t->type == LV_DRAW_DSC_TYPE_LINE) {
         lv_draw_line_dsc_t * line_dsc = (lv_draw_line_dsc_t *)data_to_find.draw_dsc;
         line_dsc->p1.x -= t->area.x1;
         line_dsc->p1.y -= t->area.y1;
         line_dsc->p2.x -= t->area.x1;
         line_dsc->p2.y -= t->area.y1;
     }
-    else if(t->type == LV_DRAW_TASK_TYPE_ARC) {
+    else if(t->type == LV_DRAW_DSC_TYPE_ARC) {
         lv_draw_arc_dsc_t * arc_dsc = (lv_draw_arc_dsc_t *)data_to_find.draw_dsc;
         arc_dsc->center.x -= t->area.x1;
         arc_dsc->center.y -= t->area.y1;
@@ -494,14 +494,14 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     /*Do not cache non static (const) texts as the text's pointer can be freed/reallocated
      *at any time resulting in a wild pointer in the cached draw dsc. */
-    if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
+    if(t->type == LV_DRAW_DSC_TYPE_LABEL) {
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
         if(!label_dsc->text_static) {
             lv_cache_drop(u->texture_cache, &data_to_find, NULL);
         }
     }
     /*Do not cache lines rendered from points at dsc->points will be freed*/
-    else if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+    else if(t->type == LV_DRAW_DSC_TYPE_LINE) {
         lv_draw_line_dsc_t * line_dsc = t->draw_dsc;
         if(line_dsc->points) {
             lv_cache_drop(u->texture_cache, &data_to_find, u);
@@ -513,7 +513,7 @@ static void execute_drawing(lv_draw_sdl_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
 
-    if(t->type == LV_DRAW_TASK_TYPE_FILL) {
+    if(t->type == LV_DRAW_DSC_TYPE_FILL) {
         lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
         if(fill_dsc->radius == 0 && fill_dsc->grad.dir == LV_GRAD_DIR_NONE) {
             SDL_Rect rect;
@@ -535,7 +535,7 @@ static void execute_drawing(lv_draw_sdl_unit_t * u)
         }
     }
 
-    if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
+    if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
         blend_texture_layer(t);
         return;
     }

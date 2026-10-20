@@ -281,7 +281,7 @@ static int32_t series_line_max_y;
 static void series_line_points_cb(lv_event_t * e)
 {
     lv_draw_task_t * draw_task = lv_event_get_param(e);
-    if(lv_draw_task_get_type(draw_task) != LV_DRAW_TASK_TYPE_LINE) return;
+    if(lv_draw_task_get_type(draw_task) != LV_DRAW_DSC_TYPE_LINE) return;
 
     lv_draw_line_dsc_t * line_dsc = lv_draw_task_get_line_dsc(draw_task);
     if(line_dsc->base.part != LV_PART_ITEMS || line_dsc->points == NULL) return;
