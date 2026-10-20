@@ -544,11 +544,8 @@ static void draw_indic(lv_event_t * e)
         }
     }
 
-    /*Do not draw a zero length indicator but at least call the draw task event*/
-    if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
-        lv_obj_send_event(obj, LV_EVENT_DRAW_TASK_ADDED, NULL);
-        return;
-    }
+    /*Do not draw a zero length indicator*/
+    if(!sym && indic_length_calc(&bar->indic_area) <= 1) return;
 
     lv_area_t indic_area;
     indic_area = bar->indic_area;
