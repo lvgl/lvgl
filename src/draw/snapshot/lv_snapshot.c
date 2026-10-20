@@ -295,7 +295,7 @@ static void snapshot_discard_layer_tasks(lv_layer_t * layer)
     while(task) {
         lv_draw_task_t * task_next = task->next;
 
-        if(task->type == LV_DRAW_TASK_TYPE_LAYER) {
+        if(task->type == LV_DRAW_DSC_TYPE_LAYER) {
             lv_draw_image_dsc_t * image_dsc = task->draw_dsc;
             lv_layer_t * sub_layer = (lv_layer_t *)image_dsc->src;
             if(sub_layer) snapshot_discard_layer_tasks(sub_layer);

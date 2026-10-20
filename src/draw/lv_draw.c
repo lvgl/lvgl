@@ -28,7 +28,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t draw_unit_id);
-static inline size_t get_draw_dsc_size(lv_draw_task_type_t type);
+static inline size_t get_draw_dsc_size(lv_draw_dsc_type_t type);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
@@ -87,7 +87,7 @@ void * lv_draw_create_unit(size_t size)
     return new_unit;
 }
 
-lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type)
+lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_dsc_type_t type)
 {
     LV_CHECK_ARG(layer != NULL, return NULL);
     LV_CHECK_ARG(coords != NULL, return NULL);
@@ -172,7 +172,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             LV_LOG_WARN("Draw task failed (%p, type %d): not taken by any unit", (void *)t, t->type);
             /* mark a non-taken layer task as BLOCKED so we don't try to release it
             * as one of its draw tasks might be in progress already */
-            if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
+            if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
                 t->state = LV_DRAW_TASK_STATE_BLOCKED;
             }
             else {
@@ -278,7 +278,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         /*Find a draw task with TYPE_LAYER in the layer where the src is this layer*/
         lv_draw_task_t * t_src = layer->parent->draw_task_head;
         while(t_src) {
-            if(t_src->type == LV_DRAW_TASK_TYPE_LAYER && t_src->state == LV_DRAW_TASK_STATE_BLOCKED) {
+            if(t_src->type == LV_DRAW_DSC_TYPE_LAYER && t_src->state == LV_DRAW_TASK_STATE_BLOCKED) {
                 lv_draw_image_dsc_t * draw_dsc = t_src->draw_dsc;
                 if(draw_dsc->src == layer) {
                     t_src->state = t_src->preferred_draw_unit_id == LV_DRAW_UNIT_NONE
@@ -553,9 +553,9 @@ void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
     return lv_draw_buf_goto_xy(layer->draw_buf, x, y);
 }
 
-lv_draw_task_type_t lv_draw_task_get_type(const lv_draw_task_t * t)
+lv_draw_dsc_type_t lv_draw_task_get_type(const lv_draw_task_t * t)
 {
-    LV_CHECK_ARG(t != NULL, return LV_DRAW_TASK_TYPE_NONE);
+    LV_CHECK_ARG(t != NULL, return LV_DRAW_DSC_TYPE_NONE);
 
     return t->type;
 }
@@ -734,42 +734,42 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t
  * @param type      type of the draw task
  * @return          size of the draw descriptor in bytes
  */
-static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
+static inline size_t get_draw_dsc_size(lv_draw_dsc_type_t type)
 {
     switch(type) {
-        case LV_DRAW_TASK_TYPE_NONE:
+        case LV_DRAW_DSC_TYPE_NONE:
             return 0;
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             return sizeof(lv_draw_fill_dsc_t);
-        case LV_DRAW_TASK_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BORDER:
             return sizeof(lv_draw_border_dsc_t);
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
             return sizeof(lv_draw_box_shadow_dsc_t);
-        case LV_DRAW_TASK_TYPE_LETTER:
+        case LV_DRAW_DSC_TYPE_LETTER:
             return sizeof(lv_draw_letter_dsc_t);
-        case LV_DRAW_TASK_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_LABEL:
             return sizeof(lv_draw_label_dsc_t);
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             return sizeof(lv_draw_image_dsc_t);
-        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LAYER:
             return sizeof(lv_draw_image_dsc_t);
-        case LV_DRAW_TASK_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_LINE:
             return sizeof(lv_draw_line_dsc_t);
-        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_ARC:
             return sizeof(lv_draw_arc_dsc_t);
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
             return sizeof(lv_draw_triangle_dsc_t);
-        case LV_DRAW_TASK_TYPE_BLUR:
+        case LV_DRAW_DSC_TYPE_BLUR:
             return sizeof(lv_draw_blur_dsc_t);
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
             return sizeof(lv_draw_mask_rect_dsc_t);
 
 #if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_TASK_TYPE_VECTOR:
+        case LV_DRAW_DSC_TYPE_VECTOR:
             return sizeof(lv_draw_vector_dsc_t);
 #endif
 #if LV_USE_3DTEXTURE
-        case LV_DRAW_TASK_TYPE_3D:
+        case LV_DRAW_DSC_TYPE_3D:
             return sizeof(lv_draw_3d_dsc_t);
 #endif
             /* Note that default is not added here because when adding new draw task type,
@@ -787,7 +787,7 @@ void lv_draw_cleanup_task(lv_draw_task_t * t)
 
     LV_ASSERT_FORMAT_MSG(t->state != LV_DRAW_TASK_STATE_IN_PROGRESS, "task %p (type %d) is still used by a draw unit",
                          (void *)t, t->type);
-    if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+    if(t->type == LV_DRAW_DSC_TYPE_LINE) {
         lv_draw_line_dsc_t * draw_line_dsc = t->draw_dsc;
         if(draw_line_dsc->points) {
             lv_free(draw_line_dsc->points);
@@ -795,7 +795,7 @@ void lv_draw_cleanup_task(lv_draw_task_t * t)
         }
     }
     /*If it was layer drawing free the layer too*/
-    else if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
+    else if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
         lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
         lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
         lv_draw_layer_delete(layer_drawn);
@@ -815,7 +815,7 @@ static lv_draw_task_t * get_first_available_task(lv_layer_t * layer)
     LV_PROFILER_DRAW_BEGIN;
     /* If there is only 1 draw unit the task can be consumed linearly as
      * they are added in the correct order. However, it can happen that
-     * there is a `LV_DRAW_TASK_TYPE_LAYER` which can be blended only when
+     * there is a `LV_DRAW_DSC_TYPE_LAYER` which can be blended only when
      * all its tasks are ready. As other areas might be on top of that
      * layer-to-blend don't skip it. Instead stop there, so that the
      * draw tasks of that layer can be consumed and can be finished.

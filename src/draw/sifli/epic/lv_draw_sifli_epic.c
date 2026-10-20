@@ -188,7 +188,7 @@ static int32_t _epic_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     }
 
     switch(task->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * draw_dsc = (const lv_draw_fill_dsc_t *)task->draw_dsc;
 
                 if(task->target_layer == NULL) {
@@ -229,7 +229,7 @@ static int32_t _epic_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                 return 1;
             }
 
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 const lv_draw_image_dsc_t * draw_dsc = (const lv_draw_image_dsc_t *)task->draw_dsc;
 
                 if(draw_dsc->src == NULL) {
@@ -272,7 +272,7 @@ static int32_t _epic_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                 return 1;
             }
 
-        case LV_DRAW_TASK_TYPE_BORDER: {
+        case LV_DRAW_DSC_TYPE_BORDER: {
                 const lv_draw_border_dsc_t * draw_dsc = (const lv_draw_border_dsc_t *)task->draw_dsc;
 
                 if(draw_dsc->radius != 0) {
@@ -287,7 +287,7 @@ static int32_t _epic_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             }
 
 #ifdef EPIC_SUPPORT_A8
-        case LV_DRAW_TASK_TYPE_LABEL: {
+        case LV_DRAW_DSC_TYPE_LABEL: {
                 const lv_draw_label_dsc_t * draw_dsc = (const lv_draw_label_dsc_t *)task->draw_dsc;
                 lv_layer_t * target_layer = task->target_layer;
 
@@ -315,7 +315,7 @@ static int32_t _epic_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             }
 #endif
 
-        case LV_DRAW_TASK_TYPE_LAYER: {
+        case LV_DRAW_DSC_TYPE_LAYER: {
                 const lv_draw_image_dsc_t * draw_dsc = (const lv_draw_image_dsc_t *)task->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
 
@@ -459,25 +459,25 @@ static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u)
 
     /* Execute based on task type */
     switch(task->type) {
-        case LV_DRAW_TASK_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BORDER:
             lv_draw_sifli_epic_border(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
                                       &task->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_LABEL:
             lv_draw_sifli_epic_label(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
                                      &task->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             lv_draw_sifli_epic_fill(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc, &task->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             lv_draw_sifli_epic_img(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc, &task->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LAYER:
             lv_draw_sifli_epic_layer(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
                                      &task->area);
             break;

@@ -47,7 +47,7 @@ void lv_draw_3d_dsc_init(lv_draw_3d_dsc_t * dsc);
 /**
  * Try to get a 3D draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_3D
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_3D
  */
 lv_draw_3d_dsc_t * lv_draw_task_get_3d_dsc(lv_draw_task_t * task);
 

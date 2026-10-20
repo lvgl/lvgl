@@ -170,7 +170,7 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_label_dsc_init(lv_draw_label_dsc_t * ds
 /**
  * Try to get a label draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_LABEL
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_LABEL
  */
 lv_draw_label_dsc_t * lv_draw_task_get_label_dsc(lv_draw_task_t * task);
 
