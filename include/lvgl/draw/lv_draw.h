@@ -169,6 +169,9 @@ typedef struct {
     /**The target layer */
     lv_layer_t * layer;
 
+    /**The type of the draw descriptor*/
+    lv_draw_dsc_type_t type;
+
     /*Drop shadow is part of every draw dsc as anything can have drop shadow*/
 
     /**Drop shadow offset in X*/
@@ -378,6 +381,13 @@ void * lv_draw_task_get_draw_dsc(const lv_draw_task_t * t);
  * @param area   the destination where the draw area will be stored
 */
 void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area);
+
+/**
+ * Get the type of a draw descriptor
+ * @param dsc    the draw descriptor
+ * @return       the type of the draw descriptor
+ */
+lv_draw_dsc_type_t lv_draw_dsc_get_type(const lv_draw_dsc_t * dsc);
 
 
 

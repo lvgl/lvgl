@@ -58,6 +58,14 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_ds
 lv_draw_mask_rect_dsc_t * lv_draw_task_get_mask_rect_dsc(lv_draw_task_t * task);
 
 /**
+ * Get the mask rect draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_MASK_RECTANGLE, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the mask rect draw descriptor
+ */
+lv_draw_mask_rect_dsc_t * lv_draw_dsc_get_mask_rect_dsc(lv_draw_dsc_t * dsc);
+
+/**
  * Create a draw task to mask a rectangle from the buffer
  * @param layer     pointer to a layer
  * @param dsc       pointer to a draw descriptor

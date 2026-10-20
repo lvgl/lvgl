@@ -59,6 +59,14 @@ void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc);
 lv_draw_triangle_dsc_t * lv_draw_task_get_triangle_dsc(lv_draw_task_t * task);
 
 /**
+ * Get the triangle draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_TRIANGLE, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the triangle draw descriptor
+ */
+lv_draw_triangle_dsc_t * lv_draw_dsc_get_triangle_dsc(lv_draw_dsc_t * dsc);
+
+/**
  * Create a triangle draw task
  * @param layer     pointer to a layer
  * @param draw_dsc  pointer to an initialized `lv_draw_triangle_dsc_t` object
