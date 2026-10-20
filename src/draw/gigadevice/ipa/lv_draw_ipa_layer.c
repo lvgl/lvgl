@@ -36,45 +36,45 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_draw_ipa_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
+bool lv_draw_ipa_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
-    LV_CHECK_ARG(t != NULL, return false);
+    LV_UNUSED(draw_unit);
+    LV_CHECK_ARG(layer != NULL, return false);
+    LV_CHECK_ARG(clip_area != NULL, return false);
     LV_CHECK_ARG(draw_dsc != NULL, return false);
     LV_CHECK_ARG(coords != NULL, return false);
     LV_CHECK_ARG(draw_dsc->src != NULL, return false);
 
     const lv_layer_t * source_layer = draw_dsc->src;
-    lv_layer_t * target_layer = t->target_layer;
     const lv_draw_buf_t * source_buf = source_layer->draw_buf;
     if(source_buf == NULL || draw_dsc->opa <= LV_OPA_MIN) return false;
 
     lv_area_t clipped_area;
-    if(!lv_area_intersect(&clipped_area, coords, &t->clip_area)) return false;
-    if(!lv_area_intersect(&clipped_area, &clipped_area, &target_layer->buf_area)) return false;
+    if(!lv_area_intersect(&clipped_area, coords, clip_area)) return false;
+    if(!lv_area_intersect(&clipped_area, &clipped_area, &layer->buf_area)) return false;
 
     lv_area_t source_area = clipped_area;
     lv_area_move(&source_area, -coords->x1, -coords->y1);
     lv_color_format_t source_cf = source_buf->header.cf;
-    lv_color_format_t target_cf = target_layer->draw_buf->header.cf;
+    lv_color_format_t target_cf = layer->draw_buf->header.cf;
     uint32_t source_size = lv_color_format_get_size(source_cf);
     uint32_t target_size = lv_color_format_get_size(target_cf);
     uint32_t source_stride = source_buf->header.stride;
-    uint32_t target_stride = target_layer->draw_buf->header.stride;
+    uint32_t target_stride = layer->draw_buf->header.stride;
 
     if(source_size == 0 || target_size == 0 || source_stride % source_size || target_stride % target_size ||
        source_area.x1 < 0 || source_area.y1 < 0 ||
        (uint32_t)source_area.x2 >= source_buf->header.w || (uint32_t)source_area.y2 >= source_buf->header.h ||
        source_stride / source_size < source_buf->header.w ||
-       target_stride / target_size < target_layer->draw_buf->header.w) {
+       target_stride / target_size < layer->draw_buf->header.w) {
         LV_LOG_WARN("Invalid IPA layer buffer layout");
-        t->state = LV_DRAW_TASK_STATE_FAILED;
         return false;
     }
 
     uint32_t width = lv_area_get_width(&clipped_area);
-    void * destination = lv_draw_layer_go_to_xy(target_layer,
-                                                clipped_area.x1 - target_layer->buf_area.x1,
-                                                clipped_area.y1 - target_layer->buf_area.y1);
+    void * destination = lv_draw_layer_go_to_xy(layer, clipped_area.x1 - layer->buf_area.x1,
+                                                clipped_area.y1 - layer->buf_area.y1);
     const uint8_t * source = source_buf->data + (size_t)source_area.y1 * source_stride +
                              (size_t)source_area.x1 * source_size;
     lv_draw_ipa_output_cf_t output_cf = lv_draw_cf_to_ipa_output_cf(target_cf);

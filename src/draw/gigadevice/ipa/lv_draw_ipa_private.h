@@ -125,17 +125,22 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_ipa_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32_t h, int32_t stride);
-void lv_draw_ipa_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                       const lv_area_t * coords);
+void lv_draw_ipa_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords, void * first_pixel, int32_t w,
+                      int32_t h, int32_t stride);
+void lv_draw_ipa_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
 /**
  * Start compositing a rendered layer with IPA.
- * @param t             drawing task
+ * @param draw_unit     the IPA draw unit
+ * @param layer         target layer
+ * @param clip_area     clip area in the target layer's coordinates
  * @param draw_dsc      descriptor whose source is a layer
  * @param coords        destination area of the source buffer
  * @return              true if a hardware transfer was started
  */
-bool lv_draw_ipa_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
+bool lv_draw_ipa_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
 
 lv_draw_ipa_output_cf_t lv_draw_cf_to_ipa_output_cf(lv_color_format_t cf);
 uint32_t lv_draw_ipa_color_to_ipa_color(lv_draw_ipa_output_cf_t cf, lv_color_t color);

@@ -486,17 +486,17 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         void * dest = lv_draw_layer_go_to_xy(layer, draw_ipa_unit->last_clipped_area.x1,
                                              draw_ipa_unit->last_clipped_area.y1);
 
-        lv_draw_ipa_fill(t, dest,
+        lv_draw_ipa_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area, dest,
                          lv_area_get_width(&clipped_coords),
                          lv_area_get_height(&clipped_coords),
                          layer->draw_buf->header.stride);
     }
     else if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
-        lv_draw_ipa_image(t, t->draw_dsc, &t->area);
+        lv_draw_ipa_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
     }
     else if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-        if(!lv_draw_ipa_layer(t, t->draw_dsc, &t->area)) {
-            if(t->state != LV_DRAW_TASK_STATE_FAILED) t->state = LV_DRAW_TASK_STATE_FINISHED;
+        if(!lv_draw_ipa_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area)) {
+            t->state = LV_DRAW_TASK_STATE_FINISHED;
             draw_ipa_unit->task_act = NULL;
             lv_draw_dispatch_request();
             return 1;

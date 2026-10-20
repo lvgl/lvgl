@@ -34,9 +34,14 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_ipa_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32_t h, int32_t stride)
+void lv_draw_ipa_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords, void * first_pixel, int32_t w,
+                      int32_t h, int32_t stride)
 {
-    lv_draw_fill_dsc_t * dsc = t->draw_dsc;
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+    LV_UNUSED(clip_area);
+    LV_UNUSED(coords);
     lv_color_format_t cf = dsc->base.layer->color_format;
     lv_opa_t opa = dsc->opa;
 
