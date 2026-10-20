@@ -427,6 +427,12 @@ and are not meant to be included directly.
   values to `LV_DRAW_DSC_TYPE_*`. The old names can still be used via LVGL's v9.6 API map.
 - `lv_draw_dsc_base_t` has been renamed to <ApiLink name="lv_draw_dsc_t"/>. The `base` field of the draw descriptors
   keeps its name. The old name can still be used via LVGL's v9.6 API map.
+- `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`, `lv_obj_set_send_draw_task_events()` and `lv_obj_is_send_draw_task_events()`
+  have been renamed to `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS`, <ApiLink name="lv_obj_set_send_draw_dsc_events"/> and
+  <ApiLink name="lv_obj_is_send_draw_dsc_events"/>, and the `LV_PROPERTY_OBJ_(FLAG_)SEND_DRAW_TASK_EVENTS` properties
+  to `LV_PROPERTY_OBJ_(FLAG_)SEND_DRAW_DSC_EVENTS`. The old names can still be used via LVGL's v9.6 API map, but the
+  property names used to look up properties by string are now `"send_draw_dsc_events"` and
+  `"flag_send_draw_dsc_events"`.
 
 ### SW draw unit
 

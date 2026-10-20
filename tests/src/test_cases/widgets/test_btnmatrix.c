@@ -544,7 +544,7 @@ void test_button_matrix_draw_task_culling(void)
     lv_obj_t * btnm_clip = lv_buttonmatrix_create(cont);
     lv_buttonmatrix_set_map(btnm_clip, map);
     lv_obj_set_size(btnm_clip, 280, 600);
-    lv_obj_set_send_draw_task_events(btnm_clip, true);
+    lv_obj_set_send_draw_dsc_events(btnm_clip, true);
     lv_obj_add_event_cb(btnm_clip, partial_clip_draw_task_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
 
     /*Scroll so the middle rows are visible, top and bottom rows clipped*/

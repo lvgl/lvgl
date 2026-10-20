@@ -44,7 +44,7 @@ static void add_data(lv_timer_t * timer)
  * A 200x150 `LV_CHART_TYPE_SCATTER` chart is configured with an X range
  * of 0..200 and a Y range of 0..1000 and 50 points. Line width on
  * `LV_PART_ITEMS` is zeroed so only the point markers show. With
- * `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` set, the
+ * `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` set, the
  * `LV_EVENT_DRAW_TASK_ADDED` callback fades older points by reducing
  * opacity and recolors each `LV_PART_INDICATOR` fill between red and
  * blue using the point's X and Y arrays. A 100 ms `lv_timer` pushes a
@@ -56,7 +56,7 @@ void lv_example_chart_scatter(void)
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_set_send_draw_dsc_events(chart, true);
     lv_obj_set_style_line_width(chart, 0, LV_PART_ITEMS);   /*Remove the lines*/
 
     lv_chart_set_type(chart, LV_CHART_TYPE_SCATTER);

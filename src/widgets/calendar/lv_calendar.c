@@ -370,7 +370,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_set_width(calendar->btnm, lv_pct(100));
 
     lv_obj_set_event_bubble(calendar->btnm, true);
-    lv_obj_set_send_draw_task_events(calendar->btnm, true);
+    lv_obj_set_send_draw_dsc_events(calendar->btnm, true);
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);

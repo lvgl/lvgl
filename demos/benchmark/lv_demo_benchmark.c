@@ -542,7 +542,7 @@ void lv_demo_benchmark_summary_display(const lv_demo_benchmark_summary_t * summa
     lv_obj_t * table = lv_table_create(scr);
     lv_obj_set_width(table, lv_pct(100));
     lv_obj_set_style_max_height(table, lv_pct(100), 0);
-    lv_obj_set_send_draw_task_events(table, true);
+    lv_obj_set_send_draw_dsc_events(table, true);
     lv_obj_set_style_text_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
     lv_obj_set_style_border_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
     lv_obj_add_event_cb(table, table_draw_task_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);

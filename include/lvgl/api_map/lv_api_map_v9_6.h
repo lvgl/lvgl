@@ -29,6 +29,12 @@ typedef lv_rotation_t lv_display_rotation_t;
 #define lv_indev_clear_ccw(indev) lv_indev_set_rotation_dir(indev, LV_ROTATION_DIR_CW)
 #define lv_indev_get_ccw(indev) (lv_indev_get_rotation_dir(indev) == LV_ROTATION_DIR_CCW)
 
+#define LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS            LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS
+#define LV_PROPERTY_OBJ_FLAG_SEND_DRAW_TASK_EVENTS   LV_PROPERTY_OBJ_FLAG_SEND_DRAW_DSC_EVENTS
+#define LV_PROPERTY_OBJ_SEND_DRAW_TASK_EVENTS        LV_PROPERTY_OBJ_SEND_DRAW_DSC_EVENTS
+#define lv_obj_set_send_draw_task_events(obj, en)    lv_obj_set_send_draw_dsc_events(obj, en)
+#define lv_obj_is_send_draw_task_events(obj)         lv_obj_is_send_draw_dsc_events(obj)
+
 typedef lv_draw_dsc_t lv_draw_dsc_base_t;
 
 typedef lv_draw_dsc_type_t lv_draw_task_type_t;

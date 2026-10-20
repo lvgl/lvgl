@@ -146,7 +146,7 @@ void lv_demo_widgets_profile_create(lv_obj_t * parent)
     lv_obj_t * slider1 = lv_slider_create(panel3);
     lv_obj_set_width(slider1, LV_PCT(95));
     lv_obj_add_event_cb(slider1, slider_event_cb, LV_EVENT_ALL, NULL);
-    lv_obj_set_send_draw_task_events(slider1, true);
+    lv_obj_set_send_draw_dsc_events(slider1, true);
     lv_obj_refresh_ext_draw_size(slider1);
 
     lv_obj_t * team_player_label = lv_label_create(panel3);

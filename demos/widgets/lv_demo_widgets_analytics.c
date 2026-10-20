@@ -567,7 +567,7 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
         lv_group_add_obj(group, chart);
     }
     lv_obj_set_scroll_on_focus(chart, true);
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_set_send_draw_dsc_events(chart, true);
     lv_chart_set_div_line_count(chart, 0, 12);
     lv_chart_set_point_count(chart, 12);
     lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);

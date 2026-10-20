@@ -343,10 +343,10 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     lv_display_t * disp = lv_refr_get_disp_refreshing();
 
     lv_obj_t * obj = ((lv_draw_dsc_t *)task->draw_dsc)->obj;
-    bool original_send_draw_task_event = false;
+    bool original_send_draw_dsc_events = false;
     if(obj) {
-        original_send_draw_task_event = lv_obj_is_send_draw_task_events(obj);
-        lv_obj_set_send_draw_task_events(obj, false);
+        original_send_draw_dsc_events = lv_obj_is_send_draw_dsc_events(obj);
+        lv_obj_set_send_draw_dsc_events(obj, false);
     }
 
     if(cache_data != NULL) {
@@ -355,7 +355,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
         LV_ASSERT_MALLOC(cache_data->draw_dsc);
         if(cache_data->draw_dsc == NULL) {
             if(obj) {
-                lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
+                lv_obj_set_send_draw_dsc_events(obj, original_send_draw_dsc_events);
             }
             LV_PROFILER_DRAW_END;
             return 0;
@@ -446,7 +446,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
             *in opengles_texture_cache_free_cb*/
             LV_LOG_ERROR("OpenGLES draw unit does not support tasks of type %d", task->type);
             if(obj) {
-                lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
+                lv_obj_set_send_draw_dsc_events(obj, original_send_draw_dsc_events);
             }
             LV_PROFILER_DRAW_END;
             return 0;
@@ -468,7 +468,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     }
 
     if(obj) {
-        lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
+        lv_obj_set_send_draw_dsc_events(obj, original_send_draw_dsc_events);
     }
 
     LV_PROFILER_DRAW_END;

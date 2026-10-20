@@ -312,9 +312,9 @@ static const lv_property_ops_t lv_obj_properties[] = {
         .getter = lv_obj_is_floating,
     },
     {
-        .id = LV_PROPERTY_OBJ_SEND_DRAW_TASK_EVENTS,
-        .setter = lv_obj_set_send_draw_task_events,
-        .getter = lv_obj_is_send_draw_task_events,
+        .id = LV_PROPERTY_OBJ_SEND_DRAW_DSC_EVENTS,
+        .setter = lv_obj_set_send_draw_dsc_events,
+        .getter = lv_obj_is_send_draw_dsc_events,
     },
     {
         .id = LV_PROPERTY_OBJ_OVERFLOW_VISIBLE,
@@ -577,10 +577,10 @@ void lv_obj_set_floating(lv_obj_t * obj, bool en)
     }
 }
 
-void lv_obj_set_send_draw_task_events(lv_obj_t * obj, bool en)
+void lv_obj_set_send_draw_dsc_events(lv_obj_t * obj, bool en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    obj->send_draw_task_events = en;
+    obj->send_draw_dsc_events = en;
 }
 
 void lv_obj_set_overflow_visible(lv_obj_t * obj, bool en)
@@ -856,10 +856,10 @@ bool lv_obj_is_floating(const lv_obj_t * obj)
     return obj->floating;
 }
 
-bool lv_obj_is_send_draw_task_events(const lv_obj_t * obj)
+bool lv_obj_is_send_draw_dsc_events(const lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
-    return obj->send_draw_task_events;
+    return obj->send_draw_dsc_events;
 }
 
 bool lv_obj_is_overflow_visible(const lv_obj_t * obj)
@@ -2065,7 +2065,7 @@ static void obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
     if(f & LV_OBJ_FLAG_ADV_HITTEST)           lv_obj_set_adv_hittest(obj, v);
     if(f & LV_OBJ_FLAG_IGNORE_LAYOUT)         lv_obj_set_ignore_layout(obj, v);
     if(f & LV_OBJ_FLAG_FLOATING)              lv_obj_set_floating(obj, v);
-    if(f & LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS) lv_obj_set_send_draw_task_events(obj, v);
+    if(f & LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS) lv_obj_set_send_draw_dsc_events(obj, v);
     if(f & LV_OBJ_FLAG_OVERFLOW_VISIBLE)      lv_obj_set_overflow_visible(obj, v);
     if(f & LV_OBJ_FLAG_EVENT_TRICKLE)         lv_obj_set_event_trickle(obj, v);
     if(f & LV_OBJ_FLAG_STATE_TRICKLE)         lv_obj_set_state_trickle(obj, v);
@@ -2121,7 +2121,7 @@ static bool obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
     if((f & LV_OBJ_FLAG_ADV_HITTEST) && obj->adv_hittest) return true;
     if((f & LV_OBJ_FLAG_IGNORE_LAYOUT) && obj->ignore_layout) return true;
     if((f & LV_OBJ_FLAG_FLOATING) && obj->floating) return true;
-    if((f & LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS) && obj->send_draw_task_events) return true;
+    if((f & LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS) && obj->send_draw_dsc_events) return true;
     if((f & LV_OBJ_FLAG_OVERFLOW_VISIBLE) && obj->overflow_visible) return true;
     if((f & LV_OBJ_FLAG_EVENT_TRICKLE) && obj->event_trickle) return true;
     if((f & LV_OBJ_FLAG_STATE_TRICKLE) && obj->state_trickle) return true;
