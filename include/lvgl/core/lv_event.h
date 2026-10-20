@@ -74,7 +74,6 @@ typedef enum {
     LV_EVENT_DRAW_POST_BEGIN,     /**< Starting the post draw phase (when all children are drawn)*/
     LV_EVENT_DRAW_POST,           /**< Perform the post draw phase (when all children are drawn)*/
     LV_EVENT_DRAW_POST_END,       /**< Finishing the post draw phase (when all children are drawn)*/
-    LV_EVENT_DRAW_TASK_ADDED,     /**< Adding a draw task. The `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` flag needs to be set */
     LV_EVENT_DRAW_DSC_BEGIN,      /**< A draw descriptor is about to be drawn and can still be changed
                                    *   Anything drawn here goes below it.
                                    *   The event parameter is `lv_draw_dsc_t *`.
