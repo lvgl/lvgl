@@ -359,11 +359,6 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 break;
             }
 
-        case LV_DRAW_TASK_TYPE_MASK_BITMAP: {
-                ret = 0;
-                break;
-            }
-
         default:
             ret = 0;
             break;
