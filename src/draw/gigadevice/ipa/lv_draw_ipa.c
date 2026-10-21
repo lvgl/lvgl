@@ -56,6 +56,12 @@ static void post_transfer_tasks(lv_draw_ipa_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_ipa_fill,
+    .draw_image_cb = lv_draw_ipa_image,
+    .draw_layer_cb = lv_draw_ipa_layer,
+};
+
 #if LV_DRAW_IPA_ASYNC
     static lv_draw_ipa_unit_t * g_unit;
 #endif
@@ -93,6 +99,7 @@ void lv_draw_ipa_init(void)
     draw_ipa_unit->base_unit.wait_for_finish_cb = wait_finish_cb;
 #endif
     draw_ipa_unit->base_unit.name = "IPA";
+    draw_ipa_unit->base_unit.draw_cbs = &draw_cbs;
 
 #if LV_DRAW_IPA_ASYNC
     g_unit = draw_ipa_unit;
@@ -486,15 +493,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     draw_ipa_unit->transfer_started = false;
 
-    if(t->type == LV_DRAW_DSC_TYPE_FILL) {
-        lv_draw_ipa_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-    }
-    else if(t->type == LV_DRAW_DSC_TYPE_IMAGE) {
-        lv_draw_ipa_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-    }
-    else if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
-        lv_draw_ipa_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-    }
+    lv_draw_unit_draw_task(t->draw_unit, t);
 
     /* No transfer to wait for, e.g. an image that failed to decode */
     if(!draw_ipa_unit->transfer_started) {
