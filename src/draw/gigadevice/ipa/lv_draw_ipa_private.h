@@ -126,8 +126,7 @@ typedef struct {
  **********************/
 
 void lv_draw_ipa_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords, void * first_pixel, int32_t w,
-                      int32_t h, int32_t stride);
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
 void lv_draw_ipa_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
 /**
