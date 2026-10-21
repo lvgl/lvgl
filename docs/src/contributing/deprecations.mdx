@@ -16,7 +16,7 @@ users without a signal they would otherwise rely on.
 
 Add a `@deprecated` line to the symbol's Doxygen comment. The tag is picked up
 by the docs pipeline and surfaces the symbol on
-[lvgl.io/docs/open/deprecated](https://lvgl.io/docs/open/deprecated).
+[lvgl.io/docs/open/api/deprecated](https://lvgl.io/docs/open/api/deprecated).
 
 ```c
 /**
@@ -132,7 +132,7 @@ Use this when deprecating any symbol.
 
 | Tool | Scope | Signal level |
 | --- | --- | --- |
-| `@deprecated` Doxygen tag | Docs | Listed on [lvgl.io/docs/open/deprecated](https://lvgl.io/docs/open/deprecated) |
+| `@deprecated` Doxygen tag | Docs | Listed on [lvgl.io/docs/open/api/deprecated](https://lvgl.io/docs/open/api/deprecated) |
 | `LV_DEPRECATED("...")` | Functions | Compiler warning at every call site |
 | `LV_LOG_DEPRECATED` | Functions | One-time runtime warning in the log |
 | `LV_DEPRECATED_MACRO_WARN("...")` | Macros | One-time runtime warning in the log |

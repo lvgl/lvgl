@@ -487,7 +487,7 @@ Setting `LV_CHECK_ARG_ASSERT_ON_FAIL 1` restores the hard-abort behavior of
 `LV_ASSERT_OBJ`, which can be useful during a debugging session.
 `LV_CHECK_ARG_LOG_MODE` has no effect when `LV_USE_LOG` is `0`.
 
-See the [Argument Checking](contributing/assertions/#argument-checking) docs for
+See the [Argument Checking](/contributing/assertions#argument-checking) docs for
 the full <ApiLink name="LV_CHECK_ARG" /> and <ApiLink name="LV_CHECK_OBJ" /> API
 if you need finer control.
 
@@ -838,7 +838,7 @@ used afterwards.
 - The `lv_menu` widget is deprecated. A menu is page navigation over base widgets
   — pages built from `lv_obj` and a back button that swaps the visible page — so
   build it directly instead. See the
-  [`lv_example_menu_navigation`](widgets/menu#building-a-menu-without-lv_menu)
+  [`lv_example_menu_navigation`](/widgets/menu#building-a-menu-without-lv_menu)
   example for a starting point.
 
 ### lv_list
@@ -846,14 +846,14 @@ used afterwards.
 - The `lv_list` widget is deprecated. A list is just a flex container with a
   column flow, so build one directly from `lv_obj` with a `LV_FLEX_FLOW_COLUMN`
   layout instead. See the
-  [`lv_example_flex_list`](common-widget-features/layouts/flex#building-a-list)
+  [`lv_example_flex_list`](/common-widget-features/layouts/flex#building-a-list)
   example for a starting point.
 
 ### lv_win
 
 - The `lv_win` widget is deprecated. A window is just a flex column with a header
   bar and a content area, so build one directly from `lv_obj` instead. See the
-  [`lv_example_flex_win`](common-widget-features/layouts/flex#building-a-window)
+  [`lv_example_flex_win`](/common-widget-features/layouts/flex#building-a-window)
   example for a starting point.
 
 ---
@@ -944,9 +944,9 @@ can enable LVGL's private api by including `lvgl_private.h` or simply enabling `
 ### lv_file_explorer
 
 - The `lv_file_explorer` widget is deprecated. A file explorer is a path header
-  plus a table of directory entries read with the [`lv_fs`](main-modules/fs) API,
+  plus a table of directory entries read with the [`lv_fs`](/main-modules/fs) API,
   so build it directly instead. See the
-  [`lv_example_table_file_browser`](widgets/table#building-a-file-explorer) example
+  [`lv_example_table_file_browser`](/widgets/table#building-a-file-explorer) example
   for a starting point.
 
 ---
@@ -955,5 +955,5 @@ can enable LVGL's private api by including `lvgl_private.h` or simply enabling `
 
 ### rlottie
 
-- The rlottie player is deprecated. Use the [`lv_lottie`](widgets/lottie) widget
+- The rlottie player is deprecated. Use the [`lv_lottie`](/widgets/lottie) widget
   instead.
