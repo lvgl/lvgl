@@ -57,8 +57,9 @@ EXAMPLES_ROOT = Path(__file__).resolve().parents[1] / "examples"
 # Skips images (![...]) by requiring no leading '!' (negative lookbehind).
 MD_LINK = re.compile(r"(?<!\!)\[([^\]]*?)\]\(\s*([^\s)]+)(?:\s+\"[^\"]*\")?\s*\)")
 
-# <LvglExample name="lv_example_..." path="..." /> — placeholders (e.g. name="...") don't match.
-LVGL_EXAMPLE = re.compile(r'<LvglExample\s+name="(lv_example_\w+)"\s+path="([^"]+)"')
+# A whole <LvglExample ... /> tag (may span lines), and its attributes in any order.
+LVGL_EXAMPLE = re.compile(r"<LvglExample\b(.*?)/?>", re.DOTALL)
+TAG_ATTR = re.compile(r'(\w+)="([^"]*)"')
 
 # Matches the legacy Sphinx-site domain in any of its forms.
 LEGACY_HOST = re.compile(
@@ -205,14 +206,25 @@ def main() -> int:
     checked_local = 0
     for path in sorted(DOCS_ROOT.rglob("*.mdx")):
         text = path.read_text(encoding="utf-8", errors="replace")
+        for m in LVGL_EXAMPLE.finditer(text):
+            attrs = dict(TAG_ATTR.findall(m.group(1)))
+            name, ex_path = attrs.get("name", ""), attrs.get("path", "")
+            if re.fullmatch(r"\.*", name) and re.fullmatch(r"\.*", ex_path):
+                continue  # syntax example in writing_docs.mdx: name="..." path="..."
+            lineno = text.count("\n", 0, m.start()) + 1
+            src = (EXAMPLES_ROOT / f"{ex_path}.c").resolve()
+            if not name or not ex_path:
+                reason = "needs both name and path"
+            elif EXAMPLES_ROOT.resolve() not in src.parents:
+                reason = f"path {ex_path} is outside examples/"
+            elif not src.is_file():
+                reason = f"examples/{ex_path}.c not found"
+            elif not re.search(rf"\bvoid\s+{re.escape(name)}\s*\([^)]*\)\s*\{{", src.read_text(encoding="utf-8", errors="replace")):
+                reason = f"examples/{ex_path}.c doesn't define {name}()"
+            else:
+                continue
+            bad_examples.append((path, lineno, name, ex_path, reason))
         for lineno, line in enumerate(text.splitlines(), 1):
-            for m in LVGL_EXAMPLE.finditer(line):
-                name, ex_path = m.group(1), m.group(2)
-                src = EXAMPLES_ROOT / f"{ex_path}.c"
-                if not src.is_file():
-                    bad_examples.append((path, lineno, name, ex_path, f"examples/{ex_path}.c not found"))
-                elif not re.search(rf"\bvoid\s+{name}\s*\(", src.read_text(encoding="utf-8", errors="replace")):
-                    bad_examples.append((path, lineno, name, ex_path, f"examples/{ex_path}.c has no {name}()"))
             for m in MD_LINK.finditer(line):
                 text_part, url = m.group(1), m.group(2)
                 resolved = resolve_link(url, path)
