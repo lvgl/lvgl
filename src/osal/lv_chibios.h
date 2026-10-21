@@ -8,7 +8,7 @@
 #include "../lvgl_public.h"
 
 #if LV_USE_OS == LV_OS_CHIBIOS
-#include "ch.h"
+#include <ch.h>
 
 #ifdef __cplusplus
 extern "C" {
