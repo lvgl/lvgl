@@ -4904,6 +4904,8 @@
 #endif
 
 /* Optional user headers (LV_*_USE_CUSTOM_INCLUDE) overriding config macros. */
+#ifndef __ASSEMBLY__
+
 #if LV_OS_USE_CUSTOM_INCLUDE
     #include LV_OS_CUSTOM_INCLUDE
 #endif
@@ -4931,6 +4933,8 @@
 #if LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
     #include LV_ATTRIBUTE_CUSTOM_INCLUDE
 #endif
+
+#endif /*__ASSEMBLY__*/
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
