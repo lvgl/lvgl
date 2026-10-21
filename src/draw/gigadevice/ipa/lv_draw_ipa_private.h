@@ -116,6 +116,9 @@ typedef struct {
     the cache after the drawing operation is done. This can either happen
     immediately after the draw operation is done or on the IPA IRQ callback */
     lv_area_t last_clipped_area;
+
+    /** Set when a transfer is started, so a task that started none can finish without waiting for the IPA */
+    bool transfer_started;
 #if LV_DRAW_IPA_ASYNC
     lv_thread_sync_t interrupt_signal;
 #endif
@@ -136,14 +139,13 @@ void lv_draw_ipa_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_
  * @param clip_area     clip area in the target layer's coordinates
  * @param draw_dsc      descriptor whose source is a layer
  * @param coords        destination area of the source buffer
- * @return              true if a hardware transfer was started
  */
-bool lv_draw_ipa_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+void lv_draw_ipa_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
 
 lv_draw_ipa_output_cf_t lv_draw_cf_to_ipa_output_cf(lv_color_format_t cf);
 uint32_t lv_draw_ipa_color_to_ipa_color(lv_draw_ipa_output_cf_t cf, lv_color_t color);
-void lv_draw_ipa_configure_and_start_transfer(const lv_draw_ipa_configuration_t * conf);
+void lv_draw_ipa_configure_and_start_transfer(lv_draw_ipa_unit_t * u, const lv_draw_ipa_configuration_t * conf);
 
 /**********************
  *      MACROS
