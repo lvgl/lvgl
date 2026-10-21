@@ -1,3 +1,8 @@
+---
+title: ChibiOS/RT
+description: "Use LVGL's native ChibiOS/RT OSAL with threads, recursive mutexes, and binary semaphore events."
+---
+
 # ChibiOS/RT
 
 Select `LV_USE_OS LV_OS_CHIBIOS` to use ChibiOS/RT threads, recursive mutexes,
@@ -29,8 +34,11 @@ event releases blocked waiters with `LV_RESULT_INVALID`.
 cannot be owned by an ISR, so `lv_mutex_lock_isr()` returns `LV_RESULT_INVALID`.
 Keep GUI operations in thread context.
 
-With `LV_USE_SYSMON`, also enable `CH_DBG_STATISTICS` and `CH_CFG_USE_TM`, and
-retain the idle thread. The CPU monitor samples the current core's idle-thread
+To enable the CPU monitor, set both `LV_USE_SYSMON` and `LV_USE_PERF_MONITOR`
+to `1` in `lv_conf.h`. Also enable `CH_DBG_STATISTICS` and `CH_CFG_USE_TM` in
+`chconf.h` and retain the idle thread (`CH_CFG_NO_IDLE_THREAD FALSE`).
+`LV_USE_PERF_MONITOR` defaults to `0`; enabling `LV_USE_SYSMON` alone does not
+start CPU sampling. The CPU monitor samples the current core's idle-thread
 runtime under the kernel lock and compares it with elapsed realtime-counter
 cycles. It includes DMA sleeps as idle time and needs no extra sampling thread
 or application hooks. Sample at least once per realtime-counter wrap (about
