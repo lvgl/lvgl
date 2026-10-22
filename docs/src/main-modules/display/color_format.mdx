@@ -17,6 +17,7 @@ you want explicitly rather than just its size:
 | <ApiLink name="LV_COLOR_FORMAT_XRGB8888" /> | 4 bytes/pixel | Alpha byte present but ignored |
 | <ApiLink name="LV_COLOR_FORMAT_ARGB8888" /> | 4 bytes/pixel | Real alpha channel. See [Transparent Screens](#transparent-screens) |
 | <ApiLink name="LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED" /> | 4 bytes/pixel | Alpha channel, RGB pre-darkened by it. What compositors such as Wayland expect |
+| <ApiLink name="LV_COLOR_FORMAT_ABGR8888" /> | 4 bytes/pixel | R, G, B, A byte order. See [Red and Blue Order](#red-and-blue-order) |
 
 The format belongs to the display, not to LVGL as a whole: two displays can render in
 different formats, and any display's format can be changed at any time with
@@ -51,6 +52,24 @@ Note that this is not about swapping the Red and Blue channel but converting
 to
 
 `GGG BBBBB | RRRRR GGG`.
+
+## Red and Blue Order
+
+<ApiLink name="LV_COLOR_FORMAT_ABGR8888" /> stores the pixels as `R, G, B, A` bytes in memory,
+i.e. `0xAABBGGRR` on little-endian CPUs. This is the layout used by HTML canvas `ImageData`
+and by `GL_RGBA` / `GL_UNSIGNED_BYTE` textures, so the rendered buffer can be passed to them
+as-is, for example when running LVGL in WebAssembly.
+
+Enable it with <ApiLink name="LV_DRAW_SW_SUPPORT_ABGR8888" /> (it requires
+<ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888" />). Fills, borders, text, shadows, gradients and
+layers work as with <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />. Images are blended
+with the ARGB8888 code, so only `ABGR8888`, `A8`, `L8` and `AL88` images are rendered with the
+right colors. All the other color images (`RGB565`, `RGB888`, `ARGB8888`, indexed, ...) have
+their red and blue channels swapped, so convert them to `ABGR8888` first (e.g. with
+`LVGLImage.py --cf ABGR8888`).
+
+Layers created on an `ABGR8888` layer are always `ABGR8888` too (except `A8` layers),
+whatever color format was requested.
 
 ## Monochrome Displays
 

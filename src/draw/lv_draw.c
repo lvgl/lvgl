@@ -477,6 +477,12 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     lv_layer_init(layer);
     lv_display_t * disp = parent_layer ? parent_layer->display : lv_refr_get_disp_refreshing();
 
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+    if(parent_layer && parent_layer->color_format == LV_COLOR_FORMAT_ABGR8888 && color_format != LV_COLOR_FORMAT_A8) {
+        color_format = LV_COLOR_FORMAT_ABGR8888;
+    }
+#endif
+
     layer->parent = parent_layer;
     layer->_clip_area = *area;
     layer->buf_area = *area;
