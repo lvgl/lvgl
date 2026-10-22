@@ -144,6 +144,9 @@ jobs:
           --fail-on-warning \
           --reporter github
 
+      - name: Check doc links
+        run: python3 scripts/check_doc_links.py
+
       - name: Convert xml files to md
         run: |
             mkdir -p /tmp/xml
