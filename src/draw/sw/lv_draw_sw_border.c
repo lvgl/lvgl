@@ -98,6 +98,11 @@ static void draw_border_complex(lv_layer_t * layer, const lv_area_t * clip_area,
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(blend_dsc));
     lv_opa_t * mask_buf = lv_malloc(draw_area_w);
+    LV_ASSERT_MALLOC(mask_buf);
+    if(!mask_buf) {
+        LV_LOG_WARN("Failed to allocate memory for mask buffer");
+        return;
+    }
     blend_dsc.mask_buf = mask_buf;
 
     void * mask_list[3] = {0};

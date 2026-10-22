@@ -97,6 +97,10 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
     LV_ASSERT_FORMAT_MSG(dsc_size > 0, "Draw task size is 0 for type %d", type);
     lv_draw_task_t * new_task = lv_malloc_zeroed(LV_ALIGN_UP(sizeof(lv_draw_task_t), 8) + dsc_size);
     LV_ASSERT_MALLOC(new_task);
+    if(!new_task) {
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
     new_task->area = *coords;
     new_task->_real_area = *coords;
     new_task->target_layer = layer;
