@@ -250,9 +250,18 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e)
 uint32_t lv_event_get_key(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return 0);
-    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_KEY,
-                            return 0,
-                            "invalid event code %" LV_PRId32, (int32_t)e->code);
+#if LV_USE_CHECK_ARG
+    static const lv_event_code_t key_codes[] = {
+        LV_EVENT_KEY, LV_EVENT_KEY_PRESSED, LV_EVENT_KEY_SHORT_CLICKED,
+        LV_EVENT_KEY_LONG_CLICKED, LV_EVENT_KEY_LONG_PRESSED, LV_EVENT_KEY_LONG_PRESSED_REPEAT,
+        LV_EVENT_KEY_CLICKED, LV_EVENT_KEY_RELEASED,
+    };
+#endif
+    LV_CHECK_ARG_FORMAT_MSG(
+        event_code_in_array(e->code, key_codes, sizeof(key_codes) / sizeof(key_codes[0])),
+        return 0,
+        "invalid event code %" LV_PRId32, (int32_t)e->code);
+
     uint32_t * k = lv_event_get_param(e);
     return k ? *k : 0;
 }
