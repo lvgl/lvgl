@@ -55,12 +55,9 @@ else()
 
   set(IDF_COMPONENTS esp_timer log)
 
-  if(${target} STREQUAL "esp32p4" OR ${target} STREQUAL "esp32s31")
+  # The PPA driver exists on every target since ESP-IDF 5.3 (empty without a PPA)
+  if(EXISTS "${IDF_PATH}/components/esp_driver_ppa")
     list(APPEND IDF_COMPONENTS esp_driver_ppa esp_mm)
-  endif()
-
-  if(CONFIG_LV_USE_FS_FATFS)
-    list(APPEND IDF_COMPONENTS fatfs)
   endif()
 
   idf_component_register(SRCS ${SOURCES} ${EXAMPLE_SOURCES} ${DEMO_SOURCES}
@@ -70,6 +67,16 @@ else()
 endif()
 
 target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
+
+# On the first pass, CONFIG_XXX values are not yet exported so this condition is never taken
+if(CONFIG_LV_USE_FS_FATFS)
+  idf_build_get_property(build_components BUILD_COMPONENTS)
+  if(NOT fatfs IN_LIST build_components)
+    message(FATAL_ERROR "lvgl: LV_USE_FS_FATFS needs the fatfs component: add fatfs to REQUIRES in main/CMakeLists.txt")
+  endif()
+  idf_component_get_property(fatfs_lib fatfs COMPONENT_LIB)
+  target_link_libraries(${COMPONENT_LIB} PRIVATE ${fatfs_lib})
+endif()
 
 if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
   target_compile_definitions(${COMPONENT_LIB}
