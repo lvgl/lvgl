@@ -477,10 +477,10 @@ void lv_draw_sw_grad_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     int32_t dx = end.x - start.x;
     int32_t dy = end.y - start.y;
 
-    int32_t l2 = lv_sqr(dx) + lv_sqr(dy);
+    int64_t l2 = (int64_t)dx * dx + (int64_t)dy * dy;
     if(l2 == 0) l2 = 1;
-    state->a = (dx * 65536) / l2;
-    state->b = (dy * 65536) / l2;
+    state->a = (int32_t)((int64_t)dx * 65536 / l2);
+    state->b = (int32_t)((int64_t)dy * 65536 / l2);
     state->c = (int32_t)(((int64_t)start.x * dx + (int64_t)start.y * dy) * 65536 / l2);
 }
 
