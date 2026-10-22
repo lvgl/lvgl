@@ -115,9 +115,15 @@ The target has to match the board, otherwise the dependencies can't be resolved.
 `esp32s3`. All BSPs and their chips are listed in the
 [esp-bsp repository](https://github.com/espressif/esp-bsp#supported-boards).
 
-For a development board with a display wired to it, use `espressif/esp_bsp_generic`. It
-supports ST7789, ILI9341 and GC9A01 displays. Enable the display and set its pins in menuconfig
-under `Component config` → `Board Support Package (generic)` → `Display`.
+For a development board with a display wired to it, use the generic BSP. It supports ST7789,
+ILI9341 and GC9A01 displays and works with any target:
+
+```sh
+idf.py add-dependency "espressif/esp_bsp_generic"
+```
+
+Then enable the display and set its pins in menuconfig under `Component config` →
+`Board Support Package (generic)` → `Display`.
 
 ### Configuration
 
