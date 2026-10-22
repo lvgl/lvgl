@@ -808,4 +808,22 @@ void test_canvas_draw_nested_sub_layer(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/canvas_nested_sub_layer.png")
 }
 
+void test_canvas_al88_opa(void)
+{
+    lv_obj_t * canvas = lv_canvas_create(g_screen_active);
+
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf_al88, 10, 10, LV_COLOR_FORMAT_AL88);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf_al88);
+    lv_canvas_set_draw_buf(canvas, &draw_buf_al88);
+
+    lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_50);
+    lv_color16a_t * px = lv_draw_buf_goto_xy(&draw_buf_al88, 3, 3);
+    TEST_ASSERT_EQUAL_UINT8(255, px->lumi);
+    TEST_ASSERT_EQUAL_UINT8(LV_OPA_50, px->alpha);
+
+    lv_canvas_set_px(canvas, 3, 3, lv_color_black(), LV_OPA_20);
+    TEST_ASSERT_EQUAL_UINT8(0, px->lumi);
+    TEST_ASSERT_EQUAL_UINT8(LV_OPA_20, px->alpha);
+}
+
 #endif
