@@ -29,27 +29,29 @@ See [Style Properties](/common-widget-features/styles/style-properties) to see t
 ## Base Draw Descriptor
 
 In each draw descriptor there is a generic "base descriptor" with
-<ApiLink name="lv_draw_dsc_base_t" /> type and with `base` in its name.  For example
+<ApiLink name="lv_draw_dsc_t" /> type and with `base` in its name.  For example
 `label_dsc.base`.  This `struct` stores useful information about which Widget
 and part created the draw descriptor.  See all the fields in
-<ApiLink name="lv_draw_dsc_base_t" />.
+<ApiLink name="lv_draw_dsc_t" />.
 
-In an <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> event, the elements of the base draw
-descriptor are very useful to identify the Draw Task.  For example:
+In the <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" /> and <ApiLink name="LV_EVENT_DRAW_DSC_END" />
+events, the elements of the base draw descriptor are very useful to identify what is
+being drawn.  For example:
 
 ```c
-/* In LV_EVENT_DRAW_TASK_ADDED */
-lv_draw_task_t * t = lv_event_get_draw_task(e);
-lv_draw_base_dsc_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
-draw_dsc.obj;  /* The Widget for which the draw descriptor was created */
-draw_dsc.part; /* The Widget part for which the draw descriptor was created
-                  E.g. LV_PART_INDICATOR */
-draw_dsc.id1;  /* A Widget type specific ID (e.g. table row index).
-                  See the docs of the given Widget. */
-draw_dsc.id2;
+/* In LV_EVENT_DRAW_DSC_BEGIN or LV_EVENT_DRAW_DSC_END */
+lv_draw_dsc_t * draw_dsc = lv_event_get_draw_dsc(e);
+draw_dsc->obj;  /* The Widget for which the draw descriptor was created */
+draw_dsc->part; /* The Widget part for which the draw descriptor was created
+                   E.g. LV_PART_INDICATOR */
+draw_dsc->id1;  /* A Widget type specific ID (e.g. table row index).
+                   See the docs of the given Widget. */
+draw_dsc->id2;
 
-draw_dsc.layer; /* The target layer.
-                   Required when a new Draw Tasks are also created */
+draw_dsc->layer; /* The target layer.
+                    Required when something new is also drawn */
+
+lv_draw_dsc_get_type(draw_dsc); /* The type, e.g. LV_DRAW_DSC_TYPE_LABEL */
 ```
 
 ### Simple Initialization
@@ -95,18 +97,29 @@ the base descriptor.
 
 ### Modify the draw descriptors
 
-In <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />, the draw descriptor of the `draw_task` can be
-accessed (using <ApiLink name="lv_draw_task_get_label_dsc" /> and similar functions)
-and modified (to change color, text, font, etc.).  This means that in
-<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />, the `draw_task`s and draw descriptors
-are already initialized and it's enough to change only a few specific values.
+If <ApiLink name="LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS" /> is enabled on a Widget, every draw
+descriptor the Widget draws is sent in two events:
+
+- <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" />: before it's drawn.  The descriptor is already
+  initialized, so it's enough to change only a few specific values (color, text, font, etc.).
+  The area can be changed too through the `coords` field of the descriptors that are drawn
+  to an area (fill, border, box shadow, label, letter, image, blur and 3D).  Anything drawn in this event goes below the descriptor.
+- <ApiLink name="LV_EVENT_DRAW_DSC_END" />: after it's drawn.  Anything drawn in this event
+  goes on top of the descriptor.
+
+Get the descriptor with <ApiLink name="lv_event_get_draw_dsc" />, check its type with
+<ApiLink name="lv_draw_dsc_get_type" />, then get the specific descriptor with
+<ApiLink name="lv_draw_dsc_get_label_dsc" /> and similar functions.  These must only be
+called for a descriptor of the matching type.
 
 For example:
 
 ```c
-/* In LV_EVENT_DRAW_TASK_ADDED */
-lv_draw_task_t * t = lv_event_get_draw_task(e);
-lv_draw_label_dsc_t * draw_dsc = lv_draw_task_get_label_dsc(t);
+/* In LV_EVENT_DRAW_DSC_BEGIN */
+lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_LABEL) return;
+
+lv_draw_label_dsc_t * draw_dsc = lv_draw_dsc_get_label_dsc(base_dsc);
 
 /* Check a few things in `draw_dsc->base` */
 
@@ -114,8 +127,9 @@ lv_draw_label_dsc_t * draw_dsc = lv_draw_task_get_label_dsc(t);
 draw_dsc->color = lv_color_lighten(draw_dsc->color,
                                    LV_MIN(lv_strlen(draw_dsc->text) * 5, 255));
 
-/* Create new Draw Tasks if needed by calling
- * `lv_draw_...(draw_dsc->base.layer, ...)` functions */
+/* Draw something below the label if needed by calling
+ * `lv_draw_...(draw_dsc->base.layer, ...)` functions.
+ * Use LV_EVENT_DRAW_DSC_END to draw on top of it instead. */
 ```
 
 ## Rectangle Draw Descriptor

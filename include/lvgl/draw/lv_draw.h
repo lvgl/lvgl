@@ -44,31 +44,30 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_DRAW_TASK_TYPE_NONE = 0,
-    LV_DRAW_TASK_TYPE_FILL,
-    LV_DRAW_TASK_TYPE_BORDER,
-    LV_DRAW_TASK_TYPE_BOX_SHADOW,
-    LV_DRAW_TASK_TYPE_LETTER,
-    LV_DRAW_TASK_TYPE_LABEL,
-    LV_DRAW_TASK_TYPE_IMAGE,
-    LV_DRAW_TASK_TYPE_LAYER,
-    LV_DRAW_TASK_TYPE_LINE,
-    LV_DRAW_TASK_TYPE_ARC,
-    LV_DRAW_TASK_TYPE_TRIANGLE,
-    LV_DRAW_TASK_TYPE_MASK_RECTANGLE,
-    LV_DRAW_TASK_TYPE_MASK_BITMAP,
-    LV_DRAW_TASK_TYPE_BLUR,
+    LV_DRAW_DSC_TYPE_NONE = 0,
+    LV_DRAW_DSC_TYPE_FILL,
+    LV_DRAW_DSC_TYPE_BORDER,
+    LV_DRAW_DSC_TYPE_BOX_SHADOW,
+    LV_DRAW_DSC_TYPE_LETTER,
+    LV_DRAW_DSC_TYPE_LABEL,
+    LV_DRAW_DSC_TYPE_IMAGE,
+    LV_DRAW_DSC_TYPE_LAYER,
+    LV_DRAW_DSC_TYPE_LINE,
+    LV_DRAW_DSC_TYPE_ARC,
+    LV_DRAW_DSC_TYPE_TRIANGLE,
+    LV_DRAW_DSC_TYPE_MASK_RECTANGLE,
+    LV_DRAW_DSC_TYPE_BLUR,
 #if LV_USE_VECTOR_GRAPHIC
-    LV_DRAW_TASK_TYPE_VECTOR,
+    LV_DRAW_DSC_TYPE_VECTOR,
 #endif
 #if LV_USE_3DTEXTURE
-    LV_DRAW_TASK_TYPE_3D,
+    LV_DRAW_DSC_TYPE_3D,
 #endif
-} lv_draw_task_type_t;
+} lv_draw_dsc_type_t;
 
 typedef enum {
     /** Waiting for an other task to be finished.
-     * For example in case of `LV_DRAW_TASK_TYPE_LAYER` (used to blend a layer)
+     * For example in case of `LV_DRAW_DSC_TYPE_LAYER` (used to blend a layer)
      * is blocked until all the draw tasks of the layer is rendered. */
     LV_DRAW_TASK_STATE_BLOCKED,
 
@@ -170,6 +169,9 @@ typedef struct {
     /**The target layer */
     lv_layer_t * layer;
 
+    /**The type of the draw descriptor*/
+    lv_draw_dsc_type_t type;
+
     /*Drop shadow is part of every draw dsc as anything can have drop shadow*/
 
     /**Drop shadow offset in X*/
@@ -195,7 +197,7 @@ typedef struct {
 
     /**Any custom user data*/
     void * user_data;
-} lv_draw_dsc_base_t;
+} lv_draw_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -226,7 +228,7 @@ void * lv_draw_create_unit(size_t size);
  * @return          the created draw task which needs to be
  *                  further configured e.g. by added a draw descriptor
  */
-lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type);
+lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_dsc_type_t type);
 
 /**
  * Needs to be called when a draw task is created and configured.
@@ -364,7 +366,7 @@ void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y);
  * @param t   the draw task to get the type of
  * @return    the draw task type
 */
-lv_draw_task_type_t lv_draw_task_get_type(const lv_draw_task_t * t);
+lv_draw_dsc_type_t lv_draw_task_get_type(const lv_draw_task_t * t);
 
 /**
  * Get the draw descriptor of a draw task
@@ -380,12 +382,19 @@ void * lv_draw_task_get_draw_dsc(const lv_draw_task_t * t);
 */
 void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area);
 
+/**
+ * Get the type of a draw descriptor
+ * @param dsc    the draw descriptor
+ * @return       the type of the draw descriptor
+ */
+lv_draw_dsc_type_t lv_draw_dsc_get_type(const lv_draw_dsc_t * dsc);
 
 
-lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_base_t * base,
+
+lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_t * base,
                                               const lv_area_t * area);
 
-void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_base_t * base);
+void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_t * base);
 
 
 

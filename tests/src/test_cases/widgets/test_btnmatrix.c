@@ -511,12 +511,11 @@ void test_button_matrix_partial_clip_render(void)
 
 static uint32_t drawn_buttons_mask;
 
-static void partial_clip_draw_task_cb(lv_event_t * e)
+static void partial_clip_draw_dsc_cb(lv_event_t * e)
 {
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
     if(base_dsc->part != LV_PART_ITEMS) return;
-    if(lv_draw_task_get_fill_dsc(draw_task) == NULL) return;
+    if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_FILL) return;
     drawn_buttons_mask |= 1UL << base_dsc->id1;
 }
 
@@ -544,8 +543,8 @@ void test_button_matrix_draw_task_culling(void)
     lv_obj_t * btnm_clip = lv_buttonmatrix_create(cont);
     lv_buttonmatrix_set_map(btnm_clip, map);
     lv_obj_set_size(btnm_clip, 280, 600);
-    lv_obj_set_send_draw_task_events(btnm_clip, true);
-    lv_obj_add_event_cb(btnm_clip, partial_clip_draw_task_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_set_send_draw_dsc_events(btnm_clip, true);
+    lv_obj_add_event_cb(btnm_clip, partial_clip_draw_dsc_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
 
     /*Scroll so the middle rows are visible, top and bottom rows clipped*/
     lv_obj_update_layout(active_screen);

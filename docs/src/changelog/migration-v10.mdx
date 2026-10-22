@@ -420,6 +420,56 @@ and are not meant to be included directly.
 
 ## Rendering
 
+### Draw events
+
+- `LV_DRAW_TASK_TYPE_MASK_BITMAP` has been removed. No draw task of this type was ever created.
+- `lv_draw_task_type_t` has been renamed to <ApiLink name="lv_draw_dsc_type_t"/>, and the `LV_DRAW_TASK_TYPE_*`
+  values to `LV_DRAW_DSC_TYPE_*`. The old names can still be used via LVGL's v9.6 API map.
+- `lv_draw_dsc_base_t` has been renamed to <ApiLink name="lv_draw_dsc_t"/>. The `base` field of the draw descriptors
+  keeps its name. The old name can still be used via LVGL's v9.6 API map.
+- `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`, `lv_obj_set_send_draw_task_events()` and `lv_obj_is_send_draw_task_events()`
+  have been renamed to `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS`, <ApiLink name="lv_obj_set_send_draw_dsc_events"/> and
+  <ApiLink name="lv_obj_is_send_draw_dsc_events"/>, and the `LV_PROPERTY_OBJ_(FLAG_)SEND_DRAW_TASK_EVENTS` properties
+  to `LV_PROPERTY_OBJ_(FLAG_)SEND_DRAW_DSC_EVENTS`. The old names can still be used via LVGL's v9.6 API map, but the
+  property names used to look up properties by string are now `"send_draw_dsc_events"` and
+  `"flag_send_draw_dsc_events"`.
+- `LV_EVENT_DRAW_TASK_ADDED` and `lv_event_get_draw_task()` have been removed. Use
+  <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN"/> or <ApiLink name="LV_EVENT_DRAW_DSC_END"/> and
+  <ApiLink name="lv_event_get_draw_dsc"/>, which return the draw descriptor instead of a draw task:
+  - `LV_EVENT_DRAW_DSC_BEGIN` is sent before the descriptor is drawn. Change the descriptor here. Anything drawn
+    in this event goes **below** it.
+  - `LV_EVENT_DRAW_DSC_END` is sent after it. Anything drawn in this event goes **on top** of it, as it did in
+    `LV_EVENT_DRAW_TASK_ADDED`.
+  - The type is read with <ApiLink name="lv_draw_dsc_get_type"/>. The area of the descriptors that are drawn to an
+    area (fill, border, box shadow, label, letter, image, blur and 3D) is in their `coords` field instead of
+    `lv_draw_task_get_area()`, and can be changed in `LV_EVENT_DRAW_DSC_BEGIN` to move or resize the draw.
+  - `lv_draw_task_get_label_dsc()` and the similar functions become `lv_draw_dsc_get_label_dsc()` etc. Unlike the old
+    ones they **don't return NULL** for a descriptor of another type (it's a failed argument check), so check the type
+    first.
+
+  ```c
+  /* Before */
+  static void event_cb(lv_event_t * e)
+  {
+      lv_draw_task_t * t = lv_event_get_draw_task(e);
+      lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(t);
+      lv_draw_fill_dsc_t * fill_dsc = lv_draw_task_get_fill_dsc(t);
+      if(base_dsc->part == LV_PART_ITEMS && fill_dsc) fill_dsc->color = lv_color_hex(0xff0000);
+  }
+  lv_obj_add_event_cb(obj, event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+
+  /* After */
+  static void event_cb(lv_event_t * e)
+  {
+      lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+      if(base_dsc->part == LV_PART_ITEMS && lv_draw_dsc_get_type(base_dsc) == LV_DRAW_DSC_TYPE_FILL) {
+          lv_draw_fill_dsc_t * fill_dsc = lv_draw_dsc_get_fill_dsc(base_dsc);
+          fill_dsc->color = lv_color_hex(0xff0000);
+      }
+  }
+  lv_obj_add_event_cb(obj, event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
+  ```
+
 ### SW draw unit
 
 - `lv_draw_sw_blend_handler_t` callback no longer takes a `lv_draw_task_t *`, instead the target layer and the clip area are passed directly.

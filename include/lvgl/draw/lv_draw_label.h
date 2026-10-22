@@ -30,7 +30,10 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
+
+    /**The area to draw*/
+    lv_area_t coords;
 
     /**The text to draw*/
     const char * text;
@@ -114,7 +117,10 @@ typedef struct {
 } lv_draw_label_dsc_t;
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
+
+    /**The area to draw*/
+    lv_area_t coords;
 
     uint32_t unicode;
     const lv_font_t * font;
@@ -170,9 +176,25 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_label_dsc_init(lv_draw_label_dsc_t * ds
 /**
  * Try to get a label draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_LABEL
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_LABEL
  */
 lv_draw_label_dsc_t * lv_draw_task_get_label_dsc(lv_draw_task_t * task);
+
+/**
+ * Get the label draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_LABEL, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the label draw descriptor
+ */
+lv_draw_label_dsc_t * lv_draw_dsc_get_label_dsc(lv_draw_dsc_t * dsc);
+
+/**
+ * Get the letter draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_LETTER, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the letter draw descriptor
+ */
+lv_draw_letter_dsc_t * lv_draw_dsc_get_letter_dsc(lv_draw_dsc_t * dsc);
 
 /**
  * Initialize a glyph draw descriptor.

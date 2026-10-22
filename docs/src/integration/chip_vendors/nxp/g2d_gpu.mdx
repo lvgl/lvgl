@@ -80,10 +80,10 @@ Supported draw tasks are available in `src/draw/nxp/g2d/lv_draw_g2d.c`:
 
 ```c
 switch(t->type) {
-    case LV_DRAW_TASK_TYPE_FILL:
+    case LV_DRAW_DSC_TYPE_FILL:
         lv_draw_g2d_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
         break;
-    case LV_DRAW_TASK_TYPE_IMAGE:
+    case LV_DRAW_DSC_TYPE_IMAGE:
         lv_draw_g2d_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
         break;
     default:

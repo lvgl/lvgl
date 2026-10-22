@@ -3,13 +3,12 @@
 
 static void draw_event_cb(lv_event_t * e)
 {
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
     if(base_dsc->part != LV_PART_INDICATOR) return;
+    if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_FILL) return;
     lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
-    lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
-    if(fill_draw_dsc == NULL) return;
+    lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_dsc_get_fill_dsc(base_dsc);
 
     uint32_t cnt = lv_chart_get_point_count(obj);
 
@@ -44,8 +43,8 @@ static void add_data(lv_timer_t * timer)
  * A 200x150 `LV_CHART_TYPE_SCATTER` chart is configured with an X range
  * of 0..200 and a Y range of 0..1000 and 50 points. Line width on
  * `LV_PART_ITEMS` is zeroed so only the point markers show. With
- * `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` set, the
- * `LV_EVENT_DRAW_TASK_ADDED` callback fades older points by reducing
+ * `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` set, the
+ * `LV_EVENT_DRAW_DSC_BEGIN` callback fades older points by reducing
  * opacity and recolors each `LV_PART_INDICATOR` fill between red and
  * blue using the point's X and Y arrays. A 100 ms `lv_timer` pushes a
  * new random point via `lv_chart_set_next_value2`.
@@ -55,8 +54,8 @@ void lv_example_chart_scatter(void)
     lv_obj_t * chart = lv_chart_create(lv_screen_active());
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
+    lv_obj_set_send_draw_dsc_events(chart, true);
     lv_obj_set_style_line_width(chart, 0, LV_PART_ITEMS);   /*Remove the lines*/
 
     lv_chart_set_type(chart, LV_CHART_TYPE_SCATTER);

@@ -246,13 +246,13 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     LV_UNUSED(u);
     int32_t ret = 0;
 
-    lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+    lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
 
     if(!lv_draw_dave2d_is_dest_cf_supported(draw_dsc_base->layer->color_format))
         return 0;
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
 #if USE_D2
                 lv_draw_fill_dsc_t * dsc = t->draw_dsc;
                 if(dsc->grad.dir == LV_GRAD_DIR_NONE
@@ -272,12 +272,12 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 ret =  0;
                 break;
             }
-        case LV_DRAW_TASK_TYPE_LAYER: {
+        case LV_DRAW_DSC_TYPE_LAYER: {
                 ret = 0;
                 break;
             }
 
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
                 if(!lv_draw_dave2d_image_color_format_supported(dsc->header.cf)) {
                     ret = 0;
@@ -291,7 +291,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 break;
             }
 
-        case LV_DRAW_TASK_TYPE_BORDER: {
+        case LV_DRAW_DSC_TYPE_BORDER: {
 #if USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;
@@ -300,12 +300,12 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 break;
             }
 
-        case  LV_DRAW_TASK_TYPE_BOX_SHADOW: {
+        case  LV_DRAW_DSC_TYPE_BOX_SHADOW: {
                 ret = 0;
                 break;
             }
 
-        case  LV_DRAW_TASK_TYPE_LABEL: {
+        case  LV_DRAW_DSC_TYPE_LABEL: {
 #if USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;
@@ -314,7 +314,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 break;
             }
 
-        case LV_DRAW_TASK_TYPE_LINE: {
+        case LV_DRAW_DSC_TYPE_LINE: {
 #if USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;
@@ -323,7 +323,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 break;
             }
 
-        case  LV_DRAW_TASK_TYPE_ARC: {
+        case  LV_DRAW_DSC_TYPE_ARC: {
 #if USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;
@@ -332,7 +332,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 break;
             }
 
-        case LV_DRAW_TASK_TYPE_TRIANGLE: {
+        case LV_DRAW_DSC_TYPE_TRIANGLE: {
 #if USE_D2
                 lv_draw_fill_dsc_t * dsc = t->draw_dsc;
                 if(dsc->grad.dir == LV_GRAD_DIR_NONE
@@ -350,16 +350,11 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 break;
             }
 
-        case  LV_DRAW_TASK_TYPE_MASK_RECTANGLE: {
+        case  LV_DRAW_DSC_TYPE_MASK_RECTANGLE: {
 #if 0//USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;
 #endif
-                ret = 0;
-                break;
-            }
-
-        case LV_DRAW_TASK_TYPE_MASK_BITMAP: {
                 ret = 0;
                 break;
             }
@@ -506,39 +501,39 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
 #endif
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             lv_draw_dave2d_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BORDER:
             lv_draw_dave2d_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
             //lv_draw_dave2d_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 #if 0
-        case LV_DRAW_TASK_TYPE_BG_IMG:
+        case LV_DRAW_DSC_TYPE_BG_IMG:
             //lv_draw_dave2d_bg_image(t, t->draw_dsc, &t->area);
             break;
 #endif
-        case LV_DRAW_TASK_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_LABEL:
             lv_draw_dave2d_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             lv_draw_dave2d_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_LINE:
             lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_dave2d_line, t->draw_unit);
             break;
-        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_ARC:
             lv_draw_dave2d_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
             lv_draw_dave2d_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
-        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LAYER:
             //lv_draw_dave2d_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
             //lv_draw_dave2d_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
         default:

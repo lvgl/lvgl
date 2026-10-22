@@ -249,13 +249,13 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
 
-    const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+    const lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
 
     if(!_pxp_dest_cf_supported(draw_dsc_base->layer->color_format))
         return 0;
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * draw_dsc = (lv_draw_fill_dsc_t *) t->draw_dsc;
 
                 /* Most simple case: just a plain rectangle (no radius, no gradient). */
@@ -269,7 +269,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 return 1;
             }
 
-        case LV_DRAW_TASK_TYPE_LAYER: {
+        case LV_DRAW_DSC_TYPE_LAYER: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
 
@@ -286,7 +286,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 return 1;
             }
 
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
@@ -394,13 +394,13 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 #endif
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             lv_draw_pxp_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             lv_draw_pxp_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LAYER:
             lv_draw_pxp_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         default:
@@ -409,7 +409,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     /*Layers manage it for themselves*/
-    if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
+    if(t->type != LV_DRAW_DSC_TYPE_LAYER) {
         lv_area_t draw_area;
         if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area))
             return;

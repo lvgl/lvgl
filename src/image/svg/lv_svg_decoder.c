@@ -354,7 +354,7 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * decoder_
 
     lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(layer);
 
-    /*Save the widget so that `LV_EVENT_DRAW_TASK_ADDED` can be sent to it in `lv_draw_vector`*/
+    /*Save the widget so that the draw events can be sent to it in `lv_draw_vector`*/
     dsc->base.obj = image_dsc->base.obj;
 
     LV_UNUSED(coords);

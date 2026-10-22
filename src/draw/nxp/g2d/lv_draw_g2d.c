@@ -193,7 +193,7 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         return 0;
     }
 
-    const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+    const lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
     lv_draw_buf_t * draw_buf = draw_dsc_base->layer->draw_buf;
 
     if(!_g2d_dest_cf_supported(draw_dsc_base->layer->color_format))
@@ -203,7 +203,7 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         return 0;
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * draw_dsc = (lv_draw_fill_dsc_t *) t->draw_dsc;
 
                 /* Most simple case: just a plain rectangle (no radius, no gradient). */
@@ -216,7 +216,7 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 }
                 return 1;
             }
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 /* TODO: Fix issue where images rendered to a different layer don't render in the final layer.*/
                 return 0;
 #if 0
@@ -324,10 +324,10 @@ static void _g2d_execute_drawing(lv_draw_task_t * t)
     lv_draw_buf_invalidate_cache(draw_buf, NULL);
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             lv_draw_g2d_fill(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_fill_dsc_t *)t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             lv_draw_g2d_img(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
             break;
         default:

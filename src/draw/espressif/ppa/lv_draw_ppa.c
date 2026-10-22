@@ -89,12 +89,12 @@ void lv_draw_ppa_deinit(void)
 static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
-    const lv_draw_dsc_base_t * base = (lv_draw_dsc_base_t *)t->draw_dsc;
+    const lv_draw_dsc_t * base = (lv_draw_dsc_t *)t->draw_dsc;
 
     if(!ppa_dest_cf_supported(base->layer->color_format)) return 0;
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * dsc = (lv_draw_fill_dsc_t *)t->draw_dsc;
                 if((dsc->radius != 0 || dsc->grad.dir != LV_GRAD_DIR_NONE)) return 0;
                 if(dsc->opa <= (lv_opa_t)LV_OPA_MAX) return 0;
@@ -107,7 +107,7 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
 
 #if LV_USE_PPA_IMG
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
                 if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
                      && dsc->clip_radius == 0
@@ -210,10 +210,10 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
     lv_draw_buf_flush_cache(buf, &buf_area);
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             lv_draw_ppa_fill(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             lv_draw_ppa_img(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
             break;
         default:

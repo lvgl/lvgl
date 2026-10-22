@@ -117,9 +117,8 @@ static void chart_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_EVENT_DRAW_TASK_ADDED) {
-        lv_draw_task_t * draw_task = lv_event_get_param(e);
-        lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+    if(code == LV_EVENT_DRAW_DSC_END) {
+        lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
 
         lv_chart_type_t chart_type = lv_chart_get_type(obj);
         if(chart_type == LV_CHART_TYPE_LINE && base_dsc->part != LV_PART_INDICATOR)  return;
@@ -143,10 +142,13 @@ static void chart_event_cb(lv_event_t * e)
 
         lv_text_get_size_attributes(&text_size, buf, LV_FONT_DEFAULT, &attributes);
 
+        if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_FILL) return;
+        lv_area_t point_area = lv_draw_dsc_get_fill_dsc(base_dsc)->coords;
+
         lv_area_t txt_area;
-        txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2 - text_size.x / 2;
+        txt_area.x1 = point_area.x1 + lv_area_get_width(&point_area) / 2 - text_size.x / 2;
         txt_area.x2 = txt_area.x1 + text_size.x;
-        txt_area.y2 = draw_task->area.y1 - LV_DPX(15);
+        txt_area.y2 = point_area.y1 - LV_DPX(15);
         txt_area.y1 = txt_area.y2 - text_size.y;
 
         lv_area_t bg_area;
@@ -171,7 +173,7 @@ static void chart_event_cb(lv_event_t * e)
     }
 }
 
-void test_draw_task_hooking(void)
+void test_draw_dsc_hooking(void)
 {
     lv_obj_t * chart_wrapper = lv_obj_create(lv_screen_active());
     lv_obj_set_size(chart_wrapper, 600, 300);
@@ -179,10 +181,10 @@ void test_draw_task_hooking(void)
 
     lv_obj_set_parent(chart, chart_wrapper);
     lv_obj_set_size(chart, lv_pct(200), lv_pct(100));
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_set_send_draw_dsc_events(chart, true);
     lv_chart_set_div_line_count(chart, 0, 21);
     lv_chart_set_point_count(chart, 21);
-    lv_obj_add_event_cb(chart, chart_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(chart, chart_event_cb, LV_EVENT_DRAW_DSC_END, NULL);
 
     lv_chart_series_t * chart_set1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_YELLOW), 0);
     lv_chart_series_t * chart_set2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), 0);
@@ -280,10 +282,10 @@ static int32_t series_line_max_y;
 
 static void series_line_points_cb(lv_event_t * e)
 {
-    lv_draw_task_t * draw_task = lv_event_get_param(e);
-    if(lv_draw_task_get_type(draw_task) != LV_DRAW_TASK_TYPE_LINE) return;
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+    if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_LINE) return;
 
-    lv_draw_line_dsc_t * line_dsc = lv_draw_task_get_line_dsc(draw_task);
+    lv_draw_line_dsc_t * line_dsc = lv_draw_dsc_get_line_dsc(base_dsc);
     if(line_dsc->base.part != LV_PART_ITEMS || line_dsc->points == NULL) return;
 
     for(int32_t i = 0; i < line_dsc->point_cnt; i++) {
@@ -305,8 +307,8 @@ void test_chart_line_out_of_range_values_are_not_clamped(void)
     static const int32_t values[] = { -100, 50, 200 };
     lv_chart_set_series_values(chart, ser, values, 3);
 
-    lv_obj_set_send_draw_task_events(chart, true);
-    lv_obj_add_event_cb(chart, series_line_points_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_set_send_draw_dsc_events(chart, true);
+    lv_obj_add_event_cb(chart, series_line_points_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
 
     series_line_min_y = INT32_MAX;
     series_line_max_y = INT32_MIN;
