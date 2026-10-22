@@ -30,10 +30,6 @@
     #error "LV_USE_DEMO_WIDGETS needs to be enabled"
 #endif
 
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 128 * 1024
-    #warning "It's recommended to have at least 128kB RAM for the benchmark"
-#endif
-
 #include "../../lvgl_private.h"
 
 /**********************
@@ -491,6 +487,10 @@ static lv_demo_benchmark_on_end_cb_t on_demo_end_cb;
 
 void lv_demo_benchmark(void)
 {
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 128 * 1024
+    LV_LOG_WARN("It's recommended to have at least 128kB RAM for the benchmark");
+#endif
+
     scene_act = 0;
 
     lv_obj_t * scr = lv_screen_active();
