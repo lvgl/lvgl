@@ -467,9 +467,13 @@ void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size)
 
     size_t name_len = lv_strlen(name);
     lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent == NULL) {
+        lv_strlcpy(buf, name, buf_size);
+        return;
+    }
 
     /*If the last character is # automatically index the children with the same name start*/
-    if(parent && name_len > 0 && name[name_len - 1] == '#') {
+    if(name_len > 0 && name[name_len - 1] == '#') {
         uint32_t child_cnt = lv_obj_get_child_count(parent);
         uint32_t cnt = 0;
         uint32_t i;

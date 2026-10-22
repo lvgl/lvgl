@@ -31,7 +31,7 @@ void test_refr_object_outside_the_clip_area_is_not_drawn(void)
 
     /*Refresh an area far from the objects*/
     lv_area_t area = {40, 40, 59, 59};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &area);
     refr_frame();
 
@@ -55,7 +55,7 @@ void test_refr_transformed_object_outside_the_clip_area(void)
 
     /*The transformed area of the object is not in the refreshed area*/
     lv_area_t area = {60, 60, 79, 79};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &area);
     refr_frame();
 
@@ -78,7 +78,7 @@ void test_refr_transformed_object_corner_of_the_bounding_box(void)
     /*The corner of the bounding box of a rotated square is empty. It overlaps the
      *transformed area, but no part of the object is rendered there.*/
     lv_area_t corner = {22, 22, 24, 24};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &corner);
     refr_frame();
 
