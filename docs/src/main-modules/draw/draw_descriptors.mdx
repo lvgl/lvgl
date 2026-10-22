@@ -162,13 +162,13 @@ gradient types.
 
 The following show some example gradients.
 
-<LvglExample name="lv_example_style_2" path="styles/lv_example_style_2" />
+<LvglExample name="lv_example_style_background" path="styles/lv_example_style_background" />
 
-<LvglExample name="lv_example_style_17" path="styles/lv_example_style_17" />
+<LvglExample name="lv_example_style_gradient_conic" path="styles/lv_example_style_gradient_conic" />
 
-<LvglExample name="lv_example_style_18" path="styles/lv_example_style_18" />
+<LvglExample name="lv_example_style_gradient_radial" path="styles/lv_example_style_gradient_radial" />
 
-<LvglExample name="lv_example_style_19" path="styles/lv_example_style_19" />
+<LvglExample name="lv_example_style_gradient_buttons" path="styles/lv_example_style_gradient_buttons" />
 
 For each gradient type, multiple color and opacity values can be assigned.  These are
 called "stops".  The maximum number of stops is limited to
@@ -306,7 +306,7 @@ The following functions are used for border drawing:
 - <ApiLink name="lv_draw_task_get_border_dsc" display="lv_draw_task_get_border_dsc(draw_task)" /> retrieves the border descriptor
   from a Draw Task.
 
-<LvglExample name="lv_example_style_3" path="styles/lv_example_style_3" />
+<LvglExample name="lv_example_style_border" path="styles/lv_example_style_border" />
 
 ## Outlines
 
@@ -325,7 +325,7 @@ differences compared to borders in <ApiLink name="lv_draw_rect_dsc_t" /> are:
 - There is no `border_side` property for the outline. It's always rendered as a
   full rectangle.
 
-<LvglExample name="lv_example_style_4" path="styles/lv_example_style_4" />
+<LvglExample name="lv_example_style_outline" path="styles/lv_example_style_outline" />
 
 ## Box Shadow Draw Descriptor
 
@@ -354,7 +354,7 @@ The following functions are used for box shadow drawing:
 - <ApiLink name="lv_draw_task_get_box_shadow_dsc" display="lv_draw_task_get_box_shadow_dsc(draw_task)" /> retrieves the box shadow
   descriptor from a Draw Task.
 
-<LvglExample name="lv_example_style_5" path="styles/lv_example_style_5" />
+<LvglExample name="lv_example_style_shadow" path="styles/lv_example_style_shadow" />
 
 ## Image Draw Descriptor
 
@@ -389,7 +389,7 @@ Functions for image drawing:
 
 <LvglExample name="lv_example_canvas_image" path="widgets/canvas/lv_example_canvas_image" />
 
-<LvglExample name="lv_example_style_6" path="styles/lv_example_style_6" />
+<LvglExample name="lv_example_style_image" path="styles/lv_example_style_image" />
 
 ### Layers - Special Images
 
@@ -447,7 +447,7 @@ callback for rendering each character.  For callback details, see
 
 <LvglExample name="lv_example_canvas_label" path="widgets/canvas/lv_example_canvas_label" />
 
-<LvglExample name="lv_example_style_8" path="styles/lv_example_style_8" />
+<LvglExample name="lv_example_style_text" path="styles/lv_example_style_text" />
 
 ## Arc Draw Descriptor
 
@@ -474,7 +474,7 @@ Functions for arc drawing:
 
 <LvglExample name="lv_example_canvas_arc" path="widgets/canvas/lv_example_canvas_arc" />
 
-<LvglExample name="lv_example_style_7" path="styles/lv_example_style_7" />
+<LvglExample name="lv_example_style_arc" path="styles/lv_example_style_arc" />
 
 ## Line Draw Descriptor
 
@@ -510,7 +510,7 @@ Functions for line drawing:
 
 <LvglExample name="lv_example_canvas_line" path="widgets/canvas/lv_example_canvas_line" />
 
-<LvglExample name="lv_example_style_9" path="styles/lv_example_style_9" />
+<LvglExample name="lv_example_style_line" path="styles/lv_example_style_line" />
 
 ## Triangle Draw Descriptor
 
@@ -574,7 +574,7 @@ following fields:
 | `drop_shadow_ofs_x` | Horizontal offset. |
 | `drop_shadow_ofs_y` | Vertical offset. |
 
-<LvglExample name="lv_example_style_10" path="styles/lv_example_style_10" />
+<LvglExample name="lv_example_style_drop_shadow" path="styles/lv_example_style_drop_shadow" />
 
 ## Vector Draw Descriptor
 
@@ -632,7 +632,7 @@ lv_vector_path_delete(path);
 lv_draw_vector_dsc_delete(dsc);
 ```
 
-To see all the path, stroke, and fill options, check out [lv_draw_vector.h](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_vector.h) .
+To see all the path, stroke, and fill options, check out [lv_draw_vector.h](https://github.com/lvgl/lvgl/blob/release/v9.6/src/draw/lv_draw_vector.h) .
 
 ## Masking Operation
 
@@ -685,7 +685,5 @@ There are several options to mask parts of a layer, Widget, or drawing:
    By using the Canvas Widget with an <ApiLink name="LV_COLOR_FORMAT_L8" /> buffer,
    bitmap masks can be rendered dynamically.
 
-<LvglExample name="lv_example_label_4" path="widgets/label/lv_example_label_4" />
-
-<LvglExample name="lv_example_roller_3" path="widgets/roller/lv_example_roller_3" />
+<LvglExample name="lv_example_roller_fade_mask" path="widgets/roller/lv_example_roller_fade_mask" />
 
