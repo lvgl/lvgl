@@ -30,6 +30,8 @@ extern "C" {
 
 #if !defined(__ASSEMBLY__)
 
+#include "../lv_draw_sw_blend_private.h"
+
 #if __GNUC__ >= 4
 #define LVGL_HIDDEN __attribute__((visibility("hidden")))
 #else
