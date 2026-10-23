@@ -72,7 +72,7 @@ static void lv_draw_dma2d_image_core(lv_layer_t * layer, const lv_draw_image_dsc
     void * dest_first_pixel = lv_draw_layer_go_to_xy(layer,
                                                      clipped_img_area->x1 - layer->buf_area.x1,
                                                      clipped_img_area->y1 - layer->buf_area.y1);
-    int32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+    int32_t dest_stride = layer->draw_buf->header.stride;
 
     int32_t w = lv_area_get_width(clipped_img_area);
     int32_t h = lv_area_get_height(clipped_img_area);
@@ -112,7 +112,7 @@ static void lv_draw_dma2d_image_core(lv_layer_t * layer, const lv_draw_image_dsc
 
         .bg_address = dest_first_pixel,
         .bg_offset = output_offset,
-        .bg_cf = output_cf_dma2d,
+        .bg_cf = (lv_draw_dma2d_fgbg_cf_t) output_cf_dma2d,
     };
 
     if(opa >= LV_OPA_MAX) {
