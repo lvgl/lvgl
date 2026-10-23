@@ -132,7 +132,7 @@ See in [music](https://github.com/lvgl/lvgl/tree/master/demos/music) folder.
 
 ### Keypad and encoder
 LVGL allows you to control the widgets with a keypad and/or encoder without a touchpad. This demo shows how to handle buttons, drop-down lists, rollers, sliders, switches, and text inputs without touchpad.
-Learn more about the touchpad-less usage of LVGL [here](https://docs.lvgl.io/master/overview/indev.html#keypad-and-encoder).
+Learn more about the touchpad-less usage of LVGL [here](https://lvgl.io/docs/open/main-modules/indev/keypad).
 
 See in [keypad_encoder](https://github.com/lvgl/lvgl/tree/master/demos/keypad_encoder) folder.
 

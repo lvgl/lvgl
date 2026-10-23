@@ -16,7 +16,7 @@ lvglgdb = ["cmds/dashboard/static/*"]
 
 [project.urls]
 Homepage = "https://lvgl.io"
-Documentation = "https://docs.lvgl.io/master/debugging/gdb_plugin.html"
+Documentation = "https://lvgl.io/docs/open/debugging/gdb_plugin"
 Repository = "https://github.com/lvgl/lvgl"
 
 [tool.setuptools.dynamic]
