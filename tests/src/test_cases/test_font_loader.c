@@ -30,6 +30,8 @@ void test_font_loader_no_cache(void);
 void test_font_loader_from_buffer(void);
 void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
+void test_font_loader_kern_class_out_of_range(void);
+void test_font_loader_kern_mapping_shorter_than_glyphs(void);
 void test_font_loader_dynamic_from_buffer(void);
 
 /**********************
@@ -209,6 +211,73 @@ void test_font_loader_corrupt_kern(void)
         .dynamic_glyph_load = true,
     };
     TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+/*Return a copy of test_font_1_buf and the offset of the class kerning data in it*/
+static uint8_t * dup_font_1_with_kern(uint32_t * kern_ofs)
+{
+    uint8_t * buf = lv_malloc(sizeof(test_font_1_buf));
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_memcpy(buf, test_font_1_buf, sizeof(test_font_1_buf));
+
+    uint32_t i;
+    for(i = 0; i + 8 < sizeof(test_font_1_buf); i++) {
+        if(lv_memcmp(&buf[i], "kern", 4) == 0) break;
+    }
+    TEST_ASSERT_LESS_THAN_UINT32(sizeof(test_font_1_buf) - 8, i);
+
+    /*"kern", format(1) + padding(3), mapping length(2), rows(1), cols(1), left[], right[], values[]*/
+    TEST_ASSERT_EQUAL_UINT8(3, buf[i + 4]);
+    *kern_ofs = i + 8;
+    return buf;
+}
+
+void test_font_loader_kern_class_out_of_range(void)
+{
+    uint32_t ofs;
+    uint8_t * buf = dup_font_1_with_kern(&ofs);
+
+    /*The unmodified font loads*/
+    lv_font_t * font = lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf));
+    TEST_ASSERT_NOT_NULL(font);
+    lv_binfont_destroy(font);
+
+    uint16_t mapping_len = buf[ofs] | (buf[ofs + 1] << 8);
+    uint8_t rows = buf[ofs + 2];
+    uint8_t cols = buf[ofs + 3];
+    uint8_t * left = &buf[ofs + 4];
+    uint8_t * right = &buf[ofs + 4 + mapping_len];
+
+    /*A left class greater than the number of rows would index past class_pair_values*/
+    left[mapping_len - 1] = rows + 1;
+    TEST_ASSERT_NULL(lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf)));
+    left[mapping_len - 1] = 0;
+
+    /*Same for a right class greater than the number of columns*/
+    right[mapping_len - 1] = cols + 1;
+    TEST_ASSERT_NULL(lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf)));
+    right[mapping_len - 1] = 0;
+
+    font = lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf));
+    TEST_ASSERT_NOT_NULL(font);
+    lv_binfont_destroy(font);
+
+    lv_free(buf);
+}
+
+void test_font_loader_kern_mapping_shorter_than_glyphs(void)
+{
+    uint32_t ofs;
+    uint8_t * buf = dup_font_1_with_kern(&ofs);
+
+    /*The class mappings are indexed by glyph id, so they must cover every glyph*/
+    uint16_t mapping_len = buf[ofs] | (buf[ofs + 1] << 8);
+    mapping_len--;
+    buf[ofs] = mapping_len & 0xff;
+    buf[ofs + 1] = mapping_len >> 8;
+    TEST_ASSERT_NULL(lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf)));
+
+    lv_free(buf);
 }
 
 void test_font_loader_reload(void)
