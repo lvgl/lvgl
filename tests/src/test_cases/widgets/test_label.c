@@ -552,6 +552,43 @@ void test_label_get_letter_on_right(void)
     TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
 }
 
+void test_label_get_letter_on_recolor(void)
+{
+    lv_label_set_text(label, "#ff0000 Hello#");
+    lv_label_set_recolor(label, true);
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_LEFT, 0);
+    lv_obj_update_layout(label);
+
+    /*The second glyph is 'e', index 9; the command characters must be skipped*/
+    lv_point_t pos;
+    pos.x = lv_font_get_glyph_width(lv_obj_get_style_text_font(label, LV_PART_MAIN), 'H', 'e') + 1;
+    pos.y = 1;
+
+    TEST_ASSERT_EQUAL_UINT32(9, lv_label_get_letter_on(label, &pos, false));
+    TEST_ASSERT_TRUE(lv_label_is_char_under_pos(label, &pos));
+}
+
+void test_label_get_letter_on_recolor_last_line_ends_with_cmd(void)
+{
+    /*The last line starts and ends with a recolor command.
+     *Clicking to the right of the text used to loop forever on the terminating '\0'.*/
+    lv_label_set_text(label, "A\n#ff0000 C#");
+    lv_label_set_recolor(label, true);
+    lv_obj_set_width(label, 200);
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_update_layout(label);
+
+    const int32_t line_h = lv_font_get_line_height(lv_obj_get_style_text_font(label, LV_PART_MAIN));
+    lv_point_t pos;
+    pos.x = 190;
+    pos.y = line_h + line_h / 2;
+
+    const uint32_t letter_idx = lv_label_get_letter_on(label, &pos, false);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT32(lv_text_get_encoded_length(lv_label_get_text(label)), letter_idx);
+
+    lv_label_is_char_under_pos(label, &pos);
+}
+
 void test_label_text_selection(void)
 {
     const uint32_t selection_start = 0;
