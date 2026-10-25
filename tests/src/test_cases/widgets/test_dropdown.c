@@ -118,6 +118,35 @@ void test_dropdown_set_options(void)
     TEST_ASSERT_UINT_WITHIN(48, m1.free_size, m2.free_size);
 }
 
+void test_dropdown_set_options_while_open(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "a\nb");
+    lv_dropdown_open(dd);
+
+    lv_obj_t * list = lv_dropdown_get_list(dd);
+    lv_obj_t * label = lv_obj_get_child(list, 0);
+
+    /*The list label shows the options as static text: it must follow them when they are replaced or freed*/
+    lv_dropdown_set_options(dd, "a much longer option\nthat needs a new buffer\nc");
+    TEST_ASSERT_EQUAL_PTR(lv_dropdown_get_options(dd), lv_label_get_text(label));
+    lv_refr_now(NULL);
+
+    lv_dropdown_add_option(dd, "d", LV_DROPDOWN_POS_LAST);
+    TEST_ASSERT_EQUAL_PTR(lv_dropdown_get_options(dd), lv_label_get_text(label));
+    lv_refr_now(NULL);
+
+    lv_dropdown_set_options_static(dd, "x\ny");
+    TEST_ASSERT_EQUAL_STRING("x\ny", lv_label_get_text(label));
+    lv_refr_now(NULL);
+
+    lv_dropdown_clear_options(dd);
+    TEST_ASSERT_EQUAL_STRING("", lv_label_get_text(label));
+    lv_refr_now(NULL);
+
+    lv_obj_delete(dd);
+}
+
 void test_dropdown_select(void)
 {
     lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
