@@ -98,6 +98,32 @@ void test_anim_delete_custom(void)
     lv_test_wait(20);
     TEST_ASSERT_EQUAL(39, var);
 }
+void test_anim_custom_delete_and_get(void)
+{
+    int32_t var;
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, &var);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_custom_exec_cb(&a, custom_exec_cb);
+    lv_anim_set_duration(&a, 100);
+    lv_anim_start(&a);
+
+    lv_test_wait(20);
+    TEST_ASSERT_EQUAL(19, var);
+
+    /*The animation is found by its custom exec callback*/
+    TEST_ASSERT_NOT_NULL(lv_anim_custom_get(&a, custom_exec_cb));
+
+    /*And deleted by it*/
+    TEST_ASSERT_TRUE(lv_anim_custom_delete(&a, custom_exec_cb));
+    TEST_ASSERT_NULL(lv_anim_custom_get(&a, custom_exec_cb));
+
+    lv_test_wait(20);
+    TEST_ASSERT_EQUAL(19, var);
+}
+
 void test_anim_pause(void)
 {
     int32_t var;
