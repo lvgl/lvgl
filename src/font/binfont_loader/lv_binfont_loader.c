@@ -393,6 +393,18 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
         return -1;
     }
 
+    /*The records follow the 4-byte label and the 4-byte count inside the section,
+     *and `cmap_num` is a uint16_t. Also check that the records fit the file.*/
+    uint32_t pos = 0, file_size = 0;
+    if(cmaps_length < 12 ||
+       cmaps_subtables_count > (uint32_t)(cmaps_length - 12) / sizeof(cmap_table_bin_t) ||
+       cmaps_subtables_count > UINT16_MAX ||
+       lv_fs_tell(fp, &pos) != LV_FS_RES_OK || lv_fs_get_size(fp, &file_size) != LV_FS_RES_OK ||
+       file_size < pos || cmaps_subtables_count > (file_size - pos) / sizeof(cmap_table_bin_t)) {
+        LV_LOG_WARN("Invalid cmap subtable count: %" LV_PRIu32, cmaps_subtables_count);
+        return -1;
+    }
+
     lv_font_fmt_txt_cmap_t * cmaps = lv_zalloc(cmaps_subtables_count * sizeof(*cmaps));
     LV_ASSERT_MALLOC(cmaps);
     if(!cmaps) {
@@ -557,6 +569,13 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     if(glyph_length < 0) {
         return -1;
     }
+
+#if SIZE_MAX < UINT64_MAX
+    if(loca_count > SIZE_MAX / sizeof(lv_font_fmt_txt_glyph_dsc_t)) {
+        LV_LOG_WARN("Invalid glyph count: %" LV_PRIu32, loca_count);
+        return -1;
+    }
+#endif
 
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc = lv_zalloc(loca_count * sizeof(*glyph_dsc));
     LV_ASSERT_MALLOC(glyph_dsc);
@@ -743,6 +762,18 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
 
     uint32_t loca_count;
     if(lv_fs_read(fp, &loca_count, sizeof(uint32_t), NULL) != LV_FS_RES_OK) {
+        return false;
+    }
+
+    /*The glyph count can't exceed what the loca table can describe.*/
+    uint32_t loca_entry_size = (font_header.index_to_loc_format == 0) ? sizeof(uint16_t) : sizeof(uint32_t);
+    bool loca_count_ok = loca_length >= (int32_t)(sizeof(uint32_t) + 8) &&
+                         loca_count <= (uint32_t)(loca_length - (sizeof(uint32_t) + 8)) / loca_entry_size;
+#if SIZE_MAX < UINT64_MAX
+    loca_count_ok = loca_count_ok && loca_count <= SIZE_MAX / sizeof(uint32_t);
+#endif
+    if(!loca_count_ok) {
+        LV_LOG_WARN("Invalid glyph count: %" LV_PRIu32, loca_count);
         return false;
     }
 
