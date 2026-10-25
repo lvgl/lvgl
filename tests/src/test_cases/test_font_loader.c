@@ -30,6 +30,7 @@ void test_font_loader_no_cache(void);
 void test_font_loader_from_buffer(void);
 void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
+void test_font_loader_corrupt_bit_width(void);
 void test_font_loader_dynamic_from_buffer(void);
 
 /**********************
@@ -196,6 +197,20 @@ void test_font_loader_dynamic_from_buffer(void)
     TEST_ASSERT_NOT_NULL(font_3_bin);
 
     common();
+}
+
+void test_font_loader_corrupt_bit_width(void)
+{
+    /*A glyph header field wider than 32 bits cannot be returned by read_bits().*/
+    const char * path = "A:src/test_assets/test_font_bit_width_oob.fnt";
+
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
 }
 
 void test_font_loader_corrupt_kern(void)
