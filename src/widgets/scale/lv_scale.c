@@ -71,7 +71,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                                                              lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
                                                              const int32_t tick_value, const uint8_t tick_idx, lv_point_t * tick_point_a);
 static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
-                                          const uint16_t major_tick_idx);
+                                          const uint32_t major_tick_idx);
 
 static void scale_free_line_needle_points_cb(lv_event_t * e);
 
@@ -1815,7 +1815,7 @@ static void scale_get_labels_max_size(lv_obj_t * obj, int32_t * max_w, int32_t *
 
         major_tick_idx++;
         if(scale->txt_src) {
-            scale_build_custom_label_text(obj, &label_dsc, (uint16_t)major_tick_idx);
+            scale_build_custom_label_text(obj, &label_dsc, major_tick_idx);
         }
         else {
             int32_t tick_value = scale->range_min;
@@ -1945,7 +1945,7 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
  * @param major_tick_idx  index of the current major tick
  */
 static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
-                                          const uint16_t major_tick_idx)
+                                          const uint32_t major_tick_idx)
 {
     LV_ASSERT(obj != NULL);
     LV_ASSERT(label_dsc != NULL);
@@ -1953,7 +1953,7 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
 
     /* Check if the scale has valid custom labels available,
      * this avoids reading past txt_src array when the scale requires more tick labels than available */
-    if(major_tick_idx <= scale->custom_label_cnt) {
+    if(major_tick_idx > 0U && major_tick_idx <= (uint32_t)scale->custom_label_cnt) {
         if(scale->txt_src[major_tick_idx - 1U]) {
             label_dsc->text = scale->txt_src[major_tick_idx - 1U];
             label_dsc->text_local = 0;
