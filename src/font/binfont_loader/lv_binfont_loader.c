@@ -321,6 +321,13 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
         switch(cmap_table[i].format_type) {
             case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL: {
+                    /*The offset list is indexed with the relative code point, up to range_length.*/
+                    if(cmap_table[i].data_entries_count < cmap_table[i].range_length) {
+                        LV_LOG_WARN("cmap %u: range length %u exceeds offset list %u",
+                                    i, cmap_table[i].range_length, cmap_table[i].data_entries_count);
+                        return false;
+                    }
+
                     uint32_t ids_size = (uint32_t)(sizeof(uint8_t) * cmap_table[i].data_entries_count);
                     uint8_t * glyph_id_ofs_list = lv_malloc(ids_size);
                     LV_ASSERT_MALLOC(glyph_id_ofs_list);
@@ -536,6 +543,58 @@ static lv_binfont_glyph_loader_t * glyph_loader_create(lv_fs_file_t * fp,
     return loader;
 }
 
+/*Verifies that every glyph id the cmaps can produce is within the glyph descriptor array.*/
+static bool cmaps_validate_glyph_ids(const lv_font_fmt_txt_dsc_t * dsc, uint32_t glyph_count)
+{
+    uint16_t i;
+
+    for(i = 0; i < dsc->cmap_num; i++) {
+        const lv_font_fmt_txt_cmap_t * cmap = &dsc->cmaps[i];
+        uint32_t max_id;
+
+        switch(cmap->type) {
+            case LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY:
+                if(cmap->range_length == 0) continue;
+                max_id = (uint32_t)cmap->glyph_id_start + cmap->range_length - 1;
+                break;
+            case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL: {
+                    const uint8_t * ofs = cmap->glyph_id_ofs_list;
+                    uint32_t j, max_ofs = 0;
+                    if(cmap->range_length == 0) continue;
+                    for(j = 0; j < cmap->range_length; j++) {
+                        max_ofs = LV_MAX(max_ofs, ofs[j]);
+                    }
+                    max_id = (uint32_t)cmap->glyph_id_start + max_ofs;
+                    break;
+                }
+            case LV_FONT_FMT_TXT_CMAP_SPARSE_TINY:
+                if(cmap->list_length == 0) continue;
+                max_id = (uint32_t)cmap->glyph_id_start + cmap->list_length - 1;
+                break;
+            case LV_FONT_FMT_TXT_CMAP_SPARSE_FULL: {
+                    const uint16_t * ofs = cmap->glyph_id_ofs_list;
+                    uint32_t j, max_ofs = 0;
+                    if(cmap->list_length == 0) continue;
+                    for(j = 0; j < cmap->list_length; j++) {
+                        max_ofs = LV_MAX(max_ofs, ofs[j]);
+                    }
+                    max_id = (uint32_t)cmap->glyph_id_start + max_ofs;
+                    break;
+                }
+            default:
+                return false;
+        }
+
+        if(max_id >= glyph_count) {
+            LV_LOG_WARN("cmap %u: glyph id %" LV_PRIu32 " is out of range (%" LV_PRIu32 " glyphs)",
+                        i, max_id, glyph_count);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 /**
  * Read the glyph table of the font.
  * @param dynamic_glyph_load    if `true` only the glyph descriptors are read and the bitmaps are
@@ -743,6 +802,11 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
 
     uint32_t loca_count;
     if(lv_fs_read(fp, &loca_count, sizeof(uint32_t), NULL) != LV_FS_RES_OK) {
+        return false;
+    }
+
+    /*A cmap must not reference glyphs that the loca table doesn't describe.*/
+    if(!cmaps_validate_glyph_ids(font_dsc, loca_count)) {
         return false;
     }
 
