@@ -157,6 +157,12 @@ typedef struct {
      * a uint8_t to preserve backwards compatibility */
     const uint8_t * glyph_bitmap;
 
+    /** Length of `glyph_bitmap` in bytes.
+     * With `are_glyphs_dynamic_loaded` it's the size of the scratch buffer.
+     * 0 means unknown (fonts stored as C arrays), in which case the readers keep
+     * their historical behaviour of trusting `box_w`, `box_h` and the compressed data. */
+    uint32_t glyph_bitmap_len;
+
     /** Describe the glyphs */
     const lv_font_fmt_txt_glyph_dsc_t * glyph_dsc;
 
