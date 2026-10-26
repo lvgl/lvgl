@@ -446,11 +446,28 @@ static void indev_sample_pressed_cb(lv_event_t * e)
     indev_sample_log(lv_event_get_user_data(e), 'P');
 }
 
+static void indev_sample_reset_cb(lv_event_t * e)
+{
+    lv_indev_reset(lv_event_get_target(e), NULL);
+}
+
+static void indev_sample_delete_cb(lv_event_t * e)
+{
+    lv_indev_delete(lv_event_get_target(e));
+}
+
+static void indev_sample_dummy_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
+{
+    LV_UNUSED(indev);
+    data->state = LV_INDEV_STATE_RELEASED;
+}
+
 /* Called from tearDown so a failed assertion cannot leave a dangling listener */
 static void indev_sample_cleanup(void)
 {
     lv_indev_t * indev = lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
     lv_indev_remove_event_cb_with_user_data(indev, indev_sample_event_cb, &sample_ctx);
+    lv_indev_remove_event_cb_with_user_data(indev, indev_sample_reset_cb, &sample_ctx);
 }
 
 void test_indev_sample_event_carries_raw_data(void)
@@ -503,6 +520,49 @@ void test_indev_sample_event_before_processing(void)
 
     /* The raw press sample is seen before the widget gets PRESSED */
     TEST_ASSERT_EQUAL_STRING("SP", sample_ctx.log);
+}
+
+void test_indev_sample_event_reset_drops_sample(void)
+{
+    lv_memzero(&sample_ctx, sizeof(sample_ctx));
+    lv_indev_t * indev = lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
+
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
+    lv_obj_set_size(btn, 100, 100);
+    lv_obj_add_event_cb(btn, indev_sample_pressed_cb, LV_EVENT_PRESSED, &sample_ctx);
+
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    /* A listener that resets the indev drops the sample, so the button is not pressed */
+    lv_indev_add_event_cb(indev, indev_sample_reset_cb, LV_EVENT_INDEV_SAMPLE, &sample_ctx);
+    lv_test_mouse_move_to(50, 50);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    TEST_ASSERT_EQUAL_STRING("", sample_ctx.log);
+
+    /* Without the listener the same press reaches the button */
+    TEST_ASSERT_EQUAL_UINT32(1, lv_indev_remove_event_cb_with_user_data(indev, indev_sample_reset_cb, &sample_ctx));
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    TEST_ASSERT_EQUAL_STRING("P", sample_ctx.log);
+}
+
+void test_indev_sample_event_delete_indev(void)
+{
+    lv_indev_t * indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev, indev_sample_dummy_read_cb);
+    lv_indev_add_event_cb(indev, indev_sample_delete_cb, LV_EVENT_INDEV_SAMPLE, NULL);
+
+    /* The listener deletes the indev, so reading must stop without touching it again */
+    lv_indev_read(indev);
+
+    TEST_PASS();
 }
 
 #endif
