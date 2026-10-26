@@ -403,4 +403,98 @@ void test_release_without_pressed_object(void)
     TEST_PASS();
 }
 
+typedef struct {
+    uint32_t sample_cnt;
+    bool target_ok;
+    bool pressed_seen;
+    lv_indev_state_t last_state;
+    lv_point_t last_point;
+    char log[16];
+    uint32_t log_cnt;
+} indev_sample_ctx_t;
+
+static void indev_sample_log(indev_sample_ctx_t * ctx, char c)
+{
+    if(ctx->log_cnt < sizeof(ctx->log) - 1) {
+        ctx->log[ctx->log_cnt++] = c;
+        ctx->log[ctx->log_cnt] = '\0';
+    }
+}
+
+static void indev_sample_event_cb(lv_event_t * e)
+{
+    indev_sample_ctx_t * ctx = lv_event_get_user_data(e);
+    const lv_indev_data_t * data = lv_event_get_param(e);
+
+    ctx->sample_cnt++;
+    ctx->target_ok = lv_event_get_target(e) == lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
+    ctx->last_state = data->state;
+    ctx->last_point = data->point;
+    if(data->state == LV_INDEV_STATE_PRESSED) {
+        ctx->pressed_seen = true;
+        if(ctx->log_cnt == 0) indev_sample_log(ctx, 'S');
+    }
+}
+
+static void indev_sample_pressed_cb(lv_event_t * e)
+{
+    indev_sample_log(lv_event_get_user_data(e), 'P');
+}
+
+void test_indev_sample_event_carries_raw_data(void)
+{
+    indev_sample_ctx_t ctx;
+    lv_memzero(&ctx, sizeof(ctx));
+    lv_indev_t * indev = lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
+
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    lv_indev_add_event_cb(indev, indev_sample_event_cb, LV_EVENT_INDEV_SAMPLE, &ctx);
+
+    lv_test_mouse_move_to(123, 45);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    TEST_ASSERT_GREATER_THAN_UINT32(0, ctx.sample_cnt);
+    TEST_ASSERT_TRUE(ctx.target_ok);
+    TEST_ASSERT_TRUE(ctx.pressed_seen);
+    TEST_ASSERT_EQUAL_INT32(123, ctx.last_point.x);
+    TEST_ASSERT_EQUAL_INT32(45, ctx.last_point.y);
+
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    TEST_ASSERT_EQUAL(LV_INDEV_STATE_RELEASED, ctx.last_state);
+
+    /* Once the callback is removed no further sample is delivered */
+    uint32_t cnt = ctx.sample_cnt;
+    TEST_ASSERT_EQUAL_UINT32(1, lv_indev_remove_event_cb_with_user_data(indev, indev_sample_event_cb, &ctx));
+    lv_test_wait(50);
+    TEST_ASSERT_EQUAL_UINT32(cnt, ctx.sample_cnt);
+}
+
+void test_indev_sample_event_before_processing(void)
+{
+    indev_sample_ctx_t ctx;
+    lv_memzero(&ctx, sizeof(ctx));
+    lv_indev_t * indev = lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
+
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
+    lv_obj_set_size(btn, 100, 100);
+    lv_obj_add_event_cb(btn, indev_sample_pressed_cb, LV_EVENT_PRESSED, &ctx);
+
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    lv_indev_add_event_cb(indev, indev_sample_event_cb, LV_EVENT_INDEV_SAMPLE, &ctx);
+
+    lv_test_mouse_move_to(50, 50);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    /* The raw press sample is seen before the widget gets PRESSED */
+    TEST_ASSERT_EQUAL_STRING("SP", ctx.log);
+
+    lv_indev_remove_event_cb_with_user_data(indev, indev_sample_event_cb, &ctx);
+}
+
 #endif

@@ -62,6 +62,7 @@ typedef enum {
     LV_EVENT_LEAVE,               /**< Widget's focus has been lost but is still selected */
     LV_EVENT_HIT_TEST,            /**< Perform advanced hit-testing */
     LV_EVENT_INDEV_RESET,         /**< Indev has been reset */
+    LV_EVENT_INDEV_SAMPLE,        /**< Sent to the indev for every raw sample, before it is processed. The event parameter is the read-only `lv_indev_data_t *`. */
     LV_EVENT_HOVER_OVER,          /**< Indev hover over object */
     LV_EVENT_HOVER_LEAVE,         /**< Indev hover leave object */
 
