@@ -245,6 +245,8 @@ void lv_indev_read(lv_indev_t * indev)
             indev->disp->last_activity_time = data.timestamp;
         }
 
+        lv_indev_send_event(indev, LV_EVENT_INDEV_SAMPLE, &data);
+
         if(indev->type == LV_INDEV_TYPE_POINTER) {
             indev_pointer_proc(indev, &data);
         }
