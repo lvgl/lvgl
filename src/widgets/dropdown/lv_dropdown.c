@@ -56,6 +56,7 @@ static void list_press_handler(lv_obj_t * page);
 static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y);
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en);
 static lv_obj_t * get_label(const lv_obj_t * obj);
+static void refresh_list_label(lv_obj_t * obj);
 static void dropdown_list_align_bidi(lv_dropdown_t * dropdown, lv_dir_t dir);
 static void remove_options_translation_tag(lv_obj_t * obj);
 static lv_result_t update_text(lv_obj_t * obj, const char * text);
@@ -236,7 +237,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     refresh_size(obj);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_list_label(obj);
 }
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
@@ -261,7 +262,7 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
     dropdown->options = (char *)options;
 
     refresh_size(obj);
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_list_label(obj);
 }
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
@@ -360,7 +361,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 #endif
 
     refresh_size(obj);
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_list_label(obj);
 }
 
 #if LV_USE_TRANSLATION
@@ -388,7 +389,7 @@ void lv_dropdown_set_options_translation_tag(lv_obj_t * obj, const char * tag)
     dropdown->options_translation_tag = new_tag;
 
     refresh_size(obj);
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_list_label(obj);
 }
 #endif /*LV_USE_TRANSLATION*/
 
@@ -409,7 +410,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     dropdown->option_cnt = 0;
 
     refresh_size(obj);
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_list_label(obj);
 }
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
@@ -607,7 +608,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_obj_send_event(dropdown_obj, LV_EVENT_READY, NULL);
 
     lv_obj_t * label = get_label(dropdown_obj);
-    lv_label_set_text_static(label, dropdown->options);
+    lv_label_set_text_static(label, dropdown->options ? dropdown->options : "");
     lv_obj_set_width(dropdown->list, LV_SIZE_CONTENT);
 
     lv_obj_update_layout(label);
@@ -1026,7 +1027,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 dropdown->sel_opt_id = LV_MIN(prev_sel, dropdown->option_cnt - 1);
                 dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
 
-                if(dropdown->list) lv_obj_invalidate(dropdown->list);
+                refresh_list_label(obj);
             }
         }
     }
@@ -1488,6 +1489,21 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
     if(dropdown->list == NULL) return NULL;
 
     return lv_obj_get_child(dropdown->list, 0);
+}
+
+/**
+ * Point the list's label to the current options. The label shows them as static
+ * text (see `lv_dropdown_open`), so it has to be updated whenever the options are
+ * replaced or freed.
+ */
+static void refresh_list_label(lv_obj_t * obj)
+{
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    if(dropdown->list == NULL) return;
+
+    lv_obj_t * label = get_label(obj);
+    if(label) lv_label_set_text_static(label, dropdown->options ? dropdown->options : "");
+    lv_obj_invalidate(dropdown->list);
 }
 
 static void dropdown_list_align_bidi(lv_dropdown_t * dropdown, lv_dir_t dir)
