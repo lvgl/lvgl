@@ -83,6 +83,12 @@ void lv_draw_sw_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_
 
 #endif /* LV_USE_DRAW_SW */
 
+/**
+ * Get the software draw unit
+ * @return  the software draw unit, or NULL if it's disabled or not created yet
+ */
+lv_draw_unit_t * lv_draw_sw_get_draw_unit(void);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
