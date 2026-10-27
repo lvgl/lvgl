@@ -30,6 +30,7 @@ void test_font_loader_no_cache(void);
 void test_font_loader_from_buffer(void);
 void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
+void test_font_loader_corrupt_cmap(void);
 void test_font_loader_dynamic_from_buffer(void);
 
 /**********************
@@ -209,6 +210,23 @@ void test_font_loader_corrupt_kern(void)
         .dynamic_glyph_load = true,
     };
     TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+void test_font_loader_corrupt_cmap(void)
+{
+    const char * paths[] = {
+        "A:src/test_assets/test_font_cmap_oob.fnt",
+        "A:src/test_assets/test_font_cmap_glyph_oob.fnt",
+    };
+
+    for(unsigned int i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+        lv_binfont_dsc_t dsc = {
+            .path = paths[i],
+            .dynamic_glyph_load = true,
+        };
+        TEST_ASSERT_NULL(lv_binfont_create(paths[i]));
+        TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+    }
 }
 
 void test_font_loader_reload(void)
