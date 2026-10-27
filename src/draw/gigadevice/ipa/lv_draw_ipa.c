@@ -36,7 +36,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static bool is_cf_supported(lv_color_format_t cf);
 static bool is_dest_supported(const lv_layer_t * layer);
 static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
@@ -100,7 +99,6 @@ void lv_draw_ipa_init(void)
 {
     lv_draw_buf_ipa_init_handlers();
     lv_draw_ipa_unit_t * draw_ipa_unit = lv_draw_create_unit(sizeof(lv_draw_ipa_unit_t));
-    draw_ipa_unit->base_unit.evaluate_cb = evaluate_cb;
     draw_ipa_unit->base_unit.dispatch_cb = dispatch_cb;
     draw_ipa_unit->base_unit.delete_cb = delete_cb;
 #if LV_DRAW_IPA_ASYNC
@@ -360,103 +358,6 @@ static void flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
-{
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_FILL: {
-                lv_draw_fill_dsc_t * dsc = task->draw_dsc;
-                if(!(dsc->radius == 0
-                     && dsc->grad.dir == LV_GRAD_DIR_NONE
-                     && (dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_XRGB8888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
-                    return 0;
-                }
-            }
-            break;
-        case LV_DRAW_DSC_TYPE_LAYER: {
-                const lv_draw_image_dsc_t * dsc = task->draw_dsc;
-                const lv_layer_t * source_layer = dsc->src;
-                if(source_layer == NULL || dsc->clip_radius || dsc->bitmap_mask_src || dsc->tile ||
-                   dsc->blend_mode != LV_BLEND_MODE_NORMAL || dsc->recolor_opa > LV_OPA_MIN ||
-                   dsc->skew_x || dsc->skew_y || dsc->rotation ||
-                   dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
-                    return 0;
-                }
-                if(!(source_layer->color_format == LV_COLOR_FORMAT_ARGB8888 ||
-                     source_layer->color_format == LV_COLOR_FORMAT_XRGB8888 ||
-                     source_layer->color_format == LV_COLOR_FORMAT_RGB888 ||
-                     source_layer->color_format == LV_COLOR_FORMAT_RGB565) ||
-                   !(dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888 ||
-                     dsc->base.layer->color_format == LV_COLOR_FORMAT_XRGB8888 ||
-                     dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888 ||
-                     dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565)) {
-                    return 0;
-                }
-                const lv_layer_t * target_layer = dsc->base.layer;
-                uint32_t source_size = lv_color_format_get_size(source_layer->color_format);
-                uint32_t target_size = lv_color_format_get_size(target_layer->color_format);
-                uint32_t source_stride = source_layer->draw_buf ? source_layer->draw_buf->header.stride :
-                                         lv_draw_buf_width_to_stride(lv_area_get_width(&source_layer->buf_area),
-                                                                     source_layer->color_format);
-                uint32_t target_stride = target_layer->draw_buf ? target_layer->draw_buf->header.stride :
-                                         lv_draw_buf_width_to_stride(lv_area_get_width(&target_layer->buf_area),
-                                                                     target_layer->color_format);
-                if(source_stride % source_size || target_stride % target_size) return 0;
-            }
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * dsc = task->draw_dsc;
-                if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
-                     && dsc->clip_radius == 0
-                     && dsc->bitmap_mask_src == NULL
-                     && dsc->sup == NULL
-                     && dsc->tile == 0
-                     && dsc->blend_mode == LV_BLEND_MODE_NORMAL
-                     && dsc->recolor_opa <= LV_OPA_MIN
-                     && dsc->skew_y == 0
-                     && dsc->skew_x == 0
-                     && dsc->scale_x == LV_SCALE_NONE
-                     && dsc->scale_y == LV_SCALE_NONE
-                     && dsc->rotation == 0
-                     && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
-                     && (dsc->header.cf == LV_COLOR_FORMAT_ARGB8888
-                         || dsc->header.cf == LV_COLOR_FORMAT_XRGB8888
-                         || dsc->header.cf == LV_COLOR_FORMAT_RGB888
-                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565
-                         || dsc->header.cf == LV_COLOR_FORMAT_ARGB1555)
-                     && (dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_XRGB8888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
-                    return 0;
-                }
-                uint32_t source_size = lv_color_format_get_size(dsc->header.cf);
-                if(dsc->header.stride % source_size) return 0;
-#if LV_DRAW_BUF_STRIDE_ALIGN != 1
-                uint32_t decoded_stride = lv_draw_buf_width_to_stride(dsc->header.w, dsc->header.cf);
-                if(decoded_stride % source_size) return 0;
-#endif
-            }
-            break;
-        default:
-            return 0;
-    }
-
-    const lv_layer_t * target_layer = task->target_layer;
-    uint32_t target_size = lv_color_format_get_size(target_layer->color_format);
-    uint32_t target_stride = target_layer->draw_buf ? target_layer->draw_buf->header.stride :
-                             lv_draw_buf_width_to_stride(lv_area_get_width(&target_layer->buf_area),
-                                                         target_layer->color_format);
-    if(target_stride % target_size) return 0;
-
-    task->preferred_draw_unit_id = DRAW_UNIT_ID_IPA;
-    task->preference_score = 0;
-
-    return 0;
-}
-
 static bool is_cf_supported(lv_color_format_t cf)
 {
     return cf == LV_COLOR_FORMAT_ARGB8888

@@ -63,7 +63,6 @@ static void execute_drawing(lv_draw_opengles_unit_t * u);
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
-static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static bool opengles_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc);
 static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
 static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
@@ -137,7 +136,6 @@ void lv_draw_opengles_init(void)
 {
     lv_draw_opengles_unit_t * draw_opengles_unit = lv_draw_create_unit(sizeof(lv_draw_opengles_unit_t));
     draw_opengles_unit->base_unit.dispatch_cb = dispatch;
-    draw_opengles_unit->base_unit.evaluate_cb = evaluate;
     draw_opengles_unit->base_unit.draw_cbs = &draw_cbs;
     draw_opengles_unit->base_unit.id = DRAW_UNIT_ID_OPENGLES;
     draw_opengles_unit->base_unit.name = "OPENGLES";
@@ -337,21 +335,6 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/
     lv_draw_dispatch_request();
     return 1;
-}
-
-static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
-{
-    LV_UNUSED(draw_unit);
-
-    /*If not refreshing the display probably it's a canvas rendering
-     *which his not supported in OpenGL as it's not a texture.*/
-    if(lv_refr_get_disp_refreshing() == NULL) return 0;
-
-    if(((lv_draw_dsc_t *)task->draw_dsc)->user_data == NULL) {
-        task->preference_score = 0;
-        task->preferred_draw_unit_id = DRAW_UNIT_ID_OPENGLES;
-    }
-    return 0;
 }
 
 static bool opengles_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc)

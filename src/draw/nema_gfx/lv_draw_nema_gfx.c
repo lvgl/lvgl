@@ -68,8 +68,6 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u);
 
 static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
-static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
-
 static bool nema_gfx_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
 static bool nema_gfx_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
 static bool nema_gfx_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
@@ -132,7 +130,6 @@ void lv_draw_nema_gfx_init(void)
     lv_draw_buf_nema_gfx_init_handlers();
 
     draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
-    draw_nema_gfx_unit->base_unit.evaluate_cb = nema_gfx_evaluate;
     draw_nema_gfx_unit->base_unit.delete_cb = nema_gfx_delete;
     draw_nema_gfx_unit->base_unit.wait_for_finish_cb = nema_gfx_wait_for_finish;
     draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
@@ -190,125 +187,6 @@ static int32_t nema_gfx_wait_for_finish(lv_draw_unit_t * draw_unit)
     nema_cl_submit(&(draw_nema_gfx_unit->cl));
     nema_cl_wait(&(draw_nema_gfx_unit->cl));
     return 1;
-}
-
-static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
-{
-    LV_UNUSED(draw_unit);
-
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_LAYER: {
-                if(task->preference_score > 80) {
-                    task->preference_score = 80;
-                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                }
-                return 1;
-            }
-#if LV_USE_NEMA_VG
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-        case LV_DRAW_DSC_TYPE_ARC:
-        case LV_DRAW_DSC_TYPE_FILL: {
-                if(task->preference_score > 80) {
-                    task->preference_score = 80;
-                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                }
-                return 1;
-            }
-#else
-        case LV_DRAW_DSC_TYPE_FILL: {
-                lv_draw_fill_dsc_t * draw_fill_dsc = (lv_draw_fill_dsc_t *) task->draw_dsc;
-                if((draw_fill_dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_TRIANGLE: {
-                lv_draw_triangle_dsc_t * draw_triangle_dsc = (lv_draw_triangle_dsc_t *) task->draw_dsc;
-                if((draw_triangle_dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-#endif
-        case LV_DRAW_DSC_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * draw_image_dsc = (lv_draw_image_dsc_t *) task->draw_dsc;
-                /*Guard for previous NemaGFX Version*/
-#ifndef NEMA_BLOP_RECOLOR
-                if(draw_image_dsc->recolor_opa > LV_OPA_MIN)
-                    break;
-#endif
-                const lv_image_dsc_t * img_dsc = draw_image_dsc->src;
-                if(!lv_nemagfx_is_cf_supported(img_dsc->header.cf))
-                    break;
-
-                if(draw_image_dsc->blend_mode != LV_BLEND_MODE_SUBTRACTIVE) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_LABEL: {
-                lv_draw_label_dsc_t * draw_label_dsc = (lv_draw_label_dsc_t *) task->draw_dsc;
-                lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)(draw_label_dsc->font->dsc);
-                if(fdsc->bitmap_format != LV_FONT_FMT_TXT_COMPRESSED) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_LINE: {
-                lv_draw_line_dsc_t * draw_line_dsc = (lv_draw_line_dsc_t *) task->draw_dsc;
-                bool is_dashed = (draw_line_dsc->dash_width && draw_line_dsc->dash_gap);
-                if(!is_dashed && !(draw_line_dsc->round_end || draw_line_dsc->round_start)) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_BORDER: {
-                const lv_draw_border_dsc_t * draw_dsc = (lv_draw_border_dsc_t *) task->draw_dsc;
-                if((!(draw_dsc->side != (lv_border_side_t)LV_BORDER_SIDE_FULL && draw_dsc->radius > 0)) &&
-                   (draw_dsc->radius > draw_dsc->width)) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
-        case LV_DRAW_DSC_TYPE_VECTOR: {
-                if(task->preference_score > 80) {
-                    task->preference_score = 80;
-                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                }
-                return 1;
-            }
-#endif
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-        default:
-            break;
-    }
-    return 0;
 }
 
 static bool nema_gfx_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)

@@ -70,14 +70,6 @@ struct _lv_draw_task_t {
      */
     uint8_t preferred_draw_unit_id;
 
-    /**
-     * Set to which extent `preferred_draw_unit_id` is good at this task.
-     * 80: means 20% better (faster) than software rendering
-     * 100: the default value
-     * 110: means 10% worse (slower) than software rendering
-     */
-    uint8_t preference_score;
-
 };
 
 struct _lv_draw_mask_t {
@@ -180,14 +172,6 @@ struct _lv_draw_unit_t {
      *                              to let draw unit try to start the rendering again.
      */
     int32_t (*dispatch_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-
-    /**
-     *
-     * @param draw_unit
-     * @param task
-     * @return
-     */
-    int32_t (*evaluate_cb)(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
     /**
      * Called to signal the unit to complete all tasks in order to return their ready status.

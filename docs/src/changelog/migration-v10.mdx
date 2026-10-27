@@ -551,6 +551,42 @@ and are not meant to be included directly.
    lv_draw_unit_draw_letter(layer, clip_area, glyph_dsc, pos, font, letter, my_draw_glyph_cb, my_user_data);
    ```
 
+### Custom draw units
+
+- `evaluate_cb` and the `preference_score` field of the draw tasks have been removed. A draw unit no longer bids for
+  the tasks; instead it tells whether it can draw a descriptor with the `can_draw_*_cb` callbacks of its `draw_cbs`
+  table (one per descriptor type, `NULL` means it can draw every descriptor of the types it has a draw callback for),
+  and sets its `id`, the ID its `dispatch_cb` looks for in `preferred_draw_unit_id`.
+- The last created draw unit is the default, and every unit falls back to the software unit:
+  <ApiLink name="lv_draw_create_unit"/> sets its new `fallback` field (`NULL` if <ApiLink name="LV_USE_DRAW_SW"/>
+  is disabled). A task goes to the default unit, or to the software unit if the default can't draw it; it never goes
+  to another GPU unit. With several GPU units enabled, only the last created one draws. Set `fallback` to `NULL` to
+  drop the tasks the unit can't draw.
+- With two GPU units enabled, the default unit may have changed: with DMA2D and NemaGFX, NemaGFX draws (DMA2D gets
+  no draw tasks); with PXP or G2D and VGLite, VGLite draws (PXP and G2D get no draw tasks). What the default unit
+  can't draw goes to the software unit, not to the other GPU unit.
+
+   ```c
+   /* Before */
+   static int32_t my_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
+   {
+       if(t->type == LV_DRAW_DSC_TYPE_FILL && t->preference_score > 80) {
+           t->preference_score = 80;
+           t->preferred_draw_unit_id = MY_DRAW_UNIT_ID;
+       }
+       return 0;
+   }
+   my_unit->base_unit.evaluate_cb = my_evaluate;
+
+   /* After */
+   static const lv_draw_unit_draw_cbs_t my_draw_cbs = {
+       .draw_fill_cb = my_fill,
+       .can_draw_fill_cb = NULL, /* can draw every fill */
+   };
+   my_unit->base_unit.draw_cbs = &my_draw_cbs;
+   my_unit->base_unit.id = MY_DRAW_UNIT_ID;
+   ```
+
 
 ---
 

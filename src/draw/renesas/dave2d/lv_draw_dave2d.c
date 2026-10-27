@@ -40,7 +40,6 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u);
     #endif
 #endif
 
-static int32_t _dave2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static bool _dave2d_grad_supported(const lv_grad_dsc_t * grad);
 static bool _dave2d_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
 static bool _dave2d_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
@@ -117,7 +116,6 @@ void lv_draw_dave2d_init(void)
 
     lv_draw_dave2d_unit_t * draw_dave2d_unit = lv_draw_create_unit(sizeof(lv_draw_dave2d_unit_t));
     draw_dave2d_unit->base_unit.dispatch_cb = lv_draw_dave2d_dispatch;
-    draw_dave2d_unit->base_unit.evaluate_cb = _dave2d_evaluate;
     draw_dave2d_unit->base_unit.wait_for_finish_cb = _dave2d_wait_finish;
     draw_dave2d_unit->base_unit.name = "DAVE2D";
     draw_dave2d_unit->base_unit.draw_cbs = &draw_cbs;
@@ -271,132 +269,6 @@ static bool lv_draw_dave2d_image_color_format_supported(lv_color_format_t color_
 }
 
 #define USE_D2 (1)
-
-static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
-{
-    LV_UNUSED(u);
-    int32_t ret = 0;
-
-    lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
-
-    if(!lv_draw_dave2d_is_dest_cf_supported(draw_dsc_base->layer->color_format))
-        return 0;
-
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL: {
-#if USE_D2
-                lv_draw_fill_dsc_t * dsc = t->draw_dsc;
-                if(dsc->grad.dir == LV_GRAD_DIR_NONE
-                   || ((dsc->grad.dir != LV_GRAD_DIR_NONE)
-                       && ((dsc->grad.stops[0].color.blue == dsc->grad.stops[dsc->grad.stops_count - 1].color.blue)
-                           && (dsc->grad.stops[0].color.red   == dsc->grad.stops[dsc->grad.stops_count - 1].color.red)
-                           && (dsc->grad.stops[0].color.green == dsc->grad.stops[dsc->grad.stops_count - 1].color.green)))) {
-
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                    t->preference_score = 0;
-
-                }
-                else
-#endif
-                {
-                }
-                ret =  0;
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_LAYER: {
-                ret = 0;
-                break;
-            }
-
-        case LV_DRAW_DSC_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                if(!lv_draw_dave2d_image_color_format_supported(dsc->header.cf)) {
-                    ret = 0;
-                    break;
-                }
-#if USE_D2
-                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                t->preference_score = 0;
-#endif
-                ret = 0;
-                break;
-            }
-
-        case LV_DRAW_DSC_TYPE_BORDER: {
-#if USE_D2
-                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                t->preference_score = 0;
-#endif
-                ret = 0;
-                break;
-            }
-
-        case  LV_DRAW_DSC_TYPE_BOX_SHADOW: {
-                ret = 0;
-                break;
-            }
-
-        case  LV_DRAW_DSC_TYPE_LABEL: {
-#if USE_D2
-                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                t->preference_score = 0;
-#endif
-                ret = 0;
-                break;
-            }
-
-        case LV_DRAW_DSC_TYPE_LINE: {
-#if USE_D2
-                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                t->preference_score = 0;
-#endif
-                ret = 0;
-                break;
-            }
-
-        case  LV_DRAW_DSC_TYPE_ARC: {
-#if USE_D2
-                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                t->preference_score = 0;
-#endif
-                ret = 0;
-                break;
-            }
-
-        case LV_DRAW_DSC_TYPE_TRIANGLE: {
-#if USE_D2
-                lv_draw_triangle_dsc_t * dsc = t->draw_dsc;
-                if(dsc->grad.dir == LV_GRAD_DIR_NONE
-                   || ((dsc->grad.dir != LV_GRAD_DIR_NONE)
-                       && ((dsc->grad.stops[0].color.blue == dsc->grad.stops[dsc->grad.stops_count - 1].color.blue)
-                           && (dsc->grad.stops[0].color.red   == dsc->grad.stops[dsc->grad.stops_count - 1].color.red)
-                           && (dsc->grad.stops[0].color.green == dsc->grad.stops[dsc->grad.stops_count - 1].color.green)))) {
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                    t->preference_score = 0;
-                }
-                else {
-                }
-#endif
-                ret = 0;
-                break;
-            }
-
-        case  LV_DRAW_DSC_TYPE_MASK_RECTANGLE: {
-#if 0//USE_D2
-                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                t->preference_score = 0;
-#endif
-                ret = 0;
-                break;
-            }
-
-        default:
-            ret = 0;
-            break;
-    }
-
-    return ret;
-}
 
 /* Gradients are drawn only if they have one color */
 static bool _dave2d_grad_supported(const lv_grad_dsc_t * grad)

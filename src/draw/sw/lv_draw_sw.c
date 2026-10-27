@@ -78,7 +78,6 @@ static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv
 #endif
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
 #if LV_USE_PARALLEL_DRAW_DEBUG
@@ -127,7 +126,6 @@ void lv_draw_sw_init(void)
 
     lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
     draw_sw_unit->base_unit.dispatch_cb = dispatch;
-    draw_sw_unit->base_unit.evaluate_cb = evaluate;
     draw_sw_unit->base_unit.draw_cbs = &draw_cbs;
     draw_sw_unit->base_unit.id = DRAW_UNIT_ID_SW;
     /*Register as the fallback of the units created after this one*/
@@ -270,48 +268,6 @@ lv_draw_sw_blend_handler_t lv_draw_sw_get_blend_handler(lv_color_format_t dest_c
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
-{
-    LV_UNUSED(draw_unit);
-
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_IMAGE:
-        case LV_DRAW_DSC_TYPE_LAYER: {
-                lv_draw_image_dsc_t * draw_dsc = task->draw_dsc;
-
-                /* not support skew */
-                if(draw_dsc->skew_x != 0 || draw_dsc->skew_y != 0) {
-                    return 0;
-                }
-
-                bool masked = draw_dsc->bitmap_mask_src != NULL;
-
-                lv_color_format_t cf = draw_dsc->header.cf;
-                if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) {
-                    return 0;
-                }
-
-                if(cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
-                    return 0;
-                }
-            }
-            break;
-#if LV_USE_3DTEXTURE
-        case LV_DRAW_DSC_TYPE_3D:
-            return 0;
-#endif
-        default:
-            break;
-    }
-
-    if(task->preference_score >= 100) {
-        task->preference_score = 100;
-        task->preferred_draw_unit_id = DRAW_UNIT_ID_SW;
-    }
-
-    return 0;
-}
 
 static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
 {

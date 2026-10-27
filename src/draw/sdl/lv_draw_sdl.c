@@ -46,7 +46,6 @@ static void execute_drawing(lv_draw_sdl_unit_t * u);
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
-static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static bool sdl_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc);
 static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
 static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
@@ -146,7 +145,6 @@ void lv_draw_sdl_init(void)
 {
     lv_draw_sdl_unit_t * draw_sdl_unit = lv_draw_create_unit(sizeof(lv_draw_sdl_unit_t));
     draw_sdl_unit->base_unit.dispatch_cb = dispatch;
-    draw_sdl_unit->base_unit.evaluate_cb = evaluate;
     draw_sdl_unit->base_unit.draw_cbs = &draw_cbs;
     draw_sdl_unit->base_unit.id = DRAW_UNIT_ID_SDL;
     draw_sdl_unit->base_unit.name = "SDL";
@@ -203,41 +201,6 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/
     lv_draw_dispatch_request();
     return 1;
-}
-
-static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
-{
-    LV_UNUSED(draw_unit);
-
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-        case LV_DRAW_DSC_TYPE_BORDER:
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-        case LV_DRAW_DSC_TYPE_LABEL:
-        case LV_DRAW_DSC_TYPE_IMAGE:
-        case LV_DRAW_DSC_TYPE_LAYER:
-        case LV_DRAW_DSC_TYPE_LINE:
-        case LV_DRAW_DSC_TYPE_ARC:
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-            break;
-        default:
-            return 0;
-    }
-
-    if(task->type == LV_DRAW_DSC_TYPE_IMAGE &&
-       ((lv_draw_image_dsc_t *)task->draw_dsc)->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
-        return 0;
-    }
-
-    /*If not refreshing the display probably it's a canvas rendering
-     *which his not support in SDL as it's not a texture.*/
-    if(lv_refr_get_disp_refreshing() == NULL) return 0;
-
-    if(((lv_draw_dsc_t *)task->draw_dsc)->user_data == NULL) {
-        task->preference_score = 0;
-        task->preferred_draw_unit_id = DRAW_UNIT_ID_SDL;
-    }
-    return 0;
 }
 
 static bool sdl_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc)
@@ -417,7 +380,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
                 break;
             }
         default:
-            /*Keep in sync with evaluate(): every type it claims must have a case above*/
+            /*Keep in sync with the can_draw callbacks: every type they take must have a case above*/
             LV_UNREACHABLE();
     }
 

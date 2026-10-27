@@ -35,12 +35,6 @@
  **********************/
 
 /*
- * Evaluate a task and set the score and preferred PXP unit.
- * Return 1 if task is preferred, 0 otherwise (task is not supported).
- */
-static int32_t _pxp_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
-
-/*
  * Tell whether PXP can draw a descriptor on the layer.
  */
 static bool _pxp_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
@@ -101,7 +95,6 @@ void lv_draw_pxp_init(void)
     lv_draw_buf_pxp_init_handlers();
 
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
-    draw_pxp_unit->base_unit.evaluate_cb = _pxp_evaluate;
     draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
     draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
     draw_pxp_unit->base_unit.name = "NXP_PXP";
@@ -261,74 +254,6 @@ static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
         return false;
 
     return true;
-}
-
-static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
-{
-    LV_UNUSED(u);
-
-    const lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
-
-    if(!_pxp_dest_cf_supported(draw_dsc_base->layer->color_format))
-        return 0;
-
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL: {
-                const lv_draw_fill_dsc_t * draw_dsc = (lv_draw_fill_dsc_t *) t->draw_dsc;
-
-                /* Most simple case: just a plain rectangle (no radius, no gradient). */
-                if((draw_dsc->radius != 0) || (draw_dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE))
-                    return 0;
-
-                if(t->preference_score > 70) {
-                    t->preference_score = 70;
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
-                }
-                return 1;
-            }
-
-        case LV_DRAW_DSC_TYPE_LAYER: {
-                const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
-                lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
-
-                if(!_pxp_src_cf_supported(layer_to_draw->color_format))
-                    return 0;
-
-                if(!_pxp_draw_img_supported(draw_dsc))
-                    return 0;
-
-                if(t->preference_score > 70) {
-                    t->preference_score = 70;
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
-                }
-                return 1;
-            }
-
-        case LV_DRAW_DSC_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
-                const lv_image_dsc_t * img_dsc = draw_dsc->src;
-
-                if(img_dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START)
-                    return 0;
-
-                if((!_pxp_src_cf_supported(img_dsc->header.cf)) ||
-                   (!pxp_buf_aligned(img_dsc->data, img_dsc->header.stride)))
-                    return 0;
-
-                if(!_pxp_draw_img_supported(draw_dsc))
-                    return 0;
-
-                if(t->preference_score > 70) {
-                    t->preference_score = 70;
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
-                }
-                return 1;
-            }
-        default:
-            return 0;
-    }
-
-    return 0;
 }
 
 static bool _pxp_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
