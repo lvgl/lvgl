@@ -126,6 +126,8 @@ void lv_draw_sw_init(void)
     draw_sw_unit->base_unit.dispatch_cb = dispatch;
     draw_sw_unit->base_unit.evaluate_cb = evaluate;
     draw_sw_unit->base_unit.draw_cbs = &draw_cbs;
+    /*Register as the fallback of the units created after this one*/
+    LV_GLOBAL_DEFAULT()->draw_info.sw_unit = &draw_sw_unit->base_unit;
 #if LV_USE_OS != LV_OS_NONE
     draw_sw_unit->base_unit.wait_for_finish_cb = wait_for_finish;
 #endif /*LV_USE_OS*/

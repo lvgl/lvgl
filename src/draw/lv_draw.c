@@ -72,6 +72,7 @@ void lv_draw_deinit(void)
         lv_free(cur_unit);
     }
     _draw_info.unit_head = NULL;
+    _draw_info.sw_unit = NULL;
 #if LV_USE_OS
     lv_thread_sync_delete(&_draw_info.sync);
 #endif
@@ -82,6 +83,8 @@ void * lv_draw_create_unit(size_t size)
     lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
     LV_ASSERT_MALLOC(new_unit);
     new_unit->next = _draw_info.unit_head;
+    /*Fall back to the software unit only, so a GPU's refusals never go to another GPU*/
+    new_unit->fallback = _draw_info.sw_unit;
 
     _draw_info.unit_head = new_unit;
     _draw_info.unit_cnt++;
