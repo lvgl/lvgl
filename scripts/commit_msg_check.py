@@ -15,7 +15,7 @@ Usage:
     commit_msg_check.py --check-title "msg" # Check a single PR title / commit message
     commit_msg_check.py --self-test         # Run self-tests
 
-See: https://docs.lvgl.io/master/contributing/pull_requests.html#commit-message-format
+See: https://lvgl.io/docs/open/contributing/pull_requests#commit-message-format
 """
 
 import os
@@ -75,7 +75,7 @@ DONT_SQUASH_PATTERN = re.compile(
 
 # Commit message format documentation URL
 COMMIT_MSG_DOC_URL = (
-    "https://docs.lvgl.io/master/contributing/pull_requests.html"
+    "https://lvgl.io/docs/open/contributing/pull_requests"
     "#commit-message-format"
 )
 

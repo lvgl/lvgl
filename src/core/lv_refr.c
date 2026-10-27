@@ -278,7 +278,8 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
      *  2.User-customized widget modify widget properties/styles again within the DRAW event.
      *
      * Therefore, ensure that LVGL is used in a single-threaded manner, or refer to
-     * documentation: https://docs.lvgl.io/master/porting/os.html for proper locking mechanisms.
+     * the documentation for proper locking mechanisms:
+     * https://lvgl.io/docs/open/integration/overview#operating-systems-and-threads
      * Additionally, ensure that only drawing-related tasks are performed within the DRAW event,
      * and move widget property/style modifications to other events.
      */

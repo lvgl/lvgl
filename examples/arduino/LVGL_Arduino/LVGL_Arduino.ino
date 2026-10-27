@@ -1,5 +1,5 @@
 /*Using LVGL with Arduino requires some extra steps:
- *Be sure to read the docs here: https://docs.lvgl.io/master/integration/framework/arduino.html  */
+ *Be sure to read the docs here: https://lvgl.io/docs/open/integration/frameworks/arduino  */
 
 #include <lvgl.h>
 
@@ -117,7 +117,7 @@ void setup()
      lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 
      * Try an example. See all the examples
-     *  - Online: https://docs.lvgl.io/master/examples.html
+     *  - Online: https://lvgl.io/docs/open/examples
      *  - Source codes: https://github.com/lvgl/lvgl/tree/master/examples
      * ----------------------------------------------------------------
 
