@@ -75,6 +75,13 @@ returns the LVGL animation which controls the
 Lottie animation. By default it is running infinitely at 60FPS however the LVGL animation
 can be freely adjusted.
 
+Loading a new source with `lv_lottie_set_src_data` or `lv_lottie_set_src_file`
+reuses the existing LVGL animation, preserving its repeat settings and callbacks.
+If that animation has completed or been deleted, `lv_lottie_get_anim` returns
+`NULL`. Loading a new source then creates an animation with the default settings,
+including infinite repetition. Call `lv_lottie_get_anim` again after setting the
+source and reapply any custom settings to the new animation.
+
 ## Examples
 
 ### Load a Lottie animation from an array
