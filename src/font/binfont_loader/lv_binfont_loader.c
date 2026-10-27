@@ -242,6 +242,16 @@ static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp)
     return it;
 }
 
+/*Reads exactly `n` bytes; a short read means the file ended inside a table.*/
+static bool read_exact(lv_fs_file_t * fp, void * buf, uint32_t n)
+{
+    uint32_t br = 0;
+    if(lv_fs_read(fp, buf, n, &br) != LV_FS_RES_OK) {
+        return false;
+    }
+    return br == n;
+}
+
 static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 {
     LV_ASSERT(it != NULL);
@@ -253,10 +263,11 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
 
         if(it->bit_pos < 0) {
             it->bit_pos = 7;
-            *res = lv_fs_read(it->fp, &(it->byte_value), 1, NULL);
-            if(*res != LV_FS_RES_OK) {
+            if(!read_exact(it->fp, &(it->byte_value), 1)) {
+                *res = LV_FS_RES_INV_PARAM;
                 return 0;
             }
+            *res = LV_FS_RES_OK;
         }
         int8_t bit = (it->byte_value & 0x80) ? 1 : 0;
 
@@ -286,8 +297,8 @@ static int read_label(lv_fs_file_t * fp, int start, const char * label)
     uint32_t length;
     char buf[4];
 
-    if(lv_fs_read(fp, &length, 4, NULL) != LV_FS_RES_OK
-       || lv_fs_read(fp, buf, 4, NULL) != LV_FS_RES_OK
+    if(!read_exact(fp, &length, 4)
+       || !read_exact(fp, buf, 4)
        || lv_memcmp(label, buf, 4) != 0) {
         LV_LOG_WARN("Error reading '%s' label.", label);
         return -1;
@@ -302,7 +313,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
     LV_ASSERT(fp != NULL);
     LV_ASSERT(font_dsc != NULL);
     LV_ASSERT(cmap_table != NULL);
-    if(lv_fs_read(fp, cmap_table, font_dsc->cmap_num * sizeof(cmap_table_bin_t), NULL) != LV_FS_RES_OK) {
+    if(!read_exact(fp, cmap_table, font_dsc->cmap_num * sizeof(cmap_table_bin_t))) {
         return false;
     }
 
@@ -330,7 +341,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
                     cmap->glyph_id_ofs_list = glyph_id_ofs_list;
 
-                    if(lv_fs_read(fp, glyph_id_ofs_list, ids_size, NULL) != LV_FS_RES_OK) {
+                    if(!read_exact(fp, glyph_id_ofs_list, ids_size)) {
                         return false;
                     }
 
@@ -351,7 +362,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
                     cmap->unicode_list = unicode_list;
                     cmap->list_length = cmap_table[i].data_entries_count;
 
-                    if(lv_fs_read(fp, unicode_list, list_size, NULL) != LV_FS_RES_OK) {
+                    if(!read_exact(fp, unicode_list, list_size)) {
                         return false;
                     }
 
@@ -364,7 +375,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
                         cmap->glyph_id_ofs_list = buf;
 
-                        if(lv_fs_read(fp, buf, sizeof(uint16_t) * cmap->list_length, NULL) != LV_FS_RES_OK) {
+                        if(!read_exact(fp, buf, sizeof(uint16_t) * cmap->list_length)) {
                             return false;
                         }
                     }
@@ -389,7 +400,7 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
 
 
     uint32_t cmaps_subtables_count;
-    if(lv_fs_read(fp, &cmaps_subtables_count, sizeof(uint32_t), NULL) != LV_FS_RES_OK) {
+    if(!read_exact(fp, &cmaps_subtables_count, sizeof(uint32_t))) {
         return -1;
     }
 
@@ -432,7 +443,7 @@ static bool read_glyph_bitmap(lv_fs_file_t * fp, uint32_t pos, uint32_t nbits, u
     if(res != LV_FS_RES_OK) return false;
 
     if(nbits % 8 == 0) {  /*Fast path: the bitmap is byte aligned in the file*/
-        return lv_fs_read(fp, buf, buf_size, NULL) == LV_FS_RES_OK;
+        return read_exact(fp, buf, buf_size);
     }
 
     for(uint32_t k = 0; k < buf_size - 1; ++k) {
@@ -558,6 +569,14 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         return -1;
     }
 
+    /*The glyph table, and every offset in it, must stay inside the file.*/
+    uint32_t file_size;
+    if(lv_fs_get_size(fp, &file_size) != LV_FS_RES_OK ||
+       (uint64_t)(uint32_t)start + (uint32_t)glyph_length > (uint64_t)file_size) {
+        LV_LOG_WARN("Glyph table is outside the file");
+        return -1;
+    }
+
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc = lv_zalloc(loca_count * sizeof(*glyph_dsc));
     LV_ASSERT_MALLOC(glyph_dsc);
     if(!glyph_dsc) {
@@ -615,6 +634,10 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         }
 
         int next_offset = (i < loca_count - 1) ? glyph_offset_table[i + 1] : (uint32_t)glyph_length;
+        if(glyph_offset_table[i] > (uint32_t)glyph_length || (uint32_t)next_offset > (uint32_t)glyph_length) {
+            LV_LOG_WARN("Invalid glyph offset for glyph %u", i);
+            return -1;
+        }
         int bmp_size = next_offset - glyph_offset_table[i] - nbits / 8;
 
         if(i == 0) {
@@ -710,7 +733,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     }
 
     font_header_bin_t font_header;
-    if(lv_fs_read(fp, &font_header, sizeof(font_header_bin_t), NULL) != LV_FS_RES_OK) {
+    if(!read_exact(fp, &font_header, sizeof(font_header_bin_t))) {
         return false;
     }
 
@@ -742,7 +765,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     }
 
     uint32_t loca_count;
-    if(lv_fs_read(fp, &loca_count, sizeof(uint32_t), NULL) != LV_FS_RES_OK) {
+    if(!read_exact(fp, &loca_count, sizeof(uint32_t))) {
         return false;
     }
 
@@ -757,7 +780,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
         case 0:
             for(unsigned int i = 0; i < loca_count; ++i) {
                 uint16_t offset;
-                if(lv_fs_read(fp, &offset, sizeof(uint16_t), NULL) != LV_FS_RES_OK) {
+                if(!read_exact(fp, &offset, sizeof(uint16_t))) {
                     lv_free(glyph_offset_table);
                     return false;
                 }
@@ -765,7 +788,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
             }
             break;
         case 1:
-            if(lv_fs_read(fp, glyph_offset_table, loca_count * sizeof(uint32_t), NULL) != LV_FS_RES_OK) {
+            if(!read_exact(fp, glyph_offset_table, loca_count * sizeof(uint32_t))) {
                 lv_free(glyph_offset_table);
                 return false;
             }
@@ -835,8 +858,8 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
 
     uint8_t kern_format_type;
     int32_t padding;
-    if(lv_fs_read(fp, &kern_format_type, sizeof(uint8_t), NULL) != LV_FS_RES_OK ||
-       lv_fs_read(fp, &padding, 3 * sizeof(uint8_t), NULL) != LV_FS_RES_OK) {
+    if(!read_exact(fp, &kern_format_type, sizeof(uint8_t)) ||
+       !read_exact(fp, &padding, 3 * sizeof(uint8_t))) {
         return -1;
     }
 
@@ -851,7 +874,7 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         font_dsc->kern_classes = 0;
 
         uint32_t glyph_entries;
-        if(lv_fs_read(fp, &glyph_entries, sizeof(uint32_t), NULL) != LV_FS_RES_OK) {
+        if(!read_exact(fp, &glyph_entries, sizeof(uint32_t))) {
             return -1;
         }
 
@@ -878,11 +901,11 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         kern_pair->glyph_ids = glyph_ids;
         kern_pair->values = values;
 
-        if(lv_fs_read(fp, glyph_ids, ids_size, NULL) != LV_FS_RES_OK) {
+        if(!read_exact(fp, glyph_ids, ids_size)) {
             return -1;
         }
 
-        if(lv_fs_read(fp, values, glyph_entries, NULL) != LV_FS_RES_OK) {
+        if(!read_exact(fp, values, glyph_entries)) {
             return -1;
         }
     }
@@ -901,9 +924,9 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         uint8_t kern_table_rows;
         uint8_t kern_table_cols;
 
-        if(lv_fs_read(fp, &kern_class_mapping_length, sizeof(uint16_t), NULL) != LV_FS_RES_OK ||
-           lv_fs_read(fp, &kern_table_rows, sizeof(uint8_t), NULL) != LV_FS_RES_OK ||
-           lv_fs_read(fp, &kern_table_cols, sizeof(uint8_t), NULL) != LV_FS_RES_OK) {
+        if(!read_exact(fp, &kern_class_mapping_length, sizeof(uint16_t)) ||
+           !read_exact(fp, &kern_table_rows, sizeof(uint8_t)) ||
+           !read_exact(fp, &kern_table_cols, sizeof(uint8_t))) {
             return -1;
         }
 
@@ -929,9 +952,9 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         kern_classes->right_class_cnt = kern_table_cols;
         kern_classes->class_pair_values = kern_values;
 
-        if(lv_fs_read(fp, kern_left, kern_class_mapping_length, NULL) != LV_FS_RES_OK ||
-           lv_fs_read(fp, kern_right, kern_class_mapping_length, NULL) != LV_FS_RES_OK ||
-           lv_fs_read(fp, kern_values, kern_values_length, NULL) != LV_FS_RES_OK) {
+        if(!read_exact(fp, kern_left, kern_class_mapping_length) ||
+           !read_exact(fp, kern_right, kern_class_mapping_length) ||
+           !read_exact(fp, kern_values, kern_values_length)) {
             return -1;
         }
     }
