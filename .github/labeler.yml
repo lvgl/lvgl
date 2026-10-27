@@ -1295,7 +1295,6 @@ evdev:
       - any-glob-to-any-file:
           - 'include/lvgl/drivers/indev/lv_evdev.h'
           - 'src/drivers/evdev/**'
-          - 'env_support/cmake/dependencies/evdev.cmake'
           - 'docs/src/integration/embedded_linux/drivers/evdev.mdx'
 
 libinput:
