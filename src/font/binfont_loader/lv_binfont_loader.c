@@ -76,8 +76,8 @@ static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp);
 static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_load);
 int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start);
 
-static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
-static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
+static int read_bits_signed(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res);
+static unsigned int read_bits(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res);
 
 static bool read_glyph_bitmap(lv_fs_file_t * fp, uint32_t pos, uint32_t nbits, uint8_t * buf, uint32_t buf_size);
 static const uint8_t * load_glyph_bitmap_cb(lv_font_fmt_txt_glyph_loader_t * loader, uint32_t gid);
@@ -242,10 +242,11 @@ static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp)
     return it;
 }
 
-static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
+static unsigned int read_bits(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res)
 {
     LV_ASSERT(it != NULL);
     LV_ASSERT(res != NULL);
+
     unsigned int value = 0;
     while(n_bits--) {
         it->byte_value = it->byte_value << 1;
@@ -260,19 +261,28 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
         }
         int8_t bit = (it->byte_value & 0x80) ? 1 : 0;
 
-        value |= (bit << n_bits);
+        /*Bits above 31 don't fit the return value, but n_bits is also used to skip
+         *whole glyph headers, so keep consuming the input without shifting.*/
+        if(n_bits < 32) {
+            value |= ((unsigned int)bit << n_bits);
+        }
     }
     *res = LV_FS_RES_OK;
     return value;
 }
 
-static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
+static int read_bits_signed(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res)
 {
     LV_ASSERT(it != NULL);
     LV_ASSERT(res != NULL);
+
     unsigned int value = read_bits(it, n_bits, res);
-    if(value & (1 << (n_bits - 1))) {
-        value |= ~0u << n_bits;
+    if(*res != LV_FS_RES_OK) {
+        return 0;
+    }
+
+    if(n_bits > 0 && n_bits < 32 && (value & ((unsigned int)1 << (n_bits - 1)))) {
+        value |= ~(unsigned int)0 << n_bits;
     }
     return value;
 }
@@ -555,6 +565,13 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
 
     int32_t glyph_length = read_label(fp, start, "glyf");
     if(glyph_length < 0) {
+        return -1;
+    }
+
+    /*The glyph header stores these fields in a 32-bit value, so each must fit it.
+     *`read_bits()` only skips wider values; it can't return them.*/
+    if(header->advance_width_bits > 32 || header->xy_bits > 32 || header->wh_bits > 32) {
+        LV_LOG_WARN("Invalid glyph field width");
         return -1;
     }
 
