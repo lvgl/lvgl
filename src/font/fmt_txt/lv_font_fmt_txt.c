@@ -35,15 +35,17 @@ static int unicode_list_compare(const void * ref, const void * element);
 static int kern_pair_8_compare(const void * ref, const void * element);
 static int kern_pair_16_compare(const void * ref, const void * element);
 static const uint8_t * glyph_bitmap_acquire(lv_font_fmt_txt_dsc_t * fdsc,
-                                            const lv_font_fmt_txt_glyph_dsc_t * gdsc, uint32_t gid);
+                                            const lv_font_fmt_txt_glyph_dsc_t * gdsc, uint32_t gid,
+                                            uint32_t * len);
 static void glyph_bitmap_release(lv_font_fmt_txt_dsc_t * fdsc);
 
 #if LV_USE_FONT_COMPRESSED
-    static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter);
-    static inline void decompress_line(uint8_t * out, int32_t w);
-    static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
-    static inline void rle_init(const uint8_t * in,  uint8_t bpp);
-    static inline uint8_t rle_next(void);
+static void decompress(const uint8_t * in, uint32_t in_len, uint8_t * out, int32_t w, int32_t h, uint8_t bpp,
+                       bool prefilter);
+static inline void decompress_line(uint8_t * out, int32_t w);
+static inline uint8_t get_bits(const uint8_t * in, uint32_t in_len, uint32_t bit_pos, uint8_t len);
+static inline void rle_init(const uint8_t * in, uint32_t in_len, uint8_t bpp);
+static inline uint8_t rle_next(void);
 #endif /*LV_USE_FONT_COMPRESSED*/
 
 static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const void * src);
@@ -106,8 +108,10 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
         /*With a loader the bitmap is read into a scratch buffer which is overwritten by the next
          *glyph, so the returned pointer is only valid until then. Such fonts have
          *`static_bitmap == 0` which tells the draw units not to hold on to the pointer.*/
-        const uint8_t * raw = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        uint32_t raw_len;
+        const uint8_t * raw = glyph_bitmap_acquire(fdsc, gdsc, gid, &raw_len);
         if(raw == NULL) return NULL;
+        LV_UNUSED(raw_len);
 
         glyph_bitmap_release(fdsc);
         return raw;
@@ -124,8 +128,17 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
         LV_ASSERT_FORMAT_MSG(fdsc->bpp == 1 || fdsc->bpp == 2 || fdsc->bpp == 4 || fdsc->bpp == 8, "bpp was %d", fdsc->bpp);
 
-        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        uint32_t bitmap_len;
+        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid, &bitmap_len);
         if(bitmap_in == NULL) return NULL;
+
+        /*The reader walks box_w * box_h pixels; make sure they fit the glyph's data.*/
+        uint64_t needed = ((uint64_t)gdsc->box_w * gdsc->box_h * fdsc->bpp + 7) / 8;
+        if(bitmap_len != 0 && needed > bitmap_len) {
+            LV_LOG_WARN("Glyph %" LV_PRIu32 " bitmap overruns its data", gid);
+            glyph_bitmap_release(fdsc);
+            return NULL;
+        }
 
         uint8_t * bitmap_out_tmp = bitmap_out;
         int32_t x, y;
@@ -200,10 +213,11 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     else {
 #if LV_USE_FONT_COMPRESSED
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
-        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid);
+        uint32_t bitmap_len;
+        const uint8_t * bitmap_in = glyph_bitmap_acquire(fdsc, gdsc, gid, &bitmap_len);
         if(bitmap_in == NULL) return NULL;
 
-        decompress(bitmap_in, bitmap_out, gdsc->box_w, gdsc->box_h,
+        decompress(bitmap_in, bitmap_len, bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
         glyph_bitmap_release(fdsc);
 
@@ -292,18 +306,30 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
  * @param fdsc      the font descriptor
  * @param gdsc      the descriptor of the glyph, i.e. `fdsc->glyph_dsc[gid]`
  * @param gid       glyph index
+ * @param len       receives the number of valid bytes at the returned pointer,
+ *                  or 0 if the font doesn't provide its bitmap length
  * @return          pointer to the raw bitmap or `NULL` on error
  */
 static const uint8_t * glyph_bitmap_acquire(lv_font_fmt_txt_dsc_t * fdsc,
-                                            const lv_font_fmt_txt_glyph_dsc_t * gdsc, uint32_t gid)
+                                            const lv_font_fmt_txt_glyph_dsc_t * gdsc, uint32_t gid,
+                                            uint32_t * len)
 {
     if(!fdsc->are_glyphs_dynamic_loaded) {
         const uint8_t * bitmap = fdsc->glyph_bitmap;
+        if(fdsc->glyph_bitmap_len > gdsc->bitmap_index) {
+            *len = fdsc->glyph_bitmap_len - gdsc->bitmap_index;
+        }
+        else {
+            *len = 0;
+        }
         return &bitmap[gdsc->bitmap_index];
     }
 
     lv_font_fmt_txt_glyph_loader_t * loader = (lv_font_fmt_txt_glyph_loader_t *) fdsc->glyph_bitmap;
     lv_mutex_lock(&loader->lock);
+
+    /*The loader validates each glyph against the scratch buffer, whose size this is.*/
+    *len = fdsc->glyph_bitmap_len;
 
     const uint8_t * bitmap = loader->get_glyph_bitmap_cb(loader, gid);
     if(bitmap == NULL) {
@@ -475,7 +501,8 @@ static int kern_pair_16_compare(const void * ref, const void * element)
  * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
  * @param prefilter true: the lines are XORed
  */
-static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter)
+static void decompress(const uint8_t * in, uint32_t in_len, uint8_t * out, int32_t w, int32_t h, uint8_t bpp,
+                       bool prefilter)
 {
     LV_ASSERT(in != NULL);
     LV_ASSERT(out != NULL);
@@ -495,7 +522,7 @@ static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, 
             return;
     }
 
-    rle_init(in, bpp);
+    rle_init(in, in_len, bpp);
 
     uint8_t * line_buf1 = lv_malloc(w);
 
@@ -560,7 +587,7 @@ static inline void decompress_line(uint8_t * out, int32_t w)
  * @param len number of bits to read (must be <= 8).
  * @return the read bits
  */
-static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len)
+static inline uint8_t get_bits(const uint8_t * in, uint32_t in_len, uint32_t bit_pos, uint8_t len)
 {
     LV_ASSERT(in != NULL);
     uint8_t bit_mask;
@@ -587,7 +614,15 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
     uint32_t byte_pos = bit_pos >> 3;
     bit_pos = bit_pos & 0x7;
 
+    /*in_len == 0 means the source length is unknown (fonts stored as C arrays).*/
+    if(in_len != 0 && byte_pos >= in_len) {
+        return 0;
+    }
+
     if(bit_pos + len > 8) {
+        if(in_len != 0 && byte_pos + 1 >= in_len) {
+            return 0;
+        }
         uint16_t in16 = (in[byte_pos] << 8) + in[byte_pos + 1];
         return (in16 >> (16 - bit_pos - len)) & bit_mask;
     }
@@ -596,11 +631,12 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
     }
 }
 
-static inline void rle_init(const uint8_t * in,  uint8_t bpp)
+static inline void rle_init(const uint8_t * in, uint32_t in_len, uint8_t bpp)
 {
     LV_ASSERT(in != NULL);
     lv_font_fmt_rle_t * rle = &font_rle;
     rle->in = in;
+    rle->in_len = in_len;
     rle->bpp = bpp;
     rle->state = RLE_STATE_SINGLE;
     rle->rdp = 0;
@@ -615,7 +651,7 @@ static inline uint8_t rle_next(void)
     lv_font_fmt_rle_t * rle = &font_rle;
 
     if(rle->state == RLE_STATE_SINGLE) {
-        ret = get_bits(rle->in, rle->rdp, rle->bpp);
+        ret = get_bits(rle->in, rle->in_len, rle->rdp, rle->bpp);
         if(rle->rdp != 0 && rle->prev_v == ret) {
             rle->count = 0;
             rle->state = RLE_STATE_REPEATED;
@@ -625,19 +661,19 @@ static inline uint8_t rle_next(void)
         rle->rdp += rle->bpp;
     }
     else if(rle->state == RLE_STATE_REPEATED) {
-        v = get_bits(rle->in, rle->rdp, 1);
+        v = get_bits(rle->in, rle->in_len, rle->rdp, 1);
         rle->count++;
         rle->rdp += 1;
         if(v == 1) {
             ret = rle->prev_v;
             if(rle->count == 11) {
-                rle->count = get_bits(rle->in, rle->rdp, 6);
+                rle->count = get_bits(rle->in, rle->in_len, rle->rdp, 6);
                 rle->rdp += 6;
                 if(rle->count != 0) {
                     rle->state = RLE_STATE_COUNTER;
                 }
                 else {
-                    ret = get_bits(rle->in, rle->rdp, rle->bpp);
+                    ret = get_bits(rle->in, rle->in_len, rle->rdp, rle->bpp);
                     rle->prev_v = ret;
                     rle->rdp += rle->bpp;
                     rle->state = RLE_STATE_SINGLE;
@@ -645,7 +681,7 @@ static inline uint8_t rle_next(void)
             }
         }
         else {
-            ret = get_bits(rle->in, rle->rdp, rle->bpp);
+            ret = get_bits(rle->in, rle->in_len, rle->rdp, rle->bpp);
             rle->prev_v = ret;
             rle->rdp += rle->bpp;
             rle->state = RLE_STATE_SINGLE;
@@ -656,7 +692,7 @@ static inline uint8_t rle_next(void)
         ret = rle->prev_v;
         rle->count--;
         if(rle->count == 0) {
-            ret = get_bits(rle->in, rle->rdp, rle->bpp);
+            ret = get_bits(rle->in, rle->in_len, rle->rdp, rle->bpp);
             rle->prev_v = ret;
             rle->rdp += rle->bpp;
             rle->state = RLE_STATE_SINGLE;

@@ -30,6 +30,7 @@ void test_font_loader_no_cache(void);
 void test_font_loader_from_buffer(void);
 void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
+void test_font_loader_corrupt_bitmap(void);
 void test_font_loader_dynamic_from_buffer(void);
 
 /**********************
@@ -209,6 +210,26 @@ void test_font_loader_corrupt_kern(void)
         .dynamic_glyph_load = true,
     };
     TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+void test_font_loader_corrupt_bitmap(void)
+{
+    /*A plain bitmap whose box does not fit its stored data is rejected.*/
+    const char * path = "A:src/test_assets/test_font_bitmap_oob.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+
+    /*A truncated compressed stream is bounded at read time; it must not crash.*/
+    const char * path2 = "A:src/test_assets/test_font_bitmap_rle_oob.fnt";
+    lv_font_t * font = lv_binfont_create(path2);
+    if(font) {
+        lv_binfont_destroy(font);
+    }
 }
 
 void test_font_loader_reload(void)
