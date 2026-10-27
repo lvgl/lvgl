@@ -37,6 +37,23 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
+static bool is_dest_supported(const lv_layer_t * layer);
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
+static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc);
+static bool can_draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc);
+static bool can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
+static bool can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
+static bool can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc);
+static bool can_draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
+#if LV_USE_VECTOR_GRAPHIC
+    static bool can_draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_vector_dsc_t * dsc);
+#endif
+
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 
 static void draw_event_cb(lv_event_t * e);
@@ -53,19 +70,32 @@ static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_vg_lite_fill,
+    .can_draw_fill_cb = can_draw_fill,
     .draw_border_cb = lv_draw_vg_lite_border,
+    .can_draw_border_cb = can_draw_border,
     .draw_box_shadow_cb = lv_draw_vg_lite_box_shadow,
+    .can_draw_box_shadow_cb = can_draw_box_shadow,
     .draw_letter_cb = lv_draw_vg_lite_letter,
+    .can_draw_letter_cb = can_draw_letter,
     .draw_label_cb = lv_draw_vg_lite_label,
+    .can_draw_label_cb = can_draw_label,
     .draw_image_cb = draw_image,
+    .can_draw_image_cb = can_draw_image,
     .draw_layer_cb = lv_draw_vg_lite_layer,
+    .can_draw_layer_cb = can_draw_layer,
     .draw_arc_cb = lv_draw_vg_lite_arc,
+    .can_draw_arc_cb = can_draw_arc,
     .draw_line_cb = draw_line,
+    .can_draw_line_cb = can_draw_line,
     .draw_triangle_cb = lv_draw_vg_lite_triangle,
+    .can_draw_triangle_cb = can_draw_triangle,
     .draw_mask_rect_cb = lv_draw_vg_lite_mask_rect,
+    .can_draw_mask_rect_cb = can_draw_mask_rect,
     .draw_blur_cb = lv_draw_vg_lite_blur,
+    .can_draw_blur_cb = can_draw_blur,
 #if LV_USE_VECTOR_GRAPHIC
     .draw_vector_cb = lv_draw_vg_lite_vector,
+    .can_draw_vector_cb = can_draw_vector,
 #endif
 };
 
@@ -97,6 +127,7 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.draw_cbs = &draw_cbs;
+    unit->base_unit.id = VG_LITE_DRAW_UNIT_ID;
     unit->base_unit.name = "VG_LITE";
 
     lv_vg_lite_image_dsc_init(unit);
@@ -285,6 +316,107 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
     return 1;
 }
+
+static bool is_dest_supported(const lv_layer_t * layer)
+{
+    return lv_vg_lite_is_dest_cf_supported(layer->color_format);
+}
+
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+#if LV_VG_LITE_USE_BOX_SHADOW
+    return is_dest_supported(layer);
+#else
+    LV_UNUSED(layer);
+    return false;
+#endif
+}
+
+static bool can_draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    return is_dest_supported(layer) && check_image_is_supported(dsc);
+}
+
+static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    return is_dest_supported(layer) && check_arc_is_supported(dsc);
+}
+
+static bool can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+
+#if LV_USE_VECTOR_GRAPHIC
+static bool can_draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_vector_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return is_dest_supported(layer);
+}
+#endif
 
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {

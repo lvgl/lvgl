@@ -41,6 +41,15 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u);
 #endif
 
 static int32_t _dave2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool _dave2d_grad_supported(const lv_grad_dsc_t * grad);
+static bool _dave2d_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool _dave2d_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
+static bool _dave2d_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
+static bool _dave2d_can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool _dave2d_can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
+static bool _dave2d_can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
+static bool _dave2d_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer,
+                                      const lv_draw_triangle_dsc_t * dsc);
 static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit);
 static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
@@ -62,12 +71,19 @@ static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_dave2d_fill,
+    .can_draw_fill_cb = _dave2d_can_draw_fill,
     .draw_border_cb = lv_draw_dave2d_border,
+    .can_draw_border_cb = _dave2d_can_draw_border,
     .draw_label_cb = lv_draw_dave2d_label,
+    .can_draw_label_cb = _dave2d_can_draw_label,
     .draw_image_cb = lv_draw_dave2d_image,
+    .can_draw_image_cb = _dave2d_can_draw_image,
     .draw_arc_cb = lv_draw_dave2d_arc,
+    .can_draw_arc_cb = _dave2d_can_draw_arc,
     .draw_line_cb = draw_line,
+    .can_draw_line_cb = _dave2d_can_draw_line,
     .draw_triangle_cb = lv_draw_dave2d_triangle,
+    .can_draw_triangle_cb = _dave2d_can_draw_triangle,
 };
 
 static d2_device * _d2_handle;
@@ -105,6 +121,7 @@ void lv_draw_dave2d_init(void)
     draw_dave2d_unit->base_unit.wait_for_finish_cb = _dave2d_wait_finish;
     draw_dave2d_unit->base_unit.name = "DAVE2D";
     draw_dave2d_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_dave2d_unit->base_unit.id = DRAW_UNIT_ID_DAVE2D;
     draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
 
     result = lv_dave2d_init();
@@ -379,6 +396,64 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     }
 
     return ret;
+}
+
+/* Gradients are drawn only if they have one color */
+static bool _dave2d_grad_supported(const lv_grad_dsc_t * grad)
+{
+    if(grad->dir == LV_GRAD_DIR_NONE) return true;
+
+    lv_color_t first = grad->stops[0].color;
+    lv_color_t last = grad->stops[grad->stops_count - 1].color;
+    return first.blue == last.blue && first.red == last.red && first.green == last.green;
+}
+
+static bool _dave2d_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format) && _dave2d_grad_supported(&dsc->grad);
+}
+
+static bool _dave2d_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
+}
+
+static bool _dave2d_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
+}
+
+static bool _dave2d_can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format) &&
+           lv_draw_dave2d_image_color_format_supported(dsc->header.cf);
+}
+
+static bool _dave2d_can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
+}
+
+static bool _dave2d_can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
+}
+
+static bool _dave2d_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer,
+                                      const lv_draw_triangle_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format) && _dave2d_grad_supported(&dsc->grad);
 }
 
 

@@ -47,6 +47,16 @@ static void execute_drawing(lv_draw_sdl_unit_t * u);
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool sdl_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc);
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
+static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc);
+static bool can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
+static bool can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
+static bool can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc);
 static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data);
 
 /**********************
@@ -56,6 +66,19 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+/* Only to pick the tasks: SDL draws them itself */
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .can_draw_fill_cb = can_draw_fill,
+    .can_draw_border_cb = can_draw_border,
+    .can_draw_box_shadow_cb = can_draw_box_shadow,
+    .can_draw_label_cb = can_draw_label,
+    .can_draw_image_cb = can_draw_image,
+    .can_draw_layer_cb = can_draw_layer,
+    .can_draw_line_cb = can_draw_line,
+    .can_draw_arc_cb = can_draw_arc,
+    .can_draw_triangle_cb = can_draw_triangle,
+};
 static SDL_Texture * layer_get_texture(lv_layer_t * layer);
 
 /**********************
@@ -124,6 +147,8 @@ void lv_draw_sdl_init(void)
     lv_draw_sdl_unit_t * draw_sdl_unit = lv_draw_create_unit(sizeof(lv_draw_sdl_unit_t));
     draw_sdl_unit->base_unit.dispatch_cb = dispatch;
     draw_sdl_unit->base_unit.evaluate_cb = evaluate;
+    draw_sdl_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_sdl_unit->base_unit.id = DRAW_UNIT_ID_SDL;
     draw_sdl_unit->base_unit.name = "SDL";
     draw_sdl_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
     sizeof(cache_data_t), 128, (lv_cache_ops_t) {
@@ -213,6 +238,64 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         task->preferred_draw_unit_id = DRAW_UNIT_ID_SDL;
     }
     return 0;
+}
+
+static bool sdl_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+
+    /*If not refreshing the display probably it's a canvas rendering
+     *which his not support in SDL as it's not a texture.*/
+    if(lv_refr_get_disp_refreshing() == NULL) return false;
+
+    return dsc->user_data == NULL;
+}
+
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    return sdl_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc)
+{
+    return sdl_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc)
+{
+    return sdl_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
+{
+    return sdl_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    if(dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) return false;
+    return sdl_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    return sdl_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
+{
+    return sdl_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
+{
+    return sdl_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
+{
+    return sdl_takes(draw_unit, layer, &dsc->base);
 }
 
 static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)

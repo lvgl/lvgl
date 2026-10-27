@@ -80,6 +80,7 @@
 
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 static void draw_event_cb(lv_event_t * e);
 static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer);
@@ -109,6 +110,7 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_triangle_cb = lv_draw_nanovg_triangle,
     .draw_mask_rect_cb = lv_draw_nanovg_mask_rect,
     .draw_blur_cb = lv_draw_nanovg_blur,
+    .can_draw_blur_cb = can_draw_blur,
 #if LV_USE_VECTOR_GRAPHIC
     .draw_vector_cb = lv_draw_nanovg_vector,
 #endif
@@ -137,6 +139,9 @@ void lv_draw_nanovg_init(void)
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.draw_cbs = &draw_cbs;
+    /*No software fallback: drop the descriptors NanoVG can't draw*/
+    unit->base_unit.fallback = NULL;
+    unit->base_unit.id = NANOVG_DRAW_UNIT_ID;
     unit->base_unit.name = "NANOVG";
 
     unit->vg = NVG_CTX_CREATE(0);
@@ -472,6 +477,15 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     }
 
     return 1;
+}
+
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc)
+{
+    LV_UNUSED(layer);
+    LV_UNUSED(dsc);
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
+    /* Only accept blur if FBO support is available (blur_state was created) */
+    return u->blur_state != NULL;
 }
 
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)

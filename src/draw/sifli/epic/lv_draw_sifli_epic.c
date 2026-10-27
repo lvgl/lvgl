@@ -43,6 +43,26 @@
 static int32_t _epic_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 /**
+ * Tell whether EPIC can draw on a layer.
+ * @param layer Target layer
+ * @return true if the layer's color format is supported
+ */
+static bool _epic_layer_supported(const lv_layer_t * layer);
+
+/**
+ * Tell whether EPIC can draw a descriptor on a layer.
+ * @param draw_unit Draw unit
+ * @param layer Target layer
+ * @param dsc Draw descriptor
+ * @return true if EPIC can draw it
+ */
+static bool _epic_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool _epic_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
+static bool _epic_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
+static bool _epic_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool _epic_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+
+/**
  * Dispatch a task to the EPIC unit.
  * @param draw_unit Draw unit
  * @param layer Layer to draw
@@ -86,10 +106,15 @@ static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u);
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_sifli_epic_fill,
+    .can_draw_fill_cb = _epic_can_draw_fill,
     .draw_border_cb = lv_draw_sifli_epic_border,
+    .can_draw_border_cb = _epic_can_draw_border,
     .draw_label_cb = lv_draw_sifli_epic_label,
+    .can_draw_label_cb = _epic_can_draw_label,
     .draw_image_cb = lv_draw_sifli_epic_img,
+    .can_draw_image_cb = _epic_can_draw_img,
     .draw_layer_cb = lv_draw_sifli_epic_layer,
+    .can_draw_layer_cb = _epic_can_draw_layer,
 };
 
 static bool epic_draw_unit_initialized = false;
@@ -158,6 +183,7 @@ void lv_draw_sifli_epic_init(void)
     draw_epic_unit->base_unit.delete_cb = _epic_delete;
     draw_epic_unit->base_unit.name = "SiFli_EPIC";
     draw_epic_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_epic_unit->base_unit.id = DRAW_UNIT_ID_SIFLI_EPIC;
 #if !LV_USE_SIFLI_EPIC_DRAW_THREAD
     draw_epic_unit->base_unit.wait_for_finish_cb = _epic_wait_for_finish;
 #endif
@@ -369,6 +395,151 @@ static int32_t _epic_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     }
 
     return 0;
+}
+
+static bool _epic_layer_supported(const lv_layer_t * layer)
+{
+    return layer != NULL && lv_epic_cf_supported(layer->color_format, 0);
+}
+
+static bool _epic_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+    if(!_epic_layer_supported(layer)) {
+        return false;
+    }
+
+    /* EPIC doesn't support rounded corners */
+    if(dsc->radius != 0) {
+        return false;
+    }
+
+    /* Check gradient support */
+    if(dsc->grad.dir != LV_GRAD_DIR_NONE) {
+        if(dsc->grad.dir != LV_GRAD_DIR_HOR && dsc->grad.dir != LV_GRAD_DIR_VER) {
+            return false;
+        }
+
+        /* Only support 2-stop gradients */
+        if(dsc->grad.stops_count != 2) {
+            return false;
+        }
+
+        /* Check if output format supports gradient */
+        uint32_t epic_cf = lv_img_cf_to_epic_cf(layer->color_format);
+        if(!EPIC_SUPPROT_OUT_FORMAT(epic_cf)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool _epic_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+    return _epic_layer_supported(layer) && dsc->radius == 0;
+}
+
+static bool _epic_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+#ifdef EPIC_SUPPORT_A8
+    if(!_epic_layer_supported(layer)) {
+        return false;
+    }
+
+    if(dsc->font == NULL || dsc->text == NULL || dsc->text[0] == '\0') {
+        return false;
+    }
+
+    return !_epic_label_has_vector_glyph(dsc);
+#else
+    LV_UNUSED(layer);
+    LV_UNUSED(dsc);
+    return false;
+#endif
+}
+
+static bool _epic_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+    if(!_epic_layer_supported(layer)) {
+        return false;
+    }
+
+    if(dsc->src == NULL) {
+        return false;
+    }
+
+    if(dsc->clip_radius != 0) {
+        return false;
+    }
+
+    if(dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
+        return false;
+    }
+
+    /* Check if recolor is used */
+    bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
+    if(has_recolor) {
+        return false;
+    }
+
+    /* Check if transform is used */
+    bool has_transform = (dsc->rotation != 0 ||
+                          dsc->scale_x != LV_SCALE_NONE ||
+                          dsc->scale_y != LV_SCALE_NONE);
+
+    /* Check color format support */
+    if(!lv_epic_cf_supported(dsc->header.cf, dsc->header.flags)) {
+        return false;
+    }
+
+    /* RGB565A8 with transform is not supported */
+    return !((LV_COLOR_FORMAT_RGB565A8 == dsc->header.cf) && has_transform);
+}
+
+static bool _epic_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+    if(!_epic_layer_supported(layer)) {
+        return false;
+    }
+
+    const lv_layer_t * layer_to_draw = dsc->src;
+
+    if(layer_to_draw == NULL) {
+        return false;
+    }
+
+    if(layer_to_draw->draw_buf == NULL) {
+        return false;
+    }
+
+    /* Check if recolor is used */
+    bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
+    if(has_recolor) {
+        return false;
+    }
+
+    /* Check if transform is used */
+    bool has_transform = (dsc->rotation != 0 ||
+                          dsc->scale_x != LV_SCALE_NONE ||
+                          dsc->scale_y != LV_SCALE_NONE);
+
+    /* Check color format support */
+    if(!lv_epic_cf_supported(layer_to_draw->color_format, 0)) {
+        return false;
+    }
+
+    /* RGB565A8 with transform is not supported */
+    return !((LV_COLOR_FORMAT_RGB565A8 == layer_to_draw->color_format) && has_transform);
 }
 
 static int32_t _epic_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)

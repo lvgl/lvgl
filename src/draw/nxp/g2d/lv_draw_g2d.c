@@ -50,6 +50,17 @@
 static int32_t _g2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 /**
+ * Tell whether G2D can draw on the layer.
+ */
+static bool _g2d_layer_supported(const lv_layer_t * layer);
+
+/**
+ * Tell whether G2D can draw a descriptor on the layer.
+ */
+static bool _g2d_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool _g2d_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+
+/**
  * Dispatch a task to the G2D unit.
  * Return 1 if task was dispatched, 0 otherwise (task not supported).
  */
@@ -74,7 +85,9 @@ static void _g2d_execute_drawing(lv_draw_task_t * t);
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_g2d_fill,
+    .can_draw_fill_cb = _g2d_can_draw_fill,
     .draw_image_cb = lv_draw_g2d_img,
+    .can_draw_image_cb = _g2d_can_draw_img,
 };
 
 static int32_t is_hw_pxp = 0;
@@ -98,6 +111,7 @@ void lv_draw_g2d_init(void)
     draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
     draw_g2d_unit->base_unit.name = "G2D";
     draw_g2d_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_g2d_unit->base_unit.id = DRAW_UNIT_ID_G2D;
 
 #if LV_USE_G2D_DRAW_THREAD
     draw_g2d_unit->base_unit.wait_for_finish_cb = _g2d_wait_for_finish;
@@ -247,6 +261,47 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
     return 0;
 
+}
+
+static bool _g2d_layer_supported(const lv_layer_t * layer)
+{
+    if(!init_successful)
+        return false;
+
+    if(!_g2d_dest_cf_supported(layer->color_format))
+        return false;
+
+    return layer->draw_buf == NULL || g2d_search_buf_map(layer->draw_buf->data);
+}
+
+static bool _g2d_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+    if(!_g2d_layer_supported(layer))
+        return false;
+
+    /* Most simple case: just a plain rectangle (no radius, no gradient). */
+    return (dsc->radius == 0) && (dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE);
+}
+
+static bool _g2d_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+    LV_UNUSED(dsc);
+
+    /* TODO: Fix issue where images rendered to a different layer don't render in the final layer.*/
+    return false;
+#if 0
+    if(!_g2d_layer_supported(layer))
+        return false;
+
+    if(!_g2d_src_cf_supported(dsc->header.cf))
+        return false;
+
+    return _g2d_draw_img_supported(dsc);
+#endif
 }
 
 static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)

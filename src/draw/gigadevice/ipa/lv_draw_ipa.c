@@ -37,6 +37,11 @@
  **********************/
 
 static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool is_cf_supported(lv_color_format_t cf);
+static bool is_dest_supported(const lv_layer_t * layer);
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t delete_cb(lv_draw_unit_t * draw_unit);
 
@@ -58,8 +63,11 @@ static void post_transfer_tasks(lv_draw_ipa_unit_t * u);
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_ipa_fill,
+    .can_draw_fill_cb = can_draw_fill,
     .draw_image_cb = lv_draw_ipa_image,
+    .can_draw_image_cb = can_draw_image,
     .draw_layer_cb = lv_draw_ipa_layer,
+    .can_draw_layer_cb = can_draw_layer,
 };
 
 #if LV_DRAW_IPA_ASYNC
@@ -100,6 +108,7 @@ void lv_draw_ipa_init(void)
 #endif
     draw_ipa_unit->base_unit.name = "IPA";
     draw_ipa_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_ipa_unit->base_unit.id = DRAW_UNIT_ID_IPA;
 
 #if LV_DRAW_IPA_ASYNC
     g_unit = draw_ipa_unit;
@@ -446,6 +455,81 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     task->preference_score = 0;
 
     return 0;
+}
+
+static bool is_cf_supported(lv_color_format_t cf)
+{
+    return cf == LV_COLOR_FORMAT_ARGB8888
+           || cf == LV_COLOR_FORMAT_XRGB8888
+           || cf == LV_COLOR_FORMAT_RGB888
+           || cf == LV_COLOR_FORMAT_RGB565;
+}
+
+static bool is_dest_supported(const lv_layer_t * layer)
+{
+    if(!is_cf_supported(layer->color_format)) return false;
+
+    uint32_t size = lv_color_format_get_size(layer->color_format);
+    uint32_t stride = layer->draw_buf ? layer->draw_buf->header.stride :
+                      lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+    return stride % size == 0;
+}
+
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    return dsc->radius == 0
+           && dsc->grad.dir == LV_GRAD_DIR_NONE
+           && is_dest_supported(layer);
+}
+
+static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    const lv_layer_t * source_layer = dsc->src;
+    if(source_layer == NULL || dsc->clip_radius || dsc->bitmap_mask_src || dsc->tile ||
+       dsc->blend_mode != LV_BLEND_MODE_NORMAL || dsc->recolor_opa > LV_OPA_MIN ||
+       dsc->skew_x || dsc->skew_y || dsc->rotation ||
+       dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
+        return false;
+    }
+    if(!is_cf_supported(source_layer->color_format)) return false;
+    uint32_t source_size = lv_color_format_get_size(source_layer->color_format);
+    uint32_t source_stride = source_layer->draw_buf ? source_layer->draw_buf->header.stride :
+                             lv_draw_buf_width_to_stride(lv_area_get_width(&source_layer->buf_area),
+                                                         source_layer->color_format);
+    if(source_stride % source_size) return false;
+
+    return is_dest_supported(layer);
+}
+
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
+         && dsc->clip_radius == 0
+         && dsc->bitmap_mask_src == NULL
+         && dsc->sup == NULL
+         && dsc->tile == 0
+         && dsc->blend_mode == LV_BLEND_MODE_NORMAL
+         && dsc->recolor_opa <= LV_OPA_MIN
+         && dsc->skew_y == 0
+         && dsc->skew_x == 0
+         && dsc->scale_x == LV_SCALE_NONE
+         && dsc->scale_y == LV_SCALE_NONE
+         && dsc->rotation == 0
+         && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
+         && (is_cf_supported(dsc->header.cf) || dsc->header.cf == LV_COLOR_FORMAT_ARGB1555))) {
+        return false;
+    }
+    uint32_t source_size = lv_color_format_get_size(dsc->header.cf);
+    if(dsc->header.stride % source_size) return false;
+#if LV_DRAW_BUF_STRIDE_ALIGN != 1
+    uint32_t decoded_stride = lv_draw_buf_width_to_stride(dsc->header.w, dsc->header.cf);
+    if(decoded_stride % source_size) return false;
+#endif
+
+    return is_dest_supported(layer);
 }
 
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)

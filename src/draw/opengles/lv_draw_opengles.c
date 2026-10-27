@@ -64,6 +64,25 @@ static void execute_drawing(lv_draw_opengles_unit_t * u);
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool opengles_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc);
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
+static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc);
+static bool can_draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc);
+static bool can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
+static bool can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
+static bool can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc);
+static bool can_draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
+#if LV_USE_VECTOR_GRAPHIC
+    static bool can_draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_vector_dsc_t * dsc);
+#endif
+#if LV_USE_3DTEXTURE
+    static bool can_draw_3d(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc);
+#endif
 static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_data);
 static void draw_texture_to_framebuffer(lv_draw_opengles_unit_t * u, unsigned int texture);
 static void draw_to_framebuffer(lv_draw_opengles_unit_t * u);
@@ -84,6 +103,28 @@ static unsigned int create_texture(int32_t w, int32_t h, const void * data);
 static lv_draw_opengles_unit_t * g_unit;
 static lv_draw_buf_handlers_t gpu_draw_buf_handlers;
 
+/* Only to pick the tasks: OpenGL ES draws them itself */
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .can_draw_fill_cb = can_draw_fill,
+    .can_draw_border_cb = can_draw_border,
+    .can_draw_box_shadow_cb = can_draw_box_shadow,
+    .can_draw_letter_cb = can_draw_letter,
+    .can_draw_label_cb = can_draw_label,
+    .can_draw_image_cb = can_draw_image,
+    .can_draw_layer_cb = can_draw_layer,
+    .can_draw_arc_cb = can_draw_arc,
+    .can_draw_line_cb = can_draw_line,
+    .can_draw_triangle_cb = can_draw_triangle,
+    .can_draw_mask_rect_cb = can_draw_mask_rect,
+    .can_draw_blur_cb = can_draw_blur,
+#if LV_USE_VECTOR_GRAPHIC
+    .can_draw_vector_cb = can_draw_vector,
+#endif
+#if LV_USE_3DTEXTURE
+    .can_draw_3d_cb = can_draw_3d,
+#endif
+};
+
 /**********************
  *      MACROS
  **********************/
@@ -97,6 +138,8 @@ void lv_draw_opengles_init(void)
     lv_draw_opengles_unit_t * draw_opengles_unit = lv_draw_create_unit(sizeof(lv_draw_opengles_unit_t));
     draw_opengles_unit->base_unit.dispatch_cb = dispatch;
     draw_opengles_unit->base_unit.evaluate_cb = evaluate;
+    draw_opengles_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_opengles_unit->base_unit.id = DRAW_UNIT_ID_OPENGLES;
     draw_opengles_unit->base_unit.name = "OPENGLES";
     draw_opengles_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
     sizeof(cache_data_t), LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT, (lv_cache_ops_t) {
@@ -310,6 +353,92 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     }
     return 0;
 }
+
+static bool opengles_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+
+    /*If not refreshing the display probably it's a canvas rendering
+     *which his not supported in OpenGL as it's not a texture.*/
+    if(lv_refr_get_disp_refreshing() == NULL) return false;
+
+    return dsc->user_data == NULL;
+}
+
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+
+#if LV_USE_VECTOR_GRAPHIC
+static bool can_draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_vector_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+#endif
+
+#if LV_USE_3DTEXTURE
+static bool can_draw_3d(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc)
+{
+    return opengles_takes(draw_unit, layer, &dsc->base);
+}
+#endif
 
 static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_data)
 {

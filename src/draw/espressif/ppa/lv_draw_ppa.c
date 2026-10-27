@@ -24,6 +24,8 @@
 **********************/
 
 static int32_t ppa_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool ppa_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool ppa_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static bool other_unit_busy(const lv_layer_t * layer, const lv_draw_unit_t * self);
 static int32_t ppa_delete(lv_draw_unit_t * draw_unit);
@@ -35,7 +37,9 @@ static void  ppa_execute_drawing(lv_draw_ppa_unit_t * u);
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_ppa_fill,
+    .can_draw_fill_cb = ppa_can_draw_fill,
     .draw_image_cb = lv_draw_ppa_img,
+    .can_draw_image_cb = ppa_can_draw_img,
 };
 
 /**********************
@@ -55,6 +59,7 @@ void lv_draw_ppa_init(void)
     draw_ppa_unit->base_unit.delete_cb    = ppa_delete;
     draw_ppa_unit->base_unit.name         = "ESP_PPA";
     draw_ppa_unit->base_unit.draw_cbs     = &draw_cbs;
+    draw_ppa_unit->base_unit.id           = DRAW_UNIT_ID_PPA;
 
     /* Register SRM client */
     cfg.oper_type = PPA_OPERATION_SRM;
@@ -150,6 +155,44 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         default:
             return 0;
     }
+}
+
+static bool ppa_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    if(!ppa_dest_cf_supported(layer->color_format)) return false;
+    if((dsc->radius != 0 || dsc->grad.dir != LV_GRAD_DIR_NONE)) return false;
+    return dsc->opa > (lv_opa_t)LV_OPA_MAX;
+}
+
+static bool ppa_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+#if LV_USE_PPA_IMG
+    if(!ppa_dest_cf_supported(layer->color_format)) return false;
+    return dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
+           && dsc->clip_radius == 0
+           && dsc->bitmap_mask_src == NULL
+           && dsc->sup == NULL
+           && dsc->tile == 0
+           && dsc->blend_mode == LV_BLEND_MODE_NORMAL
+           && dsc->recolor_opa <= LV_OPA_MIN
+           && dsc->opa >= (lv_opa_t)LV_OPA_MAX
+           && dsc->skew_y == 0
+           && dsc->skew_x == 0
+           && dsc->scale_x == 256
+           && dsc->scale_y == 256
+           && dsc->rotation == 0
+           && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
+           && (dsc->header.cf == LV_COLOR_FORMAT_RGB888
+               || dsc->header.cf == LV_COLOR_FORMAT_RGB565)
+           && (layer->color_format == LV_COLOR_FORMAT_RGB888
+               || layer->color_format == LV_COLOR_FORMAT_RGB565);
+#else
+    LV_UNUSED(layer);
+    LV_UNUSED(dsc);
+    return false;
+#endif
 }
 
 static bool other_unit_busy(const lv_layer_t * layer, const lv_draw_unit_t * self)

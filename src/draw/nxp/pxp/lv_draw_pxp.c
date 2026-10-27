@@ -41,6 +41,13 @@
 static int32_t _pxp_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 /*
+ * Tell whether PXP can draw a descriptor on the layer.
+ */
+static bool _pxp_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool _pxp_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool _pxp_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+
+/*
  * Dispatch a task to the PXP unit.
  * Return 1 if task was dispatched, 0 otherwise (task not supported).
  */
@@ -67,8 +74,11 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_pxp_fill,
+    .can_draw_fill_cb = _pxp_can_draw_fill,
     .draw_image_cb = lv_draw_pxp_img,
+    .can_draw_image_cb = _pxp_can_draw_img,
     .draw_layer_cb = lv_draw_pxp_layer,
+    .can_draw_layer_cb = _pxp_can_draw_layer,
 };
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
@@ -96,6 +106,7 @@ void lv_draw_pxp_init(void)
     draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
     draw_pxp_unit->base_unit.name = "NXP_PXP";
     draw_pxp_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_pxp_unit->base_unit.id = DRAW_UNIT_ID_PXP;
 
 #if LV_USE_PXP_DRAW_THREAD
     lv_thread_init(&draw_pxp_unit->thread, "pxpdraw", LV_DRAW_THREAD_PRIO, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
@@ -318,6 +329,51 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     }
 
     return 0;
+}
+
+static bool _pxp_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+    if(!_pxp_dest_cf_supported(layer->color_format))
+        return false;
+
+    /* Most simple case: just a plain rectangle (no radius, no gradient). */
+    return (dsc->radius == 0) && (dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE);
+}
+
+static bool _pxp_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+    if(!_pxp_dest_cf_supported(layer->color_format))
+        return false;
+
+    const lv_image_dsc_t * img_dsc = dsc->src;
+
+    if(img_dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START)
+        return false;
+
+    if((!_pxp_src_cf_supported(img_dsc->header.cf)) ||
+       (!pxp_buf_aligned(img_dsc->data, img_dsc->header.stride)))
+        return false;
+
+    return _pxp_draw_img_supported(dsc);
+}
+
+static bool _pxp_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+
+    if(!_pxp_dest_cf_supported(layer->color_format))
+        return false;
+
+    const lv_layer_t * layer_to_draw = dsc->src;
+
+    if(!_pxp_src_cf_supported(layer_to_draw->color_format))
+        return false;
+
+    return _pxp_draw_img_supported(dsc);
 }
 
 static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
