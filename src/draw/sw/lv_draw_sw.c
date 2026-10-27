@@ -466,20 +466,13 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_DSC_TYPE_LAYER) {
         lv_area_t draw_area;
-        lv_text_attributes_t attributes = {0};
-
-        attributes.text_flags = LV_TEXT_FLAG_NONE;
-        attributes.line_space = 0;
-        attributes.letter_space = 0;
-        attributes.max_width = 100;
-
         if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area)) return;
 
         lv_draw_fill_dsc_t fill_dsc;
         lv_draw_fill_dsc_init(&fill_dsc);
         fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
         fill_dsc.opa = LV_OPA_10;
-        lv_draw_sw_fill(t, &fill_dsc, &draw_area);
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &draw_area);
 
         lv_draw_border_dsc_t border_dsc;
         lv_draw_border_dsc_init(&border_dsc);
@@ -489,7 +482,7 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
         lv_draw_sw_border(t->target_layer, &t->clip_area, &border_dsc, &draw_area);
 
         lv_point_t txt_size;
-        lv_text_get_size_attributes(&txt_size, "W", LV_FONT_DEFAULT, &attributes);
+        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_area.x1;
@@ -499,7 +492,7 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
 
         lv_draw_fill_dsc_init(&fill_dsc);
         fill_dsc.color = lv_color_white();
-        lv_draw_sw_fill(t, &fill_dsc, &txt_area);
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &txt_area);
 
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d", idx);
