@@ -39,6 +39,14 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u);
 static int32_t eve_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool eve_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc);
+static bool eve_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool eve_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
+static bool eve_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
+static bool eve_can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool eve_can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
+static bool eve_can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
+static bool eve_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc);
 
 static void disp_delete_cb(lv_event_t * e);
 
@@ -55,12 +63,19 @@ static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_eve_fill,
+    .can_draw_fill_cb = eve_can_draw_fill,
     .draw_border_cb = lv_draw_eve_border,
+    .can_draw_border_cb = eve_can_draw_border,
     .draw_label_cb = lv_draw_eve_label,
+    .can_draw_label_cb = eve_can_draw_label,
     .draw_image_cb = lv_draw_eve_image,
+    .can_draw_image_cb = eve_can_draw_image,
     .draw_arc_cb = lv_draw_eve_arc,
+    .can_draw_arc_cb = eve_can_draw_arc,
     .draw_line_cb = draw_line,
+    .can_draw_line_cb = eve_can_draw_line,
     .draw_triangle_cb = lv_draw_eve_triangle,
+    .can_draw_triangle_cb = eve_can_draw_triangle,
 };
 
 /**********************
@@ -77,6 +92,9 @@ void lv_draw_eve_init(void)
     draw_eve_unit->base_unit.dispatch_cb = eve_dispatch;
     draw_eve_unit->base_unit.evaluate_cb = eve_evaluate;
     draw_eve_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_eve_unit->base_unit.id = DRAW_UNIT_ID_EVE;
+    /*EVE has no frame buffer that another unit could draw into*/
+    draw_eve_unit->base_unit.fallback = NULL;
 
     lv_draw_eve_unit_g = draw_eve_unit;
 }
@@ -153,6 +171,52 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             break;
     }
     return 0;
+}
+
+static bool eve_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+
+    if(lv_draw_eve_unit_g == NULL || lv_draw_eve_unit_g->disp == NULL)
+        return false;
+
+    return dsc->user_data == NULL;
+}
+
+static bool eve_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    return eve_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool eve_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc)
+{
+    return eve_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool eve_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
+{
+    return eve_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool eve_can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    return eve_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool eve_can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
+{
+    return eve_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool eve_can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
+{
+    return eve_takes(draw_unit, layer, &dsc->base);
+}
+
+static bool eve_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
+{
+    return eve_takes(draw_unit, layer, &dsc->base);
 }
 
 static void eve_execute_drawing(lv_draw_eve_unit_t * u)
