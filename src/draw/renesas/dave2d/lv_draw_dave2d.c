@@ -268,8 +268,6 @@ static bool lv_draw_dave2d_image_color_format_supported(lv_color_format_t color_
     return supported;
 }
 
-#define USE_D2 (1)
-
 /* Gradients are drawn only if they have one color */
 static bool _dave2d_grad_supported(const lv_grad_dsc_t * grad)
 {
@@ -283,27 +281,27 @@ static bool _dave2d_grad_supported(const lv_grad_dsc_t * grad)
 static bool _dave2d_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
 {
     LV_UNUSED(draw_unit);
-    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format) && _dave2d_grad_supported(&dsc->grad);
+    return lv_draw_dave2d_is_dest_cf_supported(layer->color_format) && _dave2d_grad_supported(&dsc->grad);
 }
 
 static bool _dave2d_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc)
 {
     LV_UNUSED(draw_unit);
     LV_UNUSED(dsc);
-    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
+    return lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
 }
 
 static bool _dave2d_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
 {
     LV_UNUSED(draw_unit);
     LV_UNUSED(dsc);
-    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
+    return lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
 }
 
 static bool _dave2d_can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
 {
     LV_UNUSED(draw_unit);
-    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format) &&
+    return lv_draw_dave2d_is_dest_cf_supported(layer->color_format) &&
            lv_draw_dave2d_image_color_format_supported(dsc->header.cf);
 }
 
@@ -311,21 +309,21 @@ static bool _dave2d_can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer,
 {
     LV_UNUSED(draw_unit);
     LV_UNUSED(dsc);
-    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
+    return lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
 }
 
 static bool _dave2d_can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
 {
     LV_UNUSED(draw_unit);
     LV_UNUSED(dsc);
-    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
+    return lv_draw_dave2d_is_dest_cf_supported(layer->color_format);
 }
 
 static bool _dave2d_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer,
                                       const lv_draw_triangle_dsc_t * dsc)
 {
     LV_UNUSED(draw_unit);
-    return USE_D2 && lv_draw_dave2d_is_dest_cf_supported(layer->color_format) && _dave2d_grad_supported(&dsc->grad);
+    return lv_draw_dave2d_is_dest_cf_supported(layer->color_format) && _dave2d_grad_supported(&dsc->grad);
 }
 
 
