@@ -39,7 +39,7 @@ typedef struct {
     lv_mutex_t exit_mutex;
     lv_draw_unit_t * draw_unit;
     uint32_t idx;
-    bool exit_status;
+    volatile bool exit_status;
 } lv_draw_sw_thread_dsc_t;
 
 struct _lv_draw_sw_unit_t {

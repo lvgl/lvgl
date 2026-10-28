@@ -13,6 +13,8 @@ void test_draw_sw_thread_shutdown(void)
         lv_test_init();
         TEST_ASSERT_TRUE(lv_is_initialized());
     }
+#else
+    TEST_IGNORE_MESSAGE("Requires an OS and the software renderer");
 #endif
 }
 #endif
