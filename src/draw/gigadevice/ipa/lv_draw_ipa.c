@@ -240,7 +240,7 @@ void lv_draw_ipa_configure_and_start_transfer(const lv_draw_ipa_configuration_t 
     /* output pixel format converter control register */
     uint32_t temp = 0;
     temp = IPA_DPCTL;
-    IPA_DPCTL = (temp & ~0x07U) | ((uint32_t)conf->output_cf & 0x07U);;
+    IPA_DPCTL = (temp & ~0x07U) | ((uint32_t)conf->output_cf & 0x07U);
 
     /* Fill color. Only for mode LV_DRAW_IPA_MODE_REGISTER_TO_MEMORY */
     IPA_DPV = conf->reg_to_mem_mode_color;
