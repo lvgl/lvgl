@@ -128,12 +128,29 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    /*EVE has no frame buffer that another unit could draw into,
+     *so keep the other units from taking the tasks EVE can't draw: they are dropped*/
+    task->preference_score = 0;
+    task->preferred_draw_unit_id = LV_DRAW_UNIT_NONE;
+
     if(lv_draw_eve_unit_g == NULL || lv_draw_eve_unit_g->disp == NULL)
         return 0;
 
-    if(((lv_draw_dsc_t *)task->draw_dsc)->user_data == NULL) {
-        task->preference_score = 0;
-        task->preferred_draw_unit_id = DRAW_UNIT_ID_EVE;
+    if(((lv_draw_dsc_t *)task->draw_dsc)->user_data != NULL)
+        return 0;
+
+    switch(task->type) {
+        case LV_DRAW_DSC_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
+            task->preferred_draw_unit_id = DRAW_UNIT_ID_EVE;
+            break;
+        default:
+            break;
     }
     return 0;
 }
