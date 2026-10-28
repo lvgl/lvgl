@@ -36,9 +36,10 @@ typedef struct {
     lv_thread_t thread;
     lv_thread_sync_t new_task_sync;
     lv_thread_sync_t task_done_sync;
+    lv_mutex_t exit_mutex;
     lv_draw_unit_t * draw_unit;
     uint32_t idx;
-    volatile bool exit_status;
+    bool exit_status;
 } lv_draw_sw_thread_dsc_t;
 
 struct _lv_draw_sw_unit_t {
