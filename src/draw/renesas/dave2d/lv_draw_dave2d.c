@@ -348,7 +348,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_DSC_TYPE_TRIANGLE: {
 #if USE_D2
-                lv_draw_fill_dsc_t * dsc = t->draw_dsc;
+                lv_draw_triangle_dsc_t * dsc = t->draw_dsc;
                 if(dsc->grad.dir == LV_GRAD_DIR_NONE
                    || ((dsc->grad.dir != LV_GRAD_DIR_NONE)
                        && ((dsc->grad.stops[0].color.blue == dsc->grad.stops[dsc->grad.stops_count - 1].color.blue)
