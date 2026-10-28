@@ -157,28 +157,28 @@ lv_draw_ipa_output_cf_t lv_draw_cf_to_ipa_output_cf(lv_color_format_t cf)
     switch(cf) {
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
-            return IPA_DPF_ARGB8888;
+            return LV_DRAW_IPA_OUTPUT_CF_ARGB8888;
         case LV_COLOR_FORMAT_RGB888:
-            return IPA_DPF_RGB888;
+            return LV_DRAW_IPA_OUTPUT_CF_RGB888;
         case LV_COLOR_FORMAT_RGB565:
-            return IPA_DPF_RGB565;
+            return LV_DRAW_IPA_OUTPUT_CF_RGB565;
         case LV_COLOR_FORMAT_ARGB1555:
-            return IPA_DPF_ARGB1555;
+            return LV_DRAW_IPA_OUTPUT_CF_ARGB1555;
         case LV_COLOR_FORMAT_ARGB4444:
-            return IPA_DPF_ARGB4444;
+            return LV_DRAW_IPA_OUTPUT_CF_ARGB4444;
         default:
             LV_ASSERT_MSG(false, "unsupported output color format");
     }
-    return IPA_DPF_RGB565;
+    return LV_DRAW_IPA_OUTPUT_CF_RGB565;
 }
 
 uint32_t lv_draw_ipa_color_to_ipa_color(lv_draw_ipa_output_cf_t cf, lv_color_t color)
 {
     switch(cf) {
-        case IPA_DPF_ARGB8888:
-        case IPA_DPF_RGB888:
+        case LV_DRAW_IPA_OUTPUT_CF_ARGB8888:
+        case LV_DRAW_IPA_OUTPUT_CF_RGB888:
             return lv_color_to_u32(color);
-        case IPA_DPF_RGB565:
+        case LV_DRAW_IPA_OUTPUT_CF_RGB565:
             return lv_color_to_u16(color);
         default:
             LV_ASSERT_MSG(false, "unsupported output color format");
@@ -189,41 +189,41 @@ uint32_t lv_draw_ipa_color_to_ipa_color(lv_draw_ipa_output_cf_t cf, lv_color_t c
 void lv_draw_ipa_configure_and_start_transfer(const lv_draw_ipa_configuration_t * conf)
 {
     /* Check that addresses are valid regarding to alignment constraints */
-    if(((conf->output_cf == IPA_DPF_ARGB8888) &&
+    if(((conf->output_cf == LV_DRAW_IPA_OUTPUT_CF_ARGB8888) &&
         (((uint32_t)(lv_uintptr_t) conf->output_address) & 0x03)) ||
-       ((conf->output_cf == IPA_DPF_RGB888) &&
+       ((conf->output_cf == LV_DRAW_IPA_OUTPUT_CF_RGB888) &&
         (((uint32_t)(lv_uintptr_t) conf->output_address) & 0x03)) ||
-       ((conf->output_cf == IPA_DPF_RGB565) &&
+       ((conf->output_cf == LV_DRAW_IPA_OUTPUT_CF_RGB565) &&
         (((uint32_t)(lv_uintptr_t) conf->output_address) & 0x01)) ||
-       ((conf->output_cf == IPA_DPF_ARGB1555) &&
+       ((conf->output_cf == LV_DRAW_IPA_OUTPUT_CF_ARGB1555) &&
         (((uint32_t)(lv_uintptr_t) conf->output_address) & 0x01)) ||
-       ((conf->output_cf == IPA_DPF_ARGB4444) &&
+       ((conf->output_cf == LV_DRAW_IPA_OUTPUT_CF_ARGB4444) &&
         (((uint32_t)(lv_uintptr_t) conf->output_address) & 0x01))) {
         LV_LOG_WARN("Incompatible output address %p and format 0x%x",
                     conf->output_address, conf->output_cf);
     }
-    if(((conf->fg_cf == IPA_DPF_ARGB8888) &&
+    if(((conf->fg_cf == LV_DRAW_IPA_FGBG_CF_ARGB8888) &&
         (((uint32_t)(lv_uintptr_t) conf->fg_address) & 0x03)) ||
-       ((conf->fg_cf == IPA_DPF_RGB888) &&
+       ((conf->fg_cf == LV_DRAW_IPA_FGBG_CF_RGB888) &&
         (((uint32_t)(lv_uintptr_t) conf->fg_address) & 0x03)) ||
-       ((conf->fg_cf == IPA_DPF_RGB565) &&
+       ((conf->fg_cf == LV_DRAW_IPA_FGBG_CF_RGB565) &&
         (((uint32_t)(lv_uintptr_t) conf->fg_address) & 0x01)) ||
-       ((conf->fg_cf == IPA_DPF_ARGB1555) &&
+       ((conf->fg_cf == LV_DRAW_IPA_FGBG_CF_ARGB1555) &&
         (((uint32_t)(lv_uintptr_t) conf->fg_address) & 0x01)) ||
-       ((conf->fg_cf == IPA_DPF_ARGB4444) &&
+       ((conf->fg_cf == LV_DRAW_IPA_FGBG_CF_ARGB4444) &&
         (((uint32_t)(lv_uintptr_t) conf->fg_address) & 0x01))) {
         LV_LOG_WARN("Incompatible foreground address %p and format 0x%x",
                     conf->fg_address, conf->fg_cf);
     }
-    if(((conf->bg_cf == IPA_DPF_ARGB8888) &&
+    if(((conf->bg_cf == LV_DRAW_IPA_FGBG_CF_ARGB8888) &&
         (((uint32_t)(lv_uintptr_t) conf->bg_address) & 0x03)) ||
-       ((conf->bg_cf == IPA_DPF_RGB888) &&
+       ((conf->bg_cf == LV_DRAW_IPA_FGBG_CF_RGB888) &&
         (((uint32_t)(lv_uintptr_t) conf->bg_address) & 0x03)) ||
-       ((conf->bg_cf == IPA_DPF_RGB565) &&
+       ((conf->bg_cf == LV_DRAW_IPA_FGBG_CF_RGB565) &&
         (((uint32_t)(lv_uintptr_t) conf->bg_address) & 0x01)) ||
-       ((conf->bg_cf == IPA_DPF_ARGB1555) &&
+       ((conf->bg_cf == LV_DRAW_IPA_FGBG_CF_ARGB1555) &&
         (((uint32_t)(lv_uintptr_t) conf->bg_address) & 0x01)) ||
-       ((conf->bg_cf == IPA_DPF_ARGB4444) &&
+       ((conf->bg_cf == LV_DRAW_IPA_FGBG_CF_ARGB4444) &&
         (((uint32_t)(lv_uintptr_t) conf->bg_address) & 0x01))) {
         LV_LOG_WARN("Incompatible background address %p and format 0x%x",
                     conf->bg_address, conf->bg_cf);
@@ -240,7 +240,7 @@ void lv_draw_ipa_configure_and_start_transfer(const lv_draw_ipa_configuration_t 
     /* output pixel format converter control register */
     uint32_t temp = 0;
     temp = IPA_DPCTL;
-    IPA_DPCTL = (temp & ~0x07U) | ((uint32_t)conf->output_cf & 0x07U);;
+    IPA_DPCTL = (temp & ~0x07U) | ((uint32_t)conf->output_cf & 0x07U);
 
     /* Fill color. Only for mode LV_DRAW_IPA_MODE_REGISTER_TO_MEMORY */
     IPA_DPV = conf->reg_to_mem_mode_color;
