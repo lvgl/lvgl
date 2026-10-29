@@ -78,6 +78,9 @@ struct _lv_draw_task_t {
      */
     uint8_t preference_score;
 
+    /** `lv_draw_finalize_task_creation` was called, or cleanup balanced an abandoned creation */
+    bool creation_finalized;
+
 };
 
 struct _lv_draw_mask_t {
@@ -92,6 +95,13 @@ struct _lv_draw_unit_t {
      */
     const char * name;
     int32_t idx;
+
+    /**
+     * Set if no task of this draw unit can start or finish before `layer->all_tasks_added`.
+     * Layers whose tasks all belong to such draw units are not dispatched before then.
+     * Layers with tasks of other draw units are dispatched as usual.
+     */
+    bool requires_all_tasks;
 
     /**
      * Called to try to assign a draw task to itself.
