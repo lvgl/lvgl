@@ -18,10 +18,9 @@ DRAW_TASK_TYPE_NAMES = {
     9: "ARC",
     10: "TRIANGLE",
     11: "MASK_RECTANGLE",
-    12: "MASK_BITMAP",
-    13: "BLUR",
-    14: "VECTOR",
-    15: "3D",
+    12: "BLUR",
+    13: "VECTOR",
+    14: "3D",
 }
 
 DRAW_TASK_STATE_NAMES = {
@@ -38,6 +37,7 @@ DRAW_UNIT_TYPE_NAMES = {
     "DMA2D": "lv_draw_dma2d_unit_t",
     "ESP_PPA": "lv_draw_ppa_unit_t",
     "G2D": "lv_draw_g2d_unit_t",
+    "IPA": "lv_draw_ipa_unit_t",
     "NANOVG": "lv_draw_nanovg_unit_t",
     "NEMA_GFX": "lv_draw_nema_gfx_unit_t",
     "NXP_PXP": "lv_draw_pxp_unit_t",

@@ -30,7 +30,7 @@ extern "C" {
 struct _lv_draw_task_t {
     lv_draw_task_t * next;
 
-    lv_draw_task_type_t type;
+    lv_draw_dsc_type_t type;
 
     /**
      * The area where to draw

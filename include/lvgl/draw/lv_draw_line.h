@@ -33,7 +33,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     /**The first point of the line. If `LV_USE_FLOAT` is enabled float number can be also used.
      *Ignored if `points` are set*/
@@ -90,9 +90,17 @@ void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
 /**
  * Try to get a line draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_LINE
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_LINE
  */
 lv_draw_line_dsc_t * lv_draw_task_get_line_dsc(lv_draw_task_t * task);
+
+/**
+ * Get the line draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_LINE, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the line draw descriptor
+ */
+lv_draw_line_dsc_t * lv_draw_dsc_get_line_dsc(lv_draw_dsc_t * dsc);
 
 /**
  * Create a line draw task
@@ -105,12 +113,16 @@ void lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
  * A helper function to call a callback which draws a line between two points.
  * This way it doesn't matter if ``p1, p2`` or ``points`` were used as it calls the
  * ``callback`` as needed.
- * @param t             draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           pointer to a draw descriptor
  * @param draw_line_cb  a callback that draws a line between ``dsc->p1`` and ``dsc->p2``
+ * @param user_data     passed to draw_line_cb as is @nullable
  */
-void lv_draw_line_iterate(lv_draw_task_t * t, lv_draw_line_dsc_t * dsc,
-                          void (*draw_line_cb)(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc));
+void lv_draw_line_iterate(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_line_dsc_t * dsc,
+                          void (*draw_line_cb)(lv_layer_t * layer, const lv_area_t * clip_area,
+                                               const lv_draw_line_dsc_t * dsc, void * user_data),
+                          void * user_data);
 
 /**********************
  *      MACROS

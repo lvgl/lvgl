@@ -55,16 +55,19 @@ void lv_draw_pxp_init(void);
 void lv_draw_pxp_deinit(void);
 
 void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
-                        int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
+                        int32_t src_stride, int32_t dest_stride, lv_rotation_t rotation,
                         lv_color_format_t cf);
 
 void lv_draw_buf_pxp_init_handlers(void);
 
-void lv_draw_pxp_fill(lv_draw_task_t * t);
+void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_pxp_img(lv_draw_task_t * t);
+void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_pxp_layer(lv_draw_task_t * t);
+void lv_draw_pxp_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *      MACROS

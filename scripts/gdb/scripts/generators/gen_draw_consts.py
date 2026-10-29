@@ -39,7 +39,7 @@ def parse_draw_unit_types(draw_dir: Path) -> dict[str, str]:
 
 
 def main():
-    task_types = parse_enum(DRAW_H, "lv_draw_task_type_t", "LV_DRAW_TASK_TYPE_")
+    task_types = parse_enum(DRAW_H, "lv_draw_dsc_type_t", "LV_DRAW_DSC_TYPE_")
     task_states = parse_enum(DRAW_H, "lv_draw_task_state_t", "LV_DRAW_TASK_STATE_")
     unit_types = parse_draw_unit_types(DRAW_DIR)
 

@@ -305,6 +305,7 @@ lv_result_t lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, 
 
     if(!circle) {
         LV_LOG_WARN("Failed to allocate memory for circle mask");
+        param->cfg.radius = 0;
         return LV_RESULT_INVALID;
     }
 
@@ -1194,6 +1195,9 @@ static lv_result_t circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_
 static lv_opa_t * get_next_line(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t y, int32_t * len,
                                 int32_t * x_start)
 {
+    LV_ASSERT(c != NULL);
+    LV_ASSERT(len != NULL);
+    LV_ASSERT(x_start != NULL);
     *len = c->opa_start_on_y[y + 1] - c->opa_start_on_y[y];
     *x_start = c->x_start_on_y[y];
     return &c->cir_opa[c->opa_start_on_y[y]];

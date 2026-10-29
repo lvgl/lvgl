@@ -31,7 +31,6 @@ ROOT_FILES = [
     "src/drivers/Kconfig",
     "src/fs/Kconfig",
     "src/debugging/Kconfig",
-    "src/others/Kconfig",
     "env_support/kconfig/Kconfig.build",
     "env_support/kconfig/Kconfig.compiler",
     "examples/Kconfig",

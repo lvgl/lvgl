@@ -249,11 +249,10 @@ void test_scale_render_example_4(void)
 static void draw_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
-    lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
-    lv_draw_line_dsc_t * line_draw_dsc = lv_draw_task_get_line_dsc(draw_task);
-    if(label_draw_dsc) {
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+    lv_draw_dsc_type_t type = lv_draw_dsc_get_type(base_dsc);
+    if(type == LV_DRAW_DSC_TYPE_LABEL) {
+        lv_draw_label_dsc_t * label_draw_dsc = lv_draw_dsc_get_label_dsc(base_dsc);
         if(base_dsc->part == LV_PART_INDICATOR) {
             const lv_color_t color_idx[7] = {
                 lv_palette_main(LV_PALETTE_RED),
@@ -286,15 +285,16 @@ static void draw_event_cb(lv_event_t * e)
 
             lv_text_get_size_attributes(&size, label_draw_dsc->text, label_draw_dsc->font, &attributes);
             int32_t new_w = size.x;
-            int32_t old_w = lv_area_get_width(&draw_task->area);
+            int32_t old_w = lv_area_get_width(&label_draw_dsc->coords);
 
             /* Distribute the new size equally on both sides */
-            draw_task->area.x1 -= (new_w - old_w) / 2;
-            draw_task->area.x2 += ((new_w - old_w) + 1) / 2;  /* +1 for rounding */
+            label_draw_dsc->coords.x1 -= (new_w - old_w) / 2;
+            label_draw_dsc->coords.x2 += ((new_w - old_w) + 1) / 2;  /* +1 for rounding */
 
         }
     }
-    else if(line_draw_dsc) {
+    else if(type == LV_DRAW_DSC_TYPE_LINE) {
+        lv_draw_line_dsc_t * line_draw_dsc = lv_draw_dsc_get_line_dsc(base_dsc);
         if(base_dsc->part == LV_PART_INDICATOR || base_dsc->part == LV_PART_ITEMS) {
             const lv_color_t color_idx[7] = {
                 lv_palette_main(LV_PALETTE_RED),
@@ -332,8 +332,8 @@ void test_scale_render_example_7(void)
     lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 10, 40);
 
-    lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(scale, true);
+    lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
+    lv_obj_set_send_draw_dsc_events(scale, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_5.png");
 }

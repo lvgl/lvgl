@@ -96,9 +96,8 @@ To show the value live in a label next to the widget, attach a label and call <A
 ## Fade mask via draw events
 
 XML can style the parts but can't paint a soft gradient over them. To fade
-the top and bottom edges of the roller, attach an
-<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> handler and blit a pre-rendered alpha mask onto
-the layer the roller is being drawn into:
+the top and bottom edges of the roller, render an alpha mask once and set it
+with <ApiLink name="lv_obj_set_style_bitmap_mask_src" />:
 
 <LvglExample name="lv_example_roller_fade_mask" path="widgets/roller/lv_example_roller_fade_mask" />
 

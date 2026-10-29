@@ -18,8 +18,7 @@ static void timer_cb(lv_timer_t * timer)
 static void event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target_obj(e);
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *) lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
     if(base_dsc->part == LV_PART_MAIN) {
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
@@ -45,13 +44,13 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * @title Custom drawing on draw task events
- * @brief Draw a pulsing red circle on top of a container with a draw task callback.
+ * @title Custom drawing on draw events
+ * @brief Draw a pulsing red circle on top of a container with a draw event callback.
  *
  * A 200x200 container is centered and flagged with
- * `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`. An `LV_EVENT_DRAW_TASK_ADDED`
- * callback inspects the draw task and, when `base_dsc->part` is
- * `LV_PART_MAIN`, calls `lv_draw_rect` to paint a pink circle with a red
+ * `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS`. An `LV_EVENT_DRAW_DSC_END`
+ * callback inspects the draw descriptor that was just drawn and, when `base_dsc->part`
+ * is `LV_PART_MAIN`, calls `lv_draw_rect` to paint a pink circle with a red
  * border and outline. A 30 ms `lv_timer_t` bounces a `size` counter between
  * 0 and 50 and invalidates the container each tick to animate the circle.
  */
@@ -60,8 +59,8 @@ void lv_example_event_draw(void)
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, 200, 200);
     lv_obj_center(cont);
-    lv_obj_add_event_cb(cont, event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(cont, true);
+    lv_obj_add_event_cb(cont, event_cb, LV_EVENT_DRAW_DSC_END, NULL);
+    lv_obj_set_send_draw_dsc_events(cont, true);
     lv_timer_create(timer_cb, 30, cont);
 }
 

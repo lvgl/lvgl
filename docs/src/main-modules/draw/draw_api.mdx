@@ -26,14 +26,15 @@ However there are three places where you can use LVGL's Drawing API directly.
      rendered on top of any children.
 
    These are relevant if a new Widget is implemented and it uses custom drawing.
-2. **Modifying the created draw tasks**:
-   The when a draw task is created for a Widget <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />
-   is sent.  In this event the created draw task can be modified or new draw tasks
-   can be added.  Typical use cases for this are modifying each bar of a bar chart,
+2. **Modifying the draw descriptors**:
+   Before a Widget draws a draw descriptor <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" /> is sent,
+   and after it <ApiLink name="LV_EVENT_DRAW_DSC_END" />.  In the first event the descriptor
+   can be modified or something can be drawn below it, in the second something can be drawn
+   on top of it.  Typical use cases for this are modifying each bar of a bar chart,
    or cells of a table.
 
    For performance reasons, this event is disabled by default.  Enable it by setting
-   the <ApiLink name="LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS" /> flag on the Widget(s) you
+   the <ApiLink name="LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS" /> flag on the Widget(s) you
    wish to emit this event.
 3. **Draw to the Canvas Widget**:
    The drawing functions can be used directly to draw to a Canvas Widget.  Doing so

@@ -10,29 +10,28 @@
 
 #include "../../lv_draw_image_private.h"
 #include "../../../image/lv_image_decoder_private.h"
-#include "../../sw/lv_draw_sw.h"
+#include "../../sw/lv_draw_sw_private.h"
 
-static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void lv_draw_img_ppa_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                                 const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+                                 const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data);
 
 
-void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                     const lv_area_t * coords)
+void lv_draw_ppa_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
-    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, NULL);
+    lv_draw_image_normal_helper(layer, clip_area, dsc, coords, lv_draw_img_ppa_core, NULL, draw_unit);
 }
 
-static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void lv_draw_img_ppa_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                                 const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
+                                 const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data)
 {
-    lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
-    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)t->draw_unit;
+    lv_draw_ppa_unit_t * u = user_data;
 
     lv_area_t rel_clip_area;
     rel_clip_area = *clipped_img_area;
@@ -48,7 +47,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
 
     lv_area_t dest_area;
     dest_area = *clipped_img_area;
-    lv_area_move(&dest_area, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
+    lv_area_move(&dest_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     const uint8_t * src_buf = decoded->data;
     lv_color_format_t src_cf = draw_dsc->header.cf;
@@ -58,11 +57,10 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     const int32_t src_pic_w  = lv_ppa_pic_w(decoded->header.stride, draw_dsc->header.w, src_cf);
     const int32_t dest_pic_w = lv_ppa_pic_w(draw_buf->header.stride, draw_buf->header.w, dest_cf);
     if(src_pic_w == 0 || dest_pic_w == 0) {
-        if(u->img_sw_fallback) return;
         u->img_sw_fallback = true;
 
         LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, using software");
-        lv_draw_sw_image(t, draw_dsc, &t->area);
+        lv_draw_sw_image_core(layer, draw_dsc, decoder_dsc, sup, img_coords, clipped_img_area, NULL);
         return;
     }
 

@@ -3,6 +3,7 @@
 #include "../lvgl_private.h"
 
 #include "unity/unity.h"
+#include "refr/lv_test_refr.h"
 
 #define LV_ARRAY_GET(array, index, type) ((type*)lv_array_at((array), (index)))
 
@@ -86,6 +87,199 @@ void test_property_is_inherited(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.lp64.png");
 #else
     TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.lp32.png");
+#endif
+}
+
+void test_stretched_svg_is_drawn_in_partial_render_mode(void)
+{
+    static const char svg[] =
+        "<svg width=\"44\" height=\"44\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect width=\"44\" height=\"44\" fill=\"#FF0000\"/>"
+        "</svg>";
+
+    /*Static because the image cache is keyed on the address of the descriptor*/
+    static lv_image_dsc_t svg_dsc;
+    lv_memzero(&svg_dsc, sizeof(svg_dsc));
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 44;
+    svg_dsc.header.h = 44;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    /*A draw buffer of 40 rows, so the 400 rows of the display are rendered in 10 bands*/
+    refr_disp_create(400, 400, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_PARTIAL, 1, 40);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+
+    lv_obj_t * image = lv_image_create(refr_screen());
+    lv_image_set_src(image, &svg_dsc);
+    lv_obj_set_size(image, 400, 400);
+    lv_image_set_inner_align(image, LV_IMAGE_ALIGN_STRETCH);
+
+    refr_frame();
+
+    /*Keep the frame that was assembled from the flushed bands, then drop the display*/
+    lv_draw_buf_t * frame = lv_draw_buf_create(400, 400, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(frame);
+    int32_t y;
+    for(y = 0; y < 400; y++) {
+        lv_memcpy(frame->data + (uint32_t)y * frame->header.stride,
+                  refr_ctx.full_frame_buffer + (uint32_t)y * refr_ctx.full_frame_buffer_stride,
+                  refr_ctx.full_frame_buffer_stride);
+    }
+    refr_disp_delete();
+
+    /*Show it on the test display so it can be compared with a reference image*/
+    lv_obj_t * shown = lv_image_create(lv_screen_active());
+    lv_image_set_src(shown, frame);
+    lv_obj_center(shown);
+
+    /*These draw units render on the GPU, the CPU draw buffer the harness assembles stays
+     *empty, just like `ASSERT_PX_*` is a no-op for them in lv_test_refr.h*/
+#if !(LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES)
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_stretch_partial.png");
+#endif
+
+    lv_obj_delete(shown);
+    lv_draw_buf_destroy(frame);
+}
+
+/*Static, because the image cache keeps the source pointer after the test returns*/
+static const lv_image_dsc_t * red_svg_dsc(void)
+{
+    static const char svg[] =
+        "<svg width=\"120\" height=\"120\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect width=\"120\" height=\"120\" fill=\"#FF0000\"/>"
+        "</svg>";
+    static lv_image_dsc_t dsc;
+
+    lv_memzero(&dsc, sizeof(dsc));
+    dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    dsc.header.w = 120;
+    dsc.header.h = 120;
+    dsc.data_size = sizeof(svg) - 1;
+    dsc.data = (const uint8_t *)svg;
+    return &dsc;
+}
+
+/*Black background of its own, so no style is left behind on the screen*/
+static lv_obj_t * svg_test_board(void)
+{
+    lv_obj_t * board = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(board);
+    lv_obj_set_size(board, 460, 380);
+    lv_obj_center(board);
+    lv_obj_set_style_bg_opa(board, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(board, lv_color_black(), 0);
+    return board;
+}
+
+void test_scaled_svg_is_not_clipped_to_the_widget(void)
+{
+    lv_obj_t * board = svg_test_board();
+
+    /*120x120 widget drawn at twice its size around its centre*/
+    lv_obj_t * image = lv_image_create(board);
+    lv_image_set_src(image, red_svg_dsc());
+    lv_obj_set_pos(image, 170, 130);
+    lv_image_set_pivot(image, 60, 60);
+    lv_image_set_scale(image, 2 * LV_SCALE_NONE);
+
+    /*The widget's own area, drawn on top: the picture has to reach outside it*/
+    lv_obj_t * frame = lv_obj_create(board);
+    lv_obj_remove_style_all(frame);
+    lv_obj_set_size(frame, 124, 124);
+    lv_obj_set_pos(frame, 168, 128);
+    lv_obj_set_style_border_width(frame, 1, 0);
+    lv_obj_set_style_border_color(frame, lv_color_white(), 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_scaled_not_clipped.png");
+}
+
+void test_svg_is_drawn_in_a_layer(void)
+{
+    lv_obj_t * board = svg_test_board();
+
+    /*Layered opacity renders the widget into a child layer*/
+    lv_obj_t * image = lv_image_create(board);
+    lv_image_set_src(image, red_svg_dsc());
+    lv_obj_set_pos(image, 170, 130);
+    lv_obj_set_style_opa_layered(image, LV_OPA_50, 0);
+
+    /*NanoVG draws nothing into a child layer yet, so the result is not compared there.
+     *The scene is still rendered, so that the sanitizers see the vector paths being
+     *freed at the end of the run*/
+#if !LV_USE_DRAW_NANOVG
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_in_layer.png");
+#else
+    lv_refr_now(NULL);
+#endif
+}
+
+void test_svg_is_drawn_without_a_widget(void)
+{
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_draw_buf_t * buf = lv_draw_buf_create(120, 120, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_canvas_set_draw_buf(canvas, buf);
+    lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
+
+    /*No base.obj: the image is not drawn by a widget*/
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
+    dsc.src = red_svg_dsc();
+    lv_area_t area = {0, 0, 119, 119};
+    lv_draw_image(&layer, &dsc, &area);
+    lv_canvas_finish_layer(canvas, &layer);
+
+    lv_obj_center(canvas);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_without_widget.png");
+
+    lv_obj_delete(canvas);
+    lv_draw_buf_destroy(buf);
+}
+
+void test_svg_drop_shadow_is_drawn(void)
+{
+    /*Static, because the image cache keeps the source pointer after the test returns*/
+    static const char svg[] =
+        "<svg width=\"120\" height=\"120\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect x=\"10\" y=\"10\" width=\"100\" height=\"100\" fill=\"#FF0000\"/>"
+        "</svg>";
+    static lv_image_dsc_t svg_dsc;
+    lv_memzero(&svg_dsc, sizeof(svg_dsc));
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 120;
+    svg_dsc.header.h = 120;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    /*Own background, so no style is left behind on the screen*/
+    lv_obj_t * board = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(board);
+    lv_obj_set_size(board, 460, 380);
+    lv_obj_center(board);
+    lv_obj_set_style_bg_opa(board, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(board, lv_color_white(), 0);
+
+    /*The shadow is rendered into an A8 layer, which is where the SVG used to be dropped*/
+    lv_obj_t * image = lv_image_create(board);
+    lv_image_set_src(image, &svg_dsc);
+    lv_obj_set_pos(image, 150, 110);
+    lv_obj_set_style_drop_shadow_radius(image, 12, 0);
+    lv_obj_set_style_drop_shadow_offset_x(image, 20, 0);
+    lv_obj_set_style_drop_shadow_offset_y(image, 20, 0);
+    lv_obj_set_style_drop_shadow_color(image, lv_color_black(), 0);
+    lv_obj_set_style_drop_shadow_opa(image, LV_OPA_COVER, 0);
+
+    /*NanoVG has its own blend path and does not produce the shadow yet, so the result is
+     *not compared there. The scene is still rendered, as above*/
+#if !LV_USE_DRAW_NANOVG
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_drop_shadow.png");
+#else
+    lv_refr_now(NULL);
 #endif
 }
 
@@ -941,6 +1135,55 @@ void testBadCase(void)
     TEST_ASSERT_EQUAL_FLOAT(matrix->m[1][2], 255.00942f);
 
     lv_svg_node_delete(svg);
+}
+
+void test_rotated_svg_keeps_its_position(void)
+{
+    /*Red square with a blue marker in one corner, so a wrong rotation origin is visible.
+     *Static, because the image cache keeps the source pointer*/
+    static const char svg[] =
+        "<svg width=\"120\" height=\"120\" xmlns=\"http://www.w3.org/2000/svg\">"
+        "<rect x=\"6\" y=\"6\" width=\"108\" height=\"108\" fill=\"#FF0000\"/>"
+        "<rect x=\"18\" y=\"18\" width=\"30\" height=\"30\" fill=\"#0000FF\"/>"
+        "</svg>";
+    static lv_image_dsc_t svg_dsc;
+    lv_memzero(&svg_dsc, sizeof(svg_dsc));
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 120;
+    svg_dsc.header.h = 120;
+    svg_dsc.data_size = sizeof(svg) - 1;
+    svg_dsc.data = (const uint8_t *)svg;
+
+    /*Own background, so no style is left behind on the screen for the other tests*/
+    lv_obj_t * board = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(board);
+    lv_obj_set_size(board, 760, 200);
+    lv_obj_center(board);
+    lv_obj_set_style_bg_opa(board, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(board, lv_color_black(), 0);
+
+    /*Right angles only: an odd angle renders differently on 32 and 64 bit builds*/
+    static const int32_t angles[] = {0, 900, 1800, 2700};
+    uint32_t i;
+    for(i = 0; i < sizeof(angles) / sizeof(angles[0]); i++) {
+        int32_t x = 30 + (int32_t)i * 180;
+
+        /*White frame marking where the image has to stay at every angle*/
+        lv_obj_t * frame = lv_obj_create(board);
+        lv_obj_remove_style_all(frame);
+        lv_obj_set_size(frame, 124, 124);
+        lv_obj_set_pos(frame, x - 2, 36);
+        lv_obj_set_style_border_width(frame, 1, 0);
+        lv_obj_set_style_border_color(frame, lv_color_white(), 0);
+
+        lv_obj_t * image = lv_image_create(board);
+        lv_image_set_src(image, &svg_dsc);
+        lv_obj_set_pos(image, x, 38);
+        lv_image_set_pivot(image, 60, 60);
+        lv_image_set_rotation(image, angles[i]);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_rotation_origin.png");
 }
 
 #endif

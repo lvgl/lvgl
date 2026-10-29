@@ -42,8 +42,8 @@ typedef struct {
 *  STATIC PROTOTYPES
 **********************/
 
-static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
-                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
+static void draw_letter_cb(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area, void * user_data);
 
 static void letter_cache_release_cb(void * entry, void * user_data);
 static bool letter_create_cb(letter_item_t * item, void * user_data);
@@ -93,9 +93,10 @@ void lv_draw_nanovg_label_deinit(lv_draw_nanovg_unit_t * u)
     u->letter_cache = NULL;
 }
 
-void lv_draw_nanovg_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nanovg_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
 {
-    LV_ASSERT_NULL(t);
+    LV_ASSERT_NULL(draw_unit);
     LV_ASSERT_NULL(dsc);
     LV_ASSERT_NULL(coords);
 
@@ -112,10 +113,10 @@ void lv_draw_nanovg_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc,
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    lv_draw_unit_draw_letter_internal(t, &glyph_dsc, &(lv_point_t) {
+    lv_draw_unit_draw_letter_internal(layer, clip_area, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
-    dsc->font, dsc->unicode, draw_letter_cb);
+    dsc->font, dsc->unicode, draw_letter_cb, draw_unit);
 
     if(glyph_dsc._draw_buf) {
         lv_draw_buf_destroy(glyph_dsc._draw_buf);
@@ -125,10 +126,11 @@ void lv_draw_nanovg_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc,
     LV_PROFILER_DRAW_END;
 }
 
-void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nanovg_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_label_iterate_characters(t, dsc, coords, draw_letter_cb);
+    lv_draw_label_iterate_characters(layer, clip_area, dsc, coords, draw_letter_cb, draw_unit);
     LV_PROFILER_DRAW_END;
 }
 
@@ -136,8 +138,8 @@ void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, c
 *   STATIC FUNCTIONS
 **********************/
 
-static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, lv_area_t * letter_area,
-                                   lv_area_t * clipped_area)
+static bool draw_letter_clip_areas(const lv_area_t * clip_area, const lv_draw_glyph_dsc_t * dsc,
+                                   lv_area_t * letter_area, lv_area_t * clipped_area)
 {
     *letter_area = *dsc->letter_coords;
 
@@ -158,25 +160,26 @@ static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t
         lv_area_move(letter_area, dsc->letter_coords->x1, dsc->letter_coords->y1);
     }
 
-    if(!lv_area_intersect(clipped_area, &t->clip_area, letter_area)) {
+    if(!lv_area_intersect(clipped_area, clip_area, letter_area)) {
         return false;
     }
 
     return true;
 }
 
-static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, int image_handle)
+static void draw_letter_bitmap(lv_draw_unit_t * draw_unit, const lv_area_t * clip_area, const lv_draw_glyph_dsc_t * dsc,
+                               int image_handle)
 {
     LV_PROFILER_DRAW_BEGIN;
 
     lv_area_t image_area;
-    lv_area_t clip_area;
-    if(!draw_letter_clip_areas(t, dsc, &image_area, &clip_area)) {
+    lv_area_t clipped_area;
+    if(!draw_letter_clip_areas(clip_area, dsc, &image_area, &clipped_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     if(!dsc->rotation) {
         float x = dsc->letter_coords->x1;
@@ -289,10 +292,11 @@ static lv_cache_compare_res_t letter_compare_cb(const letter_item_t * lhs, const
 }
 
 
-static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
-                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
+static void draw_letter_cb(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area, void * user_data)
 {
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_unit_t * draw_unit = user_data;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     if(glyph_draw_dsc) {
         switch(glyph_draw_dsc->format) {
@@ -306,7 +310,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                         return;
                     }
 
-                    draw_letter_bitmap(t, glyph_draw_dsc, image_handle);
+                    draw_letter_bitmap(draw_unit, clip_area, glyph_draw_dsc, image_handle);
                 }
                 break;
 
@@ -317,7 +321,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                             return;
                         }
 
-                        /* TODO: draw_letter_outline(t, glyph_draw_dsc); */
+                        /* TODO: draw_letter_outline(draw_unit, clip_area, glyph_draw_dsc); */
                     }
                 }
                 break;
@@ -334,7 +338,8 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     image_dsc.opa = glyph_draw_dsc->opa;
                     image_dsc.src = glyph_draw_dsc->glyph_data;
                     image_dsc.rotation = glyph_draw_dsc->rotation;
-                    lv_draw_nanovg_image(t, &image_dsc, glyph_draw_dsc->letter_coords, -1);
+                    lv_draw_nanovg_image(draw_unit, layer, clip_area,
+                                         &image_dsc, glyph_draw_dsc->letter_coords, -1);
                 }
                 break;
 
@@ -347,7 +352,8 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    lv_draw_nanovg_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_nanovg_border(draw_unit, layer, clip_area,
+                                          &border_draw_dsc, glyph_draw_dsc->bg_coords);
                 }
                 break;
 #endif /* LV_USE_FONT_PLACEHOLDER */
@@ -358,7 +364,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_nanovg_fill(t, fill_draw_dsc, fill_area);
+        lv_draw_nanovg_fill(draw_unit, layer, clip_area, fill_draw_dsc, fill_area);
     }
 }
 

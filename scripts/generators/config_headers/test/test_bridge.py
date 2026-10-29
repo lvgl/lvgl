@@ -29,8 +29,7 @@ def test_derived_int_enums_need_no_bridge(entries):
         assert entries[name].emit_kconfig() == []
 
 
-def test_bridge_file_has_preamble_and_deprecations(generated):
+def test_bridge_file_has_preamble(generated):
     b = generated["bridge"]
     assert "#ifndef LV_CONF_KCONFIG_H" in b
-    assert "CONFIG_LV_MEM_SIZE_KILOBYTES" in b  # deprecation shim
     assert b.rstrip().endswith("#endif /*LV_CONF_KCONFIG_H*/")

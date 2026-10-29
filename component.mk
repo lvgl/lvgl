@@ -38,13 +38,11 @@ COMPONENT_SRCDIRS := . \
                   src/libs/lodepng \
                   src/libs/png \
                   src/libs/qrcode \
-                  src/libs/rlottie \
                   src/libs/rle \
                   src/libs/sjgp \
                   src/libs/tiny_ttf \
                   src/libs/tjpgd \
                   src/libs/libjpeg_turbo \
-                  src/others/fragment \
                   src/others/gridnav \
                   src/others/ime \
                   src/others/imgfont \
@@ -78,7 +76,6 @@ COMPONENT_SRCDIRS := . \
                   src/widgets/label \
                   src/widgets/led \
                   src/widgets/line \
-                  src/widgets/list \
                   src/widgets/menu \
                   src/widgets/meter \
                   src/widgets/msgbox \
@@ -93,7 +90,6 @@ COMPONENT_SRCDIRS := . \
                   src/widgets/tabview \
                   src/widgets/textarea \
                   src/widgets/tileview \
-                  src/widgets/win     \
                   src/stdlib \
                   src/stdlib/builtin
 

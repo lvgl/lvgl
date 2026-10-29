@@ -14,6 +14,7 @@
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
 #include "../../misc/lv_area_private.h"
+#include "../../display/lv_display_private.h"
 #include "../../draw/opengles/lv_draw_opengles.h"
 
 #include <stdlib.h>

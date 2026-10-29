@@ -127,7 +127,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
         lv_obj_invalidate(obj);
     }
 
-    bool trans_removed = remove_trans_styles(obj, selector, LV_STYLE_PROP_ANY, NULL);
+    bool trans_removed = remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
 
     /*Try removing the style first to be sure it won't be added twice*/
     lv_obj_remove_style(obj, style, selector);
@@ -178,7 +178,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     }
 #endif
 
-    lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
+    lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
 }
 
 bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style,
@@ -199,7 +199,7 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
     }
 
     /*Similar to lv_obj_add_style, delete transition*/
-    bool trans_removed = remove_trans_styles(obj, selector, LV_STYLE_PROP_ANY, NULL);
+    bool trans_removed = remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
 
     bool replaced = false;
     uint32_t i;
@@ -219,9 +219,10 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
             continue;
         }
 
+        lv_style_selector_t selector_act = obj->styles[i].selector;
         lv_memzero(&obj->styles[i], sizeof(lv_obj_style_t));
         obj->styles[i].style = new_style;
-        obj->styles[i].selector = selector;
+        obj->styles[i].selector = selector_act;
 
         replaced = true;
         /*Don't break and continue replacing other occurrences*/
@@ -354,27 +355,6 @@ bool lv_obj_get_style_enabled(lv_obj_t * obj, const lv_style_t * style, lv_style
     return !obj_style->is_disabled;
 }
 
-void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis)
-{
-    LV_LOG_DEPRECATED("use lv_obj_set_style_enabled instead (with inverted logic).");
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(style != NULL, return);
-
-    lv_obj_set_style_enabled(obj, style, selector, !dis);
-}
-
-bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
-{
-    LV_LOG_DEPRECATED("use lv_obj_get_style_enabled instead (with inverted logic).");
-    LV_CHECK_ARG(obj != NULL, return false);
-    LV_CHECK_ARG(style != NULL, return false);
-
-    lv_obj_style_t * obj_style = find_style(obj, style, selector);
-    if(obj_style == NULL) return false;
-
-    return obj_style->is_disabled;
-}
-
 
 void lv_obj_enable_style_refresh(bool en)
 {
@@ -464,7 +444,7 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
     }
 #endif
 
-    lv_obj_refresh_style(obj, selector, prop);
+    lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), prop);
     LV_PROFILER_STYLE_END;
 }
 
@@ -504,7 +484,7 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_sty
     lv_result_t res = lv_style_remove_prop((lv_style_t *)obj->styles[i].style, prop);
     if(res == LV_RESULT_OK) {
         full_cache_refresh(obj, lv_obj_style_get_selector_part(selector));
-        lv_obj_refresh_style(obj, selector, prop);
+        lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), prop);
     }
 
     return res;
@@ -533,7 +513,7 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t p
 
     lv_obj_style_t * style_trans = get_trans_style(obj, part);
     lv_style_set_prop((lv_style_t *)style_trans->style, tr_dsc->prop, v1);  /*Be sure `trans_style` has a valid value*/
-    lv_obj_refresh_style(obj, tr_dsc->selector, tr_dsc->prop);
+    lv_obj_refresh_style(obj, part, tr_dsc->prop);
 
     if(tr_dsc->prop == LV_STYLE_RADIUS) {
         if(v1.num == LV_RADIUS_CIRCLE || v2.num == LV_RADIUS_CIRCLE) {
@@ -1268,6 +1248,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 break;
             case LV_STYLE_TRANSITION:
             case LV_STYLE_TEXT_FONT:
+            case LV_STYLE_BG_IMAGE_SRC:
                 if(v < 255) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
@@ -1277,6 +1258,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 else if(v < 128) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
+            /*Colors*/
             case LV_STYLE_RECOLOR:
             case LV_STYLE_BG_COLOR:
             case LV_STYLE_BG_GRAD_COLOR:
@@ -1288,6 +1270,30 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 if(v <= 0) value_final.color = tr->start_value.color;
                 else if(v >= 255) value_final.color = tr->end_value.color;
                 else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
+                break;
+            /*Opacities*/
+            case LV_STYLE_OPA:
+            case LV_STYLE_OPA_LAYERED:
+            case LV_STYLE_RECOLOR_OPA:
+            case LV_STYLE_COLOR_FILTER_OPA:
+            case LV_STYLE_BG_OPA:
+            case LV_STYLE_BG_GRAD_OPA:
+            case LV_STYLE_BG_MAIN_OPA:
+            case LV_STYLE_BG_IMAGE_OPA:
+            case LV_STYLE_BG_IMAGE_RECOLOR_OPA:
+            case LV_STYLE_BORDER_OPA:
+            case LV_STYLE_OUTLINE_OPA:
+            case LV_STYLE_SHADOW_OPA:
+            case LV_STYLE_LINE_OPA:
+            case LV_STYLE_ARC_OPA:
+            case LV_STYLE_TEXT_OPA:
+            case LV_STYLE_IMAGE_OPA:
+            case LV_STYLE_IMAGE_RECOLOR_OPA:
+            case LV_STYLE_DROP_SHADOW_OPA:
+            case LV_STYLE_TEXT_OUTLINE_STROKE_OPA:
+                if(v <= 0) value_final.num = tr->start_value.num;
+                else if(v >= 255) value_final.num = tr->end_value.num;
+                else value_final.num =  LV_CLAMP(0, tr->start_value.num + ((tr->end_value.num - tr->start_value.num) * v >> 8), 255);
                 break;
 
             default:

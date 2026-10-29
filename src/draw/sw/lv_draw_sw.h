@@ -40,92 +40,112 @@ void lv_draw_sw_deinit(void);
 
 /**
  * Fill an area using SW render. Handle gradient and radius.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the rectangle
  */
-void lv_draw_sw_fill(lv_draw_task_t * t, lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_fill_dsc_t * dsc,
+                     const lv_area_t * coords);
 
 /**
  * Draw border with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the rectangle
  */
-void lv_draw_sw_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_border(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_border_dsc_t * dsc,
+                       const lv_area_t * coords);
 
 /**
  * Draw box shadow with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the rectangle for which the box shadow should be drawn
  */
-void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_box_shadow(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_box_shadow_dsc_t * dsc,
+                           const lv_area_t * coords);
 
 /**
  * Draw an image with SW render. It handles image decoding, tiling, transformations, and recoloring.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param draw_dsc      the draw descriptor
  * @param coords        the coordinates of the image
  */
-void lv_draw_sw_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_sw_image(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_image_dsc_t * draw_dsc,
                       const lv_area_t * coords);
 
-void lv_draw_sw_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_letter(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_letter_dsc_t * dsc,
+                       const lv_area_t * coords);
 
 /**
  * Draw a label with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the label
  */
-void lv_draw_sw_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_label(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_label_dsc_t * dsc,
+                      const lv_area_t * coords);
 
 /**
  * Draw an arc with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the arc
  */
-void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_arc(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc,
+                    const lv_area_t * coords);
 
 /**
  * Draw a line with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
+ * @param user_data     unused
  */
-void lv_draw_sw_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc);
+void lv_draw_sw_line(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc, void * user_data);
 
 /**
  * Blend a layer with SW render
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param draw_dsc      the draw descriptor
  * @param coords        the coordinates of the layer
  */
-void lv_draw_sw_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
+void lv_draw_sw_layer(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_image_dsc_t * draw_dsc,
+                      const lv_area_t * coords);
 
 /**
  * Draw a triangle with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  */
-void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc);
+void lv_draw_sw_triangle(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_triangle_dsc_t * dsc);
 
 
 /**
  * Blur an area with SW render
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  * @param coords        the area to blur
  */
-void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_blur(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_blur_dsc_t * dsc,
+                     const lv_area_t * coords);
 
 /**
  * Mask out a rectangle with radius from a current layer
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  */
-void lv_draw_sw_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc);
+void lv_draw_sw_mask_rect(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_mask_rect_dsc_t * dsc);
 
 /**
  * Used internally to get a transformed are of an image
@@ -146,10 +166,11 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 /**
  * Draw vector graphics with SW render.
- * @param t             pointer to a draw task
+ * @param layer         the target layer
+ * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  */
-void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc);
+void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_vector_dsc_t * dsc);
 #endif
 
 /**

@@ -18,6 +18,7 @@
 #include "lv_vg_lite_utils.h"
 #include "../../misc/lv_area_private.h"
 #include "../../image/lv_image_decoder_private.h"
+#include "../lv_draw_image_private.h"
 
 /*********************
  *      DEFINES
@@ -31,8 +32,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -44,13 +43,17 @@ static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                         const lv_area_t * coords, bool no_cache)
+void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache)
 {
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    LV_UNUSED(layer);
 
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, &t->_real_area, &t->clip_area)) {
+    lv_area_t real_area;
+    lv_draw_image_get_transformed_area(&real_area, dsc, coords);
+
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, &real_area, clip_area)) {
         /*Fully clipped, nothing to do*/
         return;
     }
@@ -83,7 +86,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     vg_lite_matrix_t matrix = u->global_matrix;
     lv_vg_lite_matrix_multiply(&matrix, &image_matrix);
 
-    const bool has_transform = matrix_has_transform(&matrix);
+    const bool has_transform = lv_vg_lite_matrix_has_transform(&matrix);
     const bool has_perspective = lv_vg_lite_matrix_has_perspective(&matrix);
     const vg_lite_filter_t filter = has_transform ?  VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
@@ -91,7 +94,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);
     const uint32_t img_h = dsc->header.h ? dsc->header.h : lv_area_get_height(coords);
 
-    const bool need_clip = !lv_area_is_in(&t->_real_area, &t->clip_area, false);
+    const bool need_clip = !lv_area_is_in(&real_area, clip_area, false);
 
     if(dsc->colorkey) {
         lv_vg_lite_set_color_key(dsc->colorkey);
@@ -107,7 +110,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     if(has_perspective && !dsc->tile) {
         /* The scissor works in the coordinate system of the frame buffer */
         lv_area_t phy_clip_area;
-        bool phy_clip_area_ok = lv_vg_lite_matrix_transform_area(&phy_clip_area, &u->global_matrix, &clip_area);
+        bool phy_clip_area_ok = lv_vg_lite_matrix_transform_area(&phy_clip_area, &u->global_matrix, &clipped_area);
         const lv_area_t scissor_area_ori = u->current_scissor_area;
         bool scissor_changed = false;
 
@@ -248,12 +251,12 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
         /* append normal rect to the path */
         lv_vg_lite_path_append_rect(
             path,
-            clip_area.x1, clip_area.y1,
-            lv_area_get_width(&clip_area), lv_area_get_height(&clip_area),
+            clipped_area.x1, clipped_area.y1,
+            lv_area_get_width(&clipped_area), lv_area_get_height(&clipped_area),
             0);
     }
 
-    lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
+    lv_vg_lite_path_set_bounding_box_area(path, &clipped_area);
     lv_vg_lite_path_end(path);
 
     vg_lite_matrix_t path_matrix = u->global_matrix;
@@ -341,20 +344,5 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix)
-{
-    /**
-     * When the rotation angle is 0 or 180 degrees,
-     * it is considered that there is no transformation.
-     */
-    return !((matrix->m[0][0] == 1.0f || matrix->m[0][0] == -1.0f) &&
-             matrix->m[0][1] == 0.0f &&
-             matrix->m[1][0] == 0.0f &&
-             (matrix->m[1][1] == 1.0f || matrix->m[1][1] == -1.0f) &&
-             matrix->m[2][0] == 0.0f &&
-             matrix->m[2][1] == 0.0f &&
-             matrix->m[2][2] == 1.0f);
-}
 
 #endif /*LV_USE_DRAW_VG_LITE*/

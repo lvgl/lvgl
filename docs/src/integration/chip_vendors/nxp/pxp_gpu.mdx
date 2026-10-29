@@ -81,14 +81,14 @@ Supported draw tasks are available in `src/draw/nxp/pxp/lv_draw_pxp.c`:
 
 ```c
 switch(t->type) {
-    case LV_DRAW_TASK_TYPE_FILL:
-        lv_draw_pxp_fill(t, t->draw_dsc, &t->area);
+    case LV_DRAW_DSC_TYPE_FILL:
+        lv_draw_pxp_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
         break;
-    case LV_DRAW_TASK_TYPE_IMAGE:
-        lv_draw_pxp_img(t, t->draw_dsc, &t->area);
+    case LV_DRAW_DSC_TYPE_IMAGE:
+        lv_draw_pxp_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
         break;
-    case LV_DRAW_TASK_TYPE_LAYER:
-        lv_draw_pxp_layer(t, t->draw_dsc, &t->area);
+    case LV_DRAW_DSC_TYPE_LAYER:
+        lv_draw_pxp_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
         break;
     default:
         break;
@@ -99,7 +99,7 @@ Additionally, the screen rotation can be handled by the PXP:
 
 ```c
 void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
-                        int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
+                        int32_t src_stride, int32_t dest_stride, lv_rotation_t rotation,
                         lv_color_format_t cf);
 ```
 

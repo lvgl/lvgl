@@ -86,6 +86,13 @@
 #define VG_LITE_IS_ALPHA_FORMAT(format) \
     ((format) == VG_LITE_A8 || (format) == VG_LITE_A4)
 
+/**
+ * Pack an 8-bit channel into n bits with rounding. Truncation is biased
+ * towards dark, and combined with the truncating expansion (v * 0xFF / max)
+ * an expand/pack round trip loses one step for most values.
+ */
+#define PACK_CHANNEL(v, max) (((v) * (max) + 0x7F) / 0xFF)
+
 /* clang-format on */
 
 /**********************
@@ -294,6 +301,7 @@ typedef vg_lite_float_t FLOATVECTOR4[4];
 
 static vg_lite_error_t vg_lite_error_conv(Result result);
 static Matrix matrix_conv(const vg_lite_matrix_t * matrix);
+static Matrix picture_matrix_conv(const vg_lite_matrix_t * matrix);
 static FillRule fill_rule_conv(vg_lite_fill_t fill);
 static BlendMethod blend_method_conv(vg_lite_blend_t blend);
 static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap);
@@ -337,9 +345,9 @@ static vg_lite_converter<vg_color16_t, vg_color32_t> conv_bgra8888_to_bgr565(
     [](vg_color16_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
-        dest->red = src->red * 0x1F / 0xFF;
-        dest->green = src->green * 0x3F / 0xFF;
-        dest->blue = src->blue * 0x1F / 0xFF;
+        dest->red = PACK_CHANNEL(src->red, 0x1F);
+        dest->green = PACK_CHANNEL(src->green, 0x3F);
+        dest->blue = PACK_CHANNEL(src->blue, 0x1F);
         src++;
         dest++;
     }
@@ -349,9 +357,9 @@ static vg_lite_converter<vg_color16_alpha_t, vg_color32_t> conv_bgra8888_to_bgra
     [](vg_color16_alpha_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
-        dest->c.red = src->red * 0x1F / 0xFF;
-        dest->c.green = src->green * 0x3F / 0xFF;
-        dest->c.blue = src->blue * 0x1F / 0xFF;
+        dest->c.red = PACK_CHANNEL(src->red, 0x1F);
+        dest->c.green = PACK_CHANNEL(src->green, 0x3F);
+        dest->c.blue = PACK_CHANNEL(src->blue, 0x1F);
         dest->alpha = src->alpha;
         src++;
         dest++;
@@ -625,7 +633,7 @@ extern "C" {
         auto picture = Picture::gen();
 
         TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, source, color));
-        TVG_CHECK_RETURN_VG_ERROR(picture->transform(matrix_conv(matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(picture->transform(picture_matrix_conv(matrix)));
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
 
@@ -676,7 +684,7 @@ extern "C" {
 
         auto picture = tvg::Picture::gen();
         TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, source, color));
-        TVG_CHECK_RETURN_VG_ERROR(picture->transform(matrix_conv(&new_matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(picture->transform(picture_matrix_conv(&new_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(shape), CompositeMethod::ClipPath));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
@@ -710,9 +718,9 @@ extern "C" {
     static void picture_bgra8888_to_bgr565(vg_color16_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
     {
         while(px_size--) {
-            dest->red = src->red * 0x1F / 0xFF;
-            dest->green = src->green * 0x3F / 0xFF;
-            dest->blue = src->blue * 0x1F / 0xFF;
+            dest->red = PACK_CHANNEL(src->red, 0x1F);
+            dest->green = PACK_CHANNEL(src->green, 0x3F);
+            dest->blue = PACK_CHANNEL(src->blue, 0x1F);
             src++;
             dest++;
         }
@@ -721,9 +729,9 @@ extern "C" {
     static void picture_bgra8888_to_bgra5658(vg_color16_alpha_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
     {
         while(px_size--) {
-            dest->c.red = src->red * 0x1F / 0xFF;
-            dest->c.green = src->green * 0x3F / 0xFF;
-            dest->c.blue = src->blue * 0x1F / 0xFF;
+            dest->c.red = PACK_CHANNEL(src->red, 0x1F);
+            dest->c.green = PACK_CHANNEL(src->green, 0x3F);
+            dest->c.blue = PACK_CHANNEL(src->blue, 0x1F);
             dest->alpha = src->alpha;
             src++;
             dest++;
@@ -762,9 +770,9 @@ extern "C" {
     static void picture_bgra8888_to_bgra5551(vg_color_bgra5551_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
     {
         while(px_size--) {
-            dest->red = src->red * 0x1F / 0xFF;
-            dest->green = src->green * 0x1F / 0xFF;
-            dest->blue = src->blue * 0x1F / 0xFF;
+            dest->red = PACK_CHANNEL(src->red, 0x1F);
+            dest->green = PACK_CHANNEL(src->green, 0x1F);
+            dest->blue = PACK_CHANNEL(src->blue, 0x1F);
             dest->alpha = src->alpha > (0xFF / 2) ? 1 : 0;
             src++;
             dest++;
@@ -1196,7 +1204,7 @@ extern "C" {
 
         auto picture = tvg::Picture::gen();
         TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, pattern_image, color));
-        TVG_CHECK_RETURN_VG_ERROR(picture->transform(matrix_conv(pattern_matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(picture->transform(picture_matrix_conv(pattern_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(shape), CompositeMethod::ClipPath));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
@@ -2251,6 +2259,40 @@ static Matrix matrix_conv(const vg_lite_matrix_t * matrix)
     return *(Matrix *)matrix;
 }
 
+/**
+ * Convert the matrix of an image source (blit / pattern).
+ *
+ * The hardware maps pixel centers: src = M^-1 * (dst + 0.5) - 0.5.
+ * ThorVG's scaled image path samples at src = M^-1 * dst - 0.49 instead
+ * (SCALED_IMAGE_RANGE_X/Y in tvgSwRaster.cpp). For a scale s the difference
+ * is 0.5 / s - 0.01 source pixels, i.e. about half a destination pixel, and
+ * it always points the same way. A downscale/upscale round trip (blur) adds
+ * both errors, e.g. ~3 layer pixels towards bottom-right for a 5x factor.
+ * Compensate with M' = T(-0.5) * M * T(0.01), so that ThorVG samples like the
+ * hardware. Only the scaled path (positive scale only, no rotation, skew,
+ * mirroring or perspective) is adjusted; the direct and texmap paths use
+ * other conventions.
+ */
+static Matrix picture_matrix_conv(const vg_lite_matrix_t * matrix)
+{
+    Matrix m = matrix_conv(matrix);
+
+    const bool scale_only = math_zero(m.e12) && math_zero(m.e21)
+                            && math_zero(m.e31) && math_zero(m.e32) && math_equal(m.e33, 1.0f);
+    const bool scaled = !math_equal(m.e11, 1.0f) || !math_equal(m.e22, 1.0f);
+    /* Mirroring (e.g. 180 degree display rotation) is a negative scale. Its
+     * sampling has not been verified against the hardware, keep it as is. */
+    const bool positive = m.e11 > 0.0f && m.e22 > 0.0f;
+    if(!scale_only || !scaled || !positive) {
+        return m;
+    }
+
+    const float bias = 0.01f;
+    m.e13 += m.e11 * bias - 0.5f;
+    m.e23 += m.e22 * bias - 0.5f;
+    return m;
+}
+
 static FillRule fill_rule_conv(vg_lite_fill_t fill)
 {
     if(fill == VG_LITE_FILL_EVEN_ODD) {
@@ -2546,12 +2588,74 @@ static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_bu
     return Result::Success;
 }
 
+/**
+ * Expand the content of a non-native target into the BGRA8888 canvas buffer.
+ * It is the inverse of the writeback in vg_lite_finish.
+ * @param dest   BGRA8888 buffer with the same size as `src`
+ * @param src    target buffer in a format ThorVG cannot render to directly
+ * @return       Result::Success, or Result::InvalidArguments if the buffers
+ *               do not match or the format is not supported
+ */
+static Result canvas_load_target(vg_lite_buffer_t * dest, const vg_lite_buffer_t * src)
+{
+    LV_ASSERT_NULL(dest);
+    LV_ASSERT_NULL(src);
+
+    if(dest->format != VG_LITE_BGRA8888
+       || dest->width != src->width
+       || dest->height != src->height
+       || dest->stride < (vg_lite_int32_t)(dest->width * sizeof(vg_lite_uint32_t))) {
+        LV_LOG_ERROR("invalid canvas buffer: format %d, W%d x H%d, stride %d for target W%d x H%d",
+                     (int)dest->format, (int)dest->width, (int)dest->height, (int)dest->stride,
+                     (int)src->width, (int)src->height);
+        return Result::InvalidArguments;
+    }
+
+    switch(src->format) {
+        /* VG_LITE_A4 is intentionally not handled: the hardware does not
+         * support A4 as a render target, see lv_vg_lite_is_dest_cf_supported(). */
+        case VG_LITE_A8:
+            /* color 0: rgb = 0, alpha = value; writeback only keeps alpha */
+            conv_alpha8_to_bgra8888.convert(dest, src, 0);
+            break;
+        case VG_LITE_L8:
+            conv_l8_to_bgra8888.convert(dest, src);
+            break;
+        case VG_LITE_BGR565:
+            conv_bgr565_to_bgra8888.convert(dest, src);
+            break;
+        case VG_LITE_BGRA5658:
+            conv_bgra5658_to_bgra8888.convert(dest, src);
+            break;
+        case VG_LITE_BGR888:
+            conv_bgr888_to_bgra8888.convert(dest, src);
+            break;
+        case VG_LITE_BGRA5551:
+            conv_bgra5551_to_bgra8888.convert(dest, src);
+            break;
+        case VG_LITE_BGRA4444:
+            conv_bgra4444_to_bgra8888.convert(dest, src);
+            break;
+        case VG_LITE_BGRA2222:
+            conv_bgra2222_to_bgra8888.convert(dest, src);
+            break;
+        default:
+            LV_LOG_ERROR("unsupported target format: %d", (int)src->format);
+            return Result::InvalidArguments;
+    }
+
+    return Result::Success;
+}
+
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 {
     /* if target_buffer needs to be changed, finish current drawing */
     if(ctx->target_buffer && ctx->target_buffer != target->memory) {
         vg_lite_finish();
     }
+
+    /* A new binding (not a continuation of pending draws on the same target) */
+    const bool rebind = ctx->target_buffer != target->memory;
 
     ctx->target_buffer = target->memory;
     ctx->target_format = target->format;
@@ -2573,6 +2677,20 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
         /* if target format is not supported by VG, use internal buffer */
         canvas_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
         stride = target->width;
+
+        /* The temp buffer is shared by all non-native targets and is written back
+         * to the target entirely on finish, so it must start with the current
+         * target content. Otherwise stale pixels of a previous target leak in. */
+        if(rebind) {
+            vg_lite_buffer_t canvas_buf;
+            memset(&canvas_buf, 0, sizeof(canvas_buf));
+            canvas_buf.memory = canvas_target_buffer;
+            canvas_buf.format = VG_LITE_BGRA8888;
+            canvas_buf.width = target->width;
+            canvas_buf.height = target->height;
+            canvas_buf.stride = stride * sizeof(vg_lite_uint32_t);
+            TVG_CHECK_RETURN_RESULT(canvas_load_target(&canvas_buf, target));
+        }
     }
 
     /* Prevent repeated target setting */

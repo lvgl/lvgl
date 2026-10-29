@@ -290,11 +290,11 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         init_buffer(ctx, &ddata->buffers[i], width, height, cf);
     }
 
-    lv_display_rotation_t rotation = lv_display_get_rotation(display);
-    if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
+    lv_rotation_t rotation = lv_display_get_rotation(display);
+    if(rotation == LV_ROTATION_90 || rotation == LV_ROTATION_270) {
         init_buffer(ctx, &ddata->rotate_buffer, height, width, cf);
     }
-    else if(rotation == LV_DISPLAY_ROTATION_180) {
+    else if(rotation == LV_ROTATION_180) {
         init_buffer(ctx, &ddata->rotate_buffer, width, height, cf);
     }
 
@@ -308,7 +308,7 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         }
     }
 
-    if(rotation == LV_DISPLAY_ROTATION_0) {
+    if(rotation == LV_ROTATION_0) {
         lv_display_set_draw_buffers(display, ddata->buffers[0].lv_draw_buf, ddata->buffers[1].lv_draw_buf);
         return ddata;
     }
@@ -628,7 +628,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     lv_wl_g2d_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
     int32_t src_width = lv_area_get_width(area);
     int32_t src_height = lv_area_get_height(area);
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    lv_rotation_t rotation = lv_display_get_rotation(disp);
 
     struct wl_surface * surface = lv_wayland_get_window_surface(disp);
     /* Mark surface damage */
@@ -647,7 +647,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
 
     /*Rerender the whole surface if we're using rotation*/
-    if(rotation != LV_DISPLAY_ROTATION_0) {
+    if(rotation != LV_ROTATION_0) {
         wl_surface_damage(surface, 0, 0,
                           lv_display_get_original_horizontal_resolution(disp),
                           lv_display_get_original_vertical_resolution(disp));

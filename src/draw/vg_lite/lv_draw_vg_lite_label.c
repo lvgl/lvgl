@@ -53,15 +53,17 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
-                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
+static void draw_letter_cb(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area, void * user_data);
 
-static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, vg_lite_buffer_t * src_buf);
+static void draw_letter_bitmap(lv_draw_unit_t * draw_unit, const lv_area_t * clip_area, const lv_draw_glyph_dsc_t * dsc,
+                               vg_lite_buffer_t * src_buf);
 
 static void bitmap_cache_release_cb(void * entry, void * user_data);
 
 static void outline_iter_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len);
-static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
+static void draw_letter_outline(lv_draw_unit_t * draw_unit, const lv_area_t * clip_area,
+                                const lv_draw_glyph_dsc_t * dsc);
 static inline bool init_buffer_from_glyph_dsc(vg_lite_buffer_t * buffer, lv_font_glyph_dsc_t * g_dsc);
 
 #if LV_USE_FREETYPE
@@ -104,7 +106,8 @@ void lv_draw_vg_lite_label_deinit(struct _lv_draw_vg_lite_unit_t * u)
     lv_vg_lite_bitmap_font_cache_deinit(u);
 }
 
-void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_vg_lite_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN)
         return;
@@ -119,10 +122,10 @@ void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    lv_draw_unit_draw_letter_internal(t, &glyph_dsc, &(lv_point_t) {
+    lv_draw_unit_draw_letter_internal(layer, clip_area, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
-    dsc->font, dsc->unicode, draw_letter_cb);
+    dsc->font, dsc->unicode, draw_letter_cb, draw_unit);
 
     if(glyph_dsc._draw_buf) {
         lv_draw_buf_destroy(glyph_dsc._draw_buf);
@@ -132,11 +135,11 @@ void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc
     LV_PROFILER_DRAW_END;
 }
 
-void lv_draw_vg_lite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
-                           const lv_area_t * coords)
+void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_label_iterate_characters(t, dsc, coords, draw_letter_cb);
+    lv_draw_label_iterate_characters(layer, clip_area, dsc, coords, draw_letter_cb, draw_unit);
     LV_PROFILER_DRAW_END;
 }
 
@@ -144,10 +147,11 @@ void lv_draw_vg_lite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
  *   STATIC FUNCTIONS
  **********************/
 
-static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
-                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
+static void draw_letter_cb(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area, void * user_data)
 {
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+    lv_draw_unit_t * draw_unit = user_data;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
     if(glyph_draw_dsc) {
         switch(glyph_draw_dsc->format) {
             case LV_FONT_GLYPH_FORMAT_A1:
@@ -176,12 +180,12 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                         lv_vg_lite_buffer_from_draw_buf(&src_buf, glyph_draw_dsc->glyph_data);
                     }
 
-                    draw_letter_bitmap(t, glyph_draw_dsc, &src_buf);
+                    draw_letter_bitmap(draw_unit, clip_area, glyph_draw_dsc, &src_buf);
                 }
                 break;
 
             case LV_FONT_GLYPH_FORMAT_VECTOR:
-                draw_letter_outline(t, glyph_draw_dsc);
+                draw_letter_outline(draw_unit, clip_area, glyph_draw_dsc);
 
                 break;
 
@@ -197,7 +201,8 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     image_dsc.src = glyph_draw_dsc->glyph_data;
                     image_dsc.rotation = glyph_draw_dsc->rotation;
                     image_dsc.pivot = glyph_draw_dsc->pivot;
-                    lv_draw_vg_lite_img(t, &image_dsc, glyph_draw_dsc->letter_coords, false);
+                    lv_draw_vg_lite_img(draw_unit, layer, clip_area, &image_dsc,
+                                        glyph_draw_dsc->letter_coords, false);
                 }
                 break;
 
@@ -210,7 +215,8 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    lv_draw_vg_lite_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_vg_lite_border(draw_unit, layer, clip_area, &border_draw_dsc,
+                                           glyph_draw_dsc->bg_coords);
                 }
                 break;
 #endif /* LV_USE_FONT_PLACEHOLDER */
@@ -221,7 +227,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_vg_lite_fill(t, fill_draw_dsc, fill_area);
+        lv_draw_vg_lite_fill(draw_unit, layer, clip_area, fill_draw_dsc, fill_area);
     }
 
     /* Flush in time to avoid accumulation of drawing commands */
@@ -270,8 +276,8 @@ static inline void convert_letter_matrix(vg_lite_matrix_t * matrix, const lv_dra
     vg_lite_translate(-pivot.x, -pivot.y, matrix);
 }
 
-static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, lv_area_t * letter_area,
-                                   lv_area_t * clipped_area)
+static bool draw_letter_clip_areas(const lv_area_t * clip_area, const lv_draw_glyph_dsc_t * dsc,
+                                   lv_area_t * letter_area, lv_area_t * clipped_area)
 {
     *letter_area = *dsc->letter_coords;
 
@@ -292,33 +298,34 @@ static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t
         lv_area_move(letter_area, dsc->letter_coords->x1, dsc->letter_coords->y1);
     }
 
-    if(!lv_area_intersect(clipped_area, &t->clip_area, letter_area)) {
+    if(!lv_area_intersect(clipped_area, clip_area, letter_area)) {
         return false;
     }
 
     return true;
 }
 
-static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, vg_lite_buffer_t * src_buf)
+static void draw_letter_bitmap(lv_draw_unit_t * draw_unit, const lv_area_t * clip_area, const lv_draw_glyph_dsc_t * dsc,
+                               vg_lite_buffer_t * src_buf)
 {
     LV_PROFILER_DRAW_BEGIN;
 
     lv_area_t image_area;
-    lv_area_t clip_area;
-    if(!draw_letter_clip_areas(t, dsc, &image_area, &clip_area)) {
+    lv_area_t clipped_area;
+    if(!draw_letter_clip_areas(clip_area, dsc, &image_area, &clipped_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     vg_lite_matrix_t matrix = u->global_matrix;
     convert_letter_matrix(&matrix, dsc);
 
     const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
-    const int32_t clip_offset_x = clip_area.x1 - image_area.x1;
-    const int32_t clip_offset_y = clip_area.y1 - image_area.y1;
+    const int32_t clip_offset_x = clipped_area.x1 - image_area.x1;
+    const int32_t clip_offset_y = clipped_area.y1 - image_area.y1;
 
     /* If rotation is not required, blit directly */
     if(!dsc->rotation
@@ -333,8 +340,8 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
         vg_lite_rectangle_t rect = {
             .x = clip_offset_x,
             .y = clip_offset_y,
-            .width = lv_area_get_width(&clip_area),
-            .height = lv_area_get_height(&clip_area)
+            .width = lv_area_get_width(&clipped_area),
+            .height = lv_area_get_height(&clipped_area)
         };
 
         /* add offset for clipped area */
@@ -359,7 +366,7 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
             lv_area_get_width(&image_area), lv_area_get_height(&image_area),
             0);
         lv_vg_lite_path_end(path);
-        lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
+        lv_vg_lite_path_set_bounding_box_area(path, &clipped_area);
 
         vg_lite_matrix_t path_matrix = u->global_matrix;
 
@@ -397,18 +404,19 @@ static void bitmap_cache_release_cb(void * entry, void * user_data)
 }
 
 
-static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc)
+static void draw_letter_outline(lv_draw_unit_t * draw_unit, const lv_area_t * clip_area,
+                                const lv_draw_glyph_dsc_t * dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
 
     lv_area_t letter_area;
     lv_area_t path_clip_area;
-    if(!draw_letter_clip_areas(t, dsc, &letter_area, &path_clip_area)) {
+    if(!draw_letter_clip_areas(clip_area, dsc, &letter_area, &path_clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     /* vg-lite bounding_box will crop the pixels on the edge, so +1px is needed here */
     path_clip_area.x2++;
@@ -426,7 +434,7 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
     }
 #endif
-    const bool has_rotation_with_clipped = dsc->rotation && !lv_area_is_in(&letter_area, &t->clip_area, false);
+    const bool has_rotation_with_clipped = dsc->rotation && !lv_area_is_in(&letter_area, clip_area, false);
 
     /* calc convert matrix */
     vg_lite_matrix_t matrix;

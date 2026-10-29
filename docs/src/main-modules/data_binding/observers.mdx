@@ -87,11 +87,6 @@ static void disabled_cb(lv_observer_t * observer, lv_subject_t * subject)
 lv_subject_add_observer_obj(subject, disabled_cb, widget, NULL);
 ```
 
-<Callout type="warning">
-The older `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` functions are
-**deprecated** in favor of the two approaches above.
-</Callout>
-
 ### Checked state
 
 <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked()" /> creates a

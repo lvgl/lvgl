@@ -567,7 +567,7 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
         lv_group_add_obj(group, chart);
     }
     lv_obj_set_scroll_on_focus(chart, true);
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_set_send_draw_dsc_events(chart, true);
     lv_chart_set_div_line_count(chart, 0, 12);
     lv_chart_set_point_count(chart, 12);
     lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
@@ -598,12 +598,12 @@ static void chart_event_cb(lv_event_t * e)
     if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
         lv_obj_invalidate(obj); /*To make the value boxes visible*/
     }
-    else if(code == LV_EVENT_DRAW_TASK_ADDED) {
-        lv_draw_task_t * draw_task = lv_event_get_param(e);
-        lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    else if(code == LV_EVENT_DRAW_DSC_BEGIN) {
+        /*Draw a faded area below the lines*/
+        lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
 
-        lv_draw_line_dsc_t * draw_line_dsc = lv_draw_task_get_line_dsc(draw_task);
-        if(base_dsc->part == LV_PART_ITEMS && draw_line_dsc) {
+        if(base_dsc->part == LV_PART_ITEMS && lv_draw_dsc_get_type(base_dsc) == LV_DRAW_DSC_TYPE_LINE) {
+            lv_draw_line_dsc_t * draw_line_dsc = lv_draw_dsc_get_line_dsc(base_dsc);
             lv_area_t obj_coords;
             lv_obj_get_coords(obj, &obj_coords);
             const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
@@ -654,6 +654,13 @@ static void chart_event_cb(lv_event_t * e)
                 lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
             }
         }
+    }
+    else if(code == LV_EVENT_DRAW_DSC_END) {
+        /*Highlight the pressed point and show its value, on top of it*/
+        lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+        if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_FILL) return;
+        lv_draw_fill_dsc_t * fill_dsc = lv_draw_dsc_get_fill_dsc(base_dsc);
+        lv_area_t point_area = fill_dsc->coords;
 
         bool add_value = false;
         if(base_dsc->part == LV_PART_INDICATOR && lv_chart_get_pressed_point(obj) == base_dsc->id2) {
@@ -664,9 +671,7 @@ static void chart_event_cb(lv_event_t * e)
                 outline_dsc.outline_color = lv_color_white();
                 outline_dsc.outline_width = 2;
                 outline_dsc.radius = LV_RADIUS_CIRCLE;
-                lv_area_t draw_task_area;
-                lv_draw_task_get_area(draw_task, &draw_task_area);
-                lv_draw_rect(base_dsc->layer, &outline_dsc, &draw_task_area);
+                lv_draw_rect(base_dsc->layer, &outline_dsc, &point_area);
                 add_value = true;
             }
         }
@@ -675,16 +680,13 @@ static void chart_event_cb(lv_event_t * e)
             if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
 
             if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
-                lv_draw_fill_dsc_t * fill_dsc = lv_draw_task_get_draw_dsc(draw_task);
                 lv_draw_rect_dsc_t shadow_dsc;
                 lv_draw_rect_dsc_init(&shadow_dsc);
                 shadow_dsc.radius = fill_dsc->radius;
                 shadow_dsc.bg_opa = LV_OPA_TRANSP;
                 shadow_dsc.shadow_color = lv_chart_get_series_color(obj, ser);
                 shadow_dsc.shadow_width = 15;
-                lv_area_t draw_task_area;
-                lv_draw_task_get_area(draw_task, &draw_task_area);
-                lv_draw_rect(base_dsc->layer, &shadow_dsc, &draw_task_area);
+                lv_draw_rect(base_dsc->layer, &shadow_dsc, &point_area);
                 add_value = true;
             }
         }
@@ -702,11 +704,9 @@ static void chart_event_cb(lv_event_t * e)
             lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t txt_area;
-            lv_area_t draw_task_area;
-            lv_draw_task_get_area(draw_task, &draw_task_area);
-            txt_area.y2 = draw_task_area.y1 - LV_DPX(15);
+            txt_area.y2 = point_area.y1 - LV_DPX(15);
             txt_area.y1 = txt_area.y2 - text_size.y;
-            txt_area.x1 = draw_task_area.x1 + (lv_area_get_width(&draw_task_area) - text_size.x) / 2;
+            txt_area.x1 = point_area.x1 + (lv_area_get_width(&point_area) - text_size.x) / 2;
             txt_area.x2 = txt_area.x1 + text_size.x;
 
             lv_area_t bg_area;

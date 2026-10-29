@@ -141,7 +141,7 @@ jobs:
     - name: Download the overall coverage baseline
       if: ${{ github.event_name == 'pull_request' && matrix.build_config == '64bit build' }}
       continue-on-error: true
-      uses: dawidd6/action-download-artifact@v24
+      uses: dawidd6/action-download-artifact@v26
       with:
         workflow: ccpp.yml
         branch: master

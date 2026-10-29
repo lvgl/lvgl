@@ -36,7 +36,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static inline int sdl_render_mode(void);
 static lv_result_t window_create(lv_display_t * disp);
 static void sdl_event_handler(lv_timer_t * t);
 static void release_disp_cb(lv_event_t * e);
@@ -228,11 +227,6 @@ int32_t lv_sdl_window_get_vertical_resolution(lv_display_t * display)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static inline int sdl_render_mode(void)
-{
-    return LV_SDL_RENDER_MODE;
-}
 
 /**
  * SDL main thread. All SDL related task have to be handled here!

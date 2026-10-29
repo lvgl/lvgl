@@ -1,5 +1,5 @@
 /*Using LVGL with Arduino requires some extra steps:
- *Be sure to read the docs here: https://docs.lvgl.io/master/integration/framework/arduino.html  */
+ *Be sure to read the docs here: https://lvgl.io/docs/open/integration/frameworks/arduino  */
 
 #include <lvgl.h>
 
@@ -18,7 +18,7 @@
 /*Set to your screen resolution and rotation*/
 #define TFT_HOR_RES   320
 #define TFT_VER_RES   240
-#define TFT_ROTATION  LV_DISPLAY_ROTATION_0
+#define TFT_ROTATION  LV_ROTATION_0
 
 /*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
 #define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
@@ -117,7 +117,7 @@ void setup()
      lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 
      * Try an example. See all the examples
-     *  - Online: https://docs.lvgl.io/master/examples.html
+     *  - Online: https://lvgl.io/docs/open/examples
      *  - Source codes: https://github.com/lvgl/lvgl/tree/master/examples
      * ----------------------------------------------------------------
 

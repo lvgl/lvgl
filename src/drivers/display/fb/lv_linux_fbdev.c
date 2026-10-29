@@ -456,10 +456,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     const uint32_t px_size = lv_color_format_get_size(cf);
 
     lv_area_t rotated_area;
-    const lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    const lv_rotation_t rotation = lv_display_get_rotation(disp);
 
     /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
-    if(rotation != LV_DISPLAY_ROTATION_0) {
+    if(rotation != LV_ROTATION_0) {
         int32_t src_w;
         int32_t src_h;
         uint32_t src_stride;
@@ -540,7 +540,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         swap_buf = dsc->swap_line_buf && dsc->swap_line_buf_size >= line_bytes ? dsc->swap_line_buf : NULL;
     }
 
-    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
+    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_ROTATION_0) {
         uint32_t color_pos =
             (clipped_area.x1 - disp->offset_x) * px_size +
             (clipped_area.y1 - disp->offset_y) * disp->hor_res * px_size;

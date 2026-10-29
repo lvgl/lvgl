@@ -60,14 +60,14 @@ Widgets can be created in them.
 While the Top Layer and System Layer are created by their owning [Display (lv_display)](/main-modules/display)
 as not scroll-able and not click-able, these behaviors can be overridden the same
 as any other Widget by using <ApiLink name="lv_obj_set_scrollbar_mode" display="lv_obj_set_scrollbar_mode(scr1, LV_SCROLLBAR_MODE_xxx)" />
-and <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(scr1, LV_OBJ_FLAG_CLICKABLE)" /> respectively.
+and <ApiLink name="lv_obj_set_clickable" display="lv_obj_set_clickable(scr1, true)" /> respectively.
 </Callout>
 
 If the <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag is set on the Top Layer, then it will
 absorb all user clicks and acts as a modal Widget.
 
 ```c
-lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
+lv_obj_set_clickable(lv_layer_top(), true);
 ```
 
 ## Bottom Layer

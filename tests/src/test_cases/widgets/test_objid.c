@@ -28,19 +28,22 @@ void test_obj_id_should_grow_by_one(void)
     TEST_ASSERT_EQUAL(id1 + 1, id2);
 }
 
-void test_obj_id_get_child(void)
+void test_objid_builtin_destroy_resets_storage(void)
 {
-    lv_obj_t * parent = lv_obj_create(lv_screen_active());
-    lv_obj_t * child = lv_label_create(parent);
-    lv_obj_t * grandchild = lv_label_create(child);
+    lv_global_t * global = LV_GLOBAL_DEFAULT();
+    TEST_ASSERT_NOT_NULL(global->objid_array);
 
-    lv_obj_set_id(child, (void *)(lv_uintptr_t)42);
-    lv_obj_set_id(grandchild, (void *)(lv_uintptr_t)43);
+    lv_objid_builtin_destroy();
+    TEST_ASSERT_NULL(global->objid_array);
+    TEST_ASSERT_EQUAL_UINT32(0, global->objid_count);
 
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    TEST_ASSERT_EQUAL_PTR(child, lv_obj_find_by_id(NULL, (void *)(lv_uintptr_t)42));
-    TEST_ASSERT_EQUAL_PTR(grandchild, lv_obj_find_by_id(NULL, (void *)(lv_uintptr_t)43));
-    LV_DEPRECATIONS_IGNORE_END
+    /*Calling destroy repeatedly and assigning a new ID afterwards must be safe.*/
+    lv_objid_builtin_destroy();
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    TEST_ASSERT_NOT_NULL(global->objid_array);
+    TEST_ASSERT_EQUAL_UINT32(1, (lv_uintptr_t)obj->id);
+
+    lv_obj_delete(obj);
 }
 
 #endif

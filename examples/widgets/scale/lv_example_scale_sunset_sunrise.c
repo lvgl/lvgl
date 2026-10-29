@@ -3,14 +3,12 @@
 
 static void label_color_cb(lv_event_t * e)
 {
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    if(!draw_task) return;
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+    if(base_dsc->part != LV_PART_INDICATOR) return;
+    if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_LABEL) return;
 
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
-    if(!base_dsc || base_dsc->part != LV_PART_INDICATOR) return;
-
-    lv_draw_label_dsc_t * label_dsc = lv_draw_task_get_label_dsc(draw_task);
-    if(!label_dsc || !label_dsc->text) return;
+    lv_draw_label_dsc_t * label_dsc = lv_draw_dsc_get_label_dsc(base_dsc);
+    if(!label_dsc->text) return;
 
     const char * txt = label_dsc->text;
 
@@ -31,7 +29,7 @@ static void label_color_cb(lv_event_t * e)
  * `LV_SCALE_MODE_ROUND_OUTER` scale over the range 0 to 24 with a
  * full 360 degree sweep rotated to 105 degrees and 25 hourly ticks in
  * `lv_font_montserrat_12`. Labels `01` through `24` rotate to follow
- * the ticks while staying upright, and an `LV_EVENT_DRAW_TASK_ADDED`
+ * the ticks while staying upright, and an `LV_EVENT_DRAW_DSC_BEGIN`
  * callback whitens the `06`, `12`, `18`, and `24` labels while
  * greying the rest. Two sections colour the arc blue for 17 to 5
  * (night) and dark yellow for 5 to 17 (day). Inside the container,
@@ -107,8 +105,8 @@ void lv_example_scale_sunset_sunrise(void)
     };
     lv_scale_set_text_src(scale, hour_labels);
 
-    lv_obj_set_send_draw_task_events(scale, true);
-    lv_obj_add_event_cb(scale, label_color_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_set_send_draw_dsc_events(scale, true);
+    lv_obj_add_event_cb(scale, label_color_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
 
     lv_obj_t * today = lv_label_create(bg);
     lv_label_set_text(today, "TODAY");

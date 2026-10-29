@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation
-    url: https://docs.lvgl.io
+    url: https://lvgl.io/docs/open
     about: Be sure to read to documentation first
   - name: Forum
     url: https://forum.lvgl.io

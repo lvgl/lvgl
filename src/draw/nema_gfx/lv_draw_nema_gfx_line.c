@@ -39,7 +39,8 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_nema_gfx_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
+void lv_draw_nema_gfx_line(lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_line_dsc_t * dsc, void * user_data)
 {
     if(dsc->width == 0)
         return;
@@ -48,24 +49,23 @@ void lv_draw_nema_gfx_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     if(dsc->p1.x == dsc->p2.x && dsc->p1.y == dsc->p2.y)
         return;
 
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = user_data;
 
-    lv_layer_t * layer = t->target_layer;
-    lv_area_t clip_area;
-    clip_area.x1 = LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width / 2;
-    clip_area.x2 = LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width / 2;
-    clip_area.y1 = LV_MIN(dsc->p1.y, dsc->p2.y) - dsc->width / 2;
-    clip_area.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width / 2;
+    lv_area_t clip_line;
+    clip_line.x1 = LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width / 2;
+    clip_line.x2 = LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width / 2;
+    clip_line.y1 = LV_MIN(dsc->p1.y, dsc->p2.y) - dsc->width / 2;
+    clip_line.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width / 2;
 
-    if(!lv_area_intersect(&clip_area, &clip_area, &t->clip_area))
+    if(!lv_area_intersect(&clip_line, &clip_line, clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&clip_line, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_point_t point1 = {dsc->p1.x - layer->buf_area.x1, dsc->p1.y - layer->buf_area.y1};
     lv_point_t point2 = {dsc->p2.x - layer->buf_area.x1, dsc->p2.y - layer->buf_area.y1};
 
-    nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
+    nema_set_clip(clip_line.x1, clip_line.y1, lv_area_get_width(&clip_line), lv_area_get_height(&clip_line));
 
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
 

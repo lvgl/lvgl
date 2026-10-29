@@ -324,10 +324,10 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
     if(res > p->res) p->res = res;  /*Save only "stronger" results*/
 }
 
-lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
+lv_draw_dsc_t * lv_event_get_draw_dsc(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
-    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_DRAW_TASK_ADDED,
+    LV_CHECK_ARG_FORMAT_MSG(e->code == LV_EVENT_DRAW_DSC_BEGIN || e->code == LV_EVENT_DRAW_DSC_END,
                             return NULL,
                             "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
@@ -426,7 +426,8 @@ static bool event_is_bubbled(lv_event_t * e)
         case LV_EVENT_DRAW_POST_BEGIN:
         case LV_EVENT_DRAW_POST:
         case LV_EVENT_DRAW_POST_END:
-        case LV_EVENT_DRAW_TASK_ADDED:
+        case LV_EVENT_DRAW_DSC_BEGIN:
+        case LV_EVENT_DRAW_DSC_END:
         case LV_EVENT_REFRESH:
         case LV_EVENT_DELETE:
         case LV_EVENT_CHILD_CREATED:
@@ -458,7 +459,8 @@ static bool event_is_trickled(lv_event_t * e)
         case LV_EVENT_DRAW_POST_BEGIN:
         case LV_EVENT_DRAW_POST:
         case LV_EVENT_DRAW_POST_END:
-        case LV_EVENT_DRAW_TASK_ADDED:
+        case LV_EVENT_DRAW_DSC_BEGIN:
+        case LV_EVENT_DRAW_DSC_END:
         case LV_EVENT_REFRESH:
         case LV_EVENT_DELETE:
         case LV_EVENT_CHILD_CREATED:
