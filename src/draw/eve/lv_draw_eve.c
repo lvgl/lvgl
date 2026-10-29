@@ -117,6 +117,12 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     if(lv_draw_eve_unit_g == NULL || lv_draw_eve_unit_g->disp == NULL)
         return 0;
 
+    /*EVE draws on the display only. Tasks of child layers and the tasks that blend
+     *a layer are left to other draw units, so that lv_draw_layer_supported() is
+     *false with EVE alone and the layer effects are omitted instead of drawn flat*/
+    if(task->type == LV_DRAW_TASK_TYPE_LAYER || task->target_layer->parent != NULL)
+        return 0;
+
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_EVE;
