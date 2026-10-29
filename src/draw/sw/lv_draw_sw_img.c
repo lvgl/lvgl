@@ -21,8 +21,6 @@
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
     #include "arm2d/lv_draw_sw_helium.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
-    #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 #endif
 
 /*********************
@@ -349,7 +347,7 @@ static void recolor_only(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_ds
     if(buf_stride == 0) {
         buf_stride = 1;
     }
-    buf_h = max_buf_size(t->target_layer) / buf_stride;
+    buf_h = max_buf_size(layer) / buf_stride;
     buf_h = LV_CLAMP(1, buf_h, blend_h);
     tmp_buf = lv_malloc(buf_stride * buf_h);
     LV_ASSERT_MALLOC(tmp_buf);
@@ -450,23 +448,27 @@ static void transform_and_recolor(lv_layer_t * layer, const lv_draw_image_dsc_t 
     int32_t buf_h;
     if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
         uint32_t buf_stride = blend_w * 3;
-        buf_h = max_buf_size(t->target_layer) / buf_stride;
+        buf_h = max_buf_size(layer) / buf_stride;
         buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     else if(cf_final == LV_COLOR_FORMAT_AL88) {
         uint32_t buf_stride = blend_w;
-        buf_h = max_buf_size(t->target_layer) / (buf_stride * 2);
+        buf_h = max_buf_size(layer) / (buf_stride * 2);
         buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h * 2);
     }
     else {
         uint32_t buf_stride = blend_w * lv_color_format_get_size(cf_final);
-        buf_h = max_buf_size(t->target_layer) / buf_stride;
+        buf_h = max_buf_size(layer) / buf_stride;
         buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     LV_ASSERT_MALLOC(transformed_buf);
+    if(!transformed_buf) {
+        LV_LOG_WARN("failed to allocate buffer for transformation");
+        return;
+    }
 
     blend_dsc.src_buf = transformed_buf;
     blend_dsc.src_color_format = cf_final;

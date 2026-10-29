@@ -146,7 +146,7 @@ void lv_demo_widgets_profile_create(lv_obj_t * parent)
     lv_obj_t * slider1 = lv_slider_create(panel3);
     lv_obj_set_width(slider1, LV_PCT(95));
     lv_obj_add_event_cb(slider1, slider_event_cb, LV_EVENT_ALL, NULL);
-    lv_obj_set_send_draw_task_events(slider1, true);
+    lv_obj_set_send_draw_dsc_events(slider1, true);
     lv_obj_refresh_ext_draw_size(slider1);
 
     lv_obj_t * team_player_label = lv_label_create(panel3);
@@ -448,12 +448,14 @@ static void slider_event_cb(lv_event_t * e)
         int32_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, 60);
     }
-    else if(code == LV_EVENT_DRAW_TASK_ADDED) {
-        lv_draw_task_t * draw_task = lv_event_get_param(e);
-        if(draw_task == NULL || lv_draw_task_get_type(draw_task) != LV_DRAW_TASK_TYPE_FILL) return;
-        lv_draw_rect_dsc_t * draw_rect_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    else if(code == LV_EVENT_DRAW_DSC_END) {
+        /*Draw the value above the knob, on top of it*/
+        lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+        if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_FILL) {
+            return;
+        }
 
-        if(draw_rect_dsc->base.part == LV_PART_KNOB && lv_obj_has_state(obj, LV_STATE_PRESSED)) {
+        if(base_dsc->part == LV_PART_KNOB && lv_obj_has_state(obj, LV_STATE_PRESSED)) {
             char buf[8];
             lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_slider_get_value(obj));
 
@@ -461,11 +463,11 @@ static void slider_event_cb(lv_event_t * e)
             lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t txt_area;
-            lv_area_t draw_task_area;
-            lv_draw_task_get_area(draw_task, &draw_task_area);
-            txt_area.x1 = draw_task_area.x1 + lv_area_get_width(&draw_task_area) / 2 - text_size.x / 2;
+            lv_draw_fill_dsc_t * fill_dsc = lv_draw_dsc_get_fill_dsc(base_dsc);
+            lv_area_t knob_area = fill_dsc->coords;
+            txt_area.x1 = knob_area.x1 + lv_area_get_width(&knob_area) / 2 - text_size.x / 2;
             txt_area.x2 = txt_area.x1 + text_size.x;
-            txt_area.y2 = draw_task_area.y1 - 10;
+            txt_area.y2 = knob_area.y1 - 10;
             txt_area.y1 = txt_area.y2 - text_size.y;
 
             lv_area_t bg_area;
@@ -478,7 +480,7 @@ static void slider_event_cb(lv_event_t * e)
             lv_draw_rect_dsc_init(&rect_dsc);
             rect_dsc.bg_color = lv_palette_darken(LV_PALETTE_GREY, 3);
             rect_dsc.radius = LV_DPX(5);
-            lv_draw_rect(draw_rect_dsc->base.layer, &rect_dsc, &bg_area);
+            lv_draw_rect(base_dsc->layer, &rect_dsc, &bg_area);
 
             lv_draw_label_dsc_t label_dsc;
             lv_draw_label_dsc_init(&label_dsc);
@@ -486,7 +488,7 @@ static void slider_event_cb(lv_event_t * e)
             label_dsc.font = font_normal;
             label_dsc.text = buf;
             label_dsc.text_local = 1;
-            lv_draw_label(draw_rect_dsc->base.layer, &label_dsc, &txt_area);
+            lv_draw_label(base_dsc->layer, &label_dsc, &txt_area);
         }
     }
 }

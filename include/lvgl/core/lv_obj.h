@@ -69,7 +69,7 @@ typedef enum {
     LV_OBJ_FLAG_ADV_HITTEST     = (1u << 16), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners.*/
     LV_OBJ_FLAG_IGNORE_LAYOUT   = (1u << 17), /**< Make the object not positioned by the layouts*/
     LV_OBJ_FLAG_FLOATING        = (1u << 18), /**< Do not scroll the object when the parent scrolls and ignore layout*/
-    LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS = (1u << 19), /**< Send `LV_EVENT_DRAW_TASK_ADDED` events*/
+    LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS = (1u << 19), /**< Send `LV_EVENT_DRAW_DSC_BEGIN/END` events*/
     LV_OBJ_FLAG_OVERFLOW_VISIBLE = (1u << 20),/**< Do not clip the children to the parent's ext draw size*/
     LV_OBJ_FLAG_EVENT_TRICKLE   = (1u << 21), /**< Propagate the events to the children too*/
     LV_OBJ_FLAG_STATE_TRICKLE   = (1u << 22), /**< Propagate the states to the children too*/
@@ -111,7 +111,7 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, FLAG_ADV_HITTEST,           LV_PROPERTY_TYPE_INT,       16),
     LV_PROPERTY_ID(OBJ, FLAG_IGNORE_LAYOUT,         LV_PROPERTY_TYPE_INT,       17),
     LV_PROPERTY_ID(OBJ, FLAG_FLOATING,              LV_PROPERTY_TYPE_INT,       18),
-    LV_PROPERTY_ID(OBJ, FLAG_SEND_DRAW_TASK_EVENTS, LV_PROPERTY_TYPE_INT,       19),
+    LV_PROPERTY_ID(OBJ, FLAG_SEND_DRAW_DSC_EVENTS,  LV_PROPERTY_TYPE_INT,       19),
     LV_PROPERTY_ID(OBJ, FLAG_OVERFLOW_VISIBLE,      LV_PROPERTY_TYPE_INT,       20),
     LV_PROPERTY_ID(OBJ, FLAG_EVENT_TRICKLE,         LV_PROPERTY_TYPE_INT,       21),
     LV_PROPERTY_ID(OBJ, FLAG_STATE_TRICKLE,         LV_PROPERTY_TYPE_INT,       22),
@@ -194,14 +194,14 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, ADV_HITTEST,                LV_PROPERTY_TYPE_BOOL,      90),
     LV_PROPERTY_ID(OBJ, IGNORE_LAYOUT,              LV_PROPERTY_TYPE_BOOL,      91),
     LV_PROPERTY_ID(OBJ, FLOATING,                   LV_PROPERTY_TYPE_BOOL,      92),
-    LV_PROPERTY_ID(OBJ, SEND_DRAW_TASK_EVENTS,      LV_PROPERTY_TYPE_BOOL,      93),
+    LV_PROPERTY_ID(OBJ, SEND_DRAW_DSC_EVENTS,       LV_PROPERTY_TYPE_BOOL,      93),
     LV_PROPERTY_ID(OBJ, OVERFLOW_VISIBLE,           LV_PROPERTY_TYPE_BOOL,      94),
     LV_PROPERTY_ID(OBJ, EVENT_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      95),
     LV_PROPERTY_ID(OBJ, STATE_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      96),
     LV_PROPERTY_ID(OBJ, FLEX_IN_NEW_TRACK,          LV_PROPERTY_TYPE_BOOL,      97),
 
 #if LV_USE_OBJ_NAME
-    LV_PROPERTY_ID(OBJ, NAME,               		LV_PROPERTY_TYPE_TEXT,  	98),
+    LV_PROPERTY_ID(OBJ, NAME,                       LV_PROPERTY_TYPE_TEXT,      98),
 #endif
 
     LV_PROPERTY_OBJ_END,
@@ -349,11 +349,11 @@ void lv_obj_set_ignore_layout(lv_obj_t * obj, bool en);
  */
 void lv_obj_set_floating(lv_obj_t * obj, bool en);
 
-/** Send LV_EVENT_DRAW_TASK_ADDED events
+/** Send LV_EVENT_DRAW_DSC_BEGIN and LV_EVENT_DRAW_DSC_END events
  * @param obj     pointer to a widget
- * @param en      enable or disable draw task events
+ * @param en      enable or disable draw descriptor events
  */
-void lv_obj_set_send_draw_task_events(lv_obj_t * obj, bool en);
+void lv_obj_set_send_draw_dsc_events(lv_obj_t * obj, bool en);
 
 /** Do not clip the children to the parent's extended draw size
  * @param obj     pointer to a widget
@@ -620,11 +620,11 @@ bool lv_obj_is_ignore_layout(const lv_obj_t * obj);
  */
 bool lv_obj_is_floating(const lv_obj_t * obj);
 
-/** Get whether draw task events are sent
+/** Get whether draw descriptor events are sent
  * @param obj     pointer to a widget
- * @return        true if draw task events are enabled
+ * @return        true if draw descriptor events are enabled
  */
-bool lv_obj_is_send_draw_task_events(const lv_obj_t * obj);
+bool lv_obj_is_send_draw_dsc_events(const lv_obj_t * obj);
 
 /** Get whether overflow is visible outside the parent
  * @param obj     pointer to a widget

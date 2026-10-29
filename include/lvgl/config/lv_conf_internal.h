@@ -1207,6 +1207,30 @@
     #endif
 #endif
 
+#ifndef LV_USE_DRAW_IPA
+    #ifdef CONFIG_LV_USE_DRAW_IPA
+        #define LV_USE_DRAW_IPA CONFIG_LV_USE_DRAW_IPA
+    #else
+        #define LV_USE_DRAW_IPA 0
+    #endif
+#endif
+
+#ifndef LV_DRAW_IPA_HAL_INCLUDE
+    #ifdef CONFIG_LV_DRAW_IPA_HAL_INCLUDE
+        #define LV_DRAW_IPA_HAL_INCLUDE CONFIG_LV_DRAW_IPA_HAL_INCLUDE
+    #else
+        #define LV_DRAW_IPA_HAL_INCLUDE "gd32h7xx.h"
+    #endif
+#endif
+
+#ifndef LV_USE_DRAW_IPA_INTERRUPT
+    #ifdef CONFIG_LV_USE_DRAW_IPA_INTERRUPT
+        #define LV_USE_DRAW_IPA_INTERRUPT CONFIG_LV_USE_DRAW_IPA_INTERRUPT
+    #else
+        #define LV_USE_DRAW_IPA_INTERRUPT 0
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SDL
     #ifdef CONFIG_LV_USE_DRAW_SDL
         #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
@@ -4880,6 +4904,8 @@
 #endif
 
 /* Optional user headers (LV_*_USE_CUSTOM_INCLUDE) overriding config macros. */
+#ifndef __ASSEMBLY__
+
 #if LV_OS_USE_CUSTOM_INCLUDE
     #include LV_OS_CUSTOM_INCLUDE
 #endif
@@ -4907,6 +4933,8 @@
 #if LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
     #include LV_ATTRIBUTE_CUSTOM_INCLUDE
 #endif
+
+#endif /*__ASSEMBLY__*/
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
@@ -5109,6 +5137,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_G2D_ASSERT && !(LV_USE_DRAW_G2D && LV_USE_DRAW_G2D)
     #error "LV_USE_G2D_ASSERT requires LV_USE_DRAW_G2D && LV_USE_DRAW_G2D (Kconfig depends on)"
+#endif
+
+#if LV_USE_DRAW_IPA_INTERRUPT && !(LV_USE_OS == LV_OS_FREERTOS && LV_USE_DRAW_IPA)
+    #error "LV_USE_DRAW_IPA_INTERRUPT requires LV_USE_OS == LV_OS_FREERTOS && LV_USE_DRAW_IPA (Kconfig depends on)"
 #endif
 
 #if (LV_SDL_BACKEND == LV_SDL_BACKEND_TEXTURE) && !LV_USE_DRAW_SDL

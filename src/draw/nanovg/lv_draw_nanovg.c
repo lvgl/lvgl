@@ -171,63 +171,63 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     lv_nanovg_set_clip_area(u->vg, &t->clip_area);
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             lv_draw_nanovg_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BORDER:
             lv_draw_nanovg_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
             lv_draw_nanovg_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_LETTER:
+        case LV_DRAW_DSC_TYPE_LETTER:
             lv_draw_nanovg_letter(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_LABEL:
             lv_draw_nanovg_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             lv_draw_nanovg_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area, -1);
             break;
 
-        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LAYER:
             lv_draw_nanovg_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_LINE:
             lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_nanovg_line, t->draw_unit);
             break;
 
-        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_ARC:
             lv_draw_nanovg_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
             lv_draw_nanovg_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
             lv_draw_nanovg_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 
 #if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_TASK_TYPE_VECTOR:
+        case LV_DRAW_DSC_TYPE_VECTOR:
             lv_draw_nanovg_vector(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 #endif
 
 #if LV_USE_3DTEXTURE
-        case LV_DRAW_TASK_TYPE_3D:
+        case LV_DRAW_DSC_TYPE_3D:
             lv_draw_nanovg_3d(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 #endif
 
-        case LV_DRAW_TASK_TYPE_BLUR:
+        case LV_DRAW_DSC_TYPE_BLUR:
             lv_draw_nanovg_blur(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
 
@@ -462,26 +462,26 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     switch(task->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
-        case LV_DRAW_TASK_TYPE_BORDER:
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-        case LV_DRAW_TASK_TYPE_LETTER:
-        case LV_DRAW_TASK_TYPE_LABEL:
-        case LV_DRAW_TASK_TYPE_IMAGE:
-        case LV_DRAW_TASK_TYPE_LAYER:
-        case LV_DRAW_TASK_TYPE_LINE:
-        case LV_DRAW_TASK_TYPE_ARC:
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+        case LV_DRAW_DSC_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
+        case LV_DRAW_DSC_TYPE_LETTER:
+        case LV_DRAW_DSC_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
 #if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_TASK_TYPE_VECTOR:
+        case LV_DRAW_DSC_TYPE_VECTOR:
 #endif
 #if LV_USE_3DTEXTURE
-        case LV_DRAW_TASK_TYPE_3D:
+        case LV_DRAW_DSC_TYPE_3D:
 #endif
             break;
 
-        case LV_DRAW_TASK_TYPE_BLUR:
+        case LV_DRAW_DSC_TYPE_BLUR:
             /* Only accept blur if FBO support is available (blur_state was created) */
             if(u->blur_state == NULL) return 0;
             break;

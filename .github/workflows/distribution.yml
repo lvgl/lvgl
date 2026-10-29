@@ -35,7 +35,6 @@ jobs:
                                   pkg-config \
                                   python3-kconfiglib \
                                   libwebp-dev \
-                                  libevdev-dev \
                                   libdrm-dev \
                                   libgbm-dev \
                                   wayland-protocols \

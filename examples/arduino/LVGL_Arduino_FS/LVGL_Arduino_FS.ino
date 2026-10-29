@@ -1,5 +1,5 @@
 /*Using LVGL with Arduino requires some extra steps:
- *Be sure to read the docs here: https://docs.lvgl.io/master/integration/framework/arduino.html  */
+ *Be sure to read the docs here: https://lvgl.io/docs/open/integration/frameworks/arduino  */
 
 #include <lvgl.h>
 

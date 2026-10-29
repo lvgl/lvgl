@@ -27,7 +27,10 @@ extern "C" {
  **********************/
 
 struct _lv_draw_image_dsc_t {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
+
+    /**The area to draw*/
+    lv_area_t coords;
 
     /**The image source: pointer to `lv_image_dsc_t` or a path to a file*/
     const void * src;
@@ -127,9 +130,17 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc);
 /**
  * Try to get an image draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_IMAGE
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_IMAGE
  */
 lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task);
+
+/**
+ * Get the image draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_IMAGE, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the image draw descriptor
+ */
+lv_draw_image_dsc_t * lv_draw_dsc_get_image_dsc(lv_draw_dsc_t * dsc);
 
 /**
  * Create an image draw task

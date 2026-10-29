@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 
 #if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES
-#include "../../../lvgl_private.h"
 
 static void hook_division_lines(lv_event_t * e);
 static void add_faded_area(lv_event_t * e);
@@ -13,11 +12,11 @@ static void draw_event_cb(lv_event_t * e);
  *
  * A 200x150 `LV_CHART_TYPE_LINE` chart with 10 points uses
  * `lv_chart_set_div_line_count` to draw 5 horizontal and 7 vertical
- * division lines. With `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` enabled, the
- * `LV_EVENT_DRAW_TASK_ADDED` callback intercepts `LV_PART_ITEMS` line
- * tasks and fills each segment below the polyline with an
+ * division lines. With `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` enabled, the
+ * `LV_EVENT_DRAW_DSC_BEGIN` callback intercepts `LV_PART_ITEMS` lines
+ * and fills each segment below the polyline with an
  * `lv_draw_triangle` and `lv_draw_rect` pair using a vertical gradient
- * in the series color. `LV_PART_MAIN` line tasks are recolored and
+ * in the series color. `LV_PART_MAIN` lines are recolored and
  * dashed to highlight specific grid indices.
  */
 void lv_example_chart_area_gradient(void)
@@ -32,8 +31,8 @@ void lv_example_chart_area_gradient(void)
 
     lv_chart_set_div_line_count(chart, 5, 7);
 
-    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
+    lv_obj_set_send_draw_dsc_events(chart, true);
 
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
 
@@ -45,15 +44,14 @@ void lv_example_chart_area_gradient(void)
 
 static void draw_event_cb(lv_event_t * e)
 {
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
 
-    if(base_dsc->part == LV_PART_ITEMS && lv_draw_task_get_type(draw_task) == LV_DRAW_TASK_TYPE_LINE) {
+    if(base_dsc->part == LV_PART_ITEMS && lv_draw_dsc_get_type(base_dsc) == LV_DRAW_DSC_TYPE_LINE) {
         add_faded_area(e);
 
     }
     /*Hook the division lines too*/
-    if(base_dsc->part == LV_PART_MAIN && lv_draw_task_get_type(draw_task) == LV_DRAW_TASK_TYPE_LINE) {
+    if(base_dsc->part == LV_PART_MAIN && lv_draw_dsc_get_type(base_dsc) == LV_DRAW_DSC_TYPE_LINE) {
         hook_division_lines(e);
     }
 }
@@ -64,14 +62,13 @@ static void add_faded_area(lv_event_t * e)
     lv_area_t coords;
     lv_obj_get_coords(obj, &coords);
 
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
 
     const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
     lv_color_t ser_color = lv_chart_get_series_color(obj, ser);
 
     /*Draw a triangle below the line witch some opacity gradient*/
-    lv_draw_line_dsc_t * draw_line_dsc = lv_draw_task_get_line_dsc(draw_task);
+    lv_draw_line_dsc_t * draw_line_dsc = lv_draw_dsc_get_line_dsc(base_dsc);
     lv_draw_triangle_dsc_t tri_dsc;
     lv_draw_triangle_dsc_init(&tri_dsc);
 
@@ -132,9 +129,8 @@ static void add_faded_area(lv_event_t * e)
 
 static void hook_division_lines(lv_event_t * e)
 {
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
-    lv_draw_line_dsc_t * line_dsc = (lv_draw_line_dsc_t *)lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+    lv_draw_line_dsc_t * line_dsc = lv_draw_dsc_get_line_dsc(base_dsc);
 
     /*Vertical line*/
     if(line_dsc->p1.x == line_dsc->p2.x) {

@@ -32,6 +32,7 @@ void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
 void test_font_loader_kern_class_out_of_range(void);
 void test_font_loader_kern_mapping_shorter_than_glyphs(void);
+void test_font_loader_truncated(void);
 void test_font_loader_dynamic_from_buffer(void);
 
 /**********************
@@ -278,6 +279,18 @@ void test_font_loader_kern_mapping_shorter_than_glyphs(void)
     TEST_ASSERT_NULL(lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf)));
 
     lv_free(buf);
+}
+
+void test_font_loader_truncated(void)
+{
+    const char * path = "A:src/test_assets/test_font_truncated.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
 }
 
 void test_font_loader_reload(void)

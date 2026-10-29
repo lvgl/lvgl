@@ -31,7 +31,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void draw_task_added_event_cb(lv_event_t * e);
+static void draw_dsc_begin_event_cb(lv_event_t * e);
 
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
 static uint8_t get_month_length(int32_t year, int32_t month);
@@ -366,11 +366,11 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->btnm = lv_buttonmatrix_create(obj);
     lv_buttonmatrix_set_map(calendar->btnm, calendar->map);
     lv_buttonmatrix_set_button_ctrl_all(calendar->btnm, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT);
-    lv_obj_add_event_cb(calendar->btnm, draw_task_added_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(calendar->btnm, draw_dsc_begin_event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
     lv_obj_set_width(calendar->btnm, lv_pct(100));
 
     lv_obj_set_event_bubble(calendar->btnm, true);
-    lv_obj_set_send_draw_task_events(calendar->btnm, true);
+    lv_obj_set_send_draw_dsc_events(calendar->btnm, true);
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);
@@ -381,24 +381,27 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_calendar_set_today_date(obj, 2024, 1, 1);
 }
 
-static void draw_task_added_event_cb(lv_event_t * e)
+static void draw_dsc_begin_event_cb(lv_event_t * e)
 {
     LV_ASSERT(e != NULL);
     lv_obj_t * obj = lv_event_get_current_target(e);
-    lv_draw_task_t * draw_task = lv_event_get_param(e);
+    lv_draw_dsc_t * draw_dsc = lv_event_get_draw_dsc(e);
 
     LV_ASSERT(obj != NULL);
-    LV_ASSERT(draw_task != NULL);
-    if(((lv_draw_dsc_base_t *)draw_task->draw_dsc)->part != LV_PART_ITEMS) return;
+    LV_ASSERT(draw_dsc != NULL);
+    if(draw_dsc->part != LV_PART_ITEMS) return;
 
-    lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
-    lv_draw_border_dsc_t * border_draw_dsc = lv_draw_task_get_border_dsc(draw_task);
+    lv_draw_dsc_type_t type = lv_draw_dsc_get_type(draw_dsc);
+    lv_draw_fill_dsc_t * fill_draw_dsc = NULL;
+    lv_draw_border_dsc_t * border_draw_dsc = NULL;
+    if(type == LV_DRAW_DSC_TYPE_FILL) fill_draw_dsc = lv_draw_dsc_get_fill_dsc(draw_dsc);
+    else if(type == LV_DRAW_DSC_TYPE_BORDER) border_draw_dsc = lv_draw_dsc_get_border_dsc(draw_dsc);
 
     if(!fill_draw_dsc && !border_draw_dsc) {
         return;
     }
 
-    int32_t id = ((lv_draw_dsc_base_t *)draw_task->draw_dsc)->id1;
+    int32_t id = draw_dsc->id1;
 
     /*Day name styles*/
     if(id < 7) {

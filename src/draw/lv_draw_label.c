@@ -90,7 +90,23 @@ lv_draw_label_dsc_t * lv_draw_task_get_label_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_LABEL ? (lv_draw_label_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_LABEL ? (lv_draw_label_dsc_t *)task->draw_dsc : NULL;
+}
+
+lv_draw_label_dsc_t * lv_draw_dsc_get_label_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_LABEL, return NULL);
+
+    return (lv_draw_label_dsc_t *)dsc;
+}
+
+lv_draw_letter_dsc_t * lv_draw_dsc_get_letter_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_LETTER, return NULL);
+
+    return (lv_draw_letter_dsc_t *)dsc;
 }
 
 void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc)
@@ -129,7 +145,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
     }
 
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LABEL);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_LABEL);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -219,7 +240,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
     dsc->pivot.x = g.adv_w / 2 ;
     dsc->pivot.y = font->line_height - font->base_line;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LETTER);
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_DSC_TYPE_LETTER);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -236,7 +262,7 @@ void lv_draw_label_iterate_characters(lv_layer_t * layer, const lv_area_t * clip
     LV_CHECK_ARG(dsc != NULL, return);
     LV_CHECK_ARG(coords != NULL, return);
 
-    const lv_draw_dsc_base_t * base_dsc = &dsc->base;
+    const lv_draw_dsc_t * base_dsc = &dsc->base;
     const lv_font_t * font = dsc->font;
     int32_t w;
 
@@ -255,7 +281,7 @@ void lv_draw_label_iterate_characters(lv_layer_t * layer, const lv_area_t * clip
     }
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
-        if(base_dsc->obj && !lv_obj_is_send_draw_task_events(base_dsc->obj)) {
+        if(base_dsc->obj && !lv_obj_is_send_draw_dsc_events(base_dsc->obj)) {
             w = dsc->text_size.x;
         }
         else {

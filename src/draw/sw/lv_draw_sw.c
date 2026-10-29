@@ -24,8 +24,6 @@
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
     #include "arm2d/lv_draw_sw_helium.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
-    #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 #endif
 
 #if LV_DRAW_SW_DRAW_UNIT_CNT > 1 && LV_USE_OS == LV_OS_NONE
@@ -225,8 +223,8 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     LV_UNUSED(draw_unit);
 
     switch(task->type) {
-        case LV_DRAW_TASK_TYPE_IMAGE:
-        case LV_DRAW_TASK_TYPE_LAYER: {
+        case LV_DRAW_DSC_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_LAYER: {
                 lv_draw_image_dsc_t * draw_dsc = task->draw_dsc;
 
                 /* not support skew */
@@ -247,7 +245,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             }
             break;
 #if LV_USE_3DTEXTURE
-        case LV_DRAW_TASK_TYPE_3D:
+        case LV_DRAW_DSC_TYPE_3D:
             return 0;
 #endif
         default:
@@ -413,44 +411,44 @@ static void execute_drawing(lv_draw_task_t * t)
     LV_PROFILER_DRAW_BEGIN;
     /*Render the draw task*/
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             lv_draw_sw_fill(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BORDER:
             lv_draw_sw_border(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
             lv_draw_sw_box_shadow(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LETTER:
+        case LV_DRAW_DSC_TYPE_LETTER:
             lv_draw_sw_letter(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_LABEL:
             lv_draw_sw_label(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             lv_draw_sw_image(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_ARC:
             lv_draw_sw_arc(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_LINE:
             lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_sw_line, NULL);
             break;
-        case LV_DRAW_TASK_TYPE_BLUR:
+        case LV_DRAW_DSC_TYPE_BLUR:
             lv_draw_sw_blur(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
             lv_draw_sw_triangle(t->target_layer, &t->clip_area, t->draw_dsc);
             break;
-        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LAYER:
             lv_draw_sw_layer(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
             lv_draw_sw_mask_rect(t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-        case LV_DRAW_TASK_TYPE_VECTOR:
+        case LV_DRAW_DSC_TYPE_VECTOR:
             lv_draw_sw_vector(t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 #endif
@@ -466,7 +464,7 @@ static void execute_drawing(lv_draw_task_t * t)
 static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
 {
     /*Layers manage it for themselves*/
-    if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
+    if(t->type != LV_DRAW_DSC_TYPE_LAYER) {
         lv_area_t draw_area;
         lv_text_attributes_t attributes = {0};
 

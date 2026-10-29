@@ -145,44 +145,44 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
     }
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_LETTER:
+        case LV_DRAW_DSC_TYPE_LETTER:
             lv_draw_vg_lite_letter(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_LABEL:
             lv_draw_vg_lite_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_FILL:
             lv_draw_vg_lite_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BORDER:
             lv_draw_vg_lite_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
             lv_draw_vg_lite_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BLUR:
+        case LV_DRAW_DSC_TYPE_BLUR:
             lv_draw_vg_lite_blur(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_DSC_TYPE_IMAGE:
             lv_draw_vg_lite_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area, false);
             break;
-        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_ARC:
             lv_draw_vg_lite_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_LINE:
             lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_vg_lite_line, t->draw_unit);
             break;
-        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LAYER:
             lv_draw_vg_lite_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
             lv_draw_vg_lite_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
             lv_draw_vg_lite_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 #if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_TASK_TYPE_VECTOR:
+        case LV_DRAW_DSC_TYPE_VECTOR:
             lv_draw_vg_lite_vector(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
             break;
 #endif
@@ -241,38 +241,38 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     LV_UNUSED(draw_unit);
 
     /* Return if target buffer format is not supported. */
-    const lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
+    const lv_draw_dsc_t * base_dsc = task->draw_dsc;
     if(!lv_vg_lite_is_dest_cf_supported(base_dsc->layer->color_format)) {
         return -1;
     }
 
     switch(task->type) {
-        case LV_DRAW_TASK_TYPE_LETTER:
-        case LV_DRAW_TASK_TYPE_LABEL:
-        case LV_DRAW_TASK_TYPE_FILL:
-        case LV_DRAW_TASK_TYPE_BORDER:
-        case LV_DRAW_TASK_TYPE_BLUR:
+        case LV_DRAW_DSC_TYPE_LETTER:
+        case LV_DRAW_DSC_TYPE_LABEL:
+        case LV_DRAW_DSC_TYPE_FILL:
+        case LV_DRAW_DSC_TYPE_BORDER:
+        case LV_DRAW_DSC_TYPE_BLUR:
 #if LV_VG_LITE_USE_BOX_SHADOW
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
 #endif
-        case LV_DRAW_TASK_TYPE_LAYER:
-        case LV_DRAW_TASK_TYPE_LINE:
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+        case LV_DRAW_DSC_TYPE_LAYER:
+        case LV_DRAW_DSC_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
 
 #if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_TASK_TYPE_VECTOR:
+        case LV_DRAW_DSC_TYPE_VECTOR:
 #endif
             break;
 
-        case LV_DRAW_TASK_TYPE_ARC: {
+        case LV_DRAW_DSC_TYPE_ARC: {
                 if(!check_arc_is_supported(task->draw_dsc)) {
                     return 0;
                 }
             }
             break;
 
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 if(!check_image_is_supported(task->draw_dsc)) {
                     return 0;
                 }

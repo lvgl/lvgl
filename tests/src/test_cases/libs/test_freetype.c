@@ -325,6 +325,33 @@ void test_freetype_no_kerning_info(void)
     lv_freetype_font_delete(font);
 }
 
+void test_freetype_face_index(void)
+{
+    lv_font_info_t font_info;
+    lv_freetype_init_font_info(&font_info);
+    font_info.name = "./src/test_files/fonts/Montserrat-Collection.ttc";
+    font_info.size = 24;
+
+    lv_font_t * font_face0 = lv_freetype_font_create_with_info(&font_info);
+    TEST_ASSERT_NOT_NULL(font_face0);
+
+    lv_font_info_t font_info_face1 = font_info;
+    font_info_face1.face_index = 1;
+    TEST_ASSERT_FALSE(lv_font_info_is_equal(&font_info, &font_info_face1));
+
+    font_info.face_index = 1;
+    lv_font_t * font_face1 = lv_freetype_font_create_with_info(&font_info);
+    TEST_ASSERT_NOT_NULL(font_face1);
+    TEST_ASSERT_NOT_EQUAL(lv_font_get_glyph_width(font_face0, 'W', 0),
+                          lv_font_get_glyph_width(font_face1, 'W', 0));
+
+    font_info.face_index = 2;
+    TEST_ASSERT_NULL(lv_freetype_font_create_with_info(&font_info));
+
+    lv_freetype_font_delete(font_face0);
+    lv_freetype_font_delete(font_face1);
+}
+
 #else
 
 void setUp(void)
@@ -352,6 +379,10 @@ void test_freetype_kerning_scalable_sizes(void)
 }
 
 void test_freetype_no_kerning_info(void)
+{
+}
+
+void test_freetype_face_index(void)
 {
 }
 

@@ -24,13 +24,13 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const lv_draw_dsc_base_t * base_dsc);
-static lv_color_t normal_apply_layer_recolor(const lv_obj_t * obj, lv_part_t part,  const lv_draw_dsc_base_t * base_dsc,
+static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const lv_draw_dsc_t * base_dsc);
+static lv_color_t normal_apply_layer_recolor(const lv_obj_t * obj, lv_part_t part,  const lv_draw_dsc_t * base_dsc,
                                              lv_color_t color);
 static lv_color32_t image_apply_layer_recolor(const lv_obj_t * obj, lv_part_t part,
-                                              const lv_draw_dsc_base_t * base_dsc, lv_color_t color, lv_opa_t opa);
+                                              const lv_draw_dsc_t * base_dsc, lv_color_t color, lv_opa_t opa);
 
-static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_base_t * base_dsc);
+static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_t * base_dsc);
 
 static void set_ext_draw_size_event_cb(lv_event_t * e);
 
@@ -373,6 +373,9 @@ void lv_obj_set_ext_draw_size(lv_obj_t * obj, int32_t size)
 
     lv_obj_remove_event_cb(obj, set_ext_draw_size_event_cb);
     lv_obj_add_event_cb(obj, set_ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, (void *)(lv_uintptr_t)size);
+
+    lv_obj_invalidate(obj);
+    lv_obj_refresh_ext_draw_size(obj);
 }
 
 int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
@@ -469,7 +472,7 @@ lv_layer_type_t lv_obj_get_layer_type(const lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const lv_draw_dsc_base_t * base_dsc)
+static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const lv_draw_dsc_t * base_dsc)
 {
     if(base_dsc->layer) {
         /* Accessing the layer opa directly is faster than using get style opa recursive */
@@ -485,7 +488,7 @@ static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const
 }
 
 
-static lv_color_t normal_apply_layer_recolor(const lv_obj_t * obj, lv_part_t part,  const lv_draw_dsc_base_t * base_dsc,
+static lv_color_t normal_apply_layer_recolor(const lv_obj_t * obj, lv_part_t part,  const lv_draw_dsc_t * base_dsc,
                                              lv_color_t color)
 {
     lv_color32_t recolor;
@@ -505,7 +508,7 @@ static lv_color_t normal_apply_layer_recolor(const lv_obj_t * obj, lv_part_t par
 
 
 static lv_color32_t image_apply_layer_recolor(const lv_obj_t * obj, lv_part_t part,
-                                              const lv_draw_dsc_base_t * base_dsc, lv_color_t color, lv_opa_t opa)
+                                              const lv_draw_dsc_t * base_dsc, lv_color_t color, lv_opa_t opa)
 {
     lv_color32_t recolor;
 
@@ -530,7 +533,7 @@ static lv_color32_t image_apply_layer_recolor(const lv_obj_t * obj, lv_part_t pa
     }
 }
 
-static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_base_t * base_dsc)
+static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_t * base_dsc)
 {
     base_dsc->drop_shadow_opa = lv_obj_get_style_drop_shadow_opa_internal(obj, part);
     if(base_dsc->drop_shadow_opa) {

@@ -111,8 +111,9 @@ labels. `transform_rotation` on the indicator tilts every label (units of
 ## Drawing customisations
 
 Style attributes can colour ticks and labels uniformly, but per-tick or
-per-label customisation needs a draw event. The scale emits
-<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> once per draw task; for label tasks
+per-label customisation needs a draw event. With
+<ApiLink name="LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS" /> set, the scale emits
+<ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" /> once per draw descriptor; for labels
 `base_dsc->id1` and `id2` carry the tick index and tick value, which is
 enough to mutate the label text or recolour individual entries:
 
@@ -214,7 +215,7 @@ Only integer subjects are supported.
 
 ## Events
 
-In <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> events, a major or minor line
+In <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" /> and <ApiLink name="LV_EVENT_DRAW_DSC_END" /> events, a major or minor line
 draw descriptor's members `id1` and `id2` will be the tick index and
 tick value, respectively. If the part is <ApiLink name="LV_PART_INDICATOR" />,
 it is a major tick. If the part is <ApiLink name="LV_PART_ITEMS" /> it is a

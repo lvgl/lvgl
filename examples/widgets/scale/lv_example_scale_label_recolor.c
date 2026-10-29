@@ -1,16 +1,14 @@
 #include "../../lv_examples.h"
 #if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
-#include "../../../lvgl_private.h" /*To expose the fields of lv_draw_task_t*/
 
 static void draw_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target_obj(e);
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
-    lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
     if(base_dsc->part == LV_PART_INDICATOR) {
-        if(label_draw_dsc) {
+        if(lv_draw_dsc_get_type(base_dsc) == LV_DRAW_DSC_TYPE_LABEL) {
+            lv_draw_label_dsc_t * label_draw_dsc = lv_draw_dsc_get_label_dsc(base_dsc);
             const lv_color_t color_idx[7] = {
                 lv_palette_main(LV_PALETTE_RED),
                 lv_palette_main(LV_PALETTE_ORANGE),
@@ -36,24 +34,24 @@ static void draw_event_cb(lv_event_t * e)
             lv_point_t size;
             lv_text_get_size(&size, label_draw_dsc->text, label_draw_dsc->font, 0, 0, 1000, LV_TEXT_FLAG_NONE);
             int32_t new_w = size.x;
-            int32_t old_w = lv_area_get_width(&draw_task->area);
+            int32_t old_w = lv_area_get_width(&label_draw_dsc->coords);
 
             /* Distribute the new size equally on both sides */
-            draw_task->area.x1 -= (new_w - old_w) / 2;
-            draw_task->area.x2 += ((new_w - old_w) + 1) / 2;  /* +1 for rounding */
+            label_draw_dsc->coords.x1 -= (new_w - old_w) / 2;
+            label_draw_dsc->coords.x2 += ((new_w - old_w) + 1) / 2;  /* +1 for rounding */
 
         }
     }
 }
 
 /**
- * @title Rainbow major-tick labels via draw task
- * @brief Recolour and reformat scale labels during `LV_EVENT_DRAW_TASK_ADDED`.
+ * @title Rainbow major-tick labels via draw events
+ * @brief Recolour and reformat scale labels during `LV_EVENT_DRAW_DSC_BEGIN`.
  *
  * A horizontal-bottom scale (80% width, 100 px tall, 31 ticks, range
- * 10 to 40) enables `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` and subscribes
- * to `LV_EVENT_DRAW_TASK_ADDED`. The callback inspects each draw
- * task targeting `LV_PART_INDICATOR`, rewrites the label text to a
+ * 10 to 40) enables `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` and subscribes
+ * to `LV_EVENT_DRAW_DSC_BEGIN`. The callback inspects each label
+ * draw descriptor of `LV_PART_INDICATOR`, rewrites the label text to a
  * one-decimal value formatted from `id2`, picks one of seven palette
  * colours by tick index, and expands the draw area to fit the new
  * text width.
@@ -74,8 +72,8 @@ void lv_example_scale_label_recolor(void)
     lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 10, 40);
 
-    lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(scale, true);
+    lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
+    lv_obj_set_send_draw_dsc_events(scale, true);
 }
 
 #endif

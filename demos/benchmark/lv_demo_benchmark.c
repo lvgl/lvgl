@@ -67,7 +67,7 @@ static void next_scene_timer_cb(lv_timer_t * timer);
 static void summary_create(lv_obj_t * screen, lv_demo_benchmark_summary_t * summary);
 
 
-static void table_draw_task_event_cb(lv_event_t * e);
+static void table_draw_dsc_event_cb(lv_event_t * e);
 static void rnd_reset(void);
 static int32_t rnd_next(int32_t min, int32_t max);
 static lv_color_t rnd_color(void);
@@ -542,10 +542,10 @@ void lv_demo_benchmark_summary_display(const lv_demo_benchmark_summary_t * summa
     lv_obj_t * table = lv_table_create(scr);
     lv_obj_set_width(table, lv_pct(100));
     lv_obj_set_style_max_height(table, lv_pct(100), 0);
-    lv_obj_set_send_draw_task_events(table, true);
+    lv_obj_set_send_draw_dsc_events(table, true);
     lv_obj_set_style_text_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
     lv_obj_set_style_border_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
-    lv_obj_add_event_cb(table, table_draw_task_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(table, table_draw_dsc_event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
 
     lv_table_set_cell_value(table, 0, 0, "Name");
     lv_table_set_cell_value(table, 0, 1, "Avg. CPU");
@@ -715,32 +715,32 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
 }
 #endif
 
-static void table_draw_task_event_cb(lv_event_t * e)
+static void table_draw_dsc_event_cb(lv_event_t * e)
 {
-    lv_draw_task_t * t = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * draw_dsc_base = t->draw_dsc;
+    lv_draw_dsc_t * draw_dsc_base = lv_event_get_draw_dsc(e);
     if(draw_dsc_base->part != LV_PART_ITEMS) return;
 
+    lv_draw_dsc_type_t type = lv_draw_dsc_get_type(draw_dsc_base);
     int32_t row = draw_dsc_base->id1;
     if(row == 0) {
-        lv_draw_fill_dsc_t * draw_dsc_fill = lv_draw_task_get_fill_dsc(t);
-        if(draw_dsc_fill) {
+        if(type == LV_DRAW_DSC_TYPE_FILL) {
+            lv_draw_fill_dsc_t * draw_dsc_fill = lv_draw_dsc_get_fill_dsc(draw_dsc_base);
             draw_dsc_fill->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
         }
-        lv_draw_label_dsc_t * draw_dsc_label = lv_draw_task_get_label_dsc(t);
-        if(draw_dsc_label) {
+        else if(type == LV_DRAW_DSC_TYPE_LABEL) {
+            lv_draw_label_dsc_t * draw_dsc_label = lv_draw_dsc_get_label_dsc(draw_dsc_base);
             draw_dsc_label->color = lv_color_white();
         }
     }
     else if(row == 1) {
-        lv_draw_border_dsc_t * draw_dsc_border = lv_draw_task_get_border_dsc(t);
-        if(draw_dsc_border) {
+        if(type == LV_DRAW_DSC_TYPE_BORDER) {
+            lv_draw_border_dsc_t * draw_dsc_border = lv_draw_dsc_get_border_dsc(draw_dsc_base);
             draw_dsc_border->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
             draw_dsc_border->width = 2;
             draw_dsc_border->side = LV_BORDER_SIDE_BOTTOM;
         }
-        lv_draw_label_dsc_t * draw_dsc_label = lv_draw_task_get_label_dsc(t);
-        if(draw_dsc_label) {
+        else if(type == LV_DRAW_DSC_TYPE_LABEL) {
+            lv_draw_label_dsc_t * draw_dsc_label = lv_draw_dsc_get_label_dsc(draw_dsc_base);
             draw_dsc_label->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
         }
     }
