@@ -109,6 +109,9 @@ the weight is determined by the style: <ApiLink name="LV_FREETYPE_FONT_STYLE_BOL
 maps to 700, otherwise 400. If the font is not a variable weight font, the weight
 setting will have no effect.
 
+Font collections (e.g. `.ttc` files) are supported. Select the face by setting the
+`face_index` field of <ApiLink name="lv_font_info_t" /> (0 by default, the first face).
+
 The FreeType extension also supports colored bitmap glyphs such as emojis. Note
 that only bitmaps are supported at this time. Colored vector graphics cannot be
 rendered. An example on how to draw a colored bitmap glyph is shown below.
