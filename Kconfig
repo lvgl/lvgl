@@ -180,6 +180,9 @@ choice LV_USE_OS
 	config LV_OS_SDL2
 		bool "SDL2"
 		select LV_OS_USE_SDL2
+	config LV_OS_CHIBIOS
+		bool "ChibiOS/RT"
+		select LV_OS_USE_CHIBIOS
 	config LV_OS_CUSTOM
 		bool "Custom"
 		select LV_OS_USE_CUSTOM_INCLUDE
@@ -195,6 +198,7 @@ config LV_USE_OS
 	default 5 if LV_OS_WINDOWS
 	default 6 if LV_OS_MQX
 	default 7 if LV_OS_SDL2
+	default 8 if LV_OS_CHIBIOS
 	default 255 if LV_OS_CUSTOM
 
 config LV_OS_USE_PTHREAD
@@ -216,6 +220,9 @@ config LV_OS_USE_MQX
 	bool
 
 config LV_OS_USE_SDL2
+	bool
+
+config LV_OS_USE_CHIBIOS
 	bool
 
 config LV_OS_USE_CUSTOM_INCLUDE
