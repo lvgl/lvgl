@@ -751,8 +751,13 @@ static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t)
     }
     LV_ASSERT_NULL(cur);
 
+    /*The tasks finalized after `t` stay behind it*/
+    lv_draw_task_t * suffix = t->next;
+    lv_draw_task_t * suffix_tail = layer->draw_task_tail;
     if(prev) prev->next = NULL;
     else layer->draw_task_head = NULL;
+    layer->draw_task_tail = prev;
+    t->next = NULL;
 
     lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_DSC_BEGIN, base_dsc);
 
@@ -761,15 +766,15 @@ static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t)
      * TODO: this can be removed when draw tasks are removed from dispatching */
     apply_coords_change(t);
 
-    /*Put the task back at the end*/
+    /*Put the task back at the end, followed by the tasks that were after it*/
     if(layer->draw_task_head == NULL) {
         layer->draw_task_head = t;
     }
     else {
-        lv_draw_task_t * tail = layer->draw_task_head;
-        while(tail->next) tail = tail->next;
-        tail->next = t;
+        layer->draw_task_tail->next = t;
     }
+    t->next = suffix;
+    layer->draw_task_tail = suffix ? suffix_tail : t;
 
     lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_DSC_END, base_dsc);
 }
