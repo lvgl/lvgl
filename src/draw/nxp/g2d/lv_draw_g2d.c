@@ -72,6 +72,11 @@ static void _g2d_execute_drawing(lv_draw_task_t * t);
  *  STATIC VARIABLES
  **********************/
 
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_g2d_fill,
+    .draw_image_cb = lv_draw_g2d_img,
+};
+
 static int32_t is_hw_pxp = 0;
 static bool init_successful = false;
 
@@ -92,6 +97,7 @@ void lv_draw_g2d_init(void)
     draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
     draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
     draw_g2d_unit->base_unit.name = "G2D";
+    draw_g2d_unit->base_unit.draw_cbs = &draw_cbs;
 
 #if LV_USE_G2D_DRAW_THREAD
     draw_g2d_unit->base_unit.wait_for_finish_cb = _g2d_wait_for_finish;
@@ -323,16 +329,7 @@ static void _g2d_execute_drawing(lv_draw_task_t * t)
     /* Invalidate only the drawing area */
     lv_draw_buf_invalidate_cache(draw_buf, NULL);
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_g2d_fill(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_fill_dsc_t *)t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_g2d_img(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
-            break;
-        default:
-            break;
-    }
+    lv_draw_unit_draw_task(t->draw_unit, t);
 }
 
 #if LV_USE_G2D_DRAW_THREAD

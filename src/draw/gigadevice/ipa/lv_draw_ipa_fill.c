@@ -10,6 +10,8 @@
 #include "lv_draw_ipa_private.h"
 #if LV_USE_DRAW_IPA
 
+#include "../../../misc/lv_area_private.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -35,13 +37,17 @@
  **********************/
 
 void lv_draw_ipa_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords, void * first_pixel, int32_t w,
-                      int32_t h, int32_t stride)
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
-    LV_UNUSED(draw_unit);
-    LV_UNUSED(layer);
-    LV_UNUSED(clip_area);
-    LV_UNUSED(coords);
+    lv_area_t clipped_coords;
+    if(!lv_area_intersect(&clipped_coords, coords, clip_area)) return;
+
+    void * first_pixel = lv_draw_layer_go_to_xy(layer, clipped_coords.x1 - layer->buf_area.x1,
+                                                clipped_coords.y1 - layer->buf_area.y1);
+    int32_t w = lv_area_get_width(&clipped_coords);
+    int32_t h = lv_area_get_height(&clipped_coords);
+    int32_t stride = layer->draw_buf->header.stride;
+
     lv_color_format_t cf = dsc->base.layer->color_format;
     lv_opa_t opa = dsc->opa;
 
@@ -84,7 +90,7 @@ void lv_draw_ipa_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
             conf.bg_alpha = 0xff;
         }
     }
-    lv_draw_ipa_configure_and_start_transfer(&conf);
+    lv_draw_ipa_configure_and_start_transfer((lv_draw_ipa_unit_t *)draw_unit, &conf);
 }
 
 /**********************

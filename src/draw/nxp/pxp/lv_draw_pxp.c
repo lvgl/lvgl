@@ -65,6 +65,12 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_pxp_fill,
+    .draw_image_cb = lv_draw_pxp_img,
+    .draw_layer_cb = lv_draw_pxp_layer,
+};
+
 #if LV_USE_PARALLEL_DRAW_DEBUG
     #define _draw_info LV_GLOBAL_DEFAULT()->draw_info
 #endif
@@ -89,6 +95,7 @@ void lv_draw_pxp_init(void)
     draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
     draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
     draw_pxp_unit->base_unit.name = "NXP_PXP";
+    draw_pxp_unit->base_unit.draw_cbs = &draw_cbs;
 
 #if LV_USE_PXP_DRAW_THREAD
     lv_thread_init(&draw_pxp_unit->thread, "pxpdraw", LV_DRAW_THREAD_PRIO, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
@@ -393,19 +400,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
     t->draw_unit = &u->base_unit;
 #endif
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_pxp_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_pxp_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LAYER:
-            lv_draw_pxp_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        default:
-            break;
-    }
+    lv_draw_unit_draw_task(&u->base_unit, t);
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     /*Layers manage it for themselves*/

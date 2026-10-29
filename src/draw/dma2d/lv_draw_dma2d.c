@@ -56,6 +56,11 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_dma2d_fill,
+    .draw_image_cb = lv_draw_dma2d_image,
+};
+
 #if LV_DRAW_DMA2D_ASYNC
     static lv_draw_dma2d_unit_t * g_unit;
 #endif
@@ -93,6 +98,7 @@ void lv_draw_dma2d_init(void)
     draw_dma2d_unit->base_unit.wait_for_finish_cb = wait_finish_cb;
 #endif
     draw_dma2d_unit->base_unit.name = "DMA2D";
+    draw_dma2d_unit->base_unit.draw_cbs = &draw_cbs;
 
 #if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;
@@ -451,21 +457,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     /* Flush cache before drawing. This is a no-op when DMA2D_CACHE is disabled */
     lv_draw_buf_flush_cache(layer->draw_buf, &draw_dma2d_unit->last_clipped_area);
 
-    if(t->type == LV_DRAW_DSC_TYPE_FILL) {
-        lv_draw_fill_dsc_t * dsc = t->draw_dsc;
-
-        void * dest = lv_draw_layer_go_to_xy(layer, draw_dma2d_unit->last_clipped_area.x1,
-                                             draw_dma2d_unit->last_clipped_area.y1);
-
-        lv_draw_dma2d_fill(t->draw_unit, t->target_layer, &t->clip_area, dsc, &t->area, dest,
-                           lv_area_get_width(&clipped_coords),
-                           lv_area_get_height(&clipped_coords),
-                           lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area),
-                                                       dsc->base.layer->color_format));
-    }
-    else if(t->type == LV_DRAW_DSC_TYPE_IMAGE) {
-        lv_draw_dma2d_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-    }
+    lv_draw_unit_draw_task(t->draw_unit, t);
 
 #if LV_DRAW_DMA2D_ASYNC
     return LV_DRAW_UNIT_IDLE;

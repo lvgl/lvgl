@@ -49,6 +49,9 @@ static void lv_draw_buf_dave2d_init_handlers(void);
 static bool lv_draw_dave2d_image_color_format_supported(lv_color_format_t color_format);
 void dave2d_execute_dlist_and_flush(void);
 
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc);
+
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
@@ -56,6 +59,16 @@ void dave2d_execute_dlist_and_flush(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_dave2d_fill,
+    .draw_border_cb = lv_draw_dave2d_border,
+    .draw_label_cb = lv_draw_dave2d_label,
+    .draw_image_cb = lv_draw_dave2d_image,
+    .draw_arc_cb = lv_draw_dave2d_arc,
+    .draw_line_cb = draw_line,
+    .draw_triangle_cb = lv_draw_dave2d_triangle,
+};
 
 static d2_device * _d2_handle;
 
@@ -91,6 +104,7 @@ void lv_draw_dave2d_init(void)
     draw_dave2d_unit->base_unit.evaluate_cb = _dave2d_evaluate;
     draw_dave2d_unit->base_unit.wait_for_finish_cb = _dave2d_wait_finish;
     draw_dave2d_unit->base_unit.name = "DAVE2D";
+    draw_dave2d_unit->base_unit.draw_cbs = &draw_cbs;
     draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
 
     result = lv_dave2d_init();
@@ -500,51 +514,19 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
 #endif
 #endif
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_dave2d_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_BORDER:
-            lv_draw_dave2d_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-            //lv_draw_dave2d_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-#if 0
-        case LV_DRAW_DSC_TYPE_BG_IMG:
-            //lv_draw_dave2d_bg_image(t, t->draw_dsc, &t->area);
-            break;
-#endif
-        case LV_DRAW_DSC_TYPE_LABEL:
-            lv_draw_dave2d_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_dave2d_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LINE:
-            lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_dave2d_line, t->draw_unit);
-            break;
-        case LV_DRAW_DSC_TYPE_ARC:
-            lv_draw_dave2d_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-            lv_draw_dave2d_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-        case LV_DRAW_DSC_TYPE_LAYER:
-            //lv_draw_dave2d_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-            //lv_draw_dave2d_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-        default:
-            break;
-    }
+    lv_draw_unit_draw_task(t->draw_unit, t);
 
 #if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
 #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
 #endif
 #endif
+}
+
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc)
+{
+    lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_dave2d_line, draw_unit);
 }
 
 static d2_s32 lv_dave2d_init(void)
