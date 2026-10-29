@@ -6,7 +6,7 @@ description: LVGL supports rotation of the display in 90 degree increments.
 LVGL supports rotation of the display in 90 degree increments.
 
 The orientation of the display can be changed with
-<ApiLink name="lv_display_set_rotation" display="lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_xxx)" /> where `xxx` is
+<ApiLink name="lv_display_set_rotation" display="lv_display_set_rotation(disp, LV_ROTATION_xxx)" /> where `xxx` is
 0, 90, 180 or 270. This will swap the horizontal and vertical resolutions internally
 according to the set degree; however, it will not perform the actual rotation.
 When changing the rotation, the <ApiLink name="LV_EVENT_RESOLUTION_CHANGED" /> event is
@@ -36,9 +36,9 @@ Below is an example for rotating when the rendering mode is
 /*Rotate a partially rendered area to another buffer and send it*/
 void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    lv_rotation_t rotation = lv_display_get_rotation(disp);
     lv_area_t rotated_area;
-    if(rotation != LV_DISPLAY_ROTATION_0) {
+    if(rotation != LV_ROTATION_0) {
         lv_color_format_t cf = lv_display_get_color_format(disp);
         /*Calculate the position of the rotated area*/
         rotated_area = *area;
@@ -82,8 +82,8 @@ void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
     int32_t fb_stride = lv_draw_buf_width_to_stride(disp->hor_res, cf);
     uint8_t * fb_start = my_fb_address;
     fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-    if(rotation == LV_DISPLAY_ROTATION_0) {
+    lv_rotation_t rotation = lv_display_get_rotation(disp);
+    if(rotation == LV_ROTATION_0) {
         int32_t y;
         for(y = area->y1; y <= area->y2; y++) {
             lv_memcpy(fb_start, px_map, src_stride);

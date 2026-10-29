@@ -85,9 +85,10 @@ maps:
 
 ## Key customization
 
-Each key can be customized by using draw events such as <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />.
+Each key can be customized by using draw events such as <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" />.
+They are sent only if <ApiLink name="LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS" /> is set on the keyboard.
 
-The handler receives every draw task the keyboard emits; mutating the fill
+The handler receives every draw descriptor the keyboard draws; mutating the fill
 descriptor recolours the key, and swapping in an image draw lets you
 replace text glyphs with bitmaps. This example colours each key and
 substitutes the OK glyph with a star image:

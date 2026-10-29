@@ -24,7 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, uint32_t stride);
+static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
 static inline uint16x8_t l8_to_rgb565_8(const uint8_t * src);
 static inline uint16x4_t l8_to_rgb565_4(const uint8_t * src);

@@ -32,13 +32,6 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_DISPLAY_ROTATION_0 = 0,
-    LV_DISPLAY_ROTATION_90,
-    LV_DISPLAY_ROTATION_180,
-    LV_DISPLAY_ROTATION_270
-} lv_display_rotation_t;
-
-typedef enum {
     /**
      * Use the buffer(s) to render the screen is smaller parts.
      * This way the buffers can be smaller then the display to save RAM. At least 1/10 screen size buffer(s) are recommended.
@@ -156,9 +149,9 @@ void lv_display_set_offset(lv_display_t * disp, int32_t x, int32_t y);
 /**
  * Set the rotation of this display. LVGL will swap the horizontal and vertical resolutions internally.
  * @param disp      pointer to a display (NULL to use the default display)
- * @param rotation  `LV_DISPLAY_ROTATION_0/90/180/270`
+ * @param rotation  `LV_ROTATION_0/90/180/270`
  */
-void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation);
+void lv_display_set_rotation(lv_display_t * disp, lv_rotation_t rotation);
 
 /**
  * Use matrix rotation for the display. This function is depended on `LV_DRAW_TRANSFORM_USE_MATRIX`
@@ -236,7 +229,7 @@ int32_t lv_display_get_offset_y(const lv_display_t * disp);
  * @param disp      pointer to a display (NULL to use the default display)
  * @return          the current rotation
  */
-lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp);
+lv_rotation_t lv_display_get_rotation(lv_display_t * disp);
 
 /**
  * Get if matrix rotation is enabled for a display or not
@@ -754,13 +747,6 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
  * @param point     pointer to a point to rotate
  */
 void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point);
-
-/**
- * Rotate a point in-place opposite to the display's rotation
- * @param disp      pointer to a display
- * @param point     pointer to a point to rotate
- */
-void lv_display_rotate_point_ccw(lv_display_t * disp, lv_point_t * point);
 
 /**
  * Get the size of the draw buffers

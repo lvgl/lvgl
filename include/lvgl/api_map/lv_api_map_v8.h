@@ -24,10 +24,10 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_DISP_ROT_NONE       LV_DISPLAY_ROTATION_0
-#define LV_DISP_ROT_90      LV_DISPLAY_ROTATION_90
-#define LV_DISP_ROT_180     LV_DISPLAY_ROTATION_180
-#define LV_DISP_ROT_270     LV_DISPLAY_ROTATION_270
+#define LV_DISP_ROT_NONE    LV_ROTATION_0
+#define LV_DISP_ROT_90      LV_ROTATION_90
+#define LV_DISP_ROT_180     LV_ROTATION_180
+#define LV_DISP_ROT_270     LV_ROTATION_270
 
 #define LV_DISP_RENDER_MODE_PARTIAL LV_DISPLAY_RENDER_MODE_PARTIAL
 #define LV_DISP_RENDER_MODE_DIRECT  LV_DISPLAY_RENDER_MODE_DIRECT
@@ -54,7 +54,7 @@ typedef int32_t                     lv_coord_t;
 typedef lv_result_t                 lv_res_t;
 typedef lv_image_dsc_t              lv_img_dsc_t;
 typedef lv_display_t                lv_disp_t;
-typedef lv_display_rotation_t       lv_disp_rot_t;
+typedef lv_rotation_t       lv_disp_rot_t;
 typedef lv_display_render_mode_t    lv_disp_render_t;
 typedef lv_anim_completed_cb_t      lv_anim_ready_cb_t;
 typedef lv_screen_load_anim_t       lv_scr_load_anim_t;
@@ -120,7 +120,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 
 #define lv_obj_del                       lv_obj_delete
 #define lv_obj_del_async                 lv_obj_delete_async
-#define lv_obj_clear_flag                lv_obj_remove_flag
 #define lv_obj_clear_state               lv_obj_remove_state
 
 #define lv_indev_set_disp                lv_indev_set_display
@@ -198,12 +197,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_imgbtn_get_src_middle lv_imagebutton_get_src_middle
 #define lv_imgbtn_get_src_right  lv_imagebutton_get_src_right
 #endif /* LV_USE_IMAGEBUTTON */
-
-#if LV_USE_LIST
-#define lv_list_set_btn_text lv_list_set_button_text
-#define lv_list_get_btn_text lv_list_get_button_text
-#define lv_list_add_btn      lv_list_add_button
-#endif /* LV_USE_LIST */
 
 #if LV_USE_BUTTON
 #define lv_btn_create        lv_button_create

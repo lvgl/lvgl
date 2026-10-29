@@ -21,7 +21,7 @@ unless you prefer otherwise.
 ## Supported versions
 
 Fixes are made available for the actively supported releases. See the
-[Policies page](https://docs.lvgl.io/master/introduction/policies) for the
+[Policies page](https://lvgl.io/docs/open/introduction/policies) for the
 current support table.
 
 ## SBOM and more
@@ -32,4 +32,4 @@ folder and a human-readable component list in
 
 For our full security commitment, vulnerability handling process, and how LVGL
 supports users' EU Cyber Resilience Act (CRA) obligations, see the
-[Security page in the documentation](https://docs.lvgl.io/master/introduction/security).
+[Security page in the documentation](https://lvgl.io/docs/open/introduction/security).

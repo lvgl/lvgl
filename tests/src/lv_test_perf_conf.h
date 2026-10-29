@@ -389,7 +389,6 @@
         #define LV_USE_ASSERT_MALLOC        1   /**< Checks is the memory is successfully allocated or no. (Very fast, recommended) */
         #define LV_USE_ASSERT_STYLE         0   /**< Check if the styles are properly initialized. (Very fast, recommended) */
         #define LV_USE_ASSERT_MEM_INTEGRITY 0   /**< Check the integrity of `lv_mem` after critical operations. (Slow) */
-        #define LV_USE_ASSERT_OBJ           0   /**< Check the object's type and existence (e.g. not deleted). (Slow) */
 
         /** Add a custom handler when assert happens e.g. to restart MCU. */
         #define LV_ASSERT_HANDLER_INCLUDE <stdint.h>
@@ -655,7 +654,7 @@
         /*==================
         * WIDGETS
         *================*/
-        /* Documentation for widgets can be found here: https://docs.lvgl.io/latest/en/html/widgets/index.html . */
+        /* Documentation for widgets can be found here: https://lvgl.io/docs/open/widgets . */
 
         /** 1: Causes these widgets to be given default values at creation time.
         *  - lv_buttonmatrix_t:  Get default maps:  {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""}, else map not set.
@@ -716,11 +715,8 @@
 
         #define LV_USE_LINE       1
 
-        #define LV_USE_LIST       1
 
         #define LV_USE_LOTTIE     0  /**< Requires: lv_canvas, thorvg */
-
-        #define LV_USE_MENU       1
 
         #define LV_USE_MSGBOX     1
 
@@ -753,12 +749,11 @@
 
         #define LV_USE_TILEVIEW   1
 
-        #define LV_USE_WIN        1
 
         /*==================
         * THEMES
         *==================*/
-        /* Documentation for themes can be found here: https://docs.lvgl.io/master/overview/style.html#themes . */
+        /* Documentation for themes can be found here: https://lvgl.io/docs/open/common-widget-features/styles/themes . */
 
         /** A simple, impressive and very complete theme */
         #define LV_USE_THEME_DEFAULT 1
@@ -782,7 +777,7 @@
         /*==================
         * LAYOUTS
         *==================*/
-        /* Documentation for layouts can be found here: https://docs.lvgl.io/master/layouts/index.html . */
+        /* Documentation for layouts can be found here: https://lvgl.io/docs/open/common-widget-features/layouts . */
 
         /** A layout similar to Flexbox in CSS. */
         #define LV_USE_FLEX 1
@@ -793,13 +788,13 @@
         /*====================
         * 3RD PARTS LIBRARIES
         *====================*/
-        /* Documentation for libraries can be found here: https://docs.lvgl.io/master/libs/index.html . */
+        /* Documentation for libraries can be found here: https://lvgl.io/docs/open/libs . */
 
         /* File system interfaces for common APIs */
 
         /** Setting a default driver letter allows skipping the driver prefix in filepaths.
         *  Documentation about how to use the below driver-identifier letters can be found at
-        *  https://docs.lvgl.io/master/main-modules/fs.html#lv-fs-identifier-letters . */
+        *  https://lvgl.io/docs/open/main-modules/fs#identifier-letters . */
         #define LV_FS_DEFAULT_DRIVER_LETTER '\0'
 
         /** API for fopen, fread, etc. */
@@ -923,8 +918,6 @@
             #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
         #endif
 
-        /** Rlottie library */
-        #define LV_USE_RLOTTIE 0
 
         /** Enable Vector Graphic APIs
         *  - Requires `LV_USE_MATRIX = 1` */
@@ -938,9 +931,6 @@
 
         /** Use lvgl built-in LZ4 lib */
         #define LV_USE_LZ4_INTERNAL  0
-
-        /** Use external LZ4 library */
-        #define LV_USE_LZ4_EXTERNAL  0
 
         /*SVG library
         *  - Requires `LV_USE_VECTOR_GRAPHIC = 1` */
@@ -963,7 +953,6 @@
         /*==================
         * OTHERS
         *==================*/
-        /* Documentation for several of the below items can be found here: https://docs.lvgl.io/master/others/index.html . */
 
         /** 1: Enable API to take snapshot for object */
         #define LV_USE_SNAPSHOT 0
@@ -1058,9 +1047,6 @@
         /** 1: Enable grid navigation */
         #define LV_USE_GRIDNAV 0
 
-        /** 1: Enable `lv_obj` fragment logic */
-        #define LV_USE_FRAGMENT 0
-
         /** 1: Support using images as font in label or span widgets */
         #define LV_USE_IMGFONT 0
 
@@ -1083,17 +1069,6 @@
             #if LV_IME_PINYIN_USE_K9_MODE == 1
                 #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
             #endif /*LV_IME_PINYIN_USE_K9_MODE*/
-        #endif
-
-        /** 1: Enable file explorer.
-        *  - Requires: lv_table */
-        #define LV_USE_FILE_EXPLORER                     0
-        #if LV_USE_FILE_EXPLORER
-            /** Maximum length of path */
-            #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
-            /** Quick access bar, 1:use, 0:do not use.
-            *  - Requires: lv_list */
-            #define LV_FILE_EXPLORER_QUICK_ACCESS        1
         #endif
 
         /** 1: Enable freetype font manager

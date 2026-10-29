@@ -45,7 +45,15 @@ lv_draw_mask_rect_dsc_t * lv_draw_task_get_mask_rect_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_MASK_RECTANGLE ? (lv_draw_mask_rect_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_MASK_RECTANGLE ? (lv_draw_mask_rect_dsc_t *)task->draw_dsc : NULL;
+}
+
+lv_draw_mask_rect_dsc_t * lv_draw_dsc_get_mask_rect_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_MASK_RECTANGLE, return NULL);
+
+    return (lv_draw_mask_rect_dsc_t *)dsc;
 }
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc)
@@ -59,20 +67,14 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_m
     }
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &layer->buf_area, LV_DRAW_TASK_TYPE_MASK_RECTANGLE);
+    lv_draw_task_t * t = lv_draw_add_task(layer, &layer->buf_area, LV_DRAW_DSC_TYPE_MASK_RECTANGLE);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-
-    lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
-    base_dsc->layer = layer;
-
-    if(base_dsc->obj && lv_obj_is_send_draw_task_events(base_dsc->obj)) {
-        /*Disable sending LV_EVENT_DRAW_TASK_ADDED first to avoid triggering recursive
-         *event calls due draw task adds in the event*/
-        lv_obj_set_send_draw_task_events(base_dsc->obj, false);
-        lv_obj_send_event(dsc->base.obj, LV_EVENT_DRAW_TASK_ADDED, t);
-        lv_obj_set_send_draw_task_events(base_dsc->obj, true);
-    }
 
     lv_draw_finalize_task_creation(layer, t);
     LV_PROFILER_DRAW_END;

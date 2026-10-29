@@ -300,15 +300,81 @@ void test_indev_ccw_pointer(void)
     lv_indev_t * indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
 
-    TEST_ASSERT_FALSE(lv_indev_get_ccw(indev));
+    TEST_ASSERT_EQUAL(LV_ROTATION_DIR_CW, lv_indev_get_rotation_dir(indev));
 
-    lv_indev_set_ccw(indev);
+    lv_indev_set_rotation_dir(indev, LV_ROTATION_DIR_CCW);
 
-    TEST_ASSERT_TRUE(lv_indev_get_ccw(indev));
+    TEST_ASSERT_EQUAL(LV_ROTATION_DIR_CCW, lv_indev_get_rotation_dir(indev));
 
-    lv_indev_clear_ccw(indev);
+    lv_indev_set_rotation_dir(indev, LV_ROTATION_DIR_CW);
 
-    TEST_ASSERT_FALSE(lv_indev_get_ccw(indev));
+    TEST_ASSERT_EQUAL(LV_ROTATION_DIR_CW, lv_indev_get_rotation_dir(indev));
+}
+
+static lv_point_t rotation_raw_point;
+
+static void rotation_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
+{
+    LV_UNUSED(indev);
+    data->point = rotation_raw_point;
+    data->state = LV_INDEV_STATE_RELEASED;
+}
+
+static void rotation_never_flushed(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+{
+    LV_UNUSED(disp);
+    LV_UNUSED(area);
+    LV_UNUSED(color_p);
+    TEST_FAIL();
+}
+
+void test_indev_pointer_rotation(void)
+{
+    const int32_t width = 480;
+    const int32_t height = 320;
+    static const struct {
+        lv_rotation_t rotation;
+        lv_rotation_dir_t rotation_dir;
+        int32_t x;
+        int32_t y;
+    } cases[] = {
+        {LV_ROTATION_0, LV_ROTATION_DIR_CW, 10, 20},
+        {LV_ROTATION_90, LV_ROTATION_DIR_CW, 299, 10},
+        {LV_ROTATION_180, LV_ROTATION_DIR_CW, 469, 299},
+        {LV_ROTATION_270, LV_ROTATION_DIR_CW, 20, 469},
+
+        {LV_ROTATION_0, LV_ROTATION_DIR_CCW, 10, 20},
+        {LV_ROTATION_90, LV_ROTATION_DIR_CCW, 20, 469},
+        {LV_ROTATION_180, LV_ROTATION_DIR_CCW, 469, 299},
+        {LV_ROTATION_270, LV_ROTATION_DIR_CCW, 299, 10},
+    };
+
+    lv_display_t * disp = lv_display_create(width, height);
+    TEST_ASSERT_NOT_NULL(disp);
+    lv_display_set_flush_cb(disp, rotation_never_flushed);
+
+    lv_indev_t * indev = lv_indev_create();
+    TEST_ASSERT_NOT_NULL(indev);
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev, rotation_read_cb);
+    lv_indev_set_display(indev, disp);
+
+    for(uint32_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+        lv_display_set_rotation(disp, cases[i].rotation);
+        lv_indev_set_rotation_dir(indev, cases[i].rotation_dir);
+
+        rotation_raw_point.x = 10;
+        rotation_raw_point.y = 20;
+        lv_indev_read(indev);
+
+        lv_point_t point;
+        lv_indev_get_point(indev, &point);
+        TEST_ASSERT_EQUAL_INT32(cases[i].x, point.x);
+        TEST_ASSERT_EQUAL_INT32(cases[i].y, point.y);
+    }
+
+    lv_indev_delete(indev);
+    lv_display_delete(disp);
 }
 
 static void forget_pressed_obj_cb(lv_event_t * e)

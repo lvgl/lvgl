@@ -63,8 +63,20 @@ struct _lv_draw_glyph_dsc_t {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_unit_draw_letter_internal(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
-                                       const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb);
+/**
+ * Same as `lv_draw_unit_draw_letter` but without argument checks.
+ * @param layer         the target layer
+ * @param clip_area     the clip area
+ * @param dsc           pointer to the glyph descriptor
+ * @param pos           position of the letter
+ * @param font          the font of the letter
+ * @param letter        the Unicode code point of the letter
+ * @param cb            callback to render the glyph
+ * @param user_data     passed to cb as is
+ */
+void lv_draw_unit_draw_letter_internal(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_glyph_dsc_t * dsc,
+                                       const lv_point_t * pos, const lv_font_t * font, uint32_t letter,
+                                       lv_draw_glyph_cb_t cb, void * user_data);
 
 /**********************
  *      MACROS

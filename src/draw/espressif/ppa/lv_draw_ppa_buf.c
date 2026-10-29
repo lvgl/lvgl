@@ -12,6 +12,13 @@
 #if LV_USE_PPA
 #include LV_STDINT_INCLUDE
 #include "../../lv_draw_buf_private.h"
+#include <esp_idf_version.h>
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
+    /*esp_cache_get_line_size_by_addr() arrived in 6.0*/
+    #include <esp_memory_utils.h>
+    #include <hal/cache_hal.h>
+    #include <hal/cache_ll.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -42,9 +49,22 @@ void lv_draw_buf_ppa_init_handlers(void)
  *   STATIC FUNCTIONS
  *********************/
 
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
+/*Same body as esp_cache_get_line_size_by_addr(), which only exists from ESP-IDF 6.0*/
+static size_t ppa_cache_line_size(const void * addr)
+{
+    if(!addr) return 0;
+    if(esp_ptr_external_ram(addr)) return cache_hal_get_cache_line_size(CACHE_LL_LEVEL_EXT_MEM, CACHE_TYPE_DATA);
+    if(esp_ptr_internal(addr)) return cache_hal_get_cache_line_size(CACHE_LL_LEVEL_INT_MEM, CACHE_TYPE_DATA);
+    return 0;
+}
+#else
+#define ppa_cache_line_size(addr) esp_cache_get_line_size_by_addr(addr)
+#endif
+
 static void cache_msync_rows(const lv_draw_buf_t * draw_buf, const lv_area_t * area, uint32_t dir)
 {
-    size_t line = esp_cache_get_line_size_by_addr(draw_buf->data);
+    size_t line = ppa_cache_line_size(draw_buf->data);
     if(line == 0) return; /* Not cached */
 
     size_t start = 0;

@@ -48,7 +48,15 @@ lv_draw_arc_dsc_t * lv_draw_task_get_arc_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_ARC ? (lv_draw_arc_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_ARC ? (lv_draw_arc_dsc_t *)task->draw_dsc : NULL;
+}
+
+lv_draw_arc_dsc_t * lv_draw_dsc_get_arc_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_ARC, return NULL);
+
+    return (lv_draw_arc_dsc_t *)dsc;
 }
 
 void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
@@ -76,7 +84,12 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
         lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_ARC);
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_DSC_TYPE_ARC);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 

@@ -29,7 +29,7 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
  **********************/
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
 
     int32_t radius;
 
@@ -75,7 +75,10 @@ typedef struct {
 } lv_draw_rect_dsc_t;
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
+
+    /**The area to draw*/
+    lv_area_t coords;
 
     /**Radius, LV_RADIUS_CIRCLE for max. radius */
     int32_t radius;
@@ -93,7 +96,10 @@ typedef struct {
 } lv_draw_fill_dsc_t;
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
+
+    /**The area to draw*/
+    lv_area_t coords;
 
     /**Radius, LV_RADIUS_CIRCLE for max. radius */
     int32_t radius;
@@ -117,7 +123,10 @@ typedef struct {
 } lv_draw_border_dsc_t;
 
 typedef struct {
-    lv_draw_dsc_base_t base;
+    lv_draw_dsc_t base;
+
+    /**The area to draw*/
+    lv_area_t coords;
 
     /**Radius, LV_RADIUS_CIRCLE for max. radius */
     int32_t radius;
@@ -165,9 +174,17 @@ void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc);
 /**
  * Try to get a fill draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_FILL
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_FILL
  */
 lv_draw_fill_dsc_t * lv_draw_task_get_fill_dsc(lv_draw_task_t * task);
+
+/**
+ * Get the fill draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_FILL, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the fill draw descriptor
+ */
+lv_draw_fill_dsc_t * lv_draw_dsc_get_fill_dsc(lv_draw_dsc_t * dsc);
 
 /**
  * Fill an area
@@ -186,9 +203,17 @@ void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc);
 /**
  * Try to get a border draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_BORDER
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_BORDER
  */
 lv_draw_border_dsc_t * lv_draw_task_get_border_dsc(lv_draw_task_t * task);
+
+/**
+ * Get the border draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_BORDER, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the border draw descriptor
+ */
+lv_draw_border_dsc_t * lv_draw_dsc_get_border_dsc(lv_draw_dsc_t * dsc);
 
 /**
  * Draw a border
@@ -207,9 +232,17 @@ void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
 /**
  * Try to get a box shadow draw descriptor from a draw task.
  * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_BOX_SHADOW
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_BOX_SHADOW
  */
 lv_draw_box_shadow_dsc_t * lv_draw_task_get_box_shadow_dsc(lv_draw_task_t * task);
+
+/**
+ * Get the box shadow draw descriptor from a generic draw descriptor.
+ * `dsc` must be of type LV_DRAW_DSC_TYPE_BOX_SHADOW, use `lv_draw_dsc_get_type()` to check it first.
+ * @param dsc       draw descriptor
+ * @return          the box shadow draw descriptor
+ */
+lv_draw_box_shadow_dsc_t * lv_draw_dsc_get_box_shadow_dsc(lv_draw_dsc_t * dsc);
 
 /**
  * Draw a box shadow

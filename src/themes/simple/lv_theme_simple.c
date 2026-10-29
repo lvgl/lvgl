@@ -144,6 +144,8 @@ static void style_init(my_theme_t * theme)
 
 lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return NULL);
+
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. MicroPython)
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
@@ -166,7 +168,7 @@ lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
 
     style_init(theme);
 
-    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
+    if(lv_display_get_theme(disp) == (lv_theme_t *)theme) {
         lv_obj_report_style_change(NULL);
     }
 
@@ -246,19 +248,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         }
 #endif
 
-#if LV_USE_WIN
-        /*Header*/
-        if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 0) == obj) {
-            lv_obj_add_style(obj, &theme->styles.light, 0);
-            return;
-        }
-        /*Content*/
-        else if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 1) == obj) {
-            lv_obj_add_style(obj, &theme->styles.light, 0);
-            lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
-            return;
-        }
-#endif
         lv_obj_add_style(obj, &theme->styles.white, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
     }
@@ -395,19 +384,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_LIST
-    else if(lv_obj_check_type(obj, &lv_list_class)) {
-        lv_obj_add_style(obj, &theme->styles.light, 0);
-        lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
-        return;
-    }
-    else if(lv_obj_check_type(obj, &lv_list_text_class)) {
-
-    }
-    else if(lv_obj_check_type(obj, &lv_list_button_class)) {
-        lv_obj_add_style(obj, &theme->styles.dark, 0);
-    }
-#endif
 #if LV_USE_MSGBOX
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &theme->styles.light, 0);

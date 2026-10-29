@@ -52,6 +52,12 @@
 
 static void image_dsc_free_cb(void * dsc, void * user_data);
 
+static void lv_vg_lite_get_format_bytes(
+    vg_lite_buffer_format_t format,
+    uint32_t * mul,
+    uint32_t * div,
+    uint32_t * bytes_align);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -615,104 +621,26 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
     return 0;
 }
 
-void lv_vg_lite_buffer_format_bytes(
-    vg_lite_buffer_format_t format,
-    uint32_t * mul,
-    uint32_t * div,
-    uint32_t * bytes_align)
-{
-    /* Get the bpp information of a color format. */
-    *mul = *div = 1;
-    *bytes_align = 4;
-    switch(format) {
-        case VG_LITE_L8:
-        case VG_LITE_A8:
-        case VG_LITE_RGBA8888_ETC2_EAC:
-            break;
-        case VG_LITE_A4:
-            *div = 2;
-            break;
-        case VG_LITE_ABGR1555:
-        case VG_LITE_ARGB1555:
-        case VG_LITE_BGRA5551:
-        case VG_LITE_RGBA5551:
-        case VG_LITE_RGBA4444:
-        case VG_LITE_BGRA4444:
-        case VG_LITE_ABGR4444:
-        case VG_LITE_ARGB4444:
-        case VG_LITE_RGB565:
-        case VG_LITE_BGR565:
-        case VG_LITE_YUYV:
-        case VG_LITE_YUY2:
-        case VG_LITE_YUY2_TILED:
-        /* AYUY2 buffer memory = YUY2 + alpha. */
-        case VG_LITE_AYUY2:
-        case VG_LITE_AYUY2_TILED:
-            *mul = 2;
-            break;
-        case VG_LITE_RGBA8888:
-        case VG_LITE_BGRA8888:
-        case VG_LITE_ABGR8888:
-        case VG_LITE_ARGB8888:
-        case VG_LITE_RGBX8888:
-        case VG_LITE_BGRX8888:
-        case VG_LITE_XBGR8888:
-        case VG_LITE_XRGB8888:
-            *mul = 4;
-            break;
-        case VG_LITE_NV12:
-        case VG_LITE_NV12_TILED:
-            *mul = 1;
-            break;
-        case VG_LITE_ANV12:
-        case VG_LITE_ANV12_TILED:
-            *mul = 4;
-            break;
-        case VG_LITE_INDEX_1:
-            *div = 8;
-            *bytes_align = 8;
-            break;
-        case VG_LITE_INDEX_2:
-            *div = 4;
-            *bytes_align = 8;
-            break;
-        case VG_LITE_INDEX_4:
-            *div = 2;
-            *bytes_align = 8;
-            break;
-        case VG_LITE_INDEX_8:
-            *bytes_align = 1;
-            break;
-        case VG_LITE_RGBA2222:
-        case VG_LITE_BGRA2222:
-        case VG_LITE_ABGR2222:
-        case VG_LITE_ARGB2222:
-            *mul = 1;
-            break;
-        case VG_LITE_RGB888:
-        case VG_LITE_BGR888:
-        case VG_LITE_ABGR8565:
-        case VG_LITE_BGRA5658:
-        case VG_LITE_ARGB8565:
-        case VG_LITE_RGBA5658:
-            *mul = 3;
-            break;
-        default:
-            LV_LOG_ERROR("unsupported color format: 0x%" PRIx32, (uint32_t)format);
-            LV_ASSERT(false);
-            break;
-    }
-}
-
 uint32_t lv_vg_lite_width_to_stride(uint32_t w, vg_lite_buffer_format_t color_format)
 {
+    uint32_t mul, div, align;
+    LV_UNUSED(align);
+    lv_vg_lite_get_format_bytes(color_format, &mul, &div, &align);
+    uint32_t stride = (w * mul + div - 1) / div;
+
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN)) {
-        w = LV_VG_LITE_ALIGN(w, 16);
+        const uint32_t tmp_align = 16 * mul / div;
+        if((mul / div) % 2 != 0) {
+            if(stride % tmp_align != 0) {
+                stride = (stride + tmp_align) / tmp_align * tmp_align;
+            }
+        }
+        else {
+            stride = LV_VG_LITE_ALIGN(stride, tmp_align);
+        }
     }
 
-    uint32_t mul, div, align;
-    lv_vg_lite_buffer_format_bytes(color_format, &mul, &div, &align);
-    return LV_VG_LITE_ALIGN(((w * mul + div - 1) / div), align);
+    return stride;
 }
 
 void lv_vg_lite_buffer_init(
@@ -755,7 +683,7 @@ void lv_vg_lite_buffer_init(
     buffer->width = width;
     buffer->height = height;
     if(stride == LV_STRIDE_AUTO) {
-        buffer->stride = lv_vg_lite_width_to_stride(width, buffer->format);
+        buffer->stride = lv_vg_lite_width_to_stride(buffer->width, buffer->format);
     }
     else {
         buffer->stride = stride;
@@ -1525,6 +1453,95 @@ static void image_dsc_free_cb(void * dsc, void * user_data)
 {
     LV_UNUSED(user_data);
     lv_image_decoder_close(dsc);
+}
+
+static void lv_vg_lite_get_format_bytes(
+    vg_lite_buffer_format_t format,
+    uint32_t * mul,
+    uint32_t * div,
+    uint32_t * bytes_align)
+{
+    /* Get the bpp information of a color format. */
+    *mul = *div = 1;
+    *bytes_align = 4;
+    switch(format) {
+        case VG_LITE_L8:
+        case VG_LITE_A8:
+        case VG_LITE_RGBA8888_ETC2_EAC:
+            break;
+        case VG_LITE_A4:
+            *div = 2;
+            break;
+        case VG_LITE_ABGR1555:
+        case VG_LITE_ARGB1555:
+        case VG_LITE_BGRA5551:
+        case VG_LITE_RGBA5551:
+        case VG_LITE_RGBA4444:
+        case VG_LITE_BGRA4444:
+        case VG_LITE_ABGR4444:
+        case VG_LITE_ARGB4444:
+        case VG_LITE_RGB565:
+        case VG_LITE_BGR565:
+        case VG_LITE_YUYV:
+        case VG_LITE_YUY2:
+        case VG_LITE_YUY2_TILED:
+        /* AYUY2 buffer memory = YUY2 + alpha. */
+        case VG_LITE_AYUY2:
+        case VG_LITE_AYUY2_TILED:
+            *mul = 2;
+            break;
+        case VG_LITE_RGBA8888:
+        case VG_LITE_BGRA8888:
+        case VG_LITE_ABGR8888:
+        case VG_LITE_ARGB8888:
+        case VG_LITE_RGBX8888:
+        case VG_LITE_BGRX8888:
+        case VG_LITE_XBGR8888:
+        case VG_LITE_XRGB8888:
+            *mul = 4;
+            break;
+        case VG_LITE_NV12:
+        case VG_LITE_NV12_TILED:
+            *mul = 1;
+            break;
+        case VG_LITE_ANV12:
+        case VG_LITE_ANV12_TILED:
+            *mul = 4;
+            break;
+        case VG_LITE_INDEX_1:
+            *div = 8;
+            *bytes_align = 8;
+            break;
+        case VG_LITE_INDEX_2:
+            *div = 4;
+            *bytes_align = 8;
+            break;
+        case VG_LITE_INDEX_4:
+            *div = 2;
+            *bytes_align = 8;
+            break;
+        case VG_LITE_INDEX_8:
+            *bytes_align = 1;
+            break;
+        case VG_LITE_RGBA2222:
+        case VG_LITE_BGRA2222:
+        case VG_LITE_ABGR2222:
+        case VG_LITE_ARGB2222:
+            *mul = 1;
+            break;
+        case VG_LITE_RGB888:
+        case VG_LITE_BGR888:
+        case VG_LITE_ABGR8565:
+        case VG_LITE_BGRA5658:
+        case VG_LITE_ARGB8565:
+        case VG_LITE_RGBA5658:
+            *mul = 3;
+            break;
+        default:
+            LV_LOG_ERROR("unsupport color format: 0x%" PRIx32, (uint32_t)format);
+            LV_ASSERT(false);
+            break;
+    }
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/

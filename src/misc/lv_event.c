@@ -398,7 +398,8 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_DRAW_POST_BEGIN);
             ENUM_CASE(EVENT_DRAW_POST);
             ENUM_CASE(EVENT_DRAW_POST_END);
-            ENUM_CASE(EVENT_DRAW_TASK_ADDED);
+            ENUM_CASE(EVENT_DRAW_DSC_BEGIN);
+            ENUM_CASE(EVENT_DRAW_DSC_END);
 
             /** Special events*/
             ENUM_CASE(EVENT_VALUE_CHANGED);

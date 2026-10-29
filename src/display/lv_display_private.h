@@ -20,9 +20,6 @@ extern "C" {
 #include "../debugging/sysmon/lv_sysmon_private.h"
 #endif
 
-#define LOG_NULL_DISPLAY_DEPRECATED_MESSAGE() \
-    LV_LOG_DEPRECATED("Calling this function with a NULL display is deprecated. You can retrieve the default display with `lv_display_get_default()`")
-
 /*********************
  *      DEFINES
  *********************/
@@ -168,7 +165,7 @@ struct _lv_display_t {
 
     lv_event_list_t event_list;
 
-    uint32_t rotation  : 3; /**< Element of  lv_display_rotation_t*/
+    uint32_t rotation  : 3; /**< Element of  lv_rotation_t*/
 
     uint32_t matrix_rotation : 1; /**< 1: Use matrix for display rotation*/
 

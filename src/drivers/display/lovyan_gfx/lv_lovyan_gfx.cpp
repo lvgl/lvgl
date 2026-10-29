@@ -61,6 +61,8 @@ lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * b
     dsc->tft->setBrightness(255);
     dsc->tft->startWrite();
     dsc->tft->fillScreen(0x00000);
+    dsc->tft->waitDMA();
+    dsc->tft->endWrite();
 
     lv_display_set_driver_data(disp, (void *)dsc);
     lv_display_set_flush_cb(disp, flush_cb);
@@ -91,11 +93,16 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     uint32_t h = (area->y2 - area->y1 + 1);
 
 
-    if(dsc->tft->getStartCount() == 0) {
+    bool started_write = dsc->tft->getStartCount() == 0;
+    if(started_write) {
         dsc->tft->startWrite();
     }
     dsc->tft->pushImageDMA(area->x1, area->y1, w, h, (uint16_t *)px_map);
     dsc->tft->waitDMA();
+    /* Release only the transaction started by this callback. */
+    if(started_write) {
+        dsc->tft->endWrite();
+    }
 
     lv_display_flush_ready(disp);
 
@@ -107,20 +114,20 @@ static void resolution_changed_event_cb(lv_event_t * e)
     lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_display_get_driver_data(disp);
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
-    lv_display_rotation_t rot = lv_display_get_rotation(disp);
+    lv_rotation_t rot = lv_display_get_rotation(disp);
 
     /* handle rotation */
     switch(rot) {
-        case LV_DISPLAY_ROTATION_0:
+        case LV_ROTATION_0:
             dsc->tft->setRotation(0);   /* Portrait orientation */
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             dsc->tft->setRotation(1);   /* Landscape orientation */
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             dsc->tft->setRotation(2);   /* Portrait orientation, flipped */
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             dsc->tft->setRotation(3);   /* Landscape orientation, flipped */
             break;
     }

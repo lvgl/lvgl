@@ -102,7 +102,7 @@ void lv_draw_pxp_deinit(void)
 }
 
 void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
-                        int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
+                        int32_t src_stride, int32_t dest_stride, lv_rotation_t rotation,
                         lv_color_format_t cf)
 {
     lv_pxp_reset();
@@ -112,21 +112,21 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
      * and the PXP constants are for clockwise rotation
      *
      *    counterclockwise          clockwise
-     * LV_DISPLAY_ROTATION_90  -> kPXP_Rotate270
-     * LV_DISPLAY_ROTATION_270 -> kPXP_Rotate90
+     * LV_ROTATION_90  -> kPXP_Rotate270
+     * LV_ROTATION_270 -> kPXP_Rotate90
      */
     pxp_rotate_degree_t pxp_rotation;
     switch(rotation) {
-        case LV_DISPLAY_ROTATION_0:
+        case LV_ROTATION_0:
             pxp_rotation = kPXP_Rotate0;
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_ROTATION_270:
             pxp_rotation = kPXP_Rotate90;
             break;
-        case LV_DISPLAY_ROTATION_180:
+        case LV_ROTATION_180:
             pxp_rotation = kPXP_Rotate180;
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_ROTATION_90:
             pxp_rotation = kPXP_Rotate270;
             break;
         default:
@@ -249,13 +249,13 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
 
-    const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+    const lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
 
     if(!_pxp_dest_cf_supported(draw_dsc_base->layer->color_format))
         return 0;
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * draw_dsc = (lv_draw_fill_dsc_t *) t->draw_dsc;
 
                 /* Most simple case: just a plain rectangle (no radius, no gradient). */
@@ -269,7 +269,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 return 1;
             }
 
-        case LV_DRAW_TASK_TYPE_LAYER: {
+        case LV_DRAW_DSC_TYPE_LAYER: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
 
@@ -286,7 +286,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 return 1;
             }
 
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
@@ -394,14 +394,14 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 #endif
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_pxp_fill(t);
+        case LV_DRAW_DSC_TYPE_FILL:
+            lv_draw_pxp_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_pxp_img(t);
+        case LV_DRAW_DSC_TYPE_IMAGE:
+            lv_draw_pxp_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_pxp_layer(t);
+        case LV_DRAW_DSC_TYPE_LAYER:
+            lv_draw_pxp_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
             break;
         default:
             break;
@@ -409,7 +409,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     /*Layers manage it for themselves*/
-    if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
+    if(t->type != LV_DRAW_DSC_TYPE_LAYER) {
         lv_area_t draw_area;
         if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area))
             return;

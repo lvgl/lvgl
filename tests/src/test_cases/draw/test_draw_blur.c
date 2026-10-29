@@ -38,7 +38,7 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, voi
                                 uint32_t corner_radius)
 {
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, canvas_buf, CANVAS_WIDTH, CANVAS_HEIGHT, cf);
+    lv_canvas_set_buffer(canvas, lv_draw_buf_align(canvas_buf, cf), CANVAS_WIDTH, CANVAS_HEIGHT, cf);
     lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
 
     lv_layer_t layer;

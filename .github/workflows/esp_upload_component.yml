@@ -1,10 +1,18 @@
 name: Push LVGL release to Espressif Component Service
 
-# If the commit is tagged, it will be uploaded. Other scenario silently fail.
 on:
   push:
     tags:
       - v*
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Component version to publish (e.g. 9.6.0~1)"
+        required: true
+      dry_run:
+        description: "Validate only, don't actually publish"
+        type: boolean
+        default: false
 
 jobs:
   upload_components:
@@ -18,6 +26,7 @@ jobs:
         uses: espressif/upload-components-ci-action@v2
         with:
           name: "lvgl"
-          version: ${{ github.ref_name }}
+          version: ${{ github.event.inputs.version || github.ref_name }}
           namespace: "lvgl"
           api_token: ${{ secrets.ESP_IDF_COMPONENT_API_TOKEN }}
+          dry_run: ${{ github.event.inputs.dry_run || false }}

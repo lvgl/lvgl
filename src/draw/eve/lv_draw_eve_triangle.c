@@ -44,8 +44,11 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_eve_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
+void lv_draw_eve_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc)
 {
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
 
     lv_area_t tri_area;
     tri_area.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
@@ -55,7 +58,7 @@ void lv_draw_eve_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc
 
     bool is_common;
     lv_area_t draw_area;
-    is_common = lv_area_intersect(&draw_area, &tri_area, &t->clip_area);
+    is_common = lv_area_intersect(&draw_area, &tri_area, clip_area);
     if(!is_common) return;
 
     lv_point_t p[3];
@@ -93,7 +96,7 @@ void lv_draw_eve_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc
 
     lv_eve_save_context();
 
-    lv_eve_scissor(t->clip_area.x1, t->clip_area.y1, t->clip_area.x2, t->clip_area.y2);
+    lv_eve_scissor(clip_area->x1, clip_area->y1, clip_area->x2, clip_area->y2);
 
     lv_eve_color(dsc->color);
     lv_eve_color_opa(dsc->opa);

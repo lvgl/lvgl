@@ -69,7 +69,15 @@ lv_draw_fill_dsc_t * lv_draw_task_get_fill_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_FILL ? (lv_draw_fill_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_FILL ? (lv_draw_fill_dsc_t *)task->draw_dsc : NULL;
+}
+
+lv_draw_fill_dsc_t * lv_draw_dsc_get_fill_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_FILL, return NULL);
+
+    return (lv_draw_fill_dsc_t *)dsc;
 }
 
 void lv_draw_fill(lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
@@ -91,7 +99,12 @@ void lv_draw_fill(lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc, const lv_a
         lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_FILL);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_FILL);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -113,7 +126,15 @@ lv_draw_border_dsc_t * lv_draw_task_get_border_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_BORDER ? (lv_draw_border_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_BORDER ? (lv_draw_border_dsc_t *)task->draw_dsc : NULL;
+}
+
+lv_draw_border_dsc_t * lv_draw_dsc_get_border_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_BORDER, return NULL);
+
+    return (lv_draw_border_dsc_t *)dsc;
 }
 
 void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
@@ -135,7 +156,12 @@ void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const 
         lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BORDER);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BORDER);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -156,7 +182,15 @@ lv_draw_box_shadow_dsc_t * lv_draw_task_get_box_shadow_dsc(lv_draw_task_t * task
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_BOX_SHADOW ? (lv_draw_box_shadow_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_BOX_SHADOW ? (lv_draw_box_shadow_dsc_t *)task->draw_dsc : NULL;
+}
+
+lv_draw_box_shadow_dsc_t * lv_draw_dsc_get_box_shadow_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_BOX_SHADOW, return NULL);
+
+    return (lv_draw_box_shadow_dsc_t *)dsc;
 }
 
 void lv_draw_box_shadow(lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords)
@@ -168,7 +202,12 @@ void lv_draw_box_shadow(lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc
     if(dsc->opa <= LV_OPA_MIN) return;
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BOX_SHADOW);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BOX_SHADOW);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -242,7 +281,12 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     /*Shadow*/
     if(has_shadow) {
         /*Check whether the shadow is visible*/
-        t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BOX_SHADOW);
+        t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BOX_SHADOW);
+        if(!t) {
+            LV_LOG_WARN("Failed to create draw task");
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         lv_draw_box_shadow_dsc_t * shadow_dsc = t->draw_dsc;
 
         lv_area_increase(&t->_real_area, dsc->shadow_spread, dsc->shadow_spread);
@@ -272,7 +316,12 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
             bg_coords.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
         }
 
-        t = lv_draw_add_task(layer, &bg_coords, LV_DRAW_TASK_TYPE_FILL);
+        t = lv_draw_add_task(layer, &bg_coords, LV_DRAW_DSC_TYPE_FILL);
+        if(!t) {
+            LV_LOG_WARN("Failed to create draw task");
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         lv_draw_fill_dsc_t * bg_dsc = t->draw_dsc;
 
         lv_draw_fill_dsc_init(bg_dsc);
@@ -306,12 +355,17 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
             if(src_type == LV_IMAGE_SRC_VARIABLE || src_type == LV_IMAGE_SRC_FILE) {
 
                 if(dsc->bg_image_tiled) {
-                    t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_IMAGE);
+                    t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_IMAGE);
                 }
                 else {
                     lv_area_t a = {0, 0, header.w - 1, header.h - 1};
                     lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
-                    t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_IMAGE);
+                    t = lv_draw_add_task(layer, &a, LV_DRAW_DSC_TYPE_IMAGE);
+                }
+                if(!t) {
+                    LV_LOG_WARN("Failed to create draw task");
+                    LV_PROFILER_DRAW_END;
+                    return;
                 }
 
                 lv_draw_image_dsc_t * bg_image_dsc = t->draw_dsc;
@@ -343,7 +397,12 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 
                 lv_area_t a = {0, 0, s.x - 1, s.y - 1};
                 lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
-                t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LABEL);
+                t = lv_draw_add_task(layer, &a, LV_DRAW_DSC_TYPE_LABEL);
+                if(!t) {
+                    LV_LOG_WARN("Failed to create draw task");
+                    LV_PROFILER_DRAW_END;
+                    return;
+                }
 
                 lv_draw_label_dsc_t * bg_label_dsc = t->draw_dsc;
 
@@ -353,7 +412,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                 bg_label_dsc->color = dsc->bg_image_recolor;
                 bg_label_dsc->font = dsc->bg_image_symbol_font;
                 bg_label_dsc->text = dsc->bg_image_src;
-                t->type = LV_DRAW_TASK_TYPE_LABEL;
+                t->type = LV_DRAW_DSC_TYPE_LABEL;
                 lv_draw_finalize_task_creation(layer, t);
             }
         }
@@ -361,7 +420,12 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 
     /*Border*/
     if(has_border) {
-        t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BORDER);
+        t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BORDER);
+        if(!t) {
+            LV_LOG_WARN("Failed to create draw task");
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         lv_draw_border_dsc_t * border_dsc = t->draw_dsc;
 
         border_dsc->base = dsc->base;
@@ -378,7 +442,12 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     if(has_outline) {
         lv_area_t outline_coords = *coords;
         lv_area_increase(&outline_coords, dsc->outline_width + dsc->outline_pad, dsc->outline_width + dsc->outline_pad);
-        t = lv_draw_add_task(layer, &outline_coords, LV_DRAW_TASK_TYPE_BORDER);
+        t = lv_draw_add_task(layer, &outline_coords, LV_DRAW_DSC_TYPE_BORDER);
+        if(!t) {
+            LV_LOG_WARN("Failed to create draw task");
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         lv_draw_border_dsc_t * outline_dsc = t->draw_dsc;
         lv_area_increase(&t->_real_area, dsc->outline_width, dsc->outline_width);
         lv_area_increase(&t->_real_area, dsc->outline_pad, dsc->outline_pad);

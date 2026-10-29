@@ -382,8 +382,8 @@ static bool init_buffers(lv_wl_dmabuf_ctx_t * c, lv_wl_buffer_t * buffers, lv_di
     /* Under rotation LVGL renders at the rotated resolution while the compositor
      * is handed the physical one, so the DMA-BUFs follow the physical size and
      * the flush callback rotates into them. */
-    const lv_display_rotation_t rotation = lv_display_get_rotation(display);
-    const bool swap_axes = rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270;
+    const lv_rotation_t rotation = lv_display_get_rotation(display);
+    const bool swap_axes = rotation == LV_ROTATION_90 || rotation == LV_ROTATION_270;
     const uint32_t buf_width = swap_axes ? (uint32_t)height : (uint32_t)width;
     const uint32_t buf_height = swap_axes ? (uint32_t)width : (uint32_t)height;
 
@@ -540,7 +540,7 @@ static bool copy_frame_to_buffer(lv_wl_buffer_t * buffer, const uint8_t * px_map
     const uint32_t bo_width = gbm_bo_get_width(buffer->bo);
     const uint32_t bo_height = gbm_bo_get_height(buffer->bo);
     const lv_color_format_t cf = lv_display_get_color_format(disp);
-    const lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    const lv_rotation_t rotation = lv_display_get_rotation(disp);
 
     const int32_t src_width = lv_display_get_horizontal_resolution(disp);
     const int32_t src_height = lv_display_get_vertical_resolution(disp);
@@ -562,7 +562,7 @@ static bool copy_frame_to_buffer(lv_wl_buffer_t * buffer, const uint8_t * px_map
         return false;
     }
 
-    if(rotation != LV_DISPLAY_ROTATION_0) {
+    if(rotation != LV_ROTATION_0) {
         lv_draw_rotate(px_map, dst, src_width, src_height, src_stride, dst_stride, rotation, cf);
     }
     else if(dst_stride == src_stride) {

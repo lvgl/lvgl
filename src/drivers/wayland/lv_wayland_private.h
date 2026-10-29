@@ -167,7 +167,6 @@ typedef struct _lv_wl_window_t {
     lv_indev_t * lv_indev_touch;
     lv_indev_t * lv_indev_keyboard;
     lv_wayland_backend_display_data_t backend_ddata;
-    lv_wayland_display_close_cb_t close_cb;
     lv_wl_window_xdg_t xdg;
 
     /* The current physical assigned output */

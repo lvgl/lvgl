@@ -488,7 +488,7 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_CHECK_OBJ(obj_to_align, &obj_class, return);
+    LV_CHECK_OBJ(obj_to_align, &lv_obj_class, return);
 
     lv_obj_update_layout(obj);
 
@@ -509,7 +509,7 @@ void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, in
 void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_CHECK_OBJ(obj_to_rotate, &obj_class, return);
+    LV_CHECK_OBJ(obj_to_rotate, &lv_obj_class, return);
 
     lv_obj_update_layout(obj);
 
@@ -693,7 +693,14 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         uint32_t delta_tick = lv_tick_elaps(arc->last_tick);
         /* delta_angle_max can never be signed. delta_tick is always signed, same for ch_rate */
-        const lv_value_precise_t delta_angle_max = (arc->chg_rate * delta_tick) / 1000;
+        lv_value_precise_t delta_angle_max = (arc->chg_rate * delta_tick) / 1000;
+
+        /*A single value step in degs can exceed the rate limit. Don't limit below one step.*/
+        int32_t value_steps = arc->max_value - arc->min_value;
+        if(value_steps > 0) {
+            lv_value_precise_t one_step = deg_range / value_steps;
+            if(delta_angle_max < one_step) delta_angle_max = one_step;
+        }
 
         if(delta_angle > delta_angle_max) {
             delta_angle = delta_angle_max;

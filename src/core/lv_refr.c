@@ -23,10 +23,6 @@
  *      DEFINES
  *********************/
 
-#if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP && !defined(LV_COLOR_16_SWAP_DISABLE_WARNING)
-    #warning LV_COLOR_16_SWAP will be removed completely in v10 after being a private config since v9. Use LV_COLOR_FORMAT_RGB565_SWAPPED as the display color format instead
-#endif
-
 /*Display being refreshed*/
 #define disp_refr LV_GLOBAL_DEFAULT()->disp_refresh
 
@@ -279,10 +275,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
 lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     if(!disp) return LV_RESULT_INVALID;
     if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
 
@@ -293,7 +285,8 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
      *  2.User-customized widget modify widget properties/styles again within the DRAW event.
      *
      * Therefore, ensure that LVGL is used in a single-threaded manner, or refer to
-     * documentation: https://docs.lvgl.io/master/porting/os.html for proper locking mechanisms.
+     * the documentation for proper locking mechanisms:
+     * https://lvgl.io/docs/open/integration/overview#operating-systems-and-threads
      * Additionally, ensure that only drawing-related tasks are performed within the DRAW event,
      * and move widget property/style modifications to other events.
      */
@@ -1008,8 +1001,8 @@ static void refr_configured_layer(lv_layer_t * layer)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     if(lv_display_get_matrix_rotation(disp_refr)) {
-        const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
-        if(rotation != LV_DISPLAY_ROTATION_0) {
+        const lv_rotation_t rotation = lv_display_get_rotation(disp_refr);
+        if(rotation != LV_ROTATION_0) {
             lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
 
             /**
@@ -1017,7 +1010,7 @@ static void refr_configured_layer(lv_layer_t * layer)
              * Use direct matrix assignment to reduce precision loss and improve efficiency.
              */
             switch(rotation) {
-                case LV_DISPLAY_ROTATION_90:
+                case LV_ROTATION_90:
                     /**
                      * lv_matrix_rotate(&layer->matrix, 270);
                      * lv_matrix_translate(&layer->matrix, -disp_refr->ver_res, 0);
@@ -1030,7 +1023,7 @@ static void refr_configured_layer(lv_layer_t * layer)
                     layer->matrix.m[1][2] = disp_refr->ver_res;
                     break;
 
-                case LV_DISPLAY_ROTATION_180:
+                case LV_ROTATION_180:
                     /**
                      * lv_matrix_rotate(&layer->matrix, 180);
                      * lv_matrix_translate(&layer->matrix, -disp_refr->hor_res, -disp_refr->ver_res);
@@ -1043,7 +1036,7 @@ static void refr_configured_layer(lv_layer_t * layer)
                     layer->matrix.m[1][2] = disp_refr->ver_res;
                     break;
 
-                case LV_DISPLAY_ROTATION_270:
+                case LV_ROTATION_270:
                     /**
                      * lv_matrix_rotate(&layer->matrix, 90);
                      * lv_matrix_translate(&layer->matrix, 0, -disp_refr->hor_res);
@@ -1138,6 +1131,8 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
 
     parent = lv_obj_get_parent(top_obj);
 
+    const lv_color32_t layer_recolor = layer->recolor;
+
     /*Calculate the recolor before the parent*/
     if(parent) {
         layer->recolor = lv_obj_get_style_recolor_recursive(parent, LV_PART_MAIN);
@@ -1173,6 +1168,8 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
         /*Go a level deeper*/
         parent = lv_obj_get_parent(parent);
     }
+
+    layer->recolor = layer_recolor;
     LV_PROFILER_REFR_END;
 }
 
@@ -1464,25 +1461,6 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
     };
 
     lv_display_send_event(disp, LV_EVENT_FLUSH_START, &offset_area);
-
-    /*
-     * For backward compatibility support LV_COLOR_16_SWAP (from v8)
-     * TODO:(v10) remove this
-     */
-#if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP
-    if(lv_display_get_render_mode(disp) == LV_DISPLAY_RENDER_MODE_DIRECT) {
-        uint16_t * fb = (uint16_t *)px_map;
-        uint32_t stride_px = disp->buf_act->header.stride / 2; /* RGB565: 2 bytes/px */
-        int32_t w = lv_area_get_width(area);
-        int32_t h = lv_area_get_height(area);
-        for(int32_t y = 0; y < h; y++) {
-            lv_draw_rgb565_swap(fb + (uint32_t)(area->y1 + y) * stride_px + area->x1, w);
-        }
-    }
-    else {
-        lv_draw_rgb565_swap(px_map, lv_area_get_size(&offset_area));
-    }
-#endif
 
     disp->flush_cb(disp, &offset_area, px_map);
     lv_display_send_event(disp, LV_EVENT_FLUSH_FINISH, &offset_area);

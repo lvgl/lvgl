@@ -7,8 +7,8 @@ body:
     attributes:
       value: >
         Be sure to read the
-        [FAQ](https://docs.lvgl.io/master/introduction/faq.html), and the related
-        part of the [Documentation](https://docs.lvgl.io/) first.
+        [FAQ](https://lvgl.io/docs/open/introduction/faq), and the related
+        part of the [Documentation](https://lvgl.io/docs/open) first.
   - type: input
     id: version
     attributes:

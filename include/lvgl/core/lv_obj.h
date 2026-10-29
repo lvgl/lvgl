@@ -69,7 +69,7 @@ typedef enum {
     LV_OBJ_FLAG_ADV_HITTEST     = (1u << 16), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners.*/
     LV_OBJ_FLAG_IGNORE_LAYOUT   = (1u << 17), /**< Make the object not positioned by the layouts*/
     LV_OBJ_FLAG_FLOATING        = (1u << 18), /**< Do not scroll the object when the parent scrolls and ignore layout*/
-    LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS = (1u << 19), /**< Send `LV_EVENT_DRAW_TASK_ADDED` events*/
+    LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS = (1u << 19), /**< Send `LV_EVENT_DRAW_DSC_BEGIN/END` events*/
     LV_OBJ_FLAG_OVERFLOW_VISIBLE = (1u << 20),/**< Do not clip the children to the parent's ext draw size*/
     LV_OBJ_FLAG_EVENT_TRICKLE   = (1u << 21), /**< Propagate the events to the children too*/
     LV_OBJ_FLAG_STATE_TRICKLE   = (1u << 22), /**< Propagate the states to the children too*/
@@ -111,7 +111,7 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, FLAG_ADV_HITTEST,           LV_PROPERTY_TYPE_INT,       16),
     LV_PROPERTY_ID(OBJ, FLAG_IGNORE_LAYOUT,         LV_PROPERTY_TYPE_INT,       17),
     LV_PROPERTY_ID(OBJ, FLAG_FLOATING,              LV_PROPERTY_TYPE_INT,       18),
-    LV_PROPERTY_ID(OBJ, FLAG_SEND_DRAW_TASK_EVENTS, LV_PROPERTY_TYPE_INT,       19),
+    LV_PROPERTY_ID(OBJ, FLAG_SEND_DRAW_DSC_EVENTS,  LV_PROPERTY_TYPE_INT,       19),
     LV_PROPERTY_ID(OBJ, FLAG_OVERFLOW_VISIBLE,      LV_PROPERTY_TYPE_INT,       20),
     LV_PROPERTY_ID(OBJ, FLAG_EVENT_TRICKLE,         LV_PROPERTY_TYPE_INT,       21),
     LV_PROPERTY_ID(OBJ, FLAG_STATE_TRICKLE,         LV_PROPERTY_TYPE_INT,       22),
@@ -194,14 +194,14 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, ADV_HITTEST,                LV_PROPERTY_TYPE_BOOL,      90),
     LV_PROPERTY_ID(OBJ, IGNORE_LAYOUT,              LV_PROPERTY_TYPE_BOOL,      91),
     LV_PROPERTY_ID(OBJ, FLOATING,                   LV_PROPERTY_TYPE_BOOL,      92),
-    LV_PROPERTY_ID(OBJ, SEND_DRAW_TASK_EVENTS,      LV_PROPERTY_TYPE_BOOL,      93),
+    LV_PROPERTY_ID(OBJ, SEND_DRAW_DSC_EVENTS,       LV_PROPERTY_TYPE_BOOL,      93),
     LV_PROPERTY_ID(OBJ, OVERFLOW_VISIBLE,           LV_PROPERTY_TYPE_BOOL,      94),
     LV_PROPERTY_ID(OBJ, EVENT_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      95),
     LV_PROPERTY_ID(OBJ, STATE_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      96),
     LV_PROPERTY_ID(OBJ, FLEX_IN_NEW_TRACK,          LV_PROPERTY_TYPE_BOOL,      97),
 
 #if LV_USE_OBJ_NAME
-    LV_PROPERTY_ID(OBJ, NAME,               		LV_PROPERTY_TYPE_TEXT,  	98),
+    LV_PROPERTY_ID(OBJ, NAME,                       LV_PROPERTY_TYPE_TEXT,      98),
 #endif
 
     LV_PROPERTY_OBJ_END,
@@ -228,34 +228,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent);
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set one or more flags
- * @param obj   pointer to an object
- * @param f     OR-ed values from `lv_obj_flag_t` to set.
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, true)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, true).")
-void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
-
-/**
- * Remove one or more flags
- * @param obj   pointer to an object
- * @param f     OR-ed values from `lv_obj_flag_t` to clear.
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, false)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, false).")
-void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
-
-/**
- * Set add or remove one or more flags.
- * @param obj   pointer to an object
- * @param f     OR-ed values from `lv_obj_flag_t` to update.
- * @param v     true: add the flags; false: remove the flags
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, en)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, en).")
-void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
 
 /** Make the object hidden. (Like it wasn't there at all)
  * @param obj     pointer to a widget
@@ -377,11 +349,11 @@ void lv_obj_set_ignore_layout(lv_obj_t * obj, bool en);
  */
 void lv_obj_set_floating(lv_obj_t * obj, bool en);
 
-/** Send LV_EVENT_DRAW_TASK_ADDED events
+/** Send LV_EVENT_DRAW_DSC_BEGIN and LV_EVENT_DRAW_DSC_END events
  * @param obj     pointer to a widget
- * @param en      enable or disable draw task events
+ * @param en      enable or disable draw descriptor events
  */
-void lv_obj_set_send_draw_task_events(lv_obj_t * obj, bool en);
+void lv_obj_set_send_draw_dsc_events(lv_obj_t * obj, bool en);
 
 /** Do not clip the children to the parent's extended draw size
  * @param obj     pointer to a widget
@@ -534,26 +506,6 @@ void lv_obj_set_user_flag(lv_obj_t * obj, uint32_t bit, bool v);
  * Getter functions
  *======================*/
 
-/**
- * Check if a given flag or all the given flags are set on an object.
- * @param obj   pointer to an object
- * @param f     the flag(s) to check (OR-ed values can be used)
- * @return      true: all flags are set; false: not all flags are set
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_is_hidden(obj)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
-bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
-
-/**
- * Check if a given flag or any of the flags are set on an object.
- * @param obj   pointer to an object
- * @param f     the flag(s) to check (OR-ed values can be used)
- * @return      true: at least one flag is set; false: none of the flags are set
- * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj)`.
- */
-LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
-bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
-
 /** Get whether the object is hidden
  * @param obj     pointer to a widget
  * @return        true if the object is hidden, false otherwise
@@ -668,11 +620,11 @@ bool lv_obj_is_ignore_layout(const lv_obj_t * obj);
  */
 bool lv_obj_is_floating(const lv_obj_t * obj);
 
-/** Get whether draw task events are sent
+/** Get whether draw descriptor events are sent
  * @param obj     pointer to a widget
- * @return        true if draw task events are enabled
+ * @return        true if draw descriptor events are enabled
  */
-bool lv_obj_is_send_draw_task_events(const lv_obj_t * obj);
+bool lv_obj_is_send_draw_dsc_events(const lv_obj_t * obj);
 
 /** Get whether overflow is visible outside the parent
  * @param obj     pointer to a widget
@@ -957,22 +909,6 @@ void lv_obj_set_id(lv_obj_t * obj, void * id);
 void * lv_obj_get_id(const lv_obj_t * obj);
 
 /**
- *
- * Get the child object by its id.
- * It will check children and grandchildren recursively.
- * Function `lv_obj_id_compare` is used to matched obj id with given id.
- *
- * @deprecated IDs are used only to print the widget trees. To find a widget use `lv_obj_find_by_name`
- *
- * @param obj       pointer to an object @nullable. When NULL the active screen is
- *                  searched.
- * @param id        the id of the child object
- * @return          pointer to the child object or NULL if not found
- */
-LV_DEPRECATED("IDs are used only to print the widget trees. To find a widget use lv_obj_find_by_name")
-lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id);
-
-/**
  * Assign id to object if not previously assigned.
  * This function gets called automatically when LV_OBJ_ID_AUTO_ASSIGN is enabled.
  *
@@ -1024,30 +960,6 @@ void lv_objid_builtin_destroy(void);
 /**********************
  *      MACROS
  **********************/
-
-#if LV_USE_ASSERT_OBJ
-/**
- * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
- *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
- *             and executes the supplied action, which is safer in production.
- */
-#define LV_ASSERT_OBJ(obj_p, obj_class)                                                                      \
-    do {                                                                                                     \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");                  \
-        LV_ASSERT_INTERNAL(obj_p != NULL, "");                                                               \
-        LV_ASSERT_INTERNAL(lv_obj_has_class(obj_p, obj_class) == true, "");                                  \
-        LV_ASSERT_INTERNAL(lv_obj_is_in_widget_tree(obj_p) == true, "");                                     \
-    } while(0)
-# else
-/**
- * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
- */
-#define LV_ASSERT_OBJ(obj_p, obj_class) \
-    do { \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead."); \
-        LV_ASSERT_INTERNAL(obj_p, ""); \
-    } while(0)
-#endif
 
 #if LV_USE_LOG && LV_LOG_TRACE_OBJ_CREATE
 #  define LV_TRACE_OBJ_CREATE(...) LV_LOG_TRACE(__VA_ARGS__)

@@ -70,6 +70,10 @@
     #include "draw/sifli/epic/lv_draw_sifli_epic.h"
 #endif
 
+#if LV_USE_DRAW_IPA
+    #include "draw/gigadevice/ipa/lv_draw_ipa.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -268,6 +272,10 @@ void lv_init(void)
     lv_draw_sifli_epic_init();
 #endif
 
+#if LV_USE_DRAW_IPA
+    lv_draw_ipa_init();
+#endif
+
     lv_obj_style_init();
 
     /*Initialize the screen refresh system*/
@@ -307,10 +315,6 @@ void lv_init(void)
 
 #if LV_USE_ASSERT_MEM_INTEGRITY
     LV_LOG_WARN("Memory integrity checks are enabled via LV_USE_ASSERT_MEM_INTEGRITY which makes LVGL much slower");
-#endif
-
-#if LV_USE_ASSERT_OBJ
-    LV_LOG_WARN("Object sanity checks are enabled via LV_USE_ASSERT_OBJ which makes LVGL much slower");
 #endif
 
 #if LV_USE_ASSERT_STYLE
@@ -486,6 +490,10 @@ void lv_deinit(void)
 
 #if LV_USE_SIFLI_EPIC
     lv_draw_sifli_epic_deinit();
+#endif
+
+#if LV_USE_DRAW_IPA
+    lv_draw_ipa_deinit();
 #endif
 
     lv_draw_deinit();

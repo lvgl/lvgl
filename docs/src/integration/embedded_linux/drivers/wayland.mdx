@@ -109,7 +109,7 @@ At this time, the EGL backend can only drive one window. The work to support mul
 #define H_RES 800
 #define V_RES 480
 
-lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Window Title", NULL);
+lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Window Title");
 if(disp == NULL) {
     /* No enabled backend could set up a display */
 }
@@ -190,7 +190,7 @@ int32_t width, height;
 int32_t output = lv_wayland_get_display_size("HDMI-A-1", &width, &height);
 
 if(output >= 0) {
-    lv_display_t * disp = lv_wayland_window_create(width, height, "My window", NULL);
+    lv_display_t * disp = lv_wayland_window_create(width, height, "My window");
     lv_wayland_set_physical_display(disp, output);
     lv_wayland_window_set_fullscreen(disp, true);
 }
