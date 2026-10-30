@@ -1180,6 +1180,12 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                         line_dsc.point_cnt += 3;
                     }
                 }
+                else if(ser->y_points[p_act] != LV_CHART_POINT_NONE) {
+                    /*At the transition from a LV_CHART_POINT_NONE to a valid data point -
+                     *the Y values still need a reset to prevent massive spikes*/
+                    y_min = p_y;
+                    y_max = p_y;
+                }
             }
 
             p_prev = p_act;
