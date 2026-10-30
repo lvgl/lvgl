@@ -190,6 +190,12 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
  */
 lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded);
 
+/**
+ * Invalidate image and image header caches
+ * @param src pointer to an image source. @nullable. When NULL every image is invalidated
+ */
+void lv_image_cache_drop(const void * src);
+
 /**********************
  *      MACROS
  **********************/
