@@ -30,6 +30,8 @@
     #define DEFAULT_TILE_CNT LV_DRAW_SW_DRAW_UNIT_CNT
 #endif
 
+#define LV_DISPLAY_SCREEN_LAYER_COUNT (3)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -154,9 +156,12 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 #endif
 
     disp->bottom_layer = lv_obj_create(NULL); /*Create bottom layer on the display*/
-    disp->act_scr   = lv_obj_create(NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL); /*Create top layer on the display*/
     disp->sys_layer = lv_obj_create(NULL); /*Create sys layer on the display*/
+
+    /* IMPORTANT: act_scr should be the last so that other parts of the code can rely on
+     * user screens starting at disp->screens + 3*/
+    disp->act_scr = lv_obj_create(NULL); /*Create a default screen on the display*/
     lv_obj_remove_style_all(disp->bottom_layer);
     lv_obj_remove_style_all(disp->top_layer);
     lv_obj_remove_style_all(disp->sys_layer);
@@ -699,6 +704,20 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp)
     LV_CHECK_ARG(disp != NULL, return NULL);
 
     return disp->bottom_layer;
+}
+
+uint32_t lv_display_get_screen_count(const lv_display_t * disp)
+{
+    LV_CHECK_ARG(disp != NULL, return 0);
+    return disp->screen_cnt - LV_DISPLAY_SCREEN_LAYER_COUNT;
+}
+
+lv_obj_t * lv_display_get_screen(const lv_display_t * disp, uint32_t idx)
+{
+    LV_CHECK_ARG(disp != NULL, return NULL);
+    LV_CHECK_ARG(idx < disp->screen_cnt - LV_DISPLAY_SCREEN_LAYER_COUNT, return NULL);
+
+    return disp->screens[idx + LV_DISPLAY_SCREEN_LAYER_COUNT];
 }
 
 #if LV_USE_OBJ_NAME
