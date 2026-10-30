@@ -5,6 +5,8 @@
 
 #include "unity/unity.h"
 
+#include <string.h>
+
 static lv_obj_t * g_screen_active;
 
 void setUp(void)
@@ -806,6 +808,73 @@ void test_canvas_draw_nested_sub_layer(void)
     lv_canvas_finish_layer(canvas, &layer);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/canvas_nested_sub_layer.png")
+}
+
+
+#if LV_BIN_DECODER_RAM_LOAD
+/*Indexed buffers are decoded into the image cache only with RAM load*/
+static const void * cache_search_src;
+static bool cache_search_found;
+
+static void cache_search_cb(void * elem)
+{
+    lv_image_cache_data_t * data = elem;
+    if(data->src == cache_search_src) cache_search_found = true;
+}
+
+static bool image_cache_has_src(const void * src)
+{
+    lv_iter_t * iter = lv_image_cache_iter_create();
+    if(iter == NULL) return false;
+
+    cache_search_src = src;
+    cache_search_found = false;
+    lv_iter_inspect(iter, cache_search_cb);
+    lv_iter_destroy(iter);
+    return cache_search_found;
+}
+
+#endif
+
+void test_canvas_delete_drops_the_buffer_from_the_image_cache(void)
+{
+#if LV_BIN_DECODER_RAM_LOAD
+    /*#10824: an I1 buffer is decoded into the image cache, keyed by the canvas' static_buf.
+     *Deleting the canvas must drop that entry, or a new canvas at the same address reuses it.*/
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t buf[LV_DRAW_BUF_SIZE(32, 32, LV_COLOR_FORMAT_I1)];
+    lv_memzero(buf, sizeof(buf));
+
+    lv_obj_t * canvas = lv_canvas_create(g_screen_active);
+    lv_canvas_set_buffer(canvas, buf, 32, 32, LV_COLOR_FORMAT_I1);
+    lv_canvas_set_palette(canvas, 0, lv_color32_make(0, 0, 0, 0xff));
+    lv_canvas_set_palette(canvas, 1, lv_color32_make(0xff, 0xff, 0xff, 0xff));
+    lv_refr_now(NULL);
+
+    const lv_draw_buf_t * key = lv_canvas_get_draw_buf(canvas);
+    TEST_ASSERT_TRUE(image_cache_has_src(key));
+
+    lv_obj_delete(canvas);
+    TEST_ASSERT_FALSE(image_cache_has_src(key));
+#endif
+}
+
+static void free_draw_buf_on_delete(lv_event_t * e)
+{
+    lv_draw_buf_destroy(lv_canvas_get_draw_buf(lv_event_get_current_target(e)));
+}
+
+void test_canvas_draw_buf_freed_on_delete_event(void)
+{
+    /*The canvas must not touch its buffer after the user's LV_EVENT_DELETE handler freed it*/
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(32, 32, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    lv_draw_buf_clear(draw_buf, NULL);
+
+    lv_obj_t * canvas = lv_canvas_create(g_screen_active);
+    lv_canvas_set_draw_buf(canvas, draw_buf);
+    lv_obj_add_event_cb(canvas, free_draw_buf_on_delete, LV_EVENT_DELETE, NULL);
+    lv_refr_now(NULL);
+
+    lv_obj_delete(canvas);
 }
 
 #endif
