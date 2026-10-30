@@ -468,9 +468,6 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-    /*Only static_buf is owned by the canvas and still valid here. A draw_buf
-     *set via lv_canvas_set_draw_buf() belongs to the caller, who may free it
-     *in an LV_EVENT_DELETE handler or before lv_obj_delete() (#10824).*/
     if(canvas->draw_buf == &canvas->static_buf) lv_image_cache_drop(&canvas->static_buf);
     canvas->draw_buf = NULL;
 }

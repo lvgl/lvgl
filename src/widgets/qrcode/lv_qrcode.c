@@ -250,8 +250,6 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     /*@fixme destroy buffer in cache free_cb.*/
     lv_draw_buf_destroy(draw_buf);
-    /* The base class (canvas) destructor runs next and must not drop or read
-     * the already-destroyed buffer (#10824). */
     ((lv_canvas_t *)obj)->draw_buf = NULL;
 }
 
