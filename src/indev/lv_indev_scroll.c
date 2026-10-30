@@ -9,6 +9,7 @@
 
 #include "../core/lv_obj_scroll_private.h"
 #include "../core/lv_obj_private.h"
+#include "../core/lv_obj_draw_private.h"
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
 #include "../core/lv_obj_style_internal.h"
@@ -70,11 +71,13 @@ void lv_indev_scroll_handler(lv_indev_t * indev)
     int16_t scale_y = 256;
     lv_obj_t * parent = scroll_obj;
     while(parent) {
-        angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
-        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
-        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
-        scale_x = (scale_x * zoom_act_x) >> 8;
-        scale_y = (scale_y * zoom_act_y) >> 8;
+        if(lv_obj_get_layer_type(parent) == LV_LAYER_TYPE_TRANSFORM) {
+            angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+            int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+            int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
+            scale_x = (scale_x * zoom_act_x) >> 8;
+            scale_y = (scale_y * zoom_act_y) >> 8;
+        }
         parent = lv_obj_get_parent(parent);
     }
 
@@ -294,11 +297,13 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
         lv_point_t pivot = { 0, 0 };
         lv_obj_t * parent = obj_act;
         while(parent) {
-            angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
-            int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
-            int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
-            scale_x = (scale_x * zoom_act_x) >> 8;
-            scale_y = (scale_y * zoom_act_y) >> 8;
+            if(lv_obj_get_layer_type(parent) == LV_LAYER_TYPE_TRANSFORM) {
+                angle += lv_obj_get_style_transform_rotation_internal(parent, LV_PART_MAIN);
+                int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe_internal(parent, LV_PART_MAIN);
+                int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe_internal(parent, LV_PART_MAIN);
+                scale_x = (scale_x * zoom_act_x) >> 8;
+                scale_y = (scale_y * zoom_act_y) >> 8;
+            }
             parent = lv_obj_get_parent(parent);
         }
 

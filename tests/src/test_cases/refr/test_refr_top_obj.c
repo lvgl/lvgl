@@ -78,14 +78,15 @@ void test_refr_top_obj_skips_the_layered_object(void)
     lv_area_t inside = {20, 20, 29, 29};
 
     /*Objects drawn on their own layer are blended afterwards, they can not cover*/
+    bool layers = lv_draw_layer_supported(refr_ctx.disp);
     lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
-    TEST_ASSERT_EQUAL(LV_LAYER_TYPE_SIMPLE, lv_obj_get_layer_type(obj));
-    TEST_ASSERT_NULL(lv_refr_get_top_obj(&inside, obj));
+    TEST_ASSERT_EQUAL(layers ? LV_LAYER_TYPE_SIMPLE : LV_LAYER_TYPE_NONE, lv_obj_get_layer_type(obj));
+    TEST_ASSERT_EQUAL_PTR(layers ? NULL : obj, lv_refr_get_top_obj(&inside, obj));
 
     lv_obj_set_style_opa_layered(obj, LV_OPA_COVER, 0);
     lv_obj_set_style_transform_rotation(obj, 300, 0);
-    TEST_ASSERT_EQUAL(LV_LAYER_TYPE_TRANSFORM, lv_obj_get_layer_type(obj));
-    TEST_ASSERT_NULL(lv_refr_get_top_obj(&inside, obj));
+    TEST_ASSERT_EQUAL(layers ? LV_LAYER_TYPE_TRANSFORM : LV_LAYER_TYPE_NONE, lv_obj_get_layer_type(obj));
+    TEST_ASSERT_EQUAL_PTR(layers ? NULL : obj, lv_refr_get_top_obj(&inside, obj));
 }
 
 void test_refr_top_obj_skips_the_rounded_corner(void)
