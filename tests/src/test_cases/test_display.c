@@ -546,6 +546,38 @@ void test_display_layers(void)
     lv_display_set_default(disp_def);
 }
 
+void test_display_screens(void)
+{
+    lv_display_t * disp = lv_display_get_default();
+    lv_obj_t * first = lv_screen_active();
+
+    /*Only the default screen, the layers are not screens*/
+    TEST_ASSERT_EQUAL_UINT32(1, lv_display_get_screen_count(disp));
+    TEST_ASSERT_EQUAL_PTR(first, lv_display_get_screen(disp, 0));
+    TEST_ASSERT_NULL(lv_display_get_screen(disp, 1));
+
+    lv_obj_t * second = lv_obj_create(NULL);
+    lv_obj_t * third = lv_obj_create(NULL);
+    TEST_ASSERT_EQUAL_UINT32(3, lv_display_get_screen_count(disp));
+    TEST_ASSERT_EQUAL_PTR(first, lv_display_get_screen(disp, 0));
+    TEST_ASSERT_EQUAL_PTR(second, lv_display_get_screen(disp, 1));
+    TEST_ASSERT_EQUAL_PTR(third, lv_display_get_screen(disp, 2));
+    TEST_ASSERT_NULL(lv_display_get_screen(disp, 3));
+
+    /*Deleting a screen shifts the ones after it*/
+    lv_obj_delete(second);
+    TEST_ASSERT_EQUAL_UINT32(2, lv_display_get_screen_count(disp));
+    TEST_ASSERT_EQUAL_PTR(third, lv_display_get_screen(disp, 1));
+
+    /*Deleting every screen but the active one, from the last index down*/
+    for(uint32_t i = lv_display_get_screen_count(disp); i > 0; i--) {
+        lv_obj_t * scr = lv_display_get_screen(disp, i - 1);
+        if(scr != lv_screen_active()) lv_obj_delete(scr);
+    }
+    TEST_ASSERT_EQUAL_UINT32(1, lv_display_get_screen_count(disp));
+    TEST_ASSERT_EQUAL_PTR(first, lv_display_get_screen(disp, 0));
+}
+
 void test_display_active_time(void)
 {
     lv_display_t * disp_def = lv_display_get_default();
