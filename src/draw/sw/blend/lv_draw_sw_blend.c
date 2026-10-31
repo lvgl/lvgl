@@ -192,6 +192,12 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color(lv_color_format_
             lv_draw_sw_blend_color_to_argb8888(fill_dsc);
             break;
 #endif
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+        case LV_COLOR_FORMAT_ABGR8888:
+            fill_dsc->color = lv_color_make(fill_dsc->color.blue, fill_dsc->color.green, fill_dsc->color.red);
+            lv_draw_sw_blend_color_to_argb8888(fill_dsc);
+            break;
+#endif
 #if LV_DRAW_SW_SUPPORT_RGB888
         case LV_COLOR_FORMAT_RGB888:
             lv_draw_sw_blend_color_to_rgb888(fill_dsc, 3);
@@ -249,6 +255,14 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image(lv_color_format_
 #endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888
         case LV_COLOR_FORMAT_ARGB8888:
+            lv_draw_sw_blend_image_to_argb8888(image_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+        case LV_COLOR_FORMAT_ABGR8888:
+            if(image_dsc->src_color_format == LV_COLOR_FORMAT_ABGR8888) {
+                image_dsc->src_color_format = LV_COLOR_FORMAT_ARGB8888;
+            }
             lv_draw_sw_blend_image_to_argb8888(image_dsc);
             break;
 #endif

@@ -99,16 +99,22 @@ void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_fi
     blend_dsc.mask_area = &blend_area;
     blend_dsc.opa = LV_OPA_COVER;
 
+    lv_grad_dsc_t * grad_dsc = &dsc->grad;
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+    lv_grad_dsc_t grad_swapped;
+    if(lv_draw_sw_grad_swap_for_layer(layer, grad_dsc, &grad_swapped)) grad_dsc = &grad_swapped;
+#endif
+
     /*Get gradient if appropriate*/
-    lv_draw_sw_grad_calc_t * grad = lv_draw_sw_grad_get(&dsc->grad, coords_bg_w, coords_bg_h);
+    lv_draw_sw_grad_calc_t * grad = lv_draw_sw_grad_get(grad_dsc, coords_bg_w, coords_bg_h);
     lv_opa_t * grad_opa_map = NULL;
     bool transp = false;
     if(grad && grad_dir >= LV_GRAD_DIR_HOR) {
         blend_dsc.src_area = &blend_area;
         blend_dsc.src_buf = grad->color_map + clipped_coords.x1 - bg_coords.x1;
         uint32_t s;
-        for(s = 0; s < dsc->grad.stops_count; s++) {
-            if(dsc->grad.stops[s].opa != LV_OPA_COVER) {
+        for(s = 0; s < grad_dsc->stops_count; s++) {
+            if(grad_dsc->stops[s].opa != LV_OPA_COVER) {
                 transp = true;
                 break;
             }
@@ -126,13 +132,13 @@ void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_fi
         LV_ASSERT_NULL(grad);
         switch(grad_dir) {
             case LV_GRAD_DIR_LINEAR:
-                lv_draw_sw_grad_linear_setup(&dsc->grad, coords);
+                lv_draw_sw_grad_linear_setup(grad_dsc, coords);
                 break;
             case LV_GRAD_DIR_RADIAL:
-                lv_draw_sw_grad_radial_setup(&dsc->grad, coords);
+                lv_draw_sw_grad_radial_setup(grad_dsc, coords);
                 break;
             case LV_GRAD_DIR_CONICAL:
-                lv_draw_sw_grad_conical_setup(&dsc->grad, coords);
+                lv_draw_sw_grad_conical_setup(grad_dsc, coords);
                 break;
             default:
                 LV_LOG_WARN("Gradient type is not supported");
@@ -176,15 +182,15 @@ void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_fi
                     break;
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
                 case LV_GRAD_DIR_LINEAR:
-                    lv_draw_sw_grad_linear_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
+                    lv_draw_sw_grad_linear_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
                     preblend = true;
                     break;
                 case LV_GRAD_DIR_RADIAL:
-                    lv_draw_sw_grad_radial_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
+                    lv_draw_sw_grad_radial_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
                     preblend = true;
                     break;
                 case LV_GRAD_DIR_CONICAL:
-                    lv_draw_sw_grad_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
+                    lv_draw_sw_grad_conical_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
                     preblend = true;
                     break;
 #endif
@@ -217,17 +223,17 @@ void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_fi
                     break;
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
                 case LV_GRAD_DIR_LINEAR:
-                    lv_draw_sw_grad_linear_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w,
+                    lv_draw_sw_grad_linear_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w,
                                                     grad);
                     preblend = true;
                     break;
                 case LV_GRAD_DIR_RADIAL:
-                    lv_draw_sw_grad_radial_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w,
+                    lv_draw_sw_grad_radial_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w,
                                                     grad);
                     preblend = true;
                     break;
                 case LV_GRAD_DIR_CONICAL:
-                    lv_draw_sw_grad_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w,
+                    lv_draw_sw_grad_conical_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w,
                                                      grad);
                     preblend = true;
                     break;
@@ -299,13 +305,13 @@ void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_fi
                     break;
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
                 case LV_GRAD_DIR_LINEAR:
-                    lv_draw_sw_grad_linear_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
+                    lv_draw_sw_grad_linear_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
                     break;
                 case LV_GRAD_DIR_RADIAL:
-                    lv_draw_sw_grad_radial_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
+                    lv_draw_sw_grad_radial_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
                     break;
                 case LV_GRAD_DIR_CONICAL:
-                    lv_draw_sw_grad_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
+                    lv_draw_sw_grad_conical_get_line(grad_dsc, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
                     break;
 #endif
                 default:
@@ -326,13 +332,13 @@ void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_fi
     if(grad_dir >= LV_GRAD_DIR_LINEAR) {
         switch(grad_dir) {
             case LV_GRAD_DIR_LINEAR:
-                lv_draw_sw_grad_linear_cleanup(&dsc->grad);
+                lv_draw_sw_grad_linear_cleanup(grad_dsc);
                 break;
             case LV_GRAD_DIR_RADIAL:
-                lv_draw_sw_grad_radial_cleanup(&dsc->grad);
+                lv_draw_sw_grad_radial_cleanup(grad_dsc);
                 break;
             case LV_GRAD_DIR_CONICAL:
-                lv_draw_sw_grad_conical_cleanup(&dsc->grad);
+                lv_draw_sw_grad_conical_cleanup(grad_dsc);
                 break;
             default:
                 break;

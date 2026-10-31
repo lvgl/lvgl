@@ -78,6 +78,10 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
 static void colorkey_and_recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_buf, int32_t src_stride,
                                  lv_color_format_t cf, const lv_draw_image_dsc_t * draw_dsc, lv_draw_sw_blend_dsc_t * blend_dsc);
 
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+    static inline lv_color_t swap_red_blue(lv_color_t color);
+#endif
+
 static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc);
 
 /**********************
@@ -155,6 +159,31 @@ void lv_draw_sw_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_
                            const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data)
 {
     LV_UNUSED(user_data);
+
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+    if(decoder_dsc->decoded->header.cf == LV_COLOR_FORMAT_ABGR8888) {
+        lv_draw_buf_t decoded_as_argb8888 = *decoder_dsc->decoded;
+        decoded_as_argb8888.header.cf = LV_COLOR_FORMAT_ARGB8888;
+
+        lv_image_decoder_dsc_t decoder_dsc_as_argb8888 = *decoder_dsc;
+        decoder_dsc_as_argb8888.decoded = &decoded_as_argb8888;
+
+        lv_draw_image_dsc_t draw_dsc_swapped = *draw_dsc;
+        draw_dsc_swapped.recolor = swap_red_blue(draw_dsc->recolor);
+
+        lv_image_colorkey_t colorkey_swapped;
+        if(draw_dsc->colorkey) {
+            colorkey_swapped.low = swap_red_blue(draw_dsc->colorkey->low);
+            colorkey_swapped.high = swap_red_blue(draw_dsc->colorkey->high);
+            draw_dsc_swapped.colorkey = &colorkey_swapped;
+        }
+
+        lv_draw_sw_image_core(layer, &draw_dsc_swapped, &decoder_dsc_as_argb8888, sup, img_coords, clipped_img_area,
+                              user_data);
+        return;
+    }
+#endif
+
     bool transformed = draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                        draw_dsc->scale_y != LV_SCALE_NONE ? true : false;
 
@@ -1029,5 +1058,12 @@ static uint32_t max_buf_size(const lv_layer_t * layer)
 {
     return 4 * lv_area_get_width(&layer->buf_area) * lv_color_format_get_size(layer->color_format);
 }
+
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+static inline lv_color_t swap_red_blue(lv_color_t color)
+{
+    return lv_color_make(color.blue, color.green, color.red);
+}
+#endif
 
 #endif /*LV_USE_DRAW_SW*/
