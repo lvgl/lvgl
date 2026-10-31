@@ -680,6 +680,43 @@ lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp)
     return disp->prev_scr;
 }
 
+void lv_display_handle_screen_delete(lv_display_t * disp, lv_obj_t * screen)
+{
+    LV_ASSERT_NULL(disp);
+    LV_ASSERT_NULL(screen);
+
+    if(disp->scr_to_load == screen) {
+        bool anim_started = disp->act_scr == screen;
+        lv_obj_t * screen_to_restore = anim_started ? disp->prev_scr : disp->act_scr;
+
+        if(anim_started) disp->act_scr = screen_to_restore;
+        disp->prev_scr = NULL;
+        disp->scr_to_load = NULL;
+        disp->draw_prev_over_act = false;
+        disp->del_prev = false;
+
+        if(screen_to_restore) {
+            lv_anim_delete(screen_to_restore, set_x_anim);
+            lv_anim_delete(screen_to_restore, set_y_anim);
+            lv_anim_delete(screen_to_restore, opa_scale_anim);
+            lv_obj_set_pos(screen_to_restore, 0, 0);
+            lv_obj_remove_local_style_prop(screen_to_restore, LV_STYLE_OPA, 0);
+        }
+        return;
+    }
+
+    if(disp->act_scr == screen) {
+        LV_LOG_WARN("the active screen was deleted");
+        disp->act_scr = NULL;
+    }
+
+    if(disp->prev_scr == screen) {
+        disp->prev_scr = NULL;
+        disp->draw_prev_over_act = false;
+        disp->del_prev = false;
+    }
+}
+
 lv_obj_t * lv_display_get_layer_top(lv_display_t * disp)
 {
     LV_CHECK_ARG(disp != NULL, return NULL);
