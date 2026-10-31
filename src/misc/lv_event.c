@@ -386,6 +386,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_LEAVE);
             ENUM_CASE(EVENT_HIT_TEST);
             ENUM_CASE(EVENT_INDEV_RESET);
+            ENUM_CASE(EVENT_INDEV_SAMPLE);
             ENUM_CASE(EVENT_HOVER_OVER);
             ENUM_CASE(EVENT_HOVER_LEAVE);
 
