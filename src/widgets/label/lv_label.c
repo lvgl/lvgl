@@ -920,11 +920,12 @@ static void draw_main(lv_event_t * e)
      *Extend the bottom by the bottom trim so descenders are not clipped.*/
     lv_text_leading_trim_t leading_trim =
         lv_obj_get_style_text_leading_trim_internal(obj, LV_PART_MAIN);
+    int32_t bottom_trim = 0;
     if(leading_trim != LV_TEXT_LEADING_TRIM_NONE) {
         const lv_font_t * trim_font =
             lv_obj_get_style_text_font_internal(obj, LV_PART_MAIN);
         int32_t top_trim = lv_font_get_top_trim_internal(trim_font, leading_trim);
-        int32_t bottom_trim = lv_font_get_bottom_trim_internal(trim_font, leading_trim);
+        bottom_trim = lv_font_get_bottom_trim_internal(trim_font, leading_trim);
         txt_coords.y1 -= top_trim;
         txt_coords.y2 += bottom_trim;
     }
@@ -987,7 +988,10 @@ static void draw_main(lv_event_t * e)
     if(label->long_mode == LV_LABEL_LONG_MODE_WRAP) {
         int32_t s = lv_obj_get_scroll_top(obj);
         lv_area_move(&txt_coords, 0, -s);
-        txt_coords.y2 = obj->coords.y2;
+        /*Keep the bottom trim: a text area that stops at the baseline gets no
+         *descenders where the clip area covers only them, e.g. a partial
+         *render's buffer starting below the baseline*/
+        txt_coords.y2 = obj->coords.y2 + bottom_trim;
     }
 
     /*Clip to the text in some cases to avoid ugly overflows*/
