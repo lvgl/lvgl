@@ -769,7 +769,13 @@ static bool tiny_ttf_draw_data_cache_create_cb(tiny_ttf_cache_data_t * node, voi
     int w = x2 - x1 + 1;
     int h = y2 - y1 + 1;
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
+    uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
+    if(stride < (uint32_t)w || stride > UINT16_MAX) {
+        ttf_cb_stream_fail(&dsc->stream, TTF_ERROR_INVALID_DATA);
+        return false;
+    }
+
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, stride);
     if(NULL == draw_buf) {
         ttf_cb_stream_fail(&dsc->stream, TTF_ERROR_MEMORY);
         LV_LOG_ERROR("tiny_ttf: out of memory");
@@ -778,7 +784,6 @@ static bool tiny_ttf_draw_data_cache_create_cb(tiny_ttf_cache_data_t * node, voi
 
     lv_draw_buf_clear(draw_buf, NULL);
 
-    uint32_t stride = draw_buf->header.stride;
     stbtt_MakeGlyphBitmap(info, draw_buf->data, w, h, stride, dsc->scale, dsc->scale, g1);
     if(ttf_operation_failed(dsc)) {
         lv_draw_buf_destroy(draw_buf);
