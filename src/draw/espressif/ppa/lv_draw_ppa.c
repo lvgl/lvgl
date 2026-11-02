@@ -30,6 +30,15 @@ static int32_t ppa_delete(lv_draw_unit_t * draw_unit);
 static void  ppa_execute_drawing(lv_draw_ppa_unit_t * u);
 
 /**********************
+*  STATIC VARIABLES
+**********************/
+
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_ppa_fill,
+    .draw_image_cb = lv_draw_ppa_img,
+};
+
+/**********************
 *   GLOBAL FUNCTIONS
 **********************/
 
@@ -45,6 +54,7 @@ void lv_draw_ppa_init(void)
     draw_ppa_unit->base_unit.dispatch_cb  = ppa_dispatch;
     draw_ppa_unit->base_unit.delete_cb    = ppa_delete;
     draw_ppa_unit->base_unit.name         = "ESP_PPA";
+    draw_ppa_unit->base_unit.draw_cbs     = &draw_cbs;
 
     /* Register SRM client */
     cfg.oper_type = PPA_OPERATION_SRM;
@@ -209,17 +219,7 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
 
     lv_draw_buf_flush_cache(buf, &buf_area);
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_ppa_fill(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_ppa_img(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
-            break;
-        default:
-            LV_ASSERT_FORMAT_MSG(false, "Invalid draw task type: %d", t->type);
-            return;
-    }
+    lv_draw_unit_draw_task(t->draw_unit, t);
 
     /* The software fallback wrote through the cache, so its lines must survive */
     if(!u->img_sw_fallback) lv_draw_buf_invalidate_cache(buf, &buf_area);

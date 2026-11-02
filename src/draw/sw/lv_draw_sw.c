@@ -47,7 +47,35 @@
     static int32_t wait_for_finish(lv_draw_unit_t * draw_unit);
 #endif
 
-static void execute_drawing(lv_draw_task_t * t);
+static void execute_drawing(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+static void draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
+static void draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc);
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc);
+static void draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_mask_rect_dsc_t * dsc);
+static void draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
+static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_vector_dsc_t * dsc);
+#endif
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
@@ -60,6 +88,24 @@ static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
  *  STATIC VARIABLES
  **********************/
 #define _draw_info LV_GLOBAL_DEFAULT()->draw_info
+
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = draw_fill,
+    .draw_border_cb = draw_border,
+    .draw_box_shadow_cb = draw_box_shadow,
+    .draw_letter_cb = draw_letter,
+    .draw_label_cb = draw_label,
+    .draw_image_cb = draw_image,
+    .draw_layer_cb = draw_layer,
+    .draw_arc_cb = draw_arc,
+    .draw_line_cb = draw_line,
+    .draw_triangle_cb = draw_triangle,
+    .draw_mask_rect_cb = draw_mask_rect,
+    .draw_blur_cb = draw_blur,
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
+    .draw_vector_cb = draw_vector,
+#endif
+};
 
 /**********************
  *      MACROS
@@ -79,6 +125,7 @@ void lv_draw_sw_init(void)
     lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
     draw_sw_unit->base_unit.dispatch_cb = dispatch;
     draw_sw_unit->base_unit.evaluate_cb = evaluate;
+    draw_sw_unit->base_unit.draw_cbs = &draw_cbs;
 #if LV_USE_OS != LV_OS_NONE
     draw_sw_unit->base_unit.wait_for_finish_cb = wait_for_finish;
 #endif /*LV_USE_OS*/
@@ -346,7 +393,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sw_unit->task_act = t;
 
-    execute_drawing(t);
+    execute_drawing(draw_unit, t);
     draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     draw_sw_unit->task_act = NULL;
 
@@ -377,7 +424,7 @@ static void render_thread_cb(void * ptr)
             break;
         }
 
-        execute_drawing((lv_draw_task_t *)thread_dsc->task_act);
+        execute_drawing(thread_dsc->draw_unit, (lv_draw_task_t *)thread_dsc->task_act);
 #if LV_USE_PARALLEL_DRAW_DEBUG
         parallel_debug_draw(thread_dsc->task_act, thread_dsc->idx);
 #endif
@@ -406,59 +453,105 @@ static int32_t wait_for_finish(lv_draw_unit_t * draw_unit)
     return 0;
 }
 #endif
-static void execute_drawing(lv_draw_task_t * t)
+static void execute_drawing(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
 {
     LV_PROFILER_DRAW_BEGIN;
-    /*Render the draw task*/
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_sw_fill(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_BORDER:
-            lv_draw_sw_border(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-            lv_draw_sw_box_shadow(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LETTER:
-            lv_draw_sw_letter(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LABEL:
-            lv_draw_sw_label(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_sw_image(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_ARC:
-            lv_draw_sw_arc(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LINE:
-            lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_sw_line, NULL);
-            break;
-        case LV_DRAW_DSC_TYPE_BLUR:
-            lv_draw_sw_blur(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-            lv_draw_sw_triangle(t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-        case LV_DRAW_DSC_TYPE_LAYER:
-            lv_draw_sw_layer(t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-            lv_draw_sw_mask_rect(t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-        case LV_DRAW_DSC_TYPE_VECTOR:
-            lv_draw_sw_vector(t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-#endif
-        default:
-            break;
-    }
-
-
+    lv_draw_unit_draw_task(draw_unit, t);
     LV_PROFILER_DRAW_END;
 }
+
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_fill(layer, clip_area, dsc, coords);
+}
+
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_border(layer, clip_area, dsc, coords);
+}
+
+static void draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_box_shadow(layer, clip_area, dsc, coords);
+}
+
+static void draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_letter(layer, clip_area, dsc, coords);
+}
+
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_label(layer, clip_area, dsc, coords);
+}
+
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_image(layer, clip_area, dsc, coords);
+}
+
+static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_layer(layer, clip_area, dsc, coords);
+}
+
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_arc(layer, clip_area, dsc, coords);
+}
+
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_sw_line, NULL);
+}
+
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_triangle(layer, clip_area, dsc);
+}
+
+static void draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_mask_rect_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_mask_rect(layer, clip_area, dsc);
+}
+
+static void draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_blur(layer, clip_area, dsc, coords);
+}
+
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
+static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_vector_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_sw_vector(layer, clip_area, dsc);
+}
+#endif
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
 static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)

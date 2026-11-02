@@ -483,7 +483,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_vector_dsc_t * dsc)
+void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_vector_dsc_t * dsc)
 {
     if(dsc->task_list == NULL)
         return;
@@ -491,7 +491,6 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_
     lv_draw_buf_t * draw_buf = layer->draw_buf;
     if(draw_buf == NULL) {
         lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
-        dsc->task_list = NULL;
         return;
     }
 
@@ -522,9 +521,7 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_
 
     _tvg_draw_state state = {canvas, layer->partial_y_offset, -layer->buf_area.x1, -layer->buf_area.y1, dsc->opa};
 
-    lv_ll_t * task_list = dsc->task_list;
-    lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, &state);
-    dsc->task_list = NULL;
+    lv_vector_for_each_destroy_tasks(dsc->task_list, _task_draw_cb, &state);
 
     if(tvg_canvas_draw(canvas) == TVG_RESULT_SUCCESS) {
         tvg_canvas_sync(canvas);

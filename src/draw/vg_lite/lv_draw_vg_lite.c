@@ -41,9 +41,33 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 
 static void draw_event_cb(lv_event_t * e);
 
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_vg_lite_fill,
+    .draw_border_cb = lv_draw_vg_lite_border,
+    .draw_box_shadow_cb = lv_draw_vg_lite_box_shadow,
+    .draw_letter_cb = lv_draw_vg_lite_letter,
+    .draw_label_cb = lv_draw_vg_lite_label,
+    .draw_image_cb = draw_image,
+    .draw_layer_cb = lv_draw_vg_lite_layer,
+    .draw_arc_cb = lv_draw_vg_lite_arc,
+    .draw_line_cb = draw_line,
+    .draw_triangle_cb = lv_draw_vg_lite_triangle,
+    .draw_mask_rect_cb = lv_draw_vg_lite_mask_rect,
+    .draw_blur_cb = lv_draw_vg_lite_blur,
+#if LV_USE_VECTOR_GRAPHIC
+    .draw_vector_cb = lv_draw_vg_lite_vector,
+#endif
+};
 
 /**********************
  *      MACROS
@@ -72,6 +96,7 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.evaluate_cb = draw_evaluate;
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
+    unit->base_unit.draw_cbs = &draw_cbs;
     unit->base_unit.name = "VG_LITE";
 
     lv_vg_lite_image_dsc_init(unit);
@@ -144,53 +169,21 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
         lv_vg_lite_set_scissor_area(u, &scissor_area);
     }
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_LETTER:
-            lv_draw_vg_lite_letter(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LABEL:
-            lv_draw_vg_lite_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_vg_lite_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_BORDER:
-            lv_draw_vg_lite_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-            lv_draw_vg_lite_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_BLUR:
-            lv_draw_vg_lite_blur(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_vg_lite_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area, false);
-            break;
-        case LV_DRAW_DSC_TYPE_ARC:
-            lv_draw_vg_lite_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LINE:
-            lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_vg_lite_line, t->draw_unit);
-            break;
-        case LV_DRAW_DSC_TYPE_LAYER:
-            lv_draw_vg_lite_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-            lv_draw_vg_lite_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-            lv_draw_vg_lite_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-#if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_DSC_TYPE_VECTOR:
-            lv_draw_vg_lite_vector(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-#endif
-        default:
-            break;
-    }
+    lv_draw_unit_draw_task(t->draw_unit, t);
 
     lv_vg_lite_flush(u);
+}
+
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_vg_lite_img(draw_unit, layer, clip_area, dsc, coords, false);
+}
+
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc)
+{
+    lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_vg_lite_line, draw_unit);
 }
 
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)

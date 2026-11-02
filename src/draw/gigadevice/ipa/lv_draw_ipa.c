@@ -56,6 +56,12 @@ static void post_transfer_tasks(lv_draw_ipa_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_ipa_fill,
+    .draw_image_cb = lv_draw_ipa_image,
+    .draw_layer_cb = lv_draw_ipa_layer,
+};
+
 #if LV_DRAW_IPA_ASYNC
     static lv_draw_ipa_unit_t * g_unit;
 #endif
@@ -93,6 +99,7 @@ void lv_draw_ipa_init(void)
     draw_ipa_unit->base_unit.wait_for_finish_cb = wait_finish_cb;
 #endif
     draw_ipa_unit->base_unit.name = "IPA";
+    draw_ipa_unit->base_unit.draw_cbs = &draw_cbs;
 
 #if LV_DRAW_IPA_ASYNC
     g_unit = draw_ipa_unit;
@@ -186,7 +193,7 @@ uint32_t lv_draw_ipa_color_to_ipa_color(lv_draw_ipa_output_cf_t cf, lv_color_t c
     return 0;
 }
 
-void lv_draw_ipa_configure_and_start_transfer(const lv_draw_ipa_configuration_t * conf)
+void lv_draw_ipa_configure_and_start_transfer(lv_draw_ipa_unit_t * u, const lv_draw_ipa_configuration_t * conf)
 {
     /* Check that addresses are valid regarding to alignment constraints */
     if(((conf->output_cf == LV_DRAW_IPA_OUTPUT_CF_ARGB8888) &&
@@ -276,6 +283,8 @@ void lv_draw_ipa_configure_and_start_transfer(const lv_draw_ipa_configuration_t 
               | IPA_CTL_FTFIE
 #endif
               ;
+
+    u->transfer_started = true;
 }
 
 
@@ -482,25 +491,16 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     /* Flush cache before drawing. This is a no-op when IPA_CACHE is disabled */
     lv_draw_buf_flush_cache(layer->draw_buf, &draw_ipa_unit->last_clipped_area);
 
-    if(t->type == LV_DRAW_DSC_TYPE_FILL) {
-        void * dest = lv_draw_layer_go_to_xy(layer, draw_ipa_unit->last_clipped_area.x1,
-                                             draw_ipa_unit->last_clipped_area.y1);
+    draw_ipa_unit->transfer_started = false;
 
-        lv_draw_ipa_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area, dest,
-                         lv_area_get_width(&clipped_coords),
-                         lv_area_get_height(&clipped_coords),
-                         layer->draw_buf->header.stride);
-    }
-    else if(t->type == LV_DRAW_DSC_TYPE_IMAGE) {
-        lv_draw_ipa_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-    }
-    else if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
-        if(!lv_draw_ipa_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area)) {
-            t->state = LV_DRAW_TASK_STATE_FINISHED;
-            draw_ipa_unit->task_act = NULL;
-            lv_draw_dispatch_request();
-            return 1;
-        }
+    lv_draw_unit_draw_task(t->draw_unit, t);
+
+    /* No transfer to wait for, e.g. an image that failed to decode */
+    if(!draw_ipa_unit->transfer_started) {
+        t->state = LV_DRAW_TASK_STATE_FINISHED;
+        draw_ipa_unit->task_act = NULL;
+        lv_draw_dispatch_request();
+        return 1;
     }
 
 #if LV_DRAW_IPA_ASYNC

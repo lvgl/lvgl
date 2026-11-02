@@ -36,23 +36,22 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_draw_ipa_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+void lv_draw_ipa_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
-    LV_UNUSED(draw_unit);
-    LV_CHECK_ARG(layer != NULL, return false);
-    LV_CHECK_ARG(clip_area != NULL, return false);
-    LV_CHECK_ARG(draw_dsc != NULL, return false);
-    LV_CHECK_ARG(coords != NULL, return false);
-    LV_CHECK_ARG(draw_dsc->src != NULL, return false);
+    LV_ASSERT(layer != NULL);
+    LV_ASSERT(clip_area != NULL);
+    LV_ASSERT(draw_dsc != NULL);
+    LV_ASSERT(coords != NULL);
+    LV_ASSERT(draw_dsc->src != NULL);
 
     const lv_layer_t * source_layer = draw_dsc->src;
     const lv_draw_buf_t * source_buf = source_layer->draw_buf;
-    if(source_buf == NULL || draw_dsc->opa <= LV_OPA_MIN) return false;
+    if(source_buf == NULL || draw_dsc->opa <= LV_OPA_MIN) return;
 
     lv_area_t clipped_area;
-    if(!lv_area_intersect(&clipped_area, coords, clip_area)) return false;
-    if(!lv_area_intersect(&clipped_area, &clipped_area, &layer->buf_area)) return false;
+    if(!lv_area_intersect(&clipped_area, coords, clip_area)) return;
+    if(!lv_area_intersect(&clipped_area, &clipped_area, &layer->buf_area)) return;
 
     lv_area_t source_area = clipped_area;
     lv_area_move(&source_area, -coords->x1, -coords->y1);
@@ -69,7 +68,7 @@ bool lv_draw_ipa_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_
        source_stride / source_size < source_buf->header.w ||
        target_stride / target_size < layer->draw_buf->header.w) {
         LV_LOG_WARN("Invalid IPA layer buffer layout");
-        return false;
+        return;
     }
 
     uint32_t width = lv_area_get_width(&clipped_area);
@@ -105,8 +104,7 @@ bool lv_draw_ipa_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_
     }
 
     lv_draw_buf_flush_cache(source_buf, &source_area);
-    lv_draw_ipa_configure_and_start_transfer(&conf);
-    return true;
+    lv_draw_ipa_configure_and_start_transfer((lv_draw_ipa_unit_t *)draw_unit, &conf);
 }
 
 /**********************

@@ -42,6 +42,9 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 static void disp_delete_cb(lv_event_t * e);
 
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc);
+
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
@@ -49,6 +52,16 @@ static void disp_delete_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_eve_fill,
+    .draw_border_cb = lv_draw_eve_border,
+    .draw_label_cb = lv_draw_eve_label,
+    .draw_image_cb = lv_draw_eve_image,
+    .draw_arc_cb = lv_draw_eve_arc,
+    .draw_line_cb = draw_line,
+    .draw_triangle_cb = lv_draw_eve_triangle,
+};
 
 /**********************
  *      MACROS
@@ -63,6 +76,7 @@ void lv_draw_eve_init(void)
     lv_draw_eve_unit_t * draw_eve_unit = lv_draw_create_unit(sizeof(lv_draw_eve_unit_t));
     draw_eve_unit->base_unit.dispatch_cb = eve_dispatch;
     draw_eve_unit->base_unit.evaluate_cb = eve_evaluate;
+    draw_eve_unit->base_unit.draw_cbs = &draw_cbs;
 
     lv_draw_eve_unit_g = draw_eve_unit;
 }
@@ -128,31 +142,14 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_LINE:
-            lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_eve_line, NULL);
-            break;
-        case LV_DRAW_DSC_TYPE_BORDER:
-            lv_draw_eve_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_eve_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_eve_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LABEL:
-            lv_draw_eve_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_ARC:
-            lv_draw_eve_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-            lv_draw_eve_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-        default:
-            break;
-    }
+    lv_draw_unit_draw_task(&u->base_unit, t);
+}
+
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_eve_line, NULL);
 }
 
 static void disp_delete_cb(lv_event_t * e)
