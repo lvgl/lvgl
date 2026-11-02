@@ -152,15 +152,15 @@ void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding)
     barcode_mark_dirty(obj);
 }
 
-lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
+lv_result_t lv_barcode_set_text(lv_obj_t * obj, const char * text)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    LV_CHECK_ARG(data != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(text != NULL, return LV_RESULT_INVALID);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
-    if(data[0] == '\0') {
-        LV_LOG_WARN("data is empty");
+    if(text[0] == '\0') {
+        LV_LOG_WARN("text is empty");
         barcode_forget_data(barcode);
         barcode->needs_update = false;
         barcode->render_valid = false;
@@ -168,9 +168,17 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
         return LV_RESULT_INVALID;
     }
 
-    if(!barcode_store_data(barcode, data)) return LV_RESULT_INVALID;
+    if(!barcode_store_data(barcode, text)) return LV_RESULT_INVALID;
 
     return barcode_mark_dirty(obj);
+}
+
+const char * lv_barcode_get_text(lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    return barcode->data;
 }
 
 lv_result_t lv_barcode_render(lv_obj_t * obj)
@@ -313,10 +321,10 @@ static void lv_barcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
     if(code == LV_EVENT_SIZE_CHANGED) {
-        /*Refitting reallocates the canvas, which is itself a content size change and comes
-         *back here: `fitting` catches that echo within the call, barcode_fit_needed() the
-         *one a layout pass later. An out of date bitmap is always refitted, so a size that
-         *could not be fitted before gets another go.*/
+        /*A refit reallocates the canvas. This changes the content size, so this event
+         *comes again. `fitting` ignores the event in the same call, and barcode_fit_needed()
+         *ignores it after the next layout. A bitmap that is out of date is always refitted,
+         *so a size that failed before gets a new attempt.*/
         if(!barcode->fitting && (barcode->needs_update || barcode_fit_needed(obj))) {
             barcode_mark_dirty(obj);
         }
@@ -326,7 +334,7 @@ static void lv_barcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(barcode->needs_update && barcode->render_valid) {
             LV_ASSERT(barcode->update_mode == LV_BARCODE_UPDATE_MODE_DEFERRED);
 
-            /*Safe: the setter already resized the canvas, so nothing is reallocated here*/
+            /*The setter already resized the canvas, so nothing is reallocated here*/
             LV_LOG_WARN("filling in the barcode during the redraw because lv_barcode_render() "
                         "was not called after the property changes; this adds the work to the "
                         "refresh and its result cannot be reported");
@@ -618,11 +626,10 @@ static lv_result_t barcode_render(lv_obj_t * obj)
 {
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
-    /*Start invalid so no early return can forget to record a failure; only barcode_fill()'s
-     *success path sets `render_valid`. `needs_update` survives a failure on purpose - the
-     *bitmap still does not match the properties - and a cleared `render_valid` keeps the
-     *draw hook from retrying a known-bad state every frame. Nothing is logged here: the
-     *result is returned, and the caller reports it if nothing else will.*/
+    /*Clear `render_valid` first, so each early return records a failure. Only a successful
+     *barcode_fill() sets it. After a failure `needs_update` stays set, because the bitmap
+     *does not match the properties. The cleared `render_valid` stops the draw hook from
+     *retrying on each frame. The caller gets the result, so nothing is logged here.*/
     barcode->render_valid = false;
     barcode->needs_update = true;
 
@@ -638,7 +645,7 @@ static lv_result_t barcode_mark_dirty(lv_obj_t * obj)
 
     if(barcode->data == NULL) return LV_RESULT_INVALID;
 
-    /*The change may well make the data encodable again, so allow a new attempt*/
+    /*The change can make the text encodable again, so allow a new attempt*/
     barcode->render_valid = true;
 
     /*The canvas is resized in both modes, because the draw pass cannot do it*/

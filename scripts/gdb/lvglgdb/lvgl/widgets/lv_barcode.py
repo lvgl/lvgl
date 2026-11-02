@@ -27,7 +27,7 @@ class LVBarcode(LVCanvas):
 
     @property
     def data(self):
-        """Copy of the payload, kept so the bitmap can be regenerated on a property change"""
+        """Copy of the text, so a property change can generate the bitmap again"""
         return safe_string(self._wv_lv_barcode_t, "data")
 
     @property
@@ -69,12 +69,12 @@ class LVBarcode(LVCanvas):
 
     @property
     def render_valid(self):
-        """No generation attempt is known to have failed; a change re-arms it"""
+        """No generation failed since the last change or resize"""
         return int(self._wv_lv_barcode_t.safe_field("render_valid", 0))
 
     @property
     def fitting(self):
-        """Guard against the re-entrant resize our own reallocation triggers"""
+        """Ignore the resize event that the reallocation of the canvas causes"""
         return int(self._wv_lv_barcode_t.safe_field("fitting", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
