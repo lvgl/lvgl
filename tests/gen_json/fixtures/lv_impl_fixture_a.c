@@ -1,0 +1,1 @@
+#define TEST_IMPL_LOCAL 1
