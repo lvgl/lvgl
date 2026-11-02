@@ -144,7 +144,7 @@ jobs:
 
       - name: Upload the PR report
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pr-report-memory-usage
           path: reports/
@@ -152,7 +152,7 @@ jobs:
 
       - name: Upload results artifact
         if: ${{ !cancelled() && steps.measure.outcome == 'success' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: flash-usage-results
           path: results/
