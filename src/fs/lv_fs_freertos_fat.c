@@ -181,6 +181,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 {
     LV_ASSERT(file_p != NULL);
     LV_UNUSED(drv);
+    if(pos > INT32_MAX) return LV_FS_RES_INV_PARAM;
     int w;
     long offset = (long)pos;
     switch(whence) {
@@ -191,7 +192,6 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
             w = FF_SEEK_CUR;
             break;
         case LV_FS_SEEK_END:
-            if(pos > INT32_MAX) return LV_FS_RES_INV_PARAM;
             w = FF_SEEK_END;
             offset = -(long)pos;
             break;
