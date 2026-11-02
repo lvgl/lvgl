@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../lvgl.h"
-#include <limits.h>
+#include LV_LIMITS_INCLUDE
 
 #if LV_USE_TINY_TTF != 0
 #include "../../core/lv_global.h"
