@@ -199,6 +199,10 @@ static void * malloc_cb(size_t size_bytes, lv_color_format_t color_format)
 
     /*Allocate larger memory to be sure it can be aligned as needed*/
     size_bytes += LV_DRAW_BUF_ALIGN - 1;
+    if(!ctx->independent_image_heap && img_cache_p == NULL) {
+        return ctx->malloc_cb(size_bytes, color_format);
+    }
+
     uint32_t cache_max_size = lv_cache_get_max_size(img_cache_p, NULL);
 
     if(lv_cache_is_enabled(img_cache_p) && size_bytes > cache_max_size) {
