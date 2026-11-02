@@ -248,6 +248,14 @@
 /** ARGB8888 premultiplied */
 #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
 
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+/** R, G, B, A byte order in memory, as used by HTML canvas ImageData and GL_RGBA textures.
+ *  Images are only blended correctly if they use the same channel order as the target.
+ */
+#define LV_DRAW_SW_SUPPORT_ABGR8888 0
+
+#endif /*LV_DRAW_SW_SUPPORT_ARGB8888*/
+
 /** L8 */
 #define LV_DRAW_SW_SUPPORT_L8 1
 

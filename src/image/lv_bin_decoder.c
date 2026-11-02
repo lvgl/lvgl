@@ -232,6 +232,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         }
 #if LV_BIN_DECODER_RAM_LOAD
         else if(cf == LV_COLOR_FORMAT_ARGB8888      \
+                || cf == LV_COLOR_FORMAT_ABGR8888   \
                 || cf == LV_COLOR_FORMAT_XRGB8888   \
                 || cf == LV_COLOR_FORMAT_RGB888     \
                 || cf == LV_COLOR_FORMAT_RGB565     \
@@ -406,6 +407,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     LV_CHECK_ARG_FORMAT_MSG(
         LV_COLOR_FORMAT_IS_INDEXED(cf)
         || cf == LV_COLOR_FORMAT_ARGB8888
+        || cf == LV_COLOR_FORMAT_ABGR8888
         || cf == LV_COLOR_FORMAT_XRGB8888
         || cf == LV_COLOR_FORMAT_RGB888
         || cf == LV_COLOR_FORMAT_RGB565
@@ -490,7 +492,8 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     }
 
     if(cf == LV_COLOR_FORMAT_ARGB8888 || cf == LV_COLOR_FORMAT_XRGB8888 || cf == LV_COLOR_FORMAT_RGB888
-       || cf == LV_COLOR_FORMAT_RGB565 || cf == LV_COLOR_FORMAT_RGB565_SWAPPED || cf == LV_COLOR_FORMAT_ARGB8565) {
+       || cf == LV_COLOR_FORMAT_RGB565 || cf == LV_COLOR_FORMAT_RGB565_SWAPPED || cf == LV_COLOR_FORMAT_ARGB8565
+       || cf == LV_COLOR_FORMAT_ABGR8888) {
         uint32_t len = (w_px * bpp) / 8;
         offset += decoded_area->y1 * dsc->header.stride;
         offset += decoded_area->x1 * bpp / 8; /*Move to x1*/
