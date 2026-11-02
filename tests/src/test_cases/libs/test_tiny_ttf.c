@@ -128,6 +128,51 @@ void test_tiny_ttf_missing_glyph_uses_fallback(void)
     TEST_ASSERT_EQUAL_UINT32(0, cache_error_count);
 }
 
+void test_tiny_ttf_rejects_truncated_memory(void)
+{
+#if LV_USE_TINY_TTF
+    extern const uint8_t test_ubuntu_font[];
+
+    for(size_t size = 0; size < 12; size++) {
+        lv_font_t * font = lv_tiny_ttf_create_data(test_ubuntu_font, size, 30);
+        TEST_ASSERT_NULL(font);
+    }
+#else
+    TEST_PASS();
+#endif
+}
+
+void test_tiny_ttf_resize_invalidates_cached_glyphs(void)
+{
+#if LV_USE_TINY_TTF
+    extern const uint8_t test_ubuntu_font[];
+    extern size_t test_ubuntu_font_size;
+    lv_font_t * font = lv_tiny_ttf_create_data(test_ubuntu_font, test_ubuntu_font_size, 20);
+    TEST_ASSERT_NOT_NULL(font);
+
+    lv_font_glyph_dsc_t small_glyph;
+    lv_font_glyph_dsc_t large_glyph;
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &small_glyph, 'A', 'V'));
+    TEST_ASSERT_NOT_NULL(lv_font_get_glyph_bitmap(&small_glyph, NULL));
+    lv_font_glyph_release_draw_data(&small_glyph);
+
+    lv_tiny_ttf_set_size(font, 40);
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &large_glyph, 'A', 'V'));
+    TEST_ASSERT_GREATER_THAN(small_glyph.box_h, large_glyph.box_h);
+    TEST_ASSERT_GREATER_THAN(small_glyph.adv_w, large_glyph.adv_w);
+    TEST_ASSERT_NOT_NULL(lv_font_get_glyph_bitmap(&large_glyph, NULL));
+    lv_font_glyph_release_draw_data(&large_glyph);
+
+    lv_tiny_ttf_set_size(font, 20);
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &large_glyph, 'A', 'V'));
+    TEST_ASSERT_EQUAL_UINT(small_glyph.box_h, large_glyph.box_h);
+    TEST_ASSERT_EQUAL_UINT(small_glyph.adv_w, large_glyph.adv_w);
+    lv_tiny_ttf_destroy(font);
+#else
+    TEST_PASS();
+#endif
+}
+
 void test_tiny_ttf_gpos(void)
 {
 #if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
