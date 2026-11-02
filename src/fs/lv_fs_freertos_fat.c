@@ -66,7 +66,7 @@ void lv_fs_freertos_fat_init(void)
 
     lv_fs_drv_t * fs_drv_p = &(LV_GLOBAL_DEFAULT()->freertos_fat_fs_drv);
     lv_fs_drv_init(fs_drv_p);
-    
+
     fs_drv_p->letter = LV_FS_FREERTOS_FAT_LETTER;
     fs_drv_p->cache_size = LV_FS_FREERTOS_FAT_CACHE_SIZE;
 
@@ -235,7 +235,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
     /* FreeRTOS+FAT may retain a pointer to the path during directory iteration. */
     lv_snprintf(dir->path, sizeof(dir->path), LV_FS_FREERTOS_FAT_PATH "%s", path);
-    
+
     int res = ff_findfirst(dir->path, &dir->find_data);
     if(res != 0 && FF_GETERROR(res) != FF_ERR_DIR_END_OF_DIR) {
         lv_free(dir);
@@ -283,7 +283,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
             lv_snprintf(fn, fn_len, "/%s", name);
         }
         else lv_strlcpy(fn, name, fn_len);
-        
+
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 
     return LV_FS_RES_OK;
