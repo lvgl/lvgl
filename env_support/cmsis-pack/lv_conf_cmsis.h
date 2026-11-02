@@ -1860,6 +1860,19 @@
 
 #endif /*LV_USE_FS_FATFS*/
 
+/** FreeRTOS+FAT */
+#if LV_USE_FS_FREERTOS_FAT
+/** Drive letter for FreeRTOS+FAT (65 = 'A', 0 = disabled) */
+#define LV_FS_FREERTOS_FAT_LETTER 0
+
+/** Working directory for FreeRTOS+FAT */
+#define LV_FS_FREERTOS_FAT_PATH ""
+
+/** Read cache size in bytes for FreeRTOS+FAT (0 = disabled) */
+#define LV_FS_FREERTOS_FAT_CACHE_SIZE 0
+
+#endif /*LV_USE_FS_FREERTOS_FAT*/
+
 /** littlefs */
 
 #if LV_USE_FS_LITTLEFS

@@ -2126,6 +2126,7 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_FS_ARDUINO_ESP_LITTLEFS=1 \
                          LV_USE_FS_ARDUINO_SD=1          \
                          LV_USE_FS_FATFS=1               \
+                         LV_USE_FS_FREERTOS_FAT=1        \
                          LV_USE_FS_FROGFS=1              \
                          LV_USE_FS_LITTLEFS=1            \
                          LV_USE_FS_MEMFS=1               \

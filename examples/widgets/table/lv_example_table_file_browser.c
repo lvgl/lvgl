@@ -4,7 +4,8 @@
 
 #include "../../lv_examples.h"
 
-#if LV_USE_TABLE && (LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32 || LV_USE_FS_FATFS) && LV_BUILD_EXAMPLES
+#if LV_USE_TABLE && (LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32 || LV_USE_FS_FATFS || \
+                     LV_USE_FS_FREERTOS_FAT) && LV_BUILD_EXAMPLES
 
 #include <stdlib.h>
 #include <string.h>

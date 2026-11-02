@@ -172,6 +172,10 @@ typedef struct _lv_global_t {
     lv_fs_drv_t fatfs_fs_drv;
 #endif
 
+#if LV_USE_FS_FREERTOS_FAT
+    lv_fs_drv_t freertos_fat_fs_drv;
+#endif
+
 #if LV_USE_FS_WIN32 != '\0'
     lv_fs_drv_t win32_fs_drv;
 #endif
