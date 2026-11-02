@@ -236,7 +236,6 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     remove_options_translation_tag(obj);
     refresh_size(obj);
 
-    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     refresh_list_label(obj);
 }
 
