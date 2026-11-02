@@ -98,10 +98,6 @@ void lv_sysmon_builtin_deinit(void)
 lv_obj_t * lv_sysmon_create(lv_display_t * disp)
 {
     LV_LOG_INFO("begin");
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return NULL);
 
     lv_obj_t * label = lv_label_create(lv_display_get_layer_sys(disp));
@@ -117,10 +113,6 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp)
 
 void lv_sysmon_show_performance(lv_display_t * disp)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return);
 
     if(disp->perf_label == NULL) {
@@ -151,10 +143,6 @@ void lv_sysmon_show_performance(lv_display_t * disp)
 
 void lv_sysmon_hide_performance(lv_display_t * disp)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return);
 
     lv_obj_set_hidden(disp->perf_label, true);
@@ -162,30 +150,18 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
 
 void lv_sysmon_performance_dump(lv_display_t * disp)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return);
     perf_dump_info(disp);
 }
 
 void lv_sysmon_performance_resume(lv_display_t * disp)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return);
     perf_control(disp, true);
 }
 
 void lv_sysmon_performance_pause(lv_display_t * disp)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return);
     perf_control(disp, false);
 }
@@ -196,10 +172,6 @@ void lv_sysmon_performance_pause(lv_display_t * disp)
 
 void lv_sysmon_show_memory(lv_display_t * disp)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return);
     if(disp->mem_label == NULL) {
         disp->mem_label = lv_sysmon_create(disp);
@@ -217,10 +189,6 @@ void lv_sysmon_show_memory(lv_display_t * disp)
 
 void lv_sysmon_hide_memory(lv_display_t * disp)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
     LV_CHECK_ARG(disp != NULL, return);
 
     lv_obj_set_hidden(disp->mem_label, true);

@@ -102,7 +102,7 @@ ARG IMAGE_ARCH
 
 RUN apt-get -q -y update && \
     apt-get clean && apt-get autoremove && \
-    apt-get install -q -y curl git cmake file python3 python3-venv pkg-config libevdev-dev:arm64 && \
+    apt-get install -q -y curl git cmake file python3 python3-venv pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

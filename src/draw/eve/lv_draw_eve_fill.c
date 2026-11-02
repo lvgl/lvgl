@@ -25,15 +25,18 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_eve_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_eve_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
 
     int32_t rad = dsc->radius;
     int32_t bg_w = lv_area_get_width(coords);
     int32_t bg_h = lv_area_get_height(coords);
     int32_t real_radius = LV_MIN3(bg_w / 2, bg_h / 2, rad);
 
-    lv_eve_scissor(t->clip_area.x1, t->clip_area.y1, t->clip_area.x2, t->clip_area.y2);
+    lv_eve_scissor(clip_area->x1, clip_area->y1, clip_area->x2, clip_area->y2);
     lv_eve_save_context();
 
     lv_eve_color(dsc->color);
@@ -56,8 +59,11 @@ void lv_draw_eve_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, const 
 
 
 
-void lv_draw_eve_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_eve_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
 {
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
@@ -82,7 +88,7 @@ void lv_draw_eve_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, co
 
     lv_eve_save_context();
 
-    lv_eve_scissor(t->clip_area.x1, t->clip_area.y1, t->clip_area.x2, t->clip_area.y2);
+    lv_eve_scissor(clip_area->x1, clip_area->y1, clip_area->x2, clip_area->y2);
 
     lv_eve_color(dsc->color);
     lv_eve_color_opa(dsc->opa);

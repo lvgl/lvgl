@@ -183,16 +183,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_grad_color_calculate(const lv_grad_dsc_t *
 
     /*Find the 2 closest stop now*/
     int32_t d = 0;
-    int32_t found_i = 0;
-    for(uint8_t i = 1; i < dsc->stops_count; i++) {
-        int32_t cur = (dsc->stops[i].frac * range) >> 8;
-        if(frac <= cur) {
-            found_i = i;
-            break;
-        }
+    int32_t found_i = 1;
+    while(found_i < dsc->stops_count - 1 && frac > ((dsc->stops[found_i].frac * range) >> 8)) {
+        found_i++;
     }
-
-    LV_ASSERT(found_i != 0);
 
     lv_color_t one, two;
     one = dsc->stops[found_i - 1].color;
@@ -477,11 +471,11 @@ void lv_draw_sw_grad_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     int32_t dx = end.x - start.x;
     int32_t dy = end.y - start.y;
 
-    int32_t l2 = lv_sqr(dx) + lv_sqr(dy);
+    int64_t l2 = (int64_t)dx * dx + (int64_t)dy * dy;
     if(l2 == 0) l2 = 1;
-    state->a = (dx << 16) / l2;
-    state->b = (dy << 16) / l2;
-    state->c = ((start.x * dx + start.y * dy) << 16) / l2;
+    state->a = (int32_t)((int64_t)dx * 65536 / l2);
+    state->b = (int32_t)((int64_t)dy * 65536 / l2);
+    state->c = (int32_t)(((int64_t)start.x * dx + (int64_t)start.y * dy) * 65536 / l2);
 }
 
 void lv_draw_sw_grad_linear_cleanup(lv_grad_dsc_t * dsc)

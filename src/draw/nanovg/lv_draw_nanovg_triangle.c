@@ -37,22 +37,24 @@
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
+void lv_draw_nanovg_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_triangle_dsc_t * dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
+    LV_UNUSED(layer);
     lv_area_t tri_area;
     tri_area.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
     tri_area.y1 = (int32_t)LV_MIN3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
     tri_area.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
     tri_area.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, &tri_area, &t->clip_area)) {
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, &tri_area, clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     nvgBeginPath(u->vg);
     nvgMoveTo(u->vg, dsc->p[0].x, dsc->p[0].y);

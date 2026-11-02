@@ -37,9 +37,11 @@
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nanovg_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                               const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
+    LV_UNUSED(layer);
 
     /*Calculate the rectangle which is blurred to get the shadow in `shadow_area`*/
     lv_area_t core_area;
@@ -57,13 +59,13 @@ void lv_draw_nanovg_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_
 
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `shadow_area`*/
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, &shadow_area, &t->clip_area)) {
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, &shadow_area, clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     const NVGcolor icol = lv_nanovg_color_convert(dsc->color, dsc->opa);
     const NVGcolor ocol = lv_nanovg_color_convert(lv_color_black(), 0);

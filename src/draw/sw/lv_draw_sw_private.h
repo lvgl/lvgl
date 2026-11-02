@@ -62,6 +62,21 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Draw a decoded image.
+ *
+ * @param layer             the target layer
+ * @param draw_dsc          the draw descriptor of the image
+ * @param decoder_dsc       pointer to the decoded image's descriptor
+ * @param sup               supplementary data
+ * @param img_coords        the absolute coordinates of the image
+ * @param clipped_img_area  the absolute coordinates of the image area to draw (already clipped)
+ * @param user_data         unused
+ */
+void lv_draw_sw_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
+                           const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
+                           const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data);
+
 /**********************
  *      MACROS
  **********************/

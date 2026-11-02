@@ -93,13 +93,7 @@ static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_s
  **********************/
 
 #if LV_USE_OBJ_PROPERTY
-LV_DEPRECATIONS_IGNORE_BEGIN
 static const lv_property_ops_t lv_span_properties[] = {
-    {
-        .id = LV_PROPERTY_SPAN_ALIGN,
-        .setter = lv_spangroup_set_align,
-        .getter = lv_spangroup_get_align,
-    },
     {
         .id = LV_PROPERTY_SPAN_OVERFLOW,
         .setter = lv_spangroup_set_overflow,
@@ -111,17 +105,11 @@ static const lv_property_ops_t lv_span_properties[] = {
         .getter = lv_spangroup_get_indent,
     },
     {
-        .id = LV_PROPERTY_SPAN_MODE,
-        .setter = lv_spangroup_set_mode,
-        .getter = lv_spangroup_get_mode,
-    },
-    {
         .id = LV_PROPERTY_SPAN_MAX_LINES,
         .setter = lv_spangroup_set_max_lines,
         .getter = lv_spangroup_get_max_lines,
     },
 };
-LV_DEPRECATIONS_IGNORE_END
 #endif
 
 const lv_obj_class_t lv_spangroup_class  = {
@@ -346,15 +334,6 @@ void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_styl
     lv_spangroup_refresh(obj);
 }
 
-void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    LV_LOG_DEPRECATED("use the text_align style property instead");
-
-    lv_obj_set_style_text_align(obj, align, LV_PART_MAIN);
-}
-
 void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
@@ -372,37 +351,6 @@ void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent)
     if(spans->indent == indent) return;
 
     spans->indent = indent;
-
-    lv_spangroup_refresh(obj);
-}
-
-void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
-{
-    LV_LOG_DEPRECATED("set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping");
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    if(mode >= LV_SPAN_MODE_LAST) return;
-
-    if(mode == LV_SPAN_MODE_EXPAND) {
-        lv_obj_set_width(obj, LV_SIZE_CONTENT);
-        lv_obj_set_height(obj, LV_SIZE_CONTENT);
-    }
-    else if(mode == LV_SPAN_MODE_BREAK) {
-        if(lv_obj_get_style_width_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
-            lv_obj_set_width(obj, 100);
-        }
-        lv_obj_set_height(obj, LV_SIZE_CONTENT);
-    }
-    else if(mode == LV_SPAN_MODE_FIXED) {
-        /* use this mode, The user needs to set the size. */
-        /* This is just to prevent an infinite loop. */
-        if(lv_obj_get_style_width_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
-            lv_obj_set_width(obj, 100);
-        }
-        if(lv_obj_get_style_height_internal(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
-            lv_obj_set_content_height(obj, 100);
-        }
-    }
 
     lv_spangroup_refresh(obj);
 }

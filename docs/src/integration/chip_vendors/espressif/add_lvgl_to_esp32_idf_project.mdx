@@ -5,30 +5,45 @@ faqs:
   - question: "What is the simplest way to add LVGL to an ESP-IDF project?"
     answer: "The esp_lvgl_port component. Run idf.py add-dependency \"espressif/esp_lvgl_port^2.3.0\". It installs LVGL and the display driver and adds touch, encoder, button, and USB HID input support."
   - question: "How do I use a specific LVGL version?"
-    answer: "esp_lvgl_port depends on the latest stable LVGL by default. Pin the version in your project, e.g. idf.py add-dependency \"lvgl/lvgl^9.*\", to avoid automatic updates."
+    answer: "esp_lvgl_port depends on the latest stable LVGL by default, but an ESP-IDF installed with EIM can pick an older one from its local component mirror. Pin the version in your project, e.g. idf.py add-dependency \"lvgl/lvgl^9.6\"."
   - question: "Can I use a local LVGL checkout instead of the ESP Registry?"
     answer: "Yes. Add LVGL as a submodule under components/lvgl; every component in the project's components folder is added to the build automatically."
   - question: "Where do I configure LVGL in an IDF project?"
-    answer: "Run idf.py menuconfig and go to Component config, then LVGL configuration. Move the CONFIG_LV_ symbols to sdkconfig.defaults to make them permanent, or to sdkconfig.<chip> for a per-chip default."
+    answer: "Run idf.py menuconfig and go to Component config, then LVGL configuration. Move the CONFIG_LV_ symbols to sdkconfig.defaults to make them permanent, or to sdkconfig.defaults.<chip> (e.g. sdkconfig.defaults.esp32p4) for a per-chip default."
   - question: "Do I still need to call lv_timer_handler() periodically?"
     answer: "No. After bsp_display_start() or lvgl_port_init(), LVGL runs in a background task managed by the IDF."
 ---
 
 LVGL can be used and configured as a standard [ESP-IDF](https://github.com/espressif/esp-idf) component.
 
-If you are new to ESP-IDF, follow the instructions in the [ESP-IDF Programming guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html) to install and set up ESP-IDF on your machine.
+If you are new to ESP-IDF, follow the instructions in the ESP-IDF Programming guide ([v6.1](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32/get-started/index.html) or [v5.5](https://docs.espressif.com/projects/esp-idf/en/v5.5.6/esp32/get-started/index.html)) to install and set up ESP-IDF on your machine. The steps on this page were tested with ESP-IDF v5.5 and v6.1.
 
 ## Using LVGL in Your ESP-IDF Project
 
+The commands on this page have to be run in an ESP-IDF project. If you do not have one yet, you can create it with the following command:
+
+```sh
+idf.py create-project my_lvgl_app
+cd my_lvgl_app
+```
+
 The simplest way to integrate LVGL into your ESP-IDF project is via the [esp_lvgl_port](https://components.espressif.com/components/espressif/esp_lvgl_port) component. This component, used in the [ready-to-use projects](/integration/chip_vendors/espressif/overview), provides helper functions for easy installation of LVGL and display drivers. Moreover, it can add support for touch, rotary encoders, button or USB HID inputs. It simplifies power savings, screen rotation and other platform specific nuances.
 
-The esp_lvgl_port supports LVGL versions 8 and 9 and is compatible with ESP-IDF v4.4 and above. To add it to your project, use the following command:
+The esp_lvgl_port supports LVGL versions 8 and 9 and is compatible with ESP-IDF v5.2 and above (versions up to 2.6.1 are also compatible with ESP-IDF v4.4). To add it to your project, use the following command:
 
 ```sh
 idf.py add-dependency "espressif/esp_lvgl_port^2.3.0"
 ```
 
 By default, esp_lvgl_port depends on the latest stable version of LVGL, so no additional steps are needed for new projects. If a specific LVGL version is required, specify this in your project to avoid automatic updates. LVGL can also be used without esp_lvgl_port, as described below.
+
+<Callout type="warn">
+If ESP-IDF was installed with the ESP-IDF Installation Manager (EIM), the build may use an older LVGL version from the local component mirror created by EIM. In this case, add LVGL to your project with the required version:
+
+```sh
+idf.py add-dependency "lvgl/lvgl^9.6"
+```
+</Callout>
 
 ### Obtaining LVGL
 
@@ -69,6 +84,29 @@ To add a display or touch driver to your project, use a command like:
 idf.py add-dependency "espressif/esp_lcd_gc9a01^2.0.0"
 ```
 
+Note that this command adds only the display driver. To use `bsp_display_start()` described below, a Board Support Package is needed instead.
+
+The LCD examples of ESP-IDF (`examples/peripherals/lcd`, for example `spi_lcd_touch` and `rgb_panel`) also use LVGL, but they initialize esp_lcd and LVGL directly, without esp_lvgl_port. The pins of these examples are defined in their C source files.
+
+### Using a Board Support Package
+
+A Board Support Package (BSP) initializes the display, the touch controller and esp_lvgl_port of a specific board, so only `bsp_display_start()` needs to be called. To use it, add the BSP of your board to the project and select the chip of that board as target:
+
+```sh
+idf.py add-dependency "espressif/esp-box-3"
+idf.py set-target esp32s3
+```
+
+The target has to match the chip of the board, otherwise the dependencies cannot be resolved. For example, `espressif/esp32_p4_function_ev_board` requires `esp32p4` and `espressif/m5stack_core_s3` requires `esp32s3`. The list of all BSPs and their chips can be found in the [esp-bsp repository](https://github.com/espressif/esp-bsp#supported-boards).
+
+If a display is wired to a development board by hand, the generic BSP can be used. It supports ST7789, ILI9341 and GC9A01 displays and works with any target:
+
+```sh
+idf.py add-dependency "espressif/esp_bsp_generic"
+```
+
+After adding it, enable the display and set its pins in menuconfig under `Component config → Board Support Package (generic) → Display`.
+
 ### Configuration
 
 To configure LVGL, launch the configuration menu with `idf.py menuconfig` in your project root directory. Navigate to `Component config` and then `LVGL configuration`.
@@ -76,9 +114,13 @@ To configure LVGL, launch the configuration menu with `idf.py menuconfig` in you
 The current LVGL settings can be made permanent for the project by creating a file called
 `sdkconfig.defaults` in the project root and moving the `CONFIG_LV_` symbols to it.
 
-Per-chip defaults are possible too: a defaults file whose name ends with the chip variant is
-applied only to that chip. For example, `sdkconfig.esp32p4` applies only to an ESP32-P4 IDF
-project.
+Per-chip defaults are possible too: a defaults file named `sdkconfig.defaults.<chip>` is
+applied only to that chip. For example, `sdkconfig.defaults.esp32p4` applies only to an ESP32-P4
+IDF project. Note that ESP-IDF reads this file only if `sdkconfig.defaults` also exists (it can
+be empty).
+
+The values already stored in `sdkconfig` take precedence over the defaults files, so `sdkconfig`
+has to be deleted after a defaults file is changed.
 
 ### Starting the LVGL component
 
@@ -92,27 +134,49 @@ unlike the usual approach, there is no need to periodically call <ApiLink name="
 this function is called by a background task managed by the IDF.
 
 ```c
+#include "bsp/esp-bsp.h"
+#include "lvgl.h"
+
 void app_main(void)
 {
     bsp_display_start();
     bsp_display_backlight_on();
 
     bsp_display_lock(0);
-    lv_demo_benchmark();
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Hello LVGL");
+    lv_obj_center(label);
     bsp_display_unlock();
 }
 ```
 
+Since the LVGL API is not thread-safe, LVGL functions have to be called between
+`bsp_display_lock()` and `bsp_display_unlock()`.
+
+To run one of the LVGL demos instead, enable it in menuconfig under
+`Component config → LVGL configuration → Demos` (for example `CONFIG_LV_USE_DEMO_WIDGETS`),
+include `lv_demos.h` and call the demo, for example `lv_demo_widgets()`.
+
 For cases when the `esp_bsp` is not being used, it is possible to invoke
-the ESP-LVGL port directly:
+the ESP-LVGL port directly. In this case the display has to be added with `lvgl_port_add_disp()`,
+as described in the [Add screen](https://github.com/espressif/esp-bsp/blob/master/components/esp_lvgl_port/README.md#add-screen)
+section of the esp_lvgl_port README:
 
 ```c
+#include "esp_lvgl_port.h"
+
 void app_main(void)
 {
     const lvgl_port_cfg_t lvgl_cfg = ESP_LVGL_PORT_INIT_CONFIG();
-    esp_err_t err = lvgl_port_init(&lvgl_cfg);
+    ESP_ERROR_CHECK(lvgl_port_init(&lvgl_cfg));
 
-    lv_demo_benchmark();
+    /* Create the esp_lcd panel and add it with lvgl_port_add_disp() here */
+
+    lvgl_port_lock(0);
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Hello LVGL");
+    lv_obj_center(label);
+    lvgl_port_unlock();
 }
 ```
 

@@ -46,14 +46,5 @@ def test_internal_footer_has_static_derivations(generated):
     i = generated["internal"]
     # The *_EXTERNAL compatibility shims, the inconsistent-name alias, and the
     # trailing LV_KCONFIG_PRESENT cleanup.
-    assert "LV_USE_THORVG_EXTERNAL" in i
-    assert "LV_USE_LZ4_EXTERNAL" in i
     assert "#define LV_USE_ANIMIMAGE LV_USE_ANIMIMG" in i
     assert "#undef LV_KCONFIG_PRESENT" in i
-
-
-def test_internal_has_legacy_autobackend_shim(generated):
-    i = generated["internal"]
-    assert "#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND" in i
-    drm_auto = i[i.index("#ifndef LV_LINUX_DRM_AUTO_BACKEND") :]
-    assert "#define LV_LINUX_DRM_AUTO_BACKEND LV_USE_LINUX_DRM" in drm_auto[:400]

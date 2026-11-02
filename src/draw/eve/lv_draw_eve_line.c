@@ -18,8 +18,10 @@
 #include "lv_eve.h"
 
 
-void lv_draw_eve_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
+void lv_draw_eve_line(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc, void * user_data)
 {
+    LV_UNUSED(layer);
+    LV_UNUSED(user_data);
 
     if(dsc->width == 0)
         return;
@@ -31,7 +33,7 @@ void lv_draw_eve_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 
 
     uint32_t line_w = dsc->width * 8;
-    lv_eve_scissor(t->clip_area.x1, t->clip_area.y1, t->clip_area.x2, t->clip_area.y2);
+    lv_eve_scissor(clip_area->x1, clip_area->y1, clip_area->x2, clip_area->y2);
     lv_eve_save_context();
     lv_eve_color_opa(dsc->opa);
     lv_eve_color(dsc->color);

@@ -38,8 +38,8 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vg_lite_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * dsc,
-                                const lv_area_t * coords)
+void lv_draw_vg_lite_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                                const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords)
 {
     /*Calculate the rectangle which is blurred to get the shadow in `shadow_area`*/
     lv_area_t core_area;
@@ -58,7 +58,7 @@ void lv_draw_vg_lite_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `shadow_area`*/
     lv_area_t draw_area;
-    if(!lv_area_intersect(&draw_area, &shadow_area, &t->clip_area)) return;
+    if(!lv_area_intersect(&draw_area, &shadow_area, clip_area)) return;
 
     LV_PROFILER_DRAW_BEGIN;
 
@@ -76,7 +76,7 @@ void lv_draw_vg_lite_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc
         border_dsc.opa = lv_map(w, 0, half_w, dsc->opa / 4, LV_OPA_0);
         border_dsc.radius++;
         lv_area_increase(&draw_area, 1, 1);
-        lv_draw_vg_lite_border(t, &border_dsc, &draw_area);
+        lv_draw_vg_lite_border(draw_unit, layer, clip_area, &border_dsc, &draw_area);
     }
 
     /* fill center */
@@ -86,7 +86,7 @@ void lv_draw_vg_lite_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc
         fill_dsc.radius = dsc->radius;
         fill_dsc.opa = dsc->opa;
         fill_dsc.color = dsc->color;
-        lv_draw_vg_lite_fill(t, &fill_dsc, &core_area);
+        lv_draw_vg_lite_fill(draw_unit, layer, clip_area, &fill_dsc, &core_area);
     }
 
     LV_PROFILER_DRAW_END;

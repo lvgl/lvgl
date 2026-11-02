@@ -49,24 +49,27 @@ static enum NVGwinding lv_fill_to_nvg(lv_vector_fill_t fill_rule);
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc)
+void lv_draw_nanovg_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_vector_dsc_t * dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
+    LV_UNUSED(layer);
+    LV_UNUSED(clip_area);
     if(dsc->task_list == NULL) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_layer_t * layer = dsc->base.layer;
-    if(layer->draw_buf == NULL) {
+    lv_layer_t * dsc_layer = dsc->base.layer;
+    if(dsc_layer->draw_buf == NULL) {
         lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
-    nvgGlobalAlpha(u->vg, t->opa / (float)LV_OPA_COVER);
+    nvgGlobalAlpha(u->vg, dsc->opa / (float)LV_OPA_COVER);
 
     lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, u);
     LV_PROFILER_DRAW_END;

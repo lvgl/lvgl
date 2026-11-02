@@ -147,6 +147,14 @@ Increase the row count for fewer flushes, or reduce it when RAM is limited.
 
 ## Platform Notes
 
+When the display and an SD card share an SPI bus, configure the LovyanGFX panel
+with `cfg.bus_shared = true` and give each device a separate chip-select pin.
+Initialize Arduino `SD` with the SPI instance and pins matching your hardware.
+The LVGL driver waits for display DMA to finish and calls `endWrite()` after
+initialization and each flush, releasing the bus for SD file operations between
+display transfers. Keep display and SD access serialized if your application uses
+multiple tasks.
+
 For Arduino, install both LVGL and LovyanGFX from the Arduino Library Manager or
 as ZIP libraries, then keep your `LGFX` configuration header next to the sketch.
 

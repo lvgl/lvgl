@@ -40,10 +40,12 @@
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
+void lv_draw_nanovg_line(lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_line_dsc_t * dsc, void * user_data)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    LV_UNUSED(layer);
+    lv_draw_nanovg_unit_t * u = user_data;
 
     float p1_x = dsc->p1.x;
     float p1_y = dsc->p1.y;
@@ -63,7 +65,7 @@ void lv_draw_nanovg_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     rel_clip_area.y1 = (int32_t)(LV_MIN(p1_y, p2_y) - half_w);
     rel_clip_area.y2 = (int32_t)(LV_MAX(p1_y, p2_y) + half_w);
 
-    if(!lv_area_intersect(&rel_clip_area, &rel_clip_area, &t->clip_area)) {
+    if(!lv_area_intersect(&rel_clip_area, &rel_clip_area, clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }

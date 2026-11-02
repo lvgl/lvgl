@@ -134,14 +134,14 @@ EPIC_ColorDef lv_color_to_epic_color(lv_color_t color, lv_opa_t opa)
 
 uint32_t lv_epic_setup_layers(EPIC_LayerConfigTypeDef * epic_bg_layer,
                               EPIC_LayerConfigTypeDef * epic_output_layer,
-                              lv_draw_task_t * draw_task,
+                              lv_layer_t * layer,
+                              const lv_area_t * clip_area,
                               const lv_area_t * coords)
 {
-    lv_layer_t * layer = draw_task->target_layer;
     uint16_t dest_total_width;
 
     lv_area_t blend_area;
-    if(!lv_area_intersect(&blend_area, coords, &draw_task->clip_area)) {
+    if(!lv_area_intersect(&blend_area, coords, clip_area)) {
         return 1; /* Fully clipped, nothing to do */
     }
 

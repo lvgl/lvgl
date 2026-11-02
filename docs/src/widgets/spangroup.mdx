@@ -66,20 +66,22 @@ Like the Label Widget, a Spangroup can be set to one the following text-alignmen
 - <ApiLink name="LV_TEXT_ALIGN_RIGHT" /> Align text to right edge.
 - <ApiLink name="LV_TEXT_ALIGN_AUTO" /> Align auto.
 
-Use function <ApiLink name="lv_spangroup_set_align" display="lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_...)" />
+Use <ApiLink name="lv_obj_set_style_text_align" display="lv_obj_set_style_text_align(spangroup, LV_TEXT_ALIGN_..., LV_PART_MAIN)" />
 to set text alignment.
 
 ## Modes
 
-**DEPRECATED**, set the width to <ApiLink name="LV_SIZE_CONTENT" /> or fixed value to control expanding/wrapping.
+A Spangroup's mode is not set directly, it follows from its width and height:
 
-A Spangroup can be set to one the following modes:
+- <ApiLink name="LV_SPAN_MODE_EXPAND" /> the width is <ApiLink name="LV_SIZE_CONTENT" />, so the
+  Spangroup expands to the text size and stays on one line.
+- <ApiLink name="LV_SPAN_MODE_BREAK" /> the width is fixed and the height is
+  <ApiLink name="LV_SIZE_CONTENT" />, so lines that are too long are broken and the height
+  auto-expands.
+- <ApiLink name="LV_SPAN_MODE_FIXED" /> both the width and the height are fixed.
 
-- <ApiLink name="LV_SPAN_MODE_FIXED" /> Fixes its size.
-- <ApiLink name="LV_SPAN_MODE_EXPAND" /> Expand size to text size but stay on one line.
-- <ApiLink name="LV_SPAN_MODE_BREAK" /> Keep width; break lines that are too long and auto-expand height.
-
-Use <ApiLink name="lv_spangroup_set_mode" display="lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK)" /> to set its mode.
+Read the resulting mode with
+<ApiLink name="lv_spangroup_get_mode" display="lv_spangroup_get_mode(spangroup)" />.
 
 ## Overflow
 

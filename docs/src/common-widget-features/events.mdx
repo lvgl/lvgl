@@ -145,7 +145,12 @@ The following event codes exist:
 - <ApiLink name="LV_EVENT_DRAW_POST_BEGIN" />: Starting the post draw phase (when all children are drawn)
 - <ApiLink name="LV_EVENT_DRAW_POST" />: Perform the post draw phase (when all children are drawn)
 - <ApiLink name="LV_EVENT_DRAW_POST_END" />: Finishing the post draw phase (when all children are drawn)
-- <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />: Adding a draw task
+- <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" />: A draw descriptor is about to be drawn and can still be changed. Anything
+  drawn in the event goes below it. Get the descriptor with <ApiLink name="lv_event_get_draw_dsc" />.
+- <ApiLink name="LV_EVENT_DRAW_DSC_END" />: A draw descriptor has been drawn. Anything drawn in the event goes on top
+  of it. Get the descriptor with <ApiLink name="lv_event_get_draw_dsc" />.
+
+The draw descriptor events are sent only for Widgets with <ApiLink name="LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS" /> set.
 
 <Callout type="warn">
 In drawing-event callback functions the rendering
@@ -275,7 +280,7 @@ Calling it for Display or Indev targets is considered Undefined Behavior.
 
 ## Event Bubbling
 
-If <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(widget, LV_OBJ_FLAG_EVENT_BUBBLE)" /> is enabled all
+If <ApiLink name="lv_obj_set_event_bubble" display="lv_obj_set_event_bubble(widget, true)" /> is enabled all
 events will be sent to a Widget's parent as well.  If the parent also has
 <ApiLink name="LV_OBJ_FLAG_EVENT_BUBBLE" /> enabled the event will be sent to its
 parent, and so on.
@@ -286,7 +291,7 @@ not the original Widget. To get the original target call
 
 ## Event Trickle
 
-Also known as Event Capturing, if <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(widget, LV_OBJ_FLAG_EVENT_TRICKLE)" />
+Also known as Event Capturing, if <ApiLink name="lv_obj_set_event_trickle" display="lv_obj_set_event_trickle(widget, true)" />
 is enabled all events will be sent to the Widget's children as well. This is the opposite of
 event bubbling --- instead of propagating up the parent, events propagate down to the children.
 

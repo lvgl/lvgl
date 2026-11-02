@@ -15,6 +15,10 @@
 #include "../../../osal/lv_os_private.h"
 #include <main.h>
 
+#if USE_HAL_LTDC_REGISTER_CALLBACKS != 1
+    #error LV_USE_ST_LTDC requires USE_HAL_LTDC_REGISTER_CALLBACKS to be 1 in the STM32 HAL configuration
+#endif /*USE_HAL_LTDC_REGISTER_CALLBACKS != 1*/
+
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
     #if LV_USE_DRAW_DMA2D
         #error cannot use LV_ST_LTDC_USE_DMA2D_FLUSH with LV_USE_DRAW_DMA2D
@@ -113,6 +117,17 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
     uint32_t layer_height = layer_cfg->ImageHeight;
     uint32_t layer_cf = layer_cfg->PixelFormat;
     lv_color_format_t cf = get_lv_cf_from_layer_cf(layer_cf);
+    if(cf == LV_COLOR_FORMAT_UNKNOWN) {
+        LV_LOG_ERROR("the LTDC layer color format %u is not supported", (unsigned int)layer_cf);
+        return NULL;
+    }
+
+#if LV_ST_LTDC_USE_DMA2D_FLUSH
+    if(mode == LV_DISPLAY_RENDER_MODE_PARTIAL && (cf == LV_COLOR_FORMAT_L8 || cf == LV_COLOR_FORMAT_AL88)) {
+        LV_LOG_ERROR("DMA2D flush cannot output to the LTDC layer color format %u", (unsigned int)layer_cf);
+        return NULL;
+    }
+#endif /*LV_ST_LTDC_USE_DMA2D_FLUSH*/
 
     lv_display_t * disp = lv_display_create(layer_width, layer_height);
     lv_display_set_color_format(disp, cf);
@@ -249,6 +264,7 @@ static lv_color_format_t get_lv_cf_from_layer_cf(uint32_t cf)
         default:
             LV_ASSERT_MSG(0, "the LTDC color format is not supported");
     }
+    return LV_COLOR_FORMAT_UNKNOWN;
 }
 
 static void reload_event_callback(LTDC_HandleTypeDef * hltdc)
@@ -264,7 +280,7 @@ static void reload_event_callback(LTDC_HandleTypeDef * hltdc)
 
 static void clean_dcache(void)
 {
-#if defined(__CORTEX_M) && __CORTEX_M == 7
+#if defined(__CORTEX_M) && ((__CORTEX_M == 7) || (__CORTEX_M == 55))
     SCB_CleanDCache();
 #elif defined(__CORTEX_A) && __CORTEX_A == 7
     L1C_CleanDCacheAll();
@@ -295,6 +311,7 @@ static uint32_t get_dma2d_output_cf_from_layer_cf(uint32_t cf)
         default:
             LV_ASSERT_MSG(0, "DMA2D cannot output to the LTDC color format");
     }
+    return DMA2D_OUTPUT_ARGB8888;
 }
 
 static uint32_t get_dma2d_input_cf_from_lv_cf(uint32_t cf)
@@ -315,6 +332,7 @@ static uint32_t get_dma2d_input_cf_from_lv_cf(uint32_t cf)
         default:
             LV_ASSERT_MSG(0, "the LVGL color format is not a DMA2D input color format");
     }
+    return DMA2D_INPUT_ARGB8888;
 }
 #endif /*LV_ST_LTDC_USE_DMA2D_FLUSH*/
 

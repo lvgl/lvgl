@@ -45,14 +45,16 @@ static enum NVGwinding path_append_inner_rect(NVGcontext * ctx,
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nanovg_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
+    LV_UNUSED(layer);
 
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, coords, &t->clip_area)) {
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, coords, clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }

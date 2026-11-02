@@ -5,7 +5,7 @@ int main(void)
     char title[] = "hello";
     lv_init();
     lv_display_t * disp1 = lv_sdl_window_create(1024, 768);
-    lv_display_t * disp2 = lv_wayland_window_create(1024, 768, title, NULL);
+    lv_display_t * disp2 = lv_wayland_window_create(1024, 768, title);
     lv_display_t * disp3 = lv_linux_drm_create();
     char * device = lv_linux_drm_find_device_path();
     lv_linux_drm_set_file(disp3, device, -1);

@@ -3,20 +3,24 @@
 
 #include "../../../misc/lv_area_private.h"
 
-void lv_draw_dave2d_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc,
-                              const lv_area_t * coords)
+void lv_draw_dave2d_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                              const lv_draw_mask_rect_dsc_t * dsc)
 {
+    LV_UNUSED(dsc);
+
+    /*The mask rectangle task always covered the whole layer buffer*/
+    const lv_area_t * coords = &layer->buf_area;
     lv_area_t clipped_area;
     lv_area_t coordinates;
     int32_t x;
     int32_t y;
 
-    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)t->draw_unit;
+    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)draw_unit;
 
-    if(!lv_area_intersect(&clipped_area, coords, &t->clip_area)) return;
+    if(!lv_area_intersect(&clipped_area, coords, clip_area)) return;
 
-    x = 0 - t->target_layer->buf_area.x1;
-    y = 0 - t->target_layer->buf_area.y1;
+    x = 0 - layer->buf_area.x1;
+    y = 0 - layer->buf_area.y1;
 
     coordinates = *coords;
 
@@ -29,7 +33,7 @@ void lv_draw_dave2d_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t 
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
-    d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
+    d2_framebuffer_from_layer(u->d2_handle, layer);
 
     d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                 (d2_border)clipped_area.y2);

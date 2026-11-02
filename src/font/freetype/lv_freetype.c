@@ -179,6 +179,7 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
         /* Normalize weight: DEFAULT(0) resolves to BOLD(700) or NORMAL(400) to avoid duplicate cache nodes */
         .weight = font_info->weight > LV_FREETYPE_VAR_WEIGHT_DEFAULT ? font_info->weight
         : ((font_info->style & LV_FREETYPE_FONT_STYLE_BOLD) ? LV_FREETYPE_VAR_WEIGHT_BOLD : LV_FREETYPE_VAR_WEIGHT_NORMAL),
+        .face_index = font_info->face_index,
     };
 
     bool cache_hitting = true;
@@ -444,7 +445,7 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 
     /* Cache miss, load face */
     FT_Face face;
-    FT_Error error = FT_New_Face(ctx->library, node->pathname, 0, &face);
+    FT_Error error = FT_New_Face(ctx->library, node->pathname, (FT_Long)node->face_index, &face);
     if(error) {
         FT_ERROR_MSG("FT_New_Face", error);
         return false;
@@ -600,6 +601,9 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
     }
     if(lhs->weight != rhs->weight) {
         return lhs->weight > rhs->weight ? 1 : -1;
+    }
+    if(lhs->face_index != rhs->face_index) {
+        return lhs->face_index > rhs->face_index ? 1 : -1;
     }
 
     int32_t cmp_res = lv_strcmp(lhs->pathname, rhs->pathname);

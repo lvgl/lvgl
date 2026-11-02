@@ -44,20 +44,13 @@ See [Dependency Management](/integration/building/cmake).
 
 ## Selecting a rendering backend
 
-Disable `LV_LINUX_DRM_AUTO_BACKEND` and set `LV_LINUX_DRM_BACKEND` to one of:
+Set `LV_LINUX_DRM_BACKEND` to one of:
 
 | Value | Backend |
 |---|---|
 | `LV_LINUX_DRM_BACKEND_FBDEV` | Software rendering into DRM/KMS dumb buffers |
 | `LV_LINUX_DRM_BACKEND_GBM` | Buffers allocated through Mesa GBM as DMA buffers |
 | `LV_LINUX_DRM_BACKEND_EGL` | Hardware-accelerated rendering via OpenGL ES 2.0 and EGL |
-
-<Callout type="warning" title="Turn off the legacy auto-backend first">
-`LV_LINUX_DRM_AUTO_BACKEND` infers the backend from <ApiLink name="LV_USE_OPENGLES" />,
-picking EGL when that is enabled and dumb buffers otherwise.
-
-Set `LV_LINUX_DRM_AUTO_BACKEND` to `0` whenever you select a backend explicitly. Auto mode will be removed in LVGL v10.
-</Callout>
 
 For the GPU draw units that run on top of the EGL backend, see
 [OpenGL Overview](/integration/embedded_linux/opengl).

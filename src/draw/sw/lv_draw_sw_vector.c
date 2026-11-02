@@ -483,12 +483,11 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
+void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_vector_dsc_t * dsc)
 {
     if(dsc->task_list == NULL)
         return;
 
-    lv_layer_t * layer = dsc->base.layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
     if(draw_buf == NULL) {
         lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
@@ -518,10 +517,10 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
     tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
 
     _tvg_rect rc;
-    lv_area_to_tvg(&rc, &t->clip_area);
+    lv_area_to_tvg(&rc, clip_area);
     tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)(rc.y - layer->partial_y_offset), (int32_t)rc.w, (int32_t)rc.h);
 
-    _tvg_draw_state state = {canvas, layer->partial_y_offset, -layer->buf_area.x1, -layer->buf_area.y1, t->opa};
+    _tvg_draw_state state = {canvas, layer->partial_y_offset, -layer->buf_area.x1, -layer->buf_area.y1, dsc->opa};
 
     lv_ll_t * task_list = dsc->task_list;
     lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, &state);

@@ -14,8 +14,6 @@
     #include "neon/lv_draw_buf_convert_neon.h"
 #elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
     #include "helium/lv_draw_buf_convert_helium.h"
-#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
-    #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 #endif
 
 /*********************

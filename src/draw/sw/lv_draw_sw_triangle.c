@@ -39,7 +39,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
+void lv_draw_sw_triangle(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_triangle_dsc_t * dsc)
 {
 #if LV_DRAW_SW_COMPLEX
     lv_area_t tri_area;
@@ -50,7 +50,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
 
     bool is_common;
     lv_area_t draw_area;
-    is_common = lv_area_intersect(&draw_area, &tri_area, &t->clip_area);
+    is_common = lv_area_intersect(&draw_area, &tri_area, clip_area);
     if(!is_common) return;
 
     lv_point_t p[3];
@@ -175,7 +175,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
                 }
             }
         }
-        lv_draw_sw_blend(t, &blend_dsc);
+        lv_draw_sw_blend(layer, clip_area, &blend_dsc);
     }
 
     lv_free(mask_buf);
@@ -188,7 +188,8 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
     }
 
 #else
-    LV_UNUSED(t);
+    LV_UNUSED(layer);
+    LV_UNUSED(clip_area);
     LV_UNUSED(dsc);
     LV_LOG_WARN("Can't draw triangles with LV_DRAW_SW_COMPLEX == 0");
 #endif /*LV_DRAW_SW_COMPLEX*/

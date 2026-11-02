@@ -34,7 +34,7 @@ extern GPU2D_HandleTypeDef hgpu2d;
 /* NemaGFX byte pool size in bytes.
  * One byte per peixel for masking/stencling plus 10240 for additional allocations.
  */
-#if defined(LV_NEMA_GFX_MAX_RESX) && defined(LV_NEMA_GFX_MAX_RESY)
+#if LV_USE_NEMA_VG
     #define NEMAGFX_MEM_POOL_SIZE          ((LV_NEMA_GFX_MAX_RESX * LV_NEMA_GFX_MAX_RESY) + 10240)
 #else
     /* LV_USE_NEMA_VG is 0 so masking/stencling memory is not needed. */

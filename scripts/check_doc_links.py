@@ -16,6 +16,10 @@ Built around two concerns with very different CI tolerances:
     * Legacy domain links — anything pointing at docs.lvgl.io/master|latest
       or older versioned mirrors. These are conceptually internal links
       that need to be migrated to current internal routes.
+    * <LvglExample name="..." path="..." /> blocks whose examples/<path>.c is
+      missing or doesn't define `name`. The live preview runs `name` and the
+      "view on GitHub" link uses `path`, so either mistake leaves an empty
+      preview and a 404.
 
   WARNINGS (never fail CI)
     * Links into /examples — also auto-generated at build time (from the
@@ -47,10 +51,15 @@ from pathlib import Path
 from collections import defaultdict
 
 DOCS_ROOT = Path(__file__).resolve().parents[1] / "docs" / "src"
+EXAMPLES_ROOT = Path(__file__).resolve().parents[1] / "examples"
 
 # [text](url) — non-greedy text, url stops at whitespace, ) or ".
 # Skips images (![...]) by requiring no leading '!' (negative lookbehind).
 MD_LINK = re.compile(r"(?<!\!)\[([^\]]*?)\]\(\s*([^\s)]+)(?:\s+\"[^\"]*\")?\s*\)")
+
+# A whole <LvglExample ... /> tag (may span lines), and its attributes in any order.
+LVGL_EXAMPLE = re.compile(r"<LvglExample\b(.*?)/?>", re.DOTALL)
+TAG_ATTR = re.compile(r'(\w+)="([^"]*)"')
 
 # Matches the legacy Sphinx-site domain in any of its forms.
 LEGACY_HOST = re.compile(
@@ -192,10 +201,29 @@ def main() -> int:
     legacy: list[tuple[Path, int, str, str]] = []
     example_links: list[tuple[Path, int, str, str, str]] = []  # +resolved target
     externals: list[tuple[Path, int, str, str]] = []
+    bad_examples: list[tuple[Path, int, str, str, str]] = []  # +reason
 
     checked_local = 0
     for path in sorted(DOCS_ROOT.rglob("*.mdx")):
         text = path.read_text(encoding="utf-8", errors="replace")
+        for m in LVGL_EXAMPLE.finditer(text):
+            attrs = dict(TAG_ATTR.findall(m.group(1)))
+            name, ex_path = attrs.get("name", ""), attrs.get("path", "")
+            if re.fullmatch(r"\.*", name) and re.fullmatch(r"\.*", ex_path):
+                continue  # syntax example in writing_docs.mdx: name="..." path="..."
+            lineno = text.count("\n", 0, m.start()) + 1
+            src = (EXAMPLES_ROOT / f"{ex_path}.c").resolve()
+            if not name or not ex_path:
+                reason = "needs both name and path"
+            elif EXAMPLES_ROOT.resolve() not in src.parents:
+                reason = f"path {ex_path} is outside examples/"
+            elif not src.is_file():
+                reason = f"examples/{ex_path}.c not found"
+            elif not re.search(rf"\bvoid\s+{re.escape(name)}\s*\([^)]*\)\s*\{{", src.read_text(encoding="utf-8", errors="replace")):
+                reason = f"examples/{ex_path}.c doesn't define {name}()"
+            else:
+                continue
+            bad_examples.append((path, lineno, name, ex_path, reason))
         for lineno, line in enumerate(text.splitlines(), 1):
             for m in MD_LINK.finditer(line):
                 text_part, url = m.group(1), m.group(2)
@@ -260,7 +288,19 @@ def main() -> int:
             print(f"      [{text_part}]({url})")
         exit_code = 1
 
-    # --- Section 4: /examples links (WARNINGS) ---
+    # --- Section 4: <LvglExample> blocks (ERRORS) ---
+    print("\n=== <LvglExample> blocks (errors) ===")
+    if not bad_examples:
+        print("OK: every <LvglExample> points at an existing example.")
+    else:
+        print(f"ERROR: {len(bad_examples)} <LvglExample> block(s) point at a missing example:\n")
+        for path, lineno, name, ex_path, reason in bad_examples:
+            rel = path.relative_to(DOCS_ROOT.parents[1])
+            print(f"  {rel}:{lineno}")
+            print(f"      name=\"{name}\" path=\"{ex_path}\"  ->  {reason}")
+        exit_code = 1
+
+    # --- Section 5: /examples links (WARNINGS) ---
     print("\n=== /examples links — auto-generated routes, cannot verify locally (warnings) ===")
     if not example_links:
         print("OK: no links into /examples.")
@@ -276,7 +316,7 @@ def main() -> int:
             print(f"      [{text_part}]({url})  ->  {target}")
         # Warnings do NOT change exit_code.
 
-    # --- Section 5: external links (WARNINGS, opt-in) ---
+    # --- Section 6: external links (WARNINGS, opt-in) ---
     print("\n=== External links — MANUAL / PERIODIC CHECK ONLY (warnings, never fails CI) ===")
     print("NOTE: This section is NOT intended for per-PR CI. It issues ~800 outbound")
     print("      HTTP requests; running on every PR is slow, flaky (transient host")

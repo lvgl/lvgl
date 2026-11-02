@@ -12,7 +12,7 @@ By default, most widgets send gestures to their parents so they can be detected 
 Screen widget in the form of an <ApiLink name="LV_EVENT_GESTURE" /> event. For example:
 
 To prevent passing the gesture event to the parent from a widget, use
-<ApiLink name="lv_obj_remove_flag" display="lv_obj_remove_flag(widget, LV_OBJ_FLAG_GESTURE_BUBBLE)" />.
+<ApiLink name="lv_obj_set_gesture_bubble" display="lv_obj_set_gesture_bubble(widget, false)" />.
 
 Note that gestures are not triggered if a widget is being scrolled.
 

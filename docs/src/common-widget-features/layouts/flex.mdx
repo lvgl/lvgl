@@ -170,6 +170,10 @@ placed from right to left.
 
 You can easily build a list using a column flex with 100% wide buttons and text.
 
+Reordering a row is just <ApiLink name="lv_obj_move_to_index" /> on a flex child:
+
+<LvglExample name="lv_example_flex_list_reorder" path="layouts/flex/lv_example_flex_list_reorder" />
+
 ## Building a window
 
 <LvglExample name="lv_example_flex_win" path="layouts/flex/lv_example_flex_win" />
@@ -184,17 +188,16 @@ The title label grows so the header buttons are pushed to the right edge.
 <LvglExample name="lv_example_flex_new_track" path="layouts/flex/lv_example_flex_new_track" />
 
 You can force Flex to put an item into a new line with
-<ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(child, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)" />.
+<ApiLink name="lv_obj_set_flex_in_new_track" display="lv_obj_set_flex_in_new_track(child, true)" />.
 
 ## Ignoring layout
 
 <LvglExample name="lv_example_flex_ignore_layout" path="layouts/flex/lv_example_flex_ignore_layout" />
 
-A child can opt out of flex positioning entirely by setting the
-<ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> flag:
+A child can opt out of flex positioning entirely:
 
 ```c
-lv_obj_add_flag(child, LV_OBJ_FLAG_IGNORE_LAYOUT);
+lv_obj_set_ignore_layout(child, true);
 ```
 
 When set, the flex algorithm skips that child — it does not occupy a flex slot

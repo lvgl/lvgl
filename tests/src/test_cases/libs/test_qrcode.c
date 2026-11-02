@@ -14,6 +14,13 @@ static uint32_t encode_error_cnt;
 
 static uint32_t redraw_warning_cnt;
 
+static uint32_t invalid_magic_err_cnt;
+
+static void count_invalid_magic_cb(lv_log_level_t level, const char * buf)
+{
+    if(level == LV_LOG_LEVEL_ERROR && strstr(buf, "invalid magic") != NULL) invalid_magic_err_cnt++;
+}
+
 static void count_qrcode_logs_cb(lv_log_level_t level, const char * buf)
 {
     LV_UNUSED(level);
@@ -427,5 +434,23 @@ void test_qrcode_normal(void)
 }
 
 #endif
+
+
+void test_qrcode_delete_cycles_leave_no_stale_cache_entry(void)
+{
+    /*Repeated create/delete must not log an invalid image source (#10824)*/
+    lv_log_register_print_cb(count_invalid_magic_cb);
+    invalid_magic_err_cnt = 0;
+    for(int i = 0; i < 32; i++) {
+        void * pad = lv_malloc(8 * (i % 32 + 1));   /* shift the heap between cycles */
+        lv_obj_t * qr = lv_qrcode_create(active_screen);
+        TEST_ASSERT_NOT_NULL(qr);
+        lv_qrcode_set_size(qr, 200);
+        lv_qrcode_update(qr, "WIFI:T:WPA;S:test;P:password;;", 30);
+        lv_obj_delete(qr);
+        lv_free(pad);
+    }
+    TEST_ASSERT_EQUAL_UINT32(0, invalid_magic_err_cnt);
+}
 
 #endif

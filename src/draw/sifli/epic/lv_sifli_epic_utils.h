@@ -70,17 +70,19 @@ EPIC_ColorDef lv_color_to_epic_color(lv_color_t color, lv_opa_t opa);
 
 /**
  * Setup background and output layers for EPIC operation.
- * This function configures the EPIC layers based on the draw task.
+ * This function configures the EPIC layers based on the target layer.
  *
  * @param epic_bg_layer Pointer to background layer configuration
  * @param epic_output_layer Pointer to output layer configuration
- * @param draw_task Draw task containing layer information
+ * @param layer The target layer
+ * @param clip_area The clip area
  * @param coords Coordinates to draw
  * @return 0 on success, non-zero if fully clipped
  */
 uint32_t lv_epic_setup_layers(EPIC_LayerConfigTypeDef * epic_bg_layer,
                               EPIC_LayerConfigTypeDef * epic_output_layer,
-                              lv_draw_task_t * draw_task,
+                              lv_layer_t * layer,
+                              const lv_area_t * clip_area,
                               const lv_area_t * coords);
 
 /**

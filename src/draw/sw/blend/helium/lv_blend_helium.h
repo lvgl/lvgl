@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#if defined(_RTE_)
+#if defined(_RTE_) && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
 #include <Pre_Include_Global.h>
 #include <lv_conf_cmsis.h>
 #endif
@@ -29,6 +29,8 @@ extern "C" {
 #endif
 
 #if !defined(__ASSEMBLY__)
+
+#include "../lv_draw_sw_blend_private.h"
 
 #if __GNUC__ >= 4
 #define LVGL_HIDDEN __attribute__((visibility("hidden")))

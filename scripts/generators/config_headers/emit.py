@@ -477,6 +477,7 @@ def generate_internal(kconf: Kconfig, entries) -> str:
 
     # Optional user headers that override config macros: include each one (once
     # both its gate and path are defined) so source files don't have to.
+    # Skip them in assembly files so their C code doesn't reach the assembler.
     custom_inc: list[str] = []
     ci = custom_includes(entries)
     if ci:
@@ -484,11 +485,15 @@ def generate_internal(kconf: Kconfig, entries) -> str:
         custom_inc.append(
             "/* Optional user headers (LV_*_USE_CUSTOM_INCLUDE) overriding config macros. */"
         )
+        custom_inc.append("#ifndef __ASSEMBLY__")
+        custom_inc.append("")
         for gate, path in ci:
             custom_inc.append(f"#if {gate}")
             custom_inc.append(f"    #include {path}")
             custom_inc.append("#endif")
             custom_inc.append("")
+        custom_inc.append("#endif /*__ASSEMBLY__*/")
+        custom_inc.append("")
 
     return (
         preamble

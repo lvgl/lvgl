@@ -37,7 +37,3 @@ def test_mapped_choice_members_do_not_leak_as_bools(entries):
 def test_ignored_symbol_is_dropped(entries):
     assert "LV_SDL_SINGLE_BUFFER" not in entries  # deprecated, shimmed
     assert "LV_USE_THORVG" not in entries  # derived in the footer
-
-
-def test_deprecated_symbol_is_dropped(entries):
-    assert "LV_MEM_SIZE_KILOBYTES" not in entries

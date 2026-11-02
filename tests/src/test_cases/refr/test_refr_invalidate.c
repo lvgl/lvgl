@@ -17,28 +17,8 @@ void tearDown(void)
 
 void test_refr_inv_area_without_display(void)
 {
-    lv_display_t * disp_def = lv_display_get_default();
     lv_area_t area = {0, 0, 9, 9};
-
-    lv_display_set_default(NULL);
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_inv_area(NULL, &area));
-    lv_display_set_default(disp_def);
-}
-
-void test_refr_inv_area_uses_default_display(void)
-{
-    lv_display_t * disp_def = lv_display_get_default();
-    refr_disp_create(100, 100, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_DIRECT, 1, 100);
-
-    lv_display_set_default(refr_ctx.disp);
-    refr_ctx.disp->inv_p = 0;
-
-    lv_area_t area = {10, 20, 29, 39};
-    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_inv_area(NULL, &area));
-    lv_display_set_default(disp_def);
-
-    TEST_ASSERT_EQUAL_UINT32(1, refr_ctx.disp->inv_p);
-    TEST_ASSERT_TRUE(lv_area_is_equal(&area, &refr_ctx.disp->inv_areas[0]));
 }
 
 void test_refr_inv_area_disabled(void)

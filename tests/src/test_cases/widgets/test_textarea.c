@@ -543,23 +543,6 @@ void test_textarea_set_password_show_time(void)
     TEST_ASSERT_EQUAL_UINT32(1000, lv_textarea_get_password_show_time(textarea));
 }
 
-void test_textarea_set_align(void)
-{
-    LV_DEPRECATIONS_IGNORE_BEGIN
-    lv_textarea_set_align(textarea, LV_TEXT_ALIGN_CENTER);
-    lv_textarea_set_text(textarea, "1234567890");
-    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_center.png");
-
-    lv_textarea_set_align(textarea, LV_TEXT_ALIGN_LEFT);
-    lv_textarea_set_text(textarea, "1234567890");
-    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_left.png");
-
-    lv_textarea_set_align(textarea, LV_TEXT_ALIGN_RIGHT);
-    lv_textarea_set_text(textarea, "1234567890");
-    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_right.png");
-    LV_DEPRECATIONS_IGNORE_END
-}
-
 void test_textarea_text_align(void)
 {
     lv_obj_set_style_text_align(textarea, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
@@ -798,9 +781,7 @@ void test_textarea_one_line_scroll_should_not_depend_on_text_align(void)
     for(uint32_t a = 0; a < 3; a++) {
         lv_obj_clean(active_screen);
         textarea = one_line_textarea_create(100);
-        LV_DEPRECATIONS_IGNORE_BEGIN
-        lv_textarea_set_align(textarea, aligns[a]);
-        LV_DEPRECATIONS_IGNORE_END
+        lv_obj_set_style_text_align(textarea, aligns[a], LV_PART_MAIN);
         lv_test_wait(500);
 
         /* The text overflows, so the textarea has to be scrolled to show the cursor */

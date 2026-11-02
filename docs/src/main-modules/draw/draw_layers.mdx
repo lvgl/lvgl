@@ -122,20 +122,20 @@ in each case:
 
     It also possible to create new layers in these events, but the previous layer is
     also required since it will be the parent layer in <ApiLink name="lv_draw_layer" />.
-2. **Modifying the created Draw Tasks**:
-    In <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> the draw tasks created by
+2. **Modifying the draw descriptors**:
+    In <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" /> the draw descriptors passed to
     `lv_draw_rect/label/etc` can be modified.  It's not required to know the current
-    layer to modify a draw task.  However, if something new also needs to be drawn with
-    `lv_draw_rect/label/etc` the current layer is also required.
+    layer to modify a draw descriptor.  However, if something new also needs to be drawn with
+    `lv_draw_rect/label/etc` (below it in <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" />, or on top
+    of it in <ApiLink name="LV_EVENT_DRAW_DSC_END" />) the current layer is also required.
 
     The current layer can be read from the `base` draw descriptor.  For example:
 
 ```c
-/* In LV_EVENT_DRAW_TASK_ADDED */
-lv_draw_task_t * t = lv_event_get_draw_task(e);
-lv_draw_base_dsc_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
+/* In LV_EVENT_DRAW_DSC_BEGIN or LV_EVENT_DRAW_DSC_END */
+lv_draw_dsc_t * draw_dsc = lv_event_get_draw_dsc(e);
 
-lv_layer_t * current_layer = draw_dsc.layer;
+lv_layer_t * current_layer = draw_dsc->layer;
 ```
 
 3. **Draw to the Canvas Widget**:

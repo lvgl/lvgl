@@ -115,11 +115,6 @@ A Subject is freed with <ApiLink name="lv_subject_delete" display="lv_subject_de
 Subjects still alive when <ApiLink name="lv_deinit" display="lv_deinit()" /> is
 called are deleted automatically.
 
-<Callout type="warning">
-The `lv_subject_init_<type>()` and <ApiLink name="lv_subject_deinit" display="lv_subject_deinit()" />
-functions are **deprecated** in favor of `lv_subject_create()`/`lv_subject_delete()`.
-</Callout>
-
 ##### Setting a Subject's Value
 
 The following functions are used to update a Subject's value:
@@ -381,11 +376,6 @@ static void disabled_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
 
 lv_subject_add_observer_obj(subject, disabled_observer_cb, widget, NULL);
 ```
-
-<Callout type="warning">
-The `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` functions are
-**deprecated** in favor of the two approaches above.
-</Callout>
 
 #### Checked State
 

@@ -56,23 +56,22 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_g2d_fill(lv_draw_task_t * t)
+void lv_draw_g2d_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
-    lv_draw_fill_dsc_t * dsc = t->draw_dsc;
+    LV_UNUSED(draw_unit);
 
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
-    lv_area_t * coords = &t->area;
 
     lv_area_t rel_coords;
     rel_coords = *coords;
     lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t rel_clip_area;
-    rel_clip_area = t->clip_area;
+    rel_clip_area = *clip_area;
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;

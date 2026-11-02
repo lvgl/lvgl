@@ -3,9 +3,6 @@
 #include "../../src/themes/lv_theme_private.h"
 #include "unity/unity.h"
 
-/*The themes are tested on the deprecated `lv_menu`, `lv_list` and `lv_win` widgets too.*/
-LV_DEPRECATIONS_IGNORE_BEGIN
-
 void setUp(void)
 {
     /* Function run before every test */
@@ -72,11 +69,6 @@ static void test_widgets(const char * img_name)
     lv_obj_set_size(tabview, 100, 100);
     lv_tabview_add_tab(tabview, "Tab 1");
 
-    lv_obj_t * win = lv_win_create(scr_act);
-    lv_obj_set_size(win, 100, 100);
-    lv_win_add_title(win, "Window");
-    lv_win_add_button(win, LV_SYMBOL_CLOSE, 20);
-
     lv_button_create(scr_act);
 
     lv_obj_t * btnm = lv_buttonmatrix_create(scr_act);
@@ -124,11 +116,6 @@ static void test_widgets(const char * img_name)
     lv_obj_t * keyboard = lv_keyboard_create(scr_act);
     lv_obj_set_size(keyboard, 300, 150);
 
-    lv_obj_t * list = lv_list_create(scr_act);
-    lv_obj_set_size(list, 100, 100);
-    lv_list_add_text(list, "List item");
-    lv_list_add_button(list, LV_SYMBOL_OK, "List button");
-
     lv_spinbox_create(scr_act);
 
     lv_obj_t * tileview = lv_tileview_create(scr_act);
@@ -138,9 +125,6 @@ static void test_widgets(const char * img_name)
     lv_label_set_text(tile_label, "Tile: 0;0");
 
     lv_led_create(scr_act);
-
-    lv_obj_t * menu = lv_menu_create(scr_act);
-    lv_obj_set_size(menu, 100, 100);
 
     lv_spinner_create(scr_act);
 
@@ -158,22 +142,23 @@ void test_theme_default_resolution_change_no_recursion(void)
 #if LV_USE_DRAW_NANOVG
     TEST_PASS();
 #else
-    lv_theme_t * theme = lv_theme_default_init(NULL,
+    lv_display_t * display = lv_display_get_default();
+    lv_theme_t * theme = lv_theme_default_init(display,
                                                lv_palette_main(LV_PALETTE_BLUE),
                                                lv_palette_main(LV_PALETTE_RED),
                                                true, LV_FONT_DEFAULT);
-    lv_display_set_theme(lv_display_get_default(), theme);
+    lv_display_set_theme(display, theme);
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Resolution change test");
     lv_button_create(lv_screen_active());
 
-    lv_display_set_resolution(lv_display_get_default(), 320, 240);
+    lv_display_set_resolution(display, 320, 240);
 
     TEST_ASSERT_NOT_NULL(lv_screen_active());
     TEST_ASSERT_TRUE(lv_theme_default_is_inited());
 
-    lv_display_set_resolution(lv_display_get_default(), 800, 480);
+    lv_display_set_resolution(display, 800, 480);
 
     TEST_ASSERT_NOT_NULL(lv_screen_active());
     TEST_ASSERT_TRUE(lv_theme_default_is_inited());
@@ -187,16 +172,16 @@ void test_theme_default(void)
     TEST_ASSERT_TRUE(lv_theme_default_is_inited());
     TEST_ASSERT_NOT_NULL(lv_theme_default_get());
 
-    lv_theme_t * theme = lv_theme_default_init(NULL,
+    lv_display_t * display = lv_display_get_default();
+    lv_theme_t * theme = lv_theme_default_init(display,
                                                lv_palette_main(LV_PALETTE_BLUE),
                                                lv_palette_main(LV_PALETTE_RED),
                                                false, LV_FONT_DEFAULT);
     TEST_ASSERT_EQUAL_PTR(theme, lv_theme_default_get());
-    lv_display_t * display = lv_display_get_default();
     lv_display_set_theme(display, theme);
     test_widgets("theme_default_light.png");
 
-    theme = lv_theme_default_init(NULL,
+    theme = lv_theme_default_init(display,
                                   lv_palette_main(LV_PALETTE_BLUE),
                                   lv_palette_main(LV_PALETTE_RED),
                                   true, LV_FONT_DEFAULT);
@@ -213,13 +198,13 @@ void test_theme_default(void)
 
 void test_theme_mono(void)
 {
-    lv_theme_t * theme = lv_theme_mono_init(NULL, false, LV_FONT_DEFAULT);
-    TEST_ASSERT_EQUAL_PTR(theme, lv_theme_mono_get());
     lv_display_t * display = lv_display_get_default();
+    lv_theme_t * theme = lv_theme_mono_init(display, false, LV_FONT_DEFAULT);
+    TEST_ASSERT_EQUAL_PTR(theme, lv_theme_mono_get());
     lv_display_set_theme(display, theme);
     test_widgets("theme_mono_light.png");
 
-    theme = lv_theme_mono_init(NULL, true, LV_FONT_DEFAULT);
+    theme = lv_theme_mono_init(display, true, LV_FONT_DEFAULT);
     TEST_ASSERT_EQUAL_PTR(theme, lv_theme_mono_get());
     lv_display_set_theme(display, theme);
     test_widgets("theme_mono_dark.png");
@@ -233,9 +218,9 @@ void test_theme_mono(void)
 
 void test_theme_simple(void)
 {
-    lv_theme_t * theme = lv_theme_simple_init(NULL);
-    TEST_ASSERT_EQUAL_PTR(theme, lv_theme_simple_get());
     lv_display_t * display = lv_display_get_default();
+    lv_theme_t * theme = lv_theme_simple_init(display);
+    TEST_ASSERT_EQUAL_PTR(theme, lv_theme_simple_get());
     lv_display_set_theme(display, theme);
     test_widgets("theme_simple.png");
 
@@ -245,8 +230,6 @@ void test_theme_simple(void)
     TEST_ASSERT_FALSE(lv_theme_simple_is_inited());
     TEST_ASSERT_NULL(lv_theme_simple_get());
 }
-
-LV_DEPRECATIONS_IGNORE_END
 
 void test_theme_user_data(void)
 {

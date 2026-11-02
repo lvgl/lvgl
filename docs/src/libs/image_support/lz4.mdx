@@ -14,17 +14,6 @@ The LVGL's built-in binary image decoder supports LZ4-compressed images.
 The decoder supports both variable and file as image sources.  The original
 binary data is directly decoded to RAM.
 
-## Which Library
-
-If <ApiLink name="LV_USE_LZ4_INTERNAL" /> is enabled in `lv_conf.h`, LVGL's internal copy of the
-LZ4 decompression algorithm is used (`./src/libs/lz4/lz4.c`).
-
-If <ApiLink name="LV_USE_LZ4_EXTERNAL" /> is enabled, the LVGL project is assumed to be compiled and
-linked with an external LZ4 library that provides the <ApiLink name="LZ4_decompress_safe" />
-function.
-
-One of them must be enabled to use LZ4 decompression.
-
 ## Benefits
 
 LZ4 is best at compressing data where compression and decompression speed is a
@@ -35,13 +24,18 @@ processing.
 
 ## Usage
 
-To use the LZ4 Decoder, enable it in `lv_conf.h` configuration file by setting
-either <ApiLink name="LV_USE_LZ4_INTERNAL" /> or <ApiLink name="LV_USE_LZ4_EXTERNAL" /> to `1`.  LZ4 images can
-then be used in the same way as other images.
+To use the LZ4 Decoder, enable it in your configuration file by enabling <ApiLink name="LV_USE_LZ4" />.
+LZ4 images can then be used in the same way as other images.
 
 ```c
 lv_image_set_src(img, "path/to/cogwheel.bin");
 ```
+
+## Library
+
+You can enable <ApiLink name="LV_USE_LZ4_INTERNAL" /> to use LVGL's internal copy of the
+LZ4 decompression library. Disabling it means you must provide an external LZ4 library with LVGL which 
+provides <ApiLink name="LZ4_decompress_safe" /> function.
 
 ## Generating LZ4 Compressed Binary Images
 

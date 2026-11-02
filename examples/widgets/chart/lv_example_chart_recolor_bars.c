@@ -4,15 +4,14 @@
 
 static void draw_event_cb(lv_event_t * e)
 {
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
 
     if(base_dsc->part != LV_PART_ITEMS) {
         return;
     }
 
-    lv_draw_fill_dsc_t * fill_dsc = lv_draw_task_get_fill_dsc(draw_task);
-    if(fill_dsc) {
+    if(lv_draw_dsc_get_type(base_dsc) == LV_DRAW_DSC_TYPE_FILL) {
+        lv_draw_fill_dsc_t * fill_dsc = lv_draw_dsc_get_fill_dsc(base_dsc);
         lv_obj_t * chart = lv_event_get_target_obj(e);
         int32_t * y_array = lv_chart_get_series_y_array(chart, lv_chart_get_series_next(chart, NULL));
         int32_t v = y_array[base_dsc->id2];
@@ -27,8 +26,8 @@ static void draw_event_cb(lv_event_t * e)
  * @brief Bar chart that tints each bar between green and red based on its value.
  *
  * A 260x160 `LV_CHART_TYPE_BAR` chart holds 24 points on one series. The
- * chart sets `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` and subscribes to
- * `LV_EVENT_DRAW_TASK_ADDED`. For each `LV_PART_ITEMS` fill task the
+ * chart sets `LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS` and subscribes to
+ * `LV_EVENT_DRAW_DSC_BEGIN`. For each `LV_PART_ITEMS` fill the
  * callback reads the underlying Y value and replaces the fill color
  * with an `lv_color_mix` of green and red proportional to the value.
  */
@@ -43,8 +42,8 @@ void lv_example_chart_recolor_bars(void)
     lv_obj_center(chart);
 
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_color_hex(0xff0000), LV_CHART_AXIS_PRIMARY_Y);
-    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(chart, true);
+    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
+    lv_obj_set_send_draw_dsc_events(chart, true);
 
     uint32_t i;
     for(i = 0; i < 24; i++) {

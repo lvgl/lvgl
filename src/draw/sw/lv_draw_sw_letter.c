@@ -38,13 +38,15 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
-                                                       lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
+static void /* LV_ATTRIBUTE_FAST_MEM */ draw_letter_cb(lv_layer_t * layer, const lv_area_t * clip_area,
+                                                       lv_draw_glyph_dsc_t * glyph_draw_dsc,
+                                                       lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area,
+                                                       void * user_data);
 
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 
     static void freetype_outline_event_cb(lv_event_t * e);
-    static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc);
+    static void draw_letter_outline(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_glyph_dsc_t * dsc);
 
 #endif
 
@@ -64,7 +66,8 @@ static void /* LV_ATTRIBUTE_FAST_MEM */ draw_letter_cb(lv_draw_task_t * t, lv_dr
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sw_letter(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_letter_dsc_t * dsc,
+                       const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN)
         return;
@@ -79,10 +82,10 @@ void lv_draw_sw_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, con
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    lv_draw_unit_draw_letter_internal(t, &glyph_dsc, &(lv_point_t) {
+    lv_draw_unit_draw_letter_internal(layer, clip_area, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
-    dsc->font, dsc->unicode, draw_letter_cb);
+    dsc->font, dsc->unicode, draw_letter_cb, NULL);
 
     if(glyph_dsc._draw_buf) {
         lv_draw_buf_destroy(glyph_dsc._draw_buf);
@@ -92,7 +95,8 @@ void lv_draw_sw_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, con
     LV_PROFILER_DRAW_END;
 }
 
-void lv_draw_sw_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sw_label(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_label_dsc_t * dsc,
+                      const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -101,12 +105,12 @@ void lv_draw_sw_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
     static bool is_init = false;
     if(!is_init) {
-        lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, t);
+        lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, NULL);
         is_init = true;
     }
 #endif
 
-    lv_draw_label_iterate_characters(t, dsc, coords, draw_letter_cb);
+    lv_draw_label_iterate_characters(layer, clip_area, dsc, coords, draw_letter_cb, NULL);
     LV_PROFILER_DRAW_END;
 }
 
@@ -114,9 +118,13 @@ void lv_draw_sw_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const
  *   STATIC FUNCTIONS
  **********************/
 
-static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
-                                                 lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
+static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_layer_t * layer, const lv_area_t * clip_area,
+                                                 lv_draw_glyph_dsc_t * glyph_draw_dsc,
+                                                 lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area,
+                                                 void * user_data)
 {
+    LV_UNUSED(user_data);
+
     if(glyph_draw_dsc) {
         switch(glyph_draw_dsc->format) {
             case LV_FONT_GLYPH_FORMAT_NONE: {
@@ -128,7 +136,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    lv_draw_sw_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_sw_border(layer, clip_area, &border_draw_dsc, glyph_draw_dsc->bg_coords);
 #endif
                 }
                 break;
@@ -154,7 +162,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             blend_dsc.mask_stride = glyph_draw_dsc->g->stride;
                             blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
                             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-                            lv_draw_sw_blend(t, &blend_dsc);
+                            lv_draw_sw_blend(layer, clip_area, &blend_dsc);
                         }
                         else {
                             glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap_internal(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
@@ -174,7 +182,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             blend_dsc.mask_stride = draw_buf->header.stride;
                             blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
                             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-                            lv_draw_sw_blend(t, &blend_dsc);
+                            lv_draw_sw_blend(layer, clip_area, &blend_dsc);
                         }
                     }
                     else {
@@ -191,14 +199,14 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             .x = glyph_draw_dsc->pivot.x - glyph_draw_dsc->g->ofs_x,
                             .y = glyph_draw_dsc->g->box_h + glyph_draw_dsc->g->ofs_y
                         };
-                        lv_draw_sw_image(t, &img_dsc, glyph_draw_dsc->letter_coords);
+                        lv_draw_sw_image(layer, clip_area, &img_dsc, glyph_draw_dsc->letter_coords);
                     }
                     break;
                 }
                 break;
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
             case LV_FONT_GLYPH_FORMAT_VECTOR: {
-                    draw_letter_outline(t, glyph_draw_dsc);
+                    draw_letter_outline(layer, clip_area, glyph_draw_dsc);
                 }
                 break;
 #endif
@@ -208,7 +216,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_sw_fill(t, fill_draw_dsc, fill_area);
+        lv_draw_sw_fill(layer, clip_area, fill_draw_dsc, fill_area);
     }
 }
 
@@ -219,13 +227,13 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
  * Renders the vectors paths representing a glyph with ThorVG
  * the result is then blended into the draw buffer
  */
-static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc)
+static void draw_letter_outline(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_glyph_dsc_t * glyph_dsc)
 {
 
     lv_draw_vector_dsc_t * vector_dsc;
     lv_draw_buf_t * draw_buf;
     lv_matrix_t matrix;
-    lv_layer_t layer;
+    lv_layer_t glyph_layer;
 
     lv_vector_path_t * paths = (lv_vector_path_t *) glyph_dsc->glyph_data;
     LV_ASSERT_NULL(paths);
@@ -252,18 +260,18 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     draw_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_ARGB8888, stride);
     lv_draw_buf_clear(draw_buf, NULL);
 
-    lv_memzero(&layer, sizeof(lv_layer_t));
-    layer.draw_buf = draw_buf;
-    layer.color_format = LV_COLOR_FORMAT_ARGB8888;
-    layer.buf_area = buf_area;
-    layer.phy_clip_area = buf_area;
-    layer._clip_area = buf_area;
+    lv_memzero(&glyph_layer, sizeof(lv_layer_t));
+    glyph_layer.draw_buf = draw_buf;
+    glyph_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
+    glyph_layer.buf_area = buf_area;
+    glyph_layer.phy_clip_area = buf_area;
+    glyph_layer._clip_area = buf_area;
 
     lv_memzero(&matrix, sizeof(lv_matrix_t));
 
     lv_matrix_identity(&matrix);
 
-    vector_dsc = lv_draw_vector_dsc_create(&layer);
+    vector_dsc = lv_draw_vector_dsc_create(&glyph_layer);
 
     int32_t offset_x;
     int32_t offset_y;
@@ -292,33 +300,13 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->opa);
     lv_draw_vector_dsc_add_path(vector_dsc, paths);
 
-    lv_area_t old_area;
     lv_area_t letter_coords;
 
-    /*Render vector path(s) - set the clip area so that it matches
-     *the size of the temporary buffer used to render the glyph path(s)*/
-    lv_memcpy(&old_area, &t->clip_area, sizeof(lv_area_t));
-    lv_memcpy(&t->clip_area, &buf_area, sizeof(lv_area_t));
-
-    /*Can't call lv_draw_vector() as it would create a new draw task while
-     *the main thread also can create draw tasks. So create a dummy draw task
-     *manually to draw the outline*/
+    /*Render vector path(s) clipped to the temporary glyph layer.
+     *Draw the outline directly; lv_draw_vector() would create a draw task*/
     if(vector_dsc->task_list) {
-        vector_dsc->base.layer = vector_dsc->base.layer;
-        lv_draw_task_t dummy_t;
-        lv_memzero(&dummy_t, sizeof(lv_draw_task_t));
-        dummy_t.area = vector_dsc->base.layer->_clip_area;
-        dummy_t._real_area = vector_dsc->base.layer->_clip_area;
-        dummy_t.clip_area = vector_dsc->base.layer->_clip_area;
-        dummy_t.target_layer = vector_dsc->base.layer;
-        dummy_t.type = LV_DRAW_TASK_TYPE_VECTOR;
-        dummy_t.opa = LV_OPA_COVER;
-        dummy_t.draw_dsc = vector_dsc;
-        lv_draw_sw_vector(&dummy_t, dummy_t.draw_dsc);
+        lv_draw_sw_vector(vector_dsc->base.layer, &vector_dsc->base.layer->_clip_area, vector_dsc);
     }
-
-    /*Restore previous draw area of the entire text label*/
-    lv_memcpy(&t->clip_area, &old_area, sizeof(lv_area_t));
 
     lv_memcpy(&letter_coords, glyph_dsc->letter_coords, sizeof(lv_area_t));
     lv_area_set_width(&letter_coords, w);
@@ -328,7 +316,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 
     lv_draw_image_dsc_init(&img_dsc);
     img_dsc.src = draw_buf;
-    lv_draw_sw_image(t, &img_dsc, &letter_coords);
+    lv_draw_sw_image(layer, clip_area, &img_dsc, &letter_coords);
 
     lv_draw_vector_dsc_delete(vector_dsc);
     lv_draw_buf_destroy(draw_buf);

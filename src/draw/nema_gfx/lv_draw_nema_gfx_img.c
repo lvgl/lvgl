@@ -41,9 +41,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
+static void _draw_nema_gfx_img(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc,
                                const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                               const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+                               const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data);
 
 static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf);
 
@@ -51,15 +51,14 @@ static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf);
  *  STATIC FUNCTIONS
  **********************/
 
-static void _draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
+static void _draw_nema_gfx_img(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc,
                                const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                               const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
+                               const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = user_data;
 
-    lv_layer_t * layer = t->target_layer;
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
     const lv_image_header_t * header = &decoded->header;
 
@@ -218,17 +217,18 @@ static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf)
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nema_gfx_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     const lv_image_decoder_args_t args = {
         .use_indexed = true,
     };
 
     if(!dsc->tile) {
-        lv_draw_image_normal_helper(t, dsc, coords, _draw_nema_gfx_img, &args);
+        lv_draw_image_normal_helper(layer, clip_area, dsc, coords, _draw_nema_gfx_img, &args, draw_unit);
     }
     else {
-        lv_draw_image_tiled_helper(t, dsc, coords, _draw_nema_gfx_img, &args);
+        lv_draw_image_tiled_helper(layer, clip_area, dsc, coords, _draw_nema_gfx_img, &args, draw_unit);
     }
 
 }

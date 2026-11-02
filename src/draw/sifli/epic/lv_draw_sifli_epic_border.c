@@ -30,9 +30,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void draw_border_simple(lv_draw_task_t * task, const lv_area_t * outer_area, const lv_area_t * inner_area,
+static void draw_border_simple(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                               const lv_area_t * outer_area, const lv_area_t * inner_area,
                                const lv_draw_border_dsc_t * dsc);
-static void draw_fill_part(lv_draw_task_t * task, const lv_area_t * area, const lv_draw_border_dsc_t * dsc);
+static void draw_fill_part(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_area_t * area, const lv_draw_border_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -46,10 +48,9 @@ static void draw_fill_part(lv_draw_task_t * task, const lv_area_t * area, const 
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sifli_epic_border(lv_draw_task_t * task)
+void lv_draw_sifli_epic_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                               const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
 {
-    const lv_draw_border_dsc_t * dsc = (const lv_draw_border_dsc_t *)task->draw_dsc;
-    const lv_area_t * coords = &task->area;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
@@ -66,14 +67,15 @@ void lv_draw_sifli_epic_border(lv_draw_task_t * task)
     area_inner.y1 += ((dsc->side & LV_BORDER_SIDE_TOP) ? dsc->width : -dsc->width);
     area_inner.y2 -= ((dsc->side & LV_BORDER_SIDE_BOTTOM) ? dsc->width : -dsc->width);
 
-    draw_border_simple(task, coords, &area_inner, dsc);
+    draw_border_simple(draw_unit, layer, clip_area, coords, &area_inner, dsc);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void draw_border_simple(lv_draw_task_t * task, const lv_area_t * outer_area, const lv_area_t * inner_area,
+static void draw_border_simple(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                               const lv_area_t * outer_area, const lv_area_t * inner_area,
                                const lv_draw_border_dsc_t * dsc)
 {
     lv_area_t area;
@@ -89,14 +91,14 @@ static void draw_border_simple(lv_draw_task_t * task, const lv_area_t * outer_ar
     area.y1 = outer_area->y1;
     area.y2 = inner_area->y1 - 1;
     if(top_side && area.y1 <= area.y2) {
-        draw_fill_part(task, &area, dsc);
+        draw_fill_part(draw_unit, layer, clip_area, &area, dsc);
     }
 
     /* Bottom */
     area.y1 = inner_area->y2 + 1;
     area.y2 = outer_area->y2;
     if(bottom_side && area.y1 <= area.y2) {
-        draw_fill_part(task, &area, dsc);
+        draw_fill_part(draw_unit, layer, clip_area, &area, dsc);
     }
 
     /* Left */
@@ -105,28 +107,26 @@ static void draw_border_simple(lv_draw_task_t * task, const lv_area_t * outer_ar
     area.y1 = top_side ? inner_area->y1 : outer_area->y1;
     area.y2 = bottom_side ? inner_area->y2 : outer_area->y2;
     if(left_side && area.x1 <= area.x2 && area.y1 <= area.y2) {
-        draw_fill_part(task, &area, dsc);
+        draw_fill_part(draw_unit, layer, clip_area, &area, dsc);
     }
 
     /* Right */
     area.x1 = inner_area->x2 + 1;
     area.x2 = outer_area->x2;
     if(right_side && area.x1 <= area.x2 && area.y1 <= area.y2) {
-        draw_fill_part(task, &area, dsc);
+        draw_fill_part(draw_unit, layer, clip_area, &area, dsc);
     }
 }
 
-static void draw_fill_part(lv_draw_task_t * task, const lv_area_t * area, const lv_draw_border_dsc_t * dsc)
+static void draw_fill_part(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_area_t * area, const lv_draw_border_dsc_t * dsc)
 {
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);
     fill_dsc.color = dsc->color;
     fill_dsc.opa = dsc->opa;
 
-    lv_draw_task_t fill_task = *task;
-    fill_task.draw_dsc = &fill_dsc;
-    fill_task.area = *area;
-    lv_draw_sifli_epic_fill(&fill_task);
+    lv_draw_sifli_epic_fill(draw_unit, layer, clip_area, &fill_dsc, area);
 }
 
 #endif /*LV_USE_SIFLI_EPIC*/

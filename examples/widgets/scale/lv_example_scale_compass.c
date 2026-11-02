@@ -31,20 +31,16 @@ static void set_heading_value(void * obj, int32_t v)
 
 static void draw_event_cb(lv_event_t * e)
 {
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
-    lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
-    lv_draw_line_dsc_t * line_draw_dsc = lv_draw_task_get_line_dsc(draw_task);
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
     if(base_dsc->part == LV_PART_INDICATOR) {
-        if(label_draw_dsc) {
-            if(base_dsc->id1 == 0) {
-                label_draw_dsc->color = lv_palette_main(LV_PALETTE_RED);
-            }
+        lv_draw_dsc_type_t type = lv_draw_dsc_get_type(base_dsc);
+        if(type == LV_DRAW_DSC_TYPE_LABEL && base_dsc->id1 == 0) {
+            lv_draw_label_dsc_t * label_draw_dsc = lv_draw_dsc_get_label_dsc(base_dsc);
+            label_draw_dsc->color = lv_palette_main(LV_PALETTE_RED);
         }
-        if(line_draw_dsc) {
-            if(base_dsc->id1 == 60) {
-                line_draw_dsc->color = lv_palette_main(LV_PALETTE_RED);
-            }
+        if(type == LV_DRAW_DSC_TYPE_LINE && base_dsc->id1 == 60) {
+            lv_draw_line_dsc_t * line_draw_dsc = lv_draw_dsc_get_line_dsc(base_dsc);
+            line_draw_dsc->color = lv_palette_main(LV_PALETTE_RED);
         }
     }
 }
@@ -58,7 +54,7 @@ static void draw_event_cb(lv_event_t * e)
  * `N`, `30`, `60`, `E`, and so on. A red `LV_SYMBOL_UP` label pins
  * the forward bearing at the top, and a centre label formats the
  * heading as `<deg>` plus the cardinal string from
- * `heading_to_cardinal`. An `LV_EVENT_DRAW_TASK_ADDED` callback paints
+ * `heading_to_cardinal`. An `LV_EVENT_DRAW_DSC_BEGIN` callback paints
  * the `N` label and its tick red. An infinite 5000 ms forward and
  * reverse animation drives `lv_scale_set_rotation`, turning the dial
  * beneath the arrow.
@@ -85,8 +81,8 @@ void lv_example_scale_compass(void)
     lv_scale_set_angle_range(scale, 360);
     lv_scale_set_rotation(scale, 270);
 
-    lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_set_send_draw_task_events(scale, true);
+    lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
+    lv_obj_set_send_draw_dsc_events(scale, true);
 
     label = lv_label_create(lv_screen_active());
     lv_obj_set_width(label, 100);

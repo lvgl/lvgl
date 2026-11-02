@@ -1,0 +1,26 @@
+config LV_USE_DRAW_IPA
+	bool "IPA renderer"
+	default n
+	help
+		Accelerate rendering with the GD32 IPA peripheral.
+
+if LV_USE_DRAW_IPA
+
+config LV_DRAW_IPA_HAL_INCLUDE
+	string "GD32 peripheral header"
+	default "gd32h7xx.h"
+	help
+		Header that provides the IPA peripheral definitions for the target
+		GD32 family. Use gd32h7xx.h for GD32H7 devices, or the corresponding
+		device header for another supported GD32 family.
+
+config LV_USE_DRAW_IPA_INTERRUPT
+	bool "Transfer complete interrupt"
+	default n
+	depends on LV_OS_FREERTOS
+	help
+		Use FreeRTOS synchronization for IPA transfers.
+		Call lv_draw_ipa_transfer_complete_interrupt_handler()
+		from the IPA interrupt handler.
+
+endif

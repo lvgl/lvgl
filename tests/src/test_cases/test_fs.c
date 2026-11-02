@@ -646,6 +646,53 @@ void test_fs_get_last(void)
     TEST_ASSERT_EQUAL_STRING("a", result);
 }
 
+static uint32_t remove_cb_count;
+
+static void count_remove_cb(lv_fs_drv_t * drv)
+{
+    LV_UNUSED(drv);
+    remove_cb_count++;
+}
+
+void test_fs_remove_drive(void)
+{
+    static lv_fs_drv_t drv_r;
+    static lv_fs_drv_t drv_s;
+    static lv_fs_drv_t drv_q1;
+    static lv_fs_drv_t drv_q2;
+    lv_fs_drv_t * drvs[] = {&drv_r, &drv_s, &drv_q1, &drv_q2};
+    const char letters[] = {'R', 'S', 'Q', 'Q'};
+    for(size_t i = 0; i < sizeof(drvs) / sizeof(drvs[0]); i++) {
+        lv_fs_drv_init(drvs[i]);
+        drvs[i]->letter = letters[i];
+        drvs[i]->remove_cb = count_remove_cb;
+        lv_fs_drv_register(drvs[i]);
+    }
+    remove_cb_count = 0;
+
+    /* Removing a drive keeps the others */
+    lv_fs_remove_drive('S');
+    TEST_ASSERT_NULL(lv_fs_get_drv('S'));
+    TEST_ASSERT_EQUAL_PTR(&drv_r, lv_fs_get_drv('R'));
+    TEST_ASSERT_NOT_NULL(lv_fs_get_drv('Q'));
+    TEST_ASSERT_EQUAL_UINT32(1, remove_cb_count);
+
+    /* Every drive with the letter is removed */
+    lv_fs_remove_drive('Q');
+    TEST_ASSERT_NULL(lv_fs_get_drv('Q'));
+    TEST_ASSERT_EQUAL_PTR(&drv_r, lv_fs_get_drv('R'));
+    TEST_ASSERT_EQUAL_UINT32(3, remove_cb_count);
+
+    /* An unknown letter changes nothing */
+    lv_fs_remove_drive('S');
+    TEST_ASSERT_EQUAL_UINT32(3, remove_cb_count);
+
+    lv_fs_remove_drive('R');
+    TEST_ASSERT_NULL(lv_fs_get_drv('R'));
+    TEST_ASSERT_EQUAL_UINT32(4, remove_cb_count);
+    TEST_ASSERT_TRUE(lv_fs_is_ready('T'));
+}
+
 void test_fs_get_letters(void)
 {
     char buf[16]; /* Increased buffer size to accommodate more drive letters */

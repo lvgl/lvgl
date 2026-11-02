@@ -29,27 +29,29 @@ See [Style Properties](/common-widget-features/styles/style-properties) to see t
 ## Base Draw Descriptor
 
 In each draw descriptor there is a generic "base descriptor" with
-<ApiLink name="lv_draw_dsc_base_t" /> type and with `base` in its name.  For example
+<ApiLink name="lv_draw_dsc_t" /> type and with `base` in its name.  For example
 `label_dsc.base`.  This `struct` stores useful information about which Widget
 and part created the draw descriptor.  See all the fields in
-<ApiLink name="lv_draw_dsc_base_t" />.
+<ApiLink name="lv_draw_dsc_t" />.
 
-In an <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> event, the elements of the base draw
-descriptor are very useful to identify the Draw Task.  For example:
+In the <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" /> and <ApiLink name="LV_EVENT_DRAW_DSC_END" />
+events, the elements of the base draw descriptor are very useful to identify what is
+being drawn.  For example:
 
 ```c
-/* In LV_EVENT_DRAW_TASK_ADDED */
-lv_draw_task_t * t = lv_event_get_draw_task(e);
-lv_draw_base_dsc_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
-draw_dsc.obj;  /* The Widget for which the draw descriptor was created */
-draw_dsc.part; /* The Widget part for which the draw descriptor was created
-                  E.g. LV_PART_INDICATOR */
-draw_dsc.id1;  /* A Widget type specific ID (e.g. table row index).
-                  See the docs of the given Widget. */
-draw_dsc.id2;
+/* In LV_EVENT_DRAW_DSC_BEGIN or LV_EVENT_DRAW_DSC_END */
+lv_draw_dsc_t * draw_dsc = lv_event_get_draw_dsc(e);
+draw_dsc->obj;  /* The Widget for which the draw descriptor was created */
+draw_dsc->part; /* The Widget part for which the draw descriptor was created
+                   E.g. LV_PART_INDICATOR */
+draw_dsc->id1;  /* A Widget type specific ID (e.g. table row index).
+                   See the docs of the given Widget. */
+draw_dsc->id2;
 
-draw_dsc.layer; /* The target layer.
-                   Required when a new Draw Tasks are also created */
+draw_dsc->layer; /* The target layer.
+                    Required when something new is also drawn */
+
+lv_draw_dsc_get_type(draw_dsc); /* The type, e.g. LV_DRAW_DSC_TYPE_LABEL */
 ```
 
 ### Simple Initialization
@@ -95,18 +97,29 @@ the base descriptor.
 
 ### Modify the draw descriptors
 
-In <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />, the draw descriptor of the `draw_task` can be
-accessed (using <ApiLink name="lv_draw_task_get_label_dsc" /> and similar functions)
-and modified (to change color, text, font, etc.).  This means that in
-<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />, the `draw_task`s and draw descriptors
-are already initialized and it's enough to change only a few specific values.
+If <ApiLink name="LV_OBJ_FLAG_SEND_DRAW_DSC_EVENTS" /> is enabled on a Widget, every draw
+descriptor the Widget draws is sent in two events:
+
+- <ApiLink name="LV_EVENT_DRAW_DSC_BEGIN" />: before it's drawn.  The descriptor is already
+  initialized, so it's enough to change only a few specific values (color, text, font, etc.).
+  The area can be changed too through the `coords` field of the descriptors that are drawn
+  to an area (fill, border, box shadow, label, letter, image, blur and 3D).  Anything drawn in this event goes below the descriptor.
+- <ApiLink name="LV_EVENT_DRAW_DSC_END" />: after it's drawn.  Anything drawn in this event
+  goes on top of the descriptor.
+
+Get the descriptor with <ApiLink name="lv_event_get_draw_dsc" />, check its type with
+<ApiLink name="lv_draw_dsc_get_type" />, then get the specific descriptor with
+<ApiLink name="lv_draw_dsc_get_label_dsc" /> and similar functions.  These must only be
+called for a descriptor of the matching type.
 
 For example:
 
 ```c
-/* In LV_EVENT_DRAW_TASK_ADDED */
-lv_draw_task_t * t = lv_event_get_draw_task(e);
-lv_draw_label_dsc_t * draw_dsc = lv_draw_task_get_label_dsc(t);
+/* In LV_EVENT_DRAW_DSC_BEGIN */
+lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_LABEL) return;
+
+lv_draw_label_dsc_t * draw_dsc = lv_draw_dsc_get_label_dsc(base_dsc);
 
 /* Check a few things in `draw_dsc->base` */
 
@@ -114,8 +127,9 @@ lv_draw_label_dsc_t * draw_dsc = lv_draw_task_get_label_dsc(t);
 draw_dsc->color = lv_color_lighten(draw_dsc->color,
                                    LV_MIN(lv_strlen(draw_dsc->text) * 5, 255));
 
-/* Create new Draw Tasks if needed by calling
- * `lv_draw_...(draw_dsc->base.layer, ...)` functions */
+/* Draw something below the label if needed by calling
+ * `lv_draw_...(draw_dsc->base.layer, ...)` functions.
+ * Use LV_EVENT_DRAW_DSC_END to draw on top of it instead. */
 ```
 
 ## Rectangle Draw Descriptor
@@ -142,8 +156,8 @@ The main fields of <ApiLink name="lv_draw_fill_dsc_t" /> are straightforward.  I
 radius, opacity, and color to draw a rectangle.  If opacity is 0, no draw task will
 be created.
 
-- <ApiLink name="lv_draw_fill_dsc_init" display="lv_draw_fill_dsc_init(&dsc)" /> initializes a fill Draw Task.
-- <ApiLink name="lv_draw_sw_fill" display="lv_draw_sw_fill(layer, &dsc, area)" /> creates a Draw Task to fill an area.
+- <ApiLink name="lv_draw_fill_dsc_init" /> initializes a fill Draw Task.
+- <ApiLink name="lv_draw_sw_fill" /> creates a Draw Task to fill an area.
 - <ApiLink name="lv_draw_task_get_fill_dsc" display="lv_draw_task_get_fill_dsc(draw_task)" /> retrieves the fill descriptor from
   a Draw Task.
 
@@ -162,13 +176,13 @@ gradient types.
 
 The following show some example gradients.
 
-<LvglExample name="lv_example_style_2" path="styles/lv_example_style_2" />
+<LvglExample name="lv_example_style_background" path="styles/lv_example_style_background" />
 
-<LvglExample name="lv_example_style_17" path="styles/lv_example_style_17" />
+<LvglExample name="lv_example_style_gradient_conic" path="styles/lv_example_style_gradient_conic" />
 
-<LvglExample name="lv_example_style_18" path="styles/lv_example_style_18" />
+<LvglExample name="lv_example_style_gradient_radial" path="styles/lv_example_style_gradient_radial" />
 
-<LvglExample name="lv_example_style_19" path="styles/lv_example_style_19" />
+<LvglExample name="lv_example_style_gradient_buttons" path="styles/lv_example_style_gradient_buttons" />
 
 For each gradient type, multiple color and opacity values can be assigned.  These are
 called "stops".  The maximum number of stops is limited to
@@ -300,13 +314,12 @@ routine receives only simpler values.
 
 The following functions are used for border drawing:
 
-- <ApiLink name="lv_draw_border_dsc_init" display="lv_draw_border_dsc_init(&dsc)" /> initializes a border Draw Task.
-- <ApiLink name="lv_draw_sw_border" display="lv_draw_sw_border(layer, &dsc, area)" /> creates a Draw Task to draw a border
-  inward from its area.
+- <ApiLink name="lv_draw_border_dsc_init"/> initializes a border Draw Task.
+- <ApiLink name="lv_draw_sw_border"/> creates a Draw Task to draw a border inward from its area.
 - <ApiLink name="lv_draw_task_get_border_dsc" display="lv_draw_task_get_border_dsc(draw_task)" /> retrieves the border descriptor
   from a Draw Task.
 
-<LvglExample name="lv_example_style_3" path="styles/lv_example_style_3" />
+<LvglExample name="lv_example_style_border" path="styles/lv_example_style_border" />
 
 ## Outlines
 
@@ -325,7 +338,7 @@ differences compared to borders in <ApiLink name="lv_draw_rect_dsc_t" /> are:
 - There is no `border_side` property for the outline. It's always rendered as a
   full rectangle.
 
-<LvglExample name="lv_example_style_4" path="styles/lv_example_style_4" />
+<LvglExample name="lv_example_style_outline" path="styles/lv_example_style_outline" />
 
 ## Box Shadow Draw Descriptor
 
@@ -348,13 +361,13 @@ Note: Rendering large shadows may be slow or memory-intensive.
 
 The following functions are used for box shadow drawing:
 
-- <ApiLink name="lv_draw_box_shadow_dsc_init" display="lv_draw_box_shadow_dsc_init(&dsc)" /> initializes a box shadow Draw Task.
-- <ApiLink name="lv_draw_sw_box_shadow" display="lv_draw_sw_box_shadow(layer, &dsc, area)" /> creates a Draw Task for a rectangle's
+- <ApiLink name="lv_draw_box_shadow_dsc_init" /> initializes a box shadow Draw Task.
+- <ApiLink name="lv_draw_sw_box_shadow" /> creates a Draw Task for a rectangle's
   shadow. The shadow's size and position depend on the width, spread, and offset.
 - <ApiLink name="lv_draw_task_get_box_shadow_dsc" display="lv_draw_task_get_box_shadow_dsc(draw_task)" /> retrieves the box shadow
   descriptor from a Draw Task.
 
-<LvglExample name="lv_example_style_5" path="styles/lv_example_style_5" />
+<LvglExample name="lv_example_style_shadow" path="styles/lv_example_style_shadow" />
 
 ## Image Draw Descriptor
 
@@ -389,7 +402,7 @@ Functions for image drawing:
 
 <LvglExample name="lv_example_canvas_image" path="widgets/canvas/lv_example_canvas_image" />
 
-<LvglExample name="lv_example_style_6" path="styles/lv_example_style_6" />
+<LvglExample name="lv_example_style_image" path="styles/lv_example_style_image" />
 
 ### Layers - Special Images
 
@@ -440,14 +453,14 @@ Functions for text drawing:
 - <ApiLink name="lv_draw_task_get_label_dsc" display="lv_draw_task_get_label_dsc(draw_task)" /> retrieves the label descriptor from a task.
 
 For character-specific drawing in draw units, use
-<ApiLink name="lv_draw_label_iterate_characters" display="lv_draw_label_iterate_characters(draw_unit, draw_dsc, area, callback)" />.
+<ApiLink name="lv_draw_label_iterate_characters" />.
 This iterates through all characters, calculates their positions, and calls the
 callback for rendering each character.  For callback details, see
 <ApiLink name="lv_draw_glyph_cb_t" />.
 
 <LvglExample name="lv_example_canvas_label" path="widgets/canvas/lv_example_canvas_label" />
 
-<LvglExample name="lv_example_style_8" path="styles/lv_example_style_8" />
+<LvglExample name="lv_example_style_text" path="styles/lv_example_style_text" />
 
 ## Arc Draw Descriptor
 
@@ -474,7 +487,7 @@ Functions for arc drawing:
 
 <LvglExample name="lv_example_canvas_arc" path="widgets/canvas/lv_example_canvas_arc" />
 
-<LvglExample name="lv_example_style_7" path="styles/lv_example_style_7" />
+<LvglExample name="lv_example_style_arc" path="styles/lv_example_style_arc" />
 
 ## Line Draw Descriptor
 
@@ -504,13 +517,13 @@ Functions for line drawing:
 - <ApiLink name="lv_draw_line_dsc_init" display="lv_draw_line_dsc_init(&dsc)" /> initializes a line descriptor.
 - <ApiLink name="lv_draw_line" display="lv_draw_line(layer, &dsc)" /> creates a task to draw a line.
 - <ApiLink name="lv_draw_task_get_line_dsc" display="lv_draw_task_get_line_dsc(draw_task)" /> retrieves line descriptor.
-- <ApiLink name="lv_draw_line_iterate" display="lv_draw_line_iterate(draw_task, dsc, callback)" /> is a helper function
+- <ApiLink name="lv_draw_line_iterate" /> is a helper function
   to call a callback which draws a line between two points. This way it doesn't matter if
   `p1, p2` or `points` were used as it calls the `callback` as needed.
 
 <LvglExample name="lv_example_canvas_line" path="widgets/canvas/lv_example_canvas_line" />
 
-<LvglExample name="lv_example_style_9" path="styles/lv_example_style_9" />
+<LvglExample name="lv_example_style_line" path="styles/lv_example_style_line" />
 
 ## Triangle Draw Descriptor
 
@@ -574,7 +587,7 @@ following fields:
 | `drop_shadow_ofs_x` | Horizontal offset. |
 | `drop_shadow_ofs_y` | Vertical offset. |
 
-<LvglExample name="lv_example_style_10" path="styles/lv_example_style_10" />
+<LvglExample name="lv_example_style_drop_shadow" path="styles/lv_example_style_drop_shadow" />
 
 ## Vector Draw Descriptor
 
@@ -632,7 +645,7 @@ lv_vector_path_delete(path);
 lv_draw_vector_dsc_delete(dsc);
 ```
 
-To see all the path, stroke, and fill options, check out [lv_draw_vector.h](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_vector.h) .
+To see all the path, stroke, and fill options, check out [lv_draw_vector.h](https://github.com/lvgl/lvgl/blob/master/include/lvgl/draw/lv_draw_vector.h) .
 
 ## Masking Operation
 
@@ -685,7 +698,5 @@ There are several options to mask parts of a layer, Widget, or drawing:
    By using the Canvas Widget with an <ApiLink name="LV_COLOR_FORMAT_L8" /> buffer,
    bitmap masks can be rendered dynamically.
 
-<LvglExample name="lv_example_label_4" path="widgets/label/lv_example_label_4" />
-
-<LvglExample name="lv_example_roller_3" path="widgets/roller/lv_example_roller_3" />
+<LvglExample name="lv_example_roller_fade_mask" path="widgets/roller/lv_example_roller_fade_mask" />
 

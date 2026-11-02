@@ -37,7 +37,7 @@ extern "C" {
  * @param fb_adr_2      An additional framebuffer-sized buffer to use for double buffering.
  *                      @nullable When NULL a single buffer is used.
  * @param layer_idx     The LTDC layer number to bind the display to. Typically 0 or 1.
- * @return              The display.
+ * @return              The display, or NULL if the LTDC layer's color format is not supported.
  */
 lv_display_t * lv_st_ltdc_create_direct(void * fb_adr_1, void * fb_adr_2, uint32_t layer_idx);
 
@@ -49,7 +49,8 @@ lv_display_t * lv_st_ltdc_create_direct(void * fb_adr_1, void * fb_adr_2, uint32
  *                      NULL a single buffer is used.
  * @param buf_size      The size of the buffer(s) in bytes.
  * @param layer_idx     The LTDC layer number to bind the display to. Typically 0 or 1.
- * @return              The display.
+ * @return              The display, or NULL if the LTDC layer's color format is not supported
+ *                      (with `LV_ST_LTDC_USE_DMA2D_FLUSH`, L8 and AL88 are not supported either).
  */
 lv_display_t * lv_st_ltdc_create_partial(void * render_buf_1, void * render_buf_2, uint32_t buf_size,
                                          uint32_t layer_idx);

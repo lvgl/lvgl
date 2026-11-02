@@ -116,8 +116,14 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
         lv_test_screenshot_result_t comp_res;
 #if LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
         LV_LOG_WARN("%s%s", fn_ref_full, " was not found, creating it now from the rendered screen");
-        write_png_file(screen_buf_xrgb8888, draw_buf->header.w, draw_buf->header.h, fn_ref_full);
-        comp_res = LV_TEST_SCREENSHOT_RESULT_PASSED;
+
+        if(write_png_file(screen_buf_xrgb8888, draw_buf->header.w, draw_buf->header.h, fn_ref_full)) {
+            LV_LOG_ERROR("Couldn't write the %s reference image", fn_ref_full);
+            comp_res = LV_TEST_SCREENSHOT_RESULT_FAILED;
+        }
+        else {
+            comp_res = LV_TEST_SCREENSHOT_RESULT_PASSED;
+        }
 #else
         comp_res = LV_TEST_SCREENSHOT_RESULT_NO_REFERENCE_IMAGE;
 #endif
@@ -332,6 +338,11 @@ static void create_folders_if_needed(const char * path)
 
     char * token = strtok_r(path_copy, "/", &ptr);
     char current_path[1024] = {'\0'}; /* Adjust the size as needed */
+
+    /*leading '/' means an absolute path, keep it */
+    if(path[0] == '/') {
+        lv_strcat(current_path, "/");
+    }
 
     while(token && ptr && *ptr != '\0') {
         lv_strcat(current_path, token);

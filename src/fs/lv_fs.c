@@ -584,8 +584,9 @@ void lv_fs_drv_register(lv_fs_drv_t * drv)
 
 void lv_fs_remove_drive(char letter)
 {
-    lv_fs_drv_t ** drv;
-    LV_LL_READ(fsdrv_ll_p, drv) {
+    lv_fs_drv_t ** drv = lv_ll_get_head(fsdrv_ll_p);
+    while(drv) {
+        lv_fs_drv_t ** next = lv_ll_get_next(fsdrv_ll_p, drv);
         if((*drv)->letter == letter) {
             lv_ll_remove(fsdrv_ll_p, drv); /* remove the drive from the list of registered drives */
             if((*drv)->remove_cb) {
@@ -593,6 +594,7 @@ void lv_fs_remove_drive(char letter)
             }
             lv_free(drv); /* free the list node*/
         }
+        drv = next;
     }
 }
 

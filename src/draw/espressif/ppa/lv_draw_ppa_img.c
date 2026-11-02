@@ -12,15 +12,15 @@
 
 #include "../../lv_draw_image_private.h"
 #include "../../../image/lv_image_decoder_private.h"
-#include "../../sw/lv_draw_sw.h"
+#include "../../sw/lv_draw_sw_private.h"
 
-static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void lv_draw_img_ppa_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                                 const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+                                 const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data);
 
 
-void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                     const lv_area_t * coords)
+void lv_draw_ppa_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
@@ -37,17 +37,16 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     lv_image_decoder_args_t dec_args;
     lv_memzero(&dec_args, sizeof(dec_args));
 
-    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, &dec_args);
+    lv_draw_image_normal_helper(layer, clip_area, dsc, coords, lv_draw_img_ppa_core, &dec_args, draw_unit);
 }
 
-static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void lv_draw_img_ppa_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                                 const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
+                                 const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data)
 {
-    lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
-    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)t->draw_unit;
+    lv_draw_ppa_unit_t * u = user_data;
 
     lv_area_t rel_clip_area;
     rel_clip_area = *clipped_img_area;
@@ -63,7 +62,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
 
     lv_area_t dest_area;
     dest_area = *clipped_img_area;
-    lv_area_move(&dest_area, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
+    lv_area_move(&dest_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     const uint8_t * src_buf = decoded->data;
     lv_color_format_t src_cf = draw_dsc->header.cf;
@@ -73,11 +72,10 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     const int32_t src_pic_w  = lv_ppa_pic_w(decoded->header.stride, draw_dsc->header.w, src_cf);
     const int32_t dest_pic_w = lv_ppa_pic_w(draw_buf->header.stride, draw_buf->header.w, dest_cf);
     if(src_pic_w == 0 || dest_pic_w == 0) {
-        if(u->img_sw_fallback) return;
         u->img_sw_fallback = true;
 
         LV_LOG_INFO("PPA draw_img: stride is not a whole number of pixels, using software");
-        lv_draw_sw_image(t, draw_dsc, &t->area);
+        lv_draw_sw_image_core(layer, draw_dsc, decoder_dsc, sup, img_coords, clipped_img_area, NULL);
         return;
     }
 
@@ -172,13 +170,13 @@ static inline uint32_t lv_draw_ppa_buf_span(const lv_draw_buf_t * buf)
     return (buf->data_size / LV_DRAW_PPA_CACHE_LINE_SIZE) * LV_DRAW_PPA_CACHE_LINE_SIZE;
 }
 
-void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
+void lv_draw_ppa_img_srm(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_image_dsc_t * dsc, const lv_area_t * coords,
                          const lv_area_t * real_area)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN) return;
 
-    lv_draw_ppa_unit_t * u   = (lv_draw_ppa_unit_t *)t->draw_unit;
-    lv_layer_t * layer        = t->target_layer;
+    lv_draw_ppa_unit_t * u   = (lv_draw_ppa_unit_t *)draw_unit;
     lv_draw_buf_t * dest_buf  = layer->draw_buf;
 
     /* real_area = on-screen bounding box of the scaled image (t->_real_area).
@@ -186,7 +184,7 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
      * area; calc_block below applies the same two intersections. */
     lv_area_t visible_area;
     if(!lv_area_intersect(&visible_area, real_area, &layer->buf_area)) return;
-    if(!lv_area_intersect(&visible_area, &visible_area, &t->clip_area)) return;
+    if(!lv_area_intersect(&visible_area, &visible_area, clip_area)) return;
     LV_UNUSED(visible_area);
 
     lv_image_decoder_dsc_t decoder_dsc;
@@ -234,7 +232,7 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
         if(u->img_sw_fallback) return;
         u->img_sw_fallback = true;
 #if LV_USE_DRAW_SW
-        lv_draw_sw_image(t, dsc, &t->area);
+        lv_draw_sw_image(layer, clip_area, dsc, coords);
 #else
         LV_LOG_WARN("PPA SRM: no software draw unit to fall back on, image skipped");
 #endif
@@ -244,7 +242,7 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     /* Map the visible render tile back onto a PPA source block.
      * Pure geometry, shared with the host unit test (lv_draw_ppa_srm.h). */
     lv_draw_ppa_srm_block_t blk = lv_draw_ppa_srm_calc_block(
-                                      real_area, &layer->buf_area, &t->clip_area,
+                                      real_area, &layer->buf_area, clip_area,
                                       (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
                                       (int32_t)src_w, (int32_t)src_h,
                                       dsc->scale_x, dsc->scale_y);
@@ -350,14 +348,14 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
  * PPA SRM hardware-accelerated image rotation (0/90/180/270 degrees)
  * Uses the ESP32-P4 PPA Scale-Rotate-Mirror engine for zero-CPU-cost rotation.
  */
-void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
+void lv_draw_ppa_img_rotate(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_image_dsc_t * dsc, const lv_area_t * coords,
                             const lv_area_t * real_area)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)t->draw_unit;
-    lv_layer_t * layer = t->target_layer;
+    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
     lv_draw_buf_t * dest_buf = layer->draw_buf;
 
     /* Decode the source image */
@@ -439,7 +437,7 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
         if(u->img_sw_fallback) return;
         u->img_sw_fallback = true;
 #if LV_USE_DRAW_SW
-        lv_draw_sw_image(t, dsc, &t->area);
+        lv_draw_sw_image(layer, clip_area, dsc, coords);
 #else
         LV_LOG_WARN("PPA SRM: no software draw unit to fall back on, image skipped");
 #endif
@@ -451,11 +449,24 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
      * (lv_draw_ppa_rot.h); also guarantees the destination stays inside the
      * buffer so the PPA cannot write out of bounds. */
     lv_draw_ppa_rot_block_t blk = lv_draw_ppa_rot_calc_block(
-                                      real_area, &layer->buf_area, &t->clip_area,
+                                      real_area, &layer->buf_area, clip_area,
                                       (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
                                       (int32_t)src_w, (int32_t)src_h, angle);
     if(!blk.draw) {
         lv_image_decoder_close(&decoder_dsc);
+        return;
+    }
+
+    /* The v5.5 driver hangs on some blocks at 90 and 270 (DIG-734), and the
+     * submit below is blocking, so it would never return. Leave those to
+     * software rather than freeze the display. */
+    if(lv_ppa_rotate_hangs((uint32_t)blk.block_w, (uint32_t)blk.block_h, angle, src_cf)) {
+        LV_LOG_INFO("PPA rotate: block %" LV_PRId32 "x%" LV_PRId32 " trips DIG-734 at %" LV_PRId32
+                    ", drawing in software", blk.block_w, blk.block_h, angle);
+        lv_image_decoder_close(&decoder_dsc);
+        if(u->img_sw_fallback) return;
+        u->img_sw_fallback = true;
+        lv_draw_sw_image(layer, clip_area, dsc, coords);
         return;
     }
 

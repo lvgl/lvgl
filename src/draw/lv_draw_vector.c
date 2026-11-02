@@ -682,6 +682,7 @@ lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer)
     }
 
     dsc->base.layer = layer;
+    dsc->opa = LV_OPA_COVER;
 
     dsc->ctx = lv_zalloc(sizeof(lv_vector_path_ctx_t));
     if(dsc->ctx == NULL) {
@@ -1044,8 +1045,16 @@ void lv_draw_vector(lv_draw_vector_dsc_t * dsc)
 
     lv_layer_t * layer = dsc->base.layer;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area), LV_DRAW_TASK_TYPE_VECTOR);
+    lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area), LV_DRAW_DSC_TYPE_VECTOR);
+    if(!t) {
+        LV_LOG_WARN("Failed to create draw task");
+        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
+        dsc->task_list = NULL;
+        return;
+    }
     lv_memcpy(t->draw_dsc, dsc, sizeof(lv_draw_vector_dsc_t));
+    lv_draw_vector_dsc_t * new_dsc = t->draw_dsc;
+    new_dsc->opa = layer->opa;
     lv_draw_finalize_task_creation(layer, t);
     dsc->task_list = NULL;
 }
@@ -1116,7 +1125,15 @@ lv_draw_vector_dsc_t * lv_draw_task_get_vector_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
 
-    return task->type == LV_DRAW_TASK_TYPE_VECTOR ? (lv_draw_vector_dsc_t *)task->draw_dsc : NULL;
+    return task->type == LV_DRAW_DSC_TYPE_VECTOR ? (lv_draw_vector_dsc_t *)task->draw_dsc : NULL;
+}
+
+lv_draw_vector_dsc_t * lv_draw_dsc_get_vector_dsc(lv_draw_dsc_t * dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return NULL);
+    LV_CHECK_ARG(dsc->type == LV_DRAW_DSC_TYPE_VECTOR, return NULL);
+
+    return (lv_draw_vector_dsc_t *)dsc;
 }
 
 #endif /* LV_USE_VECTOR_GRAPHIC */

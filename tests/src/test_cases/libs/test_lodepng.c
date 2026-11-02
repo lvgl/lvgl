@@ -65,7 +65,7 @@ void test_lodepng_1(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_1.png");
 
-    size_t mem_before = lv_test_get_free_mem();
+    size_t allocs_before = lv_test_get_allocation_count();
     for(uint32_t i = 0; i < 20; i++) {
         create_images();
 
@@ -75,7 +75,7 @@ void test_lodepng_1(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_1.png");
 
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 112);
+    TEST_ASSERT_NO_MEM_LEAK(allocs_before);
 
     /* Re-add libpng decoder */
     lv_libpng_init();

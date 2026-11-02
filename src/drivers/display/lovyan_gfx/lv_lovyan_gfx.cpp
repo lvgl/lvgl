@@ -61,6 +61,8 @@ lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * b
     dsc->tft->setBrightness(255);
     dsc->tft->startWrite();
     dsc->tft->fillScreen(0x00000);
+    dsc->tft->waitDMA();
+    dsc->tft->endWrite();
 
     lv_display_set_driver_data(disp, (void *)dsc);
     lv_display_set_flush_cb(disp, flush_cb);
@@ -91,11 +93,16 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     uint32_t h = (area->y2 - area->y1 + 1);
 
 
-    if(dsc->tft->getStartCount() == 0) {
+    bool started_write = dsc->tft->getStartCount() == 0;
+    if(started_write) {
         dsc->tft->startWrite();
     }
     dsc->tft->pushImageDMA(area->x1, area->y1, w, h, (uint16_t *)px_map);
     dsc->tft->waitDMA();
+    /* Release only the transaction started by this callback. */
+    if(started_write) {
+        dsc->tft->endWrite();
+    }
 
     lv_display_flush_ready(disp);
 

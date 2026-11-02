@@ -54,11 +54,9 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spangroup_class;
 
 #if LV_USE_OBJ_PROPERTY
 enum _lv_property_span_id_t {
-    LV_PROPERTY_ID(SPAN, ALIGN,     LV_PROPERTY_TYPE_INT, 0),
-    LV_PROPERTY_ID(SPAN, OVERFLOW,  LV_PROPERTY_TYPE_INT, 1),
-    LV_PROPERTY_ID(SPAN, INDENT,    LV_PROPERTY_TYPE_INT, 2),
-    LV_PROPERTY_ID(SPAN, MODE,      LV_PROPERTY_TYPE_INT, 3),
-    LV_PROPERTY_ID(SPAN, MAX_LINES, LV_PROPERTY_TYPE_INT, 4),
+    LV_PROPERTY_ID(SPAN, OVERFLOW,  LV_PROPERTY_TYPE_INT, 0),
+    LV_PROPERTY_ID(SPAN, INDENT,    LV_PROPERTY_TYPE_INT, 1),
+    LV_PROPERTY_ID(SPAN, MAX_LINES, LV_PROPERTY_TYPE_INT, 2),
     LV_PROPERTY_SPAN_END,
 };
 #endif
@@ -165,15 +163,6 @@ void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char
 void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_style_t * style);
 
 /**
- * DEPRECATED. Use the text_align style property instead
- * Set the align of the spangroup.
- * @param obj   pointer to a spangroup object.
- * @param align see lv_text_align_t for details.
- */
-LV_DEPRECATED("Use text_align style property instead")
-void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align);
-
-/**
  * Set the overflow of the spangroup.
  * @param obj       pointer to a spangroup object.
  * @param overflow  see lv_span_overflow_t for details.
@@ -186,15 +175,6 @@ void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow);
  * @param indent    the first line indentation
  */
 void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent);
-
-/**
- * DEPRECATED, set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping"
- * Set the mode of the spangroup.
- * @param obj       pointer to a spangroup object.
- * @param mode      see lv_span_mode_t for details.
- */
-LV_DEPRECATED("set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping")
-void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
 
 /**
  * Set maximum lines of the spangroup.

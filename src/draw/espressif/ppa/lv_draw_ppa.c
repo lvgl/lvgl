@@ -89,12 +89,12 @@ void lv_draw_ppa_deinit(void)
 static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
-    const lv_draw_dsc_base_t * base = (lv_draw_dsc_base_t *)t->draw_dsc;
+    const lv_draw_dsc_t * base = (lv_draw_dsc_t *)t->draw_dsc;
 
     if(!ppa_dest_cf_supported(base->layer->color_format)) return 0;
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL: {
+        case LV_DRAW_DSC_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * dsc = (lv_draw_fill_dsc_t *)t->draw_dsc;
                 if((dsc->radius != 0 || dsc->grad.dir != LV_GRAD_DIR_NONE)) return 0;
                 /* Only fully-opaque fills: the PPA fill writes solid pixels. */
@@ -108,7 +108,7 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
 
 #if LV_USE_PPA_IMG
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
                 /* Common constraints shared by the plain blend, scale (SRM) and
                  * rotation paths. Scale and rotation are no longer required to be
@@ -243,7 +243,7 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
      * touches. The individual paths still clamp to the buffer. */
     const lv_area_t * task_area = &t->area;
 #if LV_USE_PPA_IMG
-    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+    if(t->type == LV_DRAW_DSC_TYPE_IMAGE) {
         const lv_draw_image_dsc_t * img_dsc = (const lv_draw_image_dsc_t *)t->draw_dsc;
         if(img_dsc->rotation != 0 ||
            img_dsc->scale_x != LV_SCALE_NONE || img_dsc->scale_y != LV_SCALE_NONE) {
@@ -261,10 +261,10 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
     lv_draw_buf_flush_cache(buf, &buf_area);
 
     switch(t->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_ppa_fill(t, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
+        case LV_DRAW_DSC_TYPE_FILL:
+            lv_draw_ppa_fill(t->draw_unit, t->target_layer, &t->clip_area, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE: {
+        case LV_DRAW_DSC_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
 #if LV_USE_PPA_IMG
                 /* Rotate/scale take the transformed box (t->_real_area): the
@@ -273,15 +273,17 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
                  * origin. Using t->area collapses non-square rotations and
                  * mis-places / drops down-scaled images. */
                 if(img_dsc->rotation != 0) {
-                    lv_draw_ppa_img_rotate(t, img_dsc, &t->_real_area);
+                    lv_draw_ppa_img_rotate(t->draw_unit, t->target_layer, &t->clip_area,
+                                           img_dsc, &t->area, &t->_real_area);
                 }
                 else if(img_dsc->scale_x != LV_SCALE_NONE || img_dsc->scale_y != LV_SCALE_NONE) {
-                    lv_draw_ppa_img_srm(t, img_dsc, &t->_real_area);
+                    lv_draw_ppa_img_srm(t->draw_unit, t->target_layer, &t->clip_area,
+                                        img_dsc, &t->area, &t->_real_area);
                 }
                 else
 #endif
                 {
-                    lv_draw_ppa_img(t, img_dsc, &t->area);
+                    lv_draw_ppa_img(t->draw_unit, t->target_layer, &t->clip_area, img_dsc, &t->area);
                 }
                 break;
             }

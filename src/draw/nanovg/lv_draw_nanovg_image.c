@@ -53,18 +53,23 @@ static void fill_repeat_tile_image(
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords,
-                          int image_handle)
+void lv_draw_nanovg_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, int image_handle)
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, &t->_real_area, &t->clip_area)) {
+    LV_UNUSED(layer);
+
+    lv_area_t real_area;
+    lv_draw_image_get_transformed_area(&real_area, dsc, coords);
+
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, &real_area, clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     /* Use coords as the fallback image width and height */
     const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);

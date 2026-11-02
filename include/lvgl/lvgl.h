@@ -152,8 +152,6 @@
 #include "misc/lv_math.h"
 #include "misc/lv_ll.h"
 #include "osal/lv_os.h"
-#include "others/file_explorer/lv_file_explorer.h"
-#include "others/fragment/lv_fragment.h"
 #include "stdlib/lv_mem.h"
 #include "stdlib/lv_sprintf.h"
 #include "stdlib/lv_string.h"
@@ -189,12 +187,9 @@
 #include "widgets/lv_label.h"
 #include "widgets/lv_led.h"
 #include "widgets/lv_line.h"
-#include "widgets/lv_list.h"
 #include "widgets/lv_lottie.h"
-#include "widgets/lv_menu.h"
 #include "widgets/lv_msgbox.h"
 #include "widgets/lv_qrcode.h"
-#include "widgets/lv_rlottie.h"
 #include "widgets/lv_roller.h"
 #include "widgets/lv_scale.h"
 #include "widgets/lv_slider.h"
@@ -206,7 +201,6 @@
 #include "widgets/lv_tabview.h"
 #include "widgets/lv_textarea.h"
 #include "widgets/lv_tileview.h"
-#include "widgets/lv_win.h"
 
 /* Define LV_DISABLE_API_MAPPING using a compiler option
  * to make sure your application is not using deprecated names */

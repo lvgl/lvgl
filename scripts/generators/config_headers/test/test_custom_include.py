@@ -40,6 +40,17 @@ def test_auto_include_block_is_emitted(entries):
     assert "#include LV_GLOBAL_CUSTOM_INCLUDE" not in internal
 
 
+def test_auto_include_block_is_skipped_in_assembly(entries):
+    internal = generate_internal(
+        load(os.path.join(DIR, "custom_include.kconfig")), entries
+    )
+    guard = internal.index("#ifndef __ASSEMBLY__")
+    assert guard < internal.index("#include LV_FOO_CUSTOM_INCLUDE")
+    assert internal.index("#endif /*__ASSEMBLY__*/", guard) > internal.index(
+        "#include LV_FOO_CUSTOM_INCLUDE"
+    )
+
+
 def test_missing_gate_raises():
     with pytest.raises(SystemExit):
         custom_includes(_entries("bad_custom_include.kconfig"))

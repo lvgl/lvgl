@@ -38,24 +38,26 @@
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc)
+void lv_draw_nanovg_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                              const lv_draw_mask_rect_dsc_t * dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
+    LV_UNUSED(layer);
     lv_area_t draw_area;
 
-    if(!lv_area_intersect(&draw_area, &dsc->area, &t->clip_area)) {
+    if(!lv_area_intersect(&draw_area, &dsc->area, clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     lv_area_t outer_area = dsc->area;
     if(dsc->keep_outside) {
         lv_nanovg_set_clip_area(u->vg, &draw_area);
     }
     else {
-        lv_area_join(&outer_area, &outer_area, &t->clip_area);
+        lv_area_join(&outer_area, &outer_area, clip_area);
     }
 
     /* Handle anti-aliasing */

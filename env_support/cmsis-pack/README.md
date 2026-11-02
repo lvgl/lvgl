@@ -43,7 +43,6 @@ remove the misleading guide above this code segment.
 
    - LV_USE_IME_PINYIN
    - LV_USE_OS
-   - LV_USE_FILE_EXPLORER
    - LV_USE_DEMO_WIDGETS
    - LV_USE_DEMO_KEYPAD_AND_ENCODER
    - LV_USE_DEMO_BENCHMARK
@@ -79,7 +78,6 @@ remove the misleading guide above this code segment.
    - LV_USE_SNAPSHOT
    - LV_USE_MONKEY
    - LV_USE_GRIDNAV
-   - LV_USE_FRAGMENT
    - LV_USE_IMGFONT
    - LV_USE_LINUX_DRM
    - LV_USE_LINUX_FBDEV
@@ -128,7 +126,6 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_QRCODE 0
     - \#define LV_USE_FREETYPE 0
     - \#define LV_USE_TINY_TTF 0
-    - \#define LV_USE_RLOTTIE 0
     - \#define LV_USE_FFMPEG 0
     - \#define LV_USE_FONT_MANAGER 0
     

@@ -25,7 +25,7 @@
  * STATIC PROTOTYPES
  **********************/
 
-static void draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
+static void draw_eve_arc(const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
 static bool is_same_quadrant(int16_t start_angle, int16_t end_angle) ;
 static void draw_rounded_end(lv_point_t center, int32_t radius, int32_t angle, int32_t width);
 static void lv_draw_eve_mask_angle(const lv_draw_arc_dsc_t * dsc, int32_t vertex_x, int32_t vertex_y,
@@ -37,9 +37,12 @@ static int32_t chord_length(int16_t radius, int16_t angle_degrees);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_eve_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
 {
-    draw_eve_arc(t, dsc, coords);
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+    draw_eve_arc(clip_area, dsc, coords);
 }
 
 /**********************
@@ -238,7 +241,7 @@ static void lv_draw_eve_mask_angle(const lv_draw_arc_dsc_t * dsc, int32_t vertex
 
 
 
-static void draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+static void draw_eve_arc(const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
 {
 
     if(dsc->opa <= LV_OPA_MIN)
@@ -265,7 +268,7 @@ static void draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, cons
     while(end_angle >= 360)
         end_angle -= 360;
 
-    lv_eve_scissor(t->clip_area.x1, t->clip_area.y1, t->clip_area.x2, t->clip_area.y2);
+    lv_eve_scissor(clip_area->x1, clip_area->y1, clip_area->x2, clip_area->y2);
 
     lv_eve_save_context();
 

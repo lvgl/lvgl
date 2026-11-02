@@ -3,7 +3,8 @@
 
 #include "../../../misc/lv_area_private.h"
 
-void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
+void lv_draw_dave2d_line(lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_line_dsc_t * dsc, void * user_data)
 {
 
     lv_area_t clip_line;
@@ -15,7 +16,7 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     lv_value_precise_t p2_y;
     int32_t x;
     int32_t y;
-    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)t->draw_unit;
+    lv_draw_dave2d_unit_t * u = user_data;
 
     clip_line.x1 = LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width / 2;
     clip_line.x2 = LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width / 2;
@@ -23,7 +24,7 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     clip_line.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width / 2;
 
     bool is_common;
-    is_common = lv_area_intersect(&clip_line, &clip_line, &t->clip_area);
+    is_common = lv_area_intersect(&clip_line, &clip_line, clip_area);
     if(!is_common) return;
 
 #if LV_USE_OS
@@ -34,24 +35,26 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 
     d2_u8 current_alpha = d2_getalpha(u->d2_handle);
 
-    buffer_area = t->target_layer->buf_area;
+    buffer_area = layer->buf_area;
     p1_x = dsc->p1.x - buffer_area.x1;
     p1_y = dsc->p1.y - buffer_area.y1;
     p2_x = dsc->p2.x - buffer_area.x1;
     p2_y = dsc->p2.y - buffer_area.y1;
 
-    x = 0 - t->target_layer->buf_area.x1;
-    y = 0 - t->target_layer->buf_area.y1;
+    x = 0 - layer->buf_area.x1;
+    y = 0 - layer->buf_area.y1;
 
     lv_area_move(&clip_line, x, y);
     lv_area_move(&buffer_area, x, y);
 
     bool dashed = dsc->dash_gap && dsc->dash_width;
+    /* TODO: dashed lines are drawn as solid lines */
+    LV_UNUSED(dashed);
 
     //
     // Generate render operations
     //
-    d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
+    d2_framebuffer_from_layer(u->d2_handle, layer);
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->color));
 

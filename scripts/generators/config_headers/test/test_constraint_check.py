@@ -75,14 +75,6 @@ def test_unconstrained_option_has_no_check(entries, checks):
     assert "LV_USE_PLAIN" not in checks
 
 
-def test_internal_still_maps_deprecated_symbols_without_warning(kconf, entries):
-    internal = generate_internal(kconf, entries)
-    assert "#define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL" in internal
-    assert "#warning LV_X11_RENDER_MODE_PARTIAL" in internal
-    assert "#warning LV_X11_RENDER_MODE_DIRECT" in internal
-    assert "#warning LV_X11_RENDER_MODE_FULL" in internal
-
-
 def test_template_comment_lists_user_facing_selects(kconf, entries):
     from config_headers.emit import generate_template
 

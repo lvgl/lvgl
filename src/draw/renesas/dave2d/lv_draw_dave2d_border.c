@@ -3,16 +3,18 @@
 
 #include "../../../misc/lv_area_private.h"
 
-static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area,
+static void dave2d_draw_border_complex(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                                       const lv_area_t * outer_area,
                                        const lv_area_t * inner_area,
                                        int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa);
 
-static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area,
+static void dave2d_draw_border_simple(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                                      const lv_area_t * outer_area,
                                       const lv_area_t * inner_area,
                                       lv_color_t color, lv_opa_t opa);
 
-void lv_draw_dave2d_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
-                           const lv_area_t * coords)
+void lv_draw_dave2d_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
@@ -36,31 +38,32 @@ void lv_draw_dave2d_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
     if(rin < 0) rin = 0;
 
     if(rout == 0 && rin == 0) {
-        dave2d_draw_border_simple(t, coords, &area_inner, dsc->color, dsc->opa);
+        dave2d_draw_border_simple(draw_unit, layer, clip_area, coords, &area_inner, dsc->color, dsc->opa);
     }
     else {
-        dave2d_draw_border_complex(t, coords, &area_inner, rout, rin, dsc->color, dsc->opa);
+        dave2d_draw_border_complex(draw_unit, layer, clip_area, coords, &area_inner, rout, rin, dsc->color, dsc->opa);
     }
 
 }
 
-static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area,
+static void dave2d_draw_border_simple(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                                      const lv_area_t * outer_area,
                                       const lv_area_t * inner_area,
                                       lv_color_t color, lv_opa_t opa)
 
 {
 
-    lv_area_t clip_area;
+    lv_area_t clipped_area;
     lv_area_t local_outer_area;
     lv_area_t local_inner_area;
     int32_t x;
     int32_t y;
     bool is_common;
 
-    is_common = lv_area_intersect(&clip_area, outer_area, &t->clip_area);
+    is_common = lv_area_intersect(&clipped_area, outer_area, clip_area);
     if(!is_common) return;
 
-    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)t->draw_unit;
+    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)draw_unit;
 
 #if LV_USE_OS
     lv_result_t  status;
@@ -72,19 +75,19 @@ static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * oute
     local_outer_area = *outer_area;
     local_inner_area = *inner_area;
 
-    x = 0 - t->target_layer->buf_area.x1;
-    y = 0 - t->target_layer->buf_area.y1;
+    x = 0 - layer->buf_area.x1;
+    y = 0 - layer->buf_area.y1;
 
-    lv_area_move(&clip_area, x, y);
+    lv_area_move(&clipped_area, x, y);
     lv_area_move(&local_outer_area, x, y);
     lv_area_move(&local_inner_area, x, y);
 
-    d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
+    d2_framebuffer_from_layer(u->d2_handle, layer);
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(color));
     d2_setalpha(u->d2_handle, opa);
-    d2_cliprect(u->d2_handle, (d2_border)clip_area.x1, (d2_border)clip_area.y1, (d2_border)clip_area.x2,
-                (d2_border)clip_area.y2);
+    d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1,
+                (d2_border)clipped_area.x2, (d2_border)clipped_area.y2);
 
     lv_area_t a;
 
@@ -145,7 +148,8 @@ static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * oute
 #endif
 }
 
-static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * orig_outer_area,
+static void dave2d_draw_border_complex(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                                       const lv_area_t * orig_outer_area,
                                        const lv_area_t * orig_inner_area,
                                        int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa)
 {
@@ -161,9 +165,9 @@ static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * ori
 
     outer_area = *orig_outer_area;
     inner_area = *orig_inner_area;
-    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)t->draw_unit;
+    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)draw_unit;
 
-    if(!lv_area_intersect(&draw_area, &outer_area, &t->clip_area)) return;
+    if(!lv_area_intersect(&draw_area, &outer_area, clip_area)) return;
 
 #if LV_USE_OS
     lv_result_t  status;
@@ -173,8 +177,8 @@ static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * ori
 
     d2_u8 current_alpha = d2_getalpha(u->d2_handle);
 
-    x = 0 - t->target_layer->buf_area.x1;
-    y = 0 - t->target_layer->buf_area.y1;
+    x = 0 - layer->buf_area.x1;
+    y = 0 - layer->buf_area.y1;
 
     lv_area_move(&draw_area, x, y);
     lv_area_move(&outer_area, x, y);
@@ -184,7 +188,7 @@ static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * ori
     // Generate render operations
     //
 
-    d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
+    d2_framebuffer_from_layer(u->d2_handle, layer);
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(color));
     d2_setalpha(u->d2_handle, opa);

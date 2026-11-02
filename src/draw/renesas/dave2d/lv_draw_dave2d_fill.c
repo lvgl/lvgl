@@ -3,7 +3,8 @@
 
 #include "../../../misc/lv_area_private.h"
 
-void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_dave2d_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_area_t draw_area;
     lv_area_t coordinates;
@@ -15,9 +16,9 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
     d2_u32 flags = 0;
 
     lv_point_t arc_centre;
-    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)t->draw_unit;
+    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)draw_unit;
 
-    is_common = lv_area_intersect(&draw_area, coords, &t->clip_area);
+    is_common = lv_area_intersect(&draw_area, coords, clip_area);
     if(!is_common) return;
 
 #if LV_USE_OS
@@ -28,14 +29,14 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
 
     coordinates = *coords;
 
-    x = 0 - t->target_layer->buf_area.x1;
-    y = 0 - t->target_layer->buf_area.y1;
+    x = 0 - layer->buf_area.x1;
+    y = 0 - layer->buf_area.y1;
 
     lv_area_move(&draw_area, x, y);
     lv_area_move(&coordinates, x, y);
 
     d2_u8 current_alpha = d2_getalpha(u->d2_handle);
-    d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
+    d2_framebuffer_from_layer(u->d2_handle, layer);
 
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
         float a1;

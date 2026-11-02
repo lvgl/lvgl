@@ -56,7 +56,8 @@ void lv_draw_nanovg_blur_deinit(lv_draw_nanovg_unit_t * u)
     }
 }
 
-void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nanovg_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->blur_radius <= 0) return;
 
@@ -68,8 +69,7 @@ void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, con
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
-    lv_layer_t * layer = t->target_layer;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
     NVGLUblurState * state = u->blur_state;
 
     if(state == NULL) {
@@ -80,7 +80,7 @@ void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, con
 
     /* Clip the blur area to clip_area and layer extent */
     lv_area_t clip;
-    if(!lv_area_intersect(&clip, coords, &t->clip_area)) {
+    if(!lv_area_intersect(&clip, coords, clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }

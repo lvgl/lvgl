@@ -218,55 +218,6 @@ extern "C" {
 #  define CONFIG_LV_USE_MEM_MONITOR_POS LV_ALIGN_CENTER
 #endif
 
-/*******************
- * LV_MEM_SIZE
- *******************/
-
-#if defined(CONFIG_LV_MEM_SIZE_KILOBYTES) && CONFIG_LV_MEM_SIZE_KILOBYTES > 0
-#warning "LV_MEM_SIZE_KILOBYTES is deprecated, use LV_MEM_SIZE instead (value in bytes)"
-#ifndef CONFIG_LV_MEM_SIZE
-#define CONFIG_LV_MEM_SIZE (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
-#else
-#warning "Both LV_MEM_SIZE and LV_MEM_SIZE_KILOBYTES are defined. Using LV_MEM_SIZE"
-#endif
-#endif
-
-#if defined(CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES) && CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES > 0
-#warning "LV_MEM_POOL_EXPAND_SIZE_KILOBYTES is deprecated, set the full memory size with LV_MEM_SIZE instead (value in bytes)"
-#define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
-#endif
-
-/*******************
- * LV_ASSERT_HANDLER_INCLUDE
- *******************/
-
-#if defined(CONFIG_LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY) && CONFIG_LV_ASSERT_HANDLER_INCLUDE_IS_NON_EMPTY
-#define LV_ASSERT_HANDLER_INCLUDE CONFIG_LV_ASSERT_HANDLER_INCLUDE
-#endif
-
-/*******************
- * LV_SDL_BUF_COUNT
- *******************/
-
-#if defined(CONFIG_LV_SDL_SINGLE_BUFFER)
-#warning "LV_SDL_SINGLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
-#undef CONFIG_LV_SDL_BUF_COUNT
-#define CONFIG_LV_SDL_BUF_COUNT 1
-#elif defined(CONFIG_LV_SDL_DOUBLE_BUFFER)
-#warning "LV_SDL_DOUBLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
-#undef CONFIG_LV_SDL_BUF_COUNT
-#define CONFIG_LV_SDL_BUF_COUNT 2
-#endif
-
-/*******************
- * LV_CONF_MINIMAL
- *******************/
-
-#if defined(CONFIG_LV_CONF_MINIMAL)
-#warning "LV_CONF_MINIMAL has been removed and no longer has any effect. Start from configs/defconfigs/minimal.defconfig instead."
-#undef CONFIG_LV_CONF_MINIMAL
-#endif
-
 /*
  * CONFIG_* options that no longer exist and haven't worked _ever_ in Kconfig
  *

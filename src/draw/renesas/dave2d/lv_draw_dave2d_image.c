@@ -23,9 +23,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void img_draw_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                           const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -39,14 +39,14 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_dave2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                          const lv_area_t * coords)
+void lv_draw_dave2d_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
-        lv_draw_image_normal_helper(t, draw_dsc, coords, img_draw_core, NULL);
+        lv_draw_image_normal_helper(layer, clip_area, draw_dsc, coords, img_draw_core, NULL, draw_unit);
     }
     else {
-        lv_draw_image_tiled_helper(t, draw_dsc, coords, img_draw_core, NULL);
+        lv_draw_image_tiled_helper(layer, clip_area, draw_dsc, coords, img_draw_core, NULL, draw_unit);
     }
 }
 
@@ -54,12 +54,12 @@ void lv_draw_dave2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
  *   STATIC FUNCTIONS
  **********************/
 
-static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void img_draw_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_dsc,
                           const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
-                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
+                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area, void * user_data)
 {
 
-    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)t->draw_unit;
+    lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)user_data;
 
     (void)sup; //remove warning about unused parameter
 
@@ -96,12 +96,12 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     src_alpha_blend_mode = d2_getalphablendmodesrc(u->d2_handle);
     dst_alpha_blend_mode = d2_getalphablendmodedst(u->d2_handle);
 
-    buffer_area = t->target_layer->buf_area;
+    buffer_area = layer->buf_area;
     draw_area = *img_coords;
     clipped_area = *clipped_img_area;
 
-    x = 0 - t->target_layer->buf_area.x1;
-    y = 0 - t->target_layer->buf_area.y1;
+    x = 0 - layer->buf_area.x1;
+    y = 0 - layer->buf_area.y1;
 
     lv_area_move(&draw_area, x, y);
     lv_area_move(&buffer_area, x, y);
@@ -203,7 +203,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
 
     }
 
-    d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
+    d2_framebuffer_from_layer(u->d2_handle, layer);
 
     d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                 (d2_border)clipped_area.y2);

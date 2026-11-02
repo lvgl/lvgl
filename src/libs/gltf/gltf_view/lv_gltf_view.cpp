@@ -336,28 +336,6 @@ float lv_gltf_get_world_distance(const lv_obj_t * obj)
     return (lv_gltf_data_get_radius(model) * LV_GLTF_DISTANCE_SCALE_FACTOR) * view_desc->distance;
 }
 
-void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_LOG_WARN("Deprecated. lv_gltf_set_animation_speed should now be set on the model directly via `lv_gltf_model_set_animation_speed`. Setting it on the main model as a fallback");
-    lv_gltf_model_t * model = lv_gltf_get_primary_model(obj);
-    if(!model) {
-        return;
-    }
-    lv_gltf_model_set_animation_speed(model, value);
-}
-
-uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
-    LV_LOG_WARN("Deprecated. lv_gltf_get_animation_speed should now be called on the model directly via `lv_gltf_model_get_animation_speed`. Getting the animation speed from the main model as a fallback");
-    lv_gltf_model_t * model = lv_gltf_get_primary_model(obj);
-    if(!model) {
-        return 0;
-    }
-    return lv_gltf_model_get_animation_speed(model);
-}
-
 void lv_gltf_set_focal_x(lv_obj_t * obj, float value)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
@@ -502,22 +480,6 @@ uint32_t lv_gltf_get_background_blur(const lv_obj_t * obj)
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.blur_bg * 100;
-}
-
-void lv_gltf_set_env_brightness(lv_obj_t * obj, uint32_t value)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_LOG_DEPRECATED("use lv_gltf_set_environment_brightness() instead");
-    lv_gltf_set_environment_brightness(obj, (float)value / 100.0f);
-}
-
-uint32_t lv_gltf_get_env_brightness(const lv_obj_t * obj)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
-    LV_LOG_DEPRECATED("use lv_gltf_get_environment_brightness() instead");
-    float v = lv_gltf_get_environment_brightness(obj) * 100.0f;
-    if(v <= 0.0f) return 0;
-    return (uint32_t)((double)v + 0.5);
 }
 
 void lv_gltf_set_environment_brightness(lv_obj_t * obj, float value)

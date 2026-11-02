@@ -180,6 +180,7 @@ struct _lv_font_info_t {
     uint32_t style;                  /**< Font style, see `lv_freetype_font_style_t`*/
     int32_t weight;                  /**< Font weight for variable fonts (range 1-2000, CSS-like values 100-900; 0 = default: 400 normal, 700 if bold style) */
     lv_font_kerning_t kerning;       /**< Font kerning, see `lv_font_kerning_t`*/
+    uint32_t face_index;             /**< Face index in a font collection (e.g. TTC), 0 for single-face files*/
 };
 
 /**********************

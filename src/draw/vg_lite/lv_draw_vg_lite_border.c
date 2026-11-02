@@ -47,13 +47,14 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_vg_lite_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
-                            const lv_area_t * coords)
+void lv_draw_vg_lite_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
 {
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    LV_UNUSED(layer);
 
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, coords, &t->clip_area)) {
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, coords, clip_area)) {
         /*Fully clipped, nothing to do*/
         return;
     }
@@ -70,7 +71,7 @@ void lv_draw_vg_lite_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
     lv_vg_lite_path_set_quality(path, dsc->radius == 0 ? VG_LITE_LOW : VG_LITE_HIGH);
-    lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
+    lv_vg_lite_path_set_bounding_box_area(path, &clipped_area);
 
     /* outer rect */
     lv_vg_lite_path_append_rect(path,

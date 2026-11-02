@@ -102,12 +102,15 @@ config LV_NEMA_GFX_MAX_RESX
 	default 800
 	help
 		Canvas width NemaVG is initialized for. With the vertical resolution it also
-		sizes the NemaGFX memory pool on STM32 (RESX * RESY + 10KB).
+		sizes the NemaGFX memory pool on STM32 when LV_USE_NEMA_VG is enabled
+		(RESX * RESY + 10KB).
 
 config LV_NEMA_GFX_MAX_RESY
 	int "NemaVG max vertical resolution (px)"
 	default 600
 	help
-		Canvas height NemaVG is initialized for.
+		Canvas height NemaVG is initialized for. With the horizontal resolution it also
+		sizes the NemaGFX memory pool on STM32 when LV_USE_NEMA_VG is enabled
+		(RESX * RESY + 10KB).
 
 endif
