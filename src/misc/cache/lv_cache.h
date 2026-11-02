@@ -273,7 +273,7 @@ void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data);
 
 /**
  * Drop all cache entries. All entries will be removed from the cache and their data will be freed when the last reference to them is released.
- * @note If some entries are still referenced by other objects, it will issue an error. And this case shouldn't happen in normal cases..
+ * @note Keep the cache object alive until all acquired entries have been released.
  * @param cache         The cache object pointer to drop all entries.
  * @param user_data     A user data pointer that will be passed to the free callback. @nullable
  */
