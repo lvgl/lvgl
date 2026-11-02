@@ -73,7 +73,7 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src);
 /**
  * Get the LVGL animation which controls the lottie animation
  * @param obj       pointer to a lottie widget
- * @return          the LVGL animation
+ * @return          the LVGL animation, or NULL if it has completed or been deleted
  */
 lv_anim_t * lv_lottie_get_anim(lv_obj_t * obj);
 
