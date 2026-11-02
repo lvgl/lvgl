@@ -6,6 +6,8 @@
 #include "unity/unity.h"
 
 static uint32_t MEM_SIZE = 0;
+static lv_cache_t * image_cache;
+static lv_cache_t * header_cache;
 
 // Cache size in bytes
 #define CACHE_SIZE_BYTES 1000
@@ -15,11 +17,15 @@ void setUp(void)
 {
     /* Function run before every test */
     MEM_SIZE = lv_test_get_free_mem();
+    image_cache = LV_GLOBAL_DEFAULT()->img_cache;
+    header_cache = LV_GLOBAL_DEFAULT()->img_header_cache;
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
+    LV_GLOBAL_DEFAULT()->img_cache = image_cache;
+    LV_GLOBAL_DEFAULT()->img_header_cache = header_cache;
     TEST_ASSERT_MEM_LEAK_LESS_THAN(MEM_SIZE, 64);
 }
 
@@ -108,8 +114,6 @@ void test_cache_drop_all_preserves_acquired_entries(void)
 
 void test_image_caches_unavailable(void)
 {
-    lv_cache_t * image_cache = LV_GLOBAL_DEFAULT()->img_cache;
-    lv_cache_t * header_cache = LV_GLOBAL_DEFAULT()->img_header_cache;
     LV_GLOBAL_DEFAULT()->img_cache = NULL;
     LV_GLOBAL_DEFAULT()->img_header_cache = NULL;
 
@@ -123,9 +127,6 @@ void test_image_caches_unavailable(void)
     lv_image_cache_drop("A:missing.png");
     lv_image_cache_dump();
     lv_image_header_cache_dump();
-
-    LV_GLOBAL_DEFAULT()->img_cache = image_cache;
-    LV_GLOBAL_DEFAULT()->img_header_cache = header_cache;
 }
 
 void test_cache_lru_rb_1(void)
@@ -290,6 +291,7 @@ static void cache_eviction_test(lv_cache_t * cache, test_data_t * expected_data,
         }
     }
     TEST_ASSERT_EQUAL(9, original_entries_found_cnt);
+    lv_cache_release(cache, new_entry, NULL);
 }
 
 void test_cache_lru_rb_count_add_acquire(void)
