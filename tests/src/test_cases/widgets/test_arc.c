@@ -70,6 +70,35 @@ void test_arc_rgb565a8_image(void)
 #endif
 }
 
+static void arc_image_create(const void * img_src)
+{
+    arc = lv_arc_create(active_screen);
+    lv_obj_set_size(arc, 100, 100);
+    lv_obj_center(arc);
+    lv_arc_set_value(arc, 70);
+    lv_obj_set_style_arc_width(arc, 30, 0);
+    lv_obj_set_style_arc_width(arc, 30, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_image_src(arc, img_src, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+}
+
+void test_arc_indexed_image_file(void)
+{
+    /*Without LV_BIN_DECODER_RAM_LOAD the image is read line by line via get_area_cb*/
+    arc_image_create("A:src/test_files/binimages/cogwheel.I8.bin");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_3.png");
+}
+
+void test_arc_indexed_image_c_array(void)
+{
+    /*Without LV_BIN_DECODER_RAM_LOAD indexed C arrays are also read line by line via get_area_cb*/
+    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
+    arc_image_create(&test_image_cogwheel_i4);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_4.png");
+}
+
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void)
 {
     /* Default max range is 100 */
