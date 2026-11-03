@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   check_scripts:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: ARM Emulated Benchmark - Script Check
     strategy:
       fail-fast: false
@@ -36,7 +36,7 @@ jobs:
           ./${{ matrix.test_script }}
 
   run_benchmark:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: ARM Emulated Benchmark ${{ matrix.image_type }} - ${{matrix.config }}
     needs: check_scripts
     strategy:
@@ -89,7 +89,7 @@ jobs:
           if-no-files-found: error
 
   pr_report:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: ${{ !cancelled() && github.event_name == 'pull_request' }}
     name: ARM Emulated Benchmark - PR Report
     needs: run_benchmark

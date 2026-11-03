@@ -30,7 +30,7 @@ permissions:
 jobs:
   comment:
     if: github.event.workflow_run.event == 'pull_request'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Update the PR report comment
     steps:
       - name: Checkout
