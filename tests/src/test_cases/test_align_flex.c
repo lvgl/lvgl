@@ -775,6 +775,37 @@ void test_flex_hide_item_first_grow(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("flex_hide_items_first_grow.png");
 }
 
+void test_flex_rtl_column_cross_start_aligns_to_right_edge(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_pos(cont, 10, 10);
+    lv_obj_set_size(cont, 200, 120);
+    simple_style(cont);
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_RTL, 0);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+
+    lv_obj_t * wide = lv_obj_create(cont);
+    lv_obj_set_size(wide, 60, 20);
+    simple_style(wide);
+
+    lv_obj_t * narrow = lv_obj_create(cont);
+    lv_obj_set_size(narrow, 30, 20);
+    simple_style(narrow);
+
+    lv_obj_update_layout(cont);
+
+    lv_area_t cont_coords;
+    lv_area_t wide_coords;
+    lv_area_t narrow_coords;
+    lv_obj_get_coords(cont, &cont_coords);
+    lv_obj_get_coords(wide, &wide_coords);
+    lv_obj_get_coords(narrow, &narrow_coords);
+
+    TEST_ASSERT_EQUAL(cont_coords.x2, wide_coords.x2);
+    TEST_ASSERT_EQUAL(cont_coords.x2, narrow_coords.x2);
+}
+
 void test_flex_use_rtl(void)
 {
     lv_obj_t * test = lv_obj_create(lv_screen_active());
