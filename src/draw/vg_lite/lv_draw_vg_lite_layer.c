@@ -57,10 +57,7 @@ void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
     }
 
     lv_draw_image_dsc_t new_draw_dsc;
-    if(lv_draw_image_dsc_from_layer(&new_draw_dsc, draw_dsc) != LV_RESULT_OK) {
-        LV_PROFILER_DRAW_END;
-        return;
-    }
+    lv_draw_image_dsc_from_layer(&new_draw_dsc, draw_dsc);
     lv_draw_vg_lite_img(draw_unit, layer, clip_area, &new_draw_dsc, coords, true);
 
     /* Wait for the GPU drawing to complete here,

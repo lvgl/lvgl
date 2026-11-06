@@ -50,7 +50,7 @@ void lv_draw_nema_gfx_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
     if(layer_to_draw->draw_buf == NULL) return;
 
     lv_draw_image_dsc_t new_draw_dsc;
-    if(lv_draw_image_dsc_from_layer(&new_draw_dsc, draw_dsc) != LV_RESULT_OK) return;
+    lv_draw_image_dsc_from_layer(&new_draw_dsc, draw_dsc);
 
     lv_draw_nema_gfx_img(draw_unit, layer, clip_area, &new_draw_dsc, coords);
 }
