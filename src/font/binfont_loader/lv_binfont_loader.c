@@ -74,7 +74,8 @@ typedef struct cmap_table_bin {
  **********************/
 static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp);
 static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_load);
-int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start);
+int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start,
+                  uint32_t loca_count);
 
 static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
 static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
@@ -842,12 +843,13 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     }
 
     uint32_t kern_start = glyph_start + glyph_length;
-    int32_t kern_length = load_kern(fp, font_dsc, font_header.glyph_id_format, kern_start);
+    int32_t kern_length = load_kern(fp, font_dsc, font_header.glyph_id_format, kern_start, loca_count);
 
     return kern_length >= 0;
 }
 
-int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start)
+int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start,
+                  uint32_t loca_count)
 {
     LV_ASSERT(fp != NULL);
     LV_ASSERT(font_dsc != NULL);
@@ -930,6 +932,13 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
             return -1;
         }
 
+        /*The class mappings are indexed by glyph id*/
+        if(kern_class_mapping_length < loca_count) {
+            LV_LOG_WARN("Kern class mapping length %d is less than the glyph count %d",
+                        (int)kern_class_mapping_length, (int)loca_count);
+            return -1;
+        }
+
         int kern_values_length = sizeof(int8_t) * kern_table_rows * kern_table_cols;
 
         uint8_t * kern_left = lv_malloc(kern_class_mapping_length);
@@ -956,6 +965,14 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
            !read_exact(fp, kern_right, kern_class_mapping_length) ||
            !read_exact(fp, kern_values, kern_values_length)) {
             return -1;
+        }
+
+        /*Classes are 1-based and are used to index `kern_values` without further checks*/
+        for(uint32_t i = 0; i < kern_class_mapping_length; i++) {
+            if(kern_left[i] > kern_table_rows || kern_right[i] > kern_table_cols) {
+                LV_LOG_WARN("Kern class of glyph %d is out of range", (int)i);
+                return -1;
+            }
         }
     }
     else {
