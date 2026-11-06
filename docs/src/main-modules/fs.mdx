@@ -157,6 +157,7 @@ The drivers are as implied by the macro names.
 If you use more than one, each associated identifier letter you use must be unique.
 
 - <ApiLink name="LV_USE_FS_FATFS" />
+- <ApiLink name="LV_USE_FS_FREERTOS_FAT" />
 - <ApiLink name="LV_USE_FS_STDIO" />
 - <ApiLink name="LV_USE_FS_POSIX" />
 - <ApiLink name="LV_USE_FS_WIN32" />
@@ -164,6 +165,17 @@ If you use more than one, each associated identifier letter you use must be uniq
 - <ApiLink name="LV_USE_FS_LITTLEFS" />
 - <ApiLink name="LV_USE_FS_ARDUINO_ESP_LITTLEFS" />
 - <ApiLink name="LV_USE_FS_ARDUINO_SD" />
+
+For FreeRTOS+FAT, add its headers and library to the application build and
+initialize and mount the storage in the application before accessing files.
+Set `LV_FS_FREERTOS_FAT_LETTER` to a unique drive letter and optionally set
+`LV_FS_FREERTOS_FAT_PATH` to a FreeRTOS+FAT path prefix (default empty).
+For example, with letter `S` and prefix `/sd`, `S:/images/logo.bin` maps to
+`/sd/images/logo.bin`. The prefix and the path after the drive letter are
+concatenated directly, so ensure the separator between them is correct. File positions are limited
+to the signed 32-bit range supported by FreeRTOS+FAT's seek API. For this driver,
+`LV_FS_SEEK_END` interprets `pos` as the number of bytes before the end of the
+file, unlike the FatFs driver, which adds `pos` to the file size.
 
 ## Limiting Directory Access
 
@@ -348,4 +360,3 @@ to determine where the end of the file is.
 ### `lv_fs_tell` :sub:`(behavior when cache is enabled)`
 
 The driver's `tell` will not actually be called.
-
