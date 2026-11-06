@@ -352,6 +352,49 @@ void test_freetype_face_index(void)
     lv_freetype_font_delete(font_face1);
 }
 
+/**
+ * FreeType blends COLR layers on every FT_Render_Glyph call, even into a slot that already holds
+ * the rendered bitmap, so a glyph rendered more than once gets over-saturated edges.
+ * colr_v0_test.ttf is Montserrat-Bold subset to "AO", with a COLR v0 table drawing 'A' as
+ * a red 'A' layer plus a half-transparent blue 'O' layer.
+ */
+void test_freetype_colr_glyph_rendered_once(void)
+{
+    const char * path = "./src/test_files/fonts/colr_v0_test.ttf";
+    lv_font_t * font = lv_freetype_font_create(path, LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 24,
+                                               LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NOT_NULL(font);
+
+    lv_font_glyph_dsc_t g_dsc;
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &g_dsc, 'A', '\0'));
+    const lv_draw_buf_t * draw_buf = lv_font_get_glyph_bitmap(&g_dsc, NULL);
+    TEST_ASSERT_NOT_NULL(draw_buf);
+    TEST_ASSERT_EQUAL(LV_COLOR_FORMAT_ARGB8888, draw_buf->header.cf);
+
+    FT_Library library;
+    FT_Face face;
+    TEST_ASSERT_EQUAL(0, FT_Init_FreeType(&library));
+    TEST_ASSERT_EQUAL(0, FT_New_Face(library, path, 0, &face));
+    TEST_ASSERT_EQUAL(0, FT_Set_Pixel_Sizes(face, 0, 24));
+    TEST_ASSERT_EQUAL(0, FT_Load_Char(face, 'A',
+                                      FT_LOAD_COLOR | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT));
+    const FT_Bitmap * expected = &face->glyph->bitmap;
+    TEST_ASSERT_EQUAL(FT_PIXEL_MODE_BGRA, expected->pixel_mode);
+    TEST_ASSERT_EQUAL(expected->width, draw_buf->header.w);
+    TEST_ASSERT_EQUAL(expected->rows, draw_buf->header.h);
+
+    for(uint32_t y = 0; y < expected->rows; y++) {
+        TEST_ASSERT_EQUAL_MEMORY(expected->buffer + y * expected->pitch,
+                                 draw_buf->data + y * draw_buf->header.stride,
+                                 expected->width * 4);
+    }
+
+    FT_Done_Face(face);
+    FT_Done_FreeType(library);
+    lv_font_glyph_release_draw_data(&g_dsc);
+    lv_freetype_font_delete(font);
+}
+
 #else
 
 void setUp(void)
@@ -383,6 +426,10 @@ void test_freetype_no_kerning_info(void)
 }
 
 void test_freetype_face_index(void)
+{
+}
+
+void test_freetype_colr_glyph_rendered_once(void)
 {
 }
 
