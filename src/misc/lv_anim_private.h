@@ -20,6 +20,12 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**Size of the `var` lookup index. Must be a power of two.
+ * Keeps `lv_anim_delete()`/`lv_anim_get()`/`remove_concurrent_anims()` from
+ * walking the whole animation list (quadratic blowup on mass widget creation,
+ * see #10767).*/
+#define LV_ANIM_VAR_INDEX_SIZE 64
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -30,6 +36,9 @@ typedef struct {
     bool anim_vsync_registered;
     lv_timer_t * timer;
     lv_ll_t anim_ll;
+    /**Index of animations by their `var` pointer: buckets of animations
+     * chained through `lv_anim_t::var_index_next`. Static, no heap needed.*/
+    lv_anim_t * var_index[LV_ANIM_VAR_INDEX_SIZE];
 } lv_anim_state_t;
 
 /**********************

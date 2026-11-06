@@ -43,6 +43,9 @@ static void lv_anim_pause_for_internal(lv_anim_t * a, uint32_t ms);
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(const lv_anim_t * a_current);
 static void remove_anim(void * a);
+static uint32_t anim_var_index_hash(const void * var);
+static void anim_var_index_insert(lv_anim_t * a);
+static void anim_var_index_remove(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -64,6 +67,7 @@ static void remove_anim(void * a);
 void lv_anim_core_init(void)
 {
     lv_ll_init(anim_ll_p, sizeof(lv_anim_t));
+    lv_memzero(state.var_index, sizeof(state.var_index));
     state.timer = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation timer*/
     state.anim_list_changed = false;
@@ -137,6 +141,10 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     new_anim->last_timer_run = lv_tick_get();
     new_anim->is_paused = false;
 
+    /*Register the new animation in the `var` index so that it can be found
+     *without walking the whole list (must happen before user callbacks run)*/
+    anim_var_index_insert(new_anim);
+
     /*Set the start value*/
     if(new_anim->early_apply) {
         if(new_anim->get_value_cb) {
@@ -182,22 +190,47 @@ uint32_t lv_anim_get_playtime(const lv_anim_t * a)
 
 bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
 {
-    lv_anim_t * a;
     bool del_any = false;
-    a        = lv_ll_get_head(anim_ll_p);
-    while(a != NULL) {
-        bool del = false;
-        if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
-            remove_anim(a);
-            anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
-                                       the linked list*/
-            del_any = true;
-            del = true;
-        }
 
-        /*Always start from the head on delete, because we don't know
-         *how `anim_ll_p` was changes in `a->deleted_cb` */
-        a = del ? lv_ll_get_head(anim_ll_p) : lv_ll_get_next(anim_ll_p, a);
+    /*With a known `var` only the bucket of that `var` needs to be scanned
+     *instead of the whole list (quadratic blowup on mass widget creation, #10767)*/
+    if(var != NULL) {
+        const uint32_t idx = anim_var_index_hash(var);
+        lv_anim_t ** pp = &state.var_index[idx];
+        while(*pp != NULL) {
+            lv_anim_t * a = *pp;
+            if(a->var == var && (a->exec_cb == exec_cb || exec_cb == NULL)) {
+                remove_anim(a);
+                anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
+                                           the linked list*/
+                del_any = true;
+                /*Always start from the bucket head on delete, because we don't know
+                 *how the bucket was changed in `a->deleted_cb` (a new animation
+                 *for the same `var` would be inserted at the bucket head)*/
+                pp = &state.var_index[idx];
+            }
+            else {
+                pp = &a->var_index_next;
+            }
+        }
+    }
+    else {
+        lv_anim_t * a;
+        a = lv_ll_get_head(anim_ll_p);
+        while(a != NULL) {
+            bool del = false;
+            if(exec_cb == NULL || a->exec_cb == exec_cb) {
+                remove_anim(a);
+                anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
+                                           the linked list*/
+                del_any = true;
+                del = true;
+            }
+
+            /*Always start from the head on delete, because we don't know
+             *how `anim_ll_p` was changes in `a->deleted_cb` */
+            a = del ? lv_ll_get_head(anim_ll_p) : lv_ll_get_next(anim_ll_p, a);
+        }
     }
 
     return del_any;
@@ -212,8 +245,9 @@ void lv_anim_delete_all(void)
 lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     LV_CHECK_ARG(var != NULL, return NULL);
+    const uint32_t idx = anim_var_index_hash(var);
     lv_anim_t * a;
-    LV_LL_READ(anim_ll_p, a) {
+    for(a = state.var_index[idx]; a != NULL; a = a->var_index_next) {
         if(a->var == var && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             return a;
         }
@@ -721,6 +755,7 @@ static void anim_completed_handler(lv_anim_t * a)
         /*Delete the animation from the list.
          * This way the `completed_cb` will see the animations like it's animation is already deleted*/
         lv_ll_remove(anim_ll_p, a);
+        anim_var_index_remove(a);
         /*Flag that the list has changed*/
         anim_mark_list_change();
 
@@ -837,8 +872,11 @@ static bool remove_concurrent_anims(const lv_anim_t * a_current)
 
     lv_anim_t * a;
     bool del_any = false;
-    a = lv_ll_get_head(anim_ll_p);
-    while(a != NULL) {
+    /*Concurrent animations share `a_current->var`, so it's enough to scan
+     *the bucket of that `var` instead of the whole list*/
+    lv_anim_t ** pp = &state.var_index[anim_var_index_hash(a_current->var)];
+    while(*pp != NULL) {
+        a = *pp;
         bool del = false;
         /*We can't test for custom_exec_cb equality because in the MicroPython binding
          *a wrapper callback is used here an the real callback data is stored in the `user_data`.
@@ -848,15 +886,7 @@ static bool remove_concurrent_anims(const lv_anim_t * a_current)
            (a->var == a_current->var) &&
            ((a->exec_cb && a->exec_cb == a_current->exec_cb)
             /*|| (a->custom_exec_cb && a->custom_exec_cb == a_current->custom_exec_cb)*/)) {
-            lv_ll_remove(anim_ll_p, a);
-            if(a->deleted_cb != NULL) a->deleted_cb(a);
-#if LV_USE_EXT_DATA
-            if(a->ext_data.free_cb) {
-                a->ext_data.free_cb(a->ext_data.data);
-                a->ext_data.data = NULL;
-            }
-#endif
-            lv_free(a);
+            remove_anim(a);
             /*Read by `anim_timer`. It need to know if a delete occurred in the linked list*/
             anim_mark_list_change();
 
@@ -864,9 +894,9 @@ static bool remove_concurrent_anims(const lv_anim_t * a_current)
             del = true;
         }
 
-        /*Always start from the head on delete, because we don't know
-         *how `anim_ll_p` was changes in `a->deleted_cb` */
-        a = del ? lv_ll_get_head(anim_ll_p) : lv_ll_get_next(anim_ll_p, a);
+        /*Always start from the bucket head on delete, because we don't know
+         *how the bucket was changed in `a->deleted_cb` */
+        pp = del ? &state.var_index[anim_var_index_hash(a_current->var)] : &a->var_index_next;
     }
 
     return del_any;
@@ -875,6 +905,7 @@ static bool remove_concurrent_anims(const lv_anim_t * a_current)
 static void remove_anim(void * a)
 {
     lv_anim_t * anim = a;
+    anim_var_index_remove(anim);
     lv_ll_remove(anim_ll_p, a);
     if(anim->deleted_cb != NULL) anim->deleted_cb(anim);
 #if LV_USE_EXT_DATA
@@ -884,4 +915,38 @@ static void remove_anim(void * a)
     }
 #endif
     lv_free(a);
+}
+
+/**
+ * Hash an animation's `var` pointer to a bucket of the `var` index.
+ * @param var     the animated variable
+ * @return        the bucket index in [0; LV_ANIM_VAR_INDEX_SIZE - 1]
+ */
+static uint32_t anim_var_index_hash(const void * var)
+{
+    uintptr_t v = (uintptr_t)var >> 2;    /*Drop the allocator alignment bits*/
+    v *= 2654435761u;                     /*Fibonacci hashing to spread allocator strides*/
+    return ((uint32_t)v >> 11) & (LV_ANIM_VAR_INDEX_SIZE - 1);
+}
+
+/**
+ * Add an animation to the `var` index. O(1).
+ * @param a     the animation that was just added to the animation list
+ */
+static void anim_var_index_insert(lv_anim_t * a)
+{
+    const uint32_t idx = anim_var_index_hash(a->var);
+    a->var_index_next = state.var_index[idx];
+    state.var_index[idx] = a;
+}
+
+/**
+ * Remove an animation from the `var` index. The animation must be in the index.
+ * @param a     the animation to unlink from its bucket
+ */
+static void anim_var_index_remove(lv_anim_t * a)
+{
+    lv_anim_t ** pp = &state.var_index[anim_var_index_hash(a->var)];
+    while(*pp != NULL && *pp != a) pp = &(*pp)->var_index_next;
+    if(*pp != NULL) *pp = a->var_index_next;
 }
