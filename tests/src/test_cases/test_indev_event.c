@@ -592,6 +592,7 @@ void test_indev_event_code_names(void)
     TEST_ASSERT_EQUAL_STRING("EVENT_KEY", lv_event_code_get_name(LV_EVENT_KEY));
     TEST_ASSERT_EQUAL_STRING("EVENT_ROTARY", lv_event_code_get_name(LV_EVENT_ROTARY));
     TEST_ASSERT_EQUAL_STRING("EVENT_INDEV_RESET", lv_event_code_get_name(LV_EVENT_INDEV_RESET));
+    TEST_ASSERT_EQUAL_STRING("EVENT_INDEV_SAMPLE", lv_event_code_get_name(LV_EVENT_INDEV_SAMPLE));
     TEST_ASSERT_EQUAL_STRING("EVENT_HOVER_OVER", lv_event_code_get_name(LV_EVENT_HOVER_OVER));
     TEST_ASSERT_EQUAL_STRING("EVENT_HOVER_LEAVE", lv_event_code_get_name(LV_EVENT_HOVER_LEAVE));
 }
