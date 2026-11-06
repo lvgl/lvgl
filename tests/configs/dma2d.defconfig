@@ -1,0 +1,4 @@
+# DMA2D draw unit on a stub of its registers. Nothing is drawn.
+
+CONFIG_LV_USE_DRAW_DMA2D=y
+CONFIG_LV_DRAW_DMA2D_HAL_INCLUDE="tests/src/test_helpers/dma2d/lv_test_dma2d_hal.h"
