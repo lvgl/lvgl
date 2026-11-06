@@ -43,6 +43,8 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
 static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer);
+static void add_crowded_segment(lv_draw_line_dsc_t * line_dsc, lv_value_precise_t x, lv_value_precise_t y_min,
+                                lv_value_precise_t y_max);
 static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer);
@@ -1120,11 +1122,14 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
         int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
         int32_t p_act = start_point;
-        int32_t p_prev = start_point;
 
-        lv_value_precise_t y_min = obj->coords.y2;
-        lv_value_precise_t y_max = obj->coords.y1;
-        lv_value_precise_t x_prev = -10000;
+        /*Crowded mode: the Y range of the X column being collected*/
+        lv_value_precise_t y_min = 0;
+        lv_value_precise_t y_max = 0;
+        lv_value_precise_t x_range = 0;
+        bool range_open = false;
+        lv_value_precise_t y_last = 0;
+        bool last_valid = false;
         line_dsc.p1.x = x_ofs;
         line_dsc.p2.x = x_ofs;
         line_dsc.point_cnt = 0;
@@ -1133,10 +1138,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         for(i = 0; i < chart->point_cnt; i++) {
             lv_value_precise_t p_x = (int32_t)((w * i) / (chart->point_cnt - 1)) + x_ofs;
             if(p_x > layer->_clip_area.x2 + extra_space_x + 1) break;
-            if(p_x < layer->_clip_area.x1 - extra_space_x - 1) {
-                p_prev = p_act;
-                continue;
-            }
+            if(p_x < layer->_clip_area.x1 - extra_space_x - 1) continue;
             p_act = (start_point + i) % chart->point_cnt;
 
             lv_value_precise_t p_y;
@@ -1156,34 +1158,29 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                 points[line_dsc.point_cnt].y = p_y;
                 line_dsc.point_cnt++;
             }
-            /*In crowded mode draw vertical lines from the min/max on the same X coordinate*/
-            else {
-                if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                    /*Draw only one vertical line between the min and max y-values on the same x-value*/
-                    y_max = LV_MAX(y_max, p_y);
-                    y_min = LV_MIN(y_min, p_y);
-                    if(x_prev != p_x) {
-                        line_dsc.points[line_dsc.point_cnt].y = y_min;
-                        line_dsc.points[line_dsc.point_cnt].x = p_x;
-                        line_dsc.points[line_dsc.point_cnt + 1].y = y_max;
-                        line_dsc.points[line_dsc.point_cnt + 1].x = p_x;
-                        line_dsc.points[line_dsc.point_cnt + 2].y = LV_DRAW_LINE_POINT_NONE;
-                        line_dsc.points[line_dsc.point_cnt + 2].x = p_x;
-
-                        /*If they are the same no line would be drawn*/
-                        if(line_dsc.points[line_dsc.point_cnt].y == line_dsc.points[line_dsc.point_cnt + 1].y) {
-                            line_dsc.points[line_dsc.point_cnt + 1].y++;
-                        }
-                        y_min = p_y;  /*Start the line of the next x from the current last y*/
-                        y_max = p_y;
-                        x_prev = p_x;
-                        line_dsc.point_cnt += 3;
-                    }
-                }
+            /*In crowded mode draw one vertical line per X coordinate, between the min and max y-values*/
+            else if(ser->y_points[p_act] == LV_CHART_POINT_NONE) {
+                last_valid = false;
             }
-
-            p_prev = p_act;
+            else {
+                if(range_open && x_range != p_x) {
+                    add_crowded_segment(&line_dsc, x_range, y_min, y_max);
+                    range_open = false;
+                }
+                if(!range_open) {
+                    /*Join the previous X column, unless there is a gap between them*/
+                    y_min = last_valid ? y_last : p_y;
+                    y_max = y_min;
+                    x_range = p_x;
+                    range_open = true;
+                }
+                y_min = LV_MIN(y_min, p_y);
+                y_max = LV_MAX(y_max, p_y);
+                y_last = p_y;
+                last_valid = true;
+            }
         }
+        if(range_open) add_crowded_segment(&line_dsc, x_range, y_min, y_max);
 
         /*Draw the line from the accumulated points*/
         lv_draw_line(layer, &line_dsc);
@@ -1212,6 +1209,20 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     }
 
     if(points) lv_free(points);
+}
+
+static void add_crowded_segment(lv_draw_line_dsc_t * line_dsc, lv_value_precise_t x, lv_value_precise_t y_min,
+                                lv_value_precise_t y_max)
+{
+    lv_point_precise_t * p = &line_dsc->points[line_dsc->point_cnt];
+    p[0].x = x;
+    p[0].y = y_min;
+    p[1].x = x;
+    /*A zero length line wouldn't be drawn*/
+    p[1].y = y_min == y_max ? y_max + 1 : y_max;
+    p[2].x = x;
+    p[2].y = LV_DRAW_LINE_POINT_NONE;
+    line_dsc->point_cnt += 3;
 }
 
 static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
