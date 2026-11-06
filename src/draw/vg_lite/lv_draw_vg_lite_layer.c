@@ -13,6 +13,7 @@
 
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_utils.h"
+#include "../lv_draw_image_private.h"
 
 /*********************
  *      DEFINES
@@ -55,8 +56,8 @@ void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
         LV_LOG_WARN("Non-premultiplied layer buffer for GPU to draw.");
     }
 
-    lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
-    new_draw_dsc.src = layer_to_draw->draw_buf;
+    lv_draw_image_dsc_t new_draw_dsc;
+    lv_draw_image_dsc_from_layer(&new_draw_dsc, draw_dsc);
     lv_draw_vg_lite_img(draw_unit, layer, clip_area, &new_draw_dsc, coords, true);
 
     /* Wait for the GPU drawing to complete here,
