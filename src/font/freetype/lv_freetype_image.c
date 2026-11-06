@@ -220,7 +220,7 @@ static void freetype_image_free_cb(lv_freetype_image_cache_data_t * data, void *
 {
     LV_ASSERT(data != NULL);
     LV_UNUSED(user_data);
-    if(data->draw_buf) lv_draw_buf_destroy(data->draw_buf);
+    lv_draw_buf_destroy(data->draw_buf);
 }
 static lv_cache_compare_res_t freetype_image_compare_cb(const lv_freetype_image_cache_data_t * lhs,
                                                         const lv_freetype_image_cache_data_t * rhs)
