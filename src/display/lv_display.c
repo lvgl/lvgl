@@ -59,6 +59,7 @@ static void set_y_anim(void * obj, int32_t v);
 static void scr_anim_completed(lv_anim_t * a);
 static bool is_out_anim(lv_screen_load_anim_t a);
 static void disp_event_cb(lv_event_t * e);
+static bool is_layer(const lv_display_t * disp, const lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -701,6 +702,38 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp)
     return disp->bottom_layer;
 }
 
+uint32_t lv_display_get_screen_count(const lv_display_t * disp)
+{
+    LV_CHECK_ARG(disp != NULL, return 0);
+
+    uint32_t cnt = 0;
+    for(uint32_t i = 0; i < disp->screen_cnt; i++) {
+        if(!is_layer(disp, disp->screens[i])) {
+            cnt++;
+        }
+    }
+
+    return cnt;
+}
+
+lv_obj_t * lv_display_get_screen(const lv_display_t * disp, uint32_t idx)
+{
+    LV_CHECK_ARG(disp != NULL, return NULL);
+
+
+    for(uint32_t i = 0; i < disp->screen_cnt; i++) {
+        if(is_layer(disp, disp->screens[i])) {
+            continue;
+        }
+        if(idx == 0) {
+            return disp->screens[i];
+        }
+        idx--;
+    }
+
+    return NULL;
+}
+
 #if LV_USE_OBJ_NAME
 
 lv_obj_t * lv_display_get_screen_by_name(const lv_display_t * disp, const char * screen_name)
@@ -1272,6 +1305,13 @@ void lv_display_set_external_data(lv_display_t * disp, void * data, void (* free
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static bool is_layer(const lv_display_t * disp, const lv_obj_t * obj)
+{
+    LV_ASSERT(disp != NULL);
+    LV_ASSERT(obj != NULL);
+    return obj == disp->bottom_layer || obj == disp->top_layer || obj == disp->sys_layer;
+}
 
 static bool old_screen_deleted(lv_load_screen_result_t res)
 {
