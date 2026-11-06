@@ -23,7 +23,8 @@ void test_refr_transformed_object_uses_a_layer(void)
     lv_obj_set_style_transform_pivot_x(obj, lv_pct(50), 0);
     lv_obj_set_style_transform_pivot_y(obj, lv_pct(50), 0);
     lv_obj_set_style_transform_rotation(obj, 900, 0);
-    TEST_ASSERT_EQUAL(LV_LAYER_TYPE_TRANSFORM, lv_obj_get_layer_type(obj));
+    TEST_ASSERT_EQUAL(lv_draw_layer_supported(refr_ctx.disp) ? LV_LAYER_TYPE_TRANSFORM : LV_LAYER_TYPE_NONE,
+                      lv_obj_get_layer_type(obj));
 
     uint32_t draw_cnt = 0;
     lv_obj_add_event_cb(obj, refr_draw_main_counter_cb, LV_EVENT_DRAW_MAIN, &draw_cnt);
@@ -70,7 +71,8 @@ void test_refr_scaled_and_skewed_object(void)
     /*Twice as large around its center*/
     lv_obj_set_style_transform_scale_x(obj, 2 * LV_SCALE_NONE, 0);
     lv_obj_set_style_transform_scale_y(obj, 2 * LV_SCALE_NONE, 0);
-    TEST_ASSERT_EQUAL(LV_LAYER_TYPE_TRANSFORM, lv_obj_get_layer_type(obj));
+    TEST_ASSERT_EQUAL(lv_draw_layer_supported(refr_ctx.disp) ? LV_LAYER_TYPE_TRANSFORM : LV_LAYER_TYPE_NONE,
+                      lv_obj_get_layer_type(obj));
 
     lv_obj_invalidate(refr_screen());
     refr_frame();
@@ -206,7 +208,8 @@ void test_refr_obj_matrix_is_applied_without_a_layer(void)
     lv_matrix_identity(&matrix);
     lv_matrix_translate(&matrix, 40, 30);
     lv_obj_set_transform(obj, &matrix);
-    TEST_ASSERT_EQUAL(LV_LAYER_TYPE_TRANSFORM, lv_obj_get_layer_type(obj));
+    TEST_ASSERT_EQUAL(lv_draw_layer_supported(refr_ctx.disp) ? LV_LAYER_TYPE_TRANSFORM : LV_LAYER_TYPE_NONE,
+                      lv_obj_get_layer_type(obj));
 
     uint32_t draw_cnt = 0;
     lv_obj_add_event_cb(obj, refr_draw_main_counter_cb, LV_EVENT_DRAW_MAIN, &draw_cnt);

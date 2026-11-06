@@ -90,7 +90,7 @@ void lv_draw_fill(lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc, const lv_a
 
     LV_PROFILER_DRAW_BEGIN;
 
-    if(dsc->base.drop_shadow_opa) {
+    if(dsc->base.drop_shadow_opa && lv_draw_layer_check(layer)) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_fill_dsc_t ds_dsc = *dsc;
@@ -147,7 +147,7 @@ void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const 
 
     LV_PROFILER_DRAW_BEGIN;
 
-    if(dsc->base.drop_shadow_opa) {
+    if(dsc->base.drop_shadow_opa && lv_draw_layer_check(layer)) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_border_dsc_t ds_dsc = *dsc;
@@ -266,7 +266,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         }
     }
 
-    if(dsc->base.drop_shadow_opa && (has_fill || has_outline)) {
+    if(dsc->base.drop_shadow_opa && (has_fill || has_outline) && lv_draw_layer_check(layer)) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_rect_dsc_t ds_dsc = *dsc;
