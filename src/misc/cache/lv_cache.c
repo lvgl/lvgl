@@ -46,6 +46,7 @@ lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
 {
     lv_cache_t * cache = cache_class->alloc_cb();
     LV_ASSERT_MALLOC(cache);
+    if(cache == NULL) return NULL;
 
     cache->clz = cache_class;
     cache->node_size = node_size;
