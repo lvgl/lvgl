@@ -1,0 +1,182 @@
+name: Zephyr
+
+# Builds and runs Zephyr's own LVGL samples against the LVGL code in this
+# commit. The Zephyr version is pinned in tests/zephyr/west.yml; see
+# tests/zephyr/README.md.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      zephyr_repo:
+        description: "Zephyr repository URL (default: the manifest pin)"
+        required: false
+        type: string
+      zephyr_revision:
+        description: "Zephyr branch, tag or SHA (default: the manifest pin)"
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  zephyr:
+    name: Build and run Zephyr's LVGL samples
+    runs-on: ubuntu-24.04
+    env:
+      ZEPHYR_TOOLCHAIN_VARIANT: host
+      BOARD: native_sim/native/64
+      ZEPHYR_EXTRA_MODULES: ${{ github.workspace }}/lvgl
+      RUN_SECONDS: 20
+
+    steps:
+      - name: Check out LVGL
+        uses: actions/checkout@v7
+        with:
+          path: lvgl
+          persist-credentials: false
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build gperf device-tree-compiler libsdl2-dev \
+            ccache xz-utils file
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install west
+        run: pip install west
+
+      # `west init -l` makes the manifest directory's *parent* the workspace top
+      # directory, so the manifest is copied out rather than used in place.
+      - name: Materialize the west manifest
+        id: pin
+        run: |
+          # Actions runs `bash -e`, not `-o pipefail`; without this tee would
+          # hide a failing materialize.
+          set -o pipefail
+          python3 lvgl/scripts/zephyr/manifest.py materialize \
+            --manifest lvgl/tests/zephyr/west.yml \
+            --output manifest/west.yml \
+            --repo "${{ inputs.zephyr_repo }}" \
+            --revision "${{ inputs.zephyr_revision }}" | tee -a "$GITHUB_OUTPUT"
+          echo "--- manifest used ---"
+          cat manifest/west.yml
+
+      - name: Set up the Zephyr workspace
+        run: |
+          west init -l manifest
+          west config manifest.group-filter -- -optional,-hal
+          west update --narrow -o=--depth=1
+
+      - name: Install Zephyr Python dependencies
+        run: |
+          pip install -r zephyr/scripts/requirements-base.txt \
+                      -r zephyr/scripts/requirements-build-test.txt \
+                      -r zephyr/scripts/requirements-run-test.txt
+
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: zephyr-${{ runner.os }}
+          max-size: 1G
+
+      - name: Check for a newer Zephyr release
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          note=$(python3 lvgl/scripts/zephyr/manifest.py check-version \
+                   --manifest lvgl/tests/zephyr/west.yml)
+          echo "$note"
+          echo "note=$note" >> "$GITHUB_OUTPUT"
+          case "$note" in
+            outdated*) echo "::warning::$note" ;;
+          esac
+
+      - name: Build the samples
+        id: build
+        continue-on-error: true
+        run: |
+          west twister \
+            --platform "$BOARD" \
+            --testsuite-root zephyr/samples/subsys/display/lvgl \
+            --testsuite-root zephyr/samples/modules/lvgl \
+            --fixture fixture_display \
+            --build-only \
+            --jobs "$(nproc)" \
+            --outdir twister-out
+
+      - name: Run the samples
+        id: run
+        continue-on-error: true
+        run: |
+          python3 lvgl/scripts/zephyr/samples.py run \
+            --outdir twister-out \
+            --results run-results.json \
+            --seconds "$RUN_SECONDS"
+
+      - name: Build the PR report
+        if: always()
+        env:
+          REVISION: ${{ steps.pin.outputs.revision }}
+          VERSION_NOTE: ${{ steps.version.outputs.note }}
+        run: |
+          python3 lvgl/scripts/zephyr/samples.py report \
+            --outdir twister-out \
+            --results run-results.json \
+            --output pr-report-zephyr/zephyr.json \
+            --details zephyr-details.md \
+            --verdict zephyr-verdict.json \
+            --board "$BOARD" \
+            --pin "$REVISION" \
+            --version-note "$VERSION_NOTE"
+          cat zephyr-details.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-report-zephyr
+          path: pr-report-zephyr/
+          if-no-files-found: ignore
+
+      - name: Upload the build and run logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zephyr-logs
+          path: |
+            twister-out/twister.json
+            twister-out/twister.log
+            run-results.json
+            zephyr-verdict.json
+          if-no-files-found: warn
+
+      - name: Fail if any sample did not build or run
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          path = Path("zephyr-verdict.json")
+          if not path.is_file():
+              # An earlier step failed before a verdict could be recorded; that
+              # step already failed the job, so just say so and stop.
+              sys.exit("no verdict was recorded - see the failing step above")
+          verdict = json.loads(path.read_text())
+          print(f"[{verdict['icon']}] {verdict['summary']}")
+          if verdict["icon"] == "fail":
+              sys.exit(1)
+          PY
