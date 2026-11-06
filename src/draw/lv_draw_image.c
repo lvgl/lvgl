@@ -111,6 +111,23 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     LV_PROFILER_DRAW_END;
 }
 
+lv_result_t lv_draw_image_dsc_from_layer(lv_draw_image_dsc_t * dsc, const lv_draw_image_dsc_t * layer_dsc)
+{
+    LV_CHECK_ARG(dsc != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(layer_dsc != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(layer_dsc->base.type == LV_DRAW_DSC_TYPE_LAYER, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(layer_dsc->src != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(((const lv_layer_t *)layer_dsc->src)->draw_buf != NULL, return LV_RESULT_INVALID);
+
+    const lv_layer_t * layer_to_draw = layer_dsc->src;
+    const lv_draw_buf_t * draw_buf = layer_to_draw->draw_buf;
+
+    *dsc = *layer_dsc;
+    dsc->src = draw_buf;
+    dsc->header = draw_buf->header;
+    return LV_RESULT_OK;
+}
+
 void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_CHECK_ARG(layer != NULL, return);
