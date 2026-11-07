@@ -58,6 +58,7 @@
 #define LV_OS_WINDOWS       5
 #define LV_OS_MQX           6
 #define LV_OS_SDL2          7
+#define LV_OS_CHIBIOS       8
 #define LV_OS_CUSTOM        255
 
 /* SW assembly optimization */
@@ -4812,6 +4813,14 @@
         #define LV_OS_USE_SDL2 1
     #else
         #define LV_OS_USE_SDL2 0
+    #endif
+#endif
+
+#ifndef LV_OS_USE_CHIBIOS
+    #if (LV_USE_OS == LV_OS_CHIBIOS)
+        #define LV_OS_USE_CHIBIOS 1
+    #else
+        #define LV_OS_USE_CHIBIOS 0
     #endif
 #endif
 
