@@ -1,0 +1,3 @@
+# The sdist must carry widget_specs.json so setup.py can copy it into the
+# package when a wheel is built from it.
+include scripts/generators/widget_specs.json
