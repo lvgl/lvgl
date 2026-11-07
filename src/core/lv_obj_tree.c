@@ -62,11 +62,9 @@ void lv_obj_delete(lv_obj_t * obj)
     lv_obj_t * par = lv_obj_get_parent(obj);
 
     lv_display_t * disp = NULL;
-    bool act_screen_del = false;
     if(par == NULL) {
         disp = lv_obj_get_display(obj);
         if(!disp) return;   /*Shouldn't happen*/
-        if(disp->act_scr == obj) act_screen_del = true;
     }
 
     obj_delete_core(obj);
@@ -78,11 +76,7 @@ void lv_obj_delete(lv_obj_t * obj)
         lv_obj_send_event(par, LV_EVENT_CHILD_DELETED, NULL);
     }
 
-    /*Handle if the active screen was deleted*/
-    if(act_screen_del) {
-        LV_LOG_WARN("the active screen was deleted");
-        disp->act_scr = NULL;
-    }
+    if(disp) lv_display_handle_screen_delete(disp, obj);
 
     LV_ASSERT_MEM_INTEGRITY();
     LV_LOG_TRACE("finished (delete %p)", (void *)obj);
