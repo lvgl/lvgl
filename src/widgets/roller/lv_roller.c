@@ -265,7 +265,7 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     LV_CHECK_ARG(buf != NULL, return);
 
     lv_roller_t * roller = (lv_roller_t *)obj;
-    lv_roller_get_option_str(obj, roller->sel_opt_id, buf, buf_size);
+    lv_roller_get_option_str(obj, lv_roller_get_selected(obj), buf, buf_size);
 }
 
 /**
