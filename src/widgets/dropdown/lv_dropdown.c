@@ -684,7 +684,7 @@ static void refresh_list_layout(lv_obj_t * dropdown_obj)
         }
     }
 
-    lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, dropdown->options);
+    lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, lv_label_get_text(label));
 
     switch(align) {
         default:
