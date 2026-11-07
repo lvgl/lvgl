@@ -84,6 +84,33 @@ void test_roller_get_option_str(void)
     TEST_ASSERT_EQUAL(res, LV_RESULT_INVALID);
 }
 
+void test_roller_selected_str_without_options(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_roller_set_options(obj, "", LV_ROLLER_MODE_NORMAL);
+    /*Reproduce the constructor's state when default options are disabled.*/
+    ((lv_roller_t *)obj)->option_cnt = 0;
+
+    char buf[8] = "stale";
+    lv_roller_get_selected_str(obj, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_STRING("", buf);
+
+    strcpy(buf, "stale");
+    lv_roller_get_selected_str(obj, buf, 0);
+    TEST_ASSERT_EQUAL_STRING("", buf);
+
+    char small_buf[2] = {'x', 'y'};
+    lv_roller_get_selected_str(obj, small_buf, 1);
+    TEST_ASSERT_EQUAL_CHAR('\0', small_buf[0]);
+    TEST_ASSERT_EQUAL_CHAR('y', small_buf[1]);
+
+    lv_roller_set_options(obj, "", LV_ROLLER_MODE_NORMAL);
+    strcpy(buf, "stale");
+    lv_roller_get_selected_str(obj, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_STRING("", buf);
+    lv_obj_delete(obj);
+}
+
 void test_roller_get_selected_option(void)
 {
     char actual_str[OPTION_BUFFER_SZ] = {0x00};
