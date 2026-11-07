@@ -143,7 +143,6 @@ void lv_roller_set_options_translation_tag(lv_obj_t * obj, const char * tag, lv_
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(tag && tag[0] != '\0', return);
 
-    lv_roller_t * roller = (lv_roller_t *)obj;
 
     char * new_tag = lv_strdup(tag);
     LV_ASSERT_MALLOC(new_tag);
