@@ -70,6 +70,7 @@ lv_result_t lv_image_header_cache_init(uint32_t count)
 
 void lv_image_header_cache_resize(uint32_t count, bool evict_now)
 {
+    if(img_header_cache_p == NULL) return;
     lv_cache_set_max_size(img_header_cache_p, count, NULL);
     if(evict_now) {
         lv_cache_reserve(img_header_cache_p, count, NULL);
@@ -78,6 +79,7 @@ void lv_image_header_cache_resize(uint32_t count, bool evict_now)
 
 void lv_image_header_cache_drop(const void * src)
 {
+    if(img_header_cache_p == NULL) return;
     if(src == NULL) {
         lv_cache_drop_all(img_header_cache_p, NULL);
         return;
@@ -93,11 +95,12 @@ void lv_image_header_cache_drop(const void * src)
 
 bool lv_image_header_cache_is_enabled(void)
 {
-    return lv_cache_is_enabled(img_header_cache_p);
+    return img_header_cache_p != NULL && lv_cache_is_enabled(img_header_cache_p);
 }
 
 lv_iter_t * lv_image_header_cache_iter_create(void)
 {
+    if(img_header_cache_p == NULL) return NULL;
     return lv_cache_iter_create(img_header_cache_p);
 }
 

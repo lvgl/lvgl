@@ -70,8 +70,12 @@ void lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_coun
     lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
 
     /*Initialize the cache*/
-    lv_image_cache_init(image_cache_size);
-    lv_image_header_cache_init(image_header_count);
+    if(lv_image_cache_init(image_cache_size) != LV_RESULT_OK) {
+        LV_LOG_WARN("Image cache unavailable");
+    }
+    if(lv_image_header_cache_init(image_header_count) != LV_RESULT_OK) {
+        LV_LOG_WARN("Image header cache unavailable");
+    }
 
     lv_mutex_init(img_decoder_info_lock_p);
     lv_mutex_init(img_decoder_open_lock_p);
@@ -82,8 +86,14 @@ void lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_coun
  */
 void lv_image_decoder_deinit(void)
 {
-    lv_cache_destroy(img_cache_p, NULL);
-    lv_cache_destroy(img_header_cache_p, NULL);
+    if(img_cache_p != NULL) {
+        lv_cache_destroy(img_cache_p, NULL);
+        img_cache_p = NULL;
+    }
+    if(img_header_cache_p != NULL) {
+        lv_cache_destroy(img_header_cache_p, NULL);
+        img_header_cache_p = NULL;
+    }
 
     lv_mutex_delete(img_decoder_info_lock_p);
     lv_mutex_delete(img_decoder_open_lock_p);
@@ -299,6 +309,7 @@ lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data)
 {
+    if(img_cache_p == NULL) return NULL;
     LV_PROFILER_DECODER_BEGIN;
     lv_cache_entry_t * cache_entry = lv_cache_add(img_cache_p, search_key, NULL);
     if(cache_entry == NULL) {
