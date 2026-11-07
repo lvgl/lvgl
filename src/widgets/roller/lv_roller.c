@@ -205,6 +205,7 @@ bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_en
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
     LV_CHECK_ARG(sel_opt != NULL, return false);
+    if(lv_roller_get_option_count(obj) == 0) return false;
 
     const char * options = lv_roller_get_options(obj);
     size_t options_len = lv_strlen(options);
