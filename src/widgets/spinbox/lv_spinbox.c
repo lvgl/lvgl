@@ -298,8 +298,8 @@ void lv_spinbox_step_prev(lv_obj_t * obj)
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
-    const int32_t new_step = spinbox->step * 10;
-    if(new_step <= step_limit) spinbox->step = new_step;
+    /* Check the limit before multiplying to avoid overflowing the step. */
+    if(spinbox->step <= step_limit / 10) spinbox->step *= 10;
 
     lv_spinbox_updatevalue(obj);
 }
