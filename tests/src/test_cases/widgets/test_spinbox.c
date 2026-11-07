@@ -118,6 +118,62 @@ void test_spinbox_set_range(void)
     lv_obj_clean(tmp);
 }
 
+void test_spinbox_digit_format_clamps_positive_value(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(spinbox, -20000, 20000);
+    lv_spinbox_set_value(spinbox, 19000);
+
+    lv_spinbox_set_digit_format(spinbox, 3, 0);
+
+    TEST_ASSERT_EQUAL_INT32(999, lv_spinbox_get_max_value(spinbox));
+    TEST_ASSERT_EQUAL_INT32(999, lv_spinbox_get_value(spinbox));
+    TEST_ASSERT_EQUAL_STRING("+999", lv_textarea_get_text(spinbox));
+    lv_obj_delete(spinbox);
+}
+
+void test_spinbox_digit_format_clamps_negative_value(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(spinbox, -20000, 20000);
+    lv_spinbox_set_value(spinbox, -19000);
+
+    lv_spinbox_set_digit_format(spinbox, 3, 1);
+
+    TEST_ASSERT_EQUAL_INT32(-999, lv_spinbox_get_min_value(spinbox));
+    TEST_ASSERT_EQUAL_INT32(-999, lv_spinbox_get_value(spinbox));
+    TEST_ASSERT_EQUAL_STRING("-9.99", lv_textarea_get_text(spinbox));
+    lv_obj_delete(spinbox);
+}
+
+void test_spinbox_digit_format_preserves_value_in_range(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(spinbox, -20000, 20000);
+    lv_spinbox_set_value(spinbox, 42);
+
+    lv_spinbox_set_digit_format(spinbox, 3, 1);
+
+    TEST_ASSERT_EQUAL_INT32(42, lv_spinbox_get_value(spinbox));
+    TEST_ASSERT_EQUAL_STRING("+0.42", lv_textarea_get_text(spinbox));
+    lv_obj_delete(spinbox);
+}
+
+void test_spinbox_digit_format_preserves_narrower_range(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(spinbox, -50, 50);
+    lv_spinbox_set_value(spinbox, -42);
+
+    lv_spinbox_set_digit_format(spinbox, 3, 0);
+
+    TEST_ASSERT_EQUAL_INT32(-50, lv_spinbox_get_min_value(spinbox));
+    TEST_ASSERT_EQUAL_INT32(50, lv_spinbox_get_max_value(spinbox));
+    TEST_ASSERT_EQUAL_INT32(-42, lv_spinbox_get_value(spinbox));
+    TEST_ASSERT_EQUAL_STRING("-042", lv_textarea_get_text(spinbox));
+    lv_obj_delete(spinbox);
+}
+
 void test_spinbox_step_prev(void)
 {
     lv_obj_t * tmp = lv_spinbox_create(active_screen);
