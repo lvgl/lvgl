@@ -428,17 +428,17 @@ int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32
     if(max_in <= min_in && x <= max_in) return max_out;
     if(max_in <= min_in && x >= min_in) return min_out;
 
-    /**
-     * The equation should be:
-     *   ((x - min_in) * delta_out) / delta in) + min_out
-     * To avoid rounding error reorder the operations:
-     *   (x - min_in) * (delta_out / delta_min) + min_out
-     */
+    int64_t delta_in = (int64_t)max_in - min_in;
+    int64_t delta_out = (int64_t)max_out - min_out;
+    int64_t offset = (int64_t)x - min_in;
 
-    int32_t delta_in = max_in - min_in;
-    int32_t delta_out = max_out - min_out;
+    /* Clamping above makes offset / delta_in nonnegative. The product of two
+     * full-range int32_t differences can exceed INT64_MAX, but fits uint64_t. */
+    uint64_t numerator = (uint64_t)LV_ABS(offset) * (uint64_t)LV_ABS(delta_out);
+    int64_t mapped = (int64_t)(numerator / (uint64_t)LV_ABS(delta_in));
+    if(delta_out < 0) mapped = -mapped;
 
-    return ((x - min_in) * delta_out) / delta_in + min_out;
+    return (int32_t)(mapped + min_out);
 }
 
 void lv_rand_set_seed(uint32_t seed)
