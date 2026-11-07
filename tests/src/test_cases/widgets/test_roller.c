@@ -151,6 +151,38 @@ void test_roller_infinite_mode_get_selected_option(void)
     TEST_ASSERT_EQUAL_STRING("Two", actual_str);
 }
 
+void test_roller_option_range_rejects_internal_pages(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_roller_set_options(obj, "One\nTwo\nThree", LV_ROLLER_MODE_INFINITE);
+    char buf[16] = "unchanged";
+    TEST_ASSERT_EQUAL_UINT32(3, lv_roller_get_option_count(obj));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_roller_get_option_str(obj, 3, buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_STRING("unchanged", buf);
+    lv_obj_delete(obj);
+}
+
+void test_roller_option_range_accepts_last_infinite_option(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_roller_set_options(obj, "One\nTwo\nThree", LV_ROLLER_MODE_INFINITE);
+    char buf[16];
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_roller_get_option_str(obj, 2, buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_STRING("Three", buf);
+    lv_obj_delete(obj);
+}
+
+void test_roller_option_range_preserves_empty_option(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_roller_set_options(obj, "One\n", LV_ROLLER_MODE_NORMAL);
+    char buf[16] = "unchanged";
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_roller_get_option_str(obj, 1, buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_STRING("", buf);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_roller_get_option_str(obj, 2, buf, sizeof(buf)));
+    lv_obj_delete(obj);
+}
+
 void test_roller_set_selected_option_str(void)
 {
     bool selected;
