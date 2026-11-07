@@ -163,6 +163,9 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t 
     spinbox->digit_count   = digit_count;
     spinbox->dec_point_pos = sep_pos;
 
+    if(spinbox->value > spinbox->range_max) spinbox->value = spinbox->range_max;
+    if(spinbox->value < spinbox->range_min) spinbox->value = spinbox->range_min;
+
     lv_spinbox_updatevalue(obj);
 }
 
