@@ -114,8 +114,9 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
     const int32_t border_w = dsc->width;
     const float border_w_max = LV_MIN(half_w, half_h);
 
-    /* normal fill, no inner rect */
-    if(border_w >= border_w_max) {
+    /* Full border that leaves no room for the inner rect: normal fill, no inner rect.
+     * Partial borders can not be reduced to a fill, they only cover the selected sides. */
+    if(border_w >= border_w_max && dsc->side == LV_BORDER_SIDE_FULL) {
         LV_PROFILER_DRAW_END;
         return VG_LITE_FILL_EVEN_ODD;
     }
@@ -134,32 +135,37 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
 
     /* no-radius case, simple inner rect */
     if(dsc->radius <= 0) {
-        int32_t x_offset = 0;
-        int32_t y_offset = 0;
-        int32_t w_inner = w;
-        int32_t h_inner = h;
+        /* A border wider than the rect is limited to the rect, like the SW renderer does */
+        const int32_t border_w_h = LV_MIN(border_w, w);
+        const int32_t border_w_v = LV_MIN(border_w, h);
 
-        if(dsc->side & LV_BORDER_SIDE_TOP) {
-            y_offset += border_w;
-            h_inner -= border_w;
-        }
-        if(dsc->side & LV_BORDER_SIDE_LEFT) {
-            x_offset += border_w;
-            w_inner -= border_w;
-        }
-        if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
-            h_inner -= border_w;
-        }
-        if(dsc->side & LV_BORDER_SIDE_RIGHT) {
-            w_inner -= border_w;
+        int32_t x1 = x;
+        int32_t y1 = y;
+        int32_t x2 = x + w;
+        int32_t y2 = y + h;
+
+        if(dsc->side & LV_BORDER_SIDE_TOP) y1 += border_w_v;
+        if(dsc->side & LV_BORDER_SIDE_LEFT) x1 += border_w_h;
+        if(dsc->side & LV_BORDER_SIDE_BOTTOM) y2 -= border_w_v;
+        if(dsc->side & LV_BORDER_SIDE_RIGHT) x2 -= border_w_h;
+
+        /* The borders overlap and cover the whole rect, nothing to cut out */
+        if(x2 > x1 && y2 > y1) {
+            lv_vg_lite_path_append_rect(path, x1, y1, x2 - x1, y2 - y1, 0);
         }
 
-        lv_vg_lite_path_append_rect(path,
-                                    x + x_offset,
-                                    y + y_offset,
-                                    w_inner,
-                                    h_inner,
-                                    0);
+        LV_PROFILER_DRAW_END;
+        return VG_LITE_FILL_EVEN_ODD;
+    }
+
+    /* The selected sides overlap and cover the whole rect: normal fill of the (rounded) outer rect.
+     * It also keeps the corners on the far side rounded, a clamped border band would end square there. */
+    const bool has_left = dsc->side & LV_BORDER_SIDE_LEFT;
+    const bool has_right = dsc->side & LV_BORDER_SIDE_RIGHT;
+    const bool has_top = dsc->side & LV_BORDER_SIDE_TOP;
+    const bool has_bottom = dsc->side & LV_BORDER_SIDE_BOTTOM;
+    if(((has_left || has_right) && border_w >= w) || ((has_top || has_bottom) && border_w >= h)
+       || (has_left && has_right && border_w * 2 >= w) || (has_top && has_bottom && border_w * 2 >= h)) {
         LV_PROFILER_DRAW_END;
         return VG_LITE_FILL_EVEN_ODD;
     }
