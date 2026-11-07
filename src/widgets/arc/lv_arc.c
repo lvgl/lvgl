@@ -988,12 +988,13 @@ static void get_center(const lv_obj_t * obj, lv_point_t * center, int32_t * arc_
     int32_t top_bg = lv_obj_get_style_pad_top_internal(obj, LV_PART_MAIN);
     int32_t bottom_bg = lv_obj_get_style_pad_bottom_internal(obj, LV_PART_MAIN);
 
-    int32_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg,
-                        lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2;
+    int32_t content_w = lv_obj_get_width(obj) - left_bg - right_bg;
+    int32_t content_h = lv_obj_get_height(obj) - top_bg - bottom_bg;
+    int32_t r = LV_MIN(content_w, content_h) / 2;
 
     *arc_r = r;
-    center->x = obj->coords.x1 + r + left_bg;
-    center->y = obj->coords.y1 + r + top_bg;
+    center->x = obj->coords.x1 + left_bg + content_w / 2;
+    center->y = obj->coords.y1 + top_bg + content_h / 2;
 }
 
 static lv_value_precise_t get_angle(const lv_obj_t * obj)
