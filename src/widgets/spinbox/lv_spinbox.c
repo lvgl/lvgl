@@ -239,6 +239,7 @@ void lv_spinbox_set_max_value(lv_obj_t * obj, int32_t max_value)
 void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint32_t pos)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(pos < LV_SPINBOX_MAX_DIGIT_COUNT, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
