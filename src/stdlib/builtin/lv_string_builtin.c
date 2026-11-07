@@ -209,8 +209,10 @@ int lv_memcmp(const void * p1, const void * p2, size_t len)
     LV_ASSERT(p1 != NULL);
     LV_ASSERT(p2 != NULL);
 
-    const char * s1 = (const char *) p1;
-    const char * s2 = (const char *) p2;
+    if(len == 0) return 0;
+
+    const unsigned char * s1 = (const unsigned char *) p1;
+    const unsigned char * s2 = (const unsigned char *) p2;
     while(--len > 0 && (*s1 == *s2)) {
         s1++;
         s2++;
