@@ -29,6 +29,11 @@ Width and height pick orientation by default. Override with
 - <ApiLink name="lv_bar_set_range" display="lv_bar_set_range(bar, min, max)" /> — default `[0..100]`. Pass `min > max`
   (e.g. `100..0`) to flip the fill direction.
 
+Values outside the range are stored as they are and limited only when drawing,
+so <ApiLink name="lv_bar_get_value" /> always returns the value that was set, even
+after the range is changed. In `RANGE` mode a start value larger than the end value
+is drawn at the end value.
+
 ## Modes
 
 <LvglExample name="lv_example_bar_modes" path="widgets/bar/lv_example_bar_modes" />
