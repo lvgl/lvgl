@@ -1,39 +1,9 @@
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Optional
 import gdb
 
 from lvglgdb.value import Value, ValueInput
-
-# numpy and Pillow are needed to turn pixels into an image, and nothing else in
-# the plugin needs them. Importing them here would make every command - and
-# `import lvglgdb` itself - fail on a GDB whose Python does not have them, so
-# they are imported where they are used. `from __future__ import annotations`
-# above keeps the type hints from needing them at definition time.
-np = None
-Image = None
-
-
-def _require_imaging():
-    """Import numpy and Pillow, with a message that says where they must go."""
-    global np, Image
-    if np is not None and Image is not None:
-        return
-    try:
-        import numpy
-        from PIL import Image as pil_image
-    except ImportError as e:
-        import sys
-
-        raise gdb.GdbError(
-            f"{e.name} is needed to read images, and has to be installed for "
-            f"the Python that GDB embeds "
-            f"({sys.version_info.major}.{sys.version_info.minor}), not for the "
-            f"one on your PATH. On Debian and Ubuntu: sudo apt install "
-            f"python3-{'numpy' if e.name == 'numpy' else 'pil'}"
-        ) from e
-    np, Image = numpy, pil_image
+from .image_codec import ENCODERS, RawImage, convert, encode_png
 
 
 class LVDrawBuf(Value):
@@ -103,16 +73,15 @@ class LVDrawBuf(Value):
         """Get the buffer data ptr"""
         return self.super_value("data")
 
-    def _read_image(self, strict: bool = False) -> Optional[Image.Image]:
-        """Read buffer data and convert to PIL Image.
+    def _read_image(self, strict: bool = False) -> Optional[RawImage]:
+        """Read buffer data and convert it to RGB or RGBA pixels.
 
         Args:
             strict: If True, raise on any size mismatch instead of ignoring.
 
         Returns:
-            PIL.Image or None on failure.
+            RawImage or None on failure.
         """
-        _require_imaging()
         header = self.super_value("header")
         stride = int(header["stride"])
         height = int(header["h"])
@@ -157,7 +126,7 @@ class LVDrawBuf(Value):
                 pixel_data[y * stride:y * stride + row_bytes]
                 for y in range(height)
             )
-        return self._convert_to_image(pixel_data, width, height, cf_info["value"])
+        return self._convert_to_image(pixel_data, width, height, cf_info["name"])
 
     def data_dump(self, filename: str, format: str = None) -> bool:
         """Dump the buffer data to an image file.
@@ -180,7 +149,13 @@ class LVDrawBuf(Value):
             output_format = (
                 format.upper() if format else Path(filename).suffix[1:].upper() or "BMP"
             )
-            img.save(filename, format=output_format)
+            encoder = ENCODERS.get(output_format)
+            if encoder is None:
+                raise ValueError(
+                    f"Unsupported image format {output_format}, use BMP or PNG"
+                )
+            with open(filename, "wb") as f:
+                f.write(encoder(img))
 
             cf_info = self.color_format_info()
             print(
@@ -200,67 +175,31 @@ class LVDrawBuf(Value):
 
     def to_png_bytes(self) -> Optional[bytes]:
         """Convert buffer to PNG bytes in memory. Returns None on failure."""
-        import io
-
         try:
             img = self._read_image(strict=False)
             if img is None:
                 return None
-            buf = io.BytesIO()
-            img.save(buf, format="PNG")
-            return buf.getvalue()
+            return encode_png(img)
         except Exception:
             return None
 
     def _convert_to_image(
-        self, pixel_data: bytes, width: int, height: int, color_format: int
-    ) -> Optional[Image.Image]:
+        self, pixel_data: bytes, width: int, height: int, color_format: str
+    ) -> Optional[RawImage]:
         """
-        Convert raw pixel data to PIL Image based on color format.
+        Convert raw pixel data to RGB or RGBA based on color format.
 
         Args:
-            pixel_data: Raw pixel bytes
+            pixel_data: Raw pixel bytes, rows packed back to back
             width: Image width
             height: Image height
-            color_format: LVGL color format value
+            color_format: LVGL color format name, e.g. "RGB565"
 
         Returns:
-            PIL.Image or None if conversion fails
+            RawImage or None if conversion fails
         """
-        _require_imaging()
         try:
-            if color_format == self._color_formats["RGB565"]:
-                # Convert RGB565 to RGB888
-                arr = np.frombuffer(pixel_data, dtype=np.uint8)
-                arr = arr.reshape((height, width, 2))
-                rgb565 = np.frombuffer(pixel_data, dtype=np.uint16).reshape(
-                    (height, width)
-                )
-                r = (((rgb565 & 0xF800) >> 11) << 3).astype(np.uint8)
-                g = ((rgb565 & 0x07E0) >> 3).astype(np.uint8)
-                b = ((rgb565 & 0x001F) << 3).astype(np.uint8)
-                return Image.fromarray(np.dstack((r, g, b)), "RGB")
-
-            elif color_format == self._color_formats["RGB888"]:
-                arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(
-                    height, width, 3
-                )
-                rgb_arr = arr[:, :, [2, 1, 0]]  # BGR -> RGB
-                return Image.fromarray(rgb_arr, "RGB")
-
-            elif color_format == self._color_formats["ARGB8888"]:
-                # lv_color32_t memory layout: [blue, green, red, alpha]
-                arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(-1, 4)
-                rgba = arr[:, [2, 1, 0, 3]]  # BGRA -> RGBA
-                return Image.frombytes("RGBA", (width, height), rgba.tobytes())
-
-            elif color_format == self._color_formats["XRGB8888"]:
-                arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(-1, 4)
-                rgb = arr[:, [2, 1, 0]]  # BGR -> RGB
-                return Image.fromarray(rgb.reshape(height, width, 3), "RGB")
-
-            raise ValueError(f"Unsupported color format: 0x{color_format:x}")
-
+            return convert(pixel_data, width, height, color_format)
         except Exception as e:
             print(f"Conversion error: {str(e)}")
             return None
