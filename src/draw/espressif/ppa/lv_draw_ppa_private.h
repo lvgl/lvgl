@@ -95,6 +95,7 @@ static inline bool ppa_src_cf_supported(lv_color_format_t cf)
 
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
             is_cf_supported = true;
@@ -175,13 +176,57 @@ static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t 
     }
 }
 
-#define PPA_ALIGN_UP(x, align)  ((((x) + (align) - 1) / (align)) * (align))
-#define PPA_PTR_ALIGN_UP(p, align) \
-    ((void*)(((uintptr_t)(p) + (uintptr_t)((align) - 1)) & ~(uintptr_t)((align) - 1)))
+/**
+ * Whether the v5.5 PPA driver would hang on this block at 90 or 270 degrees.
+ *
+ * DIG-734, esp-idf #19023 and #19096: the driver decides whether to bypass the
+ * macro-block order from the block as it is BEFORE the turn, while the hardware
+ * needs that decision taken on the block as it is AFTER it. When the two differ,
+ * the last macro block leaves the DMA short of its FIFO and the transfer never
+ * completes - a blocking submit then never returns. The fix is on master and
+ * release/v6.0, but not on release/v5.5 or release/v6.1.
+ *
+ * ppa_dig734_bypass() reproduces the driver's own test from ppa_srm.c. Asking
+ * for the bypass when it is not needed is harmless; withholding it when it is,
+ * is the hang - so the predicate only reports the one asymmetric case.
+ *
+ * Ported from the lv_draw_ortho work in espressif/esp-iot-solution#818, which
+ * splits the offending block into pieces that do not hang. This unit takes the
+ * simpler route and leaves the draw to software.
+ */
+static inline bool ppa_dig734_bypass(uint32_t w_in, uint32_t h_in, uint32_t bits, uint32_t mb)
+{
+    const uint32_t FIFO = 12 * 128;        /* dma2d_fifo_depth_bits */
+    const uint32_t w_out = w_in;           /* scale 1.0: this unit never scales while rotating,
+                                              so the driver's fractional term drops out */
+    const uint32_t wdiv = bits >= 24 ? 32 : 64;
 
-#define PPA_ALIGN_DOWN(x, align)  ((((x) - (align) - 1) / (align)) * (align))
-#define PPA_PTR_ALIGN_DOWN(p, align) \
-    ((void*)(((uintptr_t)(p) - (uintptr_t)((align) - 1)) & ~(uintptr_t)((align) - 1)))
+    uint32_t w_left = w_out % wdiv;
+    if(w_left == 0) w_left = wdiv;
+
+    uint32_t h_in_left = h_in % mb;
+    if(h_in_left == 0) h_in_left = mb;
+
+    return (w_out > wdiv || h_in > mb) && w_left * h_in_left * bits < FIFO;
+}
+
+static inline bool lv_ppa_rotate_hangs(uint32_t block_w, uint32_t block_h, int32_t angle, lv_color_format_t cf)
+{
+    if(angle != 900 && angle != 2700) return false;
+
+    const uint32_t bits = (uint32_t)lv_color_format_get_size(cf) * 8;
+    if(bits == 0) return false;
+
+    /* 16x16 macro blocks below silicon v3.0, 32x32 selectable on it: check both. */
+    for(uint32_t mb = 16; mb <= 32; mb += 16) {
+        const bool needed = ppa_dig734_bypass(block_h, block_w, bits, mb);  /* after the turn */
+        const bool given  = ppa_dig734_bypass(block_w, block_h, bits, mb);  /* what v5.5 gives */
+        if(needed && !given) return true;
+    }
+    return false;
+}
+
+#define PPA_ALIGN_UP(x, align)  ((((x) + (align) - 1) / (align)) * (align))
 
 #endif /* LV_USE_PPA */
 
