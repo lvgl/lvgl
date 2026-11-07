@@ -426,6 +426,36 @@ void test_math_pow_large_values(void)
 }
 
 /* Test lv_map function */
+void test_math_map_large_product(void)
+{
+    TEST_ASSERT_EQUAL_INT32(50000, lv_map(50000, 0, 100000, 0, 100000));
+}
+
+void test_math_map_full_input_range(void)
+{
+    TEST_ASSERT_EQUAL_INT32(500, lv_map(0, INT32_MIN, INT32_MAX, 0, 1000));
+}
+
+void test_math_map_full_output_range(void)
+{
+    TEST_ASSERT_EQUAL_INT32(-1, lv_map(50, 0, 100, INT32_MIN, INT32_MAX));
+    TEST_ASSERT_EQUAL_INT32(0, lv_map(50, 0, 100, INT32_MAX, INT32_MIN));
+}
+
+void test_math_map_reversed_full_ranges(void)
+{
+    TEST_ASSERT_EQUAL_INT32(0, lv_map(0, INT32_MAX, INT32_MIN, INT32_MAX, INT32_MIN));
+    TEST_ASSERT_EQUAL_INT32(-1, lv_map(0, INT32_MAX, INT32_MIN, INT32_MIN, INT32_MAX));
+}
+
+void test_math_map_near_full_scale(void)
+{
+    TEST_ASSERT_EQUAL_INT32(INT32_MAX - 1,
+                            lv_map(INT32_MAX - 1, INT32_MIN, INT32_MAX, INT32_MIN, INT32_MAX));
+    TEST_ASSERT_EQUAL_INT32(INT32_MIN + 1,
+                            lv_map(INT32_MIN + 1, INT32_MIN, INT32_MAX, INT32_MIN, INT32_MAX));
+}
+
 void test_math_map_basic(void)
 {
     /* Test basic mapping */
