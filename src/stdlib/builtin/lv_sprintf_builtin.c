@@ -472,6 +472,12 @@ static size_t _etoa(out_fct_type out, char * buffer, size_t idx, size_t maxlen, 
         conv.F /= 10;
     }
 
+    // zero has no exponent of its own, the estimate above gives -308 for it
+    if(value == 0.0) {
+        expval = 0;
+        conv.F = 1;
+    }
+
     // the exponent format is "%+03d" and largest value is "307", so set aside 4-5 characters
     unsigned int minwidth = ((expval < 100) && (expval > -100)) ? 4U : 5U;
 
@@ -495,6 +501,24 @@ static size_t _etoa(out_fct_type out, char * buffer, size_t idx, size_t maxlen, 
             if((prec > 0) && (flags & FLAGS_PRECISION)) {
                 --prec;
             }
+        }
+    }
+
+    // the exponent estimate can still be one off after the correction above: the cast truncates
+    // negative estimates toward zero (9.9e-06 printed as 0.99E-05), and rounding to prec decimals
+    // can carry the mantissa up to 10 (1e8 or 9.9999996 printed as 10.000000e+07 or 10.000000e+00)
+    if(minwidth) {
+        double half = 0.5;   // half a unit in the last printed place, _ftoa rounds at 9 decimals at most
+        for(unsigned int i = 0; i < prec && i < 9U; i++) half /= 10;
+        if(value != 0.0 && value < conv.F) {
+            expval--;
+            conv.F /= 10;
+            minwidth = ((expval < 100) && (expval > -100)) ? 4U : 5U;
+        }
+        if(value / conv.F >= 10.0 - half) {
+            expval++;
+            conv.F *= 10;
+            minwidth = ((expval < 100) && (expval > -100)) ? 4U : 5U;
         }
     }
 
