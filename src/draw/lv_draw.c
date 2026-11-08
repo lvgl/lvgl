@@ -34,6 +34,7 @@ static lv_area_t * get_dsc_coords(lv_draw_task_t * t);
 static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t);
 static void apply_coords_change(lv_draw_task_t * t);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
+static void evaluate_task(lv_draw_task_t * task);
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
@@ -117,16 +118,15 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
     new_task->draw_dsc = (uint8_t *)new_task + LV_ALIGN_UP(sizeof(lv_draw_task_t), 8);
     new_task->state = LV_DRAW_TASK_STATE_WAITING;
 
-    /*Find the tail*/
     if(layer->draw_task_head == NULL) {
         layer->draw_task_head = new_task;
+        layer->all_tasks_deferred = true;
     }
     else {
-        lv_draw_task_t * tail = layer->draw_task_head;
-        while(tail->next) tail = tail->next;
-
-        tail->next = new_task;
+        layer->draw_task_tail->next = new_task;
     }
+    layer->draw_task_tail = new_task;
+    layer->unfinalized_tasks++;
     LV_LOG_TRACE("Added task %p (type %d), layer (%p) layer head (%p)", (void *)new_task, new_task->type,
                  (void *) layer, (void *)layer->draw_task_head);
 
@@ -163,20 +163,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             info->task_running = false;
         }
 
-        /*Let the draw units set their preference score*/
-        t->preference_score = 100;
-        t->preferred_draw_unit_id = 0;
-        lv_draw_unit_t * u = info->unit_head;
-        while(u) {
-            if(u->evaluate_cb) {
-                LV_PROFILER_DRAW_BEGIN_TAG("evaluate_cb");
-                LV_PROFILER_DRAW_BEGIN_TAG(u->name);
-                u->evaluate_cb(u, t);
-                LV_PROFILER_DRAW_END_TAG(u->name);
-                LV_PROFILER_DRAW_END_TAG("evaluate_cb");
-            }
-            u = u->next;
-        }
+        evaluate_task(t);
         if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
             LV_LOG_WARN("Draw task failed (%p, type %d): not taken by any unit", (void *)t, t->type);
             /* mark a non-taken layer task as BLOCKED so we don't try to release it
@@ -192,20 +179,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
         lv_draw_dispatch();
     }
     else {
-        /*Let the draw units set their preference score*/
-        t->preference_score = 100;
-        t->preferred_draw_unit_id = 0;
-        lv_draw_unit_t * u = info->unit_head;
-        while(u) {
-            if(u->evaluate_cb) {
-                LV_PROFILER_DRAW_BEGIN_TAG("evaluate_cb");
-                LV_PROFILER_DRAW_BEGIN_TAG(u->name);
-                u->evaluate_cb(u, t);
-                LV_PROFILER_DRAW_END_TAG(u->name);
-                LV_PROFILER_DRAW_END_TAG("evaluate_cb");
-            }
-            u = u->next;
-        }
+        evaluate_task(t);
     }
     LV_PROFILER_DRAW_END;
 }
@@ -255,6 +229,17 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
     LV_CHECK_ARG(layer != NULL, return false);
 
     LV_PROFILER_DRAW_BEGIN;
+    if(layer->draw_task_head && !layer->all_tasks_added && layer->all_tasks_deferred &&
+       layer->unfinalized_tasks == 0) {
+        /*No draw unit can make progress on this layer yet. The caller still dispatches
+         *the other layers, including completed child layers. Keep a request pending
+         *for the canvas and snapshot callers that wait for one before dispatching.*/
+        lv_draw_dispatch_request();
+        LV_PROFILER_DRAW_END;
+        return true;
+    }
+    /*Once a layer is dispatched normally, keep handling its completions until it's empty*/
+    layer->all_tasks_deferred = false;
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
@@ -267,6 +252,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
                 LV_LOG_ERROR("draw task failed, type: %d", (int)t->type);
             }
 
+            if(layer->draw_task_tail == t) layer->draw_task_tail = t_prev;
             lv_draw_cleanup_task(t);
             remove_task = true;
             if(t_prev != NULL)
@@ -662,6 +648,7 @@ void lv_draw_layer_deinit(lv_layer_t * layer)
         t = next;
     }
     layer->draw_task_head = NULL;
+    layer->draw_task_tail = NULL;
 
     if(layer->display) {
         lv_layer_t * l = layer->display->layer_head;
@@ -764,8 +751,13 @@ static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t)
     }
     LV_ASSERT_NULL(cur);
 
+    /*The tasks finalized after `t` stay behind it*/
+    lv_draw_task_t * suffix = t->next;
+    lv_draw_task_t * suffix_tail = layer->draw_task_tail;
     if(prev) prev->next = NULL;
     else layer->draw_task_head = NULL;
+    layer->draw_task_tail = prev;
+    t->next = NULL;
 
     lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_DSC_BEGIN, base_dsc);
 
@@ -774,15 +766,15 @@ static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t)
      * TODO: this can be removed when draw tasks are removed from dispatching */
     apply_coords_change(t);
 
-    /*Put the task back at the end*/
+    /*Put the task back at the end, followed by the tasks that were after it*/
     if(layer->draw_task_head == NULL) {
         layer->draw_task_head = t;
     }
     else {
-        lv_draw_task_t * tail = layer->draw_task_head;
-        while(tail->next) tail = tail->next;
-        tail->next = t;
+        layer->draw_task_tail->next = t;
     }
+    t->next = suffix;
+    layer->draw_task_tail = suffix ? suffix_tail : t;
 
     lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_DSC_END, base_dsc);
 }
@@ -901,6 +893,7 @@ void lv_draw_cleanup_task(lv_draw_task_t * t)
 {
     LV_PROFILER_DRAW_BEGIN;
     LV_LOG_TRACE("Cleanup task %p (type %d)", (void *)t, t->type);
+    if(!t->creation_finalized) t->target_layer->unfinalized_tasks--;
 
     LV_ASSERT_FORMAT_MSG(t->state != LV_DRAW_TASK_STATE_IN_PROGRESS, "task %p (type %d) is still used by a draw unit",
                          (void *)t, t->type);
@@ -925,6 +918,32 @@ void lv_draw_cleanup_task(lv_draw_task_t * t)
 
     lv_free(t);
     LV_PROFILER_DRAW_END;
+}
+
+static void evaluate_task(lv_draw_task_t * task)
+{
+    LV_ASSERT(!task->creation_finalized);
+    task->preference_score = 100;
+    task->preferred_draw_unit_id = LV_DRAW_UNIT_NONE;
+    bool deferred = false;
+    for(lv_draw_unit_t * unit = _draw_info.unit_head; unit; unit = unit->next) {
+        if(!unit->evaluate_cb) continue;
+        uint8_t previous_id = task->preferred_draw_unit_id;
+        uint8_t previous_score = task->preference_score;
+        LV_PROFILER_DRAW_BEGIN_TAG("evaluate_cb");
+        LV_PROFILER_DRAW_BEGIN_TAG(unit->name);
+        unit->evaluate_cb(unit, task);
+        LV_PROFILER_DRAW_END_TAG(unit->name);
+        LV_PROFILER_DRAW_END_TAG("evaluate_cb");
+        /*Evaluate every unit before deciding: a later unit can win this task*/
+        if(task->preferred_draw_unit_id != previous_id || task->preference_score != previous_score) {
+            deferred = unit->requires_all_tasks;
+        }
+    }
+    if(task->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) deferred = false;
+    task->target_layer->all_tasks_deferred &= deferred;
+    task->target_layer->unfinalized_tasks--;
+    task->creation_finalized = true;
 }
 
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer)
