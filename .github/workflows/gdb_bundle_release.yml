@@ -49,4 +49,7 @@ jobs:
       - name: Attach the bundle to the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ steps.tag.outputs.tag }}" "$RUNNER_TEMP/lvglgdb.py" --clobber
+          # Through env, not ${{ }} in the script, so a crafted tag name can't
+          # inject shell commands.
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: gh release upload "$TAG" "$RUNNER_TEMP/lvglgdb.py" --clobber

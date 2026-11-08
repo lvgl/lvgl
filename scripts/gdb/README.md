@@ -11,8 +11,8 @@ so it runs in any GDB that has Python support, and nothing has to be
 installed.
 
 The whole plugin is also packed into a single file, `lvglgdb.py`, attached to
-every [LVGL release](https://github.com/lvgl/lvgl/releases). Download it from
-the release that matches your LVGL version:
+each [LVGL release](https://github.com/lvgl/lvgl/releases) from v9.6.0 on.
+Download it from the release that matches your LVGL version:
 
 ```bash
 curl -LO https://github.com/lvgl/lvgl/releases/download/v9.6.0/lvglgdb.py
@@ -32,17 +32,6 @@ source lvgl/scripts/gdb/gdbinit.py
 ```
 
 To load it in every session, put the `source` line in `~/.gdbinit`.
-
-It is also available on PyPI. Install it into the Python that GDB uses, then
-import it in GDB:
-
-```bash
-pip install lvglgdb
-```
-
-```bash
-py import lvglgdb
-```
 
 The plugin's version follows the LVGL release it ships with, but it also reads
 targets built from older LVGL versions.
