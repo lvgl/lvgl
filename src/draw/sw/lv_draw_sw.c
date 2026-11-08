@@ -108,6 +108,7 @@ void lv_draw_sw_init(void)
         thread_dsc->draw_unit = (void *) draw_sw_unit;
         lv_thread_sync_init(&thread_dsc->new_task_sync);
         lv_thread_sync_init(&thread_dsc->task_done_sync);
+        lv_mutex_init(&thread_dsc->exit_mutex);
         lv_thread_init(&thread_dsc->thread, "swdraw", LV_DRAW_THREAD_PRIO, render_thread_cb,
                        LV_DRAW_THREAD_STACK_SIZE, thread_dsc);
     }
@@ -146,12 +147,15 @@ static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
         lv_draw_sw_thread_dsc_t * thread_dsc = &draw_sw_unit->thread_dscs[i];
 
         LV_LOG_INFO("cancel software rendering thread");
+        lv_mutex_lock(&thread_dsc->exit_mutex);
         thread_dsc->exit_status = true;
+        lv_mutex_unlock(&thread_dsc->exit_mutex);
 
         lv_thread_sync_signal(&thread_dsc->new_task_sync);
         lv_thread_delete(&thread_dsc->thread);
         lv_thread_sync_delete(&thread_dsc->new_task_sync);
         lv_thread_sync_delete(&thread_dsc->task_done_sync);
+        lv_mutex_delete(&thread_dsc->exit_mutex);
     }
 
     return 0;
@@ -365,16 +369,18 @@ static void render_thread_cb(void * ptr)
     lv_draw_sw_thread_dsc_t * thread_dsc = ptr;
 
     while(1) {
-        while(thread_dsc->task_act == NULL) {
-            if(thread_dsc->exit_status) {
-                break;
-            }
-            lv_thread_sync_wait(&thread_dsc->new_task_sync);
-        }
+        lv_mutex_lock(&thread_dsc->exit_mutex);
+        bool exit_status = thread_dsc->exit_status;
+        lv_mutex_unlock(&thread_dsc->exit_mutex);
 
-        if(thread_dsc->exit_status) {
+        if(exit_status) {
             LV_LOG_INFO("ready to exit software rendering thread");
             break;
+        }
+
+        if(thread_dsc->task_act == NULL) {
+            lv_thread_sync_wait(&thread_dsc->new_task_sync);
+            continue;
         }
 
         execute_drawing((lv_draw_task_t *)thread_dsc->task_act);
