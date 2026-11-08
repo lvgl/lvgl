@@ -135,7 +135,13 @@ void lv_draw_sw_triangle(lv_layer_t * layer, const lv_area_t * clip_area, const 
 
     lv_grad_dir_t grad_dir = dsc->grad.dir;
 
-    lv_draw_sw_grad_calc_t * grad = lv_draw_sw_grad_get(&dsc->grad, lv_area_get_width(&tri_area),
+    const lv_grad_dsc_t * grad_dsc = &dsc->grad;
+#if LV_DRAW_SW_SUPPORT_ABGR8888
+    lv_grad_dsc_t grad_swapped;
+    if(lv_draw_sw_grad_swap_for_layer(layer, grad_dsc, &grad_swapped)) grad_dsc = &grad_swapped;
+#endif
+
+    lv_draw_sw_grad_calc_t * grad = lv_draw_sw_grad_get(grad_dsc, lv_area_get_width(&tri_area),
                                                         lv_area_get_height(&tri_area));
     lv_opa_t * grad_opa_map = NULL;
     if(grad && grad_dir == LV_GRAD_DIR_HOR) {

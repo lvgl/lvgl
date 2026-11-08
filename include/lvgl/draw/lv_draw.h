@@ -332,6 +332,8 @@ void lv_layer_reset(lv_layer_t * layer);
  * @param color_format      the color format of the layer
  * @param area              the areas of the layer (absolute coordinates)
  * @return                  the new target_layer or NULL on error
+ * @note                    if the parent layer is `LV_COLOR_FORMAT_ABGR8888`, the new layer is
+ *                          `LV_COLOR_FORMAT_ABGR8888` too, unless `LV_COLOR_FORMAT_A8` is requested
  */
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area);
 
@@ -341,6 +343,8 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
  * @param parent_layer      the parent layer to which the layer will be merged when it's rendered @nullable
  * @param color_format      the color format of the layer
  * @param area              the areas of the layer (absolute coordinates)
+ * @note                    if the parent layer is `LV_COLOR_FORMAT_ABGR8888`, the layer is
+ *                          `LV_COLOR_FORMAT_ABGR8888` too, unless `LV_COLOR_FORMAT_A8` is requested
  */
 void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
                         const lv_area_t * area);
