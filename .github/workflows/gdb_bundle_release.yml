@@ -1,0 +1,52 @@
+name: GDB Plugin Release Asset
+
+# Build the single-file GDB plugin (scripts/gdb/build_bundle.py) and attach it
+# to the GitHub release as lvglgdb.py.
+#
+# The release is created by release.yml with GITHUB_TOKEN, and releases created
+# that way don't fire `release` events in other workflows, so this runs after
+# "Create Release" finishes instead. `release: published` covers releases
+# created by hand, and workflow_dispatch can (re)upload the asset of any tag.
+on:
+  workflow_run:
+    workflows: ["Create Release"]
+    types: [completed]
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build and attach the bundle for, e.g. v9.6.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  upload:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Resolve tag
+        id: tag
+        env:
+          TAG: ${{ github.event.inputs.tag || github.event.release.tag_name || github.event.workflow_run.head_branch }}
+        run: |
+          if [ -z "$TAG" ]; then
+            echo "::error::Could not determine the release tag"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout the release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.tag.outputs.tag }}
+
+      - name: Build the bundle
+        run: python3 scripts/gdb/build_bundle.py "$RUNNER_TEMP/lvglgdb.py"
+
+      - name: Attach the bundle to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ steps.tag.outputs.tag }}" "$RUNNER_TEMP/lvglgdb.py" --clobber

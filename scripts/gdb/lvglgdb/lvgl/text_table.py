@@ -81,7 +81,7 @@ class TextTable:
 
         def render(cells: Sequence[str]) -> List[str]:
             split = [cell.split("\n") for cell in cells]
-            height = max(len(lines) for lines in split)
+            height = max((len(lines) for lines in split), default=1)
             out = []
             for n in range(height):
                 parts = []

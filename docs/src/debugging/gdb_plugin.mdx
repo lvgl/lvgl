@@ -18,16 +18,15 @@ The plugin is plain Python with no dependencies beyond the standard library,
 so it runs in any GDB that has Python support, and nothing has to be
 installed.
 
-The whole plugin is also packed into a single file. Download it from the LVGL
-release branch that matches your LVGL version:
+The whole plugin is also packed into a single file, `lvglgdb.py`, attached to
+every [LVGL release](https://github.com/lvgl/lvgl/releases). Download it from
+the release that matches your LVGL version:
 
 ```bash
-curl -LO https://raw.githubusercontent.com/lvgl/lvgl/release/v9.6/scripts/gdb/bundle/lvglgdb.py
+curl -LO https://github.com/lvgl/lvgl/releases/download/v9.6.0/lvglgdb.py
 ```
 
-(or open
-[the file on GitHub](https://github.com/lvgl/lvgl/blob/release/v9.6/scripts/gdb/bundle/lvglgdb.py)
-and use "Download raw file"), then load it in GDB:
+then load it in GDB:
 
 ```bash
 source lvglgdb.py
@@ -291,7 +290,9 @@ Connect to `PyCharm` / `VSCode` / `Eclipse (not supported yet)`
 
 `debugger -t eclipse`
 
-`--host` and `-p` / `--port` set where the IDE's debug server listens.
+`--host` and `-p` / `--port` set the debug endpoint. For VS Code, the plugin
+listens there and the IDE attaches to it; for PyCharm, the plugin connects to
+the IDE's debug server listening there.
 
 Perform a web search for `pydevd_pycharm` or `debugpy` for details about how to
 use the debugger.

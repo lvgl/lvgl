@@ -8,12 +8,12 @@ the plugin as a string literal. When sourced, it writes them to a per-user
 cache directory and imports the package from there, so the plugin runs exactly
 as it does from a checkout, data files included.
 
-The output is deterministic, and the files are stored as readable text rather
-than compressed, so a change to the plugin shows up as a readable diff of the
-bundle too. CI regenerates the bundle and fails if the committed one differs,
-so run this after every change to the plugin:
+The bundle is not committed. The gdb_bundle_release workflow builds it and
+attaches it to every GitHub release. To build it locally:
 
-    python3 build_bundle.py
+    python3 build_bundle.py [output.py]
+
+The output defaults to bundle/lvglgdb.py (git-ignored).
 """
 
 import hashlib
@@ -112,7 +112,7 @@ def build() -> str:
         "#     source lvglgdb.py",
         "#",
         "# GENERATED FILE - do not edit. The source is lvgl/scripts/gdb/lvglgdb/;",
-        "# regenerate this file with: python3 scripts/gdb/build_bundle.py",
+        "# build it with: python3 scripts/gdb/build_bundle.py",
         "# fmt: off",
         "",
         f'VERSION = "{version()}"',
@@ -127,10 +127,11 @@ def build() -> str:
 
 
 def main():
-    OUTPUT.parent.mkdir(exist_ok=True)
+    output = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else OUTPUT
+    output.parent.mkdir(parents=True, exist_ok=True)
     content = build()
-    OUTPUT.write_bytes(content.encode("utf-8"))
-    print(f"Wrote {OUTPUT.relative_to(ROOT)} ({len(content) // 1024} KiB)")
+    output.write_bytes(content.encode("utf-8"))
+    print(f"Wrote {output} ({len(content) // 1024} KiB)")
 
 
 if __name__ == "__main__":

@@ -10,16 +10,15 @@ The plugin is plain Python with no dependencies beyond the standard library,
 so it runs in any GDB that has Python support, and nothing has to be
 installed.
 
-The whole plugin is also packed into a single file. Download it from the LVGL
-release branch that matches your LVGL version:
+The whole plugin is also packed into a single file, `lvglgdb.py`, attached to
+every [LVGL release](https://github.com/lvgl/lvgl/releases). Download it from
+the release that matches your LVGL version:
 
 ```bash
-curl -LO https://raw.githubusercontent.com/lvgl/lvgl/release/v9.6/scripts/gdb/bundle/lvglgdb.py
+curl -LO https://github.com/lvgl/lvgl/releases/download/v9.6.0/lvglgdb.py
 ```
 
-(or open
-[the file on GitHub](https://github.com/lvgl/lvgl/blob/release/v9.6/scripts/gdb/bundle/lvglgdb.py)
-and use "Download raw file"), then load it in GDB:
+then load it in GDB:
 
 ```bash
 source lvglgdb.py
@@ -33,6 +32,17 @@ source lvgl/scripts/gdb/gdbinit.py
 ```
 
 To load it in every session, put the `source` line in `~/.gdbinit`.
+
+It is also available on PyPI. Install it into the Python that GDB uses, then
+import it in GDB:
+
+```bash
+pip install lvglgdb
+```
+
+```bash
+py import lvglgdb
+```
 
 The plugin's version follows the LVGL release it ships with, but it also reads
 targets built from older LVGL versions.
@@ -131,12 +141,13 @@ another.
 
 ## Rebuilding the single-file bundle
 
-`bundle/lvglgdb.py` is generated from the `lvglgdb/` package. After any change
-to the plugin, rebuild it from this directory and commit it together with the
-change; CI fails if the committed bundle is out of date:
+The single-file `lvglgdb.py` is generated from the `lvglgdb/` package and is
+not committed. The release workflow builds it and attaches it to each GitHub
+release. To build it locally (written to `bundle/lvglgdb.py`, or to the path
+given as argument):
 
 ```bash
-python3 build_bundle.py
+python3 build_bundle.py [output.py]
 ```
 
 ## Tests

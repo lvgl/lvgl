@@ -126,7 +126,11 @@ class LVDrawBuf(Value):
                 pixel_data[y * stride:y * stride + row_bytes]
                 for y in range(height)
             )
-        return self._convert_to_image(pixel_data, width, height, cf_info["name"])
+        cf_name = cf_info["name"]
+        if cf_name == "UNKNOWN":
+            # Keep the raw value so the error says which format is missing.
+            cf_name = f"UNKNOWN(0x{cf_info['value']:02X})"
+        return self._convert_to_image(pixel_data, width, height, cf_name)
 
     def data_dump(self, filename: str, format: str = None) -> bool:
         """Dump the buffer data to an image file.

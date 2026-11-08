@@ -43,6 +43,8 @@ def _decode_png(data):
             idat += payload
         pos += 12 + length
     width, height, depth, color_type = ihdr[:4]
+    assert depth == 8
+    assert color_type in (2, 6)
     bpp = 4 if color_type == 6 else 3
     raw = zlib.decompress(idat)
     row = width * bpp
