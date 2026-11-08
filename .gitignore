@@ -24,3 +24,4 @@ docs-venv
 tests/.ccache/
 tests/src/test_assets/**/generated
 build_check
+scripts/gdb/bundle/

@@ -5,11 +5,7 @@ description = "LVGL GDB scripts"
 readme = "README.md"
 requires-python = ">=3.10"
 
-dependencies = [
-    "numpy~=2.2.6",
-    "Pillow~=11.3.0",
-    "prettytable~=3.16.0",
-]
+dependencies = []
 
 [tool.setuptools.package-data]
 lvglgdb = ["cmds/dashboard/static/*"]
@@ -21,3 +17,6 @@ Repository = "https://github.com/lvgl/lvgl"
 
 [tool.setuptools.dynamic]
 version = {attr = "lvglgdb._version.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["lvglgdb*"]

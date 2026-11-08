@@ -6,7 +6,7 @@ and format callbacks passed by callers.
 """
 from typing import Callable, List, Optional, Sequence, Tuple, Union
 
-from prettytable import PrettyTable
+from .text_table import TextTable
 
 
 # ---------------------------------------------------------------------------
@@ -108,7 +108,7 @@ def print_table(
     numbered: bool = True,
     col_align: dict = None,
 ) -> None:
-    """Generic helper for printing a PrettyTable from snapshot data.
+    """Generic helper for printing a table from snapshot data.
 
     Args:
         entries: list of dict-like objects (Snapshot or plain dict).
@@ -119,13 +119,8 @@ def print_table(
         numbered: if True, prepend a '#' column with row index.
         col_align: optional per-column alignment overrides, e.g. {"src": "l"}.
     """
-    table = PrettyTable()
-    table.field_names = (["#"] + columns) if numbered else columns
-    table.align = align
-    if col_align:
-        for col, a in col_align.items():
-            if col in table.field_names:
-                table.align[col] = a
+    table = TextTable((["#"] + columns) if numbered else columns,
+                      align=align, col_align=col_align)
 
     for i, d in enumerate(entries):
         row = row_fn(i, d)
@@ -236,7 +231,7 @@ def print_spec_table(
     extra_columns: list = None,
     extra_row_fn: Callable = None,
 ) -> None:
-    """Render a PrettyTable from a Display_Spec.
+    """Render a table from a Display_Spec.
 
     Resolves columns from *spec* via :func:`resolve_table_columns`, optionally
     prepends *extra_columns* (used by DumpCache for dynamic fields), then

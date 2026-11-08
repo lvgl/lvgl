@@ -6,16 +6,24 @@ in the generator's widget_specs.json. The dashboard already ships that file to
 the browser, so reading the same file here keeps the terminal output and the
 HTML inspector telling one story instead of two that drift apart.
 
-Everything degrades to the raw value when the file is missing, which is the case
-when the plugin is vendored without its scripts/ directory.
+A pip-installed package carries its own copy next to lvglgdb/__init__.py
+(setup.py puts it there); a source checkout reads the generator's file directly.
+Everything degrades to the raw value when neither is found.
 """
 
 import json
 from pathlib import Path
 
-_SPECS_PATH = (
-    Path(__file__).resolve().parents[3] / "scripts" / "generators" / "widget_specs.json"
-)
+_PKG_DIR = Path(__file__).resolve().parents[2]
+
+
+def specs_path() -> Path:
+    """Where widget_specs.json is: the packaged copy, else the checkout's."""
+    packaged = _PKG_DIR / "widget_specs.json"
+    if packaged.exists():
+        return packaged
+    return _PKG_DIR.parent / "scripts" / "generators" / "widget_specs.json"
+
 
 _specs = None
 
@@ -24,7 +32,7 @@ def _load() -> dict:
     global _specs
     if _specs is None:
         try:
-            _specs = json.loads(_SPECS_PATH.read_text(encoding="utf-8"))
+            _specs = json.loads(specs_path().read_text(encoding="utf-8"))
         except (OSError, ValueError):
             _specs = {}
     return _specs

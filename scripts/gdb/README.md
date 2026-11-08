@@ -6,17 +6,37 @@ GDB-compatible targets.
 
 ## Installation
 
+The plugin is plain Python with no dependencies beyond the standard library,
+so it runs in any GDB that has Python support, and nothing has to be
+installed.
+
+The whole plugin is also packed into a single file, `lvglgdb.py`, attached to
+each [LVGL release](https://github.com/lvgl/lvgl/releases) from v9.6.0 on.
+Download it from the release that matches your LVGL version:
+
 ```bash
-pip install lvglgdb
+curl -LO https://github.com/lvgl/lvgl/releases/download/v9.6.0/lvglgdb.py
 ```
+
+then load it in GDB:
+
+```bash
+source lvglgdb.py
+```
+
+If your project already contains LVGL, load the plugin from its sources
+instead:
+
+```bash
+source lvgl/scripts/gdb/gdbinit.py
+```
+
+To load it in every session, put the `source` line in `~/.gdbinit`.
+
+The plugin's version follows the LVGL release it ships with, but it also reads
+targets built from older LVGL versions.
 
 ## Usage
-
-In your GDB session:
-
-```bash
-py import lvglgdb
-```
 
 ### Dump Commands
 
@@ -25,11 +45,16 @@ evaluate will do: a variable, a member chain, or a plain address.
 
 ```bash
 dump obj                        # Dump widget tree (same listing as `info widget`)
+dump obj -L 2                   # ...limited to 2 levels
+dump obj main_screen_0          # ...starting from one widget
 dump display -f png             # Dump display framebuffer as PNG
+dump display -p /tmp/ -f bmp    # ...with a path prefix
 dump cache image                # Dump image cache entries
 dump cache image_header         # Dump image header cache entries
 check cache image               # Validate image cache integrity
+check cache image_header        # Validate image header cache integrity
 dump anim                       # Dump active animations
+dump anim --detail              # ...one detailed block per animation
 dump timer                      # Dump registered timers
 dump indev                      # Dump input devices
 dump group                      # Dump focus groups
@@ -38,7 +63,11 @@ dump fs_drv                     # Dump filesystem drivers
 dump draw_task lv_global->disp_default->layer_head   # Draw tasks of a layer
 dump dashboard                  # Generate interactive HTML dashboard
 dump dashboard -o out.html      # Save dashboard to file
+dump dashboard --json           # Export the raw data as JSON
+dump dashboard --viewer         # Empty HTML viewer that loads JSON files
 dump widget props lv_keyboard   # Which fields a widget class has
+dump widget props my_obj        # ...or the class of a live widget
+dump widget props               # List the widget classes
 ```
 
 ### Info Commands
@@ -52,12 +81,22 @@ info widget my_obj text         # Only the named field(s)
 info widget ball_1              # Find it by name, anywhere on any screen
 info widget label3 -p screen_1/button_2   # ...or by name below a parent path
 info widget screen_1/button_2/label3      # ...or by a full name path
+info widget my_obj --tree -L 2  # Subtree of one widget instead of its details
 info style my_style             # Inspect a single lv_style_t
 info style --obj my_obj         # Inspect all styles of an lv_obj_t
                                 # sizes as 100%/content, enums and fonts by name
 info draw_unit                  # Show draw unit information
 info obj_class &lv_button_class # Show object class hierarchy
+info obj_class --all            # List all registered object classes
 info subject &my_subject        # Show subject and its observers
+```
+
+### Other Commands
+
+```bash
+lvglobal                        # NuttX (needs nxgdb): find the LVGL instance
+lvglobal --pid 3                # ...of a given process in multi-process mode
+debugger -t vscode              # Attach an IDE debugger to the plugin itself
 ```
 
 ### Dashboard
@@ -88,6 +127,17 @@ A generator that cannot find LVGL stops with an error rather than writing an
 empty table over a good one. Regenerating rewrites every table, so check the
 full diff: a parsing change that looks harmless for one table can quietly empty
 another.
+
+## Rebuilding the single-file bundle
+
+The single-file `lvglgdb.py` is generated from the `lvglgdb/` package and is
+not committed. The release workflow builds it and attaches it to each GitHub
+release. To build it locally (written to `bundle/lvglgdb.py`, or to the path
+given as argument):
+
+```bash
+python3 build_bundle.py [output.py]
+```
 
 ## Tests
 

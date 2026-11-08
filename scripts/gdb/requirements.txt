@@ -1,3 +1,0 @@
-numpy~=2.2.6
-Pillow~=11.3.0
-prettytable~=3.16.0

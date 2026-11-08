@@ -127,7 +127,7 @@ jobs:
           git reset --hard
 
       # ------------------------------------------------------------------
-      # Built-in fonts 
+      # Built-in fonts
       # ------------------------------------------------------------------
       - name: "Generate: built-in fonts"
         id: built-in-fonts
