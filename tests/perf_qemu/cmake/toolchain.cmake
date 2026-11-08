@@ -57,13 +57,10 @@ set(CMAKE_SIZE         ${_prefix}size)
 # fails on a missing inttypes.h.
 set(CMAKE_C_FLAGS_INIT "${_arch} ${_libc} -ffunction-sections -fdata-sections")
 set(CMAKE_ASM_FLAGS_INIT "${_arch} ${_libc}")
-# LVGL's source list has one C++ file, src/debugging/vg_lite_tvg/vg_lite_tvg.cpp. Its body
-# is behind LV_USE_VG_LITE_THORVG and compiles to nothing here, but it still has to find
-# the libc headers, so C++ needs the same flags as C.
 set(CMAKE_CXX_FLAGS_INIT "${_arch} ${_libc} -ffunction-sections -fdata-sections")
 
 # The optimisation level is the benchmark's own, not CMake's, because Release would
-# otherwise be -O3 and the level is one of the things being compared. CI uses -O2.
+# otherwise be -O3 and the level is one of the things being compared. Use -O2 by default.
 if(NOT PERF_QEMU_OPT)
     set(PERF_QEMU_OPT O2)
 endif()
