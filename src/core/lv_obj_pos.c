@@ -1371,8 +1371,18 @@ static lv_result_t obj_invalidate_area_internal(const lv_obj_t * obj, const lv_a
 
 static bool is_transformed(const lv_obj_t * obj)
 {
+    /*A requested transform is only applied when a draw unit renders layers (see
+     *lv_obj_get_layer_type), so the effective type decides. Look the display up once.*/
+    bool checked = false;
+    bool supported = false;
     while(obj) {
-        if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) return true;
+        if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) {
+            if(!checked) {
+                supported = lv_draw_layer_supported(lv_obj_get_display(obj));
+                checked = true;
+            }
+            if(supported) return true;
+        }
         obj = obj->parent;
     }
     return false;
@@ -1649,7 +1659,8 @@ static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_t
      */
     lv_area_increase(area_tmp, 5, 5);
 #else
-    if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) {
+    /*The effective layer type: an omitted transform needs no margin*/
+    if(lv_obj_get_layer_type(obj) == LV_LAYER_TYPE_TRANSFORM) {
         /*Make the area slightly larger to avoid rounding errors.
          *5 is an empirical value*/
         lv_area_increase(area_tmp, 5, 5);

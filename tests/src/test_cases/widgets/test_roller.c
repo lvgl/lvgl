@@ -294,6 +294,11 @@ void test_roller_transformed_click(void)
     lv_obj_set_style_transform_rotation(rotated, 900, 0);
 
     lv_obj_set_parent(roller_mouse, rotated);
+    lv_obj_update_layout(rotated);
+    /* Click in the effective coordinates of the option: the rotated position here, where the
+     * rotation is drawn */
+    lv_point_t click = {365, 260};
+    lv_obj_transform_point(rotated, &click, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
 
     lv_obj_t * click_dot = lv_obj_create(active_screen);
     lv_obj_set_floating(click_dot, true);
@@ -302,11 +307,11 @@ void test_roller_transformed_click(void)
     lv_obj_set_style_border_width(click_dot, 0, 0);
     lv_obj_set_style_radius(click_dot, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(click_dot, lv_color_hex3(0xf00), 0);
-    lv_obj_set_pos(click_dot, 380 - 5, 205 - 5);
+    lv_obj_set_pos(click_dot, click.x - 5, click.y - 5);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_4.png");
 
-    lv_test_mouse_click_at(380, 205);
+    lv_test_mouse_click_at(click.x, click.y);
     TEST_ASSERT_EQUAL_UINT32(1, lv_roller_get_selected(roller_mouse));
 }
 

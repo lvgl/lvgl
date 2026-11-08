@@ -78,6 +78,9 @@ struct _lv_draw_task_t {
      */
     uint8_t preference_score;
 
+    /** Evaluation only: never queued or dispatched, and excluded from draw diagnostics. */
+    bool is_probe;
+
 };
 
 struct _lv_draw_mask_t {
@@ -199,6 +202,10 @@ typedef struct {
  * @param  t      draw task to free
  */
 void lv_draw_cleanup_task(lv_draw_task_t * t);
+
+/** Check immediately before an optional effect creates a layer. A refusal
+ * records a fallback; use lv_draw_layer_supported for a pure capability query. */
+bool lv_draw_layer_check(lv_layer_t * layer);
 
 /**********************
  *      MACROS
