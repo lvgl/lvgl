@@ -27,10 +27,15 @@ All of the below format names are used in code by prefixing them with
 | RGB565_SWAPPED | 16 | Yes | RGB565 big-endian format |
 | RGB888 | 24 | Yes | Standard RGB with 8 bits per color channel |
 | ARGB8888 | 32 | Yes | Standard ARGB with 8 bits per color channel |
+| ARGB4444 | 16 | Yes | Straight alpha and four bits per channel |
 | XRGB8888 | 32 | Yes | Like ARGB but alpha bytes are ignored |
 | ARGB8888_PREMULTIPLIED | 32 | Yes | ARGB8888 with RGB pre-darkened according to alpha channel value |
 | RAW [^2] | ? | n/a | See [Custom Image Formats](/main-modules/images/decoders) |
 | RAW_ALPHA [^2] | ? | n/a | See [Custom Image Formats](/main-modules/images/decoders) |
+
+ARGB4444 stores pixels as `0xARGB` with the low byte first. It uses two bytes per
+pixel. Enable `LV_DRAW_SW_SUPPORT_ARGB4444` along with `LV_DRAW_SW_SUPPORT_ARGB8888`
+to draw these images in software. The command line converter accepts `--cf ARGB4444`.
 
 [^1]: I1, I2, I4 and I8 indexed formats require <ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888" /> to be configured to `1` in your `lv_conf.h` file.  Palette colors are always `ARGB8888`.
 

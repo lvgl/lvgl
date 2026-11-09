@@ -16,6 +16,7 @@ you want explicitly rather than just its size:
 | <ApiLink name="LV_COLOR_FORMAT_RGB888" /> | 3 bytes/pixel | |
 | <ApiLink name="LV_COLOR_FORMAT_XRGB8888" /> | 4 bytes/pixel | Alpha byte present but ignored |
 | <ApiLink name="LV_COLOR_FORMAT_ARGB8888" /> | 4 bytes/pixel | Real alpha channel. See [Transparent Screens](#transparent-screens) |
+| <ApiLink name="LV_COLOR_FORMAT_ARGB4444" /> | 2 bytes/pixel | Four bits per channel, including straight alpha. Software rendering requires `LV_DRAW_SW_SUPPORT_ARGB4444`. |
 | <ApiLink name="LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED" /> | 4 bytes/pixel | Alpha channel, RGB pre-darkened by it. What compositors such as Wayland expect |
 
 The format belongs to the display, not to LVGL as a whole: two displays can render in
