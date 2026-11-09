@@ -38,6 +38,8 @@ struct _lv_timer_t {
     int32_t repeat_count;      /**< 1: One time;  -1 : infinity;  n>0: residual times */
     volatile int paused;
     uint32_t auto_delete : 1;
+    uint32_t deferred : 1;     /**< Skip execution in the cycle in which this timer was created */
+    uint32_t defer_cycle : 1;  /**< Handler cycle to skip while deferred */
 };
 
 typedef struct {
@@ -50,6 +52,7 @@ typedef struct {
     volatile uint32_t timer_time_until_next;
 
     bool already_running;
+    bool handler_cycle;
     uint32_t periodic_last_tick;
     uint32_t busy_time;
     uint32_t idle_period_start;
@@ -72,6 +75,11 @@ void lv_timer_core_init(void);
  * Deinit the lv_timer module
  */
 void lv_timer_core_deinit(void);
+
+/**
+ * Schedule a one-shot timer for the next timer handler invocation.
+ */
+lv_result_t lv_timer_create_deferred(lv_timer_cb_t timer_cb, void * user_data);
 
 /**********************
  *      MACROS
