@@ -1499,6 +1499,9 @@ def main():
 
     args = parser.parse_args()
 
+    if args.cf == "ARGB4444" and args.premultiply:
+        parser.error("ARGB4444 uses straight alpha and cannot be premultiplied")
+
     if path.isfile(args.input):
         files = [args.input]
     elif path.isdir(args.input):

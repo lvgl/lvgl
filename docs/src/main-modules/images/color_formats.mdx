@@ -34,8 +34,9 @@ All of the below format names are used in code by prefixing them with
 | RAW_ALPHA [^2] | ? | n/a | See [Custom Image Formats](/main-modules/images/decoders) |
 
 ARGB4444 stores pixels as `0xARGB` with the low byte first. It uses two bytes per
-pixel. Enable `LV_DRAW_SW_SUPPORT_ARGB4444` along with `LV_DRAW_SW_SUPPORT_ARGB8888`
-to draw these images in software. The command line converter accepts `--cf ARGB4444`.
+pixel. Enable `LV_USE_DRAW_SW`, `LV_DRAW_SW_SUPPORT_ARGB4444`, and
+`LV_DRAW_SW_SUPPORT_ARGB8888` to draw these images in software. The command line
+converter accepts `--cf ARGB4444`; `--premultiply` is not supported for this format.
 
 [^1]: I1, I2, I4 and I8 indexed formats require <ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888" /> to be configured to `1` in your `lv_conf.h` file.  Palette colors are always `ARGB8888`.
 
@@ -75,6 +76,8 @@ The following color formats are supported by certain GPUs and are retained as
 color-format enumeration values that can be used when a GPU is going to be doing the
 drawing.
 
+ARGB4444 also supports software drawing and offline conversion, as described above.
+
 ### Alpha-Only and Special ARGB Formats
 
 | Format | BPP | Supported by offline converter | Description |
@@ -84,7 +87,7 @@ drawing.
 | A4 | 4 | No | Like A8 but 16 alpha values |
 | ARGB2222 | 8 | No | ARGB2222 |
 | ARGB1555 | 16 | No | ARGB1555 |
-| ARGB4444 | 16 | No | ARGB4444 |
+| ARGB4444 | 16 | Yes | ARGB4444; also supported by the software renderer |
 
 ### YUV Planar Formats
 

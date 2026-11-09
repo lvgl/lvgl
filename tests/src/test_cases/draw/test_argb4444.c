@@ -277,13 +277,18 @@ void test_argb4444_transform_recolor_and_colorkey(void)
 void test_argb4444_canvas_pixel_and_draw_layer(void)
 {
 #if LV_DRAW_SW_SUPPORT_ARGB4444 && LV_USE_CANVAS
-    lv_draw_buf_t * buf = make_buffer(LV_COLOR_FORMAT_ARGB4444, PACKED_STRIDE);
+    uint32_t stride = PACKED_STRIDE;
+#if LV_USE_DRAW_VG_LITE
+    /* Canvas tasks can be taken by VG-Lite, which requires its calculated stride. */
+    stride = lv_draw_buf_width_to_stride(WIDTH, LV_COLOR_FORMAT_ARGB4444);
+#endif
+    lv_draw_buf_t * buf = make_buffer(LV_COLOR_FORMAT_ARGB4444, stride);
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_draw_buf(canvas, buf);
     lv_canvas_fill_bg(canvas, lv_color_make(0x12, 0x34, 0x56), 0x89);
     TEST_ASSERT_EQUAL_HEX8(0x35, buf->data[0]);
     TEST_ASSERT_EQUAL_HEX8(0x81, buf->data[1]);
-    TEST_ASSERT_EQUAL_HEX8(PAD_BYTE, buf->data[2 * WIDTH]);
+    if(stride > 2 * WIDTH) TEST_ASSERT_EQUAL_HEX8(PAD_BYTE, buf->data[2 * WIDTH]);
     lv_canvas_set_px(canvas, 2, 1, lv_color_hex(0xa05020), 0xc0);
     lv_color32_t pixel = lv_canvas_get_px(canvas, 2, 1);
     TEST_ASSERT_EQUAL_HEX8(0xcc, pixel.alpha);
@@ -295,7 +300,8 @@ void test_argb4444_canvas_pixel_and_draw_layer(void)
     lv_canvas_init_layer(canvas, &layer);
     lv_draw_rect_dsc_t rect;
     lv_draw_rect_dsc_init(&rect);
-    rect.bg_color = lv_color_hex(0x40f0b0);
+    /* Exactly representable in four bits, independent of renderer quantization. */
+    rect.bg_color = lv_color_hex(0x44ffbb);
     const lv_area_t rect_area = {2, 1, WIDTH - 1, 1};
     lv_draw_rect(&layer, &rect, &rect_area);
     lv_canvas_finish_layer(canvas, &layer);
