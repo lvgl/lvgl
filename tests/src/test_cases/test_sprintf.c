@@ -98,4 +98,52 @@ void test_sprintf_int_precision_without_left_align(void)
     TEST_ASSERT_EQUAL_STRING("abc     ", buf);
 }
 
+/* The '#' (alternate form) of an octal conversion adds a leading zero, but it must
+ * not add a second one once the precision has already made the number start with a
+ * zero. */
+void test_sprintf_octal_alternate_form_with_precision(void)
+{
+    char buf[32];
+
+    lv_snprintf(buf, sizeof(buf), "%#o", 042);
+    TEST_ASSERT_EQUAL_STRING("042", buf);
+
+    lv_snprintf(buf, sizeof(buf), "%#.3o", 042);
+    TEST_ASSERT_EQUAL_STRING("042", buf);
+
+    lv_snprintf(buf, sizeof(buf), "%#.5o", 042);
+    TEST_ASSERT_EQUAL_STRING("00042", buf);
+
+    lv_snprintf(buf, sizeof(buf), "%#8o", 042);
+    TEST_ASSERT_EQUAL_STRING("     042", buf);
+
+    lv_snprintf(buf, sizeof(buf), "%#-8.5o", 042);
+    TEST_ASSERT_EQUAL_STRING("00042   ", buf);
+
+    lv_snprintf(buf, sizeof(buf), "%#.5o", 0);
+    TEST_ASSERT_EQUAL_STRING("00000", buf);
+}
+
+/* The sign and the alternate-form prefix are written after the precision padding, so
+ * room for them must be kept. Otherwise a large precision fills the conversion buffer
+ * and the sign disappears, turning a negative number into a positive looking one. */
+void test_sprintf_precision_larger_than_conversion_buffer(void)
+{
+    char buf[40];
+
+    lv_snprintf(buf, sizeof(buf), "%-20.20d", -42);
+    TEST_ASSERT_EQUAL_STRING("-00000000000000000042", buf);
+
+    lv_snprintf(buf, sizeof(buf), "%-31.31d", -42);
+    TEST_ASSERT_EQUAL_STRING("-0000000000000000000000000000042", buf);
+
+    /* The precision cannot exceed the room left in the conversion buffer, but the '-'
+     * must survive it. */
+    lv_snprintf(buf, sizeof(buf), "%-32.32d", -42);
+    TEST_ASSERT_EQUAL_STRING("-0000000000000000000000000000042", buf);
+
+    lv_snprintf(buf, sizeof(buf), "%#-32.32x", 0x2a);
+    TEST_ASSERT_EQUAL_STRING("0x00000000000000000000000000002a", buf);
+}
+
 #endif
