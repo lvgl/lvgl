@@ -190,13 +190,15 @@ static size_t _out_rev(out_fct_type out, char * buffer, size_t idx, size_t maxle
 static size_t _ntoa_format(out_fct_type out, char * buffer, size_t idx, size_t maxlen, char * buf, size_t len,
                            bool negative, unsigned int base, unsigned int prec, unsigned int width, unsigned int flags)
 {
-    // pad leading zeros
+    // the precision pads with zeros, the '-' (left align) flag does not switch it off
+    while((len < prec) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
+        buf[len++] = '0';
+    }
+
+    // the '0' flag pads with zeros up to the width, but only for right aligned numbers
     if(!(flags & FLAGS_LEFT)) {
         if(width && (flags & FLAGS_ZEROPAD) && (negative || (flags & (FLAGS_PLUS | FLAGS_SPACE)))) {
             width--;
-        }
-        while((len < prec) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
-            buf[len++] = '0';
         }
         while((flags & FLAGS_ZEROPAD) && (len < width) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
             buf[len++] = '0';
