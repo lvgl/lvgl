@@ -55,6 +55,8 @@ void test_display_args_layers_without_default_display(void)
     TEST_ASSERT_NULL(lv_display_get_layer_top(lv_display_get_default()));
     TEST_ASSERT_NULL(lv_display_get_layer_sys(lv_display_get_default()));
     TEST_ASSERT_NULL(lv_display_get_layer_bottom(lv_display_get_default()));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_display_get_screen_count(lv_display_get_default()));
+    TEST_ASSERT_NULL(lv_display_get_screen(lv_display_get_default(), 0));
 }
 
 void test_display_args_activity_without_default_display(void)
