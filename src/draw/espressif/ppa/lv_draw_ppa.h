@@ -44,6 +44,19 @@ void lv_draw_ppa_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
 void lv_draw_ppa_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                      const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
+#if LV_USE_PPA_IMG
+/* real_area is the transformed on-screen bounding box (t->_real_area): scaled
+ * for the SRM path, rotated (axes swapped for 90/270) for the rotate path.
+ * coords is the un-transformed image rectangle (t->area), which the software
+ * fallback needs: it redraws the image itself rather than a transformed block. */
+void lv_draw_ppa_img_srm(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_image_dsc_t * dsc, const lv_area_t * coords,
+                         const lv_area_t * real_area);
+void lv_draw_ppa_img_rotate(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_image_dsc_t * dsc, const lv_area_t * coords,
+                            const lv_area_t * real_area);
+#endif /* LV_USE_PPA_IMG */
+
 /**********************
  *      MACROS
  **********************/
