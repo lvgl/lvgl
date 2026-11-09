@@ -364,9 +364,9 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
 
     lv_draw_unit_draw_task(t->draw_unit, t);
 
-#if !LV_USE_OS
+    /* Keep the task in progress until the GPU has stopped accessing its buffers.
+     * The render thread must also wait before invalidating the destination cache. */
     nema_cl_wait(&(u->cl));
-#endif
 
     /* Invalidate cache */
     lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
