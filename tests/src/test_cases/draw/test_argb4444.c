@@ -377,6 +377,12 @@ void test_argb4444_display_clears_transparent_pixels_before_refresh(void)
 #if LV_DRAW_SW_SUPPORT_ARGB4444 && LV_USE_CANVAS
     lv_display_t * display = lv_display_create(WIDTH, HEIGHT);
     TEST_ASSERT_NOT_NULL(display);
+#if LV_USE_SYSMON && LV_USE_PERF_MONITOR
+    lv_sysmon_hide_performance(display);
+#endif
+#if LV_USE_SYSMON && LV_USE_MEM_MONITOR
+    lv_sysmon_hide_memory(display);
+#endif
     lv_display_set_color_format(display, LV_COLOR_FORMAT_ARGB4444);
     lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
     lv_display_set_flush_cb(display, argb4444_flush);
