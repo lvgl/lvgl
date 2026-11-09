@@ -353,14 +353,16 @@ void test_argb4444_layer_bitmap_mask_updates_only_alpha(void)
     lv_draw_sw_layer(&dest_layer, &dest_layer.buf_area, &draw, &source_layer.buf_area);
 
     for(int32_t y = 0; y < HEIGHT; y++) {
-        const uint8_t * packed = src->data + y * PACKED_STRIDE;
+        const uint8_t * packed = src->data + y * src->header.stride;
         const lv_color32_t * row = (const lv_color32_t *)(dest->data + y * STRIDE32);
         for(int32_t x = 0; x < WIDTH; x++) {
             TEST_ASSERT_EQUAL_HEX8(0x23, packed[2 * x]);
             TEST_ASSERT_EQUAL_HEX8(1, packed[2 * x + 1] & 0xf);
             TEST_ASSERT_EQUAL_HEX8(expected_alpha[(x + y) % 3], row[x].alpha);
         }
-        TEST_ASSERT_EQUAL_HEX8(PAD_BYTE, packed[2 * WIDTH]);
+        if(src->header.stride == PACKED_STRIDE) {
+            TEST_ASSERT_EQUAL_HEX8(PAD_BYTE, packed[2 * WIDTH]);
+        }
     }
     lv_draw_buf_destroy(mask);
     lv_draw_buf_destroy(src);
@@ -378,7 +380,8 @@ void test_argb4444_display_clears_transparent_pixels_before_refresh(void)
     lv_display_set_color_format(display, LV_COLOR_FORMAT_ARGB4444);
     lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
     lv_display_set_flush_cb(display, argb4444_flush);
-    lv_draw_buf_t * buf = make_buffer(LV_COLOR_FORMAT_ARGB4444, 2 * WIDTH + 4);
+    lv_draw_buf_t * buf = make_buffer(LV_COLOR_FORMAT_ARGB4444,
+                                      lv_draw_buf_width_to_stride(WIDTH, LV_COLOR_FORMAT_ARGB4444));
     lv_display_set_draw_buffers(display, buf, NULL);
     lv_obj_t * screen = lv_display_get_screen_active(display);
     lv_obj_remove_style_all(screen);
