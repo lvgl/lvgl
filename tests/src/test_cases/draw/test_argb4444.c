@@ -403,16 +403,31 @@ void test_argb4444_display_clears_transparent_pixels_before_refresh(void)
     lv_obj_set_size(rect, 35, 2);
     lv_obj_set_style_bg_opa(rect, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_color(rect, lv_color_hex(0x11aa77), 0);
+
+    lv_obj_t * layered_rect = lv_obj_create(screen);
+    lv_obj_remove_style_all(layered_rect);
+    lv_obj_set_pos(layered_rect, 0, 2);
+    lv_obj_set_size(layered_rect, 4, 2);
+    lv_obj_set_style_bg_opa(layered_rect, LV_OPA_COVER, 0);
+    /* Black has the same channels in straight and premultiplied output. */
+    lv_obj_set_style_bg_color(layered_rect, lv_color_black(), 0);
+    lv_obj_set_style_opa_layered(layered_rect, 0x9a, 0);
+
     display_flush_count = 0;
     lv_refr_now(display);
 
-    TEST_ASSERT_GREATER_THAN_UINT32(0, display_flush_count);
-    TEST_ASSERT_EQUAL_HEX8(0xa7, buf->data[34 * 2]);
-    TEST_ASSERT_EQUAL_HEX8(0xf1, buf->data[34 * 2 + 1]);
-    TEST_ASSERT_EQUAL_HEX8(0, buf->data[35 * 2]);
-    TEST_ASSERT_EQUAL_HEX8(0, buf->data[35 * 2 + 1]);
+    const uint8_t * layered_pixel = buf->data + 2 * buf->header.stride;
+    const uint8_t actual[] = {
+        buf->data[34 * 2], buf->data[34 * 2 + 1],
+        buf->data[35 * 2], buf->data[35 * 2 + 1],
+        layered_pixel[0], layered_pixel[1]
+    };
     lv_display_delete(display);
     lv_draw_buf_destroy(buf);
+
+    const uint8_t expected[] = {0xa7, 0xf1, 0, 0, 0, 0x90};
+    TEST_ASSERT_GREATER_THAN_UINT32(0, display_flush_count);
+    TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, actual, sizeof(expected));
 #else
     TEST_IGNORE_MESSAGE("ARGB4444 software rendering is disabled");
 #endif

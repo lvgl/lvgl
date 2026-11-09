@@ -457,9 +457,21 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     return 1;
 }
 
+static bool layer_uses_argb4444(const lv_layer_t * layer)
+{
+    for(; layer != NULL; layer = layer->parent) {
+        if(layer->color_format == LV_COLOR_FORMAT_ARGB4444) return true;
+    }
+    return false;
+}
+
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
+
+    /* NanoVG cannot read back packed ARGB4444. Keep its intermediate layers in
+     * software too, so they can be composited into the packed buffer. */
+    if(layer_uses_argb4444(task->target_layer)) return 0;
 
     switch(task->type) {
         case LV_DRAW_DSC_TYPE_FILL:
@@ -526,6 +538,8 @@ static void draw_event_cb(lv_event_t * e)
             lv_nanovg_clean_up(u);
             break;
         case LV_EVENT_CHILD_CREATED: {
+                if(layer_uses_argb4444(layer)) break;
+
                 /* The internal rendering uses RGBA format, which is switched to LVGL BGRA format during readback. */
                 lv_cache_entry_t * entry = lv_nanovg_fbo_cache_get(u, lv_area_get_width(&layer->buf_area),
                                                                    lv_area_get_height(&layer->buf_area), 0, NVG_TEXTURE_RGBA);
@@ -549,7 +563,7 @@ static void draw_event_cb(lv_event_t * e)
             }
             break;
         case LV_EVENT_SCREEN_LOAD_START:
-            on_layer_readback(u, layer);
+            if(!layer_uses_argb4444(layer)) on_layer_readback(u, layer);
             break;
         case LV_EVENT_INVALIDATE_AREA:
             lv_nanovg_image_cache_drop(u, lv_event_get_param(e));
