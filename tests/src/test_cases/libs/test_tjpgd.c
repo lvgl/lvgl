@@ -4,6 +4,12 @@
 
 #include "unity/unity.h"
 
+/* TJpgDec's RGB565 output differs slightly from RGB888, so it has its own reference images */
+#if LV_TJPGD_OUTPUT_RGB565
+    #define REF_IMG_SUFFIX "_rgb565"
+#else
+    #define REF_IMG_SUFFIX ""
+#endif
 
 void setUp(void)
 {
@@ -52,7 +58,7 @@ void test_tjpgd_1(void)
 
     create_images();
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_1" REF_IMG_SUFFIX ".png");
 
     size_t mem_before = lv_test_get_free_mem();
     for(uint32_t i = 0; i < 20; i++) {
@@ -62,7 +68,7 @@ void test_tjpgd_1(void)
         lv_refr_now(NULL);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_1" REF_IMG_SUFFIX ".png");
 
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 32);
 
@@ -86,7 +92,7 @@ void test_jdpgd_align_tile(void)
     lv_libjpeg_turbo_deinit();
 
     create_image_2();
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_3.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_3" REF_IMG_SUFFIX ".png");
     lv_obj_clean(lv_screen_active());
 
     size_t mem_before = lv_test_get_free_mem();
@@ -97,7 +103,7 @@ void test_jdpgd_align_tile(void)
         lv_obj_invalidate(lv_screen_active());
         lv_refr_now(NULL);
     }
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_3.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_3" REF_IMG_SUFFIX ".png");
     lv_obj_clean(lv_screen_active());
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
 

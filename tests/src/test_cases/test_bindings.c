@@ -4,6 +4,13 @@
 
 #include "unity/unity.h"
 
+/* TJpgDec's RGB565 output differs slightly from RGB888, so it has its own reference images */
+#if LV_TJPGD_OUTPUT_RGB565
+    #define REF_IMG_SUFFIX "_rgb565"
+#else
+    #define REF_IMG_SUFFIX ""
+#endif
+
 static void create_ui(lv_subject_t * subject);
 static void chart_type_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void buttonmatrix_event_cb(lv_event_t * e);
@@ -36,7 +43,7 @@ void test_binding(void)
     /*Wait for the animation*/
     lv_test_wait(500);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("binding.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("binding" REF_IMG_SUFFIX ".png");
 }
 
 static void create_ui(lv_subject_t * subject)

@@ -39,16 +39,8 @@ build_only_options = {
         "defconfigs": [PRESET + "empty", "minimal", "depth_16"],
     },
     "OPTIONS_NO_CHECKS": {
-        "description": "Full config with the argument checks, assertions and logging disabled, "
-        "and TJpgDec decoding to RGB565",
-        "defconfigs": [
-            "full",
-            "depth_32",
-            HOST,
-            "builtin_heap",
-            "no_checks",
-            "tjpgd_rgb565",
-        ],
+        "description": "Full config with the argument checks, assertions and logging disabled",
+        "defconfigs": ["full", "depth_32", HOST, "builtin_heap", "no_checks"],
     },
 }
 
@@ -85,7 +77,7 @@ test_options = {
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests"],
     },
     "OPTIONS_TEST_DEFHEAP": {
-        "description": "Test config, LVGL heap, 32 bit color depth",
+        "description": "Test config, LVGL heap, 32 bit color depth, TJpgDec RGB565 output",
         "defconfigs": [
             "full",
             "depth_32",
@@ -93,6 +85,7 @@ test_options = {
             "builtin_heap",
             "defheap",
             "run_tests",
+            "tjpgd_rgb565",
         ],
     },
     "OPTIONS_TEST_PUBLIC_API": {
