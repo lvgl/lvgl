@@ -39,8 +39,16 @@ build_only_options = {
         "defconfigs": [PRESET + "empty", "minimal", "depth_16"],
     },
     "OPTIONS_NO_CHECKS": {
-        "description": "Full config with the argument checks, assertions and logging disabled",
-        "defconfigs": ["full", "depth_32", HOST, "builtin_heap", "no_checks"],
+        "description": "Full config with the argument checks, assertions and logging disabled, "
+        "and TJpgDec decoding to RGB565",
+        "defconfigs": [
+            "full",
+            "depth_32",
+            HOST,
+            "builtin_heap",
+            "no_checks",
+            "tjpgd_rgb565",
+        ],
     },
 }
 
