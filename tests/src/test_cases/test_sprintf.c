@@ -137,13 +137,25 @@ void test_sprintf_precision_larger_than_conversion_buffer(void)
     lv_snprintf(buf, sizeof(buf), "%-31.31d", -42);
     TEST_ASSERT_EQUAL_STRING("-0000000000000000000000000000042", buf);
 
-    /* The precision cannot exceed the room left in the conversion buffer, but the '-'
-     * must survive it. */
+    /* The sign must survive a precision that reaches the end of the conversion
+     * buffer. The number of leading zeros is backend dependent (the C library has no
+     * fixed conversion buffer), so only the sign is required here. */
+    lv_snprintf(buf, sizeof(buf), "%-32.32d", -42);
+    TEST_ASSERT_EQUAL_CHAR('-', buf[0]);
+
+    lv_snprintf(buf, sizeof(buf), "%#-32.32x", 0x2a);
+    TEST_ASSERT_EQUAL_CHAR('0', buf[0]);
+    TEST_ASSERT_EQUAL_CHAR('x', buf[1]);
+
+#if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
+    /* The builtin reserves room for the sign and the prefix, so the digits are bounded
+     * by PRINTF_NTOA_BUFFER_SIZE and the precision cannot exceed it. */
     lv_snprintf(buf, sizeof(buf), "%-32.32d", -42);
     TEST_ASSERT_EQUAL_STRING("-0000000000000000000000000000042", buf);
 
     lv_snprintf(buf, sizeof(buf), "%#-32.32x", 0x2a);
     TEST_ASSERT_EQUAL_STRING("0x00000000000000000000000000002a", buf);
+#endif
 }
 
 #endif
