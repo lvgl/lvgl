@@ -438,6 +438,70 @@ void lv_draw_unit_send_event(const char * name, lv_event_code_t code, void * par
     LV_PROFILER_DRAW_END;
 }
 
+void lv_draw_unit_draw_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
+{
+    LV_ASSERT(draw_unit != NULL);
+    LV_ASSERT(t != NULL);
+
+    const lv_draw_unit_draw_cbs_t * cbs = draw_unit->draw_cbs;
+    LV_ASSERT(cbs != NULL);
+
+    lv_layer_t * layer = t->target_layer;
+    const lv_area_t * clip_area = &t->clip_area;
+    const lv_area_t * coords = &t->area;
+
+    switch(t->type) {
+        case LV_DRAW_DSC_TYPE_NONE:
+            break;
+        case LV_DRAW_DSC_TYPE_FILL:
+            if(cbs->draw_fill_cb) cbs->draw_fill_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_BORDER:
+            if(cbs->draw_border_cb) cbs->draw_border_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
+            if(cbs->draw_box_shadow_cb) cbs->draw_box_shadow_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_LETTER:
+            if(cbs->draw_letter_cb) cbs->draw_letter_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_LABEL:
+            if(cbs->draw_label_cb) cbs->draw_label_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_IMAGE:
+            if(cbs->draw_image_cb) cbs->draw_image_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_LAYER:
+            if(cbs->draw_layer_cb) cbs->draw_layer_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_LINE:
+            if(cbs->draw_line_cb) cbs->draw_line_cb(draw_unit, layer, clip_area, t->draw_dsc);
+            break;
+        case LV_DRAW_DSC_TYPE_ARC:
+            if(cbs->draw_arc_cb) cbs->draw_arc_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
+            if(cbs->draw_triangle_cb) cbs->draw_triangle_cb(draw_unit, layer, clip_area, t->draw_dsc);
+            break;
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
+            if(cbs->draw_mask_rect_cb) cbs->draw_mask_rect_cb(draw_unit, layer, clip_area, t->draw_dsc);
+            break;
+        case LV_DRAW_DSC_TYPE_BLUR:
+            if(cbs->draw_blur_cb) cbs->draw_blur_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+#if LV_USE_VECTOR_GRAPHIC
+        case LV_DRAW_DSC_TYPE_VECTOR:
+            if(cbs->draw_vector_cb) cbs->draw_vector_cb(draw_unit, layer, clip_area, t->draw_dsc);
+            break;
+#endif
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_DSC_TYPE_3D:
+            if(cbs->draw_3d_cb) cbs->draw_3d_cb(draw_unit, layer, clip_area, t->draw_dsc, coords);
+            break;
+#endif
+    }
+}
+
 void lv_layer_init(lv_layer_t * layer)
 {
     LV_CHECK_ARG(layer != NULL, return);

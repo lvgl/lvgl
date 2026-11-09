@@ -84,6 +84,14 @@ static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_sifli_epic_fill,
+    .draw_border_cb = lv_draw_sifli_epic_border,
+    .draw_label_cb = lv_draw_sifli_epic_label,
+    .draw_image_cb = lv_draw_sifli_epic_img,
+    .draw_layer_cb = lv_draw_sifli_epic_layer,
+};
+
 static bool epic_draw_unit_initialized = false;
 #if LV_USE_SIFLI_EPIC_DRAW_THREAD
     static uint32_t epic_dispatch_log_cnt;
@@ -149,6 +157,7 @@ void lv_draw_sifli_epic_init(void)
     draw_epic_unit->base_unit.dispatch_cb = _epic_dispatch;
     draw_epic_unit->base_unit.delete_cb = _epic_delete;
     draw_epic_unit->base_unit.name = "SiFli_EPIC";
+    draw_epic_unit->base_unit.draw_cbs = &draw_cbs;
 #if !LV_USE_SIFLI_EPIC_DRAW_THREAD
     draw_epic_unit->base_unit.wait_for_finish_cb = _epic_wait_for_finish;
 #endif
@@ -457,34 +466,7 @@ static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u)
         }
     }
 
-    /* Execute based on task type */
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_BORDER:
-            lv_draw_sifli_epic_border(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
-                                      &task->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_LABEL:
-            lv_draw_sifli_epic_label(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
-                                     &task->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_sifli_epic_fill(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc, &task->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_sifli_epic_img(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc, &task->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_LAYER:
-            lv_draw_sifli_epic_layer(task->draw_unit, task->target_layer, &task->clip_area, task->draw_dsc,
-                                     &task->area);
-            break;
-
-        default:
-            break;
-    }
+    lv_draw_unit_draw_task(task->draw_unit, task);
 
     /* Wait for operation to complete */
     lv_epic_wait();

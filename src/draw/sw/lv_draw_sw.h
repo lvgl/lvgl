@@ -45,7 +45,7 @@ void lv_draw_sw_deinit(void);
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the rectangle
  */
-void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_fill_dsc_t * dsc,
+void lv_draw_sw_fill(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_fill_dsc_t * dsc,
                      const lv_area_t * coords);
 
 /**
@@ -170,7 +170,7 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
  * @param clip_area     the clip area
  * @param dsc           the draw descriptor
  */
-void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_vector_dsc_t * dsc);
+void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_vector_dsc_t * dsc);
 #endif
 
 /**

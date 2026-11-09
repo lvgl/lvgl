@@ -46,13 +46,11 @@ static void lv_draw_ipa_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t
 void lv_draw_ipa_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
-    LV_UNUSED(draw_unit);
-
     if(!draw_dsc->tile) {
-        lv_draw_image_normal_helper(layer, clip_area, draw_dsc, coords, lv_draw_ipa_image_core, NULL, NULL);
+        lv_draw_image_normal_helper(layer, clip_area, draw_dsc, coords, lv_draw_ipa_image_core, NULL, draw_unit);
     }
     else {
-        lv_draw_image_tiled_helper(layer, clip_area, draw_dsc, coords, lv_draw_ipa_image_core, NULL, NULL);
+        lv_draw_image_tiled_helper(layer, clip_area, draw_dsc, coords, lv_draw_ipa_image_core, NULL, draw_unit);
     }
 }
 
@@ -65,7 +63,6 @@ static void lv_draw_ipa_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t
                                    const lv_area_t * img_coords, const lv_area_t * clipped_img_area,
                                    void * user_data)
 {
-    LV_UNUSED(user_data);
     LV_UNUSED(sup);
     LV_UNUSED(img_coords);
 
@@ -136,7 +133,7 @@ static void lv_draw_ipa_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t
     }
 
     lv_draw_buf_flush_cache(decoded, NULL);
-    lv_draw_ipa_configure_and_start_transfer(&conf);
+    lv_draw_ipa_configure_and_start_transfer(user_data, &conf);
 }
 
 #endif /*LV_USE_DRAW_IPA*/

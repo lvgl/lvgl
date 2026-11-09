@@ -84,6 +84,45 @@ struct _lv_draw_mask_t {
     void * user_data;
 };
 
+/**
+ * The draw callbacks of a draw unit, one per draw descriptor type.
+ * NULL for the types the unit doesn't draw.
+ */
+typedef struct {
+    void (*draw_fill_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+    void (*draw_border_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+    void (*draw_box_shadow_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                               const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
+    void (*draw_letter_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+    void (*draw_label_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+    void (*draw_image_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+    void (*draw_layer_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+    void (*draw_arc_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
+    void (*draw_line_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_line_dsc_t * dsc);
+    void (*draw_triangle_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_triangle_dsc_t * dsc);
+    void (*draw_mask_rect_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                              const lv_draw_mask_rect_dsc_t * dsc);
+    void (*draw_blur_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
+#if LV_USE_VECTOR_GRAPHIC
+    void (*draw_vector_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_vector_dsc_t * dsc);
+#endif
+#if LV_USE_3DTEXTURE
+    void (*draw_3d_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+#endif
+} lv_draw_unit_draw_cbs_t;
+
 struct _lv_draw_unit_t {
     lv_draw_unit_t * next;
 
@@ -92,6 +131,11 @@ struct _lv_draw_unit_t {
      */
     const char * name;
     int32_t idx;
+
+    /**
+     * The draw callbacks of the unit. Usually a `static const` table.
+     */
+    const lv_draw_unit_draw_cbs_t * draw_cbs;
 
     /**
      * Called to try to assign a draw task to itself.
@@ -199,6 +243,14 @@ typedef struct {
  * @param  t      draw task to free
  */
 void lv_draw_cleanup_task(lv_draw_task_t * t);
+
+/**
+ * Draw a task with the matching callback of a draw unit.
+ * Does nothing if the unit has no callback for the task's type.
+ * @param draw_unit     the draw unit drawing the task
+ * @param t             the draw task to draw
+ */
+void lv_draw_unit_draw_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
 
 /**********************
  *      MACROS
