@@ -38,6 +38,8 @@ void test_snprintf_exponent_negative(void)
 {
     check_format("9.913087E-06", "%E", 9.913086719800596e-06);
     check_format("-2.500000e-03", "%e", -0.0025);
+    check_format("1.000000e-279", "%e", 1e-279);
+    check_format("1.0000000e-45", "%.7e", 1e-45);
 }
 
 #endif

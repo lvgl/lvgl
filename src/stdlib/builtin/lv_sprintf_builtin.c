@@ -460,7 +460,10 @@ static size_t _etoa(out_fct_type out, char * buffer, size_t idx, size_t maxlen, 
     // now approximate log10 from the log2 integer part and an expansion of ln around 1.5
     int expval = (int)(0.1760912590558 + exp2 * 0.301029995663981 + (conv.F - 1.5) * 0.289529654602168);
     // now we want to compute 10^expval but we want to be sure it won't overflow
-    exp2 = (int)(expval * 3.321928094887362 + 0.5);
+    // round to nearest for negative exponents too, truncating them leaves z near ln 2 where the
+    // expansion below is only good to about 5e-8, and keep 2^exp2 a normal number
+    exp2 = (int)(expval * 3.321928094887362 + (expval < 0 ? -0.5 : 0.5));
+    if(exp2 < -1022) exp2 = -1022;
     const double z  = expval * 2.302585092994046 - exp2 * 0.6931471805599453;
     const double z2 = z * z;
     conv.U = (uint64_t)(exp2 + 1023) << 52U;
@@ -484,7 +487,7 @@ static size_t _etoa(out_fct_type out, char * buffer, size_t idx, size_t maxlen, 
     // in "%g" mode, "prec" is the number of *significant figures* not decimals
     if(flags & FLAGS_ADAPT_EXP) {
         // do we want to fall-back to "%f" mode?
-        if((value >= 1e-4) && (value < 1e6)) {
+        if((value == 0.0) || ((value >= 1e-4) && (value < 1e6))) {
             if((int)prec > expval) {
                 prec = (unsigned)((int)prec - expval - 1);
             }
