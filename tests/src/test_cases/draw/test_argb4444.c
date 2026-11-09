@@ -433,6 +433,58 @@ void test_argb4444_display_clears_transparent_pixels_before_refresh(void)
 #endif
 }
 
+#if LV_DRAW_SW_SUPPORT_ARGB4444 && LV_USE_CANVAS && LV_USE_DRAW_NANOVG
+static void draw_packed_child(lv_event_t * e)
+{
+    lv_layer_t * parent = lv_event_get_layer(e);
+    const lv_area_t area = {0, 0, 3, 1};
+    lv_layer_t * child = lv_draw_layer_create(parent, LV_COLOR_FORMAT_ARGB4444, &area);
+    if(child == NULL) return;
+
+    lv_draw_rect_dsc_t rect;
+    lv_draw_rect_dsc_init(&rect);
+    rect.bg_color = lv_color_hex(0x11aa77);
+    lv_draw_rect(child, &rect, &area);
+
+    lv_draw_image_dsc_t composite;
+    lv_draw_image_dsc_init(&composite);
+    composite.src = child;
+    lv_draw_layer(parent, &composite, &area);
+}
+#endif
+
+void test_argb4444_child_composites_into_unpacked_display(void)
+{
+#if LV_DRAW_SW_SUPPORT_ARGB4444 && LV_USE_CANVAS && LV_USE_DRAW_NANOVG
+    lv_display_t * display = lv_display_create(WIDTH, HEIGHT);
+    TEST_ASSERT_NOT_NULL(display);
+#if LV_USE_SYSMON && LV_USE_PERF_MONITOR
+    lv_sysmon_hide_performance(display);
+#endif
+#if LV_USE_SYSMON && LV_USE_MEM_MONITOR
+    lv_sysmon_hide_memory(display);
+#endif
+    lv_display_set_color_format(display, LV_COLOR_FORMAT_ARGB8888);
+    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_flush_cb(display, argb4444_flush);
+    lv_draw_buf_t * buf = make_buffer(LV_COLOR_FORMAT_ARGB8888,
+                                      lv_draw_buf_width_to_stride(WIDTH, LV_COLOR_FORMAT_ARGB8888));
+    lv_display_set_draw_buffers(display, buf, NULL);
+    lv_obj_t * screen = lv_display_get_screen_active(display);
+    lv_obj_remove_style_all(screen);
+    lv_obj_add_event_cb(screen, draw_packed_child, LV_EVENT_DRAW_MAIN, NULL);
+    lv_refr_now(display);
+
+    lv_color32_t actual = *(const lv_color32_t *)buf->data;
+    lv_display_delete(display);
+    lv_draw_buf_destroy(buf);
+
+    TEST_ASSERT_EQUAL_HEX16(0xf1a7, lv_color_to_argb4444(actual));
+#else
+    TEST_IGNORE_MESSAGE("NanoVG and ARGB4444 software rendering are required");
+#endif
+}
+
 void test_argb4444_bin_decoder_preserves_packed_pixels(void)
 {
 #if LV_USE_FS_MEMFS

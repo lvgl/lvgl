@@ -473,6 +473,12 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
      * software too, so they can be composited into the packed buffer. */
     if(layer_uses_argb4444(task->target_layer)) return 0;
 
+    if(task->type == LV_DRAW_DSC_TYPE_LAYER) {
+        const lv_draw_image_dsc_t * dsc = task->draw_dsc;
+        /* Software-rendered layers have no NanoVG framebuffer to sample. */
+        if(layer_uses_argb4444(dsc->src)) return 0;
+    }
+
     switch(task->type) {
         case LV_DRAW_DSC_TYPE_FILL:
         case LV_DRAW_DSC_TYPE_BORDER:
