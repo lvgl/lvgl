@@ -100,7 +100,7 @@ void lv_draw_dma2d_init(void)
 #endif
 
     /* enable the DMA2D clock */
-#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4) || defined(STM32H5)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #if defined(STM32F4) || defined(STM32F7)
     RCC->AHB1LPENR |= RCC_AHB1LPENR_DMA2DLPEN;
@@ -133,7 +133,7 @@ void lv_draw_dma2d_deinit(void)
     NVIC_DisableIRQ(DMA2D_IRQn);
 
     /* disable the DMA2D clock */
-#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4) || defined(STM32H5)
     RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA2DEN;
 #if defined(STM32F4) || defined(STM32F7)
     RCC->AHB1LPENR &= ~RCC_AHB1LPENR_DMA2DLPEN;
@@ -184,6 +184,7 @@ lv_draw_dma2d_output_cf_t lv_draw_dma2d_cf_to_dma2d_output_cf(lv_color_format_t 
 
 uint32_t lv_draw_dma2d_color_to_dma2d_color(lv_draw_dma2d_output_cf_t cf, lv_color_t color)
 {
+#if !LV_DRAW_DMA2D_IS_CHROM_ART2
     switch(cf) {
         case LV_DRAW_DMA2D_OUTPUT_CF_ARGB8888:
         case LV_DRAW_DMA2D_OUTPUT_CF_RGB888:
@@ -194,6 +195,9 @@ uint32_t lv_draw_dma2d_color_to_dma2d_color(lv_draw_dma2d_output_cf_t cf, lv_col
             LV_ASSERT_MSG(false, "unsupported output color format");
     }
     return 0;
+#else
+    return lv_color_to_u32(color);
+#endif
 }
 
 void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf)
@@ -273,9 +277,13 @@ void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuratio
     /* ensure the DMA2D register values are observed before the start transfer bit is set */
     __DSB();
 
+#if LV_USE_DRAW_DMA2D_INTERRUPT && LV_DRAW_DMA2D_IS_CHROM_ART2
+    DMA2D->IER |= DMA2D_IER_TCIE;
+#endif
+
     /* start the transfer (also set mode and enable transfer complete interrupt) */
     DMA2D->CR = DMA2D_CR_START | (((uint32_t) conf->mode) << DMA2D_CR_MODE_Pos)
-#if LV_USE_DRAW_DMA2D_INTERRUPT
+#if LV_USE_DRAW_DMA2D_INTERRUPT && !LV_DRAW_DMA2D_IS_CHROM_ART2
                 | DMA2D_CR_TCIE
 #endif
                 ;
