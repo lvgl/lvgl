@@ -59,7 +59,9 @@
 static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width, unsigned * height,
                                const char * file_name);
 static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
-static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out);
+static void write_diff_png_file(const uint8_t * act, uint32_t act_stride, const uint8_t * ref, uint32_t ref_stride,
+                                uint32_t w, uint32_t h, const char * fn_ref_no_ext);
+static void buf_to_rgba8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out);
 static void create_folders_if_needed(const char * path) ;
 
 /**********************
@@ -89,6 +91,11 @@ lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
 
 lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 {
+    return lv_test_screenshot_compare_core_with_tolerance(fn_ref, REF_IMG_TOLERANCE);
+}
+
+lv_test_screenshot_result_t lv_test_screenshot_compare_core_with_tolerance(const char * fn_ref, uint8_t tolerance)
+{
     LV_CHECK_ARG(fn_ref != NULL, return LV_TEST_SCREENSHOT_RESULT_FAILED);
 
     char fn_ref_full[256];
@@ -100,13 +107,13 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(lv_display_get_default());
 
-    uint8_t * screen_buf_xrgb8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);
-    if(!screen_buf_xrgb8888) {
+    uint8_t * screen_buf_rgba8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);
+    if(!screen_buf_rgba8888) {
         LV_LOG_ERROR("Not enough memory to compare display with screenshot");
         return LV_TEST_SCREENSHOT_RESULT_FAILED;
     }
 
-    buf_to_xrgb8888(draw_buf, screen_buf_xrgb8888);
+    buf_to_rgba8888(draw_buf, screen_buf_rgba8888);
 
     lv_draw_buf_t * ref_draw_buf = NULL;
     unsigned ref_img_width = 0;
@@ -117,7 +124,7 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 #if LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
         LV_LOG_WARN("%s%s", fn_ref_full, " was not found, creating it now from the rendered screen");
 
-        if(write_png_file(screen_buf_xrgb8888, draw_buf->header.w, draw_buf->header.h, fn_ref_full)) {
+        if(write_png_file(screen_buf_rgba8888, draw_buf->header.w, draw_buf->header.h, fn_ref_full)) {
             LV_LOG_ERROR("Couldn't write the %s reference image", fn_ref_full);
             comp_res = LV_TEST_SCREENSHOT_RESULT_FAILED;
         }
@@ -127,14 +134,14 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 #else
         comp_res = LV_TEST_SCREENSHOT_RESULT_NO_REFERENCE_IMAGE;
 #endif
-        lv_free(screen_buf_xrgb8888);
+        lv_free(screen_buf_rgba8888);
         if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
         return comp_res;
     }
 
     if(ref_img_width != draw_buf->header.w || ref_img_height != draw_buf->header.h) {
         LV_LOG_WARN("The dimensions of the rendered and the %s reference image don't match", fn_ref);
-        lv_free(screen_buf_xrgb8888);
+        lv_free(screen_buf_rgba8888);
         if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
         return LV_TEST_SCREENSHOT_RESULT_FAILED;
     }
@@ -143,27 +150,31 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
     unsigned x, y;
     bool err = false;
     for(y = 0; y < ref_img_height; y++) {
-        uint8_t * screen_buf_tmp = screen_buf_xrgb8888 + draw_buf->header.w * 4 * y;
+        uint8_t * screen_buf_tmp = screen_buf_rgba8888 + draw_buf->header.w * 4 * y;
         uint8_t * ref_row = (uint8_t *)ref_draw_buf->data + y * ref_draw_buf->header.stride;
         for(x = 0; x < ref_img_width; x++) {
             uint8_t * ptr_ref = &(ref_row[x * 4]);
             uint8_t * ptr_act = &screen_buf_tmp[x * 4];
 
-            if(LV_ABS((int32_t) ptr_act[0] - (int32_t) ptr_ref[0]) > REF_IMG_TOLERANCE ||
-               LV_ABS((int32_t) ptr_act[1] - (int32_t) ptr_ref[1]) > REF_IMG_TOLERANCE ||
-               LV_ABS((int32_t) ptr_act[2] - (int32_t) ptr_ref[2]) > REF_IMG_TOLERANCE) {
+            /* Compared in premultiplied alpha: a pixel counts as much as it is visible */
+            bool differs = LV_ABS((int32_t) ptr_act[3] - (int32_t) ptr_ref[3]) > tolerance;
+            for(uint32_t c = 0; c < 3 && !differs; c++) {
+                int32_t act_premul = LV_UDIV255((uint32_t)ptr_act[c] * ptr_act[3]);
+                int32_t ref_premul = LV_UDIV255((uint32_t)ptr_ref[c] * ptr_ref[3]);
+                differs = LV_ABS(act_premul - ref_premul) > tolerance;
+            }
+            if(differs) {
                 err = true;
 #if LV_USE_LOG
-                uint32_t act_px = (ptr_act[2] << 16) + (ptr_act[1] << 8) + (ptr_act[0] << 0);
-                uint32_t ref_px = 0;
-                memcpy(&ref_px, ptr_ref, 3);
                 LV_LOG("\nScreenshot compare error\n"
                        "  - File: %s\n"
                        "  - At x:%d, y:%d.\n"
-                       "  - Expected: %X\n"
-                       "  - Actual:   %X\n"
+                       "  - Expected: %02X%02X%02X/%02X\n"
+                       "  - Actual:   %02X%02X%02X/%02X\n"
                        "  - Tolerance: %d\n",
-                       fn_ref_full,  x, y, ref_px, act_px, REF_IMG_TOLERANCE);
+                       fn_ref_full,  x, y,
+                       ptr_ref[0], ptr_ref[1], ptr_ref[2], ptr_ref[3],
+                       ptr_act[0], ptr_act[1], ptr_act[2], ptr_act[3], tolerance);
 #endif
                 break;
             }
@@ -179,11 +190,14 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
         char fn_err_full[256];
         lv_snprintf(fn_err_full, sizeof(fn_err_full), "%s%s_err.png", REF_IMGS_PATH, fn_ref_no_ext);
 
-        write_png_file(screen_buf_xrgb8888, draw_buf->header.w, draw_buf->header.h, fn_err_full);
+        write_png_file(screen_buf_rgba8888, draw_buf->header.w, draw_buf->header.h, fn_err_full);
+
+        write_diff_png_file(screen_buf_rgba8888, draw_buf->header.w * 4, ref_draw_buf->data, ref_draw_buf->header.stride,
+                            draw_buf->header.w, draw_buf->header.h, fn_ref_no_ext);
     }
 
     fflush(stdout);
-    lv_free(screen_buf_xrgb8888);
+    lv_free(screen_buf_rgba8888);
     if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
     return err ? LV_TEST_SCREENSHOT_RESULT_FAILED : LV_TEST_SCREENSHOT_RESULT_PASSED;
 
@@ -214,7 +228,41 @@ static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height,
     return error;
 }
 
-static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
+/**
+ * Write <name>_diff.png next to the reference: the absolute difference of the rendered and the
+ * reference image, channel by channel, as an opaque image. A difference in alpha is added to all
+ * three color channels, so where only alpha differs the diff is grey.
+ */
+static void write_diff_png_file(const uint8_t * act, uint32_t act_stride, const uint8_t * ref, uint32_t ref_stride,
+                                uint32_t w, uint32_t h, const char * fn_ref_no_ext)
+{
+    uint8_t * diff = lv_malloc(w * h * 4);
+    if(!diff) {
+        LV_LOG_WARN("Not enough memory for the diff image of %s", fn_ref_no_ext);
+        return;
+    }
+
+    for(uint32_t y = 0; y < h; y++) {
+        const uint8_t * act_row = act + y * act_stride;
+        const uint8_t * ref_row = ref + y * ref_stride;
+        uint8_t * out = diff + y * w * 4;
+        for(uint32_t x = 0; x < w * 4; x += 4) {
+            int32_t da = LV_ABS((int32_t)act_row[x + 3] - (int32_t)ref_row[x + 3]);
+            for(uint32_t c = 0; c < 3; c++) {
+                int32_t d = LV_ABS((int32_t)act_row[x + c] - (int32_t)ref_row[x + c]) + da;
+                out[x + c] = (uint8_t)LV_MIN(d, 255);
+            }
+            out[x + 3] = 0xff;
+        }
+    }
+
+    char fn_diff_full[256];
+    lv_snprintf(fn_diff_full, sizeof(fn_diff_full), "%s%s_diff.png", REF_IMGS_PATH, fn_ref_no_ext);
+    write_png_file(diff, w, h, fn_diff_full);
+    lv_free(diff);
+}
+
+static void buf_to_rgba8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
 {
     LV_ASSERT(draw_buf != NULL);
     LV_ASSERT(buf_out != NULL);
@@ -249,10 +297,20 @@ static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
         for(y = 0; y < draw_buf->header.h; y++) {
             uint32_t x;
             for(x = 0; x < draw_buf->header.w; x++) {
-                buf_out[x * 4 + 3] = buf_in[x * 4 + 3];
-                buf_out[x * 4 + 2] = buf_in[x * 4 + 0];
-                buf_out[x * 4 + 1] = buf_in[x * 4 + 1];
-                buf_out[x * 4 + 0] = buf_in[x * 4 + 2];
+                uint8_t a = cf_in == LV_COLOR_FORMAT_XRGB8888 ? 0xff : buf_in[x * 4 + 3];
+                uint8_t r = buf_in[x * 4 + 2];
+                uint8_t g = buf_in[x * 4 + 1];
+                uint8_t b = buf_in[x * 4 + 0];
+                /* PNG holds straight alpha */
+                if(cf_in == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED && a != 0 && a != 0xff) {
+                    r = (uint8_t)LV_MIN(255, (r * 255 + a / 2) / a);
+                    g = (uint8_t)LV_MIN(255, (g * 255 + a / 2) / a);
+                    b = (uint8_t)LV_MIN(255, (b * 255 + a / 2) / a);
+                }
+                buf_out[x * 4 + 3] = a;
+                buf_out[x * 4 + 2] = b;
+                buf_out[x * 4 + 1] = g;
+                buf_out[x * 4 + 0] = r;
             }
 
             buf_in += stride;
