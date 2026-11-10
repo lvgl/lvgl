@@ -568,7 +568,6 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv
         if(new_buf == NULL) {
             LV_LOG_WARN("Couldn't allocate a %" LV_PRId32 "x%" LV_PRId32 " buffer for vector graphics", width, height);
             lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
-            dsc->task_list = NULL;
             return;
         }
         copy_back = cf == LV_COLOR_FORMAT_ARGB8888 && _reads_destination(dsc->task_list);
