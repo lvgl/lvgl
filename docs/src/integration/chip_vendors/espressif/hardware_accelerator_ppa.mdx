@@ -114,8 +114,8 @@ to the PPA section of the reference manual, this is caused by the DMA2D memory b
 
 ### Rotation
 
-With `CONFIG_LV_USE_PPA=y`, `lv_draw_rotate()` rotates RGB565 data with the PPA. Display
-drivers that rotate the rendered area in their flush callback with `lv_draw_rotate()` use it
+With `CONFIG_LV_USE_PPA=y`, <ApiLink name="lv_draw_rotate" /> rotates RGB565 data with the PPA. Display
+drivers that rotate the rendered area in their flush callback with <ApiLink name="lv_draw_rotate" /> use it
 without any code change. Small areas stay on the CPU, which is faster for them: under 1024
 pixels for 90 and 270 degrees, and under 8192 pixels for 180 degrees. Other color formats and
 any area the PPA cannot handle also fall back to the CPU.
