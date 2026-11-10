@@ -14,10 +14,6 @@
 /*********************
  *      DEFINES
  *********************/
-#if LV_USE_FONT_COMPRESSED
-    #define font_rle LV_GLOBAL_DEFAULT()->font_fmt_rle
-#endif /*LV_USE_FONT_COMPRESSED*/
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -40,10 +36,10 @@ static void glyph_bitmap_release(lv_font_fmt_txt_dsc_t * fdsc);
 
 #if LV_USE_FONT_COMPRESSED
     static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter);
-    static inline void decompress_line(uint8_t * out, int32_t w);
+    static inline void decompress_line(lv_font_fmt_rle_t * rle, uint8_t * out, int32_t w);
     static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
-    static inline void rle_init(const uint8_t * in,  uint8_t bpp);
-    static inline uint8_t rle_next(void);
+    static inline void rle_init(lv_font_fmt_rle_t * rle, const uint8_t * in,  uint8_t bpp);
+    static inline uint8_t rle_next(lv_font_fmt_rle_t * rle);
 #endif /*LV_USE_FONT_COMPRESSED*/
 
 static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const void * src);
@@ -495,7 +491,8 @@ static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, 
             return;
     }
 
-    rle_init(in, bpp);
+    lv_font_fmt_rle_t rle;
+    rle_init(&rle, in, bpp);
 
     uint8_t * line_buf1 = lv_malloc(w);
 
@@ -505,7 +502,7 @@ static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, 
         line_buf2 = lv_malloc(w);
     }
 
-    decompress_line(line_buf1, w);
+    decompress_line(&rle, line_buf1, w);
 
     int32_t y;
     int32_t x;
@@ -518,7 +515,7 @@ static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, 
 
     for(y = 1; y < h; y++) {
         if(prefilter) {
-            decompress_line(line_buf2, w);
+            decompress_line(&rle, line_buf2, w);
 
             for(x = 0; x < w; x++) {
                 line_buf1[x] = line_buf2[x] ^ line_buf1[x];
@@ -526,7 +523,7 @@ static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, 
             }
         }
         else {
-            decompress_line(line_buf1, w);
+            decompress_line(&rle, line_buf1, w);
 
             for(x = 0; x < w; x++) {
                 out[x] = opa_table[line_buf1[x]];
@@ -541,15 +538,16 @@ static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, 
 
 /**
  * Decompress one line. Store one pixel per byte
+ * @param rle the RLE decoder state, owned by the caller
  * @param out output buffer
  * @param w width of the line in pixel count
  */
-static inline void decompress_line(uint8_t * out, int32_t w)
+static inline void decompress_line(lv_font_fmt_rle_t * rle, uint8_t * out, int32_t w)
 {
     LV_ASSERT(out != NULL);
     int32_t i;
     for(i = 0; i < w; i++) {
-        out[i] = rle_next();
+        out[i] = rle_next(rle);
     }
 }
 
@@ -596,10 +594,9 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
     }
 }
 
-static inline void rle_init(const uint8_t * in,  uint8_t bpp)
+static inline void rle_init(lv_font_fmt_rle_t * rle, const uint8_t * in,  uint8_t bpp)
 {
     LV_ASSERT(in != NULL);
-    lv_font_fmt_rle_t * rle = &font_rle;
     rle->in = in;
     rle->bpp = bpp;
     rle->state = RLE_STATE_SINGLE;
@@ -608,11 +605,10 @@ static inline void rle_init(const uint8_t * in,  uint8_t bpp)
     rle->count = 0;
 }
 
-static inline uint8_t rle_next(void)
+static inline uint8_t rle_next(lv_font_fmt_rle_t * rle)
 {
     uint8_t v = 0;
     uint8_t ret = 0;
-    lv_font_fmt_rle_t * rle = &font_rle;
 
     if(rle->state == RLE_STATE_SINGLE) {
         ret = get_bits(rle->in, rle->rdp, rle->bpp);
