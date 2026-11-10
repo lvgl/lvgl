@@ -24,10 +24,8 @@
     #define LV_PPA_ROTATE_180_MIN_PIXELS 8192
 #endif
 
-/**********************
- *  STATIC VARIABLES
- **********************/
-static ppa_client_handle_t rotate_client;
+/*Only RGB565 is supported, 2 bytes per pixel*/
+#define PPA_ROTATE_PX_SIZE 2
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -38,12 +36,12 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
                                lv_color_format_t cf)
 {
     if(cf != LV_COLOR_FORMAT_RGB565) return LV_RESULT_INVALID;
-    if(src_width <= 0 || src_height <= 0) return LV_RESULT_INVALID;
-    const int32_t min_pixels = rotation == LV_ROTATION_180 ? LV_PPA_ROTATE_180_MIN_PIXELS : LV_PPA_ROTATE_MIN_PIXELS;
-    if(src_width * src_height < min_pixels) return LV_RESULT_INVALID;
+    if(src_width <= 0 || src_height <= 0 || src_stride <= 0 || dst_stride <= 0) return LV_RESULT_INVALID;
+    if(src_stride % PPA_ROTATE_PX_SIZE != 0 || dst_stride % PPA_ROTATE_PX_SIZE != 0) return LV_RESULT_INVALID;
 
-    const int32_t px_size = 2;
-    if(src_stride % px_size != 0 || dst_stride % px_size != 0) return LV_RESULT_INVALID;
+    const uint32_t pixels = (uint32_t)src_width * (uint32_t)src_height;
+    const uint32_t min_pixels = rotation == LV_ROTATION_180 ? LV_PPA_ROTATE_180_MIN_PIXELS : LV_PPA_ROTATE_MIN_PIXELS;
+    if(pixels < min_pixels) return LV_RESULT_INVALID;
 
     ppa_srm_rotation_angle_t angle;
     bool swap_xy;
@@ -64,48 +62,47 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
         default:
             return LV_RESULT_INVALID;
     }
-    const int32_t out_w = swap_xy ? src_height : src_width;
-    const int32_t out_h = swap_xy ? src_width : src_height;
+    const uint32_t out_w = (uint32_t)(swap_xy ? src_height : src_width);
+    const uint32_t out_h = (uint32_t)(swap_xy ? src_width : src_height);
 
     /*The output buffer must start and end on a cache line, so describe the block
      *as an offset into the cache line aligned memory around it.*/
     const uintptr_t align = LV_DRAW_PPA_CACHE_LINE_SIZE;
     uint8_t * out_base = (uint8_t *)((uintptr_t)dst & ~(align - 1));
-    const int32_t lead = (int32_t)((uint8_t *)dst - out_base);
-    const int32_t offset_x = (lead % dst_stride) / px_size;
-    const int32_t offset_y = lead / dst_stride;
-    const int32_t out_pic_w = dst_stride / px_size;
-    const int32_t out_pic_h = offset_y + out_h;
+    const uint32_t lead = (uint32_t)((uint8_t *)dst - out_base);
+    const uint32_t out_stride = (uint32_t)dst_stride;
+    const uint32_t offset_x = (lead % out_stride) / PPA_ROTATE_PX_SIZE;
+    const uint32_t offset_y = lead / out_stride;
+    const uint32_t out_pic_w = out_stride / PPA_ROTATE_PX_SIZE;
+    const uint32_t out_pic_h = offset_y + out_h;
     if(offset_x + out_w > out_pic_w) return LV_RESULT_INVALID;
-    const size_t out_size = LV_ALIGN_UP((size_t)dst_stride * out_pic_h, align);
+    const size_t out_size = LV_ALIGN_UP((size_t)out_stride * out_pic_h, align);
 
-    if(rotate_client == NULL) {
-        ppa_client_config_t cfg = {
-            .oper_type = PPA_OPERATION_SRM,
-            .max_pending_trans_num = 1,
-        };
-        if(ppa_register_client(&cfg, &rotate_client) != ESP_OK) {
-            rotate_client = NULL;
-            return LV_RESULT_INVALID;
-        }
-    }
+    /*The PPA cannot rotate in place*/
+    const uint8_t * in_start = src;
+    const uint8_t * in_end = in_start + (size_t)src_stride * (size_t)src_height;
+    if(in_start < out_base + out_size && (const uint8_t *)out_base < in_end) return LV_RESULT_INVALID;
 
-    /*The driver invalidates whole cache lines over the output. Write them back first
-     *so pixels the CPU drew next to the block are not lost.*/
-    esp_cache_msync(out_base, out_size, ESP_CACHE_MSYNC_FLAG_DIR_C2M);
+    ppa_client_handle_t client = lv_draw_ppa_get_srm_client();
+    if(client == NULL) return LV_RESULT_INVALID;
+
+    /*The driver writes back the input and invalidates the output, but it invalidates
+     *whole cache lines. Write those back first so pixels the CPU drew next to the
+     *block are not lost.*/
+    esp_cache_msync(out_base, out_size, ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_TYPE_DATA);
 
     ppa_srm_oper_config_t oper = {
         .in = {
             .buffer = src,
-            .pic_w = src_stride / px_size,
-            .pic_h = src_height,
-            .block_w = src_width,
-            .block_h = src_height,
+            .pic_w = (uint32_t)src_stride / PPA_ROTATE_PX_SIZE,
+            .pic_h = (uint32_t)src_height,
+            .block_w = (uint32_t)src_width,
+            .block_h = (uint32_t)src_height,
             .srm_cm = PPA_SRM_COLOR_MODE_RGB565,
         },
         .out = {
             .buffer = out_base,
-            .buffer_size = out_size,
+            .buffer_size = (uint32_t)out_size,
             .pic_w = out_pic_w,
             .pic_h = out_pic_h,
             .block_offset_x = offset_x,
@@ -118,7 +115,12 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
         .mode = PPA_TRANS_MODE_BLOCKING,
     };
 
-    return ppa_do_scale_rotate_mirror(rotate_client, &oper) == ESP_OK ? LV_RESULT_OK : LV_RESULT_INVALID;
+    esp_err_t ret = ppa_do_scale_rotate_mirror(client, &oper);
+    if(ret != ESP_OK) {
+        LV_LOG_WARN("PPA rotate failed: %d", ret);
+        return LV_RESULT_INVALID;
+    }
+    return LV_RESULT_OK;
 }
 
 #endif /*LV_USE_PPA*/

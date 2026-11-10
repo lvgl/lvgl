@@ -81,6 +81,12 @@ typedef struct lv_draw_ppa_unit {
 * GLOBAL PROTOTYPES
 **********************/
 
+/**
+ * Get the SRM client registered by the PPA draw unit.
+ * @return      the client, or NULL if the draw unit is not initialized
+ */
+ppa_client_handle_t lv_draw_ppa_get_srm_client(void);
+
 /**********************
 *      MACROS
 **********************/
