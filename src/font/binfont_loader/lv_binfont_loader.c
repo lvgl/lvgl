@@ -490,15 +490,11 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
         return -1;
     }
 
-    /*The subtable records have to fit in the section. This also bounds the allocations
-     *made from the count.*/
+    /*The subtable records have to fit in the section. This also bounds both allocations
+     *made from the count: it cannot exceed `UINT16_MAX`, so `count * sizeof(...)` cannot
+     *overflow even where `size_t` is 32 bits.*/
     if(cmaps_subtables_count > cmaps_payload / sizeof(cmap_table_bin_t)) {
         LV_LOG_WARN("Invalid cmap subtable count %" LV_PRIu32 ".", cmaps_subtables_count);
-        return -1;
-    }
-
-    if((size_t)cmaps_subtables_count > (size_t) -1 / sizeof(lv_font_fmt_txt_cmap_t)) {
-        LV_LOG_WARN("Cmap subtable count %" LV_PRIu32 " is too large.", cmaps_subtables_count);
         return -1;
     }
 
@@ -673,10 +669,14 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         return -1;
     }
 
-    if((size_t)loca_count > (size_t) -1 / sizeof(lv_font_fmt_txt_glyph_dsc_t)) {
+    /*The glyph descriptor array is allocated from `loca_count`. Where `size_t` is 32 bits
+     *the multiplication can wrap, so the count is bounded to what the allocator can hold.*/
+#if SIZE_MAX <= UINT32_MAX
+    if(loca_count > (uint32_t)(SIZE_MAX / sizeof(lv_font_fmt_txt_glyph_dsc_t))) {
         LV_LOG_WARN("Glyph count %" LV_PRIu32 " is too large.", loca_count);
         return -1;
     }
+#endif
 
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc = lv_zalloc(loca_count * sizeof(*glyph_dsc));
     LV_ASSERT_MALLOC(glyph_dsc);
@@ -903,10 +903,14 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
         return false;
     }
 
-    if((size_t)loca_count > (size_t) -1 / sizeof(uint32_t)) {
+    /*The glyph offset table is allocated from `loca_count`. Where `size_t` is 32 bits the
+     *multiplication can wrap, so the count is bounded to what the allocator can hold.*/
+#if SIZE_MAX <= UINT32_MAX
+    if(loca_count > (uint32_t)(SIZE_MAX / sizeof(uint32_t))) {
         LV_LOG_WARN("Glyph count %" LV_PRIu32 " is too large.", loca_count);
         return false;
     }
+#endif
 
     uint32_t * glyph_offset_table = lv_malloc(sizeof(uint32_t) * loca_count);
     LV_ASSERT_MALLOC(glyph_offset_table);
