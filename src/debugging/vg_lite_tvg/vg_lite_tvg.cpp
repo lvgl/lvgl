@@ -29,6 +29,8 @@
 
 #define TVG_CANVAS_ENGINE CanvasEngine::Sw
 #define TVG_COLOR(COLOR) B(COLOR), G(COLOR), R(COLOR), A(COLOR)
+/* VG-Lite paints with premultiplied colors, ThorVG with straight ones */
+#define TVG_PAINT_COLOR(COLOR) TVG_COLOR(color_unpremultiply(COLOR))
 #define TVG_IS_VG_FMT_SUPPORT(fmt) ((fmt) == VG_LITE_BGRA8888 || (fmt) == VG_LITE_BGRX8888)
 
 #define TVG_CHECK_RETURN_VG_ERROR(FUNC)                               \
@@ -341,6 +343,17 @@ static Result vg_lite_grad_matrix_conv(vg_lite_matrix_t * result, const vg_lite_
 
 /* color converters */
 
+static vg_lite_color_t color_unpremultiply(vg_lite_color_t color)
+{
+    vg_lite_uint32_t a = A(color);
+    if(a == 0 || a == 0xff) return color;
+
+    vg_lite_uint32_t r = LV_MIN(255, (R(color) * 255 + a / 2) / a);
+    vg_lite_uint32_t g = LV_MIN(255, (G(color) * 255 + a / 2) / a);
+    vg_lite_uint32_t b = LV_MIN(255, (B(color) * 255 + a / 2) / a);
+    return a << 24 | r << 16 | g << 8 | b;
+}
+
 static vg_lite_converter<vg_color16_t, vg_color32_t> conv_bgra8888_to_bgr565(
     [](vg_color16_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
@@ -613,7 +626,7 @@ extern "C" {
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_rect(shape, target, rectangle));
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(BlendMethod::SrcOver));
-        TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_COLOR(color)));
+        TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_PAINT_COLOR(color)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
         return VG_LITE_SUCCESS;
@@ -945,7 +958,7 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(matrix)));
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
-        TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_COLOR(color)));
+        TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_PAINT_COLOR(color)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
         return VG_LITE_SUCCESS;
@@ -2471,7 +2484,7 @@ static Result shape_set_stroke(std::unique_ptr<Shape> & shape, const vg_lite_pat
     TVG_CHECK_RETURN_RESULT(shape->strokeMiterlimit(path->stroke->miter_limit));
     TVG_CHECK_RETURN_RESULT(shape->stroke(stroke_cap_conv(path->stroke->cap_style)));
     TVG_CHECK_RETURN_RESULT(shape->stroke(stroke_join_conv(path->stroke->join_style)));
-    TVG_CHECK_RETURN_RESULT(shape->stroke(TVG_COLOR(path->stroke_color)));
+    TVG_CHECK_RETURN_RESULT(shape->stroke(TVG_PAINT_COLOR(path->stroke_color)));
 
     if(path->stroke->pattern_count) {
         LV_ASSERT_NULL(path->stroke->dash_pattern);
@@ -2883,6 +2896,20 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                 LV_LOG_ERROR("unsupported format: %d", source->format);
                 LV_ASSERT(false);
                 break;
+        }
+
+        /* The converters above multiplied an alpha-only image by the (straight) color's RGB. Like the
+         * GPU, premultiply the product: scale it by the color's alpha as well. */
+        if(source->image_mode == VG_LITE_MULTIPLY_IMAGE_MODE && VG_LITE_IS_ALPHA_FORMAT(source->format) && A(color) != 0xff) {
+            vg_color32_t * dest = (vg_color32_t *)image_buffer;
+            vg_lite_uint32_t px_size = width * height;
+            while(px_size--) {
+                dest->alpha = UDIV255(dest->alpha * A(color));
+                dest->red = UDIV255(dest->red * A(color));
+                dest->green = UDIV255(dest->green * A(color));
+                dest->blue = UDIV255(dest->blue * A(color));
+                dest++;
+            }
         }
 
         /* multiply color */

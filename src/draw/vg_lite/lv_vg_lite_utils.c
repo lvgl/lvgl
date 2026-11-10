@@ -63,6 +63,7 @@ static void lv_vg_lite_get_format_bytes(
  **********************/
 
 static bool g_is_dump_param_enabled = false;
+static bool g_gpu_premultiplies_alpha_images = true;
 
 /**********************
  *      MACROS
@@ -768,7 +769,7 @@ vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_dra
     if(buffer->format == VG_LITE_A4 || buffer->format == VG_LITE_A8) {
         /*Alpha only image ignore recolor opa*/
         buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-        return lv_vg_lite_color(dsc->recolor, dsc->opa, true);
+        return lv_vg_lite_color(dsc->recolor, dsc->opa, !lv_vg_lite_gpu_premultiplies_alpha_images());
     }
     else if(dsc->recolor_opa > LV_OPA_TRANSP) {
         buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
@@ -892,6 +893,21 @@ vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
         color.blue = LV_UDIV255(color.blue * opa);
     }
     return (uint32_t)opa << 24 | (uint32_t)color.blue << 16 | (uint32_t)color.green << 8 | color.red;
+}
+
+void lv_vg_lite_utils_init(void)
+{
+    char name[64];
+    vg_lite_uint32_t chip_id = 0;
+    vg_lite_uint32_t chip_rev = 0;
+    vg_lite_get_product_info(name, &chip_id, &chip_rev);
+    /* The driver disables this premultiplication only on GC255 (`#if (CHIPID==0x255)` in vg_lite_blit()) */
+    g_gpu_premultiplies_alpha_images = chip_id != 0x255;
+}
+
+bool lv_vg_lite_gpu_premultiplies_alpha_images(void)
+{
+    return g_gpu_premultiplies_alpha_images;
 }
 
 vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_mul)

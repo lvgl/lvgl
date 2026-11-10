@@ -21,6 +21,11 @@
 #include "blend/lv_draw_sw_blend_to_rgb565.h"
 #include "blend/lv_draw_sw_blend_to_rgb888.h"
 #include "blend/lv_draw_sw_blend_to_a8.h"
+#include "blend/lv_draw_sw_blend_to_argb8888.h"
+
+#if !LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+    #error "ThorVG renders premultiplied pixels: LV_USE_THORVG needs LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED"
+#endif
 
 /*********************
  *      DEFINES
@@ -413,6 +418,11 @@ static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area
     fill_dsc.src_area  = *src_area;
 
     switch(draw_buf->header.cf) {
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+        case LV_COLOR_FORMAT_ARGB8888:
+            lv_draw_sw_blend_image_to_argb8888(&fill_dsc);
+            break;
+#endif
 #if LV_DRAW_SW_SUPPORT_RGB565
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_RGB565A8:
@@ -504,10 +514,12 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv
     bool allow_buffer = false;
     lv_draw_buf_t * new_buf = NULL;
 
-    if(cf != LV_COLOR_FORMAT_ARGB8888 && \
+    /* ThorVG blends premultiplied pixels: it can draw into a premultiplied or an opaque buffer
+     * directly, anything else gets a premultiplied buffer of its own that is then blended. */
+    if(cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED && \
        cf != LV_COLOR_FORMAT_XRGB8888) {
         allow_buffer = true;
-        new_buf = lv_draw_buf_create(width, height, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+        new_buf = lv_draw_buf_create(width, height, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED, LV_STRIDE_AUTO);
         lv_draw_buf_clear(new_buf, NULL);
         buf = new_buf->data;
         stride = new_buf->header.stride;
