@@ -152,16 +152,12 @@ bool lv_wayland_dmabuf_buffer_is_ready(const lv_wayland_dmabuf_buffer_t * buf)
 }
 
 void lv_wayland_dmabuf_buffer_attach(lv_wayland_dmabuf_ctx_t * ctx, struct wl_surface * surface,
-                                     lv_wayland_dmabuf_buffer_t * buf,
-                                     uint32_t width, uint32_t height)
+                                     lv_wayland_dmabuf_buffer_t * buf)
 {
     LV_ASSERT(buf != NULL);
     LV_ASSERT(surface != NULL);
-    LV_ASSERT(width > 0);
-    LV_ASSERT(height > 0);
     LV_UNUSED(ctx);
     wl_surface_attach(surface, buf->wl_buffer, 0, 0);
-    wl_surface_damage(surface, 0, 0, width, height);
     wl_surface_commit(surface);
     buf->busy = true;
 }
