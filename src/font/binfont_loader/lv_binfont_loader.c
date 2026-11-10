@@ -592,8 +592,10 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         return -1;
     }
 
-    /*The glyph header fields are read into a 32-bit value, so each width has to fit it.
-     *`read_bits()` only skips a wider value, it cannot return it.*/
+    /*The glyph header fields are read into a 32-bit value, so each width has to fit it:
+     *`read_bits()` only skips a wider value, it cannot return it. The glyph descriptor
+     *fields are narrower (for example `box_w` is 8 or 16 bits), so a width that does fit
+     *here can still be truncated when it is stored.*/
     if(header->advance_width_bits > 32 || header->xy_bits > 32 || header->wh_bits > 32) {
         LV_LOG_WARN("Invalid glyph field width.");
         return -1;
