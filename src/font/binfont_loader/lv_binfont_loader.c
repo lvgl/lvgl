@@ -657,6 +657,14 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
             return -1;
         }
 
+        /*A plain bitmap is read as box_w * box_h pixels, so it must fit its stored
+         *data. Compressed bitmaps are bounded by their length at read time instead.*/
+        if(font_dsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN &&
+           ((uint64_t)gdsc->box_w * gdsc->box_h * font_dsc->bpp + 7) / 8 > (uint64_t)bmp_size) {
+            LV_LOG_WARN("Invalid bitmap size of glyph %u", i);
+            return -1;
+        }
+
         if(dynamic_glyph_load) {
             /* store the biggest bmp size so that we can allocate a buffer for it*/
             *max_bmp_size = LV_MAX(*max_bmp_size, (uint32_t)bmp_size);
@@ -677,6 +685,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     }
 
     font_dsc->glyph_bitmap = glyph_bmp;
+    font_dsc->glyph_bitmap_len = (uint32_t)cur_bmp_size;
     font_dsc->are_glyphs_dynamic_loaded = false;
 
     for(unsigned int i = 1; i < loca_count; ++i) {
@@ -750,6 +759,14 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     font_dsc->kern_scale = font_header.kerning_scale;
     font_dsc->bitmap_format = font_header.compression_id;
 
+    /*The plain reader walks `box_w * box_h` pixels at `bpp` bits and asserts on any
+     *other depth, so reject a plain font with an unsupported one while loading.*/
+    if(font_dsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN &&
+       font_dsc->bpp != 1 && font_dsc->bpp != 2 && font_dsc->bpp != 4 && font_dsc->bpp != 8) {
+        LV_LOG_WARN("Unsupported bits per pixel %d of a plain binary font", font_dsc->bpp);
+        return false;
+    }
+
     /*cmaps*/
     uint32_t cmaps_start = header_length;
     int32_t cmaps_length = load_cmaps(fp, font_dsc, cmaps_start);
@@ -811,6 +828,8 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     }
 
     if(dynamic_glyph_load) {
+        /*The scratch buffer holds the largest glyph, which bounds every reader.*/
+        font_dsc->glyph_bitmap_len = max_bmp_size;
         uint32_t glyph_nbits = font_header.advance_width_bits + 2 * font_header.xy_bits + 2 * font_header.wh_bits;
 
         lv_binfont_glyph_loader_t * loader = glyph_loader_create(fp,
