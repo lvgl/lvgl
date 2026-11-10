@@ -32,6 +32,8 @@ void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
 void test_font_loader_truncated(void);
 void test_font_loader_dynamic_from_buffer(void);
+void test_font_loader_rejects_out_of_bounds_subtable(void);
+void test_font_loader_rejects_huge_cmap_subtable_count(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -215,6 +217,35 @@ void test_font_loader_corrupt_kern(void)
 void test_font_loader_truncated(void)
 {
     const char * path = "A:src/test_assets/test_font_truncated.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+/*The subtable data has to stay inside the cmap section. A crafted font can point a
+ *subtable past the end of the section while the read itself stays inside the file, which
+ *used to load silently and expose data from the following table.*/
+void test_font_loader_rejects_out_of_bounds_subtable(void)
+{
+    const char * path = "A:src/test_assets/test_font_cmap_data_oob.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+/*The subtable count is read from the file, so it must not be used as an allocation size
+ *before it is bounded to the section it belongs to.*/
+void test_font_loader_rejects_huge_cmap_subtable_count(void)
+{
+    const char * path = "A:src/test_assets/test_font_count_oob.fnt";
 
     lv_binfont_dsc_t dsc = {
         .path = path,
