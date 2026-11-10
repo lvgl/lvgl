@@ -490,9 +490,17 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
         return -1;
     }
 
-    /*The subtable records have to fit in the section. This also bounds both allocations
-     *made from the count: it cannot exceed `UINT16_MAX`, so `count * sizeof(...)` cannot
-     *overflow even where `size_t` is 32 bits.*/
+    /*Both allocations multiply the count by a `sizeof`, which can wrap where `size_t` is
+     *16 bits, so the count is bounded to what those products can hold.*/
+#if SIZE_MAX <= UINT16_MAX
+    if(cmaps_subtables_count > (uint32_t)(SIZE_MAX / sizeof(lv_font_fmt_txt_cmap_t)) ||
+       cmaps_subtables_count > (uint32_t)(SIZE_MAX / sizeof(cmap_table_bin_t))) {
+        LV_LOG_WARN("Cmap subtable count %" LV_PRIu32 " is too large.", cmaps_subtables_count);
+        return -1;
+    }
+#endif
+
+    /*The subtable records have to fit in the section.*/
     if(cmaps_subtables_count > cmaps_payload / sizeof(cmap_table_bin_t)) {
         LV_LOG_WARN("Invalid cmap subtable count %" LV_PRIu32 ".", cmaps_subtables_count);
         return -1;
