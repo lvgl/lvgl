@@ -396,6 +396,11 @@ void test_slider_rotary_event_handling(void)
     int32_t diff = 1;
     lv_obj_send_event(sliderRangeMode, LV_EVENT_ROTARY, &diff);
     TEST_ASSERT_EQUAL_INT32(21, lv_slider_get_left_value(sliderRangeMode));
+
+    /* The full rotary diff must be applied to the left knob, not just 1 */
+    diff = 5;
+    lv_obj_send_event(sliderRangeMode, LV_EVENT_ROTARY, &diff);
+    TEST_ASSERT_EQUAL_INT32(26, lv_slider_get_left_value(sliderRangeMode));
 }
 
 static void assert_symmetrical_slider_knob_drawn(bool is_hor, int32_t value)
