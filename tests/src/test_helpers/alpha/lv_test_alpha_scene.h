@@ -110,8 +110,9 @@ lv_color32_t lv_test_alpha_expected(lv_test_alpha_widget_id_t widget, lv_test_al
 
 /**
  * Read a pixel from a draw buffer holding the whole screen, interpreted by the
- * buffer's color format: premultiplied only if the format is
- * LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED.
+ * buffer's color format: premultiplied if the format is
+ * LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED or the buffer has
+ * LV_IMAGE_FLAGS_PREMULTIPLIED (VG-Lite sets it on everything it draws into).
  * @param buf           the display's draw buffer after a refresh
  * @param point         where, see lv_test_alpha_scene_sample_point()
  */

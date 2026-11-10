@@ -5039,6 +5039,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_DRAW_SW must be enabled: Kconfig selects it from LV_USE_PPA || LV_USE_SIFLI_EPIC || LV_USE_DRAW_G2D || LV_USE_DRAW_SDL"
 #endif
 
+#if (LV_USE_THORVG && LV_USE_DRAW_SW) && !LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+    #error "LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED must be enabled: Kconfig selects it from LV_USE_THORVG && LV_USE_DRAW_SW"
+#endif
+
 #if LV_USE_DRAW_ARM2D_SYNC && !(LV_USE_DRAW_SW)
     #error "LV_USE_DRAW_ARM2D_SYNC requires LV_USE_DRAW_SW (Kconfig depends on)"
 #endif

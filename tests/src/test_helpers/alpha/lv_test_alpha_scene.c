@@ -184,7 +184,9 @@ lv_test_alpha_pixel_t lv_test_alpha_scene_read(const lv_draw_buf_t * buf, lv_poi
     res.straight.green = px[1];
     res.straight.red = px[2];
     res.straight.alpha = px[3];
-    if(buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED && px[3] != 0) {
+    bool premultiplied = buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED ||
+                         lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    if(premultiplied && px[3] != 0) {
         uint32_t a = px[3];
         res.straight.blue = (uint8_t)LV_MIN(255, (px[0] * 255 + a / 2) / a);
         res.straight.green = (uint8_t)LV_MIN(255, (px[1] * 255 + a / 2) / a);
@@ -199,7 +201,6 @@ lv_test_alpha_pixel_t lv_test_alpha_scene_read(const lv_draw_buf_t * buf, lv_poi
 
 static void vector_draw_event_cb(lv_event_t * e)
 {
-#if LV_USE_VECTOR_GRAPHIC
     const lv_test_alpha_widget_t * c = lv_event_get_user_data(e);
     lv_obj_t * obj = lv_event_get_current_target(e);
     lv_area_t coords;
@@ -214,9 +215,6 @@ static void vector_draw_event_cb(lv_event_t * e)
     lv_draw_vector(dsc);
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(dsc);
-#else
-    LV_UNUSED(e);
-#endif
 }
 
 #endif /*LV_BUILD_TEST*/
