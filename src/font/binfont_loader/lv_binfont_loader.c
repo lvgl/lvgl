@@ -76,8 +76,8 @@ static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp);
 static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_load);
 int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start);
 
-static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
-static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
+static int read_bits_signed(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res);
+static unsigned int read_bits(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res);
 
 static bool read_glyph_bitmap(lv_fs_file_t * fp, uint32_t pos, uint32_t nbits, uint8_t * buf, uint32_t buf_size);
 static const uint8_t * load_glyph_bitmap_cb(lv_font_fmt_txt_glyph_loader_t * loader, uint32_t gid);
@@ -252,10 +252,14 @@ static bool read_exact(lv_fs_file_t * fp, void * buf, uint32_t n)
     return br == n;
 }
 
-static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
+/*Reads `n_bits` bits as an unsigned value. The width comes from the file and can be
+ *larger than the result type; such bits are consumed to keep the stream aligned but are
+ *not shifted into the result.*/
+static unsigned int read_bits(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res)
 {
     LV_ASSERT(it != NULL);
     LV_ASSERT(res != NULL);
+
     unsigned int value = 0;
     while(n_bits--) {
         it->byte_value = it->byte_value << 1;
@@ -269,20 +273,31 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
             }
             *res = LV_FS_RES_OK;
         }
-        int8_t bit = (it->byte_value & 0x80) ? 1 : 0;
 
-        value |= (bit << n_bits);
+        /*A width above 31 cannot fit the result; it is only used to skip a whole glyph
+         *header, so the bits are consumed without being shifted in.*/
+        if(n_bits < 32) {
+            int8_t bit = (it->byte_value & 0x80) ? 1 : 0;
+            value |= ((unsigned int)bit << n_bits);
+        }
     }
     *res = LV_FS_RES_OK;
     return value;
 }
 
-static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
+/*Reads `n_bits` bits and sign extends the result. Only a width that fits in the result
+ *type is sign extended.*/
+static int read_bits_signed(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res)
 {
     LV_ASSERT(it != NULL);
     LV_ASSERT(res != NULL);
+
     unsigned int value = read_bits(it, n_bits, res);
-    if(value & (1 << (n_bits - 1))) {
+    if(*res != LV_FS_RES_OK) {
+        return 0;
+    }
+
+    if(n_bits > 0 && n_bits < 32 && (value & ((unsigned int)1 << (n_bits - 1)))) {
         value |= ~0u << n_bits;
     }
     return value;
@@ -574,6 +589,13 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     if(lv_fs_get_size(fp, &file_size) != LV_FS_RES_OK ||
        (uint64_t)(uint32_t)start + (uint32_t)glyph_length > (uint64_t)file_size) {
         LV_LOG_WARN("Glyph table is outside the file");
+        return -1;
+    }
+
+    /*The glyph header fields are read into a 32-bit value, so each width has to fit it.
+     *`read_bits()` only skips a wider value, it cannot return it.*/
+    if(header->advance_width_bits > 32 || header->xy_bits > 32 || header->wh_bits > 32) {
+        LV_LOG_WARN("Invalid glyph field width.");
         return -1;
     }
 
