@@ -132,10 +132,12 @@ uint32_t lv_os_get_idle_percent(void)
     static uint32_t last_idle_percent;
 
     chSysLock();
-    thread_t * idle = chSysGetIdleThreadX();
+    thread_t * self = chThdGetSelfX();
+    /* The running idle thread is not in the ready queue used by this accessor. */
+    thread_t * idle = chThdGetPriorityX() == IDLEPRIO ? self : chSysGetIdleThreadX();
     const uint32_t now = chSysGetRealtimeCounterX();
     rttime_t total_idle = idle->stats.cumulative;
-    if(chThdGetSelfX() == idle) total_idle += (uint32_t)(now - idle->stats.last);
+    if(self == idle) total_idle += (uint32_t)(now - idle->stats.last);
 
     const uint32_t elapsed = now - previous_time;
     const rttime_t elapsed_idle = total_idle - previous_idle;
