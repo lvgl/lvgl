@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -109,7 +109,7 @@ jobs:
       - name: Check out the base branch
         id: base_src
         if: ${{ !cancelled() && github.event_name == 'pull_request' && hashFiles('baseline/size-results.json') == '' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           path: base-src
