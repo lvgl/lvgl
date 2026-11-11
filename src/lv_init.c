@@ -226,6 +226,10 @@ void lv_init(void)
     lv_draw_sw_init();
 #endif
 
+#if LV_USE_DRAW_DMA2D
+    lv_draw_dma2d_init();
+#endif
+
 #if LV_USE_NEMA_GFX
     lv_draw_nema_gfx_init();
 #endif
@@ -244,10 +248,6 @@ void lv_init(void)
 
 #if LV_USE_DRAW_SDL
     lv_draw_sdl_init();
-#endif
-
-#if LV_USE_DRAW_DMA2D
-    lv_draw_dma2d_init();
 #endif
 
 #if LV_USE_DRAW_OPENGLES
