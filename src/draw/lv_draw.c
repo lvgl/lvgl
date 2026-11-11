@@ -156,57 +156,42 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
      *Sending the draw events might cause recursive event sends and besides
      *dispatching might remove the "main" draw task while it's still being used in the events*/
 
-    if(info->task_running == false) {
-        if(base_dsc->obj && lv_obj_is_send_draw_dsc_events(base_dsc->obj)) {
-            info->task_running = true;
-            send_draw_events(layer, t);
-            info->task_running = false;
-        }
+    bool main_task = info->task_running == false;
+    if(main_task && base_dsc->obj && lv_obj_is_send_draw_dsc_events(base_dsc->obj)) {
+        info->task_running = true;
+        send_draw_events(layer, t);
+        info->task_running = false;
+    }
 
-        /*Let the draw units set their preference score*/
-        t->preference_score = 100;
-        t->preferred_draw_unit_id = 0;
-        lv_draw_unit_t * u = info->unit_head;
-        while(u) {
-            if(u->evaluate_cb) {
-                LV_PROFILER_DRAW_BEGIN_TAG("evaluate_cb");
-                LV_PROFILER_DRAW_BEGIN_TAG(u->name);
-                u->evaluate_cb(u, t);
-                LV_PROFILER_DRAW_END_TAG(u->name);
-                LV_PROFILER_DRAW_END_TAG("evaluate_cb");
-            }
-            u = u->next;
+    /*Let the draw units set their preference score*/
+    t->preference_score = 100;
+    t->preferred_draw_unit_id = 0;
+    lv_draw_unit_t * u = info->unit_head;
+    while(u) {
+        if(u->evaluate_cb) {
+            LV_PROFILER_DRAW_BEGIN_TAG("evaluate_cb");
+            LV_PROFILER_DRAW_BEGIN_TAG(u->name);
+            u->evaluate_cb(u, t);
+            LV_PROFILER_DRAW_END_TAG(u->name);
+            LV_PROFILER_DRAW_END_TAG("evaluate_cb");
         }
-        if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
-            LV_LOG_WARN("Draw task failed (%p, type %d): not taken by any unit", (void *)t, t->type);
-            /* mark a non-taken layer task as BLOCKED so we don't try to release it
-            * as one of its draw tasks might be in progress already */
-            if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
-                t->state = LV_DRAW_TASK_STATE_BLOCKED;
-            }
-            else {
-                /* Other tasks won't have anything depending on them so we can just mark them as FAILED*/
-                t->state = LV_DRAW_TASK_STATE_FAILED;
-            }
-        }
-        lv_draw_dispatch();
+        u = u->next;
     }
-    else {
-        /*Let the draw units set their preference score*/
-        t->preference_score = 100;
-        t->preferred_draw_unit_id = 0;
-        lv_draw_unit_t * u = info->unit_head;
-        while(u) {
-            if(u->evaluate_cb) {
-                LV_PROFILER_DRAW_BEGIN_TAG("evaluate_cb");
-                LV_PROFILER_DRAW_BEGIN_TAG(u->name);
-                u->evaluate_cb(u, t);
-                LV_PROFILER_DRAW_END_TAG(u->name);
-                LV_PROFILER_DRAW_END_TAG("evaluate_cb");
-            }
-            u = u->next;
+
+    if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
+        LV_LOG_WARN("Draw task failed (%p, type %d): not taken by any unit", (void *)t, t->type);
+        /* mark a non-taken layer task as BLOCKED so we don't try to release it
+        * as one of its draw tasks might be in progress already */
+        if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
+            t->state = LV_DRAW_TASK_STATE_BLOCKED;
+        }
+        else {
+            /* Other tasks won't have anything depending on them so we can just mark them as FAILED*/
+            t->state = LV_DRAW_TASK_STATE_FAILED;
         }
     }
+
+    if(main_task) lv_draw_dispatch();
     LV_PROFILER_DRAW_END;
 }
 
