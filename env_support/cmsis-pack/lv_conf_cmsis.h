@@ -478,11 +478,15 @@
 #define LV_USE_NEMA_VG 0
 
 /** Canvas width NemaVG is initialized for. With the vertical resolution it also
- *  sizes the NemaGFX memory pool on STM32 (RESX * RESY + 10KB).
+ *  sizes the NemaGFX memory pool on STM32 when LV_USE_NEMA_VG is enabled
+ *  (RESX * RESY + 10KB).
  */
 #define LV_NEMA_GFX_MAX_RESX 800
 
-/** Canvas height NemaVG is initialized for. */
+/** Canvas height NemaVG is initialized for. With the horizontal resolution it also
+ *  sizes the NemaGFX memory pool on STM32 when LV_USE_NEMA_VG is enabled
+ *  (RESX * RESY + 10KB).
+ */
 #define LV_NEMA_GFX_MAX_RESY 600
 
 #endif /*LV_USE_NEMA_GFX*/
