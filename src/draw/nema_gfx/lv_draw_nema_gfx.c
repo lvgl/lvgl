@@ -179,7 +179,7 @@ static int32_t nema_gfx_wait_for_finish(lv_draw_unit_t * draw_unit)
 
 static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
+    LV_UNUSED(draw_unit);
 
     switch(task->type) {
         case LV_DRAW_DSC_TYPE_LAYER: {
@@ -293,7 +293,6 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
         default:
             break;
     }
-    nema_cl_wait(&(draw_nema_gfx_unit->cl));
     return 0;
 }
 
