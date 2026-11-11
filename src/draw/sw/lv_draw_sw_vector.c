@@ -44,7 +44,6 @@ typedef struct {
 
 typedef struct {
     Tvg_Canvas * canvas;
-    int32_t partial_y_offset;
     int32_t translate_x;
     int32_t translate_y;
     lv_opa_t opa;
@@ -510,9 +509,10 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
 
     _tvg_rect rc;
     lv_area_to_tvg(&rc, &t->clip_area);
-    tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)(rc.y - layer->partial_y_offset), (int32_t)rc.w, (int32_t)rc.h);
+    tvg_canvas_set_viewport(canvas, (int32_t)(rc.x - layer->buf_area.x1), (int32_t)(rc.y - layer->buf_area.y1),
+                            (int32_t)rc.w, (int32_t)rc.h);
 
-    _tvg_draw_state state = {canvas, layer->partial_y_offset, -layer->buf_area.x1, -layer->buf_area.y1, t->opa};
+    _tvg_draw_state state = {canvas, -layer->buf_area.x1, -layer->buf_area.y1, t->opa};
 
     lv_ll_t * task_list = dsc->task_list;
     lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, &state);
