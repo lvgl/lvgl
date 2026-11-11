@@ -785,9 +785,10 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, void * buf, uint32_t
         uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
         uint32_t buffer_offset = (end - start) - buffer_remaining_length + 1;
 
-        /* Do not allow reading beyond the actual memory block for memory-mapped files */
+        /* Do not allow reading beyond the actual memory block for memory-mapped files.
+         * For them `end` is the buffer size, so only `buffer_remaining_length - 1` bytes are valid*/
         if(file_p->drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
-            if(btr > buffer_remaining_length)
+            if(btr >= buffer_remaining_length)
                 btr = buffer_remaining_length - 1;
         }
 
