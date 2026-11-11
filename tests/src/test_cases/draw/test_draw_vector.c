@@ -332,6 +332,9 @@ static void canvas_draw(const char * name, draw_cb_t draw_cb)
 /* Fill a 20x20 square with `blend` on a straight ARGB8888 canvas filled with `bg`/`bg_opa`. */
 static lv_obj_t * draw_blended_square(lv_color_t bg, lv_opa_t bg_opa, lv_color_t color, lv_vector_blend_t blend)
 {
+#if LV_USE_DRAW_NANOVG
+    TEST_IGNORE_MESSAGE("NanoVG's headless readback leaves the canvas buffer zeroed");
+#endif
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(40, 40, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(draw_buf);
