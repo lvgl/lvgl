@@ -706,4 +706,40 @@ void test_fs_get_letters(void)
     TEST_ASSERT_EQUAL_STRING("TMBA", buf);
 }
 
+void test_fs_memfs_read_past_end(void)
+{
+    /* Exact-size heap buffer so ASan catches any over-read */
+    uint8_t * data = lv_malloc(10);
+    lv_memcpy(data, "0123456789", 10);
+
+    lv_fs_path_ex_t path;
+    lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, data, 10, NULL);
+
+    lv_fs_file_t f;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, (const char *)&path, LV_FS_MODE_RD));
+
+    /* Request one byte more than is left: only the 4 remaining bytes are returned */
+    char buf[16];
+    uint32_t br = 0;
+    lv_fs_seek(&f, 6, LV_FS_SEEK_SET);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(&f, buf, 5, &br));
+    TEST_ASSERT_EQUAL_UINT32(4, br);
+    TEST_ASSERT_EQUAL_MEMORY("6789", buf, 4);
+
+    /* Reading at the end returns nothing */
+    br = 1;
+    lv_fs_seek(&f, 10, LV_FS_SEEK_SET);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(&f, buf, 1, &br));
+    TEST_ASSERT_EQUAL_UINT32(0, br);
+
+    /* The whole buffer can still be read */
+    lv_fs_seek(&f, 0, LV_FS_SEEK_SET);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(&f, buf, sizeof(buf), &br));
+    TEST_ASSERT_EQUAL_UINT32(10, br);
+    TEST_ASSERT_EQUAL_MEMORY("0123456789", buf, 10);
+
+    lv_fs_close(&f);
+    lv_free(data);
+}
+
 #endif
