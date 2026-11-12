@@ -251,8 +251,11 @@ int32_t lv_display_get_dpi(const lv_display_t * disp);
 
 /**
  * Set the buffers for a display, similarly to `lv_display_set_draw_buffers`, but accept the raw buffer pointers.
- * For DIRECT/FULL rending modes, the buffer size must be at least
- * `hor_res * ver_res * lv_color_format_get_size(lv_display_get_color_format(disp))`
+ * For DIRECT/FULL rendering modes, the buffer size must be at least
+ * `hor_res * ver_res * lv_color_format_get_size(lv_display_get_color_format(disp))`.
+ * Buffer addresses must satisfy `LV_DRAW_BUF_ALIGN` and any additional requirements
+ * of the active draw units and display driver. This function uses caller-owned buffers
+ * as supplied; it does not align the addresses or pad their sizes.
  * @param disp              pointer to a display
  * @param buf1              first buffer
  * @param buf2              second buffer @nullable
