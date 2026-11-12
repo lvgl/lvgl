@@ -72,7 +72,9 @@ class Emitter:
             if term.choice is not None and term.choice.name:
                 return f"{term.choice.name} == {term.name}"
             return term.name
-        return term_key(term)
+        # A compound condition (e.g. `if A || B`) may name enum choice members
+        # too, which are only valid C once rewritten to `<macro> == <token>`.
+        return rev_dep_c_expr(term, self.guard) or term_key(term)
 
     def _sync_conditions(self, wanted: list, base_keys: set[str]):
         def is_visible(sym):

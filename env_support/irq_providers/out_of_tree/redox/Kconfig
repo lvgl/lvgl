@@ -1,0 +1,27 @@
+# Redox IRQ provider: Redox delivers interrupts to userspace through its irq
+# scheme, so the provider waits for each one in a thread.
+
+config LV_IRQ_PROVIDER_REDOX
+	int
+	default 128
+
+choice LV_IRQ_DEFAULT_PROVIDER
+	config LV_IRQ_DEFAULT_PROVIDER_REDOX
+		bool "Redox (irq scheme)"
+		depends on RUST_IS_AWESOME
+endchoice
+
+choice LV_IRQ_DMA2D_PROVIDER_CHOICE
+	config LV_IRQ_DMA2D_PROVIDER_REDOX
+		bool "Redox (irq scheme)"
+		depends on RUST_IS_AWESOME
+endchoice
+
+config LV_IRQ_DMA2D_PROVIDER
+	int
+	default LV_IRQ_PROVIDER_REDOX if LV_IRQ_DMA2D_PROVIDER_REDOX || (LV_IRQ_DMA2D_PROVIDER_DEFAULT && LV_IRQ_DEFAULT_PROVIDER_REDOX)
+
+config LV_IRQ_REDOX_DMA2D_IRQ
+	int "Redox provider: DMA2D IRQ number"
+	default -1
+	depends on LV_IRQ_DMA2D_PROVIDER = LV_IRQ_PROVIDER_REDOX

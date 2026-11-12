@@ -1,0 +1,5 @@
+# Demo: sourced at the very top of LVGL's Kconfig tree when LV_IRQ_PROVIDERS_DIR
+# points at this directory. The Redox provider depends on it.
+
+config RUST_IS_AWESOME
+	bool "Rust is awesome"

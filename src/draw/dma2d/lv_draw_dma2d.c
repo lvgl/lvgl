@@ -36,7 +36,7 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit);
 #endif
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 #if LV_DRAW_DMA2D_ASYNC
-    static void dma2d_irq_cb(void * user_data);
+    static void dma2d_irq_cb(void * arg);
 #endif
 #if LV_DRAW_DMA2D_CACHE
     static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
@@ -116,8 +116,7 @@ void lv_draw_dma2d_init(void)
     DMA2D->AMTCR = 0;
 
 #if LV_DRAW_DMA2D_ASYNC
-    /* register the transfer-complete interrupt through the IRQ abstraction layer */
-    lv_irq_attach_dma2d(dma2d_irq_cb);
+    lv_irq_attach_dma2d(dma2d_irq_cb, NULL);
 #endif
 }
 
@@ -340,10 +339,10 @@ static void flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
  *   STATIC FUNCTIONS
  **********************/
 #if LV_DRAW_DMA2D_ASYNC
-/* Called by the IRQ abstraction layer (src/irqal) when the DMA2D interrupt fires */
-static void dma2d_irq_cb(void * user_data)
+/* Called by the DMA2D IRQ provider when the transfer-complete interrupt fires */
+static void dma2d_irq_cb(void * arg)
 {
-    LV_UNUSED(user_data); /* DMA2D transfer-complete carries no payload */
+    LV_UNUSED(arg);
 
     /* Clear Transfer Complete flag */
     DMA2D->IFCR = DMA2D_IFCR_CTCIF;

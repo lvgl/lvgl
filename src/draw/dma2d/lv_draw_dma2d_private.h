@@ -19,14 +19,13 @@ extern "C" {
 
 #include "../lv_draw_private.h"
 #include "../sw/lv_draw_sw.h"
-#include "../../irqal/lv_irq_private.h"
 #include LV_DRAW_DMA2D_HAL_INCLUDE
 
 /*********************
  *      DEFINES
  *********************/
 
-#if LV_USE_OS && LV_IRQ_HAS_DMA2D
+#if LV_USE_DRAW_DMA2D_INTERRUPT
 #define LV_DRAW_DMA2D_ASYNC 1
 #else
 #define LV_DRAW_DMA2D_ASYNC 0

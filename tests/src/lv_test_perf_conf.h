@@ -320,9 +320,7 @@
         #if LV_USE_DRAW_DMA2D
             #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
-            /* if enabled, the user is required to call `lv_draw_dma2d_transfer_complete_interrupt_handler`
-            * upon receiving the DMA2D global interrupt
-            */
+            /* Needs an OS and an IRQ provider picked for DMA2D (LV_IRQ_DMA2D_PROVIDER) */
             #define LV_USE_DRAW_DMA2D_INTERRUPT 0
         #endif
 

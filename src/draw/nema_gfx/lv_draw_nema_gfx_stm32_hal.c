@@ -23,6 +23,10 @@
 
 #include LV_NEMA_STM32_HAL_INCLUDE
 
+#if !LV_IRQ_PROVIDES_NEMA_GPU2D
+    #error "NemaGFX with the STM32 HAL needs an IRQ provider picked for the GPU2D completion (LV_IRQ_NEMA_GPU2D_PROVIDER)"
+#endif
+
 extern GPU2D_HandleTypeDef hgpu2d;
 
 /*********************
@@ -49,7 +53,7 @@ extern GPU2D_HandleTypeDef hgpu2d;
  *  STATIC PROTOTYPES
  **********************/
 
-static void nema_gpu2d_completion_cb(void * user_data);
+static void nema_gpu2d_completion_cb(void * arg);
 
 /**********************
  *  STATIC VARIABLES
@@ -74,11 +78,10 @@ static lv_thread_sync_t sync;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/* NemaGFX-side completion handler passed to lv_irq_attach_nema_gpu2d(): records
- * which command list finished (from the forwarded pointer) and wakes waiters. */
-static void nema_gpu2d_completion_cb(void * user_data)
+static void nema_gpu2d_completion_cb(void * arg)
 {
-    last_cl_id = *(uint32_t *)user_data;
+    const lv_irq_nema_gpu2d_event_t * event = arg;
+    last_cl_id = event->cmd_list_id;
     lv_thread_sync_signal_isr(&sync);
 }
 
@@ -88,8 +91,7 @@ int32_t nema_sys_init(void)
 
     lv_thread_sync_init(&sync);
 
-    /* Route the GPU2D completion interrupt through the IRQ abstraction layer */
-    lv_irq_attach_nema_gpu2d(nema_gpu2d_completion_cb);
+    lv_irq_attach_nema_gpu2d(nema_gpu2d_completion_cb, NULL);
 
     /* Initialise Mem Space */
     error_code = tsi_malloc_init_pool_aligned(0, (void *)nemagfx_pool_mem, (uintptr_t)nemagfx_pool_mem,

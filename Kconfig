@@ -1,5 +1,7 @@
 # Generated file. DO NOT EDIT!
 
+osource "$(LV_IRQ_PROVIDERS_DIR)/Kconfig.top"
+
 menu "LVGL"
 menu "Memory and Standard Library"
 
@@ -246,78 +248,109 @@ config LV_OS_IDLE_PERCENT_CUSTOM
 endmenu
 endif #LV_OS_FREERTOS
 endmenu
-menu "Interrupt Handling (IRQ)"
-choice LV_USE_IRQ
-	prompt "IRQ abstraction backend to use"
-	default LV_IRQ_NONE
+menu "IRQ providers"
+	# Each completion source a draw unit can wait on has a choice of the IRQ
+	# provider that serves it, and an int LV_IRQ_<SOURCE>_PROVIDER with the
+	# picked provider's ID, which is what C reads. A provider defines its ID
+	# (LV_IRQ_PROVIDER_<NAME>: 1-127 in LVGL, 128-255 outside), adds itself to
+	# "Default IRQ provider" and to the choices of the sources it serves, and adds
+	# "default <its ID> if <picked directly, or via Default provider>" to their ints.
+	# The choices are Kconfig-only: lv_conf.h sets the ints directly.
 
-	config LV_IRQ_NONE
-		bool "NONE"
-	config LV_IRQ_CMSIS
-		bool "CMSIS"
-	config LV_IRQ_ZEPHYR
-		bool "ZEPHYR"
-	config LV_IRQ_CUSTOM
-		bool "CUSTOM"
-		select LV_IRQ_USE_CUSTOM_INCLUDE
-endchoice
+	config LV_IRQ_PROVIDER_NONE
+		int
+		default 0
 
-config LV_USE_IRQ
-	int
-	default 0 if LV_IRQ_NONE
-	default 1 if LV_IRQ_CMSIS
-	default 2 if LV_IRQ_ZEPHYR
-	default 255 if LV_IRQ_CUSTOM
+	choice LV_IRQ_DEFAULT_PROVIDER
+		prompt "Default IRQ provider"
+		help
+			Serves every interrupt whose provider is left on "Default provider" and
+			that it can serve.
 
-config LV_IRQ_USE_CUSTOM_INCLUDE
-	bool
+		config LV_IRQ_DEFAULT_PROVIDER_NONE
+			bool "None"
+	endchoice
 
-config LV_IRQ_CUSTOM_INCLUDE
-	string "Custom IRQ backend header"
-	default ""
-	depends on LV_IRQ_CUSTOM
-	help
-		Header of your own IRQ backend. It defines LV_IRQ_HAS_<PERIPH> to 1 for
-		each source it provides; your build links the matching
-		lv_irq_attach_<periph>() and lv_irq_detach_<periph>().
+	# Defined here first so that its help is the one documented; providers add
+	# their defaults below, and the fallback is the last one.
+	config LV_IRQ_DMA2D_PROVIDER
+		int
+		help
+			ID of the IRQ provider serving the DMA2D interrupt: one of LV_IRQ_PROVIDER_*,
+			e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
 
-if LV_IRQ_CMSIS
-config LV_IRQ_USE_CMSIS_INCLUDE
-	bool "Include a CMSIS/vendor device header to discover IRQ numbers"
-	default n
-	help
-		Enable to pull in a vendor/CMSIS device header (e.g. stm32h7xx.h) that
-		provides the IRQn_Type enumerators (PXP_IRQn, DMA2D_IRQn, ...) and the
-		NVIC_* helpers. Peripheral IRQ support is auto-detected from the symbols
-		this header defines.
+	choice LV_IRQ_DMA2D_PROVIDER_CHOICE
+		prompt "DMA2D interrupt provided by"
 
-config LV_IRQ_CMSIS_INCLUDE
-	string "CMSIS/vendor device header"
-	default ""
-	depends on LV_IRQ_USE_CMSIS_INCLUDE
+		config LV_IRQ_DMA2D_PROVIDER_DEFAULT
+			bool "Default provider"
+			help
+				The "Default IRQ provider", if it can serve the DMA2D interrupt; none otherwise.
 
-config LV_IRQ_CMSIS_SET_PRIORITY
-	bool "Set the NVIC priority of irqal-managed interrupts"
-	default n
-	help
-		Enable on RTOS builds (e.g. FreeRTOS, or CMSIS-RTOS2 over an RTOS) where
-		the interrupt priority must sit at or below the kernel's syscall interrupt
-		priority ceiling, so the ISR may safely call the kernel's ...FromISR APIs
-		(lv_thread_sync_signal_isr uses one). Leave disabled on bare-metal, where
-		the reset-default priority is fine.
+		config LV_IRQ_DMA2D_PROVIDER_NONE
+			bool "None"
+	endchoice
 
-config LV_IRQ_CMSIS_PRIORITY
-	int "NVIC priority value for irqal-managed interrupts"
-	default 255
-	depends on LV_IRQ_CMSIS_SET_PRIORITY
-	help
-		The value passed to NVIC_SetPriority. Defaults to 255, which NVIC_SetPriority
-		maps to the lowest preemption priority regardless of the implemented priority
-		bits (__NVIC_PRIO_BITS) - always safe to call ...FromISR from, at the cost of
-		latency. For best latency under FreeRTOS set it to
-		configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h may
-		define this symbolically; a Kconfig build takes a literal number).
-endif #LV_IRQ_CMSIS
+	# Defined here first so that its help is the one documented; providers add
+	# their defaults below, and the fallback is the last one.
+	config LV_IRQ_PXP_PROVIDER
+		int
+		help
+			ID of the IRQ provider serving the PXP interrupt: one of LV_IRQ_PROVIDER_*,
+			e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
+
+	choice LV_IRQ_PXP_PROVIDER_CHOICE
+		prompt "PXP interrupt provided by"
+
+		config LV_IRQ_PXP_PROVIDER_DEFAULT
+			bool "Default provider"
+			help
+				The "Default IRQ provider", if it can serve the PXP interrupt; none otherwise.
+
+		config LV_IRQ_PXP_PROVIDER_NONE
+			bool "None"
+	endchoice
+
+	# Defined here first so that its help is the one documented; providers add
+	# their defaults below, and the fallback is the last one.
+	config LV_IRQ_NEMA_GPU2D_PROVIDER
+		int
+		help
+			ID of the IRQ provider serving the NemaGFX GPU2D completion: one of LV_IRQ_PROVIDER_*,
+			e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
+
+	choice LV_IRQ_NEMA_GPU2D_PROVIDER_CHOICE
+		prompt "NemaGFX GPU2D completion provided by"
+
+		config LV_IRQ_NEMA_GPU2D_PROVIDER_DEFAULT
+			bool "Default provider"
+			help
+				The "Default IRQ provider", if it can serve the NemaGFX GPU2D completion; none otherwise.
+
+		config LV_IRQ_NEMA_GPU2D_PROVIDER_NONE
+			bool "None"
+	endchoice
+
+	# The paths are relative to LVGL's root Kconfig, into which this file is inlined.
+	orsource "env_support/irq_providers/cmsis/Kconfig"
+	orsource "env_support/irq_providers/zephyr/Kconfig"
+	orsource "env_support/irq_providers/nema_stm32/Kconfig"
+
+	# Providers outside LVGL: point LV_IRQ_PROVIDERS_DIR at a directory whose
+	# Kconfig.irq_providers sources them.
+	osource "$(LV_IRQ_PROVIDERS_DIR)/Kconfig.irq_providers"
+
+	config LV_IRQ_DMA2D_PROVIDER
+		int
+		default LV_IRQ_PROVIDER_NONE
+
+	config LV_IRQ_PXP_PROVIDER
+		int
+		default LV_IRQ_PROVIDER_NONE
+
+	config LV_IRQ_NEMA_GPU2D_PROVIDER
+		int
+		default LV_IRQ_PROVIDER_NONE
 endmenu
 menu "Rendering Configuration"
 
@@ -1057,6 +1090,14 @@ config LV_DRAW_DMA2D_HAL_INCLUDE
 	default "stm32h7xx_hal.h"
 	help
 		Header that declares the DMA2D HAL API of the target STM32 family.
+
+config LV_USE_DRAW_DMA2D_INTERRUPT
+	bool "Transfer complete interrupt"
+	default n
+	depends on !LV_OS_NONE && LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE
+	help
+		Run DMA2D transfers asynchronously instead of waiting for them. Needs an
+		OS and an IRQ provider picked for DMA2D (LV_IRQ_DMA2D_PROVIDER).
 
 endif
 endmenu

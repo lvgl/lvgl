@@ -61,6 +61,8 @@ def parse_kconfig_content(path):
 
 def generate_kconfig_content(lvgl_root_dir):
     content = ["# Generated file. DO NOT EDIT!\n\n"]
+    # Demo hook for the IRQ providers outside LVGL: top-level options of theirs.
+    content += ['osource "$(LV_IRQ_PROVIDERS_DIR)/Kconfig.top"\n\n']
     content += ['menu "LVGL"\n']
 
     for root_file in ROOT_FILES:

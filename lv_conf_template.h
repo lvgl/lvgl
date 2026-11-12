@@ -125,61 +125,55 @@
 
 
 /*============================================================================
- * INTERRUPT HANDLING (IRQ)
+ * IRQ PROVIDERS
  *============================================================================*/
 
-/** IRQ abstraction backend to use
- *  Possible values:
- *  - LV_IRQ_NONE
- *  - LV_IRQ_CMSIS
- *  - LV_IRQ_ZEPHYR
- *  - LV_IRQ_CUSTOM
+/** ID of the IRQ provider serving the DMA2D interrupt: one of LV_IRQ_PROVIDER_*,
+ *  e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
  */
-#define LV_USE_IRQ LV_IRQ_NONE
+#define LV_IRQ_DMA2D_PROVIDER 0
 
-#if LV_USE_IRQ == LV_IRQ_CUSTOM
-/** Header of your own IRQ backend. It defines LV_IRQ_HAS_<PERIPH> to 1 for
- *  each source it provides; your build links the matching
- *  lv_irq_attach_<periph>() and lv_irq_detach_<periph>().
+/** ID of the IRQ provider serving the PXP interrupt: one of LV_IRQ_PROVIDER_*,
+ *  e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
  */
-#define LV_IRQ_CUSTOM_INCLUDE ""
+#define LV_IRQ_PXP_PROVIDER 0
 
-#endif /*LV_USE_IRQ == LV_IRQ_CUSTOM*/
-
-#if LV_USE_IRQ == LV_IRQ_CMSIS
-/** Enable to pull in a vendor/CMSIS device header (e.g. stm32h7xx.h) that
- *  provides the IRQn_Type enumerators (PXP_IRQn, DMA2D_IRQn, ...) and the
- *  NVIC_* helpers. Peripheral IRQ support is auto-detected from the symbols
- *  this header defines.
+/** ID of the IRQ provider serving the NemaGFX GPU2D completion: one of LV_IRQ_PROVIDER_*,
+ *  e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
  */
-#define LV_IRQ_USE_CMSIS_INCLUDE 0
+#define LV_IRQ_NEMA_GPU2D_PROVIDER 0
 
-#if LV_IRQ_USE_CMSIS_INCLUDE
-/** CMSIS/vendor device header */
+#if LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS
+/** Include the device header that declares the IRQn_Type values
+ *  (DMA2D_IRQn, PXP_IRQn, ...) and the NVIC_* functions. Leave disabled if
+ *  the build already makes them visible.
+ */
+#define LV_IRQ_CMSIS_USE_INCLUDE 0
+
+#if LV_IRQ_CMSIS_USE_INCLUDE
+/** For example "stm32h7xx.h". */
 #define LV_IRQ_CMSIS_INCLUDE ""
 
-#endif /*LV_IRQ_USE_CMSIS_INCLUDE*/
+#endif /*LV_IRQ_CMSIS_USE_INCLUDE*/
 
-/** Enable on RTOS builds (e.g. FreeRTOS, or CMSIS-RTOS2 over an RTOS) where
- *  the interrupt priority must sit at or below the kernel's syscall interrupt
- *  priority ceiling, so the ISR may safely call the kernel's ...FromISR APIs
- *  (lv_thread_sync_signal_isr uses one). Leave disabled on bare-metal, where
- *  the reset-default priority is fine.
+/** Enable on RTOS builds where the interrupt priority must sit at or below
+ *  the kernel's syscall interrupt priority ceiling, so the ISR may call the
+ *  kernel's ...FromISR APIs (lv_thread_sync_signal_isr uses one). Leave
+ *  disabled on bare metal, where the reset-default priority is fine.
  */
 #define LV_IRQ_CMSIS_SET_PRIORITY 0
 
 #if LV_IRQ_CMSIS_SET_PRIORITY
-/** The value passed to NVIC_SetPriority. Defaults to 255, which NVIC_SetPriority
- *  maps to the lowest preemption priority regardless of the implemented priority
- *  bits (__NVIC_PRIO_BITS) - always safe to call ...FromISR from, at the cost of
- *  latency. For best latency under FreeRTOS set it to
- *  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h may
- *  define this symbolically; a Kconfig build takes a literal number).
+/** The value passed to NVIC_SetPriority. 255 maps to the lowest preemption
+ *  priority whatever __NVIC_PRIO_BITS is: always safe for ...FromISR calls,
+ *  at the cost of latency. Under FreeRTOS the best latency is
+ *  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h
+ *  may write it symbolically; Kconfig takes a literal number).
  */
 #define LV_IRQ_CMSIS_PRIORITY 255
 
 #endif /*LV_IRQ_CMSIS_SET_PRIORITY*/
-#endif /*LV_USE_IRQ == LV_IRQ_CMSIS*/
+#endif /*LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS*/
 
 
 /*============================================================================
@@ -603,6 +597,15 @@
 /** Header that declares the DMA2D HAL API of the target STM32 family. */
 #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
+#if LV_USE_OS != LV_OS_NONE
+#if LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE
+/** Run DMA2D transfers asynchronously instead of waiting for them. Needs an
+ *  OS and an IRQ provider picked for DMA2D (LV_IRQ_DMA2D_PROVIDER).
+ */
+#define LV_USE_DRAW_DMA2D_INTERRUPT 0
+
+#endif /*LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE*/
+#endif /*LV_USE_OS != LV_OS_NONE*/
 #endif /*LV_USE_DRAW_DMA2D*/
 
 /** Accelerate blends, fills, images and text with the EPIC (Enhanced

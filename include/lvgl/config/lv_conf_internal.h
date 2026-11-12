@@ -42,12 +42,16 @@
 #define LV_FONT_DEFAULT_UNSCII_16                   &lv_font_unscii_16
 
 /* Named constants */
-#define LV_STDLIB_BUILTIN       0
-#define LV_STDLIB_CLIB          1
-#define LV_STDLIB_MICROPYTHON   2
-#define LV_STDLIB_RTTHREAD      3
-#define LV_STDLIB_CUSTOM        255
-#define LV_LOG_LEVEL_NUM        5
+#define LV_STDLIB_BUILTIN            0
+#define LV_STDLIB_CLIB               1
+#define LV_STDLIB_MICROPYTHON        2
+#define LV_STDLIB_RTTHREAD           3
+#define LV_STDLIB_CUSTOM             255
+#define LV_IRQ_PROVIDER_NONE         0
+#define LV_IRQ_PROVIDER_CMSIS        1
+#define LV_IRQ_PROVIDER_ZEPHYR       2
+#define LV_IRQ_PROVIDER_NEMA_STM32   3
+#define LV_LOG_LEVEL_NUM             5
 
 /* Operating system */
 #define LV_OS_NONE          0
@@ -59,12 +63,6 @@
 #define LV_OS_MQX           6
 #define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
-
-/* IRQ abstraction backend to use */
-#define LV_IRQ_NONE     0
-#define LV_IRQ_CMSIS    1
-#define LV_IRQ_ZEPHYR   2
-#define LV_IRQ_CUSTOM   255
 
 /* SW assembly optimization */
 #define LV_DRAW_SW_ASM_NONE      0
@@ -326,30 +324,38 @@
 
 
 /*============================================================================
- * INTERRUPT HANDLING (IRQ)
+ * IRQ PROVIDERS
  *============================================================================*/
 
-#ifndef LV_USE_IRQ
-    #ifdef CONFIG_LV_USE_IRQ
-        #define LV_USE_IRQ CONFIG_LV_USE_IRQ
+#ifndef LV_IRQ_DMA2D_PROVIDER
+    #ifdef CONFIG_LV_IRQ_DMA2D_PROVIDER
+        #define LV_IRQ_DMA2D_PROVIDER CONFIG_LV_IRQ_DMA2D_PROVIDER
     #else
-        #define LV_USE_IRQ LV_IRQ_NONE
+        #define LV_IRQ_DMA2D_PROVIDER 0
     #endif
 #endif
 
-#ifndef LV_IRQ_CUSTOM_INCLUDE
-    #ifdef CONFIG_LV_IRQ_CUSTOM_INCLUDE
-        #define LV_IRQ_CUSTOM_INCLUDE CONFIG_LV_IRQ_CUSTOM_INCLUDE
+#ifndef LV_IRQ_PXP_PROVIDER
+    #ifdef CONFIG_LV_IRQ_PXP_PROVIDER
+        #define LV_IRQ_PXP_PROVIDER CONFIG_LV_IRQ_PXP_PROVIDER
     #else
-        #define LV_IRQ_CUSTOM_INCLUDE ""
+        #define LV_IRQ_PXP_PROVIDER 0
     #endif
 #endif
 
-#ifndef LV_IRQ_USE_CMSIS_INCLUDE
-    #ifdef CONFIG_LV_IRQ_USE_CMSIS_INCLUDE
-        #define LV_IRQ_USE_CMSIS_INCLUDE CONFIG_LV_IRQ_USE_CMSIS_INCLUDE
+#ifndef LV_IRQ_NEMA_GPU2D_PROVIDER
+    #ifdef CONFIG_LV_IRQ_NEMA_GPU2D_PROVIDER
+        #define LV_IRQ_NEMA_GPU2D_PROVIDER CONFIG_LV_IRQ_NEMA_GPU2D_PROVIDER
     #else
-        #define LV_IRQ_USE_CMSIS_INCLUDE 0
+        #define LV_IRQ_NEMA_GPU2D_PROVIDER 0
+    #endif
+#endif
+
+#ifndef LV_IRQ_CMSIS_USE_INCLUDE
+    #ifdef CONFIG_LV_IRQ_CMSIS_USE_INCLUDE
+        #define LV_IRQ_CMSIS_USE_INCLUDE CONFIG_LV_IRQ_CMSIS_USE_INCLUDE
+    #else
+        #define LV_IRQ_CMSIS_USE_INCLUDE 0
     #endif
 #endif
 
@@ -1112,6 +1118,14 @@
         #define LV_DRAW_DMA2D_HAL_INCLUDE CONFIG_LV_DRAW_DMA2D_HAL_INCLUDE
     #else
         #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
+    #endif
+#endif
+
+#ifndef LV_USE_DRAW_DMA2D_INTERRUPT
+    #ifdef CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
+        #define LV_USE_DRAW_DMA2D_INTERRUPT CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
+    #else
+        #define LV_USE_DRAW_DMA2D_INTERRUPT 0
     #endif
 #endif
 
@@ -4875,14 +4889,6 @@
     #endif
 #endif
 
-#ifndef LV_IRQ_USE_CUSTOM_INCLUDE
-    #if (LV_USE_IRQ == LV_IRQ_CUSTOM)
-        #define LV_IRQ_USE_CUSTOM_INCLUDE 1
-    #else
-        #define LV_IRQ_USE_CUSTOM_INCLUDE 0
-    #endif
-#endif
-
 #ifndef LV_DRAW_HAS_VECTOR_SUPPORT
     #if ((LV_USE_THORVG && LV_USE_DRAW_SW) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_VG && LV_USE_NEMA_GFX) || LV_USE_DRAW_NANOVG)
         #define LV_DRAW_HAS_VECTOR_SUPPORT 1
@@ -4968,10 +4974,6 @@
 
 #if LV_OS_USE_CUSTOM_INCLUDE
     #include LV_OS_CUSTOM_INCLUDE
-#endif
-
-#if LV_IRQ_USE_CUSTOM_INCLUDE
-    #include LV_IRQ_CUSTOM_INCLUDE
 #endif
 
 #if LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE
@@ -5083,12 +5085,12 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_OS_IDLE_PERCENT_CUSTOM requires LV_USE_OS == LV_OS_FREERTOS (Kconfig depends on)"
 #endif
 
-#if LV_IRQ_USE_CMSIS_INCLUDE && !(LV_USE_IRQ == LV_IRQ_CMSIS)
-    #error "LV_IRQ_USE_CMSIS_INCLUDE requires LV_USE_IRQ == LV_IRQ_CMSIS (Kconfig depends on)"
+#if LV_IRQ_CMSIS_USE_INCLUDE && !(LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS)
+    #error "LV_IRQ_CMSIS_USE_INCLUDE requires LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS (Kconfig depends on)"
 #endif
 
-#if LV_IRQ_CMSIS_SET_PRIORITY && !(LV_USE_IRQ == LV_IRQ_CMSIS)
-    #error "LV_IRQ_CMSIS_SET_PRIORITY requires LV_USE_IRQ == LV_IRQ_CMSIS (Kconfig depends on)"
+#if LV_IRQ_CMSIS_SET_PRIORITY && !(LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS)
+    #error "LV_IRQ_CMSIS_SET_PRIORITY requires LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS (Kconfig depends on)"
 #endif
 
 #if (LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES) && !LV_USE_MATRIX
@@ -5193,6 +5195,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_PPA_IMG && !(LV_USE_PPA)
     #error "LV_USE_PPA_IMG requires LV_USE_PPA (Kconfig depends on)"
+#endif
+
+#if LV_USE_DRAW_DMA2D_INTERRUPT && !(!(LV_USE_OS == LV_OS_NONE) && LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE && LV_USE_DRAW_DMA2D)
+    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires !(LV_USE_OS == LV_OS_NONE) && LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE && LV_USE_DRAW_DMA2D (Kconfig depends on)"
 #endif
 
 #if LV_USE_SIFLI_EPIC_ASSERT && !(LV_USE_SIFLI_EPIC)
