@@ -329,6 +329,10 @@ void lv_init(void)
     lv_fs_fatfs_init();
 #endif
 
+#if LV_USE_FS_FREERTOS_FAT
+    lv_fs_freertos_fat_init();
+#endif
+
 #if LV_USE_FS_STDIO != '\0'
     lv_fs_stdio_init();
 #endif

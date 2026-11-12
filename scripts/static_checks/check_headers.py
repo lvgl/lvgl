@@ -151,6 +151,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "fastgltf/util.hpp",
     "fcntl.h",
     "ff.h",
+    "ff_stdio.h",
     "float.h",
     "freertos/FreeRTOS.h",
     "freertos/atomic.h",

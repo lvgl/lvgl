@@ -3087,6 +3087,27 @@ config LV_FS_FATFS_CACHE_SIZE
 
 endif # LV_USE_FS_FATFS
 
+config LV_USE_FS_FREERTOS_FAT
+	bool "FreeRTOS+FAT"
+
+if LV_USE_FS_FREERTOS_FAT
+
+config LV_FS_FREERTOS_FAT_LETTER
+	int "Drive letter for FreeRTOS+FAT (65 = 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_FREERTOS_FAT_PATH
+	string "Working directory for FreeRTOS+FAT"
+	default ""
+
+config LV_FS_FREERTOS_FAT_CACHE_SIZE
+	int "Read cache size in bytes for FreeRTOS+FAT (0 = disabled)"
+	default 0
+	range 0 4294967295
+
+endif # LV_USE_FS_FREERTOS_FAT
+
 config LV_USE_FS_LITTLEFS
 	bool "littlefs"
 
