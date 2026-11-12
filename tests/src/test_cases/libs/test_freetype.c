@@ -395,6 +395,61 @@ void test_freetype_colr_glyph_rendered_once(void)
     lv_freetype_font_delete(font);
 }
 
+/**
+ * Synthetic bold has to be applied in bitmap render mode exactly as it is in outline render mode:
+ * FT_Outline_Embolden widens the outline before it is rasterized, for the metrics reported by
+ * get_glyph_dsc as well as for the bitmap returned by get_glyph_bitmap, so the two have to agree.
+ */
+void test_freetype_synthetic_bold_bitmap(void)
+{
+    const char * path = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+    lv_font_t * font_normal = lv_freetype_font_create(path, LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 40,
+                                                      LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NOT_NULL(font_normal);
+    lv_font_t * font_bold = lv_freetype_font_create(path, LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 40,
+                                                    LV_FREETYPE_FONT_STYLE_BOLD);
+    TEST_ASSERT_NOT_NULL(font_bold);
+
+    lv_font_glyph_dsc_t normal_dsc;
+    lv_font_glyph_dsc_t bold_dsc;
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font_normal, &normal_dsc, 'A', '\0'));
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font_bold, &bold_dsc, 'A', '\0'));
+
+    /* Bold has to thicken the glyph, so its box has to grow */
+    TEST_ASSERT_GREATER_THAN(normal_dsc.box_w, bold_dsc.box_w);
+
+    const lv_draw_buf_t * normal_buf = lv_font_get_glyph_bitmap(&normal_dsc, NULL);
+    const lv_draw_buf_t * bold_buf = lv_font_get_glyph_bitmap(&bold_dsc, NULL);
+    TEST_ASSERT_NOT_NULL(normal_buf);
+    TEST_ASSERT_NOT_NULL(bold_buf);
+
+    /* The bitmap has to match the metrics that were used to place it */
+    TEST_ASSERT_EQUAL(normal_dsc.box_w, normal_buf->header.w);
+    TEST_ASSERT_EQUAL(normal_dsc.box_h, normal_buf->header.h);
+    TEST_ASSERT_EQUAL(bold_dsc.box_w, bold_buf->header.w);
+    TEST_ASSERT_EQUAL(bold_dsc.box_h, bold_buf->header.h);
+
+    /* The bold glyph has to carry more ink than the normal one */
+    uint32_t normal_ink = 0;
+    for(uint32_t y = 0; y < normal_buf->header.h; y++) {
+        for(uint32_t x = 0; x < normal_buf->header.w; x++) {
+            normal_ink += normal_buf->data[y * normal_buf->header.stride + x];
+        }
+    }
+    uint32_t bold_ink = 0;
+    for(uint32_t y = 0; y < bold_buf->header.h; y++) {
+        for(uint32_t x = 0; x < bold_buf->header.w; x++) {
+            bold_ink += bold_buf->data[y * bold_buf->header.stride + x];
+        }
+    }
+    TEST_ASSERT_GREATER_THAN(normal_ink, bold_ink);
+
+    lv_font_glyph_release_draw_data(&bold_dsc);
+    lv_font_glyph_release_draw_data(&normal_dsc);
+    lv_freetype_font_delete(font_bold);
+    lv_freetype_font_delete(font_normal);
+}
+
 #else
 
 void setUp(void)
@@ -430,6 +485,10 @@ void test_freetype_face_index(void)
 }
 
 void test_freetype_colr_glyph_rendered_once(void)
+{
+}
+
+void test_freetype_synthetic_bold_bitmap(void)
 {
 }
 
