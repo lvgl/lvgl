@@ -245,6 +245,20 @@ void lv_indev_read(lv_indev_t * indev)
             indev->disp->last_activity_time = data.timestamp;
         }
 
+        if(lv_indev_send_event(indev, LV_EVENT_INDEV_SAMPLE, &data) == LV_RESULT_INVALID) {
+            /*The indev was deleted by the callback*/
+            indev_act     = NULL;
+            indev_obj_act = NULL;
+            LV_PROFILER_INDEV_END;
+            return;
+        }
+
+        /*The callback reset the indev, so drop this sample*/
+        if(indev_reset_check(indev)) {
+            indev_proc_reset_query_handler(indev);
+            continue;
+        }
+
         if(indev->type == LV_INDEV_TYPE_POINTER) {
             indev_pointer_proc(indev, &data);
         }
