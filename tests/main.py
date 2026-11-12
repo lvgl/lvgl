@@ -114,6 +114,9 @@ test_options = {
     },
 }
 
+if platform.system() == "Linux":
+    test_options["OPTIONS_TEST_SYSHEAP"]["defconfigs"].append("evdev")
+
 
 def get_build_config(options_name):
     if options_name in build_only_options:
