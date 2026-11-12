@@ -74,7 +74,8 @@ typedef struct cmap_table_bin {
  **********************/
 static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp);
 static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_load);
-int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start);
+int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t glyph_count,
+                  uint32_t start);
 
 static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
 static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
@@ -842,12 +843,13 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     }
 
     uint32_t kern_start = glyph_start + glyph_length;
-    int32_t kern_length = load_kern(fp, font_dsc, font_header.glyph_id_format, kern_start);
+    int32_t kern_length = load_kern(fp, font_dsc, font_header.glyph_id_format, loca_count, kern_start);
 
     return kern_length >= 0;
 }
 
-int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start)
+int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t glyph_count,
+                  uint32_t start)
 {
     LV_ASSERT(fp != NULL);
     LV_ASSERT(font_dsc != NULL);
@@ -930,6 +932,12 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
             return -1;
         }
 
+        /*The class mappings are indexed by glyph id, so they have to cover every glyph.*/
+        if(kern_class_mapping_length < glyph_count) {
+            LV_LOG_WARN("Kern class mapping is shorter than the glyph count.");
+            return -1;
+        }
+
         int kern_values_length = sizeof(int8_t) * kern_table_rows * kern_table_cols;
 
         uint8_t * kern_left = lv_malloc(kern_class_mapping_length);
@@ -956,6 +964,15 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
            !read_exact(fp, kern_right, kern_class_mapping_length) ||
            !read_exact(fp, kern_values, kern_values_length)) {
             return -1;
+        }
+
+        /*Class 0 means "no kerning"; every other class has to address a row or column of
+         *the pair table.*/
+        for(uint16_t i = 0; i < kern_class_mapping_length; ++i) {
+            if(kern_left[i] > kern_table_rows || kern_right[i] > kern_table_cols) {
+                LV_LOG_WARN("Kern class value is out of range.");
+                return -1;
+            }
         }
     }
     else {

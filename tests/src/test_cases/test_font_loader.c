@@ -32,6 +32,8 @@ void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
 void test_font_loader_truncated(void);
 void test_font_loader_dynamic_from_buffer(void);
+void test_font_loader_rejects_short_kern_class_mapping(void);
+void test_font_loader_rejects_out_of_range_kern_class(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -215,6 +217,32 @@ void test_font_loader_corrupt_kern(void)
 void test_font_loader_truncated(void)
 {
     const char * path = "A:src/test_assets/test_font_truncated.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+/*The class mappings are indexed by glyph id, so they have to cover every glyph.*/
+void test_font_loader_rejects_short_kern_class_mapping(void)
+{
+    const char * path = "A:src/test_assets/test_font_kern_mapping_short.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+/*Every class has to address a row or column of the pair table.*/
+void test_font_loader_rejects_out_of_range_kern_class(void)
+{
+    const char * path = "A:src/test_assets/test_font_kern_class_oob.fnt";
 
     lv_binfont_dsc_t dsc = {
         .path = path,
