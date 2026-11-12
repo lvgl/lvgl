@@ -849,4 +849,115 @@ void test_arc_zero_size_no_crash(void)
     TEST_ASSERT_NOT_NULL(arc);
 }
 
+typedef struct {
+    lv_point_t main_center;
+    lv_point_t indicator_center;
+    uint16_t main_radius;
+    uint16_t indicator_radius;
+    uint32_t main_count;
+    uint32_t indicator_count;
+} arc_geometry_t;
+
+static void arc_geometry_draw_cb(lv_event_t * e)
+{
+    lv_draw_dsc_t * base = lv_event_get_draw_dsc(e);
+    if(lv_draw_dsc_get_type(base) != LV_DRAW_DSC_TYPE_ARC) return;
+
+    const lv_draw_arc_dsc_t * dsc = lv_draw_dsc_get_arc_dsc(base);
+    arc_geometry_t * geometry = lv_event_get_user_data(e);
+    if(base->part == LV_PART_MAIN) {
+        geometry->main_center = dsc->center;
+        geometry->main_radius = dsc->radius;
+        geometry->main_count++;
+    }
+    else if(base->part == LV_PART_INDICATOR) {
+        geometry->indicator_center = dsc->center;
+        geometry->indicator_radius = dsc->radius;
+        geometry->indicator_count++;
+    }
+}
+
+static lv_obj_t * create_geometry_arc(int32_t width, int32_t height)
+{
+    lv_obj_t * obj = lv_arc_create(lv_screen_active());
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_pos(obj, 20, 10);
+    lv_obj_set_size(obj, width, height);
+    lv_obj_set_ext_click_area(obj, 0);
+    lv_obj_set_style_arc_width(obj, 10, LV_PART_MAIN);
+    lv_obj_set_style_arc_width(obj, 10, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_opa(obj, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_arc_opa(obj, LV_OPA_COVER, LV_PART_INDICATOR);
+    lv_arc_set_bg_angles(obj, 0, 360);
+    lv_arc_set_value(obj, 50);
+    return obj;
+}
+
+static void check_arc_geometry(lv_obj_t * obj, int32_t x, int32_t y, uint16_t radius)
+{
+    arc_geometry_t geometry = {0};
+    lv_obj_set_send_draw_dsc_events(obj, true);
+    lv_obj_add_event_cb(obj, arc_geometry_draw_cb, LV_EVENT_DRAW_DSC_BEGIN, &geometry);
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_GREATER_THAN_UINT32(0, geometry.main_count);
+    TEST_ASSERT_GREATER_THAN_UINT32(0, geometry.indicator_count);
+    TEST_ASSERT_EQUAL_INT32(x, geometry.main_center.x);
+    TEST_ASSERT_EQUAL_INT32(y, geometry.main_center.y);
+    TEST_ASSERT_EQUAL_INT32(x, geometry.indicator_center.x);
+    TEST_ASSERT_EQUAL_INT32(y, geometry.indicator_center.y);
+    TEST_ASSERT_EQUAL_UINT16(radius, geometry.main_radius);
+    TEST_ASSERT_EQUAL_UINT16(radius, geometry.indicator_radius);
+    lv_obj_delete(obj);
+}
+
+void test_arc_wide_box_centers_drawn_arcs(void)
+{
+    check_arc_geometry(create_geometry_arc(300, 100), 170, 60, 50);
+}
+
+void test_arc_tall_box_centers_drawn_arcs(void)
+{
+    check_arc_geometry(create_geometry_arc(100, 260), 70, 140, 50);
+}
+
+void test_arc_square_box_preserves_drawn_geometry(void)
+{
+    check_arc_geometry(create_geometry_arc(100, 100), 70, 60, 50);
+    check_arc_geometry(create_geometry_arc(101, 101), 70, 60, 50);
+}
+
+void test_arc_asymmetric_padding_centers_content(void)
+{
+    lv_obj_t * obj = create_geometry_arc(300, 120);
+    lv_obj_set_style_pad_left(obj, 10, LV_PART_MAIN);
+    lv_obj_set_style_pad_right(obj, 30, LV_PART_MAIN);
+    lv_obj_set_style_pad_top(obj, 6, LV_PART_MAIN);
+    lv_obj_set_style_pad_bottom(obj, 14, LV_PART_MAIN);
+    check_arc_geometry(obj, 160, 66, 50);
+
+    obj = create_geometry_arc(120, 280);
+    lv_obj_set_style_pad_left(obj, 6, LV_PART_MAIN);
+    lv_obj_set_style_pad_right(obj, 14, LV_PART_MAIN);
+    lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN);
+    lv_obj_set_style_pad_bottom(obj, 30, LV_PART_MAIN);
+    check_arc_geometry(obj, 76, 140, 50);
+}
+
+void test_arc_wide_box_hit_test_uses_drawn_center(void)
+{
+    lv_obj_t * obj = create_geometry_arc(300, 100);
+    lv_obj_set_adv_hittest(obj, true);
+    lv_obj_update_layout(obj);
+
+    lv_point_t point = {215, 60};
+    TEST_ASSERT_TRUE(lv_obj_hit_test(obj, &point));
+    point.x = 170;
+    TEST_ASSERT_FALSE(lv_obj_hit_test(obj, &point));
+    /*The former circle center was at (70, 60). Its right edge is now outside the circle.*/
+    point.x = 115;
+    TEST_ASSERT_FALSE(lv_obj_hit_test(obj, &point));
+    lv_obj_delete(obj);
+}
+
 #endif
