@@ -147,6 +147,55 @@ void test_dropdown_set_options_while_open(void)
     lv_obj_delete(dd);
 }
 
+static void reflow_lifecycle_event_cb(lv_event_t * e)
+{
+    uint32_t * counts = lv_event_get_user_data(e);
+    if(lv_event_get_code(e) == LV_EVENT_READY) counts[0]++;
+    if(lv_event_get_code(e) == LV_EVENT_CANCEL) counts[1]++;
+}
+
+void test_dropdown_relayout_options_while_open(void)
+{
+    uint32_t counts[2] = {0, 0};
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_width(dd, 80);
+    lv_obj_add_event_cb(dd, reflow_lifecycle_event_cb, LV_EVENT_ALL, counts);
+    lv_dropdown_set_options(dd, "a\nb");
+    lv_dropdown_open(dd);
+    lv_obj_t * list = lv_dropdown_get_list(dd);
+    int32_t original_w = lv_obj_get_width(list);
+    int32_t original_h = lv_obj_get_height(list);
+
+    lv_dropdown_set_options(dd, "a much longer option\nsecond option\nthird option");
+    TEST_ASSERT_GREATER_THAN(original_w, lv_obj_get_width(list));
+    TEST_ASSERT_GREATER_THAN(original_h, lv_obj_get_height(list));
+    int32_t grown_h = lv_obj_get_height(list);
+
+    lv_dropdown_set_selected(dd, 2);
+    lv_dropdown_set_options_static(dd, "x");
+    TEST_ASSERT_LESS_THAN(grown_h, lv_obj_get_height(list));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_selected(dd));
+
+    lv_dropdown_clear_options(dd);
+    TEST_ASSERT_TRUE(lv_dropdown_is_open(dd));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_option_count(dd));
+    TEST_ASSERT_EQUAL_STRING("", lv_label_get_text(lv_obj_get_child(list, 0)));
+    TEST_ASSERT_EQUAL_UINT32(1, counts[0]);
+    TEST_ASSERT_EQUAL_UINT32(0, counts[1]);
+
+    lv_dropdown_close(dd);
+    lv_dropdown_open(dd);
+    TEST_ASSERT_EQUAL_UINT32(2, counts[0]);
+    TEST_ASSERT_EQUAL_UINT32(1, counts[1]);
+    lv_dropdown_add_option(dd, "restored", LV_DROPDOWN_POS_LAST);
+    TEST_ASSERT_EQUAL_STRING("restored", lv_label_get_text(lv_obj_get_child(list, 0)));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_dropdown_get_option_count(dd));
+    TEST_ASSERT_EQUAL_UINT32(2, counts[0]);
+    TEST_ASSERT_EQUAL_UINT32(1, counts[1]);
+    lv_dropdown_close(dd);
+    lv_obj_delete(dd);
+}
+
 void test_dropdown_select(void)
 {
     lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
