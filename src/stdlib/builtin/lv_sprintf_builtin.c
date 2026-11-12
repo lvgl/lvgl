@@ -190,13 +190,29 @@ static size_t _out_rev(out_fct_type out, char * buffer, size_t idx, size_t maxle
 static size_t _ntoa_format(out_fct_type out, char * buffer, size_t idx, size_t maxlen, char * buf, size_t len,
                            bool negative, unsigned int base, unsigned int prec, unsigned int width, unsigned int flags)
 {
-    // pad leading zeros
+    // keep room for the sign and the alternate-form prefix, so that a large precision
+    // can never push them out of the conversion buffer
+    unsigned int reserved = 0U;
+    if(flags & FLAGS_HASH) {
+        reserved += (base == 16U || base == 2U) ? 2U : 1U;
+    }
+    if(negative || (flags & (FLAGS_PLUS | FLAGS_SPACE))) {
+        reserved++;
+    }
+
+    // the precision pads with zeros, the '-' (left align) flag does not switch it off
+    while((len < prec) && (len + reserved < PRINTF_NTOA_BUFFER_SIZE)) {
+        buf[len++] = '0';
+    }
+
+    // digits written so far, before any width padding; it tells whether the
+    // alternate form still has to supply a leading zero
+    const size_t digits_len = len;
+
+    // the '0' flag pads with zeros up to the width, but only for right aligned numbers
     if(!(flags & FLAGS_LEFT)) {
         if(width && (flags & FLAGS_ZEROPAD) && (negative || (flags & (FLAGS_PLUS | FLAGS_SPACE)))) {
             width--;
-        }
-        while((len < prec) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
-            buf[len++] = '0';
         }
         while((flags & FLAGS_ZEROPAD) && (len < width) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
             buf[len++] = '0';
@@ -220,7 +236,10 @@ static size_t _ntoa_format(out_fct_type out, char * buffer, size_t idx, size_t m
         else if((base == 2U) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
             buf[len++] = 'b';
         }
-        if(len < PRINTF_NTOA_BUFFER_SIZE) {
+        // the octal alternate form adds a leading zero only when the digits do not
+        // already start with one; the value or the precision may have supplied it
+        if((len < PRINTF_NTOA_BUFFER_SIZE) &&
+           ((base != 8U) || (digits_len == 0U) || (buf[digits_len - 1U] != '0'))) {
             buf[len++] = '0';
         }
     }
