@@ -21,10 +21,6 @@ extern "C" {
 #include "../osal/lv_os_private.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
-#if LV_USE_FONT_COMPRESSED
-#include "../font/fmt_txt/lv_font_fmt_txt_private.h"
-#endif
-
 #include "../misc/lv_timer_private.h"
 #include "../misc/lv_anim_private.h"
 #include "../tick/lv_tick_private.h"
@@ -198,10 +194,6 @@ typedef struct _lv_global_t {
 
 #if LV_USE_FREETYPE
     struct _lv_freetype_context_t * ft_context;
-#endif
-
-#if LV_USE_FONT_COMPRESSED
-    lv_font_fmt_rle_t font_fmt_rle;
 #endif
 
 #if LV_USE_SPAN != 0
