@@ -30,6 +30,7 @@ void test_font_loader_no_cache(void);
 void test_font_loader_from_buffer(void);
 void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
+void test_font_loader_corrupt_cmap(void);
 void test_font_loader_truncated(void);
 void test_font_loader_dynamic_from_buffer(void);
 
@@ -209,6 +210,19 @@ void test_font_loader_corrupt_kern(void)
         .path = path,
         .dynamic_glyph_load = true,
     };
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+/*A cmap must not reference glyphs that the loca table doesn't describe.*/
+void test_font_loader_corrupt_cmap(void)
+{
+    const char * path = "A:src/test_assets/test_font_cmap_glyph_oob.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
     TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
 }
 
