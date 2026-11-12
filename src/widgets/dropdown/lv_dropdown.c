@@ -417,6 +417,13 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    /*An empty dropdown has no last option to clamp to.*/
+    if(dropdown->option_cnt == 0) {
+        dropdown->sel_opt_id = 0;
+        dropdown->sel_opt_id_orig = 0;
+        return;
+    }
+
     if(dropdown->sel_opt_id == sel_opt) return;
 
     dropdown->sel_opt_id      = sel_opt < dropdown->option_cnt ? sel_opt : dropdown->option_cnt - 1;
