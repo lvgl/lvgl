@@ -22,7 +22,7 @@
 #include <fsl_pxp.h>
 
 #if !LV_IRQ_HAS_PXP
-    #error "PXP needs an IRQ backend that provides PXP (set LV_USE_IRQ to a backend whose platform exposes PXP - e.g. a Zephyr DT node or CMSIS PXP_IRQn - or supply a custom backend defining LV_IRQ_HAS_PXP)"
+    #error "PXP needs an IRQ backend that provides PXP (set LV_USE_IRQ to a backend whose platform exposes PXP - e.g. a Zephyr DT node or CMSIS PXP_IRQn - or LV_IRQ_CUSTOM with a header defining LV_IRQ_HAS_PXP)"
 #endif
 
 /*********************

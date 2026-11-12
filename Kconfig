@@ -257,6 +257,9 @@ choice LV_USE_IRQ
 		bool "CMSIS"
 	config LV_IRQ_ZEPHYR
 		bool "ZEPHYR"
+	config LV_IRQ_CUSTOM
+		bool "CUSTOM"
+		select LV_IRQ_USE_CUSTOM_INCLUDE
 endchoice
 
 config LV_USE_IRQ
@@ -264,6 +267,19 @@ config LV_USE_IRQ
 	default 0 if LV_IRQ_NONE
 	default 1 if LV_IRQ_CMSIS
 	default 2 if LV_IRQ_ZEPHYR
+	default 255 if LV_IRQ_CUSTOM
+
+config LV_IRQ_USE_CUSTOM_INCLUDE
+	bool
+
+config LV_IRQ_CUSTOM_INCLUDE
+	string "Custom IRQ backend header"
+	default ""
+	depends on LV_IRQ_CUSTOM
+	help
+		Header of your own IRQ backend. It defines LV_IRQ_HAS_<PERIPH> to 1 for
+		each source it provides; your build links the matching
+		lv_irq_attach_<periph>() and lv_irq_detach_<periph>().
 
 if LV_IRQ_CMSIS
 config LV_IRQ_USE_CMSIS_INCLUDE

@@ -133,8 +133,18 @@
  *  - LV_IRQ_NONE
  *  - LV_IRQ_CMSIS
  *  - LV_IRQ_ZEPHYR
+ *  - LV_IRQ_CUSTOM
  */
 #define LV_USE_IRQ LV_IRQ_NONE
+
+#if LV_USE_IRQ == LV_IRQ_CUSTOM
+/** Header of your own IRQ backend. It defines LV_IRQ_HAS_<PERIPH> to 1 for
+ *  each source it provides; your build links the matching
+ *  lv_irq_attach_<periph>() and lv_irq_detach_<periph>().
+ */
+#define LV_IRQ_CUSTOM_INCLUDE ""
+
+#endif /*LV_USE_IRQ == LV_IRQ_CUSTOM*/
 
 #if LV_USE_IRQ == LV_IRQ_CMSIS
 /** Enable to pull in a vendor/CMSIS device header (e.g. stm32h7xx.h) that

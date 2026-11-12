@@ -64,6 +64,7 @@
 #define LV_IRQ_NONE     0
 #define LV_IRQ_CMSIS    1
 #define LV_IRQ_ZEPHYR   2
+#define LV_IRQ_CUSTOM   255
 
 /* SW assembly optimization */
 #define LV_DRAW_SW_ASM_NONE      0
@@ -333,6 +334,14 @@
         #define LV_USE_IRQ CONFIG_LV_USE_IRQ
     #else
         #define LV_USE_IRQ LV_IRQ_NONE
+    #endif
+#endif
+
+#ifndef LV_IRQ_CUSTOM_INCLUDE
+    #ifdef CONFIG_LV_IRQ_CUSTOM_INCLUDE
+        #define LV_IRQ_CUSTOM_INCLUDE CONFIG_LV_IRQ_CUSTOM_INCLUDE
+    #else
+        #define LV_IRQ_CUSTOM_INCLUDE ""
     #endif
 #endif
 
@@ -4866,6 +4875,14 @@
     #endif
 #endif
 
+#ifndef LV_IRQ_USE_CUSTOM_INCLUDE
+    #if (LV_USE_IRQ == LV_IRQ_CUSTOM)
+        #define LV_IRQ_USE_CUSTOM_INCLUDE 1
+    #else
+        #define LV_IRQ_USE_CUSTOM_INCLUDE 0
+    #endif
+#endif
+
 #ifndef LV_DRAW_HAS_VECTOR_SUPPORT
     #if ((LV_USE_THORVG && LV_USE_DRAW_SW) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_VG && LV_USE_NEMA_GFX) || LV_USE_DRAW_NANOVG)
         #define LV_DRAW_HAS_VECTOR_SUPPORT 1
@@ -4951,6 +4968,10 @@
 
 #if LV_OS_USE_CUSTOM_INCLUDE
     #include LV_OS_CUSTOM_INCLUDE
+#endif
+
+#if LV_IRQ_USE_CUSTOM_INCLUDE
+    #include LV_IRQ_CUSTOM_INCLUDE
 #endif
 
 #if LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE

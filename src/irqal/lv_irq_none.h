@@ -21,16 +21,11 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/* No hardware IRQ backend is compiled in.
+/* No IRQ backend: it knows no peripherals. Every LV_IRQ_HAS_* is left
+ * undefined here and falls back to 0 in lv_irq_private.h, so draw units poll, or
+ * fail to compile when they require an interrupt.
  *
- * The per-peripheral capability macros (LV_IRQ_HAS_*) are left undefined here and
- * default to 0 in lv_irq_private.h, so draw units fall back to polling or emit a
- * compile error when they require an interrupt.
- *
- * This selection is also the "bring your own backend" path: define the needed
- * LV_IRQ_HAS_* macros to 1 in your lv_conf.h and link your own implementation of
- * the matching lv_irq_attach and lv_irq_detach functions from your build. Because
- * no in-repo backend .c is compiled for LV_IRQ_NONE, there is no symbol conflict.
+ * To supply your own backend, select LV_IRQ_CUSTOM instead (see src/irqal/Kconfig).
  */
 
 /**********************

@@ -50,7 +50,7 @@ typedef void (*lv_irq_cb_t)(void * user_data);
  * Providers differ by source:
  *  - DMA2D / PXP: raw hardware IRQs wired by the selected LV_USE_IRQ backend
  *    (device tree on Zephyr, NVIC on CMSIS); the priority is sourced there, and
- *    the callback's user_data is NULL. Supply your own by selecting LV_IRQ_NONE
+ *    the callback's user_data is NULL. Supply your own by selecting LV_IRQ_CUSTOM
  *    and defining the attach/detach functions you need (see src/irqal to copy).
  *  - NemaGFX GPU2D: registered through the vendor GPU2D HAL callback API; its
  *    irqal backend (src/irqal, built for the NemaGFX STM32 HAL) provides it. The

@@ -34,8 +34,8 @@ extern "C" {
  *********************/
 
 /* Capability macros default to 0 when the selected backend didn't define them.
- * A custom backend (LV_IRQ_NONE + own implementation) can pre-define these to 1
- * in lv_conf.h; those definitions win because lv_conf is included above. */
+ * A custom backend (LV_IRQ_CUSTOM) defines them in its LV_IRQ_CUSTOM_INCLUDE
+ * header, and lv_conf.h can force any of them; both are included above. */
 #ifndef LV_IRQ_HAS_DMA2D
 #define LV_IRQ_HAS_DMA2D 0
 #endif
