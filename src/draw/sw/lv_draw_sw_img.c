@@ -108,8 +108,8 @@ void lv_draw_sw_layer(lv_layer_t * layer, const lv_area_t * clip_area, const lv_
     }
 
     /*The source should be a draw_buf, not a layer*/
-    lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
-    new_draw_dsc.src = layer_to_draw->draw_buf;
+    lv_draw_image_dsc_t new_draw_dsc;
+    lv_draw_image_dsc_from_layer(&new_draw_dsc, draw_dsc);
 
     lv_draw_sw_image(layer, clip_area, &new_draw_dsc, coords);
 
