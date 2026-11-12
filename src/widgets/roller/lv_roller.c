@@ -264,8 +264,9 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(buf != NULL, return);
 
-    lv_roller_t * roller = (lv_roller_t *)obj;
-    lv_roller_get_option_str(obj, roller->sel_opt_id, buf, buf_size);
+    if(lv_roller_get_option_str(obj, lv_roller_get_selected(obj), buf, buf_size) != LV_RESULT_OK) {
+        buf[0] = '\0';
+    }
 }
 
 /**
@@ -315,6 +316,7 @@ lv_result_t lv_roller_get_option_str(const lv_obj_t * obj, uint32_t option, char
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
     LV_CHECK_ARG(buf != NULL, return LV_RESULT_INVALID);
+    if(option >= lv_roller_get_option_count(obj)) return LV_RESULT_INVALID;
 
     lv_obj_t * label = get_label(obj);
     uint32_t i;
