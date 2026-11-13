@@ -120,7 +120,7 @@ def convert_user_flag(func_name: str, flag: str, args: list[str]) -> str:
 
     bit_index = int(m.group(1)) - 1  # Map 1..4 -> 0..3
 
-    is_remove = "remove" or "clear" in func_name
+    is_remove = any(substr in func_name for substr in ("remove", "clear"))
     is_add = "add" in func_name
 
     if func_name == "lv_obj_set_flag":
@@ -142,7 +142,7 @@ def convert_flag(func_name: str, flag: str, args: list[str]) -> str:
     if fn_suffix == "user":
         return convert_user_flag(func_name, flag, args)
 
-    is_remove = "remove" in func_name
+    is_remove = any(substr in func_name for substr in ("remove", "clear"))
     is_add = "add" in func_name
 
     if func_name == "lv_obj_set_flag":
@@ -252,6 +252,10 @@ def run_tests() -> bool:
         (
             "lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE)",
             "lv_obj_is_scrollable(obj)",
+        ),
+        (
+            "lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE)",
+            "lv_obj_set_scrollable(obj, false)",
         ),
         (
             "lv_obj_set_flag(obj, LV_OBJ_FLAG_HIDDEN, is_hidden)",
