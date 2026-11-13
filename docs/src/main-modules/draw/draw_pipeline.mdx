@@ -61,7 +61,6 @@ A Draw Task carries the following information:
 | `state` | waiting, queued, in progress, completed |
 | `drawing descriptor` | carries details of the drawing to be performed |
 | `preferred Draw Unit ID` | identifier of the Draw Unit that should carry out this task |
-| `preference score` | value describing the speed of the specified Draw Unit relative to software rendering (more on this below) |
 | `next` | a link to the next Draw Task in the list. |
 
 Draw Tasks are collected in a list and periodically dispatched to Draw Units.
@@ -88,8 +87,8 @@ enabled, it will be automatically initialized and used for rendering. The same a
 
 You can also add your own Draw Unit(s) after <ApiLink name="lv_init" /> by calling
 <ApiLink name="lv_draw_create_unit" display="lv_draw_create_unit(sizeof(your_draw_unit_t))" />. You also need to
-add custom `evaluate_cb` and `dispatch_cb` callbacks (mentioned later)
-to the new draw unit.
+set its `draw_cbs` table (optionally with `can_draw_*_cb` callbacks), its `id` and a `dispatch_cb`
+callback (mentioned later).
 
 For an example of how draw-unit creation and initialization is done, see
 <ApiLink name="lv_draw_sw_init" /> in lv_draw_sw.c_ or the other draw units whose `init`
@@ -119,26 +118,27 @@ too, for example, to mask out only a smaller part of an image to be blended.
 <ApiLink name="lv_obj_set_ext_draw_size"/> combined with <ApiLink name="LV_OBJ_FLAG_OVERFLOW_VISIBLE"/>
 can be used to increase the widget's clip area, allowing the children to overflow.
 
-## Draw Task Evaluation
+## Choosing the Draw Unit
 
-When each [Draw Task](/main-modules/draw/draw_pipeline) is created, each existing Draw Unit is
-"consulted" as to its "appropriateness" for the task. It does this through
-an "evaluation callback" function pointer (a.k.a. `evaluate_cb`), which each Draw
-Unit sets (for itself) during its initialization. Normally, that evaluation:
+The last created Draw Unit is the default. The built-in Draw Units are created in
+<ApiLink name="lv_init" /> from the lowest to the highest priority, so with several GPU
+Draw Units enabled, the one with the highest priority draws and the others draw nothing.
+Each Draw Unit falls back to the software renderer if <ApiLink name="LV_USE_DRAW_SW" /> is
+enabled, never to another GPU Draw Unit. Without the software renderer, what the default
+Draw Unit can't draw isn't drawn.
+A Draw Unit whose `fallback` is `NULL` (e.g. EVE and NanoVG) drops what it can't draw.
 
-- optionally examines the existing "preference score" for the task mentioned above,
-- if it can accomplish that type of task (e.g. line drawing) faster than other
-  Draw Units that have already reported, it writes its own "preference score" and
-  "preferred Draw Unit ID" to the respective fields in the task.
+When each [Draw Task](/main-modules/draw/draw_pipeline) is created, the default Draw Unit
+is asked whether it can draw it, through the `can_draw_*_cb` callback for the task's type in
+its `draw_cbs` table. If the callback is `NULL`, the Draw Unit can draw every descriptor of the
+types it has a draw callback for. If it can't draw the task, the fallback is asked.
+The ID of the Draw Unit that can draw the task is written to the
+task's "preferred Draw Unit ID", and that Draw Unit performs the task when it is
+[dispatched](/main-modules/draw/draw_pipeline). If neither can draw it, the task isn't drawn.
 
-In this way, by the time the evaluation sequence is complete, the task will contain
-the score and the ID of the Draw Unit that will be used to perform that task when
-it is [dispatched](/main-modules/draw/draw_pipeline).
-
-This ensures that the same Draw Unit will be selected
+The `can_draw_*_cb` callbacks must not change anything, so the same Draw Unit is selected
 consistently, depending on the type (and nature) of the drawing task, avoiding any
-possible screen jitter in case more than one Draw Unit is capable of performing a
-given task type.
+possible screen jitter.
 
 ## Dispatching
 

@@ -34,6 +34,9 @@ static lv_area_t * get_dsc_coords(lv_draw_task_t * t);
 static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t);
 static void apply_coords_change(lv_draw_task_t * t);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
+static void route_task(lv_draw_task_t * t);
+static bool unit_takes_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
+static bool unit_can_draw(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
@@ -72,6 +75,7 @@ void lv_draw_deinit(void)
         lv_free(cur_unit);
     }
     _draw_info.unit_head = NULL;
+    _draw_info.sw_unit = NULL;
 #if LV_USE_OS
     lv_thread_sync_delete(&_draw_info.sync);
 #endif
@@ -82,6 +86,8 @@ void * lv_draw_create_unit(size_t size)
     lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
     LV_ASSERT_MALLOC(new_unit);
     new_unit->next = _draw_info.unit_head;
+    /*Fall back to the software unit only, so a GPU's refusals never go to another GPU*/
+    new_unit->fallback = _draw_info.sw_unit;
 
     _draw_info.unit_head = new_unit;
     _draw_info.unit_cnt++;
@@ -156,57 +162,29 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
      *Sending the draw events might cause recursive event sends and besides
      *dispatching might remove the "main" draw task while it's still being used in the events*/
 
-    if(info->task_running == false) {
-        if(base_dsc->obj && lv_obj_is_send_draw_dsc_events(base_dsc->obj)) {
-            info->task_running = true;
-            send_draw_events(layer, t);
-            info->task_running = false;
-        }
+    bool main_task = info->task_running == false;
+    if(main_task && base_dsc->obj && lv_obj_is_send_draw_dsc_events(base_dsc->obj)) {
+        info->task_running = true;
+        send_draw_events(layer, t);
+        info->task_running = false;
+    }
 
-        /*Let the draw units set their preference score*/
-        t->preference_score = 100;
-        t->preferred_draw_unit_id = 0;
-        lv_draw_unit_t * u = info->unit_head;
-        while(u) {
-            if(u->evaluate_cb) {
-                LV_PROFILER_DRAW_BEGIN_TAG("evaluate_cb");
-                LV_PROFILER_DRAW_BEGIN_TAG(u->name);
-                u->evaluate_cb(u, t);
-                LV_PROFILER_DRAW_END_TAG(u->name);
-                LV_PROFILER_DRAW_END_TAG("evaluate_cb");
-            }
-            u = u->next;
+    route_task(t);
+
+    if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
+        LV_LOG_WARN("Draw task failed (%p, type %d): not taken by any unit", (void *)t, t->type);
+        /* mark a non-taken layer task as BLOCKED so we don't try to release it
+        * as one of its draw tasks might be in progress already */
+        if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
+            t->state = LV_DRAW_TASK_STATE_BLOCKED;
         }
-        if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
-            LV_LOG_WARN("Draw task failed (%p, type %d): not taken by any unit", (void *)t, t->type);
-            /* mark a non-taken layer task as BLOCKED so we don't try to release it
-            * as one of its draw tasks might be in progress already */
-            if(t->type == LV_DRAW_DSC_TYPE_LAYER) {
-                t->state = LV_DRAW_TASK_STATE_BLOCKED;
-            }
-            else {
-                /* Other tasks won't have anything depending on them so we can just mark them as FAILED*/
-                t->state = LV_DRAW_TASK_STATE_FAILED;
-            }
-        }
-        lv_draw_dispatch();
-    }
-    else {
-        /*Let the draw units set their preference score*/
-        t->preference_score = 100;
-        t->preferred_draw_unit_id = 0;
-        lv_draw_unit_t * u = info->unit_head;
-        while(u) {
-            if(u->evaluate_cb) {
-                LV_PROFILER_DRAW_BEGIN_TAG("evaluate_cb");
-                LV_PROFILER_DRAW_BEGIN_TAG(u->name);
-                u->evaluate_cb(u, t);
-                LV_PROFILER_DRAW_END_TAG(u->name);
-                LV_PROFILER_DRAW_END_TAG("evaluate_cb");
-            }
-            u = u->next;
+        else {
+            /* Other tasks won't have anything depending on them so we can just mark them as FAILED*/
+            t->state = LV_DRAW_TASK_STATE_FAILED;
         }
     }
+
+    if(main_task) lv_draw_dispatch();
     LV_PROFILER_DRAW_END;
 }
 
@@ -1018,4 +996,94 @@ static lv_draw_task_t * get_first_available_task(lv_layer_t * layer)
 
     LV_PROFILER_DRAW_END;
     return t;
+}
+
+/**
+ * Give the task to the default draw unit, or to its fallback if the default can't draw it.
+ */
+static void route_task(lv_draw_task_t * t)
+{
+    t->preferred_draw_unit_id = LV_DRAW_UNIT_NONE;
+
+    lv_draw_unit_t * main_unit = _draw_info.unit_head;
+    if(main_unit == NULL || unit_takes_task(main_unit, t)) return;
+
+    lv_draw_unit_t * fallback = main_unit->fallback;
+    if(fallback == NULL) return;
+
+    unit_takes_task(fallback, t);
+}
+
+static bool unit_takes_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
+{
+    LV_PROFILER_DRAW_BEGIN_TAG("can_draw");
+    LV_PROFILER_DRAW_BEGIN_TAG(draw_unit->name);
+    bool can_draw = unit_can_draw(draw_unit, t);
+    LV_PROFILER_DRAW_END_TAG(draw_unit->name);
+    LV_PROFILER_DRAW_END_TAG("can_draw");
+
+    if(can_draw) t->preferred_draw_unit_id = draw_unit->id;
+    return can_draw;
+}
+
+static bool unit_can_draw(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
+{
+    const lv_draw_unit_draw_cbs_t * cbs = draw_unit->draw_cbs;
+    if(cbs == NULL) return false;
+
+    lv_layer_t * layer = t->target_layer;
+    const void * dsc = t->draw_dsc;
+
+    switch(t->type) {
+        case LV_DRAW_DSC_TYPE_NONE:
+            return false;
+        case LV_DRAW_DSC_TYPE_FILL:
+            if(cbs->can_draw_fill_cb) return cbs->can_draw_fill_cb(draw_unit, layer, dsc);
+            return cbs->draw_fill_cb != NULL;
+        case LV_DRAW_DSC_TYPE_BORDER:
+            if(cbs->can_draw_border_cb) return cbs->can_draw_border_cb(draw_unit, layer, dsc);
+            return cbs->draw_border_cb != NULL;
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
+            if(cbs->can_draw_box_shadow_cb) return cbs->can_draw_box_shadow_cb(draw_unit, layer, dsc);
+            return cbs->draw_box_shadow_cb != NULL;
+        case LV_DRAW_DSC_TYPE_LETTER:
+            if(cbs->can_draw_letter_cb) return cbs->can_draw_letter_cb(draw_unit, layer, dsc);
+            return cbs->draw_letter_cb != NULL;
+        case LV_DRAW_DSC_TYPE_LABEL:
+            if(cbs->can_draw_label_cb) return cbs->can_draw_label_cb(draw_unit, layer, dsc);
+            return cbs->draw_label_cb != NULL;
+        case LV_DRAW_DSC_TYPE_IMAGE:
+            if(cbs->can_draw_image_cb) return cbs->can_draw_image_cb(draw_unit, layer, dsc);
+            return cbs->draw_image_cb != NULL;
+        case LV_DRAW_DSC_TYPE_LAYER:
+            if(cbs->can_draw_layer_cb) return cbs->can_draw_layer_cb(draw_unit, layer, dsc);
+            return cbs->draw_layer_cb != NULL;
+        case LV_DRAW_DSC_TYPE_LINE:
+            if(cbs->can_draw_line_cb) return cbs->can_draw_line_cb(draw_unit, layer, dsc);
+            return cbs->draw_line_cb != NULL;
+        case LV_DRAW_DSC_TYPE_ARC:
+            if(cbs->can_draw_arc_cb) return cbs->can_draw_arc_cb(draw_unit, layer, dsc);
+            return cbs->draw_arc_cb != NULL;
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
+            if(cbs->can_draw_triangle_cb) return cbs->can_draw_triangle_cb(draw_unit, layer, dsc);
+            return cbs->draw_triangle_cb != NULL;
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
+            if(cbs->can_draw_mask_rect_cb) return cbs->can_draw_mask_rect_cb(draw_unit, layer, dsc);
+            return cbs->draw_mask_rect_cb != NULL;
+        case LV_DRAW_DSC_TYPE_BLUR:
+            if(cbs->can_draw_blur_cb) return cbs->can_draw_blur_cb(draw_unit, layer, dsc);
+            return cbs->draw_blur_cb != NULL;
+#if LV_USE_VECTOR_GRAPHIC
+        case LV_DRAW_DSC_TYPE_VECTOR:
+            if(cbs->can_draw_vector_cb) return cbs->can_draw_vector_cb(draw_unit, layer, dsc);
+            return cbs->draw_vector_cb != NULL;
+#endif
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_DSC_TYPE_3D:
+            if(cbs->can_draw_3d_cb) return cbs->can_draw_3d_cb(draw_unit, layer, dsc);
+            return cbs->draw_3d_cb != NULL;
+#endif
+    }
+
+    return false;
 }

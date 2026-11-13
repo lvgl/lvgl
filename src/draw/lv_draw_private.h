@@ -70,14 +70,6 @@ struct _lv_draw_task_t {
      */
     uint8_t preferred_draw_unit_id;
 
-    /**
-     * Set to which extent `preferred_draw_unit_id` is good at this task.
-     * 80: means 20% better (faster) than software rendering
-     * 100: the default value
-     * 110: means 10% worse (slower) than software rendering
-     */
-    uint8_t preference_score;
-
 };
 
 struct _lv_draw_mask_t {
@@ -87,39 +79,56 @@ struct _lv_draw_mask_t {
 /**
  * The draw callbacks of a draw unit, one per draw descriptor type.
  * NULL for the types the unit doesn't draw.
+ * Each `can_draw_*_cb` tells whether the unit can draw the descriptor on the layer. It must not change anything.
+ * NULL: the unit can draw every descriptor of the type it has a draw callback for.
  */
 typedef struct {
     void (*draw_fill_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                          const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_fill_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
     void (*draw_border_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                            const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_border_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
     void (*draw_box_shadow_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                                const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_box_shadow_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer,
+                                   const lv_draw_box_shadow_dsc_t * dsc);
     void (*draw_letter_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                            const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_letter_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc);
     void (*draw_label_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                           const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_label_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
     void (*draw_image_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                           const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_image_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
     void (*draw_layer_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                           const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_layer_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
     void (*draw_arc_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                         const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_arc_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
     void (*draw_line_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                          const lv_draw_line_dsc_t * dsc);
+    bool (*can_draw_line_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
     void (*draw_triangle_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                              const lv_draw_triangle_dsc_t * dsc);
+    bool (*can_draw_triangle_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc);
     void (*draw_mask_rect_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                               const lv_draw_mask_rect_dsc_t * dsc);
+    bool (*can_draw_mask_rect_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
     void (*draw_blur_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                          const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_blur_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
 #if LV_USE_VECTOR_GRAPHIC
     void (*draw_vector_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                            const lv_draw_vector_dsc_t * dsc);
+    bool (*can_draw_vector_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_vector_dsc_t * dsc);
 #endif
 #if LV_USE_3DTEXTURE
     void (*draw_3d_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+    bool (*can_draw_3d_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc);
 #endif
 } lv_draw_unit_draw_cbs_t;
 
@@ -138,6 +147,17 @@ struct _lv_draw_unit_t {
     const lv_draw_unit_draw_cbs_t * draw_cbs;
 
     /**
+     * The unit to try when this one can't draw a descriptor. NULL: the descriptor isn't drawn.
+     * Set by `lv_draw_create_unit()` to the software unit (NULL for the software unit itself).
+     */
+    lv_draw_unit_t * fallback;
+
+    /**
+     * The ID the unit's dispatcher looks for in `lv_draw_task_t::preferred_draw_unit_id`.
+     */
+    uint8_t id;
+
+    /**
      * Called to try to assign a draw task to itself.
      * `lv_draw_get_next_available_task` can be used to get an independent draw task.
      * A draw task should be assign only if the draw unit can draw it too
@@ -152,14 +172,6 @@ struct _lv_draw_unit_t {
      *                              to let draw unit try to start the rendering again.
      */
     int32_t (*dispatch_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-
-    /**
-     *
-     * @param draw_unit
-     * @param task
-     * @return
-     */
-    int32_t (*evaluate_cb)(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
     /**
      * Called to signal the unit to complete all tasks in order to return their ready status.
@@ -222,6 +234,7 @@ struct _lv_draw_unit_t {
 
 typedef struct {
     lv_draw_unit_t * unit_head;
+    lv_draw_unit_t * sw_unit;   /**< The possible fallback of every other unit */
     uint32_t unit_cnt;
     uint32_t used_memory_for_layers; /* measured as bytes */
 #if LV_USE_OS

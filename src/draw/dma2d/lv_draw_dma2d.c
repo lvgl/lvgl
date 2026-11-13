@@ -37,7 +37,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool is_dest_cf_supported(lv_color_format_t cf);
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t delete_cb(lv_draw_unit_t * draw_unit);
 #if LV_DRAW_DMA2D_ASYNC
@@ -58,7 +60,9 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_fill_cb = lv_draw_dma2d_fill,
+    .can_draw_fill_cb = can_draw_fill,
     .draw_image_cb = lv_draw_dma2d_image,
+    .can_draw_image_cb = can_draw_image,
 };
 
 #if LV_DRAW_DMA2D_ASYNC
@@ -91,7 +95,6 @@ void lv_draw_dma2d_init(void)
 {
     lv_draw_buf_dma2d_init_handlers();
     lv_draw_dma2d_unit_t * draw_dma2d_unit = lv_draw_create_unit(sizeof(lv_draw_dma2d_unit_t));
-    draw_dma2d_unit->base_unit.evaluate_cb = evaluate_cb;
     draw_dma2d_unit->base_unit.dispatch_cb = dispatch_cb;
     draw_dma2d_unit->base_unit.delete_cb = delete_cb;
 #if LV_DRAW_DMA2D_ASYNC
@@ -99,6 +102,7 @@ void lv_draw_dma2d_init(void)
 #endif
     draw_dma2d_unit->base_unit.name = "DMA2D";
     draw_dma2d_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_dma2d_unit->base_unit.id = DRAW_UNIT_ID_DMA2D;
 
 #if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;
@@ -361,57 +365,44 @@ static void zephyr_dma2d_irq_handler(void *)
 }
 #endif
 
-static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
+static bool is_dest_cf_supported(lv_color_format_t cf)
 {
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_FILL: {
-                lv_draw_fill_dsc_t * dsc = task->draw_dsc;
-                if(!(dsc->radius == 0
-                     && dsc->grad.dir == LV_GRAD_DIR_NONE
-                     && (dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_XRGB8888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
-                    return 0;
-                }
-            }
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * dsc = task->draw_dsc;
-                if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
-                     && dsc->clip_radius == 0
-                     && dsc->bitmap_mask_src == NULL
-                     && dsc->sup == NULL
-                     && dsc->tile == 0
-                     && dsc->blend_mode == LV_BLEND_MODE_NORMAL
-                     && dsc->recolor_opa <= LV_OPA_MIN
-                     && dsc->skew_y == 0
-                     && dsc->skew_x == 0
-                     && dsc->scale_x == LV_SCALE_NONE
-                     && dsc->scale_y == LV_SCALE_NONE
-                     && dsc->rotation == 0
-                     && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
-                     && (dsc->header.cf == LV_COLOR_FORMAT_ARGB8888
-                         || dsc->header.cf == LV_COLOR_FORMAT_XRGB8888
-                         || dsc->header.cf == LV_COLOR_FORMAT_RGB888
-                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565
-                         || dsc->header.cf == LV_COLOR_FORMAT_ARGB1555)
-                     && (dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_XRGB8888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
-                    return 0;
-                }
-            }
-            break;
-        default:
-            return 0;
-    }
+    return cf == LV_COLOR_FORMAT_ARGB8888
+           || cf == LV_COLOR_FORMAT_XRGB8888
+           || cf == LV_COLOR_FORMAT_RGB888
+           || cf == LV_COLOR_FORMAT_RGB565;
+}
 
-    task->preferred_draw_unit_id = DRAW_UNIT_ID_DMA2D;
-    task->preference_score = 0;
+static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    return dsc->radius == 0
+           && dsc->grad.dir == LV_GRAD_DIR_NONE
+           && is_dest_cf_supported(layer->color_format);
+}
 
-    return 0;
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    return dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
+           && dsc->clip_radius == 0
+           && dsc->bitmap_mask_src == NULL
+           && dsc->sup == NULL
+           && dsc->tile == 0
+           && dsc->blend_mode == LV_BLEND_MODE_NORMAL
+           && dsc->recolor_opa <= LV_OPA_MIN
+           && dsc->skew_y == 0
+           && dsc->skew_x == 0
+           && dsc->scale_x == LV_SCALE_NONE
+           && dsc->scale_y == LV_SCALE_NONE
+           && dsc->rotation == 0
+           && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
+           && (dsc->header.cf == LV_COLOR_FORMAT_ARGB8888
+               || dsc->header.cf == LV_COLOR_FORMAT_XRGB8888
+               || dsc->header.cf == LV_COLOR_FORMAT_RGB888
+               || dsc->header.cf == LV_COLOR_FORMAT_RGB565
+               || dsc->header.cf == LV_COLOR_FORMAT_ARGB1555)
+           && is_dest_cf_supported(layer->color_format);
 }
 
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
