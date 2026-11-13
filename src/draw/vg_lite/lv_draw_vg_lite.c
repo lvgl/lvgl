@@ -88,6 +88,7 @@ void lv_draw_vg_lite_init(void)
 #endif
 
     lv_vg_lite_dump_info();
+    lv_vg_lite_utils_init();
 
     lv_draw_buf_vg_lite_init_handlers();
 
