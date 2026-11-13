@@ -125,6 +125,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "atomic.h",
     "bf0_hal.h",
     "bsp_api.h",
+    "ch.h",
     "cmsis_os2.h",
     "cstdint",
     "ctype.h",
