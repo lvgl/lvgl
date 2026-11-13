@@ -95,6 +95,8 @@ lv_obj_add_style(btn, &style_btn, 0);                     /* Default button styl
 lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED);        /* Overwrite only some colors to red when pressed */
 ```
 
+A Widget can have at most 63 style entries. This limit includes styles added by a theme, local styles and transition styles. Adding another style at the limit leaves it unassigned. Re-adding an existing style with the same selector moves it to the top of the precedence order.
+
 ## Removing Styles
 
 To remove all styles from a Widget use <ApiLink name="lv_obj_remove_style_all" display="lv_obj_remove_style_all(widget)" />.

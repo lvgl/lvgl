@@ -11,6 +11,7 @@
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_MICROPYTHON
 
 #include <include/lv_mp_mem_custom_include.h>
+#include <stdlib.h>
 
 /*********************
  *      DEFINES
@@ -64,31 +65,35 @@ void lv_mem_remove_pool(lv_mem_pool_t pool)
 
 void * lv_malloc_core(size_t size)
 {
-#if MICROPY_MALLOC_USES_ALLOCATED_SIZE
-    return gc_alloc(size, true);
+#if MICROPY_ENABLE_GC
+    void * p = gc_alloc(size, 0);
 #else
-    return m_malloc(size);
+    void * p = malloc(size);
 #endif
+    if(p == NULL) m_malloc_fail(size);
+    return p;
 }
 
 void * lv_realloc_core(void * p, size_t new_size)
 {
-
-#if MICROPY_MALLOC_USES_ALLOCATED_SIZE
-    return gc_realloc(p, new_size, true);
+#if MICROPY_ENABLE_GC
+    void * new_p = gc_realloc(p, new_size, true);
+    /*gc_realloc() fails while the GC is locked (e.g. in a finaliser), even
+     *to shrink. LVGL tolerates a failed shrink, so keep the block.*/
+    if(new_p == NULL && p != NULL && new_size <= gc_nbytes(p)) return p;
 #else
-    return m_realloc(p, new_size);
+    void * new_p = realloc(p, new_size);
 #endif
+    if(new_p == NULL) m_malloc_fail(new_size);
+    return new_p;
 }
 
 void lv_free_core(void * p)
 {
-
-#if MICROPY_MALLOC_USES_ALLOCATED_SIZE
+#if MICROPY_ENABLE_GC
     gc_free(p);
-
 #else
-    m_free(p);
+    free(p);
 #endif
 }
 
