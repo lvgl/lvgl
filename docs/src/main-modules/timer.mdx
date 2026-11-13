@@ -143,6 +143,7 @@ For these cases,
 <ApiLink name="lv_async_call" display="lv_async_call(my_function, data_p)" /> can be used to call `my_function` on
 the next invocation of <ApiLink name="lv_timer_handler" />.  As a side effect, this also
 ensures it is called in a thread in which it is safe to make LVGL calls.
+A call scheduled by a timer or another async callback waits for the following handler invocation.
 `data_p` will be passed to the function when it's called. Note that only the data's
 pointer is saved, so whatever it is pointing to needs to remain valid until the
 function is called, so it can point to `static`, global or dynamically allocated
