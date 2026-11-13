@@ -433,6 +433,15 @@ void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
+    if(kb == NULL) {
+        if(pinyin_ime->kb) {
+            lv_obj_remove_event_cb_with_user_data(pinyin_ime->kb, lv_ime_pinyin_kb_event, obj);
+            lv_obj_remove_event_cb_with_user_data(pinyin_ime->kb, NULL, &pinyin_ime->kb);
+        }
+        pinyin_ime->kb = NULL;
+        return;
+    }
+
     pinyin_ime->kb = kb;
     lv_obj_null_on_delete(&pinyin_ime->kb);
     lv_obj_set_parent(obj, lv_obj_get_parent(kb));
