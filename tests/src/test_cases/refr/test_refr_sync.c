@@ -265,4 +265,80 @@ void test_refr_triple_buffer_sync(void)
     ASSERT_PX_EQ(REFR_COLOR_RED, refr_buf_px(refr_ctx.buf[2], 10, 10));
 }
 
+void test_refr_sync_waits_for_a_frame_to_render(void)
+{
+    refr_disp_create(64, 64, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_DIRECT, 2, 64);
+    lv_display_set_sync_cb(refr_ctx.disp, refr_sync_cb);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+
+    lv_area_t a1 = {0, 0, 9, 9};
+    refr_ctx.disp->inv_p = 0;
+    lv_inv_area(refr_ctx.disp, &a1);
+    refr_frame();
+    refr_log_reset();
+
+    /*Nothing to render: the off-screen buffer is not used, so it is not synchronized yet*/
+    refr_frame();
+    refr_frame();
+    TEST_ASSERT_EQUAL_UINT32(0, refr_ctx.sync_cnt);
+
+    /*It is synchronized right before the next frame renders into it*/
+    lv_area_t a2 = {40, 40, 49, 49};
+    refr_ctx.disp->inv_p = 0;
+    lv_inv_area(refr_ctx.disp, &a2);
+    refr_frame();
+    TEST_ASSERT_EQUAL_UINT32(1, refr_ctx.sync_cnt);
+    TEST_ASSERT_TRUE(lv_area_is_equal(&a1, &refr_ctx.sync_area[0]));
+}
+
+void test_refr_sync_is_skipped_when_the_next_rendered_frame_covers_it(void)
+{
+    refr_disp_create(64, 64, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_DIRECT, 2, 64);
+    lv_display_set_sync_cb(refr_ctx.disp, refr_sync_cb);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+
+    lv_area_t a1 = {0, 0, 9, 9};
+    refr_ctx.disp->inv_p = 0;
+    lv_inv_area(refr_ctx.disp, &a1);
+    refr_frame();
+    refr_log_reset();
+    refr_frame();
+
+    /*A full screen redraw (e.g. a new screen) leaves nothing to synchronize*/
+    lv_obj_invalidate(refr_screen());
+    refr_frame();
+    TEST_ASSERT_EQUAL_UINT32(0, refr_ctx.sync_cnt);
+}
+
+void test_refr_sync_areas_after_frames_without_rendering(void)
+{
+    refr_disp_create(64, 64, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_DIRECT, 2, 64);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+    lv_obj_invalidate(refr_screen());
+    refr_frame();
+
+    /*Render a red rectangle into one of the buffers only*/
+    const lv_draw_buf_t * rendered_buf = refr_ctx.disp->buf_act;
+    refr_rect_create(refr_screen(), 0, 0, 20, 20, REFR_COLOR_RED);
+    lv_obj_update_layout(refr_screen());
+    lv_area_t obj_area = {0, 0, 19, 19};
+    refr_ctx.disp->inv_p = 0;
+    lv_inv_area(refr_ctx.disp, &obj_area);
+    refr_frame();
+    const lv_draw_buf_t * next_buf = refr_ctx.disp->buf_act;
+    TEST_ASSERT_NOT_EQUAL(rendered_buf, next_buf);
+
+    /*Frames with nothing to render don't swap the buffers*/
+    refr_frame();
+    refr_frame();
+    TEST_ASSERT_EQUAL_PTR(next_buf, refr_ctx.disp->buf_act);
+
+    /*Refresh a different area: the rectangle still reaches the other buffer first*/
+    lv_area_t other = {40, 40, 59, 59};
+    refr_ctx.disp->inv_p = 0;
+    lv_inv_area(refr_ctx.disp, &other);
+    refr_frame();
+    ASSERT_PX_EQ(REFR_COLOR_RED, refr_buf_px(next_buf, 10, 10));
+}
+
 #endif /*LV_BUILD_TEST*/

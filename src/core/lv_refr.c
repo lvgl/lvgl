@@ -420,7 +420,9 @@ void lv_display_refr_timer(lv_timer_t * timer)
     /*Expand the invalidated areas for blur objects before joining them*/
     lv_obj_invalidate_expand_blur(disp_refr);
     lv_refr_join_area();
-    refr_sync_areas();
+    if(disp_refr->inv_p > 0) {
+        refr_sync_areas();
+    }
     refr_invalid_areas();
 
     if(disp_refr->inv_p == 0) goto refr_finish;
