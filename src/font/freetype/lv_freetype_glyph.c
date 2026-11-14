@@ -350,7 +350,25 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
         }
     }
     else if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
-        FT_Bitmap * glyph_bitmap = &face->glyph->bitmap;
+        /*Remember the original format: FT_Render_Glyph turns the slot into a bitmap, which
+         *would make an outline glyph look like an image glyph further down.*/
+        bool is_bitmap_glyph = glyph->format == FT_GLYPH_FORMAT_BITMAP;
+
+        /*Synthetic bold, mirroring the outline render mode. Variable fonts get their weight
+         *from the variation axis instead, so they must not be emboldened here.*/
+        if((dsc->style & LV_FREETYPE_FONT_STYLE_BOLD) && !FT_HAS_MULTIPLE_MASTERS(face) &&
+           !is_bitmap_glyph) {
+            error = FT_Outline_Embolden(&glyph->outline, FT_INT_TO_F26DOT6(1));
+            if(error) {
+                FT_ERROR_MSG("FT_Outline_Embolden", error);
+            }
+            error = FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL);
+            if(error) {
+                FT_ERROR_MSG("FT_Render_Glyph", error);
+            }
+        }
+
+        FT_Bitmap * glyph_bitmap = &glyph->bitmap;
 
         dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->advance.x);        /*Width of the glyph in [pf]*/
         dsc_out->box_h = glyph_bitmap->rows;                         /*Height of the bitmap in [px]*/
@@ -358,7 +376,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
         dsc_out->ofs_x = glyph->bitmap_left;                         /*X offset of the bitmap in [pf]*/
         dsc_out->ofs_y = glyph->bitmap_top -
                          dsc_out->box_h;                             /*Y offset of the bitmap measured from the as line*/
-        if(glyph->format == FT_GLYPH_FORMAT_BITMAP)
+        if(is_bitmap_glyph)
             dsc_out->format = LV_FONT_GLYPH_FORMAT_IMAGE;
         else
             dsc_out->format = LV_FONT_GLYPH_FORMAT_A8;

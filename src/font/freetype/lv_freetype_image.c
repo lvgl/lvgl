@@ -162,6 +162,16 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
         LV_PROFILER_FONT_END;
         return false;
     }
+    /*Synthetic bold, mirroring the outline render mode. Variable fonts get their weight from
+     *the variation axis instead, so they must not be emboldened here.*/
+    if((dsc->style & LV_FREETYPE_FONT_STYLE_BOLD) && !FT_HAS_MULTIPLE_MASTERS(face) &&
+       face->glyph->format == FT_GLYPH_FORMAT_OUTLINE) {
+        error = FT_Outline_Embolden(&face->glyph->outline, FT_INT_TO_F26DOT6(1));
+        if(error) {
+            FT_ERROR_MSG("FT_Outline_Embolden", error);
+        }
+    }
+
     if(face->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
         error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
         if(error) {
