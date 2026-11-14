@@ -235,7 +235,8 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
 
     parent->spec_attr->children[index] = obj;
     lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, NULL);
-    lv_obj_invalidate(parent);
+    /*Only the stacking order changed, so only the area obj draws can look different*/
+    lv_obj_invalidate(obj);
 }
 
 void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
