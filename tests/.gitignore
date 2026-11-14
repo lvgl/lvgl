@@ -4,5 +4,6 @@
 *.dat
 *.raw
 *_err.png
+*_diff.png
 build_*/
 report*/
