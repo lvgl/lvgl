@@ -178,4 +178,32 @@ void test_ap_proc_does_not_overflow_with_long_arabic(void)
     TEST_ASSERT_EQUAL(0x7E, output[len + 1]);
 }
 
+void test_ap_proc_alef_madda_joins_to_previous(void)
+{
+    /* "بآ": beh initial U+FE91 + alef with madda final U+FE82 */
+    char out[16] = {0};
+    lv_text_ap_proc("\xD8\xA8\xD8\xA2", out);
+    TEST_ASSERT_EQUAL_STRING("\xEF\xBA\x91\xEF\xBA\x82", out);
+
+    /* "آ" alone stays isolated U+FE81 */
+    lv_text_ap_proc("\xD8\xA2", out);
+    TEST_ASSERT_EQUAL_STRING("\xEF\xBA\x81", out);
+}
+
+void test_ap_proc_teh_marbuta_between_letters_is_final(void)
+{
+    /* "بةب": beh initial U+FE91, teh marbuta final U+FE94, beh isolated U+FE8F */
+    char out[16] = {0};
+    lv_text_ap_proc("\xD8\xA8\xD8\xA9\xD8\xA8", out);
+    TEST_ASSERT_EQUAL_STRING("\xEF\xBA\x91\xEF\xBA\x94\xEF\xBA\x8F", out);
+}
+
+void test_ap_proc_alef_maksura_before_letter_is_isolated(void)
+{
+    /* "ىة": alef maksura isolated U+FEEF, teh marbuta isolated U+FE93 */
+    char out[16] = {0};
+    lv_text_ap_proc("\xD9\x89\xD8\xA9", out);
+    TEST_ASSERT_EQUAL_STRING("\xEF\xBB\xAF\xEF\xBA\x93", out);
+}
+
 #endif /*LV_BUILD_TEST*/
