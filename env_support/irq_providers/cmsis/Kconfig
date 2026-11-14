@@ -1,0 +1,68 @@
+# CMSIS IRQ provider: defines the named NVIC vectors on Cortex-M.
+
+config LV_IRQ_PROVIDER_CMSIS
+	int
+	default 1
+
+choice LV_IRQ_DEFAULT_PROVIDER
+	config LV_IRQ_DEFAULT_PROVIDER_CMSIS
+		bool "CMSIS (NVIC)"
+endchoice
+
+choice LV_IRQ_DMA2D_PROVIDER_CHOICE
+	config LV_IRQ_DMA2D_PROVIDER_CMSIS
+		bool "CMSIS (NVIC)"
+		help
+			Defines DMA2D_IRQHandler, so the application must not define it too.
+endchoice
+
+config LV_IRQ_DMA2D_PROVIDER
+	int
+	default LV_IRQ_PROVIDER_CMSIS if LV_IRQ_DMA2D_PROVIDER_CMSIS || (LV_IRQ_DMA2D_PROVIDER_DEFAULT && LV_IRQ_DEFAULT_PROVIDER_CMSIS)
+
+choice LV_IRQ_PXP_PROVIDER_CHOICE
+	config LV_IRQ_PXP_PROVIDER_CMSIS
+		bool "CMSIS (NVIC)"
+		help
+			Defines PXP_IRQHandler, so the application must not define it too.
+endchoice
+
+config LV_IRQ_PXP_PROVIDER
+	int
+	default LV_IRQ_PROVIDER_CMSIS if LV_IRQ_PXP_PROVIDER_CMSIS || (LV_IRQ_PXP_PROVIDER_DEFAULT && LV_IRQ_DEFAULT_PROVIDER_CMSIS)
+if LV_IRQ_DMA2D_PROVIDER = LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER = LV_IRQ_PROVIDER_CMSIS
+
+config LV_IRQ_CMSIS_USE_INCLUDE
+	bool "CMSIS provider: include a device header"
+	help
+		Include the device header that declares the IRQn_Type values
+		(DMA2D_IRQn, PXP_IRQn, ...) and the NVIC_* functions. Leave disabled if
+		the build already makes them visible.
+
+config LV_IRQ_CMSIS_INCLUDE
+	string "CMSIS provider: device header"
+	default ""
+	depends on LV_IRQ_CMSIS_USE_INCLUDE
+	help
+		For example "stm32h7xx.h".
+
+config LV_IRQ_CMSIS_SET_PRIORITY
+	bool "CMSIS provider: set the NVIC priority"
+	help
+		Enable on RTOS builds where the interrupt priority must sit at or below
+		the kernel's syscall interrupt priority ceiling, so the ISR may call the
+		kernel's ...FromISR APIs (lv_thread_sync_signal_isr uses one). Leave
+		disabled on bare metal, where the reset-default priority is fine.
+
+config LV_IRQ_CMSIS_PRIORITY
+	int "CMSIS provider: NVIC priority value"
+	default 255
+	depends on LV_IRQ_CMSIS_SET_PRIORITY
+	help
+		The value passed to NVIC_SetPriority. 255 maps to the lowest preemption
+		priority whatever __NVIC_PRIO_BITS is: always safe for ...FromISR calls,
+		at the cost of latency. Under FreeRTOS the best latency is
+		configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h
+		may write it symbolically; Kconfig takes a literal number).
+
+endif

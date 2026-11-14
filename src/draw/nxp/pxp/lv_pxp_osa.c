@@ -20,13 +20,8 @@
 #include "../../../osal/lv_os_private.h"
 #include <fsl_pxp.h>
 
-#if defined(SDK_OS_FREE_RTOS)
-    #include <FreeRTOS.h>
-#endif
-
-#if defined(__ZEPHYR__)
-    #include <zephyr/kernel.h>
-    #include <zephyr/irq.h>
+#if !LV_IRQ_PROVIDES_PXP
+    #error "PXP needs an IRQ provider picked for PXP (LV_IRQ_PXP_PROVIDER)"
 #endif
 
 /*********************
@@ -61,12 +56,10 @@ static void _pxp_run(void);
  */
 static void _pxp_wait(void);
 
-#if defined(__ZEPHYR__)
-    /**
-    * Interrupt handler for Zephyr IRQ
-    */
-    static void _pxp_zephyr_irq_handler(void *);
-#endif
+/**
+ * PXP completion callback, invoked by the PXP IRQ provider.
+ */
+static void _pxp_irq_cb(void * arg);
 
 /**********************
  *  STATIC VARIABLES
@@ -92,8 +85,19 @@ static pxp_cfg_t _pxp_default_cfg = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void PXP_IRQHandler(void)
+pxp_cfg_t * pxp_get_default_cfg(void)
 {
+    return &_pxp_default_cfg;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void _pxp_irq_cb(void * arg)
+{
+    LV_UNUSED(arg);
+
     if(kPXP_CompleteFlag & PXP_GetStatusFlags(PXP_ID)) {
         PXP_ClearStatusFlags(PXP_ID, kPXP_CompleteFlag);
 #if LV_USE_OS
@@ -104,22 +108,6 @@ void PXP_IRQHandler(void)
     }
 }
 
-pxp_cfg_t * pxp_get_default_cfg(void)
-{
-    return &_pxp_default_cfg;
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-#if defined(__ZEPHYR__)
-static void _pxp_zephyr_irq_handler(void *)
-{
-    PXP_IRQHandler();
-}
-#endif
-
 static void _pxp_interrupt_init(void)
 {
 #if LV_USE_OS
@@ -128,27 +116,14 @@ static void _pxp_interrupt_init(void)
     }
 #endif
 
-#if defined(__ZEPHYR__)
-    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(pxp)), CONFIG_LV_Z_PXP_INTERRUPT_PRIORITY, _pxp_zephyr_irq_handler, NULL, 0);
-    irq_enable(DT_IRQN(DT_NODELABEL(pxp)));
-#elif defined(SDK_OS_FREE_RTOS)
-    NVIC_SetPriority(PXP_IRQ_ID, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1);
-#endif
-
-#if !defined(__ZEPHYR__)
-    NVIC_EnableIRQ(PXP_IRQ_ID);
-#endif
+    lv_irq_attach_pxp(_pxp_irq_cb, NULL);
 
     ucPXPIdle = true;
 }
 
 static void _pxp_interrupt_deinit(void)
 {
-#if defined(__ZEPHYR__)
-    irq_disable(DT_IRQN(DT_NODELABEL(pxp)));
-#else
-    NVIC_DisableIRQ(PXP_IRQ_ID);
-#endif
+    lv_irq_detach_pxp();
 
 #if LV_USE_OS
     lv_thread_sync_delete(&pxp_sync);

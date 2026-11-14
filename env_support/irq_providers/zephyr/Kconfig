@@ -1,0 +1,33 @@
+# Zephyr IRQ provider: IRQ_CONNECT with the number and priority from the
+# device tree.
+
+config LV_IRQ_PROVIDER_ZEPHYR
+	int
+	default 2
+
+choice LV_IRQ_DEFAULT_PROVIDER
+	config LV_IRQ_DEFAULT_PROVIDER_ZEPHYR
+		bool "Zephyr (device tree)"
+endchoice
+
+choice LV_IRQ_DMA2D_PROVIDER_CHOICE
+	config LV_IRQ_DMA2D_PROVIDER_ZEPHYR
+		bool "Zephyr (device tree)"
+		help
+			Needs a dma2d node in the device tree.
+endchoice
+
+config LV_IRQ_DMA2D_PROVIDER
+	int
+	default LV_IRQ_PROVIDER_ZEPHYR if LV_IRQ_DMA2D_PROVIDER_ZEPHYR || (LV_IRQ_DMA2D_PROVIDER_DEFAULT && LV_IRQ_DEFAULT_PROVIDER_ZEPHYR)
+
+choice LV_IRQ_PXP_PROVIDER_CHOICE
+	config LV_IRQ_PXP_PROVIDER_ZEPHYR
+		bool "Zephyr (device tree)"
+		help
+			Needs a pxp node in the device tree.
+endchoice
+
+config LV_IRQ_PXP_PROVIDER
+	int
+	default LV_IRQ_PROVIDER_ZEPHYR if LV_IRQ_PXP_PROVIDER_ZEPHYR || (LV_IRQ_PXP_PROVIDER_DEFAULT && LV_IRQ_DEFAULT_PROVIDER_ZEPHYR)

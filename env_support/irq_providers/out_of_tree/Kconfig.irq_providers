@@ -1,0 +1,3 @@
+# Sourced by LVGL when LV_IRQ_PROVIDERS_DIR points at this directory. List the
+# IRQ providers that live outside LVGL here.
+rsource "redox/Kconfig"

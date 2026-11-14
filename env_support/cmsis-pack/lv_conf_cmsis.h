@@ -535,8 +535,8 @@
 /** Header that declares the DMA2D HAL API of the target STM32 family. */
 #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
-/** Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
- *  Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
+/** Run DMA2D transfers asynchronously instead of waiting for them. Needs an
+ *  OS and an IRQ provider picked for DMA2D (LV_IRQ_DMA2D_PROVIDER).
  */
 #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 

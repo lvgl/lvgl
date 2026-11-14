@@ -1,5 +1,7 @@
 # Generated file. DO NOT EDIT!
 
+osource "$(LV_IRQ_PROVIDERS_DIR)/Kconfig.top"
+
 menu "LVGL"
 menu "Memory and Standard Library"
 
@@ -245,6 +247,110 @@ config LV_OS_IDLE_PERCENT_CUSTOM
 		default FreeRTOS implementation may not track idle time across all cores.
 endmenu
 endif #LV_OS_FREERTOS
+endmenu
+menu "IRQ providers"
+	# Each completion source a draw unit can wait on has a choice of the IRQ
+	# provider that serves it, and an int LV_IRQ_<SOURCE>_PROVIDER with the
+	# picked provider's ID, which is what C reads. A provider defines its ID
+	# (LV_IRQ_PROVIDER_<NAME>: 1-127 in LVGL, 128-255 outside), adds itself to
+	# "Default IRQ provider" and to the choices of the sources it serves, and adds
+	# "default <its ID> if <picked directly, or via Default provider>" to their ints.
+	# The choices are Kconfig-only: lv_conf.h sets the ints directly.
+
+	config LV_IRQ_PROVIDER_NONE
+		int
+		default 0
+
+	choice LV_IRQ_DEFAULT_PROVIDER
+		prompt "Default IRQ provider"
+		help
+			Serves every interrupt whose provider is left on "Default provider" and
+			that it can serve.
+
+		config LV_IRQ_DEFAULT_PROVIDER_NONE
+			bool "None"
+	endchoice
+
+	# Defined here first so that its help is the one documented; providers add
+	# their defaults below, and the fallback is the last one.
+	config LV_IRQ_DMA2D_PROVIDER
+		int
+		help
+			ID of the IRQ provider serving the DMA2D interrupt: one of LV_IRQ_PROVIDER_*,
+			e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
+
+	choice LV_IRQ_DMA2D_PROVIDER_CHOICE
+		prompt "DMA2D interrupt provided by"
+
+		config LV_IRQ_DMA2D_PROVIDER_DEFAULT
+			bool "Default provider"
+			help
+				The "Default IRQ provider", if it can serve the DMA2D interrupt; none otherwise.
+
+		config LV_IRQ_DMA2D_PROVIDER_NONE
+			bool "None"
+	endchoice
+
+	# Defined here first so that its help is the one documented; providers add
+	# their defaults below, and the fallback is the last one.
+	config LV_IRQ_PXP_PROVIDER
+		int
+		help
+			ID of the IRQ provider serving the PXP interrupt: one of LV_IRQ_PROVIDER_*,
+			e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
+
+	choice LV_IRQ_PXP_PROVIDER_CHOICE
+		prompt "PXP interrupt provided by"
+
+		config LV_IRQ_PXP_PROVIDER_DEFAULT
+			bool "Default provider"
+			help
+				The "Default IRQ provider", if it can serve the PXP interrupt; none otherwise.
+
+		config LV_IRQ_PXP_PROVIDER_NONE
+			bool "None"
+	endchoice
+
+	# Defined here first so that its help is the one documented; providers add
+	# their defaults below, and the fallback is the last one.
+	config LV_IRQ_NEMA_GPU2D_PROVIDER
+		int
+		help
+			ID of the IRQ provider serving the NemaGFX GPU2D completion: one of LV_IRQ_PROVIDER_*,
+			e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
+
+	choice LV_IRQ_NEMA_GPU2D_PROVIDER_CHOICE
+		prompt "NemaGFX GPU2D completion provided by"
+
+		config LV_IRQ_NEMA_GPU2D_PROVIDER_DEFAULT
+			bool "Default provider"
+			help
+				The "Default IRQ provider", if it can serve the NemaGFX GPU2D completion; none otherwise.
+
+		config LV_IRQ_NEMA_GPU2D_PROVIDER_NONE
+			bool "None"
+	endchoice
+
+	# The paths are relative to LVGL's root Kconfig, into which this file is inlined.
+	orsource "env_support/irq_providers/cmsis/Kconfig"
+	orsource "env_support/irq_providers/zephyr/Kconfig"
+	orsource "env_support/irq_providers/nema_stm32/Kconfig"
+
+	# Providers outside LVGL: point LV_IRQ_PROVIDERS_DIR at a directory whose
+	# Kconfig.irq_providers sources them.
+	osource "$(LV_IRQ_PROVIDERS_DIR)/Kconfig.irq_providers"
+
+	config LV_IRQ_DMA2D_PROVIDER
+		int
+		default LV_IRQ_PROVIDER_NONE
+
+	config LV_IRQ_PXP_PROVIDER
+		int
+		default LV_IRQ_PROVIDER_NONE
+
+	config LV_IRQ_NEMA_GPU2D_PROVIDER
+		int
+		default LV_IRQ_PROVIDER_NONE
 endmenu
 menu "Rendering Configuration"
 
@@ -988,9 +1094,10 @@ config LV_DRAW_DMA2D_HAL_INCLUDE
 config LV_USE_DRAW_DMA2D_INTERRUPT
 	bool "Transfer complete interrupt"
 	default n
+	depends on !LV_OS_NONE && LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE
 	help
-		Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
-		Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
+		Run DMA2D transfers asynchronously instead of waiting for them. Needs an
+		OS and an IRQ provider picked for DMA2D (LV_IRQ_DMA2D_PROVIDER).
 
 endif
 endmenu

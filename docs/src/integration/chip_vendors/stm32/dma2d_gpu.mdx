@@ -7,7 +7,7 @@ faqs:
   - question: "Which draw tasks does DMA2D accelerate?"
     answer: "Fills and images that use standard color formats with no gradient, no transform, and no radius. Everything else is rendered in parallel by the software draw unit."
   - question: "Can the CPU sleep while a DMA2D transfer is running?"
-    answer: "Yes, with an OS. Set LV_USE_OS to the matching value, set LV_USE_DRAW_DMA2D_INTERRUPT to 1, and call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global interrupt. Otherwise LVGL spins while waiting."
+    answer: "Yes, with an OS and an IRQ provider for DMA2D. Set LV_USE_OS to the matching value, pick an IRQ provider for DMA2D (LV_IRQ_DMA2D_PROVIDER), and set LV_USE_DRAW_DMA2D_INTERRUPT to 1. Otherwise LVGL spins while waiting."
   - question: "Does LVGL use the STM32 HAL for DMA2D?"
     answer: "No, it manipulates the DMA2D peripheral through direct register access. Make sure no framework contends with LVGL over the peripheral."
   - question: "Can DMA2D be used together with LTDC and NeoChrom?"
@@ -63,12 +63,14 @@ supported values in `lv_conf_template.h` corresponding to the RTOS you're using.
 </Step>
 
 <Step>
-**Enable the interrupt**: Set <ApiLink name="LV_USE_DRAW_DMA2D_INTERRUPT" /> to `1` in `lv_conf.h`.
+**Provide the interrupt**: Pick the IRQ provider for DMA2D in `LV_IRQ_DMA2D_PROVIDER`, for
+example CMSIS (`env_support/irq_providers/cmsis`), and add its source file to your build. It wires
+the DMA2D global interrupt to LVGL. A provider of your own defines `lv_irq_attach_dma2d()` and
+`lv_irq_detach_dma2d()`; see `env_support/irq_providers/README.md`.
 </Step>
 
 <Step>
-**Call the handler**: Call <ApiLink name="lv_draw_dma2d_transfer_complete_interrupt_handler" />
-when you receive the global interrupt that signals that a DMA2D transfer has completed.
+**Enable the interrupt**: Set <ApiLink name="LV_USE_DRAW_DMA2D_INTERRUPT" /> to `1`.
 </Step>
 
 </Steps>

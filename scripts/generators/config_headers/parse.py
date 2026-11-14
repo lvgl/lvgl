@@ -81,6 +81,12 @@ IGNORE_SYMBOLS: set[str] = {
     "LVGL_VERSION_MAJOR",
     "LVGL_VERSION_MINOR",
     "LVGL_VERSION_PATCH",
+    # IRQ provider choices: Kconfig only works out LV_IRQ_<SOURCE>_PROVIDER
+    # from them, which lv_conf.h sets directly
+    "LV_IRQ_DEFAULT_PROVIDER",
+    "LV_IRQ_DMA2D_PROVIDER_CHOICE",
+    "LV_IRQ_PXP_PROVIDER_CHOICE",
+    "LV_IRQ_NEMA_GPU2D_PROVIDER_CHOICE",
 }
 
 # Anonymous choices whose members map to tokens that live in LVGL's
@@ -300,6 +306,8 @@ def _build_choice(choice, node) -> EnumChoice | None:  # | BoolGroupChoice :
     * named choice                        -> single macro, member == token (B1:
       LV_TXT_ENC, LV_BIDI_BASE_DIR_DEF).
     Bare-choice tokens always live in C headers, so none are (re)defined."""
+    if choice.name in IGNORE_SYMBOLS:
+        return None
     members = [m for m in choice.syms if m.name not in IGNORE_SYMBOLS]
     if not members:
         return None

@@ -16,6 +16,7 @@ import re
 from kconfiglib import (
     AND,
     BOOL,
+    EQUAL,
     HEX,
     INT,
     NOT,
@@ -403,7 +404,10 @@ def _render_bool_expr(expr, guard):
             return text
 
         return (f"{wrap(left)} {sep} {wrap(right)}", myprec)
-    # comparisons (==, <, ...): kconfiglib already renders C-compatible text.
+    # Kconfig writes equality as `=`; C needs `==`. The other comparisons (!=,
+    # <, ...) already read the same in both.
+    if op == EQUAL:
+        return (f"{expr_str(expr[1])} == {expr_str(expr[2])}", 3)
     return (expr_str(expr), 3)
 
 
