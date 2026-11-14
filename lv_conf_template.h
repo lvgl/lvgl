@@ -245,6 +245,14 @@
 /** ARGB8888 */
 #define LV_DRAW_SW_SUPPORT_ARGB8888 1
 
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+/** Enable 16-bit straight-alpha ARGB images and draw buffers.
+ *  The software renderer uses small ARGB8888 tiles for blending.
+ */
+#define LV_DRAW_SW_SUPPORT_ARGB4444 0
+
+#endif /*LV_DRAW_SW_SUPPORT_ARGB8888*/
+
 /** ARGB8888 premultiplied */
 #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
 
