@@ -37,6 +37,8 @@ static void lv_image_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_image_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_image(lv_event_t * e);
+static void get_image_area(lv_obj_t * obj, lv_area_t * area);
+static void get_transformed_area(lv_obj_t * obj, lv_area_t * area);
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y);
 static void update_align(lv_obj_t * obj);
 static void reset_image_attributes(lv_obj_t * obj);
@@ -265,8 +267,10 @@ void lv_image_set_offset_x(lv_obj_t * obj, int32_t x)
 
     lv_image_t * img = (lv_image_t *)obj;
 
-    img->offset.x = x;
+    /*Before: a smaller extra draw size below would not cover the old position*/
     lv_obj_invalidate(obj);
+    img->offset.x = x;
+    lv_obj_refresh_ext_draw_size(obj);
 }
 
 void lv_image_set_offset_y(lv_obj_t * obj, int32_t y)
@@ -275,8 +279,10 @@ void lv_image_set_offset_y(lv_obj_t * obj, int32_t y)
 
     lv_image_t * img = (lv_image_t *)obj;
 
-    img->offset.y = y;
+    /*Before: a smaller extra draw size below would not cover the old position*/
     lv_obj_invalidate(obj);
+    img->offset.y = y;
+    lv_obj_refresh_ext_draw_size(obj);
 }
 
 void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
@@ -295,16 +301,8 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
     if((uint32_t)angle == img->rotation) return;
 
     lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
-    int32_t w = lv_obj_get_width(obj);
-    int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
-    lv_point_t pivot_px;
-    lv_image_get_pivot(obj, &pivot_px);
-    lv_image_buf_get_transformed_area(&a, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-    a.x1 += obj->coords.x1;
-    a.y1 += obj->coords.y1;
-    a.x2 += obj->coords.x1;
-    a.y2 += obj->coords.y1;
+    get_transformed_area(obj, &a);
     lv_obj_invalidate_area(obj, &a);
 
     img->rotation = angle;
@@ -316,11 +314,7 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
 
-    lv_image_buf_get_transformed_area(&a, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-    a.x1 += obj->coords.x1;
-    a.y1 += obj->coords.y1;
-    a.x2 += obj->coords.x1;
-    a.y2 += obj->coords.y1;
+    get_transformed_area(obj, &a);
     lv_obj_invalidate_area(obj, &a);
 }
 
@@ -337,16 +331,8 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
     if(img->pivot.x == x && img->pivot.y == y) return;
 
     lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
-    int32_t w = lv_obj_get_width(obj);
-    int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
-    lv_point_t pivot_px;
-    lv_image_get_pivot(obj, &pivot_px);
-    lv_image_buf_get_transformed_area(&a, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-    a.x1 += obj->coords.x1;
-    a.y1 += obj->coords.y1;
-    a.x2 += obj->coords.x1;
-    a.y2 += obj->coords.y1;
+    get_transformed_area(obj, &a);
     lv_obj_invalidate_area(obj, &a);
 
     lv_point_set(&img->pivot, x, y);
@@ -358,12 +344,7 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
 
-    lv_image_get_pivot(obj, &pivot_px);
-    lv_image_buf_get_transformed_area(&a, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-    a.x1 += obj->coords.x1;
-    a.y1 += obj->coords.y1;
-    a.x2 += obj->coords.x1;
-    a.y2 += obj->coords.y1;
+    get_transformed_area(obj, &a);
     lv_obj_invalidate_area(obj, &a);
 }
 
@@ -469,10 +450,11 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align)
         lv_image_set_scale(obj, LV_SCALE_NONE);
     }
 
+    /*Before: a smaller extra draw size below would not cover the old position*/
+    lv_obj_invalidate(obj);
     img->align = align;
     update_align(obj);
-
-    lv_obj_invalidate(obj);
+    lv_obj_refresh_ext_draw_size(obj);
 }
 
 void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src)
@@ -744,7 +726,8 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_area_t a;
             int32_t w = lv_obj_get_width(obj);
             int32_t h = lv_obj_get_height(obj);
-            lv_image_buf_get_transformed_area(&a, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
+            get_transformed_area(obj, &a);
+            lv_area_move(&a, -obj->coords.x1, -obj->coords.y1);
             *s = LV_MAX(*s, -a.x1);
             *s = LV_MAX(*s, -a.y1);
             *s = LV_MAX(*s, a.x2 - w);
@@ -883,29 +866,12 @@ static void draw_image(lv_event_t * e)
             draw_dsc.bitmap_mask_src = img->bitmap_mask_src;
             draw_dsc.src = img->src;
 
-            lv_area_set(&draw_dsc.image_area, obj->coords.x1,
-                        obj->coords.y1,
-                        obj->coords.x1 + img->w - 1,
-                        obj->coords.y1 + img->h - 1);
+            get_image_area(obj, &draw_dsc.image_area);
 
             draw_dsc.clip_radius = lv_obj_get_style_radius_internal(obj, LV_PART_MAIN);
 
             lv_area_t coords;
-            if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
-                lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);
-                coords = draw_dsc.image_area;
-            }
-            else if(img->align == LV_IMAGE_ALIGN_CONTAIN || img->align == LV_IMAGE_ALIGN_COVER ||
-                    img->align == LV_IMAGE_ALIGN_CONTAIN_DOWNSCALE) {
-                int32_t scale = lv_image_get_scale(obj);
-                lv_point_t offset;
-                offset.x = (lv_obj_get_width(obj) - img->w * scale / LV_SCALE_NONE) / 2;
-                offset.y = (lv_obj_get_height(obj) - img->h * scale / LV_SCALE_NONE) / 2;
-                lv_area_move(&draw_dsc.image_area, offset.x, offset.y);
-                lv_area_move(&draw_dsc.image_area, img->offset.x, img->offset.y);
-                coords = draw_dsc.image_area;
-            }
-            else if(img->align == LV_IMAGE_ALIGN_TILE) {
+            if(img->align == LV_IMAGE_ALIGN_TILE) {
                 lv_area_intersect(&layer->_clip_area, &layer->_clip_area, &obj->coords);
                 lv_area_move(&draw_dsc.image_area, img->offset.x, img->offset.y);
 
@@ -962,22 +928,55 @@ static void draw_image(lv_event_t * e)
     }
 }
 
+/**
+ * The area of the image before its transformation, where draw_image() places it in the widget:
+ * the image's own size, which can differ from the widget's.
+ */
+static void get_image_area(lv_obj_t * obj, lv_area_t * area)
+{
+    lv_image_t * img = (lv_image_t *)obj;
+
+    lv_area_set(area, obj->coords.x1, obj->coords.y1, obj->coords.x1 + img->w - 1, obj->coords.y1 + img->h - 1);
+    if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+        lv_area_align(&obj->coords, area, img->align, img->offset.x, img->offset.y);
+    }
+    else if(img->align == LV_IMAGE_ALIGN_CONTAIN || img->align == LV_IMAGE_ALIGN_COVER ||
+            img->align == LV_IMAGE_ALIGN_CONTAIN_DOWNSCALE) {
+        int32_t scale = lv_image_get_scale(obj);
+        lv_area_move(area, (lv_obj_get_width(obj) - img->w * scale / LV_SCALE_NONE) / 2 + img->offset.x,
+                     (lv_obj_get_height(obj) - img->h * scale / LV_SCALE_NONE) / 2 + img->offset.y);
+    }
+}
+
+/**
+ * The absolute area draw_image() draws to with the image's rotation, scale and pivot.
+ * Tiles are drawn in the widget only.
+ */
+static void get_transformed_area(lv_obj_t * obj, lv_area_t * area)
+{
+    lv_image_t * img = (lv_image_t *)obj;
+    lv_area_t image_area;
+    lv_point_t pivot_px;
+
+    if(img->align == LV_IMAGE_ALIGN_TILE) {
+        *area = obj->coords;
+        return;
+    }
+    get_image_area(obj, &image_area);
+    lv_image_get_pivot(obj, &pivot_px);
+    lv_image_buf_get_transformed_area(area, img->w, img->h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
+    lv_area_move(area, image_area.x1, image_area.y1);
+}
+
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
 {
     LV_ASSERT(obj != NULL);
     lv_image_t * img = (lv_image_t *)obj;
 
     lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
-    int32_t w = lv_obj_get_width(obj);
-    int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
-    lv_point_t pivot_px;
-    lv_image_get_pivot(obj, &pivot_px);
-    lv_image_buf_get_transformed_area(&a, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-    a.x1 += obj->coords.x1 - 1;
-    a.y1 += obj->coords.y1 - 1;
-    a.x2 += obj->coords.x1 + 1;
-    a.y2 += obj->coords.y1 + 1;
+    get_transformed_area(obj, &a);
+    lv_area_increase(&a, 1, 1);
     lv_obj_invalidate_area(obj, &a);
 
     img->scale_x = scale_x;
@@ -990,11 +989,8 @@ static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
 
-    lv_image_buf_get_transformed_area(&a, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-    a.x1 += obj->coords.x1 - 1;
-    a.y1 += obj->coords.y1 - 1;
-    a.x2 += obj->coords.x1 + 1;
-    a.y2 += obj->coords.y1 + 1;
+    get_transformed_area(obj, &a);
+    lv_area_increase(&a, 1, 1);
     lv_obj_invalidate_area(obj, &a);
 }
 
