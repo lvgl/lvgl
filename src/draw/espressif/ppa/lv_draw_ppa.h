@@ -44,9 +44,34 @@ void lv_draw_ppa_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
 void lv_draw_ppa_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                      const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
+/**
+ * Rotate an RGB565 block with the PPA. Used by the `LV_DRAW_ROTATE*_RGB565` hooks of
+ * `lv_draw_rotate()`.
+ * @param src           pointer to the first source pixel
+ * @param dst           pointer to the first destination pixel
+ * @param src_width     source width in pixels
+ * @param src_height    source height in pixels
+ * @param src_stride    source stride in bytes
+ * @param dst_stride    destination stride in bytes
+ * @param rotation      `LV_ROTATION_90`, `LV_ROTATION_180` or `LV_ROTATION_270`
+ * @param cf            color format, only `LV_COLOR_FORMAT_RGB565` is accelerated
+ * @return              `LV_RESULT_OK` if the PPA rotated the block, `LV_RESULT_INVALID` if the
+ *                      caller should rotate it on the CPU
+ */
+lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, int32_t src_height,
+                               int32_t src_stride, int32_t dst_stride, lv_rotation_t rotation,
+                               lv_color_format_t cf);
+
 /**********************
  *      MACROS
  **********************/
+
+#define LV_DRAW_ROTATE90_RGB565(src, dst, w, h, src_stride, dst_stride) \
+    lv_draw_ppa_rotate(src, dst, w, h, src_stride, dst_stride, LV_ROTATION_90, LV_COLOR_FORMAT_RGB565)
+#define LV_DRAW_ROTATE180_RGB565(src, dst, w, h, src_stride, dst_stride) \
+    lv_draw_ppa_rotate(src, dst, w, h, src_stride, dst_stride, LV_ROTATION_180, LV_COLOR_FORMAT_RGB565)
+#define LV_DRAW_ROTATE270_RGB565(src, dst, w, h, src_stride, dst_stride) \
+    lv_draw_ppa_rotate(src, dst, w, h, src_stride, dst_stride, LV_ROTATION_270, LV_COLOR_FORMAT_RGB565)
 
 #endif /* LV_USE_PPA */
 
