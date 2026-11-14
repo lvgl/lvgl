@@ -72,6 +72,7 @@ lv_result_t lv_image_cache_init(uint32_t size)
 
 void lv_image_cache_resize(uint32_t new_size, bool evict_now)
 {
+    if(img_cache_p == NULL) return;
     lv_cache_set_max_size(img_cache_p, new_size, NULL);
     if(evict_now) {
         lv_cache_reserve(img_cache_p, new_size, NULL);
@@ -86,6 +87,7 @@ void lv_image_cache_drop(const void * src)
     /*Notify draw units to invalidate any cached resources (e.g., GPU textures) for this image source.*/
     lv_draw_unit_send_event(NULL, LV_EVENT_INVALIDATE_AREA, (void *)src);
 
+    if(img_cache_p == NULL) return;
     if(src == NULL) {
         lv_cache_drop_all(img_cache_p, NULL);
         return;
@@ -101,11 +103,12 @@ void lv_image_cache_drop(const void * src)
 
 bool lv_image_cache_is_enabled(void)
 {
-    return lv_cache_is_enabled(img_cache_p);
+    return img_cache_p != NULL && lv_cache_is_enabled(img_cache_p);
 }
 
 lv_iter_t * lv_image_cache_iter_create(void)
 {
+    if(img_cache_p == NULL) return NULL;
     return lv_cache_iter_create(img_cache_p);
 }
 
