@@ -431,7 +431,8 @@ static void _evdev_discovery_indev_try_create(const char * file_name)
 
 static bool _evdev_discovery_inotify_try_init_watcher(int inotify_fd)
 {
-    int inotify_wd = inotify_add_watch(inotify_fd, EVDEV_DISCOVERY_PATH, IN_CREATE);
+    /* udev can grant access after the device node has already been created. */
+    int inotify_wd = inotify_add_watch(inotify_fd, EVDEV_DISCOVERY_PATH, IN_CREATE | IN_ATTRIB);
     if(inotify_wd == -1) {
         if(errno != ENOENT) {
             LV_LOG_ERROR("inotify_add_watch failed: %s", strerror(errno));
@@ -626,6 +627,13 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
     }
 
     return lv_evdev_create_fd(indev_type, fd);
+}
+
+int lv_evdev_get_fd(lv_indev_t * indev)
+{
+    if(indev == NULL || lv_indev_get_read_cb(indev) != _evdev_read) return -1;
+    lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
+    return dsc ? dsc->fd : -1;
 }
 
 lv_result_t lv_evdev_discovery_start(lv_evdev_discovery_cb_t cb, void * user_data)

@@ -1,0 +1,2 @@
+# Exercise evdev against temporary files and mocked device capabilities.
+CONFIG_LV_USE_EVDEV=y
