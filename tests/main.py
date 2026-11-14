@@ -104,6 +104,10 @@ test_options = {
         # Cover the other side of a VG-Lite configuration switch on 32 bit
         "defconfigs_non_amd64": ["vg_lite_32bit"],
     },
+    "OPTIONS_TEST_DMA2D": {
+        "description": "DMA2D draw unit on a stubbed peripheral, 32 bit color depth",
+        "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "dma2d"],
+    },
     "OPTIONS_TEST_RISCV_V": {
         "description": "RISC-V Vector emulation with full config, 32 bit color depth",
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "riscv_v"],

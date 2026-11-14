@@ -48,7 +48,7 @@ void lv_draw_dma2d_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv
                                                 clipped_coords.y1 - layer->buf_area.y1);
     int32_t w = lv_area_get_width(&clipped_coords);
     int32_t h = lv_area_get_height(&clipped_coords);
-    int32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+    int32_t stride = layer->draw_buf->header.stride;
 
     lv_color_format_t cf = dsc->base.layer->color_format;
     lv_opa_t opa = dsc->opa;
