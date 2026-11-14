@@ -168,6 +168,25 @@ void test_roller_set_selected_option_str(void)
 
     /* Make sure that the selection did not change */
     TEST_ASSERT_EQUAL(1, lv_roller_get_selected(roller));
+
+    /* A longer string that only starts with an option must not match it */
+    selected = lv_roller_set_selected_str(roller, "OneX", LV_ANIM_OFF);
+    TEST_ASSERT_FALSE(selected);
+
+    /* Make sure that the selection did not change */
+    TEST_ASSERT_EQUAL(1, lv_roller_get_selected(roller));
+
+    /* Same with options where one is the prefix of another,
+     * e.g. short and long weekday names */
+    lv_roller_set_options(roller, "Mon\nMonday\nTue", LV_ROLLER_MODE_NORMAL);
+    selected = lv_roller_set_selected_str(roller, "Monday", LV_ANIM_OFF);
+    TEST_ASSERT_TRUE(selected);
+    TEST_ASSERT_EQUAL(1, lv_roller_get_selected(roller));
+
+    /* The shorter option is still selectable on its own */
+    selected = lv_roller_set_selected_str(roller, "Mon", LV_ANIM_OFF);
+    TEST_ASSERT_TRUE(selected);
+    TEST_ASSERT_EQUAL(0, lv_roller_get_selected(roller));
 }
 
 void test_roller_keypad_events(void)
