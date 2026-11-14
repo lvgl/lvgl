@@ -18,6 +18,10 @@ extern "C" {
 #include <rtthread.h>
 #include LV_STDBOOL_INCLUDE
 
+#if !defined(RT_IPC_CMD_SET_VLIMIT) && !defined(RT_USING_EVENT)
+#error "LV_OS_RTTHREAD requires RT_USING_EVENT when semaphore value limits are unavailable"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -34,7 +38,11 @@ typedef struct {
 } lv_mutex_t;
 
 typedef struct {
+#ifdef RT_IPC_CMD_SET_VLIMIT
     rt_sem_t sem;
+#else
+    rt_event_t event;
+#endif
 } lv_thread_sync_t;
 
 /**********************
