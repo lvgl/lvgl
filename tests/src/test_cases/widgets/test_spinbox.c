@@ -118,6 +118,92 @@ void test_spinbox_set_range(void)
     lv_obj_clean(tmp);
 }
 
+void test_spinbox_digit_format_keeps_value_range(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(spinbox, -20000, 20000);
+    lv_spinbox_set_value(spinbox, 19000);
+
+    lv_spinbox_set_digit_format(spinbox, 3, 0);
+
+    /* The digit format changes the displayed format only, never the value range. */
+    TEST_ASSERT_EQUAL_INT32(-20000, lv_spinbox_get_min_value(spinbox));
+    TEST_ASSERT_EQUAL_INT32(20000, lv_spinbox_get_max_value(spinbox));
+    TEST_ASSERT_EQUAL_INT32(19000, lv_spinbox_get_value(spinbox));
+    TEST_ASSERT_EQUAL_STRING("+190", lv_textarea_get_text(spinbox));
+    lv_obj_delete(spinbox);
+}
+
+void test_spinbox_digit_format_range_order_equivalent(void)
+{
+    lv_obj_t * format_first = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_digit_format(format_first, 3, 0);
+    lv_spinbox_set_range(format_first, -20000, 20000);
+    lv_spinbox_set_value(format_first, 19000);
+
+    lv_obj_t * range_first = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(range_first, -20000, 20000);
+    lv_spinbox_set_value(range_first, 19000);
+    lv_spinbox_set_digit_format(range_first, 3, 0);
+
+    /* The visible state must not depend on the order the setters are called in. */
+    TEST_ASSERT_EQUAL_INT32(lv_spinbox_get_min_value(format_first), lv_spinbox_get_min_value(range_first));
+    TEST_ASSERT_EQUAL_INT32(lv_spinbox_get_max_value(format_first), lv_spinbox_get_max_value(range_first));
+    TEST_ASSERT_EQUAL_INT32(lv_spinbox_get_value(format_first), lv_spinbox_get_value(range_first));
+    TEST_ASSERT_EQUAL_STRING(lv_textarea_get_text(format_first), lv_textarea_get_text(range_first));
+    lv_obj_delete(format_first);
+    lv_obj_delete(range_first);
+}
+
+void test_spinbox_digit_count_and_digit_format_are_equivalent(void)
+{
+    lv_obj_t * by_count = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(by_count, -20000, 20000);
+    lv_spinbox_set_value(by_count, 19000);
+    lv_spinbox_set_digit_count(by_count, 3);
+
+    lv_obj_t * by_format = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(by_format, -20000, 20000);
+    lv_spinbox_set_value(by_format, 19000);
+    lv_spinbox_set_digit_format(by_format, 3, 0);
+
+    TEST_ASSERT_EQUAL_UINT32(lv_spinbox_get_digit_count(by_count), lv_spinbox_get_digit_count(by_format));
+    TEST_ASSERT_EQUAL_INT32(lv_spinbox_get_min_value(by_count), lv_spinbox_get_min_value(by_format));
+    TEST_ASSERT_EQUAL_INT32(lv_spinbox_get_max_value(by_count), lv_spinbox_get_max_value(by_format));
+    TEST_ASSERT_EQUAL_INT32(lv_spinbox_get_value(by_count), lv_spinbox_get_value(by_format));
+    TEST_ASSERT_EQUAL_STRING(lv_textarea_get_text(by_count), lv_textarea_get_text(by_format));
+    lv_obj_delete(by_count);
+    lv_obj_delete(by_format);
+}
+
+void test_spinbox_digit_format_keeps_value_in_range(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(spinbox, -20000, 20000);
+    lv_spinbox_set_value(spinbox, 42);
+
+    lv_spinbox_set_digit_format(spinbox, 3, 1);
+
+    TEST_ASSERT_EQUAL_INT32(42, lv_spinbox_get_value(spinbox));
+    TEST_ASSERT_EQUAL_STRING("+0.42", lv_textarea_get_text(spinbox));
+    lv_obj_delete(spinbox);
+}
+
+void test_spinbox_digit_format_keeps_narrower_range(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_range(spinbox, -50, 50);
+    lv_spinbox_set_value(spinbox, -42);
+
+    lv_spinbox_set_digit_format(spinbox, 3, 0);
+
+    TEST_ASSERT_EQUAL_INT32(-50, lv_spinbox_get_min_value(spinbox));
+    TEST_ASSERT_EQUAL_INT32(50, lv_spinbox_get_max_value(spinbox));
+    TEST_ASSERT_EQUAL_INT32(-42, lv_spinbox_get_value(spinbox));
+    TEST_ASSERT_EQUAL_STRING("-042", lv_textarea_get_text(spinbox));
+    lv_obj_delete(spinbox);
+}
+
 void test_spinbox_step_prev(void)
 {
     lv_obj_t * tmp = lv_spinbox_create(active_screen);

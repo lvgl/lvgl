@@ -154,12 +154,6 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t 
 
     if(sep_pos >= digit_count) sep_pos = 0;
 
-    if(digit_count < LV_SPINBOX_MAX_DIGIT_COUNT) {
-        const int64_t max_val = lv_pow(10, digit_count);
-        if(spinbox->range_max > max_val - 1) spinbox->range_max = max_val - 1;
-        if(spinbox->range_min < -max_val  + 1) spinbox->range_min = -max_val  + 1;
-    }
-
     spinbox->digit_count   = digit_count;
     spinbox->dec_point_pos = sep_pos;
 
