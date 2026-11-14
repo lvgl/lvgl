@@ -1839,6 +1839,14 @@
     #endif
 #endif
 
+#ifndef LV_TJPGD_OUTPUT_RGB565
+    #ifdef CONFIG_LV_TJPGD_OUTPUT_RGB565
+        #define LV_TJPGD_OUTPUT_RGB565 CONFIG_LV_TJPGD_OUTPUT_RGB565
+    #else
+        #define LV_TJPGD_OUTPUT_RGB565 0
+    #endif
+#endif
+
 #ifndef LV_USE_LIBJPEG_TURBO
     #ifdef CONFIG_LV_USE_LIBJPEG_TURBO
         #define LV_USE_LIBJPEG_TURBO CONFIG_LV_USE_LIBJPEG_TURBO
@@ -5165,6 +5173,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if (LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST) && !LV_USE_LODEPNG
     #error "LV_USE_LODEPNG must be enabled: Kconfig selects it from LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST"
+#endif
+
+#if LV_TJPGD_OUTPUT_RGB565 && !(LV_USE_TJPGD)
+    #error "LV_TJPGD_OUTPUT_RGB565 requires LV_USE_TJPGD (Kconfig depends on)"
 #endif
 
 #if LV_USE_SVG && !(LV_DRAW_HAS_VECTOR_SUPPORT)

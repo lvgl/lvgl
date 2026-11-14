@@ -1,0 +1,4 @@
+# Decode JPEG to RGB565 with TJpgDec, so the tests also cover the
+# non-default output format.
+
+CONFIG_LV_TJPGD_OUTPUT_RGB565=y

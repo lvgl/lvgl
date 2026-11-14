@@ -947,6 +947,15 @@
 /** Also decodes split JPEG, a custom format optimized for embedded systems. */
 #define LV_USE_TJPGD 0
 
+#if LV_USE_TJPGD
+/** Output RGB565 instead of RGB888 from the TJpgDec decoder.
+ *  Uses 2 bytes per pixel instead of 3 for decoded images, which
+ *  suits RGB565 displays, at the cost of color precision.
+ */
+#define LV_TJPGD_OUTPUT_RGB565 0
+
+#endif /*LV_USE_TJPGD*/
+
 /** High-performance decoder supporting the complete JPEG specifications. */
 #define LV_USE_LIBJPEG_TURBO 0
 
