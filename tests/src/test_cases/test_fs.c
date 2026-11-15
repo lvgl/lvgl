@@ -809,4 +809,25 @@ void test_fs_memfs_read_past_end(void)
     lv_free(data);
 }
 
+void test_fs_memfs_trunc_rejected(void)
+{
+    uint8_t * data = lv_malloc(10);
+    lv_memcpy(data, "0123456789", 10);
+
+    lv_fs_path_ex_t path;
+    lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, data, 10, NULL);
+
+    /* Memory-mapped files can't be truncated: fail instead of returning the old content */
+    lv_fs_file_t f;
+    TEST_ASSERT_EQUAL(LV_FS_RES_NOT_IMP, lv_fs_open(&f, (const char *)&path, LV_FS_MODE_WR | LV_FS_MODE_TRUNC));
+    TEST_ASSERT_EQUAL(LV_FS_RES_NOT_IMP,
+                      lv_fs_open(&f, (const char *)&path, LV_FS_MODE_RD | LV_FS_MODE_WR | LV_FS_MODE_TRUNC));
+
+    /* Plain reads are unaffected */
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, (const char *)&path, LV_FS_MODE_RD));
+    lv_fs_close(&f);
+
+    lv_free(data);
+}
+
 #endif

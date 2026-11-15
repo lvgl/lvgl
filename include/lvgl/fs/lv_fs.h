@@ -167,6 +167,7 @@ bool lv_fs_is_ready(char letter);
  *                  file if missing and truncate it to 0 bytes if it exists.
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  *                  (LV_FS_RES_INV_PARAM if LV_FS_MODE_TRUNC is used without LV_FS_MODE_WR)
+ *                  (LV_FS_RES_NOT_IMP if LV_FS_MODE_TRUNC is used on a memory-mapped file, see `lv_fs_make_path_from_buffer`)
  */
 lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode);
 

@@ -101,6 +101,13 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_NOT_IMP;
     }
 
+    /* Memory-mapped files bypass `open_cb` and are backed by a read-only buffer,
+     * so there is nothing to truncate. Fail instead of silently keeping the content. */
+    if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER && (mode & LV_FS_MODE_TRUNC)) {
+        LV_LOG_WARN("Can't open file (%s): LV_FS_MODE_TRUNC is not supported for memory-mapped files", path);
+        return LV_FS_RES_NOT_IMP;
+    }
+
     LV_PROFILER_FS_BEGIN;
 
     file_p->drv = drv;
