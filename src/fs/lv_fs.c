@@ -74,6 +74,12 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
     LV_CHECK_ARG(path != NULL, return LV_FS_RES_INV_PARAM);
 
+    /*Truncating a file makes sense only if it's opened for writing*/
+    if((mode & LV_FS_MODE_TRUNC) && !(mode & LV_FS_MODE_WR)) {
+        LV_LOG_WARN("Can't open file (%s): LV_FS_MODE_TRUNC requires LV_FS_MODE_WR", path);
+        return LV_FS_RES_INV_PARAM;
+    }
+
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
 
     lv_fs_drv_t * drv = lv_fs_get_drv(resolved_path.driver_letter);

@@ -114,18 +114,25 @@ static void fs_remove(lv_fs_drv_t * drv)
  * Open a file
  * @param drv       pointer to a driver where this function belongs
  * @param path      path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
- * @param mode      read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
+ * @param mode      read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
+ *                  FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
  * @return          a file descriptor or NULL on error
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
+    const bool trunc = (mode & LV_FS_MODE_TRUNC) != 0;
+    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~LV_FS_MODE_TRUNC);
+
     int flags = 0;
-    if(mode == LV_FS_MODE_WR)
+    if(rw_mode == LV_FS_MODE_WR)
         flags = LFS_O_WRONLY;
-    else if(mode == LV_FS_MODE_RD)
+    else if(rw_mode == LV_FS_MODE_RD)
         flags = LFS_O_RDONLY;
-    else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD))
+    else if(rw_mode == (LV_FS_MODE_WR | LV_FS_MODE_RD))
         flags = LFS_O_RDWR;
+
+    /*Create the file if it doesn't exist and truncate it to 0 bytes if it does*/
+    if(trunc && (rw_mode & LV_FS_MODE_WR)) flags |= LFS_O_CREAT | LFS_O_TRUNC;
 
     LittleFile * lf = lv_malloc(sizeof(LittleFile));
     LV_ASSERT_MALLOC(lf);

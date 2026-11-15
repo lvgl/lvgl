@@ -706,6 +706,73 @@ void test_fs_get_letters(void)
     TEST_ASSERT_EQUAL_STRING("TMBA", buf);
 }
 
+static void write_str(const char * path, lv_fs_mode_t mode, const char * str)
+{
+    lv_fs_file_t f;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, path, mode));
+    uint32_t bw = 0;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_write(&f, str, (uint32_t)lv_strlen(str), &bw));
+    TEST_ASSERT_EQUAL_UINT32(lv_strlen(str), bw);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&f));
+}
+
+static void test_fs_trunc_drv(char drv_letter)
+{
+    char path[64];
+    char real_path[64];
+    lv_snprintf(path, sizeof(path), "%c:fs_trunc.bin", drv_letter);
+    lv_snprintf(real_path, sizeof(real_path), "fs_trunc.bin");
+    remove(real_path);
+
+    uint32_t size = 0;
+    char buf[16];
+    uint32_t br = 0;
+    lv_fs_file_t f;
+
+    /*A missing file is created*/
+    write_str(path, LV_FS_MODE_WR | LV_FS_MODE_TRUNC, "AAAAAAAAAA");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
+    TEST_ASSERT_EQUAL_UINT32(10, size);
+
+    /*An existing longer file is truncated: no tail of the old content is left*/
+    write_str(path, LV_FS_MODE_WR | LV_FS_MODE_TRUNC, "BB");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
+    TEST_ASSERT_EQUAL_UINT32(2, size);
+
+    /*Read-write + truncate: starts empty, can be written and read back*/
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, path, LV_FS_MODE_RD | LV_FS_MODE_WR | LV_FS_MODE_TRUNC));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(&f, buf, sizeof(buf), &br));
+    TEST_ASSERT_EQUAL_UINT32(0, br);
+    uint32_t bw = 0;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_write(&f, "xyz", 3, &bw));
+    TEST_ASSERT_EQUAL_UINT32(3, bw);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_seek(&f, 0, LV_FS_SEEK_SET));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(&f, buf, sizeof(buf), &br));
+    TEST_ASSERT_EQUAL_UINT32(3, br);
+    TEST_ASSERT_EQUAL_MEMORY("xyz", buf, 3);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&f));
+
+    /*Without TRUNC the existing content is kept*/
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, path, LV_FS_MODE_RD | LV_FS_MODE_WR));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&f));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
+    TEST_ASSERT_EQUAL_UINT32(3, size);
+
+    /*TRUNC without WR is rejected and doesn't touch the file*/
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_open(&f, path, LV_FS_MODE_TRUNC));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_open(&f, path, LV_FS_MODE_RD | LV_FS_MODE_TRUNC));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
+    TEST_ASSERT_EQUAL_UINT32(3, size);
+
+    remove(real_path);
+}
+
+void test_fs_trunc(void)
+{
+    test_fs_trunc_drv('A'); /*stdio, with cache*/
+    test_fs_trunc_drv('B'); /*posix, no cache*/
+}
+
 void test_fs_memfs_read_past_end(void)
 {
     /* Exact-size heap buffer so ASan catches any over-read */
