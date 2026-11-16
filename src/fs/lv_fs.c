@@ -75,10 +75,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     LV_CHECK_ARG(path != NULL, return LV_FS_RES_INV_PARAM);
 
     /*Truncating a file makes sense only if it's opened for writing*/
-    if((mode & LV_FS_MODE_TRUNC) && !(mode & LV_FS_MODE_WR)) {
-        LV_LOG_WARN("Can't open file (%s): LV_FS_MODE_TRUNC requires LV_FS_MODE_WR", path);
-        return LV_FS_RES_INV_PARAM;
-    }
+    LV_CHECK_ARG(!(mode & LV_FS_MODE_TRUNC) || (mode & LV_FS_MODE_WR), return LV_FS_RES_INV_PARAM);
 
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
 
@@ -101,27 +98,21 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_NOT_IMP;
     }
 
-    /* Memory-mapped files bypass `open_cb` and are backed by a read-only buffer,
-     * so there is nothing to truncate. Fail instead of silently keeping the content. */
-    if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER && (mode & LV_FS_MODE_TRUNC)) {
-        LV_LOG_WARN("Can't open file (%s): LV_FS_MODE_TRUNC is not supported for memory-mapped files", path);
-        return LV_FS_RES_NOT_IMP;
-    }
-
     LV_PROFILER_FS_BEGIN;
 
     file_p->drv = drv;
+
+    void * file_d = drv->open_cb(drv, resolved_path.real_path, mode);
+    if(file_d == NULL || file_d == (void *)(-1)) {
+        LV_PROFILER_FS_END;
+        return LV_FS_RES_UNKNOWN;
+    }
 
     /* For memory-mapped files we set the file handle to our file descriptor so that we can access the cache from the file operations */
     if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
         file_p->file_d = file_p;
     }
     else {
-        void * file_d = drv->open_cb(drv, resolved_path.real_path, mode);
-        if(file_d == NULL || file_d == (void *)(-1)) {
-            LV_PROFILER_FS_END;
-            return LV_FS_RES_UNKNOWN;
-        }
         file_p->file_d = file_d;
     }
 

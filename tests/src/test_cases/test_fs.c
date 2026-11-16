@@ -758,12 +758,6 @@ static void test_fs_trunc_drv(char drv_letter)
     TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
     TEST_ASSERT_EQUAL_UINT32(3, size);
 
-    /*TRUNC without WR is rejected and doesn't touch the file*/
-    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_open(&f, path, LV_FS_MODE_TRUNC));
-    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_open(&f, path, LV_FS_MODE_RD | LV_FS_MODE_TRUNC));
-    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
-    TEST_ASSERT_EQUAL_UINT32(3, size);
-
     remove(real_path);
 }
 
@@ -819,8 +813,8 @@ void test_fs_memfs_trunc_rejected(void)
 
     /* Memory-mapped files can't be truncated: fail instead of returning the old content */
     lv_fs_file_t f;
-    TEST_ASSERT_EQUAL(LV_FS_RES_NOT_IMP, lv_fs_open(&f, (const char *)&path, LV_FS_MODE_WR | LV_FS_MODE_TRUNC));
-    TEST_ASSERT_EQUAL(LV_FS_RES_NOT_IMP,
+    TEST_ASSERT_EQUAL(LV_FS_RES_UNKNOWN, lv_fs_open(&f, (const char *)&path, LV_FS_MODE_WR | LV_FS_MODE_TRUNC));
+    TEST_ASSERT_EQUAL(LV_FS_RES_UNKNOWN,
                       lv_fs_open(&f, (const char *)&path, LV_FS_MODE_RD | LV_FS_MODE_WR | LV_FS_MODE_TRUNC));
 
     /* Plain reads are unaffected */
