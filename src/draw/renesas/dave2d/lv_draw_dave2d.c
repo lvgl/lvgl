@@ -42,9 +42,11 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u);
 
 static int32_t _dave2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit);
+static int32_t _dave2d_delete(lv_draw_unit_t * draw_unit);
 static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static d2_s32 lv_dave2d_init(void);
+static void lv_dave2d_release(bool hw_bound);
 static void lv_draw_buf_dave2d_init_handlers(void);
 static bool lv_draw_dave2d_image_color_format_supported(lv_color_format_t color_format);
 void dave2d_execute_dlist_and_flush(void);
@@ -103,6 +105,7 @@ void lv_draw_dave2d_init(void)
     draw_dave2d_unit->base_unit.dispatch_cb = lv_draw_dave2d_dispatch;
     draw_dave2d_unit->base_unit.evaluate_cb = _dave2d_evaluate;
     draw_dave2d_unit->base_unit.wait_for_finish_cb = _dave2d_wait_finish;
+    draw_dave2d_unit->base_unit.delete_cb = _dave2d_delete;
     draw_dave2d_unit->base_unit.name = "DAVE2D";
     draw_dave2d_unit->base_unit.draw_cbs = &draw_cbs;
     draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
@@ -487,6 +490,24 @@ static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
+static int32_t _dave2d_delete(lv_draw_unit_t * draw_unit)
+{
+    LV_UNUSED(draw_unit);
+
+    lv_ll_clear(&draw_tasks_on_dlist);
+    draw_pressure = 0;
+
+    if(_d2_handle != NULL) {
+        lv_dave2d_release(true);
+    }
+
+#if LV_USE_OS
+    lv_mutex_delete(&xd2Semaphore);
+#endif
+
+    return 0;
+}
+
 static void execute_drawing(lv_draw_dave2d_unit_t * u)
 {
     /*Render the draw task*/
@@ -546,7 +567,7 @@ static d2_s32 lv_dave2d_init(void)
     result = d2_inithw(_d2_handle, 0);
     if(result != D2_OK) {
         LV_LOG_ERROR("Could NOT d2_inithw");
-        d2_closedevice(_d2_handle);
+        lv_dave2d_release(false);
         return result;
     }
 
@@ -564,14 +585,14 @@ static d2_s32 lv_dave2d_init(void)
     result = d2_setdlistblocksize(_d2_handle, 20);
     if(D2_OK != result) {
         LV_LOG_ERROR("Could NOT d2_setdlistblocksize");
-        d2_closedevice(_d2_handle);
+        lv_dave2d_release(true);
         return result;
     }
 
     _renderbuffer = d2_newrenderbuffer(_d2_handle, 250, 25);
     if(!_renderbuffer) {
         LV_LOG_ERROR("NO renderbuffer");
-        d2_closedevice(_d2_handle);
+        lv_dave2d_release(true);
 
         return D2_NOMEMORY;
     }
@@ -579,7 +600,7 @@ static d2_s32 lv_dave2d_init(void)
     _label_renderbuffer = d2_newrenderbuffer(_d2_handle, 250, 25);
     if(!_label_renderbuffer) {
         LV_LOG_ERROR("NO renderbuffer");
-        d2_closedevice(_d2_handle);
+        lv_dave2d_release(true);
 
         return D2_NOMEMORY;
     }
@@ -587,10 +608,29 @@ static d2_s32 lv_dave2d_init(void)
     result = d2_selectrenderbuffer(_d2_handle, _renderbuffer);
     if(D2_OK != result) {
         LV_LOG_ERROR("Could NOT d2_selectrenderbuffer");
-        d2_closedevice(_d2_handle);
+        lv_dave2d_release(true);
     }
 
     return result;
+}
+
+/* Free the render buffers and close the device opened by `lv_dave2d_init`, so it can run again.
+ * `hw_bound`: `d2_inithw` succeeded and needs `d2_deinithw` */
+static void lv_dave2d_release(bool hw_bound)
+{
+    if(_label_renderbuffer != NULL) {
+        d2_freerenderbuffer(_d2_handle, _label_renderbuffer);
+        _label_renderbuffer = NULL;
+    }
+    if(_renderbuffer != NULL) {
+        d2_freerenderbuffer(_d2_handle, _renderbuffer);
+        _renderbuffer = NULL;
+    }
+    if(hw_bound) {
+        d2_deinithw(_d2_handle);
+    }
+    d2_closedevice(_d2_handle);
+    _d2_handle = NULL;
 }
 
 void dave2d_execute_dlist_and_flush(void)
