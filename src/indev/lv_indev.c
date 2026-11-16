@@ -245,7 +245,7 @@ void lv_indev_read(lv_indev_t * indev)
             indev->disp->last_activity_time = data.timestamp;
         }
 
-        if(lv_indev_send_event(indev, LV_EVENT_INDEV_SAMPLE, &data) == LV_RESULT_INVALID) {
+        if(lv_indev_send_event(indev, LV_EVENT_INDEV_SAMPLE, &data) != LV_RESULT_OK) {
             /*The indev was deleted by the callback*/
             indev_act     = NULL;
             indev_obj_act = NULL;
