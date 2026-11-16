@@ -84,6 +84,8 @@ struct _lv_fs_drv_t {
 
     void(*remove_cb)(lv_fs_drv_t * drv); /*Optional*/
 
+    /*If `cache_size` is `LV_FS_CACHE_FROM_BUFFER`, the returned pointer is not used (the file handle is the
+     *`lv_fs_file_t`), so it must not need to be freed. `open_cb` only accepts the mode, NULL rejects it.*/
     void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
     lv_fs_res_t (*close_cb)(lv_fs_drv_t * drv, void * file_p);
     lv_fs_res_t (*read_cb)(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
