@@ -286,6 +286,43 @@ void test_gif_src_type_variable(void)
     TEST_ASSERT_TRUE(opened);
 }
 
+/* 1x1 GIF89a. Byte 23 is the LZW minimum code size, which the spec limits to 2..8 */
+static uint8_t gif_1px_map[] = {
+    0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x2C, 0x00, 0x00,
+    0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x02, 0x02, 0x44, 0x01, 0x00, 0x3B
+};
+
+static void play_gif_with_lzw_code_size(uint8_t code_size)
+{
+    gif_1px_map[23] = code_size;
+
+    lv_image_dsc_t dsc = {
+        .header.cf = LV_COLOR_FORMAT_RAW,
+        .data = gif_1px_map,
+        .data_size = sizeof(gif_1px_map),
+    };
+
+    lv_obj_t * gif = lv_gif_create(active_screen);
+    lv_obj_add_event_cb(gif, event_handler, LV_EVENT_READY, NULL);
+    lv_gif_set_src(gif, &dsc);
+    lv_refr_now(NULL);
+    lv_obj_delete(gif);
+}
+
+void test_gif_invalid_lzw_code_size(void)
+{
+    /* Valid control: decodes the only frame and reports the end of the animation */
+    play_gif_with_lzw_code_size(2);
+    TEST_ASSERT_TRUE(event_triggered);
+
+    /* Out of range values must be rejected instead of indexing/overflowing the
+     * decoder's fixed-size tables (caught by ASan without the range check) */
+    play_gif_with_lzw_code_size(1);
+    play_gif_with_lzw_code_size(9);
+    play_gif_with_lzw_code_size(14);
+    play_gif_with_lzw_code_size(0xFF);
+}
+
 void test_gif_restart_not_loaded(void)
 {
     lv_obj_t * gif = lv_gif_create(active_screen);
