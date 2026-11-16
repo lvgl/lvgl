@@ -494,6 +494,11 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
         pPage->bUseLocalPalette = 1;
     }
     pPage->ucCodeStart = p[iOffset++]; /* initial code size */
+    /* The GIF spec limits the LZW minimum code size to 2..8. */
+    if (pPage->ucCodeStart < 2 || pPage->ucCodeStart > 8) {
+        pPage->iError = GIF_DECODE_ERROR; // must be a corrupt file to encounter this error here
+        return 0;
+    }
     /* Since GIF can be 1-8 bpp, we only allow 1,4,8 */
     pPage->iBpp = cGIFBits[pPage->ucCodeStart];
     // we are re-using the same buffer turning GIF file data
