@@ -686,4 +686,47 @@ void test_swap_invalidates_only_the_swapped_objects(void)
     TEST_ASSERT_FALSE(reorder_was_invalidated(far));
 }
 
+static void reorder_ext_draw_40_cb(lv_event_t * e)
+{
+    lv_event_set_ext_draw_size(e, 40);
+}
+
+/*Overflow-visible children are clipped to the parent's coords + ext draw size, the area lv_obj_invalidate() covers*/
+static void reorder_overflow_visible_scene(lv_obj_t ** a, lv_obj_t ** b)
+{
+    *a = reorder_box(lv_screen_active(), 50, 50, 50, 50, LV_PALETTE_RED);
+    lv_obj_set_overflow_visible(*a, true);
+    lv_obj_add_event_cb(*a, reorder_ext_draw_40_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, NULL);
+    lv_obj_refresh_ext_draw_size(*a);
+    reorder_box(*a, 20, 20, 100, 100, LV_PALETTE_ORANGE);    /*Up to (169,169), clipped at (139,139)*/
+    *b = reorder_box(lv_screen_active(), 110, 110, 100, 100, LV_PALETTE_BLUE);
+    lv_refr_now(NULL);
+}
+
+/*The child of `a` overlaps `b` outside `a`*/
+void test_move_to_index_redraw_overflow_visible(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a;
+    lv_obj_t * b;
+    reorder_overflow_visible_scene(&a, &b);
+
+    lv_obj_move_to_index(a, -1);
+    reorder_assert_no_stale_pixels();
+}
+
+/*The child of `a` overlaps `b` outside `a`*/
+void test_swap_redraw_overflow_visible(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a;
+    lv_obj_t * b;
+    reorder_overflow_visible_scene(&a, &b);
+
+    lv_obj_swap(a, b);
+    reorder_assert_no_stale_pixels();
+}
+
 #endif
