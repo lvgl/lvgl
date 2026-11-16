@@ -32,6 +32,14 @@ config LV_DRAW_SW_SUPPORT_ARGB8888
 	bool "ARGB8888"
 	default y
 
+config LV_DRAW_SW_SUPPORT_ARGB4444
+	bool "ARGB4444"
+	depends on LV_DRAW_SW_SUPPORT_ARGB8888
+	default n
+	help
+		Enable 16-bit straight-alpha ARGB images and draw buffers.
+		The software renderer uses small ARGB8888 tiles for blending.
+
 config LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 	bool "ARGB8888 premultiplied"
 	default y

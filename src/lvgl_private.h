@@ -175,6 +175,7 @@
 #include "misc/lv_array.h"
 #include "misc/lv_bidi_private.h"
 #include "misc/lv_circle_buf_private.h"
+#include "misc/lv_color_argb4444_private.h"
 #include "misc/lv_event_private.h"
 #include "misc/lv_iter_private.h"
 #include "misc/lv_lru.h"

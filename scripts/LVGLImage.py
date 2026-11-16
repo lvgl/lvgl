@@ -118,6 +118,7 @@ class ColorFormat(Enum):
     A4 = 0x0D
     A8 = 0x0E
     AL88 = 0x15
+    ARGB4444 = 0x17
     ARGB8888 = 0x10
     XRGB8888 = 0x11
     RGB565 = 0x12
@@ -143,6 +144,7 @@ class ColorFormat(Enum):
             ColorFormat.A4: 4,
             ColorFormat.A8: 8,
             ColorFormat.AL88: 16,
+            ColorFormat.ARGB4444: 16,
             ColorFormat.ARGB8888: 32,
             ColorFormat.XRGB8888: 32,
             ColorFormat.RGB565: 16,
@@ -185,6 +187,7 @@ class ColorFormat(Enum):
     def has_alpha(self) -> bool:
         return self.is_alpha_only or self.is_indexed or self in (
             ColorFormat.AL88,
+            ColorFormat.ARGB4444,
             ColorFormat.ARGB8888,
             ColorFormat.XRGB8888,  # const alpha: 0xff
             ColorFormat.ARGB8565,
@@ -193,7 +196,7 @@ class ColorFormat(Enum):
 
     @property
     def is_colormap(self) -> bool:
-        return self in (ColorFormat.ARGB8888, ColorFormat.RGB888,
+        return self in (ColorFormat.ARGB8888, ColorFormat.ARGB4444, ColorFormat.RGB888,
                         ColorFormat.XRGB8888, ColorFormat.RGB565A8,
                         ColorFormat.ARGB8565, ColorFormat.RGB565,
                         ColorFormat.RGB565_SWAPPED,
@@ -263,7 +266,11 @@ def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
                 if len(ret) % w == 0:
                     break
     elif bpp == 16:
-        if cf == ColorFormat.RGB565:
+        if cf == ColorFormat.ARGB4444:
+            for low, high in zip(data[0::2], data[1::2]):
+                ret.extend(((high & 0xf) * 17, (low >> 4) * 17,
+                            (low & 0xf) * 17, (high >> 4) * 17))
+        elif cf == ColorFormat.RGB565:
             #  This is RGB565
             pixels = [(data[2 * i + 1] << 8) | data[2 * i]
                     for i in range(len(data) // 2)]
@@ -1071,6 +1078,11 @@ class LVGLImage:
 
             def pack(r, g, b, a):
                 return uint32_t((a << 24) | (r << 16) | (g << 8) | (b << 0))
+        elif cf == ColorFormat.ARGB4444:
+
+            def pack(r, g, b, a):
+                return uint16_t(((a >> 4) << 12) | ((r >> 4) << 8) |
+                                ((g >> 4) << 4) | (b >> 4))
         elif cf == ColorFormat.ARGB8888_PREMULTIPLIED:
 
             def pack(r, g, b, a):
@@ -1446,7 +1458,7 @@ def main():
         choices=[
             "L8", "I1", "I2", "I4", "I8", "A1", "A2", "A4", "A8", "AL88", "ARGB8888",
             "XRGB8888", "RGB565", "RGB565_SWAPPED", "RGB565A8", "ARGB8565", "RGB888", "AUTO",
-            "RAW", "RAW_ALPHA", "ARGB8888_PREMULTIPLIED"
+            "RAW", "RAW_ALPHA", "ARGB8888_PREMULTIPLIED", "ARGB4444"
         ])
 
     parser.add_argument('--rgb565dither', action='store_true',
@@ -1486,6 +1498,9 @@ def main():
         'input', help="the filename or folder to be recursively converted")
 
     args = parser.parse_args()
+
+    if args.cf == "ARGB4444" and args.premultiply:
+        parser.error("ARGB4444 uses straight alpha and cannot be premultiplied")
 
     if path.isfile(args.input):
         files = [args.input]

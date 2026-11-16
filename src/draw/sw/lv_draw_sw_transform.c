@@ -8,6 +8,9 @@
  *********************/
 #include "lv_draw_sw.h"
 #include "blend/lv_draw_sw_blend_private.h"
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+    #include "../../misc/lv_color_argb4444_private.h"
+#endif
 #if LV_USE_DRAW_SW
 
 /*********************
@@ -79,6 +82,13 @@ static lv_color32_t unpremultiply(lv_color32_t c)
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
 static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                               int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                               int32_t x_start, int32_t x_end, int32_t xs_clamp_ups,
+                               uint8_t * dest_buf, bool aa);
+#endif
+
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+static void transform_argb4444(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                int32_t x_start, int32_t x_end, int32_t xs_clamp_ups,
                                uint8_t * dest_buf, bool aa);
@@ -170,6 +180,9 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
     }
     else if(src_cf == LV_COLOR_FORMAT_RGB565A8) {
         dest_stride = dest_w * 2;
+    }
+    else if(src_cf == LV_COLOR_FORMAT_ARGB4444) {
+        dest_stride = dest_w * 4;
     }
     else if(src_cf == LV_COLOR_FORMAT_L8 || src_cf == LV_COLOR_FORMAT_AL88) {
         dest_stride = dest_w;
@@ -276,6 +289,12 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
 #if LV_DRAW_SW_SUPPORT_ARGB8888
             case LV_COLOR_FORMAT_ARGB8888:
                 transform_argb8888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256,
+                                   x_start, x_end_abs, xs_clamp_ups, dest_buf, aa);
+                break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+            case LV_COLOR_FORMAT_ARGB4444:
+                transform_argb4444(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256,
                                    x_start, x_end_abs, xs_clamp_ups, dest_buf, aa);
                 break;
 #endif
@@ -666,11 +685,24 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
 
+static inline uint32_t read_straight_argb(const uint8_t * row, int32_t x, bool packed)
+{
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+    if(packed) {
+        lv_color32_t pixel = lv_color_argb4444_read(row + x * 2);
+        return ((uint32_t)pixel.alpha << 24) | ((uint32_t)pixel.red << 16) |
+               ((uint32_t)pixel.green << 8) | pixel.blue;
+    }
+#else
+    LV_UNUSED(packed);
+#endif
+    return ((const lv_draw_sw_word_t *)(row + x * 4))->u32;
+}
 
-static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
-                                 int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
-                                 int32_t x_from, int32_t x_to, int32_t x_offs, int32_t xs_clamp_ups,
-                                 lv_color32_t * dest_c32, bool aa)
+static inline void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                                        int32_t xs_base, int32_t ys_base, int32_t xs_step, int32_t ys_step,
+                                        int32_t x_from, int32_t x_to, int32_t x_offs, int32_t xs_clamp_ups,
+                                        lv_color32_t * dest_c32, bool aa, bool packed)
 {
     lv_draw_sw_word_t * dest_w = (lv_draw_sw_word_t *)dest_c32;
     int32_t x;
@@ -690,7 +722,7 @@ static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src
         }
 
         if(!aa) {
-            dest_w[x].u32 = ((const lv_draw_sw_word_t *)(src + ys_int * src_stride + xs_int * 4))->u32;
+            dest_w[x].u32 = read_straight_argb(src + ys_int * src_stride, xs_int, packed);
             continue;
         }
 
@@ -706,7 +738,7 @@ static void argb8888_row_checked(const uint8_t * src, int32_t src_w, int32_t src
             int32_t sx = x0 + (i & 1);
             int32_t sy = y0 + (i >> 1);
             if(sx >= 0 && sx < src_w && sy >= 0 && sy < src_h) {
-                p[i] = ((const lv_draw_sw_word_t *)(src + sy * src_stride + sx * 4))->u32;
+                p[i] = read_straight_argb(src + sy * src_stride, sx, packed);
             }
         }
 
@@ -789,7 +821,7 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
     fast_to -= x_start;
 
     argb8888_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
-                         0, fast_from, x_start, xs_clamp_ups, dest_c32, aa);
+                         0, fast_from, x_start, xs_clamp_ups, dest_c32, aa, false);
 
     if(aa) {
         argb8888_row_fast(src, src_stride, xs_ups, ys_ups, xs_step, ys_step, fast_from, fast_to, x_start, dest_c32);
@@ -805,7 +837,7 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
     }
 
     argb8888_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
-                         fast_to, w, x_start, xs_clamp_ups, dest_c32, aa);
+                         fast_to, w, x_start, xs_clamp_ups, dest_c32, aa, false);
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED == 0
     /*The antialiasing filter works in premultiplied space. Without the premultiplied blenders
@@ -817,6 +849,32 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
 #endif
 }
 
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+static void transform_argb4444(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                               int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                               int32_t x_start, int32_t x_end, int32_t xs_clamp_ups,
+                               uint8_t * dest_buf, bool aa)
+{
+    lv_color32_t * dest = (lv_color32_t *)dest_buf;
+    int32_t width = x_end - x_start;
+    argb8888_row_checked(src, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step, ys_step,
+                         0, width, x_start, xs_clamp_ups, dest, aa, true);
+#if LV_BIG_ENDIAN_SYSTEM
+    /* The shared filter writes a native word. The blender consumes BGRA bytes. */
+    for(int32_t x = 0; x < width; x++) {
+        lv_color32_t c = dest[x];
+        dest[x] = (lv_color32_t) {
+            .blue = c.alpha, .green = c.red, .red = c.green, .alpha = c.blue
+        };
+    }
+#endif
+#if !LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+    if(aa) {
+        for(int32_t x = 0; x < width; x++) dest[x] = unpremultiply(dest[x]);
+    }
+#endif
+}
+#endif
 
 #endif
 

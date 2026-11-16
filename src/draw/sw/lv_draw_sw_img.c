@@ -165,6 +165,9 @@ void lv_draw_sw_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_
     const lv_image_header_t * header = &decoded->header;
     uint32_t img_stride = decoded->header.stride;
     lv_color_format_t cf = decoded->header.cf;
+#if !LV_DRAW_SW_SUPPORT_ARGB4444
+    if(cf == LV_COLOR_FORMAT_ARGB4444) return;
+#endif
 
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
@@ -222,7 +225,8 @@ void lv_draw_sw_image_core(lv_layer_t * layer, const lv_draw_image_dsc_t * draw_
         blend_dsc.src_color_format = cf;
         lv_draw_sw_blend(layer, clipped_img_area, &blend_dsc);
     }
-    else if(!transformed && !radius && draw_dsc->recolor_opa > LV_OPA_MIN && draw_dsc->colorkey == NULL) {
+    else if(!transformed && !radius && cf != LV_COLOR_FORMAT_ARGB4444 &&
+            draw_dsc->recolor_opa > LV_OPA_MIN && draw_dsc->colorkey == NULL) {
         recolor_only(layer, draw_dsc, decoder_dsc, img_coords,  clipped_img_area);
     }
 #if LV_DRAW_SW_COMPLEX
@@ -439,10 +443,14 @@ static void transform_and_recolor(lv_layer_t * layer, const lv_draw_image_dsc_t 
     /*Antialiasing an image that has an alpha channel is only correct in premultiplied space,
      *so that is what the filter works in and what it writes out. Without the antialiasing the
      *pixels are copied as they are and stay straight.*/
-    else if(cf_final == LV_COLOR_FORMAT_ARGB8888 && draw_dsc->antialias) {
+    else if((cf_final == LV_COLOR_FORMAT_ARGB8888 || cf_final == LV_COLOR_FORMAT_ARGB4444) &&
+            draw_dsc->antialias) {
         cf_final = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
     }
 #endif
+    else if(cf_final == LV_COLOR_FORMAT_ARGB4444) {
+        cf_final = LV_COLOR_FORMAT_ARGB8888;
+    }
 
     uint8_t * transformed_buf;
     int32_t buf_h;
@@ -1013,8 +1021,20 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc)
     int32_t y;
     for(y = 0; y < h; y++) {
         int32_t x;
-        for(x = 0; x < w; x++) {
-            img_start[x * 4 + 3] = LV_OPA_MIX2(mask_start[x], img_start[x * 4 + 3]);
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+        if(image_draw_buf->header.cf == LV_COLOR_FORMAT_ARGB4444) {
+            for(x = 0; x < w; x++) {
+                uint8_t * pixel = img_start + x * 2;
+                lv_opa_t alpha = (pixel[1] >> 4) * 17;
+                pixel[1] = (pixel[1] & 0x0f) | (LV_OPA_MIX2(mask_start[x], alpha) & 0xf0);
+            }
+        }
+        else
+#endif
+        {
+            for(x = 0; x < w; x++) {
+                img_start[x * 4 + 3] = LV_OPA_MIX2(mask_start[x], img_start[x * 4 + 3]);
+            }
         }
         img_start += layer_to_draw->draw_buf->header.stride;
         mask_start += mask_stride;

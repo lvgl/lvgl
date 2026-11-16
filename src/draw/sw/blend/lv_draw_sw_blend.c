@@ -9,6 +9,9 @@
 #include "../../../misc/lv_area_private.h"
 #include "lv_draw_sw_blend_private.h"
 #include "../../lv_draw_private.h"
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+    #include "../../../misc/lv_color_argb4444_private.h"
+#endif
 #if LV_DRAW_SW_SUPPORT_A8
     #include "lv_draw_sw_blend_to_a8.h"
 #endif
@@ -41,6 +44,9 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+    #define ARGB4444_TILE_WIDTH 32
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -56,6 +62,10 @@ static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_color(lv_color_f
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image(lv_color_format_t layer_cf,
                                                                       lv_draw_sw_blend_image_dsc_t * image_dsc);
 
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+    static void blend_fill_argb4444(const lv_draw_sw_blend_fill_dsc_t * dsc);
+    static void blend_image_argb4444(lv_color_format_t layer_cf, const lv_draw_sw_blend_image_dsc_t * dsc);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -164,7 +174,16 @@ void lv_draw_sw_blend(lv_layer_t * layer, const lv_area_t * clip_area, const lv_
         image_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                     blend_area.y1 - layer->buf_area.y1);
 
-        lv_draw_sw_blend_image(layer->color_format, &image_dsc);
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+        if(layer->color_format == LV_COLOR_FORMAT_ARGB4444 ||
+           image_dsc.src_color_format == LV_COLOR_FORMAT_ARGB4444) {
+            blend_image_argb4444(layer->color_format, &image_dsc);
+        }
+        else
+#endif
+        {
+            lv_draw_sw_blend_image(layer->color_format, &image_dsc);
+        }
     }
     LV_PROFILER_DRAW_END;
 }
@@ -190,6 +209,11 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color(lv_color_format_
 #if LV_DRAW_SW_SUPPORT_ARGB8888
         case LV_COLOR_FORMAT_ARGB8888:
             lv_draw_sw_blend_color_to_argb8888(fill_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+        case LV_COLOR_FORMAT_ARGB4444:
+            blend_fill_argb4444(fill_dsc);
             break;
 #endif
 #if LV_DRAW_SW_SUPPORT_RGB888
@@ -291,5 +315,110 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image(lv_color_format_
             break;
     }
 }
+
+#if LV_DRAW_SW_SUPPORT_ARGB4444
+/* Expand only the pixels being blended. A fixed scratch tile preserves the
+ * existing alpha and blend-mode behavior without expanding the whole image. */
+static void unpack_argb4444(lv_draw_sw_word_t * tile, const uint8_t * packed, int32_t count)
+{
+    for(int32_t x = 0; x < count; x++) {
+        tile[x].c32 = lv_color_argb4444_read(packed + 2 * x);
+    }
+}
+
+static void pack_argb4444(uint8_t * packed, const lv_draw_sw_word_t * tile, int32_t count)
+{
+    for(int32_t x = 0; x < count; x++) {
+        lv_color_argb4444_write(packed + 2 * x, tile[x].c32);
+    }
+}
+
+static void blend_fill_argb4444(const lv_draw_sw_blend_fill_dsc_t * dsc)
+{
+    if(!dsc->mask_buf && dsc->opa >= LV_OPA_MAX) {
+        uint16_t pixel = lv_color_to_argb4444(lv_color_to_32(dsc->color, LV_OPA_COVER));
+        for(int32_t y = 0; y < dsc->dest_h; y++) {
+            uint8_t * row = (uint8_t *)dsc->dest_buf + y * dsc->dest_stride;
+            for(int32_t x = 0; x < dsc->dest_w; x++) {
+                row[2 * x] = (uint8_t)pixel;
+                row[2 * x + 1] = (uint8_t)(pixel >> 8);
+            }
+        }
+        return;
+    }
+
+    lv_draw_sw_word_t pixels[ARGB4444_TILE_WIDTH];
+    lv_draw_sw_blend_fill_dsc_t tile = *dsc;
+    tile.dest_buf = pixels;
+    tile.dest_h = 1;
+    tile.dest_stride = sizeof(pixels);
+
+    for(int32_t y = 0; y < dsc->dest_h; y++) {
+        uint8_t * row = (uint8_t *)dsc->dest_buf + y * dsc->dest_stride;
+        for(int32_t x = 0; x < dsc->dest_w; x += ARGB4444_TILE_WIDTH) {
+            uint8_t * dest = row + 2 * x;
+            tile.dest_w = LV_MIN(ARGB4444_TILE_WIDTH, dsc->dest_w - x);
+            lv_area_set(&tile.relative_area, dsc->relative_area.x1 + x, dsc->relative_area.y1 + y,
+                        dsc->relative_area.x1 + x + tile.dest_w - 1, dsc->relative_area.y1 + y);
+            if(dsc->mask_buf) tile.mask_buf = dsc->mask_buf + y * dsc->mask_stride + x;
+
+            unpack_argb4444(pixels, dest, tile.dest_w);
+            lv_draw_sw_blend_color_to_argb8888(&tile);
+            pack_argb4444(dest, pixels, tile.dest_w);
+        }
+    }
+}
+
+static void blend_image_argb4444(lv_color_format_t layer_cf, const lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    lv_draw_sw_word_t src_pixels[ARGB4444_TILE_WIDTH];
+    lv_draw_sw_word_t dest_pixels[ARGB4444_TILE_WIDTH];
+    bool packed_src = dsc->src_color_format == LV_COLOR_FORMAT_ARGB4444;
+    bool packed_dest = layer_cf == LV_COLOR_FORMAT_ARGB4444;
+    uint32_t src_bpp = lv_color_format_get_bpp(dsc->src_color_format);
+    uint32_t dest_bpp = lv_color_format_get_bpp(layer_cf);
+    lv_draw_sw_blend_image_dsc_t tile = *dsc;
+    tile.dest_h = 1;
+
+    if(packed_src) {
+        tile.src_color_format = LV_COLOR_FORMAT_ARGB8888;
+        tile.src_stride = sizeof(src_pixels);
+    }
+    if(packed_dest) {
+        tile.dest_stride = sizeof(dest_pixels);
+    }
+
+    for(int32_t y = 0; y < dsc->dest_h; y++) {
+        const uint8_t * src_row = (const uint8_t *)dsc->src_buf + y * dsc->src_stride;
+        uint8_t * dest_row = (uint8_t *)dsc->dest_buf + y * dsc->dest_stride;
+        for(int32_t x = 0; x < dsc->dest_w; x += ARGB4444_TILE_WIDTH) {
+            /* Tile boundaries also fall on byte boundaries for bit-packed formats. */
+            const uint8_t * src = src_row + ((uint32_t)x * src_bpp >> 3);
+            uint8_t * dest = dest_row + ((uint32_t)x * dest_bpp >> 3);
+            tile.dest_w = LV_MIN(ARGB4444_TILE_WIDTH, dsc->dest_w - x);
+            lv_area_set(&tile.relative_area, dsc->relative_area.x1 + x, dsc->relative_area.y1 + y,
+                        dsc->relative_area.x1 + x + tile.dest_w - 1, dsc->relative_area.y1 + y);
+            if(dsc->mask_buf) tile.mask_buf = dsc->mask_buf + y * dsc->mask_stride + x;
+
+            tile.src_buf = src;
+            if(packed_src) {
+                unpack_argb4444(src_pixels, src, tile.dest_w);
+                tile.src_buf = src_pixels;
+            }
+
+            if(packed_dest) {
+                unpack_argb4444(dest_pixels, dest, tile.dest_w);
+                tile.dest_buf = dest_pixels;
+                lv_draw_sw_blend_image_to_argb8888(&tile);
+                pack_argb4444(dest, dest_pixels, tile.dest_w);
+            }
+            else {
+                tile.dest_buf = dest;
+                lv_draw_sw_blend_image(layer_cf, &tile);
+            }
+        }
+    }
+}
+#endif
 
 #endif

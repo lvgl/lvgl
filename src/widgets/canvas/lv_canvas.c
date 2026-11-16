@@ -20,6 +20,7 @@
 #include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../misc/cache/lv_cache.h"
+#include "../../misc/lv_color_argb4444_private.h"
 #include "../../core/lv_obj_style_internal.h"
 
 /*********************
@@ -172,6 +173,9 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
         data[0] = color.blue;
         data[3] = 0xFF;
     }
+    else if(cf == LV_COLOR_FORMAT_ARGB4444) {
+        lv_color_argb4444_write(data, lv_color_to_32(color, opa));
+    }
     else if(cf == LV_COLOR_FORMAT_ARGB8888) {
         lv_color32_t * buf = (lv_color32_t *)data;
         buf->red = color.red;
@@ -224,6 +228,9 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
     LV_ASSERT(px != NULL);
 
     switch(header->cf) {
+        case LV_COLOR_FORMAT_ARGB4444:
+            ret = lv_color_argb4444_read(px);
+            break;
         case LV_COLOR_FORMAT_ARGB8888:
             ret = *(lv_color32_t *)px;
             break;
@@ -320,6 +327,15 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
             uint16_t * buf16 = (uint16_t *)(data + y * stride);
             for(x = 0; x < header->w; x++) {
                 buf16[x] = c16;
+            }
+        }
+    }
+    else if(header->cf == LV_COLOR_FORMAT_ARGB4444) {
+        lv_color32_t pixel = lv_color_to_32(color, opa);
+        for(y = 0; y < header->h; y++) {
+            uint8_t * row = data + y * stride;
+            for(x = 0; x < header->w; x++) {
+                lv_color_argb4444_write(row + 2 * x, pixel);
             }
         }
     }

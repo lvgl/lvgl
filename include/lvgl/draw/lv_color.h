@@ -160,6 +160,7 @@ typedef enum {
     /*3 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGB888            = 0x0F,
     LV_COLOR_FORMAT_ARGB8888          = 0x10,
+    LV_COLOR_FORMAT_ARGB4444          = 0x17,
     LV_COLOR_FORMAT_XRGB8888          = 0x11,
     LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED          = 0x1A,
 
@@ -168,7 +169,6 @@ typedef enum {
     LV_COLOR_FORMAT_A2                = 0x0C,
     LV_COLOR_FORMAT_A4                = 0x0D,
     LV_COLOR_FORMAT_ARGB1555          = 0x16,
-    LV_COLOR_FORMAT_ARGB4444          = 0x17,
     LV_COLOR_FORMAT_ARGB2222          = 0X18,
 
     /* reference to https://wiki.videolan.org/YUV/ */
@@ -341,6 +341,33 @@ static inline lv_color_t lv_color16_to_color(lv_color16_t c)
  * @return          `color` as RGB565 on `uin16_t`
  */
 uint16_t lv_color_to_u16(lv_color_t color);
+
+/**
+ * Pack a straight-alpha color as 0xARGB, with four bits per channel.
+ * ARGB4444 image and draw buffers store the low byte first.
+ * @param color     eight-bit ARGB channels
+ * @return          the packed sixteen-bit pixel
+ */
+static inline uint16_t lv_color_to_argb4444(lv_color32_t color)
+{
+    return (uint16_t)(((color.alpha & 0xf0u) << 8) | ((color.red & 0xf0u) << 4) |
+                      (color.green & 0xf0u) | (color.blue >> 4));
+}
+
+/**
+ * Expand a 0xARGB pixel by repeating each channel's four bits.
+ * @param pixel     the packed sixteen-bit pixel
+ * @return          eight-bit ARGB channels
+ */
+static inline lv_color32_t lv_color_from_argb4444(uint16_t pixel)
+{
+    lv_color32_t color;
+    color.alpha = (uint8_t)(((pixel >> 12) & 0xfu) * 17u);
+    color.red = (uint8_t)(((pixel >> 8) & 0xfu) * 17u);
+    color.green = (uint8_t)(((pixel >> 4) & 0xfu) * 17u);
+    color.blue = (uint8_t)((pixel & 0xfu) * 17u);
+    return color;
+}
 
 /**
  * Convert am RGB888 color to XRGB8888 stored in `uint32_t`

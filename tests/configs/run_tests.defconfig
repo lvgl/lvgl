@@ -4,6 +4,8 @@
 # Reference images were rendered at this DPI
 CONFIG_LV_DPI_DEF=130
 
+CONFIG_LV_DRAW_SW_SUPPORT_ARGB4444=y
+
 # The test runner installs its own log callback
 # CONFIG_LV_LOG_PRINTF is not set
 
