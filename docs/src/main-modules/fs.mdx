@@ -124,6 +124,9 @@ void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 
 `path` is the path after the drive letter (e.g. "S:path/to/file.txt" -> "path/to/file.txt").
 `mode` can be <ApiLink name="LV_FS_MODE_WR" /> or <ApiLink name="LV_FS_MODE_RD" /> to open for writes or reads.
+<ApiLink name="LV_FS_MODE_TRUNC" /> can be added to <ApiLink name="LV_FS_MODE_WR" /> (`lv_fs_open`
+rejects it otherwise). In that case the driver must create the file if it doesn't exist,
+and truncate it to 0 bytes if it does.
 
 The return value is a pointer to a *file object* that describes the
 opened file or `NULL` if there were any issues (e.g. the file wasn't
@@ -223,6 +226,17 @@ lv_fs_close(&f);
 The mode in <ApiLink name="lv_fs_open" /> can be <ApiLink name="LV_FS_MODE_WR" /> to open for
 writes only, <ApiLink name="LV_FS_MODE_RD" /> for reads only, or
 <ApiLink name="LV_FS_MODE_RD" /> `|` <ApiLink name="LV_FS_MODE_WR" /> for both.
+
+Add <ApiLink name="LV_FS_MODE_TRUNC" /> to a mode that includes <ApiLink name="LV_FS_MODE_WR" />
+to start from an empty file: the file is created if it doesn't exist and its content is
+discarded if it does (like `fopen(path, "w")`). Without it, whether an existing file is
+truncated depends on the driver, so a short write over a longer file can leave the old
+tail behind.
+
+```c
+/*Replace the content of the file*/
+res = lv_fs_open(&f, "S:folder/file.txt", LV_FS_MODE_WR | LV_FS_MODE_TRUNC);
+```
 
 This example shows how to read a directory's content. It's up to the
 driver how to mark directories in the result but it can be a good

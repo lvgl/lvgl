@@ -205,7 +205,8 @@ static lv_fs_res_t fs_error_from_win32(DWORD error)
  * Open a file
  * @param drv   pointer to a driver where this function belongs
  * @param path  path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
- * @param mode  read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
+ * @param mode  read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
+ *              FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
  * @return pointer to FIL struct or NULL in case of fail
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -214,6 +215,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     LV_UNUSED(drv);
 
     DWORD desired_access = 0;
+    DWORD creation_disposition = OPEN_EXISTING;
 
     if(mode & LV_FS_MODE_RD) {
         desired_access |= GENERIC_READ;
@@ -221,6 +223,11 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     if(mode & LV_FS_MODE_WR) {
         desired_access |= GENERIC_WRITE;
+
+        /*Create the file if it doesn't exist, otherwise truncate it to 0 bytes*/
+        if(mode & LV_FS_MODE_TRUNC) {
+            creation_disposition = CREATE_ALWAYS;
+        }
     }
 
     /*Make the path relative to the current directory (the projects root folder)*/
@@ -233,7 +240,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
                desired_access,
                FILE_SHARE_READ,
                NULL,
-               OPEN_EXISTING,
+               creation_disposition,
                FILE_ATTRIBUTE_NORMAL,
                NULL);
 }
