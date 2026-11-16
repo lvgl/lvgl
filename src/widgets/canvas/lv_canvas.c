@@ -182,7 +182,7 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     else if(cf == LV_COLOR_FORMAT_AL88) {
         lv_color16a_t * buf = (lv_color16a_t *)data;
         buf->lumi = lv_color_luminance(color);
-        buf->alpha = 255;
+        buf->alpha = opa;
     }
     lv_obj_invalidate(obj);
 }
@@ -358,7 +358,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     else if(header->cf == LV_COLOR_FORMAT_AL88) {
         lv_color16a_t c;
         c.lumi = lv_color_luminance(color);
-        c.alpha = 255;
+        c.alpha = opa;
         for(y = 0; y < header->h; y++) {
             lv_color16a_t * buf = (lv_color16a_t *)(data + y * stride);
             for(x = 0; x < header->w; x++) {
@@ -424,7 +424,7 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
         /*TODO(v10): dispatching a layer can create new sub layers that the layer depends on.
          * These sub layers are created in display's layer list because `lv_draw_layer_create`
          * attaches this layer to the display layer head, so in here we need to iterate over that
-         * list and dispatchs any sub layers that are required by the main layer
+         * list and dispatches any sub layers that are required by the main layer
          */
         lv_layer_t * sub_layer = display->layer_head;
         while(sub_layer) {
