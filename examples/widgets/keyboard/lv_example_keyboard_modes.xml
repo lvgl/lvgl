@@ -20,6 +20,13 @@
 			placeholder_text="Type some numbers"
 		/>
 
-		<lv_keyboard name="keyboard" align="bottom_mid" width="100%" height="60%" mode="number" />
+		<lv_keyboard
+			name="keyboard"
+			align="bottom_mid"
+			width="100%"
+			height="60%"
+			mode="number"
+			textarea="textarea"
+		/>
 	</view>
 </screen>

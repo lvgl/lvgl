@@ -31,5 +31,6 @@ void lv_example_keyboard_modes(void)
     lv_obj_set_align(keyboard, LV_ALIGN_BOTTOM_MID);
     lv_obj_set_size(keyboard, lv_pct(100), lv_pct(60));
     lv_keyboard_set_mode(keyboard, LV_KEYBOARD_MODE_NUMBER);
+    lv_keyboard_set_textarea(keyboard, textarea);
 }
 #endif
