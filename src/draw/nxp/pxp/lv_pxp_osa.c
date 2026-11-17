@@ -116,9 +116,9 @@ static void _pxp_interrupt_init(void)
     }
 #endif
 
-    lv_irq_attach_pxp(_pxp_irq_cb, NULL);
-
     ucPXPIdle = true;
+
+    lv_irq_attach_pxp(_pxp_irq_cb, NULL);
 }
 
 static void _pxp_interrupt_deinit(void)

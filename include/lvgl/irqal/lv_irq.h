@@ -39,8 +39,11 @@ typedef void (*lv_irq_cb_t)(void * arg);
 
 /* One attach/detach pair per known GPU completion source, used mainly by LVGL's
  * own GPU draw units. `attach` arranges for `cb` to be invoked when the source
- * signals completion, handing `user_data` back; `detach` stops it. `cb` must
- * not be NULL.
+ * signals completion, handing `user_data` back, and enables the source's
+ * interrupt; `detach` disables it. `cb` must not be NULL.
+ *
+ * Attach as the last step of initializing the peripheral: from then on its
+ * interrupts may arrive, and the caller must be ready to handle them.
  *
  * A provider must invoke `cb` from interrupt context: callbacks may use
  * ISR-only APIs such as lv_thread_sync_signal_isr().

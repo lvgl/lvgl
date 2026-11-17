@@ -91,8 +91,6 @@ int32_t nema_sys_init(void)
 
     lv_thread_sync_init(&sync);
 
-    lv_irq_attach_nemagfx(nemagfx_completion_cb, NULL);
-
     /* Initialise Mem Space */
     error_code = tsi_malloc_init_pool_aligned(0, (void *)nemagfx_pool_mem, (uintptr_t)nemagfx_pool_mem,
                                               NEMAGFX_MEM_POOL_SIZE, 1, 8);
@@ -110,6 +108,8 @@ int32_t nema_sys_init(void)
 
     /* Reset last_cl_id counter */
     last_cl_id = 0;
+
+    lv_irq_attach_nemagfx(nemagfx_completion_cb, NULL);
 
     return error_code;
 }

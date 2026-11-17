@@ -26,10 +26,9 @@
  **********************/
 
 /* Written from thread context (attach/detach), read in the trampoline: volatile,
- * read once into locals there. Attach clears cb, stores user_data, then sets
- * cb, so the trampoline never pairs a callback with another one's user_data. A
- * pointer-sized store is atomic on Cortex-M, and detach disables the line
- * before clearing the pointer. */
+ * read once into locals there. Attach and detach mask the line while they
+ * change the pair, so the trampoline never sees a half-updated one, and a
+ * completion arriving meanwhile stays pending instead of being lost. */
 #if ZEPHYR_DMA2D
     static volatile lv_irq_cb_t dma2d_cb;
     static void * volatile dma2d_user_data;
@@ -76,7 +75,7 @@ static void pxp_trampoline(const void * arg)
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
-    dma2d_cb = NULL;
+    irq_disable(DT_IRQN(DT_NODELABEL(dma2d)));
     dma2d_user_data = user_data;
     dma2d_cb = cb;
     IRQ_CONNECT(DT_IRQN(DT_NODELABEL(dma2d)), DT_IRQ(DT_NODELABEL(dma2d), priority),
@@ -99,7 +98,7 @@ lv_result_t lv_irq_detach_dma2d(void)
 lv_result_t lv_irq_attach_pxp(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
-    pxp_cb = NULL;
+    irq_disable(DT_IRQN(DT_NODELABEL(pxp)));
     pxp_user_data = user_data;
     pxp_cb = cb;
     IRQ_CONNECT(DT_IRQN(DT_NODELABEL(pxp)), DT_IRQ(DT_NODELABEL(pxp), priority),

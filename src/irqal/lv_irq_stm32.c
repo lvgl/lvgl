@@ -43,9 +43,10 @@
  **********************/
 
 /* The HAL owns the vectors: the generated <PERIPH>_IRQHandler calls
- * HAL_<PERIPH>_IRQHandler on these handles, which calls back here. Attach
- * clears cb, stores user_data, then sets cb, so the callback never pairs a
- * callback with another one's user_data. */
+ * HAL_<PERIPH>_IRQHandler on these handles, which calls back here. Attach masks
+ * the line while it changes the callback, so a completion arriving meanwhile
+ * stays pending instead of being lost. The priority is the one the HAL init
+ * (CubeMX) set. */
 
 #if STM32_DMA2D
     extern DMA2D_HandleTypeDef hdma2d;
@@ -55,8 +56,6 @@
 
 #if STM32_NEMAGFX
     extern GPU2D_HandleTypeDef hgpu2d;
-    /* Attach runs before the draw unit submits its first command list, so the
-    * completion cannot fire while the event's user_data is being set. */
     static volatile lv_irq_cb_t nemagfx_cb;
     static lv_irq_nemagfx_event_t nemagfx_event;
 #endif
@@ -70,15 +69,17 @@
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
-    dma2d_cb = NULL;
+    NVIC_DisableIRQ(DMA2D_IRQn);
     dma2d_user_data = user_data;
     dma2d_cb = cb;
     hdma2d.XferCpltCallback = dma2d_hal_trampoline;
+    NVIC_EnableIRQ(DMA2D_IRQn);
     return LV_RESULT_OK;
 }
 
 lv_result_t lv_irq_detach_dma2d(void)
 {
+    NVIC_DisableIRQ(DMA2D_IRQn);
     hdma2d.XferCpltCallback = NULL;
     dma2d_cb = NULL;
     return LV_RESULT_OK;
@@ -91,19 +92,21 @@ lv_result_t lv_irq_detach_dma2d(void)
 lv_result_t lv_irq_attach_nemagfx(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
-    nemagfx_cb = NULL;
+    NVIC_DisableIRQ(GPU2D_IRQn);
     nemagfx_event.user_data = user_data;
     nemagfx_cb = cb;
 #if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
     HAL_GPU2D_RegisterCommandListCpltCallback(&hgpu2d, nemagfx_hal_trampoline);
 #endif
+    NVIC_EnableIRQ(GPU2D_IRQn);
     return LV_RESULT_OK;
 }
 
 lv_result_t lv_irq_detach_nemagfx(void)
 {
-    /* With the callback cleared the HAL callback does nothing, so no HAL
-     * unregister API is needed. */
+    /* With the line disabled and the callback cleared, no HAL unregister API
+     * is needed. */
+    NVIC_DisableIRQ(GPU2D_IRQn);
     nemagfx_cb = NULL;
     return LV_RESULT_OK;
 }
