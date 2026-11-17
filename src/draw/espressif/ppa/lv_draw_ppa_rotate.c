@@ -67,7 +67,7 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
 
     /*The output buffer must start and end on a cache line, so describe the block
      *as an offset into the cache line aligned memory around it.*/
-    const uintptr_t align = LV_DRAW_PPA_CACHE_LINE_SIZE;
+    const lv_uintptr_t align = LV_DRAW_PPA_CACHE_LINE_SIZE;
     uint8_t * out_base = (uint8_t *)((uintptr_t)dst & ~(align - 1));
     const uint32_t lead = (uint32_t)((uint8_t *)dst - out_base);
     const uint32_t out_stride = (uint32_t)dst_stride;
