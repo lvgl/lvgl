@@ -62,3 +62,12 @@ def test_bool_emits_nothing_on_other_targets(entries):
     wayland = entries["LV_USE_WAYLAND"]
     assert wayland.emit_internal_options() == []
     assert wayland.emit_kconfig() == []
+
+
+def test_template_does_not_guard_on_an_option_defined_later(generated):
+    """In lv_conf.h `#if LV_USE_LATE` before its #define is always false, so
+    the earlier option is left unguarded; the internal header checks it."""
+    template = generated["template"]
+    assert "#if LV_USE_LATE" not in template
+    assert "#define LV_USE_EARLY 0" in template
+    assert '#error "LV_USE_EARLY requires LV_USE_LATE' in generated["internal"]

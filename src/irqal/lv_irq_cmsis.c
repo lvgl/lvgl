@@ -6,16 +6,33 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lvgl.h"
+#include "../lvgl_public.h"
 
-#define CMSIS_DMA2D (LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS)
-#define CMSIS_PXP   (LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS)
-
-#if CMSIS_DMA2D || CMSIS_PXP
+#if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS
 
 #if LV_IRQ_CMSIS_USE_INCLUDE
     #include LV_IRQ_CMSIS_INCLUDE
 #endif
+
+#ifndef __NVIC_PRIO_BITS
+    #error "The CMSIS IRQ provider needs the device header: set LV_IRQ_CMSIS_INCLUDE"
+#endif
+
+/* A source is served when it is enabled and the device has it. The *_IRQn
+ * values are enum constants, invisible to the preprocessor, so the
+ * base-address macros tell. */
+#if LV_IRQ_PROVIDES_DMA2D && defined(DMA2D_BASE)
+    #define CMSIS_DMA2D 1
+#else
+    #define CMSIS_DMA2D 0
+#endif
+#if LV_IRQ_PROVIDES_PXP && defined(PXP_BASE)
+    #define CMSIS_PXP 1
+#else
+    #define CMSIS_PXP 0
+#endif
+
+#if CMSIS_DMA2D || CMSIS_PXP
 
 /**********************
  *  STATIC PROTOTYPES
@@ -113,10 +130,12 @@ void PXP_IRQHandler(void)
  * from config instead of an RTOS header. */
 static void cmsis_enable_irq(IRQn_Type irqn)
 {
-#if LV_IRQ_CMSIS_SET_PRIORITY
-    NVIC_SetPriority(irqn, LV_IRQ_CMSIS_PRIORITY);
+#if LV_IRQ_CMSIS_SET_NVIC_PRIORITY
+    NVIC_SetPriority(irqn, LV_IRQ_CMSIS_NVIC_PRIORITY);
 #endif
     NVIC_EnableIRQ(irqn);
 }
 
 #endif /*CMSIS_DMA2D || CMSIS_PXP*/
+
+#endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS*/

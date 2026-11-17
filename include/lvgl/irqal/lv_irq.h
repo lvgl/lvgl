@@ -19,12 +19,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/* Whether an IRQ provider serves each completion source: LV_IRQ_<SOURCE>_PROVIDER
- * holds the provider's ID (LV_IRQ_PROVIDER_*, see src/irqal/Kconfig). */
-#define LV_IRQ_PROVIDES_DMA2D       (LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE)
-#define LV_IRQ_PROVIDES_PXP         (LV_IRQ_PXP_PROVIDER != LV_IRQ_PROVIDER_NONE)
-#define LV_IRQ_PROVIDES_NEMA_GPU2D  (LV_IRQ_NEMA_GPU2D_PROVIDER != LV_IRQ_PROVIDER_NONE)
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -34,7 +28,7 @@ extern "C" {
  * context).
  *
  * @param arg  for DMA2D and PXP, the `user_data` given to attach. For the
- *             NemaGFX GPU2D, an `lv_irq_nema_gpu2d_event_t *` whose `user_data`
+ *             NemaGFX GPU2D, an `lv_irq_nemagfx_event_t *` whose `user_data`
  *             is the one given to attach.
  */
 typedef void (*lv_irq_cb_t)(void * arg);
@@ -44,13 +38,16 @@ typedef void (*lv_irq_cb_t)(void * arg);
  **********************/
 
 /* One attach/detach pair per known GPU completion source, used mainly by LVGL's
- * own GPU draw units. `attach` arranges for `cb` to be invoked (in interrupt
- * context) when the source signals completion, handing `user_data` back;
- * `detach` stops it. `cb` must not be NULL.
+ * own GPU draw units. `attach` arranges for `cb` to be invoked when the source
+ * signals completion, handing `user_data` back; `detach` stops it. `cb` must
+ * not be NULL.
  *
- * LVGL itself defines none of these: the IRQ provider serving a source
- * (LV_IRQ_<SOURCE>_PROVIDER) defines its pair. A pair is declared only while a
- * provider is picked for its source. */
+ * A provider must invoke `cb` from interrupt context: callbacks may use
+ * ISR-only APIs such as lv_thread_sync_signal_isr().
+ *
+ * An IRQ provider defines the pairs: one bundled with LVGL (picked with
+ * LV_IRQ_PROVIDER) or any other code. A pair is declared only while
+ * LV_IRQ_PROVIDES_<SOURCE> is enabled. */
 
 #if LV_IRQ_PROVIDES_DMA2D
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb, void * user_data);
@@ -62,15 +59,15 @@ lv_result_t lv_irq_attach_pxp(lv_irq_cb_t cb, void * user_data);
 lv_result_t lv_irq_detach_pxp(void);
 #endif
 
-#if LV_IRQ_PROVIDES_NEMA_GPU2D
+#if LV_IRQ_PROVIDES_NEMAGFX
 /** What the NemaGFX GPU2D completion passes to the callback. */
 typedef struct {
-    void * user_data;       /**< The `user_data` given to lv_irq_attach_nema_gpu2d() */
+    void * user_data;       /**< The `user_data` given to lv_irq_attach_nemagfx() */
     uint32_t cmd_list_id;   /**< The command list that completed */
-} lv_irq_nema_gpu2d_event_t;
+} lv_irq_nemagfx_event_t;
 
-lv_result_t lv_irq_attach_nema_gpu2d(lv_irq_cb_t cb, void * user_data);
-lv_result_t lv_irq_detach_nema_gpu2d(void);
+lv_result_t lv_irq_attach_nemagfx(lv_irq_cb_t cb, void * user_data);
+lv_result_t lv_irq_detach_nemagfx(void);
 #endif
 
 /**********************

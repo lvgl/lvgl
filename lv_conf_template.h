@@ -125,28 +125,48 @@
 
 
 /*============================================================================
- * IRQ PROVIDERS
+ * IRQ ABSTRACTION LAYER (IRQ)
  *============================================================================*/
 
-/** ID of the IRQ provider serving the DMA2D interrupt: one of LV_IRQ_PROVIDER_*,
- *  e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
+/** IRQ provider
+ *  Possible values:
+ *  - LV_IRQ_PROVIDER_NONE: None (or provided outside LVGL)
+ *  - LV_IRQ_PROVIDER_CMSIS: CMSIS (NVIC) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_PXP)
+ *  - LV_IRQ_PROVIDER_ZEPHYR: Zephyr (device tree) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_PXP)
+ *  - LV_IRQ_PROVIDER_STM32: STM32 (HAL) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_NEMAGFX)
+ *  - LV_IRQ_PROVIDER_CUSTOM
  */
-#define LV_IRQ_DMA2D_PROVIDER 0
+#define LV_IRQ_PROVIDER LV_IRQ_PROVIDER_NONE
 
-/** ID of the IRQ provider serving the PXP interrupt: one of LV_IRQ_PROVIDER_*,
- *  e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
+#if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CUSTOM
+/** Included by lv_conf_internal.h. Your build links lv_irq_attach_<source>()
+ *  and lv_irq_detach_<source>() for each source enabled below.
  */
-#define LV_IRQ_PXP_PROVIDER 0
+#define LV_IRQ_CUSTOM_INCLUDE ""
 
-/** ID of the IRQ provider serving the NemaGFX GPU2D completion: one of LV_IRQ_PROVIDER_*,
- *  e.g. LV_IRQ_PROVIDER_CMSIS. LV_IRQ_PROVIDER_NONE when none does.
+#endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CUSTOM*/
+
+/** Declares lv_irq_attach_dma2d() and lv_irq_detach_dma2d(). LVGL's providers
+ *  serve it only when the device has it (DMA2D_BASE in the device header, a
+ *  dma2d device-tree node on Zephyr).
  */
-#define LV_IRQ_NEMA_GPU2D_PROVIDER 0
+#define LV_IRQ_PROVIDES_DMA2D 0
 
-#if LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS
+/** Declares lv_irq_attach_pxp() and lv_irq_detach_pxp(). LVGL's providers
+ *  serve it only when the device has it (PXP_BASE in the device header, a
+ *  pxp device-tree node on Zephyr).
+ */
+#define LV_IRQ_PROVIDES_PXP 0
+
+/** Declares lv_irq_attach_nemagfx() and lv_irq_detach_nemagfx(). LVGL's STM32
+ *  provider serves it only when the device has a GPU2D (GPU2D_BASE).
+ */
+#define LV_IRQ_PROVIDES_NEMAGFX 0
+
+#if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS
 /** Include the device header that declares the IRQn_Type values
- *  (DMA2D_IRQn, PXP_IRQn, ...) and the NVIC_* functions. Leave disabled if
- *  the build already makes them visible.
+ *  (DMA2D_IRQn, PXP_IRQn, ...), the peripheral base addresses and the
+ *  NVIC_* functions. Leave disabled if the build already makes them visible.
  */
 #define LV_IRQ_CMSIS_USE_INCLUDE 0
 
@@ -161,19 +181,25 @@
  *  kernel's ...FromISR APIs (lv_thread_sync_signal_isr uses one). Leave
  *  disabled on bare metal, where the reset-default priority is fine.
  */
-#define LV_IRQ_CMSIS_SET_PRIORITY 0
+#define LV_IRQ_CMSIS_SET_NVIC_PRIORITY 0
 
-#if LV_IRQ_CMSIS_SET_PRIORITY
+#if LV_IRQ_CMSIS_SET_NVIC_PRIORITY
 /** The value passed to NVIC_SetPriority. 255 maps to the lowest preemption
  *  priority whatever __NVIC_PRIO_BITS is: always safe for ...FromISR calls,
  *  at the cost of latency. Under FreeRTOS the best latency is
  *  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h
  *  may write it symbolically; Kconfig takes a literal number).
  */
-#define LV_IRQ_CMSIS_PRIORITY 255
+#define LV_IRQ_CMSIS_NVIC_PRIORITY 255
 
-#endif /*LV_IRQ_CMSIS_SET_PRIORITY*/
-#endif /*LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_CMSIS*/
+#endif /*LV_IRQ_CMSIS_SET_NVIC_PRIORITY*/
+#endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS*/
+
+#if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32
+/** The family's HAL header, e.g. "stm32h7xx_hal.h". */
+#define LV_IRQ_STM32_HAL_INCLUDE "stm32u5xx_hal.h"
+
+#endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32*/
 
 
 /*============================================================================
@@ -598,13 +624,13 @@
 #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
 #if LV_USE_OS != LV_OS_NONE
-#if LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE
+#if LV_IRQ_PROVIDES_DMA2D
 /** Run DMA2D transfers asynchronously instead of waiting for them. Needs an
- *  OS and an IRQ provider picked for DMA2D (LV_IRQ_DMA2D_PROVIDER).
+ *  OS and an IRQ provider for DMA2D (LV_IRQ_PROVIDES_DMA2D).
  */
 #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 
-#endif /*LV_IRQ_DMA2D_PROVIDER != LV_IRQ_PROVIDER_NONE*/
+#endif /*LV_IRQ_PROVIDES_DMA2D*/
 #endif /*LV_USE_OS != LV_OS_NONE*/
 #endif /*LV_USE_DRAW_DMA2D*/
 
@@ -1816,11 +1842,8 @@
 
 #endif /*LV_USE_NUTTX_MOUSE*/
 
-#if LV_USE_PROFILER_BUILTIN
 /** Write the built-in profiler output to a file instead of the console. */
 #define LV_USE_NUTTX_TRACE_FILE 0
-
-#endif /*LV_USE_PROFILER_BUILTIN*/
 
 #if LV_USE_NUTTX_TRACE_FILE
 /** Profiler trace file path */

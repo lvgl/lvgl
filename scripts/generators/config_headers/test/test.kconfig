@@ -298,3 +298,11 @@ config LV_TEST_CMP_LEVEL
 config LV_TEST_CMP_AT_TWO
 	bool "On only when the level is 2"
 	depends on LV_TEST_CMP_LEVEL = 2
+
+# --- A dependency on an option defined further down -------------------------
+config LV_USE_EARLY
+	bool "Early option"
+	depends on LV_USE_LATE
+
+config LV_USE_LATE
+	bool "Late option"

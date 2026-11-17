@@ -14,6 +14,10 @@
 #include "../../misc/lv_area_private.h"
 #include "../lv_draw_buf_private.h"
 
+#if LV_USE_DRAW_DMA2D_INTERRUPT && !LV_IRQ_PROVIDES_DMA2D
+    #error "DMA2D IRQ provider missing: enable LV_IRQ_PROVIDES_DMA2D"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

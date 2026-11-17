@@ -6,23 +6,20 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lvgl.h"
+#include "../lvgl_public.h"
 
-#define ZEPHYR_DMA2D (LV_IRQ_DMA2D_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR)
-#define ZEPHYR_PXP   (LV_IRQ_PXP_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR)
+#if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR
+
+#include <zephyr/devicetree.h>
+
+/* A source is served when it is enabled and the device tree has its node. */
+#define ZEPHYR_DMA2D (LV_IRQ_PROVIDES_DMA2D && DT_NODE_EXISTS(DT_NODELABEL(dma2d)))
+#define ZEPHYR_PXP   (LV_IRQ_PROVIDES_PXP && DT_NODE_EXISTS(DT_NODELABEL(pxp)))
 
 #if ZEPHYR_DMA2D || ZEPHYR_PXP
 
 #include <zephyr/kernel.h>
 #include <zephyr/irq.h>
-#include <zephyr/devicetree.h>
-
-#if ZEPHYR_DMA2D && !DT_NODE_EXISTS(DT_NODELABEL(dma2d))
-    #error "The Zephyr IRQ provider for DMA2D needs a dma2d node in the device tree"
-#endif
-#if ZEPHYR_PXP && !DT_NODE_EXISTS(DT_NODELABEL(pxp))
-    #error "The Zephyr IRQ provider for PXP needs a pxp node in the device tree"
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -118,3 +115,5 @@ lv_result_t lv_irq_detach_pxp(void)
 #endif /*ZEPHYR_PXP*/
 
 #endif /*ZEPHYR_DMA2D || ZEPHYR_PXP*/
+
+#endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR*/

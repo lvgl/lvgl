@@ -21,7 +21,7 @@
 #include <fsl_pxp.h>
 
 #if !LV_IRQ_PROVIDES_PXP
-    #error "PXP needs an IRQ provider picked for PXP (LV_IRQ_PXP_PROVIDER)"
+    #error "PXP IRQ provider missing: enable LV_IRQ_PROVIDES_PXP"
 #endif
 
 /*********************

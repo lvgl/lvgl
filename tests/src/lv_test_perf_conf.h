@@ -320,7 +320,7 @@
         #if LV_USE_DRAW_DMA2D
             #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
-            /* Needs an OS and an IRQ provider picked for DMA2D (LV_IRQ_DMA2D_PROVIDER) */
+            /* Needs an OS and an IRQ provider for DMA2D (LV_IRQ_PROVIDES_DMA2D) */
             #define LV_USE_DRAW_DMA2D_INTERRUPT 0
         #endif
 

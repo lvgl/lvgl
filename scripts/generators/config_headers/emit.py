@@ -84,11 +84,30 @@ class Emitter:
         #   - Choice objects (a member's implicit dep renders as `<choice>`, not valid C)
         #   - derived-combo symbols, which would gate their own selector members circularly
         #   - symbols with no prompt on any of their nodes
+        def defined_later(term):
+            refs = set()
+            collect_sym_refs(term, refs)
+            for sym in refs:
+                if sym.name in self.guard:
+                    name = self.guard[sym.name][0]
+                elif sym.choice is not None and sym.choice.name:
+                    name = sym.choice.name
+                else:
+                    name = sym.name
+                if is_visible(sym) and name not in self.emitted:
+                    return True
+            return False
+
         deduped, seen = [], set(base_keys)
         for t in wanted:
             if isinstance(t, Choice):
                 continue
             if isinstance(t, Symbol) and not is_visible(t):
+                continue
+            # The template is read top to bottom: a guard on an option defined
+            # further down is always false there. The option stays unguarded and
+            # the internal header's constraint check catches a misuse.
+            if self.target == "template" and defined_later(t):
                 continue
             k = term_key(t)
             if k not in seen:
