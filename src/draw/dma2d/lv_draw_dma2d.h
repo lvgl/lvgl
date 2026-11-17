@@ -32,8 +32,6 @@ extern "C" {
 void lv_draw_dma2d_init(void);
 void lv_draw_dma2d_deinit(void);
 
-void lv_draw_dma2d_transfer_complete_interrupt_handler(void);
-
 /**********************
  *      MACROS
  **********************/

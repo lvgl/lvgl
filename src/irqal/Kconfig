@@ -124,9 +124,10 @@ if LV_IRQ_PROVIDER_STM32
 
 config LV_IRQ_STM32_HAL_INCLUDE
 	string "STM32 HAL header"
-	default "stm32u5xx_hal.h"
+	default "set_LV_IRQ_STM32_HAL_INCLUDE_to_your_stm32xxxx_hal.h"
 	help
-		The family's HAL header, e.g. "stm32h7xx_hal.h".
+		The family's HAL header, e.g. "stm32h7xx_hal.h". The default is a
+		placeholder that names this setting in the compile error.
 
 endif
 

@@ -406,7 +406,7 @@
     #ifdef CONFIG_LV_IRQ_STM32_HAL_INCLUDE
         #define LV_IRQ_STM32_HAL_INCLUDE CONFIG_LV_IRQ_STM32_HAL_INCLUDE
     #else
-        #define LV_IRQ_STM32_HAL_INCLUDE "stm32u5xx_hal.h"
+        #define LV_IRQ_STM32_HAL_INCLUDE "set_LV_IRQ_STM32_HAL_INCLUDE_to_your_stm32xxxx_hal.h"
     #endif
 #endif
 

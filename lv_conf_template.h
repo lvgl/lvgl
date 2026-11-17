@@ -196,8 +196,10 @@
 #endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS*/
 
 #if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32
-/** The family's HAL header, e.g. "stm32h7xx_hal.h". */
-#define LV_IRQ_STM32_HAL_INCLUDE "stm32u5xx_hal.h"
+/** The family's HAL header, e.g. "stm32h7xx_hal.h". The default is a
+ *  placeholder that names this setting in the compile error.
+ */
+#define LV_IRQ_STM32_HAL_INCLUDE "set_LV_IRQ_STM32_HAL_INCLUDE_to_your_stm32xxxx_hal.h"
 
 #endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32*/
 

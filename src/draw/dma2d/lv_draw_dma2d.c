@@ -42,6 +42,9 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 #if LV_DRAW_DMA2D_ASYNC
     static void dma2d_irq_cb(void * arg);
 #endif
+#if LV_USE_DRAW_DMA2D_INTERRUPT
+    static void transfer_complete_interrupt_handler(void);
+#endif
 #if LV_DRAW_DMA2D_CACHE
     static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
     static void flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
@@ -151,13 +154,6 @@ void lv_draw_dma2d_deinit(void)
     LV_UNUSED(res);
 
     g_unit = NULL;
-#endif
-}
-
-void lv_draw_dma2d_transfer_complete_interrupt_handler(void)
-{
-#if LV_DRAW_DMA2D_ASYNC
-    lv_thread_sync_signal_isr(&g_unit->interrupt_signal);
 #endif
 }
 
@@ -351,7 +347,14 @@ static void dma2d_irq_cb(void * arg)
     /* Clear Transfer Complete flag */
     DMA2D->IFCR = DMA2D_IFCR_CTCIF;
 
-    lv_draw_dma2d_transfer_complete_interrupt_handler();
+    transfer_complete_interrupt_handler();
+}
+#endif
+
+#if LV_USE_DRAW_DMA2D_INTERRUPT
+static void transfer_complete_interrupt_handler(void)
+{
+    lv_thread_sync_signal_isr(&g_unit->interrupt_signal);
 }
 #endif
 
