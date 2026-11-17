@@ -86,6 +86,7 @@
 #include "drivers/display/lv_st7789.h"
 #include "drivers/display/lv_st7796.h"
 #include "drivers/display/lv_st_ltdc.h"
+#include "drivers/display/lv_gd_tli.h"
 #include "drivers/display/lv_tft_espi.h"
 #include "drivers/indev/lv_evdev.h"
 #include "drivers/indev/lv_libinput.h"
