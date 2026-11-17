@@ -45,8 +45,7 @@ void lv_draw_ppa_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_ar
                      const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**
- * Rotate an RGB565 block with the PPA. Used by the `LV_DRAW_ROTATE*_RGB565` hooks of
- * `lv_draw_rotate()`.
+ * Rotate a block with the PPA.
  * @param src           pointer to the first source pixel
  * @param dst           pointer to the first destination pixel
  * @param src_width     source width in pixels
