@@ -744,7 +744,7 @@ static const char * recolor_cmd_get_next(const char * text_in, uint32_t len_in,
 static lv_value_precise_t deg_to_rad(lv_value_precise_t deg, int32_t radius)
 {
 #if LV_USE_FLOAT
-    return (lv_value_precise_t)(deg * radius * M_PI / 180);
+    return (lv_value_precise_t)((double)deg * radius * M_PI / 180);
 #else
     return (lv_value_precise_t)((deg * radius * M_PI / 180) >> 8);
 #endif
@@ -753,7 +753,7 @@ static lv_value_precise_t deg_to_rad(lv_value_precise_t deg, int32_t radius)
 static lv_value_precise_t rad_to_deg(lv_value_precise_t rad, int32_t radius)
 {
 #if LV_USE_FLOAT
-    return (lv_value_precise_t)(rad * 180 / M_PI / radius);
+    return (lv_value_precise_t)((double)rad * 180 / M_PI / radius);
 #else
     return (lv_value_precise_t)(((rad * 180) << 8) / M_PI / radius);
 #endif
