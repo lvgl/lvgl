@@ -97,7 +97,7 @@ void lv_draw_ppa_deinit(void)
     /* No global deinit required */
 }
 
-ppa_client_handle_t lv_draw_ppa_get_srm_client(void)
+ppa_client_handle_t lv_draw_ppa_get_handle(void)
 {
     return ppa_unit ? ppa_unit->srm_client : NULL;
 }
@@ -207,10 +207,10 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 static int32_t ppa_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
-    ppa_unit = NULL;
     ppa_unregister_client(u->srm_client);
     ppa_unregister_client(u->fill_client);
     ppa_unregister_client(u->blend_client);
+    ppa_unit = NULL;
     return 0;
 }
 

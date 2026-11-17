@@ -15,15 +15,6 @@
  *      DEFINES
  *********************/
 
-/*Smaller areas are faster on the CPU. Each PPA call costs about 0.5 ms; rotating by
- *90 or 270 degrees is slow on the CPU, but rotating by 180 degrees is not.*/
-#ifndef LV_PPA_ROTATE_MIN_PIXELS
-    #define LV_PPA_ROTATE_MIN_PIXELS 1024
-#endif
-#ifndef LV_PPA_ROTATE_180_MIN_PIXELS
-    #define LV_PPA_ROTATE_180_MIN_PIXELS 8192
-#endif
-
 /*Only RGB565 is supported, 2 bytes per pixel*/
 #define PPA_ROTATE_PX_SIZE 2
 
@@ -35,6 +26,8 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
                                int32_t src_stride, int32_t dst_stride, lv_rotation_t rotation,
                                lv_color_format_t cf)
 {
+    ppa_client_handle_t client = lv_draw_ppa_get_handle();
+    if(client == NULL) return LV_RESULT_INVALID;
     if(cf != LV_COLOR_FORMAT_RGB565) return LV_RESULT_INVALID;
     if(src_width <= 0 || src_height <= 0 || src_stride <= 0 || dst_stride <= 0) return LV_RESULT_INVALID;
     if(src_stride % PPA_ROTATE_PX_SIZE != 0 || dst_stride % PPA_ROTATE_PX_SIZE != 0) return LV_RESULT_INVALID;
@@ -59,7 +52,7 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
             angle = PPA_SRM_ROTATION_ANGLE_270;
             swap_xy = true;
             break;
-        default:
+        case LV_ROTATION_0:
             return LV_RESULT_INVALID;
     }
     const uint32_t out_w = (uint32_t)(swap_xy ? src_height : src_width);
@@ -82,9 +75,6 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
     const uint8_t * in_start = src;
     const uint8_t * in_end = in_start + (size_t)src_stride * (size_t)src_height;
     if(in_start < out_base + out_size && (const uint8_t *)out_base < in_end) return LV_RESULT_INVALID;
-
-    ppa_client_handle_t client = lv_draw_ppa_get_srm_client();
-    if(client == NULL) return LV_RESULT_INVALID;
 
     /*The driver writes back the input and invalidates the output, but it invalidates
      *whole cache lines. Write those back first so pixels the CPU drew next to the

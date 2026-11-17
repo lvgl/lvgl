@@ -536,6 +536,12 @@
 
 #define LV_PPA_BURST_LENGTH 128
 
+/** Smaller areas are rotated on the CPU, which is faster for them. */
+#define LV_PPA_ROTATE_MIN_PIXELS 1024
+
+/** Smaller areas are rotated on the CPU, which is faster for them. */
+#define LV_PPA_ROTATE_180_MIN_PIXELS 8192
+
 #endif /*LV_USE_PPA*/
 
 /** Accelerate blends, fills and image decoding with the STM32 DMA2D peripheral. */
