@@ -291,14 +291,6 @@ static void give_back_memory(uint32_t block_cnt)
 {
     for(uint32_t i = 0; i < block_cnt; i++) lv_free(oom_blocks[i]);
 }
-
-static bool has_style(const lv_obj_t * obj, const lv_style_t * style)
-{
-    for(uint32_t i = 0; i < obj->style_cnt; i++) {
-        if(obj->styles[i].style == style) return true;
-    }
-    return false;
-}
 #endif
 
 void test_add_style_out_of_memory(void)
@@ -332,31 +324,46 @@ void test_add_style_out_of_memory(void)
 #endif
 }
 
-void test_add_style_again_out_of_memory(void)
+static uint32_t style_change_cnt;
+
+static void count_style_change(lv_event_t * e)
 {
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    static lv_style_t style;
-    lv_style_init(&style);
-    lv_style_set_bg_opa(&style, LV_OPA_COVER);
+    LV_UNUSED(e);
+    style_change_cnt++;
+}
+
+void test_add_style_again_moves_it(void)
+{
+    static lv_style_t style_a;
+    static lv_style_t style_b;
+    lv_style_init(&style_a);
+    lv_style_init(&style_b);
+    lv_style_set_bg_opa(&style_a, LV_OPA_COVER);
+    lv_style_set_bg_opa(&style_b, LV_OPA_50);
 
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    lv_obj_add_style(obj, &style, LV_PART_MAIN);
-    uint32_t style_cnt = obj->style_cnt;
+    lv_obj_remove_style_all(obj);
+    lv_obj_add_style(obj, &style_a, LV_PART_MAIN);
+    lv_obj_add_style(obj, &style_b, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_UINT32(2, obj->style_cnt);
+    TEST_ASSERT_EQUAL(LV_OPA_50, lv_obj_get_style_bg_opa(obj, LV_PART_MAIN));
 
-    /*Adding a style again only moves it, so it needs no memory and the style is kept*/
-    uint32_t block_cnt = take_all_memory();
-    lv_obj_add_style(obj, &style, LV_PART_MAIN);
-    uint32_t style_cnt_after = obj->style_cnt;
-    bool kept = has_style(obj, &style);
-    give_back_memory(block_cnt);
+    /*Adding a style again moves it to the first place and doesn't remove it first.
+     *Removing and adding would change the style twice.*/
+    style_change_cnt = 0;
+    lv_obj_add_event_cb(obj, count_style_change, LV_EVENT_STYLE_CHANGED, NULL);
+    lv_obj_add_style(obj, &style_a, LV_PART_MAIN);
+    lv_obj_remove_event_cb(obj, count_style_change);
 
-    TEST_ASSERT_EQUAL_UINT32(style_cnt, style_cnt_after);
-    TEST_ASSERT_TRUE(kept);
+    TEST_ASSERT_EQUAL_UINT32(1, style_change_cnt);
+    TEST_ASSERT_EQUAL_UINT32(2, obj->style_cnt);
+    TEST_ASSERT_EQUAL_PTR(&style_a, obj->styles[0].style);
+    TEST_ASSERT_EQUAL_PTR(&style_b, obj->styles[1].style);
     TEST_ASSERT_EQUAL(LV_OPA_COVER, lv_obj_get_style_bg_opa(obj, LV_PART_MAIN));
 
     lv_obj_delete(obj);
-    lv_style_reset(&style);
-#endif
+    lv_style_reset(&style_a);
+    lv_style_reset(&style_b);
 }
 
 #endif

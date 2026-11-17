@@ -133,8 +133,13 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
      *Moving needs no memory, so it can't fail and the style can't be lost.*/
     lv_obj_style_t * added = NULL;
     if(part != LV_PART_ANY && lv_obj_style_get_selector_state(selector) != LV_STATE_ANY) {
-        added = find_style(obj, style, selector);
-        if(added && (added->is_local || added->is_trans)) added = NULL;
+        uint32_t k;
+        for(k = 0; k < obj->style_cnt; k++) {
+            if(obj->styles[k].style != style || obj->styles[k].selector != selector) continue;
+            if(obj->styles[k].is_local || obj->styles[k].is_trans) continue;
+            added = &obj->styles[k];
+            break;
+        }
     }
 
     /*Else try removing the style first to be sure it won't be added twice*/
