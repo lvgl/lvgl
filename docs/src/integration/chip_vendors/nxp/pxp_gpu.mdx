@@ -22,6 +22,11 @@ and switch to another task or suspend the CPU for power savings.
 ## Basic configuration
 
 - In order to use PXP as a draw unit, select in `lv_conf.h`: Set <ApiLink name="LV_USE_DRAW_PXP" /> to `1`.
+- PXP needs an IRQ provider for its completion interrupt (<ApiLink name="LV_IRQ_PROVIDES_PXP" />).
+  Set <ApiLink name="LV_IRQ_PROVIDER" /> to `LV_IRQ_PROVIDER_CMSIS` (defines `PXP_IRQHandler`;
+  under FreeRTOS also set <ApiLink name="LV_IRQ_CMSIS_SET_NVIC_PRIORITY" /> to `1`) or
+  `LV_IRQ_PROVIDER_ZEPHYR`, or provide `lv_irq_attach_pxp()` / `lv_irq_detach_pxp()` yourself.
+  In a hand-written `lv_conf.h`, also set <ApiLink name="LV_IRQ_PROVIDES_PXP" /> to `1`.
 - In order to use PXP to rotate the screen, select in `lv_conf.h`: Set <ApiLink name="LV_USE_ROTATE_PXP" /> to `1`.
 - Enable PXP asserts in `lv_conf.h`: Set <ApiLink name="LV_USE_PXP_ASSERT" /> to `1`.
   There are a few PXP assertions that can stop the program execution in case the
@@ -154,7 +159,7 @@ The implementation depends on multiple OS-specific functions. The struct
 <ApiLink name="lv_pxp_init" /> function. The default implementation for
 FreeRTOS is in `lv_pxp_osa.c`.
 
-- `pxp_interrupt_init`: Initialize PXP interrupt (HW setup, OS setup)
-- `pxp_interrupt_deinit`: Deinitialize PXP interrupt (HW setup, OS setup)
+- `pxp_interrupt_init`: Initialize PXP interrupt (HW setup, OS setup, attach through the IRQ provider)
+- `pxp_interrupt_deinit`: Deinitialize PXP interrupt (HW setup, OS setup, detach from the IRQ provider)
 - `pxp_run`: Start PXP job. Use OS-specific mechanism to block the drawing thread.
 - `pxp_wait`: Wait for PXP completion.

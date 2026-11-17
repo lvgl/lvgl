@@ -349,6 +349,7 @@ config LV_IRQ_CMSIS_INCLUDE
 
 config LV_IRQ_CMSIS_SET_NVIC_PRIORITY
 	bool "Set the NVIC priority"
+	default y if LV_OS_FREERTOS
 	help
 		Enable on RTOS builds where the interrupt priority must sit at or below
 		the kernel's syscall interrupt priority ceiling, so the ISR may call the
