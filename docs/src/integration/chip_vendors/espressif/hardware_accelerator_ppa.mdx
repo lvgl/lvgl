@@ -116,13 +116,7 @@ to the PPA section of the reference manual, this is caused by the DMA2D memory b
 
 With `CONFIG_LV_USE_PPA=y`, <ApiLink name="lv_draw_rotate" /> rotates RGB565 data with the PPA. Display
 drivers that rotate the rendered area in their flush callback with <ApiLink name="lv_draw_rotate" /> use it
-without any code change. Small areas stay on the CPU, which is faster for them: under 1024
-pixels for 90 and 270 degrees, and under 8192 pixels for 180 degrees. Other color formats and
-any area the PPA cannot handle also fall back to the CPU.
-
-On an ESP32-P4 rotating an 800x640 RGB565 area by 90 degrees takes about 18 ms with the PPA,
-compared with about 31 ms on the CPU. The gain is larger when the destination is a framebuffer
-the display is reading at the same time.
+without any code change.
 
 ## Using the Espressif LVGL component PPA features
 
