@@ -1544,7 +1544,7 @@ static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subje
                 break;
 #if LV_USE_FLOAT
             case LV_SUBJECT_TYPE_FLOAT:
-                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.float_v);
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, (double)subject->value.float_v);
                 break;
 #endif
             case LV_SUBJECT_TYPE_STRING:
