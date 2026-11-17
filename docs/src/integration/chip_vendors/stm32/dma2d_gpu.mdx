@@ -7,9 +7,9 @@ faqs:
   - question: "Which draw tasks does DMA2D accelerate?"
     answer: "Fills and images that use standard color formats with no gradient, no transform, and no radius. Everything else is rendered in parallel by the software draw unit."
   - question: "Can the CPU sleep while a DMA2D transfer is running?"
-    answer: "Yes, with an OS. Set LV_USE_OS to the matching value, set LV_USE_DRAW_DMA2D_INTERRUPT to 1, and call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global interrupt. Otherwise LVGL spins while waiting."
+    answer: "Yes, with an OS and an IRQ provider for DMA2D. Set LV_USE_OS to the matching value, pick an IRQ provider for DMA2D (e.g. set LV_IRQ_PROVIDER to LV_IRQ_PROVIDER_STM32 or LV_IRQ_PROVIDER_CMSIS; in a hand-written lv_conf.h also set the LV_IRQ_PROVIDES_* flags the provider serves, see below), and set LV_USE_DRAW_DMA2D_INTERRUPT to 1. Otherwise LVGL spins while waiting."
   - question: "Does LVGL use the STM32 HAL for DMA2D?"
-    answer: "No, it manipulates the DMA2D peripheral through direct register access. Make sure no framework contends with LVGL over the peripheral."
+    answer: "The draw unit doesn't: it manipulates the DMA2D peripheral through direct register access. Make sure no framework contends with LVGL over the peripheral. Only the LV_IRQ_PROVIDER_STM32 IRQ provider uses the HAL, and only for the interrupt: it needs the global hdma2d handle CubeMX generates."
   - question: "Can DMA2D be used together with LTDC and NeoChrom?"
     answer: "DMA2D and LTDC can be mixed freely as long as LV_ST_LTDC_USE_DMA2D_FLUSH is not enabled, because LTDC would then use the DMA2D peripheral for flushing. NeoChrom and DMA2D can both be enabled; they are separate draw units."
 ---
@@ -63,12 +63,28 @@ supported values in `lv_conf_template.h` corresponding to the RTOS you're using.
 </Step>
 
 <Step>
-**Enable the interrupt**: Set <ApiLink name="LV_USE_DRAW_DMA2D_INTERRUPT" /> to `1` in `lv_conf.h`.
+**Provide the interrupt**: Set `LV_IRQ_PROVIDER` to one of the bundled providers:
+
+- `LV_IRQ_PROVIDER_STM32` for CubeMX-style projects, whose generated `DMA2D_IRQHandler` calls
+  `HAL_DMA2D_IRQHandler(&hdma2d)`. It uses the HAL only for the interrupt (the draw unit itself still
+  programs the registers directly) and expects CubeMX's global `hdma2d` handle. Set
+  `LV_IRQ_STM32_HAL_INCLUDE` to your family's HAL header (e.g. `"stm32h7xx_hal.h"`), enable the DMA2D
+  HAL module and the DMA2D global interrupt.
+- `LV_IRQ_PROVIDER_CMSIS`, which defines `DMA2D_IRQHandler` itself. Enable `LV_IRQ_CMSIS_USE_INCLUDE` and
+  set `LV_IRQ_CMSIS_INCLUDE` to your device header, unless the build already makes it visible.
+- `LV_IRQ_PROVIDER_ZEPHYR`, which connects the `dma2d` device-tree node's interrupt.
+
+With Kconfig, picking a provider turns on the `LV_IRQ_PROVIDES_*` flags it serves. In a hand-written
+`lv_conf.h`, set them yourself: `LV_IRQ_PROVIDES_DMA2D` and `LV_IRQ_PROVIDES_NEMAGFX` for STM32,
+`LV_IRQ_PROVIDES_DMA2D` and `LV_IRQ_PROVIDES_PXP` for CMSIS and Zephyr. A provider serves only the
+peripherals the device has, so the extra flag costs nothing.
+
+Any other code that defines `lv_irq_attach_dma2d()` and `lv_irq_detach_dma2d()` can be the provider
+instead: leave `LV_IRQ_PROVIDER` at `LV_IRQ_PROVIDER_NONE` and enable only `LV_IRQ_PROVIDES_DMA2D`.
 </Step>
 
 <Step>
-**Call the handler**: Call <ApiLink name="lv_draw_dma2d_transfer_complete_interrupt_handler" />
-when you receive the global interrupt that signals that a DMA2D transfer has completed.
+**Enable the interrupt**: Set <ApiLink name="LV_USE_DRAW_DMA2D_INTERRUPT" /> to `1`.
 </Step>
 
 </Steps>

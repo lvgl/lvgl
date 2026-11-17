@@ -60,6 +60,13 @@
 #define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
 
+/* IRQ provider */
+#define LV_IRQ_PROVIDER_NONE     0
+#define LV_IRQ_PROVIDER_CMSIS    1
+#define LV_IRQ_PROVIDER_ZEPHYR   2
+#define LV_IRQ_PROVIDER_STM32    3
+#define LV_IRQ_PROVIDER_CUSTOM   255
+
 /* SW assembly optimization */
 #define LV_DRAW_SW_ASM_NONE      0
 #define LV_DRAW_SW_ASM_NEON      1
@@ -314,6 +321,92 @@
         #define LV_OS_IDLE_PERCENT_CUSTOM CONFIG_LV_OS_IDLE_PERCENT_CUSTOM
     #else
         #define LV_OS_IDLE_PERCENT_CUSTOM 0
+    #endif
+#endif
+
+
+
+/*============================================================================
+ * IRQ ABSTRACTION LAYER (IRQ)
+ *============================================================================*/
+
+#ifndef LV_IRQ_PROVIDER
+    #ifdef CONFIG_LV_IRQ_PROVIDER
+        #define LV_IRQ_PROVIDER CONFIG_LV_IRQ_PROVIDER
+    #else
+        #define LV_IRQ_PROVIDER LV_IRQ_PROVIDER_NONE
+    #endif
+#endif
+
+#ifndef LV_IRQ_CUSTOM_INCLUDE
+    #ifdef CONFIG_LV_IRQ_CUSTOM_INCLUDE
+        #define LV_IRQ_CUSTOM_INCLUDE CONFIG_LV_IRQ_CUSTOM_INCLUDE
+    #else
+        #define LV_IRQ_CUSTOM_INCLUDE ""
+    #endif
+#endif
+
+#ifndef LV_IRQ_PROVIDES_DMA2D
+    #ifdef CONFIG_LV_IRQ_PROVIDES_DMA2D
+        #define LV_IRQ_PROVIDES_DMA2D CONFIG_LV_IRQ_PROVIDES_DMA2D
+    #else
+        #define LV_IRQ_PROVIDES_DMA2D 0
+    #endif
+#endif
+
+#ifndef LV_IRQ_PROVIDES_PXP
+    #ifdef CONFIG_LV_IRQ_PROVIDES_PXP
+        #define LV_IRQ_PROVIDES_PXP CONFIG_LV_IRQ_PROVIDES_PXP
+    #else
+        #define LV_IRQ_PROVIDES_PXP 0
+    #endif
+#endif
+
+#ifndef LV_IRQ_PROVIDES_NEMAGFX
+    #ifdef CONFIG_LV_IRQ_PROVIDES_NEMAGFX
+        #define LV_IRQ_PROVIDES_NEMAGFX CONFIG_LV_IRQ_PROVIDES_NEMAGFX
+    #else
+        #define LV_IRQ_PROVIDES_NEMAGFX 0
+    #endif
+#endif
+
+#ifndef LV_IRQ_CMSIS_USE_INCLUDE
+    #ifdef CONFIG_LV_IRQ_CMSIS_USE_INCLUDE
+        #define LV_IRQ_CMSIS_USE_INCLUDE CONFIG_LV_IRQ_CMSIS_USE_INCLUDE
+    #else
+        #define LV_IRQ_CMSIS_USE_INCLUDE 0
+    #endif
+#endif
+
+#ifndef LV_IRQ_CMSIS_INCLUDE
+    #ifdef CONFIG_LV_IRQ_CMSIS_INCLUDE
+        #define LV_IRQ_CMSIS_INCLUDE CONFIG_LV_IRQ_CMSIS_INCLUDE
+    #else
+        #define LV_IRQ_CMSIS_INCLUDE ""
+    #endif
+#endif
+
+#ifndef LV_IRQ_CMSIS_SET_NVIC_PRIORITY
+    #ifdef CONFIG_LV_IRQ_CMSIS_SET_NVIC_PRIORITY
+        #define LV_IRQ_CMSIS_SET_NVIC_PRIORITY CONFIG_LV_IRQ_CMSIS_SET_NVIC_PRIORITY
+    #else
+        #define LV_IRQ_CMSIS_SET_NVIC_PRIORITY 0
+    #endif
+#endif
+
+#ifndef LV_IRQ_CMSIS_NVIC_PRIORITY
+    #ifdef CONFIG_LV_IRQ_CMSIS_NVIC_PRIORITY
+        #define LV_IRQ_CMSIS_NVIC_PRIORITY CONFIG_LV_IRQ_CMSIS_NVIC_PRIORITY
+    #else
+        #define LV_IRQ_CMSIS_NVIC_PRIORITY 255
+    #endif
+#endif
+
+#ifndef LV_IRQ_STM32_HAL_INCLUDE
+    #ifdef CONFIG_LV_IRQ_STM32_HAL_INCLUDE
+        #define LV_IRQ_STM32_HAL_INCLUDE CONFIG_LV_IRQ_STM32_HAL_INCLUDE
+    #else
+        #define LV_IRQ_STM32_HAL_INCLUDE "set_LV_IRQ_STM32_HAL_INCLUDE_to_your_stm32xxxx_hal.h"
     #endif
 #endif
 
@@ -4823,6 +4916,14 @@
     #endif
 #endif
 
+#ifndef LV_IRQ_USE_CUSTOM_INCLUDE
+    #if (LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CUSTOM)
+        #define LV_IRQ_USE_CUSTOM_INCLUDE 1
+    #else
+        #define LV_IRQ_USE_CUSTOM_INCLUDE 0
+    #endif
+#endif
+
 #ifndef LV_DRAW_HAS_VECTOR_SUPPORT
     #if ((LV_USE_THORVG && LV_USE_DRAW_SW) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_VG && LV_USE_NEMA_GFX) || LV_USE_DRAW_NANOVG)
         #define LV_DRAW_HAS_VECTOR_SUPPORT 1
@@ -4908,6 +5009,10 @@
 
 #if LV_OS_USE_CUSTOM_INCLUDE
     #include LV_OS_CUSTOM_INCLUDE
+#endif
+
+#if LV_IRQ_USE_CUSTOM_INCLUDE
+    #include LV_IRQ_CUSTOM_INCLUDE
 #endif
 
 #if LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE
@@ -5019,6 +5124,26 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_OS_IDLE_PERCENT_CUSTOM requires LV_USE_OS == LV_OS_FREERTOS (Kconfig depends on)"
 #endif
 
+#if (LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR || LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32) && !LV_IRQ_PROVIDES_DMA2D
+    #error "LV_IRQ_PROVIDES_DMA2D must be enabled: Kconfig selects it from LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR || LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32"
+#endif
+
+#if (LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR) && !LV_IRQ_PROVIDES_PXP
+    #error "LV_IRQ_PROVIDES_PXP must be enabled: Kconfig selects it from LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS || LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR"
+#endif
+
+#if (LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32) && !LV_IRQ_PROVIDES_NEMAGFX
+    #error "LV_IRQ_PROVIDES_NEMAGFX must be enabled: Kconfig selects it from LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32"
+#endif
+
+#if LV_IRQ_CMSIS_USE_INCLUDE && !(LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS)
+    #error "LV_IRQ_CMSIS_USE_INCLUDE requires LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS (Kconfig depends on)"
+#endif
+
+#if LV_IRQ_CMSIS_SET_NVIC_PRIORITY && !(LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS)
+    #error "LV_IRQ_CMSIS_SET_NVIC_PRIORITY requires LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS (Kconfig depends on)"
+#endif
+
 #if (LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES) && !LV_USE_MATRIX
     #error "LV_USE_MATRIX must be enabled: Kconfig selects it from LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES"
 #endif
@@ -5123,8 +5248,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_PPA_IMG requires LV_USE_PPA (Kconfig depends on)"
 #endif
 
-#if LV_USE_DRAW_DMA2D_INTERRUPT && !(LV_USE_DRAW_DMA2D)
-    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
+#if LV_USE_DRAW_DMA2D_INTERRUPT && !(!(LV_USE_OS == LV_OS_NONE) && LV_IRQ_PROVIDES_DMA2D && LV_USE_DRAW_DMA2D)
+    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires !(LV_USE_OS == LV_OS_NONE) && LV_IRQ_PROVIDES_DMA2D && LV_USE_DRAW_DMA2D (Kconfig depends on)"
 #endif
 
 #if LV_USE_SIFLI_EPIC_ASSERT && !(LV_USE_SIFLI_EPIC)
