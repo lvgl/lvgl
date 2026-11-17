@@ -50,6 +50,7 @@ static bool new_screen_deleted(lv_load_screen_result_t res);
 
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
 static void update_resolution(lv_display_t * disp);
+static void builtin_theme_deinit(void);
 static void screen_event_delete_cb(lv_event_t * e);
 static lv_load_screen_result_t load_new_screen(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
@@ -107,11 +108,12 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     lv_display_t * original_refr_disp = lv_refr_get_disp_refreshing();
     lv_refr_set_disp_refreshing(disp);
     disp->layer_head = lv_draw_layer_create(NULL, disp->color_format, &disp_area);
+    lv_refr_set_disp_refreshing(original_refr_disp);
     if(!disp->layer_head) {
         lv_ll_remove(disp_ll_p, disp);
+        lv_free(disp);
         return NULL;
     }
-    lv_refr_set_disp_refreshing(original_refr_disp);
 
     disp->inv_en_cnt = 1;
     disp->last_activity_time = lv_tick_get();
@@ -125,14 +127,18 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->refr_timer = lv_timer_create(lv_display_refr_timer, LV_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MALLOC(disp->refr_timer);
     if(disp->refr_timer == NULL) {
-        lv_free(disp);
+        disp_def = disp_def_tmp;
+        lv_display_delete(disp);
         return NULL;
     }
 
+    /*Set when this display initialized the built-in theme, so a failure below can roll it back*/
+    bool theme_created = false;
 #if LV_USE_THEME_DEFAULT
     if(lv_theme_default_is_inited() == false) {
         disp->theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                             LV_THEME_DEFAULT_DARK, LV_FONT_DEFAULT);
+        theme_created = disp->theme != NULL;
     }
     else {
         disp->theme = lv_theme_default_get();
@@ -140,6 +146,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 #elif LV_USE_THEME_SIMPLE
     if(lv_theme_simple_is_inited() == false) {
         disp->theme = lv_theme_simple_init(disp);
+        theme_created = disp->theme != NULL;
     }
     else {
         disp->theme = lv_theme_simple_get();
@@ -147,6 +154,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 #elif LV_USE_THEME_MONO
     if(lv_theme_mono_is_inited() == false) {
         disp->theme = lv_theme_mono_init(disp, false, LV_FONT_DEFAULT);
+        theme_created = disp->theme != NULL;
     }
     else {
         disp->theme = lv_theme_mono_get();
@@ -157,6 +165,15 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->act_scr   = lv_obj_create(NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL); /*Create top layer on the display*/
     disp->sys_layer = lv_obj_create(NULL); /*Create sys layer on the display*/
+    if(!disp->bottom_layer || !disp->act_scr || !disp->top_layer || !disp->sys_layer) {
+        LV_LOG_WARN("couldn't create the display's screen and layers");
+        disp_def = disp_def_tmp;
+        lv_display_delete(disp);
+        /*After the screens are deleted: they use the theme's styles. Otherwise the theme would keep
+         *pointing to the deleted display and be reused by the next display*/
+        if(theme_created) builtin_theme_deinit();
+        return NULL;
+    }
     lv_obj_remove_style_all(disp->bottom_layer);
     lv_obj_remove_style_all(disp->top_layer);
     lv_obj_remove_style_all(disp->sys_layer);
@@ -1748,6 +1765,17 @@ static bool is_out_anim(lv_screen_load_anim_t anim_type)
            anim_type == LV_SCREEN_LOAD_ANIM_OUT_RIGHT ||
            anim_type == LV_SCREEN_LOAD_ANIM_OUT_TOP   ||
            anim_type == LV_SCREEN_LOAD_ANIM_OUT_BOTTOM;
+}
+
+static void builtin_theme_deinit(void)
+{
+#if LV_USE_THEME_DEFAULT
+    lv_theme_default_deinit();
+#elif LV_USE_THEME_SIMPLE
+    lv_theme_simple_deinit();
+#elif LV_USE_THEME_MONO
+    lv_theme_mono_deinit();
+#endif
 }
 
 static void disp_event_cb(lv_event_t * e)
