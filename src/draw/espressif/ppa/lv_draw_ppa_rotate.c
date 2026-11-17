@@ -53,6 +53,7 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
             swap_xy = true;
             break;
         case LV_ROTATION_0:
+        default:
             return LV_RESULT_INVALID;
     }
     const uint32_t out_w = (uint32_t)(swap_xy ? src_height : src_width);
