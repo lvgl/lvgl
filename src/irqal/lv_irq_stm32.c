@@ -43,7 +43,9 @@
  **********************/
 
 /* The HAL owns the vectors: the generated <PERIPH>_IRQHandler calls
- * HAL_<PERIPH>_IRQHandler on these handles, which calls back here. */
+ * HAL_<PERIPH>_IRQHandler on these handles, which calls back here. Attach
+ * clears cb, stores user_data, then sets cb, so the callback never pairs a
+ * callback with another one's user_data. */
 
 #if STM32_DMA2D
     extern DMA2D_HandleTypeDef hdma2d;
@@ -68,6 +70,7 @@
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    dma2d_cb = NULL;
     dma2d_user_data = user_data;
     dma2d_cb = cb;
     hdma2d.XferCpltCallback = dma2d_hal_trampoline;
@@ -88,6 +91,7 @@ lv_result_t lv_irq_detach_dma2d(void)
 lv_result_t lv_irq_attach_nemagfx(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    nemagfx_cb = NULL;
     nemagfx_event.user_data = user_data;
     nemagfx_cb = cb;
 #if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)

@@ -45,9 +45,10 @@ static void cmsis_enable_irq(IRQn_Type irqn);
  **********************/
 
 /* Written from thread context (attach/detach), read in the vector: volatile,
- * read once into locals there, and user_data stored before cb so the vector
- * never pairs a new cb with an old user_data. A pointer-sized store is atomic
- * on Cortex-M, and detach disables the line before clearing the pointer. */
+ * read once into locals there. Attach clears cb, stores user_data, then sets
+ * cb, so the vector never pairs a callback with another one's user_data. A
+ * pointer-sized store is atomic on Cortex-M, and detach disables the line
+ * before clearing the pointer. */
 #if CMSIS_DMA2D
     static volatile lv_irq_cb_t dma2d_cb;
     static void * volatile dma2d_user_data;
@@ -70,6 +71,7 @@ static void cmsis_enable_irq(IRQn_Type irqn);
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    dma2d_cb = NULL;
     dma2d_user_data = user_data;
     dma2d_cb = cb;
     cmsis_enable_irq(DMA2D_IRQn);
@@ -98,6 +100,7 @@ void DMA2D_IRQHandler(void)
 lv_result_t lv_irq_attach_pxp(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    pxp_cb = NULL;
     pxp_user_data = user_data;
     pxp_cb = cb;
     cmsis_enable_irq(PXP_IRQn);

@@ -187,8 +187,8 @@
 /** The value passed to NVIC_SetPriority. 255 maps to the lowest preemption
  *  priority whatever __NVIC_PRIO_BITS is: always safe for ...FromISR calls,
  *  at the cost of latency. Under FreeRTOS the best latency is
- *  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h
- *  may write it symbolically; Kconfig takes a literal number).
+ *  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY (a hand-written lv_conf.h may
+ *  write it symbolically; Kconfig takes a literal number).
  */
 #define LV_IRQ_CMSIS_NVIC_PRIORITY 255
 

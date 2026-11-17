@@ -93,3 +93,12 @@ def test_equality_dependency_renders_as_c(generated):
     i = generated["internal"]
     assert "#if LV_TEST_CMP_AT_TWO && !(LV_TEST_CMP_LEVEL == 2)" in i
     assert "LV_TEST_CMP_LEVEL = 2" not in i
+
+
+def test_bool_constant_comparison_renders_as_c(generated):
+    """`A = y` compares against Kconfig's y constant, which is 1 in C."""
+    i = generated["internal"]
+    assert (
+        "#if LV_TEST_CMP_FLAG_ON && !(LV_TEST_CMP_AT_TWO == 1 && LV_TEST_CMP_LEVEL != 3)"
+        in i
+    )

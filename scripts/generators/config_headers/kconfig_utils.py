@@ -17,11 +17,16 @@ from kconfiglib import (
     AND,
     BOOL,
     EQUAL,
+    GREATER,
+    GREATER_EQUAL,
     HEX,
     INT,
+    LESS,
+    LESS_EQUAL,
     NOT,
     OR,
     TRISTATE,
+    UNEQUAL,
     Choice,
     Symbol,
     expr_str,
@@ -404,11 +409,29 @@ def _render_bool_expr(expr, guard):
             return text
 
         return (f"{wrap(left)} {sep} {wrap(right)}", myprec)
-    # Kconfig writes equality as `=`; C needs `==`. The other comparisons (!=,
-    # <, ...) already read the same in both.
-    if op == EQUAL:
-        return (f"{expr_str(expr[1])} == {expr_str(expr[2])}", 3)
+    # Comparisons: Kconfig writes equality as `=` (C needs `==`) and the y/n
+    # constants as `y`/`n` (C needs 1/0).
+    if op in _C_RELATION:
+
+        def operand(sym):
+            if sym is sym.kconfig.y:
+                return "1"
+            if sym is sym.kconfig.n:
+                return "0"
+            return expr_str(sym)
+
+        return (f"{operand(expr[1])} {_C_RELATION[op]} {operand(expr[2])}", 3)
     return (expr_str(expr), 3)
+
+
+_C_RELATION = {
+    EQUAL: "==",
+    UNEQUAL: "!=",
+    LESS: "<",
+    LESS_EQUAL: "<=",
+    GREATER: ">",
+    GREATER_EQUAL: ">=",
+}
 
 
 def rev_dep_c_expr(expr, guard=None) -> str | None:

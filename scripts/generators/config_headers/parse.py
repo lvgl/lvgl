@@ -6,7 +6,7 @@ and returns the resulting entries in Kconfig order.
 
 Only the types implemented so far are recognised; ``classify`` returns ``None``
 for anything not yet handled, so the model can grow one type at a time without
-silently mis-emitting the rest.
+silently emitting the rest wrongly.
 """
 
 from __future__ import annotations

@@ -299,6 +299,10 @@ config LV_TEST_CMP_AT_TWO
 	bool "On only when the level is 2"
 	depends on LV_TEST_CMP_LEVEL = 2
 
+config LV_TEST_CMP_FLAG_ON
+	bool "On only when the flag is y"
+	depends on LV_TEST_CMP_AT_TWO = y && LV_TEST_CMP_LEVEL != 3
+
 # --- A dependency on an option defined further down -------------------------
 config LV_USE_EARLY
 	bool "Early option"
