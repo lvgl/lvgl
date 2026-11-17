@@ -150,6 +150,7 @@ lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
     if(!lv_theme_simple_is_inited()) {
         theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
         LV_ASSERT_MALLOC(theme_def);
+        if(theme_def == NULL) return NULL;
     }
 
     my_theme_t * theme = theme_def;
