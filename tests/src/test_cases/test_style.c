@@ -274,4 +274,37 @@ void test_style_remove_theme(void)
     TEST_ASSERT_EQUAL(0, lv_obj_get_style_bg_opa(sw, LV_PART_KNOB));
 }
 
+void test_add_style_out_of_memory(void)
+{
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    static lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_bg_opa(&style, LV_OPA_COVER);
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    uint32_t style_cnt = obj->style_cnt;
+    const lv_obj_style_t * styles = obj->styles;
+
+    /*Take all the memory, so that growing the style list fails*/
+    static void * blocks[4096];
+    uint32_t block_cnt = 0;
+    for(size_t size = LV_MEM_SIZE; size >= sizeof(void *); size /= 2) {
+        while(block_cnt < 4096 && (blocks[block_cnt] = lv_malloc(size)) != NULL) block_cnt++;
+    }
+
+    lv_obj_add_style(obj, &style, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_UINT32(style_cnt, obj->style_cnt);
+    TEST_ASSERT_EQUAL_PTR(styles, obj->styles);
+
+    for(uint32_t i = 0; i < block_cnt; i++) lv_free(blocks[i]);
+
+    /*With memory the style is added*/
+    lv_obj_add_style(obj, &style, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_UINT32(style_cnt + 1, obj->style_cnt);
+
+    lv_obj_delete(obj);
+    lv_style_reset(&style);
+#endif
+}
+
 #endif

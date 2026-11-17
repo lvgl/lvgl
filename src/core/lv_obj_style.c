@@ -145,8 +145,13 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     /*Allocate space for the new style and shift the rest of the style to the end*/
     obj->style_cnt++;
     LV_ASSERT(obj->style_cnt != 0);
-    obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-    LV_ASSERT_MALLOC(obj->styles);
+    lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+    if(new_styles == NULL) {
+        obj->style_cnt--;
+        LV_LOG_WARN("couldn't allocate styles");
+        return;
+    }
+    obj->styles = new_styles;
 
     uint32_t j;
     for(j = obj->style_cnt - 1; j > i ; j--) {
