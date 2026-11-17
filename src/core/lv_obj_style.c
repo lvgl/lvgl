@@ -129,8 +129,16 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 
     bool trans_removed = remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
 
-    /*Try removing the style first to be sure it won't be added twice*/
-    lv_obj_remove_style(obj, style, selector);
+    /*If the style is already added with exactly this selector it only needs to be moved.
+     *Moving needs no memory, so it can't fail and the style can't be lost.*/
+    lv_obj_style_t * added = NULL;
+    if(part != LV_PART_ANY && lv_obj_style_get_selector_state(selector) != LV_STATE_ANY) {
+        added = find_style(obj, style, selector);
+        if(added && (added->is_local || added->is_trans)) added = NULL;
+    }
+
+    /*Else try removing the style first to be sure it won't be added twice*/
+    if(added == NULL) lv_obj_remove_style(obj, style, selector);
 
     uint32_t i;
     /*Go after the transition and local styles*/
@@ -142,19 +150,30 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 
     /*Now `i` is at the first normal style. Insert the new style before this*/
 
-    /*Allocate space for the new style and shift the rest of the style to the end*/
-    obj->style_cnt++;
-    LV_ASSERT(obj->style_cnt != 0);
-    lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-    if(new_styles == NULL) {
-        obj->style_cnt--;
-        LV_LOG_WARN("couldn't allocate styles");
-        return;
-    }
-    obj->styles = new_styles;
-
     uint32_t j;
-    for(j = obj->style_cnt - 1; j > i ; j--) {
+    if(added) {
+        /*Shift the styles before the already added one to its place*/
+        j = (uint32_t)(added - obj->styles);
+    }
+    else {
+        /*Allocate space for the new style and shift the rest of the style to the end*/
+        obj->style_cnt++;
+        LV_ASSERT(obj->style_cnt != 0);
+        lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+        if(new_styles == NULL) {
+            obj->style_cnt--;
+            LV_LOG_WARN("couldn't allocate styles");
+            if(trans_removed) {
+                full_cache_refresh(obj, LV_PART_ANY);
+                lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
+            }
+            return;
+        }
+        obj->styles = new_styles;
+        j = obj->style_cnt - 1;
+    }
+
+    for(; j > i ; j--) {
         obj->styles[j] = obj->styles[j - 1];
     }
 
