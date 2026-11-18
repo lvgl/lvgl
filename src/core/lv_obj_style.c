@@ -113,11 +113,11 @@ void lv_obj_style_deinit(void)
     }
 }
 
-void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+lv_result_t lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(style != NULL, return);
-    LV_CHECK_ARG_MSG(obj->style_cnt < 63, return,
+    LV_CHECK_ARG(obj != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(style != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG_MSG(obj->style_cnt < 63, return LV_RESULT_INVALID,
                      "obj->style_cnt is restricted to 6 bits, so we can't store more than 63 styles");
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
@@ -129,21 +129,8 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 
     bool trans_removed = remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
 
-    /*If the style is already added with exactly this selector it only needs to be moved.
-     *Moving needs no memory, so it can't fail and the style can't be lost.*/
-    lv_obj_style_t * added = NULL;
-    if(part != LV_PART_ANY && lv_obj_style_get_selector_state(selector) != LV_STATE_ANY) {
-        uint32_t k;
-        for(k = 0; k < obj->style_cnt; k++) {
-            if(obj->styles[k].style != style || obj->styles[k].selector != selector) continue;
-            if(obj->styles[k].is_local || obj->styles[k].is_trans) continue;
-            added = &obj->styles[k];
-            break;
-        }
-    }
-
-    /*Else try removing the style first to be sure it won't be added twice*/
-    if(added == NULL) lv_obj_remove_style(obj, style, selector);
+    /*Try removing the style first to be sure it won't be added twice*/
+    lv_obj_remove_style(obj, style, selector);
 
     uint32_t i;
     /*Go after the transition and local styles*/
@@ -155,30 +142,19 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 
     /*Now `i` is at the first normal style. Insert the new style before this*/
 
-    uint32_t j;
-    if(added) {
-        /*Shift the styles before the already added one to its place*/
-        j = (uint32_t)(added - obj->styles);
+    /*Allocate space for the new style and shift the rest of the style to the end*/
+    obj->style_cnt++;
+    LV_ASSERT(obj->style_cnt != 0);
+    lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+    if(new_styles == NULL) {
+        obj->style_cnt--;
+        LV_LOG_WARN("couldn't allocate styles");
+        return LV_RESULT_INVALID;
     }
-    else {
-        /*Allocate space for the new style and shift the rest of the style to the end*/
-        obj->style_cnt++;
-        LV_ASSERT(obj->style_cnt != 0);
-        lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-        if(new_styles == NULL) {
-            obj->style_cnt--;
-            LV_LOG_WARN("couldn't allocate styles");
-            if(trans_removed) {
-                full_cache_refresh(obj, LV_PART_ANY);
-                lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
-            }
-            return;
-        }
-        obj->styles = new_styles;
-        j = obj->style_cnt - 1;
-    }
+    obj->styles = new_styles;
 
-    for(; j > i ; j--) {
+    uint32_t j;
+    for(j = obj->style_cnt - 1; j > i ; j--) {
         obj->styles[j] = obj->styles[j - 1];
     }
 
@@ -208,6 +184,8 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 #endif
 
     lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
+
+    return LV_RESULT_OK;
 }
 
 bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style,

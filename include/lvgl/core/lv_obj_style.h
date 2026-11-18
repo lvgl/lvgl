@@ -103,8 +103,10 @@ typedef uint32_t lv_style_selector_t;
  *
  * lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED); //Overwrite only some colors to red when pressed
  * @endcode
+ * @return          LV_RESULT_OK: the style was added; LV_RESULT_INVALID: it was not added
+ *                  (a parameter was invalid, the object has 63 styles already or there was no memory)
  */
-void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
+lv_result_t lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
 /**
  * Replaces a style of an object, preserving the order of the style stack (local styles and transitions are ignored).

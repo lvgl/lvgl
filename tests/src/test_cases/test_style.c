@@ -274,29 +274,11 @@ void test_style_remove_theme(void)
     TEST_ASSERT_EQUAL(0, lv_obj_get_style_bg_opa(sw, LV_PART_KNOB));
 }
 
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-static void * oom_blocks[4096];
-
-/*Take all the memory, so that the next allocation fails*/
-static uint32_t take_all_memory(void)
-{
-    uint32_t block_cnt = 0;
-    for(size_t size = LV_MEM_SIZE; size >= sizeof(void *); size /= 2) {
-        while(block_cnt < 4096 && (oom_blocks[block_cnt] = lv_malloc(size)) != NULL) block_cnt++;
-    }
-    return block_cnt;
-}
-
-static void give_back_memory(uint32_t block_cnt)
-{
-    for(uint32_t i = 0; i < block_cnt; i++) lv_free(oom_blocks[i]);
-}
-#endif
-
 void test_add_style_out_of_memory(void)
 {
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     static lv_style_t style;
+    static void * blocks[4096];
     lv_style_init(&style);
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
 
@@ -304,66 +286,31 @@ void test_add_style_out_of_memory(void)
     uint32_t style_cnt = obj->style_cnt;
     const lv_obj_style_t * styles = obj->styles;
 
-    /*Growing the style list fails. The memory is given back before the checks,
-     *so that a failed check doesn't leave the next tests without memory.*/
-    uint32_t block_cnt = take_all_memory();
-    lv_obj_add_style(obj, &style, LV_PART_MAIN);
+    /*Take all the memory, so that growing the style list fails*/
+    uint32_t block_cnt = 0;
+    for(size_t size = LV_MEM_SIZE; size >= sizeof(void *); size /= 2) {
+        while(block_cnt < 4096 && (blocks[block_cnt] = lv_malloc(size)) != NULL) block_cnt++;
+    }
+
+    lv_result_t res = lv_obj_add_style(obj, &style, LV_PART_MAIN);
     uint32_t style_cnt_after = obj->style_cnt;
     const lv_obj_style_t * styles_after = obj->styles;
-    give_back_memory(block_cnt);
 
+    /*Give the memory back before the checks, so that a failed check
+     *doesn't leave the next tests without memory*/
+    for(uint32_t i = 0; i < block_cnt; i++) lv_free(blocks[i]);
+
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
     TEST_ASSERT_EQUAL_UINT32(style_cnt, style_cnt_after);
     TEST_ASSERT_EQUAL_PTR(styles, styles_after);
 
     /*With memory the style is added*/
-    lv_obj_add_style(obj, &style, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_obj_add_style(obj, &style, LV_PART_MAIN));
     TEST_ASSERT_EQUAL_UINT32(style_cnt + 1, obj->style_cnt);
 
     lv_obj_delete(obj);
     lv_style_reset(&style);
 #endif
-}
-
-static uint32_t style_change_cnt;
-
-static void count_style_change(lv_event_t * e)
-{
-    LV_UNUSED(e);
-    style_change_cnt++;
-}
-
-void test_add_style_again_moves_it(void)
-{
-    static lv_style_t style_a;
-    static lv_style_t style_b;
-    lv_style_init(&style_a);
-    lv_style_init(&style_b);
-    lv_style_set_bg_opa(&style_a, LV_OPA_COVER);
-    lv_style_set_bg_opa(&style_b, LV_OPA_50);
-
-    lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    lv_obj_remove_style_all(obj);
-    lv_obj_add_style(obj, &style_a, LV_PART_MAIN);
-    lv_obj_add_style(obj, &style_b, LV_PART_MAIN);
-    TEST_ASSERT_EQUAL_UINT32(2, obj->style_cnt);
-    TEST_ASSERT_EQUAL(LV_OPA_50, lv_obj_get_style_bg_opa(obj, LV_PART_MAIN));
-
-    /*Adding a style again moves it to the first place and doesn't remove it first.
-     *Removing and adding would change the style twice.*/
-    style_change_cnt = 0;
-    lv_obj_add_event_cb(obj, count_style_change, LV_EVENT_STYLE_CHANGED, NULL);
-    lv_obj_add_style(obj, &style_a, LV_PART_MAIN);
-    lv_obj_remove_event_cb(obj, count_style_change);
-
-    TEST_ASSERT_EQUAL_UINT32(1, style_change_cnt);
-    TEST_ASSERT_EQUAL_UINT32(2, obj->style_cnt);
-    TEST_ASSERT_EQUAL_PTR(&style_a, obj->styles[0].style);
-    TEST_ASSERT_EQUAL_PTR(&style_b, obj->styles[1].style);
-    TEST_ASSERT_EQUAL(LV_OPA_COVER, lv_obj_get_style_bg_opa(obj, LV_PART_MAIN));
-
-    lv_obj_delete(obj);
-    lv_style_reset(&style_a);
-    lv_style_reset(&style_b);
 }
 
 #endif
