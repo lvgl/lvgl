@@ -507,6 +507,16 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area);
 bool lv_obj_is_visible(const lv_obj_t * obj);
 
 /**
+ * Tell whether an object has been rendered at least once.
+ * A widget that is created, but not drawn by a refresh yet, is not rendered.
+ * It can be used to decide if a change should be animated: before the first
+ * rendering there is nothing on the screen to animate from.
+ * @param obj       pointer to an object
+ * @return      true: `obj` was drawn by at least one refresh; false: it was not drawn yet
+ */
+bool lv_obj_is_rendered(const lv_obj_t * obj);
+
+/**
  * Set the size of an extended clickable area
  * @param obj       pointer to an object
  * @param size      extended clickable area in all 4 directions [px]
