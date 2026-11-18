@@ -23,10 +23,46 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static bool buf_size_is_valid(const lv_draw_buf_t * buf);
+static void convert_rgb565_to_rgb888(lv_draw_buf_t * dest, const lv_draw_buf_t * src);
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static bool buf_size_is_valid(const lv_draw_buf_t * buf)
+{
+    const lv_image_header_t * header = &buf->header;
+    const uint32_t row_size = ((uint32_t)header->w * lv_color_format_get_bpp(header->cf) + 7) >> 3;
+    const uint64_t palette_size = (uint64_t)LV_COLOR_INDEXED_PALETTE_SIZE(header->cf) * sizeof(lv_color32_t);
+
+    return header->stride >= row_size &&
+           palette_size + (uint64_t)header->stride * header->h <= buf->data_size;
+}
+
+static void convert_rgb565_to_rgb888(lv_draw_buf_t * dest, const lv_draw_buf_t * src)
+{
+    const uint32_t w = src->header.w;
+    const uint32_t h = src->header.h;
+
+    for(uint32_t y = 0; y < h; y++) {
+        const uint8_t * src_px = (const uint8_t *)src->data + (size_t)y * src->header.stride;
+        uint8_t * dest_px = (uint8_t *)dest->data + (size_t)y * dest->header.stride;
+
+        for(uint32_t x = 0; x < w; x++) {
+            /*Read through a copy, the row is not guaranteed to be aligned for 16 bit reads*/
+            lv_color16_t c;
+            lv_memcpy(&c, src_px, sizeof(c));
+            src_px += sizeof(c);
+
+            /*Replicate the top bits into the low bits so that the full range maps to 0..255*/
+            dest_px[0] = (uint8_t)((c.blue << 3) | (c.blue >> 2));
+            dest_px[1] = (uint8_t)((c.green << 2) | (c.green >> 4));
+            dest_px[2] = (uint8_t)((c.red << 3) | (c.red >> 2));
+            dest_px += 3;
+        }
+    }
+}
 
 /**********************
  *      MACROS
@@ -128,4 +164,34 @@ lv_result_t lv_draw_buf_convert_premultiply(lv_draw_buf_t * draw_buf)
 
     LV_PROFILER_DRAW_END;
     return LV_RESULT_OK;
+}
+
+lv_result_t lv_draw_buf_convert_format(lv_draw_buf_t * dest, const lv_draw_buf_t * src)
+{
+    LV_CHECK_ARG(dest != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(src != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(dest->data != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(src->data != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(dest->header.w == src->header.w && dest->header.h == src->header.h, return LV_RESULT_INVALID);
+
+    if(!buf_size_is_valid(dest) || !buf_size_is_valid(src)) {
+        LV_LOG_WARN("the draw buffer is too small for its width, height and stride");
+        return LV_RESULT_INVALID;
+    }
+
+    LV_PROFILER_DRAW_BEGIN;
+
+    lv_result_t res = LV_RESULT_INVALID;
+    if(src->header.cf == LV_COLOR_FORMAT_RGB565 && dest->header.cf == LV_COLOR_FORMAT_RGB888) {
+        convert_rgb565_to_rgb888(dest, src);
+        res = LV_RESULT_OK;
+    }
+    else {
+        LV_LOG_WARN("converting color format %d to %d is not supported", src->header.cf, dest->header.cf);
+    }
+
+    if(res == LV_RESULT_OK) lv_draw_buf_flush_cache(dest, NULL);
+
+    LV_PROFILER_DRAW_END;
+    return res;
 }

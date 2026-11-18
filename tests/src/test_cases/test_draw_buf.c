@@ -333,4 +333,80 @@ void test_draw_buf_premultiply(void)
         lv_draw_buf_destroy(draw_buf);
     }
 }
+
+void test_draw_buf_convert_format_rgb565_to_rgb888(void)
+{
+    const lv_color16_t colors[] = {
+        {.blue = 0, .green = 0, .red = 0},
+        {.blue = 31, .green = 63, .red = 31},
+        {.blue = 0, .green = 0, .red = 31},
+        {.blue = 0, .green = 63, .red = 0},
+        {.blue = 31, .green = 0, .red = 0},
+    };
+    const uint32_t w = sizeof(colors) / sizeof(colors[0]);
+    /*B, G, R of each color above*/
+    const uint8_t expected[][3] = {
+        {0x00, 0x00, 0x00},
+        {0xFF, 0xFF, 0xFF},
+        {0x00, 0x00, 0xFF},
+        {0x00, 0xFF, 0x00},
+        {0xFF, 0x00, 0x00},
+    };
+
+    lv_draw_buf_t * src = lv_draw_buf_create(w, 2, LV_COLOR_FORMAT_RGB565, LV_STRIDE_AUTO);
+    lv_draw_buf_t * dest = lv_draw_buf_create(w, 2, LV_COLOR_FORMAT_RGB888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(src);
+    TEST_ASSERT_NOT_NULL(dest);
+
+    for(uint32_t y = 0; y < 2; y++) {
+        lv_memcpy(lv_draw_buf_goto_xy(src, 0, y), colors, sizeof(colors));
+    }
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_draw_buf_convert_format(dest, src));
+
+    for(uint32_t y = 0; y < 2; y++) {
+        for(uint32_t x = 0; x < w; x++) {
+            TEST_ASSERT_EQUAL_UINT8_ARRAY(expected[x], lv_draw_buf_goto_xy(dest, x, y), 3);
+        }
+    }
+
+    lv_draw_buf_destroy(src);
+    lv_draw_buf_destroy(dest);
+}
+
+void test_draw_buf_convert_format_buffer_too_small(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(4, 4, LV_COLOR_FORMAT_RGB565, LV_STRIDE_AUTO);
+    lv_draw_buf_t * dest = lv_draw_buf_create(4, 4, LV_COLOR_FORMAT_RGB888, LV_STRIDE_AUTO);
+
+    /*4 RGB888 pixels need 12 bytes per row*/
+    const uint32_t dest_stride = dest->header.stride;
+    dest->header.stride = 8;
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_draw_buf_convert_format(dest, src));
+    dest->header.stride = dest_stride;
+
+    /*More rows than the data holds*/
+    src->header.h = src->data_size / src->header.stride + 1;
+    dest->header.h = src->header.h;
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_draw_buf_convert_format(dest, src));
+
+    src->header.h = 4;
+    dest->header.h = 4;
+    lv_draw_buf_destroy(src);
+    lv_draw_buf_destroy(dest);
+}
+
+void test_draw_buf_convert_format_unsupported(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(4, 4, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    lv_draw_buf_t * dest = lv_draw_buf_create(4, 4, LV_COLOR_FORMAT_RGB888, LV_STRIDE_AUTO);
+
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_draw_buf_convert_format(dest, src));
+    /*Same format*/
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_draw_buf_convert_format(src, src));
+
+    lv_draw_buf_destroy(src);
+    lv_draw_buf_destroy(dest);
+}
+
 #endif
