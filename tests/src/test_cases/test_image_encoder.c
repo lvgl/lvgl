@@ -629,6 +629,79 @@ void test_image_encoder_jpeg_open_fail(void)
     lv_draw_buf_destroy(buf);
 }
 
+/* The JPEG encoder stamps args.rotation as an EXIF orientation tag, which the JPEG decoder honors:
+ * 90 and 270 swap the width and height. A non-square buffer makes the swap observable.
+ * angle -> EXIF orientation: 0 none, 90 => 6, 180 => 3, 270 => 8 */
+
+/* Encode a w x h ARGB8888 buffer with the given rotation, decode it back and return the decoded size */
+static lv_result_t encode_decode_rotation(uint32_t w, uint32_t h, int32_t rotation, const char * path,
+                                          uint32_t * out_w, uint32_t * out_h)
+{
+    lv_draw_buf_t * buf = create_test_buf(w, h, LV_COLOR_FORMAT_ARGB8888);
+    fill_solid_argb8888(buf, 0x40, 0x80, 0xC0, 0xFF);
+
+    lv_image_encoder_args_t args;
+    lv_image_encoder_args_init(&args);
+    args.rotation = rotation;
+    args.quality = 100;
+
+    lv_result_t res = lv_image_encoder_save(buf, path, &args);
+    lv_draw_buf_destroy(buf);
+    if(res != LV_RESULT_OK) return res;
+
+    lv_image_decoder_dsc_t dsc;
+    lv_image_decoder_args_t dec_args;
+    lv_memzero(&dec_args, sizeof(dec_args));
+    dec_args.no_cache = true;
+    res = lv_image_decoder_open(&dsc, path, &dec_args);
+    if(res != LV_RESULT_OK) return res;
+    *out_w = dsc.decoded->header.w;
+    *out_h = dsc.decoded->header.h;
+    lv_image_decoder_close(&dsc);
+    return LV_RESULT_OK;
+}
+
+void test_image_encoder_jpeg_exif_orientation_0_no_swap(void)
+{
+    uint32_t dw = 0, dh = 0;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, encode_decode_rotation(24, 12, 0, TEST_ENCODER_PATH("exif0.jpg"), &dw, &dh));
+    TEST_ASSERT_EQUAL_UINT32(24, dw);
+    TEST_ASSERT_EQUAL_UINT32(12, dh);
+}
+
+void test_image_encoder_jpeg_exif_orientation_180_no_swap(void)
+{
+    uint32_t dw = 0, dh = 0;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, encode_decode_rotation(24, 12, 180, TEST_ENCODER_PATH("exif180.jpg"), &dw, &dh));
+    TEST_ASSERT_EQUAL_UINT32(24, dw);
+    TEST_ASSERT_EQUAL_UINT32(12, dh);
+}
+
+void test_image_encoder_jpeg_exif_orientation_90_swaps_wh(void)
+{
+    uint32_t dw = 0, dh = 0;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, encode_decode_rotation(24, 12, 90, TEST_ENCODER_PATH("exif90.jpg"), &dw, &dh));
+    TEST_ASSERT_EQUAL_UINT32(12, dw);
+    TEST_ASSERT_EQUAL_UINT32(24, dh);
+}
+
+void test_image_encoder_jpeg_exif_orientation_270_swaps_wh(void)
+{
+    uint32_t dw = 0, dh = 0;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, encode_decode_rotation(24, 12, 270, TEST_ENCODER_PATH("exif270.jpg"), &dw, &dh));
+    TEST_ASSERT_EQUAL_UINT32(12, dw);
+    TEST_ASSERT_EQUAL_UINT32(24, dh);
+}
+
+void test_image_encoder_jpeg_exif_unsupported_angle_no_marker(void)
+{
+    uint32_t dw = 0, dh = 0;
+    /*An angle that EXIF can't express writes no marker, so no swap*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, encode_decode_rotation(24, 12, 45, TEST_ENCODER_PATH("exif45.jpg"), &dw, &dh));
+    TEST_ASSERT_EQUAL_UINT32(24, dw);
+    TEST_ASSERT_EQUAL_UINT32(12, dh);
+}
+
 #endif /*LV_USE_LIBJPEG_TURBO_ENCODER*/
 
 #endif

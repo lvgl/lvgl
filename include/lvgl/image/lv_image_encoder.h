@@ -32,6 +32,10 @@ extern "C" {
 typedef struct {
     int32_t quality;            /**< JPEG quality 1-100, default 85. Ignored by PNG. */
     int32_t compression_level;  /**< PNG compression 0-9, default 6. Ignored by JPEG. */
+    int32_t rotation;           /**< Clockwise rotation of the content in degrees (0/90/180/270), default 0.
+                                     Records the orientation so a viewer can rotate the image upright.
+                                     Only the JPEG encoder honors this (as an EXIF orientation tag),
+                                     the other encoders ignore it. */
 } lv_image_encoder_args_t;
 
 /**

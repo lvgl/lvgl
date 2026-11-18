@@ -131,6 +131,41 @@ static lv_result_t jpeg_encoder_save(lv_image_encoder_t * encoder, const lv_draw
     LV_PROFILER_DECODER_BEGIN_TAG("jpeg_compress");
     jpeg_start_compress(&cinfo, TRUE);
 
+    /*Optional EXIF orientation: a minimal APP1 segment with only the Orientation tag (0x0112).
+     *args->rotation is the clockwise rotation of the content, the EXIF code is picked here
+     *so the encoder args stay independent of the format.*/
+    uint16_t exif_orientation = 0; /*0: no marker*/
+    if(args) {
+        switch(args->rotation) {
+            case 0:
+                break;
+            case 90:
+                exif_orientation = 6;
+                break;
+            case 180:
+                exif_orientation = 3;
+                break;
+            case 270:
+                exif_orientation = 8;
+                break;
+            default:
+                LV_LOG_WARN("unsupported rotation %d, writing no orientation marker", (int)args->rotation);
+                break;
+        }
+    }
+
+    if(exif_orientation > 0) {
+        const uint8_t exif[] = {
+            'E', 'x', 'i', 'f', 0x00, 0x00,                     /*EXIF header*/
+            0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00,     /*TIFF, little-endian, IFD0 at offset 8*/
+            0x01, 0x00,                                         /*IFD0: 1 entry*/
+            0x12, 0x01, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00,     /*tag 0x0112, SHORT, count 1*/
+            (uint8_t)(exif_orientation & 0xFF), (uint8_t)(exif_orientation >> 8), 0x00, 0x00, /*value + padding*/
+            0x00, 0x00, 0x00, 0x00,                             /*no next IFD*/
+        };
+        jpeg_write_marker(&cinfo, JPEG_APP0 + 1, exif, sizeof(exif));
+    }
+
     while(cinfo.next_scanline < cinfo.image_height) {
         uint8_t * row = draw_buf->data + (size_t)cinfo.next_scanline * draw_buf->header.stride;
         jpeg_write_scanlines(&cinfo, &row, 1);
