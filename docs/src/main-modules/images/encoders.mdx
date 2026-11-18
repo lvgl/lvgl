@@ -1,0 +1,51 @@
+---
+title: Image Encoders
+description: "Saving a draw buffer to an image file."
+---
+## What is an Image Encoder?
+An Image Encoder is the counterpart of an [Image Decoder](/main-modules/images/decoders): it
+converts a draw buffer into an image file. The format is chosen from the extension of the
+output path, for example by <ApiLink name="lv_image_encoder_save" />.
+## Built-In Image Encoders
+| Format | Extension | `lv_conf.h` Symbol to Set | External Library Required? | Supported Color Formats |
+| --- | --- | --- | --- | --- |
+| LVGL binary | `.bin` | Always on | No | All, saved as `lv_image_header_t` + raw data |
+| PNG | `.png` | `LV_USE_LIBPNG_ENCODER` (needs `LV_USE_LIBPNG`) | Yes, libpng | ARGB8888, XRGB8888, RGB888, RGB565 |
+| JPG | `.jpg`, `.jpeg` | `LV_USE_LIBJPEG_TURBO_ENCODER` (needs `LV_USE_LIBJPEG_TURBO`) | Yes, libjpeg-turbo | ARGB8888, XRGB8888, RGB888, RGB565 |
+The encoders are asked one after the other, the last registered first, until one accepts the path
+and the color format. If none does, saving fails with `LV_RESULT_INVALID`.
+The X byte of XRGB8888 is dropped, so the saved PNG and JPG are opaque.
+## Usage
+```c
+lv_draw_buf_t * buf = lv_draw_buf_create(100, 100, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+/*...draw to the buffer...*/
+lv_image_encoder_args_t args;
+lv_image_encoder_args_init(&args);
+args.quality = 90;          /*JPEG quality, ignored by the other encoders*/
+args.compression_level = 9; /*PNG compression, ignored by the other encoders*/
+lv_result_t res = lv_image_encoder_save(buf, "S:snapshot.jpg", &args);
+lv_draw_buf_destroy(buf);
+```
+Pass `NULL` as the args to use the defaults (quality 85, compression level 6).
+<ApiLink name="lv_draw_buf_save_to_file" /> does the same with the default args.
+An existing file is overwritten. The image cache entry of the path is dropped on success, so
+an image widget showing the file picks up the new content.
+## Adding a Custom Encoder
+```c
+static lv_result_t my_save_cb(lv_image_encoder_t * encoder, const lv_draw_buf_t * draw_buf,
+                              const char * path, const lv_image_encoder_args_t * args)
+{
+    if(lv_strcmp(lv_fs_get_ext(path), "xyz") != 0) return LV_RESULT_INVALID; /*Not my format, try the next one*/
+    /*...write the file...*/
+    return LV_RESULT_OK;
+}
+static my_ctx_t my_ctx; /*Any data the encoder needs*/
+
+void my_encoder_init(void)
+{
+    lv_image_encoder_t * enc = lv_image_encoder_create();
+    lv_image_encoder_set_save_cb(enc, my_save_cb);
+    lv_image_encoder_set_name(enc, "XYZ");
+    lv_image_encoder_set_user_data(enc, &my_ctx); /*Read it back with lv_image_encoder_get_user_data(encoder) in the callback*/
+}
+```

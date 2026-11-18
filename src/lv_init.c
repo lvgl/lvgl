@@ -13,6 +13,7 @@
 #include "debugging/profiler/lv_profiler_builtin_private.h"
 #include "misc/lv_anim_private.h"
 #include "image/lv_image_decoder_private.h"
+#include "image/lv_image_encoder_private.h"
 #include "draw/lv_draw_buf_private.h"
 #include "core/lv_refr_private.h"
 #include "core/lv_obj_style_private.h"
@@ -288,6 +289,8 @@ void lv_init(void)
 
     lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
+    lv_image_encoder_init();
+    lv_bin_encoder_init();  /*Registered first, but later encoders will take priority*/
 
 #if LV_USE_DRAW_VG_LITE
     lv_draw_vg_lite_init();
@@ -378,6 +381,9 @@ void lv_init(void)
 #if LV_USE_LIBPNG
     lv_libpng_init();
 #endif
+#if LV_USE_LIBPNG_ENCODER
+    lv_libpng_encoder_init();
+#endif
 
 #if LV_USE_TJPGD
     lv_tjpgd_init();
@@ -385,6 +391,9 @@ void lv_init(void)
 
 #if LV_USE_LIBJPEG_TURBO
     lv_libjpeg_turbo_init();
+#endif
+#if LV_USE_LIBJPEG_TURBO_ENCODER
+    lv_libjpeg_turbo_encoder_init();
 #endif
 
 #if LV_USE_LIBWEBP
@@ -453,6 +462,7 @@ void lv_deinit(void)
 #endif
 
     lv_image_decoder_deinit();
+    lv_image_encoder_deinit();
 
     lv_refr_deinit();
 

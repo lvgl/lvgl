@@ -35,6 +35,13 @@ void lv_libpng_init(void);
 
 void lv_libpng_deinit(void);
 
+#if LV_USE_LIBPNG_ENCODER
+/**
+ * Register the PNG encoder in LVGL
+ */
+void lv_libpng_encoder_init(void);
+#endif
+
 /**********************
  *      MACROS
  **********************/

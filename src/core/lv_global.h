@@ -114,6 +114,7 @@ typedef struct _lv_global_t {
                                                             * can be managed by image cache. */
 
     lv_ll_t img_decoder_ll;
+    lv_ll_t img_encoder_ll;
 #if LV_USE_OS != LV_OS_NONE
     lv_mutex_t img_decoder_info_lock;
     lv_mutex_t img_decoder_open_lock;

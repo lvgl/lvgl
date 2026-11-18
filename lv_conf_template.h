@@ -941,6 +941,12 @@
 /** PNG decoder (libpng) */
 #define LV_USE_LIBPNG 0
 
+#if LV_USE_LIBPNG
+/** Lets lv_image_encoder_save() write .png files. */
+#define LV_USE_LIBPNG_ENCODER 0
+
+#endif /*LV_USE_LIBPNG*/
+
 /** BMP decoder */
 #define LV_USE_BMP 0
 
@@ -949,6 +955,12 @@
 
 /** High-performance decoder supporting the complete JPEG specifications. */
 #define LV_USE_LIBJPEG_TURBO 0
+
+#if LV_USE_LIBJPEG_TURBO
+/** Lets lv_image_encoder_save() write .jpg and .jpeg files. */
+#define LV_USE_LIBJPEG_TURBO_ENCODER 0
+
+#endif /*LV_USE_LIBJPEG_TURBO*/
 
 /** WebP decoder */
 #define LV_USE_LIBWEBP 0

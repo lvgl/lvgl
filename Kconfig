@@ -1588,6 +1588,12 @@ config LV_USE_LODEPNG
 config LV_USE_LIBPNG
 	bool "PNG decoder (libpng)"
 
+config LV_USE_LIBPNG_ENCODER
+	bool "PNG encoder (libpng)"
+	depends on LV_USE_LIBPNG
+	help
+		Lets lv_image_encoder_save() write .png files.
+
 config LV_USE_BMP
 	bool "BMP decoder"
 
@@ -1600,6 +1606,12 @@ config LV_USE_LIBJPEG_TURBO
 	bool "JPEG decoder (libjpeg-turbo)"
 	help
 		High-performance decoder supporting the complete JPEG specifications.
+
+config LV_USE_LIBJPEG_TURBO_ENCODER
+	bool "JPEG encoder (libjpeg-turbo)"
+	depends on LV_USE_LIBJPEG_TURBO
+	help
+		Lets lv_image_encoder_save() write .jpg and .jpeg files.
 
 config LV_USE_LIBWEBP
 	bool "WebP decoder"
