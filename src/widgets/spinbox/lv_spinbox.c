@@ -191,6 +191,7 @@ void lv_spinbox_set_dec_point_pos(lv_obj_t * obj, uint32_t dec_point_pos)
 void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(step > 0 && step <= INT32_MAX, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     spinbox->step = step;
@@ -238,6 +239,7 @@ void lv_spinbox_set_max_value(lv_obj_t * obj, int32_t max_value)
 void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint32_t pos)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(pos < LV_SPINBOX_MAX_DIGIT_COUNT, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
@@ -298,8 +300,8 @@ void lv_spinbox_step_prev(lv_obj_t * obj)
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
-    const int32_t new_step = spinbox->step * 10;
-    if(new_step <= step_limit) spinbox->step = new_step;
+    /* Check the limit before multiplying to avoid overflowing the step. */
+    if(spinbox->step > 0 && spinbox->step <= step_limit / 10) spinbox->step *= 10;
 
     lv_spinbox_updatevalue(obj);
 }

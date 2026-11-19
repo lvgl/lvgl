@@ -142,6 +142,45 @@ void test_spinbox_step_prev(void)
     lv_obj_clean(tmp);
 }
 
+void test_spinbox_step_prev_preserves_largest_positive_step(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_digit_format(spinbox, 10, 0);
+    lv_spinbox_set_range(spinbox, 0, INT32_MAX);
+    lv_spinbox_set_step(spinbox, 1000000000);
+
+    lv_spinbox_step_prev(spinbox);
+
+    TEST_ASSERT_EQUAL_INT32(1000000000, lv_spinbox_get_step(spinbox));
+    lv_obj_delete(spinbox);
+}
+
+void test_spinbox_step_prev_preserves_largest_negative_step(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_digit_format(spinbox, 10, 0);
+    lv_spinbox_set_range(spinbox, -INT32_MAX, 0);
+    lv_spinbox_set_step(spinbox, 1000000000);
+
+    lv_spinbox_step_prev(spinbox);
+
+    TEST_ASSERT_EQUAL_INT32(1000000000, lv_spinbox_get_step(spinbox));
+    lv_obj_delete(spinbox);
+}
+
+void test_spinbox_step_prev_allows_largest_step(void)
+{
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+    lv_spinbox_set_digit_format(spinbox, 10, 0);
+    lv_spinbox_set_range(spinbox, 0, INT32_MAX);
+    lv_spinbox_set_step(spinbox, 100000000);
+
+    lv_spinbox_step_prev(spinbox);
+
+    TEST_ASSERT_EQUAL_INT32(1000000000, lv_spinbox_get_step(spinbox));
+    lv_obj_delete(spinbox);
+}
+
 void test_spinbox_rollover(void)
 {
     lv_obj_t * tmp = lv_spinbox_create(active_screen);
