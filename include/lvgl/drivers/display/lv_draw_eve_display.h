@@ -32,21 +32,30 @@ extern "C" {
  **********************/
 
 /**
- * Create a display for the EVE draw unit.
+ * Create a display for the EVE draw unit. The display is unusable until
+ * `lv_draw_eve_display_init()` runs, so it almost always follows on the next line. Only what the
+ * operation callback needs goes in between, such as `lv_display_set_user_data()`.
  * @param params      Pointer to a struct of display parameters. Can be a temporary variable
- * @param op_cb       A callback that will be called to perform pin and SPI IO operations with the EVE chip
- * @param user_data   use `lv_draw_eve_display_get_user_data` to get this pointer inside the `op_cb` @nullable
  * @return            the EVE display
  */
-lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * params, lv_draw_eve_operation_cb_t op_cb,
-                                          void * user_data);
+lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * params);
 
 /**
- * Get the `user_data` parameter that was passed to `lv_draw_eve_display_create`. Useful in the operation callback.
- * @param disp      pointer to the lv_draw_eve display
- * @return          the `user_data` pointer
+ * Set the function that performs the pin and SPI IO operations. Required before init.
+ * @param disp        the EVE display
+ * @param op_cb       A callback that will be called to perform pin and SPI IO operations with the EVE
+ *                    chip. Use `lv_display_get_user_data()` to reach your own context inside it.
  */
-void * lv_draw_eve_display_get_user_data(lv_display_t * disp);
+void lv_draw_eve_display_set_operation_cb(lv_display_t * disp, lv_draw_eve_operation_cb_t op_cb);
+
+/**
+ * Initialize the EVE chip of a display created with `lv_draw_eve_display_create()`.
+ * Fails if the operation callback has not been set.
+ * The display is not flushed before this function returns.
+ * @param disp        the EVE display
+ * @return            LV_RESULT_OK on success
+ */
+lv_result_t lv_draw_eve_display_init(lv_display_t * disp);
 
 /**
  * Create a touchscreen indev for the EVE display.
