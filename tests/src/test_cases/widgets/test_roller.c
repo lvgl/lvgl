@@ -170,6 +170,63 @@ void test_roller_set_selected_option_str(void)
     TEST_ASSERT_EQUAL(1, lv_roller_get_selected(roller));
 }
 
+void test_roller_string_match_last_option(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_roller_set_options(obj, "One\nTwo\nThree", LV_ROLLER_MODE_NORMAL);
+    TEST_ASSERT_TRUE(lv_roller_set_selected_str(obj, "Three", LV_ANIM_OFF));
+    TEST_ASSERT_EQUAL_UINT32(2, lv_roller_get_selected(obj));
+    lv_obj_delete(obj);
+}
+
+void test_roller_string_match_exact_length(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_roller_set_options(obj, "A\nAB\nABC", LV_ROLLER_MODE_NORMAL);
+    TEST_ASSERT_TRUE(lv_roller_set_selected_str(obj, "AB", LV_ANIM_OFF));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_roller_get_selected(obj));
+    TEST_ASSERT_FALSE(lv_roller_set_selected_str(obj, "ABCD", LV_ANIM_OFF));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_roller_get_selected(obj));
+    lv_obj_delete(obj);
+}
+
+void test_roller_string_match_single_option(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_roller_set_options(obj, "Only", LV_ROLLER_MODE_NORMAL);
+    TEST_ASSERT_TRUE(lv_roller_set_selected_str(obj, "Only", LV_ANIM_OFF));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_roller_get_selected(obj));
+    lv_obj_delete(obj);
+}
+
+void test_roller_string_match_infinite_options(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_roller_set_options(obj, "A\nAB\nABC", LV_ROLLER_MODE_INFINITE);
+    TEST_ASSERT_TRUE(lv_roller_set_selected_str(obj, "AB", LV_ANIM_OFF));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_roller_get_selected(obj));
+    lv_obj_delete(obj);
+}
+
+void test_roller_string_match_empty_options(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
+    /* Reproduce the constructor's state when default values are disabled. */
+    lv_roller_set_options(obj, "", LV_ROLLER_MODE_NORMAL);
+    ((lv_roller_t *)obj)->option_cnt = 0;
+#endif
+    TEST_ASSERT_EQUAL_UINT32(0, lv_roller_get_option_count(obj));
+    TEST_ASSERT_FALSE(lv_roller_set_selected_str(obj, "", LV_ANIM_OFF));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_roller_get_selected(obj));
+
+    lv_roller_set_options(obj, "", LV_ROLLER_MODE_NORMAL);
+    TEST_ASSERT_EQUAL_UINT32(1, lv_roller_get_option_count(obj));
+    TEST_ASSERT_TRUE(lv_roller_set_selected_str(obj, "", LV_ANIM_OFF));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_roller_get_selected(obj));
+    lv_obj_delete(obj);
+}
+
 void test_roller_keypad_events(void)
 {
     int16_t expected_index = 1;
