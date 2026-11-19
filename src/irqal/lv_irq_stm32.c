@@ -69,6 +69,8 @@
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    /* The HAL IRQ handler dereferences the handle: it must be initialized. */
+    if(hdma2d.Instance == NULL) return LV_RESULT_INVALID;
     NVIC_DisableIRQ(DMA2D_IRQn);
     dma2d_user_data = user_data;
     dma2d_cb = cb;
@@ -92,11 +94,15 @@ lv_result_t lv_irq_detach_dma2d(void)
 lv_result_t lv_irq_attach_nemagfx(lv_irq_cb_t cb, void * user_data)
 {
     LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    if(hgpu2d.Instance == 0U) return LV_RESULT_INVALID;
     NVIC_DisableIRQ(GPU2D_IRQn);
     nemagfx_event.user_data = user_data;
     nemagfx_cb = cb;
 #if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
-    HAL_GPU2D_RegisterCommandListCpltCallback(&hgpu2d, nemagfx_hal_trampoline);
+    if(HAL_GPU2D_RegisterCommandListCpltCallback(&hgpu2d, nemagfx_hal_trampoline) != HAL_OK) {
+        nemagfx_cb = NULL;
+        return LV_RESULT_INVALID;
+    }
 #endif
     NVIC_EnableIRQ(GPU2D_IRQn);
     return LV_RESULT_OK;

@@ -109,7 +109,10 @@ int32_t nema_sys_init(void)
     /* Reset last_cl_id counter */
     last_cl_id = 0;
 
-    lv_irq_attach_nemagfx(nemagfx_completion_cb, NULL);
+    if(lv_irq_attach_nemagfx(nemagfx_completion_cb, NULL) != LV_RESULT_OK) {
+        LV_LOG_ERROR("could not attach the NemaGFX interrupt");
+        return -1;
+    }
 
     return error_code;
 }

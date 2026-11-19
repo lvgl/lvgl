@@ -123,15 +123,19 @@ void lv_draw_dma2d_init(void)
     DMA2D->AMTCR = 0;
 
 #if LV_DRAW_DMA2D_ASYNC
-    lv_irq_attach_dma2d(dma2d_irq_cb, NULL);
+    if(lv_irq_attach_dma2d(dma2d_irq_cb, NULL) != LV_RESULT_OK) {
+        LV_LOG_ERROR("could not attach the DMA2D interrupt");
+        LV_ASSERT_MSG(false, "could not attach the DMA2D interrupt");
+    }
 #endif
 }
 
 void lv_draw_dma2d_deinit(void)
 {
 #if LV_DRAW_DMA2D_ASYNC
-    /* disable the interrupt */
-    lv_irq_detach_dma2d();
+    if(lv_irq_detach_dma2d() != LV_RESULT_OK) {
+        LV_LOG_ERROR("could not detach the DMA2D interrupt");
+    }
 #endif
 
     /* disable the DMA2D clock */

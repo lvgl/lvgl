@@ -359,6 +359,7 @@ config LV_IRQ_CMSIS_SET_NVIC_PRIORITY
 config LV_IRQ_CMSIS_NVIC_PRIORITY
 	int "NVIC priority value"
 	default 255
+	range 0 255
 	depends on LV_IRQ_CMSIS_SET_NVIC_PRIORITY
 	help
 		The value passed to NVIC_SetPriority. 255 maps to the lowest preemption

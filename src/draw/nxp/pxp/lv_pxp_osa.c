@@ -118,12 +118,17 @@ static void _pxp_interrupt_init(void)
 
     ucPXPIdle = true;
 
-    lv_irq_attach_pxp(_pxp_irq_cb, NULL);
+    if(lv_irq_attach_pxp(_pxp_irq_cb, NULL) != LV_RESULT_OK) {
+        LV_LOG_ERROR("could not attach the PXP interrupt");
+        LV_ASSERT_MSG(false, "could not attach the PXP interrupt");
+    }
 }
 
 static void _pxp_interrupt_deinit(void)
 {
-    lv_irq_detach_pxp();
+    if(lv_irq_detach_pxp() != LV_RESULT_OK) {
+        LV_LOG_ERROR("could not detach the PXP interrupt");
+    }
 
 #if LV_USE_OS
     lv_thread_sync_delete(&pxp_sync);

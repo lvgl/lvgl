@@ -27,6 +27,9 @@ and switch to another task or suspend the CPU for power savings.
   under FreeRTOS also set <ApiLink name="LV_IRQ_CMSIS_SET_NVIC_PRIORITY" /> to `1`) or
   `LV_IRQ_PROVIDER_ZEPHYR`, or provide `lv_irq_attach_pxp()` / `lv_irq_detach_pxp()` yourself.
   In a hand-written `lv_conf.h`, also set <ApiLink name="LV_IRQ_PROVIDES_PXP" /> to `1`.
+  The CMSIS provider needs the device header: unless the build already makes it visible, set
+  <ApiLink name="LV_IRQ_CMSIS_USE_INCLUDE" /> to `1` and <ApiLink name="LV_IRQ_CMSIS_INCLUDE" /> to
+  `"fsl_device_registers.h"`.
 - In order to use PXP to rotate the screen, select in `lv_conf.h`: Set <ApiLink name="LV_USE_ROTATE_PXP" /> to `1`.
 - Enable PXP asserts in `lv_conf.h`: Set <ApiLink name="LV_USE_PXP_ASSERT" /> to `1`.
   There are a few PXP assertions that can stop the program execution in case the
