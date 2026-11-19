@@ -43,6 +43,10 @@ Calling <ApiLink name="lv_display_get_screen_loading" display="lv_display_get_sc
 being loaded. A Screen is considered "being loaded" until the loading animation finishes.
 If no Screen is being loaded, this function will return `NULL`.
 
+To go through every Screen of a Display, use <ApiLink name="lv_display_get_screen_count" display="lv_display_get_screen_count(disp)" /> 
+and <ApiLink name="lv_display_get_screen" display="lv_display_get_screen(disp, idx)" />.
+The Top, System and Bottom Layers are not part of this list.
+
 ## Top and System Layers
 
 LVGL uses the Top Layer and System Layer to empower you to ensure that certain
