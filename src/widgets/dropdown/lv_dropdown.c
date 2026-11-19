@@ -1204,7 +1204,15 @@ static void draw_main(lv_event_t * e)
         label_dsc.text_local = true;
     }
 
-    lv_draw_label(layer, &label_dsc, &txt_area);
+    /*The text is drawn with LV_TEXT_FLAG_EXPAND, so clip it to its area:
+     *otherwise a text longer than the button runs under the symbol*/
+    lv_area_t txt_clip;
+    if(lv_area_intersect(&txt_clip, &txt_area, &layer->_clip_area)) {
+        const lv_area_t clip_area_ori = layer->_clip_area;
+        layer->_clip_area = txt_clip;
+        lv_draw_label(layer, &label_dsc, &txt_area);
+        layer->_clip_area = clip_area_ori;
+    }
 }
 
 static void refresh_size(lv_obj_t * obj)
