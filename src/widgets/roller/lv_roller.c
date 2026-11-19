@@ -208,6 +208,7 @@ bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_en
 
     const char * options = lv_roller_get_options(obj);
     size_t options_len = lv_strlen(options);
+    size_t sel_opt_len = lv_strlen(sel_opt);
 
     bool option_found = false;
 
@@ -216,8 +217,11 @@ bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_en
 
     for(size_t i = 0; i < options_len; i++) {
         if(options[i] == '\n') {
-            /* See if this is the correct option */
-            if(lv_strncmp(&options[line_start], sel_opt, i - line_start) == 0) {
+            /* See if this is the correct option. Require an exact match:
+             * the lengths must be equal, otherwise a longer string that
+             * only starts with an option would match it as well */
+            if(sel_opt_len == i - line_start
+               && lv_strncmp(&options[line_start], sel_opt, i - line_start) == 0) {
                 lv_roller_set_selected(obj, current_option, anim);
                 option_found = true;
                 break;
