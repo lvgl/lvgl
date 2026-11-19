@@ -898,44 +898,55 @@ void test_label_invalidate_area(void)
     lv_event_code_t inv_event = (lv_display_get_render_mode(disp) == LV_DISPLAY_RENDER_MODE_FULL)
                                 ? LV_EVENT_REFR_REQUEST : LV_EVENT_INVALIDATE_AREA;
     lv_display_add_event_cb(disp, display_invalidate_area_cb, inv_event, &i);
+
+    lv_refr_now(NULL);
     i = 0;
     lv_label_set_text_static(label, "Hello world");
     TEST_ASSERT(i > 0);
 
+    lv_refr_now(NULL);
     i = 0;
     lv_label_set_text(label, "Hello world");
     TEST_ASSERT(i > 0);
 
+    lv_refr_now(NULL);
     i = 0;
     lv_label_set_text_fmt(label, "%s", "Hello world");
     TEST_ASSERT(i > 0);
 
+    lv_refr_now(NULL);
     i = 0;
     lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL);
     TEST_ASSERT(i > 0);
 
 #if LV_LABEL_TEXT_SELECTION
+    lv_refr_now(NULL);
     i = 0;
     lv_label_set_text_selection_start(label, 1);
     TEST_ASSERT(i > 0);
 
+    lv_refr_now(NULL);
     i = 0;
     lv_label_set_text_selection_end(label, 1);
     TEST_ASSERT(i > 0);
 #endif
 
+    lv_refr_now(NULL);
     i = 0;
     lv_label_set_recolor(label, true);
     TEST_ASSERT(i > 0);
 
+    lv_refr_now(NULL);
     i = 0;
     lv_label_ins_text(label, 5, " world");
     TEST_ASSERT(i > 0);
 
+    lv_refr_now(NULL);
     i = 0;
     lv_label_cut_text(label, 5, 5);
     TEST_ASSERT(i > 0);
 
+    lv_refr_now(NULL);
     i = 0;
     lv_obj_set_style_align(label, LV_ALIGN_CENTER, 0);
     TEST_ASSERT(i > 0);
@@ -1083,6 +1094,34 @@ void test_label_trailing_spaces_do_not_widen_the_label(void)
     create_wrap_pair("hello world", "hello world              ", &plain, &padded);
 
     TEST_ASSERT_EQUAL(lv_obj_get_width(plain), lv_obj_get_width(padded));
+}
+
+/*NULL means "refresh with the current text", it must not drop the text*/
+void test_label_set_text_null_keeps_the_text(void)
+{
+    lv_label_set_text(label, "dynamic");
+    lv_label_set_text_static(label, NULL);
+    TEST_ASSERT_EQUAL_STRING("dynamic", lv_label_get_text(label));
+
+    lv_label_set_text(label, NULL);
+    TEST_ASSERT_EQUAL_STRING("dynamic", lv_label_get_text(label));
+
+    static const char static_text[] = "static";
+    lv_label_set_text_static(label, static_text);
+    lv_label_set_text_static(label, NULL);
+    TEST_ASSERT_EQUAL_PTR(static_text, lv_label_get_text(label));
+}
+
+/*A screen has no parent to take a percentage of, the limit is dropped*/
+void test_label_pct_max_width_on_a_screen(void)
+{
+    lv_obj_t * scr_label = lv_label_create(NULL);
+    lv_obj_set_style_max_width(scr_label, LV_PCT(50), 0);
+    lv_label_set_text(scr_label, "some text");
+
+    TEST_ASSERT_GREATER_THAN(0, lv_obj_get_self_width(scr_label));
+
+    lv_obj_delete(scr_label);
 }
 
 #endif
