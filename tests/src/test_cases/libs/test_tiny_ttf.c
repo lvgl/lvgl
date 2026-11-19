@@ -128,6 +128,78 @@ void test_tiny_ttf_missing_glyph_uses_fallback(void)
     TEST_ASSERT_EQUAL_UINT32(0, cache_error_count);
 }
 
+void test_tiny_ttf_rejects_truncated_memory(void)
+{
+    extern const uint8_t test_ubuntu_font[];
+
+    for(size_t size = 0; size < 12; size++) {
+        lv_font_t * font = lv_tiny_ttf_create_data(test_ubuntu_font, size, 30);
+        TEST_ASSERT_NULL(font);
+    }
+}
+
+void test_tiny_ttf_resize_invalidates_cached_glyphs(void)
+{
+    extern const uint8_t test_ubuntu_font[];
+    extern size_t test_ubuntu_font_size;
+    lv_font_t * font = lv_tiny_ttf_create_data(test_ubuntu_font, test_ubuntu_font_size, 20);
+    TEST_ASSERT_NOT_NULL(font);
+
+    lv_font_glyph_dsc_t small_glyph;
+    lv_font_glyph_dsc_t large_glyph;
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &small_glyph, 'A', 'V'));
+    TEST_ASSERT_NOT_NULL(lv_font_get_glyph_bitmap(&small_glyph, NULL));
+    lv_font_glyph_release_draw_data(&small_glyph);
+
+    lv_tiny_ttf_set_size(font, 40);
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &large_glyph, 'A', 'V'));
+    TEST_ASSERT_GREATER_THAN(small_glyph.box_h, large_glyph.box_h);
+    TEST_ASSERT_GREATER_THAN(small_glyph.adv_w, large_glyph.adv_w);
+    TEST_ASSERT_NOT_NULL(lv_font_get_glyph_bitmap(&large_glyph, NULL));
+    lv_font_glyph_release_draw_data(&large_glyph);
+
+    lv_tiny_ttf_set_size(font, 20);
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &large_glyph, 'A', 'V'));
+    TEST_ASSERT_EQUAL_UINT(small_glyph.box_h, large_glyph.box_h);
+    TEST_ASSERT_EQUAL_UINT(small_glyph.adv_w, large_glyph.adv_w);
+    lv_tiny_ttf_destroy(font);
+}
+
+void test_tiny_ttf_resize_preserves_acquired_glyphs(void)
+{
+    extern const uint8_t test_ubuntu_font[];
+    extern size_t test_ubuntu_font_size;
+    lv_font_t * font = lv_tiny_ttf_create_data_ex(test_ubuntu_font, test_ubuntu_font_size, 20,
+                                                  LV_FONT_KERNING_NONE, 1);
+    TEST_ASSERT_NOT_NULL(font);
+
+    lv_font_glyph_dsc_t first, second, large, current;
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &first, 'A', 0));
+    const lv_draw_buf_t * first_bitmap = lv_font_get_glyph_bitmap(&first, NULL);
+    TEST_ASSERT_NOT_NULL(first_bitmap);
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &second, 'A', 0));
+    TEST_ASSERT_EQUAL_PTR(first_bitmap, lv_font_get_glyph_bitmap(&second, NULL));
+
+    lv_tiny_ttf_set_size(font, 40);
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &large, 'A', 0));
+    const lv_draw_buf_t * large_bitmap = lv_font_get_glyph_bitmap(&large, NULL);
+    TEST_ASSERT_NOT_NULL(large_bitmap);
+    TEST_ASSERT_GREATER_THAN(first.box_h, large.box_h);
+    TEST_ASSERT_EQUAL_UINT(first.box_h, first_bitmap->header.h);
+    lv_font_glyph_release_draw_data(&first);
+    TEST_ASSERT_EQUAL_UINT(second.box_h, first_bitmap->header.h);
+
+    lv_tiny_ttf_set_size(font, 20);
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &current, 'A', 0));
+    TEST_ASSERT_NOT_NULL(lv_font_get_glyph_bitmap(&current, NULL));
+    TEST_ASSERT_EQUAL_UINT(second.box_h, current.box_h);
+    TEST_ASSERT_EQUAL_UINT(large.box_h, large_bitmap->header.h);
+    lv_font_glyph_release_draw_data(&second);
+    lv_font_glyph_release_draw_data(&large);
+    lv_font_glyph_release_draw_data(&current);
+    lv_tiny_ttf_destroy(font);
+}
+
 void test_tiny_ttf_gpos(void)
 {
 #if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT

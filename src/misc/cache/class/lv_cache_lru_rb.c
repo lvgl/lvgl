@@ -45,7 +45,7 @@
  *********************/
 
 #include "lv_cache_lru_rb.h"
-#include "../lv_cache_entry.h"
+#include "../lv_cache_entry_private.h"
 #include "../../../lvgl_public.h"
 #include "../../lv_rb_private.h"
 #include "../../lv_iter_private.h"
@@ -387,7 +387,6 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
         return;
     }
 
-    uint32_t used_cnt = 0;
     lv_rb_node_t ** node;
     LV_LL_READ(&lru->ll, node) {
         /*free user handled data and do other clean up*/
@@ -397,12 +396,10 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
             lru->cache.ops.free_cb(search_key, user_data);
         }
         else {
-            LV_LOG_WARN("entry (%p) is still referenced (%" LV_PRId32 ")", (void *)entry, lv_cache_entry_get_ref(entry));
-            used_cnt++;
+            /* Keep acquired data alive until lv_cache_release() releases its last reference. */
+            lv_cache_entry_set_flag(entry, LV_CACHE_ENTRY_FLAG_INVALID);
+            (*node)->data = NULL;
         }
-    }
-    if(used_cnt > 0) {
-        LV_LOG_WARN("%" LV_PRId32 " entries are still referenced", used_cnt);
     }
 
     lv_rb_destroy(&lru->rb);
