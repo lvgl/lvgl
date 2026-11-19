@@ -70,6 +70,15 @@ void lv_draw_image_tiled_helper(lv_layer_t * layer, const lv_area_t * clip_area,
                                 const lv_image_decoder_args_t * decoder_args, void * user_data);
 
 /**
+ * Can be used by draw units to draw a layer task with their image drawing code:
+ * copies the layer task's descriptor and points it at the layer's draw buffer.
+ * @param dsc           store the image descriptor here
+ * @param layer_dsc     the descriptor of a `LV_DRAW_DSC_TYPE_LAYER` task (its `src` is an `lv_layer_t`)
+ *                      whose layer has a draw buffer
+ */
+void lv_draw_image_dsc_from_layer(lv_draw_image_dsc_t * dsc, const lv_draw_image_dsc_t * layer_dsc);
+
+/**
  * Get the area of a rectangle if its rotated and scaled
  * @param res store the coordinates here
  * @param w width of the rectangle to transform
