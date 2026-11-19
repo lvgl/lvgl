@@ -84,6 +84,17 @@ static void test_svg_draw(const char * svg_name, float scale)
 
     lv_svg_render_init(&svg_render_hal);
 
+    /* The first label draw registers the freetype outline callback of the SW renderer.
+     * SVG text must still render upright after that, so do it before the first SVG text. */
+    static bool label_drawn = false;
+    if(!label_drawn) {
+        label_drawn = true;
+        lv_obj_t * label = lv_label_create(lv_screen_active());
+        lv_label_set_text(label, "label");
+        lv_refr_now(NULL);
+        lv_obj_delete(label);
+    }
+
     char svg_path[128];
     lv_snprintf(svg_path, sizeof(svg_path), "A:src/test_assets/svg/%s.svg", svg_name);
 
