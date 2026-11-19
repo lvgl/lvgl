@@ -30,8 +30,6 @@ typedef struct {
     lv_indev_t * keypad_indev;
     lv_indev_t * encoder_indev;
 
-    lv_draw_buf_t draw_buf;
-
     int32_t x_act;
     int32_t y_act;
     uint32_t key_act;

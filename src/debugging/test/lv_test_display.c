@@ -36,7 +36,6 @@ static void delete_event_cb(lv_event_t * e);
 /**********************
  *      MACROS
  **********************/
-#define _state LV_GLOBAL_DEFAULT()->test_state
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -47,15 +46,19 @@ lv_display_t * lv_test_display_create(int32_t hor_res, int32_t ver_res)
 
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_XRGB8888);
+    lv_draw_buf_t * draw_buf = malloc(sizeof(lv_draw_buf_t));
+    if(!draw_buf) {
+        lv_display_delete(disp);
+        return NULL;
+    }
 
     size_t buf_size = 4 * (hor_res + LV_DRAW_BUF_STRIDE_ALIGN - 1) * ver_res + LV_DRAW_BUF_ALIGN;
     uint8_t * buf = malloc(buf_size);
     LV_ASSERT_MALLOC(buf);
-
-    lv_draw_buf_init(&_state.draw_buf, hor_res, ver_res, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO, lv_draw_buf_align(buf,
-                                                                                                                     LV_COLOR_FORMAT_XRGB8888), buf_size);
-    _state.draw_buf.unaligned_data = buf;
-    lv_display_set_draw_buffers(disp, &_state.draw_buf, NULL);
+    lv_draw_buf_init(draw_buf, hor_res, ver_res, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO, lv_draw_buf_align(buf,
+                                                                                                             LV_COLOR_FORMAT_XRGB8888), buf_size);
+    draw_buf->unaligned_data = buf;
+    lv_display_set_draw_buffers(disp, draw_buf, NULL);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 
     lv_display_set_flush_cb(disp, dummy_flush_cb);
@@ -78,15 +81,17 @@ static void buf_changed_event_cb(lv_event_t * e)
     int32_t hor_res = lv_display_get_original_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_original_vertical_resolution(disp);
 
-    free(_state.draw_buf.unaligned_data);
+    lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
+    free(draw_buf->unaligned_data);
+    draw_buf->unaligned_data = NULL;
 
     size_t buf_size = 4 * (hor_res + LV_DRAW_BUF_STRIDE_ALIGN - 1) * ver_res + LV_DRAW_BUF_ALIGN;
     uint8_t * buf = malloc(buf_size);
     LV_ASSERT_MALLOC(buf);
 
-    lv_draw_buf_init(&_state.draw_buf, hor_res, ver_res, cf, LV_STRIDE_AUTO, lv_draw_buf_align(buf, cf), buf_size);
-    _state.draw_buf.unaligned_data = buf;
-    lv_display_set_draw_buffers(disp, &_state.draw_buf, NULL);
+    lv_draw_buf_init(draw_buf, hor_res, ver_res, cf, LV_STRIDE_AUTO, lv_draw_buf_align(buf, cf), buf_size);
+    draw_buf->unaligned_data = buf;
+    lv_display_set_draw_buffers(disp, draw_buf, NULL);
 }
 
 static void delete_event_cb(lv_event_t * e)
@@ -95,7 +100,7 @@ static void delete_event_cb(lv_event_t * e)
     lv_display_t * disp = lv_event_get_target(e);
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
     free(draw_buf->unaligned_data);
-
+    free(draw_buf);
 }
 
 static void dummy_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
