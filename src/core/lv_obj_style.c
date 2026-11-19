@@ -117,8 +117,6 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 {
     LV_CHECK_ARG(obj != NULL, return);
     LV_CHECK_ARG(style != NULL, return);
-    LV_CHECK_ARG_MSG(obj->style_cnt < 63, return,
-                     "obj->style_cnt is restricted to 6 bits, so we can't store more than 63 styles");
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
@@ -128,9 +126,16 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     }
 
     bool trans_removed = remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
+    if(trans_removed) full_cache_refresh(obj, LV_PART_ANY);
 
     /*Try removing the style first to be sure it won't be added twice*/
     lv_obj_remove_style(obj, style, selector);
+
+    if(obj->style_cnt >= 63) {
+        LV_LOG_WARN("obj->style_cnt is restricted to 6 bits");
+        if(trans_removed) lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
+        return;
+    }
 
     uint32_t i;
     /*Go after the transition and local styles*/
@@ -143,10 +148,13 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     /*Now `i` is at the first normal style. Insert the new style before this*/
 
     /*Allocate space for the new style and shift the rest of the style to the end*/
+    lv_obj_style_t * new_styles = lv_realloc(obj->styles, (obj->style_cnt + 1) * sizeof(lv_obj_style_t));
+    if(new_styles == NULL) {
+        if(trans_removed) lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
+        return;
+    }
+    obj->styles = new_styles;
     obj->style_cnt++;
-    LV_ASSERT(obj->style_cnt != 0);
-    obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-    LV_ASSERT_MALLOC(obj->styles);
 
     uint32_t j;
     for(j = obj->style_cnt - 1; j > i ; j--) {
@@ -424,8 +432,14 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
 
     /*Stop running transitions with this property */
     bool trans_removed = remove_trans_styles(obj, lv_obj_style_get_selector_part(selector), prop, NULL);
+    if(trans_removed) full_cache_refresh(obj, LV_PART_ANY);
 
     lv_style_t * style = get_local_style(obj, selector);
+    if(style == NULL) {
+        if(trans_removed) lv_obj_refresh_style(obj, lv_obj_style_get_selector_part(selector), prop);
+        LV_PROFILER_STYLE_END;
+        return;
+    }
 
     lv_style_set_prop(style, prop, value);
 
@@ -512,6 +526,7 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t p
     obj->state = new_state;
 
     lv_obj_style_t * style_trans = get_trans_style(obj, part);
+    if(style_trans == NULL) return;
     lv_style_set_prop((lv_style_t *)style_trans->style, tr_dsc->prop, v1);  /*Be sure `trans_style` has a valid value*/
     lv_obj_refresh_style(obj, part, tr_dsc->prop);
 
@@ -992,23 +1007,24 @@ static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector
         }
     }
 
-    /*Allocate the individual style first so obj->styles stays valid on failure*/
+    if(obj->style_cnt >= 63) {
+        LV_LOG_WARN("obj->style_cnt is restricted to 6 bits");
+        return NULL;
+    }
+
+    lv_obj_style_t * new_styles = lv_realloc(obj->styles, (obj->style_cnt + 1) * sizeof(lv_obj_style_t));
+    if(new_styles == NULL) {
+        LV_LOG_WARN("couldn't allocate styles");
+        return NULL;
+    }
+    obj->styles = new_styles;
+
     lv_style_t * new_style = lv_malloc_zeroed(sizeof(lv_style_t));
     if(new_style == NULL) {
         LV_LOG_WARN("couldn't allocate local style");
         return NULL;
     }
-
     obj->style_cnt++;
-    LV_ASSERT(obj->style_cnt != 0);
-    lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-    if(new_styles == NULL) {
-        obj->style_cnt--;
-        lv_free(new_style);
-        LV_LOG_WARN("couldn't allocate styles");
-        return NULL;
-    }
-    obj->styles = new_styles;
 
     for(i = obj->style_cnt - 1; i > 0 ; i--) {
         /*Copy only normal styles (not local and transition).
@@ -1043,23 +1059,24 @@ static lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t sel
     /*Already have a transition style for it*/
     if(i != obj->style_cnt) return &obj->styles[i];
 
-    /*Allocate the individual style first so obj->styles stays valid on failure*/
-    lv_style_t * new_style = lv_malloc(sizeof(lv_style_t));
-    if(new_style == NULL) {
-        LV_LOG_WARN("couldn't allocate transition style");
+    if(obj->style_cnt >= 63) {
+        LV_LOG_WARN("obj->style_cnt is restricted to 6 bits");
         return NULL;
     }
 
-    obj->style_cnt++;
-    LV_ASSERT(obj->style_cnt != 0);
-    lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+    lv_obj_style_t * new_styles = lv_realloc(obj->styles, (obj->style_cnt + 1) * sizeof(lv_obj_style_t));
     if(new_styles == NULL) {
-        obj->style_cnt--;
-        lv_free(new_style);
         LV_LOG_WARN("couldn't allocate styles");
         return NULL;
     }
     obj->styles = new_styles;
+
+    lv_style_t * new_style = lv_malloc_zeroed(sizeof(lv_style_t));
+    if(new_style == NULL) {
+        LV_LOG_WARN("couldn't allocate transition style");
+        return NULL;
+    }
+    obj->style_cnt++;
 
     for(i = obj->style_cnt - 1; i > 0 ; i--) {
         obj->styles[i] = obj->styles[i - 1];
@@ -1349,10 +1366,15 @@ static void trans_anim_start_cb(lv_anim_t * a)
 
     /*Delete the related transitions if any*/
     bool trans_removed = remove_trans_styles(tr->obj, part, prop_tmp, tr);
+    if(trans_removed) full_cache_refresh(tr->obj, part);
 
     tr->prop = prop_tmp;
 
     lv_obj_style_t * style_trans = get_trans_style(tr->obj, tr->selector);
+    if(style_trans == NULL) {
+        if(trans_removed) lv_obj_refresh_style(tr->obj, part, prop_tmp);
+        return;
+    }
     /*Be sure `trans_style` has a valid value*/
     lv_style_set_prop((lv_style_t *)style_trans->style, tr->prop, tr->start_value);
 #if LV_OBJ_STYLE_CACHE
@@ -1632,6 +1654,19 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
         lv_obj_invalidate(obj);
     }
 
+    /*Cancel transitions before compacting the list, as this can allocate memory.*/
+    for(uint32_t i = 0; i < obj->style_cnt; i++) {
+        lv_obj_style_t * obj_style = &obj->styles[i];
+        if(!obj_style->is_trans || (theme_only && !obj_style->is_theme)) continue;
+        lv_state_t state_act = lv_obj_style_get_selector_state(obj_style->selector);
+        lv_part_t part_act = lv_obj_style_get_selector_part(obj_style->selector);
+        if((state != LV_STATE_ANY && state_act != state) ||
+           (part != LV_PART_ANY && part_act != part) ||
+           (style != NULL && style != obj_style->style)) continue;
+        remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
+        break;
+    }
+
     uint32_t style_count = 0;
     bool deleted = false;
 
@@ -1659,9 +1694,6 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
         }
 
         /*This entry is being removed*/
-        if(obj->styles[i].is_trans) {
-            remove_trans_styles(obj, part, LV_STYLE_PROP_ANY, NULL);
-        }
         if(obj->styles[i].is_local || obj->styles[i].is_trans) {
             if(obj->styles[i].style) lv_style_reset((lv_style_t *)obj->styles[i].style);
             lv_free((lv_style_t *)obj->styles[i].style);
@@ -1671,22 +1703,25 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
     }
 
     if(!deleted) {
+        if(obj->style_cnt == 0) {
+            lv_free(obj->styles);
+            obj->styles = NULL;
+        }
         return;
     }
 
     obj->style_cnt = style_count;
+    full_cache_refresh(obj, part);
     if(style_count > 0) {
-        obj->styles = lv_realloc(obj->styles, style_count * sizeof(lv_obj_style_t));
+        lv_obj_style_t * new_styles = lv_realloc(obj->styles, style_count * sizeof(lv_obj_style_t));
+        if(new_styles != NULL) obj->styles = new_styles;
     }
     else {
         lv_free(obj->styles);
         obj->styles = NULL;
     }
 
-    if(deleted) {
-        full_cache_refresh(obj, part);
-        lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
-    }
+    lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
 }
 
 static lv_obj_style_t * find_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
