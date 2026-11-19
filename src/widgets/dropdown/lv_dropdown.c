@@ -1204,15 +1204,16 @@ static void draw_main(lv_event_t * e)
         label_dsc.text_local = true;
     }
 
-    /*The text is drawn with LV_TEXT_FLAG_EXPAND, so clip it to its area:
-     *otherwise a text longer than the button runs under the symbol*/
-    lv_area_t txt_clip;
-    if(lv_area_intersect(&txt_clip, &txt_area, &layer->_clip_area)) {
-        const lv_area_t clip_area_ori = layer->_clip_area;
-        layer->_clip_area = txt_clip;
+    /*The text is drawn with LV_TEXT_FLAG_EXPAND, so clip it horizontally to its area:
+     *otherwise a text longer than the button runs under the symbol.
+     *Keep the vertical clip, so glyphs that overhang the line (italic, handwritten fonts) are not cut.*/
+    const lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area.x1 = LV_MAX(clip_area_ori.x1, txt_area.x1);
+    layer->_clip_area.x2 = LV_MIN(clip_area_ori.x2, txt_area.x2);
+    if(layer->_clip_area.x1 <= layer->_clip_area.x2) {
         lv_draw_label(layer, &label_dsc, &txt_area);
-        layer->_clip_area = clip_area_ori;
     }
+    layer->_clip_area = clip_area_ori;
 }
 
 static void refresh_size(lv_obj_t * obj)
