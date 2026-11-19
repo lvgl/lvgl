@@ -15,8 +15,10 @@
 /* A source is served when it is enabled and the device tree has its node. */
 #define ZEPHYR_DMA2D (LV_IRQ_PROVIDES_DMA2D && DT_NODE_EXISTS(DT_NODELABEL(dma2d)))
 #define ZEPHYR_PXP   (LV_IRQ_PROVIDES_PXP && DT_NODE_EXISTS(DT_NODELABEL(pxp)))
+#define ZEPHYR_EPIC  (LV_IRQ_PROVIDES_EPIC && DT_NODE_EXISTS(DT_NODELABEL(epic)))
+#define ZEPHYR_EZIP  (LV_IRQ_PROVIDES_EZIP && DT_NODE_EXISTS(DT_NODELABEL(ezip)))
 
-#if ZEPHYR_DMA2D || ZEPHYR_PXP
+#if ZEPHYR_DMA2D || ZEPHYR_PXP || ZEPHYR_EPIC || ZEPHYR_EZIP
 
 #include <zephyr/kernel.h>
 #include <zephyr/irq.h>
@@ -36,6 +38,14 @@
 #if ZEPHYR_PXP
     static volatile lv_irq_cb_t pxp_cb;
     static void * volatile pxp_user_data;
+#endif
+#if ZEPHYR_EPIC
+    static volatile lv_irq_cb_t epic_cb;
+    static void * volatile epic_user_data;
+#endif
+#if ZEPHYR_EZIP
+    static volatile lv_irq_cb_t ezip_cb;
+    static void * volatile ezip_user_data;
 #endif
 
 /**********************
@@ -61,6 +71,26 @@ static void pxp_trampoline(const void * arg)
 {
     lv_irq_cb_t cb = pxp_cb;
     void * user_data = pxp_user_data;
+    LV_UNUSED(arg);
+    if(cb) cb(user_data);
+}
+#endif
+
+#if ZEPHYR_EPIC
+static void epic_trampoline(const void * arg)
+{
+    lv_irq_cb_t cb = epic_cb;
+    void * user_data = epic_user_data;
+    LV_UNUSED(arg);
+    if(cb) cb(user_data);
+}
+#endif
+
+#if ZEPHYR_EZIP
+static void ezip_trampoline(const void * arg)
+{
+    lv_irq_cb_t cb = ezip_cb;
+    void * user_data = ezip_user_data;
     LV_UNUSED(arg);
     if(cb) cb(user_data);
 }
@@ -116,6 +146,52 @@ lv_result_t lv_irq_detach_pxp(void)
 
 #endif /*ZEPHYR_PXP*/
 
-#endif /*ZEPHYR_DMA2D || ZEPHYR_PXP*/
+#if ZEPHYR_EPIC
+
+lv_result_t lv_irq_attach_epic(lv_irq_cb_t cb, void * user_data)
+{
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    irq_disable(DT_IRQN(DT_NODELABEL(epic)));
+    epic_user_data = user_data;
+    epic_cb = cb;
+    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(epic)), DT_IRQ(DT_NODELABEL(epic), priority),
+                epic_trampoline, NULL, 0);
+    irq_enable(DT_IRQN(DT_NODELABEL(epic)));
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_irq_detach_epic(void)
+{
+    irq_disable(DT_IRQN(DT_NODELABEL(epic)));
+    epic_cb = NULL;
+    return LV_RESULT_OK;
+}
+
+#endif /*ZEPHYR_EPIC*/
+
+#if ZEPHYR_EZIP
+
+lv_result_t lv_irq_attach_ezip(lv_irq_cb_t cb, void * user_data)
+{
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    irq_disable(DT_IRQN(DT_NODELABEL(ezip)));
+    ezip_user_data = user_data;
+    ezip_cb = cb;
+    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(ezip)), DT_IRQ(DT_NODELABEL(ezip), priority),
+                ezip_trampoline, NULL, 0);
+    irq_enable(DT_IRQN(DT_NODELABEL(ezip)));
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_irq_detach_ezip(void)
+{
+    irq_disable(DT_IRQN(DT_NODELABEL(ezip)));
+    ezip_cb = NULL;
+    return LV_RESULT_OK;
+}
+
+#endif /*ZEPHYR_EZIP*/
+
+#endif /*ZEPHYR_DMA2D || ZEPHYR_PXP || ZEPHYR_EPIC || ZEPHYR_EZIP*/
 
 #endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_ZEPHYR*/

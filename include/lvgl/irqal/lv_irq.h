@@ -27,7 +27,7 @@ extern "C" {
  * Callback invoked by the provider when a completion source fires (in interrupt
  * context).
  *
- * @param arg  for DMA2D and PXP, the `user_data` given to attach. For the
+ * @param arg  for DMA2D, PXP, EPIC and EZIP, the `user_data` given to attach. For the
  *             NemaGFX GPU2D, an `lv_irq_nemagfx_event_t *` whose `user_data`
  *             is the one given to attach.
  */
@@ -71,6 +71,16 @@ typedef struct {
 
 lv_result_t lv_irq_attach_nemagfx(lv_irq_cb_t cb, void * user_data);
 lv_result_t lv_irq_detach_nemagfx(void);
+#endif
+
+#if LV_IRQ_PROVIDES_EPIC
+lv_result_t lv_irq_attach_epic(lv_irq_cb_t cb, void * user_data);
+lv_result_t lv_irq_detach_epic(void);
+#endif
+
+#if LV_IRQ_PROVIDES_EZIP
+lv_result_t lv_irq_attach_ezip(lv_irq_cb_t cb, void * user_data);
+lv_result_t lv_irq_detach_ezip(void);
 #endif
 
 /**********************

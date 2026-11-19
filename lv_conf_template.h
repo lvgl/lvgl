@@ -131,8 +131,8 @@
 /** IRQ provider
  *  Possible values:
  *  - LV_IRQ_PROVIDER_NONE: None (or provided outside LVGL)
- *  - LV_IRQ_PROVIDER_CMSIS: CMSIS (NVIC) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_PXP)
- *  - LV_IRQ_PROVIDER_ZEPHYR: Zephyr (device tree) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_PXP)
+ *  - LV_IRQ_PROVIDER_CMSIS: CMSIS (NVIC) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_PXP, LV_IRQ_PROVIDES_EPIC, LV_IRQ_PROVIDES_EZIP)
+ *  - LV_IRQ_PROVIDER_ZEPHYR: Zephyr (device tree) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_PXP, LV_IRQ_PROVIDES_EPIC, LV_IRQ_PROVIDES_EZIP)
  *  - LV_IRQ_PROVIDER_STM32: STM32 (HAL) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_NEMAGFX)
  *  - LV_IRQ_PROVIDER_CUSTOM
  */
@@ -162,6 +162,18 @@
  *  provider serves it only when the device has a GPU2D (GPU2D_BASE).
  */
 #define LV_IRQ_PROVIDES_NEMAGFX 0
+
+/** Declares lv_irq_attach_epic() and lv_irq_detach_epic(). LVGL's providers
+ *  serve it only when the device has it (EPIC_BASE in the device header, an
+ *  epic device-tree node on Zephyr).
+ */
+#define LV_IRQ_PROVIDES_EPIC 0
+
+/** Declares lv_irq_attach_ezip() and lv_irq_detach_ezip(). LVGL's providers
+ *  serve it only when the device has it (EZIP_BASE or EZIP1_BASE in the
+ *  device header, an ezip device-tree node on Zephyr).
+ */
+#define LV_IRQ_PROVIDES_EZIP 0
 
 #if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS
 /** Include the device header that declares the IRQn_Type values

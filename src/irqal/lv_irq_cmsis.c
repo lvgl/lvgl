@@ -31,8 +31,30 @@
 #else
     #define CMSIS_PXP 0
 #endif
+#if LV_IRQ_PROVIDES_EPIC && defined(EPIC_BASE)
+    #define CMSIS_EPIC 1
+#else
+    #define CMSIS_EPIC 0
+#endif
+/* SiFli names the base EZIP_BASE or EZIP1_BASE depending on the family. */
+#if LV_IRQ_PROVIDES_EZIP && (defined(EZIP_BASE) || defined(EZIP1_BASE))
+    #define CMSIS_EZIP 1
+#else
+    #define CMSIS_EZIP 0
+#endif
 
-#if CMSIS_DMA2D || CMSIS_PXP
+#if CMSIS_DMA2D || CMSIS_PXP || CMSIS_EPIC || CMSIS_EZIP
+
+/* RT-Thread must be told about interrupt context, or a wakeup from the ISR
+ * does not reschedule. */
+#if LV_USE_OS == LV_OS_RTTHREAD
+    #include <rtthread.h>
+    #define CMSIS_ISR_ENTER() rt_interrupt_enter()
+    #define CMSIS_ISR_LEAVE() rt_interrupt_leave()
+#else
+    #define CMSIS_ISR_ENTER()
+    #define CMSIS_ISR_LEAVE()
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -55,6 +77,14 @@ static void cmsis_enable_irq(IRQn_Type irqn);
 #if CMSIS_PXP
     static volatile lv_irq_cb_t pxp_cb;
     static void * volatile pxp_user_data;
+#endif
+#if CMSIS_EPIC
+    static volatile lv_irq_cb_t epic_cb;
+    static void * volatile epic_user_data;
+#endif
+#if CMSIS_EZIP
+    static volatile lv_irq_cb_t ezip_cb;
+    static void * volatile ezip_user_data;
 #endif
 
 /**********************
@@ -89,7 +119,9 @@ void DMA2D_IRQHandler(void)
 {
     lv_irq_cb_t cb = dma2d_cb;
     void * user_data = dma2d_user_data;
+    CMSIS_ISR_ENTER();
     if(cb) cb(user_data);
+    CMSIS_ISR_LEAVE();
 }
 
 #endif /*CMSIS_DMA2D*/
@@ -118,10 +150,74 @@ void PXP_IRQHandler(void)
 {
     lv_irq_cb_t cb = pxp_cb;
     void * user_data = pxp_user_data;
+    CMSIS_ISR_ENTER();
     if(cb) cb(user_data);
+    CMSIS_ISR_LEAVE();
 }
 
 #endif /*CMSIS_PXP*/
+
+#if CMSIS_EPIC
+
+lv_result_t lv_irq_attach_epic(lv_irq_cb_t cb, void * user_data)
+{
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    NVIC_DisableIRQ(EPIC_IRQn);
+    epic_user_data = user_data;
+    epic_cb = cb;
+    cmsis_enable_irq(EPIC_IRQn);
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_irq_detach_epic(void)
+{
+    NVIC_DisableIRQ(EPIC_IRQn);
+    epic_cb = NULL;
+    return LV_RESULT_OK;
+}
+
+void EPIC_IRQHandler(void);
+void EPIC_IRQHandler(void)
+{
+    lv_irq_cb_t cb = epic_cb;
+    void * user_data = epic_user_data;
+    CMSIS_ISR_ENTER();
+    if(cb) cb(user_data);
+    CMSIS_ISR_LEAVE();
+}
+
+#endif /*CMSIS_EPIC*/
+
+#if CMSIS_EZIP
+
+lv_result_t lv_irq_attach_ezip(lv_irq_cb_t cb, void * user_data)
+{
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID);
+    NVIC_DisableIRQ(EZIP_IRQn);
+    ezip_user_data = user_data;
+    ezip_cb = cb;
+    cmsis_enable_irq(EZIP_IRQn);
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_irq_detach_ezip(void)
+{
+    NVIC_DisableIRQ(EZIP_IRQn);
+    ezip_cb = NULL;
+    return LV_RESULT_OK;
+}
+
+void EZIP_IRQHandler(void);
+void EZIP_IRQHandler(void)
+{
+    lv_irq_cb_t cb = ezip_cb;
+    void * user_data = ezip_user_data;
+    CMSIS_ISR_ENTER();
+    if(cb) cb(user_data);
+    CMSIS_ISR_LEAVE();
+}
+
+#endif /*CMSIS_EZIP*/
 
 /**********************
  *   STATIC FUNCTIONS
@@ -138,6 +234,6 @@ static void cmsis_enable_irq(IRQn_Type irqn)
     NVIC_EnableIRQ(irqn);
 }
 
-#endif /*CMSIS_DMA2D || CMSIS_PXP*/
+#endif /*CMSIS_DMA2D || CMSIS_PXP || CMSIS_EPIC || CMSIS_EZIP*/
 
 #endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS*/
