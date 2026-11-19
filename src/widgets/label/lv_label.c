@@ -516,10 +516,16 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
             uint32_t letter_next;
             /*Get the current letter and the next letter for kerning*/
             /*Be careful 'i' already points to the next character*/
+            const uint32_t i_prev = i;
             lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
+            /*`i` doesn't move on the terminating '\0', so stop to avoid an endless loop*/
+            if(i == i_prev) {
+                i = i_act;
+                break;
+            }
 
             if((attributes.text_flags & LV_TEXT_FLAG_RECOLOR) != 0) {
-                if(lv_text_is_cmd(&cmd_state, bidi_txt[i]) != false) {
+                if(lv_text_is_cmd(&cmd_state, letter) != false) {
                     continue; /*Skip the letter if it is part of a command*/
                 }
             }
@@ -622,10 +628,13 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
         while(i <= new_line_start - 1) {
             /*Get the current letter and the next letter for kerning*/
             /*Be careful 'i' already points to the next character*/
+            const uint32_t i_prev = i;
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
+            /*`i` doesn't move on the terminating '\0', so stop to avoid an endless loop*/
+            if(i == i_prev) break;
 
             if((attributes.text_flags & LV_TEXT_FLAG_RECOLOR) != 0) {
-                if(lv_text_is_cmd(&cmd_state, txt[i]) != false) {
+                if(lv_text_is_cmd(&cmd_state, letter) != false) {
                     continue; /*Skip the letter if it is part of a command*/
                 }
             }
