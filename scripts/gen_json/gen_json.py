@@ -11,7 +11,7 @@ sys.path.insert(0, base_path)
 
 project_dir = os.path.abspath(os.path.join(base_path, '..', '..'))
 docs_path = os.path.join(project_dir, 'docs')
-sys.path.insert(0, docs_path)
+sys.path.insert(0, os.path.dirname(base_path))
 
 import create_fake_lib_c  # NOQA
 import pycparser_monkeypatch  # NOQA
@@ -49,9 +49,12 @@ def run(output_path, lv_conf_file, output_to_stdout, target_header, filter_priva
             with open(lv_conf_templ_file, 'rb') as f:
                 lines = f.read().decode('utf-8').split('\n')
 
+            config_enabled = False
             for i, line in enumerate(lines):
-                if line.startswith('#if 0'):
-                    lines[i] = '#if 1'
+                # Enable the template's outer guard, preserving conditional includes.
+                if line.startswith('#if 0') and not config_enabled:
+                    lines[i] = line.replace('#if 0', '#if 1', 1)
+                    config_enabled = True
                 else:
                     for item in (
                         'LV_USE_LOG',
