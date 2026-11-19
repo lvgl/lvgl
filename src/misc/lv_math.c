@@ -312,7 +312,7 @@ nr1:
     xn = (xn + 1 + x / xn) / 2;
 adj:
 
-    if(xn * xn > (int32_t)x)   /* Correct rounding if necessary */
+    if((uint32_t)xn * (uint32_t)xn > x)   /* Correct rounding if necessary. xn <= 65535 here, so this fits */
         xn--;
 
     return xn;
