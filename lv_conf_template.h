@@ -214,7 +214,10 @@
 /** Render a widget and its children into an image buffer with lv_snapshot_take(). */
 #define LV_USE_SNAPSHOT 0
 
-/** Backend that gives the SW renderer vector graphics support. */
+/** Backend that gives the SW renderer vector graphics support.
+ *
+ *  Enable: LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+ */
 #define LV_USE_THORVG 0
 
 #if LV_USE_THORVG

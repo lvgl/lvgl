@@ -435,6 +435,7 @@ config LV_USE_THORVG
 	bool "Vector graphics engine (ThorVG)"
 	default n
 	select LV_DRAW_HAS_VECTOR_SUPPORT if LV_USE_DRAW_SW
+	select LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED if LV_USE_DRAW_SW
 	help
 		Backend that gives the SW renderer vector graphics support.
 

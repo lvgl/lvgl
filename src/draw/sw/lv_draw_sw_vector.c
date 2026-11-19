@@ -21,6 +21,7 @@
 #include "blend/lv_draw_sw_blend_to_rgb565.h"
 #include "blend/lv_draw_sw_blend_to_rgb888.h"
 #include "blend/lv_draw_sw_blend_to_a8.h"
+#include "blend/lv_draw_sw_blend_to_argb8888.h"
 
 /*********************
  *      DEFINES
@@ -413,6 +414,11 @@ static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area
     fill_dsc.src_area  = *src_area;
 
     switch(draw_buf->header.cf) {
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+        case LV_COLOR_FORMAT_ARGB8888:
+            lv_draw_sw_blend_image_to_argb8888(&fill_dsc);
+            break;
+#endif
 #if LV_DRAW_SW_SUPPORT_RGB565
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_RGB565A8:
@@ -431,6 +437,52 @@ static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area
 #endif
         default:
             break;
+    }
+}
+
+static bool _reads_destination(lv_ll_t * task_list)
+{
+    lv_draw_vector_subtask_t * task;
+    LV_LL_READ(task_list, task) {
+        if(task->ctx.blend_mode != LV_VECTOR_BLEND_SRC_OVER) return true;
+    }
+    return false;
+}
+
+static void _premultiply_into(lv_draw_buf_t * dest, const lv_draw_buf_t * src, int32_t width, int32_t height)
+{
+    for(int32_t y = 0; y < height; y++) {
+        const lv_color32_t * src_row = (const lv_color32_t *)(src->data + y * src->header.stride);
+        lv_color32_t * dest_row = (lv_color32_t *)(dest->data + y * dest->header.stride);
+        for(int32_t x = 0; x < width; x++) {
+            dest_row[x] = src_row[x];
+            lv_color_premultiply(&dest_row[x]);
+        }
+    }
+}
+
+/* Only the pixels ThorVG changed are written back: un-premultiplying the
+ * others wouldn't always give their original value. */
+static void _unpremultiply_changed_into(lv_draw_buf_t * dest, const lv_draw_buf_t * src, int32_t width,
+                                        int32_t height)
+{
+    for(int32_t y = 0; y < height; y++) {
+        const lv_color32_t * src_row = (const lv_color32_t *)(src->data + y * src->header.stride);
+        lv_color32_t * dest_row = (lv_color32_t *)(dest->data + y * dest->header.stride);
+        for(int32_t x = 0; x < width; x++) {
+            lv_color32_t old = dest_row[x];
+            lv_color_premultiply(&old);
+            lv_color32_t c = src_row[x];
+            if(lv_color32_eq(old, c)) continue;
+
+            uint32_t a = c.alpha;
+            if(a != LV_OPA_COVER && a != LV_OPA_TRANSP) {
+                c.red = (uint8_t)LV_MIN(255, (c.red * 255 + a / 2) / a);
+                c.green = (uint8_t)LV_MIN(255, (c.green * 255 + a / 2) / a);
+                c.blue = (uint8_t)LV_MIN(255, (c.blue * 255 + a / 2) / a);
+            }
+            dest_row[x] = c;
+        }
     }
 }
 
@@ -502,13 +554,25 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv
     lv_color_format_t cf = draw_buf->header.cf;
 
     bool allow_buffer = false;
+    bool copy_back = false;
     lv_draw_buf_t * new_buf = NULL;
 
-    if(cf != LV_COLOR_FORMAT_ARGB8888 && \
+    /* ThorVG blends premultiplied pixels: it can draw into a premultiplied or an opaque buffer
+     * directly, anything else gets a premultiplied buffer of its own that is then blended.
+     * Blend modes other than source-over need to see the destination, so a straight ARGB8888
+     * one is copied into that buffer and copied back. */
+    if(cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED && \
        cf != LV_COLOR_FORMAT_XRGB8888) {
         allow_buffer = true;
-        new_buf = lv_draw_buf_create(width, height, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
-        lv_draw_buf_clear(new_buf, NULL);
+        new_buf = lv_draw_buf_create(width, height, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED, LV_STRIDE_AUTO);
+        if(new_buf == NULL) {
+            LV_LOG_WARN("Couldn't allocate a %" LV_PRId32 "x%" LV_PRId32 " buffer for vector graphics", width, height);
+            lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
+            return;
+        }
+        copy_back = cf == LV_COLOR_FORMAT_ARGB8888 && _reads_destination(dsc->task_list);
+        if(copy_back) _premultiply_into(new_buf, draw_buf, width, height);
+        else lv_draw_buf_clear(new_buf, NULL);
         buf = new_buf->data;
         stride = new_buf->header.stride;
     }
@@ -527,7 +591,11 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv
         tvg_canvas_sync(canvas);
     }
 
-    if(allow_buffer) {
+    if(copy_back) {
+        _unpremultiply_changed_into(draw_buf, new_buf, width, height);
+        lv_draw_buf_destroy(new_buf);
+    }
+    else if(allow_buffer) {
         lv_area_t src_area = {0, 0, width, height};
         _blend_draw_buf(draw_buf, &layer->buf_area, new_buf, &src_area);
         lv_draw_buf_destroy(new_buf);

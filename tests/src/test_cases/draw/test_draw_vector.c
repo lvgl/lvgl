@@ -329,6 +329,67 @@ static void canvas_draw(const char * name, draw_cb_t draw_cb)
     lv_obj_delete(canvas);
 }
 
+/* Fill a 20x20 square with `blend` on a straight ARGB8888 canvas filled with `bg`/`bg_opa`. */
+static lv_obj_t * draw_blended_square(lv_color_t bg, lv_opa_t bg_opa, lv_color_t color, lv_vector_blend_t blend)
+{
+#if LV_USE_DRAW_NANOVG
+    TEST_IGNORE_MESSAGE("NanoVG's headless readback leaves the canvas buffer zeroed");
+#endif
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(40, 40, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(draw_buf);
+    lv_canvas_set_draw_buf(canvas, draw_buf);
+    lv_canvas_fill_bg(canvas, bg, bg_opa);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+    lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(&layer);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    lv_area_t rect = {10, 10, 29, 29};
+    lv_vector_path_append_rect(path, &rect, 0, 0);
+    lv_draw_vector_dsc_set_fill_color(dsc, color);
+    lv_draw_vector_dsc_set_blend_mode(dsc, blend);
+    lv_draw_vector_dsc_add_path(dsc, path);
+    lv_draw_vector(dsc);
+    lv_vector_path_delete(path);
+    lv_draw_vector_dsc_delete(dsc);
+    lv_canvas_finish_layer(canvas, &layer);
+    return canvas;
+}
+
+static void delete_canvas(lv_obj_t * canvas)
+{
+    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(canvas);
+    lv_image_cache_drop(draw_buf);
+    lv_obj_delete(canvas);
+    lv_draw_buf_destroy(draw_buf);
+}
+
+void test_blend_mode_sees_argb8888_destination(void)
+{
+    lv_obj_t * canvas = draw_blended_square(lv_color_hex(0xff0000), LV_OPA_COVER, lv_color_hex(0x0000ff),
+                                            LV_VECTOR_BLEND_SCREEN);
+    lv_color32_t px = lv_canvas_get_px(canvas, 20, 20);
+    TEST_ASSERT_UINT8_WITHIN(1, 0xff, px.red);
+    TEST_ASSERT_UINT8_WITHIN(1, 0x00, px.green);
+    TEST_ASSERT_UINT8_WITHIN(1, 0xff, px.blue);
+    TEST_ASSERT_EQUAL_HEX8(0xff, px.alpha);
+    delete_canvas(canvas);
+}
+
+void test_blend_mode_keeps_argb8888_destination_around_the_path(void)
+{
+    /* A color that doesn't survive being premultiplied and un-premultiplied at this opacity */
+    lv_color_t bg = lv_color_hex(0x834725);
+    lv_obj_t * canvas = draw_blended_square(bg, 0x10, lv_color_hex(0x0000ff), LV_VECTOR_BLEND_SCREEN);
+    lv_color32_t px = lv_canvas_get_px(canvas, 2, 2);
+    TEST_ASSERT_EQUAL_HEX8(0x83, px.red);
+    TEST_ASSERT_EQUAL_HEX8(0x47, px.green);
+    TEST_ASSERT_EQUAL_HEX8(0x25, px.blue);
+    TEST_ASSERT_EQUAL_HEX8(0x10, px.alpha);
+    delete_canvas(canvas);
+}
+
 void test_transform(void)
 {
     lv_matrix_t matrix;
