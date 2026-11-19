@@ -1,0 +1,25 @@
+# Pins the Zephyr the CI checks LVGL against. See README.md.
+#
+# lvgl/zephyr, not zephyrproject-rtos/zephyr: that branch is Zephyr's own LVGL
+# 9.6 uprev (zephyrproject-rtos/zephyr#118808) plus the fixes it still needs.
+# A branch, not a commit, so it follows that pull request as it is rebased.
+#
+# LVGL is deliberately not a project here. It is blocklisted below and injected
+# through ZEPHYR_EXTRA_MODULES, so the code under test replaces the revision
+# Zephyr pins.
+manifest:
+  remotes:
+    - name: lvgl-zephyr-fork
+      url-base: https://github.com/lvgl
+
+  defaults:
+    remote: lvgl-zephyr-fork
+
+  projects:
+    - name: zephyr
+      repo-path: zephyr
+      revision: lvgl-9.6-compat
+      import:
+        name-blocklist:
+          - lvgl
+          - nrf_hw_models
