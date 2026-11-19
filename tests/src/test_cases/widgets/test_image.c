@@ -1182,4 +1182,82 @@ void test_image_draw_main_unknown_src_type(void)
     lv_refr_now(NULL);
 }
 
+/* Refresh the invalidated areas, then the whole screen: if the invalidation missed something, they differ. */
+static void assert_invalidated_areas_redrawn(void)
+{
+    lv_refr_now(NULL);
+    lv_draw_buf_t * buf = lv_display_get_buf_active(lv_display_get_default());
+    lv_draw_buf_t * refreshed = lv_draw_buf_dup(buf);
+    TEST_ASSERT_NOT_NULL(refreshed);
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_MEMORY(buf->data, refreshed->data, buf->header.stride * buf->header.h);
+    lv_draw_buf_destroy(refreshed);
+}
+
+void test_image_transform_in_larger_widget_invalidates_drawn_area(void)
+{
+    /* The image is drawn in its own size, centered in the widget */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &test_img_lvgl_logo_png);
+    lv_obj_set_size(img, lv_pct(100), lv_pct(100));
+    lv_image_set_scale(img, 384);
+    lv_refr_now(NULL);
+
+    for(int32_t i = 1; i <= 6; i++) {
+        lv_image_set_rotation(img, i * 300);
+        lv_image_set_scale(img, 384 - i * 32);
+        assert_invalidated_areas_redrawn();
+    }
+}
+
+void test_image_transform_in_smaller_widget_invalidates_drawn_area(void)
+{
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &test_img_lvgl_logo_png);
+    lv_obj_set_size(img, 40, 40);
+    lv_obj_center(img);
+    lv_refr_now(NULL);
+
+    for(int32_t i = 1; i <= 6; i++) {
+        lv_image_set_rotation(img, i * 300);
+        lv_image_set_scale(img, 256 + i * 32);
+        assert_invalidated_areas_redrawn();
+
+        /* The extra draw area has to hold the transformed image, centered on the widget */
+        int32_t ext = lv_obj_get_ext_draw_size(img);
+        TEST_ASSERT_GREATER_OR_EQUAL((lv_image_get_transformed_width(img) - lv_obj_get_width(img)) / 2, ext);
+        TEST_ASSERT_GREATER_OR_EQUAL((lv_image_get_transformed_height(img) - lv_obj_get_height(img)) / 2, ext);
+    }
+}
+
+void test_image_transform_offset_and_align_invalidate_drawn_area(void)
+{
+    /* Moving the transformed image in the widget grows and shrinks the extra draw size */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &test_img_lvgl_logo_png);
+    lv_obj_set_size(img, 40, 40);
+    lv_obj_center(img);
+    lv_image_set_rotation(img, 300);
+    lv_image_set_scale(img, 384);
+    lv_refr_now(NULL);
+
+    static const int32_t offsets[] = {60, 0, -60, 0};
+    for(uint32_t i = 0; i < sizeof(offsets) / sizeof(offsets[0]); i++) {
+        lv_image_set_offset_x(img, offsets[i]);
+        assert_invalidated_areas_redrawn();
+        lv_image_set_offset_y(img, offsets[i]);
+        assert_invalidated_areas_redrawn();
+    }
+
+    static const lv_image_align_t aligns[] = {
+        LV_IMAGE_ALIGN_TOP_LEFT, LV_IMAGE_ALIGN_CENTER, LV_IMAGE_ALIGN_BOTTOM_RIGHT, LV_IMAGE_ALIGN_CENTER,
+    };
+    for(uint32_t i = 0; i < sizeof(aligns) / sizeof(aligns[0]); i++) {
+        lv_image_set_inner_align(img, aligns[i]);
+        assert_invalidated_areas_redrawn();
+    }
+}
+
 #endif
