@@ -18,6 +18,13 @@ extern "C" {
 
 #if LV_USE_EVDEV
 
+/*********************
+ *      DEFINES
+ *********************/
+
+/** The evdev driver exposes its borrowed file descriptor. */
+#define LV_EVDEV_HAS_FD_GETTER 1
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -54,6 +61,15 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path);
  * @return pointer to input device or NULL if opening failed
  */
 lv_indev_t * lv_evdev_create_fd(lv_indev_type_t indev_type, int fd);
+
+/**
+ * Get the evdev file descriptor for querying device capabilities.
+ * The descriptor remains owned by the driver and is valid until the input device
+ * is deleted. The caller must not close it or change its file status flags.
+ * @param indev evdev input device @nullable
+ * @return the file descriptor, or -1 for a NULL or non-evdev input device
+ */
+int lv_evdev_get_fd(lv_indev_t * indev);
 
 /**
  * Begin automatically creating evdev indevs for all new and existing
