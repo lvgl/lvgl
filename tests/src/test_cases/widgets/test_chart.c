@@ -360,4 +360,62 @@ void test_chart_properties(void)
 #endif
 }
 
+/* Every `points_per_px` consecutive points share an X pixel: x = w * i / (cnt - 1) = i / points_per_px */
+static int32_t * crowded_line_chart_create(uint32_t points_per_px, uint32_t * cnt_out)
+{
+    lv_obj_set_size(chart, 600, 300);
+    lv_obj_center(chart);
+    lv_obj_update_layout(chart);
+
+    uint32_t cnt = lv_obj_get_content_width(chart) * points_per_px + 1;
+    lv_chart_set_point_count(chart, cnt);
+    lv_chart_series_t * ser = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_PRIMARY_Y);
+
+    *cnt_out = cnt;
+    return lv_chart_get_series_y_array(chart, ser);
+}
+
+void test_chart_crowded_line_gap(void)
+{
+    uint32_t cnt;
+    int32_t * y = crowded_line_chart_create(4, &cnt);
+
+    uint32_t i;
+    for(i = 0; i < cnt; i++) {
+        y[i] = 50 + lv_trigo_sin((int16_t)(i * 360 / 400)) * 40 / LV_TRIGO_SIN_MAX;
+    }
+
+    /*Gaps where the value before and after the gap differ a lot*/
+    uint32_t gap_start;
+    for(gap_start = 150; gap_start + 60 < cnt; gap_start += 380) {
+        for(i = gap_start; i < gap_start + 60; i++) y[i] = LV_CHART_POINT_NONE;
+    }
+    lv_chart_refresh(chart);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_crowded_line_gap.png");
+}
+
+void test_chart_crowded_line_short_run_after_gap(void)
+{
+    uint32_t cnt;
+    int32_t * y = crowded_line_chart_create(10, &cnt);
+
+    uint32_t i;
+    for(i = 0; i < cnt; i++) y[i] = 20 + lv_trigo_sin((int16_t)(i * 360 / 200)) * 5 / LV_TRIGO_SIN_MAX;
+
+    /*Short runs between two gaps, all within the X pixel where the line was last drawn*/
+    uint32_t px;
+    for(px = 25; px * 10 + 10 < cnt; px += 50) {
+        i = px * 10;
+        y[i + 1] = LV_CHART_POINT_NONE;
+        y[i + 2] = 60;
+        y[i + 3] = 90;
+        y[i + 4] = 60;
+        y[i + 5] = LV_CHART_POINT_NONE;
+    }
+    lv_chart_refresh(chart);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_crowded_line_short_run_after_gap.png");
+}
+
 #endif
