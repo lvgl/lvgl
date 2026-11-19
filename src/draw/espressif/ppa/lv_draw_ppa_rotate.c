@@ -59,6 +59,15 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
     const uint32_t out_w = (uint32_t)(swap_xy ? src_height : src_width);
     const uint32_t out_h = (uint32_t)(swap_xy ? src_width : src_height);
 
+    /*The driver invalidates whole picture rows, which can reach past the end of the
+     *destination buffer. Let the PPA write all rows but the last; the CPU writes that one.*/
+    if(out_h < 2) return LV_RESULT_INVALID;
+    const uint8_t * ppa_src = src;
+    if(rotation == LV_ROTATION_180) ppa_src += src_stride;
+    else if(rotation == LV_ROTATION_90) ppa_src += PPA_ROTATE_PX_SIZE;
+    const int32_t ppa_src_w = swap_xy ? src_width - 1 : src_width;
+    const int32_t ppa_src_h = swap_xy ? src_height : src_height - 1;
+
     /*The output buffer must start and end on a cache line, so describe the block
      *as an offset into the cache line aligned memory around it.*/
     const lv_uintptr_t align = LV_DRAW_PPA_CACHE_LINE_SIZE;
@@ -68,7 +77,7 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
     const uint32_t offset_x = (lead % out_stride) / PPA_ROTATE_PX_SIZE;
     const uint32_t offset_y = lead / out_stride;
     const uint32_t out_pic_w = out_stride / PPA_ROTATE_PX_SIZE;
-    const uint32_t out_pic_h = offset_y + out_h;
+    const uint32_t out_pic_h = offset_y + out_h - 1;
     if(offset_x + out_w > out_pic_w) return LV_RESULT_INVALID;
     const size_t out_size = LV_ALIGN_UP((size_t)out_stride * out_pic_h, align);
 
@@ -84,11 +93,11 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
 
     ppa_srm_oper_config_t oper = {
         .in = {
-            .buffer = src,
+            .buffer = ppa_src,
             .pic_w = (uint32_t)src_stride / PPA_ROTATE_PX_SIZE,
-            .pic_h = (uint32_t)src_height,
-            .block_w = (uint32_t)src_width,
-            .block_h = (uint32_t)src_height,
+            .pic_h = (uint32_t)ppa_src_h,
+            .block_w = (uint32_t)ppa_src_w,
+            .block_h = (uint32_t)ppa_src_h,
             .srm_cm = PPA_SRM_COLOR_MODE_RGB565,
         },
         .out = {
@@ -110,6 +119,14 @@ lv_result_t lv_draw_ppa_rotate(const void * src, void * dst, int32_t src_width, 
     if(ret != ESP_OK) {
         LV_LOG_WARN("PPA rotate failed: %d", ret);
         return LV_RESULT_INVALID;
+    }
+
+    uint16_t * last = (uint16_t *)((uint8_t *)dst + (size_t)dst_stride * (out_h - 1));
+    const uint8_t * s = src;
+    for(int32_t i = 0; i < (int32_t)out_w; i++) {
+        if(rotation == LV_ROTATION_180) last[out_w - 1 - i] = ((const uint16_t *)s)[i];
+        else if(rotation == LV_ROTATION_90) last[i] = *(const uint16_t *)(s + (size_t)src_stride * i);
+        else last[out_w - 1 - i] = *(const uint16_t *)(s + (size_t)src_stride * i + (size_t)(src_width - 1) * 2);
     }
     return LV_RESULT_OK;
 }
