@@ -79,6 +79,7 @@
 #include "draw/sw/blend/lv_draw_sw_blend_to_a8.h"
 #include "draw/sw/blend/lv_draw_sw_blend_to_al88.h"
 #include "draw/sw/blend/lv_draw_sw_blend_to_argb8888.h"
+#include "draw/sw/blend/lv_draw_sw_blend_to_abgr8888.h"
 #include "draw/sw/blend/lv_draw_sw_blend_to_argb8888_premultiplied.h"
 #include "draw/sw/blend/lv_draw_sw_blend_to_i1.h"
 #include "draw/sw/blend/lv_draw_sw_blend_to_l8.h"
