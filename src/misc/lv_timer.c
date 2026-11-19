@@ -27,6 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool lv_timer_exec(lv_timer_t * timer);
+static lv_timer_t * lv_timer_create_internal(lv_timer_cb_t timer_cb, uint32_t period, void * user_data);
 static uint32_t lv_timer_time_remaining(lv_timer_t * timer);
 static void lv_timer_handler_resume(void);
 
@@ -75,6 +76,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     LV_PROFILER_TIMER_BEGIN;
     lv_lock();
 
+    state_p->handler_cycle = !state_p->handler_cycle;
     uint32_t handler_start = lv_tick_get();
 
     if(handler_start == 0) {
@@ -167,29 +169,21 @@ lv_timer_t * lv_timer_create_basic(void)
 
 lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data)
 {
-    lv_timer_t * new_timer = NULL;
+    lv_timer_t * timer = lv_timer_create_internal(timer_xcb, period, user_data);
+    if(timer != NULL) lv_timer_handler_resume();
+    return timer;
+}
 
-    new_timer = lv_ll_ins_head(timer_ll_p);
-    LV_ASSERT_MALLOC(new_timer);
-    if(new_timer == NULL) return NULL;
+lv_result_t lv_timer_create_deferred(lv_timer_cb_t timer_cb, void * user_data)
+{
+    lv_timer_t * timer = lv_timer_create_internal(timer_cb, 0, user_data);
+    if(timer == NULL) return LV_RESULT_INVALID;
 
-    new_timer->period = period;
-    new_timer->timer_cb = timer_xcb;
-    new_timer->repeat_count = -1;
-    new_timer->paused = 0;
-    new_timer->last_run = lv_tick_get();
-    new_timer->user_data = user_data;
-    new_timer->auto_delete = true;
-#if LV_USE_EXT_DATA
-    new_timer->ext_data.free_cb = NULL;
-    new_timer->ext_data.data = NULL;
-#endif
-
-    state.timer_created = true;
-
+    timer->repeat_count = 1;
+    timer->deferred = true;
+    timer->defer_cycle = state.handler_cycle;
     lv_timer_handler_resume();
-
-    return new_timer;
+    return LV_RESULT_OK;
 }
 
 void lv_timer_set_cb(lv_timer_t * timer, lv_timer_cb_t timer_cb)
@@ -331,6 +325,32 @@ void lv_timer_set_external_data(lv_timer_t * timer, void * data, void (* free_cb
  *   STATIC FUNCTIONS
  **********************/
 
+static lv_timer_t * lv_timer_create_internal(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data)
+{
+    lv_timer_t * new_timer = lv_ll_ins_head(timer_ll_p);
+
+    LV_ASSERT_MALLOC(new_timer);
+    if(new_timer == NULL) return NULL;
+
+    new_timer->period = period;
+    new_timer->timer_cb = timer_xcb;
+    new_timer->repeat_count = -1;
+    new_timer->paused = 0;
+    new_timer->last_run = lv_tick_get();
+    new_timer->user_data = user_data;
+    new_timer->auto_delete = true;
+    new_timer->deferred = false;
+    new_timer->defer_cycle = false;
+#if LV_USE_EXT_DATA
+    new_timer->ext_data.free_cb = NULL;
+    new_timer->ext_data.data = NULL;
+#endif
+
+    state.timer_created = true;
+
+    return new_timer;
+}
+
 /**
  * Execute timer if its remaining time is zero
  * @param timer pointer to lv_timer
@@ -338,6 +358,12 @@ void lv_timer_set_external_data(lv_timer_t * timer, void * data, void (* free_cb
  */
 static bool lv_timer_exec(lv_timer_t * timer)
 {
+    /* Restarts of the scan keep the same cycle. Clear the deferral before
+     * checking paused timers so it cannot become active again on a later cycle. */
+    if(timer->deferred) {
+        if(timer->defer_cycle == state.handler_cycle) return false;
+        timer->deferred = false;
+    }
     if(timer->paused) return false;
 
     bool exec = false;

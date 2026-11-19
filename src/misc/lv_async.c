@@ -51,19 +51,13 @@ lv_result_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
     if(info == NULL)
         return LV_RESULT_INVALID;
 
-    /*Create a new timer*/
-    lv_timer_t * timer = lv_timer_create(lv_async_timer_cb, 0, info);
-
-    if(timer == NULL) {
-        lv_free(info);
-        return LV_RESULT_INVALID;
-    }
-
     info->cb = async_xcb;
     info->user_data = user_data;
-
-    lv_timer_set_repeat_count(timer, 1);
-    return LV_RESULT_OK;
+    lv_result_t result = lv_timer_create_deferred(lv_async_timer_cb, info);
+    if(result != LV_RESULT_OK) {
+        lv_free(info);
+    }
+    return result;
 }
 
 lv_result_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data)

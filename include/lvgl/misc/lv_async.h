@@ -34,8 +34,8 @@ typedef void (*lv_async_cb_t)(void *);
  **********************/
 
 /**
- * Call an asynchronous function the next time lv_timer_handler() is run. This function is likely to return
- * **before** the call actually happens!
+ * Call an asynchronous function the next time lv_timer_handler() is run.
+ * A call scheduled from inside lv_timer_handler() waits for the following invocation.
  * @param async_xcb a callback which is the task itself.
  *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
  *                  the `func_name(object, callback, ...)` convention)
