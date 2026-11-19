@@ -174,11 +174,11 @@ LVGL은 외부 의존성이 없어서 어떤 장치에서든 손쉽게 컴파일
 
 ### 사전 통합됨
 
-- **칩 벤더**: [ESP32](https://components.espressif.com/components/lvgl/lvgl), [NXP MCUXpresso 컴포넌트](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY), [Renesas FSP](https://lvgl.io/docs/open/integration/chip/renesas), [STM32](https://lvgl.io/docs/open/integration/chip/stm32)
+- **칩 벤더**: [ESP32](https://components.espressif.com/components/lvgl/lvgl), [NXP MCUXpresso 컴포넌트](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY), [Renesas FSP](https://lvgl.io/docs/open/integration/chip_vendors/renesas), [STM32](https://lvgl.io/docs/open/integration/chip_vendors/stm32)
 
-- **RTOS**: [Zephyr](https://lvgl.io/docs/open/integration/os/zephyr), [NuttX](https://lvgl.io/docs/open/integration/os/nuttx), [RT-Thread](https://lvgl.io/docs/open/integration/os/rt-thread)
+- **RTOS**: [Zephyr](https://lvgl.io/docs/open/integration/rtos/zephyr), [NuttX](https://lvgl.io/docs/open/integration/rtos/nuttx), [RT-Thread](https://lvgl.io/docs/open/integration/rtos/rt-thread)
 
-- **프레임워크**: [Arduino](https://lvgl.io/docs/open/integration/framework/arduino), [PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl), [CMSIS-Pack](https://lvgl.io/docs/open/integration/framework/cmsis-pack)
+- **프레임워크**: [Arduino](https://lvgl.io/docs/open/integration/frameworks/arduino), [PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl), [CMSIS-Pack](https://lvgl.io/docs/open/integration/framework/cmsis-pack)
 
 - **보드 제조사**: [Seeed Studio](https://www.seeedstudio.com), [Elecrow](https://www.elecrow.com/display/esp-hmi-display.html), [Riverdi](https://lvgl.io/docs/open/integration/boards/manufacturers/riverdi), [VIEWE](https://lvgl.io/docs/open/integration/boards/manufacturers/viewe), 그리고 [그 외 다수](https://lvgl.io/boards)
 

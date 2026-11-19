@@ -163,11 +163,11 @@ LVGLには外部依存関係がないため、あらゆるデバイス向けに�
 
 ### 事前統合済み
 
-- **チップベンダー**: [ESP32](https://components.espressif.com/components/lvgl/lvgl)、[NXP MCUXpressoコンポーネント](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)、[Renesas FSP](https://lvgl.io/docs/open/integration/chip/renesas)、[STM32](https://lvgl.io/docs/open/integration/chip/stm32)
+- **チップベンダー**: [ESP32](https://components.espressif.com/components/lvgl/lvgl)、[NXP MCUXpressoコンポーネント](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)、[Renesas FSP](https://lvgl.io/docs/open/integration/chip_vendors/renesas)、[STM32](https://lvgl.io/docs/open/integration/chip_vendors/stm32)
 
-- **RTOS**: [Zephyr](https://lvgl.io/docs/open/integration/os/zephyr)、[NuttX](https://lvgl.io/docs/open/integration/os/nuttx)、[RT-Thread](https://lvgl.io/docs/open/integration/os/rt-thread)
+- **RTOS**: [Zephyr](https://lvgl.io/docs/open/integration/rtos/zephyr)、[NuttX](https://lvgl.io/docs/open/integration/rtos/nuttx)、[RT-Thread](https://lvgl.io/docs/open/integration/rtos/rt-thread)
 
-- **フレームワーク**: [Arduino](https://lvgl.io/docs/open/integration/framework/arduino)、[PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl)、[CMSIS-Pack](https://lvgl.io/docs/open/integration/framework/cmsis-pack)
+- **フレームワーク**: [Arduino](https://lvgl.io/docs/open/integration/frameworks/arduino)、[PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl)、[CMSIS-Pack](https://lvgl.io/docs/open/integration/framework/cmsis-pack)
 
 - **ボードメーカー**: [Seeed Studio](https://www.seeedstudio.com)、[Elecrow](https://www.elecrow.com/display/esp-hmi-display.html)、[Riverdi](https://lvgl.io/docs/open/integration/boards/manufacturers/riverdi)、[VIEWE](https://lvgl.io/docs/open/integration/boards/manufacturers/viewe)、[その他多数](https://lvgl.io/boards)
 

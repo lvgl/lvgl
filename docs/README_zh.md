@@ -163,11 +163,11 @@ LVGL 没有任何外部依赖，因此可以轻松地为任何设备编译。它
 
 ### 预集成
 
-- **芯片厂商**：[ESP32](https://components.espressif.com/components/lvgl/lvgl)、[NXP MCUXpresso 组件](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)、[Renesas FSP](https://lvgl.io/docs/open/integration/chip/renesas)、[STM32](https://lvgl.io/docs/open/integration/chip/stm32)
+- **芯片厂商**：[ESP32](https://components.espressif.com/components/lvgl/lvgl)、[NXP MCUXpresso 组件](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)、[Renesas FSP](https://lvgl.io/docs/open/integration/chip_vendors/renesas)、[STM32](https://lvgl.io/docs/open/integration/chip_vendors/stm32)
 
-- **RTOS**：[Zephyr](https://lvgl.io/docs/open/integration/os/zephyr)、[NuttX](https://lvgl.io/docs/open/integration/os/nuttx)、[RT-Thread](https://lvgl.io/docs/open/integration/os/rt-thread)
+- **RTOS**：[Zephyr](https://lvgl.io/docs/open/integration/rtos/zephyr)、[NuttX](https://lvgl.io/docs/open/integration/rtos/nuttx)、[RT-Thread](https://lvgl.io/docs/open/integration/rtos/rt-thread)
 
-- **框架**：[Arduino](https://lvgl.io/docs/open/integration/framework/arduino)、[PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl)、[CMSIS-Pack](https://lvgl.io/docs/open/integration/framework/cmsis-pack)
+- **框架**：[Arduino](https://lvgl.io/docs/open/integration/frameworks/arduino)、[PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl)、[CMSIS-Pack](https://lvgl.io/docs/open/integration/framework/cmsis-pack)
 
 - **开发板制造商**：[Seeed Studio](https://www.seeedstudio.com)、[Elecrow](https://www.elecrow.com/display/esp-hmi-display.html)、[Riverdi](https://lvgl.io/docs/open/integration/boards/manufacturers/riverdi)、[VIEWE](https://lvgl.io/docs/open/integration/boards/manufacturers/viewe)，以及[更多](https://lvgl.io/boards)
 
