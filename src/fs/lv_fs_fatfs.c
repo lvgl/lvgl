@@ -103,7 +103,7 @@ static void fs_init(void)
  * @param drv   pointer to a driver where this function belongs
  * @param path  path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
  * @param mode  read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
- *              FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
+ *              FS_MODE_CREATE or FS_MODE_TRUNC can be added to FS_MODE_WR to create/truncate the file
  * @return pointer to FIL struct or NULL in case of fail
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -113,11 +113,14 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     uint8_t flags = 0;
 
     const bool trunc = (mode & LV_FS_MODE_TRUNC) != 0;
-    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~LV_FS_MODE_TRUNC);
+    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~(LV_FS_MODE_TRUNC | LV_FS_MODE_CREATE));
 
     if(rw_mode == LV_FS_MODE_WR) flags = FA_WRITE | FA_OPEN_ALWAYS;
     else if(rw_mode == LV_FS_MODE_RD) flags = FA_READ;
     else if(rw_mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = FA_READ | FA_WRITE | FA_OPEN_ALWAYS;
+
+    /*FS_MODE_CREATE needs no extra flag: FA_OPEN_ALWAYS above already creates the file if it's missing
+     *and keeps its content otherwise.*/
 
     /*FA_CREATE_ALWAYS creates a new file or truncates the existing one to 0 bytes*/
     if(trunc && (rw_mode & LV_FS_MODE_WR)) {

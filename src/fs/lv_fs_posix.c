@@ -105,7 +105,7 @@ void lv_fs_posix_init(void)
  * @param drv   pointer to a driver where this function belongs
  * @param path  path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
  * @param mode  read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
- *              FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
+ *              FS_MODE_CREATE or FS_MODE_TRUNC can be added to FS_MODE_WR to create/truncate the file
  * @return a file handle or -1 in case of fail
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -114,13 +114,15 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     LV_UNUSED(drv);
 
     const bool trunc = (mode & LV_FS_MODE_TRUNC) != 0;
-    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~LV_FS_MODE_TRUNC);
+    const bool create = (mode & LV_FS_MODE_CREATE) != 0;
+    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~(LV_FS_MODE_TRUNC | LV_FS_MODE_CREATE));
 
     int flags = 0;
     if(rw_mode == LV_FS_MODE_WR) flags = O_WRONLY | O_CREAT;
     else if(rw_mode == LV_FS_MODE_RD) flags = O_RDONLY;
     else if(rw_mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = O_RDWR | O_CREAT;
 
+    if(create && (rw_mode & LV_FS_MODE_WR)) flags |= O_CREAT;
     if(trunc && (rw_mode & LV_FS_MODE_WR)) flags |= O_TRUNC;
 
     /*Make the path relative to the current directory (the projects root folder)*/

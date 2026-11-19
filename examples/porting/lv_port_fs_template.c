@@ -100,7 +100,7 @@ static void fs_init(void)
  * @param drv       pointer to a driver where this function belongs
  * @param path      path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
  * @param mode      read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
- *                  FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
+ *                  FS_MODE_CREATE or FS_MODE_TRUNC can be added to FS_MODE_WR to create/truncate the file
  * @return          a file descriptor or NULL on error
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -109,13 +109,15 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     void * f = NULL;
 
-    /*FS_MODE_TRUNC is a modifier: it's always combined with FS_MODE_WR (checked by `lv_fs_open`).
-     *Strip it to get the plain read/write mode.*/
+    /*FS_MODE_CREATE and FS_MODE_TRUNC are modifiers: they're always combined with FS_MODE_WR
+     *(checked by `lv_fs_open`). Strip them to get the plain read/write mode.*/
+    bool create = (mode & LV_FS_MODE_CREATE) != 0;
     bool trunc = (mode & LV_FS_MODE_TRUNC) != 0;
-    lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~LV_FS_MODE_TRUNC);
+    lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~(LV_FS_MODE_CREATE | LV_FS_MODE_TRUNC));
 
     if(rw_mode == LV_FS_MODE_WR) {
         /*Open a file for write.
+         *If `create` is true create the file if it doesn't exist and keep its content if it does.
          *If `trunc` is true create the file if it doesn't exist and truncate it to 0 bytes if it does*/
         f = ...         /*Add your code here*/
     }
@@ -125,6 +127,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     }
     else if(rw_mode == ((lv_fs_mode_t)(LV_FS_MODE_WR | LV_FS_MODE_RD))) {
         /*Open a file for read and write.
+         *If `create` is true create the file if it doesn't exist and keep its content if it does.
          *If `trunc` is true create the file if it doesn't exist and truncate it to 0 bytes if it does*/
         f = ...         /*Add your code here*/
     }
