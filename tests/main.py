@@ -77,7 +77,7 @@ test_options = {
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests"],
     },
     "OPTIONS_TEST_DEFHEAP": {
-        "description": "Test config, LVGL heap, 32 bit color depth",
+        "description": "Test config, LVGL heap, 32 bit color depth, TJpgDec RGB565 output",
         "defconfigs": [
             "full",
             "depth_32",
@@ -85,6 +85,7 @@ test_options = {
             "builtin_heap",
             "defheap",
             "run_tests",
+            "tjpgd_rgb565",
         ],
     },
     "OPTIONS_TEST_PUBLIC_API": {

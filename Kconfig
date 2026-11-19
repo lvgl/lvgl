@@ -1596,6 +1596,15 @@ config LV_USE_TJPGD
 	help
 		Also decodes split JPEG, a custom format optimized for embedded systems.
 
+config LV_TJPGD_OUTPUT_RGB565
+	bool "Decode JPEG to RGB565"
+	depends on LV_USE_TJPGD
+	default n
+	help
+		Output RGB565 instead of RGB888 from the TJpgDec decoder.
+		Uses 2 bytes per pixel instead of 3 for decoded images, which
+		suits RGB565 displays, at the cost of color precision.
+
 config LV_USE_LIBJPEG_TURBO
 	bool "JPEG decoder (libjpeg-turbo)"
 	help
