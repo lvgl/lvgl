@@ -894,7 +894,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
                 }
 
                 if(mask_buf == NULL && opa >= LV_OPA_MAX) {
-                    dest_buf_u16[dest_x] = res;
+                    dest_buf_u16[dest_x] = lv_color_swap_16(res);
                 }
                 else if(mask_buf == NULL && opa < LV_OPA_MAX) {
                     dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_16_16_mix_inlined(res, dest_buf_u16[dest_x], opa));
