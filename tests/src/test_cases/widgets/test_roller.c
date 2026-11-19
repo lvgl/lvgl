@@ -168,6 +168,12 @@ void test_roller_set_selected_option_str(void)
 
     /* Make sure that the selection did not change */
     TEST_ASSERT_EQUAL(1, lv_roller_get_selected(roller));
+
+    /* The last option has no trailing '\n' but must still be selectable */
+    selected = lv_roller_set_selected_str(roller, "Three", LV_ANIM_OFF);
+    TEST_ASSERT_TRUE(selected);
+
+    TEST_ASSERT_EQUAL(2, lv_roller_get_selected(roller));
 }
 
 void test_roller_keypad_events(void)

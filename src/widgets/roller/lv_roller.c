@@ -228,6 +228,14 @@ bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_en
         }
     }
 
+    /*The last option is not terminated by '\n', so it is not checked in the loop above*/
+    if(!option_found && line_start < options_len) {
+        if(lv_strncmp(&options[line_start], sel_opt, options_len - line_start) == 0) {
+            lv_roller_set_selected(obj, current_option, anim);
+            option_found = true;
+        }
+    }
+
     return option_found;
 }
 
