@@ -2151,6 +2151,21 @@
 
             </component>
 
+            <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="FreeRTOS+FAT" condition="LVGL-Essential">
+              <description>Add API for FreeRTOS+FAT (needs to be added separately).</description>
+              <files>
+                <!-- src/fs/ -->
+                <file category="sourceC"    name="src/fs/lv_fs_freertos_fat.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable FreeRTOS+FAT support */
+#define LV_USE_FS_FREERTOS_FAT  1
+              </RTE_Components_h>
+
+            </component>
+
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="Memory-Mapped Files" isDefaultVariant="true" condition="LVGL-Essential">
               <description>Add API for memory-mapped file access.</description>
               <files>

@@ -3875,6 +3875,38 @@
     #endif
 #endif
 
+#ifndef LV_USE_FS_FREERTOS_FAT
+    #ifdef CONFIG_LV_USE_FS_FREERTOS_FAT
+        #define LV_USE_FS_FREERTOS_FAT CONFIG_LV_USE_FS_FREERTOS_FAT
+    #else
+        #define LV_USE_FS_FREERTOS_FAT 0
+    #endif
+#endif
+
+#ifndef LV_FS_FREERTOS_FAT_LETTER
+    #ifdef CONFIG_LV_FS_FREERTOS_FAT_LETTER
+        #define LV_FS_FREERTOS_FAT_LETTER CONFIG_LV_FS_FREERTOS_FAT_LETTER
+    #else
+        #define LV_FS_FREERTOS_FAT_LETTER 0
+    #endif
+#endif
+
+#ifndef LV_FS_FREERTOS_FAT_PATH
+    #ifdef CONFIG_LV_FS_FREERTOS_FAT_PATH
+        #define LV_FS_FREERTOS_FAT_PATH CONFIG_LV_FS_FREERTOS_FAT_PATH
+    #else
+        #define LV_FS_FREERTOS_FAT_PATH ""
+    #endif
+#endif
+
+#ifndef LV_FS_FREERTOS_FAT_CACHE_SIZE
+    #ifdef CONFIG_LV_FS_FREERTOS_FAT_CACHE_SIZE
+        #define LV_FS_FREERTOS_FAT_CACHE_SIZE CONFIG_LV_FS_FREERTOS_FAT_CACHE_SIZE
+    #else
+        #define LV_FS_FREERTOS_FAT_CACHE_SIZE 0
+    #endif
+#endif
+
 #ifndef LV_USE_FS_LITTLEFS
     #ifdef CONFIG_LV_USE_FS_LITTLEFS
         #define LV_USE_FS_LITTLEFS CONFIG_LV_USE_FS_LITTLEFS
