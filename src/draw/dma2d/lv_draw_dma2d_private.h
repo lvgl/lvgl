@@ -24,6 +24,11 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#ifdef DMA2D_IER_TCIE
+#define LV_DRAW_DMA2D_IS_CHROM_ART2 1
+#else
+#define LV_DRAW_DMA2D_IS_CHROM_ART2 0
+#endif
 
 #if LV_USE_DRAW_DMA2D_INTERRUPT && LV_USE_OS
 #define LV_DRAW_DMA2D_ASYNC 1
