@@ -1293,6 +1293,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
 
         int32_t i;
         int32_t valid_point_cnt = 0;
+        bool points_seeded = false;
         int32_t point_cnt = chart->point_cnt;
         for(i = 0; i <= point_cnt; i++) {
             int32_t p_x = ((w * i) / (point_cnt - 1)) + x_ofs;
@@ -1321,9 +1322,12 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
                 else {
                     scaled_points[2].x = p_x;
                     scaled_points[2].y = value_to_y_unclamped(ser->y_points[p_next], min_v, max_v, y_ofs, h);
-                    if(i == 0) {
+                    /*Not `i == 0`: points left of the clip area and leading LV_CHART_POINT_NONE values
+                     *are skipped, and the slope must not be taken from uninitialized neighbors*/
+                    if(!points_seeded) {
                         scaled_points[0] = scaled_points[2];
                         scaled_points[1] = scaled_points[2];
+                        points_seeded = true;
                     }
 
                     if((scaled_points[2].y >= scaled_points[1].y && scaled_points[1].y >= scaled_points[0].y) ||
