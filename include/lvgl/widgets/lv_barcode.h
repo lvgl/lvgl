@@ -40,12 +40,12 @@ typedef enum {
 } lv_barcode_encoding_t;
 
 /**
- * Controls when a change is turned into a new barcode bitmap. Applies to the data too.
- * The colors are always a palette-only write, so they are never affected.
+ * When a change generates the barcode bitmap again. Applies to the text too.
+ * A color change only writes the palette.
  */
 typedef enum {
-    LV_BARCODE_UPDATE_MODE_IMMEDIATE = 0,   /**< Re-generate as soon as a property changes (default) */
-    LV_BARCODE_UPDATE_MODE_DEFERRED,        /**< Only mark the bitmap out of date and re-generate once, on the next redraw */
+    LV_BARCODE_UPDATE_MODE_IMMEDIATE = 0,   /**< Generate in the setter (default) */
+    LV_BARCODE_UPDATE_MODE_DEFERRED,        /**< Only mark the bitmap as out of date */
 } lv_barcode_update_mode_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_barcode_class;
@@ -64,8 +64,8 @@ lv_obj_t * lv_barcode_create(lv_obj_t * parent);
 
 /**
  * Set the dark color of a barcode object.
- * Only rewrites the palette, so it takes effect before or after the data and never
- * regenerates the bars.
+ * Only writes the palette. It does not generate the bars again.
+ * You can call this before or after `lv_barcode_set_text()`.
  * @param obj pointer to barcode object
  * @param color dark color of the barcode
  */
@@ -73,8 +73,8 @@ void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color_t color);
 
 /**
  * Set the light color of a barcode object.
- * Only rewrites the palette, so it takes effect before or after the data and never
- * regenerates the bars.
+ * Only writes the palette. It does not generate the bars again.
+ * You can call this before or after `lv_barcode_set_text()`.
  * @param obj pointer to barcode object
  * @param color light color of the barcode
  */
@@ -82,7 +82,7 @@ void lv_barcode_set_light_color(lv_obj_t * obj, lv_color_t color);
 
 /**
  * Set the scale of a barcode object, i.e. the pixel width of a single bar.
- * The stored data is re-generated, so this may be called before or after the data.
+ * Generates the bars again. You can call this before or after `lv_barcode_set_text()`.
  * @param obj pointer to barcode object
  * @param scale scale factor; must be at least 1
  */
@@ -90,7 +90,7 @@ void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale);
 
 /**
  * Set the direction of a barcode object.
- * The stored data is re-generated, so this may be called before or after the data.
+ * Generates the bars again. You can call this before or after `lv_barcode_set_text()`.
  * @param obj pointer to barcode object
  * @param direction draw direction (`LV_DIR_HOR` or `LV_DIR_VER`)
  */
@@ -98,7 +98,7 @@ void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction);
 
 /**
  * Set the tiled mode of a barcode object.
- * The stored data is re-generated, so this may be called before or after the data.
+ * Generates the bars again. You can call this before or after `lv_barcode_set_text()`.
  * @param obj pointer to barcode object
  * @param tiled true: tiled mode, false: normal mode (default)
  */
@@ -106,65 +106,79 @@ void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled);
 
 /**
  * Set the encoding of a barcode object.
- * The stored data is re-generated, so this may be called before or after the data.
+ * Generates the bars again. You can call this before or after `lv_barcode_set_text()`.
  * @param obj pointer to barcode object
  * @param encoding encoding (default is `LV_BARCODE_ENCODING_CODE128_GS1`)
  */
 void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding);
 
 /**
- * Set the data of a barcode object and generate the bitmap.
- * A copy is stored, so a later property change or resize can regenerate it; the properties
- * may be set before or after the data, in any order.
- * @note Obeys the update mode. In DEFERRED the canvas is only resized here, so the return
- *       value reports that resize, not the bars.
+ * Set the text to encode and generate the bitmap.
+ * The Widget keeps a copy, so a property change or a resize can generate the bars again.
+ * You can set the properties before or after the text, in any order.
+ * @note Obeys the update mode. In deferred mode, this function only resizes the canvas.
+ *       The return value is then the result of the resize.
  * @param obj  pointer to barcode object
- * @param data data to display as a NUL terminated string
+ * @param text text to encode, as a non-empty NUL terminated string
  * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error
  */
-lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data);
+lv_result_t lv_barcode_set_text(lv_obj_t * obj, const char * text);
 
 /**
- * (Re)generate the barcode bitmap from the stored data, whether or not anything changed.
- * Needs no data argument, which is how deferred changes are applied.
+ * Get the text set with `lv_barcode_set_text()`.
  * @param obj pointer to barcode object
- * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error (e.g. no data set, or
+ * @return the text, or NULL if no text is set. The barcode object owns the string.
+ *         The next `lv_barcode_set_text()` makes the pointer invalid.
+ */
+const char * lv_barcode_get_text(lv_obj_t * obj);
+
+/**
+ * Generate the bitmap from the stored text. The bitmap is always generated again.
+ * In deferred mode, call this after you set the properties.
+ * @param obj pointer to barcode object
+ * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error (e.g. no text set, or
  *         the bars do not fit the current object size)
  */
 lv_result_t lv_barcode_render(lv_obj_t * obj);
 
 /**
- * Set when a change is turned into a new barcode bitmap. Applies to the data and to the
- * scale, direction, tiled mode and encoding; the colors are never affected.
- * @note Only the fill is deferred. The canvas is resized in the setter in both modes,
- *       because the draw pass cannot reallocate it.
- * @note Deferred mode expects an explicit `lv_barcode_render()`, which returns the result.
- *       Forgetting it still gives the right bitmap, but the redraw does the work and warns,
- *       and no caller is left to see a failure.
- * @note Switching back to IMMEDIATE while out of date also regenerates, but this returns
- *       void, so a failure is only logged. Render first to get the result.
+ * Set when a change generates the barcode bitmap again. Applies to the text, the scale,
+ * the direction, the tiled mode and the encoding. A color change only writes the palette.
+ * LV_BARCODE_UPDATE_MODE_IMMEDIATE (the default) generates the bitmap in the setter.
+ * LV_BARCODE_UPDATE_MODE_DEFERRED only marks the bitmap as out of date.
+ * @note Only the fill of the bars is deferred. The setter resizes the canvas in both
+ *       modes, because the redraw cannot reallocate it.
+ * @note In deferred mode, call `lv_barcode_render()` after you set the properties.
+ *       If you do not, the next redraw generates the bitmap and logs a warning. A failure
+ *       in the redraw is only logged.
+ * @note A switch to LV_BARCODE_UPDATE_MODE_IMMEDIATE generates a bitmap that is out of
+ *       date and logs a warning. This function cannot return the result. To get it, call
+ *       `lv_barcode_render()` before you switch the mode.
  * @param obj  pointer to barcode object
  * @param mode the mode to use
  */
 void lv_barcode_set_update_mode(lv_obj_t * obj, lv_barcode_update_mode_t mode);
 
 /**
- * Get when a property change is turned into a new barcode bitmap.
+ * Get when a change generates the barcode bitmap again.
  * @param obj pointer to barcode object
  * @return the update mode currently in use
  */
 lv_barcode_update_mode_t lv_barcode_get_update_mode(lv_obj_t * obj);
 
 /**
- * Check whether the bitmap is free of a known generation failure. `lv_barcode_render()`, and
- * `lv_barcode_update()` in IMMEDIATE mode, return their result directly; the rest cannot -
- * they run in a void setter, the resize handler, or a deferred fill in the draw pass. Use
- * this for those, e.g. after shrinking the object below the size its data needs.
- * @note A failure is not retried every redraw; only a change makes the Widget try again.
+ * Check if the last generation of the bitmap failed. Use this after a property change,
+ * after a resize, or after a redraw in LV_BARCODE_UPDATE_MODE_DEFERRED. These generations
+ * cannot return a result. `lv_barcode_render()` returns its result, and so does
+ * `lv_barcode_set_text()` in LV_BARCODE_UPDATE_MODE_IMMEDIATE.
+ * @note The Widget does not retry a failed generation on each redraw. The next change of
+ *       the text, the scale, the direction, the tiled mode or the encoding, or a resize,
+ *       starts a new attempt.
  * @param obj pointer to barcode object
- * @return true: no generation attempt is known to have failed. A change re-arms the Widget,
- *               so this is also true while a deferred regeneration is still pending;
- *         false: the last generation attempt failed, or no data has been set yet
+ * @return true: no generation failed since the last change of the text or a property,
+ *               or the last resize.
+ *               This is also true while a deferred generation is pending;
+ *         false: the last generation failed, or no text is set
  */
 bool lv_barcode_is_render_valid(lv_obj_t * obj);
 
