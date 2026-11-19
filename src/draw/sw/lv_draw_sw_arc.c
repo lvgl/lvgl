@@ -21,6 +21,8 @@
 static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_area, const lv_area_t * circle_area,
                        lv_opa_t * mask_buf,  int32_t width);
 static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, lv_area_t * res_area);
+static const uint8_t * set_blend_src(lv_draw_sw_blend_dsc_t * blend_dsc, const lv_draw_buf_t * decoded,
+                                     const lv_area_t * src_area);
 
 static inline lv_opa_t * allocate_circle_mask(const lv_draw_arc_dsc_t * dsc, int32_t start_angle, int32_t  end_angle,
                                               uint32_t width, lv_area_t * out_round_area_1, lv_area_t * out_round_area_2);
@@ -143,29 +145,48 @@ void lv_draw_sw_arc(lv_layer_t * layer, const lv_area_t * clip_area, const lv_dr
 
     const uint8_t * img_mask = NULL;
     lv_image_decoder_dsc_t decoder_dsc;
+    bool img_streamed = false;          /*The image is read line by line via `lv_image_decoder_get_area`*/
+    lv_area_t img_decode_area = {0};    /*The area to decode relative to the image*/
+    lv_area_t img_decoded_area = {0};   /*The last decoded area relative to the image*/
+    lv_area_t img_row_area = {0};       /*The last decoded area in absolute coordinates*/
     if(dsc->img_src == NULL) {
         blend_dsc.color = dsc->color;
     }
     else {
         res = lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
-        if(res == LV_RESULT_INVALID || decoder_dsc.decoded == NULL) {
+        if(res == LV_RESULT_OK && decoder_dsc.decoded == NULL && decoder_dsc.decoder->get_area_cb) {
+            /*The decoder didn't decode the whole image, it needs to be read via get_area_cb*/
+            img_streamed = true;
+        }
+
+        if(res == LV_RESULT_INVALID || (decoder_dsc.decoded == NULL && !img_streamed)) {
             LV_LOG_WARN("Can't decode the background image");
             blend_dsc.color = dsc->color;
         }
         else {
+            const lv_image_header_t * header = img_streamed ? &decoder_dsc.header : &decoder_dsc.decoded->header;
             img_area.x1 = 0;
             img_area.y1 = 0;
-            img_area.x2 = decoder_dsc.decoded->header.w - 1;
-            img_area.y2 = decoder_dsc.decoded->header.h - 1;
-            int32_t ofs = decoder_dsc.decoded->header.w / 2;
-            lv_area_move(&img_area, dsc->center.x - ofs, dsc->center.y - ofs);
-            blend_dsc.src_area = &img_area;
-            blend_dsc.src_buf = decoder_dsc.decoded->data;
-            blend_dsc.src_stride = decoder_dsc.decoded->header.stride;
-            blend_dsc.src_color_format = decoder_dsc.decoded->header.cf;
-            if(blend_dsc.src_color_format == LV_COLOR_FORMAT_RGB565A8) {
-                blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
-                img_mask = (uint8_t *)blend_dsc.src_buf + blend_dsc.src_stride * lv_area_get_height(blend_dsc.src_area);
+            img_area.x2 = header->w - 1;
+            img_area.y2 = header->h - 1;
+            lv_area_move(&img_area, dsc->center.x - header->w / 2, dsc->center.y - header->h / 2);
+
+            if(img_streamed) {
+                /*Decode only the visible part of the image. Nothing to blend if there is no such part*/
+                if(lv_area_intersect(&img_decode_area, &clipped_area, &img_area)) {
+                    lv_area_move(&img_decode_area, -img_area.x1, -img_area.y1);
+                }
+                else {
+                    img_streamed = false;
+                    blend_dsc.opa = LV_OPA_TRANSP;
+                }
+                img_decoded_area.x1 = LV_COORD_MIN;
+                img_decoded_area.y1 = LV_COORD_MIN;
+                img_decoded_area.x2 = LV_COORD_MIN;
+                img_decoded_area.y2 = LV_COORD_MIN;
+            }
+            else {
+                img_mask = set_blend_src(&blend_dsc, decoder_dsc.decoded, &img_area);
             }
         }
     }
@@ -182,6 +203,30 @@ void lv_draw_sw_arc(lv_layer_t * layer, const lv_area_t * clip_area, const lv_dr
 
     blend_area.y2 = blend_area.y1;
     for(h = 0; h < blend_h; h++) {
+        if(img_streamed) {
+            /*Read the next line of the image. Rows outside of the image are not blended.*/
+            blend_dsc.src_buf = NULL;
+            img_mask = NULL;
+            int32_t img_y = blend_area.y1 - img_area.y1;
+            if(img_y >= img_decode_area.y1 && img_y <= img_decode_area.y2) {
+                if(lv_image_decoder_get_area(&decoder_dsc, &img_decode_area, &img_decoded_area) == LV_RESULT_OK) {
+                    img_row_area = img_decoded_area;
+                    lv_area_move(&img_row_area, img_area.x1, img_area.y1);
+                    img_mask = set_blend_src(&blend_dsc, decoder_dsc.decoded, &img_row_area);
+                }
+                else {
+                    img_streamed = false;   /*Stop reading the image*/
+                    blend_dsc.opa = LV_OPA_TRANSP;
+                }
+            }
+
+            if(blend_dsc.src_buf == NULL) {
+                blend_area.y1 ++;
+                blend_area.y2 ++;
+                continue;
+            }
+        }
+
         lv_memset(mask_buf, 0xff, blend_w);
         blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, blend_area.y1, blend_w);
 
@@ -276,6 +321,29 @@ static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_are
         }
     }
 
+}
+
+/**
+ * Use a decoded image (or a part of it) as the source of the blending
+ * @param blend_dsc     the blend descriptor to update
+ * @param decoded       the decoded image or image part
+ * @param src_area      the absolute area of `decoded`
+ * @return              pointer to the A8 mask in case of an RGB565A8 image, else NULL
+ */
+static const uint8_t * set_blend_src(lv_draw_sw_blend_dsc_t * blend_dsc, const lv_draw_buf_t * decoded,
+                                     const lv_area_t * src_area)
+{
+    blend_dsc->src_area = src_area;
+    blend_dsc->src_buf = decoded->data;
+    blend_dsc->src_stride = decoded->header.stride;
+    blend_dsc->src_color_format = decoded->header.cf;
+    if(blend_dsc->src_color_format == LV_COLOR_FORMAT_RGB565A8) {
+        /*The A8 mask is stored after the RGB565 part*/
+        blend_dsc->src_color_format = LV_COLOR_FORMAT_RGB565;
+        return (const uint8_t *)blend_dsc->src_buf + blend_dsc->src_stride * lv_area_get_height(src_area);
+    }
+
+    return NULL;
 }
 
 static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, lv_area_t * res_area)
