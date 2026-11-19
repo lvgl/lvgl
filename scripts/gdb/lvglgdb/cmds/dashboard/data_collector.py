@@ -227,9 +227,10 @@ def _collect_subjects_from_obj(obj, seen, result):
 def _collect_widget_specs(object_trees: list) -> dict:
     """Build widget_specs dict for all class_names found in object trees."""
     import json as _json
-    from pathlib import Path
 
-    specs_path = Path(__file__).parent.parent.parent.parent / "scripts" / "generators" / "widget_specs.json"
+    from lvglgdb.lvgl.widgets.specs import specs_path as _specs_path
+
+    specs_path = _specs_path()
     if not specs_path.exists():
         return {}
 
