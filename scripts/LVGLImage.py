@@ -221,6 +221,15 @@ def bit_extend(value, bpp):
     return res
 
 
+def unpremultiply(r, g, b, a) -> List:
+    """
+    Undo the alpha premultiplication of one pixel, rounding to the nearest value
+    """
+    if a == 0:
+        return [0, 0, 0, 0]
+    return [min(255, (c * 255 + a // 2) // a) for c in (r, g, b)] + [a]
+
+
 def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
     """
     Unpack lvgl 1/2/4/8/16/32 bpp color to png color: alpha map, grey scale,
@@ -325,10 +334,7 @@ def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
         A = data[3::4]
         if cf == ColorFormat.ARGB8888_PREMULTIPLIED:
             for r, g, b, a in zip(R, G, B, A):
-                r = (r * a // 255)
-                g = (g * a // 255)
-                b = (b * a // 255)
-                ret += [r, g, b, a]
+                ret += unpremultiply(r, g, b, a)
         else:
             for r, g, b, a in zip(R, G, B, A):
                 ret += [r, g, b, a]
@@ -492,6 +498,7 @@ class LVGLImageHeader:
             self.cf = ColorFormat(data[1] & 0x1f)  # color format
         except ValueError as exc:
             raise FormatError(f"invalid color format: {hex(data[0])}") from exc
+        self.flags = int.from_bytes(data[2:4], 'little')
         self.w = int.from_bytes(data[4:6], 'little')
         self.h = int.from_bytes(data[6:8], 'little')
         self.stride = int.from_bytes(data[8:10], 'little')
@@ -767,8 +774,10 @@ class LVGLImage:
 
     def from_data(self, data: bytes):
         header = LVGLImageHeader().from_binary(data)
-        return self.set_data(header.cf, header.w, header.h,
-                             data[len(header.binary):], header.stride)
+        self.set_data(header.cf, header.w, header.h,
+                      data[len(header.binary):], header.stride)
+        self.premultiplied = bool(header.flags & 0x01)
+        return self
 
     def from_bin(self, filename: str):
         """
@@ -885,7 +894,10 @@ class LVGLImage:
                                  self.h,
                                  alpha=self.cf.has_alpha,
                                  greyscale=False)
-            data = unpack_colors(self.data, self.cf, self.w)
+            cf = self.cf
+            if cf == ColorFormat.ARGB8888 and self.premultiplied:
+                cf = ColorFormat.ARGB8888_PREMULTIPLIED
+            data = unpack_colors(self.data, cf, self.w)
         else:
             logging.warning(f"missing logic: {self.cf.name}")
             return
