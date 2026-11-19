@@ -19,7 +19,7 @@ concurrency:
 jobs:
   run-release-branch-updater:
     if: github.repository == 'lvgl/lvgl'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout LVGL
