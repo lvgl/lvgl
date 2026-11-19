@@ -146,11 +146,6 @@ void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 
     if(bar->cur_value == value) return;
 
-    value = LV_CLAMP(bar->min_value, value, bar->max_value);
-    value = value < bar->start_value ? bar->start_value : value; /*Can't be smaller than the left value*/
-
-    if(bar->cur_value == value) return;
-
     lv_bar_set_value_with_anim(obj, value, &bar->cur_value, &bar->cur_value_anim, anim);
 }
 
@@ -163,9 +158,6 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_
     if(bar->mode != LV_BAR_MODE_RANGE) {
         return;
     }
-
-    start_value = LV_CLAMP(bar->min_value, start_value, bar->max_value);
-    start_value = start_value > bar->cur_value ? bar->cur_value : start_value; /*Can't be greater than the right value*/
 
     if(bar->start_value == start_value) return;
 
@@ -187,17 +179,9 @@ void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
     bar->max_value = real_max;
     bar->min_value = real_min;
 
-    if(lv_bar_get_mode(obj) != LV_BAR_MODE_RANGE)
-        bar->start_value = real_min;
+    if(lv_bar_get_mode(obj) != LV_BAR_MODE_RANGE) bar->start_value = real_min;
 
-    if(bar->cur_value > real_max) {
-        bar->cur_value = real_max;
-        lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
-    }
-    if(bar->cur_value < real_min) {
-        bar->cur_value = real_min;
-        lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
-    }
+    lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
 
     lv_obj_invalidate(obj);
 }
@@ -469,6 +453,10 @@ static void draw_indic(lv_event_t * e)
     else {
         anim_cur_value_x = (int32_t)(((int64_t)anim_length * (bar->cur_value - bar->min_value)) / range);
     }
+
+    anim_cur_value_x = LV_CLAMP(0, anim_cur_value_x, anim_length);
+    anim_start_value_x = LV_CLAMP(0, anim_start_value_x, anim_length);
+    if(anim_start_value_x > anim_cur_value_x) anim_start_value_x = anim_cur_value_x;
 
     /**
      * The drawing direction of the bar can be reversed only when one of the two conditions(value inversion

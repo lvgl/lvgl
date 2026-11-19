@@ -383,32 +383,72 @@ void test_bar_start_value_should_only_change_when_in_range_mode(void)
     TEST_ASSERT_EQUAL_INT32(new_start_value, lv_bar_get_start_value(g_bar));
 }
 
-void test_bar_start_value_should_be_smaller_than_current_value_in_range_mode(void)
+void test_bar_start_value_larger_than_current_value_should_be_kept_in_range_mode(void)
 {
+    lv_bar_t * bar_ptr = (lv_bar_t *) g_bar;
+    lv_obj_set_size(g_bar, 200, 20);
+
     /* Set bar in RANGE mode so we can edit the start value */
     lv_bar_set_mode(g_bar, LV_BAR_MODE_RANGE);
     lv_bar_set_value(g_bar, 50, LV_ANIM_OFF);
-    lv_bar_set_start_value(g_bar, 100u, LV_ANIM_OFF);
+    lv_bar_set_start_value(g_bar, 80, LV_ANIM_OFF);
 
-    TEST_ASSERT_EQUAL_INT32(lv_bar_get_value(g_bar), lv_bar_get_start_value(g_bar));
+    /* Both values are stored as they were set */
+    TEST_ASSERT_EQUAL_INT32(50, lv_bar_get_value(g_bar));
+    TEST_ASSERT_EQUAL_INT32(80, lv_bar_get_start_value(g_bar));
+
+    /* The start value is drawn at the current value, so the indicator is empty */
+    lv_refr_now(NULL);
+    TEST_ASSERT_LESS_OR_EQUAL_INT32(1, lv_area_get_width(&bar_ptr->indic_area));
 }
 
-void test_bar_current_value_should_be_truncated_to_max_value_when_exceeds_it(void)
+void test_bar_current_value_should_be_kept_when_exceeds_max_value(void)
 {
+    lv_bar_t * bar_ptr = (lv_bar_t *) g_bar;
+    lv_obj_set_size(g_bar, 200, 20);
+    lv_obj_set_style_pad_all(g_bar, 0, 0);
+
     int32_t max_value = lv_bar_get_max_value(g_bar);
-    int32_t new_value = max_value + 1u;
+    int32_t new_value = max_value + 50;
 
     lv_bar_set_value(g_bar, new_value, LV_ANIM_OFF);
-    TEST_ASSERT_EQUAL_INT32(max_value, lv_bar_get_value(g_bar));
+    TEST_ASSERT_EQUAL_INT32(new_value, lv_bar_get_value(g_bar));
+
+    /* The indicator is limited to the full width of the bar */
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_content_width(g_bar), lv_area_get_width(&bar_ptr->indic_area));
 }
 
-void test_bar_current_value_should_be_truncated_to_min_value_when_it_is_below_it(void)
+void test_bar_current_value_should_be_kept_when_below_min_value(void)
 {
+    lv_bar_t * bar_ptr = (lv_bar_t *) g_bar;
+    lv_obj_set_size(g_bar, 200, 20);
+    lv_obj_set_style_pad_all(g_bar, 0, 0);
+
+    lv_bar_set_value(g_bar, 50, LV_ANIM_OFF);
+
     int32_t min_value = lv_bar_get_min_value(g_bar);
-    int32_t new_value = min_value - 1u;
+    int32_t new_value = min_value - 50;
 
     lv_bar_set_value(g_bar, new_value, LV_ANIM_OFF);
-    TEST_ASSERT_EQUAL_INT32(min_value, lv_bar_get_value(g_bar));
+    TEST_ASSERT_EQUAL_INT32(new_value, lv_bar_get_value(g_bar));
+
+    /* The indicator is limited to the start of the bar */
+    lv_refr_now(NULL);
+    TEST_ASSERT_LESS_OR_EQUAL_INT32(1, lv_area_get_width(&bar_ptr->indic_area));
+}
+
+void test_bar_value_should_be_kept_when_range_changes(void)
+{
+    lv_bar_set_value(g_bar, 80, LV_ANIM_OFF);
+
+    /* Shrink the range below the value: the value is not modified */
+    lv_bar_set_range(g_bar, 0, 50);
+    TEST_ASSERT_EQUAL_INT32(80, lv_bar_get_value(g_bar));
+
+    /* Restore the range: the original value is drawn again */
+    lv_bar_set_range(g_bar, 0, 100);
+    TEST_ASSERT_EQUAL_INT32(80, lv_bar_get_value(g_bar));
 }
 
 /** When in symmetrical mode, the bar indicator has to be drawn towards the min

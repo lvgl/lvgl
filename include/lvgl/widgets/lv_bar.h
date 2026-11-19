@@ -75,6 +75,10 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent);
  * @param obj           pointer to a bar object
  * @param value         new value
  * @param anim          LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @note				Even if the value is out of the min/max values it will be saved and limited
+ * 						only during rendering.
+ * @note				If lesser than the start_value the start_value will be shown as the normal value but
+ * 						both value are stored unclipped
  */
 void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 
@@ -83,6 +87,10 @@ void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
  * @param obj             pointer to a bar object
  * @param start_value     new start value
  * @param anim            LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @note				  Even if the value is out of the min/max values it will be saved and limited
+ * 						  only during rendering.
+ * @note			  	  If lesser than the start_value the start_value will be shown as the normal value but
+ * 						  both value are stored unclipped
  */
 void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_t anim);
 
