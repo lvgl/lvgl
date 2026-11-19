@@ -507,6 +507,15 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area);
 bool lv_obj_is_visible(const lv_obj_t * obj);
 
 /**
+ * Tell whether a refresh has reached an object at least once.
+ * It is set when the object is handed to rendering, also if it turned out
+ * to be outside of the area that was drawn. A hidden object is not reached.
+ * @param obj       pointer to an object
+ * @return      true: a refresh has reached `obj`; false: none has yet
+ */
+bool lv_obj_is_rendered(const lv_obj_t * obj);
+
+/**
  * Set the size of an extended clickable area
  * @param obj       pointer to an object
  * @param size      extended clickable area in all 4 directions [px]
