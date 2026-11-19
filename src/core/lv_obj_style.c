@@ -113,11 +113,11 @@ void lv_obj_style_deinit(void)
     }
 }
 
-void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+lv_result_t lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(style != NULL, return);
-    LV_CHECK_ARG_MSG(obj->style_cnt < 63, return,
+    LV_CHECK_ARG(obj != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(style != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG_MSG(obj->style_cnt < 63, return LV_RESULT_INVALID,
                      "obj->style_cnt is restricted to 6 bits, so we can't store more than 63 styles");
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
@@ -145,8 +145,13 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     /*Allocate space for the new style and shift the rest of the style to the end*/
     obj->style_cnt++;
     LV_ASSERT(obj->style_cnt != 0);
-    obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-    LV_ASSERT_MALLOC(obj->styles);
+    lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+    if(new_styles == NULL) {
+        obj->style_cnt--;
+        LV_LOG_WARN("couldn't allocate styles");
+        return LV_RESULT_INVALID;
+    }
+    obj->styles = new_styles;
 
     uint32_t j;
     for(j = obj->style_cnt - 1; j > i ; j--) {
@@ -179,6 +184,8 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 #endif
 
     lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
+
+    return LV_RESULT_OK;
 }
 
 bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style,
