@@ -550,11 +550,12 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
     uint32_t opt_i = 0;
     const char * start = opts;
     const size_t option_len = lv_strlen(option); /*avoid recomputing this multiple times in the loop*/
+    const uint32_t option_count = lv_dropdown_get_option_count(obj);
 
-    while(start[0] != '\0') {
+    while(opt_i < option_count) {
         for(char_i = 0; (start[char_i] != '\n') && (start[char_i] != '\0'); char_i++);
 
-        if(option_len == char_i && lv_memcmp(start, option, LV_MIN(option_len, char_i)) == 0) {
+        if(option_len == char_i && (option_len == 0 || lv_memcmp(start, option, option_len) == 0)) {
             return opt_i;
         }
 
