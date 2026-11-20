@@ -36,37 +36,6 @@ extern "C" {
 #define LV_SIFLI_EPIC_INSTANCE EPIC
 #endif
 
-/** EPIC interrupt line ID (platform-specific) */
-#ifndef LV_SIFLI_EPIC_IRQn
-#define LV_SIFLI_EPIC_IRQn EPIC_IRQn
-#endif
-
-/** EPIC interrupt priority (platform-specific) */
-#ifndef LV_SIFLI_EPIC_IRQ_PRIORITY
-#define LV_SIFLI_EPIC_IRQ_PRIORITY 5
-#endif
-
-#ifdef HAL_EZIP_MODULE_ENABLED
-/** EZIP interrupt line ID (platform-specific) */
-#ifndef LV_SIFLI_EZIP_IRQn
-#define LV_SIFLI_EZIP_IRQn EZIP_IRQn
-#endif
-#endif
-
-#if LV_USE_OS == LV_OS_FREERTOS
-#if defined(configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY)
-#ifndef LV_SIFLI_EPIC_FREERTOS_IRQ_PRIORITY
-#define LV_SIFLI_EPIC_FREERTOS_IRQ_PRIORITY (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1)
-#endif
-#endif
-#endif
-
-#ifdef __ZEPHYR__
-#ifndef LV_SIFLI_EPIC_ZEPHYR_IRQ_FLAGS
-#define LV_SIFLI_EPIC_ZEPHYR_IRQ_FLAGS 0
-#endif
-#endif
-
 /** Maximum pixels for single EPIC operation */
 #define EPIC_MAX_PIXELS (1000 * 1000)
 

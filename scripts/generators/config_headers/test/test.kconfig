@@ -289,3 +289,24 @@ config LV_TEST_FORMAT_BPP
 	default 1 if LV_TEST_FORMAT_I1
 	default 16 if LV_TEST_FORMAT_RGB565 || LV_TEST_FORMAT_RGB565_SWAPPED
 	default 32
+
+# --- An int comparison in a dependency ----------------------------------------
+config LV_TEST_CMP_LEVEL
+	int "A level"
+	default 1
+
+config LV_TEST_CMP_AT_TWO
+	bool "On only when the level is 2"
+	depends on LV_TEST_CMP_LEVEL = 2
+
+config LV_TEST_CMP_FLAG_ON
+	bool "On only when the flag is y"
+	depends on LV_TEST_CMP_AT_TWO = y && LV_TEST_CMP_LEVEL != 3
+
+# --- A dependency on an option defined further down -------------------------
+config LV_USE_EARLY
+	bool "Early option"
+	depends on LV_USE_LATE
+
+config LV_USE_LATE
+	bool "Late option"
