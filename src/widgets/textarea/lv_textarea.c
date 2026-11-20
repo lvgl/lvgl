@@ -15,6 +15,7 @@
 #include "../../lvgl_public.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_text_private.h"
+#include "../../misc/lv_text_ap.h"
 #include "../../font/lv_font_private.h"
 #include "../../core/lv_obj_style_internal.h"
 
@@ -358,7 +359,11 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
         }
     }
     else {
+#if LV_USE_ARABIC_PERSIAN_CHARS
+        size_t txt_len = lv_text_ap_strlen(txt);
+#else
         size_t txt_len = lv_strlen(txt);
+#endif
         /*Allocate memory for the placeholder_txt text*/
         /*NOTE: Using special realloc behavior, malloc-like when data_p is NULL*/
         ta->placeholder_txt = lv_realloc(ta->placeholder_txt, txt_len + 1);
@@ -368,8 +373,11 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
             return;
         }
 
+#if LV_USE_ARABIC_PERSIAN_CHARS
+        lv_text_ap_proc(txt, ta->placeholder_txt);
+#else
         lv_strcpy(ta->placeholder_txt, txt);
-        ta->placeholder_txt[txt_len] = '\0';
+#endif
 
         calc_placeholder_text_size(obj);
     }
