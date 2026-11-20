@@ -89,6 +89,13 @@ lock resources. You may use a custom HAL implementation for your platform or use
 provided implementations by setting <ApiLink name="LV_USE_NEMA_HAL" /> to a value other than
 <ApiLink name="LV_NEMA_HAL_CUSTOM" />.
 
+With the STM32 HAL implementation, the GPU2D completion interrupt comes from an IRQ provider
+(<ApiLink name="LV_IRQ_PROVIDES_NEMAGFX" />). Set <ApiLink name="LV_IRQ_PROVIDER" /> to
+`LV_IRQ_PROVIDER_STM32` and <ApiLink name="LV_IRQ_STM32_HAL_INCLUDE" /> to your family's HAL
+header (e.g. "stm32u5xx_hal.h"); in a hand-written `lv_conf.h`, also set
+<ApiLink name="LV_IRQ_PROVIDES_DMA2D" /> and <ApiLink name="LV_IRQ_PROVIDES_NEMAGFX" /> to `1`. The CubeMX project must enable the GPU2D
+global interrupt, whose generated `GPU2D_IRQHandler` calls `HAL_GPU2D_IRQHandler(&hgpu2d)`.
+
 If your core has a data cache and it's enabled, which may be the case when using a Cortex-M7,
 you may set <ApiLink name="LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM" /> to a compiler-specific attribute
 that will place the memory shared between the CPU and the GPU in a region of memory that is

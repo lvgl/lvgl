@@ -10,6 +10,7 @@ COMPONENT_SRCDIRS := . \
                   src/display \
                   src/indev \
                   src/osal \
+                  src/irqal \
                   src/misc \
                   src/misc/cache \
                   src/misc/cache/class \
