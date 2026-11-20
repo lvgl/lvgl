@@ -326,6 +326,19 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 
 
 /**
+ * Convert the pixels of a draw buffer to the color format of another one.
+ * The target format is `dest->header.cf`.
+ * Supported conversions: RGB565 to RGB888.
+ * @param dest  pointer to the destination draw buffer, it must have the same width and
+ *              height as `src` and must not overlap it. Its stride and size must fit
+ *              the pixels of its own color format, e.g. 3 bytes per pixel for RGB888
+ * @param src   pointer to the source draw buffer
+ * @return      LV_RESULT_OK: success; LV_RESULT_INVALID: the conversion is not supported
+ *              or a buffer is too small for its width, height and stride
+ */
+lv_result_t lv_draw_buf_convert_format(lv_draw_buf_t * dest, const lv_draw_buf_t * src);
+
+/**
  * Check if a draw buffer has a given flag.
  * @param draw_buf  pointer to a draw buffer
  * @param flag      the flag to check

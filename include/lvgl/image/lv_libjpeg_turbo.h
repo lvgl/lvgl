@@ -35,6 +35,13 @@ void lv_libjpeg_turbo_init(void);
 
 void lv_libjpeg_turbo_deinit(void);
 
+#if LV_USE_LIBJPEG_TURBO_ENCODER
+/**
+ * Register the JPEG encoder in LVGL
+ */
+void lv_libjpeg_turbo_encoder_init(void);
+#endif
+
 /**********************
  *      MACROS
  **********************/

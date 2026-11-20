@@ -1839,6 +1839,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_LIBPNG_ENCODER
+    #ifdef CONFIG_LV_USE_LIBPNG_ENCODER
+        #define LV_USE_LIBPNG_ENCODER CONFIG_LV_USE_LIBPNG_ENCODER
+    #else
+        #define LV_USE_LIBPNG_ENCODER 0
+    #endif
+#endif
+
 #ifndef LV_USE_BMP
     #ifdef CONFIG_LV_USE_BMP
         #define LV_USE_BMP CONFIG_LV_USE_BMP
@@ -1860,6 +1868,14 @@
         #define LV_USE_LIBJPEG_TURBO CONFIG_LV_USE_LIBJPEG_TURBO
     #else
         #define LV_USE_LIBJPEG_TURBO 0
+    #endif
+#endif
+
+#ifndef LV_USE_LIBJPEG_TURBO_ENCODER
+    #ifdef CONFIG_LV_USE_LIBJPEG_TURBO_ENCODER
+        #define LV_USE_LIBJPEG_TURBO_ENCODER CONFIG_LV_USE_LIBJPEG_TURBO_ENCODER
+    #else
+        #define LV_USE_LIBJPEG_TURBO_ENCODER 0
     #endif
 #endif
 
@@ -5181,6 +5197,14 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if (LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST) && !LV_USE_LODEPNG
     #error "LV_USE_LODEPNG must be enabled: Kconfig selects it from LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST"
+#endif
+
+#if LV_USE_LIBPNG_ENCODER && !(LV_USE_LIBPNG)
+    #error "LV_USE_LIBPNG_ENCODER requires LV_USE_LIBPNG (Kconfig depends on)"
+#endif
+
+#if LV_USE_LIBJPEG_TURBO_ENCODER && !(LV_USE_LIBJPEG_TURBO)
+    #error "LV_USE_LIBJPEG_TURBO_ENCODER requires LV_USE_LIBJPEG_TURBO (Kconfig depends on)"
 #endif
 
 #if LV_USE_SVG && !(LV_DRAW_HAS_VECTOR_SUPPORT)

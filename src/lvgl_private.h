@@ -144,6 +144,7 @@
 #include "font/lv_font_private.h"
 #include "fs/lv_fs_private.h"
 #include "image/lv_image_decoder_private.h"
+#include "image/lv_image_encoder_private.h"
 #include "indev/lv_indev_gesture_private.h"
 #include "indev/lv_indev_private.h"
 #include "indev/lv_indev_scroll.h"

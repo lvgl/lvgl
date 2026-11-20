@@ -42,6 +42,11 @@ bytes of RAM, and it needs to be combined with the [Image Caching](/main-modules
 ensure that the memory usage is within a reasonable range. The decoded image is
 stored in RGBA pixel format.
 
+## Encoder
+Set <ApiLink name="LV_USE_LIBPNG_ENCODER" /> in `lv_conf.h` to `1` as well to save PNG files with
+<ApiLink name="lv_image_encoder_save" />, see [Image Encoders](/main-modules/images/encoders).
+ARGB8888, XRGB8888, RGB888 and RGB565 draw buffers are supported.
+
 ## Example
 
 ### Open a PNG image from file and variable
