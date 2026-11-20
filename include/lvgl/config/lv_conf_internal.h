@@ -1043,7 +1043,7 @@
     #ifdef CONFIG_LV_PPA_ROTATE_MIN_PIXELS
         #define LV_PPA_ROTATE_MIN_PIXELS CONFIG_LV_PPA_ROTATE_MIN_PIXELS
     #else
-        #define LV_PPA_ROTATE_MIN_PIXELS 1024
+        #define LV_PPA_ROTATE_MIN_PIXELS 10240
     #endif
 #endif
 
@@ -1051,7 +1051,7 @@
     #ifdef CONFIG_LV_PPA_ROTATE_180_MIN_PIXELS
         #define LV_PPA_ROTATE_180_MIN_PIXELS CONFIG_LV_PPA_ROTATE_180_MIN_PIXELS
     #else
-        #define LV_PPA_ROTATE_180_MIN_PIXELS 8192
+        #define LV_PPA_ROTATE_180_MIN_PIXELS 10240
     #endif
 #endif
 

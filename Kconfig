@@ -971,14 +971,14 @@ config LV_PPA_BURST_LENGTH
 config LV_PPA_ROTATE_MIN_PIXELS
 	int "Minimum pixels to rotate 90 or 270 degrees with the PPA"
 	range 0 2147483647
-	default 1024
+	default 10240
 	help
 		Smaller areas are rotated on the CPU, which is faster for them.
 
 config LV_PPA_ROTATE_180_MIN_PIXELS
 	int "Minimum pixels to rotate 180 degrees with the PPA"
 	range 0 2147483647
-	default 8192
+	default 10240
 	help
 		Smaller areas are rotated on the CPU, which is faster for them.
 endif
