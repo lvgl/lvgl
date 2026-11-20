@@ -17,6 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define MY_CLASS (&lv_tileview_class)
 
 /**********************
  *      TYPEDEFS
@@ -27,7 +28,9 @@
  **********************/
 static void lv_tileview_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_tileview_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void tileview_event_cb(lv_event_t * e);
+static bool is_tile_of(lv_obj_t * tv, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -35,6 +38,7 @@ static void tileview_event_cb(lv_event_t * e);
 
 const lv_obj_class_t lv_tileview_class = {
     .constructor_cb = lv_tileview_constructor,
+    .event_cb = lv_tileview_event,
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_tileview_t),
     .name = "lv_tileview",
@@ -91,6 +95,12 @@ void lv_tileview_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t 
     LV_CHECK_OBJ(obj, &lv_tileview_class, return);
     LV_CHECK_ARG(tile_obj != NULL, return);
 
+    /*Only tiles have a direction to read*/
+    if(!is_tile_of(obj, tile_obj)) {
+        LV_LOG_WARN("Not a tile of this tile view");
+        return;
+    }
+
     int32_t tx = lv_obj_get_x(tile_obj);
     int32_t ty = lv_obj_get_y(tile_obj);
 
@@ -117,6 +127,7 @@ void lv_tileview_set_tile_by_index(lv_obj_t * tv, uint32_t col_id, uint32_t row_
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_count(tv); i++) {
         lv_obj_t * tile_obj = lv_obj_get_child(tv, i);
+        if(!lv_obj_check_type(tile_obj, &lv_tileview_tile_class)) continue;
         int32_t x = lv_obj_get_x(tile_obj);
         int32_t y = lv_obj_get_y(tile_obj);
         if(x == tx && y == ty) {
@@ -158,6 +169,37 @@ static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_update_layout(obj);  /*Be sure the size is correct*/
 }
 
+static void lv_tileview_event(const lv_obj_class_t * class_p, lv_event_t * e)
+{
+    LV_UNUSED(class_p);
+
+    /*Call the ancestor's event handler*/
+    lv_result_t res = lv_obj_event_base(MY_CLASS, e);
+    if(res != LV_RESULT_OK) return;
+
+    /*Forget the active tile once it's deleted or moved to another parent.
+     *CHILD_CHANGED is sent for both, after the child is removed.*/
+    if(lv_event_get_code(e) == LV_EVENT_CHILD_CHANGED) {
+        lv_obj_t * obj = lv_event_get_current_target(e);
+        lv_tileview_t * tv = (lv_tileview_t *)obj;
+        if(tv->tile_act && !is_tile_of(obj, tv->tile_act)) tv->tile_act = NULL;
+    }
+}
+
+/**
+ * Tell if an object is one of the tile view's tiles, without dereferencing it:
+ * it can be a dangling pointer to a deleted tile.
+ */
+static bool is_tile_of(lv_obj_t * tv, lv_obj_t * obj)
+{
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_count(tv); i++) {
+        lv_obj_t * child = lv_obj_get_child(tv, i);
+        if(child == obj) return lv_obj_check_type(child, &lv_tileview_tile_class);
+    }
+    return false;
+}
+
 static void tileview_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -185,6 +227,7 @@ static void tileview_event_cb(lv_event_t * e)
         uint32_t i;
         for(i = 0; i < lv_obj_get_child_count(obj); i++) {
             lv_obj_t * tile_obj = lv_obj_get_child(obj, i);
+            if(!lv_obj_check_type(tile_obj, &lv_tileview_tile_class)) continue;
             int32_t x = lv_obj_get_x(tile_obj);
             int32_t y = lv_obj_get_y(tile_obj);
             if(x == tx && y == ty) {
