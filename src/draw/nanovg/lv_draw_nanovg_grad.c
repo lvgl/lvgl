@@ -91,7 +91,7 @@ void lv_nanovg_draw_grad(
         return;
     }
 
-    nvgPathWinding(ctx, winding);
+    if(winding != LV_NANOVG_WINDING_KEEP) nvgPathWinding(ctx, winding);
     nvgGlobalCompositeOperation(ctx, composite_operation);
     nvgFillPaint(ctx, paint);
     nvgFill(ctx);

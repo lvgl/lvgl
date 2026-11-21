@@ -279,7 +279,7 @@ bool lv_nanovg_grad_to_paint(NVGcontext * ctx, const lv_vector_gradient_t * grad
  * @brief Draw a gradient
  * @param ctx the nanovg context
  * @param grad the gradient descriptor
- * @param winding the fill rule
+ * @param winding the fill rule, or LV_NANOVG_WINDING_KEEP to leave the winding of the path as it is
  * @param composite_operation the blend mode
  */
 void lv_nanovg_draw_grad(

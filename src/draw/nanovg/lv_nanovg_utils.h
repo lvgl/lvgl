@@ -23,6 +23,11 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+/**
+ * Pass it as the winding of lv_nanovg_fill() and lv_nanovg_draw_grad() to keep the winding
+ * that was set for the sub-paths of the current path, instead of setting it for the last one.
+ */
+#define LV_NANOVG_WINDING_KEEP ((enum NVGwinding)0)
 
 /**********************
  *      TYPEDEFS
@@ -141,7 +146,7 @@ void lv_nanovg_path_append_arc(NVGcontext * ctx,
 /**
  * Fill the current path
  * @param ctx the NanoVG context
- * @param winding the winding rule
+ * @param winding the winding rule, or LV_NANOVG_WINDING_KEEP to leave the winding of the path as it is
  * @param composite_operation the blend mode
  * @param color the fill color
  */

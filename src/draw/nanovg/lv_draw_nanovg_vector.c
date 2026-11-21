@@ -28,12 +28,25 @@
 *      TYPEDEFS
 **********************/
 
+/*Tracks the signed area of the contour that is being appended to the NanoVG path*/
+typedef struct {
+    lv_fpoint_t first;
+    lv_fpoint_t prev;
+    float area;
+    bool open;
+} contour_tracker_t;
+
 /**********************
 *  STATIC PROTOTYPES
 **********************/
 
 static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc);
-static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fpoint_t * offset);
+static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fpoint_t * offset, bool nonzero);
+static float lv_path_main_area(const lv_vector_path_t * src);
+static void tracker_begin(contour_tracker_t * t, const lv_fpoint_t * p);
+static void tracker_add(contour_tracker_t * t, const lv_fpoint_t * p);
+static float tracker_end(contour_tracker_t * t);
+static void end_contour(NVGcontext * ctx, contour_tracker_t * t, float main_area);
 static enum NVGcompositeOperation lv_blend_to_nvg(lv_vector_blend_t blend);
 static enum NVGwinding lv_fill_to_nvg(lv_vector_fill_t fill_rule);
 
@@ -195,7 +208,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     lv_nanovg_transform(u->vg, &dsc->matrix);
 
     lv_fpoint_t offset = {0, 0};
-    lv_path_to_nvg(u->vg, path, &offset);
+    lv_path_to_nvg(u->vg, path, &offset, dsc->fill_dsc.fill_rule == LV_VECTOR_FILL_NONZERO);
 
     const enum NVGcompositeOperation comp_op = lv_blend_to_nvg(dsc->blend_mode);
     nvgGlobalCompositeOperation(u->vg, comp_op);
@@ -213,7 +226,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fpoint_t * offset)
+static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fpoint_t * offset, bool nonzero)
 {
     LV_PROFILER_DRAW_BEGIN;
 
@@ -234,23 +247,42 @@ static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fp
     const lv_fpoint_t * point = lv_array_front(&src->points);
     const uint32_t op_size = lv_array_size(&src->ops);
 
+    /* NanoVG forces every sub-path to the winding set with nvgPathWinding() (counter-clockwise by default)
+     * before it fills. A contour that goes in the opposite direction, like the inside of an "O" in a glyph,
+     * would be reversed and filled too, but with the non-zero rule it has to be a hole.
+     * So set the winding of each contour: the same direction as the biggest contour is solid (counter-clockwise),
+     * the opposite direction is a hole (clockwise).
+     * The even-odd rule doesn't use it, it's set for the last sub-path by lv_fill_to_nvg(). */
+    const float main_area = nonzero ? lv_path_main_area(src) : 0.0f;
+    contour_tracker_t tracker;
+    lv_memzero(&tracker, sizeof(tracker));
+
     nvgBeginPath(ctx);
 
     for(uint32_t i = 0; i < op_size; i++) {
         switch(ops[i]) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
+                    if(nonzero) {
+                        end_contour(ctx, &tracker, main_area);
+                        tracker_begin(&tracker, point);
+                    }
                     nvgMoveTo(ctx, point->x, point->y);
                     CMP_BOUNDS(point);
                     point++;
                 }
                 break;
             case LV_VECTOR_PATH_OP_LINE_TO: {
+                    if(nonzero) tracker_add(&tracker, point);
                     nvgLineTo(ctx, point->x, point->y);
                     CMP_BOUNDS(point);
                     point++;
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
+                    if(nonzero) {
+                        tracker_add(&tracker, &point[0]);
+                        tracker_add(&tracker, &point[1]);
+                    }
                     nvgQuadTo(ctx, point[0].x, point[0].y, point[1].x, point[1].y);
                     CMP_BOUNDS(&point[0]);
                     CMP_BOUNDS(&point[1]);
@@ -258,6 +290,11 @@ static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fp
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
+                    if(nonzero) {
+                        tracker_add(&tracker, &point[0]);
+                        tracker_add(&tracker, &point[1]);
+                        tracker_add(&tracker, &point[2]);
+                    }
                     nvgBezierTo(ctx, point[0].x, point[0].y, point[1].x, point[1].y, point[2].x, point[2].y);
                     CMP_BOUNDS(&point[0]);
                     CMP_BOUNDS(&point[1]);
@@ -267,6 +304,7 @@ static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fp
                 break;
             case LV_VECTOR_PATH_OP_CLOSE: {
                     nvgClosePath(ctx);
+                    if(nonzero) end_contour(ctx, &tracker, main_area);
                 }
                 break;
             default:
@@ -275,9 +313,104 @@ static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fp
         }
     }
 
+    if(nonzero) end_contour(ctx, &tracker, main_area);
+
     offset->x = lroundf(min_x);
     offset->y = lroundf(min_y);
     LV_PROFILER_DRAW_END;
+}
+
+static void tracker_begin(contour_tracker_t * t, const lv_fpoint_t * p)
+{
+    t->first = *p;
+    t->prev = *p;
+    t->area = 0.0f;
+    t->open = true;
+}
+
+static void tracker_add(contour_tracker_t * t, const lv_fpoint_t * p)
+{
+    if(!t->open) {
+        tracker_begin(t, p);
+        return;
+    }
+
+    t->area += (t->prev.x * p->y - p->x * t->prev.y) * 0.5f;
+    t->prev = *p;
+}
+
+/*Close the contour and return its signed area. The points of the curves are the control points.*/
+static float tracker_end(contour_tracker_t * t)
+{
+    t->area += (t->prev.x * t->first.y - t->first.x * t->prev.y) * 0.5f;
+    t->open = false;
+    return t->area;
+}
+
+/*Set the winding of the contour that was just appended, see lv_path_to_nvg()*/
+static void end_contour(NVGcontext * ctx, contour_tracker_t * t, float main_area)
+{
+    if(!t->open) return;
+
+    const float area = tracker_end(t);
+    nvgPathWinding(ctx, area * main_area >= 0.0f ? NVG_CCW : NVG_CW);
+}
+
+/*Get the signed area of the contour with the biggest area*/
+static float lv_path_main_area(const lv_vector_path_t * src)
+{
+    const lv_vector_path_op_t * ops = lv_array_front(&src->ops);
+    const lv_fpoint_t * point = lv_array_front(&src->points);
+    const uint32_t op_size = lv_array_size(&src->ops);
+
+    float main_area = 0.0f;
+    contour_tracker_t t;
+    lv_memzero(&t, sizeof(t));
+
+    for(uint32_t i = 0; i < op_size; i++) {
+        uint32_t point_cnt = 0;
+        switch(ops[i]) {
+            case LV_VECTOR_PATH_OP_MOVE_TO:
+                if(t.open) {
+                    const float area = tracker_end(&t);
+                    if(LV_ABS(area) > LV_ABS(main_area)) main_area = area;
+                }
+                tracker_begin(&t, point);
+                point_cnt = 1;
+                break;
+            case LV_VECTOR_PATH_OP_LINE_TO:
+                tracker_add(&t, point);
+                point_cnt = 1;
+                break;
+            case LV_VECTOR_PATH_OP_QUAD_TO:
+                tracker_add(&t, &point[0]);
+                tracker_add(&t, &point[1]);
+                point_cnt = 2;
+                break;
+            case LV_VECTOR_PATH_OP_CUBIC_TO:
+                tracker_add(&t, &point[0]);
+                tracker_add(&t, &point[1]);
+                tracker_add(&t, &point[2]);
+                point_cnt = 3;
+                break;
+            case LV_VECTOR_PATH_OP_CLOSE:
+                if(t.open) {
+                    const float area = tracker_end(&t);
+                    if(LV_ABS(area) > LV_ABS(main_area)) main_area = area;
+                }
+                break;
+            default:
+                break;
+        }
+        point += point_cnt;
+    }
+
+    if(t.open) {
+        const float area = tracker_end(&t);
+        if(LV_ABS(area) > LV_ABS(main_area)) main_area = area;
+    }
+
+    return main_area;
 }
 
 static enum NVGcompositeOperation lv_blend_to_nvg(lv_vector_blend_t blend)
@@ -303,12 +436,13 @@ static enum NVGwinding lv_fill_to_nvg(lv_vector_fill_t fill_rule)
 {
     switch(fill_rule) {
         case LV_VECTOR_FILL_NONZERO:
-            return NVG_CCW;
+            /*The winding of each contour was set by lv_path_to_nvg(), don't override the last one*/
+            return LV_NANOVG_WINDING_KEEP;
         case LV_VECTOR_FILL_EVENODD:
             return NVG_CW;
         default:
             LV_LOG_WARN("Unknown supported fill rule: %d", fill_rule);
-            return NVG_CCW;
+            return LV_NANOVG_WINDING_KEEP;
     }
 }
 

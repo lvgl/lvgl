@@ -229,7 +229,7 @@ void lv_nanovg_fill(NVGcontext * ctx, enum NVGwinding winding, enum NVGcomposite
 {
     LV_ASSERT_NULL(ctx);
     LV_PROFILER_DRAW_BEGIN;
-    nvgPathWinding(ctx, winding);
+    if(winding != LV_NANOVG_WINDING_KEEP) nvgPathWinding(ctx, winding);
     nvgGlobalCompositeOperation(ctx, composite_operation);
     nvgFillColor(ctx, color);
     nvgFill(ctx);
