@@ -233,13 +233,20 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
         return;
     }
 
-    window->xdg.configured = false;
+    window->resize_event.requested = false;
+
+    /* 0x0 leaves the size to the client: keep the current one. */
+    if(width == 0 && height == 0) {
+        return;
+    }
     /* Width and height are already ok, don't resize*/
     if(width == lv_wayland_window_get_width(window) &&
        height == lv_wayland_window_get_height(window)) {
         LV_LOG_TRACE("Window's size is already correct. Ignore resize request");
         return;
     }
+
+    window->xdg.configured = false;
     window->resize_event.requested = true;
     window->resize_event.width = width ? width : lv_display_get_horizontal_resolution(window->lv_disp);
     window->resize_event.height = height ? height : lv_display_get_vertical_resolution(window->lv_disp);
