@@ -234,6 +234,10 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
     }
 
     window->xdg.configured = false;
+    /* 0x0 leaves the size to the client: keep the current one. */
+    if(width == 0 && height == 0) {
+        return;
+    }
     /* Width and height are already ok, don't resize*/
     if(width == lv_wayland_window_get_width(window) &&
        height == lv_wayland_window_get_height(window)) {
