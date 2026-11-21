@@ -11,6 +11,7 @@
 #if LV_USE_FS_STDIO
 
 #include <stdio.h>
+#include <errno.h>
 #ifndef WIN32
     #include <dirent.h>
     #include <unistd.h>
@@ -126,10 +127,13 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s", path);
 
     /*Create the file if it doesn't exist but keep its content if it does.
-     *stdio has no such mode, so try to open the existing file first.*/
+     *stdio has no such mode, so try to open the existing file first, and create it only if it doesn't exist.
+     *Any other failure (e.g. the file exists but isn't readable, "rb+" needs read access too)
+     *must not fall back to "wb+", as that would truncate the existing file.*/
     if(create && !trunc && (rw_mode & LV_FS_MODE_WR)) {
+        errno = 0;
         FILE * f = fopen(buf, "rb+");
-        if(f == NULL) f = fopen(buf, "wb+");
+        if(f == NULL && errno == ENOENT) f = fopen(buf, "wb+");
         return f;
     }
 

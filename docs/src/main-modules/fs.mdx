@@ -128,7 +128,8 @@ void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 <ApiLink name="LV_FS_MODE_WR" /> (`lv_fs_open` rejects them otherwise). With
 <ApiLink name="LV_FS_MODE_CREATE" /> the driver must create the file if it doesn't exist and keep
 its content if it does. With <ApiLink name="LV_FS_MODE_TRUNC" /> it must create the file if it
-doesn't exist, and truncate it to 0 bytes if it does.
+doesn't exist, and truncate it to 0 bytes if it does. If both are given,
+<ApiLink name="LV_FS_MODE_TRUNC" /> takes precedence, so the content is not kept.
 
 The return value is a pointer to a *file object* that describes the
 opened file or `NULL` if there were any issues (e.g. the file wasn't

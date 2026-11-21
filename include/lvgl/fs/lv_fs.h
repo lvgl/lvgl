@@ -69,7 +69,8 @@ typedef enum {
      * content if it does, like `open(path, O_WRONLY | O_CREAT)`.
      * Use it as `LV_FS_MODE_WR | LV_FS_MODE_CREATE`, or
      * `LV_FS_MODE_RD | LV_FS_MODE_WR | LV_FS_MODE_CREATE` to read back too.
-     * Not needed with LV_FS_MODE_TRUNC, which creates the file as well.
+     * Not needed with LV_FS_MODE_TRUNC, which creates the file as well. If both are
+     * given, LV_FS_MODE_TRUNC takes precedence and the content is discarded.
      */
     LV_FS_MODE_CREATE = 0x08,
 } lv_fs_mode_t;

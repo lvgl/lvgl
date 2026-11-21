@@ -117,8 +117,9 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     if(rw_mode == LV_FS_MODE_WR) {
         /*Open a file for write.
-         *If `create` is true create the file if it doesn't exist and keep its content if it does.
-         *If `trunc` is true create the file if it doesn't exist and truncate it to 0 bytes if it does*/
+         *If `trunc` is true create the file if it doesn't exist and truncate it to 0 bytes if it does.
+         *Otherwise, if `create` is true create the file if it doesn't exist and keep its content if it does.
+         *`trunc` takes precedence if both are true.*/
         f = ...         /*Add your code here*/
     }
     else if(rw_mode == LV_FS_MODE_RD) {
@@ -127,8 +128,9 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     }
     else if(rw_mode == ((lv_fs_mode_t)(LV_FS_MODE_WR | LV_FS_MODE_RD))) {
         /*Open a file for read and write.
-         *If `create` is true create the file if it doesn't exist and keep its content if it does.
-         *If `trunc` is true create the file if it doesn't exist and truncate it to 0 bytes if it does*/
+         *If `trunc` is true create the file if it doesn't exist and truncate it to 0 bytes if it does.
+         *Otherwise, if `create` is true create the file if it doesn't exist and keep its content if it does.
+         *`trunc` takes precedence if both are true.*/
         f = ...         /*Add your code here*/
     }
 
