@@ -11,6 +11,7 @@
 #if LV_USE_FS_STDIO
 
 #include <stdio.h>
+#include <errno.h>
 #ifndef WIN32
     #include <dirent.h>
     #include <unistd.h>
@@ -102,7 +103,7 @@ void lv_fs_stdio_init(void)
  * @param drv   pointer to a driver where this function belongs
  * @param path  path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
  * @param mode  read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
- *              FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
+ *              FS_MODE_CREATE or FS_MODE_TRUNC can be added to FS_MODE_WR to create/truncate the file
  * @return pointer to FIL struct or NULL in case of fail
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -111,7 +112,8 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     LV_UNUSED(drv);
 
     const bool trunc = (mode & LV_FS_MODE_TRUNC) != 0;
-    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~LV_FS_MODE_TRUNC);
+    const bool create = (mode & LV_FS_MODE_CREATE) != 0;
+    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~(LV_FS_MODE_TRUNC | LV_FS_MODE_CREATE));
 
     const char * flags = "";
 
@@ -123,6 +125,17 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s", path);
+
+    /*Create the file if it doesn't exist but keep its content if it does.
+     *stdio has no such mode, so try to open the existing file first, and create it only if it doesn't exist.
+     *Any other failure (e.g. the file exists but isn't readable, "rb+" needs read access too)
+     *must not fall back to "wb+", as that would truncate the existing file.*/
+    if(create && !trunc && (rw_mode & LV_FS_MODE_WR)) {
+        errno = 0;
+        FILE * f = fopen(buf, "rb+");
+        if(f == NULL && errno == ENOENT) f = fopen(buf, "wb+");
+        return f;
+    }
 
     return fopen(buf, flags);
 }

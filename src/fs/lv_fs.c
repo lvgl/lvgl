@@ -74,8 +74,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
     LV_CHECK_ARG(path != NULL, return LV_FS_RES_INV_PARAM);
 
-    /*Truncating a file makes sense only if it's opened for writing*/
-    LV_CHECK_ARG(!(mode & LV_FS_MODE_TRUNC) || (mode & LV_FS_MODE_WR), return LV_FS_RES_INV_PARAM);
+    /*Creating or truncating a file makes sense only if it's opened for writing*/
+    LV_CHECK_ARG(!(mode & (LV_FS_MODE_TRUNC | LV_FS_MODE_CREATE)) || (mode & LV_FS_MODE_WR), return LV_FS_RES_INV_PARAM);
 
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
 

@@ -418,12 +418,16 @@ unsigned lodepng_load_file(unsigned char ** out, size_t * outsize, const char * 
 unsigned lodepng_save_file(const unsigned char * buffer, size_t buffersize, const char * filename)
 {
     lv_fs_file_t f;
-    lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_WR);
+    lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_WR | LV_FS_MODE_TRUNC);
     if(res != LV_FS_RES_OK) return 79;
 
     uint32_t bw;
     res = lv_fs_write(&f, buffer, buffersize, &bw);
     lv_fs_close(&f);
+
+    /*The file was truncated on open, so don't report success for a failed or partial write*/
+    if(res != LV_FS_RES_OK || (size_t)bw != buffersize) return 79;
+
     return 0;
 }
 

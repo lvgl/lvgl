@@ -55,7 +55,7 @@ extern "C" void lv_fs_arduino_sd_init(void)
  * @param drv       pointer to a driver where this function belongs
  * @param path      path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
  * @param mode      read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
- *                  FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
+ *                  FS_MODE_CREATE or FS_MODE_TRUNC can be added to FS_MODE_WR to create/truncate the file
  * @return          a file descriptor or NULL on error
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -64,7 +64,8 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     LV_UNUSED(drv);
 
     const bool trunc = (mode & LV_FS_MODE_TRUNC) != 0;
-    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~LV_FS_MODE_TRUNC);
+    const bool create = (mode & LV_FS_MODE_CREATE) != 0;
+    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~(LV_FS_MODE_TRUNC | LV_FS_MODE_CREATE));
 
     const char * flags;
     if(rw_mode == LV_FS_MODE_WR)
@@ -80,6 +81,12 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_ARDUINO_SD_PATH "%s", path);
+
+    /*Create the file if it doesn't exist, keeping its content if it does.
+     *"w" would truncate it, so open an existing file with "r+".*/
+    if(create && !trunc && (rw_mode & LV_FS_MODE_WR)) {
+        flags = SD.exists(buf) ? "r+" : "w+";
+    }
 
     File file = SD.open(buf, flags);
     if(!file) {
