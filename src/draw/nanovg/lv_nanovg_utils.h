@@ -104,6 +104,25 @@ void lv_nanovg_set_clip_area(NVGcontext * ctx, const lv_area_t * area);
  */
 void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, float h, float r);
 
+#if LV_USE_VECTOR_GRAPHIC
+/**
+ * Append a vector path to the NanoVG path, e.g. the outline of a glyph or the path of an SVG shape.
+ *
+ * NanoVG reverses every sub-path to the winding it was given, so the direction of the contours of the vector path is
+ * lost and the holes would be filled. For the non-zero fill rule the winding of each contour is set here: the same
+ * direction as the contour with the biggest area is solid, the opposite direction is a hole. Fill the path with
+ * LV_NANOVG_WINDING_KEEP in this case, so that the winding of the last contour isn't overridden.
+ * The direction is relative, so it doesn't depend on the current transform, e.g. a flip of the Y axis.
+ *
+ * @param ctx       the NanoVG context
+ * @param path      the vector path
+ * @param nonzero   true: the path will be filled with the non-zero rule, false: with the even-odd rule
+ *                  (the winding of the contours is not touched, the caller has to set it)
+ * @param offset    if not NULL, the top left corner of the bounding box of the points of the path, rounded
+ */
+void lv_nanovg_path_append_vector_path(NVGcontext * ctx, const lv_vector_path_t * path, bool nonzero,
+                                       lv_fpoint_t * offset);
+#endif /*LV_USE_VECTOR_GRAPHIC*/
 /**
  * Append an area to the path
  * @param ctx the NanoVG context
