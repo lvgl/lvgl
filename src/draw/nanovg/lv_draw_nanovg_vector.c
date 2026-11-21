@@ -28,6 +28,9 @@
 *      TYPEDEFS
 **********************/
 
+/*The number of the segments a curve is split into to get the area of a contour*/
+#define CURVE_AREA_STEPS 8
+
 /*Tracks the signed area of the contour that is being appended to the NanoVG path*/
 typedef struct {
     lv_fpoint_t first;
@@ -45,6 +48,8 @@ static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fp
 static float lv_path_main_area(const lv_vector_path_t * src);
 static void tracker_begin(contour_tracker_t * t, const lv_fpoint_t * p);
 static void tracker_add(contour_tracker_t * t, const lv_fpoint_t * p);
+static void tracker_quad(contour_tracker_t * t, const lv_fpoint_t * c, const lv_fpoint_t * p);
+static void tracker_cubic(contour_tracker_t * t, const lv_fpoint_t * c1, const lv_fpoint_t * c2, const lv_fpoint_t * p);
 static float tracker_end(contour_tracker_t * t);
 static void end_contour(NVGcontext * ctx, contour_tracker_t * t, float main_area);
 static enum NVGcompositeOperation lv_blend_to_nvg(lv_vector_blend_t blend);
@@ -279,10 +284,7 @@ static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fp
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    if(nonzero) {
-                        tracker_add(&tracker, &point[0]);
-                        tracker_add(&tracker, &point[1]);
-                    }
+                    if(nonzero) tracker_quad(&tracker, &point[0], &point[1]);
                     nvgQuadTo(ctx, point[0].x, point[0].y, point[1].x, point[1].y);
                     CMP_BOUNDS(&point[0]);
                     CMP_BOUNDS(&point[1]);
@@ -290,11 +292,7 @@ static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fp
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    if(nonzero) {
-                        tracker_add(&tracker, &point[0]);
-                        tracker_add(&tracker, &point[1]);
-                        tracker_add(&tracker, &point[2]);
-                    }
+                    if(nonzero) tracker_cubic(&tracker, &point[0], &point[1], &point[2]);
                     nvgBezierTo(ctx, point[0].x, point[0].y, point[1].x, point[1].y, point[2].x, point[2].y);
                     CMP_BOUNDS(&point[0]);
                     CMP_BOUNDS(&point[1]);
@@ -339,7 +337,51 @@ static void tracker_add(contour_tracker_t * t, const lv_fpoint_t * p)
     t->prev = *p;
 }
 
-/*Close the contour and return its signed area. The points of the curves are the control points.*/
+/*Add a quadratic curve, split into segments so that the area is the one of the curve and not of its control points*/
+static void tracker_quad(contour_tracker_t * t, const lv_fpoint_t * c, const lv_fpoint_t * p)
+{
+    if(!t->open) {
+        tracker_begin(t, p);
+        return;
+    }
+
+    const lv_fpoint_t p0 = t->prev;
+    for(int32_t i = 1; i <= CURVE_AREA_STEPS; i++) {
+        const float s = (float)i / CURVE_AREA_STEPS;
+        const float u = 1.0f - s;
+        const lv_fpoint_t pt = {
+            u * u * p0.x + 2.0f * u * s * c->x + s * s * p->x,
+            u * u * p0.y + 2.0f * u * s * c->y + s * s * p->y,
+        };
+        tracker_add(t, &pt);
+    }
+}
+
+/*Add a cubic curve, see tracker_quad()*/
+static void tracker_cubic(contour_tracker_t * t, const lv_fpoint_t * c1, const lv_fpoint_t * c2, const lv_fpoint_t * p)
+{
+    if(!t->open) {
+        tracker_begin(t, p);
+        return;
+    }
+
+    const lv_fpoint_t p0 = t->prev;
+    for(int32_t i = 1; i <= CURVE_AREA_STEPS; i++) {
+        const float s = (float)i / CURVE_AREA_STEPS;
+        const float u = 1.0f - s;
+        const float w0 = u * u * u;
+        const float w1 = 3.0f * u * u * s;
+        const float w2 = 3.0f * u * s * s;
+        const float w3 = s * s * s;
+        const lv_fpoint_t pt = {
+            w0 * p0.x + w1 * c1->x + w2 * c2->x + w3 * p->x,
+            w0 * p0.y + w1 * c1->y + w2 * c2->y + w3 * p->y,
+        };
+        tracker_add(t, &pt);
+    }
+}
+
+/*Close the contour and return its signed area*/
 static float tracker_end(contour_tracker_t * t)
 {
     t->area += (t->prev.x * t->first.y - t->first.x * t->prev.y) * 0.5f;
@@ -383,14 +425,11 @@ static float lv_path_main_area(const lv_vector_path_t * src)
                 point_cnt = 1;
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO:
-                tracker_add(&t, &point[0]);
-                tracker_add(&t, &point[1]);
+                tracker_quad(&t, &point[0], &point[1]);
                 point_cnt = 2;
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO:
-                tracker_add(&t, &point[0]);
-                tracker_add(&t, &point[1]);
-                tracker_add(&t, &point[2]);
+                tracker_cubic(&t, &point[0], &point[1], &point[2]);
                 point_cnt = 3;
                 break;
             case LV_VECTOR_PATH_OP_CLOSE:
