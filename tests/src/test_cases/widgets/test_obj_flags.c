@@ -270,4 +270,48 @@ void test_obj_flag_parent_hidden(void)
     TEST_PASS();
 }
 
+void test_obj_state_trickle_new_child(void)
+{
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
+    lv_obj_set_state_trickle(parent, true);
+    lv_obj_add_state(parent, LV_STATE_CHECKED | LV_STATE_DISABLED);
+
+    lv_obj_t * child = lv_obj_create(parent);
+    TEST_ASSERT_TRUE(lv_obj_has_state(child, LV_STATE_CHECKED));
+    TEST_ASSERT_TRUE(lv_obj_has_state(child, LV_STATE_DISABLED));
+
+    lv_obj_remove_state(parent, LV_STATE_CHECKED);
+    TEST_ASSERT_FALSE(lv_obj_has_state(child, LV_STATE_CHECKED));
+
+    /*No inheritance without state trickle*/
+    lv_obj_t * parent2 = lv_obj_create(lv_screen_active());
+    lv_obj_add_state(parent2, LV_STATE_CHECKED);
+    lv_obj_t * child2 = lv_obj_create(parent2);
+    TEST_ASSERT_FALSE(lv_obj_has_state(child2, LV_STATE_CHECKED));
+}
+
+void test_obj_state_trickle_set_parent(void)
+{
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
+    lv_obj_set_state_trickle(parent, true);
+    lv_obj_add_state(parent, LV_STATE_CHECKED);
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_state_trickle(obj, true);
+    lv_obj_add_state(obj, LV_STATE_FOCUSED);
+    lv_obj_t * grandchild = lv_obj_create(obj);
+    TEST_ASSERT_FALSE(lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_obj_set_parent(obj, parent);
+    TEST_ASSERT_TRUE(lv_obj_has_state(obj, LV_STATE_CHECKED));
+    TEST_ASSERT_TRUE(lv_obj_has_state(obj, LV_STATE_FOCUSED));
+    TEST_ASSERT_TRUE(lv_obj_has_state(grandchild, LV_STATE_CHECKED));
+
+    /*No inheritance without state trickle*/
+    lv_obj_t * parent2 = lv_obj_create(lv_screen_active());
+    lv_obj_add_state(parent2, LV_STATE_DISABLED);
+    lv_obj_set_parent(obj, parent2);
+    TEST_ASSERT_FALSE(lv_obj_has_state(obj, LV_STATE_DISABLED));
+}
+
 #endif
