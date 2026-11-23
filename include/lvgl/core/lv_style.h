@@ -349,6 +349,19 @@ typedef enum {
 } lv_style_res_t;
 
 /**
+ * The type of style changes that can start a transition. Can be ORed.
+ */
+typedef enum {
+    /** Use the default type, i.e. `LV_STYLE_TRANSITION_TYPE_STATE`.
+     *  It keeps zero-initialized descriptors working as before.*/
+    LV_STYLE_TRANSITION_TYPE_DEFAULT = 0x00,
+    LV_STYLE_TRANSITION_TYPE_STATE   = 0x01,  /**< The state of the widget has changed*/
+    LV_STYLE_TRANSITION_TYPE_LOCAL   = 0x02,  /**< A local style property was set or removed*/
+    LV_STYLE_TRANSITION_TYPE_STYLE   = 0x04,  /**< A style was added, removed, replaced, enabled or disabled*/
+    LV_STYLE_TRANSITION_TYPE_ALL     = 0x07,
+} lv_style_transition_type_t;
+
+/**
  * Descriptor for style transitions
  */
 typedef struct {
@@ -357,6 +370,7 @@ typedef struct {
     lv_anim_path_cb_t path_xcb;    /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
     uint32_t delay;                /**< Delay before the transition in [ms]*/
+    uint8_t type;                  /**< The changes starting the transition. ORed `lv_style_transition_type_t` values*/
 } lv_style_transition_dsc_t;
 
 /**
@@ -505,6 +519,15 @@ lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop,
  */
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
                                   lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data);
+
+/**
+ * Set which kind of style changes start the transition.
+ * By default (after `lv_style_transition_dsc_init`) only state changes start transitions.
+ * @param tr        pointer to an initialized transition descriptor
+ * @param type      ORed `lv_style_transition_type_t` values,
+ *                  e.g. `LV_STYLE_TRANSITION_TYPE_STATE | LV_STYLE_TRANSITION_TYPE_LOCAL`
+ */
+void lv_style_transition_dsc_set_type(lv_style_transition_dsc_t * tr, lv_style_transition_type_t type);
 
 /**
  * Get the default value of a property
