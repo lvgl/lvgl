@@ -239,7 +239,6 @@ void test_state_change_animates_with_state_type(void)
     TEST_ASSERT_EQUAL_INT32(200, get_width(obj));
 }
 
-#if LV_USE_OBSERVER
 void test_bind_style_prop_animates_with_local_type(void)
 {
     lv_subject_t * subject = lv_subject_create(LV_SUBJECT_TYPE_INT);
@@ -260,6 +259,4 @@ void test_bind_style_prop_animates_with_local_type(void)
     lv_obj_clean(lv_screen_active());
     lv_subject_delete(subject);
 }
-#endif
-
 #endif

@@ -631,14 +631,20 @@ static bool style_value_eq(lv_style_value_t v1, lv_style_value_t v2)
 static void start_transition_core(lv_obj_t * obj, lv_part_t part, lv_style_value_t v1, lv_style_value_t v2,
                                   const lv_obj_style_transition_dsc_t * tr_dsc)
 {
-    lv_obj_style_t * style_trans = get_trans_style(obj, part);
-    if(style_trans == NULL) return;
-    lv_style_set_prop((lv_style_t *)style_trans->style, tr_dsc->prop, v1);  /*Be sure `trans_style` has a valid value*/
+    /*The radius of the transition style is set to the original value (e.g. `LV_RADIUS_CIRCLE`)*/
+    const lv_style_value_t v_start = v1;
 
-#if LV_OBJ_STYLE_CACHE
-    if(part == LV_PART_MAIN) obj->style_main_prop_is_set |= LV_OBJ_STYLE_PROP_SHIFTED(tr_dsc->prop);
-    else obj->style_other_prop_is_set |= LV_OBJ_STYLE_PROP_SHIFTED(tr_dsc->prop);
-#endif
+    /*Allocate the descriptor first so that nothing is changed if it fails*/
+    trans_t * tr = lv_ll_ins_head(style_trans_ll_p);
+    LV_ASSERT_MALLOC(tr);
+    if(tr == NULL) return;
+
+    lv_obj_style_t * style_trans = get_trans_style(obj, part);
+    if(style_trans == NULL) {
+        lv_ll_remove(style_trans_ll_p, tr);
+        lv_free(tr);
+        return;
+    }
 
     if(tr_dsc->prop == LV_STYLE_RADIUS) {
         if(v1.num == LV_RADIUS_CIRCLE || v2.num == LV_RADIUS_CIRCLE) {
@@ -649,9 +655,6 @@ static void start_transition_core(lv_obj_t * obj, lv_part_t part, lv_style_value
         }
     }
 
-    trans_t * tr = lv_ll_ins_head(style_trans_ll_p);
-    LV_ASSERT_MALLOC(tr);
-    if(tr == NULL) return;
     tr->start_value = v1;
     tr->end_value = v2;
     tr->obj = obj;
@@ -670,5 +673,17 @@ static void start_transition_core(lv_obj_t * obj, lv_part_t part, lv_style_value
     lv_anim_set_path_cb(&a, tr_dsc->path_cb);
     lv_anim_set_early_apply(&a, false);
     lv_anim_set_user_data(&a, tr_dsc->user_data);
-    lv_anim_start(&a);
+    if(lv_anim_start(&a) == NULL) {
+        lv_ll_remove(style_trans_ll_p, tr);
+        lv_free(tr);
+        return;
+    }
+
+    /*Set the start value only if the transition really started, else the property would be stuck at it*/
+    lv_style_set_prop((lv_style_t *)style_trans->style, tr_dsc->prop, v_start);
+
+#if LV_OBJ_STYLE_CACHE
+    if(part == LV_PART_MAIN) obj->style_main_prop_is_set |= LV_OBJ_STYLE_PROP_SHIFTED(tr_dsc->prop);
+    else obj->style_other_prop_is_set |= LV_OBJ_STYLE_PROP_SHIFTED(tr_dsc->prop);
+#endif
 }

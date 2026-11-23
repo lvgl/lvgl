@@ -468,11 +468,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_rgb565(lv_draw_sw_blend_ima
             argb8888_image_blend(dsc);
             break;
 #endif
-#if LV_DRAW_SW_SUPPORT_RGBA8888
-        case LV_COLOR_FORMAT_RGBA8888:
-            rgba8888_image_blend(dsc);
-            break;
-#endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
             argb8888_premultiplied_image_blend(dsc);
