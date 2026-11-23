@@ -302,10 +302,15 @@ void test_obj_state_trickle_set_parent(void)
     lv_obj_t * grandchild = lv_obj_create(obj);
     TEST_ASSERT_FALSE(lv_obj_has_state(obj, LV_STATE_CHECKED));
 
+    TEST_ASSERT_TRUE(lv_obj_has_state(grandchild, LV_STATE_FOCUSED));
+
+    /*The state becomes an exact copy of the parent's, also trickled further*/
     lv_obj_set_parent(obj, parent);
+    TEST_ASSERT_EQUAL(lv_obj_get_state(parent), lv_obj_get_state(obj));
     TEST_ASSERT_TRUE(lv_obj_has_state(obj, LV_STATE_CHECKED));
-    TEST_ASSERT_TRUE(lv_obj_has_state(obj, LV_STATE_FOCUSED));
+    TEST_ASSERT_FALSE(lv_obj_has_state(obj, LV_STATE_FOCUSED));
     TEST_ASSERT_TRUE(lv_obj_has_state(grandchild, LV_STATE_CHECKED));
+    TEST_ASSERT_FALSE(lv_obj_has_state(grandchild, LV_STATE_FOCUSED));
 
     /*No inheritance without state trickle*/
     lv_obj_t * parent2 = lv_obj_create(lv_screen_active());
