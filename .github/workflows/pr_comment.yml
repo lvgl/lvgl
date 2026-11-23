@@ -14,7 +14,6 @@ on:
     workflows:
       - "Build and Test"
       - "Static Checks"
-      - "Emulated Performance Test"
       - "Memory Usage"
       - "QEMU Emulated Render Performance"
     types:

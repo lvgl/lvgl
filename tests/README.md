@@ -3,8 +3,7 @@
 ## Test types available
 
 - **Unit Tests**: Standard functional tests in `src/test_cases/` with screenshot comparison capabilities
-- **Performance Tests**: ARM-emulated benchmarks in `src/test_cases_perf/` running on QEMU/SO3 environment
-- **Emulated Benchmarks**: Automated `lv_demo_benchmark` runs in ARM emulation to prevent performance regressions
+- **Performance Benchmarks**: The benchmark demo and render scenes measured by instruction count under QEMU in `perf_qemu/` to prevent performance regressions
 
 All of the tests are automatically ran in LVGL's CI.
 
@@ -12,8 +11,7 @@ All of the tests are automatically ran in LVGL's CI.
 
 - **Local Testing**: Run `./tests/main.py test` (after `scripts/install-prerequisites.sh`)
 - **Docker Testing**: Build with `docker build . -f tests/Dockerfile -t lvgl_test_env` then run
-- **Performance Testing**: Use `./tests/perf.py test` (requires Docker + Linux)
-- **Benchmark Testing**: Use `./tests/benchmark_emu.py run` for emulated performance benchmarks (requires Docker + Linux)
+- **Performance Benchmarks**: Use `./tests/perf_qemu/run.sh` (requires Docker)
 
 ---
 
@@ -70,7 +68,6 @@ GitHub's CI automatically runs these tests on pushes and pull requests to `maste
     - `test_cases` The written tests,
         - `public_api` Tests that call a public function with an argument it is
           documented to reject, see below,
-    - `test_cases_perf` The performance tests,
     - `test_runners` Generated automatically from the files in `test_cases`.
     - other miscellaneous files and folders
 - `configs` Kconfig defconfig fragments the build configurations are made of
@@ -106,9 +103,9 @@ See [`lvgl_test_helpers.cmake`](./lvgl_test_helpers.cmake).
 
 ### Public API tests
 
-LVGL test run with `LV_CHECK_ARG_ASSERT_ON_FAIL` to ensure LVGL internals respect 
-its public API. The test cases that check that a public function behaves correctly when 
-invalid parameters are passed exist in `src/test_cases/public_api`. These tests are only 
+LVGL test run with `LV_CHECK_ARG_ASSERT_ON_FAIL` to ensure LVGL internals respect
+its public API. The test cases that check that a public function behaves correctly when
+invalid parameters are passed exist in `src/test_cases/public_api`. These tests are only
 exercised when `LV_CHECK_ARG_ASSERT_ON_FAIL` is disabled.
 
 ## Add new tests
@@ -125,66 +122,16 @@ There are some custom, LVGL specific asserts:
    - If the compare fails an `<image_name>_err.png` file will be created with the rendered content next to the reference image.
 - `TEST_ASSERT_EQUAL_COLOR(color1, color2)` Compare two colors.
 
-## Performance Tests
+## Performance benchmarks
 
-### Requirements
+`perf_qemu/` builds LVGL for several emulated architectures, runs the benchmark demo and the
+render scenes under QEMU and counts the executed instructions, so the numbers are
+deterministic. CI runs it on every pull request and compares the results against `master`.
 
-- **Docker**
-- **Linux host machine** (WSL *may* work but is untested)
-
-### Running Tests
-
-The performance tests are run inside a Docker container that launches an ARM emulated environment using QEMU to ensure consistent timing across machines.
-Each test runs on a lightweight ARM-based OS ([SO3](https://github.com/smartobjectoriented/so3)) within this emulated environment.
-
-To run the tests:
-
-```bash
-./perf.py [--clean] [--auto-clean] [--test-suite <suite>] [--build-options <option>] [build|generate|test]
-```
-
-- `build` and `generate`: generates all necessary build and configuration files
-- `test`: launches Docker with the appropriate volume mounts and runs the tests inside the container
-
-
-> [!NOTE]
-> Building doesn't actually build the source files because the current docker image doesn't separate the building and running. Instead, it does both
-
-You can specify different build configurations via `--build-options`, and optionally filter tests using `--test-suite`.
-
-For full usage options, run:
+To run it locally (requires Docker):
 
 ```sh
-./perf.py --help
+./perf_qemu/run.sh
 ```
 
-You can also run this script by passing a performance test config to the `main.py` script. The performance tests configs can be found inside the [`perf.py`](./perf.py) file
-
-## Emulated benchmarks
-
-In addition to unit and performance tests, LVGL automatically runs the `lv_demo_benchmark` inside the same ARM emulated
-environment mentioned in the previous section through CI to prevent unintentional slowdowns.
-
-### Requirements
-
-- **Docker**
-- **Linux host machine** (WSL *may* work but is untested)
-
-To run the these benchmarks in the emulated setup described above, you can use the provided python script:
-
-```sh
-./benchmark_emu.py [-h] [--config {perf32b,perf64b}] [--pull] [--clean] [--auto-clean]
-                        [{generate,run} ...]
-```
-
-The following command runs all available configurations:
-
-```sh
-./benchmark_emu.py run 
-```
-
-You can also request a specific configuration:
-
-```sh
-./benchmark_emu.py --config perf32b run 
-```
+See the comment at the top of [`perf_qemu/run.sh`](./perf_qemu/run.sh) for the available options.
