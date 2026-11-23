@@ -7,6 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_blend_to_argb8888.h"
+
+/*The functions are in the included template: keep astyle from indenting the preprocessor blocks*/
+/* *INDENT-OFF* */
+
 #if LV_USE_DRAW_SW
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
@@ -168,3 +172,5 @@ typedef lv_color32_t dest_px_t;
 #endif /* LV_DRAW_SW_SUPPORT_ARGB8888 */
 
 #endif /* LV_USE_DRAW_SW */
+
+/* *INDENT-ON* */
