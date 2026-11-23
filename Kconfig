@@ -246,6 +246,161 @@ config LV_OS_IDLE_PERCENT_CUSTOM
 endmenu
 endif #LV_OS_FREERTOS
 endmenu
+menu "IRQ Abstraction Layer (IRQ)"
+# An IRQ provider defines lv_irq_attach_<source>() and lv_irq_detach_<source>()
+# for the sources it serves, and turns on their LV_IRQ_PROVIDES_<SOURCE>. Where
+# it comes from does not matter: picking a bundled one turns on the sources it
+# can serve, and it serves those the device has.
+
+choice LV_IRQ_PROVIDER
+	prompt "IRQ provider"
+	default LV_IRQ_PROVIDER_NONE
+
+	config LV_IRQ_PROVIDER_NONE
+		bool "None (or provided outside LVGL)"
+		help
+			Enable below the sources your own code provides.
+	config LV_IRQ_PROVIDER_CMSIS
+		bool "CMSIS (NVIC)"
+		select LV_IRQ_PROVIDES_DMA2D
+		select LV_IRQ_PROVIDES_PXP
+		select LV_IRQ_PROVIDES_EPIC
+		select LV_IRQ_PROVIDES_EZIP
+		help
+			Defines DMA2D_IRQHandler, PXP_IRQHandler, EPIC_IRQHandler and
+			EZIP_IRQHandler for the enabled sources the device has, so the
+			application must not define them too. Under RT-Thread the handlers
+			are wrapped in rt_interrupt_enter() / rt_interrupt_leave().
+	config LV_IRQ_PROVIDER_ZEPHYR
+		bool "Zephyr (device tree)"
+		select LV_IRQ_PROVIDES_DMA2D
+		select LV_IRQ_PROVIDES_PXP
+		select LV_IRQ_PROVIDES_EPIC
+		select LV_IRQ_PROVIDES_EZIP
+		help
+			Connects the interrupts of the enabled sources whose device-tree node
+			(dma2d, pxp, epic, ezip) exists.
+	config LV_IRQ_PROVIDER_STM32
+		bool "STM32 (HAL)"
+		select LV_IRQ_PROVIDES_DMA2D
+		select LV_IRQ_PROVIDES_NEMAGFX
+		help
+			Serves the interrupts the device has through the STM32 HAL, for
+			CubeMX-style projects whose generated <PERIPH>_IRQHandler calls
+			HAL_<PERIPH>_IRQHandler: DMA2D through the hdma2d handle's
+			transfer-complete callback, the NemaGFX GPU2D through the hgpu2d
+			handle's command-list-complete callback. A source is served when the
+			device has it and its HAL module is enabled.
+	config LV_IRQ_PROVIDER_CUSTOM
+		bool "Custom"
+		select LV_IRQ_USE_CUSTOM_INCLUDE
+		help
+			Your own provider. Enable below the sources it serves.
+endchoice
+
+config LV_IRQ_PROVIDER
+	int
+	default 0 if LV_IRQ_PROVIDER_NONE
+	default 1 if LV_IRQ_PROVIDER_CMSIS
+	default 2 if LV_IRQ_PROVIDER_ZEPHYR
+	default 3 if LV_IRQ_PROVIDER_STM32
+	default 255 if LV_IRQ_PROVIDER_CUSTOM
+
+config LV_IRQ_USE_CUSTOM_INCLUDE
+	bool
+
+config LV_IRQ_CUSTOM_INCLUDE
+	string "Custom IRQ provider header"
+	default ""
+	depends on LV_IRQ_PROVIDER_CUSTOM
+	help
+		Included by lv_conf_internal.h. Your build links lv_irq_attach_<source>()
+		and lv_irq_detach_<source>() for each source enabled below.
+
+config LV_IRQ_PROVIDES_DMA2D
+	bool "Provides the DMA2D interrupt"
+	help
+		Declares lv_irq_attach_dma2d() and lv_irq_detach_dma2d(). LVGL's providers
+		serve it only when the device has it (DMA2D_BASE in the device header, a
+		dma2d device-tree node on Zephyr).
+
+config LV_IRQ_PROVIDES_PXP
+	bool "Provides the PXP interrupt"
+	help
+		Declares lv_irq_attach_pxp() and lv_irq_detach_pxp(). LVGL's providers
+		serve it only when the device has it (PXP_BASE in the device header, a
+		pxp device-tree node on Zephyr).
+
+config LV_IRQ_PROVIDES_NEMAGFX
+	bool "Provides the NemaGFX GPU2D completion"
+	help
+		Declares lv_irq_attach_nemagfx() and lv_irq_detach_nemagfx(). LVGL's STM32
+		provider serves it only when the device has a GPU2D (GPU2D_BASE).
+
+config LV_IRQ_PROVIDES_EPIC
+	bool "Provides the SiFli EPIC interrupt"
+	help
+		Declares lv_irq_attach_epic() and lv_irq_detach_epic(). LVGL's providers
+		serve it only when the device has it (EPIC_BASE in the device header, an
+		epic device-tree node on Zephyr).
+
+config LV_IRQ_PROVIDES_EZIP
+	bool "Provides the SiFli EZIP interrupt"
+	help
+		Declares lv_irq_attach_ezip() and lv_irq_detach_ezip(). LVGL's providers
+		serve it only when the device has it (EZIP_BASE or EZIP1_BASE in the
+		device header, an ezip device-tree node on Zephyr).
+
+if LV_IRQ_PROVIDER_CMSIS
+
+config LV_IRQ_CMSIS_USE_INCLUDE
+	bool "Include a device header"
+	help
+		Include the device header that declares the IRQn_Type values
+		(DMA2D_IRQn, PXP_IRQn, ...), the peripheral base addresses and the
+		NVIC_* functions. Leave disabled if the build already makes them visible.
+
+config LV_IRQ_CMSIS_INCLUDE
+	string "Device header"
+	default ""
+	depends on LV_IRQ_CMSIS_USE_INCLUDE
+	help
+		For example "stm32h7xx.h".
+
+config LV_IRQ_CMSIS_SET_NVIC_PRIORITY
+	bool "Set the NVIC priority"
+	default y if LV_OS_FREERTOS
+	help
+		Enable on RTOS builds where the interrupt priority must sit at or below
+		the kernel's syscall interrupt priority ceiling, so the ISR may call the
+		kernel's ...FromISR APIs (lv_thread_sync_signal_isr uses one). Leave
+		disabled on bare metal, where the reset-default priority is fine.
+
+config LV_IRQ_CMSIS_NVIC_PRIORITY
+	int "NVIC priority value"
+	default 255
+	depends on LV_IRQ_CMSIS_SET_NVIC_PRIORITY
+	help
+		The value passed to NVIC_SetPriority. 255 maps to the lowest preemption
+		priority whatever __NVIC_PRIO_BITS is: always safe for ...FromISR calls,
+		at the cost of latency. Under FreeRTOS the best latency is
+		configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY (a hand-written lv_conf.h may
+		write it symbolically; Kconfig takes a literal number).
+
+endif
+
+if LV_IRQ_PROVIDER_STM32
+
+config LV_IRQ_STM32_HAL_INCLUDE
+	string "STM32 HAL header"
+	default "set_LV_IRQ_STM32_HAL_INCLUDE_to_your_stm32xxxx_hal.h"
+	help
+		The family's HAL header, e.g. "stm32h7xx_hal.h". The default is a
+		placeholder that names this setting in the compile error.
+
+endif
+
+endmenu
 menu "Rendering Configuration"
 
 menu "Color Settings"
@@ -1002,9 +1157,10 @@ config LV_DRAW_DMA2D_HAL_INCLUDE
 config LV_USE_DRAW_DMA2D_INTERRUPT
 	bool "Transfer complete interrupt"
 	default n
+	depends on !LV_OS_NONE && LV_IRQ_PROVIDES_DMA2D
 	help
-		Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
-		Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
+		Run DMA2D transfers asynchronously instead of waiting for them. Needs an
+		OS and an IRQ provider for DMA2D (LV_IRQ_PROVIDES_DMA2D).
 
 endif
 endmenu

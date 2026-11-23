@@ -19,13 +19,11 @@
 #if LV_USE_SIFLI_EPIC
 #include "../../../osal/lv_os_private.h"
 
-#if defined(__ZEPHYR__)
-    #include <zephyr/kernel.h>
-    #include <zephyr/irq.h>
+#if !LV_IRQ_PROVIDES_EPIC
+    #error "EPIC IRQ provider missing: enable LV_IRQ_PROVIDES_EPIC"
 #endif
-
-#if LV_USE_OS == LV_OS_RTTHREAD
-    #include <rtthread.h>
+#if defined(HAL_EZIP_MODULE_ENABLED) && !LV_IRQ_PROVIDES_EZIP
+    #error "EZIP IRQ provider missing: enable LV_IRQ_PROVIDES_EZIP"
 #endif
 
 /*********************
@@ -40,14 +38,9 @@ static void _epic_interrupt_init(void);
 static void _epic_interrupt_deinit(void);
 static void _epic_run(void);
 static void _epic_wait(void);
-static void _epic_irq_enter(void);
-static void _epic_irq_leave(void);
-
-#if defined(__ZEPHYR__)
-    static void _epic_zephyr_irq_handler(const void * arg);
-    #ifdef HAL_EZIP_MODULE_ENABLED
-        static void _ezip_zephyr_irq_handler(const void * arg);
-    #endif
+static void _epic_irq_cb(void * user_data);
+#ifdef HAL_EZIP_MODULE_ENABLED
+    static void _ezip_irq_cb(void * user_data);
 #endif
 
 /**********************
@@ -69,52 +62,6 @@ static epic_osa_cfg_t _epic_default_cfg = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-#if defined(__ZEPHYR__)
-static void _epic_zephyr_irq_handler(const void * arg)
-{
-    LV_UNUSED(arg);
-    EPIC_IRQHandler();
-}
-
-#ifdef HAL_EZIP_MODULE_ENABLED
-static void _ezip_zephyr_irq_handler(const void * arg)
-{
-    LV_UNUSED(arg);
-    EZIP_IRQHandler();
-}
-#endif
-#endif
-
-void EPIC_IRQHandler(void)
-{
-    _epic_irq_enter();
-
-    if(lv_epic_is_initialized()) {
-        EPIC_HandleTypeDef * epic_handle = lv_epic_get_handle();
-        if(epic_handle != NULL) {
-            HAL_EPIC_IRQHandler(epic_handle);
-        }
-    }
-
-    _epic_irq_leave();
-}
-
-#ifdef HAL_EZIP_MODULE_ENABLED
-void EZIP_IRQHandler(void)
-{
-    _epic_irq_enter();
-
-    if(lv_epic_is_initialized()) {
-        EZIP_HandleTypeDef * ezip_handle = lv_ezip_get_handle();
-        if(ezip_handle != NULL) {
-            HAL_EZIP_IRQHandler(ezip_handle);
-        }
-    }
-
-    _epic_irq_leave();
-}
-#endif
 
 epic_osa_cfg_t * epic_get_default_cfg(void)
 {
@@ -184,65 +131,43 @@ void lv_epic_osa_thread_sync_delete(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void _epic_irq_enter(void)
+static void _epic_irq_cb(void * user_data)
 {
-#if LV_USE_OS == LV_OS_RTTHREAD
-    rt_interrupt_enter();
-#endif
+    LV_UNUSED(user_data);
+
+    EPIC_HandleTypeDef * epic_handle = lv_epic_get_handle();
+    if(epic_handle != NULL) {
+        HAL_EPIC_IRQHandler(epic_handle);
+    }
 }
 
-static void _epic_irq_leave(void)
+#ifdef HAL_EZIP_MODULE_ENABLED
+static void _ezip_irq_cb(void * user_data)
 {
-#if LV_USE_OS == LV_OS_RTTHREAD
-    rt_interrupt_leave();
-#endif
+    LV_UNUSED(user_data);
+
+    EZIP_HandleTypeDef * ezip_handle = lv_ezip_get_handle();
+    if(ezip_handle != NULL) {
+        (void)HAL_EZIP_IRQHandler(ezip_handle);
+    }
 }
+#endif
 
 static void _epic_interrupt_init(void)
 {
-#if defined(__ZEPHYR__)
-    IRQ_CONNECT(LV_SIFLI_EPIC_IRQn, LV_SIFLI_EPIC_IRQ_PRIORITY, _epic_zephyr_irq_handler, NULL,
-                LV_SIFLI_EPIC_ZEPHYR_IRQ_FLAGS);
-    irq_enable(LV_SIFLI_EPIC_IRQn);
-#elif LV_USE_OS == LV_OS_FREERTOS && defined(LV_SIFLI_EPIC_FREERTOS_IRQ_PRIORITY)
-    HAL_NVIC_SetPriority(LV_SIFLI_EPIC_IRQn, LV_SIFLI_EPIC_FREERTOS_IRQ_PRIORITY, 0);
-    HAL_NVIC_EnableIRQ(LV_SIFLI_EPIC_IRQn);
-#else
-    HAL_NVIC_SetPriority(LV_SIFLI_EPIC_IRQn, LV_SIFLI_EPIC_IRQ_PRIORITY, 0);
-    HAL_NVIC_EnableIRQ(LV_SIFLI_EPIC_IRQn);
-#endif
+    epic_idle = true;
 
 #ifdef HAL_EZIP_MODULE_ENABLED
-#if defined(__ZEPHYR__)
-    IRQ_CONNECT(LV_SIFLI_EZIP_IRQn, LV_SIFLI_EPIC_IRQ_PRIORITY, _ezip_zephyr_irq_handler, NULL,
-                LV_SIFLI_EPIC_ZEPHYR_IRQ_FLAGS);
-    irq_enable(LV_SIFLI_EZIP_IRQn);
-#elif LV_USE_OS == LV_OS_FREERTOS && defined(LV_SIFLI_EPIC_FREERTOS_IRQ_PRIORITY)
-    HAL_NVIC_SetPriority(LV_SIFLI_EZIP_IRQn, LV_SIFLI_EPIC_FREERTOS_IRQ_PRIORITY, 0);
-    HAL_NVIC_EnableIRQ(LV_SIFLI_EZIP_IRQn);
-#else
-    HAL_NVIC_SetPriority(LV_SIFLI_EZIP_IRQn, LV_SIFLI_EPIC_IRQ_PRIORITY, 0);
-    HAL_NVIC_EnableIRQ(LV_SIFLI_EZIP_IRQn);
+    lv_irq_attach_ezip(_ezip_irq_cb, NULL);
 #endif
-#endif
-
-    epic_idle = true;
+    lv_irq_attach_epic(_epic_irq_cb, NULL);
 }
 
 static void _epic_interrupt_deinit(void)
 {
-#if defined(__ZEPHYR__)
-    irq_disable(LV_SIFLI_EPIC_IRQn);
-#else
-    HAL_NVIC_DisableIRQ(LV_SIFLI_EPIC_IRQn);
-#endif
-
+    lv_irq_detach_epic();
 #ifdef HAL_EZIP_MODULE_ENABLED
-#if defined(__ZEPHYR__)
-    irq_disable(LV_SIFLI_EZIP_IRQn);
-#else
-    HAL_NVIC_DisableIRQ(LV_SIFLI_EZIP_IRQn);
-#endif
+    lv_irq_detach_ezip();
 #endif
 
     epic_idle = true;

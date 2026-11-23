@@ -125,6 +125,98 @@
 
 
 /*============================================================================
+ * IRQ ABSTRACTION LAYER (IRQ)
+ *============================================================================*/
+
+/** IRQ provider
+ *  Possible values:
+ *  - LV_IRQ_PROVIDER_NONE: None (or provided outside LVGL)
+ *  - LV_IRQ_PROVIDER_CMSIS: CMSIS (NVIC) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_PXP, LV_IRQ_PROVIDES_EPIC, LV_IRQ_PROVIDES_EZIP)
+ *  - LV_IRQ_PROVIDER_ZEPHYR: Zephyr (device tree) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_PXP, LV_IRQ_PROVIDES_EPIC, LV_IRQ_PROVIDES_EZIP)
+ *  - LV_IRQ_PROVIDER_STM32: STM32 (HAL) (enable: LV_IRQ_PROVIDES_DMA2D, LV_IRQ_PROVIDES_NEMAGFX)
+ *  - LV_IRQ_PROVIDER_CUSTOM
+ */
+#define LV_IRQ_PROVIDER LV_IRQ_PROVIDER_NONE
+
+#if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CUSTOM
+/** Included by lv_conf_internal.h. Your build links lv_irq_attach_<source>()
+ *  and lv_irq_detach_<source>() for each source enabled below.
+ */
+#define LV_IRQ_CUSTOM_INCLUDE ""
+
+#endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CUSTOM*/
+
+/** Declares lv_irq_attach_dma2d() and lv_irq_detach_dma2d(). LVGL's providers
+ *  serve it only when the device has it (DMA2D_BASE in the device header, a
+ *  dma2d device-tree node on Zephyr).
+ */
+#define LV_IRQ_PROVIDES_DMA2D 0
+
+/** Declares lv_irq_attach_pxp() and lv_irq_detach_pxp(). LVGL's providers
+ *  serve it only when the device has it (PXP_BASE in the device header, a
+ *  pxp device-tree node on Zephyr).
+ */
+#define LV_IRQ_PROVIDES_PXP 0
+
+/** Declares lv_irq_attach_nemagfx() and lv_irq_detach_nemagfx(). LVGL's STM32
+ *  provider serves it only when the device has a GPU2D (GPU2D_BASE).
+ */
+#define LV_IRQ_PROVIDES_NEMAGFX 0
+
+/** Declares lv_irq_attach_epic() and lv_irq_detach_epic(). LVGL's providers
+ *  serve it only when the device has it (EPIC_BASE in the device header, an
+ *  epic device-tree node on Zephyr).
+ */
+#define LV_IRQ_PROVIDES_EPIC 0
+
+/** Declares lv_irq_attach_ezip() and lv_irq_detach_ezip(). LVGL's providers
+ *  serve it only when the device has it (EZIP_BASE or EZIP1_BASE in the
+ *  device header, an ezip device-tree node on Zephyr).
+ */
+#define LV_IRQ_PROVIDES_EZIP 0
+
+#if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS
+/** Include the device header that declares the IRQn_Type values
+ *  (DMA2D_IRQn, PXP_IRQn, ...), the peripheral base addresses and the
+ *  NVIC_* functions. Leave disabled if the build already makes them visible.
+ */
+#define LV_IRQ_CMSIS_USE_INCLUDE 0
+
+#if LV_IRQ_CMSIS_USE_INCLUDE
+/** For example "stm32h7xx.h". */
+#define LV_IRQ_CMSIS_INCLUDE ""
+
+#endif /*LV_IRQ_CMSIS_USE_INCLUDE*/
+
+/** Enable on RTOS builds where the interrupt priority must sit at or below
+ *  the kernel's syscall interrupt priority ceiling, so the ISR may call the
+ *  kernel's ...FromISR APIs (lv_thread_sync_signal_isr uses one). Leave
+ *  disabled on bare metal, where the reset-default priority is fine.
+ */
+#define LV_IRQ_CMSIS_SET_NVIC_PRIORITY 0
+
+#if LV_IRQ_CMSIS_SET_NVIC_PRIORITY
+/** The value passed to NVIC_SetPriority. 255 maps to the lowest preemption
+ *  priority whatever __NVIC_PRIO_BITS is: always safe for ...FromISR calls,
+ *  at the cost of latency. Under FreeRTOS the best latency is
+ *  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY (a hand-written lv_conf.h may
+ *  write it symbolically; Kconfig takes a literal number).
+ */
+#define LV_IRQ_CMSIS_NVIC_PRIORITY 255
+
+#endif /*LV_IRQ_CMSIS_SET_NVIC_PRIORITY*/
+#endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_CMSIS*/
+
+#if LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32
+/** The family's HAL header, e.g. "stm32h7xx_hal.h". The default is a
+ *  placeholder that names this setting in the compile error.
+ */
+#define LV_IRQ_STM32_HAL_INCLUDE "set_LV_IRQ_STM32_HAL_INCLUDE_to_your_stm32xxxx_hal.h"
+
+#endif /*LV_IRQ_PROVIDER == LV_IRQ_PROVIDER_STM32*/
+
+
+/*============================================================================
  * RENDERING CONFIGURATION
  *============================================================================*/
 
@@ -551,11 +643,15 @@
 /** Header that declares the DMA2D HAL API of the target STM32 family. */
 #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
-/** Run DMA2D transfers asynchronously instead of waiting for them (needs an OS).
- *  Call lv_draw_dma2d_transfer_complete_interrupt_handler() from the DMA2D global ISR.
+#if LV_USE_OS != LV_OS_NONE
+#if LV_IRQ_PROVIDES_DMA2D
+/** Run DMA2D transfers asynchronously instead of waiting for them. Needs an
+ *  OS and an IRQ provider for DMA2D (LV_IRQ_PROVIDES_DMA2D).
  */
 #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 
+#endif /*LV_IRQ_PROVIDES_DMA2D*/
+#endif /*LV_USE_OS != LV_OS_NONE*/
 #endif /*LV_USE_DRAW_DMA2D*/
 
 /** Accelerate blends, fills, images and text with the EPIC (Enhanced
@@ -1766,11 +1862,8 @@
 
 #endif /*LV_USE_NUTTX_MOUSE*/
 
-#if LV_USE_PROFILER_BUILTIN
 /** Write the built-in profiler output to a file instead of the console. */
 #define LV_USE_NUTTX_TRACE_FILE 0
-
-#endif /*LV_USE_PROFILER_BUILTIN*/
 
 #if LV_USE_NUTTX_TRACE_FILE
 /** Profiler trace file path */

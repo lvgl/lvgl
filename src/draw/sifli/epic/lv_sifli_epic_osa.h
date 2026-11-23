@@ -55,16 +55,6 @@ typedef struct {
  **********************/
 
 /**
- * EPIC device interrupt handler exported by the adapter.
- */
-void EPIC_IRQHandler(void);
-
-/**
- * EZIP device interrupt handler exported by the adapter.
- */
-void EZIP_IRQHandler(void);
-
-/**
  * Get the EPIC default OSA configuration.
  * @return Pointer to the default EPIC OSA configuration structure
  */

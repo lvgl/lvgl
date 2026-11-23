@@ -265,6 +265,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "xf86drmMode.h",
     "xkbcommon/xkbcommon.h",
     "zephyr/arch/cache.h",
+    "zephyr/devicetree.h",
     "zephyr/irq.h",
     "zephyr/kernel.h",
 }

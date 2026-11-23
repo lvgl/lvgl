@@ -19,6 +19,7 @@ SCRIPT_PATH = Path(__file__).resolve()
 ROOT_FILES = [
     "src/stdlib/Kconfig",
     "src/osal/Kconfig",
+    "src/irqal/Kconfig",
     "src/draw/Kconfig",
     "src/indev/Kconfig",
     "src/core/Kconfig",
