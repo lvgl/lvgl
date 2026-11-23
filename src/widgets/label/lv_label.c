@@ -1571,7 +1571,7 @@ static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subj
                 break;
 #if LV_USE_FLOAT
             case LV_SUBJECT_TYPE_FLOAT:
-                lv_label_set_text_fmt(observer->target, fmt, subject->value.float_v);
+                lv_label_set_text_fmt(observer->target, fmt, (double)subject->value.float_v);
                 break;
 #endif
             case LV_SUBJECT_TYPE_STRING:
