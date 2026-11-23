@@ -10,15 +10,44 @@ can be found in the `lvgl/scripts/gdb` directory. The GDB plugin can be used
 with any target where GDB is available. For example, you can use it to debug a
 device connected to a PC via JLink, which provides a GDB server. Additionally,
 if your device crashes and you have a core dump, you can use GDB to analyze the
-core dump. To load the LVGL GDB plugin within GDB's command line, type the
-following command:
+core dump.
 
-`source lvgl/scripts/gdb/gdbinit.py`
+### Installation
+
+The plugin is plain Python with no dependencies beyond the standard library,
+so it runs in any GDB that has Python support, and nothing has to be
+installed.
+
+The whole plugin is also packed into a single file, `lvglgdb.py`, attached to
+each [LVGL release](https://github.com/lvgl/lvgl/releases) from v9.6.0 on.
+Download it from the release that matches your LVGL version:
+
+```bash
+curl -LO https://github.com/lvgl/lvgl/releases/download/v9.6.0/lvglgdb.py
+```
+
+then load it in GDB:
+
+```bash
+source lvglgdb.py
+```
+
+If your project already contains LVGL, load the plugin from its sources
+instead:
+
+```bash
+source lvgl/scripts/gdb/gdbinit.py
+```
+
+To load it in every session, put the `source` line in `~/.gdbinit`.
+
+The plugin's version follows the LVGL release it ships with, but it also reads
+targets built from older LVGL versions.
 
 Example of usage:
 
 ```bash
-(gdb) source lvgl/scripts/gdb/gdbinit.py
+(gdb) source lvglgdb.py
 
 (gdb) dump obj -L 3
 Display @0x519000005a80
@@ -45,7 +74,7 @@ and a pointer to it are both accepted, so `info style my_style` and
   buffers to image files.
 - `dump cache image|image_header`: Dump image or image header cache entries.
 - `check cache image|image_header`: Run a sanity check on that cache.
-- `dump anim`: List all active animations.
+- `dump anim [--detail]`: List all active animations.
 - `dump timer`: List all active timers.
 - `dump indev`: List all input devices.
 - `dump group`: List all focus groups with their objects.
@@ -58,9 +87,10 @@ and a pointer to it are both accepted, so `info style my_style` and
 - `dump widget props [<class>|<widget>]`: List the fields a widget has, by
   class name (`lv_keyboard`) or from a live widget. With no argument, lists the
   widget classes.
-- `info widget [<widget>] [<field>...] [-p <path>]`: Inspect one widget, or
-  list every widget. The widget can be named instead of addressed. Field names
-  limit the output to those fields.
+- `info widget [<widget>] [<field>...] [-p <path>] [-t] [-L <depth>]`: Inspect
+  one widget, or list every widget. The widget can be named instead of
+  addressed. Field names limit the output to those fields; `-t` / `--tree`
+  lists the widget's subtree instead.
 - `info style <lv_style_t>`: Inspect a single style.
 - `info style --obj <lv_obj_t *>`: Inspect all styles of a widget.
 - `info draw_unit`: Print raw struct details for each drawing unit.
@@ -72,6 +102,8 @@ and a pointer to it are both accepted, so `info style my_style` and
 - `info lvgl_version`: Print the LVGL version of the target and the plugin's
   own.
 - `lvglobal [-p <pid>]`: (NuttX only) Set which LVGL instance to inspect.
+- `debugger -t pycharm|vscode|eclipse [--host <host>] [-p <port>]`: Attach an
+  IDE's Python debugger to the plugin itself.
 
 <Callout type="info">
 Some versions of `gdb` on Windows (e.g. those delivered with various versions
@@ -258,6 +290,10 @@ Connect to `PyCharm` / `VSCode` / `Eclipse (not supported yet)`
 
 `debugger -t eclipse`
 
+`--host` and `-p` / `--port` set the debug endpoint. For VS Code, the plugin
+listens there and the IDE attaches to it; for PyCharm, the plugin connects to
+the IDE's debug server listening there.
+
 Perform a web search for `pydevd_pycharm` or `debugpy` for details about how to
 use the debugger.
 
@@ -359,7 +395,7 @@ Example:
 
 ```text
 (gdb) info obj_class lv_button_class
-ObjClass: lv_button -> lv_obj -> lv_obj
+ObjClass: lv_button -> lv_obj
   name           = lv_button
   base           = lv_obj
   size           = 48 editable=0 group_def=2
@@ -391,8 +427,8 @@ Example:
 
 ```text
 (gdb) info lvgl_version
-LVGL:    9.6.0-dev
-lvglgdb: 0.5.0
+LVGL:    9.6.0
+lvglgdb: 9.6.0
 ```
 
 The version is read from the target rather than from the plugin's own copy of
@@ -426,9 +462,9 @@ multi-process systems, use `--pid` to specify the target process.
 
 ## Data Export API
 
-Each wrapper class provides a `snapshot()` method that returns a `Snapshot
+Each wrapper class provides a `snapshot()` method that returns a `Snapshot`
 object containing a pure Python dict (JSON-serializable) plus an optional
-reference to the original wrapper via source`.
+reference to the original wrapper via `source`.
 
 ```python
 from lvglgdb import LVTimer, curr_inst
