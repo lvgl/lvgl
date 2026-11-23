@@ -259,4 +259,29 @@ void test_bind_style_prop_animates_with_local_type(void)
     lv_obj_clean(lv_screen_active());
     lv_subject_delete(subject);
 }
+void test_pointer_prop_is_not_interpolated(void)
+{
+    static const lv_style_prop_t ptr_props[] = {LV_STYLE_GRID_COLUMN_DSC_ARRAY, LV_STYLE_PROP_INV};
+    static const int32_t col_a[] = {10, LV_GRID_TEMPLATE_LAST};
+    static const int32_t col_b[] = {20, 30, LV_GRID_TEMPLATE_LAST};
+
+    lv_style_transition_dsc_t dsc;
+    lv_style_transition_dsc_init(&dsc, ptr_props, lv_anim_path_linear, 1000, 0, NULL);
+    lv_style_transition_dsc_set_type(&dsc, LV_STYLE_TRANSITION_TYPE_LOCAL);
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_style_transition(obj, &dsc, 0);
+    lv_obj_set_style_grid_column_dsc_array(obj, col_a, 0);
+    lv_refr_now(NULL);
+
+    lv_obj_set_style_grid_column_dsc_array(obj, col_b, 0);
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL_PTR(col_a, lv_obj_get_style_grid_column_dsc_array(obj, 0));
+
+    lv_test_wait(600);
+    TEST_ASSERT_EQUAL_PTR(col_b, lv_obj_get_style_grid_column_dsc_array(obj, 0));
+
+    lv_obj_delete(obj);
+}
+
 #endif

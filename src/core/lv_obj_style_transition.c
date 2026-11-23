@@ -342,9 +342,17 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 if(v < 255) value_final.num = tr->start_value.num;
                 else value_final.num = tr->end_value.num;
                 break;
+            /*Pointers can't be interpolated, switch at the end*/
             case LV_STYLE_TRANSITION:
             case LV_STYLE_TEXT_FONT:
             case LV_STYLE_BG_IMAGE_SRC:
+            case LV_STYLE_BG_GRAD:
+            case LV_STYLE_IMAGE_COLORKEY:
+            case LV_STYLE_ARC_IMAGE_SRC:
+            case LV_STYLE_ANIM:
+            case LV_STYLE_BITMAP_MASK_SRC:
+            case LV_STYLE_GRID_COLUMN_DSC_ARRAY:
+            case LV_STYLE_GRID_ROW_DSC_ARRAY:
                 if(v < 255) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
