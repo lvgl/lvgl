@@ -1016,7 +1016,11 @@ void rleFree(SwRle* rle)
 
 void rleClip(SwRle *rle, const SwRle *clip)
 {
-    if (rle->size == 0 || clip->size == 0) return;
+    if (rle->size == 0) return;
+    if (clip->size == 0) {
+        rle->size = 0;
+        return;
+    }
     auto spanCnt = rle->size > clip->size ? rle->size : clip->size;
     auto spans = static_cast<SwSpan*>(lv_malloc(sizeof(SwSpan) * (spanCnt)));
     LV_ASSERT_MALLOC(spans);

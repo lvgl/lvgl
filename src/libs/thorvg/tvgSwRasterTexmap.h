@@ -64,7 +64,8 @@ static bool _arrange(const SwImage* image, const SwBBox* region, int& yStart, in
         regionBottom = region->max.y;
     } else {
         regionTop = image->rle->spans->y;
-        regionBottom = image->rle->spans[image->rle->size - 1].y;
+        //Segments use an exclusive bottom; the final span's scanline is still visible.
+        regionBottom = image->rle->spans[image->rle->size - 1].y + 1;
     }
 
     if (yStart >= regionBottom) return false;
@@ -121,7 +122,7 @@ static bool _rasterMaskedPolygonImageSegment(SwSurface* surface, const SwImage* 
             minx = INT32_MAX;
             maxx = 0;
             //one single row, could be consisted of multiple spans.
-            while (span->y == y && spanIdx < image->rle->size) {
+            while (spanIdx < image->rle->size && span->y == y) {
                 if (minx > span->x) minx = span->x;
                 if (maxx < span->x + span->len) maxx = span->x + span->len;
                 ++span;
@@ -315,7 +316,7 @@ static void _rasterBlendingPolygonImageSegment(SwSurface* surface, const SwImage
             minx = INT32_MAX;
             maxx = 0;
             //one single row, could be consisted of multiple spans.
-            while (span->y == y && spanIdx < image->rle->size) {
+            while (spanIdx < image->rle->size && span->y == y) {
                 if (minx > span->x) minx = span->x;
                 if (maxx < span->x + span->len) maxx = span->x + span->len;
                 ++span;
@@ -497,7 +498,7 @@ static void _rasterPolygonImageSegment(SwSurface* surface, const SwImage* image,
             minx = INT32_MAX;
             maxx = 0;
             //one single row, could be consisted of multiple spans.
-            while (span->y == y && spanIdx < image->rle->size) {
+            while (spanIdx < image->rle->size && span->y == y) {
                 if (minx > span->x) minx = span->x;
                 if (maxx < span->x + span->len) maxx = span->x + span->len;
                 ++span;
@@ -679,8 +680,8 @@ static void _rasterPolygonImage(SwSurface* surface, const SwImage* image, const 
         std::swap(v[1], v[2]);
     }
 
-    //Y indexes
-    int yi[3] = {(int)y[0], (int)y[1], (int)y[2]};
+    //Floor keeps the sampling phase unchanged when a tile translates vertices below zero.
+    int yi[3] = {(int)floorf(y[0]), (int)floorf(y[1]), (int)floorf(y[2])};
 
     //Skip drawing if it's too thin to cover any pixels at all.
     if ((yi[0] == yi[1] && yi[0] == yi[2]) || ((int) x[0] == (int) x[1] && (int) x[0] == (int) x[2])) return;
@@ -727,7 +728,8 @@ static void _rasterPolygonImage(SwSurface* surface, const SwImage* image, const 
 
         //Draw upper segment if possibly visible
         if (yi[0] < yi[1]) {
-            off_y = y[0] < regionTop ? (regionTop - y[0]) : 0;
+            //The fractional offset is already in dy. Clip by whole scanlines only.
+            off_y = yi[0] < regionTop ? float(regionTop - yi[0]) : 0;
             xa += (off_y * dxdya);
             ua += (off_y * dudya);
             va += (off_y * dvdya);
@@ -748,7 +750,7 @@ static void _rasterPolygonImage(SwSurface* surface, const SwImage* image, const 
         }
         //Draw lower segment if possibly visible
         if (yi[1] < yi[2]) {
-            off_y = y[1] < regionTop ? (regionTop - y[1]) : 0;
+            off_y = yi[1] < regionTop ? float(regionTop - yi[1]) : 0;
             if (!upper) {
                 xa += (off_y * dxdya);
                 ua += (off_y * dudya);
@@ -775,7 +777,7 @@ static void _rasterPolygonImage(SwSurface* surface, const SwImage* image, const 
 
         //Draw upper segment if possibly visible
         if (yi[0] < yi[1]) {
-            off_y = y[0] < regionTop ? (regionTop - y[0]) : 0;
+            off_y = yi[0] < regionTop ? float(regionTop - yi[0]) : 0;
             xb += (off_y *dxdyb);
 
             // Set slopes along left edge and perform subpixel pre-stepping
@@ -799,7 +801,7 @@ static void _rasterPolygonImage(SwSurface* surface, const SwImage* image, const 
         }
         //Draw lower segment if possibly visible
         if (yi[1] < yi[2]) {
-            off_y = y[1] < regionTop ? (regionTop - y[1]) : 0;
+            off_y = yi[1] < regionTop ? float(regionTop - yi[1]) : 0;
             if (!upper) xb += (off_y *dxdyb);
 
             // Set slopes along left edge and perform subpixel pre-stepping
