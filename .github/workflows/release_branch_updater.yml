@@ -1,23 +1,25 @@
-name: Port repo release update
+name: Port repo update
+
+# master/main of the ports -> LVGL master  (scheduled / manual)
+# stable of the ports      -> latest LVGL release tag (on release tags, scheduled / manual)
 
 on:
   schedule:
     # Runs at 00:00 UTC on the 1st and 15th day of each month
     - cron: '0 0 1,15 * *'
   push:
-    branches:
-      - master
-      - 'release/v*' # on release branches
+    tags:
+      - 'v*'
   workflow_dispatch: # allow manual triggering
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
-# Ensure that only one commit will be running tests at a time on each push
+# Run one update at a time but don't abort a run halfway through the ports
 concurrency:
   group: ${{ github.workflow }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  run-release-branch-updater:
+  run-port-updater:
     if: github.repository == 'lvgl/lvgl'
     runs-on: ubuntu-24.04
 
@@ -26,21 +28,21 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: lvgl
-          fetch-depth: 0   # fetch all
+          fetch-depth: 0   # fetch all branches and tags
 
       - name: set git credentials
         run: |
           git config --global user.name 'lvgl-bot'
           git config --global user.email 'lvgl-bot@users.noreply.github.com'
 
-      - name: run the script for release branches (not master)
-        if: github.event_name != 'schedule' && github.event_name != 'workflow_dispatch'
+      - name: update the stable branches (on a new release)
+        if: github.event_name == 'push'
         env:
           GITHUB_TOKEN: ${{ secrets.PORT_RELEASER_GITHUB_TOKEN }}
-        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9 --github-token "$GITHUB_TOKEN" --skip-master
+        run: python3 lvgl/scripts/release_branch_updater.py --github-token "$GITHUB_TOKEN" --skip-master
 
-      - name: run the script for release branches and master
+      - name: update the master and stable branches
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.PORT_RELEASER_GITHUB_TOKEN }}
-        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9 --github-token "$GITHUB_TOKEN"
+        run: python3 lvgl/scripts/release_branch_updater.py --github-token "$GITHUB_TOKEN"
