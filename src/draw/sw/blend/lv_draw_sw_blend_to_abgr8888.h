@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_draw_sw.h"
-#if LV_USE_DRAW_SW
+#if LV_USE_DRAW_SW && LV_DRAW_SW_SUPPORT_ABGR8888
 
 /*********************
  *      DEFINES
@@ -36,7 +36,7 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_abgr8888(lv_draw_sw_b
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_SW*/
+#endif /*LV_USE_DRAW_SW && LV_DRAW_SW_SUPPORT_ABGR8888*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
