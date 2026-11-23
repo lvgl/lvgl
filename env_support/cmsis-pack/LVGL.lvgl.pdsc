@@ -877,6 +877,11 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 <file category="sourceC"            name="src/osal/lv_linux.c"/>
                 
+                <!-- src/irqal -->
+                <file category="sourceC"            name="src/irqal/lv_irq_cmsis.c"/>
+                <file category="sourceC"            name="src/irqal/lv_irq_zephyr.c"/>
+                <file category="sourceC"            name="src/irqal/lv_irq_stm32.c"/>
+                
                 <!-- general -->
                 <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="9.6.0" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />

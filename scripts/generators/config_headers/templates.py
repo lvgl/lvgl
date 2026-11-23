@@ -123,6 +123,17 @@ __CONFIG_OPTIONS__
     #endif
 #endif
 
+/* Checked before the defaults below are applied, to see what lv_conf.h itself sets. */
+#ifdef LV_IRQ_CMSIS_NVIC_PRIORITY
+    #if defined(LV_IRQ_CMSIS_SET_NVIC_PRIORITY)
+        #if !LV_IRQ_CMSIS_SET_NVIC_PRIORITY
+            #error "LV_IRQ_CMSIS_NVIC_PRIORITY is set but not applied: set LV_IRQ_CMSIS_SET_NVIC_PRIORITY to 1 too"
+        #endif
+    #elif !defined(CONFIG_LV_IRQ_CMSIS_SET_NVIC_PRIORITY)
+        #error "LV_IRQ_CMSIS_NVIC_PRIORITY is set but not applied: set LV_IRQ_CMSIS_SET_NVIC_PRIORITY to 1 too"
+    #endif
+#endif
+
 /*----------------------------------
  * Start parsing lv_conf_template.h
  -----------------------------------*/
