@@ -606,8 +606,15 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     /*To allow styling the list*/
     lv_obj_send_event(dropdown_obj, LV_EVENT_READY, NULL);
 
+    refresh_list_label(dropdown_obj);
+}
+
+static void refresh_list_layout(lv_obj_t * dropdown_obj)
+{
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
     lv_obj_t * label = get_label(dropdown_obj);
-    lv_label_set_text_static(label, dropdown->options ? dropdown->options : "");
+    if(label == NULL) return;
+
     lv_obj_set_width(dropdown->list, LV_SIZE_CONTENT);
 
     lv_obj_update_layout(label);
@@ -677,7 +684,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         }
     }
 
-    lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, dropdown->options);
+    lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, lv_label_get_text(label));
 
     switch(align) {
         default:
@@ -1502,7 +1509,19 @@ static void refresh_list_label(lv_obj_t * obj)
 
     lv_obj_t * label = get_label(obj);
     if(label) lv_label_set_text_static(label, dropdown->options ? dropdown->options : "");
+
+    if(dropdown->option_cnt == 0) {
+        dropdown->sel_opt_id = 0;
+        dropdown->sel_opt_id_orig = 0;
+    }
+    else if(dropdown->sel_opt_id >= dropdown->option_cnt) {
+        dropdown->sel_opt_id = dropdown->option_cnt - 1;
+        dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
+    }
+
+    dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
     lv_obj_invalidate(dropdown->list);
+    if(!lv_obj_is_hidden(dropdown->list)) refresh_list_layout(obj);
 }
 
 static void dropdown_list_align_bidi(lv_dropdown_t * dropdown, lv_dir_t dir)
