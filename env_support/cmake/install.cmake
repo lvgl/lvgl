@@ -12,10 +12,10 @@ if(CONFIG_LV_USE_PRIVATE_API)
     )
 
     install(CODE "
-        file(READ \"${CMAKE_INSTALL_FULL_INCLUDEDIR}/lvgl_private/lvgl_public.h\" content)
+        file(READ \"\$ENV{DESTDIR}${CMAKE_INSTALL_FULL_INCLUDEDIR}/lvgl_private/lvgl_public.h\" content)
         string(REPLACE \"../include/lvgl/lvgl.h\" \"../lvgl/lvgl.h\" content \"\${content}\")
         string(REPLACE \"../include/lvgl/config/lv_conf_internal.h\" \"../lvgl/config/lv_conf_internal.h\" content \"\${content}\")
-        file(WRITE \"${CMAKE_INSTALL_FULL_INCLUDEDIR}/lvgl_private/lvgl_public.h\" \"\${content}\")
+        file(WRITE \"\$ENV{DESTDIR}${CMAKE_INSTALL_FULL_INCLUDEDIR}/lvgl_private/lvgl_public.h\" \"\${content}\")
     ")
 endif()
 
