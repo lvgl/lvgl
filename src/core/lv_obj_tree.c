@@ -180,6 +180,15 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_send_event(obj->parent, LV_EVENT_CHILD_DELETED, NULL);
     obj->parent = parent;
 
+    /*Copy the new parent's state exactly if it trickles its state to the children.
+     *Use add/remove so that the changes trickle further to obj's children too.*/
+    if(lv_obj_is_state_trickle(parent)) {
+        lv_state_t parent_state = lv_obj_get_state(parent);
+        lv_state_t obj_state = lv_obj_get_state(obj);
+        lv_obj_remove_state(obj, obj_state & ~parent_state);
+        lv_obj_add_state(obj, parent_state & ~obj_state);
+    }
+
     /*Notify the new parent about the child*/
     lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
     lv_obj_send_event(parent, LV_EVENT_CHILD_CREATED, NULL);
