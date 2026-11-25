@@ -224,6 +224,7 @@ static void request_glyph_bitmap(lv_font_t * font, uint32_t letter)
     lv_draw_buf_destroy(buf);
 }
 #endif /*LV_USE_FONT_COMPRESSED*/
+
 void test_font_loader_corrupt_bit_width(void)
 {
     /*A glyph header field wider than 32 bits cannot be returned by read_bits().*/
@@ -255,6 +256,25 @@ void test_font_loader_corrupt_kern(void)
 void test_font_loader_corrupt_bitmap(void)
 {
     const char * path = "A:src/test_assets/test_font_bitmap_oob.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+
+#if LV_USE_FONT_COMPRESSED
+    /*A truncated compressed stream is bounded at read time: the glyph has to be
+     *requested for the compressed reader to run, and doing so must not crash.*/
+    const char * path2 = "A:src/test_assets/test_font_bitmap_rle_oob.fnt";
+    lv_font_t * font = lv_binfont_create(path2);
+    TEST_ASSERT_NOT_NULL(font);
+    request_glyph_bitmap(font, 'A');
+    lv_binfont_destroy(font);
+#endif
+}
+
 /*Return a copy of test_font_1_buf and the offset of the class kerning data in it*/
 static uint8_t * dup_font_1_with_kern(uint32_t * kern_ofs)
 {
@@ -320,6 +340,8 @@ void test_font_loader_kern_mapping_shorter_than_glyphs(void)
     TEST_ASSERT_NULL(lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf)));
 
     lv_free(buf);
+}
+
 /*A cmap must not reference glyphs that the loca table doesn't describe.*/
 void test_font_loader_corrupt_cmap(void)
 {
@@ -331,16 +353,6 @@ void test_font_loader_corrupt_cmap(void)
     };
     TEST_ASSERT_NULL(lv_binfont_create(path));
     TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
-
-#if LV_USE_FONT_COMPRESSED
-    /*A truncated compressed stream is bounded at read time: the glyph has to be
-     *requested for the compressed reader to run, and doing so must not crash.*/
-    const char * path2 = "A:src/test_assets/test_font_bitmap_rle_oob.fnt";
-    lv_font_t * font = lv_binfont_create(path2);
-    TEST_ASSERT_NOT_NULL(font);
-    request_glyph_bitmap(font, 'A');
-    lv_binfont_destroy(font);
-#endif
 }
 
 void test_font_loader_truncated(void)
