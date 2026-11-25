@@ -46,12 +46,6 @@ lv_result_t lv_image_cache_init(uint32_t size);
 void lv_image_cache_resize(uint32_t new_size, bool evict_now);
 
 /**
- * Invalidate image cache. Use NULL to invalidate all images.
- * @param src pointer to an image source.
- */
-void lv_image_cache_drop(const void * src);
-
-/**
  * Return true if the image cache is enabled.
  * @return true: enabled, false: disabled.
  */

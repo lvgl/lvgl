@@ -14,6 +14,7 @@
  *********************/
 
 #include "lv_draw_pxp.h"
+#include "../../sw/lv_draw_sw_private.h"
 
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
@@ -35,10 +36,11 @@
  **********************/
 
 /*
- * Evaluate a task and set the score and preferred PXP unit.
- * Return 1 if task is preferred, 0 otherwise (task is not supported).
+ * Tell whether PXP can draw a descriptor on the layer.
  */
-static int32_t _pxp_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool _pxp_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool _pxp_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool _pxp_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 
 /*
  * Dispatch a task to the PXP unit.
@@ -65,6 +67,15 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_pxp_fill,
+    .can_draw_fill_cb = _pxp_can_draw_fill,
+    .draw_image_cb = lv_draw_pxp_img,
+    .can_draw_image_cb = _pxp_can_draw_img,
+    .draw_layer_cb = lv_draw_pxp_layer,
+    .can_draw_layer_cb = _pxp_can_draw_layer,
+};
+
 #if LV_USE_PARALLEL_DRAW_DEBUG
     #define _draw_info LV_GLOBAL_DEFAULT()->draw_info
 #endif
@@ -85,10 +96,12 @@ void lv_draw_pxp_init(void)
     lv_draw_buf_pxp_init_handlers();
 
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
-    draw_pxp_unit->base_unit.evaluate_cb = _pxp_evaluate;
     draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
     draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
     draw_pxp_unit->base_unit.name = "NXP_PXP";
+    draw_pxp_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_pxp_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
+    draw_pxp_unit->base_unit.id = DRAW_UNIT_ID_PXP;
 
 #if LV_USE_PXP_DRAW_THREAD
     lv_thread_init(&draw_pxp_unit->thread, "pxpdraw", LV_DRAW_THREAD_PRIO, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
@@ -245,72 +258,49 @@ static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
     return true;
 }
 
-static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
+static bool _pxp_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
 {
-    LV_UNUSED(u);
+    LV_UNUSED(draw_unit);
 
-    const lv_draw_dsc_t * draw_dsc_base = (lv_draw_dsc_t *) t->draw_dsc;
+    if(!_pxp_dest_cf_supported(layer->color_format))
+        return false;
 
-    if(!_pxp_dest_cf_supported(draw_dsc_base->layer->color_format))
-        return 0;
+    /* Most simple case: just a plain rectangle (no radius, no gradient). */
+    return (dsc->radius == 0) && (dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE);
+}
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL: {
-                const lv_draw_fill_dsc_t * draw_dsc = (lv_draw_fill_dsc_t *) t->draw_dsc;
+static bool _pxp_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
 
-                /* Most simple case: just a plain rectangle (no radius, no gradient). */
-                if((draw_dsc->radius != 0) || (draw_dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE))
-                    return 0;
+    if(!_pxp_dest_cf_supported(layer->color_format))
+        return false;
 
-                if(t->preference_score > 70) {
-                    t->preference_score = 70;
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
-                }
-                return 1;
-            }
+    const lv_image_dsc_t * img_dsc = dsc->src;
 
-        case LV_DRAW_DSC_TYPE_LAYER: {
-                const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
-                lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
+    if(img_dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START)
+        return false;
 
-                if(!_pxp_src_cf_supported(layer_to_draw->color_format))
-                    return 0;
+    if((!_pxp_src_cf_supported(img_dsc->header.cf)) ||
+       (!pxp_buf_aligned(img_dsc->data, img_dsc->header.stride)))
+        return false;
 
-                if(!_pxp_draw_img_supported(draw_dsc))
-                    return 0;
+    return _pxp_draw_img_supported(dsc);
+}
 
-                if(t->preference_score > 70) {
-                    t->preference_score = 70;
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
-                }
-                return 1;
-            }
+static bool _pxp_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
 
-        case LV_DRAW_DSC_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
-                const lv_image_dsc_t * img_dsc = draw_dsc->src;
+    if(!_pxp_dest_cf_supported(layer->color_format))
+        return false;
 
-                if(img_dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START)
-                    return 0;
+    const lv_layer_t * layer_to_draw = dsc->src;
 
-                if((!_pxp_src_cf_supported(img_dsc->header.cf)) ||
-                   (!pxp_buf_aligned(img_dsc->data, img_dsc->header.stride)))
-                    return 0;
+    if(!_pxp_src_cf_supported(layer_to_draw->color_format))
+        return false;
 
-                if(!_pxp_draw_img_supported(draw_dsc))
-                    return 0;
-
-                if(t->preference_score > 70) {
-                    t->preference_score = 70;
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
-                }
-                return 1;
-            }
-        default:
-            return 0;
-    }
-
-    return 0;
+    return _pxp_draw_img_supported(dsc);
 }
 
 static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
@@ -393,19 +383,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
     t->draw_unit = &u->base_unit;
 #endif
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_pxp_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_pxp_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LAYER:
-            lv_draw_pxp_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        default:
-            break;
-    }
+    lv_draw_unit_draw_task(&u->base_unit, t);
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     /*Layers manage it for themselves*/
@@ -416,17 +394,21 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 
         int32_t idx = u->base_unit.idx;
 
-        lv_draw_rect_dsc_t rect_dsc;
-        lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
-        rect_dsc.border_color = rect_dsc.bg_color;
-        rect_dsc.bg_opa = LV_OPA_10;
-        rect_dsc.border_opa = LV_OPA_80;
-        rect_dsc.border_width = 1;
-        lv_draw_sw_fill((lv_draw_unit_t *)u, &rect_dsc, &draw_area);
+        lv_draw_fill_dsc_t fill_dsc;
+        lv_draw_fill_dsc_init(&fill_dsc);
+        fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
+        fill_dsc.opa = LV_OPA_10;
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &draw_area);
+
+        lv_draw_border_dsc_t border_dsc;
+        lv_draw_border_dsc_init(&border_dsc);
+        border_dsc.color = fill_dsc.color;
+        border_dsc.opa = LV_OPA_80;
+        border_dsc.width = 1;
+        lv_draw_sw_border(t->target_layer, &t->clip_area, &border_dsc, &draw_area);
 
         lv_point_t txt_size;
-        lv_text_get_size_attributes(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_area.x1;
@@ -434,9 +416,9 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
         txt_area.x2 = draw_area.x1 + txt_size.x - 1;
         txt_area.y2 = draw_area.y1 + txt_size.y - 1;
 
-        lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_color_white();
-        lv_draw_sw_fill((lv_draw_unit_t *)u, &rect_dsc, &txt_area);
+        lv_draw_fill_dsc_init(&fill_dsc);
+        fill_dsc.color = lv_color_white();
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &txt_area);
 
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d", idx);
@@ -444,7 +426,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
         lv_draw_label_dsc_init(&label_dsc);
         label_dsc.color = lv_color_black();
         label_dsc.text = buf;
-        lv_draw_sw_label((lv_draw_unit_t *)u, &label_dsc, &txt_area);
+        lv_draw_sw_label(t->target_layer, &t->clip_area, &label_dsc, &txt_area);
     }
 #endif
 }

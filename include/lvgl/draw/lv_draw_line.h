@@ -119,7 +119,7 @@ void lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
  * @param draw_line_cb  a callback that draws a line between ``dsc->p1`` and ``dsc->p2``
  * @param user_data     passed to draw_line_cb as is @nullable
  */
-void lv_draw_line_iterate(lv_layer_t * layer, const lv_area_t * clip_area, lv_draw_line_dsc_t * dsc,
+void lv_draw_line_iterate(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc,
                           void (*draw_line_cb)(lv_layer_t * layer, const lv_area_t * clip_area,
                                                const lv_draw_line_dsc_t * dsc, void * user_data),
                           void * user_data);

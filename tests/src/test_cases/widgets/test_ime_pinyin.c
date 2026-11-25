@@ -102,6 +102,19 @@ void test_ime_pinyin_set_keyboard(void)
     TEST_ASSERT_EQUAL_PTR(g_kb, retrieved_kb);
 }
 
+/* Test unbinding keyboard */
+void test_ime_pinyin_set_keyboard_null(void)
+{
+    lv_obj_t * ime = lv_ime_pinyin_create(lv_screen_active());
+    lv_obj_t * kb  = lv_keyboard_create(lv_screen_active());
+
+    lv_ime_pinyin_set_keyboard(ime, kb);
+
+    lv_ime_pinyin_set_keyboard(ime, NULL);
+
+    TEST_ASSERT_NULL(lv_ime_pinyin_get_kb(ime));
+}
+
 /* Test getting candidate panel */
 void test_ime_pinyin_get_cand_panel(void)
 {

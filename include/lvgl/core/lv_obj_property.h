@@ -55,7 +55,11 @@ extern "C" {
 #define LV_PROPERTY_ID2(clz, name, type, type2, index)  LV_PROPERTY_ID(clz, name, type, index) | ((type2) << LV_PROPERTY_TYPE2_SHIFT)
 
 #define LV_PROPERTY_ID_TYPE(id) ((id) >> LV_PROPERTY_TYPE_SHIFT)
-#define LV_PROPERTY_ID_TYPE2(id) ((id) >> LV_PROPERTY_TYPE_SHIFT)
+/*For paired IDs (LV_PROPERTY_ID2) the second argument type occupies bits 27:24*/
+#define LV_PROPERTY_ID_TYPE2(id) (((id) >> LV_PROPERTY_TYPE2_SHIFT) & 0xf)
+/*The index of LV_PROPERTY_ID is the low 28 bits. LV_PROPERTY_ID2() puts the
+ *second argument type in bits 27:24, so for a paired id its index is only the
+ *low 24 bits; mask with 0xffffff when the id is known to be paired.*/
 #define LV_PROPERTY_ID_INDEX(id) ((id) & 0xfffffff)
 
 /*Set properties from an array of lv_property_t*/

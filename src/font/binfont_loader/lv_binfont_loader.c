@@ -77,8 +77,8 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
 int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start,
                   uint32_t loca_count);
 
-static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
-static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
+static int read_bits_signed(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res);
+static unsigned int read_bits(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res);
 
 static bool read_glyph_bitmap(lv_fs_file_t * fp, uint32_t pos, uint32_t nbits, uint8_t * buf, uint32_t buf_size);
 static const uint8_t * load_glyph_bitmap_cb(lv_font_fmt_txt_glyph_loader_t * loader, uint32_t gid);
@@ -253,10 +253,14 @@ static bool read_exact(lv_fs_file_t * fp, void * buf, uint32_t n)
     return br == n;
 }
 
-static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
+/*Reads `n_bits` bits as an unsigned value. The width comes from the file and can be
+ *larger than the result type; such bits are consumed to keep the stream aligned but are
+ *not shifted into the result.*/
+static unsigned int read_bits(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res)
 {
     LV_ASSERT(it != NULL);
     LV_ASSERT(res != NULL);
+
     unsigned int value = 0;
     while(n_bits--) {
         it->byte_value = it->byte_value << 1;
@@ -270,20 +274,31 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
             }
             *res = LV_FS_RES_OK;
         }
-        int8_t bit = (it->byte_value & 0x80) ? 1 : 0;
 
-        value |= (bit << n_bits);
+        /*A width above 31 cannot fit the result; it is only used to skip a whole glyph
+         *header, so the bits are consumed without being shifted in.*/
+        if(n_bits < 32) {
+            int8_t bit = (it->byte_value & 0x80) ? 1 : 0;
+            value |= ((unsigned int)bit << n_bits);
+        }
     }
     *res = LV_FS_RES_OK;
     return value;
 }
 
-static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
+/*Reads `n_bits` bits and sign extends the result. Only a width that fits in the result
+ *type is sign extended.*/
+static int read_bits_signed(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res)
 {
     LV_ASSERT(it != NULL);
     LV_ASSERT(res != NULL);
+
     unsigned int value = read_bits(it, n_bits, res);
-    if(value & (1 << (n_bits - 1))) {
+    if(*res != LV_FS_RES_OK) {
+        return 0;
+    }
+
+    if(n_bits > 0 && n_bits < 32 && (value & ((unsigned int)1 << (n_bits - 1)))) {
         value |= ~0u << n_bits;
     }
     return value;
@@ -308,14 +323,80 @@ static int read_label(lv_fs_file_t * fp, int start, const char * label)
     return length;
 }
 
+/*Check that a section declared by the font fits in the file. The lengths are read
+ *straight from the file, so they must not be trusted on their own.*/
+static bool section_fits_in_file(lv_fs_file_t * fp, uint32_t start, uint32_t length)
+{
+    LV_ASSERT(fp != NULL);
+
+    uint32_t file_size;
+    if(lv_fs_get_size(fp, &file_size) != LV_FS_RES_OK) {
+        return false;
+    }
+
+    return (uint64_t)start + (uint64_t)length <= (uint64_t)file_size;
+}
+
+/*Validate a subtable before its data is read: the data has to stay inside the cmap
+ *section and a 'format 0 full' subtable has to cover its whole range.*/
+static bool validate_cmap_table(uint32_t cmaps_length, const cmap_table_bin_t * cmap_table)
+{
+    LV_ASSERT(cmap_table != NULL);
+
+    uint32_t data_offset = cmap_table->data_offset;
+    uint16_t data_entries = cmap_table->data_entries_count;
+    uint32_t data_size;
+
+    switch(cmap_table->format_type) {
+        case LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY:
+            data_size = 0;
+            break;
+        case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL:
+            data_size = sizeof(uint8_t) * data_entries;
+            break;
+        case LV_FONT_FMT_TXT_CMAP_SPARSE_TINY:
+            data_size = sizeof(uint16_t) * data_entries;
+            break;
+        case LV_FONT_FMT_TXT_CMAP_SPARSE_FULL:
+            /*The unicode list and the glyph id list are both stored*/
+            data_size = 2U * sizeof(uint16_t) * data_entries;
+            break;
+        default:
+            LV_LOG_WARN("Unknown cmaps format type %d.", cmap_table->format_type);
+            return false;
+    }
+
+    /*The subtable data has to stay inside the cmap section.*/
+    if((uint64_t)data_offset + (uint64_t)data_size > (uint64_t)cmaps_length) {
+        LV_LOG_WARN("Cmap subtable is outside the cmap section.");
+        return false;
+    }
+
+    /*A 'format 0 full' subtable is indexed by the whole range, so it needs at least one
+     *entry for every character of the range.*/
+    if(cmap_table->format_type == LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL &&
+       data_entries < cmap_table->range_length) {
+        LV_LOG_WARN("Cmap subtable has fewer entries than its range.");
+        return false;
+    }
+
+    return true;
+}
+
 static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
-                              uint32_t cmaps_start, cmap_table_bin_t * cmap_table)
+                              uint32_t cmaps_start, uint32_t cmaps_length, cmap_table_bin_t * cmap_table)
 {
     LV_ASSERT(fp != NULL);
     LV_ASSERT(font_dsc != NULL);
     LV_ASSERT(cmap_table != NULL);
     if(!read_exact(fp, cmap_table, font_dsc->cmap_num * sizeof(cmap_table_bin_t))) {
         return false;
+    }
+
+    for(unsigned int i = 0; i < font_dsc->cmap_num; ++i) {
+        if(!validate_cmap_table(cmaps_length, &cmap_table[i])) {
+            return false;
+        }
     }
 
     for(unsigned int i = 0; i < font_dsc->cmap_num; ++i) {
@@ -399,9 +480,45 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
         return -1;
     }
 
+    /*The length comes straight from the file, so it has to be checked before it is used
+     *to size anything.*/
+    if(!section_fits_in_file(fp, cmaps_start, (uint32_t)cmaps_length)) {
+        LV_LOG_WARN("Cmap table is outside the file.");
+        return -1;
+    }
+
+    /*The section is: 4 byte length + 4 byte label + 4 byte subtable count + the records.*/
+    const uint32_t cmaps_header_size = 3U * sizeof(uint32_t);
+    if((uint32_t)cmaps_length < cmaps_header_size) {
+        LV_LOG_WARN("Invalid cmap section length %" LV_PRIu32 ".", (uint32_t)cmaps_length);
+        return -1;
+    }
+    uint32_t cmaps_payload = (uint32_t)cmaps_length - cmaps_header_size;
 
     uint32_t cmaps_subtables_count;
     if(!read_exact(fp, &cmaps_subtables_count, sizeof(uint32_t))) {
+        return -1;
+    }
+
+    /*The count is kept in a `uint16_t` field, larger values would silently drop subtables.*/
+    if(cmaps_subtables_count > UINT16_MAX) {
+        LV_LOG_WARN("Invalid cmap subtable count %" LV_PRIu32 ".", cmaps_subtables_count);
+        return -1;
+    }
+
+    /*Both allocations multiply the count by a `sizeof`, which can wrap where `size_t` is
+     *16 bits, so the count is bounded to what those products can hold.*/
+#if SIZE_MAX <= UINT16_MAX
+    if(cmaps_subtables_count > (uint32_t)(SIZE_MAX / sizeof(lv_font_fmt_txt_cmap_t)) ||
+       cmaps_subtables_count > (uint32_t)(SIZE_MAX / sizeof(cmap_table_bin_t))) {
+        LV_LOG_WARN("Cmap subtable count %" LV_PRIu32 " is too large.", cmaps_subtables_count);
+        return -1;
+    }
+#endif
+
+    /*The subtable records have to fit in the section.*/
+    if(cmaps_subtables_count > cmaps_payload / sizeof(cmap_table_bin_t)) {
+        LV_LOG_WARN("Invalid cmap subtable count %" LV_PRIu32 ".", cmaps_subtables_count);
         return -1;
     }
 
@@ -419,8 +536,8 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
     }
 
     font_dsc->cmaps = cmaps;
-    font_dsc->cmap_num = cmaps_subtables_count;
-    bool success = load_cmaps_tables(fp, font_dsc, cmaps_start, cmaps_tables);
+    font_dsc->cmap_num = (uint16_t)cmaps_subtables_count;
+    bool success = load_cmaps_tables(fp, font_dsc, cmaps_start, (uint32_t)cmaps_length, cmaps_tables);
 
     lv_free(cmaps_tables);
 
@@ -548,6 +665,58 @@ static lv_binfont_glyph_loader_t * glyph_loader_create(lv_fs_file_t * fp,
     return loader;
 }
 
+/*Verifies that every glyph id the cmaps can produce is within the glyph descriptor array.*/
+static bool cmaps_validate_glyph_ids(const lv_font_fmt_txt_dsc_t * dsc, uint32_t glyph_count)
+{
+    uint16_t i;
+
+    for(i = 0; i < dsc->cmap_num; i++) {
+        const lv_font_fmt_txt_cmap_t * cmap = &dsc->cmaps[i];
+        uint32_t max_id;
+
+        switch(cmap->type) {
+            case LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY:
+                if(cmap->range_length == 0) continue;
+                max_id = (uint32_t)cmap->glyph_id_start + cmap->range_length - 1;
+                break;
+            case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL: {
+                    const uint8_t * ofs = cmap->glyph_id_ofs_list;
+                    uint32_t j, max_ofs = 0;
+                    if(cmap->range_length == 0) continue;
+                    for(j = 0; j < cmap->range_length; j++) {
+                        max_ofs = LV_MAX(max_ofs, ofs[j]);
+                    }
+                    max_id = (uint32_t)cmap->glyph_id_start + max_ofs;
+                    break;
+                }
+            case LV_FONT_FMT_TXT_CMAP_SPARSE_TINY:
+                if(cmap->list_length == 0) continue;
+                max_id = (uint32_t)cmap->glyph_id_start + cmap->list_length - 1;
+                break;
+            case LV_FONT_FMT_TXT_CMAP_SPARSE_FULL: {
+                    const uint16_t * ofs = cmap->glyph_id_ofs_list;
+                    uint32_t j, max_ofs = 0;
+                    if(cmap->list_length == 0) continue;
+                    for(j = 0; j < cmap->list_length; j++) {
+                        max_ofs = LV_MAX(max_ofs, ofs[j]);
+                    }
+                    max_id = (uint32_t)cmap->glyph_id_start + max_ofs;
+                    break;
+                }
+            default:
+                return false;
+        }
+
+        if(max_id >= glyph_count) {
+            LV_LOG_WARN("cmap %u: glyph id %" LV_PRIu32 " is out of range (%" LV_PRIu32 " glyphs)",
+                        i, max_id, glyph_count);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 /**
  * Read the glyph table of the font.
  * @param dynamic_glyph_load    if `true` only the glyph descriptors are read and the bitmaps are
@@ -571,12 +740,27 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     }
 
     /*The glyph table, and every offset in it, must stay inside the file.*/
-    uint32_t file_size;
-    if(lv_fs_get_size(fp, &file_size) != LV_FS_RES_OK ||
-       (uint64_t)(uint32_t)start + (uint32_t)glyph_length > (uint64_t)file_size) {
+    if(!section_fits_in_file(fp, start, (uint32_t)glyph_length)) {
         LV_LOG_WARN("Glyph table is outside the file");
         return -1;
     }
+
+    /*The glyph header fields are read into a 32-bit value, so each width has to fit it:
+     *`read_bits()` only skips a wider value, it cannot return it. The glyph descriptor
+     *fields are narrower (for example `box_w` is 8 or 16 bits), so a width that does fit
+     *here can still be truncated when it is stored.*/
+    if(header->advance_width_bits > 32 || header->xy_bits > 32 || header->wh_bits > 32) {
+        LV_LOG_WARN("Invalid glyph field width.");
+        return -1;
+    }
+    /*The glyph descriptor array is allocated from `loca_count`. Where `size_t` is 32 bits
+     *the multiplication can wrap, so the count is bounded to what the allocator can hold.*/
+#if SIZE_MAX <= UINT32_MAX
+    if(loca_count > (uint32_t)(SIZE_MAX / sizeof(lv_font_fmt_txt_glyph_dsc_t))) {
+        LV_LOG_WARN("Glyph count %" LV_PRIu32 " is too large.", loca_count);
+        return -1;
+    }
+#endif
 
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc = lv_zalloc(loca_count * sizeof(*glyph_dsc));
     LV_ASSERT_MALLOC(glyph_dsc);
@@ -765,8 +949,55 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
         return false;
     }
 
+    if(!section_fits_in_file(fp, loca_start, (uint32_t)loca_length)) {
+        LV_LOG_WARN("Loca table is outside the file.");
+        return false;
+    }
+
+    /*`loca` is: 4 byte length + 4 byte label + 4 byte count + `loca_count` entries.*/
+    const uint32_t loca_header_size = 3U * sizeof(uint32_t);
+    if((uint32_t)loca_length < loca_header_size) {
+        LV_LOG_WARN("Invalid loca section length %" LV_PRIu32 ".", (uint32_t)loca_length);
+        return false;
+    }
+    uint32_t loca_payload = (uint32_t)loca_length - loca_header_size;
+
     uint32_t loca_count;
     if(!read_exact(fp, &loca_count, sizeof(uint32_t))) {
+        return false;
+    }
+
+    uint32_t loca_entry_size;
+    switch(font_header.index_to_loc_format) {
+        case 0:
+            loca_entry_size = sizeof(uint16_t);
+            break;
+        case 1:
+            loca_entry_size = sizeof(uint32_t);
+            break;
+        default:
+            LV_LOG_WARN("Unknown index_to_loc_format: %d.", font_header.index_to_loc_format);
+            return false;
+    }
+
+    /*The glyph offsets have to fit in the loca section. This also bounds the allocations
+     *that are made from `loca_count`.*/
+    if(loca_count > loca_payload / loca_entry_size) {
+        LV_LOG_WARN("Invalid glyph count %" LV_PRIu32 ".", loca_count);
+        return false;
+    }
+
+    /*The glyph offset table is allocated from `loca_count`. Where `size_t` is 32 bits the
+     *multiplication can wrap, so the count is bounded to what the allocator can hold.*/
+#if SIZE_MAX <= UINT32_MAX
+    if(loca_count > (uint32_t)(SIZE_MAX / sizeof(uint32_t))) {
+        LV_LOG_WARN("Glyph count %" LV_PRIu32 " is too large.", loca_count);
+        return false;
+    }
+#endif
+
+    /*A cmap must not reference glyphs that the loca table doesn't describe.*/
+    if(!cmaps_validate_glyph_ids(font_dsc, loca_count)) {
         return false;
     }
 

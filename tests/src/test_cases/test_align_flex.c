@@ -775,6 +775,90 @@ void test_flex_hide_item_first_grow(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("flex_hide_items_first_grow.png");
 }
 
+void test_flex_rtl_column_cross_start_aligns_to_right_edge(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_pos(cont, 10, 10);
+    lv_obj_set_size(cont, 200, 120);
+    simple_style(cont);
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_RTL, 0);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+
+    lv_obj_t * wide = lv_obj_create(cont);
+    lv_obj_set_size(wide, 60, 20);
+    simple_style(wide);
+
+    lv_obj_t * narrow = lv_obj_create(cont);
+    lv_obj_set_size(narrow, 30, 20);
+    simple_style(narrow);
+
+    lv_obj_update_layout(cont);
+
+    lv_area_t cont_coords;
+    lv_area_t wide_coords;
+    lv_area_t narrow_coords;
+    lv_obj_get_coords(cont, &cont_coords);
+    lv_obj_get_coords(wide, &wide_coords);
+    lv_obj_get_coords(narrow, &narrow_coords);
+
+    TEST_ASSERT_EQUAL(cont_coords.x2, wide_coords.x2);
+    TEST_ASSERT_EQUAL(cont_coords.x2, narrow_coords.x2);
+}
+
+static void add_chat_bubble(lv_obj_t * list, uint32_t color, const char * text)
+{
+    lv_obj_t * bubble = lv_obj_create(list);
+    lv_obj_remove_style_all(bubble);
+    lv_obj_set_size(bubble, LV_SIZE_CONTENT, 55);
+    lv_obj_set_style_bg_color(bubble, lv_color_hex(color), 0);
+    lv_obj_set_style_bg_opa(bubble, LV_OPA_COVER, 0);
+    lv_obj_set_style_radius(bubble, 15, 0);
+    lv_obj_set_style_pad_hor(bubble, 13, 0);
+
+    lv_obj_t * label = lv_label_create(bubble);
+    lv_label_set_text(label, text);
+    lv_obj_set_style_text_font(label, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_text_color(label, lv_color_hex(0x25364A), 0);
+    lv_obj_center(label);
+}
+
+static void create_chat_list(lv_obj_t * parent, int32_t x, lv_base_dir_t base_dir)
+{
+    lv_obj_t * list = lv_obj_create(parent);
+    lv_obj_remove_style_all(list);
+    lv_obj_set_pos(list, x, 20);
+    lv_obj_set_size(list, 304, 278);
+    lv_obj_set_style_bg_color(list, lv_color_hex(0xF7F9FC), 0);
+    lv_obj_set_style_bg_opa(list, LV_OPA_COVER, 0);
+    lv_obj_set_style_pad_top(list, 19, 0);
+    lv_obj_set_style_pad_row(list, 27, 0);
+    lv_obj_set_style_base_dir(list, base_dir, 0);
+    lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(list, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+
+    add_chat_bubble(list, 0xDCEAFE, "أحتاج إلى مساعدة بشأن طلبي");
+    add_chat_bubble(list, 0xE3F3E8, "وصل طلبي اليوم");
+    add_chat_bubble(list, 0xDCEAFE, "شكرًا!");
+}
+
+void test_flex_rtl_column_chat(void)
+{
+    /* Earlier tests leave a flex layout on the screen */
+    lv_obj_t * bg = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(bg);
+    lv_obj_set_ignore_layout(bg, true);
+    lv_obj_set_size(bg, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_bg_color(bg, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(bg, LV_OPA_COVER, 0);
+
+    /* The children of the LTR list hug its left edge, those of the RTL list its right edge */
+    create_chat_list(bg, 60, LV_BASE_DIR_LTR);
+    create_chat_list(bg, 436, LV_BASE_DIR_RTL);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_rtl_column_chat.png");
+}
+
 void test_flex_use_rtl(void)
 {
     lv_obj_t * test = lv_obj_create(lv_screen_active());

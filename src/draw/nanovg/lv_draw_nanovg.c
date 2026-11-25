@@ -79,11 +79,15 @@
  **********************/
 
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 static void draw_event_cb(lv_event_t * e);
 static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer);
 static void bind_layer_framebuffer(lv_layer_t * layer);
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -91,6 +95,28 @@ static void bind_layer_framebuffer(lv_layer_t * layer);
 
 static lv_draw_nanovg_unit_t * g_unit;
 static lv_draw_buf_handlers_t gpu_draw_buf_handlers;
+
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_nanovg_fill,
+    .draw_border_cb = lv_draw_nanovg_border,
+    .draw_box_shadow_cb = lv_draw_nanovg_box_shadow,
+    .draw_letter_cb = lv_draw_nanovg_letter,
+    .draw_label_cb = lv_draw_nanovg_label,
+    .draw_image_cb = draw_image,
+    .draw_layer_cb = lv_draw_nanovg_layer,
+    .draw_arc_cb = lv_draw_nanovg_arc,
+    .draw_line_cb = draw_line,
+    .draw_triangle_cb = lv_draw_nanovg_triangle,
+    .draw_mask_rect_cb = lv_draw_nanovg_mask_rect,
+    .draw_blur_cb = lv_draw_nanovg_blur,
+    .can_draw_blur_cb = can_draw_blur,
+#if LV_USE_VECTOR_GRAPHIC
+    .draw_vector_cb = lv_draw_nanovg_vector,
+#endif
+#if LV_USE_3DTEXTURE
+    .draw_3d_cb = lv_draw_nanovg_3d,
+#endif
+};
 
 /**********************
  *      MACROS
@@ -108,9 +134,12 @@ void lv_draw_nanovg_init(void)
 
     lv_draw_nanovg_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_nanovg_unit_t));
     unit->base_unit.dispatch_cb = draw_dispatch;
-    unit->base_unit.evaluate_cb = draw_evaluate;
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
+    unit->base_unit.draw_cbs = &draw_cbs;
+    /*No software fallback: drop the descriptors NanoVG can't draw*/
+    unit->base_unit.fallback = NULL;
+    unit->base_unit.id = NANOVG_DRAW_UNIT_ID;
     unit->base_unit.name = "NANOVG";
 
     unit->vg = NVG_CTX_CREATE(0);
@@ -170,71 +199,19 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
 
     lv_nanovg_set_clip_area(u->vg, &t->clip_area);
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_nanovg_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
+    lv_draw_unit_draw_task(t->draw_unit, t);
+}
 
-        case LV_DRAW_DSC_TYPE_BORDER:
-            lv_draw_nanovg_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_nanovg_image(draw_unit, layer, clip_area, dsc, coords, -1);
+}
 
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-            lv_draw_nanovg_box_shadow(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_LETTER:
-            lv_draw_nanovg_letter(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_LABEL:
-            lv_draw_nanovg_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_nanovg_image(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area, -1);
-            break;
-
-        case LV_DRAW_DSC_TYPE_LAYER:
-            lv_draw_nanovg_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_LINE:
-            lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_nanovg_line, t->draw_unit);
-            break;
-
-        case LV_DRAW_DSC_TYPE_ARC:
-            lv_draw_nanovg_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-            lv_draw_nanovg_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-
-        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-            lv_draw_nanovg_mask_rect(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-
-#if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_DSC_TYPE_VECTOR:
-            lv_draw_nanovg_vector(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-#endif
-
-#if LV_USE_3DTEXTURE
-        case LV_DRAW_DSC_TYPE_3D:
-            lv_draw_nanovg_3d(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-#endif
-
-        case LV_DRAW_DSC_TYPE_BLUR:
-            lv_draw_nanovg_blur(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-
-        default:
-            LV_LOG_ERROR("unknown draw task type: %d", t->type);
-            break;
-    }
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc)
+{
+    lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_nanovg_line, draw_unit);
 }
 
 static void bind_layer_framebuffer(lv_layer_t * layer)
@@ -457,47 +434,13 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     return 1;
 }
 
-static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc)
 {
+    LV_UNUSED(layer);
+    LV_UNUSED(dsc);
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
-
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-        case LV_DRAW_DSC_TYPE_BORDER:
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-        case LV_DRAW_DSC_TYPE_LETTER:
-        case LV_DRAW_DSC_TYPE_LABEL:
-        case LV_DRAW_DSC_TYPE_IMAGE:
-        case LV_DRAW_DSC_TYPE_LAYER:
-        case LV_DRAW_DSC_TYPE_LINE:
-        case LV_DRAW_DSC_TYPE_ARC:
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-#if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_DSC_TYPE_VECTOR:
-#endif
-#if LV_USE_3DTEXTURE
-        case LV_DRAW_DSC_TYPE_3D:
-#endif
-            break;
-
-        case LV_DRAW_DSC_TYPE_BLUR:
-            /* Only accept blur if FBO support is available (blur_state was created) */
-            if(u->blur_state == NULL) return 0;
-            break;
-
-        default:
-            /*The draw unit is not able to draw this task. */
-            return 0;
-    }
-
-    if(task->preference_score > 80) {
-        /* The draw unit is able to draw this task. */
-        task->preference_score = 80;
-        task->preferred_draw_unit_id = NANOVG_DRAW_UNIT_ID;
-    }
-
-    return 1;
+    /* Only accept blur if FBO support is available (blur_state was created) */
+    return u->blur_state != NULL;
 }
 
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)

@@ -45,7 +45,7 @@ ICONS = {
 EXPECTED_SECTIONS = [
     ("Static Checks", 10),
     ("Coverage", 20),
-    ("Performance", 30),
+    ("Render Performance", 31),
     ("Memory Usage", 40),
 ]
 

@@ -180,6 +180,15 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_send_event(obj->parent, LV_EVENT_CHILD_DELETED, NULL);
     obj->parent = parent;
 
+    /*Copy the new parent's state exactly if it trickles its state to the children.
+     *Use add/remove so that the changes trickle further to obj's children too.*/
+    if(lv_obj_is_state_trickle(parent)) {
+        lv_state_t parent_state = lv_obj_get_state(parent);
+        lv_state_t obj_state = lv_obj_get_state(obj);
+        lv_obj_remove_state(obj, obj_state & ~parent_state);
+        lv_obj_add_state(obj, parent_state & ~obj_state);
+    }
+
     /*Notify the new parent about the child*/
     lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
     lv_obj_send_event(parent, LV_EVENT_CHILD_CREATED, NULL);
@@ -235,7 +244,8 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
 
     parent->spec_attr->children[index] = obj;
     lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, NULL);
-    lv_obj_invalidate(parent);
+    /*Only the stacking order changed, so only the area obj draws can look different*/
+    lv_obj_invalidate(obj);
 }
 
 void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
@@ -263,9 +273,16 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
     lv_obj_send_event(parent2, LV_EVENT_CHILD_CHANGED, obj1);
     lv_obj_send_event(parent2, LV_EVENT_CHILD_CREATED, obj1);
 
-    lv_obj_invalidate(parent);
-
-    if(parent != parent2) {
+    if(parent == parent2) {
+        /*Only the stacking order changed, so only the areas the objects draw can look different*/
+        lv_obj_invalidate(obj1);
+        lv_obj_invalidate(obj2);
+    }
+    else {
+        /*Each object is now positioned relative to its new parent*/
+        lv_obj_mark_layout_as_dirty(obj1);
+        lv_obj_mark_layout_as_dirty(obj2);
+        lv_obj_invalidate(parent);
         lv_obj_invalidate(parent2);
     }
     lv_group_swap_obj(obj1, obj2);

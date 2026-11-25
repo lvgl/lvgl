@@ -33,6 +33,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_nema_gfx.h"
+#include "../sw/lv_draw_sw_private.h"
 
 #if LV_USE_NEMA_GFX
 
@@ -68,7 +69,13 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u);
 
 static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
-static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool nema_gfx_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
+static bool nema_gfx_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
+static bool nema_gfx_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
+static bool nema_gfx_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
+static bool nema_gfx_can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
+static bool nema_gfx_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer,
+                                       const lv_draw_triangle_dsc_t * dsc);
 
 static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit);
 
@@ -78,9 +85,34 @@ static void nema_gfx_init_handlers(lv_draw_buf_handlers_t * handlers);
 
 static void lv_draw_buf_nema_gfx_init_handlers(void);
 
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static const lv_draw_unit_draw_cbs_t draw_cbs = {
+    .draw_fill_cb = lv_draw_nema_gfx_fill,
+    .can_draw_fill_cb = nema_gfx_can_draw_fill,
+    .draw_border_cb = lv_draw_nema_gfx_border,
+    .can_draw_border_cb = nema_gfx_can_draw_border,
+    .draw_label_cb = lv_draw_nema_gfx_label,
+    .can_draw_label_cb = nema_gfx_can_draw_label,
+    .draw_image_cb = lv_draw_nema_gfx_img,
+    .can_draw_image_cb = nema_gfx_can_draw_img,
+    .draw_layer_cb = lv_draw_nema_gfx_layer,
+#if LV_USE_NEMA_VG
+    .draw_arc_cb = lv_draw_nema_gfx_arc,
+#endif
+    .draw_line_cb = draw_line,
+    .can_draw_line_cb = nema_gfx_can_draw_line,
+    .draw_triangle_cb = lv_draw_nema_gfx_triangle,
+    .can_draw_triangle_cb = nema_gfx_can_draw_triangle,
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
+    .draw_vector_cb = lv_draw_nema_gfx_vector,
+#endif
+};
 
 /**********************
  *      MACROS
@@ -99,10 +131,12 @@ void lv_draw_nema_gfx_init(void)
     lv_draw_buf_nema_gfx_init_handlers();
 
     draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
-    draw_nema_gfx_unit->base_unit.evaluate_cb = nema_gfx_evaluate;
     draw_nema_gfx_unit->base_unit.delete_cb = nema_gfx_delete;
     draw_nema_gfx_unit->base_unit.wait_for_finish_cb = nema_gfx_wait_for_finish;
     draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
+    draw_nema_gfx_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_nema_gfx_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
+    draw_nema_gfx_unit->base_unit.id = DRAW_UNIT_ID_NEMA_GFX;
 
 #if LV_USE_NEMA_VG
     /*Initialize NemaVG */
@@ -157,124 +191,69 @@ static int32_t nema_gfx_wait_for_finish(lv_draw_unit_t * draw_unit)
     return 1;
 }
 
-static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
+static bool nema_gfx_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
 {
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
-
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_LAYER: {
-                if(task->preference_score > 80) {
-                    task->preference_score = 80;
-                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                }
-                return 1;
-            }
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
 #if LV_USE_NEMA_VG
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-        case LV_DRAW_DSC_TYPE_ARC:
-        case LV_DRAW_DSC_TYPE_FILL: {
-                if(task->preference_score > 80) {
-                    task->preference_score = 80;
-                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                }
-                return 1;
-            }
+    LV_UNUSED(dsc);
+    return true;
 #else
-        case LV_DRAW_DSC_TYPE_FILL: {
-                lv_draw_fill_dsc_t * draw_fill_dsc = (lv_draw_fill_dsc_t *) task->draw_dsc;
-                if((draw_fill_dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_TRIANGLE: {
-                lv_draw_triangle_dsc_t * draw_triangle_dsc = (lv_draw_triangle_dsc_t *) task->draw_dsc;
-                if((draw_triangle_dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
+    return dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE;
 #endif
-        case LV_DRAW_DSC_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * draw_image_dsc = (lv_draw_image_dsc_t *) task->draw_dsc;
-                /*Guard for previous NemaGFX Version*/
-#ifndef NEMA_BLOP_RECOLOR
-                if(draw_image_dsc->recolor_opa > LV_OPA_MIN)
-                    break;
-#endif
-                const lv_image_dsc_t * img_dsc = draw_image_dsc->src;
-                if(!lv_nemagfx_is_cf_supported(img_dsc->header.cf))
-                    break;
+}
 
-                if(draw_image_dsc->blend_mode != LV_BLEND_MODE_SUBTRACTIVE) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_LABEL: {
-                lv_draw_label_dsc_t * draw_label_dsc = (lv_draw_label_dsc_t *) task->draw_dsc;
-                lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)(draw_label_dsc->font->dsc);
-                if(fdsc->bitmap_format != LV_FONT_FMT_TXT_COMPRESSED) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_LINE: {
-                lv_draw_line_dsc_t * draw_line_dsc = (lv_draw_line_dsc_t *) task->draw_dsc;
-                bool is_dashed = (draw_line_dsc->dash_width && draw_line_dsc->dash_gap);
-                if(!is_dashed && !(draw_line_dsc->round_end || draw_line_dsc->round_start)) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-        case LV_DRAW_DSC_TYPE_BORDER: {
-                const lv_draw_border_dsc_t * draw_dsc = (lv_draw_border_dsc_t *) task->draw_dsc;
-                if((!(draw_dsc->side != (lv_border_side_t)LV_BORDER_SIDE_FULL && draw_dsc->radius > 0)) &&
-                   (draw_dsc->radius > draw_dsc->width)) {
-                    if(task->preference_score > 80) {
-                        task->preference_score = 80;
-                        task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                    }
-                    return 1;
-                }
-                break;
-            }
-#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
-        case LV_DRAW_DSC_TYPE_VECTOR: {
-                if(task->preference_score > 80) {
-                    task->preference_score = 80;
-                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                }
-                return 1;
-            }
+static bool nema_gfx_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+    return (!(dsc->side != (lv_border_side_t)LV_BORDER_SIDE_FULL && dsc->radius > 0)) &&
+           (dsc->radius > dsc->width);
+}
+
+static bool nema_gfx_can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+    const lv_font_fmt_txt_dsc_t * fdsc = (const lv_font_fmt_txt_dsc_t *)(dsc->font->dsc);
+    return fdsc->bitmap_format != LV_FONT_FMT_TXT_COMPRESSED;
+}
+
+static bool nema_gfx_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+    /*Guard for previous NemaGFX Version*/
+#ifndef NEMA_BLOP_RECOLOR
+    if(dsc->recolor_opa > LV_OPA_MIN)
+        return false;
 #endif
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-        default:
-            break;
-    }
-    nema_cl_wait(&(draw_nema_gfx_unit->cl));
-    return 0;
+    const lv_image_dsc_t * img_dsc = dsc->src;
+    if(!lv_nemagfx_is_cf_supported(img_dsc->header.cf))
+        return false;
+
+    return dsc->blend_mode != LV_BLEND_MODE_SUBTRACTIVE;
+}
+
+static bool nema_gfx_can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+    bool is_dashed = (dsc->dash_width && dsc->dash_gap);
+    return !is_dashed && !(dsc->round_end || dsc->round_start);
+}
+
+static bool nema_gfx_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer,
+                                       const lv_draw_triangle_dsc_t * dsc)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
+#if LV_USE_NEMA_VG
+    LV_UNUSED(dsc);
+    return true;
+#else
+    return dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE;
+#endif
 }
 
 static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
@@ -342,48 +321,20 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
     /* Clean cache */
     lv_draw_buf_flush_cache(layer->draw_buf, &clipped_area);
 
-    switch(t->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-            lv_draw_nema_gfx_fill(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_IMAGE:
-            lv_draw_nema_gfx_img(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-            lv_draw_nema_gfx_triangle(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc);
-            break;
-        case LV_DRAW_DSC_TYPE_LABEL:
-            lv_draw_nema_gfx_label(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LAYER:
-            lv_draw_nema_gfx_layer(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_DSC_TYPE_LINE:
-            lv_draw_line_iterate(t->target_layer, &t->clip_area, t->draw_dsc, lv_draw_nema_gfx_line, t->draw_unit);
-            break;
-#if LV_USE_NEMA_VG
-        case LV_DRAW_DSC_TYPE_ARC:
-            lv_draw_nema_gfx_arc(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-#endif
-        case LV_DRAW_DSC_TYPE_BORDER:
-            lv_draw_nema_gfx_border(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
-        case LV_DRAW_DSC_TYPE_VECTOR:
-            lv_draw_nema_gfx_vector(t->draw_unit, t->target_layer, &t->clip_area, t->draw_dsc, &t->area);
-            break;
-#endif
-        default:
-            break;
-    }
+    lv_draw_unit_draw_task(t->draw_unit, t);
 
-#if !LV_USE_OS
+    /* Keep the task in progress until the GPU has stopped accessing its buffers.
+     * The render thread must also wait before invalidating the destination cache. */
     nema_cl_wait(&(u->cl));
-#endif
 
     /* Invalidate cache */
     lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
+}
+
+static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_line_dsc_t * dsc)
+{
+    lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_nema_gfx_line, draw_unit);
 }
 
 static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit)

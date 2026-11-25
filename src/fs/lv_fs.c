@@ -74,6 +74,9 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
     LV_CHECK_ARG(path != NULL, return LV_FS_RES_INV_PARAM);
 
+    /*Truncating a file makes sense only if it's opened for writing*/
+    LV_CHECK_ARG(!(mode & LV_FS_MODE_TRUNC) || (mode & LV_FS_MODE_WR), return LV_FS_RES_INV_PARAM);
+
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
 
     lv_fs_drv_t * drv = lv_fs_get_drv(resolved_path.driver_letter);
@@ -99,16 +102,17 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 
     file_p->drv = drv;
 
+    void * file_d = drv->open_cb(drv, resolved_path.real_path, mode);
+    if(file_d == NULL || file_d == (void *)(-1)) {
+        LV_PROFILER_FS_END;
+        return LV_FS_RES_UNKNOWN;
+    }
+
     /* For memory-mapped files we set the file handle to our file descriptor so that we can access the cache from the file operations */
     if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
         file_p->file_d = file_p;
     }
     else {
-        void * file_d = drv->open_cb(drv, resolved_path.real_path, mode);
-        if(file_d == NULL || file_d == (void *)(-1)) {
-            LV_PROFILER_FS_END;
-            return LV_FS_RES_UNKNOWN;
-        }
         file_p->file_d = file_d;
     }
 
@@ -785,9 +789,10 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, void * buf, uint32_t
         uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
         uint32_t buffer_offset = (end - start) - buffer_remaining_length + 1;
 
-        /* Do not allow reading beyond the actual memory block for memory-mapped files */
+        /* Do not allow reading beyond the actual memory block for memory-mapped files.
+         * For them `end` is the buffer size, so only `buffer_remaining_length - 1` bytes are valid*/
         if(file_p->drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
-            if(btr > buffer_remaining_length)
+            if(btr >= buffer_remaining_length)
                 btr = buffer_remaining_length - 1;
         }
 

@@ -44,6 +44,8 @@
 static void lv_lottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_lottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void anim_exec_cb(void * var, int32_t v);
+static lv_anim_t * lottie_anim_create(lv_obj_t * obj);
+static void lottie_restart(lv_obj_t * obj);
 static void lottie_update(lv_lottie_t * lottie, int32_t v);
 
 /**********************
@@ -136,20 +138,7 @@ void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
 
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     tvg_picture_load_data(lottie->tvg_paint, src, src_size, "lottie", true);
-    lv_draw_buf_t * canvas_draw_buf = lv_canvas_get_draw_buf(obj);
-    if(canvas_draw_buf) {
-        tvg_picture_set_size(lottie->tvg_paint, canvas_draw_buf->header.w, canvas_draw_buf->header.h);
-    }
-
-    float f_total;
-    float duration;
-    tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
-    tvg_animation_get_duration(lottie->tvg_anim, &duration);
-    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
-    lottie->anim->act_time = 0;
-    lottie->anim->end_value = (int32_t)f_total;
-    lottie->anim->reverse_play_in_progress = false;
-    lottie_update(lottie, 0);   /*Render immediately*/
+    lottie_restart(obj);
 }
 
 void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
@@ -159,28 +148,14 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
 
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     tvg_picture_load(lottie->tvg_paint, src);
-    lv_draw_buf_t * canvas_draw_buf = lv_canvas_get_draw_buf(obj);
-    if(canvas_draw_buf) {
-        tvg_picture_set_size(lottie->tvg_paint, canvas_draw_buf->header.w, canvas_draw_buf->header.h);
-    }
-
-    float f_total;
-    float duration;
-    tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
-    tvg_animation_get_duration(lottie->tvg_anim, &duration);
-    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
-    lottie->anim->act_time = 0;
-    lottie->anim->end_value = (int32_t)f_total;
-    lottie->anim->reverse_play_in_progress = false;
-    lottie_update(lottie, 0);   /*Render immediately*/
+    lottie_restart(obj);
 }
 
 
 lv_anim_t * lv_lottie_get_anim(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
-    lv_lottie_t * lottie = (lv_lottie_t *)obj;
-    return lottie->anim;
+    return lv_anim_get(obj, anim_exec_cb);
 }
 
 /**********************
@@ -201,12 +176,7 @@ static void lv_lottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     lottie->tvg_canvas = tvg_swcanvas_create();
 
-    lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_exec_cb(&a, anim_exec_cb);
-    lv_anim_set_var(&a, obj);
-    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    lottie->anim = lv_anim_start(&a);
+    lottie_anim_create(obj);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -230,21 +200,56 @@ static void lv_lottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void anim_exec_cb(void * var, int32_t v)
 {
     lv_lottie_t * lottie = var;
+    lv_anim_t * anim = lv_anim_get(var, anim_exec_cb);
 
     /*Do not render not visible animations.*/
     if(lv_obj_is_visible(var)) {
         lottie_update(lottie, v);
-        if(lottie->anim) {
-            lottie->last_rendered_time = lottie->anim->act_time;
+        if(anim) {
+            lottie->last_rendered_time = anim->act_time;
         }
     }
     else {
         /*Artificially keep the animation on the last rendered frame's time
          *To avoid a jump when the widget becomes visible*/
-        if(lottie->anim) {
-            lottie->anim->act_time = lottie->last_rendered_time;
+        if(anim) {
+            anim->act_time = lottie->last_rendered_time;
         }
     }
+}
+
+static lv_anim_t * lottie_anim_create(lv_obj_t * obj)
+{
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_exec_cb(&a, anim_exec_cb);
+    lv_anim_set_var(&a, obj);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+    return lv_anim_start(&a);
+}
+
+static void lottie_restart(lv_obj_t * obj)
+{
+    lv_lottie_t * lottie = (lv_lottie_t *)obj;
+    lv_draw_buf_t * canvas_draw_buf = lv_canvas_get_draw_buf(obj);
+    if(canvas_draw_buf) {
+        tvg_picture_set_size(lottie->tvg_paint, canvas_draw_buf->header.w, canvas_draw_buf->header.h);
+    }
+
+    float f_total;
+    float duration;
+    tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
+    tvg_animation_get_duration(lottie->tvg_anim, &duration);
+    lv_anim_t * anim = lv_anim_get(obj, anim_exec_cb);
+    if(anim == NULL) anim = lottie_anim_create(obj);
+    if(anim) {
+        lv_anim_set_duration(anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
+        anim->act_time = 0;
+        anim->end_value = (int32_t)f_total;
+        anim->reverse_play_in_progress = false;
+    }
+    lottie->last_rendered_time = 0;
+    lottie_update(lottie, 0);   /*Render immediately*/
 }
 
 static void lottie_update(lv_lottie_t * lottie, int32_t v)

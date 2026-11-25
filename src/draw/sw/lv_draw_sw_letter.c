@@ -306,6 +306,7 @@ static void draw_letter_outline(lv_layer_t * layer, const lv_area_t * clip_area,
      *Draw the outline directly; lv_draw_vector() would create a draw task*/
     if(vector_dsc->task_list) {
         lv_draw_sw_vector(vector_dsc->base.layer, &vector_dsc->base.layer->_clip_area, vector_dsc);
+        vector_dsc->task_list = NULL; /*Freed by lv_draw_sw_vector()*/
     }
 
     lv_memcpy(&letter_coords, glyph_dsc->letter_coords, sizeof(lv_area_t));

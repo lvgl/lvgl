@@ -118,6 +118,72 @@ void test_dropdown_set_options(void)
     TEST_ASSERT_UINT_WITHIN(48, m1.free_size, m2.free_size);
 }
 
+void test_dropdown_set_options_while_open(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "a\nb");
+    lv_dropdown_open(dd);
+
+    lv_obj_t * list = lv_dropdown_get_list(dd);
+    lv_obj_t * label = lv_obj_get_child(list, 0);
+
+    /*The list label shows the options as static text: it must follow them when they are replaced or freed*/
+    lv_dropdown_set_options(dd, "a much longer option\nthat needs a new buffer\nc");
+    TEST_ASSERT_EQUAL_PTR(lv_dropdown_get_options(dd), lv_label_get_text(label));
+    lv_refr_now(NULL);
+
+    lv_dropdown_add_option(dd, "d", LV_DROPDOWN_POS_LAST);
+    TEST_ASSERT_EQUAL_PTR(lv_dropdown_get_options(dd), lv_label_get_text(label));
+    lv_refr_now(NULL);
+
+    lv_dropdown_set_options_static(dd, "x\ny");
+    TEST_ASSERT_EQUAL_STRING("x\ny", lv_label_get_text(label));
+    lv_refr_now(NULL);
+
+    lv_dropdown_clear_options(dd);
+    TEST_ASSERT_EQUAL_STRING("", lv_label_get_text(label));
+    lv_refr_now(NULL);
+
+    lv_obj_delete(dd);
+}
+
+void test_dropdown_select_after_clearing_options(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "One\nTwo\nThree");
+    lv_dropdown_set_selected(dd, 2);
+    lv_dropdown_clear_options(dd);
+
+    /*The request equals the old selection, but there are no options left.*/
+    lv_dropdown_set_selected(dd, 2);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_selected(dd));
+    lv_obj_delete(dd);
+}
+
+void test_dropdown_select_with_no_options(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_clear_options(dd);
+
+    lv_dropdown_set_selected(dd, UINT32_MAX);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_selected(dd));
+    lv_dropdown_set_selected(dd, 1);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_selected(dd));
+    lv_dropdown_set_selected(dd, 0);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_selected(dd));
+
+    /*An explicitly configured empty option is still a valid option.*/
+    lv_dropdown_set_options(dd, "");
+    TEST_ASSERT_EQUAL_UINT32(1, lv_dropdown_get_option_count(dd));
+    lv_dropdown_set_selected(dd, UINT32_MAX);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_selected(dd));
+
+    lv_dropdown_set_options(dd, "a\nb\nc");
+    lv_dropdown_set_selected(dd, 2);
+    TEST_ASSERT_EQUAL_UINT32(2, lv_dropdown_get_selected(dd));
+    lv_obj_delete(dd);
+}
+
 void test_dropdown_select(void)
 {
     lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
@@ -454,6 +520,42 @@ void test_dropdown_get_options_should_check_lengths(void)
     lv_dropdown_set_options(dd, "Option 1\nOption 2\nOption 3\nOption");
     TEST_ASSERT_EQUAL_INT(3, lv_dropdown_get_option_index(dd, "Option"));
     TEST_ASSERT_EQUAL_INT(-1, lv_dropdown_get_option_index(dd, "Option "));
+}
+
+void test_dropdown_empty_option_at_end(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "Alpha\n");
+    TEST_ASSERT_EQUAL_UINT32(2, lv_dropdown_get_option_count(dd));
+    TEST_ASSERT_EQUAL_INT32(1, lv_dropdown_get_option_index(dd, ""));
+    lv_obj_delete(dd);
+}
+
+void test_dropdown_empty_option_only(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "");
+    TEST_ASSERT_EQUAL_UINT32(1, lv_dropdown_get_option_count(dd));
+    TEST_ASSERT_EQUAL_INT32(0, lv_dropdown_get_option_index(dd, ""));
+    lv_obj_delete(dd);
+}
+
+void test_dropdown_empty_option_at_start(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "\nAlpha");
+    TEST_ASSERT_EQUAL_INT32(0, lv_dropdown_get_option_index(dd, ""));
+    TEST_ASSERT_EQUAL_INT32(1, lv_dropdown_get_option_index(dd, "Alpha"));
+    lv_obj_delete(dd);
+}
+
+void test_dropdown_empty_option_after_clear(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_clear_options(dd);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_option_count(dd));
+    TEST_ASSERT_EQUAL_INT32(-1, lv_dropdown_get_option_index(dd, ""));
+    lv_obj_delete(dd);
 }
 
 void test_dropdown_text_align(void)

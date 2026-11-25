@@ -239,6 +239,11 @@ static void flex_update(lv_obj_t * cont, void * user_data)
     }
 
     if(rtl && !f.row) {
+        if(f.cross_place == LV_FLEX_ALIGN_START)
+            f.cross_place = LV_FLEX_ALIGN_END;
+        else if(f.cross_place == LV_FLEX_ALIGN_END)
+            f.cross_place = LV_FLEX_ALIGN_START;
+
         if(track_cross_place == LV_FLEX_ALIGN_START)
             track_cross_place = LV_FLEX_ALIGN_END;
         else if(track_cross_place == LV_FLEX_ALIGN_END)

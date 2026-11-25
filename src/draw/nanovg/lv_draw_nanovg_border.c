@@ -103,8 +103,9 @@ static enum NVGwinding path_append_inner_rect(NVGcontext * ctx,
     const int32_t border_w = dsc->width;
     const float border_w_max = LV_MIN(half_w, half_h);
 
-    /* normal fill, no inner rect */
-    if(border_w >= border_w_max) {
+    /* Full border that leaves no room for the inner rect: normal fill, no inner rect.
+     * Partial borders can not be reduced to a fill, they only cover the selected sides. */
+    if(border_w >= border_w_max && dsc->side == LV_BORDER_SIDE_FULL) {
         LV_PROFILER_DRAW_END;
         return NVG_CCW;
     }
@@ -121,40 +122,60 @@ static enum NVGwinding path_append_inner_rect(NVGcontext * ctx,
         return NVG_CW;
     }
 
+    /* The selected sides overlap and cover the whole rect: normal fill of the (rounded) outer rect.
+     * It also keeps the corners on the far side rounded, a clamped border band would end square there. */
+    const bool has_left = dsc->side & LV_BORDER_SIDE_LEFT;
+    const bool has_right = dsc->side & LV_BORDER_SIDE_RIGHT;
+    const bool has_top = dsc->side & LV_BORDER_SIDE_TOP;
+    const bool has_bottom = dsc->side & LV_BORDER_SIDE_BOTTOM;
+    if(dsc->radius > 0 &&
+       (((has_left || has_right) && border_w >= w) || ((has_top || has_bottom) && border_w >= h)
+        || (has_left && has_right && border_w * 2 >= w) || (has_top && has_bottom && border_w * 2 >= h))) {
+        LV_PROFILER_DRAW_END;
+        return NVG_CCW;
+    }
+
     /* reset outer rect path */
     nvgBeginPath(ctx);
 
     /* no-radius case */
     if(dsc->radius <= 0) {
+        /* A border wider than the rect is limited to the rect, so it never leaves the rect */
+        const int32_t border_w_h = LV_MIN(border_w, w);
+        const int32_t border_w_v = LV_MIN(border_w, h);
+
         if(dsc->side & LV_BORDER_SIDE_TOP) {
             lv_nanovg_path_append_rect(ctx,
                                        x,
                                        y,
                                        w,
-                                       border_w,
+                                       border_w_v,
                                        0);
         }
+
         if(dsc->side & LV_BORDER_SIDE_LEFT) {
             lv_nanovg_path_append_rect(ctx,
                                        x,
                                        y,
-                                       border_w,
+                                       border_w_h,
                                        h,
                                        0);
         }
+
         if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
             lv_nanovg_path_append_rect(ctx,
                                        x,
-                                       y + h - border_w,
+                                       y + h - border_w_v,
                                        w,
-                                       border_w,
+                                       border_w_v,
                                        0);
         }
+
         if(dsc->side & LV_BORDER_SIDE_RIGHT) {
             lv_nanovg_path_append_rect(ctx,
-                                       x + w - border_w,
+                                       x + w - border_w_h,
                                        y,
-                                       border_w,
+                                       border_w_h,
                                        h,
                                        0);
         }

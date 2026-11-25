@@ -155,19 +155,21 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
         return false;
     }
     error = FT_Load_Glyph(face, data->glyph_index,
-                          FT_LOAD_COLOR | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT);
+                          FT_LOAD_COLOR | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT);
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
         lv_mutex_unlock(&dsc->cache_node->face_lock);
         LV_PROFILER_FONT_END;
         return false;
     }
-    error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-    if(error) {
-        FT_ERROR_MSG("FT_Render_Glyph", error);
-        lv_mutex_unlock(&dsc->cache_node->face_lock);
-        LV_PROFILER_FONT_END;
-        return false;
+    if(face->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
+        error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+        if(error) {
+            FT_ERROR_MSG("FT_Render_Glyph", error);
+            lv_mutex_unlock(&dsc->cache_node->face_lock);
+            LV_PROFILER_FONT_END;
+            return false;
+        }
     }
 
     FT_Glyph glyph;

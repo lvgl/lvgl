@@ -50,10 +50,20 @@ typedef enum {
 
 /**
  * File open mode.
+ * LV_FS_MODE_RD and LV_FS_MODE_WR can be combined with `|`.
+ * LV_FS_MODE_TRUNC is a modifier and must be combined with LV_FS_MODE_WR.
  */
 typedef enum {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
+    /**
+     * Open for writing, create the file if it doesn't exist and discard its
+     * content (set the length to 0) if it does, like `fopen(path, "w")`.
+     * Use it as `LV_FS_MODE_WR | LV_FS_MODE_TRUNC`, or
+     * `LV_FS_MODE_RD | LV_FS_MODE_WR | LV_FS_MODE_TRUNC` to read back too.
+     * Without it, the behavior of LV_FS_MODE_WR is up to the driver.
+     */
+    LV_FS_MODE_TRUNC = 0x04,
 } lv_fs_mode_t;
 
 /**
@@ -74,6 +84,8 @@ struct _lv_fs_drv_t {
 
     void(*remove_cb)(lv_fs_drv_t * drv); /*Optional*/
 
+    /*If `cache_size` is `LV_FS_CACHE_FROM_BUFFER`, the returned pointer is not used (the file handle is the
+     *`lv_fs_file_t`), so it must not need to be freed. `open_cb` only accepts the mode, NULL rejects it.*/
     void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
     lv_fs_res_t (*close_cb)(lv_fs_drv_t * drv, void * file_p);
     lv_fs_res_t (*read_cb)(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
@@ -152,8 +164,12 @@ bool lv_fs_is_ready(char letter);
  * Open a file
  * @param file_p    pointer to a lv_fs_file_t variable
  * @param path      path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
- * @param mode      read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
+ * @param mode      read: LV_FS_MODE_RD, write: LV_FS_MODE_WR, both: LV_FS_MODE_RD | LV_FS_MODE_WR.
+ *                  Add LV_FS_MODE_TRUNC (only valid together with LV_FS_MODE_WR) to create the
+ *                  file if missing and truncate it to 0 bytes if it exists.
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
+ *                  (LV_FS_RES_INV_PARAM if LV_FS_MODE_TRUNC is used without LV_FS_MODE_WR)
+ *                  (LV_FS_RES_UNKNOWN if LV_FS_MODE_TRUNC is used on a memory-mapped file, see `lv_fs_make_path_from_buffer`)
  */
 lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode);
 
