@@ -79,15 +79,15 @@ void lv_draw_nema_gfx_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t 
     if(dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
 
         lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
+        uint32_t bg_color = nema_rgba(col32.red, col32.green, col32.blue, col32.alpha);
 
         if(col32.alpha < 255U) {
-            nema_set_blend_fill(NEMA_BL_SIMPLE);
+            nema_set_blend_fill(NEMA_BL_SRC_OVER);
+            bg_color = nema_premultiply_rgba(bg_color);
         }
         else {
             nema_set_blend_fill(NEMA_BL_SRC);
         }
-
-        uint32_t bg_color = nema_rgba(col32.red, col32.green, col32.blue, col32.alpha);
 
         nema_enable_aa(1, 1, 1, 0);
         nema_fill_triangle(dsc->p[0].x - layer->buf_area.x1, dsc->p[0].y - layer->buf_area.y1,
