@@ -56,6 +56,7 @@ typedef enum {
 typedef struct {
     uint32_t rdp;
     const uint8_t * in;
+    uint32_t in_len;
     uint8_t bpp;
     uint8_t prev_v;
     uint8_t count;
