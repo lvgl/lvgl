@@ -78,7 +78,7 @@ static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv
 #endif
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
 #if LV_USE_PARALLEL_DRAW_DEBUG
     static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx);
@@ -96,7 +96,9 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_letter_cb = draw_letter,
     .draw_label_cb = draw_label,
     .draw_image_cb = draw_image,
+    .can_draw_image_cb = can_draw_image,
     .draw_layer_cb = draw_layer,
+    .can_draw_layer_cb = can_draw_image,
     .draw_arc_cb = draw_arc,
     .draw_line_cb = draw_line,
     .draw_triangle_cb = draw_triangle,
@@ -115,6 +117,14 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
  *   GLOBAL FUNCTIONS
  **********************/
 
+lv_draw_unit_t * lv_draw_sw_get_draw_unit(void)
+{
+    /*Find the unit by its callback table, so no global has to store it*/
+    lv_draw_unit_t * u = LV_GLOBAL_DEFAULT()->draw_info.unit_head;
+    while(u && u->draw_cbs != &draw_cbs) u = u->next;
+    return u;
+}
+
 void lv_draw_sw_init(void)
 {
 
@@ -124,8 +134,8 @@ void lv_draw_sw_init(void)
 
     lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
     draw_sw_unit->base_unit.dispatch_cb = dispatch;
-    draw_sw_unit->base_unit.evaluate_cb = evaluate;
     draw_sw_unit->base_unit.draw_cbs = &draw_cbs;
+    draw_sw_unit->base_unit.id = DRAW_UNIT_ID_SW;
 #if LV_USE_OS != LV_OS_NONE
     draw_sw_unit->base_unit.wait_for_finish_cb = wait_for_finish;
 #endif /*LV_USE_OS*/
@@ -265,46 +275,19 @@ lv_draw_sw_blend_handler_t lv_draw_sw_get_blend_handler(lv_color_format_t dest_c
  *   STATIC FUNCTIONS
  **********************/
 
-static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
+static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc)
 {
     LV_UNUSED(draw_unit);
+    LV_UNUSED(layer);
 
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_IMAGE:
-        case LV_DRAW_DSC_TYPE_LAYER: {
-                lv_draw_image_dsc_t * draw_dsc = task->draw_dsc;
+    /* not support skew */
+    if(dsc->skew_x != 0 || dsc->skew_y != 0) return false;
 
-                /* not support skew */
-                if(draw_dsc->skew_x != 0 || draw_dsc->skew_y != 0) {
-                    return 0;
-                }
+    lv_color_format_t cf = dsc->header.cf;
+    bool masked = dsc->bitmap_mask_src != NULL;
+    if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) return false;
 
-                bool masked = draw_dsc->bitmap_mask_src != NULL;
-
-                lv_color_format_t cf = draw_dsc->header.cf;
-                if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) {
-                    return 0;
-                }
-
-                if(cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
-                    return 0;
-                }
-            }
-            break;
-#if LV_USE_3DTEXTURE
-        case LV_DRAW_DSC_TYPE_3D:
-            return 0;
-#endif
-        default:
-            break;
-    }
-
-    if(task->preference_score >= 100) {
-        task->preference_score = 100;
-        task->preferred_draw_unit_id = DRAW_UNIT_ID_SW;
-    }
-
-    return 0;
+    return cf < LV_COLOR_FORMAT_PROPRIETARY_START;
 }
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
@@ -559,20 +542,13 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_DSC_TYPE_LAYER) {
         lv_area_t draw_area;
-        lv_text_attributes_t attributes = {0};
-
-        attributes.text_flags = LV_TEXT_FLAG_NONE;
-        attributes.line_space = 0;
-        attributes.letter_space = 0;
-        attributes.max_width = 100;
-
         if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area)) return;
 
         lv_draw_fill_dsc_t fill_dsc;
         lv_draw_fill_dsc_init(&fill_dsc);
         fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
         fill_dsc.opa = LV_OPA_10;
-        lv_draw_sw_fill(t, &fill_dsc, &draw_area);
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &draw_area);
 
         lv_draw_border_dsc_t border_dsc;
         lv_draw_border_dsc_init(&border_dsc);
@@ -582,7 +558,7 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
         lv_draw_sw_border(t->target_layer, &t->clip_area, &border_dsc, &draw_area);
 
         lv_point_t txt_size;
-        lv_text_get_size_attributes(&txt_size, "W", LV_FONT_DEFAULT, &attributes);
+        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_area.x1;
@@ -592,7 +568,7 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
 
         lv_draw_fill_dsc_init(&fill_dsc);
         fill_dsc.color = lv_color_white();
-        lv_draw_sw_fill(t, &fill_dsc, &txt_area);
+        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &txt_area);
 
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d", idx);
@@ -605,5 +581,12 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
 }
 #endif
 
+
+#else /*LV_USE_DRAW_SW*/
+
+lv_draw_unit_t * lv_draw_sw_get_draw_unit(void)
+{
+    return NULL;
+}
 
 #endif /*LV_USE_DRAW_SW*/

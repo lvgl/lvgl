@@ -214,7 +214,8 @@ void lv_draw_init(void);
 void lv_draw_deinit(void);
 
 /**
- * Allocate a new draw unit with the given size and appends it to the list of draw units
+ * Allocate a new draw unit with the given size and appends it to the list of draw units.
+ * It becomes the default draw unit and falls back to the software draw unit.
  * @param size      the size to allocate. E.g. `sizeof(my_draw_unit_t)`,
  *                  where the first element of `my_draw_unit_t` is `lv_draw_unit_t`.
  */

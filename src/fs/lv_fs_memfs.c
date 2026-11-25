@@ -123,7 +123,13 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
-    LV_UNUSED(mode);
+
+    /*The buffer is read-only, there is nothing to truncate. Fail instead of silently keeping the content.*/
+    if(mode & LV_FS_MODE_TRUNC) {
+        LV_LOG_WARN("LV_FS_MODE_TRUNC is not supported for memory-mapped files");
+        return NULL;
+    }
+
     return (void *)path;
 }
 
