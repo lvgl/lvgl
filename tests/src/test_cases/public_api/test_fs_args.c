@@ -17,6 +17,14 @@ void test_fs_args_open_null_path(void)
     TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_open(&f, NULL, LV_FS_MODE_RD));
 }
 
+/*Truncating needs write access*/
+void test_fs_args_open_trunc_without_wr(void)
+{
+    lv_fs_file_t f;
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_open(&f, "A:src/test_files/trunc.txt", LV_FS_MODE_TRUNC));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_open(&f, "A:src/test_files/trunc.txt", LV_FS_MODE_RD | LV_FS_MODE_TRUNC));
+}
+
 void test_fs_args_path_get_size_null_path(void)
 {
     uint32_t size;

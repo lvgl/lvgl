@@ -385,4 +385,348 @@ void test_rtl_align_center(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/rtl_obj_align_center.png");
 }
+
+#define REORDER_MAX_INV_AREAS 64
+static lv_area_t reorder_inv_areas[REORDER_MAX_INV_AREAS];
+static uint32_t reorder_inv_cnt;
+
+static void reorder_require_direct_mode(void)
+{
+    if(lv_display_get_render_mode(lv_display_get_default()) != LV_DISPLAY_RENDER_MODE_DIRECT) {
+        TEST_IGNORE_MESSAGE("Needs LV_DISPLAY_RENDER_MODE_DIRECT to keep the previous frame");
+    }
+}
+
+static lv_obj_t * reorder_box(lv_obj_t * parent, int32_t x, int32_t y, int32_t w, int32_t h, lv_palette_t color)
+{
+    lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(obj, lv_palette_main(color), 0);
+    lv_obj_set_pos(obj, x, y);
+    lv_obj_set_size(obj, w, h);
+    return obj;
+}
+
+static lv_obj_t * reorder_flex_row(void)
+{
+    lv_obj_t * cont = reorder_box(lv_screen_active(), 20, 20, 400, 100, LV_PALETTE_GREY);
+    lv_obj_set_layout(cont, LV_LAYOUT_FLEX);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    return cont;
+}
+
+/*Two grid items spanning overlapping cells: a reorder changes only the stacking*/
+static void reorder_grid_overlapping(lv_obj_t ** a, lv_obj_t ** b)
+{
+    static const int32_t cols[] = {60, 100, 140, LV_GRID_TEMPLATE_LAST};
+    static const int32_t rows[] = {80, LV_GRID_TEMPLATE_LAST};
+
+    lv_obj_t * cont = reorder_box(lv_screen_active(), 20, 20, 400, 100, LV_PALETTE_GREY);
+    lv_obj_set_grid_dsc_array(cont, cols, rows);
+
+    *a = reorder_box(cont, 0, 0, 50, 50, LV_PALETTE_RED);
+    *b = reorder_box(cont, 0, 0, 50, 50, LV_PALETTE_BLUE);
+    lv_obj_set_grid_cell(*a, LV_GRID_ALIGN_STRETCH, 0, 2, LV_GRID_ALIGN_STRETCH, 0, 1);
+    lv_obj_set_grid_cell(*b, LV_GRID_ALIGN_STRETCH, 1, 2, LV_GRID_ALIGN_STRETCH, 0, 1);
+}
+
+/*Redraw what the reorder invalidated, then compare it with a full redraw*/
+static void reorder_assert_no_stale_pixels(void)
+{
+    lv_display_t * disp = lv_display_get_default();
+    lv_refr_now(disp);  /*Partial redraw; the layout runs here too*/
+
+    lv_draw_buf_t * buf = lv_display_get_buf_active(disp);
+    uint32_t size = buf->header.stride * buf->header.h;
+    uint8_t * partial = lv_malloc(size);
+    TEST_ASSERT_NOT_NULL(partial);
+    lv_memcpy(partial, buf->data, size);
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(disp);  /*Reference: everything redrawn*/
+
+    uint32_t px_size = lv_color_format_get_size(buf->header.cf);
+    uint32_t stale = 0;
+    lv_area_t bbox = {INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN};
+    for(int32_t y = 0; y < (int32_t)buf->header.h; y++) {
+        for(int32_t x = 0; x < (int32_t)buf->header.w; x++) {
+            uint32_t ofs = y * buf->header.stride + x * px_size;
+            if(lv_memcmp(&partial[ofs], &buf->data[ofs], px_size) != 0) {
+                stale++;
+                bbox.x1 = LV_MIN(bbox.x1, x);
+                bbox.y1 = LV_MIN(bbox.y1, y);
+                bbox.x2 = LV_MAX(bbox.x2, x);
+                bbox.y2 = LV_MAX(bbox.y2, y);
+            }
+        }
+    }
+    lv_free(partial);
+
+    char msg[128];
+    lv_snprintf(msg, sizeof(msg), "%" LV_PRIu32 " stale pixels in (%" LV_PRId32 ",%" LV_PRId32 ")-(%" LV_PRId32 ",%"
+                LV_PRId32 ")", stale, bbox.x1, bbox.y1, bbox.x2, bbox.y2);
+    TEST_ASSERT_EQUAL_UINT32_MESSAGE(0, stale, msg);
+}
+
+static void reorder_inv_area_cb(lv_event_t * e)
+{
+    TEST_ASSERT_LESS_THAN_UINT32(REORDER_MAX_INV_AREAS, reorder_inv_cnt);
+    reorder_inv_areas[reorder_inv_cnt++] = *(lv_area_t *)lv_event_get_param(e);
+}
+
+static void reorder_capture_start(void)
+{
+    reorder_inv_cnt = 0;
+    lv_display_add_event_cb(lv_display_get_default(), reorder_inv_area_cb, LV_EVENT_INVALIDATE_AREA, NULL);
+}
+
+static void reorder_capture_stop(void)
+{
+    lv_display_remove_event_cb_with_user_data(lv_display_get_default(), reorder_inv_area_cb, NULL);
+}
+
+static bool reorder_was_invalidated(const lv_obj_t * obj)
+{
+    lv_area_t common;
+    for(uint32_t i = 0; i < reorder_inv_cnt; i++) {
+        if(lv_area_intersect(&common, &obj->coords, &reorder_inv_areas[i])) return true;
+    }
+    return false;
+}
+
+/*lv_obj_move_to_index()*/
+
+void test_move_to_index_redraw_overlapping(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a = reorder_box(lv_screen_active(), 50, 50, 100, 100, LV_PALETTE_RED);
+    reorder_box(lv_screen_active(), 100, 100, 100, 100, LV_PALETTE_BLUE);
+    lv_refr_now(NULL);
+
+    lv_obj_move_to_index(a, -1);
+    reorder_assert_no_stale_pixels();
+}
+
+/*Moving the first item to the end shifts every sibling*/
+void test_move_to_index_redraw_flex(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * cont = reorder_flex_row();
+    lv_obj_t * a = reorder_box(cont, 0, 0, 40, 60, LV_PALETTE_RED);
+    lv_obj_t * b = reorder_box(cont, 0, 0, 80, 80, LV_PALETTE_GREEN);
+    reorder_box(cont, 0, 0, 120, 40, LV_PALETTE_BLUE);
+    lv_refr_now(NULL);
+
+    lv_obj_move_to_index(a, -1);
+    reorder_assert_no_stale_pixels();
+
+    TEST_ASSERT_EQUAL_INT32(cont->coords.x1, b->coords.x1);
+    TEST_ASSERT_EQUAL_INT32(cont->coords.x1 + 80 + 120, a->coords.x1);
+}
+
+/*The grow item ends up in a different slot*/
+void test_move_to_index_redraw_flex_grow(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * cont = reorder_flex_row();
+    lv_obj_t * a = reorder_box(cont, 0, 0, 60, 60, LV_PALETTE_RED);
+    lv_obj_t * grow = reorder_box(cont, 0, 0, 10, 30, LV_PALETTE_GREEN);
+    lv_obj_set_flex_grow(grow, 1);
+    reorder_box(cont, 0, 0, 150, 80, LV_PALETTE_BLUE);
+    lv_refr_now(NULL);
+
+    lv_obj_move_to_index(a, -1);
+    reorder_assert_no_stale_pixels();
+
+    TEST_ASSERT_EQUAL_INT32(cont->coords.x1, grow->coords.x1);
+    TEST_ASSERT_EQUAL_INT32(cont->coords.x2 - 60 + 1, a->coords.x1);
+}
+
+/*Nothing moves, only the stacking changes*/
+void test_move_to_index_redraw_grid(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a;
+    lv_obj_t * b;
+    reorder_grid_overlapping(&a, &b);
+    lv_refr_now(NULL);
+
+    lv_obj_move_to_index(a, -1);
+    reorder_assert_no_stale_pixels();
+}
+
+/*Only the moved object can look different, not the whole parent*/
+void test_move_to_index_invalidates_only_the_moved_object(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a = reorder_box(lv_screen_active(), 10, 10, 50, 50, LV_PALETTE_RED);
+    reorder_box(lv_screen_active(), 30, 30, 50, 50, LV_PALETTE_BLUE);
+    lv_obj_t * far = reorder_box(lv_screen_active(), 300, 300, 50, 50, LV_PALETTE_GREEN);
+    lv_refr_now(NULL);
+
+    reorder_capture_start();
+    lv_obj_move_to_index(a, -1);
+    reorder_capture_stop();
+
+    TEST_ASSERT_TRUE(reorder_was_invalidated(a));
+    TEST_ASSERT_FALSE(reorder_was_invalidated(far));
+}
+
+/*lv_obj_swap()*/
+
+void test_swap_redraw_overlapping(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a = reorder_box(lv_screen_active(), 50, 50, 100, 100, LV_PALETTE_RED);
+    lv_obj_t * b = reorder_box(lv_screen_active(), 100, 100, 100, 100, LV_PALETTE_BLUE);
+    lv_refr_now(NULL);
+
+    lv_obj_swap(a, b);
+    reorder_assert_no_stale_pixels();
+}
+
+/*Swapping the first and last items moves all three*/
+void test_swap_redraw_flex(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * cont = reorder_flex_row();
+    lv_obj_t * a = reorder_box(cont, 0, 0, 40, 60, LV_PALETTE_RED);
+    lv_obj_t * b = reorder_box(cont, 0, 0, 80, 80, LV_PALETTE_GREEN);
+    lv_obj_t * c = reorder_box(cont, 0, 0, 120, 40, LV_PALETTE_BLUE);
+    lv_refr_now(NULL);
+
+    lv_obj_swap(a, c);
+    reorder_assert_no_stale_pixels();
+
+    TEST_ASSERT_EQUAL_INT32(cont->coords.x1, c->coords.x1);
+    TEST_ASSERT_EQUAL_INT32(cont->coords.x1 + 120, b->coords.x1);
+    TEST_ASSERT_EQUAL_INT32(cont->coords.x1 + 120 + 80, a->coords.x1);
+}
+
+/*Nothing moves, only the stacking changes*/
+void test_swap_redraw_grid(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a;
+    lv_obj_t * b;
+    reorder_grid_overlapping(&a, &b);
+    lv_refr_now(NULL);
+
+    lv_obj_swap(a, b);
+    reorder_assert_no_stale_pixels();
+}
+
+/*Children of different parents: each one moves into the other parent*/
+void test_swap_redraw_different_parents(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * p1 = reorder_box(lv_screen_active(), 20, 20, 200, 200, LV_PALETTE_GREY);
+    lv_obj_t * p2 = reorder_box(lv_screen_active(), 300, 20, 200, 200, LV_PALETTE_BROWN);
+    lv_obj_t * a = reorder_box(p1, 10, 10, 50, 50, LV_PALETTE_RED);
+    lv_obj_t * b = reorder_box(p2, 100, 100, 80, 80, LV_PALETTE_BLUE);
+    lv_refr_now(NULL);
+
+    lv_obj_swap(a, b);
+    reorder_assert_no_stale_pixels();
+
+    TEST_ASSERT_EQUAL_INT32(p2->coords.x1 + 10, a->coords.x1);
+    TEST_ASSERT_EQUAL_INT32(p1->coords.x1 + 100, b->coords.x1);
+}
+
+/*Items of two flex containers trade places*/
+void test_swap_redraw_different_flex_parents(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * p1 = reorder_flex_row();
+    lv_obj_t * p2 = reorder_flex_row();
+    lv_obj_set_y(p2, 200);
+    lv_obj_t * a = reorder_box(p1, 0, 0, 40, 60, LV_PALETTE_RED);
+    lv_obj_t * a2 = reorder_box(p1, 0, 0, 80, 80, LV_PALETTE_GREEN);
+    lv_obj_t * b = reorder_box(p2, 0, 0, 120, 40, LV_PALETTE_BLUE);
+    reorder_box(p2, 0, 0, 60, 60, LV_PALETTE_ORANGE);
+    lv_refr_now(NULL);
+
+    lv_obj_swap(a, b);
+    reorder_assert_no_stale_pixels();
+
+    TEST_ASSERT_EQUAL_INT32(p1->coords.x1, b->coords.x1);
+    TEST_ASSERT_EQUAL_INT32(p1->coords.y1, b->coords.y1);
+    TEST_ASSERT_EQUAL_INT32(p1->coords.x1 + 120, a2->coords.x1);
+    TEST_ASSERT_EQUAL_INT32(p2->coords.x1, a->coords.x1);
+    TEST_ASSERT_EQUAL_INT32(p2->coords.y1, a->coords.y1);
+}
+
+/*Only the swapped objects can look different, not the whole parent*/
+void test_swap_invalidates_only_the_swapped_objects(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a = reorder_box(lv_screen_active(), 10, 10, 50, 50, LV_PALETTE_RED);
+    lv_obj_t * b = reorder_box(lv_screen_active(), 30, 30, 50, 50, LV_PALETTE_BLUE);
+    lv_obj_t * far = reorder_box(lv_screen_active(), 300, 300, 50, 50, LV_PALETTE_GREEN);
+    lv_refr_now(NULL);
+
+    reorder_capture_start();
+    lv_obj_swap(a, b);
+    reorder_capture_stop();
+
+    TEST_ASSERT_TRUE(reorder_was_invalidated(a));
+    TEST_ASSERT_TRUE(reorder_was_invalidated(b));
+    TEST_ASSERT_FALSE(reorder_was_invalidated(far));
+}
+
+static void reorder_ext_draw_40_cb(lv_event_t * e)
+{
+    lv_event_set_ext_draw_size(e, 40);
+}
+
+/*Overflow-visible children are clipped to the parent's coords + ext draw size, the area lv_obj_invalidate() covers*/
+static void reorder_overflow_visible_scene(lv_obj_t ** a, lv_obj_t ** b)
+{
+    *a = reorder_box(lv_screen_active(), 50, 50, 50, 50, LV_PALETTE_RED);
+    lv_obj_set_overflow_visible(*a, true);
+    lv_obj_add_event_cb(*a, reorder_ext_draw_40_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, NULL);
+    lv_obj_refresh_ext_draw_size(*a);
+    reorder_box(*a, 20, 20, 100, 100, LV_PALETTE_ORANGE);    /*Up to (169,169), clipped at (139,139)*/
+    *b = reorder_box(lv_screen_active(), 110, 110, 100, 100, LV_PALETTE_BLUE);
+    lv_refr_now(NULL);
+}
+
+/*The child of `a` overlaps `b` outside `a`*/
+void test_move_to_index_redraw_overflow_visible(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a;
+    lv_obj_t * b;
+    reorder_overflow_visible_scene(&a, &b);
+
+    lv_obj_move_to_index(a, -1);
+    reorder_assert_no_stale_pixels();
+}
+
+/*The child of `a` overlaps `b` outside `a`*/
+void test_swap_redraw_overflow_visible(void)
+{
+    reorder_require_direct_mode();
+
+    lv_obj_t * a;
+    lv_obj_t * b;
+    reorder_overflow_visible_scene(&a, &b);
+
+    lv_obj_swap(a, b);
+    reorder_assert_no_stale_pixels();
+}
+
 #endif

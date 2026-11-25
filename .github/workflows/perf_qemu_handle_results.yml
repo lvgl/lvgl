@@ -1,0 +1,53 @@
+name: QEMU Render Performance Results Handler
+
+
+on:
+  workflow_run:
+    workflows: [QEMU Emulated Render Performance]
+    types:
+      - completed
+
+concurrency:
+  group: ${{ github.event.workflow_run.head_branch }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  # contents: write is required to publish the pre-release
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    # Only update the release if the workflow is triggered after a push to master
+    if: ${{ github.event.workflow_run.conclusion == 'success'
+            && github.event.workflow_run.event == 'push'
+            && github.event.workflow_run.head_branch == 'master' }}
+    runs-on: ubuntu-24.04
+    name: QEMU Benchmark - Publish the master baseline
+    steps:
+      - name: Download the results of that run
+        uses: dawidd6/action-download-artifact@v24
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          pattern: perf-qemu-*
+          path: artifacts
+          allow_forks: false
+
+      - name: Gather the result files
+        run: |
+          mkdir output
+          # One results-<target>.json per matrix job, each in its own artifact directory
+          find artifacts -name 'results-*.json' -exec mv -t output {} +
+          ls -l output
+
+      - name: Store them in the benchmark pre-release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: QEMU Render Benchmark Latest
+          files: output/results-*.json
+          tag_name: qemu-benchmark-latest
+          prerelease: true
+          body: >
+            Automatically generated. Holds the QEMU instruction counts for the current
+            master, which pull requests are compared against. See
+            .github/workflows/perf_qemu.yml.

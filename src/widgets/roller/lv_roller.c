@@ -205,19 +205,21 @@ bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_en
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
     LV_CHECK_ARG(sel_opt != NULL, return false);
+    if(lv_roller_get_option_count(obj) == 0) return false;
 
     const char * options = lv_roller_get_options(obj);
     size_t options_len = lv_strlen(options);
+    size_t selected_len = lv_strlen(sel_opt);
 
     bool option_found = false;
 
     uint32_t current_option = 0;
     size_t line_start = 0;
 
-    for(size_t i = 0; i < options_len; i++) {
-        if(options[i] == '\n') {
+    for(size_t i = 0; i <= options_len; i++) {
+        if(options[i] == '\n' || options[i] == '\0') {
             /* See if this is the correct option */
-            if(lv_strncmp(&options[line_start], sel_opt, i - line_start) == 0) {
+            if(i - line_start == selected_len && lv_strncmp(&options[line_start], sel_opt, selected_len) == 0) {
                 lv_roller_set_selected(obj, current_option, anim);
                 option_found = true;
                 break;
@@ -264,8 +266,9 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(buf != NULL, return);
 
-    lv_roller_t * roller = (lv_roller_t *)obj;
-    lv_roller_get_option_str(obj, roller->sel_opt_id, buf, buf_size);
+    if(lv_roller_get_option_str(obj, lv_roller_get_selected(obj), buf, buf_size) != LV_RESULT_OK) {
+        buf[0] = '\0';
+    }
 }
 
 /**
@@ -315,6 +318,7 @@ lv_result_t lv_roller_get_option_str(const lv_obj_t * obj, uint32_t option, char
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
     LV_CHECK_ARG(buf != NULL, return LV_RESULT_INVALID);
+    if(option >= lv_roller_get_option_count(obj)) return LV_RESULT_INVALID;
 
     lv_obj_t * label = get_label(obj);
     uint32_t i;

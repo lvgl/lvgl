@@ -62,7 +62,8 @@ static void fs_init(void)
  * Open a file
  * @param drv       pointer to a driver where this function belongs
  * @param path      path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
- * @param mode      read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
+ * @param mode      read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
+ *                  FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
  * @return          a file descriptor or NULL on error
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -70,13 +71,16 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     LV_ASSERT(path != NULL);
     LV_UNUSED(drv);
 
+    const bool trunc = (mode & LV_FS_MODE_TRUNC) != 0;
+    const lv_fs_mode_t rw_mode = (lv_fs_mode_t)(mode & ~LV_FS_MODE_TRUNC);
+
     const char * flags;
-    if(mode == LV_FS_MODE_WR)
-        flags = FILE_WRITE;
-    else if(mode == LV_FS_MODE_RD)
+    if(rw_mode == LV_FS_MODE_WR)
+        flags = FILE_WRITE; /*"w" always creates and truncates*/
+    else if(rw_mode == LV_FS_MODE_RD)
         flags = FILE_READ;
-    else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD))
-        flags = FILE_WRITE;
+    else if(rw_mode == (LV_FS_MODE_WR | LV_FS_MODE_RD))
+        flags = trunc ? "w+" : FILE_WRITE;
     else {
         LV_LOG_WARN("Unsupported mode: 0x%x", (unsigned)mode);
         return NULL;

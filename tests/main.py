@@ -16,8 +16,6 @@ sys.path.append(lvgl_script_path)
 
 from LVGLImage import ColorFormat, CompressMethod, LVGLImage
 
-from perf import perf_test_options
-
 lvgl_configs_dir = os.path.join(lvgl_test_dir, "configs")
 lvgl_presets_dir = os.path.join(lvgl_dir, "configs", "defconfigs")
 
@@ -449,7 +447,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--build-options",
         nargs=1,
-        choices=list(chain(build_only_options, test_options, perf_test_options)),
+        choices=list(chain(build_only_options, test_options)),
         help="""the build option name to build or run. When
                         omitted all build configurations are used.
                         """,
@@ -510,15 +508,6 @@ if __name__ == "__main__":
     clean_build_dirs = []
     for options_name in options_to_build:
         is_test = options_name in test_options
-        is_perf_test = options_name in perf_test_options
-        if is_perf_test:
-            perf_test_script = os.path.join(lvgl_test_dir, "perf.py")
-            try:
-                subprocess.check_call([perf_test_script, *(sys.argv[1:])])
-            except subprocess.CalledProcessError as e:
-                sys.exit(e.returncode)
-            continue
-
         build_type = "Debug"
         build_tests(options_name, build_type, args.clean)
         if is_test:

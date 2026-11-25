@@ -1295,6 +1295,10 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         obj->scroll_chain_hor = 1;
         obj->scroll_chain_ver = 1;
         obj->gesture_bubble = 1;
+
+        /*Inherit the parent's state immediately if it trickles its state to the children.
+         *Set it directly (styles are refreshed after construction) to avoid transitions.*/
+        if(parent->state_trickle) obj->state = parent->state;
     }
 
 #if LV_USE_OBJ_ID && LV_OBJ_ID_AUTO_ASSIGN
