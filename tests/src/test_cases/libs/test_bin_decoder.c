@@ -226,4 +226,187 @@ void test_bin_decoder_open_stride_zero_handling(void)
 
     lv_bin_decoder_close(decoder_dsc->decoder, decoder_dsc);
 }
+
+#if LV_USE_LZ4 && LV_BIN_DECODER_RAM_LOAD
+
+#define COMPRESSED_A8_LZ4 "A:test_images/stride_align1/LZ4/test_A8.bin"
+#define COMPRESSED_A8_RLE "A:test_images/stride_align1/RLE/test_A8.bin"
+#define COMPRESSED_A8_RAW "A:test_images/stride_align1/UNCOMPRESSED/test_A8.bin"
+#define TMP_FILE_NAME     "A:tmp_bin_decoder.bin"
+
+/*Read a whole file into an exactly sized heap buffer, so ASAN reports any access beyond it.*/
+static uint8_t * read_file_exact(const char * path, uint32_t * size)
+{
+    lv_fs_file_t f;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, path, LV_FS_MODE_RD));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_seek(&f, 0, LV_FS_SEEK_END));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_tell(&f, size));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_seek(&f, 0, LV_FS_SEEK_SET));
+    uint8_t * buf = lv_malloc(*size);
+    TEST_ASSERT_NOT_NULL(buf);
+    uint32_t rn;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(&f, buf, *size, &rn));
+    TEST_ASSERT_EQUAL_UINT32(*size, rn);
+    lv_fs_close(&f);
+    return buf;
+}
+
+static void write_tmp_file(const uint8_t * data, uint32_t size)
+{
+    lv_fs_file_t f;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, TMP_FILE_NAME, LV_FS_MODE_WR | LV_FS_MODE_TRUNC));
+    uint32_t wn;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_write(&f, data, size, &wn));
+    TEST_ASSERT_EQUAL_UINT32(size, wn);
+    lv_fs_close(&f);
+}
+
+/*Open `src` without cache and return the result. If it is OK, compare the pixels with the uncompressed image.*/
+static lv_result_t open_and_check_a8(const void * src, const uint8_t * ref, uint32_t ref_size)
+{
+    lv_image_decoder_dsc_t dsc;
+    lv_image_decoder_args_t args = { .no_cache = true };
+    lv_result_t res = lv_image_decoder_open(&dsc, src, &args);
+    if(res != LV_RESULT_OK) return res;
+
+    TEST_ASSERT_EQUAL(LV_COLOR_FORMAT_A8, dsc.header.cf);
+    TEST_ASSERT_NOT_NULL(dsc.decoded);
+    if(ref) {
+        TEST_ASSERT_GREATER_OR_EQUAL_UINT32(ref_size, dsc.decoded->data_size);
+        TEST_ASSERT_EQUAL_UINT8_ARRAY(ref, dsc.decoded->data, ref_size);
+    }
+    lv_image_decoder_close(&dsc);
+    return LV_RESULT_OK;
+}
+
+/*The source is a path. A short path must not be read as an `lv_image_dsc_t`.*/
+static void test_short_path(const char * image_path)
+{
+    uint32_t ref_size;
+    uint8_t * ref = read_file_exact(COMPRESSED_A8_RAW, &ref_size);
+    uint32_t size;
+    uint8_t * img = read_file_exact(image_path, &size);
+    write_tmp_file(img, size);
+
+    /*Exact sized heap copy of the path*/
+    const char * path = TMP_FILE_NAME;
+    char * short_path = lv_malloc(lv_strlen(path) + 1);
+    lv_memcpy(short_path, path, lv_strlen(path) + 1);
+
+    /*Skip the header of the uncompressed image, it has the same pixels.*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, open_and_check_a8(short_path, ref + sizeof(lv_image_header_t),
+                                                      ref_size - sizeof(lv_image_header_t)));
+    lv_free(short_path);
+    lv_free(img);
+    lv_free(ref);
+}
+
+void test_bin_decoder_compressed_file_short_path_lz4(void)
+{
+    test_short_path(COMPRESSED_A8_LZ4);
+}
+
+#if LV_USE_RLE
+void test_bin_decoder_compressed_file_short_path_rle(void)
+{
+    test_short_path(COMPRESSED_A8_RLE);
+}
+#endif
+
+/*Compressed file shorter than the header + compress header.*/
+void test_bin_decoder_compressed_file_too_small(void)
+{
+    uint32_t size;
+    uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
+    const uint32_t lens[] = {sizeof(lv_image_header_t), sizeof(lv_image_header_t) + 1, sizeof(lv_image_header_t) + 11,
+                             sizeof(lv_image_header_t) + 12
+                            };
+    for(uint32_t i = 0; i < sizeof(lens) / sizeof(lens[0]); i++) {
+        write_tmp_file(img, lens[i]);
+        TEST_ASSERT_EQUAL(LV_RESULT_INVALID, open_and_check_a8(TMP_FILE_NAME, NULL, 0));
+    }
+    lv_free(img);
+}
+
+static lv_image_dsc_t * create_variable_dsc(uint8_t * file_data, uint32_t file_size, uint32_t data_size)
+{
+    lv_image_dsc_t * dsc = lv_malloc_zeroed(sizeof(lv_image_dsc_t));
+    lv_memcpy(&dsc->header, file_data, sizeof(lv_image_header_t));
+    dsc->data_size = data_size;
+    /*Exact sized copy of the payload*/
+    uint8_t * data = lv_malloc(data_size);
+    lv_memcpy(data, file_data + sizeof(lv_image_header_t), data_size);
+    dsc->data = data;
+    LV_UNUSED(file_size);
+    return dsc;
+}
+
+static void free_variable_dsc(lv_image_dsc_t * dsc)
+{
+    lv_free((void *)dsc->data);
+    lv_free(dsc);
+}
+
+/*Variable image with less data than the compress header.*/
+void test_bin_decoder_compressed_variable_too_small(void)
+{
+    uint32_t size;
+    uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
+    for(uint32_t n = 0; n < 12; n++) {
+        lv_image_dsc_t * dsc = create_variable_dsc(img, size, n);
+        TEST_ASSERT_EQUAL(LV_RESULT_INVALID, open_and_check_a8(dsc, NULL, 0));
+        free_variable_dsc(dsc);
+    }
+    lv_free(img);
+}
+
+/*Variable image whose decompressed_size is larger than the draw buffer.*/
+void test_bin_decoder_compressed_variable_decompressed_size_overflow(void)
+{
+    uint32_t size;
+    uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
+    lv_image_dsc_t * dsc = create_variable_dsc(img, size, size - sizeof(lv_image_header_t));
+
+    uint32_t * decompressed_size = (uint32_t *)((uint8_t *)dsc->data + 8);
+    *decompressed_size += 1024;
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, open_and_check_a8(dsc, NULL, 0));
+
+    free_variable_dsc(dsc);
+    lv_free(img);
+}
+
+/*Variable image whose compressed_size does not match the data size.*/
+void test_bin_decoder_compressed_variable_compressed_size_mismatch(void)
+{
+    uint32_t size;
+    uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
+    lv_image_dsc_t * dsc = create_variable_dsc(img, size, size - sizeof(lv_image_header_t));
+
+    uint32_t * compressed_size = (uint32_t *)((uint8_t *)dsc->data + 4);
+    *compressed_size += 1;
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, open_and_check_a8(dsc, NULL, 0));
+
+    free_variable_dsc(dsc);
+    lv_free(img);
+}
+
+/*A valid variable image still decodes to the same pixels as the uncompressed one.*/
+void test_bin_decoder_compressed_variable_ok(void)
+{
+    uint32_t ref_size;
+    uint8_t * ref = read_file_exact(COMPRESSED_A8_RAW, &ref_size);
+    uint32_t size;
+    uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
+    lv_image_dsc_t * dsc = create_variable_dsc(img, size, size - sizeof(lv_image_header_t));
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, open_and_check_a8(dsc, ref + sizeof(lv_image_header_t),
+                                                      ref_size - sizeof(lv_image_header_t)));
+
+    free_variable_dsc(dsc);
+    lv_free(img);
+    lv_free(ref);
+}
+
+#endif /*LV_USE_LZ4 && LV_BIN_DECODER_RAM_LOAD*/
+
 #endif

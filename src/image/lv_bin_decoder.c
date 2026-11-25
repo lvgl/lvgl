@@ -947,6 +947,10 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
             return LV_RESULT_INVALID;
         }
 
+        if(compressed_len < sizeof(lv_image_header_t) + 12) {
+            LV_LOG_WARN("File too small to hold the compress header: %" LV_PRIu32, compressed_len);
+            return LV_RESULT_INVALID;
+        }
         compressed_len -= sizeof(lv_image_header_t);
         compressed_len -= 12;
 
@@ -985,6 +989,10 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
         lv_image_dsc_t * image = (lv_image_dsc_t *)dsc->src;
         compressed_len = image->data_size;
+        if(compressed_len < 12) {
+            LV_LOG_WARN("Data too small to hold the compress header: %" LV_PRIu32, compressed_len);
+            return LV_RESULT_INVALID;
+        }
 
         /*Read compress header*/
         len = 12;
