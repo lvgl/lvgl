@@ -32,6 +32,8 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
 static lv_fs_res_t fs_size(lv_fs_drv_t * drv, void * file_p, uint32_t * size_p);
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
+static lv_fs_res_t fs_map(lv_fs_drv_t * drv, void * file_p, uint32_t offset, uint32_t len, const void ** ptr);
+static lv_fs_res_t fs_unmap(lv_fs_drv_t * drv, void * file_p, const void * ptr, uint32_t len);
 
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * rddir_p, char * fn, uint32_t fn_len);
@@ -75,6 +77,10 @@ void lv_port_fs_init(void)
     fs_drv.write_cb = fs_write;
     fs_drv.seek_cb = fs_seek;
     fs_drv.tell_cb = fs_tell;
+
+    /*Optional: set these only if the storage can give a pointer to the file's data without copying it*/
+    /*fs_drv.map_cb = fs_map;*/
+    /*fs_drv.unmap_cb = fs_unmap;*/
 
     fs_drv.dir_close_cb = fs_dir_close;
     fs_drv.dir_open_cb = fs_dir_open;
@@ -207,6 +213,41 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  * @return          LV_FS_RES_OK: no error or  any error from @lv_fs_res_t enum
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
+{
+    lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+
+    /*Add your code here*/
+
+    return res;
+}
+
+/**
+ * Give a read-only pointer to a range of a file
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    pointer to a file_t variable
+ * @param offset    start of the range in the file
+ * @param len       length of the range
+ * @param ptr       pointer to store the result
+ * @return          LV_FS_RES_OK: no error or  any error from @lv_fs_res_t enum
+ */
+static lv_fs_res_t fs_map(lv_fs_drv_t * drv, void * file_p, uint32_t offset, uint32_t len, const void ** ptr)
+{
+    lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+
+    /*Add your code here*/
+
+    return res;
+}
+
+/**
+ * Release a range given by fs_map
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    pointer to a file_t variable
+ * @param ptr       the pointer fs_map gave
+ * @param len       the length given to fs_map
+ * @return          LV_FS_RES_OK: no error or  any error from @lv_fs_res_t enum
+ */
+static lv_fs_res_t fs_unmap(lv_fs_drv_t * drv, void * file_p, const void * ptr, uint32_t len)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 

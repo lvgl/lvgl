@@ -356,6 +356,57 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
     return res;
 }
 
+lv_fs_res_t lv_fs_map(lv_fs_file_t * file_p, uint32_t offset, uint32_t len, const void ** ptr)
+{
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(file_p->drv != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(len > 0, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(ptr != NULL, return LV_FS_RES_INV_PARAM);
+
+    /* TODO: refactor the memfs driver to use map/unmap which means
+     * the special handling for LV_FS_CACHE_FROM_BUFFER can go away
+     */
+    if(file_p->drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
+        uint32_t size = file_p->cache->end;
+        if(offset > size || len > size - offset) {
+            return LV_FS_RES_INV_PARAM;
+        }
+        *ptr = (const uint8_t *)file_p->cache->buffer + offset;
+        return LV_FS_RES_OK;
+    }
+
+    if(!file_p->drv->map_cb) {
+        return LV_FS_RES_NOT_IMP;
+    }
+
+    uint32_t size = 0;
+    lv_fs_res_t res = lv_fs_get_size(file_p, &size);
+    if(res != LV_FS_RES_OK) {
+        return res;
+    }
+
+    if(offset > size || len > size - offset) {
+        return LV_FS_RES_INV_PARAM;
+    }
+
+    return file_p->drv->map_cb(file_p->drv, file_p->file_d, offset, len, ptr);
+}
+
+lv_fs_res_t lv_fs_unmap(lv_fs_file_t * file_p, const void * ptr, uint32_t len)
+{
+    LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(file_p->drv != NULL, return LV_FS_RES_INV_PARAM);
+    LV_CHECK_ARG(len > 0, return LV_FS_RES_INV_PARAM);
+    if(ptr == NULL) {
+        return LV_FS_RES_OK;
+    }
+    if(!file_p->drv->unmap_cb) {
+        return LV_FS_RES_OK;
+    }
+
+    return file_p->drv->unmap_cb(file_p->drv, file_p->file_d, ptr, len);
+}
+
 lv_fs_res_t lv_fs_get_size(lv_fs_file_t * file_p, uint32_t * size_res)
 {
     LV_CHECK_ARG(file_p != NULL, return LV_FS_RES_INV_PARAM);
