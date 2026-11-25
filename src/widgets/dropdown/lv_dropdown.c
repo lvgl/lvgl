@@ -417,6 +417,13 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    /*An empty dropdown has no last option to clamp to.*/
+    if(dropdown->option_cnt == 0) {
+        dropdown->sel_opt_id = 0;
+        dropdown->sel_opt_id_orig = 0;
+        return;
+    }
+
     if(dropdown->sel_opt_id == sel_opt) return;
 
     dropdown->sel_opt_id      = sel_opt < dropdown->option_cnt ? sel_opt : dropdown->option_cnt - 1;
@@ -550,11 +557,12 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
     uint32_t opt_i = 0;
     const char * start = opts;
     const size_t option_len = lv_strlen(option); /*avoid recomputing this multiple times in the loop*/
+    const uint32_t option_count = lv_dropdown_get_option_count(obj);
 
-    while(start[0] != '\0') {
+    while(opt_i < option_count) {
         for(char_i = 0; (start[char_i] != '\n') && (start[char_i] != '\0'); char_i++);
 
-        if(option_len == char_i && lv_memcmp(start, option, LV_MIN(option_len, char_i)) == 0) {
+        if(option_len == char_i && (option_len == 0 || lv_memcmp(start, option, option_len) == 0)) {
             return opt_i;
         }
 

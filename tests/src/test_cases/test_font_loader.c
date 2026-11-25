@@ -31,8 +31,14 @@ void test_font_loader_from_buffer(void);
 void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
 void test_font_loader_corrupt_bitmap(void);
+void test_font_loader_kern_class_out_of_range(void);
+void test_font_loader_kern_mapping_shorter_than_glyphs(void);
+void test_font_loader_corrupt_cmap(void);
+void test_font_loader_corrupt_bit_width(void);
 void test_font_loader_truncated(void);
 void test_font_loader_dynamic_from_buffer(void);
+void test_font_loader_rejects_out_of_bounds_subtable(void);
+void test_font_loader_rejects_huge_cmap_subtable_count(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -218,6 +224,19 @@ static void request_glyph_bitmap(lv_font_t * font, uint32_t letter)
     lv_draw_buf_destroy(buf);
 }
 #endif /*LV_USE_FONT_COMPRESSED*/
+void test_font_loader_corrupt_bit_width(void)
+{
+    /*A glyph header field wider than 32 bits cannot be returned by read_bits().*/
+    const char * path = "A:src/test_assets/test_font_bit_width_oob.fnt";
+
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
 
 void test_font_loader_corrupt_kern(void)
 {
@@ -236,6 +255,75 @@ void test_font_loader_corrupt_kern(void)
 void test_font_loader_corrupt_bitmap(void)
 {
     const char * path = "A:src/test_assets/test_font_bitmap_oob.fnt";
+/*Return a copy of test_font_1_buf and the offset of the class kerning data in it*/
+static uint8_t * dup_font_1_with_kern(uint32_t * kern_ofs)
+{
+    uint8_t * buf = lv_malloc(sizeof(test_font_1_buf));
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_memcpy(buf, test_font_1_buf, sizeof(test_font_1_buf));
+
+    uint32_t i;
+    for(i = 0; i + 8 < sizeof(test_font_1_buf); i++) {
+        if(lv_memcmp(&buf[i], "kern", 4) == 0) break;
+    }
+    TEST_ASSERT_LESS_THAN_UINT32(sizeof(test_font_1_buf) - 8, i);
+
+    /*"kern", format(1) + padding(3), mapping length(2), rows(1), cols(1), left[], right[], values[]*/
+    TEST_ASSERT_EQUAL_UINT8(3, buf[i + 4]);
+    *kern_ofs = i + 8;
+    return buf;
+}
+
+void test_font_loader_kern_class_out_of_range(void)
+{
+    uint32_t ofs;
+    uint8_t * buf = dup_font_1_with_kern(&ofs);
+
+    /*The unmodified font loads*/
+    lv_font_t * font = lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf));
+    TEST_ASSERT_NOT_NULL(font);
+    lv_binfont_destroy(font);
+
+    uint16_t mapping_len = buf[ofs] | (buf[ofs + 1] << 8);
+    uint8_t rows = buf[ofs + 2];
+    uint8_t cols = buf[ofs + 3];
+    uint8_t * left = &buf[ofs + 4];
+    uint8_t * right = &buf[ofs + 4 + mapping_len];
+
+    /*A left class greater than the number of rows would index past class_pair_values*/
+    left[mapping_len - 1] = rows + 1;
+    TEST_ASSERT_NULL(lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf)));
+    left[mapping_len - 1] = 0;
+
+    /*Same for a right class greater than the number of columns*/
+    right[mapping_len - 1] = cols + 1;
+    TEST_ASSERT_NULL(lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf)));
+    right[mapping_len - 1] = 0;
+
+    font = lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf));
+    TEST_ASSERT_NOT_NULL(font);
+    lv_binfont_destroy(font);
+
+    lv_free(buf);
+}
+
+void test_font_loader_kern_mapping_shorter_than_glyphs(void)
+{
+    uint32_t ofs;
+    uint8_t * buf = dup_font_1_with_kern(&ofs);
+
+    /*The class mappings are indexed by glyph id, so they must cover every glyph*/
+    uint16_t mapping_len = buf[ofs] | (buf[ofs + 1] << 8);
+    mapping_len--;
+    buf[ofs] = mapping_len & 0xff;
+    buf[ofs + 1] = mapping_len >> 8;
+    TEST_ASSERT_NULL(lv_binfont_create_from_buffer(buf, sizeof(test_font_1_buf)));
+
+    lv_free(buf);
+/*A cmap must not reference glyphs that the loca table doesn't describe.*/
+void test_font_loader_corrupt_cmap(void)
+{
+    const char * path = "A:src/test_assets/test_font_cmap_glyph_oob.fnt";
 
     lv_binfont_dsc_t dsc = {
         .path = path,
@@ -258,6 +346,35 @@ void test_font_loader_corrupt_bitmap(void)
 void test_font_loader_truncated(void)
 {
     const char * path = "A:src/test_assets/test_font_truncated.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+/*The subtable data has to stay inside the cmap section. A crafted font can point a
+ *subtable past the end of the section while the read itself stays inside the file, which
+ *used to load silently and expose data from the following table.*/
+void test_font_loader_rejects_out_of_bounds_subtable(void)
+{
+    const char * path = "A:src/test_assets/test_font_cmap_data_oob.fnt";
+
+    lv_binfont_dsc_t dsc = {
+        .path = path,
+        .dynamic_glyph_load = true,
+    };
+    TEST_ASSERT_NULL(lv_binfont_create(path));
+    TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+}
+
+/*The subtable count is read from the file, so it must not be used as an allocation size
+ *before it is bounded to the section it belongs to.*/
+void test_font_loader_rejects_huge_cmap_subtable_count(void)
+{
+    const char * path = "A:src/test_assets/test_font_count_oob.fnt";
 
     lv_binfont_dsc_t dsc = {
         .path = path,

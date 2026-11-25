@@ -79,7 +79,7 @@
  **********************/
 
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 static void draw_event_cb(lv_event_t * e);
 static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer);
@@ -109,6 +109,7 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .draw_triangle_cb = lv_draw_nanovg_triangle,
     .draw_mask_rect_cb = lv_draw_nanovg_mask_rect,
     .draw_blur_cb = lv_draw_nanovg_blur,
+    .can_draw_blur_cb = can_draw_blur,
 #if LV_USE_VECTOR_GRAPHIC
     .draw_vector_cb = lv_draw_nanovg_vector,
 #endif
@@ -133,10 +134,12 @@ void lv_draw_nanovg_init(void)
 
     lv_draw_nanovg_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_nanovg_unit_t));
     unit->base_unit.dispatch_cb = draw_dispatch;
-    unit->base_unit.evaluate_cb = draw_evaluate;
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.draw_cbs = &draw_cbs;
+    /*No software fallback: drop the descriptors NanoVG can't draw*/
+    unit->base_unit.fallback = NULL;
+    unit->base_unit.id = NANOVG_DRAW_UNIT_ID;
     unit->base_unit.name = "NANOVG";
 
     unit->vg = NVG_CTX_CREATE(0);
@@ -431,47 +434,13 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     return 1;
 }
 
-static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
+static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc)
 {
+    LV_UNUSED(layer);
+    LV_UNUSED(dsc);
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
-
-    switch(task->type) {
-        case LV_DRAW_DSC_TYPE_FILL:
-        case LV_DRAW_DSC_TYPE_BORDER:
-        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-        case LV_DRAW_DSC_TYPE_LETTER:
-        case LV_DRAW_DSC_TYPE_LABEL:
-        case LV_DRAW_DSC_TYPE_IMAGE:
-        case LV_DRAW_DSC_TYPE_LAYER:
-        case LV_DRAW_DSC_TYPE_LINE:
-        case LV_DRAW_DSC_TYPE_ARC:
-        case LV_DRAW_DSC_TYPE_TRIANGLE:
-        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-#if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_DSC_TYPE_VECTOR:
-#endif
-#if LV_USE_3DTEXTURE
-        case LV_DRAW_DSC_TYPE_3D:
-#endif
-            break;
-
-        case LV_DRAW_DSC_TYPE_BLUR:
-            /* Only accept blur if FBO support is available (blur_state was created) */
-            if(u->blur_state == NULL) return 0;
-            break;
-
-        default:
-            /*The draw unit is not able to draw this task. */
-            return 0;
-    }
-
-    if(task->preference_score > 80) {
-        /* The draw unit is able to draw this task. */
-        task->preference_score = 80;
-        task->preferred_draw_unit_id = NANOVG_DRAW_UNIT_ID;
-    }
-
-    return 1;
+    /* Only accept blur if FBO support is available (blur_state was created) */
+    return u->blur_state != NULL;
 }
 
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)

@@ -46,38 +46,6 @@ extern "C" {
  */
 #  define TEST_ASSERT_NO_MEM_LEAK(prev_cnt)                      TEST_ASSERT_EQUAL(prev_cnt, lv_test_get_allocation_count());
 
-#ifdef LV_BUILD_TEST_PERF
-
-#include <time.h>
-
-#define TEST_ASSERT_MAX_TIME(fn, max_time_ms, ...)                           \
-	do {                                                                 \
-		clock_t t = clock();                                         \
-		fn(__VA_ARGS__);                                             \
-		t = clock() - t;                                             \
-		const double time_taken =                                    \
-			((double)t * 1000.) / CLOCKS_PER_SEC;                \
-		TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((max_time_ms), time_taken); \
-	} while (0)
-
-#define TEST_ASSERT_MAX_TIME_ITER(fn, max_time_ms, iterations, ...)          \
-	do {                                                                 \
-		clock_t t = clock();                                         \
-		for (size_t i = 0; i < iterations; ++i)                      \
-			fn(__VA_ARGS__);                                     \
-		t = clock() - t;                                             \
-		const double time_taken =                                    \
-			((double)t * 1000.) / CLOCKS_PER_SEC;                \
-		TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((max_time_ms), time_taken); \
-	} while (0)
-
-#else
-
-#define TEST_ASSERT_MAX_TIME(fn, max_time_ms, ...)	fn(__VA_ARGS__);
-#define TEST_ASSERT_MAX_TIME_ITER(fn, max_time_ms, ...) fn(__VA_ARGS__);
-
-#endif /* LV_BUILD_TEST_PERF */
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

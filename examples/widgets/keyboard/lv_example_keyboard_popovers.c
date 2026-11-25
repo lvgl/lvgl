@@ -33,5 +33,6 @@ void lv_example_keyboard_popovers(void)
     lv_obj_set_size(keyboard, lv_pct(100), lv_pct(60));
     lv_keyboard_set_mode(keyboard, LV_KEYBOARD_MODE_TEXT_LOWER);
     lv_keyboard_set_popovers(keyboard, true);
+    lv_keyboard_set_textarea(keyboard, textarea);
 }
 #endif

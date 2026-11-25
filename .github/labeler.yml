@@ -733,9 +733,7 @@ profiler:
           - 'src/debugging/profiler/**'
           - 'src/drivers/nuttx/lv_nuttx_profiler.*'
           - 'docs/src/debugging/profiler.mdx'
-          - 'scripts/perf/**'
           - 'tests/src/test_cases/test_profiler.c'
-          - 'tests/src/test_cases_perf/**'
 
 monkey:
   - changed-files:

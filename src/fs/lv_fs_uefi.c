@@ -49,6 +49,7 @@ static void lv_fs_uefi_uefi_path_to_lvgl_path(CHAR16 * path);
 static bool lv_fs_uefi_is_dot_path(CONST CHAR16 * path);
 static bool lv_fs_uefi_is_dir(EFI_FILE_PROTOCOL * dir);
 static bool lv_fs_uefi_is_file(EFI_FILE_PROTOCOL * file);
+static bool lv_fs_uefi_truncate(EFI_FILE_PROTOCOL * file);
 static EFI_FILE_INFO * lv_fs_uefi_get_info(EFI_FILE_PROTOCOL * file);
 
 static bool lv_fs_uefi_ready_cb(lv_fs_drv_t * drv);
@@ -155,7 +156,7 @@ static void * lv_fs_uefi_open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mod
     file_ctx = lv_calloc(1, sizeof(lv_uefi_fs_file_context_t));
     LV_ASSERT_MALLOC(file_ctx);
 
-    if(mode == LV_FS_MODE_WR) {
+    if(mode & LV_FS_MODE_WR) {
         uefi_mode = EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE;
     }
     else {
@@ -175,6 +176,13 @@ static void * lv_fs_uefi_open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mod
 
     if(!lv_fs_uefi_is_file(file_ctx->interface)) {
         goto error;
+    }
+
+    if((mode & LV_FS_MODE_WR) && (mode & LV_FS_MODE_TRUNC)) {
+        if(!lv_fs_uefi_truncate(file_ctx->interface)) {
+            LV_LOG_WARN("[lv_uefi] Unable to truncate file '%s'.", path);
+            goto error;
+        }
     }
 
     goto finish;
@@ -587,6 +595,21 @@ static bool lv_fs_uefi_is_file(EFI_FILE_PROTOCOL * file)
     lv_free(info);
 
     return (attributes & EFI_FILE_DIRECTORY) == 0;
+}
+
+static bool lv_fs_uefi_truncate(EFI_FILE_PROTOCOL * file)
+{
+    LV_ASSERT(file != NULL);
+
+    EFI_FILE_INFO * info = lv_fs_uefi_get_info(file);
+    if(info == NULL) return FALSE;
+
+    /*Setting a smaller FileSize in the file info truncates the file*/
+    info->FileSize = 0;
+    EFI_STATUS status = file->SetInfo(file, &_uefi_guid_file_info, (UINTN)info->Size, info);
+    lv_free(info);
+
+    return status == EFI_SUCCESS;
 }
 
 static EFI_FILE_INFO * lv_fs_uefi_get_info(EFI_FILE_PROTOCOL * file)

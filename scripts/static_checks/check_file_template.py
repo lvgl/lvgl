@@ -19,7 +19,6 @@ LVGL_ROOT_DIR = SCRIPT_PATH.parents[2]
 ignored_file_prefixes = {
     "lv_conf_template.h",
     "lv_conf_cmsis.h",
-    "lv_test_perf_conf.h",
     "lv_font_",
 }
 

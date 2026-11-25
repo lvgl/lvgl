@@ -18,10 +18,8 @@ asserts. Read that file if you need anything beyond the basics below.
   against reference images in `tests/ref_imgs/`.
 - **Build-only tests** — verify that LVGL still compiles and links with a range of
   `lv_conf.h` configurations.
-- **Performance tests** — ARM-emulated benchmarks in `tests/src/test_cases_perf/`, run
-  under QEMU/SO3 so timings are consistent across machines.
-- **Emulated benchmarks** — automated `lv_demo_benchmark` runs in the same ARM emulation,
-  used to catch performance regressions.
+- **Performance benchmarks** — the benchmark demo and render scenes measured by
+  instruction count under QEMU, used to catch performance regressions.
 
 ## Running Locally
 
@@ -65,17 +63,15 @@ docker run --rm -it -v $(pwd):/work lvgl_test_env "./tests/main.py"
 
 `scripts/run_tests_docker.sh` automates both steps; run it with `--help` for details.
 
-## Performance Tests and Benchmarks
+## Performance Benchmarks
 
-These require **Docker** and a **Linux host** (WSL may work but is untested), since they
-boot an ARM emulated environment:
+These require **Docker**, since they run in an emulated environment:
 
 ```sh
-./tests/perf.py test          # performance tests
-./tests/benchmark_emu.py run  # emulated lv_demo_benchmark
+./tests/perf_qemu/run.sh
 ```
 
-Both scripts accept `--help`.
+See [QEMU Render Benchmark](/contributing/perf_qemu) for the details.
 
 <Callout type="info" title="Adding new tests">
 New test files go into `tests/src/test_cases/` and are named `test_<name>.c`. Start from

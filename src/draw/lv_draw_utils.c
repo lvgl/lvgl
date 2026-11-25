@@ -484,7 +484,7 @@ static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t src_w
 static void rotate180_rgb565(const uint16_t * src, uint16_t * dst, int32_t width, int32_t height, int32_t src_stride,
                              int32_t dest_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_ROTATE180_RGB565(src, dst, width, height, src_stride)) {
+    if(LV_RESULT_OK == LV_DRAW_ROTATE180_RGB565(src, dst, width, height, src_stride, dest_stride)) {
         return ;
     }
 
@@ -542,7 +542,7 @@ static void rotate90_l8(const uint8_t * src, uint8_t * dst, int32_t src_width, i
 static void rotate180_l8(const uint8_t * src, uint8_t * dst, int32_t width, int32_t height, int32_t src_stride,
                          int32_t dest_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_ROTATE180_L8(src, dst, width, height, src_stride)) {
+    if(LV_RESULT_OK == LV_DRAW_ROTATE180_L8(src, dst, width, height, src_stride, dest_stride)) {
         return ;
     }
 
