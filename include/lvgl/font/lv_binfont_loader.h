@@ -37,8 +37,7 @@ typedef struct {
     /** Path to the font file. If `NULL` the font is loaded from `buffer`.*/
     const char * path;
 
-    /** Address of the font file in the memory. Used only if `path` is `NULL`.
-     * Requires LV_USE_FS_MEMFS.*/
+    /** Address of the font file in the memory. Used only if `path` is `NULL`. */
     const void * buffer;
 
     /** Size of the font file buffer*/
@@ -71,16 +70,13 @@ lv_font_t * lv_binfont_create(const char * path);
  */
 lv_font_t * lv_binfont_create_ex(const lv_binfont_dsc_t * dsc);
 
-#if LV_USE_FS_MEMFS
 /**
  * Loads a `lv_font_t` object from a memory buffer containing the binary font file.
- * Requires LV_USE_FS_MEMFS
  * @param buffer        address of the font file in the memory
  * @param size          size of the font file buffer
  * @return              pointer to font where to load
  */
 lv_font_t * lv_binfont_create_from_buffer(void * buffer, uint32_t size);
-#endif
 
 /**
  * Frees the memory allocated by the `lv_binfont_create()` function
