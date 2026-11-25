@@ -12,6 +12,8 @@ static void read_range(lv_fs_file_t * f, uint32_t from, uint32_t to);
 
 static void read_random_drv(char drv_letter, uint32_t cache_size);
 
+static void map_cleanup(void);
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -23,6 +25,7 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
+    map_cleanup();
 }
 #include <stdio.h>
 #include <errno.h>
@@ -704,6 +707,319 @@ void test_fs_get_letters(void)
 
     /* Verify that the buffer contains valid drive letters */
     TEST_ASSERT_EQUAL_STRING("TMBA", buf);
+}
+
+/* What the map tests hold, released in tearDown so a failing assert doesn't leak it */
+static lv_fs_file_t map_file;
+static bool map_file_open;
+static uint8_t * map_buf;
+static lv_fs_drv_t map_drv;
+static bool map_drv_registered;
+
+static void map_cleanup(void)
+{
+    if(map_file_open) lv_fs_close(&map_file);
+    map_file_open = false;
+    if(map_buf) lv_free(map_buf);
+    map_buf = NULL;
+    if(map_drv_registered) lv_fs_remove_drive(map_drv.letter);
+    map_drv_registered = false;
+}
+
+static lv_fs_file_t * map_open(const char * path)
+{
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&map_file, path, LV_FS_MODE_RD));
+    map_file_open = true;
+    return &map_file;
+}
+
+static void map_close(void)
+{
+    map_file_open = false;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&map_file));
+}
+
+/* Open a 10 byte memfs file over an exact-size heap buffer, so ASan catches a mapping past its end */
+static lv_fs_file_t * map_open_memfs_digits(void)
+{
+    map_buf = lv_malloc(10);
+    lv_memcpy(map_buf, "0123456789", 10);
+
+    lv_fs_path_ex_t path;
+    lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, map_buf, 10, NULL);
+    return map_open((const char *)&path);
+}
+
+void test_fs_map_memfs(void)
+{
+    lv_fs_file_t * f = map_open_memfs_digits();
+
+    /* A buffer-backed file maps to the buffer itself: no copy */
+    const void * ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 3, 4, &ptr));
+    TEST_ASSERT_EQUAL_PTR(map_buf + 3, ptr);
+    TEST_ASSERT_EQUAL_MEMORY("3456", ptr, 4);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 4));
+
+    /* The whole file and its last byte */
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 0, 10, &ptr));
+    TEST_ASSERT_EQUAL_MEMORY("0123456789", ptr, 10);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 10));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 9, 1, &ptr));
+    TEST_ASSERT_EQUAL_MEMORY("9", ptr, 1);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 1));
+
+    map_close();
+}
+
+void test_fs_map_keeps_position(void)
+{
+    lv_fs_file_t * f = map_open_memfs_digits();
+
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_seek(f, 2, LV_FS_SEEK_SET));
+
+    const void * ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 5, 5, &ptr));
+
+    uint32_t pos = 0;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_tell(f, &pos));
+    TEST_ASSERT_EQUAL_UINT32(2, pos);
+
+    /* Reads go on from the position, the mapping stays valid meanwhile */
+    char buf[3];
+    uint32_t br = 0;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(f, buf, 3, &br));
+    TEST_ASSERT_EQUAL_UINT32(3, br);
+    TEST_ASSERT_EQUAL_MEMORY("234", buf, 3);
+    TEST_ASSERT_EQUAL_MEMORY("56789", ptr, 5);
+
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 5));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_tell(f, &pos));
+    TEST_ASSERT_EQUAL_UINT32(5, pos);
+
+    map_close();
+}
+
+void test_fs_map_overlapping(void)
+{
+    lv_fs_file_t * f = map_open_memfs_digits();
+
+    /* Several mappings of one file live at the same time */
+    const void * a = NULL;
+    const void * b = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 0, 6, &a));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 4, 6, &b));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, a, 6));
+    TEST_ASSERT_EQUAL_MEMORY("456789", b, 6);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, b, 6));
+
+    map_close();
+}
+
+void test_fs_map_out_of_range(void)
+{
+    lv_fs_file_t * f = map_open_memfs_digits();
+
+    /* Rejected ranges leave the pointer alone */
+    const void * sentinel = f;
+    const void * ptr = sentinel;
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, 0, 11, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, 9, 2, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, 10, 1, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, UINT32_MAX, 1, &ptr));
+    /* offset + len wraps around to a small number */
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, 5, UINT32_MAX - 1, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, UINT32_MAX, 2, &ptr));
+    TEST_ASSERT_EQUAL_PTR(sentinel, ptr);
+
+    map_close();
+}
+
+void test_fs_map_not_implemented(void)
+{
+    /* Drives without map support say so and leave the pointer alone; the file stays readable */
+    const char * paths[] = {"A:src/test_files/readtest.txt", "T:src/test_files/readtest.txt"};
+    for(size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+        lv_fs_file_t * f = map_open(paths[i]);
+
+        const void * sentinel = f;
+        const void * ptr = sentinel;
+        TEST_ASSERT_EQUAL(LV_FS_RES_NOT_IMP, lv_fs_map(f, 0, 5, &ptr));
+        TEST_ASSERT_EQUAL_PTR(sentinel, ptr);
+
+        char buf[5];
+        uint32_t br = 0;
+        TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(f, buf, 5, &br));
+        TEST_ASSERT_EQUAL_UINT32(5, br);
+        TEST_ASSERT_EQUAL_MEMORY(read_exp, buf, 5);
+
+        map_close();
+    }
+}
+
+/* A drive whose file is a static buffer, recording what reaches its map callbacks */
+static const uint8_t map_drv_data[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'};
+static uint32_t map_drv_pos;
+static struct {
+    uint32_t map_calls;
+    uint32_t unmap_calls;
+    void * file_p;
+    uint32_t offset;
+    uint32_t len;
+    const void * ptr;
+    lv_fs_res_t map_res;
+} map_drv_rec;
+
+static void * map_drv_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
+{
+    LV_UNUSED(drv);
+    LV_UNUSED(path);
+    LV_UNUSED(mode);
+    map_drv_pos = 0;
+    return &map_drv_pos;
+}
+
+static lv_fs_res_t map_drv_close(lv_fs_drv_t * drv, void * file_p)
+{
+    LV_UNUSED(drv);
+    LV_UNUSED(file_p);
+    return LV_FS_RES_OK;
+}
+
+static lv_fs_res_t map_drv_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
+{
+    LV_UNUSED(drv);
+    uint32_t * pos = file_p;
+    uint32_t n = LV_MIN(btr, sizeof(map_drv_data) - *pos);
+    lv_memcpy(buf, map_drv_data + *pos, n);
+    *pos += n;
+    if(br) *br = n;
+    return LV_FS_RES_OK;
+}
+
+static lv_fs_res_t map_drv_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
+{
+    LV_UNUSED(drv);
+    uint32_t * cur = file_p;
+    if(whence == LV_FS_SEEK_SET) *cur = pos;
+    else if(whence == LV_FS_SEEK_CUR) *cur += pos;
+    else *cur = sizeof(map_drv_data) + pos;
+    return LV_FS_RES_OK;
+}
+
+static lv_fs_res_t map_drv_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
+{
+    LV_UNUSED(drv);
+    *pos_p = *(uint32_t *)file_p;
+    return LV_FS_RES_OK;
+}
+
+static lv_fs_res_t map_drv_map(lv_fs_drv_t * drv, void * file_p, uint32_t offset, uint32_t len, const void ** ptr)
+{
+    LV_UNUSED(drv);
+    map_drv_rec.map_calls++;
+    map_drv_rec.file_p = file_p;
+    map_drv_rec.offset = offset;
+    map_drv_rec.len = len;
+    if(map_drv_rec.map_res != LV_FS_RES_OK) return map_drv_rec.map_res;
+    *ptr = map_drv_data + offset;
+    return LV_FS_RES_OK;
+}
+
+static lv_fs_res_t map_drv_unmap(lv_fs_drv_t * drv, void * file_p, const void * ptr, uint32_t len)
+{
+    LV_UNUSED(drv);
+    map_drv_rec.unmap_calls++;
+    map_drv_rec.file_p = file_p;
+    map_drv_rec.ptr = ptr;
+    map_drv_rec.len = len;
+    return LV_FS_RES_OK;
+}
+
+static void map_drv_register(void)
+{
+    lv_fs_drv_init(&map_drv);
+    map_drv.letter = 'R';
+    map_drv.open_cb = map_drv_open;
+    map_drv.close_cb = map_drv_close;
+    map_drv.read_cb = map_drv_read;
+    map_drv.seek_cb = map_drv_seek;
+    map_drv.tell_cb = map_drv_tell;
+    map_drv.map_cb = map_drv_map;
+    map_drv.unmap_cb = map_drv_unmap;
+    lv_fs_drv_register(&map_drv);
+    map_drv_registered = true;
+    lv_memzero(&map_drv_rec, sizeof(map_drv_rec));
+}
+
+void test_fs_map_driver_callbacks(void)
+{
+    map_drv_register();
+    lv_fs_file_t * f = map_open("R:file");
+
+    /* map and unmap reach the driver with its own file handle */
+    const void * ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 3, 5, &ptr));
+    TEST_ASSERT_EQUAL_UINT32(1, map_drv_rec.map_calls);
+    TEST_ASSERT_EQUAL_PTR(&map_drv_pos, map_drv_rec.file_p);
+    TEST_ASSERT_EQUAL_UINT32(3, map_drv_rec.offset);
+    TEST_ASSERT_EQUAL_UINT32(5, map_drv_rec.len);
+    TEST_ASSERT_EQUAL_PTR(map_drv_data + 3, ptr);
+
+    map_drv_rec.file_p = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 5));
+    TEST_ASSERT_EQUAL_UINT32(1, map_drv_rec.unmap_calls);
+    TEST_ASSERT_EQUAL_PTR(&map_drv_pos, map_drv_rec.file_p);
+    TEST_ASSERT_EQUAL_PTR(map_drv_data + 3, map_drv_rec.ptr);
+    TEST_ASSERT_EQUAL_UINT32(5, map_drv_rec.len);
+
+    /* A driver error comes back as is, the pointer is left alone */
+    map_drv_rec.map_res = LV_FS_RES_HW_ERR;
+    const void * sentinel = f;
+    ptr = sentinel;
+    TEST_ASSERT_EQUAL(LV_FS_RES_HW_ERR, lv_fs_map(f, 0, 4, &ptr));
+    TEST_ASSERT_EQUAL_PTR(sentinel, ptr);
+
+    map_close();
+}
+
+void test_fs_map_driver_without_unmap(void)
+{
+    /* unmap_cb is optional: unmapping a mapping of such a drive succeeds */
+    map_drv_register();
+    map_drv.unmap_cb = NULL;
+    lv_fs_file_t * f = map_open("R:file");
+
+    const void * ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 0, 16, &ptr));
+    TEST_ASSERT_EQUAL_MEMORY(map_drv_data, ptr, 16);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 16));
+
+    map_close();
+}
+
+void test_fs_unmap_null_is_noop(void)
+{
+    /* Like free(NULL): after unmapping, the caller sets its pointer to NULL and can then
+     * unmap it again from another cleanup path without effect */
+    lv_fs_file_t * f = map_open_memfs_digits();
+    const void * ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 2, 4, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 4));
+    ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 4));
+    map_close();
+    map_cleanup();
+
+    /* The driver only sees the real unmap */
+    map_drv_register();
+    f = map_open("R:file");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 2, 4, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 4));
+    ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 4));
+    TEST_ASSERT_EQUAL_UINT32(1, map_drv_rec.unmap_calls);
+    map_close();
 }
 
 #endif

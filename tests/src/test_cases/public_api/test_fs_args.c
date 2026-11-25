@@ -7,8 +7,11 @@ void setUp(void)
 {
 }
 
+static void map_cleanup(void);
+
 void tearDown(void)
 {
+    map_cleanup();
 }
 
 void test_fs_args_open_null_path(void)
@@ -46,6 +49,63 @@ void test_fs_args_dir_read_zero_length_buffer(void)
     TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_dir_open(&dir, "A:src/test_files"));
     TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_dir_read(&dir, filename, 0));
     TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_dir_close(&dir));
+}
+
+/*The file the map tests open, closed in tearDown so a failing assert doesn't leak it*/
+static const uint8_t map_data[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+static lv_fs_file_t map_file;
+static bool map_file_open;
+
+static void map_cleanup(void)
+{
+    if(map_file_open) lv_fs_close(&map_file);
+    map_file_open = false;
+}
+
+static lv_fs_file_t * map_open(void)
+{
+    lv_fs_path_ex_t path;
+    lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, map_data, sizeof(map_data), NULL);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&map_file, (const char *)&path, LV_FS_MODE_RD));
+    map_file_open = true;
+    return &map_file;
+}
+
+void test_fs_args_map_null(void)
+{
+    lv_fs_file_t * f = map_open();
+
+    const void * ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(NULL, 0, 1, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, 0, 1, NULL));
+}
+
+/*An empty range is rejected, also at the end of the file, and the pointer is left alone*/
+void test_fs_args_map_zero_length(void)
+{
+    lv_fs_file_t * f = map_open();
+
+    const void * sentinel = f;
+    const void * ptr = sentinel;
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, 0, 0, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_map(f, 10, 0, &ptr));
+    TEST_ASSERT_EQUAL_PTR(sentinel, ptr);
+}
+
+void test_fs_args_unmap_null_file(void)
+{
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_unmap(NULL, map_data, 1));
+}
+
+/*A real mapping with an empty length is rejected*/
+void test_fs_args_unmap_zero_length(void)
+{
+    lv_fs_file_t * f = map_open();
+
+    const void * ptr = NULL;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_map(f, 0, 4, &ptr));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_unmap(f, ptr, 0));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_unmap(f, ptr, 4));
 }
 
 #endif /*LV_BUILD_TEST*/

@@ -253,6 +253,30 @@ while(1) {
 lv_fs_dir_close(&dir);
 ```
 
+## Mapping Files
+
+<ApiLink name="lv_fs_map" /> gives a read-only pointer to a range of an open file instead of
+copying it into a buffer. Drives that can't do this return <ApiLink name="LV_FS_RES_NOT_IMP" />;
+read the range with <ApiLink name="lv_fs_read" /> instead.
+
+```c
+const void * data;
+res = lv_fs_map(&f, offset, len, &data);
+if(res == LV_FS_RES_OK) {
+    use_data(data, len);
+    lv_fs_unmap(&f, data, len);
+}
+else if(res == LV_FS_RES_NOT_IMP) {
+    /*Fall back to lv_fs_read()*/
+}
+```
+
+- The pointer stays valid until <ApiLink name="lv_fs_unmap" /> is called with it. Unmap every
+  mapping before closing the file.
+- A file can have several mappings at once. Mapping doesn't move the file position.
+- The range must lie within the file and `len` must not be 0.
+- Don't write to or truncate a file while it has mappings.
+
 ## Use Drives for Images
 
 [Image](/widgets/image) Widgets can be opened from files as well (besides
