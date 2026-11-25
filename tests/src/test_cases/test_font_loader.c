@@ -30,6 +30,7 @@ void test_font_loader_no_cache(void);
 void test_font_loader_from_buffer(void);
 void test_font_loader_dynamic(void);
 void test_font_loader_corrupt_kern(void);
+void test_font_loader_corrupt_bitmap(void);
 void test_font_loader_kern_class_out_of_range(void);
 void test_font_loader_kern_mapping_shorter_than_glyphs(void);
 void test_font_loader_corrupt_cmap(void);
@@ -205,6 +206,24 @@ void test_font_loader_dynamic_from_buffer(void)
     common();
 }
 
+#if LV_USE_FONT_COMPRESSED
+/*Request a glyph through the normal (decompressing) path so the bitmap
+ *readers actually run on the loaded font.*/
+static void request_glyph_bitmap(lv_font_t * font, uint32_t letter)
+{
+    lv_font_glyph_dsc_t g_dsc;
+    TEST_ASSERT_TRUE(lv_font_get_glyph_dsc(font, &g_dsc, letter, 0));
+
+    lv_draw_buf_t * buf = lv_draw_buf_create(g_dsc.box_w, g_dsc.box_h, LV_COLOR_FORMAT_A8, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    /*Must return without reading past the glyph's stored data.*/
+    TEST_ASSERT_NOT_NULL(lv_font_get_glyph_bitmap(&g_dsc, buf));
+
+    lv_font_glyph_release_draw_data(&g_dsc);
+    lv_draw_buf_destroy(buf);
+}
+#endif /*LV_USE_FONT_COMPRESSED*/
 void test_font_loader_corrupt_bit_width(void)
 {
     /*A glyph header field wider than 32 bits cannot be returned by read_bits().*/
@@ -232,6 +251,10 @@ void test_font_loader_corrupt_kern(void)
     TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
 }
 
+/*A plain bitmap whose box does not fit its stored data is rejected.*/
+void test_font_loader_corrupt_bitmap(void)
+{
+    const char * path = "A:src/test_assets/test_font_bitmap_oob.fnt";
 /*Return a copy of test_font_1_buf and the offset of the class kerning data in it*/
 static uint8_t * dup_font_1_with_kern(uint32_t * kern_ofs)
 {
@@ -308,6 +331,16 @@ void test_font_loader_corrupt_cmap(void)
     };
     TEST_ASSERT_NULL(lv_binfont_create(path));
     TEST_ASSERT_NULL(lv_binfont_create_ex(&dsc));
+
+#if LV_USE_FONT_COMPRESSED
+    /*A truncated compressed stream is bounded at read time: the glyph has to be
+     *requested for the compressed reader to run, and doing so must not crash.*/
+    const char * path2 = "A:src/test_assets/test_font_bitmap_rle_oob.fnt";
+    lv_font_t * font = lv_binfont_create(path2);
+    TEST_ASSERT_NOT_NULL(font);
+    request_glyph_bitmap(font, 'A');
+    lv_binfont_destroy(font);
+#endif
 }
 
 void test_font_loader_truncated(void)

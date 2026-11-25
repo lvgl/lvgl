@@ -204,6 +204,10 @@ typedef struct {
      * `lv_font_fmt_txt_glyph_loader_t *` instead
      */
     bool are_glyphs_dynamic_loaded;
+
+    /** Length of `glyph_bitmap` in bytes. 0 means the length is unknown, which is
+     * the case for fonts stored as C arrays and keeps their historical behaviour.*/
+    uint32_t glyph_bitmap_len;
 } lv_font_fmt_txt_dsc_t;
 
 typedef struct {
