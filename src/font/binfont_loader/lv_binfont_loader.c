@@ -9,13 +9,27 @@
 
 #include "../../lvgl_public.h"
 #include "../fmt_txt/lv_font_fmt_txt_private.h"
-#include "../../fs/lv_fs_private.h"
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+/* A single reader implementation to allow reading from:
+ * 1. A buffer in memory (!r->has_file)
+ * 2. A mapped file (r->mapped)
+ * 3. A file (r->has_file)
+ */
 typedef struct {
-    lv_fs_file_t * fp;
+    lv_fs_file_t file;      /**< Open file, if `has_file`*/
+    const uint8_t * base;   /**< The file's content in memory (mapping or buffer), NULL: read `file`*/
+    uint32_t size;          /**< Size of the content in bytes*/
+    uint32_t pos;           /**< Read position*/
+    bool has_file;
+    bool mapped;            /**< `base` is a mapping of `file`*/
+} font_reader_t;
+
+typedef struct {
+    font_reader_t * reader;
     int8_t bit_pos;
     uint8_t byte_value;
 } bit_iterator_t;
@@ -49,7 +63,7 @@ typedef struct font_header_bin {
 
 typedef struct {
     lv_font_fmt_txt_glyph_loader_t base;    /**< Must be the first member*/
-    lv_fs_file_t file;                      /**< The font file, kept open for the font's lifetime*/
+    font_reader_t reader;
     uint8_t * bitmap_buf;                   /**< Scratch buffer, fits the largest glyph of the font*/
     uint32_t * glyph_offset_table;          /**< `loca_count` offsets, relative to `glyph_start`*/
     uint32_t loca_count;                    /**< Number of glyphs*/
@@ -72,17 +86,26 @@ typedef struct cmap_table_bin {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp);
-static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_load);
-int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start,
-                  uint32_t loca_count);
+
+static bool reader_open_path(font_reader_t * r, const char * path);
+static void reader_open_buffer(font_reader_t * r, const void * buf, uint32_t size);
+static void reader_close(font_reader_t * r);
+static bool reader_read(font_reader_t * r, void * buf, uint32_t n);
+static bool reader_seek(font_reader_t * r, uint32_t pos);
+static uint32_t reader_size(const font_reader_t * r);
+static const uint8_t * reader_peek(font_reader_t * r, uint32_t n);
+
+static bit_iterator_t init_bit_iterator(font_reader_t * reader);
+static bool load_font(font_reader_t * reader, lv_font_t * font, bool dynamic_glyph_load);
+static int32_t load_kern(font_reader_t * reader, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start,
+                         uint32_t loca_count);
 
 static int read_bits_signed(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res);
 static unsigned int read_bits(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_t * res);
 
-static bool read_glyph_bitmap(lv_fs_file_t * fp, uint32_t pos, uint32_t nbits, uint8_t * buf, uint32_t buf_size);
+static bool read_glyph_bitmap(font_reader_t * reader, uint32_t pos, uint32_t nbits, uint8_t * buf, uint32_t buf_size);
 static const uint8_t * load_glyph_bitmap_cb(lv_font_fmt_txt_glyph_loader_t * loader, uint32_t gid);
-static lv_binfont_glyph_loader_t * glyph_loader_create(lv_fs_file_t * fp,
+static lv_binfont_glyph_loader_t * glyph_loader_create(font_reader_t * reader,
                                                        uint32_t * glyph_offset_table,
                                                        uint32_t loca_count, uint32_t glyph_start, uint32_t glyph_length,
                                                        uint32_t glyph_nbits, uint32_t max_bmp_size);
@@ -126,33 +149,29 @@ lv_font_t * lv_binfont_create(const char * path)
 lv_font_t * lv_binfont_create_ex(const lv_binfont_dsc_t * dsc)
 {
     LV_CHECK_ARG(dsc != NULL, return NULL);
-#if LV_USE_FS_MEMFS
     LV_CHECK_ARG(dsc->path != NULL || dsc->buffer != NULL, return NULL);
-#else
-    LV_CHECK_ARG(dsc->path != NULL, return NULL);
-#endif
 
     const char * path = dsc->path;
-    lv_fs_path_ex_t mempath;
-    if(LV_USE_FS_MEMFS && path == NULL) {
-        lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, (void *)dsc->buffer, dsc->buffer_size, "bin");
-        path = (const char *)&mempath;
+    font_reader_t reader;
+    if(path) {
+        if(!reader_open_path(&reader, dsc->path)) {
+            return NULL;
+        }
     }
-
-    lv_fs_file_t file;
-    lv_fs_res_t fs_res = lv_fs_open(&file, path, LV_FS_MODE_RD);
-    if(fs_res != LV_FS_RES_OK) return NULL;
+    else {
+        reader_open_buffer(&reader, dsc->buffer, dsc->buffer_size);
+    }
 
     lv_font_t * font = lv_zalloc(sizeof(*font));
     LV_ASSERT_MALLOC(font);
     if(!font) {
         LV_LOG_ERROR("Failed to allocate memory for font");
-        lv_fs_close(&file);
+        reader_close(&reader);
         return NULL;
     }
 
 
-    bool loaded = load_font(&file, font, dsc->dynamic_glyph_load);
+    bool loaded = load_font(&reader, font, dsc->dynamic_glyph_load);
 
     const lv_font_fmt_txt_dsc_t * font_dsc = font->dsc;
     bool file_owned_by_loader = font_dsc != NULL && font_dsc->are_glyphs_dynamic_loaded;
@@ -160,16 +179,19 @@ lv_font_t * lv_binfont_create_ex(const lv_binfont_dsc_t * dsc)
     if(!loaded) {
         LV_LOG_WARN("Error loading font file: %s", path);
         lv_binfont_destroy(font);
-        if(!file_owned_by_loader) lv_fs_close(&file);
+        if(!file_owned_by_loader) {
+            reader_close(&reader);
+        }
         return NULL;
     }
 
-    if(!file_owned_by_loader) lv_fs_close(&file);
+    if(!file_owned_by_loader) {
+        reader_close(&reader);
+    }
 
     return font;
 }
 
-#if LV_USE_FS_MEMFS
 lv_font_t * lv_binfont_create_from_buffer(void * buffer, uint32_t size)
 {
     LV_CHECK_ARG(buffer != NULL, return NULL);
@@ -181,7 +203,6 @@ lv_font_t * lv_binfont_create_from_buffer(void * buffer, uint32_t size)
 
     return lv_binfont_create_ex(&dsc);
 }
-#endif
 
 void lv_binfont_destroy(lv_font_t * font)
 {
@@ -233,24 +254,14 @@ void lv_binfont_destroy(lv_font_t * font)
  *   STATIC FUNCTIONS
  **********************/
 
-static bit_iterator_t init_bit_iterator(lv_fs_file_t * fp)
+static bit_iterator_t init_bit_iterator(font_reader_t * reader)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     bit_iterator_t it;
-    it.fp = fp;
+    it.reader = reader;
     it.bit_pos = -1;
     it.byte_value = 0;
     return it;
-}
-
-/*Reads exactly `n` bytes; a short read means the file ended inside a table.*/
-static bool read_exact(lv_fs_file_t * fp, void * buf, uint32_t n)
-{
-    uint32_t br = 0;
-    if(lv_fs_read(fp, buf, n, &br) != LV_FS_RES_OK) {
-        return false;
-    }
-    return br == n;
 }
 
 /*Reads `n_bits` bits as an unsigned value. The width comes from the file and can be
@@ -268,13 +279,16 @@ static unsigned int read_bits(bit_iterator_t * it, unsigned int n_bits, lv_fs_re
 
         if(it->bit_pos < 0) {
             it->bit_pos = 7;
-            if(!read_exact(it->fp, &(it->byte_value), 1)) {
+            const uint8_t * p = reader_peek(it->reader, 1);
+            if(p) {
+                it->byte_value = *p;
+            }
+            else if(!reader_read(it->reader, &it->byte_value, 1)) {
                 *res = LV_FS_RES_INV_PARAM;
                 return 0;
             }
             *res = LV_FS_RES_OK;
         }
-
         /*A width above 31 cannot fit the result; it is only used to skip a whole glyph
          *header, so the bits are consumed without being shifted in.*/
         if(n_bits < 32) {
@@ -304,17 +318,17 @@ static int read_bits_signed(bit_iterator_t * it, unsigned int n_bits, lv_fs_res_
     return value;
 }
 
-static int read_label(lv_fs_file_t * fp, int start, const char * label)
+static int read_label(font_reader_t * reader, int start, const char * label)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     LV_ASSERT(label != NULL);
-    lv_fs_seek(fp, start, LV_FS_SEEK_SET);
+    reader_seek(reader, start);
 
     uint32_t length;
     char buf[4];
 
-    if(!read_exact(fp, &length, 4)
-       || !read_exact(fp, buf, 4)
+    if(!reader_read(reader, &length, 4)
+       || !reader_read(reader, buf, 4)
        || lv_memcmp(label, buf, 4) != 0) {
         LV_LOG_WARN("Error reading '%s' label.", label);
         return -1;
@@ -325,15 +339,11 @@ static int read_label(lv_fs_file_t * fp, int start, const char * label)
 
 /*Check that a section declared by the font fits in the file. The lengths are read
  *straight from the file, so they must not be trusted on their own.*/
-static bool section_fits_in_file(lv_fs_file_t * fp, uint32_t start, uint32_t length)
+static bool section_fits_in_file(font_reader_t * reader, uint32_t start, uint32_t length)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
 
-    uint32_t file_size;
-    if(lv_fs_get_size(fp, &file_size) != LV_FS_RES_OK) {
-        return false;
-    }
-
+    uint32_t file_size = reader_size(reader);
     return (uint64_t)start + (uint64_t)length <= (uint64_t)file_size;
 }
 
@@ -383,13 +393,13 @@ static bool validate_cmap_table(uint32_t cmaps_length, const cmap_table_bin_t * 
     return true;
 }
 
-static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
+static bool load_cmaps_tables(font_reader_t * reader, lv_font_fmt_txt_dsc_t * font_dsc,
                               uint32_t cmaps_start, uint32_t cmaps_length, cmap_table_bin_t * cmap_table)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     LV_ASSERT(font_dsc != NULL);
     LV_ASSERT(cmap_table != NULL);
-    if(!read_exact(fp, cmap_table, font_dsc->cmap_num * sizeof(cmap_table_bin_t))) {
+    if(!reader_read(reader, cmap_table, font_dsc->cmap_num * sizeof(cmap_table_bin_t))) {
         return false;
     }
 
@@ -400,8 +410,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
     }
 
     for(unsigned int i = 0; i < font_dsc->cmap_num; ++i) {
-        lv_fs_res_t res = lv_fs_seek(fp, cmaps_start + cmap_table[i].data_offset, LV_FS_SEEK_SET);
-        if(res != LV_FS_RES_OK) {
+        if(!reader_seek(reader, cmaps_start + cmap_table[i].data_offset)) {
             return false;
         }
 
@@ -423,7 +432,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
                     cmap->glyph_id_ofs_list = glyph_id_ofs_list;
 
-                    if(!read_exact(fp, glyph_id_ofs_list, ids_size)) {
+                    if(!reader_read(reader, glyph_id_ofs_list, ids_size)) {
                         return false;
                     }
 
@@ -444,7 +453,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
                     cmap->unicode_list = unicode_list;
                     cmap->list_length = cmap_table[i].data_entries_count;
 
-                    if(!read_exact(fp, unicode_list, list_size)) {
+                    if(!reader_read(reader, unicode_list, list_size)) {
                         return false;
                     }
 
@@ -457,7 +466,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
                         cmap->glyph_id_ofs_list = buf;
 
-                        if(!read_exact(fp, buf, sizeof(uint16_t) * cmap->list_length)) {
+                        if(!reader_read(reader, buf, sizeof(uint16_t) * cmap->list_length)) {
                             return false;
                         }
                     }
@@ -471,18 +480,18 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
     return true;
 }
 
-static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint32_t cmaps_start)
+static int32_t load_cmaps(font_reader_t * reader, lv_font_fmt_txt_dsc_t * font_dsc, uint32_t cmaps_start)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     LV_ASSERT(font_dsc != NULL);
-    int32_t cmaps_length = read_label(fp, cmaps_start, "cmap");
+    int32_t cmaps_length = read_label(reader, cmaps_start, "cmap");
     if(cmaps_length < 0) {
         return -1;
     }
 
     /*The length comes straight from the file, so it has to be checked before it is used
      *to size anything.*/
-    if(!section_fits_in_file(fp, cmaps_start, (uint32_t)cmaps_length)) {
+    if(!section_fits_in_file(reader, cmaps_start, (uint32_t)cmaps_length)) {
         LV_LOG_WARN("Cmap table is outside the file.");
         return -1;
     }
@@ -496,7 +505,7 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
     uint32_t cmaps_payload = (uint32_t)cmaps_length - cmaps_header_size;
 
     uint32_t cmaps_subtables_count;
-    if(!read_exact(fp, &cmaps_subtables_count, sizeof(uint32_t))) {
+    if(!reader_read(reader, &cmaps_subtables_count, sizeof(uint32_t))) {
         return -1;
     }
 
@@ -537,31 +546,31 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
 
     font_dsc->cmaps = cmaps;
     font_dsc->cmap_num = (uint16_t)cmaps_subtables_count;
-    bool success = load_cmaps_tables(fp, font_dsc, cmaps_start, (uint32_t)cmaps_length, cmaps_tables);
+    bool success = load_cmaps_tables(reader, font_dsc, cmaps_start, (uint32_t)cmaps_length, cmaps_tables);
 
     lv_free(cmaps_tables);
 
     return success ? cmaps_length : -1;
 }
 
-static bool read_glyph_bitmap(lv_fs_file_t * fp, uint32_t pos, uint32_t nbits, uint8_t * buf, uint32_t buf_size)
+static bool read_glyph_bitmap(font_reader_t * reader, uint32_t pos, uint32_t nbits, uint8_t * buf, uint32_t buf_size)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     LV_ASSERT(buf != NULL);
     LV_ASSERT(buf_size > 0);
 
 
-    lv_fs_res_t res = lv_fs_seek(fp, pos, LV_FS_SEEK_SET);
-    if(res != LV_FS_RES_OK) return false;
+    if(!reader_seek(reader, pos)) return false;
 
-    bit_iterator_t bit_it = init_bit_iterator(fp);
+    lv_fs_res_t res = LV_FS_RES_OK;
+    bit_iterator_t bit_it = init_bit_iterator(reader);
 
     /*Skip the glyph header*/
     read_bits(&bit_it, nbits, &res);
     if(res != LV_FS_RES_OK) return false;
 
     if(nbits % 8 == 0) {  /*Fast path: the bitmap is byte aligned in the file*/
-        return read_exact(fp, buf, buf_size);
+        return reader_read(reader, buf, buf_size);
     }
 
     for(uint32_t k = 0; k < buf_size - 1; ++k) {
@@ -603,7 +612,7 @@ static const uint8_t * load_glyph_bitmap_cb(lv_font_fmt_txt_glyph_loader_t * bas
         return NULL;
     }
 
-    if(!read_glyph_bitmap(&loader->file, loader->glyph_start + offset, loader->glyph_nbits,
+    if(!read_glyph_bitmap(&loader->reader, loader->glyph_start + offset, loader->glyph_nbits,
                           loader->bitmap_buf, bmp_size)) {
         return NULL;
     }
@@ -615,7 +624,7 @@ static void glyph_loader_delete(lv_binfont_glyph_loader_t * loader)
 {
     if(loader == NULL) return;
 
-    lv_fs_close(&loader->file);
+    reader_close(&loader->reader);
     lv_mutex_delete(&loader->base.lock);
     lv_free(loader->bitmap_buf);
     loader->bitmap_buf = NULL;
@@ -624,12 +633,12 @@ static void glyph_loader_delete(lv_binfont_glyph_loader_t * loader)
     lv_free(loader);
 }
 
-static lv_binfont_glyph_loader_t * glyph_loader_create(lv_fs_file_t * fp,
+static lv_binfont_glyph_loader_t * glyph_loader_create(font_reader_t * reader,
                                                        uint32_t * glyph_offset_table,
                                                        uint32_t loca_count, uint32_t glyph_start, uint32_t glyph_length,
                                                        uint32_t glyph_nbits, uint32_t max_bmp_size)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     LV_ASSERT(glyph_offset_table != NULL);
 
     lv_binfont_glyph_loader_t * loader = lv_malloc_zeroed(sizeof(lv_binfont_glyph_loader_t));
@@ -655,7 +664,7 @@ static lv_binfont_glyph_loader_t * glyph_loader_create(lv_fs_file_t * fp,
     }
 
     loader->base.get_glyph_bitmap_cb = load_glyph_bitmap_cb;
-    loader->file = *fp;
+    loader->reader = *reader;
     loader->glyph_offset_table = glyph_offset_table;
     loader->loca_count = loca_count;
     loader->glyph_start = glyph_start;
@@ -724,23 +733,23 @@ static bool cmaps_validate_glyph_ids(const lv_font_fmt_txt_dsc_t * dsc, uint32_t
  *                              largest glyph bitmap, otherwise it's set to 0.
  * @return                      the length of the glyph table in bytes or -1 on error
  */
-static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
+static int32_t load_glyph(font_reader_t * reader, lv_font_fmt_txt_dsc_t * font_dsc,
                           uint32_t start, uint32_t * glyph_offset_table, uint32_t loca_count, font_header_bin_t * header,
                           bool dynamic_glyph_load, uint32_t * max_bmp_size)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     LV_ASSERT(font_dsc != NULL);
     LV_ASSERT(glyph_offset_table != NULL);
     LV_ASSERT(header != NULL);
     LV_ASSERT(max_bmp_size != NULL);
 
-    int32_t glyph_length = read_label(fp, start, "glyf");
+    int32_t glyph_length = read_label(reader, start, "glyf");
     if(glyph_length < 0) {
         return -1;
     }
 
     /*The glyph table, and every offset in it, must stay inside the file.*/
-    if(!section_fits_in_file(fp, start, (uint32_t)glyph_length)) {
+    if(!section_fits_in_file(reader, start, (uint32_t)glyph_length)) {
         LV_LOG_WARN("Glyph table is outside the file");
         return -1;
     }
@@ -777,12 +786,12 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     for(unsigned int i = 0; i < loca_count; ++i) {
         lv_font_fmt_txt_glyph_dsc_t * gdsc = &glyph_dsc[i];
 
-        lv_fs_res_t res = lv_fs_seek(fp, start + glyph_offset_table[i], LV_FS_SEEK_SET);
-        if(res != LV_FS_RES_OK) {
+        if(!reader_seek(reader, start + glyph_offset_table[i])) {
             return -1;
         }
 
-        bit_iterator_t bit_it = init_bit_iterator(fp);
+        lv_fs_res_t res = LV_FS_RES_OK;
+        bit_iterator_t bit_it = init_bit_iterator(reader);
 
         if(header->advance_width_bits == 0) {
             gdsc->adv_w = header->default_advance_width;
@@ -881,7 +890,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
         int next_offset = (i < loca_count - 1) ? glyph_offset_table[i + 1] : (uint32_t)glyph_length;
         int bmp_size = next_offset - glyph_offset_table[i] - nbits / 8;
 
-        if(!read_glyph_bitmap(fp, start + glyph_offset_table[i], nbits,
+        if(!read_glyph_bitmap(reader, start + glyph_offset_table[i], nbits,
                               &glyph_bmp[glyph_dsc[i].bitmap_index], bmp_size)) {
             return -1;
         }
@@ -908,9 +917,9 @@ static void release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * glyph
  * `lv_binfont_destroy` will assume that all non-null pointers are allocated and
  * should be freed.
  */
-static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_load)
+static bool load_font(font_reader_t * reader, lv_font_t * font, bool dynamic_glyph_load)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     LV_ASSERT(font != NULL);
     lv_font_fmt_txt_dsc_t * font_dsc = lv_zalloc(sizeof(*font_dsc));
     LV_ASSERT_MALLOC(font_dsc);
@@ -921,13 +930,13 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     font->dsc = font_dsc;
 
     /*header*/
-    int32_t header_length = read_label(fp, 0, "head");
+    int32_t header_length = read_label(reader, 0, "head");
     if(header_length < 0) {
         return false;
     }
 
     font_header_bin_t font_header;
-    if(!read_exact(fp, &font_header, sizeof(font_header_bin_t))) {
+    if(!reader_read(reader, &font_header, sizeof(font_header_bin_t))) {
         return false;
     }
 
@@ -954,19 +963,19 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
 
     /*cmaps*/
     uint32_t cmaps_start = header_length;
-    int32_t cmaps_length = load_cmaps(fp, font_dsc, cmaps_start);
+    int32_t cmaps_length = load_cmaps(reader, font_dsc, cmaps_start);
     if(cmaps_length < 0) {
         return false;
     }
 
     /*loca*/
     uint32_t loca_start = cmaps_start + cmaps_length;
-    int32_t loca_length = read_label(fp, loca_start, "loca");
+    int32_t loca_length = read_label(reader, loca_start, "loca");
     if(loca_length < 0) {
         return false;
     }
 
-    if(!section_fits_in_file(fp, loca_start, (uint32_t)loca_length)) {
+    if(!section_fits_in_file(reader, loca_start, (uint32_t)loca_length)) {
         LV_LOG_WARN("Loca table is outside the file.");
         return false;
     }
@@ -980,7 +989,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     uint32_t loca_payload = (uint32_t)loca_length - loca_header_size;
 
     uint32_t loca_count;
-    if(!read_exact(fp, &loca_count, sizeof(uint32_t))) {
+    if(!reader_read(reader, &loca_count, sizeof(uint32_t))) {
         return false;
     }
 
@@ -1029,7 +1038,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
         case 0:
             for(unsigned int i = 0; i < loca_count; ++i) {
                 uint16_t offset;
-                if(!read_exact(fp, &offset, sizeof(uint16_t))) {
+                if(!reader_read(reader, &offset, sizeof(uint16_t))) {
                     lv_free(glyph_offset_table);
                     return false;
                 }
@@ -1037,7 +1046,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
             }
             break;
         case 1:
-            if(!read_exact(fp, glyph_offset_table, loca_count * sizeof(uint32_t))) {
+            if(!reader_read(reader, glyph_offset_table, loca_count * sizeof(uint32_t))) {
                 lv_free(glyph_offset_table);
                 return false;
             }
@@ -1051,7 +1060,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     /*glyph*/
     uint32_t glyph_start = loca_start + loca_length;
     uint32_t max_bmp_size = 0;
-    int32_t glyph_length = load_glyph(fp, font_dsc, glyph_start, glyph_offset_table, loca_count, &font_header,
+    int32_t glyph_length = load_glyph(reader, font_dsc, glyph_start, glyph_offset_table, loca_count, &font_header,
                                       dynamic_glyph_load, &max_bmp_size);
 
     if(glyph_length < 0) {
@@ -1064,7 +1073,7 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
         font_dsc->glyph_bitmap_len = max_bmp_size;
         uint32_t glyph_nbits = font_header.advance_width_bits + 2 * font_header.xy_bits + 2 * font_header.wh_bits;
 
-        lv_binfont_glyph_loader_t * loader = glyph_loader_create(fp,
+        lv_binfont_glyph_loader_t * loader = glyph_loader_create(reader,
                                                                  glyph_offset_table,
                                                                  loca_count,
                                                                  glyph_start,
@@ -1093,25 +1102,25 @@ static bool load_font(lv_fs_file_t * fp, lv_font_t * font, bool dynamic_glyph_lo
     }
 
     uint32_t kern_start = glyph_start + glyph_length;
-    int32_t kern_length = load_kern(fp, font_dsc, font_header.glyph_id_format, kern_start, loca_count);
+    int32_t kern_length = load_kern(reader, font_dsc, font_header.glyph_id_format, kern_start, loca_count);
 
     return kern_length >= 0;
 }
 
-int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start,
-                  uint32_t loca_count)
+static int32_t load_kern(font_reader_t * reader, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start,
+                         uint32_t loca_count)
 {
-    LV_ASSERT(fp != NULL);
+    LV_ASSERT(reader != NULL);
     LV_ASSERT(font_dsc != NULL);
-    int32_t kern_length = read_label(fp, start, "kern");
+    int32_t kern_length = read_label(reader, start, "kern");
     if(kern_length < 0) {
         return -1;
     }
 
     uint8_t kern_format_type;
     int32_t padding;
-    if(!read_exact(fp, &kern_format_type, sizeof(uint8_t)) ||
-       !read_exact(fp, &padding, 3 * sizeof(uint8_t))) {
+    if(!reader_read(reader, &kern_format_type, sizeof(uint8_t)) ||
+       !reader_read(reader, &padding, 3 * sizeof(uint8_t))) {
         return -1;
     }
 
@@ -1126,7 +1135,7 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         font_dsc->kern_classes = 0;
 
         uint32_t glyph_entries;
-        if(!read_exact(fp, &glyph_entries, sizeof(uint32_t))) {
+        if(!reader_read(reader, &glyph_entries, sizeof(uint32_t))) {
             return -1;
         }
 
@@ -1153,11 +1162,11 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         kern_pair->glyph_ids = glyph_ids;
         kern_pair->values = values;
 
-        if(!read_exact(fp, glyph_ids, ids_size)) {
+        if(!reader_read(reader, glyph_ids, ids_size)) {
             return -1;
         }
 
-        if(!read_exact(fp, values, glyph_entries)) {
+        if(!reader_read(reader, values, glyph_entries)) {
             return -1;
         }
     }
@@ -1176,9 +1185,9 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         uint8_t kern_table_rows;
         uint8_t kern_table_cols;
 
-        if(!read_exact(fp, &kern_class_mapping_length, sizeof(uint16_t)) ||
-           !read_exact(fp, &kern_table_rows, sizeof(uint8_t)) ||
-           !read_exact(fp, &kern_table_cols, sizeof(uint8_t))) {
+        if(!reader_read(reader, &kern_class_mapping_length, sizeof(uint16_t)) ||
+           !reader_read(reader, &kern_table_rows, sizeof(uint8_t)) ||
+           !reader_read(reader, &kern_table_cols, sizeof(uint8_t))) {
             return -1;
         }
 
@@ -1211,9 +1220,9 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         kern_classes->right_class_cnt = kern_table_cols;
         kern_classes->class_pair_values = kern_values;
 
-        if(!read_exact(fp, kern_left, kern_class_mapping_length) ||
-           !read_exact(fp, kern_right, kern_class_mapping_length) ||
-           !read_exact(fp, kern_values, kern_values_length)) {
+        if(!reader_read(reader, kern_left, kern_class_mapping_length) ||
+           !reader_read(reader, kern_right, kern_class_mapping_length) ||
+           !reader_read(reader, kern_values, kern_values_length)) {
             return -1;
         }
 
@@ -1283,4 +1292,98 @@ static void binfont_font_free_src_cb(void * src)
     lv_free((char *)font_src->path);
     font_src->path = NULL;
     lv_free(font_src);
+}
+
+static bool reader_open_path(font_reader_t * r, const char * path)
+{
+    lv_memset(r, 0, sizeof(*r));
+    lv_fs_res_t res = lv_fs_open(&r->file, path, LV_FS_MODE_RD);
+    if(res != LV_FS_RES_OK) {
+        return false;
+    }
+    r->has_file = true;
+
+    uint32_t file_size = 0;
+    res = lv_fs_get_size(&r->file, &file_size);
+    if(res != LV_FS_RES_OK) {
+        lv_fs_close(&r->file);
+        return false;
+    }
+
+    r->size = file_size;
+    if(file_size == 0) {
+        lv_fs_close(&r->file);
+        return false;
+    }
+    const void * p = NULL;
+    if(lv_fs_map(&r->file, 0, file_size, &p) == LV_FS_RES_OK) {
+        r->base = p;
+        r->mapped = true;
+    }
+    return true;
+}
+
+static void reader_open_buffer(font_reader_t * r, const void * buf, uint32_t size)
+{
+    lv_memset(r, 0, sizeof(*r));
+    r->base = buf;
+    r->size = size;
+    r->has_file = false;
+}
+
+static void reader_close(font_reader_t * r)
+{
+    if(r->mapped) {
+        lv_fs_unmap(&r->file, r->base, r->size);
+        r->mapped = false;
+    }
+    if(r->has_file) {
+        lv_fs_close(&r->file);
+        r->has_file = false;
+    }
+    r->base = NULL;
+}
+
+static bool reader_read(font_reader_t * r, void * buf, uint32_t n)
+{
+    if(!r->base) {
+        uint32_t br = 0;
+        lv_fs_res_t res = lv_fs_read(&r->file, buf, n, &br);
+        return res == LV_FS_RES_OK && n == br;
+    }
+    if(n > r->size || r->pos > r->size - n) {
+        return false;
+    }
+    lv_memcpy(buf, r->base + r->pos, n);
+    r->pos += n;
+    return true;
+}
+
+static bool reader_seek(font_reader_t * r, uint32_t pos)
+{
+    if(!r->base) {
+        return lv_fs_seek(&r->file, pos, LV_FS_SEEK_SET) == LV_FS_RES_OK;
+    }
+    r->pos = pos;
+    return true;
+}
+
+static uint32_t reader_size(const font_reader_t * r)
+{
+    return r->size;
+}
+
+static const uint8_t * reader_peek(font_reader_t * r, uint32_t n)
+{
+    if(!r->base) {
+        /* can't peek into a file */
+        return NULL;
+    }
+
+    if(n > r->size || r->pos > r->size - n) {
+        return NULL;
+    }
+    const uint8_t * ret =  r->base + r->pos;
+    r->pos += n;
+    return ret;
 }
