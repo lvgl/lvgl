@@ -1240,9 +1240,38 @@ void test_image_cover_check_without_background(void)
     static const lv_image_colorkey_t colorkey = {.low = {0, 0, 0}, .high = {0, 0, 0}};
     lv_obj_set_style_image_colorkey(img, &colorkey, LV_PART_MAIN);
     TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 110, 110, 189, 169));
+    lv_obj_remove_local_style_prop(img, LV_STYLE_IMAGE_COLORKEY, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_COVER, image_cover_check(img, 110, 110, 189, 169));
 
     lv_obj_delete(img);
     lv_draw_buf_destroy(buf);
+}
+
+void test_image_cover_check_only_uncompressed_ram_images(void)
+{
+    /* Files and compressed images can fail to decode at draw time, so they don't cover */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_files/binimages/cogwheel.RGB565.bin");
+    lv_obj_update_layout(img);
+    TEST_ASSERT_GREATER_THAN(0, lv_image_get_src_width(img));
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 10, 10, 20, 20));
+
+    static const uint16_t pixels[4 * 4];
+    static const lv_image_dsc_t compressed = {
+        .header.magic = LV_IMAGE_HEADER_MAGIC,
+        .header.cf = LV_COLOR_FORMAT_RGB565,
+        .header.flags = LV_IMAGE_FLAGS_COMPRESSED,
+        .header.w = 4,
+        .header.h = 4,
+        .data_size = sizeof(pixels),
+        .data = (const uint8_t *)pixels,
+    };
+    lv_image_set_src(img, &compressed);
+    lv_obj_update_layout(img);
+    TEST_ASSERT_EQUAL(4, lv_image_get_src_width(img));
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 0, 0, 3, 3));
+
+    lv_obj_delete(img);
 }
 
 #endif

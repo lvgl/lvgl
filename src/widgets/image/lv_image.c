@@ -855,8 +855,13 @@ static void draw_image(lv_event_t * e)
         }
 
         /* The base class only checked the background, which the image is drawn over.
-         * An opaque, unscaled image covers the area by itself if its pixels are there. */
+         * An opaque, unscaled image covers the area by itself if its pixels are there.
+         * Only uncompressed images in RAM: files and compressed data can fail to decode
+         * at draw time, and then nothing is drawn. Both lv_image_dsc_t and lv_draw_buf_t
+         * start with the header. */
         if(info->res == LV_COVER_RES_NOT_COVER && img->w > 0 && img->h > 0 &&
+           img->src_type == LV_IMAGE_SRC_VARIABLE &&
+           !(((const lv_image_header_t *)img->src)->flags & LV_IMAGE_FLAGS_COMPRESSED) &&
            img->blend_mode == LV_BLEND_MODE_NORMAL &&
            img->scale_x == LV_SCALE_NONE && img->scale_y == LV_SCALE_NONE &&
            lv_obj_get_style_opa_internal(obj, LV_PART_MAIN) >= LV_OPA_MAX &&
