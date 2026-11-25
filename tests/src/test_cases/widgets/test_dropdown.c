@@ -485,6 +485,42 @@ void test_dropdown_get_options_should_check_lengths(void)
     TEST_ASSERT_EQUAL_INT(-1, lv_dropdown_get_option_index(dd, "Option "));
 }
 
+void test_dropdown_empty_option_at_end(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "Alpha\n");
+    TEST_ASSERT_EQUAL_UINT32(2, lv_dropdown_get_option_count(dd));
+    TEST_ASSERT_EQUAL_INT32(1, lv_dropdown_get_option_index(dd, ""));
+    lv_obj_delete(dd);
+}
+
+void test_dropdown_empty_option_only(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "");
+    TEST_ASSERT_EQUAL_UINT32(1, lv_dropdown_get_option_count(dd));
+    TEST_ASSERT_EQUAL_INT32(0, lv_dropdown_get_option_index(dd, ""));
+    lv_obj_delete(dd);
+}
+
+void test_dropdown_empty_option_at_start(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "\nAlpha");
+    TEST_ASSERT_EQUAL_INT32(0, lv_dropdown_get_option_index(dd, ""));
+    TEST_ASSERT_EQUAL_INT32(1, lv_dropdown_get_option_index(dd, "Alpha"));
+    lv_obj_delete(dd);
+}
+
+void test_dropdown_empty_option_after_clear(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_clear_options(dd);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_dropdown_get_option_count(dd));
+    TEST_ASSERT_EQUAL_INT32(-1, lv_dropdown_get_option_index(dd, ""));
+    lv_obj_delete(dd);
+}
+
 void test_dropdown_text_align(void)
 {
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN_WRAP);
