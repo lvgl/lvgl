@@ -232,4 +232,18 @@ void test_bin_decoder_get_area_outside_image(void)
     lv_image_decoder_close(&dsc);
 }
 
+/*Only indexed images in memory are decoded by area: the others are used directly*/
+void test_bin_decoder_get_area_of_a_true_color_variable_is_refused(void)
+{
+    const lv_image_decoder_args_t args = { .no_cache = true };
+    lv_image_decoder_dsc_t dsc;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&dsc, get_image_dsc(), &args));
+
+    const lv_area_t full = {0, 0, dsc.header.w - 1, dsc.header.h - 1};
+    lv_area_t decoded_area = {LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MIN};
+    lv_result_t res = lv_bin_decoder_get_area(dsc.decoder, &dsc, &full, &decoded_area);
+    lv_image_decoder_close(&dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+}
+
 #endif /*LV_BUILD_TEST*/
