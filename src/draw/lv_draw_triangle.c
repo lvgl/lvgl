@@ -81,11 +81,12 @@ void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_ds
 
     if(draw_dsc->base.drop_shadow_opa) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &draw_dsc->base, &a);
-        LV_ASSERT_NULL(ds_layer);
-        lv_draw_triangle_dsc_t ds_dsc = *draw_dsc;
-        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain triangle*/
-        lv_draw_triangle(ds_layer, &ds_dsc);
-        lv_draw_layer_finish_drop_shadow(ds_layer, &draw_dsc->base);
+        if(ds_layer) {
+            lv_draw_triangle_dsc_t ds_dsc = *draw_dsc;
+            ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain triangle*/
+            lv_draw_triangle(ds_layer, &ds_dsc);
+            lv_draw_layer_finish_drop_shadow(ds_layer, &draw_dsc->base);
+        }
     }
 
 
