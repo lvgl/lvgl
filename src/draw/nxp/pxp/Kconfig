@@ -20,14 +20,6 @@ config LV_USE_ROTATE_PXP
 	help
 		Rotate the rendered display buffer with the PXP instead of the CPU.
 
-config LV_USE_PXP_DRAW_THREAD
-	bool "Dedicated draw thread"
-	depends on !LV_OS_NONE
-	default y
-	help
-		Dispatch PXP operations from their own thread so the CPU can keep
-		rendering in parallel. Needs an OS.
-
 config LV_USE_PXP_ASSERT
 	bool "Asserts"
 	help

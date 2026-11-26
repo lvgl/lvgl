@@ -22,14 +22,6 @@ config LV_G2D_HASH_TABLE_SIZE
 		Maximum number of buffers mapped for the G2D draw unit, including frame
 		buffers and assets. Drawing asserts once the table is full.
 
-config LV_USE_G2D_DRAW_THREAD
-	bool "Dedicated draw thread"
-	depends on !LV_OS_NONE
-	default y
-	help
-		Dispatch G2D operations from their own thread so the CPU can keep
-		rendering in parallel. Needs an OS.
-
 config LV_USE_G2D_ASSERT
 	bool "Asserts"
 	depends on LV_USE_DRAW_G2D

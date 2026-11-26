@@ -705,30 +705,13 @@ index 62a834f..58fbe7a 100644
 
 #if LV_USE_OS == LV_OS_CUSTOM
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
-@@ -117,12 +117,12 @@
+@@ -117,7 +117,7 @@
   * and can't be drawn in chunks. */
 
 /* The target buffer size for simple layer chunks. */
 -#define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /* [bytes] */
 +#define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    (512 * 1024)   /* [bytes] */
 
-/* The stack size of the drawing thread.
-  * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
-  */
--#define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /* [bytes] */
-+#define LV_DRAW_THREAD_STACK_SIZE    (32 * 1024)   /* [bytes] */
-
-#define LV_USE_DRAW_SW 1
-#if LV_USE_DRAW_SW == 1
-@@ -147,7 +147,7 @@
-  /* Set the number of draw unit.
-      * > 1 requires an operating system enabled in `LV_USE_OS`
-      * > 1 means multiple threads will render the screen in parallel */
--    #define LV_DRAW_SW_DRAW_UNIT_CNT    1
-+    #define LV_DRAW_SW_DRAW_UNIT_CNT    2
-
-    /* Use Arm-2D to accelerate the sw render */
-    #define LV_USE_DRAW_ARM2D_SYNC      0
 @@ -979,8 +979,8 @@
 #define LV_USE_LINUX_FBDEV      1
 #if LV_USE_LINUX_FBDEV

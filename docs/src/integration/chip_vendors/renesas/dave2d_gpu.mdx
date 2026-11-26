@@ -66,8 +66,3 @@ Images are accelerated in the following color formats:
 a 4 byte format. Therefore RGB888 images are drawn by the software renderer.
 </Callout>
 
-### Fine-tuning
-
-`LV_DAVE2D_MAX_DRAW_PRESSURE` controls how many pending drawing tasks are collected into one
-display list before it is submitted to the GPU. Its default value is `256`, which is also the
-minimum; with smaller values the Dave engine may crash.

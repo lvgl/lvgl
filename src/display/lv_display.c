@@ -21,14 +21,7 @@
 #define disp_def LV_GLOBAL_DEFAULT()->disp_default
 #define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
-#if LV_DRAW_DISABLE_TILED_RENDERING
-    #define DEFAULT_TILE_CNT 1
-#else
-    #if LV_DRAW_SW_DRAW_UNIT_CNT < 1
-        #error LV_DRAW_SW_DRAW_UNIT_CNT should be at least 1
-    #endif
-    #define DEFAULT_TILE_CNT LV_DRAW_SW_DRAW_UNIT_CNT
-#endif
+#define DEFAULT_TILE_CNT 1
 
 /**********************
  *      TYPEDEFS

@@ -446,6 +446,22 @@ inspect or dispatch.
   queues work instead of drawing before the callback returns, it copies what it needs and implements
   `wait_for_finish_cb`; the layer's buffer is allocated when the layer is created.
 
+### Draw threads
+
+Drawing runs on the thread that calls the draw functions: the software renderer and the PXP, G2D, SiFli EPIC
+and NemaGFX draw units no longer start render threads. Draw units that queue their work in the hardware (VG-Lite,
+NanoVG, DMA2D and IPA with the interrupt enabled) still let the CPU continue while the GPU draws. Parallel
+software rendering may come back in a later release.
+
+These options have been removed:
+
+| Removed | Notes |
+|---|---|
+| `LV_DRAW_SW_DRAW_UNIT_CNT` | Also set ThorVG's thread count: use <ApiLink name="LV_THORVG_THREAD_COUNT"/> for that. A value above 1 in `lv_conf.h` gives a warning. The default tile count (<ApiLink name="lv_display_set_tile_cnt"/>) is now 1. |
+| `LV_USE_PXP_DRAW_THREAD`, `LV_USE_G2D_DRAW_THREAD`, `LV_USE_SIFLI_EPIC_DRAW_THREAD` | |
+| `LV_DRAW_THREAD_STACK_SIZE`, `LV_DRAW_THREAD_PRIO` | The drawing uses the calling thread's stack: give it 32 KB or more with FreeType or ThorVG. |
+| `LV_DAVE2D_MAX_DRAW_PRESSURE` | Dave2D renders each drawing when it's called. |
+
 ### Draw events
 
 - `LV_DRAW_TASK_TYPE_MASK_BITMAP` has been removed. No draw task of this type was ever created.

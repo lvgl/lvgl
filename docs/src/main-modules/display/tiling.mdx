@@ -21,8 +21,7 @@ Specifically, if there are 4 tiles and 4 cores, there will always be an independ
 area for each core within one of the tiles.
 
 The maximum number of tiles can be set using the function
-<ApiLink name="lv_display_set_tile_cnt" display="lv_display_set_tile_cnt(disp, cnt)" />. The default value is
-<ApiLink name="LV_DRAW_SW_DRAW_UNIT_CNT" /> (or 1 if software rendering is not enabled).
+<ApiLink name="lv_display_set_tile_cnt" display="lv_display_set_tile_cnt(disp, cnt)" />. The default value is 1.
 
 Small areas are not further divided into smaller tiles because the overhead of
 spinning up 4 cores would outweigh the benefits.

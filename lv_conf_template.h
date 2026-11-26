@@ -185,25 +185,6 @@
  */
 #define LV_DRAW_LAYER_MAX_MEMORY 0
 
-#if LV_USE_OS != LV_OS_NONE
-/** If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more. */
-#define LV_DRAW_THREAD_STACK_SIZE 8192
-
-/** Thread priority controls the relative importance of the drawing threads.
- *  Values correspond to lv_thread_prio_t enum in lv_os.h:
- *  0: LV_THREAD_PRIO_LOWEST
- *  1: LV_THREAD_PRIO_LOW
- *  2: LV_THREAD_PRIO_MID (default)
- *  3: LV_THREAD_PRIO_HIGH
- *  4: LV_THREAD_PRIO_HIGHEST
- *
- *  Higher priority can improve rendering performance but might cause
- *  starvation of lower priority tasks.
- */
-#define LV_DRAW_THREAD_PRIO 3
-
-#endif /*LV_USE_OS != LV_OS_NONE*/
-
 /** Vector drawing API (lv_vector_dsc_*) for paths, strokes and fills.
  *  Needs a renderer with vector support, e.g. the SW renderer with ThorVG, or VG-Lite.
  *
@@ -224,6 +205,11 @@
 /** Build the ThorVG copy shipped with LVGL instead of linking an external one. */
 #define LV_USE_THORVG_INTERNAL 1
 
+#if LV_USE_OS != LV_OS_NONE
+/** Number of threads ThorVG renders vector graphics with. More than 1 needs an OS. */
+#define LV_THORVG_THREAD_COUNT 1
+
+#endif /*LV_USE_OS != LV_OS_NONE*/
 #endif /*LV_USE_THORVG*/
 
 /** Required to draw anything on the screen. */
@@ -268,12 +254,6 @@
 #define LV_DRAW_SW_I1_LUM_THRESHOLD 127
 
 #endif /*LV_DRAW_SW_SUPPORT_I1*/
-
-#if LV_USE_OS != LV_OS_NONE
-/** Number of threads used to render a frame in parallel */
-#define LV_DRAW_SW_DRAW_UNIT_CNT 1
-
-#endif /*LV_USE_OS != LV_OS_NONE*/
 
 /** Requires the Arm-2D library in your project and an include path for "arm_2d.h". */
 #define LV_USE_DRAW_ARM2D_SYNC 0
@@ -509,14 +489,6 @@
 /** Rotate the rendered display buffer with the PXP instead of the CPU. */
 #define LV_USE_ROTATE_PXP 0
 
-#if LV_USE_OS != LV_OS_NONE
-/** Dispatch PXP operations from their own thread so the CPU can keep
- *  rendering in parallel. Needs an OS.
- */
-#define LV_USE_PXP_DRAW_THREAD 1
-
-#endif /*LV_USE_OS != LV_OS_NONE*/
-
 /** Check the status of every PXP call and assert on failure. Useful while
  *  bringing up a board.
  */
@@ -569,20 +541,13 @@
  */
 #define LV_USE_SIFLI_EPIC 0
 
-#if LV_USE_OS != LV_OS_NONE
 #if LV_USE_SIFLI_EPIC
-/** Dispatch EPIC operations from their own thread so the CPU can keep
- *  rendering in parallel.
- */
-#define LV_USE_SIFLI_EPIC_DRAW_THREAD 1
-
 /** Check the status of every EPIC call and assert on failure. Useful
  *  while bringing up a board.
  */
 #define LV_USE_SIFLI_EPIC_ASSERT 0
 
 #endif /*LV_USE_SIFLI_EPIC*/
-#endif /*LV_USE_OS != LV_OS_NONE*/
 
 /** Offload drawing to an external EVE (FT81X/BT81X) graphics controller over SPI. */
 #define LV_USE_DRAW_EVE 0
@@ -618,14 +583,6 @@
  *  buffers and assets. Drawing asserts once the table is full.
  */
 #define LV_G2D_HASH_TABLE_SIZE 50
-
-#if LV_USE_OS != LV_OS_NONE
-/** Dispatch G2D operations from their own thread so the CPU can keep
- *  rendering in parallel. Needs an OS.
- */
-#define LV_USE_G2D_DRAW_THREAD 1
-
-#endif /*LV_USE_OS != LV_OS_NONE*/
 
 /** Check the status of every G2D call and assert on failure. Useful while
  *  bringing up a board.

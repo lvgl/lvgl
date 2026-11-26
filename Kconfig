@@ -392,29 +392,6 @@ config LV_DRAW_LAYER_MAX_MEMORY
 		Must be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE`, and with transformed layers large enough
 		for the largest widget too (width x height x 4).
 
-config LV_DRAW_THREAD_STACK_SIZE
-	int "Draw thread stack size (bytes)"
-	default 8192
-	depends on !LV_OS_NONE
-	help
-		If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
-
-config LV_DRAW_THREAD_PRIO
-	int "Draw thread priority"
-	range 0 4
-	default 3
-	depends on !LV_OS_NONE
-	help
-		Thread priority controls the relative importance of the drawing threads.
-		Values correspond to lv_thread_prio_t enum in lv_os.h:
-		0: LV_THREAD_PRIO_LOWEST
-		1: LV_THREAD_PRIO_LOW
-		2: LV_THREAD_PRIO_MID (default)
-		3: LV_THREAD_PRIO_HIGH
-		4: LV_THREAD_PRIO_HIGHEST
-
-		Higher priority can improve rendering performance but might cause
-		starvation of lower priority tasks.
 
 config LV_USE_VECTOR_GRAPHIC
 	bool "Vector graphics"
@@ -446,6 +423,14 @@ config LV_USE_THORVG_INTERNAL
 	depends on LV_USE_THORVG
 	help
 		Build the ThorVG copy shipped with LVGL instead of linking an external one.
+
+config LV_THORVG_THREAD_COUNT
+	int "ThorVG threads"
+	default 1
+	range 1 255
+	depends on LV_USE_THORVG && !LV_OS_NONE
+	help
+		Number of threads ThorVG renders vector graphics with. More than 1 needs an OS.
 
 
 menu "SW"
@@ -512,14 +497,6 @@ config LV_DRAW_SW_I1_LUM_THRESHOLD
 		Pixels brighter than this luminance become active (set) when rendering to I1.
 
 endmenu
-
-config LV_DRAW_SW_DRAW_UNIT_CNT
-	int "Number of draw units"
-	default 1
-	range 1 255
-	depends on !LV_OS_NONE
-	help
-		Number of threads used to render a frame in parallel
 
 config LV_USE_DRAW_ARM2D_SYNC
 	bool "Arm-2D acceleration (Cortex-M)"
@@ -909,14 +886,6 @@ config LV_USE_ROTATE_PXP
 	help
 		Rotate the rendered display buffer with the PXP instead of the CPU.
 
-config LV_USE_PXP_DRAW_THREAD
-	bool "Dedicated draw thread"
-	depends on !LV_OS_NONE
-	default y
-	help
-		Dispatch PXP operations from their own thread so the CPU can keep
-		rendering in parallel. Needs an OS.
-
 config LV_USE_PXP_ASSERT
 	bool "Asserts"
 	help
@@ -1023,14 +992,6 @@ config LV_USE_SIFLI_EPIC
 
 if LV_USE_SIFLI_EPIC
 
-config LV_USE_SIFLI_EPIC_DRAW_THREAD
-	bool "Draw thread"
-	depends on !LV_OS_NONE
-	default y
-	help
-		Dispatch EPIC operations from their own thread so the CPU can keep
-		rendering in parallel.
-
 config LV_USE_SIFLI_EPIC_ASSERT
 	bool "Asserts"
 	help
@@ -1091,14 +1052,6 @@ config LV_G2D_HASH_TABLE_SIZE
 	help
 		Maximum number of buffers mapped for the G2D draw unit, including frame
 		buffers and assets. Drawing asserts once the table is full.
-
-config LV_USE_G2D_DRAW_THREAD
-	bool "Dedicated draw thread"
-	depends on !LV_OS_NONE
-	default y
-	help
-		Dispatch G2D operations from their own thread so the CPU can keep
-		rendering in parallel. Needs an OS.
 
 config LV_USE_G2D_ASSERT
 	bool "Asserts"

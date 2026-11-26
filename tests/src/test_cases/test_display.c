@@ -418,11 +418,7 @@ void test_display_dpi_tile_cnt_antialiasing(void)
 
     /* Verify default values */
     TEST_ASSERT_EQUAL_INT32(LV_DPI_DEF, lv_display_get_dpi(disp));
-#if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && (LV_DRAW_SW_DRAW_UNIT_CNT != 0)
-    TEST_ASSERT_EQUAL_INT32(LV_DRAW_SW_DRAW_UNIT_CNT, lv_display_get_tile_cnt(disp));
-#else
     TEST_ASSERT_EQUAL_INT32(1, lv_display_get_tile_cnt(disp));
-#endif
     TEST_ASSERT_EQUAL(LV_COLOR_DEPTH > 8 ? true : false, lv_display_get_antialiasing(disp));
 
     lv_display_set_dpi(disp, 80);

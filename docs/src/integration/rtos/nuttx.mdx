@@ -224,9 +224,8 @@ to allocate from the NuttX global heap or use its own.
 NuttX tries to be POSIX compliant where possible, meaning it supports
 pthreads (POSIX threads). To enable OS features in LVGL on NuttX,
 set <ApiLink name="LV_USE_OS" /> to <ApiLink name="LV_OS_PTHREAD" />.
-The main reason for enabling OS features is for [multi-core rendering](/main-modules/draw/draw_units).
-See <ApiLink name="LV_DRAW_SW_DRAW_UNIT_CNT" />. Otherwise there is no case
-for setting it.
+It's needed, for example, to let ThorVG render with several threads (see
+<ApiLink name="LV_THORVG_THREAD_COUNT" />).
 
 ## Using a Specific Version of LVGL
 

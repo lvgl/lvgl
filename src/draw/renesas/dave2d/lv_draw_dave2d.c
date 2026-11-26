@@ -15,16 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-/* The amount of tasks exercising pressure to the current to get finished
- * This one is used as the main signal to start to render a block of tasks.
- */
-#ifndef LV_DAVE2D_MAX_DRAW_PRESSURE
-    #define LV_DAVE2D_MAX_DRAW_PRESSURE    256
-#endif
-
-#if (LV_DAVE2D_MAX_DRAW_PRESSURE < 256)
-    #error "DRAW Pressure should be at least 256 otherwise the Dave engine may crash!"
-#endif
 /**********************
  *      TYPEDEFS
  **********************/

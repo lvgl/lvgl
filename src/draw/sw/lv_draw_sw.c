@@ -26,10 +26,6 @@
     #include "arm2d/lv_draw_sw_helium.h"
 #endif
 
-#if LV_DRAW_SW_DRAW_UNIT_CNT > 1 && LV_USE_OS == LV_OS_NONE
-    #error "OS support is required when more than one SW rendering units are enabled"
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -140,8 +136,8 @@ void lv_draw_sw_init(void)
 #endif
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-    if(LV_DRAW_SW_DRAW_UNIT_CNT > 1) {
-        tvg_engine_init(TVG_ENGINE_SW, LV_DRAW_SW_DRAW_UNIT_CNT);
+    if(LV_THORVG_THREAD_COUNT > 1) {
+        tvg_engine_init(TVG_ENGINE_SW, LV_THORVG_THREAD_COUNT);
     }
     else {
         tvg_engine_init(TVG_ENGINE_SW, 0);
