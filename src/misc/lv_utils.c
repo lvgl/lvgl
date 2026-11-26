@@ -60,7 +60,7 @@ void * lv_utils_bsearch(const void * key, const void * base, size_t n, size_t si
 lv_result_t lv_draw_buf_save_to_file(const lv_draw_buf_t * draw_buf, const char * path)
 {
     lv_fs_file_t file;
-    lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_WR);
+    lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_WR | LV_FS_MODE_TRUNC);
     if(res != LV_FS_RES_OK) {
         LV_LOG_ERROR("create file %s failed", path);
         return LV_RESULT_INVALID;

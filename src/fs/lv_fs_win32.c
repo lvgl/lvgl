@@ -206,7 +206,7 @@ static lv_fs_res_t fs_error_from_win32(DWORD error)
  * @param drv   pointer to a driver where this function belongs
  * @param path  path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
  * @param mode  read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR,
- *              FS_MODE_TRUNC can be added to FS_MODE_WR to truncate the file
+ *              FS_MODE_CREATE or FS_MODE_TRUNC can be added to FS_MODE_WR to create/truncate the file
  * @return pointer to FIL struct or NULL in case of fail
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -224,9 +224,13 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     if(mode & LV_FS_MODE_WR) {
         desired_access |= GENERIC_WRITE;
 
-        /*Create the file if it doesn't exist, otherwise truncate it to 0 bytes*/
         if(mode & LV_FS_MODE_TRUNC) {
+            /*Create the file if it doesn't exist, otherwise truncate it to 0 bytes*/
             creation_disposition = CREATE_ALWAYS;
+        }
+        else if(mode & LV_FS_MODE_CREATE) {
+            /*Create the file if it doesn't exist, otherwise open it keeping its content*/
+            creation_disposition = OPEN_ALWAYS;
         }
     }
 

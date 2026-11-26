@@ -124,9 +124,12 @@ void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 
 `path` is the path after the drive letter (e.g. "S:path/to/file.txt" -> "path/to/file.txt").
 `mode` can be <ApiLink name="LV_FS_MODE_WR" /> or <ApiLink name="LV_FS_MODE_RD" /> to open for writes or reads.
-<ApiLink name="LV_FS_MODE_TRUNC" /> can be added to <ApiLink name="LV_FS_MODE_WR" /> (`lv_fs_open`
-rejects it otherwise). In that case the driver must create the file if it doesn't exist,
-and truncate it to 0 bytes if it does.
+<ApiLink name="LV_FS_MODE_CREATE" /> and <ApiLink name="LV_FS_MODE_TRUNC" /> can be added to
+<ApiLink name="LV_FS_MODE_WR" /> (`lv_fs_open` rejects them otherwise). With
+<ApiLink name="LV_FS_MODE_CREATE" /> the driver must create the file if it doesn't exist and keep
+its content if it does. With <ApiLink name="LV_FS_MODE_TRUNC" /> it must create the file if it
+doesn't exist, and truncate it to 0 bytes if it does. If both are given,
+<ApiLink name="LV_FS_MODE_TRUNC" /> takes precedence, so the content is not kept.
 
 The return value is a pointer to a *file object* that describes the
 opened file or `NULL` if there were any issues (e.g. the file wasn't
@@ -236,6 +239,15 @@ tail behind.
 ```c
 /*Replace the content of the file*/
 res = lv_fs_open(&f, "S:folder/file.txt", LV_FS_MODE_WR | LV_FS_MODE_TRUNC);
+```
+
+Add <ApiLink name="LV_FS_MODE_CREATE" /> instead to create the file if it doesn't exist but keep
+its content if it does (like `open(path, O_WRONLY | O_CREAT)`). This is useful to update parts of a file
+or to write at an offset.
+
+```c
+/*Create the file if needed, then overwrite only the first bytes*/
+res = lv_fs_open(&f, "S:folder/file.bin", LV_FS_MODE_WR | LV_FS_MODE_CREATE);
 ```
 
 This example shows how to read a directory's content. It's up to the

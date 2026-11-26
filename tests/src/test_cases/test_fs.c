@@ -767,6 +767,62 @@ void test_fs_trunc(void)
     test_fs_trunc_drv('B'); /*posix, no cache*/
 }
 
+static void test_fs_create_drv(char drv_letter)
+{
+    char path[64];
+    lv_snprintf(path, sizeof(path), "%c:fs_create.bin", drv_letter);
+    remove("fs_create.bin");
+
+    uint32_t size = 0;
+    char buf[16];
+    uint32_t br = 0;
+    lv_fs_file_t f;
+
+    /*A missing file is created (empty)*/
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, path, LV_FS_MODE_WR | LV_FS_MODE_CREATE));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&f));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
+    TEST_ASSERT_EQUAL_UINT32(0, size);
+
+    /*An existing file keeps its content: overwrite only the first bytes*/
+    write_str(path, LV_FS_MODE_WR | LV_FS_MODE_TRUNC, "AAAAAAAAAA");
+    write_str(path, LV_FS_MODE_WR | LV_FS_MODE_CREATE, "BB");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
+    TEST_ASSERT_EQUAL_UINT32(10, size);
+
+    /*Read-write: the content is kept and can be read back*/
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, path, LV_FS_MODE_RD | LV_FS_MODE_WR | LV_FS_MODE_CREATE));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(&f, buf, sizeof(buf), &br));
+    TEST_ASSERT_EQUAL_UINT32(10, br);
+    TEST_ASSERT_EQUAL_MEMORY("BBAAAAAAAA", buf, 10);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&f));
+
+    /*Read-write on a missing file creates it too*/
+    remove("fs_create.bin");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&f, path, LV_FS_MODE_RD | LV_FS_MODE_WR | LV_FS_MODE_CREATE));
+    uint32_t bw = 0;
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_write(&f, "xyz", 3, &bw));
+    TEST_ASSERT_EQUAL_UINT32(3, bw);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_seek(&f, 0, LV_FS_SEEK_SET));
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_read(&f, buf, sizeof(buf), &br));
+    TEST_ASSERT_EQUAL_UINT32(3, br);
+    TEST_ASSERT_EQUAL_MEMORY("xyz", buf, 3);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&f));
+
+    /*TRUNC still wins when both are given*/
+    write_str(path, LV_FS_MODE_WR | LV_FS_MODE_CREATE | LV_FS_MODE_TRUNC, "Q");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_path_get_size(path, &size));
+    TEST_ASSERT_EQUAL_UINT32(1, size);
+
+    remove("fs_create.bin");
+}
+
+void test_fs_create(void)
+{
+    test_fs_create_drv('A'); /*stdio, with cache*/
+    test_fs_create_drv('B'); /*posix, no cache*/
+}
+
 void test_fs_memfs_read_past_end(void)
 {
     /* Exact-size heap buffer so ASan catches any over-read */
