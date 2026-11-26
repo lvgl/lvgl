@@ -1654,7 +1654,7 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
 
                     lv_matrix_t scale_matrix = mtx;
                     lv_matrix_translate(&mtx, g.ofs_x, 0);
-                    lv_matrix_scale(&scale_matrix, scale, scale);
+                    lv_matrix_scale(&scale_matrix, scale, -scale); /*FreeType outlines are Y-up*/
                     lv_matrix_transform_path(&scale_matrix, glyph_path);
 
                     lv_vector_path_append_path(text->path, glyph_path);
@@ -1723,7 +1723,7 @@ static void _render_span(const lv_svg_render_content_t * content, lv_draw_vector
 
             lv_matrix_t scale_matrix = *mtx;
             lv_matrix_translate(mtx, g.ofs_x, 0);
-            lv_matrix_scale(&scale_matrix, scale, scale);
+            lv_matrix_scale(&scale_matrix, scale, -scale); /*FreeType outlines are Y-up*/
             lv_matrix_transform_path(&scale_matrix, glyph_path);
 
             lv_vector_path_append_path(span->path, glyph_path);
@@ -2434,31 +2434,31 @@ static void _freetype_outline_cb(lv_event_t * e)
                 if(param->type == LV_FREETYPE_OUTLINE_MOVE_TO) {
                     lv_fpoint_t pt = {0};
                     pt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
-                    pt.y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
+                    pt.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
                     lv_vector_path_move_to(param->outline, &pt);
                 }
                 else if(param->type == LV_FREETYPE_OUTLINE_LINE_TO) {
                     lv_fpoint_t pt = {0};
                     pt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
-                    pt.y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
+                    pt.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
                     lv_vector_path_line_to(param->outline, &pt);
                 }
                 else if(param->type == LV_FREETYPE_OUTLINE_CUBIC_TO) {
                     lv_fpoint_t pt[3] = {0};
                     pt[0].x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.x);
-                    pt[0].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.y);
+                    pt[0].y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.y);
                     pt[1].x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control2.x);
-                    pt[1].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->control2.y);
+                    pt[1].y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control2.y);
                     pt[2].x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
-                    pt[2].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
+                    pt[2].y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
                     lv_vector_path_cubic_to(param->outline, &pt[0], &pt[1], &pt[2]);
                 }
                 else if(param->type == LV_FREETYPE_OUTLINE_CONIC_TO) {
                     lv_fpoint_t pt[2] = {0};
                     pt[0].x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.x);
-                    pt[0].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.y);
+                    pt[0].y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.y);
                     pt[1].x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
-                    pt[1].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
+                    pt[1].y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
                     lv_vector_path_quad_to(param->outline, &pt[0], &pt[1]);
                 }
                 else if(param->type == LV_FREETYPE_OUTLINE_END) {
