@@ -93,20 +93,41 @@ static int32_t _epic_delete(lv_draw_unit_t * draw_unit);
  */
 static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u);
 
+/**
+ * Wait for EPIC and write the CPU cache of the clip area back before it draws.
+ */
+static void _epic_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area);
+
+/**
+ * Wait for EPIC to finish drawing and invalidate the CPU cache of the clip area.
+ */
+static void _epic_draw_end(lv_layer_t * layer, const lv_area_t * clip_area);
+
+static void _epic_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void _epic_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                              const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+static void _epic_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+static void _epic_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void _epic_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_sifli_epic_fill,
+    .draw_fill_cb = _epic_draw_fill,
     .can_draw_fill_cb = _epic_can_draw_fill,
-    .draw_border_cb = lv_draw_sifli_epic_border,
+    .draw_border_cb = _epic_draw_border,
     .can_draw_border_cb = _epic_can_draw_border,
-    .draw_label_cb = lv_draw_sifli_epic_label,
+    .draw_label_cb = _epic_draw_label,
     .can_draw_label_cb = _epic_can_draw_label,
-    .draw_image_cb = lv_draw_sifli_epic_img,
+    .draw_image_cb = _epic_draw_image,
     .can_draw_image_cb = _epic_can_draw_img,
-    .draw_layer_cb = lv_draw_sifli_epic_layer,
+    .draw_layer_cb = _epic_draw_layer,
     .can_draw_layer_cb = _epic_can_draw_layer,
 };
 
@@ -429,33 +450,8 @@ static int32_t _epic_delete(lv_draw_unit_t * draw_unit)
 static void _epic_execute_drawing(lv_draw_sifli_epic_unit_t * u)
 {
     lv_draw_task_t * task = u->task_act;
-    lv_layer_t * layer = task->target_layer;
-
-    /* Wait for previous operation to complete */
-    lv_epic_wait();
-
-    if(layer && layer->draw_buf) {
-        lv_area_t draw_area;
-
-        if(lv_area_intersect(&draw_area, &task->_real_area, &task->clip_area)) {
-            lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
-            lv_draw_buf_flush_cache(layer->draw_buf, &draw_area);
-        }
-    }
 
     lv_draw_unit_draw_task(task->draw_unit, task);
-
-    /* Wait for operation to complete */
-    lv_epic_wait();
-
-    if(layer && layer->draw_buf) {
-        lv_area_t draw_area;
-
-        if(lv_area_intersect(&draw_area, &task->_real_area, &task->clip_area)) {
-            lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
-            lv_draw_buf_invalidate_cache(layer->draw_buf, &draw_area);
-        }
-    }
 }
 
 #if !LV_USE_SIFLI_EPIC_DRAW_THREAD
@@ -523,5 +519,65 @@ static void _epic_render_thread_cb(void * ptr)
     lv_thread_sync_delete(&u->sync);
 }
 #endif
+
+static void _epic_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area)
+{
+    /* Wait for previous operation to complete */
+    lv_epic_wait();
+
+    lv_area_t draw_area = *clip_area;
+    lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_draw_buf_flush_cache(layer->draw_buf, &draw_area);
+}
+
+static void _epic_draw_end(lv_layer_t * layer, const lv_area_t * clip_area)
+{
+    /* Wait for operation to complete */
+    lv_epic_wait();
+
+    lv_area_t draw_area = *clip_area;
+    lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &draw_area);
+}
+
+static void _epic_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    _epic_draw_begin(layer, clip_area);
+    lv_draw_sifli_epic_fill(draw_unit, layer, clip_area, dsc, coords);
+    _epic_draw_end(layer, clip_area);
+}
+
+static void _epic_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                              const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+{
+    _epic_draw_begin(layer, clip_area);
+    lv_draw_sifli_epic_border(draw_unit, layer, clip_area, dsc, coords);
+    _epic_draw_end(layer, clip_area);
+}
+
+static void _epic_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+{
+    _epic_draw_begin(layer, clip_area);
+    lv_draw_sifli_epic_label(draw_unit, layer, clip_area, dsc, coords);
+    _epic_draw_end(layer, clip_area);
+}
+
+static void _epic_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    _epic_draw_begin(layer, clip_area);
+    lv_draw_sifli_epic_img(draw_unit, layer, clip_area, dsc, coords);
+    _epic_draw_end(layer, clip_area);
+}
+
+static void _epic_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                             const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    _epic_draw_begin(layer, clip_area);
+    lv_draw_sifli_epic_layer(draw_unit, layer, clip_area, dsc, coords);
+    _epic_draw_end(layer, clip_area);
+}
 
 #endif /*LV_USE_SIFLI_EPIC*/
