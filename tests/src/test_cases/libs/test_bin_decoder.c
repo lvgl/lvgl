@@ -227,7 +227,13 @@ void test_bin_decoder_open_stride_zero_handling(void)
     lv_bin_decoder_close(decoder_dsc->decoder, decoder_dsc);
 }
 
-#if LV_USE_LZ4 && LV_BIN_DECODER_RAM_LOAD
+/*The compressed image tests need LZ4 and loading the whole image to RAM.
+ *The test functions are always defined (the runner calls every `test_*`), and skipped if unsupported.*/
+#define BIN_DECODER_COMPRESSED_TEST (LV_USE_LZ4 && LV_BIN_DECODER_RAM_LOAD)
+#define BIN_DECODER_COMPRESSED_RLE_TEST (BIN_DECODER_COMPRESSED_TEST && LV_USE_RLE)
+#define BIN_DECODER_COMPRESSED_SKIP_MSG "Needs LV_USE_LZ4 and LV_BIN_DECODER_RAM_LOAD"
+
+#if BIN_DECODER_COMPRESSED_TEST
 
 #define COMPRESSED_A8_LZ4 "A:test_images/stride_align1/LZ4/test_A8.bin"
 #define COMPRESSED_A8_RLE "A:test_images/stride_align1/RLE/test_A8.bin"
@@ -301,33 +307,6 @@ static void test_short_path(const char * image_path)
     lv_free(ref);
 }
 
-void test_bin_decoder_compressed_file_short_path_lz4(void)
-{
-    test_short_path(COMPRESSED_A8_LZ4);
-}
-
-#if LV_USE_RLE
-void test_bin_decoder_compressed_file_short_path_rle(void)
-{
-    test_short_path(COMPRESSED_A8_RLE);
-}
-#endif
-
-/*Compressed file shorter than the header + compress header.*/
-void test_bin_decoder_compressed_file_too_small(void)
-{
-    uint32_t size;
-    uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
-    const uint32_t lens[] = {sizeof(lv_image_header_t), sizeof(lv_image_header_t) + 1, sizeof(lv_image_header_t) + 11,
-                             sizeof(lv_image_header_t) + 12
-                            };
-    for(uint32_t i = 0; i < sizeof(lens) / sizeof(lens[0]); i++) {
-        write_tmp_file(img, lens[i]);
-        TEST_ASSERT_EQUAL(LV_RESULT_INVALID, open_and_check_a8(TMP_FILE_NAME, NULL, 0));
-    }
-    lv_free(img);
-}
-
 static lv_image_dsc_t * create_variable_dsc(uint8_t * file_data, uint32_t file_size, uint32_t data_size)
 {
     lv_image_dsc_t * dsc = lv_malloc_zeroed(sizeof(lv_image_dsc_t));
@@ -347,9 +326,49 @@ static void free_variable_dsc(lv_image_dsc_t * dsc)
     lv_free(dsc);
 }
 
+#endif /*BIN_DECODER_COMPRESSED_TEST*/
+
+void test_bin_decoder_compressed_file_short_path_lz4(void)
+{
+#if BIN_DECODER_COMPRESSED_TEST
+    test_short_path(COMPRESSED_A8_LZ4);
+#else
+    TEST_IGNORE_MESSAGE(BIN_DECODER_COMPRESSED_SKIP_MSG);
+#endif
+}
+
+void test_bin_decoder_compressed_file_short_path_rle(void)
+{
+#if BIN_DECODER_COMPRESSED_RLE_TEST
+    test_short_path(COMPRESSED_A8_RLE);
+#else
+    TEST_IGNORE_MESSAGE("Needs LV_USE_LZ4, LV_USE_RLE and LV_BIN_DECODER_RAM_LOAD");
+#endif
+}
+
+/*Compressed file shorter than the header + compress header.*/
+void test_bin_decoder_compressed_file_too_small(void)
+{
+#if BIN_DECODER_COMPRESSED_TEST
+    uint32_t size;
+    uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
+    const uint32_t lens[] = {sizeof(lv_image_header_t), sizeof(lv_image_header_t) + 1, sizeof(lv_image_header_t) + 11,
+                             sizeof(lv_image_header_t) + 12
+                            };
+    for(uint32_t i = 0; i < sizeof(lens) / sizeof(lens[0]); i++) {
+        write_tmp_file(img, lens[i]);
+        TEST_ASSERT_EQUAL(LV_RESULT_INVALID, open_and_check_a8(TMP_FILE_NAME, NULL, 0));
+    }
+    lv_free(img);
+#else
+    TEST_IGNORE_MESSAGE(BIN_DECODER_COMPRESSED_SKIP_MSG);
+#endif
+}
+
 /*Variable image with less data than the compress header.*/
 void test_bin_decoder_compressed_variable_too_small(void)
 {
+#if BIN_DECODER_COMPRESSED_TEST
     uint32_t size;
     uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
     for(uint32_t n = 0; n < 12; n++) {
@@ -358,11 +377,15 @@ void test_bin_decoder_compressed_variable_too_small(void)
         free_variable_dsc(dsc);
     }
     lv_free(img);
+#else
+    TEST_IGNORE_MESSAGE(BIN_DECODER_COMPRESSED_SKIP_MSG);
+#endif
 }
 
 /*Variable image whose decompressed_size is larger than the draw buffer.*/
 void test_bin_decoder_compressed_variable_decompressed_size_overflow(void)
 {
+#if BIN_DECODER_COMPRESSED_TEST
     uint32_t size;
     uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
     lv_image_dsc_t * dsc = create_variable_dsc(img, size, size - sizeof(lv_image_header_t));
@@ -373,11 +396,15 @@ void test_bin_decoder_compressed_variable_decompressed_size_overflow(void)
 
     free_variable_dsc(dsc);
     lv_free(img);
+#else
+    TEST_IGNORE_MESSAGE(BIN_DECODER_COMPRESSED_SKIP_MSG);
+#endif
 }
 
 /*Variable image whose compressed_size does not match the data size.*/
 void test_bin_decoder_compressed_variable_compressed_size_mismatch(void)
 {
+#if BIN_DECODER_COMPRESSED_TEST
     uint32_t size;
     uint8_t * img = read_file_exact(COMPRESSED_A8_LZ4, &size);
     lv_image_dsc_t * dsc = create_variable_dsc(img, size, size - sizeof(lv_image_header_t));
@@ -388,11 +415,15 @@ void test_bin_decoder_compressed_variable_compressed_size_mismatch(void)
 
     free_variable_dsc(dsc);
     lv_free(img);
+#else
+    TEST_IGNORE_MESSAGE(BIN_DECODER_COMPRESSED_SKIP_MSG);
+#endif
 }
 
 /*A valid variable image still decodes to the same pixels as the uncompressed one.*/
 void test_bin_decoder_compressed_variable_ok(void)
 {
+#if BIN_DECODER_COMPRESSED_TEST
     uint32_t ref_size;
     uint8_t * ref = read_file_exact(COMPRESSED_A8_RAW, &ref_size);
     uint32_t size;
@@ -405,8 +436,10 @@ void test_bin_decoder_compressed_variable_ok(void)
     free_variable_dsc(dsc);
     lv_free(img);
     lv_free(ref);
+#else
+    TEST_IGNORE_MESSAGE(BIN_DECODER_COMPRESSED_SKIP_MSG);
+#endif
 }
 
-#endif /*LV_USE_LZ4 && LV_BIN_DECODER_RAM_LOAD*/
 
 #endif
