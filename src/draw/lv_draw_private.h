@@ -264,6 +264,17 @@ void lv_draw_cleanup_task(lv_draw_task_t * t);
  */
 void lv_draw_unit_draw_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
 
+/**
+ * Initialize a layer that draws into a buffer owned by someone else.
+ * @param layer         pointer to the layer to initialize
+ * @param parent_layer  the parent layer @nullable
+ * @param draw_buf      the buffer to draw into, can be set later @nullable
+ * @param color_format  the color format of the layer
+ * @param area          the area of the layer (absolute coordinates)
+ */
+void lv_draw_layer_init_with_buf(lv_layer_t * layer, lv_layer_t * parent_layer, lv_draw_buf_t * draw_buf,
+                                 lv_color_format_t color_format, const lv_area_t * area);
+
 /**********************
  *      MACROS
  **********************/

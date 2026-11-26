@@ -524,6 +524,16 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     LV_CHECK_ARG(area != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
+    lv_draw_layer_init_with_buf(layer, parent_layer, NULL, color_format, area);
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_draw_layer_init_with_buf(lv_layer_t * layer, lv_layer_t * parent_layer, lv_draw_buf_t * draw_buf,
+                                 lv_color_format_t color_format, const lv_area_t * area)
+{
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(area != NULL, return);
+
     lv_layer_init(layer);
     lv_display_t * disp = parent_layer ? parent_layer->display : lv_refr_get_disp_refreshing();
 
@@ -533,6 +543,8 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     layer->phy_clip_area = *area;
     layer->color_format = color_format;
     layer->display = disp;
+    layer->draw_buf = draw_buf;
+    layer->buffer_owned = false;
 
     lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
 
@@ -544,8 +556,6 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     else {
         disp->layer_head = layer;
     }
-
-    LV_PROFILER_DRAW_END;
 }
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
