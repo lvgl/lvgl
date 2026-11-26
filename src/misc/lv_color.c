@@ -79,6 +79,7 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
             return 24;
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+        case LV_COLOR_FORMAT_ABGR8888:
         case LV_COLOR_FORMAT_XRGB8888:
             return 32;
 
@@ -103,6 +104,7 @@ bool lv_color_format_has_alpha(lv_color_format_t src_cf)
         case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+        case LV_COLOR_FORMAT_ABGR8888:
         case LV_COLOR_FORMAT_AL88:
         case LV_COLOR_FORMAT_ARGB2222:
         case LV_COLOR_FORMAT_ARGB1555:

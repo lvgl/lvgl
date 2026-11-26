@@ -248,6 +248,9 @@
 /** ARGB8888 premultiplied */
 #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
 
+/** 0xAABBGGRR, i.e. R, G, B, A bytes on little endian. E.g. for a WebAssembly canvas. */
+#define LV_DRAW_SW_SUPPORT_ABGR8888 0
+
 /** L8 */
 #define LV_DRAW_SW_SUPPORT_L8 1
 
