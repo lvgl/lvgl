@@ -7,6 +7,7 @@
     "adding_images",
     "using_images",
     "decoders",
+    "encoders",
     "caching"
   ]
 }

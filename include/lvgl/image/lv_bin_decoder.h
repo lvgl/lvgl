@@ -33,6 +33,11 @@ extern "C" {
 void lv_bin_decoder_init(void);
 
 /**
+ * Initialize the binary image encoder module (catch-all fallback)
+ */
+void lv_bin_encoder_init(void);
+
+/**
  * Get info about a lvgl binary image
  * @param decoder the decoder where this function belongs
  * @param dsc image descriptor containing the source and type of the image and other info.

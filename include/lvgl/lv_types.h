@@ -144,6 +144,7 @@ typedef struct _lv_font_manager_t lv_font_manager_t;
 typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
 typedef struct _lv_image_decoder_dsc_t lv_image_decoder_dsc_t;
+typedef struct _lv_image_encoder_t lv_image_encoder_t;
 
 typedef struct _lv_draw_image_dsc_t lv_draw_image_dsc_t;
 

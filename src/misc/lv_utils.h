@@ -49,14 +49,6 @@ void * lv_utils_bsearch(const void * key, const void * base, size_t n, size_t si
                         int (*cmp)(const void * pRef, const void * pElement));
 
 /**
- * Save a draw buf to a file
- * @param draw_buf  pointer to a draw buffer
- * @param path      path to the file to save
- * @return          LV_RESULT_OK: success; LV_RESULT_INVALID: error
- */
-lv_result_t lv_draw_buf_save_to_file(const lv_draw_buf_t * draw_buf, const char * path);
-
-/**
  * Reverse the order of the bytes in a 32-bit value.
  * @param x     a 32-bit value.
  * @return      the value `x` with reversed byte-order.
