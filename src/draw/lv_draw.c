@@ -505,7 +505,12 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
         return NULL;
     }
 
-    lv_draw_layer_init(new_layer, parent_layer, color_format, area);
+    lv_result_t res = lv_draw_layer_init(new_layer, parent_layer, color_format, area);
+    if(res != LV_RESULT_OK) {
+        lv_free(new_layer);
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
 
     /*Inherits transparency from parent*/
     if(parent_layer) {
@@ -517,15 +522,46 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     return new_layer;
 }
 
-void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
-                        const lv_area_t * area)
+lv_result_t lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
+                               const lv_area_t * area)
 {
-    LV_CHECK_ARG(layer != NULL, return);
-    LV_CHECK_ARG(area != NULL, return);
+    LV_CHECK_ARG(layer != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(area != NULL, return LV_RESULT_INVALID);
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_layer_init_with_buf(layer, parent_layer, NULL, color_format, area);
+    int32_t w = lv_area_get_width(area);
+    int32_t h = lv_area_get_height(area);
+    const uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, color_format);
+
+#if LV_DRAW_LAYER_MAX_MEMORY > 0
+    /* Do not allocate the layer if the sum of allocated layer sizes
+     * would exceed `LV_DRAW_LAYER_MAX_MEMORY` */
+    if((_draw_info.used_memory_for_layers + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
+        LV_LOG_WARN("LV_DRAW_LAYER_MAX_MEMORY was reached when allocating the layer.");
+        LV_PROFILER_DRAW_END;
+        return LV_RESULT_INVALID;
+    }
+#endif
+
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, color_format, LV_STRIDE_AUTO);
+    if(draw_buf == NULL) {
+        LV_LOG_WARN("Allocating the layer buffer failed");
+        LV_PROFILER_DRAW_END;
+        return LV_RESULT_INVALID;
+    }
+
+    if(lv_color_format_has_alpha(color_format)) {
+        lv_draw_buf_clear(draw_buf, NULL);
+    }
+
+    lv_draw_layer_init_with_buf(layer, parent_layer, draw_buf, color_format, area);
+    layer->buffer_owned = true;
+
+    _draw_info.used_memory_for_layers += layer_size_byte;
+    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
+
     LV_PROFILER_DRAW_END;
+    return LV_RESULT_OK;
 }
 
 void lv_draw_layer_init_with_buf(lv_layer_t * layer, lv_layer_t * parent_layer, lv_draw_buf_t * draw_buf,
@@ -561,44 +597,9 @@ void lv_draw_layer_init_with_buf(lv_layer_t * layer, lv_layer_t * parent_layer, 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
     LV_CHECK_ARG(layer != NULL, return NULL);
-    LV_PROFILER_DRAW_BEGIN;
-    /*If the buffer of the layer is already allocated return it*/
-    if(layer->draw_buf != NULL) {
-        LV_PROFILER_DRAW_END;
-        return layer->draw_buf->data;
-    }
 
-    /*If the buffer of the layer is not allocated yet, allocate it now*/
-    int32_t w = lv_area_get_width(&layer->buf_area);
-    int32_t h = lv_area_get_height(&layer->buf_area);
-    uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
-
-#if LV_DRAW_LAYER_MAX_MEMORY > 0
-    /* Do not allocate the layer if the sum of allocated layer sizes
-     * will exceed `LV_DRAW_LAYER_MAX_MEMORY` */
-    if((_draw_info.used_memory_for_layers + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
-        LV_LOG_WARN("LV_DRAW_LAYER_MAX_MEMORY was reached when allocating the layer.");
-        return NULL;
-    }
-#endif
-
-    layer->draw_buf = lv_draw_buf_create(w, h, layer->color_format, 0);
-
-    if(layer->draw_buf == NULL) {
-        LV_LOG_WARN("Allocating layer buffer failed. Try later");
-        LV_PROFILER_DRAW_END;
-        return NULL;
-    }
-    layer->buffer_owned = true;
-
-    _draw_info.used_memory_for_layers += layer_size_byte;
-    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
-
-    if(lv_color_format_has_alpha(layer->color_format)) {
-        lv_draw_buf_clear(layer->draw_buf, NULL);
-    }
-
-    LV_PROFILER_DRAW_END;
+    /*The buffer is allocated when the layer is created*/
+    if(layer->draw_buf == NULL) return NULL;
     return layer->draw_buf->data;
 }
 

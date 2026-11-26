@@ -341,14 +341,15 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
  * @param parent_layer      the parent layer to which the layer will be merged when it's rendered @nullable
  * @param color_format      the color format of the layer
  * @param area              the areas of the layer (absolute coordinates)
+ * @return                  LV_RESULT_OK or LV_RESULT_INVALID on error
  */
-void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
-                        const lv_area_t * area);
+lv_result_t lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
+                               const lv_area_t * area);
 
 /**
- * Try to allocate a buffer for the layer.
+ * Get the pixel data of the layer's buffer.
  * @param layer             pointer to a layer
- * @return                  pointer to the allocated aligned buffer or NULL on failure
+ * @return                  pointer to the pixel data, or NULL if the layer has no buffer
  */
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
 

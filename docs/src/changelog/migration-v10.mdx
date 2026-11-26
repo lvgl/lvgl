@@ -588,6 +588,16 @@ and are not meant to be included directly.
    my_unit->base_unit.fallback = lv_draw_sw_get_draw_unit(); /* or NULL to drop what it can't draw */
    ```
 
+### Layers
+
+- A layer's buffer is allocated when the layer is created by <ApiLink name="lv_draw_layer_create"/> or
+  <ApiLink name="lv_draw_layer_init"/>, not when the first draw on it is dispatched.
+- <ApiLink name="lv_draw_layer_init"/> returns an <ApiLink name="lv_result_t"/>: `LV_RESULT_INVALID` if the buffer
+  can't be allocated. A layer initialized with it owns its buffer and frees it in
+  <ApiLink name="lv_draw_layer_deinit"/>; don't replace `draw_buf` afterwards.
+- When <ApiLink name="LV_DRAW_LAYER_MAX_MEMORY"/> is reached, the layer isn't created and that part of the widget
+  isn't drawn (a warning is logged). Before, the draw waited until other layers had freed their memory.
+
 
 ---
 

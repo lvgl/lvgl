@@ -208,3 +208,7 @@ The total memory available for layers at once is controlled by
 <ApiLink name="LV_DRAW_LAYER_MAX_MEMORY" /> in `lv_conf.h`.  If set to `0`, there is no
 limit.
 
+A layer's buffer is allocated when the layer is created. If that would exceed the
+limit, or the allocation fails, the layer isn't created and the part of the Widget
+that needed it isn't drawn.
+
