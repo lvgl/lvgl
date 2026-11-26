@@ -916,9 +916,10 @@ JRESULT jd_mcu_output(
         unsigned int n = rx * ry;
 
         do {
-            w = (*s++ & 0xF8) << 8;     /* RRRRR----------- */
+            /* The RGB888 MCU above is stored in B, G, R byte order */
+            w = *s++ >> 3;              /* -----------BBBBB */
             w |= (*s++ & 0xFC) << 3;    /* -----GGGGGG----- */
-            w |= *s++ >> 3;             /* -----------BBBBB */
+            w |= (*s++ & 0xF8) << 8;    /* RRRRR----------- */
             *d++ = w;
         } while(--n);
     }

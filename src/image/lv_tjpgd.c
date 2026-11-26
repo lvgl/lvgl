@@ -24,6 +24,13 @@
 
 #define TJPGD_WORKBUFF_SIZE             4096    //Recommended by TJPGD library
 
+#if JD_FORMAT == 1
+    #define TJPGD_OUTPUT_CF             LV_COLOR_FORMAT_RGB565
+#else
+    #define TJPGD_OUTPUT_CF             LV_COLOR_FORMAT_RGB888
+#endif
+#define TJPGD_OUTPUT_BPP                (LV_COLOR_FORMAT_GET_SIZE(TJPGD_OUTPUT_CF))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -95,7 +102,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = img_dsc->header.w;
             header->h = img_dsc->header.h;
-            header->stride = img_dsc->header.w * 3;
+            header->stride = img_dsc->header.w * TJPGD_OUTPUT_BPP;
             return LV_RESULT_OK;
 #else
             LV_LOG_WARN("LV_USE_FS_MEMFS needs to enabled to decode from data");
@@ -122,7 +129,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = jd.width;
             header->h = jd.height;
-            header->stride = jd.width * 3;
+            header->stride = jd.width * TJPGD_OUTPUT_BPP;
 
             return LV_RESULT_OK;
         }
@@ -210,10 +217,10 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
 
     dsc->user_data = jd;
-    dsc->header.cf = LV_COLOR_FORMAT_RGB888;
+    dsc->header.cf = TJPGD_OUTPUT_CF;
     dsc->header.w = jd->width;
     dsc->header.h = jd->height;
-    dsc->header.stride = jd->width * 3;
+    dsc->header.stride = jd->width * TJPGD_OUTPUT_BPP;
 
     return LV_RESULT_OK;
 }
@@ -270,7 +277,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
     decoded->header.w = lv_area_get_width(decoded_area);
     decoded->header.h = lv_area_get_height(decoded_area);
-    decoded->header.stride = decoded->header.w * 3;
+    decoded->header.stride = decoded->header.w * TJPGD_OUTPUT_BPP;
     decoded->data_size = decoded->header.stride * decoded->header.h;
 
     /* Process restart interval if enabled */

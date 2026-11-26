@@ -31,6 +31,11 @@ For example:
 lv_image_set_src(my_img, "S:path/to/picture.jpg");
 ```
 
+Images are decoded to RGB888 by default.  Set
+<ApiLink name="LV_TJPGD_OUTPUT_RGB565" /> to `1` to decode them to RGB565
+instead.  This needs 2 bytes per pixel instead of 3 and suits RGB565 displays,
+at the cost of color precision.
+
 <Callout type="info">
 A file system driver needs to be registered to open images from files.  To do so,
 follow the instructions in [File System (lv_fs_drv)](/main-modules/fs).
