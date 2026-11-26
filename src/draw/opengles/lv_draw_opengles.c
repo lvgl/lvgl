@@ -330,6 +330,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(texture == 0) {
         lv_display_t * disp = lv_refr_get_disp_refreshing();
         LV_ASSERT(layer != disp->layer_head);
+        LV_UNUSED(disp);
         int32_t w = lv_area_get_width(&layer->buf_area);
         int32_t h = lv_area_get_height(&layer->buf_area);
 
@@ -427,6 +428,7 @@ static unsigned int draw_to_texture(texture_data_t * tex_data, const lv_draw_dsc
         lv_result_t init_result = lv_draw_buf_init(&u->render_draw_buf, texture_w, texture_h, LV_COLOR_FORMAT_ARGB8888,
                                                    LV_STRIDE_AUTO, data, data_size);
         LV_ASSERT(init_result == LV_RESULT_OK);
+        LV_UNUSED(init_result);
     }
 
     lv_layer_t dest_layer;
