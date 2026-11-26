@@ -29,15 +29,20 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static bool other_unit_busy(const lv_layer_t * layer, const lv_draw_unit_t * self);
 static int32_t ppa_delete(lv_draw_unit_t * draw_unit);
 static void  ppa_execute_drawing(lv_draw_ppa_unit_t * u);
+static void ppa_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area, lv_area_t * buf_area);
+static void ppa_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void ppa_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
 *  STATIC VARIABLES
 **********************/
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_ppa_fill,
+    .draw_fill_cb = ppa_draw_fill,
     .can_draw_fill_cb = ppa_can_draw_fill,
-    .draw_image_cb = lv_draw_ppa_img,
+    .draw_image_cb = ppa_draw_img,
     .can_draw_image_cb = ppa_can_draw_img,
 };
 
@@ -179,7 +184,6 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     u->task_act = t;
     u->task_act->draw_unit = draw_unit;
-    u->img_sw_fallback = false;
 
     ppa_execute_drawing(u);
 
@@ -202,23 +206,42 @@ static int32_t ppa_delete(lv_draw_unit_t * draw_unit)
 
 static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
 {
-    lv_draw_task_t * t         = u->task_act;
-    lv_layer_t * layer         = t->target_layer;
-    lv_draw_buf_t * buf        = layer->draw_buf;
-    lv_area_t area;
-
-    if(!lv_area_intersect(&area, &t->area, &t->clip_area)) return;
-
-    /* The handlers take an area relative to the buffer */
-    lv_area_t buf_area = area;
-    lv_area_move(&buf_area, -layer->buf_area.x1, -layer->buf_area.y1);
-
-    lv_draw_buf_flush_cache(buf, &buf_area);
+    lv_draw_task_t * t = u->task_act;
 
     lv_draw_unit_draw_task(t->draw_unit, t);
+}
+
+/**
+ * Write the CPU cache of the clip area back before the PPA draws, and return that area relative to the buffer
+ */
+static void ppa_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area, lv_area_t * buf_area)
+{
+    *buf_area = *clip_area;
+    lv_area_move(buf_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_draw_buf_flush_cache(layer->draw_buf, buf_area);
+}
+
+static void ppa_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_area_t buf_area;
+    ppa_draw_begin(layer, clip_area, &buf_area);
+    lv_draw_ppa_fill(draw_unit, layer, clip_area, dsc, coords);
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &buf_area);
+}
+
+static void ppa_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                         const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
+    lv_area_t buf_area;
+    ppa_draw_begin(layer, clip_area, &buf_area);
+
+    u->img_sw_fallback = false;
+    lv_draw_ppa_img(draw_unit, layer, clip_area, dsc, coords);
 
     /* The software fallback wrote through the cache, so its lines must survive */
-    if(!u->img_sw_fallback) lv_draw_buf_invalidate_cache(buf, &buf_area);
+    if(!u->img_sw_fallback) lv_draw_buf_invalidate_cache(layer->draw_buf, &buf_area);
 }
 
 #endif /*LV_USE_PPA*/
