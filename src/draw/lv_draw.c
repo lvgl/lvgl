@@ -1057,7 +1057,7 @@ void lv_draw_cleanup_task(lv_draw_task_t * t)
         lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
         lv_draw_layer_delete(layer_drawn);
     }
-    lv_draw_label_dsc_t * draw_label_dsc = lv_draw_task_get_label_dsc(t);
+    lv_draw_label_dsc_t * draw_label_dsc = t->type == LV_DRAW_DSC_TYPE_LABEL ? t->draw_dsc : NULL;
     if(draw_label_dsc && draw_label_dsc->text_local) {
         lv_free((void *)draw_label_dsc->text);
         draw_label_dsc->text = NULL;

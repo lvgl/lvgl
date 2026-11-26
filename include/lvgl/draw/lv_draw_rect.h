@@ -172,13 +172,6 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc);
 
 /**
- * Try to get a fill draw descriptor from a draw task.
- * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_FILL
- */
-lv_draw_fill_dsc_t * lv_draw_task_get_fill_dsc(lv_draw_task_t * task);
-
-/**
  * Get the fill draw descriptor from a generic draw descriptor.
  * `dsc` must be of type LV_DRAW_DSC_TYPE_FILL, use `lv_draw_dsc_get_type()` to check it first.
  * @param dsc       draw descriptor
@@ -201,13 +194,6 @@ void lv_draw_fill(lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc, const lv_a
 void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc);
 
 /**
- * Try to get a border draw descriptor from a draw task.
- * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_BORDER
- */
-lv_draw_border_dsc_t * lv_draw_task_get_border_dsc(lv_draw_task_t * task);
-
-/**
  * Get the border draw descriptor from a generic draw descriptor.
  * `dsc` must be of type LV_DRAW_DSC_TYPE_BORDER, use `lv_draw_dsc_get_type()` to check it first.
  * @param dsc       draw descriptor
@@ -228,13 +214,6 @@ void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const 
  * @param dsc       pointer to a draw descriptor
  */
 void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
-
-/**
- * Try to get a box shadow draw descriptor from a draw task.
- * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_BOX_SHADOW
- */
-lv_draw_box_shadow_dsc_t * lv_draw_task_get_box_shadow_dsc(lv_draw_task_t * task);
 
 /**
  * Get the box shadow draw descriptor from a generic draw descriptor.

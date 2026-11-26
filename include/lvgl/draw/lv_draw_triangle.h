@@ -52,13 +52,6 @@ typedef struct {
 void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc);
 
 /**
- * Try to get a triangle draw descriptor from a draw task.
- * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_TRIANGLE
- */
-lv_draw_triangle_dsc_t * lv_draw_task_get_triangle_dsc(lv_draw_task_t * task);
-
-/**
  * Get the triangle draw descriptor from a generic draw descriptor.
  * `dsc` must be of type LV_DRAW_DSC_TYPE_TRIANGLE, use `lv_draw_dsc_get_type()` to check it first.
  * @param dsc       draw descriptor

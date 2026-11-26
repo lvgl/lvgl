@@ -56,13 +56,6 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
 }
 
-lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task)
-{
-    LV_CHECK_ARG(task != NULL, return NULL);
-
-    return task->type == LV_DRAW_DSC_TYPE_IMAGE ? (lv_draw_image_dsc_t *)task->draw_dsc : NULL;
-}
-
 lv_draw_image_dsc_t * lv_draw_dsc_get_image_dsc(lv_draw_dsc_t * dsc)
 {
     LV_CHECK_ARG(dsc != NULL, return NULL);

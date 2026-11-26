@@ -49,13 +49,6 @@ void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc)
     LV_PROFILER_DRAW_END;
 }
 
-lv_draw_triangle_dsc_t * lv_draw_task_get_triangle_dsc(lv_draw_task_t * task)
-{
-    LV_CHECK_ARG(task != NULL, return NULL);
-
-    return task->type == LV_DRAW_DSC_TYPE_TRIANGLE ? (lv_draw_triangle_dsc_t *)task->draw_dsc : NULL;
-}
-
 lv_draw_triangle_dsc_t * lv_draw_dsc_get_triangle_dsc(lv_draw_dsc_t * dsc)
 {
     LV_CHECK_ARG(dsc != NULL, return NULL);
