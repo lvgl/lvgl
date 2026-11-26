@@ -661,7 +661,7 @@
 
 /** Draw with OpenGL ES, keeping rendered widgets and images as GPU textures.
  *
- *  Enable: LV_USE_OPENGLES
+ *  Enable: LV_USE_OPENGLES, LV_USE_DRAW_SW
  */
 #define LV_USE_DRAW_OPENGLES 0
 
