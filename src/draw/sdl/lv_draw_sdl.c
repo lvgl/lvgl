@@ -177,7 +177,8 @@ void lv_draw_sdl_init(void)
     lv_draw_sdl_unit_t * draw_sdl_unit = lv_draw_create_unit(sizeof(lv_draw_sdl_unit_t));
     draw_sdl_unit->base_unit.dispatch_cb = dispatch;
     draw_sdl_unit->base_unit.draw_cbs = &draw_cbs;
-    draw_sdl_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
+    /*No software fallback: SDL draws into textures, drop what it can't draw*/
+    draw_sdl_unit->base_unit.fallback = NULL;
     draw_sdl_unit->base_unit.id = DRAW_UNIT_ID_SDL;
     draw_sdl_unit->base_unit.name = "SDL";
     draw_sdl_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
