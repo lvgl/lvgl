@@ -74,14 +74,19 @@ static int32_t _g2d_delete(lv_draw_unit_t * draw_unit);
 
 static void _g2d_execute_drawing(lv_draw_task_t * t);
 
+static void _g2d_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void _g2d_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_g2d_fill,
+    .draw_fill_cb = _g2d_draw_fill,
     .can_draw_fill_cb = _g2d_can_draw_fill,
-    .draw_image_cb = lv_draw_g2d_img,
+    .draw_image_cb = _g2d_draw_img,
     .can_draw_image_cb = _g2d_can_draw_img,
 };
 
@@ -316,13 +321,21 @@ static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
 
 static void _g2d_execute_drawing(lv_draw_task_t * t)
 {
-    lv_layer_t * layer = t->target_layer;
-    lv_draw_buf_t * draw_buf = layer->draw_buf;
-
-    /* Invalidate only the drawing area */
-    lv_draw_buf_invalidate_cache(draw_buf, NULL);
-
     lv_draw_unit_draw_task(t->draw_unit, t);
+}
+
+static void _g2d_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_buf_invalidate_cache(layer->draw_buf, NULL);
+    lv_draw_g2d_fill(draw_unit, layer, clip_area, dsc, coords);
+}
+
+static void _g2d_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_buf_invalidate_cache(layer->draw_buf, NULL);
+    lv_draw_g2d_img(draw_unit, layer, clip_area, dsc, coords);
 }
 
 #if LV_USE_G2D_DRAW_THREAD
