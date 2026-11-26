@@ -242,7 +242,7 @@ typedef struct {
     volatile int dispatch_req;
 #endif
     lv_mutex_t circle_cache_mutex;
-    bool task_running;
+    bool is_sending_event;
 } lv_draw_global_info_t;
 
 /**********************
@@ -263,6 +263,27 @@ void lv_draw_cleanup_task(lv_draw_task_t * t);
  * @param t             the draw task to draw
  */
 void lv_draw_unit_draw_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
+
+/**
+ * Draw a descriptor on a layer with the draw units, sending the draw events around it.
+ * Used by the `lv_draw_<type>()` functions after they've prepared the descriptor.
+ *
+ * The descriptor is modified, so pass a local copy (e.g. on the stack), never the caller's `const` descriptor:
+ * - its `type` and `layer` fields are set;
+ * - `LV_EVENT_DRAW_DSC_BEGIN` handlers may change it before it's drawn.
+ *
+ * The copy doesn't need to be allocated: the descriptor, and everything it points to (points, text,
+ * image source), is no longer used after this function returns. Drawing may still be in progress
+ * when it returns.
+ *
+ * If no draw unit can draw it, nothing is drawn and a warning is logged.
+ *
+ * @param dsc       the descriptor to draw, modified as described above
+ * @param type      the type of `dsc`, which decides the draw callback that is called
+ * @param layer     the layer to draw on; the clip area is read from it once
+ * @param coords    the area of the drawing, or its bounding box for line, triangle, arc, vector and mask (absolute coordinates)
+ */
+void lv_draw_dsc_submit(lv_draw_dsc_t * dsc, lv_draw_dsc_type_t type, lv_layer_t * layer, const lv_area_t * coords);
 
 /**
  * Initialize a layer that draws into a buffer owned by someone else.

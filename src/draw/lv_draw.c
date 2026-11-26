@@ -30,13 +30,17 @@
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t draw_unit_id);
 static inline size_t get_draw_dsc_size(lv_draw_dsc_type_t type);
-static lv_area_t * get_dsc_coords(lv_draw_task_t * t);
+static lv_area_t * get_dsc_coords(lv_draw_dsc_t * dsc);
 static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t);
-static void apply_coords_change(lv_draw_task_t * t);
+static void apply_coords_change(lv_draw_dsc_t * dsc, const lv_area_t * old_coords, const lv_area_t * new_coords);
+static void apply_task_coords_change(lv_draw_task_t * t);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
 static void route_task(lv_draw_task_t * t);
 static bool unit_takes_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
-static bool unit_can_draw(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
+static bool unit_can_draw(lv_draw_unit_t * draw_unit, lv_layer_t * layer, lv_draw_dsc_t * dsc);
+static bool unit_can_draw_type(lv_draw_unit_t * draw_unit, lv_layer_t * layer, lv_draw_dsc_t * dsc);
+static void unit_draw(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      lv_draw_dsc_t * dsc, const lv_area_t * coords);
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
@@ -147,7 +151,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
     lv_draw_dsc_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
     base_dsc->type = t->type;
-    lv_area_t * coords = get_dsc_coords(t);
+    lv_area_t * coords = get_dsc_coords(base_dsc);
     if(coords) {
         *coords = t->area;
     }
@@ -159,11 +163,11 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
      *Sending the draw events might cause recursive event sends and besides
      *dispatching might remove the "main" draw task while it's still being used in the events*/
 
-    bool main_task = info->task_running == false;
+    bool main_task = info->is_sending_event == false;
     if(main_task && base_dsc->obj && lv_obj_is_send_draw_dsc_events(base_dsc->obj)) {
-        info->task_running = true;
+        info->is_sending_event = true;
         send_draw_events(layer, t);
-        info->task_running = false;
+        info->is_sending_event = false;
     }
 
     route_task(t);
@@ -330,6 +334,72 @@ lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t *
     }
     else {
         return lv_draw_get_next_available_task(layer, t_prev, draw_unit_id);
+    }
+}
+
+void lv_draw_dsc_submit(lv_draw_dsc_t * dsc, lv_draw_dsc_type_t type, lv_layer_t * layer, const lv_area_t * coords)
+{
+    LV_ASSERT(dsc != NULL);
+    LV_ASSERT(layer != NULL);
+    LV_ASSERT(coords != NULL);
+    dsc->type = type;
+    dsc->layer = layer;
+    const lv_area_t clip = layer->_clip_area;
+
+    lv_area_t * dsc_coords = get_dsc_coords(dsc);
+    if(dsc_coords) {
+        *dsc_coords = *coords;
+    }
+
+    bool send_events = !_draw_info.is_sending_event && dsc->obj && lv_obj_is_send_draw_dsc_events(dsc->obj);
+    if(send_events) {
+        _draw_info.is_sending_event = true;
+        lv_result_t res = lv_obj_send_event(dsc->obj, LV_EVENT_DRAW_DSC_BEGIN, dsc);
+        _draw_info.is_sending_event = false;
+        if(res != LV_RESULT_OK) {
+            /* object deleted during event*/
+            return;
+        }
+    }
+
+    const lv_area_t * draw_coords = coords;
+    if(dsc_coords) {
+        apply_coords_change(dsc, coords, dsc_coords);
+        draw_coords = dsc_coords;
+    }
+
+    lv_draw_unit_t * main = _draw_info.unit_head;
+    if(!main) {
+        LV_LOG_ERROR("No draw unit registered");
+        return;
+    }
+
+    /* we try to render with the main draw unit*/
+    if(unit_can_draw(main, layer, dsc)) {
+        unit_draw(main, layer, &clip, dsc, draw_coords);
+    }
+    else if(main->fallback && unit_can_draw(main->fallback, layer, dsc)) {
+        /* if we can't, check with its fallback */
+
+        /* before sending the task to the fallback, ensure the pixels have been actually
+         * written in case the main draw unit queues instead of drawing immediately */
+        if(main->wait_for_finish_cb) {
+            LV_PROFILER_DRAW_BEGIN_TAG("wait_for_finish_cb");
+            LV_PROFILER_DRAW_BEGIN_TAG(main->name);
+            main->wait_for_finish_cb(main);
+            LV_PROFILER_DRAW_END_TAG(main->name);
+            LV_PROFILER_DRAW_END_TAG("wait_for_finish_cb");
+        }
+        unit_draw(main->fallback, layer, &clip, dsc, draw_coords);
+    }
+    else {
+        LV_LOG_WARN("Draw dropped (type %d): no draw unit can draw it", (int)type);
+    }
+
+    if(send_events) {
+        _draw_info.is_sending_event = true;
+        lv_obj_send_event(dsc->obj, LV_EVENT_DRAW_DSC_END, dsc);
+        _draw_info.is_sending_event = false;
     }
 }
 
@@ -820,7 +890,7 @@ static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t)
     /* The event might have changed the coordinates of the descriptor
      * so make sure the draw task is in sync
      * TODO: this can be removed when draw tasks are removed from dispatching */
-    apply_coords_change(t);
+    apply_task_coords_change(t);
 
     /*Put the task back at the end*/
     if(layer->draw_task_head == NULL) {
@@ -835,21 +905,34 @@ static void send_draw_events(lv_layer_t * layer, lv_draw_task_t * t)
     lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_DSC_END, base_dsc);
 }
 
-static void apply_coords_change(lv_draw_task_t * t)
+/**
+ * Keep the image area in line with the coords when they're changed (e.g. in `LV_EVENT_DRAW_DSC_BEGIN`):
+ * if it was the same as the old coords, it becomes the new coords.
+ */
+static void apply_coords_change(lv_draw_dsc_t * dsc, const lv_area_t * old_coords, const lv_area_t * new_coords)
+{
+    if(lv_area_is_equal(old_coords, new_coords)) return;
+
+    if(dsc->type == LV_DRAW_DSC_TYPE_IMAGE || dsc->type == LV_DRAW_DSC_TYPE_LAYER) {
+        lv_draw_image_dsc_t * image_dsc = (lv_draw_image_dsc_t *)dsc;
+        if(lv_area_is_equal(&image_dsc->image_area, old_coords)) {
+            image_dsc->image_area = *new_coords;
+        }
+    }
+}
+
+static void apply_task_coords_change(lv_draw_task_t * t)
 {
     LV_ASSERT(t != NULL);
     const lv_area_t * old_coords = &t->area;
-    const lv_area_t * coords = get_dsc_coords(t);
+    const lv_area_t * coords = get_dsc_coords(t->draw_dsc);
     if(coords == NULL || lv_area_is_equal(coords, old_coords)) return;
 
-    if(t->type == LV_DRAW_DSC_TYPE_IMAGE || t->type == LV_DRAW_DSC_TYPE_LAYER) {
-        lv_draw_image_dsc_t * image_dsc = t->draw_dsc;
-        if(lv_area_is_equal(&image_dsc->image_area, old_coords)) {
-            image_dsc->image_area = *coords;
-        }
+    apply_coords_change(t->draw_dsc, old_coords, coords);
 
+    if(t->type == LV_DRAW_DSC_TYPE_IMAGE || t->type == LV_DRAW_DSC_TYPE_LAYER) {
         /*The transformed area depends on the size, so compute it again*/
-        lv_draw_image_get_transformed_area(&t->_real_area, image_dsc, coords);
+        lv_draw_image_get_transformed_area(&t->_real_area, t->draw_dsc, coords);
         t->area = *coords;
         return;
     }
@@ -863,35 +946,44 @@ static void apply_coords_change(lv_draw_task_t * t)
 }
 
 /**
- * Get the area of a draw task's descriptor, for the types that are drawn to an area.
- * @param t         the draw task
+ * Get the area of a draw descriptor, for the types that are drawn to an area.
+ * @param dsc       the draw descriptor, with its `type` set
  * @return          the `coords` of the draw descriptor, or NULL if its geometry is in other fields (e.g. lines)
  */
-static lv_area_t * get_dsc_coords(lv_draw_task_t * t)
+static lv_area_t * get_dsc_coords(lv_draw_dsc_t * dsc)
 {
-    switch(t->type) {
+    LV_ASSERT(dsc != NULL);
+    switch(dsc->type) {
         case LV_DRAW_DSC_TYPE_FILL:
-            return &((lv_draw_fill_dsc_t *)t->draw_dsc)->coords;
+            return &((lv_draw_fill_dsc_t *)dsc)->coords;
         case LV_DRAW_DSC_TYPE_BORDER:
-            return &((lv_draw_border_dsc_t *)t->draw_dsc)->coords;
+            return &((lv_draw_border_dsc_t *)dsc)->coords;
         case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-            return &((lv_draw_box_shadow_dsc_t *)t->draw_dsc)->coords;
+            return &((lv_draw_box_shadow_dsc_t *)dsc)->coords;
         case LV_DRAW_DSC_TYPE_LETTER:
-            return &((lv_draw_letter_dsc_t *)t->draw_dsc)->coords;
+            return &((lv_draw_letter_dsc_t *)dsc)->coords;
         case LV_DRAW_DSC_TYPE_LABEL:
-            return &((lv_draw_label_dsc_t *)t->draw_dsc)->coords;
+            return &((lv_draw_label_dsc_t *)dsc)->coords;
         case LV_DRAW_DSC_TYPE_IMAGE:
         case LV_DRAW_DSC_TYPE_LAYER:
-            return &((lv_draw_image_dsc_t *)t->draw_dsc)->coords;
+            return &((lv_draw_image_dsc_t *)dsc)->coords;
         case LV_DRAW_DSC_TYPE_BLUR:
-            return &((lv_draw_blur_dsc_t *)t->draw_dsc)->coords;
+            return &((lv_draw_blur_dsc_t *)dsc)->coords;
 #if LV_USE_3DTEXTURE
         case LV_DRAW_DSC_TYPE_3D:
-            return &((lv_draw_3d_dsc_t *)t->draw_dsc)->coords;
+            return &((lv_draw_3d_dsc_t *)dsc)->coords;
 #endif
-        default:
+        case LV_DRAW_DSC_TYPE_NONE:
+        case LV_DRAW_DSC_TYPE_LINE:
+        case LV_DRAW_DSC_TYPE_ARC:
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
+#if LV_USE_VECTOR_GRAPHIC
+        case LV_DRAW_DSC_TYPE_VECTOR:
+#endif
             return NULL;
     }
+    return NULL;
 }
 
 /**
@@ -1022,74 +1114,154 @@ static void route_task(lv_draw_task_t * t)
 
 static bool unit_takes_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
 {
-    LV_PROFILER_DRAW_BEGIN_TAG("can_draw");
-    LV_PROFILER_DRAW_BEGIN_TAG(draw_unit->name);
-    bool can_draw = unit_can_draw(draw_unit, t);
-    LV_PROFILER_DRAW_END_TAG(draw_unit->name);
-    LV_PROFILER_DRAW_END_TAG("can_draw");
+    bool can_draw = unit_can_draw(draw_unit, t->target_layer, t->draw_dsc);
 
     if(can_draw) t->preferred_draw_unit_id = draw_unit->id;
     return can_draw;
 }
 
-static bool unit_can_draw(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
+static bool unit_can_draw(lv_draw_unit_t * draw_unit, lv_layer_t * layer, lv_draw_dsc_t * dsc)
+{
+    LV_PROFILER_DRAW_BEGIN_TAG("can_draw");
+    LV_PROFILER_DRAW_BEGIN_TAG(draw_unit->name);
+    bool can_draw = unit_can_draw_type(draw_unit, layer, dsc);
+    LV_PROFILER_DRAW_END_TAG(draw_unit->name);
+    LV_PROFILER_DRAW_END_TAG("can_draw");
+    return can_draw;
+}
+
+static bool unit_can_draw_type(lv_draw_unit_t * draw_unit, lv_layer_t * layer, lv_draw_dsc_t * dsc)
 {
     const lv_draw_unit_draw_cbs_t * cbs = draw_unit->draw_cbs;
     if(cbs == NULL) return false;
 
-    lv_layer_t * layer = t->target_layer;
-    const void * dsc = t->draw_dsc;
-
-    switch(t->type) {
+    switch(dsc->type) {
         case LV_DRAW_DSC_TYPE_NONE:
             return false;
         case LV_DRAW_DSC_TYPE_FILL:
-            if(cbs->can_draw_fill_cb) return cbs->can_draw_fill_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_fill_cb) return cbs->can_draw_fill_cb(draw_unit, layer, (lv_draw_fill_dsc_t *)dsc);
             return cbs->draw_fill_cb != NULL;
         case LV_DRAW_DSC_TYPE_BORDER:
-            if(cbs->can_draw_border_cb) return cbs->can_draw_border_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_border_cb) return cbs->can_draw_border_cb(draw_unit, layer, (lv_draw_border_dsc_t *)dsc);
             return cbs->draw_border_cb != NULL;
         case LV_DRAW_DSC_TYPE_BOX_SHADOW:
-            if(cbs->can_draw_box_shadow_cb) return cbs->can_draw_box_shadow_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_box_shadow_cb) return cbs->can_draw_box_shadow_cb(draw_unit, layer, (lv_draw_box_shadow_dsc_t *)dsc);
             return cbs->draw_box_shadow_cb != NULL;
         case LV_DRAW_DSC_TYPE_LETTER:
-            if(cbs->can_draw_letter_cb) return cbs->can_draw_letter_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_letter_cb) return cbs->can_draw_letter_cb(draw_unit, layer, (lv_draw_letter_dsc_t *)dsc);
             return cbs->draw_letter_cb != NULL;
         case LV_DRAW_DSC_TYPE_LABEL:
-            if(cbs->can_draw_label_cb) return cbs->can_draw_label_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_label_cb) return cbs->can_draw_label_cb(draw_unit, layer, (lv_draw_label_dsc_t *)dsc);
             return cbs->draw_label_cb != NULL;
         case LV_DRAW_DSC_TYPE_IMAGE:
-            if(cbs->can_draw_image_cb) return cbs->can_draw_image_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_image_cb) return cbs->can_draw_image_cb(draw_unit, layer, (lv_draw_image_dsc_t *)dsc);
             return cbs->draw_image_cb != NULL;
         case LV_DRAW_DSC_TYPE_LAYER:
-            if(cbs->can_draw_layer_cb) return cbs->can_draw_layer_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_layer_cb) return cbs->can_draw_layer_cb(draw_unit, layer, (lv_draw_image_dsc_t *)dsc);
             return cbs->draw_layer_cb != NULL;
         case LV_DRAW_DSC_TYPE_LINE:
-            if(cbs->can_draw_line_cb) return cbs->can_draw_line_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_line_cb) return cbs->can_draw_line_cb(draw_unit, layer, (lv_draw_line_dsc_t *)dsc);
             return cbs->draw_line_cb != NULL;
         case LV_DRAW_DSC_TYPE_ARC:
-            if(cbs->can_draw_arc_cb) return cbs->can_draw_arc_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_arc_cb) return cbs->can_draw_arc_cb(draw_unit, layer, (lv_draw_arc_dsc_t *)dsc);
             return cbs->draw_arc_cb != NULL;
         case LV_DRAW_DSC_TYPE_TRIANGLE:
-            if(cbs->can_draw_triangle_cb) return cbs->can_draw_triangle_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_triangle_cb) return cbs->can_draw_triangle_cb(draw_unit, layer, (lv_draw_triangle_dsc_t *)dsc);
             return cbs->draw_triangle_cb != NULL;
         case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
-            if(cbs->can_draw_mask_rect_cb) return cbs->can_draw_mask_rect_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_mask_rect_cb) return cbs->can_draw_mask_rect_cb(draw_unit, layer, (lv_draw_mask_rect_dsc_t *)dsc);
             return cbs->draw_mask_rect_cb != NULL;
         case LV_DRAW_DSC_TYPE_BLUR:
-            if(cbs->can_draw_blur_cb) return cbs->can_draw_blur_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_blur_cb) return cbs->can_draw_blur_cb(draw_unit, layer, (lv_draw_blur_dsc_t *)dsc);
             return cbs->draw_blur_cb != NULL;
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_DSC_TYPE_VECTOR:
-            if(cbs->can_draw_vector_cb) return cbs->can_draw_vector_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_vector_cb) return cbs->can_draw_vector_cb(draw_unit, layer, (lv_draw_vector_dsc_t *)dsc);
             return cbs->draw_vector_cb != NULL;
 #endif
 #if LV_USE_3DTEXTURE
         case LV_DRAW_DSC_TYPE_3D:
-            if(cbs->can_draw_3d_cb) return cbs->can_draw_3d_cb(draw_unit, layer, dsc);
+            if(cbs->can_draw_3d_cb) return cbs->can_draw_3d_cb(draw_unit, layer, (lv_draw_3d_dsc_t *) dsc);
             return cbs->draw_3d_cb != NULL;
 #endif
     }
 
     return false;
+}
+
+
+static void unit_draw(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      lv_draw_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_ASSERT(draw_unit != NULL);
+    const lv_draw_unit_draw_cbs_t * cbs = draw_unit->draw_cbs;
+    LV_ASSERT(cbs != NULL);
+
+    LV_PROFILER_DRAW_BEGIN_TAG(draw_unit->name);
+    switch(dsc->type) {
+        case LV_DRAW_DSC_TYPE_NONE:
+            break;
+        case LV_DRAW_DSC_TYPE_FILL:
+            LV_ASSERT(cbs->draw_fill_cb != NULL);
+            cbs->draw_fill_cb(draw_unit, layer, clip_area, (lv_draw_fill_dsc_t *)dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_BORDER:
+            LV_ASSERT(cbs->draw_border_cb != NULL);
+            cbs->draw_border_cb(draw_unit, layer, clip_area, (lv_draw_border_dsc_t *)dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_BOX_SHADOW:
+            LV_ASSERT(cbs->draw_box_shadow_cb != NULL);
+            cbs->draw_box_shadow_cb(draw_unit, layer, clip_area, (lv_draw_box_shadow_dsc_t *)dsc,
+                                    coords);
+            break;
+        case LV_DRAW_DSC_TYPE_LETTER:
+            LV_ASSERT(cbs->draw_letter_cb != NULL);
+            cbs->draw_letter_cb(draw_unit, layer, clip_area, (lv_draw_letter_dsc_t *)dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_LABEL:
+            LV_ASSERT(cbs->draw_label_cb != NULL);
+            cbs->draw_label_cb(draw_unit, layer, clip_area, (lv_draw_label_dsc_t *)dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_IMAGE:
+            LV_ASSERT(cbs->draw_image_cb != NULL);
+            cbs->draw_image_cb(draw_unit, layer, clip_area, (lv_draw_image_dsc_t *)dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_LAYER:
+            LV_ASSERT(cbs->draw_layer_cb != NULL);
+            cbs->draw_layer_cb(draw_unit, layer, clip_area, (lv_draw_image_dsc_t *)dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_LINE:
+            LV_ASSERT(cbs->draw_line_cb != NULL);
+            cbs->draw_line_cb(draw_unit, layer, clip_area, (lv_draw_line_dsc_t *)dsc);
+            break;
+        case LV_DRAW_DSC_TYPE_ARC:
+            LV_ASSERT(cbs->draw_arc_cb != NULL);
+            cbs->draw_arc_cb(draw_unit, layer, clip_area, (lv_draw_arc_dsc_t *)dsc, coords);
+            break;
+        case LV_DRAW_DSC_TYPE_TRIANGLE:
+            LV_ASSERT(cbs->draw_triangle_cb != NULL);
+            cbs->draw_triangle_cb(draw_unit, layer, clip_area, (lv_draw_triangle_dsc_t *)dsc);
+            break;
+        case LV_DRAW_DSC_TYPE_MASK_RECTANGLE:
+            LV_ASSERT(cbs->draw_mask_rect_cb != NULL);
+            cbs->draw_mask_rect_cb(draw_unit, layer, clip_area, (lv_draw_mask_rect_dsc_t *)dsc);
+            break;
+        case LV_DRAW_DSC_TYPE_BLUR:
+            LV_ASSERT(cbs->draw_blur_cb != NULL);
+            cbs->draw_blur_cb(draw_unit, layer, clip_area, (lv_draw_blur_dsc_t *)dsc, coords);
+            break;
+#if LV_USE_VECTOR_GRAPHIC
+        case LV_DRAW_DSC_TYPE_VECTOR:
+            LV_ASSERT(cbs->draw_vector_cb != NULL);
+            cbs->draw_vector_cb(draw_unit, layer, clip_area, (lv_draw_vector_dsc_t *)dsc);
+            break;
+#endif
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_DSC_TYPE_3D:
+            LV_ASSERT(cbs->draw_3d_cb != NULL);
+            cbs->draw_3d_cb(draw_unit, layer, clip_area, (lv_draw_3d_dsc_t *)dsc, coords);
+            break;
+#endif
+    }
+    LV_PROFILER_DRAW_END_TAG(draw_unit->name);
 }
