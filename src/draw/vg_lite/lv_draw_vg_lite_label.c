@@ -322,7 +322,9 @@ static void draw_letter_bitmap(lv_draw_unit_t * draw_unit, const lv_area_t * cli
     vg_lite_matrix_t matrix = u->global_matrix;
     convert_letter_matrix(&matrix, dsc);
 
-    const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, !lv_vg_lite_gpu_premultiplies_alpha_images());
+    const vg_lite_blend_t blend = VG_LITE_BLEND_SRC_OVER;
+    const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa,
+                                                   !lv_vg_lite_gpu_premultiplies_image_color(src_buf->format, blend));
 
     const int32_t clip_offset_x = clipped_area.x1 - image_area.x1;
     const int32_t clip_offset_y = clipped_area.y1 - image_area.y1;
@@ -354,7 +356,7 @@ static void draw_letter_bitmap(lv_draw_unit_t * draw_unit, const lv_area_t * cli
             src_buf,
             &rect,
             &matrix,
-            VG_LITE_BLEND_SRC_OVER,
+            blend,
             color,
             lv_vg_lite_matrix_get_filter(&matrix));
     }
@@ -377,7 +379,7 @@ static void draw_letter_bitmap(lv_draw_unit_t * draw_unit, const lv_area_t * cli
             &path_matrix,
             src_buf,
             &matrix,
-            VG_LITE_BLEND_SRC_OVER,
+            blend,
             VG_LITE_PATTERN_COLOR,
             0,
             color,
