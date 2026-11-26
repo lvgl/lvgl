@@ -35,6 +35,7 @@
  **********************/
 
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t wait_for_finish(lv_draw_unit_t * draw_unit);
 
 static bool is_dest_supported(const lv_layer_t * layer);
 static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
@@ -57,43 +58,66 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 
 static void draw_event_cb(lv_event_t * e);
 
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+static void draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
+static void draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
-
+static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_line_dsc_t * dsc);
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc);
+static void draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_mask_rect_dsc_t * dsc);
+static void draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
+#if LV_USE_VECTOR_GRAPHIC
+static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_vector_dsc_t * dsc);
+#endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_vg_lite_fill,
+    .draw_fill_cb = draw_fill,
     .can_draw_fill_cb = can_draw_fill,
-    .draw_border_cb = lv_draw_vg_lite_border,
+    .draw_border_cb = draw_border,
     .can_draw_border_cb = can_draw_border,
-    .draw_box_shadow_cb = lv_draw_vg_lite_box_shadow,
+    .draw_box_shadow_cb = draw_box_shadow,
     .can_draw_box_shadow_cb = can_draw_box_shadow,
-    .draw_letter_cb = lv_draw_vg_lite_letter,
+    .draw_letter_cb = draw_letter,
     .can_draw_letter_cb = can_draw_letter,
-    .draw_label_cb = lv_draw_vg_lite_label,
+    .draw_label_cb = draw_label,
     .can_draw_label_cb = can_draw_label,
     .draw_image_cb = draw_image,
     .can_draw_image_cb = can_draw_image,
-    .draw_layer_cb = lv_draw_vg_lite_layer,
+    .draw_layer_cb = draw_layer,
     .can_draw_layer_cb = can_draw_layer,
-    .draw_arc_cb = lv_draw_vg_lite_arc,
+    .draw_arc_cb = draw_arc,
     .can_draw_arc_cb = can_draw_arc,
     .draw_line_cb = draw_line,
     .can_draw_line_cb = can_draw_line,
-    .draw_triangle_cb = lv_draw_vg_lite_triangle,
+    .draw_triangle_cb = draw_triangle,
     .can_draw_triangle_cb = can_draw_triangle,
-    .draw_mask_rect_cb = lv_draw_vg_lite_mask_rect,
+    .draw_mask_rect_cb = draw_mask_rect,
     .can_draw_mask_rect_cb = can_draw_mask_rect,
-    .draw_blur_cb = lv_draw_vg_lite_blur,
+    .draw_blur_cb = draw_blur,
     .can_draw_blur_cb = can_draw_blur,
 #if LV_USE_VECTOR_GRAPHIC
-    .draw_vector_cb = lv_draw_vg_lite_vector,
+    .draw_vector_cb = draw_vector,
     .can_draw_vector_cb = can_draw_vector,
 #endif
 };
@@ -123,6 +147,7 @@ void lv_draw_vg_lite_init(void)
 
     lv_draw_vg_lite_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_vg_lite_unit_t));
     unit->base_unit.dispatch_cb = draw_dispatch;
+    unit->base_unit.wait_for_finish_cb = wait_for_finish;
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.draw_cbs = &draw_cbs;
@@ -169,14 +194,11 @@ static bool check_arc_is_supported(const lv_draw_arc_dsc_t * dsc)
     return lv_vg_lite_is_src_cf_supported(header.cf);
 }
 
-static void draw_execute(lv_draw_vg_lite_unit_t * u)
+/**
+ * Make `layer` the target of the next VG-Lite draws: target buffer, global matrix and scissor
+ */
+static void draw_begin(lv_draw_vg_lite_unit_t * u, lv_layer_t * layer)
 {
-    lv_draw_task_t * t = u->task_act;
-    lv_layer_t * layer = t->target_layer;
-
-    /* remember draw unit for access to unit's context */
-    t->draw_unit = (lv_draw_unit_t *)u;
-
     lv_vg_lite_buffer_from_draw_buf(&u->target_buffer, layer->draw_buf);
 
     /* VG-Lite will output premultiplied image, set the flag correspondingly. */
@@ -189,7 +211,7 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     vg_lite_matrix_t layer_matrix;
-    lv_vg_lite_matrix(&layer_matrix, &t->matrix);
+    lv_vg_lite_matrix(&layer_matrix, &layer->matrix);
     lv_vg_lite_matrix_multiply(&u->global_matrix, &layer_matrix);
 #endif
 
@@ -199,22 +221,119 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
         lv_area_move(&scissor_area, -layer->buf_area.x1, -layer->buf_area.y1);
         lv_vg_lite_set_scissor_area(u, &scissor_area);
     }
+}
 
-    lv_draw_unit_draw_task(t->draw_unit, t);
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_fill(draw_unit, layer, clip_area, dsc, coords);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
 
-    lv_vg_lite_flush(u);
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_border(draw_unit, layer, clip_area, dsc, coords);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+static void draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_box_shadow(draw_unit, layer, clip_area, dsc, coords);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+static void draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_letter(draw_unit, layer, clip_area, dsc, coords);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_label(draw_unit, layer, clip_area, dsc, coords);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
 }
 
 static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
     lv_draw_vg_lite_img(draw_unit, layer, clip_area, dsc, coords, false);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_layer(draw_unit, layer, clip_area, dsc, coords);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_arc(draw_unit, layer, clip_area, dsc, coords);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
 }
 
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_line_dsc_t * dsc)
 {
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
     lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_vg_lite_line, draw_unit);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_triangle(draw_unit, layer, clip_area, dsc);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+static void draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_mask_rect_dsc_t * dsc)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_mask_rect(draw_unit, layer, clip_area, dsc);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+static void draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_blur(draw_unit, layer, clip_area, dsc, coords);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+
+#if LV_USE_VECTOR_GRAPHIC
+static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_vector_dsc_t * dsc)
+{
+    draw_begin((lv_draw_vg_lite_unit_t *)draw_unit, layer);
+    lv_draw_vg_lite_vector(draw_unit, layer, clip_area, dsc);
+    lv_vg_lite_flush((lv_draw_vg_lite_unit_t *)draw_unit);
+}
+#endif
+
+static int32_t wait_for_finish(lv_draw_unit_t * draw_unit)
+{
+    /*Wait until the GPU has finished everything submitted so far*/
+    lv_vg_lite_finish((lv_draw_vg_lite_unit_t *)draw_unit);
+    return 0;
 }
 
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
@@ -249,7 +368,20 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     u->task_act = t;
 
-    draw_execute(u);
+    /* remember draw unit for access to unit's context */
+    t->draw_unit = draw_unit;
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /* The draw callbacks read the layer's matrix: use the one the task was created with */
+    lv_matrix_t layer_matrix = layer->matrix;
+    layer->matrix = t->matrix;
+#endif
+
+    lv_draw_unit_draw_task(draw_unit, t);
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    layer->matrix = layer_matrix;
+#endif
 
     u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
