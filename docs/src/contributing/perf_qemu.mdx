@@ -95,7 +95,7 @@ gdb-multiarch -ex 'target remote :1234' <output>/build/cortex-m7-O2/render_rgb56
 ```
 
 LVGL's own [GDB plug-in](/debugging/gdb_plugin) works here as well, and is worth loading
-before inspecting draw tasks, layers or objects.
+before inspecting layers or objects.
 
 **To end a `--gdb` run, press Ctrl-A then X.** Ctrl-C and Ctrl-D do nothing: QEMU runs with
 `-nographic`, which gives it the terminal, and Ctrl-A is its escape key.
