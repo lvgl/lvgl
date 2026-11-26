@@ -17,6 +17,7 @@
 
 #ifdef ESP_PLATFORM
     #include <freertos/atomic.h>
+    #include <esp_idf_version.h>
 #else
     #include <atomic.h>
 #endif
@@ -28,6 +29,15 @@
  *********************/
 
 #define ulMAX_COUNT 10U
+
+/* ESP-IDF does not route the FreeRTOS trace hooks to lv_freertos_task_switch_in/out(),
+ * so read the idle tasks' run time counters instead (ESP-IDF 5.2+). */
+#if defined(ESP_PLATFORM) && CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS && !CONFIG_FREERTOS_SMP && \
+    ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 2, 0)
+    #define LV_FREERTOS_IDLE_FROM_RUN_TIME_STATS 1
+#else
+    #define LV_FREERTOS_IDLE_FROM_RUN_TIME_STATS 0
+#endif
 
 #define globals LV_GLOBAL_DEFAULT()
 
@@ -406,10 +416,42 @@ void lv_freertos_task_switch_out(void)
 }
 
 #if LV_OS_IDLE_PERCENT_CUSTOM == 0
+#if LV_FREERTOS_IDLE_FROM_RUN_TIME_STATS
+uint32_t lv_os_get_idle_percent(void)
+{
+    static configRUN_TIME_COUNTER_TYPE prev_idle;
+    static configRUN_TIME_COUNTER_TYPE prev_total;
+
+    configRUN_TIME_COUNTER_TYPE idle = 0;
+    for(BaseType_t core = 0; core < configNUMBER_OF_CORES; core++) {
+        idle += ulTaskGetIdleRunTimeCounterForCore(core);
+    }
+    configRUN_TIME_COUNTER_TYPE total = portGET_RUN_TIME_COUNTER_VALUE() * configNUMBER_OF_CORES;
+
+    /*Unsigned subtraction stays correct when the counters wrap*/
+    configRUN_TIME_COUNTER_TYPE idle_diff = idle - prev_idle;
+    configRUN_TIME_COUNTER_TYPE total_diff = total - prev_total;
+    prev_idle = idle;
+    prev_total = total;
+
+    if(total_diff == 0) {
+        LV_LOG_WARN("Not enough time elapsed to provide idle percentage");
+        return 0;
+    }
+
+    uint32_t pct = (uint32_t)((uint64_t)idle_diff * 100 / total_diff);
+    return LV_MIN(pct, 100);
+}
+#else
 uint32_t lv_os_get_idle_percent(void)
 {
     if(globals->freertos_non_idle_time_sum + globals->freertos_idle_time_sum == 0) {
+#ifdef ESP_PLATFORM
+        LV_LOG_WARN("Idle time is not tracked. Needs ESP-IDF 5.2+, CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS "
+                    "and a non-SMP kernel, or a custom lv_os_get_idle_percent() (LV_OS_IDLE_PERCENT_CUSTOM)");
+#else
         LV_LOG_WARN("Not enough time elapsed to provide idle percentage");
+#endif
         return 0;
     }
 
@@ -421,7 +463,8 @@ uint32_t lv_os_get_idle_percent(void)
 
     return pct;
 }
-#endif
+#endif /*LV_FREERTOS_IDLE_FROM_RUN_TIME_STATS*/
+#endif /*LV_OS_IDLE_PERCENT_CUSTOM == 0*/
 
 void lv_sleep_ms(uint32_t ms)
 {
