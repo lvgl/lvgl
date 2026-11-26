@@ -73,7 +73,7 @@ void lv_draw_nema_gfx_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, con
 
     nema_vg_set_blend(NEMA_BL_SRC_OVER | NEMA_BLOP_SRC_PREMULT);
 
-    lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, &c);
+    lv_vector_for_each_task(dsc->task_list, task_draw_cb, &c);
 }
 
 /**********************

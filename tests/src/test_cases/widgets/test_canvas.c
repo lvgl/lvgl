@@ -4,10 +4,12 @@
 #include "lv_test_init.h"
 
 #include "unity/unity.h"
+#include "draw/lv_test_deferred_draw_unit.h"
 
 #include <string.h>
 
 static lv_obj_t * g_screen_active;
+static lv_draw_buf_t * g_draw_buf;
 
 void setUp(void)
 {
@@ -16,7 +18,12 @@ void setUp(void)
 
 void tearDown(void)
 {
+    deferred_draw_unit_delete();
     lv_obj_clean(g_screen_active);
+    if(g_draw_buf) {
+        lv_draw_buf_destroy(g_draw_buf);
+        g_draw_buf = NULL;
+    }
 }
 
 static void draw_event_cb(lv_event_t * e)
@@ -408,10 +415,14 @@ void test_canvas_layer_operations(void)
     lv_refr_now(NULL);
     TEST_ASSERT_EQUAL_INT(1, draw_counter);
 
-    /* Test for secondary redrawing */
+    /* Finishing the layer again invalidates the canvas again: draws aren't tracked, so it can't know nothing changed */
     lv_canvas_finish_layer(canvas, &layer);
     lv_refr_now(NULL);
-    TEST_ASSERT_EQUAL_INT(1, draw_counter);
+    TEST_ASSERT_EQUAL_INT(2, draw_counter);
+
+    /* No redraw without a change */
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_INT(2, draw_counter);
 }
 
 void test_canvas_image_operations(void)
@@ -893,6 +904,34 @@ void test_canvas_al88_opa(void)
     lv_canvas_set_px(canvas, 3, 3, lv_color_black(), LV_OPA_20);
     TEST_ASSERT_EQUAL_UINT8(0, px->lumi);
     TEST_ASSERT_EQUAL_UINT8(LV_OPA_20, px->alpha);
+}
+
+void test_canvas_finish_layer_waits_for_the_draw_units(void)
+{
+    lv_obj_t * canvas = lv_canvas_create(g_screen_active);
+    g_draw_buf = lv_draw_buf_create(20, 20, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(g_draw_buf);
+    canvas_draw_buf_reshape(g_draw_buf);
+    lv_canvas_set_draw_buf(canvas, g_draw_buf);
+
+    deferred_draw_unit_create();
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    lv_draw_fill_dsc_t fill_dsc;
+    lv_draw_fill_dsc_init(&fill_dsc);
+    fill_dsc.color = lv_color_hex(0xff0000);
+    lv_area_t area = {0, 0, 19, 19};
+    lv_draw_fill(&layer, &fill_dsc, &area);
+
+    /*The unit only queued the fill*/
+    TEST_ASSERT_TRUE(deferred_draw_unit_has_pending());
+
+    lv_canvas_finish_layer(canvas, &layer);
+
+    /*The buffer can be read once the layer is finished*/
+    TEST_ASSERT_FALSE(deferred_draw_unit_has_pending());
 }
 
 #endif

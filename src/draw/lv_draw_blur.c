@@ -66,16 +66,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_blur(lv_layer_t * layer, const lv_draw_blur_d
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BLUR);
-    if(!t) {
-        LV_LOG_WARN("Failed to create draw task");
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-
-    lv_draw_finalize_task_creation(layer, t);
+    lv_draw_blur_dsc_t local = *dsc;
+    lv_draw_dsc_submit(&local.base, LV_DRAW_DSC_TYPE_BLUR, layer, coords);
     LV_PROFILER_DRAW_END;
 }
 

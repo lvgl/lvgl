@@ -56,6 +56,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static void task_list_delete(lv_ll_t * task_list);
 static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_t * src)
 {
     lv_memcpy(&(dst->fill_dsc), &(src->fill_dsc), sizeof(lv_vector_fill_dsc_t));
@@ -721,7 +722,7 @@ void lv_draw_vector_dsc_delete(lv_draw_vector_dsc_t * dsc)
 
     if(dsc->task_list) {
         lv_ll_t * task_list = dsc->task_list;
-        lv_vector_for_each_destroy_tasks(task_list, NULL, NULL);
+        task_list_delete(task_list);
         dsc->task_list = NULL;
     }
     lv_array_deinit(&(dsc->ctx->stroke_dsc.dash_pattern));
@@ -1045,18 +1046,24 @@ void lv_draw_vector(lv_draw_vector_dsc_t * dsc)
 
     lv_layer_t * layer = dsc->base.layer;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area), LV_DRAW_DSC_TYPE_VECTOR);
-    if(!t) {
-        LV_LOG_WARN("Failed to create draw task");
-        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
-        dsc->task_list = NULL;
-        return;
-    }
-    lv_memcpy(t->draw_dsc, dsc, sizeof(lv_draw_vector_dsc_t));
-    lv_draw_vector_dsc_t * new_dsc = t->draw_dsc;
-    new_dsc->opa = layer->opa;
-    lv_draw_finalize_task_creation(layer, t);
+    lv_draw_vector_dsc_t local = *dsc;
+    local.opa = layer->opa;
+    lv_draw_dsc_submit(&local.base, LV_DRAW_DSC_TYPE_VECTOR, layer, &layer->_clip_area);
+
+    /*The paths have been drawn or dropped: free them so the dsc can collect the next batch*/
+    task_list_delete(dsc->task_list);
     dsc->task_list = NULL;
+}
+
+void lv_vector_for_each_task(const lv_ll_t * task_list, vector_draw_task_cb cb, void * user_data)
+{
+    LV_ASSERT(cb != NULL);
+    if(task_list == NULL) return;
+
+    lv_draw_vector_subtask_t * task;
+    LV_LL_READ(task_list, task) {
+        cb(user_data, task->path, &task->ctx);
+    }
 }
 
 /* draw dsc transform */
@@ -1095,32 +1102,6 @@ void lv_draw_vector_dsc_skew(lv_draw_vector_dsc_t * dsc, float skew_x, float ske
     lv_matrix_skew(&(dsc->ctx->matrix), skew_x, skew_y);
 }
 
-void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * user_data)
-{
-    if(task_list == NULL) return;
-
-    lv_draw_vector_subtask_t * task = lv_ll_get_head(task_list);
-    lv_draw_vector_subtask_t * next_task = NULL;
-
-    while(task != NULL) {
-        next_task = lv_ll_get_next(task_list, task);
-        lv_ll_remove(task_list, task);
-
-        if(cb) {
-            cb(user_data, task->path, &task->ctx);
-        }
-
-        if(task->path) {
-            lv_vector_path_delete(task->path);
-        }
-        lv_array_deinit(&(task->ctx.stroke_dsc.dash_pattern));
-
-        lv_free(task);
-        task = next_task;
-    }
-    lv_free(task_list);
-}
-
 lv_draw_vector_dsc_t * lv_draw_task_get_vector_dsc(lv_draw_task_t * task)
 {
     LV_CHECK_ARG(task != NULL, return NULL);
@@ -1136,4 +1117,23 @@ lv_draw_vector_dsc_t * lv_draw_dsc_get_vector_dsc(lv_draw_dsc_t * dsc)
     return (lv_draw_vector_dsc_t *)dsc;
 }
 
+static void task_list_delete(lv_ll_t * task_list)
+{
+    if(task_list == NULL) return;
+
+    lv_draw_vector_subtask_t * task = lv_ll_get_head(task_list);
+    while(task != NULL) {
+        lv_draw_vector_subtask_t * next_task = lv_ll_get_next(task_list, task);
+        lv_ll_remove(task_list, task);
+
+        if(task->path) {
+            lv_vector_path_delete(task->path);
+        }
+        lv_array_deinit(&(task->ctx.stroke_dsc.dash_pattern));
+
+        lv_free(task);
+        task = next_task;
+    }
+    lv_free(task_list);
+}
 #endif /* LV_USE_VECTOR_GRAPHIC */

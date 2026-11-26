@@ -228,7 +228,7 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_character(lv_layer_t * layer, lv_draw_l
  * @param dsc            pointer to draw descriptor
  * @param point          position of the label
  */
-void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc_t * dsc,
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_letter(lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc,
                                                 const lv_point_t * point);
 
 /**

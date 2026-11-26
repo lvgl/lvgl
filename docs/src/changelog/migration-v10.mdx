@@ -420,6 +420,13 @@ and are not meant to be included directly.
 
 ## Rendering
 
+### Draw functions
+
+- The `lv_draw_*()` functions draw (or hand the drawing to the draw unit) before they return, instead of queuing
+  a draw task. The descriptor and the data it points to (text, points, image source...) only need to be valid
+  during the call; LVGL doesn't copy or free them. The same applies to what an `LV_EVENT_DRAW_DSC_BEGIN` handler
+  puts in the descriptor.
+
 ### Draw events
 
 - `LV_DRAW_TASK_TYPE_MASK_BITMAP` has been removed. No draw task of this type was ever created.
@@ -587,6 +594,9 @@ and are not meant to be included directly.
    my_unit->base_unit.id = MY_DRAW_UNIT_ID;
    my_unit->base_unit.fallback = lv_draw_sw_get_draw_unit(); /* or NULL to drop what it can't draw */
    ```
+
+- A vector draw callback iterates the paths with `lv_vector_for_each_task()` (was
+  `lv_vector_for_each_destroy_tasks()`), which doesn't free them: LVGL frees the list after the draw.
 
 ### Layers
 

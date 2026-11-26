@@ -4,6 +4,7 @@
 #if LV_BUILD_TEST
 
 #include "refr/lv_test_refr.h"
+#include "draw/lv_test_deferred_draw_unit.h"
 
 void setUp(void)
 {
@@ -12,6 +13,7 @@ void setUp(void)
 
 void tearDown(void)
 {
+    deferred_draw_unit_delete();
     refr_disp_delete();
 }
 
@@ -161,6 +163,36 @@ void test_refr_without_flush_cb(void)
     /*Rendering still happens, only the flushing is skipped*/
     TEST_ASSERT_EQUAL_UINT32(0, refr_ctx.flush_cnt);
     ASSERT_PX_EQ(REFR_COLOR_BLACK, refr_buf_px(refr_ctx.buf[0], 30, 30));
+}
+
+static uint32_t flushed_while_pending;
+
+static void pending_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+{
+    if(deferred_draw_unit_has_pending()) flushed_while_pending++;
+    refr_flush_cb(disp, area, px_map);
+}
+
+void test_refr_flush_waits_for_the_draw_units(void)
+{
+    refr_disp_create(64, 64, LV_COLOR_FORMAT_XRGB8888, LV_DISPLAY_RENDER_MODE_PARTIAL, 1, 16);
+    lv_display_set_flush_cb(refr_ctx.disp, pending_flush_cb);
+    refr_screen_set_color(REFR_COLOR_BLACK);
+    refr_rect_create(refr_screen(), 8, 8, 48, 48, REFR_COLOR_RED);
+    refr_frame();
+    refr_log_reset();
+
+    /*Only fills are drawn, so the main unit is never waited for before a fallback draw*/
+    deferred_draw_unit_create();
+    flushed_while_pending = 0;
+    lv_obj_invalidate(refr_screen());
+    refr_frame();
+
+    /*Every chunk is flushed only after the unit finished what it queued for it*/
+    TEST_ASSERT_GREATER_THAN_UINT32(1, refr_ctx.flush_cnt);
+    TEST_ASSERT_GREATER_OR_EQUAL_UINT32(refr_ctx.flush_cnt, deferred_draw_unit_get_fill_cnt());
+    TEST_ASSERT_GREATER_OR_EQUAL_UINT32(refr_ctx.flush_cnt, deferred_draw_unit_get_wait_cnt());
+    TEST_ASSERT_EQUAL_UINT32(0, flushed_while_pending);
 }
 
 #endif /*LV_BUILD_TEST*/

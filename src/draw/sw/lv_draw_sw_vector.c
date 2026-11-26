@@ -542,7 +542,6 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv
 
     lv_draw_buf_t * draw_buf = layer->draw_buf;
     if(draw_buf == NULL) {
-        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
         return;
     }
 
@@ -567,7 +566,6 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv
         new_buf = lv_draw_buf_create(width, height, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED, LV_STRIDE_AUTO);
         if(new_buf == NULL) {
             LV_LOG_WARN("Couldn't allocate a %" LV_PRId32 "x%" LV_PRId32 " buffer for vector graphics", width, height);
-            lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
             return;
         }
         copy_back = cf == LV_COLOR_FORMAT_ARGB8888 && _reads_destination(dsc->task_list);
@@ -585,7 +583,7 @@ void lv_draw_sw_vector(lv_layer_t * layer, const lv_area_t * clip_area, const lv
 
     _tvg_draw_state state = {canvas, layer->partial_y_offset, -layer->buf_area.x1, -layer->buf_area.y1, dsc->opa};
 
-    lv_vector_for_each_destroy_tasks(dsc->task_list, _task_draw_cb, &state);
+    lv_vector_for_each_task(dsc->task_list, _task_draw_cb, &state);
 
     if(tvg_canvas_draw(canvas) == TVG_RESULT_SUCCESS) {
         tvg_canvas_sync(canvas);

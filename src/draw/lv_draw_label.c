@@ -145,24 +145,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
         }
     }
 
-
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_LABEL);
-    if(!t) {
-        LV_LOG_WARN("Failed to create draw task");
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-
-    /*The text is stored in a local variable so malloc memory for it*/
-    if(dsc->text_local) {
-        lv_draw_label_dsc_t * new_dsc = t->draw_dsc;
-        new_dsc->text = lv_strndup(dsc->text, dsc->text_length);
-        LV_ASSERT_MALLOC(new_dsc->text);
-    }
-
-    lv_draw_finalize_task_creation(layer, t);
+    lv_draw_label_dsc_t local = *dsc;
+    lv_draw_dsc_submit(&local.base, LV_DRAW_DSC_TYPE_LABEL, layer, coords);
     LV_PROFILER_DRAW_END;
 }
 
@@ -211,7 +195,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
     LV_PROFILER_DRAW_END;
 }
 
-void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc_t * dsc, const lv_point_t * point)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc,
+                                          const lv_point_t * point)
 {
     LV_CHECK_ARG(layer != NULL, return);
     LV_CHECK_ARG(dsc != NULL, return);
@@ -223,14 +208,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
         return;
     }
 
-    const lv_font_t * font = dsc->font;
-
     LV_PROFILER_DRAW_BEGIN;
     lv_font_glyph_dsc_t g;
+    lv_font_get_glyph_dsc_internal(dsc->font, &g, dsc->unicode, 0);
 
-    lv_font_get_glyph_dsc_internal(font, &g, dsc->unicode, 0);
-
-    font = g.resolved_font ? g.resolved_font : dsc->font;
+    const lv_font_t * font = g.resolved_font ? g.resolved_font : dsc->font;
 
     lv_area_t a;
     a.x1 = point->x;
@@ -238,19 +220,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
     a.x2 = a.x1 + g.adv_w;
     a.y2 = a.y1 + lv_font_get_line_height_internal(font);
 
-    dsc->pivot.x = g.adv_w / 2 ;
-    dsc->pivot.y = font->line_height - font->base_line;
-
-    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_DSC_TYPE_LETTER);
-    if(!t) {
-        LV_LOG_WARN("Failed to create draw task");
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-
-    lv_draw_finalize_task_creation(layer, t);
+    lv_draw_letter_dsc_t local = *dsc;
+    local.pivot.x = g.adv_w / 2;
+    local.pivot.y = font->line_height - font->base_line;
+    lv_draw_dsc_submit(&local.base, LV_DRAW_DSC_TYPE_LETTER, layer, &a);
     LV_PROFILER_DRAW_END;
 }
 
