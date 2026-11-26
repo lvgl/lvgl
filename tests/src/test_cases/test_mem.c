@@ -197,6 +197,37 @@ void test_mem_test(void)
 #endif
 }
 
+void test_memcmp_zero_length(void)
+{
+    const uint8_t a[] = {1};
+    const uint8_t b[] = {2};
+    TEST_ASSERT_EQUAL_INT(0, lv_memcmp(a, b, 0));
+}
+
+void test_memcmp_unsigned_bytes(void)
+{
+    const uint8_t a[] = {0x80};
+    const uint8_t b[] = {0x7f};
+    TEST_ASSERT_GREATER_THAN_INT(0, lv_memcmp(a, b, 1));
+    TEST_ASSERT_LESS_THAN_INT(0, lv_memcmp(b, a, 1));
+}
+
+void test_memcmp_respects_length(void)
+{
+    const uint8_t a[] = {0x11, 0x20};
+    const uint8_t b[] = {0x11, 0x99};
+    TEST_ASSERT_EQUAL_INT(0, lv_memcmp(a, b, 1));
+    TEST_ASSERT_LESS_THAN_INT(0, lv_memcmp(a, b, 2));
+}
+
+void test_memcmp_binary_data(void)
+{
+    const uint8_t a[] = {0, 0x80, 0xff};
+    const uint8_t b[] = {0, 0x80, 0xfe};
+    TEST_ASSERT_GREATER_THAN_INT(0, lv_memcmp(a, b, sizeof(a)));
+    TEST_ASSERT_EQUAL_INT(0, lv_memcmp(a, a, sizeof(a)));
+}
+
 /* #7573: Test memcpy with unaligned addresses */
 void test_memcpy_unaligned(void)
 {
