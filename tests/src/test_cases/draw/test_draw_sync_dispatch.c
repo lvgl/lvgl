@@ -8,7 +8,6 @@
  * pipeline calls the main unit. It's created last, so it's the main unit, and it falls back to the software unit.
  * It refuses the fills of `REFUSED_COLOR`, so that the tests can send a fill to the fallback. */
 
-#define FAKE_UNIT_ID    200
 #define LOG_MAX         64
 #define CANVAS_SIZE     40
 
@@ -73,8 +72,6 @@ static void fake_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
                            const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_UNUSED(draw_unit);
-    /* Allocate the target like real units do, so that a layer drawn only by this unit has a buffer */
-    lv_draw_layer_alloc_buf(layer);
     call_t * c = log_call(CALL_FILL, layer, clip_area, coords);
     if(c) c->color = dsc->color;
 }
@@ -90,7 +87,6 @@ static void fake_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
                             const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_UNUSED(draw_unit);
-    lv_draw_layer_alloc_buf(layer);
     call_t * c = log_call(CALL_IMAGE, layer, clip_area, coords);
     if(c) c->src = dsc->src;
 }
@@ -99,7 +95,6 @@ static void fake_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
                             const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     LV_UNUSED(draw_unit);
-    lv_draw_layer_alloc_buf(layer);
     call_t * c = log_call(CALL_LAYER, layer, clip_area, coords);
     if(c) c->src = dsc->src;
 }
@@ -122,26 +117,11 @@ static int32_t fake_wait_for_finish(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
-/* Draws one task at a time, inline, so that the tests also run on the task pipeline */
-static int32_t fake_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, FAKE_UNIT_ID);
-    if(t == NULL) return LV_DRAW_UNIT_IDLE;
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    lv_draw_unit_draw_task(draw_unit, t);
-    t->state = LV_DRAW_TASK_STATE_FINISHED;
-    lv_draw_dispatch_request();
-    return 1;
-}
-
 static void fake_unit_create(void)
 {
     fake_unit = lv_draw_create_unit(sizeof(lv_draw_unit_t));
     fake_unit->name = "FAKE";
-    fake_unit->id = FAKE_UNIT_ID;
     fake_unit->draw_cbs = &fake_draw_cbs;
-    fake_unit->dispatch_cb = fake_dispatch;
     fake_unit->wait_for_finish_cb = fake_wait_for_finish;
     fake_unit->fallback = lv_draw_sw_get_draw_unit();
 }

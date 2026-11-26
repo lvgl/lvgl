@@ -202,7 +202,6 @@ void test_draw_layer_create_allocates_the_buffer(void)
     TEST_ASSERT_TRUE(g_layer->buffer_owned);
     TEST_ASSERT_EQUAL_INT32(20, g_layer->draw_buf->header.w);
     TEST_ASSERT_EQUAL_INT32(15, g_layer->draw_buf->header.h);
-    TEST_ASSERT_EQUAL_PTR(g_layer->draw_buf->data, lv_draw_layer_alloc_buf(g_layer));
     TEST_ASSERT_EQUAL_UINT32(15 * g_layer->draw_buf->header.stride, layer_memory());
 
     const uint8_t * row = g_layer->draw_buf->data;

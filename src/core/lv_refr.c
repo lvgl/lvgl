@@ -955,7 +955,6 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     layer->_clip_area = *area_p;
     layer->phy_clip_area = *area_p;
     layer->partial_y_offset = y_offset;
-    layer->all_tasks_added = false;
 
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /*In partial mode render this area to the buffer*/
@@ -998,7 +997,6 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
 
     if(tile_cnt == 1) {
         refr_configured_layer(layer);
-        layer->all_tasks_added = true;
     }
     else {
         /* Don't draw to the layers buffer of the display but create smaller dummy layers which are using the
@@ -1025,7 +1023,6 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             lv_draw_layer_init_with_buf(tile_layer, NULL, layer->draw_buf, layer->color_format, &tile_area);
             tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
             refr_configured_layer(tile_layer);
-            tile_layer->all_tasks_added = true;
         }
 
         /*The tiles are drawn: remove them*/
@@ -1033,8 +1030,6 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             lv_draw_layer_deinit(&tile_layers[i]);
         }
         lv_free(tile_layers);
-
-        layer->all_tasks_added = true;
     }
 
     disp_refr->refreshed_area = *area_p;

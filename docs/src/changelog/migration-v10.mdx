@@ -427,6 +427,25 @@ and are not meant to be included directly.
   during the call; LVGL doesn't copy or free them. The same applies to what an `LV_EVENT_DRAW_DSC_BEGIN` handler
   puts in the descriptor.
 
+### Draw tasks
+
+Draw tasks are gone: the draw functions draw before they return (see "Draw functions"), so there is no task list to
+inspect or dispatch.
+
+- `lv_draw_task_t`, `lv_draw_task_state_t`, `lv_draw_task_get_type()`, `lv_draw_task_get_draw_dsc()`,
+  `lv_draw_task_get_area()` and the `lv_draw_task_get_<type>_dsc()` getters have been removed. In draw events, use
+  the descriptor passed to the event (see "Draw events").
+- `lv_draw_add_task()`, `lv_draw_finalize_task_creation()`, `lv_draw_dispatch()`, `lv_draw_dispatch_layer()`,
+  `lv_draw_dispatch_request()`, `lv_draw_dispatch_wait_for_request()`, `lv_draw_get_available_task()`,
+  `lv_draw_get_next_available_task()`, `lv_draw_get_dependent_count()` and `lv_draw_layer_alloc_buf()` have been
+  removed, and so have the `draw_task_head` and `all_tasks_added` fields of `lv_layer_t`.
+- To wait until the draw units have finished drawing (e.g. before reading a buffer), call
+  <ApiLink name="lv_draw_wait_for_finish"/>.
+- Custom draw units: `dispatch_cb`, `LV_DRAW_UNIT_IDLE` and `LV_DRAW_UNIT_NONE` have been removed. A unit implements
+  the callbacks of its `draw_cbs` table, which are called directly with the layer, clip area and descriptor. If it
+  queues work instead of drawing before the callback returns, it copies what it needs and implements
+  `wait_for_finish_cb`; the layer's buffer is allocated when the layer is created.
+
 ### Draw events
 
 - `LV_DRAW_TASK_TYPE_MASK_BITMAP` has been removed. No draw task of this type was ever created.

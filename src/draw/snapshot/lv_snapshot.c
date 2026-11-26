@@ -181,7 +181,6 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
         }
     }
 
-    layer.all_tasks_added = true;
 
     lv_draw_wait_for_finish();
     disp_new->layer_head = layer_old;
