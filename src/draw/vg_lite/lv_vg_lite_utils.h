@@ -141,6 +141,18 @@ uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format);
 
 vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul);
 
+/**
+ * Read the properties of the GPU that the helpers below depend on. Call it once, after the GPU is initialized.
+ */
+void lv_vg_lite_utils_init(void);
+
+/**
+ * Whether the GPU premultiplies the product of the color and an alpha-only (A4, A8) image drawn in
+ * VG_LITE_MULTIPLY_IMAGE_MODE. If it does, that color must be passed to it straight.
+ * @return          true on every chip but GC255
+ */
+bool lv_vg_lite_gpu_premultiplies_alpha_images(void);
+
 void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area);
 
 static inline void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src)

@@ -322,7 +322,7 @@ static void draw_letter_bitmap(lv_draw_unit_t * draw_unit, const lv_area_t * cli
     vg_lite_matrix_t matrix = u->global_matrix;
     convert_letter_matrix(&matrix, dsc);
 
-    const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
+    const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, !lv_vg_lite_gpu_premultiplies_alpha_images());
 
     const int32_t clip_offset_x = clipped_area.x1 - image_area.x1;
     const int32_t clip_offset_y = clipped_area.y1 - image_area.y1;

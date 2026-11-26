@@ -33,6 +33,10 @@
  *      DEFINES
  *********************/
 
+/* A8 layers are copied in VG_LITE_MULTIPLY_IMAGE_MODE: opaque white leaves them unchanged.
+ * Other formats ignore the color. */
+#define ALPHA_IMAGE_COLOR 0xFFFFFFFF
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -126,7 +130,7 @@ void lv_draw_vg_lite_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
 
     /* Replace semantics: every pixel of the temporary buffer comes from the
      * source, uninitialized content must not leak in. */
-    lv_vg_lite_blit(&small_vg_buf, &u->target_buffer, &matrix, VG_LITE_BLEND_NONE, 0,
+    lv_vg_lite_blit(&small_vg_buf, &u->target_buffer, &matrix, VG_LITE_BLEND_NONE, ALPHA_IMAGE_COLOR,
                     VG_LITE_FILTER_BI_LINEAR);
 
     /* The temporary buffer is the source of the next operation */
@@ -166,7 +170,7 @@ void lv_draw_vg_lite_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
         VG_LITE_BLEND_NONE,
         VG_LITE_PATTERN_COLOR,
         0,
-        0,
+        ALPHA_IMAGE_COLOR,
         VG_LITE_FILTER_BI_LINEAR);
 
     lv_vg_lite_path_drop(u, path);
