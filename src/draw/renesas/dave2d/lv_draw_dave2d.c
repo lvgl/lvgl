@@ -35,6 +35,8 @@
  **********************/
 
 static void execute_drawing(lv_draw_dave2d_unit_t * u);
+static void draw_begin(lv_layer_t * layer, const lv_area_t * clip_area);
+static void draw_end(lv_layer_t * layer, const lv_area_t * clip_area);
 #if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
     #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
         static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
@@ -60,8 +62,20 @@ static void lv_draw_buf_dave2d_init_handlers(void);
 static bool lv_draw_dave2d_image_color_format_supported(lv_color_format_t color_format);
 void dave2d_execute_dlist_and_flush(void);
 
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_line_dsc_t * dsc);
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc);
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -72,19 +86,19 @@ static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
  **********************/
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_dave2d_fill,
+    .draw_fill_cb = draw_fill,
     .can_draw_fill_cb = _dave2d_can_draw_fill,
-    .draw_border_cb = lv_draw_dave2d_border,
+    .draw_border_cb = draw_border,
     .can_draw_border_cb = _dave2d_can_draw_border,
-    .draw_label_cb = lv_draw_dave2d_label,
+    .draw_label_cb = draw_label,
     .can_draw_label_cb = _dave2d_can_draw_label,
-    .draw_image_cb = lv_draw_dave2d_image,
+    .draw_image_cb = draw_image,
     .can_draw_image_cb = _dave2d_can_draw_image,
-    .draw_arc_cb = lv_draw_dave2d_arc,
+    .draw_arc_cb = draw_arc,
     .can_draw_arc_cb = _dave2d_can_draw_arc,
     .draw_line_cb = draw_line,
     .can_draw_line_cb = _dave2d_can_draw_line,
-    .draw_triangle_cb = lv_draw_dave2d_triangle,
+    .draw_triangle_cb = draw_triangle,
     .can_draw_triangle_cb = _dave2d_can_draw_triangle,
 };
 
@@ -403,10 +417,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
          */
         draw_dave2d_unit->task_act = t;
         draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-        d2_selectrenderbuffer(_d2_handle, _renderbuffer);
         execute_drawing(draw_dave2d_unit);
-        d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
-        d2_flushframe(_d2_handle);
 
         draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
         draw_dave2d_unit->task_act = NULL;
@@ -463,38 +474,108 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     /* remember draw unit for access to unit's context */
     t->draw_unit = (lv_draw_unit_t *)u;
 
-#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
-#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
-    lv_layer_t * layer = t->target_layer;
-    lv_area_t clipped_area;
-    int32_t x;
-    int32_t y;
-
-    lv_area_intersect(&clipped_area,  &t->area, &t->clip_area);
-
-    x = 0 - t->target_layer->buf_area.x1;
-    y = 0 - t->target_layer->buf_area.y1;
-
-    lv_area_move(&clipped_area, x, y);
-
-    /* Invalidate cache */
-    lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
-#endif
-#endif
-
     lv_draw_unit_draw_task(t->draw_unit, t);
+}
+
+/**
+ * Invalidate the CPU cache of the clip area (where the D-cache is on) and select the main render buffer
+ */
+static void draw_begin(lv_layer_t * layer, const lv_area_t * clip_area)
+{
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
+    lv_area_t buf_area = *clip_area;
+    lv_area_move(&buf_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &buf_area);
+#else
+    LV_UNUSED(layer);
+    LV_UNUSED(clip_area);
+#endif
+#else
+    LV_UNUSED(layer);
+    LV_UNUSED(clip_area);
+#endif
+
+    d2_selectrenderbuffer(_d2_handle, _renderbuffer);
+}
+
+/**
+ * Render the commands and wait for the GPU, then invalidate the CPU cache of the clip area again
+ */
+static void draw_end(lv_layer_t * layer, const lv_area_t * clip_area)
+{
+    d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
+    d2_flushframe(_d2_handle);
 
 #if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
 #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
-    lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
+    lv_area_t buf_area = *clip_area;
+    lv_area_move(&buf_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &buf_area);
+#else
+    LV_UNUSED(layer);
+    LV_UNUSED(clip_area);
 #endif
+#else
+    LV_UNUSED(layer);
+    LV_UNUSED(clip_area);
 #endif
+}
+
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_dave2d_fill(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(layer, clip_area);
+}
+
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_dave2d_border(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(layer, clip_area);
+}
+
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_dave2d_label(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(layer, clip_area);
+}
+
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_dave2d_image(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(layer, clip_area);
+}
+
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_dave2d_arc(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(layer, clip_area);
 }
 
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_line_dsc_t * dsc)
 {
+    draw_begin(layer, clip_area);
     lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_dave2d_line, draw_unit);
+    draw_end(layer, clip_area);
+}
+
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_dave2d_triangle(draw_unit, layer, clip_area, dsc);
+    draw_end(layer, clip_area);
 }
 
 static d2_s32 lv_dave2d_init(void)
