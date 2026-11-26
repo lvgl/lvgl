@@ -41,6 +41,8 @@ Enable <ApiLink name="LV_USE_DRAW_OPENGLES" />
 - **Layer transparency.** Layers that have both transparent pixels and an overall layer opacity do not blend
   correctly
 - **No layer rotation.** Rotated layers are unsupported. Rotated *images* are fine.
+- **Not drawn:** single letters (<ApiLink name="lv_draw_letter" />), rectangle masks, blur and vector graphics.
+- **Display only.** Drawing outside a display refresh, e.g. into a canvas or a snapshot, draws nothing.
 
 [NanoVG](/integration/embedded_linux/draw_units/draw_nanovg) has none of these limitations.
 

@@ -70,18 +70,12 @@ static bool opengles_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
 static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
 static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
 static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc);
-static bool can_draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc);
 static bool can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc);
 static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static bool can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static bool can_draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
 static bool can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
 static bool can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc);
-static bool can_draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
-static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
-#if LV_USE_VECTOR_GRAPHIC
-    static bool can_draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_vector_dsc_t * dsc);
-#endif
 #if LV_USE_3DTEXTURE
     static bool can_draw_3d(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc);
 #endif
@@ -92,8 +86,6 @@ static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv
                         const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
 static void draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                             const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
-static void draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                        const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
 static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
@@ -106,14 +98,6 @@ static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
                       const lv_draw_line_dsc_t * dsc);
 static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                           const lv_draw_triangle_dsc_t * dsc);
-static void draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                           const lv_draw_mask_rect_dsc_t * dsc);
-static void draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                      const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
-#if LV_USE_VECTOR_GRAPHIC
-static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                        const lv_draw_vector_dsc_t * dsc);
-#endif
 
 static unsigned int layer_get_texture(lv_layer_t * layer);
 static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer);
@@ -139,8 +123,6 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .can_draw_border_cb = can_draw_border,
     .draw_box_shadow_cb = draw_box_shadow,
     .can_draw_box_shadow_cb = can_draw_box_shadow,
-    .draw_letter_cb = draw_letter,
-    .can_draw_letter_cb = can_draw_letter,
     .draw_label_cb = draw_label,
     .can_draw_label_cb = can_draw_label,
     .draw_image_cb = draw_image,
@@ -153,14 +135,6 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
     .can_draw_line_cb = can_draw_line,
     .draw_triangle_cb = draw_triangle,
     .can_draw_triangle_cb = can_draw_triangle,
-    .draw_mask_rect_cb = draw_mask_rect,
-    .can_draw_mask_rect_cb = can_draw_mask_rect,
-    .draw_blur_cb = draw_blur,
-    .can_draw_blur_cb = can_draw_blur,
-#if LV_USE_VECTOR_GRAPHIC
-    .draw_vector_cb = draw_vector,
-    .can_draw_vector_cb = can_draw_vector,
-#endif
 #if LV_USE_3DTEXTURE
     .draw_3d_cb = draw_3d,
     .can_draw_3d_cb = can_draw_3d,
@@ -180,7 +154,8 @@ void lv_draw_opengles_init(void)
     lv_draw_opengles_unit_t * draw_opengles_unit = lv_draw_create_unit(sizeof(lv_draw_opengles_unit_t));
     draw_opengles_unit->base_unit.dispatch_cb = dispatch;
     draw_opengles_unit->base_unit.draw_cbs = &draw_cbs;
-    draw_opengles_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
+    /*No software fallback: OpenGL ES draws into textures, drop what it can't draw*/
+    draw_opengles_unit->base_unit.fallback = NULL;
     draw_opengles_unit->base_unit.id = DRAW_UNIT_ID_OPENGLES;
     draw_opengles_unit->base_unit.name = "OPENGLES";
     draw_opengles_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
@@ -397,11 +372,6 @@ static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, 
     return opengles_takes(draw_unit, layer, &dsc->base);
 }
 
-static bool can_draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_letter_dsc_t * dsc)
-{
-    return opengles_takes(draw_unit, layer, &dsc->base);
-}
-
 static bool can_draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_label_dsc_t * dsc)
 {
     return opengles_takes(draw_unit, layer, &dsc->base);
@@ -431,23 +401,6 @@ static bool can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, co
 {
     return opengles_takes(draw_unit, layer, &dsc->base);
 }
-
-static bool can_draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc)
-{
-    return opengles_takes(draw_unit, layer, &dsc->base);
-}
-
-static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc)
-{
-    return opengles_takes(draw_unit, layer, &dsc->base);
-}
-
-#if LV_USE_VECTOR_GRAPHIC
-static bool can_draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_vector_dsc_t * dsc)
-{
-    return opengles_takes(draw_unit, layer, &dsc->base);
-}
-#endif
 
 #if LV_USE_3DTEXTURE
 static bool can_draw_3d(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc)
@@ -816,53 +769,6 @@ static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
 
     draw_cached((lv_draw_opengles_unit_t *)draw_unit, layer, clip_area, &key.base, &coords, &coords, true);
 }
-
-/*Taken but not drawn: the target is a texture, so the SW fallback can't draw them either*/
-
-static void drop_unsupported(const lv_draw_dsc_t * dsc)
-{
-    LV_LOG_ERROR("OpenGLES draw unit does not support tasks of type %d", dsc->type);
-}
-
-static void draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                        const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
-{
-    LV_UNUSED(draw_unit);
-    LV_UNUSED(layer);
-    LV_UNUSED(clip_area);
-    LV_UNUSED(coords);
-    drop_unsupported(&dsc->base);
-}
-
-static void draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                           const lv_draw_mask_rect_dsc_t * dsc)
-{
-    LV_UNUSED(draw_unit);
-    LV_UNUSED(layer);
-    LV_UNUSED(clip_area);
-    drop_unsupported(&dsc->base);
-}
-
-static void draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                      const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
-{
-    LV_UNUSED(draw_unit);
-    LV_UNUSED(layer);
-    LV_UNUSED(clip_area);
-    LV_UNUSED(coords);
-    drop_unsupported(&dsc->base);
-}
-
-#if LV_USE_VECTOR_GRAPHIC
-static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
-                        const lv_draw_vector_dsc_t * dsc)
-{
-    LV_UNUSED(draw_unit);
-    LV_UNUSED(layer);
-    LV_UNUSED(clip_area);
-    drop_unsupported(&dsc->base);
-}
-#endif
 
 static unsigned int layer_get_texture(lv_layer_t * layer)
 {
