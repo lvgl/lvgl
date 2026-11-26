@@ -1207,6 +1207,13 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
     return lv_obj_area_is_visible(obj, &obj_coords);
 }
 
+bool lv_obj_is_rendered(const lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+
+    return obj->rendered;
+}
+
 void lv_obj_set_ext_click_area(lv_obj_t * obj, int32_t size)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
