@@ -999,9 +999,8 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             }
 
             lv_layer_t * tile_layer = &tile_layers[i];
-            lv_draw_layer_init(tile_layer, NULL, layer->color_format, &tile_area);
+            lv_draw_layer_init_with_buf(tile_layer, NULL, layer->draw_buf, layer->color_format, &tile_area);
             tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
-            tile_layer->draw_buf = layer->draw_buf;
             refr_configured_layer(tile_layer);
             tile_layer->all_tasks_added = true;
         }
