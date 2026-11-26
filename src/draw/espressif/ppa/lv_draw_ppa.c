@@ -25,10 +25,7 @@
 
 static bool ppa_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
 static bool ppa_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
-static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-static bool other_unit_busy(const lv_layer_t * layer, const lv_draw_unit_t * self);
 static int32_t ppa_delete(lv_draw_unit_t * draw_unit);
-static void  ppa_execute_drawing(lv_draw_ppa_unit_t * u);
 static void ppa_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area, lv_area_t * buf_area);
 static void ppa_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                           const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
@@ -60,7 +57,6 @@ void lv_draw_ppa_init(void)
     /* Create draw unit */
     lv_draw_buf_ppa_init_handlers();
     lv_draw_ppa_unit_t * draw_ppa_unit = lv_draw_create_unit(sizeof(lv_draw_ppa_unit_t));
-    draw_ppa_unit->base_unit.dispatch_cb  = ppa_dispatch;
     draw_ppa_unit->base_unit.delete_cb    = ppa_delete;
     draw_ppa_unit->base_unit.name         = "ESP_PPA";
     draw_ppa_unit->base_unit.draw_cbs     = &draw_cbs;
@@ -152,48 +148,6 @@ static bool ppa_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, con
 #endif
 }
 
-static bool other_unit_busy(const lv_layer_t * layer, const lv_draw_unit_t * self)
-{
-    lv_draw_task_t * t = layer->draw_task_head;
-    while(t) {
-        if(t->state == LV_DRAW_TASK_STATE_IN_PROGRESS && t->draw_unit != self) return true;
-        t = t->next;
-    }
-    return false;
-}
-
-static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
-    if(u->task_act) {
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    /* Row maintenance would discard another unit's pixels in the same rows */
-    if(other_unit_busy(layer, draw_unit)) {
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_PPA);
-    if(!t || t->preferred_draw_unit_id != DRAW_UNIT_ID_PPA) return LV_DRAW_UNIT_IDLE;
-    if(lv_draw_layer_alloc_buf(layer) == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    u->task_act = t;
-    u->task_act->draw_unit = draw_unit;
-
-    ppa_execute_drawing(u);
-
-    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    u->task_act = NULL;
-    lv_draw_dispatch_request();
-
-    return 1;
-}
-
 static int32_t ppa_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
@@ -202,13 +156,6 @@ static int32_t ppa_delete(lv_draw_unit_t * draw_unit)
     ppa_unregister_client(u->blend_client);
     ppa_unit = NULL;
     return 0;
-}
-
-static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
-{
-    lv_draw_task_t * t = u->task_act;
-
-    lv_draw_unit_draw_task(t->draw_unit, t);
 }
 
 /**

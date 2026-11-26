@@ -34,7 +34,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t wait_for_finish(lv_draw_unit_t * draw_unit);
 
 static bool is_dest_supported(const lv_layer_t * layer);
@@ -146,7 +145,6 @@ void lv_draw_vg_lite_init(void)
     lv_draw_buf_vg_lite_init_handlers();
 
     lv_draw_vg_lite_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_vg_lite_unit_t));
-    unit->base_unit.dispatch_cb = draw_dispatch;
     unit->base_unit.wait_for_finish_cb = wait_for_finish;
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
@@ -334,62 +332,6 @@ static int32_t wait_for_finish(lv_draw_unit_t * draw_unit)
     /*Wait until the GPU has finished everything submitted so far*/
     lv_vg_lite_finish((lv_draw_vg_lite_unit_t *)draw_unit);
     return 0;
-}
-
-static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
-
-    /* Return immediately if it's busy with draw task. */
-    if(u->task_act) {
-        return 0;
-    }
-
-    /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, VG_LITE_DRAW_UNIT_ID);
-
-    /* Return 0 is no selection, some tasks can be supported by other units. */
-    if(!t || t->preferred_draw_unit_id != VG_LITE_DRAW_UNIT_ID) {
-        lv_vg_lite_finish(u);
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    /* Return if target buffer format is not supported. */
-    if(!lv_vg_lite_is_dest_cf_supported(layer->color_format)) {
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(!buf) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    u->task_act = t;
-
-    /* remember draw unit for access to unit's context */
-    t->draw_unit = draw_unit;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    /* The draw callbacks read the layer's matrix: use the one the task was created with */
-    lv_matrix_t layer_matrix = layer->matrix;
-    layer->matrix = t->matrix;
-#endif
-
-    lv_draw_unit_draw_task(draw_unit, t);
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    layer->matrix = layer_matrix;
-#endif
-
-    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    u->task_act = NULL;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-
-    return 1;
 }
 
 static bool is_dest_supported(const lv_layer_t * layer)

@@ -78,7 +78,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t wait_for_finish(lv_draw_unit_t * draw_unit);
 static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
@@ -163,7 +162,6 @@ void lv_draw_nanovg_init(void)
     initialized = true;
 
     lv_draw_nanovg_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_nanovg_unit_t));
-    unit->base_unit.dispatch_cb = draw_dispatch;
     unit->base_unit.wait_for_finish_cb = wait_for_finish;
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
@@ -528,41 +526,6 @@ static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
     lv_draw_buf_flush_cache(draw_buf, NULL);
 
     LV_PROFILER_DRAW_END;
-}
-
-static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
-
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, NANOVG_DRAW_UNIT_ID);
-    if(!t || t->preferred_draw_unit_id != NANOVG_DRAW_UNIT_ID) {
-        lv_nanovg_end_frame(u);
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-
-    /* remember draw unit for access to unit's context */
-    t->draw_unit = draw_unit;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    /* The draw callbacks read the layer's matrix: use the one the task was created with */
-    lv_matrix_t layer_matrix = layer->matrix;
-    layer->matrix = t->matrix;
-#endif
-
-    lv_draw_unit_draw_task(draw_unit, t);
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    layer->matrix = layer_matrix;
-#endif
-
-    t->state = LV_DRAW_TASK_STATE_FINISHED;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-
-    return 1;
 }
 
 static int32_t wait_for_finish(lv_draw_unit_t * draw_unit)

@@ -42,12 +42,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_USE_OS
-    static void render_thread_cb(void * ptr);
-    static int32_t wait_for_finish(lv_draw_unit_t * draw_unit);
-#endif
-
-static void execute_drawing(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
 static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
 static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
@@ -77,12 +71,7 @@ static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv
                         const lv_draw_vector_dsc_t * dsc);
 #endif
 
-static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
-static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -133,13 +122,8 @@ void lv_draw_sw_init(void)
 #endif
 
     lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
-    draw_sw_unit->base_unit.dispatch_cb = dispatch;
     draw_sw_unit->base_unit.draw_cbs = &draw_cbs;
     draw_sw_unit->base_unit.id = DRAW_UNIT_ID_SW;
-#if LV_USE_OS != LV_OS_NONE
-    draw_sw_unit->base_unit.wait_for_finish_cb = wait_for_finish;
-#endif /*LV_USE_OS*/
-    draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     draw_sw_unit->base_unit.name = "SW_NEON";
@@ -155,19 +139,6 @@ void lv_draw_sw_init(void)
     draw_sw_unit->base_unit.name = "SW_CUSTOM";
 #else
     draw_sw_unit->base_unit.name = "SW";
-#endif
-
-#if LV_USE_OS
-    uint32_t i;
-    for(i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
-        lv_draw_sw_thread_dsc_t * thread_dsc = &draw_sw_unit->thread_dscs[i];
-        thread_dsc->idx = i;
-        thread_dsc->draw_unit = (void *) draw_sw_unit;
-        lv_thread_sync_init(&thread_dsc->new_task_sync);
-        lv_thread_sync_init(&thread_dsc->task_done_sync);
-        lv_thread_init(&thread_dsc->thread, "swdraw", LV_DRAW_THREAD_PRIO, render_thread_cb,
-                       LV_DRAW_THREAD_STACK_SIZE, thread_dsc);
-    }
 #endif
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
@@ -190,31 +161,6 @@ void lv_draw_sw_deinit(void)
 
 #if LV_DRAW_SW_COMPLEX == 1
     lv_draw_sw_mask_deinit();
-#endif
-}
-
-static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
-{
-#if LV_USE_OS
-    lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
-
-    uint32_t i;
-    for(i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
-        lv_draw_sw_thread_dsc_t * thread_dsc = &draw_sw_unit->thread_dscs[i];
-
-        LV_LOG_INFO("cancel software rendering thread");
-        thread_dsc->exit_status = true;
-
-        lv_thread_sync_signal(&thread_dsc->new_task_sync);
-        lv_thread_delete(&thread_dsc->thread);
-        lv_thread_sync_delete(&thread_dsc->new_task_sync);
-        lv_thread_sync_delete(&thread_dsc->task_done_sync);
-    }
-
-    return 0;
-#else
-    LV_UNUSED(draw_unit);
-    return 0;
 #endif
 }
 
@@ -288,159 +234,6 @@ static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
     if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) return false;
 
     return cf < LV_COLOR_FORMAT_PROPRIETARY_START;
-}
-
-static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    LV_PROFILER_DRAW_BEGIN;
-    lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
-
-#if LV_USE_OS
-    uint32_t i;
-    uint32_t taken_cnt = 0;
-    /* All idle (couldn't take any tasks): return LV_DRAW_UNIT_IDLE;
-     * All busy: return 0; as 0 tasks were taken
-     * Otherwise return taken_cnt;
-     */
-
-    /*If at least one is busy, it's not all idle*/
-    bool all_idle = true;
-    for(i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
-        if(draw_sw_unit->thread_dscs[i].task_act) {
-            all_idle = false;
-            break;
-        }
-    }
-
-    lv_draw_task_t * t = NULL;
-    for(i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
-        lv_draw_sw_thread_dsc_t * thread_dsc = &draw_sw_unit->thread_dscs[i];
-
-        /*Do nothing if busy*/
-        if(thread_dsc->task_act) continue;
-
-        /*Find an available task. Start from the previously taken task.*/
-        t = lv_draw_get_next_available_task(layer, t, DRAW_UNIT_ID_SW);
-
-        /*If there is not available task don't try other threads as there won't be available
-         *tasks for then either*/
-        if(t == NULL) {
-            LV_PROFILER_DRAW_END;
-            if(all_idle) return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
-            else return taken_cnt;
-        }
-
-        /*Allocate a buffer if not done yet.*/
-        void * buf = lv_draw_layer_alloc_buf(layer);
-        /*Do not return is failed. The other thread might already have a buffer can do something. */
-        if(buf == NULL) {
-            t->state = LV_DRAW_TASK_STATE_FAILED;
-            continue;
-        }
-
-        /*Take the task*/
-        all_idle = false;
-        taken_cnt++;
-        t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-        thread_dsc->task_act = t;
-
-        /*Let the render thread work*/
-        lv_thread_sync_signal(&thread_dsc->new_task_sync);
-    }
-
-    LV_PROFILER_DRAW_END;
-    if(all_idle) return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
-    else return taken_cnt;
-
-#else
-    /*Return immediately if it's busy with draw task*/
-    if(draw_sw_unit->task_act) {
-        LV_PROFILER_DRAW_END;
-        return 0;
-    }
-
-    lv_draw_task_t * t = NULL;
-    t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_SW);
-    if(t == NULL) {
-        LV_PROFILER_DRAW_END;
-        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
-    }
-
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        LV_PROFILER_DRAW_END;
-        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_sw_unit->task_act = t;
-
-    execute_drawing(draw_unit, t);
-    draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    draw_sw_unit->task_act = NULL;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-
-    LV_PROFILER_DRAW_END;
-    return 1;
-#endif
-
-}
-
-#if LV_USE_OS
-static void render_thread_cb(void * ptr)
-{
-    lv_draw_sw_thread_dsc_t * thread_dsc = ptr;
-
-    while(1) {
-        while(thread_dsc->task_act == NULL) {
-            if(thread_dsc->exit_status) {
-                break;
-            }
-            lv_thread_sync_wait(&thread_dsc->new_task_sync);
-        }
-
-        if(thread_dsc->exit_status) {
-            LV_LOG_INFO("ready to exit software rendering thread");
-            break;
-        }
-
-        execute_drawing(thread_dsc->draw_unit, (lv_draw_task_t *)thread_dsc->task_act);
-#if LV_USE_PARALLEL_DRAW_DEBUG
-        parallel_debug_draw(thread_dsc->task_act, thread_dsc->idx);
-#endif
-        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-        thread_dsc->task_act = NULL;
-
-        lv_thread_sync_signal(&thread_dsc->task_done_sync);
-        /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-        lv_draw_dispatch_request();
-
-    }
-
-    LV_LOG_INFO("exit software rendering thread");
-}
-
-static int32_t wait_for_finish(lv_draw_unit_t * draw_unit)
-{
-    lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
-
-    for(uint32_t i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
-        lv_draw_sw_thread_dsc_t * thread_dsc = &draw_sw_unit->thread_dscs[i];
-        while(thread_dsc->task_act) {
-            lv_thread_sync_wait(&thread_dsc->task_done_sync);
-        }
-    }
-    return 0;
-}
-#endif
-static void execute_drawing(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
-{
-    LV_PROFILER_DRAW_BEGIN;
-    lv_draw_unit_draw_task(draw_unit, t);
-    LV_PROFILER_DRAW_END;
 }
 
 static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
@@ -535,52 +328,6 @@ static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv
     lv_draw_sw_vector(layer, clip_area, dsc);
 }
 #endif
-
-#if LV_USE_PARALLEL_DRAW_DEBUG
-static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
-{
-    /*Layers manage it for themselves*/
-    if(t->type != LV_DRAW_DSC_TYPE_LAYER) {
-        lv_area_t draw_area;
-        if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area)) return;
-
-        lv_draw_fill_dsc_t fill_dsc;
-        lv_draw_fill_dsc_init(&fill_dsc);
-        fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
-        fill_dsc.opa = LV_OPA_10;
-        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &draw_area);
-
-        lv_draw_border_dsc_t border_dsc;
-        lv_draw_border_dsc_init(&border_dsc);
-        border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
-        border_dsc.opa = LV_OPA_60;
-        border_dsc.width = 1;
-        lv_draw_sw_border(t->target_layer, &t->clip_area, &border_dsc, &draw_area);
-
-        lv_point_t txt_size;
-        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
-
-        lv_area_t txt_area;
-        txt_area.x1 = draw_area.x1;
-        txt_area.y1 = draw_area.y1;
-        txt_area.x2 = draw_area.x1 + txt_size.x - 1;
-        txt_area.y2 = draw_area.y1 + txt_size.y - 1;
-
-        lv_draw_fill_dsc_init(&fill_dsc);
-        fill_dsc.color = lv_color_white();
-        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &txt_area);
-
-        char buf[8];
-        lv_snprintf(buf, sizeof(buf), "%d", idx);
-        lv_draw_label_dsc_t label_dsc;
-        lv_draw_label_dsc_init(&label_dsc);
-        label_dsc.color = lv_color_black();
-        label_dsc.text = buf;
-        lv_draw_sw_label(t->target_layer, &t->clip_area, &label_dsc, &txt_area);
-    }
-}
-#endif
-
 
 #else /*LV_USE_DRAW_SW*/
 

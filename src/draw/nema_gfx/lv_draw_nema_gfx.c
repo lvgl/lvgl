@@ -47,27 +47,9 @@
  *      TYPEDEFS
  **********************/
 
-#if LV_USE_OS
-/**
- * Structure of pending nema_gfx draw task
- */
-typedef struct _nema_gfx_draw_task_t {
-    lv_draw_task_t * task;
-    bool flushed;
-} nema_gfx_draw_task_t;
-#endif
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-#if LV_USE_OS
-    static void nema_gfx_render_thread_cb(void * ptr);
-#endif
-
-static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u);
-
-static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static void draw_begin(lv_layer_t * layer, const lv_area_t * clip_area);
 static void draw_end(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area);
@@ -153,7 +135,6 @@ void lv_draw_nema_gfx_init(void)
 
     lv_draw_buf_nema_gfx_init_handlers();
 
-    draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
     draw_nema_gfx_unit->base_unit.delete_cb = nema_gfx_delete;
     draw_nema_gfx_unit->base_unit.wait_for_finish_cb = nema_gfx_wait_for_finish;
     draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
@@ -176,11 +157,6 @@ void lv_draw_nema_gfx_init(void)
     /*Bind Command List*/
     nema_cl_bind_circular(&(draw_nema_gfx_unit->cl));
 
-
-#if LV_USE_OS
-    lv_thread_init(&draw_nema_gfx_unit->thread, "nemagfx", LV_DRAW_THREAD_PRIO, nema_gfx_render_thread_cb, 2 * 1024,
-                   draw_nema_gfx_unit);
-#endif
 }
 
 void lv_draw_nema_gfx_deinit(void)
@@ -277,56 +253,6 @@ static bool nema_gfx_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * 
 #else
     return dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE;
 #endif
-}
-
-static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *) draw_unit;
-
-    /* Return immediately if it's busy with draw task. */
-    if(draw_nema_gfx_unit->task_act)
-        return 0;
-
-    /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_NEMA_GFX);
-
-    /* Return 0 is no selection, some tasks can be supported by other units. */
-    if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_NEMA_GFX)
-        return LV_DRAW_UNIT_IDLE;
-
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_nema_gfx_unit->task_act = t;
-
-#if LV_USE_OS
-    /* Let the render thread work. */
-    if(draw_nema_gfx_unit->inited)
-        lv_thread_sync_signal(&draw_nema_gfx_unit->sync);
-#else
-    nema_gfx_execute_drawing(draw_nema_gfx_unit);
-
-    draw_nema_gfx_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    draw_nema_gfx_unit->task_act = NULL;
-
-    /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-    lv_draw_dispatch_request();
-#endif
-
-    return 1;
-}
-
-static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
-{
-    lv_draw_task_t * t = u->task_act;
-    /* remember draw unit for access to unit's context */
-    t->draw_unit = (lv_draw_unit_t *)u;
-
-    lv_draw_unit_draw_task(t->draw_unit, t);
 }
 
 /**
@@ -438,63 +364,10 @@ static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit)
     nema_vg_grad_destroy(draw_nema_gfx_unit->gradient);
 #endif
 
-#if LV_USE_OS
-    lv_draw_nema_gfx_unit_t * _draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *) draw_unit;
-    LV_LOG_INFO("Cancel NemaGFX draw thread.");
-    _draw_nema_gfx_unit->exit_status = true;
-
-    if(_draw_nema_gfx_unit->inited)
-        lv_thread_sync_signal(&_draw_nema_gfx_unit->sync);
-
-    lv_result_t res = lv_thread_delete(&_draw_nema_gfx_unit->thread);
-
-    return res;
-#endif
-
-#if LV_USE_NEMA_VG == 0 && LV_USE_OS == LV_OS_NONE
+#if LV_USE_NEMA_VG == 0
     LV_UNUSED(draw_unit);
 #endif
     return 0;
 }
-
-#if LV_USE_OS
-static void nema_gfx_render_thread_cb(void * ptr)
-{
-    lv_draw_nema_gfx_unit_t * u = ptr;
-
-    lv_thread_sync_init(&u->sync);
-    u->inited = true;
-
-    while(1) {
-        /* Wait for sync if there is no task set. */
-        while(u->task_act == NULL) {
-            if(u->exit_status)
-                break;
-
-            lv_thread_sync_wait(&u->sync);
-        }
-
-        if(u->exit_status) {
-            LV_LOG_INFO("Ready to exit NemaGFX draw thread.");
-            break;
-        }
-
-        if(u->task_act) {
-            nema_gfx_execute_drawing(u);
-        }
-        /* Signal the ready state to dispatcher. */
-        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-        /* Cleanup. */
-        u->task_act = NULL;
-
-        /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-        lv_draw_dispatch_request();
-    }
-
-    u->inited = false;
-    lv_thread_sync_delete(&u->sync);
-    LV_LOG_INFO("Exit NemaGFX draw thread.");
-}
-#endif
 
 #endif

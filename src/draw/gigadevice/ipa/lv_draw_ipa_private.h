@@ -110,7 +110,6 @@ typedef struct {
 
 typedef struct {
     lv_draw_unit_t base_unit;
-    lv_draw_task_t * volatile task_act;
 
     /** Target buffer of the transfer in flight (async only), NULL if none */
     lv_draw_buf_t * pending_buf;

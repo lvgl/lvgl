@@ -55,7 +55,6 @@ typedef struct {
 
 struct _lv_draw_eve_unit_t {
     lv_draw_unit_t base_unit;
-    lv_draw_task_t * task_act;
     lv_display_t * disp;
     lv_draw_eve_ramg_t ramg;
     lv_draw_eve_parameters_t params;

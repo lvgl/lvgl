@@ -41,14 +41,6 @@ extern "C" {
  */
 typedef struct _lv_draw_sifli_epic_unit_t {
     lv_draw_unit_t base_unit;       /**< Base draw unit */
-    lv_draw_task_t * task_act;      /**< Currently active task */
-
-#if LV_USE_SIFLI_EPIC_DRAW_THREAD
-    lv_thread_sync_t sync;          /**< Thread synchronization primitive */
-    lv_thread_t thread;             /**< Render thread */
-    volatile bool inited;           /**< Initialization status */
-    volatile bool exit_status;      /**< Exit status for thread */
-#endif
 } lv_draw_sifli_epic_unit_t;
 
 /**********************

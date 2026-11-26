@@ -64,7 +64,6 @@ static bool opengles_texture_cache_create_cb(cache_data_t * cached_data, void * 
 static void opengles_texture_cache_free_cb(cache_data_t * cached_data, void * user_data);
 static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data_t * lhs, const cache_data_t * rhs);
 
-static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static bool opengles_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc);
 static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
@@ -152,7 +151,6 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
 void lv_draw_opengles_init(void)
 {
     lv_draw_opengles_unit_t * draw_opengles_unit = lv_draw_create_unit(sizeof(lv_draw_opengles_unit_t));
-    draw_opengles_unit->base_unit.dispatch_cb = dispatch;
     draw_opengles_unit->base_unit.draw_cbs = &draw_cbs;
     /*No software fallback: OpenGL ES draws into textures, drop what it can't draw*/
     draw_opengles_unit->base_unit.fallback = NULL;
@@ -319,20 +317,6 @@ static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data
     }
 
     return 0;
-}
-
-static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_OPENGLES);
-    if(t == NULL) return -1;
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    lv_draw_unit_draw_task(draw_unit, t);
-    t->state = LV_DRAW_TASK_STATE_FINISHED;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-    return 1;
 }
 
 static bool opengles_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc)

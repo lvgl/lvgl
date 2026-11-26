@@ -42,23 +42,6 @@ static bool _pxp_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, c
 static bool _pxp_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static bool _pxp_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 
-/*
- * Dispatch a task to the PXP unit.
- * Return 1 if task was dispatched, 0 otherwise (task not supported).
- */
-static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-
-/*
- * Delete the PXP draw unit.
- */
-static int32_t _pxp_delete(lv_draw_unit_t * draw_unit);
-
-#if LV_USE_PXP_DRAW_THREAD
-    static void _pxp_render_thread_cb(void * ptr);
-#endif
-
-static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
-
 static void _pxp_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area);
 #if LV_USE_PARALLEL_DRAW_DEBUG
 static void _pxp_draw_debug(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
@@ -108,16 +91,10 @@ void lv_draw_pxp_init(void)
     lv_draw_buf_pxp_init_handlers();
 
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
-    draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
-    draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
     draw_pxp_unit->base_unit.name = "NXP_PXP";
     draw_pxp_unit->base_unit.draw_cbs = &draw_cbs;
     draw_pxp_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
     draw_pxp_unit->base_unit.id = DRAW_UNIT_ID_PXP;
-
-#if LV_USE_PXP_DRAW_THREAD
-    lv_thread_init(&draw_pxp_unit->thread, "pxpdraw", LV_DRAW_THREAD_PRIO, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
-#endif
 #endif /*LV_USE_DRAW_PXP*/
 }
 
@@ -314,117 +291,6 @@ static bool _pxp_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, 
 
     return _pxp_draw_img_supported(dsc);
 }
-
-static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_pxp_unit_t * draw_pxp_unit = (lv_draw_pxp_unit_t *) draw_unit;
-
-    /* Return immediately if it's busy with draw task. */
-    if(draw_pxp_unit->task_act)
-        return 0;
-
-    /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
-
-    if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
-        return LV_DRAW_UNIT_IDLE;
-
-    if(lv_draw_layer_alloc_buf(layer) == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_pxp_unit->task_act = t;
-
-#if LV_USE_PXP_DRAW_THREAD
-    /* Let the render thread work. */
-    if(draw_pxp_unit->inited)
-        lv_thread_sync_signal(&draw_pxp_unit->sync);
-#else
-    _pxp_execute_drawing(draw_pxp_unit);
-
-    draw_pxp_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    draw_pxp_unit->task_act = NULL;
-
-    /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-    lv_draw_dispatch_request();
-#endif
-
-    return 1;
-}
-
-static int32_t _pxp_delete(lv_draw_unit_t * draw_unit)
-{
-#if LV_USE_PXP_DRAW_THREAD
-    lv_draw_pxp_unit_t * draw_pxp_unit = (lv_draw_pxp_unit_t *) draw_unit;
-
-    LV_LOG_INFO("Cancel PXP draw thread.");
-    draw_pxp_unit->exit_status = true;
-
-    if(draw_pxp_unit->inited)
-        lv_thread_sync_signal(&draw_pxp_unit->sync);
-
-    lv_result_t res = lv_thread_delete(&draw_pxp_unit->thread);
-
-    return res;
-#else
-    LV_UNUSED(draw_unit);
-
-    return 0;
-#endif
-}
-
-static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
-{
-    lv_draw_task_t * t = u->task_act;
-
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    t->draw_unit = &u->base_unit;
-#endif
-
-    lv_draw_unit_draw_task(&u->base_unit, t);
-}
-
-#if LV_USE_PXP_DRAW_THREAD
-static void _pxp_render_thread_cb(void * ptr)
-{
-    lv_draw_pxp_unit_t * u = ptr;
-
-    lv_thread_sync_init(&u->sync);
-    u->inited = true;
-
-    while(1) {
-        /* Wait for sync if there is no task set. */
-        while(u->task_act == NULL) {
-            if(u->exit_status)
-                break;
-
-            lv_thread_sync_wait(&u->sync);
-        }
-
-        if(u->exit_status) {
-            LV_LOG_INFO("Ready to exit PXP draw thread.");
-            break;
-        }
-
-        _pxp_execute_drawing(u);
-
-        /* Signal the ready state to dispatcher. */
-        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-
-        /* Cleanup. */
-        u->task_act = NULL;
-
-        /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-        lv_draw_dispatch_request();
-    }
-
-    u->inited = false;
-    lv_thread_sync_delete(&u->sync);
-    LV_LOG_INFO("Exit PXP draw thread.");
-}
-#endif /*LV_USE_PXP_DRAW_THREAD*/
 
 static void _pxp_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area)
 {

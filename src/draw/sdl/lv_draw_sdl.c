@@ -49,7 +49,6 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static bool sdl_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc);
 static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
@@ -175,7 +174,6 @@ static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * 
 void lv_draw_sdl_init(void)
 {
     lv_draw_sdl_unit_t * draw_sdl_unit = lv_draw_create_unit(sizeof(lv_draw_sdl_unit_t));
-    draw_sdl_unit->base_unit.dispatch_cb = dispatch;
     draw_sdl_unit->base_unit.draw_cbs = &draw_cbs;
     /*No software fallback: SDL draws into textures, drop what it can't draw*/
     draw_sdl_unit->base_unit.fallback = NULL;
@@ -195,29 +193,6 @@ void lv_draw_sdl_init(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_SDL);
-    if(t == NULL) return -1;
-
-    lv_display_t * disp = lv_refr_get_disp_refreshing();
-    if(layer != disp->layer_head && layer->user_data == NULL) {
-        void * buf = lv_draw_layer_alloc_buf(layer);
-        if(buf == NULL) {
-            t->state = LV_DRAW_TASK_STATE_FAILED;
-            return -1;
-        }
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    lv_draw_unit_draw_task(draw_unit, t);
-    t->state = LV_DRAW_TASK_STATE_FINISHED;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-    return 1;
-}
 
 static bool sdl_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc)
 {

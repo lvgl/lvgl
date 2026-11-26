@@ -56,23 +56,9 @@ static bool _g2d_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, c
 static bool _g2d_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 
 /**
- * Dispatch a task to the G2D unit.
- * Return 1 if task was dispatched, 0 otherwise (task not supported).
- */
-static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-
-/**
  * Delete the G2D draw unit.
  */
 static int32_t _g2d_delete(lv_draw_unit_t * draw_unit);
-
-#if LV_USE_G2D_DRAW_THREAD
-    static void _g2d_render_thread_cb(void * ptr);
-
-    static int32_t _g2d_wait_for_finish(lv_draw_unit_t * draw_unit);
-#endif
-
-static void _g2d_execute_drawing(lv_draw_task_t * t);
 
 static void _g2d_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                            const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
@@ -106,24 +92,11 @@ void lv_draw_g2d_init(void)
     lv_draw_buf_g2d_init_handlers();
 #if LV_USE_DRAW_G2D
     lv_draw_g2d_unit_t * draw_g2d_unit = lv_draw_create_unit(sizeof(lv_draw_g2d_unit_t));
-    draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
     draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
     draw_g2d_unit->base_unit.name = "G2D";
     draw_g2d_unit->base_unit.draw_cbs = &draw_cbs;
     draw_g2d_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
     draw_g2d_unit->base_unit.id = DRAW_UNIT_ID_G2D;
-
-#if LV_USE_G2D_DRAW_THREAD
-    draw_g2d_unit->base_unit.wait_for_finish_cb = _g2d_wait_for_finish;
-
-    lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
-    thread_dsc->idx = 0;
-    thread_dsc->draw_unit = (void *) draw_g2d_unit;
-    lv_thread_sync_init(&thread_dsc->new_task_sync);
-    lv_thread_sync_init(&thread_dsc->task_done_sync);
-    lv_thread_init(&thread_dsc->thread, "g2ddraw", LV_DRAW_THREAD_PRIO, _g2d_render_thread_cb, LV_DRAW_THREAD_STACK_SIZE,
-                   thread_dsc);
-#endif
 #endif
     g2d_create_buf_map();
     void * handle;
@@ -247,81 +220,12 @@ static bool _g2d_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, co
 #endif
 }
 
-static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
-
-#if LV_USE_G2D_DRAW_THREAD
-    lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
-
-    /* Return immediately if it's busy with draw task. */
-    if(thread_dsc->task_act)
-        return 0;
-#else
-    /* Return immediately if it's busy with draw task. */
-    if(draw_g2d_unit->task_act)
-        return 0;
-#endif
-
-    /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_G2D);
-
-    if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_G2D)
-        return LV_DRAW_UNIT_IDLE;
-
-    if(lv_draw_layer_alloc_buf(layer) == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    t->draw_unit = draw_unit;
-
-#if LV_USE_G2D_DRAW_THREAD
-    thread_dsc->task_act = t;
-
-    /* Let the render thread work. */
-    lv_thread_sync_signal(&thread_dsc->new_task_sync);
-#else
-    draw_g2d_unit->task_act = t;
-
-    _g2d_execute_drawing(t);
-
-    draw_g2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    draw_g2d_unit->task_act = NULL;
-
-    /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-    lv_draw_dispatch_request();
-#endif
-
-    return 1;
-}
-
 static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
 {
-    lv_result_t res = LV_RESULT_OK;
-
-#if !LV_USE_G2D_DRAW_THREAD
     LV_UNUSED(draw_unit);
-#else
-    lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
-    lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
-    LV_LOG_INFO("Cancel G2D draw thread.");
-    thread_dsc->exit_status = true;
-
-    lv_thread_sync_signal(&thread_dsc->new_task_sync);
-    res = lv_thread_delete(&thread_dsc->thread);
-    lv_thread_sync_delete(&thread_dsc->new_task_sync);
-    lv_thread_sync_delete(&thread_dsc->task_done_sync);
-#endif
     g2d_close(g2d_get_handle());
 
-    return res;
-}
-
-static void _g2d_execute_drawing(lv_draw_task_t * t)
-{
-    lv_draw_unit_draw_task(t->draw_unit, t);
+    return LV_RESULT_OK;
 }
 
 static void _g2d_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
@@ -337,54 +241,5 @@ static void _g2d_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
     lv_draw_buf_invalidate_cache(layer->draw_buf, NULL);
     lv_draw_g2d_img(draw_unit, layer, clip_area, dsc, coords);
 }
-
-#if LV_USE_G2D_DRAW_THREAD
-static void _g2d_render_thread_cb(void * ptr)
-{
-    lv_draw_sw_thread_dsc_t * thread_dsc = ptr;
-
-    while(1) {
-        /* Wait for sync if there is no task set. */
-        while(thread_dsc->task_act == NULL) {
-            if(thread_dsc->exit_status)
-                break;
-
-            lv_thread_sync_wait(&thread_dsc->new_task_sync);
-        }
-
-        if(thread_dsc->exit_status) {
-            LV_LOG_INFO("Ready to exit G2D draw thread.");
-            break;
-        }
-
-        _g2d_execute_drawing(thread_dsc->task_act);
-
-        /* Signal the ready state to dispatcher. */
-        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-
-        /* Cleanup. */
-        thread_dsc->task_act = NULL;
-
-        lv_thread_sync_signal(&thread_dsc->task_done_sync);
-
-        /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-        lv_draw_dispatch_request();
-    }
-
-    LV_LOG_INFO("Exit G2D draw thread.");
-}
-
-static int32_t _g2d_wait_for_finish(lv_draw_unit_t * draw_unit)
-{
-    lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
-    lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
-
-    while(thread_dsc->task_act) {
-        lv_thread_sync_wait(&thread_dsc->task_done_sync);
-    }
-
-    return 0;
-}
-#endif /*LV_USE_G2D_DRAW_THREAD*/
 
 #endif /*LV_USE_DRAW_G2D */
