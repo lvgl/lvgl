@@ -182,7 +182,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
 #endif
 
     dsc->text = letter_buf_char;
-    dsc->text_local = 1;
 
     lv_draw_label(layer, dsc, &a);
     LV_PROFILER_DRAW_END;

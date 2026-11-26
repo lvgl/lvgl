@@ -577,6 +577,9 @@ inspect or dispatch.
    lv_draw_unit_draw_letter(layer, clip_area, glyph_dsc, pos, font, letter, my_draw_glyph_cb, my_user_data);
    ```
 
+- The `text_local` field of <ApiLink name="lv_draw_label_dsc_t"/> has been removed: the text is no longer copied,
+  it only has to be valid during the `lv_draw_label()` call (see "Draw functions"). Remove the lines that set it.
+
 ### Custom draw units
 
 - `evaluate_cb` and the `preference_score` field of the draw tasks have been removed. A draw unit no longer bids for

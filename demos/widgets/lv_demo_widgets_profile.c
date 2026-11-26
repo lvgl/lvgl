@@ -488,7 +488,6 @@ static void slider_event_cb(lv_event_t * e)
             label_dsc.color = lv_color_white();
             label_dsc.font = font_normal;
             label_dsc.text = buf;
-            label_dsc.text_local = 1;
             lv_draw_label(base_dsc->layer, &label_dsc, &txt_area);
         }
     }

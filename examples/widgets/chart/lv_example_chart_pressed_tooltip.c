@@ -56,7 +56,6 @@ static void event_cb(lv_event_t * e)
                 lv_draw_label_dsc_init(&draw_label_dsc);
                 draw_label_dsc.color = lv_color_white();
                 draw_label_dsc.text = buf;
-                draw_label_dsc.text_local = 1;
                 draw_label_dsc.align = LV_TEXT_ALIGN_CENTER;
                 lv_area_t label_area = rect_area;
                 lv_area_set_height(&label_area, lv_font_get_line_height(draw_label_dsc.font));

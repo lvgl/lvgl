@@ -96,10 +96,6 @@ typedef struct {
     /**Some flags to control type setting*/
     lv_text_flag_t flag : 5;
 
-    /**1: malloc a buffer and copy `text` there.
-     * 0: `text` will be valid during rendering.*/
-    uint8_t text_local : 1;
-
     /**Indicate that the text is constant and its pointer can be safely saved e.g. in a cache.*/
     uint8_t text_static : 1;
 

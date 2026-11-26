@@ -812,7 +812,6 @@ static void draw_main(lv_event_t * e)
 
         /*Draw the text*/
         draw_label_dsc_act.text = txt;
-        draw_label_dsc_act.text_local = true;
         draw_label_dsc_act.base.id1 = btn_i;
         lv_draw_label(layer, &draw_label_dsc_act, &btn_area);
     }
