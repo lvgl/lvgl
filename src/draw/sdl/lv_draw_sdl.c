@@ -202,19 +202,12 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(t == NULL) return -1;
 
     lv_display_t * disp = lv_refr_get_disp_refreshing();
-    SDL_Texture * texture = layer_get_texture(layer);
-    if(layer != disp->layer_head && texture == NULL) {
+    if(layer != disp->layer_head && layer->user_data == NULL) {
         void * buf = lv_draw_layer_alloc_buf(layer);
         if(buf == NULL) {
             t->state = LV_DRAW_TASK_STATE_FAILED;
             return -1;
         }
-
-        SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
-        int32_t w = lv_area_get_width(&layer->buf_area);
-        int32_t h = lv_area_get_height(&layer->buf_area);
-        layer->user_data = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
-                                             SDL_TEXTUREACCESS_TARGET, w, h);
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
@@ -520,6 +513,7 @@ static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_
     SDL_RenderCopyEx(renderer, src_texture, NULL, &rect, dsc->rotation / 10, &center, SDL_FLIP_NONE);
 
     SDL_DestroyTexture(src_texture);
+    src_layer->user_data = NULL;
     SDL_RenderSetClipRect(renderer, NULL);
 }
 
@@ -593,6 +587,18 @@ static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
 
 static SDL_Texture * layer_get_texture(lv_layer_t * layer)
 {
+    /*The display's own layer is drawn to the window, it has no texture*/
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
+    if(layer == disp->layer_head) return NULL;
+
+    /*Create the texture of a child layer on its first use*/
+    if(layer->user_data == NULL) {
+        SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
+        int32_t w = lv_area_get_width(&layer->buf_area);
+        int32_t h = lv_area_get_height(&layer->buf_area);
+        layer->user_data = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, w, h);
+    }
+
     return layer->user_data;
 }
 
