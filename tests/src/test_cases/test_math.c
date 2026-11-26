@@ -539,4 +539,14 @@ void test_math_sqr(void)
     }
 }
 
+void test_math_sqrt32_large_values(void)
+{
+    /* The final rounding check used to overflow int32_t just below 2^31 */
+    TEST_ASSERT_EQUAL_INT32(46340, lv_sqrt32(2147441940U));
+    TEST_ASSERT_EQUAL_INT32(46340, lv_sqrt32(2147483647U));
+    TEST_ASSERT_EQUAL_INT32(46341, lv_sqrt32(2147488281U));
+    TEST_ASSERT_EQUAL_INT32(65534, lv_sqrt32(4294836224U));
+    TEST_ASSERT_EQUAL_INT32(65535, lv_sqrt32(4294967295U));
+}
+
 #endif
