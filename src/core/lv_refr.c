@@ -1028,15 +1028,9 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             tile_layer->all_tasks_added = true;
         }
 
-
-        /*Wait until all tiles are ready and destroy remove them*/
+        /*The tiles are drawn: remove them*/
         for(i = 0; i < tile_cnt; i++) {
-            lv_layer_t * tile_layer = &tile_layers[i];
-            while(tile_layer->draw_task_head) {
-                lv_draw_dispatch_wait_for_request();
-                lv_draw_dispatch();
-            }
-            lv_draw_layer_deinit(tile_layer);
+            lv_draw_layer_deinit(&tile_layers[i]);
         }
         lv_free(tile_layers);
 
@@ -1461,11 +1455,7 @@ static void draw_buf_flush(lv_display_t * disp)
     /*Flush the rendered content to the display*/
     lv_layer_t * layer = disp->layer_head;
 
-    while(layer->draw_task_head) {
-        lv_draw_dispatch_wait_for_request();
-        lv_draw_dispatch();
-    }
-    /*Units may have queued work (GPU command lists) even after the last task finished*/
+    /*Units may have queued work (GPU command lists) that has to be done before the buffer is sent*/
     lv_draw_wait_for_finish();
 
     /* Every layer must've been drawn*/
