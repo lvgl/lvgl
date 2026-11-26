@@ -256,13 +256,13 @@ static void draw_letter_outline(lv_layer_t * layer, const lv_area_t * clip_area,
     lv_area_set_width(&buf_area, w);
     lv_area_set_height(&buf_area, h);
 
-    stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888);
-    draw_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_ARGB8888, stride);
+    stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
+    draw_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED, stride);
     lv_draw_buf_clear(draw_buf, NULL);
 
     lv_memzero(&glyph_layer, sizeof(lv_layer_t));
     glyph_layer.draw_buf = draw_buf;
-    glyph_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
+    glyph_layer.color_format = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
     glyph_layer.buf_area = buf_area;
     glyph_layer.phy_clip_area = buf_area;
     glyph_layer._clip_area = buf_area;
