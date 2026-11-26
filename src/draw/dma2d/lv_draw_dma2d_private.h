@@ -110,9 +110,12 @@ typedef struct {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * volatile task_act;
 
-    /** Last draw task clipped area, stored here so that we can invalidate
+    /** Target buffer of the transfer in flight (async only), NULL if none */
+    lv_draw_buf_t * pending_buf;
+
+    /** Last clipped area, relative to the buffer, stored here so that we can invalidate
     the cache after the drawing operation is done. This can either happen
-    immediately after the draw operation is done or on the DMA2D IRQ callback */
+    immediately after the draw operation is done or after the DMA2D interrupt */
     lv_area_t last_clipped_area;
 #if LV_DRAW_DMA2D_ASYNC
     lv_thread_sync_t interrupt_signal;

@@ -45,8 +45,15 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t delete_cb(lv_draw_unit_t * draw_unit);
 #if LV_DRAW_DMA2D_ASYNC
     static int32_t wait_finish_cb(lv_draw_unit_t * u);
+    static void wait_transfer(lv_draw_dma2d_unit_t * u);
 #endif
-static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
+static bool draw_begin(lv_draw_dma2d_unit_t * u, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_area_t * coords);
+static void draw_end(lv_draw_dma2d_unit_t * u, lv_layer_t * layer);
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 #if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
     static void zephyr_dma2d_irq_handler(void *);
 #endif
@@ -60,9 +67,9 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
  **********************/
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_dma2d_fill,
+    .draw_fill_cb = draw_fill,
     .can_draw_fill_cb = can_draw_fill,
-    .draw_image_cb = lv_draw_dma2d_image,
+    .draw_image_cb = draw_image,
     .can_draw_image_cb = can_draw_image,
 };
 
@@ -431,38 +438,19 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t->draw_unit = draw_unit;
     draw_dma2d_unit->task_act = t;
 
-    /* Abort rapidly if nothing to do */
-    lv_area_t clipped_coords;
-    if(!lv_area_intersect(&clipped_coords, &t->area, &t->clip_area)) {
-        draw_dma2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-        draw_dma2d_unit->task_act = NULL;
-
-        lv_draw_dispatch_request();
-        return 1;
-    }
-
-    int32_t x = 0 - t->target_layer->buf_area.x1;
-    int32_t y = 0 - t->target_layer->buf_area.y1;
-
-    draw_dma2d_unit->last_clipped_area = clipped_coords;
-    lv_area_move(&draw_dma2d_unit->last_clipped_area, x, y);
-
-    /* Flush cache before drawing. This is a no-op when DMA2D_CACHE is disabled */
-    lv_draw_buf_flush_cache(layer->draw_buf, &draw_dma2d_unit->last_clipped_area);
-
     lv_draw_unit_draw_task(t->draw_unit, t);
 
 #if LV_DRAW_DMA2D_ASYNC
-    return LV_DRAW_UNIT_IDLE;
-#else
-    while(DMA2D->CR & DMA2D_CR_START);
+    /* The task is finished by `wait_finish_cb` once its transfer is done */
+    if(draw_dma2d_unit->pending_buf) return LV_DRAW_UNIT_IDLE;
+#endif
 
-    post_transfer_tasks(draw_dma2d_unit);
+    draw_dma2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
+    draw_dma2d_unit->task_act = NULL;
 
     lv_draw_dispatch_request();
 
     return 1;
-#endif
 }
 
 static int32_t delete_cb(lv_draw_unit_t * draw_unit)
@@ -475,25 +463,87 @@ static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
 {
     lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) draw_unit;
 
-    /* No need to wait if the DMA2D doesn't have task to complete */
-    if(u->task_act == NULL) return 0;
-
-    /* If a DMA2D task has been dispatched, wait its interrupt */
-    lv_thread_sync_wait(&u->interrupt_signal);
+    wait_transfer(u);
 
     /* Then cleanup the DMA2D draw unit to accept a new task */
-    post_transfer_tasks(u);
+    if(u->task_act) {
+        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
+        u->task_act = NULL;
+    }
     return 0;
+}
+
+/**
+ * Wait for the transfer in flight, if any, and invalidate the CPU cache of the area it drew
+ */
+static void wait_transfer(lv_draw_dma2d_unit_t * u)
+{
+    /* No need to wait if no transfer is in flight */
+    if(u->pending_buf == NULL) return;
+
+    /* Wait for the transfer complete interrupt */
+    lv_thread_sync_wait(&u->interrupt_signal);
+
+    /* Invalidate cache after drawing. This is a no-op when DMA2D_CACHE is disabled */
+    lv_draw_buf_invalidate_cache(u->pending_buf, &u->last_clipped_area);
+    u->pending_buf = NULL;
 }
 #endif /*LV_DRAW_DMA2D_ASYNC*/
 
-static void post_transfer_tasks(lv_draw_dma2d_unit_t * u)
+/**
+ * Prepare a transfer: wait for the previous one and write the CPU cache of the drawn area back.
+ * Return false if there is nothing to draw.
+ */
+static bool draw_begin(lv_draw_dma2d_unit_t * u, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_area_t * coords)
 {
-    /* Invalidate cache after drawing. This is a no-op when DMA2D_CACHE is disabled */
-    lv_draw_buf_invalidate_cache(u->task_act->target_layer->draw_buf, &u->last_clipped_area);
+#if LV_DRAW_DMA2D_ASYNC
+    /* The DMA2D runs one transfer at a time */
+    wait_transfer(u);
+#endif
 
-    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    u->task_act = NULL;
+    lv_area_t clipped_coords;
+    if(!lv_area_intersect(&clipped_coords, coords, clip_area)) return false;
+
+    u->last_clipped_area = clipped_coords;
+    lv_area_move(&u->last_clipped_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
+    /* Flush cache before drawing. This is a no-op when DMA2D_CACHE is disabled */
+    lv_draw_buf_flush_cache(layer->draw_buf, &u->last_clipped_area);
+    return true;
+}
+
+/**
+ * Finish a transfer: wait for it (sync) or leave it in flight until the next draw or `wait_finish_cb` (async)
+ */
+static void draw_end(lv_draw_dma2d_unit_t * u, lv_layer_t * layer)
+{
+#if LV_DRAW_DMA2D_ASYNC
+    u->pending_buf = layer->draw_buf;
+#else
+    while(DMA2D->CR & DMA2D_CR_START);
+
+    /* Invalidate cache after drawing. This is a no-op when DMA2D_CACHE is disabled */
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &u->last_clipped_area);
+#endif
+}
+
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) draw_unit;
+    if(!draw_begin(u, layer, clip_area, coords)) return;
+    lv_draw_dma2d_fill(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(u, layer);
+}
+
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) draw_unit;
+    if(!draw_begin(u, layer, clip_area, coords)) return;
+    lv_draw_dma2d_image(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(u, layer);
 }
 
 #endif /*LV_USE_DRAW_DMA2D*/
