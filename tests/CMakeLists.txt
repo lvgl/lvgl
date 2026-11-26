@@ -241,6 +241,7 @@ if(CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL)
 endif()
 
 lvgl_add_test_folder_if(NOT CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL test_cases/public_api)
+lvgl_add_test_folder_if(CONFIG_LV_USE_EVDEV AND CMAKE_SYSTEM_NAME STREQUAL "Linux" test_cases/drivers)
 lvgl_get_test_files(TEST_CASE_FILES)
 
 file(GLOB_RECURSE TEST_HELPERS_FILES src/test_helpers/*.c)
@@ -291,6 +292,11 @@ foreach(test_case_fname ${TEST_CASE_FILES})
         $<TARGET_NAME_IF_EXISTS:lvgl_thorvg>
         $<TARGET_NAME_IF_EXISTS:test_helpers>
     )
+
+    if(test_name STREQUAL "test_evdev" AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        target_link_options(${test_name} PRIVATE
+            -Wl,--wrap=open,--wrap=opendir,--wrap=inotify_add_watch,--wrap=ioctl)
+    endif()
 
     add_test(
         NAME ${test_name}
