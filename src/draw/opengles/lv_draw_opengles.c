@@ -375,12 +375,11 @@ static bool opengles_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
 {
     LV_UNUSED(draw_unit);
     LV_UNUSED(layer);
+    LV_UNUSED(dsc);
 
     /*If not refreshing the display probably it's a canvas rendering
      *which his not supported in OpenGL as it's not a texture.*/
-    if(lv_refr_get_disp_refreshing() == NULL) return false;
-
-    return dsc->user_data == NULL;
+    return lv_refr_get_disp_refreshing() != NULL;
 }
 
 static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc)
