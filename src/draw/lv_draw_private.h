@@ -108,11 +108,6 @@ struct _lv_draw_unit_t {
     lv_draw_unit_t * fallback;
 
     /**
-     * Not used by LVGL.
-     */
-    uint8_t id;
-
-    /**
      * Wait until the unit has finished everything it has queued (e.g. a GPU command list),
      * so that the CPU can read or flush the buffers it drew to.
      * NULL if the unit draws before its draw callbacks return.

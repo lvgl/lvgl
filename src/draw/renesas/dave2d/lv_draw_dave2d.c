@@ -15,7 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define DRAW_UNIT_ID_DAVE2D         4
 /* The amount of tasks exercising pressure to the current to get finished
  * This one is used as the main signal to start to render a block of tasks.
  */
@@ -129,8 +128,6 @@ void lv_draw_dave2d_init(void)
     draw_dave2d_unit->base_unit.name = "DAVE2D";
     draw_dave2d_unit->base_unit.draw_cbs = &draw_cbs;
     draw_dave2d_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_dave2d_unit->base_unit.id = DRAW_UNIT_ID_DAVE2D;
-    draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
 
     result = lv_dave2d_init();
     LV_ASSERT(D2_OK == result);

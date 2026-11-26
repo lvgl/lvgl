@@ -25,7 +25,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_SIFLI_EPIC 11
 
 /**********************
  *      TYPEDEFS
@@ -158,7 +157,6 @@ void lv_draw_sifli_epic_init(void)
     draw_epic_unit->base_unit.name = "SiFli_EPIC";
     draw_epic_unit->base_unit.draw_cbs = &draw_cbs;
     draw_epic_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_epic_unit->base_unit.id = DRAW_UNIT_ID_SIFLI_EPIC;
     draw_epic_unit->base_unit.wait_for_finish_cb = _epic_wait_for_finish;
 
     epic_draw_unit_initialized = true;

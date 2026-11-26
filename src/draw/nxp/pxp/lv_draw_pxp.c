@@ -25,7 +25,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_PXP 3
 
 /**********************
  *      TYPEDEFS
@@ -94,7 +93,6 @@ void lv_draw_pxp_init(void)
     draw_pxp_unit->base_unit.name = "NXP_PXP";
     draw_pxp_unit->base_unit.draw_cbs = &draw_cbs;
     draw_pxp_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_pxp_unit->base_unit.id = DRAW_UNIT_ID_PXP;
 #endif /*LV_USE_DRAW_PXP*/
 }
 

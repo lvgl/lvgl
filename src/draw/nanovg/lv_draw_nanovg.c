@@ -68,7 +68,6 @@
  *      DEFINES
  *********************/
 
-#define NANOVG_DRAW_UNIT_ID 10
 
 /**********************
  *      TYPEDEFS
@@ -168,7 +167,6 @@ void lv_draw_nanovg_init(void)
     unit->base_unit.draw_cbs = &draw_cbs;
     /*No software fallback: drop the descriptors NanoVG can't draw*/
     unit->base_unit.fallback = NULL;
-    unit->base_unit.id = NANOVG_DRAW_UNIT_ID;
     unit->base_unit.name = "NANOVG";
 
     unit->vg = NVG_CTX_CREATE(0);

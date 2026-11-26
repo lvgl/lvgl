@@ -41,7 +41,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_NEMA_GFX 7
 
 /**********************
  *      TYPEDEFS
@@ -140,7 +139,6 @@ void lv_draw_nema_gfx_init(void)
     draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
     draw_nema_gfx_unit->base_unit.draw_cbs = &draw_cbs;
     draw_nema_gfx_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_nema_gfx_unit->base_unit.id = DRAW_UNIT_ID_NEMA_GFX;
 
 #if LV_USE_NEMA_VG
     /*Initialize NemaVG */

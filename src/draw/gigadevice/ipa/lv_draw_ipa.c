@@ -27,7 +27,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_IPA 16
 
 /**********************
  *      TYPEDEFS
@@ -114,7 +113,6 @@ void lv_draw_ipa_init(void)
     draw_ipa_unit->base_unit.name = "IPA";
     draw_ipa_unit->base_unit.draw_cbs = &draw_cbs;
     draw_ipa_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_ipa_unit->base_unit.id = DRAW_UNIT_ID_IPA;
 
 #if LV_DRAW_IPA_ASYNC
     g_unit = draw_ipa_unit;

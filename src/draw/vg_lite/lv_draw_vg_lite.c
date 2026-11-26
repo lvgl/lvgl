@@ -24,7 +24,6 @@
  *      DEFINES
  *********************/
 
-#define VG_LITE_DRAW_UNIT_ID 2
 
 /**********************
  *      TYPEDEFS
@@ -150,7 +149,6 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.draw_cbs = &draw_cbs;
     unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    unit->base_unit.id = VG_LITE_DRAW_UNIT_ID;
     unit->base_unit.name = "VG_LITE";
 
     lv_vg_lite_image_dsc_init(unit);

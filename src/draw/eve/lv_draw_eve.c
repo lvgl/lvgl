@@ -25,7 +25,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_EVE 9
 
 /**********************
  *      TYPEDEFS
@@ -87,7 +86,6 @@ void lv_draw_eve_init(void)
 {
     lv_draw_eve_unit_t * draw_eve_unit = lv_draw_create_unit(sizeof(lv_draw_eve_unit_t));
     draw_eve_unit->base_unit.draw_cbs = &draw_cbs;
-    draw_eve_unit->base_unit.id = DRAW_UNIT_ID_EVE;
     /*EVE has no frame buffer that another unit could draw into*/
     draw_eve_unit->base_unit.fallback = NULL;
 

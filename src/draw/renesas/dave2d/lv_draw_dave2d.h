@@ -60,7 +60,6 @@ extern "C" {
 
 typedef struct {
     lv_draw_unit_t base_unit;
-    uint32_t idx;
     d2_device * d2_handle;
     d2_renderbuffer * renderbuffer;
     d2_renderbuffer * label_renderbuffer;

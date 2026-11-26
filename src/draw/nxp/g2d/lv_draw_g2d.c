@@ -21,7 +21,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_G2D 8
 
 /**
  * Enum name differs depending on g2d version (breaking API change, not handled in g2d.h)
@@ -96,7 +95,6 @@ void lv_draw_g2d_init(void)
     draw_g2d_unit->base_unit.name = "G2D";
     draw_g2d_unit->base_unit.draw_cbs = &draw_cbs;
     draw_g2d_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_g2d_unit->base_unit.id = DRAW_UNIT_ID_G2D;
 #endif
     g2d_create_buf_map();
     void * handle;

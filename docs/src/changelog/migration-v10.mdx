@@ -581,15 +581,14 @@ inspect or dispatch.
 
 - `evaluate_cb` and the `preference_score` field of the draw tasks have been removed. A draw unit no longer bids for
   the tasks; instead it tells whether it can draw a descriptor with the `can_draw_*_cb` callbacks of its `draw_cbs`
-  table (one per descriptor type, `NULL` means it can draw every descriptor of the types it has a draw callback for),
-  and sets its `id`, the ID its `dispatch_cb` looks for in `preferred_draw_unit_id`.
+  table (one per descriptor type, `NULL` means it can draw every descriptor of the types it has a draw callback for).
 - The last created draw unit is the default. Each unit sets its new `fallback` field when it's created; the built-in
-  GPU units set it to the software unit (`NULL` if <ApiLink name="LV_USE_DRAW_SW"/> is disabled). A task goes to the
-  default unit, or to its fallback if the default can't draw it; it never goes to another GPU unit. With several GPU
-  units enabled, only the last created one draws. A unit that leaves `fallback` `NULL` drops the tasks it can't
-  draw.
-- With two GPU units enabled, the default unit may have changed: with DMA2D and NemaGFX, NemaGFX draws (DMA2D gets
-  no draw tasks); with PXP or G2D and VGLite, VGLite draws (PXP and G2D get no draw tasks). What the default unit
+  GPU units set it to the software unit (`NULL` if <ApiLink name="LV_USE_DRAW_SW"/> is disabled). A descriptor goes to
+  the default unit, or to its fallback if the default can't draw it; it never goes to another GPU unit. With several GPU
+  units enabled, only the last created one draws. A unit that leaves `fallback` `NULL` drops the descriptors it
+  can't draw.
+- With two GPU units enabled, the default unit may have changed: with DMA2D and NemaGFX, NemaGFX draws (DMA2D draws
+  nothing); with PXP or G2D and VGLite, VGLite draws (PXP and G2D draw nothing). What the default unit
   can't draw goes to the software unit, not to the other GPU unit.
 
    ```c
@@ -610,7 +609,6 @@ inspect or dispatch.
        .can_draw_fill_cb = NULL, /* can draw every fill */
    };
    my_unit->base_unit.draw_cbs = &my_draw_cbs;
-   my_unit->base_unit.id = MY_DRAW_UNIT_ID;
    my_unit->base_unit.fallback = lv_draw_sw_get_draw_unit(); /* or NULL to drop what it can't draw */
    ```
 

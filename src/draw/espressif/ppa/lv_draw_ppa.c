@@ -17,7 +17,6 @@
 *      DEFINES
 *********************/
 
-#define DRAW_UNIT_ID_PPA         80
 
 /**********************
 *  STATIC PROTOTYPES
@@ -61,7 +60,6 @@ void lv_draw_ppa_init(void)
     draw_ppa_unit->base_unit.name         = "ESP_PPA";
     draw_ppa_unit->base_unit.draw_cbs     = &draw_cbs;
     draw_ppa_unit->base_unit.fallback     = lv_draw_sw_get_draw_unit();
-    draw_ppa_unit->base_unit.id           = DRAW_UNIT_ID_PPA;
 
     /* Register SRM client */
     cfg.oper_type = PPA_OPERATION_SRM;

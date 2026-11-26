@@ -30,7 +30,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_OPENGLES 6
 
 /**********************
  *      TYPEDEFS
@@ -154,7 +153,6 @@ void lv_draw_opengles_init(void)
     draw_opengles_unit->base_unit.draw_cbs = &draw_cbs;
     /*No software fallback: OpenGL ES draws into textures, drop what it can't draw*/
     draw_opengles_unit->base_unit.fallback = NULL;
-    draw_opengles_unit->base_unit.id = DRAW_UNIT_ID_OPENGLES;
     draw_opengles_unit->base_unit.name = "OPENGLES";
     draw_opengles_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
     sizeof(cache_data_t), LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT, (lv_cache_ops_t) {

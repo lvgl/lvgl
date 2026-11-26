@@ -33,7 +33,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define DRAW_UNIT_ID_SW     1
 
 /**********************
  *      TYPEDEFS
@@ -123,7 +122,6 @@ void lv_draw_sw_init(void)
 
     lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
     draw_sw_unit->base_unit.draw_cbs = &draw_cbs;
-    draw_sw_unit->base_unit.id = DRAW_UNIT_ID_SW;
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     draw_sw_unit->base_unit.name = "SW_NEON";

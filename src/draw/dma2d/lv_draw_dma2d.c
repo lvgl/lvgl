@@ -28,7 +28,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_DMA2D 5
 
 /**********************
  *      TYPEDEFS
@@ -108,7 +107,6 @@ void lv_draw_dma2d_init(void)
     draw_dma2d_unit->base_unit.name = "DMA2D";
     draw_dma2d_unit->base_unit.draw_cbs = &draw_cbs;
     draw_dma2d_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_dma2d_unit->base_unit.id = DRAW_UNIT_ID_DMA2D;
 
 #if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;
