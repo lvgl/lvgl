@@ -79,15 +79,45 @@
  **********************/
 
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t wait_for_finish(lv_draw_unit_t * draw_unit);
 static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc);
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 static void draw_event_cb(lv_event_t * e);
 static void gpu_buf_clear_cb(lv_draw_buf_t * draw_buf, const lv_area_t * a, lv_layer_t * layer);
 static void bind_layer_framebuffer(lv_layer_t * layer);
+static void on_layer_changed(lv_layer_t * new_layer);
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+static void draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
+static void draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_line_dsc_t * dsc);
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc);
+static void draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_mask_rect_dsc_t * dsc);
+static void draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
+#if LV_USE_VECTOR_GRAPHIC
+static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_vector_dsc_t * dsc);
+#endif
+#if LV_USE_3DTEXTURE
+static void draw_3d(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                    const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -97,24 +127,24 @@ static lv_draw_nanovg_unit_t * g_unit;
 static lv_draw_buf_handlers_t gpu_draw_buf_handlers;
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_nanovg_fill,
-    .draw_border_cb = lv_draw_nanovg_border,
-    .draw_box_shadow_cb = lv_draw_nanovg_box_shadow,
-    .draw_letter_cb = lv_draw_nanovg_letter,
-    .draw_label_cb = lv_draw_nanovg_label,
+    .draw_fill_cb = draw_fill,
+    .draw_border_cb = draw_border,
+    .draw_box_shadow_cb = draw_box_shadow,
+    .draw_letter_cb = draw_letter,
+    .draw_label_cb = draw_label,
     .draw_image_cb = draw_image,
-    .draw_layer_cb = lv_draw_nanovg_layer,
-    .draw_arc_cb = lv_draw_nanovg_arc,
+    .draw_layer_cb = draw_layer,
+    .draw_arc_cb = draw_arc,
     .draw_line_cb = draw_line,
-    .draw_triangle_cb = lv_draw_nanovg_triangle,
-    .draw_mask_rect_cb = lv_draw_nanovg_mask_rect,
-    .draw_blur_cb = lv_draw_nanovg_blur,
+    .draw_triangle_cb = draw_triangle,
+    .draw_mask_rect_cb = draw_mask_rect,
+    .draw_blur_cb = draw_blur,
     .can_draw_blur_cb = can_draw_blur,
 #if LV_USE_VECTOR_GRAPHIC
-    .draw_vector_cb = lv_draw_nanovg_vector,
+    .draw_vector_cb = draw_vector,
 #endif
 #if LV_USE_3DTEXTURE
-    .draw_3d_cb = lv_draw_nanovg_3d,
+    .draw_3d_cb = draw_3d,
 #endif
 };
 
@@ -134,6 +164,7 @@ void lv_draw_nanovg_init(void)
 
     lv_draw_nanovg_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_nanovg_unit_t));
     unit->base_unit.dispatch_cb = draw_dispatch;
+    unit->base_unit.wait_for_finish_cb = wait_for_finish;
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.draw_cbs = &draw_cbs;
@@ -172,11 +203,31 @@ int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb)
  *   STATIC FUNCTIONS
  **********************/
 
-static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
+/**
+ * Prepare NanoVG to draw on `layer`: bind its framebuffer, start a frame and set the transform and clip area
+ */
+static void draw_begin(lv_draw_nanovg_unit_t * u, lv_layer_t * layer, const lv_area_t * clip_area)
 {
-    /* remember draw unit for access to unit's context */
-    t->draw_unit = (lv_draw_unit_t *)u;
-    lv_layer_t * layer = t->target_layer;
+    if(u->current_layer != layer) {
+        /* Flush any draws still queued for the previous layer before
+         * rebinding to the new layer's FBO. Otherwise those queued draws
+         * get rerouted to the new FBO when nvgEndFrame is eventually
+         * called (and the previous layer ends up missing them). */
+        lv_nanovg_end_frame(u);
+        on_layer_changed(layer);
+        u->current_layer = layer;
+    }
+
+    if(!u->is_started) {
+        const int32_t buf_w = lv_area_get_width(&layer->buf_area);
+        const int32_t buf_h = lv_area_get_height(&layer->buf_area);
+
+        glViewport(0, 0, buf_w, buf_h);
+        LV_PROFILER_DRAW_BEGIN_TAG("nvgBeginFrame");
+        nvgBeginFrame(u->vg, buf_w, buf_h, 1.0f);
+        LV_PROFILER_DRAW_END_TAG("nvgBeginFrame");
+        u->is_started = true;
+    }
 
     lv_matrix_t global_matrix;
     lv_matrix_identity(&global_matrix);
@@ -185,7 +236,7 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     }
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_t layer_matrix = t->matrix;
+    lv_matrix_t layer_matrix = layer->matrix;
     lv_matrix_multiply(&global_matrix, &layer_matrix);
 #endif
 
@@ -197,22 +248,110 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     nvgReset(u->vg);
     lv_nanovg_transform(u->vg, &global_matrix);
 
-    lv_nanovg_set_clip_area(u->vg, &t->clip_area);
+    lv_nanovg_set_clip_area(u->vg, clip_area);
+}
 
-    lv_draw_unit_draw_task(t->draw_unit, t);
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_fill(draw_unit, layer, clip_area, dsc, coords);
+}
+
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_border(draw_unit, layer, clip_area, dsc, coords);
+}
+
+static void draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_box_shadow(draw_unit, layer, clip_area, dsc, coords);
+}
+
+static void draw_letter(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_letter(draw_unit, layer, clip_area, dsc, coords);
+}
+
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_label(draw_unit, layer, clip_area, dsc, coords);
 }
 
 static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                        const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
     lv_draw_nanovg_image(draw_unit, layer, clip_area, dsc, coords, -1);
+}
+
+static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_layer(draw_unit, layer, clip_area, dsc, coords);
+}
+
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_arc(draw_unit, layer, clip_area, dsc, coords);
 }
 
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_line_dsc_t * dsc)
 {
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
     lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_nanovg_line, draw_unit);
 }
+
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_triangle(draw_unit, layer, clip_area, dsc);
+}
+
+static void draw_mask_rect(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_mask_rect_dsc_t * dsc)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_mask_rect(draw_unit, layer, clip_area, dsc);
+}
+
+static void draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_blur(draw_unit, layer, clip_area, dsc, coords);
+}
+
+#if LV_USE_VECTOR_GRAPHIC
+static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_vector_dsc_t * dsc)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_vector(draw_unit, layer, clip_area, dsc);
+}
+#endif
+
+#if LV_USE_3DTEXTURE
+static void draw_3d(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                    const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin((lv_draw_nanovg_unit_t *)draw_unit, layer, clip_area);
+    lv_draw_nanovg_3d(draw_unit, layer, clip_area, dsc, coords);
+}
+#endif
 
 static void bind_layer_framebuffer(lv_layer_t * layer)
 {
@@ -401,30 +540,22 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
     }
 
-    if(u->current_layer != layer) {
-        /* Flush any draws still queued for the previous layer before
-         * rebinding to the new layer's FBO. Otherwise those queued draws
-         * get rerouted to the new FBO when nvgEndFrame is eventually
-         * called (and the previous layer ends up missing them). */
-        lv_nanovg_end_frame(u);
-        on_layer_changed(layer);
-        u->current_layer = layer;
-    }
-
-    if(!u->is_started) {
-        const int32_t buf_w = lv_area_get_width(&layer->buf_area);
-        const int32_t buf_h = lv_area_get_height(&layer->buf_area);
-
-        glViewport(0, 0, buf_w, buf_h);
-        LV_PROFILER_DRAW_BEGIN_TAG("nvgBeginFrame");
-        nvgBeginFrame(u->vg, buf_w, buf_h, 1.0f);
-        LV_PROFILER_DRAW_END_TAG("nvgBeginFrame");
-        u->is_started = true;
-    }
-
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
 
-    draw_execute(u, t);
+    /* remember draw unit for access to unit's context */
+    t->draw_unit = draw_unit;
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /* The draw callbacks read the layer's matrix: use the one the task was created with */
+    lv_matrix_t layer_matrix = layer->matrix;
+    layer->matrix = t->matrix;
+#endif
+
+    lv_draw_unit_draw_task(draw_unit, t);
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    layer->matrix = layer_matrix;
+#endif
 
     t->state = LV_DRAW_TASK_STATE_FINISHED;
 
@@ -432,6 +563,13 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_dispatch_request();
 
     return 1;
+}
+
+static int32_t wait_for_finish(lv_draw_unit_t * draw_unit)
+{
+    /*Render everything NanoVG has queued in the current frame*/
+    lv_nanovg_end_frame((lv_draw_nanovg_unit_t *)draw_unit);
+    return 0;
 }
 
 static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc)
