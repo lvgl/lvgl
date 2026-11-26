@@ -132,9 +132,9 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     lv_draw_rect_dsc_t draw_dsc;
     lv_draw_rect_dsc_init(&draw_dsc);
     draw_dsc.bg_color = debug_color;
-    draw_dsc.bg_opa = LV_OPA_20;
+    draw_dsc.bg_opa = LV_OPA_TRANSP;
     draw_dsc.border_width = 1;
-    draw_dsc.border_opa = LV_OPA_30;
+    draw_dsc.border_opa = LV_OPA_COVER;
     draw_dsc.border_color = debug_color;
     lv_draw_rect(layer, &draw_dsc, &obj_coords_ext);
 #endif
