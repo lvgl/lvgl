@@ -326,16 +326,6 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_OPENGLES);
     if(t == NULL) return -1;
 
-    unsigned int texture = layer_get_texture(layer);
-    if(texture == 0) {
-        LV_ASSERT(layer != disp->layer_head);
-        int32_t w = lv_area_get_width(&layer->buf_area);
-        int32_t h = lv_area_get_height(&layer->buf_area);
-
-        texture = create_texture(w, h, NULL);
-        layer->user_data = (void *)(uintptr_t)texture;
-    }
-
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     lv_draw_unit_draw_task(draw_unit, t);
     t->state = LV_DRAW_TASK_STATE_FINISHED;
@@ -698,6 +688,7 @@ static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_
     }
 
     GL_CALL(glDeleteTextures(1, &src_texture));
+    src_layer->user_data = NULL;
     LV_PROFILER_DRAW_END;
 }
 
@@ -772,6 +763,14 @@ static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
 
 static unsigned int layer_get_texture(lv_layer_t * layer)
 {
+    /*Create the texture of a child layer on its first use. The display's layer gets its texture from the driver.*/
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
+    if(layer->user_data == NULL && disp && layer != disp->layer_head) {
+        int32_t w = lv_area_get_width(&layer->buf_area);
+        int32_t h = lv_area_get_height(&layer->buf_area);
+        layer->user_data = (void *)(uintptr_t)create_texture(w, h, NULL);
+    }
+
     return (unsigned int)(uintptr_t)layer->user_data;
 }
 
