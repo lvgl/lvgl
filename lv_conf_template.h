@@ -216,7 +216,7 @@
 
 /** Backend that gives the SW renderer vector graphics support.
  *
- *  Enable: LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+ *  Enable: LV_DRAW_SW_SUPPORT_ARGB8888, LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
  */
 #define LV_USE_THORVG 0
 
