@@ -11,7 +11,7 @@ from .core import (
     DumpWidgetProps,
 )
 from .display import DumpDisplayBuf
-from .draw import InfoDrawUnit, DumpDrawTask
+from .draw import InfoDrawUnit
 from .misc import (
     InfoStyle,
     DumpCache,
@@ -51,7 +51,6 @@ DumpImageDecoder()
 DumpFsDrv()
 DumpIndev()
 DumpGroup()
-DumpDrawTask()
 DumpWidget()  # prefix for 'dump widget props'
 DumpWidgetProps()
 

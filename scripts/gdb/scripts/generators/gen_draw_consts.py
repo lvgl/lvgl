@@ -40,21 +40,18 @@ def parse_draw_unit_types(draw_dir: Path) -> dict[str, str]:
 
 def main():
     task_types = parse_enum(DRAW_H, "lv_draw_dsc_type_t", "LV_DRAW_DSC_TYPE_")
-    task_states = parse_enum(DRAW_H, "lv_draw_task_state_t", "LV_DRAW_TASK_STATE_")
     unit_types = parse_draw_unit_types(DRAW_DIR)
 
     src = generate_dict_module(
         "draw constants from LVGL headers",
         {
             "DRAW_TASK_TYPE_NAMES": task_types,
-            "DRAW_TASK_STATE_NAMES": task_states,
             "DRAW_UNIT_TYPE_NAMES": unit_types,
         },
     )
     OUTPUT.write_text(src)
     print(
-        f"Generated {OUTPUT.name} ({len(task_types)} task types, "
-        f"{len(task_states)} task states, {len(unit_types)} unit types)"
+        f"Generated {OUTPUT.name} ({len(task_types)} task types, {len(unit_types)} unit types)"
     )
 
 

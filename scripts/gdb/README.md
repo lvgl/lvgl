@@ -35,7 +35,6 @@ dump indev                      # Dump input devices
 dump group                      # Dump focus groups
 dump image_decoder              # Dump registered image decoders
 dump fs_drv                     # Dump filesystem drivers
-dump draw_task lv_global->disp_default->layer_head   # Draw tasks of a layer
 dump dashboard                  # Generate interactive HTML dashboard
 dump dashboard -o out.html      # Save dashboard to file
 dump widget props lv_keyboard   # Which fields a widget class has
