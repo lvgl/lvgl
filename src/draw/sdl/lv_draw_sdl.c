@@ -283,6 +283,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
         lv_result_t init_result = lv_draw_buf_init(&u->render_draw_buf, texture_w, texture_h, LV_COLOR_FORMAT_ARGB8888,
                                                    LV_STRIDE_AUTO, data, data_size);
         LV_ASSERT(init_result == LV_RESULT_OK);
+        LV_UNUSED(init_result);
     }
 
 
