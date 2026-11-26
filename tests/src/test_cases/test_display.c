@@ -264,6 +264,57 @@ void test_display_triple_buffer(void)
     lv_draw_buf_destroy(buf3);
 }
 
+static uint32_t flush_wait_cnt;
+
+static void async_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+{
+    LV_UNUSED(disp);
+    LV_UNUSED(area);
+    LV_UNUSED(color_p);
+}
+
+static void async_flush_wait_cb(lv_display_t * disp)
+{
+    LV_UNUSED(disp);
+    flush_wait_cnt++;
+}
+
+void test_display_wait_flush(void)
+{
+    lv_display_t * disp = lv_display_create(80, 60);
+    lv_draw_buf_t * buf = lv_draw_buf_create(80, 60, LV_COLOR_FORMAT_DEFAULT, 0);
+    lv_display_set_draw_buffers(disp, buf, NULL);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_flush_cb(disp, async_flush_cb);
+    lv_display_set_flush_wait_cb(disp, async_flush_wait_cb);
+
+    flush_wait_cnt = 0;
+    lv_obj_invalidate(lv_display_get_screen_active(disp));
+    lv_display_refr_timer(lv_display_get_refr_timer(disp));
+
+    /*The flush is still pending after the refresh*/
+    TEST_ASSERT_EQUAL(0, flush_wait_cnt);
+
+    lv_display_wait_flush(disp);
+    TEST_ASSERT_EQUAL(1, flush_wait_cnt);
+
+    /*Nothing is pending anymore*/
+    lv_display_wait_flush(disp);
+    TEST_ASSERT_EQUAL(1, flush_wait_cnt);
+
+    /*LVGL doesn't wait again for a flush that was already waited for*/
+    lv_obj_invalidate(lv_display_get_screen_active(disp));
+    lv_display_refr_timer(lv_display_get_refr_timer(disp));
+    TEST_ASSERT_EQUAL(1, flush_wait_cnt);
+
+    /*The new flush is pending again*/
+    lv_display_wait_flush(disp);
+    TEST_ASSERT_EQUAL(2, flush_wait_cnt);
+
+    lv_display_delete(disp);
+    lv_draw_buf_destroy(buf);
+}
+
 static void refr_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);

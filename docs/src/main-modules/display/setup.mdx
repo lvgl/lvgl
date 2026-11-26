@@ -170,3 +170,24 @@ that (clearing the display's `flushing` flag) when your callback returns.
 However, if a Flush-Wait Callback is not set, LVGL assumes that
 <ApiLink name="lv_display_flush_ready" /> is called after the flush has completed.
 
+
+## Waiting for the Flush to complete
+
+LVGL doesn't wait for the last flush to complete before returning from
+<ApiLink name="lv_timer_handler" /> or <ApiLink name="lv_refr_now" />. It only waits
+when it needs the buffer again, so the application can do other work in the meantime.
+
+If the application needs the last frame to actually be on the display, it can call
+<ApiLink name="lv_display_wait_flush" display="lv_display_wait_flush(display1)" />.
+It waits the same way LVGL does internally: by calling the Flush-Wait Callback, or by
+waiting for <ApiLink name="lv_display_flush_ready" /> if no callback is set. It returns
+immediately if no flush is in progress.
+
+```c
+lv_timer_handler();
+lv_display_wait_flush(display1);
+enter_low_power_mode();
+```
+
+Call it from the thread that runs LVGL (or while holding the LVGL lock), and never
+from the Flush Callback, the Flush-Wait Callback or an interrupt.
