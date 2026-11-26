@@ -260,8 +260,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer);
 void lv_draw_dispatch_wait_for_request(void);
 
 /**
- * Wait for draw finish in case of asynchronous task execution.
- * If `LV_USE_OS == 0` it just return.
+ * Wait until every draw unit has finished the drawing it has queued.
  */
 void lv_draw_wait_for_finish(void);
 

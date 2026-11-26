@@ -440,6 +440,9 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
         }
     }
 
+    /*Units may have queued work (GPU command lists) even after the last task finished*/
+    lv_draw_wait_for_finish();
+
     lv_draw_unit_send_event(NULL, LV_EVENT_SCREEN_LOAD_START, layer);
     lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer);
     lv_obj_invalidate(canvas);

@@ -1443,6 +1443,8 @@ static void draw_buf_flush(lv_display_t * disp)
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch();
     }
+    /*Units may have queued work (GPU command lists) even after the last task finished*/
+    lv_draw_wait_for_finish();
 
     /* Every layer must've been drawn*/
     LV_ASSERT_MSG(layer->next == NULL, "Expected every layer to have been drawn at this point");
