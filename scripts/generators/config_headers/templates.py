@@ -151,6 +151,10 @@ INTERNAL_OUTDATED_CONFIG_CHECK_BLOCK = r"""
     #error LV_COLOR_16_SWAP has been removed. Use LV_COLOR_FORMAT_RGB565_SWAPPED as the display color format instead
 #endif
 
+#if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && LV_DRAW_SW_DRAW_UNIT_CNT > 1
+    #warning LV_DRAW_SW_DRAW_UNIT_CNT has been removed: drawing runs on the calling thread. For ThorVG use LV_THORVG_THREAD_COUNT. See the v10 migration guide
+#endif
+
 /*----------------------------------
  * End of outdated config check block
  -----------------------------------*/
@@ -208,17 +212,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #undef LV_KCONFIG_PRESENT
 
-
-#if LV_USE_OS
-    #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
-        #error "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
-    #endif
-
-    #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)
-        #warning "LV_DRAW_THREAD_STACKSIZE was renamed to LV_DRAW_THREAD_STACK_SIZE. Please update lv_conf.h or run menuconfig again."
-        #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
-    #endif
-#endif
 
 /*Allow only upper case letters and '/'  ('/' is a special case for backward compatibility)*/
 #define LV_FS_IS_VALID_LETTER(l) ((l) == '/' || ((l) >= 'A' && (l) <= 'Z'))

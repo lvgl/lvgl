@@ -4,15 +4,45 @@
 
 #include "unity/unity.h"
 
+static lv_layer_t * g_layer;
+static lv_draw_buf_malloc_cb_t g_original_malloc_cb;
+static uint32_t g_draw_cnt;
+static uint32_t g_layer_memory_while_drawing;
+static uint32_t g_tile_cnt;
+
+static uint32_t layer_memory(void)
+{
+    return LV_GLOBAL_DEFAULT()->draw_info.used_memory_for_layers;
+}
+
 void setUp(void)
 {
     /* Function run before every test */
+    g_draw_cnt = 0;
+    g_layer_memory_while_drawing = 0;
+    g_tile_cnt = lv_display_get_tile_cnt(lv_display_get_default());
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
+    if(g_original_malloc_cb) {
+        lv_draw_buf_get_handlers()->buf_malloc_cb = g_original_malloc_cb;
+        g_original_malloc_cb = NULL;
+    }
+    if(g_layer) {
+        lv_draw_layer_delete(g_layer);
+        g_layer = NULL;
+    }
+    lv_display_set_tile_cnt(lv_display_get_default(), g_tile_cnt);
     lv_obj_clean(lv_screen_active());
+}
+
+static void draw_main_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    g_draw_cnt++;
+    g_layer_memory_while_drawing = LV_MAX(g_layer_memory_while_drawing, layer_memory());
 }
 
 
@@ -98,16 +128,12 @@ void test_draw_layer_dispatch(void)
 
 /**
  * Test that rendering completes without deadlock when layer buffer
- * allocation fails due to memory exhaustion.
+ * allocation fails due to memory exhaustion, and that the rest of the
+ * screen is still drawn.
  *
- * Before the fix, lv_draw_layer_alloc_buf returning NULL left the draw
- * task in WAITING state forever, causing draw_buf_flush to spin in an
- * infinite loop. The fix sets the task to LV_DRAW_TASK_STATE_FAILED so
- * it gets cleaned up and rendering proceeds.
- *
- * Strategy: temporarily replace buf_malloc_cb with a stub that always
- * returns NULL, create a rotated widget to trigger layer allocation,
- * then call lv_refr_now(). If it returns, the fix works.
+ * Strategy: replace buf_malloc_cb with a stub that always returns NULL,
+ * create a rotated widget to trigger layer allocation, then call
+ * lv_refr_now(). The layer can't be created, so that widget is skipped.
  */
 static void * fake_buf_malloc_fail(size_t size, lv_color_format_t cf)
 {
@@ -125,17 +151,67 @@ void test_draw_layer_alloc_failed_no_deadlock(void)
     lv_obj_set_style_transform_rotation(obj, 450, 0); /*45 degrees*/
     lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0); /*Force layer even with matrix path*/
 
+    /*A widget next to it that needs no layer*/
+    lv_obj_t * sibling = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(sibling, 50, 50);
+    lv_obj_add_event_cb(sibling, draw_main_cb, LV_EVENT_DRAW_MAIN, NULL);
+
     /*Hook buf_malloc_cb to always fail*/
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
-    lv_draw_buf_malloc_cb_t original_malloc_cb = handlers->buf_malloc_cb;
+    g_original_malloc_cb = handlers->buf_malloc_cb;
     handlers->buf_malloc_cb = fake_buf_malloc_fail;
 
-    /*This must return without deadlock - the FAILED state allows the
-     *render pipeline to clean up the failed task and proceed.*/
+    /*This must return without deadlock: the layer isn't created and the widget is skipped*/
     lv_refr_now(NULL);
 
-    /*Restore original handler*/
-    handlers->buf_malloc_cb = original_malloc_cb;
+    /*The rest of the screen is still drawn, and no layer memory is left counted*/
+    TEST_ASSERT_GREATER_THAN_UINT32(0, g_draw_cnt);
+    TEST_ASSERT_EQUAL_UINT32(0, layer_memory());
+}
+
+void test_draw_layer_display_and_tiles_allocate_no_layer_memory(void)
+{
+    lv_display_set_tile_cnt(lv_display_get_default(), 4);
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(obj, 100, 100);
+    lv_obj_center(obj);
+    lv_obj_add_event_cb(obj, draw_main_cb, LV_EVENT_DRAW_MAIN, NULL);
+
+    lv_obj_invalidate(lv_screen_active());
+    lv_refr_now(NULL);
+
+    /*The display's layer and its tiles draw into the display's buffer*/
+    TEST_ASSERT_GREATER_THAN_UINT32(0, g_draw_cnt);
+    TEST_ASSERT_EQUAL_UINT32(0, g_layer_memory_while_drawing);
+    TEST_ASSERT_EQUAL_UINT32(0, layer_memory());
+}
+
+void test_draw_layer_create_allocates_the_buffer(void)
+{
+    lv_layer_t parent;
+    lv_layer_init(&parent);
+    parent.display = lv_display_get_default();
+
+    lv_area_t area = {10, 20, 29, 34};
+    g_layer = lv_draw_layer_create(&parent, LV_COLOR_FORMAT_ARGB8888, &area);
+    TEST_ASSERT_NOT_NULL(g_layer);
+
+    /*The buffer exists right away, covers the area, is cleared and is counted*/
+    TEST_ASSERT_NOT_NULL(g_layer->draw_buf);
+    TEST_ASSERT_TRUE(g_layer->buffer_owned);
+    TEST_ASSERT_EQUAL_INT32(20, g_layer->draw_buf->header.w);
+    TEST_ASSERT_EQUAL_INT32(15, g_layer->draw_buf->header.h);
+    TEST_ASSERT_EQUAL_UINT32(15 * g_layer->draw_buf->header.stride, layer_memory());
+
+    const uint8_t * row = g_layer->draw_buf->data;
+    uint32_t i;
+    for(i = 0; i < 20 * 4; i++) TEST_ASSERT_EQUAL_UINT8(0, row[i]);
+
+    /*Deleting it gives the memory back*/
+    lv_draw_layer_delete(g_layer);
+    g_layer = NULL;
+    TEST_ASSERT_EQUAL_UINT32(0, layer_memory());
 }
 
 #endif

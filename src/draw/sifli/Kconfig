@@ -9,14 +9,6 @@ config LV_USE_SIFLI_EPIC
 
 if LV_USE_SIFLI_EPIC
 
-config LV_USE_SIFLI_EPIC_DRAW_THREAD
-	bool "Draw thread"
-	depends on !LV_OS_NONE
-	default y
-	help
-		Dispatch EPIC operations from their own thread so the CPU can keep
-		rendering in parallel.
-
 config LV_USE_SIFLI_EPIC_ASSERT
 	bool "Asserts"
 	help

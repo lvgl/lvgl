@@ -21,6 +21,12 @@ through the SDL driver's EGL backend instead. It rasterizes on the GPU rather th
 Enable <ApiLink name="LV_USE_DRAW_SDL" /> and <ApiLink name="LV_USE_SDL" /> and select `LV_SDL_BACKEND_TEXTURE` 
 as your <ApiLink name="LV_SDL_BACKEND" />
 
+## Limitations
+
+- **Display only.** Drawing outside a display refresh, e.g. into a canvas or a snapshot, draws nothing.
+- Single letters (<ApiLink name="lv_draw_letter" />), rectangle masks, blur, vector graphics and 3D textures
+  are not drawn.
+
 ## Building
 
 The renderer requires `sdl2_image`.

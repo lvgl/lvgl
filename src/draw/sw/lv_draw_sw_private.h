@@ -31,23 +31,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    lv_draw_task_t * volatile task_act;
-    lv_thread_t thread;
-    lv_thread_sync_t new_task_sync;
-    lv_thread_sync_t task_done_sync;
-    lv_draw_unit_t * draw_unit;
-    uint32_t idx;
-    volatile bool exit_status;
-} lv_draw_sw_thread_dsc_t;
-
 struct _lv_draw_sw_unit_t {
     lv_draw_unit_t base_unit;
-#if LV_USE_OS
-    lv_draw_sw_thread_dsc_t thread_dscs[LV_DRAW_SW_DRAW_UNIT_CNT];
-#else
-    lv_draw_task_t * task_act;
-#endif
 };
 
 #if LV_DRAW_SW_SHADOW_CACHE_SIZE

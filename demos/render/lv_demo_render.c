@@ -1114,6 +1114,468 @@ static void conical_gradient_cb(lv_obj_t * parent)
 
 #endif
 
+/*A gradient with a border and a label, so that clipping and blurring are visible*/
+static lv_obj_t * pattern_obj_create(lv_obj_t * parent)
+{
+    lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(obj, lv_color_hex3(0xff0), 0);
+    lv_obj_set_style_bg_grad_color(obj, lv_color_hex3(0x00f), 0);
+    lv_obj_set_style_bg_grad_dir(obj, LV_GRAD_DIR_HOR, 0);
+    lv_obj_set_style_border_width(obj, 2, 0);
+    lv_obj_set_style_border_color(obj, lv_color_hex3(0xf00), 0);
+
+    lv_obj_t * label = lv_label_create(obj);
+    lv_label_set_text(label, "ABC");
+    lv_obj_center(label);
+
+    return obj;
+}
+
+static lv_obj_t * mask_rect_obj_create(lv_obj_t * parent, int32_t col, int32_t row, int32_t radius)
+{
+    lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
+    lv_obj_set_style_radius(obj, radius, 0);
+    lv_obj_set_style_clip_corner(obj, true, 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
+    lv_obj_set_scrollable(obj, false);
+    add_to_cell(obj, col, row);
+
+    pattern_obj_create(obj);
+
+    return obj;
+}
+
+/*Clip corner draws the children on a layer and masks it with a mask rectangle*/
+static void mask_rect_cb(lv_obj_t * parent)
+{
+    static const int32_t radii[] = {0, 2, 5, 8, 10, 15, 100, LV_RADIUS_CIRCLE};
+
+    uint32_t i;
+    for(i = 0; i < COL_CNT; i++) {
+        lv_obj_t * obj;
+
+        mask_rect_obj_create(parent, i, 0, radii[i]);
+
+        obj = mask_rect_obj_create(parent, i, 1, radii[i]);
+        lv_obj_set_style_border_width(obj, 3, 0);
+        lv_obj_set_style_border_color(obj, lv_color_hex3(0x000), 0);
+
+        obj = mask_rect_obj_create(parent, i, 2, radii[i]);
+        lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
+
+        obj = mask_rect_obj_create(parent, i, 3, radii[i]);
+        lv_obj_set_style_transform_rotation(obj, 150, 0);
+        lv_obj_set_style_transform_pivot_x(obj, DEF_WIDTH / 2, 0);
+        lv_obj_set_style_transform_pivot_y(obj, DEF_HEIGHT / 2, 0);
+
+        /*The child is moved so that only some corners are covered*/
+        obj = mask_rect_obj_create(parent, i, 4, radii[i]);
+        lv_obj_set_pos(lv_obj_get_child(obj, 0), DEF_WIDTH / 3, -DEF_HEIGHT / 3);
+
+        /*A clip corner object in a clip corner object*/
+        obj = mask_rect_obj_create(parent, i, 5, radii[i]);
+        lv_obj_t * inner = lv_obj_get_child(obj, 0);
+        lv_obj_set_size(inner, DEF_WIDTH - 10, DEF_HEIGHT - 6);
+        lv_obj_set_style_radius(inner, radii[COL_CNT - 1 - i], 0);
+        lv_obj_set_style_clip_corner(inner, true, 0);
+        lv_obj_center(inner);
+
+        obj = mask_rect_obj_create(parent, i, 6, radii[i]);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(obj, 0), LV_OPA_50, 0);
+
+        obj = mask_rect_obj_create(parent, i, 7, radii[i]);
+        lv_obj_set_style_blend_mode(obj, LV_BLEND_MODE_ADDITIVE, 0);
+    }
+}
+
+static lv_obj_t * blur_obj_create(lv_obj_t * parent, int32_t col, int32_t row, bool backdrop)
+{
+    lv_obj_t * obj;
+    if(backdrop) {
+        /*Blurs the pattern below it*/
+        lv_obj_t * bg = pattern_obj_create(parent);
+        lv_obj_set_style_opa(bg, opa_saved, 0);
+        add_to_cell(bg, col, row);
+
+        obj = lv_obj_create(parent);
+        lv_obj_remove_style_all(obj);
+        lv_obj_set_size(obj, DEF_WIDTH - 16, DEF_HEIGHT - 10);
+        lv_obj_set_style_bg_opa(obj, LV_OPA_20, 0);
+        lv_obj_set_style_bg_color(obj, lv_color_hex3(0xfff), 0);
+        lv_obj_set_style_blur_backdrop(obj, true, 0);
+    }
+    else {
+        /*Blurs its own background, but not its label*/
+        obj = pattern_obj_create(parent);
+    }
+
+    lv_obj_set_style_opa(obj, opa_saved, 0);
+    add_to_cell(obj, col, row);
+
+    return obj;
+}
+
+static void blur_cb(lv_obj_t * parent)
+{
+    static const int32_t blur_radii[] = {0, 1, 2, 4, 6, 10, 16, 30};
+    static const lv_blur_quality_t qualities[] = {LV_BLUR_QUALITY_AUTO, LV_BLUR_QUALITY_SPEED,
+                                                  LV_BLUR_QUALITY_PRECISION, LV_BLUR_QUALITY_AUTO
+                                                 };
+    static const int32_t corner_radii[] = {0, 0, 0, 10};
+
+    uint32_t r;
+    for(r = 0; r < 4; r++) {
+        uint32_t i;
+        for(i = 0; i < COL_CNT; i++) {
+            lv_obj_t * obj;
+
+            obj = blur_obj_create(parent, i, r, true);
+            lv_obj_set_style_blur_radius(obj, blur_radii[i], 0);
+            lv_obj_set_style_blur_quality(obj, qualities[r], 0);
+            lv_obj_set_style_radius(obj, corner_radii[r], 0);
+
+            obj = blur_obj_create(parent, i, r + 4, false);
+            lv_obj_set_style_blur_radius(obj, blur_radii[i], 0);
+            lv_obj_set_style_blur_quality(obj, qualities[r], 0);
+            lv_obj_set_style_radius(obj, corner_radii[r], 0);
+        }
+    }
+}
+
+static void drop_shadow_set(lv_obj_t * obj, int32_t radius, int32_t ofs_x, int32_t ofs_y)
+{
+    lv_obj_set_style_drop_shadow_radius(obj, radius, 0);
+    lv_obj_set_style_drop_shadow_offset_x(obj, ofs_x, 0);
+    lv_obj_set_style_drop_shadow_offset_y(obj, ofs_y, 0);
+    lv_obj_set_style_drop_shadow_color(obj, lv_color_hex3(0x00f), 0);
+    lv_obj_set_style_drop_shadow_opa(obj, LV_OPA_COVER, 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
+}
+
+static lv_obj_t * drop_shadow_rect_create(lv_obj_t * parent, int32_t col, int32_t row)
+{
+    lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_size(obj, DEF_WIDTH - 16, DEF_HEIGHT - 12);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(obj, lv_color_hex3(0xff0), 0);
+    lv_obj_set_style_radius(obj, 6, 0);
+    add_to_cell(obj, col, row);
+
+    return obj;
+}
+
+/*The drop shadow is drawn on an A8 layer and blurred*/
+static void drop_shadow_cb(lv_obj_t * parent)
+{
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
+    static const int32_t radii[] = {0, 1, 2, 4, 6, 8, 12, 16};
+    static const lv_point_t ofs[] = {{0, 0}, {4, 0}, {-4, 0}, {0, 4}, {0, -4}, {4, 4}, {-4, -4}, {8, 8}};
+    lv_color_t colors[] = {lv_color_hex3(0x000), lv_color_hex3(0xfff), lv_color_hex3(0xf00), lv_color_hex3(0x0f0),
+                           lv_color_hex3(0x00f), lv_color_hex3(0xff0), lv_color_hex3(0x0ff), lv_color_hex3(0xf0f)
+                          };
+
+    uint32_t i;
+    for(i = 0; i < COL_CNT; i++) {
+        lv_obj_t * obj;
+
+        obj = drop_shadow_rect_create(parent, i, 0);
+        drop_shadow_set(obj, radii[i], 3, 3);
+
+        obj = drop_shadow_rect_create(parent, i, 1);
+        drop_shadow_set(obj, 4, ofs[i].x, ofs[i].y);
+
+        /*Only a border, the inside stays transparent*/
+        obj = drop_shadow_rect_create(parent, i, 2);
+        lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, 0);
+        lv_obj_set_style_border_width(obj, 3, 0);
+        lv_obj_set_style_border_color(obj, lv_color_hex3(0xf00), 0);
+        drop_shadow_set(obj, radii[i], 3, 3);
+
+        obj = lv_label_create(parent);
+        lv_label_set_text(obj, "ABC");
+        add_to_cell(obj, i, 3);
+        drop_shadow_set(obj, radii[i], 2, 2);
+
+        obj = lv_image_create(parent);
+        lv_image_set_src(obj, &img_render_lvgl_logo_argb8888);
+        add_to_cell(obj, i, 4);
+        drop_shadow_set(obj, radii[i], 3, 3);
+
+        obj = arc_obj_create(parent, i, 5, 5, 30, 330);
+        drop_shadow_set(obj, radii[i], 2, 2);
+
+        obj = drop_shadow_rect_create(parent, i, 6);
+        drop_shadow_set(obj, 6, 3, 3);
+        lv_obj_set_style_drop_shadow_color(obj, colors[i], 0);
+        lv_obj_set_style_drop_shadow_opa(obj, (i + 1) * 32 - 1, 0);
+
+        obj = drop_shadow_rect_create(parent, i, 7);
+        drop_shadow_set(obj, radii[i], 3, 3);
+        if(i % 2) {
+            lv_obj_set_style_transform_rotation(obj, 300, 0);
+            lv_obj_set_style_transform_pivot_x(obj, LV_PCT(50), 0);
+            lv_obj_set_style_transform_pivot_y(obj, LV_PCT(50), 0);
+        }
+        else {
+            lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
+        }
+    }
+}
+
+static void letter_draw_event_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_target(e);
+    int32_t rotation = (int32_t)(lv_uintptr_t)lv_event_get_user_data(e);
+
+    lv_draw_letter_dsc_t dsc;
+    lv_draw_letter_dsc_init(&dsc);
+    dsc.font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    dsc.color = lv_obj_get_style_text_color(obj, LV_PART_MAIN);
+    dsc.opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+    dsc.rotation = rotation;
+
+    lv_area_t coords;
+    lv_obj_get_coords(obj, &coords);
+    int32_t letter_w = lv_obj_get_width(obj) / 3;
+
+    /*The point is the letter's pivot: the middle of the letter on the base line.
+     *Keep the base line in the middle, so rotated letters stay in the cell*/
+    static const uint32_t letters[] = {'A', 'g', '8'};
+    uint32_t i;
+    for(i = 0; i < 3; i++) {
+        lv_point_t p;
+        p.x = coords.x1 + i * letter_w + letter_w / 2;
+        p.y = coords.y1 + lv_obj_get_height(obj) / 2;
+        dsc.unicode = letters[i];
+        lv_draw_letter(lv_event_get_layer(e), &dsc, &p);
+    }
+}
+
+static lv_obj_t * letter_obj_create(lv_obj_t * parent, int32_t col, int32_t row, int32_t rotation,
+                                    const lv_font_t * font)
+{
+    lv_color_t colors[] = {lv_color_hex3(0x000), lv_color_hex3(0xfff), lv_color_hex3(0xf00), lv_color_hex3(0x0f0),
+                           lv_color_hex3(0x00f), lv_color_hex3(0xff0), lv_color_hex3(0x0ff), lv_color_hex3(0xf0f)
+                          };
+
+    lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
+    lv_obj_set_style_text_font(obj, font, 0);
+    lv_obj_set_style_text_color(obj, colors[col], 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
+    lv_obj_add_event_cb(obj, letter_draw_event_cb, LV_EVENT_DRAW_MAIN, (void *)(lv_uintptr_t)rotation);
+    add_to_cell(obj, col, row);
+
+    return obj;
+}
+
+/*Single letters drawn directly, not through a label*/
+static void letter_cb(lv_obj_t * parent)
+{
+    static const int32_t rotations[] = {0, 150, 300, 450, 600, 900, 1350, 1800,
+                                        2250, 2700, 3150, 3600, 3750, -150, -450, -900
+                                       };
+
+    const lv_font_t * fonts[2] = {LV_FONT_DEFAULT, LV_FONT_DEFAULT};
+#if LV_FONT_MONTSERRAT_20
+    fonts[1] = &lv_font_montserrat_20;
+#endif
+
+    uint32_t f;
+    for(f = 0; f < 2; f++) {
+        uint32_t i;
+        for(i = 0; i < COL_CNT; i++) {
+            letter_obj_create(parent, i, f * 4 + 0, 0, fonts[f]);
+            letter_obj_create(parent, i, f * 4 + 1, rotations[i], fonts[f]);
+            letter_obj_create(parent, i, f * 4 + 2, rotations[i + COL_CNT], fonts[f]);
+
+            /*Over a fill, to see the letters' edges*/
+            lv_obj_t * obj = letter_obj_create(parent, i, f * 4 + 3, rotations[i * 2], fonts[f]);
+            lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+            lv_obj_set_style_bg_color(obj, lv_color_hex3(0x888), 0);
+        }
+    }
+}
+
+#if LV_USE_VECTOR_GRAPHIC
+
+typedef enum {
+    VECTOR_STYLE_FILL,
+    VECTOR_STYLE_STROKE,
+    VECTOR_STYLE_FILL_STROKE,
+    VECTOR_STYLE_LINEAR_GRADIENT,
+    VECTOR_STYLE_RADIAL_GRADIENT,
+    VECTOR_STYLE_DASH,
+    VECTOR_STYLE_ROTATED,
+    VECTOR_STYLE_EVENODD,
+} vector_style_t;
+
+static void vector_path_add_shape(lv_vector_path_t * path, uint32_t shape, float x, float y, float w, float h)
+{
+    lv_fpoint_t c = {x + w / 2, y + h / 2};
+
+    switch(shape) {
+        case 0:
+            lv_vector_path_append_rectangle(path, x, y, w, h, 0, 0);
+            break;
+        case 1:
+            lv_vector_path_append_rectangle(path, x, y, w, h, 8, 8);
+            break;
+        case 2:
+            lv_vector_path_append_circle(path, &c, w / 2, h / 2);
+            break;
+        case 3: {
+                lv_fpoint_t p[] = {{x, y + h}, {x + w / 2, y}, {x + w, y + h}};
+                lv_vector_path_move_to(path, &p[0]);
+                lv_vector_path_line_to(path, &p[1]);
+                lv_vector_path_line_to(path, &p[2]);
+                lv_vector_path_close(path);
+                break;
+            }
+        case 4: {
+                lv_fpoint_t p[] = {{x, y + h}, {x + w / 2, y - h}, {x + w, y + h}};
+                lv_vector_path_move_to(path, &p[0]);
+                lv_vector_path_quad_to(path, &p[1], &p[2]);
+                lv_vector_path_close(path);
+                break;
+            }
+        case 5: {
+                lv_fpoint_t p[] = {{x, y + h / 2}, {x + w / 3, y - h / 2}, {x + 2 * w / 3, y + 3 * h / 2},
+                    {x + w, y + h / 2}, {x + w, y + h}, {x, y + h}
+                };
+                lv_vector_path_move_to(path, &p[0]);
+                lv_vector_path_cubic_to(path, &p[1], &p[2], &p[3]);
+                lv_vector_path_line_to(path, &p[4]);
+                lv_vector_path_line_to(path, &p[5]);
+                lv_vector_path_close(path);
+                break;
+            }
+        case 6:
+            lv_vector_path_append_arc(path, &c, h / 2, 30, 270, true);
+            break;
+        default: {
+                /*A five-pointed star, self-intersecting, so the fill rule matters*/
+                static const float star[][2] = {{0.0f, -1.0f}, {0.588f, 0.809f}, {-0.951f, -0.309f},
+                    {0.951f, -0.309f}, {-0.588f, 0.809f}
+                };
+                uint32_t i;
+                for(i = 0; i < 5; i++) {
+                    lv_fpoint_t p = {c.x + star[i][0] * h / 2, c.y + star[i][1] * h / 2};
+                    if(i == 0) lv_vector_path_move_to(path, &p);
+                    else lv_vector_path_line_to(path, &p);
+                }
+                lv_vector_path_close(path);
+                break;
+            }
+    }
+}
+
+static void vector_draw_event_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_target(e);
+    uint32_t cfg = (uint32_t)(lv_uintptr_t)lv_event_get_user_data(e);
+    uint32_t shape = cfg & 0xff;
+    vector_style_t style = (vector_style_t)(cfg >> 8);
+
+    lv_area_t coords;
+    lv_obj_get_coords(obj, &coords);
+    float x = (float)coords.x1 + 4;
+    float y = (float)coords.y1 + 3;
+    float w = (float)lv_area_get_width(&coords) - 8;
+    float h = (float)lv_area_get_height(&coords) - 6;
+
+    lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+
+    lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(lv_event_get_layer(e));
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    vector_path_add_shape(path, shape, x, y, w, h);
+
+    lv_draw_vector_dsc_set_fill_color(dsc, lv_color_hex3(0xff0));
+    lv_draw_vector_dsc_set_fill_opa(dsc, opa);
+    lv_draw_vector_dsc_set_stroke_color(dsc, lv_color_hex3(0xf00));
+    lv_draw_vector_dsc_set_stroke_opa(dsc, opa);
+    lv_draw_vector_dsc_set_stroke_width(dsc, 2);
+
+    lv_grad_stop_t stops[] = {
+        {.color = lv_color_hex3(0xf00), .opa = opa, .frac = 0},
+        {.color = lv_color_hex3(0x00f), .opa = opa, .frac = 255},
+    };
+
+    switch(style) {
+        case VECTOR_STYLE_FILL:
+        case VECTOR_STYLE_EVENODD:
+            lv_draw_vector_dsc_set_stroke_opa(dsc, LV_OPA_TRANSP);
+            if(style == VECTOR_STYLE_EVENODD) lv_draw_vector_dsc_set_fill_rule(dsc, LV_VECTOR_FILL_EVENODD);
+            break;
+        case VECTOR_STYLE_STROKE:
+            lv_draw_vector_dsc_set_fill_opa(dsc, LV_OPA_TRANSP);
+            break;
+        case VECTOR_STYLE_FILL_STROKE:
+            lv_draw_vector_dsc_set_stroke_width(dsc, 4);
+            lv_draw_vector_dsc_set_stroke_join(dsc, LV_VECTOR_STROKE_JOIN_ROUND);
+            lv_draw_vector_dsc_set_fill_opa(dsc, LV_OPA_MIX2(opa, LV_OPA_50));
+            break;
+        case VECTOR_STYLE_LINEAR_GRADIENT:
+            lv_draw_vector_dsc_set_stroke_opa(dsc, LV_OPA_TRANSP);
+            lv_draw_vector_dsc_set_fill_units(dsc, LV_VECTOR_FILL_UNITS_USER_SPACE_ON_USE);
+            lv_draw_vector_dsc_set_fill_gradient_color_stops(dsc, stops, 2);
+            lv_draw_vector_dsc_set_fill_linear_gradient(dsc, x, y, x + w, y + h);
+            break;
+        case VECTOR_STYLE_RADIAL_GRADIENT:
+            lv_draw_vector_dsc_set_stroke_opa(dsc, LV_OPA_TRANSP);
+            lv_draw_vector_dsc_set_fill_units(dsc, LV_VECTOR_FILL_UNITS_USER_SPACE_ON_USE);
+            lv_draw_vector_dsc_set_fill_gradient_color_stops(dsc, stops, 2);
+            lv_draw_vector_dsc_set_fill_radial_gradient(dsc, x + w / 2, y + h / 2, h / 2);
+            break;
+        case VECTOR_STYLE_DASH: {
+                float dash[] = {4, 2};
+                lv_draw_vector_dsc_set_fill_opa(dsc, LV_OPA_TRANSP);
+                lv_draw_vector_dsc_set_stroke_dash(dsc, dash, 2);
+                lv_draw_vector_dsc_set_stroke_cap(dsc, LV_VECTOR_STROKE_CAP_ROUND);
+                break;
+            }
+        case VECTOR_STYLE_ROTATED: {
+                lv_matrix_t m;
+                lv_matrix_identity(&m);
+                lv_matrix_translate(&m, x + w / 2, y + h / 2);
+                lv_matrix_rotate(&m, 15);
+                lv_matrix_translate(&m, -(x + w / 2), -(y + h / 2));
+                lv_draw_vector_dsc_set_transform(dsc, &m);
+                break;
+            }
+    }
+
+    lv_draw_vector_dsc_add_path(dsc, path);
+    lv_draw_vector(dsc);
+    lv_vector_path_delete(path);
+    lv_draw_vector_dsc_delete(dsc);
+}
+
+static void vector_cb(lv_obj_t * parent)
+{
+    uint32_t r;
+    for(r = 0; r < ROW_CNT; r++) {
+        uint32_t i;
+        for(i = 0; i < COL_CNT; i++) {
+            lv_obj_t * obj = lv_obj_create(parent);
+            lv_obj_remove_style_all(obj);
+            lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
+            lv_obj_set_style_opa(obj, opa_saved, 0);
+            lv_obj_add_event_cb(obj, vector_draw_event_cb, LV_EVENT_DRAW_MAIN, (void *)(lv_uintptr_t)((r << 8) | i));
+            add_to_cell(obj, i, r);
+        }
+    }
+}
+
+#endif /*LV_USE_VECTOR_GRAPHIC*/
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -1140,6 +1602,14 @@ static scene_dsc_t scenes[] = {
     {.name = "linear_gradient",     .create_cb = linear_gradient_cb},
     {.name = "radial_gradient",     .create_cb = radial_gradient_cb},
     {.name = "conical_gradient",    .create_cb = conical_gradient_cb},
+#endif
+
+    {.name = "mask_rect",           .create_cb = mask_rect_cb},
+    {.name = "blur",                .create_cb = blur_cb},
+    {.name = "drop_shadow",         .create_cb = drop_shadow_cb},
+    {.name = "letter",              .create_cb = letter_cb},
+#if LV_USE_VECTOR_GRAPHIC
+    {.name = "vector",              .create_cb = vector_cb},
 #endif
 
     {.name = "", .create_cb = NULL}

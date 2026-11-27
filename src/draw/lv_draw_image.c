@@ -56,13 +56,6 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
 }
 
-lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task)
-{
-    LV_CHECK_ARG(task != NULL, return NULL);
-
-    return task->type == LV_DRAW_DSC_TYPE_IMAGE ? (lv_draw_image_dsc_t *)task->draw_dsc : NULL;
-}
-
 lv_draw_image_dsc_t * lv_draw_dsc_get_image_dsc(lv_draw_dsc_t * dsc)
 {
     LV_CHECK_ARG(dsc != NULL, return NULL);
@@ -77,36 +70,28 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     LV_CHECK_ARG(dsc != NULL, return);
     LV_CHECK_ARG(coords != NULL, return);
 
+    /*The child layer is consumed here: delete it even if it's not drawn*/
+    lv_layer_t * layer_to_draw = (lv_layer_t *)dsc->src;
+
     if(dsc->scale_x <= 0 || dsc->scale_y <= 0) {
         /* NOT draw if scale is negative or zero */
+        lv_draw_layer_delete(layer_to_draw);
         return;
     }
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_LAYER);
-    if(!t) {
-        LV_LOG_WARN("Failed to create draw task");
-        /*The layer is normally deleted when its draw task is cleaned up*/
-        lv_draw_layer_delete((lv_layer_t *)dsc->src);
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-    lv_draw_image_dsc_t * new_image_dsc = t->draw_dsc;
-    lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
-    t->state = LV_DRAW_TASK_STATE_BLOCKED;
-
-    lv_draw_image_get_transformed_area(&t->_real_area, dsc, coords);
+    lv_draw_image_dsc_t local = *dsc;
 
     /*If the image_area is not set assume that it's the same as the rendering area */
-    if(new_image_dsc->image_area.x2 == LV_COORD_MIN) {
-        new_image_dsc->image_area = *coords;
+    if(local.image_area.x2 == LV_COORD_MIN) {
+        local.image_area = *coords;
     }
 
-    lv_layer_t * layer_to_draw = (lv_layer_t *)dsc->src;
-    layer_to_draw->all_tasks_added = true;
+    lv_draw_dsc_submit(&local.base, LV_DRAW_DSC_TYPE_LAYER, layer, coords);
 
-    lv_draw_finalize_task_creation(layer, t);
+    /*The layer has been blended (or dropped), so it's not needed anymore*/
+    lv_draw_layer_delete(layer_to_draw);
 
     LV_PROFILER_DRAW_END;
 }
@@ -132,11 +117,12 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     if(dsc->base.drop_shadow_opa) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
-        LV_ASSERT_NULL(ds_layer);
-        lv_draw_image_dsc_t ds_dsc = *dsc;
-        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain image*/
-        lv_draw_image(ds_layer, &ds_dsc, coords);
-        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+        if(ds_layer) {
+            lv_draw_image_dsc_t ds_dsc = *dsc;
+            ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain image*/
+            lv_draw_image(ds_layer, &ds_dsc, coords);
+            lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+        }
     }
 
     lv_draw_image_dsc_t new_image_dsc;
@@ -155,17 +141,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     /*Typical case, draw the image as bitmap*/
     if(!(new_image_dsc.header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW)) {
-        lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_IMAGE);
-        if(!t) {
-            LV_LOG_WARN("Failed to create draw task");
-            LV_PROFILER_DRAW_END;
-            return;
-        }
-        lv_memcpy(t->draw_dsc, &new_image_dsc, sizeof(lv_draw_image_dsc_t));
-
-        lv_draw_image_get_transformed_area(&t->_real_area, dsc, coords);
-
-        lv_draw_finalize_task_creation(layer, t);
+        lv_draw_dsc_submit(&new_image_dsc.base, LV_DRAW_DSC_TYPE_IMAGE, layer, coords);
     }
     /*Use a custom draw callback*/
     else {

@@ -24,58 +24,35 @@ Modern embedded devices come with a wide variety of solutions to speed up render
 - Software libraries
 - and more
 
-To make it possible to utilize such facilities in the most efficient fashion, LVGL
-implements a :dfn:`Drawing Pipeline`, like an assembly line, where decisions are
-made as to which drawing tasks (Draw Tasks) are given to which Draw Units
-(rendering engines) in order to be carried out.
+To make it possible to utilize such facilities, LVGL hands each drawing to a
+:dfn:`Draw Unit` (rendering engine). The drawing functions, such as
+<ApiLink name="lv_draw_rect" /> and <ApiLink name="lv_draw_label" />, take a
+[Draw Descriptor](/main-modules/draw/draw_descriptors) describing what to draw, and pass it
+to the default Draw Unit, or to its fallback if the default can't draw it, before they
+return.
 
-This Pipeline is designed so that it is both flexible and extensible. You can use it
-to perform custom rendering with a GPU or replace parts of the built-in software
-rendering logic to any extent desired.
+This is designed so that it is both flexible and extensible. You can use it to perform
+custom rendering with a GPU or replace parts of the built-in software rendering logic to
+any extent desired.
 
-Using events, it's also possible to modify [Draw Tasks](/main-modules/draw/draw_pipeline) or insert new ones as
-LVGL renders Widgets.
+Using events, it's also possible to modify the draw descriptors or draw something below or
+on top of them as LVGL renders Widgets (see `LV_EVENT_DRAW_DSC_BEGIN` and
+`LV_EVENT_DRAW_DSC_END`).
 
 The following sections describe the basic terminology and concepts of rendering.
-
-## Draw Tasks
-
-A "Draw Task" (<ApiLink name="lv_draw_task_t" />) is a package of information that is
-created at the beginning of the Drawing Pipeline when a request to draw is made.
-Functions such as <ApiLink name="lv_draw_rect" /> and <ApiLink name="lv_draw_label" /> create
-one or more Draw Tasks and pass them down the Drawing Pipeline. Each Draw Task
-carries all the information required to:
-
-- compute which [Draw Unit](/main-modules/draw/draw_pipeline) should receive this task, and
-- give the Draw Unit all the information required to accomplish the drawing task.
-
-A Draw Task carries the following information:
-
-:type:                    defines the drawing algorithm involved (e.g. line, fill,
-                          border, image, label, arc, triangle, etc.)
-
-| Field | Description |
-|-------|-------------|
-| `area` | defines the rectangle in which drawing will occur |
-| `transformation matrix` | if <ApiLink name="LV_DRAW_TRANSFORM_USE_MATRIX" /> is configured to '1' |
-| `state` | waiting, queued, in progress, completed |
-| `drawing descriptor` | carries details of the drawing to be performed |
-| `preferred Draw Unit ID` | identifier of the Draw Unit that should carry out this task |
-| `next` | a link to the next Draw Task in the list. |
-
-Draw Tasks are collected in a list and periodically dispatched to Draw Units.
 
 ## Draw Units
 
 A "Draw Unit" (based on <ApiLink name="lv_draw_unit_t" />) is any "logic entity" that can
-generate the output required by a [Draw Task](/main-modules/draw/draw_pipeline). This can be a CPU
-core, a GPU, a custom rendering library for specific Draw Tasks, or any entity
-capable of performing rendering.
+draw a descriptor. This can be a CPU core, a GPU, a custom rendering library for specific
+descriptor types, or any entity capable of performing rendering.
+
+A Draw Unit has a `draw_cbs` table with a draw callback for each descriptor type it can draw
+(e.g. `draw_fill_cb`, `draw_label_cb`). Each callback gets the target layer, the clip area,
+the descriptor and, for most types, the area to draw.
 
 For a reference implementation of a draw unit, see
 [lv_draw_sw.c](https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c).
-
-Learn more about [Draw Units](/main-modules/draw/draw_pipeline)
 
 ### Creating Draw Units
 
@@ -87,33 +64,23 @@ enabled, it will be automatically initialized and used for rendering. The same a
 
 You can also add your own Draw Unit(s) after <ApiLink name="lv_init" /> by calling
 <ApiLink name="lv_draw_create_unit" display="lv_draw_create_unit(sizeof(your_draw_unit_t))" />. You also need to
-set its `draw_cbs` table (optionally with `can_draw_*_cb` callbacks), its `id`, its `fallback` and a
-`dispatch_cb` callback (mentioned later).
+set its `draw_cbs` table (optionally with `can_draw_*_cb` callbacks) and its `fallback`.
 
 For an example of how draw-unit creation and initialization is done, see
 <ApiLink name="lv_draw_sw_init" /> in lv_draw_sw.c_ or the other draw units whose `init`
 functions are in <ApiLink name="lv_init" />.
 
-### Thread Priority
-
-If <ApiLink name="LV_USE_OS" /> is set to something other than <ApiLink name="LV_OS_NONE" />, draw units might use a thread to
-allow waiting for the completion of rendering in a non-blocking way.
-
-The thread priority can be set using the <ApiLink name="LV_DRAW_THREAD_PRIO" />
-(<ApiLink name="LV_THREAD_PRIO_HIGH" /> by default) configuration option in `lv_conf.h`.
-This allows you to fine-tune the priority level for rendering in general.
-
 ### Clip Area
 
 LVGL clips the children widgets to the parent's boundary. To do that, it needs to know
-the current clip area when creating a draw task. The current clip area is the smallest
+the current clip area when a drawing function is called. The current clip area is the smallest
 intersection of all parent clip areas and the widget to be rendered. So, if a widget is
 out of its parent at the bottom and only its top part is visible, the clip area will be
 that small top part.
 
-As the current clip area always changes as LVGL traverses the widget tree, the clip
-area is saved in each draw task. This clip area should be considered by the draw units
-too, for example, to mask out only a smaller part of an image to be blended.
+The draw callbacks get this clip area as a parameter. Draw units should use it, not the
+layer's current clip area, for example, to mask out only a smaller part of an image to be
+blended.
 
 <ApiLink name="lv_obj_set_ext_draw_size"/> combined with <ApiLink name="LV_OBJ_FLAG_OVERFLOW_VISIBLE"/>
 can be used to increase the widget's clip area, allowing the children to overflow.
@@ -128,30 +95,48 @@ the software renderer, never to another GPU Draw Unit. Without <ApiLink name="LV
 it's `NULL`, so what the default Draw Unit can't draw isn't drawn.
 A Draw Unit that leaves `fallback` `NULL` (e.g. EVE and NanoVG) drops what it can't draw.
 
-When each [Draw Task](/main-modules/draw/draw_pipeline) is created, the default Draw Unit
-is asked whether it can draw it, through the `can_draw_*_cb` callback for the task's type in
-its `draw_cbs` table. If the callback is `NULL`, the Draw Unit can draw every descriptor of the
-types it has a draw callback for. If it can't draw the task, the fallback is asked.
-The ID of the Draw Unit that can draw the task is written to the
-task's "preferred Draw Unit ID", and that Draw Unit performs the task when it is
-[dispatched](/main-modules/draw/draw_pipeline). If neither can draw it, the task isn't drawn.
+When a drawing function is called, the default Draw Unit is asked whether it can draw the
+descriptor, through the `can_draw_*_cb` callback for its type in the `draw_cbs` table. If the
+callback is `NULL`, the Draw Unit can draw every descriptor of the types it has a draw callback
+for. If it can, its draw callback is called. If it can't, the fallback is asked the same way.
+If neither can draw it, nothing is drawn and a warning is logged.
 
 The `can_draw_*_cb` callbacks must not change anything, so the same Draw Unit is selected
-consistently, depending on the type (and nature) of the drawing task, avoiding any
-possible screen jitter.
+consistently, depending on the type (and nature) of the drawing, avoiding any possible
+screen jitter.
 
-## Dispatching
+## Draw Counters
 
-While collecting Draw Tasks, LVGL frequently dispatches the collected Draw Tasks to
-their assigned Draw Units. This is handled via the `dispatch_cb` of the Draw Units.
+With <ApiLink name="LV_USE_DRAW_COUNTERS" /> enabled, LVGL counts per descriptor type how many
+descriptors each Draw Unit draws, including those it draws as a fallback, and how many no Draw
+Unit can draw. This shows, for example, whether a GPU draws the images or the software renderer
+does. A rectangle counts its fill, border and shadow separately, and a refresh in several
+areas (e.g. partial rendering) counts each area.
 
-If a Draw Unit is busy with another Draw Task, it just returns. However, if it is
-available, it can take a Draw Task.
+```c
+lv_draw_reset_counters();
+/* ... draw or refresh ... */
 
-<ApiLink name="lv_draw_get_next_available_task" display="lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)" /> is a
-useful helper function which is used by the `dispatch_cb` to get the next Draw Task
-it should act on. If it handled the task, it sets the Draw Task's `state` field to
-<ApiLink name="LV_DRAW_TASK_STATE_FINISHED" />.
+lv_draw_unit_t * unit = lv_draw_unit_get_next(NULL);   /* the default Draw Unit */
+while(unit) {
+    LV_LOG_USER("%s: %u images", lv_draw_unit_get_name(unit),
+                lv_draw_unit_get_draw_count(unit, LV_DRAW_DSC_TYPE_IMAGE));
+    unit = lv_draw_unit_get_next(unit);
+}
+LV_LOG_USER("dropped: %u images", lv_draw_get_dropped_count(LV_DRAW_DSC_TYPE_IMAGE));
+```
+
+## Waiting for the Draw Units
+
+A Draw Unit may queue the drawing instead of finishing it before its draw callback returns,
+for example in a GPU command list. Such a Draw Unit implements `wait_for_finish_cb`, which
+waits until everything it has queued is drawn. LVGL calls it before the fallback draws, and
+<ApiLink name="lv_draw_wait_for_finish" /> calls it for every Draw Unit, e.g. before a
+rendered area is flushed to the display, a snapshot is returned, or a Canvas layer is
+finished.
+
+A Draw Unit that queues copies what it needs from the descriptor: the descriptor, and the
+data it points to, are only valid during the draw callback.
 
 ## Hierarchy Summary
 
@@ -163,6 +148,3 @@ All of the above have this relationship:
   - list of [Display(s)](/main-modules/display/overview)
 
     - Layer(s): Each [Display object](/main-modules/display/overview) has its own list of [Draw Layers](/main-modules/draw/draw_layers)
-
-      - Draw Tasks: Each Layer has its own list of Draw Tasks
-

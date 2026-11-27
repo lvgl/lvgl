@@ -23,15 +23,6 @@ DRAW_TASK_TYPE_NAMES = {
     14: "3D",
 }
 
-DRAW_TASK_STATE_NAMES = {
-    0: "BLOCKED",
-    1: "WAITING",
-    2: "QUEUED",
-    3: "IN_PROGRESS",
-    4: "FINISHED",
-    5: "FAILED",
-}
-
 DRAW_UNIT_TYPE_NAMES = {
     "DAVE2D": "lv_draw_dave2d_unit_t",
     "DMA2D": "lv_draw_dma2d_unit_t",

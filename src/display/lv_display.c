@@ -21,14 +21,7 @@
 #define disp_def LV_GLOBAL_DEFAULT()->disp_default
 #define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
-#if LV_DRAW_DISABLE_TILED_RENDERING
-    #define DEFAULT_TILE_CNT 1
-#else
-    #if LV_DRAW_SW_DRAW_UNIT_CNT < 1
-        #error LV_DRAW_SW_DRAW_UNIT_CNT should be at least 1
-    #endif
-    #define DEFAULT_TILE_CNT LV_DRAW_SW_DRAW_UNIT_CNT
-#endif
+#define DEFAULT_TILE_CNT 1
 
 /**********************
  *      TYPEDEFS
@@ -106,11 +99,15 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     * instead of assuming it needs to be bound to the refreshing display*/
     lv_display_t * original_refr_disp = lv_refr_get_disp_refreshing();
     lv_refr_set_disp_refreshing(disp);
-    disp->layer_head = lv_draw_layer_create(NULL, disp->color_format, &disp_area);
-    if(!disp->layer_head) {
+    /*The display's layer draws into the display's buffers, set at each refresh*/
+    lv_layer_t * layer = lv_malloc_zeroed(sizeof(lv_layer_t));
+    LV_ASSERT_MALLOC(layer);
+    if(!layer) {
         lv_ll_remove(disp_ll_p, disp);
         return NULL;
     }
+    /*Also makes it the display's `layer_head`*/
+    lv_draw_layer_init_with_buf(layer, NULL, NULL, disp->color_format, &disp_area);
     lv_refr_set_disp_refreshing(original_refr_disp);
 
     disp->inv_en_cnt = 1;

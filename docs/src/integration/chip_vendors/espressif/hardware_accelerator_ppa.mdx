@@ -7,7 +7,7 @@ faqs:
   - question: "Why does my application crash after enabling the PPA?"
     answer: "The draw buffer is probably not aligned to the 64-byte cache line size. Set CONFIG_LV_DRAW_BUF_ALIGN to 64."
   - question: "How much performance does the PPA gain?"
-    answer: "About 30% of the rendering time on average for image and rectangle fill draw tasks, and up to 9x for pure fills on integer multiples of the display size. Image blending is operational but shows no significant gain because of DMA2D memory bandwidth."
+    answer: "About 30% of the rendering time on average for images and rectangle fills, and up to 9x for pure fills on integer multiples of the display size. Image blending is operational but shows no significant gain because of DMA2D memory bandwidth."
   - question: "Should I use the PPA in partial render mode?"
     answer: "No. Use it with the double buffer support of the ESP LVGL port; in partial mode it offers no performance increase because of DMA2D memory bandwidth."
   - question: "Can the PPA rotate and mirror the display?"
@@ -103,7 +103,7 @@ void app_main(void)
 When running the `lv_demo_benchmark` from LVGL the user can compare the performance when
 the PPA is enabled versus the pure software rendering, by using the latest version of the
 LVGL and LVGL port component, an average saving of 30% of the rendering time can be observed
-for image and rectangle fill draw tasks. In some cases, for pure fills on integer multiples of
+for images and rectangle fills. In some cases, for pure fills on integer multiples of
 the display size, up to 9x speed increase is possible when the PPA is enabled.
 
 ### Limitations

@@ -8,13 +8,13 @@ title: Draw Descriptors
 
 ## Overview
 
-Each [Draw Task](/main-modules/draw/draw_pipeline) type has its own draw descriptor type.  For
+Each type of drawing has its own draw descriptor type.  For
 example, <ApiLink name="lv_draw_label_dsc_t" /> is used for label drawing,
 <ApiLink name="lv_draw_image_dsc_t" /> is used for image drawing.
 
-When an `lv_draw_...` function is called, it creates a Draw Task, copies the draw
-descriptor into a `malloc`ed memory block, and frees it automatically when
-needed.  Therefore, local draw descriptor variables can be safely used.
+The `lv_draw_...` functions don't keep the draw descriptor: it, and the data it
+points to, only need to be valid during the call.  Therefore, local draw descriptor
+variables can be safely used.
 
 ## Relation to Styles
 
@@ -153,13 +153,12 @@ specified area.
 ## Fill Draw Descriptor
 
 The main fields of <ApiLink name="lv_draw_fill_dsc_t" /> are straightforward.  It has a
-radius, opacity, and color to draw a rectangle.  If opacity is 0, no draw task will
-be created.
+radius, opacity, and color to draw a rectangle.  If opacity is 0, nothing is drawn.
 
-- <ApiLink name="lv_draw_fill_dsc_init" /> initializes a fill Draw Task.
-- <ApiLink name="lv_draw_sw_fill" /> creates a Draw Task to fill an area.
-- <ApiLink name="lv_draw_task_get_fill_dsc" display="lv_draw_task_get_fill_dsc(draw_task)" /> retrieves the fill descriptor from
-  a Draw Task.
+- <ApiLink name="lv_draw_fill_dsc_init" /> initializes a fill draw descriptor.
+- <ApiLink name="lv_draw_sw_fill" /> fills an area with the software renderer.
+- <ApiLink name="lv_draw_dsc_get_fill_dsc" display="lv_draw_dsc_get_fill_dsc(dsc)" /> gets the fill descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 
 ## Gradients
 
@@ -303,8 +302,7 @@ The zero angle is on the right-hand side, and 90 degrees is at the bottom.
 ## Border Draw Descriptor
 
 The <ApiLink name="lv_draw_border_dsc_t" /> border descriptor has radius, opacity,
-width, color, and side fields.  If the opacity or width is 0, no Draw Task will
-be created.
+width, color, and side fields.  If the opacity or width is 0, nothing is drawn.
 
 `side` can contain ORed values of <ApiLink name="lv_border_side_t" />, such as
 <ApiLink name="LV_BORDER_SIDE_BOTTOM" />.  <ApiLink name="LV_BORDER_SIDE_ALL" />
@@ -314,10 +312,10 @@ routine receives only simpler values.
 
 The following functions are used for border drawing:
 
-- <ApiLink name="lv_draw_border_dsc_init"/> initializes a border Draw Task.
-- <ApiLink name="lv_draw_sw_border"/> creates a Draw Task to draw a border inward from its area.
-- <ApiLink name="lv_draw_task_get_border_dsc" display="lv_draw_task_get_border_dsc(draw_task)" /> retrieves the border descriptor
-  from a Draw Task.
+- <ApiLink name="lv_draw_border_dsc_init"/> initializes a border draw descriptor.
+- <ApiLink name="lv_draw_sw_border"/> draws a border inward from its area with the software renderer.
+- <ApiLink name="lv_draw_dsc_get_border_dsc" display="lv_draw_dsc_get_border_dsc(dsc)" /> gets the border descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 
 <LvglExample name="lv_example_style_border" path="styles/lv_example_style_border" />
 
@@ -361,11 +359,11 @@ Note: Rendering large shadows may be slow or memory-intensive.
 
 The following functions are used for box shadow drawing:
 
-- <ApiLink name="lv_draw_box_shadow_dsc_init" /> initializes a box shadow Draw Task.
-- <ApiLink name="lv_draw_sw_box_shadow" /> creates a Draw Task for a rectangle's
-  shadow. The shadow's size and position depend on the width, spread, and offset.
-- <ApiLink name="lv_draw_task_get_box_shadow_dsc" display="lv_draw_task_get_box_shadow_dsc(draw_task)" /> retrieves the box shadow
-  descriptor from a Draw Task.
+- <ApiLink name="lv_draw_box_shadow_dsc_init" /> initializes a box shadow draw descriptor.
+- <ApiLink name="lv_draw_sw_box_shadow" /> draws a rectangle's shadow with the software
+  renderer. The shadow's size and position depend on the width, spread, and offset.
+- <ApiLink name="lv_draw_dsc_get_box_shadow_dsc" display="lv_draw_dsc_get_box_shadow_dsc(dsc)" /> gets the box shadow descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 
 <LvglExample name="lv_example_style_shadow" path="styles/lv_example_style_shadow" />
 
@@ -398,7 +396,8 @@ Functions for image drawing:
 
 - <ApiLink name="lv_draw_image_dsc_init" display="lv_draw_image_dsc_init(&dsc)" /> initializes an image draw descriptor.
 - <ApiLink name="lv_draw_image" display="lv_draw_image(layer, &dsc, area)" /> creates a task to draw an image in a given area.
-- <ApiLink name="lv_draw_task_get_image_dsc" display="lv_draw_task_get_image_dsc(draw_task)" /> retrieves the image descriptor from a task.
+- <ApiLink name="lv_draw_dsc_get_image_dsc" display="lv_draw_dsc_get_image_dsc(dsc)" /> gets the image descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 
 <LvglExample name="lv_example_canvas_image" path="widgets/canvas/lv_example_canvas_image" />
 
@@ -440,7 +439,6 @@ for controlling text rendering:
 | `decor` | Text decoration, e.g., underline. See <ApiLink name="lv_text_decor_t" />. |
 | `flag` | Flags for text rendering. See <ApiLink name="lv_text_flag_t" />. |
 | `text_length` | Number of characters to render (0 means render until `\\0`). |
-| `text_local` | Set to 1 to allocate a buffer and copy the text. |
 | `text_static` | Indicates `text` is constant and its pointer can be cached. |
 | `hint` | Pointer to externally stored data to speed up rendering. See <ApiLink name="lv_draw_label_hint_t" />. |
 
@@ -450,7 +448,8 @@ Functions for text drawing:
 - <ApiLink name="lv_draw_label" display="lv_draw_label(layer, &dsc, area)" /> creates a task to render text in an area.
 - <ApiLink name="lv_draw_character" display="lv_draw_character(layer, &dsc, point, unicode_letter)" /> creates a task to
   draw a character at a specific point.
-- <ApiLink name="lv_draw_task_get_label_dsc" display="lv_draw_task_get_label_dsc(draw_task)" /> retrieves the label descriptor from a task.
+- <ApiLink name="lv_draw_dsc_get_label_dsc" display="lv_draw_dsc_get_label_dsc(dsc)" /> gets the label descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 
 For character-specific drawing in draw units, use
 <ApiLink name="lv_draw_label_iterate_characters" />.
@@ -483,7 +482,8 @@ Functions for arc drawing:
 
 - <ApiLink name="lv_draw_arc_dsc_init" display="lv_draw_arc_dsc_init(&dsc)" /> initializes an arc descriptor.
 - <ApiLink name="lv_draw_arc" display="lv_draw_arc(layer, &dsc)" /> creates a task to render an arc.
-- <ApiLink name="lv_draw_task_get_arc_dsc" display="lv_draw_task_get_arc_dsc(draw_task)" /> retrieves arc descriptor from task.
+- <ApiLink name="lv_draw_dsc_get_arc_dsc" display="lv_draw_dsc_get_arc_dsc(dsc)" /> gets the arc descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 
 <LvglExample name="lv_example_canvas_arc" path="widgets/canvas/lv_example_canvas_arc" />
 
@@ -510,13 +510,14 @@ these fields:
 | `raw_end` | Set to 1 to skip end calculations if they are unnecessary. |
 
 If a large amount of points needs to be rendered it's recommended to use `points`
-instead of `p1` and `p2` as it avoids creating many draw tasks.
+instead of `p1` and `p2` as it draws all the segments in one call.
 
 Functions for line drawing:
 
 - <ApiLink name="lv_draw_line_dsc_init" display="lv_draw_line_dsc_init(&dsc)" /> initializes a line descriptor.
 - <ApiLink name="lv_draw_line" display="lv_draw_line(layer, &dsc)" /> creates a task to draw a line.
-- <ApiLink name="lv_draw_task_get_line_dsc" display="lv_draw_task_get_line_dsc(draw_task)" /> retrieves line descriptor.
+- <ApiLink name="lv_draw_dsc_get_line_dsc" display="lv_draw_dsc_get_line_dsc(dsc)" /> gets the line descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 - <ApiLink name="lv_draw_line_iterate" /> is a helper function
   to call a callback which draws a line between two points. This way it doesn't matter if
   `p1, p2` or `points` were used as it calls the `callback` as needed.
@@ -540,7 +541,8 @@ Functions for triangle drawing:
 
 - <ApiLink name="lv_draw_triangle_dsc_init" display="lv_draw_triangle_dsc_init(&dsc)" /> initializes a triangle descriptor.
 - <ApiLink name="lv_draw_triangle" display="lv_draw_triangle(layer, &dsc)" /> creates a task to draw a triangle.
-- <ApiLink name="lv_draw_task_get_triangle_dsc" display="lv_draw_task_get_triangle_dsc(draw_task)" /> retrieves triangle descriptor.
+- <ApiLink name="lv_draw_dsc_get_triangle_dsc" display="lv_draw_dsc_get_triangle_dsc(dsc)" /> gets the triangle descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 
 <LvglExample name="lv_example_canvas_triangle" path="widgets/canvas/lv_example_canvas_triangle" />
 
@@ -558,7 +560,8 @@ Functions for blur drawing:
 
 - <ApiLink name="lv_draw_blur_dsc_init" display="lv_draw_blur_dsc_init(&dsc)" /> initializes a blur descriptor.
 - <ApiLink name="lv_draw_blur" display="lv_draw_blur(layer, &dsc, area)" /> creates a task to blur an area.
-- <ApiLink name="lv_draw_task_get_blur_dsc" display="lv_draw_task_get_blur_dsc(draw_task)" /> retrieves blur descriptor.
+- <ApiLink name="lv_draw_dsc_get_blur_dsc" display="lv_draw_dsc_get_blur_dsc(dsc)" /> gets the blur descriptor from a
+  generic draw descriptor, e.g. in `LV_EVENT_DRAW_DSC_BEGIN`.
 
 <LvglExample name="lv_example_canvas_blur" path="widgets/canvas/lv_example_canvas_blur" />
 
@@ -662,8 +665,8 @@ There are several options to mask parts of a layer, Widget, or drawing:
 
    You can draw various content on a layer and then render the layer with a
    `clip_radius`, masking out all the content on the corners.
-3. **Rectangle Mask Draw Task**:
-   A special Draw Task can mask out a rectangle from a layer by setting the alpha
+3. **Rectangle Mask**:
+   A rectangle mask can mask out a rectangle from a layer by setting the alpha
    channel of certain pixels to 0.  To achieve this:
 
    - Create an <ApiLink name="lv_draw_mask_rect_dsc_t" /> descriptor.
@@ -677,7 +680,7 @@ There are several options to mask parts of a layer, Widget, or drawing:
 
    In most cases, the *"Clip Radius of Images"* method is better because it
    blends the layer with a radius mask on the fly, avoiding a dedicated masking
-   step. However, the *"Rectangle Mask Draw Task"* is useful when multiple areas
+   step. However, the *"Rectangle Mask"* is useful when multiple areas
    need clearing or when the area to be masked differs from the layer area.
 4. **Clip Corner Style Property**:
    Enabling `..._style_clip_corner` in a local or global style allows LVGL to

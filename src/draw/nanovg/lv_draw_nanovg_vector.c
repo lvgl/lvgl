@@ -62,7 +62,6 @@ void lv_draw_nanovg_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
 
     lv_layer_t * dsc_layer = dsc->base.layer;
     if(dsc_layer->draw_buf == NULL) {
-        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -71,7 +70,7 @@ void lv_draw_nanovg_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
 
     nvgGlobalAlpha(u->vg, dsc->opa / (float)LV_OPA_COVER);
 
-    lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, u);
+    lv_vector_for_each_task(dsc->task_list, task_draw_cb, u);
     LV_PROFILER_DRAW_END;
 }
 

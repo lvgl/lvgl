@@ -51,8 +51,6 @@ and a pointer to it are both accepted, so `info style my_style` and
 - `dump group`: List all focus groups with their objects.
 - `dump image_decoder`: List all registered image decoders.
 - `dump fs_drv`: List all registered filesystem drivers.
-- `dump draw_task <lv_layer_t *>`: List the draw tasks of a layer, e.g.
-  `dump draw_task lv_global->disp_default->layer_head`.
 - `dump dashboard [-o <file>] [--json|--viewer]`: Generate an HTML dashboard of
   all LVGL runtime state.
 - `dump widget props [<class>|<widget>]`: List the fields a widget has, by
@@ -308,16 +306,10 @@ open_cb, and close_cb.
 `dump fs_drv`: List all registered filesystem drivers with drive letter, driver type,
 cache size, and callbacks (open, read, write, close).
 
-## Dump Draw Tasks
-
-`dump draw_task <lv_layer_t *>`: Walk the draw task linked list of a layer and
-display each task's type, state, area, opacity, and preferred draw unit id. A
-display's layers start at `lv_global->disp_default->layer_head`.
-
 ## Dump Dashboard
 
 `dump dashboard`: Collect all LVGL runtime state (displays, object trees,
-animations, timers, caches, input devices, groups, draw units/tasks,
+animations, timers, caches, input devices, groups, draw units,
 subjects/observers, image decoders, filesystem drivers) and generate a
 self-contained HTML file for offline browsing.
 

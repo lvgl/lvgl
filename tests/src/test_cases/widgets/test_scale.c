@@ -266,15 +266,10 @@ static void draw_event_cb(lv_event_t * e)
             uint8_t major_tick = lv_scale_get_major_tick_every(obj);
             label_draw_dsc->color = color_idx[base_dsc->id1 / major_tick];
 
-            /*Free the previously allocated text if needed*/
-            if(label_draw_dsc->text_local) lv_free((void *)label_draw_dsc->text);
-
-            /*Malloc the text and set text_local as 1 to make LVGL automatically free the text.
-             * (Local texts are malloc'd internally by LVGL. Mimic this behavior here too)*/
-            char tmp_buffer[20] = {0}; /* Big enough buffer */
+            /*The text only has to be valid until the label is drawn, so a static buffer is enough*/
+            static char tmp_buffer[20]; /* Big enough buffer */
             lv_snprintf(tmp_buffer, sizeof(tmp_buffer), "%.1f", base_dsc->id2 * 1.0f);
-            label_draw_dsc->text = lv_strdup(tmp_buffer);
-            label_draw_dsc->text_local = 1;
+            label_draw_dsc->text = tmp_buffer;
 
             lv_point_t size;
             lv_text_attributes_t attributes = {0};

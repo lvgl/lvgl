@@ -29,7 +29,6 @@ extern "C" {
 
 /**
  * Initialize the SW renderer. Called in internally.
- * It creates as many SW renderers as defined in LV_DRAW_SW_DRAW_UNIT_CNT
  */
 void lv_draw_sw_init(void);
 

@@ -1371,7 +1371,6 @@ static void draw_cursor(lv_event_t * e)
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
     if(cur_dsc.bg_opa > LV_OPA_MIN || !lv_color_eq(cur_label_dsc.color, label_color)) {
         cur_label_dsc.text = letter_buf;
-        cur_label_dsc.text_local = true;
         lv_draw_label(layer, &cur_label_dsc, &cur_area);
     }
 }

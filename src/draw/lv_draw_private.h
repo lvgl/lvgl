@@ -27,51 +27,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_task_t {
-    lv_draw_task_t * next;
-
-    lv_draw_dsc_type_t type;
-
-    /**
-     * The area where to draw
-     */
-    lv_area_t area;
-
-    /**
-     * The real draw area. E.g. for shadow, outline, or transformed images it's different from `area`
-     */
-    lv_area_t _real_area;
-
-    /**
-     * The clip area of the layer is saved here when the draw task is created.
-     * As the clip area of the layer can be changed as new draw tasks are added its current value needs to be saved.
-     * Therefore during drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
-     */
-    lv_area_t clip_area;
-    lv_layer_t * target_layer;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    /** Transform matrix to be applied when rendering the layer */
-    lv_matrix_t matrix;
-#endif
-
-    /* Reference to the draw unit for debug or draw context purposes */
-    lv_draw_unit_t * draw_unit;
-
-    volatile int state;              /** int instead of lv_draw_task_state_t to be sure its atomic */
-
-    void * draw_dsc;
-
-    /** Opacity of the layer */
-    lv_opa_t opa;
-
-    /**
-     * The ID of the draw_unit which should take this task
-     */
-    uint8_t preferred_draw_unit_id;
-
-};
-
 struct _lv_draw_mask_t {
     void * user_data;
 };
@@ -153,68 +108,11 @@ struct _lv_draw_unit_t {
     lv_draw_unit_t * fallback;
 
     /**
-     * The ID the unit's dispatcher looks for in `lv_draw_task_t::preferred_draw_unit_id`.
-     */
-    uint8_t id;
-
-    /**
-     * Called to try to assign a draw task to itself.
-     * `lv_draw_get_next_available_task` can be used to get an independent draw task.
-     * A draw task should be assign only if the draw unit can draw it too
+     * Wait until the unit has finished everything it has queued (e.g. a GPU command list),
+     * so that the CPU can read or flush the buffers it drew to.
+     * NULL if the unit draws before its draw callbacks return.
      * @param draw_unit     pointer to the draw unit
-     * @param layer         pointer to a layer on which the draw task should be drawn
-     * @return              >=0:    The number of taken draw task:
-     *                                  0 means the task has not yet been completed.
-     *                                  1 means a new task has been accepted.
-     *                      -1:     The draw unit wanted to work on a task but couldn't do that
-     *                              due to some errors (e.g. out of memory).
-     *                              It signals that LVGL should call the dispatcher later again
-     *                              to let draw unit try to start the rendering again.
-     */
-    int32_t (*dispatch_cb)(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-
-    /**
-     * Called to signal the unit to complete all tasks in order to return their ready status.
-     * This callback can be implemented in case of asynchronous task processing.
-     * Below is an example to show the difference between synchronous and asynchronous:
-     *
-     * Synchronous:
-     * LVGL thread              DRAW thread                 HW
-     *
-     * task1             -->    submit               -->    Receive task1
-     *                          wait_for_finish()
-     *                   <--    task1->state = READY <--    Complete task1
-     * task2             -->    submit               -->    Receive task2
-     *                          wait_for_finish()
-     *                          task2->state = READY <--    Complete task2
-     * task3             -->    submit               -->    Receive task3
-     *                          wait_for_finish()
-     *                   <--    task3->state = READY <--    Complete task3
-     * task4             -->    submit               -->    Receive task4
-     *                          wait_for_finish()
-     *                   <--    task4->state = READY <--    Complete task4
-     * NO MORE TASKS
-     *
-     *
-     * Asynchronous:
-     * LVGL thread              DRAW thread                 HW
-     *                                                      is IDLE
-     * task1             -->    queue task1
-     *                          submit               -->    Receive task1
-     * task2             -->    queue task2                 is BUSY (with task1)
-     * task3             -->    queue task3                 still BUSY (with task1)
-     * task4             -->    queue task4                 becomes IDLE
-     *                   <--    task1->state = READY <--    Complete task1
-     *                          submit               -->    Receive task2, task3, task4
-     * NO MORE TASKS
-     * wait_for_finish_cb()     wait_for_finish()
-     *                                               <--    Complete task2, task3, task4
-     *                   <--    task2->state = READY <--
-     *                   <--    task3->state = READY <--
-     *                   <--    task4->state = READY <--
-     *
-     * @param draw_unit
-     * @return
+     * @return              not used, return 0
      */
     int32_t (*wait_for_finish_cb)(lv_draw_unit_t * draw_unit);
 
@@ -230,19 +128,20 @@ struct _lv_draw_unit_t {
      * @param event pointer to the event descriptor
      */
     void (*event_cb)(lv_event_t * event);
+#if LV_USE_DRAW_COUNTERS
+    uint32_t draw_count[LV_DRAW_DSC_TYPE_COUNT];
+#endif
 };
 
 typedef struct {
     lv_draw_unit_t * unit_head;
+#if LV_USE_DRAW_COUNTERS
+    uint32_t dropped_count[LV_DRAW_DSC_TYPE_COUNT];
+#endif
     uint32_t unit_cnt;
     uint32_t used_memory_for_layers; /* measured as bytes */
-#if LV_USE_OS
-    lv_thread_sync_t sync;
-#else
-    volatile int dispatch_req;
-#endif
     lv_mutex_t circle_cache_mutex;
-    bool task_running;
+    bool is_sending_event;
 } lv_draw_global_info_t;
 
 /**********************
@@ -250,19 +149,36 @@ typedef struct {
  **********************/
 
 /**
- * Free a draw task and everything it owns
- * Used both by the normal dispatch path and to unwind a redraw that is being abandoned.
- * @param  t      draw task to free
+ * Draw a descriptor on a layer with the draw units, sending the draw events around it.
+ * Used by the `lv_draw_<type>()` functions after they've prepared the descriptor.
+ *
+ * The descriptor is modified, so pass a local copy (e.g. on the stack), never the caller's `const` descriptor:
+ * - its `type` and `layer` fields are set;
+ * - `LV_EVENT_DRAW_DSC_BEGIN` handlers may change it before it's drawn.
+ *
+ * The copy doesn't need to be allocated: the descriptor, and everything it points to (points, text,
+ * image source), is no longer used after this function returns. Drawing may still be in progress
+ * when it returns.
+ *
+ * If no draw unit can draw it, nothing is drawn and a warning is logged.
+ *
+ * @param dsc       the descriptor to draw, modified as described above
+ * @param type      the type of `dsc`, which decides the draw callback that is called
+ * @param layer     the layer to draw on; the clip area is read from it once
+ * @param coords    the area of the drawing, or its bounding box for line, triangle, arc, vector and mask (absolute coordinates)
  */
-void lv_draw_cleanup_task(lv_draw_task_t * t);
+void lv_draw_dsc_submit(lv_draw_dsc_t * dsc, lv_draw_dsc_type_t type, lv_layer_t * layer, const lv_area_t * coords);
 
 /**
- * Draw a task with the matching callback of a draw unit.
- * Does nothing if the unit has no callback for the task's type.
- * @param draw_unit     the draw unit drawing the task
- * @param t             the draw task to draw
+ * Initialize a layer that draws into a buffer owned by someone else.
+ * @param layer         pointer to the layer to initialize
+ * @param parent_layer  the parent layer @nullable
+ * @param draw_buf      the buffer to draw into, can be set later @nullable
+ * @param color_format  the color format of the layer
+ * @param area          the area of the layer (absolute coordinates)
  */
-void lv_draw_unit_draw_task(lv_draw_unit_t * draw_unit, lv_draw_task_t * t);
+void lv_draw_layer_init_with_buf(lv_layer_t * layer, lv_layer_t * parent_layer, lv_draw_buf_t * draw_buf,
+                                 lv_color_format_t color_format, const lv_area_t * area);
 
 /**********************
  *      MACROS

@@ -62,14 +62,6 @@ config LV_DRAW_SW_I1_LUM_THRESHOLD
 
 endmenu
 
-config LV_DRAW_SW_DRAW_UNIT_CNT
-	int "Number of draw units"
-	default 1
-	range 1 255
-	depends on !LV_OS_NONE
-	help
-		Number of threads used to render a frame in parallel
-
 config LV_USE_DRAW_ARM2D_SYNC
 	bool "Arm-2D acceleration (Cortex-M)"
 	default n

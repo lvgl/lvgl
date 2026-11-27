@@ -546,13 +546,6 @@ void lv_draw_vector_dsc_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t *
 void lv_draw_vector(lv_draw_vector_dsc_t * dsc);
 
 /**
- * Try to get a vector draw descriptor from a draw task.
- * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_VECTOR
- */
-lv_draw_vector_dsc_t * lv_draw_task_get_vector_dsc(lv_draw_task_t * task);
-
-/**
  * Get the vector draw descriptor from a generic draw descriptor.
  * `dsc` must be of type LV_DRAW_DSC_TYPE_VECTOR, use `lv_draw_dsc_get_type()` to check it first.
  * @param dsc       draw descriptor

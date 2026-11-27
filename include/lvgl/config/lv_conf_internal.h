@@ -403,22 +403,6 @@
     #endif
 #endif
 
-#ifndef LV_DRAW_THREAD_STACK_SIZE
-    #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
-        #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
-    #else
-        #define LV_DRAW_THREAD_STACK_SIZE 8192
-    #endif
-#endif
-
-#ifndef LV_DRAW_THREAD_PRIO
-    #ifdef CONFIG_LV_DRAW_THREAD_PRIO
-        #define LV_DRAW_THREAD_PRIO CONFIG_LV_DRAW_THREAD_PRIO
-    #else
-        #define LV_DRAW_THREAD_PRIO 3
-    #endif
-#endif
-
 #ifndef LV_USE_VECTOR_GRAPHIC
     #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
         #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
@@ -452,6 +436,14 @@
         #endif
     #else
           #define LV_USE_THORVG_INTERNAL LV_USE_THORVG
+    #endif
+#endif
+
+#ifndef LV_THORVG_THREAD_COUNT
+    #ifdef CONFIG_LV_THORVG_THREAD_COUNT
+        #define LV_THORVG_THREAD_COUNT CONFIG_LV_THORVG_THREAD_COUNT
+    #else
+        #define LV_THORVG_THREAD_COUNT 1
     #endif
 #endif
 
@@ -604,14 +596,6 @@
         #define LV_DRAW_SW_I1_LUM_THRESHOLD CONFIG_LV_DRAW_SW_I1_LUM_THRESHOLD
     #else
         #define LV_DRAW_SW_I1_LUM_THRESHOLD 127
-    #endif
-#endif
-
-#ifndef LV_DRAW_SW_DRAW_UNIT_CNT
-    #ifdef CONFIG_LV_DRAW_SW_DRAW_UNIT_CNT
-        #define LV_DRAW_SW_DRAW_UNIT_CNT CONFIG_LV_DRAW_SW_DRAW_UNIT_CNT
-    #else
-        #define LV_DRAW_SW_DRAW_UNIT_CNT 1
     #endif
 #endif
 
@@ -995,18 +979,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_PXP_DRAW_THREAD
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_PXP_DRAW_THREAD
-            #define LV_USE_PXP_DRAW_THREAD CONFIG_LV_USE_PXP_DRAW_THREAD
-        #else
-            #define LV_USE_PXP_DRAW_THREAD 0
-        #endif
-    #else
-          #define LV_USE_PXP_DRAW_THREAD !(LV_USE_OS == LV_OS_NONE) && LV_USE_DRAW_PXP
-    #endif
-#endif
-
 #ifndef LV_USE_PXP_ASSERT
     #ifdef CONFIG_LV_USE_PXP_ASSERT
         #define LV_USE_PXP_ASSERT CONFIG_LV_USE_PXP_ASSERT
@@ -1087,18 +1059,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_SIFLI_EPIC_DRAW_THREAD
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SIFLI_EPIC_DRAW_THREAD
-            #define LV_USE_SIFLI_EPIC_DRAW_THREAD CONFIG_LV_USE_SIFLI_EPIC_DRAW_THREAD
-        #else
-            #define LV_USE_SIFLI_EPIC_DRAW_THREAD 0
-        #endif
-    #else
-          #define LV_USE_SIFLI_EPIC_DRAW_THREAD !(LV_USE_OS == LV_OS_NONE) && LV_USE_SIFLI_EPIC
-    #endif
-#endif
-
 #ifndef LV_USE_SIFLI_EPIC_ASSERT
     #ifdef CONFIG_LV_USE_SIFLI_EPIC_ASSERT
         #define LV_USE_SIFLI_EPIC_ASSERT CONFIG_LV_USE_SIFLI_EPIC_ASSERT
@@ -1152,18 +1112,6 @@
         #define LV_G2D_HASH_TABLE_SIZE CONFIG_LV_G2D_HASH_TABLE_SIZE
     #else
         #define LV_G2D_HASH_TABLE_SIZE 50
-    #endif
-#endif
-
-#ifndef LV_USE_G2D_DRAW_THREAD
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_G2D_DRAW_THREAD
-            #define LV_USE_G2D_DRAW_THREAD CONFIG_LV_USE_G2D_DRAW_THREAD
-        #else
-            #define LV_USE_G2D_DRAW_THREAD 0
-        #endif
-    #else
-          #define LV_USE_G2D_DRAW_THREAD !(LV_USE_OS == LV_OS_NONE) && LV_USE_DRAW_G2D
     #endif
 #endif
 
@@ -4337,6 +4285,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_DRAW_COUNTERS
+    #ifdef CONFIG_LV_USE_DRAW_COUNTERS
+        #define LV_USE_DRAW_COUNTERS CONFIG_LV_USE_DRAW_COUNTERS
+    #else
+        #define LV_USE_DRAW_COUNTERS 0
+    #endif
+#endif
+
 
 
 /*============================================================================
@@ -4741,6 +4697,10 @@
     #error LV_COLOR_16_SWAP has been removed. Use LV_COLOR_FORMAT_RGB565_SWAPPED as the display color format instead
 #endif
 
+#if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && LV_DRAW_SW_DRAW_UNIT_CNT > 1
+    #warning LV_DRAW_SW_DRAW_UNIT_CNT has been removed: drawing runs on the calling thread. For ThorVG use LV_THORVG_THREAD_COUNT. See the v10 migration guide
+#endif
+
 /*----------------------------------
  * End of outdated config check block
  -----------------------------------*/
@@ -5004,17 +4964,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #undef LV_KCONFIG_PRESENT
 
 
-#if LV_USE_OS
-    #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
-        #error "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
-    #endif
-
-    #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)
-        #warning "LV_DRAW_THREAD_STACKSIZE was renamed to LV_DRAW_THREAD_STACK_SIZE. Please update lv_conf.h or run menuconfig again."
-        #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
-    #endif
-#endif
-
 /*Allow only upper case letters and '/'  ('/' is a special case for backward compatibility)*/
 #define LV_FS_IS_VALID_LETTER(l) ((l) == '/' || ((l) >= 'A' && (l) <= 'Z'))
 
@@ -5051,8 +5000,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_THORVG must be enabled: Kconfig selects it from LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE"
 #endif
 
-#if (LV_USE_PPA || LV_USE_SIFLI_EPIC || LV_USE_DRAW_G2D || LV_USE_DRAW_SDL) && !LV_USE_DRAW_SW
-    #error "LV_USE_DRAW_SW must be enabled: Kconfig selects it from LV_USE_PPA || LV_USE_SIFLI_EPIC || LV_USE_DRAW_G2D || LV_USE_DRAW_SDL"
+#if (LV_USE_PPA || LV_USE_SIFLI_EPIC || LV_USE_DRAW_G2D || LV_USE_DRAW_OPENGLES || LV_USE_DRAW_SDL) && !LV_USE_DRAW_SW
+    #error "LV_USE_DRAW_SW must be enabled: Kconfig selects it from LV_USE_PPA || LV_USE_SIFLI_EPIC || LV_USE_DRAW_G2D || LV_USE_DRAW_OPENGLES || LV_USE_DRAW_SDL"
 #endif
 
 #if (LV_USE_THORVG && LV_USE_DRAW_SW) && !LV_DRAW_SW_SUPPORT_ARGB8888

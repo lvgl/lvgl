@@ -420,6 +420,48 @@ and are not meant to be included directly.
 
 ## Rendering
 
+### Draw functions
+
+- The `lv_draw_*()` functions draw (or hand the drawing to the draw unit) before they return, instead of queuing
+  a draw task. The descriptor and the data it points to (text, points, image source...) only need to be valid
+  during the call; LVGL doesn't copy or free them. The same applies to what an `LV_EVENT_DRAW_DSC_BEGIN` handler
+  puts in the descriptor.
+
+### Draw tasks
+
+Draw tasks are gone: the draw functions draw before they return (see "Draw functions"), so there is no task list to
+inspect or dispatch.
+
+- `lv_draw_task_t`, `lv_draw_task_state_t`, `lv_draw_task_get_type()`, `lv_draw_task_get_draw_dsc()`,
+  `lv_draw_task_get_area()` and the `lv_draw_task_get_<type>_dsc()` getters have been removed. In draw events, use
+  the descriptor passed to the event (see "Draw events").
+- `lv_draw_add_task()`, `lv_draw_finalize_task_creation()`, `lv_draw_dispatch()`, `lv_draw_dispatch_layer()`,
+  `lv_draw_dispatch_request()`, `lv_draw_dispatch_wait_for_request()`, `lv_draw_get_available_task()`,
+  `lv_draw_get_next_available_task()`, `lv_draw_get_dependent_count()` and `lv_draw_layer_alloc_buf()` have been
+  removed, and so have the `draw_task_head` and `all_tasks_added` fields of `lv_layer_t`.
+- To wait until the draw units have finished drawing (e.g. before reading a buffer), call
+  <ApiLink name="lv_draw_wait_for_finish"/>.
+- Custom draw units: `dispatch_cb`, `LV_DRAW_UNIT_IDLE` and `LV_DRAW_UNIT_NONE` have been removed. A unit implements
+  the callbacks of its `draw_cbs` table, which are called directly with the layer, clip area and descriptor. If it
+  queues work instead of drawing before the callback returns, it copies what it needs and implements
+  `wait_for_finish_cb`; the layer's buffer is allocated when the layer is created.
+
+### Draw threads
+
+Drawing runs on the thread that calls the draw functions: the software renderer and the PXP, G2D, SiFli EPIC
+and NemaGFX draw units no longer start render threads. Draw units that queue their work in the hardware (VG-Lite,
+NanoVG, DMA2D and IPA with the interrupt enabled) still let the CPU continue while the GPU draws. Parallel
+software rendering may come back in a later release.
+
+These options have been removed:
+
+| Removed | Notes |
+|---|---|
+| `LV_DRAW_SW_DRAW_UNIT_CNT` | Also set ThorVG's thread count: use <ApiLink name="LV_THORVG_THREAD_COUNT"/> for that. A value above 1 in `lv_conf.h` gives a warning. The default tile count (<ApiLink name="lv_display_set_tile_cnt"/>) is now 1. |
+| `LV_USE_PXP_DRAW_THREAD`, `LV_USE_G2D_DRAW_THREAD`, `LV_USE_SIFLI_EPIC_DRAW_THREAD` | |
+| `LV_DRAW_THREAD_STACK_SIZE`, `LV_DRAW_THREAD_PRIO` | The drawing uses the calling thread's stack: give it 32 KB or more with FreeType or ThorVG. |
+| `LV_DAVE2D_MAX_DRAW_PRESSURE` | Dave2D renders each drawing when it's called. |
+
 ### Draw events
 
 - `LV_DRAW_TASK_TYPE_MASK_BITMAP` has been removed. No draw task of this type was ever created.
@@ -551,19 +593,21 @@ and are not meant to be included directly.
    lv_draw_unit_draw_letter(layer, clip_area, glyph_dsc, pos, font, letter, my_draw_glyph_cb, my_user_data);
    ```
 
+- The `text_local` field of <ApiLink name="lv_draw_label_dsc_t"/> has been removed: the text is no longer copied,
+  it only has to be valid during the `lv_draw_label()` call (see "Draw functions"). Remove the lines that set it.
+
 ### Custom draw units
 
 - `evaluate_cb` and the `preference_score` field of the draw tasks have been removed. A draw unit no longer bids for
   the tasks; instead it tells whether it can draw a descriptor with the `can_draw_*_cb` callbacks of its `draw_cbs`
-  table (one per descriptor type, `NULL` means it can draw every descriptor of the types it has a draw callback for),
-  and sets its `id`, the ID its `dispatch_cb` looks for in `preferred_draw_unit_id`.
+  table (one per descriptor type, `NULL` means it can draw every descriptor of the types it has a draw callback for).
 - The last created draw unit is the default. Each unit sets its new `fallback` field when it's created; the built-in
-  GPU units set it to the software unit (`NULL` if <ApiLink name="LV_USE_DRAW_SW"/> is disabled). A task goes to the
-  default unit, or to its fallback if the default can't draw it; it never goes to another GPU unit. With several GPU
-  units enabled, only the last created one draws. A unit that leaves `fallback` `NULL` drops the tasks it can't
-  draw.
-- With two GPU units enabled, the default unit may have changed: with DMA2D and NemaGFX, NemaGFX draws (DMA2D gets
-  no draw tasks); with PXP or G2D and VGLite, VGLite draws (PXP and G2D get no draw tasks). What the default unit
+  GPU units set it to the software unit (`NULL` if <ApiLink name="LV_USE_DRAW_SW"/> is disabled). A descriptor goes to
+  the default unit, or to its fallback if the default can't draw it; it never goes to another GPU unit. With several GPU
+  units enabled, only the last created one draws. A unit that leaves `fallback` `NULL` drops the descriptors it
+  can't draw.
+- With two GPU units enabled, the default unit may have changed: with DMA2D and NemaGFX, NemaGFX draws (DMA2D draws
+  nothing); with PXP or G2D and VGLite, VGLite draws (PXP and G2D draw nothing). What the default unit
   can't draw goes to the software unit, not to the other GPU unit.
 
    ```c
@@ -584,9 +628,21 @@ and are not meant to be included directly.
        .can_draw_fill_cb = NULL, /* can draw every fill */
    };
    my_unit->base_unit.draw_cbs = &my_draw_cbs;
-   my_unit->base_unit.id = MY_DRAW_UNIT_ID;
    my_unit->base_unit.fallback = lv_draw_sw_get_draw_unit(); /* or NULL to drop what it can't draw */
    ```
+
+- A vector draw callback iterates the paths with `lv_vector_for_each_task()` (was
+  `lv_vector_for_each_destroy_tasks()`), which doesn't free them: LVGL frees the list after the draw.
+
+### Layers
+
+- A layer's buffer is allocated when the layer is created by <ApiLink name="lv_draw_layer_create"/> or
+  <ApiLink name="lv_draw_layer_init"/>, not when the first draw on it is dispatched.
+- <ApiLink name="lv_draw_layer_init"/> returns an <ApiLink name="lv_result_t"/>: `LV_RESULT_INVALID` if the buffer
+  can't be allocated. A layer initialized with it owns its buffer and frees it in
+  <ApiLink name="lv_draw_layer_deinit"/>; don't replace `draw_buf` afterwards.
+- When <ApiLink name="LV_DRAW_LAYER_MAX_MEMORY"/> is reached, the layer isn't created and that part of the widget
+  isn't drawn (a warning is logged). Before, the draw waited until other layers had freed their memory.
 
 
 ---

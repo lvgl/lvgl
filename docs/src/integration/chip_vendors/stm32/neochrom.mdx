@@ -155,6 +155,6 @@ const lv_image_dsc_t img_demo_widgets_avatar_tsc6a = {
 NeoChrom can be enabled at the same time as [LTDC](/integration/chip_vendors/stm32/ltdc). They will not interfere
 with each other at all.
 
-NeoChrom and [DMA2D](/integration/chip_vendors/stm32/dma2d_gpu) may be enabled at the same time. They are both draw units
-and they will both independently accept draw tasks.
+NeoChrom and [DMA2D](/integration/chip_vendors/stm32/dma2d_gpu) may be enabled at the same time. They are both draw units,
+and only one of them draws: see [Choosing the Draw Unit](/main-modules/draw/draw_pipeline).
 

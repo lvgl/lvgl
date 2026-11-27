@@ -46,7 +46,7 @@ However there are three places where you can use LVGL's Drawing API directly.
 
 The main components of LVGL's Drawing API are the <ApiLink name="lv_draw_rect" />,
 <ApiLink name="lv_draw_label" />, <ApiLink name="lv_draw_image" />, and similar functions.
-When they are called <ApiLink name="lv_draw_task_t" /> objects are created internally.
+They draw with the draw units before they return; see [Draw Pipeline](/main-modules/draw/draw_pipeline).
 
 These functions have the following parameters:
 

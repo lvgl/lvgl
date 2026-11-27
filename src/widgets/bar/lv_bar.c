@@ -644,26 +644,31 @@ static void draw_indic(lv_event_t * e)
 
         lv_layer_t * layer_indic = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &indic_draw_area);
 
-        lv_draw_rect(layer_indic, &draw_tmp_dsc, &indic_draw_area);
-
-        lv_draw_mask_rect_dsc_t mask_dsc;
-        lv_draw_mask_rect_dsc_init(&mask_dsc);
-        if(radius_issue) {
-            mask_dsc.area = bar_coords;
-            mask_dsc.radius = bg_radius;
-            lv_draw_mask_rect(layer_indic, &mask_dsc);
+        if(layer_indic == NULL) {
+            LV_LOG_WARN("Couldn't create a layer, the indicator's background is not drawn");
         }
+        else {
+            lv_draw_rect(layer_indic, &draw_tmp_dsc, &indic_draw_area);
 
-        if(mask_needed) {
-            mask_dsc.area = indic_area;
-            mask_dsc.radius = indic_radius;
-            lv_draw_mask_rect(layer_indic, &mask_dsc);
+            lv_draw_mask_rect_dsc_t mask_dsc;
+            lv_draw_mask_rect_dsc_init(&mask_dsc);
+            if(radius_issue) {
+                mask_dsc.area = bar_coords;
+                mask_dsc.radius = bg_radius;
+                lv_draw_mask_rect(layer_indic, &mask_dsc);
+            }
+
+            if(mask_needed) {
+                mask_dsc.area = indic_area;
+                mask_dsc.radius = indic_radius;
+                lv_draw_mask_rect(layer_indic, &mask_dsc);
+            }
+
+            lv_draw_image_dsc_t layer_draw_dsc;
+            lv_draw_image_dsc_init(&layer_draw_dsc);
+            layer_draw_dsc.src = layer_indic;
+            lv_draw_layer(layer, &layer_draw_dsc, &indic_draw_area);
         }
-
-        lv_draw_image_dsc_t layer_draw_dsc;
-        lv_draw_image_dsc_init(&layer_draw_dsc);
-        layer_draw_dsc.src = layer_indic;
-        lv_draw_layer(layer, &layer_draw_dsc, &indic_draw_area);
 
         /*Add the border, outline, and shadow only to the indicator area.
          *They might have disabled if there is a radius_issue*/

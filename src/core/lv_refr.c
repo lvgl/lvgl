@@ -203,6 +203,15 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 bottom.y1 = bottom.y2 - rout + 1;
                 if(lv_area_intersect(&bottom, &bottom, &layer->_clip_area)) {
                     layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &bottom);
+                    if(!layer_children) {
+                        LV_LOG_WARN("Couldn't create a layer, this part of the children is not drawn");
+                    }
+                }
+                else {
+                    layer_children = NULL;
+                }
+
+                if(layer_children) {
 
                     for(i = 0; i < child_cnt; i++) {
                         lv_obj_t * child = obj->spec_attr->children[i];
@@ -224,6 +233,15 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 top.y2 = top.y1 + rout - 1;
                 if(lv_area_intersect(&top, &top, &layer->_clip_area)) {
                     layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &top);
+                    if(!layer_children) {
+                        LV_LOG_WARN("Couldn't create a layer, this part of the children is not drawn");
+                    }
+                }
+                else {
+                    layer_children = NULL;
+                }
+
+                if(layer_children) {
 
                     for(i = 0; i < child_cnt; i++) {
                         lv_obj_t * child = obj->spec_attr->children[i];
@@ -616,6 +634,11 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
 
             lv_layer_t * new_layer = lv_draw_layer_create(layer,
                                                           area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_DEFAULT, &layer_area_act);
+            if(!new_layer) {
+                LV_LOG_WARN("Couldn't create a layer, this part of the object is not drawn");
+                layer_area_act.y1 = layer_area_act.y2 + 1;
+                continue;
+            }
             lv_obj_redraw(new_layer, obj);
 
             lv_point_t pivot = {
@@ -932,7 +955,6 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     layer->_clip_area = *area_p;
     layer->phy_clip_area = *area_p;
     layer->partial_y_offset = y_offset;
-    layer->all_tasks_added = false;
 
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /*In partial mode render this area to the buffer*/
@@ -975,7 +997,6 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
 
     if(tile_cnt == 1) {
         refr_configured_layer(layer);
-        layer->all_tasks_added = true;
     }
     else {
         /* Don't draw to the layers buffer of the display but create smaller dummy layers which are using the
@@ -999,26 +1020,16 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             }
 
             lv_layer_t * tile_layer = &tile_layers[i];
-            lv_draw_layer_init(tile_layer, NULL, layer->color_format, &tile_area);
+            lv_draw_layer_init_with_buf(tile_layer, NULL, layer->draw_buf, layer->color_format, &tile_area);
             tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
-            tile_layer->draw_buf = layer->draw_buf;
             refr_configured_layer(tile_layer);
-            tile_layer->all_tasks_added = true;
         }
 
-
-        /*Wait until all tiles are ready and destroy remove them*/
+        /*The tiles are drawn: remove them*/
         for(i = 0; i < tile_cnt; i++) {
-            lv_layer_t * tile_layer = &tile_layers[i];
-            while(tile_layer->draw_task_head) {
-                lv_draw_dispatch_wait_for_request();
-                lv_draw_dispatch();
-            }
-            lv_draw_layer_deinit(tile_layer);
+            lv_draw_layer_deinit(&tile_layers[i]);
         }
         lv_free(tile_layers);
-
-        layer->all_tasks_added = true;
     }
 
     disp_refr->refreshed_area = *area_p;
@@ -1439,10 +1450,8 @@ static void draw_buf_flush(lv_display_t * disp)
     /*Flush the rendered content to the display*/
     lv_layer_t * layer = disp->layer_head;
 
-    while(layer->draw_task_head) {
-        lv_draw_dispatch_wait_for_request();
-        lv_draw_dispatch();
-    }
+    /*Units may have queued work (GPU command lists) that has to be done before the buffer is sent*/
+    lv_draw_wait_for_finish();
 
     /* Every layer must've been drawn*/
     LV_ASSERT_MSG(layer->next == NULL, "Expected every layer to have been drawn at this point");

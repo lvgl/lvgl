@@ -41,33 +41,17 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_NEMA_GFX 7
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-#if LV_USE_OS
-/**
- * Structure of pending nema_gfx draw task
- */
-typedef struct _nema_gfx_draw_task_t {
-    lv_draw_task_t * task;
-    bool flushed;
-} nema_gfx_draw_task_t;
-#endif
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-#if LV_USE_OS
-    static void nema_gfx_render_thread_cb(void * ptr);
-#endif
-
-static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u);
-
-static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static void draw_begin(lv_layer_t * layer, const lv_area_t * clip_area);
+static void draw_end(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area);
 
 static bool nema_gfx_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
 static bool nema_gfx_can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_border_dsc_t * dsc);
@@ -85,32 +69,52 @@ static void nema_gfx_init_handlers(lv_draw_buf_handlers_t * handlers);
 
 static void lv_draw_buf_nema_gfx_init_handlers(void);
 
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+#if LV_USE_NEMA_VG
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
+#endif
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_line_dsc_t * dsc);
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc);
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
+static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_vector_dsc_t * dsc);
+#endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_nema_gfx_fill,
+    .draw_fill_cb = draw_fill,
     .can_draw_fill_cb = nema_gfx_can_draw_fill,
-    .draw_border_cb = lv_draw_nema_gfx_border,
+    .draw_border_cb = draw_border,
     .can_draw_border_cb = nema_gfx_can_draw_border,
-    .draw_label_cb = lv_draw_nema_gfx_label,
+    .draw_label_cb = draw_label,
     .can_draw_label_cb = nema_gfx_can_draw_label,
-    .draw_image_cb = lv_draw_nema_gfx_img,
+    .draw_image_cb = draw_image,
     .can_draw_image_cb = nema_gfx_can_draw_img,
-    .draw_layer_cb = lv_draw_nema_gfx_layer,
+    .draw_layer_cb = draw_layer,
 #if LV_USE_NEMA_VG
-    .draw_arc_cb = lv_draw_nema_gfx_arc,
+    .draw_arc_cb = draw_arc,
 #endif
     .draw_line_cb = draw_line,
     .can_draw_line_cb = nema_gfx_can_draw_line,
-    .draw_triangle_cb = lv_draw_nema_gfx_triangle,
+    .draw_triangle_cb = draw_triangle,
     .can_draw_triangle_cb = nema_gfx_can_draw_triangle,
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
-    .draw_vector_cb = lv_draw_nema_gfx_vector,
+    .draw_vector_cb = draw_vector,
 #endif
 };
 
@@ -130,13 +134,11 @@ void lv_draw_nema_gfx_init(void)
 
     lv_draw_buf_nema_gfx_init_handlers();
 
-    draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
     draw_nema_gfx_unit->base_unit.delete_cb = nema_gfx_delete;
     draw_nema_gfx_unit->base_unit.wait_for_finish_cb = nema_gfx_wait_for_finish;
     draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
     draw_nema_gfx_unit->base_unit.draw_cbs = &draw_cbs;
     draw_nema_gfx_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_nema_gfx_unit->base_unit.id = DRAW_UNIT_ID_NEMA_GFX;
 
 #if LV_USE_NEMA_VG
     /*Initialize NemaVG */
@@ -153,11 +155,6 @@ void lv_draw_nema_gfx_init(void)
     /*Bind Command List*/
     nema_cl_bind_circular(&(draw_nema_gfx_unit->cl));
 
-
-#if LV_USE_OS
-    lv_thread_init(&draw_nema_gfx_unit->thread, "nemagfx", LV_DRAW_THREAD_PRIO, nema_gfx_render_thread_cb, 2 * 1024,
-                   draw_nema_gfx_unit);
-#endif
 }
 
 void lv_draw_nema_gfx_deinit(void)
@@ -256,86 +253,104 @@ static bool nema_gfx_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * 
 #endif
 }
 
-static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+/**
+ * Write the CPU cache of the clip area back before the GPU draws
+ */
+static void draw_begin(lv_layer_t * layer, const lv_area_t * clip_area)
 {
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *) draw_unit;
-
-    /* Return immediately if it's busy with draw task. */
-    if(draw_nema_gfx_unit->task_act)
-        return 0;
-
-    /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_NEMA_GFX);
-
-    /* Return 0 is no selection, some tasks can be supported by other units. */
-    if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_NEMA_GFX)
-        return LV_DRAW_UNIT_IDLE;
-
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_nema_gfx_unit->task_act = t;
-
-#if LV_USE_OS
-    /* Let the render thread work. */
-    if(draw_nema_gfx_unit->inited)
-        lv_thread_sync_signal(&draw_nema_gfx_unit->sync);
-#else
-    nema_gfx_execute_drawing(draw_nema_gfx_unit);
-
-    draw_nema_gfx_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    draw_nema_gfx_unit->task_act = NULL;
-
-    /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-    lv_draw_dispatch_request();
-#endif
-
-    return 1;
+    lv_area_t buf_area = *clip_area;
+    lv_area_move(&buf_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_draw_buf_flush_cache(layer->draw_buf, &buf_area);
 }
 
-static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
+/**
+ * Wait until the GPU has stopped accessing the buffers, then invalidate the CPU cache of the clip area
+ */
+static void draw_end(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area)
 {
-    lv_draw_task_t * t = u->task_act;
-    /* remember draw unit for access to unit's context */
-    t->draw_unit = (lv_draw_unit_t *)u;
-
-    lv_layer_t * layer = t->target_layer;
-    lv_area_t clipped_area;
-    int32_t x;
-    int32_t y;
-
-    if(!lv_area_intersect(&clipped_area, &t->_real_area, &t->clip_area)) {
-        /* Nothing to do */
-        return;
-    }
-
-    x = 0 - t->target_layer->buf_area.x1;
-    y = 0 - t->target_layer->buf_area.y1;
-
-    lv_area_move(&clipped_area, x, y);
-
-    /* Clean cache */
-    lv_draw_buf_flush_cache(layer->draw_buf, &clipped_area);
-
-    lv_draw_unit_draw_task(t->draw_unit, t);
-
-    /* Keep the task in progress until the GPU has stopped accessing its buffers.
-     * The render thread must also wait before invalidating the destination cache. */
+    lv_draw_nema_gfx_unit_t * u = (lv_draw_nema_gfx_unit_t *)draw_unit;
     nema_cl_wait(&(u->cl));
 
-    /* Invalidate cache */
-    lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
+    lv_area_t buf_area = *clip_area;
+    lv_area_move(&buf_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &buf_area);
 }
+
+static void draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                      const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_nema_gfx_fill(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(draw_unit, layer, clip_area);
+}
+
+static void draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_border_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_nema_gfx_border(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(draw_unit, layer, clip_area);
+}
+
+static void draw_label(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_nema_gfx_label(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(draw_unit, layer, clip_area);
+}
+
+static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_nema_gfx_img(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(draw_unit, layer, clip_area);
+}
+
+static void draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                       const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_nema_gfx_layer(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(draw_unit, layer, clip_area);
+}
+
+#if LV_USE_NEMA_VG
+static void draw_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                     const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_nema_gfx_arc(draw_unit, layer, clip_area, dsc, coords);
+    draw_end(draw_unit, layer, clip_area);
+}
+#endif
 
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                       const lv_draw_line_dsc_t * dsc)
 {
+    draw_begin(layer, clip_area);
     lv_draw_line_iterate(layer, clip_area, dsc, lv_draw_nema_gfx_line, draw_unit);
+    draw_end(draw_unit, layer, clip_area);
 }
+
+static void draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_triangle_dsc_t * dsc)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_nema_gfx_triangle(draw_unit, layer, clip_area, dsc);
+    draw_end(draw_unit, layer, clip_area);
+}
+
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
+static void draw_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                        const lv_draw_vector_dsc_t * dsc)
+{
+    draw_begin(layer, clip_area);
+    lv_draw_nema_gfx_vector(draw_unit, layer, clip_area, dsc);
+    draw_end(draw_unit, layer, clip_area);
+}
+#endif
 
 static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit)
 {
@@ -347,63 +362,10 @@ static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit)
     nema_vg_grad_destroy(draw_nema_gfx_unit->gradient);
 #endif
 
-#if LV_USE_OS
-    lv_draw_nema_gfx_unit_t * _draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *) draw_unit;
-    LV_LOG_INFO("Cancel NemaGFX draw thread.");
-    _draw_nema_gfx_unit->exit_status = true;
-
-    if(_draw_nema_gfx_unit->inited)
-        lv_thread_sync_signal(&_draw_nema_gfx_unit->sync);
-
-    lv_result_t res = lv_thread_delete(&_draw_nema_gfx_unit->thread);
-
-    return res;
-#endif
-
-#if LV_USE_NEMA_VG == 0 && LV_USE_OS == LV_OS_NONE
+#if LV_USE_NEMA_VG == 0
     LV_UNUSED(draw_unit);
 #endif
     return 0;
 }
-
-#if LV_USE_OS
-static void nema_gfx_render_thread_cb(void * ptr)
-{
-    lv_draw_nema_gfx_unit_t * u = ptr;
-
-    lv_thread_sync_init(&u->sync);
-    u->inited = true;
-
-    while(1) {
-        /* Wait for sync if there is no task set. */
-        while(u->task_act == NULL) {
-            if(u->exit_status)
-                break;
-
-            lv_thread_sync_wait(&u->sync);
-        }
-
-        if(u->exit_status) {
-            LV_LOG_INFO("Ready to exit NemaGFX draw thread.");
-            break;
-        }
-
-        if(u->task_act) {
-            nema_gfx_execute_drawing(u);
-        }
-        /* Signal the ready state to dispatcher. */
-        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-        /* Cleanup. */
-        u->task_act = NULL;
-
-        /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-        lv_draw_dispatch_request();
-    }
-
-    u->inited = false;
-    lv_thread_sync_delete(&u->sync);
-    LV_LOG_INFO("Exit NemaGFX draw thread.");
-}
-#endif
 
 #endif

@@ -74,7 +74,6 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
 
     lv_layer_t * dsc_layer = dsc->base.layer;
     if(dsc_layer->draw_buf == NULL) {
-        lv_vector_for_each_destroy_tasks(dsc->task_list, NULL, NULL);
         return;
     }
 
@@ -85,7 +84,7 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
     draw_ctx.opa = dsc->opa;
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, &draw_ctx);
+    lv_vector_for_each_task(dsc->task_list, task_draw_cb, &draw_ctx);
     LV_PROFILER_DRAW_END;
 }
 

@@ -25,7 +25,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_EVE 9
 
 /**********************
  *      TYPEDEFS
@@ -34,9 +33,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void eve_execute_drawing(lv_draw_eve_unit_t * u);
 
-static int32_t eve_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static bool eve_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc);
 static bool eve_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc);
@@ -88,9 +85,7 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
 void lv_draw_eve_init(void)
 {
     lv_draw_eve_unit_t * draw_eve_unit = lv_draw_create_unit(sizeof(lv_draw_eve_unit_t));
-    draw_eve_unit->base_unit.dispatch_cb = eve_dispatch;
     draw_eve_unit->base_unit.draw_cbs = &draw_cbs;
-    draw_eve_unit->base_unit.id = DRAW_UNIT_ID_EVE;
     /*EVE has no frame buffer that another unit could draw into*/
     draw_eve_unit->base_unit.fallback = NULL;
 
@@ -115,30 +110,6 @@ void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_paramet
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static int32_t eve_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
-{
-    lv_draw_eve_unit_t * draw_eve_unit = (lv_draw_eve_unit_t *) draw_unit;
-
-    lv_draw_task_t * t = NULL;
-    t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_EVE);
-    if(t == NULL) return LV_DRAW_UNIT_IDLE;
-
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_eve_unit->task_act = t;
-
-    eve_execute_drawing(draw_eve_unit);
-
-    draw_eve_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    draw_eve_unit->task_act = NULL;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-
-
-    return 1;
-}
 
 static bool eve_takes(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_dsc_t * dsc)
 {
@@ -184,13 +155,6 @@ static bool eve_can_draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, co
 static bool eve_can_draw_triangle(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
 {
     return eve_takes(draw_unit, layer, &dsc->base);
-}
-
-static void eve_execute_drawing(lv_draw_eve_unit_t * u)
-{
-    lv_draw_task_t * t = u->task_act;
-
-    lv_draw_unit_draw_task(&u->base_unit, t);
 }
 
 static void draw_line(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,

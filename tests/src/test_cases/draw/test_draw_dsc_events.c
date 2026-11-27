@@ -139,17 +139,6 @@ static void resize_image_end_cb(lv_event_t * e)
     end_cnt++;
     lv_draw_image_dsc_t * image_dsc = lv_draw_dsc_get_image_dsc(dsc);
 
-    /* The task is the last one of the layer */
-    lv_draw_task_t * t = dsc->layer->draw_task_head;
-    while(t->next) t = t->next;
-    TEST_ASSERT_EQUAL_PTR(dsc, t->draw_dsc);
-
-    /* The task follows the new area */
-    TEST_ASSERT_EQUAL_MEMORY(&image_dsc->coords, &t->area, sizeof(lv_area_t));
-    lv_area_t expected;
-    lv_draw_image_get_transformed_area(&expected, image_dsc, &image_dsc->coords);
-    TEST_ASSERT_EQUAL_MEMORY(&expected, &t->_real_area, sizeof(lv_area_t));
-
     /* The image area wasn't set, so it follows the drawn area */
     TEST_ASSERT_EQUAL_MEMORY(&image_dsc->coords, &image_dsc->image_area, sizeof(lv_area_t));
 }

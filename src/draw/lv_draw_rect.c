@@ -65,13 +65,6 @@ void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_fill_dsc_t);
 }
 
-lv_draw_fill_dsc_t * lv_draw_task_get_fill_dsc(lv_draw_task_t * task)
-{
-    LV_CHECK_ARG(task != NULL, return NULL);
-
-    return task->type == LV_DRAW_DSC_TYPE_FILL ? (lv_draw_fill_dsc_t *)task->draw_dsc : NULL;
-}
-
 lv_draw_fill_dsc_t * lv_draw_dsc_get_fill_dsc(lv_draw_dsc_t * dsc)
 {
     LV_CHECK_ARG(dsc != NULL, return NULL);
@@ -92,23 +85,16 @@ void lv_draw_fill(lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc, const lv_a
 
     if(dsc->base.drop_shadow_opa) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
-        LV_ASSERT_NULL(ds_layer);
-        lv_draw_fill_dsc_t ds_dsc = *dsc;
-        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain fill*/
-        lv_draw_fill(ds_layer, &ds_dsc, coords);
-        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+        if(ds_layer) {
+            lv_draw_fill_dsc_t ds_dsc = *dsc;
+            ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain fill*/
+            lv_draw_fill(ds_layer, &ds_dsc, coords);
+            lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+        }
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_FILL);
-    if(!t) {
-        LV_LOG_WARN("Failed to create draw task");
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-
-    lv_draw_finalize_task_creation(layer, t);
+    lv_draw_fill_dsc_t local = *dsc;
+    lv_draw_dsc_submit(&local.base, LV_DRAW_DSC_TYPE_FILL, layer, coords);
     LV_PROFILER_DRAW_END;
 }
 
@@ -120,13 +106,6 @@ void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc)
     dsc->opa = LV_OPA_COVER;
     dsc->side = LV_BORDER_SIDE_FULL;
     dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
-}
-
-lv_draw_border_dsc_t * lv_draw_task_get_border_dsc(lv_draw_task_t * task)
-{
-    LV_CHECK_ARG(task != NULL, return NULL);
-
-    return task->type == LV_DRAW_DSC_TYPE_BORDER ? (lv_draw_border_dsc_t *)task->draw_dsc : NULL;
 }
 
 lv_draw_border_dsc_t * lv_draw_dsc_get_border_dsc(lv_draw_dsc_t * dsc)
@@ -149,23 +128,16 @@ void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const 
 
     if(dsc->base.drop_shadow_opa) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
-        LV_ASSERT_NULL(ds_layer);
-        lv_draw_border_dsc_t ds_dsc = *dsc;
-        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain border*/
-        lv_draw_border(ds_layer, &ds_dsc, coords);
-        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+        if(ds_layer) {
+            lv_draw_border_dsc_t ds_dsc = *dsc;
+            ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain border*/
+            lv_draw_border(ds_layer, &ds_dsc, coords);
+            lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+        }
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BORDER);
-    if(!t) {
-        LV_LOG_WARN("Failed to create draw task");
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-
-    lv_draw_finalize_task_creation(layer, t);
+    lv_draw_border_dsc_t local = *dsc;
+    lv_draw_dsc_submit(&local.base, LV_DRAW_DSC_TYPE_BORDER, layer, coords);
     LV_PROFILER_DRAW_END;
 }
 
@@ -176,13 +148,6 @@ void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc)
     lv_memzero(dsc, sizeof(*dsc));
     dsc->opa = LV_OPA_COVER;
     dsc->base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
-}
-
-lv_draw_box_shadow_dsc_t * lv_draw_task_get_box_shadow_dsc(lv_draw_task_t * task)
-{
-    LV_CHECK_ARG(task != NULL, return NULL);
-
-    return task->type == LV_DRAW_DSC_TYPE_BOX_SHADOW ? (lv_draw_box_shadow_dsc_t *)task->draw_dsc : NULL;
 }
 
 lv_draw_box_shadow_dsc_t * lv_draw_dsc_get_box_shadow_dsc(lv_draw_dsc_t * dsc)
@@ -202,16 +167,9 @@ void lv_draw_box_shadow(lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc
     if(dsc->opa <= LV_OPA_MIN) return;
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BOX_SHADOW);
-    if(!t) {
-        LV_LOG_WARN("Failed to create draw task");
-        LV_PROFILER_DRAW_END;
-        return;
-    }
 
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-
-    lv_draw_finalize_task_creation(layer, t);
+    lv_draw_box_shadow_dsc_t local = *dsc;
+    lv_draw_dsc_submit(&local.base, LV_DRAW_DSC_TYPE_BOX_SHADOW, layer, coords);
     LV_PROFILER_DRAW_END;
 }
 
@@ -268,41 +226,30 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 
     if(dsc->base.drop_shadow_opa && (has_fill || has_outline)) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
-        LV_ASSERT_NULL(ds_layer);
-        lv_draw_rect_dsc_t ds_dsc = *dsc;
-        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain shadow*/
-        ds_dsc.shadow_opa = 0;
-        lv_draw_rect(ds_layer, &ds_dsc, coords);
-        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+        if(ds_layer) {
+            lv_draw_rect_dsc_t ds_dsc = *dsc;
+            ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain shadow*/
+            ds_dsc.shadow_opa = 0;
+            lv_draw_rect(ds_layer, &ds_dsc, coords);
+            lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+        }
     }
-
-    lv_draw_task_t * t;
 
     /*Shadow*/
     if(has_shadow) {
-        /*Check whether the shadow is visible*/
-        t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BOX_SHADOW);
-        if(!t) {
-            LV_LOG_WARN("Failed to create draw task");
-            LV_PROFILER_DRAW_END;
-            return;
-        }
-        lv_draw_box_shadow_dsc_t * shadow_dsc = t->draw_dsc;
-
-        lv_area_increase(&t->_real_area, dsc->shadow_spread, dsc->shadow_spread);
-        lv_area_increase(&t->_real_area, dsc->shadow_width, dsc->shadow_width);
-        lv_area_move(&t->_real_area, dsc->shadow_offset_x, dsc->shadow_offset_y);
-        shadow_dsc->base = dsc->base;
-        shadow_dsc->base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
-        shadow_dsc->radius = dsc->radius;
-        shadow_dsc->color = dsc->shadow_color;
-        shadow_dsc->width = dsc->shadow_width;
-        shadow_dsc->spread = dsc->shadow_spread;
-        shadow_dsc->opa = dsc->shadow_opa;
-        shadow_dsc->ofs_x = dsc->shadow_offset_x;
-        shadow_dsc->ofs_y = dsc->shadow_offset_y;
-        shadow_dsc->bg_cover = bg_cover;
-        lv_draw_finalize_task_creation(layer, t);
+        lv_draw_box_shadow_dsc_t shadow_dsc;
+        lv_draw_box_shadow_dsc_init(&shadow_dsc);
+        shadow_dsc.base = dsc->base;
+        shadow_dsc.base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
+        shadow_dsc.radius = dsc->radius;
+        shadow_dsc.color = dsc->shadow_color;
+        shadow_dsc.width = dsc->shadow_width;
+        shadow_dsc.spread = dsc->shadow_spread;
+        shadow_dsc.opa = dsc->shadow_opa;
+        shadow_dsc.ofs_x = dsc->shadow_offset_x;
+        shadow_dsc.ofs_y = dsc->shadow_offset_y;
+        shadow_dsc.bg_cover = bg_cover;
+        lv_draw_dsc_submit(&shadow_dsc.base, LV_DRAW_DSC_TYPE_BOX_SHADOW, layer, coords);
     }
 
     /*Background*/
@@ -316,23 +263,15 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
             bg_coords.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
         }
 
-        t = lv_draw_add_task(layer, &bg_coords, LV_DRAW_DSC_TYPE_FILL);
-        if(!t) {
-            LV_LOG_WARN("Failed to create draw task");
-            LV_PROFILER_DRAW_END;
-            return;
-        }
-        lv_draw_fill_dsc_t * bg_dsc = t->draw_dsc;
-
-        lv_draw_fill_dsc_init(bg_dsc);
-        bg_dsc->base = dsc->base;
-        bg_dsc->base.dsc_size = sizeof(lv_draw_fill_dsc_t);
-        bg_dsc->radius = dsc->radius;
-        bg_dsc->color = dsc->bg_color;
-        bg_dsc->grad = dsc->bg_grad;
-        bg_dsc->opa = dsc->bg_opa;
-
-        lv_draw_finalize_task_creation(layer, t);
+        lv_draw_fill_dsc_t bg_dsc;
+        lv_draw_fill_dsc_init(&bg_dsc);
+        bg_dsc.base = dsc->base;
+        bg_dsc.base.dsc_size = sizeof(lv_draw_fill_dsc_t);
+        bg_dsc.radius = dsc->radius;
+        bg_dsc.color = dsc->bg_color;
+        bg_dsc.grad = dsc->bg_grad;
+        bg_dsc.opa = dsc->bg_opa;
+        lv_draw_dsc_submit(&bg_dsc.base, LV_DRAW_DSC_TYPE_FILL, layer, &bg_coords);
     }
 
     /*Background image*/
@@ -354,35 +293,26 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         if(res == LV_RESULT_OK) {
             if(src_type == LV_IMAGE_SRC_VARIABLE || src_type == LV_IMAGE_SRC_FILE) {
 
-                if(dsc->bg_image_tiled) {
-                    t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_IMAGE);
-                }
-                else {
-                    lv_area_t a = {0, 0, header.w - 1, header.h - 1};
+                lv_area_t a = *coords;
+                if(!dsc->bg_image_tiled) {
+                    lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
                     lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
-                    t = lv_draw_add_task(layer, &a, LV_DRAW_DSC_TYPE_IMAGE);
-                }
-                if(!t) {
-                    LV_LOG_WARN("Failed to create draw task");
-                    LV_PROFILER_DRAW_END;
-                    return;
                 }
 
-                lv_draw_image_dsc_t * bg_image_dsc = t->draw_dsc;
-
-                lv_draw_image_dsc_init(bg_image_dsc);
-                bg_image_dsc->base = dsc->base;
-                bg_image_dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
-                bg_image_dsc->src = dsc->bg_image_src;
-                bg_image_dsc->opa = dsc->bg_image_opa;
-                bg_image_dsc->recolor = dsc->bg_image_recolor;
-                bg_image_dsc->recolor_opa = dsc->bg_image_recolor_opa;
-                bg_image_dsc->tile = dsc->bg_image_tiled;
-                bg_image_dsc->colorkey = dsc->bg_image_colorkey;
-                bg_image_dsc->header = header;
-                bg_image_dsc->clip_radius = dsc->radius;
-                bg_image_dsc->image_area = *coords;
-                lv_draw_finalize_task_creation(layer, t);
+                lv_draw_image_dsc_t bg_image_dsc;
+                lv_draw_image_dsc_init(&bg_image_dsc);
+                bg_image_dsc.base = dsc->base;
+                bg_image_dsc.base.dsc_size = sizeof(lv_draw_image_dsc_t);
+                bg_image_dsc.src = dsc->bg_image_src;
+                bg_image_dsc.opa = dsc->bg_image_opa;
+                bg_image_dsc.recolor = dsc->bg_image_recolor;
+                bg_image_dsc.recolor_opa = dsc->bg_image_recolor_opa;
+                bg_image_dsc.tile = dsc->bg_image_tiled;
+                bg_image_dsc.colorkey = dsc->bg_image_colorkey;
+                bg_image_dsc.header = header;
+                bg_image_dsc.clip_radius = dsc->radius;
+                bg_image_dsc.image_area = *coords;
+                lv_draw_dsc_submit(&bg_image_dsc.base, LV_DRAW_DSC_TYPE_IMAGE, layer, &a);
             }
             else {
                 lv_point_t s;
@@ -397,69 +327,48 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 
                 lv_area_t a = {0, 0, s.x - 1, s.y - 1};
                 lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
-                t = lv_draw_add_task(layer, &a, LV_DRAW_DSC_TYPE_LABEL);
-                if(!t) {
-                    LV_LOG_WARN("Failed to create draw task");
-                    LV_PROFILER_DRAW_END;
-                    return;
-                }
 
-                lv_draw_label_dsc_t * bg_label_dsc = t->draw_dsc;
-
-                lv_draw_label_dsc_init(bg_label_dsc);
-                bg_label_dsc->base = dsc->base;
-                bg_label_dsc->base.dsc_size = sizeof(lv_draw_label_dsc_t);
-                bg_label_dsc->color = dsc->bg_image_recolor;
-                bg_label_dsc->font = dsc->bg_image_symbol_font;
-                bg_label_dsc->text = dsc->bg_image_src;
-                t->type = LV_DRAW_DSC_TYPE_LABEL;
-                lv_draw_finalize_task_creation(layer, t);
+                lv_draw_label_dsc_t bg_label_dsc;
+                lv_draw_label_dsc_init(&bg_label_dsc);
+                bg_label_dsc.base = dsc->base;
+                bg_label_dsc.base.dsc_size = sizeof(lv_draw_label_dsc_t);
+                bg_label_dsc.color = dsc->bg_image_recolor;
+                bg_label_dsc.font = dsc->bg_image_symbol_font;
+                bg_label_dsc.text = dsc->bg_image_src;
+                lv_draw_dsc_submit(&bg_label_dsc.base, LV_DRAW_DSC_TYPE_LABEL, layer, &a);
             }
         }
     }
 
     /*Border*/
     if(has_border) {
-        t = lv_draw_add_task(layer, coords, LV_DRAW_DSC_TYPE_BORDER);
-        if(!t) {
-            LV_LOG_WARN("Failed to create draw task");
-            LV_PROFILER_DRAW_END;
-            return;
-        }
-        lv_draw_border_dsc_t * border_dsc = t->draw_dsc;
-
-        border_dsc->base = dsc->base;
-        border_dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
-        border_dsc->radius = dsc->radius;
-        border_dsc->color = dsc->border_color;
-        border_dsc->opa = dsc->border_opa;
-        border_dsc->width = dsc->border_width;
-        border_dsc->side = dsc->border_side;
-        lv_draw_finalize_task_creation(layer, t);
+        lv_draw_border_dsc_t border_dsc;
+        lv_draw_border_dsc_init(&border_dsc);
+        border_dsc.base = dsc->base;
+        border_dsc.base.dsc_size = sizeof(lv_draw_border_dsc_t);
+        border_dsc.radius = dsc->radius;
+        border_dsc.color = dsc->border_color;
+        border_dsc.opa = dsc->border_opa;
+        border_dsc.width = dsc->border_width;
+        border_dsc.side = dsc->border_side;
+        lv_draw_dsc_submit(&border_dsc.base, LV_DRAW_DSC_TYPE_BORDER, layer, coords);
     }
 
     /*Outline*/
     if(has_outline) {
         lv_area_t outline_coords = *coords;
         lv_area_increase(&outline_coords, dsc->outline_width + dsc->outline_pad, dsc->outline_width + dsc->outline_pad);
-        t = lv_draw_add_task(layer, &outline_coords, LV_DRAW_DSC_TYPE_BORDER);
-        if(!t) {
-            LV_LOG_WARN("Failed to create draw task");
-            LV_PROFILER_DRAW_END;
-            return;
-        }
-        lv_draw_border_dsc_t * outline_dsc = t->draw_dsc;
-        lv_area_increase(&t->_real_area, dsc->outline_width, dsc->outline_width);
-        lv_area_increase(&t->_real_area, dsc->outline_pad, dsc->outline_pad);
-        outline_dsc->base = dsc->base;
-        outline_dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
-        outline_dsc->radius = dsc->radius == LV_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->radius + dsc->outline_width +
-                              dsc->outline_pad;
-        outline_dsc->color = dsc->outline_color;
-        outline_dsc->opa = dsc->outline_opa;
-        outline_dsc->width = dsc->outline_width;
-        outline_dsc->side = LV_BORDER_SIDE_FULL;
-        lv_draw_finalize_task_creation(layer, t);
+        lv_draw_border_dsc_t outline_dsc;
+        lv_draw_border_dsc_init(&outline_dsc);
+        outline_dsc.base = dsc->base;
+        outline_dsc.base.dsc_size = sizeof(lv_draw_border_dsc_t);
+        outline_dsc.radius = dsc->radius == LV_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->radius + dsc->outline_width +
+                             dsc->outline_pad;
+        outline_dsc.color = dsc->outline_color;
+        outline_dsc.opa = dsc->outline_opa;
+        outline_dsc.width = dsc->outline_width;
+        outline_dsc.side = LV_BORDER_SIDE_FULL;
+        lv_draw_dsc_submit(&outline_dsc.base, LV_DRAW_DSC_TYPE_BORDER, layer, &outline_coords);
     }
 
     LV_ASSERT_MEM_INTEGRITY();

@@ -144,29 +144,6 @@ config LV_DRAW_LAYER_MAX_MEMORY
 		Must be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE`, and with transformed layers large enough
 		for the largest widget too (width x height x 4).
 
-config LV_DRAW_THREAD_STACK_SIZE
-	int "Draw thread stack size (bytes)"
-	default 8192
-	depends on !LV_OS_NONE
-	help
-		If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
-
-config LV_DRAW_THREAD_PRIO
-	int "Draw thread priority"
-	range 0 4
-	default 3
-	depends on !LV_OS_NONE
-	help
-		Thread priority controls the relative importance of the drawing threads.
-		Values correspond to lv_thread_prio_t enum in lv_os.h:
-		0: LV_THREAD_PRIO_LOWEST
-		1: LV_THREAD_PRIO_LOW
-		2: LV_THREAD_PRIO_MID (default)
-		3: LV_THREAD_PRIO_HIGH
-		4: LV_THREAD_PRIO_HIGHEST
-
-		Higher priority can improve rendering performance but might cause
-		starvation of lower priority tasks.
 
 config LV_USE_VECTOR_GRAPHIC
 	bool "Vector graphics"
@@ -194,6 +171,14 @@ config LV_USE_THORVG_INTERNAL
 	depends on LV_USE_THORVG
 	help
 		Build the ThorVG copy shipped with LVGL instead of linking an external one.
+
+config LV_THORVG_THREAD_COUNT
+	int "ThorVG threads"
+	default 1
+	range 1 255
+	depends on LV_USE_THORVG && !LV_OS_NONE
+	help
+		Number of threads ThorVG renders vector graphics with. More than 1 needs an OS.
 
 
 menu "SW"

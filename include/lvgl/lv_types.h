@@ -120,7 +120,6 @@ typedef struct _lv_display_t lv_display_t;
 
 typedef struct _lv_layer_t lv_layer_t;
 typedef struct _lv_draw_unit_t lv_draw_unit_t;
-typedef struct _lv_draw_task_t lv_draw_task_t;
 
 typedef struct _lv_indev_t lv_indev_t;
 

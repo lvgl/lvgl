@@ -52,7 +52,6 @@ def collect_all() -> dict:
         "displays": _collect_displays(lvgl),
         "object_trees": _collect_object_trees(lvgl),
         "image_cache": _collect_image_cache(lvgl),
-        "draw_tasks": _collect_draw_tasks(lvgl),
         "subjects": _collect_subjects(lvgl),
     }
     # Registry-driven simple collectors
@@ -162,22 +161,6 @@ def _collect_image_cache(lvgl) -> list:
             except Exception:
                 pass
         result.append(d)
-    return result
-
-
-@safe_collect("draw tasks")
-def _collect_draw_tasks(lvgl) -> list:
-    """Collect draw tasks from each display's layer chain."""
-    from lvglgdb.lvgl.draw.lv_draw_task import LVDrawTask
-    result = []
-    for disp in lvgl.displays():
-        layer = disp.super_value("layer_head")
-        while layer and int(layer):
-            task_head = layer["draw_task_head"]
-            if int(task_head):
-                for t in LVDrawTask(task_head):
-                    result.append(t.snapshot().as_dict())
-            layer = layer["next"]
     return result
 
 

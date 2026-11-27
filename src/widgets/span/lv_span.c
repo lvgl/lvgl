@@ -1287,7 +1287,6 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                 lv_memcpy(bidi_txt, pinfo->txt, (size_t)pinfo->bytes);
                 label_draw_dsc.bidi_dir = base_dir;
                 label_draw_dsc.has_bided = true;
-                label_draw_dsc.text_local = true;
                 lv_bidi_process_paragraph(pinfo->txt, bidi_txt, pinfo->bytes, label_draw_dsc.bidi_dir, NULL, 0);
             }
             else {
@@ -1389,7 +1388,6 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                     a.x1 = a.x2;
                     a.x2 = a.x1 + dot_width;
                 }
-                label_draw_dsc.text_local = false;
 #else
                 a.x1 = a.x2;
                 a.x2 = a.x1 + dot_width;

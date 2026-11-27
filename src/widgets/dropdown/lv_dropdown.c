@@ -1209,9 +1209,6 @@ static void draw_main(lv_event_t * e)
     }
 
     label_dsc.text = opt_txt;
-    if(dropdown->text == NULL) {
-        label_dsc.text_local = true;
-    }
 
     lv_draw_label(layer, &label_dsc, &txt_area);
 }

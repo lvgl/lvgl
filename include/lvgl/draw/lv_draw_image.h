@@ -128,13 +128,6 @@ typedef void (*lv_draw_image_core_cb)(lv_layer_t * layer, const lv_draw_image_ds
 void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc);
 
 /**
- * Try to get an image draw descriptor from a draw task.
- * @param task      draw task
- * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_DSC_TYPE_IMAGE
- */
-lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task);
-
-/**
  * Get the image draw descriptor from a generic draw descriptor.
  * `dsc` must be of type LV_DRAW_DSC_TYPE_IMAGE, use `lv_draw_dsc_get_type()` to check it first.
  * @param dsc       draw descriptor

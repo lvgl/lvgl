@@ -123,15 +123,12 @@ typedef struct {
  **********************/
 
 /**
- * This is the main function to draw the accumulated vector tasks by passing them
- * to a vector renderer callback.
- * When the callback returns the processed vector task will be destroyed.
- * @param task_list     pointer to the linked list in `lv_draw_vector_dsc_t` that stores
- *                      the path shapes and their attributes.
- * @param cb            the callback used to iterate through the task
- * @param user_data     a custom pointer that will be passed to the callback @nullable
+ * Call `cb` for each path in the list, in order, without changing or freeing the list.
+ * @param task_list     pointer to the linked list in `lv_draw_vector_dsc_t` that stores the paths
+ * @param cb            called with `user_data`, the path and its draw context
+ * @param user_data     passed to `cb`
  */
-void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * user_data);
+void lv_vector_for_each_task(const lv_ll_t * task_list, vector_draw_task_cb cb, void * user_data);
 
 /**********************
  *      MACROS

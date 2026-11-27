@@ -25,7 +25,6 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_PXP 3
 
 /**********************
  *      TYPEDEFS
@@ -42,22 +41,17 @@ static bool _pxp_can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, c
 static bool _pxp_can_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static bool _pxp_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 
-/*
- * Dispatch a task to the PXP unit.
- * Return 1 if task was dispatched, 0 otherwise (task not supported).
- */
-static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-
-/*
- * Delete the PXP draw unit.
- */
-static int32_t _pxp_delete(lv_draw_unit_t * draw_unit);
-
-#if LV_USE_PXP_DRAW_THREAD
-    static void _pxp_render_thread_cb(void * ptr);
+static void _pxp_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area);
+#if LV_USE_PARALLEL_DRAW_DEBUG
+static void _pxp_draw_debug(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_area_t * coords);
 #endif
-
-static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
+static void _pxp_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+static void _pxp_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void _pxp_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -68,11 +62,11 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
  **********************/
 
 static const lv_draw_unit_draw_cbs_t draw_cbs = {
-    .draw_fill_cb = lv_draw_pxp_fill,
+    .draw_fill_cb = _pxp_draw_fill,
     .can_draw_fill_cb = _pxp_can_draw_fill,
-    .draw_image_cb = lv_draw_pxp_img,
+    .draw_image_cb = _pxp_draw_img,
     .can_draw_image_cb = _pxp_can_draw_img,
-    .draw_layer_cb = lv_draw_pxp_layer,
+    .draw_layer_cb = _pxp_draw_layer,
     .can_draw_layer_cb = _pxp_can_draw_layer,
 };
 
@@ -96,16 +90,9 @@ void lv_draw_pxp_init(void)
     lv_draw_buf_pxp_init_handlers();
 
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
-    draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
-    draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
     draw_pxp_unit->base_unit.name = "NXP_PXP";
     draw_pxp_unit->base_unit.draw_cbs = &draw_cbs;
     draw_pxp_unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
-    draw_pxp_unit->base_unit.id = DRAW_UNIT_ID_PXP;
-
-#if LV_USE_PXP_DRAW_THREAD
-    lv_thread_init(&draw_pxp_unit->thread, "pxpdraw", LV_DRAW_THREAD_PRIO, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
-#endif
 #endif /*LV_USE_DRAW_PXP*/
 }
 
@@ -303,171 +290,85 @@ static bool _pxp_can_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, 
     return _pxp_draw_img_supported(dsc);
 }
 
-static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static void _pxp_draw_begin(lv_layer_t * layer, const lv_area_t * clip_area)
 {
-    lv_draw_pxp_unit_t * draw_pxp_unit = (lv_draw_pxp_unit_t *) draw_unit;
-
-    /* Return immediately if it's busy with draw task. */
-    if(draw_pxp_unit->task_act)
-        return 0;
-
-    /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
-
-    if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
-        return LV_DRAW_UNIT_IDLE;
-
-    if(lv_draw_layer_alloc_buf(layer) == NULL) {
-        t->state = LV_DRAW_TASK_STATE_FAILED;
-        return LV_DRAW_UNIT_IDLE;
-    }
-
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_pxp_unit->task_act = t;
-
-#if LV_USE_PXP_DRAW_THREAD
-    /* Let the render thread work. */
-    if(draw_pxp_unit->inited)
-        lv_thread_sync_signal(&draw_pxp_unit->sync);
-#else
-    _pxp_execute_drawing(draw_pxp_unit);
-
-    draw_pxp_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-    draw_pxp_unit->task_act = NULL;
-
-    /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-    lv_draw_dispatch_request();
-#endif
-
-    return 1;
-}
-
-static int32_t _pxp_delete(lv_draw_unit_t * draw_unit)
-{
-#if LV_USE_PXP_DRAW_THREAD
-    lv_draw_pxp_unit_t * draw_pxp_unit = (lv_draw_pxp_unit_t *) draw_unit;
-
-    LV_LOG_INFO("Cancel PXP draw thread.");
-    draw_pxp_unit->exit_status = true;
-
-    if(draw_pxp_unit->inited)
-        lv_thread_sync_signal(&draw_pxp_unit->sync);
-
-    lv_result_t res = lv_thread_delete(&draw_pxp_unit->thread);
-
-    return res;
-#else
-    LV_UNUSED(draw_unit);
-
-    return 0;
-#endif
-}
-
-static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
-{
-    lv_draw_task_t * t = u->task_act;
-    lv_layer_t * layer = t->target_layer;
-    lv_draw_buf_t * draw_buf = layer->draw_buf;
-
-    lv_area_t draw_area;
-    if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area))
-        return; /*Fully clipped, nothing to do*/
-
-    /* Make area relative to the buffer */
+    /* Invalidate only the drawing area, relative to the buffer */
+    lv_area_t draw_area = *clip_area;
     lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
-
-    /* Invalidate only the drawing area */
-    lv_draw_buf_invalidate_cache(draw_buf, &draw_area);
-
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    t->draw_unit = &u->base_unit;
-#endif
-
-    lv_draw_unit_draw_task(&u->base_unit, t);
-
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    /*Layers manage it for themselves*/
-    if(t->type != LV_DRAW_DSC_TYPE_LAYER) {
-        lv_area_t draw_area;
-        if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area))
-            return;
-
-        int32_t idx = u->base_unit.idx;
-
-        lv_draw_fill_dsc_t fill_dsc;
-        lv_draw_fill_dsc_init(&fill_dsc);
-        fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
-        fill_dsc.opa = LV_OPA_10;
-        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &draw_area);
-
-        lv_draw_border_dsc_t border_dsc;
-        lv_draw_border_dsc_init(&border_dsc);
-        border_dsc.color = fill_dsc.color;
-        border_dsc.opa = LV_OPA_80;
-        border_dsc.width = 1;
-        lv_draw_sw_border(t->target_layer, &t->clip_area, &border_dsc, &draw_area);
-
-        lv_point_t txt_size;
-        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
-
-        lv_area_t txt_area;
-        txt_area.x1 = draw_area.x1;
-        txt_area.y1 = draw_area.y1;
-        txt_area.x2 = draw_area.x1 + txt_size.x - 1;
-        txt_area.y2 = draw_area.y1 + txt_size.y - 1;
-
-        lv_draw_fill_dsc_init(&fill_dsc);
-        fill_dsc.color = lv_color_white();
-        lv_draw_sw_fill(t->target_layer, &t->clip_area, &fill_dsc, &txt_area);
-
-        char buf[8];
-        lv_snprintf(buf, sizeof(buf), "%d", idx);
-        lv_draw_label_dsc_t label_dsc;
-        lv_draw_label_dsc_init(&label_dsc);
-        label_dsc.color = lv_color_black();
-        label_dsc.text = buf;
-        lv_draw_sw_label(t->target_layer, &t->clip_area, &label_dsc, &txt_area);
-    }
-#endif
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &draw_area);
 }
 
-#if LV_USE_PXP_DRAW_THREAD
-static void _pxp_render_thread_cb(void * ptr)
+static void _pxp_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                           const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
-    lv_draw_pxp_unit_t * u = ptr;
-
-    lv_thread_sync_init(&u->sync);
-    u->inited = true;
-
-    while(1) {
-        /* Wait for sync if there is no task set. */
-        while(u->task_act == NULL) {
-            if(u->exit_status)
-                break;
-
-            lv_thread_sync_wait(&u->sync);
-        }
-
-        if(u->exit_status) {
-            LV_LOG_INFO("Ready to exit PXP draw thread.");
-            break;
-        }
-
-        _pxp_execute_drawing(u);
-
-        /* Signal the ready state to dispatcher. */
-        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-
-        /* Cleanup. */
-        u->task_act = NULL;
-
-        /* The draw unit is free now. Request a new dispatching as it can get a new task. */
-        lv_draw_dispatch_request();
-    }
-
-    u->inited = false;
-    lv_thread_sync_delete(&u->sync);
-    LV_LOG_INFO("Exit PXP draw thread.");
+    _pxp_draw_begin(layer, clip_area);
+    lv_draw_pxp_fill(draw_unit, layer, clip_area, dsc, coords);
+#if LV_USE_PARALLEL_DRAW_DEBUG
+    _pxp_draw_debug(draw_unit, layer, clip_area, coords);
+#endif
 }
-#endif /*LV_USE_PXP_DRAW_THREAD*/
+
+static void _pxp_draw_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                          const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    _pxp_draw_begin(layer, clip_area);
+    lv_draw_pxp_img(draw_unit, layer, clip_area, dsc, coords);
+#if LV_USE_PARALLEL_DRAW_DEBUG
+    _pxp_draw_debug(draw_unit, layer, clip_area, coords);
+#endif
+}
+
+static void _pxp_draw_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    _pxp_draw_begin(layer, clip_area);
+    lv_draw_pxp_layer(draw_unit, layer, clip_area, dsc, coords);
+}
+
+#if LV_USE_PARALLEL_DRAW_DEBUG
+/*Tint the drawn area with the unit's color and write its index. Layers manage it for themselves.*/
+static void _pxp_draw_debug(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
+                            const lv_area_t * coords)
+{
+    lv_area_t draw_area;
+    if(!lv_area_intersect(&draw_area, coords, clip_area))
+        return;
+
+    int32_t idx = draw_unit->idx;
+
+    lv_draw_fill_dsc_t fill_dsc;
+    lv_draw_fill_dsc_init(&fill_dsc);
+    fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
+    fill_dsc.opa = LV_OPA_10;
+    lv_draw_sw_fill(layer, clip_area, &fill_dsc, &draw_area);
+
+    lv_draw_border_dsc_t border_dsc;
+    lv_draw_border_dsc_init(&border_dsc);
+    border_dsc.color = fill_dsc.color;
+    border_dsc.opa = LV_OPA_80;
+    border_dsc.width = 1;
+    lv_draw_sw_border(layer, clip_area, &border_dsc, &draw_area);
+
+    lv_point_t txt_size;
+    lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+
+    lv_area_t txt_area;
+    txt_area.x1 = draw_area.x1;
+    txt_area.y1 = draw_area.y1;
+    txt_area.x2 = draw_area.x1 + txt_size.x - 1;
+    txt_area.y2 = draw_area.y1 + txt_size.y - 1;
+
+    lv_draw_fill_dsc_init(&fill_dsc);
+    fill_dsc.color = lv_color_white();
+    lv_draw_sw_fill(layer, clip_area, &fill_dsc, &txt_area);
+
+    char buf[8];
+    lv_snprintf(buf, sizeof(buf), "%d", idx);
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.color = lv_color_black();
+    label_dsc.text = buf;
+    lv_draw_sw_label(layer, clip_area, &label_dsc, &txt_area);
+}
+#endif
 #endif /*LV_USE_DRAW_PXP*/

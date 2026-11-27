@@ -65,7 +65,6 @@ extern "C" {
 **********************/
 typedef struct lv_draw_ppa_unit {
     lv_draw_unit_t base_unit;
-    lv_draw_task_t * task_act;
     ppa_client_handle_t srm_client;
     ppa_client_handle_t fill_client;
     ppa_client_handle_t blend_client;

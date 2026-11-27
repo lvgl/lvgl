@@ -30,9 +30,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_DRAW_UNIT_NONE  0
-#define LV_DRAW_UNIT_IDLE  -1   /**< The draw unit is idle, new dispatching might be requested to try again */
-
 #if LV_DRAW_TRANSFORM_USE_MATRIX
 #if !LV_USE_MATRIX
 #error "LV_DRAW_TRANSFORM_USE_MATRIX requires LV_USE_MATRIX = 1"
@@ -63,43 +60,12 @@ typedef enum {
 #if LV_USE_3DTEXTURE
     LV_DRAW_DSC_TYPE_3D,
 #endif
+    LV_DRAW_DSC_TYPE_COUNT
 } lv_draw_dsc_type_t;
-
-typedef enum {
-    /** Waiting for an other task to be finished.
-     * For example in case of `LV_DRAW_DSC_TYPE_LAYER` (used to blend a layer)
-     * is blocked until all the draw tasks of the layer is rendered. */
-    LV_DRAW_TASK_STATE_BLOCKED,
-
-    /** The draw task is added to the layers list and waits to be rendered. */
-    LV_DRAW_TASK_STATE_WAITING,
-
-    /** The draw task is added to the command queue of the draw unit.
-     * As the queued task are executed in order it's possible to queue multiple draw task
-     * (for the same draw unit) even if they are depending on each other.
-     * Therefore `lv_draw_get_available_task` and `lv_draw_get_next_available_task` can return
-     * draw task for the same draw unit even if a dependent draw task is not finished ready yet.*/
-    LV_DRAW_TASK_STATE_QUEUED,
-
-    /** The draw task is being rendered. This draw task needs to be finished before
-     * `lv_draw_get_available_task` and `lv_draw_get_next_available_task` would
-     * return any depending draw tasks.*/
-    LV_DRAW_TASK_STATE_IN_PROGRESS,
-
-    /** The draw task is rendered. It will be removed from the draw task list of the layer
-     * and freed automatically. */
-    LV_DRAW_TASK_STATE_FINISHED,
-
-    /*Task cannot be completed. E.g. OOM during layer buf alloc*/
-    LV_DRAW_TASK_STATE_FAILED,
-} lv_draw_task_state_t;
 
 struct _lv_layer_t  {
     /** Target draw buffer of the layer */
     lv_draw_buf_t * draw_buf;
-
-    /** Linked list of draw tasks */
-    lv_draw_task_t * draw_task_head;
 
     /** The display assigned to this layer*/
     lv_display_t * display;
@@ -120,12 +86,8 @@ struct _lv_layer_t  {
     lv_area_t phy_clip_area;
 
     /**
-     * NEVER USE IT DRAW UNITS. USED INTERNALLY DURING DRAW TASK CREATION.
-     * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
-     * Can be set before new draw tasks are added to indicate the clip area of the draw tasks.
-     * Therefore `lv_draw_add_task()` always saves it in the new draw task to know the clip area when the draw task was added.
-     * During drawing the draw units also sees the saved clip_area and should use it during drawing.
-     * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
+     * The current clip area with absolute coordinates, always the same or smaller than `buf_area`.
+     * The draw functions read it when they're called. Draw units use the `clip_area` they get instead.
      */
     lv_area_t _clip_area;
 
@@ -142,9 +104,6 @@ struct _lv_layer_t  {
 
     /** The color format of the layer. LV_COLOR_FORMAT_... */
     lv_color_format_t color_format;
-
-    /** Flag indicating all tasks are added */
-    bool all_tasks_added;
 
     /** Opacity of the layer */
     lv_opa_t opa;
@@ -222,88 +181,14 @@ void lv_draw_deinit(void);
 void * lv_draw_create_unit(size_t size);
 
 /**
- * Add an empty draw task to the draw task list of a layer.
- * @param layer     pointer to a layer
- * @param coords    the coordinates of the draw task
- * @param type      the draw task type
- * @return          the created draw task which needs to be
- *                  further configured e.g. by added a draw descriptor
- */
-lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_dsc_type_t type);
-
-/**
- * Needs to be called when a draw task is created and configured.
- * It will send an event about the new draw task to the widget
- * and assign it to a draw unit.
- * @param layer     pointer to a layer
- * @param t         pointer to a draw task
- */
-void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t);
-
-/**
- * Try dispatching draw tasks to draw units
- */
-void lv_draw_dispatch(void);
-
-/**
- * Used internally to try dispatching draw tasks of a specific layer
- * @param disp      pointer to a display on which the dispatching was requested @nullable
- * @param layer     pointer to a layer
- * @return          at least one draw task is being rendered (maybe it was taken earlier)
- */
-bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer);
-
-/**
- * Wait for a new dispatch request.
- * It's blocking if `LV_USE_OS == 0` else it yields
- */
-void lv_draw_dispatch_wait_for_request(void);
-
-/**
- * Wait for draw finish in case of asynchronous task execution.
- * If `LV_USE_OS == 0` it just return.
+ * Wait until every draw unit has finished the drawing it has queued.
  */
 void lv_draw_wait_for_finish(void);
-
-/**
- * When a draw unit finished a draw task it needs to request dispatching
- * to let LVGL assign a new draw task to it
- */
-void lv_draw_dispatch_request(void);
 
 /**
  * Get the total number of draw units.
   */
 uint32_t lv_draw_get_unit_count(void);
-
-/**
- * If there is only one draw unit check the first draw task if it's available.
- * If there are multiple draw units call `lv_draw_get_next_available_task` to find a task.
- * @param layer             the draw layer to search in
- * @param t_prev            continue searching from this task @nullable
- * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
- * @return                  an available draw task or NULL if there is not any
- */
-lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
-
-/**
- * Find and available draw task
- * @param layer             the draw layer to search in
- * @param t_prev            continue searching from this task @nullable
- * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
- * @return                  an available draw task or NULL if there is not any
- */
-lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
-
-/**
- * Tell how many draw task are waiting to be drawn on the area of `t_check`.
- * It can be used to determine if a GPU shall combine many draw tasks into one or not.
- * If a lot of tasks are waiting for the current ones it makes sense to draw them one-by-one
- * to not block the dependent tasks' rendering
- * @param t_check   the task whose dependent tasks shall be counted @nullable
- * @return          number of tasks depending on `t_check`
- */
-uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check);
 
 
 /**
@@ -342,16 +227,10 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
  * @param parent_layer      the parent layer to which the layer will be merged when it's rendered @nullable
  * @param color_format      the color format of the layer
  * @param area              the areas of the layer (absolute coordinates)
+ * @return                  LV_RESULT_OK or LV_RESULT_INVALID on error
  */
-void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
-                        const lv_area_t * area);
-
-/**
- * Try to allocate a buffer for the layer.
- * @param layer             pointer to a layer
- * @return                  pointer to the allocated aligned buffer or NULL on failure
- */
-void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
+lv_result_t lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
+                               const lv_area_t * area);
 
 /**
  * Got to a pixel at X and Y coordinate on a layer
@@ -361,27 +240,6 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
  * @return                  `buf` offset to point to the given X and Y coordinate
  */
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y);
-
-/**
- * Get the type of a draw task
- * @param t   the draw task to get the type of
- * @return    the draw task type
-*/
-lv_draw_dsc_type_t lv_draw_task_get_type(const lv_draw_task_t * t);
-
-/**
- * Get the draw descriptor of a draw task
- * @param t   the draw task to get the draw descriptor of
- * @return    a void pointer to the draw descriptor
-*/
-void * lv_draw_task_get_draw_dsc(const lv_draw_task_t * t);
-
-/**
- * Get the draw area of a draw task
- * @param t      the draw task to get the draw area of
- * @param area   the destination where the draw area will be stored
-*/
-void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area);
 
 /**
  * Get the type of a draw descriptor
@@ -416,6 +274,47 @@ void lv_draw_layer_deinit(lv_layer_t * layer);
  * @param layer             pointer the layer to delete @nullable
  */
 void lv_draw_layer_delete(lv_layer_t * layer);
+
+/**
+ * Get the next draw unit.
+ * @param unit  a draw unit, or NULL to get the first one, which is the main unit   @nullable
+ * @return      the draw unit after `unit`, or NULL after the last one
+ */
+lv_draw_unit_t * lv_draw_unit_get_next(lv_draw_unit_t * unit);
+
+/**
+ * Get the name of a draw unit, e.g. "SW".
+ * @param unit  pointer to a draw unit
+ * @return      the name of the draw unit
+ */
+const char * lv_draw_unit_get_name(const lv_draw_unit_t * unit);
+
+/**
+ * Get how many descriptors of a type a draw unit has drawn since the last reset,
+ * including those it drew as the fallback of another unit.
+ *
+ * Always 0 if LV_USE_DRAW_COUNTERS is disabled
+ *
+ * @param unit  pointer to a draw unit
+ * @param type  the draw descriptor type
+ * @return      the number of descriptors drawn
+ */
+uint32_t lv_draw_unit_get_draw_count(const lv_draw_unit_t * unit, lv_draw_dsc_type_t type);
+
+/**
+ * Get how many descriptors of a type no draw unit could draw since the last reset.
+ *
+ * Always 0 if LV_USE_DRAW_COUNTERS is disabled
+ *
+ * @param type  the draw descriptor type
+ * @return      the number of descriptors dropped
+ */
+uint32_t lv_draw_get_dropped_count(lv_draw_dsc_type_t type);
+
+/**
+ * Set the draw counts of every draw unit and the dropped counts to 0.
+ */
+void lv_draw_reset_counters(void);
 
 /**********************
  *  GLOBAL VARIABLES

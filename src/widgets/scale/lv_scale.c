@@ -48,7 +48,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event);
 
 static void scale_draw_main(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
-static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_dsc_t * label_dsc,
+static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, const lv_draw_label_dsc_t * base_label_dsc,
                              const uint32_t major_tick_idx, const int32_t tick_value, lv_point_t * tick_point_b, const uint32_t tick_idx);
 static void scale_calculate_main_compensation(lv_obj_t * obj);
 
@@ -942,7 +942,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     }
 }
 
-static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_dsc_t * label_dsc,
+static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, const lv_draw_label_dsc_t * base_label_dsc,
                              const uint32_t major_tick_idx, const int32_t tick_value, lv_point_t * tick_point_b,
                              const uint32_t tick_idx)
 {
@@ -953,8 +953,12 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     lv_scale_t * scale = (lv_scale_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(event);
     LV_ASSERT(layer != NULL);
-    LV_ASSERT(label_dsc != NULL);
+    LV_ASSERT(base_label_dsc != NULL);
     LV_ASSERT(tick_point_b != NULL);
+
+    /*Draw from a copy, as its text can point to the buffer below*/
+    lv_draw_label_dsc_t label_dsc_copy = *base_label_dsc;
+    lv_draw_label_dsc_t * label_dsc = &label_dsc_copy;
 
     /* Label text setup */
     char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
@@ -966,11 +970,7 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     else { /* Add label with mapped values */
         lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
-        /* LVGL guarantees it will copy the label text if the text is local*/
-        /* TODO: get rid of text_local and this suppression*/
-        /*cppcheck-suppress autoVariables*/
         label_dsc->text = text_buffer;
-        label_dsc->text_local = 1;
     }
 
     int32_t translate_x = lv_obj_get_style_translate_x_internal(obj, LV_PART_INDICATOR);
@@ -1043,39 +1043,33 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     /* Invalid mode */
     else {
-        if(label_dsc->text_local) {
-            /* clear the reference to the text buffer on the stack */
-            label_dsc->text = NULL;
-            label_dsc->text_local = false;
-        }
         return;
     }
 
     if(label_rotation > 0) {
         /*Draw the label to a new layer and draw the layer rotated*/
         lv_layer_t * layer_label = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &label_coords);
-        lv_draw_label(layer_label, label_dsc, &label_coords);
+        if(layer_label == NULL) {
+            LV_LOG_WARN("Couldn't create a layer, the rotated label is not drawn");
+        }
+        else {
+            lv_draw_label(layer_label, label_dsc, &label_coords);
 
-        lv_point_t pivot_point;
-        /* Set pivot point to the center of the label so it matches the scale curve */
-        pivot_point.x = lv_area_get_width(&label_coords) / 2;
-        pivot_point.y = lv_area_get_height(&label_coords) / 2;
+            lv_point_t pivot_point;
+            /* Set pivot point to the center of the label so it matches the scale curve */
+            pivot_point.x = lv_area_get_width(&label_coords) / 2;
+            pivot_point.y = lv_area_get_height(&label_coords) / 2;
 
-        lv_draw_image_dsc_t layer_draw_dsc;
-        lv_draw_image_dsc_init(&layer_draw_dsc);
-        layer_draw_dsc.src = layer_label;
-        layer_draw_dsc.rotation = label_rotation;
-        layer_draw_dsc.pivot = pivot_point;
-        lv_draw_layer(layer, &layer_draw_dsc, &label_coords);
+            lv_draw_image_dsc_t layer_draw_dsc;
+            lv_draw_image_dsc_init(&layer_draw_dsc);
+            layer_draw_dsc.src = layer_label;
+            layer_draw_dsc.rotation = label_rotation;
+            layer_draw_dsc.pivot = pivot_point;
+            lv_draw_layer(layer, &layer_draw_dsc, &label_coords);
+        }
     }
     else {
         lv_draw_label(layer, label_dsc, &label_coords);
-    }
-
-    if(label_dsc->text_local) {
-        /* clear the reference to the text buffer on the stack */
-        label_dsc->text = NULL;
-        label_dsc->text_local = false;
     }
 }
 
@@ -1826,7 +1820,6 @@ static void scale_get_labels_max_size(lv_obj_t * obj, int32_t * max_w, int32_t *
 
             lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
             label_dsc.text = text_buffer;
-            label_dsc.text_local = 1;
         }
 
         if(label_dsc.text == NULL) {
@@ -1956,7 +1949,6 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
     if(major_tick_idx <= scale->custom_label_cnt) {
         if(scale->txt_src[major_tick_idx - 1U]) {
             label_dsc->text = scale->txt_src[major_tick_idx - 1U];
-            label_dsc->text_local = 0;
         }
         else {
             label_dsc->text = NULL;

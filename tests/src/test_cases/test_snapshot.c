@@ -3,6 +3,7 @@
 #include "../lvgl_private.h"
 
 #include "unity/unity.h"
+#include "draw/lv_test_deferred_draw_unit.h"
 
 #define NUM_SNAPSHOTS 10
 
@@ -22,6 +23,8 @@ static const lv_color_format_t supported_color_formats[] = {
 
 #define NUM_SUPPORTED_FORMATS (sizeof(supported_color_formats) / sizeof(supported_color_formats[0]))
 
+static lv_draw_buf_t * g_snapshot;
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -30,7 +33,12 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
+    deferred_draw_unit_delete();
     lv_obj_clean(lv_screen_active());
+    if(g_snapshot) {
+        lv_draw_buf_destroy(g_snapshot);
+        g_snapshot = NULL;
+    }
 }
 
 void test_snapshot_should_not_leak_memory(void)
@@ -570,6 +578,24 @@ void test_snapshot_rotated_large_bbox_no_overflow(void)
     lv_draw_buf_destroy(src_buf);
     lv_display_set_resolution(disp, orig_hor, orig_ver);
 #endif /* LV_USE_DRAW_NANOVG */
+}
+
+void test_snapshot_take_waits_for_the_draw_units(void)
+{
+    /*Only a fill is drawn, so the main unit is never waited for before a fallback draw*/
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_size(obj, 40, 40);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(obj, lv_color_hex(0xff0000), 0);
+
+    deferred_draw_unit_create();
+    g_snapshot = lv_snapshot_take(obj, LV_COLOR_FORMAT_ARGB8888);
+    TEST_ASSERT_NOT_NULL(g_snapshot);
+
+    /*The snapshot is returned only after the unit finished what it queued*/
+    TEST_ASSERT_GREATER_THAN_UINT32(0, deferred_draw_unit_get_fill_cnt());
+    TEST_ASSERT_FALSE(deferred_draw_unit_has_pending());
 }
 
 #endif

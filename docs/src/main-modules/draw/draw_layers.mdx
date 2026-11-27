@@ -162,7 +162,7 @@ lv_area_t layer_area = {10, 10, 80, 50}; /* Area of the new layer */
 lv_layer_t * new_layer = lv_draw_layer_create(parent_layer, LV_COLOR_FORMAT_RGB565, &layer_area);
 ```
 
-Once the layer is created, draw tasks can be added to it
+Once the layer is created, it can be drawn on
 by using the [Draw API](/main-modules/draw/draw_api) and [Draw descriptors](/main-modules/draw/draw_descriptors).
 In most cases this means calling the `lv_draw_rect/label/etc` functions.
 
@@ -181,8 +181,8 @@ lv_draw_layer(parent_layer, &image_draw_dsc, &layer_area);
 
 ### Layer Buffers
 
-The buffer for a layer (where rendering occurs) is not allocated at creation.
-Instead, it is allocated by Draw Units when the first Draw Task is dispatched.
+The buffer for a layer (where rendering occurs) is allocated when the layer is created.
+If it can't be allocated, the layer isn't created (see "Memory Limit for Layers").
 
 Layer buffers can be large, so ensure there is sufficient heap memory or increase
 <ApiLink name="LV_MEM_SIZE" /> in `lv_conf.h`.
@@ -207,4 +207,8 @@ To save memory, LVGL can render certain types of layers in smaller chunks:
 The total memory available for layers at once is controlled by
 <ApiLink name="LV_DRAW_LAYER_MAX_MEMORY" /> in `lv_conf.h`.  If set to `0`, there is no
 limit.
+
+A layer's buffer is allocated when the layer is created. If that would exceed the
+limit, or the allocation fails, the layer isn't created and the part of the Widget
+that needed it isn't drawn.
 
