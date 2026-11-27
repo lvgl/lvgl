@@ -21,6 +21,8 @@
 static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_area, const lv_area_t * circle_area,
                        lv_opa_t * mask_buf,  int32_t width);
 static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, lv_area_t * res_area);
+static void apply_image_mask(lv_opa_t * mask_buf, const lv_area_t * row_area, const uint8_t * img_mask,
+                             int32_t img_mask_stride, const lv_area_t * img_area);
 
 static inline lv_opa_t * allocate_circle_mask(const lv_draw_arc_dsc_t * dsc, int32_t start_angle, int32_t  end_angle,
                                               uint32_t width, lv_area_t * out_round_area_1, lv_area_t * out_round_area_2);
@@ -142,6 +144,7 @@ void lv_draw_sw_arc(lv_layer_t * layer, const lv_area_t * clip_area, const lv_dr
     blend_dsc.mask_area = &blend_area;
 
     const uint8_t * img_mask = NULL;
+    int32_t img_mask_stride = 0;
     lv_image_decoder_dsc_t decoder_dsc;
     if(dsc->img_src == NULL) {
         blend_dsc.color = dsc->color;
@@ -159,13 +162,22 @@ void lv_draw_sw_arc(lv_layer_t * layer, const lv_area_t * clip_area, const lv_dr
             img_area.y2 = decoder_dsc.decoded->header.h - 1;
             int32_t ofs = decoder_dsc.decoded->header.w / 2;
             lv_area_move(&img_area, dsc->center.x - ofs, dsc->center.y - ofs);
-            blend_dsc.src_area = &img_area;
-            blend_dsc.src_buf = decoder_dsc.decoded->data;
-            blend_dsc.src_stride = decoder_dsc.decoded->header.stride;
-            blend_dsc.src_color_format = decoder_dsc.decoded->header.cf;
-            if(blend_dsc.src_color_format == LV_COLOR_FORMAT_RGB565A8) {
-                blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
-                img_mask = (uint8_t *)blend_dsc.src_buf + blend_dsc.src_stride * lv_area_get_height(blend_dsc.src_area);
+            if(decoder_dsc.decoded->header.cf == LV_COLOR_FORMAT_A8) {
+                /*An alpha only image masks the arc's color*/
+                blend_dsc.color = dsc->color;
+                img_mask = decoder_dsc.decoded->data;
+                img_mask_stride = decoder_dsc.decoded->header.stride;
+            }
+            else {
+                blend_dsc.src_area = &img_area;
+                blend_dsc.src_buf = decoder_dsc.decoded->data;
+                blend_dsc.src_stride = decoder_dsc.decoded->header.stride;
+                blend_dsc.src_color_format = decoder_dsc.decoded->header.cf;
+                if(blend_dsc.src_color_format == LV_COLOR_FORMAT_RGB565A8) {
+                    blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
+                    img_mask = (uint8_t *)blend_dsc.src_buf + blend_dsc.src_stride * lv_area_get_height(&img_area);
+                    img_mask_stride = blend_dsc.src_stride / 2;
+                }
             }
         }
     }
@@ -202,19 +214,10 @@ void lv_draw_sw_arc(lv_layer_t * layer, const lv_area_t * clip_area, const lv_dr
             }
         }
 
-        /*If it was an RGB565A8 image use consider its A8 part on the mask*/
+        /*The alpha of an A8 image, or the A8 part of an RGB565A8 image*/
         if(img_mask && blend_dsc.mask_res != LV_DRAW_SW_MASK_RES_TRANSP) {
-            const uint8_t * img_mask_tmp = img_mask;
-            img_mask_tmp += blend_dsc.src_stride / 2 * (blend_area.y1 - blend_dsc.src_area->y1);
-            img_mask_tmp += blend_area.x1 - blend_dsc.src_area->x1;
-
-            int32_t i;
-            for(i = 0; i < blend_w; i++) {
-                mask_buf[i] = LV_OPA_MIX2(mask_buf[i], img_mask_tmp[i]);
-            }
-            if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) {
-                blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-            }
+            apply_image_mask(mask_buf, &blend_area, img_mask, img_mask_stride, &img_area);
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         }
 
         lv_draw_sw_blend(layer, &clipped_area, &blend_dsc);
@@ -276,6 +279,24 @@ static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_are
         }
     }
 
+}
+
+static void apply_image_mask(lv_opa_t * mask_buf, const lv_area_t * row_area, const uint8_t * img_mask,
+                             int32_t img_mask_stride, const lv_area_t * img_area)
+{
+    int32_t w = lv_area_get_width(row_area);
+    if(row_area->y1 < img_area->y1 || row_area->y1 > img_area->y2) {
+        lv_memzero(mask_buf, w);
+        return;
+    }
+
+    const uint8_t * img_row = img_mask + img_mask_stride * (row_area->y1 - img_area->y1);
+    int32_t i;
+    for(i = 0; i < w; i++) {
+        int32_t x = row_area->x1 + i;
+        if(x < img_area->x1 || x > img_area->x2) mask_buf[i] = LV_OPA_TRANSP;
+        else mask_buf[i] = LV_OPA_MIX2(mask_buf[i], img_row[x - img_area->x1]);
+    }
 }
 
 static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, lv_area_t * res_area)
