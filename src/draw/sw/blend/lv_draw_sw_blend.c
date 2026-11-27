@@ -169,6 +169,56 @@ void lv_draw_sw_blend(lv_layer_t * layer, const lv_area_t * clip_area, const lv_
     LV_PROFILER_DRAW_END;
 }
 
+bool lv_draw_sw_blend_is_dest_cf_supported(lv_color_format_t cf)
+{
+    if(lv_draw_sw_get_blend_handler(cf)) return true;
+
+    switch(cf) {
+#if LV_DRAW_SW_SUPPORT_RGB565
+        case LV_COLOR_FORMAT_RGB565:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+        case LV_COLOR_FORMAT_ARGB8888:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
+        case LV_COLOR_FORMAT_RGB888:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_XRGB8888
+        case LV_COLOR_FORMAT_XRGB8888:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_A8
+        case LV_COLOR_FORMAT_A8:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_L8
+        case LV_COLOR_FORMAT_L8:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_AL88
+        case LV_COLOR_FORMAT_AL88:
+            return true;
+#endif
+#if LV_DRAW_SW_SUPPORT_I1
+        case LV_COLOR_FORMAT_I1:
+            return true;
+#endif
+        default:
+            return false;
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

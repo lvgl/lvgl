@@ -55,6 +55,8 @@ static bool can_draw_blur(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
 
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 
+static int32_t draw_wait_for_finish(lv_draw_unit_t * draw_unit);
+
 static void draw_event_cb(lv_event_t * e);
 
 static void draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
@@ -124,11 +126,14 @@ void lv_draw_vg_lite_init(void)
     lv_draw_vg_lite_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_vg_lite_unit_t));
     unit->base_unit.dispatch_cb = draw_dispatch;
     unit->base_unit.delete_cb = draw_delete;
+    unit->base_unit.wait_for_finish_cb = draw_wait_for_finish;
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.draw_cbs = &draw_cbs;
     unit->base_unit.fallback = lv_draw_sw_get_draw_unit();
     unit->base_unit.id = VG_LITE_DRAW_UNIT_ID;
     unit->base_unit.name = "VG_LITE";
+
+    lv_array_init(&unit->queued_tasks, 16, sizeof(lv_draw_task_t *));
 
     lv_vg_lite_image_dsc_init(unit);
 #if LV_USE_VECTOR_GRAPHIC
@@ -142,6 +147,21 @@ void lv_draw_vg_lite_init(void)
 
 void lv_draw_vg_lite_deinit(void)
 {
+}
+
+void lv_draw_vg_lite_finish_queued_tasks(lv_draw_vg_lite_unit_t * u)
+{
+    uint32_t cnt = lv_array_size(&u->queued_tasks);
+    if(cnt == 0) return;
+
+    uint32_t i;
+    for(i = 0; i < cnt; i++) {
+        lv_draw_task_t ** t = lv_array_at(&u->queued_tasks, i);
+        (*t)->state = LV_DRAW_TASK_STATE_FINISHED;
+    }
+    lv_array_clear(&u->queued_tasks);
+
+    lv_draw_dispatch_request();
 }
 
 /**********************
@@ -251,7 +271,12 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     draw_execute(u);
 
-    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
+    /*Finished only when the GPU has drawn it, see lv_draw_vg_lite_finish_queued_tasks()*/
+    u->task_act->state = LV_DRAW_TASK_STATE_QUEUED;
+    if(lv_array_push_back(&u->queued_tasks, &u->task_act) != LV_RESULT_OK) {
+        lv_vg_lite_finish(u);
+        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
+    }
     u->task_act = NULL;
 
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/
@@ -282,10 +307,10 @@ static bool can_draw_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
 static bool can_draw_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc)
 {
     LV_UNUSED(draw_unit);
-    LV_UNUSED(dsc);
 #if LV_VG_LITE_USE_BOX_SHADOW
-    return is_dest_supported(layer);
+    return is_dest_supported(layer) && lv_draw_vg_lite_box_shadow_is_supported(dsc, layer->color_format);
 #else
+    LV_UNUSED(dsc);
     LV_UNUSED(layer);
     return false;
 #endif
@@ -373,6 +398,13 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
     lv_vg_lite_path_deinit(unit);
     lv_vg_lite_decoder_deinit();
     lv_draw_vg_lite_label_deinit(unit);
+    lv_array_deinit(&unit->queued_tasks);
+    return 1;
+}
+
+static int32_t draw_wait_for_finish(lv_draw_unit_t * draw_unit)
+{
+    lv_vg_lite_finish((lv_draw_vg_lite_unit_t *)draw_unit);
     return 1;
 }
 

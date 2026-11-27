@@ -52,6 +52,13 @@ typedef struct {
  */
 void lv_draw_sw_blend(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_sw_blend_dsc_t * dsc);
 
+/**
+ * Check whether the SW renderer can draw into a layer of a given color format.
+ * @param cf        the color format of the layer
+ * @return          true: there is a built-in or custom blend handler for it
+ */
+bool lv_draw_sw_blend_is_dest_cf_supported(lv_color_format_t cf);
+
 /**********************
  *      MACROS
  **********************/

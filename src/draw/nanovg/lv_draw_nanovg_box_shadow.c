@@ -82,7 +82,21 @@ void lv_draw_nanovg_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, c
                          dsc->radius, dsc->width, icol, ocol);
 
     nvgBeginPath(u->vg);
-    lv_nanovg_path_append_rect(u->vg, shadow_area.x1, shadow_area.y1, shadow_w, shadow_h, dsc->radius);
+    if(dsc->bg_cover) {
+        lv_nanovg_path_append_rect(u->vg, shadow_area.x1, shadow_area.y1, shadow_w, shadow_h, dsc->radius);
+    }
+    else {
+        /*Don't draw the shadow under the object. Same 1 px smaller area as in the SW renderer.
+         *The hole must be inside the outer path; the paint is transparent outside `shadow_area`.*/
+        lv_area_t bg_area = *coords;
+        lv_area_increase(&bg_area, -1, -1);
+        lv_area_t outer_area;
+        lv_area_join(&outer_area, &shadow_area, &bg_area);
+        lv_nanovg_path_append_area(u->vg, &outer_area);
+        lv_nanovg_path_append_rect(u->vg, bg_area.x1, bg_area.y1,
+                                   lv_area_get_width(&bg_area), lv_area_get_height(&bg_area), dsc->radius);
+        nvgPathWinding(u->vg, NVG_HOLE);
+    }
     nvgFillPaint(u->vg, paint);
     nvgFill(u->vg);
 

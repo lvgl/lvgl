@@ -344,7 +344,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     /*If the first task covers the whole layer, there cannot be independent areas.*/
     if(layer->draw_task_head) {
         lv_draw_task_t * t = layer->draw_task_head;
-        if(t->state != LV_DRAW_TASK_STATE_WAITING &&
+        bool queued_here = t->state == LV_DRAW_TASK_STATE_QUEUED && t->preferred_draw_unit_id == draw_unit_id;
+        if(t->state != LV_DRAW_TASK_STATE_WAITING && !queued_here &&
            t->area.x1 <= layer->buf_area.x1 && t->area.x2 >= layer->buf_area.x2 &&
            t->area.y1 <= layer->buf_area.y1 && t->area.y2 >= layer->buf_area.y2) {
             LV_PROFILER_DRAW_END;
@@ -694,6 +695,14 @@ void lv_draw_layer_deinit(lv_layer_t * layer)
         t = t->next;
     }
 
+    /*A draw unit refers to its queued tasks until it finishes them, also without an OS*/
+    for(t = layer->draw_task_head; t; t = t->next) {
+        if(t->state == LV_DRAW_TASK_STATE_QUEUED && t->draw_unit && t->draw_unit->wait_for_finish_cb) {
+            LV_LOG_WARN("Deiniting a layer with a queued task, waiting for its draw unit");
+            t->draw_unit->wait_for_finish_cb(t->draw_unit);
+        }
+    }
+
     t = layer->draw_task_head;
     while(t) {
         lv_draw_task_t * next = t->next;
@@ -979,6 +988,11 @@ static lv_draw_task_t * get_first_available_task(lv_layer_t * layer)
      * so it can be blended normally.*/
     lv_draw_task_t * t = layer->draw_task_head;
     while(t) {
+        /*The only draw unit renders its queued tasks in order, so the next one can be queued too*/
+        if(t->state == LV_DRAW_TASK_STATE_QUEUED) {
+            t = t->next;
+            continue;
+        }
         /*Not waiting to be rendered, leave this layer while the first task is ready (i.e. not blocked)*/
         if(t->state != LV_DRAW_TASK_STATE_WAITING) {
             t = NULL;

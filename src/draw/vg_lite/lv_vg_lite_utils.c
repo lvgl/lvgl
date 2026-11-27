@@ -11,6 +11,7 @@
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "lv_draw_vg_lite.h"
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
@@ -1425,6 +1426,8 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     LV_PROFILER_DRAW_BEGIN;
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish(), {});
+
+    lv_draw_vg_lite_finish_queued_tasks(u);
 
 #if LV_USE_VECTOR_GRAPHIC
     /* Clear all gradient caches reference */

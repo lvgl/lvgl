@@ -203,6 +203,16 @@ class vg_lite_ctx
             return dest_buffer.data();
         }
 
+        void save_loaded_target_buffer(vg_lite_uint32_t px_size)
+        {
+            loaded_buffer.assign(dest_buffer.begin(), dest_buffer.begin() + px_size);
+        }
+
+        const vg_lite_uint32_t * get_loaded_target_buffer()
+        {
+            return loaded_buffer.data();
+        }
+
         void set_CLUT(vg_lite_uint32_t count, const vg_lite_uint32_t * colors)
         {
             switch(count) {
@@ -257,6 +267,7 @@ class vg_lite_ctx
         /*  */
         std::vector<vg_lite_uint32_t> src_buffer;
         std::vector<vg_lite_uint32_t> dest_buffer;
+        std::vector<vg_lite_uint32_t> loaded_buffer;
 
         vg_lite_uint32_t clut_2colors[2];
         vg_lite_uint32_t clut_4colors[4];
@@ -313,6 +324,7 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
 static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_buffer_t * target,
                                 const vg_lite_rectangle_t * rect);
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target);
+static void write_back_target(vg_lite_ctx * ctx, vg_lite_uint32_t start, vg_lite_uint32_t count);
 static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture, const vg_lite_buffer_t * source,
                            vg_lite_color_t color = 0);
 
@@ -795,10 +807,10 @@ extern "C" {
     static void picture_bgra8888_to_bgra4444(vg_color_bgra4444_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
     {
         while(px_size--) {
-            dest->red = src->red * 0xF / 0xFF;
-            dest->green = src->green * 0xF / 0xFF;
-            dest->blue = src->blue * 0xF / 0xFF;
-            dest->alpha = src->alpha * 0xF / 0xFF;
+            dest->red = PACK_CHANNEL(src->red, 0xF);
+            dest->green = PACK_CHANNEL(src->green, 0xF);
+            dest->blue = PACK_CHANNEL(src->blue, 0xF);
+            dest->alpha = PACK_CHANNEL(src->alpha, 0xF);
             src++;
             dest++;
         }
@@ -807,10 +819,10 @@ extern "C" {
     static void picture_bgra8888_to_bgra2222(vg_color_bgra2222_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
     {
         while(px_size--) {
-            dest->red = src->red * 0x3 / 0xFF;
-            dest->green = src->green * 0x3 / 0xFF;
-            dest->blue = src->blue * 0x3 / 0xFF;
-            dest->alpha = src->alpha * 0x3 / 0xFF;
+            dest->red = PACK_CHANNEL(src->red, 0x3);
+            dest->green = PACK_CHANNEL(src->green, 0x3);
+            dest->blue = PACK_CHANNEL(src->blue, 0x3);
+            dest->alpha = PACK_CHANNEL(src->alpha, 0x3);
             src++;
             dest++;
         }
@@ -831,61 +843,34 @@ extern "C" {
         /* make sure target buffer is valid */
         LV_ASSERT_NULL(ctx->target_buffer);
 
-        /* If target_buffer is not in a format supported by thorvg, software conversion is required. */
-        switch(ctx->target_format) {
-            case VG_LITE_BGR565:
-                picture_bgra8888_to_bgr565(
-                    (vg_color16_t *)ctx->target_buffer,
-                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                    ctx->target_px_size);
-                break;
-            case VG_LITE_BGRA5658:
-                picture_bgra8888_to_bgra5658(
-                    (vg_color16_alpha_t *)ctx->target_buffer,
-                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                    ctx->target_px_size);
-                break;
-            case VG_LITE_BGR888:
-                picture_bgra8888_to_bgr888(
-                    (vg_color24_t *)ctx->target_buffer,
-                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                    ctx->target_px_size);
-                break;
-            case VG_LITE_L8:
-                picture_bgra8888_to_l8(
-                    (uint8_t *)ctx->target_buffer,
-                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                    ctx->target_px_size);
-                break;
-            case VG_LITE_A8:
-                picture_bgra8888_to_alpha8(
-                    (uint8_t *)ctx->target_buffer,
-                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                    ctx->target_px_size);
-                break;
-            case VG_LITE_BGRA5551:
-                picture_bgra8888_to_bgra5551((vg_color_bgra5551_t *)ctx->target_buffer,
-                                             (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                                             ctx->target_px_size);
-                break;
-            case VG_LITE_BGRA4444:
-                picture_bgra8888_to_bgra4444((vg_color_bgra4444_t *)ctx->target_buffer,
-                                             (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                                             ctx->target_px_size);
-                break;
-            case VG_LITE_BGRA2222:
-                picture_bgra8888_to_bgra2222((vg_color_bgra2222_t *)ctx->target_buffer,
-                                             (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                                             ctx->target_px_size);
-                break;
-            case VG_LITE_BGRA8888:
-            case VG_LITE_BGRX8888:
-                /* No conversion required. */
-                break;
-            default:
-                LV_LOG_ERROR("unsupported format: %d", ctx->target_format);
-                LV_ASSERT(false);
-                break;
+        /* If target_buffer is not in a format supported by thorvg, software conversion is required.
+         * Write back only the pixels that were drawn: other draw units may be drawing into
+         * the rest of the target in parallel. */
+        if(!TVG_IS_VG_FMT_SUPPORT(ctx->target_format)) {
+            const vg_lite_uint32_t * temp = ctx->get_temp_target_buffer();
+            const vg_lite_uint32_t * loaded = ctx->get_loaded_target_buffer();
+            const vg_lite_uint32_t px_size = ctx->target_px_size;
+            /* Skip the unchanged chunks with memcmp: comparing pixel by pixel is slow in the debug test builds */
+            const vg_lite_uint32_t chunk = 256;
+            vg_lite_uint32_t i = 0;
+            while(i < px_size) {
+                vg_lite_uint32_t chunk_end = LV_MIN(i + chunk, px_size);
+                if(memcmp(&temp[i], &loaded[i], (chunk_end - i) * sizeof(vg_lite_uint32_t)) == 0) {
+                    i = chunk_end;
+                    continue;
+                }
+
+                while(i < chunk_end) {
+                    if(temp[i] == loaded[i]) {
+                        i++;
+                        continue;
+                    }
+
+                    vg_lite_uint32_t run_start = i;
+                    while(i < px_size && temp[i] != loaded[i]) i++;
+                    write_back_target(ctx, run_start, i - run_start);
+                }
+            }
         }
 
         /* finish convert, clean target buffer info */
@@ -2660,6 +2645,42 @@ static Result canvas_load_target(vg_lite_buffer_t * dest, const vg_lite_buffer_t
     return Result::Success;
 }
 
+static void write_back_target(vg_lite_ctx * ctx, vg_lite_uint32_t start, vg_lite_uint32_t count)
+{
+    const vg_color32_t * src = (const vg_color32_t *)ctx->get_temp_target_buffer() + start;
+
+    switch(ctx->target_format) {
+        case VG_LITE_BGR565:
+            picture_bgra8888_to_bgr565((vg_color16_t *)ctx->target_buffer + start, src, count);
+            break;
+        case VG_LITE_BGRA5658:
+            picture_bgra8888_to_bgra5658((vg_color16_alpha_t *)ctx->target_buffer + start, src, count);
+            break;
+        case VG_LITE_BGR888:
+            picture_bgra8888_to_bgr888((vg_color24_t *)ctx->target_buffer + start, src, count);
+            break;
+        case VG_LITE_L8:
+            picture_bgra8888_to_l8((uint8_t *)ctx->target_buffer + start, src, count);
+            break;
+        case VG_LITE_A8:
+            picture_bgra8888_to_alpha8((uint8_t *)ctx->target_buffer + start, src, count);
+            break;
+        case VG_LITE_BGRA5551:
+            picture_bgra8888_to_bgra5551((vg_color_bgra5551_t *)ctx->target_buffer + start, src, count);
+            break;
+        case VG_LITE_BGRA4444:
+            picture_bgra8888_to_bgra4444((vg_color_bgra4444_t *)ctx->target_buffer + start, src, count);
+            break;
+        case VG_LITE_BGRA2222:
+            picture_bgra8888_to_bgra2222((vg_color_bgra2222_t *)ctx->target_buffer + start, src, count);
+            break;
+        default:
+            LV_LOG_ERROR("unsupported format: %d", ctx->target_format);
+            LV_ASSERT(false);
+            break;
+    }
+}
+
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 {
     /* if target_buffer needs to be changed, finish current drawing */
@@ -2703,6 +2724,7 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
             canvas_buf.height = target->height;
             canvas_buf.stride = stride * sizeof(vg_lite_uint32_t);
             TVG_CHECK_RETURN_RESULT(canvas_load_target(&canvas_buf, target));
+            ctx->save_loaded_target_buffer(target->width * target->height);
         }
     }
 
