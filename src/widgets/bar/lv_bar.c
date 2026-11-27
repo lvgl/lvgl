@@ -642,7 +642,7 @@ static void draw_indic(lv_event_t * e)
             draw_tmp_dsc.radius = 0;
         }
 
-        lv_layer_t * layer_indic = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &indic_draw_area);
+        lv_layer_t * layer_indic = lv_draw_layer_create(layer, LV_DRAW_LAYER_ALPHA_COLOR_FORMAT, &indic_draw_area);
 
         lv_draw_rect(layer_indic, &draw_tmp_dsc, &indic_draw_area);
 

@@ -325,7 +325,7 @@
 
 /** Renders with a VG-Lite GPU. Requires a VG-Lite driver, or the VG-Lite simulator below.
  *
- *  Enable: LV_USE_MATRIX
+ *  Enable: LV_USE_MATRIX, LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
  */
 #define LV_USE_DRAW_VG_LITE 0
 
