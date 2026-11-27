@@ -70,6 +70,25 @@ void test_arc_rgb565a8_image(void)
 #endif
 }
 
+void test_arc_same_image_file_twice(void)
+{
+#if LV_BIN_DECODER_RAM_LOAD
+    /*The second arc gets the image from the image cache*/
+    for(int32_t i = 0; i < 2; i++) {
+        arc = lv_arc_create(active_screen);
+        lv_obj_set_size(arc, 100, 100);
+        lv_obj_align(arc, LV_ALIGN_CENTER, i == 0 ? -80 : 80, 0);
+        lv_arc_set_value(arc, 70);
+        lv_obj_set_style_arc_width(arc, 30, 0);
+        lv_obj_set_style_arc_width(arc, 30, LV_PART_INDICATOR);
+        lv_obj_set_style_arc_image_src(arc, "A:src/test_files/binimages/cogwheel.ARGB8888.bin", LV_PART_INDICATOR);
+        lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_same_image_file_twice.png");
+#endif
+}
+
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void)
 {
     /* Default max range is 100 */

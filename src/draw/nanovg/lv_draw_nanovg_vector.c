@@ -92,7 +92,8 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
 
     const enum NVGwinding winding = lv_fill_to_nvg(fill_dsc->fill_rule);
 
-    lv_nanovg_transform(u->vg, &fill_dsc->matrix);
+    /*The fill matrix is for the paint only: keep it out of the stroke*/
+    nvgSave(u->vg);
 
     switch(fill_dsc->style) {
         case LV_VECTOR_DRAW_STYLE_SOLID: {
@@ -102,21 +103,18 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
         case LV_VECTOR_DRAW_STYLE_PATTERN: {
                 const lv_draw_image_dsc_t * img_dsc = &fill_dsc->img_dsc;
                 lv_image_header_t header;
-                int image_handle = lv_nanovg_image_cache_get_handle(u, img_dsc->src, 0, &header);
+                int image_handle = lv_nanovg_image_cache_get_handle(u, img_dsc->src, NVG_IMAGE_CLAMP_TO_BORDER, &header);
                 if(image_handle < 0) {
-                    LV_PROFILER_DRAW_END;
-                    return;
+                    break;
                 }
 
-                float offset_x = 0;
-                float offset_y = 0;
-
+                /*The bounding box offset comes before the fill matrix, so it isn't scaled by it*/
                 if(fill_dsc->fill_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
-                    offset_x = offset->x;
-                    offset_y = offset->y;
+                    nvgTranslate(u->vg, offset->x, offset->y);
                 }
+                lv_nanovg_transform(u->vg, &fill_dsc->matrix);
 
-                NVGpaint paint = nvgImagePattern(u->vg, offset_x, offset_y, header.w, header.h, 0, image_handle,
+                NVGpaint paint = nvgImagePattern(u->vg, 0, 0, header.w, header.h, 0, image_handle,
                                                  img_dsc->opa / (float)LV_OPA_COVER);
 
                 nvgFillPaint(u->vg, paint);
@@ -124,6 +122,7 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
             }
             break;
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
+                lv_nanovg_transform(u->vg, &fill_dsc->matrix);
                 lv_nanovg_draw_grad(u->vg, &fill_dsc->gradient, winding, comp_op);
             }
             break;
@@ -131,6 +130,8 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
             LV_LOG_WARN("unsupported style: %d", fill_dsc->style);
             break;
     }
+
+    nvgRestore(u->vg);
 
     LV_PROFILER_DRAW_END;
 }

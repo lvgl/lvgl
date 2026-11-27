@@ -51,7 +51,7 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u);
  * @param u pointer to the nanovg unit
  * @param src the source image data
  * @param image_flags the image flags
- * @param header the image header to fill (can be NULL)
+ * @param header filled with the header of the decoded image the texture is made from (can be NULL)
  * @return the image handle, or -1 on failure
  * @note Modifiable sources (canvas/snapshot/lottie) are detected via the decoded
  *       buffer flags and are not cached, so callers don't need to decide.

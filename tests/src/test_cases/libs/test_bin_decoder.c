@@ -170,6 +170,34 @@ void test_bin_decoder_flush_cache(void)
 #endif
 }
 
+void test_bin_decoder_header_from_cache(void)
+{
+#if LV_BIN_DECODER_RAM_LOAD == 1
+    const char * src = "A:src/test_files/binimages/cogwheel.ARGB8888.bin";
+    lv_image_cache_drop(src);
+
+    lv_image_decoder_dsc_t first;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&first, src, NULL));
+    TEST_ASSERT_NOT_NULL(first.cache_entry);
+
+    lv_image_decoder_dsc_t cached;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_image_decoder_open(&cached, src, NULL));
+    TEST_ASSERT_EQUAL_PTR(first.cache_entry, cached.cache_entry);
+
+    TEST_ASSERT_EQUAL(100, first.header.w);
+    TEST_ASSERT_EQUAL(first.header.magic, cached.header.magic);
+    TEST_ASSERT_EQUAL(first.header.cf, cached.header.cf);
+    TEST_ASSERT_EQUAL(first.header.flags, cached.header.flags);
+    TEST_ASSERT_EQUAL(first.header.w, cached.header.w);
+    TEST_ASSERT_EQUAL(first.header.h, cached.header.h);
+    TEST_ASSERT_EQUAL(first.header.stride, cached.header.stride);
+
+    lv_image_decoder_close(&cached);
+    lv_image_decoder_close(&first);
+    lv_image_cache_drop(src);
+#endif
+}
+
 static void render_transformed_image(const void * src)
 {
     lv_image_cache_drop(src);

@@ -63,6 +63,9 @@ struct _lv_image_cache_data_t {
     const lv_draw_buf_t * decoded;
     const lv_image_decoder_t * decoder;
     void * user_data;
+
+    /**The `header` of the decoder descriptor that added this entry, given to later opens from the cache*/
+    lv_image_header_t header;
 };
 
 struct _lv_image_header_cache_data_t {
