@@ -735,6 +735,13 @@ config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
 	default n
 	depends on LV_USE_VG_LITE_THORVG
 
+config LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT
+	bool "Hardware premultiplication"
+	default y
+	help
+		Report the hardware premultiplication of GC355 and GC555: honour the buffers' premultiplied flags in the
+		OpenVG blend modes. Disable it to simulate a GPU without it, such as GC255.
+
 config LV_VG_LITE_THORVG_YUV_SUPPORT
 	bool "YUV color formats"
 	default n

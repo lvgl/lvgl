@@ -29,8 +29,8 @@
 
 #define TVG_CANVAS_ENGINE CanvasEngine::Sw
 #define TVG_COLOR(COLOR) B(COLOR), G(COLOR), R(COLOR), A(COLOR)
-/* VG-Lite paints with premultiplied colors, ThorVG with straight ones */
-#define TVG_PAINT_COLOR(COLOR) TVG_COLOR(color_unpremultiply(COLOR))
+/* ThorVG paints with straight colors, VG-Lite with premultiplied ones, except in the modes it premultiplies itself */
+#define TVG_PAINT_COLOR(COLOR, BLEND) TVG_COLOR(blend_premultiplies_source(BLEND) ? (COLOR) : color_unpremultiply(COLOR))
 #define TVG_IS_VG_FMT_SUPPORT(fmt) ((fmt) == VG_LITE_BGRA8888 || (fmt) == VG_LITE_BGRX8888)
 
 #define TVG_CHECK_RETURN_VG_ERROR(FUNC)                               \
@@ -166,6 +166,13 @@ class vg_lite_ctx
         vg_lite_buffer_format_t target_format;
         vg_lite_rectangle_t scissor_rect;
         bool scissor_is_set;
+        /* The target holds straight pixels: the canvas draws into a premultiplied copy of it */
+        bool target_straight;
+        vg_lite_uint32_t target_stride;
+        vg_lite_uint32_t target_width;
+        /* The straight target pixels in `straight_area`, the area the pushed paints can draw into */
+        std::vector<vg_lite_uint32_t> target_initial;
+        vg_lite_rectangle_t straight_area;
 
     public:
         vg_lite_ctx()
@@ -175,6 +182,10 @@ class vg_lite_ctx
             , target_format { VG_LITE_BGRA8888 }
             , scissor_rect { 0, 0, 0, 0 }
             , scissor_is_set { false }
+            , target_straight { false }
+            , target_stride { 0 }
+            , target_width { 0 }
+            , straight_area { 0, 0, 0, 0 }
             , clut_2colors { 0 }
             , clut_4colors { 0 }
             , clut_16colors { 0 }
@@ -313,8 +324,14 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
 static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_buffer_t * target,
                                 const vg_lite_rectangle_t * rect);
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target);
+static void canvas_premultiply_target(vg_lite_ctx * ctx);
+static void canvas_unpremultiply_target(vg_lite_ctx * ctx);
+static bool target_holds_premultiplied(const vg_lite_buffer_t * target);
 static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture, const vg_lite_buffer_t * source,
-                           vg_lite_color_t color = 0);
+                           vg_lite_blend_t blend, vg_lite_color_t color = 0);
+static bool blend_premultiplies_source(vg_lite_blend_t blend);
+static vg_lite_color_t color_unpremultiply(vg_lite_color_t color);
+static vg_lite_color_t color_premultiply(vg_lite_color_t color);
 
 static inline bool math_zero(float a)
 {
@@ -342,6 +359,40 @@ static Result vg_lite_grad_matrix_conv(vg_lite_matrix_t * result, const vg_lite_
  **********************/
 
 /* color converters */
+
+/* With hardware premultiplication, and in the *_LVGL modes, the GPU premultiplies the sources flagged as straight
+ * and the paint colors itself */
+static bool blend_premultiplies_source(vg_lite_blend_t blend)
+{
+    switch(blend) {
+        case VG_LITE_BLEND_NORMAL_LVGL:
+        case VG_LITE_BLEND_ADDITIVE_LVGL:
+        case VG_LITE_BLEND_SUBTRACT_LVGL:
+        case VG_LITE_BLEND_MULTIPLY_LVGL:
+        case OPENVG_BLEND_SRC:
+        case OPENVG_BLEND_SRC_OVER:
+        case OPENVG_BLEND_DST_OVER:
+        case OPENVG_BLEND_SRC_IN:
+        case OPENVG_BLEND_DST_IN:
+        case OPENVG_BLEND_MULTIPLY:
+        case OPENVG_BLEND_SCREEN:
+        case OPENVG_BLEND_DARKEN:
+        case OPENVG_BLEND_LIGHTEN:
+        case OPENVG_BLEND_ADDITIVE:
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+static vg_lite_color_t color_premultiply(vg_lite_color_t color)
+{
+    vg_lite_uint32_t a = A(color);
+    if(a == 0xff) return color;
+
+    return a << 24 | UDIV255(R(color) * a) << 16 | UDIV255(G(color) * a) << 8 | UDIV255(B(color) * a);
+}
 
 static vg_lite_color_t color_unpremultiply(vg_lite_color_t color)
 {
@@ -623,10 +674,12 @@ extern "C" {
         auto ctx = vg_lite_ctx::get_instance();
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
+        /* The color is written as it is, so it is in the target's alpha format, also for a target without alpha */
+        const vg_lite_color_t straight = target_holds_premultiplied(target) ? color_unpremultiply(color) : color;
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_rect(shape, target, rectangle));
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(BlendMethod::SrcOver));
-        TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_PAINT_COLOR(color)));
+        TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_COLOR(straight)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
         return VG_LITE_SUCCESS;
@@ -645,7 +698,7 @@ extern "C" {
 
         auto picture = Picture::gen();
 
-        TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, source, color));
+        TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, source, blend, color));
         TVG_CHECK_RETURN_VG_ERROR(picture->transform(picture_matrix_conv(matrix)));
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
@@ -696,7 +749,7 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(&new_matrix)));
 
         auto picture = tvg::Picture::gen();
-        TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, source, color));
+        TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, source, blend, color));
         TVG_CHECK_RETURN_VG_ERROR(picture->transform(picture_matrix_conv(&new_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(shape), CompositeMethod::ClipPath));
@@ -821,7 +874,15 @@ extern "C" {
     {
         vg_lite_ctx * ctx = vg_lite_ctx::get_instance();
 
+        /* Like the GPU, blend in premultiplied alpha */
+        if(ctx->target_straight) {
+            canvas_premultiply_target(ctx);
+        }
+
         if(ctx->canvas->draw() == Result::InsufficientCondition) {
+            if(ctx->target_straight) {
+                canvas_unpremultiply_target(ctx);
+            }
             return VG_LITE_SUCCESS;
         }
 
@@ -830,6 +891,10 @@ extern "C" {
 
         /* make sure target buffer is valid */
         LV_ASSERT_NULL(ctx->target_buffer);
+
+        if(ctx->target_straight) {
+            canvas_unpremultiply_target(ctx);
+        }
 
         /* If target_buffer is not in a format supported by thorvg, software conversion is required. */
         switch(ctx->target_format) {
@@ -880,7 +945,16 @@ extern "C" {
                 break;
             case VG_LITE_BGRA8888:
             case VG_LITE_BGRX8888:
-                /* No conversion required. */
+                /* No conversion required, unless drawn into a copy */
+                if(ctx->tvg_target_buffer != ctx->target_buffer) {
+                    const vg_lite_uint32_t * src = ctx->get_temp_target_buffer();
+                    uint8_t * dest = (uint8_t *)ctx->target_buffer;
+                    const vg_lite_uint32_t h = ctx->target_px_size / ctx->target_width;
+                    for(vg_lite_uint32_t y = 0; y < h; y++) {
+                        lv_memcpy(dest + y * ctx->target_stride, src + y * ctx->target_width,
+                                  ctx->target_width * sizeof(vg_lite_uint32_t));
+                    }
+                }
                 break;
             default:
                 LV_LOG_ERROR("unsupported format: %d", ctx->target_format);
@@ -892,6 +966,7 @@ extern "C" {
         ctx->target_buffer = nullptr;
         ctx->tvg_target_buffer = nullptr;
         ctx->target_px_size = 0;
+        ctx->target_straight = false;
 
         return VG_LITE_SUCCESS;
     }
@@ -920,7 +995,7 @@ extern "C" {
          *   - The target buffer is cleared with lv_memzero before rendering, ensuring inside pixels are zeroed.
          *   - This simulates the erase effect of VG_LITE_BLEND_DST_IN.
          */
-        if(blend == VG_LITE_BLEND_DST_IN) {
+        if(blend == VG_LITE_BLEND_DST_IN || blend == OPENVG_BLEND_DST_IN) {
             /* Flush any pending operations first */
             vg_lite_error_t error;
             VG_LITE_RETURN_ERROR(vg_lite_finish());
@@ -936,13 +1011,18 @@ extern "C" {
 
             /* Create a Picture from current target buffer content */
             auto picture = Picture::gen();
-            TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, target));
+            TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, target, blend));
 
             /**
              * Since the contents of the target buffer have already been copied into the picture,
              * we can now clean up the target buffer in preparation for rendering the masked image.
              */
-            lv_memzero(target->memory, target->stride * target->height);
+            if(ctx->tvg_target_buffer == target->memory) {
+                lv_memzero(target->memory, target->stride * target->height);
+            }
+            else {
+                lv_memzero(ctx->tvg_target_buffer, target->width * target->height * sizeof(vg_lite_uint32_t));
+            }
 
             /* Render masked picture back */
             TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(mask), CompositeMethod::InvAlphaMask));
@@ -958,7 +1038,10 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(matrix)));
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
-        TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_PAINT_COLOR(color)));
+        TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_PAINT_COLOR(color, blend)));
+        if(path->path_type == VG_LITE_DRAW_STROKE_PATH || path->path_type == VG_LITE_DRAW_FILL_STROKE_PATH) {
+            TVG_CHECK_RETURN_VG_ERROR(shape->stroke(TVG_PAINT_COLOR(path->stroke_color, blend)));
+        }
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
         return VG_LITE_SUCCESS;
@@ -1064,6 +1147,10 @@ extern "C" {
 
 #if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
             case gcFEATURE_BIT_VG_LVGL_SUPPORT:
+#endif
+
+#if LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT
+            case gcFEATURE_BIT_VG_HW_PREMULTIPLY:
 #endif
 
 #if LV_VG_LITE_THORVG_YUV_SUPPORT
@@ -1216,7 +1303,7 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(path_matrix)));
 
         auto picture = tvg::Picture::gen();
-        TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, pattern_image, color));
+        TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, pattern_image, blend, color));
         TVG_CHECK_RETURN_VG_ERROR(picture->transform(picture_matrix_conv(pattern_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(shape), CompositeMethod::ClipPath));
@@ -2319,22 +2406,35 @@ static BlendMethod blend_method_conv(vg_lite_blend_t blend)
 {
     switch(blend) {
         case VG_LITE_BLEND_NONE:
+        case OPENVG_BLEND_SRC:
             return BlendMethod::SrcOver;
 
         case VG_LITE_BLEND_NORMAL_LVGL:
             return BlendMethod::Normal;
 
         case VG_LITE_BLEND_SRC_OVER:
+        case OPENVG_BLEND_SRC_OVER:
             return BlendMethod::Normal;
 
         case VG_LITE_BLEND_SCREEN:
+        case OPENVG_BLEND_SCREEN:
             return BlendMethod::Screen;
 
         case VG_LITE_BLEND_ADDITIVE:
+        case OPENVG_BLEND_ADDITIVE:
             return BlendMethod::Add;
 
         case VG_LITE_BLEND_MULTIPLY:
+        case OPENVG_BLEND_MULTIPLY:
             return BlendMethod::Multiply;
+
+        case VG_LITE_BLEND_DARKEN:
+        case OPENVG_BLEND_DARKEN:
+            return BlendMethod::Darken;
+
+        case VG_LITE_BLEND_LIGHTEN:
+        case OPENVG_BLEND_LIGHTEN:
+            return BlendMethod::Lighten;
 
         default:
             break;
@@ -2484,7 +2584,8 @@ static Result shape_set_stroke(std::unique_ptr<Shape> & shape, const vg_lite_pat
     TVG_CHECK_RETURN_RESULT(shape->strokeMiterlimit(path->stroke->miter_limit));
     TVG_CHECK_RETURN_RESULT(shape->stroke(stroke_cap_conv(path->stroke->cap_style)));
     TVG_CHECK_RETURN_RESULT(shape->stroke(stroke_join_conv(path->stroke->join_style)));
-    TVG_CHECK_RETURN_RESULT(shape->stroke(TVG_PAINT_COLOR(path->stroke_color)));
+    /* vg_lite_draw() sets the color again according to the blend mode */
+    TVG_CHECK_RETURN_RESULT(shape->stroke(TVG_PAINT_COLOR(path->stroke_color, VG_LITE_BLEND_SRC_OVER)));
 
     if(path->stroke->pattern_count) {
         LV_ASSERT_NULL(path->stroke->dash_pattern);
@@ -2652,12 +2753,120 @@ static Result canvas_load_target(vg_lite_buffer_t * dest, const vg_lite_buffer_t
         case VG_LITE_BGRA2222:
             conv_bgra2222_to_bgra8888.convert(dest, src);
             break;
+        case VG_LITE_BGRA8888:
+            conv_bgra8888_to_bgra8888.convert(dest, src);
+            break;
         default:
             LV_LOG_ERROR("unsupported target format: %d", (int)src->format);
             return Result::InvalidArguments;
     }
 
     return Result::Success;
+}
+
+/* With hardware premultiplication the GPU writes straight pixels into a target with alpha that is not flagged as
+ * premultiplied */
+static bool target_is_straight(const vg_lite_buffer_t * target)
+{
+#if LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT
+    switch(target->format) {
+        case VG_LITE_BGRA8888:
+        case VG_LITE_BGRA5658:
+        case VG_LITE_BGRA5551:
+        case VG_LITE_BGRA4444:
+        case VG_LITE_BGRA2222:
+            return !target->premultiplied;
+        default:
+            return false;
+    }
+#else
+    LV_UNUSED(target);
+    return false;
+#endif
+}
+
+/* Without hardware premultiplication every buffer holds premultiplied pixels, flagged or not */
+static bool target_holds_premultiplied(const vg_lite_buffer_t * target)
+{
+#if LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT
+    return target->premultiplied;
+#else
+    LV_UNUSED(target);
+    return true;
+#endif
+}
+
+/* Premultiply the straight target, only where the pushed paints can draw: LVGL flushes after every draw task */
+static void canvas_premultiply_target(vg_lite_ctx * ctx)
+{
+    const float target_w = (float)ctx->target_width;
+    const float target_h = (float)(ctx->target_px_size / ctx->target_width);
+    float x1 = target_w, y1 = target_h, x2 = 0, y2 = 0;
+
+    /* The transformed bounds are only valid after an update */
+    ctx->canvas->update();
+    for(Paint * paint : ctx->canvas->paints()) {
+        float x, y, w, h;
+        if(paint->bounds(&x, &y, &w, &h, true) != Result::Success) {
+            x1 = 0, y1 = 0, x2 = target_w, y2 = target_h;
+            break;
+        }
+
+        /* Anti-aliasing, and miter joins that reach past the stroke width the bounds include */
+        float margin = 2;
+        if(paint->type() == Type::Shape) {
+            const Shape * shape = static_cast<const Shape *>(paint);
+            const Matrix m = paint->transform();
+            const float scale = LV_MAX(sqrtf(m.e11 * m.e11 + m.e21 * m.e21), sqrtf(m.e12 * m.e12 + m.e22 * m.e22));
+            margin += shape->strokeWidth() * LV_MAX(shape->strokeMiterlimit(), 1.0f) * scale;
+        }
+
+        x1 = LV_MIN(x1, x - margin);
+        y1 = LV_MIN(y1, y - margin);
+        x2 = LV_MAX(x2, x + w + margin);
+        y2 = LV_MAX(y2, y + h + margin);
+    }
+
+    if(ctx->scissor_is_set) {
+        x1 = LV_MAX(x1, (float)ctx->scissor_rect.x);
+        y1 = LV_MAX(y1, (float)ctx->scissor_rect.y);
+        x2 = LV_MIN(x2, (float)(ctx->scissor_rect.x + ctx->scissor_rect.width));
+        y2 = LV_MIN(y2, (float)(ctx->scissor_rect.y + ctx->scissor_rect.height));
+    }
+
+    vg_lite_rectangle_t * area = &ctx->straight_area;
+    area->x = (vg_lite_int32_t)LV_MAX(0.0f, floorf(x1));
+    area->y = (vg_lite_int32_t)LV_MAX(0.0f, floorf(y1));
+    area->width = LV_MAX(0, (vg_lite_int32_t)LV_MIN(target_w, ceilf(x2)) - area->x);
+    area->height = LV_MAX(0, (vg_lite_int32_t)LV_MIN(target_h, ceilf(y2)) - area->y);
+
+    ctx->target_initial.resize((size_t)area->width * area->height);
+    vg_lite_uint32_t * initial = ctx->target_initial.data();
+    for(vg_lite_int32_t y = 0; y < area->height; y++) {
+        vg_lite_uint32_t * px = ctx->get_temp_target_buffer() + (area->y + y) * ctx->target_width + area->x;
+        for(vg_lite_int32_t x = 0; x < area->width; x++) {
+            *initial++ = px[x];
+            px[x] = color_premultiply(px[x]);
+        }
+    }
+}
+
+/* Divide the pixels the canvas changed, give back the others as they were */
+static void canvas_unpremultiply_target(vg_lite_ctx * ctx)
+{
+    const vg_lite_rectangle_t * area = &ctx->straight_area;
+    const vg_lite_uint32_t * initial = ctx->target_initial.data();
+    for(vg_lite_int32_t y = 0; y < area->height; y++) {
+        vg_lite_uint32_t * px = ctx->get_temp_target_buffer() + (area->y + y) * ctx->target_width + area->x;
+        for(vg_lite_int32_t x = 0; x < area->width; x++, initial++) {
+            if(px[x] == color_premultiply(*initial)) {
+                px[x] = *initial;
+            }
+            else {
+                px[x] = color_unpremultiply(px[x]);
+            }
+        }
+    }
 }
 
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
@@ -2673,11 +2882,16 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     ctx->target_buffer = target->memory;
     ctx->target_format = target->format;
     ctx->target_px_size = target->width * target->height;
+    ctx->target_stride = target->stride;
+    ctx->target_width = target->width;
+    if(rebind) {
+        ctx->target_straight = target_is_straight(target);
+    }
 
     void * canvas_target_buffer;
     uint32_t stride = 0;
 
-    if(TVG_IS_VG_FMT_SUPPORT(target->format)) {
+    if(TVG_IS_VG_FMT_SUPPORT(target->format) && !ctx->target_straight) {
         /* if target format is supported by VG, use target buffer directly */
         canvas_target_buffer = target->memory;
 
@@ -2786,12 +3000,16 @@ static bool decode_indexed_line(
 }
 
 static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture, const vg_lite_buffer_t * source,
-                           vg_lite_color_t color)
+                           vg_lite_blend_t blend, vg_lite_color_t color)
 {
     vg_lite_uint32_t * image_buffer;
 
     /* At least 8-byte alignment */
     LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, 8));
+
+    /* ThorVG takes premultiplied pixels: premultiply what the GPU would. The color is straight then too. */
+    const bool straight = blend_premultiplies_source(blend);
+    const bool straight_pixels = straight && !source->premultiplied;
 
     /**
      * Since ThorVG's picture->load does not support stride,
@@ -2799,6 +3017,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
      */
     if(source->format == VG_LITE_BGRA8888
        && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE
+       && !straight_pixels
        && (size_t)source->stride == (size_t)(source->width * sizeof(vg_lite_uint32_t))) {
         image_buffer = (vg_lite_uint32_t *)source->memory;
     }
@@ -2912,8 +3131,16 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
             }
         }
 
-        /* multiply color */
+        if(straight_pixels && !VG_LITE_IS_ALPHA_FORMAT(source->format)) {
+            vg_lite_uint32_t * px = image_buffer;
+            for(vg_lite_uint32_t i = 0; i < width * height; i++) {
+                px[i] = color_premultiply(px[i]);
+            }
+        }
+
+        /* multiply color: premultiplied pixels by a premultiplied color give a premultiplied product */
         if(source->image_mode == VG_LITE_MULTIPLY_IMAGE_MODE && !VG_LITE_IS_ALPHA_FORMAT(source->format)) {
+            if(straight) color = color_premultiply(color);
             vg_color32_t * dest = (vg_color32_t *)image_buffer;
             vg_lite_uint32_t px_size = width * height;
             while(px_size--) {

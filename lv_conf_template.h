@@ -397,6 +397,11 @@
 /** LVGL blend modes */
 #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
 
+/** Report the hardware premultiplication of GC355 and GC555: honour the buffers' premultiplied flags in the
+ *  OpenVG blend modes. Disable it to simulate a GPU without it, such as GC255.
+ */
+#define LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT 1
+
 /** YUV color formats */
 #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
 
