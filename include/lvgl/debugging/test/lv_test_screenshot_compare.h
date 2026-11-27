@@ -74,6 +74,15 @@ lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref);
  */
 lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref);
 
+/**
+ * Works the same way as `lv_test_screenshot_compare_core` with a tolerance of its own instead of
+ * REF_IMG_TOLERANCE. The images are compared in premultiplied alpha (color * alpha), so a pixel
+ * counts as much as it is visible.
+ * @param fn_ref    reference image path
+ * @param tolerance the largest difference allowed in a premultiplied channel or in alpha
+ */
+lv_test_screenshot_result_t lv_test_screenshot_compare_core_with_tolerance(const char * fn_ref, uint8_t tolerance);
+
 /**********************
  *      MACROS
  **********************/
