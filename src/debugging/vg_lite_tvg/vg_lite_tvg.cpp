@@ -996,6 +996,11 @@ extern "C" {
          *   - This simulates the erase effect of VG_LITE_BLEND_DST_IN.
          */
         if(blend == VG_LITE_BLEND_DST_IN || blend == OPENVG_BLEND_DST_IN) {
+            /* D * 1 = D. ThorVG would also skip the fully transparent mask, leaving the zeroed target. */
+            if(A(color) == 0xFF) {
+                return VG_LITE_SUCCESS;
+            }
+
             /* Flush any pending operations first */
             vg_lite_error_t error;
             VG_LITE_RETURN_ERROR(vg_lite_finish());

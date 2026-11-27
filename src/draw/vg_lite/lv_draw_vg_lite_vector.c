@@ -95,7 +95,7 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
 
 static vg_lite_color_t lv_color32_to_vg(lv_color32_t color, lv_opa_t opa)
 {
-    return lv_vg_lite_paint_color(lv_color_make(color.red, color.green, color.blue), LV_OPA_MIX2(color.alpha, opa));
+    return lv_vg_lite_paint_color(lv_color_make(color.red, color.green, color.blue), OPA_MIX(color.alpha, opa));
 }
 
 static void draw_fill(lv_draw_vg_lite_unit_t * u,
