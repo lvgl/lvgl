@@ -761,12 +761,12 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
 }
 
 vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_draw_image_dsc_t * dsc,
-                                         vg_lite_blend_t blend)
+                                         vg_lite_blend_t blend, bool pattern)
 {
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(dsc);
 
-    const bool pre_mul = !lv_vg_lite_gpu_premultiplies_image_color(buffer->format, blend);
+    const bool pre_mul = !lv_vg_lite_gpu_premultiplies_image_color(buffer->format, blend, pattern);
 
     /* alpha image and image recolor */
     if(buffer->format == VG_LITE_A4 || buffer->format == VG_LITE_A8) {
@@ -903,7 +903,7 @@ void lv_vg_lite_utils_init(void)
     vg_lite_get_product_info(name, &g_chip_id, &chip_rev);
 }
 
-bool lv_vg_lite_gpu_premultiplies_image_color(vg_lite_buffer_format_t format, vg_lite_blend_t blend)
+bool lv_vg_lite_gpu_premultiplies_image_color(vg_lite_buffer_format_t format, vg_lite_blend_t blend, bool pattern)
 {
     switch(blend) {
         case VG_LITE_BLEND_NORMAL_LVGL:
@@ -922,8 +922,9 @@ bool lv_vg_lite_gpu_premultiplies_image_color(vg_lite_buffer_format_t format, vg
         case VG_LITE_BLEND_LIGHTEN:
         case VG_LITE_BLEND_ADDITIVE:
         case VG_LITE_BLEND_SUBTRACT:
-            /* On GC255 the driver premultiplies the image itself instead (`#if (CHIPID==0x255)` in vg_lite_blit()) */
-            return (format == VG_LITE_A4 || format == VG_LITE_A8) && g_chip_id != 0x255;
+            /* On GC255 vg_lite_blit() premultiplies the image itself instead (`#if (CHIPID==0x255)`), but its
+             * vg_lite_draw_pattern() has no such exception */
+            return (format == VG_LITE_A4 || format == VG_LITE_A8) && (pattern || g_chip_id != 0x255);
 
         default:
             return false;
