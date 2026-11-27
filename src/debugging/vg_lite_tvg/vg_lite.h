@@ -1346,6 +1346,16 @@ vg_lite_error_t vg_lite_get_parameter(vg_lite_param_type_t type,
 
 #endif /* VGLITE_VERSION_3_0 */
 
+/* Simulator only, not part of the VG-Lite API */
+
+/**
+ * Set whether the simulated GPU premultiplies in hardware (gcFEATURE_BIT_VG_HW_PREMULTIPLY), to simulate a GPU
+ * without it, such as GC255, at run time. It starts as LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT. Call it only
+ * between draws, followed by lv_vg_lite_utils_init(), so that LVGL queries the features again.
+ * @param enable    non-zero to premultiply in hardware
+ */
+void vg_lite_tvg_set_hw_premultiply(vg_lite_uint32_t enable);
+
 #ifdef __cplusplus
 }
 #endif

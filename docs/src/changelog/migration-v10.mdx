@@ -484,14 +484,15 @@ and are not meant to be included directly.
 
 ### VG-Lite draw unit
 
-- VG-Lite no longer marks every buffer it draws into with `LV_IMAGE_FLAGS_PREMULTIPLIED`, and no longer writes
-  premultiplied pixels into straight-alpha buffers (`LV_COLOR_FORMAT_ARGB8888`, `ARGB1555`, `ARGB4444`, `ARGB2222`,
-  `ARGB8565`). On GPUs that premultiply in hardware (for example GC355 and GC555) it writes them in straight alpha,
-  as their format says. If a `flush_cb`, or other code, read an `ARGB8888` display buffer or canvas as premultiplied
-  because of the flag, read it as straight alpha now.
-- On GPUs without hardware premultiplication (for example GC255), straight-alpha buffers are drawn by the software
-  renderer, and a warning is logged once. Use `LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED`, or a format without alpha,
-  to keep the display or canvas on the GPU.
+- On GPUs that premultiply in hardware (for example GC355 and GC555), VG-Lite no longer writes premultiplied pixels
+  into straight-alpha buffers (`LV_COLOR_FORMAT_ARGB8888`, `ARGB1555`, `ARGB4444`, `ARGB2222`, `ARGB8565`) and no
+  longer marks them with `LV_IMAGE_FLAGS_PREMULTIPLIED`: it writes them in straight alpha, as their format says. If a
+  `flush_cb`, or other code, read an `ARGB8888` display buffer or canvas as premultiplied because of the flag, read
+  it as straight alpha now.
+- On GPUs without hardware premultiplication (for example GC255), `ARGB8888` buffers are drawn by the software
+  renderer if it's enabled with `LV_DRAW_SW_SUPPORT_ARGB8888`. The other straight-alpha buffers are still drawn by
+  VG-Lite, premultiplied and marked as before. A warning is logged once in both cases. Use
+  `LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED`, or a format without alpha, to keep the display or canvas on the GPU.
 - LVGL's own intermediate layers are created in <ApiLink name="LV_DRAW_LAYER_ALPHA_COLOR_FORMAT" />, which is
   `LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED` when VG-Lite is enabled, and <ApiLink name="LV_USE_DRAW_VG_LITE" /> selects
   <ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED" />. With an `lv_conf.h`, enable it when the software

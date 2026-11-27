@@ -358,6 +358,9 @@ static Result vg_lite_grad_matrix_conv(vg_lite_matrix_t * result, const vg_lite_
  *  STATIC VARIABLES
  **********************/
 
+/* gcFEATURE_BIT_VG_HW_PREMULTIPLY, see vg_lite_tvg_set_hw_premultiply() */
+static bool g_hw_premultiply = LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT;
+
 /* color converters */
 
 /* With hardware premultiplication, and in the *_LVGL modes, the GPU premultiplies the sources flagged as straight
@@ -1135,9 +1138,17 @@ extern "C" {
         return 1;
     }
 
+    void vg_lite_tvg_set_hw_premultiply(vg_lite_uint32_t enable)
+    {
+        g_hw_premultiply = enable != 0;
+    }
+
     vg_lite_uint32_t vg_lite_query_feature(vg_lite_feature_t feature)
     {
         switch(feature) {
+            case gcFEATURE_BIT_VG_HW_PREMULTIPLY:
+                return g_hw_premultiply ? 1 : 0;
+
             case gcFEATURE_BIT_VG_IM_INDEX_FORMAT:
             case gcFEATURE_BIT_VG_BORDER_CULLING:
             case gcFEATURE_BIT_VG_RGBA2_FORMAT:
@@ -1152,10 +1163,6 @@ extern "C" {
 
 #if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
             case gcFEATURE_BIT_VG_LVGL_SUPPORT:
-#endif
-
-#if LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT
-            case gcFEATURE_BIT_VG_HW_PREMULTIPLY:
 #endif
 
 #if LV_VG_LITE_THORVG_YUV_SUPPORT
@@ -2773,7 +2780,8 @@ static Result canvas_load_target(vg_lite_buffer_t * dest, const vg_lite_buffer_t
  * premultiplied */
 static bool target_is_straight(const vg_lite_buffer_t * target)
 {
-#if LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT
+    if(!g_hw_premultiply) return false;
+
     switch(target->format) {
         case VG_LITE_BGRA8888:
         case VG_LITE_BGRA5658:
@@ -2784,21 +2792,12 @@ static bool target_is_straight(const vg_lite_buffer_t * target)
         default:
             return false;
     }
-#else
-    LV_UNUSED(target);
-    return false;
-#endif
 }
 
 /* Without hardware premultiplication every buffer holds premultiplied pixels, flagged or not */
 static bool target_holds_premultiplied(const vg_lite_buffer_t * target)
 {
-#if LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT
-    return target->premultiplied;
-#else
-    LV_UNUSED(target);
-    return true;
-#endif
+    return g_hw_premultiply ? target->premultiplied : true;
 }
 
 /* Premultiply the straight target, only where the pushed paints can draw: LVGL flushes after every draw task */

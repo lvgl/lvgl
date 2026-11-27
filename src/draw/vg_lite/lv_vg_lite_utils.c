@@ -52,7 +52,7 @@
 
 static void image_dsc_free_cb(void * dsc, void * user_data);
 
-static bool straight_target_supported(void);
+static bool straight_target_supported(bool sw_can_draw);
 static void lv_vg_lite_get_format_bytes(
     vg_lite_buffer_format_t format,
     uint32_t * mul,
@@ -502,13 +502,16 @@ bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
             return true;
 
         case LV_COLOR_FORMAT_ARGB8888:
+            return straight_target_supported(LV_USE_DRAW_SW && LV_DRAW_SW_SUPPORT_ARGB8888);
+
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
         case LV_COLOR_FORMAT_ARGB2222:
-            return straight_target_supported();
+            /* The software renderer can't draw into these */
+            return straight_target_supported(false);
 
         case LV_COLOR_FORMAT_ARGB8565:
-            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) && straight_target_supported();
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) && straight_target_supported(false);
 
         case LV_COLOR_FORMAT_RGB888:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? true : false;
@@ -922,14 +925,24 @@ bool lv_vg_lite_hw_premultiply(void)
     return g_hw_premultiply;
 }
 
-static bool straight_target_supported(void)
+/* Without hardware premultiplication the GPU writes premultiplied pixels into a straight-alpha target too. Leave it
+ * to the software renderer if that can draw into it, otherwise draw it anyway: opaque pixels still come out right. */
+static bool straight_target_supported(bool sw_can_draw)
 {
     if(g_hw_premultiply) return true;
 
-    LV_LOG_WARN_ONCE("This GPU can't write straight alpha: drawing into ARGB8888, ARGB1555, ARGB4444, ARGB2222 and "
-                     "ARGB8565 buffers falls back to the software renderer. Use LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED, "
-                     "or a format without alpha, e.g. LV_COLOR_FORMAT_XRGB8888 or LV_COLOR_FORMAT_RGB565.");
-    return false;
+    if(sw_can_draw) {
+        LV_LOG_WARN_ONCE("This GPU can't write straight alpha: drawing into ARGB8888 buffers falls back to the "
+                         "software renderer. Use LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED, or a format without alpha, "
+                         "e.g. LV_COLOR_FORMAT_XRGB8888 or LV_COLOR_FORMAT_RGB565.");
+        return false;
+    }
+
+    LV_LOG_WARN_ONCE("This GPU can't write straight alpha: in the straight-alpha buffers the software renderer can't "
+                     "draw into (ARGB1555, ARGB4444, ARGB2222, ARGB8565, and ARGB8888 without it) translucent pixels "
+                     "are written premultiplied, too dark. Use LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED, or a format "
+                     "without alpha, e.g. LV_COLOR_FORMAT_XRGB8888 or LV_COLOR_FORMAT_RGB565.");
+    return true;
 }
 
 vg_lite_blend_t lv_vg_lite_hw_blend(vg_lite_blend_t blend)

@@ -12,7 +12,24 @@
 /* Larger glyphs than the largest built-in font */
 #define LABEL_FONT_SIZE 120
 
+/* The simulator can stand in for a GPU without hardware premultiplication (GC255) */
+#define GC255_SIMULATED (LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG)
+
 static lv_font_t * label_font;
+static lv_draw_buf_t * canvas_buf;
+
+#if GC255_SIMULATED
+static bool gc255_mode;
+
+static void set_gc255_mode(bool enable)
+{
+    vg_lite_tvg_set_hw_premultiply(!enable);
+    lv_vg_lite_utils_init();
+    /* Decoded images are cached premultiplied or not, depending on the GPU */
+    lv_image_cache_drop(NULL);
+    gc255_mode = enable;
+}
+#endif
 
 void setUp(void)
 {
@@ -26,6 +43,13 @@ void setUp(void)
 void tearDown(void)
 {
     lv_obj_clean(lv_screen_active());
+    if(canvas_buf) {
+        lv_draw_buf_destroy(canvas_buf);
+        canvas_buf = NULL;
+    }
+#if GC255_SIMULATED
+    if(gc255_mode) set_gc255_mode(false);
+#endif
     lv_test_alpha_scene_set_label_font(&lv_font_montserrat_48);
     lv_tiny_ttf_destroy(label_font);
     lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_COVER, 0);
@@ -204,17 +228,15 @@ void test_vg_lite_alpha_vector_opa_77_on_translucent(void)
     assert_case(LV_TEST_ALPHA_WIDGET_VECTOR_OPA_77, LV_TEST_ALPHA_BG_TRANSLUCENT, LV_COLOR_FORMAT_ARGB8888);
 }
 
-/* An application's own straight-alpha buffer: a translucent rectangle drawn on a translucent ARGB8888 canvas */
-void test_vg_lite_alpha_argb8888_canvas(void)
+/* A red rectangle @ 0x77 at (40, 40)..(59, 59) on a 100 x 100 canvas of color format `cf`, filled with `bg` */
+static lv_draw_buf_t * draw_rect_on_canvas(lv_color_format_t cf, lv_color_t bg, lv_opa_t bg_opa)
 {
-#if LV_USE_DRAW_NANOVG
-    TEST_IGNORE_MESSAGE("NanoVG's readback replaces the canvas' content");
-#endif
-    lv_draw_buf_t * buf = lv_draw_buf_create(100, 100, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
-    TEST_ASSERT_NOT_NULL(buf);
+    canvas_buf = lv_draw_buf_create(100, 100, cf, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(canvas_buf);
+    lv_draw_buf_clear(canvas_buf, NULL);
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_draw_buf(canvas, buf);
-    lv_canvas_fill_bg(canvas, lv_color_hex(0x00ff00), 0x80);
+    lv_canvas_set_draw_buf(canvas, canvas_buf);
+    if(bg_opa > LV_OPA_TRANSP) lv_canvas_fill_bg(canvas, bg, bg_opa);
 
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
@@ -225,6 +247,13 @@ void test_vg_lite_alpha_argb8888_canvas(void)
     lv_area_t area = {40, 40, 59, 59};
     lv_draw_rect(&layer, &rect_dsc, &area);
     lv_canvas_finish_layer(canvas, &layer);
+    return canvas_buf;
+}
+
+/* An application's own straight-alpha buffer: a translucent rectangle drawn on a translucent ARGB8888 canvas */
+static void assert_argb8888_canvas(void)
+{
+    lv_draw_buf_t * buf = draw_rect_on_canvas(LV_COLOR_FORMAT_ARGB8888, lv_color_hex(0x00ff00), 0x80);
 
     TEST_ASSERT_FALSE_MESSAGE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED), "premultiplied flag");
 
@@ -241,9 +270,90 @@ void test_vg_lite_alpha_argb8888_canvas(void)
     TEST_ASSERT_EQUAL_HEX8_MESSAGE(0xff, px.green, "green");
     TEST_ASSERT_EQUAL_HEX8_MESSAGE(0x00, px.blue, "blue");
     TEST_ASSERT_EQUAL_HEX8_MESSAGE(0x80, px.alpha, "alpha");
+}
 
-    lv_obj_delete(canvas);
-    lv_draw_buf_destroy(buf);
+void test_vg_lite_alpha_argb8888_canvas(void)
+{
+#if LV_USE_DRAW_NANOVG
+    TEST_IGNORE_MESSAGE("NanoVG's readback replaces the canvas' content");
+#endif
+    assert_argb8888_canvas();
+}
+
+/* Without hardware premultiplication the software renderer draws into a straight ARGB8888 canvas */
+void test_vg_lite_alpha_argb8888_canvas_without_hw_premultiply(void)
+{
+#if GC255_SIMULATED
+    set_gc255_mode(true);
+    TEST_ASSERT_FALSE(lv_vg_lite_is_dest_cf_supported(LV_COLOR_FORMAT_ARGB8888));
+    assert_argb8888_canvas();
+#else
+    TEST_IGNORE_MESSAGE("Needs the VG-Lite simulator");
+#endif
+}
+
+/* Without hardware premultiplication VG-Lite still draws into the straight-alpha formats the software renderer can't
+ * draw into: premultiplied, and marked so */
+void test_vg_lite_alpha_argb4444_canvas_without_hw_premultiply(void)
+{
+#if GC255_SIMULATED
+    set_gc255_mode(true);
+    TEST_ASSERT_TRUE(lv_vg_lite_is_dest_cf_supported(LV_COLOR_FORMAT_ARGB4444));
+    lv_draw_buf_t * buf = draw_rect_on_canvas(LV_COLOR_FORMAT_ARGB4444, lv_color_black(), LV_OPA_TRANSP);
+
+    TEST_ASSERT_TRUE_MESSAGE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED), "premultiplied flag");
+
+    /* B, G, R and A nibbles from the lowest. Red @ 0x77 premultiplied is 0x77 red at alpha 0x77, about 7 of 15 for
+     * both; straight it would be 15 red. */
+    uint16_t px = *(const uint16_t *)lv_draw_buf_goto_xy(buf, 50, 50);
+    uint32_t alpha = (px >> 12) & 0xf;
+    uint32_t red = (px >> 8) & 0xf;
+    TEST_ASSERT_UINT32_WITHIN_MESSAGE(1, 7, alpha, "alpha");
+    TEST_ASSERT_UINT32_WITHIN_MESSAGE(1, alpha, red, "red");
+    TEST_ASSERT_EQUAL_UINT32_MESSAGE(0, px & 0xff, "green and blue");
+#else
+    TEST_IGNORE_MESSAGE("Needs the VG-Lite simulator");
+#endif
+}
+
+/* A bitmap mask scales a premultiplied layer's colors too: without hardware premultiplication the software renderer
+ * composites the premultiplied layer onto the straight ARGB8888 display */
+void test_vg_lite_alpha_bitmap_mask_on_premultiplied_layer(void)
+{
+#if GC255_SIMULATED
+    set_gc255_mode(true);
+    LV_IMAGE_DECLARE(test_image_cogwheel_a8);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_style_bg_opa(scr, LV_OPA_TRANSP, 0);
+    lv_obj_t * obj = lv_obj_create(scr);
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_size(obj, 100, 100);
+    lv_obj_set_style_bg_color(obj, lv_color_hex(0x404040), 0);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+    lv_obj_set_style_bitmap_mask_src(obj, &test_image_cogwheel_a8, 0);
+    /* With LV_DRAW_TRANSFORM_USE_MATRIX an object with full opa_layered is drawn without a layer, ignoring the mask */
+    lv_obj_set_style_opa_layered(obj, 250, 0);
+    lv_obj_invalidate(scr);
+    lv_refr_now(NULL);
+
+    /* Where the mask is partial, the straight color must stay 0x40 */
+    lv_draw_buf_t * buf = lv_display_get_buf_active(lv_display_get_default());
+    uint32_t partial = 0;
+    for(int32_t y = 0; y < 100; y++) {
+        for(int32_t x = 0; x < 100; x++) {
+            lv_color32_t px = *(const lv_color32_t *)lv_draw_buf_goto_xy(buf, x, y);
+            if(px.alpha < 0x40 || px.alpha > 0xc0) continue;
+            partial++;
+            char msg[64];
+            lv_snprintf(msg, sizeof(msg), "pixel %" LV_PRId32 ",%" LV_PRId32 ": %02X%02X%02X/%02X", x, y,
+                        px.red, px.green, px.blue, px.alpha);
+            TEST_ASSERT_UINT8_WITHIN_MESSAGE(4, 0x40, px.red, msg);
+        }
+    }
+    TEST_ASSERT_GREATER_THAN_UINT32(10, partial);
+#else
+    TEST_IGNORE_MESSAGE("Needs the VG-Lite simulator");
+#endif
 }
 
 #endif
