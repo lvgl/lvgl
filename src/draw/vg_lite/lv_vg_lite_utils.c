@@ -52,6 +52,7 @@
 
 static void image_dsc_free_cb(void * dsc, void * user_data);
 
+static bool straight_target_supported(void);
 static void lv_vg_lite_get_format_bytes(
     vg_lite_buffer_format_t format,
     uint32_t * mul,
@@ -64,6 +65,7 @@ static void lv_vg_lite_get_format_bytes(
 
 static bool g_is_dump_param_enabled = false;
 static vg_lite_uint32_t g_chip_id = 0;
+static bool g_hw_premultiply = false;
 
 /**********************
  *      MACROS
@@ -495,15 +497,19 @@ bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
         case LV_COLOR_FORMAT_XRGB8888:
+            return true;
+
+        case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
         case LV_COLOR_FORMAT_ARGB2222:
-            return true;
+            return straight_target_supported();
 
         case LV_COLOR_FORMAT_ARGB8565:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) && straight_target_supported();
+
         case LV_COLOR_FORMAT_RGB888:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? true : false;
 
@@ -728,6 +734,13 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     lv_vg_lite_buffer_init(buffer, ptr,
                            width, height, stride, format,
                            lv_draw_buf_has_flag(draw_buf, LV_VG_LITE_IMAGE_FLAGS_TILED));
+
+    /* Only with hardware premultiplication does the driver take the flag into account as it is meant: without it,
+     * all buffers are left unflagged and hold premultiplied pixels (see lv_vg_lite_hw_premultiply()) */
+    if(g_hw_premultiply) {
+        buffer->premultiplied = draw_buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
+                                || lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    }
 }
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
@@ -901,15 +914,84 @@ void lv_vg_lite_utils_init(void)
     char name[64];
     vg_lite_uint32_t chip_rev = 0;
     vg_lite_get_product_info(name, &g_chip_id, &chip_rev);
+    g_hw_premultiply = vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY) ? true : false;
+}
+
+bool lv_vg_lite_hw_premultiply(void)
+{
+    return g_hw_premultiply;
+}
+
+static bool straight_target_supported(void)
+{
+    if(g_hw_premultiply) return true;
+
+    LV_LOG_WARN_ONCE("This GPU can't write straight alpha: drawing into ARGB8888, ARGB1555, ARGB4444, ARGB2222 and "
+                     "ARGB8565 buffers falls back to the software renderer. Use LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED, "
+                     "or a format without alpha, e.g. LV_COLOR_FORMAT_XRGB8888 or LV_COLOR_FORMAT_RGB565.");
+    return false;
+}
+
+vg_lite_blend_t lv_vg_lite_hw_blend(vg_lite_blend_t blend)
+{
+    if(!g_hw_premultiply) return blend;
+
+    switch(blend) {
+        case VG_LITE_BLEND_NONE:
+            return OPENVG_BLEND_SRC;
+        case VG_LITE_BLEND_SRC_OVER:
+            return OPENVG_BLEND_SRC_OVER;
+        case VG_LITE_BLEND_DST_OVER:
+            return OPENVG_BLEND_DST_OVER;
+        case VG_LITE_BLEND_SRC_IN:
+            return OPENVG_BLEND_SRC_IN;
+        case VG_LITE_BLEND_DST_IN:
+            return OPENVG_BLEND_DST_IN;
+        case VG_LITE_BLEND_MULTIPLY:
+            return OPENVG_BLEND_MULTIPLY;
+        case VG_LITE_BLEND_SCREEN:
+            return OPENVG_BLEND_SCREEN;
+        case VG_LITE_BLEND_DARKEN:
+            return OPENVG_BLEND_DARKEN;
+        case VG_LITE_BLEND_LIGHTEN:
+            return OPENVG_BLEND_LIGHTEN;
+        case VG_LITE_BLEND_ADDITIVE:
+            return OPENVG_BLEND_ADDITIVE;
+        default:
+            /* VG_LITE_BLEND_SUBTRACT and the *_LVGL modes have no OpenVG equivalent */
+            return blend;
+    }
+}
+
+vg_lite_color_t lv_vg_lite_paint_color(lv_color_t color, lv_opa_t opa)
+{
+    return lv_vg_lite_color(color, opa, !g_hw_premultiply);
+}
+
+vg_lite_color_t lv_vg_lite_color_premultiply(vg_lite_color_t color)
+{
+    lv_color_t c = lv_color_make(color & 0xFF, (color >> 8) & 0xFF, (color >> 16) & 0xFF);
+    return lv_vg_lite_color(c, color >> 24, true);
 }
 
 bool lv_vg_lite_gpu_premultiplies_image_color(vg_lite_buffer_format_t format, vg_lite_blend_t blend, bool pattern)
 {
+    blend = lv_vg_lite_hw_blend(blend);
     switch(blend) {
         case VG_LITE_BLEND_NORMAL_LVGL:
         case VG_LITE_BLEND_ADDITIVE_LVGL:
         case VG_LITE_BLEND_SUBTRACT_LVGL:
         case VG_LITE_BLEND_MULTIPLY_LVGL:
+        case OPENVG_BLEND_SRC:
+        case OPENVG_BLEND_SRC_OVER:
+        case OPENVG_BLEND_DST_OVER:
+        case OPENVG_BLEND_SRC_IN:
+        case OPENVG_BLEND_DST_IN:
+        case OPENVG_BLEND_MULTIPLY:
+        case OPENVG_BLEND_SCREEN:
+        case OPENVG_BLEND_DARKEN:
+        case OPENVG_BLEND_LIGHTEN:
+        case OPENVG_BLEND_ADDITIVE:
             return true;
 
         case VG_LITE_BLEND_SRC_OVER:
@@ -933,7 +1015,12 @@ bool lv_vg_lite_gpu_premultiplies_image_color(vg_lite_buffer_format_t format, vg
 
 vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_mul)
 {
-    if(!has_pre_mul && lv_vg_lite_support_blend_normal()) {
+    if(g_hw_premultiply && blend_mode == LV_BLEND_MODE_SUBTRACTIVE && lv_vg_lite_support_blend_normal()) {
+        return VG_LITE_BLEND_SUBTRACT_LVGL;
+    }
+
+    /* With hardware premultiplication the GPU is told by the buffer flags which images are premultiplied */
+    if(!has_pre_mul && !g_hw_premultiply && lv_vg_lite_support_blend_normal()) {
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
                 return VG_LITE_BLEND_NORMAL_LVGL;

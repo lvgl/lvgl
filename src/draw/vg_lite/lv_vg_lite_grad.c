@@ -161,6 +161,8 @@ bool lv_vg_lite_draw_grad(
     LV_VG_LITE_ASSERT_MATRIX(grad_matrix);
     LV_VG_LITE_ASSERT_MATRIX(matrix);
 
+    blend = lv_vg_lite_hw_blend(blend);
+
     /* check radial gradient is supported */
     if(grad->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         if(!vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
@@ -510,7 +512,7 @@ static bool linear_grad_create(grad_item_t * item)
 
         /* lvgl color -> gradient color */
         lv_color_t grad_color = lv_color_make(c->blue, c->green, c->red);
-        colors[i] = lv_vg_lite_color(grad_color, opa, true);
+        colors[i] = lv_vg_lite_paint_color(grad_color, opa);
     }
 
     LV_VG_LITE_CHECK_ERROR(

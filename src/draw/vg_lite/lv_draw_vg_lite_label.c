@@ -498,7 +498,7 @@ static void draw_letter_outline(lv_draw_unit_t * draw_unit, const lv_area_t * cl
             VG_LITE_FILL_NON_ZERO,
             &draw_matrix,
             VG_LITE_BLEND_SRC_OVER,
-            lv_vg_lite_color(dsc->color, dsc->opa, true));
+            lv_vg_lite_paint_color(dsc->color, dsc->opa));
 
         lv_vg_lite_path_drop(u, outline_transformed);
 
@@ -535,7 +535,7 @@ static void draw_letter_outline(lv_draw_unit_t * draw_unit, const lv_area_t * cl
         LV_VG_LITE_CHECK_ERROR(vg_lite_set_stroke(vg_path,
                                                   VG_LITE_CAP_ROUND, VG_LITE_JOIN_ROUND, stroke_width_scaled, 1.0,
                                                   NULL, 0, 0,
-                                                  lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true)), {});
+                                                  lv_vg_lite_paint_color(dsc->outline_stroke_color, dsc->outline_stroke_opa)), {});
 
         LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, VG_LITE_DRAW_STROKE_PATH), {});
         LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(vg_path), {});
@@ -547,7 +547,7 @@ static void draw_letter_outline(lv_draw_unit_t * draw_unit, const lv_area_t * cl
             VG_LITE_FILL_NON_ZERO,
             &draw_matrix,
             VG_LITE_BLEND_SRC_OVER,
-            lv_vg_lite_color(dsc->color, 0, true));
+            lv_vg_lite_paint_color(dsc->color, 0));
 
         /*Restore the path to fill mode, it will release the local memory allocated for the stroke op */
         LV_VG_LITE_CHECK_ERROR(vg_lite_set_draw_path_type(vg_path, VG_LITE_DRAW_FILL_PATH), {});
@@ -561,7 +561,7 @@ static void draw_letter_outline(lv_draw_unit_t * draw_unit, const lv_area_t * cl
         VG_LITE_FILL_NON_ZERO,
         &draw_matrix,
         VG_LITE_BLEND_SRC_OVER,
-        lv_vg_lite_color(dsc->color, dsc->opa, true));
+        lv_vg_lite_paint_color(dsc->color, dsc->opa));
 
 
     LV_PROFILER_DRAW_END;

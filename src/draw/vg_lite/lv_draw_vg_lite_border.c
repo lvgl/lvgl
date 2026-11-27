@@ -92,7 +92,7 @@ void lv_draw_vg_lite_border(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
         fill_rule,
         &matrix,
         VG_LITE_BLEND_SRC_OVER,
-        lv_vg_lite_color(dsc->color, dsc->opa, true));
+        lv_vg_lite_paint_color(dsc->color, dsc->opa));
 
     lv_vg_lite_path_drop(u, path);
     LV_PROFILER_DRAW_END;

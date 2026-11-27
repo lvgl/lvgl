@@ -50,11 +50,6 @@ void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const
 
     LV_PROFILER_DRAW_BEGIN;
 
-    /* The GPU output should already be premultiplied RGB */
-    if(!lv_draw_buf_has_flag(layer_to_draw->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED)) {
-        LV_LOG_WARN("Non-premultiplied layer buffer for GPU to draw.");
-    }
-
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = layer_to_draw->draw_buf;
     lv_draw_vg_lite_img(draw_unit, layer, clip_area, &new_draw_dsc, coords, true);

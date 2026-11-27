@@ -162,15 +162,51 @@ void lv_vg_lite_utils_init(void);
  * Whether the driver makes the GPU premultiply the product of the color and an image drawn in
  * VG_LITE_MULTIPLY_IMAGE_MODE. If it does, the color must be passed straight, otherwise premultiplied.
  * Describes vg_lite_blit() and vg_lite_blit_rect() with source and target buffers not flagged as premultiplied
- * (`vg_lite_buffer_t::premultiplied`), as LVGL uses them. vg_lite_draw_pattern() behaves the same, except that
- * on GC255 it lacks the driver's exception for alpha-only images.
+ * (`vg_lite_buffer_t::premultiplied`), as LVGL uses them without hardware premultiplication.
+ * vg_lite_draw_pattern() behaves the same, except that on GC255 it lacks the driver's exception for alpha-only
+ * images.
  * @param format    the image's format
  * @param blend     the blend mode the image is drawn with
  * @param pattern   true if the image is drawn with vg_lite_draw_pattern(), false for vg_lite_blit*()
- * @return          true for the *_LVGL blend modes, and for alpha-only (A4, A8) images with
+ * @return          true for the *_LVGL and OPENVG_* blend modes, and for alpha-only (A4, A8) images with
  *                  VG_LITE_BLEND_SRC_OVER ... VG_LITE_BLEND_SUBTRACT, except when blitted on GC255
  */
 bool lv_vg_lite_gpu_premultiplies_image_color(vg_lite_buffer_format_t format, vg_lite_blend_t blend, bool pattern);
+
+/**
+ * Whether the GPU premultiplies in hardware (GC355, GC555). If it does, every buffer is flagged as straight or
+ * premultiplied, the blend modes are OpenVG's and colors are passed straight: the GPU premultiplies straight
+ * sources and destinations, and divides the result when it writes a straight buffer, so it can draw into
+ * straight-alpha buffers (ARGB8888, ARGB1555, ARGB4444, ARGB2222, ARGB8565) too. Without it (GC255) every buffer
+ * holds premultiplied pixels and colors are passed premultiplied: straight-alpha targets are left to the
+ * software renderer.
+ * @return          true if the GPU premultiplies in hardware
+ */
+bool lv_vg_lite_hw_premultiply(void);
+
+/**
+ * Convert a blend mode to the one to pass to the GPU: its OpenVG equivalent with hardware premultiplication,
+ * which honours the buffers' premultiplied flags. All draw functions below do it.
+ * @param blend     a VG_LITE_BLEND_* mode
+ * @return          the mode to pass to the driver
+ */
+vg_lite_blend_t lv_vg_lite_hw_blend(vg_lite_blend_t blend);
+
+/**
+ * Convert a color to a paint color for paths, strokes and gradients: straight with hardware
+ * premultiplication, premultiplied otherwise.
+ * @param color     the color
+ * @param opa       its opacity
+ * @return          the paint color
+ */
+vg_lite_color_t lv_vg_lite_paint_color(lv_color_t color, lv_opa_t opa);
+
+/**
+ * Premultiply a VG-Lite color
+ * @param color     a straight color
+ * @return          the premultiplied color
+ */
+vg_lite_color_t lv_vg_lite_color_premultiply(vg_lite_color_t color);
 
 void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area);
 
@@ -300,7 +336,7 @@ static inline void lv_vg_lite_draw(vg_lite_buffer_t * target,
                                path,
                                fill_rule,
                                matrix,
-                               blend,
+                               lv_vg_lite_hw_blend(blend),
                                color),
                            /* Dump parameters */
     {
@@ -308,7 +344,7 @@ static inline void lv_vg_lite_draw(vg_lite_buffer_t * target,
         lv_vg_lite_path_dump_info(path);
         LV_LOG_USER("fill_rule: 0x%X,", (int)fill_rule);
         lv_vg_lite_matrix_dump_info(matrix);
-        LV_LOG_USER("blend: 0x%X,", (int)blend);
+        LV_LOG_USER("blend: 0x%X,", (int)lv_vg_lite_hw_blend(blend));
         lv_vg_lite_color_dump_info(color);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
@@ -340,7 +376,7 @@ static inline void lv_vg_lite_draw_pattern(vg_lite_buffer_t * target,
                                path_matrix,
                                pattern_image,
                                pattern_matrix,
-                               blend,
+                               lv_vg_lite_hw_blend(blend),
                                pattern_mode,
                                pattern_color,
                                color,
@@ -353,7 +389,7 @@ static inline void lv_vg_lite_draw_pattern(vg_lite_buffer_t * target,
         lv_vg_lite_matrix_dump_info(path_matrix);
         lv_vg_lite_buffer_dump_info(pattern_image);
         lv_vg_lite_matrix_dump_info(pattern_matrix);
-        LV_LOG_USER("blend: 0x%X,", (int)blend);
+        LV_LOG_USER("blend: 0x%X,", (int)lv_vg_lite_hw_blend(blend));
         LV_LOG_USER("pattern_mode: 0x%X,", (int)pattern_mode);
         lv_vg_lite_color_dump_info(pattern_color);
         lv_vg_lite_color_dump_info(color);
@@ -380,7 +416,7 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
                                source,
                                rect,
                                matrix,
-                               blend,
+                               lv_vg_lite_hw_blend(blend),
                                color,
                                filter),
                            /* Dump parameters */
@@ -390,7 +426,7 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
         LV_LOG_USER("rect: X%d Y%d W%d H%d",
                     (int)rect->x, (int)rect->y, (int)rect->width, (int)rect->height);
         lv_vg_lite_matrix_dump_info(matrix);
-        LV_LOG_USER("blend: 0x%X", (int)blend);
+        LV_LOG_USER("blend: 0x%X", (int)lv_vg_lite_hw_blend(blend));
         lv_vg_lite_color_dump_info(color);
         LV_LOG_USER("filter: 0x%X", (int)filter);
     });
@@ -413,7 +449,7 @@ static inline void lv_vg_lite_blit(vg_lite_buffer_t * target,
                                target,
                                source,
                                matrix,
-                               blend,
+                               lv_vg_lite_hw_blend(blend),
                                color,
                                filter),
                            /* Dump parameters */
@@ -421,7 +457,7 @@ static inline void lv_vg_lite_blit(vg_lite_buffer_t * target,
         lv_vg_lite_buffer_dump_info(target);
         lv_vg_lite_buffer_dump_info(source);
         lv_vg_lite_matrix_dump_info(matrix);
-        LV_LOG_USER("blend: 0x%X", (int)blend);
+        LV_LOG_USER("blend: 0x%X", (int)lv_vg_lite_hw_blend(blend));
         lv_vg_lite_color_dump_info(color);
         LV_LOG_USER("filter: 0x%X", (int)filter);
     });
@@ -431,8 +467,19 @@ static inline void lv_vg_lite_blit(vg_lite_buffer_t * target,
 
 void lv_vg_lite_set_color_key(const lv_image_colorkey_t * colorkey);
 
+/**
+ * Fill an area of the target with a color, without blending
+ * @param target    the target buffer
+ * @param area      the area to fill
+ * @param color     a paint color, see lv_vg_lite_paint_color()
+ */
 static inline void lv_vg_lite_clear(vg_lite_buffer_t * target, const lv_area_t * area, vg_lite_color_t color)
 {
+    /* The color is written as it is: a straight paint color must be premultiplied for a premultiplied target */
+    if(target->premultiplied) {
+        color = lv_vg_lite_color_premultiply(color);
+    }
+
     vg_lite_rectangle_t rect;
     lv_vg_lite_rect(&rect, area);
     LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
