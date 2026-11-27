@@ -23,6 +23,11 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+/**
+ * Pass it as the winding of lv_nanovg_fill() and lv_nanovg_draw_grad() to keep the winding
+ * that was set for the sub-paths of the current path, instead of setting it for the last one.
+ */
+#define LV_NANOVG_WINDING_KEEP ((enum NVGwinding)0)
 
 /**********************
  *      TYPEDEFS
@@ -99,6 +104,25 @@ void lv_nanovg_set_clip_area(NVGcontext * ctx, const lv_area_t * area);
  */
 void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, float h, float r);
 
+#if LV_USE_VECTOR_GRAPHIC
+/**
+ * Append a vector path to the NanoVG path, e.g. the outline of a glyph or the path of an SVG shape.
+ *
+ * NanoVG reverses every sub-path to the winding it was given, so the direction of the contours of the vector path is
+ * lost and the holes would be filled. For the non-zero fill rule the winding of each contour is set here: the same
+ * direction as the contour with the biggest area is solid, the opposite direction is a hole. Fill the path with
+ * LV_NANOVG_WINDING_KEEP in this case, so that the winding of the last contour isn't overridden.
+ * The direction is relative, so it doesn't depend on the current transform, e.g. a flip of the Y axis.
+ *
+ * @param ctx       the NanoVG context
+ * @param path      the vector path
+ * @param nonzero   true: the path will be filled with the non-zero rule, false: with the even-odd rule
+ *                  (the winding of the contours is not touched, the caller has to set it)
+ * @param offset    if not NULL, the top left corner of the bounding box of the points of the path, rounded
+ */
+void lv_nanovg_path_append_vector_path(NVGcontext * ctx, const lv_vector_path_t * path, bool nonzero,
+                                       lv_fpoint_t * offset);
+#endif /*LV_USE_VECTOR_GRAPHIC*/
 /**
  * Append an area to the path
  * @param ctx the NanoVG context
@@ -141,7 +165,7 @@ void lv_nanovg_path_append_arc(NVGcontext * ctx,
 /**
  * Fill the current path
  * @param ctx the NanoVG context
- * @param winding the winding rule
+ * @param winding the winding rule, or LV_NANOVG_WINDING_KEEP to leave the winding of the path as it is
  * @param composite_operation the blend mode
  * @param color the fill color
  */

@@ -15,8 +15,6 @@
 #include "lv_nanovg_image_cache.h"
 #include "../lv_draw_vector_private.h"
 #include "../../image/lv_image_decoder_private.h"
-#include <float.h>
-#include <math.h>
 
 /*********************
 *      DEFINES
@@ -33,7 +31,6 @@
 **********************/
 
 static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc);
-static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fpoint_t * offset);
 static enum NVGcompositeOperation lv_blend_to_nvg(lv_vector_blend_t blend);
 static enum NVGwinding lv_fill_to_nvg(lv_vector_fill_t fill_rule);
 
@@ -195,7 +192,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     lv_nanovg_transform(u->vg, &dsc->matrix);
 
     lv_fpoint_t offset = {0, 0};
-    lv_path_to_nvg(u->vg, path, &offset);
+    lv_nanovg_path_append_vector_path(u->vg, path, dsc->fill_dsc.fill_rule == LV_VECTOR_FILL_NONZERO, &offset);
 
     const enum NVGcompositeOperation comp_op = lv_blend_to_nvg(dsc->blend_mode);
     nvgGlobalCompositeOperation(u->vg, comp_op);
@@ -210,73 +207,6 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     nvgRestore(u->vg);
 
-    LV_PROFILER_DRAW_END;
-}
-
-static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fpoint_t * offset)
-{
-    LV_PROFILER_DRAW_BEGIN;
-
-    float min_x = FLT_MAX;
-    float min_y = FLT_MAX;
-    float max_x = -FLT_MAX;
-    float max_y = -FLT_MAX;
-
-#define CMP_BOUNDS(point)                           \
-    do {                                            \
-        if((point)->x < min_x) min_x = (point)->x;  \
-        if((point)->y < min_y) min_y = (point)->y;  \
-        if((point)->x > max_x) max_x = (point)->x;  \
-        if((point)->y > max_y) max_y = (point)->y;  \
-    } while(0)
-
-    const lv_vector_path_op_t * ops = lv_array_front(&src->ops);
-    const lv_fpoint_t * point = lv_array_front(&src->points);
-    const uint32_t op_size = lv_array_size(&src->ops);
-
-    nvgBeginPath(ctx);
-
-    for(uint32_t i = 0; i < op_size; i++) {
-        switch(ops[i]) {
-            case LV_VECTOR_PATH_OP_MOVE_TO: {
-                    nvgMoveTo(ctx, point->x, point->y);
-                    CMP_BOUNDS(point);
-                    point++;
-                }
-                break;
-            case LV_VECTOR_PATH_OP_LINE_TO: {
-                    nvgLineTo(ctx, point->x, point->y);
-                    CMP_BOUNDS(point);
-                    point++;
-                }
-                break;
-            case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    nvgQuadTo(ctx, point[0].x, point[0].y, point[1].x, point[1].y);
-                    CMP_BOUNDS(&point[0]);
-                    CMP_BOUNDS(&point[1]);
-                    point += 2;
-                }
-                break;
-            case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    nvgBezierTo(ctx, point[0].x, point[0].y, point[1].x, point[1].y, point[2].x, point[2].y);
-                    CMP_BOUNDS(&point[0]);
-                    CMP_BOUNDS(&point[1]);
-                    CMP_BOUNDS(&point[2]);
-                    point += 3;
-                }
-                break;
-            case LV_VECTOR_PATH_OP_CLOSE: {
-                    nvgClosePath(ctx);
-                }
-                break;
-            default:
-                LV_LOG_WARN("unknown op: %d", ops[i]);
-                break;
-        }
-    }
-
-    offset->x = lroundf(min_x);
-    offset->y = lroundf(min_y);
     LV_PROFILER_DRAW_END;
 }
 
@@ -303,12 +233,13 @@ static enum NVGwinding lv_fill_to_nvg(lv_vector_fill_t fill_rule)
 {
     switch(fill_rule) {
         case LV_VECTOR_FILL_NONZERO:
-            return NVG_CCW;
+            /*The winding of each contour was set by lv_path_to_nvg(), don't override the last one*/
+            return LV_NANOVG_WINDING_KEEP;
         case LV_VECTOR_FILL_EVENODD:
             return NVG_CW;
         default:
             LV_LOG_WARN("Unknown supported fill rule: %d", fill_rule);
-            return NVG_CCW;
+            return LV_NANOVG_WINDING_KEEP;
     }
 }
 

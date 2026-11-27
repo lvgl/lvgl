@@ -14,6 +14,9 @@
 #include "../../misc/lv_pending.h"
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_math.h"
+#if LV_USE_VECTOR_GRAPHIC
+    #include "../lv_draw_vector_private.h"
+#endif
 #include <float.h>
 #include <math.h>
 
@@ -30,9 +33,32 @@
 *      TYPEDEFS
 **********************/
 
+#if LV_USE_VECTOR_GRAPHIC
+/*The number of the segments a curve is split into to get the area of a contour*/
+#define CURVE_AREA_STEPS 8
+
+/*Tracks the signed area of the contour that is being appended to the NanoVG path*/
+typedef struct {
+    lv_fpoint_t first;
+    lv_fpoint_t prev;
+    float area;
+    bool open;
+} contour_tracker_t;
+#endif /*LV_USE_VECTOR_GRAPHIC*/
+
 /**********************
 *  STATIC PROTOTYPES
 **********************/
+
+#if LV_USE_VECTOR_GRAPHIC
+    static float lv_path_main_area(const lv_vector_path_t * src);
+    static void tracker_begin(contour_tracker_t * t, const lv_fpoint_t * p);
+    static void tracker_add(contour_tracker_t * t, const lv_fpoint_t * p);
+    static void tracker_quad(contour_tracker_t * t, const lv_fpoint_t * c, const lv_fpoint_t * p);
+    static void tracker_cubic(contour_tracker_t * t, const lv_fpoint_t * c1, const lv_fpoint_t * c2, const lv_fpoint_t * p);
+    static float tracker_end(contour_tracker_t * t);
+    static void end_contour(NVGcontext * ctx, contour_tracker_t * t, float main_area);
+#endif /*LV_USE_VECTOR_GRAPHIC*/
 
 /**********************
 *  STATIC VARIABLES
@@ -229,7 +255,7 @@ void lv_nanovg_fill(NVGcontext * ctx, enum NVGwinding winding, enum NVGcomposite
 {
     LV_ASSERT_NULL(ctx);
     LV_PROFILER_DRAW_BEGIN;
-    nvgPathWinding(ctx, winding);
+    if(winding != LV_NANOVG_WINDING_KEEP) nvgPathWinding(ctx, winding);
     nvgGlobalCompositeOperation(ctx, composite_operation);
     nvgFillColor(ctx, color);
     nvgFill(ctx);
@@ -295,8 +321,240 @@ lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u
     return u->image_buf;
 }
 
+#if LV_USE_VECTOR_GRAPHIC
+
+void lv_nanovg_path_append_vector_path(NVGcontext * ctx, const lv_vector_path_t * src, bool nonzero,
+                                       lv_fpoint_t * offset)
+{
+    LV_PROFILER_DRAW_BEGIN;
+
+    float min_x = FLT_MAX;
+    float min_y = FLT_MAX;
+    float max_x = -FLT_MAX;
+    float max_y = -FLT_MAX;
+
+#define CMP_BOUNDS(point)                           \
+    do {                                            \
+        if((point)->x < min_x) min_x = (point)->x;  \
+        if((point)->y < min_y) min_y = (point)->y;  \
+        if((point)->x > max_x) max_x = (point)->x;  \
+        if((point)->y > max_y) max_y = (point)->y;  \
+    } while(0)
+
+    const lv_vector_path_op_t * ops = lv_array_front(&src->ops);
+    const lv_fpoint_t * point = lv_array_front(&src->points);
+    const uint32_t op_size = lv_array_size(&src->ops);
+
+    /* NanoVG forces every sub-path to the winding set with nvgPathWinding() (counter-clockwise by default)
+     * before it fills. A contour that goes in the opposite direction, like the inside of an "O" in a glyph,
+     * would be reversed and filled too, but with the non-zero rule it has to be a hole.
+     * So set the winding of each contour: the same direction as the biggest contour is solid (counter-clockwise),
+     * the opposite direction is a hole (clockwise).
+     * The even-odd rule doesn't use it, the caller sets it for the last sub-path. */
+    const float main_area = nonzero ? lv_path_main_area(src) : 0.0f;
+    contour_tracker_t tracker;
+    lv_memzero(&tracker, sizeof(tracker));
+
+    nvgBeginPath(ctx);
+
+    for(uint32_t i = 0; i < op_size; i++) {
+        switch(ops[i]) {
+            case LV_VECTOR_PATH_OP_MOVE_TO: {
+                    if(nonzero) {
+                        end_contour(ctx, &tracker, main_area);
+                        tracker_begin(&tracker, point);
+                    }
+                    nvgMoveTo(ctx, point->x, point->y);
+                    CMP_BOUNDS(point);
+                    point++;
+                }
+                break;
+            case LV_VECTOR_PATH_OP_LINE_TO: {
+                    if(nonzero) tracker_add(&tracker, point);
+                    nvgLineTo(ctx, point->x, point->y);
+                    CMP_BOUNDS(point);
+                    point++;
+                }
+                break;
+            case LV_VECTOR_PATH_OP_QUAD_TO: {
+                    if(nonzero) tracker_quad(&tracker, &point[0], &point[1]);
+                    nvgQuadTo(ctx, point[0].x, point[0].y, point[1].x, point[1].y);
+                    CMP_BOUNDS(&point[0]);
+                    CMP_BOUNDS(&point[1]);
+                    point += 2;
+                }
+                break;
+            case LV_VECTOR_PATH_OP_CUBIC_TO: {
+                    if(nonzero) tracker_cubic(&tracker, &point[0], &point[1], &point[2]);
+                    nvgBezierTo(ctx, point[0].x, point[0].y, point[1].x, point[1].y, point[2].x, point[2].y);
+                    CMP_BOUNDS(&point[0]);
+                    CMP_BOUNDS(&point[1]);
+                    CMP_BOUNDS(&point[2]);
+                    point += 3;
+                }
+                break;
+            case LV_VECTOR_PATH_OP_CLOSE: {
+                    nvgClosePath(ctx);
+                    if(nonzero) end_contour(ctx, &tracker, main_area);
+                }
+                break;
+            default:
+                LV_LOG_WARN("unknown op: %d", ops[i]);
+                break;
+        }
+    }
+
+    if(nonzero) end_contour(ctx, &tracker, main_area);
+
+    if(offset) {
+        offset->x = lroundf(min_x);
+        offset->y = lroundf(min_y);
+    }
+    LV_PROFILER_DRAW_END;
+}
+
+#endif /*LV_USE_VECTOR_GRAPHIC*/
+
 /**********************
 *   STATIC FUNCTIONS
 **********************/
+
+#if LV_USE_VECTOR_GRAPHIC
+
+static void tracker_begin(contour_tracker_t * t, const lv_fpoint_t * p)
+{
+    t->first = *p;
+    t->prev = *p;
+    t->area = 0.0f;
+    t->open = true;
+}
+
+static void tracker_add(contour_tracker_t * t, const lv_fpoint_t * p)
+{
+    if(!t->open) {
+        tracker_begin(t, p);
+        return;
+    }
+
+    t->area += (t->prev.x * p->y - p->x * t->prev.y) * 0.5f;
+    t->prev = *p;
+}
+
+/*Add a quadratic curve, split into segments so that the area is the one of the curve and not of its control points*/
+static void tracker_quad(contour_tracker_t * t, const lv_fpoint_t * c, const lv_fpoint_t * p)
+{
+    if(!t->open) {
+        tracker_begin(t, p);
+        return;
+    }
+
+    const lv_fpoint_t p0 = t->prev;
+    for(int32_t i = 1; i <= CURVE_AREA_STEPS; i++) {
+        const float s = (float)i / CURVE_AREA_STEPS;
+        const float u = 1.0f - s;
+        const lv_fpoint_t pt = {
+            u * u * p0.x + 2.0f * u * s * c->x + s * s * p->x,
+            u * u * p0.y + 2.0f * u * s * c->y + s * s * p->y,
+        };
+        tracker_add(t, &pt);
+    }
+}
+
+/*Add a cubic curve, see tracker_quad()*/
+static void tracker_cubic(contour_tracker_t * t, const lv_fpoint_t * c1, const lv_fpoint_t * c2, const lv_fpoint_t * p)
+{
+    if(!t->open) {
+        tracker_begin(t, p);
+        return;
+    }
+
+    const lv_fpoint_t p0 = t->prev;
+    for(int32_t i = 1; i <= CURVE_AREA_STEPS; i++) {
+        const float s = (float)i / CURVE_AREA_STEPS;
+        const float u = 1.0f - s;
+        const float w0 = u * u * u;
+        const float w1 = 3.0f * u * u * s;
+        const float w2 = 3.0f * u * s * s;
+        const float w3 = s * s * s;
+        const lv_fpoint_t pt = {
+            w0 * p0.x + w1 * c1->x + w2 * c2->x + w3 * p->x,
+            w0 * p0.y + w1 * c1->y + w2 * c2->y + w3 * p->y,
+        };
+        tracker_add(t, &pt);
+    }
+}
+
+/*Close the contour and return its signed area*/
+static float tracker_end(contour_tracker_t * t)
+{
+    t->area += (t->prev.x * t->first.y - t->first.x * t->prev.y) * 0.5f;
+    t->open = false;
+    return t->area;
+}
+
+/*Set the winding of the contour that was just appended, see lv_path_to_nvg()*/
+static void end_contour(NVGcontext * ctx, contour_tracker_t * t, float main_area)
+{
+    if(!t->open) return;
+
+    const float area = tracker_end(t);
+    nvgPathWinding(ctx, area * main_area >= 0.0f ? NVG_CCW : NVG_CW);
+}
+
+/*Get the signed area of the contour with the biggest area*/
+static float lv_path_main_area(const lv_vector_path_t * src)
+{
+    const lv_vector_path_op_t * ops = lv_array_front(&src->ops);
+    const lv_fpoint_t * point = lv_array_front(&src->points);
+    const uint32_t op_size = lv_array_size(&src->ops);
+
+    float main_area = 0.0f;
+    contour_tracker_t t;
+    lv_memzero(&t, sizeof(t));
+
+    for(uint32_t i = 0; i < op_size; i++) {
+        uint32_t point_cnt = 0;
+        switch(ops[i]) {
+            case LV_VECTOR_PATH_OP_MOVE_TO:
+                if(t.open) {
+                    const float area = tracker_end(&t);
+                    if(LV_ABS(area) > LV_ABS(main_area)) main_area = area;
+                }
+                tracker_begin(&t, point);
+                point_cnt = 1;
+                break;
+            case LV_VECTOR_PATH_OP_LINE_TO:
+                tracker_add(&t, point);
+                point_cnt = 1;
+                break;
+            case LV_VECTOR_PATH_OP_QUAD_TO:
+                tracker_quad(&t, &point[0], &point[1]);
+                point_cnt = 2;
+                break;
+            case LV_VECTOR_PATH_OP_CUBIC_TO:
+                tracker_cubic(&t, &point[0], &point[1], &point[2]);
+                point_cnt = 3;
+                break;
+            case LV_VECTOR_PATH_OP_CLOSE:
+                if(t.open) {
+                    const float area = tracker_end(&t);
+                    if(LV_ABS(area) > LV_ABS(main_area)) main_area = area;
+                }
+                break;
+            default:
+                break;
+        }
+        point += point_cnt;
+    }
+
+    if(t.open) {
+        const float area = tracker_end(&t);
+        if(LV_ABS(area) > LV_ABS(main_area)) main_area = area;
+    }
+
+    return main_area;
+}
+
+#endif /*LV_USE_VECTOR_GRAPHIC*/
 
 #endif /* LV_USE_DRAW_NANOVG */
