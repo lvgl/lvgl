@@ -406,6 +406,14 @@ LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp);
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp);
 
 /**
+ * Wait until the last flush has completed, i.e. until the driver called `lv_display_flush_ready()`
+ * or the flush-wait callback has returned. Returns immediately if no flush is in progress.
+ * Must not be called from `flush_cb`, `flush_wait_cb` or an interrupt.
+ * @param disp      pointer to a display
+ */
+void lv_display_wait_flush(lv_display_t * disp);
+
+/**
  * Call from the display driver when the syncing is finished
  * @param disp      pointer to display whose `sync_cb` was called
  */

@@ -36,10 +36,10 @@ The following events are sent for Display (lv_display_t) objects:
   calling [Flush Callback](/main-modules/display/setup))
 - <ApiLink name="LV_EVENT_FLUSH_START" />: Sent before [Flush Callback](/main-modules/display/setup) is called.
 - <ApiLink name="LV_EVENT_FLUSH_FINISH" />: Sent after [Flush Callback](/main-modules/display/setup) call has returned.
-- <ApiLink name="LV_EVENT_FLUSH_WAIT_START" />: Sent at the beginning of internal call to
-  `wait_for_flushing()` -- happens whether or not any waiting will actually occur.
-  Call returns immediately if `disp->flushing == 0`.
-- <ApiLink name="LV_EVENT_FLUSH_WAIT_FINISH" />: Sent when the call to `wait_for_flushing()`
+- <ApiLink name="LV_EVENT_FLUSH_WAIT_START" />: Sent at the beginning of
+  <ApiLink name="lv_display_wait_flush" /> -- happens whether or not any waiting will actually occur.
+  The call returns immediately if no flush is in progress.
+- <ApiLink name="LV_EVENT_FLUSH_WAIT_FINISH" />: Sent when <ApiLink name="lv_display_wait_flush" />
   is about to return, regardless whether any actual waiting occurred.
 - <ApiLink name="LV_EVENT_SCREEN_UNLOAD_START" />: Sent when a screen starts to be unloaded on this display
 - <ApiLink name="LV_EVENT_SCREEN_LOAD_START" />: Sent when a screen starts to be loaded on this display
