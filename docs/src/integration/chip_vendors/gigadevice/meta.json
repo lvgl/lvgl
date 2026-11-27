@@ -1,0 +1,10 @@
+{
+  "title": "GigaDevice",
+  "pages": [
+    "overview",
+    "add_lvgl_to_your_gd32_project",
+    "tli",
+    "ipa",
+    "lcd_gd32_guide"
+  ]
+}

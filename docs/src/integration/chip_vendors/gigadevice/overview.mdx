@@ -1,0 +1,42 @@
+---
+title: Overview
+description: "GigaDevice is a chip vendor of 32-bit ARM MCUs. LVGL supports the GD32 TLI display controller and the IPA pixel accelerator."
+faqs:
+  - question: "Which IDE should I use for GD32?"
+    answer: "Any IDE that supports Cortex-M, such as Keil MDK or IAR EWARM with the GD32 device pack, or GigaDevice's Eclipse-based GD32 Embedded Builder. LVGL integrates with them like with any other C project."
+  - question: "Which GD32 graphical peripherals does LVGL support?"
+    answer: "LVGL supports TLI as a display controller and IPA as a draw unit for fills, images, and layer blending. Alternatively, an application can drive a display controller over EXMC, SPI, or QSPI and use DMA or MDMA to accelerate pixel transfers. The TLI driver can also use IPA to flush partial buffers instead of using it as a draw unit."
+  - question: "Which GD32 series and models does LVGL support?"
+    answer: "GigaDevice publishes LVGL example projects for eight GD32 series at https://github.com/GigaDevice-GD32-MCU/GD32-LVGL-Resources. The examples may target different LVGL versions. The TLI driver and IPA draw unit in LVGL target the GD32H7 series, and the IPA draw unit also supports GD32F470 and GD32F527."
+---
+
+## About
+
+GigaDevice is a chip vendor of 32-bit ARM MCUs. Its GD32 series covers a wide range of
+Cortex-M devices. High-end models such as the GD32H7 (Cortex-M7) and the GD32F4
+feature dedicated graphics peripherals.
+
+### Application Development
+
+GD32 projects are typically based on the GD32 firmware library (the standard
+peripheral library) provided by GigaDevice for each family, e.g. `gd32h7xx.h` and the
+`gd32h7xx_*.c` drivers for the GD32H7. GigaDevice also provides demo projects for its
+evaluation boards, such as the GD32H759I-EVAL.
+
+Projects can be built with Keil MDK or IAR EWARM using the GD32 device packs,
+with GigaDevice's Eclipse-based GD32 Embedded Builder, or with GCC and CMake. LVGL is a
+set of C files and integrates with all of them the same way.
+
+GD32 projects can also run an RTOS such as FreeRTOS, RT-Thread, or Zephyr.
+Frameworks like Zephyr often cause a project to be treated like "a Zephyr project on GD32"
+rather than a "GD32 project running Zephyr", so their documentation is where to start.
+
+### LVGL Support for GD32 Graphical Peripherals
+
+LVGL supports the graphics hardware acceleration peripherals of the GD32. See the
+individual pages about them.
+
+- [TLI: TFT-LCD interface display controller.](/integration/chip_vendors/gigadevice/tli)
+- [IPA: image processing accelerator for fills, images and layer blending.](/integration/chip_vendors/gigadevice/ipa)
+
+Each page mentions if/how they can be used with each other.
