@@ -160,7 +160,7 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                         img_dsc = &tmp_dsc;
                     }
 
-                    vg_lite_color_t recolor = lv_vg_lite_image_recolor(&image_buffer, img_dsc);
+                    vg_lite_color_t recolor = lv_vg_lite_image_recolor(&image_buffer, img_dsc, blend, true);
 
                     if(ctx->fill_dsc.img_dsc.colorkey) {
                         lv_vg_lite_set_color_key(ctx->fill_dsc.img_dsc.colorkey);

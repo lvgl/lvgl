@@ -70,12 +70,13 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
         return;
     }
 
-    vg_lite_color_t color = lv_vg_lite_image_recolor(&src_buf, dsc);
-
     /* convert the blend mode to vg-lite blend mode, considering the premultiplied alpha */
     bool has_pre_mul = lv_draw_buf_has_flag(decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)
                        || (decoder_dsc.decoded->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     vg_lite_blend_t blend = lv_vg_lite_blend_mode(dsc->blend_mode, has_pre_mul);
+
+    const vg_lite_color_t blit_color = lv_vg_lite_image_recolor(&src_buf, dsc, blend, false);
+    const vg_lite_color_t pattern_color = lv_vg_lite_image_recolor(&src_buf, dsc, blend, true);
 
     /* original image matrix */
     vg_lite_matrix_t image_matrix;
@@ -166,7 +167,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
                 blend,
                 VG_LITE_PATTERN_COLOR,
                 0,
-                color,
+                pattern_color,
                 filter);
 
             lv_vg_lite_path_drop(u, radius_path);
@@ -177,7 +178,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
                 &src_buf,
                 &matrix,
                 blend,
-                color,
+                blit_color,
                 filter);
         }
 
@@ -211,7 +212,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
             &rect,
             &matrix,
             blend,
-            color,
+            blit_color,
             filter);
 
         if(dsc->colorkey) {
@@ -300,7 +301,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
                         blend,
                         VG_LITE_PATTERN_REPEAT,
                         0,
-                        color,
+                        pattern_color,
                         filter);
                 }
 
@@ -327,7 +328,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
             blend,
             VG_LITE_PATTERN_COLOR,
             0,
-            color,
+            pattern_color,
             filter);
     }
 

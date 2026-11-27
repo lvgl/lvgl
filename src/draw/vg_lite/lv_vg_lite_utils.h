@@ -126,7 +126,19 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
 
-vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_draw_image_dsc_t * dsc);
+/**
+ * Set up an image's opacity and recolor: switch the buffer to VG_LITE_MULTIPLY_IMAGE_MODE if needed.
+ * The color has to be passed straight or premultiplied depending on whether the GPU premultiplies its product
+ * with the image, which the driver decides by the blend mode (and the image format, the chip), see
+ * lv_vg_lite_gpu_premultiplies_image_color(). So the color can only be made for a given blend mode and draw call.
+ * @param buffer    the image
+ * @param dsc       the image descriptor
+ * @param blend     the blend mode the image will be drawn with
+ * @param pattern   true if the image will be drawn with vg_lite_draw_pattern(), false for vg_lite_blit*()
+ * @return          the color to multiply the image with
+ */
+vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_draw_image_dsc_t * dsc,
+                                         vg_lite_blend_t blend, bool pattern);
 
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
                                   bool no_cache, bool premultiply);
@@ -140,6 +152,25 @@ vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_m
 uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format);
 
 vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul);
+
+/**
+ * Read the properties of the GPU that the helpers below depend on. Call it once, after the GPU is initialized.
+ */
+void lv_vg_lite_utils_init(void);
+
+/**
+ * Whether the driver makes the GPU premultiply the product of the color and an image drawn in
+ * VG_LITE_MULTIPLY_IMAGE_MODE. If it does, the color must be passed straight, otherwise premultiplied.
+ * Describes vg_lite_blit() and vg_lite_blit_rect() with source and target buffers not flagged as premultiplied
+ * (`vg_lite_buffer_t::premultiplied`), as LVGL uses them. vg_lite_draw_pattern() behaves the same, except that
+ * on GC255 it lacks the driver's exception for alpha-only images.
+ * @param format    the image's format
+ * @param blend     the blend mode the image is drawn with
+ * @param pattern   true if the image is drawn with vg_lite_draw_pattern(), false for vg_lite_blit*()
+ * @return          true for the *_LVGL blend modes, and for alpha-only (A4, A8) images with
+ *                  VG_LITE_BLEND_SRC_OVER ... VG_LITE_BLEND_SUBTRACT, except when blitted on GC255
+ */
+bool lv_vg_lite_gpu_premultiplies_image_color(vg_lite_buffer_format_t format, vg_lite_blend_t blend, bool pattern);
 
 void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area);
 

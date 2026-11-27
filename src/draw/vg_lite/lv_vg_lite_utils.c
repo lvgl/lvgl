@@ -63,6 +63,7 @@ static void lv_vg_lite_get_format_bytes(
  **********************/
 
 static bool g_is_dump_param_enabled = false;
+static vg_lite_uint32_t g_chip_id = 0;
 
 /**********************
  *      MACROS
@@ -759,30 +760,31 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
-vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_draw_image_dsc_t * dsc)
+vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_draw_image_dsc_t * dsc,
+                                         vg_lite_blend_t blend, bool pattern)
 {
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(dsc);
+
+    const bool pre_mul = !lv_vg_lite_gpu_premultiplies_image_color(buffer->format, blend, pattern);
 
     /* alpha image and image recolor */
     if(buffer->format == VG_LITE_A4 || buffer->format == VG_LITE_A8) {
         /*Alpha only image ignore recolor opa*/
         buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-        return lv_vg_lite_color(dsc->recolor, dsc->opa, true);
+        return lv_vg_lite_color(dsc->recolor, dsc->opa, pre_mul);
     }
     else if(dsc->recolor_opa > LV_OPA_TRANSP) {
         buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
         /** The 0xff value in a color channel (R/G/B) maintains that channel's maximum intensity,
          *  effectively preserving its original color contribution when used in blending operations.*/
         lv_color_t recolor = lv_color_mix(dsc->recolor, lv_color_make(0xff, 0xff, 0xff), dsc->recolor_opa);
-        return lv_vg_lite_color(recolor, dsc->opa, true);
+        return lv_vg_lite_color(recolor, dsc->opa, pre_mul);
     }
     else if(dsc->opa < LV_OPA_COVER) {
         /* normal image opa */
         buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-        vg_lite_color_t color;
-        lv_memset(&color, dsc->opa, sizeof(color));
-        return color;
+        return lv_vg_lite_color(lv_color_white(), dsc->opa, pre_mul);
     }
 
     return 0;
@@ -892,6 +894,41 @@ vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
         color.blue = LV_UDIV255(color.blue * opa);
     }
     return (uint32_t)opa << 24 | (uint32_t)color.blue << 16 | (uint32_t)color.green << 8 | color.red;
+}
+
+void lv_vg_lite_utils_init(void)
+{
+    char name[64];
+    vg_lite_uint32_t chip_rev = 0;
+    vg_lite_get_product_info(name, &g_chip_id, &chip_rev);
+}
+
+bool lv_vg_lite_gpu_premultiplies_image_color(vg_lite_buffer_format_t format, vg_lite_blend_t blend, bool pattern)
+{
+    switch(blend) {
+        case VG_LITE_BLEND_NORMAL_LVGL:
+        case VG_LITE_BLEND_ADDITIVE_LVGL:
+        case VG_LITE_BLEND_SUBTRACT_LVGL:
+        case VG_LITE_BLEND_MULTIPLY_LVGL:
+            return true;
+
+        case VG_LITE_BLEND_SRC_OVER:
+        case VG_LITE_BLEND_DST_OVER:
+        case VG_LITE_BLEND_SRC_IN:
+        case VG_LITE_BLEND_DST_IN:
+        case VG_LITE_BLEND_MULTIPLY:
+        case VG_LITE_BLEND_SCREEN:
+        case VG_LITE_BLEND_DARKEN:
+        case VG_LITE_BLEND_LIGHTEN:
+        case VG_LITE_BLEND_ADDITIVE:
+        case VG_LITE_BLEND_SUBTRACT:
+            /* On GC255 vg_lite_blit() premultiplies the image itself instead (`#if (CHIPID==0x255)`), but its
+             * vg_lite_draw_pattern() has no such exception */
+            return (format == VG_LITE_A4 || format == VG_LITE_A8) && (pattern || g_chip_id != 0x255);
+
+        default:
+            return false;
+    }
 }
 
 vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_mul)
