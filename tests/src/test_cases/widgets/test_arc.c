@@ -18,6 +18,7 @@ void test_arc_angles_when_reversed(void);
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * arc = NULL;
 static lv_obj_t * arc2 = NULL;
+static lv_draw_buf_t * checker = NULL;
 static uint32_t event_cnt;
 static uint32_t event_cnt2;
 
@@ -33,6 +34,12 @@ void tearDown(void)
 {
     lv_obj_clean(active_screen);
     lv_obj_set_style_layout(active_screen, LV_LAYOUT_NONE, 0);
+
+    if(checker) {
+        lv_image_cache_drop(checker);
+        lv_draw_buf_destroy(checker);
+        checker = NULL;
+    }
 }
 
 void test_arc_creation_successful(void)
@@ -75,7 +82,7 @@ void test_arc_a8_image(void)
     /*An A8 image is an alpha mask: the arc is drawn in its own color through it.
      *Drawn over a checkerboard so that translucency shows.*/
     LV_IMAGE_DECLARE(test_image_cogwheel_a8);
-    lv_draw_buf_t * checker = lv_draw_buf_create(100, 100, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO);
+    checker = lv_draw_buf_create(100, 100, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(checker);
     uint32_t x, y;
     for(y = 0; y < checker->header.h; y++) {
@@ -109,10 +116,28 @@ void test_arc_a8_image(void)
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_a8_image.png");
+}
 
-    lv_obj_clean(active_screen);
-    lv_image_cache_drop(checker);
-    lv_draw_buf_destroy(checker);
+void test_arc_image_smaller_than_arc(void)
+{
+    /*The image covers only the middle of the arc: nothing is drawn outside it*/
+    LV_IMAGE_DECLARE(test_image_cogwheel_a8);
+    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565a8);
+    const void * srcs[] = {&test_image_cogwheel_a8, &test_image_cogwheel_rgb565a8};
+    uint32_t i;
+    for(i = 0; i < sizeof(srcs) / sizeof(srcs[0]); i++) {
+        arc = lv_arc_create(active_screen);
+        lv_obj_set_size(arc, 160, 160);
+        lv_obj_align(arc, LV_ALIGN_CENTER, i == 0 ? -100 : 100, 0);
+        lv_arc_set_value(arc, 100);
+        lv_obj_set_style_arc_opa(arc, LV_OPA_TRANSP, 0);
+        lv_obj_set_style_arc_width(arc, 40, LV_PART_INDICATOR);
+        lv_obj_set_style_arc_image_src(arc, srcs[i], LV_PART_INDICATOR);
+        lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
+        lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_image_smaller_than_arc.png");
 }
 
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void)
