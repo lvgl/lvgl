@@ -12,7 +12,12 @@ option(LV_USE_PKG_CONFIG_WEBP "Resolve libwebp via pkg-config"
 option(LV_FETCH_WEBP "Fetch libwebp from source" ${LV_FETCH_DEPENDENCIES})
 
 if(LV_USE_FIND_PACKAGE_WEBP)
-  find_package(${CMAKE_PACKAGE_NAME} QUIET)
+  if(TARGET WebP::webp)
+    set(WebP_FOUND TRUE)
+  else()
+    find_package(${CMAKE_PACKAGE_NAME} QUIET)
+  endif()
+
   if(WebP_FOUND)
     message(STATUS "lvgl: libwebp: found via find_package")
     lvgl_link_packages(
