@@ -120,6 +120,41 @@ void test_style_replacement(void)
     lv_style_reset(&style_blue);
 }
 
+void test_style_count_limit(void)
+{
+    lv_style_t styles[63];
+    lv_style_t extra;
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(obj);
+
+    for(uint32_t i = 0; i < 63; i++) {
+        lv_style_init(&styles[i]);
+        lv_style_set_height(&styles[i], i + 1);
+        lv_obj_add_style(obj, &styles[i], LV_PART_MAIN);
+        TEST_ASSERT_EQUAL_INT32(i + 1, lv_obj_get_style_height(obj, LV_PART_MAIN));
+    }
+
+    lv_style_init(&extra);
+    lv_style_set_height(&extra, 100);
+
+    lv_obj_add_style(obj, &styles[0], LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_INT32(1, lv_obj_get_style_height(obj, LV_PART_MAIN));
+
+    lv_obj_add_style(obj, &extra, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_INT32(1, lv_obj_get_style_height(obj, LV_PART_MAIN));
+    TEST_ASSERT_FALSE(lv_obj_replace_style(obj, &extra, &styles[0], LV_PART_MAIN));
+
+    lv_obj_remove_style(obj, &styles[0], LV_PART_MAIN);
+    for(uint32_t i = 62; i > 0; i--) {
+        TEST_ASSERT_EQUAL_INT32(i + 1, lv_obj_get_style_height(obj, LV_PART_MAIN));
+        lv_obj_remove_style(obj, &styles[i], LV_PART_MAIN);
+    }
+
+    lv_obj_delete(obj);
+    for(uint32_t i = 0; i < 63; i++) lv_style_reset(&styles[i]);
+    lv_style_reset(&extra);
+}
+
 void test_style_replacement_with_wildcard_selector(void)
 {
     lv_style_t style_red;
