@@ -60,6 +60,7 @@ typedef enum {
 #if LV_USE_3DTEXTURE
     LV_DRAW_DSC_TYPE_3D,
 #endif
+    LV_DRAW_DSC_TYPE_COUNT
 } lv_draw_dsc_type_t;
 
 struct _lv_layer_t  {
@@ -287,6 +288,33 @@ lv_draw_unit_t * lv_draw_unit_get_next(lv_draw_unit_t * unit);
  * @return      the name of the draw unit
  */
 const char * lv_draw_unit_get_name(const lv_draw_unit_t * unit);
+
+/**
+ * Get how many descriptors of a type a draw unit has drawn since the last reset,
+ * including those it drew as the fallback of another unit.
+ *
+ * Always 0 if LV_USE_DRAW_COUNTERS is disabled
+ *
+ * @param unit  pointer to a draw unit
+ * @param type  the draw descriptor type
+ * @return      the number of descriptors drawn
+ */
+uint32_t lv_draw_unit_get_draw_count(const lv_draw_unit_t * unit, lv_draw_dsc_type_t type);
+
+/**
+ * Get how many descriptors of a type no draw unit could draw since the last reset.
+ *
+ * Always 0 if LV_USE_DRAW_COUNTERS is disabled
+ *
+ * @param type  the draw descriptor type
+ * @return      the number of descriptors dropped
+ */
+uint32_t lv_draw_get_dropped_count(lv_draw_dsc_type_t type);
+
+/**
+ * Set the draw counts of every draw unit and the dropped counts to 0.
+ */
+void lv_draw_reset_counters(void);
 
 /**********************
  *  GLOBAL VARIABLES

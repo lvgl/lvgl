@@ -128,10 +128,16 @@ struct _lv_draw_unit_t {
      * @param event pointer to the event descriptor
      */
     void (*event_cb)(lv_event_t * event);
+#if LV_USE_DRAW_COUNTERS
+    uint32_t draw_count[LV_DRAW_DSC_TYPE_COUNT];
+#endif
 };
 
 typedef struct {
     lv_draw_unit_t * unit_head;
+#if LV_USE_DRAW_COUNTERS
+    uint32_t dropped_count[LV_DRAW_DSC_TYPE_COUNT];
+#endif
     uint32_t unit_cnt;
     uint32_t used_memory_for_layers; /* measured as bytes */
     lv_mutex_t circle_cache_mutex;

@@ -105,6 +105,27 @@ The `can_draw_*_cb` callbacks must not change anything, so the same Draw Unit is
 consistently, depending on the type (and nature) of the drawing, avoiding any possible
 screen jitter.
 
+## Draw Counters
+
+With <ApiLink name="LV_USE_DRAW_COUNTERS" /> enabled, LVGL counts per descriptor type how many
+descriptors each Draw Unit draws, including those it draws as a fallback, and how many no Draw
+Unit can draw. This shows, for example, whether a GPU draws the images or the software renderer
+does. A rectangle counts its fill, border and shadow separately, and a refresh in several
+areas (e.g. partial rendering) counts each area.
+
+```c
+lv_draw_reset_counters();
+/* ... draw or refresh ... */
+
+lv_draw_unit_t * unit = lv_draw_unit_get_next(NULL);   /* the default Draw Unit */
+while(unit) {
+    LV_LOG_USER("%s: %u images", lv_draw_unit_get_name(unit),
+                lv_draw_unit_get_draw_count(unit, LV_DRAW_DSC_TYPE_IMAGE));
+    unit = lv_draw_unit_get_next(unit);
+}
+LV_LOG_USER("dropped: %u images", lv_draw_get_dropped_count(LV_DRAW_DSC_TYPE_IMAGE));
+```
+
 ## Waiting for the Draw Units
 
 A Draw Unit may queue the drawing instead of finishing it before its draw callback returns,

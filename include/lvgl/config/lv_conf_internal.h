@@ -4285,6 +4285,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_DRAW_COUNTERS
+    #ifdef CONFIG_LV_USE_DRAW_COUNTERS
+        #define LV_USE_DRAW_COUNTERS CONFIG_LV_USE_DRAW_COUNTERS
+    #else
+        #define LV_USE_DRAW_COUNTERS 0
+    #endif
+#endif
+
 
 
 /*============================================================================

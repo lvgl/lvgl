@@ -3417,6 +3417,12 @@ config LV_USE_PARALLEL_DRAW_DEBUG
 	help
 		Draw an overlay in a different color for each draw unit's tasks, with the
 		draw unit's index number on a white background (black for layers).
+
+config LV_USE_DRAW_COUNTERS
+	bool "Draw counters"
+	help
+		Count the descriptors each draw unit draws and those no unit can draw, per draw type.
+
 endmenu
 endmenu
 menu "Build"

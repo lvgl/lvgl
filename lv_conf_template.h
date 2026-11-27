@@ -2248,6 +2248,9 @@
  */
 #define LV_USE_PARALLEL_DRAW_DEBUG 0
 
+/** Count the descriptors each draw unit draws and those no unit can draw, per draw type. */
+#define LV_USE_DRAW_COUNTERS 0
+
 
 
 /*============================================================================

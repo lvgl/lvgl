@@ -107,6 +107,40 @@ uint32_t lv_draw_get_unit_count(void)
     return _draw_info.unit_cnt;
 }
 
+uint32_t lv_draw_unit_get_draw_count(const lv_draw_unit_t * unit, lv_draw_dsc_type_t type)
+{
+    LV_CHECK_ARG(unit != NULL, return 0);
+    LV_CHECK_ARG(type < LV_DRAW_DSC_TYPE_COUNT, return 0);
+#if LV_USE_DRAW_COUNTERS
+    return unit->draw_count[type];
+#else
+    return 0;
+#endif
+}
+
+uint32_t lv_draw_get_dropped_count(lv_draw_dsc_type_t type)
+{
+    LV_CHECK_ARG(type < LV_DRAW_DSC_TYPE_COUNT, return 0);
+#if LV_USE_DRAW_COUNTERS
+    return _draw_info.dropped_count[type];
+#else
+    return 0;
+#endif
+}
+
+void lv_draw_reset_counters(void)
+{
+#if LV_USE_DRAW_COUNTERS
+    lv_draw_unit_t * u = _draw_info.unit_head;
+    while(u) {
+        lv_memset(u->draw_count, 0, sizeof(u->draw_count));
+        u = u->next;
+    }
+
+    lv_memset(_draw_info.dropped_count, 0, sizeof(_draw_info.dropped_count));
+#endif
+}
+
 void lv_draw_dsc_submit(lv_draw_dsc_t * dsc, lv_draw_dsc_type_t type, lv_layer_t * layer, const lv_area_t * coords)
 {
     LV_ASSERT(dsc != NULL);
@@ -164,6 +198,9 @@ void lv_draw_dsc_submit(lv_draw_dsc_t * dsc, lv_draw_dsc_type_t type, lv_layer_t
     }
     else {
         LV_LOG_WARN("Draw dropped (type %d): no draw unit can draw it", (int)type);
+#if LV_USE_DRAW_COUNTERS
+        _draw_info.dropped_count[type]++;
+#endif /* LV_USE_DRAW_COUNTERS */
     }
 
     if(send_events) {
@@ -490,6 +527,7 @@ static lv_area_t * get_dsc_coords(lv_draw_dsc_t * dsc)
             return &((lv_draw_3d_dsc_t *)dsc)->coords;
 #endif
         case LV_DRAW_DSC_TYPE_NONE:
+        case LV_DRAW_DSC_TYPE_COUNT:
         case LV_DRAW_DSC_TYPE_LINE:
         case LV_DRAW_DSC_TYPE_ARC:
         case LV_DRAW_DSC_TYPE_TRIANGLE:
@@ -519,6 +557,7 @@ static bool unit_can_draw_type(lv_draw_unit_t * draw_unit, lv_layer_t * layer, l
 
     switch(dsc->type) {
         case LV_DRAW_DSC_TYPE_NONE:
+        case LV_DRAW_DSC_TYPE_COUNT:
             return false;
         case LV_DRAW_DSC_TYPE_FILL:
             if(cbs->can_draw_fill_cb) return cbs->can_draw_fill_cb(draw_unit, layer, (lv_draw_fill_dsc_t *)dsc);
@@ -579,9 +618,14 @@ static void unit_draw(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_a
     const lv_draw_unit_draw_cbs_t * cbs = draw_unit->draw_cbs;
     LV_ASSERT(cbs != NULL);
 
+#if LV_USE_DRAW_COUNTERS
+    draw_unit->draw_count[dsc->type]++;
+#endif /* LV_USE_DRAW_COUNTERS */
+
     LV_PROFILER_DRAW_BEGIN_TAG(draw_unit->name);
     switch(dsc->type) {
         case LV_DRAW_DSC_TYPE_NONE:
+        case LV_DRAW_DSC_TYPE_COUNT:
             break;
         case LV_DRAW_DSC_TYPE_FILL:
             LV_ASSERT(cbs->draw_fill_cb != NULL);
