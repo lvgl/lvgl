@@ -493,7 +493,7 @@ static lv_obj_t * arc_obj_create(lv_obj_t * parent, int32_t col, int32_t row, in
     lv_obj_t * obj = lv_arc_create(parent);
     lv_obj_remove_style_all(obj);
     lv_obj_set_style_arc_width(obj, w, 0);
-    lv_obj_set_style_arc_color(obj, lv_color_white(), 0);
+    lv_obj_set_style_arc_color(obj, lv_color_black(), 0);
     lv_obj_set_style_opa(obj, opa_saved, 0);
     lv_arc_set_bg_angles(obj, start, end);
     lv_obj_set_size(obj, DEF_HEIGHT, DEF_HEIGHT);
