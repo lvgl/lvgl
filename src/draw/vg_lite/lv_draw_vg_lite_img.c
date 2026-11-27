@@ -63,8 +63,8 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
     vg_lite_buffer_t src_buf;
     lv_image_decoder_dsc_t decoder_dsc;
 
-    /* if not support blend normal, premultiply alpha */
-    bool premultiply = !lv_vg_lite_support_blend_normal();
+    /* the GPU premultiplies the image itself if it can */
+    bool premultiply = !lv_vg_lite_hw_premultiply() && !lv_vg_lite_support_blend_normal();
     if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache, premultiply)) {
         LV_PROFILER_DRAW_END;
         return;

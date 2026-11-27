@@ -202,7 +202,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 lv_area_t bottom = obj->coords;
                 bottom.y1 = bottom.y2 - rout + 1;
                 if(lv_area_intersect(&bottom, &bottom, &layer->_clip_area)) {
-                    layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &bottom);
+                    layer_children = lv_draw_layer_create(layer, LV_DRAW_LAYER_ALPHA_COLOR_FORMAT, &bottom);
 
                     for(i = 0; i < child_cnt; i++) {
                         lv_obj_t * child = obj->spec_attr->children[i];
@@ -223,7 +223,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 lv_area_t top = obj->coords;
                 top.y2 = top.y1 + rout - 1;
                 if(lv_area_intersect(&top, &top, &layer->_clip_area)) {
-                    layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &top);
+                    layer_children = lv_draw_layer_create(layer, LV_DRAW_LAYER_ALPHA_COLOR_FORMAT, &top);
 
                     for(i = 0; i < child_cnt; i++) {
                         lv_obj_t * child = obj->spec_attr->children[i];
@@ -615,7 +615,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
             }
 
             lv_layer_t * new_layer = lv_draw_layer_create(layer,
-                                                          area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_DEFAULT, &layer_area_act);
+                                                          area_need_alpha ? LV_DRAW_LAYER_ALPHA_COLOR_FORMAT : LV_COLOR_FORMAT_DEFAULT, &layer_area_act);
             lv_obj_redraw(new_layer, obj);
 
             lv_point_t pivot = {

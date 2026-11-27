@@ -188,7 +188,7 @@ void lv_draw_vg_lite_line(lv_layer_t * layer, const lv_area_t * clip_area,
         VG_LITE_FILL_EVEN_ODD,
         &matrix,
         VG_LITE_BLEND_SRC_OVER,
-        lv_vg_lite_color(dsc->color, dsc->opa, true));
+        lv_vg_lite_paint_color(dsc->color, dsc->opa));
 
     lv_vg_lite_path_drop(u, path);
 

@@ -33,6 +33,16 @@ extern "C" {
 #define LV_DRAW_UNIT_NONE  0
 #define LV_DRAW_UNIT_IDLE  -1   /**< The draw unit is idle, new dispatching might be requested to try again */
 
+/**
+ * The color format of LVGL's own layers that need alpha. Premultiplied when VG-Lite is enabled: every VG-Lite GPU
+ * can draw into it, and the GPU doesn't have to divide by alpha on every write.
+ */
+#if LV_USE_DRAW_VG_LITE
+#define LV_DRAW_LAYER_ALPHA_COLOR_FORMAT LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
+#else
+#define LV_DRAW_LAYER_ALPHA_COLOR_FORMAT LV_COLOR_FORMAT_ARGB8888
+#endif
+
 #if LV_DRAW_TRANSFORM_USE_MATRIX
 #if !LV_USE_MATRIX
 #error "LV_DRAW_TRANSFORM_USE_MATRIX requires LV_USE_MATRIX = 1"

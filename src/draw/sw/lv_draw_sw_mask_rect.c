@@ -83,6 +83,7 @@ void lv_draw_sw_mask_rect(lv_layer_t * layer, const lv_area_t * clip_area, const
     void * masks[2] = {0};
     masks[0] = &param;
 
+    const bool premultiplied = layer->color_format == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
     uint32_t area_w = lv_area_get_width(&draw_area);
     lv_opa_t * mask_buf = lv_malloc(area_w);
 
@@ -97,6 +98,17 @@ void lv_draw_sw_mask_rect(lv_layer_t * layer, const lv_area_t * clip_area, const
 
         if(res == LV_DRAW_SW_MASK_RES_TRANSP) {
             lv_memzero(c32_buf, area_w * sizeof(lv_color32_t));
+        }
+        else if(premultiplied) {
+            uint32_t i;
+            for(i = 0; i < area_w; i++) {
+                if(mask_buf[i] != LV_OPA_COVER) {
+                    c32_buf[i].red = LV_OPA_MIX2(c32_buf[i].red, mask_buf[i]);
+                    c32_buf[i].green = LV_OPA_MIX2(c32_buf[i].green, mask_buf[i]);
+                    c32_buf[i].blue = LV_OPA_MIX2(c32_buf[i].blue, mask_buf[i]);
+                    c32_buf[i].alpha = LV_OPA_MIX2(c32_buf[i].alpha, mask_buf[i]);
+                }
+            }
         }
         else {
             uint32_t i;

@@ -325,7 +325,7 @@
 
 /** Renders with a VG-Lite GPU. Requires a VG-Lite driver, or the VG-Lite simulator below.
  *
- *  Enable: LV_USE_MATRIX
+ *  Enable: LV_USE_MATRIX, LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
  */
 #define LV_USE_DRAW_VG_LITE 0
 
@@ -396,6 +396,11 @@
 #if LV_USE_VG_LITE_THORVG
 /** LVGL blend modes */
 #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
+
+/** Report the hardware premultiplication of GC355 and GC555: honour the buffers' premultiplied flags in the
+ *  OpenVG blend modes. Disable it to simulate a GPU without it, such as GC255.
+ */
+#define LV_VG_LITE_THORVG_HW_PREMULTIPLY_SUPPORT 1
 
 /** YUV color formats */
 #define LV_VG_LITE_THORVG_YUV_SUPPORT 0

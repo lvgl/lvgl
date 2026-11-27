@@ -162,13 +162,16 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
     if(dsc->img_src) {
         vg_lite_buffer_t src_buf;
         lv_image_decoder_dsc_t decoder_dsc;
-        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false, true)) {
+        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false,
+                                        !lv_vg_lite_hw_premultiply())) {
 
             vg_lite_color_t img_color = 0;
             if(dsc->opa < LV_OPA_COVER) {
                 /* normal image opa */
                 src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-                lv_memset(&img_color, dsc->opa, sizeof(img_color));
+                const bool pre_mul = !lv_vg_lite_gpu_premultiplies_image_color(src_buf.format, VG_LITE_BLEND_SRC_OVER,
+                                                                               true);
+                img_color = lv_vg_lite_color(lv_color_white(), dsc->opa, pre_mul);
             }
 
             vg_lite_matrix_t path_matrix = u->global_matrix;
@@ -202,7 +205,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
             fill,
             &matrix,
             VG_LITE_BLEND_SRC_OVER,
-            lv_vg_lite_color(dsc->color, dsc->opa, true));
+            lv_vg_lite_paint_color(dsc->color, dsc->opa));
     }
 
     lv_vg_lite_path_drop(u, path);

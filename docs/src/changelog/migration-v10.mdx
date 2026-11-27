@@ -482,6 +482,23 @@ and are not meant to be included directly.
    void my_custom_blend_handler(lv_layer_t * layer, const lv_area_t * clip_area, const lv_draw_sw_blend_dsc_t * dsc);
    ```
 
+### VG-Lite draw unit
+
+- On GPUs that premultiply in hardware (for example GC355 and GC555), VG-Lite no longer writes premultiplied pixels
+  into straight-alpha buffers (`LV_COLOR_FORMAT_ARGB8888`, `ARGB1555`, `ARGB4444`, `ARGB2222`, `ARGB8565`) and no
+  longer marks them with `LV_IMAGE_FLAGS_PREMULTIPLIED`: it writes them in straight alpha, as their format says. If a
+  `flush_cb`, or other code, read an `ARGB8888` display buffer or canvas as premultiplied because of the flag, read
+  it as straight alpha now.
+- On GPUs without hardware premultiplication (for example GC255), `ARGB8888` buffers are drawn by the software
+  renderer if it's enabled with `LV_DRAW_SW_SUPPORT_ARGB8888`. The other straight-alpha buffers are still drawn by
+  VG-Lite, premultiplied and marked as before. A warning is logged once in both cases. Use
+  `LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED`, or a format without alpha, to keep the display or canvas on the GPU.
+- LVGL's own intermediate layers are created in <ApiLink name="LV_DRAW_LAYER_ALPHA_COLOR_FORMAT" />, which is
+  `LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED` when VG-Lite is enabled, and <ApiLink name="LV_USE_DRAW_VG_LITE" /> selects
+  <ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED" />. With an `lv_conf.h`, enable it when the software
+  renderer is enabled too.
+  See [Render Target Color Formats](/integration/chip_vendors/nxp/vg_lite_gpu#render-target-color-formats).
+
 ### Image
 
 - `lv_draw_image_core_cb` callback no longer takes a `lv_draw_task_t *`, instead the target layer is passed directly.

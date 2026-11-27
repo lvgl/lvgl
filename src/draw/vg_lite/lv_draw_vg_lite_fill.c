@@ -100,7 +100,7 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
             VG_LITE_FILL_EVEN_ODD,
             &matrix,
             VG_LITE_BLEND_SRC_OVER,
-            lv_vg_lite_color(dsc->color, dsc->opa, true));
+            lv_vg_lite_paint_color(dsc->color, dsc->opa));
     }
 
     lv_vg_lite_path_drop(u, path);

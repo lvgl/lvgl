@@ -179,8 +179,21 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
 
     lv_vg_lite_buffer_from_draw_buf(&u->target_buffer, layer->draw_buf);
 
-    /* VG-Lite will output premultiplied image, set the flag correspondingly. */
-    lv_draw_buf_set_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    /* Without hardware premultiplication the pixels written into a straight-alpha target are premultiplied anyway
+     * (see lv_vg_lite_is_dest_cf_supported()) */
+    if(!lv_vg_lite_hw_premultiply()) {
+        switch(layer->color_format) {
+            case LV_COLOR_FORMAT_ARGB8888:
+            case LV_COLOR_FORMAT_ARGB1555:
+            case LV_COLOR_FORMAT_ARGB4444:
+            case LV_COLOR_FORMAT_ARGB2222:
+            case LV_COLOR_FORMAT_ARGB8565:
+                lv_draw_buf_set_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+                break;
+            default:
+                break;
+        }
+    }
 
     vg_lite_identity(&u->global_matrix);
     if(layer->buf_area.x1 || layer->buf_area.y1) {

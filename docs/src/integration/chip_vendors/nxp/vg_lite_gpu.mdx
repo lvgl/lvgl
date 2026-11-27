@@ -100,6 +100,32 @@ you can try increasing the size of the GPU memory pool or reducing the number of
 
 </Steps>
 
+## Render Target Color Formats
+
+The GPU blends in premultiplied alpha. What it can write depends on whether it premultiplies in hardware
+(`gcFEATURE_BIT_VG_HW_PREMULTIPLY`, for example GC355 and GC555):
+
+- **With hardware premultiplication**, VG-Lite draws into premultiplied targets
+  (`LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED`), into targets without alpha (`LV_COLOR_FORMAT_XRGB8888`,
+  `LV_COLOR_FORMAT_RGB565`, ...) and into straight-alpha targets (`LV_COLOR_FORMAT_ARGB8888`, `ARGB1555`,
+  `ARGB4444`, `ARGB2222`). Each target is written in its own format: a straight-alpha display buffer or canvas holds
+  straight pixels.
+- **Without it** (for example GC255), VG-Lite writes premultiplied pixels into every target. Drawing into an
+  `LV_COLOR_FORMAT_ARGB8888` target is left to the software renderer, if it's enabled with
+  <ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888" />. The other straight-alpha targets (and `ARGB8888` without the
+  software renderer) are still drawn by VG-Lite and marked with `LV_IMAGE_FLAGS_PREMULTIPLIED`: opaque pixels are
+  right, but translucent ones are premultiplied, too dark for anything that reads them as straight alpha. A warning
+  is logged once in both cases. To keep such a display or canvas on the GPU, and correct, use
+  `LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED` instead, or a format without alpha if no transparency is needed.
+
+`LV_COLOR_FORMAT_RGB888` and `LV_COLOR_FORMAT_ARGB8565` targets also need `gcFEATURE_BIT_VG_24BIT`.
+
+LVGL's own intermediate layers (for example of widgets with `opa_layered`, or with a transformation) are created
+in <ApiLink name="LV_DRAW_LAYER_ALPHA_COLOR_FORMAT" />, which is `LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED` when
+VG-Lite is enabled, on every GPU. Use it for the layers created with <ApiLink name="lv_draw_layer_create" /> too.
+Because the software renderer may draw into these layers as well, <ApiLink name="LV_USE_DRAW_VG_LITE" /> selects
+<ApiLink name="LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED" />.
+
 ## VG-Lite Simulator
 
 LVGL integrates a VG-Lite simulator based on ThorVG.

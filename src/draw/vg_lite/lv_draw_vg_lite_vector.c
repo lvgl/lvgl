@@ -95,13 +95,7 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, lv_layer_t * layer, cons
 
 static vg_lite_color_t lv_color32_to_vg(lv_color32_t color, lv_opa_t opa)
 {
-    uint8_t a = LV_OPA_MIX2(color.alpha, opa);
-    if(a < LV_OPA_COVER) {
-        color.red = LV_UDIV255(color.red * a);
-        color.green = LV_UDIV255(color.green * a);
-        color.blue = LV_UDIV255(color.blue * a);
-    }
-    return (uint32_t)a << 24 | (uint32_t)color.blue << 16 | (uint32_t)color.green << 8 | color.red;
+    return lv_vg_lite_paint_color(lv_color_make(color.red, color.green, color.blue), OPA_MIX(color.alpha, opa));
 }
 
 static void draw_fill(lv_draw_vg_lite_unit_t * u,
@@ -139,7 +133,8 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                 /* draw image */
                 vg_lite_buffer_t image_buffer;
                 lv_image_decoder_dsc_t decoder_dsc;
-                if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, ctx->fill_dsc.img_dsc.src, false, true)) {
+                if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, ctx->fill_dsc.img_dsc.src, false,
+                                                !lv_vg_lite_hw_premultiply())) {
                     /* Calculate pattern matrix. Should start from path bond box, and also apply fill matrix. */
                     vg_lite_matrix_t pattern_matrix = *matrix;
 
