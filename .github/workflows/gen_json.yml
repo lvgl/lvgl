@@ -26,9 +26,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install doxygen texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
+          doxygen --version
 
       - name: Install requirements
-        run: pip install -r scripts/gen_json/requirements.txt
+        run: python3 -m pip install pytest -r scripts/gen_json/requirements.txt
 
       - name: Run test
-        run: python3 tests/gen_json/test_gen_json.py
+        run: python3 -m pytest tests/gen_json/ -q
