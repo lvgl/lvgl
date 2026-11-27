@@ -72,9 +72,9 @@ void test_arc_rgb565a8_image(void)
 
 void test_arc_a8_image(void)
 {
-#if LV_BIN_DECODER_RAM_LOAD
     /*An A8 image is an alpha mask: the arc is drawn in its own color through it.
      *Drawn over a checkerboard so that translucency shows.*/
+    LV_IMAGE_DECLARE(test_image_cogwheel_a8);
     lv_draw_buf_t * checker = lv_draw_buf_create(100, 100, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(checker);
     uint32_t x, y;
@@ -102,7 +102,7 @@ void test_arc_a8_image(void)
         lv_arc_set_value(arc, 70);
         lv_obj_set_style_arc_opa(arc, LV_OPA_TRANSP, 0);
         lv_obj_set_style_arc_width(arc, 30, LV_PART_INDICATOR);
-        lv_obj_set_style_arc_image_src(arc, "A:src/test_files/binimages/cogwheel.A8.bin", LV_PART_INDICATOR);
+        lv_obj_set_style_arc_image_src(arc, &test_image_cogwheel_a8, LV_PART_INDICATOR);
         lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
         lv_obj_set_style_arc_opa(arc, opas[i], LV_PART_INDICATOR);
         lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
@@ -113,7 +113,6 @@ void test_arc_a8_image(void)
     lv_obj_clean(active_screen);
     lv_image_cache_drop(checker);
     lv_draw_buf_destroy(checker);
-#endif
 }
 
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void)

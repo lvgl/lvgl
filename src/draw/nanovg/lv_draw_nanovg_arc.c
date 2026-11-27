@@ -162,6 +162,10 @@ void lv_draw_nanovg_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv
                                          header.w, header.h, 0,
                                          image_handle,
                                          dsc->opa / (float)LV_OPA_COVER);
+        if(header.cf == LV_COLOR_FORMAT_A8) {
+            /* alpha only image: the arc's color drawn through it */
+            paint.innerColor = paint.outerColor = nvgRGBA(dsc->color.red, dsc->color.green, dsc->color.blue, dsc->opa);
+        }
         nvgFillPaint(u->vg, paint);
         nvgFill(u->vg);
     }
