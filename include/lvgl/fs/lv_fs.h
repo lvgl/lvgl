@@ -93,6 +93,19 @@ struct _lv_fs_drv_t {
     lv_fs_res_t (*seek_cb)(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
     lv_fs_res_t (*tell_cb)(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 
+    /**
+     * Optional. Give a read-only pointer to `len` bytes of an open file, starting at `offset`.
+     * The range is within the file and `len` is not 0. The pointer must stay valid until
+     * `unmap_cb` is called with it, or until the file is closed when there is no `unmap_cb`.
+     * Must not change the file position. Return `LV_FS_RES_NOT_IMP` if this file can't be mapped.
+     */
+    lv_fs_res_t (*map_cb)(lv_fs_drv_t * drv, void * file_p, uint32_t offset, uint32_t len, const void ** ptr);
+
+    /**
+     * Optional. Release a mapping made by `map_cb`; `ptr` and `len` are the ones `map_cb` got and gave.
+     */
+    lv_fs_res_t (*unmap_cb)(lv_fs_drv_t * drv, void * file_p, const void * ptr, uint32_t len);
+
     void * (*dir_open_cb)(lv_fs_drv_t * drv, const char * path);
     lv_fs_res_t (*dir_read_cb)(lv_fs_drv_t * drv, void * rddir_p, char * fn, uint32_t fn_len);
     lv_fs_res_t (*dir_close_cb)(lv_fs_drv_t * drv, void * rddir_p);
@@ -246,6 +259,36 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
  * @return          LV_FS_RES_OK or any error from 'fs_res_t'
  */
 lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos);
+
+/**
+ * Get a read-only pointer to a range of an open file, without copying it.
+ * The pointer stays valid until `lv_fs_unmap` is called with it which must be called
+ * before `lv_fs_close`.
+ *
+ * A file can have several mappings at once, also overlapping ones.
+ *
+ * The mapped range must not change while it is mapped so on't write or truncate the file until
+ * every mapping of it is released.
+ *
+ * @param file_p    pointer to an open `lv_fs_file_t`
+ * @param offset    start of the range in the file, in bytes
+ * @param len       length of the range in bytes, not 0
+ * @param ptr       set to the start of the range on success, left unchanged on failure
+ * @return          LV_FS_RES_OK on success;
+ *                  LV_FS_RES_NOT_IMP if the drive can't map files: read the range with `lv_fs_read` instead;
+ *                  LV_FS_RES_INV_PARAM if `len` is 0 or the range doesn't fit in the file;
+ *                  another error code from the driver otherwise
+ */
+lv_fs_res_t lv_fs_map(lv_fs_file_t * file_p, uint32_t offset, uint32_t len, const void ** ptr);
+
+/**
+ * Release a mapping made by `lv_fs_map`. The pointer must not be used afterwards.
+ * @param file_p    the file the mapping was made from
+ * @param ptr       the pointer `lv_fs_map` gave @nullable
+ * @param len       the `len` given to `lv_fs_map`
+ * @return          LV_FS_RES_OK on success, or an error code
+ */
+lv_fs_res_t lv_fs_unmap(lv_fs_file_t * file_p, const void * ptr, uint32_t len);
 
 /**
  * Get the size in bytes of an open file.
