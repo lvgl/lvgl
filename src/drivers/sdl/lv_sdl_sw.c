@@ -171,11 +171,9 @@ static lv_result_t resize_display(lv_display_t * display)
     ddata->fb1 = sdl_draw_buf_realloc_aligned(ddata->fb1, stride * display->ver_res);
     LV_ASSERT_MALLOC(ddata->fb1);
     lv_memzero(ddata->fb1, stride * display->ver_res);
+    ddata->fb_act = ddata->fb1;
 
-    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        ddata->fb_act = ddata->fb1;
-    }
-    else {
+    if(sdl_render_mode() != LV_DISPLAY_RENDER_MODE_PARTIAL) {
         if(LV_SDL_BUF_COUNT == 2) {
             ddata->fb2 = sdl_draw_buf_realloc_aligned(ddata->fb2, stride * display->ver_res);
             lv_memset(ddata->fb2, 0x00, stride * display->ver_res);
