@@ -168,6 +168,11 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
     LV_PROFILER_DECODER_END_TAG(dsc->decoder->name);
 
+    if(res == LV_RESULT_OK && dsc->cache_entry != NULL) {
+        lv_image_cache_data_t * cached_data = lv_cache_entry_get_data(dsc->cache_entry);
+        cached_data->header = dsc->header;
+    }
+
     if(res == LV_RESULT_OK && dsc->decoded != NULL) {
         LV_ASSERT_MSG(dsc->decoded->unaligned_data && dsc->decoded->handlers, "Invalid draw buffer");
 
@@ -514,6 +519,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
         lv_image_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
         dsc->decoded = cached_data->decoded;
         dsc->decoder = (lv_image_decoder_t *)cached_data->decoder;
+        dsc->header = cached_data->header;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
         LV_PROFILER_DECODER_END;
         return LV_RESULT_OK;

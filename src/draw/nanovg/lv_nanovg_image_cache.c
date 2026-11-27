@@ -142,7 +142,7 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
     }
 
     if(header) {
-        *header = decoder_dsc.header;
+        *header = decoded->header;
     }
 
     image_item_t item = { 0 };

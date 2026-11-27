@@ -720,11 +720,17 @@ static int glnvg__renderCreate(void * uptr)
         "#else\n"
         "		vec4 color = texture2D(tex, pt);\n"
         "#endif\n"
-        "		if (texType == 1) color = vec4(color.xyz*color.w,color.w);"
-        "		else if (texType == 2) color = vec4(color.x);"
-        "		else if (texType == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle (premultiplied)
-        "		else if (texType == 4) color = vec4(color.bgr, 1.0);"  // BGRX -> RGB with alpha=1
-        "		else if (texType == 5) color = vec4(color.bgr*color.a, color.a);"  // BGR swizzle + premultiply
+        "		int tt = texType >= 8 ? texType - 8 : texType;\n"
+        "		if (tt == 1) color = vec4(color.xyz*color.w,color.w);"
+        "		else if (tt == 2) color = vec4(color.x);"
+        "		else if (tt == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle (premultiplied)
+        "		else if (tt == 4) color = vec4(color.bgr, 1.0);"  // BGRX -> RGB with alpha=1
+        "		else if (tt == 5) color = vec4(color.bgr*color.a, color.a);"  // BGR swizzle + premultiply
+        "		if (texType >= 8) {\n"
+        "			// Clamp to a transparent border: fade out over the edge texel like bilinear filtering does.\n"
+        "			vec2 d = min(v_paintPos, extent - v_paintPos);\n"
+        "			color *= clamp(0.5 + min(d.x, d.y), 0.0, 1.0);\n"
+        "		}\n"
         "		// Apply image recolor (premultiplied-aware) before tint/opacity.\n"
         "		if (recolor.a > 0.0) color.rgb = mix(color.rgb, recolor.rgb*color.a, recolor.a);\n"
         "		// Apply color tint and alpha.\n"
@@ -740,11 +746,12 @@ static int glnvg__renderCreate(void * uptr)
         "#else\n"
         "		vec4 color = texture2D(tex, ftcoord);\n"
         "#endif\n"
-        "		if (texType == 1) color = vec4(color.xyz*color.w,color.w);"
-        "		else if (texType == 2) color = vec4(color.x);"
-        "		else if (texType == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle (premultiplied)
-        "		else if (texType == 4) color = vec4(color.bgr, 1.0);"  // BGRX -> RGB with alpha=1
-        "		else if (texType == 5) color = vec4(color.bgr*color.a, color.a);"  // BGR swizzle + premultiply
+        "		int tt = texType >= 8 ? texType - 8 : texType;\n"
+        "		if (tt == 1) color = vec4(color.xyz*color.w,color.w);"
+        "		else if (tt == 2) color = vec4(color.x);"
+        "		else if (tt == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle (premultiplied)
+        "		else if (tt == 4) color = vec4(color.bgr, 1.0);"  // BGRX -> RGB with alpha=1
+        "		else if (tt == 5) color = vec4(color.bgr*color.a, color.a);"  // BGR swizzle + premultiply
         "		color *= scissor;\n"
         "		result = color * innerCol;\n"
         "	#endif\n"
@@ -1084,6 +1091,9 @@ static int glnvg__convertPaint(GLNVGcontext * gl, GLNVGfragUniforms * frag, NVGp
         else
             frag->s.texType = 2.0f;
 #endif
+        /* The shader takes texType >= 8 as texType - 8 plus NVG_IMAGE_CLAMP_TO_BORDER. */
+        if(tex->flags & NVG_IMAGE_CLAMP_TO_BORDER)
+            frag->s.texType += 8;
         //      printf("frag->texType = %d\n", frag->texType);
         frag->s.recolor = paint->recolor;
     }
