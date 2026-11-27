@@ -164,8 +164,14 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
         lv_image_decoder_dsc_t decoder_dsc;
         if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false, true)) {
 
+            const vg_lite_blend_t blend = VG_LITE_BLEND_SRC_OVER;
             vg_lite_color_t img_color = 0;
-            if(dsc->opa < LV_OPA_COVER) {
+            if(src_buf.format == VG_LITE_A8 || src_buf.format == VG_LITE_A4) {
+                /* alpha only image: the arc's color drawn through it (already in multiply mode) */
+                img_color = lv_vg_lite_color(dsc->color, dsc->opa,
+                                             !lv_vg_lite_gpu_premultiplies_image_color(src_buf.format, blend, true));
+            }
+            else if(dsc->opa < LV_OPA_COVER) {
                 /* normal image opa */
                 src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
                 lv_memset(&img_color, dsc->opa, sizeof(img_color));
@@ -185,7 +191,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const l
                 &path_matrix,
                 &src_buf,
                 &matrix,
-                VG_LITE_BLEND_SRC_OVER,
+                blend,
                 VG_LITE_PATTERN_COLOR,
                 0,
                 img_color,
