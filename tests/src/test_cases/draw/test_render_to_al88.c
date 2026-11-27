@@ -5,6 +5,27 @@
 
 #include "unity/unity.h"
 
+/*Scenes that render slightly differently in 32 and 64 bit builds have a reference for each*/
+static inline const char * ref_img_ext(uint32_t scene)
+{
+    LV_UNUSED(scene);
+    bool per_bitness = false;
+#if LV_USE_VECTOR_GRAPHIC
+    if(scene == LV_DEMO_RENDER_SCENE_VECTOR) per_bitness = true;
+#endif
+#if LV_USE_DRAW_VG_LITE
+    if(scene == LV_DEMO_RENDER_SCENE_MASK_RECT) per_bitness = true;
+    if(scene == LV_DEMO_RENDER_SCENE_DROP_SHADOW) per_bitness = true;
+#endif
+    if(!per_bitness) return ".png";
+
+#ifndef NON_AMD64_BUILD
+    return ".lp64.png";
+#else
+    return ".lp32.png";
+#endif
+}
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -38,8 +59,8 @@ void test_render_to_al88(void)
             lv_demo_render(i, opa_values[opa]);
 
             char buf[128];
-            lv_snprintf(buf, sizeof(buf), "draw/render/al88/demo_render_%s_opa_%d.png",
-                        lv_demo_render_get_scene_name(i), opa_values[opa]);
+            lv_snprintf(buf, sizeof(buf), "draw/render/al88/demo_render_%s_opa_%d%s",
+                        lv_demo_render_get_scene_name(i), opa_values[opa], ref_img_ext(i));
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
         }
     }
