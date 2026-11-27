@@ -274,6 +274,20 @@ void lv_draw_layer_deinit(lv_layer_t * layer);
  */
 void lv_draw_layer_delete(lv_layer_t * layer);
 
+/**
+ * Get the next draw unit.
+ * @param unit  a draw unit, or NULL to get the first one, which is the main unit   @nullable
+ * @return      the draw unit after `unit`, or NULL after the last one
+ */
+lv_draw_unit_t * lv_draw_unit_get_next(lv_draw_unit_t * unit);
+
+/**
+ * Get the name of a draw unit, e.g. "SW".
+ * @param unit  pointer to a draw unit
+ * @return      the name of the draw unit
+ */
+const char * lv_draw_unit_get_name(const lv_draw_unit_t * unit);
+
 /**********************
  *  GLOBAL VARIABLES
  **********************/

@@ -173,6 +173,20 @@ void lv_draw_dsc_submit(lv_draw_dsc_t * dsc, lv_draw_dsc_type_t type, lv_layer_t
     }
 }
 
+lv_draw_unit_t * lv_draw_unit_get_next(lv_draw_unit_t * unit)
+{
+    if(!unit) {
+        return _draw_info.unit_head;
+    }
+    return unit->next;
+}
+
+const char * lv_draw_unit_get_name(const lv_draw_unit_t * unit)
+{
+    LV_CHECK_ARG(unit != NULL, return NULL);
+    return unit->name;
+}
+
 void lv_draw_unit_send_event(const char * name, lv_event_code_t code, void * param)
 {
     LV_PROFILER_DRAW_BEGIN;
