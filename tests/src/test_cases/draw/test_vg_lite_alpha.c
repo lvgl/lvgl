@@ -69,6 +69,11 @@ static void assert_case(lv_test_alpha_widget_id_t widget, lv_test_alpha_bg_id_t 
     lv_draw_buf_t * buf = render_scene(widget, bg);
     lv_color32_t expected = lv_test_alpha_expected(widget, bg);
 
+    /* A straight-alpha buffer has to hold straight pixels, not premultiplied ones marked with the flag */
+    if(cf == LV_COLOR_FORMAT_ARGB8888) {
+        TEST_ASSERT_FALSE_MESSAGE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED), "premultiplied flag");
+    }
+
     lv_test_alpha_pixel_t px = lv_test_alpha_scene_read(buf, point);
     print_pixel(buf, &px, expected);
     /* Blending two colors rounds once more than drawing on nothing. Alpha has
@@ -165,6 +170,80 @@ void test_vg_lite_alpha_vector_opa_77_on_translucent_premultiplied(void)
 {
     assert_case(LV_TEST_ALPHA_WIDGET_VECTOR_OPA_77, LV_TEST_ALPHA_BG_TRANSLUCENT,
                 LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
+}
+
+/* Translucent results in a straight-alpha display buffer */
+
+void test_vg_lite_alpha_obj_opa_77_on_none(void)
+{
+    assert_case(LV_TEST_ALPHA_WIDGET_OBJ_OPA_77, LV_TEST_ALPHA_BG_NONE, LV_COLOR_FORMAT_ARGB8888);
+}
+
+void test_vg_lite_alpha_obj_opa_77_on_translucent(void)
+{
+    assert_case(LV_TEST_ALPHA_WIDGET_OBJ_OPA_77, LV_TEST_ALPHA_BG_TRANSLUCENT, LV_COLOR_FORMAT_ARGB8888);
+}
+
+void test_vg_lite_alpha_button_opa_dd_on_none(void)
+{
+    assert_case(LV_TEST_ALPHA_WIDGET_BUTTON_OPA_DD, LV_TEST_ALPHA_BG_NONE, LV_COLOR_FORMAT_ARGB8888);
+}
+
+void test_vg_lite_alpha_button_opa_dd_on_translucent(void)
+{
+    assert_case(LV_TEST_ALPHA_WIDGET_BUTTON_OPA_DD, LV_TEST_ALPHA_BG_TRANSLUCENT, LV_COLOR_FORMAT_ARGB8888);
+}
+
+void test_vg_lite_alpha_vector_opa_77_on_none(void)
+{
+    assert_case(LV_TEST_ALPHA_WIDGET_VECTOR_OPA_77, LV_TEST_ALPHA_BG_NONE, LV_COLOR_FORMAT_ARGB8888);
+}
+
+void test_vg_lite_alpha_vector_opa_77_on_translucent(void)
+{
+    assert_case(LV_TEST_ALPHA_WIDGET_VECTOR_OPA_77, LV_TEST_ALPHA_BG_TRANSLUCENT, LV_COLOR_FORMAT_ARGB8888);
+}
+
+/* An application's own straight-alpha buffer: a translucent rectangle drawn on a translucent ARGB8888 canvas */
+void test_vg_lite_alpha_argb8888_canvas(void)
+{
+#if LV_USE_DRAW_NANOVG
+    TEST_IGNORE_MESSAGE("NanoVG's readback replaces the canvas' content");
+#endif
+    lv_draw_buf_t * buf = lv_draw_buf_create(100, 100, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_canvas_set_draw_buf(canvas, buf);
+    lv_canvas_fill_bg(canvas, lv_color_hex(0x00ff00), 0x80);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_draw_rect_dsc_init(&rect_dsc);
+    rect_dsc.bg_color = lv_color_hex(0xff0000);
+    rect_dsc.bg_opa = 0x77;
+    lv_area_t area = {40, 40, 59, 59};
+    lv_draw_rect(&layer, &rect_dsc, &area);
+    lv_canvas_finish_layer(canvas, &layer);
+
+    TEST_ASSERT_FALSE_MESSAGE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED), "premultiplied flag");
+
+    /* Red @ 0x77 over green @ 0x80, source-over in straight alpha */
+    lv_color32_t px = *(const lv_color32_t *)lv_draw_buf_goto_xy(buf, 50, 50);
+    TEST_ASSERT_UINT8_WITHIN_MESSAGE(2, 0xa2, px.red, "red");
+    TEST_ASSERT_UINT8_WITHIN_MESSAGE(2, 0x5d, px.green, "green");
+    TEST_ASSERT_UINT8_WITHIN_MESSAGE(2, 0x00, px.blue, "blue");
+    TEST_ASSERT_UINT8_WITHIN_MESSAGE(1, 0xbb, px.alpha, "alpha");
+
+    /* Outside the rectangle the background stays as it was */
+    px = *(const lv_color32_t *)lv_draw_buf_goto_xy(buf, 10, 10);
+    TEST_ASSERT_EQUAL_HEX8_MESSAGE(0x00, px.red, "red");
+    TEST_ASSERT_EQUAL_HEX8_MESSAGE(0xff, px.green, "green");
+    TEST_ASSERT_EQUAL_HEX8_MESSAGE(0x00, px.blue, "blue");
+    TEST_ASSERT_EQUAL_HEX8_MESSAGE(0x80, px.alpha, "alpha");
+
+    lv_obj_delete(canvas);
+    lv_draw_buf_destroy(buf);
 }
 
 #endif
