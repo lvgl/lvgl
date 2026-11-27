@@ -19,6 +19,7 @@ extern "C" {
 #if LV_USE_DRAW_VG_LITE
 
 #include "../lv_draw_private.h"
+#include "../../misc/lv_array.h"
 
 #if LV_USE_VG_LITE_THORVG
 #include "../../debugging/vg_lite_tvg/vg_lite.h"
@@ -44,6 +45,7 @@ struct _lv_vg_lite_grad_ctx_t;
 typedef struct _lv_draw_vg_lite_unit_t {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
+    lv_array_t queued_tasks; /*lv_draw_task_t *, drawn by the GPU only after lv_vg_lite_finish()*/
     lv_area_t current_scissor_area;
 
     struct _lv_vg_lite_pending_t * image_dsc_pending;

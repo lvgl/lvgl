@@ -36,11 +36,27 @@ void lv_draw_vg_lite_init(void);
 
 void lv_draw_vg_lite_deinit(void);
 
+/**
+ * Mark the draw tasks queued to the GPU as finished. Call it when the GPU has drawn everything.
+ * Until then the draw tasks of other draw units that depend on them can't start.
+ * @param u     pointer to the VG-Lite draw unit
+ */
+void lv_draw_vg_lite_finish_queued_tasks(struct _lv_draw_vg_lite_unit_t * u);
+
 void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                          const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_vg_lite_box_shadow(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_area_t * clip_area,
                                 const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
+
+/**
+ * Check whether VG-Lite should draw a box shadow. It can't cut a non-covering object out of every shadow,
+ * so those are left to SW, unless SW can't draw into the layer.
+ * @param dsc       the box shadow descriptor
+ * @param layer_cf  the color format of the target layer
+ * @return          true: VG-Lite should draw it
+ */
+bool lv_draw_vg_lite_box_shadow_is_supported(const lv_draw_box_shadow_dsc_t * dsc, lv_color_format_t layer_cf);
 
 void lv_draw_vg_lite_blur(lv_draw_unit_t * u, lv_layer_t * layer, const lv_area_t * clip_area,
                           const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
