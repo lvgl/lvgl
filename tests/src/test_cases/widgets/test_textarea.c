@@ -157,6 +157,13 @@ void test_textarea_should_update_placeholder_text(void)
     TEST_ASSERT_EQUAL_STRING("", lv_textarea_get_placeholder_text(textarea));
 }
 
+void test_textarea_placeholder_text_is_shaped(void)
+{
+    /* "سلا": seen initial U+FEB3, lam-alef final U+FEFC */
+    lv_textarea_set_placeholder_text(textarea, "\xD8\xB3\xD9\x84\xD8\xA7");
+    TEST_ASSERT_EQUAL_STRING("\xEF\xBA\xB3\xEF\xBB\xBC", lv_textarea_get_placeholder_text(textarea));
+}
+
 void test_textarea_should_keep_only_accepted_chars(void)
 {
     const char * accepted_list = "abcd";
