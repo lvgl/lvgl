@@ -12,6 +12,7 @@
 
 #include "lv_scale_private.h"
 #include "../../misc/lv_text_private.h"
+#include "../../misc/lv_text_ap.h"
 #include "../../core/lv_observer_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_style_internal.h"
@@ -22,7 +23,12 @@
  *********************/
 #define MY_CLASS (&lv_scale_class)
 
-#define LV_SCALE_LABEL_TXT_LEN          (20U)
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    /* Also holds the shaped custom labels */
+    #define LV_SCALE_LABEL_TXT_LEN          (256U)
+#else
+    #define LV_SCALE_LABEL_TXT_LEN          (20U)
+#endif
 #define LV_SCALE_DEFAULT_ANGLE_RANGE    ((uint32_t) 270U)
 #define LV_SCALE_DEFAULT_ROTATION       ((int32_t) 135U)
 #define LV_SCALE_TICK_IDX_DEFAULT_ID    ((uint32_t) 255U)
@@ -71,7 +77,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                                                              lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
                                                              const int32_t tick_value, const uint8_t tick_idx, lv_point_t * tick_point_a);
 static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
-                                          const uint16_t major_tick_idx);
+                                          const uint16_t major_tick_idx, char * text_buffer);
 
 static void scale_free_line_needle_points_cb(lv_event_t * e);
 
@@ -962,7 +968,7 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
 
     /* Check if the custom text array has element for this major tick index */
     if(scale->txt_src) {
-        scale_build_custom_label_text(obj, label_dsc, major_tick_idx);
+        scale_build_custom_label_text(obj, label_dsc, major_tick_idx, text_buffer);
     }
     else { /* Add label with mapped values */
         lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
@@ -1815,7 +1821,7 @@ static void scale_get_labels_max_size(lv_obj_t * obj, int32_t * max_w, int32_t *
 
         major_tick_idx++;
         if(scale->txt_src) {
-            scale_build_custom_label_text(obj, &label_dsc, (uint16_t)major_tick_idx);
+            scale_build_custom_label_text(obj, &label_dsc, (uint16_t)major_tick_idx, text_buffer);
         }
         else {
             int32_t tick_value = scale->range_min;
@@ -1943,9 +1949,10 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
  * @param obj       pointer to a scale object
  * @param label_dsc pointer to the label descriptor
  * @param major_tick_idx  index of the current major tick
+ * @param text_buffer     LV_SCALE_LABEL_TXT_LEN bytes for the shaped label text
  */
 static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
-                                          const uint16_t major_tick_idx)
+                                          const uint16_t major_tick_idx, char * text_buffer)
 {
     LV_ASSERT(obj != NULL);
     LV_ASSERT(label_dsc != NULL);
@@ -1954,9 +1961,19 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
     /* Check if the scale has valid custom labels available,
      * this avoids reading past txt_src array when the scale requires more tick labels than available */
     if(major_tick_idx <= scale->custom_label_cnt) {
-        if(scale->txt_src[major_tick_idx - 1U]) {
-            label_dsc->text = scale->txt_src[major_tick_idx - 1U];
+        const char * txt = scale->txt_src[major_tick_idx - 1U];
+        if(txt) {
+            label_dsc->text = txt;
             label_dsc->text_local = 0;
+#if LV_USE_ARABIC_PERSIAN_CHARS
+            if(lv_text_ap_strlen(txt) < LV_SCALE_LABEL_TXT_LEN) {
+                lv_text_ap_proc(txt, text_buffer);
+                label_dsc->text = text_buffer;
+                label_dsc->text_local = 1;
+            }
+#else
+            LV_UNUSED(text_buffer);
+#endif
         }
         else {
             label_dsc->text = NULL;

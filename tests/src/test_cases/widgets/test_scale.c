@@ -398,6 +398,41 @@ void test_scale_custom_labels_count(void)
     TEST_ASSERT_EQUAL(2U, scale_widget->custom_label_cnt);
 }
 
+#if LV_USE_ARABIC_PERSIAN_CHARS
+static char drawn_label[32];
+
+static void capture_label_cb(lv_event_t * e)
+{
+    lv_draw_dsc_t * base_dsc = lv_event_get_draw_dsc(e);
+    if(lv_draw_dsc_get_type(base_dsc) != LV_DRAW_DSC_TYPE_LABEL || base_dsc->part != LV_PART_INDICATOR) return;
+
+    const char * text = lv_draw_dsc_get_label_dsc(base_dsc)->text;
+    if(text) {
+        lv_strlcpy(drawn_label, text, sizeof(drawn_label));
+    }
+}
+
+void test_scale_custom_labels_are_shaped(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_obj_set_size(scale, 200, 60);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_scale_set_label_show(scale, true);
+    lv_scale_set_total_tick_count(scale, 2);
+    lv_scale_set_major_tick_every(scale, 1);
+
+    /* "سلا": seen initial U+FEB3, lam-alef final U+FEFC */
+    static const char * labels[] = {"\xD8\xB3\xD9\x84\xD8\xA7", NULL};
+    lv_scale_set_text_src(scale, labels);
+
+    lv_obj_add_event_cb(scale, capture_label_cb, LV_EVENT_DRAW_DSC_BEGIN, NULL);
+    lv_obj_set_send_draw_dsc_events(scale, true);
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_EQUAL_STRING("\xEF\xBA\xB3\xEF\xBB\xBC", drawn_label);
+}
+#endif
+
 void test_scale_mode(void)
 {
     lv_obj_t * scale = lv_scale_create(lv_screen_active());
