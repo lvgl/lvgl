@@ -59,6 +59,16 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
  */
 void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
+/**
+ * Decompress an RLE/LZ4 compressed bin image into a new draw buf.
+ * The data layout is the same as the uncompressed image (palette first for indexed formats).
+ * @param src       pointer to an `lv_image_dsc_t` variable or a file path
+ * @param src_type  type of `src`
+ * @param header    the image header as stored in the source, with `LV_IMAGE_FLAGS_COMPRESSED` and a valid `stride`
+ * @return          the decompressed draw buf to be freed by `lv_draw_buf_destroy`, or NULL on failure
+ */
+lv_draw_buf_t * lv_bin_decoder_decompress(const void * src, lv_image_src_t src_type, const lv_image_header_t * header);
+
 /**********************
  *      MACROS
  **********************/

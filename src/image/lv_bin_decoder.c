@@ -68,6 +68,9 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
 static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
                                        int32_t w_px, const uint8_t * in, lv_color32_t * out);
 static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+#if LV_BIN_DECODER_RAM_LOAD
+    static lv_result_t load_decompressed(lv_image_decoder_dsc_t * dsc);
+#endif
 
 static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, uint32_t btr, uint32_t * br);
 
@@ -392,6 +395,58 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     }
 
     free_decoder_data(dsc);
+}
+
+lv_draw_buf_t * lv_bin_decoder_decompress(const void * src, lv_image_src_t src_type, const lv_image_header_t * header)
+{
+#if LV_BIN_DECODER_RAM_LOAD
+    if(src == NULL || header == NULL) return NULL;
+
+    /*Decoders that rewrite dsc->header (e.g. VG-Lite) can't be used here, so work on a private dsc*/
+    lv_image_decoder_dsc_t dsc;
+    lv_memzero(&dsc, sizeof(dsc));
+    dsc.src = src;
+    dsc.src_type = src_type;
+    dsc.header = *header;
+
+    decoder_data_t * decoder_data = get_decoder_data(&dsc);
+    if(decoder_data == NULL) return NULL;
+
+    lv_draw_buf_t * decompressed = NULL;
+    bool opened = true;
+
+    if(src_type == LV_IMAGE_SRC_FILE) {
+        lv_fs_file_t * f = lv_malloc(sizeof(*f));
+        if(f == NULL) {
+            LV_LOG_WARN("No memory for file %s", (const char *)src);
+            opened = false;
+        }
+        else {
+            lv_fs_res_t fs_res = lv_fs_open(f, src, LV_FS_MODE_RD);
+            if(fs_res != LV_FS_RES_OK) {
+                LV_LOG_WARN("Open file %s failed: %d", (const char *)src, fs_res);
+                lv_free(f);
+                opened = false;
+            }
+            else {
+                decoder_data->f = f;
+            }
+        }
+    }
+
+    if(opened && load_decompressed(&dsc) == LV_RESULT_OK) {
+        decompressed = decoder_data->decompressed;
+        decoder_data->decompressed = NULL;
+    }
+
+    free_decoder_data(&dsc);
+    return decompressed;
+#else
+    LV_UNUSED(src);
+    LV_UNUSED(src_type);
+    LV_UNUSED(header);
+    return NULL;
+#endif
 }
 
 lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
@@ -923,9 +978,10 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
     return LV_RESULT_OK;
 }
 
-static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
-{
 #if LV_BIN_DECODER_RAM_LOAD
+/*Leaves the raw image data in decoder_data->decompressed*/
+static lv_result_t load_decompressed(lv_image_decoder_dsc_t * dsc)
+{
     uint32_t rn;
     uint32_t len;
     uint32_t compressed_len;
@@ -934,6 +990,11 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     lv_result_t res;
     lv_fs_res_t fs_res;
     uint8_t * file_buf = NULL;
+
+    if(decoder_data == NULL) {
+        return LV_RESULT_INVALID;
+    }
+
     lv_image_compressed_t * compressed = &decoder_data->compressed;
 
     lv_memzero(compressed, sizeof(lv_image_compressed_t));
@@ -1007,6 +1068,23 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     if(res != LV_RESULT_OK) {
         LV_LOG_WARN("Decompress failed");
         return LV_RESULT_INVALID;
+    }
+
+    return LV_RESULT_OK;
+}
+#endif
+
+static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+{
+#if LV_BIN_DECODER_RAM_LOAD
+    decoder_data_t * decoder_data = get_decoder_data(dsc);
+    if(decoder_data == NULL) {
+        return LV_RESULT_INVALID;
+    }
+
+    lv_result_t res = load_decompressed(dsc);
+    if(res != LV_RESULT_OK) {
+        return res;
     }
 
     /*Depends on the cf, need to further decode image like an C-array image*/

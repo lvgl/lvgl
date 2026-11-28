@@ -134,5 +134,6 @@ The following table shows the color format mapping:
   If the GPU supports 24-bit formats, the decoder will skip these formats and let the default binary decoder handle them.
 - Index formats (`I1`, `I2`, `I4`) maintain their palette but expand index values to 8-bit for GPU compatibility.
 - Alpha formats (`A1`, `A2`) are linearly scaled to 8-bit (e.g., A1: 0→0, 1→255; A2: 0→0, 1→85, 2→170, 3→255).
-- **Compressed formats are not supported.** Images with `LV_IMAGE_FLAGS_COMPRESSED` flag will be rejected by this decoder
-  and passed to other decoders that support decompression.
+- Compressed images (`LV_IMAGE_FLAGS_COMPRESSED`, RLE or LZ4) of the formats listed above are decompressed with
+  `lv_bin_decoder_decompress()` and then converted like uncompressed ones. This needs `LV_BIN_DECODER_RAM_LOAD`,
+  and the decompressed image and the converted image are both in memory while converting.

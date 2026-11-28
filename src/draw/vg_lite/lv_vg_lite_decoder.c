@@ -208,13 +208,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         return LV_RESULT_INVALID;
     }
 
-    if(header->flags & LV_IMAGE_FLAGS_COMPRESSED) {
-        lv_image_src_t src_type = lv_image_src_get_type(dsc->src);
-        LV_LOG_WARN("NOT Supported compressed flags: %d, format: %d, type: %d, src: %p (%s)",
-                    header->flags, header->cf, src_type, dsc->src, src_type == LV_IMAGE_SRC_FILE ? (const char *)dsc->src : "variable");
-        return LV_RESULT_INVALID;
-    }
-
     header->cf = cf;
     return LV_RESULT_OK;
 }
@@ -703,6 +696,95 @@ static lv_draw_buf_t * create_dest_buf(uint32_t width, uint32_t height, lv_color
     return dest_buf;
 }
 
+static lv_result_t decoder_open_buf(lv_draw_buf_t * dest_buf, const lv_draw_buf_t * src_buf, bool premultiply)
+{
+    switch(src_buf->header.cf) {
+        case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_I4:
+        case LV_COLOR_FORMAT_I8:
+            return decoder_open_variable_index(dest_buf, src_buf, premultiply);
+
+        case LV_COLOR_FORMAT_A1:
+        case LV_COLOR_FORMAT_A2:
+            return decoder_open_variable_alpha(dest_buf, src_buf);
+
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_ARGB8565:
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_AL88:
+            return decoder_open_variable_rgb(dest_buf, src_buf, premultiply);
+
+        default:
+            LV_LOG_WARN("NOT Supported color format: %d", src_buf->header.cf);
+            return LV_RESULT_INVALID;
+    }
+}
+
+/**
+ * Decompress an RLE/LZ4 image with the bin decoder, then convert the raw data like an uncompressed one.
+ * @param dsc   pointer to the decoder descriptor
+ * @return      LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+ */
+static lv_result_t decoder_open_compressed(lv_image_decoder_dsc_t * dsc)
+{
+    lv_image_header_t src_header;
+
+    if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
+        src_header = ((const lv_image_dsc_t *)dsc->src)->header;
+    }
+    else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+        lv_fs_file_t file;
+        lv_fs_res_t fs_res = lv_fs_open(&file, dsc->src, LV_FS_MODE_RD);
+        if(fs_res != LV_FS_RES_OK) {
+            LV_LOG_ERROR("open %s failed, res: %d", (const char *)dsc->src, fs_res);
+            return LV_RESULT_INVALID;
+        }
+
+        uint32_t header_br = 0;
+        fs_res = lv_fs_read(&file, &src_header, sizeof(src_header), &header_br);
+        lv_fs_close(&file);
+        if(fs_res != LV_FS_RES_OK || header_br != sizeof(src_header)) {
+            LV_LOG_ERROR("read %s lv_image_header_t failed, res: %d, br: %" LV_PRIu32, (const char *)dsc->src, fs_res,
+                         header_br);
+            return LV_RESULT_INVALID;
+        }
+    }
+    else {
+        return LV_RESULT_INVALID;
+    }
+
+    /*The bin decoder sizes the output from stride, so it must be the compressed image's own*/
+    src_header.stride = get_image_stride(&src_header);
+
+    lv_draw_buf_t * raw = lv_bin_decoder_decompress(dsc->src, dsc->src_type, &src_header);
+    if(raw == NULL) {
+        return LV_RESULT_INVALID;
+    }
+
+    const bool src_premultiplied = src_header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED;
+    const bool premultiply = src_premultiplied ? false : dsc->args.premultiply;
+
+    lv_draw_buf_t * dest_buf = create_dest_buf(dsc->header.w, dsc->header.h, src_header.cf);
+    if(dest_buf == NULL) {
+        lv_draw_buf_destroy(raw);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_result_t res = decoder_open_buf(dest_buf, raw, premultiply);
+    lv_draw_buf_destroy(raw);
+    if(res != LV_RESULT_OK) {
+        lv_draw_buf_destroy(dest_buf);
+        dsc->decoded = NULL;
+        return res;
+    }
+
+    set_premultiplied_flag_if_needed(dest_buf, src_premultiplied || dsc->args.premultiply);
+    dsc->decoded = dest_buf;
+    return LV_RESULT_OK;
+}
+
 /**
  * Decode an image using the vg_lite gpu.
  * @param decoder pointer to the decoder
@@ -713,145 +795,128 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 {
     lv_result_t res = LV_RESULT_INVALID;
 
-    switch(dsc->src_type) {
-        case LV_IMAGE_SRC_VARIABLE: {
-                lv_draw_buf_t src_buf;
-                res = lv_draw_buf_from_image(&src_buf, dsc->src);
-                if(res != LV_RESULT_OK) {
-                    return res;
+    if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
+        res = decoder_open_compressed(dsc);
+        if(res != LV_RESULT_OK) {
+            return res;
+        }
+    }
+    else {
+        switch(dsc->src_type) {
+            case LV_IMAGE_SRC_VARIABLE: {
+                    lv_draw_buf_t src_buf;
+                    res = lv_draw_buf_from_image(&src_buf, dsc->src);
+                    if(res != LV_RESULT_OK) {
+                        return res;
+                    }
+
+                    const bool src_premultiplied = lv_draw_buf_has_flag(&src_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+                    const bool premultiply = src_premultiplied ? false : dsc->args.premultiply;
+
+                    /**
+                     * Since lv_draw_buf_from_image automatically calculates the stride,
+                     * we need to obtain the original stride information.
+                     */
+                    src_buf.header.stride = get_image_stride(&((lv_image_dsc_t *)dsc->src)->header);
+
+                    lv_draw_buf_t * dest_buf = create_dest_buf(dsc->header.w, dsc->header.h, src_buf.header.cf);
+                    if(!dest_buf) {
+                        return LV_RESULT_INVALID;
+                    }
+
+                    res = decoder_open_buf(dest_buf, &src_buf, premultiply);
+
+                    if(res == LV_RESULT_OK) {
+                        set_premultiplied_flag_if_needed(dest_buf, src_premultiplied || dsc->args.premultiply);
+                        dsc->decoded = dest_buf;
+                    }
+                    else {
+                        lv_draw_buf_destroy(dest_buf);
+                        dsc->decoded = NULL;
+                        return res;
+                    }
                 }
 
-                const bool src_premultiplied = lv_draw_buf_has_flag(&src_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
-                const bool premultiply = src_premultiplied ? false : dsc->args.premultiply;
+                break;
+            case LV_IMAGE_SRC_FILE: {
+                    lv_fs_file_t file;
+                    lv_fs_res_t fs_res = lv_fs_open(&file, dsc->src, LV_FS_MODE_RD);
+                    if(fs_res != LV_FS_RES_OK) {
+                        LV_LOG_ERROR("open %s failed, res: %d", (const char *)dsc->src, fs_res);
+                        return LV_RESULT_INVALID;
+                    }
 
-                /**
-                 * Since lv_draw_buf_from_image automatically calculates the stride,
-                 * we need to obtain the original stride information.
-                 */
-                src_buf.header.stride = get_image_stride(&((lv_image_dsc_t *)dsc->src)->header);
+                    /* get real src header */
+                    lv_image_header_t src_header;
+                    uint32_t header_br = 0;
+                    fs_res = lv_fs_read(&file, &src_header, sizeof(src_header), &header_br);
+                    if(fs_res != LV_FS_RES_OK || header_br != sizeof(src_header)) {
+                        LV_LOG_ERROR("read %s lv_image_header_t failed, res: %d, br: %" LV_PRIu32, (const char *)dsc->src, fs_res, header_br);
+                        lv_fs_close(&file);
+                        return LV_RESULT_INVALID;
+                    }
 
-                lv_draw_buf_t * dest_buf = create_dest_buf(dsc->header.w, dsc->header.h, src_buf.header.cf);
-                if(!dest_buf) {
-                    return LV_RESULT_INVALID;
-                }
+                    if(src_header.magic != LV_IMAGE_HEADER_MAGIC) {
+                        LV_LOG_WARN("Legacy bin image detected: %s", (const char *)dsc->src);
+                        src_header.cf = src_header.magic;
+                        src_header.magic = LV_IMAGE_HEADER_MAGIC;
+                        src_header.flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
+                    }
 
-                switch(src_buf.header.cf) {
-                    case LV_COLOR_FORMAT_I1:
-                    case LV_COLOR_FORMAT_I2:
-                    case LV_COLOR_FORMAT_I4:
-                    case LV_COLOR_FORMAT_I8:
-                        res = decoder_open_variable_index(dest_buf, &src_buf, premultiply);
-                        break;
+                    const bool src_premultiplied = src_header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED;
+                    const bool premultiply = src_premultiplied ? false : dsc->args.premultiply;
 
-                    case LV_COLOR_FORMAT_A1:
-                    case LV_COLOR_FORMAT_A2:
-                        res = decoder_open_variable_alpha(dest_buf, &src_buf);
-                        break;
+                    src_header.stride = get_image_stride(&src_header);
 
-                    case LV_COLOR_FORMAT_RGB565_SWAPPED:
-                    case LV_COLOR_FORMAT_RGB888:
-                    case LV_COLOR_FORMAT_ARGB8565:
-                    case LV_COLOR_FORMAT_RGB565A8:
-                    case LV_COLOR_FORMAT_AL88:
-                        res = decoder_open_variable_rgb(dest_buf, &src_buf, premultiply);
-                        break;
+                    lv_draw_buf_t * dest_buf = create_dest_buf(dsc->header.w, dsc->header.h, src_header.cf);
+                    if(!dest_buf) {
+                        lv_fs_close(&file);
+                        return LV_RESULT_INVALID;
+                    }
 
-                    default:
-                        LV_LOG_WARN("NOT Supported color format: %d, src: %p", src_buf.header.cf, dsc->src);
-                        res = LV_RESULT_INVALID;
-                        break;
-                }
+                    switch(src_header.cf) {
+                        case LV_COLOR_FORMAT_I1:
+                        case LV_COLOR_FORMAT_I2:
+                        case LV_COLOR_FORMAT_I4:
+                        case LV_COLOR_FORMAT_I8:
+                            res = decoder_open_file_index(dest_buf, &file, &src_header, premultiply);
+                            break;
 
-                if(res == LV_RESULT_OK) {
-                    set_premultiplied_flag_if_needed(dest_buf, src_premultiplied || dsc->args.premultiply);
-                    dsc->decoded = dest_buf;
-                }
-                else {
-                    lv_draw_buf_destroy(dest_buf);
-                    dsc->decoded = NULL;
-                    return res;
-                }
-            }
+                        case LV_COLOR_FORMAT_A1:
+                        case LV_COLOR_FORMAT_A2:
+                            res = decoder_open_file_alpha(dest_buf, &file, &src_header);
+                            break;
 
-            break;
-        case LV_IMAGE_SRC_FILE: {
-                lv_fs_file_t file;
-                lv_fs_res_t fs_res = lv_fs_open(&file, dsc->src, LV_FS_MODE_RD);
-                if(fs_res != LV_FS_RES_OK) {
-                    LV_LOG_ERROR("open %s failed, res: %d", (const char *)dsc->src, fs_res);
-                    return LV_RESULT_INVALID;
-                }
+                        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+                        case LV_COLOR_FORMAT_RGB888:
+                        case LV_COLOR_FORMAT_ARGB8565:
+                        case LV_COLOR_FORMAT_RGB565A8:
+                        case LV_COLOR_FORMAT_AL88:
+                            res = decoder_open_file_rgb(dest_buf, &file, &src_header, premultiply);
+                            break;
 
-                /* get real src header */
-                lv_image_header_t src_header;
-                uint32_t header_br = 0;
-                fs_res = lv_fs_read(&file, &src_header, sizeof(src_header), &header_br);
-                if(fs_res != LV_FS_RES_OK || header_br != sizeof(src_header)) {
-                    LV_LOG_ERROR("read %s lv_image_header_t failed, res: %d, br: %" LV_PRIu32, (const char *)dsc->src, fs_res, header_br);
+                        default:
+                            LV_LOG_WARN("NOT Supported color format: %d, src: %s", src_header.cf, (const char *)dsc->src);
+                            res = LV_RESULT_INVALID;
+                            break;
+                    }
+
+                    if(res == LV_RESULT_OK) {
+                        set_premultiplied_flag_if_needed(dest_buf, src_premultiplied || dsc->args.premultiply);
+                        dsc->decoded = dest_buf;
+                    }
+                    else {
+                        LV_LOG_WARN("read %s failed", (const char *)dsc->src);
+                        lv_draw_buf_destroy(dest_buf);
+                        dsc->decoded = NULL;
+                    }
+
                     lv_fs_close(&file);
-                    return LV_RESULT_INVALID;
                 }
-
-                if(src_header.magic != LV_IMAGE_HEADER_MAGIC) {
-                    LV_LOG_WARN("Legacy bin image detected: %s", (const char *)dsc->src);
-                    src_header.cf = src_header.magic;
-                    src_header.magic = LV_IMAGE_HEADER_MAGIC;
-                    src_header.flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
-                }
-
-                const bool src_premultiplied = src_header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED;
-                const bool premultiply = src_premultiplied ? false : dsc->args.premultiply;
-
-                src_header.stride = get_image_stride(&src_header);
-
-                lv_draw_buf_t * dest_buf = create_dest_buf(dsc->header.w, dsc->header.h, src_header.cf);
-                if(!dest_buf) {
-                    lv_fs_close(&file);
-                    return LV_RESULT_INVALID;
-                }
-
-                switch(src_header.cf) {
-                    case LV_COLOR_FORMAT_I1:
-                    case LV_COLOR_FORMAT_I2:
-                    case LV_COLOR_FORMAT_I4:
-                    case LV_COLOR_FORMAT_I8:
-                        res = decoder_open_file_index(dest_buf, &file, &src_header, premultiply);
-                        break;
-
-                    case LV_COLOR_FORMAT_A1:
-                    case LV_COLOR_FORMAT_A2:
-                        res = decoder_open_file_alpha(dest_buf, &file, &src_header);
-                        break;
-
-                    case LV_COLOR_FORMAT_RGB565_SWAPPED:
-                    case LV_COLOR_FORMAT_RGB888:
-                    case LV_COLOR_FORMAT_ARGB8565:
-                    case LV_COLOR_FORMAT_RGB565A8:
-                    case LV_COLOR_FORMAT_AL88:
-                        res = decoder_open_file_rgb(dest_buf, &file, &src_header, premultiply);
-                        break;
-
-                    default:
-                        LV_LOG_WARN("NOT Supported color format: %d, src: %s", src_header.cf, (const char *)dsc->src);
-                        res = LV_RESULT_INVALID;
-                        break;
-                }
-
-                if(res == LV_RESULT_OK) {
-                    set_premultiplied_flag_if_needed(dest_buf, src_premultiplied || dsc->args.premultiply);
-                    dsc->decoded = dest_buf;
-                }
-                else {
-                    LV_LOG_WARN("read %s failed", (const char *)dsc->src);
-                    lv_draw_buf_destroy(dest_buf);
-                    dsc->decoded = NULL;
-                }
-
-                lv_fs_close(&file);
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
+        }
     }
 
     if(dsc->args.no_cache) return res;
