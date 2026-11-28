@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "lv_draw_dma2d.h"
 #include "lv_draw_dma2d_private.h"
 #if LV_USE_DRAW_DMA2D
 
@@ -43,6 +44,7 @@ static bool can_draw_fill(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const 
 static bool can_draw_image(lv_draw_unit_t * draw_unit, lv_layer_t * layer, const lv_draw_image_dsc_t * dsc);
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t delete_cb(lv_draw_unit_t * draw_unit);
+static void lv_draw_buf_dma2d_init_handlers(void);
 #if LV_DRAW_DMA2D_ASYNC
     static int32_t wait_finish_cb(lv_draw_unit_t * u);
 #endif
@@ -77,7 +79,7 @@ static const lv_draw_unit_draw_cbs_t draw_cbs = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_buf_dma2d_init_handlers(void)
+static void lv_draw_buf_dma2d_init_handlers(void)
 {
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
@@ -467,6 +469,8 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 static int32_t delete_cb(lv_draw_unit_t * draw_unit)
 {
+    LV_UNUSED(draw_unit);
+
     return 0;
 }
 

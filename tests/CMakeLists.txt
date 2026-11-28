@@ -230,7 +230,9 @@ target_compile_definitions(test_common PRIVATE
     LV_BUILD_EXAMPLES=1
 )
 
-if(CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL)
+if(CONFIG_LV_USE_DRAW_DMA2D)
+    lvgl_add_test_folder(test_cases/dma2d)
+elseif(CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL)
     lvgl_add_test_folder(test_cases)
     lvgl_add_test_folder(test_cases/3d)
     lvgl_add_test_folder(test_cases/cache)
