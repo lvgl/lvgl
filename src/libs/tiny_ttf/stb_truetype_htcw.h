@@ -1667,7 +1667,8 @@ static int stbtt__get_svg(stbtt_fontinfo * info)
                 break;
             case STBTT_PLATFORM_ID_UNICODE:
                 // Mac/iOS has these
-                // all the encodingIDs are unicode, so we don't bother to check it
+                // Encoding 5 supplies variation selectors, not a base mapping.
+                if(ttUSHORT(data, encoding_record + 2) == 5) break;
                 info->index_map = cmap + ttULONG(data, encoding_record + 4);
                 break;
         }
@@ -1749,7 +1750,10 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo * info, int unicode_code
             if(offset == 0)
                 return (stbtt_uint16)(unicode_codepoint + ttSHORT(data, index_map + 14 + segcount * 4 + 2 + 2 * item));
 
-            return ttUSHORT(data, offset + (unicode_codepoint - start) * 2 + index_map + 14 + segcount * 6 + 2 + 2 * item);
+            stbtt_uint16 glyph = ttUSHORT(data, offset + (unicode_codepoint - start) * 2 + index_map + 14 + segcount * 6 + 2 + 2 *
+                                          item);
+            if(glyph) glyph = (stbtt_uint16)(glyph + ttSHORT(data, index_map + 16 + segcount * 4 + 2 * item));
+            return glyph;
         }
     }
     else if(format == 12 || format == 13) {
