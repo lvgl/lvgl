@@ -575,7 +575,7 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
     }
     else {
         for(y = 0; y < h; y++) {
-            for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
+            for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
                 uint16_t res = 0;
                 uint8_t chan_val = get_bit(src_buf_i1, src_x) * 255;
                 switch(dsc->blend_mode) {
@@ -703,7 +703,7 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *)dest_buf_u16;
-            for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
+            for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
                 uint8_t rb = src_buf_al88[src_x].lumi >> 3;
                 uint8_t g = src_buf_al88[src_x].lumi >> 2;
                 switch(dsc->blend_mode) {
@@ -830,7 +830,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *)dest_buf_u16;
-            for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
+            for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x++) {
                 uint8_t rb = src_buf_l8[src_x] >> 3;
                 uint8_t g = src_buf_l8[src_x] >> 2;
                 switch(dsc->blend_mode) {
