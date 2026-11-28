@@ -27,9 +27,9 @@ void lv_example_bar_value_range(void)
     /* Default 0..100 range */
     lv_obj_t * bar_1 = lv_bar_create(screen);
     lv_obj_set_size(bar_1, lv_pct(90), 20);
-    lv_bar_set_min_value(bar_1, 0);
-    lv_bar_set_max_value(bar_1, 100);
-    lv_bar_set_value(bar_1, 30, false);
+    lv_bar_set_value(bar_1, 130, false);
+    lv_bar_set_min_value(bar_1, 100);
+    lv_bar_set_max_value(bar_1, 200);
     lv_obj_t * label_1 = lv_label_create(bar_1);
     lv_obj_set_align(label_1, LV_ALIGN_CENTER);
     lv_label_set_text(label_1, "0..100");
