@@ -856,6 +856,40 @@ static void draw_image(lv_event_t * e)
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
+
+        /* The base class only checked the background, which the image is drawn over.
+         * An opaque, unscaled image covers the area by itself if its pixels are there.
+         * Only uncompressed images in RAM: files and compressed data can fail to decode
+         * at draw time, and then nothing is drawn. Both lv_image_dsc_t and lv_draw_buf_t
+         * start with the header. */
+        if(info->res == LV_COVER_RES_NOT_COVER && img->w > 0 && img->h > 0 &&
+           img->src_type == LV_IMAGE_SRC_VARIABLE &&
+           !(((const lv_image_header_t *)img->src)->flags & LV_IMAGE_FLAGS_COMPRESSED) &&
+           img->blend_mode == LV_BLEND_MODE_NORMAL &&
+           img->scale_x == LV_SCALE_NONE && img->scale_y == LV_SCALE_NONE &&
+           lv_obj_get_style_opa_internal(obj, LV_PART_MAIN) >= LV_OPA_MAX &&
+           lv_obj_get_style_image_colorkey_internal(obj, LV_PART_MAIN) == NULL) {
+            int32_t r = lv_obj_get_style_radius_internal(obj, LV_PART_MAIN);
+            lv_area_t image_area;
+            /* The radius is applied to each tile, so tiles cover the widget only without a radius */
+            if(img->align == LV_IMAGE_ALIGN_TILE && r == 0) {
+                image_area = obj->coords;
+            }
+            else if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+                /* Same placement as in LV_EVENT_DRAW_MAIN below */
+                lv_area_set(&image_area, obj->coords.x1, obj->coords.y1,
+                            obj->coords.x1 + img->w - 1, obj->coords.y1 + img->h - 1);
+                lv_area_align(&obj->coords, &image_area, img->align, img->offset.x, img->offset.y);
+            }
+            else {
+                /* Auto-scaled images and tiles with a radius are left to the background */
+                return;
+            }
+
+            if(lv_area_is_in(info->area, &obj->coords, r) && lv_area_is_in(info->area, &image_area, r)) {
+                info->res = LV_COVER_RES_COVER;
+            }
+        }
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
 

@@ -1182,4 +1182,96 @@ void test_image_draw_main_unknown_src_type(void)
     lv_refr_now(NULL);
 }
 
+static lv_cover_res_t image_cover_check(lv_obj_t * img, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    lv_area_t area = {.x1 = x1, .y1 = y1, .x2 = x2, .y2 = y2};
+    lv_cover_check_info_t cover_info = {.area = &area, .res = LV_COVER_RES_COVER};
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    return cover_info.res;
+}
+
+void test_image_cover_check_without_background(void)
+{
+    /* An opaque image covers the area by itself, without an opaque background */
+    lv_draw_buf_t * buf = lv_draw_buf_create(100, 80, LV_COLOR_FORMAT_RGB565, 0);
+    lv_draw_buf_clear(buf, NULL);
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, buf);
+    lv_obj_set_pos(img, 100, 100);
+    lv_obj_update_layout(img);
+    TEST_ASSERT_EQUAL(LV_OPA_TRANSP, lv_obj_get_style_bg_opa(img, LV_PART_MAIN));
+
+    TEST_ASSERT_EQUAL(LV_COVER_RES_COVER, image_cover_check(img, 110, 110, 189, 169));
+
+    /* A translucent image doesn't cover */
+    lv_obj_set_style_image_opa(img, LV_OPA_50, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 110, 110, 189, 169));
+    lv_obj_set_style_image_opa(img, LV_OPA_COVER, LV_PART_MAIN);
+
+    /* Neither does one blended with another mode */
+    lv_image_set_blend_mode(img, LV_BLEND_MODE_ADDITIVE);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 110, 110, 189, 169));
+    lv_image_set_blend_mode(img, LV_BLEND_MODE_NORMAL);
+
+    /* In a larger widget only the image's own pixels cover */
+    lv_obj_set_size(img, 200, 160);
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TOP_LEFT);
+    lv_obj_update_layout(img);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_COVER, image_cover_check(img, 100, 100, 199, 179));
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 250, 200, 290, 250));
+
+    /* A tiled image covers the whole widget */
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TILE);
+    lv_obj_update_layout(img);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_COVER, image_cover_check(img, 250, 200, 290, 250));
+
+    /* The radius is applied to each tile, so a tiled image with a radius doesn't cover */
+    lv_obj_set_style_radius(img, 30, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 150, 150, 250, 200));
+
+    /* Rounded corners don't cover, the rest of the image does */
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TOP_LEFT);
+    lv_obj_update_layout(img);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 100, 100, 110, 110));
+    TEST_ASSERT_EQUAL(LV_COVER_RES_COVER, image_cover_check(img, 130, 130, 189, 169));
+    lv_obj_set_style_radius(img, 0, LV_PART_MAIN);
+
+    /* Color keyed pixels are transparent, so a color keyed image doesn't cover */
+    static const lv_image_colorkey_t colorkey = {.low = {0, 0, 0}, .high = {0, 0, 0}};
+    lv_obj_set_style_image_colorkey(img, &colorkey, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 110, 110, 189, 169));
+    lv_obj_remove_local_style_prop(img, LV_STYLE_IMAGE_COLORKEY, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_COVER, image_cover_check(img, 110, 110, 189, 169));
+
+    lv_obj_delete(img);
+    lv_draw_buf_destroy(buf);
+}
+
+void test_image_cover_check_only_uncompressed_ram_images(void)
+{
+    /* Files and compressed images can fail to decode at draw time, so they don't cover */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_files/binimages/cogwheel.RGB565.bin");
+    lv_obj_update_layout(img);
+    TEST_ASSERT_GREATER_THAN(0, lv_image_get_src_width(img));
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 10, 10, 20, 20));
+
+    static const uint16_t pixels[4 * 4];
+    static const lv_image_dsc_t compressed = {
+        .header.magic = LV_IMAGE_HEADER_MAGIC,
+        .header.cf = LV_COLOR_FORMAT_RGB565,
+        .header.flags = LV_IMAGE_FLAGS_COMPRESSED,
+        .header.w = 4,
+        .header.h = 4,
+        .data_size = sizeof(pixels),
+        .data = (const uint8_t *)pixels,
+    };
+    lv_image_set_src(img, &compressed);
+    lv_obj_update_layout(img);
+    TEST_ASSERT_EQUAL(4, lv_image_get_src_width(img));
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, image_cover_check(img, 0, 0, 3, 3));
+
+    lv_obj_delete(img);
+}
+
 #endif
