@@ -483,6 +483,22 @@ lv_obj_t * lv_display_get_layer_sys(lv_display_t * disp);
  */
 lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp);
 
+/**
+ * Get the number of screens on a display. The top, sys. and bottom layers are not counted.
+ * @param disp      pointer to a display
+ * @return          number of screens, or 0 if `disp` is NULL
+ */
+uint32_t lv_display_get_screen_count(const lv_display_t * disp);
+
+/**
+ * Get a screen of a display by its index, in creation order. The top, sys. and bottom layers
+ * are skipped. Deleting a screen shifts the index of the screens after it.
+ * @param disp      pointer to a display
+ * @param idx       0 for the first screen, up to `lv_display_get_screen_count(disp) - 1`
+ * @return          pointer to the screen, or NULL if `idx` is out of range or `disp` is NULL
+ */
+lv_obj_t * lv_display_get_screen(const lv_display_t * disp, uint32_t idx);
+
 
 #if LV_USE_OBJ_NAME
 
