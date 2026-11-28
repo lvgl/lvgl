@@ -1,0 +1,276 @@
+---
+title: GD32 TLI Display Driver
+description: "LVGL's TLI driver creates a display bound to a layer of an already-configured GD32 TLI peripheral, in direct or partial render mode, single or double buffered."
+faqs:
+  - question: "Does the driver configure the TLI peripheral?"
+    answer: "No. It works with an already-configured TLI and reads the layer window size, pixel format, framebuffer address and line stride from the TLI registers. Initialize the TLI, its clock, GPIOs and the layer (e.g. with tli_init() and tli_layer_init() of the GD32 firmware library) before creating the display."
+  - question: "Can I drive both TLI layers?"
+    answer: "Yes. The driver creates a display for one specific layer, so two LVGL TLI displays can be created and operate independently on LAYER0 and LAYER1."
+  - question: "Should I use direct or partial render mode?"
+    answer: "Double-buffered direct mode gives the best visual results if enough memory is available, e.g. in SDRAM. Use single-buffered direct mode only when memory is very scarce; on the GD32H7 it has unavoidable visual artifacts because of the data cache. If there is almost, but not quite, enough memory for double-buffered direct mode, use partial mode."
+  - question: "What exactly is the framebuffer address the driver needs?"
+    answer: "The value of layer_frame_bufaddr in the tli_layer_parameter_struct used to configure the TLI layer, which is written to the TLI_LXFBADDR register."
+  - question: "Can the display be rotated?"
+    answer: "Yes, with lv_display_set_rotation(), but only for displays created with lv_gd_tli_create_partial(). The rotation is done in software, requires LV_USE_DRAW_SW, and LV_GD_TLI_USE_IPA_FLUSH has no effect while it is used."
+  - question: "Can the TLI driver be combined with the IPA draw unit?"
+    answer: "Yes, but LV_GD_TLI_USE_IPA_FLUSH cannot be enabled at the same time as LV_USE_DRAW_IPA, because both would use the IPA peripheral. With the IPA draw unit enabled, partial buffers are copied to the framebuffer by the CPU."
+---
+
+Some GD32s, such as the GD32H7, have a peripheral called
+TLI (TFT-LCD Interface) for driving RGB parallel displays. It has two layers that are
+blended in hardware over a background color.
+See the [Display](/main-modules/display) module for general background on LVGL displays.
+
+## Usage Modes With LVGL
+
+The driver within LVGL is designed to work with an
+already-configured TLI peripheral. It reads the configuration
+of the layer from the TLI registers:
+
+- the layer window width and height become the resolution of the display,
+- the layer pixel format becomes the color format of the display,
+- the layer framebuffer address and line stride are used for flushing.
+
+Initialize the TLI with the GD32 firmware library, e.g. with `tli_init()`,
+`tli_layer_init()`, `tli_layer_enable()`, `tli_reload_config()` and `tli_enable()`,
+before creating the LVGL display. GigaDevice's TLI demo projects for the evaluation
+boards are a good starting point.
+
+The supported layer pixel formats are:
+
+| TLI pixel format     | LVGL color format                                    |
+|----------------------|------------------------------------------------------|
+| `LAYER_PPF_ARGB8888` | <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />          |
+| `LAYER_PPF_RGB888`   | <ApiLink name="LV_COLOR_FORMAT_RGB888" />            |
+| `LAYER_PPF_RGB565`   | <ApiLink name="LV_COLOR_FORMAT_RGB565" />            |
+| `LAYER_PPF_L8`       | <ApiLink name="LV_COLOR_FORMAT_L8" />                |
+| `LAYER_PPF_AL88`     | <ApiLink name="LV_COLOR_FORMAT_AL88" />              |
+
+If the layer uses another pixel format, the create functions return `NULL`.
+
+There are some different use cases for LVGL's driver.
+All permutations of the below options are supported.
+
+- single or double buffered
+- direct or partial render mode
+- OS or no OS
+- parallelized flushing with the IPA (only for partial render mode)
+
+If an OS is enabled, a synchronization primitive will be used to
+give the thread a chance to yield to other threads while blocked,
+improving CPU utilization. See <ApiLink name="LV_USE_OS" /> in your `lv_conf.h`.
+
+## Configuration
+
+Enable the driver in `lv_conf.h`:
+
+```c
+#define LV_USE_GD_TLI 1
+
+/* Header with the TLI and IPA register definitions of your GD32 family */
+#define LV_DRIVER_TLI_HAL_INCLUDE "gd32h7xx.h"
+```
+
+| Option                                              | Default        | Description |
+|-----------------------------------------------------|----------------|-------------|
+| <ApiLink name="LV_USE_GD_TLI" />                    | `0`            | Enable the TLI driver. |
+| <ApiLink name="LV_DRIVER_TLI_HAL_INCLUDE" />        | `"gd32h7xx.h"` | Header providing the TLI and IPA register definitions. |
+| <ApiLink name="LV_GD_TLI_DEFINE_IRQ_HANDLERS" />    | `1`            | Let the driver define `TLI_IRQHandler()`. |
+| <ApiLink name="LV_GD_TLI_USE_IPA_FLUSH" />          | `0`            | Flush partial buffers with the IPA. Only available if <ApiLink name="LV_USE_DRAW_IPA" /> is `0`. |
+| <ApiLink name="LV_GD_IPA_DEFINE_IRQ_HANDLERS" />    | `1`            | Let the driver define `IPA_IRQHandler()`. Only used with <ApiLink name="LV_GD_TLI_USE_IPA_FLUSH" />. |
+
+## TLI Layers
+
+This driver creates an LVGL display
+which is only concerned with a specific layer of the TLI peripheral, meaning
+two LVGL TLI displays can be created and operate independently on the separate
+layers. Pass `0` for `LAYER0` and `1` for `LAYER1`.
+
+For example, to initialize a 480 × 272 RGB565 panel on the background layer:
+
+```c
+#define LCD_LAYER_BACKGROUND 0U
+#define LCD_LAYER_FOREGROUND 1U
+#define LCD_PIXEL_WIDTH      480U
+#define LCD_PIXEL_HEIGHT     272U
+#define FB_SIZE              (LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * 2U)
+#define RENDER_BUF_SIZE      (LCD_PIXEL_WIDTH * 32U * 2U)
+
+__ALIGNED(32) static uint8_t g_framebuf[FB_SIZE];
+__ALIGNED(32) static uint8_t g_renderbuf1[RENDER_BUF_SIZE];
+__ALIGNED(32) static uint8_t g_renderbuf2[RENDER_BUF_SIZE];
+
+static void board_display_init(void)
+{
+    lcd_init();
+    lcd_layer_init(LCD_LAYER_BACKGROUND, (uint32_t)(uintptr_t)g_framebuf,
+                   LCD_PIXEL_WIDTH, LCD_PIXEL_HEIGHT, LAYER_PPF_RGB565);
+    lcd_layer_enable(LCD_LAYER_BACKGROUND);
+    lcd_transparency_set(255);
+    tli_enable();
+}
+```
+
+The `lcd_*` functions are board-specific helpers; use the ones supplied by your board example
+or implement equivalent setup with the GD32 firmware library. The render buffers hold 32 lines
+each and are only needed in partial mode. Place `g_framebuf` in TLI-accessible memory as shown in
+[Memory Placement](#memory-placement). If using external SDRAM, initialize it before calling
+`board_display_init()`.
+
+## Direct Render Mode
+
+After board initialization, pass the same framebuffer address and layer to
+<ApiLink name="lv_gd_tli_create_direct" />. If enough memory is available, provide a second
+full-size framebuffer for double buffering:
+
+```c
+__ALIGNED(32) static uint8_t g_framebuf2[FB_SIZE];
+
+lv_display_t * disp = lv_gd_tli_create_direct(g_framebuf, g_framebuf2, LCD_LAYER_BACKGROUND);
+```
+
+Place both full-size buffers in TLI-accessible memory. For single buffering, omit `g_framebuf2`
+and pass `NULL` as the second argument.
+
+In double-buffered mode, LVGL renders into the inactive buffer. When rendering is done,
+the driver writes the address of that buffer to the `TLI_LXFBADDR` register and
+requests a register reload at the next vertical blanking period. The driver waits for the TLI
+layer-configuration-reload interrupt before rendering into the other buffer again,
+so there is no tearing.
+
+For the best visual results, use double buffering if enough memory is available.
+Use single buffering only when memory is very scarce. The GD32H7 has a CPU data cache,
+so single-buffered direct mode has unavoidable visual artifacts. If there is not enough
+memory for double-buffered direct mode, consider partial render mode.
+
+`g_framebuf` is the address assigned to `layer_frame_bufaddr` in the
+`tli_layer_parameter_struct` when using the GD32 firmware library directly. This value
+is written to the `TLI_LXFBADDR` register.
+
+```c
+tli_layer_parameter_struct tli_layer_init_struct;
+/* ... window, pixel format, etc. ... */
+tli_layer_init_struct.layer_frame_bufaddr = (uint32_t)(uintptr_t)g_framebuf;
+tli_layer_init(LAYER0, &tli_layer_init_struct);
+```
+
+## Partial Render Mode
+
+After board initialization, pass the partial render buffers to
+<ApiLink name="lv_gd_tli_create_partial" />:
+
+```c
+lv_display_t * disp = lv_gd_tli_create_partial(g_renderbuf1,
+                                               g_renderbuf2,
+                                               sizeof(g_renderbuf1),
+                                               LCD_LAYER_BACKGROUND);
+```
+
+The driver will use the information in the TLI layer configuration to find the
+layer's framebuffer and flush to it. By default the CPU copies the rendered area to the framebuffer.
+
+If <ApiLink name="LV_GD_TLI_USE_IPA_FLUSH" /> is enabled, the IPA copies the rendered
+area and converts it to the layer's pixel format, while LVGL already renders into the
+other partial buffer. Providing a second partial buffer improves CPU utilization
+and increases performance compared to a single buffer in this case.
+With IPA flush, the layer pixel format must be ARGB8888, RGB888 or RGB565; L8 and AL88 layers
+are not supported and the create function returns `NULL`.
+
+## Memory Placement
+
+A full-screen framebuffer is usually too large for the internal SRAM, so it's
+typically placed in external SDRAM connected to the EXMC. The SDRAM must be initialized
+before the TLI is enabled and before LVGL is drawing into it.
+For example, a 480 × 272 RGB565 framebuffer needs 2 × 480 × 272 = 255 KB, and an 800 × 480
+RGB888 framebuffer needs 3 × 800 × 480 = 1125 KB.
+
+You should ensure the framebuffer memory is actually reserved and not used by
+anything else, either in the linker script or scatter file, or by pointing to a
+fixed address in SDRAM that the linker doesn't use. In a GCC linker script, this
+can look like this:
+
+```c
+MEMORY
+{
+    /* ... FLASH and RAM regions of your device ... */
+    SDRAM (xrw) : ORIGIN = 0xC0000000, LENGTH = 32M /* EXMC SDRAM, the size depends on the board */
+}
+
+SECTIONS
+{
+    /* ... */
+    .framebuffer (NOLOAD) : { *(.framebuffer) } > SDRAM
+}
+```
+
+```c
+static uint8_t fb1[480 * 272 * 2] __attribute__((section(".framebuffer"), aligned(32)));
+static uint8_t fb2[480 * 272 * 2] __attribute__((section(".framebuffer"), aligned(32)));
+```
+
+Adjust the addresses and sizes to the memory map of your device and board.
+With Keil MDK, use a scatter file and `__attribute__((section(...)))` the same way.
+
+If the framebuffer is not set during board initialization, you may set it at runtime
+before creating the LVGL display:
+
+```c
+TLI_LXFBADDR(LAYER0) = (uint32_t)(uintptr_t)g_framebuf;
+tli_reload_config(TLI_REQUEST_RELOAD_EN);
+```
+
+Then create the display in either direct or partial mode as shown above.
+
+## Interrupts
+
+The driver uses these interrupts:
+
+- **TLI**: the layer-configuration-reload interrupt, in double-buffered direct mode only.
+- **IPA**: the transfer-finished interrupt, in partial mode with <ApiLink name="LV_GD_TLI_USE_IPA_FLUSH" /> only.
+
+The driver enables them in the NVIC at priority `5`. With FreeRTOS, this has to be
+numerically greater than or equal to `configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY`.
+
+By default, the driver defines `TLI_IRQHandler()` and `IPA_IRQHandler()`. If your
+application already defines them, e.g. because it also handles other TLI interrupts,
+set <ApiLink name="LV_GD_TLI_DEFINE_IRQ_HANDLERS" /> or
+<ApiLink name="LV_GD_IPA_DEFINE_IRQ_HANDLERS" /> to `0` and call the handlers of
+the driver from your own:
+
+```c
+void TLI_IRQHandler(void)
+{
+    lv_gd_tli_irq_handler();
+    /* handle other TLI interrupts */
+}
+
+void IPA_IRQHandler(void)
+{
+    lv_gd_tli_ipa_irq_handler();
+}
+```
+
+## Display Rotation
+
+The driver supports display rotation with
+<ApiLink name="lv_display_set_rotation" display="lv_display_set_rotation(disp, rotation)" /> where rotation is one of
+<ApiLink name="LV_ROTATION_90" />, <ApiLink name="LV_ROTATION_180" />,
+or <ApiLink name="LV_ROTATION_270" />. The rotation is initially
+<ApiLink name="LV_ROTATION_0" />.
+
+The rotation is done in software, requires <ApiLink name="LV_USE_DRAW_SW" />, and only
+works if the display was created using <ApiLink name="lv_gd_tli_create_partial" />.
+<ApiLink name="LV_GD_TLI_USE_IPA_FLUSH" /> will have no effect if rotation
+is used.
+
+## Interop with the IPA Draw Unit
+
+<ApiLink name="LV_GD_TLI_USE_IPA_FLUSH" /> can be enabled to use the IPA to flush
+partial buffers in parallel with other LVGL tasks, whether or not an OS is
+enabled. If the display is not partial, then there is no need to enable this
+option.
+
+It must not be enabled at the same time as <ApiLink name="LV_USE_DRAW_IPA" />, since both
+would use the IPA peripheral. With the IPA draw unit enabled, partial buffers are copied
+by the CPU; consider using double-buffered direct mode then, which needs no copy at all.
+See the [IPA support](/integration/chip_vendors/gigadevice/ipa).

@@ -1,0 +1,122 @@
+---
+title: Use LVGL in a GD32 Project
+description: "Adding the LVGL sources to a GD32 firmware library project and the GD32-specific parts of the integration: the tick, the display driver, and RTOS support."
+faqs:
+  - question: "How should I create the project?"
+    answer: "Start from a GigaDevice demo project for your evaluation board, ideally one where the LCD already works. It contains the clock, SDRAM and TLI initialization that LVGL relies on."
+  - question: "How do I add the LVGL sources to the project?"
+    answer: "Clone or copy LVGL into the project, add its .c files to the build, and add the directory containing the lvgl folder to the include paths."
+  - question: "What should the tick callback be?"
+    answer: "A function returning a millisecond counter, typically incremented in SysTick_Handler(). With FreeRTOS at a 1 kHz tick rate, xTaskGetTickCount can be used directly."
+  - question: "How should I provide the LVGL tick?"
+    answer: "For a bare-metal project with a 1 ms SysTick, call lv_tick_inc(1) from SysTick_Handler(). Alternatively, register a function that returns a millisecond count. With FreeRTOS at a 1 kHz tick rate, xTaskGetTickCount can be used as that callback."
+  - question: "Do I have to write a display driver?"
+    answer: "Not necessarily. If the board LCD is driven by the TLI peripheral, use LVGL's TLI driver. If LVGL has a driver for your display controller, use that. Otherwise see the SPI display driver guide."
+  - question: "Can LVGL use FreeRTOS in a GD32 project?"
+
+    answer: "Yes. Set LV_USE_OS to LV_OS_FREERTOS and LVGL will use FreeRTOS's thread creation and synchronization primitives while rendering. The TLI driver and the IPA draw unit then also let the CPU run other tasks while waiting for the hardware."
+---
+
+## Create the GD32 Project
+
+If you have a GD32 board with a display mounted to it, it's best to start from
+a GigaDevice demo project for that board, e.g. one of the TLI demos of the
+GD32H759I-EVAL. Such a project already contains the clock, SDRAM, GPIO and
+TLI (TFT-LCD Interface) initialization for the board LCD. If the board LCD is
+controlled by the TLI peripheral, you can use the
+[LVGL TLI driver](/integration/chip_vendors/gigadevice/tli).
+
+## Add LVGL to your Project
+
+<Steps>
+
+<Step>
+**Copy LVGL into the project**: `git clone` or copy LVGL into your project directory.
+</Step>
+
+<Step>
+**Add the sources**: Add the `.c` files of `lvgl/src` to the build. In Keil MDK
+or IAR EWARM, add them to a source group; with CMake, use LVGL's `CMakeLists.txt`.
+</Step>
+
+<Step>
+**Add it to the include paths**: Add the directory that contains the `lvgl` folder
+and the directory of your `lv_conf.h` to the include paths of the project.
+</Step>
+
+</Steps>
+
+Now that the source files are included in your project, follow the instructions to
+[add LVGL to your project](/integration/overview) and to create the
+`lv_conf.h` file and initialize the display.
+Before manually initializing your display though, check to see
+if your project uses the TLI peripheral. If it does, you can simply
+[use LVGL's TLI driver](/integration/chip_vendors/gigadevice/tli).
+
+## Using LVGL with the GD32 Firmware Library
+
+After reviewing [Adding LVGL to your project](/integration/overview),
+you will appreciate the specifics of using LVGL with a GD32 project
+covered here.
+
+### Tick
+
+The GD32 firmware library doesn't provide a millisecond tick getter. In a bare-metal project,
+configure SysTick to interrupt every millisecond if it does not already do so. After
+`lv_init()`, call `lv_tick_inc(1)` on each tick. GigaDevice demo projects typically define
+`SysTick_Handler()` in `gd32xxx_it.c`; add the call to the existing handler without removing
+any board-specific tick processing.
+
+```c
+/* In the existing SysTick_Handler(), after LVGL is initialized. */
+lv_tick_inc(1);
+```
+
+Alternatively, use `lv_tick_set_cb()` to register a millisecond tick getter. Use one method,
+not both. For FreeRTOS, see the RTOS section rather than reconfiguring the kernel's SysTick.
+
+In your main loop, call the timer handler and delay for a few milliseconds.
+
+```c
+while(1) {
+    uint32_t time_till_next = lv_timer_handler();
+    if(time_till_next == LV_NO_TIMER_READY) time_till_next = LV_DEF_REFR_PERIOD;
+    delay_ms(time_till_next); /* your millisecond delay function */
+}
+```
+
+### Display Driver
+
+Before manually initializing your display, check to see
+if your project uses the TLI peripheral. If it
+does, you can simply [use LVGL's TLI driver](/integration/chip_vendors/gigadevice/tli).
+
+If your display is [one that LVGL has a driver for](/integration/external_display_controllers),
+you should use it so that you have less driver logic to implement in
+your project.
+
+[See this guide for creating an SPI display driver.](/integration/chip_vendors/gigadevice/lcd_gd32_guide)
+
+To speed up rendering, enable the [IPA draw unit](/integration/chip_vendors/gigadevice/ipa).
+
+### Data Cache
+
+The GD32H7 is a Cortex-M7 with a data cache. The TLI driver and the IPA draw
+unit clean and invalidate the cache themselves, so no extra steps are needed
+when using them. If you write your own driver that hands buffers to a DMA or the
+TLI, clean the data cache (`SCB_CleanDCache_by_Addr()`) before the transfer.
+
+### RTOS
+
+If you use FreeRTOS in your GD32 project, set <ApiLink name="LV_USE_OS" /> to
+<ApiLink name="LV_OS_FREERTOS" />. LVGL will use the thread creation and
+synchronization primitives of FreeRTOS when rendering, and the TLI driver and the
+IPA draw unit will let the CPU run other tasks while waiting for the hardware.
+
+With FreeRTOS, the tick callback can be `xTaskGetTickCount` if
+`configTICK_RATE_HZ` is `1000`.
+
+The TLI driver enables its interrupts at priority `5`, and the IPA draw unit
+uses `configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY`, because their interrupt
+handlers call FreeRTOS `FromISR` APIs. Make sure
+`configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY` is `5` or lower (numerically).

@@ -3193,6 +3193,54 @@
     #endif
 #endif
 
+#ifndef LV_USE_GD_TLI
+    #ifdef CONFIG_LV_USE_GD_TLI
+        #define LV_USE_GD_TLI CONFIG_LV_USE_GD_TLI
+    #else
+        #define LV_USE_GD_TLI 0
+    #endif
+#endif
+
+#ifndef LV_DRIVER_TLI_HAL_INCLUDE
+    #ifdef CONFIG_LV_DRIVER_TLI_HAL_INCLUDE
+        #define LV_DRIVER_TLI_HAL_INCLUDE CONFIG_LV_DRIVER_TLI_HAL_INCLUDE
+    #else
+        #define LV_DRIVER_TLI_HAL_INCLUDE "gd32h7xx.h"
+    #endif
+#endif
+
+#ifndef LV_GD_TLI_DEFINE_IRQ_HANDLERS
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_GD_TLI_DEFINE_IRQ_HANDLERS
+            #define LV_GD_TLI_DEFINE_IRQ_HANDLERS CONFIG_LV_GD_TLI_DEFINE_IRQ_HANDLERS
+        #else
+            #define LV_GD_TLI_DEFINE_IRQ_HANDLERS 0
+        #endif
+    #else
+          #define LV_GD_TLI_DEFINE_IRQ_HANDLERS LV_USE_GD_TLI
+    #endif
+#endif
+
+#ifndef LV_GD_TLI_USE_IPA_FLUSH
+    #ifdef CONFIG_LV_GD_TLI_USE_IPA_FLUSH
+        #define LV_GD_TLI_USE_IPA_FLUSH CONFIG_LV_GD_TLI_USE_IPA_FLUSH
+    #else
+        #define LV_GD_TLI_USE_IPA_FLUSH 0
+    #endif
+#endif
+
+#ifndef LV_GD_IPA_DEFINE_IRQ_HANDLERS
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_GD_IPA_DEFINE_IRQ_HANDLERS
+            #define LV_GD_IPA_DEFINE_IRQ_HANDLERS CONFIG_LV_GD_IPA_DEFINE_IRQ_HANDLERS
+        #else
+            #define LV_GD_IPA_DEFINE_IRQ_HANDLERS 0
+        #endif
+    #else
+          #define LV_GD_IPA_DEFINE_IRQ_HANDLERS LV_GD_TLI_USE_IPA_FLUSH && LV_USE_GD_TLI
+    #endif
+#endif
+
 #ifndef LV_USE_LOVYAN_GFX
     #ifdef CONFIG_LV_USE_LOVYAN_GFX
         #define LV_USE_LOVYAN_GFX CONFIG_LV_USE_LOVYAN_GFX
@@ -5273,6 +5321,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_LINUX_FBDEV_VSYNC && !(LV_USE_LINUX_FBDEV)
     #error "LV_LINUX_FBDEV_VSYNC requires LV_USE_LINUX_FBDEV (Kconfig depends on)"
+#endif
+
+#if LV_GD_TLI_USE_IPA_FLUSH && !(!LV_USE_DRAW_IPA && LV_USE_GD_TLI)
+    #error "LV_GD_TLI_USE_IPA_FLUSH requires !LV_USE_DRAW_IPA && LV_USE_GD_TLI (Kconfig depends on)"
 #endif
 
 #if (LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341 || LV_USE_NV3007) && !LV_USE_GENERIC_MIPI

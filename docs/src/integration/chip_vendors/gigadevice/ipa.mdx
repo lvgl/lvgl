@@ -1,0 +1,123 @@
+---
+title: GD32 IPA
+description: "The GD32 IPA (Image Processing Accelerator) peripheral accelerates pixel data manipulation asynchronously. LVGL integrates it as a draw unit for fills, images and layers."
+faqs:
+  - question: "How do I enable the IPA draw unit?"
+    answer: "Set LV_USE_DRAW_IPA to 1 in lv_conf.h and set LV_DRAW_IPA_HAL_INCLUDE to the header of your GD32 family, e.g. \"gd32h7xx.h\". lv_init() initializes the draw unit and enables the IPA clock; nothing else is required."
+  - question: "Which GD32 families are supported?"
+    answer: "GD32H7, GD32F470 and GD32F527. The draw unit enables the IPA clock itself and fails to compile for other families."
+  - question: "Which draw tasks does the IPA accelerate?"
+    answer: "Fills without radius and gradient, images from C arrays and layers without transformation, recoloring, masks or special blend modes, all with opacity. The target must be ARGB8888, XRGB8888, RGB888 or RGB565. Everything else is rendered in parallel by the software draw unit."
+  - question: "Can the CPU sleep while an IPA transfer is running?"
+    answer: "Yes, with FreeRTOS. Set LV_USE_OS to LV_OS_FREERTOS, set LV_USE_DRAW_IPA_INTERRUPT to 1, and call lv_draw_ipa_transfer_complete_interrupt_handler() from IPA_IRQHandler() after clearing the transfer-finished flag. Otherwise LVGL spins while waiting."
+  - question: "Does LVGL use the GD32 firmware library for the IPA?"
+
+    answer: "No, it programs the IPA through direct register access. Make sure no other code uses the IPA peripheral at the same time."
+  - question: "Can the IPA draw unit be used together with the TLI driver?"
+    answer: "Yes, as long as LV_GD_TLI_USE_IPA_FLUSH is not enabled, because the TLI driver would then use the IPA for flushing."
+---
+
+The GD32 IPA (Image Processing Accelerator) will be referred to as IPA on this page.
+
+## What is the IPA
+
+Many high-end GD32s, such as the GD32H7 and GD32F4 series, come with a dedicated
+hardware peripheral for accelerating pixel data manipulation. It works asynchronously with
+the CPU. It's similar to a memory-to-memory DMA engine, but allows specifying source and
+destination line offsets and converting the data it's moving from one pixel format to another.
+It can fill an area with a constant color and blend a foreground over a background controlled
+by a constant alpha value or by a pixel alpha channel.
+
+LVGL integrates the IPA as a [draw unit](/main-modules/draw/draw_pipeline). During rendering,
+the LVGL IPA draw unit will take tasks that it can perform. The ones
+it cannot perform will be done in parallel by the software draw unit.
+
+## Supported Draw Tasks
+
+The IPA draw unit renders into layers with the color formats
+<ApiLink name="LV_COLOR_FORMAT_ARGB8888" />, <ApiLink name="LV_COLOR_FORMAT_XRGB8888" />,
+<ApiLink name="LV_COLOR_FORMAT_RGB888" /> and <ApiLink name="LV_COLOR_FORMAT_RGB565" />.
+It accepts these draw tasks:
+
+- **Fills** with any opacity, without radius and gradient.
+- **Images** with any opacity, whose source is a variable (e.g. an image converted to a C array)
+  in ARGB8888, XRGB8888, RGB888, RGB565 or ARGB1555 format, without rotation, scaling, skew,
+  recoloring, tiling, bitmap masks, clip radius, and with normal blend mode.
+- **Layers**, i.e. blending a rendered layer (e.g. of a widget with opacity) into its parent layer,
+  with the same restrictions as images. The source layer must be ARGB8888, XRGB8888, RGB888 or RGB565.
+
+The line stride of the buffers must be a multiple of the pixel size.
+Text, lines, arcs, rounded rectangles, gradients, shadows, and transformed images are
+rendered by the software draw unit.
+
+## Usage
+
+To use the IPA in your project, set <ApiLink name="LV_USE_DRAW_IPA" />
+to `1` in `lv_conf.h`. You will need to specify the header for LVGL
+to include internally for the IPA register definitions. Set <ApiLink name="LV_DRAW_IPA_HAL_INCLUDE" />
+to the corresponding header, e.g. `"gd32h7xx.h"` for the GD32H7 or `"gd32f4xx.h"` for the GD32F470.
+
+```c
+#define LV_USE_DRAW_IPA 1
+#define LV_DRAW_IPA_HAL_INCLUDE "gd32h7xx.h"
+```
+
+<ApiLink name="lv_init" /> initializes the draw unit, which enables the IPA clock and
+disables the IPA inter-transfer dead time. LVGL uses direct register access to
+manipulate the IPA peripheral. It does not use the IPA functions of the GD32 firmware library.
+If you're using a framework or other code that uses the IPA, ensure it will not be in contention
+with LVGL over the peripheral.
+
+On the Cortex-M7 based GD32H7, the draw unit cleans the data cache before and
+invalidates it after each IPA transfer, so the CPU and the IPA see the same pixel data.
+
+Nothing more is required for the IPA to start working immediately, but
+you may want to make some other considerations.
+
+## Interrupt Mode
+
+Since the IPA is implemented in LVGL as a draw unit, it can work in parallel
+with other draw units (typically only the software draw unit). By default,
+any time that the IPA is working on a draw task that LVGL depends on the
+completion of before continuing, LVGL will spin waiting for
+the IPA to complete. If you would like the CPU to be scheduled to
+other FreeRTOS tasks while an IPA transfer is ongoing, do the following:
+
+<Steps>
+
+<Step>
+**Enable FreeRTOS**: Set <ApiLink name="LV_USE_OS" /> to <ApiLink name="LV_OS_FREERTOS" />.
+</Step>
+
+<Step>
+**Enable the interrupt**: Set <ApiLink name="LV_USE_DRAW_IPA_INTERRUPT" /> to `1` in `lv_conf.h`.
+The draw unit then enables the transfer-finished interrupt and enables `IPA_IRQn` in the NVIC with
+the priority `configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY`.
+</Step>
+
+<Step>
+**Call the handler**: Define `IPA_IRQHandler()` in your application. Check and clear the
+transfer-finished flag, then call <ApiLink name="lv_draw_ipa_transfer_complete_interrupt_handler" />.
+</Step>
+
+</Steps>
+
+```c
+void IPA_IRQHandler(void)
+{
+    if(IPA_INTF & IPA_INTF_FTFIF) {
+        IPA_INTC = IPA_INTC_FTFIFC;
+        lv_draw_ipa_transfer_complete_interrupt_handler();
+    }
+}
+```
+
+## Interop with the TLI Driver
+
+IPA usage can be freely mixed with [TLI](/integration/chip_vendors/gigadevice/tli) usage as long as
+<ApiLink name="LV_GD_TLI_USE_IPA_FLUSH" /> is **not** enabled. The TLI driver would use the IPA
+peripheral for flushing, if that is enabled, so enabling both options causes a compile error.
+
+With the IPA draw unit enabled, the TLI driver copies partial buffers to the framebuffer with
+the CPU. Double-buffered direct render mode avoids that copy, so it's the best fit for the IPA
+draw unit if enough memory is available.

@@ -1,0 +1,176 @@
+---
+title: SPI Display Driver Creation for GD32
+description: "Driving an RGB565 240x320 SPI display and an I2C touch panel from a GD32 firmware library project, with example flush and read callbacks."
+faqs:
+  - question: "Which render mode does the example use?"
+    answer: "Single-buffered direct mode, but partial mode works too. Performance can be improved by using DMA with double buffering."
+  - question: "Does LVGL have a driver for my SPI display controller?"
+    answer: "Probably. LVGL has drivers for MIPI DBI compatible controllers such as the ST7789 and ILI9341, which also send the initialization sequence. Then you only need to implement the functions that send commands and pixel data over SPI."
+  - question: "When should the display initialization commands be sent?"
+    answer: "Before entering the timer loop, after the SPI peripheral and the GPIOs have been initialized with the GD32 firmware library."
+  - question: "Why does the flush callback check lv_display_flush_is_last()?"
+    answer: "In direct mode LVGL renders into the full-size buffer and flushes it once per refresh, so the whole buffer only needs to be transmitted on the last flush call."
+  - question: "How does the touch driver know when data is available?"
+    answer: "Through an interrupt pin connected to an EXTI line. The EXTI interrupt handler sets a flag that the read callback checks with the interrupt temporarily disabled."
+---
+
+Displays without an RGB interface can't be driven by the
+[TLI](/integration/chip_vendors/gigadevice/tli). They usually have a
+display controller with its own frame memory, connected over SPI. This page shows how
+to write the display and touch drivers for such a display in your project.
+
+## Using a Built-in Display Controller Driver
+
+LVGL has [drivers for common display controllers](/integration/external_display_controllers),
+such as the ST7789 and the ILI9341. They send the initialization sequence of the controller and
+set the drawing window for each flush. You only implement two functions which send a command
+and pixel data over SPI.
+
+```c
+static void lcd_send_cmd(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size,
+                         const uint8_t * param, size_t param_size)
+{
+    /* DC low: send cmd; DC high: send param, with your SPI function */
+}
+
+static void lcd_send_color(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size,
+                           uint8_t * param, size_t param_size)
+{
+    /* DC low: send cmd; DC high: send the pixel data in param, e.g. with DMA */
+    lv_display_flush_ready(disp); /* call it when the transfer is complete */
+}
+
+static uint8_t buf[240 * 32 * 2];
+
+lv_display_t * disp = lv_st7789_create(240, 320, LV_LCD_FLAG_NONE, lcd_send_cmd, lcd_send_color);
+lv_display_set_buffers(disp, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
+```
+
+See [examples/porting/lv_port_lcd_stm32_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_lcd_stm32_template.c)
+for a complete example. Only the SPI and GPIO calls have to be replaced by the GD32 firmware library calls shown below.
+
+## Display Driver
+
+Here is how you can drive an RGB565 240x320 SPI display using the GD32 firmware library
+without a built-in driver.
+You can use direct or partial mode. Single-buffered direct is shown in this example.
+See the [Display](/main-modules/display) module for general background on LVGL displays.
+
+In your initialization code, create the display and set the buffers and flush callback.
+
+```c
+static uint8_t fb[240 * 320 * 2];
+
+lv_display_t * disp = lv_display_create(240, 320);
+lv_display_set_buffers(disp, fb, NULL, sizeof(fb), LV_DISPLAY_RENDER_MODE_DIRECT);
+lv_display_set_flush_cb(disp, flush_cb);
+lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565); /* not needed if LV_COLOR_FORMAT_DEFAULT is LV_COLOR_FORMAT_RGB565 */
+```
+
+Initialize the SPI peripheral and the GPIOs of the display (CS, DC, reset, backlight)
+with the GD32 firmware library, e.g. with `rcu_periph_clock_enable()`, `gpio_mode_set()`,
+`spi_init()` and `spi_enable()`.
+
+If there are any commands that should be sent to initialize the display, send them before
+entering the timer loop. They are in the datasheet of the display controller or in the
+demo code of the display module.
+
+Here is an example flush callback implementation. It uses blocking transfers of the
+GD32F4 style SPI API. Other families, such as the GD32H7, have a different SPI API;
+see the SPI examples of their firmware library.
+
+```c
+#define LCD_SPI         SPI0
+#define LCD_CS_PORT     GPIOA
+#define LCD_CS_PIN      GPIO_PIN_4
+
+static void lcd_spi_write(const uint8_t * data, uint32_t size)
+{
+    while(size--) {
+        while(RESET == spi_i2s_flag_get(LCD_SPI, SPI_FLAG_TBE));
+        spi_i2s_data_transmit(LCD_SPI, *data++);
+    }
+    while(SET == spi_i2s_flag_get(LCD_SPI, SPI_FLAG_TRANS));
+}
+
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+{
+    if(lv_display_flush_is_last(disp)) {
+        /* Chip select (CS) pins are typically active-low. */
+        gpio_bit_reset(LCD_CS_PORT, LCD_CS_PIN);
+        lcd_spi_write(px_map, lv_area_get_size(area) * 2);
+        gpio_bit_set(LCD_CS_PORT, LCD_CS_PIN);
+    }
+    lv_display_flush_ready(disp);
+}
+```
+
+Performance can be improved by using DMA with double buffering. In that case, call
+<ApiLink name="lv_display_flush_ready" /> from the DMA transfer-complete interrupt
+instead. On the GD32H7, clean the data cache of the buffer with
+`SCB_CleanDCache_by_Addr()` before starting the DMA.
+
+## Touch Input Device
+
+In your initialization code, create the touch screen [input device](/main-modules/indev).
+
+```c
+lv_indev_t * indev = lv_indev_create();
+lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+lv_indev_set_read_cb(indev, touch_read);
+```
+
+Initialize the I2C peripheral, and configure the interrupt pin of the touch controller
+as an EXTI line with a falling-edge trigger, e.g. with `syscfg_exti_line_config()`,
+`exti_init()` and `nvic_irq_enable()`.
+
+Here is an example implementation of a touch driver for a GT911 touch controller that uses I2C
+communication and an interrupt pin on `PB5` to signal available data.
+`touch_reg_read()` and `touch_reg_write()` stand for your I2C functions that read and
+write the 16-bit addressed registers of the touch controller.
+
+```c
+static volatile bool do_sample_touch = false;
+static lv_indev_state_t last_state = LV_INDEV_STATE_RELEASED;
+
+void EXTI5_9_IRQHandler(void)
+{
+    if(RESET != exti_interrupt_flag_get(EXTI_5)) {
+        exti_interrupt_flag_clear(EXTI_5);
+        do_sample_touch = true;
+    }
+}
+
+static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
+{
+    NVIC_DisableIRQ(EXTI5_9_IRQn);
+    if(do_sample_touch) {
+        uint8_t touches = 0;
+        uint8_t buf[6];
+        const uint16_t STATUS_REG = 0x814E;
+        const uint16_t TOUCH_POS_REG = 0x8150;
+        uint8_t zero = 0;
+
+        touch_reg_read(STATUS_REG, buf, 1);
+        touches = (0x0F & buf[0]);
+
+        touch_reg_write(STATUS_REG, &zero, 1);
+
+        do_sample_touch = false;
+
+        if(touches > 0) {
+            last_state = LV_INDEV_STATE_PRESSED;
+
+            touch_reg_read(TOUCH_POS_REG, buf, 4);
+            data->point.x = buf[0] + (buf[1] << 8);
+            data->point.y = buf[2] + (buf[3] << 8);
+        }
+        else {
+            last_state = LV_INDEV_STATE_RELEASED;
+        }
+    }
+    NVIC_EnableIRQ(EXTI5_9_IRQn);
+
+    data->state = last_state;
+}
+```

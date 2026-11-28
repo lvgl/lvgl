@@ -4,13 +4,13 @@
  */
 
 /*Copy this file as "lv_port_indev.c" and set this value to "1" to enable content*/
-#if 0
+#if 1
 
 /*********************
  *      INCLUDES
  *********************/
 #include "lv_port_indev_template.h"
-
+#include "bsp_ts_gt911.h"
 /*********************
  *      DEFINES
  *********************/
@@ -58,6 +58,8 @@ lv_indev_t * indev_button;
 static int32_t encoder_diff;
 static lv_indev_state_t encoder_state;
 
+extern uint8_t touch_buf[48]; 
+extern uint8_t clear_flag;
 /**********************
  *      MACROS
  **********************/
@@ -92,75 +94,6 @@ void lv_port_indev_init(void)
     lv_indev_set_type(indev_touchpad, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev_touchpad, touchpad_read);
 
-    /*------------------
-     * Mouse
-     * -----------------*/
-
-    /*Initialize your mouse if you have*/
-    mouse_init();
-
-    /*Register a mouse input device*/
-    indev_mouse = lv_indev_create();
-    lv_indev_set_type(indev_mouse, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(indev_mouse, mouse_read);
-
-    /*Set cursor. For simplicity set a HOME symbol now.*/
-    lv_obj_t * mouse_cursor = lv_image_create(lv_screen_active());
-    lv_image_set_src(mouse_cursor, LV_SYMBOL_HOME);
-    lv_indev_set_cursor(indev_mouse, mouse_cursor);
-
-    /*------------------
-     * Keypad
-     * -----------------*/
-
-    /*Initialize your keypad or keyboard if you have*/
-    keypad_init();
-
-    /*Register a keypad input device*/
-    indev_keypad = lv_indev_create();
-    lv_indev_set_type(indev_keypad, LV_INDEV_TYPE_KEYPAD);
-    lv_indev_set_read_cb(indev_keypad, keypad_read);
-
-    /*Later you should create group(s) with `lv_group_t * group = lv_group_create()`,
-     *add objects to the group with `lv_group_add_obj(group, obj)`
-     *and assign this input device to group to navigate in it:
-     *`lv_indev_set_group(indev_keypad, group);`*/
-
-    /*------------------
-     * Encoder
-     * -----------------*/
-
-    /*Initialize your encoder if you have*/
-    encoder_init();
-
-    /*Register a encoder input device*/
-    indev_encoder = lv_indev_create();
-    lv_indev_set_type(indev_encoder, LV_INDEV_TYPE_ENCODER);
-    lv_indev_set_read_cb(indev_encoder, encoder_read);
-
-    /*Later you should create group(s) with `lv_group_t * group = lv_group_create()`,
-     *add objects to the group with `lv_group_add_obj(group, obj)`
-     *and assign this input device to group to navigate in it:
-     *`lv_indev_set_group(indev_encoder, group);`*/
-
-    /*------------------
-     * Button
-     * -----------------*/
-
-    /*Initialize your button if you have*/
-    button_init();
-
-    /*Register a button input device*/
-    indev_button = lv_indev_create();
-    lv_indev_set_type(indev_button, LV_INDEV_TYPE_BUTTON);
-    lv_indev_set_read_cb(indev_button, button_read);
-
-    /*Assign buttons to points on the screen*/
-    static const lv_point_t btn_points[2] = {
-        {10, 10},   /*Button 0 -> x:10; y:10*/
-        {40, 100},  /*Button 1 -> x:40; y:100*/
-    };
-    lv_indev_set_button_points(indev_button, btn_points);
 }
 
 /**********************
@@ -175,26 +108,47 @@ void lv_port_indev_init(void)
 static void touchpad_init(void)
 {
     /*Your code comes here*/
+    gt911_init();
 }
 
 /*Will be called by the library to read the touchpad*/
 static void touchpad_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
 {
-    static int32_t last_x = 0;
-    static int32_t last_y = 0;
+    ErrStatus err = SUCCESS;
+
+    /* return error if gt911 is not enabled */
+    if (gt911.enable == 0) {
+        return ; 
+    }
+    /* read gt911 pressed info */
+    err &= gt911_readreg(GT911_PRESSED_INFO_REG, touch_buf, 1);
+    gt911.pressed_info = touch_buf[0];
 
     /*Save the pressed coordinates and the state*/
-    if(touchpad_is_pressed()) {
-        touchpad_get_xy(&last_x, &last_y);
-        data->state = LV_INDEV_STATE_PRESSED;
+    if(gt911.pressed_info & 0x0f) {
+        /* read coordinate data */
+        err &= gt911_readreg(GT911_COORDINATE_REG, touch_buf, 8 * (gt911.pressed_info & 0x0f));
+        /* store coordinate data */
+        for (uint8_t i = 0; i < (gt911.pressed_info & 0x0f); i++) {
+            gt911.x[i] = ((uint16_t)touch_buf[2 + i * 8] << 8) + touch_buf[1 + i * 8];
+            gt911.y[i] = ((uint16_t)touch_buf[4 + i * 8] << 8) + touch_buf[3 + i * 8];
+            gt911.s[i] = ((uint16_t)touch_buf[6 + i * 8] << 8) + touch_buf[5 + i * 8];
+        }
+        /* touch detected, set pressed to 2 (release time) */
+        gt911.pressed = 2;
+        data->point.x =  gt911.x[0];
+        data->point.y = gt911.y[0];
+
+        data->state = LV_INDEV_STATE_PR;
     }
     else {
-        data->state = LV_INDEV_STATE_RELEASED;
+        data->state = LV_INDEV_STATE_REL;
     }
 
-    /*Set the last pressed coordinates*/
-    data->point.x = last_x;
-    data->point.y = last_y;
+    if (gt911.pressed_info) {
+        /* clear pressed info */
+        err &= gt911_writereg(GT911_PRESSED_INFO_REG, &clear_flag, 1);
+    }
 }
 
 /*Return true is the touchpad is pressed*/

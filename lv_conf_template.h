@@ -1612,6 +1612,37 @@
 /** Driver for FT81X EVE graphics controllers connected over SPI. */
 #define LV_USE_FT81X 0
 
+/** Create a display bound to a layer of the GigaDevice TLI peripheral. */
+#define LV_USE_GD_TLI 0
+
+#if LV_USE_GD_TLI
+/** Header that provides the TLI and IPA register definitions for the target
+ *  GD32 family. Use gd32h7xx.h for GD32H7 devices.
+ */
+#define LV_DRIVER_TLI_HAL_INCLUDE "gd32h7xx.h"
+
+/** Disable it to define TLI_IRQHandler in the application and call
+ *  lv_gd_tli_irq_handler() from it.
+ */
+#define LV_GD_TLI_DEFINE_IRQ_HANDLERS 1
+
+#if !LV_USE_DRAW_IPA
+/** Flush partial mode TLI displays with the IPA, in parallel with rendering.
+ *  Only available when the IPA renderer is disabled.
+ */
+#define LV_GD_TLI_USE_IPA_FLUSH 0
+
+#endif /*!LV_USE_DRAW_IPA*/
+
+#if LV_GD_TLI_USE_IPA_FLUSH
+/** Disable it to define IPA_IRQHandler in the application and call
+ *  lv_gd_tli_ipa_irq_handler() from it.
+ */
+#define LV_GD_IPA_DEFINE_IRQ_HANDLERS 1
+
+#endif /*LV_GD_TLI_USE_IPA_FLUSH*/
+#endif /*LV_USE_GD_TLI*/
+
 /** Display and touch driver built on the LovyanGFX C++ library, which must be available in the build. */
 #define LV_USE_LOVYAN_GFX 0
 

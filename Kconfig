@@ -2479,6 +2479,45 @@ config LV_USE_FT81X
 	default n
 	help
 		Driver for FT81X EVE graphics controllers connected over SPI.
+config LV_USE_GD_TLI
+	bool "GigaDevice TLI"
+	default n
+	help
+		Create a display bound to a layer of the GigaDevice TLI peripheral.
+
+if LV_USE_GD_TLI
+
+config LV_DRIVER_TLI_HAL_INCLUDE
+	string "GD32 peripheral header"
+	default "gd32h7xx.h"
+	help
+		Header that provides the TLI and IPA register definitions for the target
+		GD32 family. Use gd32h7xx.h for GD32H7 devices.
+
+config LV_GD_TLI_DEFINE_IRQ_HANDLERS
+	bool "Define TLI_IRQHandler in the driver"
+	default y
+	help
+		Disable it to define TLI_IRQHandler in the application and call
+		lv_gd_tli_irq_handler() from it.
+
+config LV_GD_TLI_USE_IPA_FLUSH
+	bool "IPA flush for partial mode displays"
+	default n
+	depends on !LV_USE_DRAW_IPA
+	help
+		Flush partial mode TLI displays with the IPA, in parallel with rendering.
+		Only available when the IPA renderer is disabled.
+
+config LV_GD_IPA_DEFINE_IRQ_HANDLERS
+	bool "Define IPA_IRQHandler in the driver"
+	default y
+	depends on LV_GD_TLI_USE_IPA_FLUSH
+	help
+		Disable it to define IPA_IRQHandler in the application and call
+		lv_gd_tli_ipa_irq_handler() from it.
+
+endif #LV_USE_GD_TLI
 config LV_USE_LOVYAN_GFX
 	bool "LovyanGFX"
 	default n
