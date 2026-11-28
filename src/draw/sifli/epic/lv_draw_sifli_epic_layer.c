@@ -17,6 +17,7 @@
 
 #if LV_USE_SIFLI_EPIC
 #include "lv_sifli_epic_utils.h"
+#include "../../lv_draw_image_private.h"
 /*********************
  *      DEFINES
  *********************/
@@ -65,8 +66,8 @@ void lv_draw_sifli_epic_layer(lv_draw_unit_t * draw_unit, lv_layer_t * layer, co
      * layout/format handling for temporary layers. */
     lv_draw_buf_flush_cache(layer_to_draw->draw_buf, NULL);
 
-    lv_draw_image_dsc_t new_draw_dsc = *dsc;
-    new_draw_dsc.src = layer_to_draw->draw_buf;
+    lv_draw_image_dsc_t new_draw_dsc;
+    lv_draw_image_dsc_from_layer(&new_draw_dsc, dsc);
 
     lv_draw_sifli_epic_img(draw_unit, layer, clip_area, &new_draw_dsc, coords);
 }
