@@ -188,6 +188,8 @@ struct _lv_cache_slot_size_t {
 
 /**
  * Create a cache object with the given parameters.
+ * @note Allocation failure triggers LV_ASSERT_MALLOC when enabled. If execution continues,
+ *       callers must handle a NULL result before using the cache.
  * @param cache_class   The class of the cache. Currently only support one two builtin classes:
  *                        - lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
  *                        - lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy.
@@ -204,6 +206,7 @@ lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
 
 /**
  * Destroy a cache object.
+ * @note Release all acquired entries, including previously dropped entries, before destroying the cache.
  * @param cache         The cache object pointer to destroy.
  * @param user_data     A user data pointer that will be passed to the free callback. @nullable
  */
@@ -272,8 +275,11 @@ void lv_cache_reserve(lv_cache_t * cache, uint32_t reserved_size, void * user_da
 void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data);
 
 /**
- * Drop all cache entries. All entries will be removed from the cache and their data will be freed when the last reference to them is released.
- * @note If some entries are still referenced by other objects, it will issue an error. And this case shouldn't happen in normal cases..
+ * Drop all cache entries.
+ * The built-in LRU red-black-tree classes remove entries from lookup immediately and free acquired
+ * entries after their last release. Keep the cache object alive until those references are released.
+ * @note Release all acquired entries before calling this function for the built-in linked-list
+ *       and second-chance array classes. Custom classes define their own reference-handling policy.
  * @param cache         The cache object pointer to drop all entries.
  * @param user_data     A user data pointer that will be passed to the free callback. @nullable
  */

@@ -6,6 +6,8 @@
 #include "unity/unity.h"
 
 static uint32_t MEM_SIZE = 0;
+static lv_cache_t * image_cache;
+static lv_cache_t * header_cache;
 
 // Cache size in bytes
 #define CACHE_SIZE_BYTES 1000
@@ -15,11 +17,15 @@ void setUp(void)
 {
     /* Function run before every test */
     MEM_SIZE = lv_test_get_free_mem();
+    image_cache = LV_GLOBAL_DEFAULT()->img_cache;
+    header_cache = LV_GLOBAL_DEFAULT()->img_header_cache;
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
+    LV_GLOBAL_DEFAULT()->img_cache = image_cache;
+    LV_GLOBAL_DEFAULT()->img_header_cache = header_cache;
     TEST_ASSERT_MEM_LEAK_LESS_THAN(MEM_SIZE, 64);
 }
 
@@ -58,6 +64,69 @@ static lv_cache_t * create_cache(const lv_cache_class_t * cache_class,
         .free_cb = (lv_cache_free_cb_t)free_cb,
     };
     return lv_cache_create(cache_class, sizeof(test_data_t), max_size, ops);
+}
+
+static void count_free_cb(test_data_t * node, void * user_data)
+{
+    uint32_t * count = user_data;
+    (*count)++;
+    free_cb(node, NULL);
+}
+
+void test_cache_drop_all_preserves_acquired_entries(void)
+{
+    const lv_cache_class_t * classes[] = {&lv_cache_class_lru_rb_count, &lv_cache_class_lru_rb_size};
+    for(size_t i = 0; i < sizeof(classes) / sizeof(classes[0]); i++) {
+        lv_cache_t * cache = create_cache(classes[i], 4);
+        TEST_ASSERT_NOT_NULL(cache);
+        lv_cache_set_free_cb(cache, (lv_cache_free_cb_t)count_free_cb, NULL);
+        uint32_t freed = 0;
+        test_data_t key = {.slot.size = 1, .key1 = 1, .magic = 123};
+        lv_cache_entry_t * first = lv_cache_add(cache, &key, NULL);
+        TEST_ASSERT_NOT_NULL(first);
+        lv_cache_entry_t * second = lv_cache_acquire(cache, &key, NULL);
+        TEST_ASSERT_EQUAL_PTR(first, second);
+        key.key1 = 2;
+        lv_cache_entry_t * unused = lv_cache_add(cache, &key, NULL);
+        TEST_ASSERT_NOT_NULL(unused);
+        lv_cache_release(cache, unused, &freed);
+
+        lv_cache_drop_all(cache, &freed);
+        TEST_ASSERT_EQUAL_UINT32(1, freed);
+        TEST_ASSERT_EQUAL_UINT(0, lv_cache_get_size(cache, NULL));
+        key.key1 = 1;
+        TEST_ASSERT_NULL(lv_cache_acquire(cache, &key, NULL));
+        TEST_ASSERT_TRUE(lv_cache_entry_is_invalid(first));
+        TEST_ASSERT_EQUAL_INT32(2, lv_cache_entry_get_ref(first));
+        TEST_ASSERT_EQUAL_UINT32(123, ((test_data_t *)lv_cache_entry_get_data(first))->magic);
+        lv_cache_entry_t * replacement = lv_cache_add(cache, &key, NULL);
+        TEST_ASSERT_NOT_NULL(replacement);
+        TEST_ASSERT_NOT_EQUAL(first, replacement);
+        lv_cache_release(cache, first, &freed);
+        TEST_ASSERT_EQUAL_UINT32(1, freed);
+        lv_cache_release(cache, second, &freed);
+        TEST_ASSERT_EQUAL_UINT32(2, freed);
+        lv_cache_release(cache, replacement, &freed);
+        lv_cache_destroy(cache, &freed);
+        TEST_ASSERT_EQUAL_UINT32(3, freed);
+    }
+}
+
+void test_image_caches_unavailable(void)
+{
+    LV_GLOBAL_DEFAULT()->img_cache = NULL;
+    LV_GLOBAL_DEFAULT()->img_header_cache = NULL;
+
+    TEST_ASSERT_FALSE(lv_image_cache_is_enabled());
+    TEST_ASSERT_FALSE(lv_image_header_cache_is_enabled());
+    TEST_ASSERT_NULL(lv_image_cache_iter_create());
+    TEST_ASSERT_NULL(lv_image_header_cache_iter_create());
+    lv_image_cache_resize(16, true);
+    lv_image_header_cache_resize(16, true);
+    lv_image_cache_drop(NULL);
+    lv_image_cache_drop("A:missing.png");
+    lv_image_cache_dump();
+    lv_image_header_cache_dump();
 }
 
 void test_cache_lru_rb_1(void)
@@ -222,6 +291,7 @@ static void cache_eviction_test(lv_cache_t * cache, test_data_t * expected_data,
         }
     }
     TEST_ASSERT_EQUAL(9, original_entries_found_cnt);
+    lv_cache_release(cache, new_entry, NULL);
 }
 
 void test_cache_lru_rb_count_add_acquire(void)
