@@ -420,6 +420,13 @@ void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style
     tr->time = time;
     tr->delay = delay;
     tr->user_data = user_data;
+    tr->type = LV_STYLE_TRANSITION_TYPE_STATE;
+}
+
+void lv_style_transition_dsc_set_type(lv_style_transition_dsc_t * tr, lv_style_transition_type_t type)
+{
+    LV_CHECK_ARG(tr != NULL, return);
+    tr->type = (uint8_t)type;
 }
 
 lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)

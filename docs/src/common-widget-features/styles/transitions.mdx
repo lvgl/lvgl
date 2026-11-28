@@ -1,33 +1,64 @@
 ---
 title: Transitions
-description: "By default, when a Widget changes state (e.g."
+description: "Animate style changes, e.g. when a Widget changes state, instead of applying them immediately."
 ---
 
 ## Overview
 
 By default, when a Widget changes state the new properties are applied immediately.
-A transition instead animates the change — e.g. on press a button's background color
+A transition instead animates the change. For example, on press a button's background color
 fades to the pressed color over 300 ms.
 
 <LvglExample name="lv_example_style_transition" path="styles/lv_example_style_transition" />
 
-Transition parameters are stored in the style and set per state — the duration, delay,
-animation path (easing function) and the list of properties to animate. Defining them
-per state controls each direction independently: a 100 ms time in the pressed state
+Transition parameters are stored in the style to describe the duration, delay,
+animation path (easing function) and the list of properties to animate, for each state.
+
+Defining them per state controls each direction independently: a 100 ms time in the pressed state
 and 500 ms in the default state enters the pressed look quickly and returns slowly.
+
+In general, the transition descriptor is taken from the styles applied *after* the change.
+For example, removing the style that holds the transition changes the properties immediately.
+
+Transitions are not started before the Widget is rendered for the first time, so the
+initial styles are applied immediately.
+
+If a property is changed while its transition is running, the new transition continues
+from the currently shown value.
+
+## Usage
 
 To describe a transition, an <ApiLink name="lv_style_transition_dsc_t" /> variable needs to be
 initialized and added to a style:
 
 ```c
-/* Only its pointer is saved so must static, global or dynamically allocated */
+/* Only its pointer is saved so it must be static, global or dynamically allocated */
 static const lv_style_prop_t trans_props[] = {
                                             LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
                                             0, /* End marker */
 };
 
 static lv_style_transition_dsc_t trans1;
-lv_style_transition_dsc_init(&trans1, trans_props, lv_anim_path_ease_out, duration_ms, delay_ms);
+lv_style_transition_dsc_init(&trans1, trans_props, lv_anim_path_ease_out, duration_ms, delay_ms, NULL);
 
 lv_style_set_transition(&style1, &trans1);
 ```
+
+## Transition types
+
+By default, transitions are started only by state changes. The `type` of the
+transition descriptor selects which kinds of style changes start it:
+
+- `LV_STYLE_TRANSITION_TYPE_STATE`: the state of the Widget has changed (default)
+- `LV_STYLE_TRANSITION_TYPE_LOCAL`: a local style property was set or removed,
+  e.g. with `lv_obj_set_style_bg_color()` or <ApiLink name="lv_obj_bind_style_prop" />
+- `LV_STYLE_TRANSITION_TYPE_STYLE`: a style was added, removed, replaced, enabled or disabled,
+  e.g. with <ApiLink name="lv_obj_add_style" /> or <ApiLink name="lv_obj_bind_style" />
+- `LV_STYLE_TRANSITION_TYPE_ALL`: all of the above
+
+The values can be ORed:
+
+```c
+lv_style_transition_dsc_set_type(&trans1, LV_STYLE_TRANSITION_TYPE_STATE | LV_STYLE_TRANSITION_TYPE_LOCAL);
+```
+

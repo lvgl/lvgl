@@ -25,7 +25,6 @@
 #define MY_CLASS (&lv_obj_class)
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
-#define STYLE_TRANSITION_MAX 32
 
 /**********************
  *      TYPEDEFS
@@ -62,7 +61,6 @@ static void lv_obj_draw(lv_event_t * e);
 static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
-static void obj_transition_states(lv_obj_t * obj, lv_state_t prev_state, lv_state_t new_state);
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
 static void lv_obj_children_add_state(lv_obj_t * obj, lv_state_t state);
 static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state);
@@ -1793,7 +1791,7 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
         return;
     }
 
-    obj_transition_states(obj, prev_state, new_state);
+    lv_obj_style_start_state_transitions(obj, prev_state, new_state);
 
     if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW && changed_part == LV_PART_SCROLLBAR) {
         /*A redraw-only change confined to the scrollbar: refresh just that part.
@@ -1815,60 +1813,6 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     }
 
     lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
-}
-
-static void obj_transition_states(lv_obj_t * obj, lv_state_t prev_state, lv_state_t new_state)
-{
-
-    lv_obj_style_transition_dsc_t * ts = lv_malloc(sizeof(lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
-    LV_ASSERT_MALLOC(ts);
-    if(!ts) {
-        LV_LOG_WARN("No memory to compute state transitions");
-        return;
-    }
-    uint32_t tsi = 0;
-    uint32_t i;
-    for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
-        lv_obj_style_t * obj_style = &obj->styles[i];
-        lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
-        lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
-        if(state_act & (~new_state)) continue; /*Skip unrelated styles*/
-        if(obj_style->is_trans) continue;
-
-        lv_style_value_t v;
-        if(lv_style_get_prop_internal(obj_style->style, LV_STYLE_TRANSITION, &v) != LV_STYLE_RES_FOUND) continue;
-        const lv_style_transition_dsc_t * tr = v.ptr;
-
-        /*Add the props to the set if not added yet or added but with smaller weight*/
-        uint32_t j;
-        for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
-            uint32_t t;
-            for(t = 0; t < tsi; t++) {
-                lv_style_selector_t selector = ts[t].selector;
-                lv_state_t state_ts = lv_obj_style_get_selector_state(selector);
-                lv_part_t part_ts = lv_obj_style_get_selector_part(selector);
-                if(ts[t].prop == tr->props[j] && part_ts == part_act && state_ts >= state_act) break;
-            }
-
-            /*If not found  add it*/
-            if(t == tsi) {
-                ts[tsi].time = tr->time;
-                ts[tsi].delay = tr->delay;
-                ts[tsi].path_cb = tr->path_xcb;
-                ts[tsi].prop = tr->props[j];
-                ts[tsi].user_data = tr->user_data;
-                ts[tsi].selector = obj_style->selector;
-                tsi++;
-            }
-        }
-    }
-
-    for(i = 0; i < tsi; i++) {
-        lv_part_t part_act = lv_obj_style_get_selector_part(ts[i].selector);
-        lv_obj_style_create_transition(obj, part_act, prev_state, new_state, &ts[i]);
-    }
-
-    lv_free(ts);
 }
 
 /**
