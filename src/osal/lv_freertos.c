@@ -32,10 +32,12 @@
 
 /* ESP-IDF does not route the FreeRTOS trace hooks to lv_freertos_task_switch_in/out(),
  * so read the idle tasks' run time counters instead (ESP-IDF 5.2+). */
-#if defined(ESP_PLATFORM) && CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS && !CONFIG_FREERTOS_SMP && \
-    ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 2, 0)
-    #define LV_FREERTOS_IDLE_FROM_RUN_TIME_STATS 1
-#else
+#if defined(ESP_PLATFORM)
+    #if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS && !CONFIG_FREERTOS_SMP && ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 2, 0)
+        #define LV_FREERTOS_IDLE_FROM_RUN_TIME_STATS 1
+    #endif
+#endif
+#ifndef LV_FREERTOS_IDLE_FROM_RUN_TIME_STATS
     #define LV_FREERTOS_IDLE_FROM_RUN_TIME_STATS 0
 #endif
 
